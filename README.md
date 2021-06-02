@@ -1,3 +1,5 @@
-# ui
+# Project Example
 
-user interface for project-example
+code templates for getto projects
+
+-   [example site](https://example.getto.systems)
