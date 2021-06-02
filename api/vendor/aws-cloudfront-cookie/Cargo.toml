@@ -9,6 +9,7 @@ base64 = "0.13"
 ring = "0.16"
 rsa = "0.4"
 sha-1 = "0.9"
+sha2 = "0.9"
 digest = "0.9"
 pem = "0.8"
 serde = { version = "1", features = ["derive"] }

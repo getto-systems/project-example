@@ -2,6 +2,7 @@ const headers = {
   "strict-transport-security": "max-age=31536000",
   "content-security-policy": [
     "default-src 'none'",
+    "child-src 'self'",
     "object-src 'none'",
     "base-uri 'none'",
     "form-action 'self'",
