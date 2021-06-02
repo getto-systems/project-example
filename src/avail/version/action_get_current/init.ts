@@ -1,4 +1,4 @@
-import { env } from "../../../y_environment/env"
+import { env } from "../../../y_environment/_ui/env"
 
 import { initGetCurrentVersionResource } from "./impl"
 import { initGetCurrentVersionCoreAction } from "./core/impl"

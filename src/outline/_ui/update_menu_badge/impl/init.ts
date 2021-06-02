@@ -1,4 +1,4 @@
-import { env } from "../../../../y_environment/env"
+import { env } from "../../../../y_environment/_ui/env"
 
 import { newAuthzRepositoryPod } from "../../../../auth/auth_ticket/_ui/kernel/infra/repository/authz"
 import { newGetMenuBadgeRemote } from "../../kernel/infra/remote/get_menu_badge/core"

@@ -1,4 +1,4 @@
-import { env } from "../../../../../../y_environment/env"
+import { env } from "../../../../../../y_environment/_ui/env"
 import { Authz_pb } from "../../../y_protobuf/db_pb.js"
 
 import { convertRepository } from "../../../../../../../ui/vendor/getto-application/infra/repository/helper"

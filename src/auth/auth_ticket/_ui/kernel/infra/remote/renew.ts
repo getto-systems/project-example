@@ -1,4 +1,4 @@
-import { env } from "../../../../../../y_environment/env"
+import { env } from "../../../../../../y_environment/_ui/env"
 import { AuthenticateResponse_pb } from "../../../../../_ui/y_protobuf/api_pb.js"
 
 import {
