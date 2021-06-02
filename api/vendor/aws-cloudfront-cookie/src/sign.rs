@@ -12,7 +12,7 @@ use ring::{
 use rsa::{Hash, PaddingScheme, RSAPrivateKey};
 use serde_json::{to_string, Error as SerdeJsonError};
 use sha1::{Digest, Sha1};
-use sha2::Sha512;
+use sha2::{Sha256, Sha512};
 
 use crate::data::{Policy, SignedContent};
 
@@ -32,9 +32,9 @@ impl Key {
     pub fn sign(&self, policy: Policy) -> Result<SignedContent, SignError> {
         let policy = to_string(&policy).map_err(SignError::SerializeError)?;
 
-        let padding = PaddingScheme::new_pkcs1v15_sign(Some(Hash::SHA2_512));
+        let padding = PaddingScheme::new_pkcs1v15_sign(Some(Hash::SHA2_256));
 
-        let signature = Sha512::new().chain(policy.as_bytes()).finalize();
+        let signature = Sha256::new().chain(policy.as_bytes()).finalize();
 
         let signature = self
             .private_key
