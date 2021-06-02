@@ -28,7 +28,7 @@ fn sign() {
     let expires = Utc::now();
     let policy = CloudfrontPolicy::from_resource(resource.into(), expires.timestamp());
 
-    let content = key.sign_sha1(policy)
+    let content = key.sign(policy)
         .expect("failed to sign");
 
     println!("policy: {}", content.policy);

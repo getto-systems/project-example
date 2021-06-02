@@ -5,7 +5,7 @@ use std::{
 
 use base64::{encode_config, STANDARD};
 use digest::Digest;
-use rsa::{Hash, PaddingScheme, RSAPrivateKey, errors::Error as RsaError};
+use rsa::{errors::Error as RsaError, Hash, PaddingScheme, RSAPrivateKey};
 use serde_json::{to_string, Error as SerdeJsonError};
 use sha1::Sha1;
 
@@ -22,13 +22,10 @@ impl Key {
 }
 
 impl Key {
-    pub fn sign_sha1(&self, policy: Policy) -> Result<SignedContent, KeyError> {
+    pub fn sign(&self, policy: Policy) -> Result<SignedContent, KeyError> {
         let policy = to_string(&policy).map_err(KeyError::SerializeError)?;
 
-        let padding = PaddingScheme::new_pkcs1v15_sign(Some(Hash::SHA1));
-
-        let hash = Sha1::new().chain(policy.as_bytes()).finalize();
-
+        let (padding, hash) = hash_sha1(policy.as_bytes());
         let signature = self
             .private_key
             .sign(padding, hash.as_ref())
@@ -39,6 +36,13 @@ impl Key {
             signature: cloudfront_base64(signature),
         })
     }
+}
+
+fn hash_sha1(message: &[u8]) -> (PaddingScheme, impl AsRef<[u8]>) {
+    (
+        PaddingScheme::new_pkcs1v15_sign(Some(Hash::SHA1)),
+        Sha1::new().chain(message).finalize(),
+    )
 }
 
 fn cloudfront_base64(source: impl AsRef<[u8]>) -> String {
