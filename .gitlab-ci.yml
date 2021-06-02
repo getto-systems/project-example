@@ -89,7 +89,7 @@ release-ui:
   stage: release
   only:
     refs:
-      - release@getto-systems-base/projects/example/ui
+      - release@getto-systems-base/projects/example
     changes:
       - ui/VERSION
   except:
@@ -109,7 +109,7 @@ release_deploy-ui:
   stage: release_deploy
   only:
     refs:
-      - release@getto-systems-base/projects/example/ui
+      - release@getto-systems-base/projects/example
     changes:
       - ui/VERSION
   except:
@@ -131,7 +131,7 @@ release_success-ui:
   stage: release_notify
   only:
     refs:
-      - release@getto-systems-base/projects/example/ui
+      - release@getto-systems-base/projects/example
     changes:
       - ui/VERSION
   except:
@@ -153,7 +153,7 @@ release_failure-ui:
   stage: release_notify
   only:
     refs:
-      - release@getto-systems-base/projects/example/ui
+      - release@getto-systems-base/projects/example
     changes:
       - ui/VERSION
   except:
@@ -201,7 +201,7 @@ release-api:
   stage: release
   only:
     refs:
-      - release@getto-systems-base/projects/example/ui
+      - release@getto-systems-base/projects/example
     changes:
       - api/VERSION
   except:
@@ -221,7 +221,7 @@ release_build-api:
   stage: release_build
   only:
     refs:
-      - release@getto-systems-base/projects/example/ui
+      - release@getto-systems-base/projects/example
     changes:
       - api/VERSION
   except:
@@ -245,7 +245,7 @@ release_deploy-api:
   stage: release_deploy
   only:
     refs:
-      - release@getto-systems-base/projects/example/ui
+      - release@getto-systems-base/projects/example
     changes:
       - api/VERSION
   except:
@@ -264,7 +264,7 @@ release_success-api:
   stage: release_notify
   only:
     refs:
-      - release@getto-systems-base/projects/example/ui
+      - release@getto-systems-base/projects/example
     changes:
       - api/VERSION
   except:
@@ -286,7 +286,7 @@ release_failure-api:
   stage: release_notify
   only:
     refs:
-      - release@getto-systems-base/projects/example/ui
+      - release@getto-systems-base/projects/example
     changes:
       - api/VERSION
   except:

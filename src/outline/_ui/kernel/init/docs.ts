@@ -1,4 +1,4 @@
-import { env } from "../../../../y_environment/env"
+import { env } from "../../../../y_environment/_ui/env"
 
 import { lnir } from "../../../../z_details/_ui/icon/line_icon"
 

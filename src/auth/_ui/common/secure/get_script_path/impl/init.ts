@@ -1,4 +1,4 @@
-import { env } from "../../../../../../y_environment/env"
+import { env } from "../../../../../../y_environment/_ui/env"
 import { newLocationDetecter } from "../../../../../../../ui/vendor/getto-application/location/init"
 
 import { detectPathname } from "./core"
