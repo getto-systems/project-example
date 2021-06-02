@@ -1,0 +1,11 @@
+server {
+  listen      8443 ssl;
+  server_name dev-example-api.$DOMAIN;
+
+  ssl_certificate     ${TLS_CERT};
+  ssl_certificate_key ${TLS_KEY};
+
+  location / {
+    proxy_pass http://${GETTO_EXAMPLE_API_DEV_IP}:${GETTO_EXAMPLE_API_PORT};
+  }
+}

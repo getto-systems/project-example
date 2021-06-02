@@ -1,0 +1,11 @@
+@font-face {
+  font-family: minmoji;
+  src: url('../fonts/minmoji/minmoji.eot');
+  src: local('minmoji'),
+    url('../fonts/minmoji/minmoji.woff') format('woff'),
+    url('../fonts/minmoji/minmoji.ttf') format('opentype');
+}
+
+body {
+  font-family: minmoji, sans-serif !important;
+}

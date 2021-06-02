@@ -1,0 +1,3 @@
+syntax = "proto3";
+
+message Season_pb { int32 year = 1; }

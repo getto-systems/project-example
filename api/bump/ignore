@@ -1,0 +1,15 @@
+/*
+*.ts
+*.js
+
+!/src/
+
+!/api/
+/api/*
+!/api/details
+!/api/vendor
+
+!/ui/
+/ui/*
+!/ui/details
+!/ui/vendor

@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+message MenuExpand_pb {
+  repeated Path paths = 1;
+
+  message Path { repeated string labels = 1; }
+}

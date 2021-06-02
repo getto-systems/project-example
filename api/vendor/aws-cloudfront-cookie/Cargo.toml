@@ -1,0 +1,12 @@
+[package]
+name = "aws-cloudfront-cookie"
+version = "0.24.0-api"
+authors = ["shun <shun.fix9@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+base64 = "0.13"
+ring = "0.16"
+pem = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

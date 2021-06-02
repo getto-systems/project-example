@@ -1,0 +1,51 @@
+{
+    "folders": [
+        {
+            "path": "src"
+        },
+        {
+            "name": "api/vendor",
+            "path": "api/vendor"
+        },
+        {
+            "name": "api/setup",
+            "path": "api/setup"
+        },
+        {
+            "name": "api/ci",
+            "path": "api/ci"
+        },
+        {
+            "name": "ui/vendor",
+            "path": "ui/vendor"
+        },
+        {
+            "name": "ui/css",
+            "path": "ui/css"
+        },
+        {
+            "name": "ui/public",
+            "path": "ui/public"
+        },
+        {
+            "name": "ui/secure",
+            "path": "ui/secure"
+        },
+        {
+            "name": "ui/env",
+            "path": "ui/env"
+        },
+        {
+            "name": "ui/setup",
+            "path": "ui/setup"
+        },
+        {
+            "name": "ui/config",
+            "path": "ui/config"
+        },
+        {
+            "name": "ui/ci",
+            "path": "ui/ci"
+        }
+    ]
+}

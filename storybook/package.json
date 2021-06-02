@@ -1,0 +1,24 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "npm run cleanup && npm run setup && npm run build-storybook && npm run cleanup",
+    "setup": "cp -a ../src . && mkdir ui && cp -a ../ui/vendor ui",
+    "cleanup": "rm -rf src ui",
+    "build-storybook": "build-storybook -o ../ui/public/dist/storybook/"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@storybook/addon-actions": "^6.1.21",
+    "@storybook/addon-essentials": "^6.1.21",
+    "@storybook/addon-links": "^6.1.21",
+    "@storybook/preact": "^6.1.21",
+    "babel-loader": "^8.2.2",
+    "htm": "^3.0.4",
+    "preact": "^10.5.13",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "typescript": "^4.2.3"
+  }
+}

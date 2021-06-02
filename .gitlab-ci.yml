@@ -1,0 +1,305 @@
+image: node:15.12.0-buster
+
+stages:
+  - test
+  - bump_version
+  - release
+  - release_build
+  - release_deploy
+  - release_notify
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  TRELLIS_GIT_POST: https://trellis.getto.systems/git/post/1.5.2
+  TRELLIS_CI_BUMP_VERSION: https://trellis.getto.systems/ci/bump-version/1.14.3
+  TRELLIS_PSYCHER_GETTO: https://trellis.getto.systems/psycher/getto/2.7.2
+  BUMP_MAINT_REPO: .bump-maint-repo
+  UI_BUMP_VERSION_FILE: ui/VERSION
+  UI_BUMP_IGNORE_FILE: ui/bump/ignore
+  UI_BUMP_MAJOR_FILE: ui/bump/major
+  UI_BUMP_SCRIPT: ui/bump/bump.sh
+  API_BUMP_VERSION_FILE: api/VERSION
+  API_BUMP_IGNORE_FILE: api/bump/ignore
+  API_BUMP_MAJOR_FILE: api/bump/major
+  API_BUMP_SCRIPT: api/bump/bump.sh
+
+test-ui:
+  stage: test
+  only:
+    refs:
+      - merge_requests
+    changes:
+      - "src/**/*.ts"
+      - "ui/details/**/*.ts"
+      - "ui/vendor/**/*.ts"
+
+  variables:
+    SECURE_SERVER_URL: https://secure.example.com
+    API_SERVER_URL: https://api.example.com
+
+  before_script:
+    - npm clean-install
+  script:
+    - npm test
+    - npm run build
+
+test-api:
+  stage: test
+  only:
+    refs:
+      - merge_requests
+    changes:
+      - "src/**/*.rs"
+      - "api/details/**/*.rs"
+      - "api/vendor/**/*.rs"
+
+  image: rust:1-buster
+
+  script:
+    - "cargo build"
+    - ": cargo test"
+
+bump_version-ui:
+  stage: bump_version
+  only:
+    refs:
+      - triggers
+    variables:
+      - $RELEASE_UI
+
+  image: buildpack-deps:buster-scm
+
+  variables:
+    BUMP_VERSION_SUFFIX: "-ui"
+    BUMP_VERSION_FILE: $UI_BUMP_VERSION_FILE
+    BUMP_IGNORE_FILE: $UI_BUMP_IGNORE_FILE
+    BUMP_MAJOR_FILE: $UI_BUMP_MAJOR_FILE
+    BUMP_SCRIPT: $UI_BUMP_SCRIPT
+
+  before_script:
+    - git config user.email admin@getto.systems
+    - git config user.name getto
+    - curl $TRELLIS_GIT_POST/setup.sh | sh -s -- ./vendor/getto-systems
+    - export PATH=$PATH:./vendor/getto-systems/git-post/bin
+  script:
+    - curl $TRELLIS_CI_BUMP_VERSION/bump_version.sh | bash
+    - curl $TRELLIS_CI_BUMP_VERSION/request.sh | bash -s -- ./ui/bump/message.sh
+
+release-ui:
+  stage: release
+  only:
+    refs:
+      - release@getto-systems-base/projects/example/ui
+    changes:
+      - ui/VERSION
+  except:
+    refs:
+      - triggers
+      - schedules
+
+  image: buildpack-deps:buster-scm
+
+  variables:
+    BUMP_VERSION_FILE: $UI_BUMP_VERSION_FILE
+
+  script:
+    - curl $TRELLIS_CI_BUMP_VERSION/push_tags.sh | sh
+
+release_deploy-ui:
+  stage: release_deploy
+  only:
+    refs:
+      - release@getto-systems-base/projects/example/ui
+    changes:
+      - ui/VERSION
+  except:
+    refs:
+      - triggers
+      - schedules
+  when: on_success
+
+  variables:
+    BUILD_ENV: production
+  before_script:
+    - apt-get update && apt-get install -y python3-pip
+    - pip3 install awscli
+    - npm clean-install
+  script:
+    - ./ui/ci/deploy.sh
+
+release_success-ui:
+  stage: release_notify
+  only:
+    refs:
+      - release@getto-systems-base/projects/example/ui
+    changes:
+      - ui/VERSION
+  except:
+    refs:
+      - triggers
+      - schedules
+  when: on_success
+
+  image: buildpack-deps:buster-curl
+
+  before_script:
+    - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
+    - export channel=$SLACK_CHANNEL
+    - export version=example:$(cat $UI_BUMP_VERSION_FILE)
+  script:
+    - curl $TRELLIS_PSYCHER_GETTO/notify-release-success.sh | sh -s -- $url $channel $version
+
+release_failure-ui:
+  stage: release_notify
+  only:
+    refs:
+      - release@getto-systems-base/projects/example/ui
+    changes:
+      - ui/VERSION
+  except:
+    refs:
+      - triggers
+      - schedules
+  when: on_failure
+
+  image: buildpack-deps:buster-curl
+
+  before_script:
+    - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
+    - export channel=$SLACK_CHANNEL
+    - export version=example:$(cat $UI_BUMP_VERSION_FILE)
+  script:
+    - curl $TRELLIS_PSYCHER_GETTO/notify-release-failure.sh | sh -s -- $url $channel $version
+
+bump_version-api:
+  stage: bump_version
+  only:
+    refs:
+      - triggers
+    variables:
+      - $RELEASE_API
+
+  image: buildpack-deps:buster-scm
+
+  variables:
+    BUMP_VERSION_SUFFIX: "-api"
+    BUMP_VERSION_FILE: $API_BUMP_VERSION_FILE
+    BUMP_IGNORE_FILE: $API_BUMP_IGNORE_FILE
+    BUMP_MAJOR_FILE: $API_BUMP_MAJOR_FILE
+    BUMP_SCRIPT: $API_BUMP_SCRIPT
+
+  before_script:
+    - git config user.email admin@getto.systems
+    - git config user.name getto
+    - curl $TRELLIS_GIT_POST/setup.sh | sh -s -- ./vendor/getto-systems
+    - export PATH=$PATH:./vendor/getto-systems/git-post/bin
+  script:
+    - curl $TRELLIS_CI_BUMP_VERSION/bump_version.sh | bash
+    - curl $TRELLIS_CI_BUMP_VERSION/request.sh | bash -s -- ./api/bump/message.sh
+
+release-api:
+  stage: release
+  only:
+    refs:
+      - release@getto-systems-base/projects/example/ui
+    changes:
+      - api/VERSION
+  except:
+    refs:
+      - triggers
+      - schedules
+
+  image: buildpack-deps:buster-scm
+
+  variables:
+    BUMP_VERSION_FILE: $API_BUMP_VERSION_FILE
+
+  script:
+    - curl $TRELLIS_CI_BUMP_VERSION/push_tags.sh | sh
+
+release_build-api:
+  stage: release_build
+  only:
+    refs:
+      - release@getto-systems-base/projects/example/ui
+    changes:
+      - api/VERSION
+  except:
+    refs:
+      - triggers
+      - schedules
+
+  image: docker:stable
+
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+
+  services:
+    - docker:dind
+
+  script:
+    - api/ci/build.sh
+
+release_deploy-api:
+  stage: release_deploy
+  only:
+    refs:
+      - release@getto-systems-base/projects/example/ui
+    changes:
+      - api/VERSION
+  except:
+    refs:
+      - triggers
+      - schedules
+  when: on_success
+
+  image: google/cloud-sdk:latest
+
+  script:
+    - api/ci/deploy.sh
+
+
+release_success-api:
+  stage: release_notify
+  only:
+    refs:
+      - release@getto-systems-base/projects/example/ui
+    changes:
+      - api/VERSION
+  except:
+    refs:
+      - triggers
+      - schedules
+  when: on_success
+
+  image: buildpack-deps:buster-curl
+
+  before_script:
+    - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
+    - export channel=$SLACK_CHANNEL
+    - export version=example:$(cat $API_BUMP_VERSION_FILE)
+  script:
+    - curl $TRELLIS_PSYCHER_GETTO/notify-release-success.sh | sh -s -- $url $channel $version
+
+release_failure-api:
+  stage: release_notify
+  only:
+    refs:
+      - release@getto-systems-base/projects/example/ui
+    changes:
+      - api/VERSION
+  except:
+    refs:
+      - triggers
+      - schedules
+  when: on_failure
+
+  image: buildpack-deps:buster-curl
+
+  before_script:
+    - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
+    - export channel=$SLACK_CHANNEL
+    - export version=example:$(cat $API_BUMP_VERSION_FILE)
+  script:
+    - curl $TRELLIS_PSYCHER_GETTO/notify-release-failure.sh | sh -s -- $url $channel $version

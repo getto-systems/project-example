@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+message GetMenuBadgeResult_pb {
+  repeated MenuBadgeItem badge = 1;
+
+  message MenuBadgeItem {
+    string path = 1;
+    int32 count = 2;
+  }
+}

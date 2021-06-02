@@ -1,0 +1,9 @@
+/*
+*.rs
+
+!/src/
+
+!/ui/
+/ui/*
+!/ui/details
+!/ui/vendor
