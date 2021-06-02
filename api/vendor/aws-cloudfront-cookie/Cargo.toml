@@ -1,6 +1,6 @@
 [package]
 name = "aws-cloudfront-cookie"
-version = "0.26.0-api"
+version = "0.27.0-api"
 authors = ["shun <shun.fix9@gmail.com>"]
 edition = "2018"
 
