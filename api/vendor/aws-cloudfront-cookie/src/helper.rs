@@ -4,11 +4,7 @@ use std::{
 };
 
 use pem::{parse, PemError};
-use ring::{
-    error::KeyRejected,
-    signature::{RsaKeyPair, RSA_PKCS1_SHA512},
-};
-use rsa::RSAPrivateKey;
+use rsa::{errors::Error as RsaError, RSAPrivateKey};
 
 use crate::{
     data::{Condition, ConditionDateLessThan, Policy, Statement},
@@ -16,14 +12,11 @@ use crate::{
 };
 
 impl Key {
-    pub fn pkcs1_sha512_from_pem(private_key_pem: impl AsRef<[u8]>) -> Result<Self, KeyParseError> {
+    pub fn from_pem(private_key_pem: impl AsRef<[u8]>) -> Result<Self, KeyParseError> {
         let pem = parse(private_key_pem).map_err(KeyParseError::PemError)?;
 
         let private_key =
             RSAPrivateKey::from_pkcs1(pem.contents.as_ref()).map_err(KeyParseError::KeyError)?;
-
-        // let key_pair =
-        //     RsaKeyPair::from_der(pem.contents.as_ref()).map_err(KeyParseError::KeyRejected)?;
 
         Ok(Self::new(private_key))
     }
@@ -32,8 +25,7 @@ impl Key {
 #[derive(Debug)]
 pub enum KeyParseError {
     PemError(PemError),
-    KeyError(rsa::errors::Error)
-    // KeyRejected(KeyRejected),
+    KeyError(RsaError),
 }
 
 impl Display for KeyParseError {

@@ -54,7 +54,7 @@ pub fn new_auth_outside_feature(env: &Env, secret: &impl Secret) -> AuthOutsideF
                 encoding_key: JwtTokenEncoderKey::ec(secret.load("API_PRIVATE_KEY")),
             },
             cdn: AuthOutsideCdnSecret {
-                key: CloudfrontKey::pkcs1_sha512_from_pem(secret.load("CLOUDFRONT_PRIVATE_KEY"))
+                key: CloudfrontKey::from_pem(secret.load("CLOUDFRONT_PRIVATE_KEY"))
                     .expect("failed to parse cloudfront private key"),
             },
         },

@@ -21,7 +21,7 @@ use chrono::Utc;
 use aws_cloudfront_cookie::{CloudfrontKey, CloudfrontPolicy};
 
 fn sign() {
-    let key = CloudfrontKey::pkcs1_sha512_from_pem(PEM)
+    let key = CloudfrontKey::from_pem(PEM)
         .expect("failed to parse cloudfront private key");
 
     let resource = "https://secure.example.com/*";

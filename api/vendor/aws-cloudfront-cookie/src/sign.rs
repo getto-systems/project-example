@@ -4,21 +4,14 @@ use std::{
 };
 
 use base64::{encode_config, STANDARD};
-use ring::{
-    error::Unspecified,
-    rand::SystemRandom,
-    signature::{RsaEncoding, RsaKeyPair},
-};
-use rsa::{Hash, PaddingScheme, RSAPrivateKey};
+use digest::Digest;
+use rsa::{errors::Error as RsaError, Hash, PaddingScheme, RSAPrivateKey};
 use serde_json::{to_string, Error as SerdeJsonError};
-use sha1::{Digest, Sha1};
-use sha2::{Sha256, Sha512};
+use sha1::Sha1;
 
 use crate::data::{Policy, SignedContent};
 
 pub struct Key {
-    // key_pair: RsaKeyPair,
-    // padding_algorithm: &'static dyn RsaEncoding,
     private_key: RSAPrivateKey,
 }
 
@@ -29,35 +22,27 @@ impl Key {
 }
 
 impl Key {
-    pub fn sign(&self, policy: Policy) -> Result<SignedContent, SignError> {
-        let policy = to_string(&policy).map_err(SignError::SerializeError)?;
+    pub fn sign(&self, policy: Policy) -> Result<SignedContent, KeyError> {
+        let policy = to_string(&policy).map_err(KeyError::SerializeError)?;
 
-        let padding = PaddingScheme::new_pkcs1v15_sign(Some(Hash::SHA2_256));
-
-        let signature = Sha256::new().chain(policy.as_bytes()).finalize();
-
+        let (padding, hash) = hash_sha1(policy.as_bytes());
         let signature = self
             .private_key
-            .sign(padding, signature.as_ref())
-            .map_err(|err| SignError::SignError(err))?;
-
-        // let random_generator = SystemRandom::new();
-
-        // let mut signature = vec![0; self.key_pair.public_modulus_len()];
-        // self.key_pair
-        //     .sign(
-        //         self.padding_algorithm,
-        //         &random_generator,
-        //         policy.as_bytes(),
-        //         &mut signature,
-        //     )
-        //     .map_err(SignError::SignError)?;
+            .sign(padding, hash.as_ref())
+            .map_err(|err| KeyError::SignError(err))?;
 
         Ok(SignedContent {
             policy: cloudfront_base64(policy),
             signature: cloudfront_base64(signature),
         })
     }
+}
+
+fn hash_sha1(message: &[u8]) -> (PaddingScheme, impl AsRef<[u8]>) {
+    (
+        PaddingScheme::new_pkcs1v15_sign(Some(Hash::SHA1)),
+        Sha1::new().chain(message).finalize(),
+    )
 }
 
 fn cloudfront_base64(source: impl AsRef<[u8]>) -> String {
@@ -69,13 +54,12 @@ fn cloudfront_base64(source: impl AsRef<[u8]>) -> String {
 }
 
 #[derive(Debug)]
-pub enum SignError {
+pub enum KeyError {
     SerializeError(SerdeJsonError),
-    SignError(rsa::errors::Error),
-    // SignError(Unspecified),
+    SignError(RsaError),
 }
 
-impl Display for SignError {
+impl Display for KeyError {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::SerializeError(err) => write!(f, "{}", err),
@@ -83,4 +67,4 @@ impl Display for SignError {
         }
     }
 }
-impl Error for SignError {}
+impl Error for KeyError {}
