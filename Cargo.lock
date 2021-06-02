@@ -349,17 +349,15 @@ dependencies = [
 
 [[package]]
 name = "aws-cloudfront-cookie"
-version = "0.25.0-api"
+version = "0.27.0-api"
 dependencies = [
  "base64 0.13.0",
  "digest",
  "pem",
- "ring",
  "rsa",
  "serde",
  "serde_json",
  "sha-1",
- "sha2",
 ]
 
 [[package]]
@@ -526,15 +524,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2df960f5d869b2dd8532793fde43eb5427cceb126c929747a26823ab0eeb536"
 
 [[package]]
-name = "cpufeatures"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ed00c67cb5d0a7d64a44f6ad2668db7e7530311dd53ea79bcd4fb022c64911c8"
-dependencies = [
- "libc",
-]
-
-[[package]]
 name = "cpuid-bool"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -615,7 +604,7 @@ dependencies = [
 
 [[package]]
 name = "example-api"
-version = "0.25.0-api"
+version = "0.27.0-api"
 dependencies = [
  "actix-cors",
  "actix-web",
@@ -800,7 +789,7 @@ dependencies = [
 
 [[package]]
 name = "getto-application"
-version = "0.25.0-api"
+version = "0.27.0-api"
 
 [[package]]
 name = "h2"
@@ -1631,19 +1620,6 @@ name = "sha1"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2579985fda508104f7587689507983eadd6a6e84dd35d6d115361f530916fa0d"
-
-[[package]]
-name = "sha2"
-version = "0.9.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b362ae5752fd2137731f9fa25fd4d9058af34666ca1966fb969119cc35719f12"
-dependencies = [
- "block-buffer",
- "cfg-if 1.0.0",
- "cpufeatures",
- "digest",
- "opaque-debug",
-]
 
 [[package]]
 name = "signal-hook-registry"

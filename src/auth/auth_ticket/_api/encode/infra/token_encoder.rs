@@ -149,7 +149,7 @@ impl<'a> AuthTokenEncoder for CloudfrontTokenEncoder<'a> {
         let policy = CloudfrontPolicy::from_resource(self.resource.into(), expires.timestamp());
         let content = self
             .key
-            .sign(policy)
+            .sign_sha1(policy)
             .map_err(|err| EncodeAuthTokenError::InfraError(format!("sign error: {}", err)))?;
 
         Ok(vec![
