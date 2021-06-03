@@ -17,8 +17,6 @@ pub struct Store {
 
 struct Entry {
     limit: ExpansionLimitDateTime,
-    // TODO データとして持っておかないとまずいと思うんだけどアプリケーションの中でどう使われるのか・・・
-    registered_at: AuthDateTime,
 }
 
 pub struct MemoryAuthTicketRepository<'a> {
@@ -45,7 +43,7 @@ impl<'a> AuthTicketRepository for MemoryAuthTicketRepository<'a> {
     fn register(
         &self,
         id_generator: impl Fn() -> AuthTicketId,
-        registered_at: AuthDateTime,
+        _registered_at: AuthDateTime,
         limit: ExpansionLimitDateTime,
     ) -> Result<AuthTicketId, RepositoryError> {
         let mut store = self.store.lock().unwrap();
@@ -65,13 +63,8 @@ impl<'a> AuthTicketRepository for MemoryAuthTicketRepository<'a> {
                 continue;
             }
 
-            store.ticket.insert(
-                id.as_str().into(),
-                Entry {
-                    registered_at,
-                    limit,
-                },
-            );
+            // 実際のデータベースには registered_at も保存する必要がある
+            store.ticket.insert(id.as_str().into(), Entry { limit });
 
             return Ok(id);
         }
