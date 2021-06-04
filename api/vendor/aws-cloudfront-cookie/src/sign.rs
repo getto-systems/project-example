@@ -19,9 +19,7 @@ impl Key {
     pub fn new(private_key: RSAPrivateKey) -> Self {
         Self { private_key }
     }
-}
 
-impl Key {
     pub fn sign(&self, policy: Policy) -> Result<SignedContent, KeyError> {
         let policy = to_string(&policy).map_err(KeyError::SerializeError)?;
 
