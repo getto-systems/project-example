@@ -2,7 +2,13 @@ import { html } from "htm/preact"
 import { VNode } from "preact"
 
 import { box } from "../../../../ui/vendor/getto-css/preact/design/box"
-import { label_alert, label_info, label_success, label_warning, notice_info } from "../../../../ui/vendor/getto-css/preact/design/highlight"
+import {
+    label_alert,
+    label_info,
+    label_success,
+    label_warning,
+    notice_info,
+} from "../../../../ui/vendor/getto-css/preact/design/highlight"
 import { icon } from "../../../example/_ui/x_preact/design/icon"
 
 import {
@@ -13,13 +19,19 @@ import {
     DocsDomainContent,
     DocsUsecaseContent,
 } from "../../../../ui/vendor/getto-application/docs/data"
-import { field,  } from "../../../../ui/vendor/getto-css/preact/design/form"
+import { field } from "../../../../ui/vendor/getto-css/preact/design/form"
 
-export function domainBox(docs: DocsDomainContent): VNode {
-    return box({
-        title: docs.title,
-        body: [...docs.purpose.map(notice_info), usecase(docs.usecase)],
-    })
+export function domainBox(docs: DocsDomainContent): VNode[] {
+    return [
+        box({
+            title: "目的",
+            body: docs.purpose.map(notice_info),
+        }),
+        box({
+            title: "操作",
+            body: usecase(docs.usecase),
+        }),
+    ]
 
     function usecase(docs: DocsUsecaseContent[]) {
         return html`<section class="paragraph">
@@ -34,11 +46,36 @@ export function domainBox(docs: DocsDomainContent): VNode {
     }
 }
 
-export function usecaseBox(docs: DocsUsecaseContent): VNode {
+export function usecaseAbstractBox(docs: DocsUsecaseContent): VNode {
     return box({
         title: docs.title,
-        body: [...docs.purpose.map(notice_info), action(docs.action)],
+        body: action(docs.action),
     })
+
+    function action(docs: DocsAction[]) {
+        return html`<section class="paragraph">
+            <ul>
+                ${docs.map(li)}
+            </ul>
+        </section>`
+
+        function li(action: DocsAction): VNode {
+            return html`<li>${icon("chevron-right")} ${action.title}</li>`
+        }
+    }
+}
+
+export function usecaseBox(docs: DocsUsecaseContent): VNode[] {
+    return [
+        box({
+            title: "目的",
+            body: docs.purpose.map(notice_info),
+        }),
+        box({
+            title: "操作",
+            body: action(docs.action),
+        }),
+    ]
 
     function action(docs: DocsAction[]) {
         return html`<section class="paragraph">

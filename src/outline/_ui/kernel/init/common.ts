@@ -1,4 +1,4 @@
-import { StaticMenuPath } from "../../../../y_environment/_ui/path"
+import { staticMenuPath, StaticMenuPath } from "../../../../y_environment/_ui/path"
 
 import { LineIcon, lniClass } from "../../../../z_details/_ui/icon/line_icon"
 
@@ -14,4 +14,11 @@ export function category(
 
 export function item(label: string, icon: LineIcon, path: StaticMenuPath): MenuTreeNode {
     return { type: "item", item: { label, icon: lniClass(icon), path } }
+}
+
+export function assertMenuPath(path: string): StaticMenuPath {
+    if (staticMenuPath.filter((staticPath) => staticPath === path).length === 0) {
+        throw new Error(`path is not included in static-path: ${path}`)
+    }
+    return path as StaticMenuPath
 }

@@ -15,7 +15,7 @@ import {
 import { container } from "../../../../ui/vendor/getto-css/preact/design/box"
 
 import { copyright, siteInfo } from "../../../example/site"
-import { domainBox, usecaseBox } from "./helper"
+import { domainBox, usecaseAbstractBox } from "./helper"
 
 import { ApplicationErrorComponent } from "../../../avail/_ui/x_preact/application_error"
 import { LoadMenuEntry } from "../../../outline/_ui/action_load_menu/x_preact/load_menu"
@@ -41,14 +41,14 @@ export function DocsDomainEntry(props: EntryProps): VNode {
 
 type Props = DocsResource & Readonly<{ docs: DocsDomainContent }>
 export function DocsDomainComponent(resource: Props): VNode {
-    useDocumentTitle(resource.docs.title)
+    useDocumentTitle(title())
 
     return appLayout({
         siteInfo,
         header: [],
         main: appMain({
             header: mainHeader([
-                mainTitle(resource.docs.title),
+                mainTitle(title()),
                 h(LoadBreadcrumbListComponent, resource),
             ]),
             body: mainBody(content(resource.docs)),
@@ -56,8 +56,12 @@ export function DocsDomainComponent(resource: Props): VNode {
         }),
         menu: h(LoadMenuEntry, resource),
     })
+
+    function title() {
+        return `${resource.docs.title}概要`
+    }
 }
 
 function content(docs: DocsDomainContent): VNode {
-    return html`${[container(domainBox(docs)), container(docs.usecase.map(usecaseBox))]}`
+    return html`${[container(domainBox(docs)), container(docs.usecase.map(usecaseAbstractBox))]}`
 }
