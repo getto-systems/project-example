@@ -2,9 +2,13 @@ import { env } from "../../../../y_environment/_ui/env"
 
 import { lnir } from "../../../../z_details/_ui/icon/line_icon"
 
-import { category, item } from "./common"
+import { assertMenuPath, category, item } from "./common"
 
-import { MenuContent, MenuPermission } from "../infra"
+import { docs_auth } from "../../../../auth/docs"
+
+import { MenuContent, MenuPermission, MenuTreeNode } from "../infra"
+
+import { DocsDomain } from "../../../../../ui/vendor/getto-application/docs/data"
 
 export function docsMenuContent(): MenuContent {
     return {
@@ -18,10 +22,7 @@ export function docsMenuContent(): MenuContent {
                 item("プライバシーポリシー", lnir("files-alt"), "/docs/privacy-policy.html"),
             ]),
             category("ドキュメント", allow, [
-                item("認証・認可", lnir("files-alt"), "/docs/auth.html"),
-                category("認証・認可", dev, [
-                    item("認証", lnir("files-alt"), "/docs/z-dev/auth/sign.html"),
-                ]),
+                docsMenuNode(docs_auth, "auth"),
                 item("保守・運用", lnir("files-alt"), "/docs/avail.html"),
             ]),
             ...(env.isProduction
@@ -34,6 +35,26 @@ export function docsMenuContent(): MenuContent {
                   ]),
         ],
     }
+}
+
+function docsMenuNode<U, A, D>(domain: DocsDomain<U, A, D>, path: string): MenuTreeNode {
+    return category(domain.title, allow, [
+        item("概要", lnir("files-alt"), assertMenuPath(`/docs/${path}/index.html`)),
+        ...domain.usecase.map((name) => {
+            const usecase = domain.toUsecase(name)
+            const action = usecase.toAction(usecase.title)
+            return item(
+                action.title,
+                lnir("files-alt"),
+                assertMenuPath(
+                    `/docs/${path}/${`${name}`.replaceAll(
+                        /[A-Z]/g,
+                        (char) => `-${char.toLowerCase()}`,
+                    )}.html`,
+                ),
+            )
+        }),
+    ])
 }
 
 const allow: MenuPermission = { type: "allow" }
