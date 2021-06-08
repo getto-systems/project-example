@@ -1,11 +1,28 @@
 import {
     docsAction,
+    docsAction_legacy,
     docsModule,
     docsNote,
     docsSection,
 } from "../../../../../ui/vendor/getto-application/docs/helper"
 
 import { DocsSection } from "../../../../../ui/vendor/getto-application/docs/data"
+
+export const docs_checkAuthTicket = docsAction("認証チケットの確認", ({ item }) => [
+    item(
+        "input",
+        ["認証チケット有効期限", "認証チケット延長トークン"],
+        ["ブラウザに保存されたデータ"],
+    ),
+    item("check", ["認証チケットが有効", "認証チケット延長トークンが有効"]),
+    item(
+        "success",
+        ["画面の読み込み", "認証チケット継続更新の開始"],
+        ["コンテンツアクセストークンが cookie で返される"],
+    ),
+    item("error", ["認証チケット有効期限切れ"], ["ログイン画面へ"]),
+    item("error", ["認証チケット延長トークン無効"], ["ログイン画面へ"]),
+])
 
 export const docs_auth_checkAuthTicket: DocsSection[] = [
     docsSection("認証チケット更新", [
@@ -17,7 +34,7 @@ export const docs_auth_checkAuthTicket_description: DocsSection[] = [
     ...docs_auth_checkAuthTicket,
 
     docsSection("コンテンツのロード", [
-        docsAction(({ request, action, message }) => [
+        docsAction_legacy(({ request, action, message }) => [
             request({
                 from: "http-client",
                 to: "content-server",
@@ -33,7 +50,7 @@ export const docs_auth_checkAuthTicket_description: DocsSection[] = [
         docsNote(["コンテンツトークンの有効期限が切れていた場合は認証チケット更新に移る"]),
     ]),
     docsSection("チケット有効期限更新", [
-        docsAction(({ request, action, validate, message }) => [
+        docsAction_legacy(({ request, action, validate, message }) => [
             request({
                 from: "http-client",
                 to: "api-server",
@@ -63,7 +80,7 @@ export const docs_auth_checkAuthTicket_description: DocsSection[] = [
         docsNote(["検証失敗で認証トークンは失効", "更新失敗の場合はログイン画面に遷移"]),
     ]),
     docsSection("チケット継続更新", [
-        docsAction(({ request, action, validate, message }) => [
+        docsAction_legacy(({ request, action, validate, message }) => [
             request({
                 from: "http-client",
                 to: "api-server",

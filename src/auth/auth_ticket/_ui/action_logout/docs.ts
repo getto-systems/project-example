@@ -1,5 +1,5 @@
 import {
-    docsAction,
+    docsAction_legacy,
     docsModule,
     docsNote,
     docsSection,
@@ -15,7 +15,7 @@ export const docs_auth_logout_description: DocsSection[] = [
     ...docs_auth_logout,
 
     docsSection("認証チケットの無効化", [
-        docsAction(({ request, action, validate, message }) => [
+        docsAction_legacy(({ request, action, validate, message }) => [
             request({
                 from: "http-client",
                 to: "api-server",

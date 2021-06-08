@@ -1,5 +1,5 @@
 import {
-    docsAction,
+    docsAction_legacy,
     docsModule,
     docsNote,
     docsSection,
@@ -17,7 +17,7 @@ export const docs_auth_authenticatePassword_description: DocsSection[] = [
     ...docs_auth_authenticatePassword,
 
     docsSection("ログインID・パスワード入力", [
-        docsAction(({ action, validate }) => [
+        docsAction_legacy(({ action, validate }) => [
             action({
                 on: "http-client",
                 body: [...validate(["ログインID・パスワード"])],
@@ -27,7 +27,7 @@ export const docs_auth_authenticatePassword_description: DocsSection[] = [
         docsNote(["検証失敗の場合はリクエストしない"]),
     ]),
     docsSection("ログインID・パスワード認証", [
-        docsAction(({ request, action, validate, message }) => [
+        docsAction_legacy(({ request, action, validate, message }) => [
             request({
                 from: "http-client",
                 to: "api-server",

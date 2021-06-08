@@ -4,17 +4,15 @@ import { foregroundOutsideFeature } from "../../../../x_outside_feature/_ui/comm
 
 import { newDocsView } from "../../../../docs/action_docs/init"
 
-import { docs_auth, docs_auth_detail, docs_auth_summary } from "../../../../auth/docs"
+import { DocsDomainEntry } from "../../../../docs/action_docs/x_preact/domain"
 
-import { DocsEntry } from "../../../../docs/action_docs/x_preact/docs"
+import { docsDomainContent } from "../../../../../ui/vendor/getto-application/docs/helper"
+import { docs_auth } from "../../../../auth/docs"
 
 render(
-    h(DocsEntry, {
+    h(DocsDomainEntry, {
         view: newDocsView(foregroundOutsideFeature()),
-        docs: {
-            title: "認証・認可",
-            contents: [[[...docs_auth, ...docs_auth_summary]], ...docs_auth_detail],
-        },
+        docs: docsDomainContent(docs_auth),
     }),
     document.body,
 )

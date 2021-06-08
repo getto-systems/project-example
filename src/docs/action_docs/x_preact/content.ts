@@ -15,7 +15,7 @@ import { field } from "../../../../ui/vendor/getto-css/preact/design/form"
 import { icon } from "../../../example/_ui/x_preact/design/icon"
 
 import {
-    DocsAction,
+    DocsAction_legacy,
     DocsActionContent,
     DocsActionTargetType,
     DocsContent,
@@ -167,10 +167,10 @@ function negativeNote(contents: DocsNegativeNote[]): VNodeContent {
         </p>`,
     )
 }
-function action(contents: DocsAction[]): VNodeContent {
+function action(contents: DocsAction_legacy[]): VNodeContent {
     return contents.map(action)
 
-    function action(action: DocsAction): VNode {
+    function action(action: DocsAction_legacy): VNode {
         return field({
             title: title(),
             body: body(action.content.body),
