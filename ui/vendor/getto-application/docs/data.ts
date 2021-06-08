@@ -1,3 +1,61 @@
+export type DocsDomain<U, A, D> = Readonly<{
+    title: string
+    purpose: string[]
+    usecase: U[]
+    toUsecase: DocsUsecaseMap<U, A, D>
+}>
+export type DocsDomainContent = Readonly<{
+    title: string
+    purpose: string[]
+    usecase: DocsUsecaseContent[]
+}>
+export interface DocsUsecaseMap<U, A, D> {
+    (usecase: U): DocsUsecase<A, D>
+}
+
+export type DocsUsecase<A, D> = Readonly<{
+    title: A
+    purpose: string[]
+}> &
+    DocsUsecaseDescription<A, D> &
+    DocsUsecaseDescriptionMap<A, D>
+export type DocsUsecaseContent = Readonly<{
+    title: string
+    purpose: string[]
+    action: DocsAction[]
+    data: DocsData[]
+}>
+export type DocsUsecaseDescription<A, D> = Readonly<{
+    action: A[]
+    data: D[]
+}>
+export type DocsUsecaseDescriptionMap<A, D> = Readonly<{
+    toAction: DocsActionMap<A>
+    toData: DocsDataMap<D>
+}>
+export interface DocsActionMap<A> {
+    (action: A): DocsAction
+}
+export interface DocsDataMap<D> {
+    (data: D): DocsData
+}
+
+export type DocsAction = Readonly<{ title: string; item: DocsActionItem[] }>
+export type DocsActionItem = Readonly<{
+    type: DocsActionItemType
+    content: string[]
+    help: string[]
+}>
+export type DocsActionItemType = "input" | "check" | "success" | "error"
+
+export type DocsData = Readonly<{
+    title: string
+    data: DocsDataDescription[]
+}>
+export type DocsDataDescription = Readonly<{ description: string; help: string[] }>
+
+// TODO 以下削除予定
+
 export type DocsSection = Readonly<{
     type: "normal" | "pending" | "double"
     title: string
@@ -10,13 +68,13 @@ export type DocsContent =
     | Readonly<{ type: "description"; content: DocsDescription[] }>
     | Readonly<{ type: "explanation"; target: DocsActionTargetType[] }>
     | Readonly<{ type: "negativeNote"; content: DocsNegativeNote[] }>
-    | Readonly<{ type: "action"; content: DocsAction[] }>
+    | Readonly<{ type: "action"; content: DocsAction_legacy[] }>
     | Readonly<{ type: "note"; content: string[] }>
 
 export type DocsDescription = Readonly<{ title: string; body: string[]; help: string[] }>
 export type DocsNegativeNote = Readonly<{ message: string; help: string }>
 
-export type DocsAction =
+export type DocsAction_legacy =
     | Readonly<{ type: "request"; content: DocsAction_request }>
     | Readonly<{ type: "action"; content: DocsAction_action }>
 

@@ -1,5 +1,5 @@
 import {
-    docsAction,
+    docsAction_legacy,
     docsDescription,
     docsModule,
     docsNote,
@@ -52,7 +52,7 @@ export const docs_auth_resetPassword_description: DocsSection[] = [
     ...docs_auth_resetPassword,
 
     docsSection("ログインID入力", [
-        docsAction(({ action, validate }) => [
+        docsAction_legacy(({ action, validate }) => [
             action({
                 on: "http-client",
                 body: [...validate(["ログインID"])],
@@ -62,7 +62,7 @@ export const docs_auth_resetPassword_description: DocsSection[] = [
         docsNote(["検証失敗の場合はリクエストしない"]),
     ]),
     docsSection("ログインIDでリセットトークンを発行", [
-        docsAction(({ request, action, validate, message }) => [
+        docsAction_legacy(({ request, action, validate, message }) => [
             request({
                 from: "http-client",
                 to: "api-server",
@@ -84,7 +84,7 @@ export const docs_auth_resetPassword_description: DocsSection[] = [
         docsNote(["ログインIDに宛先が紐づいていない場合、リセットトークンは発行できない"]),
     ]),
     docsSection("リセットトークン送信状況のチェック", [
-        docsAction(({ request, action, validate, message }) => [
+        docsAction_legacy(({ request, action, validate, message }) => [
             request({
                 from: "http-client",
                 to: "api-server",
@@ -109,7 +109,7 @@ export const docs_auth_resetPassword_description: DocsSection[] = [
         docsNote(["セッションIDが存在しないならエラー", "セッション完了なら完了済みエラー"]),
     ]),
     docsSection("ログインID・パスワード入力", [
-        docsAction(({ request, validate }) => [
+        docsAction_legacy(({ request, validate }) => [
             request({
                 from: "http-client",
                 to: "api-server",
@@ -120,7 +120,7 @@ export const docs_auth_resetPassword_description: DocsSection[] = [
         docsNote(["検証失敗の場合はリクエストしない"]),
     ]),
     docsSection("リセットトークンでリセット", [
-        docsAction(({ request, action, validate, message }) => [
+        docsAction_legacy(({ request, action, validate, message }) => [
             request({
                 from: "http-client",
                 to: "api-server",

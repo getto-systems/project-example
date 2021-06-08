@@ -7,7 +7,7 @@ import { newDocsView } from "../../../../docs/action_docs/init"
 import { docs_example } from "../../../../example/docs"
 import { docs_avail } from "../../../../avail/docs"
 import { docs_docs } from "../../../../docs/docs"
-import { docs_auth } from "../../../../auth/docs"
+import { docs_auth_legacy } from "../../../../auth/docs"
 
 import { DocsEntry } from "../../../../docs/action_docs/x_preact/docs"
 
@@ -16,7 +16,7 @@ render(
         view: newDocsView(foregroundOutsideFeature()),
         docs: {
             title: "ドキュメント",
-            contents: [[docs_example], [[...docs_docs, ...docs_avail, ...docs_auth]]],
+            contents: [[docs_example], [[...docs_docs, ...docs_avail, ...docs_auth_legacy]]],
         },
     }),
     document.body,
