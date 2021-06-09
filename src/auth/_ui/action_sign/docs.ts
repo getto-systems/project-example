@@ -28,7 +28,7 @@ import {
 
 import { docs_auth_ticket } from "../../auth_ticket/docs"
 import { docs_auth_loginID } from "../../login_id/docs"
-import { docs_auth_password } from "../../password/_ui/docs"
+import { docs_auth_password } from "../../password/docs"
 
 import { DocsSection } from "../../../../ui/vendor/getto-application/docs/data"
 
