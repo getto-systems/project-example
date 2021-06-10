@@ -39,7 +39,7 @@ impl AuthUser {
 
 impl Display for AuthUser {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "{} (granted: {})", self.id, self.granted_roles)
+        write!(f, "{} ({})", self.id, self.granted_roles)
     }
 }
 

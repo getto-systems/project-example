@@ -17,11 +17,15 @@ import {
     DocsUsecaseDescription,
 } from "../../ui/vendor/getto-application/docs/data"
 import { docs_authTicket } from "./auth_ticket/docs"
+import { docs_authenticatePassword } from "./password/_ui/action_authenticate/docs"
+import { docs_loginID } from "./login_id/docs"
+import { docs_password } from "./password/docs"
+import { docs_authUser } from "./auth_user/docs"
 
 export const docs_auth = docsDomain<AuthUsecase, AuthAction, AuthData>(
     "認証・認可",
     ["業務で必要な時に使用できる", "業務内容をプライベートに保つ"],
-    ["checkAuthTicket"],
+    ["checkAuthTicket", "authenticatePassword"],
     (name) => usecase[name],
 )
 
@@ -29,12 +33,21 @@ const usecase = {
     checkAuthTicket: docsAuthUsecase(
         "checkAuthTicket",
         ["業務で必要な時に使用できる", "業務内容をプライベートに保つ"],
-        { action: ["checkAuthTicket", "loadApplication"], data: ["authTicket"] },
+        { action: ["checkAuthTicket", "loadApplication"], data: ["authUser", "authTicket"] },
+    ),
+    authenticatePassword: docsAuthUsecase(
+        "authenticatePassword",
+        ["業務内容をプライベートに保つ"],
+        {
+            action: ["authenticatePassword", "loadApplication"],
+            data: ["authUser", "authTicket", "loginID", "password"],
+        },
     ),
 } as const
 
 const action = {
     checkAuthTicket: docs_checkAuthTicket,
+    authenticatePassword: docs_authenticatePassword,
     loadApplication: docsAction("アプリケーションのロード", ({ item }) => [
         item("input", ["コンテンツアクセストークン"], ["ブラウザに保存されたデータ"]),
         item("check", ["コンテンツアクセストークンが有効"], ["CDN によって判定"]),
@@ -44,6 +57,9 @@ const action = {
 
 const data = {
     authTicket: docs_authTicket,
+    authUser: docs_authUser,
+    loginID: docs_loginID,
+    password: docs_password,
 } as const
 
 export type AuthUsecase = keyof typeof usecase
