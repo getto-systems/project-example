@@ -10,9 +10,7 @@ use crate::x_outside_feature::_api::{env::Env, secret::Secret};
 
 use crate::auth::auth_ticket::_api::{
     encode::infra::token_encoder::JwtTokenEncoderKey,
-    kernel::infra::{
-        nonce_repository::MemoryAuthNonceRepository, ticket_repository::MemoryAuthTicketRepository,
-    },
+    kernel::infra::{nonce_repository::MemoryAuthNonceMap, ticket_repository::MemoryAuthTicketMap},
     validate::infra::token_validator::JwtTokenValidatorKey,
 };
 use crate::auth::auth_user::_api::kernel::infra::user_repository::MemoryAuthUserRepository;
@@ -34,8 +32,8 @@ pub fn new_auth_outside_feature(env: &Env, secret: &impl Secret) -> AuthOutsideF
         },
         store: AuthOutsideStore {
             // TODO それぞれ外部データベースを使うように
-            nonce: MemoryAuthNonceRepository::new_store(),
-            ticket: MemoryAuthTicketRepository::new_store(),
+            nonce: MemoryAuthNonceMap::new().to_store(),
+            ticket: MemoryAuthTicketMap::new().to_store(),
             user: MemoryAuthUserRepository::new_store(),
             user_password: MemoryAuthUserPasswordRepository::new_store(),
         },

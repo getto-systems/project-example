@@ -1,39 +1,41 @@
 use jsonwebtoken::{decode, errors::ErrorKind, Algorithm, DecodingKey, Validation};
 
-use super::super::super::kernel::infra::{AuthJwtClaims, AUTH_JWT_AUDIENCE_API, AUTH_JWT_AUDIENCE_TICKET};
+use super::super::super::kernel::infra::{
+    AuthJwtClaims, AUTH_JWT_AUDIENCE_API, AUTH_JWT_AUDIENCE_TICKET,
+};
 
 use super::AuthTokenValidator;
 
 use super::super::super::kernel::data::{AuthTicket, AuthTokenValue};
 use super::super::data::DecodeAuthTokenError;
 
-pub struct AuthJwtTokenValidator<'a> {
+pub struct JwtAuthTokenValidator<'a> {
     key: &'a JwtTokenValidatorKey,
 }
 
-pub struct ApiJwtTokenValidator<'a> {
-    key: &'a JwtTokenValidatorKey,
-}
-
-impl<'a> AuthJwtTokenValidator<'a> {
+impl<'a> JwtAuthTokenValidator<'a> {
     pub const fn new(key: &'a JwtTokenValidatorKey) -> Self {
         Self { key }
     }
 }
 
-impl<'a> AuthTokenValidator for AuthJwtTokenValidator<'a> {
+impl<'a> AuthTokenValidator for JwtAuthTokenValidator<'a> {
     fn validate(&self, token: &AuthTokenValue) -> Result<AuthTicket, DecodeAuthTokenError> {
         validate_jwt(token, &[AUTH_JWT_AUDIENCE_TICKET], &self.key.parse())
     }
 }
 
-impl<'a> ApiJwtTokenValidator<'a> {
-    pub const fn with_key(key: &'a JwtTokenValidatorKey) -> Self {
+pub struct JwtApiTokenValidator<'a> {
+    key: &'a JwtTokenValidatorKey,
+}
+
+impl<'a> JwtApiTokenValidator<'a> {
+    pub const fn new(key: &'a JwtTokenValidatorKey) -> Self {
         Self { key }
     }
 }
 
-impl<'a> AuthTokenValidator for ApiJwtTokenValidator<'a> {
+impl<'a> AuthTokenValidator for JwtApiTokenValidator<'a> {
     fn validate(&self, token: &AuthTokenValue) -> Result<AuthTicket, DecodeAuthTokenError> {
         validate_jwt(token, &[AUTH_JWT_AUDIENCE_API], &self.key.parse())
     }
@@ -48,12 +50,12 @@ fn validate_jwt(
     validation.set_audience(audience);
 
     let data =
-        decode::<AuthJwtClaims>(token.as_str(), &key, &validation).map_err(
-            |err| match err.kind() {
+        decode::<AuthJwtClaims>(token.as_str(), &key, &validation).map_err(|err| {
+            match err.kind() {
                 ErrorKind::ExpiredSignature => DecodeAuthTokenError::Expired,
                 _ => DecodeAuthTokenError::Invalid(format!("{}", err)),
-            },
-        )?;
+            }
+        })?;
 
     Ok(data.claims.into_auth_ticket())
 }
@@ -67,6 +69,28 @@ impl JwtTokenValidatorKey {
         match self {
             Self::Ec(key) => {
                 DecodingKey::from_ec_pem(key.as_bytes()).expect("failed to parse ec pem")
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+pub mod test {
+    use super::super::AuthTokenValidator;
+
+    use super::super::super::super::kernel::data::{AuthTicket, AuthTokenValue};
+    use super::super::super::data::DecodeAuthTokenError;
+
+    pub enum StaticAuthTokenValidator {
+        Valid(AuthTicket),
+        Expired,
+    }
+
+    impl AuthTokenValidator for StaticAuthTokenValidator {
+        fn validate(&self, _token: &AuthTokenValue) -> Result<AuthTicket, DecodeAuthTokenError> {
+            match self {
+                Self::Expired => Err(DecodeAuthTokenError::Expired),
+                Self::Valid(ticket) => Ok(ticket.clone()),
             }
         }
     }

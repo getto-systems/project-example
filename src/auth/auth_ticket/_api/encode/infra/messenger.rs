@@ -1,19 +1,21 @@
 use crate::auth::_api::y_protobuf::api::{AuthenticatePasswordResult_pb, AuthenticateResponse_pb};
 
+use crate::z_details::_api::message::helper::encode_protobuf_base64;
+
 use super::EncodeMessenger;
 
 use crate::auth::auth_user::_api::kernel::data::GrantedAuthRoles;
-use crate::z_details::_api::message::{data::MessageError, helper::encode_protobuf_base64};
+use crate::z_details::_api::message::data::MessageError;
 
-pub struct EncodeRenewMessenger;
+pub struct RenewEncodeMessenger;
 
-impl EncodeRenewMessenger {
+impl RenewEncodeMessenger {
     pub const fn new() -> Self {
         Self
     }
 }
 
-impl EncodeMessenger for EncodeRenewMessenger {
+impl EncodeMessenger for RenewEncodeMessenger {
     fn encode(&self, granted_roles: GrantedAuthRoles) -> Result<String, MessageError> {
         let mut message = AuthenticateResponse_pb::new();
 
@@ -27,15 +29,15 @@ impl EncodeMessenger for EncodeRenewMessenger {
     }
 }
 
-pub struct EncodeAuthenticatePasswordMessenger;
+pub struct AuthenticatePasswordEncodeMessenger;
 
-impl EncodeAuthenticatePasswordMessenger {
+impl AuthenticatePasswordEncodeMessenger {
     pub const fn new() -> Self {
         Self
     }
 }
 
-impl EncodeMessenger for EncodeAuthenticatePasswordMessenger {
+impl EncodeMessenger for AuthenticatePasswordEncodeMessenger {
     fn encode(&self, granted_roles: GrantedAuthRoles) -> Result<String, MessageError> {
         let mut message = AuthenticatePasswordResult_pb::new();
 
@@ -51,5 +53,27 @@ impl EncodeMessenger for EncodeAuthenticatePasswordMessenger {
         message.set_value(user);
 
         encode_protobuf_base64(message)
+    }
+}
+
+#[cfg(test)]
+pub mod test {
+    use super::super::EncodeMessenger;
+    
+    use crate::auth::auth_user::_api::kernel::data::GrantedAuthRoles;
+    use crate::z_details::_api::message::data::MessageError;
+
+    pub struct StaticEncodeMessenger;
+
+    impl StaticEncodeMessenger {
+        pub const fn new() -> Self {
+            Self
+        }
+    }
+
+    impl EncodeMessenger for StaticEncodeMessenger {
+        fn encode(&self, _granted_roles: GrantedAuthRoles) -> Result<String, MessageError> {
+            Ok("encoded".into())
+        }
     }
 }

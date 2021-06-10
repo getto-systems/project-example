@@ -1,8 +1,8 @@
-pub struct PubSub<E> {
+pub struct ActionStatePubSub<E> {
     handlers: Vec<Box<dyn Fn(&E)>>,
 }
 
-impl<E> PubSub<E> {
+impl<E> ActionStatePubSub<E> {
     pub fn new() -> Self {
         Self { handlers: vec![] }
     }

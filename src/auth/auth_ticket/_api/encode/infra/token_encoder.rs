@@ -17,12 +17,12 @@ use crate::auth::auth_ticket::_api::kernel::infra::{
 use super::super::super::kernel::data::{AuthTicket, AuthTokenExtract, ExpireDateTime};
 use super::super::data::{AuthTokenEncoded, EncodeAuthTokenError};
 
-pub struct TicketJwtTokenEncoder<'a> {
+pub struct TicketJwtAuthTokenEncoder<'a> {
     domain: &'a str,
     key: &'a EncodingKey,
 }
 
-impl<'a> TicketJwtTokenEncoder<'a> {
+impl<'a> TicketJwtAuthTokenEncoder<'a> {
     pub fn new(cookie: &'a AuthOutsideCookie, key: &'a EncodingKey) -> Self {
         Self {
             domain: &cookie.domain,
@@ -31,7 +31,7 @@ impl<'a> TicketJwtTokenEncoder<'a> {
     }
 }
 
-impl<'a> AuthTokenEncoder for TicketJwtTokenEncoder<'a> {
+impl<'a> AuthTokenEncoder for TicketJwtAuthTokenEncoder<'a> {
     fn encode(
         &self,
         ticket: AuthTicket,
@@ -48,12 +48,12 @@ impl<'a> AuthTokenEncoder for TicketJwtTokenEncoder<'a> {
     }
 }
 
-pub struct ApiJwtTokenEncoder<'a> {
+pub struct ApiJwtAuthTokenEncoder<'a> {
     domain: &'a str,
     key: &'a EncodingKey,
 }
 
-impl<'a> ApiJwtTokenEncoder<'a> {
+impl<'a> ApiJwtAuthTokenEncoder<'a> {
     pub fn new(cookie: &'a AuthOutsideCookie, key: &'a EncodingKey) -> Self {
         Self {
             domain: &cookie.domain,
@@ -62,7 +62,7 @@ impl<'a> ApiJwtTokenEncoder<'a> {
     }
 }
 
-impl<'a> AuthTokenEncoder for ApiJwtTokenEncoder<'a> {
+impl<'a> AuthTokenEncoder for ApiJwtAuthTokenEncoder<'a> {
     fn encode(
         &self,
         ticket: AuthTicket,
@@ -178,5 +178,31 @@ impl<'a> AuthTokenEncoder for CloudfrontTokenEncoder<'a> {
                 },
             },
         ])
+    }
+}
+
+#[cfg(test)]
+pub mod test {
+    use super::AuthTokenEncoder;
+
+    use super::super::super::super::kernel::data::{AuthTicket, ExpireDateTime};
+    use super::super::super::data::{AuthTokenEncoded, EncodeAuthTokenError};
+
+    pub struct StaticAuthTokenEncoder;
+
+    impl<'a> StaticAuthTokenEncoder {
+        pub fn new() -> Self {
+            Self
+        }
+    }
+
+    impl<'a> AuthTokenEncoder for StaticAuthTokenEncoder {
+        fn encode(
+            &self,
+            _ticket: AuthTicket,
+            _expires: ExpireDateTime,
+        ) -> Result<Vec<AuthTokenEncoded>, EncodeAuthTokenError> {
+            Ok(vec![])
+        }
     }
 }

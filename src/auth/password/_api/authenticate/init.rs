@@ -8,7 +8,7 @@ use super::infra::{
 };
 use crate::auth::{
     auth_ticket::_api::kernel::infra::{
-        clock::ChronoAuthClock, header::ActixWebAuthNonceHeader,
+        clock::ChronoAuthClock, nonce_header::ActixWebAuthNonceHeader,
         nonce_repository::MemoryAuthNonceRepository, AuthNonceConfig,
     },
     auth_user::_api::kernel::infra::user_repository::MemoryAuthUserRepository,

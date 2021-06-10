@@ -56,8 +56,7 @@ test-api:
   image: rust:1-buster
 
   script:
-    - "cargo build"
-    - ": cargo test"
+    - "cargo test"
 
 bump_version-ui:
   stage: bump_version

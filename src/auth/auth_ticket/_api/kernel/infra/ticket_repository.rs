@@ -7,12 +7,36 @@ use super::super::data::{
 };
 use crate::z_details::_api::repository::data::RepositoryError;
 
-pub type MemoryAuthTicketStore = Mutex<Store>;
-
-pub struct Store {
+pub type MemoryAuthTicketStore = Mutex<MemoryAuthTicketMap>;
+pub struct MemoryAuthTicketMap {
     ticket: HashMap<String, Entry>,
     tokens: HashMap<String, Vec<AuthToken>>,
     token_map: HashMap<String, AuthTicketId>,
+}
+
+impl MemoryAuthTicketMap {
+    pub fn new() -> Self {
+        Self {
+            ticket: HashMap::new(),
+            tokens: HashMap::new(),
+            token_map: HashMap::new(),
+        }
+    }
+
+    pub fn with_entry(ticket_id: String, limit: ExpansionLimitDateTime) -> Self {
+        let mut ticket = HashMap::new();
+        ticket.insert(ticket_id, Entry { limit });
+
+        Self {
+            ticket,
+            tokens: HashMap::new(),
+            token_map: HashMap::new(),
+        }
+    }
+
+    pub fn to_store(self) -> MemoryAuthTicketStore {
+        Mutex::new(self)
+    }
 }
 
 struct Entry {
@@ -24,14 +48,6 @@ pub struct MemoryAuthTicketRepository<'a> {
 }
 
 impl<'a> MemoryAuthTicketRepository<'a> {
-    pub fn new_store() -> MemoryAuthTicketStore {
-        Mutex::new(Store {
-            ticket: HashMap::new(),
-            tokens: HashMap::new(),
-            token_map: HashMap::new(),
-        })
-    }
-
     pub const fn new(store: &'a MemoryAuthTicketStore) -> Self {
         Self { store }
     }

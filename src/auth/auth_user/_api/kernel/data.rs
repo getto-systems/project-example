@@ -107,9 +107,15 @@ impl RequireAuthRoles {
         Self::api(&["user"])
     }
 
+    // admin ロールを持っていれば api アクセスが可能
     fn api(roles: &[&str]) -> Self {
+        let mut roles = Vec::from(roles);
+        roles.push("admin");
+        Self::has_any(roles.as_ref())
+    }
+
+    pub fn has_any(roles: &[&str]) -> Self {
         let mut hash_set = HashSet::new();
-        hash_set.insert("admin".to_string());
         roles.iter().for_each(|role| {
             hash_set.insert(role.to_string());
         });

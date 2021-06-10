@@ -1,4 +1,4 @@
-pub mod header;
+pub mod token_header;
 pub mod token_validator;
 
 use super::super::kernel::infra::{
@@ -18,7 +18,7 @@ pub trait ValidateAuthTokenInfra {
     type TicketRepository: AuthTicketRepository;
     type TokenValidator: AuthTokenValidator;
 
-    fn config(&self) -> &ValidateConfig;
+    fn config(&self) -> &ValidateAuthTokenConfig;
     fn nonce_config(&self) -> &AuthNonceConfig;
     fn clock(&self) -> &Self::Clock;
     fn nonce_header(&self) -> &Self::NonceHeader;
@@ -28,7 +28,7 @@ pub trait ValidateAuthTokenInfra {
     fn token_validator(&self) -> &Self::TokenValidator;
 }
 
-pub struct ValidateConfig {
+pub struct ValidateAuthTokenConfig {
     pub require_roles: RequireAuthRoles,
 }
 
