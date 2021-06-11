@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use super::data::{
     AuthDateTime, AuthNonceValue, AuthTicket, AuthTicketExtract, AuthTicketId, AuthToken,
-    AuthTokenValue, ExpansionLimitDateTime, ExpireDateTime, ExpireDuration,
+    ExpansionLimitDateTime, ExpireDateTime, ExpireDuration,
 };
 use crate::z_details::_api::{repository::data::RepositoryError, request::data::HeaderError};
 
@@ -43,8 +43,6 @@ pub trait AuthTicketRepository {
         &self,
         ticket: &AuthTicket,
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError>;
-
-    fn disable(&self, token: &AuthTokenValue) -> Result<(), RepositoryError>;
 }
 
 pub struct AuthTicketTokens(Vec<AuthToken>);
