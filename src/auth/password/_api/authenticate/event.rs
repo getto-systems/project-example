@@ -1,5 +1,7 @@
 use std::fmt::Display;
 
+use super::infra::MatchPasswordError;
+
 use super::data::{AuthenticatePasswordError, ConvertPasswordError, PasswordHashError};
 use crate::auth::{
     auth_ticket::_api::kernel::data::ValidateAuthNonceError,
@@ -25,15 +27,24 @@ const ERROR: &'static str = "authenticate error";
 impl Display for AuthenticatePasswordEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Success(user) => write!(f, "{}: {}", SUCCESS, user.id_as_str()),
-            Self::InvalidPassword(_) => write!(f, "{}: password not match", ERROR),
-            Self::UserNotFound => write!(f, "{}: user not found", ERROR),
-            Self::NonceError(err) => write!(f, "{}: {}", ERROR, err),
-            Self::PasswordHashError(err) => write!(f, "{}: {}", ERROR, err),
-            Self::RepositoryError(err) => write!(f, "{}: {}", ERROR, err),
-            Self::MessageError(err) => write!(f, "{}: {}", ERROR, err),
-            Self::ConvertLoginIdError(err) => write!(f, "{}: {}", ERROR, err),
-            Self::ConvertPasswordError(err) => write!(f, "{}: {}", ERROR, err),
+            Self::Success(user) => write!(f, "{}; {}", SUCCESS, user),
+            Self::InvalidPassword(_) => write!(f, "{}; password not match", ERROR),
+            Self::UserNotFound => write!(f, "{}; user not found", ERROR),
+            Self::NonceError(err) => write!(f, "{}; {}", ERROR, err),
+            Self::PasswordHashError(err) => write!(f, "{}; {}", ERROR, err),
+            Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
+            Self::MessageError(err) => write!(f, "{}; {}", ERROR, err),
+            Self::ConvertLoginIdError(err) => write!(f, "{}; {}", ERROR, err),
+            Self::ConvertPasswordError(err) => write!(f, "{}; {}", ERROR, err),
+        }
+    }
+}
+
+impl From<MatchPasswordError> for AuthenticatePasswordEvent {
+    fn from(err: MatchPasswordError) -> Self {
+        match err {
+            MatchPasswordError::PasswordHashError(err) => Self::PasswordHashError(err),
+            MatchPasswordError::RepositoryError(err) => Self::RepositoryError(err),
         }
     }
 }

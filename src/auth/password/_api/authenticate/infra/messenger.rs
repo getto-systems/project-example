@@ -40,3 +40,29 @@ impl AuthenticateMessenger for ProtobufAuthenticateMessenger {
         encode_protobuf_base64(message)
     }
 }
+
+#[cfg(test)]
+pub mod test {
+    use super::super::{AuthenticateMessenger, AuthenticatePasswordFieldsExtract};
+
+    use crate::z_details::_api::message::data::MessageError;
+
+    pub struct StaticAuthenticateMessenger {
+        fields: AuthenticatePasswordFieldsExtract,
+    }
+
+    impl StaticAuthenticateMessenger {
+        pub const fn new(fields: AuthenticatePasswordFieldsExtract) -> Self {
+            Self { fields }
+        }
+    }
+
+    impl AuthenticateMessenger for StaticAuthenticateMessenger {
+        fn decode(&self) -> Result<AuthenticatePasswordFieldsExtract, MessageError> {
+            Ok(self.fields.clone())
+        }
+        fn encode_invalid_password(&self) -> Result<String, MessageError> {
+            Ok("encoded".into())
+        }
+    }
+}

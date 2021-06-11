@@ -23,7 +23,7 @@ impl MemoryAuthTicketMap {
         }
     }
 
-    pub fn with_entry(ticket_id: String, limit: ExpansionLimitDateTime) -> Self {
+    pub fn with_ticket(ticket_id: String, limit: ExpansionLimitDateTime) -> Self {
         let mut ticket = HashMap::new();
         ticket.insert(ticket_id, Entry { limit });
 

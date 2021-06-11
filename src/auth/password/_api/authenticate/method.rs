@@ -1,17 +1,16 @@
-use std::convert::TryInto;
-
 use crate::auth::auth_ticket::_api::kernel::part::check_nonce;
 
+use super::infra::PlainPassword;
 use super::infra::{
     AuthUserPasswordHash, AuthUserPasswordRepository, AuthenticateMessenger,
-    AuthenticatePasswordInfra, MatchPasswordError,
+    AuthenticatePasswordInfra,
 };
 use crate::auth::auth_user::_api::kernel::infra::AuthUserRepository;
 
 use super::event::AuthenticatePasswordEvent;
 
 use super::data::AuthenticatePasswordError;
-use crate::auth::auth_user::_api::kernel::data::AuthUser;
+use crate::auth::{auth_user::_api::kernel::data::AuthUser, login_id::_api::data::LoginId};
 
 pub fn authenticate_password<S>(
     infra: &impl AuthenticatePasswordInfra,
@@ -33,14 +32,10 @@ pub fn authenticate_password<S>(
         .decode()
         .map_err(|err| post(AuthenticatePasswordEvent::MessageError(err)))?;
 
-    let login_id = fields
-        .login_id
-        .try_into()
+    let login_id = LoginId::validate(fields.login_id)
         .map_err(|err| post(AuthenticatePasswordEvent::ConvertLoginIdError(err)))?;
 
-    let plain_password = fields
-        .password
-        .try_into()
+    let plain_password = PlainPassword::validate(fields.password)
         .map_err(|err| post(AuthenticatePasswordEvent::ConvertPasswordError(err)))?;
 
     let user_id = password_repository
@@ -49,14 +44,7 @@ pub fn authenticate_password<S>(
                 .verify(&plain_password, hashed_password)
                 .map_err(|err| err.into())
         })
-        .map_err(|err| match err {
-            MatchPasswordError::PasswordHashError(err) => {
-                post(AuthenticatePasswordEvent::PasswordHashError(err))
-            }
-            MatchPasswordError::RepositoryError(err) => {
-                post(AuthenticatePasswordEvent::RepositoryError(err))
-            }
-        })?;
+        .map_err(|err| post(err.into()))?;
 
     match user_id {
         None => {

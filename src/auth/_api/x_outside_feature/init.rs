@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use chrono::Duration;
 
 use aws_cloudfront_cookie::CloudfrontKey;
@@ -6,17 +8,26 @@ use super::feature::{
     AuthOutsideCdnSecret, AuthOutsideConfig, AuthOutsideCookie, AuthOutsideFeature,
     AuthOutsideJwtSecret, AuthOutsideSecret, AuthOutsideStore,
 };
+use crate::auth::login_id::_api::data::LoginId;
+use crate::auth::password::_api::authenticate::infra::HashedPassword;
 use crate::x_outside_feature::_api::{env::Env, secret::Secret};
 
-use crate::auth::auth_ticket::_api::{
-    encode::infra::token_encoder::JwtTokenEncoderKey,
-    kernel::infra::{nonce_repository::MemoryAuthNonceMap, ticket_repository::MemoryAuthTicketMap},
-    validate::infra::token_validator::JwtTokenValidatorKey,
+use crate::auth::{
+    auth_ticket::_api::{
+        encode::infra::token_encoder::JwtTokenEncoderKey,
+        kernel::infra::{
+            nonce_repository::MemoryAuthNonceMap, ticket_repository::MemoryAuthTicketMap,
+        },
+        validate::infra::token_validator::JwtTokenValidatorKey,
+    },
+    auth_user::_api::kernel::infra::user_repository::MemoryAuthUserMap,
+    password::_api::authenticate::infra::password_repository::MemoryAuthUserPasswordMap,
 };
-use crate::auth::auth_user::_api::kernel::infra::user_repository::MemoryAuthUserRepository;
-use crate::auth::password::_api::authenticate::infra::password_repository::MemoryAuthUserPasswordRepository;
 
-use crate::auth::auth_ticket::_api::kernel::data::{ExpansionLimitDuration, ExpireDuration};
+use crate::auth::{
+    auth_ticket::_api::kernel::data::{ExpansionLimitDuration, ExpireDuration},
+    auth_user::_api::kernel::data::{AuthUser, AuthUserExtract},
+};
 
 pub fn new_auth_outside_feature(env: &Env, secret: &impl Secret) -> AuthOutsideFeature {
     AuthOutsideFeature {
@@ -34,8 +45,13 @@ pub fn new_auth_outside_feature(env: &Env, secret: &impl Secret) -> AuthOutsideF
             // TODO それぞれ外部データベースを使うように
             nonce: MemoryAuthNonceMap::new().to_store(),
             ticket: MemoryAuthTicketMap::new().to_store(),
-            user: MemoryAuthUserRepository::new_store(),
-            user_password: MemoryAuthUserPasswordRepository::new_store(),
+            user: MemoryAuthUserMap::with_user(admin_user()).to_store(),
+            user_password: MemoryAuthUserPasswordMap::with_password(
+                admin_login_id(),
+                admin_user(),
+                admin_password(),
+            )
+            .to_store(),
         },
         cookie: AuthOutsideCookie {
             domain: env.load("DOMAIN"),
@@ -57,4 +73,21 @@ pub fn new_auth_outside_feature(env: &Env, secret: &impl Secret) -> AuthOutsideF
             },
         },
     }
+}
+
+fn admin_user() -> AuthUser {
+    let mut granted_roles = HashSet::new();
+    granted_roles.insert("admin".into());
+    granted_roles.insert("dev-docs".into());
+
+    AuthUser::from_extract(AuthUserExtract {
+        id: "admin".into(),
+        granted_roles,
+    })
+}
+fn admin_login_id() -> LoginId {
+    LoginId::validate("admin".to_string()).unwrap()
+}
+fn admin_password() -> HashedPassword {
+    HashedPassword::new("$argon2id$v=19$m=4096,t=3,p=1$wL7bldJ+qUCSNYyrgm6OUA$BW+HlZoe6tYaO4yZ3PwQ+F/hj640LiKtfuM8B6YZ+bk".into())
 }

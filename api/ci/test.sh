@@ -6,6 +6,7 @@ coverage_main() {
     prof_dir="target/coverage"
     output_dir="./ui/public/dist/coverage/api"
 
+    RUSTFLAGS="-Zinstrument-coverage" LLVM_PROFILE_FILE="${prof_dir}/%m-%p.profraw" cargo +nightly build
     RUSTFLAGS="-Zinstrument-coverage" LLVM_PROFILE_FILE="${prof_dir}/%m-%p.profraw" cargo +nightly test
     if [ "$?" != 0 ]; then
         coverage_cleanup
@@ -26,6 +27,7 @@ coverage_main() {
         --ignore '**/test.rs' \
         --ignore '**/init.rs' \
         --ignore '**/data.rs' \
+        --ignore '**/event.rs' \
         --ignore '**/infra.rs' \
         --ignore '**/infra/**' \
         --ignore 'src/main.rs' \

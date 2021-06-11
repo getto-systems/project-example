@@ -14,7 +14,7 @@ impl MemoryAuthNonceMap {
         Self(HashMap::new())
     }
 
-    pub fn with_entry(nonce: String, expires: ExpireDateTime) -> Self {
+    pub fn with_nonce(nonce: String, expires: ExpireDateTime) -> Self {
         let mut hash_map = HashMap::new();
         hash_map.insert(nonce, expires);
         Self(hash_map)

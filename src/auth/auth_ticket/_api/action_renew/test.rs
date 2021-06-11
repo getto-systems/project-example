@@ -333,26 +333,26 @@ fn expired_token_validator() -> StaticAuthTokenValidator {
 fn standard_nonce_store() -> MemoryAuthNonceStore {
     MemoryAuthNonceMap::new().to_store()
 }
-fn conflict_nonce_store() -> MemoryAuthNonceStore {
-    let expires = AuthDateTime::from_now(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(1)));
-    MemoryAuthNonceMap::with_entry(NONCE.into(), expires).to_store()
-}
 fn expired_nonce_store() -> MemoryAuthNonceStore {
     let expires = AuthDateTime::from_now(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(-1)));
-    MemoryAuthNonceMap::with_entry(NONCE.into(), expires).to_store()
+    MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
+}
+fn conflict_nonce_store() -> MemoryAuthNonceStore {
+    let expires = AuthDateTime::from_now(standard_now())
+        .expires(&ExpireDuration::with_duration(Duration::days(1)));
+    MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
 }
 
 fn standard_ticket_store() -> MemoryAuthTicketStore {
     let limit = AuthDateTime::from_now(standard_now())
         .limit(&ExpansionLimitDuration::with_duration(Duration::days(10)));
-    MemoryAuthTicketMap::with_entry(TICKET_ID.into(), limit).to_store()
+    MemoryAuthTicketMap::with_ticket(TICKET_ID.into(), limit).to_store()
 }
 fn limited_ticket_store() -> MemoryAuthTicketStore {
     let limit = AuthDateTime::from_now(standard_now())
         .limit(&ExpansionLimitDuration::with_duration(Duration::hours(1)));
-    MemoryAuthTicketMap::with_entry(TICKET_ID.into(), limit).to_store()
+    MemoryAuthTicketMap::with_ticket(TICKET_ID.into(), limit).to_store()
 }
 fn no_ticket_store() -> MemoryAuthTicketStore {
     MemoryAuthTicketMap::new().to_store()
