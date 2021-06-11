@@ -52,6 +52,123 @@ fn success_allow_for_any_role() {
     ])
 }
 
+#[test]
+fn success_allow_for_something_role() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::standard();
+    let feature = TestFeature::allow_for_something_role(&store);
+
+    let mut action = RenewAuthTicketAction::with_material(feature);
+    action.subscribe(handler);
+
+    assert!(action.ignite().is_ok());
+    assert_state(vec![
+        "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
+        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
+        "encode success",
+    ])
+}
+
+#[test]
+fn error_allow_for_something_role_but_not_granted() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::standard();
+    let feature = TestFeature::allow_for_something_role_but_not_granted(&store);
+
+    let mut action = RenewAuthTicketAction::with_material(feature);
+    action.subscribe(handler);
+
+    assert!(!action.ignite().is_ok());
+    assert_state(vec![
+        "validate error; auth token error: user permission denied: granted: [], required: any [something]",
+    ])
+}
+
+#[test]
+fn error_token_expired() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::standard();
+    let feature = TestFeature::token_expired(&store);
+
+    let mut action = RenewAuthTicketAction::with_material(feature);
+    action.subscribe(handler);
+
+    assert!(!action.ignite().is_ok());
+    assert_state(vec![
+        "validate error; auth token error: token expired",
+    ])
+}
+
+#[test]
+fn success_expired_nonce() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::expired_nonce();
+    let feature = TestFeature::allow_for_any_role(&store);
+
+    let mut action = RenewAuthTicketAction::with_material(feature);
+    action.subscribe(handler);
+
+    assert!(action.ignite().is_ok());
+    assert_state(vec![
+        "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
+        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
+        "encode success",
+    ])
+}
+
+#[test]
+fn success_limited_ticket() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::limited_ticket();
+    let feature = TestFeature::allow_for_any_role(&store);
+
+    let mut action = RenewAuthTicketAction::with_material(feature);
+    action.subscribe(handler);
+
+    assert!(action.ignite().is_ok());
+    assert_state(vec![
+        "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
+        "token expires calculated; ticket: 2021-01-01 11:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
+        "encode success",
+    ])
+}
+
+#[test]
+fn error_conflict_nonce() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::conflict_nonce();
+    let feature = TestFeature::allow_for_any_role(&store);
+
+    let mut action = RenewAuthTicketAction::with_material(feature);
+    action.subscribe(handler);
+
+    assert!(!action.ignite().is_ok());
+    assert_state(vec!["validate error; auth nonce error: conflict"])
+}
+
+#[test]
+fn error_no_ticket() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::no_ticket();
+    let feature = TestFeature::allow_for_any_role(&store);
+
+    let mut action = RenewAuthTicketAction::with_material(feature);
+    action.subscribe(handler);
+
+    assert!(!action.ignite().is_ok());
+    assert_state(vec![
+        "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
+        "encode error; ticket data not found",
+    ])
+}
+
 struct TestFeature<'a> {
     validate: StaticValidateAuthTokenStruct<'a>,
     encode: StaticEncodeAuthTicketStruct<'a>,
@@ -81,12 +198,6 @@ impl TestStore {
             ticket: standard_ticket_store(),
         }
     }
-    fn conflict_nonce() -> Self {
-        Self {
-            nonce: conflict_nonce_store(),
-            ticket: standard_ticket_store(),
-        }
-    }
     fn expired_nonce() -> Self {
         Self {
             nonce: expired_nonce_store(),
@@ -97,6 +208,12 @@ impl TestStore {
         Self {
             nonce: standard_nonce_store(),
             ticket: limited_ticket_store(),
+        }
+    }
+    fn conflict_nonce() -> Self {
+        Self {
+            nonce: conflict_nonce_store(),
+            ticket: standard_ticket_store(),
         }
     }
     fn no_ticket() -> Self {

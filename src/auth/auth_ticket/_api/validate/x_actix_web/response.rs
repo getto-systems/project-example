@@ -12,7 +12,6 @@ impl ValidateAuthTokenEvent {
             Self::Success(_) => HttpResponse::Ok().finish(),
             Self::NonceError(err) => err.respond_to(request),
             Self::TokenError(err) => err.respond_to(request),
-            Self::TicketDisabled => unauthorized(request),
         }
     }
 }

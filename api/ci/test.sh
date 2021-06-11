@@ -25,6 +25,8 @@ coverage_main() {
         --ignore '**/z_*/**' \
         --ignore '**/test.rs' \
         --ignore '**/init.rs' \
+        --ignore '**/data.rs' \
+        --ignore '**/infra.rs' \
         --ignore '**/infra/**' \
         --ignore 'src/main.rs' \
         -t html -o "${output_dir}"

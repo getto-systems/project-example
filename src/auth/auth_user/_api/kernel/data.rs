@@ -127,7 +127,7 @@ impl Display for RequireAuthRoles {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             RequireAuthRoles::Nothing => write!(f, "require: nothing"),
-            RequireAuthRoles::HasAny(roles) => write!(f, "require: any {}", roles),
+            RequireAuthRoles::HasAny(roles) => write!(f, "required: any {}", roles),
         }
     }
 }

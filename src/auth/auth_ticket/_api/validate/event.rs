@@ -7,7 +7,6 @@ pub enum ValidateAuthTokenEvent {
     Success(AuthTicket),
     NonceError(ValidateAuthNonceError),
     TokenError(ValidateAuthTokenError),
-    TicketDisabled,
 }
 
 const SUCCESS: &'static str = "validate success";
@@ -19,7 +18,6 @@ impl Display for ValidateAuthTokenEvent {
             Self::Success(auth_ticket) => write!(f, "{}; {}", SUCCESS, auth_ticket),
             Self::NonceError(err) => write!(f, "{}; {}", ERROR, err),
             Self::TokenError(err) => write!(f, "{}; {}", ERROR, err),
-            Self::TicketDisabled => write!(f, "{}; ticket disabled", ERROR),
         }
     }
 }
