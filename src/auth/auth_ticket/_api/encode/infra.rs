@@ -5,7 +5,7 @@ use super::super::kernel::infra::{AuthClock, AuthTicketRepository};
 
 use crate::auth::auth_user::_api::kernel::data::GrantedAuthRoles;
 use super::super::kernel::data::{AuthTicket, ExpireDateTime, ExpireDuration};
-use super::data::{AuthTokenEncoded, EncodeAuthTokenError};
+use super::data::{AuthTokenEncodedData, EncodeAuthTokenError};
 use crate::z_details::_api::message::data::MessageError;
 
 pub trait EncodeAuthTicketInfra {
@@ -36,7 +36,7 @@ pub trait AuthTokenEncoder {
         &self,
         ticket: AuthTicket,
         expires: ExpireDateTime,
-    ) -> Result<Vec<AuthTokenEncoded>, EncodeAuthTokenError>;
+    ) -> Result<Vec<AuthTokenEncodedData>, EncodeAuthTokenError>;
 }
 
 pub trait EncodeMessenger {

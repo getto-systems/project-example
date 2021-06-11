@@ -9,11 +9,12 @@ use super::super::super::kernel::x_actix_web::response::unauthorized;
 use super::super::event::EncodeAuthTicketEvent;
 
 use super::super::super::kernel::data::ExpireDateTime;
-use super::super::data::{AuthTicketEncoded, AuthTokenEncoded, EncodeAuthTokenError};
+use super::super::data::{AuthTokenEncoded, AuthTokenEncodedData, EncodeAuthTokenError};
 
 impl EncodeAuthTicketEvent {
     pub fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
+            Self::TokenExpiresCalculated(_) => HttpResponse::Ok().finish(),
             Self::Success(token) => token.respond_to(request),
             Self::TicketNotFound => unauthorized(request),
             Self::RepositoryError(err) => err.respond_to(request),
@@ -23,7 +24,7 @@ impl EncodeAuthTicketEvent {
     }
 }
 
-impl AuthTicketEncoded {
+impl AuthTokenEncoded {
     fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
         let mut response = HttpResponse::Ok();
 
@@ -41,7 +42,7 @@ impl AuthTicketEncoded {
     }
 }
 
-fn auth_cookie<'a>(info: AuthTokenEncoded) -> Cookie<'a> {
+fn auth_cookie<'a>(info: AuthTokenEncodedData) -> Cookie<'a> {
     Cookie::build(info.name, info.token.value)
         .expires(into_offset_date_time(info.token.expires))
         .domain(info.domain)

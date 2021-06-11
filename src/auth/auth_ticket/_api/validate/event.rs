@@ -16,10 +16,10 @@ const ERROR: &'static str = "validate error";
 impl Display for ValidateAuthTokenEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Success(auth_ticket) => write!(f, "{}: {}", SUCCESS, auth_ticket),
-            Self::NonceError(err) => write!(f, "{}: {}", ERROR, err),
-            Self::TokenError(err) => write!(f, "{}: {}", ERROR, err),
-            Self::TicketDisabled => write!(f, "{}: ticket disabled", ERROR),
+            Self::Success(auth_ticket) => write!(f, "{}; {}", SUCCESS, auth_ticket),
+            Self::NonceError(err) => write!(f, "{}; {}", ERROR, err),
+            Self::TokenError(err) => write!(f, "{}; {}", ERROR, err),
+            Self::TicketDisabled => write!(f, "{}; ticket disabled", ERROR),
         }
     }
 }

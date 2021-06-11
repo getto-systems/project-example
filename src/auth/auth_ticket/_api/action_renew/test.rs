@@ -47,7 +47,7 @@ fn success_allow_for_any_role() {
     assert!(action.ignite().is_ok());
     assert_state(vec![
         "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
-        "token expires; ticket: 2021-01-02 10:00:00 / api: 2021-01-01 10:00:05 / cdn: 2021-01-01 10:00:05",
+        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
         "encode success",
     ])
 }
@@ -70,8 +70,8 @@ impl<'a> RenewAuthTicketMaterial for TestFeature<'a> {
 }
 
 struct TestStore {
-    pub nonce: MemoryAuthNonceStore,
-    pub ticket: MemoryAuthTicketStore,
+    nonce: MemoryAuthNonceStore,
+    ticket: MemoryAuthTicketStore,
 }
 
 impl TestStore {
@@ -173,8 +173,8 @@ fn standard_nonce_config() -> AuthNonceConfig {
 fn standard_encode_config() -> EncodeAuthTicketConfig {
     EncodeAuthTicketConfig {
         ticket_expires: ExpireDuration::with_duration(Duration::days(1)),
-        api_expires: ExpireDuration::with_duration(Duration::days(1)),
-        cdn_expires: ExpireDuration::with_duration(Duration::days(1)),
+        api_expires: ExpireDuration::with_duration(Duration::minutes(1)),
+        cdn_expires: ExpireDuration::with_duration(Duration::minutes(1)),
     }
 }
 
