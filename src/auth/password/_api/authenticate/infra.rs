@@ -3,9 +3,7 @@ pub mod password_hash;
 pub mod password_repository;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::{
-        AuthClock, AuthNonceConfig, AuthNonceHeader, AuthNonceRepository,
-    },
+    auth_ticket::_api::kernel::infra::{AuthClock, CheckAuthNonceInfra},
     auth_user::_api::kernel::infra::AuthUserRepository,
 };
 
@@ -15,18 +13,15 @@ use crate::auth::login_id::_api::data::LoginId;
 use crate::z_details::_api::{message::data::MessageError, repository::data::RepositoryError};
 
 pub trait AuthenticatePasswordInfra {
+    type CheckNonceInfra: CheckAuthNonceInfra;
     type Clock: AuthClock;
-    type NonceHeader: AuthNonceHeader;
-    type NonceRepository: AuthNonceRepository;
     type PasswordHash: AuthUserPasswordHash;
     type PasswordRepository: AuthUserPasswordRepository;
     type UserRepository: AuthUserRepository;
     type Messenger: AuthenticateMessenger;
 
-    fn nonce_config(&self) -> &AuthNonceConfig;
+    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
     fn clock(&self) -> &Self::Clock;
-    fn nonce_header(&self) -> &Self::NonceHeader;
-    fn nonce_repository(&self) -> &Self::NonceRepository;
     fn password_hash(&self) -> &Self::PasswordHash;
     fn password_repository(&self) -> &Self::PasswordRepository;
     fn user_repository(&self) -> &Self::UserRepository;

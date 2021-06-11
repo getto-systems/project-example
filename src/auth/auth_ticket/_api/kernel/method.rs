@@ -1,14 +1,16 @@
-use super::infra::{AuthClock, AuthNonceConfig, AuthNonceEntry, AuthNonceHeader, AuthNonceRepository};
+use super::infra::{
+    AuthClock, AuthNonceEntry, AuthNonceHeader, AuthNonceRepository, CheckAuthNonceInfra,
+};
 
 use super::data::ValidateAuthNonceError;
 
-pub fn check_nonce(
-    config: &AuthNonceConfig,
-    clock: &impl AuthClock,
-    header: &impl AuthNonceHeader,
-    nonce_repository: &impl AuthNonceRepository,
-) -> Result<(), ValidateAuthNonceError> {
-    let nonce = header
+pub fn check_nonce(infra: &impl CheckAuthNonceInfra) -> Result<(), ValidateAuthNonceError> {
+    let nonce_header = infra.nonce_header();
+    let nonce_repository = infra.nonce_repository();
+    let clock = infra.clock();
+    let config = infra.config();
+
+    let nonce = nonce_header
         .nonce()
         .map_err(ValidateAuthNonceError::HeaderError)?;
 

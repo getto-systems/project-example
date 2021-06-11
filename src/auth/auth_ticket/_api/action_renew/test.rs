@@ -6,6 +6,7 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::auth_ticket::_api::{
     encode::init::test::{StaticEncodeAuthTicketParam, StaticEncodeAuthTicketStruct},
+    kernel::init::test::StaticCheckAuthNonceStruct,
     validate::init::test::StaticValidateAuthTokenStruct,
 };
 
@@ -97,9 +98,7 @@ fn error_token_expired() {
     action.subscribe(handler);
 
     assert!(!action.ignite().is_ok());
-    assert_state(vec![
-        "validate error; auth token error: token expired",
-    ])
+    assert_state(vec!["validate error; auth token error: token expired"])
 }
 
 #[test]
@@ -261,12 +260,15 @@ impl<'a> TestFeature<'a> {
     ) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
+                check_nonce_infra: StaticCheckAuthNonceStruct {
+                    config: standard_nonce_config(),
+                    clock: standard_clock(),
+                    nonce_header: standard_nonce_header(),
+                    nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
+                },
                 config: ValidateAuthTokenConfig { require_roles },
-                nonce_config: standard_nonce_config(),
                 clock: standard_clock(),
-                nonce_header: standard_nonce_header(),
                 token_header: standard_token_header(),
-                nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
                 token_validator,
             },

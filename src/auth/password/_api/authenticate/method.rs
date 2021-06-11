@@ -1,4 +1,4 @@
-use crate::auth::auth_ticket::_api::kernel::part::check_nonce;
+use crate::auth::auth_ticket::_api::kernel::method::check_nonce;
 
 use super::infra::PlainPassword;
 use super::infra::{
@@ -16,13 +16,8 @@ pub fn authenticate_password<S>(
     infra: &impl AuthenticatePasswordInfra,
     post: impl Fn(AuthenticatePasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
-    check_nonce(
-        infra.nonce_config(),
-        infra.clock(),
-        infra.nonce_header(),
-        infra.nonce_repository(),
-    )
-    .map_err(|err| post(AuthenticatePasswordEvent::NonceError(err)))?;
+    check_nonce(infra.check_nonce_infra())
+        .map_err(|err| post(AuthenticatePasswordEvent::NonceError(err)))?;
 
     let password_hash = infra.password_hash();
     let password_repository = infra.password_repository();
