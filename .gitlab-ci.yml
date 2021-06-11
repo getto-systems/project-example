@@ -58,6 +58,7 @@ test-api:
   before_script:
     - rustup component add llvm-tools-preview
     - rustup install nightly
+    - cargo install grcov
   script:
     - ./api/ci/test.sh
 
