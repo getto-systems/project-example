@@ -25,5 +25,5 @@ module.exports = {
             functions: 100,
         },
     },
-    coverageDirectory: "../public/dist/coverage",
+    coverageDirectory: "ui/public/dist/coverage/ui",
 }

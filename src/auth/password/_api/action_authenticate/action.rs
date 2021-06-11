@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use getto_application::{data::MethodResult, infra::PubSub};
+use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::{
     auth_ticket::_api::{
@@ -44,14 +44,14 @@ pub trait AuthenticatePasswordMaterial {
 }
 
 pub struct AuthenticatePasswordAction<M: AuthenticatePasswordMaterial> {
-    pubsub: PubSub<AuthenticatePasswordState>,
+    pubsub: ActionStatePubSub<AuthenticatePasswordState>,
     material: M,
 }
 
 impl<M: AuthenticatePasswordMaterial> AuthenticatePasswordAction<M> {
     pub fn with_material(material: M) -> Self {
         Self {
-            pubsub: PubSub::new(),
+            pubsub: ActionStatePubSub::new(),
             material,
         }
     }

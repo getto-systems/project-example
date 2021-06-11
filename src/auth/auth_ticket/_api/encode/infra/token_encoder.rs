@@ -15,14 +15,14 @@ use crate::auth::auth_ticket::_api::kernel::infra::{
 };
 
 use super::super::super::kernel::data::{AuthTicket, AuthTokenExtract, ExpireDateTime};
-use super::super::data::{AuthTokenEncoded, EncodeAuthTokenError};
+use super::super::data::{AuthTokenEncodedData, EncodeAuthTokenError};
 
-pub struct TicketJwtTokenEncoder<'a> {
+pub struct TicketJwtAuthTokenEncoder<'a> {
     domain: &'a str,
     key: &'a EncodingKey,
 }
 
-impl<'a> TicketJwtTokenEncoder<'a> {
+impl<'a> TicketJwtAuthTokenEncoder<'a> {
     pub fn new(cookie: &'a AuthOutsideCookie, key: &'a EncodingKey) -> Self {
         Self {
             domain: &cookie.domain,
@@ -31,12 +31,12 @@ impl<'a> TicketJwtTokenEncoder<'a> {
     }
 }
 
-impl<'a> AuthTokenEncoder for TicketJwtTokenEncoder<'a> {
+impl<'a> AuthTokenEncoder for TicketJwtAuthTokenEncoder<'a> {
     fn encode(
         &self,
         ticket: AuthTicket,
         expires: ExpireDateTime,
-    ) -> Result<Vec<AuthTokenEncoded>, EncodeAuthTokenError> {
+    ) -> Result<Vec<AuthTokenEncodedData>, EncodeAuthTokenError> {
         Ok(vec![encode_jwt(JwtConfig {
             domain: self.domain,
             name: COOKIE_TICKET_TOKEN,
@@ -48,12 +48,12 @@ impl<'a> AuthTokenEncoder for TicketJwtTokenEncoder<'a> {
     }
 }
 
-pub struct ApiJwtTokenEncoder<'a> {
+pub struct ApiJwtAuthTokenEncoder<'a> {
     domain: &'a str,
     key: &'a EncodingKey,
 }
 
-impl<'a> ApiJwtTokenEncoder<'a> {
+impl<'a> ApiJwtAuthTokenEncoder<'a> {
     pub fn new(cookie: &'a AuthOutsideCookie, key: &'a EncodingKey) -> Self {
         Self {
             domain: &cookie.domain,
@@ -62,12 +62,12 @@ impl<'a> ApiJwtTokenEncoder<'a> {
     }
 }
 
-impl<'a> AuthTokenEncoder for ApiJwtTokenEncoder<'a> {
+impl<'a> AuthTokenEncoder for ApiJwtAuthTokenEncoder<'a> {
     fn encode(
         &self,
         ticket: AuthTicket,
         expires: ExpireDateTime,
-    ) -> Result<Vec<AuthTokenEncoded>, EncodeAuthTokenError> {
+    ) -> Result<Vec<AuthTokenEncodedData>, EncodeAuthTokenError> {
         Ok(vec![encode_jwt(JwtConfig {
             domain: self.domain,
             name: COOKIE_API_TOKEN,
@@ -87,7 +87,7 @@ struct JwtConfig<'a> {
     expires: ExpireDateTime,
     key: &'a EncodingKey,
 }
-fn encode_jwt<'a>(config: JwtConfig<'a>) -> Result<AuthTokenEncoded, EncodeAuthTokenError> {
+fn encode_jwt<'a>(config: JwtConfig<'a>) -> Result<AuthTokenEncodedData, EncodeAuthTokenError> {
     let JwtConfig {
         domain,
         name,
@@ -104,7 +104,7 @@ fn encode_jwt<'a>(config: JwtConfig<'a>) -> Result<AuthTokenEncoded, EncodeAuthT
     )
     .map_err(|err| EncodeAuthTokenError::InfraError(format!("{}", err)))?;
 
-    Ok(AuthTokenEncoded {
+    Ok(AuthTokenEncodedData {
         domain: domain.into(),
         name: name.into(),
         token: AuthTokenExtract {
@@ -145,7 +145,7 @@ impl<'a> AuthTokenEncoder for CloudfrontTokenEncoder<'a> {
         &self,
         _ticket: AuthTicket,
         expires: ExpireDateTime,
-    ) -> Result<Vec<AuthTokenEncoded>, EncodeAuthTokenError> {
+    ) -> Result<Vec<AuthTokenEncodedData>, EncodeAuthTokenError> {
         let policy = CloudfrontPolicy::from_resource(self.resource.into(), expires.timestamp());
         let content = self
             .key
@@ -153,7 +153,7 @@ impl<'a> AuthTokenEncoder for CloudfrontTokenEncoder<'a> {
             .map_err(|err| EncodeAuthTokenError::InfraError(format!("sign error: {}", err)))?;
 
         Ok(vec![
-            AuthTokenEncoded {
+            AuthTokenEncodedData {
                 domain: self.domain.into(),
                 name: COOKIE_CLOUDFRONT_KEY_PAIR_ID.into(),
                 token: AuthTokenExtract {
@@ -161,7 +161,7 @@ impl<'a> AuthTokenEncoder for CloudfrontTokenEncoder<'a> {
                     expires: expires.clone(),
                 },
             },
-            AuthTokenEncoded {
+            AuthTokenEncodedData {
                 domain: self.domain.into(),
                 name: COOKIE_CLOUDFRONT_POLICY.into(),
                 token: AuthTokenExtract {
@@ -169,7 +169,7 @@ impl<'a> AuthTokenEncoder for CloudfrontTokenEncoder<'a> {
                     expires: expires.clone(),
                 },
             },
-            AuthTokenEncoded {
+            AuthTokenEncodedData {
                 domain: self.domain.into(),
                 name: COOKIE_CLOUDFRONT_SIGNATURE.into(),
                 token: AuthTokenExtract {
@@ -178,5 +178,31 @@ impl<'a> AuthTokenEncoder for CloudfrontTokenEncoder<'a> {
                 },
             },
         ])
+    }
+}
+
+#[cfg(test)]
+pub mod test {
+    use super::AuthTokenEncoder;
+
+    use super::super::super::super::kernel::data::{AuthTicket, ExpireDateTime};
+    use super::super::super::data::{AuthTokenEncodedData, EncodeAuthTokenError};
+
+    pub struct StaticAuthTokenEncoder;
+
+    impl<'a> StaticAuthTokenEncoder {
+        pub fn new() -> Self {
+            Self
+        }
+    }
+
+    impl<'a> AuthTokenEncoder for StaticAuthTokenEncoder {
+        fn encode(
+            &self,
+            _ticket: AuthTicket,
+            _expires: ExpireDateTime,
+        ) -> Result<Vec<AuthTokenEncodedData>, EncodeAuthTokenError> {
+            Ok(vec![])
+        }
     }
 }

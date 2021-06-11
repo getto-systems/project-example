@@ -10,7 +10,6 @@ impl ValidateAuthTokenEvent {
             Self::Success(_) => LogLevel::Audit,
             Self::NonceError(err) => err.log_level(),
             Self::TokenError(err) => err.log_level(),
-            Self::TicketDisabled => LogLevel::Audit,
         }
     }
 }

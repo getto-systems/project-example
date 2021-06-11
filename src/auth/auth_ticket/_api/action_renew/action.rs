@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use getto_application::{data::MethodResult, infra::PubSub};
+use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use super::super::encode::{
     event::EncodeAuthTicketEvent, infra::EncodeAuthTicketInfra, method::encode_auth_ticket,
@@ -32,14 +32,14 @@ pub trait RenewAuthTicketMaterial {
 }
 
 pub struct RenewAuthTicketAction<M: RenewAuthTicketMaterial> {
-    pubsub: PubSub<RenewAuthTicketState>,
+    pubsub: ActionStatePubSub<RenewAuthTicketState>,
     material: M,
 }
 
 impl<M: RenewAuthTicketMaterial> RenewAuthTicketAction<M> {
     pub fn with_material(material: M) -> Self {
         Self {
-            pubsub: PubSub::new(),
+            pubsub: ActionStatePubSub::new(),
             material,
         }
     }

@@ -1,8 +1,8 @@
 [package]
-name = "getto-application"
+name = "getto-application-test"
 version = "0.28.0-api"
 authors = ["shun <shun.fix9@gmail.com>"]
 edition = "2018"
 
-[dev-dependencies]
+[dependencies]
 pretty_assertions = "0.7"

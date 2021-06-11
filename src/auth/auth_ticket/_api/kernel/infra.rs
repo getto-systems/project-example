@@ -1,5 +1,5 @@
 pub mod clock;
-pub mod header;
+pub mod nonce_header;
 pub mod nonce_repository;
 pub mod ticket_repository;
 

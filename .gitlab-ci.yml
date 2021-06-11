@@ -55,9 +55,12 @@ test-api:
 
   image: rust:1-buster
 
+  before_script:
+    - rustup component add llvm-tools-preview
+    - rustup install nightly
+    - cargo install grcov
   script:
-    - "cargo build"
-    - ": cargo test"
+    - ./api/ci/test.sh
 
 bump_version-ui:
   stage: bump_version

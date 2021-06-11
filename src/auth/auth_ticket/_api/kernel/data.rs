@@ -126,7 +126,7 @@ impl AuthTicket {
 
 impl Display for AuthTicket {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "auth-ticket: {} / {}", self.id, self.user)
+        write!(f, "{} / {}", self.id, self.user)
     }
 }
 
@@ -151,7 +151,7 @@ impl AuthTicketId {
 
 impl Display for AuthTicketId {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "auth-ticket: {}", self.0)
+        write!(f, "ticket: {}", self.0)
     }
 }
 
@@ -194,6 +194,12 @@ impl ExpireDateTime {
 
     pub fn timestamp(&self) -> i64 {
         self.0.timestamp()
+    }
+}
+
+impl Display for ExpireDateTime {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        self.0.fmt(f)
     }
 }
 

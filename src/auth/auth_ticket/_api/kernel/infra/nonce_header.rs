@@ -24,3 +24,25 @@ impl AuthNonceHeader for ActixWebAuthNonceHeader {
         header(&self.request, HEADER_NONCE).map(AuthNonceValue::new)
     }
 }
+
+#[cfg(test)]
+pub mod test {
+    use super::super::AuthNonceHeader;
+
+    use super::super::super::data::AuthNonceValue;
+    use crate::z_details::_api::request::data::HeaderError;
+
+    pub enum StaticAuthNonceHeader {
+        Valid(AuthNonceValue),
+        NotFound,
+    }
+
+    impl AuthNonceHeader for StaticAuthNonceHeader {
+        fn nonce(&self) -> Result<AuthNonceValue, HeaderError> {
+            match self {
+                Self::NotFound => Err(HeaderError::NotFound),
+                Self::Valid(nonce) => Ok(nonce.clone()),
+            }
+        }
+    }
+}

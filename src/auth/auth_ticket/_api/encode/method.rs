@@ -6,8 +6,8 @@ use super::infra::{AuthTokenEncoder, EncodeAuthTicketInfra, EncodeMessenger};
 use super::event::EncodeAuthTicketEvent;
 
 use super::super::kernel::data::{AuthTicket, AuthToken, ExpansionLimitDateTime};
-use super::data::{AuthTicketEncoded, AuthTokenEncoded, EncodeAuthTokenError};
-use crate::z_details::_api::{message::data::MessageError, repository::data::RepositoryError};
+use super::data::{AuthTokenEncoded, AuthTokenExpires};
+use crate::z_details::_api::repository::data::RepositoryError;
 
 pub fn encode_auth_ticket<S>(
     infra: &impl EncodeAuthTicketInfra,
@@ -15,21 +15,33 @@ pub fn encode_auth_ticket<S>(
     post: impl Fn(EncodeAuthTicketEvent) -> S,
 ) -> MethodResult<S> {
     let limit = fetch_expansion_limit(infra, &ticket)
-        .map_err(|err| post(EncodeAuthTicketEvent::RepositoryError(err)))?;
+        .map_err(|err| post(EncodeAuthTicketEvent::RepositoryError(err)))?
+        .ok_or_else(|| post(EncodeAuthTicketEvent::TicketNotFound))?;
 
-    let limit = limit.ok_or_else(|| post(EncodeAuthTicketEvent::TicketNotFound))?;
+    let expires = calc_expires(infra, limit);
+    post(EncodeAuthTicketEvent::TokenExpiresCalculated(
+        expires.clone(),
+    ));
 
-    let encoded = AuthTicketEncoded {
-        message: encode_message(infra, ticket.clone())
+    let encoded = AuthTokenEncoded {
+        message: infra
+            .messenger()
+            .encode(ticket.clone().into_granted_roles())
             .map_err(|err| post(EncodeAuthTicketEvent::MessageError(err)))?,
 
-        ticket_tokens: encode_ticket_token(infra, ticket.clone(), limit.clone())
+        ticket_tokens: infra
+            .ticket_encoder()
+            .encode(ticket.clone(), expires.ticket)
             .map_err(|err| post(EncodeAuthTicketEvent::EncodeError(err)))?,
 
-        api_tokens: encode_api_token(infra, ticket.clone(), limit.clone())
+        api_tokens: infra
+            .api_encoder()
+            .encode(ticket.clone(), expires.api)
             .map_err(|err| post(EncodeAuthTicketEvent::EncodeError(err)))?,
 
-        cdn_tokens: encode_cdn_token(infra, ticket.clone(), limit.clone())
+        cdn_tokens: infra
+            .cdn_encoder()
+            .encode(ticket.clone(), expires.cdn)
             .map_err(|err| post(EncodeAuthTicketEvent::EncodeError(err)))?,
     };
 
@@ -45,10 +57,29 @@ fn fetch_expansion_limit(
     let ticket_repository = infra.ticket_repository();
     ticket_repository.expansion_limit(&ticket)
 }
+fn calc_expires(
+    infra: &impl EncodeAuthTicketInfra,
+    limit: ExpansionLimitDateTime,
+) -> AuthTokenExpires {
+    let config = infra.config();
+    let clock = infra.clock();
+
+    AuthTokenExpires {
+        ticket: clock
+            .now()
+            .expires_with_limit(&config.ticket_expires, limit.clone()),
+        api: clock
+            .now()
+            .expires_with_limit(&config.api_expires, limit.clone()),
+        cdn: clock
+            .now()
+            .expires_with_limit(&config.cdn_expires, limit.clone()),
+    }
+}
 fn register_ticket_tokens(
     infra: &impl EncodeAuthTicketInfra,
     ticket: AuthTicket,
-    encoded: AuthTicketEncoded,
+    encoded: AuthTokenEncoded,
 ) -> Result<(), RepositoryError> {
     let ticket_repository = infra.ticket_repository();
 
@@ -63,51 +94,4 @@ fn register_ticket_tokens(
         .for_each(|token| tokens.push(AuthToken::new(token.token)));
 
     ticket_repository.register_tokens(ticket, AuthTicketTokens::new(tokens))
-}
-fn encode_message(
-    infra: &impl EncodeAuthTicketInfra,
-    ticket: AuthTicket,
-) -> Result<String, MessageError> {
-    infra.messenger().encode(ticket.into_granted_roles())
-}
-fn encode_ticket_token(
-    infra: &impl EncodeAuthTicketInfra,
-    ticket: AuthTicket,
-    limit: ExpansionLimitDateTime,
-) -> Result<Vec<AuthTokenEncoded>, EncodeAuthTokenError> {
-    let config = infra.config();
-    let clock = infra.clock();
-    let ticket_encoder = infra.ticket_encoder();
-
-    let expires = clock
-        .now()
-        .expires_with_limit(&config.ticket_expires, limit);
-
-    ticket_encoder.encode(ticket.clone(), expires)
-}
-fn encode_api_token(
-    infra: &impl EncodeAuthTicketInfra,
-    ticket: AuthTicket,
-    limit: ExpansionLimitDateTime,
-) -> Result<Vec<AuthTokenEncoded>, EncodeAuthTokenError> {
-    let config = infra.config();
-    let clock = infra.clock();
-    let api_encoder = infra.api_encoder();
-
-    let expires = clock.now().expires_with_limit(&config.api_expires, limit);
-
-    api_encoder.encode(ticket.clone(), expires)
-}
-fn encode_cdn_token(
-    infra: &impl EncodeAuthTicketInfra,
-    ticket: AuthTicket,
-    limit: ExpansionLimitDateTime,
-) -> Result<Vec<AuthTokenEncoded>, EncodeAuthTokenError> {
-    let config = infra.config();
-    let clock = infra.clock();
-    let cdn_encoder = infra.cdn_encoder();
-
-    let expires = clock.now().expires_with_limit(&config.cdn_expires, limit);
-
-    cdn_encoder.encode(ticket.clone(), expires)
 }

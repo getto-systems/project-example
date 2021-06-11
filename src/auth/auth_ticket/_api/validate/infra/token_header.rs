@@ -8,7 +8,7 @@ use crate::z_details::_api::request::helper::cookie;
 
 use super::AuthTokenHeader;
 
-use super::super::super::kernel::data::AuthTokenValue;
+use crate::auth::auth_ticket::_api::kernel::data::AuthTokenValue;
 use crate::z_details::_api::request::data::HeaderError;
 
 pub struct TicketAuthTokenHeader {
@@ -40,5 +40,27 @@ impl ApiAuthTokenHeader {
 impl AuthTokenHeader for ApiAuthTokenHeader {
     fn token(&self) -> Result<AuthTokenValue, HeaderError> {
         cookie(&self.request, COOKIE_API_TOKEN).map(AuthTokenValue::new)
+    }
+}
+
+#[cfg(test)]
+pub mod test {
+    use super::super::AuthTokenHeader;
+
+    use crate::auth::auth_ticket::_api::kernel::data::AuthTokenValue;
+    use crate::z_details::_api::request::data::HeaderError;
+
+    pub enum StaticAuthTokenHeader {
+        Valid(AuthTokenValue),
+        NotFound,
+    }
+
+    impl AuthTokenHeader for StaticAuthTokenHeader {
+        fn token(&self) -> Result<AuthTokenValue, HeaderError> {
+            match self {
+                Self::NotFound => Err(HeaderError::NotFound),
+                Self::Valid(token) => Ok(token.clone()),
+            }
+        }
     }
 }

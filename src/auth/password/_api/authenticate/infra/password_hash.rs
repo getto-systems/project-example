@@ -4,15 +4,15 @@ use super::{AuthUserPasswordHash, HashedPassword, PlainPassword};
 
 use super::super::data::PasswordHashError;
 
-pub struct PassthroughPasswordHash {}
+pub struct Argon2PasswordHash;
 
-impl PassthroughPasswordHash {
+impl Argon2PasswordHash {
     pub const fn new() -> Self {
-        Self {}
+        Self
     }
 }
 
-impl AuthUserPasswordHash for PassthroughPasswordHash {
+impl AuthUserPasswordHash for Argon2PasswordHash {
     fn verify(
         &self,
         plain_password: &PlainPassword,
@@ -26,5 +26,30 @@ impl AuthUserPasswordHash for PassthroughPasswordHash {
         Ok(engine
             .verify_password(plain_password.as_bytes(), &hash)
             .is_ok())
+    }
+}
+
+#[cfg(test)]
+pub mod test {
+    use super::{AuthUserPasswordHash, HashedPassword, PlainPassword};
+
+    use super::super::super::data::PasswordHashError;
+
+    pub struct PlainPasswordHash;
+
+    impl PlainPasswordHash {
+        pub const fn new() -> Self {
+            Self
+        }
+    }
+
+    impl AuthUserPasswordHash for PlainPasswordHash {
+        fn verify(
+            &self,
+            plain_password: &PlainPassword,
+            hashed_password: &HashedPassword,
+        ) -> Result<bool, PasswordHashError> {
+            Ok(plain_password.as_bytes() == hashed_password.as_str().as_bytes())
+        }
     }
 }

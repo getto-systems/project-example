@@ -8,22 +8,37 @@ use super::AuthUserRepository;
 use super::super::data::{AuthUser, AuthUserExtract, AuthUserId};
 use crate::z_details::_api::repository::data::RepositoryError;
 
-pub type MemoryAuthUserStore = Mutex<HashMap<String, HashSet<String>>>;
+pub type MemoryAuthUserStore = Mutex<MemoryAuthUserMap>;
+pub struct MemoryAuthUserMap(HashMap<String, HashSet<String>>);
+
+impl MemoryAuthUserMap {
+    pub fn new() -> Self {
+        Self(HashMap::new())
+    }
+
+    pub fn with_user(user: AuthUser) -> Self {
+        let extract = user.extract();
+
+        let mut store = HashMap::new();
+        store.insert(extract.id, extract.granted_roles);
+
+        Self(store)
+    }
+
+    pub fn to_store(self) -> MemoryAuthUserStore {
+        Mutex::new(self)
+    }
+
+    fn get(&self, user_id: &str) -> Option<&HashSet<String>> {
+        self.0.get(user_id)
+    }
+}
 
 pub struct MemoryAuthUserRepository<'a> {
     store: &'a MemoryAuthUserStore,
 }
 
 impl<'a> MemoryAuthUserRepository<'a> {
-    pub fn new_store() -> MemoryAuthUserStore {
-        let mut store = HashMap::new();
-        let mut roles = HashSet::new();
-        roles.insert("admin".to_string());
-        roles.insert("dev-docs".to_string());
-        store.insert("admin".to_string(), roles);
-        Mutex::new(store)
-    }
-
     pub const fn new(store: &'a MemoryAuthUserStore) -> Self {
         Self { store }
     }

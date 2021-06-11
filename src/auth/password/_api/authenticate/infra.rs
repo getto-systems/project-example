@@ -2,8 +2,6 @@ pub mod messenger;
 pub mod password_hash;
 pub mod password_repository;
 
-use std::convert::TryInto;
-
 use crate::auth::{
     auth_ticket::_api::kernel::infra::{
         AuthClock, AuthNonceConfig, AuthNonceHeader, AuthNonceRepository,
@@ -61,6 +59,7 @@ pub trait AuthenticateMessenger {
     fn encode_invalid_password(&self) -> Result<String, MessageError>;
 }
 
+#[derive(Clone)]
 pub struct AuthenticatePasswordFieldsExtract {
     pub login_id: String,
     pub password: String,
@@ -80,24 +79,20 @@ impl HashedPassword {
 
 pub struct PlainPassword(String);
 
-impl PlainPassword {
-    pub fn as_bytes(&self) -> &[u8] {
-        self.0.as_bytes()
-    }
-}
-
-// bcrypt を想定しているので、72 バイト以上ではいけない
+// bcrypt を想定しているので、72 バイト以上ではいけない TODO この制限はなしになった
 // ui の設定と同期させること
-const PASSWORD_MAX_BYTES: usize = 72;
+const PASSWORD_MAX_BYTES: usize = 72; // TODO BYTES じゃなくて LENGTH にする
 
-impl TryInto<PlainPassword> for String {
-    type Error = ConvertPasswordError;
-
-    fn try_into(self) -> Result<PlainPassword, Self::Error> {
-        match self.chars().count() {
+impl PlainPassword {
+    pub fn validate(password: String) -> Result<PlainPassword, ConvertPasswordError> {
+        match password.chars().count() {
             n if n == 0 => Err(ConvertPasswordError::Empty),
             n if n > PASSWORD_MAX_BYTES => Err(ConvertPasswordError::TooLong),
-            _ => Ok(PlainPassword(self)),
+            _ => Ok(Self(password)),
         }
+    }
+
+    pub fn as_bytes(&self) -> &[u8] {
+        self.0.as_bytes()
     }
 }
