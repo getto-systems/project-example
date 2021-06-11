@@ -46,8 +46,8 @@ fn success_allow_for_any_role() {
 
     assert!(action.ignite().is_ok());
     assert_state(vec![
-        "validate success: ticket: ticket-id / user: something-role-user-id (granted: [something])",
-        "token expires: ticket: 2021-01-02 10:00:00 / api: 2021-01-01 10:00:05 / cdn: 2021-01-01 10:00:05",
+        "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
+        "token expires; ticket: 2021-01-02 10:00:00 / api: 2021-01-01 10:00:05 / cdn: 2021-01-01 10:00:05",
         "encode success",
     ])
 }

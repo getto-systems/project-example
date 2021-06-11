@@ -55,8 +55,10 @@ test-api:
 
   image: rust:1-buster
 
+  before_script:
+    - rustup component add llvm-tools-preview
   script:
-    - "cargo test"
+    - ./api/ci/test.sh
 
 bump_version-ui:
   stage: bump_version

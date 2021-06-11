@@ -40,7 +40,7 @@ function envContent() {
 }
 
 function pathContent() {
-    const files = ["/storybook/index.html", "/coverage/lcov-report/index.html"].concat(
+    const files = ["/storybook/index.html", "/coverage/api/index.html", "/coverage/ui/lcov-report/index.html"].concat(
         entryPoint.findHtmlFiles(),
     )
     return [

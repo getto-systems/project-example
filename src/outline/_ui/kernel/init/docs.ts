@@ -30,7 +30,8 @@ export function docsMenuContent(): MenuContent {
                 : [
                       category("開発用", dev, [
                           item("Storybook", lnir("files-alt"), "/storybook/index.html"),
-                          item("coverage", lnir("files-alt"), "/coverage/lcov-report/index.html"),
+                          item("coverage api", lnir("files-alt"), "/coverage/api/index.html"),
+                          item("coverage ui", lnir("files-alt"), "/coverage/ui/lcov-report/index.html"),
                       ]),
                   ]),
         ],
