@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::Mutex};
 use super::{AuthTicketRepository, AuthTicketTokens};
 
 use super::super::data::{
-    AuthDateTime, AuthTicket, AuthTicketId, AuthToken, AuthTokenValue, ExpansionLimitDateTime,
+    AuthDateTime, AuthTicket, AuthTicketId, AuthToken, ExpansionLimitDateTime,
 };
 use crate::z_details::_api::repository::data::RepositoryError;
 
@@ -11,7 +11,6 @@ pub type MemoryAuthTicketStore = Mutex<MemoryAuthTicketMap>;
 pub struct MemoryAuthTicketMap {
     ticket: HashMap<String, Entry>,
     tokens: HashMap<String, Vec<AuthToken>>,
-    token_map: HashMap<String, AuthTicketId>,
 }
 
 impl MemoryAuthTicketMap {
@@ -19,7 +18,6 @@ impl MemoryAuthTicketMap {
         Self {
             ticket: HashMap::new(),
             tokens: HashMap::new(),
-            token_map: HashMap::new(),
         }
     }
 
@@ -30,7 +28,6 @@ impl MemoryAuthTicketMap {
         Self {
             ticket,
             tokens: HashMap::new(),
-            token_map: HashMap::new(),
         }
     }
 
@@ -92,14 +89,9 @@ impl<'a> AuthTicketRepository for MemoryAuthTicketRepository<'a> {
     ) -> Result<(), RepositoryError> {
         let mut store = self.store.lock().unwrap();
 
-        let id = ticket.into_id();
-        let tokens = tokens.extract();
-
-        store.tokens.insert(id.as_str().into(), tokens.clone());
-
-        tokens.into_iter().for_each(|token| {
-            store.token_map.insert(token.as_str().into(), id.clone());
-        });
+        store
+            .tokens
+            .insert(ticket.into_id().as_str().into(), tokens.extract());
 
         Ok(())
     }
@@ -113,22 +105,5 @@ impl<'a> AuthTicketRepository for MemoryAuthTicketRepository<'a> {
             .ticket
             .get(ticket.id_as_str())
             .map(|entry| entry.limit.clone()))
-    }
-    fn disable(&self, token: &AuthTokenValue) -> Result<(), RepositoryError> {
-        let mut store = self.store.lock().unwrap();
-
-        let id = store
-            .token_map
-            .get(token.as_str())
-            .map(|id| id.clone())
-            .ok_or_else(|| RepositoryError::InfraError(format!("{}", "token not registered")))?;
-
-        store.ticket.remove(id.as_str());
-        if let Some(tokens) = store.tokens.remove(id.as_str()) {
-            tokens.iter().for_each(|token| {
-                store.token_map.remove(token.as_str());
-            })
-        }
-        Ok(())
     }
 }

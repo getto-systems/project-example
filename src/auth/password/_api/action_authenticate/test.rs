@@ -8,6 +8,7 @@ use crate::auth::{
     auth_ticket::_api::{
         encode::init::test::{StaticEncodeAuthTicketParam, StaticEncodeAuthTicketStruct},
         issue::init::test::StaticIssueAuthTicketStruct,
+        kernel::init::test::StaticCheckAuthNonceStruct,
     },
     password::_api::authenticate::init::test::{
         StaticAuthenticatePasswordParam, StaticAuthenticatePasswordStruct,
@@ -99,9 +100,7 @@ fn error_conflict_nonce() {
     action.subscribe(handler);
 
     assert!(!action.ignite().is_ok());
-    assert_state(vec![
-        "authenticate error; auth nonce error: conflict",
-    ])
+    assert_state(vec!["authenticate error; auth nonce error: conflict"])
 }
 
 #[test]
@@ -115,9 +114,7 @@ fn error_invalid_password() {
     action.subscribe(handler);
 
     assert!(!action.ignite().is_ok());
-    assert_state(vec![
-        "authenticate error; password not match",
-    ])
+    assert_state(vec!["authenticate error; password not match"])
 }
 
 #[test]
@@ -131,9 +128,7 @@ fn error_no_password() {
     action.subscribe(handler);
 
     assert!(!action.ignite().is_ok());
-    assert_state(vec![
-        "authenticate error; password not match",
-    ])
+    assert_state(vec!["authenticate error; password not match"])
 }
 
 #[test]
@@ -147,9 +142,7 @@ fn error_no_user() {
     action.subscribe(handler);
 
     assert!(!action.ignite().is_ok());
-    assert_state(vec![
-        "authenticate error; user not found",
-    ])
+    assert_state(vec!["authenticate error; user not found"])
 }
 
 struct TestFeature<'a> {
@@ -236,10 +229,13 @@ impl<'a> TestFeature<'a> {
     fn new(store: &'a TestStore) -> Self {
         Self {
             authenticate: StaticAuthenticatePasswordStruct::new(StaticAuthenticatePasswordParam {
-                nonce_config: standard_nonce_config(),
+                check_nonce_infra: StaticCheckAuthNonceStruct {
+                    config: standard_nonce_config(),
+                    clock: standard_clock(),
+                    nonce_header: standard_nonce_header(),
+                    nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
+                },
                 clock: standard_clock(),
-                nonce_header: standard_nonce_header(),
-                nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
                 user_repository: MemoryAuthUserRepository::new(&store.user),
                 messenger: standard_messenger(),
@@ -329,12 +325,8 @@ fn standard_password_store() -> MemoryAuthUserPasswordStore {
     .to_store()
 }
 fn invalid_password_store() -> MemoryAuthUserPasswordStore {
-    MemoryAuthUserPasswordMap::with_password(
-        test_user_login_id(),
-        test_user(),
-        invalid_password(),
-    )
-    .to_store()
+    MemoryAuthUserPasswordMap::with_password(test_user_login_id(), test_user(), invalid_password())
+        .to_store()
 }
 fn no_password_store() -> MemoryAuthUserPasswordStore {
     MemoryAuthUserPasswordMap::new().to_store()

@@ -9,9 +9,20 @@ use serde::{Deserialize, Serialize};
 
 use super::data::{
     AuthDateTime, AuthNonceValue, AuthTicket, AuthTicketExtract, AuthTicketId, AuthToken,
-    AuthTokenValue, ExpansionLimitDateTime, ExpireDateTime, ExpireDuration,
+    ExpansionLimitDateTime, ExpireDateTime, ExpireDuration,
 };
 use crate::z_details::_api::{repository::data::RepositoryError, request::data::HeaderError};
+
+pub trait CheckAuthNonceInfra {
+    type Clock: AuthClock;
+    type NonceHeader: AuthNonceHeader;
+    type NonceRepository: AuthNonceRepository;
+
+    fn config(&self) -> &AuthNonceConfig;
+    fn clock(&self) -> &Self::Clock;
+    fn nonce_header(&self) -> &Self::NonceHeader;
+    fn nonce_repository(&self) -> &Self::NonceRepository;
+}
 
 pub struct AuthNonceConfig {
     pub nonce_expires: ExpireDuration,
@@ -43,8 +54,6 @@ pub trait AuthTicketRepository {
         &self,
         ticket: &AuthTicket,
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError>;
-
-    fn disable(&self, token: &AuthTokenValue) -> Result<(), RepositoryError>;
 }
 
 pub struct AuthTicketTokens(Vec<AuthToken>);
