@@ -1,9 +1,9 @@
-import { LoadMenuLocationDetecter } from "../kernel/method"
+import { LoadMenuDetecter } from "../kernel/method"
 
 import { BreadcrumbList } from "./data"
 
 export interface LoadBreadcrumbListPod {
-    (detecter: LoadMenuLocationDetecter): LoadBreadcrumbListMethod
+    (detecter: LoadMenuDetecter): LoadBreadcrumbListMethod
 }
 export interface LoadBreadcrumbListMethod {
     (): BreadcrumbList

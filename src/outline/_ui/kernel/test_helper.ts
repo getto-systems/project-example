@@ -1,5 +1,5 @@
-import { MenuCategoryLabel } from "../data"
-import { MenuPermission, MenuTree, MenuTreeNode } from "../infra"
+import { MenuCategoryLabel } from "./data"
+import { MenuPermission, MenuTree, MenuTreeNode } from "./infra"
 
 export function standard_MenuTree(): MenuTree {
     const allow: MenuPermission = { type: "allow" }

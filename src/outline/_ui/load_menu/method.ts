@@ -1,9 +1,9 @@
-import { LoadMenuLocationDetecter } from "../kernel/method"
+import { LoadMenuDetecter } from "../kernel/method"
 
 import { LoadMenuEvent } from "./event"
 
 export interface LoadMenuPod {
-    (detecter: LoadMenuLocationDetecter): LoadMenuMethod
+    (detecter: LoadMenuDetecter): LoadMenuMethod
 }
 export interface LoadMenuMethod {
     <S>(post: Post<LoadMenuEvent, S>): Promise<S>

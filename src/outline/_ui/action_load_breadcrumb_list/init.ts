@@ -1,4 +1,4 @@
-import { newLoadMenuLocationDetecter } from "../kernel/impl/init"
+import { newLoadMenuLocationDetecter } from "../kernel/init"
 import { newLoadBreadcrumbListInfra } from "../load_breadcrumb_list/init"
 
 import { initLoadBreadcrumbListCoreAction, initLoadBreadcrumbListCoreMaterial } from "./core/impl"

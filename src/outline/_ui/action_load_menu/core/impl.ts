@@ -15,7 +15,7 @@ import {
     initialLoadMenuCoreState,
 } from "./action"
 
-import { LoadMenuLocationDetecter } from "../../kernel/method"
+import { LoadMenuDetecter } from "../../kernel/method"
 
 import { MenuCategoryPath } from "../../kernel/data"
 import { initMenuBadgeStore, initMenuExpandStore } from "../../kernel/infra/store"
@@ -26,7 +26,7 @@ type Store = LoadMenuStore & UpdateMenuBadgeStore & ToggleMenuExpandStore
 
 export function initLoadMenuCoreMaterial(
     infra: LoadMenuCoreInfra,
-    detecter: LoadMenuLocationDetecter,
+    detecter: LoadMenuDetecter,
 ): LoadMenuCoreMaterial {
     const store: Store = {
         menuExpand: initMenuExpandStore(),

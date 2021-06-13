@@ -1,4 +1,4 @@
-import { RepositoryConverter } from "../../../../../ui/vendor/getto-application/infra/repository/infra"
+import { RepositoryConverter } from "../../../../ui/vendor/getto-application/infra/repository/infra"
 import {
     initMenuExpand,
     MenuBadge,
@@ -7,18 +7,18 @@ import {
     MenuExpandRepositoryValue,
     MenuTreeCategory,
     MenuTreeItem,
-} from "../infra"
+} from "./infra"
 
-import { ConvertLocationResult } from "../../../../../ui/vendor/getto-application/location/data"
+import { ConvertLocationResult } from "../../../../ui/vendor/getto-application/location/data"
 import {
     MenuCategory,
     MenuCategoryLabel,
     MenuCategoryPath,
     MenuItem,
     MenuTargetPath,
-} from "../data"
+} from "./data"
 
-export function menuTargetPathLocationConverter(
+export function detectMenuTargetPath(
     currentURL: URL,
     version: string,
 ): ConvertLocationResult<MenuTargetPath> {

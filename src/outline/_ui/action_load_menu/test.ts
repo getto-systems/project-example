@@ -1,16 +1,16 @@
 import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
 
-import { markMenuCategoryLabel, standard_MenuTree } from "../kernel/impl/test_helper"
+import { markMenuCategoryLabel, standard_MenuTree } from "../kernel/test_helper"
 
 import { convertRepository } from "../../../../ui/vendor/getto-application/infra/repository/helper"
 import { mockRemotePod } from "../../../../ui/vendor/getto-application/infra/remote/mock"
 import { mockRepository } from "../../../../ui/vendor/getto-application/infra/repository/mock"
 
-import { mockLoadMenuLocationDetecter } from "../kernel/impl/mock"
+import { mockLoadMenuLocationDetecter } from "../kernel/mock"
 
 import { initLoadMenuCoreAction, initLoadMenuCoreMaterial } from "./core/impl"
 
-import { menuExpandRepositoryConverter } from "../kernel/impl/converter"
+import { menuExpandRepositoryConverter } from "../kernel/converter"
 
 import { AuthzRepositoryPod, AuthzRepositoryValue } from "../../../auth/auth_ticket/_ui/kernel/infra"
 import {
@@ -21,7 +21,7 @@ import {
 
 import { LoadMenuResource } from "./resource"
 
-import { LoadMenuLocationDetecter } from "../kernel/method"
+import { LoadMenuDetecter } from "../kernel/method"
 
 describe("Menu", () => {
     test("load menu", async () => {
@@ -382,7 +382,7 @@ function initResource(
     ]
 }
 
-function standard_detecter(): LoadMenuLocationDetecter {
+function standard_detecter(): LoadMenuDetecter {
     return mockLoadMenuLocationDetecter(
         new URL("https://example.com/1.0.0/index.html"),
         standard_version(),

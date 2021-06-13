@@ -1,5 +1,5 @@
-import { standard_MenuTree } from "../kernel/impl/test_helper"
-import { mockLoadMenuLocationDetecter } from "../kernel/impl/mock"
+import { standard_MenuTree } from "../kernel/test_helper"
+import { mockLoadMenuLocationDetecter } from "../kernel/mock"
 
 import { initLoadBreadcrumbListCoreAction, initLoadBreadcrumbListCoreMaterial } from "./core/impl"
 

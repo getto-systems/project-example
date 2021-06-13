@@ -8,11 +8,11 @@ import {
     MenuTreeCategory,
     MenuTreeItem,
     MenuTreeNode,
-} from "../infra"
+} from "./infra"
 
-import { ConvertLocationResult } from "../../../../../ui/vendor/getto-application/location/data"
-import { GrantedRoles } from "../../../../auth/auth_ticket/_ui/kernel/data"
-import { Menu, MenuCategoryPath, MenuNode, MenuTargetPath } from "../data"
+import { ConvertLocationResult } from "../../../../ui/vendor/getto-application/location/data"
+import { GrantedRoles } from "../../../auth/auth_ticket/_ui/kernel/data"
+import { Menu, MenuCategoryPath, MenuNode, MenuTargetPath } from "./data"
 
 export type BuildMenuParams = Readonly<{
     version: string
