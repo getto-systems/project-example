@@ -1,4 +1,4 @@
-import { getCurrentVersion } from "../../get_current/impl"
+import { getCurrentVersion } from "../../get_current/method"
 
 import { GetCurrentVersionInfra } from "../../get_current/infra"
 
