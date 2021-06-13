@@ -20,7 +20,7 @@ import { ForegroundMessage, BackgroundMessage } from "./message"
 import { RepositoryOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/repository/feature"
 import { RemoteOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/remote/feature"
 import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-application/action/worker/infra"
-import { LocationOutsideFeature } from "../../../../../../ui/vendor/getto-application/location/infra"
+import { LocationOutsideFeature } from "../../../../../../ui/vendor/getto-application/location/feature"
 
 import { SignView } from "../../resource"
 

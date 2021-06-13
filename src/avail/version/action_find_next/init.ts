@@ -3,8 +3,9 @@ import { newFindNextVersionInfra, newFindNextVersionLocationDetecter } from "../
 import { initFindNextVersionView } from "./impl"
 import { initFindNextVersionCoreAction, initFindNextVersionCoreMaterial } from "./core/impl"
 
+import { LocationOutsideFeature } from "../../../../ui/vendor/getto-application/location/feature"
+
 import { FindNextVersionView } from "./resource"
-import { LocationOutsideFeature } from "../../../../ui/vendor/getto-application/location/infra"
 
 export function newFindNextVersionView(feature: LocationOutsideFeature): FindNextVersionView {
     return initFindNextVersionView({

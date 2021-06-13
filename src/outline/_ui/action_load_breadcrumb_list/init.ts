@@ -6,7 +6,7 @@ import { initLoadBreadcrumbListCoreAction, initLoadBreadcrumbListCoreMaterial } 
 import { MenuContent } from "../kernel/infra"
 
 import { LoadBreadcrumbListResource } from "./resource"
-import { LocationOutsideFeature } from "../../../../ui/vendor/getto-application/location/infra"
+import { LocationOutsideFeature } from "../../../../ui/vendor/getto-application/location/feature"
 
 export function newLoadBreadcrumbListResource(
     feature: LocationOutsideFeature,

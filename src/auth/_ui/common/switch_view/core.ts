@@ -1,26 +1,16 @@
-import {
-    ResetPasswordVariant,
-    SignNav,
-    signNavKey,
-    StaticSignViewVariant,
-} from "../nav/data"
-import { SignViewLocationDetectMethod, SignViewType } from "./data"
-import {
-    resetPasswordVariantLocationConverter,
-    staticSignViewVariantLocationConverter,
-} from "./converter"
+import { detectResetPasswordVariant, detectStaticSignViewVariant } from "./converter"
 
-export const detectSignViewType: SignViewLocationDetectMethod = (currentURL) => {
-    const staticView = staticSignViewVariantLocationConverter(
-        currentURL.searchParams.get(signNavKey(SignNav.static)),
-    )
+import { ConvertLocationResult } from "../../../../../ui/vendor/getto-application/location/data"
+import { ResetPasswordVariant, StaticSignViewVariant } from "../nav/data"
+import { SignViewType } from "./data"
+
+export function detectSignViewType(currentURL: URL): ConvertLocationResult<SignViewType> {
+    const staticView = detectStaticSignViewVariant(currentURL)
     if (staticView.valid) {
         return { valid: true, value: staticViewType(staticView.value) }
     }
 
-    const resetPassword = resetPasswordVariantLocationConverter(
-        currentURL.searchParams.get(signNavKey(SignNav.passwordReset)),
-    )
+    const resetPassword = detectResetPasswordVariant(currentURL)
     if (resetPassword.valid) {
         return { valid: true, value: resetPasswordViewType(resetPassword.value) }
     }

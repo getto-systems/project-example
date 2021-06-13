@@ -7,7 +7,7 @@ import { initDocsView } from "./impl"
 
 import { RepositoryOutsideFeature } from "../../../ui/vendor/getto-application/infra/repository/feature"
 import { RemoteOutsideFeature } from "../../../ui/vendor/getto-application/infra/remote/feature"
-import { LocationOutsideFeature } from "../../../ui/vendor/getto-application/location/infra"
+import { LocationOutsideFeature } from "../../../ui/vendor/getto-application/location/feature"
 
 import { DocsView } from "./resource"
 
