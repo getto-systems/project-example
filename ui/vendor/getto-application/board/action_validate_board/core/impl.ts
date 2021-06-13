@@ -2,7 +2,7 @@ import { ApplicationAbstractStateAction } from "../../../action/impl"
 
 import { initValidateBoardStack } from "../../validate_board/infra/stack"
 
-import { updateBoardValidateState } from "../../validate_board/impl"
+import { updateBoardValidateState } from "../../validate_board/method"
 
 import { ValidateBoardStore } from "../../validate_board/infra"
 import { BoardConverter } from "../../kernel/infra"
