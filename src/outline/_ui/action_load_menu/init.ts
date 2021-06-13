@@ -1,6 +1,6 @@
 import { newLoadMenuLocationDetecter } from "../kernel/init"
 import { newLoadMenuInfra } from "../load_menu/init"
-import { newUpdateMenuBadgeInfra } from "../update_menu_badge/impl/init"
+import { newUpdateMenuBadgeInfra } from "../update_menu_badge/init"
 import { newToggleMenuExpandInfra } from "../toggle_menu_expand/init"
 
 import { initLoadMenuCoreAction, initLoadMenuCoreMaterial } from "./core/impl"
