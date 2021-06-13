@@ -3,12 +3,12 @@ import { setupActionTestRunner } from "../../../../../ui/vendor/getto-applicatio
 import { mockClock, mockClockPubSub } from "../../../../../ui/vendor/getto-application/infra/clock/mock"
 import { mockRepository } from "../../../../../ui/vendor/getto-application/infra/repository/mock"
 
-import { markSeason } from "../load_season/impl/test_helper"
+import { markSeason } from "../load_season/test_helper"
 import { convertRepository } from "../../../../../ui/vendor/getto-application/infra/repository/helper"
 
 import { initLoadSeasonCoreAction } from "./core/impl"
 
-import { seasonRepositoryConverter } from "../load_season/impl/converter"
+import { seasonRepositoryConverter } from "../load_season/converter"
 
 import { SeasonRepositoryPod, SeasonRepositoryValue } from "../load_season/infra"
 

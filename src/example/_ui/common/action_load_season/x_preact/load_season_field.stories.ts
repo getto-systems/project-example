@@ -4,7 +4,7 @@ import { enumKeys, storyTemplate } from "../../../../../../ui/vendor/storybook/p
 
 import { LoadSeasonFieldComponent } from "./load_season_field"
 
-import { markSeason } from "../../load_season/impl/test_helper"
+import { markSeason } from "../../load_season/test_helper"
 
 import { mockLoadSeasonResource } from "../mock"
 
