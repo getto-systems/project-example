@@ -1,6 +1,6 @@
 import { ApplicationAbstractStateAction } from "../../../../../../../ui/vendor/getto-application/action/impl"
 
-import { requestResetToken } from "../../request_token/impl/core"
+import { requestResetToken } from "../../request_token/method"
 
 import { RequestResetTokenInfra } from "../../request_token/infra"
 

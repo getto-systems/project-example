@@ -1,4 +1,4 @@
-import { newRequestResetTokenInfra } from "../../request_token/impl/init"
+import { newRequestResetTokenInfra } from "../../request_token/init"
 
 import { initRequestResetTokenCoreMaterial } from "../core/impl"
 
