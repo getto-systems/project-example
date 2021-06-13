@@ -1,10 +1,10 @@
 import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/impl"
 
-import { findNextVersion } from "../../find_next/impl/core"
+import { findNextVersion } from "../../find_next/method"
 
 import { FindNextVersionInfra } from "../../find_next/infra"
 
-import { FindNextVersionLocationDetecter } from "../../find_next/method"
+import { FindNextVersionDetecter } from "../../find_next/method"
 
 import {
     FindNextVersionMaterial,
@@ -15,7 +15,7 @@ import {
 
 export function initFindNextVersionCoreMaterial(
     infra: FindNextVersionInfra,
-    detecter: FindNextVersionLocationDetecter,
+    detecter: FindNextVersionDetecter,
 ): FindNextVersionMaterial {
     return {
         find: findNextVersion(infra)(detecter),

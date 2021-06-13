@@ -1,7 +1,7 @@
-import { ConvertLocationResult } from "../../../../../ui/vendor/getto-application/location/data"
-import { ApplicationTargetPath, ParseVersionResult, Version } from "../data"
+import { ConvertLocationResult } from "../../../../ui/vendor/getto-application/location/data"
+import { ApplicationTargetPath, ParseVersionResult, Version } from "./data"
 
-export function applicationTargetPathLocationConverter(
+export function detectApplicationTargetPath(
     currentURL: URL,
     version: string,
 ): ConvertLocationResult<ApplicationTargetPath> {

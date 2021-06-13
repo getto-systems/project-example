@@ -2,7 +2,7 @@ import { FindNextVersionView } from "../resource"
 
 import { FindNextVersionCoreState } from "../core/action"
 
-import { applicationPath } from "../../find_next/impl/helper"
+import { applicationPath } from "../../find_next/helper"
 
 import { ConvertLocationResult } from "../../../../../ui/vendor/getto-application/location/data"
 import { ApplicationTargetPath } from "../../find_next/data"
