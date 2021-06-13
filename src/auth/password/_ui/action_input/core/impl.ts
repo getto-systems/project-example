@@ -1,7 +1,7 @@
 import { initInputBoardValueResource } from "../../../../../../ui/vendor/getto-application/board/action_input/impl"
 import { initValidateBoardFieldAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/core/impl"
 
-import { checkPasswordCharacter } from "../../check_character/impl"
+import { checkPasswordCharacter } from "../../check_character/method"
 
 import { InputPasswordAction } from "./action"
 

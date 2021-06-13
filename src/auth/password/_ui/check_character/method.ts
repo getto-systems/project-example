@@ -4,3 +4,9 @@ import { PasswordCharacterState } from "../data"
 export interface CheckPasswordCharacterMethod {
     (password: BoardValue): PasswordCharacterState
 }
+
+export const checkPasswordCharacter: CheckPasswordCharacterMethod = (password) => {
+    return {
+        multiByte: new TextEncoder().encode(password).byteLength > password.length
+    }
+}
