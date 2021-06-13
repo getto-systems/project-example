@@ -1,9 +1,9 @@
-import { RepositoryConverter } from "../../../../../../ui/vendor/getto-application/infra/repository/infra"
+import { RepositoryConverter } from "../../../../../ui/vendor/getto-application/infra/repository/infra"
 
-import { Clock } from "../../../../../../ui/vendor/getto-application/infra/clock/infra"
-import { SeasonRepositoryValue } from "../infra"
+import { Clock } from "../../../../../ui/vendor/getto-application/infra/clock/infra"
+import { SeasonRepositoryValue } from "./infra"
 
-import { Season } from "../data"
+import { Season } from "./data"
 
 export const seasonRepositoryConverter: RepositoryConverter<Season, SeasonRepositoryValue> = {
     toRepository: (value) => value,

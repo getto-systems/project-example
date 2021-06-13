@@ -1,5 +1,6 @@
 import { ApplicationAbstractStateAction } from "../../../../../../ui/vendor/getto-application/action/impl"
-import { loadSeason } from "../../load_season/impl/core"
+
+import { loadSeason } from "../../load_season/method"
 
 import { LoadSeasonInfra } from "../../load_season/infra"
 
