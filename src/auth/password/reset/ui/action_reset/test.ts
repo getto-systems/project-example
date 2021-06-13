@@ -11,7 +11,7 @@ import {
 import { mockRemotePod } from "../../../../../../ui/vendor/getto-application/infra/remote/mock"
 
 import { mockGetScriptPathDetecter } from "../../../../_ui/common/secure/get_script_path/mock"
-import { mockResetPasswordLocationDetecter } from "../reset/impl/mock"
+import { mockResetPasswordLocationDetecter } from "../reset/mock"
 
 import { convertRepository } from "../../../../../../ui/vendor/getto-application/infra/repository/helper"
 

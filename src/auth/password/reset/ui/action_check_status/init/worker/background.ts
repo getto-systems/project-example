@@ -1,12 +1,14 @@
 import { WorkerHandler } from "../../../../../../../../ui/vendor/getto-application/action/worker/background"
+import { backgroundLocationDetecter } from "../../../../../../../../ui/vendor/getto-application/location/helper"
+
+import { newCheckSendingStatusMaterialPod } from "../common"
 
 import {
     CheckPasswordResetSendingStatusProxyMessage,
     CheckPasswordResetSendingStatusProxyResponse,
 } from "./message"
-import { newCheckSendingStatusMaterialPod } from "../common"
-import { backgroundLocationDetecter } from "../../../../../../../../ui/vendor/getto-application/location/helper"
-import { RemoteOutsideFeature } from "../../../../../../../../ui/vendor/getto-application/infra/remote/infra"
+
+import { RemoteOutsideFeature } from "../../../../../../../../ui/vendor/getto-application/infra/remote/feature"
 
 type OutsideFeature = RemoteOutsideFeature
 export function newCheckPasswordResetSendingStatusWorkerHandler(

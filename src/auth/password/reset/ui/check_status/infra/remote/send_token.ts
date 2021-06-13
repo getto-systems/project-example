@@ -10,7 +10,8 @@ import {
     apiStatusError,
 } from "../../../../../../../z_details/_ui/api/helper"
 
-import { RemoteOutsideFeature } from "../../../../../../../../ui/vendor/getto-application/infra/remote/infra"
+import { RemoteOutsideFeature } from "../../../../../../../../ui/vendor/getto-application/infra/remote/feature"
+
 import { SendResetTokenRemotePod } from "../../infra"
 
 import { ApiCommonError, ApiResult } from "../../../../../../../z_details/_ui/api/data"

@@ -6,7 +6,8 @@ import {
 } from "../../../../../../ui/vendor/getto-application/infra/remote/helper"
 import { apiInfraError, apiRequest, apiStatusError } from "../../../../../z_details/_ui/api/helper"
 
-import { RemoteOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/remote/infra"
+import { RemoteOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/remote/feature"
+
 import { ClearAuthTicketRemotePod } from "../infra"
 
 export function newClearAuthTicketRemote(feature: RemoteOutsideFeature): ClearAuthTicketRemotePod {

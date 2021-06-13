@@ -7,7 +7,7 @@ import { ForegroundMessage, BackgroundMessage } from "./message"
 import { RequestPasswordResetTokenProxyMessage } from "../../../../password/reset/ui/action_request_token/init/worker/message"
 import { CheckPasswordResetSendingStatusProxyMessage } from "../../../../password/reset/ui/action_check_status/init/worker/message"
 
-import { RemoteOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/remote/infra"
+import { RemoteOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/remote/feature"
 import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-application/action/worker/infra"
 
 type OutsideFeature = RemoteOutsideFeature & WorkerOutsideFeature

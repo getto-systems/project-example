@@ -15,7 +15,8 @@ import {
 } from "../../../../../../z_details/_ui/api/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 
-import { RemoteOutsideFeature } from "../../../../../../../ui/vendor/getto-application/infra/remote/infra"
+import { RemoteOutsideFeature } from "../../../../../../../ui/vendor/getto-application/infra/remote/feature"
+
 import { AuthenticatePasswordRemotePod } from "../../infra"
 
 import {

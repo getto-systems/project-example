@@ -1,5 +1,5 @@
 import { env } from "../../../../../y_environment/_ui/env"
-import { newLocationDetecter } from "../../../../../../ui/vendor/getto-application/location/init"
+import { newDetecter } from "../../../../../../ui/vendor/getto-application/location/init"
 
 import { GetScriptPathInfra } from "./infra"
 
@@ -11,7 +11,7 @@ import { detectPathname } from "./converter"
 export function newGetScriptPathLocationDetecter(
     feature: LocationOutsideFeature,
 ): GetScriptPathDetecter {
-    return newLocationDetecter(feature, detectPathname)
+    return newDetecter(feature, detectPathname)
 }
 
 export function newGetSecureScriptPathInfra(): GetScriptPathInfra {

@@ -4,14 +4,14 @@ import { newAuthnRepositoryPod } from "../kernel/infra/repository/authn"
 
 import { newClock } from "../../../../../ui/vendor/getto-application/infra/clock/init"
 
+import { RemoteOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/remote/feature"
+import { RepositoryOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/repository/infra"
+
 import {
     expireMinute,
     intervalMinute,
 } from "../../../../../ui/vendor/getto-application/infra/config/infra"
-
 import { StartContinuousRenewInfra } from "./infra"
-import { RemoteOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/remote/infra"
-import { RepositoryOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/repository/infra"
 
 type OutsideFeature = RepositoryOutsideFeature & RemoteOutsideFeature
 export function newStartContinuousRenewAuthnInfoInfra(

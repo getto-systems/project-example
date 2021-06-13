@@ -13,16 +13,16 @@ import {
 
 import { initSignView } from "../../impl"
 import { initSignAction } from "../../core/impl"
+import { initSignLinkResource } from "../../../common/nav/action_nav/impl"
 
 import { ForegroundMessage, BackgroundMessage } from "./message"
 
-import { SignView } from "../../resource"
-import { initSignLinkResource } from "../../../common/nav/action_nav/impl"
-
 import { RepositoryOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/repository/infra"
-import { RemoteOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/remote/infra"
+import { RemoteOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/remote/feature"
 import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-application/action/worker/infra"
 import { LocationOutsideFeature } from "../../../../../../ui/vendor/getto-application/location/infra"
+
+import { SignView } from "../../resource"
 
 type OutsideFeature = RemoteOutsideFeature &
     RepositoryOutsideFeature &

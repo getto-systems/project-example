@@ -1,5 +1,8 @@
+import { RemoteOutsideFeature, RemoteFeature } from "./feature"
+
+import { Remote, RemotePod } from "./infra"
+
 import { RemoteCommonError } from "./data"
-import { Remote, RemoteFeature, RemoteOutsideFeature, RemotePod } from "./infra"
 
 export function remoteFeature(
     serverURL: string,

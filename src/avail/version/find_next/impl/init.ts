@@ -1,6 +1,6 @@
 import { env } from "../../../../y_environment/_ui/env"
 
-import { newLocationDetecter } from "../../../../../ui/vendor/getto-application/location/init"
+import { newDetecter } from "../../../../../ui/vendor/getto-application/location/init"
 
 import { newCheckDeployExistsRemote } from "../infra/remote/check_deploy_exists"
 
@@ -14,7 +14,7 @@ import { LocationOutsideFeature } from "../../../../../ui/vendor/getto-applicati
 export function newFindNextVersionLocationDetecter(
     feature: LocationOutsideFeature,
 ): FindNextVersionLocationDetecter {
-    return newLocationDetecter(feature, detectApplicationTargetPath({ version: env.version }))
+    return newDetecter(feature, detectApplicationTargetPath({ version: env.version }))
 }
 
 export function newFindNextVersionInfra(): FindNextVersionInfra {

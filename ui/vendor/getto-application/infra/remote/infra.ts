@@ -1,11 +1,3 @@
-export type RemoteOutsideFeature = Readonly<{
-    webCrypto: Crypto
-}>
-export type RemoteFeature = Readonly<{
-    serverURL: string
-    nonce: RemoteNonceGenerator
-}>
-
 export interface RemoteNonceGenerator {
     (): RemoteNonce
 }

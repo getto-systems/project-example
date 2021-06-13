@@ -1,11 +1,9 @@
-import { LocationConverter } from "../../../../../ui/vendor/getto-application/location/infra"
-
 import { ConvertLocationResult } from "../../../../../ui/vendor/getto-application/location/data"
 import { SignNav, signNavKey } from "../../../_ui/common/nav/data"
 import { ResetSessionID, ResetToken } from "./data"
 
-type ResetTokenConverter = LocationConverter<ResetToken, string | null>
-export const resetTokenLocationConverter: ResetTokenConverter = (resetToken) => {
+export function detectResetToken(currentURL: URL): ConvertLocationResult<ResetToken> {
+    const resetToken = currentURL.searchParams.get(signNavKey(SignNav.passwordResetToken))
     if (resetToken === null) {
         return { valid: false }
     }

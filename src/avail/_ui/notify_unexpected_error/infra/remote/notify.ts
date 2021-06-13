@@ -8,7 +8,8 @@ import {
 import { encodeProtobuf } from "../../../../../../ui/vendor/protobuf/helper"
 import { apiInfraError, apiRequest, apiStatusError } from "../../../../../z_details/_ui/api/helper"
 
-import { RemoteOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/remote/infra"
+import { RemoteOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/remote/feature"
+
 import { NotifyUnexpectedErrorRemotePod } from "../../infra"
 
 import { ApiCommonError, ApiResult } from "../../../../../z_details/_ui/api/data"

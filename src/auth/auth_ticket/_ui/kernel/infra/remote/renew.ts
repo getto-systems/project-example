@@ -12,7 +12,8 @@ import {
 } from "../../../../../../z_details/_ui/api/helper"
 import { decodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 
-import { RemoteOutsideFeature } from "../../../../../../../ui/vendor/getto-application/infra/remote/infra"
+import { RemoteOutsideFeature } from "../../../../../../../ui/vendor/getto-application/infra/remote/feature"
+
 import { RenewAuthTicketRemotePod } from "../../infra"
 
 export function newRenewAuthTicketRemote(feature: RemoteOutsideFeature): RenewAuthTicketRemotePod {

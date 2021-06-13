@@ -4,7 +4,7 @@ import { buildRequestResetTokenView } from "./worker/foreground"
 
 import { initRequestResetTokenCoreAction, initRequestResetTokenCoreMaterial } from "../core/impl"
 
-import { RemoteOutsideFeature } from "../../../../../../../ui/vendor/getto-application/infra/remote/infra"
+import { RemoteOutsideFeature } from "../../../../../../../ui/vendor/getto-application/infra/remote/feature"
 
 import { RequestResetTokenView } from "../resource"
 
