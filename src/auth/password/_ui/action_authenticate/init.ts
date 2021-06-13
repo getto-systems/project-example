@@ -3,7 +3,7 @@ import {
     newGetScriptPathLocationDetecter,
     newGetSecureScriptPathInfra,
 } from "../../../_ui/common/secure/get_script_path/init"
-import { newAuthenticatePasswordInfra } from "../authenticate/impl/init"
+import { newAuthenticatePasswordInfra } from "../authenticate/init"
 
 import { initAuthenticatePasswordView } from "./impl"
 import { initAuthenticatePasswordFormAction } from "./form/impl"
