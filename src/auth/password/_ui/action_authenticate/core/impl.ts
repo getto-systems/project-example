@@ -4,7 +4,10 @@ import {
     saveAuthTicket,
     startContinuousRenew,
 } from "../../../../auth_ticket/_ui/start_continuous_renew/impl/core"
-import { getScriptPath } from "../../../../_ui/common/secure/get_script_path/impl/core"
+import {
+    GetScriptPathDetecter,
+    getScriptPath,
+} from "../../../../_ui/common/secure/get_script_path/method"
 import { authenticatePassword } from "../../authenticate/impl/core"
 
 import { AuthenticatePasswordInfra } from "../../authenticate/infra"
@@ -17,8 +20,6 @@ import {
     AuthenticatePasswordCoreState,
     initialAuthenticatePasswordCoreState,
 } from "./action"
-
-import { GetScriptPathLocationDetecter } from "../../../../_ui/common/secure/get_script_path/method"
 
 import { LoadScriptError } from "../../../../_ui/common/secure/get_script_path/data"
 import { AuthenticatePasswordFields } from "../../authenticate/data"
@@ -33,7 +34,7 @@ export type AuthenticatePasswordCoreInfra = Readonly<{
 
 export function initAuthenticatePasswordCoreMaterial(
     infra: AuthenticatePasswordCoreInfra,
-    locationInfo: GetScriptPathLocationDetecter,
+    locationInfo: GetScriptPathDetecter,
 ): AuthenticatePasswordCoreMaterial {
     return {
         save: saveAuthTicket(infra.startContinuousRenew),
@@ -51,7 +52,8 @@ export function initAuthenticatePasswordCoreAction(
 
 class Action
     extends ApplicationAbstractStateAction<AuthenticatePasswordCoreState>
-    implements AuthenticatePasswordCoreAction {
+    implements AuthenticatePasswordCoreAction
+{
     readonly initialState = initialAuthenticatePasswordCoreState
 
     material: AuthenticatePasswordCoreMaterial
@@ -61,7 +63,9 @@ class Action
         this.material = material
     }
 
-    async submit(fields: ConvertBoardResult<AuthenticatePasswordFields>): Promise<AuthenticatePasswordCoreState> {
+    async submit(
+        fields: ConvertBoardResult<AuthenticatePasswordFields>,
+    ): Promise<AuthenticatePasswordCoreState> {
         return this.material.authenticate(fields, (event) => {
             switch (event.type) {
                 case "succeed-to-login":

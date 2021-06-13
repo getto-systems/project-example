@@ -10,7 +10,7 @@ import {
 } from "../../../../../../ui/vendor/getto-application/infra/clock/mock"
 import { mockRemotePod } from "../../../../../../ui/vendor/getto-application/infra/remote/mock"
 
-import { mockGetScriptPathLocationDetecter } from "../../../../_ui/common/secure/get_script_path/impl/mock"
+import { mockGetScriptPathDetecter } from "../../../../_ui/common/secure/get_script_path/mock"
 import { mockResetPasswordLocationDetecter } from "../reset/impl/mock"
 
 import { convertRepository } from "../../../../../../ui/vendor/getto-application/infra/repository/helper"
@@ -232,7 +232,7 @@ function initView(
     const authz = standard_authz()
 
     const detecter = {
-        getSecureScriptPath: mockGetScriptPathLocationDetecter(currentURL),
+        getSecureScriptPath: mockGetScriptPathDetecter(currentURL),
         reset: mockResetPasswordLocationDetecter(currentURL),
     }
 

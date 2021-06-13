@@ -1,7 +1,10 @@
 import { ApplicationAbstractStateAction } from "../../../../../../../ui/vendor/getto-application/action/impl"
 
 import { resetPassword } from "../../reset/impl/core"
-import { getScriptPath } from "../../../../../_ui/common/secure/get_script_path/impl/core"
+import {
+    GetScriptPathDetecter,
+    getScriptPath,
+} from "../../../../../_ui/common/secure/get_script_path/method"
 import {
     saveAuthTicket,
     startContinuousRenew,
@@ -18,7 +21,6 @@ import {
     initialResetPasswordCoreState,
 } from "./action"
 
-import { GetScriptPathLocationDetecter } from "../../../../../_ui/common/secure/get_script_path/method"
 import { ResetPasswordLocationDetecter } from "../../reset/method"
 
 import { LoadScriptError } from "../../../../../_ui/common/secure/get_script_path/data"
@@ -33,7 +35,7 @@ export type ResetPasswordCoreInfra = Readonly<{
 }>
 
 export type ResetPasswordCoreForegroundDetecter = Readonly<{
-    getSecureScriptPath: GetScriptPathLocationDetecter
+    getSecureScriptPath: GetScriptPathDetecter
 }>
 export type ResetPasswordCoreBackgroundDetecter = Readonly<{
     reset: ResetPasswordLocationDetecter
@@ -59,7 +61,8 @@ export function initResetPasswordCoreAction(
 
 class Action
     extends ApplicationAbstractStateAction<ResetPasswordCoreState>
-    implements ResetPasswordCoreAction {
+    implements ResetPasswordCoreAction
+{
     readonly initialState = initialResetPasswordCoreState
 
     material: ResetPasswordCoreMaterial

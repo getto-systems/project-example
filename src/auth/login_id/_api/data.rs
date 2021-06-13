@@ -10,6 +10,7 @@ pub struct LoginId(String);
 const LOGIN_ID_MAX_LENGTH: usize = 100;
 
 impl LoginId {
+    // TODO これは validate.rs に移動するべき
     pub fn validate(login_id: String) -> Result<Self, ConvertLoginIdError> {
         match login_id.chars().count() {
             n if n == 0 => Err(ConvertLoginIdError::Empty),
