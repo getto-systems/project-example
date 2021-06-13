@@ -1,8 +1,8 @@
-import { LoadMenuLocationDetecter } from "../kernel/method";
+import { LoadMenuDetecter } from "../kernel/method";
 import { UpdateMenuBadgeEvent } from "./event"
 
 export interface UpdateMenuBadgePod {
-    (detecter: LoadMenuLocationDetecter): UpdateMenuBadgeMethod
+    (detecter: LoadMenuDetecter): UpdateMenuBadgeMethod
 }
 export interface UpdateMenuBadgeMethod {
     <S>(post: Post<UpdateMenuBadgeEvent, S>): Promise<S>

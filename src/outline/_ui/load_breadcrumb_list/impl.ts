@@ -1,4 +1,4 @@
-import { toMenuCategory, toMenuItem } from "../kernel/impl/converter"
+import { toMenuCategory, toMenuItem } from "../kernel/converter"
 
 import { MenuTree, MenuTreeCategory, MenuTreeItem, MenuTreeNode } from "../kernel/infra"
 import { LoadBreadcrumbListInfra } from "./infra"

@@ -1,7 +1,7 @@
 import { authzRepositoryConverter } from "../../../../auth/auth_ticket/_ui/kernel/converter"
-import { menuBadgeRemoteConverter } from "../../kernel/impl/converter"
+import { menuBadgeRemoteConverter } from "../../kernel/converter"
 
-import { buildMenu, BuildMenuParams } from "../../kernel/impl/menu"
+import { buildMenu, BuildMenuParams } from "../../kernel/helper"
 
 import { initMenuExpand, MenuBadge } from "../../kernel/infra"
 import { UpdateMenuBadgeInfra, UpdateMenuBadgeStore } from "../infra"
