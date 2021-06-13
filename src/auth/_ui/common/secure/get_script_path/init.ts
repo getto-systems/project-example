@@ -1,17 +1,17 @@
 import { env } from "../../../../../y_environment/_ui/env"
-import { newDetecter } from "../../../../../../ui/vendor/getto-application/location/init"
+import { toURL } from "../../../../../../ui/vendor/getto-application/location/init"
 
 import { GetScriptPathInfra } from "./infra"
 
 import { GetScriptPathDetecter } from "./method"
-import { LocationOutsideFeature } from "../../../../../../ui/vendor/getto-application/location/infra"
+import { LocationOutsideFeature } from "../../../../../../ui/vendor/getto-application/location/feature"
 
 import { detectPathname } from "./converter"
 
 export function newGetScriptPathLocationDetecter(
     feature: LocationOutsideFeature,
 ): GetScriptPathDetecter {
-    return newDetecter(feature, detectPathname)
+    return () => detectPathname(toURL(feature))
 }
 
 export function newGetSecureScriptPathInfra(): GetScriptPathInfra {

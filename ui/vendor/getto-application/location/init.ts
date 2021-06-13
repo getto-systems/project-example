@@ -1,9 +1,5 @@
-import { LocationDetecter, LocationDetectMethod, LocationOutsideFeature } from "./infra"
+import { LocationOutsideFeature } from "./feature"
 
-export function newDetecter<T>(
-    feature: LocationOutsideFeature,
-    method: LocationDetectMethod<T>,
-): LocationDetecter<T> {
-    const { currentLocation } = feature
-    return () => method(new URL(currentLocation.toString()))
+export function toURL(feature: LocationOutsideFeature): URL {
+    return new URL(feature.currentLocation.toString())
 }

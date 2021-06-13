@@ -1,6 +1,8 @@
-import { RepositoryOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/repository/infra"
 import { newLoadSeasonInfra } from "../load_season/init"
 import { initLoadSeasonCoreAction } from "./core/impl"
+
+import { RepositoryOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/repository/feature"
+
 import { LoadSeasonResource } from "./resource"
 
 type OutsideFeature = RepositoryOutsideFeature

@@ -1,13 +1,13 @@
 import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/impl"
 
-import { SignViewLocationDetecter, SignViewType } from "../../common/switch_view/data"
+import { SignViewDetecter, SignViewType } from "../../common/switch_view/data"
 
 import { initialSignViewState, SignAction, SignActionState, SignSubView } from "./action"
 
 import { ConvertLocationResult } from "../../../../../ui/vendor/getto-application/location/data"
 
 export function initSignAction(
-    detecter: SignViewLocationDetecter,
+    detecter: SignViewDetecter,
     subView: SignSubView,
 ): SignAction {
     return new Action(detecter, subView)
@@ -16,10 +16,10 @@ export function initSignAction(
 class Action extends ApplicationAbstractStateAction<SignActionState> implements SignAction {
     readonly initialState = initialSignViewState
 
-    detecter: SignViewLocationDetecter
+    detecter: SignViewDetecter
     subView: SignSubView
 
-    constructor(detecter: SignViewLocationDetecter, subView: SignSubView) {
+    constructor(detecter: SignViewDetecter, subView: SignSubView) {
         super(async () => {
             const view = this.subView.check()
 

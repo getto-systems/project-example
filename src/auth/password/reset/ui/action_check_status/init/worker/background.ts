@@ -1,5 +1,4 @@
 import { WorkerHandler } from "../../../../../../../../ui/vendor/getto-application/action/worker/background"
-import { backgroundLocationDetecter } from "../../../../../../../../ui/vendor/getto-application/location/helper"
 
 import { newCheckSendingStatusMaterialPod } from "../common"
 
@@ -19,7 +18,7 @@ export function newCheckPasswordResetSendingStatusWorkerHandler(
     return async (message) => {
         switch (message.method) {
             case "checkStatus":
-                await pod.initCheckStatus(backgroundLocationDetecter(message.params))((event) => {
+                await pod.initCheckStatus(() => message.params)((event) => {
                     post({ ...message, done: false, event })
                 })
                 post({ ...message, done: true })

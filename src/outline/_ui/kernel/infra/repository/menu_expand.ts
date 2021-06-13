@@ -4,8 +4,9 @@ import { convertRepository } from "../../../../../../ui/vendor/getto-application
 import { decodeProtobuf, encodeProtobuf } from "../../../../../../ui/vendor/protobuf/helper"
 import { IndexedDBTarget, initIndexedDB } from "../../../../../z_details/_ui/db/indexed_db"
 
+import { RepositoryOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/repository/feature"
+
 import { FetchDBResult, StoreDBResult } from "../../../../../z_details/_ui/db/infra"
-import { RepositoryOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/repository/infra"
 import { MenuExpandRepositoryPod } from "../../infra"
 
 export type MenuExpandRepositoryParams = Readonly<{

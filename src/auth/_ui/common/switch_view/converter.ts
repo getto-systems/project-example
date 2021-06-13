@@ -1,14 +1,18 @@
-import { LocationConverter } from "../../../../../ui/vendor/getto-application/location/infra"
+import { ConvertLocationResult } from "../../../../../ui/vendor/getto-application/location/data"
 
 import {
     ResetPasswordVariant,
     ResetPasswordVariantKey,
+    SignNav,
+    signNavKey,
     StaticSignViewVariant,
     StaticSignViewVariantKey,
 } from "../nav/data"
 
-type StaticSignViewVariantConverter = LocationConverter<StaticSignViewVariant, string | null>
-export const staticSignViewVariantLocationConverter: StaticSignViewVariantConverter = (search) => {
+export function detectStaticSignViewVariant(
+    currentURL: URL,
+): ConvertLocationResult<StaticSignViewVariant> {
+    const search = currentURL.searchParams.get(signNavKey(SignNav.static))
     if (!search) {
         return { valid: false }
     }
@@ -19,8 +23,10 @@ export const staticSignViewVariantLocationConverter: StaticSignViewVariantConver
     return { valid: false }
 }
 
-type ResetPasswordVariantConverter = LocationConverter<ResetPasswordVariant, string | null>
-export const resetPasswordVariantLocationConverter: ResetPasswordVariantConverter = (search) => {
+export function detectResetPasswordVariant(
+    currentURL: URL,
+): ConvertLocationResult<ResetPasswordVariant> {
+    const search = currentURL.searchParams.get(signNavKey(SignNav.passwordReset))
     if (!search) {
         return { valid: false }
     }
