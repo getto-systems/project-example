@@ -1,5 +1,5 @@
-import { LocationOutsideFeature } from "../../../../../ui/vendor/getto-application/location/feature"
-import { toURL } from "../../../../../ui/vendor/getto-application/location/init"
+import { LocationOutsideFeature } from "../../../../z_details/_ui/location/feature"
+import { toURL } from "../../../../z_details/_ui/location/init"
 
 import { detectSignViewType } from "./core"
 

@@ -1,10 +1,7 @@
 import { env } from "../../../../../../y_environment/_ui/env"
 import { GetMenuBadgeResult_pb } from "../../../../y_protobuf/api_pb.js"
 
-import {
-    remoteFeature,
-    convertRemote,
-} from "../../../../../../../ui/vendor/getto-application/infra/remote/helper"
+import { remoteFeature, convertRemote } from "../../../../../../z_details/_ui/remote/helper"
 import { decodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 import {
     apiInfraError,
@@ -12,7 +9,7 @@ import {
     apiStatusError,
 } from "../../../../../../z_details/_ui/api/helper"
 
-import { RemoteOutsideFeature } from "../../../../../../../ui/vendor/getto-application/infra/remote/feature"
+import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/feature"
 
 import { GetMenuBadgeRemotePod } from "../../../infra"
 

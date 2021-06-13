@@ -11,9 +11,9 @@ import { v_small } from "../../../../../../ui/vendor/getto-css/preact/design/ali
 
 import { LogoutResource, LogoutResourceState } from "../resource"
 
-import { RepositoryError } from "../../../../../../ui/vendor/getto-application/infra/repository/data"
+import { RepositoryError } from "../../../../../z_details/_ui/repository/data"
 import { ClearAuthTicketError } from "../../clear/data"
-import { remoteCommonError } from "../../../../../../ui/vendor/getto-application/infra/remote/helper"
+import { remoteCommonError } from "../../../../../z_details/_ui/remote/helper"
 
 export function LogoutEntry(resource: LogoutResource): VNode {
     return h(LogoutComponent, {

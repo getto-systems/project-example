@@ -1,6 +1,6 @@
 import { setupActionTestRunner } from "../../../../../../ui/vendor/getto-application/action/test_helper"
 
-import { mockRemotePod } from "../../../../../../ui/vendor/getto-application/infra/remote/mock"
+import { mockRemotePod } from "../../../../../z_details/_ui/remote/mock"
 
 import { mockCheckResetTokenSendingStatusLocationDetecter } from "../check_status/mock"
 

@@ -34,7 +34,7 @@ import {
 } from "../resource"
 
 import { AuthenticatePasswordError } from "../../authenticate/data"
-import { remoteCommonError } from "../../../../../../ui/vendor/getto-application/infra/remote/helper"
+import { remoteCommonError } from "../../../../../z_details/_ui/remote/helper"
 
 export function AuthenticatePasswordEntry(view: AuthenticatePasswordView): VNode {
     const resource = useApplicationView(view)

@@ -1,4 +1,4 @@
-import { RemoteTypes } from "../../../../ui/vendor/getto-application/infra/remote/infra"
+import { RemoteTypes } from "../../../z_details/_ui/remote/infra"
 
 import { NotifyUnexpectedErrorRemoteError } from "./data"
 

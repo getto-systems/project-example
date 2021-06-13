@@ -1,6 +1,6 @@
-import { RemoteTypes } from "../../../../../ui/vendor/getto-application/infra/remote/infra"
-import { DelayTime } from "../../../../../ui/vendor/getto-application/infra/config/infra"
-import { Clock } from "../../../../../ui/vendor/getto-application/infra/clock/infra"
+import { RemoteTypes } from "../../../../z_details/_ui/remote/infra"
+import { DelayTime } from "../../../../z_details/_ui/config/infra"
+import { Clock } from "../../../../z_details/_ui/clock/infra"
 
 import { AuthRemoteValue } from "../../../auth_ticket/_ui/kernel/infra"
 

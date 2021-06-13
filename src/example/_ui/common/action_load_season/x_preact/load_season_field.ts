@@ -11,7 +11,7 @@ import { VNodeContent } from "../../../x_preact/design/common"
 
 import { LoadSeasonResource, LoadSeasonResourceState } from "../resource"
 
-import { RepositoryError } from "../../../../../../ui/vendor/getto-application/infra/repository/data"
+import { RepositoryError } from "../../../../../z_details/_ui/repository/data"
 import { Season } from "../../load_season/data"
 
 export function LoadSeasonFieldEntry(resource: LoadSeasonResource): VNode {

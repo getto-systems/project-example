@@ -1,4 +1,4 @@
-import { passThroughRemoteValue } from "../../../../ui/vendor/getto-application/infra/remote/helper"
+import { passThroughRemoteValue } from "../../../z_details/_ui/remote/helper"
 
 import { NotifyUnexpectedErrorInfra } from "./infra"
 

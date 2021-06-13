@@ -4,8 +4,8 @@ import { newAuthzRepositoryPod } from "../../../auth/auth_ticket/_ui/kernel/infr
 import { newGetMenuBadgeRemote } from "../kernel/infra/remote/get_menu_badge/core"
 import { newGetMenuBadgeNoopRemote } from "../kernel/infra/remote/get_menu_badge/noop"
 
-import { RepositoryOutsideFeature } from "../../../../ui/vendor/getto-application/infra/repository/feature"
-import { RemoteOutsideFeature } from "../../../../ui/vendor/getto-application/infra/remote/feature"
+import { RepositoryOutsideFeature } from "../../../z_details/_ui/repository/feature"
+import { RemoteOutsideFeature } from "../../../z_details/_ui/remote/feature"
 
 import { UpdateMenuBadgeInfra } from "./infra"
 import { MenuContent } from "../kernel/infra"

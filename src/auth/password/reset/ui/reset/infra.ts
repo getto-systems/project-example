@@ -1,11 +1,11 @@
-import { RemoteTypes } from "../../../../../../ui/vendor/getto-application/infra/remote/infra"
-import { DelayTime } from "../../../../../../ui/vendor/getto-application/infra/config/infra"
+import { RemoteTypes } from "../../../../../z_details/_ui/remote/infra"
+import { DelayTime } from "../../../../../z_details/_ui/config/infra"
 import { AuthTicket } from "../../../../auth_ticket/_ui/kernel/data"
 
 import { ResetPasswordFields, ResetPasswordRemoteError } from "./data"
 import { ResetToken } from "../data"
 import { AuthRemoteValue } from "../../../../auth_ticket/_ui/kernel/infra"
-import { Clock } from "../../../../../../ui/vendor/getto-application/infra/clock/infra"
+import { Clock } from "../../../../../z_details/_ui/clock/infra"
 
 export type ResetPasswordInfra = Readonly<{
     reset: ResetPasswordRemotePod

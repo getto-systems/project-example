@@ -1,7 +1,7 @@
 import { newLoadSeasonInfra } from "../load_season/init"
 import { initLoadSeasonCoreAction } from "./core/impl"
 
-import { RepositoryOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/repository/feature"
+import { RepositoryOutsideFeature } from "../../../../z_details/_ui/repository/feature"
 
 import { LoadSeasonResource } from "./resource"
 

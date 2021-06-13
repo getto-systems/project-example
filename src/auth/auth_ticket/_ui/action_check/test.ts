@@ -4,18 +4,18 @@ import {
     ClockPubSub,
     mockClock,
     mockClockPubSub,
-} from "../../../../../ui/vendor/getto-application/infra/clock/mock"
-import { mockRepository } from "../../../../../ui/vendor/getto-application/infra/repository/mock"
-import { mockRemotePod } from "../../../../../ui/vendor/getto-application/infra/remote/mock"
+} from "../../../../z_details/_ui/clock/mock"
+import { mockRepository } from "../../../../z_details/_ui/repository/mock"
+import { mockRemotePod } from "../../../../z_details/_ui/remote/mock"
 
 import { mockGetScriptPathDetecter } from "../../../_ui/common/secure/get_script_path/mock"
 
-import { convertRepository } from "../../../../../ui/vendor/getto-application/infra/repository/helper"
+import { convertRepository } from "../../../../z_details/_ui/repository/helper"
 import { initCheckAuthTicketView } from "./impl"
 import { initCheckAuthTicketCoreAction, initCheckAuthTicketCoreMaterial } from "./core/impl"
 
-import { Clock } from "../../../../../ui/vendor/getto-application/infra/clock/infra"
-import { WaitTime } from "../../../../../ui/vendor/getto-application/infra/config/infra"
+import { Clock } from "../../../../z_details/_ui/clock/infra"
+import { WaitTime } from "../../../../z_details/_ui/config/infra"
 import { AuthnRepositoryValue, AuthzRepositoryPod, AuthzRepositoryValue } from "../kernel/infra"
 import { AuthnRepositoryPod, RenewAuthTicketRemotePod } from "../kernel/infra"
 

@@ -1,5 +1,5 @@
-import { RemoteTypes } from "../../../../../../ui/vendor/getto-application/infra/remote/infra"
-import { Limit, WaitTime } from "../../../../../../ui/vendor/getto-application/infra/config/infra"
+import { RemoteTypes } from "../../../../../z_details/_ui/remote/infra"
+import { Limit, WaitTime } from "../../../../../z_details/_ui/config/infra"
 
 import { CheckResetTokenSendingStatusRemoteError, ResetTokenSendingResult } from "./data"
 import { ResetSessionID } from "../data"

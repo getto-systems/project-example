@@ -1,9 +1,9 @@
 import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
 
-import { mockRepository } from "../../../../../ui/vendor/getto-application/infra/repository/mock"
-import { mockRemotePod } from "../../../../../ui/vendor/getto-application/infra/remote/mock"
+import { mockRepository } from "../../../../z_details/_ui/repository/mock"
+import { mockRemotePod } from "../../../../z_details/_ui/remote/mock"
 
-import { convertRepository } from "../../../../../ui/vendor/getto-application/infra/repository/helper"
+import { convertRepository } from "../../../../z_details/_ui/repository/helper"
 import { initLogoutCoreAction, initLogoutCoreMaterial } from "./core/impl"
 import { initLogoutResource } from "./impl"
 

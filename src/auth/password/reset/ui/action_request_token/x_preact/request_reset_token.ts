@@ -30,7 +30,7 @@ import {
 
 import { RequestResetTokenError } from "../../request_token/data"
 import { InputLoginIDEntry } from "../../../../../login_id/_ui/action_input/x_preact/input"
-import { remoteCommonError } from "../../../../../../../ui/vendor/getto-application/infra/remote/helper"
+import { remoteCommonError } from "../../../../../../z_details/_ui/remote/helper"
 
 export function RequestResetTokenEntry(view: RequestResetTokenView): VNode {
     const resource = useApplicationView(view)

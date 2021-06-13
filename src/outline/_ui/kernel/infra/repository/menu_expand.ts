@@ -1,10 +1,10 @@
 import { MenuExpand_pb } from "../../../y_protobuf/db_pb.js"
 
-import { convertRepository } from "../../../../../../ui/vendor/getto-application/infra/repository/helper"
+import { convertRepository } from "../../../../../z_details/_ui/repository/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../../ui/vendor/protobuf/helper"
 import { IndexedDBTarget, initIndexedDB } from "../../../../../z_details/_ui/db/indexed_db"
 
-import { RepositoryOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/repository/feature"
+import { RepositoryOutsideFeature } from "../../../../../z_details/_ui/repository/feature"
 
 import { FetchDBResult, StoreDBResult } from "../../../../../z_details/_ui/db/infra"
 import { MenuExpandRepositoryPod } from "../../infra"

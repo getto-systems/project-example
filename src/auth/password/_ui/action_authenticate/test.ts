@@ -1,18 +1,14 @@
 import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
 
-import {
-    ClockPubSub,
-    mockClock,
-    mockClockPubSub,
-} from "../../../../../ui/vendor/getto-application/infra/clock/mock"
-import { mockRepository } from "../../../../../ui/vendor/getto-application/infra/repository/mock"
-import { mockRemotePod } from "../../../../../ui/vendor/getto-application/infra/remote/mock"
+import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_details/_ui/clock/mock"
+import { mockRepository } from "../../../../z_details/_ui/repository/mock"
+import { mockRemotePod } from "../../../../z_details/_ui/remote/mock"
 
 import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/action_input/mock"
 import { mockGetScriptPathDetecter } from "../../../_ui/common/secure/get_script_path/mock"
 
-import { convertRepository } from "../../../../../ui/vendor/getto-application/infra/repository/helper"
+import { convertRepository } from "../../../../z_details/_ui/repository/helper"
 
 import { initAuthenticatePasswordView } from "./impl"
 import {
@@ -21,7 +17,7 @@ import {
 } from "./core/impl"
 import { initAuthenticatePasswordFormAction } from "./form/impl"
 
-import { Clock } from "../../../../../ui/vendor/getto-application/infra/clock/infra"
+import { Clock } from "../../../../z_details/_ui/clock/infra"
 import { AuthenticatePasswordRemotePod, AuthenticatePasswordResult } from "../authenticate/infra"
 import {
     AuthnRepositoryValue,

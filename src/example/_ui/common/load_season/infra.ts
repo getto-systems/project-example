@@ -1,5 +1,5 @@
-import { Clock } from "../../../../../ui/vendor/getto-application/infra/clock/infra"
-import { RepositoryPod } from "../../../../../ui/vendor/getto-application/infra/repository/infra"
+import { Clock } from "../../../../z_details/_ui/clock/infra"
+import { RepositoryPod } from "../../../../z_details/_ui/repository/infra"
 
 import { Season } from "./data"
 

@@ -1,4 +1,4 @@
-import { RemoteCommonError } from "../../../../../../ui/vendor/getto-application/infra/remote/data"
+import { RemoteCommonError } from "../../../../../z_details/_ui/remote/data"
 
 import { LoginID } from "../../../../login_id/_ui/data"
 
@@ -10,6 +10,4 @@ export type RequestResetTokenError =
     | Readonly<{ type: "validation-error" }>
     | RequestResetTokenRemoteError
 
-export type RequestResetTokenRemoteError =
-    | RemoteCommonError
-    | Readonly<{ type: "invalid-reset" }>
+export type RequestResetTokenRemoteError = RemoteCommonError | Readonly<{ type: "invalid-reset" }>

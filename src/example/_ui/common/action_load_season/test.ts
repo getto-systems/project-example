@@ -1,10 +1,10 @@
 import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
 
-import { mockClock, mockClockPubSub } from "../../../../../ui/vendor/getto-application/infra/clock/mock"
-import { mockRepository } from "../../../../../ui/vendor/getto-application/infra/repository/mock"
+import { mockClock, mockClockPubSub } from "../../../../z_details/_ui/clock/mock"
+import { mockRepository } from "../../../../z_details/_ui/repository/mock"
 
 import { markSeason } from "../load_season/test_helper"
-import { convertRepository } from "../../../../../ui/vendor/getto-application/infra/repository/helper"
+import { convertRepository } from "../../../../z_details/_ui/repository/helper"
 
 import { initLoadSeasonCoreAction } from "./core/impl"
 

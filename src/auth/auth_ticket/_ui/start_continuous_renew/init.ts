@@ -2,15 +2,12 @@ import { newAuthzRepositoryPod } from "../kernel/infra/repository/authz"
 import { newRenewAuthTicketRemote } from "../kernel/infra/remote/renew"
 import { newAuthnRepositoryPod } from "../kernel/infra/repository/authn"
 
-import { newClock } from "../../../../../ui/vendor/getto-application/infra/clock/init"
+import { newClock } from "../../../../z_details/_ui/clock/init"
 
-import { RemoteOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/remote/feature"
-import { RepositoryOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/repository/feature"
+import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"
+import { RepositoryOutsideFeature } from "../../../../z_details/_ui/repository/feature"
 
-import {
-    expireMinute,
-    intervalMinute,
-} from "../../../../../ui/vendor/getto-application/infra/config/infra"
+import { expireMinute, intervalMinute } from "../../../../z_details/_ui/config/infra"
 import { StartContinuousRenewInfra } from "./infra"
 
 type OutsideFeature = RepositoryOutsideFeature & RemoteOutsideFeature

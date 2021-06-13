@@ -1,14 +1,14 @@
 import { newResetPasswordRemote } from "./infra/remote/reset"
 
-import { newClock } from "../../../../../../ui/vendor/getto-application/infra/clock/init"
-import { toURL } from "../../../../../../ui/vendor/getto-application/location/init"
+import { newClock } from "../../../../../z_details/_ui/clock/init"
+import { toURL } from "../../../../../z_details/_ui/location/init"
 
 import { ResetPasswordDetecter } from "./method"
 
-import { RemoteOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/remote/feature"
-import { LocationOutsideFeature } from "../../../../../../ui/vendor/getto-application/location/feature"
+import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/feature"
+import { LocationOutsideFeature } from "../../../../../z_details/_ui/location/feature"
 
-import { delaySecond } from "../../../../../../ui/vendor/getto-application/infra/config/infra"
+import { delaySecond } from "../../../../../z_details/_ui/config/infra"
 import { ResetPasswordInfra } from "./infra"
 
 import { detectResetToken } from "../converter"

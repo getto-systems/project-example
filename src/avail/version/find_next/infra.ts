@@ -1,5 +1,5 @@
-import { RemoteTypes } from "../../../../ui/vendor/getto-application/infra/remote/infra"
-import { DelayTime } from "../../../../ui/vendor/getto-application/infra/config/infra"
+import { RemoteTypes } from "../../../z_details/_ui/remote/infra"
+import { DelayTime } from "../../../z_details/_ui/config/infra"
 
 import { CheckDeployExistsRemoteError } from "./data"
 

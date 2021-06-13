@@ -1,10 +1,7 @@
 import { env } from "../../../../../../y_environment/_ui/env"
 import { AuthenticateResponse_pb } from "../../../../../_ui/y_protobuf/api_pb.js"
 
-import {
-    remoteFeature,
-    convertRemote,
-} from "../../../../../../../ui/vendor/getto-application/infra/remote/helper"
+import { remoteFeature, convertRemote } from "../../../../../../z_details/_ui/remote/helper"
 import {
     apiInfraError,
     apiRequest,
@@ -12,7 +9,7 @@ import {
 } from "../../../../../../z_details/_ui/api/helper"
 import { decodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 
-import { RemoteOutsideFeature } from "../../../../../../../ui/vendor/getto-application/infra/remote/feature"
+import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/feature"
 
 import { RenewAuthTicketRemotePod } from "../../infra"
 

@@ -2,9 +2,9 @@ import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/a
 
 import { markMenuCategoryLabel, standard_MenuTree } from "../kernel/test_helper"
 
-import { convertRepository } from "../../../../ui/vendor/getto-application/infra/repository/helper"
-import { mockRemotePod } from "../../../../ui/vendor/getto-application/infra/remote/mock"
-import { mockRepository } from "../../../../ui/vendor/getto-application/infra/repository/mock"
+import { convertRepository } from "../../../z_details/_ui/repository/helper"
+import { mockRemotePod } from "../../../z_details/_ui/remote/mock"
+import { mockRepository } from "../../../z_details/_ui/repository/mock"
 
 import { mockLoadMenuLocationDetecter } from "../kernel/mock"
 
@@ -12,7 +12,10 @@ import { initLoadMenuCoreAction, initLoadMenuCoreMaterial } from "./core/impl"
 
 import { menuExpandRepositoryConverter } from "../kernel/converter"
 
-import { AuthzRepositoryPod, AuthzRepositoryValue } from "../../../auth/auth_ticket/_ui/kernel/infra"
+import {
+    AuthzRepositoryPod,
+    AuthzRepositoryValue,
+} from "../../../auth/auth_ticket/_ui/kernel/infra"
 import {
     GetMenuBadgeRemotePod,
     MenuExpandRepositoryPod,

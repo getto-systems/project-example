@@ -2,8 +2,8 @@ import { newAuthzRepositoryPod } from "../kernel/infra/repository/authz"
 import { newAuthnRepositoryPod } from "../kernel/infra/repository/authn"
 import { newClearAuthTicketRemote } from "./infra/clear"
 
-import { RemoteOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/remote/feature"
-import { RepositoryOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/repository/feature"
+import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"
+import { RepositoryOutsideFeature } from "../../../../z_details/_ui/repository/feature"
 
 import { ClearAuthTicketInfra } from "./infra"
 

@@ -1,4 +1,4 @@
-import { ConvertLocationResult } from "../../../../../ui/vendor/getto-application/location/data"
+import { ConvertLocationResult } from "../../../../z_details/_ui/location/data"
 import { SignNav, signNavKey } from "../../../_ui/common/nav/data"
 import { ResetSessionID, ResetToken } from "./data"
 

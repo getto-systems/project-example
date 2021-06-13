@@ -1,4 +1,4 @@
-import { delayedChecker } from "../../../../../../ui/vendor/getto-application/infra/timer/helper"
+import { delayedChecker } from "../../../../../z_details/_ui/timer/helper"
 
 import { ResetPasswordInfra } from "./infra"
 
@@ -7,7 +7,7 @@ import { ResetPasswordEvent } from "./event"
 import { authRemoteConverter } from "../../../../auth_ticket/_ui/kernel/converter"
 
 import { ConvertBoardResult } from "../../../../../../ui/vendor/getto-application/board/kernel/data"
-import { ConvertLocationResult } from "../../../../../../ui/vendor/getto-application/location/data"
+import { ConvertLocationResult } from "../../../../../z_details/_ui/location/data"
 import { ResetToken } from "../data"
 import { ResetPasswordFields } from "./data"
 

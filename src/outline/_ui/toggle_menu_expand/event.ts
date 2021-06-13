@@ -1,4 +1,4 @@
-import { RepositoryError } from "../../../../ui/vendor/getto-application/infra/repository/data"
+import { RepositoryError } from "../../../z_details/_ui/repository/data"
 import { Menu } from "../kernel/data"
 
 export type ToggleMenuExpandEvent =

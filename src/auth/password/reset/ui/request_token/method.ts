@@ -1,4 +1,4 @@
-import { delayedChecker } from "../../../../../../ui/vendor/getto-application/infra/timer/helper"
+import { delayedChecker } from "../../../../../z_details/_ui/timer/helper"
 
 import { RequestResetTokenInfra } from "./infra"
 

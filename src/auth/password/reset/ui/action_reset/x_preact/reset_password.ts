@@ -29,7 +29,7 @@ import { InputPasswordEntry } from "../../../../_ui/action_input/x_preact/input"
 import { ResetPasswordView, ResetPasswordResource, ResetPasswordResourceState } from "../resource"
 
 import { ResetPasswordError } from "../../reset/data"
-import { remoteCommonError } from "../../../../../../../ui/vendor/getto-application/infra/remote/helper"
+import { remoteCommonError } from "../../../../../../z_details/_ui/remote/helper"
 
 export function ResetPasswordEntry(view: ResetPasswordView): VNode {
     const resource = useApplicationView(view)

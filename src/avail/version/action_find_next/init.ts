@@ -3,7 +3,7 @@ import { newFindNextVersionInfra, newFindNextVersionLocationDetecter } from "../
 import { initFindNextVersionView } from "./impl"
 import { initFindNextVersionCoreAction, initFindNextVersionCoreMaterial } from "./core/impl"
 
-import { LocationOutsideFeature } from "../../../../ui/vendor/getto-application/location/feature"
+import { LocationOutsideFeature } from "../../../z_details/_ui/location/feature"
 
 import { FindNextVersionView } from "./resource"
 

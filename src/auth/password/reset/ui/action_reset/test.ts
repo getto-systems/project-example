@@ -2,31 +2,30 @@ import { setupActionTestRunner } from "../../../../../../ui/vendor/getto-applica
 
 import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/action_input/mock"
-import { mockRepository } from "../../../../../../ui/vendor/getto-application/infra/repository/mock"
-import {
-    ClockPubSub,
-    mockClock,
-    mockClockPubSub,
-} from "../../../../../../ui/vendor/getto-application/infra/clock/mock"
-import { mockRemotePod } from "../../../../../../ui/vendor/getto-application/infra/remote/mock"
+import { mockRepository } from "../../../../../z_details/_ui/repository/mock"
+import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../../z_details/_ui/clock/mock"
+import { mockRemotePod } from "../../../../../z_details/_ui/remote/mock"
 
 import { mockGetScriptPathDetecter } from "../../../../_ui/common/secure/get_script_path/mock"
 import { mockResetPasswordLocationDetecter } from "../reset/mock"
 
-import { convertRepository } from "../../../../../../ui/vendor/getto-application/infra/repository/helper"
+import { convertRepository } from "../../../../../z_details/_ui/repository/helper"
 
 import { initResetPasswordView } from "./impl"
 import { initResetPasswordCoreAction, initResetPasswordCoreMaterial } from "./core/impl"
 import { initResetPasswordFormAction } from "./form/impl"
 
-import { Clock } from "../../../../../../ui/vendor/getto-application/infra/clock/infra"
+import { Clock } from "../../../../../z_details/_ui/clock/infra"
 import { ResetPasswordRemotePod, ResetPasswordResult } from "../reset/infra"
 import {
     AuthnRepositoryValue,
     AuthzRepositoryPod,
     AuthzRepositoryValue,
 } from "../../../../auth_ticket/_ui/kernel/infra"
-import { AuthnRepositoryPod, RenewAuthTicketRemotePod } from "../../../../auth_ticket/_ui/kernel/infra"
+import {
+    AuthnRepositoryPod,
+    RenewAuthTicketRemotePod,
+} from "../../../../auth_ticket/_ui/kernel/infra"
 
 import { ResetPasswordView } from "./resource"
 

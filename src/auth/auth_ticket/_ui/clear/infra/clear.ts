@@ -3,10 +3,10 @@ import { env } from "../../../../../y_environment/_ui/env"
 import {
     remoteFeature,
     convertRemote,
-} from "../../../../../../ui/vendor/getto-application/infra/remote/helper"
+} from "../../../../../z_details/_ui/remote/helper"
 import { apiInfraError, apiRequest, apiStatusError } from "../../../../../z_details/_ui/api/helper"
 
-import { RemoteOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/remote/feature"
+import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/feature"
 
 import { ClearAuthTicketRemotePod } from "../infra"
 

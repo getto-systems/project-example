@@ -1,5 +1,5 @@
-import { RemoteTypes } from "../../../../ui/vendor/getto-application/infra/remote/infra"
-import { RepositoryPod } from "../../../../ui/vendor/getto-application/infra/repository/infra"
+import { RemoteTypes } from "../../../z_details/_ui/remote/infra"
+import { RepositoryPod } from "../../../z_details/_ui/repository/infra"
 
 import { GetMenuBadgeRemoteError, MenuCategoryPath } from "./data"
 

@@ -26,7 +26,7 @@ import {
     CheckResetTokenSendingStatusError,
     SendResetTokenError,
 } from "../../check_status/data"
-import { remoteCommonError } from "../../../../../../../ui/vendor/getto-application/infra/remote/helper"
+import { remoteCommonError } from "../../../../../../z_details/_ui/remote/helper"
 
 export function CheckPasswordResetSendingStatusEntry(
     view: CheckResetTokenSendingStatusView,

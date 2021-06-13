@@ -18,7 +18,7 @@ import { appendScript } from "../../../../_ui/common/x_preact/script"
 
 import { ApplicationErrorComponent } from "../../../../../avail/_ui/x_preact/application_error"
 
-import { remoteCommonError } from "../../../../../../ui/vendor/getto-application/infra/remote/helper"
+import { remoteCommonError } from "../../../../../z_details/_ui/remote/helper"
 
 import {
     CheckAuthTicketView,

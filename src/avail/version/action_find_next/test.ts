@@ -2,7 +2,7 @@ import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/a
 
 import { markApplicationTargetPath } from "../find_next/test_helper"
 
-import { mockRemotePod } from "../../../../ui/vendor/getto-application/infra/remote/mock"
+import { mockRemotePod } from "../../../z_details/_ui/remote/mock"
 import { mockFindNextVersionLocationDetecter } from "../find_next/mock"
 
 import { initFindNextVersionView } from "./impl"

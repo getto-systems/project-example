@@ -17,10 +17,10 @@ import { initSignLinkResource } from "../../../common/nav/action_nav/impl"
 
 import { ForegroundMessage, BackgroundMessage } from "./message"
 
-import { RepositoryOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/repository/feature"
-import { RemoteOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/remote/feature"
+import { RepositoryOutsideFeature } from "../../../../../z_details/_ui/repository/feature"
+import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/feature"
 import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-application/action/worker/feature"
-import { LocationOutsideFeature } from "../../../../../../ui/vendor/getto-application/location/feature"
+import { LocationOutsideFeature } from "../../../../../z_details/_ui/location/feature"
 
 import { SignView } from "../../resource"
 

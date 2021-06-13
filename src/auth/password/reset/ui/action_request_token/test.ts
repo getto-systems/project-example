@@ -2,7 +2,7 @@ import { setupActionTestRunner } from "../../../../../../ui/vendor/getto-applica
 
 import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/action_input/mock"
-import { mockRemotePod } from "../../../../../../ui/vendor/getto-application/infra/remote/mock"
+import { mockRemotePod } from "../../../../../z_details/_ui/remote/mock"
 
 import { initRequestResetTokenView } from "./impl"
 import { initRequestResetTokenCoreMaterial, initRequestResetTokenCoreAction } from "./core/impl"

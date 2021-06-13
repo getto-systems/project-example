@@ -2,7 +2,7 @@ import { newRequestResetTokenInfra } from "../../request_token/init"
 
 import { initRequestResetTokenCoreMaterial } from "../core/impl"
 
-import { RemoteOutsideFeature } from "../../../../../../../ui/vendor/getto-application/infra/remote/feature"
+import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/feature"
 
 import { RequestResetTokenCoreMaterial } from "../core/action"
 

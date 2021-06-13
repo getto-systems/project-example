@@ -16,7 +16,7 @@ import {
 
 import { CheckResetTokenSendingStatusView } from "../../resource"
 
-import { LocationOutsideFeature } from "../../../../../../../../ui/vendor/getto-application/location/feature"
+import { LocationOutsideFeature } from "../../../../../../../z_details/_ui/location/feature"
 
 type OutsideFeature = LocationOutsideFeature
 export interface CheckPasswordResetSendingStatusProxy

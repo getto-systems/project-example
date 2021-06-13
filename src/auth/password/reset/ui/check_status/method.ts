@@ -1,12 +1,12 @@
-import { ticker } from "../../../../../../ui/vendor/getto-application/infra/timer/helper"
-import { passThroughRemoteValue } from "../../../../../../ui/vendor/getto-application/infra/remote/helper"
+import { passThroughRemoteValue } from "../../../../../z_details/_ui/remote/helper"
+import { ticker } from "../../../../../z_details/_ui/timer/helper"
 
 import { CheckResetTokenSendingStatusInfra } from "./infra"
 
 import { CheckResetTokenSendingStatusEvent } from "./event"
 
 import { ResetSessionID } from "../data"
-import { ConvertLocationResult } from "../../../../../../ui/vendor/getto-application/location/data"
+import { ConvertLocationResult } from "../../../../../z_details/_ui/location/data"
 import { CheckResetTokenSendingStatusError } from "./data"
 
 export interface CheckResetTokenSendingStatusPod {
