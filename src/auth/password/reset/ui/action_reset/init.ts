@@ -4,7 +4,7 @@ import { RepositoryOutsideFeature } from "../../../../../../ui/vendor/getto-appl
 import { LocationOutsideFeature } from "../../../../../../ui/vendor/getto-application/location/infra"
 import { initResetPasswordView } from "./impl"
 import { initResetPasswordCoreAction, initResetPasswordCoreMaterial } from "./core/impl"
-import { newStartContinuousRenewAuthnInfoInfra } from "../../../../auth_ticket/_ui/start_continuous_renew/impl/init"
+import { newStartContinuousRenewAuthnInfoInfra } from "../../../../auth_ticket/_ui/start_continuous_renew/init"
 import {
     newGetScriptPathLocationDetecter,
     newGetSecureScriptPathInfra,

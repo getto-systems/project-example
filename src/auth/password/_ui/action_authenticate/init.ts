@@ -1,4 +1,4 @@
-import { newStartContinuousRenewAuthnInfoInfra } from "../../../auth_ticket/_ui/start_continuous_renew/impl/init"
+import { newStartContinuousRenewAuthnInfoInfra } from "../../../auth_ticket/_ui/start_continuous_renew/init"
 import {
     newGetScriptPathLocationDetecter,
     newGetSecureScriptPathInfra,
