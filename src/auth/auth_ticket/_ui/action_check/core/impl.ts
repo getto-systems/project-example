@@ -1,6 +1,9 @@
 import { ApplicationAbstractStateAction } from "../../../../../../ui/vendor/getto-application/action/impl"
 
-import { getScriptPath } from "../../../../_ui/common/secure/get_script_path/impl/core"
+import {
+    GetScriptPathDetecter,
+    getScriptPath,
+} from "../../../../_ui/common/secure/get_script_path/method"
 import { startContinuousRenew, saveAuthTicket } from "../../start_continuous_renew/impl/core"
 import { renewAuthTicket, checkAuthTicket } from "../../check/impl/core"
 
@@ -15,8 +18,6 @@ import {
     initialCheckAuthTicketCoreState,
 } from "./action"
 
-import { GetScriptPathLocationDetecter } from "../../../../_ui/common/secure/get_script_path/method"
-
 import { AuthTicket } from "../../kernel/data"
 import { LoadScriptError } from "../../../../_ui/common/secure/get_script_path/data"
 
@@ -28,7 +29,7 @@ export type CheckAuthTicketCoreInfra = Readonly<{
 
 export function initCheckAuthTicketCoreMaterial(
     infra: CheckAuthTicketCoreInfra,
-    locationInfo: GetScriptPathLocationDetecter,
+    locationInfo: GetScriptPathDetecter,
 ): CheckAuthTicketCoreMaterial {
     return {
         renew: checkAuthTicket(infra.check),
@@ -47,7 +48,8 @@ export function initCheckAuthTicketCoreAction(
 
 class Action
     extends ApplicationAbstractStateAction<CheckAuthTicketCoreState>
-    implements CheckAuthTicketCoreAction {
+    implements CheckAuthTicketCoreAction
+{
     readonly initialState = initialCheckAuthTicketCoreState
 
     material: CheckAuthTicketCoreMaterial

@@ -1,4 +1,4 @@
-import { mockLocationDetecter } from "../../../../../ui/vendor/getto-application/location/mock"
+import { mockDetecter } from "../../../../../ui/vendor/getto-application/location/mock"
 
 import { detectApplicationTargetPath } from "./core"
 
@@ -8,5 +8,5 @@ export function mockFindNextVersionLocationDetecter(
     currentURL: URL,
     version: string,
 ): FindNextVersionLocationDetecter {
-    return mockLocationDetecter(currentURL, detectApplicationTargetPath({ version }))
+    return mockDetecter(currentURL, detectApplicationTargetPath({ version }))
 }

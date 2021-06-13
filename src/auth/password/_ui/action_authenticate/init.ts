@@ -2,7 +2,7 @@ import { newStartContinuousRenewAuthnInfoInfra } from "../../../auth_ticket/_ui/
 import {
     newGetScriptPathLocationDetecter,
     newGetSecureScriptPathInfra,
-} from "../../../_ui/common/secure/get_script_path/impl/init"
+} from "../../../_ui/common/secure/get_script_path/init"
 import { newAuthenticatePasswordInfra } from "../authenticate/impl/init"
 
 import { initAuthenticatePasswordView } from "./impl"

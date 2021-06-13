@@ -1,4 +1,4 @@
-import { mockLocationDetecter } from "../../../../../ui/vendor/getto-application/location/mock"
+import { mockDetecter } from "../../../../../ui/vendor/getto-application/location/mock"
 
 import { detectMenuTargetPath } from "./detecter"
 
@@ -8,5 +8,5 @@ export function mockLoadMenuLocationDetecter(
     currentURL: URL,
     version: string,
 ): LoadMenuLocationDetecter {
-    return mockLocationDetecter(currentURL, detectMenuTargetPath({ version }))
+    return mockDetecter(currentURL, detectMenuTargetPath({ version }))
 }

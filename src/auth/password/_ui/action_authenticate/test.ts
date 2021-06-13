@@ -10,7 +10,7 @@ import { mockRemotePod } from "../../../../../ui/vendor/getto-application/infra/
 
 import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/action_input/mock"
-import { mockGetScriptPathLocationDetecter } from "../../../_ui/common/secure/get_script_path/impl/mock"
+import { mockGetScriptPathDetecter } from "../../../_ui/common/secure/get_script_path/mock"
 
 import { convertRepository } from "../../../../../ui/vendor/getto-application/infra/repository/helper"
 
@@ -215,7 +215,7 @@ function initView(
     const authn = standard_authn()
     const authz = standard_authz()
 
-    const getScriptPathDetecter = mockGetScriptPathLocationDetecter(currentURL)
+    const getScriptPathDetecter = mockGetScriptPathDetecter(currentURL)
 
     const view = initAuthenticatePasswordView({
         core: initAuthenticatePasswordCoreAction(

@@ -8,7 +8,7 @@ import {
 import { mockRepository } from "../../../../../ui/vendor/getto-application/infra/repository/mock"
 import { mockRemotePod } from "../../../../../ui/vendor/getto-application/infra/remote/mock"
 
-import { mockGetScriptPathLocationDetecter } from "../../../_ui/common/secure/get_script_path/impl/mock"
+import { mockGetScriptPathDetecter } from "../../../_ui/common/secure/get_script_path/mock"
 
 import { convertRepository } from "../../../../../ui/vendor/getto-application/infra/repository/helper"
 import { initCheckAuthTicketView } from "./impl"
@@ -248,7 +248,7 @@ function initView(
     clock: Clock,
 ): CheckAuthTicketView {
     const currentURL = new URL("https://example.com/index.html")
-    const getScriptPathDetecter = mockGetScriptPathLocationDetecter(currentURL)
+    const getScriptPathDetecter = mockGetScriptPathDetecter(currentURL)
     return initCheckAuthTicketView(
         initCheckAuthTicketCoreAction(
             initCheckAuthTicketCoreMaterial(

@@ -79,6 +79,7 @@ pub struct PlainPassword(String);
 const PASSWORD_MAX_BYTES: usize = 72; // TODO BYTES じゃなくて LENGTH にする
 
 impl PlainPassword {
+    // TODO これは validate.rs に移動するべき
     pub fn validate(password: String) -> Result<PlainPassword, ConvertPasswordError> {
         match password.chars().count() {
             n if n == 0 => Err(ConvertPasswordError::Empty),

@@ -1,15 +1,34 @@
-import { LocationTypes } from "../../../../../../ui/vendor/getto-application/location/infra"
+import { GetScriptPathInfra } from "./infra"
+
+import { toScriptPath } from "./converter"
+
+import { ConvertLocationResult } from "../../../../../../ui/vendor/getto-application/location/data"
 import { ConvertScriptPathResult, LocationPathname } from "./data"
 
 export interface GetScriptPathPod {
-    (info: GetScriptPathLocationDetecter): GetScriptPathMethod
+    (detecter: GetScriptPathDetecter): GetScriptPathMethod
 }
 
-type GetScriptPathLocationTypes = LocationTypes<LocationPathname>
-export type GetScriptPathLocationDetecter = GetScriptPathLocationTypes["detecter"]
-export type GetScriptPathLocationMethod = GetScriptPathLocationTypes["method"]
-export type GetScriptPathLocationInfo = GetScriptPathLocationTypes["info"]
+export type GetScriptPathDetecter = Detect<LocationPathname>
 
 export interface GetScriptPathMethod {
     (): ConvertScriptPathResult
+}
+
+interface GetSecureScriptPath {
+    (infra: GetScriptPathInfra): GetScriptPathPod
+}
+export const getScriptPath: GetSecureScriptPath = (infra) => (detecter) => () => {
+    const { config } = infra
+
+    const pathname = detecter()
+    if (!pathname.valid) {
+        return { valid: false }
+    }
+
+    return { valid: true, value: toScriptPath(pathname.value, config) }
+}
+
+interface Detect<T> {
+    (): ConvertLocationResult<T>
 }

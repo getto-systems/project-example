@@ -8,7 +8,7 @@ import { newStartContinuousRenewAuthnInfoInfra } from "../../../../auth_ticket/_
 import {
     newGetScriptPathLocationDetecter,
     newGetSecureScriptPathInfra,
-} from "../../../../_ui/common/secure/get_script_path/impl/init"
+} from "../../../../_ui/common/secure/get_script_path/init"
 import { newResetPasswordInfra, newResetPasswordLocationDetecter } from "../reset/impl/init"
 import { initResetPasswordFormAction } from "./form/impl"
 
