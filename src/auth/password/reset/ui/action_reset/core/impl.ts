@@ -8,7 +8,7 @@ import {
 import {
     saveAuthTicket,
     startContinuousRenew,
-} from "../../../../../auth_ticket/_ui/start_continuous_renew/impl/core"
+} from "../../../../../auth_ticket/_ui/start_continuous_renew/method"
 
 import { StartContinuousRenewInfra } from "../../../../../auth_ticket/_ui/start_continuous_renew/infra"
 import { GetScriptPathInfra } from "../../../../../_ui/common/secure/get_script_path/infra"

@@ -1,5 +1,5 @@
 import { newCheckAuthTicketInfra } from "../check/init"
-import { newStartContinuousRenewAuthnInfoInfra } from "../start_continuous_renew/impl/init"
+import { newStartContinuousRenewAuthnInfoInfra } from "../start_continuous_renew/init"
 import { newGetSecureScriptPathInfra } from "../../../_ui/common/secure/get_script_path/init"
 
 import { initCheckAuthTicketView } from "./impl"
