@@ -1,5 +1,5 @@
 import { ApplicationAbstractStateAction } from "../../../../../../ui/vendor/getto-application/action/impl"
-import { clearAuthTicket } from "../../clear/impl/core"
+import { clearAuthTicket } from "../../clear/method"
 import { ClearAuthTicketInfra } from "../../clear/infra"
 
 import {
