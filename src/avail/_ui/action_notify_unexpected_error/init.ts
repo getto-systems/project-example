@@ -1,4 +1,4 @@
-import { newNotifyUnexpectedErrorInfra } from "../notify_unexpected_error/impl/init"
+import { newNotifyUnexpectedErrorInfra } from "../notify_unexpected_error/init"
 
 import { initNotifyUnexpectedErrorResource } from "./impl"
 import { initNotifyUnexpectedErrorCoreAction } from "./core/impl"

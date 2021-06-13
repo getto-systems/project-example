@@ -1,6 +1,6 @@
 import { ApplicationAbstractStateAction } from "../../../../../../../ui/vendor/getto-application/action/impl"
 
-import { resetPassword } from "../../reset/impl/core"
+import { resetPassword } from "../../reset/method"
 import {
     GetScriptPathDetecter,
     getScriptPath,
