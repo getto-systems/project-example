@@ -1,4 +1,4 @@
-import { newClearAuthTicketInfra } from "../clear/impl/init"
+import { newClearAuthTicketInfra } from "../clear/init"
 
 import { initLogoutResource } from "./impl"
 import { initLogoutCoreAction, initLogoutCoreMaterial } from "./core/impl"
