@@ -1,4 +1,4 @@
-import { newCheckAuthTicketInfra } from "../check/impl/init"
+import { newCheckAuthTicketInfra } from "../check/init"
 import { newStartContinuousRenewAuthnInfoInfra } from "../start_continuous_renew/impl/init"
 import { newGetSecureScriptPathInfra } from "../../../_ui/common/secure/get_script_path/init"
 

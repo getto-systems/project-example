@@ -5,7 +5,7 @@ import {
     getScriptPath,
 } from "../../../../_ui/common/secure/get_script_path/method"
 import { startContinuousRenew, saveAuthTicket } from "../../start_continuous_renew/impl/core"
-import { renewAuthTicket, checkAuthTicket } from "../../check/impl/core"
+import { renewAuthTicket, checkAuthTicket } from "../../check/method"
 
 import { GetScriptPathInfra } from "../../../../_ui/common/secure/get_script_path/infra"
 import { StartContinuousRenewInfra } from "../../start_continuous_renew/infra"
