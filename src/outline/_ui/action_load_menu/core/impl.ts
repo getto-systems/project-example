@@ -1,6 +1,6 @@
 import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/impl"
 
-import { loadMenu } from "../../load_menu/impl/core"
+import { loadMenu } from "../../load_menu/method"
 import { updateMenuBadge } from "../../update_menu_badge/impl/core"
 import { hideMenuExpand, showMenuExpand } from "../../toggle_menu_expand/impl/core"
 
