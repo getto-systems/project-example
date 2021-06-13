@@ -1,4 +1,4 @@
-import { newCheckResetTokenSendingStatusLocationDetecter } from "../../../check_status/impl/init"
+import { newCheckResetTokenSendingStatusLocationDetecter } from "../../../check_status/init"
 
 import { initCheckResetTokenSendingStatusView } from "../../impl"
 import { initCheckResetTokenSendingStatusCoreAction } from "../../core/impl"

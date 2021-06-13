@@ -1,5 +1,7 @@
 import { LocationConverter } from "../../../../../ui/vendor/getto-application/location/infra"
 
+import { ConvertLocationResult } from "../../../../../ui/vendor/getto-application/location/data"
+import { SignNav, signNavKey } from "../../../_ui/common/nav/data"
 import { ResetSessionID, ResetToken } from "./data"
 
 type ResetTokenConverter = LocationConverter<ResetToken, string | null>
@@ -13,8 +15,8 @@ export const resetTokenLocationConverter: ResetTokenConverter = (resetToken) => 
     return { valid: true, value: markResetToken(resetToken) }
 }
 
-type ResetSessionIDConverter = LocationConverter<ResetSessionID, string | null>
-export const resetSessionIDLocationConverter: ResetSessionIDConverter = (sessionID) => {
+export function detectResetSessionID(currentURL: URL): ConvertLocationResult<ResetSessionID> {
+    const sessionID = currentURL.searchParams.get(signNavKey(SignNav.passwordResetSessionID))
     if (sessionID === null) {
         return { valid: false }
     }

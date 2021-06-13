@@ -1,6 +1,6 @@
 import { ApplicationAbstractStateAction } from "../../../../../../../ui/vendor/getto-application/action/impl"
 
-import { checkSendingStatus } from "../../check_status/impl/core"
+import { CheckResetTokenSendingStatusDetecter, checkSendingStatus } from "../../check_status/method"
 
 import { CheckResetTokenSendingStatusInfra } from "../../check_status/infra"
 
@@ -12,11 +12,9 @@ import {
     initialCheckResetTokenSendingStatusCoreState,
 } from "./action"
 
-import { CheckResetTokenSendingStatusLocationDetecter } from "../../check_status/method"
-
 export function initCheckResetTokenSendingStatusCoreMaterial(
     infra: CheckResetTokenSendingStatusInfra,
-    detecter: CheckResetTokenSendingStatusLocationDetecter,
+    detecter: CheckResetTokenSendingStatusDetecter,
 ): CheckResetTokenSendingStatusCoreMaterial {
     const pod = initCheckResetTokenSendingStatusCoreMaterialPod(infra)
     return {
@@ -39,7 +37,8 @@ export function initCheckResetTokenSendingStatusCoreAction(
 
 class Action
     extends ApplicationAbstractStateAction<CheckResetTokenSendingStatusCoreState>
-    implements CheckResetTokenSendingStatusCoreAction {
+    implements CheckResetTokenSendingStatusCoreAction
+{
     readonly initialState = initialCheckResetTokenSendingStatusCoreState
 
     material: CheckResetTokenSendingStatusCoreMaterial
