@@ -1,7 +1,7 @@
 import {
     newCheckResetTokenSendingStatusInfra,
     newCheckResetTokenSendingStatusLocationDetecter,
-} from "../../check_status/impl/init"
+} from "../../check_status/init"
 
 import {
     initCheckResetTokenSendingStatusCoreMaterial,

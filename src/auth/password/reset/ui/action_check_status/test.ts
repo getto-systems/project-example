@@ -2,7 +2,7 @@ import { setupActionTestRunner } from "../../../../../../ui/vendor/getto-applica
 
 import { mockRemotePod } from "../../../../../../ui/vendor/getto-application/infra/remote/mock"
 
-import { mockCheckResetTokenSendingStatusLocationDetecter } from "../check_status/impl/mock"
+import { mockCheckResetTokenSendingStatusLocationDetecter } from "../check_status/mock"
 
 import { initCheckResetTokenSendingStatusView } from "./impl"
 import {
