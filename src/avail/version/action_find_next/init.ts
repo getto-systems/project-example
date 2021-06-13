@@ -1,4 +1,4 @@
-import { newFindNextVersionInfra, newFindNextVersionLocationDetecter } from "../find_next/impl/init"
+import { newFindNextVersionInfra, newFindNextVersionLocationDetecter } from "../find_next/init"
 
 import { initFindNextVersionView } from "./impl"
 import { initFindNextVersionCoreAction, initFindNextVersionCoreMaterial } from "./core/impl"

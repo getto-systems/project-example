@@ -13,7 +13,7 @@ import { spinner } from "../../../../example/_ui/x_preact/design/icon"
 
 import { ApplicationErrorComponent } from "../../../_ui/x_preact/application_error"
 
-import { applicationPath } from "../../find_next/impl/helper"
+import { applicationPath } from "../../find_next/helper"
 
 import {
     FindNextVersionView,

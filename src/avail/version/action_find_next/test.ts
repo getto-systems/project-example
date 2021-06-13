@@ -1,14 +1,14 @@
 import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
 
-import { markApplicationTargetPath } from "../find_next/impl/test_helper"
+import { markApplicationTargetPath } from "../find_next/test_helper"
 
 import { mockRemotePod } from "../../../../ui/vendor/getto-application/infra/remote/mock"
-import { mockFindNextVersionLocationDetecter } from "../find_next/impl/mock"
+import { mockFindNextVersionLocationDetecter } from "../find_next/mock"
 
 import { initFindNextVersionView } from "./impl"
 import { initFindNextVersionCoreAction, initFindNextVersionCoreMaterial } from "./core/impl"
 
-import { applicationPath } from "../find_next/impl/helper"
+import { applicationPath } from "../find_next/helper"
 
 import { CheckDeployExistsRemotePod } from "../find_next/infra"
 
