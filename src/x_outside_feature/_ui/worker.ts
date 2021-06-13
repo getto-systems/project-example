@@ -7,7 +7,7 @@ import {
     ForegroundOutsideFeature,
 } from "./common"
 
-import { WorkerOutsideFeature } from "../../../ui/vendor/getto-application/action/worker/infra"
+import { WorkerOutsideFeature } from "../../../ui/vendor/getto-application/action/worker/feature"
 
 type WorkerForegroundOutsideFeature = ForegroundOutsideFeature & WorkerOutsideFeature
 type WorkerBackgroundOutsideFeature = CommonOutsideFeature & WorkerOutsideFeature

@@ -1,4 +1,4 @@
-import { InitWorkerOutsideFeature } from "./infra"
+import { InitWorkerOutsideFeature } from "./feature"
 
 export function newWorker(feature: InitWorkerOutsideFeature): Worker {
     const { webDocument } = feature

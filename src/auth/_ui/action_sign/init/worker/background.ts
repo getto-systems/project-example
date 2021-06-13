@@ -8,7 +8,7 @@ import { RequestPasswordResetTokenProxyMessage } from "../../../../password/rese
 import { CheckPasswordResetSendingStatusProxyMessage } from "../../../../password/reset/ui/action_check_status/init/worker/message"
 
 import { RemoteOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/remote/feature"
-import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-application/action/worker/infra"
+import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-application/action/worker/feature"
 
 type OutsideFeature = RemoteOutsideFeature & WorkerOutsideFeature
 export function newSignWorkerBackground(feature: OutsideFeature): void {
