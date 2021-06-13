@@ -7,7 +7,7 @@ import {
     RequestPasswordResetTokenProxyResponse,
 } from "./message"
 
-import { RemoteOutsideFeature } from "../../../../../../../../ui/vendor/getto-application/infra/remote/infra"
+import { RemoteOutsideFeature } from "../../../../../../../../ui/vendor/getto-application/infra/remote/feature"
 
 type OutsideFeature = RemoteOutsideFeature
 export function newRequestResetTokenHandler(

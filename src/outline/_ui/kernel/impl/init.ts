@@ -1,6 +1,6 @@
 import { env } from "../../../../y_environment/_ui/env"
 
-import { newLocationDetecter } from "../../../../../ui/vendor/getto-application/location/init"
+import { newDetecter } from "../../../../../ui/vendor/getto-application/location/init"
 
 import { detectMenuTargetPath } from "./detecter"
 
@@ -10,5 +10,5 @@ import { LocationOutsideFeature } from "../../../../../ui/vendor/getto-applicati
 export function newLoadMenuLocationDetecter(
     feature: LocationOutsideFeature,
 ): LoadMenuLocationDetecter {
-    return newLocationDetecter(feature, detectMenuTargetPath({ version: env.version }))
+    return newDetecter(feature, detectMenuTargetPath({ version: env.version }))
 }

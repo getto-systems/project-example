@@ -15,7 +15,8 @@ import {
     apiStatusError,
 } from "../../../../../../../z_details/_ui/api/helper"
 
-import { RemoteOutsideFeature } from "../../../../../../../../ui/vendor/getto-application/infra/remote/infra"
+import { RemoteOutsideFeature } from "../../../../../../../../ui/vendor/getto-application/infra/remote/feature"
+
 import { ResetPasswordRemotePod } from "../../infra"
 
 import {

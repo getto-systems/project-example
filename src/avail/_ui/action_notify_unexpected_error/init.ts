@@ -3,8 +3,9 @@ import { newNotifyUnexpectedErrorInfra } from "../notify_unexpected_error/impl/i
 import { initNotifyUnexpectedErrorResource } from "./impl"
 import { initNotifyUnexpectedErrorCoreAction } from "./core/impl"
 
+import { RemoteOutsideFeature } from "../../../../ui/vendor/getto-application/infra/remote/feature"
+
 import { NotifyUnexpectedErrorResource } from "./resource"
-import { RemoteOutsideFeature } from "../../../../ui/vendor/getto-application/infra/remote/infra"
 
 type OutsideFeature = RemoteOutsideFeature
 export function newNotifyUnexpectedErrorResource(

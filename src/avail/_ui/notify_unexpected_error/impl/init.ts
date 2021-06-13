@@ -1,7 +1,8 @@
 import { newNotifyUnexpectedErrorRemote } from "../infra/remote/notify"
 
+import { RemoteOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/remote/feature"
+
 import { NotifyUnexpectedErrorInfra } from "../infra"
-import { RemoteOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/remote/infra"
 
 export function newNotifyUnexpectedErrorInfra(
     feature: RemoteOutsideFeature,

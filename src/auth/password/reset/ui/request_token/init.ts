@@ -1,8 +1,9 @@
 import { newRequestResetTokenRemote } from "./infra/remote/request_token"
 
+import { RemoteOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/remote/feature"
+
 import { delaySecond } from "../../../../../../ui/vendor/getto-application/infra/config/infra"
 import { RequestResetTokenInfra } from "./infra"
-import { RemoteOutsideFeature } from "../../../../../../ui/vendor/getto-application/infra/remote/infra"
 
 export function newRequestResetTokenInfra(feature: RemoteOutsideFeature): RequestResetTokenInfra {
     return {

@@ -5,10 +5,11 @@ import { newLoadMenuResource } from "../../outline/_ui/action_load_menu/init"
 
 import { initDocsView } from "./impl"
 
-import { DocsView } from "./resource"
 import { RepositoryOutsideFeature } from "../../../ui/vendor/getto-application/infra/repository/infra"
-import { RemoteOutsideFeature } from "../../../ui/vendor/getto-application/infra/remote/infra"
+import { RemoteOutsideFeature } from "../../../ui/vendor/getto-application/infra/remote/feature"
 import { LocationOutsideFeature } from "../../../ui/vendor/getto-application/location/infra"
+
+import { DocsView } from "./resource"
 
 export function newDocsView(
     feature: RemoteOutsideFeature & RepositoryOutsideFeature & LocationOutsideFeature,

@@ -4,13 +4,14 @@ import { newRenewAuthTicketRemote } from "../kernel/infra/remote/renew"
 
 import { newClock } from "../../../../../ui/vendor/getto-application/infra/clock/init"
 
+import { RemoteOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/remote/feature"
+import { RepositoryOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/repository/infra"
+
 import {
     delaySecond,
     expireMinute,
 } from "../../../../../ui/vendor/getto-application/infra/config/infra"
 import { CheckAuthTicketInfra } from "./infra"
-import { RemoteOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/remote/infra"
-import { RepositoryOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/repository/infra"
 
 type OutsideFeature = RepositoryOutsideFeature & RemoteOutsideFeature
 export function newCheckAuthTicketInfra(

@@ -12,7 +12,7 @@ import { SignView } from "../resource"
 import { initSignLinkResource } from "../../common/nav/action_nav/impl"
 
 import { RepositoryOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/repository/infra"
-import { RemoteOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/remote/infra"
+import { RemoteOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/remote/feature"
 import { LocationOutsideFeature } from "../../../../../ui/vendor/getto-application/location/infra"
 
 type OutsideFeature = RepositoryOutsideFeature &

@@ -4,10 +4,11 @@ import { newLoadBreadcrumbListResource } from "../../../outline/_ui/action_load_
 import { newLoadMenuResource } from "../../../outline/_ui/action_load_menu/init"
 import { newLoadSeasonResource } from "../common/action_load_season/init"
 
-import { BaseResource } from "./resource"
 import { RepositoryOutsideFeature } from "../../../../ui/vendor/getto-application/infra/repository/infra"
-import { RemoteOutsideFeature } from "../../../../ui/vendor/getto-application/infra/remote/infra"
+import { RemoteOutsideFeature } from "../../../../ui/vendor/getto-application/infra/remote/feature"
 import { LocationOutsideFeature } from "../../../../ui/vendor/getto-application/location/infra"
+
+import { BaseResource } from "./resource"
 
 export type BaseOutsideFeature = RemoteOutsideFeature &
     RepositoryOutsideFeature &

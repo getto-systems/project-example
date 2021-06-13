@@ -1,6 +1,6 @@
 import { LocationDetecter, LocationDetectMethod, LocationOutsideFeature } from "./infra"
 
-export function newLocationDetecter<T>(
+export function newDetecter<T>(
     feature: LocationOutsideFeature,
     method: LocationDetectMethod<T>,
 ): LocationDetecter<T> {

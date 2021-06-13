@@ -21,7 +21,7 @@ import {
     initialResetPasswordCoreState,
 } from "./action"
 
-import { ResetPasswordLocationDetecter } from "../../reset/method"
+import { ResetPasswordDetecter } from "../../reset/method"
 
 import { LoadScriptError } from "../../../../../_ui/common/secure/get_script_path/data"
 import { ResetPasswordFields } from "../../reset/data"
@@ -38,7 +38,7 @@ export type ResetPasswordCoreForegroundDetecter = Readonly<{
     getSecureScriptPath: GetScriptPathDetecter
 }>
 export type ResetPasswordCoreBackgroundDetecter = Readonly<{
-    reset: ResetPasswordLocationDetecter
+    reset: ResetPasswordDetecter
 }>
 
 export function initResetPasswordCoreMaterial(

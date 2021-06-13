@@ -8,12 +8,13 @@ import {
     initCheckResetTokenSendingStatusCoreMaterialPod,
 } from "../core/impl"
 
+import { RemoteOutsideFeature } from "../../../../../../../ui/vendor/getto-application/infra/remote/feature"
+import { LocationOutsideFeature } from "../../../../../../../ui/vendor/getto-application/location/infra"
+
 import {
     CheckResetTokenSendingStatusCoreMaterial,
     CheckResetTokenSendingStatusCoreMaterialPod,
 } from "../core/action"
-import { RemoteOutsideFeature } from "../../../../../../../ui/vendor/getto-application/infra/remote/infra"
-import { LocationOutsideFeature } from "../../../../../../../ui/vendor/getto-application/location/infra"
 
 export function newCheckSendingStatusMaterial(
     feature: RemoteOutsideFeature & LocationOutsideFeature,

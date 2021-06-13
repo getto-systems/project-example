@@ -1,16 +1,10 @@
 import { delayedChecker } from "../../../../../../../ui/vendor/getto-application/infra/timer/helper"
 
 import { authRemoteConverter } from "../../../../../auth_ticket/_ui/kernel/converter"
-import { resetTokenLocationConverter } from "../../converter"
 
 import { ResetPasswordInfra } from "../infra"
 
-import { ResetPasswordLocationDetectMethod, ResetPasswordPod } from "../method"
-
-import { SignNav, signNavKey } from "../../../../../_ui/common/nav/data"
-
-export const detectResetToken: ResetPasswordLocationDetectMethod = (currentURL) =>
-    resetTokenLocationConverter(currentURL.searchParams.get(signNavKey(SignNav.passwordResetToken)))
+import { ResetPasswordPod } from "../method"
 
 interface Reset {
     (infra: ResetPasswordInfra): ResetPasswordPod
