@@ -1,10 +1,9 @@
-import { loadBreadcrumbList } from "../../load_breadcrumb_list/impl"
+import { loadBreadcrumbList } from "../../load_breadcrumb_list/method"
+import { LoadMenuDetecter } from "../../kernel/method"
 
 import { LoadBreadcrumbListInfra } from "../../load_breadcrumb_list/infra"
 
 import { LoadBreadcrumbListCoreAction, LoadBreadcrumbListCoreMaterial } from "./action"
-
-import { LoadMenuDetecter } from "../../kernel/method"
 
 export function initLoadBreadcrumbListCoreMaterial(
     infra: LoadBreadcrumbListInfra,
