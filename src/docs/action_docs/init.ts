@@ -5,7 +5,7 @@ import { newLoadMenuResource } from "../../outline/_ui/action_load_menu/init"
 
 import { initDocsView } from "./impl"
 
-import { RepositoryOutsideFeature } from "../../../ui/vendor/getto-application/infra/repository/infra"
+import { RepositoryOutsideFeature } from "../../../ui/vendor/getto-application/infra/repository/feature"
 import { RemoteOutsideFeature } from "../../../ui/vendor/getto-application/infra/remote/feature"
 import { LocationOutsideFeature } from "../../../ui/vendor/getto-application/location/infra"
 

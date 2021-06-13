@@ -13,7 +13,7 @@ import {
 } from "./core/impl"
 
 import { RemoteOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/remote/feature"
-import { RepositoryOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/repository/infra"
+import { RepositoryOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/repository/feature"
 import { LocationOutsideFeature } from "../../../../../ui/vendor/getto-application/location/infra"
 
 import { AuthenticatePasswordView } from "./resource"

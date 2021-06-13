@@ -1,9 +1,5 @@
 import { RepositoryError } from "./data"
 
-export type RepositoryOutsideFeature = Readonly<{
-    webDB: IDBFactory
-}>
-
 export interface RepositoryPod<V, R> {
     (converter: RepositoryConverter<V, R>): Repository<V>
 }

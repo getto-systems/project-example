@@ -5,7 +5,8 @@ import { convertRepository } from "../../../../../../../ui/vendor/getto-applicat
 import { decodeProtobuf, encodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 import { IndexedDBTarget, initIndexedDB } from "../../../../../../z_details/_ui/db/indexed_db"
 
-import { RepositoryOutsideFeature } from "../../../../../../../ui/vendor/getto-application/infra/repository/infra"
+import { RepositoryOutsideFeature } from "../../../../../../../ui/vendor/getto-application/infra/repository/feature"
+
 import { AuthzRepositoryPod } from "../../infra"
 import { FetchDBResult, StoreDBResult } from "../../../../../../z_details/_ui/db/infra"
 

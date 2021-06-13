@@ -11,7 +11,7 @@ import { initSignAction } from "../core/impl"
 import { SignView } from "../resource"
 import { initSignLinkResource } from "../../common/nav/action_nav/impl"
 
-import { RepositoryOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/repository/infra"
+import { RepositoryOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/repository/feature"
 import { RemoteOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/remote/feature"
 import { LocationOutsideFeature } from "../../../../../ui/vendor/getto-application/location/infra"
 
