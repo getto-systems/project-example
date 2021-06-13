@@ -8,7 +8,7 @@ import {
     GetScriptPathDetecter,
     getScriptPath,
 } from "../../../../_ui/common/secure/get_script_path/method"
-import { authenticatePassword } from "../../authenticate/impl/core"
+import { authenticatePassword } from "../../authenticate/method"
 
 import { AuthenticatePasswordInfra } from "../../authenticate/infra"
 import { StartContinuousRenewInfra } from "../../../../auth_ticket/_ui/start_continuous_renew/infra"
