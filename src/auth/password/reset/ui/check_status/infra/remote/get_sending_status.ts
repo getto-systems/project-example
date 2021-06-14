@@ -5,7 +5,6 @@ import {
 } from "../../../../../../_ui/y_protobuf/api_pb.js"
 
 import {
-    convertRemote,
     fetchOptions,
     generateNonce,
     remoteCommonError,
@@ -15,29 +14,14 @@ import { decodeProtobuf, encodeProtobuf } from "../../../../../../../../ui/vendo
 
 import { RemoteOutsideFeature } from "../../../../../../../z_details/_ui/remote/feature"
 
-import { GetResetTokenSendingStatusRemotePod } from "../../infra"
+import { GetResetTokenSendingStatusRemote } from "../../infra"
 
-import { ApiCommonError, ApiResult } from "../../../../../../../z_details/_ui/api/data"
+import { CheckResetTokenSendingStatusRemoteError, ResetTokenSendingResult } from "../../data"
 
 export function newGetResetTokenSendingStatusRemote(
     feature: RemoteOutsideFeature,
-): GetResetTokenSendingStatusRemotePod {
-    type GetSendingStatusResult = ApiResult<
-        SendingTokenResult,
-        ApiCommonError | GetSendingStatusError
-    >
-    type SendingTokenResult =
-        | Readonly<{ done: false; status: Readonly<{ sending: boolean }> }>
-        | Readonly<{ done: true; send: false; err: SendingTokenError }>
-        | Readonly<{ done: true; send: true }>
-
-    type SendingTokenError = "failed-to-connect-message-service"
-
-    type GetSendingStatusError =
-        | Readonly<{ type: "invalid-reset" }>
-        | Readonly<{ type: "already-reset" }>
-
-    return convertRemote(async (sessionID: string): Promise<GetSendingStatusResult> => {
+): GetResetTokenSendingStatusRemote {
+    return async (sessionID) => {
         try {
             const mock = true
             if (mock) {
@@ -79,7 +63,7 @@ export function newGetResetTokenSendingStatusRemote(
 
         function toSendTokenResult(
             result: GetResetTokenSendingStatusResult_pb,
-        ): SendingTokenResult {
+        ): ResetTokenSendingResult {
             if (!result.value) {
                 return { done: false, status: { sending: false } }
             }
@@ -92,7 +76,9 @@ export function newGetResetTokenSendingStatusRemote(
             }
             return { done: true, send: true }
         }
-        function mapError(result: GetResetTokenSendingStatusResult_pb): GetSendingStatusError {
+        function mapError(
+            result: GetResetTokenSendingStatusResult_pb,
+        ): CheckResetTokenSendingStatusRemoteError {
             if (!result.err || !result.err.type) {
                 return { type: "invalid-reset" }
             }
@@ -104,5 +90,5 @@ export function newGetResetTokenSendingStatusRemote(
                     return { type: "already-reset" }
             }
         }
-    })
+    }
 }

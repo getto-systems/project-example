@@ -1,7 +1,6 @@
 import { env } from "../../../../../../../y_environment/_ui/env"
 
 import {
-    convertRemote,
     fetchOptions,
     generateNonce,
     remoteCommonError,
@@ -10,14 +9,10 @@ import {
 
 import { RemoteOutsideFeature } from "../../../../../../../z_details/_ui/remote/feature"
 
-import { SendResetTokenRemotePod } from "../../infra"
+import { SendResetTokenRemote } from "../../infra"
 
-import { ApiCommonError, ApiResult } from "../../../../../../../z_details/_ui/api/data"
-
-export function newSendResetTokenRemote(feature: RemoteOutsideFeature): SendResetTokenRemotePod {
-    type SendTokenResult = ApiResult<true, ApiCommonError>
-
-    return convertRemote(async (): Promise<SendTokenResult> => {
+export function newSendResetTokenRemote(feature: RemoteOutsideFeature): SendResetTokenRemote {
+    return async () => {
         try {
             const mock = true
             if (mock) {
@@ -40,5 +35,5 @@ export function newSendResetTokenRemote(feature: RemoteOutsideFeature): SendRese
         } catch (err) {
             return remoteInfraError(err)
         }
-    })
+    }
 }

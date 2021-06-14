@@ -1,27 +1,27 @@
-import { RemoteTypes } from "../../../../../z_details/_ui/remote/infra"
 import { Limit, WaitTime } from "../../../../../z_details/_ui/config/infra"
 
 import { CheckResetTokenSendingStatusRemoteError, ResetTokenSendingResult } from "./data"
 import { ResetSessionID } from "../data"
+import { RemoteResult } from "../../../../../z_details/_ui/remote/data"
 
 export type CheckResetTokenSendingStatusInfra = Readonly<{
-    sendToken: SendResetTokenRemotePod
-    getStatus: GetResetTokenSendingStatusRemotePod
+    sendToken: SendResetTokenRemote
+    getStatus: GetResetTokenSendingStatusRemote
     config: Readonly<{
         wait: WaitTime
         limit: Limit
     }>
 }>
 
-type SendRemoteTypes = RemoteTypes<null, true, true, CheckResetTokenSendingStatusRemoteError>
-export type SendResetTokenRemotePod = SendRemoteTypes["pod"]
-export type SendResetTokenResult = SendRemoteTypes["result"]
+export interface SendResetTokenRemote {
+    (): Promise<SendResetTokenRemoteResult>
+}
+export type SendResetTokenRemoteResult = RemoteResult<true, CheckResetTokenSendingStatusRemoteError>
 
-type GetSendingStatusRemoteTypes = RemoteTypes<
-    ResetSessionID,
-    ResetTokenSendingResult,
+export interface GetResetTokenSendingStatusRemote {
+    (resetSessionID: ResetSessionID): Promise<GetResetTokenSendingStatusRemoteResult>
+}
+export type GetResetTokenSendingStatusRemoteResult = RemoteResult<
     ResetTokenSendingResult,
     CheckResetTokenSendingStatusRemoteError
 >
-export type GetResetTokenSendingStatusRemotePod = GetSendingStatusRemoteTypes["pod"]
-export type GetResetTokenSendingStatusResult = GetSendingStatusRemoteTypes["result"]
