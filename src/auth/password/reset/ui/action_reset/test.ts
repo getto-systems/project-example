@@ -1,10 +1,10 @@
 import { setupActionTestRunner } from "../../../../../../ui/vendor/getto-application/action/test_helper"
+import { ticker } from "../../../../../z_details/_ui/timer/helper"
 
 import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/action_input/mock"
 import { mockRepository } from "../../../../../z_details/_ui/repository/mock"
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../../z_details/_ui/clock/mock"
-import { mockRemotePod } from "../../../../../z_details/_ui/remote/mock"
 
 import { mockGetScriptPathDetecter } from "../../../../_ui/common/secure/get_script_path/mock"
 import { mockResetPasswordLocationDetecter } from "../reset/mock"
@@ -16,7 +16,7 @@ import { initResetPasswordCoreAction, initResetPasswordCoreMaterial } from "./co
 import { initResetPasswordFormAction } from "./form/impl"
 
 import { Clock } from "../../../../../z_details/_ui/clock/infra"
-import { ResetPasswordRemotePod, ResetPasswordResult } from "../reset/infra"
+import { ResetPasswordRemote, ResetPasswordRemoteResult } from "../reset/infra"
 import {
     AuthnRepositoryPod,
     AuthnRepositoryValue,
@@ -192,7 +192,7 @@ function standard() {
     const clock = mockClock(START_AT, clockPubSub)
     const view = initView(
         standard_URL(),
-        standard_reset(),
+        standard_reset(clock),
         standard_renew(clock, clockPubSub),
         clock,
     )
@@ -204,7 +204,7 @@ function takeLongtime() {
     const clock = mockClock(START_AT, clockPubSub)
     const view = initView(
         standard_URL(),
-        takeLongtime_reset(),
+        takeLongtime_reset(clock),
         standard_renew(clock, clockPubSub),
         clock,
     )
@@ -216,7 +216,7 @@ function emptyResetToken() {
     const clock = mockClock(START_AT, clockPubSub)
     const view = initView(
         emptyResetToken_URL(),
-        standard_reset(),
+        standard_reset(clock),
         standard_renew(clock, clockPubSub),
         clock,
     )
@@ -226,7 +226,7 @@ function emptyResetToken() {
 
 function initView(
     currentURL: URL,
-    reset: ResetPasswordRemotePod,
+    reset: ResetPasswordRemote,
     renew: RenewAuthTicketRemote,
     clock: Clock,
 ): ResetPasswordView {
@@ -262,7 +262,6 @@ function initView(
                         config: {
                             takeLongtimeThreshold: { delay_millisecond: 32 },
                         },
-                        clock,
                     },
                 },
                 detecter,
@@ -294,18 +293,17 @@ function standard_authz(): AuthzRepositoryPod {
     return convertRepository(db)
 }
 
-function standard_reset(): ResetPasswordRemotePod {
-    return mockRemotePod(simulateReset, { wait_millisecond: 0 })
+function standard_reset(clock: Clock): ResetPasswordRemote {
+    return async () => standard_resetPasswordRemoteResult(clock)
 }
-function takeLongtime_reset(): ResetPasswordRemotePod {
-    return mockRemotePod(simulateReset, { wait_millisecond: 64 })
+function takeLongtime_reset(clock: Clock): ResetPasswordRemote {
+    return async () =>
+        ticker({ wait_millisecond: 64 }, () => standard_resetPasswordRemoteResult(clock))
 }
-function simulateReset(): ResetPasswordResult {
+function standard_resetPasswordRemoteResult(clock: Clock): ResetPasswordRemoteResult {
     return {
         success: true,
-        value: {
-            roles: ["role"],
-        },
+        value: convertAuthRemote(clock, { roles: ["role"] }),
     }
 }
 

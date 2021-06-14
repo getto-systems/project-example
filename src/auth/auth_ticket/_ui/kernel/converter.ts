@@ -2,7 +2,6 @@ import { RepositoryConverter } from "../../../../z_details/_ui/repository/infra"
 
 import { AuthzRepositoryValue } from "./infra"
 import { Clock } from "../../../../z_details/_ui/clock/infra"
-import { RemoteConverter } from "../../../../z_details/_ui/remote/infra"
 import { AuthRemoteValue, AuthnRepositoryValue } from "./infra"
 
 import { Authn, Authz, GrantedRoles } from "./data"
@@ -27,12 +26,6 @@ export const authnRepositoryConverter: RepositoryConverter<Authn, AuthnRepositor
         }
     },
 }
-
-interface AuthConverter {
-    (clock: Clock): RemoteConverter<AuthTicket, AuthRemoteValue>
-}
-export const authRemoteConverter: AuthConverter = (clock) => (value) =>
-    convertAuthRemote(clock, value)
 
 export function convertAuthRemote(clock: Clock, value: AuthRemoteValue): AuthTicket {
     // remote からの値はバリデーションせずに受け取る

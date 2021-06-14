@@ -5,7 +5,6 @@ import {
 } from "../../../../../../_ui/y_protobuf/api_pb.js"
 
 import {
-    convertRemote,
     fetchOptions,
     generateNonce,
     remoteCommonError,
@@ -15,31 +14,25 @@ import { decodeProtobuf, encodeProtobuf } from "../../../../../../../../ui/vendo
 
 import { RemoteOutsideFeature } from "../../../../../../../z_details/_ui/remote/feature"
 
-import { ResetPasswordRemotePod } from "../../infra"
+import { ResetPasswordRemote } from "../../infra"
 
-import {
-    ApiAuthenticateResponse,
-    ApiCommonError,
-    ApiResult,
-} from "../../../../../../../z_details/_ui/api/data"
+import { convertAuthRemote } from "../../../../../../auth_ticket/_ui/kernel/converter"
+import { Clock } from "../../../../../../../z_details/_ui/clock/infra"
+import { ResetPasswordRemoteError } from "../../data"
 
-export function newResetPasswordRemote(feature: RemoteOutsideFeature): ResetPasswordRemotePod {
-    type ResetParams = Readonly<{
-        resetToken: string
-        fields: Readonly<{
-            loginID: string
-            password: string
-        }>
-    }>
-    type ResetResult = ApiResult<ApiAuthenticateResponse, ApiCommonError | ResetError>
-    type ResetError = Readonly<{ type: "invalid-reset" }> | Readonly<{ type: "already-reset" }>
-
-    return convertRemote(async (params: ResetParams): Promise<ResetResult> => {
+export function newResetPasswordRemote(
+    feature: RemoteOutsideFeature,
+    clock: Clock,
+): ResetPasswordRemote {
+    return async (resetToken, fields) => {
         try {
             const mock = true
             if (mock) {
                 // TODO api の実装が終わったらつなぐ
-                return { success: true, value: { roles: ["admin", "dev-docs"] } }
+                return {
+                    success: true,
+                    value: convertAuthRemote(clock, { roles: ["admin", "dev-docs"] }),
+                }
             }
 
             const opts = fetchOptions({
@@ -51,9 +44,9 @@ export function newResetPasswordRemote(feature: RemoteOutsideFeature): ResetPass
             const response = await fetch(opts.url, {
                 ...opts.options,
                 body: encodeProtobuf(ResetPassword_pb, (message) => {
-                    message.resetToken = params.resetToken
-                    message.loginId = params.fields.loginID
-                    message.password = params.fields.password
+                    message.resetToken = resetToken
+                    message.loginId = fields.loginID
+                    message.password = fields.password
                 }),
             })
 
@@ -67,15 +60,13 @@ export function newResetPasswordRemote(feature: RemoteOutsideFeature): ResetPass
             }
             return {
                 success: true,
-                value: {
-                    roles: result.value?.roles || [],
-                },
+                value: convertAuthRemote(clock, { roles: result.value?.roles || [] }),
             }
         } catch (err) {
             return remoteInfraError(err)
         }
 
-        function mapError(result: ResetPasswordResult_pb): ResetError {
+        function mapError(result: ResetPasswordResult_pb): ResetPasswordRemoteError {
             if (!result.err || !result.err.type) {
                 return { type: "invalid-reset" }
             }
@@ -87,5 +78,5 @@ export function newResetPasswordRemote(feature: RemoteOutsideFeature): ResetPass
                     return { type: "already-reset" }
             }
         }
-    })
+    }
 }
