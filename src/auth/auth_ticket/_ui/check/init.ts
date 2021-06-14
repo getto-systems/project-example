@@ -20,7 +20,7 @@ export function newCheckAuthTicketInfra(
     return {
         authz: newAuthzRepositoryPod(feature),
         authn: newAuthnRepositoryPod(feature),
-        renew: newRenewAuthTicketRemote(feature),
+        renew: newRenewAuthTicketRemote(feature, newClock()),
         clock: newClock(),
         config: {
             instantLoadExpire: expireMinute(3),

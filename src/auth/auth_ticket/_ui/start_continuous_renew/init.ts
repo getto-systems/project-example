@@ -17,7 +17,7 @@ export function newStartContinuousRenewAuthnInfoInfra(
     return {
         authn: newAuthnRepositoryPod(feature),
         authz: newAuthzRepositoryPod(feature),
-        renew: newRenewAuthTicketRemote(feature),
+        renew: newRenewAuthTicketRemote(feature, newClock()),
         clock: newClock(),
         config: {
             authnExpire: expireMinute(1),

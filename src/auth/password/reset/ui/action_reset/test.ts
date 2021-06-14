@@ -18,16 +18,16 @@ import { initResetPasswordFormAction } from "./form/impl"
 import { Clock } from "../../../../../z_details/_ui/clock/infra"
 import { ResetPasswordRemotePod, ResetPasswordResult } from "../reset/infra"
 import {
+    AuthnRepositoryPod,
     AuthnRepositoryValue,
     AuthzRepositoryPod,
     AuthzRepositoryValue,
-} from "../../../../auth_ticket/_ui/kernel/infra"
-import {
-    AuthnRepositoryPod,
-    RenewAuthTicketRemotePod,
+    RenewAuthTicketRemote,
 } from "../../../../auth_ticket/_ui/kernel/infra"
 
 import { ResetPasswordView } from "./resource"
+
+import { authRemoteConverter } from "../../../../auth_ticket/_ui/kernel/converter"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")
@@ -189,33 +189,36 @@ describe("RegisterPassword", () => {
 
 function standard() {
     const clockPubSub = mockClockPubSub()
+    const clock = mockClock(START_AT, clockPubSub)
     const view = initView(
         standard_URL(),
         standard_reset(),
-        standard_renew(clockPubSub),
-        mockClock(START_AT, clockPubSub),
+        standard_renew(clock, clockPubSub),
+        clock,
     )
 
     return { clock: clockPubSub, view }
 }
 function takeLongtime() {
     const clockPubSub = mockClockPubSub()
+    const clock = mockClock(START_AT, clockPubSub)
     const view = initView(
         standard_URL(),
         takeLongtime_reset(),
-        standard_renew(clockPubSub),
-        mockClock(START_AT, clockPubSub),
+        standard_renew(clock, clockPubSub),
+        clock,
     )
 
     return { clock: clockPubSub, view }
 }
 function emptyResetToken() {
     const clockPubSub = mockClockPubSub()
+    const clock = mockClock(START_AT, clockPubSub)
     const view = initView(
         emptyResetToken_URL(),
         standard_reset(),
-        standard_renew(clockPubSub),
-        mockClock(START_AT, clockPubSub),
+        standard_renew(clock, clockPubSub),
+        clock,
     )
 
     return { view }
@@ -224,7 +227,7 @@ function emptyResetToken() {
 function initView(
     currentURL: URL,
     reset: ResetPasswordRemotePod,
-    renew: RenewAuthTicketRemotePod,
+    renew: RenewAuthTicketRemote,
     clock: Clock,
 ): ResetPasswordView {
     const authn = standard_authn()
@@ -306,27 +309,24 @@ function simulateReset(): ResetPasswordResult {
     }
 }
 
-function standard_renew(clock: ClockPubSub): RenewAuthTicketRemotePod {
+function standard_renew(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
     let count = 0
-    return mockRemotePod(
-        () => {
-            if (count > 1) {
-                // 最初の 2回だけ renew して、あとは renew を cancel するための unauthorized
-                return { success: false, err: { type: "unauthorized" } }
-            }
+    return async () => {
+        if (count > 1) {
+            // 最初の 2回だけ renew して、あとは renew を cancel するための unauthorized
+            return { success: false, err: { type: "unauthorized" } }
+        }
 
-            // 現在時刻を動かす
-            const nextTime = CONTINUOUS_RENEW_AT[count]
-            setTimeout(() => clock.update(nextTime))
+        // 現在時刻を動かす
+        const nextTime = CONTINUOUS_RENEW_AT[count]
+        setTimeout(() => clockPubSub.update(nextTime))
 
-            count++
-            return {
-                success: true,
-                value: {
-                    roles: ["role"],
-                },
-            }
-        },
-        { wait_millisecond: 0 },
-    )
+        count++
+        return {
+            success: true,
+            value: authRemoteConverter(clock, {
+                roles: ["role"],
+            }),
+        }
+    }
 }

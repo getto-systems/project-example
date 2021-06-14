@@ -45,6 +45,7 @@ export function LogoutComponent(props: Props): VNode {
             return logoutBox({ success: false, err: { type: "remote", err: props.state.err } })
     }
 
+    // TODO state をこの形にするべき
     type LogoutBoxContent =
         | Readonly<{ success: true }>
         | Readonly<{ success: false; err: LogoutBoxError }>

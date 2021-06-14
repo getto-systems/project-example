@@ -1,7 +1,6 @@
 import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
 
 import { mockRepository } from "../../../../z_details/_ui/repository/mock"
-import { mockRemotePod } from "../../../../z_details/_ui/remote/mock"
 
 import { convertRepository } from "../../../../z_details/_ui/repository/helper"
 import { initLogoutCoreAction, initLogoutCoreMaterial } from "./core/impl"
@@ -9,7 +8,7 @@ import { initLogoutResource } from "./impl"
 
 import { AuthnRepositoryValue, AuthzRepositoryPod, AuthzRepositoryValue } from "../kernel/infra"
 import { AuthnRepositoryPod } from "../kernel/infra"
-import { ClearAuthTicketRemotePod } from "../clear/infra"
+import { ClearAuthTicketRemote } from "../clear/infra"
 
 import { LogoutResource } from "./resource"
 
@@ -72,6 +71,6 @@ function standard_authz(): AuthzRepositoryPod {
     return convertRepository(db)
 }
 
-function standard_clear(): ClearAuthTicketRemotePod {
-    return mockRemotePod(() => ({ success: true, value: true }), { wait_millisecond: 0 })
+function standard_clear(): ClearAuthTicketRemote {
+    return async () => ({ success: true, value: true })
 }

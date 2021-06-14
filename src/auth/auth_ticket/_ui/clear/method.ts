@@ -1,5 +1,3 @@
-import { passThroughRemoteValue } from "../../../../z_details/_ui/remote/helper"
-
 import { ClearAuthTicketInfra } from "./infra"
 
 import { ClearAuthTicketEvent } from "./event"
@@ -16,7 +14,6 @@ interface Clear {
 export const clearAuthTicket: Clear = (infra) => async (post) => {
     const authn = infra.authn(authnRepositoryConverter)
     const authz = infra.authz(authzRepositoryConverter)
-    const clear = infra.clear(passThroughRemoteValue)
 
     const authnResult = await authn.get()
     if (!authnResult.success) {
@@ -32,7 +29,7 @@ export const clearAuthTicket: Clear = (infra) => async (post) => {
         return post({ type: "succeed-to-logout" })
     }
 
-    const clearResponse = await clear({ type: "always" })
+    const clearResponse = await infra.clear()
     if (!clearResponse.success) {
         return post({ type: "failed-to-clear", err: clearResponse.err })
     }

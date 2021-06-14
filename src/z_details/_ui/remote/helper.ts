@@ -9,7 +9,13 @@ import {
     RemotePod,
 } from "./infra"
 
-import { RemoteCommonError, RemoteErrorResult, RemoteInfraError, RemoteServerError } from "./data"
+import {
+    RemoteCommonError,
+    RemoteErrorResult,
+    RemoteInfraError,
+    RemoteResult,
+    RemoteServerError,
+} from "./data"
 
 export type RemoteFetchParams = Readonly<{
     serverURL: string
@@ -60,6 +66,16 @@ export function remoteServerError(): RemoteErrorResult<RemoteServerError> {
 }
 export function remoteInfraError(err: unknown): RemoteErrorResult<RemoteInfraError> {
     return { success: false, err: { type: "infra-error", err: `${err}` } }
+}
+
+export function mapRemoteResult<V, R, E>(
+    result: RemoteResult<R, E>,
+    converter: { (value: R): V },
+): RemoteResult<V, E> {
+    if (!result.success) {
+        return result
+    }
+    return { success: true, value: converter(result.value) }
 }
 
 export function convertRemote<M, V, R, E_raw, E_unknown>(

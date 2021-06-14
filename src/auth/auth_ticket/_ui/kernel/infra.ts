@@ -1,4 +1,4 @@
-import { RemoteTypes } from "../../../../z_details/_ui/remote/infra"
+import { RemoteResult } from "../../../../z_details/_ui/remote/data"
 import { RepositoryPod } from "../../../../z_details/_ui/repository/infra"
 
 import { AuthTicket, Authn, Authz, RenewAuthTicketRemoteError } from "./data"
@@ -13,13 +13,9 @@ export type AuthzRepositoryValue = Readonly<{
     roles: string[]
 }>
 
-type RenewRemoteTypes = RemoteTypes<
-    { type: "always" }, // 引数は必要ないが、null を使うのは嫌なのでこうしておく
-    AuthTicket,
-    AuthRemoteValue,
-    RenewAuthTicketRemoteError
->
-export type RenewAuthTicketRemotePod = RenewRemoteTypes["pod"]
+export interface RenewAuthTicketRemote {
+    (): Promise<RemoteResult<AuthTicket, RenewAuthTicketRemoteError>>
+}
 
 export type AuthRemoteValue = Readonly<{
     roles: string[]

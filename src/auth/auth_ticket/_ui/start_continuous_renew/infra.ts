@@ -1,15 +1,11 @@
-import { AuthzRepositoryPod } from "../kernel/infra"
+import { AuthnRepositoryPod, AuthzRepositoryPod, RenewAuthTicketRemote } from "../kernel/infra"
 import { Clock } from "../../../../z_details/_ui/clock/infra"
-import {
-    ExpireTime,
-    IntervalTime,
-} from "../../../../z_details/_ui/config/infra"
-import { AuthnRepositoryPod, RenewAuthTicketRemotePod } from "../kernel/infra"
+import { ExpireTime, IntervalTime } from "../../../../z_details/_ui/config/infra"
 
 export type StartContinuousRenewInfra = Readonly<{
     authn: AuthnRepositoryPod
     authz: AuthzRepositoryPod
-    renew: RenewAuthTicketRemotePod
+    renew: RenewAuthTicketRemote
     clock: Clock
     config: Readonly<{
         interval: IntervalTime

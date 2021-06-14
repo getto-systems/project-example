@@ -4,11 +4,7 @@ import { CheckAuthTicketInfra } from "./infra"
 
 import { RenewAuthTicketEvent, CheckAuthTicketEvent } from "./event"
 
-import {
-    authnRepositoryConverter,
-    authRemoteConverter,
-    authzRepositoryConverter,
-} from "../kernel/converter"
+import { authnRepositoryConverter, authzRepositoryConverter } from "../kernel/converter"
 
 import { hasExpired } from "../kernel/data"
 
@@ -57,18 +53,15 @@ async function renewTicket<S>(
     infra: CheckAuthTicketInfra,
     post: Post<RenewAuthTicketEvent, S>,
 ): Promise<S> {
-    const { clock, config } = infra
+    const { config } = infra
     const authn = infra.authn(authnRepositoryConverter)
     const authz = infra.authz(authzRepositoryConverter)
-    const renew = infra.renew(authRemoteConverter(clock))
 
     post({ type: "try-to-renew" })
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
-    const response = await delayedChecker(
-        renew({ type: "always" }),
-        config.takeLongtimeThreshold,
-        () => post({ type: "take-longtime-to-renew" }),
+    const response = await delayedChecker(infra.renew(), config.takeLongtimeThreshold, () =>
+        post({ type: "take-longtime-to-renew" }),
     )
     if (!response.success) {
         if (response.err.type === "unauthorized") {

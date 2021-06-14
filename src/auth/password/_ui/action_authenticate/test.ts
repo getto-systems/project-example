@@ -20,13 +20,16 @@ import { initAuthenticatePasswordFormAction } from "./form/impl"
 import { Clock } from "../../../../z_details/_ui/clock/infra"
 import { AuthenticatePasswordRemotePod, AuthenticatePasswordResult } from "../authenticate/infra"
 import {
+    AuthnRepositoryPod,
     AuthnRepositoryValue,
     AuthzRepositoryPod,
     AuthzRepositoryValue,
+    RenewAuthTicketRemote,
 } from "../../../auth_ticket/_ui/kernel/infra"
-import { AuthnRepositoryPod, RenewAuthTicketRemotePod } from "../../../auth_ticket/_ui/kernel/infra"
 
 import { AuthenticatePasswordView } from "./resource"
+
+import { authRemoteConverter } from "../../../auth_ticket/_ui/kernel/converter"
 
 import { AuthenticatePasswordFields } from "../authenticate/data"
 import { LoadScriptError } from "../../../_ui/common/secure/get_script_path/data"
@@ -182,28 +185,22 @@ describe("AuthenticatePassword", () => {
 
 function standard() {
     const clockPubSub = mockClockPubSub()
-    const view = initView(
-        standard_authenticate(),
-        standard_renew(clockPubSub),
-        mockClock(START_AT, clockPubSub),
-    )
+    const clock = mockClock(START_AT, clockPubSub)
+    const view = initView(standard_authenticate(), standard_renew(clock, clockPubSub), clock)
 
     return { clock: clockPubSub, view }
 }
 function takeLongtime_elements() {
     const clockPubSub = mockClockPubSub()
-    const view = initView(
-        takeLongtime_authenticate(),
-        standard_renew(clockPubSub),
-        mockClock(START_AT, clockPubSub),
-    )
+    const clock = mockClock(START_AT, clockPubSub)
+    const view = initView(takeLongtime_authenticate(), standard_renew(clock, clockPubSub), clock)
 
     return { clock: clockPubSub, view }
 }
 
 function initView(
     authenticate: AuthenticatePasswordRemotePod,
-    renew: RenewAuthTicketRemotePod,
+    renew: RenewAuthTicketRemote,
     clock: Clock,
 ): AuthenticatePasswordView {
     const currentURL = new URL("https://example.com/index.html")
@@ -277,27 +274,24 @@ function simulateAuthenticate(_fields: AuthenticatePasswordFields): Authenticate
     }
 }
 
-function standard_renew(clock: ClockPubSub): RenewAuthTicketRemotePod {
+function standard_renew(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
     let count = 0
-    return mockRemotePod(
-        () => {
-            if (count > 1) {
-                // 最初の 2回だけ renew して、あとは renew を cancel するための unauthorized
-                return { success: false, err: { type: "unauthorized" } }
-            }
+    return async () => {
+        if (count > 1) {
+            // 最初の 2回だけ renew して、あとは renew を cancel するための unauthorized
+            return { success: false, err: { type: "unauthorized" } }
+        }
 
-            // 現在時刻を動かす
-            const nextTime = CONTINUOUS_RENEW_AT[count]
-            setTimeout(() => clock.update(nextTime))
+        // 現在時刻を動かす
+        const nextTime = CONTINUOUS_RENEW_AT[count]
+        setTimeout(() => clockPubSub.update(nextTime))
 
-            count++
-            return {
-                success: true,
-                value: {
-                    roles: ["role"],
-                },
-            }
-        },
-        { wait_millisecond: 0 },
-    )
+        count++
+        return {
+            success: true,
+            value: authRemoteConverter(clock, {
+                roles: ["role"],
+            }),
+        }
+    }
 }

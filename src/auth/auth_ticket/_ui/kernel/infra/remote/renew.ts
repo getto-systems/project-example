@@ -2,7 +2,6 @@ import { env } from "../../../../../../y_environment/_ui/env"
 import { AuthenticateResponse_pb } from "../../../../../_ui/y_protobuf/api_pb.js"
 
 import {
-    convertRemote,
     fetchOptions,
     generateNonce,
     remoteCommonError,
@@ -12,15 +11,24 @@ import { decodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 
 import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/feature"
 
-import { RenewAuthTicketRemotePod } from "../../infra"
+import { RenewAuthTicketRemote } from "../../infra"
+import { Clock } from "../../../../../../z_details/_ui/clock/infra"
 
-export function newRenewAuthTicketRemote(feature: RemoteOutsideFeature): RenewAuthTicketRemotePod {
-    return convertRemote(async () => {
+import { authRemoteConverter } from "../../converter"
+
+export function newRenewAuthTicketRemote(
+    feature: RemoteOutsideFeature,
+    clock: Clock,
+): RenewAuthTicketRemote {
+    return async () => {
         try {
             const mock = false
             if (mock) {
                 // TODO api の実装が終わったらつなぐ
-                return { success: true, value: { roles: ["admin", "dev-docs"] } }
+                return {
+                    success: true,
+                    value: authRemoteConverter(clock, { roles: ["admin", "dev-docs"] }),
+                }
             }
 
             const opts = fetchOptions({
@@ -37,10 +45,13 @@ export function newRenewAuthTicketRemote(feature: RemoteOutsideFeature): RenewAu
 
             return {
                 success: true,
-                value: decodeProtobuf(AuthenticateResponse_pb, await response.text()),
+                value: authRemoteConverter(
+                    clock,
+                    decodeProtobuf(AuthenticateResponse_pb, await response.text()),
+                ),
             }
         } catch (err) {
             return remoteInfraError(err)
         }
-    })
+    }
 }

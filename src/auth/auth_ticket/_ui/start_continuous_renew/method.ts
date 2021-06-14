@@ -2,11 +2,7 @@ import { StartContinuousRenewInfra } from "./infra"
 
 import { SaveAuthTicketEvent, StartContinuousRenewEvent } from "./event"
 
-import {
-    authnRepositoryConverter,
-    authRemoteConverter,
-    authzRepositoryConverter,
-} from "../kernel/converter"
+import { authnRepositoryConverter, authzRepositoryConverter } from "../kernel/converter"
 
 import { AuthTicket, hasExpired } from "../kernel/data"
 
@@ -61,7 +57,6 @@ export const startContinuousRenew: Start = (infra) => (post) => {
         const { clock, config } = infra
         const authz = infra.authz(authzRepositoryConverter)
         const authn = infra.authn(authnRepositoryConverter)
-        const renew = infra.renew(authRemoteConverter(clock))
 
         const result = await authn.get()
         if (!result.success) {
@@ -77,7 +72,7 @@ export const startContinuousRenew: Start = (infra) => (post) => {
             return { type: "authn-not-expired", continue: true }
         }
 
-        const response = await renew({ type: "always" })
+        const response = await infra.renew()
         if (!response.success) {
             if (response.err.type === "unauthorized") {
                 return clearTicket()

@@ -4,7 +4,7 @@ import { ResetPasswordInfra } from "./infra"
 
 import { ResetPasswordEvent } from "./event"
 
-import { authRemoteConverter } from "../../../../auth_ticket/_ui/kernel/converter"
+import { authRemoteConverterPod } from "../../../../auth_ticket/_ui/kernel/converter"
 
 import { ConvertBoardResult } from "../../../../../../ui/vendor/getto-application/board/kernel/data"
 import { ConvertLocationResult } from "../../../../../z_details/_ui/location/data"
@@ -40,7 +40,7 @@ export const resetPassword: Reset = (infra) => (detecter) => async (fields, post
     post({ type: "try-to-reset" })
 
     const { clock, config } = infra
-    const reset = infra.reset(authRemoteConverter(clock))
+    const reset = infra.reset(authRemoteConverterPod(clock))
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(

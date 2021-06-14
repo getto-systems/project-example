@@ -31,7 +31,10 @@ export const authnRepositoryConverter: RepositoryConverter<Authn, AuthnRepositor
 interface AuthConverter {
     (clock: Clock): RemoteConverter<AuthTicket, AuthRemoteValue>
 }
-export const authRemoteConverter: AuthConverter = (clock) => (value) => {
+export const authRemoteConverterPod: AuthConverter = (clock) => (value) =>
+    authRemoteConverter(clock, value)
+
+export function authRemoteConverter(clock: Clock, value: AuthRemoteValue): AuthTicket {
     // remote からの値はバリデーションせずに受け取る
     return {
         authn: {

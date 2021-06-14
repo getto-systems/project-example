@@ -1,7 +1,6 @@
 import { env } from "../../../../../y_environment/_ui/env"
 
 import {
-    convertRemote,
     fetchOptions,
     generateNonce,
     remoteCommonError,
@@ -10,10 +9,10 @@ import {
 
 import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/feature"
 
-import { ClearAuthTicketRemotePod } from "../infra"
+import { ClearAuthTicketRemote } from "../infra"
 
-export function newClearAuthTicketRemote(feature: RemoteOutsideFeature): ClearAuthTicketRemotePod {
-    return convertRemote(async () => {
+export function newClearAuthTicketRemote(feature: RemoteOutsideFeature): ClearAuthTicketRemote {
+    return async () => {
         try {
             const mock = true
             if (mock) {
@@ -37,5 +36,5 @@ export function newClearAuthTicketRemote(feature: RemoteOutsideFeature): ClearAu
         } catch (err) {
             return remoteInfraError(err)
         }
-    })
+    }
 }

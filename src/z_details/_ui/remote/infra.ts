@@ -1,3 +1,5 @@
+import { RemoteResult } from "./data"
+
 export type RemoteFetchOptions = Readonly<{
     url: string
     options: Readonly<{
@@ -27,10 +29,6 @@ export interface Remote<M, V, E> {
 export interface RemoteSimulator<M, V, E> {
     (message: M): RemoteResult<V, E>
 }
-
-export type RemoteResult<V, E> =
-    | Readonly<{ success: true; value: V }>
-    | Readonly<{ success: false; err: E }>
 
 export interface RemoteConverter<V, R> {
     (raw: R): V
