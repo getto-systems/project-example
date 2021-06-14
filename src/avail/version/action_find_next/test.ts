@@ -1,8 +1,8 @@
 import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
+import { ticker } from "../../../z_details/_ui/timer/helper"
 
 import { markApplicationTargetPath } from "../find_next/test_helper"
 
-import { mockRemotePod } from "../../../z_details/_ui/remote/mock"
 import { mockFindNextVersionLocationDetecter } from "../find_next/mock"
 
 import { initFindNextVersionView } from "./impl"
@@ -10,7 +10,7 @@ import { initFindNextVersionCoreAction, initFindNextVersionCoreMaterial } from "
 
 import { applicationPath } from "../find_next/helper"
 
-import { CheckDeployExistsRemotePod } from "../find_next/infra"
+import { CheckDeployExistsRemote } from "../find_next/infra"
 
 import { FindNextVersionView } from "./resource"
 
@@ -257,7 +257,7 @@ function takeLongtime() {
 function initView(
     currentURL: URL,
     version: string,
-    check: CheckDeployExistsRemotePod,
+    check: CheckDeployExistsRemote,
 ): FindNextVersionView {
     return initFindNextVersionView({
         findNext: initFindNextVersionCoreAction(
@@ -293,21 +293,15 @@ function invalidVersion_URL(): URL {
     return new URL("https://example.com/invalid.html?search=parameter#hash")
 }
 
-function standard_check(): CheckDeployExistsRemotePod {
-    return mockRemotePod(() => ({ success: true, value: { found: false } }), {
-        wait_millisecond: 0,
-    })
+function standard_check(): CheckDeployExistsRemote {
+    return async () => ({ success: true, value: { found: false } })
 }
-function found_check(versions: string[]): CheckDeployExistsRemotePod {
-    return mockRemotePod(
-        (version) => {
-            return { success: true, value: { found: versions.includes(version) } }
-        },
-        { wait_millisecond: 0 },
-    )
+function found_check(versions: string[]): CheckDeployExistsRemote {
+    return async (version) => {
+        return { success: true, value: { found: versions.includes(version) } }
+    }
 }
-function takeLongtime_check(): CheckDeployExistsRemotePod {
-    return mockRemotePod(() => ({ success: true, value: { found: false } }), {
-        wait_millisecond: 2,
-    })
+function takeLongtime_check(): CheckDeployExistsRemote {
+    return async () =>
+        ticker({ wait_millisecond: 2 }, () => ({ success: true, value: { found: false } }))
 }

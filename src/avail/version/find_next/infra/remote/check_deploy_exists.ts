@@ -1,19 +1,9 @@
-import {
-    convertRemote,
-    remoteInfraError,
-    remoteServerError,
-} from "../../../../../z_details/_ui/remote/helper"
+import { remoteInfraError, remoteServerError } from "../../../../../z_details/_ui/remote/helper"
 
-import { CheckDeployExistsRemotePod } from "../../infra"
+import { CheckDeployExistsRemote } from "../../infra"
 
-import { ApiInfraError, ApiResult, ApiServerError } from "../../../../../z_details/_ui/api/data"
-
-export function newCheckDeployExistsRemote(): CheckDeployExistsRemotePod {
-    type CheckResult = ApiResult<CheckResponse, CheckError>
-    type CheckResponse = Readonly<{ found: boolean }>
-    type CheckError = ApiServerError | ApiInfraError
-
-    return convertRemote(async (url: string): Promise<CheckResult> => {
+export function newCheckDeployExistsRemote(): CheckDeployExistsRemote {
+    return async (url) => {
         try {
             const response = await fetch(url, { method: "HEAD" })
             if (!response.ok) {
@@ -26,5 +16,5 @@ export function newCheckDeployExistsRemote(): CheckDeployExistsRemotePod {
         } catch (err) {
             return remoteInfraError(err)
         }
-    })
+    }
 }
