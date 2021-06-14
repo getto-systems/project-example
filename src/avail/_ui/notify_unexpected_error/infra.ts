@@ -1,15 +1,12 @@
-import { RemoteTypes } from "../../../z_details/_ui/remote/infra"
+import { RemoteResult } from "../../../z_details/_ui/remote/data"
 
 import { NotifyUnexpectedErrorRemoteError } from "./data"
 
 export type NotifyUnexpectedErrorInfra = Readonly<{
-    notify: NotifyUnexpectedErrorRemotePod
+    notify: NotifyUnexpectedErrorRemote
 }>
 
-type NotifyUnexpectedErrorRemoteTypes = RemoteTypes<
-    unknown,
-    true,
-    true,
-    NotifyUnexpectedErrorRemoteError
->
-export type NotifyUnexpectedErrorRemotePod = NotifyUnexpectedErrorRemoteTypes["pod"]
+export interface NotifyUnexpectedErrorRemote {
+    (err: unknown): Promise<NotifyUnexpectedErrorRemoteResult>
+}
+export type NotifyUnexpectedErrorRemoteResult = RemoteResult<true, NotifyUnexpectedErrorRemoteError>

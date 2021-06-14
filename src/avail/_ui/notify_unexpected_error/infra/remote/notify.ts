@@ -2,7 +2,6 @@ import { env } from "../../../../../y_environment/_ui/env"
 import { NotifyUnexpectedError_pb } from "../../../y_protobuf/api_pb.js"
 
 import {
-    convertRemote,
     fetchOptions,
     generateNonce,
     remoteCommonError,
@@ -12,16 +11,12 @@ import { encodeProtobuf } from "../../../../../../ui/vendor/protobuf/helper"
 
 import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/feature"
 
-import { NotifyUnexpectedErrorRemotePod } from "../../infra"
-
-import { ApiCommonError, ApiResult } from "../../../../../z_details/_ui/api/data"
+import { NotifyUnexpectedErrorRemote } from "../../infra"
 
 export function newNotifyUnexpectedErrorRemote(
     feature: RemoteOutsideFeature,
-): NotifyUnexpectedErrorRemotePod {
-    type NotifyResult = ApiResult<true, ApiCommonError>
-
-    return convertRemote(async (err: unknown): Promise<NotifyResult> => {
+): NotifyUnexpectedErrorRemote {
+    return async (err) => {
         try {
             const mock = true
             if (mock) {
@@ -50,5 +45,5 @@ export function newNotifyUnexpectedErrorRemote(
         } catch (err) {
             return remoteInfraError(err)
         }
-    })
+    }
 }
