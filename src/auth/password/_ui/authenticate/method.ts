@@ -4,8 +4,6 @@ import { AuthenticatePasswordInfra } from "./infra"
 
 import { AuthenticatePasswordEvent } from "./event"
 
-import { authRemoteConverterPod } from "../../../auth_ticket/_ui/kernel/converter"
-
 import { ConvertBoardResult } from "../../../../../ui/vendor/getto-application/board/kernel/data"
 import { AuthenticatePasswordFields } from "./data"
 
@@ -26,12 +24,11 @@ export const authenticatePassword: Authenticate = (infra) => async (fields, post
 
     post({ type: "try-to-login" })
 
-    const { clock, config } = infra
-    const authenticate = infra.authenticate(authRemoteConverterPod(clock))
+    const { config } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(
-        authenticate(fields.value),
+        infra.authenticate(fields.value),
         config.takeLongtimeThreshold,
         () => post({ type: "take-longtime-to-login" }),
     )

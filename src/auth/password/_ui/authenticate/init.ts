@@ -10,8 +10,7 @@ export function newAuthenticatePasswordInfra(
     feature: RemoteOutsideFeature,
 ): AuthenticatePasswordInfra {
     return {
-        authenticate: newAuthenticatePasswordRemote(feature),
-        clock: newClock(),
+        authenticate: newAuthenticatePasswordRemote(feature, newClock()),
         config: {
             takeLongtimeThreshold: delaySecond(1),
         },

@@ -1,8 +1,8 @@
 import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
+import { ticker } from "../../../../z_details/_ui/timer/helper"
 
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_details/_ui/clock/mock"
 import { mockRepository } from "../../../../z_details/_ui/repository/mock"
-import { mockRemotePod } from "../../../../z_details/_ui/remote/mock"
 
 import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/action_input/mock"
@@ -18,7 +18,7 @@ import {
 import { initAuthenticatePasswordFormAction } from "./form/impl"
 
 import { Clock } from "../../../../z_details/_ui/clock/infra"
-import { AuthenticatePasswordRemotePod, AuthenticatePasswordResult } from "../authenticate/infra"
+import { AuthenticatePasswordRemote, AuthenticatePasswordRemoteResult } from "../authenticate/infra"
 import {
     AuthnRepositoryPod,
     AuthnRepositoryValue,
@@ -29,9 +29,8 @@ import {
 
 import { AuthenticatePasswordView } from "./resource"
 
-import { authRemoteConverter } from "../../../auth_ticket/_ui/kernel/converter"
+import { convertAuthRemote } from "../../../auth_ticket/_ui/kernel/converter"
 
-import { AuthenticatePasswordFields } from "../authenticate/data"
 import { LoadScriptError } from "../../../_ui/common/secure/get_script_path/data"
 
 // テスト開始時刻
@@ -186,20 +185,24 @@ describe("AuthenticatePassword", () => {
 function standard() {
     const clockPubSub = mockClockPubSub()
     const clock = mockClock(START_AT, clockPubSub)
-    const view = initView(standard_authenticate(), standard_renew(clock, clockPubSub), clock)
+    const view = initView(standard_authenticate(clock), standard_renew(clock, clockPubSub), clock)
 
     return { clock: clockPubSub, view }
 }
 function takeLongtime_elements() {
     const clockPubSub = mockClockPubSub()
     const clock = mockClock(START_AT, clockPubSub)
-    const view = initView(takeLongtime_authenticate(), standard_renew(clock, clockPubSub), clock)
+    const view = initView(
+        takeLongtime_authenticate(clock),
+        standard_renew(clock, clockPubSub),
+        clock,
+    )
 
     return { clock: clockPubSub, view }
 }
 
 function initView(
-    authenticate: AuthenticatePasswordRemotePod,
+    authenticate: AuthenticatePasswordRemote,
     renew: RenewAuthTicketRemote,
     clock: Clock,
 ): AuthenticatePasswordView {
@@ -234,7 +237,6 @@ function initView(
                         config: {
                             takeLongtimeThreshold: { delay_millisecond: 32 },
                         },
-                        clock,
                     },
                 },
                 getScriptPathDetecter,
@@ -259,18 +261,17 @@ function standard_authz(): AuthzRepositoryPod {
     return convertRepository(db)
 }
 
-function standard_authenticate(): AuthenticatePasswordRemotePod {
-    return mockRemotePod(simulateAuthenticate, { wait_millisecond: 0 })
+function standard_authenticate(clock: Clock): AuthenticatePasswordRemote {
+    return async () => standard_authenticateRemoteResult(clock)
 }
-function takeLongtime_authenticate(): AuthenticatePasswordRemotePod {
-    return mockRemotePod(simulateAuthenticate, { wait_millisecond: 64 })
+function takeLongtime_authenticate(clock: Clock): AuthenticatePasswordRemote {
+    return async () =>
+        ticker({ wait_millisecond: 64 }, () => standard_authenticateRemoteResult(clock))
 }
-function simulateAuthenticate(_fields: AuthenticatePasswordFields): AuthenticatePasswordResult {
+function standard_authenticateRemoteResult(clock: Clock): AuthenticatePasswordRemoteResult {
     return {
         success: true,
-        value: {
-            roles: ["role"],
-        },
+        value: convertAuthRemote(clock, { roles: ["role"] }),
     }
 }
 
@@ -289,9 +290,7 @@ function standard_renew(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicket
         count++
         return {
             success: true,
-            value: authRemoteConverter(clock, {
-                roles: ["role"],
-            }),
+            value: convertAuthRemote(clock, { roles: ["role"] }),
         }
     }
 }

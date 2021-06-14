@@ -11,10 +11,10 @@ import { decodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 
 import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/feature"
 
-import { RenewAuthTicketRemote } from "../../infra"
 import { Clock } from "../../../../../../z_details/_ui/clock/infra"
+import { RenewAuthTicketRemote } from "../../infra"
 
-import { authRemoteConverter } from "../../converter"
+import { convertAuthRemote } from "../../converter"
 
 export function newRenewAuthTicketRemote(
     feature: RemoteOutsideFeature,
@@ -27,7 +27,7 @@ export function newRenewAuthTicketRemote(
                 // TODO api の実装が終わったらつなぐ
                 return {
                     success: true,
-                    value: authRemoteConverter(clock, { roles: ["admin", "dev-docs"] }),
+                    value: convertAuthRemote(clock, { roles: ["admin", "dev-docs"] }),
                 }
             }
 
@@ -45,7 +45,7 @@ export function newRenewAuthTicketRemote(
 
             return {
                 success: true,
-                value: authRemoteConverter(
+                value: convertAuthRemote(
                     clock,
                     decodeProtobuf(AuthenticateResponse_pb, await response.text()),
                 ),

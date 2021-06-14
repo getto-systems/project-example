@@ -22,7 +22,7 @@ import {
 
 import { CheckAuthTicketView } from "./resource"
 
-import { authRemoteConverter } from "../kernel/converter"
+import { convertAuthRemote } from "../kernel/converter"
 
 import { LoadScriptError } from "../../../_ui/common/secure/get_script_path/data"
 
@@ -336,9 +336,7 @@ function renewRemote(
             count++
             return {
                 success: true,
-                value: authRemoteConverter(clock, {
-                    roles: ["role"],
-                }),
+                value: convertAuthRemote(clock, { roles: ["role"] }),
             }
         })
 }

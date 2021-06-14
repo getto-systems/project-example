@@ -27,7 +27,7 @@ import {
 
 import { ResetPasswordView } from "./resource"
 
-import { authRemoteConverter } from "../../../../auth_ticket/_ui/kernel/converter"
+import { convertAuthRemote } from "../../../../auth_ticket/_ui/kernel/converter"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")
@@ -324,9 +324,7 @@ function standard_renew(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicket
         count++
         return {
             success: true,
-            value: authRemoteConverter(clock, {
-                roles: ["role"],
-            }),
+            value: convertAuthRemote(clock, { roles: ["role"] }),
         }
     }
 }
