@@ -24,7 +24,7 @@ export function detectResetSessionID(currentURL: URL): ConvertLocationResult<Res
     return { valid: true, value: markResetSessionID(sessionID) }
 }
 
-export function resetSessionIDRemoteConverter(sessionID: string): ResetSessionID {
+export function convertResetSessionIDRemote(sessionID: string): ResetSessionID {
     // remote からの値は validation チェックなしで受け入れる
     return markResetSessionID(sessionID)
 }

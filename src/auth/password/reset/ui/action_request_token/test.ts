@@ -1,18 +1,18 @@
 import { setupActionTestRunner } from "../../../../../../ui/vendor/getto-application/action/test_helper"
+import { ticker } from "../../../../../z_details/_ui/timer/helper"
 
 import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/action_input/mock"
-import { mockRemotePod } from "../../../../../z_details/_ui/remote/mock"
 
 import { initRequestResetTokenView } from "./impl"
 import { initRequestResetTokenCoreMaterial, initRequestResetTokenCoreAction } from "./core/impl"
 import { initRequestResetTokenFormAction } from "./form/impl"
 
-import { resetSessionIDRemoteConverter } from "../converter"
-
-import { RequestResetTokenRemotePod, RequestResetTokenResult } from "../request_token/infra"
+import { RequestResetTokenRemote, RequestResetTokenRemoteResult } from "../request_token/infra"
 
 import { RequestResetTokenView } from "./resource"
+
+import { convertResetSessionIDRemote } from "../converter"
 
 const VALID_LOGIN = { loginID: "login-id" } as const
 
@@ -111,7 +111,7 @@ function takeLongtime() {
     return { view }
 }
 
-function initView(requestToken: RequestResetTokenRemotePod): RequestResetTokenView {
+function initView(requestToken: RequestResetTokenRemote): RequestResetTokenView {
     const view = initRequestResetTokenView({
         core: initRequestResetTokenCoreAction(
             initRequestResetTokenCoreMaterial({
@@ -130,12 +130,13 @@ function initView(requestToken: RequestResetTokenRemotePod): RequestResetTokenVi
     return view
 }
 
-function standard_requestToken(): RequestResetTokenRemotePod {
-    return mockRemotePod(simulateRequestToken, { wait_millisecond: 0 })
+function standard_requestToken(): RequestResetTokenRemote {
+    return async () => standard_requestResetTokenRemoteResult()
 }
-function takeLongtime_requestToken(): RequestResetTokenRemotePod {
-    return mockRemotePod(simulateRequestToken, { wait_millisecond: 64 })
+function takeLongtime_requestToken(): RequestResetTokenRemote {
+    return async () =>
+        ticker({ wait_millisecond: 64 }, () => standard_requestResetTokenRemoteResult())
 }
-function simulateRequestToken(): RequestResetTokenResult {
-    return { success: true, value: resetSessionIDRemoteConverter("session-id") }
+function standard_requestResetTokenRemoteResult(): RequestResetTokenRemoteResult {
+    return { success: true, value: convertResetSessionIDRemote("session-id") }
 }
