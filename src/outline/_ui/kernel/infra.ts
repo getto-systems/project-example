@@ -1,6 +1,6 @@
 import { RepositoryPod } from "../../../z_details/_ui/repository/infra"
+import { RemoteResult } from "../../../z_details/_ui/remote/infra"
 
-import { RemoteResult } from "../../../z_details/_ui/remote/data"
 import { GetMenuBadgeRemoteError, MenuCategoryPath } from "./data"
 
 export type MenuContent = Readonly<{
