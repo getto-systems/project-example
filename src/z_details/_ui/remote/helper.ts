@@ -1,21 +1,8 @@
 import { RemoteOutsideFeature } from "./feature"
 
-import {
-    Remote,
-    RemoteFetchMethod,
-    RemoteFetchOptions,
-    RemoteHeader,
-    RemoteNonce,
-    RemotePod,
-} from "./infra"
+import { RemoteFetchMethod, RemoteFetchOptions, RemoteHeader, RemoteNonce } from "./infra"
 
-import {
-    RemoteCommonError,
-    RemoteErrorResult,
-    RemoteInfraError,
-    RemoteResult,
-    RemoteServerError,
-} from "./data"
+import { RemoteCommonError, RemoteErrorResult, RemoteInfraError, RemoteServerError } from "./data"
 
 export type RemoteFetchParams = Readonly<{
     serverURL: string
@@ -66,32 +53,6 @@ export function remoteServerError(): RemoteErrorResult<RemoteServerError> {
 }
 export function remoteInfraError(err: unknown): RemoteErrorResult<RemoteInfraError> {
     return { success: false, err: { type: "infra-error", err: `${err}` } }
-}
-
-export function mapRemoteResult<V, R, E>(
-    result: RemoteResult<R, E>,
-    converter: { (value: R): V },
-): RemoteResult<V, E> {
-    if (!result.success) {
-        return result
-    }
-    return { success: true, value: converter(result.value) }
-}
-
-export function convertRemote<M, V, R, E_raw, E_unknown>(
-    remote: Remote<M, R, E_raw>,
-): RemotePod<M, V, R, E_raw | E_unknown> {
-    return (converter) => async (message) => {
-        const result = await remote(message)
-        if (!result.success) {
-            return result
-        }
-        return { success: true, value: converter(result.value) }
-    }
-}
-
-export function passThroughRemoteValue<T>(value: T): T {
-    return value
 }
 
 export type RemoteCommonErrorReason = Readonly<{
