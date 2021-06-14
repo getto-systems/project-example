@@ -1,6 +1,6 @@
-import { RemoteTypes } from "../../../z_details/_ui/remote/infra"
 import { RepositoryPod } from "../../../z_details/_ui/repository/infra"
 
+import { RemoteResult } from "../../../z_details/_ui/remote/data"
 import { GetMenuBadgeRemoteError, MenuCategoryPath } from "./data"
 
 export type MenuContent = Readonly<{
@@ -45,13 +45,10 @@ export type FetchMenuStoreResult<T> =
     | Readonly<{ found: true; value: T }>
     | Readonly<{ found: false }>
 
-type GetMenuBadgeRemoteTypes = RemoteTypes<
-    { type: "always" }, // 引数は必要ないが、null にするのは嫌なのでこうしておく
-    MenuBadge,
-    MenuBadgeItem[],
-    GetMenuBadgeRemoteError
->
-export type GetMenuBadgeRemotePod = GetMenuBadgeRemoteTypes["pod"]
+export interface GetMenuBadgeRemote {
+    (): Promise<GetMenuBadgeRemoteResult>
+}
+export type GetMenuBadgeRemoteResult = RemoteResult<MenuBadge, GetMenuBadgeRemoteError>
 
 export type MenuBadge = Map<string, number>
 export type MenuBadgeItem = Readonly<{ path: string; count: number }>

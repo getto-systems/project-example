@@ -33,7 +33,7 @@ export function detectMenuTargetPath(
     }
 }
 
-export function menuBadgeRemoteConverter(menuBadgeItems: MenuBadgeItem[]): MenuBadge {
+export function convertMenuBadgeRemote(menuBadgeItems: MenuBadgeItem[]): MenuBadge {
     return menuBadgeItems.reduce((acc, item) => {
         acc.set(item.path, item.count)
         return acc

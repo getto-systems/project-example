@@ -3,28 +3,27 @@ import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/a
 import { markMenuCategoryLabel, standard_MenuTree } from "../kernel/test_helper"
 
 import { convertRepository } from "../../../z_details/_ui/repository/helper"
-import { mockRemotePod } from "../../../z_details/_ui/remote/mock"
 import { mockRepository } from "../../../z_details/_ui/repository/mock"
 
 import { mockLoadMenuLocationDetecter } from "../kernel/mock"
 
 import { initLoadMenuCoreAction, initLoadMenuCoreMaterial } from "./core/impl"
 
-import { menuExpandRepositoryConverter } from "../kernel/converter"
+import { LoadMenuDetecter } from "../kernel/method"
 
 import {
     AuthzRepositoryPod,
     AuthzRepositoryValue,
 } from "../../../auth/auth_ticket/_ui/kernel/infra"
 import {
-    GetMenuBadgeRemotePod,
+    GetMenuBadgeRemote,
     MenuExpandRepositoryPod,
     MenuExpandRepositoryValue,
 } from "../kernel/infra"
 
 import { LoadMenuResource } from "./resource"
 
-import { LoadMenuDetecter } from "../kernel/method"
+import { convertMenuBadgeRemote, menuExpandRepositoryConverter } from "../kernel/converter"
 
 describe("Menu", () => {
     test("load menu", async () => {
@@ -418,15 +417,12 @@ function expand_menuExpand(): MenuExpandRepositoryPod {
     return convertRepository(menuExpand)
 }
 
-function standard_getMenuBadge(): GetMenuBadgeRemotePod {
-    return mockRemotePod(
-        () => ({
-            success: true,
-            value: [
-                { path: "/index.html", count: 10 },
-                { path: "/docs/index.html", count: 20 },
-            ],
-        }),
-        { wait_millisecond: 0 },
-    )
+function standard_getMenuBadge(): GetMenuBadgeRemote {
+    return async () => ({
+        success: true,
+        value: convertMenuBadgeRemote([
+            { path: "/index.html", count: 10 },
+            { path: "/docs/index.html", count: 20 },
+        ]),
+    })
 }

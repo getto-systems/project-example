@@ -2,7 +2,6 @@ import { env } from "../../../../../../y_environment/_ui/env"
 import { GetMenuBadgeResult_pb } from "../../../../y_protobuf/api_pb.js"
 
 import {
-    convertRemote,
     fetchOptions,
     generateNonce,
     remoteCommonError,
@@ -12,20 +11,17 @@ import { decodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 
 import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/feature"
 
-import { GetMenuBadgeRemotePod } from "../../../infra"
+import { GetMenuBadgeRemote } from "../../../infra"
 
-import { ApiCommonError, ApiResult } from "../../../../../../z_details/_ui/api/data"
+import { convertMenuBadgeRemote } from "../../../converter"
 
-export function newGetMenuBadgeRemote(feature: RemoteOutsideFeature): GetMenuBadgeRemotePod {
-    type GetMenuResult = ApiResult<MenuBadgeItem[], ApiCommonError>
-    type MenuBadgeItem = Readonly<{ path: string; count: number }>
-
-    return convertRemote(async (): Promise<GetMenuResult> => {
+export function newGetMenuBadgeRemote(feature: RemoteOutsideFeature): GetMenuBadgeRemote {
+    return async () => {
         try {
             const mock = true
             if (mock) {
                 // TODO api の実装が終わったらつなぐ
-                return { success: true, value: [] }
+                return { success: true, value: convertMenuBadgeRemote([]) }
             }
 
             const opts = fetchOptions({
@@ -43,13 +39,15 @@ export function newGetMenuBadgeRemote(feature: RemoteOutsideFeature): GetMenuBad
             const result = decodeProtobuf(GetMenuBadgeResult_pb, await response.text())
             return {
                 success: true,
-                value: result.badge.map((item) => ({
-                    path: item.path || "",
-                    count: item.count || 0,
-                })),
+                value: convertMenuBadgeRemote(
+                    result.badge.map((item) => ({
+                        path: item.path || "",
+                        count: item.count || 0,
+                    })),
+                ),
             }
         } catch (err) {
             return remoteInfraError(err)
         }
-    })
+    }
 }

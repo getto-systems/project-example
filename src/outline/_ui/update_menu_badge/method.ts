@@ -8,7 +8,6 @@ import { UpdateMenuBadgeInfra, UpdateMenuBadgeStore } from "./infra"
 import { UpdateMenuBadgeEvent } from "./event"
 
 import { authzRepositoryConverter } from "../../../auth/auth_ticket/_ui/kernel/converter"
-import { menuBadgeRemoteConverter } from "../kernel/converter"
 
 export interface UpdateMenuBadgePod {
     (detecter: LoadMenuDetecter): UpdateMenuBadgeMethod
@@ -21,7 +20,6 @@ interface Update {
     (infra: UpdateMenuBadgeInfra, store: UpdateMenuBadgeStore): UpdateMenuBadgePod
 }
 export const updateMenuBadge: Update = (infra, store) => (detecter) => async (post) => {
-    const getMenuBadge = infra.getMenuBadge(menuBadgeRemoteConverter)
     const authz = infra.authz(authzRepositoryConverter)
 
     const authzResult = await authz.get()
@@ -48,7 +46,7 @@ export const updateMenuBadge: Update = (infra, store) => (detecter) => async (po
         menuBadge: EMPTY_BADGE,
     }
 
-    const response = await getMenuBadge({ type: "always" })
+    const response = await infra.getMenuBadge()
     if (!response.success) {
         return post({ type: "failed-to-update", menu: buildMenu(buildParams), err: response.err })
     }
