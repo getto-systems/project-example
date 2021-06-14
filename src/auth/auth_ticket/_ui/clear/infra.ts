@@ -17,5 +17,3 @@ type ClearRemoteTypes = RemoteTypes<
     ClearAuthTicketRemoteError
 >
 export type ClearAuthTicketRemotePod = ClearRemoteTypes["pod"]
-export type ClearAuthTicketResult = ClearRemoteTypes["result"]
-export type ClearAuthTicketSimulator = ClearRemoteTypes["simulator"]

@@ -1,5 +1,8 @@
-import { convertRemote } from "../../../../../z_details/_ui/remote/helper"
-import { apiInfraError } from "../../../../../z_details/_ui/api/helper"
+import {
+    convertRemote,
+    remoteInfraError,
+    remoteServerError,
+} from "../../../../../z_details/_ui/remote/helper"
 
 import { CheckDeployExistsRemotePod } from "../../infra"
 
@@ -15,13 +18,13 @@ export function newCheckDeployExistsRemote(): CheckDeployExistsRemotePod {
             const response = await fetch(url, { method: "HEAD" })
             if (!response.ok) {
                 if (response.status >= 500) {
-                    return { success: false, err: { type: "server-error" } }
+                    return remoteServerError()
                 }
                 return { success: true, value: { found: false } }
             }
             return { success: true, value: { found: true } }
         } catch (err) {
-            return apiInfraError(err)
+            return remoteInfraError(err)
         }
     })
 }

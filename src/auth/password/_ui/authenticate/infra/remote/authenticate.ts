@@ -4,12 +4,13 @@ import {
     AuthenticatePassword_pb,
 } from "../../../../../_ui/y_protobuf/api_pb.js"
 
-import { remoteFeature, convertRemote } from "../../../../../../z_details/_ui/remote/helper"
 import {
-    apiInfraError,
-    apiRequest,
-    apiStatusError,
-} from "../../../../../../z_details/_ui/api/helper"
+    convertRemote,
+    generateNonce,
+    fetchOptions,
+    remoteCommonError,
+    remoteInfraError,
+} from "../../../../../../z_details/_ui/remote/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 
 import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/feature"
@@ -36,13 +37,14 @@ export function newAuthenticatePasswordRemote(
                 return { success: true, value: { roles: ["admin", "dev-docs"] } }
             }
 
-            const request = apiRequest(
-                remoteFeature(env.apiServerURL, feature),
-                "/auth/password/authenticate",
-                "POST",
-            )
-            const response = await fetch(request.url, {
-                ...request.options,
+            const opts = fetchOptions({
+                serverURL: env.apiServerURL,
+                path: "/auth/password/authenticate",
+                method: "POST",
+                headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
+            })
+            const response = await fetch(opts.url, {
+                ...opts.options,
                 body: encodeProtobuf(AuthenticatePassword_pb, (message) => {
                     message.loginId = fields.loginID
                     message.password = fields.password
@@ -50,7 +52,7 @@ export function newAuthenticatePasswordRemote(
             })
 
             if (!response.ok) {
-                return apiStatusError(response.status)
+                return remoteCommonError(response.status)
             }
 
             const result = decodeProtobuf(AuthenticatePasswordResult_pb, await response.text())
@@ -64,7 +66,7 @@ export function newAuthenticatePasswordRemote(
                 },
             }
         } catch (err) {
-            return apiInfraError(err)
+            return remoteInfraError(err)
         }
     })
 }

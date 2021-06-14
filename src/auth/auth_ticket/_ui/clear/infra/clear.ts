@@ -1,10 +1,12 @@
 import { env } from "../../../../../y_environment/_ui/env"
 
 import {
-    remoteFeature,
     convertRemote,
+    fetchOptions,
+    generateNonce,
+    remoteCommonError,
+    remoteInfraError,
 } from "../../../../../z_details/_ui/remote/helper"
-import { apiInfraError, apiRequest, apiStatusError } from "../../../../../z_details/_ui/api/helper"
 
 import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/feature"
 
@@ -19,20 +21,21 @@ export function newClearAuthTicketRemote(feature: RemoteOutsideFeature): ClearAu
                 return { success: true, value: true }
             }
 
-            const request = apiRequest(
-                remoteFeature(env.apiServerURL, feature),
-                "/auth/clear",
-                "POST",
-            )
-            const response = await fetch(request.url, request.options)
+            const opts = fetchOptions({
+                serverURL: env.apiServerURL,
+                path: "/auth/clear",
+                method: "POST",
+                headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
+            })
+            const response = await fetch(opts.url, opts.options)
 
             if (!response.ok) {
-                return apiStatusError(response.status)
+                return remoteCommonError(response.status)
             }
 
             return { success: true, value: true }
         } catch (err) {
-            return apiInfraError(err)
+            return remoteInfraError(err)
         }
     })
 }

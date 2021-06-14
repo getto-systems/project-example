@@ -4,13 +4,14 @@ import {
     ResetPassword_pb,
 } from "../../../../../../_ui/y_protobuf/api_pb.js"
 
-import { remoteFeature, convertRemote } from "../../../../../../../z_details/_ui/remote/helper"
-import { decodeProtobuf, encodeProtobuf } from "../../../../../../../../ui/vendor/protobuf/helper"
 import {
-    apiInfraError,
-    apiRequest,
-    apiStatusError,
-} from "../../../../../../../z_details/_ui/api/helper"
+    convertRemote,
+    fetchOptions,
+    generateNonce,
+    remoteCommonError,
+    remoteInfraError,
+} from "../../../../../../../z_details/_ui/remote/helper"
+import { decodeProtobuf, encodeProtobuf } from "../../../../../../../../ui/vendor/protobuf/helper"
 
 import { RemoteOutsideFeature } from "../../../../../../../z_details/_ui/remote/feature"
 
@@ -41,13 +42,14 @@ export function newResetPasswordRemote(feature: RemoteOutsideFeature): ResetPass
                 return { success: true, value: { roles: ["admin", "dev-docs"] } }
             }
 
-            const request = apiRequest(
-                remoteFeature(env.apiServerURL, feature),
-                "/auth/password/reset",
-                "POST",
-            )
-            const response = await fetch(request.url, {
-                ...request.options,
+            const opts = fetchOptions({
+                serverURL: env.apiServerURL,
+                path: "/auth/password/reset",
+                method: "POST",
+                headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
+            })
+            const response = await fetch(opts.url, {
+                ...opts.options,
                 body: encodeProtobuf(ResetPassword_pb, (message) => {
                     message.resetToken = params.resetToken
                     message.loginId = params.fields.loginID
@@ -56,7 +58,7 @@ export function newResetPasswordRemote(feature: RemoteOutsideFeature): ResetPass
             })
 
             if (!response.ok) {
-                return apiStatusError(response.status)
+                return remoteCommonError(response.status)
             }
 
             const result = decodeProtobuf(ResetPasswordResult_pb, await response.text())
@@ -70,7 +72,7 @@ export function newResetPasswordRemote(feature: RemoteOutsideFeature): ResetPass
                 },
             }
         } catch (err) {
-            return apiInfraError(err)
+            return remoteInfraError(err)
         }
 
         function mapError(result: ResetPasswordResult_pb): ResetError {

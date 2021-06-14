@@ -13,5 +13,3 @@ type NotifyUnexpectedErrorRemoteTypes = RemoteTypes<
     NotifyUnexpectedErrorRemoteError
 >
 export type NotifyUnexpectedErrorRemotePod = NotifyUnexpectedErrorRemoteTypes["pod"]
-export type NotifyUnexpectedErrorRemoteResult = NotifyUnexpectedErrorRemoteTypes["result"]
-export type NotifyUnexpectedErrorSimulator = NotifyUnexpectedErrorRemoteTypes["simulator"]

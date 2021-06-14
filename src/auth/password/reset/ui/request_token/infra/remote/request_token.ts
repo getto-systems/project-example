@@ -4,13 +4,14 @@ import {
     RequestResetToken_pb,
 } from "../../../../../../_ui/y_protobuf/api_pb.js"
 
-import { remoteFeature, convertRemote } from "../../../../../../../z_details/_ui/remote/helper"
-import { decodeProtobuf, encodeProtobuf } from "../../../../../../../../ui/vendor/protobuf/helper"
 import {
-    apiInfraError,
-    apiRequest,
-    apiStatusError,
-} from "../../../../../../../z_details/_ui/api/helper"
+    convertRemote,
+    fetchOptions,
+    generateNonce,
+    remoteCommonError,
+    remoteInfraError,
+} from "../../../../../../../z_details/_ui/remote/helper"
+import { decodeProtobuf, encodeProtobuf } from "../../../../../../../../ui/vendor/protobuf/helper"
 
 import { RemoteOutsideFeature } from "../../../../../../../z_details/_ui/remote/feature"
 
@@ -35,20 +36,21 @@ export function newRequestResetTokenRemote(
                 return { success: true, value: "reset-session-id" }
             }
 
-            const request = apiRequest(
-                remoteFeature(env.apiServerURL, feature),
-                "/auth/password/reset/token",
-                "POST",
-            )
-            const response = await fetch(request.url, {
-                ...request.options,
+            const opts = fetchOptions({
+                serverURL: env.apiServerURL,
+                path: "/auth/password/reset/token",
+                method: "POST",
+                headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
+            })
+            const response = await fetch(opts.url, {
+                ...opts.options,
                 body: encodeProtobuf(RequestResetToken_pb, (message) => {
                     message.loginId = fields.loginID
                 }),
             })
 
             if (!response.ok) {
-                return apiStatusError(response.status)
+                return remoteCommonError(response.status)
             }
 
             const result = decodeProtobuf(RequestResetTokenResult_pb, await response.text())
@@ -60,7 +62,7 @@ export function newRequestResetTokenRemote(
                 value: result.value?.sessionId || "",
             }
         } catch (err) {
-            return apiInfraError(err)
+            return remoteInfraError(err)
         }
 
         function mapError(_result: RequestResetTokenResult_pb): RequestTokenError {

@@ -16,7 +16,6 @@ export type CheckResetTokenSendingStatusInfra = Readonly<{
 type SendRemoteTypes = RemoteTypes<null, true, true, CheckResetTokenSendingStatusRemoteError>
 export type SendResetTokenRemotePod = SendRemoteTypes["pod"]
 export type SendResetTokenResult = SendRemoteTypes["result"]
-export type SendResetTokenSimulator = SendRemoteTypes["simulator"]
 
 type GetSendingStatusRemoteTypes = RemoteTypes<
     ResetSessionID,
@@ -26,4 +25,3 @@ type GetSendingStatusRemoteTypes = RemoteTypes<
 >
 export type GetResetTokenSendingStatusRemotePod = GetSendingStatusRemoteTypes["pod"]
 export type GetResetTokenSendingStatusResult = GetSendingStatusRemoteTypes["result"]
-export type GetResetTokenSendingStatusSimulator = GetSendingStatusRemoteTypes["simulator"]

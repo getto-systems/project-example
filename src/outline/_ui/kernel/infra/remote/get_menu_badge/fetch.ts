@@ -1,13 +1,14 @@
 import { env } from "../../../../../../y_environment/_ui/env"
 import { GetMenuBadgeResult_pb } from "../../../../y_protobuf/api_pb.js"
 
-import { remoteFeature, convertRemote } from "../../../../../../z_details/_ui/remote/helper"
-import { decodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 import {
-    apiInfraError,
-    apiRequest,
-    apiStatusError,
-} from "../../../../../../z_details/_ui/api/helper"
+    convertRemote,
+    fetchOptions,
+    generateNonce,
+    remoteCommonError,
+    remoteInfraError,
+} from "../../../../../../z_details/_ui/remote/helper"
+import { decodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 
 import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/feature"
 
@@ -27,15 +28,16 @@ export function newGetMenuBadgeRemote(feature: RemoteOutsideFeature): GetMenuBad
                 return { success: true, value: [] }
             }
 
-            const request = apiRequest(
-                remoteFeature(env.apiServerURL, feature),
-                "/outline/menu/badge",
-                "GET",
-            )
-            const response = await fetch(request.url, request.options)
+            const opts = fetchOptions({
+                serverURL: env.apiServerURL,
+                path: "/outline/menu/badge",
+                method: "GET",
+                headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
+            })
+            const response = await fetch(opts.url, opts.options)
 
             if (!response.ok) {
-                return apiStatusError(response.status)
+                return remoteCommonError(response.status)
             }
 
             const result = decodeProtobuf(GetMenuBadgeResult_pb, await response.text())
@@ -47,7 +49,7 @@ export function newGetMenuBadgeRemote(feature: RemoteOutsideFeature): GetMenuBad
                 })),
             }
         } catch (err) {
-            return apiInfraError(err)
+            return remoteInfraError(err)
         }
     })
 }

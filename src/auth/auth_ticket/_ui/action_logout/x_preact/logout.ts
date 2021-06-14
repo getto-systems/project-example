@@ -13,7 +13,7 @@ import { LogoutResource, LogoutResourceState } from "../resource"
 
 import { RepositoryError } from "../../../../../z_details/_ui/repository/data"
 import { ClearAuthTicketError } from "../../clear/data"
-import { remoteCommonError } from "../../../../../z_details/_ui/remote/helper"
+import { remoteCommonErrorReason } from "../../../../../z_details/_ui/remote/helper"
 
 export function LogoutEntry(resource: LogoutResource): VNode {
     return h(LogoutComponent, {
@@ -93,7 +93,7 @@ export function LogoutComponent(props: Props): VNode {
                 }
             }
             function remoteError(err: ClearAuthTicketError): string[] {
-                return remoteCommonError(err, (reason) => [
+                return remoteCommonErrorReason(err, (reason) => [
                     `${reason.message}によりログアウトに失敗しました`,
                     ...reason.detail,
                 ])

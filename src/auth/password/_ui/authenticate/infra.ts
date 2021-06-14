@@ -23,4 +23,3 @@ type AuthenticatePasswordRemoteTypes = RemoteTypes<
 >
 export type AuthenticatePasswordRemotePod = AuthenticatePasswordRemoteTypes["pod"]
 export type AuthenticatePasswordResult = AuthenticatePasswordRemoteTypes["result"]
-export type AuthenticatePasswordSimulator = AuthenticatePasswordRemoteTypes["simulator"]

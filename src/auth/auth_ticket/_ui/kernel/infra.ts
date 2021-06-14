@@ -20,8 +20,6 @@ type RenewRemoteTypes = RemoteTypes<
     RenewAuthTicketRemoteError
 >
 export type RenewAuthTicketRemotePod = RenewRemoteTypes["pod"]
-export type RenewAuthTicketResult = RenewRemoteTypes["result"]
-export type RenewAuthTicketSimulator = RenewRemoteTypes["simulator"]
 
 export type AuthRemoteValue = Readonly<{
     roles: string[]

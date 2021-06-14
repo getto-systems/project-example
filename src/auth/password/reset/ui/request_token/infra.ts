@@ -19,4 +19,3 @@ type RequestResetTokenRemoteTypes = RemoteTypes<
 >
 export type RequestResetTokenRemotePod = RequestResetTokenRemoteTypes["pod"]
 export type RequestResetTokenResult = RequestResetTokenRemoteTypes["result"]
-export type RequestResetTokenSimulator = RequestResetTokenRemoteTypes["simulator"]

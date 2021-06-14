@@ -52,8 +52,6 @@ type GetMenuBadgeRemoteTypes = RemoteTypes<
     GetMenuBadgeRemoteError
 >
 export type GetMenuBadgeRemotePod = GetMenuBadgeRemoteTypes["pod"]
-export type GetMenuBadgeRemoteResult = GetMenuBadgeRemoteTypes["result"]
-export type GetMenuBadgeSimulator = GetMenuBadgeRemoteTypes["simulator"]
 
 export type MenuBadge = Map<string, number>
 export type MenuBadgeItem = Readonly<{ path: string; count: number }>

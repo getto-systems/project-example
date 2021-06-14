@@ -27,6 +27,7 @@ function envContent() {
 
         secureServerURL: process.env.SECURE_SERVER_URL,
         apiServerURL: process.env.API_SERVER_URL,
+        apiServerNonceHeader: "X-GETTO-EXAMPLE-NONCE",
 
         database: {
             authn: "GETTO-EXAMPLE-AUTHN",

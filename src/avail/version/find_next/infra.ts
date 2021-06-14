@@ -20,8 +20,6 @@ type CheckDeployExistsRemoteTypes = RemoteTypes<
 >
 export type CheckDeployExistsRemotePod = CheckDeployExistsRemoteTypes["pod"]
 export type CheckDeployExistsRemote = CheckDeployExistsRemoteTypes["remote"]
-export type CheckDeployExistsRemoteResult = CheckDeployExistsRemoteTypes["result"]
-export type CheckDeployExistsSimulator = CheckDeployExistsRemoteTypes["simulator"]
 
 export type CheckDeployExistsURL = string
 export type CheckDeployExistsResponse = Readonly<{ found: boolean }>

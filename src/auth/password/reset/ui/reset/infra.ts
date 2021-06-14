@@ -23,7 +23,6 @@ type ResetRemoteTypes = RemoteTypes<
 >
 export type ResetPasswordRemotePod = ResetRemoteTypes["pod"]
 export type ResetPasswordResult = ResetRemoteTypes["result"]
-export type ResetPasswordSimulator = ResetRemoteTypes["simulator"]
 export type ResetPasswordMessage = Readonly<{
     resetToken: ResetToken
     fields: ResetPasswordFields
