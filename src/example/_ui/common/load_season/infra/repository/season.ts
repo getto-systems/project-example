@@ -4,7 +4,7 @@ import { Season_pb } from "../../../../y_protobuf/db_pb.js"
 import { convertRepository } from "../../../../../../z_details/_ui/repository/helper"
 import { FetchDBResult, StoreDBResult } from "../../../../../../z_details/_ui/db/infra"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
-import { IndexedDBTarget, initIndexedDB } from "../../../../../../z_details/_ui/db/indexed_db"
+import { IndexedDBTarget, initIndexedDB } from "../../../../../../z_details/_ui/repository/infra/indexed_db"
 
 import { RepositoryOutsideFeature } from "../../../../../../z_details/_ui/repository/feature"
 

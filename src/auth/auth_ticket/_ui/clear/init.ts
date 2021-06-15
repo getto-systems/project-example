@@ -1,5 +1,5 @@
 import { newAuthzRepositoryPod } from "../kernel/infra/repository/authz"
-import { newAuthnRepositoryPod } from "../kernel/infra/repository/authn"
+import { newAuthnRepository } from "../kernel/infra/repository/authn"
 import { newClearAuthTicketRemote } from "./infra/clear"
 
 import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"
@@ -12,7 +12,7 @@ export function newClearAuthTicketInfra(
     feature: OutsideFeature,
 ): ClearAuthTicketInfra {
     return {
-        authn: newAuthnRepositoryPod(feature),
+        authn: newAuthnRepository(feature),
         authz: newAuthzRepositoryPod(feature),
         clear: newClearAuthTicketRemote(feature),
     }

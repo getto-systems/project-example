@@ -1,5 +1,9 @@
 import { RemoteResult } from "../../../../z_details/_ui/remote/infra"
-import { RepositoryPod } from "../../../../z_details/_ui/repository/infra"
+import {
+    FetchRepositoryResult,
+    RepositoryPod,
+    StoreRepositoryResult,
+} from "../../../../z_details/_ui/repository/infra"
 
 import { AuthTicket, Authn, Authz, RenewAuthTicketRemoteError } from "./data"
 
@@ -7,6 +11,11 @@ export type AuthnRepositoryPod = RepositoryPod<Authn, AuthnRepositoryValue>
 export type AuthnRepositoryValue = Readonly<{
     authAt: string
 }>
+export interface AuthnRepository {
+    get(): Promise<FetchRepositoryResult<Authn>>
+    set(value: Authn): Promise<StoreRepositoryResult>
+    remove(): Promise<StoreRepositoryResult>
+}
 
 export type AuthzRepositoryPod = RepositoryPod<Authz, AuthzRepositoryValue>
 export type AuthzRepositoryValue = Readonly<{

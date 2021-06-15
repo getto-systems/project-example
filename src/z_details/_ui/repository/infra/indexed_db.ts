@@ -1,10 +1,6 @@
-import {
-    DBErrorResult,
-    FetchDBResult,
-    FromDBConverter,
-    StoreDBResult,
-    ToDBConverter,
-} from "./infra"
+import { repositoryError } from "../helper"
+
+import { FetchRepositoryResult, RepositoryErrorResult, StoreRepositoryResult } from "../infra"
 
 export function initIndexedDB(webDB: IDBFactory, config: IndexedDBConfig): IndexedDB {
     return new DB(webDB, config)
@@ -12,9 +8,16 @@ export function initIndexedDB(webDB: IDBFactory, config: IndexedDBConfig): Index
 
 // objectStore(`name`, { keyPath: "key" }) に { key: string, value: string } という値を保存する
 export interface IndexedDB {
-    get<T>(store: IndexedDBTarget, converter: FromDBConverter<T>): Promise<FetchDBResult<T>>
-    set<T>(store: IndexedDBTarget, converter: ToDBConverter<T>, value: T): Promise<StoreDBResult>
-    remove(store: IndexedDBTarget): Promise<StoreDBResult>
+    get<T>(store: IndexedDBTarget, converter: FromDB<T>): Promise<FetchRepositoryResult<T>>
+    set<T>(store: IndexedDBTarget, converter: ToDB<T>, value: T): Promise<StoreRepositoryResult>
+    remove(store: IndexedDBTarget): Promise<StoreRepositoryResult>
+}
+
+export interface ToDB<T> {
+    (value: T): string
+}
+export interface FromDB<T> {
+    (raw: string): T
 }
 
 // データベース名と作成する objectStore を指定する
@@ -50,7 +53,7 @@ class DB implements IndexedDB {
         this.config = config
     }
 
-    get<T>(target: IndexedDBTarget, converter: FromDBConverter<T>): Promise<FetchDBResult<T>> {
+    get<T>(target: IndexedDBTarget, converter: FromDB<T>): Promise<FetchRepositoryResult<T>> {
         return new Promise((resolve) => {
             this.open(resolve, (db) => {
                 try {
@@ -60,7 +63,7 @@ class DB implements IndexedDB {
                     const request = tx.objectStore(target.store).get(target.key)
                     request.onsuccess = (e: Event) => {
                         if (!e.target || !(e.target instanceof IDBRequest)) {
-                            resolve(dbError("invalid get result"))
+                            resolve(repositoryError("invalid get result"))
                             return
                         }
                         if (!e.target.result) {
@@ -77,20 +80,20 @@ class DB implements IndexedDB {
                                 value: converter(e.target.result.value),
                             })
                         } catch (err) {
-                            resolve(dbError(`${err}`))
+                            resolve(repositoryError(`${err}`))
                         }
                     }
                     request.onerror = () => {
-                        resolve(dbError("failed to get"))
+                        resolve(repositoryError("failed to get"))
                     }
                 } catch (err) {
-                    resolve(dbError(`${err}`))
+                    resolve(repositoryError(`${err}`))
                 }
             })
         })
     }
 
-    set<T>(target: IndexedDBTarget, converter: ToDBConverter<T>, value: T): Promise<StoreDBResult> {
+    set<T>(target: IndexedDBTarget, converter: ToDB<T>, value: T): Promise<StoreRepositoryResult> {
         return new Promise((resolve) => {
             this.open(resolve, (db) => {
                 try {
@@ -104,16 +107,16 @@ class DB implements IndexedDB {
                         resolve({ success: true })
                     }
                     request.onerror = () => {
-                        resolve(dbError("failed to put"))
+                        resolve(repositoryError("failed to put"))
                     }
                 } catch (err) {
-                    resolve(dbError(`${err}`))
+                    resolve(repositoryError(`${err}`))
                 }
             })
         })
     }
 
-    remove(target: IndexedDBTarget): Promise<StoreDBResult> {
+    remove(target: IndexedDBTarget): Promise<StoreRepositoryResult> {
         return new Promise((resolve) => {
             this.open(resolve, (db) => {
                 try {
@@ -125,24 +128,24 @@ class DB implements IndexedDB {
                         resolve({ success: true })
                     }
                     request.onerror = () => {
-                        resolve(dbError("failed to remove"))
+                        resolve(repositoryError("failed to remove"))
                     }
                 } catch (err) {
-                    resolve(dbError(`${err}`))
+                    resolve(repositoryError(`${err}`))
                 }
             })
         })
     }
 
-    open(error: Post<DBErrorResult>, success: Post<IDBDatabase>): void {
+    open(error: Post<RepositoryErrorResult>, success: Post<IDBDatabase>): void {
         const request = this.webDB.open(this.config.database, MIGRATIONS.length)
         request.onupgradeneeded = upgrade(this.config.stores, MIGRATIONS)
         request.onerror = () => {
-            error(dbError("failed to open db"))
+            error(repositoryError("failed to open db"))
         }
         request.onsuccess = (e: Event) => {
             if (!e.target || !(e.target instanceof IDBOpenDBRequest)) {
-                error(dbError("invalid open db result"))
+                error(repositoryError("invalid open db result"))
                 return
             }
             success(e.target.result)
@@ -163,10 +166,6 @@ class DB implements IndexedDB {
             }
         }
     }
-}
-
-function dbError(err: string): DBErrorResult {
-    return { success: false, err: { type: "infra-error", err } }
 }
 
 interface Post<T> {

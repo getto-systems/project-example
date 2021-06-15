@@ -1,11 +1,11 @@
 import { RemoteResult } from "../../../../z_details/_ui/remote/infra"
 import { AuthzRepositoryPod } from "../kernel/infra"
-import { AuthnRepositoryPod } from "../kernel/infra"
+import { AuthnRepository } from "../kernel/infra"
 
 import { ClearAuthTicketRemoteError } from "./data"
 
 export type ClearAuthTicketInfra = Readonly<{
-    authn: AuthnRepositoryPod
+    authn: AuthnRepository
     authz: AuthzRepositoryPod
     clear: ClearAuthTicketRemote
 }>

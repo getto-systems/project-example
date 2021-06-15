@@ -2,7 +2,7 @@ import { ClearAuthTicketInfra } from "./infra"
 
 import { ClearAuthTicketEvent } from "./event"
 
-import { authnRepositoryConverter, authzRepositoryConverter } from "../kernel/converter"
+import { authzRepositoryConverter } from "../kernel/converter"
 
 export interface ClearAuthTicketMethod {
     <S>(post: Post<ClearAuthTicketEvent, S>): Promise<S>
@@ -12,10 +12,9 @@ interface Clear {
     (infra: ClearAuthTicketInfra): ClearAuthTicketMethod
 }
 export const clearAuthTicket: Clear = (infra) => async (post) => {
-    const authn = infra.authn(authnRepositoryConverter)
     const authz = infra.authz(authzRepositoryConverter)
 
-    const authnResult = await authn.get()
+    const authnResult = await infra.authn.get()
     if (!authnResult.success) {
         return post({ type: "failed-to-logout", err: authnResult.err })
     }
@@ -34,7 +33,7 @@ export const clearAuthTicket: Clear = (infra) => async (post) => {
         return post({ type: "failed-to-clear", err: clearResponse.err })
     }
 
-    const authnRemoveResult = await authn.remove()
+    const authnRemoveResult = await infra.authn.remove()
     if (!authnRemoveResult.success) {
         return post({ type: "failed-to-logout", err: authnRemoveResult.err })
     }

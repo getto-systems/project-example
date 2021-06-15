@@ -17,12 +17,16 @@ export interface Repository<T> {
 
 export type FetchRepositoryResult<T> =
     | Readonly<{ success: true; found: true; value: T }>
-    | Readonly<{ success: true; found: false }>
-    | Readonly<{ success: false; err: RepositoryError }>
+    | FetchRepositoryNotFoundResult
+    | RepositoryErrorResult
 
-export type StoreRepositoryResult =
-    | Readonly<{ success: true }>
-    | Readonly<{ success: false; err: RepositoryError }>
+export type FetchRepositoryRemovedResult = FetchRepositoryNotFoundResult | RepositoryErrorResult
+
+export type FetchRepositoryNotFoundResult = Readonly<{ success: true; found: false }>
+
+export type StoreRepositoryResult = Readonly<{ success: true }> | RepositoryErrorResult
+
+export type RepositoryErrorResult = Readonly<{ success: false; err: RepositoryError }>
 
 export type ConvertRepositoryResult<T> =
     | Readonly<{ valid: true; value: T }>
