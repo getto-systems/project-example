@@ -7,7 +7,6 @@ import {
 
 import { AuthTicket, Authn, Authz, RenewAuthTicketRemoteError } from "./data"
 
-export type AuthnRepositoryPod = RepositoryPod<Authn, AuthnRepositoryValue>
 export interface AuthnRepository {
     get(): Promise<FetchRepositoryResult<Authn>>
     set(value: Authn): Promise<StoreRepositoryResult>
