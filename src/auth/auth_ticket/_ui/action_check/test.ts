@@ -2,29 +2,26 @@ import { setupActionTestRunner } from "../../../../../ui/vendor/getto-applicatio
 import { ticker } from "../../../../z_details/_ui/timer/helper"
 
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_details/_ui/clock/mock"
-import { mockRepository } from "../../../../z_details/_ui/repository/mock"
+import { mockAuthnRepository, mockAuthzRepository } from "../kernel/infra/repository/mock"
 
 import { mockGetScriptPathDetecter } from "../../../_ui/common/secure/get_script_path/mock"
 
-import { convertRepository } from "../../../../z_details/_ui/repository/helper"
 import { initCheckAuthTicketView } from "./impl"
 import { initCheckAuthTicketCoreAction, initCheckAuthTicketCoreMaterial } from "./core/impl"
 
 import { Clock } from "../../../../z_details/_ui/clock/infra"
 import { WaitTime } from "../../../../z_details/_ui/config/infra"
-import {
-    AuthnRepository,
-    AuthzRepositoryPod,
-    AuthzRepositoryValue,
-    RenewAuthTicketRemote,
-} from "../kernel/infra"
+import { AuthnRepository, AuthzRepository, RenewAuthTicketRemote } from "../kernel/infra"
 
 import { CheckAuthTicketView } from "./resource"
 
-import { authnRepositoryConverter, convertAuthRemote } from "../kernel/converter"
+import {
+    authnRepositoryConverter,
+    authzRepositoryConverter,
+    convertAuthRemote,
+} from "../kernel/converter"
 
 import { LoadScriptError } from "../../../_ui/common/secure/get_script_path/data"
-import { mockAuthnRepository } from "../kernel/infra/repository/mock"
 
 // last auth at : テスト開始時刻と expire 設定によって instant load の可否が決まる
 const STORED_LAST_AUTH_AT = new Date("2020-01-01 10:00:00").toISOString()
@@ -245,7 +242,7 @@ function noStored() {
 
 function initView(
     authn: AuthnRepository,
-    authz: AuthzRepositoryPod,
+    authz: AuthzRepository,
     renew: RenewAuthTicketRemote,
     clock: Clock,
 ): CheckAuthTicketView {
@@ -303,15 +300,20 @@ function noStored_authn(): AuthnRepository {
     return mockAuthnRepository()
 }
 
-function standard_authz(): AuthzRepositoryPod {
-    const db = mockRepository<AuthzRepositoryValue>()
-    db.set({
+function standard_authz(): AuthzRepository {
+    const result = authzRepositoryConverter.fromRepository({
         roles: ["role"],
     })
-    return convertRepository(db)
+    if (!result.valid) {
+        throw new Error("invalid authz")
+    }
+
+    const repository = mockAuthzRepository()
+    repository.set(result.value)
+    return repository
 }
-function noStored_authz(): AuthzRepositoryPod {
-    return convertRepository(mockRepository<AuthzRepositoryValue>())
+function noStored_authz(): AuthzRepository {
+    return mockAuthzRepository()
 }
 
 function standard_renew(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {

@@ -4,8 +4,6 @@ import { CheckAuthTicketInfra } from "./infra"
 
 import { RenewAuthTicketEvent, CheckAuthTicketEvent } from "./event"
 
-import { authzRepositoryConverter } from "../kernel/converter"
-
 import { hasExpired } from "../kernel/data"
 
 export interface CheckAuthTicketMethod {
@@ -53,7 +51,6 @@ async function renewTicket<S>(
     post: Post<RenewAuthTicketEvent, S>,
 ): Promise<S> {
     const { config } = infra
-    const authz = infra.authz(authzRepositoryConverter)
 
     post({ type: "try-to-renew" })
 
@@ -77,7 +74,7 @@ async function renewTicket<S>(
         return post({ type: "repository-error", err: authnResult.err })
     }
 
-    const authzResult = await authz.set(response.value.authz)
+    const authzResult = await infra.authz.set(response.value.authz)
     if (!authzResult.success) {
         return post({ type: "repository-error", err: authzResult.err })
     }

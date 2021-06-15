@@ -20,6 +20,11 @@ export type AuthzRepositoryPod = RepositoryPod<Authz, AuthzRepositoryValue>
 export type AuthzRepositoryValue = Readonly<{
     roles: string[]
 }>
+export interface AuthzRepository {
+    get(): Promise<FetchRepositoryResult<Authz>>
+    set(value: Authz): Promise<StoreRepositoryResult>
+    remove(): Promise<StoreRepositoryResult>
+}
 
 export interface RenewAuthTicketRemote {
     (): Promise<RemoteResult<AuthTicket, RenewAuthTicketRemoteError>>

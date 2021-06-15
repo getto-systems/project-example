@@ -3,13 +3,10 @@ import { ticker } from "../../../../../z_details/_ui/timer/helper"
 
 import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/action_input/mock"
-import { mockRepository } from "../../../../../z_details/_ui/repository/mock"
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../../z_details/_ui/clock/mock"
 
 import { mockGetScriptPathDetecter } from "../../../../_ui/common/secure/get_script_path/mock"
 import { mockResetPasswordLocationDetecter } from "../reset/mock"
-
-import { convertRepository } from "../../../../../z_details/_ui/repository/helper"
 
 import { initResetPasswordView } from "./impl"
 import { initResetPasswordCoreAction, initResetPasswordCoreMaterial } from "./core/impl"
@@ -19,15 +16,20 @@ import { Clock } from "../../../../../z_details/_ui/clock/infra"
 import { ResetPasswordRemote, ResetPasswordRemoteResult } from "../reset/infra"
 import {
     AuthnRepository,
-    AuthzRepositoryPod,
-    AuthzRepositoryValue,
+    AuthzRepository,
     RenewAuthTicketRemote,
 } from "../../../../auth_ticket/_ui/kernel/infra"
 
 import { ResetPasswordView } from "./resource"
 
-import { convertAuthRemote } from "../../../../auth_ticket/_ui/kernel/converter"
-import { mockAuthnRepository } from "../../../../auth_ticket/_ui/kernel/infra/repository/mock"
+import {
+    authzRepositoryConverter,
+    convertAuthRemote,
+} from "../../../../auth_ticket/_ui/kernel/converter"
+import {
+    mockAuthnRepository,
+    mockAuthzRepository,
+} from "../../../../auth_ticket/_ui/kernel/infra/repository/mock"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")
@@ -287,10 +289,17 @@ function emptyResetToken_URL(): URL {
 function standard_authn(): AuthnRepository {
     return mockAuthnRepository()
 }
-function standard_authz(): AuthzRepositoryPod {
-    const db = mockRepository<AuthzRepositoryValue>()
-    db.set({ roles: ["role"] })
-    return convertRepository(db)
+function standard_authz(): AuthzRepository {
+    const result = authzRepositoryConverter.fromRepository({
+        roles: ["role"],
+    })
+    if (!result.valid) {
+        throw new Error("invalid authz")
+    }
+
+    const repository = mockAuthzRepository()
+    repository.set(result.value)
+    return repository
 }
 
 function standard_reset(clock: Clock): ResetPasswordRemote {

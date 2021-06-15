@@ -2,8 +2,6 @@ import { StartContinuousRenewInfra } from "./infra"
 
 import { SaveAuthTicketEvent, StartContinuousRenewEvent } from "./event"
 
-import { authzRepositoryConverter } from "../kernel/converter"
-
 import { AuthTicket, hasExpired } from "../kernel/data"
 
 export interface SaveAuthTicketMethod {
@@ -18,13 +16,11 @@ interface Save {
     (infra: StartContinuousRenewInfra): SaveAuthTicketMethod
 }
 export const saveAuthTicket: Save = (infra) => async (info, post) => {
-    const authz = infra.authz(authzRepositoryConverter)
-
     const authnResult = await infra.authn.set(info.authn)
     if (!authnResult.success) {
         return post({ type: "failed-to-save", err: authnResult.err })
     }
-    const authzResult = await authz.set(info.authz)
+    const authzResult = await infra.authz.set(info.authz)
     if (!authzResult.success) {
         return post({ type: "failed-to-save", err: authzResult.err })
     }
@@ -54,7 +50,6 @@ export const startContinuousRenew: Start = (infra) => (post) => {
 
     async function continuousRenew(): Promise<StartContinuousRenewEvent> {
         const { clock, config } = infra
-        const authz = infra.authz(authzRepositoryConverter)
 
         const result = await infra.authn.get()
         if (!result.success) {
@@ -97,7 +92,7 @@ export const startContinuousRenew: Start = (infra) => (post) => {
                 return { type: "repository-error", continue: false, err: authnRemoveResult.err }
             }
 
-            const authzRemoveResult = await authz.remove()
+            const authzRemoveResult = await infra.authz.remove()
             if (!authzRemoveResult.success) {
                 return { type: "repository-error", continue: false, err: authzRemoveResult.err }
             }

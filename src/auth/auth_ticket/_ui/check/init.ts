@@ -1,5 +1,5 @@
 import { newAuthnRepository } from "../kernel/infra/repository/authn"
-import { newAuthzRepositoryPod } from "../kernel/infra/repository/authz"
+import { newAuthzRepository } from "../kernel/infra/repository/authz"
 import { newRenewAuthTicketRemote } from "../kernel/infra/remote/renew"
 
 import { newClock } from "../../../../z_details/_ui/clock/init"
@@ -18,7 +18,7 @@ export function newCheckAuthTicketInfra(
     feature: OutsideFeature,
 ): CheckAuthTicketInfra {
     return {
-        authz: newAuthzRepositoryPod(feature),
+        authz: newAuthzRepository(feature),
         authn: newAuthnRepository(feature),
         renew: newRenewAuthTicketRemote(feature, newClock()),
         clock: newClock(),
