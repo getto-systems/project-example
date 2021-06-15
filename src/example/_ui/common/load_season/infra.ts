@@ -1,7 +1,6 @@
 import { Clock } from "../../../../z_details/_ui/clock/infra"
 import {
     FetchRepositoryResult,
-    RepositoryPod,
     StoreRepositoryResult,
 } from "../../../../z_details/_ui/repository/infra"
 
@@ -12,7 +11,6 @@ export type LoadSeasonInfra = Readonly<{
     clock: Clock
 }>
 
-export type SeasonRepositoryPod = RepositoryPod<Season, SeasonRepositoryValue>
 export interface SeasonRepository {
     get(): Promise<FetchRepositoryResult<Season>>
     set(value: Season): Promise<StoreRepositoryResult>
