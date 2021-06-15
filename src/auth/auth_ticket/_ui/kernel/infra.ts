@@ -1,7 +1,6 @@
 import { RemoteResult } from "../../../../z_details/_ui/remote/infra"
 import {
     FetchRepositoryResult,
-    RepositoryPod,
     StoreRepositoryResult,
 } from "../../../../z_details/_ui/repository/infra"
 
@@ -16,7 +15,6 @@ export type AuthnRepositoryValue = Readonly<{
     authAt: string
 }>
 
-export type AuthzRepositoryPod = RepositoryPod<Authz, AuthzRepositoryValue>
 export type AuthzRepositoryValue = Readonly<{
     roles: string[]
 }>
