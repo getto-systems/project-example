@@ -18,8 +18,7 @@ import { initResetPasswordFormAction } from "./form/impl"
 import { Clock } from "../../../../../z_details/_ui/clock/infra"
 import { ResetPasswordRemote, ResetPasswordRemoteResult } from "../reset/infra"
 import {
-    AuthnRepositoryPod,
-    AuthnRepositoryValue,
+    AuthnRepository,
     AuthzRepositoryPod,
     AuthzRepositoryValue,
     RenewAuthTicketRemote,
@@ -28,6 +27,7 @@ import {
 import { ResetPasswordView } from "./resource"
 
 import { convertAuthRemote } from "../../../../auth_ticket/_ui/kernel/converter"
+import { mockAuthnRepository } from "../../../../auth_ticket/_ui/kernel/infra/repository/mock"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")
@@ -284,8 +284,8 @@ function emptyResetToken_URL(): URL {
     return new URL("https://example.com/index.html")
 }
 
-function standard_authn(): AuthnRepositoryPod {
-    return convertRepository(mockRepository<AuthnRepositoryValue>())
+function standard_authn(): AuthnRepository {
+    return mockAuthnRepository()
 }
 function standard_authz(): AuthzRepositoryPod {
     const db = mockRepository<AuthzRepositoryValue>()

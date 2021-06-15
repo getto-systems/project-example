@@ -4,7 +4,7 @@ import { CheckAuthTicketInfra } from "./infra"
 
 import { RenewAuthTicketEvent, CheckAuthTicketEvent } from "./event"
 
-import { authnRepositoryConverter, authzRepositoryConverter } from "../kernel/converter"
+import { authzRepositoryConverter } from "../kernel/converter"
 
 import { hasExpired } from "../kernel/data"
 
@@ -17,9 +17,8 @@ interface Check {
 }
 export const checkAuthTicket: Check = (infra) => async (post) => {
     const { clock, config } = infra
-    const authn = infra.authn(authnRepositoryConverter)
 
-    const findResult = await authn.get()
+    const findResult = await infra.authn.get()
     if (!findResult.success) {
         return post({ type: "repository-error", err: findResult.err })
     }
@@ -54,7 +53,6 @@ async function renewTicket<S>(
     post: Post<RenewAuthTicketEvent, S>,
 ): Promise<S> {
     const { config } = infra
-    const authn = infra.authn(authnRepositoryConverter)
     const authz = infra.authz(authzRepositoryConverter)
 
     post({ type: "try-to-renew" })
@@ -65,7 +63,7 @@ async function renewTicket<S>(
     )
     if (!response.success) {
         if (response.err.type === "unauthorized") {
-            const removeResult = await authn.remove()
+            const removeResult = await infra.authn.remove()
             if (!removeResult.success) {
                 return post({ type: "repository-error", err: removeResult.err })
             }
@@ -74,7 +72,7 @@ async function renewTicket<S>(
         return post({ type: "failed-to-renew", err: response.err })
     }
 
-    const authnResult = await authn.set(response.value.authn)
+    const authnResult = await infra.authn.set(response.value.authn)
     if (!authnResult.success) {
         return post({ type: "repository-error", err: authnResult.err })
     }

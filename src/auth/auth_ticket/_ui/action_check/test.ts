@@ -13,8 +13,7 @@ import { initCheckAuthTicketCoreAction, initCheckAuthTicketCoreMaterial } from "
 import { Clock } from "../../../../z_details/_ui/clock/infra"
 import { WaitTime } from "../../../../z_details/_ui/config/infra"
 import {
-    AuthnRepositoryPod,
-    AuthnRepositoryValue,
+    AuthnRepository,
     AuthzRepositoryPod,
     AuthzRepositoryValue,
     RenewAuthTicketRemote,
@@ -22,9 +21,10 @@ import {
 
 import { CheckAuthTicketView } from "./resource"
 
-import { convertAuthRemote } from "../kernel/converter"
+import { authnRepositoryConverter, convertAuthRemote } from "../kernel/converter"
 
 import { LoadScriptError } from "../../../_ui/common/secure/get_script_path/data"
+import { mockAuthnRepository } from "../kernel/infra/repository/mock"
 
 // last auth at : テスト開始時刻と expire 設定によって instant load の可否が決まる
 const STORED_LAST_AUTH_AT = new Date("2020-01-01 10:00:00").toISOString()
@@ -244,7 +244,7 @@ function noStored() {
 }
 
 function initView(
-    authn: AuthnRepositoryPod,
+    authn: AuthnRepository,
     authz: AuthzRepositoryPod,
     renew: RenewAuthTicketRemote,
     clock: Clock,
@@ -287,15 +287,20 @@ function initView(
     )
 }
 
-function standard_authn(): AuthnRepositoryPod {
-    const db = mockRepository<AuthnRepositoryValue>()
-    db.set({
+function standard_authn(): AuthnRepository {
+    const result = authnRepositoryConverter.fromRepository({
         authAt: STORED_LAST_AUTH_AT,
     })
-    return convertRepository(db)
+    if (!result.valid) {
+        throw new Error("invalid authn")
+    }
+
+    const repository = mockAuthnRepository()
+    repository.set(result.value)
+    return repository
 }
-function noStored_authn(): AuthnRepositoryPod {
-    return convertRepository(mockRepository<AuthnRepositoryValue>())
+function noStored_authn(): AuthnRepository {
+    return mockAuthnRepository()
 }
 
 function standard_authz(): AuthzRepositoryPod {

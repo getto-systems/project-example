@@ -1,6 +1,6 @@
 import { newAuthzRepositoryPod } from "../kernel/infra/repository/authz"
 import { newRenewAuthTicketRemote } from "../kernel/infra/remote/renew"
-import { newAuthnRepositoryPod } from "../kernel/infra/repository/authn"
+import { newAuthnRepository } from "../kernel/infra/repository/authn"
 
 import { newClock } from "../../../../z_details/_ui/clock/init"
 
@@ -15,7 +15,7 @@ export function newStartContinuousRenewAuthnInfoInfra(
     feature: OutsideFeature,
 ): StartContinuousRenewInfra {
     return {
-        authn: newAuthnRepositoryPod(feature),
+        authn: newAuthnRepository(feature),
         authz: newAuthzRepositoryPod(feature),
         renew: newRenewAuthTicketRemote(feature, newClock()),
         clock: newClock(),
