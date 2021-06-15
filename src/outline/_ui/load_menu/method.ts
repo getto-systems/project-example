@@ -7,8 +7,6 @@ import { LoadMenuInfra, LoadMenuStore } from "./infra"
 
 import { LoadMenuEvent } from "./event"
 
-import { menuExpandRepositoryConverter } from "../kernel/converter"
-
 export interface LoadMenuPod {
     (detecter: LoadMenuDetecter): LoadMenuMethod
 }
@@ -20,7 +18,7 @@ interface Load {
     (infra: LoadMenuInfra, store: LoadMenuStore): LoadMenuPod
 }
 export const loadMenu: Load = (infra, store) => (detecter) => async (post) => {
-    const menuExpand = infra.menuExpand(menuExpandRepositoryConverter)
+    const { menuExpand } = infra
 
     const authzResult = await infra.authz.get()
     if (!authzResult.success) {

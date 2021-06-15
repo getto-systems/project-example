@@ -1,4 +1,7 @@
-import { RepositoryPod } from "../../../z_details/_ui/repository/infra"
+import {
+    FetchRepositoryResult,
+    StoreRepositoryResult,
+} from "../../../z_details/_ui/repository/infra"
 import { RemoteResult } from "../../../z_details/_ui/remote/infra"
 
 import { GetMenuBadgeRemoteError, MenuCategoryPath } from "./data"
@@ -55,7 +58,11 @@ export type MenuBadgeItem = Readonly<{ path: string; count: number }>
 
 export type MenuExpand = ArraySet<MenuCategoryPath>
 
-export type MenuExpandRepositoryPod = RepositoryPod<MenuExpand, MenuExpandRepositoryValue>
+export interface MenuExpandRepository {
+    get(): Promise<FetchRepositoryResult<MenuExpand>>
+    set(value: MenuExpand): Promise<StoreRepositoryResult>
+    remove(): Promise<StoreRepositoryResult>
+}
 export type MenuExpandRepositoryValue = string[][]
 
 class ArraySet<T> {
