@@ -8,7 +8,6 @@ import { initMenuExpand, MenuBadge, MenuExpand } from "../kernel/infra"
 import { ToggleMenuExpandInfra, ToggleMenuExpandStore } from "./infra"
 
 import { menuExpandRepositoryConverter } from "../kernel/converter"
-import { authzRepositoryConverter } from "../../../auth/auth_ticket/_ui/kernel/converter"
 
 import { MenuCategoryPath } from "../kernel/data"
 
@@ -31,7 +30,7 @@ interface ModifyExpand {
 }
 function modifyMenuExpand(modify: ModifyExpand): Toggle {
     return (infra, store) => (detecter) => async (path, post) => {
-        const authz = infra.authz(authzRepositoryConverter)
+        const { authz } = infra
         const menuExpand = infra.menuExpand(menuExpandRepositoryConverter)
 
         const authzResult = await authz.get()

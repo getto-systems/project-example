@@ -7,8 +7,6 @@ import { UpdateMenuBadgeInfra, UpdateMenuBadgeStore } from "./infra"
 
 import { UpdateMenuBadgeEvent } from "./event"
 
-import { authzRepositoryConverter } from "../../../auth/auth_ticket/_ui/kernel/converter"
-
 export interface UpdateMenuBadgePod {
     (detecter: LoadMenuDetecter): UpdateMenuBadgeMethod
 }
@@ -20,7 +18,7 @@ interface Update {
     (infra: UpdateMenuBadgeInfra, store: UpdateMenuBadgeStore): UpdateMenuBadgePod
 }
 export const updateMenuBadge: Update = (infra, store) => (detecter) => async (post) => {
-    const authz = infra.authz(authzRepositoryConverter)
+    const { authz } = infra
 
     const authzResult = await authz.get()
     if (!authzResult.success) {

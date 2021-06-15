@@ -7,7 +7,6 @@ import { LoadMenuInfra, LoadMenuStore } from "./infra"
 
 import { LoadMenuEvent } from "./event"
 
-import { authzRepositoryConverter } from "../../../auth/auth_ticket/_ui/kernel/converter"
 import { menuExpandRepositoryConverter } from "../kernel/converter"
 
 export interface LoadMenuPod {
@@ -21,15 +20,14 @@ interface Load {
     (infra: LoadMenuInfra, store: LoadMenuStore): LoadMenuPod
 }
 export const loadMenu: Load = (infra, store) => (detecter) => async (post) => {
-    const authz = infra.authz(authzRepositoryConverter)
     const menuExpand = infra.menuExpand(menuExpandRepositoryConverter)
 
-    const authzResult = await authz.get()
+    const authzResult = await infra.authz.get()
     if (!authzResult.success) {
         return post({ type: "repository-error", err: authzResult.err })
     }
     if (!authzResult.found) {
-        const authzRemoveResult = await authz.remove()
+        const authzRemoveResult = await infra.authz.remove()
         if (!authzRemoveResult.success) {
             return post({ type: "repository-error", err: authzRemoveResult.err })
         }

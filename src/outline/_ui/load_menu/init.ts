@@ -1,6 +1,6 @@
 import { env } from "../../../y_environment/_ui/env"
 
-import { newAuthzRepositoryPod } from "../../../auth/auth_ticket/_ui/kernel/infra/repository/authz"
+import { newAuthzRepository } from "../../../auth/auth_ticket/_ui/kernel/infra/repository/authz"
 import { newMenuExpandRepositoryPod } from "../kernel/infra/repository/menu_expand"
 
 import { RepositoryOutsideFeature } from "../../../z_details/_ui/repository/feature"
@@ -15,7 +15,7 @@ export function newLoadMenuInfra(
     return {
         version: env.version,
         menuTree: menuContent.menuTree,
-        authz: newAuthzRepositoryPod(feature),
+        authz: newAuthzRepository(feature),
         menuExpand: newMenuExpandRepositoryPod(feature, menuContent),
     }
 }

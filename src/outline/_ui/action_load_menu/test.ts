@@ -6,15 +6,13 @@ import { convertRepository } from "../../../z_details/_ui/repository/helper"
 import { mockRepository } from "../../../z_details/_ui/repository/mock"
 
 import { mockLoadMenuLocationDetecter } from "../kernel/mock"
+import { mockAuthzRepository } from "../../../auth/auth_ticket/_ui/kernel/infra/repository/mock"
 
 import { initLoadMenuCoreAction, initLoadMenuCoreMaterial } from "./core/impl"
 
 import { LoadMenuDetecter } from "../kernel/method"
 
-import {
-    AuthzRepositoryPod,
-    AuthzRepositoryValue,
-} from "../../../auth/auth_ticket/_ui/kernel/infra"
+import { AuthzRepository } from "../../../auth/auth_ticket/_ui/kernel/infra"
 import {
     GetMenuBadgeRemote,
     MenuExpandRepositoryPod,
@@ -24,6 +22,7 @@ import {
 import { LoadMenuResource } from "./resource"
 
 import { convertMenuBadgeRemote, menuExpandRepositoryConverter } from "../kernel/converter"
+import { authzRepositoryConverter } from "../../../auth/auth_ticket/_ui/kernel/converter"
 
 describe("Menu", () => {
     test("load menu", async () => {
@@ -358,7 +357,7 @@ function expand() {
 }
 
 function initResource(
-    authz: AuthzRepositoryPod,
+    authz: AuthzRepository,
     menuExpand: MenuExpandRepositoryPod,
 ): [LoadMenuResource, MenuExpandRepositoryPod] {
     const version = standard_version()
@@ -394,18 +393,32 @@ function standard_version(): string {
     return "1.0.0"
 }
 
-function standard_authz(): AuthzRepositoryPod {
-    const authz = mockRepository<AuthzRepositoryValue>()
-    authz.set({ roles: ["admin"] })
-    return convertRepository(authz)
+function standard_authz(): AuthzRepository {
+    const result = authzRepositoryConverter.fromRepository({
+        roles: ["admin"],
+    })
+    if (!result.valid) {
+        throw new Error("invalid authz")
+    }
+
+    const repository = mockAuthzRepository()
+    repository.set(result.value)
+    return repository
 }
-function empty_authz(): AuthzRepositoryPod {
-    return convertRepository(mockRepository<AuthzRepositoryValue>())
+function empty_authz(): AuthzRepository {
+    return mockAuthzRepository()
 }
-function devDocs_authz(): AuthzRepositoryPod {
-    const authz = mockRepository<AuthzRepositoryValue>()
-    authz.set({ roles: ["admin", "dev-docs"] })
-    return convertRepository(authz)
+function devDocs_authz(): AuthzRepository {
+    const result = authzRepositoryConverter.fromRepository({
+        roles: ["admin", "dev-docs"],
+    })
+    if (!result.valid) {
+        throw new Error("invalid authz")
+    }
+
+    const repository = mockAuthzRepository()
+    repository.set(result.value)
+    return repository
 }
 
 function empty_menuExpand(): MenuExpandRepositoryPod {
