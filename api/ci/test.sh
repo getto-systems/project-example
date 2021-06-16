@@ -1,10 +1,14 @@
 #!/bin/sh
 
 coverage_main() {
+    if [ -z "$RUSTUP_HOME" ]; then
+        RUSTUP_HOME="${HOME}/.rustup"
+    fi
+
     local toolchain_dir
     local llvm_profdata
     local llvm_cov
-    toolchain_dir="${HOME}/.rustup/toolchains"
+    toolchain_dir="${RUSTUP_HOME}/toolchains"
     coverage_setup
 
     local target_dir
