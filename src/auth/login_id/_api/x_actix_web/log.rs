@@ -1,8 +1,8 @@
 use crate::x_outside_feature::_api::logger::LogLevel;
 
-use super::super::data::ConvertLoginIdError;
+use super::super::data::ValidateLoginIdError;
 
-impl ConvertLoginIdError {
+impl ValidateLoginIdError {
     pub const fn log_level(&self) -> LogLevel {
         match self {
             Self::Empty => LogLevel::Error,
