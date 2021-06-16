@@ -16,7 +16,7 @@ pub fn scope_auth_ticket() -> Scope {
 #[post("/renew")]
 async fn renew(data: AppData, request: HttpRequest) -> impl Responder {
     let logger = app_logger(&request);
-    let mut action = RenewAuthTicketAction::new(&request, &data.auth);
+    let mut action = RenewAuthTicketAction::new(&data.auth, &request);
     action.subscribe(move |state| logger.log(state.log_level(), state));
     flatten(action.ignite()).respond_to(&request)
 }

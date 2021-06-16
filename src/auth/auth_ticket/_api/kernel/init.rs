@@ -34,7 +34,7 @@ impl<'a> CheckAuthNonceInfra for CheckAuthNonceStruct<'a> {
 }
 
 impl<'a> CheckAuthNonceStruct<'a> {
-    pub fn new(request: &'a HttpRequest, feature: &'a AuthOutsideFeature) -> Self {
+    pub fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest) -> Self {
         Self {
             config: AuthNonceConfig {
                 nonce_expires: feature.config.ticket_expires,

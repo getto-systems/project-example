@@ -24,9 +24,9 @@ pub struct AuthenticatePasswordStruct<'a> {
 }
 
 impl<'a> AuthenticatePasswordStruct<'a> {
-    pub fn new(request: &'a HttpRequest, body: String, feature: &'a AuthOutsideFeature) -> Self {
+    pub fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest, body: String) -> Self {
         Self {
-            check_nonce_infra: CheckAuthNonceStruct::new(request, feature),
+            check_nonce_infra: CheckAuthNonceStruct::new(feature, request),
             clock: ChronoAuthClock::new(),
             password_hash: Argon2PasswordHash::new(),
             password_repository: MemoryAuthUserPasswordRepository::new(

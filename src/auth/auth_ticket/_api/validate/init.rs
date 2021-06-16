@@ -25,9 +25,9 @@ pub struct TicketValidateAuthTokenStruct<'a> {
 }
 
 impl<'a> TicketValidateAuthTokenStruct<'a> {
-    pub fn new(request: &'a HttpRequest, feature: &'a AuthOutsideFeature) -> Self {
+    pub fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest) -> Self {
         Self {
-            check_nonce_infra: CheckAuthNonceStruct::new(request, feature),
+            check_nonce_infra: CheckAuthNonceStruct::new(feature, request),
             config: ValidateAuthTokenConfig {
                 require_roles: RequireAuthRoles::Nothing, // ticket 検証では role は不問
             },
@@ -77,12 +77,12 @@ pub struct ApiValidateAuthTokenStruct<'a> {
 
 impl<'a> ApiValidateAuthTokenStruct<'a> {
     pub fn new(
-        request: &'a HttpRequest,
         feature: &'a AuthOutsideFeature,
+        request: &'a HttpRequest,
         require_roles: RequireAuthRoles,
     ) -> Self {
         Self {
-            check_nonce_infra: CheckAuthNonceStruct::new(request, feature),
+            check_nonce_infra: CheckAuthNonceStruct::new(feature, request),
             config: ValidateAuthTokenConfig { require_roles },
             clock: ChronoAuthClock::new(),
             token_header: ApiAuthTokenHeader::new(request.clone()),
