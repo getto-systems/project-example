@@ -1,4 +1,4 @@
-import { markResetSessionID } from "../../../../password/reset/ui/test_helper"
+import { markResetSessionID } from "../../../../password/reset/_ui/test_helper"
 
 import { initSignLinkResource } from "./impl"
 

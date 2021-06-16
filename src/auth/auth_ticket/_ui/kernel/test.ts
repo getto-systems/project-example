@@ -1,4 +1,4 @@
-import { authnRepositoryConverter, authzRepositoryConverter } from "./converter"
+import { authnRepositoryConverter, authzRepositoryConverter } from "./convert"
 
 test("authnRepositoryConverter", () => {
     const authAt = new Date("2020-01-01 10:00:00").toISOString()

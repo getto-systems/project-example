@@ -6,7 +6,7 @@ import { GetScriptPathInfra } from "./infra"
 import { GetScriptPathDetecter } from "./method"
 import { LocationOutsideFeature } from "../../../../../z_details/_ui/location/feature"
 
-import { detectPathname } from "./converter"
+import { detectPathname } from "./convert"
 
 export function newGetScriptPathLocationDetecter(
     feature: LocationOutsideFeature,

@@ -16,7 +16,7 @@ import { RemoteOutsideFeature } from "../../../../../../../z_details/_ui/remote/
 
 import { ResetPasswordRemote } from "../../infra"
 
-import { convertAuthRemote } from "../../../../../../auth_ticket/_ui/kernel/converter"
+import { convertAuthRemote } from "../../../../../../auth_ticket/_ui/kernel/convert"
 import { Clock } from "../../../../../../../z_details/_ui/clock/infra"
 import { ResetPasswordRemoteError } from "../../data"
 

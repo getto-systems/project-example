@@ -3,7 +3,7 @@ import { LoadMenuDetecter } from "../kernel/method"
 import { MenuTree, MenuTreeCategory, MenuTreeItem, MenuTreeNode } from "../kernel/infra"
 import { LoadBreadcrumbListInfra } from "./infra"
 
-import { toMenuCategory, toMenuItem } from "../kernel/converter"
+import { toMenuCategory, toMenuItem } from "../kernel/convert"
 
 import { BreadcrumbList, BreadcrumbNode } from "./data"
 import { MenuTargetPath } from "../kernel/data"

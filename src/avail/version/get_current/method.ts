@@ -1,6 +1,6 @@
 import { GetCurrentVersionInfra } from "./infra"
 
-import { versionStringConfigConverter } from "../converter"
+import { versionStringConfigConverter } from "../convert"
 
 import { VersionString } from "../data"
 

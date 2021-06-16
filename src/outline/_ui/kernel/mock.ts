@@ -1,4 +1,4 @@
-import { detectMenuTargetPath } from "./converter"
+import { detectMenuTargetPath } from "./convert"
 
 import { LoadMenuDetecter } from "./method"
 

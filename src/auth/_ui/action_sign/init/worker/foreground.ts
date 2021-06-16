@@ -1,15 +1,15 @@
 import { newCheckAuthTicketView } from "../../../../auth_ticket/_ui/action_check/init"
 import { newSignViewLocationDetecter } from "../../../common/switch_view/init"
 import { newAuthenticatePasswordView } from "../../../../password/_ui/action_authenticate/init"
-import { newResetPasswordView } from "../../../../password/reset/ui/action_reset/init"
+import { newResetPasswordView } from "../../../../password/reset/_ui/action_reset/init"
 import {
     newRequestPasswordResetTokenProxy,
     RequestPasswordResetTokenProxy,
-} from "../../../../password/reset/ui/action_request_token/init/worker/foreground"
+} from "../../../../password/reset/_ui/action_request_token/init/worker/foreground"
 import {
     CheckPasswordResetSendingStatusProxy,
     newCheckPasswordResetSendingStatusProxy,
-} from "../../../../password/reset/ui/action_check_status/init/worker/foreground"
+} from "../../../../password/reset/_ui/action_check_status/init/worker/foreground"
 
 import { initSignView } from "../../impl"
 import { initSignAction } from "../../core/impl"

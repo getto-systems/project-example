@@ -6,8 +6,8 @@ import { CheckDeployExistsRemote, FindNextVersionInfra } from "./infra"
 
 import { FindNextVersionEvent } from "./event"
 
-import { versionStringConfigConverter } from "../converter"
-import { versionConfigConverter } from "./converter"
+import { versionStringConfigConverter } from "../convert"
+import { versionConfigConverter } from "./convert"
 
 import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
 import { ApplicationTargetPath, CheckDeployExistsRemoteError, Version } from "./data"

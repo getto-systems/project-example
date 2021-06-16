@@ -1,11 +1,11 @@
 import {
     CheckPasswordResetSendingStatusProxyMessage,
     CheckPasswordResetSendingStatusProxyResponse,
-} from "../../../../password/reset/ui/action_check_status/init/worker/message"
+} from "../../../../password/reset/_ui/action_check_status/init/worker/message"
 import {
     RequestPasswordResetTokenProxyMessage,
     RequestPasswordResetTokenProxyResponse,
-} from "../../../../password/reset/ui/action_request_token/init/worker/message"
+} from "../../../../password/reset/_ui/action_request_token/init/worker/message"
 
 export type ForegroundMessage =
     | Readonly<{

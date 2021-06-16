@@ -10,7 +10,7 @@ import { LocationOutsideFeature } from "../../../z_details/_ui/location/feature"
 
 import { FindNextVersionInfra } from "./infra"
 
-import { detectApplicationTargetPath } from "./converter"
+import { detectApplicationTargetPath } from "./convert"
 
 export function newFindNextVersionLocationDetecter(
     feature: LocationOutsideFeature,

@@ -1,4 +1,4 @@
-import { menuExpandRepositoryConverter } from "./converter"
+import { menuExpandRepositoryConverter } from "./convert"
 
 test("menuExpandRepositoryConverter", () => {
     const expand = [["MENU"]]

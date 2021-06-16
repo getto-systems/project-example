@@ -15,8 +15,8 @@ import { GetMenuBadgeRemote, MenuExpandRepository } from "../kernel/infra"
 
 import { LoadMenuResource } from "./resource"
 
-import { convertMenuBadgeRemote, menuExpandRepositoryConverter } from "../kernel/converter"
-import { authzRepositoryConverter } from "../../../auth/auth_ticket/_ui/kernel/converter"
+import { convertMenuBadgeRemote, menuExpandRepositoryConverter } from "../kernel/convert"
+import { authzRepositoryConverter } from "../../../auth/auth_ticket/_ui/kernel/convert"
 
 describe("Menu", () => {
     test("load menu", async () => {

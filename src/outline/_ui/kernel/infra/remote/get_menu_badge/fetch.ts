@@ -13,7 +13,7 @@ import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/fea
 
 import { GetMenuBadgeRemote } from "../../../infra"
 
-import { convertMenuBadgeRemote } from "../../../converter"
+import { convertMenuBadgeRemote } from "../../../convert"
 
 export function newGetMenuBadgeRemote(feature: RemoteOutsideFeature): GetMenuBadgeRemote {
     return async () => {

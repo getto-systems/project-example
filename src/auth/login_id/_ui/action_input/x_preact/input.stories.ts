@@ -6,7 +6,7 @@ import { InputLoginIDComponent } from "./input"
 
 import { mockInputLoginIDAction } from "../core/mock"
 
-import { LOGIN_ID_MAX_LENGTH } from "../../converter"
+import { LOGIN_ID_MAX_LENGTH } from "../../convert"
 
 import { ValidateLoginIDState } from "../core/action"
 

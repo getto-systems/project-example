@@ -10,7 +10,7 @@ import { ClearAuthTicketRemote } from "../clear/infra"
 
 import { LogoutResource } from "./resource"
 
-import { authnRepositoryConverter, authzRepositoryConverter } from "../kernel/converter"
+import { authnRepositoryConverter, authzRepositoryConverter } from "../kernel/convert"
 
 describe("Logout", () => {
     test("clear", async () => {

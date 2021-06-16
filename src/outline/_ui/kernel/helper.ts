@@ -1,4 +1,4 @@
-import { appendMenuCategoryPath, toMenuCategory, toMenuItem } from "./converter"
+import { appendMenuCategoryPath, toMenuCategory, toMenuItem } from "./convert"
 
 import {
     MenuBadge,

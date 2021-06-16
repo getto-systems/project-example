@@ -2,7 +2,7 @@ import { LoadSeasonInfra } from "./infra"
 
 import { LoadSeasonEvent } from "./event"
 
-import { defaultSeason } from "./converter"
+import { defaultSeason } from "./convert"
 
 export interface LoadSeasonMethod {
     <S>(post: Post<LoadSeasonEvent, S>): Promise<S>

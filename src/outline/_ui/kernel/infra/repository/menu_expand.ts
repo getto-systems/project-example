@@ -14,7 +14,7 @@ import { RepositoryOutsideFeature } from "../../../../../z_details/_ui/repositor
 
 import { MenuExpandRepository, MenuExpandRepositoryValue } from "../../infra"
 
-import { menuExpandRepositoryConverter } from "../../converter"
+import { menuExpandRepositoryConverter } from "../../convert"
 
 export type MenuExpandRepositoryParams = Readonly<{
     database: string

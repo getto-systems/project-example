@@ -1,9 +1,9 @@
 import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
 
 import { mockAuthenticatePasswordView } from "../../password/_ui/action_authenticate/mock"
-import { mockRequestResetTokenView } from "../../password/reset/ui/action_request_token/mock"
-import { mockResetPasswordView } from "../../password/reset/ui/action_reset/mock"
-import { mockCheckResetTokenSendingStatusView } from "../../password/reset/ui/action_check_status/mock"
+import { mockRequestResetTokenView } from "../../password/reset/_ui/action_request_token/mock"
+import { mockResetPasswordView } from "../../password/reset/_ui/action_reset/mock"
+import { mockCheckResetTokenSendingStatusView } from "../../password/reset/_ui/action_check_status/mock"
 import { mockCheckAuthTicketView } from "../../auth_ticket/_ui/action_check/mock"
 import { mockSignViewLocationDetecter } from "../common/switch_view/mock"
 
