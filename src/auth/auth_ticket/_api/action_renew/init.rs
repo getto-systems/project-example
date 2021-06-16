@@ -9,7 +9,7 @@ use super::action::RenewAuthTicketAction;
 use super::action::RenewAuthTicketMaterial;
 
 impl<'a> RenewAuthTicketAction<RenewAuthTicketFeature<'a>> {
-    pub fn new(request: HttpRequest, feature: &'a AuthOutsideFeature) -> Self {
+    pub fn new(request: &'a HttpRequest, feature: &'a AuthOutsideFeature) -> Self {
         Self::with_material(RenewAuthTicketFeature::new(request, feature))
     }
 }
@@ -20,7 +20,7 @@ pub struct RenewAuthTicketFeature<'a> {
 }
 
 impl<'a> RenewAuthTicketFeature<'a> {
-    fn new(request: HttpRequest, feature: &'a AuthOutsideFeature) -> Self {
+    fn new(request: &'a HttpRequest, feature: &'a AuthOutsideFeature) -> Self {
         Self {
             validate: TicketValidateAuthTokenStruct::new(request, feature),
             encode: RenewEncodeAuthTicketStruct::new(feature),

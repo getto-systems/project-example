@@ -10,13 +10,13 @@ use super::infra::{
 pub struct CheckAuthNonceStruct<'a> {
     config: AuthNonceConfig,
     clock: ChronoAuthClock,
-    nonce_header: ActixWebAuthNonceHeader,
+    nonce_header: ActixWebAuthNonceHeader<'a>,
     nonce_repository: MemoryAuthNonceRepository<'a>,
 }
 
 impl<'a> CheckAuthNonceInfra for CheckAuthNonceStruct<'a> {
     type Clock = ChronoAuthClock;
-    type NonceHeader = ActixWebAuthNonceHeader;
+    type NonceHeader = ActixWebAuthNonceHeader<'a>;
     type NonceRepository = MemoryAuthNonceRepository<'a>;
 
     fn config(&self) -> &AuthNonceConfig {
@@ -34,13 +34,13 @@ impl<'a> CheckAuthNonceInfra for CheckAuthNonceStruct<'a> {
 }
 
 impl<'a> CheckAuthNonceStruct<'a> {
-    pub fn new(request: HttpRequest, feature: &'a AuthOutsideFeature) -> Self {
+    pub fn new(request: &'a HttpRequest, feature: &'a AuthOutsideFeature) -> Self {
         Self {
             config: AuthNonceConfig {
                 nonce_expires: feature.config.ticket_expires,
             },
             clock: ChronoAuthClock::new(),
-            nonce_header: ActixWebAuthNonceHeader::new(request.clone()),
+            nonce_header: ActixWebAuthNonceHeader::new(request),
             nonce_repository: MemoryAuthNonceRepository::new(&feature.store.nonce),
         }
     }
