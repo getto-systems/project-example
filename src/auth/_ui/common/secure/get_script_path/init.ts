@@ -1,10 +1,10 @@
 import { env } from "../../../../../y_environment/_ui/env"
-import { toURL } from "../../../../../../ui/vendor/getto-application/location/init"
+import { toURL } from "../../../../../z_details/_ui/location/init"
 
 import { GetScriptPathInfra } from "./infra"
 
 import { GetScriptPathDetecter } from "./method"
-import { LocationOutsideFeature } from "../../../../../../ui/vendor/getto-application/location/feature"
+import { LocationOutsideFeature } from "../../../../../z_details/_ui/location/feature"
 
 import { detectPathname } from "./converter"
 

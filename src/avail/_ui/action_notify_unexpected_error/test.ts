@@ -1,9 +1,7 @@
-import { mockRemotePod } from "../../../../ui/vendor/getto-application/infra/remote/mock"
-
 import { initNotifyUnexpectedErrorCoreAction } from "./core/impl"
 import { initNotifyUnexpectedErrorResource } from "./impl"
 
-import { NotifyUnexpectedErrorRemotePod } from "../notify_unexpected_error/infra"
+import { NotifyUnexpectedErrorRemote } from "../notify_unexpected_error/infra"
 
 describe("NotifyUnexpectedError", () => {
     test("notify", () => {
@@ -28,6 +26,6 @@ function initResource() {
     )
 }
 
-function standard_notify(): NotifyUnexpectedErrorRemotePod {
-    return mockRemotePod(() => ({ success: true, value: true }), { wait_millisecond: 0 })
+function standard_notify(): NotifyUnexpectedErrorRemote {
+    return async () => ({ success: true, value: true })
 }

@@ -2,12 +2,6 @@ import { StartContinuousRenewInfra } from "./infra"
 
 import { SaveAuthTicketEvent, StartContinuousRenewEvent } from "./event"
 
-import {
-    authnRepositoryConverter,
-    authRemoteConverter,
-    authzRepositoryConverter,
-} from "../kernel/converter"
-
 import { AuthTicket, hasExpired } from "../kernel/data"
 
 export interface SaveAuthTicketMethod {
@@ -22,14 +16,11 @@ interface Save {
     (infra: StartContinuousRenewInfra): SaveAuthTicketMethod
 }
 export const saveAuthTicket: Save = (infra) => async (info, post) => {
-    const authn = infra.authn(authnRepositoryConverter)
-    const authz = infra.authz(authzRepositoryConverter)
-
-    const authnResult = await authn.set(info.authn)
+    const authnResult = await infra.authn.set(info.authn)
     if (!authnResult.success) {
         return post({ type: "failed-to-save", err: authnResult.err })
     }
-    const authzResult = await authz.set(info.authz)
+    const authzResult = await infra.authz.set(info.authz)
     if (!authzResult.success) {
         return post({ type: "failed-to-save", err: authzResult.err })
     }
@@ -59,11 +50,8 @@ export const startContinuousRenew: Start = (infra) => (post) => {
 
     async function continuousRenew(): Promise<StartContinuousRenewEvent> {
         const { clock, config } = infra
-        const authz = infra.authz(authzRepositoryConverter)
-        const authn = infra.authn(authnRepositoryConverter)
-        const renew = infra.renew(authRemoteConverter(clock))
 
-        const result = await authn.get()
+        const result = await infra.authn.get()
         if (!result.success) {
             return { type: "repository-error", continue: false, err: result.err }
         }
@@ -77,7 +65,7 @@ export const startContinuousRenew: Start = (infra) => (post) => {
             return { type: "authn-not-expired", continue: true }
         }
 
-        const response = await renew({ type: "always" })
+        const response = await infra.renew()
         if (!response.success) {
             if (response.err.type === "unauthorized") {
                 return clearTicket()
@@ -86,12 +74,12 @@ export const startContinuousRenew: Start = (infra) => (post) => {
             }
         }
 
-        const authnStoreResult = await authn.set(response.value.authn)
+        const authnStoreResult = await infra.authn.set(response.value.authn)
         if (!authnStoreResult.success) {
             return { type: "repository-error", continue: false, err: authnStoreResult.err }
         }
 
-        const authzStoreResult = await authn.set(response.value.authn)
+        const authzStoreResult = await infra.authn.set(response.value.authn)
         if (!authzStoreResult.success) {
             return { type: "repository-error", continue: false, err: authzStoreResult.err }
         }
@@ -99,12 +87,12 @@ export const startContinuousRenew: Start = (infra) => (post) => {
         return { type: "succeed-to-renew", continue: true }
 
         async function clearTicket(): Promise<StartContinuousRenewEvent> {
-            const authnRemoveResult = await authn.remove()
+            const authnRemoveResult = await infra.authn.remove()
             if (!authnRemoveResult.success) {
                 return { type: "repository-error", continue: false, err: authnRemoveResult.err }
             }
 
-            const authzRemoveResult = await authz.remove()
+            const authzRemoveResult = await infra.authz.remove()
             if (!authzRemoveResult.success) {
                 return { type: "repository-error", continue: false, err: authzRemoveResult.err }
             }

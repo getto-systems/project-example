@@ -26,7 +26,7 @@ import {
     CheckResetTokenSendingStatusError,
     SendResetTokenError,
 } from "../../check_status/data"
-import { remoteCommonError } from "../../../../../../../ui/vendor/getto-application/infra/remote/helper"
+import { remoteCommonErrorReason } from "../../../../../../z_details/_ui/remote/helper"
 
 export function CheckPasswordResetSendingStatusEntry(
     view: CheckResetTokenSendingStatusView,
@@ -137,14 +137,14 @@ function checkStatusError(err: CheckResetTokenSendingStatusError): VNodeContent[
             return ["すでにリセット済みです"]
 
         default:
-            return remoteCommonError(err, (reason) => [
+            return remoteCommonErrorReason(err, (reason) => [
                 `${reason.message}によりステータスの取得に失敗しました`,
                 ...reason.detail,
             ])
     }
 }
 function sendTokenError(err: SendResetTokenError): VNodeContent[] {
-    return remoteCommonError(err, (reason) => [
+    return remoteCommonErrorReason(err, (reason) => [
         `${reason.message}によりリセットトークンの送信に失敗しました`,
         ...reason.detail,
     ])

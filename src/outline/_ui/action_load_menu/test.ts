@@ -2,26 +2,21 @@ import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/a
 
 import { markMenuCategoryLabel, standard_MenuTree } from "../kernel/test_helper"
 
-import { convertRepository } from "../../../../ui/vendor/getto-application/infra/repository/helper"
-import { mockRemotePod } from "../../../../ui/vendor/getto-application/infra/remote/mock"
-import { mockRepository } from "../../../../ui/vendor/getto-application/infra/repository/mock"
-
 import { mockLoadMenuLocationDetecter } from "../kernel/mock"
+import { mockAuthzRepository } from "../../../auth/auth_ticket/_ui/kernel/infra/repository/mock"
+import { mockMenuExpandRepository } from "../kernel/infra/repository/mock"
 
 import { initLoadMenuCoreAction, initLoadMenuCoreMaterial } from "./core/impl"
 
-import { menuExpandRepositoryConverter } from "../kernel/converter"
+import { LoadMenuDetecter } from "../kernel/method"
 
-import { AuthzRepositoryPod, AuthzRepositoryValue } from "../../../auth/auth_ticket/_ui/kernel/infra"
-import {
-    GetMenuBadgeRemotePod,
-    MenuExpandRepositoryPod,
-    MenuExpandRepositoryValue,
-} from "../kernel/infra"
+import { AuthzRepository } from "../../../auth/auth_ticket/_ui/kernel/infra"
+import { GetMenuBadgeRemote, MenuExpandRepository } from "../kernel/infra"
 
 import { LoadMenuResource } from "./resource"
 
-import { LoadMenuDetecter } from "../kernel/method"
+import { convertMenuBadgeRemote, menuExpandRepositoryConverter } from "../kernel/converter"
+import { authzRepositoryConverter } from "../../../auth/auth_ticket/_ui/kernel/converter"
 
 describe("Menu", () => {
     test("load menu", async () => {
@@ -117,8 +112,7 @@ describe("Menu", () => {
     })
 
     test("load menu; toggle expands", async () => {
-        const { resource, repository } = standard()
-        const menuExpand = repository.menuExpand(menuExpandRepositoryConverter)
+        const { resource, menuExpand } = standard()
 
         const runner = setupActionTestRunner(resource.menu.subscriber)
 
@@ -337,7 +331,7 @@ describe("Menu", () => {
 function standard() {
     const [resource, menuExpand] = initResource(standard_authz(), empty_menuExpand())
 
-    return { resource, repository: { menuExpand } }
+    return { resource, menuExpand }
 }
 function empty() {
     const [resource] = initResource(empty_authz(), empty_menuExpand())
@@ -356,9 +350,9 @@ function expand() {
 }
 
 function initResource(
-    authz: AuthzRepositoryPod,
-    menuExpand: MenuExpandRepositoryPod,
-): [LoadMenuResource, MenuExpandRepositoryPod] {
+    authz: AuthzRepository,
+    menuExpand: MenuExpandRepository,
+): [LoadMenuResource, MenuExpandRepository] {
     const version = standard_version()
     const detecter = standard_detecter()
     const getMenuBadge = standard_getMenuBadge()
@@ -392,38 +386,54 @@ function standard_version(): string {
     return "1.0.0"
 }
 
-function standard_authz(): AuthzRepositoryPod {
-    const authz = mockRepository<AuthzRepositoryValue>()
-    authz.set({ roles: ["admin"] })
-    return convertRepository(authz)
+function standard_authz(): AuthzRepository {
+    const result = authzRepositoryConverter.fromRepository({
+        roles: ["admin"],
+    })
+    if (!result.valid) {
+        throw new Error("invalid authz")
+    }
+
+    const repository = mockAuthzRepository()
+    repository.set(result.value)
+    return repository
 }
-function empty_authz(): AuthzRepositoryPod {
-    return convertRepository(mockRepository<AuthzRepositoryValue>())
+function empty_authz(): AuthzRepository {
+    return mockAuthzRepository()
 }
-function devDocs_authz(): AuthzRepositoryPod {
-    const authz = mockRepository<AuthzRepositoryValue>()
-    authz.set({ roles: ["admin", "dev-docs"] })
-    return convertRepository(authz)
+function devDocs_authz(): AuthzRepository {
+    const result = authzRepositoryConverter.fromRepository({
+        roles: ["admin", "dev-docs"],
+    })
+    if (!result.valid) {
+        throw new Error("invalid authz")
+    }
+
+    const repository = mockAuthzRepository()
+    repository.set(result.value)
+    return repository
 }
 
-function empty_menuExpand(): MenuExpandRepositoryPod {
-    return convertRepository(mockRepository<MenuExpandRepositoryValue>())
+function empty_menuExpand(): MenuExpandRepository {
+    return mockMenuExpandRepository()
 }
-function expand_menuExpand(): MenuExpandRepositoryPod {
-    const menuExpand = mockRepository<MenuExpandRepositoryValue>()
-    menuExpand.set([["DOCUMENT"]])
-    return convertRepository(menuExpand)
+function expand_menuExpand(): MenuExpandRepository {
+    const result = menuExpandRepositoryConverter.fromRepository([["DOCUMENT"]])
+    if (!result.valid) {
+        throw new Error("invalid menu expand")
+    }
+
+    const repository = mockMenuExpandRepository()
+    repository.set(result.value)
+    return repository
 }
 
-function standard_getMenuBadge(): GetMenuBadgeRemotePod {
-    return mockRemotePod(
-        () => ({
-            success: true,
-            value: [
-                { path: "/index.html", count: 10 },
-                { path: "/docs/index.html", count: 20 },
-            ],
-        }),
-        { wait_millisecond: 0 },
-    )
+function standard_getMenuBadge(): GetMenuBadgeRemote {
+    return async () => ({
+        success: true,
+        value: convertMenuBadgeRemote([
+            { path: "/index.html", count: 10 },
+            { path: "/docs/index.html", count: 20 },
+        ]),
+    })
 }

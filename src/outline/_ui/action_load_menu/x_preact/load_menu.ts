@@ -11,15 +11,18 @@ import {
     menuFooter,
     menuItem,
 } from "../../../../../ui/vendor/getto-css/preact/layout/app"
-import { badge_alert, notice_alert } from "../../../../../ui/vendor/getto-css/preact/design/highlight"
+import {
+    badge_alert,
+    notice_alert,
+} from "../../../../../ui/vendor/getto-css/preact/design/highlight"
 
 import { poweredBy } from "../../../../example/site"
 
 import { LoadMenuResource, LoadMenuResourceState } from "../resource"
 
-import { RepositoryError } from "../../../../../ui/vendor/getto-application/infra/repository/data"
+import { RepositoryError } from "../../../../z_details/_ui/repository/data"
 import { GetMenuBadgeError, Menu, MenuCategoryNode, MenuItemNode } from "../../kernel/data"
-import { remoteCommonError } from "../../../../../ui/vendor/getto-application/infra/remote/helper"
+import { remoteCommonErrorReason } from "../../../../z_details/_ui/remote/helper"
 
 export const MENU_ID = "menu"
 
@@ -135,7 +138,7 @@ function repositoryError(err: RepositoryError): VNode[] {
     }
 }
 function error(err: GetMenuBadgeError): VNode[] {
-    return remoteCommonError(err, (reason) => [
+    return remoteCommonErrorReason(err, (reason) => [
         notice_alert(reason.message),
         ...reason.detail.map((message) => html`<small><p>${message}</p></small>`),
     ])

@@ -18,7 +18,7 @@ import { appendScript } from "../../../../_ui/common/x_preact/script"
 
 import { ApplicationErrorComponent } from "../../../../../avail/_ui/x_preact/application_error"
 
-import { remoteCommonError } from "../../../../../../ui/vendor/getto-application/infra/remote/helper"
+import { remoteCommonErrorReason } from "../../../../../z_details/_ui/remote/helper"
 
 import {
     CheckAuthTicketView,
@@ -137,7 +137,7 @@ export function CheckAuthTicketComponent(props: Props): VNode {
 }
 
 function renewError(err: RenewAuthTicketError): VNodeContent[] {
-    return remoteCommonError(err, (reason) => [
+    return remoteCommonErrorReason(err, (reason) => [
         `${reason.message}により認証に失敗しました`,
         ...reason.detail,
     ])

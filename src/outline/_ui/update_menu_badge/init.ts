@@ -1,11 +1,11 @@
 import { env } from "../../../y_environment/_ui/env"
 
-import { newAuthzRepositoryPod } from "../../../auth/auth_ticket/_ui/kernel/infra/repository/authz"
-import { newGetMenuBadgeRemote } from "../kernel/infra/remote/get_menu_badge/core"
+import { newAuthzRepository } from "../../../auth/auth_ticket/_ui/kernel/infra/repository/authz"
+import { newGetMenuBadgeRemote } from "../kernel/infra/remote/get_menu_badge/fetch"
 import { newGetMenuBadgeNoopRemote } from "../kernel/infra/remote/get_menu_badge/noop"
 
-import { RepositoryOutsideFeature } from "../../../../ui/vendor/getto-application/infra/repository/feature"
-import { RemoteOutsideFeature } from "../../../../ui/vendor/getto-application/infra/remote/feature"
+import { RepositoryOutsideFeature } from "../../../z_details/_ui/repository/feature"
+import { RemoteOutsideFeature } from "../../../z_details/_ui/remote/feature"
 
 import { UpdateMenuBadgeInfra } from "./infra"
 import { MenuContent } from "../kernel/infra"
@@ -18,7 +18,7 @@ export function newUpdateMenuBadgeInfra(
     return {
         version: env.version,
         menuTree: menuContent.menuTree,
-        authz: newAuthzRepositoryPod(feature),
+        authz: newAuthzRepository(feature),
         getMenuBadge: menuContent.loadMenuBadge
             ? newGetMenuBadgeRemote(feature)
             : newGetMenuBadgeNoopRemote(),

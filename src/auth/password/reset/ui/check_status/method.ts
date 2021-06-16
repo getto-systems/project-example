@@ -1,12 +1,11 @@
-import { ticker } from "../../../../../../ui/vendor/getto-application/infra/timer/helper"
-import { passThroughRemoteValue } from "../../../../../../ui/vendor/getto-application/infra/remote/helper"
+import { ticker } from "../../../../../z_details/_ui/timer/helper"
 
 import { CheckResetTokenSendingStatusInfra } from "./infra"
 
 import { CheckResetTokenSendingStatusEvent } from "./event"
 
 import { ResetSessionID } from "../data"
-import { ConvertLocationResult } from "../../../../../../ui/vendor/getto-application/location/data"
+import { ConvertLocationResult } from "../../../../../z_details/_ui/location/data"
 import { CheckResetTokenSendingStatusError } from "./data"
 
 export interface CheckResetTokenSendingStatusPod {
@@ -24,8 +23,6 @@ interface CheckStatus {
 }
 export const checkSendingStatus: CheckStatus = (infra) => (detecter) => async (post) => {
     const { config } = infra
-    const sendToken = infra.sendToken(passThroughRemoteValue)
-    const getStatus = infra.getStatus(passThroughRemoteValue)
 
     const sessionID = detecter()
     if (!sessionID.valid) {
@@ -52,7 +49,7 @@ export const checkSendingStatus: CheckStatus = (infra) => (detecter) => async (p
             return post({ type: "failed-to-check-status", err: currentSendTokenState.err })
         }
 
-        const response = await getStatus(sessionID.value)
+        const response = await infra.getStatus(sessionID.value)
         if (!response.success) {
             return post({ type: "failed-to-check-status", err: response.err })
         }
@@ -80,7 +77,7 @@ export const checkSendingStatus: CheckStatus = (infra) => (detecter) => async (p
     })
 
     async function requestSendToken() {
-        const response = await sendToken(null)
+        const response = await infra.sendToken()
         if (!response.success) {
             sendTokenState = { type: "failed", err: response.err }
             return

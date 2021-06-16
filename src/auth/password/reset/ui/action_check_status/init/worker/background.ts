@@ -7,7 +7,7 @@ import {
     CheckPasswordResetSendingStatusProxyResponse,
 } from "./message"
 
-import { RemoteOutsideFeature } from "../../../../../../../../ui/vendor/getto-application/infra/remote/feature"
+import { RemoteOutsideFeature } from "../../../../../../../z_details/_ui/remote/feature"
 
 type OutsideFeature = RemoteOutsideFeature
 export function newCheckPasswordResetSendingStatusWorkerHandler(

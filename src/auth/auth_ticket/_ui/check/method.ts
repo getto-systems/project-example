@@ -1,14 +1,8 @@
-import { delayedChecker } from "../../../../../ui/vendor/getto-application/infra/timer/helper"
+import { delayedChecker } from "../../../../z_details/_ui/timer/helper"
 
 import { CheckAuthTicketInfra } from "./infra"
 
 import { RenewAuthTicketEvent, CheckAuthTicketEvent } from "./event"
-
-import {
-    authnRepositoryConverter,
-    authRemoteConverter,
-    authzRepositoryConverter,
-} from "../kernel/converter"
 
 import { hasExpired } from "../kernel/data"
 
@@ -21,9 +15,8 @@ interface Check {
 }
 export const checkAuthTicket: Check = (infra) => async (post) => {
     const { clock, config } = infra
-    const authn = infra.authn(authnRepositoryConverter)
 
-    const findResult = await authn.get()
+    const findResult = await infra.authn.get()
     if (!findResult.success) {
         return post({ type: "repository-error", err: findResult.err })
     }
@@ -57,22 +50,17 @@ async function renewTicket<S>(
     infra: CheckAuthTicketInfra,
     post: Post<RenewAuthTicketEvent, S>,
 ): Promise<S> {
-    const { clock, config } = infra
-    const authn = infra.authn(authnRepositoryConverter)
-    const authz = infra.authz(authzRepositoryConverter)
-    const renew = infra.renew(authRemoteConverter(clock))
+    const { config } = infra
 
     post({ type: "try-to-renew" })
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
-    const response = await delayedChecker(
-        renew({ type: "always" }),
-        config.takeLongtimeThreshold,
-        () => post({ type: "take-longtime-to-renew" }),
+    const response = await delayedChecker(infra.renew(), config.takeLongtimeThreshold, () =>
+        post({ type: "take-longtime-to-renew" }),
     )
     if (!response.success) {
         if (response.err.type === "unauthorized") {
-            const removeResult = await authn.remove()
+            const removeResult = await infra.authn.remove()
             if (!removeResult.success) {
                 return post({ type: "repository-error", err: removeResult.err })
             }
@@ -81,12 +69,12 @@ async function renewTicket<S>(
         return post({ type: "failed-to-renew", err: response.err })
     }
 
-    const authnResult = await authn.set(response.value.authn)
+    const authnResult = await infra.authn.set(response.value.authn)
     if (!authnResult.success) {
         return post({ type: "repository-error", err: authnResult.err })
     }
 
-    const authzResult = await authz.set(response.value.authz)
+    const authzResult = await infra.authz.set(response.value.authz)
     if (!authzResult.success) {
         return post({ type: "repository-error", err: authzResult.err })
     }

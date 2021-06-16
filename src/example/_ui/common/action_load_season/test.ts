@@ -1,18 +1,17 @@
 import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
 
-import { mockClock, mockClockPubSub } from "../../../../../ui/vendor/getto-application/infra/clock/mock"
-import { mockRepository } from "../../../../../ui/vendor/getto-application/infra/repository/mock"
+import { mockClock, mockClockPubSub } from "../../../../z_details/_ui/clock/mock"
+import { mockSeasonRepository } from "../load_season/infra/repository/mock"
 
 import { markSeason } from "../load_season/test_helper"
-import { convertRepository } from "../../../../../ui/vendor/getto-application/infra/repository/helper"
 
 import { initLoadSeasonCoreAction } from "./core/impl"
 
-import { seasonRepositoryConverter } from "../load_season/converter"
-
-import { SeasonRepositoryPod, SeasonRepositoryValue } from "../load_season/infra"
+import { SeasonRepository } from "../load_season/infra"
 
 import { LoadSeasonResource } from "./resource"
+
+import { seasonRepositoryConverter } from "../load_season/converter"
 
 describe("LoadSeason", () => {
     test("load from repository", async () => {
@@ -39,7 +38,7 @@ describe("LoadSeason", () => {
         const season = standard_season()
 
         // TODO カバレッジのために直接呼び出している。あとでシーズンの設定用 action を作って移動
-        season(seasonRepositoryConverter).set(markSeason({ year: 2021 }))
+        season.set(markSeason({ year: 2021 }))
         expect(true).toBe(true)
     })
 })
@@ -55,7 +54,7 @@ function empty() {
     return { resource }
 }
 
-function initResource(season: SeasonRepositoryPod): LoadSeasonResource {
+function initResource(season: SeasonRepository): LoadSeasonResource {
     const clock = mockClock(new Date("2021-01-01 10:00:00"), mockClockPubSub())
     return {
         season: initLoadSeasonCoreAction({
@@ -65,11 +64,18 @@ function initResource(season: SeasonRepositoryPod): LoadSeasonResource {
     }
 }
 
-function standard_season(): SeasonRepositoryPod {
-    const season = mockRepository<SeasonRepositoryValue>()
-    season.set({ year: 2020 })
-    return convertRepository(season)
+function standard_season(): SeasonRepository {
+    const result = seasonRepositoryConverter.fromRepository({
+        year: 2020,
+    })
+    if (!result.valid) {
+        throw new Error("invalid authz")
+    }
+
+    const repository = mockSeasonRepository()
+    repository.set(result.value)
+    return repository
 }
-function empty_season(): SeasonRepositoryPod {
-    return convertRepository(mockRepository<SeasonRepositoryValue>())
+function empty_season(): SeasonRepository {
+    return mockSeasonRepository()
 }

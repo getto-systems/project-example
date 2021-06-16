@@ -4,7 +4,7 @@ import { SignViewDetecter, SignViewType } from "../../common/switch_view/data"
 
 import { initialSignViewState, SignAction, SignActionState, SignSubView } from "./action"
 
-import { ConvertLocationResult } from "../../../../../ui/vendor/getto-application/location/data"
+import { ConvertLocationResult } from "../../../../z_details/_ui/location/data"
 
 export function initSignAction(
     detecter: SignViewDetecter,

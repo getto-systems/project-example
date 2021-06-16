@@ -3,8 +3,8 @@ import { newClearAuthTicketInfra } from "../clear/init"
 import { initLogoutResource } from "./impl"
 import { initLogoutCoreAction, initLogoutCoreMaterial } from "./core/impl"
 
-import { RepositoryOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/repository/feature"
-import { RemoteOutsideFeature } from "../../../../../ui/vendor/getto-application/infra/remote/feature"
+import { RepositoryOutsideFeature } from "../../../../z_details/_ui/repository/feature"
+import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"
 
 import { LogoutResource } from "./resource"
 

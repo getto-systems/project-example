@@ -3,7 +3,7 @@ import { LineIcon, lniClass, lnir } from "../../../../../z_details/_ui/icon/line
 import {
     encodeLocationSearchQuery,
     LocationSearchParam,
-} from "../../../../../../ui/vendor/getto-application/location/helper"
+} from "../../../../../z_details/_ui/location/helper"
 
 import { SignLinkResource } from "./resource"
 

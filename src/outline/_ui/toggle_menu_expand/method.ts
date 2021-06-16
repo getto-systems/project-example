@@ -7,9 +7,6 @@ import { ToggleMenuExpandEvent } from "./event"
 import { initMenuExpand, MenuBadge, MenuExpand } from "../kernel/infra"
 import { ToggleMenuExpandInfra, ToggleMenuExpandStore } from "./infra"
 
-import { menuExpandRepositoryConverter } from "../kernel/converter"
-import { authzRepositoryConverter } from "../../../auth/auth_ticket/_ui/kernel/converter"
-
 import { MenuCategoryPath } from "../kernel/data"
 
 export interface ToggleMenuExpandPod {
@@ -31,8 +28,7 @@ interface ModifyExpand {
 }
 function modifyMenuExpand(modify: ModifyExpand): Toggle {
     return (infra, store) => (detecter) => async (path, post) => {
-        const authz = infra.authz(authzRepositoryConverter)
-        const menuExpand = infra.menuExpand(menuExpandRepositoryConverter)
+        const { authz, menuExpand } = infra
 
         const authzResult = await authz.get()
         if (!authzResult.success) {

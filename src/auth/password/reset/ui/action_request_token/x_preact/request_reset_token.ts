@@ -30,7 +30,7 @@ import {
 
 import { RequestResetTokenError } from "../../request_token/data"
 import { InputLoginIDEntry } from "../../../../../login_id/_ui/action_input/x_preact/input"
-import { remoteCommonError } from "../../../../../../../ui/vendor/getto-application/infra/remote/helper"
+import { remoteCommonErrorReason } from "../../../../../../z_details/_ui/remote/helper"
 
 export function RequestResetTokenEntry(view: RequestResetTokenView): VNode {
     const resource = useApplicationView(view)
@@ -198,7 +198,7 @@ function requestTokenError(err: RequestResetTokenError): VNodeContent[] {
             return ["ログインIDが登録されていないか、トークンの送信先が登録されていません"]
 
         default:
-            return remoteCommonError(err, (reason) => [
+            return remoteCommonErrorReason(err, (reason) => [
                 `${reason.message}によりトークンの送信に失敗しました`,
                 ...reason.detail,
             ])

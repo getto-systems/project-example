@@ -5,47 +5,43 @@ import {
 } from "../../../../../_ui/y_protobuf/api_pb.js"
 
 import {
-    remoteFeature,
-    convertRemote,
-} from "../../../../../../../ui/vendor/getto-application/infra/remote/helper"
-import {
-    apiInfraError,
-    apiRequest,
-    apiStatusError,
-} from "../../../../../../z_details/_ui/api/helper"
+    generateNonce,
+    fetchOptions,
+    remoteCommonError,
+    remoteInfraError,
+} from "../../../../../../z_details/_ui/remote/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 
-import { RemoteOutsideFeature } from "../../../../../../../ui/vendor/getto-application/infra/remote/feature"
+import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/feature"
 
-import { AuthenticatePasswordRemotePod } from "../../infra"
+import { Clock } from "../../../../../../z_details/_ui/clock/infra"
+import { AuthenticatePasswordRemote } from "../../infra"
 
-import {
-    ApiAuthenticateResponse,
-    ApiCommonError,
-    ApiResult,
-} from "../../../../../../z_details/_ui/api/data"
+import { convertAuthRemote } from "../../../../../auth_ticket/_ui/kernel/converter"
 
 export function newAuthenticatePasswordRemote(
     feature: RemoteOutsideFeature,
-): AuthenticatePasswordRemotePod {
-    type AuthenticateResult = ApiResult<ApiAuthenticateResponse, ApiCommonError | AuthenticateError>
-    type AuthenticateError = Readonly<{ type: "invalid-password" }>
-
-    return convertRemote(async (fields): Promise<AuthenticateResult> => {
+    clock: Clock,
+): AuthenticatePasswordRemote {
+    return async (fields) => {
         try {
             const mock = false
             if (mock) {
                 // TODO api の実装が終わったらつなぐ
-                return { success: true, value: { roles: ["admin", "dev-docs"] } }
+                return {
+                    success: true,
+                    value: convertAuthRemote(clock, { roles: ["admin", "dev-docs"] }),
+                }
             }
 
-            const request = apiRequest(
-                remoteFeature(env.apiServerURL, feature),
-                "/auth/password/authenticate",
-                "POST",
-            )
-            const response = await fetch(request.url, {
-                ...request.options,
+            const opts = fetchOptions({
+                serverURL: env.apiServerURL,
+                path: "/auth/password/authenticate",
+                method: "POST",
+                headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
+            })
+            const response = await fetch(opts.url, {
+                ...opts.options,
                 body: encodeProtobuf(AuthenticatePassword_pb, (message) => {
                     message.loginId = fields.loginID
                     message.password = fields.password
@@ -53,7 +49,7 @@ export function newAuthenticatePasswordRemote(
             })
 
             if (!response.ok) {
-                return apiStatusError(response.status)
+                return remoteCommonError(response.status)
             }
 
             const result = decodeProtobuf(AuthenticatePasswordResult_pb, await response.text())
@@ -62,12 +58,10 @@ export function newAuthenticatePasswordRemote(
             }
             return {
                 success: true,
-                value: {
-                    roles: result.value?.roles || [],
-                },
+                value: convertAuthRemote(clock, { roles: result.value?.roles || [] }),
             }
         } catch (err) {
-            return apiInfraError(err)
+            return remoteInfraError(err)
         }
-    })
+    }
 }

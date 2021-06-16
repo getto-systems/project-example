@@ -1,4 +1,4 @@
-import { ConvertLocationResult } from "../../../../../ui/vendor/getto-application/location/data"
+import { ConvertLocationResult } from "../../../../z_details/_ui/location/data"
 import { SignNav, signNavKey } from "../../../_ui/common/nav/data"
 import { ResetSessionID, ResetToken } from "./data"
 
@@ -24,7 +24,7 @@ export function detectResetSessionID(currentURL: URL): ConvertLocationResult<Res
     return { valid: true, value: markResetSessionID(sessionID) }
 }
 
-export function resetSessionIDRemoteConverter(sessionID: string): ResetSessionID {
+export function convertResetSessionIDRemote(sessionID: string): ResetSessionID {
     // remote からの値は validation チェックなしで受け入れる
     return markResetSessionID(sessionID)
 }

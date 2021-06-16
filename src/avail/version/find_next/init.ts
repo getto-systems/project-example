@@ -1,12 +1,12 @@
 import { env } from "../../../y_environment/_ui/env"
 
-import { toURL } from "../../../../ui/vendor/getto-application/location/init"
+import { toURL } from "../../../z_details/_ui/location/init"
 
 import { newCheckDeployExistsRemote } from "./infra/remote/check_deploy_exists"
 
 import { FindNextVersionDetecter } from "./method"
 
-import { LocationOutsideFeature } from "../../../../ui/vendor/getto-application/location/feature"
+import { LocationOutsideFeature } from "../../../z_details/_ui/location/feature"
 
 import { FindNextVersionInfra } from "./infra"
 

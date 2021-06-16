@@ -1,5 +1,4 @@
-import { delayedChecker } from "../../../../ui/vendor/getto-application/infra/timer/helper"
-import { passThroughRemoteValue } from "../../../../ui/vendor/getto-application/infra/remote/helper"
+import { delayedChecker } from "../../../z_details/_ui/timer/helper"
 
 import { versionToString } from "./helper"
 
@@ -10,7 +9,7 @@ import { FindNextVersionEvent } from "./event"
 import { versionStringConfigConverter } from "../converter"
 import { versionConfigConverter } from "./converter"
 
-import { ConvertLocationResult } from "../../../../ui/vendor/getto-application/location/data"
+import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
 import { ApplicationTargetPath, CheckDeployExistsRemoteError, Version } from "./data"
 
 export interface FindNextVersionPod {
@@ -27,7 +26,6 @@ interface Find {
 }
 export const findNextVersion: Find = (infra) => (detecter) => async (post) => {
     const { version, versionSuffix, config } = infra
-    const check = infra.check(passThroughRemoteValue)
 
     const target = detecter()
     const currentVersion = versionConfigConverter(version)
@@ -43,7 +41,7 @@ export const findNextVersion: Find = (infra) => (detecter) => async (post) => {
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const next = await delayedChecker(
-        findNext(check, currentVersion.value, versionSuffix),
+        findNext(infra.check, currentVersion.value, versionSuffix),
         config.takeLongtimeThreshold,
         () => post({ type: "take-longtime-to-find" }),
     )

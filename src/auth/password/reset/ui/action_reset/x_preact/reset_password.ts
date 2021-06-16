@@ -29,7 +29,7 @@ import { InputPasswordEntry } from "../../../../_ui/action_input/x_preact/input"
 import { ResetPasswordView, ResetPasswordResource, ResetPasswordResourceState } from "../resource"
 
 import { ResetPasswordError } from "../../reset/data"
-import { remoteCommonError } from "../../../../../../../ui/vendor/getto-application/infra/remote/helper"
+import { remoteCommonErrorReason } from "../../../../../../z_details/_ui/remote/helper"
 
 export function ResetPasswordEntry(view: ResetPasswordView): VNode {
     const resource = useApplicationView(view)
@@ -230,7 +230,7 @@ function resetError(err: ResetPasswordError): VNodeContent[] {
             ]
 
         default:
-            return remoteCommonError(err, (reason) => [
+            return remoteCommonErrorReason(err, (reason) => [
                 `${reason.message}によりリセットに失敗しました`,
                 ...reason.detail,
             ])

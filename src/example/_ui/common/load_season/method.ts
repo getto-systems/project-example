@@ -2,7 +2,7 @@ import { LoadSeasonInfra } from "./infra"
 
 import { LoadSeasonEvent } from "./event"
 
-import { defaultSeason, seasonRepositoryConverter } from "./converter"
+import { defaultSeason } from "./converter"
 
 export interface LoadSeasonMethod {
     <S>(post: Post<LoadSeasonEvent, S>): Promise<S>
@@ -12,8 +12,7 @@ interface Load {
     (infra: LoadSeasonInfra): LoadSeasonMethod
 }
 export const loadSeason: Load = (infra) => async (post) => {
-    const { clock } = infra
-    const season = infra.season(seasonRepositoryConverter)
+    const { clock, season } = infra
 
     const result = await season.get()
     if (!result.success) {

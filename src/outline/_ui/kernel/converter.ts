@@ -1,4 +1,4 @@
-import { RepositoryConverter } from "../../../../ui/vendor/getto-application/infra/repository/infra"
+import { RepositoryConverter } from "../../../z_details/_ui/repository/infra"
 import {
     initMenuExpand,
     MenuBadge,
@@ -9,7 +9,7 @@ import {
     MenuTreeItem,
 } from "./infra"
 
-import { ConvertLocationResult } from "../../../../ui/vendor/getto-application/location/data"
+import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
 import {
     MenuCategory,
     MenuCategoryLabel,
@@ -33,7 +33,7 @@ export function detectMenuTargetPath(
     }
 }
 
-export function menuBadgeRemoteConverter(menuBadgeItems: MenuBadgeItem[]): MenuBadge {
+export function convertMenuBadgeRemote(menuBadgeItems: MenuBadgeItem[]): MenuBadge {
     return menuBadgeItems.reduce((acc, item) => {
         acc.set(item.path, item.count)
         return acc

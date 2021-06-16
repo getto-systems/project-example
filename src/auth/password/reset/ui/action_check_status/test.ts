@@ -1,6 +1,5 @@
 import { setupActionTestRunner } from "../../../../../../ui/vendor/getto-application/action/test_helper"
-
-import { mockRemotePod } from "../../../../../../ui/vendor/getto-application/infra/remote/mock"
+import { ticker } from "../../../../../z_details/_ui/timer/helper"
 
 import { mockCheckResetTokenSendingStatusLocationDetecter } from "../check_status/mock"
 
@@ -11,10 +10,9 @@ import {
 } from "./core/impl"
 
 import {
-    GetResetTokenSendingStatusRemotePod,
-    GetResetTokenSendingStatusResult,
-    SendResetTokenRemotePod,
-    SendResetTokenResult,
+    GetResetTokenSendingStatusRemote,
+    SendResetTokenRemote,
+    SendResetTokenRemoteResult,
 } from "../check_status/infra"
 
 import { CheckResetTokenSendingStatusView } from "./resource"
@@ -106,8 +104,8 @@ function noSessionID() {
 
 function initView(
     currentURL: URL,
-    sendToken: SendResetTokenRemotePod,
-    getStatus: GetResetTokenSendingStatusRemotePod,
+    sendToken: SendResetTokenRemote,
+    getStatus: GetResetTokenSendingStatusRemote,
 ): CheckResetTokenSendingStatusView {
     const checkStatusDetecter = mockCheckResetTokenSendingStatusLocationDetecter(currentURL)
     return initCheckResetTokenSendingStatusView(
@@ -136,17 +134,20 @@ function noSessionID_URL() {
     return new URL("https://example.com/index.html?-password-reset=check-status")
 }
 
-function standard_sendToken(): SendResetTokenRemotePod {
-    return mockRemotePod(simulateSendToken, { wait_millisecond: 0 })
+function standard_sendToken(): SendResetTokenRemote {
+    return async () => standard_sendResetTokenRemoteResult()
 }
-function takeLongtime_sendToken(): SendResetTokenRemotePod {
-    return mockRemotePod(simulateSendToken, { wait_millisecond: 64 })
+function takeLongtime_sendToken(): SendResetTokenRemote {
+    return async () => ticker({ wait_millisecond: 64 }, () => standard_sendResetTokenRemoteResult())
+}
+function standard_sendResetTokenRemoteResult(): SendResetTokenRemoteResult {
+    return { success: true, value: true }
 }
 
-function standard_getStatus(): GetResetTokenSendingStatusRemotePod {
+function standard_getStatus(): GetResetTokenSendingStatusRemote {
     return getStatusRemoteAccess([{ done: true, send: true }])
 }
-function takeLongtime_getStatus(): GetResetTokenSendingStatusRemotePod {
+function takeLongtime_getStatus(): GetResetTokenSendingStatusRemote {
     // 完了するまでに 5回以上かかる
     return getStatusRemoteAccess([
         { done: false, status: { sending: true } },
@@ -158,25 +159,19 @@ function takeLongtime_getStatus(): GetResetTokenSendingStatusRemotePod {
     ])
 }
 
-function simulateSendToken(): SendResetTokenResult {
-    return { success: true, value: true }
-}
 function getStatusRemoteAccess(
     responseCollection: ResetTokenSendingResult[],
-): GetResetTokenSendingStatusRemotePod {
+): GetResetTokenSendingStatusRemote {
     let position = 0
-    return mockRemotePod(
-        (): GetResetTokenSendingStatusResult => {
-            if (responseCollection.length === 0) {
-                return { success: false, err: { type: "infra-error", err: "no response" } }
-            }
-            const response = getResponse()
-            position++
+    return async () => {
+        if (responseCollection.length === 0) {
+            return { success: false, err: { type: "infra-error", err: "no response" } }
+        }
+        const response = getResponse()
+        position++
 
-            return { success: true, value: response }
-        },
-        { wait_millisecond: 0 },
-    )
+        return { success: true, value: response }
+    }
 
     function getResponse(): ResetTokenSendingResult {
         if (position < responseCollection.length) {

@@ -1,5 +1,8 @@
-import { RemoteTypes } from "../../../../ui/vendor/getto-application/infra/remote/infra"
-import { RepositoryPod } from "../../../../ui/vendor/getto-application/infra/repository/infra"
+import {
+    FetchRepositoryResult,
+    StoreRepositoryResult,
+} from "../../../z_details/_ui/repository/infra"
+import { RemoteResult } from "../../../z_details/_ui/remote/infra"
 
 import { GetMenuBadgeRemoteError, MenuCategoryPath } from "./data"
 
@@ -45,22 +48,21 @@ export type FetchMenuStoreResult<T> =
     | Readonly<{ found: true; value: T }>
     | Readonly<{ found: false }>
 
-type GetMenuBadgeRemoteTypes = RemoteTypes<
-    { type: "always" }, // 引数は必要ないが、null にするのは嫌なのでこうしておく
-    MenuBadge,
-    MenuBadgeItem[],
-    GetMenuBadgeRemoteError
->
-export type GetMenuBadgeRemotePod = GetMenuBadgeRemoteTypes["pod"]
-export type GetMenuBadgeRemoteResult = GetMenuBadgeRemoteTypes["result"]
-export type GetMenuBadgeSimulator = GetMenuBadgeRemoteTypes["simulator"]
+export interface GetMenuBadgeRemote {
+    (): Promise<GetMenuBadgeRemoteResult>
+}
+export type GetMenuBadgeRemoteResult = RemoteResult<MenuBadge, GetMenuBadgeRemoteError>
 
 export type MenuBadge = Map<string, number>
 export type MenuBadgeItem = Readonly<{ path: string; count: number }>
 
 export type MenuExpand = ArraySet<MenuCategoryPath>
 
-export type MenuExpandRepositoryPod = RepositoryPod<MenuExpand, MenuExpandRepositoryValue>
+export interface MenuExpandRepository {
+    get(): Promise<FetchRepositoryResult<MenuExpand>>
+    set(value: MenuExpand): Promise<StoreRepositoryResult>
+    remove(): Promise<StoreRepositoryResult>
+}
 export type MenuExpandRepositoryValue = string[][]
 
 class ArraySet<T> {

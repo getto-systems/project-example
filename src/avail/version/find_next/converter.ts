@@ -1,4 +1,4 @@
-import { ConvertLocationResult } from "../../../../ui/vendor/getto-application/location/data"
+import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
 import { ApplicationTargetPath, ParseVersionResult, Version } from "./data"
 
 export function detectApplicationTargetPath(

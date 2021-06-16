@@ -3,8 +3,8 @@ import { newCheckSendingStatusMaterial } from "./common"
 import { initCheckResetTokenSendingStatusView } from "../impl"
 import { initCheckResetTokenSendingStatusCoreAction } from "../core/impl"
 
-import { RemoteOutsideFeature } from "../../../../../../../ui/vendor/getto-application/infra/remote/feature"
-import { LocationOutsideFeature } from "../../../../../../../ui/vendor/getto-application/location/feature"
+import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/feature"
+import { LocationOutsideFeature } from "../../../../../../z_details/_ui/location/feature"
 
 import { CheckResetTokenSendingStatusView } from "../resource"
 

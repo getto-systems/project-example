@@ -1,10 +1,6 @@
-import { passThroughRemoteValue } from "../../../../../ui/vendor/getto-application/infra/remote/helper"
-
 import { ClearAuthTicketInfra } from "./infra"
 
 import { ClearAuthTicketEvent } from "./event"
-
-import { authnRepositoryConverter, authzRepositoryConverter } from "../kernel/converter"
 
 export interface ClearAuthTicketMethod {
     <S>(post: Post<ClearAuthTicketEvent, S>): Promise<S>
@@ -14,17 +10,13 @@ interface Clear {
     (infra: ClearAuthTicketInfra): ClearAuthTicketMethod
 }
 export const clearAuthTicket: Clear = (infra) => async (post) => {
-    const authn = infra.authn(authnRepositoryConverter)
-    const authz = infra.authz(authzRepositoryConverter)
-    const clear = infra.clear(passThroughRemoteValue)
-
-    const authnResult = await authn.get()
+    const authnResult = await infra.authn.get()
     if (!authnResult.success) {
         return post({ type: "failed-to-logout", err: authnResult.err })
     }
     if (!authnResult.found) {
         // authn が保存されていなければ authz のクリアだけ行う
-        const authzRemoveResult = await authz.remove()
+        const authzRemoveResult = await infra.authz.remove()
         if (!authzRemoveResult.success) {
             return post({ type: "failed-to-logout", err: authzRemoveResult.err })
         }
@@ -32,17 +24,17 @@ export const clearAuthTicket: Clear = (infra) => async (post) => {
         return post({ type: "succeed-to-logout" })
     }
 
-    const clearResponse = await clear({ type: "always" })
+    const clearResponse = await infra.clear()
     if (!clearResponse.success) {
         return post({ type: "failed-to-clear", err: clearResponse.err })
     }
 
-    const authnRemoveResult = await authn.remove()
+    const authnRemoveResult = await infra.authn.remove()
     if (!authnRemoveResult.success) {
         return post({ type: "failed-to-logout", err: authnRemoveResult.err })
     }
 
-    const authzRemoveResult = await authz.remove()
+    const authzRemoveResult = await infra.authz.remove()
     if (!authzRemoveResult.success) {
         return post({ type: "failed-to-logout", err: authzRemoveResult.err })
     }

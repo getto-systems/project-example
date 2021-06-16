@@ -1,17 +1,16 @@
 import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
 
-import { mockRepository } from "../../../../../ui/vendor/getto-application/infra/repository/mock"
-import { mockRemotePod } from "../../../../../ui/vendor/getto-application/infra/remote/mock"
+import { mockAuthnRepository, mockAuthzRepository } from "../kernel/infra/repository/mock"
 
-import { convertRepository } from "../../../../../ui/vendor/getto-application/infra/repository/helper"
 import { initLogoutCoreAction, initLogoutCoreMaterial } from "./core/impl"
 import { initLogoutResource } from "./impl"
 
-import { AuthnRepositoryValue, AuthzRepositoryPod, AuthzRepositoryValue } from "../kernel/infra"
-import { AuthnRepositoryPod } from "../kernel/infra"
-import { ClearAuthTicketRemotePod } from "../clear/infra"
+import { AuthnRepository, AuthzRepository } from "../kernel/infra"
+import { ClearAuthTicketRemote } from "../clear/infra"
 
 import { LogoutResource } from "./resource"
+
+import { authnRepositoryConverter, authzRepositoryConverter } from "../kernel/converter"
 
 describe("Logout", () => {
     test("clear", async () => {
@@ -45,7 +44,7 @@ function standard() {
     return { resource }
 }
 
-function initResource(authn: AuthnRepositoryPod, authz: AuthzRepositoryPod): LogoutResource {
+function initResource(authn: AuthnRepository, authz: AuthzRepository): LogoutResource {
     return initLogoutResource(
         initLogoutCoreAction(
             initLogoutCoreMaterial({
@@ -57,21 +56,31 @@ function initResource(authn: AuthnRepositoryPod, authz: AuthzRepositoryPod): Log
     )
 }
 
-function standard_authn(): AuthnRepositoryPod {
-    const db = mockRepository<AuthnRepositoryValue>()
-    db.set({
+function standard_authn(): AuthnRepository {
+    const result = authnRepositoryConverter.fromRepository({
         authAt: new Date("2020-01-01 09:00:00").toISOString(),
     })
-    return convertRepository(db)
+    if (!result.valid) {
+        throw new Error("invalid authn")
+    }
+
+    const repository = mockAuthnRepository()
+    repository.set(result.value)
+    return repository
 }
-function standard_authz(): AuthzRepositoryPod {
-    const db = mockRepository<AuthzRepositoryValue>()
-    db.set({
+function standard_authz(): AuthzRepository {
+    const result = authzRepositoryConverter.fromRepository({
         roles: ["role"],
     })
-    return convertRepository(db)
+    if (!result.valid) {
+        throw new Error("invalid authz")
+    }
+
+    const repository = mockAuthzRepository()
+    repository.set(result.value)
+    return repository
 }
 
-function standard_clear(): ClearAuthTicketRemotePod {
-    return mockRemotePod(() => ({ success: true, value: true }), { wait_millisecond: 0 })
+function standard_clear(): ClearAuthTicketRemote {
+    return async () => ({ success: true, value: true })
 }

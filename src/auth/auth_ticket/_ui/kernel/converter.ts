@@ -1,12 +1,11 @@
-import { RepositoryConverter } from "../../../../../ui/vendor/getto-application/infra/repository/infra"
+import { RepositoryConverter } from "../../../../z_details/_ui/repository/infra"
 
-import {  AuthzRepositoryValue } from "./infra"
-import { Clock } from "../../../../../ui/vendor/getto-application/infra/clock/infra"
-import { RemoteConverter } from "../../../../../ui/vendor/getto-application/infra/remote/infra"
+import { AuthzRepositoryValue } from "./infra"
+import { Clock } from "../../../../z_details/_ui/clock/infra"
 import { AuthRemoteValue, AuthnRepositoryValue } from "./infra"
 
-import { Authn, Authz,  GrantedRoles } from "./data"
-import { AuthAt, AuthTicket,  } from "./data"
+import { Authn, Authz, GrantedRoles } from "./data"
+import { AuthAt, AuthTicket } from "./data"
 
 export const authnRepositoryConverter: RepositoryConverter<Authn, AuthnRepositoryValue> = {
     toRepository: (value) => ({
@@ -28,10 +27,7 @@ export const authnRepositoryConverter: RepositoryConverter<Authn, AuthnRepositor
     },
 }
 
-interface AuthConverter {
-    (clock: Clock): RemoteConverter<AuthTicket, AuthRemoteValue>
-}
-export const authRemoteConverter: AuthConverter = (clock) => (value) => {
+export function convertAuthRemote(clock: Clock, value: AuthRemoteValue): AuthTicket {
     // remote からの値はバリデーションせずに受け取る
     return {
         authn: {

@@ -34,7 +34,7 @@ import {
 } from "../resource"
 
 import { AuthenticatePasswordError } from "../../authenticate/data"
-import { remoteCommonError } from "../../../../../../ui/vendor/getto-application/infra/remote/helper"
+import { remoteCommonErrorReason } from "../../../../../z_details/_ui/remote/helper"
 
 export function AuthenticatePasswordEntry(view: AuthenticatePasswordView): VNode {
     const resource = useApplicationView(view)
@@ -231,7 +231,7 @@ function loginError(err: AuthenticatePasswordError): VNodeContent[] {
             return ["ログインIDかパスワードが違います"]
 
         default:
-            return remoteCommonError(err, (reason) => [
+            return remoteCommonErrorReason(err, (reason) => [
                 `${reason.message}により認証に失敗しました`,
                 ...reason.detail,
             ])

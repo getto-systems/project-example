@@ -1,25 +1,25 @@
 import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
+import { ticker } from "../../../../z_details/_ui/timer/helper"
 
-import {
-    ClockPubSub,
-    mockClock,
-    mockClockPubSub,
-} from "../../../../../ui/vendor/getto-application/infra/clock/mock"
-import { mockRepository } from "../../../../../ui/vendor/getto-application/infra/repository/mock"
-import { mockRemotePod } from "../../../../../ui/vendor/getto-application/infra/remote/mock"
+import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_details/_ui/clock/mock"
+import { mockAuthnRepository, mockAuthzRepository } from "../kernel/infra/repository/mock"
 
 import { mockGetScriptPathDetecter } from "../../../_ui/common/secure/get_script_path/mock"
 
-import { convertRepository } from "../../../../../ui/vendor/getto-application/infra/repository/helper"
 import { initCheckAuthTicketView } from "./impl"
 import { initCheckAuthTicketCoreAction, initCheckAuthTicketCoreMaterial } from "./core/impl"
 
-import { Clock } from "../../../../../ui/vendor/getto-application/infra/clock/infra"
-import { WaitTime } from "../../../../../ui/vendor/getto-application/infra/config/infra"
-import { AuthnRepositoryValue, AuthzRepositoryPod, AuthzRepositoryValue } from "../kernel/infra"
-import { AuthnRepositoryPod, RenewAuthTicketRemotePod } from "../kernel/infra"
+import { Clock } from "../../../../z_details/_ui/clock/infra"
+import { WaitTime } from "../../../../z_details/_ui/config/infra"
+import { AuthnRepository, AuthzRepository, RenewAuthTicketRemote } from "../kernel/infra"
 
 import { CheckAuthTicketView } from "./resource"
+
+import {
+    authnRepositoryConverter,
+    authzRepositoryConverter,
+    convertAuthRemote,
+} from "../kernel/converter"
 
 import { LoadScriptError } from "../../../_ui/common/secure/get_script_path/data"
 
@@ -200,51 +200,50 @@ describe("CheckAuthTicket", () => {
 
 function standard() {
     const clockPubSub = mockClockPubSub()
+    const clock = mockClock(START_AT, clockPubSub)
     const view = initView(
         standard_authn(),
         standard_authz(),
-        standard_renew(clockPubSub),
-        mockClock(START_AT, clockPubSub),
+        standard_renew(clock, clockPubSub),
+        clock,
     )
 
     return { clock: clockPubSub, view }
 }
 function instantLoadable() {
     const clockPubSub = mockClockPubSub()
+    const clock = mockClock(START_AT_INSTANT_LOAD_AVAILABLE, clockPubSub)
     const view = initView(
         standard_authn(),
         standard_authz(),
-        standard_renew(clockPubSub),
-        mockClock(START_AT_INSTANT_LOAD_AVAILABLE, clockPubSub),
+        standard_renew(clock, clockPubSub),
+        clock,
     )
 
     return { clock: clockPubSub, view }
 }
 function takeLongtime() {
     const clockPubSub = mockClockPubSub()
-    const view = initView(
-        standard_authn(),
-        standard_authz(),
-        wait_renew(clockPubSub),
-        mockClock(START_AT, clockPubSub),
-    )
+    const clock = mockClock(START_AT, clockPubSub)
+    const view = initView(standard_authn(), standard_authz(), wait_renew(clock, clockPubSub), clock)
     return { clock: clockPubSub, view }
 }
 function noStored() {
     const clockPubSub = mockClockPubSub()
+    const clock = mockClock(START_AT, clockPubSub)
     const view = initView(
         noStored_authn(),
         noStored_authz(),
-        standard_renew(clockPubSub),
-        mockClock(START_AT, clockPubSub),
+        standard_renew(clock, clockPubSub),
+        clock,
     )
     return { view }
 }
 
 function initView(
-    authn: AuthnRepositoryPod,
-    authz: AuthzRepositoryPod,
-    renew: RenewAuthTicketRemotePod,
+    authn: AuthnRepository,
+    authz: AuthzRepository,
+    renew: RenewAuthTicketRemote,
     clock: Clock,
 ): CheckAuthTicketView {
     const currentURL = new URL("https://example.com/index.html")
@@ -285,53 +284,66 @@ function initView(
     )
 }
 
-function standard_authn(): AuthnRepositoryPod {
-    const db = mockRepository<AuthnRepositoryValue>()
-    db.set({
+function standard_authn(): AuthnRepository {
+    const result = authnRepositoryConverter.fromRepository({
         authAt: STORED_LAST_AUTH_AT,
     })
-    return convertRepository(db)
+    if (!result.valid) {
+        throw new Error("invalid authn")
+    }
+
+    const repository = mockAuthnRepository()
+    repository.set(result.value)
+    return repository
 }
-function noStored_authn(): AuthnRepositoryPod {
-    return convertRepository(mockRepository<AuthnRepositoryValue>())
+function noStored_authn(): AuthnRepository {
+    return mockAuthnRepository()
 }
 
-function standard_authz(): AuthzRepositoryPod {
-    const db = mockRepository<AuthzRepositoryValue>()
-    db.set({
+function standard_authz(): AuthzRepository {
+    const result = authzRepositoryConverter.fromRepository({
         roles: ["role"],
     })
-    return convertRepository(db)
+    if (!result.valid) {
+        throw new Error("invalid authz")
+    }
+
+    const repository = mockAuthzRepository()
+    repository.set(result.value)
+    return repository
 }
-function noStored_authz(): AuthzRepositoryPod {
-    return convertRepository(mockRepository<AuthzRepositoryValue>())
+function noStored_authz(): AuthzRepository {
+    return mockAuthzRepository()
 }
 
-function standard_renew(clock: ClockPubSub): RenewAuthTicketRemotePod {
-    return renewPod(clock, { wait_millisecond: 0 })
+function standard_renew(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
+    return renewRemote(clock, clockPubSub, { wait_millisecond: 0 })
 }
-function wait_renew(clock: ClockPubSub): RenewAuthTicketRemotePod {
+function wait_renew(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
     // wait for take longtime timeout
-    return renewPod(clock, { wait_millisecond: 64 })
+    return renewRemote(clock, clockPubSub, { wait_millisecond: 64 })
 }
-function renewPod(clock: ClockPubSub, waitTime: WaitTime): RenewAuthTicketRemotePod {
+function renewRemote(
+    clock: Clock,
+    clockPubSub: ClockPubSub,
+    waitTime: WaitTime,
+): RenewAuthTicketRemote {
     let count = 0
-    return mockRemotePod(() => {
-        if (count > 2) {
-            // 最初の 3回だけ renew して、あとは renew を cancel するための unauthorized
-            return { success: false, err: { type: "unauthorized" } }
-        }
+    return async () =>
+        ticker(waitTime, () => {
+            if (count > 2) {
+                // 最初の 3回だけ renew して、あとは renew を cancel するための unauthorized
+                return { success: false, err: { type: "unauthorized" } }
+            }
 
-        // 現在時刻を動かす
-        const nextTime = CONTINUOUS_RENEW_AT[count]
-        setTimeout(() => clock.update(nextTime))
+            // 現在時刻を動かす
+            const nextTime = CONTINUOUS_RENEW_AT[count]
+            setTimeout(() => clockPubSub.update(nextTime))
 
-        count++
-        return {
-            success: true,
-            value: {
-                roles: ["role"],
-            },
-        }
-    }, waitTime)
+            count++
+            return {
+                success: true,
+                value: convertAuthRemote(clock, { roles: ["role"] }),
+            }
+        })
 }

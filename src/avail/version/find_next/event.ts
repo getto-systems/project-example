@@ -1,6 +1,6 @@
 import { VersionString } from "../data"
 import { ApplicationTargetPath, CheckDeployExistsError } from "./data"
-import { ConvertLocationResult } from "../../../../ui/vendor/getto-application/location/data"
+import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
 
 export type FindNextVersionEvent =
     | Readonly<{ type: "take-longtime-to-find" }>

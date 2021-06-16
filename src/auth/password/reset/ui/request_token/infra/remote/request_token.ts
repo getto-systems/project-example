@@ -5,69 +5,55 @@ import {
 } from "../../../../../../_ui/y_protobuf/api_pb.js"
 
 import {
-    remoteFeature,
-    convertRemote,
-} from "../../../../../../../../ui/vendor/getto-application/infra/remote/helper"
+    fetchOptions,
+    generateNonce,
+    remoteCommonError,
+    remoteInfraError,
+} from "../../../../../../../z_details/_ui/remote/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../../../../ui/vendor/protobuf/helper"
-import {
-    apiInfraError,
-    apiRequest,
-    apiStatusError,
-} from "../../../../../../../z_details/_ui/api/helper"
 
-import { RemoteOutsideFeature } from "../../../../../../../../ui/vendor/getto-application/infra/remote/feature"
+import { RemoteOutsideFeature } from "../../../../../../../z_details/_ui/remote/feature"
 
-import { RequestResetTokenRemotePod } from "../../infra"
+import { RequestResetTokenRemote } from "../../infra"
 
-import { ApiCommonError, ApiResult } from "../../../../../../../z_details/_ui/api/data"
+import { convertResetSessionIDRemote } from "../../../converter"
 
-export function newRequestResetTokenRemote(
-    feature: RemoteOutsideFeature,
-): RequestResetTokenRemotePod {
-    type RequestTokenFields = Readonly<{
-        loginID: string
-    }>
-    type RequestTokenResult = ApiResult<string, ApiCommonError | RequestTokenError>
-    type RequestTokenError = Readonly<{ type: "invalid-reset" }>
-
-    return convertRemote(async (fields: RequestTokenFields): Promise<RequestTokenResult> => {
+export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): RequestResetTokenRemote {
+    return async (fields) => {
         try {
             const mock = true
             if (mock) {
                 // TODO api の実装が終わったらつなぐ
-                return { success: true, value: "reset-session-id" }
+                return { success: true, value: convertResetSessionIDRemote("reset-session-id") }
             }
 
-            const request = apiRequest(
-                remoteFeature(env.apiServerURL, feature),
-                "/auth/password/reset/token",
-                "POST",
-            )
-            const response = await fetch(request.url, {
-                ...request.options,
+            const opts = fetchOptions({
+                serverURL: env.apiServerURL,
+                path: "/auth/password/reset/token",
+                method: "POST",
+                headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
+            })
+            const response = await fetch(opts.url, {
+                ...opts.options,
                 body: encodeProtobuf(RequestResetToken_pb, (message) => {
                     message.loginId = fields.loginID
                 }),
             })
 
             if (!response.ok) {
-                return apiStatusError(response.status)
+                return remoteCommonError(response.status)
             }
 
             const result = decodeProtobuf(RequestResetTokenResult_pb, await response.text())
             if (!result.success) {
-                return { success: false, err: mapError(result) }
+                return { success: false, err: { type: "invalid-reset" } }
             }
             return {
                 success: true,
-                value: result.value?.sessionId || "",
+                value: convertResetSessionIDRemote(result.value?.sessionId || ""),
             }
         } catch (err) {
-            return apiInfraError(err)
+            return remoteInfraError(err)
         }
-
-        function mapError(_result: RequestResetTokenResult_pb): RequestTokenError {
-            return { type: "invalid-reset" }
-        }
-    })
+    }
 }

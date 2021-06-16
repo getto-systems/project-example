@@ -5,9 +5,9 @@ import { newLoadMenuResource } from "../../outline/_ui/action_load_menu/init"
 
 import { initDocsView } from "./impl"
 
-import { RepositoryOutsideFeature } from "../../../ui/vendor/getto-application/infra/repository/feature"
-import { RemoteOutsideFeature } from "../../../ui/vendor/getto-application/infra/remote/feature"
-import { LocationOutsideFeature } from "../../../ui/vendor/getto-application/location/feature"
+import { RepositoryOutsideFeature } from "../../z_details/_ui/repository/feature"
+import { RemoteOutsideFeature } from "../../z_details/_ui/remote/feature"
+import { LocationOutsideFeature } from "../../z_details/_ui/location/feature"
 
 import { DocsView } from "./resource"
 
