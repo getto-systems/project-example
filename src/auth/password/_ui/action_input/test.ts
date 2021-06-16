@@ -40,15 +40,13 @@ describe("InputPassword", () => {
         const runner = setupActionTestRunner(action.validate.subscriber)
 
         await runner(async () => {
-            action.board.input.set(markBoardValue("a".repeat(72 + 1)))
+            action.board.input.set(markBoardValue("a".repeat(100 + 1)))
             return action.validate.initialState
         }).then((stack) => {
-            expect(stack).toEqual([
-                { valid: false, err: [{ type: "too-long", maxBytes: 72, multiByte: false }] },
-            ])
+            expect(stack).toEqual([{ valid: false, err: [{ type: "too-long", maxLength: 100 }] }])
             expect(action.validate.get()).toEqual({
                 valid: false,
-                err: [{ type: "too-long", maxBytes: 72, multiByte: false }],
+                err: [{ type: "too-long", maxLength: 100 }],
             })
         })
     })
@@ -59,11 +57,11 @@ describe("InputPassword", () => {
         const runner = setupActionTestRunner(action.validate.subscriber)
 
         await runner(async () => {
-            action.board.input.set(markBoardValue("a".repeat(72)))
+            action.board.input.set(markBoardValue("a".repeat(100)))
             return action.validate.initialState
         }).then((stack) => {
             expect(stack).toEqual([{ valid: true }])
-            expect(action.validate.get()).toEqual({ valid: true, value: "a".repeat(72) })
+            expect(action.validate.get()).toEqual({ valid: true, value: "a".repeat(100) })
         })
     })
 
@@ -73,16 +71,13 @@ describe("InputPassword", () => {
         const runner = setupActionTestRunner(action.validate.subscriber)
 
         await runner(async () => {
-            // too-long : "あ"(UTF8) is 3 bytes character
-            action.board.input.set(markBoardValue("あ".repeat(24) + "a"))
+            action.board.input.set(markBoardValue("あ".repeat(100) + "a"))
             return action.validate.initialState
         }).then((stack) => {
-            expect(stack).toEqual([
-                { valid: false, err: [{ type: "too-long", maxBytes: 72, multiByte: true }] },
-            ])
+            expect(stack).toEqual([{ valid: false, err: [{ type: "too-long", maxLength: 100 }] }])
             expect(action.validate.get()).toEqual({
                 valid: false,
-                err: [{ type: "too-long", maxBytes: 72, multiByte: true }],
+                err: [{ type: "too-long", maxLength: 100 }],
             })
         })
     })
@@ -93,12 +88,11 @@ describe("InputPassword", () => {
         const runner = setupActionTestRunner(action.validate.subscriber)
 
         await runner(async () => {
-            // too-long : "あ"(UTF8) is 3 bytes character
-            action.board.input.set(markBoardValue("あ".repeat(24)))
+            action.board.input.set(markBoardValue("あ".repeat(100)))
             return action.validate.initialState
         }).then((stack) => {
             expect(stack).toEqual([{ valid: true }])
-            expect(action.validate.get()).toEqual({ valid: true, value: "あ".repeat(24) })
+            expect(action.validate.get()).toEqual({ valid: true, value: "あ".repeat(100) })
         })
     })
 

@@ -5,7 +5,7 @@ use std::{
 
 pub struct LoginId(String);
 
-// login id には技術的な制限はないが、使用可能な最大文字数（バイト数ではない）は定義しておく
+// login id には技術的な制限はないが、使用可能な最大文字数は定義しておく
 // ui の設定と同期させること
 const LOGIN_ID_MAX_LENGTH: usize = 100;
 

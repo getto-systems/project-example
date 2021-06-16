@@ -8,7 +8,7 @@ import { markBoardValue } from "../../../../../../ui/vendor/getto-application/bo
 
 import { mockInputPasswordAction } from "../core/mock"
 
-import { PASSWORD_MAX_BYTES } from "../../converter"
+import { PASSWORD_MAX_LENGTH } from "../../converter"
 
 import { ValidatePasswordState } from "../core/action"
 
@@ -60,9 +60,7 @@ const template = storyTemplate<Props>((props) => {
             case "too-long":
                 return {
                     valid: false,
-                    err: [
-                        { type: props.validate, maxBytes: PASSWORD_MAX_BYTES, ...characterState() },
-                    ],
+                    err: [{ type: props.validate, maxLength: PASSWORD_MAX_LENGTH }],
                 }
         }
     }

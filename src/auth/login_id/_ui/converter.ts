@@ -3,7 +3,7 @@ import { BoardFieldValueConverter } from "../../../../ui/vendor/getto-applicatio
 import { BoardValue } from "../../../../ui/vendor/getto-application/board/kernel/data"
 import { LoginID, ValidateLoginIDError } from "./data"
 
-// login id には技術的な制限はないが、使用可能な最大文字数（バイト数ではない）は定義しておく
+// login id には技術的な制限はないが、使用可能な最大文字数は定義しておく
 // api の設定と同期させること
 export const LOGIN_ID_MAX_LENGTH = 100
 

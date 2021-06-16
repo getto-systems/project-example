@@ -74,16 +74,16 @@ impl HashedPassword {
 
 pub struct PlainPassword(String);
 
-// bcrypt を想定しているので、72 バイト以上ではいけない TODO この制限はなしになった
+// password には技術的な制限はないが、使用可能な最大文字数は定義しておく
 // ui の設定と同期させること
-const PASSWORD_MAX_BYTES: usize = 72; // TODO BYTES じゃなくて LENGTH にする
+const PASSWORD_MAX_LENGTH: usize = 100; // TODO BYTES じゃなくて LENGTH にする
 
 impl PlainPassword {
     // TODO これは validate.rs に移動するべき
     pub fn validate(password: String) -> Result<PlainPassword, ConvertPasswordError> {
         match password.chars().count() {
             n if n == 0 => Err(ConvertPasswordError::Empty),
-            n if n > PASSWORD_MAX_BYTES => Err(ConvertPasswordError::TooLong),
+            n if n > PASSWORD_MAX_LENGTH => Err(ConvertPasswordError::TooLong),
             _ => Ok(Self(password)),
         }
     }
