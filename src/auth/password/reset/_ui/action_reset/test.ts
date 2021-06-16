@@ -25,7 +25,7 @@ import { ResetPasswordView } from "./resource"
 import {
     authzRepositoryConverter,
     convertAuthRemote,
-} from "../../../../auth_ticket/_ui/kernel/converter"
+} from "../../../../auth_ticket/_ui/kernel/convert"
 import {
     mockAuthnRepository,
     mockAuthzRepository,

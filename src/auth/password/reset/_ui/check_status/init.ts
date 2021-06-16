@@ -11,7 +11,7 @@ import { LocationOutsideFeature } from "../../../../../z_details/_ui/location/fe
 import { limit, waitSecond } from "../../../../../z_details/_ui/config/infra"
 import { CheckResetTokenSendingStatusInfra } from "./infra"
 
-import { detectResetSessionID } from "../converter"
+import { detectResetSessionID } from "../convert"
 
 export function newCheckResetTokenSendingStatusLocationDetecter(
     feature: LocationOutsideFeature,

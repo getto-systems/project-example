@@ -9,19 +9,19 @@ use super::AuthNonceHeader;
 use super::super::data::AuthNonceValue;
 use crate::z_details::_api::request::data::HeaderError;
 
-pub struct ActixWebAuthNonceHeader {
-    request: HttpRequest,
+pub struct ActixWebAuthNonceHeader<'a> {
+    request: &'a HttpRequest,
 }
 
-impl ActixWebAuthNonceHeader {
-    pub const fn new(request: HttpRequest) -> Self {
+impl<'a> ActixWebAuthNonceHeader<'a> {
+    pub const fn new(request: &'a HttpRequest) -> Self {
         Self { request }
     }
 }
 
-impl AuthNonceHeader for ActixWebAuthNonceHeader {
+impl<'a> AuthNonceHeader for ActixWebAuthNonceHeader<'a> {
     fn nonce(&self) -> Result<AuthNonceValue, HeaderError> {
-        header(&self.request, HEADER_NONCE).map(AuthNonceValue::new)
+        header(self.request, HEADER_NONCE).map(AuthNonceValue::new)
     }
 }
 

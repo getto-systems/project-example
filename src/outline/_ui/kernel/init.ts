@@ -6,7 +6,7 @@ import { LoadMenuDetecter } from "./method"
 
 import { LocationOutsideFeature } from "../../../z_details/_ui/location/feature"
 
-import { detectMenuTargetPath } from "./converter"
+import { detectMenuTargetPath } from "./convert"
 
 export function newLoadMenuLocationDetecter(feature: LocationOutsideFeature): LoadMenuDetecter {
     return () => detectMenuTargetPath(toURL(feature), env.version)

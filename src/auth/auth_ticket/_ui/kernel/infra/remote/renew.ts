@@ -14,7 +14,7 @@ import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/fea
 import { Clock } from "../../../../../../z_details/_ui/clock/infra"
 import { RenewAuthTicketRemote } from "../../infra"
 
-import { convertAuthRemote } from "../../converter"
+import { convertAuthRemote } from "../../convert"
 
 export function newRenewAuthTicketRemote(
     feature: RemoteOutsideFeature,

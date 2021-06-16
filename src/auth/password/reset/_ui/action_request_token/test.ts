@@ -12,7 +12,7 @@ import { RequestResetTokenRemote, RequestResetTokenRemoteResult } from "../reque
 
 import { RequestResetTokenView } from "./resource"
 
-import { convertResetSessionIDRemote } from "../converter"
+import { convertResetSessionIDRemote } from "../convert"
 
 const VALID_LOGIN = { loginID: "login-id" } as const
 

@@ -1,6 +1,6 @@
 import { FindNextVersionDetecter } from "./method"
 
-import { detectApplicationTargetPath } from "./converter"
+import { detectApplicationTargetPath } from "./convert"
 
 export function mockFindNextVersionLocationDetecter(
     currentURL: URL,

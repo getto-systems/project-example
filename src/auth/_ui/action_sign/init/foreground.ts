@@ -1,7 +1,7 @@
 import { newCheckAuthTicketView } from "../../../auth_ticket/_ui/action_check/init"
-import { newRequestResetTokenView } from "../../../password/reset/ui/action_request_token/init/foreground"
-import { newResetPasswordView } from "../../../password/reset/ui/action_reset/init"
-import { newCheckPasswordResetSendingStatus } from "../../../password/reset/ui/action_check_status/init/foreground"
+import { newRequestResetTokenView } from "../../../password/reset/_ui/action_request_token/init/foreground"
+import { newResetPasswordView } from "../../../password/reset/_ui/action_reset/init"
+import { newCheckPasswordResetSendingStatus } from "../../../password/reset/_ui/action_check_status/init/foreground"
 import { newAuthenticatePasswordView } from "../../../password/_ui/action_authenticate/init"
 import { newSignViewLocationDetecter } from "../../common/switch_view/init"
 

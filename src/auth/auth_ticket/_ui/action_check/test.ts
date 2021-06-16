@@ -19,7 +19,7 @@ import {
     authnRepositoryConverter,
     authzRepositoryConverter,
     convertAuthRemote,
-} from "../kernel/converter"
+} from "../kernel/convert"
 
 import { LoadScriptError } from "../../../_ui/common/secure/get_script_path/data"
 

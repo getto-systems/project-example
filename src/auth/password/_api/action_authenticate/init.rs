@@ -14,8 +14,8 @@ use super::action::AuthenticatePasswordAction;
 use super::action::AuthenticatePasswordMaterial;
 
 impl<'a> AuthenticatePasswordAction<AuthenticatePasswordFeature<'a>> {
-    pub fn new(request: HttpRequest, body: String, feature: &'a AuthOutsideFeature) -> Self {
-        Self::with_material(AuthenticatePasswordFeature::new(request, body, feature))
+    pub fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest, body: String) -> Self {
+        Self::with_material(AuthenticatePasswordFeature::new(feature, request, body))
     }
 }
 
@@ -26,9 +26,9 @@ pub struct AuthenticatePasswordFeature<'a> {
 }
 
 impl<'a> AuthenticatePasswordFeature<'a> {
-    fn new(request: HttpRequest, body: String, feature: &'a AuthOutsideFeature) -> Self {
+    fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest, body: String) -> Self {
         Self {
-            authenticate: AuthenticatePasswordStruct::new(request, body, feature),
+            authenticate: AuthenticatePasswordStruct::new(feature, request, body),
             issue: IssueAuthTicketStruct::new(feature),
             encode: AuthenticatePasswordEncodeAuthTicketStruct::new(feature),
         }

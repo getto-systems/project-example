@@ -1,4 +1,4 @@
-import { seasonRepositoryConverter } from "./converter"
+import { seasonRepositoryConverter } from "./convert"
 
 test("seasonRepositoryConverter", () => {
     const year = 2021

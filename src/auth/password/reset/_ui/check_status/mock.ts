@@ -1,4 +1,4 @@
-import { detectResetSessionID } from "../converter"
+import { detectResetSessionID } from "../convert"
 
 import { CheckResetTokenSendingStatusDetecter } from "./method"
 

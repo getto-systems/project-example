@@ -14,7 +14,7 @@ import {
 import { RepositoryOutsideFeature } from "../../../../../../z_details/_ui/repository/feature"
 
 import { AuthnRepository, AuthnRepositoryValue } from "../../infra"
-import { authnRepositoryConverter } from "../../converter"
+import { authnRepositoryConverter } from "../../convert"
 
 export function newAuthnRepository({ webDB }: RepositoryOutsideFeature): AuthnRepository {
     const db = initDB()

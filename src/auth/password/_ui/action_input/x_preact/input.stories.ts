@@ -8,7 +8,7 @@ import { markBoardValue } from "../../../../../../ui/vendor/getto-application/bo
 
 import { mockInputPasswordAction } from "../core/mock"
 
-import { PASSWORD_MAX_LENGTH } from "../../converter"
+import { PASSWORD_MAX_LENGTH } from "../../convert"
 
 import { ValidatePasswordState } from "../core/action"
 

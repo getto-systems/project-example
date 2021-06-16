@@ -1,4 +1,4 @@
-import { detectResetPasswordVariant, detectStaticSignViewVariant } from "./converter"
+import { detectResetPasswordVariant, detectStaticSignViewVariant } from "./convert"
 
 import { ConvertLocationResult } from "../../../../z_details/_ui/location/data"
 import { ResetPasswordVariant, StaticSignViewVariant } from "../nav/data"

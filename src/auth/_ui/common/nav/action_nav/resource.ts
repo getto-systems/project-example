@@ -1,4 +1,4 @@
-import { ResetSessionID } from "../../../../password/reset/ui/data"
+import { ResetSessionID } from "../../../../password/reset/_ui/data"
 import { SignNavHref, SignNavItem } from "../data"
 
 export type SignLinkResource = Readonly<{

@@ -16,7 +16,7 @@ import { RemoteOutsideFeature } from "../../../../../../../z_details/_ui/remote/
 
 import { RequestResetTokenRemote } from "../../infra"
 
-import { convertResetSessionIDRemote } from "../../../converter"
+import { convertResetSessionIDRemote } from "../../../convert"
 
 export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): RequestResetTokenRemote {
     return async (fields) => {

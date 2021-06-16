@@ -1,6 +1,6 @@
 import { GetScriptPathInfra } from "./infra"
 
-import { toScriptPath } from "./converter"
+import { toScriptPath } from "./convert"
 
 import { ConvertLocationResult } from "../../../../../z_details/_ui/location/data"
 import { ConvertScriptPathResult, LocationPathname } from "./data"

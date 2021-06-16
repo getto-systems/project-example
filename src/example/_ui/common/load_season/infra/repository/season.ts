@@ -15,7 +15,7 @@ import { RepositoryOutsideFeature } from "../../../../../../z_details/_ui/reposi
 
 import { SeasonRepository, SeasonRepositoryValue } from "../../infra"
 
-import { seasonRepositoryConverter } from "../../converter"
+import { seasonRepositoryConverter } from "../../convert"
 
 export function newSeasonRepository({ webDB }: RepositoryOutsideFeature): SeasonRepository {
     const db = initDB()

@@ -11,7 +11,7 @@ import { SeasonRepository } from "../load_season/infra"
 
 import { LoadSeasonResource } from "./resource"
 
-import { seasonRepositoryConverter } from "../load_season/converter"
+import { seasonRepositoryConverter } from "../load_season/convert"
 
 describe("LoadSeason", () => {
     test("load from repository", async () => {

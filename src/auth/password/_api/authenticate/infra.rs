@@ -76,7 +76,7 @@ pub struct PlainPassword(String);
 
 // password には技術的な制限はないが、使用可能な最大文字数は定義しておく
 // ui の設定と同期させること
-const PASSWORD_MAX_LENGTH: usize = 100; // TODO BYTES じゃなくて LENGTH にする
+const PASSWORD_MAX_LENGTH: usize = 100;
 
 impl PlainPassword {
     // TODO これは validate.rs に移動するべき
