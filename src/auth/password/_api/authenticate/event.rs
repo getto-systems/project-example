@@ -5,7 +5,7 @@ use super::infra::MatchPasswordError;
 use super::data::{AuthenticatePasswordError, ConvertPasswordError, PasswordHashError};
 use crate::auth::{
     auth_ticket::_api::kernel::data::ValidateAuthNonceError,
-    auth_user::_api::kernel::data::AuthUser, login_id::_api::data::ConvertLoginIdError,
+    auth_user::_api::kernel::data::AuthUser, login_id::_api::data::ValidateLoginIdError,
 };
 use crate::z_details::_api::{message::data::MessageError, repository::data::RepositoryError};
 
@@ -17,7 +17,7 @@ pub enum AuthenticatePasswordEvent {
     PasswordHashError(PasswordHashError),
     RepositoryError(RepositoryError),
     MessageError(MessageError),
-    ConvertLoginIdError(ConvertLoginIdError),
+    ConvertLoginIdError(ValidateLoginIdError),
     ConvertPasswordError(ConvertPasswordError),
 }
 

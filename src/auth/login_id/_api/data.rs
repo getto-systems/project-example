@@ -3,20 +3,14 @@ use std::{
     fmt::{Display, Formatter},
 };
 
+use super::convert::validate_login_id;
+
 pub struct LoginId(String);
 
-// login id には技術的な制限はないが、使用可能な最大文字数は定義しておく
-// ui の設定と同期させること
-const LOGIN_ID_MAX_LENGTH: usize = 100;
-
 impl LoginId {
-    // TODO これは validate.rs に移動するべき
-    pub fn validate(login_id: String) -> Result<Self, ConvertLoginIdError> {
-        match login_id.chars().count() {
-            n if n == 0 => Err(ConvertLoginIdError::Empty),
-            n if n > LOGIN_ID_MAX_LENGTH => Err(ConvertLoginIdError::TooLong),
-            _ => Ok(Self(login_id)),
-        }
+    pub fn validate(login_id: String) -> Result<Self, ValidateLoginIdError> {
+        validate_login_id(&login_id)?;
+        Ok(Self(login_id))
     }
 
     pub fn extract(self) -> String {
@@ -29,12 +23,12 @@ impl LoginId {
 }
 
 #[derive(Debug)]
-pub enum ConvertLoginIdError {
+pub enum ValidateLoginIdError {
     Empty,
     TooLong,
 }
 
-impl Display for ConvertLoginIdError {
+impl Display for ValidateLoginIdError {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::Empty => write!(f, "empty login id"),
@@ -42,4 +36,4 @@ impl Display for ConvertLoginIdError {
         }
     }
 }
-impl Error for ConvertLoginIdError {}
+impl Error for ValidateLoginIdError {}
