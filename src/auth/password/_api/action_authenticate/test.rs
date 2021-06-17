@@ -56,18 +56,19 @@ fn success_authenticate() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::new(&store);
+    let feature = TestFeature::standard(&store);
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    assert!(action.ignite().is_ok());
+    let result = action.ignite();
     assert_state(vec![
         "authenticate success; user: test-user-id (granted: [something])",
         "issue success; ticket: ticket-id / user: test-user-id (granted: [something])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
         "encode success",
-    ])
+    ]);
+    assert!(result.is_ok());
 }
 
 #[test]
@@ -75,18 +76,19 @@ fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let feature = TestFeature::new(&store);
+    let feature = TestFeature::standard(&store);
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    assert!(action.ignite().is_ok());
+    let result = action.ignite();
     assert_state(vec![
         "authenticate success; user: test-user-id (granted: [something])",
         "issue success; ticket: ticket-id / user: test-user-id (granted: [something])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
         "encode success",
-    ])
+    ]);
+    assert!(result.is_ok());
 }
 
 #[test]
@@ -94,55 +96,149 @@ fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let feature = TestFeature::new(&store);
+    let feature = TestFeature::standard(&store);
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    assert!(!action.ignite().is_ok());
-    assert_state(vec!["authenticate error; auth nonce error: conflict"])
+    let result = action.ignite();
+    assert_state(vec!["authenticate error; auth nonce error: conflict"]);
+    assert!(!result.is_ok());
 }
 
 #[test]
-fn error_invalid_password() {
+fn error_empty_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::invalid_password();
-    let feature = TestFeature::new(&store);
+    let store = TestStore::standard();
+    let feature = TestFeature::empty_login_id(&store);
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    assert!(!action.ignite().is_ok());
-    assert_state(vec!["authenticate error; password not match"])
+    let result = action.ignite();
+    assert_state(vec!["authenticate error; empty login id"]);
+    assert!(!result.is_ok());
 }
 
 #[test]
-fn error_no_password() {
+fn error_too_long_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::no_password();
-    let feature = TestFeature::new(&store);
+    let store = TestStore::standard();
+    let feature = TestFeature::too_long_login_id(&store);
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    assert!(!action.ignite().is_ok());
-    assert_state(vec!["authenticate error; password not match"])
+    let result = action.ignite();
+    assert_state(vec!["authenticate error; too long login id"]);
+    assert!(!result.is_ok());
 }
 
 #[test]
-fn error_no_user() {
+fn just_max_length_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::no_user();
-    let feature = TestFeature::new(&store);
+    let store = TestStore::standard();
+    let feature = TestFeature::just_max_length_login_id(&store);
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    assert!(!action.ignite().is_ok());
-    assert_state(vec!["authenticate error; user not found"])
+    let result = action.ignite();
+    assert_state(vec!["authenticate error; password not match"]);
+    assert!(!result.is_ok());
+}
+
+#[test]
+fn error_empty_password() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::standard();
+    let feature = TestFeature::empty_password(&store);
+
+    let mut action = AuthenticatePasswordAction::with_material(feature);
+    action.subscribe(handler);
+
+    let result = action.ignite();
+    assert_state(vec!["authenticate error; empty password"]);
+    assert!(!result.is_ok());
+}
+
+#[test]
+fn error_too_long_password() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::standard();
+    let feature = TestFeature::too_long_password(&store);
+
+    let mut action = AuthenticatePasswordAction::with_material(feature);
+    action.subscribe(handler);
+
+    let result = action.ignite();
+    assert_state(vec!["authenticate error; too long password"]);
+    assert!(!result.is_ok());
+}
+
+#[test]
+fn just_max_length_password() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::standard();
+    let feature = TestFeature::just_max_length_password(&store);
+
+    let mut action = AuthenticatePasswordAction::with_material(feature);
+    action.subscribe(handler);
+
+    let result = action.ignite();
+    assert_state(vec!["authenticate error; password not match"]);
+    assert!(!result.is_ok());
+}
+
+#[test]
+fn error_failed_to_match_password() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::match_fail_password();
+    let feature = TestFeature::standard(&store);
+
+    let mut action = AuthenticatePasswordAction::with_material(feature);
+    action.subscribe(handler);
+
+    let result = action.ignite();
+    assert_state(vec!["authenticate error; password not match"]);
+    assert!(!result.is_ok());
+}
+
+#[test]
+fn error_password_not_stored() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::password_not_stored();
+    let feature = TestFeature::standard(&store);
+
+    let mut action = AuthenticatePasswordAction::with_material(feature);
+    action.subscribe(handler);
+
+    let result = action.ignite();
+    assert_state(vec!["authenticate error; password not match"]);
+    assert!(!result.is_ok());
+}
+
+#[test]
+fn error_user_not_stored() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::user_not_stored();
+    let feature = TestFeature::standard(&store);
+
+    let mut action = AuthenticatePasswordAction::with_material(feature);
+    action.subscribe(handler);
+
+    let result = action.ignite();
+    assert_state(vec!["authenticate error; user not found"]);
+    assert!(!result.is_ok());
 }
 
 struct TestFeature<'a> {
@@ -199,34 +295,55 @@ impl TestStore {
             user: standard_user_store(),
         }
     }
-    fn invalid_password() -> Self {
+    fn match_fail_password() -> Self {
         Self {
             nonce: standard_nonce_store(),
             ticket: standard_ticket_store(),
-            password: invalid_password_store(),
+            password: match_fail_password_store(),
             user: standard_user_store(),
         }
     }
-    fn no_password() -> Self {
+    fn password_not_stored() -> Self {
         Self {
             nonce: standard_nonce_store(),
             ticket: standard_ticket_store(),
-            password: no_password_store(),
+            password: not_stored_password_store(),
             user: standard_user_store(),
         }
     }
-    fn no_user() -> Self {
+    fn user_not_stored() -> Self {
         Self {
             nonce: standard_nonce_store(),
             ticket: standard_ticket_store(),
             password: standard_password_store(),
-            user: no_user_store(),
+            user: not_stored_user_store(),
         }
     }
 }
 
 impl<'a> TestFeature<'a> {
-    fn new(store: &'a TestStore) -> Self {
+    fn standard(store: &'a TestStore) -> Self {
+        Self::with_messenger(store, standard_messenger())
+    }
+    fn empty_login_id(store: &'a TestStore) -> Self {
+        Self::with_messenger(store, empty_login_id_messenger())
+    }
+    fn too_long_login_id(store: &'a TestStore) -> Self {
+        Self::with_messenger(store, too_long_login_id_messenger())
+    }
+    fn just_max_length_login_id(store: &'a TestStore) -> Self {
+        Self::with_messenger(store, just_max_length_login_id_messenger())
+    }
+    fn empty_password(store: &'a TestStore) -> Self {
+        Self::with_messenger(store, empty_password_messenger())
+    }
+    fn too_long_password(store: &'a TestStore) -> Self {
+        Self::with_messenger(store, too_long_password_messenger())
+    }
+    fn just_max_length_password(store: &'a TestStore) -> Self {
+        Self::with_messenger(store, just_max_length_password_messenger())
+    }
+    fn with_messenger(store: &'a TestStore, messenger: StaticAuthenticateMessenger) -> Self {
         Self {
             authenticate: StaticAuthenticatePasswordStruct::new(StaticAuthenticatePasswordParam {
                 check_nonce_infra: StaticCheckAuthNonceStruct {
@@ -238,7 +355,7 @@ impl<'a> TestFeature<'a> {
                 clock: standard_clock(),
                 password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
                 user_repository: MemoryAuthUserRepository::new(&store.user),
-                messenger: standard_messenger(),
+                messenger,
             }),
             issue: StaticIssueAuthTicketStruct {
                 config: standard_issue_config(),
@@ -260,7 +377,7 @@ impl<'a> TestFeature<'a> {
 const NONCE: &'static str = "nonce";
 const LOGIN_ID: &'static str = "login-id";
 const PASSWORD: &'static str = "password";
-const INVALID_PASSWORD: &'static str = "invalid-password";
+const ANOTHER_PASSWORD: &'static str = "another-password";
 
 fn standard_nonce_config() -> AuthNonceConfig {
     AuthNonceConfig {
@@ -297,6 +414,42 @@ fn standard_messenger() -> StaticAuthenticateMessenger {
         password: "password".into(),
     })
 }
+fn empty_login_id_messenger() -> StaticAuthenticateMessenger {
+    StaticAuthenticateMessenger::new(AuthenticatePasswordFieldsExtract {
+        login_id: "".into(),
+        password: "password".into(),
+    })
+}
+fn too_long_login_id_messenger() -> StaticAuthenticateMessenger {
+    StaticAuthenticateMessenger::new(AuthenticatePasswordFieldsExtract {
+        login_id: vec!["a"; 100 + 1].join(""),
+        password: "password".into(),
+    })
+}
+fn just_max_length_login_id_messenger() -> StaticAuthenticateMessenger {
+    StaticAuthenticateMessenger::new(AuthenticatePasswordFieldsExtract {
+        login_id: vec!["a"; 100].join(""),
+        password: "password".into(),
+    })
+}
+fn empty_password_messenger() -> StaticAuthenticateMessenger {
+    StaticAuthenticateMessenger::new(AuthenticatePasswordFieldsExtract {
+        login_id: "login-id".into(),
+        password: "".into(),
+    })
+}
+fn too_long_password_messenger() -> StaticAuthenticateMessenger {
+    StaticAuthenticateMessenger::new(AuthenticatePasswordFieldsExtract {
+        login_id: "login-id".into(),
+        password: vec!["a"; 100 + 1].join(""),
+    })
+}
+fn just_max_length_password_messenger() -> StaticAuthenticateMessenger {
+    StaticAuthenticateMessenger::new(AuthenticatePasswordFieldsExtract {
+        login_id: "login-id".into(),
+        password: vec!["a"; 100].join(""),
+    })
+}
 
 fn standard_nonce_store() -> MemoryAuthNonceStore {
     MemoryAuthNonceMap::new().to_store()
@@ -324,18 +477,18 @@ fn standard_password_store() -> MemoryAuthUserPasswordStore {
     )
     .to_store()
 }
-fn invalid_password_store() -> MemoryAuthUserPasswordStore {
-    MemoryAuthUserPasswordMap::with_password(test_user_login_id(), test_user(), invalid_password())
+fn match_fail_password_store() -> MemoryAuthUserPasswordStore {
+    MemoryAuthUserPasswordMap::with_password(test_user_login_id(), test_user(), another_password())
         .to_store()
 }
-fn no_password_store() -> MemoryAuthUserPasswordStore {
+fn not_stored_password_store() -> MemoryAuthUserPasswordStore {
     MemoryAuthUserPasswordMap::new().to_store()
 }
 
 fn standard_user_store() -> MemoryAuthUserStore {
     MemoryAuthUserMap::with_user(test_user()).to_store()
 }
-fn no_user_store() -> MemoryAuthUserStore {
+fn not_stored_user_store() -> MemoryAuthUserStore {
     MemoryAuthUserMap::new().to_store()
 }
 
@@ -354,6 +507,6 @@ fn test_user_login_id() -> LoginId {
 fn test_user_password() -> HashedPassword {
     HashedPassword::new(PASSWORD.into())
 }
-fn invalid_password() -> HashedPassword {
-    HashedPassword::new(INVALID_PASSWORD.into())
+fn another_password() -> HashedPassword {
+    HashedPassword::new(ANOTHER_PASSWORD.into())
 }
