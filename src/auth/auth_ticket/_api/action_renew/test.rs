@@ -45,12 +45,13 @@ fn success_allow_for_any_role() {
     let mut action = RenewAuthTicketAction::with_material(feature);
     action.subscribe(handler);
 
-    assert!(action.ignite().is_ok());
+    let result = action.ignite();
     assert_state(vec![
         "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
         "encode success",
-    ])
+    ]);
+    assert!(result.is_ok());
 }
 
 #[test]
@@ -63,12 +64,13 @@ fn success_allow_for_something_role() {
     let mut action = RenewAuthTicketAction::with_material(feature);
     action.subscribe(handler);
 
-    assert!(action.ignite().is_ok());
+    let result = action.ignite();
     assert_state(vec![
         "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
         "encode success",
-    ])
+    ]);
+    assert!(result.is_ok());
 }
 
 #[test]
@@ -81,10 +83,11 @@ fn error_allow_for_something_role_but_not_granted() {
     let mut action = RenewAuthTicketAction::with_material(feature);
     action.subscribe(handler);
 
-    assert!(!action.ignite().is_ok());
+    let result = action.ignite();
     assert_state(vec![
         "validate error; auth token error: user permission denied: granted: [], required: any [something]",
-    ])
+    ]);
+    assert!(!result.is_ok());
 }
 
 #[test]
@@ -97,8 +100,9 @@ fn error_token_expired() {
     let mut action = RenewAuthTicketAction::with_material(feature);
     action.subscribe(handler);
 
-    assert!(!action.ignite().is_ok());
-    assert_state(vec!["validate error; auth token error: token expired"])
+    let result = action.ignite();
+    assert_state(vec!["validate error; auth token error: token expired"]);
+    assert!(!result.is_ok());
 }
 
 #[test]
@@ -111,12 +115,13 @@ fn success_expired_nonce() {
     let mut action = RenewAuthTicketAction::with_material(feature);
     action.subscribe(handler);
 
-    assert!(action.ignite().is_ok());
+    let result = action.ignite();
     assert_state(vec![
         "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
         "encode success",
-    ])
+    ]);
+    assert!(result.is_ok());
 }
 
 #[test]
@@ -129,12 +134,13 @@ fn success_limited_ticket() {
     let mut action = RenewAuthTicketAction::with_material(feature);
     action.subscribe(handler);
 
-    assert!(action.ignite().is_ok());
+    let result = action.ignite();
     assert_state(vec![
         "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
         "token expires calculated; ticket: 2021-01-01 11:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
         "encode success",
-    ])
+    ]);
+    assert!(result.is_ok());
 }
 
 #[test]
@@ -147,8 +153,9 @@ fn error_conflict_nonce() {
     let mut action = RenewAuthTicketAction::with_material(feature);
     action.subscribe(handler);
 
-    assert!(!action.ignite().is_ok());
-    assert_state(vec!["validate error; auth nonce error: conflict"])
+    let result = action.ignite();
+    assert_state(vec!["validate error; auth nonce error: conflict"]);
+    assert!(!result.is_ok());
 }
 
 #[test]
@@ -161,11 +168,12 @@ fn error_no_ticket() {
     let mut action = RenewAuthTicketAction::with_material(feature);
     action.subscribe(handler);
 
-    assert!(!action.ignite().is_ok());
+    let result = action.ignite();
     assert_state(vec![
         "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
         "encode error; ticket data not found",
-    ])
+    ]);
+    assert!(!result.is_ok());
 }
 
 struct TestFeature<'a> {
