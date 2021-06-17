@@ -9,9 +9,9 @@ import {
 
 import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/feature"
 
-import { ClearAuthTicketRemote } from "../infra"
+import { LogoutRemote } from "../infra"
 
-export function newClearAuthTicketRemote(feature: RemoteOutsideFeature): ClearAuthTicketRemote {
+export function newLogoutRemote(feature: RemoteOutsideFeature): LogoutRemote {
     return async () => {
         try {
             const mock = true
@@ -22,8 +22,8 @@ export function newClearAuthTicketRemote(feature: RemoteOutsideFeature): ClearAu
 
             const opts = fetchOptions({
                 serverURL: env.apiServerURL,
-                path: "/auth/clear",
-                method: "POST",
+                path: "/auth/auth-ticket",
+                method: "DELETE",
                 headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
             })
             const response = await fetch(opts.url, opts.options)

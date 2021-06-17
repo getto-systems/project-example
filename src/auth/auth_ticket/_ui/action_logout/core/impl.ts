@@ -1,6 +1,6 @@
 import { ApplicationAbstractStateAction } from "../../../../../../ui/vendor/getto-application/action/impl"
-import { clearAuthTicket } from "../../clear/method"
-import { ClearAuthTicketInfra } from "../../clear/infra"
+import { logout } from "../../logout/method"
+import { LogoutInfra } from "../../logout/infra"
 
 import {
     initialLogoutCoreState,
@@ -9,9 +9,9 @@ import {
     LogoutCoreState,
 } from "./action"
 
-export function initLogoutCoreMaterial(infra: ClearAuthTicketInfra): LogoutCoreMaterial {
+export function initLogoutCoreMaterial(infra: LogoutInfra): LogoutCoreMaterial {
     return {
-        clear: clearAuthTicket(infra),
+        clear: logout(infra),
     }
 }
 

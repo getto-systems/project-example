@@ -6,7 +6,7 @@ import { initLogoutCoreAction, initLogoutCoreMaterial } from "./core/impl"
 import { initLogoutResource } from "./impl"
 
 import { AuthnRepository, AuthzRepository } from "../kernel/infra"
-import { ClearAuthTicketRemote } from "../clear/infra"
+import { LogoutRemote } from "../logout/infra"
 
 import { LogoutResource } from "./resource"
 
@@ -50,7 +50,7 @@ function initResource(authn: AuthnRepository, authz: AuthzRepository): LogoutRes
             initLogoutCoreMaterial({
                 authn,
                 authz,
-                clear: standard_clear(),
+                logout: standard_clear(),
             }),
         ),
     )
@@ -81,6 +81,6 @@ function standard_authz(): AuthzRepository {
     return repository
 }
 
-function standard_clear(): ClearAuthTicketRemote {
+function standard_clear(): LogoutRemote {
     return async () => ({ success: true, value: true })
 }

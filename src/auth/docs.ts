@@ -21,11 +21,12 @@ import { docs_authenticatePassword } from "./password/_ui/action_authenticate/do
 import { docs_loginID } from "./login_id/docs"
 import { docs_password } from "./password/docs"
 import { docs_authUser } from "./auth_user/docs"
+import { docs_logout } from "./auth_ticket/_ui/action_logout/docs"
 
 export const docs_auth = docsDomain<AuthUsecase, AuthAction, AuthData>(
     "認証・認可",
     ["業務で必要な時に使用できる", "業務内容をプライベートに保つ"],
-    ["checkAuthTicket", "authenticatePassword"],
+    ["checkAuthTicket", "authenticatePassword", "logout"],
     (name) => usecase[name],
 )
 
@@ -43,11 +44,17 @@ const usecase = {
             data: ["authUser", "authTicket", "loginID", "password"],
         },
     ),
+    logout: docsAuthUsecase(
+        "logout",
+        ["業務内容をプライベートに保つ"],
+        { action: ["logout"], data: ["authUser", "authTicket"] },
+    ),
 } as const
 
 const action = {
     checkAuthTicket: docs_checkAuthTicket,
     authenticatePassword: docs_authenticatePassword,
+    logout: docs_logout,
     loadApplication: docsAction("アプリケーションのロード", ({ item }) => [
         item("input", ["コンテンツアクセストークン"], ["ブラウザに保存されたデータ"]),
         item("check", ["コンテンツアクセストークンが有効"], ["CDN によって判定"]),
