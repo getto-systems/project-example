@@ -1,5 +1,5 @@
 pub mod messenger;
-pub mod password_hash;
+pub mod password_matcher;
 pub mod password_repository;
 
 use crate::auth::{
@@ -7,7 +7,7 @@ use crate::auth::{
     auth_user::_api::kernel::infra::AuthUserRepository,
 };
 
-use super::data::{ConvertPasswordError, PasswordHashError};
+use super::data::{ConvertPasswordError, PasswordMatchError};
 use crate::auth::auth_user::_api::kernel::data::AuthUserId;
 use crate::auth::login_id::_api::data::LoginId;
 use crate::z_details::_api::{message::data::MessageError, repository::data::RepositoryError};
@@ -15,37 +15,36 @@ use crate::z_details::_api::{message::data::MessageError, repository::data::Repo
 pub trait AuthenticatePasswordInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
     type Clock: AuthClock;
-    type PasswordHash: AuthUserPasswordHash;
+    type PasswordMatcher: AuthUserPasswordMatcher;
     type PasswordRepository: AuthUserPasswordRepository;
     type UserRepository: AuthUserRepository;
     type Messenger: AuthenticateMessenger;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
     fn clock(&self) -> &Self::Clock;
-    fn password_hash(&self) -> &Self::PasswordHash;
+    fn password_matcher(&self, plain_password: PlainPassword) -> Self::PasswordMatcher {
+        Self::PasswordMatcher::new(plain_password)
+    }
     fn password_repository(&self) -> &Self::PasswordRepository;
     fn user_repository(&self) -> &Self::UserRepository;
     fn messenger(&self) -> &Self::Messenger;
 }
 
-pub trait AuthUserPasswordHash {
-    fn verify(
-        &self,
-        plain_password: &PlainPassword,
-        hashed_password: &HashedPassword,
-    ) -> Result<bool, PasswordHashError>;
-}
-
 pub trait AuthUserPasswordRepository {
-    fn match_password(
+    fn verify_password(
         &self,
         login_id: &LoginId,
-        matcher: impl Fn(&HashedPassword) -> Result<bool, PasswordHashError>,
-    ) -> Result<Option<AuthUserId>, MatchPasswordError>;
+        matcher: impl AuthUserPasswordMatcher,
+    ) -> Result<Option<AuthUserId>, VerifyPasswordError>;
 }
 
-pub enum MatchPasswordError {
-    PasswordHashError(PasswordHashError),
+pub trait AuthUserPasswordMatcher {
+    fn new(plain_password: PlainPassword) -> Self;
+    fn match_password(&self, password: &HashedPassword) -> Result<bool, PasswordMatchError>;
+}
+
+pub enum VerifyPasswordError {
+    PasswordMatchError(PasswordMatchError),
     RepositoryError(RepositoryError),
 }
 

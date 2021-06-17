@@ -1,6 +1,6 @@
 use actix_web::{HttpRequest, HttpResponse};
 
-use crate::auth::password::_api::authenticate::data::{AuthenticatePasswordError, PasswordHashError};
+use crate::auth::password::_api::authenticate::data::{AuthenticatePasswordError, PasswordMatchError};
 
 use super::super::event::AuthenticatePasswordEvent;
 
@@ -28,7 +28,7 @@ impl AuthenticatePasswordError {
     }
 }
 
-impl PasswordHashError {
+impl PasswordMatchError {
     pub fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
         match self {
             Self::InfraError(_) => HttpResponse::InternalServerError().finish()

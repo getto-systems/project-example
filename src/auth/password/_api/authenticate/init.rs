@@ -6,7 +6,7 @@ use crate::auth::{
 };
 
 use super::infra::{
-    messenger::ProtobufAuthenticateMessenger, password_hash::Argon2PasswordHash,
+    messenger::ProtobufAuthenticateMessenger, password_matcher::Argon2PasswordMatcher,
     password_repository::MemoryAuthUserPasswordRepository, AuthenticatePasswordInfra,
 };
 use crate::auth::{
@@ -17,7 +17,6 @@ use crate::auth::{
 pub struct AuthenticatePasswordStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
     clock: ChronoAuthClock,
-    password_hash: Argon2PasswordHash,
     password_repository: MemoryAuthUserPasswordRepository<'a>,
     user_repository: MemoryAuthUserRepository<'a>,
     messenger: ProtobufAuthenticateMessenger,
@@ -28,7 +27,6 @@ impl<'a> AuthenticatePasswordStruct<'a> {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, request),
             clock: ChronoAuthClock::new(),
-            password_hash: Argon2PasswordHash::new(),
             password_repository: MemoryAuthUserPasswordRepository::new(
                 &feature.store.user_password,
             ),
@@ -41,7 +39,7 @@ impl<'a> AuthenticatePasswordStruct<'a> {
 impl<'a> AuthenticatePasswordInfra for AuthenticatePasswordStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
     type Clock = ChronoAuthClock;
-    type PasswordHash = Argon2PasswordHash;
+    type PasswordMatcher = Argon2PasswordMatcher;
     type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
     type UserRepository = MemoryAuthUserRepository<'a>;
     type Messenger = ProtobufAuthenticateMessenger;
@@ -51,9 +49,6 @@ impl<'a> AuthenticatePasswordInfra for AuthenticatePasswordStruct<'a> {
     }
     fn clock(&self) -> &Self::Clock {
         &self.clock
-    }
-    fn password_hash(&self) -> &Self::PasswordHash {
-        &self.password_hash
     }
     fn password_repository(&self) -> &Self::PasswordRepository {
         &self.password_repository
@@ -71,7 +66,7 @@ pub mod test {
     use crate::auth::auth_ticket::_api::kernel::init::test::StaticCheckAuthNonceStruct;
 
     use super::super::infra::{
-        messenger::test::StaticAuthenticateMessenger, password_hash::test::PlainPasswordHash,
+        messenger::test::StaticAuthenticateMessenger, password_matcher::test::PlainPasswordMatcher,
         password_repository::MemoryAuthUserPasswordRepository, AuthenticatePasswordInfra,
     };
     use crate::auth::{
@@ -82,7 +77,6 @@ pub mod test {
     pub struct StaticAuthenticatePasswordStruct<'a> {
         check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
         clock: StaticChronoAuthClock,
-        password_hash: PlainPasswordHash,
         password_repository: MemoryAuthUserPasswordRepository<'a>,
         user_repository: MemoryAuthUserRepository<'a>,
         messenger: StaticAuthenticateMessenger,
@@ -101,7 +95,6 @@ pub mod test {
             Self {
                 check_nonce_infra: param.check_nonce_infra,
                 clock: param.clock,
-                password_hash: PlainPasswordHash::new(),
                 password_repository: param.password_repository,
                 user_repository: param.user_repository,
                 messenger: param.messenger,
@@ -112,7 +105,7 @@ pub mod test {
     impl<'a> AuthenticatePasswordInfra for StaticAuthenticatePasswordStruct<'a> {
         type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
         type Clock = StaticChronoAuthClock;
-        type PasswordHash = PlainPasswordHash;
+        type PasswordMatcher = PlainPasswordMatcher;
         type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
         type UserRepository = MemoryAuthUserRepository<'a>;
         type Messenger = StaticAuthenticateMessenger;
@@ -122,9 +115,6 @@ pub mod test {
         }
         fn clock(&self) -> &Self::Clock {
             &self.clock
-        }
-        fn password_hash(&self) -> &Self::PasswordHash {
-            &self.password_hash
         }
         fn password_repository(&self) -> &Self::PasswordRepository {
             &self.password_repository
