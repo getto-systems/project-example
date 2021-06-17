@@ -1,11 +1,10 @@
 use std::{collections::HashMap, sync::Mutex};
 
-use super::{AuthUserPasswordRepository, HashedPassword, MatchPasswordError};
+use super::{AuthUserPasswordMatcher, AuthUserPasswordRepository, HashedPassword, VerifyPasswordError};
 
 use crate::auth::{
     auth_user::_api::kernel::data::{AuthUser, AuthUserId},
     login_id::_api::data::LoginId,
-    password::_api::authenticate::data::PasswordHashError,
 };
 
 pub type MemoryAuthUserPasswordStore = Mutex<MemoryAuthUserPasswordMap>;
@@ -47,16 +46,16 @@ impl<'a> MemoryAuthUserPasswordRepository<'a> {
 }
 
 impl<'a> AuthUserPasswordRepository for MemoryAuthUserPasswordRepository<'a> {
-    fn match_password(
+    fn verify_password(
         &self,
         login_id: &LoginId,
-        matcher: impl Fn(&HashedPassword) -> Result<bool, PasswordHashError>,
-    ) -> Result<Option<AuthUserId>, MatchPasswordError> {
+        matcher: impl AuthUserPasswordMatcher,
+    ) -> Result<Option<AuthUserId>, VerifyPasswordError> {
         let store = self.store.lock().unwrap();
         Ok(match store.get(login_id.as_str()) {
             None => None,
             Some(Entry(user_id, password)) => {
-                if matcher(password).map_err(MatchPasswordError::PasswordHashError)? {
+                if matcher.match_password(password).map_err(VerifyPasswordError::PasswordMatchError)? {
                     Some(user_id.clone())
                 } else {
                     None

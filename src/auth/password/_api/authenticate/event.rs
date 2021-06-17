@@ -1,8 +1,8 @@
 use std::fmt::Display;
 
-use super::infra::MatchPasswordError;
+use super::infra::VerifyPasswordError;
 
-use super::data::{AuthenticatePasswordError, ConvertPasswordError, PasswordHashError};
+use super::data::{AuthenticatePasswordError, ConvertPasswordError, PasswordMatchError};
 use crate::auth::{
     auth_ticket::_api::kernel::data::ValidateAuthNonceError,
     auth_user::_api::kernel::data::AuthUser, login_id::_api::data::ValidateLoginIdError,
@@ -14,7 +14,7 @@ pub enum AuthenticatePasswordEvent {
     UserNotFound,
     InvalidPassword(AuthenticatePasswordError),
     NonceError(ValidateAuthNonceError),
-    PasswordHashError(PasswordHashError),
+    PasswordHashError(PasswordMatchError),
     RepositoryError(RepositoryError),
     MessageError(MessageError),
     ConvertLoginIdError(ValidateLoginIdError),
@@ -40,11 +40,11 @@ impl Display for AuthenticatePasswordEvent {
     }
 }
 
-impl From<MatchPasswordError> for AuthenticatePasswordEvent {
-    fn from(err: MatchPasswordError) -> Self {
+impl From<VerifyPasswordError> for AuthenticatePasswordEvent {
+    fn from(err: VerifyPasswordError) -> Self {
         match err {
-            MatchPasswordError::PasswordHashError(err) => Self::PasswordHashError(err),
-            MatchPasswordError::RepositoryError(err) => Self::RepositoryError(err),
+            VerifyPasswordError::PasswordMatchError(err) => Self::PasswordHashError(err),
+            VerifyPasswordError::RepositoryError(err) => Self::RepositoryError(err),
         }
     }
 }

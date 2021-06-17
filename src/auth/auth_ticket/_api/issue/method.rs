@@ -1,8 +1,5 @@
+use super::super::kernel::infra::{AuthClock, AuthTicketRepository};
 use super::infra::IssueAuthTicketInfra;
-use super::{
-    super::kernel::infra::{AuthClock, AuthTicketRepository},
-    infra::AuthTicketIdGenerator,
-};
 
 use super::event::IssueAuthTicketEvent;
 
@@ -21,7 +18,7 @@ pub fn issue_auth_ticket<S>(
 
     let id = ticket_repository
         .register(
-            || ticket_id_generator.generate(),
+            ticket_id_generator,
             clock.now(),
             clock.now().limit(&config.ticket_expansion_limit),
         )

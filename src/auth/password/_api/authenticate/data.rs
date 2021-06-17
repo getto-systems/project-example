@@ -26,20 +26,20 @@ impl Display for ConvertPasswordError {
 impl Error for ConvertPasswordError {}
 
 #[derive(Debug)]
-pub enum PasswordHashError {
+pub enum PasswordMatchError {
     InfraError(String),
 }
 
-impl Display for PasswordHashError {
+impl Display for PasswordMatchError {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::InfraError(err) => write!(f, "password hash error: {}", err),
         }
     }
 }
-impl Error for PasswordHashError {}
+impl Error for PasswordMatchError {}
 
-impl Into<RepositoryError> for PasswordHashError {
+impl Into<RepositoryError> for PasswordMatchError {
     fn into(self) -> RepositoryError {
         match self {
             Self::InfraError(err) => RepositoryError::InfraError(err),

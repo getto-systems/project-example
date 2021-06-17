@@ -1,10 +1,7 @@
 use crate::auth::auth_ticket::_api::kernel::method::check_nonce;
 
 use super::infra::PlainPassword;
-use super::infra::{
-    AuthUserPasswordHash, AuthUserPasswordRepository, AuthenticateMessenger,
-    AuthenticatePasswordInfra,
-};
+use super::infra::{AuthUserPasswordRepository, AuthenticateMessenger, AuthenticatePasswordInfra};
 use crate::auth::auth_user::_api::kernel::infra::AuthUserRepository;
 
 use super::event::AuthenticatePasswordEvent;
@@ -19,7 +16,6 @@ pub fn authenticate_password<S>(
     check_nonce(infra.check_nonce_infra())
         .map_err(|err| post(AuthenticatePasswordEvent::NonceError(err)))?;
 
-    let password_hash = infra.password_hash();
     let password_repository = infra.password_repository();
     let messenger = infra.messenger();
 
@@ -34,11 +30,7 @@ pub fn authenticate_password<S>(
         .map_err(|err| post(AuthenticatePasswordEvent::ConvertPasswordError(err)))?;
 
     let user_id = password_repository
-        .match_password(&login_id, |hashed_password| {
-            password_hash
-                .verify(&plain_password, hashed_password)
-                .map_err(|err| err.into())
-        })
+        .verify_password(&login_id, infra.password_matcher(plain_password))
         .map_err(|err| post(err.into()))?;
 
     match user_id {

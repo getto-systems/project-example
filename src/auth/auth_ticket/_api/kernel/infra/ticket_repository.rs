@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::Mutex};
 
-use super::{AuthTicketRepository, AuthTicketTokens};
+use super::{AuthTicketIdGenerator, AuthTicketRepository, AuthTicketTokens};
 
 use super::super::data::{
     AuthDateTime, AuthTicket, AuthTicketId, AuthToken, ExpansionLimitDateTime,
@@ -55,7 +55,7 @@ const REGISTER_TRY_LIMIT: u8 = 10;
 impl<'a> AuthTicketRepository for MemoryAuthTicketRepository<'a> {
     fn register(
         &self,
-        id_generator: impl Fn() -> AuthTicketId,
+        id_generator: &impl AuthTicketIdGenerator,
         _registered_at: AuthDateTime,
         limit: ExpansionLimitDateTime,
     ) -> Result<AuthTicketId, RepositoryError> {
@@ -63,7 +63,7 @@ impl<'a> AuthTicketRepository for MemoryAuthTicketRepository<'a> {
         let mut count = 0;
 
         loop {
-            let id = id_generator();
+            let id = id_generator.generate();
 
             if store.ticket.get(id.as_str()).is_some() {
                 count += 1;

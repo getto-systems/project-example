@@ -1,8 +1,8 @@
 pub mod id_generator;
 
-use super::super::kernel::infra::{AuthClock, AuthTicketRepository};
+use super::super::kernel::infra::{AuthClock, AuthTicketIdGenerator, AuthTicketRepository};
 
-use crate::auth::auth_ticket::_api::kernel::data::{AuthTicketId, ExpansionLimitDuration};
+use crate::auth::auth_ticket::_api::kernel::data::ExpansionLimitDuration;
 
 pub trait IssueAuthTicketInfra {
     type Clock: AuthClock;
@@ -17,8 +17,4 @@ pub trait IssueAuthTicketInfra {
 
 pub struct IssueAuthTicketConfig {
     pub ticket_expansion_limit: ExpansionLimitDuration,
-}
-
-pub trait AuthTicketIdGenerator {
-    fn generate(&self) -> AuthTicketId;
 }
