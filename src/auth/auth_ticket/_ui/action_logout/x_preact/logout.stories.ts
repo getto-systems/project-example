@@ -40,7 +40,7 @@ const template = storyTemplate<Props>((props) => {
 
             case "failed":
                 return {
-                    type: "failed-to-logout",
+                    type: "repository-error",
                     err: { type: "infra-error", err: props.err },
                 }
         }

@@ -12,7 +12,7 @@ import { v_small } from "../../../../../../ui/vendor/getto-css/preact/design/ali
 import { LogoutResource, LogoutResourceState } from "../resource"
 
 import { RepositoryError } from "../../../../../z_details/_ui/repository/data"
-import { ClearAuthTicketError } from "../../clear/data"
+import { LogoutError } from "../../logout/data"
 import { remoteCommonErrorReason } from "../../../../../z_details/_ui/remote/helper"
 
 export function LogoutEntry(resource: LogoutResource): VNode {
@@ -38,10 +38,10 @@ export function LogoutComponent(props: Props): VNode {
         case "succeed-to-logout":
             return logoutBox({ success: true })
 
-        case "failed-to-logout":
+        case "repository-error":
             return logoutBox({ success: false, err: { type: "repository", err: props.state.err } })
 
-        case "failed-to-clear":
+        case "failed-to-logout":
             return logoutBox({ success: false, err: { type: "remote", err: props.state.err } })
     }
 
@@ -51,7 +51,7 @@ export function LogoutComponent(props: Props): VNode {
         | Readonly<{ success: false; err: LogoutBoxError }>
     type LogoutBoxError =
         | Readonly<{ type: "repository"; err: RepositoryError }>
-        | Readonly<{ type: "remote"; err: ClearAuthTicketError }>
+        | Readonly<{ type: "remote"; err: LogoutError }>
 
     function logoutBox(content: LogoutBoxContent): VNode {
         return box({
@@ -93,7 +93,7 @@ export function LogoutComponent(props: Props): VNode {
                     return html`<p>${message}</p>`
                 }
             }
-            function remoteError(err: ClearAuthTicketError): string[] {
+            function remoteError(err: LogoutError): string[] {
                 return remoteCommonErrorReason(err, (reason) => [
                     `${reason.message}によりログアウトに失敗しました`,
                     ...reason.detail,

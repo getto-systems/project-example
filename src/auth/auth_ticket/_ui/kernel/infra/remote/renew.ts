@@ -33,8 +33,8 @@ export function newRenewAuthTicketRemote(
 
             const opts = fetchOptions({
                 serverURL: env.apiServerURL,
-                path: "/auth/auth-ticket/renew",
-                method: "POST",
+                path: "/auth/auth-ticket",
+                method: "PATCH",
                 headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
             })
             const response = await fetch(opts.url, opts.options)

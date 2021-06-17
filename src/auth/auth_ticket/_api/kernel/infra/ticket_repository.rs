@@ -1,23 +1,19 @@
 use std::{collections::HashMap, sync::Mutex};
 
-use super::{AuthTicketIdGenerator, AuthTicketRepository, AuthTicketTokens};
+use super::{AuthTicketIdGenerator, AuthTicketRepository};
 
-use super::super::data::{
-    AuthDateTime, AuthTicket, AuthTicketId, AuthToken, ExpansionLimitDateTime,
-};
+use super::super::data::{AuthDateTime, AuthTicket, AuthTicketId, ExpansionLimitDateTime};
 use crate::z_details::_api::repository::data::RepositoryError;
 
 pub type MemoryAuthTicketStore = Mutex<MemoryAuthTicketMap>;
 pub struct MemoryAuthTicketMap {
     ticket: HashMap<String, Entry>,
-    tokens: HashMap<String, Vec<AuthToken>>,
 }
 
 impl MemoryAuthTicketMap {
     pub fn new() -> Self {
         Self {
             ticket: HashMap::new(),
-            tokens: HashMap::new(),
         }
     }
 
@@ -25,10 +21,7 @@ impl MemoryAuthTicketMap {
         let mut ticket = HashMap::new();
         ticket.insert(ticket_id, Entry { limit });
 
-        Self {
-            ticket,
-            tokens: HashMap::new(),
-        }
+        Self { ticket }
     }
 
     pub fn to_store(self) -> MemoryAuthTicketStore {
@@ -82,19 +75,21 @@ impl<'a> AuthTicketRepository for MemoryAuthTicketRepository<'a> {
             return Ok(id);
         }
     }
-    fn register_tokens(
+
+    fn discard(
         &self,
-        ticket: AuthTicket,
-        tokens: AuthTicketTokens,
+        auth_ticket: AuthTicket,
+        _discard_at: AuthDateTime,
     ) -> Result<(), RepositoryError> {
         let mut store = self.store.lock().unwrap();
 
-        store
-            .tokens
-            .insert(ticket.into_id().as_str().into(), tokens.extract());
+        store.ticket.remove(auth_ticket.id_as_str());
 
-        Ok(())
+        // 実際のデータベースには discard_at も保存する必要がある
+
+        return Ok(());
     }
+
     fn expansion_limit(
         &self,
         ticket: &AuthTicket,

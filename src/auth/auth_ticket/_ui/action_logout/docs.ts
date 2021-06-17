@@ -1,4 +1,5 @@
 import {
+    docsAction,
     docsAction_legacy,
     docsModule,
     docsNote,
@@ -10,6 +11,22 @@ import { DocsSection } from "../../../../../ui/vendor/getto-application/docs/dat
 export const docs_auth_logout: DocsSection[] = [
     docsSection("ログアウト", [docsModule(["認証チケットの無効化"])]),
 ]
+
+export const docs_logout = docsAction("ログアウト", ({ item }) => [
+    item(
+        "input",
+        ["認証チケット延長トークン"],
+        ["ブラウザに保存されたデータ"],
+    ),
+    item("check", ["認証チケットが有効", "認証チケット延長トークンが有効"]),
+    item(
+        "success",
+        ["ログアウト", "認証チケットの破棄"],
+        ["ログイン画面へ"],
+    ),
+    item("error", ["認証チケット有効期限切れ"], ["ログイン画面へ"]),
+    item("error", ["認証チケット延長トークン無効"], ["ログイン画面へ"]),
+])
 
 export const docs_auth_logout_description: DocsSection[] = [
     ...docs_auth_logout,
