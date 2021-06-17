@@ -14,7 +14,7 @@ import { LogoutRemote } from "../infra"
 export function newLogoutRemote(feature: RemoteOutsideFeature): LogoutRemote {
     return async () => {
         try {
-            const mock = true
+            const mock = false
             if (mock) {
                 // TODO api の実装が終わったらつなぐ
                 return { success: true, value: true }

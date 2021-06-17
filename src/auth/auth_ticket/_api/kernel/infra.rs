@@ -8,7 +8,7 @@ use std::collections::HashSet;
 use serde::{Deserialize, Serialize};
 
 use super::data::{
-    AuthDateTime, AuthNonceValue, AuthTicket, AuthTicketExtract, AuthTicketId, AuthToken,
+    AuthDateTime, AuthNonceValue, AuthTicket, AuthTicketExtract, AuthTicketId,
     ExpansionLimitDateTime, ExpireDateTime, ExpireDuration,
 };
 use crate::z_details::_api::{repository::data::RepositoryError, request::data::HeaderError};
@@ -44,10 +44,10 @@ pub trait AuthTicketRepository {
         limit: ExpansionLimitDateTime,
     ) -> Result<AuthTicketId, RepositoryError>;
 
-    fn register_tokens(
+    fn discard(
         &self,
-        ticket: AuthTicket,
-        tokens: AuthTicketTokens,
+        auth_ticket: AuthTicket,
+        discard_at: AuthDateTime,
     ) -> Result<(), RepositoryError>;
 
     fn expansion_limit(
@@ -58,18 +58,6 @@ pub trait AuthTicketRepository {
 
 pub trait AuthTicketIdGenerator {
     fn generate(&self) -> AuthTicketId;
-}
-
-pub struct AuthTicketTokens(Vec<AuthToken>);
-
-impl AuthTicketTokens {
-    pub const fn new(tokens: Vec<AuthToken>) -> Self {
-        Self(tokens)
-    }
-
-    pub fn extract(self) -> Vec<AuthToken> {
-        self.0
-    }
 }
 
 pub trait AuthNonceRepository {
