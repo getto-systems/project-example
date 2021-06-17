@@ -39,7 +39,7 @@ pub trait AuthNonceHeader {
 pub trait AuthTicketRepository {
     fn register(
         &self,
-        id_generator: impl Fn() -> AuthTicketId,
+        id_generator: &impl AuthTicketIdGenerator,
         registered_at: AuthDateTime,
         limit: ExpansionLimitDateTime,
     ) -> Result<AuthTicketId, RepositoryError>;
@@ -54,6 +54,10 @@ pub trait AuthTicketRepository {
         &self,
         ticket: &AuthTicket,
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError>;
+}
+
+pub trait AuthTicketIdGenerator {
+    fn generate(&self) -> AuthTicketId;
 }
 
 pub struct AuthTicketTokens(Vec<AuthToken>);
