@@ -5,29 +5,25 @@ use std::{
 
 #[derive(Clone)]
 pub struct AuthUser {
-    id: AuthUserId,
+    user_id: AuthUserId,
     granted_roles: GrantedAuthRoles,
 }
 
 impl AuthUser {
-    pub fn from_extract(user: AuthUserExtract) -> Self {
-        Self {
-            id: AuthUserId::new(user.id),
-            granted_roles: GrantedAuthRoles::from_extract(user.granted_roles),
-        }
+    pub fn user_id_as_str(&self) -> &str {
+        self.user_id.0.as_str()
     }
 
-    pub fn id_as_str(&self) -> &str {
-        self.id.0.as_str()
+    pub fn into_user_id(self) -> AuthUserId {
+        self.user_id
     }
-
     pub fn into_granted_roles(self) -> GrantedAuthRoles {
         self.granted_roles
     }
 
     pub fn extract(self) -> AuthUserExtract {
         AuthUserExtract {
-            id: self.id.0,
+            user_id: self.user_id.0,
             granted_roles: self.granted_roles.0 .0,
         }
     }
@@ -39,21 +35,34 @@ impl AuthUser {
 
 impl Display for AuthUser {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "{} ({})", self.id, self.granted_roles)
+        write!(f, "{} ({})", self.user_id, self.granted_roles)
     }
 }
 
 pub struct AuthUserExtract {
-    pub id: String,
+    pub user_id: String,
     pub granted_roles: HashSet<String>,
+}
+
+impl Into<AuthUser> for AuthUserExtract {
+    fn into(self) -> AuthUser {
+        AuthUser {
+            user_id: AuthUserId::new(self.user_id),
+            granted_roles: self.granted_roles.into(),
+        }
+    }
 }
 
 #[derive(Clone)]
 pub struct AuthUserId(String);
 
 impl AuthUserId {
-    pub fn new(id: String) -> Self {
-        Self(id)
+    pub fn new(user_id: String) -> Self {
+        Self(user_id)
+    }
+
+    pub fn extract(self) -> String {
+        self.0
     }
 
     pub fn as_str(&self) -> &str {
@@ -71,10 +80,6 @@ impl Display for AuthUserId {
 pub struct GrantedAuthRoles(AuthRoles);
 
 impl GrantedAuthRoles {
-    fn from_extract(roles: HashSet<String>) -> Self {
-        Self(AuthRoles(roles))
-    }
-
     pub fn has_enough_permission(&self, require_roles: &RequireAuthRoles) -> bool {
         match require_roles {
             RequireAuthRoles::Nothing => true,
@@ -84,6 +89,12 @@ impl GrantedAuthRoles {
 
     pub fn extract(self) -> HashSet<String> {
         self.0 .0
+    }
+}
+
+impl Into<GrantedAuthRoles> for HashSet<String> {
+    fn into(self) -> GrantedAuthRoles {
+        GrantedAuthRoles(AuthRoles(self))
     }
 }
 

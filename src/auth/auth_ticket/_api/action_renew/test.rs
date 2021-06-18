@@ -5,13 +5,16 @@ use getto_application_test::ActionTestRunner;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::auth_ticket::_api::{
-    encode::init::test::{StaticEncodeAuthTicketParam, StaticEncodeAuthTicketStruct},
+    encode::init::test::StaticEncodeAuthTicketStruct,
     kernel::init::test::StaticCheckAuthNonceStruct,
     validate::init::test::StaticValidateAuthTokenStruct,
 };
 
 use crate::auth::auth_ticket::_api::{
-    encode::infra::EncodeAuthTicketConfig,
+    encode::infra::{
+        messenger::test::StaticEncodeMessenger, token_encoder::test::StaticAuthTokenEncoder,
+        EncodeAuthTicketConfig,
+    },
     kernel::infra::{
         clock::test::StaticChronoAuthClock,
         nonce_header::test::StaticAuthNonceHeader,
@@ -30,7 +33,7 @@ use crate::auth::auth_ticket::_api::{
 use super::action::{RenewAuthTicketAction, RenewAuthTicketMaterial};
 
 use crate::auth::auth_ticket::_api::kernel::data::{
-    AuthDateTime, AuthNonceValue, AuthTicket, AuthTicketExtract, AuthTokenValue,
+    AuthDateTime, AuthNonceValue, AuthTicketExtract, AuthTicketId, AuthTokenValue,
     ExpansionLimitDuration, ExpireDuration,
 };
 use crate::auth::auth_user::_api::kernel::data::RequireAuthRoles;
@@ -280,11 +283,15 @@ impl<'a> TestFeature<'a> {
                 ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
                 token_validator,
             },
-            encode: StaticEncodeAuthTicketStruct::new(StaticEncodeAuthTicketParam {
+            encode: StaticEncodeAuthTicketStruct {
                 config: standard_encode_config(),
                 clock: standard_clock(),
                 ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
-            }),
+                ticket_encoder: StaticAuthTokenEncoder::new(),
+                api_encoder: StaticAuthTokenEncoder::new(),
+                cdn_encoder: StaticAuthTokenEncoder::new(),
+                messenger: StaticEncodeMessenger::new(),
+            },
         }
     }
 }
@@ -323,18 +330,24 @@ fn standard_token_validator() -> StaticAuthTokenValidator {
     let mut granted_roles = HashSet::new();
     granted_roles.insert("something".into());
 
-    StaticAuthTokenValidator::Valid(AuthTicket::from_extract(AuthTicketExtract {
-        auth_ticket_id: TICKET_ID.into(),
-        user_id: "something-role-user-id".into(),
-        granted_roles,
-    }))
+    StaticAuthTokenValidator::Valid(
+        AuthTicketExtract {
+            ticket_id: TICKET_ID.into(),
+            user_id: "something-role-user-id".into(),
+            granted_roles,
+        }
+        .into(),
+    )
 }
 fn no_granted_roles_token_validator() -> StaticAuthTokenValidator {
-    StaticAuthTokenValidator::Valid(AuthTicket::from_extract(AuthTicketExtract {
-        auth_ticket_id: TICKET_ID.into(),
-        user_id: "no-role-user-id".into(),
-        granted_roles: HashSet::new(),
-    }))
+    StaticAuthTokenValidator::Valid(
+        AuthTicketExtract {
+            ticket_id: TICKET_ID.into(),
+            user_id: "no-role-user-id".into(),
+            granted_roles: HashSet::new(),
+        }
+        .into(),
+    )
 }
 fn expired_token_validator() -> StaticAuthTokenValidator {
     StaticAuthTokenValidator::Expired
@@ -357,12 +370,12 @@ fn conflict_nonce_store() -> MemoryAuthNonceStore {
 fn standard_ticket_store() -> MemoryAuthTicketStore {
     let limit = AuthDateTime::from_now(standard_now())
         .limit(&ExpansionLimitDuration::with_duration(Duration::days(10)));
-    MemoryAuthTicketMap::with_ticket(TICKET_ID.into(), limit).to_store()
+    MemoryAuthTicketMap::with_ticket(AuthTicketId::new(TICKET_ID.into()), limit).to_store()
 }
 fn limited_ticket_store() -> MemoryAuthTicketStore {
     let limit = AuthDateTime::from_now(standard_now())
         .limit(&ExpansionLimitDuration::with_duration(Duration::hours(1)));
-    MemoryAuthTicketMap::with_ticket(TICKET_ID.into(), limit).to_store()
+    MemoryAuthTicketMap::with_ticket(AuthTicketId::new(TICKET_ID.into()), limit).to_store()
 }
 fn no_ticket_store() -> MemoryAuthTicketStore {
     MemoryAuthTicketMap::new().to_store()

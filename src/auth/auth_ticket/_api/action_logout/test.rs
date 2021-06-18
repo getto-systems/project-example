@@ -29,7 +29,7 @@ use crate::auth::auth_ticket::_api::{
 use super::action::{LogoutAction, LogoutMaterial};
 
 use crate::auth::auth_ticket::_api::kernel::data::{
-    AuthDateTime, AuthNonceValue, AuthTicket, AuthTicketExtract, AuthTokenValue,
+    AuthDateTime, AuthNonceValue, AuthTicketExtract, AuthTicketId, AuthTokenValue,
     ExpansionLimitDuration, ExpireDuration,
 };
 use crate::auth::auth_user::_api::kernel::data::RequireAuthRoles;
@@ -186,13 +186,15 @@ impl<'a> TestFeature<'a> {
                     nonce_header: standard_nonce_header(),
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
-                config: ValidateAuthTokenConfig { require_roles: RequireAuthRoles::Nothing },
+                config: ValidateAuthTokenConfig {
+                    require_roles: RequireAuthRoles::Nothing,
+                },
                 clock: standard_clock(),
                 token_header: standard_token_header(),
                 ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
                 token_validator: standard_token_validator(),
             },
-            discard: StaticDiscardAuthTicketStruct{
+            discard: StaticDiscardAuthTicketStruct {
                 clock: standard_clock(),
                 ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
             },
@@ -224,11 +226,14 @@ fn standard_token_header() -> StaticAuthTokenHeader {
 }
 
 fn standard_token_validator() -> StaticAuthTokenValidator {
-    StaticAuthTokenValidator::Valid(AuthTicket::from_extract(AuthTicketExtract {
-        auth_ticket_id: TICKET_ID.into(),
-        user_id: "user-id".into(),
-        granted_roles: HashSet::new(),
-    }))
+    StaticAuthTokenValidator::Valid(
+        AuthTicketExtract {
+            ticket_id: TICKET_ID.into(),
+            user_id: "user-id".into(),
+            granted_roles: HashSet::new(),
+        }
+        .into(),
+    )
 }
 
 fn standard_nonce_store() -> MemoryAuthNonceStore {
@@ -248,12 +253,12 @@ fn conflict_nonce_store() -> MemoryAuthNonceStore {
 fn standard_ticket_store() -> MemoryAuthTicketStore {
     let limit = AuthDateTime::from_now(standard_now())
         .limit(&ExpansionLimitDuration::with_duration(Duration::days(10)));
-    MemoryAuthTicketMap::with_ticket(TICKET_ID.into(), limit).to_store()
+    MemoryAuthTicketMap::with_ticket(AuthTicketId::new(TICKET_ID.into()), limit).to_store()
 }
 fn limited_ticket_store() -> MemoryAuthTicketStore {
     let limit = AuthDateTime::from_now(standard_now())
         .limit(&ExpansionLimitDuration::with_duration(Duration::hours(1)));
-    MemoryAuthTicketMap::with_ticket(TICKET_ID.into(), limit).to_store()
+    MemoryAuthTicketMap::with_ticket(AuthTicketId::new(TICKET_ID.into()), limit).to_store()
 }
 fn no_ticket_store() -> MemoryAuthTicketStore {
     MemoryAuthTicketMap::new().to_store()

@@ -187,6 +187,7 @@ impl Display for LogEntry {
 #[derive(Clone, Serialize)]
 struct RequestEntry {
     id: String,
+    // TODO remote addr と host はこの時点では意味ないからなくす; cloud run のログとかで確認できる
     remote_addr: Option<String>,
     host: String,
     path: String,
