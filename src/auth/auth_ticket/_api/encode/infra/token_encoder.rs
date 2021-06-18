@@ -11,7 +11,7 @@ use super::super::super::kernel::x_actix_web::header::{
 
 use super::AuthTokenEncoder;
 use crate::auth::auth_ticket::_api::kernel::infra::{
-    AUTH_JWT_AUDIENCE_API, AUTH_JWT_AUDIENCE_TICKET,
+    AuthJwtClaims, AUTH_JWT_AUDIENCE_API, AUTH_JWT_AUDIENCE_TICKET,
 };
 
 use super::super::super::kernel::data::{AuthTicket, AuthTokenExtract, ExpireDateTime};
@@ -99,7 +99,7 @@ fn encode_jwt<'a>(config: JwtConfig<'a>) -> Result<AuthTokenEncodedData, EncodeA
 
     let token = encode(
         &Header::new(Algorithm::ES384),
-        &ticket.into_jwt_claims(aud.into(), expires.clone()),
+        &AuthJwtClaims::from_ticket(ticket, aud.into(), expires.clone()),
         key,
     )
     .map_err(|err| EncodeAuthTokenError::InfraError(format!("{}", err)))?;
@@ -112,14 +112,6 @@ fn encode_jwt<'a>(config: JwtConfig<'a>) -> Result<AuthTokenEncodedData, EncodeA
             expires,
         },
     })
-}
-
-pub enum JwtTokenEncoderKey {}
-
-impl JwtTokenEncoderKey {
-    pub fn ec(key: String) -> EncodingKey {
-        EncodingKey::from_ec_pem(key.as_bytes()).expect("failed to parse ec pem")
-    }
 }
 
 pub struct CloudfrontTokenEncoder<'a> {

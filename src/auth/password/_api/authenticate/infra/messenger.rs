@@ -5,21 +5,21 @@ use crate::auth::_api::y_protobuf::api::{
 
 use crate::z_details::_api::message::helper::{decode_protobuf_base64, encode_protobuf_base64};
 
-use super::{AuthenticateMessenger, AuthenticatePasswordFieldsExtract};
+use super::{AuthenticatePasswordMessenger, AuthenticatePasswordFieldsExtract};
 
 use crate::z_details::_api::message::data::MessageError;
 
-pub struct ProtobufAuthenticateMessenger {
+pub struct ProtobufAuthenticatePasswordMessenger {
     body: String,
 }
 
-impl ProtobufAuthenticateMessenger {
+impl ProtobufAuthenticatePasswordMessenger {
     pub const fn new(body: String) -> Self {
         Self { body }
     }
 }
 
-impl AuthenticateMessenger for ProtobufAuthenticateMessenger {
+impl AuthenticatePasswordMessenger for ProtobufAuthenticatePasswordMessenger {
     fn decode(&self) -> Result<AuthenticatePasswordFieldsExtract, MessageError> {
         let message: AuthenticatePassword_pb = decode_protobuf_base64(self.body.clone())?;
 
@@ -30,11 +30,10 @@ impl AuthenticateMessenger for ProtobufAuthenticateMessenger {
     }
     fn encode_invalid_password(&self) -> Result<String, MessageError> {
         let mut message = AuthenticatePasswordResult_pb::new();
+        message.set_success(false);
 
         let mut err = AuthenticatePasswordResult_pb_Error::new();
         err.set_field_type(AuthenticatePasswordResult_pb_ErrorType::INVALID_PASSWORD);
-
-        message.set_success(false);
         message.set_err(err);
 
         encode_protobuf_base64(message)
@@ -43,21 +42,21 @@ impl AuthenticateMessenger for ProtobufAuthenticateMessenger {
 
 #[cfg(test)]
 pub mod test {
-    use super::super::{AuthenticateMessenger, AuthenticatePasswordFieldsExtract};
+    use super::super::{AuthenticatePasswordMessenger, AuthenticatePasswordFieldsExtract};
 
     use crate::z_details::_api::message::data::MessageError;
 
-    pub struct StaticAuthenticateMessenger {
+    pub struct StaticAuthenticatePasswordMessenger {
         fields: AuthenticatePasswordFieldsExtract,
     }
 
-    impl StaticAuthenticateMessenger {
+    impl StaticAuthenticatePasswordMessenger {
         pub const fn new(fields: AuthenticatePasswordFieldsExtract) -> Self {
             Self { fields }
         }
     }
 
-    impl AuthenticateMessenger for StaticAuthenticateMessenger {
+    impl AuthenticatePasswordMessenger for StaticAuthenticatePasswordMessenger {
         fn decode(&self) -> Result<AuthenticatePasswordFieldsExtract, MessageError> {
             Ok(self.fields.clone())
         }

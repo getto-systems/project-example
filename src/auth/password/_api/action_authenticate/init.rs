@@ -10,8 +10,7 @@ use crate::auth::{
     password::_api::authenticate::init::AuthenticatePasswordStruct,
 };
 
-use super::action::AuthenticatePasswordAction;
-use super::action::AuthenticatePasswordMaterial;
+use super::action::{AuthenticatePasswordAction, AuthenticatePasswordMaterial};
 
 impl<'a> AuthenticatePasswordAction<AuthenticatePasswordFeature<'a>> {
     pub fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest, body: String) -> Self {

@@ -19,6 +19,10 @@ impl AuthNonceValue {
         Self(nonce)
     }
 
+    pub fn extract(self) -> String {
+        self.0
+    }
+
     pub fn as_str(&self) -> &str {
         self.0.as_str()
     }
@@ -71,29 +75,20 @@ impl AuthTokenValue {
 
 #[derive(Clone)]
 pub struct AuthTicket {
-    id: AuthTicketId,
+    ticket_id: AuthTicketId,
     user: AuthUser,
 }
 
 impl AuthTicket {
-    pub const fn new(id: AuthTicketId, user: AuthUser) -> Self {
-        Self { id, user }
-    }
-    pub fn from_extract(ticket: AuthTicketExtract) -> Self {
-        Self {
-            id: AuthTicketId::new(ticket.auth_ticket_id),
-            user: AuthUser::from_extract(AuthUserExtract {
-                id: ticket.user_id,
-                granted_roles: ticket.granted_roles,
-            }),
-        }
+    pub const fn new(ticket_id: AuthTicketId, user: AuthUser) -> Self {
+        Self { ticket_id, user }
     }
 
-    pub fn into_id(self) -> AuthTicketId {
-        self.id
+    pub fn into_ticket_id(self) -> AuthTicketId {
+        self.ticket_id
     }
     pub fn id_as_str(&self) -> &str {
-        self.id.as_str()
+        self.ticket_id.as_str()
     }
 
     pub fn into_granted_roles(self) -> GrantedAuthRoles {
@@ -103,8 +98,8 @@ impl AuthTicket {
     pub fn extract(self) -> AuthTicketExtract {
         let user = self.user.extract();
         AuthTicketExtract {
-            auth_ticket_id: self.id.0,
-            user_id: user.id,
+            ticket_id: self.ticket_id.0,
+            user_id: user.user_id,
             granted_roles: user.granted_roles,
         }
     }
@@ -126,14 +121,27 @@ impl AuthTicket {
 
 impl Display for AuthTicket {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "{} / {}", self.id, self.user)
+        write!(f, "{} / {}", self.ticket_id, self.user)
     }
 }
 
 pub struct AuthTicketExtract {
-    pub auth_ticket_id: String,
+    pub ticket_id: String,
     pub user_id: String,
     pub granted_roles: HashSet<String>,
+}
+
+impl Into<AuthTicket> for AuthTicketExtract {
+    fn into(self) -> AuthTicket {
+        AuthTicket {
+            ticket_id: AuthTicketId::new(self.ticket_id),
+            user: AuthUserExtract {
+                user_id: self.user_id,
+                granted_roles: self.granted_roles,
+            }
+            .into(),
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -142,6 +150,10 @@ pub struct AuthTicketId(String);
 impl AuthTicketId {
     pub const fn new(id: String) -> Self {
         Self(id)
+    }
+
+    pub fn extract(self) -> String {
+        self.0
     }
 
     pub fn as_str(&self) -> &str {

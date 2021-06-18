@@ -7,7 +7,7 @@ use crate::auth::{
     auth_user::_api::kernel::infra::AuthUserRepository,
 };
 
-use super::data::{ConvertPasswordError, PasswordMatchError};
+use super::{convert::validate_password, data::{ValidatePasswordError, PasswordMatchError}};
 use crate::auth::auth_user::_api::kernel::data::AuthUserId;
 use crate::auth::login_id::_api::data::LoginId;
 use crate::z_details::_api::{message::data::MessageError, repository::data::RepositoryError};
@@ -18,7 +18,7 @@ pub trait AuthenticatePasswordInfra {
     type PasswordMatcher: AuthUserPasswordMatcher;
     type PasswordRepository: AuthUserPasswordRepository;
     type UserRepository: AuthUserRepository;
-    type Messenger: AuthenticateMessenger;
+    type Messenger: AuthenticatePasswordMessenger;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
     fn clock(&self) -> &Self::Clock;
@@ -48,7 +48,7 @@ pub enum VerifyPasswordError {
     RepositoryError(RepositoryError),
 }
 
-pub trait AuthenticateMessenger {
+pub trait AuthenticatePasswordMessenger {
     fn decode(&self) -> Result<AuthenticatePasswordFieldsExtract, MessageError>;
     fn encode_invalid_password(&self) -> Result<String, MessageError>;
 }
@@ -73,18 +73,10 @@ impl HashedPassword {
 
 pub struct PlainPassword(String);
 
-// password には技術的な制限はないが、使用可能な最大文字数は定義しておく
-// ui の設定と同期させること
-const PASSWORD_MAX_LENGTH: usize = 100;
-
 impl PlainPassword {
-    // TODO これは validate.rs に移動するべき
-    pub fn validate(password: String) -> Result<PlainPassword, ConvertPasswordError> {
-        match password.chars().count() {
-            n if n == 0 => Err(ConvertPasswordError::Empty),
-            n if n > PASSWORD_MAX_LENGTH => Err(ConvertPasswordError::TooLong),
-            _ => Ok(Self(password)),
-        }
+    pub fn validate(password: String) -> Result<PlainPassword, ValidatePasswordError> {
+        validate_password(&password)?;
+        Ok(Self(password))
     }
 
     pub fn as_bytes(&self) -> &[u8] {

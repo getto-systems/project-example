@@ -17,15 +17,21 @@ impl MemoryAuthTicketMap {
         }
     }
 
-    pub fn with_ticket(ticket_id: String, limit: ExpansionLimitDateTime) -> Self {
-        let mut ticket = HashMap::new();
-        ticket.insert(ticket_id, Entry { limit });
-
-        Self { ticket }
+    pub fn with_ticket(ticket_id: AuthTicketId, limit: ExpansionLimitDateTime) -> Self {
+        let mut store = Self::new();
+        store.insert(ticket_id, Entry { limit });
+        store
     }
 
     pub fn to_store(self) -> MemoryAuthTicketStore {
         Mutex::new(self)
+    }
+
+    fn get(&self, ticket_id: &AuthTicketId) -> Option<&Entry> {
+        self.ticket.get(ticket_id.as_str())
+    }
+    fn insert(&mut self, ticket_id: AuthTicketId, entry: Entry) {
+        self.ticket.insert(ticket_id.extract(), entry);
     }
 }
 
@@ -49,8 +55,8 @@ impl<'a> AuthTicketRepository for MemoryAuthTicketRepository<'a> {
     fn register(
         &self,
         id_generator: &impl AuthTicketIdGenerator,
-        _registered_at: AuthDateTime,
         limit: ExpansionLimitDateTime,
+        _registered_at: AuthDateTime,
     ) -> Result<AuthTicketId, RepositoryError> {
         let mut store = self.store.lock().unwrap();
         let mut count = 0;
@@ -58,7 +64,7 @@ impl<'a> AuthTicketRepository for MemoryAuthTicketRepository<'a> {
         loop {
             let id = id_generator.generate();
 
-            if store.ticket.get(id.as_str()).is_some() {
+            if store.get(&id).is_some() {
                 count += 1;
                 if count > REGISTER_TRY_LIMIT {
                     return Err(RepositoryError::InfraError(format!(
@@ -70,7 +76,7 @@ impl<'a> AuthTicketRepository for MemoryAuthTicketRepository<'a> {
             }
 
             // 実際のデータベースには registered_at も保存する必要がある
-            store.ticket.insert(id.as_str().into(), Entry { limit });
+            store.insert(id.clone(), Entry { limit });
 
             return Ok(id);
         }

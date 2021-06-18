@@ -98,32 +98,13 @@ pub mod test {
     };
 
     pub struct StaticEncodeAuthTicketStruct<'a> {
-        config: EncodeAuthTicketConfig,
-        clock: StaticChronoAuthClock,
-        ticket_repository: MemoryAuthTicketRepository<'a>,
-        ticket_encoder: StaticAuthTokenEncoder,
-        api_encoder: StaticAuthTokenEncoder,
-        cdn_encoder: StaticAuthTokenEncoder,
-        messenger: StaticEncodeMessenger,
-    }
-    pub struct StaticEncodeAuthTicketParam<'a> {
         pub config: EncodeAuthTicketConfig,
         pub clock: StaticChronoAuthClock,
         pub ticket_repository: MemoryAuthTicketRepository<'a>,
-    }
-
-    impl<'a> StaticEncodeAuthTicketStruct<'a> {
-        pub fn new(param: StaticEncodeAuthTicketParam<'a>) -> Self {
-            Self {
-                config: param.config,
-                clock: param.clock,
-                ticket_repository: param.ticket_repository,
-                ticket_encoder: StaticAuthTokenEncoder::new(),
-                api_encoder: StaticAuthTokenEncoder::new(),
-                cdn_encoder: StaticAuthTokenEncoder::new(),
-                messenger: StaticEncodeMessenger::new(),
-            }
-        }
+        pub ticket_encoder: StaticAuthTokenEncoder,
+        pub api_encoder: StaticAuthTokenEncoder,
+        pub cdn_encoder: StaticAuthTokenEncoder,
+        pub messenger: StaticEncodeMessenger,
     }
 
     impl<'a> EncodeAuthTicketInfra for StaticEncodeAuthTicketStruct<'a> {

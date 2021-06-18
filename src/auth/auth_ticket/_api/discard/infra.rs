@@ -1,6 +1,4 @@
-pub mod id_generator;
-
-use super::super::kernel::infra::{AuthClock, AuthTicketIdGenerator, AuthTicketRepository};
+use super::super::kernel::infra::{AuthClock, AuthTicketRepository};
 
 pub trait DiscardAuthTicketInfra {
     type Clock: AuthClock;

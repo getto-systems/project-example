@@ -17,20 +17,21 @@ impl MemoryAuthUserMap {
     }
 
     pub fn with_user(user: AuthUser) -> Self {
-        let extract = user.extract();
-
-        let mut store = HashMap::new();
-        store.insert(extract.id, extract.granted_roles);
-
-        Self(store)
+        let mut store = Self::new();
+        store.insert(user);
+        store
     }
 
     pub fn to_store(self) -> MemoryAuthUserStore {
         Mutex::new(self)
     }
 
-    fn get(&self, user_id: &str) -> Option<&HashSet<String>> {
-        self.0.get(user_id)
+    fn insert(&mut self, user: AuthUser) {
+        let user = user.extract();
+        self.0.insert(user.user_id, user.granted_roles);
+    }
+    fn get(&self, user_id: &AuthUserId) -> Option<&HashSet<String>> {
+        self.0.get(user_id.as_str())
     }
 }
 
@@ -45,13 +46,14 @@ impl<'a> MemoryAuthUserRepository<'a> {
 }
 
 impl<'a> AuthUserRepository for MemoryAuthUserRepository<'a> {
-    fn get(&self, id: &AuthUserId) -> Result<Option<AuthUser>, RepositoryError> {
+    fn get(&self, user_id: &AuthUserId) -> Result<Option<AuthUser>, RepositoryError> {
         let store = self.store.lock().unwrap();
-        Ok(store.get(id.as_str()).map(|granted_roles| {
-            AuthUser::from_extract(AuthUserExtract {
-                id: id.as_str().into(),
+        Ok(store.get(user_id).map(|granted_roles| {
+            AuthUserExtract {
+                user_id: user_id.as_str().into(),
                 granted_roles: granted_roles.clone(),
-            })
+            }
+            .into()
         }))
     }
 }

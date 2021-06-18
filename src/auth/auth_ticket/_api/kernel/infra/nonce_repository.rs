@@ -24,11 +24,11 @@ impl MemoryAuthNonceMap {
         Mutex::new(self)
     }
 
-    fn get(&self, nonce: &str) -> Option<&ExpireDateTime> {
-        self.0.get(nonce)
+    fn get(&self, nonce: &AuthNonceValue) -> Option<&ExpireDateTime> {
+        self.0.get(nonce.as_str())
     }
-    fn insert(&mut self, nonce: String, expires: ExpireDateTime) {
-        self.0.insert(nonce, expires);
+    fn insert(&mut self, entry: AuthNonceEntry) {
+        self.0.insert(entry.nonce.extract(), entry.expires);
     }
 }
 
@@ -46,12 +46,12 @@ impl<'a> AuthNonceRepository for MemoryAuthNonceRepository<'a> {
     fn get(&self, nonce: &AuthNonceValue) -> Result<Option<AuthNonceEntry>, RepositoryError> {
         let store = self.store.lock().unwrap();
         Ok(store
-            .get(nonce.as_str())
+            .get(nonce)
             .map(|expires| AuthNonceEntry::new(nonce.clone(), expires.clone())))
     }
     fn put(&self, entry: AuthNonceEntry) -> Result<(), RepositoryError> {
         let mut store = self.store.lock().unwrap();
-        store.insert(entry.nonce.as_str().into(), entry.expires);
+        store.insert(entry);
         Ok(())
     }
 }

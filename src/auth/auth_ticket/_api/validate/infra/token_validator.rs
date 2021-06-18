@@ -57,7 +57,7 @@ fn validate_jwt(
             }
         })?;
 
-    Ok(data.claims.into_auth_ticket())
+    Ok(data.claims.into())
 }
 
 pub enum JwtTokenValidatorKey {

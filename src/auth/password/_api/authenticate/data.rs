@@ -5,17 +5,17 @@ use std::{
 
 use crate::z_details::_api::repository::data::RepositoryError;
 
-pub struct AuthenticatePasswordError {
+pub struct AuthenticatePasswordResponse {
     pub message: String,
 }
 
 #[derive(Debug)]
-pub enum ConvertPasswordError {
+pub enum ValidatePasswordError {
     Empty,
     TooLong,
 }
 
-impl Display for ConvertPasswordError {
+impl Display for ValidatePasswordError {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::Empty => write!(f, "empty password"),
@@ -23,7 +23,7 @@ impl Display for ConvertPasswordError {
         }
     }
 }
-impl Error for ConvertPasswordError {}
+impl Error for ValidatePasswordError {}
 
 #[derive(Debug)]
 pub enum PasswordMatchError {

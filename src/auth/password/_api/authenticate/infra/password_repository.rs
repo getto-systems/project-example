@@ -1,6 +1,8 @@
 use std::{collections::HashMap, sync::Mutex};
 
-use super::{AuthUserPasswordMatcher, AuthUserPasswordRepository, HashedPassword, VerifyPasswordError};
+use super::{
+    AuthUserPasswordMatcher, AuthUserPasswordRepository, HashedPassword, VerifyPasswordError,
+};
 
 use crate::auth::{
     auth_user::_api::kernel::data::{AuthUser, AuthUserId},
@@ -18,20 +20,20 @@ impl MemoryAuthUserPasswordMap {
     }
 
     pub fn with_password(login_id: LoginId, user: AuthUser, password: HashedPassword) -> Self {
-        let mut store = HashMap::new();
-        store.insert(
-            login_id.extract(),
-            Entry(AuthUserId::new(user.id_as_str().into()), password),
-        );
-        Self(store)
+        let mut store = Self::new();
+        store.insert(login_id, Entry(user.into_user_id(), password));
+        store
     }
 
     pub fn to_store(self) -> MemoryAuthUserPasswordStore {
         Mutex::new(self)
     }
 
-    fn get(&self, user_id: &str) -> Option<&Entry> {
-        self.0.get(user_id)
+    fn insert(&mut self, login_id: LoginId, entry: Entry) {
+        self.0.insert(login_id.extract(), entry);
+    }
+    fn get(&self, login_id: &LoginId) -> Option<&Entry> {
+        self.0.get(login_id.as_str())
     }
 }
 
@@ -52,10 +54,13 @@ impl<'a> AuthUserPasswordRepository for MemoryAuthUserPasswordRepository<'a> {
         matcher: impl AuthUserPasswordMatcher,
     ) -> Result<Option<AuthUserId>, VerifyPasswordError> {
         let store = self.store.lock().unwrap();
-        Ok(match store.get(login_id.as_str()) {
+        Ok(match store.get(login_id) {
             None => None,
             Some(Entry(user_id, password)) => {
-                if matcher.match_password(password).map_err(VerifyPasswordError::PasswordMatchError)? {
+                if matcher
+                    .match_password(password)
+                    .map_err(VerifyPasswordError::PasswordMatchError)?
+                {
                     Some(user_id.clone())
                 } else {
                     None

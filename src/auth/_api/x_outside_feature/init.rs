@@ -4,29 +4,35 @@ use chrono::Duration;
 
 use aws_cloudfront_cookie::CloudfrontKey;
 
+use crate::auth::password::reset::_api::request_token::infra::destination_repository::MemoryResetTokenDestinationMap;
+use crate::z_details::_api::jwt::helper::JwtTokenEncoderKey;
+
 use super::feature::{
     AuthOutsideCdnSecret, AuthOutsideConfig, AuthOutsideCookie, AuthOutsideFeature,
     AuthOutsideJwtSecret, AuthOutsideSecret, AuthOutsideStore,
 };
-use crate::auth::login_id::_api::data::LoginId;
-use crate::auth::password::_api::authenticate::infra::HashedPassword;
 use crate::x_outside_feature::_api::{env::Env, secret::Secret};
 
 use crate::auth::{
     auth_ticket::_api::{
-        encode::infra::token_encoder::JwtTokenEncoderKey,
         kernel::infra::{
             nonce_repository::MemoryAuthNonceMap, ticket_repository::MemoryAuthTicketMap,
         },
         validate::infra::token_validator::JwtTokenValidatorKey,
     },
     auth_user::_api::kernel::infra::user_repository::MemoryAuthUserMap,
-    password::_api::authenticate::infra::password_repository::MemoryAuthUserPasswordMap,
+    password::{
+        _api::authenticate::infra::{
+            password_repository::MemoryAuthUserPasswordMap, HashedPassword,
+        },
+        reset::_api::kernel::infra::token_repository::MemoryResetTokenMap,
+    },
 };
 
 use crate::auth::{
     auth_ticket::_api::kernel::data::{ExpansionLimitDuration, ExpireDuration},
     auth_user::_api::kernel::data::{AuthUser, AuthUserExtract},
+    login_id::_api::data::LoginId,
 };
 
 pub fn new_auth_outside_feature(env: &Env, secret: &impl Secret) -> AuthOutsideFeature {
@@ -40,6 +46,9 @@ pub fn new_auth_outside_feature(env: &Env, secret: &impl Secret) -> AuthOutsideF
             // api と cdn の有効期限: renew で再延長; 実用的な範囲の短い設定で１桁分程度
             api_expires: ExpireDuration::with_duration(Duration::minutes(5)),
             cdn_expires: ExpireDuration::with_duration(Duration::minutes(5)),
+
+            // メールが届いてから作業が完了するまでの見込み時間
+            reset_token_expires: ExpireDuration::with_duration(Duration::hours(3)),
         },
         store: AuthOutsideStore {
             // TODO それぞれ外部データベースを使うように
@@ -52,6 +61,8 @@ pub fn new_auth_outside_feature(env: &Env, secret: &impl Secret) -> AuthOutsideF
                 admin_password(),
             )
             .to_store(),
+            reset_token: MemoryResetTokenMap::new().to_store(),
+            reset_token_destination: MemoryResetTokenDestinationMap::new().to_store(),
         },
         cookie: AuthOutsideCookie {
             domain: env.load("DOMAIN"),
@@ -71,6 +82,10 @@ pub fn new_auth_outside_feature(env: &Env, secret: &impl Secret) -> AuthOutsideF
                 key: CloudfrontKey::from_pem(secret.load("CLOUDFRONT_PRIVATE_KEY"))
                     .expect("failed to parse cloudfront private key"),
             },
+            reset_token: AuthOutsideJwtSecret {
+                decoding_key: JwtTokenValidatorKey::Ec(secret.load("RESET_TOKEN_PUBLIC_KEY")),
+                encoding_key: JwtTokenEncoderKey::ec(secret.load("RESET_TOKEN_PRIVATE_KEY")),
+            },
         },
     }
 }
@@ -80,10 +95,11 @@ fn admin_user() -> AuthUser {
     granted_roles.insert("admin".into());
     granted_roles.insert("dev-docs".into());
 
-    AuthUser::from_extract(AuthUserExtract {
-        id: "admin".into(),
+    AuthUserExtract {
+        user_id: "admin".into(),
         granted_roles,
-    })
+    }
+    .into()
 }
 fn admin_login_id() -> LoginId {
     LoginId::validate("admin".to_string()).unwrap()

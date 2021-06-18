@@ -6,18 +6,19 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     auth_ticket::_api::{
-        encode::init::test::{StaticEncodeAuthTicketParam, StaticEncodeAuthTicketStruct},
+        encode::init::test::StaticEncodeAuthTicketStruct,
         issue::init::test::StaticIssueAuthTicketStruct,
         kernel::init::test::StaticCheckAuthNonceStruct,
     },
-    password::_api::authenticate::init::test::{
-        StaticAuthenticatePasswordParam, StaticAuthenticatePasswordStruct,
-    },
+    password::_api::authenticate::init::test::StaticAuthenticatePasswordStruct,
 };
 
 use crate::auth::{
     auth_ticket::_api::{
-        encode::infra::EncodeAuthTicketConfig,
+        encode::infra::{
+            messenger::test::StaticEncodeMessenger, token_encoder::test::StaticAuthTokenEncoder,
+            EncodeAuthTicketConfig,
+        },
         issue::infra::{id_generator::test::StaticAuthTicketIdGenerator, IssueAuthTicketConfig},
         kernel::infra::{
             clock::test::StaticChronoAuthClock, nonce_header::test::StaticAuthNonceHeader,
@@ -31,7 +32,7 @@ use crate::auth::{
         MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
     },
     password::_api::authenticate::infra::{
-        messenger::test::StaticAuthenticateMessenger,
+        messenger::test::StaticAuthenticatePasswordMessenger,
         password_repository::{
             MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
             MemoryAuthUserPasswordStore,
@@ -343,9 +344,12 @@ impl<'a> TestFeature<'a> {
     fn just_max_length_password(store: &'a TestStore) -> Self {
         Self::with_messenger(store, just_max_length_password_messenger())
     }
-    fn with_messenger(store: &'a TestStore, messenger: StaticAuthenticateMessenger) -> Self {
+    fn with_messenger(
+        store: &'a TestStore,
+        messenger: StaticAuthenticatePasswordMessenger,
+    ) -> Self {
         Self {
-            authenticate: StaticAuthenticatePasswordStruct::new(StaticAuthenticatePasswordParam {
+            authenticate: StaticAuthenticatePasswordStruct {
                 check_nonce_infra: StaticCheckAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),
@@ -356,7 +360,7 @@ impl<'a> TestFeature<'a> {
                 password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
                 user_repository: MemoryAuthUserRepository::new(&store.user),
                 messenger,
-            }),
+            },
             issue: StaticIssueAuthTicketStruct {
                 config: standard_issue_config(),
                 clock: standard_clock(),
@@ -365,11 +369,15 @@ impl<'a> TestFeature<'a> {
                     "ticket-id".into(),
                 )),
             },
-            encode: StaticEncodeAuthTicketStruct::new(StaticEncodeAuthTicketParam {
+            encode: StaticEncodeAuthTicketStruct {
                 config: standard_encode_config(),
                 clock: standard_clock(),
                 ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
-            }),
+                ticket_encoder: StaticAuthTokenEncoder::new(),
+                api_encoder: StaticAuthTokenEncoder::new(),
+                cdn_encoder: StaticAuthTokenEncoder::new(),
+                messenger: StaticEncodeMessenger::new(),
+            },
         }
     }
 }
@@ -408,44 +416,44 @@ fn standard_nonce_header() -> StaticAuthNonceHeader {
     StaticAuthNonceHeader::Valid(AuthNonceValue::new(NONCE.into()))
 }
 
-fn standard_messenger() -> StaticAuthenticateMessenger {
-    StaticAuthenticateMessenger::new(AuthenticatePasswordFieldsExtract {
+fn standard_messenger() -> StaticAuthenticatePasswordMessenger {
+    StaticAuthenticatePasswordMessenger::new(AuthenticatePasswordFieldsExtract {
         login_id: "login-id".into(),
         password: "password".into(),
     })
 }
-fn empty_login_id_messenger() -> StaticAuthenticateMessenger {
-    StaticAuthenticateMessenger::new(AuthenticatePasswordFieldsExtract {
+fn empty_login_id_messenger() -> StaticAuthenticatePasswordMessenger {
+    StaticAuthenticatePasswordMessenger::new(AuthenticatePasswordFieldsExtract {
         login_id: "".into(),
         password: "password".into(),
     })
 }
-fn too_long_login_id_messenger() -> StaticAuthenticateMessenger {
-    StaticAuthenticateMessenger::new(AuthenticatePasswordFieldsExtract {
+fn too_long_login_id_messenger() -> StaticAuthenticatePasswordMessenger {
+    StaticAuthenticatePasswordMessenger::new(AuthenticatePasswordFieldsExtract {
         login_id: vec!["a"; 100 + 1].join(""),
         password: "password".into(),
     })
 }
-fn just_max_length_login_id_messenger() -> StaticAuthenticateMessenger {
-    StaticAuthenticateMessenger::new(AuthenticatePasswordFieldsExtract {
+fn just_max_length_login_id_messenger() -> StaticAuthenticatePasswordMessenger {
+    StaticAuthenticatePasswordMessenger::new(AuthenticatePasswordFieldsExtract {
         login_id: vec!["a"; 100].join(""),
         password: "password".into(),
     })
 }
-fn empty_password_messenger() -> StaticAuthenticateMessenger {
-    StaticAuthenticateMessenger::new(AuthenticatePasswordFieldsExtract {
+fn empty_password_messenger() -> StaticAuthenticatePasswordMessenger {
+    StaticAuthenticatePasswordMessenger::new(AuthenticatePasswordFieldsExtract {
         login_id: "login-id".into(),
         password: "".into(),
     })
 }
-fn too_long_password_messenger() -> StaticAuthenticateMessenger {
-    StaticAuthenticateMessenger::new(AuthenticatePasswordFieldsExtract {
+fn too_long_password_messenger() -> StaticAuthenticatePasswordMessenger {
+    StaticAuthenticatePasswordMessenger::new(AuthenticatePasswordFieldsExtract {
         login_id: "login-id".into(),
         password: vec!["a"; 100 + 1].join(""),
     })
 }
-fn just_max_length_password_messenger() -> StaticAuthenticateMessenger {
-    StaticAuthenticateMessenger::new(AuthenticatePasswordFieldsExtract {
+fn just_max_length_password_messenger() -> StaticAuthenticatePasswordMessenger {
+    StaticAuthenticatePasswordMessenger::new(AuthenticatePasswordFieldsExtract {
         login_id: "login-id".into(),
         password: vec!["a"; 100].join(""),
     })
@@ -496,10 +504,11 @@ fn test_user() -> AuthUser {
     let mut granted_roles = HashSet::new();
     granted_roles.insert("something".into());
 
-    AuthUser::from_extract(AuthUserExtract {
-        id: "test-user-id".into(),
+    AuthUserExtract {
+        user_id: "test-user-id".into(),
         granted_roles,
-    })
+    }
+    .into()
 }
 fn test_user_login_id() -> LoginId {
     LoginId::validate(LOGIN_ID.to_string()).unwrap()

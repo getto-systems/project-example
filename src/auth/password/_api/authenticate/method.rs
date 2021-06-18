@@ -1,12 +1,12 @@
 use crate::auth::auth_ticket::_api::kernel::method::check_nonce;
 
 use super::infra::PlainPassword;
-use super::infra::{AuthUserPasswordRepository, AuthenticateMessenger, AuthenticatePasswordInfra};
+use super::infra::{AuthUserPasswordRepository, AuthenticatePasswordMessenger, AuthenticatePasswordInfra};
 use crate::auth::auth_user::_api::kernel::infra::AuthUserRepository;
 
 use super::event::AuthenticatePasswordEvent;
 
-use super::data::AuthenticatePasswordError;
+use super::data::AuthenticatePasswordResponse;
 use crate::auth::{auth_user::_api::kernel::data::AuthUser, login_id::_api::data::LoginId};
 
 pub fn authenticate_password<S>(
@@ -24,10 +24,10 @@ pub fn authenticate_password<S>(
         .map_err(|err| post(AuthenticatePasswordEvent::MessageError(err)))?;
 
     let login_id = LoginId::validate(fields.login_id)
-        .map_err(|err| post(AuthenticatePasswordEvent::ConvertLoginIdError(err)))?;
+        .map_err(|err| post(AuthenticatePasswordEvent::ValidateLoginIdError(err)))?;
 
     let plain_password = PlainPassword::validate(fields.password)
-        .map_err(|err| post(AuthenticatePasswordEvent::ConvertPasswordError(err)))?;
+        .map_err(|err| post(AuthenticatePasswordEvent::ValidatePasswordError(err)))?;
 
     let user_id = password_repository
         .verify_password(&login_id, infra.password_matcher(plain_password))
@@ -40,7 +40,7 @@ pub fn authenticate_password<S>(
                 .map_err(|err| post(AuthenticatePasswordEvent::MessageError(err)))?;
 
             Err(post(AuthenticatePasswordEvent::InvalidPassword(
-                AuthenticatePasswordError { message },
+                AuthenticatePasswordResponse { message },
             )))
         }
         Some(user_id) => {

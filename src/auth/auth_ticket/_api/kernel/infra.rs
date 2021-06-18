@@ -40,8 +40,8 @@ pub trait AuthTicketRepository {
     fn register(
         &self,
         id_generator: &impl AuthTicketIdGenerator,
-        registered_at: AuthDateTime,
         limit: ExpansionLimitDateTime,
+        registered_at: AuthDateTime,
     ) -> Result<AuthTicketId, RepositoryError>;
 
     fn discard(
@@ -75,7 +75,7 @@ impl AuthNonceEntry {
         Self { nonce, expires }
     }
 
-    pub fn has_elapsed(&self, now: AuthDateTime) -> bool {
+    pub fn has_expired(&self, now: AuthDateTime) -> bool {
         self.expires.has_elapsed(now)
     }
 }
@@ -84,7 +84,7 @@ impl AuthNonceEntry {
 pub struct AuthJwtClaims {
     aud: String,
     exp: i64,
-    auth_ticket_id: String,
+    ticket_id: String,
     user_id: String,
     granted_roles: HashSet<String>,
 }
@@ -92,25 +92,26 @@ pub struct AuthJwtClaims {
 pub const AUTH_JWT_AUDIENCE_TICKET: &'static str = "ticket";
 pub const AUTH_JWT_AUDIENCE_API: &'static str = "api";
 
-impl AuthTicket {
-    pub fn into_jwt_claims(self, aud: String, expires: ExpireDateTime) -> AuthJwtClaims {
-        let auth_ticket = self.extract();
-        AuthJwtClaims {
+impl AuthJwtClaims {
+    pub fn from_ticket(ticket: AuthTicket, aud: String, expires: ExpireDateTime) -> Self {
+        let ticket = ticket.extract();
+        Self {
             aud,
             exp: expires.timestamp(),
-            auth_ticket_id: auth_ticket.auth_ticket_id,
-            user_id: auth_ticket.user_id,
-            granted_roles: auth_ticket.granted_roles,
+            ticket_id: ticket.ticket_id,
+            user_id: ticket.user_id,
+            granted_roles: ticket.granted_roles,
         }
     }
 }
 
-impl AuthJwtClaims {
-    pub fn into_auth_ticket(self) -> AuthTicket {
-        AuthTicket::from_extract(AuthTicketExtract {
-            auth_ticket_id: self.auth_ticket_id,
+impl Into<AuthTicket> for AuthJwtClaims {
+    fn into(self) -> AuthTicket {
+        AuthTicketExtract {
+            ticket_id: self.ticket_id,
             user_id: self.user_id,
             granted_roles: self.granted_roles,
-        })
+        }
+        .into()
     }
 }
