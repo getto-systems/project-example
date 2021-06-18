@@ -1,5 +1,6 @@
 import {
     docsAction_legacy,
+    docsData,
     docsDescription,
     docsModule,
     docsNote,
@@ -7,6 +8,14 @@ import {
 } from "../../../../ui/vendor/getto-application/docs/helper"
 
 import { DocsSection } from "../../../../ui/vendor/getto-application/docs/data"
+
+export const docs_reset = docsData("パスワードリセットデータ", ({ data }) => [
+    data("リセットトークン", [
+        "パスワードをリセットするためのトークン",
+        "ログインIDに紐付けて保存",
+        "メールで送信される",
+    ]),
+])
 
 export const docs_auth_resetPassword: DocsSection[] = [
     docsSection("パスワードリセット", [
