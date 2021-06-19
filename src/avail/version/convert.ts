@@ -1,6 +1,6 @@
 import { VersionString } from "./data"
 
-export function versionStringConfigConverter(version: string): VersionString {
+export function versionStringConverter(version: string): VersionString {
     return markVersionString(version)
 }
 

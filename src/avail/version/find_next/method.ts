@@ -6,7 +6,7 @@ import { CheckDeployExistsRemote, FindNextVersionInfra } from "./infra"
 
 import { FindNextVersionEvent } from "./event"
 
-import { versionStringConfigConverter } from "../convert"
+import { versionStringConverter } from "../convert"
 import { versionConfigConverter } from "./convert"
 
 import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
@@ -34,7 +34,7 @@ export const findNextVersion: Find = (infra) => (detecter) => async (post) => {
         return post({
             type: "succeed-to-find",
             upToDate: true,
-            version: versionStringConfigConverter(version),
+            version: versionStringConverter(version),
             target,
         })
     }
@@ -53,7 +53,7 @@ export const findNextVersion: Find = (infra) => (detecter) => async (post) => {
         return post({
             type: "succeed-to-find",
             upToDate: true,
-            version: versionStringConfigConverter(version),
+            version: versionStringConverter(version),
             target,
         })
     } else {
