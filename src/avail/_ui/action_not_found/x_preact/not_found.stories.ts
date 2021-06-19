@@ -4,9 +4,6 @@ import { storyTemplate } from "../../../../../ui/vendor/storybook/preact/story"
 
 import { NotFoundComponent } from "./not_found"
 
-import { initGetCurrentVersionResource } from "../../../version/action_get_current/impl"
-import { initGetCurrentVersionCoreAction } from "../../../version/action_get_current/core/impl"
-
 export default {
     title: "main/public/Avail/Not Found",
     parameters: {
@@ -15,17 +12,10 @@ export default {
 }
 
 type MockProps = {
-    version: string
+    // no props
 }
-const template = storyTemplate<MockProps>((props) => {
-    return h(
-        NotFoundComponent,
-        initGetCurrentVersionResource(
-            initGetCurrentVersionCoreAction({
-                version: props.version,
-            }),
-        ),
-    )
+const template = storyTemplate<MockProps>((_props) => {
+    return h(NotFoundComponent, {})
 })
 
-export const NotFound = template({ version: "1.0.0" })
+export const NotFound = template({})
