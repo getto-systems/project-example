@@ -1,16 +1,11 @@
 use std::io;
 
 use actix_cors::Cors;
-use actix_web::{get, web, App, HttpServer, Responder};
+use actix_web::{web, App, HttpServer};
 
 use example_api::x_outside_feature::_api::init::new_app_state;
 
 use example_api::auth::_api::x_actix_web::route::scope_auth;
-
-#[get("/")]
-async fn root() -> impl Responder {
-    "GETTO-EXAMPLE-API: OK"
-}
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
@@ -30,10 +25,29 @@ async fn main() -> io::Result<()> {
         App::new()
             .wrap(cors)
             .app_data(data.clone())
-            .service(root)
+            .service(route::root)
+            .service(demo::aws_sms)
             .service(scope_auth())
     })
     .bind(format!("0.0.0.0:{}", setting.port))?
     .run()
     .await
+}
+
+mod route {
+    use actix_web::{get, Responder};
+
+    #[get("/")]
+    async fn root() -> impl Responder {
+        "GETTO-EXAMPLE-API: OK"
+    }
+}
+
+mod demo {
+    use actix_web::{get, Responder};
+
+    #[get("/aws-sms")]
+    async fn aws_sms() -> impl Responder {
+        "demo; AWS SMS"
+    }
 }
