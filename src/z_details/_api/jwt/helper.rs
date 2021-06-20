@@ -1,9 +1,8 @@
-use jsonwebtoken::EncodingKey;
+use jsonwebtoken::{DecodingKey, EncodingKey};
 
-pub enum JwtTokenEncoderKey {}
-
-impl JwtTokenEncoderKey {
-    pub fn ec(key: String) -> EncodingKey {
-        EncodingKey::from_ec_pem(key.as_bytes()).expect("failed to parse ec pem")
-    }
+pub fn encoding_key_from_ec_pem(key: &str) -> EncodingKey {
+    EncodingKey::from_ec_pem(key.as_bytes()).expect("failed to parse ec pem")
+}
+pub fn decoding_key_from_ec_pem<'a>(key: &'a str) -> DecodingKey<'a> {
+    DecodingKey::from_ec_pem(key.as_bytes()).expect("failed to parse ec pem")
 }

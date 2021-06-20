@@ -1,23 +1,29 @@
 use std::io;
 
-use actix_cors::Cors;
-use actix_web::{web, App, HttpServer};
+use lazy_static::lazy_static;
 
-use example_api::x_outside_feature::_api::init::new_app_state;
+use actix_cors::Cors;
+use actix_web::{App, HttpServer};
+
+use example_api::x_outside_feature::_api::state::AppData;
+use example_api::x_outside_feature::_api::{env::Env, state::AppState};
 
 use example_api::auth::_api::x_actix_web::route::scope_auth;
 
+lazy_static! {
+    static ref ENV: Env = Env::new();
+}
+
 #[actix_web::main]
 async fn main() -> io::Result<()> {
-    let (state, setting) = new_app_state();
+    let state = AppState::new(&ENV);
 
-    let data = web::Data::new(state);
-    let origin = setting.origin;
+    let data: AppData = state.into();
 
     HttpServer::new(move || {
         let cors = Cors::default()
             .supports_credentials()
-            .allowed_origin(&origin)
+            .allowed_origin(&ENV.origin)
             .allowed_methods(vec!["GET", "POST", "PUT", "PATCH", "DELETE"])
             .allowed_headers(vec!["X-GETTO-EXAMPLE-NONCE"])
             .max_age(3600);
@@ -28,7 +34,7 @@ async fn main() -> io::Result<()> {
             .service(root::index)
             .service(scope_auth())
     })
-    .bind(format!("0.0.0.0:{}", setting.port))?
+    .bind(format!("0.0.0.0:{}", &ENV.port))?
     .run()
     .await
 }

@@ -5,7 +5,7 @@ use getto_application::helper::flatten;
 use crate::{
     auth::password::reset::_api::action_request_token::action::RequestResetTokenAction,
     x_outside_feature::_api::{
-        data::AppData,
+        state::AppData,
         logger::{app_logger, Logger},
     },
 };

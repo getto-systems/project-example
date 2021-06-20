@@ -3,7 +3,7 @@ use actix_web::{post, web, HttpRequest, Responder, Scope};
 use getto_application::helper::flatten;
 
 use crate::x_outside_feature::_api::{
-    data::AppData,
+    state::AppData,
     logger::{app_logger, Logger},
 };
 

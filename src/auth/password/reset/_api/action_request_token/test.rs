@@ -1,4 +1,3 @@
-use actix_rt;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use getto_application_test::ActionTestRunner;
@@ -41,7 +40,7 @@ use crate::auth::{
     password::reset::_api::kernel::data::ResetToken,
 };
 
-#[actix_rt::test]
+#[tokio::test]
 async fn success_request_token() {
     let (handler, assert_state) = ActionTestRunner::new();
 
@@ -60,7 +59,7 @@ async fn success_request_token() {
     assert!(result.is_ok());
 }
 
-#[actix_rt::test]
+#[tokio::test]
 async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
@@ -79,7 +78,7 @@ async fn success_expired_nonce() {
     assert!(result.is_ok());
 }
 
-#[actix_rt::test]
+#[tokio::test]
 async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
@@ -96,7 +95,7 @@ async fn error_conflict_nonce() {
     assert!(!result.is_ok());
 }
 
-#[actix_rt::test]
+#[tokio::test]
 async fn error_empty_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
@@ -111,7 +110,7 @@ async fn error_empty_login_id() {
     assert!(!result.is_ok());
 }
 
-#[actix_rt::test]
+#[tokio::test]
 async fn error_too_long_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
@@ -126,7 +125,7 @@ async fn error_too_long_login_id() {
     assert!(!result.is_ok());
 }
 
-#[actix_rt::test]
+#[tokio::test]
 async fn just_max_length_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
@@ -141,7 +140,7 @@ async fn just_max_length_login_id() {
     assert!(!result.is_ok());
 }
 
-#[actix_rt::test]
+#[tokio::test]
 async fn error_destination_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
