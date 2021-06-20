@@ -67,7 +67,7 @@ pub trait ResetTokenNotifier {
     async fn notify(
         &self,
         destination: ResetTokenDestination,
-        token: ResetTokenEncoded,
+        token: &ResetTokenEncoded,
     ) -> Result<NotifyResetTokenResponse, NotifyResetTokenError>;
 }
 
