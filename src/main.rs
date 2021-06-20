@@ -25,7 +25,7 @@ async fn main() -> io::Result<()> {
         App::new()
             .wrap(cors)
             .app_data(data.clone())
-            .service(root::root)
+            .service(root::index)
             .service(scope_auth())
     })
     .bind(format!("0.0.0.0:{}", setting.port))?
@@ -39,7 +39,7 @@ mod root {
     use example_api::y_environment::_api::env::VERSION;
 
     #[get("/")]
-    async fn root() -> impl Responder {
+    async fn index() -> impl Responder {
         format!("GETTO-EXAMPLE-API: OK; version: {}", VERSION)
     }
 }
