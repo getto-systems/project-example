@@ -6,7 +6,7 @@ use protobuf_codegen_pure::Codegen;
 pub fn generate(root: &str) {
     ProtobufCodegen::new(root)
         .build()
-        .expect(format!("failed to build protobuf: {}", root).as_str());
+        .expect(format!("failed to build protobuf; {}", root).as_str());
 }
 
 struct ProtobufTarget {
