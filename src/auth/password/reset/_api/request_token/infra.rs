@@ -4,6 +4,8 @@ pub mod token_encoder;
 pub mod token_generator;
 pub mod token_notifier;
 
+use async_trait::async_trait;
+
 use crate::auth::{
     auth_ticket::_api::kernel::{
         data::{ExpireDateTime, ExpireDuration},
@@ -15,7 +17,9 @@ use crate::auth::{
     },
 };
 
-use super::data::{EncodeResetTokenError, NotifyResetTokenError, ResetTokenDestination};
+use super::data::{
+    EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse, ResetTokenDestination,
+};
 use crate::{
     auth::login_id::_api::data::LoginId,
     z_details::_api::{message::data::MessageError, repository::data::RepositoryError},
@@ -58,12 +62,13 @@ pub trait ResetTokenEncoder {
     ) -> Result<ResetTokenEncoded, EncodeResetTokenError>;
 }
 
+#[async_trait]
 pub trait ResetTokenNotifier {
-    fn notify(
+    async fn notify(
         &self,
         destination: ResetTokenDestination,
         token: ResetTokenEncoded,
-    ) -> Result<(), NotifyResetTokenError>;
+    ) -> Result<NotifyResetTokenResponse, NotifyResetTokenError>;
 }
 
 pub trait RequestResetTokenMessenger {

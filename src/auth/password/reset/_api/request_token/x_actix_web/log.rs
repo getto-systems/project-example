@@ -6,6 +6,7 @@ impl RequestResetTokenEvent {
     pub const fn log_level(&self) -> LogLevel {
         match self {
             Self::TokenExpiresCalculated(_) => LogLevel::Info,
+            Self::TokenNotified(_) => LogLevel::Info,
             Self::Success(_) => LogLevel::Audit,
             Self::InvalidReset(_) => LogLevel::Error,
             Self::NonceError(err) => err.log_level(),

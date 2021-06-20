@@ -7,10 +7,14 @@ use crate::auth::{
 };
 use crate::z_details::_api::{message::data::MessageError, repository::data::RepositoryError};
 
-use super::data::{EncodeResetTokenError, NotifyResetTokenError, RequestResetTokenResponse};
+use super::data::{
+    EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
+    RequestResetTokenResponse,
+};
 
 pub enum RequestResetTokenEvent {
     TokenExpiresCalculated(ExpireDateTime),
+    TokenNotified(NotifyResetTokenResponse),
     Success(RequestResetTokenResponse),
     InvalidReset(RequestResetTokenResponse),
     NonceError(ValidateAuthNonceError),
@@ -29,6 +33,9 @@ impl Display for RequestResetTokenEvent {
         match self {
             Self::TokenExpiresCalculated(expires) => {
                 write!(f, "token expires calculated; {}", expires)
+            }
+            Self::TokenNotified(response) => {
+                write!(f, "token notified; {}", response)
             }
             Self::Success(_) => write!(f, "{}", SUCCESS),
             Self::InvalidReset(_) => write!(f, "{}; invalid reset", ERROR),

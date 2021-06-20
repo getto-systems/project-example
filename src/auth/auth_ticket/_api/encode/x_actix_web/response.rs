@@ -14,7 +14,7 @@ use super::super::data::{AuthTokenEncoded, AuthTokenEncodedData, EncodeAuthToken
 impl EncodeAuthTicketEvent {
     pub fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
-            Self::TokenExpiresCalculated(_) => HttpResponse::Ok().finish(),
+            Self::TokenExpiresCalculated(_) => HttpResponse::Accepted().finish(),
             Self::Success(token) => token.respond_to(request),
             Self::TicketNotFound => unauthorized(request),
             Self::RepositoryError(err) => err.respond_to(request),

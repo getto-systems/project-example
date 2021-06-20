@@ -7,7 +7,8 @@ use crate::auth::password::reset::_api::request_token::data::{EncodeResetTokenEr
 impl RequestResetTokenEvent {
     pub fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
-            Self::TokenExpiresCalculated(_) => HttpResponse::Ok().finish(),
+            Self::TokenExpiresCalculated(_) => HttpResponse::Accepted().finish(),
+            Self::TokenNotified(_) => HttpResponse::Accepted().finish(),
             Self::Success(response) => response.respond_to(request),
             Self::InvalidReset(response) => response.respond_to(request),
             Self::NonceError(err) => err.respond_to(request),
