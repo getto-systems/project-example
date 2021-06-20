@@ -81,6 +81,8 @@ coverage_check() {
     line_coverage=$(grep abbr "${output_dir}/index.html" | head -1 | cut -d'>' -f 2 | cut -d'%' -f 1)
     case "${line_coverage}" in
     100 | 9*.*)
+        # await のカバレッジが取れないので 100% は無理
+        # 90% 以上ならなんとかなる、と思う
         echo "OK; line coverage: ${line_coverage}"
         ;;
 
