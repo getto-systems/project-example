@@ -87,7 +87,7 @@ coverage_check() {
         ;;
 
     *)
-        echo "NG; line coverage < 90%"
+        echo "NG; line coverage: ${line_coverage} < 90%"
         exit 1
         ;;
     esac
