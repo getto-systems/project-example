@@ -10,34 +10,34 @@ use super::super::super::kernel::data::{AuthTicket, AuthTokenValue};
 use super::super::data::DecodeAuthTokenError;
 
 pub struct JwtAuthTokenValidator<'a> {
-    key: &'a JwtTokenValidatorKey,
+    key: &'a DecodingKey<'a>,
 }
 
 impl<'a> JwtAuthTokenValidator<'a> {
-    pub const fn new(key: &'a JwtTokenValidatorKey) -> Self {
+    pub const fn new(key: &'a DecodingKey) -> Self {
         Self { key }
     }
 }
 
 impl<'a> AuthTokenValidator for JwtAuthTokenValidator<'a> {
     fn validate(&self, token: &AuthTokenValue) -> Result<AuthTicket, DecodeAuthTokenError> {
-        validate_jwt(token, &[AUTH_JWT_AUDIENCE_TICKET], &self.key.parse())
+        validate_jwt(token, &[AUTH_JWT_AUDIENCE_TICKET], &self.key)
     }
 }
 
 pub struct JwtApiTokenValidator<'a> {
-    key: &'a JwtTokenValidatorKey,
+    key: &'a DecodingKey<'a>,
 }
 
 impl<'a> JwtApiTokenValidator<'a> {
-    pub const fn new(key: &'a JwtTokenValidatorKey) -> Self {
+    pub const fn new(key: &'a DecodingKey<'a>) -> Self {
         Self { key }
     }
 }
 
 impl<'a> AuthTokenValidator for JwtApiTokenValidator<'a> {
     fn validate(&self, token: &AuthTokenValue) -> Result<AuthTicket, DecodeAuthTokenError> {
-        validate_jwt(token, &[AUTH_JWT_AUDIENCE_API], &self.key.parse())
+        validate_jwt(token, &[AUTH_JWT_AUDIENCE_API], &self.key)
     }
 }
 
@@ -58,20 +58,6 @@ fn validate_jwt(
         })?;
 
     Ok(data.claims.into())
-}
-
-pub enum JwtTokenValidatorKey {
-    Ec(String),
-}
-
-impl JwtTokenValidatorKey {
-    fn parse<'a>(&'a self) -> DecodingKey<'a> {
-        match self {
-            Self::Ec(key) => {
-                DecodingKey::from_ec_pem(key.as_bytes()).expect("failed to parse ec pem")
-            }
-        }
-    }
 }
 
 #[cfg(test)]

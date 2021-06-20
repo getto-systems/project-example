@@ -4,28 +4,28 @@ use chrono::Duration;
 
 use aws_cloudfront_cookie::CloudfrontKey;
 
-use crate::auth::password::reset::_api::request_token::infra::destination_repository::MemoryResetTokenDestinationMap;
-use crate::z_details::_api::jwt::helper::JwtTokenEncoderKey;
+use crate::z_details::_api::jwt::helper::{decoding_key_from_ec_pem, encoding_key_from_ec_pem};
+
+use crate::x_outside_feature::_api::env::Env;
 
 use super::feature::{
     AuthOutsideCdnSecret, AuthOutsideConfig, AuthOutsideCookie, AuthOutsideEmail,
     AuthOutsideFeature, AuthOutsideJwtSecret, AuthOutsideSecret, AuthOutsideStore,
 };
-use crate::x_outside_feature::_api::{env::Env, secret::Secret};
 
 use crate::auth::{
-    auth_ticket::_api::{
-        kernel::infra::{
-            nonce_repository::MemoryAuthNonceMap, ticket_repository::MemoryAuthTicketMap,
-        },
-        validate::infra::token_validator::JwtTokenValidatorKey,
+    auth_ticket::_api::kernel::infra::{
+        nonce_repository::MemoryAuthNonceMap, ticket_repository::MemoryAuthTicketMap,
     },
     auth_user::_api::kernel::infra::user_repository::MemoryAuthUserMap,
     password::{
         _api::authenticate::infra::{
             password_repository::MemoryAuthUserPasswordMap, HashedPassword,
         },
-        reset::_api::kernel::infra::token_repository::MemoryResetTokenMap,
+        reset::_api::{
+            kernel::infra::token_repository::MemoryResetTokenMap,
+            request_token::infra::destination_repository::MemoryResetTokenDestinationMap,
+        },
     },
 };
 
@@ -35,7 +35,7 @@ use crate::auth::{
     login_id::_api::data::LoginId,
 };
 
-pub fn new_auth_outside_feature(env: &Env, secret: &impl Secret) -> AuthOutsideFeature {
+pub fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
     AuthOutsideFeature {
         config: AuthOutsideConfig {
             // ticket の有効期限: 切れると再ログインが必要; renew で延長; 週末を挟めるように１桁日程度
@@ -65,31 +65,31 @@ pub fn new_auth_outside_feature(env: &Env, secret: &impl Secret) -> AuthOutsideF
             reset_token_destination: MemoryResetTokenDestinationMap::new().to_store(),
         },
         cookie: AuthOutsideCookie {
-            domain: env.load("DOMAIN"),
-            cloudfront_key_pair_id: secret.load("CLOUDFRONT_KEY_PAIR_ID"),
-            cloudfront_resource: env.load("CLOUDFRONT_RESOURCE"),
+            domain: &env.domain,
+            cloudfront_key_pair_id: &env.cloudfront_key_pair_id,
+            cloudfront_resource: &env.cloudfront_resource,
         },
         secret: AuthOutsideSecret {
             ticket: AuthOutsideJwtSecret {
-                decoding_key: JwtTokenValidatorKey::Ec(secret.load("TICKET_PUBLIC_KEY")),
-                encoding_key: JwtTokenEncoderKey::ec(secret.load("TICKET_PRIVATE_KEY")),
+                decoding_key: decoding_key_from_ec_pem(&env.ticket_public_key),
+                encoding_key: encoding_key_from_ec_pem(&env.ticket_private_key),
             },
             api: AuthOutsideJwtSecret {
-                decoding_key: JwtTokenValidatorKey::Ec(secret.load("API_PUBLIC_KEY")),
-                encoding_key: JwtTokenEncoderKey::ec(secret.load("API_PRIVATE_KEY")),
+                decoding_key: decoding_key_from_ec_pem(&env.api_public_key),
+                encoding_key: encoding_key_from_ec_pem(&env.api_private_key),
             },
             cdn: AuthOutsideCdnSecret {
-                key: CloudfrontKey::from_pem(secret.load("CLOUDFRONT_PRIVATE_KEY"))
+                key: CloudfrontKey::from_pem(&env.cloudfront_private_key)
                     .expect("failed to parse cloudfront private key"),
             },
             reset_token: AuthOutsideJwtSecret {
-                decoding_key: JwtTokenValidatorKey::Ec(secret.load("RESET_TOKEN_PUBLIC_KEY")),
-                encoding_key: JwtTokenEncoderKey::ec(secret.load("RESET_TOKEN_PRIVATE_KEY")),
+                decoding_key: decoding_key_from_ec_pem(&env.reset_token_public_key),
+                encoding_key: encoding_key_from_ec_pem(&env.reset_token_private_key),
             },
         },
         email: AuthOutsideEmail {
-            ui_host: env.load("UI_HOST"),
-            sender_address: "labo@message.getto.systems".into(),
+            ui_host: &env.ui_host,
+            sender_address: "labo@message.getto.systems",
         },
     }
 }

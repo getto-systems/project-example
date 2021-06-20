@@ -1,16 +1,21 @@
 use std::sync::Mutex;
 
 use aws_cloudfront_cookie::CloudfrontKey;
-use jsonwebtoken::EncodingKey;
+use jsonwebtoken::{DecodingKey, EncodingKey};
 
-use crate::auth::{auth_ticket::_api::{
-    kernel::infra::{
+use crate::auth::{
+    auth_ticket::_api::kernel::infra::{
         nonce_repository::MemoryAuthNonceMap, ticket_repository::MemoryAuthTicketMap,
     },
-    validate::infra::token_validator::JwtTokenValidatorKey,
-}, password::reset::_api::{kernel::infra::token_repository::MemoryResetTokenStore, request_token::infra::destination_repository::MemoryResetTokenDestinationStore}};
-use crate::auth::auth_user::_api::kernel::infra::user_repository::MemoryAuthUserStore;
-use crate::auth::password::_api::authenticate::infra::password_repository::MemoryAuthUserPasswordStore;
+    auth_user::_api::kernel::infra::user_repository::MemoryAuthUserStore,
+    password::{
+        _api::authenticate::infra::password_repository::MemoryAuthUserPasswordStore,
+        reset::_api::{
+            kernel::infra::token_repository::MemoryResetTokenStore,
+            request_token::infra::destination_repository::MemoryResetTokenDestinationStore,
+        },
+    },
+};
 
 use crate::auth::auth_ticket::_api::kernel::data::{ExpansionLimitDuration, ExpireDuration};
 
@@ -37,9 +42,9 @@ pub struct AuthOutsideStore {
     pub reset_token_destination: MemoryResetTokenDestinationStore,
 }
 pub struct AuthOutsideCookie {
-    pub domain: String,
-    pub cloudfront_key_pair_id: String,
-    pub cloudfront_resource: String,
+    pub domain: &'static str,
+    pub cloudfront_key_pair_id: &'static str,
+    pub cloudfront_resource: &'static str,
 }
 pub struct AuthOutsideSecret {
     pub ticket: AuthOutsideJwtSecret,
@@ -48,13 +53,13 @@ pub struct AuthOutsideSecret {
     pub reset_token: AuthOutsideJwtSecret,
 }
 pub struct AuthOutsideJwtSecret {
-    pub decoding_key: JwtTokenValidatorKey,
+    pub decoding_key: DecodingKey<'static>,
     pub encoding_key: EncodingKey,
 }
 pub struct AuthOutsideCdnSecret {
     pub key: CloudfrontKey,
 }
 pub struct AuthOutsideEmail {
-    pub ui_host: String,
-    pub sender_address: String,
+    pub ui_host: &'static str,
+    pub sender_address: &'static str,
 }

@@ -8,7 +8,6 @@ build = "api/setup/build.rs"
 [dependencies]
 getto-application = { path = "api/vendor/getto-application" }
 aws-cloudfront-cookie = { path = "api/vendor/aws-cloudfront-cookie" }
-actix-rt = "1"
 actix-web = "3"
 actix-cors = "0.5"
 protobuf = "2"
@@ -21,11 +20,13 @@ uuid = { version = "0.8", features = ["v4"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 async-trait = "0.1"
+lazy_static = "1"
 rusoto_core = { version = "0.45", default_features = false, features = ["rustls"] }
 rusoto_ses = { version = "0.45", default_features = false, features = ["rustls"] }
 url = "2"
 
 [dev-dependencies]
+tokio = "0.2"
 getto-application-test = { path = "api/vendor/getto-application-test" }
 
 [build-dependencies]
