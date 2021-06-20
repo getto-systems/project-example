@@ -1,3 +1,4 @@
+use actix_rt;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use getto_application_test::ActionTestRunner;
@@ -40,8 +41,8 @@ use crate::auth::{
     password::reset::_api::kernel::data::ResetToken,
 };
 
-#[test]
-fn success_request_token() {
+#[actix_rt::test]
+async fn success_request_token() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -50,16 +51,17 @@ fn success_request_token() {
     let mut action = RequestResetTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec![
         "token expires calculated; 2021-01-02 10:00:00 UTC",
+        "token notified; message-id: message-id",
         "request reset token success",
     ]);
     assert!(result.is_ok());
 }
 
-#[test]
-fn success_expired_nonce() {
+#[actix_rt::test]
+async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
@@ -68,16 +70,17 @@ fn success_expired_nonce() {
     let mut action = RequestResetTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec![
         "token expires calculated; 2021-01-02 10:00:00 UTC",
+        "token notified; message-id: message-id",
         "request reset token success",
     ]);
     assert!(result.is_ok());
 }
 
-#[test]
-fn error_conflict_nonce() {
+#[actix_rt::test]
+async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
@@ -86,15 +89,15 @@ fn error_conflict_nonce() {
     let mut action = RequestResetTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec![
         "request reset token error; auth nonce error: conflict",
     ]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_empty_login_id() {
+#[actix_rt::test]
+async fn error_empty_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -103,13 +106,13 @@ fn error_empty_login_id() {
     let mut action = RequestResetTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["request reset token error; empty login id"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_too_long_login_id() {
+#[actix_rt::test]
+async fn error_too_long_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -118,13 +121,13 @@ fn error_too_long_login_id() {
     let mut action = RequestResetTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["request reset token error; too long login id"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn just_max_length_login_id() {
+#[actix_rt::test]
+async fn just_max_length_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -133,13 +136,13 @@ fn just_max_length_login_id() {
     let mut action = RequestResetTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["request reset token error; invalid reset"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_destination_not_stored() {
+#[actix_rt::test]
+async fn error_destination_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::destination_not_stored();
@@ -148,7 +151,7 @@ fn error_destination_not_stored() {
     let mut action = RequestResetTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["request reset token error; invalid reset"]);
     assert!(!result.is_ok());
 }

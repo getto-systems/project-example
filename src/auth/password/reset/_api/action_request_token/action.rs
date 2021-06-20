@@ -41,12 +41,13 @@ impl<M: RequestResetTokenMaterial> RequestResetTokenAction<M> {
         self.pubsub.subscribe(handler);
     }
 
-    pub fn ignite(self) -> MethodResult<RequestResetTokenState> {
+    pub async fn ignite(self) -> MethodResult<RequestResetTokenState> {
         let pubsub = self.pubsub;
         let m = self.material;
 
         request_reset_token(m.request_token(), |event| {
             pubsub.post(RequestResetTokenState::RequestToken(event))
         })
+        .await
     }
 }

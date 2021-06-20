@@ -9,7 +9,7 @@ use super::super::data::ValidatePasswordError;
 impl AuthenticatePasswordEvent {
     pub fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
-            Self::Success(_) => HttpResponse::Ok().finish(),
+            Self::Success(_) => HttpResponse::Accepted().finish(),
             Self::UserNotFound => HttpResponse::InternalServerError().finish(),
             Self::InvalidPassword(err) => err.respond_to(request),
             Self::NonceError(err) => err.respond_to(request),

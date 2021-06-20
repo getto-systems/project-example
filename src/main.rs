@@ -45,9 +45,52 @@ mod route {
 
 mod demo {
     use actix_web::{get, Responder};
+    use rusoto_core::Region;
+    use rusoto_ses::{Body, Content, Destination, Message, SendEmailRequest, Ses, SesClient};
 
     #[get("/aws-sms")]
     async fn aws_sms() -> impl Responder {
-        "demo; AWS SMS"
+        println!("{}", "init client");
+        let client = SesClient::new(Region::ApNortheast1);
+        println!("{}", "init request");
+        println!("{}", CONTENT);
+        let request = SendEmailRequest {
+            destination: Destination {
+                bcc_addresses: None,
+                cc_addresses: None,
+                to_addresses: Some(vec!["shun@getto.systems".into()]),
+            },
+            message: Message {
+                subject: Content {
+                    charset: Some("UTF-8".into()),
+                    data: "rusoto で aws ses を利用してみるテスト".into(),
+                },
+                body: Body {
+                    html: None,
+                    text: Some(Content {
+                        charset: Some("UTF-8".into()),
+                        data: CONTENT.into(),
+                    }),
+                },
+            },
+            source: "labo@message.getto.systems".into(),
+            ..Default::default()
+        };
+        println!("{}", "send email");
+        match client.send_email(request).await {
+            Ok(response) => {
+                format!("send email success; message-id: {}", response.message_id)
+            }
+            Err(err) => {
+                format!("send email error!; {}", err)
+            }
+        }
     }
+
+    const CONTENT: &'static str = r#########"よろしくお願いいたします
+
+####
+send by rusoto / aws ses
+labo@message.getto.systems
+"#########;
 }

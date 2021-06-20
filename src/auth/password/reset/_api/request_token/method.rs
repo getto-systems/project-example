@@ -14,7 +14,7 @@ use super::event::RequestResetTokenEvent;
 use super::data::RequestResetTokenResponse;
 use crate::auth::login_id::_api::data::LoginId;
 
-pub fn request_reset_token<S>(
+pub async fn request_reset_token<S>(
     infra: &impl RequestResetTokenInfra,
     post: impl Fn(RequestResetTokenEvent) -> S,
 ) -> MethodResult<S> {
@@ -71,9 +71,12 @@ pub fn request_reset_token<S>(
                 .encode(token, expires)
                 .map_err(|err| post(RequestResetTokenEvent::EncodeError(err)))?;
 
-            token_notifier
+            let response = token_notifier
                 .notify(destination, token)
+                .await
                 .map_err(|err| post(RequestResetTokenEvent::NotifyError(err)))?;
+
+            post(RequestResetTokenEvent::TokenNotified(response));
 
             let message = messenger
                 .encode_success()

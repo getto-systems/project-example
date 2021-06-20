@@ -9,7 +9,7 @@ use super::super::data::{DecodeAuthTokenError, ValidateAuthTokenError};
 impl ValidateAuthTokenEvent {
     pub fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
-            Self::Success(_) => HttpResponse::Ok().finish(),
+            Self::Success(_) => HttpResponse::Accepted().finish(),
             Self::NonceError(err) => err.respond_to(request),
             Self::TokenError(err) => err.respond_to(request),
         }
