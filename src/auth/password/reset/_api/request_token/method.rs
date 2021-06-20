@@ -72,7 +72,7 @@ pub async fn request_reset_token<S>(
                 .map_err(|err| post(RequestResetTokenEvent::EncodeError(err)))?;
 
             let response = token_notifier
-                .notify(destination, token)
+                .notify(destination, &token)
                 .await
                 .map_err(|err| post(RequestResetTokenEvent::NotifyError(err)))?;
 

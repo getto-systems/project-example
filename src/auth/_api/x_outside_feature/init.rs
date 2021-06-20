@@ -8,8 +8,8 @@ use crate::auth::password::reset::_api::request_token::infra::destination_reposi
 use crate::z_details::_api::jwt::helper::JwtTokenEncoderKey;
 
 use super::feature::{
-    AuthOutsideCdnSecret, AuthOutsideConfig, AuthOutsideCookie, AuthOutsideFeature,
-    AuthOutsideJwtSecret, AuthOutsideSecret, AuthOutsideStore,
+    AuthOutsideCdnSecret, AuthOutsideConfig, AuthOutsideCookie, AuthOutsideEmail,
+    AuthOutsideFeature, AuthOutsideJwtSecret, AuthOutsideSecret, AuthOutsideStore,
 };
 use crate::x_outside_feature::_api::{env::Env, secret::Secret};
 
@@ -86,6 +86,10 @@ pub fn new_auth_outside_feature(env: &Env, secret: &impl Secret) -> AuthOutsideF
                 decoding_key: JwtTokenValidatorKey::Ec(secret.load("RESET_TOKEN_PUBLIC_KEY")),
                 encoding_key: JwtTokenEncoderKey::ec(secret.load("RESET_TOKEN_PRIVATE_KEY")),
             },
+        },
+        email: AuthOutsideEmail {
+            ui_host: env.load("UI_HOST"),
+            sender_address: "labo@message.getto.systems".into(),
         },
     }
 }

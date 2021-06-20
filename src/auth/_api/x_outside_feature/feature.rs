@@ -19,6 +19,7 @@ pub struct AuthOutsideFeature {
     pub store: AuthOutsideStore,
     pub cookie: AuthOutsideCookie,
     pub secret: AuthOutsideSecret,
+    pub email: AuthOutsideEmail,
 }
 pub struct AuthOutsideConfig {
     pub ticket_expires: ExpireDuration,
@@ -52,4 +53,8 @@ pub struct AuthOutsideJwtSecret {
 }
 pub struct AuthOutsideCdnSecret {
     pub key: CloudfrontKey,
+}
+pub struct AuthOutsideEmail {
+    pub ui_host: String,
+    pub sender_address: String,
 }

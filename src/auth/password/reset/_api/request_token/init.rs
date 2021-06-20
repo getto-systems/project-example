@@ -23,7 +23,7 @@ pub struct RequestResetTokenStruct<'a> {
     token_repository: MemoryResetTokenRepository<'a>,
     token_generator: UuidResetTokenGenerator,
     token_encoder: JwtResetTokenEncoder<'a>,
-    token_notifier: EmailResetTokenNotifier,
+    token_notifier: EmailResetTokenNotifier<'a>,
     messenger: ProtobufRequestResetTokenMessenger,
 }
 
@@ -41,7 +41,7 @@ impl<'a> RequestResetTokenStruct<'a> {
             token_repository: MemoryResetTokenRepository::new(&feature.store.reset_token),
             token_generator: UuidResetTokenGenerator::new(),
             token_encoder: JwtResetTokenEncoder::new(&feature.secret.reset_token.encoding_key),
-            token_notifier: EmailResetTokenNotifier::new(),
+            token_notifier: EmailResetTokenNotifier::ap_north_east_1(&feature.email),
             messenger: ProtobufRequestResetTokenMessenger::new(body),
         }
     }
@@ -54,7 +54,7 @@ impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
     type TokenRepository = MemoryResetTokenRepository<'a>;
     type TokenGenerator = UuidResetTokenGenerator;
     type TokenEncoder = JwtResetTokenEncoder<'a>;
-    type TokenNotifier = EmailResetTokenNotifier;
+    type TokenNotifier = EmailResetTokenNotifier<'a>;
     type Messenger = ProtobufRequestResetTokenMessenger;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
