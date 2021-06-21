@@ -1,30 +1,35 @@
 pub mod destination_repository;
 pub mod messenger;
 pub mod token_encoder;
+pub mod token_generator;
 pub mod token_notifier;
 
 use async_trait::async_trait;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::{AuthClock, CheckAuthNonceInfra},
-    password::_api::kernel::infra::{AuthUserPasswordRepository, ResetTokenGenerator},
+    auth_ticket::_api::kernel::{
+        data::{ExpireDateTime, ExpireDuration},
+        infra::{AuthClock, CheckAuthNonceInfra},
+    },
+    password::reset::_api::kernel::{
+        data::{ResetToken, ResetTokenEncoded},
+        infra::{ResetTokenGenerator, ResetTokenRepository},
+    },
 };
 
 use super::data::{
-    EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse, ResetTokenDestination,
+    DecodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse, ResetTokenDestination,
 };
-use crate::auth::{
-    auth_ticket::_api::kernel::data::{ExpireDateTime, ExpireDuration},
-    login_id::_api::data::LoginId,
-    password::{_api::kernel::data::ResetToken, reset::_api::kernel::data::ResetTokenEncoded},
+use crate::{
+    auth::login_id::_api::data::LoginId,
+    z_details::_api::{message::data::MessageError, repository::data::RepositoryError},
 };
-use crate::z_details::_api::{message::data::MessageError, repository::data::RepositoryError};
 
 pub trait RequestResetTokenInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
     type Clock: AuthClock;
     type DestinationRepository: ResetTokenDestinationRepository;
-    type PasswordRepository: AuthUserPasswordRepository;
+    type TokenRepository: ResetTokenRepository;
     type TokenGenerator: ResetTokenGenerator;
     type TokenEncoder: ResetTokenEncoder;
     type TokenNotifier: ResetTokenNotifier;
@@ -34,7 +39,7 @@ pub trait RequestResetTokenInfra {
     fn config(&self) -> &RequestResetTokenConfig;
     fn clock(&self) -> &Self::Clock;
     fn destination_repository(&self) -> &Self::DestinationRepository;
-    fn password_repository(&self) -> &Self::PasswordRepository;
+    fn token_repository(&self) -> &Self::TokenRepository;
     fn token_generator(&self) -> &Self::TokenGenerator;
     fn token_encoder(&self) -> &Self::TokenEncoder;
     fn token_notifier(&self) -> &Self::TokenNotifier;
@@ -54,7 +59,7 @@ pub trait ResetTokenEncoder {
         &self,
         token: ResetToken,
         expires: ExpireDateTime,
-    ) -> Result<ResetTokenEncoded, EncodeResetTokenError>;
+    ) -> Result<ResetTokenEncoded, DecodeResetTokenError>;
 }
 
 #[async_trait]

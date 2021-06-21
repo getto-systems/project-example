@@ -7,14 +7,12 @@ use crate::auth::auth_ticket::_api::kernel::init::CheckAuthNonceStruct;
 use super::infra::{
     destination_repository::MemoryResetTokenDestinationRepository,
     messenger::ProtobufRequestResetTokenMessenger, token_encoder::JwtResetTokenEncoder,
-    token_notifier::EmailResetTokenNotifier, RequestResetTokenConfig, RequestResetTokenInfra,
+    token_generator::UuidResetTokenGenerator, token_notifier::EmailResetTokenNotifier,
+    RequestResetTokenConfig, RequestResetTokenInfra,
 };
 use crate::auth::{
     auth_ticket::_api::kernel::infra::clock::ChronoAuthClock,
-    password::_api::kernel::infra::{
-        password_repository::MemoryAuthUserPasswordRepository,
-        token_generator::UuidResetTokenGenerator,
-    },
+    password::reset::_api::kernel::infra::token_repository::MemoryResetTokenRepository,
 };
 
 pub struct RequestResetTokenStruct<'a> {
@@ -22,7 +20,7 @@ pub struct RequestResetTokenStruct<'a> {
     config: RequestResetTokenConfig,
     clock: ChronoAuthClock,
     destination_repository: MemoryResetTokenDestinationRepository<'a>,
-    password_repository: MemoryAuthUserPasswordRepository<'a>,
+    token_repository: MemoryResetTokenRepository<'a>,
     token_generator: UuidResetTokenGenerator,
     token_encoder: JwtResetTokenEncoder<'a>,
     token_notifier: EmailResetTokenNotifier<'a>,
@@ -40,7 +38,7 @@ impl<'a> RequestResetTokenStruct<'a> {
             destination_repository: MemoryResetTokenDestinationRepository::new(
                 &feature.store.reset_token_destination,
             ),
-            password_repository: MemoryAuthUserPasswordRepository::new(&feature.store.user_password),
+            token_repository: MemoryResetTokenRepository::new(&feature.store.reset_token),
             token_generator: UuidResetTokenGenerator::new(),
             token_encoder: JwtResetTokenEncoder::new(&feature.secret.reset_token.encoding_key),
             token_notifier: EmailResetTokenNotifier::ap_north_east_1(&feature.email),
@@ -53,7 +51,7 @@ impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
     type Clock = ChronoAuthClock;
     type DestinationRepository = MemoryResetTokenDestinationRepository<'a>;
-    type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
+    type TokenRepository = MemoryResetTokenRepository<'a>;
     type TokenGenerator = UuidResetTokenGenerator;
     type TokenEncoder = JwtResetTokenEncoder<'a>;
     type TokenNotifier = EmailResetTokenNotifier<'a>;
@@ -71,8 +69,8 @@ impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
     fn destination_repository(&self) -> &Self::DestinationRepository {
         &self.destination_repository
     }
-    fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.password_repository
+    fn token_repository(&self) -> &Self::TokenRepository {
+        &self.token_repository
     }
     fn token_generator(&self) -> &Self::TokenGenerator {
         &self.token_generator
@@ -96,15 +94,13 @@ pub mod test {
         destination_repository::MemoryResetTokenDestinationRepository,
         messenger::test::StaticRequestResetTokenMessenger,
         token_encoder::test::StaticResetTokenEncoder,
+        token_generator::test::StaticResetTokenGenerator,
         token_notifier::test::StaticResetTokenNotifier, RequestResetTokenConfig,
         RequestResetTokenInfra,
     };
     use crate::auth::{
         auth_ticket::_api::kernel::infra::clock::test::StaticChronoAuthClock,
-        password::_api::kernel::infra::{
-            password_repository::MemoryAuthUserPasswordRepository,
-            token_generator::test::StaticResetTokenGenerator,
-        },
+        password::reset::_api::kernel::infra::token_repository::MemoryResetTokenRepository,
     };
 
     pub struct StaticRequestResetTokenStruct<'a> {
@@ -112,7 +108,7 @@ pub mod test {
         pub config: RequestResetTokenConfig,
         pub clock: StaticChronoAuthClock,
         pub destination_repository: MemoryResetTokenDestinationRepository<'a>,
-        pub password_repository: MemoryAuthUserPasswordRepository<'a>,
+        pub token_repository: MemoryResetTokenRepository<'a>,
         pub token_generator: StaticResetTokenGenerator,
         pub token_encoder: StaticResetTokenEncoder,
         pub token_notifier: StaticResetTokenNotifier,
@@ -123,7 +119,7 @@ pub mod test {
         type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
         type Clock = StaticChronoAuthClock;
         type DestinationRepository = MemoryResetTokenDestinationRepository<'a>;
-        type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
+        type TokenRepository = MemoryResetTokenRepository<'a>;
         type TokenGenerator = StaticResetTokenGenerator;
         type TokenEncoder = StaticResetTokenEncoder;
         type TokenNotifier = StaticResetTokenNotifier;
@@ -141,8 +137,8 @@ pub mod test {
         fn destination_repository(&self) -> &Self::DestinationRepository {
             &self.destination_repository
         }
-        fn password_repository(&self) -> &Self::PasswordRepository {
-            &self.password_repository
+        fn token_repository(&self) -> &Self::TokenRepository {
+            &self.token_repository
         }
         fn token_generator(&self) -> &Self::TokenGenerator {
             &self.token_generator

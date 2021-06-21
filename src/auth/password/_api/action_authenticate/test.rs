@@ -31,13 +31,17 @@ use crate::auth::{
     auth_user::_api::kernel::infra::user_repository::{
         MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
     },
-    password::_api::authenticate::infra::{
-        messenger::test::StaticAuthenticatePasswordMessenger,
-        password_repository::{
-            MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-            MemoryAuthUserPasswordStore,
+    password::_api::{
+        authenticate::infra::{
+            messenger::test::StaticAuthenticatePasswordMessenger, AuthenticatePasswordFieldsExtract,
         },
-        AuthenticatePasswordFieldsExtract, HashedPassword,
+        kernel::infra::{
+            password_repository::{
+                MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
+                MemoryAuthUserPasswordStore,
+            },
+            HashedPassword,
+        },
     },
 };
 

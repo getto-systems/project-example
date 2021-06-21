@@ -1,11 +1,14 @@
 use std::fmt::Display;
 
-use super::infra::VerifyPasswordError;
-
-use super::data::{AuthenticatePasswordResponse, ValidatePasswordError, PasswordMatchError};
+use super::data::AuthenticatePasswordResponse;
 use crate::auth::{
     auth_ticket::_api::kernel::data::ValidateAuthNonceError,
-    auth_user::_api::kernel::data::AuthUser, login_id::_api::data::ValidateLoginIdError,
+    auth_user::_api::kernel::data::AuthUser,
+    login_id::_api::data::ValidateLoginIdError,
+    password::_api::kernel::{
+        data::{PasswordHashError, ValidatePasswordError},
+        infra::VerifyPasswordError,
+    },
 };
 use crate::z_details::_api::{message::data::MessageError, repository::data::RepositoryError};
 
@@ -14,7 +17,7 @@ pub enum AuthenticatePasswordEvent {
     UserNotFound,
     InvalidPassword(AuthenticatePasswordResponse),
     NonceError(ValidateAuthNonceError),
-    PasswordHashError(PasswordMatchError),
+    PasswordHashError(PasswordHashError),
     RepositoryError(RepositoryError),
     MessageError(MessageError),
     ValidateLoginIdError(ValidateLoginIdError),

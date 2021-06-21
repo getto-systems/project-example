@@ -5,6 +5,7 @@ use std::{
 
 use super::convert::validate_login_id;
 
+#[derive(Clone)]
 pub struct LoginId(String);
 
 impl LoginId {

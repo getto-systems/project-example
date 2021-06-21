@@ -19,13 +19,8 @@ use crate::auth::{
     },
     auth_user::_api::kernel::infra::user_repository::MemoryAuthUserMap,
     password::{
-        _api::authenticate::infra::{
-            password_repository::MemoryAuthUserPasswordMap, HashedPassword,
-        },
-        reset::_api::{
-            kernel::infra::token_repository::MemoryResetTokenMap,
-            request_token::infra::destination_repository::MemoryResetTokenDestinationMap,
-        },
+        _api::kernel::infra::{password_repository::MemoryAuthUserPasswordMap, HashedPassword},
+        reset::_api::request_token::infra::destination_repository::MemoryResetTokenDestinationMap,
     },
 };
 
@@ -61,7 +56,6 @@ pub fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
                 admin_password(),
             )
             .to_store(),
-            reset_token: MemoryResetTokenMap::new().to_store(),
             reset_token_destination: MemoryResetTokenDestinationMap::new().to_store(),
         },
         cookie: AuthOutsideCookie {

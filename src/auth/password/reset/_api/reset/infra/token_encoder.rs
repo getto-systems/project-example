@@ -3,10 +3,10 @@ use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 use super::ResetTokenEncoder;
 use crate::auth::password::reset::_api::kernel::infra::ResetTokenJwtClaims;
 
-use super::super::data::EncodeResetTokenError;
+use super::super::data::DecodeResetTokenError;
 use crate::auth::{
     auth_ticket::_api::kernel::data::ExpireDateTime,
-    password::{_api::kernel::data::ResetToken, reset::_api::kernel::data::ResetTokenEncoded},
+    password::reset::_api::kernel::data::{ResetToken, ResetTokenEncoded},
 };
 
 pub struct JwtResetTokenEncoder<'a> {
@@ -24,7 +24,7 @@ impl<'a> ResetTokenEncoder for JwtResetTokenEncoder<'a> {
         &self,
         token: ResetToken,
         expires: ExpireDateTime,
-    ) -> Result<ResetTokenEncoded, EncodeResetTokenError> {
+    ) -> Result<ResetTokenEncoded, DecodeResetTokenError> {
         Ok(encode_jwt(JwtConfig {
             token,
             expires,
@@ -38,7 +38,7 @@ struct JwtConfig<'a> {
     expires: ExpireDateTime,
     key: &'a EncodingKey,
 }
-fn encode_jwt<'a>(config: JwtConfig<'a>) -> Result<ResetTokenEncoded, EncodeResetTokenError> {
+fn encode_jwt<'a>(config: JwtConfig<'a>) -> Result<ResetTokenEncoded, DecodeResetTokenError> {
     let JwtConfig {
         token,
         expires,
@@ -50,7 +50,7 @@ fn encode_jwt<'a>(config: JwtConfig<'a>) -> Result<ResetTokenEncoded, EncodeRese
         &ResetTokenJwtClaims::from_token(token, expires),
         key,
     )
-    .map_err(|err| EncodeResetTokenError::InfraError(format!("{}", err)))?;
+    .map_err(|err| DecodeResetTokenError::InfraError(format!("{}", err)))?;
 
     Ok(ResetTokenEncoded::new(token))
 }
@@ -59,10 +59,10 @@ fn encode_jwt<'a>(config: JwtConfig<'a>) -> Result<ResetTokenEncoded, EncodeRese
 pub mod test {
     use super::ResetTokenEncoder;
 
-    use super::super::super::data::EncodeResetTokenError;
+    use super::super::super::data::DecodeResetTokenError;
     use crate::auth::{
         auth_ticket::_api::kernel::data::ExpireDateTime,
-        password::{_api::kernel::data::ResetToken, reset::_api::kernel::data::ResetTokenEncoded},
+        password::reset::_api::kernel::data::{ResetToken, ResetTokenEncoded},
     };
 
     pub struct StaticResetTokenEncoder;
@@ -78,7 +78,7 @@ pub mod test {
             &self,
             _token: ResetToken,
             _expires: ExpireDateTime,
-        ) -> Result<ResetTokenEncoded, EncodeResetTokenError> {
+        ) -> Result<ResetTokenEncoded, DecodeResetTokenError> {
             Ok(ResetTokenEncoded::new("encoded".into()))
         }
     }

@@ -2,11 +2,6 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use getto_application_test::ActionTestRunner;
 
-use crate::auth::password::reset::_api::kernel::infra::token_repository::MemoryResetTokenMap;
-use crate::auth::password::reset::_api::request_token::data::{
-    ResetTokenDestination, ResetTokenDestinationExtract,
-};
-use crate::auth::password::reset::_api::request_token::infra::destination_repository::MemoryResetTokenDestinationMap;
 use crate::auth::{
     auth_ticket::_api::kernel::init::test::StaticCheckAuthNonceStruct,
     password::reset::_api::request_token::init::test::StaticRequestResetTokenStruct,
@@ -18,16 +13,23 @@ use crate::auth::{
         nonce_repository::MemoryAuthNonceMap, nonce_repository::MemoryAuthNonceRepository,
         nonce_repository::MemoryAuthNonceStore, AuthNonceConfig,
     },
-    password::reset::_api::{
-        kernel::infra::token_repository::{MemoryResetTokenRepository, MemoryResetTokenStore},
-        request_token::infra::{
-            destination_repository::MemoryResetTokenDestinationRepository,
-            destination_repository::MemoryResetTokenDestinationStore,
+    password::{
+        _api::kernel::infra::{
+            password_repository::{
+                MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
+                MemoryAuthUserPasswordStore,
+            },
+            token_generator::test::StaticResetTokenGenerator,
+        },
+        reset::_api::request_token::infra::{
+            destination_repository::{
+                MemoryResetTokenDestinationMap, MemoryResetTokenDestinationRepository,
+                MemoryResetTokenDestinationStore,
+            },
             messenger::test::StaticRequestResetTokenMessenger,
             token_encoder::test::StaticResetTokenEncoder,
-            token_generator::test::StaticResetTokenGenerator,
-            token_notifier::test::StaticResetTokenNotifier, RequestResetTokenConfig,
-            RequestResetTokenFieldsExtract,
+            token_notifier::test::StaticResetTokenNotifier,
+            RequestResetTokenConfig, RequestResetTokenFieldsExtract,
         },
     },
 };
@@ -37,7 +39,10 @@ use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 use crate::auth::{
     auth_ticket::_api::kernel::data::{AuthDateTime, AuthNonceValue, ExpireDuration},
     login_id::_api::data::LoginId,
-    password::reset::_api::kernel::data::ResetToken,
+    password::{
+        _api::kernel::data::ResetToken,
+        reset::_api::request_token::data::{ResetTokenDestination, ResetTokenDestinationExtract},
+    },
 };
 
 #[tokio::test]
@@ -169,37 +174,37 @@ impl<'a> RequestResetTokenMaterial for TestFeature<'a> {
 
 struct TestStore {
     nonce: MemoryAuthNonceStore,
+    password: MemoryAuthUserPasswordStore,
     destination: MemoryResetTokenDestinationStore,
-    token: MemoryResetTokenStore,
 }
 
 impl TestStore {
     fn standard() -> Self {
         Self {
             nonce: standard_nonce_store(),
+            password: standard_password_store(),
             destination: standard_destination_store(),
-            token: standard_token_store(),
         }
     }
     fn expired_nonce() -> Self {
         Self {
             nonce: expired_nonce_store(),
+            password: standard_password_store(),
             destination: standard_destination_store(),
-            token: standard_token_store(),
         }
     }
     fn conflict_nonce() -> Self {
         Self {
             nonce: conflict_nonce_store(),
+            password: standard_password_store(),
             destination: standard_destination_store(),
-            token: standard_token_store(),
         }
     }
     fn destination_not_stored() -> Self {
         Self {
             nonce: standard_nonce_store(),
+            password: standard_password_store(),
             destination: empty_destination_store(),
-            token: standard_token_store(),
         }
     }
 }
@@ -231,7 +236,7 @@ impl<'a> TestFeature<'a> {
                 destination_repository: MemoryResetTokenDestinationRepository::new(
                     &store.destination,
                 ),
-                token_repository: MemoryResetTokenRepository::new(&store.token),
+                password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
                 token_generator: standard_token_generator(),
                 token_encoder: StaticResetTokenEncoder::new(),
                 token_notifier: StaticResetTokenNotifier::new(),
@@ -316,8 +321,8 @@ fn empty_destination_store() -> MemoryResetTokenDestinationStore {
     MemoryResetTokenDestinationMap::new().to_store()
 }
 
-fn standard_token_store() -> MemoryResetTokenStore {
-    MemoryResetTokenMap::new().to_store()
+fn standard_password_store() -> MemoryAuthUserPasswordStore {
+    MemoryAuthUserPasswordMap::new().to_store()
 }
 
 fn test_user_login_id() -> LoginId {

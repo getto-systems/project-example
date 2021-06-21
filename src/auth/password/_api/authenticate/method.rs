@@ -1,8 +1,11 @@
 use crate::auth::auth_ticket::_api::kernel::method::check_nonce;
+use crate::auth::password::_api::kernel::infra::AuthUserPasswordRepository;
 
-use super::infra::PlainPassword;
-use super::infra::{AuthUserPasswordRepository, AuthenticatePasswordMessenger, AuthenticatePasswordInfra};
-use crate::auth::auth_user::_api::kernel::infra::AuthUserRepository;
+use super::infra::{AuthenticatePasswordInfra, AuthenticatePasswordMessenger};
+use crate::auth::{
+    auth_user::_api::kernel::infra::AuthUserRepository,
+    password::_api::kernel::infra::PlainPassword,
+};
 
 use super::event::AuthenticatePasswordEvent;
 

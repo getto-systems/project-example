@@ -23,6 +23,10 @@ impl ResetTokenDestination {
         }
     }
 
+    pub fn as_user_id(&self) -> &AuthUserId {
+        &self.user_id
+    }
+
     pub fn into_email(self) -> String {
         self.email
     }

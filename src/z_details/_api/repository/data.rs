@@ -3,6 +3,11 @@ use std::{
     fmt::{Display, Formatter},
 };
 
+pub enum RegisterAttemptResult<T> {
+    Success(T),
+    Conflict,
+}
+
 #[derive(Debug)]
 pub enum RepositoryError {
     InfraError(String),

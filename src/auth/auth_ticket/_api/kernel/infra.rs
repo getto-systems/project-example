@@ -11,7 +11,10 @@ use super::data::{
     AuthDateTime, AuthNonceValue, AuthTicket, AuthTicketExtract, AuthTicketId,
     ExpansionLimitDateTime, ExpireDateTime, ExpireDuration,
 };
-use crate::z_details::_api::{repository::data::RepositoryError, request::data::HeaderError};
+use crate::z_details::_api::{
+    repository::data::{RegisterAttemptResult, RepositoryError},
+    request::data::HeaderError,
+};
 
 pub trait CheckAuthNonceInfra {
     type Clock: AuthClock;
@@ -39,10 +42,10 @@ pub trait AuthNonceHeader {
 pub trait AuthTicketRepository {
     fn register(
         &self,
-        id_generator: &impl AuthTicketIdGenerator,
+        ticket_id: AuthTicketId,
         limit: ExpansionLimitDateTime,
         registered_at: AuthDateTime,
-    ) -> Result<AuthTicketId, RepositoryError>;
+    ) -> Result<RegisterAttemptResult<AuthTicketId>, RepositoryError>;
 
     fn discard(
         &self,

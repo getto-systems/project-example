@@ -4,16 +4,9 @@ use super::infra::{
     RequestResetTokenInfra, RequestResetTokenMessenger, ResetTokenDestinationRepository,
     ResetTokenEncoder, ResetTokenNotifier,
 };
-use crate::{
-    auth::{
-        auth_ticket::_api::kernel::{data::ExpireDateTime, infra::AuthClock, method::check_nonce},
-        auth_user::_api::kernel::data::AuthUserId,
-        password::_api::kernel::{
-            data::ResetToken,
-            infra::{AuthUserPasswordRepository, ResetTokenGenerator},
-        },
-    },
-    z_details::_api::repository::{data::RepositoryError, helper::register_attempt},
+use crate::auth::{
+    auth_ticket::_api::kernel::{infra::AuthClock, method::check_nonce},
+    password::reset::_api::kernel::infra::ResetTokenRepository,
 };
 
 use super::event::RequestResetTokenEvent;
@@ -55,6 +48,8 @@ pub async fn request_reset_token<S>(
         Some(destination) => {
             let config = infra.config();
             let clock = infra.clock();
+            let token_repository = infra.token_repository();
+            let token_generator = infra.token_generator();
             let token_encoder = infra.token_encoder();
             let token_notifier = infra.token_notifier();
 
@@ -63,7 +58,13 @@ pub async fn request_reset_token<S>(
                 expires.clone(),
             ));
 
-            let token = register_reset_token(infra, destination.as_user_id(), &login_id, &expires)
+            let token = token_repository
+                .register(
+                    destination.clone(),
+                    token_generator,
+                    expires.clone(),
+                    clock.now(),
+                )
                 .map_err(|err| post(RequestResetTokenEvent::RepositoryError(err)))?;
 
             let token = token_encoder
@@ -86,27 +87,4 @@ pub async fn request_reset_token<S>(
             )))
         }
     }
-}
-
-fn register_reset_token(
-    infra: &impl RequestResetTokenInfra,
-    user_id: &AuthUserId,
-    login_id: &LoginId,
-    expires: &ExpireDateTime,
-) -> Result<ResetToken, RepositoryError> {
-    let clock = infra.clock();
-    let password_repository = infra.password_repository();
-    let token_generator = infra.token_generator();
-
-    register_attempt(|| {
-        let token = token_generator.generate();
-        let registered_at = clock.now();
-        password_repository.register_reset_token(
-            user_id.clone(),
-            login_id.clone(),
-            token,
-            expires.clone(),
-            registered_at,
-        )
-    })
 }
