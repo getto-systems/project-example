@@ -9,7 +9,7 @@ setup_grcov() {
             grep '"tag_name":' |
             sed -E 's/.*"v([^"]+)".*/\1/'
     )
-    curl https://github.com/mozilla/grcov/releases/download/v${version}/grcov-linux-x86_64.tar.bz2 > tmp/grcov.tar.bz2
+    curl -sSL https://github.com/mozilla/grcov/releases/download/v${version}/grcov-linux-x86_64.tar.bz2 > tmp/grcov.tar.bz2
     tar -xjf tmp/grcov.tar.bz2
 
     ls -R tmp
