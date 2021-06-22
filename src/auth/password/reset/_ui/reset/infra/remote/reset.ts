@@ -26,7 +26,7 @@ export function newResetPasswordRemote(
 ): ResetPasswordRemote {
     return async (resetToken, fields) => {
         try {
-            const mock = true
+            const mock = false
             if (mock) {
                 // TODO api の実装が終わったらつなぐ
                 return {
