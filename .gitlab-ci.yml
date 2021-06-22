@@ -59,7 +59,7 @@ test-api:
     - rustup install nightly
     - rustup component add --toolchain nightly llvm-tools-preview
     - cargo install rustfilt
-    - cargo install grcov
+    - ./api/ci/setup-test.sh # cargo install grcov
   script:
     - ./api/ci/test.sh
 
