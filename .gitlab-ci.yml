@@ -63,10 +63,6 @@ test-api:
     - ./api/ci/setup-test.sh
   script:
     - ./api/ci/test.sh
-  artifacts:
-    paths:
-      - tmp/coverage.tar.gz
-    expire_in: 1 hour
 
 bump_version-ui:
   stage: bump_version
