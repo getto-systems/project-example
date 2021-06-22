@@ -10,11 +10,9 @@ setup_grcov() {
             sed -E 's/.*"v([^"]+)".*/\1/'
     )
     curl -sSL https://github.com/mozilla/grcov/releases/download/v${version}/grcov-linux-x86_64.tar.bz2 > tmp/grcov.tar.bz2
-    tar -xjf tmp/grcov.tar.bz2
+    tar -xvjf tmp/grcov.tar.bz2
 
-    ls -R tmp
-
-    mv tmp/grcov/bin/grcov ${CARGO_HOME}/bin
+    mv grcov ${CARGO_HOME}/bin
 }
 
 setup_grcov
