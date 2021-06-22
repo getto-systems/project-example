@@ -1,4 +1,5 @@
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
+use crate::auth::auth_ticket::_api::encode::infra::messenger::ResetPasswordEncodeMessenger;
 
 use super::super::kernel::infra::{
     clock::ChronoAuthClock, ticket_repository::MemoryAuthTicketRepository,
@@ -21,6 +22,8 @@ pub struct EncodeAuthTicketStruct<'a, M: EncodeMessenger> {
 pub type RenewEncodeAuthTicketStruct<'a> = EncodeAuthTicketStruct<'a, RenewEncodeMessenger>;
 pub type AuthenticatePasswordEncodeAuthTicketStruct<'a> =
     EncodeAuthTicketStruct<'a, AuthenticatePasswordEncodeMessenger>;
+pub type ResetPasswordEncodeAuthTicketStruct<'a> =
+    EncodeAuthTicketStruct<'a, ResetPasswordEncodeMessenger>;
 
 impl<'a, M: EncodeMessenger> EncodeAuthTicketStruct<'a, M> {
     fn with_messenger(feature: &'a AuthOutsideFeature, messenger: M) -> Self {
@@ -53,6 +56,11 @@ impl<'a> RenewEncodeAuthTicketStruct<'a> {
 impl<'a> AuthenticatePasswordEncodeAuthTicketStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature) -> Self {
         Self::with_messenger(feature, AuthenticatePasswordEncodeMessenger::new())
+    }
+}
+impl<'a> ResetPasswordEncodeAuthTicketStruct<'a> {
+    pub fn new(feature: &'a AuthOutsideFeature) -> Self {
+        Self::with_messenger(feature, ResetPasswordEncodeMessenger::new())
     }
 }
 

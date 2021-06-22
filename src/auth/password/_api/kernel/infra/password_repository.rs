@@ -48,7 +48,7 @@ impl MemoryAuthUserPasswordMap {
 
     pub fn with_user_id(login_id: LoginId, user_id: AuthUserId) -> Self {
         let mut store = Self::new();
-        store.insert_login_id(login_id.clone(), user_id);
+        store.insert_login_id(login_id, user_id);
         store
     }
     pub fn with_password(login_id: LoginId, user: AuthUser, password: HashedPassword) -> Self {
@@ -56,6 +56,27 @@ impl MemoryAuthUserPasswordMap {
         store
             .insert_login_id(login_id.clone(), user.into_user_id())
             .insert_password(login_id, password);
+        store
+    }
+    pub fn with_reset_token(
+        login_id: LoginId,
+        user_id: AuthUserId,
+        reset_token: ResetToken,
+        expires: ExpireDateTime,
+        discard_at: Option<AuthDateTime>,
+    ) -> Self {
+        let mut store = Self::new();
+        store
+            .insert_login_id(login_id.clone(), user_id.clone())
+            .insert_reset_token(
+                reset_token,
+                ResetEntry {
+                    user_id,
+                    login_id,
+                    expires,
+                    discard_at,
+                },
+            );
         store
     }
 
@@ -83,7 +104,7 @@ impl MemoryAuthUserPasswordMap {
         self.reset_token.insert(token.extract(), entry);
         self
     }
-    fn get_reset_token(&self, token: &ResetToken) -> Option<&ResetEntry> {
+    fn get_reset_entry(&self, token: &ResetToken) -> Option<&ResetEntry> {
         self.reset_token.get(token.as_str())
     }
 }
@@ -143,7 +164,7 @@ impl<'a> AuthUserPasswordRepository for MemoryAuthUserPasswordRepository<'a> {
 
             // 有効期限が切れていても削除しない
             // もし衝突したら token generator の桁数を増やす
-            if store.get_reset_token(&reset_token).is_some() {
+            if store.get_reset_entry(&reset_token).is_some() {
                 return Ok(RegisterAttemptResult::Conflict);
             }
 
@@ -181,14 +202,17 @@ impl<'a> AuthUserPasswordRepository for MemoryAuthUserPasswordRepository<'a> {
             let store = self.store.lock().unwrap();
 
             let entry = store
-                .get_reset_token(&reset_token)
+                .get_reset_entry(&reset_token)
                 .ok_or(ResetPasswordError::NotFound)?;
 
             if entry.discard_at.is_some() {
                 return Err(ResetPasswordError::AlreadyReset);
             }
             if entry.expires.has_elapsed(reset_at) {
-                return Err(ResetPasswordError::NotFound);
+                return Err(ResetPasswordError::Expired);
+            }
+            if entry.login_id.as_str() != login_id.as_str() {
+                return Err(ResetPasswordError::InvalidLoginId);
             }
 
             target_entry = entry.clone().discard(reset_at.clone());

@@ -18,7 +18,7 @@ use crate::auth::{
     password::reset::_api::kernel::data::ResetTokenEncoded,
 };
 
-pub async fn request_reset_token<S>(
+pub fn reset_password<S>(
     infra: &impl ResetPasswordInfra,
     post: impl Fn(ResetPasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
@@ -56,8 +56,10 @@ pub async fn request_reset_token<S>(
             post(match err {
                 ResetPasswordError::RepositoryError(err) => err.into(),
                 ResetPasswordError::PasswordHashError(err) => err.into(),
-                ResetPasswordError::NotFound => messenger.encode_invalid_reset().into(),
+                ResetPasswordError::NotFound => messenger.encode_not_found().into(),
                 ResetPasswordError::AlreadyReset => messenger.encode_already_reset().into(),
+                ResetPasswordError::Expired => messenger.encode_expired().into(),
+                ResetPasswordError::InvalidLoginId => messenger.encode_invalid_login_id().into(),
             })
         })?;
 

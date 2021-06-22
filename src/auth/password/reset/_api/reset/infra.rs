@@ -42,8 +42,10 @@ pub trait ResetTokenDecoder {
 
 pub trait ResetPasswordMessenger {
     fn decode(&self) -> Result<ResetPasswordFieldsExtract, MessageError>;
-    fn encode_invalid_reset(&self) -> Result<ResetPasswordResponse, MessageError>;
+    fn encode_not_found(&self) -> Result<ResetPasswordResponse, MessageError>;
     fn encode_already_reset(&self) -> Result<ResetPasswordResponse, MessageError>;
+    fn encode_expired(&self) -> Result<ResetPasswordResponse, MessageError>;
+    fn encode_invalid_login_id(&self) -> Result<ResetPasswordResponse, MessageError>;
 }
 
 #[derive(Clone)]

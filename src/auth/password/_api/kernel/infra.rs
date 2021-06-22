@@ -96,4 +96,6 @@ pub enum ResetPasswordError {
     PasswordHashError(PasswordHashError),
     NotFound,
     AlreadyReset,
+    Expired,
+    InvalidLoginId,
 }

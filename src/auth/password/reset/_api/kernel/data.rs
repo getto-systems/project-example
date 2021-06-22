@@ -30,7 +30,7 @@ pub enum ValidateResetTokenError {
 impl Display for ValidateResetTokenError {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::Empty => write!(f, "empty password reset token"),
+            Self::Empty => write!(f, "empty reset token"),
         }
     }
 }

@@ -19,7 +19,7 @@ use crate::auth::{
     },
 };
 
-pub struct RequestResetTokenStruct<'a> {
+pub struct ResetPasswordStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
     clock: ChronoAuthClock,
     password_repository: MemoryAuthUserPasswordRepository<'a>,
@@ -28,7 +28,7 @@ pub struct RequestResetTokenStruct<'a> {
     messenger: ProtobufResetPasswordMessenger,
 }
 
-impl<'a> RequestResetTokenStruct<'a> {
+impl<'a> ResetPasswordStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest, body: String) -> Self {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, request),
@@ -43,7 +43,7 @@ impl<'a> RequestResetTokenStruct<'a> {
     }
 }
 
-impl<'a> ResetPasswordInfra for RequestResetTokenStruct<'a> {
+impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
     type Clock = ChronoAuthClock;
     type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
@@ -91,7 +91,7 @@ pub mod test {
         },
     };
 
-    pub struct StaticRequestResetTokenStruct<'a> {
+    pub struct StaticResetPasswordStruct<'a> {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
         pub clock: StaticChronoAuthClock,
         pub password_repository: MemoryAuthUserPasswordRepository<'a>,
@@ -100,7 +100,7 @@ pub mod test {
         pub messenger: StaticResetPasswordMessenger,
     }
 
-    impl<'a> ResetPasswordInfra for StaticRequestResetTokenStruct<'a> {
+    impl<'a> ResetPasswordInfra for StaticResetPasswordStruct<'a> {
         type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
         type Clock = StaticChronoAuthClock;
         type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
