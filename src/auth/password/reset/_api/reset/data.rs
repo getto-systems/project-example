@@ -3,15 +3,21 @@ use std::{
     fmt::{Display, Formatter},
 };
 
+pub struct ResetPasswordResponse {
+    pub message: String,
+}
+
 #[derive(Debug)]
 pub enum DecodeResetTokenError {
-    InfraError(String),
+    Expired,
+    Invalid(String),
 }
 
 impl Display for DecodeResetTokenError {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::InfraError(err) => write!(f, "decode error: {}", err),
+            Self::Expired => write!(f, "token expired"),
+            Self::Invalid(err) => write!(f, "decode error; {}", err),
         }
     }
 }

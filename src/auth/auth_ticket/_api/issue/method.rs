@@ -17,8 +17,8 @@ pub fn issue_auth_ticket<S>(
     user: AuthUser,
     post: impl Fn(IssueAuthTicketEvent) -> S,
 ) -> Result<AuthTicket, S> {
-    let ticket_id =
-        register_ticket_id(infra).map_err(|err| post(IssueAuthTicketEvent::RepositoryError(err)))?;
+    let ticket_id = register_ticket_id(infra)
+        .map_err(|err| post(IssueAuthTicketEvent::RepositoryError(err)))?;
 
     let ticket = AuthTicket::new(ticket_id, user);
 
@@ -33,10 +33,13 @@ fn register_ticket_id(infra: &impl IssueAuthTicketInfra) -> Result<AuthTicketId,
     let ticket_id_generator = infra.ticket_id_generator();
     let ticket_repository = infra.ticket_repository();
 
-    register_attempt(|| {
-        let ticket_id = ticket_id_generator.generate();
-        let limit = clock.now().limit(&config.ticket_expansion_limit);
-        let registered_at = clock.now();
-        Ok(ticket_repository.register(ticket_id, limit, registered_at)?)
-    })
+    register_attempt(
+        || {
+            let ticket_id = ticket_id_generator.generate();
+            let limit = clock.now().limit(&config.ticket_expansion_limit);
+            let registered_at = clock.now();
+            Ok(ticket_repository.register(ticket_id, limit, registered_at)?)
+        },
+        |err| err,
+    )
 }

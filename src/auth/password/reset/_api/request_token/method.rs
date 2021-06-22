@@ -1,24 +1,25 @@
 use getto_application::data::MethodResult;
 
+use crate::z_details::_api::repository::helper::register_attempt;
+
 use super::infra::{
     RequestResetTokenInfra, RequestResetTokenMessenger, ResetTokenDestinationRepository,
     ResetTokenEncoder, ResetTokenNotifier,
 };
-use crate::{
-    auth::{
-        auth_ticket::_api::kernel::{data::ExpireDateTime, infra::AuthClock, method::check_nonce},
-        auth_user::_api::kernel::data::AuthUserId,
-        password::_api::kernel::{
-            data::ResetToken,
-            infra::{AuthUserPasswordRepository, ResetTokenGenerator},
-        },
+use crate::auth::{
+    auth_ticket::_api::kernel::{
+        data::{AuthDateTime, ExpireDateTime},
+        infra::AuthClock,
+        method::check_nonce,
     },
-    z_details::_api::repository::{data::RepositoryError, helper::register_attempt},
+    password::_api::kernel::{
+        data::ResetToken,
+        infra::{AuthUserPasswordRepository, RegisterResetTokenError, ResetTokenGenerator},
+    },
 };
 
 use super::event::RequestResetTokenEvent;
 
-use super::data::RequestResetTokenResponse;
 use crate::auth::login_id::_api::data::LoginId;
 
 pub async fn request_reset_token<S>(
@@ -40,73 +41,61 @@ pub async fn request_reset_token<S>(
 
     let destination = destination_repository
         .get(&login_id)
-        .map_err(|err| post(RequestResetTokenEvent::RepositoryError(err)))?;
+        .map_err(|err| post(RequestResetTokenEvent::RepositoryError(err)))?
+        .ok_or_else(|| post(messenger.encode_invalid_reset().into()))?;
 
-    match destination {
-        None => {
-            let message = messenger
-                .encode_invalid_reset()
-                .map_err(|err| post(RequestResetTokenEvent::MessageError(err)))?;
+    let config = infra.config();
+    let clock = infra.clock();
+    let token_encoder = infra.token_encoder();
+    let token_notifier = infra.token_notifier();
 
-            Err(post(RequestResetTokenEvent::InvalidReset(
-                RequestResetTokenResponse { message },
-            )))
-        }
-        Some(destination) => {
-            let config = infra.config();
-            let clock = infra.clock();
-            let token_encoder = infra.token_encoder();
-            let token_notifier = infra.token_notifier();
+    let expires = clock.now().expires(&config.token_expires);
+    post(RequestResetTokenEvent::TokenExpiresCalculated(
+        expires.clone(),
+    ));
 
-            let expires = clock.now().expires(&config.token_expires);
-            post(RequestResetTokenEvent::TokenExpiresCalculated(
-                expires.clone(),
-            ));
+    let registered_at = clock.now();
 
-            let token = register_reset_token(infra, destination.as_user_id(), &login_id, &expires)
-                .map_err(|err| post(RequestResetTokenEvent::RepositoryError(err)))?;
+    let token =
+        register_reset_token(infra, &login_id, &expires, &registered_at).map_err(|err| {
+            post(match err {
+                RegisterResetTokenError::RepositoryError(err) => err.into(),
+                RegisterResetTokenError::NotFound => messenger.encode_invalid_reset().into(),
+            })
+        })?;
 
-            let token = token_encoder
-                .encode(token, expires)
-                .map_err(|err| post(RequestResetTokenEvent::EncodeError(err)))?;
+    let token = token_encoder
+        .encode(token, expires)
+        .map_err(|err| post(RequestResetTokenEvent::EncodeError(err)))?;
 
-            let response = token_notifier
-                .notify(destination, &token)
-                .await
-                .map_err(|err| post(RequestResetTokenEvent::NotifyError(err)))?;
+    let response = token_notifier
+        .notify(destination, &token)
+        .await
+        .map_err(|err| post(RequestResetTokenEvent::NotifyError(err)))?;
 
-            post(RequestResetTokenEvent::TokenNotified(response));
+    post(RequestResetTokenEvent::TokenNotified(response));
 
-            let message = messenger
-                .encode_success()
-                .map_err(|err| post(RequestResetTokenEvent::MessageError(err)))?;
+    let response = messenger
+        .encode_success()
+        .map_err(|err| post(RequestResetTokenEvent::MessageError(err)))?;
 
-            Ok(post(RequestResetTokenEvent::Success(
-                RequestResetTokenResponse { message },
-            )))
-        }
-    }
+    Ok(post(RequestResetTokenEvent::Success(response)))
 }
 
 fn register_reset_token(
     infra: &impl RequestResetTokenInfra,
-    user_id: &AuthUserId,
     login_id: &LoginId,
     expires: &ExpireDateTime,
-) -> Result<ResetToken, RepositoryError> {
-    let clock = infra.clock();
+    registered_at: &AuthDateTime,
+) -> Result<ResetToken, RegisterResetTokenError> {
     let password_repository = infra.password_repository();
     let token_generator = infra.token_generator();
 
-    register_attempt(|| {
-        let token = token_generator.generate();
-        let registered_at = clock.now();
-        password_repository.register_reset_token(
-            user_id.clone(),
-            login_id.clone(),
-            token,
-            expires.clone(),
-            registered_at,
-        )
-    })
+    register_attempt(
+        || {
+            let token = token_generator.generate();
+            password_repository.register_reset_token(token, login_id, expires, registered_at)
+        },
+        RegisterResetTokenError::RepositoryError,
+    )
 }

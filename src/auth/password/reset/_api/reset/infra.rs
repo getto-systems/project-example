@@ -1,83 +1,54 @@
-pub mod destination_repository;
 pub mod messenger;
-pub mod token_encoder;
-pub mod token_generator;
-pub mod token_notifier;
-
-use async_trait::async_trait;
+pub mod token_decoder;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::{
-        data::{ExpireDateTime, ExpireDuration},
-        infra::{AuthClock, CheckAuthNonceInfra},
-    },
-    password::reset::_api::kernel::{
-        data::{ResetToken, ResetTokenEncoded},
-        infra::{ResetTokenGenerator, ResetTokenRepository},
+    auth_ticket::_api::kernel::infra::{AuthClock, CheckAuthNonceInfra},
+    auth_user::_api::kernel::infra::AuthUserRepository,
+    password::_api::kernel::infra::{
+        AuthUserPasswordHasher, AuthUserPasswordRepository, PlainPassword,
     },
 };
 
-use super::data::{
-    DecodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse, ResetTokenDestination,
+use super::data::DecodeResetTokenError;
+use crate::auth::password::{
+    _api::kernel::data::ResetToken,
+    reset::_api::{kernel::data::ResetTokenEncoded, reset::data::ResetPasswordResponse},
 };
-use crate::{
-    auth::login_id::_api::data::LoginId,
-    z_details::_api::{message::data::MessageError, repository::data::RepositoryError},
-};
+use crate::z_details::_api::message::data::MessageError;
 
-pub trait RequestResetTokenInfra {
+pub trait ResetPasswordInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
     type Clock: AuthClock;
-    type DestinationRepository: ResetTokenDestinationRepository;
-    type TokenRepository: ResetTokenRepository;
-    type TokenGenerator: ResetTokenGenerator;
-    type TokenEncoder: ResetTokenEncoder;
-    type TokenNotifier: ResetTokenNotifier;
-    type Messenger: RequestResetTokenMessenger;
+    type PasswordRepository: AuthUserPasswordRepository;
+    type UserRepository: AuthUserRepository;
+    type PasswordHasher: AuthUserPasswordHasher;
+    type TokenDecoder: ResetTokenDecoder;
+    type Messenger: ResetPasswordMessenger;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
-    fn config(&self) -> &RequestResetTokenConfig;
     fn clock(&self) -> &Self::Clock;
-    fn destination_repository(&self) -> &Self::DestinationRepository;
-    fn token_repository(&self) -> &Self::TokenRepository;
-    fn token_generator(&self) -> &Self::TokenGenerator;
-    fn token_encoder(&self) -> &Self::TokenEncoder;
-    fn token_notifier(&self) -> &Self::TokenNotifier;
+    fn password_repository(&self) -> &Self::PasswordRepository;
+    fn user_repository(&self) -> &Self::UserRepository;
+    fn password_hasher(&self, plain_password: PlainPassword) -> Self::PasswordHasher {
+        Self::PasswordHasher::new(plain_password)
+    }
+    fn token_decoder(&self) -> &Self::TokenDecoder;
     fn messenger(&self) -> &Self::Messenger;
 }
 
-pub struct RequestResetTokenConfig {
-    pub token_expires: ExpireDuration,
+pub trait ResetTokenDecoder {
+    fn decode(&self, token: &ResetTokenEncoded) -> Result<ResetToken, DecodeResetTokenError>;
 }
 
-pub trait ResetTokenDestinationRepository {
-    fn get(&self, login_id: &LoginId) -> Result<Option<ResetTokenDestination>, RepositoryError>;
-}
-
-pub trait ResetTokenEncoder {
-    fn encode(
-        &self,
-        token: ResetToken,
-        expires: ExpireDateTime,
-    ) -> Result<ResetTokenEncoded, DecodeResetTokenError>;
-}
-
-#[async_trait]
-pub trait ResetTokenNotifier {
-    async fn notify(
-        &self,
-        destination: ResetTokenDestination,
-        token: &ResetTokenEncoded,
-    ) -> Result<NotifyResetTokenResponse, NotifyResetTokenError>;
-}
-
-pub trait RequestResetTokenMessenger {
-    fn decode(&self) -> Result<RequestResetTokenFieldsExtract, MessageError>;
-    fn encode_success(&self) -> Result<String, MessageError>;
-    fn encode_invalid_reset(&self) -> Result<String, MessageError>;
+pub trait ResetPasswordMessenger {
+    fn decode(&self) -> Result<ResetPasswordFieldsExtract, MessageError>;
+    fn encode_invalid_reset(&self) -> Result<ResetPasswordResponse, MessageError>;
+    fn encode_already_reset(&self) -> Result<ResetPasswordResponse, MessageError>;
 }
 
 #[derive(Clone)]
-pub struct RequestResetTokenFieldsExtract {
+pub struct ResetPasswordFieldsExtract {
     pub login_id: String,
+    pub password: String,
+    pub reset_token: String,
 }

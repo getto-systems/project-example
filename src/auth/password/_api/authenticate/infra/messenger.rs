@@ -5,8 +5,11 @@ use crate::auth::_api::y_protobuf::api::{
 
 use crate::z_details::_api::message::helper::{decode_protobuf_base64, encode_protobuf_base64};
 
-use super::{AuthenticatePasswordMessenger, AuthenticatePasswordFieldsExtract};
+use crate::auth::password::_api::authenticate::infra::{
+    AuthenticatePasswordFieldsExtract, AuthenticatePasswordMessenger,
+};
 
+use crate::auth::password::_api::authenticate::data::AuthenticatePasswordResponse;
 use crate::z_details::_api::message::data::MessageError;
 
 pub struct ProtobufAuthenticatePasswordMessenger {
@@ -28,7 +31,7 @@ impl AuthenticatePasswordMessenger for ProtobufAuthenticatePasswordMessenger {
             password: message.password,
         })
     }
-    fn encode_invalid_password(&self) -> Result<String, MessageError> {
+    fn encode_invalid_password(&self) -> Result<AuthenticatePasswordResponse, MessageError> {
         let mut message = AuthenticatePasswordResult_pb::new();
         message.set_success(false);
 
@@ -36,14 +39,19 @@ impl AuthenticatePasswordMessenger for ProtobufAuthenticatePasswordMessenger {
         err.set_field_type(AuthenticatePasswordResult_pb_ErrorType::INVALID_PASSWORD);
         message.set_err(err);
 
-        encode_protobuf_base64(message)
+        let message = encode_protobuf_base64(message)?;
+
+        Ok(AuthenticatePasswordResponse { message })
     }
 }
 
 #[cfg(test)]
 pub mod test {
-    use super::super::{AuthenticatePasswordMessenger, AuthenticatePasswordFieldsExtract};
+    use crate::auth::password::_api::authenticate::infra::{
+        AuthenticatePasswordFieldsExtract, AuthenticatePasswordMessenger,
+    };
 
+    use crate::auth::password::_api::authenticate::data::AuthenticatePasswordResponse;
     use crate::z_details::_api::message::data::MessageError;
 
     pub struct StaticAuthenticatePasswordMessenger {
@@ -60,8 +68,10 @@ pub mod test {
         fn decode(&self) -> Result<AuthenticatePasswordFieldsExtract, MessageError> {
             Ok(self.fields.clone())
         }
-        fn encode_invalid_password(&self) -> Result<String, MessageError> {
-            Ok("encoded".into())
+        fn encode_invalid_password(&self) -> Result<AuthenticatePasswordResponse, MessageError> {
+            Ok(AuthenticatePasswordResponse {
+                message: "encoded".into(),
+            })
         }
     }
 }

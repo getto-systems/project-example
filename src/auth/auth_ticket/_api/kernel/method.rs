@@ -19,7 +19,7 @@ pub fn check_nonce(infra: &impl CheckAuthNonceInfra) -> Result<(), ValidateAuthN
         .map_err(ValidateAuthNonceError::RepositoryError)?;
 
     if let Some(entry) = entry {
-        if !entry.has_expired(clock.now()) {
+        if !entry.has_expired(&clock.now()) {
             return Err(ValidateAuthNonceError::Conflict);
         }
     }

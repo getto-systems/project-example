@@ -1,6 +1,6 @@
 use super::super::kernel::method::check_nonce;
 
-use super::infra::{AuthTokenHeader, AuthTokenValidator, ValidateAuthTokenInfra};
+use super::infra::{AuthTokenHeader, AuthTokenDecoder, ValidateAuthTokenInfra};
 
 use super::event::ValidateAuthTokenEvent;
 
@@ -34,7 +34,7 @@ fn validate_token(
         .map_err(|err| ValidateAuthTokenError::HeaderError(err))?;
 
     let ticket = token_validator
-        .validate(&token)
+        .decode(&token)
         .map_err(|err| ValidateAuthTokenError::DecodeError(err))?;
 
     ticket

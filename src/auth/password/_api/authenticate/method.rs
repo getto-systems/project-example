@@ -1,15 +1,16 @@
 use crate::auth::auth_ticket::_api::kernel::method::check_nonce;
-use crate::auth::password::_api::kernel::infra::AuthUserPasswordRepository;
 
-use super::infra::{AuthenticatePasswordInfra, AuthenticatePasswordMessenger};
+use crate::auth::password::_api::kernel::infra::VerifyPasswordError;
 use crate::auth::{
     auth_user::_api::kernel::infra::AuthUserRepository,
-    password::_api::kernel::infra::PlainPassword,
+    password::_api::{
+        authenticate::infra::{AuthenticatePasswordInfra, AuthenticatePasswordMessenger},
+        kernel::infra::{AuthUserPasswordRepository, PlainPassword},
+    },
 };
 
 use super::event::AuthenticatePasswordEvent;
 
-use super::data::AuthenticatePasswordResponse;
 use crate::auth::{auth_user::_api::kernel::data::AuthUser, login_id::_api::data::LoginId};
 
 pub fn authenticate_password<S>(
@@ -32,32 +33,27 @@ pub fn authenticate_password<S>(
     let plain_password = PlainPassword::validate(fields.password)
         .map_err(|err| post(AuthenticatePasswordEvent::ValidatePasswordError(err)))?;
 
+    let matcher = infra.password_matcher(plain_password);
+
     let user_id = password_repository
-        .verify_password(&login_id, infra.password_matcher(plain_password))
-        .map_err(|err| post(err.into()))?;
+        .verify_password(&login_id, &matcher)
+        .map_err(|err| {
+            post(match err {
+                VerifyPasswordError::PasswordMatchError(err) => err.into(),
+                VerifyPasswordError::RepositoryError(err) => err.into(),
+                VerifyPasswordError::NotFound => messenger.encode_invalid_password().into(),
+            })
+        })?;
 
-    match user_id {
-        None => {
-            let message = messenger
-                .encode_invalid_password()
-                .map_err(|err| post(AuthenticatePasswordEvent::MessageError(err)))?;
+    let user_repository = infra.user_repository();
 
-            Err(post(AuthenticatePasswordEvent::InvalidPassword(
-                AuthenticatePasswordResponse { message },
-            )))
-        }
-        Some(user_id) => {
-            let user_repository = infra.user_repository();
+    let user = user_repository
+        .get(&user_id)
+        .map_err(|err| post(AuthenticatePasswordEvent::RepositoryError(err)))?;
 
-            let user = user_repository
-                .get(&user_id)
-                .map_err(|err| post(AuthenticatePasswordEvent::RepositoryError(err)))?;
+    let user = user.ok_or_else(|| post(AuthenticatePasswordEvent::UserNotFound))?;
 
-            let user = user.ok_or_else(|| post(AuthenticatePasswordEvent::UserNotFound))?;
-
-            // 呼び出し側を簡単にするため、例外的に State ではなく AuthUser を返す
-            post(AuthenticatePasswordEvent::Success(user.clone()));
-            Ok(user)
-        }
-    }
+    // 呼び出し側を簡単にするため、例外的に State ではなく AuthUser を返す
+    post(AuthenticatePasswordEvent::Success(user.clone()));
+    Ok(user)
 }

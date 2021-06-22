@@ -8,6 +8,7 @@ use crate::auth::{
     },
 };
 
+use crate::auth::password::_api::authenticate::data::AuthenticatePasswordResponse;
 use crate::z_details::_api::message::data::MessageError;
 
 pub trait AuthenticatePasswordInfra {
@@ -30,7 +31,7 @@ pub trait AuthenticatePasswordInfra {
 
 pub trait AuthenticatePasswordMessenger {
     fn decode(&self) -> Result<AuthenticatePasswordFieldsExtract, MessageError>;
-    fn encode_invalid_password(&self) -> Result<String, MessageError>;
+    fn encode_invalid_password(&self) -> Result<AuthenticatePasswordResponse, MessageError>;
 }
 
 #[derive(Clone)]

@@ -1,13 +1,12 @@
 use std::fmt::Display;
 
-use super::data::AuthenticatePasswordResponse;
 use crate::auth::{
     auth_ticket::_api::kernel::data::ValidateAuthNonceError,
     auth_user::_api::kernel::data::AuthUser,
     login_id::_api::data::ValidateLoginIdError,
-    password::_api::kernel::{
-        data::{PasswordHashError, ValidatePasswordError},
-        infra::VerifyPasswordError,
+    password::_api::{
+        authenticate::data::AuthenticatePasswordResponse,
+        kernel::data::{PasswordHashError, ValidatePasswordError},
     },
 };
 use crate::z_details::_api::{message::data::MessageError, repository::data::RepositoryError};
@@ -43,11 +42,23 @@ impl Display for AuthenticatePasswordEvent {
     }
 }
 
-impl From<VerifyPasswordError> for AuthenticatePasswordEvent {
-    fn from(err: VerifyPasswordError) -> Self {
-        match err {
-            VerifyPasswordError::PasswordMatchError(err) => Self::PasswordHashError(err),
-            VerifyPasswordError::RepositoryError(err) => Self::RepositoryError(err),
+impl Into<AuthenticatePasswordEvent> for Result<AuthenticatePasswordResponse, MessageError> {
+    fn into(self) -> AuthenticatePasswordEvent {
+        match self {
+            Ok(response) => AuthenticatePasswordEvent::InvalidPassword(response),
+            Err(err) => AuthenticatePasswordEvent::MessageError(err),
         }
+    }
+}
+
+impl Into<AuthenticatePasswordEvent> for PasswordHashError {
+    fn into(self) -> AuthenticatePasswordEvent {
+        AuthenticatePasswordEvent::PasswordHashError(self)
+    }
+}
+
+impl Into<AuthenticatePasswordEvent> for RepositoryError {
+    fn into(self) -> AuthenticatePasswordEvent {
+        AuthenticatePasswordEvent::RepositoryError(self)
     }
 }

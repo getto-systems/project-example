@@ -167,6 +167,7 @@ impl Display for AuthTicketId {
     }
 }
 
+#[derive(Clone)]
 pub struct AuthDateTime(DateTime<Utc>);
 
 impl AuthDateTime {
@@ -200,7 +201,7 @@ impl AuthDateTime {
 pub struct ExpireDateTime(DateTime<Utc>);
 
 impl ExpireDateTime {
-    pub fn has_elapsed(&self, now: AuthDateTime) -> bool {
+    pub fn has_elapsed(&self, now: &AuthDateTime) -> bool {
         self.0 < now.0
     }
 

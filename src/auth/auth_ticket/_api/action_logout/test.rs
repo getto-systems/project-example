@@ -21,7 +21,7 @@ use crate::auth::auth_ticket::_api::{
         AuthNonceConfig,
     },
     validate::infra::{
-        token_header::test::StaticAuthTokenHeader, token_validator::test::StaticAuthTokenValidator,
+        token_header::test::StaticAuthTokenHeader, token_decoder::test::StaticAuthTokenDecoder,
         ValidateAuthTokenConfig,
     },
 };
@@ -225,8 +225,8 @@ fn standard_token_header() -> StaticAuthTokenHeader {
     StaticAuthTokenHeader::Valid(AuthTokenValue::new("TOKEN".into()))
 }
 
-fn standard_token_validator() -> StaticAuthTokenValidator {
-    StaticAuthTokenValidator::Valid(
+fn standard_token_validator() -> StaticAuthTokenDecoder {
+    StaticAuthTokenDecoder::Valid(
         AuthTicketExtract {
             ticket_id: TICKET_ID.into(),
             user_id: "user-id".into(),

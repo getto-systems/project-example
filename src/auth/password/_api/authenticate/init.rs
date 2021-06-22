@@ -1,9 +1,8 @@
 use actix_web::HttpRequest;
 
-use crate::auth::{
-    _api::x_outside_feature::feature::AuthOutsideFeature,
-    auth_ticket::_api::kernel::init::CheckAuthNonceStruct,
-};
+use crate::auth::auth_ticket::_api::kernel::init::CheckAuthNonceStruct;
+
+use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use super::infra::{messenger::ProtobufAuthenticatePasswordMessenger, AuthenticatePasswordInfra};
 use crate::auth::{
@@ -15,7 +14,7 @@ use crate::auth::{
     },
 };
 
-pub struct AuthenticatePasswordStruct<'a> {
+pub(in crate::auth::password) struct AuthenticatePasswordStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
     clock: ChronoAuthClock,
     password_repository: MemoryAuthUserPasswordRepository<'a>,

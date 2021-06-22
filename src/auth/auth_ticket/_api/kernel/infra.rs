@@ -78,7 +78,7 @@ impl AuthNonceEntry {
         Self { nonce, expires }
     }
 
-    pub fn has_expired(&self, now: AuthDateTime) -> bool {
+    pub fn has_expired(&self, now: &AuthDateTime) -> bool {
         self.expires.has_elapsed(now)
     }
 }

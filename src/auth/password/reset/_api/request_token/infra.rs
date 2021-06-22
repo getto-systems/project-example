@@ -10,13 +10,19 @@ use crate::auth::{
     password::_api::kernel::infra::{AuthUserPasswordRepository, ResetTokenGenerator},
 };
 
-use super::data::{
-    EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse, ResetTokenDestination,
-};
 use crate::auth::{
     auth_ticket::_api::kernel::data::{ExpireDateTime, ExpireDuration},
     login_id::_api::data::LoginId,
-    password::{_api::kernel::data::ResetToken, reset::_api::kernel::data::ResetTokenEncoded},
+    password::{
+        _api::kernel::data::ResetToken,
+        reset::_api::{
+            kernel::data::ResetTokenEncoded,
+            request_token::data::{
+                EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
+                RequestResetTokenResponse, ResetTokenDestination,
+            },
+        },
+    },
 };
 use crate::z_details::_api::{message::data::MessageError, repository::data::RepositoryError};
 
@@ -68,8 +74,8 @@ pub trait ResetTokenNotifier {
 
 pub trait RequestResetTokenMessenger {
     fn decode(&self) -> Result<RequestResetTokenFieldsExtract, MessageError>;
-    fn encode_success(&self) -> Result<String, MessageError>;
-    fn encode_invalid_reset(&self) -> Result<String, MessageError>;
+    fn encode_success(&self) -> Result<RequestResetTokenResponse, MessageError>;
+    fn encode_invalid_reset(&self) -> Result<RequestResetTokenResponse, MessageError>;
 }
 
 #[derive(Clone)]

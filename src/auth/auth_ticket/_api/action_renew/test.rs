@@ -25,7 +25,7 @@ use crate::auth::auth_ticket::_api::{
         AuthNonceConfig,
     },
     validate::infra::{
-        token_header::test::StaticAuthTokenHeader, token_validator::test::StaticAuthTokenValidator,
+        token_header::test::StaticAuthTokenHeader, token_decoder::test::StaticAuthTokenDecoder,
         ValidateAuthTokenConfig,
     },
 };
@@ -267,7 +267,7 @@ impl<'a> TestFeature<'a> {
     fn with_require_roles_and_validator(
         store: &'a TestStore,
         require_roles: RequireAuthRoles,
-        token_validator: StaticAuthTokenValidator,
+        token_validator: StaticAuthTokenDecoder,
     ) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
@@ -326,11 +326,11 @@ fn standard_token_header() -> StaticAuthTokenHeader {
     StaticAuthTokenHeader::Valid(AuthTokenValue::new("TOKEN".into()))
 }
 
-fn standard_token_validator() -> StaticAuthTokenValidator {
+fn standard_token_validator() -> StaticAuthTokenDecoder {
     let mut granted_roles = HashSet::new();
     granted_roles.insert("something".into());
 
-    StaticAuthTokenValidator::Valid(
+    StaticAuthTokenDecoder::Valid(
         AuthTicketExtract {
             ticket_id: TICKET_ID.into(),
             user_id: "something-role-user-id".into(),
@@ -339,8 +339,8 @@ fn standard_token_validator() -> StaticAuthTokenValidator {
         .into(),
     )
 }
-fn no_granted_roles_token_validator() -> StaticAuthTokenValidator {
-    StaticAuthTokenValidator::Valid(
+fn no_granted_roles_token_validator() -> StaticAuthTokenDecoder {
+    StaticAuthTokenDecoder::Valid(
         AuthTicketExtract {
             ticket_id: TICKET_ID.into(),
             user_id: "no-role-user-id".into(),
@@ -349,8 +349,8 @@ fn no_granted_roles_token_validator() -> StaticAuthTokenValidator {
         .into(),
     )
 }
-fn expired_token_validator() -> StaticAuthTokenValidator {
-    StaticAuthTokenValidator::Expired
+fn expired_token_validator() -> StaticAuthTokenDecoder {
+    StaticAuthTokenDecoder::Expired
 }
 
 fn standard_nonce_store() -> MemoryAuthNonceStore {

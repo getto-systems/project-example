@@ -38,6 +38,7 @@ use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 
 use crate::auth::{
     auth_ticket::_api::kernel::data::{AuthDateTime, AuthNonceValue, ExpireDuration},
+    auth_user::_api::kernel::data::AuthUserId,
     login_id::_api::data::LoginId,
     password::{
         _api::kernel::data::ResetToken,
@@ -247,8 +248,8 @@ impl<'a> TestFeature<'a> {
 }
 
 const NONCE: &'static str = "nonce";
-const LOGIN_ID: &'static str = "login-id";
 const USER_ID: &'static str = "user-id";
+const LOGIN_ID: &'static str = "login-id";
 const USER_EMAIL: &'static str = "user@example.com";
 const RESET_TOKEN: &'static str = "reset-token";
 
@@ -322,15 +323,17 @@ fn empty_destination_store() -> MemoryResetTokenDestinationStore {
 }
 
 fn standard_password_store() -> MemoryAuthUserPasswordStore {
-    MemoryAuthUserPasswordMap::new().to_store()
+    MemoryAuthUserPasswordMap::with_user_id(test_user_login_id(), test_user_id()).to_store()
 }
 
+fn test_user_id() -> AuthUserId {
+    AuthUserId::new(USER_ID.to_string())
+}
 fn test_user_login_id() -> LoginId {
     LoginId::validate(LOGIN_ID.to_string()).unwrap()
 }
 fn test_user_destination() -> ResetTokenDestination {
     ResetTokenDestinationExtract {
-        user_id: USER_ID.to_string(),
         email: USER_EMAIL.to_string(),
     }
     .into()

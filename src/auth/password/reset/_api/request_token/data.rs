@@ -3,28 +3,18 @@ use std::{
     fmt::{Display, Formatter},
 };
 
-use crate::auth::auth_user::_api::kernel::data::AuthUserId;
-
 pub struct RequestResetTokenResponse {
     pub message: String,
 }
 
 #[derive(Clone)]
 pub struct ResetTokenDestination {
-    user_id: AuthUserId,
     email: String,
 }
 
 impl ResetTokenDestination {
     pub fn extract(self) -> ResetTokenDestinationExtract {
-        ResetTokenDestinationExtract {
-            user_id: self.user_id.extract(),
-            email: self.email,
-        }
-    }
-
-    pub fn as_user_id(&self) -> &AuthUserId {
-        &self.user_id
+        ResetTokenDestinationExtract { email: self.email }
     }
 
     pub fn into_email(self) -> String {
@@ -33,16 +23,12 @@ impl ResetTokenDestination {
 }
 
 pub struct ResetTokenDestinationExtract {
-    pub user_id: String,
     pub email: String,
 }
 
 impl Into<ResetTokenDestination> for ResetTokenDestinationExtract {
     fn into(self) -> ResetTokenDestination {
-        ResetTokenDestination {
-            user_id: AuthUserId::new(self.user_id),
-            email: self.email,
-        }
+        ResetTokenDestination { email: self.email }
     }
 }
 
