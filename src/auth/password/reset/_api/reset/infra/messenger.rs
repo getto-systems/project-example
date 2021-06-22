@@ -33,32 +33,32 @@ impl ResetPasswordMessenger for ProtobufResetPasswordMessenger {
         })
     }
     fn encode_not_found(&self) -> Result<ResetPasswordResponse, MessageError> {
-        encode(
+        encode_failed(
             ResetPasswordResult_pb_ErrorType::INVALID_RESET,
-            ResetPasswordResponse::not_found,
+            ResetPasswordResponse::NotFound,
         )
     }
     fn encode_already_reset(&self) -> Result<ResetPasswordResponse, MessageError> {
-        encode(
+        encode_failed(
             ResetPasswordResult_pb_ErrorType::ALREADY_RESET,
-            ResetPasswordResponse::already_reset,
+            ResetPasswordResponse::AlreadyReset,
         )
     }
     fn encode_expired(&self) -> Result<ResetPasswordResponse, MessageError> {
-        encode(
+        encode_failed(
             ResetPasswordResult_pb_ErrorType::INVALID_RESET,
-            ResetPasswordResponse::expired,
+            ResetPasswordResponse::Expired,
         )
     }
     fn encode_invalid_login_id(&self) -> Result<ResetPasswordResponse, MessageError> {
-        encode(
+        encode_failed(
             ResetPasswordResult_pb_ErrorType::INVALID_RESET,
-            ResetPasswordResponse::invalid_login_id,
+            ResetPasswordResponse::InvalidLoginId,
         )
     }
 }
 
-fn encode(
+fn encode_failed(
     field_type: ResetPasswordResult_pb_ErrorType,
     response: impl Fn(String) -> ResetPasswordResponse,
 ) -> Result<ResetPasswordResponse, MessageError> {
@@ -97,16 +97,16 @@ pub mod test {
             Ok(self.fields.clone())
         }
         fn encode_not_found(&self) -> Result<ResetPasswordResponse, MessageError> {
-            Ok(ResetPasswordResponse::not_found("encoded".into()))
+            Ok(ResetPasswordResponse::NotFound("encoded".into()))
         }
         fn encode_already_reset(&self) -> Result<ResetPasswordResponse, MessageError> {
-            Ok(ResetPasswordResponse::already_reset("encoded".into()))
+            Ok(ResetPasswordResponse::AlreadyReset("encoded".into()))
         }
         fn encode_expired(&self) -> Result<ResetPasswordResponse, MessageError> {
-            Ok(ResetPasswordResponse::expired("encoded".into()))
+            Ok(ResetPasswordResponse::Expired("encoded".into()))
         }
         fn encode_invalid_login_id(&self) -> Result<ResetPasswordResponse, MessageError> {
-            Ok(ResetPasswordResponse::invalid_login_id("encoded".into()))
+            Ok(ResetPasswordResponse::InvalidLoginId("encoded".into()))
         }
     }
 }

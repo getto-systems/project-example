@@ -1,6 +1,5 @@
 use crate::auth::auth_ticket::_api::kernel::method::check_nonce;
 
-use crate::auth::password::_api::kernel::infra::VerifyPasswordError;
 use crate::auth::{
     auth_user::_api::kernel::infra::AuthUserRepository,
     password::_api::{
@@ -37,13 +36,7 @@ pub fn authenticate_password<S>(
 
     let user_id = password_repository
         .verify_password(&login_id, &matcher)
-        .map_err(|err| {
-            post(match err {
-                VerifyPasswordError::PasswordMatchError(err) => err.into(),
-                VerifyPasswordError::RepositoryError(err) => err.into(),
-                VerifyPasswordError::NotFound => messenger.encode_invalid_password().into(),
-            })
-        })?;
+        .map_err(|err| post(err.into_authenticate_password_event(messenger)))?;
 
     let user_repository = infra.user_repository();
 

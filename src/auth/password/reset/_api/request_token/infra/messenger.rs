@@ -35,19 +35,35 @@ impl RequestResetTokenMessenger for ProtobufRequestResetTokenMessenger {
         message.set_success(true);
 
         let message = encode_protobuf_base64(message)?;
-        Ok(RequestResetTokenResponse { message })
+        Ok(RequestResetTokenResponse::Success(message))
     }
-    fn encode_invalid_reset(&self) -> Result<RequestResetTokenResponse, MessageError> {
-        let mut message = RequestResetTokenResult_pb::new();
-        message.set_success(false);
-
-        let mut err = RequestResetTokenResult_pb_Error::new();
-        err.set_field_type(RequestResetTokenResult_pb_ErrorType::INVALID_RESET);
-        message.set_err(err);
-
-        let message = encode_protobuf_base64(message)?;
-        Ok(RequestResetTokenResponse { message })
+    fn encode_destination_not_found(&self) -> Result<RequestResetTokenResponse, MessageError> {
+        encode_failed(
+            RequestResetTokenResult_pb_ErrorType::INVALID_RESET,
+            RequestResetTokenResponse::DestinationNotFound,
+        )
     }
+    fn encode_user_not_found(&self) -> Result<RequestResetTokenResponse, MessageError> {
+        encode_failed(
+            RequestResetTokenResult_pb_ErrorType::INVALID_RESET,
+            RequestResetTokenResponse::UserNotFound,
+        )
+    }
+}
+
+fn encode_failed(
+    field_type: RequestResetTokenResult_pb_ErrorType,
+    response: impl Fn(String) -> RequestResetTokenResponse,
+) -> Result<RequestResetTokenResponse, MessageError> {
+    let mut message = RequestResetTokenResult_pb::new();
+    message.set_success(false);
+
+    let mut err = RequestResetTokenResult_pb_Error::new();
+    err.set_field_type(field_type);
+    message.set_err(err);
+
+    let message = encode_protobuf_base64(message)?;
+    Ok(response(message))
 }
 
 #[cfg(test)]
@@ -74,14 +90,15 @@ pub mod test {
             Ok(self.fields.clone())
         }
         fn encode_success(&self) -> Result<RequestResetTokenResponse, MessageError> {
-            Ok(RequestResetTokenResponse {
-                message: "encoded".into(),
-            })
+            Ok(RequestResetTokenResponse::Success("encoded".into()))
         }
-        fn encode_invalid_reset(&self) -> Result<RequestResetTokenResponse, MessageError> {
-            Ok(RequestResetTokenResponse {
-                message: "encoded".into(),
-            })
+        fn encode_destination_not_found(&self) -> Result<RequestResetTokenResponse, MessageError> {
+            Ok(RequestResetTokenResponse::DestinationNotFound(
+                "encoded".into(),
+            ))
+        }
+        fn encode_user_not_found(&self) -> Result<RequestResetTokenResponse, MessageError> {
+            Ok(RequestResetTokenResponse::UserNotFound("encoded".into()))
         }
     }
 }

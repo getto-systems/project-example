@@ -4,7 +4,7 @@ use crate::auth::{
     auth_ticket::_api::kernel::infra::AuthClock,
     auth_user::_api::kernel::infra::AuthUserRepository,
     password::{
-        _api::kernel::infra::{AuthUserPasswordRepository, PlainPassword, ResetPasswordError},
+        _api::kernel::infra::{AuthUserPasswordRepository, PlainPassword},
         reset::_api::reset::infra::{
             ResetPasswordInfra, ResetPasswordMessenger, ResetTokenDecoder,
         },
@@ -52,16 +52,7 @@ pub fn reset_password<S>(
 
     let user_id = password_repository
         .reset_password(&token, &login_id, &hasher, &reset_at)
-        .map_err(|err| {
-            post(match err {
-                ResetPasswordError::RepositoryError(err) => err.into(),
-                ResetPasswordError::PasswordHashError(err) => err.into(),
-                ResetPasswordError::NotFound => messenger.encode_not_found().into(),
-                ResetPasswordError::AlreadyReset => messenger.encode_already_reset().into(),
-                ResetPasswordError::Expired => messenger.encode_expired().into(),
-                ResetPasswordError::InvalidLoginId => messenger.encode_invalid_login_id().into(),
-            })
-        })?;
+        .map_err(|err| post(err.into_reset_password_event(messenger)))?;
 
     let user_repository = infra.user_repository();
 

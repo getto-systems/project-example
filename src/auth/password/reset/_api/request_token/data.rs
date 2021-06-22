@@ -3,8 +3,20 @@ use std::{
     fmt::{Display, Formatter},
 };
 
-pub struct RequestResetTokenResponse {
-    pub message: String,
+pub enum RequestResetTokenResponse {
+    Success(String),
+    DestinationNotFound(String),
+    UserNotFound(String),
+}
+
+impl Display for RequestResetTokenResponse {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::Success(_) => write!(f, "success"),
+            Self::DestinationNotFound(_) => write!(f, "destination not found"),
+            Self::UserNotFound(_) => write!(f, "user not found"),
+        }
+    }
 }
 
 #[derive(Clone)]

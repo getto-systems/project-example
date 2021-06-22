@@ -36,7 +36,7 @@ impl Display for RequestResetTokenEvent {
                 write!(f, "token notified; {}", response)
             }
             Self::Success(_) => write!(f, "{}", SUCCESS),
-            Self::InvalidReset(_) => write!(f, "{}; invalid reset", ERROR),
+            Self::InvalidReset(response) => write!(f, "{}; {}", ERROR, response),
             Self::NonceError(err) => write!(f, "{}; {}", ERROR, err),
             Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
             Self::MessageError(err) => write!(f, "{}; {}", ERROR, err),
@@ -44,20 +44,5 @@ impl Display for RequestResetTokenEvent {
             Self::NotifyError(err) => write!(f, "{}; {}", ERROR, err),
             Self::ValidateLoginIdError(err) => write!(f, "{}; {}", ERROR, err),
         }
-    }
-}
-
-impl Into<RequestResetTokenEvent> for Result<RequestResetTokenResponse, MessageError> {
-    fn into(self) -> RequestResetTokenEvent {
-        match self {
-            Ok(response) => RequestResetTokenEvent::InvalidReset(response),
-            Err(err) => RequestResetTokenEvent::MessageError(err),
-        }
-    }
-}
-
-impl Into<RequestResetTokenEvent> for RepositoryError {
-    fn into(self) -> RequestResetTokenEvent {
-        RequestResetTokenEvent::RepositoryError(self)
     }
 }

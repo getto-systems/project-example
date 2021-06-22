@@ -142,7 +142,7 @@ async fn just_max_length_login_id() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["request reset token error; invalid reset"]);
+    assert_state(vec!["request reset token error; destination not found"]);
     assert!(!result.is_ok());
 }
 
@@ -157,7 +157,7 @@ async fn error_destination_not_stored() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["request reset token error; invalid reset"]);
+    assert_state(vec!["request reset token error; destination not found"]);
     assert!(!result.is_ok());
 }
 

@@ -89,9 +89,6 @@ coverage_check() {
 
     *)
         echo "NG; line coverage: ${line_coverage} < 100%"
-        if [ -n "${COVERAGE_PRESERVE}" ]; then
-            tar -f tmp/coverage.tar.gz -cz ui/public/dist/coverage/api
-        fi
         exit 1
         ;;
     esac

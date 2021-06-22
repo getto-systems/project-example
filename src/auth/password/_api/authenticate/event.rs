@@ -23,14 +23,14 @@ pub enum AuthenticatePasswordEvent {
     ValidatePasswordError(ValidatePasswordError),
 }
 
-const SUCCESS: &'static str = "authenticate success";
-const ERROR: &'static str = "authenticate error";
+const SUCCESS: &'static str = "authenticate password success";
+const ERROR: &'static str = "authenticate password error";
 
 impl Display for AuthenticatePasswordEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Success(user) => write!(f, "{}; {}", SUCCESS, user),
-            Self::InvalidPassword(_) => write!(f, "{}; password not match", ERROR),
+            Self::InvalidPassword(response) => write!(f, "{}; {}", ERROR, response),
             Self::UserNotFound => write!(f, "{}; user not found", ERROR),
             Self::NonceError(err) => write!(f, "{}; {}", ERROR, err),
             Self::PasswordHashError(err) => write!(f, "{}; {}", ERROR, err),
@@ -39,26 +39,5 @@ impl Display for AuthenticatePasswordEvent {
             Self::ValidateLoginIdError(err) => write!(f, "{}; {}", ERROR, err),
             Self::ValidatePasswordError(err) => write!(f, "{}; {}", ERROR, err),
         }
-    }
-}
-
-impl Into<AuthenticatePasswordEvent> for Result<AuthenticatePasswordResponse, MessageError> {
-    fn into(self) -> AuthenticatePasswordEvent {
-        match self {
-            Ok(response) => AuthenticatePasswordEvent::InvalidPassword(response),
-            Err(err) => AuthenticatePasswordEvent::MessageError(err),
-        }
-    }
-}
-
-impl Into<AuthenticatePasswordEvent> for PasswordHashError {
-    fn into(self) -> AuthenticatePasswordEvent {
-        AuthenticatePasswordEvent::PasswordHashError(self)
-    }
-}
-
-impl Into<AuthenticatePasswordEvent> for RepositoryError {
-    fn into(self) -> AuthenticatePasswordEvent {
-        AuthenticatePasswordEvent::RepositoryError(self)
     }
 }

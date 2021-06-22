@@ -3,52 +3,20 @@ use std::{
     fmt::{Display, Formatter},
 };
 
-pub struct ResetPasswordResponse {
-    kind: ResponseKind,
-    pub message: String,
-}
-
-impl ResetPasswordResponse {
-    pub fn not_found(message: String) -> Self {
-        Self {
-            kind: ResponseKind::NotFound,
-            message,
-        }
-    }
-    pub fn already_reset(message: String) -> Self {
-        Self {
-            kind: ResponseKind::AlreadyReset,
-            message,
-        }
-    }
-    pub fn expired(message: String) -> Self {
-        Self {
-            kind: ResponseKind::Expired,
-            message,
-        }
-    }
-    pub fn invalid_login_id(message: String) -> Self {
-        Self {
-            kind: ResponseKind::InvalidLoginId,
-            message,
-        }
-    }
-}
-
-enum ResponseKind {
-    NotFound,
-    AlreadyReset,
-    Expired,
-    InvalidLoginId,
+pub enum ResetPasswordResponse {
+    NotFound(String),
+    AlreadyReset(String),
+    Expired(String),
+    InvalidLoginId(String),
 }
 
 impl Display for ResetPasswordResponse {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        match self.kind {
-            ResponseKind::NotFound => write!(f, "reset token not found"),
-            ResponseKind::AlreadyReset => write!(f, "already reset"),
-            ResponseKind::Expired => write!(f, "reset token expired"),
-            ResponseKind::InvalidLoginId => write!(f, "invalid login id"),
+        match self {
+            Self::NotFound(_) => write!(f, "reset token not found"),
+            Self::AlreadyReset(_) => write!(f, "already reset"),
+            Self::Expired(_) => write!(f, "reset token expired"),
+            Self::InvalidLoginId(_) => write!(f, "invalid login id"),
         }
     }
 }

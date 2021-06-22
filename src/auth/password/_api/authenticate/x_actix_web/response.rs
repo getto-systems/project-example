@@ -22,6 +22,10 @@ impl AuthenticatePasswordEvent {
 
 impl AuthenticatePasswordResponse {
     pub fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
-        HttpResponse::Ok().body(self.message)
+        match self {
+            Self::UserNotFound(message) => HttpResponse::Ok().body(message),
+            Self::PasswordNotFound(message) => HttpResponse::Ok().body(message),
+            Self::PasswordNotMatched(message) => HttpResponse::Ok().body(message),
+        }
     }
 }

@@ -48,24 +48,3 @@ impl Display for ResetPasswordEvent {
         }
     }
 }
-
-impl Into<ResetPasswordEvent> for Result<ResetPasswordResponse, MessageError> {
-    fn into(self) -> ResetPasswordEvent {
-        match self {
-            Ok(response) => ResetPasswordEvent::InvalidReset(response),
-            Err(err) => ResetPasswordEvent::MessageError(err),
-        }
-    }
-}
-
-impl Into<ResetPasswordEvent> for RepositoryError {
-    fn into(self) -> ResetPasswordEvent {
-        ResetPasswordEvent::RepositoryError(self)
-    }
-}
-
-impl Into<ResetPasswordEvent> for PasswordHashError {
-    fn into(self) -> ResetPasswordEvent {
-        ResetPasswordEvent::PasswordHashError(self)
-    }
-}

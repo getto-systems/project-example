@@ -42,7 +42,7 @@ pub async fn request_reset_token<S>(
     let destination = destination_repository
         .get(&login_id)
         .map_err(|err| post(RequestResetTokenEvent::RepositoryError(err)))?
-        .ok_or_else(|| post(messenger.encode_invalid_reset().into()))?;
+        .ok_or_else(|| post(messenger.encode_destination_not_found().into()))?;
 
     let config = infra.config();
     let clock = infra.clock();
@@ -58,10 +58,7 @@ pub async fn request_reset_token<S>(
 
     let token =
         register_reset_token(infra, &login_id, &expires, &registered_at).map_err(|err| {
-            post(match err {
-                RegisterResetTokenError::RepositoryError(err) => err.into(),
-                RegisterResetTokenError::NotFound => messenger.encode_invalid_reset().into(),
-            })
+            post(err.into_request_reset_token_event(messenger))
         })?;
 
     let token = token_encoder

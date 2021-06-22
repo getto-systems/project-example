@@ -7,8 +7,12 @@ use async_trait::async_trait;
 
 use crate::auth::{
     auth_ticket::_api::kernel::infra::{AuthClock, CheckAuthNonceInfra},
-    password::_api::kernel::infra::{AuthUserPasswordRepository, ResetTokenGenerator},
+    password::_api::kernel::infra::{
+        AuthUserPasswordRepository, RegisterResetTokenError, ResetTokenGenerator,
+    },
 };
+
+use crate::auth::password::reset::_api::request_token::event::RequestResetTokenEvent;
 
 use crate::auth::{
     auth_ticket::_api::kernel::data::{ExpireDateTime, ExpireDuration},
@@ -75,10 +79,32 @@ pub trait ResetTokenNotifier {
 pub trait RequestResetTokenMessenger {
     fn decode(&self) -> Result<RequestResetTokenFieldsExtract, MessageError>;
     fn encode_success(&self) -> Result<RequestResetTokenResponse, MessageError>;
-    fn encode_invalid_reset(&self) -> Result<RequestResetTokenResponse, MessageError>;
+    fn encode_destination_not_found(&self) -> Result<RequestResetTokenResponse, MessageError>;
+    fn encode_user_not_found(&self) -> Result<RequestResetTokenResponse, MessageError>;
 }
 
 #[derive(Clone)]
 pub struct RequestResetTokenFieldsExtract {
     pub login_id: String,
+}
+
+impl RegisterResetTokenError {
+    pub fn into_request_reset_token_event(
+        self,
+        messenger: &impl RequestResetTokenMessenger,
+    ) -> RequestResetTokenEvent {
+        match self {
+            Self::RepositoryError(err) => RequestResetTokenEvent::RepositoryError(err),
+            Self::NotFound => messenger.encode_user_not_found().into(),
+        }
+    }
+}
+
+impl Into<RequestResetTokenEvent> for Result<RequestResetTokenResponse, MessageError> {
+    fn into(self) -> RequestResetTokenEvent {
+        match self {
+            Ok(response) => RequestResetTokenEvent::InvalidReset(response),
+            Err(err) => RequestResetTokenEvent::MessageError(err),
+        }
+    }
 }

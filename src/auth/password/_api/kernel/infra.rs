@@ -81,9 +81,11 @@ pub trait ResetTokenGenerator {
 }
 
 pub enum VerifyPasswordError {
-    PasswordMatchError(PasswordHashError),
+    PasswordHashError(PasswordHashError),
     RepositoryError(RepositoryError),
-    NotFound,
+    UserNotFound,
+    PasswordNotFound,
+    PasswordNotMatched,
 }
 
 pub enum RegisterResetTokenError {

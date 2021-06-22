@@ -5,14 +5,18 @@ use crate::auth::{
     auth_ticket::_api::kernel::infra::{AuthClock, CheckAuthNonceInfra},
     auth_user::_api::kernel::infra::AuthUserRepository,
     password::_api::kernel::infra::{
-        AuthUserPasswordHasher, AuthUserPasswordRepository, PlainPassword,
+        AuthUserPasswordHasher, AuthUserPasswordRepository, PlainPassword, ResetPasswordError,
     },
 };
 
-use super::data::DecodeResetTokenError;
+use crate::auth::password::reset::_api::reset::event::ResetPasswordEvent;
+
 use crate::auth::password::{
     _api::kernel::data::ResetToken,
-    reset::_api::{kernel::data::ResetTokenEncoded, reset::data::ResetPasswordResponse},
+    reset::_api::{
+        kernel::data::ResetTokenEncoded,
+        reset::data::{DecodeResetTokenError, ResetPasswordResponse},
+    },
 };
 use crate::z_details::_api::message::data::MessageError;
 
@@ -53,4 +57,29 @@ pub struct ResetPasswordFieldsExtract {
     pub login_id: String,
     pub password: String,
     pub reset_token: String,
+}
+
+impl ResetPasswordError {
+    pub fn into_reset_password_event(
+        self,
+        messenger: &impl ResetPasswordMessenger,
+    ) -> ResetPasswordEvent {
+        match self {
+            Self::RepositoryError(err) => ResetPasswordEvent::RepositoryError(err),
+            Self::PasswordHashError(err) => ResetPasswordEvent::PasswordHashError(err),
+            Self::NotFound => messenger.encode_not_found().into(),
+            Self::AlreadyReset => messenger.encode_already_reset().into(),
+            Self::Expired => messenger.encode_expired().into(),
+            Self::InvalidLoginId => messenger.encode_invalid_login_id().into(),
+        }
+    }
+}
+
+impl Into<ResetPasswordEvent> for Result<ResetPasswordResponse, MessageError> {
+    fn into(self) -> ResetPasswordEvent {
+        match self {
+            Ok(response) => ResetPasswordEvent::InvalidReset(response),
+            Err(err) => ResetPasswordEvent::MessageError(err),
+        }
+    }
 }

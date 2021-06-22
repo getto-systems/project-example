@@ -55,9 +55,6 @@ test-api:
 
   image: rust:1-buster
 
-  variables:
-    COVERAGE_PRESERVE: "true"
-
   before_script:
     - rustup install nightly
     - rustup component add --toolchain nightly llvm-tools-preview

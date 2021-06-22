@@ -129,20 +129,20 @@ impl<'a> AuthUserPasswordRepository for MemoryAuthUserPasswordRepository<'a> {
 
         let user_id = store
             .get_user_id(login_id)
-            .ok_or(VerifyPasswordError::NotFound)?;
+            .ok_or(VerifyPasswordError::UserNotFound)?;
 
         let password = store
             .get_password(login_id)
-            .ok_or(VerifyPasswordError::NotFound)?;
+            .ok_or(VerifyPasswordError::PasswordNotFound)?;
 
         let is_matched = matcher
             .match_password(password)
-            .map_err(VerifyPasswordError::PasswordMatchError)?;
+            .map_err(VerifyPasswordError::PasswordHashError)?;
 
         if is_matched {
             Ok(user_id.clone())
         } else {
-            Err(VerifyPasswordError::NotFound)
+            Err(VerifyPasswordError::PasswordNotMatched)
         }
     }
 

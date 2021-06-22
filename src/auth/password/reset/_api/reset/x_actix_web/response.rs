@@ -31,7 +31,12 @@ impl ResetPasswordEvent {
 
 impl ResetPasswordResponse {
     fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
-        HttpResponse::Ok().body(self.message)
+        match self {
+            Self::NotFound(message) => HttpResponse::Ok().body(message),
+            Self::AlreadyReset(message) => HttpResponse::Ok().body(message),
+            Self::Expired(message) => HttpResponse::Ok().body(message),
+            Self::InvalidLoginId(message) => HttpResponse::Ok().body(message),
+        }
     }
 }
 
