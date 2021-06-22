@@ -3,24 +3,30 @@ use std::{
     fmt::{Display, Formatter},
 };
 
-use crate::auth::auth_user::_api::kernel::data::AuthUserId;
+pub enum RequestResetTokenResponse {
+    Success(String),
+    DestinationNotFound(String),
+    UserNotFound(String),
+}
 
-pub struct RequestResetTokenResponse {
-    pub message: String,
+impl Display for RequestResetTokenResponse {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::Success(_) => write!(f, "success"),
+            Self::DestinationNotFound(_) => write!(f, "destination not found"),
+            Self::UserNotFound(_) => write!(f, "user not found"),
+        }
+    }
 }
 
 #[derive(Clone)]
 pub struct ResetTokenDestination {
-    user_id: AuthUserId,
     email: String,
 }
 
 impl ResetTokenDestination {
     pub fn extract(self) -> ResetTokenDestinationExtract {
-        ResetTokenDestinationExtract {
-            user_id: self.user_id.extract(),
-            email: self.email,
-        }
+        ResetTokenDestinationExtract { email: self.email }
     }
 
     pub fn into_email(self) -> String {
@@ -29,16 +35,12 @@ impl ResetTokenDestination {
 }
 
 pub struct ResetTokenDestinationExtract {
-    pub user_id: String,
     pub email: String,
 }
 
 impl Into<ResetTokenDestination> for ResetTokenDestinationExtract {
     fn into(self) -> ResetTokenDestination {
-        ResetTokenDestination {
-            user_id: AuthUserId::new(self.user_id),
-            email: self.email,
-        }
+        ResetTokenDestination { email: self.email }
     }
 }
 

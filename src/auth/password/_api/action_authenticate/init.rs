@@ -18,7 +18,7 @@ impl<'a> AuthenticatePasswordAction<AuthenticatePasswordFeature<'a>> {
     }
 }
 
-pub struct AuthenticatePasswordFeature<'a> {
+pub(in crate::auth::password) struct AuthenticatePasswordFeature<'a> {
     authenticate: AuthenticatePasswordStruct<'a>,
     issue: IssueAuthTicketStruct<'a>,
     encode: AuthenticatePasswordEncodeAuthTicketStruct<'a>,

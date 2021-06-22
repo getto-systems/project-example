@@ -9,11 +9,8 @@ use crate::auth::{
     },
     auth_user::_api::kernel::infra::user_repository::MemoryAuthUserStore,
     password::{
-        _api::authenticate::infra::password_repository::MemoryAuthUserPasswordStore,
-        reset::_api::{
-            kernel::infra::token_repository::MemoryResetTokenStore,
-            request_token::infra::destination_repository::MemoryResetTokenDestinationStore,
-        },
+        _api::kernel::infra::password_repository::MemoryAuthUserPasswordStore,
+        reset::_api::request_token::infra::destination_repository::MemoryResetTokenDestinationStore,
     },
 };
 
@@ -38,7 +35,6 @@ pub struct AuthOutsideStore {
     pub ticket: Mutex<MemoryAuthTicketMap>,
     pub user: MemoryAuthUserStore,
     pub user_password: MemoryAuthUserPasswordStore,
-    pub reset_token: MemoryResetTokenStore,
     pub reset_token_destination: MemoryResetTokenDestinationStore,
 }
 pub struct AuthOutsideCookie {

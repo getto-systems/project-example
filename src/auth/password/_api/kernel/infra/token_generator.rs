@@ -2,7 +2,7 @@ use uuid::Uuid;
 
 use super::ResetTokenGenerator;
 
-use crate::auth::password::reset::_api::kernel::data::ResetToken;
+use crate::auth::password::_api::kernel::data::ResetToken;
 
 pub struct UuidResetTokenGenerator;
 
@@ -22,7 +22,7 @@ impl ResetTokenGenerator for UuidResetTokenGenerator {
 pub mod test {
     use super::super::ResetTokenGenerator;
 
-    use crate::auth::password::reset::_api::kernel::data::ResetToken;
+    use crate::auth::password::_api::kernel::data::ResetToken;
 
     pub struct StaticResetTokenGenerator {
         token: ResetToken,

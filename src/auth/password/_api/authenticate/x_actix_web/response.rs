@@ -1,10 +1,8 @@
 use actix_web::{HttpRequest, HttpResponse};
 
-use crate::auth::password::_api::authenticate::data::{AuthenticatePasswordResponse, PasswordMatchError};
-
 use super::super::event::AuthenticatePasswordEvent;
 
-use super::super::data::ValidatePasswordError;
+use crate::auth::password::_api::authenticate::data::AuthenticatePasswordResponse;
 
 impl AuthenticatePasswordEvent {
     pub fn respond_to(self, request: &HttpRequest) -> HttpResponse {
@@ -24,23 +22,10 @@ impl AuthenticatePasswordEvent {
 
 impl AuthenticatePasswordResponse {
     pub fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
-        HttpResponse::Ok().body(self.message)
-    }
-}
-
-impl PasswordMatchError {
-    pub fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
         match self {
-            Self::InfraError(_) => HttpResponse::InternalServerError().finish()
-        }
-    }
-}
-
-impl ValidatePasswordError {
-    pub fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
-        match self {
-            Self::Empty => HttpResponse::BadRequest().finish(),
-            Self::TooLong => HttpResponse::BadRequest().finish(),
+            Self::UserNotFound(message) => HttpResponse::Ok().body(message),
+            Self::PasswordNotFound(message) => HttpResponse::Ok().body(message),
+            Self::PasswordNotMatched(message) => HttpResponse::Ok().body(message),
         }
     }
 }

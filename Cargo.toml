@@ -6,24 +6,29 @@ edition = "2018"
 build = "api/setup/build.rs"
 
 [dependencies]
+async-trait = "0.1"
+lazy_static = "1"
+
 getto-application = { path = "api/vendor/getto-application" }
 aws-cloudfront-cookie = { path = "api/vendor/aws-cloudfront-cookie" }
+
 actix-web = "3"
 actix-cors = "0.5"
-protobuf = "2"
-base64 = "0.13"
+rusoto_core = { version = "0.45", default_features = false, features = ["rustls"] }
+rusoto_ses = { version = "0.45", default_features = false, features = ["rustls"] }
+
 jsonwebtoken = "7"
 argon2 = "0.2"
+
+protobuf = "2"
+base64 = "0.13"
 chrono = "0.4"
 time = "0.2"
 uuid = { version = "0.8", features = ["v4"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-async-trait = "0.1"
-lazy_static = "1"
-rusoto_core = { version = "0.45", default_features = false, features = ["rustls"] }
-rusoto_ses = { version = "0.45", default_features = false, features = ["rustls"] }
 url = "2"
+rand_core = { version = "0.6", features = ["std"] }
 
 [dev-dependencies]
 tokio = "0.2"

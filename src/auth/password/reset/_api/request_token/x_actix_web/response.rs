@@ -2,7 +2,9 @@ use actix_web::{HttpRequest, HttpResponse};
 
 use super::super::event::RequestResetTokenEvent;
 
-use crate::auth::password::reset::_api::request_token::data::{EncodeResetTokenError, NotifyResetTokenError, RequestResetTokenResponse};
+use crate::auth::password::reset::_api::request_token::data::{
+    EncodeResetTokenError, NotifyResetTokenError, RequestResetTokenResponse,
+};
 
 impl RequestResetTokenEvent {
     pub fn respond_to(self, request: &HttpRequest) -> HttpResponse {
@@ -23,7 +25,11 @@ impl RequestResetTokenEvent {
 
 impl RequestResetTokenResponse {
     pub fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
-        HttpResponse::Ok().body(self.message)
+        match self {
+            Self::Success(message) => HttpResponse::Ok().body(message),
+            Self::DestinationNotFound(message) => HttpResponse::Ok().body(message),
+            Self::UserNotFound(message) => HttpResponse::Ok().body(message),
+        }
     }
 }
 

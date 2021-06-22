@@ -1,20 +1,20 @@
 use actix_web::HttpRequest;
 
-use crate::auth::{
-    _api::x_outside_feature::feature::AuthOutsideFeature,
-    auth_ticket::_api::kernel::init::CheckAuthNonceStruct,
-};
+use crate::auth::auth_ticket::_api::kernel::init::CheckAuthNonceStruct;
 
-use super::infra::{
-    messenger::ProtobufAuthenticatePasswordMessenger, password_matcher::Argon2PasswordMatcher,
-    password_repository::MemoryAuthUserPasswordRepository, AuthenticatePasswordInfra,
-};
+use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
+
+use super::infra::{messenger::ProtobufAuthenticatePasswordMessenger, AuthenticatePasswordInfra};
 use crate::auth::{
     auth_ticket::_api::kernel::infra::clock::ChronoAuthClock,
     auth_user::_api::kernel::infra::user_repository::MemoryAuthUserRepository,
+    password::_api::kernel::infra::{
+        password_matcher::Argon2PasswordMatcher,
+        password_repository::MemoryAuthUserPasswordRepository,
+    },
 };
 
-pub struct AuthenticatePasswordStruct<'a> {
+pub(in crate::auth::password) struct AuthenticatePasswordStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
     clock: ChronoAuthClock,
     password_repository: MemoryAuthUserPasswordRepository<'a>,
@@ -66,12 +66,15 @@ pub mod test {
     use crate::auth::auth_ticket::_api::kernel::init::test::StaticCheckAuthNonceStruct;
 
     use super::super::infra::{
-        messenger::test::StaticAuthenticatePasswordMessenger, password_matcher::test::PlainPasswordMatcher,
-        password_repository::MemoryAuthUserPasswordRepository, AuthenticatePasswordInfra,
+        messenger::test::StaticAuthenticatePasswordMessenger, AuthenticatePasswordInfra,
     };
     use crate::auth::{
         auth_ticket::_api::kernel::infra::clock::test::StaticChronoAuthClock,
         auth_user::_api::kernel::infra::user_repository::MemoryAuthUserRepository,
+        password::_api::kernel::infra::{
+            password_matcher::test::PlainPasswordMatcher,
+            password_repository::MemoryAuthUserPasswordRepository,
+        },
     };
 
     pub struct StaticAuthenticatePasswordStruct<'a> {

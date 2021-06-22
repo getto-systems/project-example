@@ -9,7 +9,7 @@ use super::super::kernel::infra::{
 };
 use super::infra::{
     token_header::{ApiAuthTokenHeader, TicketAuthTokenHeader},
-    token_validator::{JwtApiTokenValidator, JwtAuthTokenValidator},
+    token_decoder::{JwtApiTokenDecoder, JwtAuthTokenDecoder},
     ValidateAuthTokenConfig, ValidateAuthTokenInfra,
 };
 
@@ -21,7 +21,7 @@ pub struct TicketValidateAuthTokenStruct<'a> {
     clock: ChronoAuthClock,
     token_header: TicketAuthTokenHeader,
     ticket_repository: MemoryAuthTicketRepository<'a>,
-    token_validator: JwtAuthTokenValidator<'a>,
+    token_validator: JwtAuthTokenDecoder<'a>,
 }
 
 impl<'a> TicketValidateAuthTokenStruct<'a> {
@@ -34,7 +34,7 @@ impl<'a> TicketValidateAuthTokenStruct<'a> {
             clock: ChronoAuthClock::new(),
             token_header: TicketAuthTokenHeader::new(request.clone()),
             ticket_repository: MemoryAuthTicketRepository::new(&feature.store.ticket),
-            token_validator: JwtAuthTokenValidator::new(&feature.secret.ticket.decoding_key),
+            token_validator: JwtAuthTokenDecoder::new(&feature.secret.ticket.decoding_key),
         }
     }
 }
@@ -44,7 +44,7 @@ impl<'a> ValidateAuthTokenInfra for TicketValidateAuthTokenStruct<'a> {
     type Clock = ChronoAuthClock;
     type TokenHeader = TicketAuthTokenHeader;
     type TicketRepository = MemoryAuthTicketRepository<'a>;
-    type TokenValidator = JwtAuthTokenValidator<'a>;
+    type TokenDecoder = JwtAuthTokenDecoder<'a>;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
         &self.check_nonce_infra
@@ -61,7 +61,7 @@ impl<'a> ValidateAuthTokenInfra for TicketValidateAuthTokenStruct<'a> {
     fn ticket_repository(&self) -> &Self::TicketRepository {
         &self.ticket_repository
     }
-    fn token_validator(&self) -> &Self::TokenValidator {
+    fn token_validator(&self) -> &Self::TokenDecoder {
         &self.token_validator
     }
 }
@@ -72,7 +72,7 @@ pub struct ApiValidateAuthTokenStruct<'a> {
     clock: ChronoAuthClock,
     token_header: ApiAuthTokenHeader,
     ticket_repository: MemoryAuthTicketRepository<'a>,
-    token_validator: JwtApiTokenValidator<'a>,
+    token_validator: JwtApiTokenDecoder<'a>,
 }
 
 impl<'a> ApiValidateAuthTokenStruct<'a> {
@@ -87,7 +87,7 @@ impl<'a> ApiValidateAuthTokenStruct<'a> {
             clock: ChronoAuthClock::new(),
             token_header: ApiAuthTokenHeader::new(request.clone()),
             ticket_repository: MemoryAuthTicketRepository::new(&feature.store.ticket),
-            token_validator: JwtApiTokenValidator::new(&feature.secret.api.decoding_key),
+            token_validator: JwtApiTokenDecoder::new(&feature.secret.api.decoding_key),
         }
     }
 }
@@ -97,7 +97,7 @@ impl<'a> ValidateAuthTokenInfra for ApiValidateAuthTokenStruct<'a> {
     type Clock = ChronoAuthClock;
     type TokenHeader = ApiAuthTokenHeader;
     type TicketRepository = MemoryAuthTicketRepository<'a>;
-    type TokenValidator = JwtApiTokenValidator<'a>;
+    type TokenDecoder = JwtApiTokenDecoder<'a>;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
         &self.check_nonce_infra
@@ -114,7 +114,7 @@ impl<'a> ValidateAuthTokenInfra for ApiValidateAuthTokenStruct<'a> {
     fn ticket_repository(&self) -> &Self::TicketRepository {
         &self.ticket_repository
     }
-    fn token_validator(&self) -> &Self::TokenValidator {
+    fn token_validator(&self) -> &Self::TokenDecoder {
         &self.token_validator
     }
 }
@@ -124,7 +124,7 @@ pub mod test {
     use crate::auth::auth_ticket::_api::kernel::init::test::StaticCheckAuthNonceStruct;
 
     use super::super::infra::{
-        token_header::test::StaticAuthTokenHeader, token_validator::test::StaticAuthTokenValidator,
+        token_header::test::StaticAuthTokenHeader, token_decoder::test::StaticAuthTokenDecoder,
         ValidateAuthTokenConfig, ValidateAuthTokenInfra,
     };
     use crate::auth::auth_ticket::_api::kernel::infra::{
@@ -137,7 +137,7 @@ pub mod test {
         pub clock: StaticChronoAuthClock,
         pub token_header: StaticAuthTokenHeader,
         pub ticket_repository: MemoryAuthTicketRepository<'a>,
-        pub token_validator: StaticAuthTokenValidator,
+        pub token_validator: StaticAuthTokenDecoder,
     }
 
     impl<'a> ValidateAuthTokenInfra for StaticValidateAuthTokenStruct<'a> {
@@ -145,7 +145,7 @@ pub mod test {
         type Clock = StaticChronoAuthClock;
         type TokenHeader = StaticAuthTokenHeader;
         type TicketRepository = MemoryAuthTicketRepository<'a>;
-        type TokenValidator = StaticAuthTokenValidator;
+        type TokenDecoder = StaticAuthTokenDecoder;
 
         fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
             &self.check_nonce_infra
@@ -162,7 +162,7 @@ pub mod test {
         fn ticket_repository(&self) -> &Self::TicketRepository {
             &self.ticket_repository
         }
-        fn token_validator(&self) -> &Self::TokenValidator {
+        fn token_validator(&self) -> &Self::TokenDecoder {
             &self.token_validator
         }
     }

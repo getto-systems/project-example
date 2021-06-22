@@ -714,6 +714,7 @@ dependencies = [
  "lazy_static",
  "protobuf",
  "protobuf-codegen-pure",
+ "rand_core 0.6.2",
  "rusoto_core",
  "rusoto_ses",
  "serde",

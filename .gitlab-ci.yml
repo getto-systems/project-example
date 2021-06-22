@@ -59,9 +59,14 @@ test-api:
     - rustup install nightly
     - rustup component add --toolchain nightly llvm-tools-preview
     - cargo install rustfilt
-    - cargo install grcov
+    - mkdir tmp
+    - ./api/ci/setup-test.sh
   script:
     - ./api/ci/test.sh
+  artifacts:
+    paths:
+      - tmp/coverage.tar.gz
+    expire_in: 1 hour
 
 bump_version-ui:
   stage: bump_version

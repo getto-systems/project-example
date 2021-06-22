@@ -1,16 +1,14 @@
 use std::fmt::Display;
 
-use crate::auth::auth_ticket::_api::kernel::data::ExpireDateTime;
-use crate::auth::{
-    auth_ticket::_api::kernel::data::ValidateAuthNonceError,
-    login_id::_api::data::ValidateLoginIdError,
-};
-use crate::z_details::_api::{message::data::MessageError, repository::data::RepositoryError};
-
 use super::data::{
     EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
     RequestResetTokenResponse,
 };
+use crate::auth::{
+    auth_ticket::_api::kernel::data::{ExpireDateTime, ValidateAuthNonceError},
+    login_id::_api::data::ValidateLoginIdError,
+};
+use crate::z_details::_api::{message::data::MessageError, repository::data::RepositoryError};
 
 pub enum RequestResetTokenEvent {
     TokenExpiresCalculated(ExpireDateTime),
@@ -38,7 +36,7 @@ impl Display for RequestResetTokenEvent {
                 write!(f, "token notified; {}", response)
             }
             Self::Success(_) => write!(f, "{}", SUCCESS),
-            Self::InvalidReset(_) => write!(f, "{}; invalid reset", ERROR),
+            Self::InvalidReset(response) => write!(f, "{}; {}", ERROR, response),
             Self::NonceError(err) => write!(f, "{}; {}", ERROR, err),
             Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
             Self::MessageError(err) => write!(f, "{}; {}", ERROR, err),

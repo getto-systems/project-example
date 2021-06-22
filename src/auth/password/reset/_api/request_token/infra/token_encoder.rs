@@ -6,7 +6,7 @@ use crate::auth::password::reset::_api::kernel::infra::ResetTokenJwtClaims;
 use super::super::data::EncodeResetTokenError;
 use crate::auth::{
     auth_ticket::_api::kernel::data::ExpireDateTime,
-    password::reset::_api::kernel::data::{ResetToken, ResetTokenEncoded},
+    password::{_api::kernel::data::ResetToken, reset::_api::kernel::data::ResetTokenEncoded},
 };
 
 pub struct JwtResetTokenEncoder<'a> {
@@ -62,7 +62,7 @@ pub mod test {
     use super::super::super::data::EncodeResetTokenError;
     use crate::auth::{
         auth_ticket::_api::kernel::data::ExpireDateTime,
-        password::reset::_api::kernel::data::{ResetToken, ResetTokenEncoded},
+        password::{_api::kernel::data::ResetToken, reset::_api::kernel::data::ResetTokenEncoded},
     };
 
     pub struct StaticResetTokenEncoder;

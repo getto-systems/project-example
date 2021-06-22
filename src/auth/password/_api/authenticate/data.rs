@@ -1,48 +1,17 @@
-use std::{
-    error::Error,
-    fmt::{Display, Formatter},
-};
+use std::fmt::{Display, Formatter};
 
-use crate::z_details::_api::repository::data::RepositoryError;
-
-pub struct AuthenticatePasswordResponse {
-    pub message: String,
+pub enum AuthenticatePasswordResponse {
+    UserNotFound(String),
+    PasswordNotFound(String),
+    PasswordNotMatched(String),
 }
 
-#[derive(Debug)]
-pub enum ValidatePasswordError {
-    Empty,
-    TooLong,
-}
-
-impl Display for ValidatePasswordError {
+impl Display for AuthenticatePasswordResponse {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::Empty => write!(f, "empty password"),
-            Self::TooLong => write!(f, "too long password"),
-        }
-    }
-}
-impl Error for ValidatePasswordError {}
-
-#[derive(Debug)]
-pub enum PasswordMatchError {
-    InfraError(String),
-}
-
-impl Display for PasswordMatchError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        match self {
-            Self::InfraError(err) => write!(f, "password hash error: {}", err),
-        }
-    }
-}
-impl Error for PasswordMatchError {}
-
-impl Into<RepositoryError> for PasswordMatchError {
-    fn into(self) -> RepositoryError {
-        match self {
-            Self::InfraError(err) => RepositoryError::InfraError(err),
+            Self::UserNotFound(_) => write!(f, "user not found"),
+            Self::PasswordNotFound(_) => write!(f, "password not found"),
+            Self::PasswordNotMatched(_) => write!(f, "password not matched"),
         }
     }
 }

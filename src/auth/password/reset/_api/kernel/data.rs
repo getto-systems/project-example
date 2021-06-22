@@ -5,33 +5,16 @@ use std::{
 
 use super::convert::validate_reset_token;
 
-#[derive(Clone)]
-pub struct ResetToken(String);
+pub struct ResetTokenEncoded(String);
 
-impl ResetToken {
-    pub fn new(token: String) -> Self {
-        Self(token)
-    }
-
+impl ResetTokenEncoded {
     pub fn validate(token: String) -> Result<Self, ValidateResetTokenError> {
         validate_reset_token(&token)?;
         Ok(Self(token))
     }
 
-    pub fn as_str(&self) -> &str {
-        self.0.as_str()
-    }
-
-    pub fn extract(self) -> String {
-        self.0
-    }
-}
-
-pub struct ResetTokenEncoded(String);
-
-impl ResetTokenEncoded {
-    pub fn new(encoded: String) -> Self {
-        Self(encoded)
+    pub fn new(token: String) -> Self {
+        Self(token)
     }
 
     pub fn as_str(&self) -> &str {
@@ -47,7 +30,7 @@ pub enum ValidateResetTokenError {
 impl Display for ValidateResetTokenError {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::Empty => write!(f, "empty password reset token"),
+            Self::Empty => write!(f, "empty reset token"),
         }
     }
 }

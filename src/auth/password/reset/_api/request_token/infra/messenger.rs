@@ -5,8 +5,11 @@ use crate::auth::_api::y_protobuf::api::{
 
 use crate::z_details::_api::message::helper::{decode_protobuf_base64, encode_protobuf_base64};
 
-use super::{RequestResetTokenFieldsExtract, RequestResetTokenMessenger};
+use crate::auth::password::reset::_api::request_token::infra::{
+    RequestResetTokenFieldsExtract, RequestResetTokenMessenger,
+};
 
+use crate::auth::password::reset::_api::request_token::data::RequestResetTokenResponse;
 use crate::z_details::_api::message::data::MessageError;
 
 pub struct ProtobufRequestResetTokenMessenger {
@@ -27,28 +30,49 @@ impl RequestResetTokenMessenger for ProtobufRequestResetTokenMessenger {
             login_id: message.login_id,
         })
     }
-    fn encode_success(&self) -> Result<String, MessageError> {
+    fn encode_success(&self) -> Result<RequestResetTokenResponse, MessageError> {
         let mut message = RequestResetTokenResult_pb::new();
         message.set_success(true);
 
-        encode_protobuf_base64(message)
+        let message = encode_protobuf_base64(message)?;
+        Ok(RequestResetTokenResponse::Success(message))
     }
-    fn encode_invalid_reset(&self) -> Result<String, MessageError> {
-        let mut message = RequestResetTokenResult_pb::new();
-        message.set_success(false);
-
-        let mut err = RequestResetTokenResult_pb_Error::new();
-        err.set_field_type(RequestResetTokenResult_pb_ErrorType::INVALID_RESET);
-        message.set_err(err);
-
-        encode_protobuf_base64(message)
+    fn encode_destination_not_found(&self) -> Result<RequestResetTokenResponse, MessageError> {
+        encode_failed(
+            RequestResetTokenResult_pb_ErrorType::INVALID_RESET,
+            RequestResetTokenResponse::DestinationNotFound,
+        )
     }
+    fn encode_user_not_found(&self) -> Result<RequestResetTokenResponse, MessageError> {
+        encode_failed(
+            RequestResetTokenResult_pb_ErrorType::INVALID_RESET,
+            RequestResetTokenResponse::UserNotFound,
+        )
+    }
+}
+
+fn encode_failed(
+    field_type: RequestResetTokenResult_pb_ErrorType,
+    response: impl Fn(String) -> RequestResetTokenResponse,
+) -> Result<RequestResetTokenResponse, MessageError> {
+    let mut message = RequestResetTokenResult_pb::new();
+    message.set_success(false);
+
+    let mut err = RequestResetTokenResult_pb_Error::new();
+    err.set_field_type(field_type);
+    message.set_err(err);
+
+    let message = encode_protobuf_base64(message)?;
+    Ok(response(message))
 }
 
 #[cfg(test)]
 pub mod test {
-    use super::super::{RequestResetTokenFieldsExtract, RequestResetTokenMessenger};
+    use crate::auth::password::reset::_api::request_token::infra::{
+        RequestResetTokenFieldsExtract, RequestResetTokenMessenger,
+    };
 
+    use crate::auth::password::reset::_api::request_token::data::RequestResetTokenResponse;
     use crate::z_details::_api::message::data::MessageError;
 
     pub struct StaticRequestResetTokenMessenger {
@@ -65,11 +89,16 @@ pub mod test {
         fn decode(&self) -> Result<RequestResetTokenFieldsExtract, MessageError> {
             Ok(self.fields.clone())
         }
-        fn encode_success(&self) -> Result<String, MessageError> {
-            Ok("encoded".into())
+        fn encode_success(&self) -> Result<RequestResetTokenResponse, MessageError> {
+            Ok(RequestResetTokenResponse::Success("encoded".into()))
         }
-        fn encode_invalid_reset(&self) -> Result<String, MessageError> {
-            Ok("encoded".into())
+        fn encode_destination_not_found(&self) -> Result<RequestResetTokenResponse, MessageError> {
+            Ok(RequestResetTokenResponse::DestinationNotFound(
+                "encoded".into(),
+            ))
+        }
+        fn encode_user_not_found(&self) -> Result<RequestResetTokenResponse, MessageError> {
+            Ok(RequestResetTokenResponse::UserNotFound("encoded".into()))
         }
     }
 }

@@ -31,13 +31,17 @@ use crate::auth::{
     auth_user::_api::kernel::infra::user_repository::{
         MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
     },
-    password::_api::authenticate::infra::{
-        messenger::test::StaticAuthenticatePasswordMessenger,
-        password_repository::{
-            MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-            MemoryAuthUserPasswordStore,
+    password::_api::{
+        authenticate::infra::{
+            messenger::test::StaticAuthenticatePasswordMessenger, AuthenticatePasswordFieldsExtract,
         },
-        AuthenticatePasswordFieldsExtract, HashedPassword,
+        kernel::infra::{
+            password_repository::{
+                MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
+                MemoryAuthUserPasswordStore,
+            },
+            HashedPassword,
+        },
     },
 };
 
@@ -64,7 +68,7 @@ fn success_authenticate() {
 
     let result = action.ignite();
     assert_state(vec![
-        "authenticate success; user: test-user-id (granted: [something])",
+        "authenticate password success; user: test-user-id (granted: [something])",
         "issue success; ticket: ticket-id / user: test-user-id (granted: [something])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
         "encode success",
@@ -84,7 +88,7 @@ fn success_expired_nonce() {
 
     let result = action.ignite();
     assert_state(vec![
-        "authenticate success; user: test-user-id (granted: [something])",
+        "authenticate password success; user: test-user-id (granted: [something])",
         "issue success; ticket: ticket-id / user: test-user-id (granted: [something])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
         "encode success",
@@ -103,7 +107,7 @@ fn error_conflict_nonce() {
     action.subscribe(handler);
 
     let result = action.ignite();
-    assert_state(vec!["authenticate error; auth nonce error: conflict"]);
+    assert_state(vec!["authenticate password error; auth nonce error: conflict"]);
     assert!(!result.is_ok());
 }
 
@@ -118,7 +122,7 @@ fn error_empty_login_id() {
     action.subscribe(handler);
 
     let result = action.ignite();
-    assert_state(vec!["authenticate error; empty login id"]);
+    assert_state(vec!["authenticate password error; empty login id"]);
     assert!(!result.is_ok());
 }
 
@@ -133,7 +137,7 @@ fn error_too_long_login_id() {
     action.subscribe(handler);
 
     let result = action.ignite();
-    assert_state(vec!["authenticate error; too long login id"]);
+    assert_state(vec!["authenticate password error; too long login id"]);
     assert!(!result.is_ok());
 }
 
@@ -148,7 +152,7 @@ fn just_max_length_login_id() {
     action.subscribe(handler);
 
     let result = action.ignite();
-    assert_state(vec!["authenticate error; password not match"]);
+    assert_state(vec!["authenticate password error; user not found"]);
     assert!(!result.is_ok());
 }
 
@@ -163,7 +167,7 @@ fn error_empty_password() {
     action.subscribe(handler);
 
     let result = action.ignite();
-    assert_state(vec!["authenticate error; empty password"]);
+    assert_state(vec!["authenticate password error; empty password"]);
     assert!(!result.is_ok());
 }
 
@@ -178,7 +182,7 @@ fn error_too_long_password() {
     action.subscribe(handler);
 
     let result = action.ignite();
-    assert_state(vec!["authenticate error; too long password"]);
+    assert_state(vec!["authenticate password error; too long password"]);
     assert!(!result.is_ok());
 }
 
@@ -193,7 +197,7 @@ fn just_max_length_password() {
     action.subscribe(handler);
 
     let result = action.ignite();
-    assert_state(vec!["authenticate error; password not match"]);
+    assert_state(vec!["authenticate password error; password not matched"]);
     assert!(!result.is_ok());
 }
 
@@ -208,7 +212,7 @@ fn error_failed_to_match_password() {
     action.subscribe(handler);
 
     let result = action.ignite();
-    assert_state(vec!["authenticate error; password not match"]);
+    assert_state(vec!["authenticate password error; password not matched"]);
     assert!(!result.is_ok());
 }
 
@@ -223,7 +227,7 @@ fn error_password_not_stored() {
     action.subscribe(handler);
 
     let result = action.ignite();
-    assert_state(vec!["authenticate error; password not match"]);
+    assert_state(vec!["authenticate password error; user not found"]);
     assert!(!result.is_ok());
 }
 
@@ -238,7 +242,7 @@ fn error_user_not_stored() {
     action.subscribe(handler);
 
     let result = action.ignite();
-    assert_state(vec!["authenticate error; user not found"]);
+    assert_state(vec!["authenticate password error; user not found"]);
     assert!(!result.is_ok());
 }
 

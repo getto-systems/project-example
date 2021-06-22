@@ -1,16 +1,17 @@
 pub mod messenger;
-pub mod password_matcher;
-pub mod password_repository;
 
 use crate::auth::{
     auth_ticket::_api::kernel::infra::{AuthClock, CheckAuthNonceInfra},
     auth_user::_api::kernel::infra::AuthUserRepository,
+    password::_api::kernel::infra::{
+        AuthUserPasswordMatcher, AuthUserPasswordRepository, PlainPassword, VerifyPasswordError,
+    },
 };
 
-use super::{convert::validate_password, data::{ValidatePasswordError, PasswordMatchError}};
-use crate::auth::auth_user::_api::kernel::data::AuthUserId;
-use crate::auth::login_id::_api::data::LoginId;
-use crate::z_details::_api::{message::data::MessageError, repository::data::RepositoryError};
+use crate::auth::password::_api::authenticate::event::AuthenticatePasswordEvent;
+
+use crate::auth::password::_api::authenticate::data::AuthenticatePasswordResponse;
+use crate::z_details::_api::message::data::MessageError;
 
 pub trait AuthenticatePasswordInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
@@ -30,27 +31,11 @@ pub trait AuthenticatePasswordInfra {
     fn messenger(&self) -> &Self::Messenger;
 }
 
-pub trait AuthUserPasswordRepository {
-    fn verify_password(
-        &self,
-        login_id: &LoginId,
-        matcher: impl AuthUserPasswordMatcher,
-    ) -> Result<Option<AuthUserId>, VerifyPasswordError>;
-}
-
-pub trait AuthUserPasswordMatcher {
-    fn new(plain_password: PlainPassword) -> Self;
-    fn match_password(&self, password: &HashedPassword) -> Result<bool, PasswordMatchError>;
-}
-
-pub enum VerifyPasswordError {
-    PasswordMatchError(PasswordMatchError),
-    RepositoryError(RepositoryError),
-}
-
 pub trait AuthenticatePasswordMessenger {
     fn decode(&self) -> Result<AuthenticatePasswordFieldsExtract, MessageError>;
-    fn encode_invalid_password(&self) -> Result<String, MessageError>;
+    fn encode_user_not_found(&self) -> Result<AuthenticatePasswordResponse, MessageError>;
+    fn encode_password_not_found(&self) -> Result<AuthenticatePasswordResponse, MessageError>;
+    fn encode_password_not_matched(&self) -> Result<AuthenticatePasswordResponse, MessageError>;
 }
 
 #[derive(Clone)]
@@ -59,27 +44,26 @@ pub struct AuthenticatePasswordFieldsExtract {
     pub password: String,
 }
 
-pub struct HashedPassword(String);
-
-impl HashedPassword {
-    pub const fn new(password: String) -> Self {
-        Self(password)
-    }
-
-    pub fn as_str(&self) -> &str {
-        self.0.as_str()
+impl VerifyPasswordError {
+    pub fn into_authenticate_password_event(
+        self,
+        messenger: &impl AuthenticatePasswordMessenger,
+    ) -> AuthenticatePasswordEvent {
+        match self {
+            Self::PasswordHashError(err) => AuthenticatePasswordEvent::PasswordHashError(err),
+            Self::RepositoryError(err) => AuthenticatePasswordEvent::RepositoryError(err),
+            Self::UserNotFound => messenger.encode_user_not_found().into(),
+            Self::PasswordNotFound => messenger.encode_password_not_found().into(),
+            Self::PasswordNotMatched => messenger.encode_password_not_matched().into(),
+        }
     }
 }
 
-pub struct PlainPassword(String);
-
-impl PlainPassword {
-    pub fn validate(password: String) -> Result<PlainPassword, ValidatePasswordError> {
-        validate_password(&password)?;
-        Ok(Self(password))
-    }
-
-    pub fn as_bytes(&self) -> &[u8] {
-        self.0.as_bytes()
+impl Into<AuthenticatePasswordEvent> for Result<AuthenticatePasswordResponse, MessageError> {
+    fn into(self) -> AuthenticatePasswordEvent {
+        match self {
+            Ok(response) => AuthenticatePasswordEvent::InvalidPassword(response),
+            Err(err) => AuthenticatePasswordEvent::MessageError(err),
+        }
     }
 }
