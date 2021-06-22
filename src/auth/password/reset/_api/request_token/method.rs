@@ -56,10 +56,8 @@ pub async fn request_reset_token<S>(
 
     let registered_at = clock.now();
 
-    let token =
-        register_reset_token(infra, &login_id, &expires, &registered_at).map_err(|err| {
-            post(err.into_request_reset_token_event(messenger))
-        })?;
+    let token = register_reset_token(infra, &login_id, &expires, &registered_at)
+        .map_err(|err| post(err.into_request_reset_token_event(messenger)))?;
 
     let token = token_encoder
         .encode(token, expires)
