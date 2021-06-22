@@ -43,6 +43,9 @@ coverage_main() {
     local crate_name
     crate_name="$(cat Cargo.toml | grep name | head -1 | cut -d'"' -f2 | sed 's/-/_/g')"
 
+    local ignore_regex
+    ignore_regex='(\.cargo|rustc|^api/|/[xyz]_|/infra/|/(main|test|init|data|event|infra)\.rs)'
+
     local object_file
     local output_file
     for object_file in $(find "${target_dir}" -type f -perm -a+x -name "${crate_name}"'-*'); do
@@ -50,7 +53,7 @@ coverage_main() {
         $llvm_cov export "${object_file}" \
             -Xdemangler=rustfilt \
             -instr-profile="${prof_data}" \
-            --ignore-filename-regex='(\.cargo|rustc|^api/|/[xyz]_|/infra/|/(main|test|init|data|event|infra)\.rs)' \
+            --ignore-filename-regex="${ignore_regex}" \
             --format=lcov >"${output_file}"
 
         if [ -z "$(cat "${output_file}")" ]; then

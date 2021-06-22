@@ -1,8 +1,6 @@
 #!/bin/sh
 
 setup_grcov() {
-    mkdir tmp
-
     local version
     version=$(
         curl --silent "https://api.github.com/repos/mozilla/grcov/releases/latest" |
