@@ -1,5 +1,3 @@
-#![deny(rust_2018_idioms)]
-
 use std::io;
 
 use lazy_static::lazy_static;

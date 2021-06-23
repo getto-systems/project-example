@@ -15,7 +15,7 @@ pub struct JwtAuthTokenDecoder<'a> {
 }
 
 impl<'a> JwtAuthTokenDecoder<'a> {
-    pub const fn new(key: &'a DecodingKey) -> Self {
+    pub const fn new(key: &'a DecodingKey<'a>) -> Self {
         Self { key }
     }
 }
@@ -42,10 +42,10 @@ impl<'a> AuthTokenDecoder for JwtApiTokenDecoder<'a> {
     }
 }
 
-fn validate_jwt(
+fn validate_jwt<'a>(
     token: &AuthTokenValue,
     audience: &[&str],
-    key: &DecodingKey,
+    key: &DecodingKey<'a>,
 ) -> Result<AuthTicket, DecodeAuthTokenError> {
     let mut validation = Validation::new(Algorithm::ES384);
     validation.set_audience(audience);

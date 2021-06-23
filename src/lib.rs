@@ -1,5 +1,3 @@
-#![deny(rust_2018_idioms)]
-
 pub mod auth;
 pub mod x_outside_feature;
 pub mod y_environment;
