@@ -14,7 +14,7 @@ pub struct JwtResetTokenDecoder<'a> {
 }
 
 impl<'a> JwtResetTokenDecoder<'a> {
-    pub const fn new(key: &'a DecodingKey) -> Self {
+    pub const fn new(key: &'a DecodingKey<'a>) -> Self {
         Self { key }
     }
 }
@@ -25,9 +25,9 @@ impl<'a> ResetTokenDecoder for JwtResetTokenDecoder<'a> {
     }
 }
 
-fn validate_jwt(
+fn validate_jwt<'a>(
     token: &ResetTokenEncoded,
-    key: &DecodingKey,
+    key: &DecodingKey<'a>,
 ) -> Result<ResetToken, DecodeResetTokenError> {
     let validation = Validation::new(Algorithm::ES384);
 

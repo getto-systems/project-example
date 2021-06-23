@@ -42,8 +42,8 @@ impl ProtobufCodegen {
 
     fn build(&self) -> io::Result<()> {
         self.cleanup()?;
-        self.module_index()?;
         self.protobuf()?;
+        self.module_index()?;
         Ok(())
     }
 
@@ -75,34 +75,26 @@ impl ProtobufCodegen {
     }
 
     fn source_proto(&self) -> io::Result<impl Iterator<Item = path::PathBuf>> {
-        Ok(self
-            .read_source_dir()?
-            .filter_map(ProtobufCodegen::filter_proto))
+        Ok(fs::read_dir(self.target.source.as_path())?.filter_map(filter_proto))
     }
-    fn filter_proto(result: Result<fs::DirEntry, io::Error>) -> Option<path::PathBuf> {
-        result.ok().and_then(|entry| {
-            entry
-                .path()
-                .file_name()
-                .and_then(|name| match name.to_str() {
-                    Some("api.proto") => Some(entry.path()),
-                    _ => None,
-                })
-        })
-    }
-
     fn source_proto_basename(&self) -> io::Result<impl Iterator<Item = String>> {
-        Ok(self
-            .source_proto()?
-            .filter_map(ProtobufCodegen::pickup_basename))
+        Ok(self.source_proto()?.filter_map(pickup_basename))
     }
-    fn pickup_basename(file: path::PathBuf) -> Option<String> {
-        file.file_stem()
-            .and_then(|name| name.to_str())
-            .map(|name| name.to_string())
-    }
+}
 
-    fn read_source_dir(&self) -> io::Result<fs::ReadDir> {
-        fs::read_dir(self.target.source.as_path())
-    }
+fn filter_proto(result: Result<fs::DirEntry, io::Error>) -> Option<path::PathBuf> {
+    result.ok().and_then(|entry| {
+        entry
+            .path()
+            .file_name()
+            .and_then(|name| match name.to_str() {
+                Some("api.proto") => Some(entry.path()),
+                _ => None,
+            })
+    })
+}
+fn pickup_basename(file: path::PathBuf) -> Option<String> {
+    file.file_stem()
+        .and_then(|name| name.to_str())
+        .map(|name| name.to_string())
 }
