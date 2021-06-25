@@ -13,7 +13,7 @@ impl ResetTokenEncoded {
         Ok(Self(token))
     }
 
-    pub fn new(token: String) -> Self {
+    pub const fn new(token: String) -> Self {
         Self(token)
     }
 
