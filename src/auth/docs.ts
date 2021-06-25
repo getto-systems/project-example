@@ -24,6 +24,7 @@ import { docs_authUser } from "./auth_user/docs"
 import { docs_logout } from "./auth_ticket/_ui/action_logout/docs"
 import { docs_requestResetToken } from "./password/reset/_ui/action_request_token/docs"
 import { docs_reset } from "./password/reset/docs"
+import { docs_resetPassword } from "./password/reset/_ui/action_reset/docs"
 
 export const docs_auth = docsDomain<AuthUsecase, AuthAction, AuthData>(
     "認証・認可",
@@ -47,11 +48,11 @@ const usecase = {
         },
     ),
     resetPassword: docsAuthUsecase(
-        "requestResetToken",
+        "resetPassword",
         ["業務で必要な時に使用できる"],
         {
-            action: ["requestResetToken"],
-            data: ["authUser", "loginID", "reset"],
+            action: ["requestResetToken", "resetPassword", "loadApplication"],
+            data: ["authUser", "loginID", "password", "reset"],
         },
     ),
     logout: docsAuthUsecase(
@@ -65,6 +66,7 @@ const action = {
     checkAuthTicket: docs_checkAuthTicket,
     authenticatePassword: docs_authenticatePassword,
     requestResetToken: docs_requestResetToken,
+    resetPassword: docs_resetPassword,
     logout: docs_logout,
     loadApplication: docsAction("アプリケーションのロード", ({ item }) => [
         item("input", ["コンテンツアクセストークン"], ["ブラウザに保存されたデータ"]),

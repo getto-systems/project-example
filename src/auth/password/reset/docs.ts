@@ -10,10 +10,9 @@ import {
 import { DocsSection } from "../../../../ui/vendor/getto-application/docs/data"
 
 export const docs_reset = docsData("パスワードリセットデータ", ({ data }) => [
-    data("リセットトークン", [
-        "パスワードをリセットするためのトークン",
+    data("リセットトークン送信先", [
+        "リセットトークンをメールで送信する送信先",
         "ログインIDに紐付けて保存",
-        "メールで送信される",
     ]),
 ])
 

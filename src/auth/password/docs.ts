@@ -12,6 +12,10 @@ export const docs_password = docsData("パスワードデータ", ({ data }) => 
         "ハッシュ化して保存",
         "一定文字数を超えない",
     ]),
+    data("リセットトークン", [
+        "パスワードをリセットするためのトークン",
+        "メールで送信される",
+    ]),
 ])
 
 export const docs_auth_password: DocsSection[] = [
