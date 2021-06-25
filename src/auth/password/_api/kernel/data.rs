@@ -7,7 +7,7 @@ use std::{
 pub struct ResetToken(String);
 
 impl ResetToken {
-    pub fn new(token: String) -> Self {
+    pub const fn new(token: String) -> Self {
         Self(token)
     }
 
