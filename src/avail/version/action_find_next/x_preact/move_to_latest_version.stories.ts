@@ -11,7 +11,7 @@ import { FindNextVersionCoreState } from "../core/action"
 const options = ["takeLongtime", "failed"] as const
 
 export default {
-    title: "main/public/Avail/Move To Latest Version",
+    title: "main/Avail/Move To Latest Version",
     parameters: {
         layout: "fullscreen",
     },

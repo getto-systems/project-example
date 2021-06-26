@@ -5,7 +5,7 @@ import { storyTemplate } from "../../../../ui/vendor/storybook/preact/story"
 import { NotFoundComponent } from "./not_found"
 
 export default {
-    title: "main/public/Avail/Not Found",
+    title: "main/Avail/Not Found",
     parameters: {
         layout: "fullscreen",
     },

@@ -29,9 +29,6 @@ function resetPasswordViewType(variant: ResetPasswordVariant): SignViewType {
         case ResetPasswordVariant["request-token"]:
             return "password-reset-requestToken"
 
-        case ResetPasswordVariant["check-status"]:
-            return "password-reset-checkStatus"
-
         case ResetPasswordVariant["reset"]:
             return "password-reset"
     }

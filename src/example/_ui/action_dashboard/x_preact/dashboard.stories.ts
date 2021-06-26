@@ -7,7 +7,7 @@ import { DashboardComponent } from "./dashboard"
 import { mockBaseResource } from "../../action_base/mock"
 
 export default {
-    title: "main/secure/Example/Dashboard",
+    title: "main/Example/Dashboard",
     parameters: {
         layout: "fullscreen",
     },

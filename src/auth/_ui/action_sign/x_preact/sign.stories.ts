@@ -9,7 +9,7 @@ import { mockSignAction } from "../core/mock"
 import { SignActionState } from "../core/action"
 
 export default {
-    title: "main/public/Auth/Sign/Error",
+    title: "main/Auth/Sign/Error",
     parameters: {
         layout: "fullscreen",
     },

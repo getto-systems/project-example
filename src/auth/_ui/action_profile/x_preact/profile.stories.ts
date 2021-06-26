@@ -11,7 +11,7 @@ import { mockLoadSeasonResource } from "../../../../example/_ui/common/action_lo
 import { mockLogoutResource } from "../../../auth_ticket/_ui/action_logout/mock"
 
 export default {
-    title: "main/secure/Auth/Profile",
+    title: "main/Auth/Profile",
     parameters: {
         layout: "fullscreen",
     },

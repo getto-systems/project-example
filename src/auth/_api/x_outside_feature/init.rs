@@ -28,6 +28,9 @@ use crate::auth::{
     auth_ticket::_api::kernel::data::{ExpansionLimitDuration, ExpireDuration},
     auth_user::_api::kernel::data::{AuthUser, AuthUserExtract},
     login_id::_api::data::LoginId,
+    password::reset::_api::request_token::data::{
+        ResetTokenDestination, ResetTokenDestinationExtract,
+    },
 };
 
 pub fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
@@ -56,7 +59,11 @@ pub fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
                 admin_password(),
             )
             .to_store(),
-            reset_token_destination: MemoryResetTokenDestinationMap::new().to_store(),
+            reset_token_destination: MemoryResetTokenDestinationMap::with_destination(
+                admin_login_id(),
+                admin_reset_token_destination(),
+            )
+            .to_store(),
         },
         cookie: AuthOutsideCookie {
             domain: &env.domain,
@@ -100,8 +107,14 @@ fn admin_user() -> AuthUser {
     .into()
 }
 fn admin_login_id() -> LoginId {
-    LoginId::validate("admin".to_string()).unwrap()
+    LoginId::validate("admin".into()).unwrap()
 }
 fn admin_password() -> HashedPassword {
     HashedPassword::new("$argon2id$v=19$m=4096,t=3,p=1$wL7bldJ+qUCSNYyrgm6OUA$BW+HlZoe6tYaO4yZ3PwQ+F/hj640LiKtfuM8B6YZ+bk".into())
+}
+fn admin_reset_token_destination() -> ResetTokenDestination {
+    ResetTokenDestinationExtract {
+        email: "shun@getto.systems".into(),
+    }
+    .into()
 }

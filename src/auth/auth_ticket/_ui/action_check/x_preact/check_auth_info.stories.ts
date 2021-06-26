@@ -11,7 +11,7 @@ import { CheckAuthTicketCoreState } from "../core/action"
 const options = ["takeLongtime", "server-error", "infra-error"] as const
 
 export default {
-    title: "main/public/Auth/Sign/AuthTicket/Check",
+    title: "main/Auth/AuthTicket/Check",
     parameters: {
         layout: "fullscreen",
     },

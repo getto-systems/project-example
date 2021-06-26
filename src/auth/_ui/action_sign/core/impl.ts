@@ -57,8 +57,6 @@ class Action extends ApplicationAbstractStateAction<SignActionState> implements 
 
             case "password-reset-requestToken":
                 return { type, view: this.subView.password_reset_requestToken() }
-            case "password-reset-checkStatus":
-                return { type, view: this.subView.password_reset_checkStatus() }
             case "password-reset":
                 return { type, view: this.subView.password_reset() }
         }

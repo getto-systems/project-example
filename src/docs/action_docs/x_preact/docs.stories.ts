@@ -8,7 +8,7 @@ import { mockDocsResource } from "../mock"
 import { DocsComponent } from "./docs"
 
 export default {
-    title: "main/secure/Docs",
+    title: "main/Docs",
     parameters: {
         layout: "fullscreen",
     },

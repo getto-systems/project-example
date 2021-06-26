@@ -14,6 +14,7 @@ const options = [
     "initial",
     "try",
     "takeLongtime",
+    "success",
     "validation-error",
     "invalid",
     "server-error",
@@ -21,7 +22,7 @@ const options = [
 ] as const
 
 export default {
-    title: "main/public/Auth/Sign/Password/Reset/Request Token",
+    title: "main/Auth/Password/Reset/Request Token",
     parameters: {
         layout: "fullscreen",
     },
@@ -59,6 +60,9 @@ const template = storyTemplate<Props>((props) => {
 
             case "takeLongtime":
                 return { type: "take-longtime-to-request-token" }
+
+            case "success":
+                return { type: "succeed-to-request-token" }
 
             case "validation-error":
                 return {
