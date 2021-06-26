@@ -18,7 +18,7 @@ export function initLoadSeasonCoreAction(infra: LoadSeasonInfra): LoadSeasonCore
 }
 
 class Action extends ApplicationAbstractStateAction<LoadSeasonCoreState> {
-    initialState = initialLoadSeasonCoreState
+    readonly initialState = initialLoadSeasonCoreState
 
     material: LoadSeasonCoreMaterial
 

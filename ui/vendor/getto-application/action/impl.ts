@@ -22,6 +22,9 @@ export abstract class ApplicationAbstractStateAction<S> implements ApplicationSt
     readonly igniteRunner: ApplicationActionIgniteRunner<S>
     readonly terminateRunner: ApplicationActionTerminateRunner = initActionTerminateRunner()
 
+    // コンストラクタの中で state をアップデートするためにプロパティとして定義
+    readonly currentState: { (): S }
+
     constructor(hook: ApplicationActionIgniteHook<S> = async () => this.initialState) {
         const { pub, sub } = initActionStatePubSub<S>()
         this.subscriber = sub
@@ -31,6 +34,20 @@ export abstract class ApplicationAbstractStateAction<S> implements ApplicationSt
         this.terminateHook(() => {
             pub.terminate()
         })
+
+        // 動的に初期化される action でも最新の state で始められるようにする
+        // sub class では currentState に手出しできないようにコンストラクタの中で構築する
+        let currentState: S | null = null
+        sub.subscribe((state) => {
+            currentState = state
+        })
+        this.currentState = () => {
+            if (currentState === null) {
+                return this.initialState
+            } else {
+                return currentState
+            }
+        }
     }
 
     terminateHook(hook: ApplicationActionTerminateHook): void {

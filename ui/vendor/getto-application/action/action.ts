@@ -7,8 +7,8 @@ export interface ApplicationAction {
     terminate(): void
 }
 export interface ApplicationStateAction<S> extends ApplicationAction {
-    readonly initialState: S
     readonly subscriber: ApplicationActionStateSubscriber<S>
+    currentState(): S
     ignite(): Promise<S>
 }
 
