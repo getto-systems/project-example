@@ -11,7 +11,7 @@ import { LogoutCoreState } from "../core/action"
 const options = ["initial", "failed"] as const
 
 export default {
-    title: "library/Auth/Sign/AuthTicket/Logout",
+    title: "library/Auth/AuthTicket/Logout",
     argTypes: {
         logout: {
             control: { type: "select", options },
