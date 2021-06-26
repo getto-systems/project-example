@@ -11,8 +11,3 @@ export interface Story<P> {
     args?: P
     (args: P): VNode
 }
-
-// enum A { text }; enumKeys(A) => ["text"]
-export function enumKeys(target: Record<string,unknown>): string[] {
-    return Object.keys(target).filter((key) => isNaN(parseInt(key)))
-}

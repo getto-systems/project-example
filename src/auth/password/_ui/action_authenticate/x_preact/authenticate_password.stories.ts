@@ -1,6 +1,6 @@
 import { h } from "preact"
 
-import { enumKeys, storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
+import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
 
 import { AuthenticatePasswordComponent } from "./authenticate_password"
 
@@ -8,9 +8,9 @@ import { mockAuthenticatePasswordResource } from "../mock"
 
 import { AuthenticatePasswordCoreState } from "../core/action"
 import { ValidateBoardActionState } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/core/action"
-import { ValidateBoardStateEnum } from "../../../../../../ui/vendor/getto-application/board/validate_board/data"
+import { validateBoardStates } from "../../../../../../ui/vendor/getto-application/board/validate_board/data"
 
-enum AuthenticateEnum {
+const options = [
     "initial",
     "try",
     "takeLongtime",
@@ -18,7 +18,7 @@ enum AuthenticateEnum {
     "invalid",
     "server-error",
     "infra-error",
-}
+] as const
 
 export default {
     title: "main/public/Auth/Sign/Password/Authenticate",
@@ -27,16 +27,16 @@ export default {
     },
     argTypes: {
         authenticate: {
-            control: { type: "select", options: enumKeys(AuthenticateEnum) },
+            control: { type: "select", options },
         },
         form: {
-            control: { type: "select", options: enumKeys(ValidateBoardStateEnum) },
+            control: { type: "select", options: validateBoardStates },
         },
     },
 }
 
 export type Props = Readonly<{
-    authenticate: keyof typeof AuthenticateEnum
+    authenticate: typeof options[number]
     form: ValidateBoardActionState
     err: string
 }>

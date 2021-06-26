@@ -1,6 +1,6 @@
 import { h } from "preact"
 
-import { enumKeys, storyTemplate } from "../../../../../ui/vendor/storybook/preact/story"
+import { storyTemplate } from "../../../../../ui/vendor/storybook/preact/story"
 
 import { mockFindNextVersionCoreAction } from "../core/mock"
 
@@ -8,10 +8,7 @@ import { MoveToLatestVersionComponent } from "./move_to_latest_version"
 
 import { FindNextVersionCoreState } from "../core/action"
 
-enum FindNextEnum {
-    "takeLongtime",
-    "failed",
-}
+const options = ["takeLongtime", "failed"] as const
 
 export default {
     title: "main/public/Avail/Move To Latest Version",
@@ -20,13 +17,13 @@ export default {
     },
     argTypes: {
         findNext: {
-            control: { type: "select", options: enumKeys(FindNextEnum) },
+            control: { type: "select", options },
         },
     },
 }
 
 type MockProps = Readonly<{
-    findNext: keyof typeof FindNextEnum
+    findNext: typeof options[number]
     err: string
 }>
 const template = storyTemplate<MockProps>((props) => {

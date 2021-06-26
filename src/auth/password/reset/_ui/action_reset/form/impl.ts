@@ -2,7 +2,7 @@ import { initInputLoginIDAction } from "../../../../../login_id/_ui/action_input
 import { initInputPasswordAction } from "../../../../_ui/action_input/core/impl"
 import { initValidateBoardAction } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/core/impl"
 
-import { ResetPasswordFormAction, ResetPasswordFieldsEnum } from "./action"
+import { ResetPasswordFormAction, resetPasswordFields } from "./action"
 
 import { ResetPasswordFields } from "../../reset/data"
 import { ConvertBoardResult } from "../../../../../../../ui/vendor/getto-application/board/kernel/data"
@@ -11,7 +11,7 @@ export function initResetPasswordFormAction(): ResetPasswordFormAction {
     const loginID = initInputLoginIDAction()
     const password = initInputPasswordAction()
     const validate = initValidateBoardAction({
-        fields: Object.keys(ResetPasswordFieldsEnum),
+        fields: resetPasswordFields,
         converter,
     })
 

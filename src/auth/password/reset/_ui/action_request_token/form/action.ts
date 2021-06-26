@@ -10,11 +10,9 @@ export interface RequestResetTokenFormAction extends ApplicationAction {
     readonly clear: ClearAction
 }
 
-export enum RequestResetTokenFieldsEnum {
-    "loginID" = "loginID",
-}
+export const requestResetTokenFields = ["loginID"] as const
 export type ValidateRequestTokenAction = ValidateBoardAction<
-    keyof typeof RequestResetTokenFieldsEnum,
+    typeof requestResetTokenFields[number],
     RequestResetTokenFields
 >
 

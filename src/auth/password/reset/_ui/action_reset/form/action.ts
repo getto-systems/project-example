@@ -12,12 +12,9 @@ export interface ResetPasswordFormAction extends ApplicationAction {
     readonly clear: ClearAction
 }
 
-export enum ResetPasswordFieldsEnum {
-    "loginID" = "loginID",
-    "password" = "password",
-}
+export const resetPasswordFields = ["loginID", "password"] as const
 export type ValidateResetAction = ValidateBoardAction<
-    keyof typeof ResetPasswordFieldsEnum,
+    typeof resetPasswordFields[number],
     ResetPasswordFields
 >
 

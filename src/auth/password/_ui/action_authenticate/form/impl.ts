@@ -2,7 +2,7 @@ import { initInputLoginIDAction } from "../../../../login_id/_ui/action_input/co
 import { initInputPasswordAction } from "../../action_input/core/impl"
 import { initValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/core/impl"
 
-import { AuthenticatePasswordFieldsEnum, AuthenticatePasswordFormAction } from "./action"
+import { authenticatePasswordFields, AuthenticatePasswordFormAction } from "./action"
 
 import { ConvertBoardResult } from "../../../../../../ui/vendor/getto-application/board/kernel/data"
 import { AuthenticatePasswordFields } from "../../authenticate/data"
@@ -12,7 +12,7 @@ export function initAuthenticatePasswordFormAction(): AuthenticatePasswordFormAc
     const password = initInputPasswordAction()
 
     const validate = initValidateBoardAction({
-        fields: Object.keys(AuthenticatePasswordFieldsEnum),
+        fields: authenticatePasswordFields,
         converter,
     })
 

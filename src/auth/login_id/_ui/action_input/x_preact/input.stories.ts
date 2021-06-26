@@ -1,6 +1,6 @@
 import { h } from "preact"
 
-import { enumKeys, storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
+import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
 
 import { InputLoginIDComponent } from "./input"
 
@@ -10,23 +10,19 @@ import { LOGIN_ID_MAX_LENGTH } from "../../convert"
 
 import { ValidateLoginIDState } from "../core/action"
 
-enum ValidateEnum {
-    "valid",
-    "empty",
-    "too-long",
-}
+const options = ["valid", "empty", "too-long"] as const
 
 export default {
     title: "library/Auth/Common/Fields/Input Login ID",
     argTypes: {
         validate: {
-            control: { type: "select", options: enumKeys(ValidateEnum) },
+            control: { type: "select", options },
         },
     },
 }
 
 type Props = Readonly<{
-    validate: keyof typeof ValidateEnum
+    validate: typeof options[number]
     help: string
 }>
 const template = storyTemplate<Props>((props) => {

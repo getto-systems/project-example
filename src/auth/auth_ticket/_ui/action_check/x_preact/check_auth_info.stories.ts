@@ -1,6 +1,6 @@
 import { h } from "preact"
 
-import { enumKeys, storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
+import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
 
 import { CheckAuthTicketComponent } from "./check_auth_info"
 
@@ -8,11 +8,7 @@ import { mockCheckAuthTicketResource } from "../mock"
 
 import { CheckAuthTicketCoreState } from "../core/action"
 
-enum CheckEnum {
-    "takeLongtime",
-    "server-error",
-    "infra-error",
-}
+const options = ["takeLongtime", "server-error", "infra-error"] as const
 
 export default {
     title: "main/public/Auth/Sign/AuthTicket/Check",
@@ -21,13 +17,13 @@ export default {
     },
     argTypes: {
         check: {
-            control: { type: "select", options: enumKeys(CheckEnum) },
+            control: { type: "select", options },
         },
     },
 }
 
 type Props = Readonly<{
-    check: keyof typeof CheckEnum
+    check: typeof options[number]
     err: string
 }>
 const template = storyTemplate<Props>((props) => {

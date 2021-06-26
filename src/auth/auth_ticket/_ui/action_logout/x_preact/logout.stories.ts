@@ -1,6 +1,6 @@
 import { h } from "preact"
 
-import { enumKeys, storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
+import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
 
 import { LogoutComponent } from "./logout"
 
@@ -8,22 +8,19 @@ import { mockLogoutResource } from "../mock"
 
 import { LogoutCoreState } from "../core/action"
 
-enum LogoutEnum {
-    "initial",
-    "failed",
-}
+const options = ["initial", "failed"] as const
 
 export default {
     title: "library/Auth/Sign/AuthTicket/Logout",
     argTypes: {
         logout: {
-            control: { type: "select", options: enumKeys(LogoutEnum) },
+            control: { type: "select", options },
         },
     },
 }
 
 type Props = Readonly<{
-    logout: keyof typeof LogoutEnum
+    logout: typeof options[number]
     err: string
 }>
 

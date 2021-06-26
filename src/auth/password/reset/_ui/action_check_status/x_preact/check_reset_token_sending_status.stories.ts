@@ -1,6 +1,6 @@
 import { h } from "preact"
 
-import { enumKeys, storyTemplate } from "../../../../../../../ui/vendor/storybook/preact/story"
+import { storyTemplate } from "../../../../../../../ui/vendor/storybook/preact/story"
 
 import { CheckPasswordResetSendingStatusComponent } from "./check_reset_token_sending_status"
 
@@ -8,7 +8,7 @@ import { mockCheckResetTokenSendingStatusResource } from "../mock"
 
 import { CheckResetTokenSendingStatusCoreState } from "../core/action"
 
-enum CheckStatusEnum {
+const options = [
     "initial",
     "check",
     "waiting",
@@ -18,7 +18,7 @@ enum CheckStatusEnum {
     "infra-error",
     "send-error",
     "send",
-}
+] as const
 
 export default {
     title: "main/public/Auth/Sign/Password/Reset/Check Status",
@@ -27,13 +27,13 @@ export default {
     },
     argTypes: {
         checkStatus: {
-            control: { type: "select", options: enumKeys(CheckStatusEnum) },
+            control: { type: "select", options },
         },
     },
 }
 
 type Props = Readonly<{
-    checkStatus: keyof typeof CheckStatusEnum
+    checkStatus: typeof options[number]
     err: string
 }>
 const template = storyTemplate<Props>((props) => {

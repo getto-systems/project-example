@@ -18,7 +18,7 @@ import {
 import { ConvertBoardResult } from "../../kernel/data"
 
 export type ValidateBoardActionParams<N extends string, T> = Readonly<{
-    fields: N[]
+    fields: readonly N[]
     converter: BoardConverter<T>
 }>
 export function initValidateBoardAction<N extends string, T>({

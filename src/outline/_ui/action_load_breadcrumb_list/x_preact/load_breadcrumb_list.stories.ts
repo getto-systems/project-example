@@ -1,27 +1,24 @@
 import { h } from "preact"
 
-import { enumKeys, storyTemplate } from "../../../../../ui/vendor/storybook/preact/story"
+import { storyTemplate } from "../../../../../ui/vendor/storybook/preact/story"
 
 import { LoadBreadcrumbListComponent } from "./load_breadcrumb_list"
 
 import { mockBreadcrumbList, mockLoadBreadcrumbListCoreAction } from "../core/mock"
 
-enum LoadEnum {
-    "home",
-    "empty",
-}
+const options = ["home", "empty"] as const
 
 export default {
     title: "library/Outline/Menu/Load Breadcrumb List",
     argTypes: {
         load: {
-            control: { type: "select", options: enumKeys(LoadEnum) },
+            control: { type: "select", options },
         },
     },
 }
 
 type MockProps = Readonly<{
-    load: keyof typeof LoadEnum
+    load: typeof options[number]
     label: string
 }>
 const template = storyTemplate<MockProps>((props) => {
