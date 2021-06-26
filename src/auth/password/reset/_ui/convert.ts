@@ -1,17 +1,6 @@
 import { ConvertLocationResult } from "../../../../z_details/_ui/location/data"
 import { SignNav, signNavKey } from "../../../_ui/common/nav/data"
-import { ResetSessionID, ResetToken } from "./data"
-
-export function detectResetToken(currentURL: URL): ConvertLocationResult<ResetToken> {
-    const resetToken = currentURL.searchParams.get(signNavKey(SignNav.passwordResetToken))
-    if (resetToken === null) {
-        return { valid: false }
-    }
-    if (resetToken.length === 0) {
-        return { valid: false }
-    }
-    return { valid: true, value: markResetToken(resetToken) }
-}
+import { ResetSessionID } from "./data"
 
 export function detectResetSessionID(currentURL: URL): ConvertLocationResult<ResetSessionID> {
     const sessionID = currentURL.searchParams.get(signNavKey(SignNav.passwordResetSessionID))
@@ -31,7 +20,4 @@ export function convertResetSessionIDRemote(sessionID: string): ResetSessionID {
 
 function markResetSessionID(sessionID: string): ResetSessionID {
     return sessionID as ResetSessionID
-}
-function markResetToken(resetToken: string): ResetToken {
-    return resetToken as ResetToken
 }

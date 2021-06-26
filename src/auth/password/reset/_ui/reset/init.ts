@@ -11,7 +11,7 @@ import { LocationOutsideFeature } from "../../../../../z_details/_ui/location/fe
 import { delaySecond } from "../../../../../z_details/_ui/config/infra"
 import { ResetPasswordInfra } from "./infra"
 
-import { detectResetToken } from "../convert"
+import { detectResetToken } from "../../../_ui/convert"
 
 export function newResetPasswordLocationDetecter(
     feature: LocationOutsideFeature,
