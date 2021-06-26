@@ -8,7 +8,7 @@ export function useApplicationView<R>({ resource, terminate }: ApplicationView<R
 }
 
 export function useApplicationAction<S>(action: ApplicationStateAction<S>): S {
-    const [state, setState] = useState(action.initialState)
+    const [state, setState] = useState(action.currentState())
     useLayoutEffect(() => {
         action.subscriber.subscribe(setState)
         action.ignite()

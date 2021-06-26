@@ -13,7 +13,7 @@ describe("InputPassword", () => {
 
         await runner(async () => {
             action.board.input.set(markBoardValue("valid"))
-            return action.validate.initialState
+            return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: true }])
             expect(action.validate.get()).toEqual({ valid: true, value: "valid" })
@@ -27,7 +27,7 @@ describe("InputPassword", () => {
 
         await runner(async () => {
             action.board.input.set(markBoardValue(""))
-            return action.validate.initialState
+            return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: false, err: [{ type: "empty" }] }])
             expect(action.validate.get()).toEqual({ valid: false, err: [{ type: "empty" }] })
@@ -41,7 +41,7 @@ describe("InputPassword", () => {
 
         await runner(async () => {
             action.board.input.set(markBoardValue("a".repeat(100 + 1)))
-            return action.validate.initialState
+            return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: false, err: [{ type: "too-long", maxLength: 100 }] }])
             expect(action.validate.get()).toEqual({
@@ -58,7 +58,7 @@ describe("InputPassword", () => {
 
         await runner(async () => {
             action.board.input.set(markBoardValue("a".repeat(100)))
-            return action.validate.initialState
+            return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: true }])
             expect(action.validate.get()).toEqual({ valid: true, value: "a".repeat(100) })
@@ -72,7 +72,7 @@ describe("InputPassword", () => {
 
         await runner(async () => {
             action.board.input.set(markBoardValue("あ".repeat(100) + "a"))
-            return action.validate.initialState
+            return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: false, err: [{ type: "too-long", maxLength: 100 }] }])
             expect(action.validate.get()).toEqual({
@@ -89,7 +89,7 @@ describe("InputPassword", () => {
 
         await runner(async () => {
             action.board.input.set(markBoardValue("あ".repeat(100)))
-            return action.validate.initialState
+            return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: true }])
             expect(action.validate.get()).toEqual({ valid: true, value: "あ".repeat(100) })

@@ -11,7 +11,7 @@ describe("ValidateBoard", () => {
         await runner(async () => {
             handler.name({ valid: true })
             handler.description({ valid: true })
-            return action.initialState
+            return action.currentState()
         }).then((stack) => {
             expect(stack).toEqual(["initial", "valid"])
         })
@@ -25,7 +25,7 @@ describe("ValidateBoard", () => {
         await runner(async () => {
             handler.name({ valid: false, err: ["invalid"] }) // invalid
             handler.description({ valid: true })
-            return action.initialState
+            return action.currentState()
         }).then((stack) => {
             expect(stack).toEqual(["invalid", "invalid"])
         })
@@ -39,7 +39,7 @@ describe("ValidateBoard", () => {
         await runner(async () => {
             handler.name({ valid: true })
             // description: initial state
-            return action.initialState
+            return action.currentState()
         }).then((stack) => {
             expect(stack).toEqual(["initial"])
         })
