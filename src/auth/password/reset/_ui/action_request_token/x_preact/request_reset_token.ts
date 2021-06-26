@@ -42,6 +42,8 @@ export function RequestResetTokenEntry(view: RequestResetTokenView): VNode {
     })
 }
 
+const title = "パスワードリセット"
+
 type Props = RequestResetTokenResource & RequestResetTokenResourceState
 export function RequestResetTokenComponent(props: Props): VNode {
     switch (props.state.core.type) {
@@ -71,8 +73,6 @@ export function RequestResetTokenComponent(props: Props): VNode {
         | (StartSessionFormContent_base & StartSessionFormContent_error)
     type StartSessionFormContent_base = Readonly<{ state: StartSessionFormState }>
     type StartSessionFormContent_error = Readonly<{ error: VNodeContent[] }>
-
-    const title = "パスワードリセット"
 
     function startSessionForm(content: StartSessionFormContent): VNode {
         return form(

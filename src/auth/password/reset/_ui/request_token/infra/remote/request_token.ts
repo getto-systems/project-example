@@ -19,7 +19,7 @@ import { RequestResetTokenRemote } from "../../infra"
 export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): RequestResetTokenRemote {
     return async (fields) => {
         try {
-            const mock = true
+            const mock = false
             if (mock) {
                 // TODO api の実装が終わったらつなぐ
                 return { success: true, value: true }
