@@ -1,6 +1,8 @@
 import { BoardValue } from "../../../../ui/vendor/getto-application/board/kernel/data"
 import { BoardFieldValueConverter } from "../../../../ui/vendor/getto-application/board/validate_field/infra"
-import { Password, ValidatePasswordError } from "./data"
+import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
+import { SignNav, signNavKey } from "../../_ui/common/nav/data"
+import { Password, ResetToken, ValidatePasswordError } from "./data"
 
 // password には技術的な制限はないが、使用可能な最大文字数は定義しておく
 // api の設定と同期すること
@@ -22,4 +24,19 @@ const TOO_LONG: ValidatePasswordError[] = [{ type: "too-long", maxLength: PASSWO
 
 function markPassword(password: string): Password {
     return password as Password
+}
+
+export function detectResetToken(currentURL: URL): ConvertLocationResult<ResetToken> {
+    const resetToken = currentURL.searchParams.get(signNavKey(SignNav.passwordResetToken))
+    if (resetToken === null) {
+        return { valid: false }
+    }
+    if (resetToken.length === 0) {
+        return { valid: false }
+    }
+    return { valid: true, value: markResetToken(resetToken) }
+}
+
+function markResetToken(resetToken: string): ResetToken {
+    return resetToken as ResetToken
 }

@@ -1,6 +1,6 @@
 import { h } from "preact"
 
-import { enumKeys, storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
+import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
 
 import { LoadSeasonFieldComponent } from "./load_season_field"
 
@@ -10,22 +10,19 @@ import { mockLoadSeasonResource } from "../mock"
 
 import { LoadSeasonCoreState } from "../core/action"
 
-enum LoadEnum {
-    "success",
-    "error",
-}
+const options = ["success", "error"] as const
 
 export default {
     title: "library/Example/Common/Example",
     argTypes: {
         load: {
-            control: { type: "select", options: enumKeys(LoadEnum) },
+            control: { type: "select", options },
         },
     },
 }
 
 type MockProps = Readonly<{
-    load: keyof typeof LoadEnum
+    load: typeof options[number]
     year: number
     err: string
 }>

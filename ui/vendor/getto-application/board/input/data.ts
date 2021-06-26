@@ -1,4 +1,4 @@
-export enum InputBoardValueTypeEnum {
+export const inputBoardValueTypes = [
     "text",
     "password",
     "search",
@@ -7,5 +7,5 @@ export enum InputBoardValueTypeEnum {
     "email",
     "date",
     "time",
-}
-export type InputBoardValueType = keyof typeof InputBoardValueTypeEnum
+] as const
+export type InputBoardValueType = typeof inputBoardValueTypes[number]

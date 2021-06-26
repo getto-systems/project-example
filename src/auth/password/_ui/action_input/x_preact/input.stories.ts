@@ -1,6 +1,6 @@
 import { h } from "preact"
 
-import { enumKeys, storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
+import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
 
 import { InputPasswordComponent } from "./input"
 
@@ -14,32 +14,25 @@ import { ValidatePasswordState } from "../core/action"
 
 import { PasswordCharacterState } from "../../data"
 
-enum ValidateEnum {
-    "valid",
-    "empty",
-    "too-long",
-}
-enum CharacterEnum {
-    "singleByte",
-    "multiByte",
-}
+const validateOptions = ["valid", "empty", "too-long"] as const
+const characterOptions = ["singleByte", "multiByte"] as const
 
 export default {
     title: "library/Auth/Common/Fields/Input Password",
     argTypes: {
         validate: {
-            control: { type: "select", options: enumKeys(ValidateEnum) },
+            control: { type: "select", options: validateOptions },
         },
         character: {
-            control: { type: "select", options: enumKeys(CharacterEnum) },
+            control: { type: "select", options: characterOptions },
         },
     },
 }
 
 type Props = Readonly<{
     password: string
-    validate: keyof typeof ValidateEnum
-    character: keyof typeof CharacterEnum
+    validate: typeof validateOptions[number]
+    character: typeof characterOptions[number]
     help: string
 }>
 const template = storyTemplate<Props>((props) => {

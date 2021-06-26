@@ -3,7 +3,7 @@ import { RemoteResult } from "../../../../../z_details/_ui/remote/infra"
 
 import { AuthTicket } from "../../../../auth_ticket/_ui/kernel/data"
 import { ResetPasswordFields, ResetPasswordRemoteError } from "./data"
-import { ResetToken } from "../data"
+import { ResetToken } from "../../../_ui/data"
 
 export type ResetPasswordInfra = Readonly<{
     reset: ResetPasswordRemote

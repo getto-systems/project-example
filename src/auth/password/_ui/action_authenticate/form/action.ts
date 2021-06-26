@@ -12,12 +12,9 @@ export interface AuthenticatePasswordFormAction extends ApplicationAction {
     readonly clear: ClearAction
 }
 
-export enum AuthenticatePasswordFieldsEnum {
-    "loginID" = "loginID",
-    "password" = "password",
-}
+export const authenticatePasswordFields = ["loginID", "password"] as const
 export type ValidateAuthenticatePasswordFieldsAction = ValidateBoardAction<
-    keyof typeof AuthenticatePasswordFieldsEnum,
+    typeof authenticatePasswordFields[number],
     AuthenticatePasswordFields
 >
 

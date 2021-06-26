@@ -7,7 +7,10 @@ export interface UpdateBoardValidateStateMethod<N extends string> {
 }
 
 interface Update {
-    <N extends string>(fields: N[], store: ValidateBoardStore): UpdateBoardValidateStateMethod<N>
+    <N extends string>(
+        fields: readonly N[],
+        store: ValidateBoardStore,
+    ): UpdateBoardValidateStateMethod<N>
 }
 export const updateBoardValidateState: Update = (fields, infra) => (name, valid, post) => {
     const { stack } = infra

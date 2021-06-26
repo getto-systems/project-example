@@ -1,6 +1,6 @@
 import { h } from "preact"
 
-import { enumKeys, storyTemplate } from "../../../../../ui/vendor/storybook/preact/story"
+import { storyTemplate } from "../../../../../ui/vendor/storybook/preact/story"
 
 import {
     appLayout,
@@ -21,13 +21,13 @@ import { LoadMenuCoreState } from "../core/action"
 
 import { Menu } from "../../kernel/data"
 
-enum LoadEnum {
+const options = [
     "success",
     "required-to-login",
     "repository-error",
     "server-error",
     "infra-error",
-}
+] as const
 
 export default {
     title: "library/Outline/Menu/Load Menu",
@@ -36,13 +36,13 @@ export default {
     },
     argTypes: {
         load: {
-            control: { type: "select", options: enumKeys(LoadEnum) },
+            control: { type: "select", options },
         },
     },
 }
 
 type MockProps = Readonly<{
-    load: keyof typeof LoadEnum
+    load: typeof options[number]
     label: string
     badgeCount: number
     err: string

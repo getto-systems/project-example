@@ -1,6 +1,6 @@
 import { h } from "preact"
 
-import { enumKeys, storyTemplate } from "../../../../storybook/preact/story"
+import { storyTemplate } from "../../../../storybook/preact/story"
 
 import { InputBoardComponent } from "./input"
 
@@ -8,13 +8,13 @@ import { markBoardValue } from "../../kernel/mock"
 
 import { mockInputBoardValueAction } from "../core/mock"
 
-import { InputBoardValueType, InputBoardValueTypeEnum } from "../../input/data"
+import { InputBoardValueType, inputBoardValueTypes } from "../../input/data"
 
 export default {
     title: "Getto/Board/Input",
     argTypes: {
         inputType: {
-            control: { type: "select", options: enumKeys(InputBoardValueTypeEnum) },
+            control: { type: "select", options: inputBoardValueTypes },
         },
     },
 }

@@ -1,7 +1,7 @@
 import { initInputLoginIDAction } from "../../../../../login_id/_ui/action_input/core/impl"
 import { initValidateBoardAction } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/core/impl"
 
-import { RequestResetTokenFormAction, RequestResetTokenFieldsEnum } from "./action"
+import { RequestResetTokenFormAction, requestResetTokenFields } from "./action"
 
 import { ConvertBoardResult } from "../../../../../../../ui/vendor/getto-application/board/kernel/data"
 import { RequestResetTokenFields } from "../../request_token/data"
@@ -9,7 +9,7 @@ import { RequestResetTokenFields } from "../../request_token/data"
 export function initRequestResetTokenFormAction(): RequestResetTokenFormAction {
     const loginID = initInputLoginIDAction()
     const validate = initValidateBoardAction({
-        fields: Object.keys(RequestResetTokenFieldsEnum),
+        fields: requestResetTokenFields,
         converter,
     })
 

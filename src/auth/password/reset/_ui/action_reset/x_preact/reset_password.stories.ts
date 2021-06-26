@@ -1,6 +1,6 @@
 import { h } from "preact"
 
-import { enumKeys, storyTemplate } from "../../../../../../../ui/vendor/storybook/preact/story"
+import { storyTemplate } from "../../../../../../../ui/vendor/storybook/preact/story"
 
 import { ResetPasswordComponent } from "./reset_password"
 
@@ -8,9 +8,9 @@ import { mockResetPasswordResource } from "../mock"
 
 import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/core/action"
 import { ResetPasswordCoreState } from "../core/action"
-import { ValidateBoardStateEnum } from "../../../../../../../ui/vendor/getto-application/board/validate_board/data"
+import { validateBoardStates } from "../../../../../../../ui/vendor/getto-application/board/validate_board/data"
 
-enum ResetEnum {
+const options = [
     "initial",
     "try",
     "takeLongtime",
@@ -18,7 +18,7 @@ enum ResetEnum {
     "invalid",
     "server-error",
     "infra-error",
-}
+] as const
 
 export default {
     title: "main/public/Auth/Sign/Password/Reset/Reset",
@@ -27,16 +27,16 @@ export default {
     },
     argTypes: {
         reset: {
-            control: { type: "select", options: enumKeys(ResetEnum) },
+            control: { type: "select", options },
         },
         form: {
-            control: { type: "select", options: enumKeys(ValidateBoardStateEnum) },
+            control: { type: "select", options: validateBoardStates },
         },
     },
 }
 
 type Props = Readonly<{
-    reset: keyof typeof ResetEnum
+    reset: typeof options[number]
     form: ValidateBoardActionState
     err: string
 }>
