@@ -45,10 +45,6 @@ export function initSignLinkResource(): SignLinkResource {
                     lnir("arrow-left"),
                     resetPasswordHref("request-token", []),
                 ),
-            getHref_password_reset_checkStatus: (sessionID) =>
-                resetPasswordHref("check-status", [
-                    [signNavKey(SignNav.passwordResetSessionID), sessionID],
-                ]),
         },
     }
 }

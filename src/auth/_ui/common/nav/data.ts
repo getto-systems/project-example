@@ -45,7 +45,6 @@ export type AuthenticatePasswordVariantKey = keyof typeof AuthenticatePasswordVa
 
 export enum ResetPasswordVariant {
     "request-token",
-    "check-status",
     "reset",
 }
 export type ResetPasswordVariantKey = keyof typeof ResetPasswordVariant

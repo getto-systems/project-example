@@ -11,7 +11,6 @@ import { ApplicationErrorComponent } from "../../../../avail/_ui/x_preact/applic
 import { CheckAuthTicketEntry } from "../../../auth_ticket/_ui/action_check/x_preact/check_auth_info"
 import { AuthenticatePasswordEntry } from "../../../password/_ui/action_authenticate/x_preact/authenticate_password"
 import { RequestResetTokenEntry } from "../../../password/reset/_ui/action_request_token/x_preact/request_reset_token"
-import { CheckPasswordResetSendingStatusEntry } from "../../../password/reset/_ui/action_check_status/x_preact/check_reset_token_sending_status"
 import { ResetPasswordEntry } from "../../../password/reset/_ui/action_reset/x_preact/reset_password"
 
 import { SignView, SignResource, SignResourceState } from "../resource"
@@ -49,9 +48,6 @@ export function SignComponent(props: Props): VNode {
 
         case "password-reset-requestToken":
             return h(RequestResetTokenEntry, props.state.view)
-
-        case "password-reset-checkStatus":
-            return h(CheckPasswordResetSendingStatusEntry, props.state.view)
 
         case "password-reset":
             return h(ResetPasswordEntry, props.state.view)

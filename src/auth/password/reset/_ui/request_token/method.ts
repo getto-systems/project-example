@@ -36,7 +36,7 @@ export const requestResetToken: RequestToken = (infra) => async (fields, post) =
         return post({ type: "failed-to-request-token", err: response.err })
     }
 
-    return post({ type: "succeed-to-request-token", sessionID: response.value })
+    return post({ type: "succeed-to-request-token" })
 }
 
 interface Post<E, S> {

@@ -3,7 +3,6 @@ import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/a
 import { mockAuthenticatePasswordView } from "../../password/_ui/action_authenticate/mock"
 import { mockRequestResetTokenView } from "../../password/reset/_ui/action_request_token/mock"
 import { mockResetPasswordView } from "../../password/reset/_ui/action_reset/mock"
-import { mockCheckResetTokenSendingStatusView } from "../../password/reset/_ui/action_check_status/mock"
 import { mockCheckAuthTicketView } from "../../auth_ticket/_ui/action_check/mock"
 import { mockSignViewLocationDetecter } from "../common/switch_view/mock"
 
@@ -75,26 +74,6 @@ describe("SignView", () => {
         })
     })
 
-    test("password reset check status", async () => {
-        const { action } = passwordReset_checkStatus()
-
-        const runner = setupActionTestRunner(action.subscriber)
-
-        await runner(async () => {
-            const state = await action.ignite()
-            switch (state.type) {
-                case "check-authTicket":
-                    await state.view.resource.core.ignite()
-            }
-            return state
-        }).then((stack) => {
-            expect(stack.map((state) => state.type)).toEqual([
-                "check-authTicket",
-                "password-reset-checkStatus",
-            ])
-        })
-    })
-
     test("password reset", async () => {
         const { action } = passwordReset_reset()
 
@@ -156,12 +135,6 @@ function passwordReset_requestToken() {
 
     return { action }
 }
-function passwordReset_checkStatus() {
-    const currentURL = passwordReset_checkStatus_URL()
-    const action = initAction(currentURL)
-
-    return { action }
-}
 function passwordReset_reset() {
     const currentURL = passwordReset_reset_URL()
     const action = initAction(currentURL)
@@ -178,7 +151,6 @@ function initAction(currentURL: URL): SignAction {
         password_authenticate: () => mockAuthenticatePasswordView(),
         password_reset: () => mockResetPasswordView(),
         password_reset_requestToken: () => mockRequestResetTokenView(),
-        password_reset_checkStatus: () => mockCheckResetTokenSendingStatusView(),
     })
 }
 
@@ -190,9 +162,6 @@ function static_privacyPolicy_URL(): URL {
 }
 function passwordReset_requestToken_URL(): URL {
     return new URL("https://example.com/index.html?-password-reset=request-token")
-}
-function passwordReset_checkStatus_URL(): URL {
-    return new URL("https://example.com/index.html?-password-reset=check-status")
 }
 function passwordReset_reset_URL(): URL {
     return new URL("https://example.com/index.html?-password-reset=reset")

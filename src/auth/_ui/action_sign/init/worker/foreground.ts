@@ -6,10 +6,6 @@ import {
     newRequestPasswordResetTokenProxy,
     RequestPasswordResetTokenProxy,
 } from "../../../../password/reset/_ui/action_request_token/init/worker/foreground"
-import {
-    CheckPasswordResetSendingStatusProxy,
-    newCheckPasswordResetSendingStatusProxy,
-} from "../../../../password/reset/_ui/action_check_status/init/worker/foreground"
 
 import { initSignView } from "../../impl"
 import { initSignAction } from "../../core/impl"
@@ -39,7 +35,6 @@ export function newSignWorkerForeground(feature: OutsideFeature): SignView {
 
         password_authenticate: () => newAuthenticatePasswordView(feature),
         password_reset_requestToken: () => proxy.password.reset.requestToken.view(),
-        password_reset_checkStatus: () => proxy.password.reset.checkStatus.view(feature),
         password_reset: () => newResetPasswordView(feature),
     })
 
@@ -69,7 +64,6 @@ type Proxy = Readonly<{
     password: Readonly<{
         reset: Readonly<{
             requestToken: RequestPasswordResetTokenProxy
-            checkStatus: CheckPasswordResetSendingStatusProxy
         }>
     }>
 }>
@@ -79,9 +73,6 @@ function initProxy(post: Post<ForegroundMessage>): Proxy {
             reset: {
                 requestToken: newRequestPasswordResetTokenProxy((message) =>
                     post({ type: "password-reset-requestToken", message }),
-                ),
-                checkStatus: newCheckPasswordResetSendingStatusProxy((message) =>
-                    post({ type: "password-reset-checkStatus", message }),
                 ),
             },
         },
@@ -96,10 +87,6 @@ function initBackgroundMessageHandler(
             switch (message.type) {
                 case "password-reset-requestToken":
                     proxy.password.reset.requestToken.resolve(message.response)
-                    break
-
-                case "password-reset-checkStatus":
-                    proxy.password.reset.checkStatus.resolve(message.response)
                     break
 
                 case "error":

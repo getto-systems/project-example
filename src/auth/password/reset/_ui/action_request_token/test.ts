@@ -12,8 +12,6 @@ import { RequestResetTokenRemote, RequestResetTokenRemoteResult } from "../reque
 
 import { RequestResetTokenView } from "./resource"
 
-import { convertResetSessionIDRemote } from "../convert"
-
 const VALID_LOGIN = { loginID: "login-id" } as const
 
 describe("RequestResetToken", () => {
@@ -29,7 +27,7 @@ describe("RequestResetToken", () => {
         }).then((stack) => {
             expect(stack).toEqual([
                 { type: "try-to-request-token" },
-                { type: "succeed-to-request-token", sessionID: "session-id" },
+                { type: "succeed-to-request-token" },
             ])
         })
     })
@@ -48,7 +46,7 @@ describe("RequestResetToken", () => {
             expect(stack).toEqual([
                 { type: "try-to-request-token" },
                 { type: "take-longtime-to-request-token" },
-                { type: "succeed-to-request-token", sessionID: "session-id" },
+                { type: "succeed-to-request-token" },
             ])
         })
     })
@@ -138,5 +136,5 @@ function takeLongtime_requestToken(): RequestResetTokenRemote {
         ticker({ wait_millisecond: 64 }, () => standard_requestResetTokenRemoteResult())
 }
 function standard_requestResetTokenRemoteResult(): RequestResetTokenRemoteResult {
-    return { success: true, value: convertResetSessionIDRemote("session-id") }
+    return { success: true, value: true }
 }

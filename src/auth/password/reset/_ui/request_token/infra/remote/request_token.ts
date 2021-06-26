@@ -16,15 +16,13 @@ import { RemoteOutsideFeature } from "../../../../../../../z_details/_ui/remote/
 
 import { RequestResetTokenRemote } from "../../infra"
 
-import { convertResetSessionIDRemote } from "../../../convert"
-
 export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): RequestResetTokenRemote {
     return async (fields) => {
         try {
             const mock = true
             if (mock) {
                 // TODO api の実装が終わったらつなぐ
-                return { success: true, value: convertResetSessionIDRemote("reset-session-id") }
+                return { success: true, value: true }
             }
 
             const opts = fetchOptions({
@@ -48,10 +46,7 @@ export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): Reque
             if (!result.success) {
                 return { success: false, err: { type: "invalid-reset" } }
             }
-            return {
-                success: true,
-                value: convertResetSessionIDRemote(result.value?.sessionId || ""),
-            }
+            return { success: true, value: true }
         } catch (err) {
             return remoteInfraError(err)
         }

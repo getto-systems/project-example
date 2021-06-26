@@ -1,5 +1,4 @@
 import { h, VNode } from "preact"
-import { useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
 
 import {
@@ -45,16 +44,6 @@ export function RequestResetTokenEntry(view: RequestResetTokenView): VNode {
 
 type Props = RequestResetTokenResource & RequestResetTokenResourceState
 export function RequestResetTokenComponent(props: Props): VNode {
-    useLayoutEffect(() => {
-        switch (props.state.core.type) {
-            case "succeed-to-request-token":
-                location.href = props.link.getHref_password_reset_checkStatus(
-                    props.state.core.sessionID,
-                )
-                return
-        }
-    }, [props.link, props.state.core])
-
     switch (props.state.core.type) {
         case "initial-request-token":
             return startSessionForm({ state: "start" })
@@ -72,8 +61,7 @@ export function RequestResetTokenComponent(props: Props): VNode {
             return takeLongtimeMessage()
 
         case "succeed-to-request-token":
-            // useLayoutEffect で check status にリダイレクトする
-            return EMPTY_CONTENT
+            return successMessage()
     }
 
     type StartSessionFormState = "start" | "connecting"
@@ -84,14 +72,12 @@ export function RequestResetTokenComponent(props: Props): VNode {
     type StartSessionFormContent_base = Readonly<{ state: StartSessionFormState }>
     type StartSessionFormContent_error = Readonly<{ error: VNodeContent[] }>
 
-    function startSessionTitle() {
-        return "パスワードリセット"
-    }
+    const title = "パスワードリセット"
 
     function startSessionForm(content: StartSessionFormContent): VNode {
         return form(
             loginBox(siteInfo, {
-                title: startSessionTitle(),
+                title,
                 body: [
                     h(InputLoginIDEntry, {
                         field: props.requestToken.form.loginID,
@@ -165,13 +151,26 @@ export function RequestResetTokenComponent(props: Props): VNode {
     }
     function takeLongtimeMessage() {
         return loginBox(siteInfo, {
-            title: startSessionTitle(),
+            title,
             body: [
                 html`<p>${spinner} トークンの送信に時間がかかっています</p>`,
                 html`<p>
                     30秒以上かかる場合は何かがおかしいので、
                     <br />
                     お手数ですが管理者に連絡お願いします
+                </p>`,
+            ],
+            footer: footerLinks(),
+        })
+    }
+    function successMessage() {
+        return loginBox(siteInfo, {
+            title,
+            body: [
+                html`<p>トークンの送信が完了しました</p>`,
+                html`<p>
+                    メールからパスワードのリセットができます<br />
+                    メールを確認してください
                 </p>`,
             ],
             footer: footerLinks(),
@@ -204,5 +203,3 @@ function requestTokenError(err: RequestResetTokenError): VNodeContent[] {
             ])
     }
 }
-
-const EMPTY_CONTENT = html``
