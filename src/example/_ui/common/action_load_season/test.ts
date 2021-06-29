@@ -1,7 +1,7 @@
 import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
 
 import { mockClock, mockClockPubSub } from "../../../../z_details/_ui/clock/mock"
-import { mockSeasonRepository } from "../load_season/infra/repository/mock"
+import { mockSeasonRepository } from "../load_season/init/repository/mock"
 
 import { markSeason } from "../load_season/test_helper"
 

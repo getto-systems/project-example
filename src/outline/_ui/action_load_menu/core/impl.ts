@@ -18,7 +18,7 @@ import {
 import { LoadMenuDetecter } from "../../kernel/method"
 
 import { MenuCategoryPath } from "../../kernel/data"
-import { initMenuBadgeStore, initMenuExpandStore } from "../../kernel/infra/store"
+import { initMenuBadgeStore, initMenuExpandStore } from "../../kernel/init/store"
 
 export type LoadMenuCoreInfra = LoadMenuInfra & UpdateMenuBadgeInfra & ToggleMenuExpandInfra
 

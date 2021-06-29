@@ -1,8 +1,8 @@
 import { env } from "../../../y_environment/_ui/env"
 
-import { newAuthzRepository } from "../../../auth/auth_ticket/_ui/kernel/infra/repository/authz"
-import { newGetMenuBadgeRemote } from "../kernel/infra/remote/get_menu_badge/fetch"
-import { newGetMenuBadgeNoopRemote } from "../kernel/infra/remote/get_menu_badge/noop"
+import { newAuthzRepository } from "../../../auth/auth_ticket/_ui/kernel/init/repository/authz"
+import { newGetMenuBadgeRemote } from "../kernel/init/remote/get_menu_badge/fetch"
+import { newGetMenuBadgeNoopRemote } from "../kernel/init/remote/get_menu_badge/noop"
 
 import { RepositoryOutsideFeature } from "../../../z_details/_ui/repository/feature"
 import { RemoteOutsideFeature } from "../../../z_details/_ui/remote/feature"

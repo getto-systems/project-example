@@ -1,4 +1,4 @@
-import { newAuthenticatePasswordRemote } from "./infra/remote/authenticate"
+import { newAuthenticatePasswordRemote } from "./init/remote/authenticate"
 import { newClock } from "../../../../z_details/_ui/clock/init"
 
 import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"

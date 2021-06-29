@@ -3,8 +3,8 @@ import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/a
 import { markMenuCategoryLabel, standard_MenuTree } from "../kernel/test_helper"
 
 import { mockLoadMenuLocationDetecter } from "../kernel/mock"
-import { mockAuthzRepository } from "../../../auth/auth_ticket/_ui/kernel/infra/repository/mock"
-import { mockMenuExpandRepository } from "../kernel/infra/repository/mock"
+import { mockAuthzRepository } from "../../../auth/auth_ticket/_ui/kernel/init/repository/mock"
+import { mockMenuExpandRepository } from "../kernel/init/repository/mock"
 
 import { initLoadMenuCoreAction, initLoadMenuCoreMaterial } from "./core/impl"
 

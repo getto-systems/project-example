@@ -1,4 +1,4 @@
-import { newResetPasswordRemote } from "./infra/remote/reset"
+import { newResetPasswordRemote } from "./init/remote/reset"
 
 import { newClock } from "../../../../../z_details/_ui/clock/init"
 import { toURL } from "../../../../../z_details/_ui/location/init"
