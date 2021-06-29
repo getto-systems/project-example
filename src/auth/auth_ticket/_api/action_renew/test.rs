@@ -13,16 +13,14 @@ use crate::auth::auth_ticket::_api::{
         MemoryAuthTicketRepository, MemoryAuthTicketStore, StaticAuthNonceHeader,
         StaticCheckAuthNonceStruct, StaticChronoAuthClock,
     },
-    validate::init::test::StaticValidateAuthTokenStruct,
+    validate::init::test::{
+        StaticAuthTokenDecoder, StaticAuthTokenHeader, StaticValidateAuthTokenStruct,
+    },
 };
 
 use crate::auth::auth_ticket::_api::{
-    encode::infra::EncodeAuthTicketConfig,
-    kernel::infra::AuthNonceConfig,
-    validate::infra::{
-        token_decoder::test::StaticAuthTokenDecoder, token_header::test::StaticAuthTokenHeader,
-        ValidateAuthTokenConfig,
-    },
+    encode::infra::EncodeAuthTicketConfig, kernel::infra::AuthNonceConfig,
+    validate::infra::ValidateAuthTokenConfig,
 };
 
 use super::action::{RenewAuthTicketAction, RenewAuthTicketMaterial};

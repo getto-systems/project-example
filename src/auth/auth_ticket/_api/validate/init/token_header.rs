@@ -6,7 +6,7 @@ use crate::auth::auth_ticket::_api::kernel::x_actix_web::header::{
 
 use crate::z_details::_api::request::helper::cookie;
 
-use super::AuthTokenHeader;
+use crate::auth::auth_ticket::_api::validate::infra::AuthTokenHeader;
 
 use crate::auth::auth_ticket::_api::kernel::data::AuthTokenValue;
 use crate::z_details::_api::request::data::HeaderError;
@@ -45,7 +45,7 @@ impl AuthTokenHeader for ApiAuthTokenHeader {
 
 #[cfg(test)]
 pub mod test {
-    use super::super::AuthTokenHeader;
+    use crate::auth::auth_ticket::_api::validate::infra::AuthTokenHeader;
 
     use crate::auth::auth_ticket::_api::kernel::data::AuthTokenValue;
     use crate::z_details::_api::request::data::HeaderError;

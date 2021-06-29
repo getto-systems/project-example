@@ -1,6 +1,3 @@
-pub mod token_decoder;
-pub mod token_header;
-
 use crate::auth::auth_ticket::_api::kernel::infra::{
     AuthClock, AuthTicketRepository, CheckAuthNonceInfra,
 };
