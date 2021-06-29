@@ -59,7 +59,7 @@ impl<'a> CheckAuthNonceStruct<'a> {
 pub mod test {
     pub use super::clock::test::StaticChronoAuthClock;
     pub use super::nonce_header::test::StaticAuthNonceHeader;
-    pub use super::nonce_repository::{
+    pub use super::nonce_repository::test::{
         MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
     };
     pub use super::ticket_repository::{
