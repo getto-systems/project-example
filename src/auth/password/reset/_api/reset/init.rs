@@ -1,3 +1,6 @@
+mod messenger;
+mod token_decoder;
+
 use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
@@ -7,11 +10,10 @@ use crate::auth::{
     auth_user::_api::kernel::init::MemoryAuthUserRepository,
     password::_api::kernel::init::{Argon2PasswordHasher, MemoryAuthUserPasswordRepository},
 };
+use messenger::ProtobufResetPasswordMessenger;
+use token_decoder::JwtResetTokenDecoder;
 
-use crate::auth::password::reset::_api::reset::infra::{
-    messenger::ProtobufResetPasswordMessenger, token_decoder::JwtResetTokenDecoder,
-    ResetPasswordInfra,
-};
+use crate::auth::password::reset::_api::reset::infra::ResetPasswordInfra;
 
 pub struct ResetPasswordStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
@@ -68,6 +70,8 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
+    pub use super::messenger::test::StaticResetPasswordMessenger;
+    pub use super::token_decoder::test::StaticResetTokenDecoder;
     use crate::auth::{
         auth_ticket::_api::kernel::init::test::{
             StaticCheckAuthNonceStruct, StaticChronoAuthClock,
@@ -78,10 +82,7 @@ pub mod test {
         },
     };
 
-    use crate::auth::password::reset::_api::reset::infra::{
-        messenger::test::StaticResetPasswordMessenger,
-        token_decoder::test::StaticResetTokenDecoder, ResetPasswordInfra,
-    };
+    use crate::auth::password::reset::_api::reset::infra::ResetPasswordInfra;
 
     pub struct StaticResetPasswordStruct<'a> {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,

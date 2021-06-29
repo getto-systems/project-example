@@ -1,6 +1,3 @@
-pub mod messenger;
-pub mod token_decoder;
-
 use crate::auth::{
     auth_ticket::_api::kernel::infra::{AuthClock, CheckAuthNonceInfra},
     auth_user::_api::kernel::infra::AuthUserRepository,
