@@ -16,13 +16,13 @@ use super::feature::{
 use crate::auth::{
     auth_ticket::_api::kernel::init::{MemoryAuthNonceMap, MemoryAuthTicketMap},
     auth_user::_api::kernel::init::MemoryAuthUserMap,
-    password::_api::kernel::init::MemoryAuthUserPasswordMap,
+    password::{
+        _api::kernel::init::MemoryAuthUserPasswordMap,
+        reset::_api::request_token::init::MemoryResetTokenDestinationMap,
+    },
 };
 
-use crate::auth::password::{
-    _api::kernel::infra::HashedPassword,
-    reset::_api::request_token::infra::destination_repository::MemoryResetTokenDestinationMap,
-};
+use crate::auth::password::_api::kernel::infra::HashedPassword;
 
 use crate::auth::{
     auth_ticket::_api::kernel::data::{ExpansionLimitDuration, ExpireDuration},

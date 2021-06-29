@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::Mutex};
 
-use super::ResetTokenDestinationRepository;
+use crate::auth::password::reset::_api::request_token::infra::ResetTokenDestinationRepository;
 
 use crate::{
     auth::{

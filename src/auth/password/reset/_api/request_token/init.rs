@@ -1,3 +1,8 @@
+mod destination_repository;
+mod messenger;
+mod token_encoder;
+mod token_notifier;
+
 use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
@@ -6,12 +11,15 @@ use crate::auth::{
     auth_ticket::_api::kernel::init::{CheckAuthNonceStruct, ChronoAuthClock},
     password::_api::kernel::init::{MemoryAuthUserPasswordRepository, UuidResetTokenGenerator},
 };
-
-use super::infra::{
-    destination_repository::MemoryResetTokenDestinationRepository,
-    messenger::ProtobufRequestResetTokenMessenger, token_encoder::JwtResetTokenEncoder,
-    token_notifier::EmailResetTokenNotifier, RequestResetTokenConfig, RequestResetTokenInfra,
+pub use destination_repository::{
+    MemoryResetTokenDestinationMap, MemoryResetTokenDestinationRepository,
+    MemoryResetTokenDestinationStore,
 };
+use messenger::ProtobufRequestResetTokenMessenger;
+use token_encoder::JwtResetTokenEncoder;
+use token_notifier::EmailResetTokenNotifier;
+
+use super::infra::{RequestResetTokenConfig, RequestResetTokenInfra};
 
 pub struct RequestResetTokenStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
@@ -88,6 +96,13 @@ impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
+    pub use super::destination_repository::{
+        MemoryResetTokenDestinationMap, MemoryResetTokenDestinationRepository,
+        MemoryResetTokenDestinationStore,
+    };
+    pub use super::messenger::test::StaticRequestResetTokenMessenger;
+    pub use super::token_encoder::test::StaticResetTokenEncoder;
+    pub use super::token_notifier::test::StaticResetTokenNotifier;
     use crate::auth::{
         auth_ticket::_api::kernel::init::test::{
             StaticCheckAuthNonceStruct, StaticChronoAuthClock,
@@ -97,13 +112,7 @@ pub mod test {
         },
     };
 
-    use super::super::infra::{
-        destination_repository::MemoryResetTokenDestinationRepository,
-        messenger::test::StaticRequestResetTokenMessenger,
-        token_encoder::test::StaticResetTokenEncoder,
-        token_notifier::test::StaticResetTokenNotifier, RequestResetTokenConfig,
-        RequestResetTokenInfra,
-    };
+    use super::super::infra::{RequestResetTokenConfig, RequestResetTokenInfra};
 
     pub struct StaticRequestResetTokenStruct<'a> {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,

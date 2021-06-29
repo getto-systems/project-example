@@ -12,20 +12,17 @@ use crate::auth::{
             MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
             MemoryAuthUserPasswordStore, StaticResetTokenGenerator,
         },
-        reset::_api::request_token::init::test::StaticRequestResetTokenStruct,
+        reset::_api::request_token::init::test::{
+            MemoryResetTokenDestinationMap, MemoryResetTokenDestinationRepository,
+            MemoryResetTokenDestinationStore, StaticRequestResetTokenMessenger,
+            StaticRequestResetTokenStruct, StaticResetTokenEncoder, StaticResetTokenNotifier,
+        },
     },
 };
 
 use crate::auth::{
     auth_ticket::_api::kernel::infra::AuthNonceConfig,
     password::reset::_api::request_token::infra::{
-        destination_repository::{
-            MemoryResetTokenDestinationMap, MemoryResetTokenDestinationRepository,
-            MemoryResetTokenDestinationStore,
-        },
-        messenger::test::StaticRequestResetTokenMessenger,
-        token_encoder::test::StaticResetTokenEncoder,
-        token_notifier::test::StaticResetTokenNotifier,
         RequestResetTokenConfig, RequestResetTokenFieldsExtract,
     },
 };

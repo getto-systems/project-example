@@ -6,7 +6,7 @@ use url::{ParseError, Url};
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideEmail;
 
-use super::ResetTokenNotifier;
+use crate::auth::password::reset::_api::request_token::infra::ResetTokenNotifier;
 
 use crate::auth::password::reset::_api::{
     kernel::data::ResetTokenEncoded,
@@ -116,7 +116,7 @@ email: labo@message.getto.systems
 pub mod test {
     use async_trait::async_trait;
 
-    use super::super::ResetTokenNotifier;
+    use crate::auth::password::reset::_api::request_token::infra::ResetTokenNotifier;
 
     use crate::auth::password::reset::_api::{
         kernel::data::ResetTokenEncoded,

@@ -1,7 +1,8 @@
 use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 
-use super::ResetTokenEncoder;
-use crate::auth::password::reset::_api::kernel::infra::ResetTokenJwtClaims;
+use crate::auth::password::reset::_api::{
+    kernel::infra::ResetTokenJwtClaims, request_token::infra::ResetTokenEncoder,
+};
 
 use super::super::data::EncodeResetTokenError;
 use crate::auth::{
