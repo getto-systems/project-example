@@ -7,13 +7,11 @@ use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 use crate::auth::{
     auth_ticket::_api::kernel::init::{CheckAuthNonceStruct, ChronoAuthClock},
     auth_user::_api::kernel::init::MemoryAuthUserRepository,
+    password::_api::kernel::init::{Argon2PasswordMatcher, MemoryAuthUserPasswordRepository},
 };
 use messenger::ProtobufAuthenticatePasswordMessenger;
 
 use super::infra::AuthenticatePasswordInfra;
-use crate::auth::password::_api::kernel::infra::{
-    password_matcher::Argon2PasswordMatcher, password_repository::MemoryAuthUserPasswordRepository,
-};
 
 pub(in crate::auth::password) struct AuthenticatePasswordStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
@@ -72,11 +70,9 @@ pub mod test {
             StaticCheckAuthNonceStruct, StaticChronoAuthClock,
         },
         auth_user::_api::kernel::init::test::MemoryAuthUserRepository,
-    };
-
-    use crate::auth::password::_api::kernel::infra::{
-        password_matcher::test::PlainPasswordMatcher,
-        password_repository::MemoryAuthUserPasswordRepository,
+        password::_api::kernel::init::test::{
+            MemoryAuthUserPasswordRepository, PlainPasswordMatcher,
+        },
     };
 
     pub struct StaticAuthenticatePasswordStruct<'a> {

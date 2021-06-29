@@ -19,7 +19,13 @@ use crate::auth::{
     auth_user::_api::kernel::init::test::{
         MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
     },
-    password::reset::_api::reset::init::test::StaticResetPasswordStruct,
+    password::{
+        _api::kernel::init::test::{
+            MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
+            MemoryAuthUserPasswordStore,
+        },
+        reset::_api::reset::init::test::StaticResetPasswordStruct,
+    },
 };
 
 use crate::auth::{
@@ -27,15 +33,9 @@ use crate::auth::{
         encode::infra::EncodeAuthTicketConfig, issue::infra::IssueAuthTicketConfig,
         kernel::infra::AuthNonceConfig,
     },
-    password::{
-        _api::kernel::infra::password_repository::{
-            MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-            MemoryAuthUserPasswordStore,
-        },
-        reset::_api::reset::infra::{
-            messenger::test::StaticResetPasswordMessenger,
-            token_decoder::test::StaticResetTokenDecoder, ResetPasswordFieldsExtract,
-        },
+    password::reset::_api::reset::infra::{
+        messenger::test::StaticResetPasswordMessenger,
+        token_decoder::test::StaticResetTokenDecoder, ResetPasswordFieldsExtract,
     },
 };
 

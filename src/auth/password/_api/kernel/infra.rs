@@ -1,8 +1,3 @@
-pub mod password_hasher;
-pub mod password_matcher;
-pub mod password_repository;
-pub mod token_generator;
-
 use super::convert::validate_password;
 
 use crate::auth::{

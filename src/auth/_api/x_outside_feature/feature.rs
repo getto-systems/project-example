@@ -4,12 +4,10 @@ use jsonwebtoken::{DecodingKey, EncodingKey};
 use crate::auth::{
     auth_ticket::_api::kernel::init::{MemoryAuthNonceStore, MemoryAuthTicketStore},
     auth_user::_api::kernel::init::MemoryAuthUserStore,
+    password::_api::kernel::init::MemoryAuthUserPasswordStore,
 };
 
-use crate::auth::password::{
-    _api::kernel::infra::password_repository::MemoryAuthUserPasswordStore,
-    reset::_api::request_token::infra::destination_repository::MemoryResetTokenDestinationStore,
-};
+use crate::auth::password::reset::_api::request_token::infra::destination_repository::MemoryResetTokenDestinationStore;
 
 use crate::auth::auth_ticket::_api::kernel::data::{ExpansionLimitDuration, ExpireDuration};
 

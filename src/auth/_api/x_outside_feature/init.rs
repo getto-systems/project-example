@@ -16,10 +16,11 @@ use super::feature::{
 use crate::auth::{
     auth_ticket::_api::kernel::init::{MemoryAuthNonceMap, MemoryAuthTicketMap},
     auth_user::_api::kernel::init::MemoryAuthUserMap,
+    password::_api::kernel::init::MemoryAuthUserPasswordMap,
 };
 
 use crate::auth::password::{
-    _api::kernel::infra::{password_repository::MemoryAuthUserPasswordMap, HashedPassword},
+    _api::kernel::infra::HashedPassword,
     reset::_api::request_token::infra::destination_repository::MemoryResetTokenDestinationMap,
 };
 

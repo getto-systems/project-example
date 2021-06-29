@@ -19,8 +19,14 @@ use crate::auth::{
     auth_user::_api::kernel::init::test::{
         MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
     },
-    password::_api::authenticate::init::test::{
-        StaticAuthenticatePasswordMessenger, StaticAuthenticatePasswordStruct,
+    password::_api::{
+        authenticate::init::test::{
+            StaticAuthenticatePasswordMessenger, StaticAuthenticatePasswordStruct,
+        },
+        kernel::init::test::{
+            MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
+            MemoryAuthUserPasswordStore,
+        },
     },
 };
 
@@ -30,14 +36,7 @@ use crate::auth::{
         kernel::infra::AuthNonceConfig,
     },
     password::_api::{
-        authenticate::infra::AuthenticatePasswordFieldsExtract,
-        kernel::infra::{
-            password_repository::{
-                MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-                MemoryAuthUserPasswordStore,
-            },
-            HashedPassword,
-        },
+        authenticate::infra::AuthenticatePasswordFieldsExtract, kernel::infra::HashedPassword,
     },
 };
 

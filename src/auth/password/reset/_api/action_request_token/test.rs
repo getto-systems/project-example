@@ -7,29 +7,26 @@ use crate::auth::{
         MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore, StaticAuthNonceHeader,
         StaticCheckAuthNonceStruct, StaticChronoAuthClock,
     },
-    password::reset::_api::request_token::init::test::StaticRequestResetTokenStruct,
+    password::{
+        _api::kernel::init::test::{
+            MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
+            MemoryAuthUserPasswordStore, StaticResetTokenGenerator,
+        },
+        reset::_api::request_token::init::test::StaticRequestResetTokenStruct,
+    },
 };
 
 use crate::auth::{
     auth_ticket::_api::kernel::infra::AuthNonceConfig,
-    password::{
-        _api::kernel::infra::{
-            password_repository::{
-                MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-                MemoryAuthUserPasswordStore,
-            },
-            token_generator::test::StaticResetTokenGenerator,
+    password::reset::_api::request_token::infra::{
+        destination_repository::{
+            MemoryResetTokenDestinationMap, MemoryResetTokenDestinationRepository,
+            MemoryResetTokenDestinationStore,
         },
-        reset::_api::request_token::infra::{
-            destination_repository::{
-                MemoryResetTokenDestinationMap, MemoryResetTokenDestinationRepository,
-                MemoryResetTokenDestinationStore,
-            },
-            messenger::test::StaticRequestResetTokenMessenger,
-            token_encoder::test::StaticResetTokenEncoder,
-            token_notifier::test::StaticResetTokenNotifier,
-            RequestResetTokenConfig, RequestResetTokenFieldsExtract,
-        },
+        messenger::test::StaticRequestResetTokenMessenger,
+        token_encoder::test::StaticResetTokenEncoder,
+        token_notifier::test::StaticResetTokenNotifier,
+        RequestResetTokenConfig, RequestResetTokenFieldsExtract,
     },
 };
 

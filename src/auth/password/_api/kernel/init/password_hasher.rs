@@ -1,7 +1,9 @@
 use argon2::{password_hash::SaltString, Argon2, PasswordHasher};
 use rand_core::OsRng;
 
-use super::{AuthUserPasswordHasher, HashedPassword, PlainPassword};
+use crate::auth::password::_api::kernel::infra::{
+    AuthUserPasswordHasher, HashedPassword, PlainPassword,
+};
 
 use crate::auth::password::_api::kernel::data::PasswordHashError;
 
@@ -28,7 +30,9 @@ impl AuthUserPasswordHasher for Argon2PasswordHasher {
 
 #[cfg(test)]
 pub mod test {
-    use super::super::{AuthUserPasswordHasher, HashedPassword, PlainPassword};
+    use crate::auth::password::_api::kernel::infra::{
+        AuthUserPasswordHasher, HashedPassword, PlainPassword,
+    };
 
     use super::super::super::data::PasswordHashError;
 
@@ -38,7 +42,9 @@ pub mod test {
 
     impl AuthUserPasswordHasher for PlainPasswordHasher {
         fn new(plain_password: PlainPassword) -> Self {
-            Self { password: plain_password.extract() }
+            Self {
+                password: plain_password.extract(),
+            }
         }
         fn hash_password(&self) -> Result<HashedPassword, PasswordHashError> {
             Ok(HashedPassword::new(self.password.clone()))
