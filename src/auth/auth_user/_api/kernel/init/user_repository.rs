@@ -3,7 +3,7 @@ use std::{
     sync::Mutex,
 };
 
-use super::AuthUserRepository;
+use crate::auth::auth_user::_api::kernel::infra::AuthUserRepository;
 
 use super::super::data::{AuthUser, AuthUserExtract, AuthUserId};
 use crate::z_details::_api::repository::data::RepositoryError;

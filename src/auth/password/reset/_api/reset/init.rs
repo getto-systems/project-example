@@ -2,19 +2,19 @@ use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_api::kernel::init::{CheckAuthNonceStruct, ChronoAuthClock};
-
 use crate::auth::{
-    auth_user::_api::kernel::infra::user_repository::MemoryAuthUserRepository,
-    password::{
-        _api::kernel::infra::{
-            password_hasher::Argon2PasswordHasher,
-            password_repository::MemoryAuthUserPasswordRepository,
-        },
-        reset::_api::reset::infra::{
-            messenger::ProtobufResetPasswordMessenger, token_decoder::JwtResetTokenDecoder,
-            ResetPasswordInfra,
-        },
+    auth_ticket::_api::kernel::init::{CheckAuthNonceStruct, ChronoAuthClock},
+    auth_user::_api::kernel::init::MemoryAuthUserRepository,
+};
+
+use crate::auth::password::{
+    _api::kernel::infra::{
+        password_hasher::Argon2PasswordHasher,
+        password_repository::MemoryAuthUserPasswordRepository,
+    },
+    reset::_api::reset::infra::{
+        messenger::ProtobufResetPasswordMessenger, token_decoder::JwtResetTokenDecoder,
+        ResetPasswordInfra,
     },
 };
 
@@ -73,21 +73,21 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::auth_ticket::_api::kernel::init::test::{
-        StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+    use crate::auth::{
+        auth_ticket::_api::kernel::init::test::{
+            StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+        },
+        auth_user::_api::kernel::init::test::MemoryAuthUserRepository,
     };
 
-    use crate::auth::{
-        auth_user::_api::kernel::infra::user_repository::MemoryAuthUserRepository,
-        password::{
-            _api::kernel::infra::{
-                password_hasher::test::PlainPasswordHasher,
-                password_repository::MemoryAuthUserPasswordRepository,
-            },
-            reset::_api::reset::infra::{
-                messenger::test::StaticResetPasswordMessenger,
-                token_decoder::test::StaticResetTokenDecoder, ResetPasswordInfra,
-            },
+    use crate::auth::password::{
+        _api::kernel::infra::{
+            password_hasher::test::PlainPasswordHasher,
+            password_repository::MemoryAuthUserPasswordRepository,
+        },
+        reset::_api::reset::infra::{
+            messenger::test::StaticResetPasswordMessenger,
+            token_decoder::test::StaticResetTokenDecoder, ResetPasswordInfra,
         },
     };
 

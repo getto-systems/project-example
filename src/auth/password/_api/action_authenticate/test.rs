@@ -16,6 +16,9 @@ use crate::auth::{
             StaticAuthNonceHeader, StaticCheckAuthNonceStruct, StaticChronoAuthClock,
         },
     },
+    auth_user::_api::kernel::init::test::{
+        MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
+    },
     password::_api::authenticate::init::test::StaticAuthenticatePasswordStruct,
 };
 
@@ -23,9 +26,6 @@ use crate::auth::{
     auth_ticket::_api::{
         encode::infra::EncodeAuthTicketConfig, issue::infra::IssueAuthTicketConfig,
         kernel::infra::AuthNonceConfig,
-    },
-    auth_user::_api::kernel::infra::user_repository::{
-        MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
     },
     password::_api::{
         authenticate::infra::{

@@ -2,15 +2,14 @@ use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_api::kernel::init::{CheckAuthNonceStruct, ChronoAuthClock};
+use crate::auth::{
+    auth_ticket::_api::kernel::init::{CheckAuthNonceStruct, ChronoAuthClock},
+    auth_user::_api::kernel::init::MemoryAuthUserRepository,
+};
 
 use super::infra::{messenger::ProtobufAuthenticatePasswordMessenger, AuthenticatePasswordInfra};
-use crate::auth::{
-    auth_user::_api::kernel::infra::user_repository::MemoryAuthUserRepository,
-    password::_api::kernel::infra::{
-        password_matcher::Argon2PasswordMatcher,
-        password_repository::MemoryAuthUserPasswordRepository,
-    },
+use crate::auth::password::_api::kernel::infra::{
+    password_matcher::Argon2PasswordMatcher, password_repository::MemoryAuthUserPasswordRepository,
 };
 
 pub(in crate::auth::password) struct AuthenticatePasswordStruct<'a> {
@@ -62,19 +61,19 @@ impl<'a> AuthenticatePasswordInfra for AuthenticatePasswordStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::auth_ticket::_api::kernel::init::test::{
-        StaticCheckAuthNonceStruct, StaticChronoAuthClock,
-    };
-
     use super::super::infra::{
         messenger::test::StaticAuthenticatePasswordMessenger, AuthenticatePasswordInfra,
     };
     use crate::auth::{
-        auth_user::_api::kernel::infra::user_repository::MemoryAuthUserRepository,
-        password::_api::kernel::infra::{
-            password_matcher::test::PlainPasswordMatcher,
-            password_repository::MemoryAuthUserPasswordRepository,
+        auth_ticket::_api::kernel::init::test::{
+            StaticCheckAuthNonceStruct, StaticChronoAuthClock,
         },
+        auth_user::_api::kernel::init::test::MemoryAuthUserRepository,
+    };
+
+    use crate::auth::password::_api::kernel::infra::{
+        password_matcher::test::PlainPasswordMatcher,
+        password_repository::MemoryAuthUserPasswordRepository,
     };
 
     pub struct StaticAuthenticatePasswordStruct<'a> {
