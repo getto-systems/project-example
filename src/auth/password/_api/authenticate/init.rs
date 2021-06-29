@@ -1,3 +1,5 @@
+mod messenger;
+
 use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
@@ -6,8 +8,9 @@ use crate::auth::{
     auth_ticket::_api::kernel::init::{CheckAuthNonceStruct, ChronoAuthClock},
     auth_user::_api::kernel::init::MemoryAuthUserRepository,
 };
+use messenger::ProtobufAuthenticatePasswordMessenger;
 
-use super::infra::{messenger::ProtobufAuthenticatePasswordMessenger, AuthenticatePasswordInfra};
+use super::infra::AuthenticatePasswordInfra;
 use crate::auth::password::_api::kernel::infra::{
     password_matcher::Argon2PasswordMatcher, password_repository::MemoryAuthUserPasswordRepository,
 };
@@ -61,9 +64,9 @@ impl<'a> AuthenticatePasswordInfra for AuthenticatePasswordStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use super::super::infra::{
-        messenger::test::StaticAuthenticatePasswordMessenger, AuthenticatePasswordInfra,
-    };
+    pub use super::messenger::test::StaticAuthenticatePasswordMessenger;
+
+    use super::super::infra::AuthenticatePasswordInfra;
     use crate::auth::{
         auth_ticket::_api::kernel::init::test::{
             StaticCheckAuthNonceStruct, StaticChronoAuthClock,
