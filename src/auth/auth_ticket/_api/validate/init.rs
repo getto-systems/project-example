@@ -1,17 +1,17 @@
+mod token_decoder;
+mod token_header;
+
 use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_api::kernel::init::CheckAuthNonceStruct;
+use crate::auth::auth_ticket::_api::kernel::init::{
+    CheckAuthNonceStruct, ChronoAuthClock, MemoryAuthTicketRepository,
+};
+use token_decoder::{JwtApiTokenDecoder, JwtAuthTokenDecoder};
+use token_header::{ApiAuthTokenHeader, TicketAuthTokenHeader};
 
-use super::super::kernel::infra::{
-    clock::ChronoAuthClock, ticket_repository::MemoryAuthTicketRepository,
-};
-use super::infra::{
-    token_header::{ApiAuthTokenHeader, TicketAuthTokenHeader},
-    token_decoder::{JwtApiTokenDecoder, JwtAuthTokenDecoder},
-    ValidateAuthTokenConfig, ValidateAuthTokenInfra,
-};
+use super::infra::{ValidateAuthTokenConfig, ValidateAuthTokenInfra};
 
 use crate::auth::auth_user::_api::kernel::data::RequireAuthRoles;
 
@@ -121,15 +121,13 @@ impl<'a> ValidateAuthTokenInfra for ApiValidateAuthTokenStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::auth_ticket::_api::kernel::init::test::StaticCheckAuthNonceStruct;
+    pub use super::token_decoder::test::StaticAuthTokenDecoder;
+    pub use super::token_header::test::StaticAuthTokenHeader;
+    use crate::auth::auth_ticket::_api::kernel::init::test::{
+        MemoryAuthTicketRepository, StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+    };
 
-    use super::super::infra::{
-        token_header::test::StaticAuthTokenHeader, token_decoder::test::StaticAuthTokenDecoder,
-        ValidateAuthTokenConfig, ValidateAuthTokenInfra,
-    };
-    use crate::auth::auth_ticket::_api::kernel::infra::{
-        clock::test::StaticChronoAuthClock, ticket_repository::MemoryAuthTicketRepository,
-    };
+    use super::super::infra::{ValidateAuthTokenConfig, ValidateAuthTokenInfra};
 
     pub struct StaticValidateAuthTokenStruct<'a> {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,

@@ -6,42 +6,37 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     auth_ticket::_api::{
-        encode::init::test::StaticEncodeAuthTicketStruct,
-        issue::init::test::StaticIssueAuthTicketStruct,
-        kernel::init::test::StaticCheckAuthNonceStruct,
+        encode::init::test::{
+            StaticAuthTokenEncoder, StaticEncodeAuthTicketStruct, StaticEncodeMessenger,
+        },
+        issue::init::test::{StaticAuthTicketIdGenerator, StaticIssueAuthTicketStruct},
+        kernel::init::test::{
+            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+            MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+            StaticAuthNonceHeader, StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+        },
     },
-    password::_api::authenticate::init::test::StaticAuthenticatePasswordStruct,
+    auth_user::_api::kernel::init::test::{
+        MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
+    },
+    password::_api::{
+        authenticate::init::test::{
+            StaticAuthenticatePasswordMessenger, StaticAuthenticatePasswordStruct,
+        },
+        kernel::init::test::{
+            MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
+            MemoryAuthUserPasswordStore,
+        },
+    },
 };
 
 use crate::auth::{
     auth_ticket::_api::{
-        encode::infra::{
-            messenger::test::StaticEncodeMessenger, token_encoder::test::StaticAuthTokenEncoder,
-            EncodeAuthTicketConfig,
-        },
-        issue::infra::{id_generator::test::StaticAuthTicketIdGenerator, IssueAuthTicketConfig},
-        kernel::infra::{
-            clock::test::StaticChronoAuthClock, nonce_header::test::StaticAuthNonceHeader,
-            nonce_repository::MemoryAuthNonceMap, nonce_repository::MemoryAuthNonceRepository,
-            nonce_repository::MemoryAuthNonceStore, ticket_repository::MemoryAuthTicketMap,
-            ticket_repository::MemoryAuthTicketRepository,
-            ticket_repository::MemoryAuthTicketStore, AuthNonceConfig,
-        },
-    },
-    auth_user::_api::kernel::infra::user_repository::{
-        MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
+        encode::infra::EncodeAuthTicketConfig, issue::infra::IssueAuthTicketConfig,
+        kernel::infra::AuthNonceConfig,
     },
     password::_api::{
-        authenticate::infra::{
-            messenger::test::StaticAuthenticatePasswordMessenger, AuthenticatePasswordFieldsExtract,
-        },
-        kernel::infra::{
-            password_repository::{
-                MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-                MemoryAuthUserPasswordStore,
-            },
-            HashedPassword,
-        },
+        authenticate::infra::AuthenticatePasswordFieldsExtract, kernel::infra::HashedPassword,
     },
 };
 
@@ -107,7 +102,9 @@ fn error_conflict_nonce() {
     action.subscribe(handler);
 
     let result = action.ignite();
-    assert_state(vec!["authenticate password error; auth nonce error: conflict"]);
+    assert_state(vec![
+        "authenticate password error; auth nonce error: conflict",
+    ]);
     assert!(!result.is_ok());
 }
 

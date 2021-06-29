@@ -1,16 +1,12 @@
-use std::sync::Mutex;
-
 use aws_cloudfront_cookie::CloudfrontKey;
 use jsonwebtoken::{DecodingKey, EncodingKey};
 
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::{
-        nonce_repository::MemoryAuthNonceMap, ticket_repository::MemoryAuthTicketMap,
-    },
-    auth_user::_api::kernel::infra::user_repository::MemoryAuthUserStore,
+    auth_ticket::_api::kernel::init::{MemoryAuthNonceStore, MemoryAuthTicketStore},
+    auth_user::_api::kernel::init::MemoryAuthUserStore,
     password::{
-        _api::kernel::infra::password_repository::MemoryAuthUserPasswordStore,
-        reset::_api::request_token::infra::destination_repository::MemoryResetTokenDestinationStore,
+        _api::kernel::init::MemoryAuthUserPasswordStore,
+        reset::_api::request_token::init::MemoryResetTokenDestinationStore,
     },
 };
 
@@ -31,8 +27,8 @@ pub struct AuthOutsideConfig {
     pub reset_token_expires: ExpireDuration,
 }
 pub struct AuthOutsideStore {
-    pub nonce: Mutex<MemoryAuthNonceMap>,
-    pub ticket: Mutex<MemoryAuthTicketMap>,
+    pub nonce: MemoryAuthNonceStore,
+    pub ticket: MemoryAuthTicketStore,
     pub user: MemoryAuthUserStore,
     pub user_password: MemoryAuthUserPasswordStore,
     pub reset_token_destination: MemoryResetTokenDestinationStore,

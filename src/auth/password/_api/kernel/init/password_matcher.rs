@@ -1,6 +1,8 @@
 use argon2::{Argon2, PasswordHash, PasswordVerifier};
 
-use super::{AuthUserPasswordMatcher, HashedPassword, PlainPassword};
+use crate::auth::password::_api::kernel::infra::{
+    AuthUserPasswordMatcher, HashedPassword, PlainPassword,
+};
 
 use super::super::data::PasswordHashError;
 
@@ -26,7 +28,9 @@ impl AuthUserPasswordMatcher for Argon2PasswordMatcher {
 
 #[cfg(test)]
 pub mod test {
-    use super::{AuthUserPasswordMatcher, HashedPassword, PlainPassword};
+    use crate::auth::password::_api::kernel::infra::{
+        AuthUserPasswordMatcher, HashedPassword, PlainPassword,
+    };
 
     use super::super::super::data::PasswordHashError;
 

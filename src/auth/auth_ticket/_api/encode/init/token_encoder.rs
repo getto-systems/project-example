@@ -4,14 +4,14 @@ use aws_cloudfront_cookie::{CloudfrontKey, CloudfrontPolicy};
 
 use crate::auth::_api::x_outside_feature::feature::{AuthOutsideCdnSecret, AuthOutsideCookie};
 
-use super::super::super::kernel::x_actix_web::header::{
+use crate::auth::auth_ticket::_api::kernel::x_actix_web::header::{
     COOKIE_API_TOKEN, COOKIE_CLOUDFRONT_KEY_PAIR_ID, COOKIE_CLOUDFRONT_POLICY,
     COOKIE_CLOUDFRONT_SIGNATURE, COOKIE_TICKET_TOKEN,
 };
 
-use super::AuthTokenEncoder;
-use crate::auth::auth_ticket::_api::kernel::infra::{
-    AuthJwtClaims, AUTH_JWT_AUDIENCE_API, AUTH_JWT_AUDIENCE_TICKET,
+use crate::auth::auth_ticket::_api::{
+    encode::infra::AuthTokenEncoder,
+    kernel::infra::{AuthJwtClaims, AUTH_JWT_AUDIENCE_API, AUTH_JWT_AUDIENCE_TICKET},
 };
 
 use super::super::super::kernel::data::{AuthTicket, AuthTokenExtract, ExpireDateTime};

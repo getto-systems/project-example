@@ -1,5 +1,3 @@
-pub mod user_repository;
-
 use super::data::{AuthUser, AuthUserId};
 use crate::z_details::_api::repository::data::RepositoryError;
 

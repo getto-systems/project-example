@@ -1,11 +1,8 @@
-pub mod messenger;
-pub mod token_encoder;
-
 use super::super::kernel::infra::{AuthClock, AuthTicketRepository};
 
-use crate::auth::auth_user::_api::kernel::data::GrantedAuthRoles;
 use super::super::kernel::data::{AuthTicket, ExpireDateTime, ExpireDuration};
 use super::data::{AuthTokenEncodedData, EncodeAuthTokenError};
+use crate::auth::auth_user::_api::kernel::data::GrantedAuthRoles;
 use crate::z_details::_api::message::data::MessageError;
 
 pub trait EncodeAuthTicketInfra {

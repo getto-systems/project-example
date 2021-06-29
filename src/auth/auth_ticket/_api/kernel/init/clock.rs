@@ -1,8 +1,8 @@
 use chrono::Utc;
 
-use super::AuthClock;
+use crate::auth::auth_ticket::_api::kernel::infra::AuthClock;
 
-use super::super::data::AuthDateTime;
+use crate::auth::auth_ticket::_api::kernel::data::AuthDateTime;
 
 pub struct ChronoAuthClock;
 
@@ -23,9 +23,9 @@ pub mod test {
     use chrono::DateTime;
     use chrono::Utc;
 
-    use super::super::AuthClock;
+    use crate::auth::auth_ticket::_api::kernel::infra::AuthClock;
 
-    use super::super::super::data::AuthDateTime;
+    use crate::auth::auth_ticket::_api::kernel::data::AuthDateTime;
 
     #[derive(Clone)]
     pub struct StaticChronoAuthClock {

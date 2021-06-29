@@ -1,13 +1,12 @@
 use std::{collections::HashMap, sync::Mutex};
 
-use super::{AuthNonceEntry, AuthNonceRepository};
+use crate::auth::auth_ticket::_api::kernel::infra::{AuthNonceEntry, AuthNonceRepository};
 
-use super::super::super::kernel::data::ExpireDateTime;
-use super::super::data::AuthNonceValue;
+use crate::auth::auth_ticket::_api::kernel::data::{AuthNonceValue, ExpireDateTime};
 use crate::z_details::_api::repository::data::RepositoryError;
 
 pub type MemoryAuthNonceStore = Mutex<MemoryAuthNonceMap>;
-pub struct MemoryAuthNonceMap(HashMap<String, ExpireDateTime>);
+pub struct MemoryAuthNonceMap(HashMap<String, AuthNonceEntry>);
 
 impl MemoryAuthNonceMap {
     pub fn new() -> Self {
@@ -16,7 +15,7 @@ impl MemoryAuthNonceMap {
 
     pub fn with_nonce(nonce: String, expires: ExpireDateTime) -> Self {
         let mut hash_map = HashMap::new();
-        hash_map.insert(nonce, expires);
+        hash_map.insert(nonce.clone(), AuthNonceEntry::new(AuthNonceValue::new(nonce), expires));
         Self(hash_map)
     }
 
@@ -24,11 +23,11 @@ impl MemoryAuthNonceMap {
         Mutex::new(self)
     }
 
-    fn get(&self, nonce: &AuthNonceValue) -> Option<&ExpireDateTime> {
+    fn get(&self, nonce: &AuthNonceValue) -> Option<&AuthNonceEntry> {
         self.0.get(nonce.as_str())
     }
     fn insert(&mut self, entry: AuthNonceEntry) {
-        self.0.insert(entry.nonce.extract(), entry.expires);
+        self.0.insert(entry.clone().into_nonce().extract(), entry);
     }
 }
 
@@ -47,7 +46,7 @@ impl<'a> AuthNonceRepository for MemoryAuthNonceRepository<'a> {
         let store = self.store.lock().unwrap();
         Ok(store
             .get(nonce)
-            .map(|expires| AuthNonceEntry::new(nonce.clone(), expires.clone())))
+            .map(|entry| entry.clone()))
     }
     fn put(&self, entry: AuthNonceEntry) -> Result<(), RepositoryError> {
         let mut store = self.store.lock().unwrap();

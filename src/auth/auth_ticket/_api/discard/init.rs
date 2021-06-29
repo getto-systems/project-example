@@ -1,8 +1,7 @@
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use super::super::kernel::infra::{
-    clock::ChronoAuthClock, ticket_repository::MemoryAuthTicketRepository,
-};
+use crate::auth::auth_ticket::_api::kernel::init::{ChronoAuthClock, MemoryAuthTicketRepository};
+
 use super::infra::DiscardAuthTicketInfra;
 
 pub struct DiscardAuthTicketStruct<'a> {
@@ -33,9 +32,10 @@ impl<'a> DiscardAuthTicketInfra for DiscardAuthTicketStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use super::super::super::kernel::infra::{
-        clock::test::StaticChronoAuthClock, ticket_repository::MemoryAuthTicketRepository,
+    use crate::auth::auth_ticket::_api::kernel::init::test::{
+        MemoryAuthTicketRepository, StaticChronoAuthClock,
     };
+
     use super::super::infra::DiscardAuthTicketInfra;
 
     pub struct StaticDiscardAuthTicketStruct<'a> {

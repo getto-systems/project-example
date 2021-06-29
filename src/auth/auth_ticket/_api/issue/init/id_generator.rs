@@ -1,6 +1,6 @@
 use uuid::Uuid;
 
-use super::AuthTicketIdGenerator;
+use crate::auth::auth_ticket::_api::kernel::infra::AuthTicketIdGenerator;
 
 use crate::auth::auth_ticket::_api::kernel::data::AuthTicketId;
 
@@ -20,7 +20,7 @@ impl AuthTicketIdGenerator for UuidAuthTicketIdGenerator {
 
 #[cfg(test)]
 pub mod test {
-    use super::super::AuthTicketIdGenerator;
+    use crate::auth::auth_ticket::_api::kernel::infra::AuthTicketIdGenerator;
 
     use crate::auth::auth_ticket::_api::kernel::data::AuthTicketId;
 

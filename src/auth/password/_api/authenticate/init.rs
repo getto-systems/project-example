@@ -1,20 +1,19 @@
-use actix_web::HttpRequest;
+mod messenger;
 
-use crate::auth::auth_ticket::_api::kernel::init::CheckAuthNonceStruct;
+use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use super::infra::{messenger::ProtobufAuthenticatePasswordMessenger, AuthenticatePasswordInfra};
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::clock::ChronoAuthClock,
-    auth_user::_api::kernel::infra::user_repository::MemoryAuthUserRepository,
-    password::_api::kernel::infra::{
-        password_matcher::Argon2PasswordMatcher,
-        password_repository::MemoryAuthUserPasswordRepository,
-    },
+    auth_ticket::_api::kernel::init::{CheckAuthNonceStruct, ChronoAuthClock},
+    auth_user::_api::kernel::init::MemoryAuthUserRepository,
+    password::_api::kernel::init::{Argon2PasswordMatcher, MemoryAuthUserPasswordRepository},
 };
+use messenger::ProtobufAuthenticatePasswordMessenger;
 
-pub(in crate::auth::password) struct AuthenticatePasswordStruct<'a> {
+use super::infra::AuthenticatePasswordInfra;
+
+pub struct AuthenticatePasswordStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
     clock: ChronoAuthClock,
     password_repository: MemoryAuthUserPasswordRepository<'a>,
@@ -63,17 +62,16 @@ impl<'a> AuthenticatePasswordInfra for AuthenticatePasswordStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::auth_ticket::_api::kernel::init::test::StaticCheckAuthNonceStruct;
+    pub use super::messenger::test::StaticAuthenticatePasswordMessenger;
 
-    use super::super::infra::{
-        messenger::test::StaticAuthenticatePasswordMessenger, AuthenticatePasswordInfra,
-    };
+    use super::super::infra::AuthenticatePasswordInfra;
     use crate::auth::{
-        auth_ticket::_api::kernel::infra::clock::test::StaticChronoAuthClock,
-        auth_user::_api::kernel::infra::user_repository::MemoryAuthUserRepository,
-        password::_api::kernel::infra::{
-            password_matcher::test::PlainPasswordMatcher,
-            password_repository::MemoryAuthUserPasswordRepository,
+        auth_ticket::_api::kernel::init::test::{
+            StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+        },
+        auth_user::_api::kernel::init::test::MemoryAuthUserRepository,
+        password::_api::kernel::init::test::{
+            MemoryAuthUserPasswordRepository, PlainPasswordMatcher,
         },
     };
 
