@@ -1,3 +1,3 @@
 pub mod data;
-pub(in crate::auth) mod init;
+pub mod init;
 pub mod infra;
