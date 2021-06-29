@@ -46,7 +46,7 @@ pub fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
             cdn_expires: ExpireDuration::with_duration(Duration::minutes(5)),
 
             // メールが届いてから作業が完了するまでの見込み時間
-            reset_token_expires: ExpireDuration::with_duration(Duration::hours(3)),
+            reset_token_expires: ExpireDuration::with_duration(Duration::hours(8)),
         },
         store: AuthOutsideStore {
             // TODO それぞれ外部データベースを使うように
@@ -90,7 +90,7 @@ pub fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
         },
         email: AuthOutsideEmail {
             ui_host: &env.ui_host,
-            sender_address: "labo@message.getto.systems",
+            sender_address: "GETTO Example <labo@message.getto.systems>",
         },
     }
 }
