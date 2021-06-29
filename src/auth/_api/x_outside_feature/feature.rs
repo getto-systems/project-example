@@ -57,5 +57,4 @@ pub struct AuthOutsideCdnSecret {
 }
 pub struct AuthOutsideEmail {
     pub ui_host: &'static str,
-    pub sender_address: &'static str,
 }
