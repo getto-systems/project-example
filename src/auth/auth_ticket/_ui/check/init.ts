@@ -1,6 +1,6 @@
-import { newAuthnRepository } from "../kernel/infra/repository/authn"
-import { newAuthzRepository } from "../kernel/infra/repository/authz"
-import { newRenewAuthTicketRemote } from "../kernel/infra/remote/renew"
+import { newAuthnRepository } from "../kernel/init/repository/authn"
+import { newAuthzRepository } from "../kernel/init/repository/authz"
+import { newRenewAuthTicketRemote } from "../kernel/init/remote/renew"
 
 import { newClock } from "../../../../z_details/_ui/clock/init"
 

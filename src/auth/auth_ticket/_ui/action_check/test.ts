@@ -2,7 +2,7 @@ import { setupActionTestRunner } from "../../../../../ui/vendor/getto-applicatio
 import { ticker } from "../../../../z_details/_ui/timer/helper"
 
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_details/_ui/clock/mock"
-import { mockAuthnRepository, mockAuthzRepository } from "../kernel/infra/repository/mock"
+import { mockAuthnRepository, mockAuthzRepository } from "../kernel/init/repository/mock"
 
 import { mockGetScriptPathDetecter } from "../../../_ui/common/secure/get_script_path/mock"
 

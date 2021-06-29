@@ -1,4 +1,4 @@
-import { newRequestResetTokenRemote } from "./infra/remote/request_token"
+import { newRequestResetTokenRemote } from "./init/remote/request_token"
 
 import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/feature"
 

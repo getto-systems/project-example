@@ -1,6 +1,6 @@
 import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
 
-import { mockAuthnRepository, mockAuthzRepository } from "../kernel/infra/repository/mock"
+import { mockAuthnRepository, mockAuthzRepository } from "../kernel/init/repository/mock"
 
 import { initLogoutCoreAction, initLogoutCoreMaterial } from "./core/impl"
 import { initLogoutResource } from "./impl"
