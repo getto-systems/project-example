@@ -1,6 +1,6 @@
 import { ApplicationAbstractStateAction } from "../../../action/impl"
 
-import { initValidateBoardStack } from "../../validate_board/infra/stack"
+import { initValidateBoardStack } from "../../validate_board/init/stack"
 
 import { updateBoardValidateState } from "../../validate_board/method"
 

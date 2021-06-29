@@ -14,7 +14,6 @@ module.exports = {
         "!**/test_helper.ts",
         "!**/init/**",
         "!**/init.ts",
-        "!**/infra/**",
         "!**/infra.ts",
         "!**/mock.ts",
         "!**/docs.ts",

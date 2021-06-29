@@ -1,6 +1,6 @@
-import { initActionIgniteRunner } from "./infra/ignite_runner"
-import { initActionStatePubSub } from "./infra/state_pub_sub"
-import { initActionTerminateRunner } from "./infra/terminate_runner"
+import { initActionIgniteRunner } from "./init/ignite_runner"
+import { initActionStatePubSub } from "./init/state_pub_sub"
+import { initActionTerminateRunner } from "./init/terminate_runner"
 
 import {
     ApplicationActionIgniteHook,

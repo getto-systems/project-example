@@ -44,7 +44,7 @@ coverage_main() {
     crate_name="$(cat Cargo.toml | grep name | head -1 | cut -d'"' -f2 | sed 's/-/_/g')"
 
     local ignore_regex
-    ignore_regex='(\.cargo|rustc|^api/|/[xyz]_|/(infra|init)/|/(main|test|init|data|event|infra)\.rs)'
+    ignore_regex='(\.cargo|rustc|^api/|/[xyz]_|/init/|/(main|test|init|data|event|infra)\.rs)'
 
     local object_file
     local output_file
