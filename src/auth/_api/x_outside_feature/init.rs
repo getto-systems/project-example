@@ -90,7 +90,6 @@ pub fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
         },
         email: AuthOutsideEmail {
             ui_host: &env.ui_host,
-            sender_address: "GETTO Example <labo@message.getto.systems>",
         },
     }
 }

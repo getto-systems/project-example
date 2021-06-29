@@ -16,7 +16,6 @@ use crate::auth::password::reset::_api::{
 pub struct EmailResetTokenNotifier<'a> {
     region: Region,
     ui_host: &'a str,
-    sender_address: &'a str,
 }
 
 impl<'a> EmailResetTokenNotifier<'a> {
@@ -24,7 +23,6 @@ impl<'a> EmailResetTokenNotifier<'a> {
         Self {
             region: Region::ApNortheast1,
             ui_host: &email.ui_host,
-            sender_address: &email.sender_address,
         }
     }
 }
@@ -41,7 +39,7 @@ impl<'a> ResetTokenNotifier for EmailResetTokenNotifier<'a> {
         let destination = destination.into();
         let message = build_message(self.ui_host, token)
             .map_err(|err| NotifyResetTokenError::InfraError(format!("{}", err)))?;
-        let source = self.sender_address.into();
+        let source = SENDER_ADDRESS.into();
 
         let request = SendEmailRequest {
             destination,
@@ -97,6 +95,7 @@ fn utf8_content(data: String) -> Content {
     }
 }
 
+const SENDER_ADDRESS: &'static str = "GETTO Example <labo@message.getto.systems>";
 const SUBJECT: &'static str = "GETTO Example パスワードリセットの件 [URL のご案内]";
 const BODY: &'static str = r#####"お世話になっております
 GETTO Example システムです
