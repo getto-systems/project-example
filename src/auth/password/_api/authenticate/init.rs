@@ -13,7 +13,7 @@ use messenger::ProtobufAuthenticatePasswordMessenger;
 
 use super::infra::AuthenticatePasswordInfra;
 
-pub(in crate::auth::password) struct AuthenticatePasswordStruct<'a> {
+pub struct AuthenticatePasswordStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
     clock: ChronoAuthClock,
     password_repository: MemoryAuthUserPasswordRepository<'a>,
