@@ -1,8 +1,3 @@
-pub mod clock;
-pub mod nonce_header;
-pub mod nonce_repository;
-pub mod ticket_repository;
-
 use std::collections::HashSet;
 
 use serde::{Deserialize, Serialize};
@@ -68,6 +63,7 @@ pub trait AuthNonceRepository {
     fn put(&self, nonce: AuthNonceEntry) -> Result<(), RepositoryError>;
 }
 
+#[derive(Clone)]
 pub struct AuthNonceEntry {
     nonce: AuthNonceValue,
     expires: ExpireDateTime,
@@ -76,6 +72,10 @@ pub struct AuthNonceEntry {
 impl AuthNonceEntry {
     pub const fn new(nonce: AuthNonceValue, expires: ExpireDateTime) -> Self {
         Self { nonce, expires }
+    }
+
+    pub fn into_nonce(self) -> AuthNonceValue {
+        self.nonce
     }
 
     pub fn has_expired(&self, now: &AuthDateTime) -> bool {

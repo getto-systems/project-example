@@ -2,19 +2,15 @@ use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_api::kernel::init::CheckAuthNonceStruct;
+use crate::auth::auth_ticket::_api::kernel::init::{CheckAuthNonceStruct, ChronoAuthClock};
 
 use super::infra::{
     destination_repository::MemoryResetTokenDestinationRepository,
     messenger::ProtobufRequestResetTokenMessenger, token_encoder::JwtResetTokenEncoder,
     token_notifier::EmailResetTokenNotifier, RequestResetTokenConfig, RequestResetTokenInfra,
 };
-use crate::auth::{
-    auth_ticket::_api::kernel::infra::clock::ChronoAuthClock,
-    password::_api::kernel::infra::{
-        password_repository::MemoryAuthUserPasswordRepository,
-        token_generator::UuidResetTokenGenerator,
-    },
+use crate::auth::password::_api::kernel::infra::{
+    password_repository::MemoryAuthUserPasswordRepository, token_generator::UuidResetTokenGenerator,
 };
 
 pub struct RequestResetTokenStruct<'a> {
@@ -40,7 +36,9 @@ impl<'a> RequestResetTokenStruct<'a> {
             destination_repository: MemoryResetTokenDestinationRepository::new(
                 &feature.store.reset_token_destination,
             ),
-            password_repository: MemoryAuthUserPasswordRepository::new(&feature.store.user_password),
+            password_repository: MemoryAuthUserPasswordRepository::new(
+                &feature.store.user_password,
+            ),
             token_generator: UuidResetTokenGenerator::new(),
             token_encoder: JwtResetTokenEncoder::new(&feature.secret.reset_token.encoding_key),
             token_notifier: EmailResetTokenNotifier::ap_north_east_1(&feature.email),
@@ -90,7 +88,9 @@ impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::auth_ticket::_api::kernel::init::test::StaticCheckAuthNonceStruct;
+    use crate::auth::auth_ticket::_api::kernel::init::test::{
+        StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+    };
 
     use super::super::infra::{
         destination_repository::MemoryResetTokenDestinationRepository,
@@ -99,12 +99,9 @@ pub mod test {
         token_notifier::test::StaticResetTokenNotifier, RequestResetTokenConfig,
         RequestResetTokenInfra,
     };
-    use crate::auth::{
-        auth_ticket::_api::kernel::infra::clock::test::StaticChronoAuthClock,
-        password::_api::kernel::infra::{
-            password_repository::MemoryAuthUserPasswordRepository,
-            token_generator::test::StaticResetTokenGenerator,
-        },
+    use crate::auth::password::_api::kernel::infra::{
+        password_repository::MemoryAuthUserPasswordRepository,
+        token_generator::test::StaticResetTokenGenerator,
     };
 
     pub struct StaticRequestResetTokenStruct<'a> {

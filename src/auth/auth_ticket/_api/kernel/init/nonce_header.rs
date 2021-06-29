@@ -4,9 +4,9 @@ use crate::auth::auth_ticket::_api::kernel::x_actix_web::header::HEADER_NONCE;
 
 use crate::z_details::_api::request::helper::header;
 
-use super::AuthNonceHeader;
+use crate::auth::auth_ticket::_api::kernel::infra::AuthNonceHeader;
 
-use super::super::data::AuthNonceValue;
+use crate::auth::auth_ticket::_api::kernel::data::AuthNonceValue;
 use crate::z_details::_api::request::data::HeaderError;
 
 pub struct ActixWebAuthNonceHeader<'a> {
@@ -27,9 +27,9 @@ impl<'a> AuthNonceHeader for ActixWebAuthNonceHeader<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use super::super::AuthNonceHeader;
-
-    use super::super::super::data::AuthNonceValue;
+    use crate::auth::auth_ticket::_api::kernel::infra::AuthNonceHeader;
+    
+    use crate::auth::auth_ticket::_api::kernel::data::AuthNonceValue;
     use crate::z_details::_api::request::data::HeaderError;
 
     pub enum StaticAuthNonceHeader {

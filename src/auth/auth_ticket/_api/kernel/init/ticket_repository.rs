@@ -1,8 +1,10 @@
 use std::{collections::HashMap, sync::Mutex};
 
-use super::AuthTicketRepository;
+use crate::auth::auth_ticket::_api::kernel::infra::AuthTicketRepository;
 
-use super::super::data::{AuthDateTime, AuthTicket, AuthTicketId, ExpansionLimitDateTime};
+use crate::auth::auth_ticket::_api::kernel::data::{
+    AuthDateTime, AuthTicket, AuthTicketId, ExpansionLimitDateTime,
+};
 use crate::z_details::_api::repository::data::{RegisterAttemptResult, RepositoryError};
 
 pub struct MemoryAuthTicketRepository<'a> {

@@ -1,11 +1,20 @@
+mod clock;
+mod nonce_header;
+mod nonce_repository;
+mod ticket_repository;
+
 use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use super::infra::{
-    clock::ChronoAuthClock, nonce_header::ActixWebAuthNonceHeader,
-    nonce_repository::MemoryAuthNonceRepository, AuthNonceConfig, CheckAuthNonceInfra,
+pub use clock::ChronoAuthClock;
+pub use nonce_header::ActixWebAuthNonceHeader;
+pub use nonce_repository::{MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore};
+pub use ticket_repository::{
+    MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
 };
+
+use super::infra::{AuthNonceConfig, CheckAuthNonceInfra};
 
 pub struct CheckAuthNonceStruct<'a> {
     config: AuthNonceConfig,
@@ -48,10 +57,16 @@ impl<'a> CheckAuthNonceStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use super::super::infra::{
-        clock::test::StaticChronoAuthClock, nonce_header::test::StaticAuthNonceHeader,
-        nonce_repository::MemoryAuthNonceRepository, AuthNonceConfig, CheckAuthNonceInfra,
+    pub use super::clock::test::StaticChronoAuthClock;
+    pub use super::nonce_header::test::StaticAuthNonceHeader;
+    pub use super::nonce_repository::{
+        MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
     };
+    pub use super::ticket_repository::{
+        MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+    };
+
+    use super::super::infra::{AuthNonceConfig, CheckAuthNonceInfra};
 
     pub struct StaticCheckAuthNonceStruct<'a> {
         pub config: AuthNonceConfig,

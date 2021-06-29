@@ -2,10 +2,9 @@ use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_api::kernel::init::CheckAuthNonceStruct;
+use crate::auth::auth_ticket::_api::kernel::init::{CheckAuthNonceStruct, ChronoAuthClock};
 
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::clock::ChronoAuthClock,
     auth_user::_api::kernel::infra::user_repository::MemoryAuthUserRepository,
     password::{
         _api::kernel::infra::{
@@ -74,10 +73,11 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::auth_ticket::_api::kernel::init::test::StaticCheckAuthNonceStruct;
+    use crate::auth::auth_ticket::_api::kernel::init::test::{
+        StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+    };
 
     use crate::auth::{
-        auth_ticket::_api::kernel::infra::clock::test::StaticChronoAuthClock,
         auth_user::_api::kernel::infra::user_repository::MemoryAuthUserRepository,
         password::{
             _api::kernel::infra::{

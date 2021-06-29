@@ -13,10 +13,9 @@ use super::feature::{
     AuthOutsideFeature, AuthOutsideJwtSecret, AuthOutsideSecret, AuthOutsideStore,
 };
 
+use crate::auth::auth_ticket::_api::kernel::init::{MemoryAuthNonceMap, MemoryAuthTicketMap};
+
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::{
-        nonce_repository::MemoryAuthNonceMap, ticket_repository::MemoryAuthTicketMap,
-    },
     auth_user::_api::kernel::infra::user_repository::MemoryAuthUserMap,
     password::{
         _api::kernel::infra::{password_repository::MemoryAuthUserPasswordMap, HashedPassword},
