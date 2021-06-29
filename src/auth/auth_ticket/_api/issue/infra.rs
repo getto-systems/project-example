@@ -1,5 +1,3 @@
-pub mod id_generator;
-
 use super::super::kernel::infra::{AuthClock, AuthTicketIdGenerator, AuthTicketRepository};
 
 use crate::auth::auth_ticket::_api::kernel::data::ExpansionLimitDuration;

@@ -1,10 +1,13 @@
+mod id_generator;
+
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use super::infra::{IssueAuthTicketConfig, IssueAuthTicketInfra};
-use super::{
-    super::kernel::infra::{clock::ChronoAuthClock, ticket_repository::MemoryAuthTicketRepository},
-    infra::id_generator::UuidAuthTicketIdGenerator,
+use id_generator::UuidAuthTicketIdGenerator;
+
+use super::super::kernel::infra::{
+    clock::ChronoAuthClock, ticket_repository::MemoryAuthTicketRepository,
 };
+use super::infra::{IssueAuthTicketConfig, IssueAuthTicketInfra};
 
 pub struct IssueAuthTicketStruct<'a> {
     config: IssueAuthTicketConfig,
@@ -47,13 +50,12 @@ impl<'a> IssueAuthTicketInfra for IssueAuthTicketStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use super::super::infra::{IssueAuthTicketConfig, IssueAuthTicketInfra};
-    use super::super::{
-        super::kernel::infra::{
-            clock::test::StaticChronoAuthClock, ticket_repository::MemoryAuthTicketRepository,
-        },
-        infra::id_generator::test::StaticAuthTicketIdGenerator,
+    pub use super::id_generator::test::StaticAuthTicketIdGenerator;
+
+    use super::super::super::kernel::infra::{
+        clock::test::StaticChronoAuthClock, ticket_repository::MemoryAuthTicketRepository,
     };
+    use super::super::infra::{IssueAuthTicketConfig, IssueAuthTicketInfra};
 
     pub struct StaticIssueAuthTicketStruct<'a> {
         pub config: IssueAuthTicketConfig,

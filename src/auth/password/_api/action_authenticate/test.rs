@@ -9,7 +9,7 @@ use crate::auth::{
         encode::init::test::{
             StaticAuthTokenEncoder, StaticEncodeAuthTicketStruct, StaticEncodeMessenger,
         },
-        issue::init::test::StaticIssueAuthTicketStruct,
+        issue::init::test::{StaticAuthTicketIdGenerator, StaticIssueAuthTicketStruct},
         kernel::init::test::StaticCheckAuthNonceStruct,
     },
     password::_api::authenticate::init::test::StaticAuthenticatePasswordStruct,
@@ -18,7 +18,7 @@ use crate::auth::{
 use crate::auth::{
     auth_ticket::_api::{
         encode::infra::EncodeAuthTicketConfig,
-        issue::infra::{id_generator::test::StaticAuthTicketIdGenerator, IssueAuthTicketConfig},
+        issue::infra::IssueAuthTicketConfig,
         kernel::infra::{
             clock::test::StaticChronoAuthClock, nonce_header::test::StaticAuthNonceHeader,
             nonce_repository::MemoryAuthNonceMap, nonce_repository::MemoryAuthNonceRepository,
