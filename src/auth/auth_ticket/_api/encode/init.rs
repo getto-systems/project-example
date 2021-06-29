@@ -1,14 +1,17 @@
+mod messenger;
+mod token_encoder;
+
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
-use crate::auth::auth_ticket::_api::encode::infra::messenger::ResetPasswordEncodeMessenger;
+
+use messenger::{
+    AuthenticatePasswordEncodeMessenger, RenewEncodeMessenger, ResetPasswordEncodeMessenger,
+};
+use token_encoder::{ApiJwtAuthTokenEncoder, CloudfrontTokenEncoder, TicketJwtAuthTokenEncoder};
 
 use super::super::kernel::infra::{
     clock::ChronoAuthClock, ticket_repository::MemoryAuthTicketRepository,
 };
-use super::infra::{
-    messenger::{AuthenticatePasswordEncodeMessenger, RenewEncodeMessenger},
-    token_encoder::{ApiJwtAuthTokenEncoder, CloudfrontTokenEncoder, TicketJwtAuthTokenEncoder},
-    EncodeAuthTicketConfig, EncodeAuthTicketInfra, EncodeMessenger,
-};
+use super::infra::{EncodeAuthTicketConfig, EncodeAuthTicketInfra, EncodeMessenger};
 
 pub struct EncodeAuthTicketStruct<'a, M: EncodeMessenger> {
     config: EncodeAuthTicketConfig,
@@ -97,12 +100,14 @@ impl<'a, M: EncodeMessenger> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a
 
 #[cfg(test)]
 pub mod test {
-    use super::super::infra::{
-        messenger::test::StaticEncodeMessenger, token_encoder::test::StaticAuthTokenEncoder,
-        EncodeAuthTicketConfig, EncodeAuthTicketInfra,
-    };
-    use crate::auth::auth_ticket::_api::kernel::infra::{
-        clock::test::StaticChronoAuthClock, ticket_repository::MemoryAuthTicketRepository,
+    pub use super::messenger::test::StaticEncodeMessenger;
+    pub use super::token_encoder::test::StaticAuthTokenEncoder;
+
+    use crate::auth::auth_ticket::_api::{
+        encode::infra::{EncodeAuthTicketConfig, EncodeAuthTicketInfra},
+        kernel::infra::{
+            clock::test::StaticChronoAuthClock, ticket_repository::MemoryAuthTicketRepository,
+        },
     };
 
     pub struct StaticEncodeAuthTicketStruct<'a> {

@@ -5,16 +5,15 @@ use getto_application_test::ActionTestRunner;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::auth_ticket::_api::{
-    encode::init::test::StaticEncodeAuthTicketStruct,
+    encode::init::test::{
+        StaticAuthTokenEncoder, StaticEncodeAuthTicketStruct, StaticEncodeMessenger,
+    },
     kernel::init::test::StaticCheckAuthNonceStruct,
     validate::init::test::StaticValidateAuthTokenStruct,
 };
 
 use crate::auth::auth_ticket::_api::{
-    encode::infra::{
-        messenger::test::StaticEncodeMessenger, token_encoder::test::StaticAuthTokenEncoder,
-        EncodeAuthTicketConfig,
-    },
+    encode::infra::EncodeAuthTicketConfig,
     kernel::infra::{
         clock::test::StaticChronoAuthClock,
         nonce_header::test::StaticAuthNonceHeader,
@@ -25,7 +24,7 @@ use crate::auth::auth_ticket::_api::{
         AuthNonceConfig,
     },
     validate::infra::{
-        token_header::test::StaticAuthTokenHeader, token_decoder::test::StaticAuthTokenDecoder,
+        token_decoder::test::StaticAuthTokenDecoder, token_header::test::StaticAuthTokenHeader,
         ValidateAuthTokenConfig,
     },
 };

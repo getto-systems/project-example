@@ -6,7 +6,9 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     auth_ticket::_api::{
-        encode::init::test::StaticEncodeAuthTicketStruct,
+        encode::init::test::{
+            StaticAuthTokenEncoder, StaticEncodeAuthTicketStruct, StaticEncodeMessenger,
+        },
         issue::init::test::StaticIssueAuthTicketStruct,
         kernel::init::test::StaticCheckAuthNonceStruct,
     },
@@ -15,10 +17,7 @@ use crate::auth::{
 
 use crate::auth::{
     auth_ticket::_api::{
-        encode::infra::{
-            messenger::test::StaticEncodeMessenger, token_encoder::test::StaticAuthTokenEncoder,
-            EncodeAuthTicketConfig,
-        },
+        encode::infra::EncodeAuthTicketConfig,
         issue::infra::{id_generator::test::StaticAuthTicketIdGenerator, IssueAuthTicketConfig},
         kernel::infra::{
             clock::test::StaticChronoAuthClock, nonce_header::test::StaticAuthNonceHeader,
@@ -107,7 +106,9 @@ fn error_conflict_nonce() {
     action.subscribe(handler);
 
     let result = action.ignite();
-    assert_state(vec!["authenticate password error; auth nonce error: conflict"]);
+    assert_state(vec![
+        "authenticate password error; auth nonce error: conflict",
+    ]);
     assert!(!result.is_ok());
 }
 
