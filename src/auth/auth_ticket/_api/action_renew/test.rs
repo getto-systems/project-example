@@ -270,17 +270,13 @@ impl<'a> TestFeature<'a> {
                     nonce_header: standard_nonce_header(),
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
+                ticket_infra: ticket_infra(store),
                 config: ValidateAuthTokenConfig { require_roles },
-                clock: standard_clock(),
                 token_header: standard_token_header(),
-                ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
                 token_validator,
             },
             encode: StaticEncodeAuthTicketStruct {
-                ticket_infra: StaticAuthTicketStruct {
-                    clock: standard_clock(),
-                    ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
-                },
+                ticket_infra: ticket_infra(store),
                 ticket_encoder: StaticAuthTokenEncoder::new(),
                 api_encoder: StaticAuthTokenEncoder::new(),
                 cdn_encoder: StaticAuthTokenEncoder::new(),
@@ -288,6 +284,13 @@ impl<'a> TestFeature<'a> {
                 config: standard_encode_config(),
             },
         }
+    }
+}
+
+fn ticket_infra<'a>(store: &'a TestStore) -> StaticAuthTicketStruct<'a> {
+    StaticAuthTicketStruct {
+        clock: standard_clock(),
+        ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
     }
 }
 
