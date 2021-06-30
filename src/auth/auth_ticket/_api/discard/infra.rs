@@ -1,9 +1,7 @@
-use super::super::kernel::infra::{AuthClock, AuthTicketRepository};
+use crate::auth::auth_ticket::_api::kernel::infra::AuthTicketInfra;
 
 pub trait DiscardAuthTicketInfra {
-    type Clock: AuthClock;
-    type TicketRepository: AuthTicketRepository;
+    type TicketInfra: AuthTicketInfra;
 
-    fn clock(&self) -> &Self::Clock;
-    fn ticket_repository(&self) -> &Self::TicketRepository;
+    fn ticket_infra(&self) -> &Self::TicketInfra;
 }
