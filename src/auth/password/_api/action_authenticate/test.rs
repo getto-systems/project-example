@@ -18,7 +18,7 @@ use crate::auth::{
         },
     },
     auth_user::_api::kernel::init::test::{
-        MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
+        MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore, StaticAuthUserStruct,
     },
     password::_api::{
         authenticate::init::test::{
@@ -357,8 +357,10 @@ impl<'a> TestFeature<'a> {
                     nonce_header: standard_nonce_header(),
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
+                user_infra: StaticAuthUserStruct {
+                    user_repository: MemoryAuthUserRepository::new(&store.user),
+                },
                 password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
-                user_repository: MemoryAuthUserRepository::new(&store.user),
                 messenger,
             },
             issue: StaticIssueAuthTicketStruct {

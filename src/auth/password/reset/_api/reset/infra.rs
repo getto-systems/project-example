@@ -1,6 +1,6 @@
 use crate::auth::{
     auth_ticket::_api::kernel::infra::CheckAuthNonceInfra,
-    auth_user::_api::kernel::infra::AuthUserRepository,
+    auth_user::_api::kernel::infra::AuthUserInfra,
     password::_api::kernel::infra::{
         AuthUserPasswordHasher, AuthUserPasswordRepository, PlainPassword, ResetPasswordError,
     },
@@ -19,15 +19,15 @@ use crate::z_details::_api::message::data::MessageError;
 
 pub trait ResetPasswordInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
+    type UserInfra: AuthUserInfra;
     type PasswordRepository: AuthUserPasswordRepository;
-    type UserRepository: AuthUserRepository;
     type PasswordHasher: AuthUserPasswordHasher;
     type TokenDecoder: ResetTokenDecoder;
     type Messenger: ResetPasswordMessenger;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
+    fn user_infra(&self) -> &Self::UserInfra;
     fn password_repository(&self) -> &Self::PasswordRepository;
-    fn user_repository(&self) -> &Self::UserRepository;
     fn password_hasher(&self, plain_password: PlainPassword) -> Self::PasswordHasher {
         Self::PasswordHasher::new(plain_password)
     }

@@ -7,7 +7,7 @@ use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::{
     auth_ticket::_api::kernel::init::CheckAuthNonceStruct,
-    auth_user::_api::kernel::init::MemoryAuthUserRepository,
+    auth_user::_api::kernel::init::AuthUserStruct,
     password::_api::kernel::init::{Argon2PasswordHasher, MemoryAuthUserPasswordRepository},
 };
 use messenger::ProtobufResetPasswordMessenger;
@@ -17,8 +17,8 @@ use crate::auth::password::reset::_api::reset::infra::ResetPasswordInfra;
 
 pub struct ResetPasswordStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
+    user_infra: AuthUserStruct<'a>,
     password_repository: MemoryAuthUserPasswordRepository<'a>,
-    user_repository: MemoryAuthUserRepository<'a>,
     token_decoder: JwtResetTokenDecoder<'a>,
     messenger: ProtobufResetPasswordMessenger,
 }
@@ -27,10 +27,10 @@ impl<'a> ResetPasswordStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest, body: String) -> Self {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, request),
+            user_infra: AuthUserStruct::new(feature),
             password_repository: MemoryAuthUserPasswordRepository::new(
                 &feature.store.user_password,
             ),
-            user_repository: MemoryAuthUserRepository::new(&feature.store.user),
             token_decoder: JwtResetTokenDecoder::new(&feature.secret.reset_token.decoding_key),
             messenger: ProtobufResetPasswordMessenger::new(body),
         }
@@ -39,8 +39,8 @@ impl<'a> ResetPasswordStruct<'a> {
 
 impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
+    type UserInfra = AuthUserStruct<'a>;
     type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
-    type UserRepository = MemoryAuthUserRepository<'a>;
     type PasswordHasher = Argon2PasswordHasher;
     type TokenDecoder = JwtResetTokenDecoder<'a>;
     type Messenger = ProtobufResetPasswordMessenger;
@@ -48,11 +48,11 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
         &self.check_nonce_infra
     }
+    fn user_infra(&self) -> &Self::UserInfra {
+        &self.user_infra
+    }
     fn password_repository(&self) -> &Self::PasswordRepository {
         &self.password_repository
-    }
-    fn user_repository(&self) -> &Self::UserRepository {
-        &self.user_repository
     }
     fn token_decoder(&self) -> &Self::TokenDecoder {
         &self.token_decoder
@@ -68,7 +68,7 @@ pub mod test {
     pub use super::token_decoder::test::StaticResetTokenDecoder;
     use crate::auth::{
         auth_ticket::_api::kernel::init::test::StaticCheckAuthNonceStruct,
-        auth_user::_api::kernel::init::test::MemoryAuthUserRepository,
+        auth_user::_api::kernel::init::test::StaticAuthUserStruct,
         password::_api::kernel::init::test::{
             MemoryAuthUserPasswordRepository, PlainPasswordHasher,
         },
@@ -78,16 +78,16 @@ pub mod test {
 
     pub struct StaticResetPasswordStruct<'a> {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
+        pub user_infra: StaticAuthUserStruct<'a>,
         pub password_repository: MemoryAuthUserPasswordRepository<'a>,
-        pub user_repository: MemoryAuthUserRepository<'a>,
         pub token_decoder: StaticResetTokenDecoder,
         pub messenger: StaticResetPasswordMessenger,
     }
 
     impl<'a> ResetPasswordInfra for StaticResetPasswordStruct<'a> {
         type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
+        type UserInfra = StaticAuthUserStruct<'a>;
         type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
-        type UserRepository = MemoryAuthUserRepository<'a>;
         type PasswordHasher = PlainPasswordHasher;
         type TokenDecoder = StaticResetTokenDecoder;
         type Messenger = StaticResetPasswordMessenger;
@@ -95,11 +95,11 @@ pub mod test {
         fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
             &self.check_nonce_infra
         }
+        fn user_infra(&self) -> &Self::UserInfra {
+            &self.user_infra
+        }
         fn password_repository(&self) -> &Self::PasswordRepository {
             &self.password_repository
-        }
-        fn user_repository(&self) -> &Self::UserRepository {
-            &self.user_repository
         }
         fn token_decoder(&self) -> &Self::TokenDecoder {
             &self.token_decoder
