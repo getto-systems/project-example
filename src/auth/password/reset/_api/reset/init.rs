@@ -6,7 +6,7 @@ use actix_web::HttpRequest;
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::init::{CheckAuthNonceStruct, ChronoAuthClock},
+    auth_ticket::_api::kernel::init::{AuthClockStruct, CheckAuthNonceStruct},
     auth_user::_api::kernel::init::MemoryAuthUserRepository,
     password::_api::kernel::init::{Argon2PasswordHasher, MemoryAuthUserPasswordRepository},
 };
@@ -17,7 +17,7 @@ use crate::auth::password::reset::_api::reset::infra::ResetPasswordInfra;
 
 pub struct ResetPasswordStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
-    clock: ChronoAuthClock,
+    clock_infra: AuthClockStruct,
     password_repository: MemoryAuthUserPasswordRepository<'a>,
     user_repository: MemoryAuthUserRepository<'a>,
     token_decoder: JwtResetTokenDecoder<'a>,
@@ -28,7 +28,7 @@ impl<'a> ResetPasswordStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest, body: String) -> Self {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, request),
-            clock: ChronoAuthClock::new(),
+            clock_infra: AuthClockStruct::new(),
             password_repository: MemoryAuthUserPasswordRepository::new(
                 &feature.store.user_password,
             ),
@@ -41,7 +41,7 @@ impl<'a> ResetPasswordStruct<'a> {
 
 impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
-    type Clock = ChronoAuthClock;
+    type ClockInfra = AuthClockStruct;
     type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
     type UserRepository = MemoryAuthUserRepository<'a>;
     type PasswordHasher = Argon2PasswordHasher;
@@ -51,8 +51,8 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
         &self.check_nonce_infra
     }
-    fn clock(&self) -> &Self::Clock {
-        &self.clock
+    fn clock_infra(&self) -> &Self::ClockInfra {
+        &self.clock_infra
     }
     fn password_repository(&self) -> &Self::PasswordRepository {
         &self.password_repository
@@ -72,10 +72,9 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
 pub mod test {
     pub use super::messenger::test::StaticResetPasswordMessenger;
     pub use super::token_decoder::test::StaticResetTokenDecoder;
+    use crate::auth::auth_ticket::_api::kernel::init::test::StaticAuthClockStruct;
     use crate::auth::{
-        auth_ticket::_api::kernel::init::test::{
-            StaticCheckAuthNonceStruct, StaticChronoAuthClock,
-        },
+        auth_ticket::_api::kernel::init::test::StaticCheckAuthNonceStruct,
         auth_user::_api::kernel::init::test::MemoryAuthUserRepository,
         password::_api::kernel::init::test::{
             MemoryAuthUserPasswordRepository, PlainPasswordHasher,
@@ -86,7 +85,7 @@ pub mod test {
 
     pub struct StaticResetPasswordStruct<'a> {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
-        pub clock: StaticChronoAuthClock,
+        pub clock_infra: StaticAuthClockStruct,
         pub password_repository: MemoryAuthUserPasswordRepository<'a>,
         pub user_repository: MemoryAuthUserRepository<'a>,
         pub token_decoder: StaticResetTokenDecoder,
@@ -95,7 +94,7 @@ pub mod test {
 
     impl<'a> ResetPasswordInfra for StaticResetPasswordStruct<'a> {
         type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
-        type Clock = StaticChronoAuthClock;
+        type ClockInfra = StaticAuthClockStruct;
         type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
         type UserRepository = MemoryAuthUserRepository<'a>;
         type PasswordHasher = PlainPasswordHasher;
@@ -105,8 +104,8 @@ pub mod test {
         fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
             &self.check_nonce_infra
         }
-        fn clock(&self) -> &Self::Clock {
-            &self.clock
+        fn clock_infra(&self) -> &Self::ClockInfra {
+            &self.clock_infra
         }
         fn password_repository(&self) -> &Self::PasswordRepository {
             &self.password_repository

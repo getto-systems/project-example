@@ -13,8 +13,8 @@ use crate::auth::{
         kernel::init::test::{
             MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
             MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
-            StaticAuthNonceHeader, StaticAuthTicketStruct, StaticCheckAuthNonceStruct,
-            StaticChronoAuthClock,
+            StaticAuthClockStruct, StaticAuthNonceHeader, StaticAuthTicketStruct,
+            StaticCheckAuthNonceStruct, StaticChronoAuthClock,
         },
     },
     auth_user::_api::kernel::init::test::{
@@ -469,7 +469,9 @@ impl<'a> TestFeature<'a> {
                     nonce_header: standard_nonce_header(),
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
-                clock: standard_clock(),
+                clock_infra: StaticAuthClockStruct {
+                    clock: standard_clock(),
+                },
                 password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
                 user_repository: MemoryAuthUserRepository::new(&store.user),
                 token_decoder,

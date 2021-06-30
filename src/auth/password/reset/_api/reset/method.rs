@@ -1,3 +1,4 @@
+use crate::auth::auth_ticket::_api::kernel::infra::AuthClockInfra;
 use crate::auth::auth_ticket::_api::kernel::method::check_nonce;
 
 use crate::auth::{
@@ -25,7 +26,8 @@ pub fn reset_password<S>(
     check_nonce(infra.check_nonce_infra())
         .map_err(|err| post(ResetPasswordEvent::NonceError(err)))?;
 
-    let clock = infra.clock();
+    let clock_infra = infra.clock_infra();
+    let clock = clock_infra.clock();
     let password_repository = infra.password_repository();
     let token_decoder = infra.token_decoder();
     let messenger = infra.messenger();
