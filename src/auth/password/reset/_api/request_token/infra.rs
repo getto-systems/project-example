@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::{AuthClock, CheckAuthNonceInfra},
+    auth_ticket::_api::kernel::infra::{AuthClockInfra, CheckAuthNonceInfra},
     password::_api::kernel::infra::{
         AuthUserPasswordRepository, RegisterResetTokenError, ResetTokenGenerator,
     },
@@ -27,7 +27,7 @@ use crate::z_details::_api::{message::data::MessageError, repository::data::Repo
 
 pub trait RequestResetTokenInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
-    type Clock: AuthClock;
+    type ClockInfra: AuthClockInfra;
     type DestinationRepository: ResetTokenDestinationRepository;
     type PasswordRepository: AuthUserPasswordRepository;
     type TokenGenerator: ResetTokenGenerator;
@@ -36,14 +36,14 @@ pub trait RequestResetTokenInfra {
     type Messenger: RequestResetTokenMessenger;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
-    fn config(&self) -> &RequestResetTokenConfig;
-    fn clock(&self) -> &Self::Clock;
+    fn clock_infra(&self) -> &Self::ClockInfra;
     fn destination_repository(&self) -> &Self::DestinationRepository;
     fn password_repository(&self) -> &Self::PasswordRepository;
     fn token_generator(&self) -> &Self::TokenGenerator;
     fn token_encoder(&self) -> &Self::TokenEncoder;
     fn token_notifier(&self) -> &Self::TokenNotifier;
     fn messenger(&self) -> &Self::Messenger;
+    fn config(&self) -> &RequestResetTokenConfig;
 }
 
 pub struct RequestResetTokenConfig {

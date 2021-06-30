@@ -2,25 +2,28 @@ use getto_application::data::MethodResult;
 
 use crate::z_details::_api::repository::helper::register_attempt;
 
-use super::infra::{
-    RequestResetTokenInfra, RequestResetTokenMessenger, ResetTokenDestinationRepository,
-    ResetTokenEncoder, ResetTokenNotifier,
-};
+use crate::auth::auth_ticket::_api::kernel::method::check_nonce;
+
 use crate::auth::{
-    auth_ticket::_api::kernel::{
-        data::{AuthDateTime, ExpireDateTime},
-        infra::AuthClock,
-        method::check_nonce,
-    },
-    password::_api::kernel::{
-        data::ResetToken,
-        infra::{AuthUserPasswordRepository, RegisterResetTokenError, ResetTokenGenerator},
+    auth_ticket::_api::kernel::infra::{AuthClock, AuthClockInfra},
+    password::{
+        _api::kernel::infra::{
+            AuthUserPasswordRepository, RegisterResetTokenError, ResetTokenGenerator,
+        },
+        reset::_api::request_token::infra::{
+            RequestResetTokenInfra, RequestResetTokenMessenger, ResetTokenDestinationRepository,
+            ResetTokenEncoder, ResetTokenNotifier,
+        },
     },
 };
 
 use super::event::RequestResetTokenEvent;
 
-use crate::auth::login_id::_api::data::LoginId;
+use crate::auth::{
+    auth_ticket::_api::kernel::data::{AuthDateTime, ExpireDateTime},
+    login_id::_api::data::LoginId,
+    password::_api::kernel::data::ResetToken,
+};
 
 pub async fn request_reset_token<S>(
     infra: &impl RequestResetTokenInfra,
@@ -44,10 +47,11 @@ pub async fn request_reset_token<S>(
         .map_err(|err| post(RequestResetTokenEvent::RepositoryError(err)))?
         .ok_or_else(|| post(messenger.encode_destination_not_found().into()))?;
 
-    let config = infra.config();
-    let clock = infra.clock();
+    let clock_infra = infra.clock_infra();
+    let clock = clock_infra.clock();
     let token_encoder = infra.token_encoder();
     let token_notifier = infra.token_notifier();
+    let config = infra.config();
 
     let expires = clock.now().expires(&config.token_expires);
     post(RequestResetTokenEvent::TokenExpiresCalculated(

@@ -357,7 +357,6 @@ impl<'a> TestFeature<'a> {
                     nonce_header: standard_nonce_header(),
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
-                clock: standard_clock(),
                 password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
                 user_repository: MemoryAuthUserRepository::new(&store.user),
                 messenger,

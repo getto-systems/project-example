@@ -1,5 +1,5 @@
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::{AuthClock, CheckAuthNonceInfra},
+    auth_ticket::_api::kernel::infra::CheckAuthNonceInfra,
     auth_user::_api::kernel::infra::AuthUserRepository,
     password::_api::kernel::infra::{
         AuthUserPasswordMatcher, AuthUserPasswordRepository, PlainPassword, VerifyPasswordError,
@@ -13,14 +13,12 @@ use crate::z_details::_api::message::data::MessageError;
 
 pub trait AuthenticatePasswordInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
-    type Clock: AuthClock;
     type PasswordMatcher: AuthUserPasswordMatcher;
     type PasswordRepository: AuthUserPasswordRepository;
     type UserRepository: AuthUserRepository;
     type Messenger: AuthenticatePasswordMessenger;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
-    fn clock(&self) -> &Self::Clock;
     fn password_matcher(&self, plain_password: PlainPassword) -> Self::PasswordMatcher {
         Self::PasswordMatcher::new(plain_password)
     }
