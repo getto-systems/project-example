@@ -7,12 +7,10 @@ use crate::auth::auth_ticket::_api::kernel::method::check_nonce;
 use crate::auth::{
     auth_ticket::_api::kernel::infra::{AuthClock, CheckAuthNonceInfra},
     password::{
-        _api::kernel::infra::{
-            AuthUserPasswordRepository, RegisterResetTokenError, ResetTokenGenerator,
-        },
+        _api::kernel::infra::{AuthUserPasswordRepository, RegisterResetTokenError},
         reset::_api::request_token::infra::{
             RequestResetTokenInfra, RequestResetTokenMessenger, ResetTokenDestinationRepository,
-            ResetTokenEncoder, ResetTokenNotifier,
+            ResetTokenEncoder, ResetTokenGenerator, ResetTokenNotifier,
         },
     },
 };

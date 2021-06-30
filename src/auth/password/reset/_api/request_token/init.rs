@@ -1,6 +1,7 @@
 mod destination_repository;
 mod messenger;
 mod token_encoder;
+mod token_generator;
 mod token_notifier;
 
 use actix_web::HttpRequest;
@@ -9,15 +10,17 @@ use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::{
     auth_ticket::_api::kernel::init::CheckAuthNonceStruct,
-    password::_api::kernel::init::{MemoryAuthUserPasswordRepository, UuidResetTokenGenerator},
+    password::_api::kernel::init::MemoryAuthUserPasswordRepository,
 };
-pub use destination_repository::{
-    MemoryResetTokenDestinationMap, MemoryResetTokenDestinationRepository,
-    MemoryResetTokenDestinationStore,
-};
+use destination_repository::MemoryResetTokenDestinationRepository;
 use messenger::ProtobufRequestResetTokenMessenger;
 use token_encoder::JwtResetTokenEncoder;
+use token_generator::UuidResetTokenGenerator;
 use token_notifier::EmailResetTokenNotifier;
+
+pub use destination_repository::{
+    MemoryResetTokenDestinationMap, MemoryResetTokenDestinationStore,
+};
 
 use super::infra::{RequestResetTokenConfig, RequestResetTokenInfra};
 
@@ -96,12 +99,11 @@ pub mod test {
     };
     pub use super::messenger::test::StaticRequestResetTokenMessenger;
     pub use super::token_encoder::test::StaticResetTokenEncoder;
+    pub use super::token_generator::test::StaticResetTokenGenerator;
     pub use super::token_notifier::test::StaticResetTokenNotifier;
     use crate::auth::{
         auth_ticket::_api::kernel::init::test::StaticCheckAuthNonceStruct,
-        password::_api::kernel::init::test::{
-            MemoryAuthUserPasswordRepository, StaticResetTokenGenerator,
-        },
+        password::_api::kernel::init::test::MemoryAuthUserPasswordRepository,
     };
 
     use super::super::infra::{RequestResetTokenConfig, RequestResetTokenInfra};

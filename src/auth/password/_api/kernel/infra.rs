@@ -71,10 +71,6 @@ pub trait AuthUserPasswordHasher {
     fn hash_password(&self) -> Result<HashedPassword, PasswordHashError>;
 }
 
-pub trait ResetTokenGenerator {
-    fn generate(&self) -> ResetToken;
-}
-
 pub enum VerifyPasswordError {
     PasswordHashError(PasswordHashError),
     RepositoryError(RepositoryError),

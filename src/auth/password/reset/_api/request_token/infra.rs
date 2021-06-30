@@ -2,9 +2,7 @@ use async_trait::async_trait;
 
 use crate::auth::{
     auth_ticket::_api::kernel::infra::CheckAuthNonceInfra,
-    password::_api::kernel::infra::{
-        AuthUserPasswordRepository, RegisterResetTokenError, ResetTokenGenerator,
-    },
+    password::_api::kernel::infra::{AuthUserPasswordRepository, RegisterResetTokenError},
 };
 
 use crate::auth::password::reset::_api::request_token::event::RequestResetTokenEvent;
@@ -50,6 +48,10 @@ pub struct RequestResetTokenConfig {
 
 pub trait ResetTokenDestinationRepository {
     fn get(&self, login_id: &LoginId) -> Result<Option<ResetTokenDestination>, RepositoryError>;
+}
+
+pub trait ResetTokenGenerator {
+    fn generate(&self) -> ResetToken;
 }
 
 pub trait ResetTokenEncoder {

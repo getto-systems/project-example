@@ -10,12 +10,13 @@ use crate::auth::{
     password::{
         _api::kernel::init::test::{
             MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-            MemoryAuthUserPasswordStore, StaticResetTokenGenerator,
+            MemoryAuthUserPasswordStore,
         },
         reset::_api::request_token::init::test::{
             MemoryResetTokenDestinationMap, MemoryResetTokenDestinationRepository,
             MemoryResetTokenDestinationStore, StaticRequestResetTokenMessenger,
-            StaticRequestResetTokenStruct, StaticResetTokenEncoder, StaticResetTokenNotifier,
+            StaticRequestResetTokenStruct, StaticResetTokenEncoder, StaticResetTokenGenerator,
+            StaticResetTokenNotifier,
         },
     },
 };
