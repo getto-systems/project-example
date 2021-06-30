@@ -13,7 +13,8 @@ use crate::auth::{
         kernel::init::test::{
             MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
             MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
-            StaticAuthNonceHeader, StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+            StaticAuthNonceHeader, StaticAuthTicketStruct, StaticCheckAuthNonceStruct,
+            StaticChronoAuthClock,
         },
     },
     auth_user::_api::kernel::init::test::{
@@ -40,8 +41,7 @@ use crate::auth::{
     },
 };
 
-use super::action::AuthenticatePasswordAction;
-use super::action::AuthenticatePasswordMaterial;
+use super::action::{AuthenticatePasswordAction, AuthenticatePasswordMaterial};
 
 use crate::auth::{
     auth_ticket::_api::kernel::data::{
@@ -363,12 +363,14 @@ impl<'a> TestFeature<'a> {
                 messenger,
             },
             issue: StaticIssueAuthTicketStruct {
-                config: standard_issue_config(),
-                clock: standard_clock(),
-                ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
+                ticket_infra: StaticAuthTicketStruct {
+                    clock: standard_clock(),
+                    ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
+                },
                 ticket_id_generator: StaticAuthTicketIdGenerator::new(AuthTicketId::new(
                     "ticket-id".into(),
                 )),
+                config: standard_issue_config(),
             },
             encode: StaticEncodeAuthTicketStruct {
                 config: standard_encode_config(),

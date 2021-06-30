@@ -11,6 +11,14 @@ use crate::z_details::_api::{
     request::data::HeaderError,
 };
 
+pub trait AuthTicketInfra {
+    type Clock: AuthClock;
+    type TicketRepository: AuthTicketRepository;
+
+    fn clock(&self) -> &Self::Clock;
+    fn ticket_repository(&self) -> &Self::TicketRepository;
+}
+
 pub trait CheckAuthNonceInfra {
     type Clock: AuthClock;
     type NonceHeader: AuthNonceHeader;
@@ -52,10 +60,6 @@ pub trait AuthTicketRepository {
         &self,
         ticket: &AuthTicket,
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError>;
-}
-
-pub trait AuthTicketIdGenerator {
-    fn generate(&self) -> AuthTicketId;
 }
 
 pub trait AuthNonceRepository {

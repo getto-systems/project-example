@@ -2,44 +2,38 @@ mod id_generator;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_api::kernel::init::{ChronoAuthClock, MemoryAuthTicketRepository};
+use crate::auth::auth_ticket::_api::kernel::init::AuthTicketStruct;
 use id_generator::UuidAuthTicketIdGenerator;
 
 use super::infra::{IssueAuthTicketConfig, IssueAuthTicketInfra};
 
 pub struct IssueAuthTicketStruct<'a> {
-    config: IssueAuthTicketConfig,
-    clock: ChronoAuthClock,
-    ticket_repository: MemoryAuthTicketRepository<'a>,
+    ticket_infra: AuthTicketStruct<'a>,
     ticket_id_generator: UuidAuthTicketIdGenerator,
+    config: IssueAuthTicketConfig,
 }
 
 impl<'a> IssueAuthTicketStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature) -> Self {
         Self {
+            ticket_infra: AuthTicketStruct::new(feature),
+            ticket_id_generator: UuidAuthTicketIdGenerator::new(),
             config: IssueAuthTicketConfig {
                 ticket_expansion_limit: feature.config.ticket_expansion_limit,
             },
-            clock: ChronoAuthClock::new(),
-            ticket_repository: MemoryAuthTicketRepository::new(&feature.store.ticket),
-            ticket_id_generator: UuidAuthTicketIdGenerator::new(),
         }
     }
 }
 
 impl<'a> IssueAuthTicketInfra for IssueAuthTicketStruct<'a> {
-    type Clock = ChronoAuthClock;
-    type TicketRepository = MemoryAuthTicketRepository<'a>;
+    type TicketInfra = AuthTicketStruct<'a>;
     type TicketIdGenerator = UuidAuthTicketIdGenerator;
 
+    fn ticket_infra(&self) -> &Self::TicketInfra {
+        &self.ticket_infra
+    }
     fn config(&self) -> &IssueAuthTicketConfig {
         &self.config
-    }
-    fn clock(&self) -> &Self::Clock {
-        &self.clock
-    }
-    fn ticket_repository(&self) -> &Self::TicketRepository {
-        &self.ticket_repository
     }
     fn ticket_id_generator(&self) -> &Self::TicketIdGenerator {
         &self.ticket_id_generator
@@ -49,32 +43,25 @@ impl<'a> IssueAuthTicketInfra for IssueAuthTicketStruct<'a> {
 #[cfg(test)]
 pub mod test {
     pub use super::id_generator::test::StaticAuthTicketIdGenerator;
-    use crate::auth::auth_ticket::_api::kernel::init::test::{
-        MemoryAuthTicketRepository, StaticChronoAuthClock,
-    };
+    use crate::auth::auth_ticket::_api::kernel::init::test::StaticAuthTicketStruct;
 
     use super::super::infra::{IssueAuthTicketConfig, IssueAuthTicketInfra};
 
     pub struct StaticIssueAuthTicketStruct<'a> {
-        pub config: IssueAuthTicketConfig,
-        pub clock: StaticChronoAuthClock,
-        pub ticket_repository: MemoryAuthTicketRepository<'a>,
+        pub ticket_infra: StaticAuthTicketStruct<'a>,
         pub ticket_id_generator: StaticAuthTicketIdGenerator,
+        pub config: IssueAuthTicketConfig,
     }
 
     impl<'a> IssueAuthTicketInfra for StaticIssueAuthTicketStruct<'a> {
-        type Clock = StaticChronoAuthClock;
-        type TicketRepository = MemoryAuthTicketRepository<'a>;
+        type TicketInfra = StaticAuthTicketStruct<'a>;
         type TicketIdGenerator = StaticAuthTicketIdGenerator;
 
+        fn ticket_infra(&self) -> &Self::TicketInfra {
+            &self.ticket_infra
+        }
         fn config(&self) -> &IssueAuthTicketConfig {
             &self.config
-        }
-        fn clock(&self) -> &Self::Clock {
-            &self.clock
-        }
-        fn ticket_repository(&self) -> &Self::TicketRepository {
-            &self.ticket_repository
         }
         fn ticket_id_generator(&self) -> &Self::TicketIdGenerator {
             &self.ticket_id_generator
