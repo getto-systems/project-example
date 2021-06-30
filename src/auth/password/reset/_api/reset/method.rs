@@ -1,6 +1,7 @@
 use crate::auth::auth_ticket::_api::kernel::method::check_nonce;
 
 use crate::auth::auth_user::_api::kernel::infra::AuthUserInfra;
+use crate::auth::password::_api::kernel::infra::AuthUserPasswordInfra;
 use crate::auth::{
     auth_ticket::_api::kernel::infra::{AuthClock, CheckAuthNonceInfra},
     auth_user::_api::kernel::infra::AuthUserRepository,
@@ -26,8 +27,9 @@ pub fn reset_password<S>(
     check_nonce(infra.check_nonce_infra())
         .map_err(|err| post(ResetPasswordEvent::NonceError(err)))?;
 
+    let password_infra = infra.password_infra();
     let clock = infra.check_nonce_infra().clock();
-    let password_repository = infra.password_repository();
+    let password_repository = password_infra.password_repository();
     let token_decoder = infra.token_decoder();
     let messenger = infra.messenger();
 
@@ -48,7 +50,7 @@ pub fn reset_password<S>(
         .decode(&reset_token)
         .map_err(|err| post(ResetPasswordEvent::DecodeError(err)))?;
 
-    let hasher = infra.password_hasher(plain_password);
+    let hasher = password_infra.password_hasher(plain_password);
     let reset_at = clock.now();
 
     let user_id = password_repository

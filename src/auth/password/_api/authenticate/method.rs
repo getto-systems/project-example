@@ -1,11 +1,10 @@
 use crate::auth::auth_ticket::_api::kernel::method::check_nonce;
 
-use crate::auth::auth_user::_api::kernel::infra::AuthUserInfra;
 use crate::auth::{
-    auth_user::_api::kernel::infra::AuthUserRepository,
+    auth_user::_api::kernel::infra::{AuthUserInfra, AuthUserRepository},
     password::_api::{
         authenticate::infra::{AuthenticatePasswordInfra, AuthenticatePasswordMessenger},
-        kernel::infra::{AuthUserPasswordRepository, PlainPassword},
+        kernel::infra::{AuthUserPasswordInfra, AuthUserPasswordRepository, PlainPassword},
     },
 };
 
@@ -20,7 +19,8 @@ pub fn authenticate_password<S>(
     check_nonce(infra.check_nonce_infra())
         .map_err(|err| post(AuthenticatePasswordEvent::NonceError(err)))?;
 
-    let password_repository = infra.password_repository();
+    let password_infra = infra.password_infra();
+    let password_repository = password_infra.password_repository();
     let messenger = infra.messenger();
 
     let fields = messenger
@@ -33,7 +33,7 @@ pub fn authenticate_password<S>(
     let plain_password = PlainPassword::validate(fields.password)
         .map_err(|err| post(AuthenticatePasswordEvent::ValidatePasswordError(err)))?;
 
-    let matcher = infra.password_matcher(plain_password);
+    let matcher = password_infra.password_matcher(plain_password);
 
     let user_id = password_repository
         .verify_password(&login_id, &matcher)

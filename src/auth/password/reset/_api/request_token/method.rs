@@ -7,7 +7,9 @@ use crate::auth::auth_ticket::_api::kernel::method::check_nonce;
 use crate::auth::{
     auth_ticket::_api::kernel::infra::{AuthClock, CheckAuthNonceInfra},
     password::{
-        _api::kernel::infra::{AuthUserPasswordRepository, RegisterResetTokenError},
+        _api::kernel::infra::{
+            AuthUserPasswordInfra, AuthUserPasswordRepository, RegisterResetTokenError,
+        },
         reset::_api::request_token::infra::{
             RequestResetTokenInfra, RequestResetTokenMessenger, ResetTokenDestinationRepository,
             ResetTokenEncoder, ResetTokenGenerator, ResetTokenNotifier,
@@ -84,7 +86,7 @@ fn register_reset_token(
     expires: &ExpireDateTime,
     registered_at: &AuthDateTime,
 ) -> Result<ResetToken, RegisterResetTokenError> {
-    let password_repository = infra.password_repository();
+    let password_repository = infra.password_infra().password_repository();
     let token_generator = infra.token_generator();
 
     register_attempt(

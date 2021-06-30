@@ -1,9 +1,7 @@
 use crate::auth::{
     auth_ticket::_api::kernel::infra::CheckAuthNonceInfra,
     auth_user::_api::kernel::infra::AuthUserInfra,
-    password::_api::kernel::infra::{
-        AuthUserPasswordMatcher, AuthUserPasswordRepository, PlainPassword, VerifyPasswordError,
-    },
+    password::_api::kernel::infra::{AuthUserPasswordInfra, VerifyPasswordError},
 };
 
 use crate::auth::password::_api::authenticate::event::AuthenticatePasswordEvent;
@@ -14,16 +12,12 @@ use crate::z_details::_api::message::data::MessageError;
 pub trait AuthenticatePasswordInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
     type UserInfra: AuthUserInfra;
-    type PasswordMatcher: AuthUserPasswordMatcher;
-    type PasswordRepository: AuthUserPasswordRepository;
+    type PasswordInfra: AuthUserPasswordInfra;
     type Messenger: AuthenticatePasswordMessenger;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
     fn user_infra(&self) -> &Self::UserInfra;
-    fn password_matcher(&self, plain_password: PlainPassword) -> Self::PasswordMatcher {
-        Self::PasswordMatcher::new(plain_password)
-    }
-    fn password_repository(&self) -> &Self::PasswordRepository;
+    fn password_infra(&self) -> &Self::PasswordInfra;
     fn messenger(&self) -> &Self::Messenger;
 }
 

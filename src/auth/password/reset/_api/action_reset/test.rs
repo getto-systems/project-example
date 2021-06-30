@@ -23,7 +23,7 @@ use crate::auth::{
     password::{
         _api::kernel::init::test::{
             MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-            MemoryAuthUserPasswordStore,
+            MemoryAuthUserPasswordStore, StaticAuthUserPasswordStruct,
         },
         reset::_api::reset::init::test::{
             StaticResetPasswordMessenger, StaticResetPasswordStruct, StaticResetTokenDecoder,
@@ -472,7 +472,9 @@ impl<'a> TestFeature<'a> {
                 user_infra: StaticAuthUserStruct {
                     user_repository: MemoryAuthUserRepository::new(&store.user),
                 },
-                password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
+                password_infra: StaticAuthUserPasswordStruct {
+                    password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
+                },
                 token_decoder,
                 messenger,
             },

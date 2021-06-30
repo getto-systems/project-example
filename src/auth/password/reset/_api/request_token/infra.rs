@@ -2,7 +2,7 @@ use async_trait::async_trait;
 
 use crate::auth::{
     auth_ticket::_api::kernel::infra::CheckAuthNonceInfra,
-    password::_api::kernel::infra::{AuthUserPasswordRepository, RegisterResetTokenError},
+    password::_api::kernel::infra::{AuthUserPasswordInfra, RegisterResetTokenError},
 };
 
 use crate::auth::password::reset::_api::request_token::event::RequestResetTokenEvent;
@@ -25,16 +25,16 @@ use crate::z_details::_api::{message::data::MessageError, repository::data::Repo
 
 pub trait RequestResetTokenInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
+    type PasswordInfra: AuthUserPasswordInfra;
     type DestinationRepository: ResetTokenDestinationRepository;
-    type PasswordRepository: AuthUserPasswordRepository;
     type TokenGenerator: ResetTokenGenerator;
     type TokenEncoder: ResetTokenEncoder;
     type TokenNotifier: ResetTokenNotifier;
     type Messenger: RequestResetTokenMessenger;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
+    fn password_infra(&self) -> &Self::PasswordInfra;
     fn destination_repository(&self) -> &Self::DestinationRepository;
-    fn password_repository(&self) -> &Self::PasswordRepository;
     fn token_generator(&self) -> &Self::TokenGenerator;
     fn token_encoder(&self) -> &Self::TokenEncoder;
     fn token_notifier(&self) -> &Self::TokenNotifier;

@@ -10,7 +10,7 @@ use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::{
     auth_ticket::_api::kernel::init::CheckAuthNonceStruct,
-    password::_api::kernel::init::MemoryAuthUserPasswordRepository,
+    password::_api::kernel::init::AuthUserPasswordStruct,
 };
 use destination_repository::MemoryResetTokenDestinationRepository;
 use messenger::ProtobufRequestResetTokenMessenger;
@@ -26,8 +26,8 @@ use super::infra::{RequestResetTokenConfig, RequestResetTokenInfra};
 
 pub struct RequestResetTokenStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
+    password_infra: AuthUserPasswordStruct<'a>,
     destination_repository: MemoryResetTokenDestinationRepository<'a>,
-    password_repository: MemoryAuthUserPasswordRepository<'a>,
     token_generator: UuidResetTokenGenerator,
     token_encoder: JwtResetTokenEncoder<'a>,
     token_notifier: EmailResetTokenNotifier<'a>,
@@ -39,11 +39,9 @@ impl<'a> RequestResetTokenStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest, body: String) -> Self {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, request),
+            password_infra: AuthUserPasswordStruct::new(feature),
             destination_repository: MemoryResetTokenDestinationRepository::new(
                 &feature.store.reset_token_destination,
-            ),
-            password_repository: MemoryAuthUserPasswordRepository::new(
-                &feature.store.user_password,
             ),
             token_generator: UuidResetTokenGenerator::new(),
             token_encoder: JwtResetTokenEncoder::new(&feature.secret.reset_token.encoding_key),
@@ -58,8 +56,8 @@ impl<'a> RequestResetTokenStruct<'a> {
 
 impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
+    type PasswordInfra = AuthUserPasswordStruct<'a>;
     type DestinationRepository = MemoryResetTokenDestinationRepository<'a>;
-    type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
     type TokenGenerator = UuidResetTokenGenerator;
     type TokenEncoder = JwtResetTokenEncoder<'a>;
     type TokenNotifier = EmailResetTokenNotifier<'a>;
@@ -68,11 +66,11 @@ impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
         &self.check_nonce_infra
     }
+    fn password_infra(&self) -> &Self::PasswordInfra {
+        &self.password_infra
+    }
     fn destination_repository(&self) -> &Self::DestinationRepository {
         &self.destination_repository
-    }
-    fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.password_repository
     }
     fn token_generator(&self) -> &Self::TokenGenerator {
         &self.token_generator
@@ -103,15 +101,15 @@ pub mod test {
     pub use super::token_notifier::test::StaticResetTokenNotifier;
     use crate::auth::{
         auth_ticket::_api::kernel::init::test::StaticCheckAuthNonceStruct,
-        password::_api::kernel::init::test::MemoryAuthUserPasswordRepository,
+        password::_api::kernel::init::test::StaticAuthUserPasswordStruct,
     };
 
     use super::super::infra::{RequestResetTokenConfig, RequestResetTokenInfra};
 
     pub struct StaticRequestResetTokenStruct<'a> {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
+        pub password_infra: StaticAuthUserPasswordStruct<'a>,
         pub destination_repository: MemoryResetTokenDestinationRepository<'a>,
-        pub password_repository: MemoryAuthUserPasswordRepository<'a>,
         pub token_generator: StaticResetTokenGenerator,
         pub token_encoder: StaticResetTokenEncoder,
         pub token_notifier: StaticResetTokenNotifier,
@@ -121,8 +119,8 @@ pub mod test {
 
     impl<'a> RequestResetTokenInfra for StaticRequestResetTokenStruct<'a> {
         type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
+        type PasswordInfra = StaticAuthUserPasswordStruct<'a>;
         type DestinationRepository = MemoryResetTokenDestinationRepository<'a>;
-        type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
         type TokenGenerator = StaticResetTokenGenerator;
         type TokenEncoder = StaticResetTokenEncoder;
         type TokenNotifier = StaticResetTokenNotifier;
@@ -131,11 +129,11 @@ pub mod test {
         fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
             &self.check_nonce_infra
         }
+        fn password_infra(&self) -> &Self::PasswordInfra {
+            &self.password_infra
+        }
         fn destination_repository(&self) -> &Self::DestinationRepository {
             &self.destination_repository
-        }
-        fn password_repository(&self) -> &Self::PasswordRepository {
-            &self.password_repository
         }
         fn token_generator(&self) -> &Self::TokenGenerator {
             &self.token_generator

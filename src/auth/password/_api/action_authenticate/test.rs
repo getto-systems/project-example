@@ -26,7 +26,7 @@ use crate::auth::{
         },
         kernel::init::test::{
             MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-            MemoryAuthUserPasswordStore,
+            MemoryAuthUserPasswordStore, StaticAuthUserPasswordStruct,
         },
     },
 };
@@ -360,7 +360,9 @@ impl<'a> TestFeature<'a> {
                 user_infra: StaticAuthUserStruct {
                     user_repository: MemoryAuthUserRepository::new(&store.user),
                 },
-                password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
+                password_infra: StaticAuthUserPasswordStruct {
+                    password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
+                },
                 messenger,
             },
             issue: StaticIssueAuthTicketStruct {
