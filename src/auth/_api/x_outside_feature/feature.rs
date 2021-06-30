@@ -15,11 +15,11 @@ use crate::auth::{
 use crate::auth::auth_ticket::_api::kernel::data::{ExpansionLimitDuration, ExpireDuration};
 
 pub struct AuthOutsideFeature {
-    pub config: AuthOutsideConfig,
-    pub store: AuthOutsideStore,
-    pub cookie: AuthOutsideCookie,
-    pub secret: AuthOutsideSecret,
-    pub email: AuthOutsideEmail,
+    pub(in crate::auth) config: AuthOutsideConfig,
+    pub(in crate::auth) store: AuthOutsideStore,
+    pub(in crate::auth) cookie: AuthOutsideCookie,
+    pub(in crate::auth) secret: AuthOutsideSecret,
+    pub(in crate::auth) email: AuthOutsideEmail,
 }
 pub struct AuthOutsideConfig {
     pub ticket_expires: ExpireDuration,
