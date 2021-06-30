@@ -1,6 +1,3 @@
-use async_trait::async_trait;
-
-use rusoto_core::Region;
 use rusoto_ses::{Body, Content, Destination, Message, SendEmailRequest, Ses, SesClient};
 use url::{ParseError, Url};
 
@@ -14,28 +11,26 @@ use crate::auth::password::reset::_api::{
 };
 
 pub struct EmailResetTokenNotifier<'a> {
-    region: Region,
+    client: &'a SesClient,
     ui_host: &'a str,
 }
 
 impl<'a> EmailResetTokenNotifier<'a> {
-    pub fn ap_north_east_1(email: &'a AuthOutsideEmail) -> Self {
+    pub fn new(email: &'a AuthOutsideEmail) -> Self {
         Self {
-            region: Region::ApNortheast1,
+            client: &email.ses_ap_northeast1,
             ui_host: &email.ui_host,
         }
     }
 }
 
-#[async_trait]
+#[async_trait::async_trait]
 impl<'a> ResetTokenNotifier for EmailResetTokenNotifier<'a> {
     async fn notify(
         &self,
         destination: ResetTokenDestination,
         token: ResetTokenEncoded,
     ) -> Result<NotifyResetTokenResponse, NotifyResetTokenError> {
-        let client = SesClient::new(self.region.clone());
-
         let destination = destination.into();
         let message = build_message(self.ui_host, token)
             .map_err(|err| NotifyResetTokenError::InfraError(format!("{}", err)))?;
@@ -48,7 +43,8 @@ impl<'a> ResetTokenNotifier for EmailResetTokenNotifier<'a> {
             ..Default::default()
         };
 
-        let response = client
+        let response = self
+            .client
             .send_email(request)
             .await
             .map_err(|err| NotifyResetTokenError::InfraError(format!("{}", err)))?;
@@ -114,8 +110,6 @@ email: labo@message.getto.systems
 
 #[cfg(test)]
 pub mod test {
-    use async_trait::async_trait;
-
     use crate::auth::password::reset::_api::request_token::infra::ResetTokenNotifier;
 
     use crate::auth::password::reset::_api::{
@@ -133,7 +127,7 @@ pub mod test {
         }
     }
 
-    #[async_trait]
+    #[async_trait::async_trait]
     impl ResetTokenNotifier for StaticResetTokenNotifier {
         async fn notify(
             &self,

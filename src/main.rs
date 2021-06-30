@@ -32,6 +32,7 @@ async fn main() -> io::Result<()> {
             .wrap(cors)
             .app_data(data.clone())
             .service(root::index)
+            .service(demo::dynamodb)
             .service(scope_auth())
     })
     .bind(format!("0.0.0.0:{}", &ENV.port))?
@@ -47,5 +48,54 @@ mod root {
     #[get("/")]
     async fn index() -> impl Responder {
         format!("GETTO-EXAMPLE-API: OK; version: {}", VERSION)
+    }
+}
+
+mod demo {
+    use std::collections::HashMap;
+
+    use actix_web::{get, Responder};
+    use rusoto_core::Region;
+    use rusoto_dynamodb::{AttributeValue, DynamoDb, DynamoDbClient, PutItemInput};
+
+    #[get("/dynamodb")]
+    async fn dynamodb() -> impl Responder {
+        match list_tables().await {
+            Ok(response) => response,
+            Err(err) => err,
+        }
+    }
+
+    async fn list_tables() -> Result<String, String> {
+        let client = DynamoDbClient::new(Region::ApNortheast1);
+        let mut item: HashMap<String, AttributeValue> = HashMap::new();
+        item.insert(
+            "nonce".into(),
+            AttributeValue {
+                s: Some("NONCE".into()),
+                ..Default::default()
+            },
+        );
+        item.insert(
+            "expires".into(),
+            AttributeValue {
+                s: Some("EXPIRES".into()),
+                ..Default::default()
+            },
+        );
+
+        let input = PutItemInput {
+            condition_expression: Some("attribute_not_exists(nonce)".into()),
+            item,
+            table_name: "dev-getto-example-auth-nonce".into(),
+            ..Default::default()
+        };
+
+        client
+            .put_item(input)
+            .await
+            .map_err(|err| format!("{}", err))?;
+
+        Ok("success: put item".into())
     }
 }

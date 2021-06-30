@@ -51,8 +51,8 @@ use crate::auth::{
     login_id::_api::data::LoginId,
 };
 
-#[test]
-fn success_authenticate() {
+#[tokio::test]
+async fn success_authenticate() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -61,7 +61,7 @@ fn success_authenticate() {
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec![
         "authenticate password success; user: test-user-id (granted: [something])",
         "issue success; ticket: ticket-id / user: test-user-id (granted: [something])",
@@ -71,8 +71,8 @@ fn success_authenticate() {
     assert!(result.is_ok());
 }
 
-#[test]
-fn success_expired_nonce() {
+#[tokio::test]
+async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
@@ -81,7 +81,7 @@ fn success_expired_nonce() {
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec![
         "authenticate password success; user: test-user-id (granted: [something])",
         "issue success; ticket: ticket-id / user: test-user-id (granted: [something])",
@@ -91,8 +91,8 @@ fn success_expired_nonce() {
     assert!(result.is_ok());
 }
 
-#[test]
-fn error_conflict_nonce() {
+#[tokio::test]
+async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
@@ -101,15 +101,15 @@ fn error_conflict_nonce() {
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec![
         "authenticate password error; auth nonce error: conflict",
     ]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_empty_login_id() {
+#[tokio::test]
+async fn error_empty_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -118,13 +118,13 @@ fn error_empty_login_id() {
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["authenticate password error; empty login id"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_too_long_login_id() {
+#[tokio::test]
+async fn error_too_long_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -133,13 +133,13 @@ fn error_too_long_login_id() {
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["authenticate password error; too long login id"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn just_max_length_login_id() {
+#[tokio::test]
+async fn just_max_length_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -148,13 +148,13 @@ fn just_max_length_login_id() {
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["authenticate password error; user not found"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_empty_password() {
+#[tokio::test]
+async fn error_empty_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -163,13 +163,13 @@ fn error_empty_password() {
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["authenticate password error; empty password"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_too_long_password() {
+#[tokio::test]
+async fn error_too_long_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -178,13 +178,13 @@ fn error_too_long_password() {
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["authenticate password error; too long password"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn just_max_length_password() {
+#[tokio::test]
+async fn just_max_length_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -193,13 +193,13 @@ fn just_max_length_password() {
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["authenticate password error; password not matched"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_failed_to_match_password() {
+#[tokio::test]
+async fn error_failed_to_match_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::match_fail_password();
@@ -208,13 +208,13 @@ fn error_failed_to_match_password() {
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["authenticate password error; password not matched"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_password_not_stored() {
+#[tokio::test]
+async fn error_password_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::password_not_stored();
@@ -223,13 +223,13 @@ fn error_password_not_stored() {
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["authenticate password error; user not found"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_user_not_stored() {
+#[tokio::test]
+async fn error_user_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::user_not_stored();
@@ -238,7 +238,7 @@ fn error_user_not_stored() {
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["authenticate password error; user not found"]);
     assert!(!result.is_ok());
 }

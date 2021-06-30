@@ -45,7 +45,7 @@ impl<'a> RequestResetTokenStruct<'a> {
             ),
             token_generator: UuidResetTokenGenerator::new(),
             token_encoder: JwtResetTokenEncoder::new(&feature.secret.reset_token.encoding_key),
-            token_notifier: EmailResetTokenNotifier::ap_north_east_1(&feature.email),
+            token_notifier: EmailResetTokenNotifier::new(&feature.email),
             messenger: ProtobufRequestResetTokenMessenger::new(body),
             config: RequestResetTokenConfig {
                 token_expires: feature.config.reset_token_expires,

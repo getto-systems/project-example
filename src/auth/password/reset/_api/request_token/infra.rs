@@ -1,5 +1,3 @@
-use async_trait::async_trait;
-
 use crate::auth::{
     auth_ticket::_api::kernel::infra::CheckAuthNonceInfra,
     password::_api::kernel::infra::{AuthUserPasswordInfra, RegisterResetTokenError},
@@ -62,7 +60,7 @@ pub trait ResetTokenEncoder {
     ) -> Result<ResetTokenEncoded, EncodeResetTokenError>;
 }
 
-#[async_trait]
+#[async_trait::async_trait]
 pub trait ResetTokenNotifier {
     async fn notify(
         &self,

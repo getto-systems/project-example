@@ -58,28 +58,52 @@ pub trait AuthTicketRepository {
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError>;
 }
 
+#[async_trait::async_trait]
 pub trait AuthNonceRepository {
-    fn get(&self, nonce: &AuthNonceValue) -> Result<Option<AuthNonceEntry>, RepositoryError>;
-    fn put(&self, nonce: AuthNonceEntry) -> Result<(), RepositoryError>;
+    async fn get(&self, nonce: &AuthNonceValue) -> Result<Option<AuthNonceEntry>, RepositoryError>;
+    async fn put(&self, nonce: AuthNonceEntry) -> Result<(), RepositoryError>;
 }
 
-#[derive(Clone)]
 pub struct AuthNonceEntry {
     nonce: AuthNonceValue,
-    expires: ExpireDateTime,
+    expires: Option<ExpireDateTime>,
 }
 
 impl AuthNonceEntry {
     pub const fn new(nonce: AuthNonceValue, expires: ExpireDateTime) -> Self {
-        Self { nonce, expires }
+        Self {
+            nonce,
+            expires: Some(expires),
+        }
     }
 
-    pub fn into_nonce(self) -> AuthNonceValue {
-        self.nonce
+    pub fn extract(self) -> AuthNonceEntryExtract {
+        AuthNonceEntryExtract {
+            nonce: self.nonce.extract(),
+            expires: self.expires.map(|expires| expires.timestamp()),
+        }
     }
 
     pub fn has_expired(&self, now: &AuthDateTime) -> bool {
-        self.expires.has_elapsed(now)
+        match self.expires {
+            None => false, // parse に失敗; この場合、nonce は常に有効と判定される
+            Some(ref expires) => expires.has_elapsed(now),
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct AuthNonceEntryExtract {
+    pub nonce: String,
+    pub expires: Option<i64>,
+}
+
+impl From<AuthNonceEntryExtract> for AuthNonceEntry {
+    fn from(src: AuthNonceEntryExtract) -> Self {
+        Self {
+            nonce: AuthNonceValue::new(src.nonce),
+            expires: src.expires.map(|expires| ExpireDateTime::restore(expires)),
+        }
     }
 }
 

@@ -1,17 +1,18 @@
 use super::super::kernel::method::check_nonce;
 
-use super::infra::{AuthTokenHeader, AuthTokenDecoder, ValidateAuthTokenInfra};
+use super::infra::{AuthTokenDecoder, AuthTokenHeader, ValidateAuthTokenInfra};
 
 use super::event::ValidateAuthTokenEvent;
 
 use super::super::kernel::data::AuthTicket;
 use super::data::ValidateAuthTokenError;
 
-pub fn validate_auth_token<S>(
+pub async fn validate_auth_token<S>(
     infra: &impl ValidateAuthTokenInfra,
     post: impl Fn(ValidateAuthTokenEvent) -> S,
 ) -> Result<AuthTicket, S> {
     check_nonce(infra.check_nonce_infra())
+        .await
         .map_err(|err| post(ValidateAuthTokenEvent::NonceError(err)))?;
 
     let ticket =

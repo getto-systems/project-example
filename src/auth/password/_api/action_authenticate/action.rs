@@ -60,13 +60,14 @@ impl<M: AuthenticatePasswordMaterial> AuthenticatePasswordAction<M> {
         self.pubsub.subscribe(handler);
     }
 
-    pub fn ignite(self) -> MethodResult<AuthenticatePasswordState> {
+    pub async fn ignite(self) -> MethodResult<AuthenticatePasswordState> {
         let pubsub = self.pubsub;
         let m = self.material;
 
         let user = authenticate_password(m.authenticate(), |event| {
             pubsub.post(AuthenticatePasswordState::Authenticate(event))
-        })?;
+        })
+        .await?;
 
         let ticket = issue_auth_ticket(m.issue(), user, |event| {
             pubsub.post(AuthenticatePasswordState::Issue(event))

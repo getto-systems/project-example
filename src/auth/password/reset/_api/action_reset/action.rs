@@ -59,13 +59,14 @@ impl<M: ResetPasswordMaterial> ResetPasswordAction<M> {
         self.pubsub.subscribe(handler);
     }
 
-    pub fn ignite(self) -> MethodResult<ResetPasswordState> {
+    pub async fn ignite(self) -> MethodResult<ResetPasswordState> {
         let pubsub = self.pubsub;
         let m = self.material;
 
         let user = reset_password(m.reset(), |event| {
             pubsub.post(ResetPasswordState::Reset(event))
-        })?;
+        })
+        .await?;
 
         let ticket = issue_auth_ticket(m.issue(), user, |event| {
             pubsub.post(ResetPasswordState::Issue(event))

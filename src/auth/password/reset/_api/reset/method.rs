@@ -20,11 +20,12 @@ use crate::auth::{
     password::reset::_api::kernel::data::ResetTokenEncoded,
 };
 
-pub fn reset_password<S>(
+pub async fn reset_password<S>(
     infra: &impl ResetPasswordInfra,
     post: impl Fn(ResetPasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
     check_nonce(infra.check_nonce_infra())
+        .await
         .map_err(|err| post(ResetPasswordEvent::NonceError(err)))?;
 
     let password_infra = infra.password_infra();

@@ -3,6 +3,9 @@ use std::collections::HashSet;
 use chrono::Duration;
 
 use aws_cloudfront_cookie::CloudfrontKey;
+use rusoto_core::Region;
+use rusoto_dynamodb::DynamoDbClient;
+use rusoto_ses::SesClient;
 
 use crate::z_details::_api::jwt::helper::{decoding_key_from_ec_pem, encoding_key_from_ec_pem};
 
@@ -14,7 +17,7 @@ use super::feature::{
 };
 
 use crate::auth::{
-    auth_ticket::_api::kernel::init::{MemoryAuthNonceMap, MemoryAuthTicketMap},
+    auth_ticket::_api::kernel::init::MemoryAuthTicketMap,
     auth_user::_api::kernel::init::MemoryAuthUserMap,
     password::{
         _api::kernel::init::MemoryAuthUserPasswordMap,
@@ -49,8 +52,9 @@ pub fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
             reset_token_expires: ExpireDuration::with_duration(Duration::hours(8)),
         },
         store: AuthOutsideStore {
+            dynamodb_ap_northeast1: DynamoDbClient::new(Region::ApNortheast1),
+            nonce_table_name: &env.auth_nonce_table_name,
             // TODO それぞれ外部データベースを使うように
-            nonce: MemoryAuthNonceMap::new().to_store(),
             ticket: MemoryAuthTicketMap::new().to_store(),
             user: MemoryAuthUserMap::with_user(admin_user()).to_store(),
             user_password: MemoryAuthUserPasswordMap::with_password(
@@ -89,6 +93,7 @@ pub fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
             },
         },
         email: AuthOutsideEmail {
+            ses_ap_northeast1: SesClient::new(Region::ApNortheast1),
             ui_host: &env.ui_host,
         },
     }

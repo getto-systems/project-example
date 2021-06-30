@@ -4,7 +4,7 @@ use super::infra::{
 
 use super::data::ValidateAuthNonceError;
 
-pub fn check_nonce(infra: &impl CheckAuthNonceInfra) -> Result<(), ValidateAuthNonceError> {
+pub async fn check_nonce(infra: &impl CheckAuthNonceInfra) -> Result<(), ValidateAuthNonceError> {
     let nonce_header = infra.nonce_header();
     let nonce_repository = infra.nonce_repository();
     let clock = infra.clock();
@@ -16,6 +16,7 @@ pub fn check_nonce(infra: &impl CheckAuthNonceInfra) -> Result<(), ValidateAuthN
 
     let entry = nonce_repository
         .get(&nonce)
+        .await
         .map_err(ValidateAuthNonceError::RepositoryError)?;
 
     if let Some(entry) = entry {
@@ -29,6 +30,7 @@ pub fn check_nonce(infra: &impl CheckAuthNonceInfra) -> Result<(), ValidateAuthN
             nonce,
             clock.now().expires(&config.nonce_expires),
         ))
+        .await
         .map_err(ValidateAuthNonceError::RepositoryError)?;
 
     Ok(())
