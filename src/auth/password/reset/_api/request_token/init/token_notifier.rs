@@ -32,7 +32,7 @@ impl<'a> ResetTokenNotifier for EmailResetTokenNotifier<'a> {
     async fn notify(
         &self,
         destination: ResetTokenDestination,
-        token: &ResetTokenEncoded,
+        token: ResetTokenEncoded,
     ) -> Result<NotifyResetTokenResponse, NotifyResetTokenError> {
         let client = SesClient::new(self.region.clone());
 
@@ -67,7 +67,7 @@ impl Into<Destination> for ResetTokenDestination {
     }
 }
 
-fn build_message(ui_host: &str, token: &ResetTokenEncoded) -> Result<Message, ParseError> {
+fn build_message(ui_host: &str, token: ResetTokenEncoded) -> Result<Message, ParseError> {
     let url = build_url(ui_host, token)?;
 
     let subject = SUBJECT.into();
@@ -81,7 +81,7 @@ fn build_message(ui_host: &str, token: &ResetTokenEncoded) -> Result<Message, Pa
         },
     })
 }
-fn build_url(ui_host: &str, token: &ResetTokenEncoded) -> Result<Url, ParseError> {
+fn build_url(ui_host: &str, token: ResetTokenEncoded) -> Result<Url, ParseError> {
     let mut url = Url::parse(format!("https://{}", ui_host).as_str())?;
     url.query_pairs_mut()
         .append_pair("-password-reset", "reset")
@@ -138,7 +138,7 @@ pub mod test {
         async fn notify(
             &self,
             _destination: ResetTokenDestination,
-            _token: &ResetTokenEncoded,
+            _token: ResetTokenEncoded,
         ) -> Result<NotifyResetTokenResponse, NotifyResetTokenError> {
             Ok(NotifyResetTokenResponse::new("message-id".into()))
         }

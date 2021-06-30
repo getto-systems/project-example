@@ -20,12 +20,6 @@ pub trait EncodeAuthTicketInfra {
     fn config(&self) -> &EncodeAuthTicketConfig;
 }
 
-pub struct EncodeAuthTicketConfig {
-    pub ticket_expires: ExpireDuration,
-    pub api_expires: ExpireDuration,
-    pub cdn_expires: ExpireDuration,
-}
-
 pub trait AuthTokenEncoder {
     fn encode(
         &self,
@@ -36,4 +30,10 @@ pub trait AuthTokenEncoder {
 
 pub trait EncodeMessenger {
     fn encode(&self, granted_roles: GrantedAuthRoles) -> Result<String, MessageError>;
+}
+
+pub struct EncodeAuthTicketConfig {
+    pub ticket_expires: ExpireDuration,
+    pub api_expires: ExpireDuration,
+    pub cdn_expires: ExpireDuration,
 }

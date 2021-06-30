@@ -11,10 +11,10 @@ pub trait IssueAuthTicketInfra {
     fn config(&self) -> &IssueAuthTicketConfig;
 }
 
-pub struct IssueAuthTicketConfig {
-    pub ticket_expansion_limit: ExpansionLimitDuration,
-}
-
 pub trait AuthTicketIdGenerator {
     fn generate(&self) -> AuthTicketId;
+}
+
+pub struct IssueAuthTicketConfig {
+    pub ticket_expansion_limit: ExpansionLimitDuration,
 }

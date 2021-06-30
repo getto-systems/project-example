@@ -46,6 +46,7 @@ impl PlainPassword {
         self.0.as_bytes()
     }
 
+    #[cfg(test)]
     pub fn extract(self) -> String {
         self.0
     }

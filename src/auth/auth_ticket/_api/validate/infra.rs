@@ -22,14 +22,14 @@ pub trait ValidateAuthTokenInfra {
     fn config(&self) -> &ValidateAuthTokenConfig;
 }
 
-pub struct ValidateAuthTokenConfig {
-    pub require_roles: RequireAuthRoles,
-}
-
 pub trait AuthTokenHeader {
     fn token(&self) -> Result<AuthTokenValue, HeaderError>;
 }
 
 pub trait AuthTokenDecoder {
     fn decode(&self, token: &AuthTokenValue) -> Result<AuthTicket, DecodeAuthTokenError>;
+}
+
+pub struct ValidateAuthTokenConfig {
+    pub require_roles: RequireAuthRoles,
 }

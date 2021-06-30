@@ -24,14 +24,10 @@ pub trait CheckAuthNonceInfra {
     type NonceHeader: AuthNonceHeader;
     type NonceRepository: AuthNonceRepository;
 
-    fn config(&self) -> &AuthNonceConfig;
     fn clock(&self) -> &Self::Clock;
     fn nonce_header(&self) -> &Self::NonceHeader;
     fn nonce_repository(&self) -> &Self::NonceRepository;
-}
-
-pub struct AuthNonceConfig {
-    pub nonce_expires: ExpireDuration,
+    fn config(&self) -> &AuthNonceConfig;
 }
 
 pub trait AuthClock {
@@ -121,4 +117,8 @@ impl Into<AuthTicket> for AuthJwtClaims {
         }
         .into()
     }
+}
+
+pub struct AuthNonceConfig {
+    pub nonce_expires: ExpireDuration,
 }
