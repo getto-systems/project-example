@@ -1,6 +1,4 @@
-use crate::auth::auth_ticket::_api::kernel::infra::{
-    AuthClock, AuthTicketRepository, CheckAuthNonceInfra,
-};
+use crate::auth::auth_ticket::_api::kernel::infra::{AuthTicketInfra, CheckAuthNonceInfra};
 
 use crate::auth::{
     auth_ticket::_api::{
@@ -13,21 +11,15 @@ use crate::z_details::_api::request::data::HeaderError;
 
 pub trait ValidateAuthTokenInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
-    type Clock: AuthClock;
+    type TicketInfra: AuthTicketInfra;
     type TokenHeader: AuthTokenHeader;
-    type TicketRepository: AuthTicketRepository;
     type TokenDecoder: AuthTokenDecoder;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
-    fn config(&self) -> &ValidateAuthTokenConfig;
-    fn clock(&self) -> &Self::Clock;
+    fn ticket_infra(&self) -> &Self::TicketInfra;
     fn token_header(&self) -> &Self::TokenHeader;
-    fn ticket_repository(&self) -> &Self::TicketRepository;
     fn token_validator(&self) -> &Self::TokenDecoder;
-}
-
-pub struct ValidateAuthTokenConfig {
-    pub require_roles: RequireAuthRoles,
+    fn config(&self) -> &ValidateAuthTokenConfig;
 }
 
 pub trait AuthTokenHeader {
@@ -36,4 +28,8 @@ pub trait AuthTokenHeader {
 
 pub trait AuthTokenDecoder {
     fn decode(&self, token: &AuthTokenValue) -> Result<AuthTicket, DecodeAuthTokenError>;
+}
+
+pub struct ValidateAuthTokenConfig {
+    pub require_roles: RequireAuthRoles,
 }

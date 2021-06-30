@@ -1,8 +1,9 @@
 use crate::z_details::_api::repository::helper::register_attempt;
 
-use super::super::kernel::infra::{AuthClock, AuthTicketRepository};
-use super::infra::IssueAuthTicketInfra;
-use crate::auth::auth_ticket::_api::kernel::infra::AuthTicketIdGenerator;
+use crate::auth::auth_ticket::_api::{
+    issue::infra::{AuthTicketIdGenerator, IssueAuthTicketInfra},
+    kernel::infra::{AuthClock, AuthTicketInfra, AuthTicketRepository},
+};
 
 use super::event::IssueAuthTicketEvent;
 
@@ -28,10 +29,11 @@ pub fn issue_auth_ticket<S>(
 }
 
 fn register_ticket_id(infra: &impl IssueAuthTicketInfra) -> Result<AuthTicketId, RepositoryError> {
-    let config = infra.config();
-    let clock = infra.clock();
+    let ticket_infra = infra.ticket_infra();
+    let clock = ticket_infra.clock();
+    let ticket_repository = ticket_infra.ticket_repository();
     let ticket_id_generator = infra.ticket_id_generator();
-    let ticket_repository = infra.ticket_repository();
+    let config = infra.config();
 
     register_attempt(
         || {

@@ -3,7 +3,7 @@ mod token_encoder;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_api::kernel::init::{ChronoAuthClock, MemoryAuthTicketRepository};
+use crate::auth::auth_ticket::_api::kernel::init::AuthTicketStruct;
 use messenger::{
     AuthenticatePasswordEncodeMessenger, RenewEncodeMessenger, ResetPasswordEncodeMessenger,
 };
@@ -12,13 +12,12 @@ use token_encoder::{ApiJwtAuthTokenEncoder, CloudfrontTokenEncoder, TicketJwtAut
 use super::infra::{EncodeAuthTicketConfig, EncodeAuthTicketInfra, EncodeMessenger};
 
 pub struct EncodeAuthTicketStruct<'a, M: EncodeMessenger> {
-    config: EncodeAuthTicketConfig,
-    clock: ChronoAuthClock,
-    ticket_repository: MemoryAuthTicketRepository<'a>,
+    ticket_infra: AuthTicketStruct<'a>,
     ticket_encoder: TicketJwtAuthTokenEncoder<'a>,
     api_encoder: ApiJwtAuthTokenEncoder<'a>,
     cdn_encoder: CloudfrontTokenEncoder<'a>,
     messenger: M,
+    config: EncodeAuthTicketConfig,
 }
 pub type RenewEncodeAuthTicketStruct<'a> = EncodeAuthTicketStruct<'a, RenewEncodeMessenger>;
 pub type AuthenticatePasswordEncodeAuthTicketStruct<'a> =
@@ -29,13 +28,7 @@ pub type ResetPasswordEncodeAuthTicketStruct<'a> =
 impl<'a, M: EncodeMessenger> EncodeAuthTicketStruct<'a, M> {
     fn with_messenger(feature: &'a AuthOutsideFeature, messenger: M) -> Self {
         Self {
-            config: EncodeAuthTicketConfig {
-                ticket_expires: feature.config.ticket_expires,
-                api_expires: feature.config.api_expires,
-                cdn_expires: feature.config.cdn_expires,
-            },
-            clock: ChronoAuthClock::new(),
-            ticket_repository: MemoryAuthTicketRepository::new(&feature.store.ticket),
+            ticket_infra: AuthTicketStruct::new(feature),
             ticket_encoder: TicketJwtAuthTokenEncoder::new(
                 &feature.cookie,
                 &feature.secret.ticket.encoding_key,
@@ -46,6 +39,11 @@ impl<'a, M: EncodeMessenger> EncodeAuthTicketStruct<'a, M> {
             ),
             cdn_encoder: CloudfrontTokenEncoder::new(&feature.secret.cdn, &feature.cookie),
             messenger,
+            config: EncodeAuthTicketConfig {
+                ticket_expires: feature.config.ticket_expires,
+                api_expires: feature.config.api_expires,
+                cdn_expires: feature.config.cdn_expires,
+            },
         }
     }
 }
@@ -66,21 +64,14 @@ impl<'a> ResetPasswordEncodeAuthTicketStruct<'a> {
 }
 
 impl<'a, M: EncodeMessenger> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a, M> {
-    type Clock = ChronoAuthClock;
-    type TicketRepository = MemoryAuthTicketRepository<'a>;
+    type TicketInfra = AuthTicketStruct<'a>;
     type TicketEncoder = TicketJwtAuthTokenEncoder<'a>;
     type ApiEncoder = ApiJwtAuthTokenEncoder<'a>;
     type CdnEncoder = CloudfrontTokenEncoder<'a>;
     type Messenger = M;
 
-    fn config(&self) -> &EncodeAuthTicketConfig {
-        &self.config
-    }
-    fn clock(&self) -> &Self::Clock {
-        &self.clock
-    }
-    fn ticket_repository(&self) -> &Self::TicketRepository {
-        &self.ticket_repository
+    fn ticket_infra(&self) -> &Self::TicketInfra {
+        &self.ticket_infra
     }
     fn ticket_encoder(&self) -> &Self::TicketEncoder {
         &self.ticket_encoder
@@ -94,46 +85,39 @@ impl<'a, M: EncodeMessenger> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a
     fn messenger(&self) -> &Self::Messenger {
         &self.messenger
     }
+    fn config(&self) -> &EncodeAuthTicketConfig {
+        &self.config
+    }
 }
 
 #[cfg(test)]
 pub mod test {
     pub use super::messenger::test::StaticEncodeMessenger;
     pub use super::token_encoder::test::StaticAuthTokenEncoder;
-    use crate::auth::auth_ticket::_api::kernel::init::test::{
-        MemoryAuthTicketRepository, StaticChronoAuthClock,
-    };
+    use crate::auth::auth_ticket::_api::kernel::init::test::StaticAuthTicketStruct;
 
     use crate::auth::auth_ticket::_api::encode::infra::{
         EncodeAuthTicketConfig, EncodeAuthTicketInfra,
     };
 
     pub struct StaticEncodeAuthTicketStruct<'a> {
-        pub config: EncodeAuthTicketConfig,
-        pub clock: StaticChronoAuthClock,
-        pub ticket_repository: MemoryAuthTicketRepository<'a>,
+        pub ticket_infra: StaticAuthTicketStruct<'a>,
         pub ticket_encoder: StaticAuthTokenEncoder,
         pub api_encoder: StaticAuthTokenEncoder,
         pub cdn_encoder: StaticAuthTokenEncoder,
         pub messenger: StaticEncodeMessenger,
+        pub config: EncodeAuthTicketConfig,
     }
 
     impl<'a> EncodeAuthTicketInfra for StaticEncodeAuthTicketStruct<'a> {
-        type Clock = StaticChronoAuthClock;
-        type TicketRepository = MemoryAuthTicketRepository<'a>;
+        type TicketInfra = StaticAuthTicketStruct<'a>;
         type TicketEncoder = StaticAuthTokenEncoder;
         type ApiEncoder = StaticAuthTokenEncoder;
         type CdnEncoder = StaticAuthTokenEncoder;
         type Messenger = StaticEncodeMessenger;
 
-        fn config(&self) -> &EncodeAuthTicketConfig {
-            &self.config
-        }
-        fn clock(&self) -> &Self::Clock {
-            &self.clock
-        }
-        fn ticket_repository(&self) -> &Self::TicketRepository {
-            &self.ticket_repository
+        fn ticket_infra(&self) -> &Self::TicketInfra {
+            &self.ticket_infra
         }
         fn ticket_encoder(&self) -> &Self::TicketEncoder {
             &self.ticket_encoder
@@ -146,6 +130,9 @@ pub mod test {
         }
         fn messenger(&self) -> &Self::Messenger {
             &self.messenger
+        }
+        fn config(&self) -> &EncodeAuthTicketConfig {
+            &self.config
         }
     }
 }

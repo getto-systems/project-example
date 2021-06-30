@@ -9,7 +9,7 @@ use crate::auth::auth_ticket::_api::{
     kernel::init::test::{
         MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore, MemoryAuthTicketMap,
         MemoryAuthTicketRepository, MemoryAuthTicketStore, StaticAuthNonceHeader,
-        StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+        StaticAuthTicketStruct, StaticCheckAuthNonceStruct, StaticChronoAuthClock,
     },
     validate::init::test::{
         StaticAuthTokenDecoder, StaticAuthTokenHeader, StaticValidateAuthTokenStruct,
@@ -180,19 +180,24 @@ impl<'a> TestFeature<'a> {
                     nonce_header: standard_nonce_header(),
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
+                ticket_infra: ticket_infra(store),
+                token_header: standard_token_header(),
+                token_validator: standard_token_validator(),
                 config: ValidateAuthTokenConfig {
                     require_roles: RequireAuthRoles::Nothing,
                 },
-                clock: standard_clock(),
-                token_header: standard_token_header(),
-                ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
-                token_validator: standard_token_validator(),
             },
             discard: StaticDiscardAuthTicketStruct {
-                clock: standard_clock(),
-                ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
+                ticket_infra: ticket_infra(store),
             },
         }
+    }
+}
+
+fn ticket_infra<'a>(store: &'a TestStore) -> StaticAuthTicketStruct<'a> {
+    StaticAuthTicketStruct {
+        clock: standard_clock(),
+        ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
     }
 }
 

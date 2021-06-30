@@ -8,6 +8,20 @@ use crate::auth::{
 };
 use crate::z_details::_api::repository::data::{RegisterAttemptResult, RepositoryError};
 
+pub trait AuthUserPasswordInfra {
+    type PasswordRepository: AuthUserPasswordRepository;
+    type PasswordMatcher: AuthUserPasswordMatcher;
+    type PasswordHasher: AuthUserPasswordHasher;
+
+    fn password_repository(&self) -> &Self::PasswordRepository;
+    fn password_matcher(&self, plain_password: PlainPassword) -> Self::PasswordMatcher {
+        Self::PasswordMatcher::new(plain_password)
+    }
+    fn password_hasher(&self, plain_password: PlainPassword) -> Self::PasswordHasher {
+        Self::PasswordHasher::new(plain_password)
+    }
+}
+
 pub struct HashedPassword(String);
 
 impl HashedPassword {
@@ -32,6 +46,7 @@ impl PlainPassword {
         self.0.as_bytes()
     }
 
+    #[cfg(test)]
     pub fn extract(self) -> String {
         self.0
     }
@@ -69,10 +84,6 @@ pub trait AuthUserPasswordMatcher {
 pub trait AuthUserPasswordHasher {
     fn new(plain_password: PlainPassword) -> Self;
     fn hash_password(&self) -> Result<HashedPassword, PasswordHashError>;
-}
-
-pub trait ResetTokenGenerator {
-    fn generate(&self) -> ResetToken;
 }
 
 pub enum VerifyPasswordError {

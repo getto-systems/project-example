@@ -1,9 +1,7 @@
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::{AuthClock, CheckAuthNonceInfra},
-    auth_user::_api::kernel::infra::AuthUserRepository,
-    password::_api::kernel::infra::{
-        AuthUserPasswordHasher, AuthUserPasswordRepository, PlainPassword, ResetPasswordError,
-    },
+    auth_ticket::_api::kernel::infra::CheckAuthNonceInfra,
+    auth_user::_api::kernel::infra::AuthUserInfra,
+    password::_api::kernel::infra::{AuthUserPasswordInfra, ResetPasswordError},
 };
 
 use crate::auth::password::reset::_api::reset::event::ResetPasswordEvent;
@@ -19,20 +17,14 @@ use crate::z_details::_api::message::data::MessageError;
 
 pub trait ResetPasswordInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
-    type Clock: AuthClock;
-    type PasswordRepository: AuthUserPasswordRepository;
-    type UserRepository: AuthUserRepository;
-    type PasswordHasher: AuthUserPasswordHasher;
+    type UserInfra: AuthUserInfra;
+    type PasswordInfra: AuthUserPasswordInfra;
     type TokenDecoder: ResetTokenDecoder;
     type Messenger: ResetPasswordMessenger;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
-    fn clock(&self) -> &Self::Clock;
-    fn password_repository(&self) -> &Self::PasswordRepository;
-    fn user_repository(&self) -> &Self::UserRepository;
-    fn password_hasher(&self, plain_password: PlainPassword) -> Self::PasswordHasher {
-        Self::PasswordHasher::new(plain_password)
-    }
+    fn user_infra(&self) -> &Self::UserInfra;
+    fn password_infra(&self) -> &Self::PasswordInfra;
     fn token_decoder(&self) -> &Self::TokenDecoder;
     fn messenger(&self) -> &Self::Messenger;
 }

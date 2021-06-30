@@ -1,57 +1,44 @@
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_api::kernel::init::{ChronoAuthClock, MemoryAuthTicketRepository};
+use crate::auth::auth_ticket::_api::kernel::init::AuthTicketStruct;
 
 use super::infra::DiscardAuthTicketInfra;
 
 pub struct DiscardAuthTicketStruct<'a> {
-    clock: ChronoAuthClock,
-    ticket_repository: MemoryAuthTicketRepository<'a>,
+    ticket_infra: AuthTicketStruct<'a>,
 }
 
 impl<'a> DiscardAuthTicketStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature) -> Self {
         Self {
-            clock: ChronoAuthClock::new(),
-            ticket_repository: MemoryAuthTicketRepository::new(&feature.store.ticket),
+            ticket_infra: AuthTicketStruct::new(feature),
         }
     }
 }
 
 impl<'a> DiscardAuthTicketInfra for DiscardAuthTicketStruct<'a> {
-    type Clock = ChronoAuthClock;
-    type TicketRepository = MemoryAuthTicketRepository<'a>;
+    type TicketInfra = AuthTicketStruct<'a>;
 
-    fn clock(&self) -> &Self::Clock {
-        &self.clock
-    }
-    fn ticket_repository(&self) -> &Self::TicketRepository {
-        &self.ticket_repository
+    fn ticket_infra(&self) -> &Self::TicketInfra {
+        &self.ticket_infra
     }
 }
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::auth_ticket::_api::kernel::init::test::{
-        MemoryAuthTicketRepository, StaticChronoAuthClock,
-    };
+    use crate::auth::auth_ticket::_api::kernel::init::test::StaticAuthTicketStruct;
 
     use super::super::infra::DiscardAuthTicketInfra;
 
     pub struct StaticDiscardAuthTicketStruct<'a> {
-        pub clock: StaticChronoAuthClock,
-        pub ticket_repository: MemoryAuthTicketRepository<'a>,
+        pub ticket_infra: StaticAuthTicketStruct<'a>,
     }
 
     impl<'a> DiscardAuthTicketInfra for StaticDiscardAuthTicketStruct<'a> {
-        type Clock = StaticChronoAuthClock;
-        type TicketRepository = MemoryAuthTicketRepository<'a>;
+        type TicketInfra = StaticAuthTicketStruct<'a>;
 
-        fn clock(&self) -> &Self::Clock {
-            &self.clock
-        }
-        fn ticket_repository(&self) -> &Self::TicketRepository {
-            &self.ticket_repository
+        fn ticket_infra(&self) -> &Self::TicketInfra {
+            &self.ticket_infra
         }
     }
 }

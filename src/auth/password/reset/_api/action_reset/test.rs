@@ -13,16 +13,17 @@ use crate::auth::{
         kernel::init::test::{
             MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
             MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
-            StaticAuthNonceHeader, StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+            StaticAuthNonceHeader, StaticAuthTicketStruct, StaticCheckAuthNonceStruct,
+            StaticChronoAuthClock,
         },
     },
     auth_user::_api::kernel::init::test::{
-        MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
+        MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore, StaticAuthUserStruct,
     },
     password::{
         _api::kernel::init::test::{
             MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-            MemoryAuthUserPasswordStore,
+            MemoryAuthUserPasswordStore, StaticAuthUserPasswordStruct,
         },
         reset::_api::reset::init::test::{
             StaticResetPasswordMessenger, StaticResetPasswordStruct, StaticResetTokenDecoder,
@@ -468,28 +469,35 @@ impl<'a> TestFeature<'a> {
                     nonce_header: standard_nonce_header(),
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
-                clock: standard_clock(),
-                password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
-                user_repository: MemoryAuthUserRepository::new(&store.user),
+                user_infra: StaticAuthUserStruct {
+                    user_repository: MemoryAuthUserRepository::new(&store.user),
+                },
+                password_infra: StaticAuthUserPasswordStruct {
+                    password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
+                },
                 token_decoder,
                 messenger,
             },
             issue: StaticIssueAuthTicketStruct {
-                config: standard_issue_config(),
-                clock: standard_clock(),
-                ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
+                ticket_infra: StaticAuthTicketStruct {
+                    clock: standard_clock(),
+                    ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
+                },
                 ticket_id_generator: StaticAuthTicketIdGenerator::new(AuthTicketId::new(
                     "ticket-id".into(),
                 )),
+                config: standard_issue_config(),
             },
             encode: StaticEncodeAuthTicketStruct {
-                config: standard_encode_config(),
-                clock: standard_clock(),
-                ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
+                ticket_infra: StaticAuthTicketStruct {
+                    clock: standard_clock(),
+                    ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
+                },
                 ticket_encoder: StaticAuthTokenEncoder::new(),
                 api_encoder: StaticAuthTokenEncoder::new(),
                 cdn_encoder: StaticAuthTokenEncoder::new(),
                 messenger: StaticEncodeMessenger::new(),
+                config: standard_encode_config(),
             },
         }
     }

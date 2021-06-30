@@ -11,19 +11,23 @@ use crate::z_details::_api::{
     request::data::HeaderError,
 };
 
+pub trait AuthTicketInfra {
+    type Clock: AuthClock;
+    type TicketRepository: AuthTicketRepository;
+
+    fn clock(&self) -> &Self::Clock;
+    fn ticket_repository(&self) -> &Self::TicketRepository;
+}
+
 pub trait CheckAuthNonceInfra {
     type Clock: AuthClock;
     type NonceHeader: AuthNonceHeader;
     type NonceRepository: AuthNonceRepository;
 
-    fn config(&self) -> &AuthNonceConfig;
     fn clock(&self) -> &Self::Clock;
     fn nonce_header(&self) -> &Self::NonceHeader;
     fn nonce_repository(&self) -> &Self::NonceRepository;
-}
-
-pub struct AuthNonceConfig {
-    pub nonce_expires: ExpireDuration,
+    fn config(&self) -> &AuthNonceConfig;
 }
 
 pub trait AuthClock {
@@ -52,10 +56,6 @@ pub trait AuthTicketRepository {
         &self,
         ticket: &AuthTicket,
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError>;
-}
-
-pub trait AuthTicketIdGenerator {
-    fn generate(&self) -> AuthTicketId;
 }
 
 pub trait AuthNonceRepository {
@@ -117,4 +117,8 @@ impl Into<AuthTicket> for AuthJwtClaims {
         }
         .into()
     }
+}
+
+pub struct AuthNonceConfig {
+    pub nonce_expires: ExpireDuration,
 }
