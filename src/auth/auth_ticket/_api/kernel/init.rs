@@ -7,36 +7,17 @@ use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-pub use clock::ChronoAuthClock;
-pub use nonce_header::ActixWebAuthNonceHeader;
-pub use nonce_repository::{MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore};
-pub use ticket_repository::{
-    MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
-};
+use clock::ChronoAuthClock;
+use nonce_header::ActixWebAuthNonceHeader;
+use nonce_repository::MemoryAuthNonceRepository;
+use ticket_repository::MemoryAuthTicketRepository;
+
+pub use nonce_repository::{MemoryAuthNonceMap, MemoryAuthNonceStore};
+pub use ticket_repository::{MemoryAuthTicketMap, MemoryAuthTicketStore};
 
 use crate::auth::auth_ticket::_api::kernel::infra::{
-    AuthClockInfra, AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
+    AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
 };
-
-pub struct AuthClockStruct {
-    clock: ChronoAuthClock,
-}
-
-impl AuthClockStruct {
-    pub fn new() -> Self {
-        Self {
-            clock: ChronoAuthClock::new(),
-        }
-    }
-}
-
-impl AuthClockInfra for AuthClockStruct {
-    type Clock = ChronoAuthClock;
-
-    fn clock(&self) -> &Self::Clock {
-        &self.clock
-    }
-}
 
 pub struct AuthTicketStruct<'a> {
     clock: ChronoAuthClock,
@@ -115,20 +96,8 @@ pub mod test {
     };
 
     use crate::auth::auth_ticket::_api::kernel::infra::{
-        AuthClockInfra, AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
+        AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
     };
-
-    pub struct StaticAuthClockStruct {
-        pub clock: StaticChronoAuthClock,
-    }
-
-    impl AuthClockInfra for StaticAuthClockStruct {
-        type Clock = StaticChronoAuthClock;
-
-        fn clock(&self) -> &Self::Clock {
-            &self.clock
-        }
-    }
 
     pub struct StaticAuthTicketStruct<'a> {
         pub clock: StaticChronoAuthClock,

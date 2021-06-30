@@ -5,7 +5,7 @@ use crate::z_details::_api::repository::helper::register_attempt;
 use crate::auth::auth_ticket::_api::kernel::method::check_nonce;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::{AuthClock, AuthClockInfra},
+    auth_ticket::_api::kernel::infra::{AuthClock, CheckAuthNonceInfra},
     password::{
         _api::kernel::infra::{
             AuthUserPasswordRepository, RegisterResetTokenError, ResetTokenGenerator,
@@ -47,8 +47,7 @@ pub async fn request_reset_token<S>(
         .map_err(|err| post(RequestResetTokenEvent::RepositoryError(err)))?
         .ok_or_else(|| post(messenger.encode_destination_not_found().into()))?;
 
-    let clock_infra = infra.clock_infra();
-    let clock = clock_infra.clock();
+    let clock = infra.check_nonce_infra().clock();
     let token_encoder = infra.token_encoder();
     let token_notifier = infra.token_notifier();
     let config = infra.config();

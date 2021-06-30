@@ -7,7 +7,6 @@ use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_api::kernel::init::AuthClockStruct;
 use crate::auth::{
     auth_ticket::_api::kernel::init::CheckAuthNonceStruct,
     password::_api::kernel::init::{MemoryAuthUserPasswordRepository, UuidResetTokenGenerator},
@@ -24,7 +23,6 @@ use super::infra::{RequestResetTokenConfig, RequestResetTokenInfra};
 
 pub struct RequestResetTokenStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
-    clock_infra: AuthClockStruct,
     destination_repository: MemoryResetTokenDestinationRepository<'a>,
     password_repository: MemoryAuthUserPasswordRepository<'a>,
     token_generator: UuidResetTokenGenerator,
@@ -38,7 +36,6 @@ impl<'a> RequestResetTokenStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest, body: String) -> Self {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, request),
-            clock_infra: AuthClockStruct::new(),
             destination_repository: MemoryResetTokenDestinationRepository::new(
                 &feature.store.reset_token_destination,
             ),
@@ -58,7 +55,6 @@ impl<'a> RequestResetTokenStruct<'a> {
 
 impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
-    type ClockInfra = AuthClockStruct;
     type DestinationRepository = MemoryResetTokenDestinationRepository<'a>;
     type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
     type TokenGenerator = UuidResetTokenGenerator;
@@ -68,9 +64,6 @@ impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
         &self.check_nonce_infra
-    }
-    fn clock_infra(&self) -> &Self::ClockInfra {
-        &self.clock_infra
     }
     fn destination_repository(&self) -> &Self::DestinationRepository {
         &self.destination_repository
@@ -104,7 +97,6 @@ pub mod test {
     pub use super::messenger::test::StaticRequestResetTokenMessenger;
     pub use super::token_encoder::test::StaticResetTokenEncoder;
     pub use super::token_notifier::test::StaticResetTokenNotifier;
-    use crate::auth::auth_ticket::_api::kernel::init::test::StaticAuthClockStruct;
     use crate::auth::{
         auth_ticket::_api::kernel::init::test::StaticCheckAuthNonceStruct,
         password::_api::kernel::init::test::{
@@ -116,7 +108,6 @@ pub mod test {
 
     pub struct StaticRequestResetTokenStruct<'a> {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
-        pub clock_infra: StaticAuthClockStruct,
         pub destination_repository: MemoryResetTokenDestinationRepository<'a>,
         pub password_repository: MemoryAuthUserPasswordRepository<'a>,
         pub token_generator: StaticResetTokenGenerator,
@@ -128,7 +119,6 @@ pub mod test {
 
     impl<'a> RequestResetTokenInfra for StaticRequestResetTokenStruct<'a> {
         type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
-        type ClockInfra = StaticAuthClockStruct;
         type DestinationRepository = MemoryResetTokenDestinationRepository<'a>;
         type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
         type TokenGenerator = StaticResetTokenGenerator;
@@ -138,9 +128,6 @@ pub mod test {
 
         fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
             &self.check_nonce_infra
-        }
-        fn clock_infra(&self) -> &Self::ClockInfra {
-            &self.clock_infra
         }
         fn destination_repository(&self) -> &Self::DestinationRepository {
             &self.destination_repository

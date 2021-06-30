@@ -4,8 +4,8 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     auth_ticket::_api::kernel::init::test::{
-        MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore, StaticAuthClockStruct,
-        StaticAuthNonceHeader, StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+        MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore, StaticAuthNonceHeader,
+        StaticCheckAuthNonceStruct, StaticChronoAuthClock,
     },
     password::{
         _api::kernel::init::test::{
@@ -224,9 +224,6 @@ impl<'a> TestFeature<'a> {
                     clock: standard_clock(),
                     nonce_header: standard_nonce_header(),
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
-                },
-                clock_infra: StaticAuthClockStruct {
-                    clock: standard_clock(),
                 },
                 destination_repository: MemoryResetTokenDestinationRepository::new(
                     &store.destination,

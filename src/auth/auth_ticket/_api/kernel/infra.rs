@@ -11,12 +11,6 @@ use crate::z_details::_api::{
     request::data::HeaderError,
 };
 
-pub trait AuthClockInfra {
-    type Clock: AuthClock;
-
-    fn clock(&self) -> &Self::Clock;
-}
-
 pub trait AuthTicketInfra {
     type Clock: AuthClock;
     type TicketRepository: AuthTicketRepository;
