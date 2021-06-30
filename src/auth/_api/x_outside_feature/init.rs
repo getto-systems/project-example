@@ -5,6 +5,7 @@ use chrono::Duration;
 use aws_cloudfront_cookie::CloudfrontKey;
 use rusoto_core::Region;
 use rusoto_dynamodb::DynamoDbClient;
+use rusoto_ses::SesClient;
 
 use crate::z_details::_api::jwt::helper::{decoding_key_from_ec_pem, encoding_key_from_ec_pem};
 
@@ -92,6 +93,7 @@ pub fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
             },
         },
         email: AuthOutsideEmail {
+            ses_ap_northeast1: SesClient::new(Region::ApNortheast1),
             ui_host: &env.ui_host,
         },
     }

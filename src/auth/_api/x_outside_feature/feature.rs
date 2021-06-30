@@ -1,6 +1,7 @@
 use aws_cloudfront_cookie::CloudfrontKey;
 use jsonwebtoken::{DecodingKey, EncodingKey};
 use rusoto_dynamodb::DynamoDbClient;
+use rusoto_ses::SesClient;
 
 use crate::auth::{
     auth_ticket::_api::kernel::init::MemoryAuthTicketStore,
@@ -54,5 +55,6 @@ pub struct AuthOutsideCdnSecret {
     pub key: CloudfrontKey,
 }
 pub struct AuthOutsideEmail {
+    pub ses_ap_northeast1: SesClient,
     pub ui_host: &'static str,
 }
