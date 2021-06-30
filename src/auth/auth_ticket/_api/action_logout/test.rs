@@ -28,8 +28,8 @@ use crate::auth::auth_ticket::_api::kernel::data::{
 };
 use crate::auth::auth_user::_api::kernel::data::RequireAuthRoles;
 
-#[test]
-fn success_logout() {
+#[tokio::test]
+async fn success_logout() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -38,7 +38,7 @@ fn success_logout() {
     let mut action = LogoutAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "discard success",
@@ -46,8 +46,8 @@ fn success_logout() {
     assert!(result.is_ok());
 }
 
-#[test]
-fn success_expired_nonce() {
+#[tokio::test]
+async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
@@ -56,7 +56,7 @@ fn success_expired_nonce() {
     let mut action = LogoutAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "discard success",
@@ -64,8 +64,8 @@ fn success_expired_nonce() {
     assert!(result.is_ok());
 }
 
-#[test]
-fn success_limited_ticket() {
+#[tokio::test]
+async fn success_limited_ticket() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::limited_ticket();
@@ -74,7 +74,7 @@ fn success_limited_ticket() {
     let mut action = LogoutAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "discard success",
@@ -82,8 +82,8 @@ fn success_limited_ticket() {
     assert!(result.is_ok());
 }
 
-#[test]
-fn error_conflict_nonce() {
+#[tokio::test]
+async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
@@ -92,13 +92,13 @@ fn error_conflict_nonce() {
     let mut action = LogoutAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["validate error; auth nonce error: conflict"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_no_ticket() {
+#[tokio::test]
+async fn error_no_ticket() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::no_ticket();
@@ -107,7 +107,7 @@ fn error_no_ticket() {
     let mut action = LogoutAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "discard success",

@@ -48,13 +48,14 @@ impl<M: LogoutMaterial> LogoutAction<M> {
         self.pubsub.subscribe(handler);
     }
 
-    pub fn ignite(self) -> MethodResult<LogoutState> {
+    pub async fn ignite(self) -> MethodResult<LogoutState> {
         let pubsub = self.pubsub;
         let m = self.material;
 
         let ticket = validate_auth_token(m.validate(), |event| {
             pubsub.post(LogoutState::Validate(event))
-        })?;
+        })
+        .await?;
 
         discard_auth_ticket(m.discard(), ticket, |event| {
             pubsub.post(LogoutState::Discard(event))

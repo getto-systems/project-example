@@ -21,7 +21,7 @@ async fn renew(data: AppData, request: HttpRequest) -> impl Responder {
     let logger = app_logger(&request);
     let mut action = RenewAuthTicketAction::new(&data.auth, &request);
     action.subscribe(move |state| logger.log(state.log_level(), state));
-    flatten(action.ignite()).respond_to(&request)
+    flatten(action.ignite().await).respond_to(&request)
 }
 
 #[delete("")]
@@ -29,5 +29,5 @@ async fn logout(data: AppData, request: HttpRequest) -> impl Responder {
     let logger = app_logger(&request);
     let mut action = LogoutAction::new(&data.auth, &request);
     action.subscribe(move |state| logger.log(state.log_level(), state));
-    flatten(action.ignite()).respond_to(&request)
+    flatten(action.ignite().await).respond_to(&request)
 }

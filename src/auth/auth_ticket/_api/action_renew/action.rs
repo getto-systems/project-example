@@ -48,13 +48,13 @@ impl<M: RenewAuthTicketMaterial> RenewAuthTicketAction<M> {
         self.pubsub.subscribe(handler);
     }
 
-    pub fn ignite(self) -> MethodResult<RenewAuthTicketState> {
+    pub async fn ignite(self) -> MethodResult<RenewAuthTicketState> {
         let pubsub = self.pubsub;
         let m = self.material;
 
         let ticket = validate_auth_token(m.validate(), |event| {
             pubsub.post(RenewAuthTicketState::Validate(event))
-        })?;
+        }).await?;
 
         encode_auth_ticket(m.encode(), ticket, |event| {
             pubsub.post(RenewAuthTicketState::Encode(event))

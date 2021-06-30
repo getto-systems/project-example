@@ -22,5 +22,5 @@ async fn authenticate(data: AppData, request: HttpRequest, body: String) -> impl
     let logger = app_logger(&request);
     let mut action = AuthenticatePasswordAction::new(&data.auth, &request, body);
     action.subscribe(move |state| logger.log(state.log_level(), state));
-    flatten(action.ignite()).respond_to(&request)
+    flatten(action.ignite().await).respond_to(&request)
 }

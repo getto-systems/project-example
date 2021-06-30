@@ -30,6 +30,7 @@ pub async fn request_reset_token<S>(
     post: impl Fn(RequestResetTokenEvent) -> S,
 ) -> MethodResult<S> {
     check_nonce(infra.check_nonce_infra())
+        .await
         .map_err(|err| post(RequestResetTokenEvent::NonceError(err)))?;
 
     let destination_repository = infra.destination_repository();

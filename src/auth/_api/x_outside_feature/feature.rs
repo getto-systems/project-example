@@ -1,8 +1,9 @@
 use aws_cloudfront_cookie::CloudfrontKey;
 use jsonwebtoken::{DecodingKey, EncodingKey};
+use rusoto_dynamodb::DynamoDbClient;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::init::{MemoryAuthNonceStore, MemoryAuthTicketStore},
+    auth_ticket::_api::kernel::init::MemoryAuthTicketStore,
     auth_user::_api::kernel::init::MemoryAuthUserStore,
     password::{
         _api::kernel::init::MemoryAuthUserPasswordStore,
@@ -27,7 +28,8 @@ pub struct AuthOutsideConfig {
     pub reset_token_expires: ExpireDuration,
 }
 pub struct AuthOutsideStore {
-    pub nonce: MemoryAuthNonceStore,
+    pub dynamodb_ap_northeast1: DynamoDbClient,
+    pub nonce_table_name: &'static str,
     pub ticket: MemoryAuthTicketStore,
     pub user: MemoryAuthUserStore,
     pub user_password: MemoryAuthUserPasswordStore,

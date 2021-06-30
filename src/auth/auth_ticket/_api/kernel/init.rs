@@ -9,10 +9,9 @@ use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use clock::ChronoAuthClock;
 use nonce_header::ActixWebAuthNonceHeader;
-use nonce_repository::MemoryAuthNonceRepository;
+use nonce_repository::DynamoDbAuthNonceRepository;
 use ticket_repository::MemoryAuthTicketRepository;
 
-pub use nonce_repository::{MemoryAuthNonceMap, MemoryAuthNonceStore};
 pub use ticket_repository::{MemoryAuthTicketMap, MemoryAuthTicketStore};
 
 use crate::auth::auth_ticket::_api::kernel::infra::{
@@ -49,13 +48,13 @@ pub struct CheckAuthNonceStruct<'a> {
     config: AuthNonceConfig,
     clock: ChronoAuthClock,
     nonce_header: ActixWebAuthNonceHeader<'a>,
-    nonce_repository: MemoryAuthNonceRepository<'a>,
+    nonce_repository: DynamoDbAuthNonceRepository<'a>,
 }
 
 impl<'a> CheckAuthNonceInfra for CheckAuthNonceStruct<'a> {
     type Clock = ChronoAuthClock;
     type NonceHeader = ActixWebAuthNonceHeader<'a>;
-    type NonceRepository = MemoryAuthNonceRepository<'a>;
+    type NonceRepository = DynamoDbAuthNonceRepository<'a>;
 
     fn config(&self) -> &AuthNonceConfig {
         &self.config
@@ -79,7 +78,10 @@ impl<'a> CheckAuthNonceStruct<'a> {
             },
             clock: ChronoAuthClock::new(),
             nonce_header: ActixWebAuthNonceHeader::new(request),
-            nonce_repository: MemoryAuthNonceRepository::new(&feature.store.nonce),
+            nonce_repository: DynamoDbAuthNonceRepository::new(
+                &feature.store.dynamodb_ap_northeast1,
+                feature.store.nonce_table_name,
+            ),
         }
     }
 }

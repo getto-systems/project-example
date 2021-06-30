@@ -12,11 +12,12 @@ use super::event::AuthenticatePasswordEvent;
 
 use crate::auth::{auth_user::_api::kernel::data::AuthUser, login_id::_api::data::LoginId};
 
-pub fn authenticate_password<S>(
+pub async fn authenticate_password<S>(
     infra: &impl AuthenticatePasswordInfra,
     post: impl Fn(AuthenticatePasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
     check_nonce(infra.check_nonce_infra())
+        .await
         .map_err(|err| post(AuthenticatePasswordEvent::NonceError(err)))?;
 
     let password_infra = infra.password_infra();

@@ -34,7 +34,7 @@ pub mod test {
 
     pub enum StaticAuthNonceHeader {
         Valid(AuthNonceValue),
-        NotFound,
+        NotFound, // TODO このテストを追加する必要がある
     }
 
     impl AuthNonceHeader for StaticAuthNonceHeader {

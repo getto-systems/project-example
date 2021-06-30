@@ -50,8 +50,8 @@ use crate::auth::{
     password::_api::kernel::data::ResetToken,
 };
 
-#[test]
-fn success_request_token() {
+#[tokio::test]
+async fn success_request_token() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -60,7 +60,7 @@ fn success_request_token() {
     let mut action = ResetPasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec![
         "reset password success; user: user-id (granted: [])",
         "issue success; ticket: ticket-id / user: user-id (granted: [])",
@@ -70,8 +70,8 @@ fn success_request_token() {
     assert!(result.is_ok());
 }
 
-#[test]
-fn success_expired_nonce() {
+#[tokio::test]
+async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
@@ -80,7 +80,7 @@ fn success_expired_nonce() {
     let mut action = ResetPasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec![
         "reset password success; user: user-id (granted: [])",
         "issue success; ticket: ticket-id / user: user-id (granted: [])",
@@ -90,8 +90,8 @@ fn success_expired_nonce() {
     assert!(result.is_ok());
 }
 
-#[test]
-fn error_conflict_nonce() {
+#[tokio::test]
+async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
@@ -100,13 +100,13 @@ fn error_conflict_nonce() {
     let mut action = ResetPasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["reset password error; auth nonce error: conflict"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_match_failed_login_id() {
+#[tokio::test]
+async fn error_match_failed_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -115,13 +115,13 @@ fn error_match_failed_login_id() {
     let mut action = ResetPasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["reset password error; invalid login id"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_empty_login_id() {
+#[tokio::test]
+async fn error_empty_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -130,13 +130,13 @@ fn error_empty_login_id() {
     let mut action = ResetPasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["reset password error; empty login id"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_too_long_login_id() {
+#[tokio::test]
+async fn error_too_long_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -145,13 +145,13 @@ fn error_too_long_login_id() {
     let mut action = ResetPasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["reset password error; too long login id"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn just_max_length_login_id() {
+#[tokio::test]
+async fn just_max_length_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -160,13 +160,13 @@ fn just_max_length_login_id() {
     let mut action = ResetPasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["reset password error; invalid login id"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_empty_password() {
+#[tokio::test]
+async fn error_empty_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -175,13 +175,13 @@ fn error_empty_password() {
     let mut action = ResetPasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["reset password error; empty password"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_too_long_password() {
+#[tokio::test]
+async fn error_too_long_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -190,13 +190,13 @@ fn error_too_long_password() {
     let mut action = ResetPasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["reset password error; too long password"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn just_max_length_password() {
+#[tokio::test]
+async fn just_max_length_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -205,7 +205,7 @@ fn just_max_length_password() {
     let mut action = ResetPasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec![
         "reset password success; user: user-id (granted: [])",
         "issue success; ticket: ticket-id / user: user-id (granted: [])",
@@ -215,8 +215,8 @@ fn just_max_length_password() {
     assert!(result.is_ok());
 }
 
-#[test]
-fn error_empty_reset_token() {
+#[tokio::test]
+async fn error_empty_reset_token() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -225,13 +225,13 @@ fn error_empty_reset_token() {
     let mut action = ResetPasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["reset password error; empty reset token"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_reset_token_expired_when_decode() {
+#[tokio::test]
+async fn error_reset_token_expired_when_decode() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
@@ -240,13 +240,13 @@ fn error_reset_token_expired_when_decode() {
     let mut action = ResetPasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["reset password error; reset token expired"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_reset_token_expired_in_store() {
+#[tokio::test]
+async fn error_reset_token_expired_in_store() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_reset_token();
@@ -255,13 +255,13 @@ fn error_reset_token_expired_in_store() {
     let mut action = ResetPasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["reset password error; reset token expired"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_reset_token_discarded() {
+#[tokio::test]
+async fn error_reset_token_discarded() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::discarded_reset_token();
@@ -270,13 +270,13 @@ fn error_reset_token_discarded() {
     let mut action = ResetPasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["reset password error; already reset"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_password_not_stored() {
+#[tokio::test]
+async fn error_password_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::password_not_stored();
@@ -285,13 +285,13 @@ fn error_password_not_stored() {
     let mut action = ResetPasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["reset password error; reset token not found"]);
     assert!(!result.is_ok());
 }
 
-#[test]
-fn error_user_not_stored() {
+#[tokio::test]
+async fn error_user_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::user_not_stored();
@@ -300,7 +300,7 @@ fn error_user_not_stored() {
     let mut action = ResetPasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite();
+    let result = action.ignite().await;
     assert_state(vec!["reset password error; user not found"]);
     assert!(!result.is_ok());
 }
