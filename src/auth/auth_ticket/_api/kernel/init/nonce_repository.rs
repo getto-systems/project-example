@@ -27,18 +27,12 @@ const PUT_CONDITION_EXPRESSION: &'static str = "attribute_not_exists(nonce)";
 #[async_trait::async_trait]
 impl<'a> AuthNonceRepository for DynamoDbAuthNonceRepository<'a> {
     async fn get(&self, nonce: &AuthNonceValue) -> Result<Option<AuthNonceEntry>, RepositoryError> {
-        let mut key: HashMap<String, AttributeValue> = HashMap::new();
-        key.insert(
-            NONCE.into(),
-            AttributeValue {
-                s: Some(nonce.as_str().into()),
-                ..Default::default()
-            },
-        );
+        let mut key = AttributeMap::new();
+        key.insert_nonce(nonce.as_str().into());
 
         let input = GetItemInput {
             table_name: self.table_name.into(),
-            key,
+            key: key.extract(),
             attributes_to_get: Some(vec![EXPIRES.into()]),
             ..Default::default()
         };
@@ -62,28 +56,14 @@ impl<'a> AuthNonceRepository for DynamoDbAuthNonceRepository<'a> {
     async fn put(&self, entry: AuthNonceEntry) -> Result<(), RepositoryError> {
         let extract = entry.extract();
 
-        let mut item: HashMap<String, AttributeValue> = HashMap::new();
-        item.insert(
-            NONCE.into(),
-            AttributeValue {
-                s: Some(extract.nonce),
-                ..Default::default()
-            },
-        );
-        if let Some(expires) = extract.expires {
-            item.insert(
-                EXPIRES.into(),
-                AttributeValue {
-                    n: Some(expires.to_string()),
-                    ..Default::default()
-                },
-            );
-        }
+        let mut item = AttributeMap::new();
+        item.insert_nonce(extract.nonce);
+        item.insert_expires(extract.expires);
 
         let input = PutItemInput {
             table_name: self.table_name.into(),
             condition_expression: Some(PUT_CONDITION_EXPRESSION.into()),
-            item,
+            item: item.extract(),
             ..Default::default()
         };
 
@@ -93,6 +73,41 @@ impl<'a> AuthNonceRepository for DynamoDbAuthNonceRepository<'a> {
             .map_err(|err| RepositoryError::InfraError(format!("{}", err)))?;
 
         Ok(())
+    }
+}
+
+struct AttributeMap(HashMap<String, AttributeValue>);
+
+impl AttributeMap {
+    fn new() -> Self {
+        Self(HashMap::new())
+    }
+
+    fn extract(self) -> HashMap<String, AttributeValue> {
+        self.0
+    }
+
+    fn insert_nonce(&mut self, nonce: String) -> &mut Self {
+        self.0.insert(
+            NONCE.into(),
+            AttributeValue {
+                s: Some(nonce),
+                ..Default::default()
+            },
+        );
+        self
+    }
+    fn insert_expires(&mut self, expires: Option<i64>) -> &mut Self {
+        if let Some(expires) = expires {
+            self.0.insert(
+                EXPIRES.into(),
+                AttributeValue {
+                    n: Some(expires.to_string()),
+                    ..Default::default()
+                },
+            );
+        }
+        self
     }
 }
 
