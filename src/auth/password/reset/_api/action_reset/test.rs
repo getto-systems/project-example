@@ -486,13 +486,15 @@ impl<'a> TestFeature<'a> {
                 config: standard_issue_config(),
             },
             encode: StaticEncodeAuthTicketStruct {
-                config: standard_encode_config(),
-                clock: standard_clock(),
-                ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
+                ticket_infra: StaticAuthTicketStruct {
+                    clock: standard_clock(),
+                    ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
+                },
                 ticket_encoder: StaticAuthTokenEncoder::new(),
                 api_encoder: StaticAuthTokenEncoder::new(),
                 cdn_encoder: StaticAuthTokenEncoder::new(),
                 messenger: StaticEncodeMessenger::new(),
+                config: standard_encode_config(),
             },
         }
     }

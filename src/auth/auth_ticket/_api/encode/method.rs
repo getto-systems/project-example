@@ -7,6 +7,7 @@ use super::event::EncodeAuthTicketEvent;
 
 use super::super::kernel::data::{AuthTicket, ExpansionLimitDateTime};
 use super::data::{AuthTokenEncoded, AuthTokenExpires};
+use crate::auth::auth_ticket::_api::kernel::infra::AuthTicketInfra;
 use crate::z_details::_api::repository::data::RepositoryError;
 
 pub fn encode_auth_ticket<S>(
@@ -51,15 +52,17 @@ fn fetch_expansion_limit(
     infra: &impl EncodeAuthTicketInfra,
     ticket: &AuthTicket,
 ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError> {
-    let ticket_repository = infra.ticket_repository();
+    let ticket_infra = infra.ticket_infra();
+    let ticket_repository = ticket_infra.ticket_repository();
     ticket_repository.expansion_limit(&ticket)
 }
 fn calc_expires(
     infra: &impl EncodeAuthTicketInfra,
     limit: ExpansionLimitDateTime,
 ) -> AuthTokenExpires {
+    let ticket_infra = infra.ticket_infra();
+    let clock = ticket_infra.clock();
     let config = infra.config();
-    let clock = infra.clock();
 
     AuthTokenExpires {
         ticket: clock
