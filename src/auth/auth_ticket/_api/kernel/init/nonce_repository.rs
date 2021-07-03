@@ -1,13 +1,13 @@
 use std::collections::HashMap;
+use std::fmt::Display;
 
-use rusoto_dynamodb::{AttributeValue, DynamoDb, DynamoDbClient, GetItemInput, PutItemInput};
+use rusoto_core::RusotoError;
+use rusoto_dynamodb::{AttributeValue, DynamoDb, DynamoDbClient, PutItemError, PutItemInput};
 
-use crate::auth::auth_ticket::_api::kernel::infra::{
-    AuthNonceEntry, AuthNonceEntryExtract, AuthNonceRepository,
-};
+use crate::auth::auth_ticket::_api::kernel::data::AuthDateTime;
+use crate::auth::auth_ticket::_api::kernel::infra::{AuthNonceEntry, AuthNonceRepository};
 
-use crate::auth::auth_ticket::_api::kernel::data::AuthNonceValue;
-use crate::z_details::_api::repository::data::RepositoryError;
+use crate::z_details::_api::repository::data::{RegisterAttemptResult, RepositoryError};
 
 pub struct DynamoDbAuthNonceRepository<'a> {
     client: &'a DynamoDbClient,
@@ -22,44 +22,24 @@ impl<'a> DynamoDbAuthNonceRepository<'a> {
 
 const NONCE: &'static str = "nonce";
 const EXPIRES: &'static str = "expires";
+const REGISTERED_AT: &'static str = "registered_at";
 const PUT_CONDITION_EXPRESSION: &'static str = "attribute_not_exists(nonce)";
 
 #[async_trait::async_trait]
 impl<'a> AuthNonceRepository for DynamoDbAuthNonceRepository<'a> {
-    async fn get(&self, nonce: &AuthNonceValue) -> Result<Option<AuthNonceEntry>, RepositoryError> {
-        let mut key = AttributeMap::new();
-        key.insert_nonce(nonce.as_str().into());
-
-        let input = GetItemInput {
-            table_name: self.table_name.into(),
-            key: key.extract(),
-            attributes_to_get: Some(vec![EXPIRES.into()]),
-            ..Default::default()
-        };
-
-        let output = self
-            .client
-            .get_item(input)
-            .await
-            .map_err(|err| RepositoryError::InfraError(format!("{}", err)))?;
-
-        Ok(output.item.map(|mut value| {
-            AuthNonceEntryExtract {
-                nonce: nonce.as_str().into(),
-                expires: value
-                    .remove(EXPIRES)
-                    .and_then(|value| value.n.and_then(|value| value.parse::<i64>().ok())),
-            }
-            .into()
-        }))
-    }
-    async fn put(&self, entry: AuthNonceEntry) -> Result<(), RepositoryError> {
+    async fn put(
+        &self,
+        entry: AuthNonceEntry,
+        registered_at: &AuthDateTime,
+    ) -> Result<RegisterAttemptResult<()>, RepositoryError> {
         let extract = entry.extract();
 
         let mut item = AttributeMap::new();
         item.insert_nonce(extract.nonce);
         item.insert_expires(extract.expires);
+        item.insert_registered_at(registered_at);
 
+        // 有効期限が切れた項目は dynamodb の TTL の設定によって削除される
         let input = PutItemInput {
             table_name: self.table_name.into(),
             condition_expression: Some(PUT_CONDITION_EXPRESSION.into()),
@@ -67,13 +47,21 @@ impl<'a> AuthNonceRepository for DynamoDbAuthNonceRepository<'a> {
             ..Default::default()
         };
 
-        self.client
-            .put_item(input)
-            .await
-            .map_err(|err| RepositoryError::InfraError(format!("{}", err)))?;
-
-        Ok(())
+        match self.client.put_item(input).await {
+            Ok(_) => Ok(RegisterAttemptResult::Success(())),
+            Err(err) => match err {
+                RusotoError::Service(err) => match err {
+                    PutItemError::ConditionalCheckFailed(_) => Ok(RegisterAttemptResult::Conflict),
+                    _ => Err(repository_error(err)),
+                },
+                _ => Err(repository_error(err)),
+            },
+        }
     }
+}
+
+fn repository_error(err: impl Display) -> RepositoryError {
+    RepositoryError::InfraError(format!("{}", err))
 }
 
 struct AttributeMap(HashMap<String, AttributeValue>);
@@ -88,26 +76,34 @@ impl AttributeMap {
     }
 
     fn insert_nonce(&mut self, nonce: String) -> &mut Self {
-        self.0.insert(
-            NONCE.into(),
-            AttributeValue {
-                s: Some(nonce),
-                ..Default::default()
-            },
-        );
+        self.0.insert(NONCE.into(), string_value(nonce));
         self
     }
     fn insert_expires(&mut self, expires: Option<i64>) -> &mut Self {
         if let Some(expires) = expires {
-            self.0.insert(
-                EXPIRES.into(),
-                AttributeValue {
-                    n: Some(expires.to_string()),
-                    ..Default::default()
-                },
-            );
+            self.0.insert(EXPIRES.into(), timestamp_value(expires));
         }
         self
+    }
+    fn insert_registered_at(&mut self, registered_at: &AuthDateTime) -> &mut Self {
+        self.0.insert(
+            REGISTERED_AT.into(),
+            timestamp_value(registered_at.timestamp()),
+        );
+        self
+    }
+}
+
+fn string_value(value: String) -> AttributeValue {
+    AttributeValue {
+        s: Some(value),
+        ..Default::default()
+    }
+}
+fn timestamp_value(value: i64) -> AttributeValue {
+    AttributeValue {
+        n: Some(value.to_string()),
+        ..Default::default()
     }
 }
 
@@ -119,8 +115,10 @@ pub mod test {
         AuthNonceEntry, AuthNonceEntryExtract, AuthNonceRepository,
     };
 
-    use crate::auth::auth_ticket::_api::kernel::data::{AuthNonceValue, ExpireDateTime};
-    use crate::z_details::_api::repository::data::RepositoryError;
+    use crate::auth::auth_ticket::_api::kernel::data::{
+        AuthDateTime, AuthNonceValue, ExpireDateTime,
+    };
+    use crate::z_details::_api::repository::data::{RegisterAttemptResult, RepositoryError};
 
     pub type MemoryAuthNonceStore = Mutex<MemoryAuthNonceMap>;
     pub struct MemoryAuthNonceMap(HashMap<String, AuthNonceEntryExtract>);
@@ -167,17 +165,28 @@ pub mod test {
 
     #[async_trait::async_trait]
     impl<'a> AuthNonceRepository for MemoryAuthNonceRepository<'a> {
-        async fn get(
+        async fn put(
             &self,
-            nonce: &AuthNonceValue,
-        ) -> Result<Option<AuthNonceEntry>, RepositoryError> {
-            let store = self.store.lock().unwrap();
-            Ok(store.get(nonce).map(|entry| entry.clone().into()))
-        }
-        async fn put(&self, entry: AuthNonceEntry) -> Result<(), RepositoryError> {
+            entry: AuthNonceEntry,
+            registered_at: &AuthDateTime,
+        ) -> Result<RegisterAttemptResult<()>, RepositoryError> {
             let mut store = self.store.lock().unwrap();
+
+            if let Some(found) = store.get(entry.nonce()) {
+                if !has_expired(found.expires, registered_at) {
+                    return Ok(RegisterAttemptResult::Conflict);
+                }
+            }
+
             store.insert(entry);
-            Ok(())
+            Ok(RegisterAttemptResult::Success(()))
+        }
+    }
+
+    fn has_expired(expires: Option<i64>, now: &AuthDateTime) -> bool {
+        match expires {
+            None => false,
+            Some(expires) => ExpireDateTime::restore(expires).has_elapsed(now),
         }
     }
 }

@@ -60,8 +60,11 @@ pub trait AuthTicketRepository {
 
 #[async_trait::async_trait]
 pub trait AuthNonceRepository {
-    async fn get(&self, nonce: &AuthNonceValue) -> Result<Option<AuthNonceEntry>, RepositoryError>;
-    async fn put(&self, nonce: AuthNonceEntry) -> Result<(), RepositoryError>;
+    async fn put(
+        &self,
+        nonce: AuthNonceEntry,
+        registered_at: &AuthDateTime,
+    ) -> Result<RegisterAttemptResult<()>, RepositoryError>;
 }
 
 pub struct AuthNonceEntry {
@@ -77,17 +80,15 @@ impl AuthNonceEntry {
         }
     }
 
+    #[cfg(test)]
+    pub fn nonce(&self) -> &AuthNonceValue {
+        &self.nonce
+    }
+
     pub fn extract(self) -> AuthNonceEntryExtract {
         AuthNonceEntryExtract {
             nonce: self.nonce.extract(),
             expires: self.expires.map(|expires| expires.timestamp()),
-        }
-    }
-
-    pub fn has_expired(&self, now: &AuthDateTime) -> bool {
-        match self.expires {
-            None => false, // parse に失敗; この場合、nonce は常に有効と判定される
-            Some(ref expires) => expires.has_elapsed(now),
         }
     }
 }
