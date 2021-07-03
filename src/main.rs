@@ -32,7 +32,7 @@ async fn main() -> io::Result<()> {
             .wrap(cors)
             .app_data(data.clone())
             .service(root::index)
-            .service(demo::dynamodb)
+            .service(demo::mysql_select)
             .service(scope_auth())
     })
     .bind(format!("0.0.0.0:{}", &ENV.port))?
@@ -52,50 +52,42 @@ mod root {
 }
 
 mod demo {
-    use std::collections::HashMap;
+    use std::{env::var, path::Path};
 
     use actix_web::{get, Responder};
-    use rusoto_core::Region;
-    use rusoto_dynamodb::{AttributeValue, DynamoDb, DynamoDbClient, PutItemInput};
+    use mysql::{prelude::Queryable, OptsBuilder, Pool, SslOpts};
 
-    #[get("/dynamodb")]
-    async fn dynamodb() -> impl Responder {
-        match list_tables().await {
+    #[get("/mysql")]
+    async fn mysql_select() -> impl Responder {
+        match select().await {
             Ok(response) => response,
             Err(err) => err,
         }
     }
 
-    async fn list_tables() -> Result<String, String> {
-        let client = DynamoDbClient::new(Region::ApNortheast1);
-        let mut item: HashMap<String, AttributeValue> = HashMap::new();
-        item.insert(
-            "nonce".into(),
-            AttributeValue {
-                s: Some("NONCE".into()),
-                ..Default::default()
-            },
-        );
-        item.insert(
-            "expires".into(),
-            AttributeValue {
-                s: Some("EXPIRES".into()),
-                ..Default::default()
-            },
-        );
+    async fn select() -> Result<String, String> {
+        let ssl_opts = SslOpts::default()
+            .with_pkcs12_path(Some(Path::new("./.secret/mysql-auth-key.p12")))
+            .with_password(Some("password"));
 
-        let input = PutItemInput {
-            condition_expression: Some("attribute_not_exists(nonce)".into()),
-            item,
-            table_name: "dev-getto-example-auth-nonce".into(),
-            ..Default::default()
-        };
+        let opts = OptsBuilder::new()
+            .ip_or_hostname(Some(load("MYSQL_SERVER_IP")))
+            .db_name(Some(load("MYSQL_AUTH_DATABASE")))
+            .user(Some(load("MYSQL_AUTH_USER")))
+            .pass(Some(load("MYSQL_AUTH_PASSWORD")))
+            .ssl_opts(ssl_opts);
 
-        client
-            .put_item(input)
-            .await
-            .map_err(|err| format!("{}", err))?;
+        let pool = Pool::new(opts).map_err(|err| format!("{}", err))?;
+        let mut conn = pool.get_conn().expect("failed to get connection!");
+        let result: u8 = conn
+            .query_first("select 1")
+            .expect("failed to query!")
+            .expect("unexpected result!");
 
-        Ok("success: put item".into())
+        Ok(format!("success; value: {}", result))
+    }
+
+    fn load(key: &'static str) -> String {
+        var(key).expect(format!("env not specified: {}", key).as_str())
     }
 }
