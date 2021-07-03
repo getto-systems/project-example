@@ -1,3 +1,5 @@
+use crate::z_details::_api::repository::data::RegisterAttemptResult;
+
 use super::infra::{
     AuthClock, AuthNonceEntry, AuthNonceHeader, AuthNonceRepository, CheckAuthNonceInfra,
 };
@@ -14,24 +16,15 @@ pub async fn check_nonce(infra: &impl CheckAuthNonceInfra) -> Result<(), Validat
         .nonce()
         .map_err(ValidateAuthNonceError::HeaderError)?;
 
-    let entry = nonce_repository
-        .get(&nonce)
+    match nonce_repository
+        .put(
+            AuthNonceEntry::new(nonce, clock.now().expires(&config.nonce_expires)),
+            &clock.now(),
+        )
         .await
-        .map_err(ValidateAuthNonceError::RepositoryError)?;
-
-    if let Some(entry) = entry {
-        if !entry.has_expired(&clock.now()) {
-            return Err(ValidateAuthNonceError::Conflict);
-        }
+        .map_err(ValidateAuthNonceError::RepositoryError)?
+    {
+        RegisterAttemptResult::Success(_) => Ok(()),
+        RegisterAttemptResult::Conflict => Err(ValidateAuthNonceError::Conflict),
     }
-
-    nonce_repository
-        .put(AuthNonceEntry::new(
-            nonce,
-            clock.now().expires(&config.nonce_expires),
-        ))
-        .await
-        .map_err(ValidateAuthNonceError::RepositoryError)?;
-
-    Ok(())
 }

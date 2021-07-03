@@ -23,6 +23,7 @@ impl AuthNonceValue {
         self.0
     }
 
+    #[cfg(test)]
     pub fn as_str(&self) -> &str {
         self.0.as_str()
     }
@@ -153,6 +154,10 @@ pub struct AuthDateTime(DateTime<Utc>);
 impl AuthDateTime {
     pub const fn from_now(now: DateTime<Utc>) -> Self {
         Self(now)
+    }
+
+    pub fn timestamp(&self) -> i64 {
+        self.0.timestamp()
     }
 
     pub fn expires(self, duration: &ExpireDuration) -> ExpireDateTime {
