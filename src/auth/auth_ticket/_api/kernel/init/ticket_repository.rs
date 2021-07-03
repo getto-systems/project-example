@@ -1,11 +1,13 @@
 use std::{collections::HashMap, sync::Mutex};
 
+use crate::z_details::_api::repository::helper::register_conflict_error;
+
 use crate::auth::auth_ticket::_api::kernel::infra::AuthTicketRepository;
 
 use crate::auth::auth_ticket::_api::kernel::data::{
     AuthDateTime, AuthTicket, AuthTicketId, ExpansionLimitDateTime,
 };
-use crate::z_details::_api::repository::data::{RegisterAttemptResult, RepositoryError};
+use crate::z_details::_api::repository::data::RepositoryError;
 
 pub struct MemoryAuthTicketRepository<'a> {
     store: &'a MemoryAuthTicketStore,
@@ -35,7 +37,7 @@ impl MemoryAuthTicketMap {
 
     pub fn with_ticket(ticket_id: AuthTicketId, limit: ExpansionLimitDateTime) -> Self {
         let mut store = Self::new();
-        store.insert(ticket_id, Entry { limit });
+        store.ticket.insert(ticket_id.extract(), Entry { limit });
         store
     }
 
@@ -43,31 +45,32 @@ impl MemoryAuthTicketMap {
         Mutex::new(self)
     }
 
-    fn get(&self, ticket_id: &AuthTicketId) -> Option<&Entry> {
-        self.ticket.get(ticket_id.as_str())
+    fn get(&self, ticket: &AuthTicket) -> Option<&Entry> {
+        self.ticket.get(ticket.id_as_str())
     }
-    fn insert(&mut self, ticket_id: AuthTicketId, entry: Entry) {
-        self.ticket.insert(ticket_id.extract(), entry);
+    fn insert(&mut self, ticket: AuthTicket, entry: Entry) {
+        let ticket = ticket.extract();
+        self.ticket.insert(ticket.ticket_id, entry);
     }
 }
 
 impl<'a> AuthTicketRepository for MemoryAuthTicketRepository<'a> {
     fn register(
         &self,
-        ticket_id: AuthTicketId,
+        ticket: AuthTicket,
         limit: ExpansionLimitDateTime,
         _registered_at: AuthDateTime,
-    ) -> Result<RegisterAttemptResult<AuthTicketId>, RepositoryError> {
+    ) -> Result<(), RepositoryError> {
         let mut store = self.store.lock().unwrap();
 
-        if store.get(&ticket_id).is_some() {
-            return Ok(RegisterAttemptResult::Conflict);
+        if store.get(&ticket).is_some() {
+            return Err(register_conflict_error(ticket.id_as_str()));
         }
 
-        // 実際のデータベースには registered_at も保存する必要がある
-        store.insert(ticket_id.clone(), Entry { limit });
+        // 実際のデータベースには user_id と registered_at も保存する必要がある
+        store.insert(ticket, Entry { limit });
 
-        return Ok(RegisterAttemptResult::Success(ticket_id));
+        return Ok(());
     }
 
     fn discard(

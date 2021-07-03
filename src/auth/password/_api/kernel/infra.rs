@@ -6,7 +6,7 @@ use crate::auth::{
     login_id::_api::data::LoginId,
     password::_api::kernel::data::{PasswordHashError, ResetToken, ValidatePasswordError},
 };
-use crate::z_details::_api::repository::data::{RegisterAttemptResult, RepositoryError};
+use crate::z_details::_api::repository::data::RepositoryError;
 
 pub trait AuthUserPasswordInfra {
     type PasswordRepository: AuthUserPasswordRepository;
@@ -62,10 +62,10 @@ pub trait AuthUserPasswordRepository {
     fn register_reset_token(
         &self,
         reset_token: ResetToken,
-        login_id: &LoginId,
-        expires: &ExpireDateTime,
-        registered_at: &AuthDateTime,
-    ) -> Result<RegisterAttemptResult<ResetToken>, RegisterResetTokenError>;
+        login_id: LoginId,
+        expires: ExpireDateTime,
+        registered_at: AuthDateTime,
+    ) -> Result<(), RegisterResetTokenError>;
 
     fn reset_password(
         &self,
