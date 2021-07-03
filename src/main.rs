@@ -66,16 +66,12 @@ mod demo {
     }
 
     async fn select() -> Result<String, String> {
-        let ssl_opts = SslOpts::default()
-            .with_pkcs12_path(Some(Path::new("./.secret/mysql-auth-key.p12")))
-            .with_password(Some("password"));
-
         let opts = OptsBuilder::new()
-            .ip_or_hostname(Some(load("MYSQL_SERVER_IP")))
+            .ip_or_hostname(Some(load("MYSQL_SERVER")))
+            .tcp_port(load_u16("MYSQL_PORT"))
             .db_name(Some(load("MYSQL_AUTH_DATABASE")))
             .user(Some(load("MYSQL_AUTH_USER")))
-            .pass(Some(load("MYSQL_AUTH_PASSWORD")))
-            .ssl_opts(ssl_opts);
+            .pass(Some(load("MYSQL_AUTH_PASSWORD")));
 
         let pool = Pool::new(opts).map_err(|err| format!("{}", err))?;
         let mut conn = pool.get_conn().expect("failed to get connection!");
@@ -89,5 +85,8 @@ mod demo {
 
     fn load(key: &'static str) -> String {
         var(key).expect(format!("env not specified: {}", key).as_str())
+    }
+    fn load_u16(key: &'static str) -> u16 {
+        load(key).parse::<u16>().expect("u16 parse error")
     }
 }
