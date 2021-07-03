@@ -52,10 +52,10 @@ mod root {
 }
 
 mod demo {
-    use std::{env::var, path::Path};
+    use std::env::var;
 
     use actix_web::{get, Responder};
-    use mysql::{prelude::Queryable, OptsBuilder, Pool, SslOpts};
+    use mysql::{prelude::Queryable, Pool};
 
     #[get("/mysql")]
     async fn mysql_select() -> impl Responder {
@@ -66,14 +66,7 @@ mod demo {
     }
 
     async fn select() -> Result<String, String> {
-        let opts = OptsBuilder::new()
-            .ip_or_hostname(Some(load("MYSQL_SERVER")))
-            .tcp_port(load_u16("MYSQL_PORT"))
-            .db_name(Some(load("MYSQL_AUTH_DATABASE")))
-            .user(Some(load("MYSQL_AUTH_USER")))
-            .pass(Some(load("MYSQL_AUTH_PASSWORD")));
-
-        let pool = Pool::new(opts).map_err(|err| format!("{}", err))?;
+        let pool = Pool::new(load("MYSQL_AUTH_URL")).map_err(|err| format!("{}", err))?;
         let mut conn = pool.get_conn().expect("failed to get connection!");
         let result: u8 = conn
             .query_first("select 1")
@@ -85,8 +78,5 @@ mod demo {
 
     fn load(key: &'static str) -> String {
         var(key).expect(format!("env not specified: {}", key).as_str())
-    }
-    fn load_u16(key: &'static str) -> u16 {
-        load(key).parse::<u16>().expect("u16 parse error")
     }
 }
