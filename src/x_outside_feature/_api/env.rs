@@ -20,7 +20,7 @@ pub struct Env {
     pub cloudfront_private_key: String,
     pub cloudfront_key_pair_id: String,
 
-    pub auth_nonce_table_name: String,
+    pub dynamodb_auth_nonce_table: String,
 }
 
 impl Env {
@@ -45,7 +45,7 @@ impl Env {
             cloudfront_private_key: load("SECRET_CLOUDFRONT_PRIVATE_KEY"),
             cloudfront_key_pair_id: load("SECRET_CLOUDFRONT_KEY_PAIR_ID"),
 
-            auth_nonce_table_name: load("DYNAMODB_NONCE_TABLE_NAME"),
+            dynamodb_auth_nonce_table: load("DYNAMODB_AUTH_NONCE_TABLE_NAME"),
         }
     }
 }

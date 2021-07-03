@@ -53,7 +53,7 @@ pub fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
         },
         store: AuthOutsideStore {
             dynamodb_ap_northeast1: DynamoDbClient::new(Region::ApNortheast1),
-            nonce_table_name: &env.auth_nonce_table_name,
+            nonce_table_name: &env.dynamodb_auth_nonce_table,
             // TODO それぞれ外部データベースを使うように
             ticket: MemoryAuthTicketMap::new().to_store(),
             user: MemoryAuthUserMap::with_user(admin_user()).to_store(),
