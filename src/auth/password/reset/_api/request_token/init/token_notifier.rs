@@ -18,7 +18,7 @@ pub struct EmailResetTokenNotifier<'a> {
 impl<'a> EmailResetTokenNotifier<'a> {
     pub fn new(email: &'a AuthOutsideEmail) -> Self {
         Self {
-            client: &email.ses_ap_northeast1,
+            client: &email.ses,
             ui_host: &email.ui_host,
         }
     }

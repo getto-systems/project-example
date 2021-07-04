@@ -88,7 +88,7 @@ impl AttributeMap {
     fn insert_registered_at(&mut self, registered_at: AuthDateTime) -> &mut Self {
         self.0.insert(
             REGISTERED_AT.into(),
-            timestamp_value(registered_at.timestamp()),
+            timestamp_value(registered_at.extract().timestamp()),
         );
         self
     }

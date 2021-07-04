@@ -21,6 +21,7 @@ pub struct Env {
     pub cloudfront_key_pair_id: String,
 
     pub dynamodb_auth_nonce_table: String,
+    pub mysql_auth_url: String,
 }
 
 impl Env {
@@ -45,7 +46,8 @@ impl Env {
             cloudfront_private_key: load("SECRET_CLOUDFRONT_PRIVATE_KEY"),
             cloudfront_key_pair_id: load("SECRET_CLOUDFRONT_KEY_PAIR_ID"),
 
-            dynamodb_auth_nonce_table: load("DYNAMODB_AUTH_NONCE_TABLE"),
+            dynamodb_auth_nonce_table: load("SECRET_DYNAMODB_AUTH_NONCE_TABLE"),
+            mysql_auth_url: load("SECRET_MYSQL_AUTH_URL"),
         }
     }
 }

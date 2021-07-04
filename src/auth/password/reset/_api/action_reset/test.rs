@@ -482,20 +482,14 @@ impl<'a> TestFeature<'a> {
                 messenger,
             },
             issue: StaticIssueAuthTicketStruct {
-                ticket_infra: StaticAuthTicketStruct {
-                    clock: standard_clock(),
-                    ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
-                },
+                ticket_infra: standard_ticket_infra(store),
                 ticket_id_generator: StaticAuthTicketIdGenerator::new(AuthTicketId::new(
                     "ticket-id".into(),
                 )),
                 config: standard_issue_config(),
             },
             encode: StaticEncodeAuthTicketStruct {
-                ticket_infra: StaticAuthTicketStruct {
-                    clock: standard_clock(),
-                    ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
-                },
+                ticket_infra: standard_ticket_infra(store),
                 ticket_encoder: StaticAuthTokenEncoder::new(),
                 api_encoder: StaticAuthTokenEncoder::new(),
                 cdn_encoder: StaticAuthTokenEncoder::new(),
@@ -503,6 +497,13 @@ impl<'a> TestFeature<'a> {
                 config: standard_encode_config(),
             },
         }
+    }
+}
+
+fn standard_ticket_infra<'a>(store: &'a TestStore) -> StaticAuthTicketStruct<'a> {
+    StaticAuthTicketStruct {
+        clock: standard_clock(),
+        ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
     }
 }
 

@@ -270,13 +270,13 @@ impl<'a> TestFeature<'a> {
                     nonce_header: standard_nonce_header(),
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
-                ticket_infra: ticket_infra(store),
+                ticket_infra: standard_ticket_infra(store),
                 config: ValidateAuthTokenConfig { require_roles },
                 token_header: standard_token_header(),
                 token_validator,
             },
             encode: StaticEncodeAuthTicketStruct {
-                ticket_infra: ticket_infra(store),
+                ticket_infra: standard_ticket_infra(store),
                 ticket_encoder: StaticAuthTokenEncoder::new(),
                 api_encoder: StaticAuthTokenEncoder::new(),
                 cdn_encoder: StaticAuthTokenEncoder::new(),
@@ -287,7 +287,7 @@ impl<'a> TestFeature<'a> {
     }
 }
 
-fn ticket_infra<'a>(store: &'a TestStore) -> StaticAuthTicketStruct<'a> {
+fn standard_ticket_infra<'a>(store: &'a TestStore) -> StaticAuthTicketStruct<'a> {
     StaticAuthTicketStruct {
         clock: standard_clock(),
         ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
