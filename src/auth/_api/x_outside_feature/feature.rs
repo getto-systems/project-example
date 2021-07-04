@@ -5,8 +5,6 @@ use rusoto_ses::SesClient;
 
 use aws_cloudfront_cookie::CloudfrontKey;
 
-use crate::auth::password::_api::kernel::init::MemoryAuthUserPasswordStore;
-
 use crate::auth::auth_ticket::_api::kernel::data::{ExpansionLimitDuration, ExpireDuration};
 
 pub struct AuthOutsideFeature {
@@ -27,7 +25,6 @@ pub struct AuthOutsideStore {
     pub dynamodb: DynamoDbClient,
     pub nonce_table_name: &'static str,
     pub mysql: Pool,
-    pub user_password: MemoryAuthUserPasswordStore,
 }
 pub struct AuthOutsideCookie {
     pub domain: &'static str,

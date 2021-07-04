@@ -138,7 +138,10 @@ impl<'a> AuthTokenEncoder for CloudfrontTokenEncoder<'a> {
         _ticket: AuthTicket,
         expires: ExpireDateTime,
     ) -> Result<Vec<AuthTokenEncodedData>, EncodeAuthTokenError> {
-        let policy = CloudfrontPolicy::from_resource(self.resource.into(), expires.timestamp());
+        let policy = CloudfrontPolicy::from_resource(
+            self.resource.into(),
+            expires.clone().extract().timestamp(),
+        );
         let content = self
             .key
             .sign(policy)

@@ -151,7 +151,7 @@ async fn just_max_length_login_id() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authenticate password error; user not found"]);
+    assert_state(vec!["authenticate password error; password not found"]);
     assert!(!result.is_ok());
 }
 
@@ -226,7 +226,7 @@ async fn error_password_not_stored() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authenticate password error; user not found"]);
+    assert_state(vec!["authenticate password error; password not found"]);
     assert!(!result.is_ok());
 }
 
@@ -525,8 +525,8 @@ fn test_user_login_id() -> LoginId {
     LoginId::validate(LOGIN_ID.to_string()).unwrap()
 }
 fn test_user_password() -> HashedPassword {
-    HashedPassword::new(PASSWORD.into())
+    HashedPassword::restore(PASSWORD.into())
 }
 fn another_password() -> HashedPassword {
-    HashedPassword::new(ANOTHER_PASSWORD.into())
+    HashedPassword::restore(ANOTHER_PASSWORD.into())
 }

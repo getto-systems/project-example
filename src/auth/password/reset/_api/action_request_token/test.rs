@@ -322,7 +322,7 @@ fn standard_password_store() -> MemoryAuthUserPasswordStore {
 }
 
 fn test_user_id() -> AuthUserId {
-    AuthUserId::new(USER_ID.to_string())
+    AuthUserId::restore(USER_ID.to_string())
 }
 fn test_user_login_id() -> LoginId {
     LoginId::validate(LOGIN_ID.to_string()).unwrap()

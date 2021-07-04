@@ -52,7 +52,7 @@ pub mod test {
 
     pub enum StaticAuthTokenHeader {
         Valid(AuthTokenValue),
-        NotFound,
+        NotFound, // TODO これのテスト
     }
 
     impl AuthTokenHeader for StaticAuthTokenHeader {

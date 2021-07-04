@@ -1,6 +1,6 @@
 use crate::auth::{
     auth_ticket::_api::kernel::infra::CheckAuthNonceInfra,
-    password::_api::kernel::infra::{AuthUserPasswordInfra, RegisterResetTokenError},
+    password::_api::kernel::infra::{AuthUserPasswordInfra, RequestResetTokenError},
 };
 
 use crate::auth::password::reset::_api::request_token::event::RequestResetTokenEvent;
@@ -81,7 +81,7 @@ pub struct RequestResetTokenFieldsExtract {
     pub login_id: String,
 }
 
-impl RegisterResetTokenError {
+impl RequestResetTokenError {
     pub fn into_request_reset_token_event(
         self,
         messenger: &impl RequestResetTokenMessenger,

@@ -4,7 +4,7 @@ use std::{
     fmt::{Display, Formatter},
 };
 
-use chrono::{DateTime, Duration, NaiveDateTime, Utc};
+use chrono::{DateTime, Duration, Utc};
 
 use crate::auth::auth_user::_api::kernel::data::{
     AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
@@ -186,17 +186,16 @@ impl AuthDateTime {
 pub struct ExpireDateTime(DateTime<Utc>);
 
 impl ExpireDateTime {
-    pub fn restore(timestamp: i64) -> Self {
-        let naive = NaiveDateTime::from_timestamp(timestamp, 0);
-        Self(DateTime::from_utc(naive, Utc))
+    pub fn restore(time: DateTime<Utc>) -> Self {
+        Self(time)
     }
 
     pub fn has_elapsed(&self, now: &AuthDateTime) -> bool {
         self.0 < now.0
     }
 
-    pub fn timestamp(&self) -> i64 {
-        self.0.timestamp()
+    pub fn extract(self) -> DateTime<Utc> {
+        self.0
     }
 }
 

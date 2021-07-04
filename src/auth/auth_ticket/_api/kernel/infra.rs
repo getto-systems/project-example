@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 
+use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::auth::auth_ticket::_api::kernel::data::{
@@ -88,7 +89,7 @@ impl AuthNonceEntry {
     pub fn extract(self) -> AuthNonceEntryExtract {
         AuthNonceEntryExtract {
             nonce: self.nonce.extract(),
-            expires: self.expires.map(|expires| expires.timestamp()),
+            expires: self.expires.map(|expires| expires.extract().timestamp()),
         }
     }
 }
@@ -103,7 +104,12 @@ impl From<AuthNonceEntryExtract> for AuthNonceEntry {
     fn from(src: AuthNonceEntryExtract) -> Self {
         Self {
             nonce: AuthNonceValue::new(src.nonce),
-            expires: src.expires.map(|expires| ExpireDateTime::restore(expires)),
+            expires: src.expires.map(|expires| {
+                ExpireDateTime::restore(DateTime::from_utc(
+                    NaiveDateTime::from_timestamp(expires, 0),
+                    Utc,
+                ))
+            }),
         }
     }
 }
@@ -125,7 +131,7 @@ impl AuthJwtClaims {
         let ticket = ticket.extract();
         Self {
             aud,
-            exp: expires.timestamp(),
+            exp: expires.extract().timestamp(),
             ticket_id: ticket.ticket_id,
             user_id: ticket.user_id,
             granted_roles: ticket.granted_roles,

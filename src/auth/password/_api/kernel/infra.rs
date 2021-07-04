@@ -25,7 +25,7 @@ pub trait AuthUserPasswordInfra {
 pub struct HashedPassword(String);
 
 impl HashedPassword {
-    pub const fn new(password: String) -> Self {
+    pub const fn restore(password: String) -> Self {
         Self(password)
     }
 
@@ -65,7 +65,7 @@ pub trait AuthUserPasswordRepository {
         login_id: LoginId,
         expires: ExpireDateTime,
         requested_at: AuthDateTime,
-    ) -> Result<(), RegisterResetTokenError>;
+    ) -> Result<(), RequestResetTokenError>;
 
     fn reset_password(
         &self,
@@ -89,12 +89,11 @@ pub trait AuthUserPasswordHasher {
 pub enum VerifyPasswordError {
     PasswordHashError(PasswordHashError),
     RepositoryError(RepositoryError),
-    UserNotFound,
     PasswordNotFound,
     PasswordNotMatched,
 }
 
-pub enum RegisterResetTokenError {
+pub enum RequestResetTokenError {
     RepositoryError(RepositoryError),
     NotFound,
 }
