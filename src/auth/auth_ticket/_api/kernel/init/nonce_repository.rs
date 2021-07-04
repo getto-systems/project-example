@@ -111,6 +111,8 @@ fn timestamp_value(value: i64) -> AttributeValue {
 pub mod test {
     use std::{collections::HashMap, sync::Mutex};
 
+    use chrono::{DateTime, NaiveDateTime, Utc};
+
     use crate::auth::auth_ticket::_api::kernel::infra::{
         AuthNonceEntry, AuthNonceEntryExtract, AuthNonceRepository,
     };
@@ -134,7 +136,7 @@ pub mod test {
                 nonce.clone(),
                 AuthNonceEntryExtract {
                     nonce,
-                    expires: Some(expires.timestamp()),
+                    expires: Some(expires.extract().timestamp()),
                 },
             );
             Self(hash_map)
@@ -186,7 +188,11 @@ pub mod test {
     fn has_expired(expires: Option<i64>, now: &AuthDateTime) -> bool {
         match expires {
             None => false,
-            Some(expires) => ExpireDateTime::restore(expires).has_elapsed(now),
+            Some(expires) => ExpireDateTime::restore(DateTime::from_utc(
+                NaiveDateTime::from_timestamp(expires, 0),
+                Utc,
+            ))
+            .has_elapsed(now),
         }
     }
 }

@@ -73,27 +73,27 @@ mod demo {
         let pool = Pool::new(Opts::from_url(load("SECRET_MYSQL_AUTH_URL").as_str())?)?;
         let mut conn = pool.get_conn()?;
 
-        conn.exec_drop(
-            "insert into user(user_id, login_id) values(:user_id, :login_id)",
-            params! {
-                "user_id" => USER_ID,
-                "login_id" => "admin",
-            },
-        )?;
-        conn.exec_drop(
-            "insert into user_granted_role(user_id, role) values(:user_id, :role)",
-            params! {
-                "user_id" => USER_ID,
-                "role" => "admin",
-            },
-        )?;
-        conn.exec_drop(
-            "insert into user_granted_role(user_id, role) values(:user_id, :role)",
-            params! {
-                "user_id" => USER_ID,
-                "role" => "dev-docs",
-            },
-        )?;
+        // conn.exec_drop(
+        //     "insert into user(user_id, login_id) values(:user_id, :login_id)",
+        //     params! {
+        //         "user_id" => USER_ID,
+        //         "login_id" => "admin",
+        //     },
+        // )?;
+        // conn.exec_drop(
+        //     "insert into user_granted_role(user_id, role) values(:user_id, :role)",
+        //     params! {
+        //         "user_id" => USER_ID,
+        //         "role" => "admin",
+        //     },
+        // )?;
+        // conn.exec_drop(
+        //     "insert into user_granted_role(user_id, role) values(:user_id, :role)",
+        //     params! {
+        //         "user_id" => USER_ID,
+        //         "role" => "dev-docs",
+        //     },
+        // )?;
         conn.exec_drop(
             "insert into user_password_reset_token_destination(user_id, email) values(:user_id, :email)",
             params! {

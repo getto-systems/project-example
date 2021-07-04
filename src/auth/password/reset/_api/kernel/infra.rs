@@ -14,7 +14,7 @@ impl ResetTokenJwtClaims {
     pub fn from_token(token: ResetToken, expires: ExpireDateTime) -> Self {
         Self {
             sub: token.extract(),
-            exp: expires.timestamp(),
+            exp: expires.extract().timestamp(),
         }
     }
 }

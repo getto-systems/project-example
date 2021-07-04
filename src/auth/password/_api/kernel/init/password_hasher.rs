@@ -24,7 +24,7 @@ impl AuthUserPasswordHasher for Argon2PasswordHasher {
             .hash_password_simple(self.plain_password.as_bytes(), salt.as_ref())
             .map_err(|err| PasswordHashError::InfraError(format!("{}", err)))?;
 
-        Ok(HashedPassword::new(hash.to_string()))
+        Ok(HashedPassword::restore(hash.to_string()))
     }
 }
 
@@ -47,7 +47,7 @@ pub mod test {
             }
         }
         fn hash_password(self) -> Result<HashedPassword, PasswordHashError> {
-            Ok(HashedPassword::new(self.password))
+            Ok(HashedPassword::restore(self.password))
         }
     }
 }

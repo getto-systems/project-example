@@ -54,7 +54,7 @@ fn auth_cookie<'a>(info: AuthTokenEncodedData) -> Cookie<'a> {
 }
 
 fn into_offset_date_time(src: ExpireDateTime) -> OffsetDateTime {
-    OffsetDateTime::from_unix_timestamp(src.timestamp())
+    OffsetDateTime::from_unix_timestamp(src.extract().timestamp())
 }
 
 impl EncodeAuthTokenError {

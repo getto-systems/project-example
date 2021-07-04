@@ -47,7 +47,7 @@ pub struct AuthUserExtract {
 impl Into<AuthUser> for AuthUserExtract {
     fn into(self) -> AuthUser {
         AuthUser {
-            user_id: AuthUserId::new(self.user_id),
+            user_id: AuthUserId::restore(self.user_id),
             granted_roles: self.granted_roles.into(),
         }
     }
@@ -57,7 +57,7 @@ impl Into<AuthUser> for AuthUserExtract {
 pub struct AuthUserId(String);
 
 impl AuthUserId {
-    pub fn new(user_id: String) -> Self {
+    pub const fn restore(user_id: String) -> Self {
         Self(user_id)
     }
 

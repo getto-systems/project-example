@@ -31,12 +31,6 @@ impl AuthenticatePasswordMessenger for ProtobufAuthenticatePasswordMessenger {
             password: message.password,
         })
     }
-    fn encode_user_not_found(&self) -> Result<AuthenticatePasswordResponse, MessageError> {
-        encode_failed(
-            AuthenticatePasswordResult_pb_ErrorType::INVALID_PASSWORD,
-            AuthenticatePasswordResponse::UserNotFound,
-        )
-    }
     fn encode_password_not_found(&self) -> Result<AuthenticatePasswordResponse, MessageError> {
         encode_failed(
             AuthenticatePasswordResult_pb_ErrorType::INVALID_PASSWORD,
@@ -88,9 +82,6 @@ pub mod test {
     impl AuthenticatePasswordMessenger for StaticAuthenticatePasswordMessenger {
         fn decode(&self) -> Result<AuthenticatePasswordFieldsExtract, MessageError> {
             Ok(self.fields.clone())
-        }
-        fn encode_user_not_found(&self) -> Result<AuthenticatePasswordResponse, MessageError> {
-            Ok(AuthenticatePasswordResponse::UserNotFound("encoded".into()))
         }
         fn encode_password_not_found(&self) -> Result<AuthenticatePasswordResponse, MessageError> {
             Ok(AuthenticatePasswordResponse::PasswordNotFound("encoded".into()))

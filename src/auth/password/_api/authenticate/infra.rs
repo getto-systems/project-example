@@ -23,7 +23,6 @@ pub trait AuthenticatePasswordInfra {
 
 pub trait AuthenticatePasswordMessenger {
     fn decode(&self) -> Result<AuthenticatePasswordFieldsExtract, MessageError>;
-    fn encode_user_not_found(&self) -> Result<AuthenticatePasswordResponse, MessageError>;
     fn encode_password_not_found(&self) -> Result<AuthenticatePasswordResponse, MessageError>;
     fn encode_password_not_matched(&self) -> Result<AuthenticatePasswordResponse, MessageError>;
 }
@@ -42,7 +41,6 @@ impl VerifyPasswordError {
         match self {
             Self::PasswordHashError(err) => AuthenticatePasswordEvent::PasswordHashError(err),
             Self::RepositoryError(err) => AuthenticatePasswordEvent::RepositoryError(err),
-            Self::UserNotFound => messenger.encode_user_not_found().into(),
             Self::PasswordNotFound => messenger.encode_password_not_found().into(),
             Self::PasswordNotMatched => messenger.encode_password_not_matched().into(),
         }

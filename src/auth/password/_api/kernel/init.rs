@@ -6,28 +6,24 @@ use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use password_hasher::Argon2PasswordHasher;
 use password_matcher::Argon2PasswordMatcher;
-use password_repository::MemoryAuthUserPasswordRepository;
-
-pub use password_repository::{MemoryAuthUserPasswordMap, MemoryAuthUserPasswordStore};
+use password_repository::MysqlAuthUserPasswordRepository;
 
 use crate::auth::password::_api::kernel::infra::AuthUserPasswordInfra;
 
 pub struct AuthUserPasswordStruct<'a> {
-    password_repository: MemoryAuthUserPasswordRepository<'a>,
+    password_repository: MysqlAuthUserPasswordRepository<'a>,
 }
 
 impl<'a> AuthUserPasswordStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature) -> Self {
         Self {
-            password_repository: MemoryAuthUserPasswordRepository::new(
-                &feature.store.user_password,
-            ),
+            password_repository: MysqlAuthUserPasswordRepository::new(&feature.store.mysql),
         }
     }
 }
 
 impl<'a> AuthUserPasswordInfra for AuthUserPasswordStruct<'a> {
-    type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
+    type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
     type PasswordMatcher = Argon2PasswordMatcher;
     type PasswordHasher = Argon2PasswordHasher;
 
@@ -40,7 +36,7 @@ impl<'a> AuthUserPasswordInfra for AuthUserPasswordStruct<'a> {
 pub mod test {
     use super::password_hasher::test::PlainPasswordHasher;
     use super::password_matcher::test::PlainPasswordMatcher;
-    pub use super::password_repository::{
+    pub use super::password_repository::test::{
         MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository, MemoryAuthUserPasswordStore,
     };
 
