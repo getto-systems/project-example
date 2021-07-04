@@ -22,12 +22,14 @@ pub fn issue_auth_ticket<S>(
 
     let ticket = AuthTicket::new(ticket_id_generator.generate(), user);
 
-    // TODO limit calculated イベントを発行したい
-    let limit = clock.now().limit(&config.ticket_expansion_limit);
-    let registered_at = clock.now();
+    let limit = clock.now().expansion_limit(&config.ticket_expansion_limit);
+    let issued_at = clock.now();
+    post(IssueAuthTicketEvent::ExpansionLimitCalculated(
+        limit.clone(),
+    ));
 
     ticket_repository
-        .register(ticket.clone(), limit, registered_at)
+        .issue(ticket.clone(), limit, issued_at)
         .map_err(|err| post(IssueAuthTicketEvent::RepositoryError(err)))?;
 
     // 呼び出し側を簡単にするため、例外的に State ではなく AuthTicket を返す

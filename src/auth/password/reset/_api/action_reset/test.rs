@@ -63,6 +63,7 @@ async fn success_request_token() {
     let result = action.ignite().await;
     assert_state(vec![
         "reset password success; user: user-id (granted: [])",
+        "expansion limit calculated; 2021-01-11 10:00:00 UTC",
         "issue success; ticket: ticket-id / user: user-id (granted: [])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
         "encode success",
@@ -83,6 +84,7 @@ async fn success_expired_nonce() {
     let result = action.ignite().await;
     assert_state(vec![
         "reset password success; user: user-id (granted: [])",
+        "expansion limit calculated; 2021-01-11 10:00:00 UTC",
         "issue success; ticket: ticket-id / user: user-id (granted: [])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
         "encode success",
@@ -208,6 +210,7 @@ async fn just_max_length_password() {
     let result = action.ignite().await;
     assert_state(vec![
         "reset password success; user: user-id (granted: [])",
+        "expansion limit calculated; 2021-01-11 10:00:00 UTC",
         "issue success; ticket: ticket-id / user: user-id (granted: [])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
         "encode success",

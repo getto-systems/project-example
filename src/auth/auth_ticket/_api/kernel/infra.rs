@@ -39,11 +39,11 @@ pub trait AuthNonceHeader {
 }
 
 pub trait AuthTicketRepository {
-    fn register(
+    fn issue(
         &self,
         ticket: AuthTicket,
         limit: ExpansionLimitDateTime,
-        registered_at: AuthDateTime,
+        issued_at: AuthDateTime,
     ) -> Result<(), RepositoryError>;
 
     fn discard(

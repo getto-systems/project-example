@@ -55,11 +55,11 @@ impl MemoryAuthTicketMap {
 }
 
 impl<'a> AuthTicketRepository for MemoryAuthTicketRepository<'a> {
-    fn register(
+    fn issue(
         &self,
         ticket: AuthTicket,
         limit: ExpansionLimitDateTime,
-        _registered_at: AuthDateTime,
+        _issued_at: AuthDateTime,
     ) -> Result<(), RepositoryError> {
         let mut store = self.store.lock().unwrap();
 
