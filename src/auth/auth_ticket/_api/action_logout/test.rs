@@ -180,7 +180,7 @@ impl<'a> TestFeature<'a> {
                     nonce_header: standard_nonce_header(),
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
-                ticket_infra: ticket_infra(store),
+                ticket_infra: standard_ticket_infra(store),
                 token_header: standard_token_header(),
                 token_validator: standard_token_validator(),
                 config: ValidateAuthTokenConfig {
@@ -188,13 +188,13 @@ impl<'a> TestFeature<'a> {
                 },
             },
             discard: StaticDiscardAuthTicketStruct {
-                ticket_infra: ticket_infra(store),
+                ticket_infra: standard_ticket_infra(store),
             },
         }
     }
 }
 
-fn ticket_infra<'a>(store: &'a TestStore) -> StaticAuthTicketStruct<'a> {
+fn standard_ticket_infra<'a>(store: &'a TestStore) -> StaticAuthTicketStruct<'a> {
     StaticAuthTicketStruct {
         clock: standard_clock(),
         ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),

@@ -10,9 +10,7 @@ use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 use clock::ChronoAuthClock;
 use nonce_header::ActixWebAuthNonceHeader;
 use nonce_repository::DynamoDbAuthNonceRepository;
-use ticket_repository::MemoryAuthTicketRepository;
-
-pub use ticket_repository::{MemoryAuthTicketMap, MemoryAuthTicketStore};
+use ticket_repository::MysqlAuthTicketRepository;
 
 use crate::auth::auth_ticket::_api::kernel::infra::{
     AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
@@ -20,21 +18,21 @@ use crate::auth::auth_ticket::_api::kernel::infra::{
 
 pub struct AuthTicketStruct<'a> {
     clock: ChronoAuthClock,
-    ticket_repository: MemoryAuthTicketRepository<'a>,
+    ticket_repository: MysqlAuthTicketRepository<'a>,
 }
 
 impl<'a> AuthTicketStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature) -> Self {
         Self {
             clock: ChronoAuthClock::new(),
-            ticket_repository: MemoryAuthTicketRepository::new(&feature.store.ticket),
+            ticket_repository: MysqlAuthTicketRepository::new(&feature.store.mysql),
         }
     }
 }
 
 impl<'a> AuthTicketInfra for AuthTicketStruct<'a> {
     type Clock = ChronoAuthClock;
-    type TicketRepository = MemoryAuthTicketRepository<'a>;
+    type TicketRepository = MysqlAuthTicketRepository<'a>;
 
     fn clock(&self) -> &Self::Clock {
         &self.clock
@@ -79,7 +77,7 @@ impl<'a> CheckAuthNonceStruct<'a> {
             clock: ChronoAuthClock::new(),
             nonce_header: ActixWebAuthNonceHeader::new(request),
             nonce_repository: DynamoDbAuthNonceRepository::new(
-                &feature.store.dynamodb_ap_northeast1,
+                &feature.store.dynamodb,
                 feature.store.nonce_table_name,
             ),
         }
@@ -93,8 +91,8 @@ pub mod test {
     pub use super::nonce_repository::test::{
         MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
     };
-    pub use super::ticket_repository::{
-        MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+    pub use super::ticket_repository::test::{
+        MemoryAuthTicketMap, MemoryAuthTicketStore, MemoryAuthTicketRepository,
     };
 
     use crate::auth::auth_ticket::_api::kernel::infra::{

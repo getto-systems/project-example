@@ -68,7 +68,7 @@ impl AuthTicket {
     pub fn into_ticket_id(self) -> AuthTicketId {
         self.ticket_id
     }
-    pub fn id_as_str(&self) -> &str {
+    pub fn ticket_id_as_str(&self) -> &str {
         self.ticket_id.as_str()
     }
 
@@ -156,8 +156,8 @@ impl AuthDateTime {
         Self(now)
     }
 
-    pub fn timestamp(&self) -> i64 {
-        self.0.timestamp()
+    pub fn extract(self) -> DateTime<Utc> {
+        self.0
     }
 
     pub fn expires(self, duration: &ExpireDuration) -> ExpireDateTime {
@@ -217,6 +217,16 @@ impl ExpireDuration {
 
 #[derive(Clone)]
 pub struct ExpansionLimitDateTime(DateTime<Utc>);
+
+impl ExpansionLimitDateTime {
+    pub fn restore(time: DateTime<Utc>) -> Self {
+        Self(time)
+    }
+
+    pub fn extract(self) -> DateTime<Utc> {
+        self.0
+    }
+}
 
 impl Display for ExpansionLimitDateTime {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {

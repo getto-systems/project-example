@@ -1,6 +1,6 @@
 datasource db {
   provider = "mysql"
-  url      = env("MYSQL_AUTH_URL")
+  url      = env("SECRET_MYSQL_AUTH_URL")
 }
 
 generator client {
@@ -13,8 +13,9 @@ generator client {
 // id カラムは {table}_id
 
 model user {
-  user_id String   @id @db.VarChar(36)
-  tickets ticket[]
+  user_id          String             @id @db.VarChar(36)
+  tickets          ticket[]
+  ticket_discarded ticket_discarded[]
 }
 
 model ticket {
@@ -23,4 +24,11 @@ model ticket {
   ticket_id       String   @id @db.VarChar(36)
   expansion_limit DateTime
   issued_at       DateTime
+}
+
+model ticket_discarded {
+  user       user     @relation(fields: [user_id], references: [user_id])
+  user_id    String   @db.VarChar(36)
+  ticket_id  String   @id @db.VarChar(36)
+  discard_at DateTime
 }

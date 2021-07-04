@@ -17,7 +17,7 @@ actix-cors = "0.5"
 rusoto_core = { version = "0.45", default_features = false, features = ["rustls"] }
 rusoto_ses = { version = "0.45", default_features = false, features = ["rustls"] }
 rusoto_dynamodb = { version = "0.45", default_features = false, features = ["rustls"] }
-mysql = "20"
+mysql = "21"
 
 jsonwebtoken = "7"
 argon2 = "0.2"

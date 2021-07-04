@@ -55,25 +55,30 @@ mod demo {
     use std::env::var;
 
     use actix_web::{get, Responder};
-    use mysql::{prelude::Queryable, Pool};
+    use mysql::{params, prelude::Queryable, Error, Opts, Pool};
 
     #[get("/mysql")]
     async fn mysql_select() -> impl Responder {
         match select().await {
             Ok(response) => response,
-            Err(err) => err,
+            Err(err) => format!("{}", err),
         }
     }
 
-    async fn select() -> Result<String, String> {
-        let pool = Pool::new(load("MYSQL_AUTH_URL")).map_err(|err| format!("{}", err))?;
-        let mut conn = pool.get_conn().expect("failed to get connection!");
-        let result: u8 = conn
-            .query_first("select 1")
-            .expect("failed to query!")
-            .expect("unexpected result!");
+    const USER_ID: &'static str = "admin";
 
-        Ok(format!("success; value: {}", result))
+    async fn select() -> Result<String, Error> {
+        let pool = Pool::new(Opts::from_url(load("SECRET_MYSQL_AUTH_URL").as_str())?)?;
+        let mut conn = pool.get_conn()?;
+
+        conn.exec_drop(
+            "insert into user(user_id) values(:user_id)",
+            params! {
+                "user_id" => USER_ID,
+            },
+        )?;
+
+        Ok(format!("success"))
     }
 
     fn load(key: &'static str) -> String {
