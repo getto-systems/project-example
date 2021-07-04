@@ -49,20 +49,15 @@ pub async fn request_reset_token<S>(
 
     let reset_token = token_generator.generate();
 
-    let expires = clock.now().expires(&config.token_expires);
-    let registered_at = clock.now();
+    let requested_at = clock.now();
+    let expires = requested_at.clone().expires(&config.token_expires);
 
     post(RequestResetTokenEvent::TokenExpiresCalculated(
         expires.clone(),
     ));
 
     password_repository
-        .register_reset_token(
-            reset_token.clone(),
-            login_id,
-            expires.clone(),
-            registered_at,
-        )
+        .request_reset_token(reset_token.clone(), login_id, expires.clone(), requested_at)
         .map_err(|err| post(err.into_request_reset_token_event(messenger)))?;
 
     let token_encoded = token_encoder

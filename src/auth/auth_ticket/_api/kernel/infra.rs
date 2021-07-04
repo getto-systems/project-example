@@ -63,7 +63,7 @@ pub trait AuthNonceRepository {
     async fn put(
         &self,
         nonce: AuthNonceEntry,
-        registered_at: &AuthDateTime,
+        registered_at: AuthDateTime,
     ) -> Result<RegisterResult<()>, RepositoryError>;
 }
 

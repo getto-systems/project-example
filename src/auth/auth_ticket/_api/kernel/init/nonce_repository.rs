@@ -30,7 +30,7 @@ impl<'a> AuthNonceRepository for DynamoDbAuthNonceRepository<'a> {
     async fn put(
         &self,
         entry: AuthNonceEntry,
-        registered_at: &AuthDateTime,
+        registered_at: AuthDateTime,
     ) -> Result<RegisterResult<()>, RepositoryError> {
         let extract = entry.extract();
 
@@ -85,7 +85,7 @@ impl AttributeMap {
         }
         self
     }
-    fn insert_registered_at(&mut self, registered_at: &AuthDateTime) -> &mut Self {
+    fn insert_registered_at(&mut self, registered_at: AuthDateTime) -> &mut Self {
         self.0.insert(
             REGISTERED_AT.into(),
             timestamp_value(registered_at.timestamp()),
@@ -168,12 +168,12 @@ pub mod test {
         async fn put(
             &self,
             entry: AuthNonceEntry,
-            registered_at: &AuthDateTime,
+            registered_at: AuthDateTime,
         ) -> Result<RegisterResult<()>, RepositoryError> {
             let mut store = self.store.lock().unwrap();
 
             if let Some(found) = store.get(entry.nonce()) {
-                if !has_expired(found.expires, registered_at) {
+                if !has_expired(found.expires, &registered_at) {
                     return Ok(RegisterResult::Conflict);
                 }
             }
