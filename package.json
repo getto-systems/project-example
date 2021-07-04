@@ -36,6 +36,7 @@
     "postcss": "^8.2.8",
     "postcss-cli": "^8.3.1",
     "preact": "^10.5.14",
+    "prisma": "^2.26.0",
     "protobufjs": "^6.10.2",
     "terser-webpack-plugin": "^5.1.0",
     "ts-jest": "^26.5.4",
@@ -45,5 +46,8 @@
     "webpack-cli": "^4.5.0",
     "webpack-dev-server": "^3.11.2",
     "worker-plugin": "^5.0.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^2.26.0"
   }
 }
