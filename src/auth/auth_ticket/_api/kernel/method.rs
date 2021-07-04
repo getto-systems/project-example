@@ -16,11 +16,11 @@ pub async fn check_nonce(infra: &impl CheckAuthNonceInfra) -> Result<(), Validat
         .nonce()
         .map_err(ValidateAuthNonceError::HeaderError)?;
 
+    let registered_at = clock.now();
+    let expires = registered_at.clone().expires(&config.nonce_expires);
+
     match nonce_repository
-        .put(
-            AuthNonceEntry::new(nonce, clock.now().expires(&config.nonce_expires)),
-            &clock.now(),
-        )
+        .put(AuthNonceEntry::new(nonce, expires), registered_at)
         .await
         .map_err(ValidateAuthNonceError::RepositoryError)?
     {

@@ -147,12 +147,12 @@ impl<'a> AuthUserPasswordRepository for MemoryAuthUserPasswordRepository<'a> {
         }
     }
 
-    fn register_reset_token(
+    fn request_reset_token(
         &self,
         reset_token: ResetToken,
         login_id: LoginId,
         expires: ExpireDateTime,
-        _registered_at: AuthDateTime,
+        _requested_at: AuthDateTime,
     ) -> Result<(), RegisterResetTokenError> {
         let target_user_id: AuthUserId;
 

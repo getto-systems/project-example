@@ -22,8 +22,10 @@ pub fn issue_auth_ticket<S>(
 
     let ticket = AuthTicket::new(ticket_id_generator.generate(), user);
 
-    let limit = clock.now().expansion_limit(&config.ticket_expansion_limit);
     let issued_at = clock.now();
+    let limit = issued_at
+        .clone()
+        .expansion_limit(&config.ticket_expansion_limit);
     post(IssueAuthTicketEvent::ExpansionLimitCalculated(
         limit.clone(),
     ));

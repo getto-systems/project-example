@@ -59,12 +59,12 @@ pub trait AuthUserPasswordRepository {
         matcher: &impl AuthUserPasswordMatcher,
     ) -> Result<AuthUserId, VerifyPasswordError>;
 
-    fn register_reset_token(
+    fn request_reset_token(
         &self,
         reset_token: ResetToken,
         login_id: LoginId,
         expires: ExpireDateTime,
-        registered_at: AuthDateTime,
+        requested_at: AuthDateTime,
     ) -> Result<(), RegisterResetTokenError>;
 
     fn reset_password(
