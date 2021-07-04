@@ -17,12 +17,9 @@ use super::feature::{
     AuthOutsideFeature, AuthOutsideJwtSecret, AuthOutsideSecret, AuthOutsideStore,
 };
 
-use crate::auth::{
-    auth_user::_api::kernel::init::MemoryAuthUserMap,
-    password::{
-        _api::kernel::init::MemoryAuthUserPasswordMap,
-        reset::_api::request_token::init::MemoryResetTokenDestinationMap,
-    },
+use crate::auth::password::{
+    _api::kernel::init::MemoryAuthUserPasswordMap,
+    reset::_api::request_token::init::MemoryResetTokenDestinationMap,
 };
 
 use crate::auth::password::_api::kernel::infra::HashedPassword;
@@ -59,7 +56,6 @@ pub fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
             )
             .expect("failed to connect mysql".into()),
             // TODO それぞれ外部データベースを使うように
-            user: MemoryAuthUserMap::with_user(admin_user()).to_store(),
             user_password: MemoryAuthUserPasswordMap::with_password(
                 admin_login_id(),
                 admin_user(),

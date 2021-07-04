@@ -72,9 +72,17 @@ mod demo {
         let mut conn = pool.get_conn()?;
 
         conn.exec_drop(
-            "insert into user(user_id) values(:user_id)",
+            "insert into user_granted_role(user_id, role) values(:user_id, :role)",
             params! {
                 "user_id" => USER_ID,
+                "role" => "admin",
+            },
+        )?;
+        conn.exec_drop(
+            "insert into user_granted_role(user_id, role) values(:user_id, :role)",
+            params! {
+                "user_id" => USER_ID,
+                "role" => "dev-docs",
             },
         )?;
 

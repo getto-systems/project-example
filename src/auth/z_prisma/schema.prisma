@@ -13,9 +13,18 @@ generator client {
 // id カラムは {table}_id
 
 model user {
-  user_id          String             @id @db.VarChar(36)
-  tickets          ticket[]
-  ticket_discarded ticket_discarded[]
+  user_id            String              @id @db.VarChar(36)
+  tickets            ticket[]
+  ticket_discardeds  ticket_discarded[]
+  user_granted_roles user_granted_role[]
+}
+
+model user_granted_role {
+  user    user   @relation(fields: [user_id], references: [user_id])
+  user_id String @db.VarChar(36)
+  role    String @db.VarChar(50)
+
+  @@id([user_id, role])
 }
 
 model ticket {
