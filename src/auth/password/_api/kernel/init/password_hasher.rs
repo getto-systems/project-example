@@ -16,7 +16,7 @@ impl AuthUserPasswordHasher for Argon2PasswordHasher {
         Self { plain_password }
     }
 
-    fn hash_password(&self) -> Result<HashedPassword, PasswordHashError> {
+    fn hash_password(self) -> Result<HashedPassword, PasswordHashError> {
         let engine = Argon2::default();
         let salt = SaltString::generate(&mut OsRng);
 
@@ -46,8 +46,8 @@ pub mod test {
                 password: plain_password.extract(),
             }
         }
-        fn hash_password(&self) -> Result<HashedPassword, PasswordHashError> {
-            Ok(HashedPassword::new(self.password.clone()))
+        fn hash_password(self) -> Result<HashedPassword, PasswordHashError> {
+            Ok(HashedPassword::new(self.password))
         }
     }
 }

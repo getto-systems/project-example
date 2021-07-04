@@ -56,7 +56,7 @@ pub trait AuthUserPasswordRepository {
     fn verify_password(
         &self,
         login_id: &LoginId,
-        matcher: &impl AuthUserPasswordMatcher,
+        matcher: impl AuthUserPasswordMatcher,
     ) -> Result<AuthUserId, VerifyPasswordError>;
 
     fn request_reset_token(
@@ -71,19 +71,19 @@ pub trait AuthUserPasswordRepository {
         &self,
         reset_token: &ResetToken,
         login_id: &LoginId,
-        hasher: &impl AuthUserPasswordHasher,
-        reset_at: &AuthDateTime,
+        hasher: impl AuthUserPasswordHasher,
+        reset_at: AuthDateTime,
     ) -> Result<AuthUserId, ResetPasswordError>;
 }
 
 pub trait AuthUserPasswordMatcher {
     fn new(plain_password: PlainPassword) -> Self;
-    fn match_password(&self, hashed_password: &HashedPassword) -> Result<bool, PasswordHashError>;
+    fn match_password(self, hashed_password: &HashedPassword) -> Result<bool, PasswordHashError>;
 }
 
 pub trait AuthUserPasswordHasher {
     fn new(plain_password: PlainPassword) -> Self;
-    fn hash_password(&self) -> Result<HashedPassword, PasswordHashError>;
+    fn hash_password(self) -> Result<HashedPassword, PasswordHashError>;
 }
 
 pub enum VerifyPasswordError {

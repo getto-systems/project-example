@@ -124,7 +124,7 @@ impl<'a> AuthUserPasswordRepository for MemoryAuthUserPasswordRepository<'a> {
     fn verify_password(
         &self,
         login_id: &LoginId,
-        matcher: &impl AuthUserPasswordMatcher,
+        matcher: impl AuthUserPasswordMatcher,
     ) -> Result<AuthUserId, VerifyPasswordError> {
         let store = self.store.lock().unwrap();
 
@@ -196,8 +196,8 @@ impl<'a> AuthUserPasswordRepository for MemoryAuthUserPasswordRepository<'a> {
         &self,
         reset_token: &ResetToken,
         login_id: &LoginId,
-        hasher: &impl AuthUserPasswordHasher,
-        reset_at: &AuthDateTime,
+        hasher: impl AuthUserPasswordHasher,
+        reset_at: AuthDateTime,
     ) -> Result<AuthUserId, ResetPasswordError> {
         let target_entry: ResetEntry;
 
@@ -211,14 +211,14 @@ impl<'a> AuthUserPasswordRepository for MemoryAuthUserPasswordRepository<'a> {
             if entry.discard_at.is_some() {
                 return Err(ResetPasswordError::AlreadyReset);
             }
-            if entry.expires.has_elapsed(reset_at) {
+            if entry.expires.has_elapsed(&reset_at) {
                 return Err(ResetPasswordError::Expired);
             }
             if entry.login_id.as_str() != login_id.as_str() {
                 return Err(ResetPasswordError::InvalidLoginId);
             }
 
-            target_entry = entry.clone().discard(reset_at.clone());
+            target_entry = entry.clone().discard(reset_at);
         }
 
         {
