@@ -2,26 +2,24 @@ mod user_repository;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use user_repository::MemoryAuthUserRepository;
-
-pub use user_repository::{MemoryAuthUserMap, MemoryAuthUserStore};
+use user_repository::MysqlAuthUserRepository;
 
 use crate::auth::auth_user::_api::kernel::infra::AuthUserInfra;
 
 pub struct AuthUserStruct<'a> {
-    user_repository: MemoryAuthUserRepository<'a>,
+    user_repository: MysqlAuthUserRepository<'a>,
 }
 
 impl<'a> AuthUserStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature) -> Self {
         Self {
-            user_repository: MemoryAuthUserRepository::new(&feature.store.user),
+            user_repository: MysqlAuthUserRepository::new(&feature.store.mysql),
         }
     }
 }
 
 impl<'a> AuthUserInfra for AuthUserStruct<'a> {
-    type UserRepository = MemoryAuthUserRepository<'a>;
+    type UserRepository = MysqlAuthUserRepository<'a>;
 
     fn user_repository(&self) -> &Self::UserRepository {
         &self.user_repository
@@ -30,7 +28,7 @@ impl<'a> AuthUserInfra for AuthUserStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    pub use super::user_repository::{
+    pub use super::user_repository::test::{
         MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
     };
 

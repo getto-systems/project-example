@@ -5,8 +5,10 @@ use lazy_static::lazy_static;
 use actix_cors::Cors;
 use actix_web::{App, HttpServer};
 
-use example_api::x_outside_feature::_api::state::AppData;
-use example_api::x_outside_feature::_api::{env::Env, state::AppState};
+use example_api::x_outside_feature::_api::{
+    env::Env,
+    state::{AppData, AppState},
+};
 
 use example_api::auth::_api::x_actix_web::route::scope_auth;
 
@@ -72,9 +74,31 @@ mod demo {
         let mut conn = pool.get_conn()?;
 
         conn.exec_drop(
-            "insert into user(user_id) values(:user_id)",
+            "insert into user(user_id, login_id) values(:user_id, :login_id)",
             params! {
                 "user_id" => USER_ID,
+                "login_id" => "admin",
+            },
+        )?;
+        conn.exec_drop(
+            "insert into user_granted_role(user_id, role) values(:user_id, :role)",
+            params! {
+                "user_id" => USER_ID,
+                "role" => "admin",
+            },
+        )?;
+        conn.exec_drop(
+            "insert into user_granted_role(user_id, role) values(:user_id, :role)",
+            params! {
+                "user_id" => USER_ID,
+                "role" => "dev-docs",
+            },
+        )?;
+        conn.exec_drop(
+            "insert into user_password_reset_token_destination(user_id, email) values(:user_id, :email)",
+            params! {
+                "user_id" => USER_ID,
+                "email" => "shun@getto.systems",
             },
         )?;
 

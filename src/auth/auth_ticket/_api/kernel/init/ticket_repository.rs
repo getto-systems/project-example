@@ -1,7 +1,8 @@
 use chrono::{NaiveDateTime, TimeZone, Utc};
 use mysql::{params, prelude::Queryable, Pool};
 
-use crate::z_details::_api::mysql::helper::infra_error;
+use crate::z_details::_api::mysql::helper::mysql_error;
+use crate::z_details::_api::repository::helper::infra_error;
 
 use crate::auth::auth_ticket::_api::kernel::infra::AuthTicketRepository;
 
@@ -36,7 +37,7 @@ impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
         expansion_limit: ExpansionLimitDateTime,
         issued_at: AuthDateTime,
     ) -> Result<(), RepositoryError> {
-        let mut conn = self.pool.get_conn().map_err(infra_error)?;
+        let mut conn = self.pool.get_conn().map_err(mysql_error)?;
 
         let ticket = ticket.extract();
 
@@ -54,16 +55,16 @@ impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
                 "issued_at" => issued_at.extract().naive_utc(),
             },
         )
-        .map_err(infra_error)?;
+        .map_err(mysql_error)?;
 
         Ok(())
     }
 
     fn discard(&self, ticket: AuthTicket, discard_at: AuthDateTime) -> Result<(), RepositoryError> {
-        let mut conn = self.pool.get_conn().map_err(infra_error)?;
+        let mut conn = self.pool.get_conn().map_err(mysql_error)?;
         let mut conn = conn
             .start_transaction(Default::default())
-            .map_err(infra_error)?;
+            .map_err(mysql_error)?;
 
         let ticket = ticket.extract();
         let ticket_id = ticket.ticket_id;
@@ -79,11 +80,11 @@ impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
                 },
                 |(user_id, ticket_id)| Ticket { user_id, ticket_id },
             )
-            .map_err(infra_error)?;
+            .map_err(mysql_error)?;
 
-        let found = found.get(0).ok_or_else(|| {
-            RepositoryError::InfraError(format!("ticket not found; ticket-id: {}", &ticket_id))
-        })?;
+        let found = found
+            .get(0)
+            .ok_or_else(|| infra_error(format!("ticket not found; ticket-id: {}", &ticket_id)))?;
 
         conn.exec_drop(
             r"#####
@@ -94,7 +95,7 @@ impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
                 "ticket_id" => &ticket_id,
             },
         )
-        .map_err(infra_error)?;
+        .map_err(mysql_error)?;
 
         conn.exec_drop(
             r"#####
@@ -109,9 +110,9 @@ impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
                 "discard_at" => discard_at.extract().naive_utc(),
             },
         )
-        .map_err(infra_error)?;
+        .map_err(mysql_error)?;
 
-        conn.commit().map_err(infra_error)?;
+        conn.commit().map_err(mysql_error)?;
 
         Ok(())
     }
@@ -120,7 +121,7 @@ impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
         &self,
         ticket: &AuthTicket,
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError> {
-        let mut conn = self.pool.get_conn().map_err(infra_error)?;
+        let mut conn = self.pool.get_conn().map_err(mysql_error)?;
 
         let found = conn
             .exec_map(
@@ -133,7 +134,7 @@ impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
                 },
                 |expansion_limit| TicketExpansionLimit { expansion_limit },
             )
-            .map_err(infra_error)?;
+            .map_err(mysql_error)?;
 
         Ok(found.get(0).map(|found| {
             ExpansionLimitDateTime::restore(Utc.from_utc_datetime(&found.expansion_limit))
@@ -145,7 +146,7 @@ impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
 pub mod test {
     use std::{collections::HashMap, sync::Mutex};
 
-    use crate::z_details::_api::repository::helper::register_conflict_error;
+    use crate::z_details::_api::repository::helper::infra_error;
 
     use crate::auth::auth_ticket::_api::kernel::infra::AuthTicketRepository;
 
@@ -209,7 +210,7 @@ pub mod test {
             let mut store = self.store.lock().unwrap();
 
             if store.get(&ticket).is_some() {
-                return Err(register_conflict_error(ticket.ticket_id_as_str()));
+                return Err(infra_error("ticket id conflict"));
             }
 
             // 実際のデータベースには user_id と registered_at も保存する必要がある

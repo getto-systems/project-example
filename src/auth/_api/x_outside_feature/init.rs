@@ -17,13 +17,7 @@ use super::feature::{
     AuthOutsideFeature, AuthOutsideJwtSecret, AuthOutsideSecret, AuthOutsideStore,
 };
 
-use crate::auth::{
-    auth_user::_api::kernel::init::MemoryAuthUserMap,
-    password::{
-        _api::kernel::init::MemoryAuthUserPasswordMap,
-        reset::_api::request_token::init::MemoryResetTokenDestinationMap,
-    },
-};
+use crate::auth::password::_api::kernel::init::MemoryAuthUserPasswordMap;
 
 use crate::auth::password::_api::kernel::infra::HashedPassword;
 
@@ -31,9 +25,6 @@ use crate::auth::{
     auth_ticket::_api::kernel::data::{ExpansionLimitDuration, ExpireDuration},
     auth_user::_api::kernel::data::{AuthUser, AuthUserExtract},
     login_id::_api::data::LoginId,
-    password::reset::_api::request_token::data::{
-        ResetTokenDestination, ResetTokenDestinationExtract,
-    },
 };
 
 pub fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
@@ -59,16 +50,10 @@ pub fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
             )
             .expect("failed to connect mysql".into()),
             // TODO それぞれ外部データベースを使うように
-            user: MemoryAuthUserMap::with_user(admin_user()).to_store(),
             user_password: MemoryAuthUserPasswordMap::with_password(
                 admin_login_id(),
                 admin_user(),
                 admin_password(),
-            )
-            .to_store(),
-            reset_token_destination: MemoryResetTokenDestinationMap::with_destination(
-                admin_login_id(),
-                admin_reset_token_destination(),
             )
             .to_store(),
         },
@@ -118,10 +103,4 @@ fn admin_login_id() -> LoginId {
 }
 fn admin_password() -> HashedPassword {
     HashedPassword::new("$argon2id$v=19$m=4096,t=3,p=1$wL7bldJ+qUCSNYyrgm6OUA$BW+HlZoe6tYaO4yZ3PwQ+F/hj640LiKtfuM8B6YZ+bk".into())
-}
-fn admin_reset_token_destination() -> ResetTokenDestination {
-    ResetTokenDestinationExtract {
-        email: "shun@getto.systems".into(),
-    }
-    .into()
 }
