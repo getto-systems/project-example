@@ -2,7 +2,8 @@ use std::{collections::HashSet, iter::FromIterator};
 
 use mysql::{params, prelude::Queryable, Pool};
 
-use crate::z_details::_api::mysql::helper::{infra_error, read_only_transaction};
+use crate::z_details::_api::mysql::helper::{mysql_error, read_only_transaction};
+use crate::z_details::_api::repository::helper::infra_error;
 
 use crate::auth::auth_user::_api::kernel::infra::AuthUserRepository;
 
@@ -19,19 +20,19 @@ impl<'a> MysqlAuthUserRepository<'a> {
     }
 }
 
-type GrantedRoles = Vec<String>;
-
 impl<'a> AuthUserRepository for MysqlAuthUserRepository<'a> {
     fn get(&self, user_id: &AuthUserId) -> Result<Option<AuthUser>, RepositoryError> {
-        let mut conn = self.pool.get_conn().map_err(infra_error)?;
+        let mut conn = self.pool.get_conn().map_err(mysql_error)?;
         let mut conn = conn
             .start_transaction(read_only_transaction())
-            .map_err(infra_error)?;
+            .map_err(mysql_error)?;
 
-        // granted roles の検索だけだと granted roles が未登録だとユーザーが存在しない判定になる
-        // それは直感に反するので、user の存在を確認するために user を検索する
+        // granted roles だけ検索するだけだと、未登録だった場合に不足
+        // user の存在を確認して、問題なければ granted roles を合わせて返す
+        // group concat を使えば一度に取れるが、データの構築をしないといけない
+        // ここではそこまで効率を重視しないので、クエリを２回投げることにする
 
-        let count: usize = conn
+        let count: u8 = conn
             .exec_first(
                 r"#####
                 select count(*) from user
@@ -41,14 +42,14 @@ impl<'a> AuthUserRepository for MysqlAuthUserRepository<'a> {
                     "user_id" => user_id.as_str(),
                 },
             )
-            .map_err(infra_error)?
-            .ok_or(RepositoryError::InfraError("failed to count user".into()))?;
+            .map_err(mysql_error)?
+            .ok_or(infra_error("failed to count user"))?;
 
         if count == 0 {
             return Ok(None);
         }
 
-        let found: GrantedRoles = conn
+        let found: Vec<String> = conn
             .exec(
                 r"#####
                 select role from user_granted_role
@@ -58,7 +59,7 @@ impl<'a> AuthUserRepository for MysqlAuthUserRepository<'a> {
                     "user_id" => user_id.as_str(),
                 },
             )
-            .map_err(infra_error)?;
+            .map_err(mysql_error)?;
 
         Ok(Some(
             AuthUserExtract {

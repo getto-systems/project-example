@@ -25,10 +25,6 @@ pub struct ResetTokenDestination {
 }
 
 impl ResetTokenDestination {
-    pub fn extract(self) -> ResetTokenDestinationExtract {
-        ResetTokenDestinationExtract { email: self.email }
-    }
-
     pub fn into_email(self) -> String {
         self.email
     }

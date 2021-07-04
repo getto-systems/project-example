@@ -12,22 +12,18 @@ use crate::auth::{
     auth_ticket::_api::kernel::init::CheckAuthNonceStruct,
     password::_api::kernel::init::AuthUserPasswordStruct,
 };
-use destination_repository::MemoryResetTokenDestinationRepository;
+use destination_repository::MysqlResetTokenDestinationRepository;
 use messenger::ProtobufRequestResetTokenMessenger;
 use token_encoder::JwtResetTokenEncoder;
 use token_generator::UuidResetTokenGenerator;
 use token_notifier::EmailResetTokenNotifier;
-
-pub use destination_repository::{
-    MemoryResetTokenDestinationMap, MemoryResetTokenDestinationStore,
-};
 
 use super::infra::{RequestResetTokenConfig, RequestResetTokenInfra};
 
 pub struct RequestResetTokenStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
     password_infra: AuthUserPasswordStruct<'a>,
-    destination_repository: MemoryResetTokenDestinationRepository<'a>,
+    destination_repository: MysqlResetTokenDestinationRepository<'a>,
     token_generator: UuidResetTokenGenerator,
     token_encoder: JwtResetTokenEncoder<'a>,
     token_notifier: EmailResetTokenNotifier<'a>,
@@ -40,9 +36,7 @@ impl<'a> RequestResetTokenStruct<'a> {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, request),
             password_infra: AuthUserPasswordStruct::new(feature),
-            destination_repository: MemoryResetTokenDestinationRepository::new(
-                &feature.store.reset_token_destination,
-            ),
+            destination_repository: MysqlResetTokenDestinationRepository::new(&feature.store.mysql),
             token_generator: UuidResetTokenGenerator::new(),
             token_encoder: JwtResetTokenEncoder::new(&feature.secret.reset_token.encoding_key),
             token_notifier: EmailResetTokenNotifier::new(&feature.email),
@@ -57,7 +51,7 @@ impl<'a> RequestResetTokenStruct<'a> {
 impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
     type PasswordInfra = AuthUserPasswordStruct<'a>;
-    type DestinationRepository = MemoryResetTokenDestinationRepository<'a>;
+    type DestinationRepository = MysqlResetTokenDestinationRepository<'a>;
     type TokenGenerator = UuidResetTokenGenerator;
     type TokenEncoder = JwtResetTokenEncoder<'a>;
     type TokenNotifier = EmailResetTokenNotifier<'a>;
@@ -91,7 +85,7 @@ impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    pub use super::destination_repository::{
+    pub use super::destination_repository::test::{
         MemoryResetTokenDestinationMap, MemoryResetTokenDestinationRepository,
         MemoryResetTokenDestinationStore,
     };
