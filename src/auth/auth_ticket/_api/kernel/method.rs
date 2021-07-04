@@ -1,4 +1,4 @@
-use crate::z_details::_api::repository::data::RegisterAttemptResult;
+use crate::z_details::_api::repository::data::RegisterResult;
 
 use super::infra::{
     AuthClock, AuthNonceEntry, AuthNonceHeader, AuthNonceRepository, CheckAuthNonceInfra,
@@ -24,7 +24,7 @@ pub async fn check_nonce(infra: &impl CheckAuthNonceInfra) -> Result<(), Validat
         .await
         .map_err(ValidateAuthNonceError::RepositoryError)?
     {
-        RegisterAttemptResult::Success(_) => Ok(()),
-        RegisterAttemptResult::Conflict => Err(ValidateAuthNonceError::Conflict),
+        RegisterResult::Success(_) => Ok(()),
+        RegisterResult::Conflict => Err(ValidateAuthNonceError::Conflict),
     }
 }

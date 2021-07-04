@@ -251,12 +251,12 @@ fn conflict_nonce_store() -> MemoryAuthNonceStore {
 
 fn standard_ticket_store() -> MemoryAuthTicketStore {
     let limit = AuthDateTime::from_now(standard_now())
-        .limit(&ExpansionLimitDuration::with_duration(Duration::days(10)));
+        .expansion_limit(&ExpansionLimitDuration::with_duration(Duration::days(10)));
     MemoryAuthTicketMap::with_ticket(AuthTicketId::new(TICKET_ID.into()), limit).to_store()
 }
 fn limited_ticket_store() -> MemoryAuthTicketStore {
     let limit = AuthDateTime::from_now(standard_now())
-        .limit(&ExpansionLimitDuration::with_duration(Duration::hours(1)));
+        .expansion_limit(&ExpansionLimitDuration::with_duration(Duration::hours(1)));
     MemoryAuthTicketMap::with_ticket(AuthTicketId::new(TICKET_ID.into()), limit).to_store()
 }
 fn no_ticket_store() -> MemoryAuthTicketStore {

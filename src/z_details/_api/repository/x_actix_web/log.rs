@@ -4,8 +4,6 @@ use super::super::data::RepositoryError;
 
 impl RepositoryError {
     pub const fn log_level(&self) -> LogLevel {
-        match self {
-            Self::InfraError(_) => LogLevel::Error,
-        }
+        LogLevel::Error
     }
 }

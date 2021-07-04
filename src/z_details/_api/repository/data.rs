@@ -3,7 +3,7 @@ use std::{
     fmt::{Display, Formatter},
 };
 
-pub enum RegisterAttemptResult<T> {
+pub enum RegisterResult<T> {
     Success(T),
     Conflict,
 }

@@ -2,12 +2,12 @@ use std::collections::HashSet;
 
 use serde::{Deserialize, Serialize};
 
-use super::data::{
-    AuthDateTime, AuthNonceValue, AuthTicket, AuthTicketExtract, AuthTicketId,
-    ExpansionLimitDateTime, ExpireDateTime, ExpireDuration,
+use crate::auth::auth_ticket::_api::kernel::data::{
+    AuthDateTime, AuthNonceValue, AuthTicket, AuthTicketExtract, ExpansionLimitDateTime,
+    ExpireDateTime, ExpireDuration,
 };
 use crate::z_details::_api::{
-    repository::data::{RegisterAttemptResult, RepositoryError},
+    repository::data::{RegisterResult, RepositoryError},
     request::data::HeaderError,
 };
 
@@ -39,12 +39,12 @@ pub trait AuthNonceHeader {
 }
 
 pub trait AuthTicketRepository {
-    fn register(
+    fn issue(
         &self,
-        ticket_id: AuthTicketId,
+        ticket: AuthTicket,
         limit: ExpansionLimitDateTime,
-        registered_at: AuthDateTime,
-    ) -> Result<RegisterAttemptResult<AuthTicketId>, RepositoryError>;
+        issued_at: AuthDateTime,
+    ) -> Result<(), RepositoryError>;
 
     fn discard(
         &self,
@@ -64,7 +64,7 @@ pub trait AuthNonceRepository {
         &self,
         nonce: AuthNonceEntry,
         registered_at: &AuthDateTime,
-    ) -> Result<RegisterAttemptResult<()>, RepositoryError>;
+    ) -> Result<RegisterResult<()>, RepositoryError>;
 }
 
 pub struct AuthNonceEntry {

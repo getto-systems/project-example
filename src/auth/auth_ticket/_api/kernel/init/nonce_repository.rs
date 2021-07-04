@@ -7,7 +7,7 @@ use rusoto_dynamodb::{AttributeValue, DynamoDb, DynamoDbClient, PutItemError, Pu
 use crate::auth::auth_ticket::_api::kernel::data::AuthDateTime;
 use crate::auth::auth_ticket::_api::kernel::infra::{AuthNonceEntry, AuthNonceRepository};
 
-use crate::z_details::_api::repository::data::{RegisterAttemptResult, RepositoryError};
+use crate::z_details::_api::repository::data::{RegisterResult, RepositoryError};
 
 pub struct DynamoDbAuthNonceRepository<'a> {
     client: &'a DynamoDbClient,
@@ -31,7 +31,7 @@ impl<'a> AuthNonceRepository for DynamoDbAuthNonceRepository<'a> {
         &self,
         entry: AuthNonceEntry,
         registered_at: &AuthDateTime,
-    ) -> Result<RegisterAttemptResult<()>, RepositoryError> {
+    ) -> Result<RegisterResult<()>, RepositoryError> {
         let extract = entry.extract();
 
         let mut item = AttributeMap::new();
@@ -48,10 +48,10 @@ impl<'a> AuthNonceRepository for DynamoDbAuthNonceRepository<'a> {
         };
 
         match self.client.put_item(input).await {
-            Ok(_) => Ok(RegisterAttemptResult::Success(())),
+            Ok(_) => Ok(RegisterResult::Success(())),
             Err(err) => match err {
                 RusotoError::Service(err) => match err {
-                    PutItemError::ConditionalCheckFailed(_) => Ok(RegisterAttemptResult::Conflict),
+                    PutItemError::ConditionalCheckFailed(_) => Ok(RegisterResult::Conflict),
                     _ => Err(repository_error(err)),
                 },
                 _ => Err(repository_error(err)),
@@ -118,7 +118,7 @@ pub mod test {
     use crate::auth::auth_ticket::_api::kernel::data::{
         AuthDateTime, AuthNonceValue, ExpireDateTime,
     };
-    use crate::z_details::_api::repository::data::{RegisterAttemptResult, RepositoryError};
+    use crate::z_details::_api::repository::data::{RegisterResult, RepositoryError};
 
     pub type MemoryAuthNonceStore = Mutex<MemoryAuthNonceMap>;
     pub struct MemoryAuthNonceMap(HashMap<String, AuthNonceEntryExtract>);
@@ -169,17 +169,17 @@ pub mod test {
             &self,
             entry: AuthNonceEntry,
             registered_at: &AuthDateTime,
-        ) -> Result<RegisterAttemptResult<()>, RepositoryError> {
+        ) -> Result<RegisterResult<()>, RepositoryError> {
             let mut store = self.store.lock().unwrap();
 
             if let Some(found) = store.get(entry.nonce()) {
                 if !has_expired(found.expires, registered_at) {
-                    return Ok(RegisterAttemptResult::Conflict);
+                    return Ok(RegisterResult::Conflict);
                 }
             }
 
             store.insert(entry);
-            Ok(RegisterAttemptResult::Success(()))
+            Ok(RegisterResult::Success(()))
         }
     }
 

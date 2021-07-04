@@ -164,7 +164,7 @@ impl AuthDateTime {
         ExpireDateTime(self.0 + duration.0)
     }
 
-    pub fn limit(self, duration: &ExpansionLimitDuration) -> ExpansionLimitDateTime {
+    pub fn expansion_limit(self, duration: &ExpansionLimitDuration) -> ExpansionLimitDateTime {
         ExpansionLimitDateTime(self.0 + duration.0)
     }
 
@@ -217,6 +217,12 @@ impl ExpireDuration {
 
 #[derive(Clone)]
 pub struct ExpansionLimitDateTime(DateTime<Utc>);
+
+impl Display for ExpansionLimitDateTime {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        self.0.fmt(f)
+    }
+}
 
 #[derive(Clone, Copy)]
 pub struct ExpansionLimitDuration(Duration);

@@ -1,5 +1,7 @@
 use std::{collections::HashMap, sync::Mutex};
 
+use crate::z_details::_api::repository::helper::register_conflict_error;
+
 use crate::auth::password::_api::kernel::infra::{
     AuthUserPasswordHasher, AuthUserPasswordMatcher, AuthUserPasswordRepository, HashedPassword,
     RegisterResetTokenError, ResetPasswordError, VerifyPasswordError,
@@ -11,7 +13,6 @@ use crate::auth::{
     login_id::_api::data::LoginId,
     password::_api::kernel::data::ResetToken,
 };
-use crate::z_details::_api::repository::data::RegisterAttemptResult;
 
 pub type MemoryAuthUserPasswordStore = Mutex<MemoryAuthUserPasswordMap>;
 pub struct MemoryAuthUserPasswordMap {
@@ -149,23 +150,25 @@ impl<'a> AuthUserPasswordRepository for MemoryAuthUserPasswordRepository<'a> {
     fn register_reset_token(
         &self,
         reset_token: ResetToken,
-        login_id: &LoginId,
-        expires: &ExpireDateTime,
-        _registered_at: &AuthDateTime,
-    ) -> Result<RegisterAttemptResult<ResetToken>, RegisterResetTokenError> {
+        login_id: LoginId,
+        expires: ExpireDateTime,
+        _registered_at: AuthDateTime,
+    ) -> Result<(), RegisterResetTokenError> {
         let target_user_id: AuthUserId;
 
         {
             let store = self.store.lock().unwrap();
 
             let user_id = store
-                .get_user_id(login_id)
+                .get_user_id(&login_id)
                 .ok_or(RegisterResetTokenError::NotFound)?;
 
             // 有効期限が切れていても削除しない
             // もし衝突したら token generator の桁数を増やす
             if store.get_reset_entry(&reset_token).is_some() {
-                return Ok(RegisterAttemptResult::Conflict);
+                return Err(RegisterResetTokenError::RepositoryError(
+                    register_conflict_error(reset_token.as_str()),
+                ));
             }
 
             target_user_id = user_id.clone();
@@ -179,14 +182,14 @@ impl<'a> AuthUserPasswordRepository for MemoryAuthUserPasswordRepository<'a> {
                 reset_token.clone(),
                 ResetEntry {
                     user_id: target_user_id,
-                    login_id: login_id.clone(),
-                    expires: expires.clone(),
+                    login_id,
+                    expires,
                     discard_at: None,
                 },
             );
         }
 
-        return Ok(RegisterAttemptResult::Success(reset_token));
+        Ok(())
     }
 
     fn reset_password(
