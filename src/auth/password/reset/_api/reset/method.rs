@@ -47,7 +47,7 @@ pub async fn reset_password<S>(
     let reset_token = ResetTokenEncoded::validate(fields.reset_token)
         .map_err(|err| post(ResetPasswordEvent::ValidateResetTokenError(err)))?;
 
-    let token = token_decoder
+    let reset_token = token_decoder
         .decode(&reset_token)
         .map_err(|err| post(ResetPasswordEvent::DecodeError(err)))?;
 
@@ -55,7 +55,7 @@ pub async fn reset_password<S>(
     let reset_at = clock.now();
 
     let user_id = password_repository
-        .reset_password(&token, &login_id, &hasher, &reset_at)
+        .reset_password(&reset_token, &login_id, hasher, reset_at)
         .map_err(|err| post(err.into_reset_password_event(messenger)))?;
 
     let user_repository = infra.user_infra().user_repository();

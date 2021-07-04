@@ -37,7 +37,7 @@ pub async fn authenticate_password<S>(
     let matcher = password_infra.password_matcher(plain_password);
 
     let user_id = password_repository
-        .verify_password(&login_id, &matcher)
+        .verify_password(&login_id, matcher)
         .map_err(|err| post(err.into_authenticate_password_event(messenger)))?;
 
     let user_repository = infra.user_infra().user_repository();
