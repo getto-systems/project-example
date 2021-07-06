@@ -1,12 +1,14 @@
 use std::collections::HashMap;
-use std::fmt::Display;
 
+use chrono::{DateTime, Utc};
 use rusoto_core::RusotoError;
 use rusoto_dynamodb::{AttributeValue, DynamoDb, DynamoDbClient, PutItemError, PutItemInput};
 
-use crate::auth::auth_ticket::_api::kernel::data::AuthDateTime;
+use crate::z_details::_api::repository::helper::infra_error;
+
 use crate::auth::auth_ticket::_api::kernel::infra::{AuthNonceEntry, AuthNonceRepository};
 
+use crate::auth::auth_ticket::_api::kernel::data::AuthDateTime;
 use crate::z_details::_api::repository::data::{RegisterResult, RepositoryError};
 
 pub struct DynamoDbAuthNonceRepository<'a> {
@@ -32,11 +34,8 @@ impl<'a> AuthNonceRepository for DynamoDbAuthNonceRepository<'a> {
         entry: AuthNonceEntry,
         registered_at: AuthDateTime,
     ) -> Result<RegisterResult<()>, RepositoryError> {
-        let extract = entry.extract();
-
         let mut item = AttributeMap::new();
-        item.insert_nonce(extract.nonce);
-        item.insert_expires(extract.expires);
+        item.insert_entry(entry);
         item.insert_registered_at(registered_at);
 
         // 有効期限が切れた項目は dynamodb の TTL の設定によって削除される
@@ -52,16 +51,12 @@ impl<'a> AuthNonceRepository for DynamoDbAuthNonceRepository<'a> {
             Err(err) => match err {
                 RusotoError::Service(err) => match err {
                     PutItemError::ConditionalCheckFailed(_) => Ok(RegisterResult::Conflict),
-                    _ => Err(repository_error(err)),
+                    _ => Err(infra_error(err)),
                 },
-                _ => Err(repository_error(err)),
+                _ => Err(infra_error(err)),
             },
         }
     }
-}
-
-fn repository_error(err: impl Display) -> RepositoryError {
-    RepositoryError::InfraError(format!("{}", err))
 }
 
 struct AttributeMap(HashMap<String, AttributeValue>);
@@ -75,20 +70,21 @@ impl AttributeMap {
         self.0
     }
 
-    fn insert_nonce(&mut self, nonce: String) -> &mut Self {
-        self.0.insert(NONCE.into(), string_value(nonce));
-        self
-    }
-    fn insert_expires(&mut self, expires: Option<i64>) -> &mut Self {
-        if let Some(expires) = expires {
+    fn insert_entry(&mut self, entry: AuthNonceEntry) -> &mut Self {
+        let extract = entry.extract();
+
+        self.0.insert(NONCE.into(), string_value(extract.nonce));
+
+        if let Some(expires) = extract.expires {
             self.0.insert(EXPIRES.into(), timestamp_value(expires));
         }
+
         self
     }
     fn insert_registered_at(&mut self, registered_at: AuthDateTime) -> &mut Self {
         self.0.insert(
             REGISTERED_AT.into(),
-            timestamp_value(registered_at.extract().timestamp()),
+            timestamp_value(registered_at.extract()),
         );
         self
     }
@@ -100,9 +96,9 @@ fn string_value(value: String) -> AttributeValue {
         ..Default::default()
     }
 }
-fn timestamp_value(value: i64) -> AttributeValue {
+fn timestamp_value(value: DateTime<Utc>) -> AttributeValue {
     AttributeValue {
-        n: Some(value.to_string()),
+        n: Some(value.timestamp().to_string()),
         ..Default::default()
     }
 }
@@ -111,7 +107,7 @@ fn timestamp_value(value: i64) -> AttributeValue {
 pub mod test {
     use std::{collections::HashMap, sync::Mutex};
 
-    use chrono::{DateTime, NaiveDateTime, Utc};
+    use chrono::{DateTime, Utc};
 
     use crate::auth::auth_ticket::_api::kernel::infra::{
         AuthNonceEntry, AuthNonceEntryExtract, AuthNonceRepository,
@@ -136,7 +132,7 @@ pub mod test {
                 nonce.clone(),
                 AuthNonceEntryExtract {
                     nonce,
-                    expires: Some(expires.extract().timestamp()),
+                    expires: Some(expires.extract()),
                 },
             );
             Self(hash_map)
@@ -185,14 +181,10 @@ pub mod test {
         }
     }
 
-    fn has_expired(expires: Option<i64>, now: &AuthDateTime) -> bool {
+    fn has_expired(expires: Option<DateTime<Utc>>, now: &AuthDateTime) -> bool {
         match expires {
             None => false,
-            Some(expires) => ExpireDateTime::restore(DateTime::from_utc(
-                NaiveDateTime::from_timestamp(expires, 0),
-                Utc,
-            ))
-            .has_elapsed(now),
+            Some(expires) => ExpireDateTime::restore(expires).has_elapsed(now),
         }
     }
 }
