@@ -66,6 +66,8 @@ model ticket {
 model ticket_discarded {
   user       user     @relation(fields: [user_id], references: [user_id])
   user_id    String   @db.VarChar(36)
-  ticket_id  String   @id @db.VarChar(36)
+  ticket_id  String   @db.VarChar(36)
   discard_at DateTime
+
+  @@id([ticket_id, discard_at])
 }
