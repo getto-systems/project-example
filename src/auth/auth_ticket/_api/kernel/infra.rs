@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::auth::auth_ticket::_api::kernel::data::{
@@ -89,7 +89,7 @@ impl AuthNonceEntry {
     pub fn extract(self) -> AuthNonceEntryExtract {
         AuthNonceEntryExtract {
             nonce: self.nonce.extract(),
-            expires: self.expires.map(|expires| expires.extract().timestamp()),
+            expires: self.expires.map(|expires| expires.extract()),
         }
     }
 }
@@ -97,19 +97,14 @@ impl AuthNonceEntry {
 #[derive(Clone)]
 pub struct AuthNonceEntryExtract {
     pub nonce: String,
-    pub expires: Option<i64>,
+    pub expires: Option<DateTime<Utc>>,
 }
 
 impl From<AuthNonceEntryExtract> for AuthNonceEntry {
     fn from(src: AuthNonceEntryExtract) -> Self {
         Self {
             nonce: AuthNonceValue::new(src.nonce),
-            expires: src.expires.map(|expires| {
-                ExpireDateTime::restore(DateTime::from_utc(
-                    NaiveDateTime::from_timestamp(expires, 0),
-                    Utc,
-                ))
-            }),
+            expires: src.expires.map(|expires| ExpireDateTime::restore(expires)),
         }
     }
 }
