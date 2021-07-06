@@ -1,7 +1,9 @@
 use crate::auth::{
     auth_ticket::_api::kernel::infra::CheckAuthNonceInfra,
     auth_user::_api::kernel::infra::AuthUserInfra,
-    password::_api::kernel::infra::{AuthUserPasswordInfra, ResetPasswordError},
+    password::_api::kernel::infra::{
+        AuthUserPasswordInfra, ResetPasswordError, VerifyResetTokenEntryError,
+    },
 };
 
 use crate::auth::password::reset::_api::reset::event::ResetPasswordEvent;
@@ -48,14 +50,21 @@ pub struct ResetPasswordFieldsExtract {
     pub reset_token: String,
 }
 
-impl ResetPasswordError {
+impl Into<ResetPasswordEvent> for ResetPasswordError {
+    fn into(self) -> ResetPasswordEvent {
+        match self {
+            Self::RepositoryError(err) => ResetPasswordEvent::RepositoryError(err),
+            Self::PasswordHashError(err) => ResetPasswordEvent::PasswordHashError(err),
+        }
+    }
+}
+
+impl VerifyResetTokenEntryError {
     pub fn into_reset_password_event(
         self,
         messenger: &impl ResetPasswordMessenger,
     ) -> ResetPasswordEvent {
         match self {
-            Self::RepositoryError(err) => ResetPasswordEvent::RepositoryError(err),
-            Self::PasswordHashError(err) => ResetPasswordEvent::PasswordHashError(err),
             Self::NotFound => messenger.encode_not_found().into(),
             Self::AlreadyReset => messenger.encode_already_reset().into(),
             Self::Expired => messenger.encode_expired().into(),

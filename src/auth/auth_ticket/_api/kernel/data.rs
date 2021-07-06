@@ -152,7 +152,7 @@ impl Display for AuthTicketId {
 pub struct AuthDateTime(DateTime<Utc>);
 
 impl AuthDateTime {
-    pub const fn from_now(now: DateTime<Utc>) -> Self {
+    pub const fn restore(now: DateTime<Utc>) -> Self {
         Self(now)
     }
 

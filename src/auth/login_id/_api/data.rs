@@ -14,6 +14,10 @@ impl LoginId {
         Ok(Self(login_id))
     }
 
+    pub const fn restore(login_id: String) -> Self {
+        Self(login_id)
+    }
+
     pub fn extract(self) -> String {
         self.0
     }

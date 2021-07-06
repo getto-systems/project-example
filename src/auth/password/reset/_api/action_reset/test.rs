@@ -616,12 +616,12 @@ fn standard_nonce_store() -> MemoryAuthNonceStore {
     MemoryAuthNonceMap::new().to_store()
 }
 fn expired_nonce_store() -> MemoryAuthNonceStore {
-    let expires = AuthDateTime::from_now(standard_now())
+    let expires = AuthDateTime::restore(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(-1)));
     MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
 }
 fn conflict_nonce_store() -> MemoryAuthNonceStore {
-    let expires = AuthDateTime::from_now(standard_now())
+    let expires = AuthDateTime::restore(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(1)));
     MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
 }
@@ -632,7 +632,7 @@ fn standard_ticket_store() -> MemoryAuthTicketStore {
 
 fn standard_password_store() -> MemoryAuthUserPasswordStore {
     let reset_token = ResetToken::new(RESET_TOKEN.into());
-    let expires = AuthDateTime::from_now(standard_now())
+    let expires = AuthDateTime::restore(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(1)));
     MemoryAuthUserPasswordMap::with_reset_token(
         test_user_login_id(),
@@ -648,7 +648,7 @@ fn not_stored_password_store() -> MemoryAuthUserPasswordStore {
 }
 fn expired_reset_token_password_store() -> MemoryAuthUserPasswordStore {
     let reset_token = ResetToken::new(RESET_TOKEN.into());
-    let expires = AuthDateTime::from_now(standard_now())
+    let expires = AuthDateTime::restore(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(-1)));
     MemoryAuthUserPasswordMap::with_reset_token(
         test_user_login_id(),
@@ -661,9 +661,9 @@ fn expired_reset_token_password_store() -> MemoryAuthUserPasswordStore {
 }
 fn discarded_reset_token_password_store() -> MemoryAuthUserPasswordStore {
     let reset_token = ResetToken::new(RESET_TOKEN.into());
-    let expires = AuthDateTime::from_now(standard_now())
+    let expires = AuthDateTime::restore(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(1)));
-    let discarded_at = AuthDateTime::from_now(standard_now() - Duration::days(1));
+    let discarded_at = AuthDateTime::restore(standard_now() - Duration::days(1));
     MemoryAuthUserPasswordMap::with_reset_token(
         test_user_login_id(),
         test_user_id(),

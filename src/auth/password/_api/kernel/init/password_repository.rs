@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use chrono::{NaiveDateTime, TimeZone, Utc};
 use mysql::{params, prelude::Queryable, Pool};
 
@@ -5,7 +7,8 @@ use crate::z_details::_api::mysql::helper::mysql_error;
 
 use crate::auth::password::_api::kernel::infra::{
     AuthUserPasswordHasher, AuthUserPasswordMatcher, AuthUserPasswordRepository, HashedPassword,
-    RequestResetTokenError, ResetPasswordError, VerifyPasswordError,
+    RequestResetTokenError, ResetPasswordError, ResetTokenEntry, ResetTokenEntryExtract,
+    VerifyPasswordError,
 };
 
 use crate::auth::{
@@ -14,6 +17,8 @@ use crate::auth::{
     login_id::_api::data::LoginId,
     password::_api::kernel::data::ResetToken,
 };
+use crate::z_details::_api::repository::data::RepositoryError;
+use crate::z_details::_api::repository::helper::infra_error;
 
 pub struct MysqlAuthUserPasswordRepository<'a> {
     pool: &'a Pool,
@@ -30,8 +35,7 @@ struct UserPassword {
     hashed_password: String,
 }
 
-struct UserResetToken {
-    user_id: String,
+struct UserResetTokenEntry {
     login_id: String,
     expires: NaiveDateTime,
     reset_at: Option<NaiveDateTime>,
@@ -48,7 +52,10 @@ impl<'a> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'a> {
         let mut found = conn
             .exec_map(
                 r"#####
-                select user.user_id, hashed_password from user_password
+                select
+                    user.user_id,
+                    hashed_password
+                from user_password
                 inner join user on user_password.user_id = user.user_id
                 where user.login_id = :login_id
                 #####",
@@ -90,7 +97,9 @@ impl<'a> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'a> {
         let mut found: Vec<String> = conn
             .exec(
                 r"#####
-                    select user_id from user
+                    select
+                        user_id
+                    from user
                     where login_id = :login_id
                     #####",
                 params! {
@@ -123,23 +132,16 @@ impl<'a> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'a> {
         Ok(())
     }
 
-    fn reset_password(
+    fn reset_token_entry(
         &self,
         reset_token: &ResetToken,
-        login_id: &LoginId,
-        hasher: impl AuthUserPasswordHasher,
-        reset_at: AuthDateTime,
-    ) -> Result<AuthUserId, ResetPasswordError> {
-        let mut conn = self.pool.get_conn().map_err(reset_mysql_error)?;
-        let mut conn = conn
-            .start_transaction(Default::default())
-            .map_err(reset_mysql_error)?;
+    ) -> Result<Option<ResetTokenEntry>, RepositoryError> {
+        let mut conn = self.pool.get_conn().map_err(mysql_error)?;
 
         let mut found = conn
             .exec_map(
                 r"#####
                     select
-                        user_id,
                         login_id,
                         expires,
                         reset_at
@@ -149,26 +151,66 @@ impl<'a> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'a> {
                 params! {
                     "reset_token" => reset_token.as_str(),
                 },
-                |(user_id, login_id, expires, reset_at)| UserResetToken {
-                    user_id,
+                |(login_id, expires, reset_at)| UserResetTokenEntry {
                     login_id,
                     expires,
                     reset_at,
                 },
             )
+            .map_err(mysql_error)?;
+
+        Ok(found.pop().map(|entry| {
+            ResetTokenEntryExtract {
+                login_id: entry.login_id,
+                expires: Utc.from_utc_datetime(&entry.expires),
+                reset_at: entry
+                    .reset_at
+                    .map(|reset_at| Utc.from_utc_datetime(&reset_at)),
+            }
+            .into()
+        }))
+    }
+
+    fn reset_password(
+        &self,
+        reset_token: &ResetToken,
+        hasher: impl AuthUserPasswordHasher,
+        reset_at: AuthDateTime,
+    ) -> Result<AuthUserId, ResetPasswordError> {
+        let mut conn = self.pool.get_conn().map_err(reset_mysql_error)?;
+        let mut conn = conn
+            .start_transaction(Default::default())
             .map_err(reset_mysql_error)?;
 
-        let entry = found.pop().ok_or(ResetPasswordError::NotFound)?;
+        // reset_token が正しいことが前提; reset_token_entry() で事前に確認する
 
-        if entry.reset_at.is_some() {
-            return Err(ResetPasswordError::AlreadyReset);
-        }
-        if ExpireDateTime::restore(Utc.from_utc_datetime(&entry.expires)).has_elapsed(&reset_at) {
-            return Err(ResetPasswordError::Expired);
-        }
-        if entry.login_id.as_str() != login_id.as_str() {
-            return Err(ResetPasswordError::InvalidLoginId);
-        }
+        let user_id: String = conn
+            .exec_first(
+                r"#####
+                    select
+                        user_id
+                    from user_password_reset_token
+                    where reset_token = :reset_token
+                    #####",
+                params! {
+                    "reset_token" => reset_token.as_str(),
+                },
+            )
+            .map_err(reset_mysql_error)?
+            .ok_or(reset_infra_error("reset token not found"))?;
+
+        conn.exec_drop(
+            r"#####
+            update user_password_reset_token
+            set reset_at = :reset_at
+            where user_id = :user_id
+            #####",
+            params! {
+                "user_id" => &user_id,
+                "reset_at" => reset_at.extract().naive_utc(),
+            },
+        )
+        .map_err(reset_mysql_error)?;
 
         let hashed_password = hasher
             .hash_password()
@@ -180,7 +222,7 @@ impl<'a> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'a> {
             where user_id = :user_id
             #####",
             params! {
-                "user_id" => &entry.user_id,
+                "user_id" => &user_id,
             },
         )
         .map_err(reset_mysql_error)?;
@@ -193,7 +235,7 @@ impl<'a> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'a> {
                 (:user_id, :hashed_password)
             #####",
             params! {
-                "user_id" => &entry.user_id,
+                "user_id" => &user_id,
                 "hashed_password" => hashed_password.as_str(),
             },
         )
@@ -201,7 +243,7 @@ impl<'a> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'a> {
 
         conn.commit().map_err(reset_mysql_error)?;
 
-        Ok(AuthUserId::restore(entry.user_id))
+        Ok(AuthUserId::restore(user_id))
     }
 }
 
@@ -214,16 +256,22 @@ fn request_mysql_error(err: mysql::Error) -> RequestResetTokenError {
 fn reset_mysql_error(err: mysql::Error) -> ResetPasswordError {
     ResetPasswordError::RepositoryError(mysql_error(err))
 }
+fn reset_infra_error(err: impl Display) -> ResetPasswordError {
+    ResetPasswordError::RepositoryError(infra_error(err))
+}
 
 #[cfg(test)]
 pub mod test {
     use std::{collections::HashMap, sync::Mutex};
 
+    use chrono::{DateTime, Utc};
+
     use crate::z_details::_api::repository::helper::infra_error;
 
     use crate::auth::password::_api::kernel::infra::{
         AuthUserPasswordHasher, AuthUserPasswordMatcher, AuthUserPasswordRepository,
-        HashedPassword, RequestResetTokenError, ResetPasswordError, VerifyPasswordError,
+        HashedPassword, RequestResetTokenError, ResetPasswordError, ResetTokenEntry,
+        ResetTokenEntryExtract, VerifyPasswordError,
     };
 
     use crate::auth::{
@@ -232,6 +280,7 @@ pub mod test {
         login_id::_api::data::LoginId,
         password::_api::kernel::data::ResetToken,
     };
+    use crate::z_details::_api::repository::data::RepositoryError;
 
     pub type MemoryAuthUserPasswordStore = Mutex<MemoryAuthUserPasswordMap>;
     pub struct MemoryAuthUserPasswordMap {
@@ -243,15 +292,15 @@ pub mod test {
     #[derive(Clone)]
     struct ResetEntry {
         user_id: AuthUserId,
-        login_id: LoginId,
-        expires: ExpireDateTime,
-        discard_at: Option<AuthDateTime>,
+        login_id: String,
+        expires: DateTime<Utc>,
+        reset_at: Option<DateTime<Utc>>,
     }
 
     impl ResetEntry {
-        fn discard(self, discard_at: AuthDateTime) -> Self {
+        fn discard(self, reset_at: AuthDateTime) -> Self {
             Self {
-                discard_at: Some(discard_at),
+                reset_at: Some(reset_at.extract()),
                 ..self
             }
         }
@@ -292,9 +341,9 @@ pub mod test {
                     reset_token,
                     ResetEntry {
                         user_id,
-                        login_id,
-                        expires,
-                        discard_at,
+                        login_id: login_id.extract(),
+                        expires: expires.extract(),
+                        reset_at: discard_at.map(|discard_at| discard_at.extract()),
                     },
                 );
             store
@@ -405,9 +454,9 @@ pub mod test {
                     reset_token.clone(),
                     ResetEntry {
                         user_id: target_user_id,
-                        login_id,
-                        expires,
-                        discard_at: None,
+                        login_id: login_id.extract(),
+                        expires: expires.extract(),
+                        reset_at: None,
                     },
                 );
             }
@@ -415,10 +464,26 @@ pub mod test {
             Ok(())
         }
 
+        fn reset_token_entry(
+            &self,
+            reset_token: &ResetToken,
+        ) -> Result<Option<ResetTokenEntry>, RepositoryError> {
+            let store = self.store.lock().unwrap();
+
+            Ok(store.get_reset_entry(&reset_token).map(|entry| {
+                let entry = entry.clone();
+                ResetTokenEntryExtract {
+                    login_id: entry.login_id,
+                    expires: entry.expires,
+                    reset_at: entry.reset_at,
+                }
+                .into()
+            }))
+        }
+
         fn reset_password(
             &self,
             reset_token: &ResetToken,
-            login_id: &LoginId,
             hasher: impl AuthUserPasswordHasher,
             reset_at: AuthDateTime,
         ) -> Result<AuthUserId, ResetPasswordError> {
@@ -427,19 +492,9 @@ pub mod test {
             {
                 let store = self.store.lock().unwrap();
 
-                let entry = store
-                    .get_reset_entry(&reset_token)
-                    .ok_or(ResetPasswordError::NotFound)?;
-
-                if entry.discard_at.is_some() {
-                    return Err(ResetPasswordError::AlreadyReset);
-                }
-                if entry.expires.has_elapsed(&reset_at) {
-                    return Err(ResetPasswordError::Expired);
-                }
-                if entry.login_id.as_str() != login_id.as_str() {
-                    return Err(ResetPasswordError::InvalidLoginId);
-                }
+                let entry = store.get_reset_entry(&reset_token).ok_or(
+                    ResetPasswordError::RepositoryError(infra_error("reset token not found")),
+                )?;
 
                 target_entry = entry.clone().discard(reset_at);
             }
@@ -453,7 +508,10 @@ pub mod test {
 
                 // 実際のデータベースには registered_at も保存する必要がある
                 store
-                    .insert_password(login_id.clone(), hashed_password)
+                    .insert_password(
+                        LoginId::restore(target_entry.login_id.clone()),
+                        hashed_password,
+                    )
                     .insert_reset_token(reset_token.clone(), target_entry.clone());
             }
 
