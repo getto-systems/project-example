@@ -65,7 +65,7 @@ pub fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
         },
         email: AuthOutsideEmail {
             ses: SesClient::new(Region::ApNortheast1),
-            ui_host: &env.ui_host,
+            reset_password_url: &env.reset_password_url,
         },
     }
 }

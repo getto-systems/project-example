@@ -46,5 +46,5 @@ pub struct AuthOutsideCdnSecret {
 }
 pub struct AuthOutsideEmail {
     pub ses: SesClient,
-    pub ui_host: &'static str,
+    pub reset_password_url: &'static str,
 }
