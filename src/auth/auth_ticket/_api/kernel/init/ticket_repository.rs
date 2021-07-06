@@ -1,8 +1,7 @@
 use chrono::{NaiveDateTime, TimeZone, Utc};
 use mysql::{params, prelude::Queryable, Pool};
 
-use crate::z_details::_api::mysql::helper::mysql_error;
-use crate::z_details::_api::repository::helper::infra_error;
+use crate::z_details::_api::{mysql::helper::mysql_error, repository::helper::infra_error};
 
 use crate::auth::auth_ticket::_api::kernel::infra::AuthTicketRepository;
 
@@ -19,11 +18,6 @@ impl<'a> MysqlAuthTicketRepository<'a> {
     pub const fn new(pool: &'a Pool) -> Self {
         Self { pool }
     }
-}
-
-struct Ticket {
-    user_id: String,
-    ticket_id: String,
 }
 
 struct TicketExpansionLimit {
@@ -68,51 +62,53 @@ impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
 
         let ticket = ticket.extract();
         let ticket_id = ticket.ticket_id;
+        let user_id = ticket.user_id;
 
-        let found = conn
-            .exec_map(
+        let count: u8 = conn
+            .exec_first(
                 r"#####
-                select user_id, ticket_id from ticket
+                select count(*)
+                from ticket
+                where ticket_id = :ticket_id
+                and user_id = :user_id
+                #####",
+                params! {
+                    "ticket_id" => &ticket_id,
+                    "user_id" => &user_id,
+                },
+            )
+            .map_err(mysql_error)?
+            .ok_or(infra_error("failed to count ticket"))?;
+
+        if count > 0 {
+            conn.exec_drop(
+                r"#####
+                delete from ticket
                 where ticket_id = :ticket_id
                 #####",
                 params! {
                     "ticket_id" => &ticket_id,
                 },
-                |(user_id, ticket_id)| Ticket { user_id, ticket_id },
             )
             .map_err(mysql_error)?;
 
-        let found = found
-            .get(0)
-            .ok_or_else(|| infra_error(format!("ticket not found; ticket-id: {}", &ticket_id)))?;
+            conn.exec_drop(
+                r"#####
+                insert into ticket_discarded
+                    (user_id, ticket_id, discard_at)
+                values
+                    (:user_id, :ticket_id, :discard_at)
+                #####",
+                params! {
+                    "user_id" => &user_id,
+                    "ticket_id" => &ticket_id,
+                    "discard_at" => discard_at.extract().naive_utc(),
+                },
+            )
+            .map_err(mysql_error)?;
 
-        conn.exec_drop(
-            r"#####
-            delete from ticket
-            where ticket_id = :ticket_id
-            #####",
-            params! {
-                "ticket_id" => &ticket_id,
-            },
-        )
-        .map_err(mysql_error)?;
-
-        conn.exec_drop(
-            r"#####
-            insert into ticket_discarded
-                (user_id, ticket_id, discard_at)
-            values
-                (:user_id, :ticket_id, :discard_at)
-            #####",
-            params! {
-                "user_id" => &found.user_id,
-                "ticket_id" => &found.ticket_id,
-                "discard_at" => discard_at.extract().naive_utc(),
-            },
-        )
-        .map_err(mysql_error)?;
-
-        conn.commit().map_err(mysql_error)?;
+            conn.commit().map_err(mysql_error)?;
+        }
 
         Ok(())
     }
