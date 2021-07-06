@@ -299,12 +299,12 @@ fn standard_nonce_store() -> MemoryAuthNonceStore {
     MemoryAuthNonceMap::new().to_store()
 }
 fn expired_nonce_store() -> MemoryAuthNonceStore {
-    let expires = AuthDateTime::from_now(standard_now())
+    let expires = AuthDateTime::restore(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(-1)));
     MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
 }
 fn conflict_nonce_store() -> MemoryAuthNonceStore {
-    let expires = AuthDateTime::from_now(standard_now())
+    let expires = AuthDateTime::restore(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(1)));
     MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
 }

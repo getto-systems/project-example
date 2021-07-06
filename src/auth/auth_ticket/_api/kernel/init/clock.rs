@@ -14,7 +14,7 @@ impl ChronoAuthClock {
 
 impl AuthClock for ChronoAuthClock {
     fn now(&self) -> AuthDateTime {
-        AuthDateTime::from_now(Utc::now())
+        AuthDateTime::restore(Utc::now())
     }
 }
 
@@ -40,7 +40,7 @@ pub mod test {
 
     impl AuthClock for StaticChronoAuthClock {
         fn now(&self) -> AuthDateTime {
-            AuthDateTime::from_now(self.now.clone())
+            AuthDateTime::restore(self.now.clone())
         }
     }
 }
