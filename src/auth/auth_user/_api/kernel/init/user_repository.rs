@@ -2,8 +2,10 @@ use std::{collections::HashSet, iter::FromIterator};
 
 use mysql::{params, prelude::Queryable, Pool};
 
-use crate::z_details::_api::mysql::helper::{mysql_error, read_only_transaction};
-use crate::z_details::_api::repository::helper::infra_error;
+use crate::z_details::_api::{
+    mysql::helper::{mysql_error, read_only_transaction},
+    repository::helper::infra_error,
+};
 
 use crate::auth::auth_user::_api::kernel::infra::AuthUserRepository;
 
@@ -27,7 +29,7 @@ impl<'a> AuthUserRepository for MysqlAuthUserRepository<'a> {
             .start_transaction(read_only_transaction())
             .map_err(mysql_error)?;
 
-        // granted roles だけ検索するだけだと、未登録だった場合に不足
+        // granted roles だけの検索だと、未登録だった場合に不足
         // user の存在を確認して、問題なければ granted roles を合わせて返す
         // group concat を使えば一度に取れるが、データの構築をしないといけない
         // ここではそこまで効率を重視しないので、クエリを２回投げることにする
@@ -35,7 +37,8 @@ impl<'a> AuthUserRepository for MysqlAuthUserRepository<'a> {
         let count: u8 = conn
             .exec_first(
                 r"#####
-                select count(*) from user
+                select count(*)
+                from user
                 where user_id = :user_id
                 #####",
                 params! {
