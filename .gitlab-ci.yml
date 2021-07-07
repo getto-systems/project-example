@@ -34,7 +34,7 @@ migrate:
 
   before_script:
     - npm clean-install
-    - curl -s https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 > cloud_sql_proxy
+    - curl -s https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 > cloudsql_proxy
     - chmod a+x cloudsql_proxy
   script:
     - ./api/ci/migrate.sh ./cloudsql_proxy
