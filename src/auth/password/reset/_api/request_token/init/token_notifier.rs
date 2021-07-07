@@ -12,14 +12,14 @@ use crate::auth::password::reset::_api::{
 
 pub struct EmailResetTokenNotifier<'a> {
     client: &'a SesClient,
-    ui_host: &'a str,
+    reset_password_url: &'a str,
 }
 
 impl<'a> EmailResetTokenNotifier<'a> {
     pub fn new(email: &'a AuthOutsideEmail) -> Self {
         Self {
             client: &email.ses,
-            ui_host: &email.ui_host,
+            reset_password_url: &email.reset_password_url,
         }
     }
 }
@@ -32,7 +32,7 @@ impl<'a> ResetTokenNotifier for EmailResetTokenNotifier<'a> {
         token: ResetTokenEncoded,
     ) -> Result<NotifyResetTokenResponse, NotifyResetTokenError> {
         let destination = destination.into();
-        let message = build_message(self.ui_host, token)
+        let message = build_message(self.reset_password_url, token)
             .map_err(|err| NotifyResetTokenError::InfraError(format!("{}", err)))?;
         let source = SENDER_ADDRESS.into();
 
@@ -63,8 +63,11 @@ impl Into<Destination> for ResetTokenDestination {
     }
 }
 
-fn build_message(ui_host: &str, token: ResetTokenEncoded) -> Result<Message, ParseError> {
-    let url = build_url(ui_host, token)?;
+fn build_message(
+    reset_password_url: &str,
+    token: ResetTokenEncoded,
+) -> Result<Message, ParseError> {
+    let url = build_url(reset_password_url, token)?;
 
     let subject = SUBJECT.into();
     let body = BODY.replace("{URL}", url.as_str());
@@ -77,8 +80,8 @@ fn build_message(ui_host: &str, token: ResetTokenEncoded) -> Result<Message, Par
         },
     })
 }
-fn build_url(ui_host: &str, token: ResetTokenEncoded) -> Result<Url, ParseError> {
-    let mut url = Url::parse(format!("https://{}", ui_host).as_str())?;
+fn build_url(reset_password_url: &str, token: ResetTokenEncoded) -> Result<Url, ParseError> {
+    let mut url = Url::parse(reset_password_url)?;
     url.query_pairs_mut()
         .append_pair("-password-reset", "reset")
         .append_pair("-password-reset-token", token.as_str());

@@ -34,7 +34,6 @@ async fn main() -> io::Result<()> {
             .wrap(cors)
             .app_data(data.clone())
             .service(root::index)
-            .service(demo::mysql_select)
             .service(scope_auth())
     })
     .bind(format!("0.0.0.0:{}", &ENV.port))?
@@ -50,62 +49,5 @@ mod root {
     #[get("/")]
     async fn index() -> impl Responder {
         format!("GETTO-EXAMPLE-API: OK; version: {}", VERSION)
-    }
-}
-
-mod demo {
-    use std::env::var;
-
-    use actix_web::{get, Responder};
-    use mysql::{params, prelude::Queryable, Error, Opts, Pool};
-
-    #[get("/mysql")]
-    async fn mysql_select() -> impl Responder {
-        match select().await {
-            Ok(response) => response,
-            Err(err) => format!("{}", err),
-        }
-    }
-
-    const USER_ID: &'static str = "admin";
-
-    async fn select() -> Result<String, Error> {
-        let pool = Pool::new(Opts::from_url(load("SECRET_MYSQL_AUTH_URL").as_str())?)?;
-        let mut conn = pool.get_conn()?;
-
-        // conn.exec_drop(
-        //     "insert into user(user_id, login_id) values(:user_id, :login_id)",
-        //     params! {
-        //         "user_id" => USER_ID,
-        //         "login_id" => "admin",
-        //     },
-        // )?;
-        // conn.exec_drop(
-        //     "insert into user_granted_role(user_id, role) values(:user_id, :role)",
-        //     params! {
-        //         "user_id" => USER_ID,
-        //         "role" => "admin",
-        //     },
-        // )?;
-        // conn.exec_drop(
-        //     "insert into user_granted_role(user_id, role) values(:user_id, :role)",
-        //     params! {
-        //         "user_id" => USER_ID,
-        //         "role" => "dev-docs",
-        //     },
-        // )?;
-        conn.exec_drop(
-            "insert into user_password_reset_token_destination(user_id, email) values(:user_id, :email)",
-            params! {
-                "user_id" => USER_ID,
-                "email" => "shun@getto.systems",
-            },
-        )?;
-
-        Ok(format!("success"))
-    }
-
-    fn load(key: &'static str) -> String {
-        var(key).expect(format!("env not specified: {}", key).as_str())
     }
 }
