@@ -9,6 +9,7 @@ generator client {
 }
 
 //
+//
 // テーブル名は単数で; schema.prisma を読みやすくするため
 // カラム名はデータベース内でできる限り衝突させない
 // id カラムは {table}_id
