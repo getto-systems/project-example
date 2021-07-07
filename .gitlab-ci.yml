@@ -28,7 +28,7 @@ migrate:
   stage: migrate
   only:
     refs:
-      - merge_requests
+      - release@getto-systems-base/projects/example
     changes:
       - "src/**/z_prisma/*"
 
