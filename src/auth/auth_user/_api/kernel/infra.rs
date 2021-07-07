@@ -7,6 +7,7 @@ pub trait AuthUserInfra {
     fn user_repository(&self) -> &Self::UserRepository;
 }
 
+#[async_trait::async_trait]
 pub trait AuthUserRepository {
-    fn get(&self, id: &AuthUserId) -> Result<Option<AuthUser>, RepositoryError>;
+    async fn get(&self, id: &AuthUserId) -> Result<Option<AuthUser>, RepositoryError>;
 }

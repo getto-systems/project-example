@@ -70,10 +70,12 @@ impl<M: ResetPasswordMaterial> ResetPasswordAction<M> {
 
         let ticket = issue_auth_ticket(m.issue(), user, |event| {
             pubsub.post(ResetPasswordState::Issue(event))
-        })?;
+        })
+        .await?;
 
         encode_auth_ticket(m.encode(), ticket, |event| {
             pubsub.post(ResetPasswordState::Encode(event))
         })
+        .await
     }
 }

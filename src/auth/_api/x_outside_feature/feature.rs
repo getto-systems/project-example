@@ -1,7 +1,7 @@
 use jsonwebtoken::{DecodingKey, EncodingKey};
-use mysql::Pool;
 use rusoto_dynamodb::DynamoDbClient;
 use rusoto_ses::SesClient;
+use sqlx::MySqlPool;
 
 use aws_cloudfront_cookie::CloudfrontKey;
 
@@ -24,7 +24,7 @@ pub struct AuthOutsideConfig {
 pub struct AuthOutsideStore {
     pub dynamodb: DynamoDbClient,
     pub nonce_table_name: &'static str,
-    pub mysql: Pool,
+    pub mysql: MySqlPool,
 }
 pub struct AuthOutsideCookie {
     pub domain: &'static str,

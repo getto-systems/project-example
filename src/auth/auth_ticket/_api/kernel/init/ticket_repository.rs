@@ -1,7 +1,7 @@
-use chrono::{NaiveDateTime, TimeZone, Utc};
-use mysql::{params, prelude::Queryable, Pool};
+use chrono::{TimeZone, Utc};
+use sqlx::{query, MySqlPool};
 
-use crate::z_details::_api::{mysql::helper::mysql_error, repository::helper::infra_error};
+use crate::z_details::_api::mysql::helper::mysql_error;
 
 use crate::auth::auth_ticket::_api::kernel::infra::AuthTicketRepository;
 
@@ -11,128 +11,123 @@ use crate::auth::auth_ticket::_api::kernel::data::{
 use crate::z_details::_api::repository::data::RepositoryError;
 
 pub struct MysqlAuthTicketRepository<'a> {
-    pool: &'a Pool,
+    pool: &'a MySqlPool,
 }
 
 impl<'a> MysqlAuthTicketRepository<'a> {
-    pub const fn new(pool: &'a Pool) -> Self {
+    pub const fn new(pool: &'a MySqlPool) -> Self {
         Self { pool }
     }
 }
 
-struct TicketExpansionLimit {
-    expansion_limit: NaiveDateTime,
-}
-
+#[async_trait::async_trait]
 impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
-    fn issue(
+    async fn issue(
         &self,
         ticket: AuthTicket,
         expansion_limit: ExpansionLimitDateTime,
         issued_at: AuthDateTime,
     ) -> Result<(), RepositoryError> {
-        let mut conn = self.pool.get_conn().map_err(mysql_error)?;
+        let conn = self.pool;
 
         let ticket = ticket.extract();
 
-        conn.exec_drop(
+        query!(
             r"#####
             insert into ticket
                 (user_id, ticket_id, expansion_limit, issued_at)
             values
-                (:user_id, :ticket_id, :expansion_limit, :issued_at)
+                (?, ?, ?, ?)
             #####",
-            params! {
-                "user_id" => ticket.user_id,
-                "ticket_id" => ticket.ticket_id,
-                "expansion_limit" => expansion_limit.extract().naive_utc(),
-                "issued_at" => issued_at.extract().naive_utc(),
-            },
+            ticket.user_id,
+            ticket.ticket_id,
+            expansion_limit.extract(),
+            issued_at.extract(),
         )
+        .execute(conn)
+        .await
         .map_err(mysql_error)?;
 
         Ok(())
     }
 
-    fn discard(&self, ticket: AuthTicket, discard_at: AuthDateTime) -> Result<(), RepositoryError> {
-        let mut conn = self.pool.get_conn().map_err(mysql_error)?;
-        let mut conn = conn
-            .start_transaction(Default::default())
-            .map_err(mysql_error)?;
+    async fn discard(
+        &self,
+        ticket: AuthTicket,
+        discard_at: AuthDateTime,
+    ) -> Result<(), RepositoryError> {
+        let mut conn = self.pool.begin().await.map_err(mysql_error)?;
 
         let ticket = ticket.extract();
         let ticket_id = ticket.ticket_id;
         let user_id = ticket.user_id;
 
-        let count: u8 = conn
-            .exec_first(
-                r"#####
-                select count(*)
-                from ticket
-                where ticket_id = :ticket_id
-                and user_id = :user_id
-                #####",
-                params! {
-                    "ticket_id" => &ticket_id,
-                    "user_id" => &user_id,
-                },
-            )
-            .map_err(mysql_error)?
-            .ok_or(infra_error("failed to count ticket"))?;
+        let record = query!(
+            r"#####
+            select
+                count(*) as count
+            from ticket
+            where ticket_id = ?
+            and user_id = ?
+            #####",
+            &ticket_id,
+            &user_id,
+        )
+        .fetch_one(&mut conn)
+        .await
+        .map_err(mysql_error)?;
 
-        if count > 0 {
-            conn.exec_drop(
+        if record.count > 0 {
+            query!(
                 r"#####
                 delete from ticket
-                where ticket_id = :ticket_id
+                where ticket_id = ?
                 #####",
-                params! {
-                    "ticket_id" => &ticket_id,
-                },
+                &ticket_id,
             )
+            .execute(&mut conn)
+            .await
             .map_err(mysql_error)?;
 
-            conn.exec_drop(
+            query!(
                 r"#####
                 insert into ticket_discarded
                     (user_id, ticket_id, discard_at)
                 values
-                    (:user_id, :ticket_id, :discard_at)
+                    (?, ?, ?)
                 #####",
-                params! {
-                    "user_id" => &user_id,
-                    "ticket_id" => &ticket_id,
-                    "discard_at" => discard_at.extract().naive_utc(),
-                },
+                &user_id,
+                &ticket_id,
+                discard_at.extract(),
             )
+            .execute(&mut conn)
+            .await
             .map_err(mysql_error)?;
 
-            conn.commit().map_err(mysql_error)?;
+            conn.commit().await.map_err(mysql_error)?;
         }
 
         Ok(())
     }
 
-    fn expansion_limit(
+    async fn expansion_limit(
         &self,
         ticket: &AuthTicket,
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError> {
-        let mut conn = self.pool.get_conn().map_err(mysql_error)?;
+        let conn = self.pool;
 
-        let found = conn
-            .exec_map(
-                r"#####
-                select expansion_limit from ticket
-                where ticket_id = :ticket_id
-                #####",
-                params! {
-                    "ticket_id" => ticket.ticket_id_as_str(),
-                },
-                |expansion_limit| TicketExpansionLimit { expansion_limit },
-            )
-            .map_err(mysql_error)?;
+        let found = query!(
+            r"#####
+            select expansion_limit from ticket
+            where ticket_id = ?
+            #####",
+            ticket.ticket_id_as_str(),
+        )
+        .fetch_optional(conn)
+        .await
+        .map_err(mysql_error)?;
 
-        Ok(found.get(0).map(|found| {
+        Ok(found.map(|found| {
             ExpansionLimitDateTime::restore(Utc.from_utc_datetime(&found.expansion_limit))
         }))
     }
@@ -196,8 +191,9 @@ pub mod test {
         }
     }
 
+    #[async_trait::async_trait]
     impl<'a> AuthTicketRepository for MemoryAuthTicketRepository<'a> {
-        fn issue(
+        async fn issue(
             &self,
             ticket: AuthTicket,
             limit: ExpansionLimitDateTime,
@@ -215,7 +211,7 @@ pub mod test {
             Ok(())
         }
 
-        fn discard(
+        async fn discard(
             &self,
             auth_ticket: AuthTicket,
             _discard_at: AuthDateTime,
@@ -229,7 +225,7 @@ pub mod test {
             Ok(())
         }
 
-        fn expansion_limit(
+        async fn expansion_limit(
             &self,
             ticket: &AuthTicket,
         ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError> {

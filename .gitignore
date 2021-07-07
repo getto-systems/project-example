@@ -2,6 +2,7 @@
 /tmp/
 
 /.secret/
+/.env
 
 /node_modules/
 /target/

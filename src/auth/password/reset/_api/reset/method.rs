@@ -60,6 +60,7 @@ pub async fn reset_password<S>(
 
     let entry = password_repository
         .reset_token_entry(&reset_token)
+        .await
         .map_err(|err| post(ResetPasswordEvent::RepositoryError(err)))?;
 
     verify_reset_token_entry(entry, &reset_at, &login_id)
@@ -67,10 +68,12 @@ pub async fn reset_password<S>(
 
     let user_id = password_repository
         .reset_password(&reset_token, hasher, reset_at)
+        .await
         .map_err(|err| post(err.into()))?;
 
     let user = user_repository
         .get(&user_id)
+        .await
         .map_err(|err| post(ResetPasswordEvent::RepositoryError(err)))?
         .ok_or_else(|| post(ResetPasswordEvent::UserNotFound))?;
 

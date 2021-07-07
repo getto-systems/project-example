@@ -44,8 +44,9 @@ pub struct RequestResetTokenConfig {
     pub token_expires: ExpireDuration,
 }
 
+#[async_trait::async_trait]
 pub trait ResetTokenDestinationRepository {
-    fn get(&self, login_id: &LoginId) -> Result<Option<ResetTokenDestination>, RepositoryError>;
+    async fn get(&self, login_id: &LoginId) -> Result<Option<ResetTokenDestination>, RepositoryError>;
 }
 
 pub trait ResetTokenGenerator {

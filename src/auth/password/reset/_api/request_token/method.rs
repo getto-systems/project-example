@@ -37,6 +37,7 @@ pub async fn request_reset_token<S>(
 
     let destination = destination_repository
         .get(&login_id)
+        .await
         .map_err(|err| post(RequestResetTokenEvent::RepositoryError(err)))?
         .ok_or_else(|| post(messenger.encode_destination_not_found().into()))?;
 
@@ -58,6 +59,7 @@ pub async fn request_reset_token<S>(
 
     password_repository
         .request_reset_token(reset_token.clone(), login_id, expires.clone(), requested_at)
+        .await
         .map_err(|err| post(err.into_request_reset_token_event(messenger)))?;
 
     let token_encoded = token_encoder

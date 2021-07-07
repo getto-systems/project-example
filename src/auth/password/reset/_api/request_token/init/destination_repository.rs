@@ -1,4 +1,4 @@
-use mysql::{params, prelude::Queryable, Pool};
+use sqlx::{query, MySqlPool};
 
 use crate::z_details::_api::mysql::helper::mysql_error;
 
@@ -13,36 +13,38 @@ use crate::auth::{
 use crate::z_details::_api::repository::data::RepositoryError;
 
 pub struct MysqlResetTokenDestinationRepository<'a> {
-    pool: &'a Pool,
+    pool: &'a MySqlPool,
 }
 
 impl<'a> MysqlResetTokenDestinationRepository<'a> {
-    pub const fn new(pool: &'a Pool) -> Self {
+    pub const fn new(pool: &'a MySqlPool) -> Self {
         Self { pool }
     }
 }
 
+#[async_trait::async_trait]
 impl<'a> ResetTokenDestinationRepository for MysqlResetTokenDestinationRepository<'a> {
-    fn get(&self, login_id: &LoginId) -> Result<Option<ResetTokenDestination>, RepositoryError> {
-        let mut conn = self.pool.get_conn().map_err(mysql_error)?;
+    async fn get(
+        &self,
+        login_id: &LoginId,
+    ) -> Result<Option<ResetTokenDestination>, RepositoryError> {
+        let conn = self.pool;
 
-        let mut found: Vec<String> = conn
-            .exec_map(
-                r"#####
-                select email from user_password_reset_token_destination
-                inner join user on user.user_id = user_password_reset_token_destination.user_id
-                where user.login_id = :login_id
-                #####",
-                params! {
-                    "login_id" => login_id.as_str(),
-                },
-                |email| email,
-            )
-            .map_err(mysql_error)?;
+        let found = query!(
+            r"#####
+            select
+                email
+            from user_password_reset_token_destination
+            inner join user on user.user_id = user_password_reset_token_destination.user_id
+            where user.login_id = ?
+            #####",
+            login_id.as_str(),
+        )
+        .fetch_optional(conn)
+        .await
+        .map_err(mysql_error)?;
 
-        Ok(found
-            .pop()
-            .map(|email| ResetTokenDestinationExtract { email }.into()))
+        Ok(found.map(|entry| ResetTokenDestinationExtract { email: entry.email }.into()))
     }
 }
 
@@ -96,8 +98,9 @@ pub mod test {
         }
     }
 
+    #[async_trait::async_trait]
     impl<'a> ResetTokenDestinationRepository for MemoryResetTokenDestinationRepository<'a> {
-        fn get(
+        async fn get(
             &self,
             login_id: &LoginId,
         ) -> Result<Option<ResetTokenDestination>, RepositoryError> {

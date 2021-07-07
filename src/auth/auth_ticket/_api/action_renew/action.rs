@@ -54,10 +54,12 @@ impl<M: RenewAuthTicketMaterial> RenewAuthTicketAction<M> {
 
         let ticket = validate_auth_token(m.validate(), |event| {
             pubsub.post(RenewAuthTicketState::Validate(event))
-        }).await?;
+        })
+        .await?;
 
         encode_auth_ticket(m.encode(), ticket, |event| {
             pubsub.post(RenewAuthTicketState::Encode(event))
         })
+        .await
     }
 }

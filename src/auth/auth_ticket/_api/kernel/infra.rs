@@ -39,21 +39,22 @@ pub trait AuthNonceHeader {
     fn nonce(&self) -> Result<AuthNonceValue, HeaderError>;
 }
 
+#[async_trait::async_trait]
 pub trait AuthTicketRepository {
-    fn issue(
+    async fn issue(
         &self,
         ticket: AuthTicket,
         limit: ExpansionLimitDateTime,
         issued_at: AuthDateTime,
     ) -> Result<(), RepositoryError>;
 
-    fn discard(
+    async fn discard(
         &self,
         auth_ticket: AuthTicket,
         discard_at: AuthDateTime,
     ) -> Result<(), RepositoryError>;
 
-    fn expansion_limit(
+    async fn expansion_limit(
         &self,
         ticket: &AuthTicket,
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError>;
