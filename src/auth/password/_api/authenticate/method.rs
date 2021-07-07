@@ -38,12 +38,14 @@ pub async fn authenticate_password<S>(
 
     let user_id = password_repository
         .verify_password(&login_id, matcher)
+        .await
         .map_err(|err| post(err.into_authenticate_password_event(messenger)))?;
 
     let user_repository = infra.user_infra().user_repository();
 
     let user = user_repository
         .get(&user_id)
+        .await
         .map_err(|err| post(AuthenticatePasswordEvent::RepositoryError(err)))?;
 
     let user = user.ok_or_else(|| post(AuthenticatePasswordEvent::UserNotFound))?;

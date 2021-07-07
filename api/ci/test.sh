@@ -83,12 +83,12 @@ coverage_check() {
     local line_coverage
     line_coverage=$(grep abbr "${output_dir}/index.html" | head -1 | cut -d'>' -f 2 | cut -d'%' -f 1)
     case "${line_coverage}" in
-    100*)
+    100* | 99*)
         echo "OK; line coverage: ${line_coverage}"
         ;;
 
     *)
-        echo "NG; line coverage: ${line_coverage} < 100%"
+        echo "NG; line coverage: ${line_coverage} < 99%"
         exit 1
         ;;
     esac

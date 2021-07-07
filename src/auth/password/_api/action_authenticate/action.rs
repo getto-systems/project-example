@@ -71,10 +71,12 @@ impl<M: AuthenticatePasswordMaterial> AuthenticatePasswordAction<M> {
 
         let ticket = issue_auth_ticket(m.issue(), user, |event| {
             pubsub.post(AuthenticatePasswordState::Issue(event))
-        })?;
+        })
+        .await?;
 
         encode_auth_ticket(m.encode(), ticket, |event| {
             pubsub.post(AuthenticatePasswordState::Encode(event))
         })
+        .await
     }
 }

@@ -9,7 +9,7 @@ use super::event::DiscardAuthTicketEvent;
 
 use crate::auth::auth_ticket::_api::kernel::data::AuthTicket;
 
-pub fn discard_auth_ticket<S>(
+pub async fn discard_auth_ticket<S>(
     infra: &impl DiscardAuthTicketInfra,
     auth_ticket: AuthTicket,
     post: impl Fn(DiscardAuthTicketEvent) -> S,
@@ -20,6 +20,7 @@ pub fn discard_auth_ticket<S>(
 
     ticket_repository
         .discard(auth_ticket, clock.now())
+        .await
         .map_err(|err| post(DiscardAuthTicketEvent::RepositoryError(err)))?;
 
     Ok(post(DiscardAuthTicketEvent::Success))

@@ -1,10 +1,10 @@
 use chrono::Duration;
 
 use aws_cloudfront_cookie::CloudfrontKey;
-use mysql::{Opts, Pool};
 use rusoto_core::Region;
 use rusoto_dynamodb::DynamoDbClient;
 use rusoto_ses::SesClient;
+use sqlx::mysql::MySqlPoolOptions;
 
 use crate::z_details::_api::jwt::helper::{decoding_key_from_ec_pem, encoding_key_from_ec_pem};
 
@@ -17,7 +17,7 @@ use super::feature::{
 
 use crate::auth::auth_ticket::_api::kernel::data::{ExpansionLimitDuration, ExpireDuration};
 
-pub fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
+pub async fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
     AuthOutsideFeature {
         config: AuthOutsideConfig {
             // ticket の有効期限: 切れると再ログインが必要; renew で延長; 週末を挟めるように１桁日程度
@@ -35,10 +35,11 @@ pub fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
         store: AuthOutsideStore {
             dynamodb: DynamoDbClient::new(Region::ApNortheast1),
             nonce_table_name: &env.dynamodb_auth_nonce_table,
-            mysql: Pool::new(
-                Opts::from_url(&env.mysql_auth_url).expect("failed to parse connection url".into()),
-            )
-            .expect("failed to connect mysql".into()),
+            mysql: MySqlPoolOptions::new()
+                .max_connections(5)
+                .connect(&env.mysql_auth_url)
+                .await
+                .expect("failed to connect mysql auth server"),
         },
         cookie: AuthOutsideCookie {
             domain: &env.domain,

@@ -31,6 +31,10 @@ impl HashedPassword {
         Self(password)
     }
 
+    pub fn extract(self) -> String {
+        self.0
+    }
+
     pub fn as_str(&self) -> &str {
         self.0.as_str()
     }
@@ -54,14 +58,15 @@ impl PlainPassword {
     }
 }
 
+#[async_trait::async_trait]
 pub trait AuthUserPasswordRepository {
-    fn verify_password(
+    async fn verify_password<'a>(
         &self,
-        login_id: &LoginId,
-        matcher: impl AuthUserPasswordMatcher,
+        login_id: &'a LoginId,
+        matcher: impl AuthUserPasswordMatcher + 'a,
     ) -> Result<AuthUserId, VerifyPasswordError>;
 
-    fn request_reset_token(
+    async fn request_reset_token(
         &self,
         reset_token: ResetToken,
         login_id: LoginId,
@@ -69,15 +74,15 @@ pub trait AuthUserPasswordRepository {
         requested_at: AuthDateTime,
     ) -> Result<(), RequestResetTokenError>;
 
-    fn reset_token_entry(
+    async fn reset_token_entry(
         &self,
         reset_token: &ResetToken,
     ) -> Result<Option<ResetTokenEntry>, RepositoryError>;
 
-    fn reset_password(
+    async fn reset_password<'a>(
         &self,
-        reset_token: &ResetToken,
-        hasher: impl AuthUserPasswordHasher,
+        reset_token: &'a ResetToken,
+        hasher: impl AuthUserPasswordHasher + 'a,
         reset_at: AuthDateTime,
     ) -> Result<AuthUserId, ResetPasswordError>;
 }
@@ -118,12 +123,12 @@ impl Into<ResetTokenEntry> for ResetTokenEntryExtract {
     }
 }
 
-pub trait AuthUserPasswordMatcher {
+pub trait AuthUserPasswordMatcher: Send {
     fn new(plain_password: PlainPassword) -> Self;
     fn match_password(self, hashed_password: &HashedPassword) -> Result<bool, PasswordHashError>;
 }
 
-pub trait AuthUserPasswordHasher {
+pub trait AuthUserPasswordHasher: Send {
     fn new(plain_password: PlainPassword) -> Self;
     fn hash_password(self) -> Result<HashedPassword, PasswordHashError>;
 }

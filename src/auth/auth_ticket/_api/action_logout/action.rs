@@ -60,5 +60,6 @@ impl<M: LogoutMaterial> LogoutAction<M> {
         discard_auth_ticket(m.discard(), ticket, |event| {
             pubsub.post(LogoutState::Discard(event))
         })
+        .await
     }
 }

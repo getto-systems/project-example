@@ -10,12 +10,13 @@ use super::data::{AuthTokenEncoded, AuthTokenExpires};
 use crate::auth::auth_ticket::_api::kernel::infra::AuthTicketInfra;
 use crate::z_details::_api::repository::data::RepositoryError;
 
-pub fn encode_auth_ticket<S>(
+pub async fn encode_auth_ticket<S>(
     infra: &impl EncodeAuthTicketInfra,
     ticket: AuthTicket,
     post: impl Fn(EncodeAuthTicketEvent) -> S,
 ) -> MethodResult<S> {
     let limit = fetch_expansion_limit(infra, &ticket)
+        .await
         .map_err(|err| post(EncodeAuthTicketEvent::RepositoryError(err)))?
         .ok_or_else(|| post(EncodeAuthTicketEvent::TicketNotFound))?;
 
@@ -48,13 +49,13 @@ pub fn encode_auth_ticket<S>(
 
     Ok(post(EncodeAuthTicketEvent::Success(encoded)))
 }
-fn fetch_expansion_limit(
+async fn fetch_expansion_limit(
     infra: &impl EncodeAuthTicketInfra,
     ticket: &AuthTicket,
 ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError> {
     let ticket_infra = infra.ticket_infra();
     let ticket_repository = ticket_infra.ticket_repository();
-    ticket_repository.expansion_limit(&ticket)
+    ticket_repository.expansion_limit(&ticket).await
 }
 fn calc_expires(
     infra: &impl EncodeAuthTicketInfra,

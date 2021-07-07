@@ -18,7 +18,7 @@ lazy_static! {
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
-    let state = AppState::new(&ENV);
+    let state = AppState::new(&ENV).await;
 
     let data: AppData = state.into();
 

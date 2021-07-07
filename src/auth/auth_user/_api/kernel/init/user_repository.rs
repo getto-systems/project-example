@@ -1,11 +1,8 @@
 use std::{collections::HashSet, iter::FromIterator};
 
-use mysql::{params, prelude::Queryable, Pool};
+use sqlx::{query, MySqlPool};
 
-use crate::z_details::_api::{
-    mysql::helper::{mysql_error, read_only_transaction},
-    repository::helper::infra_error,
-};
+use crate::z_details::_api::mysql::helper::mysql_error;
 
 use crate::auth::auth_user::_api::kernel::infra::AuthUserRepository;
 
@@ -13,61 +10,59 @@ use crate::auth::auth_user::_api::kernel::data::{AuthUser, AuthUserExtract, Auth
 use crate::z_details::_api::repository::data::RepositoryError;
 
 pub struct MysqlAuthUserRepository<'a> {
-    pool: &'a Pool,
+    pool: &'a MySqlPool,
 }
 
 impl<'a> MysqlAuthUserRepository<'a> {
-    pub const fn new(pool: &'a Pool) -> Self {
+    pub const fn new(pool: &'a MySqlPool) -> Self {
         Self { pool }
     }
 }
 
+#[async_trait::async_trait]
 impl<'a> AuthUserRepository for MysqlAuthUserRepository<'a> {
-    fn get(&self, user_id: &AuthUserId) -> Result<Option<AuthUser>, RepositoryError> {
-        let mut conn = self.pool.get_conn().map_err(mysql_error)?;
-        let mut conn = conn
-            .start_transaction(read_only_transaction())
-            .map_err(mysql_error)?;
-
+    async fn get(&self, user_id: &AuthUserId) -> Result<Option<AuthUser>, RepositoryError> {
         // granted roles だけの検索だと、未登録だった場合に不足
         // user の存在を確認して、問題なければ granted roles を合わせて返す
         // group concat を使えば一度に取れるが、データの構築をしないといけない
         // ここではそこまで効率を重視しないので、クエリを２回投げることにする
 
-        let count: u8 = conn
-            .exec_first(
-                r"#####
-                select count(*)
-                from user
-                where user_id = :user_id
-                #####",
-                params! {
-                    "user_id" => user_id.as_str(),
-                },
-            )
-            .map_err(mysql_error)?
-            .ok_or(infra_error("failed to count user"))?;
+        let mut conn = self.pool.begin().await.map_err(mysql_error)?;
 
-        if count == 0 {
+        let found = query!(
+            r"#####
+            select
+                count(*) as count
+            from user
+            where user_id = ?
+            #####",
+            user_id.as_str(),
+        )
+        .fetch_one(&mut conn)
+        .await
+        .map_err(mysql_error)?;
+
+        if found.count == 0 {
             return Ok(None);
         }
 
-        let found: Vec<String> = conn
-            .exec(
-                r"#####
-                select role from user_granted_role
-                where user_id = :user_id
-                #####",
-                params! {
-                    "user_id" => user_id.as_str(),
-                },
-            )
-            .map_err(mysql_error)?;
+        let roles = query!(
+            r"#####
+            select
+                role
+            from user_granted_role
+            where user_id = ?
+            #####",
+            user_id.as_str(),
+        )
+        .fetch_all(&mut conn)
+        .await
+        .map_err(mysql_error)?;
 
         Ok(Some(
             AuthUserExtract {
                 user_id: user_id.as_str().into(),
-                granted_roles: HashSet::from_iter(found),
+                granted_roles: HashSet::from_iter(roles.into_iter().map(|entry| entry.role)),
             }
             .into(),
         ))
@@ -123,8 +118,9 @@ pub mod test {
         }
     }
 
+    #[async_trait::async_trait]
     impl<'a> AuthUserRepository for MemoryAuthUserRepository<'a> {
-        fn get(&self, user_id: &AuthUserId) -> Result<Option<AuthUser>, RepositoryError> {
+        async fn get(&self, user_id: &AuthUserId) -> Result<Option<AuthUser>, RepositoryError> {
             let store = self.store.lock().unwrap();
             Ok(store.get(user_id).map(|granted_roles| {
                 AuthUserExtract {

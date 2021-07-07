@@ -13,9 +13,9 @@ pub struct AppState {
 }
 
 impl AppState {
-    pub fn new(env: &'static Env) -> Self {
+    pub async fn new(env: &'static Env) -> Self {
         Self {
-            auth: new_auth_outside_feature(env),
+            auth: new_auth_outside_feature(env).await,
         }
     }
 }

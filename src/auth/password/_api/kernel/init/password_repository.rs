@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
-use chrono::{NaiveDateTime, TimeZone, Utc};
-use mysql::{params, prelude::Queryable, Pool};
+use chrono::{TimeZone, Utc};
+use sqlx::{query, MySqlPool};
 
 use crate::z_details::_api::mysql::helper::mysql_error;
 
@@ -21,145 +21,118 @@ use crate::z_details::_api::repository::data::RepositoryError;
 use crate::z_details::_api::repository::helper::infra_error;
 
 pub struct MysqlAuthUserPasswordRepository<'a> {
-    pool: &'a Pool,
+    pool: &'a MySqlPool,
 }
 
 impl<'a> MysqlAuthUserPasswordRepository<'a> {
-    pub const fn new(pool: &'a Pool) -> Self {
+    pub const fn new(pool: &'a MySqlPool) -> Self {
         Self { pool }
     }
 }
 
-struct UserPassword {
-    user_id: String,
-    hashed_password: String,
-}
-
-struct UserResetTokenEntry {
-    login_id: String,
-    expires: NaiveDateTime,
-    reset_at: Option<NaiveDateTime>,
-}
-
-impl<'a> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'a> {
-    fn verify_password(
+#[async_trait::async_trait]
+impl<'pool> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'pool> {
+    async fn verify_password<'a>(
         &self,
-        login_id: &LoginId,
-        matcher: impl AuthUserPasswordMatcher,
+        login_id: &'a LoginId,
+        matcher: impl AuthUserPasswordMatcher + 'a,
     ) -> Result<AuthUserId, VerifyPasswordError> {
-        let mut conn = self.pool.get_conn().map_err(verify_mysql_error)?;
+        let conn = self.pool;
 
-        let mut found = conn
-            .exec_map(
-                r"#####
-                select
-                    user.user_id,
-                    hashed_password
-                from user_password
-                inner join user on user_password.user_id = user.user_id
-                where user.login_id = :login_id
-                #####",
-                params! {
-                    "login_id" => login_id.as_str(),
-                },
-                |(user_id, hashed_password)| UserPassword {
-                    user_id,
-                    hashed_password,
-                },
-            )
-            .map_err(verify_mysql_error)?;
-
-        let user_password = found.pop().ok_or(VerifyPasswordError::PasswordNotFound)?;
+        let found = query!(
+            r"#####
+            select
+                user.user_id,
+                hashed_password
+            from user_password
+            inner join user on user_password.user_id = user.user_id
+            where user.login_id = ?
+            #####",
+            login_id.as_str(),
+        )
+        .fetch_optional(conn)
+        .await
+        .map_err(verify_mysql_error)?
+        .ok_or(VerifyPasswordError::PasswordNotFound)?;
 
         let is_matched = matcher
-            .match_password(&HashedPassword::restore(user_password.hashed_password))
+            .match_password(&HashedPassword::restore(found.hashed_password))
             .map_err(VerifyPasswordError::PasswordHashError)?;
 
         if is_matched {
-            Ok(AuthUserId::restore(user_password.user_id))
+            Ok(AuthUserId::restore(found.user_id))
         } else {
             Err(VerifyPasswordError::PasswordNotMatched)
         }
     }
 
-    fn request_reset_token(
+    async fn request_reset_token(
         &self,
         reset_token: ResetToken,
         login_id: LoginId,
         expires: ExpireDateTime,
         requested_at: AuthDateTime,
     ) -> Result<(), RequestResetTokenError> {
-        let mut conn = self.pool.get_conn().map_err(request_mysql_error)?;
-        let mut conn = conn
-            .start_transaction(Default::default())
-            .map_err(request_mysql_error)?;
+        let mut conn = self.pool.begin().await.map_err(request_mysql_error)?;
 
-        let mut found: Vec<String> = conn
-            .exec(
-                r"#####
-                    select
-                        user_id
-                    from user
-                    where login_id = :login_id
-                    #####",
-                params! {
-                    "login_id" => login_id.as_str(),
-                },
-            )
-            .map_err(request_mysql_error)?;
+        let found = query!(
+            r"#####
+            select
+                user_id
+            from user
+            where login_id = ?
+            #####",
+            login_id.as_str(),
+        )
+        .fetch_optional(&mut conn)
+        .await
+        .map_err(request_mysql_error)?
+        .ok_or(RequestResetTokenError::NotFound)?;
 
-        let user_id = found.pop().ok_or(RequestResetTokenError::NotFound)?;
-
-        conn.exec_drop(
+        query!(
             r"#####
             insert into user_password_reset_token
                 (user_id, reset_token, login_id, expires, requested_at)
             values
-                (:user_id, :reset_token, :login_id, :expires, :requested_at)
+                (?, ?, ?, ?, ?)
             #####",
-            params! {
-                "user_id" => user_id,
-                "reset_token" => reset_token.extract(),
-                "login_id" => login_id.extract(),
-                "expires" => expires.extract().naive_utc(),
-                "requested_at" => requested_at.extract().naive_utc(),
-            },
+            found.user_id,
+            reset_token.extract(),
+            login_id.extract(),
+            expires.extract(),
+            requested_at.extract(),
         )
+        .execute(&mut conn)
+        .await
         .map_err(request_mysql_error)?;
 
-        conn.commit().map_err(request_mysql_error)?;
+        conn.commit().await.map_err(request_mysql_error)?;
 
         Ok(())
     }
 
-    fn reset_token_entry(
+    async fn reset_token_entry(
         &self,
         reset_token: &ResetToken,
     ) -> Result<Option<ResetTokenEntry>, RepositoryError> {
-        let mut conn = self.pool.get_conn().map_err(mysql_error)?;
+        let conn = self.pool;
 
-        let mut found = conn
-            .exec_map(
-                r"#####
-                    select
-                        login_id,
-                        expires,
-                        reset_at
-                    from user_password_reset_token
-                    where reset_token = :reset_token
-                    #####",
-                params! {
-                    "reset_token" => reset_token.as_str(),
-                },
-                |(login_id, expires, reset_at)| UserResetTokenEntry {
-                    login_id,
-                    expires,
-                    reset_at,
-                },
-            )
-            .map_err(mysql_error)?;
+        let found = query!(
+            r"#####
+            select
+                login_id,
+                expires,
+                reset_at
+            from user_password_reset_token
+            where reset_token = ?
+            #####",
+            reset_token.as_str(),
+        )
+        .fetch_optional(conn)
+        .await
+        .map_err(mysql_error)?;
 
-        Ok(found.pop().map(|entry| {
+        Ok(found.map(|entry| {
             ResetTokenEntryExtract {
                 login_id: entry.login_id,
                 expires: Utc.from_utc_datetime(&entry.expires),
@@ -171,89 +144,85 @@ impl<'a> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'a> {
         }))
     }
 
-    fn reset_password(
+    async fn reset_password<'a>(
         &self,
-        reset_token: &ResetToken,
-        hasher: impl AuthUserPasswordHasher,
+        reset_token: &'a ResetToken,
+        hasher: impl AuthUserPasswordHasher + 'a,
         reset_at: AuthDateTime,
     ) -> Result<AuthUserId, ResetPasswordError> {
-        let mut conn = self.pool.get_conn().map_err(reset_mysql_error)?;
-        let mut conn = conn
-            .start_transaction(Default::default())
-            .map_err(reset_mysql_error)?;
-
         // reset_token が正しいことが前提; reset_token_entry() で事前に確認する
 
-        let user_id: String = conn
-            .exec_first(
-                r"#####
-                    select
-                        user_id
-                    from user_password_reset_token
-                    where reset_token = :reset_token
-                    #####",
-                params! {
-                    "reset_token" => reset_token.as_str(),
-                },
-            )
-            .map_err(reset_mysql_error)?
-            .ok_or(reset_infra_error("reset token not found"))?;
+        let mut conn = self.pool.begin().await.map_err(reset_mysql_error)?;
 
-        conn.exec_drop(
+        let found = query!(
+            r"#####
+            select
+                user_id
+            from user_password_reset_token
+            where reset_token = ?
+            #####",
+            reset_token.as_str(),
+        )
+        .fetch_optional(&mut conn)
+        .await
+        .map_err(reset_mysql_error)?
+        .ok_or(reset_infra_error("reset token not found"))?;
+
+        query!(
             r"#####
             update user_password_reset_token
-            set reset_at = :reset_at
-            where user_id = :user_id
+            set reset_at = ?
+            where user_id = ?
             #####",
-            params! {
-                "user_id" => &user_id,
-                "reset_at" => reset_at.extract().naive_utc(),
-            },
+            reset_at.extract(),
+            &found.user_id,
         )
+        .execute(&mut conn)
+        .await
         .map_err(reset_mysql_error)?;
 
         let hashed_password = hasher
             .hash_password()
             .map_err(ResetPasswordError::PasswordHashError)?;
 
-        conn.exec_drop(
+        query!(
             r"#####
             delete from user_password
-            where user_id = :user_id
+            where user_id = ?
             #####",
-            params! {
-                "user_id" => &user_id,
-            },
+            &found.user_id,
         )
+        .execute(&mut conn)
+        .await
         .map_err(reset_mysql_error)?;
 
-        conn.exec_drop(
+        query!(
             r"#####
             insert into user_password
                 (user_id, hashed_password)
             values
-                (:user_id, :hashed_password)
+                (?, ?)
             #####",
-            params! {
-                "user_id" => &user_id,
-                "hashed_password" => hashed_password.as_str(),
-            },
+            &found.user_id,
+            hashed_password.extract(),
         )
+        .execute(&mut conn)
+        .await
         .map_err(reset_mysql_error)?;
 
-        conn.commit().map_err(reset_mysql_error)?;
+        conn.commit().await.map_err(reset_mysql_error)?;
 
-        Ok(AuthUserId::restore(user_id))
+        Ok(AuthUserId::restore(found.user_id))
     }
 }
 
-fn verify_mysql_error(err: mysql::Error) -> VerifyPasswordError {
+fn verify_mysql_error(err: sqlx::Error) -> VerifyPasswordError {
     VerifyPasswordError::RepositoryError(mysql_error(err))
 }
-fn request_mysql_error(err: mysql::Error) -> RequestResetTokenError {
+fn request_mysql_error(err: sqlx::Error) -> RequestResetTokenError {
     RequestResetTokenError::RepositoryError(mysql_error(err))
 }
-fn reset_mysql_error(err: mysql::Error) -> ResetPasswordError {
+fn reset_mysql_error(err: sqlx::Error) -> ResetPasswordError {
     ResetPasswordError::RepositoryError(mysql_error(err))
 }
 fn reset_infra_error(err: impl Display) -> ResetPasswordError {
@@ -392,11 +361,12 @@ pub mod test {
         }
     }
 
-    impl<'a> AuthUserPasswordRepository for MemoryAuthUserPasswordRepository<'a> {
-        fn verify_password(
+    #[async_trait::async_trait]
+    impl<'store> AuthUserPasswordRepository for MemoryAuthUserPasswordRepository<'store> {
+        async fn verify_password<'a>(
             &self,
-            login_id: &LoginId,
-            matcher: impl AuthUserPasswordMatcher,
+            login_id: &'a LoginId,
+            matcher: impl AuthUserPasswordMatcher + 'a,
         ) -> Result<AuthUserId, VerifyPasswordError> {
             let store = self.store.lock().unwrap();
 
@@ -419,7 +389,7 @@ pub mod test {
             }
         }
 
-        fn request_reset_token(
+        async fn request_reset_token(
             &self,
             reset_token: ResetToken,
             login_id: LoginId,
@@ -464,7 +434,7 @@ pub mod test {
             Ok(())
         }
 
-        fn reset_token_entry(
+        async fn reset_token_entry(
             &self,
             reset_token: &ResetToken,
         ) -> Result<Option<ResetTokenEntry>, RepositoryError> {
@@ -481,10 +451,10 @@ pub mod test {
             }))
         }
 
-        fn reset_password(
+        async fn reset_password<'a>(
             &self,
-            reset_token: &ResetToken,
-            hasher: impl AuthUserPasswordHasher,
+            reset_token: &'a ResetToken,
+            hasher: impl AuthUserPasswordHasher + 'a,
             reset_at: AuthDateTime,
         ) -> Result<AuthUserId, ResetPasswordError> {
             let target_entry: ResetEntry;
@@ -515,7 +485,7 @@ pub mod test {
                     .insert_reset_token(reset_token.clone(), target_entry.clone());
             }
 
-            return Ok(target_entry.user_id);
+            Ok(target_entry.user_id)
         }
     }
 }

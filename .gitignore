@@ -2,9 +2,11 @@
 /tmp/
 
 /.secret/
+/.env
 
 /node_modules/
 /target/
+/src/target/
 
 /storybook/node_modules/
 /storybook/src/

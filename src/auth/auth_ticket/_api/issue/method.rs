@@ -9,7 +9,7 @@ use crate::auth::{
     auth_ticket::_api::kernel::data::AuthTicket, auth_user::_api::kernel::data::AuthUser,
 };
 
-pub fn issue_auth_ticket<S>(
+pub async fn issue_auth_ticket<S>(
     infra: &impl IssueAuthTicketInfra,
     user: AuthUser,
     post: impl Fn(IssueAuthTicketEvent) -> S,
@@ -32,6 +32,7 @@ pub fn issue_auth_ticket<S>(
 
     ticket_repository
         .issue(ticket.clone(), limit, issued_at)
+        .await
         .map_err(|err| post(IssueAuthTicketEvent::RepositoryError(err)))?;
 
     // 呼び出し側を簡単にするため、例外的に State ではなく AuthTicket を返す
