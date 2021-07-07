@@ -1,6 +1,7 @@
 image: node:15.12.0-buster
 
 stages:
+  - migrate
   - test
   - bump_version
   - release
@@ -22,6 +23,21 @@ variables:
   API_BUMP_IGNORE_FILE: api/bump/ignore
   API_BUMP_MAJOR_FILE: api/bump/major
   API_BUMP_SCRIPT: api/bump/bump.sh
+
+migrate:
+  stage: migrate
+  only:
+    refs:
+      - merge_requests
+    changes:
+      - "src/**/z_prisma/*"
+
+  before_script:
+    - npm clean-install
+    - curl -s https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 > cloud_sql_proxy
+    - chmod a+x cloudsql_proxy
+  script:
+    - ./api/ci/migrate.sh ./cloudsql_proxy
 
 test-ui:
   stage: test
