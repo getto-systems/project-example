@@ -392,7 +392,7 @@ dependencies = [
 
 [[package]]
 name = "aws-cloudfront-cookie"
-version = "0.29.0-api"
+version = "0.30.0-api"
 dependencies = [
  "base64 0.13.0",
  "digest",
@@ -804,7 +804,7 @@ dependencies = [
 
 [[package]]
 name = "example-api"
-version = "0.29.0-api"
+version = "0.30.0-api"
 dependencies = [
  "actix-cors",
  "actix-web",
@@ -1018,7 +1018,7 @@ dependencies = [
 
 [[package]]
 name = "getto-application"
-version = "0.29.0-api"
+version = "0.30.0-api"
 
 [[package]]
 name = "getto-application-test"
