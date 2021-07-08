@@ -62,7 +62,7 @@ impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
         let ticket_id = ticket.ticket_id;
         let user_id = ticket.user_id;
 
-        let record = query!(
+        let found = query!(
             r"#####
             select
                 count(*) as count
@@ -77,7 +77,7 @@ impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
         .await
         .map_err(mysql_error)?;
 
-        if record.count > 0 {
+        if found.count > 0 {
             query!(
                 r"#####
                 delete from ticket

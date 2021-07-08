@@ -99,8 +99,8 @@ impl<'pool> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'pool
             found.user_id,
             reset_token.extract(),
             login_id.extract(),
-            expires.extract(),
-            requested_at.extract(),
+            expires.extract().naive_utc(),
+            requested_at.extract().naive_utc(),
         )
         .execute(&mut conn)
         .await
@@ -174,7 +174,7 @@ impl<'pool> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'pool
             set reset_at = ?
             where user_id = ?
             #####",
-            reset_at.extract(),
+            reset_at.extract().naive_utc(),
             &found.user_id,
         )
         .execute(&mut conn)
