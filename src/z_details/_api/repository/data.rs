@@ -16,7 +16,7 @@ pub enum RepositoryError {
 impl Display for RepositoryError {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::InfraError(err) => write!(f, "infra error: {}", err),
+            Self::InfraError(err) => write!(f, "repository infra error: {}", err),
         }
     }
 }
