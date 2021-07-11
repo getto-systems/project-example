@@ -4,6 +4,9 @@
             "path": "src"
         },
         {
+            "path": "main"
+        },
+        {
             "name": "api/vendor",
             "path": "api/vendor"
         },

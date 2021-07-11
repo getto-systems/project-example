@@ -78,7 +78,7 @@ function toEntry(root) {
         return toPath("background", file)
     }
     function toPath(type, file) {
-        return path.join(__dirname, "../../src/x_main", root, toEntryPath(file), `${type}.ts`)
+        return path.join(__dirname, "../../main/_ui", root, toEntryPath(file), `${type}.ts`)
     }
     function toEntryPath(file) {
         return file.replaceAll("-", "_")
