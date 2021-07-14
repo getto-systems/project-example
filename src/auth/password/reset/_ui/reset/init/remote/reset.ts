@@ -1,8 +1,5 @@
 import { env } from "../../../../../../../y_environment/_ui/env"
-import {
-    ResetPasswordResult_pb,
-    ResetPassword_pb,
-} from "../../../../../../_ui/y_protobuf/api_pb.js"
+import pb from "../../../y_protobuf/api_pb.js"
 
 import {
     fetchOptions,
@@ -14,16 +11,19 @@ import { decodeProtobuf, encodeProtobuf } from "../../../../../../../../ui/vendo
 
 import { RemoteOutsideFeature } from "../../../../../../../z_details/_ui/remote/feature"
 
+import { Clock } from "../../../../../../../z_details/_ui/clock/infra"
 import { ResetPasswordRemote } from "../../infra"
 
 import { convertAuthRemote } from "../../../../../../auth_ticket/_ui/kernel/convert"
-import { Clock } from "../../../../../../../z_details/_ui/clock/infra"
-import { ResetPasswordRemoteError } from "../../data"
 
 export function newResetPasswordRemote(
     feature: RemoteOutsideFeature,
     clock: Clock,
 ): ResetPasswordRemote {
+    const ResetPasswordPb = pb.auth.password.reset.api.ResetPasswordPb
+    const ResetPasswordResultPb = pb.auth.password.reset.api.ResetPasswordResultPb
+    const ResetPasswordErrorKind = pb.auth.password.reset.api.ResetPasswordErrorKindPb
+
     return async (resetToken, fields) => {
         try {
             const mock = false
@@ -43,7 +43,7 @@ export function newResetPasswordRemote(
             })
             const response = await fetch(opts.url, {
                 ...opts.options,
-                body: encodeProtobuf(ResetPassword_pb, (message) => {
+                body: encodeProtobuf(ResetPasswordPb, (message) => {
                     message.resetToken = resetToken
                     message.loginId = fields.loginID
                     message.password = fields.password
@@ -54,9 +54,18 @@ export function newResetPasswordRemote(
                 return remoteCommonError(response.status)
             }
 
-            const result = decodeProtobuf(ResetPasswordResult_pb, await response.text())
+            const result = decodeProtobuf(ResetPasswordResultPb, await response.text())
             if (!result.success) {
-                return { success: false, err: mapError(result) }
+                if (!result.err) {
+                    return { success: false, err: { type: "invalid-reset" } }
+                }
+                switch (result.err.kind) {
+                    case ResetPasswordErrorKind.INVALID_RESET:
+                        return { success: false, err: { type: "invalid-reset" } }
+
+                    case ResetPasswordErrorKind.ALREADY_RESET:
+                        return { success: false, err: { type: "already-reset" } }
+                }
             }
             return {
                 success: true,
@@ -64,19 +73,6 @@ export function newResetPasswordRemote(
             }
         } catch (err) {
             return remoteInfraError(err)
-        }
-
-        function mapError(result: ResetPasswordResult_pb): ResetPasswordRemoteError {
-            if (!result.err || !result.err.type) {
-                return { type: "invalid-reset" }
-            }
-            switch (result.err.type) {
-                case ResetPasswordResult_pb.ErrorType.INVALID_RESET:
-                    return { type: "invalid-reset" }
-
-                case ResetPasswordResult_pb.ErrorType.ALREADY_RESET:
-                    return { type: "already-reset" }
-            }
         }
     }
 }

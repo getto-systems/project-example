@@ -1,8 +1,5 @@
 import { env } from "../../../../../../y_environment/_ui/env"
-import {
-    AuthenticatePasswordResult_pb,
-    AuthenticatePassword_pb,
-} from "../../../../../_ui/y_protobuf/api_pb.js"
+import pb from "../../../y_protobuf/api_pb.js"
 
 import {
     generateNonce,
@@ -23,6 +20,9 @@ export function newAuthenticatePasswordRemote(
     feature: RemoteOutsideFeature,
     clock: Clock,
 ): AuthenticatePasswordRemote {
+    const AuthenticatePasswordPb = pb.auth.password.api.AuthenticatePasswordPb
+    const AuthenticatePasswordResultPb = pb.auth.password.api.AuthenticatePasswordResultPb
+
     return async (fields) => {
         try {
             const mock = false
@@ -42,7 +42,7 @@ export function newAuthenticatePasswordRemote(
             })
             const response = await fetch(opts.url, {
                 ...opts.options,
-                body: encodeProtobuf(AuthenticatePassword_pb, (message) => {
+                body: encodeProtobuf(AuthenticatePasswordPb, (message) => {
                     message.loginId = fields.loginID
                     message.password = fields.password
                 }),
@@ -52,7 +52,7 @@ export function newAuthenticatePasswordRemote(
                 return remoteCommonError(response.status)
             }
 
-            const result = decodeProtobuf(AuthenticatePasswordResult_pb, await response.text())
+            const result = decodeProtobuf(AuthenticatePasswordResultPb, await response.text())
             if (!result.success) {
                 return { success: false, err: { type: "invalid-password" } }
             }
