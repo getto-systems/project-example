@@ -1,5 +1,5 @@
 import { env } from "../../../../../../y_environment/_ui/env"
-import { AuthenticateResponse_pb } from "../../../../../_ui/y_protobuf/api_pb.js"
+import pb from "../../../y_protobuf/api_pb.js"
 
 import {
     fetchOptions,
@@ -20,6 +20,8 @@ export function newRenewAuthTicketRemote(
     feature: RemoteOutsideFeature,
     clock: Clock,
 ): RenewAuthTicketRemote {
+    const AuthenticateResponsePb = pb.auth.auth_ticket.api.AuthenticateResponsePb
+
     return async () => {
         try {
             const mock = false
@@ -47,7 +49,7 @@ export function newRenewAuthTicketRemote(
                 success: true,
                 value: convertAuthRemote(
                     clock,
-                    decodeProtobuf(AuthenticateResponse_pb, await response.text()),
+                    decodeProtobuf(AuthenticateResponsePb, await response.text()),
                 ),
             }
         } catch (err) {

@@ -1,8 +1,5 @@
 import { env } from "../../../../../../../y_environment/_ui/env"
-import {
-    RequestResetTokenResult_pb,
-    RequestResetToken_pb,
-} from "../../../../../../_ui/y_protobuf/api_pb.js"
+import pb from "../../../y_protobuf/api_pb.js"
 
 import {
     fetchOptions,
@@ -17,6 +14,9 @@ import { RemoteOutsideFeature } from "../../../../../../../z_details/_ui/remote/
 import { RequestResetTokenRemote } from "../../infra"
 
 export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): RequestResetTokenRemote {
+    const RequestResetTokenPb = pb.auth.password.reset.api.RequestResetTokenPb
+    const RequestResetTokenResultPb = pb.auth.password.reset.api.RequestResetTokenResultPb
+
     return async (fields) => {
         try {
             const mock = false
@@ -33,7 +33,7 @@ export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): Reque
             })
             const response = await fetch(opts.url, {
                 ...opts.options,
-                body: encodeProtobuf(RequestResetToken_pb, (message) => {
+                body: encodeProtobuf(RequestResetTokenPb, (message) => {
                     message.loginId = fields.loginID
                 }),
             })
@@ -42,7 +42,7 @@ export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): Reque
                 return remoteCommonError(response.status)
             }
 
-            const result = decodeProtobuf(RequestResetTokenResult_pb, await response.text())
+            const result = decodeProtobuf(RequestResetTokenResultPb, await response.text())
             if (!result.success) {
                 return { success: false, err: { type: "invalid-reset" } }
             }

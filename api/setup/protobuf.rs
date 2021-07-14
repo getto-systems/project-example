@@ -1,27 +1,37 @@
-use io::Write;
-use std::{fs, io, path};
+use std::{
+    env::var,
+    fs::{create_dir, read_dir, read_to_string, remove_dir_all, DirEntry, File},
+    io::{Error as IoError, Result as IoResult, Write},
+    path::{Path, PathBuf},
+};
 
-use protobuf_codegen_pure::Codegen;
+use prost_build::compile_protos;
+use regex::Regex;
 
-pub fn generate(root: &str) {
-    ProtobufCodegen::new(root)
+pub fn generate(package: &str) {
+    ProtobufBuilder::new(ProtobufTarget::new(package.into()))
         .build()
-        .expect(format!("failed to build protobuf; {}", root).as_str());
+        .expect(format!("failed to build protobuf; {}", package).as_str());
 }
 
 struct ProtobufTarget {
-    dist: path::PathBuf,
-    source: path::PathBuf,
-    index: path::PathBuf,
+    package: String,
+    dist: PathBuf,
+    source: PathBuf,
+    index: PathBuf,
 }
 
 impl ProtobufTarget {
-    fn new(target: &path::Path) -> Self {
+    fn new(package: String) -> Self {
+        let target = format!("src/{}", package.replace(".", "/"));
+        let target = Path::new(&target);
+
         let source = target.join("z_protobuf");
         let dist = target.join("_api/y_protobuf");
         let index = dist.join("mod.rs");
 
         Self {
+            package,
             source,
             dist,
             index,
@@ -29,34 +39,32 @@ impl ProtobufTarget {
     }
 }
 
-struct ProtobufCodegen {
+struct ProtobufBuilder {
     target: ProtobufTarget,
 }
 
-impl ProtobufCodegen {
-    fn new(root: &str) -> Self {
-        Self {
-            target: ProtobufTarget::new(path::Path::new(root)),
-        }
+impl ProtobufBuilder {
+    fn new(target: ProtobufTarget) -> Self {
+        Self { target }
     }
 
-    fn build(&self) -> io::Result<()> {
+    fn build(&self) -> IoResult<()> {
         self.cleanup()?;
         self.protobuf()?;
         self.module_index()?;
         Ok(())
     }
 
-    fn cleanup(&self) -> io::Result<()> {
+    fn cleanup(&self) -> IoResult<()> {
         if self.target.dist.exists() {
-            fs::remove_dir_all(self.target.dist.as_path())?;
+            remove_dir_all(self.target.dist.as_path())?;
         }
-        fs::create_dir(self.target.dist.as_path())?;
+        create_dir(self.target.dist.as_path())?;
 
         Ok(())
     }
-    fn module_index(&self) -> io::Result<()> {
-        let mut file = fs::File::create(self.target.index.as_path())?;
+    fn module_index(&self) -> IoResult<()> {
+        let mut file = File::create(self.target.index.as_path())?;
         write!(
             file,
             "{}",
@@ -66,23 +74,38 @@ impl ProtobufCodegen {
         )?;
         file.flush()
     }
-    fn protobuf(&self) -> io::Result<()> {
-        Codegen::new()
-            .out_dir(self.target.dist.as_path())
-            .inputs(self.source_proto()?)
-            .include(self.target.source.as_path())
-            .run()
+    fn protobuf(&self) -> IoResult<()> {
+        let out_dir = var("OUT_DIR").expect("OUT_DIR is not defined");
+
+        // 他の proto は _api::y_protobuf を追加して参照しないといけない
+        let import_ref_regex = Regex::new("super::(.*)::api::").unwrap();
+
+        let inputs: Vec<PathBuf> = self.source_proto()?.collect();
+        compile_protos(&inputs, &["src/"])?;
+        self.source_proto_basename()?.fold(Ok(()), |acc, name| {
+            acc?;
+            let content =
+                read_to_string(format!("{}/{}.{}.rs", out_dir, self.target.package, name))?;
+            let mut file = File::create(self.target.dist.join(format!("{}.rs", name)))?;
+            write!(
+                file,
+                "{}",
+                import_ref_regex
+                    .replace_all(&content, "super::super::super::$1::_api::y_protobuf::api::"),
+            )?;
+            file.flush()
+        })
     }
 
-    fn source_proto(&self) -> io::Result<impl Iterator<Item = path::PathBuf>> {
-        Ok(fs::read_dir(self.target.source.as_path())?.filter_map(filter_proto))
+    fn source_proto(&self) -> IoResult<impl Iterator<Item = PathBuf>> {
+        Ok(read_dir(self.target.source.as_path())?.filter_map(filter_proto))
     }
-    fn source_proto_basename(&self) -> io::Result<impl Iterator<Item = String>> {
+    fn source_proto_basename(&self) -> IoResult<impl Iterator<Item = String>> {
         Ok(self.source_proto()?.filter_map(pickup_basename))
     }
 }
 
-fn filter_proto(result: Result<fs::DirEntry, io::Error>) -> Option<path::PathBuf> {
+fn filter_proto(result: Result<DirEntry, IoError>) -> Option<PathBuf> {
     result.ok().and_then(|entry| {
         entry
             .path()
@@ -93,7 +116,7 @@ fn filter_proto(result: Result<fs::DirEntry, io::Error>) -> Option<path::PathBuf
             })
     })
 }
-fn pickup_basename(file: path::PathBuf) -> Option<String> {
+fn pickup_basename(file: PathBuf) -> Option<String> {
     file.file_stem()
         .and_then(|name| name.to_str())
         .map(|name| name.to_string())

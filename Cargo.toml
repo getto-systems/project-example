@@ -33,8 +33,10 @@ funty = "=1.1.0"
 jsonwebtoken = "7"
 argon2 = "0.2"
 
-protobuf = "2"
+prost = "0.8"
+bytes = "1"
 base64 = "0.13"
+
 chrono = "0.4"
 time = "0.2"
 uuid = { version = "0.8", features = ["v4"] }
@@ -48,4 +50,6 @@ tokio = "0.2"
 getto-application-test = { path = "api/vendor/getto-application-test" }
 
 [build-dependencies]
-protobuf-codegen-pure = "2"
+prost-build = "0.8"
+
+regex = "1"

@@ -1,9 +1,11 @@
-use crate::auth::_api::y_protobuf::api::{
-    ResetPasswordResult_pb, ResetPasswordResult_pb_Error, ResetPasswordResult_pb_ErrorType,
-    ResetPassword_pb,
-};
+use prost::Message;
 
-use crate::z_details::_api::message::helper::{decode_protobuf_base64, encode_protobuf_base64};
+use crate::auth::password::reset::_api::y_protobuf::api::{
+    ResetPasswordErrorKindPb, ResetPasswordErrorPb, ResetPasswordPb, ResetPasswordResultPb,
+};
+use crate::z_details::_api::message::helper::{
+    decode_base64, encode_protobuf_base64, invalid_protobuf,
+};
 
 use crate::auth::password::reset::_api::reset::infra::{
     ResetPasswordFieldsExtract, ResetPasswordMessenger,
@@ -24,7 +26,8 @@ impl ProtobufResetPasswordMessenger {
 
 impl ResetPasswordMessenger for ProtobufResetPasswordMessenger {
     fn decode(&self) -> Result<ResetPasswordFieldsExtract, MessageError> {
-        let message: ResetPassword_pb = decode_protobuf_base64(self.body.clone())?;
+        let message =
+            ResetPasswordPb::decode(decode_base64(self.body.clone())?).map_err(invalid_protobuf)?;
 
         Ok(ResetPasswordFieldsExtract {
             login_id: message.login_id,
@@ -34,42 +37,41 @@ impl ResetPasswordMessenger for ProtobufResetPasswordMessenger {
     }
     fn encode_not_found(&self) -> Result<ResetPasswordResponse, MessageError> {
         encode_failed(
-            ResetPasswordResult_pb_ErrorType::INVALID_RESET,
+            ResetPasswordErrorKindPb::InvalidReset,
             ResetPasswordResponse::NotFound,
         )
     }
     fn encode_already_reset(&self) -> Result<ResetPasswordResponse, MessageError> {
         encode_failed(
-            ResetPasswordResult_pb_ErrorType::ALREADY_RESET,
+            ResetPasswordErrorKindPb::AlreadyReset,
             ResetPasswordResponse::AlreadyReset,
         )
     }
     fn encode_expired(&self) -> Result<ResetPasswordResponse, MessageError> {
         encode_failed(
-            ResetPasswordResult_pb_ErrorType::INVALID_RESET,
+            ResetPasswordErrorKindPb::InvalidReset,
             ResetPasswordResponse::Expired,
         )
     }
     fn encode_invalid_login_id(&self) -> Result<ResetPasswordResponse, MessageError> {
         encode_failed(
-            ResetPasswordResult_pb_ErrorType::INVALID_RESET,
+            ResetPasswordErrorKindPb::InvalidReset,
             ResetPasswordResponse::InvalidLoginId,
         )
     }
 }
 
 fn encode_failed(
-    field_type: ResetPasswordResult_pb_ErrorType,
+    error_kind: ResetPasswordErrorKindPb,
     response: impl Fn(String) -> ResetPasswordResponse,
 ) -> Result<ResetPasswordResponse, MessageError> {
-    let mut message = ResetPasswordResult_pb::new();
-    message.set_success(false);
-
-    let mut err = ResetPasswordResult_pb_Error::new();
-    err.set_field_type(field_type);
-    message.set_err(err);
-
-    let message = encode_protobuf_base64(message)?;
+    let message = encode_protobuf_base64(ResetPasswordResultPb {
+        success: false,
+        err: Some(ResetPasswordErrorPb {
+            kind: error_kind as i32,
+        }),
+        ..Default::default()
+    })?;
     Ok(response(message))
 }
 

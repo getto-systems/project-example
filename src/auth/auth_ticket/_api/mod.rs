@@ -6,3 +6,4 @@ pub mod issue;
 pub mod kernel;
 pub mod validate;
 pub mod x_actix_web;
+pub mod y_protobuf;

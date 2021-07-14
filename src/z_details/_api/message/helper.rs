@@ -1,16 +1,25 @@
+use std::collections::VecDeque;
+
 use base64::{decode_config, encode_config, STANDARD};
-use protobuf::Message;
+use bytes::Buf;
+use prost::{DecodeError, Message as ProstMessage};
 
 use super::data::MessageError;
 
-pub fn encode_protobuf_base64(message: impl Message) -> Result<String, MessageError> {
-    let bytes = message
-        .write_to_bytes()
-        .map_err(|err| MessageError::Invalid(format!("{}", err)))?;
+pub fn encode_protobuf_base64(message: impl ProstMessage) -> Result<String, MessageError> {
+    let mut bytes: Vec<u8> = vec![];
+    message
+        .encode(&mut bytes)
+        .map_err(|err| MessageError::Invalid(format!("failed to encode protobuf; {}", err)))?;
     Ok(encode_config(bytes, STANDARD))
 }
-pub fn decode_protobuf_base64<M: Message>(message: String) -> Result<M, MessageError> {
-    let bytes = decode_config(message, STANDARD)
-        .map_err(|err| MessageError::Invalid(format!("{}", err)))?;
-    Message::parse_from_bytes(&bytes).map_err(|err| MessageError::Invalid(format!("{}", err)))
+
+pub fn decode_base64(content: String) -> Result<impl Buf, MessageError> {
+    let buf = decode_config(content, STANDARD)
+        .map_err(|err| MessageError::Invalid(format!("failed to decode base64; {}", err)))?;
+    let buf: VecDeque<u8> = buf.into();
+    Ok(buf)
+}
+pub fn invalid_protobuf(err: DecodeError) -> MessageError {
+    MessageError::Invalid(format!("failed to decode protobuf; {}", err))
 }

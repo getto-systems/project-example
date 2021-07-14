@@ -1,9 +1,13 @@
-use crate::auth::_api::y_protobuf::api::{
-    AuthenticatePasswordResult_pb, AuthenticatePasswordResult_pb_Error,
-    AuthenticatePasswordResult_pb_ErrorType, AuthenticatePassword_pb,
+use prost::Message;
+
+use crate::auth::password::_api::y_protobuf::api::{
+    AuthenticatePasswordErrorKindPb, AuthenticatePasswordErrorPb, AuthenticatePasswordPb,
+    AuthenticatePasswordResultPb,
 };
 
-use crate::z_details::_api::message::helper::{decode_protobuf_base64, encode_protobuf_base64};
+use crate::z_details::_api::message::helper::{
+    decode_base64, encode_protobuf_base64, invalid_protobuf,
+};
 
 use crate::auth::password::_api::authenticate::infra::{
     AuthenticatePasswordFieldsExtract, AuthenticatePasswordMessenger,
@@ -24,7 +28,8 @@ impl ProtobufAuthenticatePasswordMessenger {
 
 impl AuthenticatePasswordMessenger for ProtobufAuthenticatePasswordMessenger {
     fn decode(&self) -> Result<AuthenticatePasswordFieldsExtract, MessageError> {
-        let message: AuthenticatePassword_pb = decode_protobuf_base64(self.body.clone())?;
+        let message = AuthenticatePasswordPb::decode(decode_base64(self.body.clone())?)
+            .map_err(invalid_protobuf)?;
 
         Ok(AuthenticatePasswordFieldsExtract {
             login_id: message.login_id,
@@ -33,30 +38,29 @@ impl AuthenticatePasswordMessenger for ProtobufAuthenticatePasswordMessenger {
     }
     fn encode_password_not_found(&self) -> Result<AuthenticatePasswordResponse, MessageError> {
         encode_failed(
-            AuthenticatePasswordResult_pb_ErrorType::INVALID_PASSWORD,
+            AuthenticatePasswordErrorKindPb::InvalidPassword,
             AuthenticatePasswordResponse::PasswordNotFound,
         )
     }
     fn encode_password_not_matched(&self) -> Result<AuthenticatePasswordResponse, MessageError> {
         encode_failed(
-            AuthenticatePasswordResult_pb_ErrorType::INVALID_PASSWORD,
+            AuthenticatePasswordErrorKindPb::InvalidPassword,
             AuthenticatePasswordResponse::PasswordNotMatched,
         )
     }
 }
 
 fn encode_failed(
-    field_type: AuthenticatePasswordResult_pb_ErrorType,
+    error_kind: AuthenticatePasswordErrorKindPb,
     response: impl Fn(String) -> AuthenticatePasswordResponse,
 ) -> Result<AuthenticatePasswordResponse, MessageError> {
-    let mut message = AuthenticatePasswordResult_pb::new();
-    message.set_success(false);
-
-    let mut err = AuthenticatePasswordResult_pb_Error::new();
-    err.set_field_type(field_type);
-    message.set_err(err);
-
-    let message = encode_protobuf_base64(message)?;
+    let message = encode_protobuf_base64(AuthenticatePasswordResultPb {
+        success: false,
+        err: Some(AuthenticatePasswordErrorPb {
+            kind: error_kind as i32,
+        }),
+        ..Default::default()
+    })?;
     Ok(response(message))
 }
 
@@ -84,10 +88,16 @@ pub mod test {
             Ok(self.fields.clone())
         }
         fn encode_password_not_found(&self) -> Result<AuthenticatePasswordResponse, MessageError> {
-            Ok(AuthenticatePasswordResponse::PasswordNotFound("encoded".into()))
+            Ok(AuthenticatePasswordResponse::PasswordNotFound(
+                "encoded".into(),
+            ))
         }
-        fn encode_password_not_matched(&self) -> Result<AuthenticatePasswordResponse, MessageError> {
-            Ok(AuthenticatePasswordResponse::PasswordNotMatched("encoded".into()))
+        fn encode_password_not_matched(
+            &self,
+        ) -> Result<AuthenticatePasswordResponse, MessageError> {
+            Ok(AuthenticatePasswordResponse::PasswordNotMatched(
+                "encoded".into(),
+            ))
         }
     }
 }
