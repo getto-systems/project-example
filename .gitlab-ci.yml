@@ -74,6 +74,7 @@ test-api:
   before_script:
     - rustup install nightly
     - rustup component add --toolchain nightly llvm-tools-preview
+    - rustup component add --toolchain nightly rustfmt
     - cargo install rustfilt
     - mkdir tmp
     - ./api/ci/setup-test.sh

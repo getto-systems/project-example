@@ -6,7 +6,6 @@ RUN : && \
   apt-get install -y \
     musl-tools \
   && \
-  && ./api/ci/setup-protoc.sh $CARGO_HOME/bin \
   :
 RUN : && \
   rustup target add x86_64-unknown-linux-musl && \
