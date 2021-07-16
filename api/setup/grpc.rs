@@ -5,29 +5,29 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use prost_build::compile_protos;
 use regex::Regex;
+use tonic_build::configure;
 
 pub fn generate(package: &str) {
-    ProtobufBuilder::new(ProtobufTarget::new(package.into()))
+    GrpcBuilder::new(GrpcTarget::new(package.into()))
         .build()
-        .expect(format!("failed to build protobuf; {}", package).as_str());
+        .expect(format!("failed to build grpc; {}", package).as_str());
 }
 
-struct ProtobufTarget {
+struct GrpcTarget {
     package: String,
     dist: PathBuf,
     source: PathBuf,
     index: PathBuf,
 }
 
-impl ProtobufTarget {
+impl GrpcTarget {
     fn new(package: String) -> Self {
         let target = format!("src/{}", package.replace(".", "/"));
         let target = Path::new(&target);
 
-        let source = target.join("z_protobuf");
-        let dist = target.join("_api/y_protobuf"); // TODO _api の部分を指定できるようにしたい
+        let source = target.join("z_grpc");
+        let dist = target.join("_api/y_grpc"); // TODO _api の部分を指定できるようにしたい
         let index = dist.join("mod.rs");
 
         Self {
@@ -39,12 +39,12 @@ impl ProtobufTarget {
     }
 }
 
-struct ProtobufBuilder {
-    target: ProtobufTarget,
+struct GrpcBuilder {
+    target: GrpcTarget,
 }
 
-impl ProtobufBuilder {
-    fn new(target: ProtobufTarget) -> Self {
+impl GrpcBuilder {
+    fn new(target: GrpcTarget) -> Self {
         Self { target }
     }
 
@@ -78,10 +78,11 @@ impl ProtobufBuilder {
         let out_dir = var("OUT_DIR").expect("OUT_DIR is not defined");
 
         let inputs: Vec<PathBuf> = self.source_proto()?.collect();
-        compile_protos(&inputs, &["src/"])?;
 
-        // 他の proto は _api::y_protobuf を追加して参照しないといけない
-        let import_ref_regex = Regex::new("super::(.*)::api::").unwrap();
+        configure().compile(&inputs, &[Path::new("src/").into()])?;
+
+        // 他の proto は _api::y_grpc を追加して参照しないといけない
+        let import_ref_regex = Regex::new("super::(.*)::service::").unwrap();
         self.source_proto_basename()?.fold(Ok(()), |acc, name| {
             acc?;
             let content =
@@ -91,7 +92,7 @@ impl ProtobufBuilder {
                 file,
                 "{}",
                 import_ref_regex
-                    .replace_all(&content, "super::super::super::$1::_api::y_protobuf::api::"),
+                    .replace_all(&content, "super::super::super::$1::_api::y_grpc::service::"),
             )?;
             file.flush()
         })
@@ -111,7 +112,7 @@ fn filter_proto(result: Result<DirEntry, IoError>) -> Option<PathBuf> {
             .path()
             .file_name()
             .and_then(|name| match name.to_str() {
-                Some("api.proto") => Some(entry.path()),
+                Some("service.proto") => Some(entry.path()),
                 _ => None,
             })
     })
