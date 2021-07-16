@@ -1,4 +1,4 @@
-use actix_web::{HttpMessage, HttpRequest};
+use actix_web::HttpRequest;
 
 use super::data::HeaderError;
 
