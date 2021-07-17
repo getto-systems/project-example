@@ -1,28 +1,31 @@
-use std::fmt::{Display, Formatter};
-
 use actix_web::HttpRequest;
-use chrono::Utc;
 use serde::Serialize;
 use uuid::Uuid;
 
-use crate::z_details::_api::logger::{LogMessage, Logger};
+use crate::z_details::_api::logger::{LogEntry, LogMessage, Logger};
 
-pub fn app_logger(request: &HttpRequest) -> impl Logger {
+const ERROR: &'static str = "ERROR";
+const AUDIT: &'static str = "AUDIT";
+const INFO: &'static str = "INFO";
+const DEBUG: &'static str = "DEBUG";
+
+pub fn request_id() -> String {
+    Uuid::new_v4().to_string()
+}
+
+pub fn app_logger(id: String, request: &HttpRequest) -> impl Logger {
     // アプリケーション全体で使用するデフォルトの logger を返す
-    // 個別のアクションでレベルを指定した logger を使用することもできる
-    verbose_logger(request)
+    // 個別のアクションでレベルを指定したい時はそれぞれ個別のやつを呼び出す
+    verbose_logger(id, request)
 }
-
-pub fn quiet_logger(request: &HttpRequest) -> impl Logger {
-    QuietLogger::with_request(request)
+pub fn quiet_logger(id: String, request: &HttpRequest) -> impl Logger {
+    QuietLogger::with_request(id, request)
 }
-
-pub fn info_logger(request: &HttpRequest) -> impl Logger {
-    InfoLogger::with_request(request)
+pub fn info_logger(id: String, request: &HttpRequest) -> impl Logger {
+    InfoLogger::with_request(id, request)
 }
-
-pub fn verbose_logger(request: &HttpRequest) -> impl Logger {
-    VerboseLogger::with_request(request)
+pub fn verbose_logger(id: String, request: &HttpRequest) -> impl Logger {
+    VerboseLogger::with_request(id, request)
 }
 
 pub struct QuietLogger {
@@ -30,53 +33,16 @@ pub struct QuietLogger {
 }
 
 impl QuietLogger {
-    fn with_request(request: &HttpRequest) -> Self {
+    fn with_request(id: String, request: &HttpRequest) -> Self {
         Self {
-            request: RequestEntry::new(request),
+            request: RequestEntry::new(id, request),
         }
     }
 
     fn message(&self, level: &'static str, message: impl LogMessage) -> String {
-        LogEntry::with_message(level, message, self.request.clone()).to_json()
+        log_message(level, message, self.request.clone())
     }
 }
-
-pub struct InfoLogger {
-    request: RequestEntry,
-}
-
-impl InfoLogger {
-    fn with_request(request: &HttpRequest) -> Self {
-        Self {
-            request: RequestEntry::new(request),
-        }
-    }
-
-    fn message(&self, level: &'static str, message: impl LogMessage) -> String {
-        LogEntry::with_message(level, message, self.request.clone()).to_json()
-    }
-}
-
-pub struct VerboseLogger {
-    request: RequestEntry,
-}
-
-impl VerboseLogger {
-    fn with_request(request: &HttpRequest) -> Self {
-        Self {
-            request: RequestEntry::new(request),
-        }
-    }
-
-    fn message(&self, level: &'static str, message: impl LogMessage) -> String {
-        LogEntry::with_message(level, message, self.request.clone()).to_json()
-    }
-}
-
-const ERROR: &'static str = "ERROR";
-const AUDIT: &'static str = "AUDIT";
-const INFO: &'static str = "INFO";
-const DEBUG: &'static str = "DEBUG";
 
 impl Logger for QuietLogger {
     fn error(&self, message: impl LogMessage) {
@@ -90,6 +56,22 @@ impl Logger for QuietLogger {
     }
     fn debug(&self, _message: impl LogMessage) {
         // no log for debug
+    }
+}
+
+pub struct InfoLogger {
+    request: RequestEntry,
+}
+
+impl InfoLogger {
+    fn with_request(id: String, request: &HttpRequest) -> Self {
+        Self {
+            request: RequestEntry::new(id, request),
+        }
+    }
+
+    fn message(&self, level: &'static str, message: impl LogMessage) -> String {
+        log_message(level, message, self.request.clone())
     }
 }
 
@@ -108,6 +90,26 @@ impl Logger for InfoLogger {
     }
 }
 
+pub struct VerboseLogger {
+    request: RequestEntry,
+}
+
+impl VerboseLogger {
+    fn with_request(id: String, request: &HttpRequest) -> Self {
+        Self {
+            request: RequestEntry::new(id, request),
+        }
+    }
+
+    fn message(&self, level: &'static str, message: impl LogMessage) -> String {
+        log_message(level, message, self.request.clone())
+    }
+}
+
+fn log_message(level: &'static str, message: impl LogMessage, request: RequestEntry) -> String {
+    LogEntry::with_message(level, message, request).to_json()
+}
+
 impl Logger for VerboseLogger {
     fn error(&self, message: impl LogMessage) {
         println!("{}", self.message(ERROR, message))
@@ -123,75 +125,19 @@ impl Logger for VerboseLogger {
     }
 }
 
-#[derive(Serialize)]
-struct LogEntry {
-    at: String,
-    level: &'static str,
-    message: String,
-    request: RequestEntry,
-}
-
-impl LogEntry {
-    fn with_message(level: &'static str, message: impl LogMessage, request: RequestEntry) -> Self {
-        Self {
-            at: Utc::now().to_rfc3339(),
-            level,
-            message: message.log_message(),
-            request,
-        }
-    }
-
-    fn to_json(&self) -> String {
-        match serde_json::to_string(&self) {
-            Ok(json) => json,
-            Err(_) => format!("{}", self),
-        }
-    }
-}
-
-impl Display for LogEntry {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "{}: {}: {}: {}",
-            self.at, self.level, self.message, self.request
-        )
-    }
-}
-
-#[derive(Clone, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 struct RequestEntry {
     id: String,
-    // TODO remote addr と host はこの時点では意味ないからなくす; cloud run のログとかで確認できる
-    remote_addr: Option<String>,
-    host: String,
     path: String,
     method: String,
 }
 
 impl RequestEntry {
-    fn new(request: &HttpRequest) -> Self {
-        let connection_info = request.connection_info();
+    fn new(id: String, request: &HttpRequest) -> Self {
         Self {
-            id: Uuid::new_v4().to_string(),
-            remote_addr: connection_info.remote_addr().map(|addr| addr.to_string()),
-            host: connection_info.host().to_string(),
+            id,
             path: request.path().to_string(),
             method: request.method().to_string(),
         }
-    }
-}
-
-impl Display for RequestEntry {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        let remote_addr = match self.remote_addr.clone() {
-            Some(addr) => addr,
-            None => "X.X.X.X".to_string(),
-        };
-        write!(
-            f,
-            "{}: {}: {}, {}",
-            self.id, remote_addr, self.path, self.method
-        )
     }
 }
