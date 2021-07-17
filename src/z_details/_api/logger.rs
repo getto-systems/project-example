@@ -53,3 +53,103 @@ impl<R: std::fmt::Debug + Serialize> LogEntry<R> {
         }
     }
 }
+
+const ERROR: &'static str = "ERROR";
+const AUDIT: &'static str = "AUDIT";
+const INFO: &'static str = "INFO";
+const DEBUG: &'static str = "DEBUG";
+
+pub struct QuietLogger<R: std::fmt::Debug + Serialize + Clone> {
+    request: R,
+}
+
+impl<R: std::fmt::Debug + Serialize + Clone> QuietLogger<R> {
+    pub fn with_request(request: R) -> Self {
+        Self { request }
+    }
+
+    fn message(&self, level: &'static str, message: impl LogMessage) -> String {
+        log_message(level, message, self.request.clone())
+    }
+}
+
+impl<R: std::fmt::Debug + Serialize + Clone> Logger for QuietLogger<R> {
+    fn error(&self, message: impl LogMessage) {
+        println!("{}", self.message(ERROR, message))
+    }
+    fn audit(&self, message: impl LogMessage) {
+        println!("{}", self.message(AUDIT, message))
+    }
+    fn info(&self, _message: impl LogMessage) {
+        // no log for info
+    }
+    fn debug(&self, _message: impl LogMessage) {
+        // no log for debug
+    }
+}
+
+pub struct InfoLogger<R: std::fmt::Debug + Serialize + Clone> {
+    request: R,
+}
+
+impl<R: std::fmt::Debug + Serialize + Clone> InfoLogger<R> {
+    pub fn with_request(request: R) -> Self {
+        Self { request }
+    }
+
+    fn message(&self, level: &'static str, message: impl LogMessage) -> String {
+        log_message(level, message, self.request.clone())
+    }
+}
+
+impl<R: std::fmt::Debug + Serialize + Clone> Logger for InfoLogger<R> {
+    fn error(&self, message: impl LogMessage) {
+        println!("{}", self.message(ERROR, message))
+    }
+    fn audit(&self, message: impl LogMessage) {
+        println!("{}", self.message(AUDIT, message))
+    }
+    fn info(&self, message: impl LogMessage) {
+        println!("{}", self.message(INFO, message))
+    }
+    fn debug(&self, _message: impl LogMessage) {
+        // no log for debug
+    }
+}
+
+pub struct VerboseLogger<R: std::fmt::Debug + Serialize + Clone> {
+    request: R,
+}
+
+impl<R: std::fmt::Debug + Serialize + Clone> VerboseLogger<R> {
+    pub fn with_request(request: R) -> Self {
+        Self { request }
+    }
+
+    fn message(&self, level: &'static str, message: impl LogMessage) -> String {
+        log_message(level, message, self.request.clone())
+    }
+}
+
+impl<R: std::fmt::Debug + Serialize + Clone> Logger for VerboseLogger<R> {
+    fn error(&self, message: impl LogMessage) {
+        println!("{}", self.message(ERROR, message))
+    }
+    fn audit(&self, message: impl LogMessage) {
+        println!("{}", self.message(AUDIT, message))
+    }
+    fn info(&self, message: impl LogMessage) {
+        println!("{}", self.message(INFO, message))
+    }
+    fn debug(&self, message: impl LogMessage) {
+        println!("{}", self.message(DEBUG, message))
+    }
+}
+
+fn log_message<R: std::fmt::Debug + Serialize + Clone>(
+    level: &'static str,
+    message: impl LogMessage,
+    request: R,
+) -> String {
+    LogEntry::with_message(level, message, request).to_json()
+}
