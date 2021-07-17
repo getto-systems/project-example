@@ -2,10 +2,9 @@ use actix_web::{post, web, HttpRequest, Responder, Scope};
 
 use getto_application::helper::flatten;
 
-use crate::x_outside_feature::_api::{
-    state::AppData,
-    logger::{app_logger, Logger},
-};
+use crate::z_details::_api::logger::Logger;
+
+use crate::x_outside_feature::_api::{logger::app_logger, state::AppData};
 
 use crate::auth::password::reset::_api::x_actix_web::route::scope_reset;
 

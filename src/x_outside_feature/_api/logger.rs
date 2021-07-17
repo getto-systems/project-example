@@ -5,35 +5,10 @@ use chrono::Utc;
 use serde::Serialize;
 use uuid::Uuid;
 
-pub trait Logger {
-    fn error(&self, message: impl LogMessage);
-    fn audit(&self, message: impl LogMessage);
-    fn info(&self, message: impl LogMessage);
-    fn debug(&self, message: impl LogMessage);
-
-    fn log(&self, log_level: LogLevel, message: impl LogMessage) {
-        match log_level {
-            LogLevel::Error => self.error(message),
-            LogLevel::Audit => self.audit(message),
-            LogLevel::Info => self.info(message),
-            LogLevel::Debug => self.debug(message),
-        }
-    }
-}
-
-pub trait LogMessage {
-    fn log_message(&self) -> String;
-}
-
-pub enum LogLevel {
-    Error,
-    Audit,
-    Info,
-    Debug,
-}
+use crate::z_details::_api::logger::{LogMessage, Logger};
 
 pub fn app_logger(request: &HttpRequest) -> impl Logger {
-    // アプリケーション全体でしようするデフォルトの logger を返す
+    // アプリケーション全体で使用するデフォルトの logger を返す
     // 個別のアクションでレベルを指定した logger を使用することもできる
     verbose_logger(request)
 }

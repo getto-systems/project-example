@@ -2,10 +2,9 @@ use actix_web::{delete, patch, web, HttpRequest, Responder, Scope};
 
 use getto_application::helper::flatten;
 
-use crate::x_outside_feature::_api::{
-    state::AppData,
-    logger::{app_logger, Logger},
-};
+use crate::z_details::_api::logger::Logger;
+
+use crate::x_outside_feature::_api::{logger::app_logger, state::AppData};
 
 use crate::{
     auth::auth_ticket::_api::action_logout::action::LogoutAction,
