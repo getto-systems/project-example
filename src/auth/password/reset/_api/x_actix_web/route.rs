@@ -6,7 +6,7 @@ use crate::z_details::_api::logger::Logger;
 
 use crate::x_outside_feature::_api::{
     logger::{app_logger, request_id},
-    state::AppData,
+    feature::AppData,
 };
 
 use crate::auth::password::reset::_api::{
