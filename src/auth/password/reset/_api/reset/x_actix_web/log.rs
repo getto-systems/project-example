@@ -1,11 +1,10 @@
-use crate::{
-    auth::password::reset::_api::{
-        kernel::data::ValidateResetTokenError, reset::data::DecodeResetTokenError,
-    },
-    x_outside_feature::_api::logger::LogLevel,
-};
+use crate::z_details::_api::logger::LogLevel;
 
-use super::super::event::ResetPasswordEvent;
+use crate::auth::password::reset::_api::reset::event::ResetPasswordEvent;
+
+use crate::auth::password::reset::_api::{
+    kernel::data::ValidateResetTokenError, reset::data::DecodeResetTokenError,
+};
 
 impl ResetPasswordEvent {
     pub const fn log_level(&self) -> LogLevel {

@@ -1,6 +1,10 @@
-use crate::{auth::password::reset::_api::request_token::data::{EncodeResetTokenError, NotifyResetTokenError}, x_outside_feature::_api::logger::LogLevel};
+use crate::z_details::_api::logger::LogLevel;
 
-use super::super::event::RequestResetTokenEvent;
+use crate::auth::password::reset::_api::request_token::event::RequestResetTokenEvent;
+
+use crate::auth::password::reset::_api::request_token::data::{
+    EncodeResetTokenError, NotifyResetTokenError,
+};
 
 impl RequestResetTokenEvent {
     pub const fn log_level(&self) -> LogLevel {

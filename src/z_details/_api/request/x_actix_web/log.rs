@@ -1,6 +1,6 @@
-use crate::x_outside_feature::_api::logger::LogLevel;
+use crate::z_details::_api::logger::LogLevel;
 
-use super::super::data::HeaderError;
+use crate::z_details::_api::request::data::HeaderError;
 
 impl HeaderError {
     pub const fn log_level(&self) -> LogLevel {

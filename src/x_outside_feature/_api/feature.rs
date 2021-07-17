@@ -6,22 +6,16 @@ use crate::auth::_api::x_outside_feature::{
     feature::AuthOutsideFeature, init::new_auth_outside_feature,
 };
 
-pub type AppData = web::Data<AppState>;
+pub type AppData = web::Data<AppFeature>;
 
-pub struct AppState {
+pub struct AppFeature {
     pub auth: AuthOutsideFeature,
 }
 
-impl AppState {
+impl AppFeature {
     pub async fn new(env: &'static Env) -> Self {
         Self {
             auth: new_auth_outside_feature(env).await,
         }
-    }
-}
-
-impl Into<AppData> for AppState {
-    fn into(self) -> AppData {
-        web::Data::new(self)
     }
 }

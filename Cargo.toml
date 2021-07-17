@@ -4,16 +4,16 @@ version = "0.30.0-api"
 authors = ["shun <shun.fix9@gmail.com>"]
 edition = "2018"
 build = "api/setup/build.rs"
-default-run = "http"
+default-run = "api"
 
 [[bin]]
-name = "http"
-path = "main/_api/http.rs"
+name = "api"
+path = "main/_api/main.rs"
 
 
 [[bin]]
 name = "auth"
-path = "main/_api/auth.rs"
+path = "main/_auth/main.rs"
 
 [dependencies]
 async-trait = "0.1"

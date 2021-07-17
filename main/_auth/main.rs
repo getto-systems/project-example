@@ -18,11 +18,11 @@ async fn main() {
 }
 
 mod demo {
-    use tonic::Response;
+    use tonic::{Request, Response, Status};
 
     use example_api::auth::_api::y_grpc::service::{
         greeter_server::{Greeter, GreeterServer},
-        HelloResponse,
+        HelloRequest, HelloResponse,
     };
 
     pub fn new_greeter_server() -> GreeterServer<DemoGreeter> {
@@ -35,11 +35,8 @@ mod demo {
     impl Greeter for DemoGreeter {
         async fn hello(
             &self,
-            request: tonic::Request<example_api::auth::_api::y_grpc::service::HelloRequest>,
-        ) -> Result<
-            tonic::Response<example_api::auth::_api::y_grpc::service::HelloResponse>,
-            tonic::Status,
-        > {
+            request: Request<HelloRequest>,
+        ) -> Result<Response<HelloResponse>, Status> {
             println!("hello request received; {:?}", request);
 
             Ok(Response::new(HelloResponse {

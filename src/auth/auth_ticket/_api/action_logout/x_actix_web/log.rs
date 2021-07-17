@@ -1,4 +1,4 @@
-use crate::x_outside_feature::_api::logger::{LogLevel, LogMessage};
+use crate::z_details::_api::logger::{LogLevel, LogMessage};
 
 use super::super::action::LogoutState;
 
