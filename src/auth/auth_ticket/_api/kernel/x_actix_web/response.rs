@@ -1,5 +1,7 @@
 use actix_web::{HttpRequest, HttpResponse};
 
+use crate::z_details::_common::response::actix_web::RespondTo;
+
 use super::header::{
     COOKIE_API_TOKEN, COOKIE_CLOUDFRONT_KEY_PAIR_ID, COOKIE_CLOUDFRONT_POLICY,
     COOKIE_CLOUDFRONT_SIGNATURE, COOKIE_TICKET_TOKEN,
@@ -7,8 +9,8 @@ use super::header::{
 
 use super::super::data::{ValidateAuthNonceError, ValidateAuthRolesError};
 
-impl ValidateAuthNonceError {
-    pub fn respond_to(self, request: &HttpRequest) -> HttpResponse {
+impl RespondTo for ValidateAuthNonceError {
+    fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
             Self::HeaderError(err) => err.respond_to(request),
             Self::RepositoryError(err) => err.respond_to(request),
@@ -17,8 +19,8 @@ impl ValidateAuthNonceError {
     }
 }
 
-impl ValidateAuthRolesError {
-    pub fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
+impl RespondTo for ValidateAuthRolesError {
+    fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
         match self {
             Self::PermissionDenied(_, _) => HttpResponse::Unauthorized().finish(),
         }

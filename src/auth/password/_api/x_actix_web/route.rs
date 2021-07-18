@@ -2,11 +2,11 @@ use actix_web::{post, web, HttpRequest, Responder, Scope};
 
 use getto_application::helper::flatten;
 
-use crate::z_details::_api::logger::Logger;
+use crate::z_details::_common::{logger::Logger, response::actix_web::RespondTo};
 
 use crate::x_outside_feature::_api::{
-    logger::{app_logger, request_id},
     feature::AppData,
+    logger::{app_logger, request_id},
 };
 
 use crate::auth::password::reset::_api::x_actix_web::route::scope_reset;

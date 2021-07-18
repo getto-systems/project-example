@@ -5,7 +5,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use regex::Regex;
+use regex::{escape, Regex};
 use tonic_build::configure;
 
 pub fn generate(package: &str) {
@@ -26,8 +26,8 @@ impl GrpcTarget {
         let target = format!("src/{}", package.replace(".", "/"));
         let target = Path::new(&target);
 
-        let source = target.join("z_grpc");
-        let dist = target.join("_api/y_grpc"); // TODO _api の部分を指定できるようにしたい
+        let source = target.join("z_protobuf");
+        let dist = target.join("_auth/y_protobuf"); // TODO _auth の部分を指定できるようにしたい
         let index = dist.join("mod.rs");
 
         Self {
@@ -81,18 +81,22 @@ impl GrpcBuilder {
 
         configure().compile(&inputs, &[Path::new("src/").into()])?;
 
-        // 他の proto は _api::y_grpc を追加して参照しないといけない
-        let import_ref_regex = Regex::new("super::(.*)::service::").unwrap();
+        // 他の proto は _auth::y_protobuf を追加して参照しないといけない
         self.source_proto_basename()?.fold(Ok(()), |acc, name| {
             acc?;
+
+            let import_ref_regex =
+                Regex::new(&format!("super::(.*)::{}::", escape(&name))).unwrap();
             let content =
                 read_to_string(format!("{}/{}.{}.rs", out_dir, self.target.package, name))?;
             let mut file = File::create(self.target.dist.join(format!("{}.rs", name)))?;
             write!(
                 file,
                 "{}",
-                import_ref_regex
-                    .replace_all(&content, "super::super::super::$1::_api::y_grpc::service::"),
+                import_ref_regex.replace_all(
+                    &content,
+                    format!("super::super::super::$1::_auth::y_protobuf::{}::", name)
+                ),
             )?;
             file.flush()
         })

@@ -6,7 +6,7 @@ use std::{
 };
 
 use prost_build::compile_protos;
-use regex::Regex;
+use regex::{escape, Regex};
 
 pub fn generate(package: &str) {
     ProtobufBuilder::new(ProtobufTarget::new(package.into()))
@@ -81,17 +81,21 @@ impl ProtobufBuilder {
         compile_protos(&inputs, &["src/"])?;
 
         // 他の proto は _api::y_protobuf を追加して参照しないといけない
-        let import_ref_regex = Regex::new("super::(.*)::api::").unwrap();
         self.source_proto_basename()?.fold(Ok(()), |acc, name| {
             acc?;
+
+            let import_ref_regex =
+                Regex::new(&format!("super::(.*)::{}::", escape(&name))).unwrap();
             let content =
                 read_to_string(format!("{}/{}.{}.rs", out_dir, self.target.package, name))?;
             let mut file = File::create(self.target.dist.join(format!("{}.rs", name)))?;
             write!(
                 file,
                 "{}",
-                import_ref_regex
-                    .replace_all(&content, "super::super::super::$1::_api::y_protobuf::api::"),
+                import_ref_regex.replace_all(
+                    &content,
+                    format!("super::super::super::$1::_api::y_protobuf::{}::", name)
+                ),
             )?;
             file.flush()
         })

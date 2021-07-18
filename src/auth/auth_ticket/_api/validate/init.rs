@@ -16,8 +16,8 @@ use crate::auth::auth_user::_api::kernel::data::RequireAuthRoles;
 pub struct TicketValidateAuthTokenStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
     ticket_infra: AuthTicketStruct<'a>,
-    token_header: TicketAuthTokenHeader,
-    token_validator: JwtAuthTokenDecoder<'a>,
+    token_header: TicketAuthTokenHeader<'a>,
+    token_decoder: JwtAuthTokenDecoder<'a>,
     config: ValidateAuthTokenConfig,
 }
 
@@ -26,8 +26,8 @@ impl<'a> TicketValidateAuthTokenStruct<'a> {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, request),
             ticket_infra: AuthTicketStruct::new(feature),
-            token_header: TicketAuthTokenHeader::new(request.clone()),
-            token_validator: JwtAuthTokenDecoder::new(&feature.secret.ticket.decoding_key),
+            token_header: TicketAuthTokenHeader::new(request),
+            token_decoder: JwtAuthTokenDecoder::new(&feature.secret.ticket.decoding_key),
             config: ValidateAuthTokenConfig {
                 require_roles: RequireAuthRoles::Nothing, // ticket 検証では role は不問
             },
@@ -38,7 +38,7 @@ impl<'a> TicketValidateAuthTokenStruct<'a> {
 impl<'a> ValidateAuthTokenInfra for TicketValidateAuthTokenStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
     type TicketInfra = AuthTicketStruct<'a>;
-    type TokenHeader = TicketAuthTokenHeader;
+    type TokenHeader = TicketAuthTokenHeader<'a>;
     type TokenDecoder = JwtAuthTokenDecoder<'a>;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
@@ -50,8 +50,8 @@ impl<'a> ValidateAuthTokenInfra for TicketValidateAuthTokenStruct<'a> {
     fn token_header(&self) -> &Self::TokenHeader {
         &self.token_header
     }
-    fn token_validator(&self) -> &Self::TokenDecoder {
-        &self.token_validator
+    fn token_decoder(&self) -> &Self::TokenDecoder {
+        &self.token_decoder
     }
     fn config(&self) -> &ValidateAuthTokenConfig {
         &self.config
@@ -61,8 +61,8 @@ impl<'a> ValidateAuthTokenInfra for TicketValidateAuthTokenStruct<'a> {
 pub struct ApiValidateAuthTokenStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
     ticket_infra: AuthTicketStruct<'a>,
-    token_header: ApiAuthTokenHeader,
-    token_validator: JwtApiTokenDecoder<'a>,
+    token_header: ApiAuthTokenHeader<'a>,
+    token_decoder: JwtApiTokenDecoder<'a>,
     config: ValidateAuthTokenConfig,
 }
 
@@ -76,8 +76,8 @@ impl<'a> ApiValidateAuthTokenStruct<'a> {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, request),
             ticket_infra: AuthTicketStruct::new(feature),
             config: ValidateAuthTokenConfig { require_roles },
-            token_header: ApiAuthTokenHeader::new(request.clone()),
-            token_validator: JwtApiTokenDecoder::new(&feature.secret.api.decoding_key),
+            token_header: ApiAuthTokenHeader::new(request),
+            token_decoder: JwtApiTokenDecoder::new(&feature.secret.api.decoding_key),
         }
     }
 }
@@ -85,7 +85,7 @@ impl<'a> ApiValidateAuthTokenStruct<'a> {
 impl<'a> ValidateAuthTokenInfra for ApiValidateAuthTokenStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
     type TicketInfra = AuthTicketStruct<'a>;
-    type TokenHeader = ApiAuthTokenHeader;
+    type TokenHeader = ApiAuthTokenHeader<'a>;
     type TokenDecoder = JwtApiTokenDecoder<'a>;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
@@ -97,8 +97,8 @@ impl<'a> ValidateAuthTokenInfra for ApiValidateAuthTokenStruct<'a> {
     fn token_header(&self) -> &Self::TokenHeader {
         &self.token_header
     }
-    fn token_validator(&self) -> &Self::TokenDecoder {
-        &self.token_validator
+    fn token_decoder(&self) -> &Self::TokenDecoder {
+        &self.token_decoder
     }
     fn config(&self) -> &ValidateAuthTokenConfig {
         &self.config
@@ -119,7 +119,7 @@ pub mod test {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
         pub ticket_infra: StaticAuthTicketStruct<'a>,
         pub token_header: StaticAuthTokenHeader,
-        pub token_validator: StaticAuthTokenDecoder,
+        pub token_decoder: StaticAuthTokenDecoder,
         pub config: ValidateAuthTokenConfig,
     }
 
@@ -138,8 +138,8 @@ pub mod test {
         fn token_header(&self) -> &Self::TokenHeader {
             &self.token_header
         }
-        fn token_validator(&self) -> &Self::TokenDecoder {
-            &self.token_validator
+        fn token_decoder(&self) -> &Self::TokenDecoder {
+            &self.token_decoder
         }
         fn config(&self) -> &ValidateAuthTokenConfig {
             &self.config

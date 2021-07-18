@@ -65,7 +65,7 @@ async fn success_request_token() {
         "reset password success; user: user-id (granted: [])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
         "issue success; ticket: ticket-id / user: user-id (granted: [])",
-        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
+        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
     ]);
     assert!(result.is_ok());
@@ -86,7 +86,7 @@ async fn success_expired_nonce() {
         "reset password success; user: user-id (granted: [])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
         "issue success; ticket: ticket-id / user: user-id (granted: [])",
-        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
+        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
     ]);
     assert!(result.is_ok());
@@ -212,7 +212,7 @@ async fn just_max_length_password() {
         "reset password success; user: user-id (granted: [])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
         "issue success; ticket: ticket-id / user: user-id (granted: [])",
-        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
+        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
     ]);
     assert!(result.is_ok());
@@ -492,7 +492,7 @@ impl<'a> TestFeature<'a> {
                 ticket_infra: standard_ticket_infra(store),
                 ticket_encoder: StaticAuthTokenEncoder::new(),
                 api_encoder: StaticAuthTokenEncoder::new(),
-                cdn_encoder: StaticAuthTokenEncoder::new(),
+                cloudfront_encoder: StaticAuthTokenEncoder::new(),
                 messenger: StaticEncodeMessenger::new(),
                 config: standard_encode_config(),
             },
@@ -521,7 +521,7 @@ fn standard_encode_config() -> EncodeAuthTicketConfig {
     EncodeAuthTicketConfig {
         ticket_expires: ExpireDuration::with_duration(Duration::days(1)),
         api_expires: ExpireDuration::with_duration(Duration::minutes(1)),
-        cdn_expires: ExpireDuration::with_duration(Duration::minutes(1)),
+        cloudfront_expires: ExpireDuration::with_duration(Duration::minutes(1)),
     }
 }
 fn standard_issue_config() -> IssueAuthTicketConfig {

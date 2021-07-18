@@ -18,7 +18,7 @@ pub struct AuthOutsideConfig {
     pub ticket_expires: ExpireDuration,
     pub ticket_expansion_limit: ExpansionLimitDuration,
     pub api_expires: ExpireDuration,
-    pub cdn_expires: ExpireDuration,
+    pub cloudfront_expires: ExpireDuration,
     pub reset_token_expires: ExpireDuration,
 }
 pub struct AuthOutsideStore {
@@ -34,14 +34,14 @@ pub struct AuthOutsideCookie {
 pub struct AuthOutsideSecret {
     pub ticket: AuthOutsideJwtSecret,
     pub api: AuthOutsideJwtSecret,
-    pub cdn: AuthOutsideCdnSecret,
+    pub cloudfront: AuthOutsideCloudfrontSecret,
     pub reset_token: AuthOutsideJwtSecret,
 }
 pub struct AuthOutsideJwtSecret {
     pub decoding_key: DecodingKey<'static>,
     pub encoding_key: EncodingKey,
 }
-pub struct AuthOutsideCdnSecret {
+pub struct AuthOutsideCloudfrontSecret {
     pub key: CloudfrontKey,
 }
 pub struct AuthOutsideEmail {

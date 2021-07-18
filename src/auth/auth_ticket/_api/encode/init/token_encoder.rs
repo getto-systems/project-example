@@ -2,7 +2,7 @@ use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 
 use aws_cloudfront_cookie::{CloudfrontKey, CloudfrontPolicy};
 
-use crate::auth::_api::x_outside_feature::feature::{AuthOutsideCdnSecret, AuthOutsideCookie};
+use crate::auth::_api::x_outside_feature::feature::{AuthOutsideCloudfrontSecret, AuthOutsideCookie};
 
 use crate::auth::auth_ticket::_api::kernel::x_actix_web::header::{
     COOKIE_API_TOKEN, COOKIE_CLOUDFRONT_KEY_PAIR_ID, COOKIE_CLOUDFRONT_POLICY,
@@ -122,7 +122,7 @@ pub struct CloudfrontTokenEncoder<'a> {
 }
 
 impl<'a> CloudfrontTokenEncoder<'a> {
-    pub fn new(secret: &'a AuthOutsideCdnSecret, cookie: &'a AuthOutsideCookie) -> Self {
+    pub fn new(secret: &'a AuthOutsideCloudfrontSecret, cookie: &'a AuthOutsideCookie) -> Self {
         Self {
             domain: &cookie.domain,
             key: &secret.key,

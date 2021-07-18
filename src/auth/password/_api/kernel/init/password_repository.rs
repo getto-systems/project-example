@@ -3,7 +3,7 @@ use std::fmt::Display;
 use chrono::{TimeZone, Utc};
 use sqlx::{query, MySqlPool};
 
-use crate::z_details::_api::mysql::helper::mysql_error;
+use crate::z_details::_common::repository::{helper::infra_error, mysql::helper::mysql_error};
 
 use crate::auth::password::_api::kernel::infra::{
     AuthUserPasswordHasher, AuthUserPasswordMatcher, AuthUserPasswordRepository, HashedPassword,
@@ -17,8 +17,7 @@ use crate::auth::{
     login_id::_api::data::LoginId,
     password::_api::kernel::data::ResetToken,
 };
-use crate::z_details::_api::repository::data::RepositoryError;
-use crate::z_details::_api::repository::helper::infra_error;
+use crate::z_details::_common::repository::data::RepositoryError;
 
 pub struct MysqlAuthUserPasswordRepository<'a> {
     pool: &'a MySqlPool,
@@ -235,7 +234,7 @@ pub mod test {
 
     use chrono::{DateTime, Utc};
 
-    use crate::z_details::_api::repository::helper::infra_error;
+    use crate::z_details::_common::repository::helper::infra_error;
 
     use crate::auth::password::_api::kernel::infra::{
         AuthUserPasswordHasher, AuthUserPasswordMatcher, AuthUserPasswordRepository,
@@ -249,7 +248,7 @@ pub mod test {
         login_id::_api::data::LoginId,
         password::_api::kernel::data::ResetToken,
     };
-    use crate::z_details::_api::repository::data::RepositoryError;
+    use crate::z_details::_common::repository::data::RepositoryError;
 
     pub type MemoryAuthUserPasswordStore = Mutex<MemoryAuthUserPasswordMap>;
     pub struct MemoryAuthUserPasswordMap {

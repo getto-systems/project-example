@@ -1,15 +1,35 @@
-use std::env::var;
+use std::sync::Arc;
 
+use lazy_static::lazy_static;
+use tonic::service::interceptor_fn;
 use tonic::transport::Server;
+use tower::ServiceBuilder;
+
+use example_api::x_outside_feature::_auth::{env::Env, feature::AppFeature};
+
+lazy_static! {
+    static ref ENV: Env = Env::new();
+}
 
 #[tokio::main]
 async fn main() {
-    let port = var("PORT").expect("PORT is not specified");
+    let data = Arc::new(AppFeature::new(&ENV).await);
+
+    let server = route::Server::new();
 
     Server::builder()
-        .add_service(demo::new_greeter_server())
+        .layer(
+            ServiceBuilder::new()
+                .layer(interceptor_fn(move |mut request| {
+                    request.extensions_mut().insert(data.clone());
+                    Ok(request)
+                }))
+                .into_inner(),
+        )
+        .add_service(server.auth().auth_ticket().logout())
+        .add_service(server.auth().auth_ticket().renew())
         .serve(
-            format!("0.0.0.0:{}", port)
+            format!("0.0.0.0:{}", &ENV.port)
                 .parse()
                 .expect("failed to parse socket addr"),
         )
@@ -17,31 +37,22 @@ async fn main() {
         .expect("failed to start grpc server")
 }
 
-mod demo {
-    use tonic::{Request, Response, Status};
+mod route {
+    use example_api::auth::_auth::x_tonic::route::AuthServer;
 
-    use example_api::auth::_api::y_grpc::service::{
-        greeter_server::{Greeter, GreeterServer},
-        HelloRequest, HelloResponse,
-    };
-
-    pub fn new_greeter_server() -> GreeterServer<DemoGreeter> {
-        GreeterServer::new(DemoGreeter)
+    pub struct Server {
+        auth: AuthServer,
     }
 
-    pub struct DemoGreeter;
+    impl Server {
+        pub const fn new() -> Self {
+            Self {
+                auth: AuthServer::new(),
+            }
+        }
 
-    #[async_trait::async_trait]
-    impl Greeter for DemoGreeter {
-        async fn hello(
-            &self,
-            request: Request<HelloRequest>,
-        ) -> Result<Response<HelloResponse>, Status> {
-            println!("hello request received; {:?}", request);
-
-            Ok(Response::new(HelloResponse {
-                message: format!("Hello, {}!", request.into_inner().name).into(),
-            }))
+        pub fn auth(&self) -> &AuthServer {
+            &self.auth
         }
     }
 }

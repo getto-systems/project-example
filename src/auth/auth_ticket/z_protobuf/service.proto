@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package auth.auth_ticket.service;
+
+service LogoutPb {
+    rpc Logout (LogoutRequestPb) returns (LogoutResponsePb);
+}
+message LogoutRequestPb {}
+message LogoutResponsePb {}
+
+service RenewAuthTicketPb {
+    rpc Renew (RenewAuthTicketRequestPb) returns (RenewAuthTicketResponsePb);
+}
+message RenewAuthTicketRequestPb {}
+message RenewAuthTicketResponsePb {
+    repeated string granted_roles = 1;
+    repeated AuthTokenPb ticket_tokens = 2;
+    repeated AuthTokenPb api_tokens = 3;
+    repeated AuthTokenPb cloudfront_tokens = 4;
+}
+message AuthTokenPb {
+    AuthTokenKindPb kind = 1;
+    string token = 2;
+    int64 expires = 3;
+}
+enum AuthTokenKindPb {
+    Ticket = 0;
+    Api = 1;
+    CloudfrontKeyPairId = 2;
+    CloudfrontPolicy = 3;
+    CloudfrontSignature = 4;
+}

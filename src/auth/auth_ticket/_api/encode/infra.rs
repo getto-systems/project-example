@@ -9,13 +9,13 @@ pub trait EncodeAuthTicketInfra {
     type TicketInfra: AuthTicketInfra;
     type TicketEncoder: AuthTokenEncoder;
     type ApiEncoder: AuthTokenEncoder;
-    type CdnEncoder: AuthTokenEncoder;
+    type CloudfrontEncoder: AuthTokenEncoder;
     type Messenger: EncodeMessenger;
 
     fn ticket_infra(&self) -> &Self::TicketInfra;
     fn ticket_encoder(&self) -> &Self::TicketEncoder;
     fn api_encoder(&self) -> &Self::ApiEncoder;
-    fn cdn_encoder(&self) -> &Self::CdnEncoder;
+    fn cloudfront_encoder(&self) -> &Self::CloudfrontEncoder;
     fn messenger(&self) -> &Self::Messenger;
     fn config(&self) -> &EncodeAuthTicketConfig;
 }
@@ -35,5 +35,5 @@ pub trait EncodeMessenger {
 pub struct EncodeAuthTicketConfig {
     pub ticket_expires: ExpireDuration,
     pub api_expires: ExpireDuration,
-    pub cdn_expires: ExpireDuration,
+    pub cloudfront_expires: ExpireDuration,
 }

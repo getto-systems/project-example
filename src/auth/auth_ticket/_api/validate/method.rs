@@ -27,7 +27,7 @@ fn validate_token(
     infra: &impl ValidateAuthTokenInfra,
 ) -> Result<AuthTicket, ValidateAuthTokenError> {
     let header = infra.token_header();
-    let token_validator = infra.token_validator();
+    let token_validator = infra.token_decoder();
     let config = infra.config();
 
     let token = header

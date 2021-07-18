@@ -1,5 +1,5 @@
 pub struct ActionStatePubSub<E> {
-    handlers: Vec<Box<dyn Fn(&E)>>,
+    handlers: Vec<Box<dyn 'static + Fn(&E) + Send + Sync>>,
 }
 
 impl<E> ActionStatePubSub<E> {
@@ -7,7 +7,7 @@ impl<E> ActionStatePubSub<E> {
         Self { handlers: vec![] }
     }
 
-    pub fn subscribe(&mut self, handler: impl 'static + Fn(&E)) {
+    pub fn subscribe(&mut self, handler: impl 'static + Fn(&E) + Send + Sync) {
         self.handlers.push(Box::new(handler));
     }
     pub fn post(&self, event: E) -> E {

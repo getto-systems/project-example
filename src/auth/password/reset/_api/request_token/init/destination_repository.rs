@@ -1,6 +1,6 @@
 use sqlx::{query, MySqlPool};
 
-use crate::z_details::_api::mysql::helper::mysql_error;
+use crate::z_details::_common::repository::mysql::helper::mysql_error;
 
 use crate::auth::password::reset::_api::request_token::infra::ResetTokenDestinationRepository;
 
@@ -10,7 +10,7 @@ use crate::auth::{
         ResetTokenDestination, ResetTokenDestinationExtract,
     },
 };
-use crate::z_details::_api::repository::data::RepositoryError;
+use crate::z_details::_common::repository::data::RepositoryError;
 
 pub struct MysqlResetTokenDestinationRepository<'a> {
     pool: &'a MySqlPool,
@@ -59,7 +59,7 @@ pub mod test {
             login_id::_api::data::LoginId,
             password::reset::_api::request_token::data::ResetTokenDestination,
         },
-        z_details::_api::repository::data::RepositoryError,
+        z_details::_common::repository::data::RepositoryError,
     };
 
     pub type MemoryResetTokenDestinationStore = Mutex<MemoryResetTokenDestinationMap>;

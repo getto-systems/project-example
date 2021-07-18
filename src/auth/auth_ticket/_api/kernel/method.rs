@@ -1,10 +1,9 @@
-use crate::z_details::_api::repository::data::RegisterResult;
-
 use super::infra::{
     AuthClock, AuthNonceEntry, AuthNonceHeader, AuthNonceRepository, CheckAuthNonceInfra,
 };
 
 use super::data::ValidateAuthNonceError;
+use crate::z_details::_common::repository::data::RegisterResult;
 
 pub async fn check_nonce(infra: &impl CheckAuthNonceInfra) -> Result<(), ValidateAuthNonceError> {
     let nonce_header = infra.nonce_header();

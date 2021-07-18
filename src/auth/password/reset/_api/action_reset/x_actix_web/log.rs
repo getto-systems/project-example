@@ -1,4 +1,4 @@
-use crate::z_details::_api::logger::{LogLevel, LogMessage};
+use crate::z_details::_common::logger::{LogLevel, LogMessage};
 
 use super::super::action::ResetPasswordState;
 

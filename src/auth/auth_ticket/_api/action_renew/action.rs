@@ -44,7 +44,7 @@ impl<M: RenewAuthTicketMaterial> RenewAuthTicketAction<M> {
         }
     }
 
-    pub fn subscribe(&mut self, handler: impl 'static + Fn(&RenewAuthTicketState)) {
+    pub fn subscribe(&mut self, handler: impl 'static + Fn(&RenewAuthTicketState) + Send + Sync) {
         self.pubsub.subscribe(handler);
     }
 

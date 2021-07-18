@@ -44,7 +44,7 @@ impl<M: LogoutMaterial> LogoutAction<M> {
         }
     }
 
-    pub fn subscribe(&mut self, handler: impl 'static + Fn(&LogoutState)) {
+    pub fn subscribe(&mut self, handler: impl 'static + Fn(&LogoutState) + Send + Sync) {
         self.pubsub.subscribe(handler);
     }
 

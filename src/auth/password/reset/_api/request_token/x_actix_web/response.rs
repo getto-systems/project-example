@@ -1,13 +1,15 @@
 use actix_web::{HttpRequest, HttpResponse};
 
+use crate::z_details::_common::response::actix_web::RespondTo;
+
 use super::super::event::RequestResetTokenEvent;
 
 use crate::auth::password::reset::_api::request_token::data::{
     EncodeResetTokenError, NotifyResetTokenError, RequestResetTokenResponse,
 };
 
-impl RequestResetTokenEvent {
-    pub fn respond_to(self, request: &HttpRequest) -> HttpResponse {
+impl RespondTo for RequestResetTokenEvent {
+    fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
             Self::TokenExpiresCalculated(_) => HttpResponse::Accepted().finish(),
             Self::TokenNotified(_) => HttpResponse::Accepted().finish(),
@@ -23,8 +25,8 @@ impl RequestResetTokenEvent {
     }
 }
 
-impl RequestResetTokenResponse {
-    pub fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
+impl RespondTo for RequestResetTokenResponse {
+    fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
         match self {
             Self::Success(message) => HttpResponse::Ok().body(message),
             Self::DestinationNotFound(message) => HttpResponse::Ok().body(message),
@@ -33,16 +35,16 @@ impl RequestResetTokenResponse {
     }
 }
 
-impl EncodeResetTokenError {
-    pub fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
+impl RespondTo for EncodeResetTokenError {
+    fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
         match self {
             Self::InfraError(_) => HttpResponse::InternalServerError().finish(),
         }
     }
 }
 
-impl NotifyResetTokenError {
-    pub fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
+impl RespondTo for NotifyResetTokenError {
+    fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
         match self {
             Self::InfraError(_) => HttpResponse::InternalServerError().finish(),
         }

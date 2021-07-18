@@ -9,7 +9,9 @@ use chrono::{DateTime, Duration, Utc};
 use crate::auth::auth_user::_api::kernel::data::{
     AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
 };
-use crate::z_details::_api::{repository::data::RepositoryError, request::data::HeaderError};
+use crate::z_details::{
+    _api::request::data::HeaderError, _common::repository::data::RepositoryError,
+};
 
 #[derive(Clone)]
 pub struct AuthNonceValue(String);

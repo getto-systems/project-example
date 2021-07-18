@@ -19,7 +19,9 @@ use crate::auth::{
         },
     },
 };
-use crate::z_details::_api::{message::data::MessageError, repository::data::RepositoryError};
+use crate::z_details::{
+    _api::message::data::MessageError, _common::repository::data::RepositoryError,
+};
 
 pub trait RequestResetTokenInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
@@ -46,7 +48,10 @@ pub struct RequestResetTokenConfig {
 
 #[async_trait::async_trait]
 pub trait ResetTokenDestinationRepository {
-    async fn get(&self, login_id: &LoginId) -> Result<Option<ResetTokenDestination>, RepositoryError>;
+    async fn get(
+        &self,
+        login_id: &LoginId,
+    ) -> Result<Option<ResetTokenDestination>, RepositoryError>;
 }
 
 pub trait ResetTokenGenerator {

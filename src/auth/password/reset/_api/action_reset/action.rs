@@ -55,7 +55,7 @@ impl<M: ResetPasswordMaterial> ResetPasswordAction<M> {
         }
     }
 
-    pub fn subscribe(&mut self, handler: impl 'static + Fn(&ResetPasswordState)) {
+    pub fn subscribe(&mut self, handler: impl 'static + Fn(&ResetPasswordState) + Send + Sync) {
         self.pubsub.subscribe(handler);
     }
 

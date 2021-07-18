@@ -15,7 +15,7 @@ pub struct EncodeAuthTicketStruct<'a, M: EncodeMessenger> {
     ticket_infra: AuthTicketStruct<'a>,
     ticket_encoder: TicketJwtAuthTokenEncoder<'a>,
     api_encoder: ApiJwtAuthTokenEncoder<'a>,
-    cdn_encoder: CloudfrontTokenEncoder<'a>,
+    cloudfront_encoder: CloudfrontTokenEncoder<'a>,
     messenger: M,
     config: EncodeAuthTicketConfig,
 }
@@ -37,12 +37,12 @@ impl<'a, M: EncodeMessenger> EncodeAuthTicketStruct<'a, M> {
                 &feature.cookie,
                 &feature.secret.api.encoding_key,
             ),
-            cdn_encoder: CloudfrontTokenEncoder::new(&feature.secret.cdn, &feature.cookie),
+            cloudfront_encoder: CloudfrontTokenEncoder::new(&feature.secret.cloudfront, &feature.cookie),
             messenger,
             config: EncodeAuthTicketConfig {
                 ticket_expires: feature.config.ticket_expires,
                 api_expires: feature.config.api_expires,
-                cdn_expires: feature.config.cdn_expires,
+                cloudfront_expires: feature.config.cloudfront_expires,
             },
         }
     }
@@ -67,7 +67,7 @@ impl<'a, M: EncodeMessenger> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a
     type TicketInfra = AuthTicketStruct<'a>;
     type TicketEncoder = TicketJwtAuthTokenEncoder<'a>;
     type ApiEncoder = ApiJwtAuthTokenEncoder<'a>;
-    type CdnEncoder = CloudfrontTokenEncoder<'a>;
+    type CloudfrontEncoder = CloudfrontTokenEncoder<'a>;
     type Messenger = M;
 
     fn ticket_infra(&self) -> &Self::TicketInfra {
@@ -79,8 +79,8 @@ impl<'a, M: EncodeMessenger> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a
     fn api_encoder(&self) -> &Self::ApiEncoder {
         &self.api_encoder
     }
-    fn cdn_encoder(&self) -> &Self::CdnEncoder {
-        &self.cdn_encoder
+    fn cloudfront_encoder(&self) -> &Self::CloudfrontEncoder {
+        &self.cloudfront_encoder
     }
     fn messenger(&self) -> &Self::Messenger {
         &self.messenger
@@ -104,7 +104,7 @@ pub mod test {
         pub ticket_infra: StaticAuthTicketStruct<'a>,
         pub ticket_encoder: StaticAuthTokenEncoder,
         pub api_encoder: StaticAuthTokenEncoder,
-        pub cdn_encoder: StaticAuthTokenEncoder,
+        pub cloudfront_encoder: StaticAuthTokenEncoder,
         pub messenger: StaticEncodeMessenger,
         pub config: EncodeAuthTicketConfig,
     }
@@ -113,7 +113,7 @@ pub mod test {
         type TicketInfra = StaticAuthTicketStruct<'a>;
         type TicketEncoder = StaticAuthTokenEncoder;
         type ApiEncoder = StaticAuthTokenEncoder;
-        type CdnEncoder = StaticAuthTokenEncoder;
+        type CloudfrontEncoder = StaticAuthTokenEncoder;
         type Messenger = StaticEncodeMessenger;
 
         fn ticket_infra(&self) -> &Self::TicketInfra {
@@ -125,8 +125,8 @@ pub mod test {
         fn api_encoder(&self) -> &Self::ApiEncoder {
             &self.api_encoder
         }
-        fn cdn_encoder(&self) -> &Self::CdnEncoder {
-            &self.cdn_encoder
+        fn cloudfront_encoder(&self) -> &Self::CloudfrontEncoder {
+            &self.cloudfront_encoder
         }
         fn messenger(&self) -> &Self::Messenger {
             &self.messenger

@@ -18,7 +18,7 @@ pub trait ValidateAuthTokenInfra {
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
     fn ticket_infra(&self) -> &Self::TicketInfra;
     fn token_header(&self) -> &Self::TokenHeader;
-    fn token_validator(&self) -> &Self::TokenDecoder;
+    fn token_decoder(&self) -> &Self::TokenDecoder;
     fn config(&self) -> &ValidateAuthTokenConfig;
 }
 

@@ -182,7 +182,7 @@ impl<'a> TestFeature<'a> {
                 },
                 ticket_infra: standard_ticket_infra(store),
                 token_header: standard_token_header(),
-                token_validator: standard_token_validator(),
+                token_decoder: standard_token_validator(),
                 config: ValidateAuthTokenConfig {
                     require_roles: RequireAuthRoles::Nothing,
                 },

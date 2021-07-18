@@ -1,13 +1,16 @@
 use actix_web::{HttpRequest, HttpResponse};
 
+use crate::z_details::_common::response::actix_web::RespondTo;
+
+// TODO import の整理
 use super::super::super::kernel::x_actix_web::response::unauthorized;
 
 use super::super::event::ValidateAuthTokenEvent;
 
 use super::super::data::{DecodeAuthTokenError, ValidateAuthTokenError};
 
-impl ValidateAuthTokenEvent {
-    pub fn respond_to(self, request: &HttpRequest) -> HttpResponse {
+impl RespondTo for ValidateAuthTokenEvent {
+    fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
             Self::Success(_) => HttpResponse::Accepted().finish(),
             Self::NonceError(err) => err.respond_to(request),
