@@ -9,7 +9,6 @@ protobuf_main() {
     protobuf_generate_all "src/example"
 }
 
-# TODO service.proto は除外したい
 protobuf_generate_all() {
     local root
     local protobuf
@@ -29,8 +28,12 @@ protobuf_generate_all() {
         file=${file#/}
         file=${file%.proto}
 
-        echo "${root} : ${file}"
-        protobuf_generate "$proto" "$dest" "$file"
+        case "$file" in
+        api | db)
+            echo "${root} : ${file}"
+            protobuf_generate "$proto" "$dest" "$file"
+            ;;
+        esac
     done
 }
 protobuf_generate() {

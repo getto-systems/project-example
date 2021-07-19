@@ -1,5 +1,4 @@
 import { env } from "../../../../../../../y_environment/_ui/env"
-import pb from "../../../y_protobuf/api_pb.js"
 
 import {
     fetchOptions,
@@ -20,11 +19,12 @@ export function newResetPasswordRemote(
     feature: RemoteOutsideFeature,
     clock: Clock,
 ): ResetPasswordRemote {
-    const ResetPasswordPb = pb.auth.password.reset.api.ResetPasswordPb
-    const ResetPasswordResultPb = pb.auth.password.reset.api.ResetPasswordResultPb
-    const ResetPasswordErrorKind = pb.auth.password.reset.api.ResetPasswordErrorKindPb
-
     return async (resetToken, fields) => {
+        const pb = await import(/* webpackMode: "eager" */ "../../../y_protobuf/api_pb.js")
+        const ResetPasswordPb = pb.auth.password.reset.api.ResetPasswordPb
+        const ResetPasswordResultPb = pb.auth.password.reset.api.ResetPasswordResultPb
+        const ResetPasswordErrorKind = pb.auth.password.reset.api.ResetPasswordErrorKindPb
+
         try {
             const mock = false
             if (mock) {

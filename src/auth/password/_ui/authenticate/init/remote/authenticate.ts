@@ -1,5 +1,4 @@
 import { env } from "../../../../../../y_environment/_ui/env"
-import pb from "../../../y_protobuf/api_pb.js"
 
 import {
     generateNonce,
@@ -20,10 +19,11 @@ export function newAuthenticatePasswordRemote(
     feature: RemoteOutsideFeature,
     clock: Clock,
 ): AuthenticatePasswordRemote {
-    const AuthenticatePasswordPb = pb.auth.password.api.AuthenticatePasswordPb
-    const AuthenticatePasswordResultPb = pb.auth.password.api.AuthenticatePasswordResultPb
-
     return async (fields) => {
+        const pb = await import(/* webpackMode: "eager" */ "../../../y_protobuf/api_pb.js")
+        const AuthenticatePasswordPb = pb.auth.password.api.AuthenticatePasswordPb
+        const AuthenticatePasswordResultPb = pb.auth.password.api.AuthenticatePasswordResultPb
+
         try {
             const mock = false
             if (mock) {

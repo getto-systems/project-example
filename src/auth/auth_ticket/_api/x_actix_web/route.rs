@@ -6,7 +6,7 @@ use crate::z_details::_common::{logger::Logger, response::actix_web::RespondTo};
 
 use crate::x_outside_feature::_api::{
     feature::AppData,
-    logger::{app_logger, request_id},
+    logger::{app_logger, generate_request_id},
 };
 
 use crate::{
@@ -20,7 +20,7 @@ pub fn scope_auth_ticket() -> Scope {
 
 #[patch("")]
 async fn renew(data: AppData, request: HttpRequest) -> impl Responder {
-    let logger = app_logger(request_id(), &request);
+    let logger = app_logger(generate_request_id(), &request);
     let mut action = RenewAuthTicketAction::new(&data.auth, &request);
     action.subscribe(move |state| logger.log(state.log_level(), state));
     flatten(action.ignite().await).respond_to(&request)
@@ -28,8 +28,9 @@ async fn renew(data: AppData, request: HttpRequest) -> impl Responder {
 
 #[delete("")]
 async fn logout(data: AppData, request: HttpRequest) -> impl Responder {
-    let logger = app_logger(request_id(), &request);
-    let mut action = LogoutAction::new(&data.auth, &request);
+    let request_id = generate_request_id();
+    let logger = app_logger(request_id.clone(), &request);
+    let mut action = LogoutAction::new(&data.auth, &request_id, &request);
     action.subscribe(move |state| logger.log(state.log_level(), state));
     flatten(action.ignite().await).respond_to(&request)
 }

@@ -34,13 +34,11 @@ pub mod test {
 
     pub enum StaticAuthNonceHeader {
         Valid(AuthNonceValue),
-        NotFound, // TODO このテストを追加する必要がある
     }
 
     impl AuthNonceHeader for StaticAuthNonceHeader {
         fn nonce(&self) -> Result<AuthNonceValue, HeaderError> {
             match self {
-                Self::NotFound => Err(HeaderError::NotFound),
                 Self::Valid(nonce) => Ok(nonce.clone()),
             }
         }

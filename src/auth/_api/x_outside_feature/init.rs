@@ -13,7 +13,8 @@ use crate::x_outside_feature::_api::env::Env;
 
 use super::feature::{
     AuthOutsideCloudfrontSecret, AuthOutsideConfig, AuthOutsideCookie, AuthOutsideEmail,
-    AuthOutsideFeature, AuthOutsideJwtSecret, AuthOutsideSecret, AuthOutsideStore,
+    AuthOutsideFeature, AuthOutsideJwtSecret, AuthOutsideSecret, AuthOutsideService,
+    AuthOutsideStore,
 };
 
 use crate::auth::auth_ticket::_api::kernel::data::{ExpansionLimitDuration, ExpireDuration};
@@ -41,6 +42,9 @@ pub async fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
                 .connect(&env.mysql_auth_url)
                 .await
                 .expect("failed to connect mysql auth server"),
+        },
+        service: AuthOutsideService {
+            auth_service_url: &env.auth_service_url,
         },
         cookie: AuthOutsideCookie {
             domain: &env.domain,

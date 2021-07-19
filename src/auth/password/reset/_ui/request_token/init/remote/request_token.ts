@@ -1,5 +1,4 @@
 import { env } from "../../../../../../../y_environment/_ui/env"
-import pb from "../../../y_protobuf/api_pb.js"
 
 import {
     fetchOptions,
@@ -14,10 +13,11 @@ import { RemoteOutsideFeature } from "../../../../../../../z_details/_ui/remote/
 import { RequestResetTokenRemote } from "../../infra"
 
 export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): RequestResetTokenRemote {
-    const RequestResetTokenPb = pb.auth.password.reset.api.RequestResetTokenPb
-    const RequestResetTokenResultPb = pb.auth.password.reset.api.RequestResetTokenResultPb
-
     return async (fields) => {
+        const pb = await import(/* webpackMode: "eager" */ "../../../y_protobuf/api_pb.js")
+        const RequestResetTokenPb = pb.auth.password.reset.api.RequestResetTokenPb
+        const RequestResetTokenResultPb = pb.auth.password.reset.api.RequestResetTokenResultPb
+
         try {
             const mock = false
             if (mock) {
