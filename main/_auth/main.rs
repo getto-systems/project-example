@@ -5,7 +5,10 @@ use tonic::service::interceptor_fn;
 use tonic::transport::Server;
 use tower::ServiceBuilder;
 
-use example_api::x_outside_feature::_auth::{env::Env, feature::AppFeature};
+use example_api::x_outside_feature::_auth::{
+    env::Env,
+    feature::{AppData, AppFeature},
+};
 
 lazy_static! {
     static ref ENV: Env = Env::new();
@@ -13,7 +16,7 @@ lazy_static! {
 
 #[tokio::main]
 async fn main() {
-    let data = Arc::new(AppFeature::new(&ENV).await);
+    let data: AppData = Arc::new(AppFeature::new(&ENV).await);
 
     let server = route::Server::new();
 

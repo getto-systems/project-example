@@ -1,10 +1,13 @@
 use std::io;
 
-use lazy_static::lazy_static;
 use actix_cors::Cors;
 use actix_web::{web::Data, App, HttpServer};
+use lazy_static::lazy_static;
 
-use example_api::x_outside_feature::_api::{env::Env, feature::AppFeature};
+use example_api::x_outside_feature::_api::{
+    env::Env,
+    feature::{AppData, AppFeature},
+};
 
 use example_api::auth::_api::x_actix_web::route::scope_auth;
 
@@ -14,7 +17,7 @@ lazy_static! {
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
-    let data = Data::new(AppFeature::new(&ENV).await);
+    let data: AppData = Data::new(AppFeature::new(&ENV).await);
 
     HttpServer::new(move || {
         let cors = Cors::default()
