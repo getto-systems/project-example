@@ -12,7 +12,7 @@ protobuf_main() {
     pb_path="${destination_dir}/proto.js"
     data_path="${destination_dir}/proto.d.ts"
 
-    protobuf_find_proto
+    protobuf_find_proto | sort
 
     mkdir -p "$destination_dir" &&
         rm -f $pb_path $data_path &&
