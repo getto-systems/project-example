@@ -1,4 +1,7 @@
-use std::{fmt::Display, rc::Rc, sync::Mutex};
+use std::{
+    fmt::Display,
+    sync::{Arc, Mutex},
+};
 
 use pretty_assertions::assert_eq;
 
@@ -7,11 +10,11 @@ pub struct ActionTestRunner {
 }
 
 impl ActionTestRunner {
-    pub fn new<S: Display>() -> (impl Fn(&S), impl Fn(Vec<&str>)) {
-        let runner = Rc::new(Self {
+    pub fn new<S: Display>() -> (impl 'static + Fn(&S) + Send + Sync, impl Fn(Vec<&str>)) {
+        let runner = Arc::new(Self {
             store: Mutex::new(vec![]),
         });
-        let handler_runner = Rc::clone(&runner);
+        let handler_runner = Arc::clone(&runner);
         (
             move |state| handler_runner.push(state),
             move |expect| runner.assert(expect),

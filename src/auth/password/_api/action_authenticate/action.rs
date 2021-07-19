@@ -56,7 +56,7 @@ impl<M: AuthenticatePasswordMaterial> AuthenticatePasswordAction<M> {
         }
     }
 
-    pub fn subscribe(&mut self, handler: impl 'static + Fn(&AuthenticatePasswordState)) {
+    pub fn subscribe(&mut self, handler: impl 'static + Fn(&AuthenticatePasswordState) + Send + Sync) {
         self.pubsub.subscribe(handler);
     }
 

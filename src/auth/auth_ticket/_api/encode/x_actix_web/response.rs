@@ -4,6 +4,9 @@ use actix_web::{
 };
 use time::OffsetDateTime;
 
+use crate::z_details::_common::response::actix_web::RespondTo;
+
+// TODO import の整理
 use super::super::super::kernel::x_actix_web::response::unauthorized;
 
 use super::super::event::EncodeAuthTicketEvent;
@@ -11,8 +14,8 @@ use super::super::event::EncodeAuthTicketEvent;
 use super::super::super::kernel::data::ExpireDateTime;
 use super::super::data::{AuthTokenEncoded, AuthTokenEncodedData, EncodeAuthTokenError};
 
-impl EncodeAuthTicketEvent {
-    pub fn respond_to(self, request: &HttpRequest) -> HttpResponse {
+impl RespondTo for EncodeAuthTicketEvent {
+    fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
             Self::TokenExpiresCalculated(_) => HttpResponse::Accepted().finish(),
             Self::Success(token) => token.respond_to(request),
@@ -34,7 +37,7 @@ impl AuthTokenEncoded {
         self.api_tokens.into_iter().for_each(|info| {
             response.cookie(auth_cookie(info));
         });
-        self.cdn_tokens.into_iter().for_each(|info| {
+        self.cloudfront_tokens.into_iter().for_each(|info| {
             response.cookie(auth_cookie(info));
         });
 

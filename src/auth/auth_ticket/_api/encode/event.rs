@@ -1,7 +1,9 @@
 use std::fmt::Display;
 
 use super::data::{AuthTokenEncoded, AuthTokenExpires, EncodeAuthTokenError};
-use crate::z_details::_api::{message::data::MessageError, repository::data::RepositoryError};
+use crate::z_details::{
+    _api::message::data::MessageError, _common::repository::data::RepositoryError,
+};
 
 pub enum EncodeAuthTicketEvent {
     TokenExpiresCalculated(AuthTokenExpires),

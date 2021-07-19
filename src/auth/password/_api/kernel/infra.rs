@@ -8,7 +8,7 @@ use crate::auth::{
     login_id::_api::data::LoginId,
     password::_api::kernel::data::{PasswordHashError, ResetToken, ValidatePasswordError},
 };
-use crate::z_details::_api::repository::data::RepositoryError;
+use crate::z_details::_common::repository::data::RepositoryError;
 
 pub trait AuthUserPasswordInfra {
     type PasswordRepository: AuthUserPasswordRepository;

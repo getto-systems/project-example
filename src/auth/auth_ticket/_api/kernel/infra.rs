@@ -7,9 +7,9 @@ use crate::auth::auth_ticket::_api::kernel::data::{
     AuthDateTime, AuthNonceValue, AuthTicket, AuthTicketExtract, ExpansionLimitDateTime,
     ExpireDateTime, ExpireDuration,
 };
-use crate::z_details::_api::{
-    repository::data::{RegisterResult, RepositoryError},
-    request::data::HeaderError,
+use crate::z_details::{
+    _api::request::data::HeaderError,
+    _common::repository::data::{RegisterResult, RepositoryError},
 };
 
 pub trait AuthTicketInfra {

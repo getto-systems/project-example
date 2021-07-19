@@ -8,7 +8,9 @@ use crate::auth::{
     auth_ticket::_api::kernel::data::{ExpireDateTime, ValidateAuthNonceError},
     login_id::_api::data::ValidateLoginIdError,
 };
-use crate::z_details::_api::{message::data::MessageError, repository::data::RepositoryError};
+use crate::z_details::{
+    _api::message::data::MessageError, _common::repository::data::RepositoryError,
+};
 
 pub enum RequestResetTokenEvent {
     TokenExpiresCalculated(ExpireDateTime),

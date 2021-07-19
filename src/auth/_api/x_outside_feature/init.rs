@@ -6,12 +6,13 @@ use rusoto_dynamodb::DynamoDbClient;
 use rusoto_ses::SesClient;
 use sqlx::mysql::MySqlPoolOptions;
 
-use crate::z_details::_api::jwt::helper::{decoding_key_from_ec_pem, encoding_key_from_ec_pem};
+// TODO あとで削除
+use crate::z_details::_auth::jwt::helper::{decoding_key_from_ec_pem, encoding_key_from_ec_pem};
 
 use crate::x_outside_feature::_api::env::Env;
 
 use super::feature::{
-    AuthOutsideCdnSecret, AuthOutsideConfig, AuthOutsideCookie, AuthOutsideEmail,
+    AuthOutsideCloudfrontSecret, AuthOutsideConfig, AuthOutsideCookie, AuthOutsideEmail,
     AuthOutsideFeature, AuthOutsideJwtSecret, AuthOutsideSecret, AuthOutsideStore,
 };
 
@@ -25,9 +26,9 @@ pub async fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
             // ticket の再延長期限: この期限を超えて renew できない
             ticket_expansion_limit: ExpansionLimitDuration::with_duration(Duration::weeks(12)),
 
-            // api と cdn の有効期限: renew で再延長; 実用的な範囲の短い設定で１桁分程度
+            // api と cloudfront の有効期限: renew で再延長; 実用的な範囲の短い設定で１桁分程度
             api_expires: ExpireDuration::with_duration(Duration::minutes(5)),
-            cdn_expires: ExpireDuration::with_duration(Duration::minutes(5)),
+            cloudfront_expires: ExpireDuration::with_duration(Duration::minutes(5)),
 
             // メールが届いてから作業が完了するまでの見込み時間
             reset_token_expires: ExpireDuration::with_duration(Duration::hours(8)),
@@ -55,7 +56,7 @@ pub async fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
                 decoding_key: decoding_key_from_ec_pem(&env.api_public_key),
                 encoding_key: encoding_key_from_ec_pem(&env.api_private_key),
             },
-            cdn: AuthOutsideCdnSecret {
+            cloudfront: AuthOutsideCloudfrontSecret {
                 key: CloudfrontKey::from_pem(&env.cloudfront_private_key)
                     .expect("failed to parse cloudfront private key"),
             },

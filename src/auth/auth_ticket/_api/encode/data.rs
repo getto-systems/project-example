@@ -9,12 +9,12 @@ use crate::auth::auth_ticket::_api::kernel::data::{AuthTokenExtract, ExpireDateT
 pub struct AuthTokenExpires {
     pub ticket: ExpireDateTime,
     pub api: ExpireDateTime,
-    pub cdn: ExpireDateTime,
+    pub cloudfront: ExpireDateTime,
 }
 
 impl Display for AuthTokenExpires {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "ticket: {} / api: {} / cdn: {}", self.ticket, self.api, self.cdn)
+        write!(f, "ticket: {} / api: {} / cloudfront: {}", self.ticket, self.api, self.cloudfront)
     }
 }
 
@@ -23,7 +23,7 @@ pub struct AuthTokenEncoded {
     pub message: String,
     pub ticket_tokens: Vec<AuthTokenEncodedData>,
     pub api_tokens: Vec<AuthTokenEncodedData>,
-    pub cdn_tokens: Vec<AuthTokenEncodedData>,
+    pub cloudfront_tokens: Vec<AuthTokenEncodedData>,
 }
 
 #[derive(Clone)]

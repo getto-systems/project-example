@@ -9,6 +9,7 @@ protobuf_main() {
     protobuf_generate_all "src/example"
 }
 
+# TODO service.proto は除外したい
 protobuf_generate_all() {
     local root
     local protobuf

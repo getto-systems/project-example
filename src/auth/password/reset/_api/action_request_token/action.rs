@@ -37,7 +37,7 @@ impl<M: RequestResetTokenMaterial> RequestResetTokenAction<M> {
         }
     }
 
-    pub fn subscribe(&mut self, handler: impl 'static + Fn(&RequestResetTokenState)) {
+    pub fn subscribe(&mut self, handler: impl 'static + Fn(&RequestResetTokenState) + Send + Sync) {
         self.pubsub.subscribe(handler);
     }
 

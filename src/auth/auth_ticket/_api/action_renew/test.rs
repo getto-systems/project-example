@@ -44,7 +44,7 @@ async fn success_allow_for_any_role() {
     let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
-        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
+        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
     ]);
     assert!(result.is_ok());
@@ -63,7 +63,7 @@ async fn success_allow_for_something_role() {
     let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
-        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
+        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
     ]);
     assert!(result.is_ok());
@@ -114,7 +114,7 @@ async fn success_expired_nonce() {
     let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
-        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
+        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
     ]);
     assert!(result.is_ok());
@@ -133,7 +133,7 @@ async fn success_limited_ticket() {
     let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
-        "token expires calculated; ticket: 2021-01-01 11:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cdn: 2021-01-01 10:01:00 UTC",
+        "token expires calculated; ticket: 2021-01-01 11:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
     ]);
     assert!(result.is_ok());
@@ -273,13 +273,13 @@ impl<'a> TestFeature<'a> {
                 ticket_infra: standard_ticket_infra(store),
                 config: ValidateAuthTokenConfig { require_roles },
                 token_header: standard_token_header(),
-                token_validator,
+                token_decoder: token_validator,
             },
             encode: StaticEncodeAuthTicketStruct {
                 ticket_infra: standard_ticket_infra(store),
                 ticket_encoder: StaticAuthTokenEncoder::new(),
                 api_encoder: StaticAuthTokenEncoder::new(),
-                cdn_encoder: StaticAuthTokenEncoder::new(),
+                cloudfront_encoder: StaticAuthTokenEncoder::new(),
                 messenger: StaticEncodeMessenger::new(),
                 config: standard_encode_config(),
             },
@@ -306,7 +306,7 @@ fn standard_encode_config() -> EncodeAuthTicketConfig {
     EncodeAuthTicketConfig {
         ticket_expires: ExpireDuration::with_duration(Duration::days(1)),
         api_expires: ExpireDuration::with_duration(Duration::minutes(1)),
-        cdn_expires: ExpireDuration::with_duration(Duration::minutes(1)),
+        cloudfront_expires: ExpireDuration::with_duration(Duration::minutes(1)),
     }
 }
 

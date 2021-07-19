@@ -1,9 +1,11 @@
 use actix_web::{HttpRequest, HttpResponse};
 
+use crate::z_details::_common::response::actix_web::RespondTo;
+
 use super::super::action::RequestResetTokenState;
 
-impl RequestResetTokenState {
-    pub fn respond_to(self, request: &HttpRequest) -> HttpResponse {
+impl RespondTo for RequestResetTokenState {
+    fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
             Self::RequestToken(event) => event.respond_to(request),
         }

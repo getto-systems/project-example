@@ -1,5 +1,7 @@
 use actix_web::{HttpRequest, HttpResponse};
 
+use crate::z_details::_common::response::actix_web::RespondTo;
+
 use crate::auth::{
     auth_ticket::_api::kernel::x_actix_web::response::unauthorized,
     password::reset::_api::kernel::data::ValidateResetTokenError,
@@ -11,8 +13,8 @@ use crate::auth::password::reset::_api::reset::data::{
     DecodeResetTokenError, ResetPasswordResponse,
 };
 
-impl ResetPasswordEvent {
-    pub fn respond_to(self, request: &HttpRequest) -> HttpResponse {
+impl RespondTo for ResetPasswordEvent {
+    fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
             Self::Success(_) => HttpResponse::Accepted().finish(),
             Self::InvalidReset(response) => response.respond_to(request),

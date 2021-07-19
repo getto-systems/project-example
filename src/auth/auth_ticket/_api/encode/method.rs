@@ -1,14 +1,17 @@
 use getto_application::data::MethodResult;
 
-use super::super::kernel::infra::{AuthClock, AuthTicketRepository};
-use super::infra::{AuthTokenEncoder, EncodeAuthTicketInfra, EncodeMessenger};
+use crate::auth::auth_ticket::_api::{
+    encode::infra::{AuthTokenEncoder, EncodeAuthTicketInfra, EncodeMessenger},
+    kernel::infra::{AuthClock, AuthTicketInfra, AuthTicketRepository},
+};
 
 use super::event::EncodeAuthTicketEvent;
 
-use super::super::kernel::data::{AuthTicket, ExpansionLimitDateTime};
-use super::data::{AuthTokenEncoded, AuthTokenExpires};
-use crate::auth::auth_ticket::_api::kernel::infra::AuthTicketInfra;
-use crate::z_details::_api::repository::data::RepositoryError;
+use crate::auth::auth_ticket::_api::{
+    encode::data::{AuthTokenEncoded, AuthTokenExpires},
+    kernel::data::{AuthTicket, ExpansionLimitDateTime},
+};
+use crate::z_details::_common::repository::data::RepositoryError;
 
 pub async fn encode_auth_ticket<S>(
     infra: &impl EncodeAuthTicketInfra,
@@ -41,9 +44,9 @@ pub async fn encode_auth_ticket<S>(
             .encode(ticket.clone(), expires.api)
             .map_err(|err| post(EncodeAuthTicketEvent::EncodeError(err)))?,
 
-        cdn_tokens: infra
-            .cdn_encoder()
-            .encode(ticket.clone(), expires.cdn)
+        cloudfront_tokens: infra
+            .cloudfront_encoder()
+            .encode(ticket.clone(), expires.cloudfront)
             .map_err(|err| post(EncodeAuthTicketEvent::EncodeError(err)))?,
     };
 
@@ -72,8 +75,8 @@ fn calc_expires(
         api: clock
             .now()
             .expires_with_limit(&config.api_expires, limit.clone()),
-        cdn: clock
+        cloudfront: clock
             .now()
-            .expires_with_limit(&config.cdn_expires, limit.clone()),
+            .expires_with_limit(&config.cloudfront_expires, limit.clone()),
     }
 }

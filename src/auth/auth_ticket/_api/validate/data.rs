@@ -4,7 +4,9 @@ use std::{
 };
 
 use super::super::kernel::data::ValidateAuthRolesError;
-use crate::z_details::_api::{repository::data::RepositoryError, request::data::HeaderError};
+use crate::z_details::{
+    _api::request::data::HeaderError, _common::repository::data::RepositoryError,
+};
 
 #[derive(Debug)]
 pub enum ValidateAuthTokenError {

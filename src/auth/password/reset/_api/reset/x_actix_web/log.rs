@@ -1,4 +1,4 @@
-use crate::z_details::_api::logger::LogLevel;
+use crate::z_details::_common::logger::LogLevel;
 
 use crate::auth::password::reset::_api::reset::event::ResetPasswordEvent;
 

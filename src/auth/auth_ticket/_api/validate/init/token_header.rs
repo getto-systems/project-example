@@ -11,33 +11,33 @@ use crate::auth::auth_ticket::_api::validate::infra::AuthTokenHeader;
 use crate::auth::auth_ticket::_api::kernel::data::AuthTokenValue;
 use crate::z_details::_api::request::data::HeaderError;
 
-pub struct TicketAuthTokenHeader {
-    request: HttpRequest,
+pub struct TicketAuthTokenHeader<'a> {
+    request: &'a HttpRequest,
 }
 
-impl TicketAuthTokenHeader {
-    pub const fn new(request: HttpRequest) -> Self {
+impl<'a> TicketAuthTokenHeader<'a> {
+    pub const fn new(request: &'a HttpRequest) -> Self {
         Self { request }
     }
 }
 
-impl AuthTokenHeader for TicketAuthTokenHeader {
+impl<'a> AuthTokenHeader for TicketAuthTokenHeader<'a> {
     fn token(&self) -> Result<AuthTokenValue, HeaderError> {
         cookie(&self.request, COOKIE_TICKET_TOKEN).map(AuthTokenValue::new)
     }
 }
 
-pub struct ApiAuthTokenHeader {
-    request: HttpRequest,
+pub struct ApiAuthTokenHeader<'a> {
+    request: &'a HttpRequest,
 }
 
-impl ApiAuthTokenHeader {
-    pub const fn new(request: HttpRequest) -> Self {
+impl<'a> ApiAuthTokenHeader<'a> {
+    pub const fn new(request: &'a HttpRequest) -> Self {
         Self { request }
     }
 }
 
-impl AuthTokenHeader for ApiAuthTokenHeader {
+impl<'a> AuthTokenHeader for ApiAuthTokenHeader<'a> {
     fn token(&self) -> Result<AuthTokenValue, HeaderError> {
         cookie(&self.request, COOKIE_API_TOKEN).map(AuthTokenValue::new)
     }

@@ -2,10 +2,10 @@ use std::env::var;
 
 pub struct Env {
     pub port: String,
+
     pub domain: String,
     pub origin: String,
     pub reset_password_url: String,
-
     pub cloudfront_resource: String,
 
     pub ticket_private_key: String,
@@ -28,9 +28,9 @@ impl Env {
     pub fn new() -> Self {
         Self {
             port: load("PORT"),
+
             domain: load("DOMAIN"),
             origin: load("ORIGIN"),
-
             reset_password_url: load("RESET_PASSWORD_URL"),
             cloudfront_resource: load("CLOUDFRONT_RESOURCE"),
 
