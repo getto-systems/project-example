@@ -8,6 +8,8 @@ pub struct Env {
     pub reset_password_url: String,
     pub cloudfront_resource: String,
 
+    pub auth_service_url: String,
+
     pub ticket_private_key: String,
     pub ticket_public_key: String,
 
@@ -33,6 +35,8 @@ impl Env {
             origin: load("ORIGIN"),
             reset_password_url: load("RESET_PASSWORD_URL"),
             cloudfront_resource: load("CLOUDFRONT_RESOURCE"),
+
+            auth_service_url: load("AUTH_SERVICE_URL"),
 
             ticket_private_key: load("SECRET_TICKET_PRIVATE_KEY"),
             ticket_public_key: load("SECRET_TICKET_PUBLIC_KEY"),

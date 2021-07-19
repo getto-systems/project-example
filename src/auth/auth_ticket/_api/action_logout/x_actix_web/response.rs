@@ -7,8 +7,7 @@ use super::super::action::LogoutState;
 impl RespondTo for LogoutState {
     fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
-            Self::Validate(event) => event.respond_to(request),
-            Self::Discard(event) => event.respond_to(request),
+            Self::Logout(event) => event.respond_to(request),
         }
     }
 }

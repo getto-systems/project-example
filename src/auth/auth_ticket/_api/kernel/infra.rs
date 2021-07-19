@@ -4,13 +4,21 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::auth::auth_ticket::_api::kernel::data::{
-    AuthDateTime, AuthNonceValue, AuthTicket, AuthTicketExtract, ExpansionLimitDateTime,
-    ExpireDateTime, ExpireDuration,
+    AuthDateTime, AuthNonceValue, AuthTicket, AuthTicketExtract, AuthTokenValue,
+    ExpansionLimitDateTime, ExpireDateTime, ExpireDuration,
 };
 use crate::z_details::{
     _api::request::data::HeaderError,
     _common::repository::data::{RegisterResult, RepositoryError},
 };
+
+pub trait AuthHeaderInfra {
+    type NonceHeader: AuthNonceHeader;
+    type TokenHeader: AuthTokenHeader;
+
+    fn nonce_header(&self) -> &Self::NonceHeader;
+    fn token_header(&self) -> &Self::TokenHeader;
+}
 
 pub trait AuthTicketInfra {
     type Clock: AuthClock;
@@ -37,6 +45,10 @@ pub trait AuthClock {
 
 pub trait AuthNonceHeader {
     fn nonce(&self) -> Result<AuthNonceValue, HeaderError>;
+}
+
+pub trait AuthTokenHeader {
+    fn token(&self) -> Result<AuthTokenValue, HeaderError>;
 }
 
 #[async_trait::async_trait]

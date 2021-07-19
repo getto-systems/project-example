@@ -2,19 +2,50 @@ mod clock;
 mod nonce_header;
 mod nonce_repository;
 mod ticket_repository;
+mod token_header;
 
 use actix_web::HttpRequest;
 
-use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
+use crate::auth::{
+    _api::x_outside_feature::feature::AuthOutsideFeature,
+    auth_ticket::_api::kernel::infra::AuthHeaderInfra,
+};
 
 use clock::ChronoAuthClock;
 use nonce_header::ActixWebAuthNonceHeader;
 use nonce_repository::DynamoDbAuthNonceRepository;
 use ticket_repository::MysqlAuthTicketRepository;
+use token_header::TicketAuthTokenHeader;
 
 use crate::auth::auth_ticket::_api::kernel::infra::{
     AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
 };
+
+pub struct TicketAuthHeaderStruct<'a> {
+    nonce_header: ActixWebAuthNonceHeader<'a>,
+    token_header: TicketAuthTokenHeader<'a>,
+}
+
+impl<'a> TicketAuthHeaderStruct<'a> {
+    pub fn new(request: &'a HttpRequest) -> Self {
+        Self {
+            nonce_header: ActixWebAuthNonceHeader::new(request),
+            token_header: TicketAuthTokenHeader::new(request),
+        }
+    }
+}
+
+impl<'a> AuthHeaderInfra for TicketAuthHeaderStruct<'a> {
+    type NonceHeader = ActixWebAuthNonceHeader<'a>;
+    type TokenHeader = TicketAuthTokenHeader<'a>;
+
+    fn nonce_header(&self) -> &Self::NonceHeader {
+        &self.nonce_header
+    }
+    fn token_header(&self) -> &Self::TokenHeader {
+        &self.token_header
+    }
+}
 
 pub struct AuthTicketStruct<'a> {
     clock: ChronoAuthClock,
@@ -92,12 +123,30 @@ pub mod test {
         MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
     };
     pub use super::ticket_repository::test::{
-        MemoryAuthTicketMap, MemoryAuthTicketStore, MemoryAuthTicketRepository,
+        MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
     };
+    pub use super::token_header::test::StaticAuthTokenHeader;
 
     use crate::auth::auth_ticket::_api::kernel::infra::{
-        AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
+        AuthHeaderInfra, AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
     };
+
+    pub struct StaticAuthHeaderStruct {
+        pub nonce_header: StaticAuthNonceHeader,
+        pub token_header: StaticAuthTokenHeader,
+    }
+
+    impl AuthHeaderInfra for StaticAuthHeaderStruct {
+        type NonceHeader = StaticAuthNonceHeader;
+        type TokenHeader = StaticAuthTokenHeader;
+
+        fn nonce_header(&self) -> &Self::NonceHeader {
+            &self.nonce_header
+        }
+        fn token_header(&self) -> &Self::TokenHeader {
+            &self.token_header
+        }
+    }
 
     pub struct StaticAuthTicketStruct<'a> {
         pub clock: StaticChronoAuthClock,

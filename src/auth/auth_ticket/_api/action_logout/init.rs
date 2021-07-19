@@ -2,40 +2,36 @@ use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use super::super::discard::init::DiscardAuthTicketStruct;
-use super::super::validate::init::TicketValidateAuthTokenStruct;
+use crate::auth::auth_ticket::_api::logout::init::LogoutStruct;
 
-use super::action::LogoutAction;
-use super::action::LogoutMaterial;
+use super::action::{LogoutAction, LogoutMaterial};
 
 impl<'a> LogoutAction<LogoutFeature<'a>> {
-    pub fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest) -> Self {
-        Self::with_material(LogoutFeature::new(feature, request))
+    pub fn new(
+        feature: &'a AuthOutsideFeature,
+        request_id: &'a str,
+        request: &'a HttpRequest,
+    ) -> Self {
+        Self::with_material(LogoutFeature::new(feature, request_id, request))
     }
 }
 
 pub struct LogoutFeature<'a> {
-    validate: TicketValidateAuthTokenStruct<'a>,
-    discard: DiscardAuthTicketStruct<'a>,
+    logout: LogoutStruct<'a>,
 }
 
 impl<'a> LogoutFeature<'a> {
-    fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest) -> Self {
+    fn new(feature: &'a AuthOutsideFeature, request_id: &'a str, request: &'a HttpRequest) -> Self {
         Self {
-            validate: TicketValidateAuthTokenStruct::new(feature, request),
-            discard: DiscardAuthTicketStruct::new(feature),
+            logout: LogoutStruct::new(feature, request_id, request),
         }
     }
 }
 
 impl<'a> LogoutMaterial for LogoutFeature<'a> {
-    type Validate = TicketValidateAuthTokenStruct<'a>;
-    type Discard = DiscardAuthTicketStruct<'a>;
+    type Logout = LogoutStruct<'a>;
 
-    fn validate(&self) -> &Self::Validate {
-        &self.validate
-    }
-    fn discard(&self) -> &Self::Discard {
-        &self.discard
+    fn logout(&self) -> &Self::Logout {
+        &self.logout
     }
 }

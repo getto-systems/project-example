@@ -32,7 +32,7 @@ async fn main() {
         .add_service(server.auth.auth_ticket.logout())
         .add_service(server.auth.auth_ticket.renew())
         .serve(
-            format!("0.0.0.0:{}", &ENV.port)
+            format!("127.0.0.1:{}", &ENV.port)
                 .parse()
                 .expect("failed to parse socket addr"),
         )

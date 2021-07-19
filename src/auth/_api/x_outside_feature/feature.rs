@@ -10,6 +10,7 @@ use crate::auth::auth_ticket::_api::kernel::data::{ExpansionLimitDuration, Expir
 pub struct AuthOutsideFeature {
     pub(in crate::auth) config: AuthOutsideConfig,
     pub(in crate::auth) store: AuthOutsideStore,
+    pub(in crate::auth) service: AuthOutsideService,
     pub(in crate::auth) cookie: AuthOutsideCookie,
     pub(in crate::auth) secret: AuthOutsideSecret,
     pub(in crate::auth) email: AuthOutsideEmail,
@@ -25,6 +26,9 @@ pub struct AuthOutsideStore {
     pub dynamodb: DynamoDbClient,
     pub nonce_table_name: &'static str,
     pub mysql: MySqlPool,
+}
+pub struct AuthOutsideService {
+    pub auth_service_url: &'static str,
 }
 pub struct AuthOutsideCookie {
     pub domain: &'static str,

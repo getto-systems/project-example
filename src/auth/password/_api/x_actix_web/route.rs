@@ -6,7 +6,7 @@ use crate::z_details::_common::{logger::Logger, response::actix_web::RespondTo};
 
 use crate::x_outside_feature::_api::{
     feature::AppData,
-    logger::{app_logger, request_id},
+    logger::{app_logger, generate_request_id},
 };
 
 use crate::auth::password::reset::_api::x_actix_web::route::scope_reset;
@@ -21,7 +21,7 @@ pub fn scope_password() -> Scope {
 
 #[post("/authenticate")]
 async fn authenticate(data: AppData, request: HttpRequest, body: String) -> impl Responder {
-    let logger = app_logger(request_id(), &request);
+    let logger = app_logger(generate_request_id(), &request);
     let mut action = AuthenticatePasswordAction::new(&data.auth, &request, body);
     action.subscribe(move |state| logger.log(state.log_level(), state));
     flatten(action.ignite().await).respond_to(&request)
