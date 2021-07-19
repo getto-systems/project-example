@@ -1,4 +1,5 @@
 import { env } from "../../../../../../y_environment/_ui/env"
+import pb from "../../../../../../y_protobuf/proto.js"
 
 import {
     generateNonce,
@@ -20,7 +21,6 @@ export function newAuthenticatePasswordRemote(
     clock: Clock,
 ): AuthenticatePasswordRemote {
     return async (fields) => {
-        const pb = await import(/* webpackMode: "eager" */ "../../../y_protobuf/api_pb.js")
         const AuthenticatePasswordPb = pb.auth.password.api.AuthenticatePasswordPb
         const AuthenticatePasswordResultPb = pb.auth.password.api.AuthenticatePasswordResultPb
 

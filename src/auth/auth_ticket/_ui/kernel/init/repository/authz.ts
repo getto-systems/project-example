@@ -1,5 +1,5 @@
 import { env } from "../../../../../../y_environment/_ui/env"
-import { Authz_pb } from "../../../y_protobuf/db_pb.js"
+import { Authz_pb } from "../../../../../../y_protobuf/proto.js"
 
 import { decodeProtobuf, encodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 import {

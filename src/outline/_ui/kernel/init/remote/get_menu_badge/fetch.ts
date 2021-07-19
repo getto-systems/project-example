@@ -1,5 +1,5 @@
 import { env } from "../../../../../../y_environment/_ui/env"
-import { GetMenuBadgeResult_pb } from "../../../../y_protobuf/api_pb.js"
+import { GetMenuBadgeResult_pb } from "../../../../../../y_protobuf/proto.js"
 
 import {
     fetchOptions,

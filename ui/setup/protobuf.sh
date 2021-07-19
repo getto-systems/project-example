@@ -1,61 +1,27 @@
 #!/bin/sh
 
 protobuf_main() {
-    protobuf_generate_all "src/auth/auth_ticket"
-    protobuf_generate_all "src/auth/password"
-    protobuf_generate_all "src/auth/password/reset"
-    protobuf_generate_all "src/avail"
-    protobuf_generate_all "src/outline"
-    protobuf_generate_all "src/example"
-}
-
-protobuf_generate_all() {
-    local root
-    local protobuf
-    local dest
-
-    root=$1
-    protobuf=${root}/z_protobuf/
-    dest=${root}/_ui/y_protobuf/
-
-    rm -rf $dest/*
-
-    local proto
-    local file
-
-    for proto in $(find "$protobuf" -name '*.proto'); do
-        file=${proto#$protobuf}
-        file=${file#/}
-        file=${file%.proto}
-
-        case "$file" in
-        api | db)
-            echo "${root} : ${file}"
-            protobuf_generate "$proto" "$dest" "$file"
-            ;;
-        esac
-    done
-}
-protobuf_generate() {
-    local source_proto
     local destination_dir
-    local destination_base_path
-
-    source_proto=$1
-    destination_dir=$2
-    destination_base_path=$3
+    destination_dir="src/y_protobuf"
 
     local pb_path
     local data_path
 
-    pb_path="${destination_dir}/${destination_base_path}_pb.js"
-    data_path="${destination_dir}/${destination_base_path}_pb.d.ts"
+    # すべての proto を一度に処理しないと namespace の構築がうまくいかない
+    # rust の prost は package が必須で、namespace は package の指定によって構築される
+    pb_path="${destination_dir}/proto.js"
+    data_path="${destination_dir}/proto.d.ts"
 
-    mkdir -p $destination_dir &&
+    protobuf_find_proto
+
+    mkdir -p "$destination_dir" &&
         rm -f $pb_path $data_path &&
-        pbjs -t static-module -w es6 -p ./src/ -o $pb_path $source_proto &&
-        pbts -o $data_path $pb_path &&
+        protobuf_find_proto | xargs pbjs -t static-module -w es6 -p ./src/ -o "$pb_path" &&
+        pbts -o "$data_path" "$pb_path" &&
         :
+}
+protobuf_find_proto() {
+    find ./src -name api.proto -o -name db.proto
 }
 
 protobuf_main "$@"

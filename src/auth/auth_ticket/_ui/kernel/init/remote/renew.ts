@@ -1,4 +1,5 @@
 import { env } from "../../../../../../y_environment/_ui/env"
+import pb from "../../../../../../y_protobuf/proto.js"
 
 import {
     fetchOptions,
@@ -20,7 +21,6 @@ export function newRenewAuthTicketRemote(
     clock: Clock,
 ): RenewAuthTicketRemote {
     return async () => {
-        const pb = await import(/* webpackMode: "eager" */ "../../../y_protobuf/api_pb.js")
         const AuthenticateResponsePb = pb.auth.auth_ticket.api.AuthenticateResponsePb
 
         try {

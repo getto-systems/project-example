@@ -1,5 +1,5 @@
 import { env } from "../../../../../../y_environment/_ui/env"
-import { Authn_pb } from "../../../y_protobuf/db_pb.js"
+import { Authn_pb } from "../../../../../../y_protobuf/proto.js"
 
 import {
     fetchRepositoryRemovedResult,
