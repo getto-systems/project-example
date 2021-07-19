@@ -26,8 +26,8 @@ async fn main() {
                 }))
                 .into_inner(),
         )
-        .add_service(server.auth().auth_ticket().logout())
-        .add_service(server.auth().auth_ticket().renew())
+        .add_service(server.auth.auth_ticket.logout())
+        .add_service(server.auth.auth_ticket.renew())
         .serve(
             format!("0.0.0.0:{}", &ENV.port)
                 .parse()
@@ -41,7 +41,7 @@ mod route {
     use example_api::auth::_auth::x_tonic::route::AuthServer;
 
     pub struct Server {
-        auth: AuthServer,
+        pub auth: AuthServer,
     }
 
     impl Server {
@@ -49,10 +49,6 @@ mod route {
             Self {
                 auth: AuthServer::new(),
             }
-        }
-
-        pub fn auth(&self) -> &AuthServer {
-            &self.auth
         }
     }
 }
