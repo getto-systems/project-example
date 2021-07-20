@@ -1,8 +1,11 @@
 use tonic::{Response, Status};
 
-use crate::z_details::_common::response::tonic::RespondTo;
+use crate::auth::{
+    auth_ticket::_common::y_protobuf::service::RenewAuthTicketResponsePb,
+    password::_common::y_protobuf::service::AuthenticatePasswordResponsePb,
+};
 
-use crate::auth::auth_ticket::_common::y_protobuf::service::RenewAuthTicketResponsePb;
+use crate::z_details::_common::response::tonic::RespondTo;
 
 use crate::auth::{
     auth_ticket::_common::{
@@ -15,6 +18,17 @@ impl RespondTo<RenewAuthTicketResponsePb> for EncodeAuthTicketResponse {
     fn respond_to(self) -> Result<Response<RenewAuthTicketResponsePb>, Status> {
         let (user, token) = self.extract();
         Ok(Response::new(RenewAuthTicketResponsePb {
+            user: Some(user.into()),
+            token: Some(token.into()),
+        }))
+    }
+}
+
+impl RespondTo<AuthenticatePasswordResponsePb> for EncodeAuthTicketResponse {
+    fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
+        let (user, token) = self.extract();
+        Ok(Response::new(AuthenticatePasswordResponsePb {
+            success: true,
             user: Some(user.into()),
             token: Some(token.into()),
         }))

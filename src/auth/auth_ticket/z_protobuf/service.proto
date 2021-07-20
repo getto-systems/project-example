@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-import "auth/auth_user/z_protobuf/service.proto";
-
 package auth.auth_ticket.service;
+
+import "auth/auth_user/z_protobuf/service.proto";
 
 service LogoutPb {
     rpc Logout (LogoutRequestPb) returns (LogoutResponsePb);

@@ -28,6 +28,7 @@ impl ProtobufAuthenticatePasswordMessenger {
 
 impl AuthenticatePasswordMessenger for ProtobufAuthenticatePasswordMessenger {
     fn decode(&self) -> Result<AuthenticatePasswordFieldsExtract, MessageError> {
+        // TODO body は clone したくない
         let message = AuthenticatePasswordPb::decode(decode_base64(self.body.clone())?)
             .map_err(invalid_protobuf)?;
 
