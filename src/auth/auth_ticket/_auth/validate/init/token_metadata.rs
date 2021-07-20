@@ -1,6 +1,6 @@
 use tonic::Request;
 
-use crate::auth::auth_ticket::_common::x_tonic::metadata::{
+use crate::auth::auth_ticket::_common::kernel::x_tonic::metadata::{
     METADATA_API_TOKEN, METADATA_TICKET_TOKEN,
 };
 

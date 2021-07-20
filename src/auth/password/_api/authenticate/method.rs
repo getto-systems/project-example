@@ -10,7 +10,7 @@ use crate::auth::{
 
 use super::event::AuthenticatePasswordEvent;
 
-use crate::auth::{auth_user::_api::kernel::data::AuthUser, login_id::_api::data::LoginId};
+use crate::auth::{auth_user::_common::kernel::data::AuthUser, login_id::_api::data::LoginId};
 
 pub async fn authenticate_password<S>(
     infra: &impl AuthenticatePasswordInfra,

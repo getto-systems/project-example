@@ -1,15 +1,14 @@
 use tonic::metadata::MetadataValue;
 use tonic::Request;
 
-use crate::auth::auth_ticket::_api::kernel::data::{AuthNonceValue, AuthTokenValue};
-use crate::auth::auth_ticket::_auth::y_protobuf::service::{
+use crate::auth::auth_ticket::_common::y_protobuf::service::{
     logout_pb_client::LogoutPbClient, LogoutRequestPb,
 };
 
 use crate::{
     auth::{
         _api::x_outside_feature::feature::AuthOutsideService,
-        auth_ticket::_common::x_tonic::metadata::{METADATA_NONCE, METADATA_TICKET_TOKEN},
+        auth_ticket::_common::kernel::x_tonic::metadata::{METADATA_NONCE, METADATA_TICKET_TOKEN},
     },
     x_outside_feature::_common::metadata::METADATA_REQUEST_ID,
 };
@@ -18,14 +17,17 @@ use crate::auth::_api::service::helper::infra_error;
 
 use crate::auth::auth_ticket::_api::logout::infra::LogoutService;
 
-use crate::auth::_api::service::data::ServiceError;
+use crate::auth::{
+    _api::service::data::ServiceError,
+    auth_ticket::_api::kernel::data::{AuthNonceValue, AuthTokenValue},
+};
 
-pub struct GrpcLogoutService<'a> {
+pub struct TonicLogoutService<'a> {
     auth_service_url: &'static str,
     request_id: &'a str,
 }
 
-impl<'a> GrpcLogoutService<'a> {
+impl<'a> TonicLogoutService<'a> {
     pub const fn new(service: &'a AuthOutsideService, request_id: &'a str) -> Self {
         Self {
             auth_service_url: service.auth_service_url,
@@ -35,7 +37,7 @@ impl<'a> GrpcLogoutService<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> LogoutService for GrpcLogoutService<'a> {
+impl<'a> LogoutService for TonicLogoutService<'a> {
     async fn logout(
         &self,
         nonce: AuthNonceValue,

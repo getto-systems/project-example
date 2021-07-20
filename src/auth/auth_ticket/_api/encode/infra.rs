@@ -1,9 +1,15 @@
 use crate::auth::auth_ticket::_api::kernel::infra::AuthTicketInfra;
 
-use super::super::kernel::data::{AuthTicket, ExpireDateTime, ExpireDuration};
-use super::data::{AuthTokenEncodedData, EncodeAuthTokenError};
-use crate::auth::auth_user::_api::kernel::data::GrantedAuthRoles;
-use crate::z_details::_api::message::data::MessageError;
+use crate::{
+    auth::{
+        auth_ticket::_api::{
+            encode::data::{AuthTokenEncodedData, EncodeAuthTokenError},
+            kernel::data::{AuthTicket, ExpireDateTime, ExpireDuration},
+        },
+        auth_user::_common::kernel::data::GrantedAuthRoles,
+    },
+    z_details::_api::message::data::MessageError,
+};
 
 pub trait EncodeAuthTicketInfra {
     type TicketInfra: AuthTicketInfra;

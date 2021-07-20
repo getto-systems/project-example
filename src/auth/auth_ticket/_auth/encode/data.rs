@@ -3,10 +3,7 @@ use std::{
     fmt::{Display, Formatter},
 };
 
-use crate::auth::{
-    auth_ticket::_auth::kernel::data::{AuthTokenExtract, ExpireDateTime},
-    auth_user::_auth::kernel::data::GrantedAuthRoles,
-};
+use crate::auth::auth_ticket::_auth::kernel::data::ExpireDateTime;
 
 #[derive(Clone)]
 pub struct AuthTokenExpires {
@@ -23,26 +20,6 @@ impl Display for AuthTokenExpires {
             self.ticket, self.api, self.cloudfront
         )
     }
-}
-
-pub struct AuthTokenEncoded {
-    pub granted_roles: GrantedAuthRoles,
-    pub ticket_tokens: Vec<AuthTokenEncodedData>,
-    pub api_tokens: Vec<AuthTokenEncodedData>,
-    pub cloudfront_tokens: Vec<AuthTokenEncodedData>,
-}
-
-pub struct AuthTokenEncodedData {
-    pub kind: AuthTokenKind,
-    pub token: AuthTokenExtract,
-}
-
-pub enum AuthTokenKind {
-    Ticket,
-    Api,
-    CloudfrontKeyPairId,
-    CloudfrontPolicy,
-    CloudfrontSignature,
 }
 
 #[derive(Debug)]

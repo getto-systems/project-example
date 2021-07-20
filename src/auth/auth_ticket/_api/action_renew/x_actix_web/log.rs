@@ -11,8 +11,7 @@ impl LogMessage for &RenewAuthTicketState {
 impl RenewAuthTicketState {
     pub const fn log_level(&self) -> LogLevel {
         match self {
-            Self::Validate(event) => event.log_level(),
-            Self::Encode(event) => event.log_level(),
+            Self::Renew(event) => event.log_level(),
         }
     }
 }

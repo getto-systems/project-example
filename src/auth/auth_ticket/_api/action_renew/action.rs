@@ -2,33 +2,26 @@ use std::fmt::Display;
 
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use super::super::encode::{
-    event::EncodeAuthTicketEvent, infra::EncodeAuthTicketInfra, method::encode_auth_ticket,
-};
-use super::super::validate::{
-    event::ValidateAuthTokenEvent, infra::ValidateAuthTokenInfra, method::validate_auth_token,
+use crate::auth::auth_ticket::_api::renew::{
+    event::RenewAuthTicketEvent, infra::RenewAuthTicketInfra, method::renew,
 };
 
 pub enum RenewAuthTicketState {
-    Validate(ValidateAuthTokenEvent),
-    Encode(EncodeAuthTicketEvent),
+    Renew(RenewAuthTicketEvent),
 }
 
 impl Display for RenewAuthTicketState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Validate(event) => write!(f, "{}", event),
-            Self::Encode(event) => write!(f, "{}", event),
+            Self::Renew(event) => write!(f, "{}", event),
         }
     }
 }
 
 pub trait RenewAuthTicketMaterial {
-    type Validate: ValidateAuthTokenInfra;
-    type Encode: EncodeAuthTicketInfra;
+    type Renew: RenewAuthTicketInfra;
 
-    fn validate(&self) -> &Self::Validate;
-    fn encode(&self) -> &Self::Encode;
+    fn renew(&self) -> &Self::Renew;
 }
 
 pub struct RenewAuthTicketAction<M: RenewAuthTicketMaterial> {
@@ -52,13 +45,8 @@ impl<M: RenewAuthTicketMaterial> RenewAuthTicketAction<M> {
         let pubsub = self.pubsub;
         let m = self.material;
 
-        let ticket = validate_auth_token(m.validate(), |event| {
-            pubsub.post(RenewAuthTicketState::Validate(event))
-        })
-        .await?;
-
-        encode_auth_ticket(m.encode(), ticket, |event| {
-            pubsub.post(RenewAuthTicketState::Encode(event))
+        renew(m.renew(), |event| {
+            pubsub.post(RenewAuthTicketState::Renew(event))
         })
         .await
     }

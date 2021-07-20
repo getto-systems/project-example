@@ -3,7 +3,9 @@ mod token_encoder;
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::auth_ticket::_auth::kernel::init::AuthTicketStruct;
-use token_encoder::{ApiJwtAuthTokenEncoder, CloudfrontTokenEncoder, TicketJwtAuthTokenEncoder};
+use token_encoder::{
+    ApiJwtAuthTokenEncoder, CookieCloudfrontTokenEncoder, TicketJwtAuthTokenEncoder,
+};
 
 use super::infra::{EncodeAuthTicketConfig, EncodeAuthTicketInfra};
 
@@ -11,7 +13,7 @@ pub struct EncodeAuthTicketStruct<'a> {
     ticket_infra: AuthTicketStruct<'a>,
     ticket_encoder: TicketJwtAuthTokenEncoder<'a>,
     api_encoder: ApiJwtAuthTokenEncoder<'a>,
-    cloudfront_encoder: CloudfrontTokenEncoder<'a>,
+    cloudfront_encoder: CookieCloudfrontTokenEncoder<'a>,
     config: EncodeAuthTicketConfig,
 }
 
@@ -21,7 +23,7 @@ impl<'a> EncodeAuthTicketStruct<'a> {
             ticket_infra: AuthTicketStruct::new(feature),
             ticket_encoder: TicketJwtAuthTokenEncoder::new(&feature.secret.ticket.encoding_key),
             api_encoder: ApiJwtAuthTokenEncoder::new(&feature.secret.api.encoding_key),
-            cloudfront_encoder: CloudfrontTokenEncoder::new(&feature.secret.cloudfront),
+            cloudfront_encoder: CookieCloudfrontTokenEncoder::new(&feature.secret.cloudfront),
             config: EncodeAuthTicketConfig {
                 ticket_expires: feature.config.ticket_expires,
                 api_expires: feature.config.api_expires,
@@ -35,7 +37,7 @@ impl<'a> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a> {
     type TicketInfra = AuthTicketStruct<'a>;
     type TicketEncoder = TicketJwtAuthTokenEncoder<'a>;
     type ApiEncoder = ApiJwtAuthTokenEncoder<'a>;
-    type CloudfrontEncoder = CloudfrontTokenEncoder<'a>;
+    type CloudfrontEncoder = CookieCloudfrontTokenEncoder<'a>;
 
     fn ticket_infra(&self) -> &Self::TicketInfra {
         &self.ticket_infra
@@ -56,7 +58,7 @@ impl<'a> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    pub use super::token_encoder::test::StaticAuthTokenEncoder;
+    pub use super::token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder};
     use crate::auth::auth_ticket::_auth::kernel::init::test::StaticAuthTicketStruct;
 
     use crate::auth::auth_ticket::_auth::encode::infra::{
@@ -67,7 +69,7 @@ pub mod test {
         pub ticket_infra: StaticAuthTicketStruct<'a>,
         pub ticket_encoder: StaticAuthTokenEncoder,
         pub api_encoder: StaticAuthTokenEncoder,
-        pub cloudfront_encoder: StaticAuthTokenEncoder,
+        pub cloudfront_encoder: StaticCloudfrontTokenEncoder,
         pub config: EncodeAuthTicketConfig,
     }
 
@@ -75,7 +77,7 @@ pub mod test {
         type TicketInfra = StaticAuthTicketStruct<'a>;
         type TicketEncoder = StaticAuthTokenEncoder;
         type ApiEncoder = StaticAuthTokenEncoder;
-        type CloudfrontEncoder = StaticAuthTokenEncoder;
+        type CloudfrontEncoder = StaticCloudfrontTokenEncoder;
 
         fn ticket_infra(&self) -> &Self::TicketInfra {
             &self.ticket_infra

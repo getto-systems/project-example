@@ -1,16 +1,16 @@
 use std::fmt::Display;
 
-use crate::auth::{
-    auth_ticket::_api::kernel::data::ValidateAuthNonceError,
-    auth_user::_api::kernel::data::AuthUser,
-    login_id::_api::data::ValidateLoginIdError,
-    password::_api::{
-        authenticate::data::AuthenticatePasswordResponse,
-        kernel::data::{PasswordHashError, ValidatePasswordError},
+use crate::{
+    auth::{
+        auth_ticket::_api::kernel::data::ValidateAuthNonceError,
+        auth_user::_common::kernel::data::AuthUser,
+        login_id::_api::data::ValidateLoginIdError,
+        password::_api::{
+            authenticate::data::AuthenticatePasswordResponse,
+            kernel::data::{PasswordHashError, ValidatePasswordError},
+        },
     },
-};
-use crate::z_details::{
-    _api::message::data::MessageError, _common::repository::data::RepositoryError,
+    z_details::{_api::message::data::MessageError, _common::repository::data::RepositoryError},
 };
 
 pub enum AuthenticatePasswordEvent {

@@ -11,7 +11,7 @@ use token_header::{ApiAuthTokenHeader, TicketAuthTokenHeader};
 
 use super::infra::{ValidateAuthTokenConfig, ValidateAuthTokenInfra};
 
-use crate::auth::auth_user::_api::kernel::data::RequireAuthRoles;
+use crate::auth::auth_user::_common::kernel::data::RequireAuthRoles;
 
 pub struct TicketValidateAuthTokenStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,

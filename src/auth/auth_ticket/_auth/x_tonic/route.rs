@@ -2,7 +2,7 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::auth::auth_ticket::_auth::y_protobuf::service::{
+use crate::auth::auth_ticket::_common::y_protobuf::service::{
     logout_pb_server::{LogoutPb, LogoutPbServer},
     renew_auth_ticket_pb_server::{RenewAuthTicketPb, RenewAuthTicketPbServer},
     LogoutRequestPb, LogoutResponsePb, RenewAuthTicketRequestPb, RenewAuthTicketResponsePb,

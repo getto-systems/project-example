@@ -1,4 +1,4 @@
-import { MenuExpand_pb } from "../../../y_protobuf/db_pb.js"
+import { MenuExpand_pb } from "../../../../../y_protobuf/proto.js"
 
 import {
     fetchRepositoryRemovedResult,

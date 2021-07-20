@@ -123,15 +123,19 @@ pub const AUTH_JWT_AUDIENCE_TICKET: &'static str = "ticket";
 pub const AUTH_JWT_AUDIENCE_API: &'static str = "api";
 
 impl AuthJwtClaims {
-    pub fn from_ticket(ticket: AuthTicket, aud: String, expires: ExpireDateTime) -> Self {
+    pub fn from_ticket(ticket: AuthTicket, aud: String, expires: ExpireDateTime) -> (Self, i64) {
         let ticket = ticket.extract();
-        Self {
-            aud,
-            exp: expires.extract().timestamp(),
-            ticket_id: ticket.ticket_id,
-            user_id: ticket.user_id,
-            granted_roles: ticket.granted_roles,
-        }
+        let exp = expires.extract().timestamp();
+        (
+            Self {
+                aud,
+                exp,
+                ticket_id: ticket.ticket_id,
+                user_id: ticket.user_id,
+                granted_roles: ticket.granted_roles,
+            },
+            exp,
+        )
     }
 }
 

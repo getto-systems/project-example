@@ -1,11 +1,16 @@
 use std::fmt::Display;
 
-use super::data::{AuthTokenEncoded, AuthTokenExpires, EncodeAuthTokenError};
-use crate::z_details::_common::repository::data::RepositoryError;
+use crate::{
+    auth::auth_ticket::{
+        _auth::encode::data::{AuthTokenExpires, EncodeAuthTokenError},
+        _common::encode::data::EncodeAuthTicketResponse,
+    },
+    z_details::_common::repository::data::RepositoryError,
+};
 
 pub enum EncodeAuthTicketEvent {
     TokenExpiresCalculated(AuthTokenExpires),
-    Success(AuthTokenEncoded),
+    Success(EncodeAuthTicketResponse),
     TicketNotFound,
     RepositoryError(RepositoryError),
     EncodeError(EncodeAuthTokenError),

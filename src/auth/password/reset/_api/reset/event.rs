@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use crate::auth::{
     auth_ticket::_api::kernel::data::ValidateAuthNonceError,
-    auth_user::_api::kernel::data::AuthUser,
+    auth_user::_common::kernel::data::AuthUser,
     login_id::_api::data::ValidateLoginIdError,
     password::{
         _api::kernel::data::{PasswordHashError, ValidatePasswordError},
