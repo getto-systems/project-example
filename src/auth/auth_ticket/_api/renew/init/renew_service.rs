@@ -1,19 +1,12 @@
-use tonic::metadata::MetadataValue;
 use tonic::Request;
 
 use crate::auth::auth_ticket::_common::y_protobuf::service::{
     renew_auth_ticket_pb_client::RenewAuthTicketPbClient, RenewAuthTicketRequestPb,
 };
 
-use crate::{
-    auth::{
-        _api::x_outside_feature::feature::AuthOutsideService,
-        auth_ticket::_common::kernel::x_tonic::metadata::{METADATA_NONCE, METADATA_TICKET_TOKEN},
-    },
-    x_outside_feature::_common::metadata::METADATA_REQUEST_ID,
-};
+use crate::auth::_api::x_outside_feature::feature::AuthOutsideService;
 
-use crate::auth::_api::service::helper::infra_error;
+use crate::auth::_api::service::helper::{infra_error, set_metadata};
 
 use crate::auth::auth_ticket::_api::renew::infra::RenewAuthTicketService;
 
@@ -51,19 +44,7 @@ impl<'a> RenewAuthTicketService for TonicRenewAuthTicketService<'a> {
             .map_err(infra_error)?;
 
         let mut request = Request::new(RenewAuthTicketRequestPb {});
-        // TODO request_id と nonce と token を設定する helper が欲しい
-        request.metadata_mut().append(
-            METADATA_REQUEST_ID,
-            MetadataValue::from_str(self.request_id).map_err(infra_error)?,
-        );
-        request.metadata_mut().append(
-            METADATA_NONCE,
-            MetadataValue::from_str(&nonce.extract()).map_err(infra_error)?,
-        );
-        request.metadata_mut().append(
-            METADATA_TICKET_TOKEN,
-            MetadataValue::from_str(&token.extract()).map_err(infra_error)?,
-        );
+        set_metadata(&mut request, self.request_id, nonce, token)?;
 
         client
             .renew(request)
