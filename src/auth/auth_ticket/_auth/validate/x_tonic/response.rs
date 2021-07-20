@@ -1,6 +1,6 @@
 use tonic::{Response, Status};
 
-use crate::auth::auth_ticket::_auth::y_protobuf::service::{
+use crate::auth::auth_ticket::_common::y_protobuf::service::{
     LogoutResponsePb, RenewAuthTicketResponsePb,
 };
 

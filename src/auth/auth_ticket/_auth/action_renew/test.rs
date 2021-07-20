@@ -5,7 +5,9 @@ use getto_application_test::ActionTestRunner;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::auth_ticket::_auth::{
-    encode::init::test::{StaticAuthTokenEncoder, StaticEncodeAuthTicketStruct},
+    encode::init::test::{
+        StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder, StaticEncodeAuthTicketStruct,
+    },
     kernel::init::test::{
         MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore, MemoryAuthTicketMap,
         MemoryAuthTicketRepository, MemoryAuthTicketStore, StaticAuthNonceMetadata,
@@ -23,11 +25,13 @@ use crate::auth::auth_ticket::_auth::{
 
 use super::action::{RenewAuthTicketAction, RenewAuthTicketMaterial};
 
-use crate::auth::auth_ticket::_auth::kernel::data::{
-    AuthDateTime, AuthNonceValue, AuthTicketExtract, AuthTicketId, AuthTokenValue,
-    ExpansionLimitDuration, ExpireDuration,
+use crate::auth::{
+    auth_ticket::_auth::kernel::data::{
+        AuthDateTime, AuthNonceValue, AuthTicketExtract, AuthTicketId, AuthTokenValue,
+        ExpansionLimitDuration, ExpireDuration,
+    },
+    auth_user::_common::kernel::data::RequireAuthRoles,
 };
-use crate::auth::auth_user::_auth::kernel::data::RequireAuthRoles;
 
 #[tokio::test]
 async fn success_allow_for_any_role() {
@@ -275,9 +279,9 @@ impl<'a> TestFeature<'a> {
             },
             encode: StaticEncodeAuthTicketStruct {
                 ticket_infra: standard_ticket_infra(store),
-                ticket_encoder: StaticAuthTokenEncoder::new(),
-                api_encoder: StaticAuthTokenEncoder::new(),
-                cloudfront_encoder: StaticAuthTokenEncoder::new(),
+                ticket_encoder: StaticAuthTokenEncoder,
+                api_encoder: StaticAuthTokenEncoder,
+                cloudfront_encoder: StaticCloudfrontTokenEncoder,
                 config: standard_encode_config(),
             },
         }

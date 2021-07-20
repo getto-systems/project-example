@@ -2,40 +2,36 @@ use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use super::super::encode::init::RenewEncodeAuthTicketStruct;
-use super::super::validate::init::TicketValidateAuthTokenStruct;
+use crate::auth::auth_ticket::_api::renew::init::RenewAuthTicketStruct;
 
-use super::action::RenewAuthTicketAction;
-use super::action::RenewAuthTicketMaterial;
+use super::action::{RenewAuthTicketAction, RenewAuthTicketMaterial};
 
 impl<'a> RenewAuthTicketAction<RenewAuthTicketFeature<'a>> {
-    pub fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest) -> Self {
-        Self::with_material(RenewAuthTicketFeature::new(feature, request))
+    pub fn new(
+        feature: &'a AuthOutsideFeature,
+        request_id: &'a str,
+        request: &'a HttpRequest,
+    ) -> Self {
+        Self::with_material(RenewAuthTicketFeature::new(feature, request_id, request))
     }
 }
 
 pub struct RenewAuthTicketFeature<'a> {
-    validate: TicketValidateAuthTokenStruct<'a>,
-    encode: RenewEncodeAuthTicketStruct<'a>,
+    renew: RenewAuthTicketStruct<'a>,
 }
 
 impl<'a> RenewAuthTicketFeature<'a> {
-    fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest) -> Self {
+    fn new(feature: &'a AuthOutsideFeature, request_id: &'a str, request: &'a HttpRequest) -> Self {
         Self {
-            validate: TicketValidateAuthTokenStruct::new(feature, request),
-            encode: RenewEncodeAuthTicketStruct::new(feature),
+            renew: RenewAuthTicketStruct::new(feature, request_id, request),
         }
     }
 }
 
 impl<'a> RenewAuthTicketMaterial for RenewAuthTicketFeature<'a> {
-    type Validate = TicketValidateAuthTokenStruct<'a>;
-    type Encode = RenewEncodeAuthTicketStruct<'a>;
+    type Renew = RenewAuthTicketStruct<'a>;
 
-    fn validate(&self) -> &Self::Validate {
-        &self.validate
-    }
-    fn encode(&self) -> &Self::Encode {
-        &self.encode
+    fn renew(&self) -> &Self::Renew {
+        &self.renew
     }
 }

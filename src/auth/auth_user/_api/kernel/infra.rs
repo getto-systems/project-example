@@ -1,5 +1,7 @@
-use super::data::{AuthUser, AuthUserId};
-use crate::z_details::_common::repository::data::RepositoryError;
+use crate::{
+    auth::auth_user::_common::kernel::data::{AuthUser, AuthUserId},
+    z_details::_common::repository::data::RepositoryError,
+};
 
 pub trait AuthUserInfra {
     type UserRepository: AuthUserRepository;

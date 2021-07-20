@@ -5,7 +5,7 @@ use crate::auth::{
         kernel::data::{AuthTicket, AuthTokenValue},
         validate::data::DecodeAuthTokenError,
     },
-    auth_user::_auth::kernel::data::RequireAuthRoles,
+    auth_user::_common::kernel::data::RequireAuthRoles,
 };
 use crate::z_details::_auth::request::data::MetadataError;
 

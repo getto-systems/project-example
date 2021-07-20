@@ -11,13 +11,15 @@ use crate::auth::password::_api::kernel::infra::{
     VerifyPasswordError,
 };
 
-use crate::auth::{
-    auth_ticket::_api::kernel::data::{AuthDateTime, ExpireDateTime},
-    auth_user::_api::kernel::data::AuthUserId,
-    login_id::_api::data::LoginId,
-    password::_api::kernel::data::ResetToken,
+use crate::{
+    auth::{
+        auth_ticket::_api::kernel::data::{AuthDateTime, ExpireDateTime},
+        auth_user::_common::kernel::data::AuthUserId,
+        login_id::_api::data::LoginId,
+        password::_api::kernel::data::ResetToken,
+    },
+    z_details::_common::repository::data::RepositoryError,
 };
-use crate::z_details::_common::repository::data::RepositoryError;
 
 pub struct MysqlAuthUserPasswordRepository<'a> {
     pool: &'a MySqlPool,
@@ -242,13 +244,15 @@ pub mod test {
         ResetTokenEntryExtract, VerifyPasswordError,
     };
 
-    use crate::auth::{
-        auth_ticket::_api::kernel::data::{AuthDateTime, ExpireDateTime},
-        auth_user::_api::kernel::data::{AuthUser, AuthUserId},
-        login_id::_api::data::LoginId,
-        password::_api::kernel::data::ResetToken,
+    use crate::{
+        auth::{
+            auth_ticket::_api::kernel::data::{AuthDateTime, ExpireDateTime},
+            auth_user::_common::kernel::data::{AuthUser, AuthUserId},
+            login_id::_api::data::LoginId,
+            password::_api::kernel::data::ResetToken,
+        },
+        z_details::_common::repository::data::RepositoryError,
     };
-    use crate::z_details::_common::repository::data::RepositoryError;
 
     pub type MemoryAuthUserPasswordStore = Mutex<MemoryAuthUserPasswordMap>;
     pub struct MemoryAuthUserPasswordMap {

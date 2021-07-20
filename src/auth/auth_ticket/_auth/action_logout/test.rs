@@ -22,11 +22,13 @@ use crate::auth::auth_ticket::_auth::{
 
 use super::action::{LogoutAction, LogoutMaterial};
 
-use crate::auth::auth_ticket::_auth::kernel::data::{
-    AuthDateTime, AuthNonceValue, AuthTicketExtract, AuthTicketId, AuthTokenValue,
-    ExpansionLimitDuration, ExpireDuration,
+use crate::auth::{
+    auth_ticket::_auth::kernel::data::{
+        AuthDateTime, AuthNonceValue, AuthTicketExtract, AuthTicketId, AuthTokenValue,
+        ExpansionLimitDuration, ExpireDuration,
+    },
+    auth_user::_common::kernel::data::RequireAuthRoles,
 };
-use crate::auth::auth_user::_auth::kernel::data::RequireAuthRoles;
 
 #[tokio::test]
 async fn success_logout() {

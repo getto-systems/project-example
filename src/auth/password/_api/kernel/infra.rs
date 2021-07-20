@@ -2,13 +2,15 @@ use chrono::{DateTime, Utc};
 
 use super::convert::validate_password;
 
-use crate::auth::{
-    auth_ticket::_api::kernel::data::{AuthDateTime, ExpireDateTime},
-    auth_user::_api::kernel::data::AuthUserId,
-    login_id::_api::data::LoginId,
-    password::_api::kernel::data::{PasswordHashError, ResetToken, ValidatePasswordError},
+use crate::{
+    auth::{
+        auth_ticket::_api::kernel::data::{AuthDateTime, ExpireDateTime},
+        auth_user::_common::kernel::data::AuthUserId,
+        login_id::_api::data::LoginId,
+        password::_api::kernel::data::{PasswordHashError, ResetToken, ValidatePasswordError},
+    },
+    z_details::_common::repository::data::RepositoryError,
 };
-use crate::z_details::_common::repository::data::RepositoryError;
 
 pub trait AuthUserPasswordInfra {
     type PasswordRepository: AuthUserPasswordRepository;

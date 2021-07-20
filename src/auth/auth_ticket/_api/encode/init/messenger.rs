@@ -11,8 +11,10 @@ use crate::z_details::_api::message::helper::encode_protobuf_base64;
 
 use super::EncodeMessenger;
 
-use crate::auth::auth_user::_api::kernel::data::GrantedAuthRoles;
-use crate::z_details::_api::message::data::MessageError;
+use crate::{
+    auth::auth_user::_common::kernel::data::GrantedAuthRoles,
+    z_details::_api::message::data::MessageError,
+};
 
 pub struct RenewEncodeMessenger;
 
@@ -75,8 +77,10 @@ fn authenticate_response(granted_roles: GrantedAuthRoles) -> AuthenticateRespons
 pub mod test {
     use super::super::EncodeMessenger;
 
-    use crate::auth::auth_user::_api::kernel::data::GrantedAuthRoles;
-    use crate::z_details::_api::message::data::MessageError;
+    use crate::{
+        auth::auth_user::_common::kernel::data::GrantedAuthRoles,
+        z_details::_api::message::data::MessageError,
+    };
 
     pub struct StaticEncodeMessenger;
 

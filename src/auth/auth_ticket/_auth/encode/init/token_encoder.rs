@@ -1,18 +1,22 @@
+use std::collections::HashMap;
+
 use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 
 use aws_cloudfront_cookie::CloudfrontPolicy;
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideCloudfrontSecret;
 
-use crate::auth::auth_ticket::_auth::encode::data::AuthTokenKind;
 use crate::auth::auth_ticket::_auth::{
-    encode::infra::AuthTokenEncoder,
+    encode::infra::{AuthTokenEncoder, CloudfrontTokenEncoder},
     kernel::infra::{AuthJwtClaims, AUTH_JWT_AUDIENCE_API, AUTH_JWT_AUDIENCE_TICKET},
 };
 
-use crate::auth::auth_ticket::_auth::{
-    encode::data::{AuthTokenEncodedData, EncodeAuthTokenError},
-    kernel::data::{AuthTicket, AuthTokenExtract, ExpireDateTime},
+use crate::auth::auth_ticket::{
+    _auth::{
+        encode::data::EncodeAuthTokenError,
+        kernel::data::{AuthTicket, ExpireDateTime},
+    },
+    _common::kernel::data::{AuthTokenExtract, CloudfrontTokenKind},
 };
 
 pub struct TicketJwtAuthTokenEncoder<'a> {
@@ -30,14 +34,13 @@ impl<'a> AuthTokenEncoder for TicketJwtAuthTokenEncoder<'a> {
         &self,
         ticket: AuthTicket,
         expires: ExpireDateTime,
-    ) -> Result<Vec<AuthTokenEncodedData>, EncodeAuthTokenError> {
-        Ok(vec![encode_jwt(JwtConfig {
-            kind: AuthTokenKind::Ticket,
+    ) -> Result<AuthTokenExtract, EncodeAuthTokenError> {
+        encode_jwt(JwtConfig {
             aud: AUTH_JWT_AUDIENCE_TICKET,
             ticket,
             expires,
             key: self.key,
-        })?])
+        })
     }
 }
 
@@ -56,65 +59,53 @@ impl<'a> AuthTokenEncoder for ApiJwtAuthTokenEncoder<'a> {
         &self,
         ticket: AuthTicket,
         expires: ExpireDateTime,
-    ) -> Result<Vec<AuthTokenEncodedData>, EncodeAuthTokenError> {
-        Ok(vec![encode_jwt(JwtConfig {
-            kind: AuthTokenKind::Api,
+    ) -> Result<AuthTokenExtract, EncodeAuthTokenError> {
+        encode_jwt(JwtConfig {
             aud: AUTH_JWT_AUDIENCE_API,
             ticket,
             expires,
             key: self.key,
-        })?])
+        })
     }
 }
 
 struct JwtConfig<'a> {
-    kind: AuthTokenKind,
     aud: &'static str,
     ticket: AuthTicket,
     expires: ExpireDateTime,
     key: &'a EncodingKey,
 }
-fn encode_jwt<'a>(config: JwtConfig<'a>) -> Result<AuthTokenEncodedData, EncodeAuthTokenError> {
+fn encode_jwt<'a>(config: JwtConfig<'a>) -> Result<AuthTokenExtract, EncodeAuthTokenError> {
     let JwtConfig {
-        kind,
         aud,
         ticket,
         expires,
         key,
     } = config;
 
-    let token = encode(
-        &Header::new(Algorithm::ES384),
-        &AuthJwtClaims::from_ticket(ticket, aud.into(), expires.clone()),
-        key,
-    )
-    .map_err(|err| EncodeAuthTokenError::InfraError(format!("{}", err)))?;
+    let (claims, expires) = AuthJwtClaims::from_ticket(ticket, aud.into(), expires);
 
-    Ok(AuthTokenEncodedData {
-        kind,
-        token: AuthTokenExtract {
-            value: token,
-            expires,
-        },
-    })
+    let token = encode(&Header::new(Algorithm::ES384), &claims, key)
+        .map_err(|err| EncodeAuthTokenError::InfraError(format!("{}", err)))?;
+
+    Ok(AuthTokenExtract { token, expires })
 }
 
-pub struct CloudfrontTokenEncoder<'a> {
+pub struct CookieCloudfrontTokenEncoder<'a> {
     secret: &'a AuthOutsideCloudfrontSecret,
 }
 
-impl<'a> CloudfrontTokenEncoder<'a> {
+impl<'a> CookieCloudfrontTokenEncoder<'a> {
     pub fn new(secret: &'a AuthOutsideCloudfrontSecret) -> Self {
         Self { secret }
     }
 }
 
-impl<'a> AuthTokenEncoder for CloudfrontTokenEncoder<'a> {
+impl<'a> CloudfrontTokenEncoder for CookieCloudfrontTokenEncoder<'a> {
     fn encode(
         &self,
-        _ticket: AuthTicket,
         expires: ExpireDateTime,
-    ) -> Result<Vec<AuthTokenEncodedData>, EncodeAuthTokenError> {
+    ) -> Result<HashMap<CloudfrontTokenKind, AuthTokenExtract>, EncodeAuthTokenError> {
         let policy = CloudfrontPolicy::from_resource(
             self.secret.resource.into(),
             expires.clone().extract().timestamp(),
@@ -125,56 +116,74 @@ impl<'a> AuthTokenEncoder for CloudfrontTokenEncoder<'a> {
             .sign(policy)
             .map_err(|err| EncodeAuthTokenError::InfraError(format!("sign error: {}", err)))?;
 
-        Ok(vec![
-            AuthTokenEncodedData {
-                kind: AuthTokenKind::CloudfrontKeyPairId,
-                token: AuthTokenExtract {
-                    value: self.secret.key_pair_id.into(),
-                    expires: expires.clone(),
-                },
+        let expires = expires.extract().timestamp();
+
+        let mut map = HashMap::new();
+        map.insert(
+            CloudfrontTokenKind::KeyPairId,
+            AuthTokenExtract {
+                token: self.secret.key_pair_id.into(),
+                expires,
             },
-            AuthTokenEncodedData {
-                kind: AuthTokenKind::CloudfrontPolicy,
-                token: AuthTokenExtract {
-                    value: content.policy,
-                    expires: expires.clone(),
-                },
+        );
+        map.insert(
+            CloudfrontTokenKind::Policy,
+            AuthTokenExtract {
+                token: content.policy,
+                expires,
             },
-            AuthTokenEncodedData {
-                kind: AuthTokenKind::CloudfrontSignature,
-                token: AuthTokenExtract {
-                    value: content.signature,
-                    expires: expires.clone(),
-                },
+        );
+        map.insert(
+            CloudfrontTokenKind::Signature,
+            AuthTokenExtract {
+                token: content.signature,
+                expires,
             },
-        ])
+        );
+
+        Ok(map)
     }
 }
 
 #[cfg(test)]
 pub mod test {
-    use super::AuthTokenEncoder;
+    use std::collections::HashMap;
 
-    use crate::auth::auth_ticket::_auth::{
-        encode::data::{AuthTokenEncodedData, EncodeAuthTokenError},
-        kernel::data::{AuthTicket, ExpireDateTime},
+    use crate::auth::auth_ticket::_auth::encode::infra::{
+        AuthTokenEncoder, CloudfrontTokenEncoder,
+    };
+
+    use crate::auth::auth_ticket::{
+        _auth::{
+            encode::data::EncodeAuthTokenError,
+            kernel::data::{AuthTicket, ExpireDateTime},
+        },
+        _common::kernel::data::{AuthTokenExtract, CloudfrontTokenKind},
     };
 
     pub struct StaticAuthTokenEncoder;
 
-    impl<'a> StaticAuthTokenEncoder {
-        pub fn new() -> Self {
-            Self
-        }
-    }
-
-    impl<'a> AuthTokenEncoder for StaticAuthTokenEncoder {
+    impl AuthTokenEncoder for StaticAuthTokenEncoder {
         fn encode(
             &self,
             _ticket: AuthTicket,
+            expires: ExpireDateTime,
+        ) -> Result<AuthTokenExtract, EncodeAuthTokenError> {
+            Ok(AuthTokenExtract {
+                token: "TOKEN".into(),
+                expires: expires.extract().timestamp(),
+            })
+        }
+    }
+
+    pub struct StaticCloudfrontTokenEncoder;
+
+    impl CloudfrontTokenEncoder for StaticCloudfrontTokenEncoder {
+        fn encode(
+            &self,
             _expires: ExpireDateTime,
-        ) -> Result<Vec<AuthTokenEncodedData>, EncodeAuthTokenError> {
-            Ok(vec![])
+        ) -> Result<HashMap<CloudfrontTokenKind, AuthTokenExtract>, EncodeAuthTokenError> {
+            Ok(HashMap::new())
         }
     }
 }

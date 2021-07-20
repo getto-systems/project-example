@@ -6,7 +6,7 @@ use crate::auth::auth_ticket::_api::{
 use super::event::IssueAuthTicketEvent;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::data::AuthTicket, auth_user::_api::kernel::data::AuthUser,
+    auth_ticket::_api::kernel::data::AuthTicket, auth_user::_common::kernel::data::AuthUser,
 };
 
 pub async fn issue_auth_ticket<S>(

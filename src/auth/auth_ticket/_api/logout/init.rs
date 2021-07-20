@@ -4,14 +4,15 @@ use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_api::kernel::init::TicketAuthHeaderStruct;
-use crate::auth::auth_ticket::_api::logout::init::logout_service::GrpcLogoutService;
+use crate::auth::auth_ticket::_api::{
+    kernel::init::TicketAuthHeaderStruct, logout::init::logout_service::TonicLogoutService,
+};
 
 use super::infra::LogoutInfra;
 
 pub struct LogoutStruct<'a> {
     header_infra: TicketAuthHeaderStruct<'a>,
-    logout_service: GrpcLogoutService<'a>,
+    logout_service: TonicLogoutService<'a>,
 }
 
 impl<'a> LogoutStruct<'a> {
@@ -22,14 +23,14 @@ impl<'a> LogoutStruct<'a> {
     ) -> Self {
         Self {
             header_infra: TicketAuthHeaderStruct::new(request),
-            logout_service: GrpcLogoutService::new(&feature.service, request_id),
+            logout_service: TonicLogoutService::new(&feature.service, request_id),
         }
     }
 }
 
 impl<'a> LogoutInfra for LogoutStruct<'a> {
     type HeaderInfra = TicketAuthHeaderStruct<'a>;
-    type LogoutService = GrpcLogoutService<'a>;
+    type LogoutService = TonicLogoutService<'a>;
 
     fn header_infra(&self) -> &Self::HeaderInfra {
         &self.header_infra

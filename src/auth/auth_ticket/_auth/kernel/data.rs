@@ -6,11 +6,11 @@ use std::{
 
 use chrono::{DateTime, Duration, Utc};
 
-use crate::auth::auth_user::_auth::kernel::data::{
-    AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
-};
-use crate::z_details::{
-    _auth::request::data::MetadataError, _common::repository::data::RepositoryError,
+use crate::{
+    auth::auth_user::_common::kernel::data::{
+        AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
+    },
+    z_details::{_auth::request::data::MetadataError, _common::repository::data::RepositoryError},
 };
 
 #[derive(Clone)]
@@ -74,8 +74,8 @@ impl AuthTicket {
         self.ticket_id.as_str()
     }
 
-    pub fn into_granted_roles(self) -> GrantedAuthRoles {
-        self.user.into_granted_roles()
+    pub fn into_user(self) -> AuthUser {
+        self.user
     }
 
     pub fn extract(self) -> AuthTicketExtract {

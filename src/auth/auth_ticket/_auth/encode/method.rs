@@ -1,17 +1,22 @@
 use getto_application::data::MethodResult;
 
 use crate::auth::auth_ticket::_auth::{
-    encode::infra::{AuthTokenEncoder, EncodeAuthTicketInfra},
+    encode::infra::{AuthTokenEncoder, CloudfrontTokenEncoder, EncodeAuthTicketInfra},
     kernel::infra::{AuthClock, AuthTicketInfra, AuthTicketRepository},
 };
 
 use super::event::EncodeAuthTicketEvent;
 
-use crate::auth::auth_ticket::_auth::{
-    encode::data::{AuthTokenEncoded, AuthTokenExpires},
-    kernel::data::{AuthTicket, ExpansionLimitDateTime},
+use crate::{
+    auth::auth_ticket::{
+        _auth::{
+            encode::data::AuthTokenExpires,
+            kernel::data::{AuthTicket, ExpansionLimitDateTime},
+        },
+        _common::{encode::data::EncodeAuthTicketResponse, kernel::data::AuthTokenEncoded},
+    },
+    z_details::_common::repository::data::RepositoryError,
 };
-use crate::z_details::_common::repository::data::RepositoryError;
 
 pub async fn encode_auth_ticket<S>(
     infra: &impl EncodeAuthTicketInfra,
@@ -28,26 +33,25 @@ pub async fn encode_auth_ticket<S>(
         expires.clone(),
     ));
 
-    let encoded = AuthTokenEncoded {
-        ticket_tokens: infra
+    let token = AuthTokenEncoded {
+        ticket_token: infra
             .ticket_encoder()
             .encode(ticket.clone(), expires.ticket)
             .map_err(|err| post(EncodeAuthTicketEvent::EncodeError(err)))?,
 
-        api_tokens: infra
+        api_token: infra
             .api_encoder()
             .encode(ticket.clone(), expires.api)
             .map_err(|err| post(EncodeAuthTicketEvent::EncodeError(err)))?,
 
         cloudfront_tokens: infra
             .cloudfront_encoder()
-            .encode(ticket.clone(), expires.cloudfront)
+            .encode(expires.cloudfront)
             .map_err(|err| post(EncodeAuthTicketEvent::EncodeError(err)))?,
-
-        granted_roles: ticket.into_granted_roles(),
     };
 
-    Ok(post(EncodeAuthTicketEvent::Success(encoded)))
+    let response = EncodeAuthTicketResponse::new(ticket.into_user(), token);
+    Ok(post(EncodeAuthTicketEvent::Success(response)))
 }
 async fn fetch_expansion_limit(
     infra: &impl EncodeAuthTicketInfra,

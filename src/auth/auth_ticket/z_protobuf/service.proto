@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "auth/auth_user/z_protobuf/service.proto";
+
 package auth.auth_ticket.service;
 
 service LogoutPb {
@@ -13,20 +15,24 @@ service RenewAuthTicketPb {
 }
 message RenewAuthTicketRequestPb {}
 message RenewAuthTicketResponsePb {
-    repeated string granted_roles = 1;
-    repeated AuthTokenPb ticket_tokens = 2;
-    repeated AuthTokenPb api_tokens = 3;
-    repeated AuthTokenPb cloudfront_tokens = 4;
+    auth.auth_user.service.AuthUserPb user = 1;
+    AuthTokenEncodedPb token = 2;
+}
+message AuthTokenEncodedPb {
+    AuthTokenPb ticket_token = 1;
+    AuthTokenPb api_token = 2;
+    repeated CloudfrontTokenPb cloudfront_tokens = 3;
 }
 message AuthTokenPb {
-    AuthTokenKindPb kind = 1;
-    string token = 2;
-    int64 expires = 3;
+    string token = 1;
+    int64 expires = 2;
 }
-enum AuthTokenKindPb {
-    Ticket = 0;
-    Api = 1;
-    CloudfrontKeyPairId = 2;
-    CloudfrontPolicy = 3;
-    CloudfrontSignature = 4;
+message CloudfrontTokenPb {
+    CloudfrontTokenKindPb kind = 1;
+    AuthTokenPb token = 2;
+}
+enum CloudfrontTokenKindPb {
+    KeyPairId = 0;
+    Policy = 1;
+    Signature = 2;
 }

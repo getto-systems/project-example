@@ -6,8 +6,10 @@ use crate::z_details::_common::repository::mysql::helper::mysql_error;
 
 use crate::auth::auth_user::_auth::kernel::infra::AuthUserRepository;
 
-use crate::auth::auth_user::_auth::kernel::data::{AuthUser, AuthUserExtract, AuthUserId};
-use crate::z_details::_common::repository::data::RepositoryError;
+use crate::{
+    auth::auth_user::_common::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
+    z_details::_common::repository::data::RepositoryError,
+};
 
 pub struct MysqlAuthUserRepository<'a> {
     pool: &'a MySqlPool,
@@ -78,8 +80,10 @@ pub mod test {
 
     use crate::auth::auth_user::_auth::kernel::infra::AuthUserRepository;
 
-    use crate::auth::auth_user::_auth::kernel::data::{AuthUser, AuthUserExtract, AuthUserId};
-    use crate::z_details::_common::repository::data::RepositoryError;
+    use crate::{
+        auth::auth_user::_common::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
+        z_details::_common::repository::data::RepositoryError,
+    };
 
     pub type MemoryAuthUserStore = Mutex<MemoryAuthUserMap>;
     pub struct MemoryAuthUserMap(HashMap<String, HashSet<String>>);

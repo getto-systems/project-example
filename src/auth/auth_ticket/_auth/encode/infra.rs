@@ -1,15 +1,20 @@
+use std::collections::HashMap;
+
 use crate::auth::auth_ticket::_auth::kernel::infra::AuthTicketInfra;
 
-use crate::auth::auth_ticket::_auth::{
-    encode::data::{AuthTokenEncodedData, EncodeAuthTokenError},
-    kernel::data::{AuthTicket, ExpireDateTime, ExpireDuration},
+use crate::auth::auth_ticket::{
+    _auth::{
+        encode::data::EncodeAuthTokenError,
+        kernel::data::{AuthTicket, ExpireDateTime, ExpireDuration},
+    },
+    _common::kernel::data::{AuthTokenExtract, CloudfrontTokenKind},
 };
 
 pub trait EncodeAuthTicketInfra {
     type TicketInfra: AuthTicketInfra;
     type TicketEncoder: AuthTokenEncoder;
     type ApiEncoder: AuthTokenEncoder;
-    type CloudfrontEncoder: AuthTokenEncoder;
+    type CloudfrontEncoder: CloudfrontTokenEncoder;
 
     fn ticket_infra(&self) -> &Self::TicketInfra;
     fn ticket_encoder(&self) -> &Self::TicketEncoder;
@@ -23,7 +28,14 @@ pub trait AuthTokenEncoder {
         &self,
         ticket: AuthTicket,
         expires: ExpireDateTime,
-    ) -> Result<Vec<AuthTokenEncodedData>, EncodeAuthTokenError>;
+    ) -> Result<AuthTokenExtract, EncodeAuthTokenError>;
+}
+
+pub trait CloudfrontTokenEncoder {
+    fn encode(
+        &self,
+        expires: ExpireDateTime,
+    ) -> Result<HashMap<CloudfrontTokenKind, AuthTokenExtract>, EncodeAuthTokenError>;
 }
 
 pub struct EncodeAuthTicketConfig {

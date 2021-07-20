@@ -1,6 +1,6 @@
 use tonic::Request;
 
-use crate::auth::auth_ticket::_common::x_tonic::metadata::METADATA_NONCE;
+use crate::auth::auth_ticket::_common::kernel::x_tonic::metadata::METADATA_NONCE;
 
 use crate::z_details::_auth::request::helper::metadata;
 
