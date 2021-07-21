@@ -29,8 +29,7 @@ pub trait RenewAuthTicketMaterial {
     type Validate: ValidateAuthTokenInfra;
     type Encode: EncodeAuthTicketInfra;
 
-    fn validate(&self) -> &Self::Validate;
-    fn encode(&self) -> &Self::Encode;
+    fn extract(self) -> (Self::Validate, Self::Encode);
 }
 
 pub struct RenewAuthTicketAction<M: RenewAuthTicketMaterial> {
@@ -52,14 +51,14 @@ impl<M: RenewAuthTicketMaterial> RenewAuthTicketAction<M> {
 
     pub async fn ignite(self) -> MethodResult<RenewAuthTicketState> {
         let pubsub = self.pubsub;
-        let m = self.material;
+        let (validate, encode) = self.material.extract();
 
-        let ticket = validate_auth_token(m.validate(), |event| {
+        let ticket = validate_auth_token(validate, |event| {
             pubsub.post(RenewAuthTicketState::Validate(event))
         })
         .await?;
 
-        encode_auth_ticket(m.encode(), ticket, |event| {
+        encode_auth_ticket(encode, ticket, |event| {
             pubsub.post(RenewAuthTicketState::Encode(event))
         })
         .await

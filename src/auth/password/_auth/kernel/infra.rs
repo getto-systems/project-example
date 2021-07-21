@@ -12,6 +12,14 @@ use crate::{
     z_details::_common::repository::data::RepositoryError,
 };
 
+pub trait AuthUserPasswordMatchInfra {
+    type PasswordRepository: AuthUserPasswordRepository;
+    type PasswordMatcher: AuthUserPasswordMatcher;
+
+    fn extract(self, plain_password: PlainPassword) -> (Self::PasswordRepository, Self::PasswordMatcher);
+}
+
+// TODO hash infra にして extract したい
 pub trait AuthUserPasswordInfra {
     type PasswordRepository: AuthUserPasswordRepository;
     type PasswordMatcher: AuthUserPasswordMatcher;

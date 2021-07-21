@@ -34,11 +34,8 @@ impl<'a> AuthTicketInfra for AuthTicketStruct<'a> {
     type Clock = ChronoAuthClock;
     type TicketRepository = MysqlAuthTicketRepository<'a>;
 
-    fn clock(&self) -> &Self::Clock {
-        &self.clock
-    }
-    fn ticket_repository(&self) -> &Self::TicketRepository {
-        &self.ticket_repository
+    fn extract(self) -> (Self::Clock, Self::TicketRepository) {
+        (self.clock, self.ticket_repository)
     }
 }
 
@@ -54,17 +51,20 @@ impl<'a> CheckAuthNonceInfra for CheckAuthNonceStruct<'a> {
     type NonceMetadata = TonicAuthNonceMetadata;
     type NonceRepository = DynamoDbAuthNonceRepository<'a>;
 
-    fn config(&self) -> &AuthNonceConfig {
-        &self.config
-    }
-    fn clock(&self) -> &Self::Clock {
-        &self.clock
-    }
-    fn nonce_metadata(&self) -> &Self::NonceMetadata {
-        &self.nonce_metadata
-    }
-    fn nonce_repository(&self) -> &Self::NonceRepository {
-        &self.nonce_repository
+    fn extract(
+        self,
+    ) -> (
+        Self::Clock,
+        Self::NonceMetadata,
+        Self::NonceRepository,
+        AuthNonceConfig,
+    ) {
+        (
+            self.clock,
+            self.nonce_metadata,
+            self.nonce_repository,
+            self.config,
+        )
     }
 }
 
@@ -108,11 +108,8 @@ pub mod test {
         type Clock = StaticChronoAuthClock;
         type TicketRepository = MemoryAuthTicketRepository<'a>;
 
-        fn clock(&self) -> &Self::Clock {
-            &self.clock
-        }
-        fn ticket_repository(&self) -> &Self::TicketRepository {
-            &self.ticket_repository
+        fn extract(self) -> (Self::Clock, Self::TicketRepository) {
+            (self.clock, self.ticket_repository)
         }
     }
 
@@ -128,17 +125,20 @@ pub mod test {
         type NonceMetadata = StaticAuthNonceMetadata;
         type NonceRepository = MemoryAuthNonceRepository<'a>;
 
-        fn config(&self) -> &AuthNonceConfig {
-            &self.config
-        }
-        fn clock(&self) -> &Self::Clock {
-            &self.clock
-        }
-        fn nonce_metadata(&self) -> &Self::NonceMetadata {
-            &self.nonce_metadata
-        }
-        fn nonce_repository(&self) -> &Self::NonceRepository {
-            &self.nonce_repository
+        fn extract(
+            self,
+        ) -> (
+            Self::Clock,
+            Self::NonceMetadata,
+            Self::NonceRepository,
+            AuthNonceConfig,
+        ) {
+            (
+                self.clock,
+                self.nonce_metadata,
+                self.nonce_repository,
+                self.config,
+            )
         }
     }
 }

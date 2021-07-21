@@ -1,6 +1,8 @@
 use crate::auth::auth_ticket::_auth::kernel::method::check_nonce;
 
-use super::infra::{AuthTokenDecoder, AuthTokenMetadata, ValidateAuthTokenInfra};
+use crate::auth::auth_ticket::_auth::validate::infra::{
+    AuthTokenDecoder, AuthTokenMetadata, ValidateAuthTokenConfig, ValidateAuthTokenInfra,
+};
 
 use super::event::ValidateAuthTokenEvent;
 
@@ -9,15 +11,17 @@ use crate::auth::auth_ticket::_auth::{
 };
 
 pub async fn validate_auth_token<S>(
-    infra: &impl ValidateAuthTokenInfra,
+    infra: impl ValidateAuthTokenInfra,
     post: impl Fn(ValidateAuthTokenEvent) -> S,
 ) -> Result<AuthTicket, S> {
-    check_nonce(infra.check_nonce_infra())
+    let (check_nonce_infra, token_metadata, token_decoder, config) = infra.extract();
+
+    check_nonce(check_nonce_infra)
         .await
         .map_err(|err| post(ValidateAuthTokenEvent::NonceError(err)))?;
 
-    let ticket =
-        validate_token(infra).map_err(|err| post(ValidateAuthTokenEvent::TokenError(err)))?;
+    let ticket = validate_token(token_metadata, token_decoder, config)
+        .map_err(|err| post(ValidateAuthTokenEvent::TokenError(err)))?;
 
     // 呼び出し側を簡単にするため、例外的に State ではなく AuthTicket を返す
     post(ValidateAuthTokenEvent::Success(ticket.clone()));
@@ -25,17 +29,15 @@ pub async fn validate_auth_token<S>(
 }
 
 fn validate_token(
-    infra: &impl ValidateAuthTokenInfra,
+    token_metadata: impl AuthTokenMetadata,
+    token_decoder: impl AuthTokenDecoder,
+    config: ValidateAuthTokenConfig,
 ) -> Result<AuthTicket, ValidateAuthTokenError> {
-    let header = infra.token_metadata();
-    let token_validator = infra.token_decoder();
-    let config = infra.config();
-
-    let token = header
+    let token = token_metadata
         .token()
         .map_err(ValidateAuthTokenError::MetadataError)?;
 
-    let ticket = token_validator
+    let ticket = token_decoder
         .decode(&token)
         .map_err(ValidateAuthTokenError::DecodeError)?;
 

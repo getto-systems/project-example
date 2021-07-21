@@ -8,7 +8,9 @@ use password_hasher::Argon2PasswordHasher;
 use password_matcher::Argon2PasswordMatcher;
 use password_repository::MysqlAuthUserPasswordRepository;
 
-use crate::auth::password::_auth::kernel::infra::AuthUserPasswordInfra;
+use crate::auth::password::_auth::kernel::infra::{
+    AuthUserPasswordInfra, AuthUserPasswordMatchInfra, AuthUserPasswordMatcher, PlainPassword,
+};
 
 pub struct AuthUserPasswordStruct<'a> {
     password_repository: MysqlAuthUserPasswordRepository<'a>,
@@ -19,6 +21,21 @@ impl<'a> AuthUserPasswordStruct<'a> {
         Self {
             password_repository: MysqlAuthUserPasswordRepository::new(&feature.store.mysql),
         }
+    }
+}
+
+impl<'a> AuthUserPasswordMatchInfra for AuthUserPasswordStruct<'a> {
+    type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
+    type PasswordMatcher = Argon2PasswordMatcher;
+
+    fn extract(
+        self,
+        plain_password: PlainPassword,
+    ) -> (Self::PasswordRepository, Self::PasswordMatcher) {
+        (
+            self.password_repository,
+            Self::PasswordMatcher::new(plain_password),
+        )
     }
 }
 
@@ -40,10 +57,27 @@ pub mod test {
         MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository, MemoryAuthUserPasswordStore,
     };
 
-    use crate::auth::password::_auth::kernel::infra::AuthUserPasswordInfra;
+    use crate::auth::password::_auth::kernel::infra::{
+        AuthUserPasswordInfra, AuthUserPasswordMatchInfra, AuthUserPasswordMatcher, PlainPassword,
+    };
 
     pub struct StaticAuthUserPasswordStruct<'a> {
         pub password_repository: MemoryAuthUserPasswordRepository<'a>,
+    }
+
+    impl<'a> AuthUserPasswordMatchInfra for StaticAuthUserPasswordStruct<'a> {
+        type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
+        type PasswordMatcher = PlainPasswordMatcher;
+
+        fn extract(
+            self,
+            plain_password: PlainPassword,
+        ) -> (Self::PasswordRepository, Self::PasswordMatcher) {
+            (
+                self.password_repository,
+                Self::PasswordMatcher::new(plain_password),
+            )
+        }
     }
 
     impl<'a> AuthUserPasswordInfra for StaticAuthUserPasswordStruct<'a> {

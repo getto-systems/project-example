@@ -1,13 +1,13 @@
 use crate::auth::{
     auth_ticket::_auth::kernel::infra::CheckAuthNonceInfra,
     auth_user::_auth::kernel::infra::AuthUserInfra,
-    password::_auth::kernel::infra::AuthUserPasswordInfra,
+    password::_auth::kernel::infra::AuthUserPasswordMatchInfra,
 };
 
 pub trait AuthenticatePasswordInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
     type UserInfra: AuthUserInfra;
-    type PasswordInfra: AuthUserPasswordInfra;
+    type PasswordInfra: AuthUserPasswordMatchInfra;
     type RequestDecoder: AuthenticatePasswordRequestDecoder;
 
     fn extract(

@@ -16,11 +16,15 @@ pub trait EncodeAuthTicketInfra {
     type ApiEncoder: AuthTokenEncoder;
     type CloudfrontEncoder: CloudfrontTokenEncoder;
 
-    fn ticket_infra(&self) -> &Self::TicketInfra;
-    fn ticket_encoder(&self) -> &Self::TicketEncoder;
-    fn api_encoder(&self) -> &Self::ApiEncoder;
-    fn cloudfront_encoder(&self) -> &Self::CloudfrontEncoder;
-    fn config(&self) -> &EncodeAuthTicketConfig;
+    fn extract(
+        self,
+    ) -> (
+        Self::TicketInfra,
+        Self::TicketEncoder,
+        Self::ApiEncoder,
+        Self::CloudfrontEncoder,
+        EncodeAuthTicketConfig,
+    );
 }
 
 pub trait AuthTokenEncoder {

@@ -39,20 +39,22 @@ impl<'a> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a> {
     type ApiEncoder = ApiJwtAuthTokenEncoder<'a>;
     type CloudfrontEncoder = CookieCloudfrontTokenEncoder<'a>;
 
-    fn ticket_infra(&self) -> &Self::TicketInfra {
-        &self.ticket_infra
-    }
-    fn ticket_encoder(&self) -> &Self::TicketEncoder {
-        &self.ticket_encoder
-    }
-    fn api_encoder(&self) -> &Self::ApiEncoder {
-        &self.api_encoder
-    }
-    fn cloudfront_encoder(&self) -> &Self::CloudfrontEncoder {
-        &self.cloudfront_encoder
-    }
-    fn config(&self) -> &EncodeAuthTicketConfig {
-        &self.config
+    fn extract(
+        self,
+    ) -> (
+        Self::TicketInfra,
+        Self::TicketEncoder,
+        Self::ApiEncoder,
+        Self::CloudfrontEncoder,
+        EncodeAuthTicketConfig,
+    ) {
+        (
+            self.ticket_infra,
+            self.ticket_encoder,
+            self.api_encoder,
+            self.cloudfront_encoder,
+            self.config,
+        )
     }
 }
 
@@ -79,20 +81,22 @@ pub mod test {
         type ApiEncoder = StaticAuthTokenEncoder;
         type CloudfrontEncoder = StaticCloudfrontTokenEncoder;
 
-        fn ticket_infra(&self) -> &Self::TicketInfra {
-            &self.ticket_infra
-        }
-        fn ticket_encoder(&self) -> &Self::TicketEncoder {
-            &self.ticket_encoder
-        }
-        fn api_encoder(&self) -> &Self::ApiEncoder {
-            &self.api_encoder
-        }
-        fn cloudfront_encoder(&self) -> &Self::CloudfrontEncoder {
-            &self.cloudfront_encoder
-        }
-        fn config(&self) -> &EncodeAuthTicketConfig {
-            &self.config
+        fn extract(
+            self,
+        ) -> (
+            Self::TicketInfra,
+            Self::TicketEncoder,
+            Self::ApiEncoder,
+            Self::CloudfrontEncoder,
+            EncodeAuthTicketConfig,
+        ) {
+            (
+                self.ticket_infra,
+                self.ticket_encoder,
+                self.api_encoder,
+                self.cloudfront_encoder,
+                self.config,
+            )
         }
     }
 }
