@@ -1,4 +1,4 @@
-use crate::auth::auth_ticket::_auth::kernel::infra::{AuthTicketInfra, CheckAuthNonceInfra};
+use crate::auth::auth_ticket::_auth::kernel::infra::CheckAuthNonceInfra;
 
 use crate::auth::{
     auth_ticket::_auth::{
@@ -11,15 +11,17 @@ use crate::z_details::_auth::request::data::MetadataError;
 
 pub trait ValidateAuthTokenInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
-    type TicketInfra: AuthTicketInfra;
     type TokenMetadata: AuthTokenMetadata;
     type TokenDecoder: AuthTokenDecoder;
 
-    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
-    fn ticket_infra(&self) -> &Self::TicketInfra;
-    fn token_metadata(&self) -> &Self::TokenMetadata;
-    fn token_decoder(&self) -> &Self::TokenDecoder;
-    fn config(&self) -> &ValidateAuthTokenConfig;
+    fn extract(
+        self,
+    ) -> (
+        Self::CheckNonceInfra,
+        Self::TokenMetadata,
+        Self::TokenDecoder,
+        ValidateAuthTokenConfig,
+    );
 }
 
 pub trait AuthTokenMetadata {

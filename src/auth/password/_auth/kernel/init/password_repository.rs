@@ -35,7 +35,7 @@ impl<'pool> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'pool
     async fn verify_password<'a>(
         &self,
         login_id: &'a LoginId,
-        matcher: impl AuthUserPasswordMatcher + 'a,
+        matcher: impl 'a + AuthUserPasswordMatcher,
     ) -> Result<AuthUserId, VerifyPasswordError> {
         let conn = self.pool;
 
@@ -147,7 +147,7 @@ impl<'pool> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'pool
     async fn reset_password<'a>(
         &self,
         reset_token: &'a ResetToken,
-        hasher: impl AuthUserPasswordHasher + 'a,
+        hasher: impl 'a + AuthUserPasswordHasher,
         reset_at: AuthDateTime,
     ) -> Result<AuthUserId, ResetPasswordError> {
         // reset_token が正しいことが前提; reset_token_entry() で事前に確認する

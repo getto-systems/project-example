@@ -19,8 +19,8 @@ impl<'a> DiscardAuthTicketStruct<'a> {
 impl<'a> DiscardAuthTicketInfra for DiscardAuthTicketStruct<'a> {
     type TicketInfra = AuthTicketStruct<'a>;
 
-    fn ticket_infra(&self) -> &Self::TicketInfra {
-        &self.ticket_infra
+    fn extract(self) -> Self::TicketInfra {
+        self.ticket_infra
     }
 }
 
@@ -37,8 +37,8 @@ pub mod test {
     impl<'a> DiscardAuthTicketInfra for StaticDiscardAuthTicketStruct<'a> {
         type TicketInfra = StaticAuthTicketStruct<'a>;
 
-        fn ticket_infra(&self) -> &Self::TicketInfra {
-            &self.ticket_infra
+        fn extract(self) -> Self::TicketInfra {
+            self.ticket_infra
         }
     }
 }

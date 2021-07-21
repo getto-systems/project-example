@@ -32,10 +32,7 @@ impl<'a> LogoutMaterial for LogoutFeature<'a> {
     type Validate = TicketValidateAuthTokenStruct<'a>;
     type Discard = DiscardAuthTicketStruct<'a>;
 
-    fn validate(&self) -> &Self::Validate {
-        &self.validate
-    }
-    fn discard(&self) -> &Self::Discard {
-        &self.discard
+    fn extract(self) -> (Self::Validate, Self::Discard) {
+        (self.validate, self.discard)
     }
 }

@@ -16,8 +16,7 @@ pub trait AuthTicketInfra {
     type Clock: AuthClock;
     type TicketRepository: AuthTicketRepository;
 
-    fn clock(&self) -> &Self::Clock;
-    fn ticket_repository(&self) -> &Self::TicketRepository;
+    fn extract(self) -> (Self::Clock, Self::TicketRepository);
 }
 
 pub trait CheckAuthNonceInfra {
@@ -25,10 +24,14 @@ pub trait CheckAuthNonceInfra {
     type NonceMetadata: AuthNonceMetadata;
     type NonceRepository: AuthNonceRepository;
 
-    fn clock(&self) -> &Self::Clock;
-    fn nonce_metadata(&self) -> &Self::NonceMetadata;
-    fn nonce_repository(&self) -> &Self::NonceRepository;
-    fn config(&self) -> &AuthNonceConfig;
+    fn extract(
+        self,
+    ) -> (
+        Self::Clock,
+        Self::NonceMetadata,
+        Self::NonceRepository,
+        AuthNonceConfig,
+    );
 }
 
 pub trait AuthClock {

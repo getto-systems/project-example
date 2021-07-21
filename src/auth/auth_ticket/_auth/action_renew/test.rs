@@ -183,11 +183,8 @@ impl<'a> RenewAuthTicketMaterial for TestFeature<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
-    fn validate(&self) -> &Self::Validate {
-        &self.validate
-    }
-    fn encode(&self) -> &Self::Encode {
-        &self.encode
+    fn extract(self) -> (Self::Validate, Self::Encode) {
+        (self.validate, self.encode)
     }
 }
 
@@ -272,7 +269,6 @@ impl<'a> TestFeature<'a> {
                     nonce_metadata: standard_nonce_header(),
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
-                ticket_infra: standard_ticket_infra(store),
                 config: ValidateAuthTokenConfig { require_roles },
                 token_metadata: standard_token_header(),
                 token_decoder: token_validator,

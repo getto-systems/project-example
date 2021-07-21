@@ -5,11 +5,8 @@ use super::infra::{
 use super::data::ValidateAuthNonceError;
 use crate::z_details::_common::repository::data::RegisterResult;
 
-pub async fn check_nonce(infra: &impl CheckAuthNonceInfra) -> Result<(), ValidateAuthNonceError> {
-    let nonce_header = infra.nonce_metadata();
-    let nonce_repository = infra.nonce_repository();
-    let clock = infra.clock();
-    let config = infra.config();
+pub async fn check_nonce(infra: impl CheckAuthNonceInfra) -> Result<(), ValidateAuthNonceError> {
+    let (clock, nonce_header, nonce_repository, config) = infra.extract();
 
     let nonce = nonce_header
         .nonce()

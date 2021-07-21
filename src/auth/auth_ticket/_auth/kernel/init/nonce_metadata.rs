@@ -36,13 +36,11 @@ pub mod test {
 
     pub enum StaticAuthNonceMetadata {
         Valid(AuthNonceValue),
-        NotFound, // TODO このテストを追加する必要がある
     }
 
     impl AuthNonceMetadata for StaticAuthNonceMetadata {
         fn nonce(&self) -> Result<AuthNonceValue, MetadataError> {
             match self {
-                Self::NotFound => Err(MetadataError::NotFound),
                 Self::Valid(nonce) => Ok(nonce.clone()),
             }
         }

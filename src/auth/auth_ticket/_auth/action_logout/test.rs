@@ -126,11 +126,8 @@ impl<'a> LogoutMaterial for TestFeature<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
     type Discard = StaticDiscardAuthTicketStruct<'a>;
 
-    fn validate(&self) -> &Self::Validate {
-        &self.validate
-    }
-    fn discard(&self) -> &Self::Discard {
-        &self.discard
+    fn extract(self) -> (Self::Validate, Self::Discard) {
+        (self.validate, self.discard)
     }
 }
 
@@ -182,7 +179,6 @@ impl<'a> TestFeature<'a> {
                     nonce_metadata: standard_nonce_metadata(),
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
-                ticket_infra: standard_ticket_infra(store),
                 token_metadata: standard_token_metadata(),
                 token_decoder: standard_token_validator(),
                 config: ValidateAuthTokenConfig {
