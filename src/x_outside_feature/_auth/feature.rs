@@ -29,8 +29,9 @@ pub fn extract_request<T>(request: Request<T>) -> (AppData, MetadataMap, T) {
         .expect("failed to get AppFeature")
         .clone();
 
-    // TODO into_inner_and_metadata みたいなメソッドを pull request したい
     // request が metadata と inner の両方を into してくれるやつが無いため、to_owned する
+    // TODO into_inner_and_metadata みたいなメソッドを pull request したい
+    // layer に metadata を配る必要があるため、metadata を owned で返すのは難しいかもしれない
     let metadata = request.metadata().to_owned();
 
     let request = request.into_inner();

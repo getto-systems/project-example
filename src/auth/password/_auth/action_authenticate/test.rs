@@ -108,7 +108,7 @@ async fn error_empty_login_id() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authenticate password error; empty login id"]);
+    assert_state(vec!["authenticate password error; invalid login id: empty login id"]);
     assert!(!result.is_ok());
 }
 
@@ -123,7 +123,7 @@ async fn error_too_long_login_id() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authenticate password error; too long login id"]);
+    assert_state(vec!["authenticate password error; invalid login id: too long login id"]);
     assert!(!result.is_ok());
 }
 
@@ -153,7 +153,7 @@ async fn error_empty_password() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authenticate password error; empty password"]);
+    assert_state(vec!["authenticate password error; invalid password: empty password"]);
     assert!(!result.is_ok());
 }
 
@@ -168,7 +168,7 @@ async fn error_too_long_password() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authenticate password error; too long password"]);
+    assert_state(vec!["authenticate password error; invalid password: too long password"]);
     assert!(!result.is_ok());
 }
 
