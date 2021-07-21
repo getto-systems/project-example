@@ -13,20 +13,20 @@ use super::infra::{ValidateAuthTokenConfig, ValidateAuthTokenInfra};
 
 use crate::auth::auth_user::_common::kernel::data::RequireAuthRoles;
 
-pub struct TicketValidateAuthTokenStruct<'a, T> {
-    check_nonce_infra: CheckAuthNonceStruct<'a, T>,
+pub struct TicketValidateAuthTokenStruct<'a> {
+    check_nonce_infra: CheckAuthNonceStruct<'a>,
     ticket_infra: AuthTicketStruct<'a>,
-    token_metadata: TicketAuthTokenMetadata<'a, T>,
+    token_metadata: TicketAuthTokenMetadata<'a>,
     token_validator: JwtAuthTokenDecoder<'a>,
     config: ValidateAuthTokenConfig,
 }
 
-impl<'a, T> TicketValidateAuthTokenStruct<'a, T> {
-    pub fn new(feature: &'a AuthOutsideFeature, request: &'a Request<T>) -> Self {
+impl<'a> TicketValidateAuthTokenStruct<'a> {
+    pub fn new<T>(feature: &'a AuthOutsideFeature, request: &'a Request<T>) -> Self {
         Self {
-            check_nonce_infra: CheckAuthNonceStruct::new(feature, request),
+            check_nonce_infra: CheckAuthNonceStruct::new(feature, request.metadata().clone()),
             ticket_infra: AuthTicketStruct::new(feature),
-            token_metadata: TicketAuthTokenMetadata::new(request),
+            token_metadata: TicketAuthTokenMetadata::new(request.metadata()),
             token_validator: JwtAuthTokenDecoder::new(&feature.secret.ticket.decoding_key),
             config: ValidateAuthTokenConfig {
                 require_roles: RequireAuthRoles::Nothing, // ticket 検証では role は不問
@@ -35,10 +35,10 @@ impl<'a, T> TicketValidateAuthTokenStruct<'a, T> {
     }
 }
 
-impl<'a, T> ValidateAuthTokenInfra for TicketValidateAuthTokenStruct<'a, T> {
-    type CheckNonceInfra = CheckAuthNonceStruct<'a, T>;
+impl<'a> ValidateAuthTokenInfra for TicketValidateAuthTokenStruct<'a> {
+    type CheckNonceInfra = CheckAuthNonceStruct<'a>;
     type TicketInfra = AuthTicketStruct<'a>;
-    type TokenMetadata = TicketAuthTokenMetadata<'a, T>;
+    type TokenMetadata = TicketAuthTokenMetadata<'a>;
     type TokenDecoder = JwtAuthTokenDecoder<'a>;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
@@ -58,34 +58,34 @@ impl<'a, T> ValidateAuthTokenInfra for TicketValidateAuthTokenStruct<'a, T> {
     }
 }
 
-pub struct ApiValidateAuthTokenStruct<'a, T> {
-    check_nonce_infra: CheckAuthNonceStruct<'a, T>,
+pub struct ApiValidateAuthTokenStruct<'a> {
+    check_nonce_infra: CheckAuthNonceStruct<'a>,
     ticket_infra: AuthTicketStruct<'a>,
-    token_header: ApiAuthTokenMetadata<'a, T>,
+    token_header: ApiAuthTokenMetadata<'a>,
     token_validator: JwtApiTokenDecoder<'a>,
     config: ValidateAuthTokenConfig,
 }
 
-impl<'a, T> ApiValidateAuthTokenStruct<'a, T> {
-    pub fn new(
+impl<'a> ApiValidateAuthTokenStruct<'a> {
+    pub fn new<T>(
         feature: &'a AuthOutsideFeature,
         request: &'a Request<T>,
         require_roles: RequireAuthRoles,
     ) -> Self {
         Self {
-            check_nonce_infra: CheckAuthNonceStruct::new(feature, request),
+            check_nonce_infra: CheckAuthNonceStruct::new(feature, request.metadata().clone()),
             ticket_infra: AuthTicketStruct::new(feature),
             config: ValidateAuthTokenConfig { require_roles },
-            token_header: ApiAuthTokenMetadata::new(request),
+            token_header: ApiAuthTokenMetadata::new(request.metadata()),
             token_validator: JwtApiTokenDecoder::new(&feature.secret.api.decoding_key),
         }
     }
 }
 
-impl<'a, T> ValidateAuthTokenInfra for ApiValidateAuthTokenStruct<'a, T> {
-    type CheckNonceInfra = CheckAuthNonceStruct<'a, T>;
+impl<'a> ValidateAuthTokenInfra for ApiValidateAuthTokenStruct<'a> {
+    type CheckNonceInfra = CheckAuthNonceStruct<'a>;
     type TicketInfra = AuthTicketStruct<'a>;
-    type TokenMetadata = ApiAuthTokenMetadata<'a, T>;
+    type TokenMetadata = ApiAuthTokenMetadata<'a>;
     type TokenDecoder = JwtApiTokenDecoder<'a>;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {

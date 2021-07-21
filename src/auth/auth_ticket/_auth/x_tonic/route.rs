@@ -19,10 +19,6 @@ use crate::auth::auth_ticket::_auth::{
 pub struct AuthTicketServer;
 
 impl AuthTicketServer {
-    pub const fn new() -> Self {
-        Self
-    }
-
     pub fn logout(&self) -> LogoutPbServer<Logout> {
         LogoutPbServer::new(Logout)
     }
@@ -39,8 +35,8 @@ impl LogoutPb for Logout {
         &self,
         request: Request<LogoutRequestPb>,
     ) -> Result<Response<LogoutResponsePb>, Status> {
-        let data = app_data(&request);
-        let logger = app_logger("auth.auth_ticket.logout", &request);
+        let data = app_data(request.extensions());
+        let logger = app_logger("auth.auth_ticket.logout", request.metadata());
         let mut action = LogoutAction::new(&data.auth, &request);
         action.subscribe(move |state| logger.log(state.log_level(), state));
         flatten(action.ignite().await).respond_to()
@@ -55,8 +51,8 @@ impl RenewAuthTicketPb for Renew {
         &self,
         request: Request<RenewAuthTicketRequestPb>,
     ) -> Result<Response<RenewAuthTicketResponsePb>, Status> {
-        let data = app_data(&request);
-        let logger = app_logger("auth.auth_ticket.renew", &request);
+        let data = app_data(request.extensions());
+        let logger = app_logger("auth.auth_ticket.renew", request.metadata());
         let mut action = RenewAuthTicketAction::new(&data.auth, &request);
         action.subscribe(move |state| logger.log(state.log_level(), state));
         flatten(action.ignite().await).respond_to()

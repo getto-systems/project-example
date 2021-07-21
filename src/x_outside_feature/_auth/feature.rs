@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use tonic::Request;
+use tonic::{metadata::MetadataMap, Extensions, Request};
 
 use super::env::Env;
 
@@ -22,9 +22,25 @@ impl AppFeature {
     }
 }
 
-pub fn app_data<T>(request: &Request<T>) -> &AppData {
-    request
+pub fn extract_request<T>(request: Request<T>) -> (AppData, MetadataMap, T) {
+    let data = request
         .extensions()
+        .get::<AppData>()
+        .expect("failed to get AppFeature")
+        .clone();
+
+    // request が metadata と inner の両方を into してくれるやつが無いため、to_owned する
+    // TODO into_inner_and_metadata みたいなメソッドを pull request したい
+    // layer に metadata を配る必要があるため、metadata を owned で返すのは難しいかもしれない
+    let metadata = request.metadata().to_owned();
+
+    let request = request.into_inner();
+
+    (data, metadata, request)
+}
+
+pub fn app_data(extensions: &Extensions) -> &AppData {
+    extensions
         .get::<AppData>()
         .expect("failed to get AppFeature")
 }

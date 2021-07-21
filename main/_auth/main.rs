@@ -1,8 +1,7 @@
 use std::sync::Arc;
 
 use lazy_static::lazy_static;
-use tonic::service::interceptor_fn;
-use tonic::transport::Server;
+use tonic::{service::interceptor_fn, transport::Server};
 use tower::ServiceBuilder;
 
 use example_api::x_outside_feature::_auth::{
@@ -31,6 +30,7 @@ async fn main() {
         )
         .add_service(server.auth.auth_ticket.logout())
         .add_service(server.auth.auth_ticket.renew())
+        .add_service(server.auth.password.authenticate())
         .serve(
             format!("127.0.0.1:{}", &ENV.port)
                 .parse()

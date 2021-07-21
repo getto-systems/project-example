@@ -1,4 +1,4 @@
-use tonic::Request;
+use tonic::metadata::MetadataMap;
 
 use crate::auth::auth_ticket::_common::kernel::x_tonic::metadata::{
     METADATA_API_TOKEN, METADATA_TICKET_TOKEN,
@@ -8,38 +8,40 @@ use crate::z_details::_auth::request::helper::metadata;
 
 use crate::auth::auth_ticket::_auth::validate::infra::AuthTokenMetadata;
 
-use crate::auth::auth_ticket::_auth::kernel::data::AuthTokenValue;
-use crate::z_details::_auth::request::data::MetadataError;
+use crate::{
+    auth::auth_ticket::_auth::kernel::data::AuthTokenValue,
+    z_details::_auth::request::data::MetadataError,
+};
 
-pub struct TicketAuthTokenMetadata<'a, T> {
-    request: &'a Request<T>,
+pub struct TicketAuthTokenMetadata<'a> {
+    metadata: &'a MetadataMap,
 }
 
-impl<'a, T> TicketAuthTokenMetadata<'a, T> {
-    pub const fn new(request: &'a Request<T>) -> Self {
-        Self { request }
+impl<'a> TicketAuthTokenMetadata<'a> {
+    pub const fn new(metadata: &'a MetadataMap) -> Self {
+        Self { metadata }
     }
 }
 
-impl<'a, T> AuthTokenMetadata for TicketAuthTokenMetadata<'a, T> {
+impl<'a> AuthTokenMetadata for TicketAuthTokenMetadata<'a> {
     fn token(&self) -> Result<AuthTokenValue, MetadataError> {
-        metadata(&self.request, METADATA_TICKET_TOKEN).map(AuthTokenValue::new)
+        metadata(&self.metadata, METADATA_TICKET_TOKEN).map(AuthTokenValue::new)
     }
 }
 
-pub struct ApiAuthTokenMetadata<'a, T> {
-    request: &'a Request<T>,
+pub struct ApiAuthTokenMetadata<'a> {
+    metadata: &'a MetadataMap,
 }
 
-impl<'a, T> ApiAuthTokenMetadata<'a, T> {
-    pub const fn new(request: &'a Request<T>) -> Self {
-        Self { request }
+impl<'a> ApiAuthTokenMetadata<'a> {
+    pub const fn new(metadata: &'a MetadataMap) -> Self {
+        Self { metadata }
     }
 }
 
-impl<'a, T> AuthTokenMetadata for ApiAuthTokenMetadata<'a, T> {
+impl<'a> AuthTokenMetadata for ApiAuthTokenMetadata<'a> {
     fn token(&self) -> Result<AuthTokenValue, MetadataError> {
-        metadata(&self.request, METADATA_API_TOKEN).map(AuthTokenValue::new)
+        metadata(&self.metadata, METADATA_API_TOKEN).map(AuthTokenValue::new)
     }
 }
 

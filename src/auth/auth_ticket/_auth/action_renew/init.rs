@@ -8,19 +8,19 @@ use crate::auth::auth_ticket::_auth::{
 
 use super::action::{RenewAuthTicketAction, RenewAuthTicketMaterial};
 
-impl<'a, T> RenewAuthTicketAction<RenewAuthTicketFeature<'a, T>> {
-    pub fn new(feature: &'a AuthOutsideFeature, request: &'a Request<T>) -> Self {
+impl<'a> RenewAuthTicketAction<RenewAuthTicketFeature<'a>> {
+    pub fn new<T>(feature: &'a AuthOutsideFeature, request: &'a Request<T>) -> Self {
         Self::with_material(RenewAuthTicketFeature::new(feature, request))
     }
 }
 
-pub struct RenewAuthTicketFeature<'a, T> {
-    validate: TicketValidateAuthTokenStruct<'a, T>,
+pub struct RenewAuthTicketFeature<'a> {
+    validate: TicketValidateAuthTokenStruct<'a>,
     encode: EncodeAuthTicketStruct<'a>,
 }
 
-impl<'a, T> RenewAuthTicketFeature<'a, T> {
-    fn new(feature: &'a AuthOutsideFeature, request: &'a Request<T>) -> Self {
+impl<'a> RenewAuthTicketFeature<'a> {
+    fn new<T>(feature: &'a AuthOutsideFeature, request: &'a Request<T>) -> Self {
         Self {
             validate: TicketValidateAuthTokenStruct::new(feature, request),
             encode: EncodeAuthTicketStruct::new(feature),
@@ -28,8 +28,8 @@ impl<'a, T> RenewAuthTicketFeature<'a, T> {
     }
 }
 
-impl<'a, T> RenewAuthTicketMaterial for RenewAuthTicketFeature<'a, T> {
-    type Validate = TicketValidateAuthTokenStruct<'a, T>;
+impl<'a> RenewAuthTicketMaterial for RenewAuthTicketFeature<'a> {
+    type Validate = TicketValidateAuthTokenStruct<'a>;
     type Encode = EncodeAuthTicketStruct<'a>;
 
     fn validate(&self) -> &Self::Validate {

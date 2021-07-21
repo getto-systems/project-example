@@ -3,7 +3,7 @@ mod nonce_metadata;
 mod nonce_repository;
 mod ticket_repository;
 
-use tonic::Request;
+use tonic::metadata::MetadataMap;
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
@@ -42,16 +42,16 @@ impl<'a> AuthTicketInfra for AuthTicketStruct<'a> {
     }
 }
 
-pub struct CheckAuthNonceStruct<'a, T> {
+pub struct CheckAuthNonceStruct<'a> {
     config: AuthNonceConfig,
     clock: ChronoAuthClock,
-    nonce_metadata: TonicAuthNonceMetadata<'a, T>,
+    nonce_metadata: TonicAuthNonceMetadata,
     nonce_repository: DynamoDbAuthNonceRepository<'a>,
 }
 
-impl<'a, T> CheckAuthNonceInfra for CheckAuthNonceStruct<'a, T> {
+impl<'a> CheckAuthNonceInfra for CheckAuthNonceStruct<'a> {
     type Clock = ChronoAuthClock;
-    type NonceMetadata = TonicAuthNonceMetadata<'a, T>;
+    type NonceMetadata = TonicAuthNonceMetadata;
     type NonceRepository = DynamoDbAuthNonceRepository<'a>;
 
     fn config(&self) -> &AuthNonceConfig {
@@ -68,14 +68,14 @@ impl<'a, T> CheckAuthNonceInfra for CheckAuthNonceStruct<'a, T> {
     }
 }
 
-impl<'a, T> CheckAuthNonceStruct<'a, T> {
-    pub fn new(feature: &'a AuthOutsideFeature, request: &'a Request<T>) -> Self {
+impl<'a> CheckAuthNonceStruct<'a> {
+    pub fn new(feature: &'a AuthOutsideFeature, metadata: MetadataMap) -> Self {
         Self {
             config: AuthNonceConfig {
                 nonce_expires: feature.config.ticket_expires,
             },
             clock: ChronoAuthClock::new(),
-            nonce_metadata: TonicAuthNonceMetadata::new(request),
+            nonce_metadata: TonicAuthNonceMetadata::new(metadata),
             nonce_repository: DynamoDbAuthNonceRepository::new(
                 &feature.store.dynamodb,
                 feature.store.nonce_table_name,
@@ -92,7 +92,7 @@ pub mod test {
         MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
     };
     pub use super::ticket_repository::test::{
-        MemoryAuthTicketMap, MemoryAuthTicketStore, MemoryAuthTicketRepository,
+        MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
     };
 
     use crate::auth::auth_ticket::_auth::kernel::infra::{

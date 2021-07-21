@@ -1,10 +1,9 @@
-use tonic::Request;
+use tonic::metadata::MetadataMap;
 
 use super::data::MetadataError;
 
-pub fn metadata<T>(request: &Request<T>, key: &str) -> Result<String, MetadataError> {
-    request
-        .metadata()
+pub fn metadata(metadata: &MetadataMap, key: &str) -> Result<String, MetadataError> {
+    metadata
         .get(key)
         .ok_or(MetadataError::NotFound)
         .and_then(|value| {

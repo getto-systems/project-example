@@ -13,6 +13,7 @@ pub trait AuthenticatePasswordInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
     type UserInfra: AuthUserInfra;
     type PasswordInfra: AuthUserPasswordInfra;
+    // TODO Messenger と RequestDecoder に分けたい
     type Messenger: AuthenticatePasswordMessenger;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;

@@ -1,4 +1,4 @@
-use tonic::Request;
+use tonic::metadata::MetadataMap;
 
 use crate::auth::auth_ticket::_common::kernel::x_tonic::metadata::METADATA_NONCE;
 
@@ -6,22 +6,24 @@ use crate::z_details::_auth::request::helper::metadata;
 
 use crate::auth::auth_ticket::_auth::kernel::infra::AuthNonceMetadata;
 
-use crate::auth::auth_ticket::_auth::kernel::data::AuthNonceValue;
-use crate::z_details::_auth::request::data::MetadataError;
+use crate::{
+    auth::auth_ticket::_auth::kernel::data::AuthNonceValue,
+    z_details::_auth::request::data::MetadataError,
+};
 
-pub struct TonicAuthNonceMetadata<'a, T> {
-    request: &'a Request<T>,
+pub struct TonicAuthNonceMetadata {
+    metadata: MetadataMap,
 }
 
-impl<'a, T> TonicAuthNonceMetadata<'a, T> {
-    pub const fn new(request: &'a Request<T>) -> Self {
-        Self { request }
+impl TonicAuthNonceMetadata {
+    pub const fn new(metadata: MetadataMap) -> Self {
+        Self { metadata }
     }
 }
 
-impl<'a, T> AuthNonceMetadata for TonicAuthNonceMetadata<'a, T> {
+impl AuthNonceMetadata for TonicAuthNonceMetadata {
     fn nonce(&self) -> Result<AuthNonceValue, MetadataError> {
-        metadata(self.request, METADATA_NONCE).map(AuthNonceValue::new)
+        metadata(&self.metadata, METADATA_NONCE).map(AuthNonceValue::new)
     }
 }
 
