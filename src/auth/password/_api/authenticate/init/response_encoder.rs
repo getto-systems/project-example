@@ -1,7 +1,4 @@
-use crate::auth::{
-    auth_ticket::_api::y_protobuf::api::AuthenticateResponsePb,
-    password::_api::y_protobuf::api::AuthenticatePasswordResultPb,
-};
+use crate::auth::password::_api::y_protobuf::api::AuthenticatePasswordResultPb;
 
 use crate::z_details::_api::message::helper::encode_protobuf_base64;
 
@@ -38,7 +35,11 @@ impl AuthenticatePasswordResponseEncoder for ProstAuthenticatePasswordResponseEn
             }
             AuthenticatePasswordResponse::Success(response) => {
                 let (user, token) = response.extract();
-                let message: AuthenticateResponsePb = user.into();
+                let message = AuthenticatePasswordResultPb {
+                    success: true,
+                    value: Some(user.into()),
+                    ..Default::default()
+                };
                 Ok(AuthenticatePasswordResult::Success(
                     AuthTokenMessageEncoded {
                         message: encode_protobuf_base64(message)?,
