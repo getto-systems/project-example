@@ -3,13 +3,16 @@ use std::collections::HashSet;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use crate::auth::auth_ticket::_api::kernel::data::{
-    AuthDateTime, AuthNonceValue, AuthTicket, AuthTicketExtract, AuthTokenValue,
-    ExpansionLimitDateTime, ExpireDateTime, ExpireDuration,
-};
-use crate::z_details::{
-    _api::request::data::HeaderError,
-    _common::repository::data::{RegisterResult, RepositoryError},
+use crate::{
+    auth::auth_ticket::_api::kernel::data::{
+        AuthDateTime, AuthNonceValue, AuthTicket, AuthTicketExtract, AuthTokenMessage,
+        AuthTokenMessageEncoded, AuthTokenValue, ExpansionLimitDateTime, ExpireDateTime,
+        ExpireDuration,
+    },
+    z_details::{
+        _api::request::data::HeaderError,
+        _common::repository::data::{RegisterResult, RepositoryError},
+    },
 };
 
 pub trait AuthHeaderInfra {
@@ -18,6 +21,16 @@ pub trait AuthHeaderInfra {
 
     fn nonce_header(&self) -> &Self::NonceHeader;
     fn token_header(&self) -> &Self::TokenHeader;
+}
+
+pub trait AuthTokenInfra {
+    type TokenMessenger: AuthTokenMessenger;
+
+    fn token_messenger(&self) -> &Self::TokenMessenger;
+}
+
+pub trait AuthTokenMessenger {
+    fn to_message(&self, message: AuthTokenMessageEncoded) -> AuthTokenMessage;
 }
 
 pub trait AuthTicketInfra {

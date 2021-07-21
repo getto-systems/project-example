@@ -1,91 +1,113 @@
-mod messenger;
+mod authenticate_service;
+mod request_decoder;
+mod response_encoder;
 
 use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
+use crate::auth::password::_api::authenticate::init::response_encoder::ProstAuthenticatePasswordResponseEncoder;
 use crate::auth::{
-    auth_ticket::_api::kernel::init::CheckAuthNonceStruct,
-    auth_user::_api::kernel::init::AuthUserStruct,
-    password::_api::kernel::init::AuthUserPasswordStruct,
+    auth_ticket::_api::kernel::init::{AuthTokenStruct, TicketAuthHeaderStruct},
+    password::_api::authenticate::init::authenticate_service::TonicAuthenticatePasswordService,
 };
-use messenger::ProtobufAuthenticatePasswordMessenger;
+use request_decoder::ProtobufAuthenticatePasswordRequestDecoder;
 
 use super::infra::AuthenticatePasswordInfra;
 
 pub struct AuthenticatePasswordStruct<'a> {
-    check_nonce_infra: CheckAuthNonceStruct<'a>,
-    user_infra: AuthUserStruct<'a>,
-    password_infra: AuthUserPasswordStruct<'a>,
-    messenger: ProtobufAuthenticatePasswordMessenger,
+    header_infra: TicketAuthHeaderStruct<'a>,
+    token_infra: AuthTokenStruct<'a>,
+    request_decoder: ProtobufAuthenticatePasswordRequestDecoder,
+    authenticate_service: TonicAuthenticatePasswordService<'a>,
+    response_encoder: ProstAuthenticatePasswordResponseEncoder,
 }
 
 impl<'a> AuthenticatePasswordStruct<'a> {
-    pub fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest, body: String) -> Self {
+    pub fn new(
+        feature: &'a AuthOutsideFeature,
+        request_id: &'a str,
+        request: &'a HttpRequest,
+        body: String,
+    ) -> Self {
         Self {
-            check_nonce_infra: CheckAuthNonceStruct::new(feature, request),
-            user_infra: AuthUserStruct::new(feature),
-            password_infra: AuthUserPasswordStruct::new(feature),
-            messenger: ProtobufAuthenticatePasswordMessenger::new(body),
+            header_infra: TicketAuthHeaderStruct::new(request),
+            token_infra: AuthTokenStruct::new(feature),
+            request_decoder: ProtobufAuthenticatePasswordRequestDecoder::new(body),
+            authenticate_service: TonicAuthenticatePasswordService::new(
+                &feature.service,
+                request_id,
+            ),
+            response_encoder: ProstAuthenticatePasswordResponseEncoder,
         }
     }
 }
 
 impl<'a> AuthenticatePasswordInfra for AuthenticatePasswordStruct<'a> {
-    type CheckNonceInfra = CheckAuthNonceStruct<'a>;
-    type UserInfra = AuthUserStruct<'a>;
-    type PasswordInfra = AuthUserPasswordStruct<'a>;
-    type Messenger = ProtobufAuthenticatePasswordMessenger;
+    type HeaderInfra = TicketAuthHeaderStruct<'a>;
+    type TokenInfra = AuthTokenStruct<'a>;
+    type RequestDecoder = ProtobufAuthenticatePasswordRequestDecoder;
+    type AuthenticateService = TonicAuthenticatePasswordService<'a>;
+    type ResponseEncoder = ProstAuthenticatePasswordResponseEncoder;
 
-    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
-        &self.check_nonce_infra
+    fn header_infra(&self) -> &Self::HeaderInfra {
+        &self.header_infra
     }
-    fn user_infra(&self) -> &Self::UserInfra {
-        &self.user_infra
+    fn token_infra(&self) -> &Self::TokenInfra {
+        &self.token_infra
     }
-    fn password_infra(&self) -> &Self::PasswordInfra {
-        &self.password_infra
+    fn request_decoder(&self) -> &Self::RequestDecoder {
+        &self.request_decoder
     }
-    fn messenger(&self) -> &Self::Messenger {
-        &self.messenger
+    fn authenticate_service(&self) -> &Self::AuthenticateService {
+        &self.authenticate_service
+    }
+    fn response_encoder(&self) -> &Self::ResponseEncoder {
+        &self.response_encoder
     }
 }
 
 #[cfg(test)]
 pub mod test {
-    pub use super::messenger::test::StaticAuthenticatePasswordMessenger;
+    pub use super::authenticate_service::test::StaticAuthenticatePasswordService;
+    pub use super::request_decoder::test::StaticAuthenticatePasswordRequestDecoder;
+    pub use super::response_encoder::test::StaticAuthenticatePasswordResponseEncoder;
 
-    use super::super::infra::AuthenticatePasswordInfra;
-    use crate::auth::{
-        auth_ticket::_api::kernel::init::test::StaticCheckAuthNonceStruct,
-        auth_user::_api::kernel::init::test::StaticAuthUserStruct,
-        password::_api::kernel::init::test::StaticAuthUserPasswordStruct,
+    use crate::auth::auth_ticket::_api::kernel::init::test::{
+        StaticAuthHeaderStruct, StaticAuthTokenStruct,
     };
 
-    pub struct StaticAuthenticatePasswordStruct<'a> {
-        pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
-        pub user_infra: StaticAuthUserStruct<'a>,
-        pub password_infra: StaticAuthUserPasswordStruct<'a>,
-        pub messenger: StaticAuthenticatePasswordMessenger,
+    use super::super::infra::AuthenticatePasswordInfra;
+
+    pub struct StaticAuthenticatePasswordStruct {
+        pub header_infra: StaticAuthHeaderStruct,
+        pub token_infra: StaticAuthTokenStruct,
+        pub request_decoder: StaticAuthenticatePasswordRequestDecoder,
+        pub authenticate_service: StaticAuthenticatePasswordService,
+        pub response_encoder: StaticAuthenticatePasswordResponseEncoder,
     }
 
-    impl<'a> AuthenticatePasswordInfra for StaticAuthenticatePasswordStruct<'a> {
-        type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
-        type UserInfra = StaticAuthUserStruct<'a>;
-        type PasswordInfra = StaticAuthUserPasswordStruct<'a>;
-        type Messenger = StaticAuthenticatePasswordMessenger;
+    impl AuthenticatePasswordInfra for StaticAuthenticatePasswordStruct {
+        type HeaderInfra = StaticAuthHeaderStruct;
+        type TokenInfra = StaticAuthTokenStruct;
+        type RequestDecoder = StaticAuthenticatePasswordRequestDecoder;
+        type AuthenticateService = StaticAuthenticatePasswordService;
+        type ResponseEncoder = StaticAuthenticatePasswordResponseEncoder;
 
-        fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
-            &self.check_nonce_infra
+        fn header_infra(&self) -> &Self::HeaderInfra {
+            &self.header_infra
         }
-        fn user_infra(&self) -> &Self::UserInfra {
-            &self.user_infra
+        fn token_infra(&self) -> &Self::TokenInfra {
+            &self.token_infra
         }
-        fn password_infra(&self) -> &Self::PasswordInfra {
-            &self.password_infra
+        fn request_decoder(&self) -> &Self::RequestDecoder {
+            &self.request_decoder
         }
-        fn messenger(&self) -> &Self::Messenger {
-            &self.messenger
+        fn authenticate_service(&self) -> &Self::AuthenticateService {
+            &self.authenticate_service
+        }
+        fn response_encoder(&self) -> &Self::ResponseEncoder {
+            &self.response_encoder
         }
     }
 }

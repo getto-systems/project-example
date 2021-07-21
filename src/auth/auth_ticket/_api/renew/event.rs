@@ -1,14 +1,14 @@
 use std::fmt::Display;
 
 use crate::{
-    auth::{_api::service::data::ServiceError, auth_ticket::_api::renew::data::AuthTokenMessage},
+    auth::{_api::service::data::ServiceError, auth_ticket::_api::kernel::data::AuthTokenMessage},
     z_details::_api::{message::data::MessageError, request::data::HeaderError},
 };
 
 pub enum RenewAuthTicketEvent {
     Success(AuthTokenMessage),
-    ServiceError(ServiceError),
     HeaderError(HeaderError),
+    ServiceError(ServiceError),
     MessageError(MessageError),
 }
 
@@ -19,8 +19,8 @@ impl Display for RenewAuthTicketEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Success(_) => write!(f, "{}", SUCCESS),
-            Self::ServiceError(err) => write!(f, "{}: {}", ERROR, err),
             Self::HeaderError(err) => write!(f, "{}: {}", ERROR, err),
+            Self::ServiceError(err) => write!(f, "{}: {}", ERROR, err),
             Self::MessageError(err) => write!(f, "{}: {}", ERROR, err),
         }
     }

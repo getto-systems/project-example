@@ -1,15 +1,20 @@
-use std::fmt::{Display, Formatter};
+use crate::auth::auth_ticket::_api::kernel::data::{AuthTokenMessage, AuthTokenMessageEncoded};
 
-pub enum AuthenticatePasswordResponse {
-    PasswordNotFound(String),
-    PasswordNotMatched(String),
+pub type AuthenticatePasswordMessage = AuthenticatePasswordResult<AuthTokenMessage>;
+pub type AuthenticatePasswordMessageEncoded = AuthenticatePasswordResult<AuthTokenMessageEncoded>;
+
+pub enum AuthenticatePasswordResult<T> {
+    Success(T),
+    InvalidPassword(String),
 }
 
-impl Display for AuthenticatePasswordResponse {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl<T> AuthenticatePasswordResult<T> {
+    pub fn map<M>(self, mapper: impl Fn(T) -> M) -> AuthenticatePasswordResult<M> {
         match self {
-            Self::PasswordNotFound(_) => write!(f, "password not found"),
-            Self::PasswordNotMatched(_) => write!(f, "password not matched"),
+            Self::InvalidPassword(response) => {
+                AuthenticatePasswordResult::InvalidPassword(response)
+            }
+            Self::Success(response) => AuthenticatePasswordResult::Success(mapper(response)),
         }
     }
 }

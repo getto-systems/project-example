@@ -5,10 +5,11 @@ use getto_application_test::ActionTestRunner;
 use crate::auth::{
     auth_ticket::_api::{
         kernel::init::test::{
-            StaticAuthHeaderStruct, StaticAuthNonceHeader, StaticAuthTokenHeader,
+            StaticAuthHeaderStruct, StaticAuthNonceHeader, StaticAuthTokenMessenger,
+            StaticAuthTokenHeader, StaticAuthTokenStruct,
         },
         renew::init::test::{
-            StaticRenewAuthTicketMessenger, StaticRenewAuthTicketService,
+            StaticRenewAuthTicketResponseEncoder, StaticRenewAuthTicketService,
             StaticRenewAuthTicketStruct,
         },
     },
@@ -50,10 +51,13 @@ impl TestFeature {
         Self {
             renew: StaticRenewAuthTicketStruct {
                 header_infra: standard_header_infra(),
+                token_infra: StaticAuthTokenStruct {
+                    token_messenger: StaticAuthTokenMessenger,
+                },
                 renew_service: StaticRenewAuthTicketService {
                     user: standard_user(),
                 },
-                messenger: StaticRenewAuthTicketMessenger,
+                response_encoder: StaticRenewAuthTicketResponseEncoder,
             },
         }
     }

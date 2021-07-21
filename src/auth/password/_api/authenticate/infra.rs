@@ -1,58 +1,60 @@
-use crate::auth::{
-    auth_ticket::_api::kernel::infra::CheckAuthNonceInfra,
-    auth_user::_api::kernel::infra::AuthUserInfra,
-    password::_api::kernel::infra::{AuthUserPasswordInfra, VerifyPasswordError},
+use crate::auth::auth_ticket::_api::kernel::infra::{AuthHeaderInfra, AuthTokenInfra};
+
+use crate::{
+    auth::{
+        _api::service::data::ServiceError,
+        auth_ticket::{
+            _api::kernel::data::{AuthNonceValue, AuthTokenValue},
+            _common::encode::data::EncodeAuthTicketResponse,
+        },
+        password::_api::authenticate::data::AuthenticatePasswordMessageEncoded,
+    },
+    z_details::_api::message::data::MessageError,
 };
 
-use crate::auth::password::_api::authenticate::event::AuthenticatePasswordEvent;
-
-use crate::auth::password::_api::authenticate::data::AuthenticatePasswordResponse;
-use crate::z_details::_api::message::data::MessageError;
-
 pub trait AuthenticatePasswordInfra {
-    type CheckNonceInfra: CheckAuthNonceInfra;
-    type UserInfra: AuthUserInfra;
-    type PasswordInfra: AuthUserPasswordInfra;
-    // TODO Messenger と RequestDecoder に分けたい
-    type Messenger: AuthenticatePasswordMessenger;
+    type HeaderInfra: AuthHeaderInfra;
+    type TokenInfra: AuthTokenInfra;
+    type RequestDecoder: AuthenticatePasswordRequestDecoder;
+    type AuthenticateService: AuthenticatePasswordService;
+    type ResponseEncoder: AuthenticatePasswordResponseEncoder;
 
-    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
-    fn user_infra(&self) -> &Self::UserInfra;
-    fn password_infra(&self) -> &Self::PasswordInfra;
-    fn messenger(&self) -> &Self::Messenger;
+    fn header_infra(&self) -> &Self::HeaderInfra;
+    fn token_infra(&self) -> &Self::TokenInfra;
+    fn request_decoder(&self) -> &Self::RequestDecoder;
+    fn authenticate_service(&self) -> &Self::AuthenticateService;
+    fn response_encoder(&self) -> &Self::ResponseEncoder;
 }
 
-pub trait AuthenticatePasswordMessenger {
+pub trait AuthenticatePasswordRequestDecoder {
     fn decode(&self) -> Result<AuthenticatePasswordFieldsExtract, MessageError>;
-    fn encode_password_not_found(&self) -> Result<AuthenticatePasswordResponse, MessageError>;
-    fn encode_password_not_matched(&self) -> Result<AuthenticatePasswordResponse, MessageError>;
 }
 
+// TODO common にするべき
 #[derive(Clone)]
 pub struct AuthenticatePasswordFieldsExtract {
     pub login_id: String,
     pub password: String,
 }
 
-impl VerifyPasswordError {
-    pub fn into_authenticate_password_event(
-        self,
-        messenger: &impl AuthenticatePasswordMessenger,
-    ) -> AuthenticatePasswordEvent {
-        match self {
-            Self::PasswordHashError(err) => AuthenticatePasswordEvent::PasswordHashError(err),
-            Self::RepositoryError(err) => AuthenticatePasswordEvent::RepositoryError(err),
-            Self::PasswordNotFound => messenger.encode_password_not_found().into(),
-            Self::PasswordNotMatched => messenger.encode_password_not_matched().into(),
-        }
-    }
+#[async_trait::async_trait]
+pub trait AuthenticatePasswordService {
+    async fn authenticate(
+        &self,
+        nonce: AuthNonceValue,
+        token: AuthTokenValue,
+        fields: AuthenticatePasswordFieldsExtract,
+    ) -> Result<AuthenticatePasswordResponse, ServiceError>;
 }
 
-impl Into<AuthenticatePasswordEvent> for Result<AuthenticatePasswordResponse, MessageError> {
-    fn into(self) -> AuthenticatePasswordEvent {
-        match self {
-            Ok(response) => AuthenticatePasswordEvent::InvalidPassword(response),
-            Err(err) => AuthenticatePasswordEvent::MessageError(err),
-        }
-    }
+pub enum AuthenticatePasswordResponse {
+    Success(EncodeAuthTicketResponse),
+    InvalidPassword,
+}
+
+pub trait AuthenticatePasswordResponseEncoder {
+    fn encode(
+        &self,
+        response: AuthenticatePasswordResponse,
+    ) -> Result<AuthenticatePasswordMessageEncoded, MessageError>;
 }

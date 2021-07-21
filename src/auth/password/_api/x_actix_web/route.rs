@@ -21,8 +21,9 @@ pub fn scope_password() -> Scope {
 
 #[post("/authenticate")]
 async fn authenticate(data: AppData, request: HttpRequest, body: String) -> impl Responder {
-    let logger = app_logger(generate_request_id(), &request);
-    let mut action = AuthenticatePasswordAction::new(&data.auth, &request, body);
+    let request_id = generate_request_id();
+    let logger = app_logger(request_id.clone(), &request);
+    let mut action = AuthenticatePasswordAction::new(&data.auth, &request_id, &request, body);
     action.subscribe(move |state| logger.log(state.log_level(), state));
     flatten(action.ignite().await).respond_to(&request)
 }
