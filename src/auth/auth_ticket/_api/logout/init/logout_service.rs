@@ -43,7 +43,8 @@ impl<'a> LogoutService for TonicLogoutService<'a> {
         let mut request = Request::new(LogoutRequestPb {});
         set_metadata(&mut request, self.request_id, nonce, token)?;
 
-        client.logout(request).await.map_err(Into::into).map(|_| ())
+        client.logout(request).await.map_err(ServiceError::from)?;
+        Ok(())
     }
 }
 

@@ -46,14 +46,9 @@ impl<'a> RenewAuthTicketService for TonicRenewAuthTicketService<'a> {
         let mut request = Request::new(RenewAuthTicketRequestPb {});
         set_metadata(&mut request, self.request_id, nonce, token)?;
 
-        client
-            .renew(request)
-            .await
-            .map_err(Into::into)
-            .and_then(|response| {
-                let response: Option<EncodeAuthTicketResponse> = response.into_inner().into();
-                response.ok_or_else(|| ServiceError::InfraError("failed to decode response".into()))
-            })
+        let response = client.renew(request).await.map_err(ServiceError::from)?;
+        let response: Option<EncodeAuthTicketResponse> = response.into_inner().into();
+        response.ok_or(ServiceError::InfraError("failed to decode response".into()))
     }
 }
 

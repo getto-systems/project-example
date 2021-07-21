@@ -2,13 +2,17 @@ mod clock;
 mod nonce_header;
 mod nonce_repository;
 mod ticket_repository;
+mod token_messenger;
 mod token_header;
 
 use actix_web::HttpRequest;
 
 use crate::auth::{
     _api::x_outside_feature::feature::AuthOutsideFeature,
-    auth_ticket::_api::kernel::infra::AuthHeaderInfra,
+    auth_ticket::_api::kernel::{
+        infra::{AuthHeaderInfra, AuthTokenInfra},
+        init::token_messenger::CookieAuthTokenMessenger,
+    },
 };
 
 use clock::ChronoAuthClock;
@@ -44,6 +48,26 @@ impl<'a> AuthHeaderInfra for TicketAuthHeaderStruct<'a> {
     }
     fn token_header(&self) -> &Self::TokenHeader {
         &self.token_header
+    }
+}
+
+pub struct AuthTokenStruct<'a> {
+    token_messenger: CookieAuthTokenMessenger<'a>,
+}
+
+impl<'a> AuthTokenStruct<'a> {
+    pub const fn new(feature: &'a AuthOutsideFeature) -> Self {
+        Self {
+            token_messenger: CookieAuthTokenMessenger::new(&feature.cookie),
+        }
+    }
+}
+
+impl<'a> AuthTokenInfra for AuthTokenStruct<'a> {
+    type TokenMessenger = CookieAuthTokenMessenger<'a>;
+
+    fn token_messenger(&self) -> &Self::TokenMessenger {
+        &self.token_messenger
     }
 }
 
@@ -125,11 +149,13 @@ pub mod test {
     pub use super::ticket_repository::test::{
         MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
     };
+    pub use super::token_messenger::test::StaticAuthTokenMessenger;
     pub use super::token_header::test::StaticAuthTokenHeader;
 
     use crate::auth::auth_ticket::_api::kernel::infra::{
-        AuthHeaderInfra, AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
+        AuthHeaderInfra, AuthNonceConfig, AuthTicketInfra, AuthTokenInfra, CheckAuthNonceInfra,
     };
+    use crate::auth::auth_ticket::_api::validate::infra::ValidateAuthTokenInfra;
 
     pub struct StaticAuthHeaderStruct {
         pub nonce_header: StaticAuthNonceHeader,
@@ -145,6 +171,18 @@ pub mod test {
         }
         fn token_header(&self) -> &Self::TokenHeader {
             &self.token_header
+        }
+    }
+
+    pub struct StaticAuthTokenStruct {
+        pub token_messenger: StaticAuthTokenMessenger,
+    }
+
+    impl AuthTokenInfra for StaticAuthTokenStruct {
+        type TokenMessenger = StaticAuthTokenMessenger;
+
+        fn token_messenger(&self) -> &Self::TokenMessenger {
+            &self.token_messenger
         }
     }
 

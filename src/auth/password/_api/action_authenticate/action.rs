@@ -2,45 +2,27 @@ use std::fmt::Display;
 
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::{
-    auth_ticket::_api::{
-        encode::{
-            event::EncodeAuthTicketEvent, infra::EncodeAuthTicketInfra, method::encode_auth_ticket,
-        },
-        issue::{
-            event::IssueAuthTicketEvent, infra::IssueAuthTicketInfra, method::issue_auth_ticket,
-        },
-    },
-    password::_api::authenticate::{
-        event::AuthenticatePasswordEvent, infra::AuthenticatePasswordInfra,
-        method::authenticate_password,
-    },
+use crate::auth::password::_api::authenticate::{
+    event::AuthenticatePasswordEvent, infra::AuthenticatePasswordInfra,
+    method::authenticate_password,
 };
 
 pub enum AuthenticatePasswordState {
     Authenticate(AuthenticatePasswordEvent),
-    Issue(IssueAuthTicketEvent),
-    Encode(EncodeAuthTicketEvent),
 }
 
 impl Display for AuthenticatePasswordState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Authenticate(event) => write!(f, "{}", event),
-            Self::Issue(event) => write!(f, "{}", event),
-            Self::Encode(event) => write!(f, "{}", event),
         }
     }
 }
 
 pub trait AuthenticatePasswordMaterial {
     type Authenticate: AuthenticatePasswordInfra;
-    type Issue: IssueAuthTicketInfra;
-    type Encode: EncodeAuthTicketInfra;
 
     fn authenticate(&self) -> &Self::Authenticate;
-    fn issue(&self) -> &Self::Issue;
-    fn encode(&self) -> &Self::Encode;
 }
 
 pub struct AuthenticatePasswordAction<M: AuthenticatePasswordMaterial> {
@@ -56,7 +38,10 @@ impl<M: AuthenticatePasswordMaterial> AuthenticatePasswordAction<M> {
         }
     }
 
-    pub fn subscribe(&mut self, handler: impl 'static + Fn(&AuthenticatePasswordState) + Send + Sync) {
+    pub fn subscribe(
+        &mut self,
+        handler: impl 'static + Fn(&AuthenticatePasswordState) + Send + Sync,
+    ) {
         self.pubsub.subscribe(handler);
     }
 
@@ -64,18 +49,8 @@ impl<M: AuthenticatePasswordMaterial> AuthenticatePasswordAction<M> {
         let pubsub = self.pubsub;
         let m = self.material;
 
-        let user = authenticate_password(m.authenticate(), |event| {
+        authenticate_password(m.authenticate(), |event| {
             pubsub.post(AuthenticatePasswordState::Authenticate(event))
-        })
-        .await?;
-
-        let ticket = issue_auth_ticket(m.issue(), user, |event| {
-            pubsub.post(AuthenticatePasswordState::Issue(event))
-        })
-        .await?;
-
-        encode_auth_ticket(m.encode(), ticket, |event| {
-            pubsub.post(AuthenticatePasswordState::Encode(event))
         })
         .await
     }

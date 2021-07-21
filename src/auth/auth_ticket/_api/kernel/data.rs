@@ -7,11 +7,24 @@ use std::{
 use chrono::{DateTime, Duration, Utc};
 
 use crate::{
-    auth::auth_user::_common::kernel::data::{
-        AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
+    auth::{
+        auth_ticket::_common::kernel::data::AuthTokenEncoded,
+        auth_user::_common::kernel::data::{
+            AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
+        },
     },
     z_details::{_api::request::data::HeaderError, _common::repository::data::RepositoryError},
 };
+
+pub struct AuthTokenMessage {
+    pub domain: String,
+    pub message: AuthTokenMessageEncoded,
+}
+
+pub struct AuthTokenMessageEncoded {
+    pub message: String,
+    pub token: AuthTokenEncoded,
+}
 
 #[derive(Clone)]
 pub struct AuthNonceValue(String);

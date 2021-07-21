@@ -1,8 +1,10 @@
 use getto_application::data::MethodResult;
 
 use crate::auth::auth_ticket::_api::{
-    kernel::infra::{AuthHeaderInfra, AuthNonceHeader, AuthTokenHeader},
-    renew::infra::{RenewAuthTicketInfra, RenewAuthTicketService, RenewAuthTicketMessenger},
+    kernel::infra::{
+        AuthHeaderInfra, AuthNonceHeader, AuthTokenHeader, AuthTokenInfra, AuthTokenMessenger,
+    },
+    renew::infra::{RenewAuthTicketInfra, RenewAuthTicketResponseEncoder, RenewAuthTicketService},
 };
 
 use super::event::RenewAuthTicketEvent;
@@ -15,7 +17,9 @@ pub async fn renew<S>(
     let nonce_header = header_infra.nonce_header();
     let token_header = header_infra.token_header();
     let renew_service = infra.renew_service();
-    let messenger = infra.messenger();
+    let token_infra = infra.token_infra();
+    let token_messenger = token_infra.token_messenger();
+    let response_encoder = infra.response_encoder();
 
     let nonce = nonce_header
         .nonce()
@@ -30,9 +34,11 @@ pub async fn renew<S>(
         .await
         .map_err(|err| post(RenewAuthTicketEvent::ServiceError(err)))?;
 
-    let message = messenger
+    let message = response_encoder
         .encode(response)
         .map_err(|err| post(RenewAuthTicketEvent::MessageError(err)))?;
+
+    let message = token_messenger.to_message(message);
 
     Ok(post(RenewAuthTicketEvent::Success(message)))
 }
