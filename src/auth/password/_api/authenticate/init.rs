@@ -6,12 +6,10 @@ use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::password::_api::authenticate::init::response_encoder::ProstAuthenticatePasswordResponseEncoder;
-use crate::auth::{
-    auth_ticket::_api::kernel::init::{AuthTokenStruct, TicketAuthHeaderStruct},
-    password::_api::authenticate::init::authenticate_service::TonicAuthenticatePasswordService,
-};
+use crate::auth::auth_ticket::_api::kernel::init::{AuthTokenStruct, TicketAuthHeaderStruct};
+use authenticate_service::TonicAuthenticatePasswordService;
 use request_decoder::ProtobufAuthenticatePasswordRequestDecoder;
+use response_encoder::ProstAuthenticatePasswordResponseEncoder;
 
 use super::infra::AuthenticatePasswordInfra;
 

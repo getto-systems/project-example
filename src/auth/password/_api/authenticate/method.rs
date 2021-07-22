@@ -49,5 +49,5 @@ pub async fn authenticate_password<S>(
 
     let message = message.map(|message| token_messenger.to_message(message));
 
-    Ok(post(AuthenticatePasswordEvent::Success(message)))
+    Ok(post(AuthenticatePasswordEvent::Result(message)))
 }
