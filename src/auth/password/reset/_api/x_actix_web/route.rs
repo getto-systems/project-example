@@ -29,8 +29,9 @@ async fn request_token(data: AppData, request: HttpRequest, body: String) -> imp
 
 #[post("")]
 async fn reset(data: AppData, request: HttpRequest, body: String) -> impl Responder {
-    let logger = app_logger(generate_request_id(), &request);
-    let mut action = ResetPasswordAction::new(&data.auth, &request, body);
+    let request_id = generate_request_id();
+    let logger = app_logger(request_id.clone(), &request);
+    let mut action = ResetPasswordAction::new(&data.auth, &request_id, &request, body);
     action.subscribe(move |state| logger.log(state.log_level(), state));
     flatten(action.ignite().await).respond_to(&request)
 }

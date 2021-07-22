@@ -1,48 +1,36 @@
-use crate::auth::{
-    auth_ticket::_api::kernel::infra::CheckAuthNonceInfra,
-    auth_user::_api::kernel::infra::AuthUserInfra,
-    password::_api::kernel::infra::{
-        AuthUserPasswordInfra, ResetPasswordError, VerifyResetTokenEntryError,
-    },
-};
+use crate::auth::auth_ticket::_api::kernel::infra::{AuthHeaderInfra, AuthTokenInfra};
 
-use crate::auth::password::reset::_api::reset::event::ResetPasswordEvent;
-
-use crate::auth::password::{
-    _api::kernel::data::ResetToken,
-    reset::_api::{
-        kernel::data::ResetTokenEncoded,
-        reset::data::{DecodeResetTokenError, ResetPasswordResponse},
+use crate::{
+    auth::{
+        _api::service::data::ServiceError,
+        auth_ticket::{
+            _api::kernel::data::{AuthNonceValue, AuthTokenValue},
+            _common::encode::data::EncodeAuthTicketResponse,
+        },
+        password::reset::_api::reset::data::ResetPasswordMessageEncoded,
     },
+    z_details::_api::message::data::MessageError,
 };
-use crate::z_details::_api::message::data::MessageError;
 
 pub trait ResetPasswordInfra {
-    type CheckNonceInfra: CheckAuthNonceInfra;
-    type UserInfra: AuthUserInfra;
-    type PasswordInfra: AuthUserPasswordInfra;
-    type TokenDecoder: ResetTokenDecoder;
-    type Messenger: ResetPasswordMessenger;
+    type HeaderInfra: AuthHeaderInfra;
+    type TokenInfra: AuthTokenInfra;
+    type RequestDecoder: ResetPasswordRequestDecoder;
+    type ResetService: ResetPasswordService;
+    type ResponseEncoder: ResetPasswordResponseEncoder;
 
-    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
-    fn user_infra(&self) -> &Self::UserInfra;
-    fn password_infra(&self) -> &Self::PasswordInfra;
-    fn token_decoder(&self) -> &Self::TokenDecoder;
-    fn messenger(&self) -> &Self::Messenger;
+    fn header_infra(&self) -> &Self::HeaderInfra;
+    fn token_infra(&self) -> &Self::TokenInfra;
+    fn request_decoder(&self) -> &Self::RequestDecoder;
+    fn reset_service(&self) -> &Self::ResetService;
+    fn response_encoder(&self) -> &Self::ResponseEncoder;
 }
 
-pub trait ResetTokenDecoder {
-    fn decode(&self, token: &ResetTokenEncoded) -> Result<ResetToken, DecodeResetTokenError>;
-}
-
-pub trait ResetPasswordMessenger {
+pub trait ResetPasswordRequestDecoder {
     fn decode(&self) -> Result<ResetPasswordFieldsExtract, MessageError>;
-    fn encode_not_found(&self) -> Result<ResetPasswordResponse, MessageError>;
-    fn encode_already_reset(&self) -> Result<ResetPasswordResponse, MessageError>;
-    fn encode_expired(&self) -> Result<ResetPasswordResponse, MessageError>;
-    fn encode_invalid_login_id(&self) -> Result<ResetPasswordResponse, MessageError>;
 }
 
+// TODO common にするべき
 #[derive(Clone)]
 pub struct ResetPasswordFieldsExtract {
     pub login_id: String,
@@ -50,34 +38,25 @@ pub struct ResetPasswordFieldsExtract {
     pub reset_token: String,
 }
 
-impl Into<ResetPasswordEvent> for ResetPasswordError {
-    fn into(self) -> ResetPasswordEvent {
-        match self {
-            Self::RepositoryError(err) => ResetPasswordEvent::RepositoryError(err),
-            Self::PasswordHashError(err) => ResetPasswordEvent::PasswordHashError(err),
-        }
-    }
+#[async_trait::async_trait]
+pub trait ResetPasswordService {
+    async fn reset(
+        &self,
+        nonce: AuthNonceValue,
+        token: AuthTokenValue,
+        fields: ResetPasswordFieldsExtract,
+    ) -> Result<ResetPasswordResponse, ServiceError>;
 }
 
-impl VerifyResetTokenEntryError {
-    pub fn into_reset_password_event(
-        self,
-        messenger: &impl ResetPasswordMessenger,
-    ) -> ResetPasswordEvent {
-        match self {
-            Self::NotFound => messenger.encode_not_found().into(),
-            Self::AlreadyReset => messenger.encode_already_reset().into(),
-            Self::Expired => messenger.encode_expired().into(),
-            Self::InvalidLoginId => messenger.encode_invalid_login_id().into(),
-        }
-    }
+pub enum ResetPasswordResponse {
+    Success(EncodeAuthTicketResponse),
+    InvalidReset,
+    AlreadyReset,
 }
 
-impl Into<ResetPasswordEvent> for Result<ResetPasswordResponse, MessageError> {
-    fn into(self) -> ResetPasswordEvent {
-        match self {
-            Ok(response) => ResetPasswordEvent::InvalidReset(response),
-            Err(err) => ResetPasswordEvent::MessageError(err),
-        }
-    }
+pub trait ResetPasswordResponseEncoder {
+    fn encode(
+        &self,
+        response: ResetPasswordResponse,
+    ) -> Result<ResetPasswordMessageEncoded, MessageError>;
 }

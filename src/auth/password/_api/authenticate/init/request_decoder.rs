@@ -10,17 +10,17 @@ use crate::auth::password::_api::authenticate::infra::{
 
 use crate::z_details::_api::message::data::MessageError;
 
-pub struct ProtobufAuthenticatePasswordRequestDecoder {
+pub struct ProstAuthenticatePasswordRequestDecoder {
     body: String,
 }
 
-impl ProtobufAuthenticatePasswordRequestDecoder {
+impl ProstAuthenticatePasswordRequestDecoder {
     pub const fn new(body: String) -> Self {
         Self { body }
     }
 }
 
-impl AuthenticatePasswordRequestDecoder for ProtobufAuthenticatePasswordRequestDecoder {
+impl AuthenticatePasswordRequestDecoder for ProstAuthenticatePasswordRequestDecoder {
     fn decode(&self) -> Result<AuthenticatePasswordFieldsExtract, MessageError> {
         // TODO body は clone したくない
         let message = AuthenticatePasswordPb::decode(decode_base64(self.body.clone())?)

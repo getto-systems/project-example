@@ -1,38 +1,20 @@
-use std::{
-    error::Error,
-    fmt::{Display, Formatter},
-};
+use crate::auth::auth_ticket::_api::kernel::data::{AuthTokenMessage, AuthTokenMessageEncoded};
 
-pub enum ResetPasswordResponse {
-    NotFound(String),
+pub type ResetPasswordMessage = ResetPasswordResult<AuthTokenMessage>;
+pub type ResetPasswordMessageEncoded = ResetPasswordResult<AuthTokenMessageEncoded>;
+
+pub enum ResetPasswordResult<T> {
+    Success(T),
+    InvalidReset(String),
     AlreadyReset(String),
-    Expired(String),
-    InvalidLoginId(String),
 }
 
-impl Display for ResetPasswordResponse {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl<T> ResetPasswordResult<T> {
+    pub fn map<M>(self, mapper: impl Fn(T) -> M) -> ResetPasswordResult<M> {
         match self {
-            Self::NotFound(_) => write!(f, "reset token not found"),
-            Self::AlreadyReset(_) => write!(f, "already reset"),
-            Self::Expired(_) => write!(f, "reset token expired"),
-            Self::InvalidLoginId(_) => write!(f, "invalid login id"),
+            Self::InvalidReset(response) => ResetPasswordResult::InvalidReset(response),
+            Self::AlreadyReset(response) => ResetPasswordResult::AlreadyReset(response),
+            Self::Success(response) => ResetPasswordResult::Success(mapper(response)),
         }
     }
 }
-
-#[derive(Debug)]
-pub enum DecodeResetTokenError {
-    Expired,
-    Invalid(String),
-}
-
-impl Display for DecodeResetTokenError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        match self {
-            Self::Expired => write!(f, "reset token expired"),
-            Self::Invalid(err) => write!(f, "decode error; {}", err),
-        }
-    }
-}
-impl Error for DecodeResetTokenError {}
