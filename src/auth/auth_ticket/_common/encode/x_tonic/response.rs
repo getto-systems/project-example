@@ -1,5 +1,6 @@
 use tonic::{Response, Status};
 
+use crate::auth::password::reset::_common::y_protobuf::service::ResetPasswordResponsePb;
 use crate::auth::{
     auth_ticket::_common::y_protobuf::service::RenewAuthTicketResponsePb,
     password::_common::y_protobuf::service::AuthenticatePasswordResponsePb,
@@ -31,6 +32,18 @@ impl RespondTo<AuthenticatePasswordResponsePb> for EncodeAuthTicketResponse {
             success: true,
             user: Some(user.into()),
             token: Some(token.into()),
+        }))
+    }
+}
+
+impl RespondTo<ResetPasswordResponsePb> for EncodeAuthTicketResponse {
+    fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
+        let (user, token) = self.extract();
+        Ok(Response::new(ResetPasswordResponsePb {
+            success: true,
+            user: Some(user.into()),
+            token: Some(token.into()),
+            ..Default::default()
         }))
     }
 }

@@ -12,7 +12,7 @@ impl AuthServer {
     pub const fn new() -> Self {
         Self {
             auth_ticket: AuthTicketServer,
-            password: PasswordServer,
+            password: PasswordServer::new(),
         }
     }
 }

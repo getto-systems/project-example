@@ -4,17 +4,17 @@ use crate::auth::password::_auth::authenticate::infra::{
     AuthenticatePasswordFieldsExtract, AuthenticatePasswordRequestDecoder,
 };
 
-pub struct TonicAuthenticatePasswordRequestDecoder {
+pub struct PbAuthenticatePasswordRequestDecoder {
     request: AuthenticatePasswordRequestPb,
 }
 
-impl TonicAuthenticatePasswordRequestDecoder {
+impl PbAuthenticatePasswordRequestDecoder {
     pub const fn new(request: AuthenticatePasswordRequestPb) -> Self {
         Self { request }
     }
 }
 
-impl AuthenticatePasswordRequestDecoder for TonicAuthenticatePasswordRequestDecoder {
+impl AuthenticatePasswordRequestDecoder for PbAuthenticatePasswordRequestDecoder {
     fn decode(self) -> AuthenticatePasswordFieldsExtract {
         self.request.into()
     }

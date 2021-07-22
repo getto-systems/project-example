@@ -2,7 +2,10 @@ use tonic::{Response, Status};
 
 use crate::auth::{
     auth_ticket::_common::y_protobuf::service::RenewAuthTicketResponsePb,
-    password::_common::y_protobuf::service::AuthenticatePasswordResponsePb,
+    password::{
+        _common::y_protobuf::service::AuthenticatePasswordResponsePb,
+        reset::_common::y_protobuf::service::ResetPasswordResponsePb,
+    },
 };
 
 use crate::z_details::_common::response::tonic::RespondTo;
@@ -25,6 +28,18 @@ impl RespondTo<RenewAuthTicketResponsePb> for EncodeAuthTicketEvent {
 
 impl RespondTo<AuthenticatePasswordResponsePb> for EncodeAuthTicketEvent {
     fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
+        match self {
+            Self::TokenExpiresCalculated(_) => token_expires_calculated(),
+            Self::Success(response) => response.respond_to(),
+            Self::TicketNotFound => ticket_not_found(),
+            Self::RepositoryError(err) => err.respond_to(),
+            Self::EncodeError(err) => err.respond_to(),
+        }
+    }
+}
+
+impl RespondTo<ResetPasswordResponsePb> for EncodeAuthTicketEvent {
+    fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
         match self {
             Self::TokenExpiresCalculated(_) => token_expires_calculated(),
             Self::Success(response) => response.respond_to(),

@@ -22,6 +22,41 @@ impl ResetToken {
     }
 }
 
+pub enum VerifyResetTokenEntryError {
+    ResetTokenEntryNotFound,
+    LoginIdNotMatched,
+    Expired,
+    AlreadyReset,
+}
+
+impl Display for VerifyResetTokenEntryError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::ResetTokenEntryNotFound => write!(f, "reset token entry not found"),
+            Self::LoginIdNotMatched => write!(f, "login id not matched"),
+            Self::Expired => write!(f, "reset token expired"),
+            Self::AlreadyReset => write!(f, "already reset"),
+        }
+    }
+}
+
+pub enum VerifyPasswordError {
+    PasswordHashError(PasswordHashError),
+    RepositoryError(RepositoryError),
+    PasswordNotFound,
+    PasswordNotMatched,
+}
+
+pub enum RegisterResetTokenError {
+    RepositoryError(RepositoryError),
+    UserNotFound,
+}
+
+pub enum PasswordHashRepositoryError {
+    RepositoryError(RepositoryError),
+    PasswordHashError(PasswordHashError),
+}
+
 #[derive(Debug)]
 pub enum ValidatePasswordError {
     Empty,
@@ -37,13 +72,6 @@ impl Display for ValidatePasswordError {
     }
 }
 impl Error for ValidatePasswordError {}
-
-pub enum VerifyPasswordError {
-    PasswordHashError(PasswordHashError),
-    RepositoryError(RepositoryError),
-    PasswordNotFound,
-    PasswordNotMatched,
-}
 
 #[derive(Debug)]
 pub enum PasswordHashError {
