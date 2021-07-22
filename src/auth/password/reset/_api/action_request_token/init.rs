@@ -7,8 +7,13 @@ use crate::auth::password::reset::_api::request_token::init::RequestResetTokenSt
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 
 impl<'a> RequestResetTokenAction<RequestResetTokenFeature<'a>> {
-    pub fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest, body: String) -> Self {
-        Self::with_material(RequestResetTokenFeature::new(feature, request, body))
+    pub fn new(
+        feature: &'a AuthOutsideFeature,
+        request_id: &'a str,
+        request: &'a HttpRequest,
+        body: String,
+    ) -> Self {
+        Self::with_material(RequestResetTokenFeature::new(feature, request_id, request, body))
     }
 }
 
@@ -17,9 +22,14 @@ pub struct RequestResetTokenFeature<'a> {
 }
 
 impl<'a> RequestResetTokenFeature<'a> {
-    fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest, body: String) -> Self {
+    fn new(
+        feature: &'a AuthOutsideFeature,
+        request_id: &'a str,
+        request: &'a HttpRequest,
+        body: String,
+    ) -> Self {
         Self {
-            request_token: RequestResetTokenStruct::new(feature, request, body),
+            request_token: RequestResetTokenStruct::new(feature, request_id, request, body),
         }
     }
 }

@@ -1,148 +1,95 @@
-mod destination_repository;
-mod messenger;
-mod token_encoder;
-mod token_generator;
-mod token_notifier;
+mod request_decoder;
+mod request_token_service;
+mod response_encoder;
 
 use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::{
-    auth_ticket::_api::kernel::init::CheckAuthNonceStruct,
-    password::_api::kernel::init::AuthUserPasswordStruct,
-};
-use destination_repository::MysqlResetTokenDestinationRepository;
-use messenger::ProtobufRequestResetTokenMessenger;
-use token_encoder::JwtResetTokenEncoder;
-use token_generator::UuidResetTokenGenerator;
-use token_notifier::EmailResetTokenNotifier;
+use crate::auth::auth_ticket::_api::kernel::init::TicketAuthHeaderStruct;
+use request_decoder::ProtobufRequestResetTokenRequestDecoder;
+use request_token_service::TonicRequestResetTokenService;
+use response_encoder::ProstRequestResetTokenResponseEncoder;
 
-use super::infra::{RequestResetTokenConfig, RequestResetTokenInfra};
+use super::infra::RequestResetTokenInfra;
 
 pub struct RequestResetTokenStruct<'a> {
-    check_nonce_infra: CheckAuthNonceStruct<'a>,
-    password_infra: AuthUserPasswordStruct<'a>,
-    destination_repository: MysqlResetTokenDestinationRepository<'a>,
-    token_generator: UuidResetTokenGenerator,
-    token_encoder: JwtResetTokenEncoder<'a>,
-    token_notifier: EmailResetTokenNotifier<'a>,
-    messenger: ProtobufRequestResetTokenMessenger,
-    config: RequestResetTokenConfig,
+    header_infra: TicketAuthHeaderStruct<'a>,
+    request_decoder: ProtobufRequestResetTokenRequestDecoder,
+    request_token_service: TonicRequestResetTokenService<'a>,
+    response_encoder: ProstRequestResetTokenResponseEncoder,
 }
 
 impl<'a> RequestResetTokenStruct<'a> {
-    pub fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest, body: String) -> Self {
+    pub fn new(
+        feature: &'a AuthOutsideFeature,
+        request_id: &'a str,
+        request: &'a HttpRequest,
+        body: String,
+    ) -> Self {
         Self {
-            check_nonce_infra: CheckAuthNonceStruct::new(feature, request),
-            password_infra: AuthUserPasswordStruct::new(feature),
-            destination_repository: MysqlResetTokenDestinationRepository::new(&feature.store.mysql),
-            token_generator: UuidResetTokenGenerator::new(),
-            token_encoder: JwtResetTokenEncoder::new(&feature.secret.reset_token.encoding_key),
-            token_notifier: EmailResetTokenNotifier::new(&feature.email),
-            messenger: ProtobufRequestResetTokenMessenger::new(body),
-            config: RequestResetTokenConfig {
-                token_expires: feature.config.reset_token_expires,
-            },
+            header_infra: TicketAuthHeaderStruct::new(request),
+            request_decoder: ProtobufRequestResetTokenRequestDecoder::new(body),
+            request_token_service: TonicRequestResetTokenService::new(&feature.service, request_id),
+            response_encoder: ProstRequestResetTokenResponseEncoder,
         }
     }
 }
 
 impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
-    type CheckNonceInfra = CheckAuthNonceStruct<'a>;
-    type PasswordInfra = AuthUserPasswordStruct<'a>;
-    type DestinationRepository = MysqlResetTokenDestinationRepository<'a>;
-    type TokenGenerator = UuidResetTokenGenerator;
-    type TokenEncoder = JwtResetTokenEncoder<'a>;
-    type TokenNotifier = EmailResetTokenNotifier<'a>;
-    type Messenger = ProtobufRequestResetTokenMessenger;
+    type HeaderInfra = TicketAuthHeaderStruct<'a>;
+    type RequestDecoder = ProtobufRequestResetTokenRequestDecoder;
+    type RequestTokenService = TonicRequestResetTokenService<'a>;
+    type ResponseEncoder = ProstRequestResetTokenResponseEncoder;
 
-    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
-        &self.check_nonce_infra
+    fn header_infra(&self) -> &Self::HeaderInfra {
+        &self.header_infra
     }
-    fn password_infra(&self) -> &Self::PasswordInfra {
-        &self.password_infra
+    fn request_decoder(&self) -> &Self::RequestDecoder {
+        &self.request_decoder
     }
-    fn destination_repository(&self) -> &Self::DestinationRepository {
-        &self.destination_repository
+    fn request_token_service(&self) -> &Self::RequestTokenService {
+        &self.request_token_service
     }
-    fn token_generator(&self) -> &Self::TokenGenerator {
-        &self.token_generator
-    }
-    fn token_encoder(&self) -> &Self::TokenEncoder {
-        &self.token_encoder
-    }
-    fn token_notifier(&self) -> &Self::TokenNotifier {
-        &self.token_notifier
-    }
-    fn messenger(&self) -> &Self::Messenger {
-        &self.messenger
-    }
-    fn config(&self) -> &RequestResetTokenConfig {
-        &self.config
+    fn response_encoder(&self) -> &Self::ResponseEncoder {
+        &self.response_encoder
     }
 }
 
 #[cfg(test)]
 pub mod test {
-    pub use super::destination_repository::test::{
-        MemoryResetTokenDestinationMap, MemoryResetTokenDestinationRepository,
-        MemoryResetTokenDestinationStore,
-    };
-    pub use super::messenger::test::StaticRequestResetTokenMessenger;
-    pub use super::token_encoder::test::StaticResetTokenEncoder;
-    pub use super::token_generator::test::StaticResetTokenGenerator;
-    pub use super::token_notifier::test::StaticResetTokenNotifier;
-    use crate::auth::{
-        auth_ticket::_api::kernel::init::test::StaticCheckAuthNonceStruct,
-        password::_api::kernel::init::test::StaticAuthUserPasswordStruct,
-    };
+    pub use super::request_decoder::test::StaticRequestResetTokenRequestDecoder;
+    pub use super::request_token_service::test::StaticRequestResetTokenService;
+    pub use super::response_encoder::test::StaticRequestResetTokenResponseEncoder;
 
-    use super::super::infra::{RequestResetTokenConfig, RequestResetTokenInfra};
+    use crate::auth::auth_ticket::_api::kernel::init::test::StaticAuthHeaderStruct;
 
-    pub struct StaticRequestResetTokenStruct<'a> {
-        pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
-        pub password_infra: StaticAuthUserPasswordStruct<'a>,
-        pub destination_repository: MemoryResetTokenDestinationRepository<'a>,
-        pub token_generator: StaticResetTokenGenerator,
-        pub token_encoder: StaticResetTokenEncoder,
-        pub token_notifier: StaticResetTokenNotifier,
-        pub messenger: StaticRequestResetTokenMessenger,
-        pub config: RequestResetTokenConfig,
+    use super::super::infra::RequestResetTokenInfra;
+
+    pub struct StaticRequestResetTokenStruct {
+        pub header_infra: StaticAuthHeaderStruct,
+        pub request_decoder: StaticRequestResetTokenRequestDecoder,
+        pub request_token_service: StaticRequestResetTokenService,
+        pub response_encoder: StaticRequestResetTokenResponseEncoder,
     }
 
-    impl<'a> RequestResetTokenInfra for StaticRequestResetTokenStruct<'a> {
-        type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
-        type PasswordInfra = StaticAuthUserPasswordStruct<'a>;
-        type DestinationRepository = MemoryResetTokenDestinationRepository<'a>;
-        type TokenGenerator = StaticResetTokenGenerator;
-        type TokenEncoder = StaticResetTokenEncoder;
-        type TokenNotifier = StaticResetTokenNotifier;
-        type Messenger = StaticRequestResetTokenMessenger;
+    impl RequestResetTokenInfra for StaticRequestResetTokenStruct {
+        type HeaderInfra = StaticAuthHeaderStruct;
+        type RequestDecoder = StaticRequestResetTokenRequestDecoder;
+        type RequestTokenService = StaticRequestResetTokenService;
+        type ResponseEncoder = StaticRequestResetTokenResponseEncoder;
 
-        fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
-            &self.check_nonce_infra
+        fn header_infra(&self) -> &Self::HeaderInfra {
+            &self.header_infra
         }
-        fn password_infra(&self) -> &Self::PasswordInfra {
-            &self.password_infra
+        fn request_decoder(&self) -> &Self::RequestDecoder {
+            &self.request_decoder
         }
-        fn destination_repository(&self) -> &Self::DestinationRepository {
-            &self.destination_repository
+        fn request_token_service(&self) -> &Self::RequestTokenService {
+            &self.request_token_service
         }
-        fn token_generator(&self) -> &Self::TokenGenerator {
-            &self.token_generator
-        }
-        fn token_encoder(&self) -> &Self::TokenEncoder {
-            &self.token_encoder
-        }
-        fn token_notifier(&self) -> &Self::TokenNotifier {
-            &self.token_notifier
-        }
-        fn messenger(&self) -> &Self::Messenger {
-            &self.messenger
-        }
-        fn config(&self) -> &RequestResetTokenConfig {
-            &self.config
+        fn response_encoder(&self) -> &Self::ResponseEncoder {
+            &self.response_encoder
         }
     }
 }
