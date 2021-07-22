@@ -8,7 +8,7 @@ use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::auth_ticket::_api::kernel::init::{AuthTokenStruct, TicketAuthHeaderStruct};
 use authenticate_service::TonicAuthenticatePasswordService;
-use request_decoder::ProtobufAuthenticatePasswordRequestDecoder;
+use request_decoder::ProstAuthenticatePasswordRequestDecoder;
 use response_encoder::ProstAuthenticatePasswordResponseEncoder;
 
 use super::infra::AuthenticatePasswordInfra;
@@ -16,7 +16,7 @@ use super::infra::AuthenticatePasswordInfra;
 pub struct AuthenticatePasswordStruct<'a> {
     header_infra: TicketAuthHeaderStruct<'a>,
     token_infra: AuthTokenStruct<'a>,
-    request_decoder: ProtobufAuthenticatePasswordRequestDecoder,
+    request_decoder: ProstAuthenticatePasswordRequestDecoder,
     authenticate_service: TonicAuthenticatePasswordService<'a>,
     response_encoder: ProstAuthenticatePasswordResponseEncoder,
 }
@@ -31,7 +31,7 @@ impl<'a> AuthenticatePasswordStruct<'a> {
         Self {
             header_infra: TicketAuthHeaderStruct::new(request),
             token_infra: AuthTokenStruct::new(feature),
-            request_decoder: ProtobufAuthenticatePasswordRequestDecoder::new(body),
+            request_decoder: ProstAuthenticatePasswordRequestDecoder::new(body),
             authenticate_service: TonicAuthenticatePasswordService::new(
                 &feature.service,
                 request_id,
@@ -44,7 +44,7 @@ impl<'a> AuthenticatePasswordStruct<'a> {
 impl<'a> AuthenticatePasswordInfra for AuthenticatePasswordStruct<'a> {
     type HeaderInfra = TicketAuthHeaderStruct<'a>;
     type TokenInfra = AuthTokenStruct<'a>;
-    type RequestDecoder = ProtobufAuthenticatePasswordRequestDecoder;
+    type RequestDecoder = ProstAuthenticatePasswordRequestDecoder;
     type AuthenticateService = TonicAuthenticatePasswordService<'a>;
     type ResponseEncoder = ProstAuthenticatePasswordResponseEncoder;
 

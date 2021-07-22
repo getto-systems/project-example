@@ -1,105 +1,108 @@
-mod messenger;
-mod token_decoder;
+mod request_decoder;
+mod reset_service;
+mod response_encoder;
 
 use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::{
-    auth_ticket::_api::kernel::init::CheckAuthNonceStruct,
-    auth_user::_api::kernel::init::AuthUserStruct,
-    password::_api::kernel::init::AuthUserPasswordStruct,
-};
-use messenger::ProtobufResetPasswordMessenger;
-use token_decoder::JwtResetTokenDecoder;
+use crate::auth::auth_ticket::_api::kernel::init::{AuthTokenStruct, TicketAuthHeaderStruct};
+use request_decoder::ProstResetPasswordRequestDecoder;
+use reset_service::TonicResetPasswordService;
+use response_encoder::ProstResetPasswordResponseEncoder;
 
 use crate::auth::password::reset::_api::reset::infra::ResetPasswordInfra;
 
 pub struct ResetPasswordStruct<'a> {
-    check_nonce_infra: CheckAuthNonceStruct<'a>,
-    user_infra: AuthUserStruct<'a>,
-    password_infra: AuthUserPasswordStruct<'a>,
-    token_decoder: JwtResetTokenDecoder<'a>,
-    messenger: ProtobufResetPasswordMessenger,
+    header_infra: TicketAuthHeaderStruct<'a>,
+    token_infra: AuthTokenStruct<'a>,
+    request_decoder: ProstResetPasswordRequestDecoder,
+    reset_service: TonicResetPasswordService<'a>,
+    response_encoder: ProstResetPasswordResponseEncoder,
 }
 
 impl<'a> ResetPasswordStruct<'a> {
-    pub fn new(feature: &'a AuthOutsideFeature, request: &'a HttpRequest, body: String) -> Self {
+    pub fn new(
+        feature: &'a AuthOutsideFeature,
+        request_id: &'a str,
+        request: &'a HttpRequest,
+        body: String,
+    ) -> Self {
         Self {
-            check_nonce_infra: CheckAuthNonceStruct::new(feature, request),
-            user_infra: AuthUserStruct::new(feature),
-            password_infra: AuthUserPasswordStruct::new(feature),
-            token_decoder: JwtResetTokenDecoder::new(&feature.secret.reset_token.decoding_key),
-            messenger: ProtobufResetPasswordMessenger::new(body),
+            header_infra: TicketAuthHeaderStruct::new(request),
+            token_infra: AuthTokenStruct::new(feature),
+            request_decoder: ProstResetPasswordRequestDecoder::new(body),
+            reset_service: TonicResetPasswordService::new(&feature.service, request_id),
+            response_encoder: ProstResetPasswordResponseEncoder,
         }
     }
 }
 
 impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
-    type CheckNonceInfra = CheckAuthNonceStruct<'a>;
-    type UserInfra = AuthUserStruct<'a>;
-    type PasswordInfra = AuthUserPasswordStruct<'a>;
-    type TokenDecoder = JwtResetTokenDecoder<'a>;
-    type Messenger = ProtobufResetPasswordMessenger;
+    type HeaderInfra = TicketAuthHeaderStruct<'a>;
+    type TokenInfra = AuthTokenStruct<'a>;
+    type RequestDecoder = ProstResetPasswordRequestDecoder;
+    type ResetService = TonicResetPasswordService<'a>;
+    type ResponseEncoder = ProstResetPasswordResponseEncoder;
 
-    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
-        &self.check_nonce_infra
+    fn header_infra(&self) -> &Self::HeaderInfra {
+        &self.header_infra
     }
-    fn user_infra(&self) -> &Self::UserInfra {
-        &self.user_infra
+    fn token_infra(&self) -> &Self::TokenInfra {
+        &self.token_infra
     }
-    fn password_infra(&self) -> &Self::PasswordInfra {
-        &self.password_infra
+    fn request_decoder(&self) -> &Self::RequestDecoder {
+        &self.request_decoder
     }
-    fn token_decoder(&self) -> &Self::TokenDecoder {
-        &self.token_decoder
+    fn reset_service(&self) -> &Self::ResetService {
+        &self.reset_service
     }
-    fn messenger(&self) -> &Self::Messenger {
-        &self.messenger
+    fn response_encoder(&self) -> &Self::ResponseEncoder {
+        &self.response_encoder
     }
 }
 
 #[cfg(test)]
 pub mod test {
-    pub use super::messenger::test::StaticResetPasswordMessenger;
-    pub use super::token_decoder::test::StaticResetTokenDecoder;
-    use crate::auth::{
-        auth_ticket::_api::kernel::init::test::StaticCheckAuthNonceStruct,
-        auth_user::_api::kernel::init::test::StaticAuthUserStruct,
-        password::_api::kernel::init::test::StaticAuthUserPasswordStruct,
+    pub use super::reset_service::test::StaticResetPasswordService;
+    pub use super::request_decoder::test::StaticResetPasswordRequestDecoder;
+    pub use super::response_encoder::test::StaticResetPasswordResponseEncoder;
+
+    use crate::auth::auth_ticket::_api::kernel::init::test::{
+        StaticAuthHeaderStruct, StaticAuthTokenStruct,
     };
 
-    use crate::auth::password::reset::_api::reset::infra::ResetPasswordInfra;
+    use super::super::infra::ResetPasswordInfra;
 
-    pub struct StaticResetPasswordStruct<'a> {
-        pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
-        pub user_infra: StaticAuthUserStruct<'a>,
-        pub password_infra: StaticAuthUserPasswordStruct<'a>,
-        pub token_decoder: StaticResetTokenDecoder,
-        pub messenger: StaticResetPasswordMessenger,
+    pub struct StaticResetPasswordStruct {
+        pub header_infra: StaticAuthHeaderStruct,
+        pub token_infra: StaticAuthTokenStruct,
+        pub request_decoder: StaticResetPasswordRequestDecoder,
+        pub reset_service: StaticResetPasswordService,
+        pub response_encoder: StaticResetPasswordResponseEncoder,
     }
 
-    impl<'a> ResetPasswordInfra for StaticResetPasswordStruct<'a> {
-        type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
-        type UserInfra = StaticAuthUserStruct<'a>;
-        type PasswordInfra = StaticAuthUserPasswordStruct<'a>;
-        type TokenDecoder = StaticResetTokenDecoder;
-        type Messenger = StaticResetPasswordMessenger;
+    impl ResetPasswordInfra for StaticResetPasswordStruct {
+        type HeaderInfra = StaticAuthHeaderStruct;
+        type TokenInfra = StaticAuthTokenStruct;
+        type RequestDecoder = StaticResetPasswordRequestDecoder;
+        type ResetService = StaticResetPasswordService;
+        type ResponseEncoder = StaticResetPasswordResponseEncoder;
 
-        fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
-            &self.check_nonce_infra
+        fn header_infra(&self) -> &Self::HeaderInfra {
+            &self.header_infra
         }
-        fn user_infra(&self) -> &Self::UserInfra {
-            &self.user_infra
+        fn token_infra(&self) -> &Self::TokenInfra {
+            &self.token_infra
         }
-        fn password_infra(&self) -> &Self::PasswordInfra {
-            &self.password_infra
+        fn request_decoder(&self) -> &Self::RequestDecoder {
+            &self.request_decoder
         }
-        fn token_decoder(&self) -> &Self::TokenDecoder {
-            &self.token_decoder
+        fn reset_service(&self) -> &Self::ResetService {
+            &self.reset_service
         }
-        fn messenger(&self) -> &Self::Messenger {
-            &self.messenger
+        fn response_encoder(&self) -> &Self::ResponseEncoder {
+            &self.response_encoder
         }
     }
 }

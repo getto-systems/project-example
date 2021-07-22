@@ -8,8 +8,6 @@ impl RespondTo for ResetPasswordState {
     fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
             Self::Reset(event) => event.respond_to(request),
-            Self::Issue(event) => event.respond_to(request),
-            Self::Encode(event) => event.respond_to(request),
         }
     }
 }
