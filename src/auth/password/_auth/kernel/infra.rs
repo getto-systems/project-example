@@ -6,32 +6,37 @@ use crate::{
         auth_user::_common::kernel::data::AuthUserId,
         login_id::_auth::data::LoginId,
         password::_auth::kernel::data::{
-            PasswordHashError, ResetToken, ValidatePasswordError, VerifyPasswordError,
+            PasswordHashError, PasswordHashRepositoryError, RegisterResetTokenError, ResetToken,
+            ValidatePasswordError, VerifyPasswordError,
         },
     },
     z_details::_common::repository::data::RepositoryError,
 };
 
+pub trait AuthUserPasswordInfra {
+    type PasswordRepository: AuthUserPasswordRepository;
+
+    fn extract(self) -> Self::PasswordRepository;
+}
+
 pub trait AuthUserPasswordMatchInfra {
     type PasswordRepository: AuthUserPasswordRepository;
     type PasswordMatcher: AuthUserPasswordMatcher;
 
-    fn extract(self, plain_password: PlainPassword) -> (Self::PasswordRepository, Self::PasswordMatcher);
+    fn extract(
+        self,
+        plain_password: PlainPassword,
+    ) -> (Self::PasswordRepository, Self::PasswordMatcher);
 }
 
-// TODO hash infra にして extract したい
-pub trait AuthUserPasswordInfra {
+pub trait AuthUserPasswordHashInfra {
     type PasswordRepository: AuthUserPasswordRepository;
-    type PasswordMatcher: AuthUserPasswordMatcher;
     type PasswordHasher: AuthUserPasswordHasher;
 
-    fn password_repository(&self) -> &Self::PasswordRepository;
-    fn password_matcher(&self, plain_password: PlainPassword) -> Self::PasswordMatcher {
-        Self::PasswordMatcher::new(plain_password)
-    }
-    fn password_hasher(&self, plain_password: PlainPassword) -> Self::PasswordHasher {
-        Self::PasswordHasher::new(plain_password)
-    }
+    fn extract(
+        self,
+        plain_password: PlainPassword,
+    ) -> (Self::PasswordRepository, Self::PasswordHasher);
 }
 
 pub struct HashedPassword(String);
@@ -81,13 +86,13 @@ pub trait AuthUserPasswordRepository {
         matcher: impl AuthUserPasswordMatcher + 'a,
     ) -> Result<AuthUserId, VerifyPasswordError>;
 
-    async fn request_reset_token(
+    async fn register_reset_token(
         &self,
-        reset_token: ResetToken,
         login_id: LoginId,
+        reset_token: ResetToken,
         expires: ExpireDateTime,
         requested_at: AuthDateTime,
-    ) -> Result<(), RequestResetTokenError>;
+    ) -> Result<(), RegisterResetTokenError>;
 
     async fn reset_token_entry(
         &self,
@@ -99,7 +104,7 @@ pub trait AuthUserPasswordRepository {
         reset_token: &'a ResetToken,
         hasher: impl AuthUserPasswordHasher + 'a,
         reset_at: AuthDateTime,
-    ) -> Result<AuthUserId, ResetPasswordError>;
+    ) -> Result<AuthUserId, PasswordHashRepositoryError>;
 }
 
 pub struct ResetTokenEntry {
@@ -146,21 +151,4 @@ pub trait AuthUserPasswordMatcher: Send {
 pub trait AuthUserPasswordHasher: Send {
     fn new(plain_password: PlainPassword) -> Self;
     fn hash_password(self) -> Result<HashedPassword, PasswordHashError>;
-}
-
-pub enum RequestResetTokenError {
-    RepositoryError(RepositoryError),
-    NotFound,
-}
-
-pub enum VerifyResetTokenEntryError {
-    NotFound,
-    AlreadyReset,
-    Expired,
-    InvalidLoginId,
-}
-
-pub enum ResetPasswordError {
-    RepositoryError(RepositoryError),
-    PasswordHashError(PasswordHashError),
 }

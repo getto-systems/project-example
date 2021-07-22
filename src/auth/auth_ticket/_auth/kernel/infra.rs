@@ -12,6 +12,12 @@ use crate::z_details::{
     _common::repository::data::{RegisterResult, RepositoryError},
 };
 
+pub trait AuthClockInfra {
+    type Clock: AuthClock;
+
+    fn extract(self) -> Self::Clock;
+}
+
 pub trait AuthTicketInfra {
     type Clock: AuthClock;
     type TicketRepository: AuthTicketRepository;

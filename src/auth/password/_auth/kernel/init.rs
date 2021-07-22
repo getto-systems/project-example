@@ -3,13 +3,15 @@ mod password_matcher;
 mod password_repository;
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
+use crate::auth::password::_auth::kernel::infra::AuthUserPasswordHashInfra;
 
 use password_hasher::Argon2PasswordHasher;
 use password_matcher::Argon2PasswordMatcher;
 use password_repository::MysqlAuthUserPasswordRepository;
 
 use crate::auth::password::_auth::kernel::infra::{
-    AuthUserPasswordInfra, AuthUserPasswordMatchInfra, AuthUserPasswordMatcher, PlainPassword,
+    AuthUserPasswordHasher, AuthUserPasswordInfra, AuthUserPasswordMatchInfra,
+    AuthUserPasswordMatcher, PlainPassword,
 };
 
 pub struct AuthUserPasswordStruct<'a> {
@@ -21,6 +23,14 @@ impl<'a> AuthUserPasswordStruct<'a> {
         Self {
             password_repository: MysqlAuthUserPasswordRepository::new(&feature.store.mysql),
         }
+    }
+}
+
+impl<'a> AuthUserPasswordInfra for AuthUserPasswordStruct<'a> {
+    type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
+
+    fn extract(self) -> Self::PasswordRepository {
+        self.password_repository
     }
 }
 
@@ -39,13 +49,18 @@ impl<'a> AuthUserPasswordMatchInfra for AuthUserPasswordStruct<'a> {
     }
 }
 
-impl<'a> AuthUserPasswordInfra for AuthUserPasswordStruct<'a> {
+impl<'a> AuthUserPasswordHashInfra for AuthUserPasswordStruct<'a> {
     type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
-    type PasswordMatcher = Argon2PasswordMatcher;
     type PasswordHasher = Argon2PasswordHasher;
 
-    fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.password_repository
+    fn extract(
+        self,
+        plain_password: PlainPassword,
+    ) -> (Self::PasswordRepository, Self::PasswordHasher) {
+        (
+            self.password_repository,
+            Self::PasswordHasher::new(plain_password),
+        )
     }
 }
 
@@ -58,11 +73,20 @@ pub mod test {
     };
 
     use crate::auth::password::_auth::kernel::infra::{
-        AuthUserPasswordInfra, AuthUserPasswordMatchInfra, AuthUserPasswordMatcher, PlainPassword,
+        AuthUserPasswordHashInfra, AuthUserPasswordHasher, AuthUserPasswordInfra,
+        AuthUserPasswordMatchInfra, AuthUserPasswordMatcher, PlainPassword,
     };
 
     pub struct StaticAuthUserPasswordStruct<'a> {
         pub password_repository: MemoryAuthUserPasswordRepository<'a>,
+    }
+
+    impl<'a> AuthUserPasswordInfra for StaticAuthUserPasswordStruct<'a> {
+        type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
+
+        fn extract(self) -> Self::PasswordRepository {
+            self.password_repository
+        }
     }
 
     impl<'a> AuthUserPasswordMatchInfra for StaticAuthUserPasswordStruct<'a> {
@@ -80,13 +104,18 @@ pub mod test {
         }
     }
 
-    impl<'a> AuthUserPasswordInfra for StaticAuthUserPasswordStruct<'a> {
+    impl<'a> AuthUserPasswordHashInfra for StaticAuthUserPasswordStruct<'a> {
         type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
-        type PasswordMatcher = PlainPasswordMatcher;
         type PasswordHasher = PlainPasswordHasher;
 
-        fn password_repository(&self) -> &Self::PasswordRepository {
-            &self.password_repository
+        fn extract(
+            self,
+            plain_password: PlainPassword,
+        ) -> (Self::PasswordRepository, Self::PasswordHasher) {
+            (
+                self.password_repository,
+                Self::PasswordHasher::new(plain_password),
+            )
         }
     }
 }

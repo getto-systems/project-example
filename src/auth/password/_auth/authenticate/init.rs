@@ -10,7 +10,7 @@ use crate::auth::{
     auth_user::_auth::kernel::init::AuthUserStruct,
     password::_auth::kernel::init::AuthUserPasswordStruct,
 };
-use request_decoder::TonicAuthenticatePasswordRequestDecoder;
+use request_decoder::PbAuthenticatePasswordRequestDecoder;
 
 use super::infra::AuthenticatePasswordInfra;
 
@@ -18,7 +18,7 @@ pub struct AuthenticatePasswordStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
     user_infra: AuthUserStruct<'a>,
     password_infra: AuthUserPasswordStruct<'a>,
-    request_decoder: TonicAuthenticatePasswordRequestDecoder,
+    request_decoder: PbAuthenticatePasswordRequestDecoder,
 }
 
 impl<'a> AuthenticatePasswordStruct<'a> {
@@ -31,7 +31,7 @@ impl<'a> AuthenticatePasswordStruct<'a> {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata.clone()),
             user_infra: AuthUserStruct::new(feature),
             password_infra: AuthUserPasswordStruct::new(feature),
-            request_decoder: TonicAuthenticatePasswordRequestDecoder::new(request),
+            request_decoder: PbAuthenticatePasswordRequestDecoder::new(request),
         }
     }
 }
@@ -40,7 +40,7 @@ impl<'a> AuthenticatePasswordInfra for AuthenticatePasswordStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
     type UserInfra = AuthUserStruct<'a>;
     type PasswordInfra = AuthUserPasswordStruct<'a>;
-    type RequestDecoder = TonicAuthenticatePasswordRequestDecoder;
+    type RequestDecoder = PbAuthenticatePasswordRequestDecoder;
 
     fn extract(
         self,

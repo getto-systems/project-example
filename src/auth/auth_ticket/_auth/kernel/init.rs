@@ -13,8 +13,28 @@ use nonce_repository::DynamoDbAuthNonceRepository;
 use ticket_repository::MysqlAuthTicketRepository;
 
 use crate::auth::auth_ticket::_auth::kernel::infra::{
-    AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
+    AuthClockInfra, AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
 };
+
+pub struct AuthClockStruct {
+    clock: ChronoAuthClock,
+}
+
+impl AuthClockStruct {
+    pub fn new() -> Self {
+        Self {
+            clock: ChronoAuthClock::new(),
+        }
+    }
+}
+
+impl AuthClockInfra for AuthClockStruct {
+    type Clock = ChronoAuthClock;
+
+    fn extract(self) -> Self::Clock {
+        self.clock
+    }
+}
 
 pub struct AuthTicketStruct<'a> {
     clock: ChronoAuthClock,
@@ -96,8 +116,20 @@ pub mod test {
     };
 
     use crate::auth::auth_ticket::_auth::kernel::infra::{
-        AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
+        AuthClockInfra, AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
     };
+
+    pub struct StaticAuthClockStruct {
+        pub clock: StaticChronoAuthClock,
+    }
+
+    impl AuthClockInfra for StaticAuthClockStruct {
+        type Clock = StaticChronoAuthClock;
+
+        fn extract(self) -> Self::Clock {
+            self.clock
+        }
+    }
 
     pub struct StaticAuthTicketStruct<'a> {
         pub clock: StaticChronoAuthClock,
