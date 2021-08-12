@@ -8,8 +8,9 @@ use crate::auth::password::reset::_common::y_protobuf::service::{
 
 use crate::auth::_api::service::helper::{infra_error, set_metadata};
 
-use crate::auth::password::reset::_api::request_token::infra::{
-    RequestResetTokenFieldsExtract, RequestResetTokenResponse, RequestResetTokenService,
+use crate::auth::password::reset::{
+    _api::request_token::infra::{RequestResetTokenResponse, RequestResetTokenService},
+    _common::request_token::infra::RequestResetTokenFieldsExtract,
 };
 
 use crate::auth::{
@@ -59,8 +60,9 @@ impl<'a> RequestResetTokenService for TonicRequestResetTokenService<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::password::reset::_api::request_token::infra::{
-        RequestResetTokenFieldsExtract, RequestResetTokenResponse, RequestResetTokenService,
+    use crate::auth::password::reset::{
+        _api::request_token::infra::{RequestResetTokenResponse, RequestResetTokenService},
+        _common::request_token::infra::RequestResetTokenFieldsExtract,
     };
 
     use crate::auth::{

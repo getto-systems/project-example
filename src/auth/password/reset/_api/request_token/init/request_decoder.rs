@@ -4,8 +4,9 @@ use crate::auth::password::reset::_api::y_protobuf::api::RequestResetTokenPb;
 
 use crate::z_details::_api::message::helper::{decode_base64, invalid_protobuf};
 
-use crate::auth::password::reset::_api::request_token::infra::{
-    RequestResetTokenFieldsExtract, RequestResetTokenRequestDecoder,
+use crate::auth::password::reset::{
+    _api::request_token::infra::RequestResetTokenRequestDecoder,
+    _common::request_token::infra::RequestResetTokenFieldsExtract,
 };
 
 use crate::z_details::_api::message::data::MessageError;
@@ -34,8 +35,9 @@ impl RequestResetTokenRequestDecoder for ProtobufRequestResetTokenRequestDecoder
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::password::reset::_api::request_token::infra::{
-        RequestResetTokenFieldsExtract, RequestResetTokenRequestDecoder,
+    use crate::auth::password::reset::{
+        _api::request_token::infra::RequestResetTokenRequestDecoder,
+        _common::request_token::infra::RequestResetTokenFieldsExtract,
     };
 
     use crate::z_details::_api::message::data::MessageError;

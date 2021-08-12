@@ -11,7 +11,7 @@ use crate::auth::{
     },
 };
 
-use crate::auth::password::reset::_api::request_token::infra::RequestResetTokenFieldsExtract;
+use crate::auth::password::reset::_common::request_token::infra::RequestResetTokenFieldsExtract;
 
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 
