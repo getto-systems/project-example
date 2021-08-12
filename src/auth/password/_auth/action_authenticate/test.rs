@@ -45,8 +45,11 @@ use crate::auth::{
 use super::action::{AuthenticatePasswordAction, AuthenticatePasswordMaterial};
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::data::{
-        AuthDateTime, AuthNonceValue, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
+    auth_ticket::{
+        _auth::kernel::data::AuthTicketId,
+        _common::kernel::data::{
+            AuthDateTime, AuthNonceValue, ExpansionLimitDuration, ExpireDuration,
+        },
     },
     auth_user::_common::kernel::data::{AuthUser, AuthUserExtract},
     login_id::_auth::data::LoginId,

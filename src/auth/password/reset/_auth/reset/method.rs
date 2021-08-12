@@ -17,7 +17,7 @@ use crate::auth::{
 use super::event::ResetPasswordEvent;
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::data::AuthDateTime, auth_user::_common::kernel::data::AuthUser,
+    auth_ticket::_common::kernel::data::AuthDateTime, auth_user::_common::kernel::data::AuthUser,
     login_id::_auth::data::LoginId, password::reset::_auth::kernel::data::ResetTokenEncoded,
 };
 

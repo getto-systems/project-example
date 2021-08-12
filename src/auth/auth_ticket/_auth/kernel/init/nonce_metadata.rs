@@ -7,7 +7,7 @@ use crate::z_details::_auth::request::helper::metadata;
 use crate::auth::auth_ticket::_auth::kernel::infra::AuthNonceMetadata;
 
 use crate::{
-    auth::auth_ticket::_auth::kernel::data::AuthNonceValue,
+    auth::auth_ticket::_common::kernel::data::AuthNonceValue,
     z_details::_auth::request::data::MetadataError,
 };
 
@@ -31,7 +31,7 @@ impl AuthNonceMetadata for TonicAuthNonceMetadata {
 pub mod test {
     use crate::auth::auth_ticket::_auth::kernel::infra::AuthNonceMetadata;
 
-    use crate::auth::auth_ticket::_auth::kernel::data::AuthNonceValue;
+    use crate::auth::auth_ticket::_common::kernel::data::AuthNonceValue;
     use crate::z_details::_auth::request::data::MetadataError;
 
     pub enum StaticAuthNonceMetadata {

@@ -3,13 +3,17 @@ use std::collections::HashSet;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use crate::auth::auth_ticket::_auth::kernel::data::{
-    AuthDateTime, AuthNonceValue, AuthTicket, AuthTicketExtract, ExpansionLimitDateTime,
-    ExpireDateTime, ExpireDuration,
-};
-use crate::z_details::{
-    _auth::request::data::MetadataError,
-    _common::repository::data::{RegisterResult, RepositoryError},
+use crate::{
+    auth::auth_ticket::{
+        _auth::kernel::data::{AuthTicket, AuthTicketExtract},
+        _common::kernel::data::{
+            AuthDateTime, AuthNonceValue, ExpansionLimitDateTime, ExpireDateTime, ExpireDuration,
+        },
+    },
+    z_details::{
+        _auth::request::data::MetadataError,
+        _common::repository::data::{RegisterResult, RepositoryError},
+    },
 };
 
 pub trait AuthClockInfra {

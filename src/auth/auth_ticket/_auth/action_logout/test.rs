@@ -23,9 +23,11 @@ use crate::auth::auth_ticket::_auth::{
 use super::action::{LogoutAction, LogoutMaterial};
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::data::{
-        AuthDateTime, AuthNonceValue, AuthTicketExtract, AuthTicketId, AuthTokenValue,
-        ExpansionLimitDuration, ExpireDuration,
+    auth_ticket::{
+        _auth::kernel::data::{AuthTicketExtract, AuthTicketId},
+        _common::kernel::data::{
+            AuthDateTime, AuthNonceValue, AuthTokenValue, ExpansionLimitDuration, ExpireDuration,
+        },
     },
     auth_user::_common::kernel::data::RequireAuthRoles,
 };

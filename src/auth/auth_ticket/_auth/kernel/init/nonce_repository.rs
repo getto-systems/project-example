@@ -8,7 +8,7 @@ use crate::z_details::_common::repository::helper::infra_error;
 
 use crate::auth::auth_ticket::_auth::kernel::infra::{AuthNonceEntry, AuthNonceRepository};
 
-use crate::auth::auth_ticket::_auth::kernel::data::AuthDateTime;
+use crate::auth::auth_ticket::_common::kernel::data::AuthDateTime;
 use crate::z_details::_common::repository::data::{RegisterResult, RepositoryError};
 
 pub struct DynamoDbAuthNonceRepository<'a> {
@@ -113,7 +113,7 @@ pub mod test {
         AuthNonceEntry, AuthNonceEntryExtract, AuthNonceRepository,
     };
 
-    use crate::auth::auth_ticket::_auth::kernel::data::{
+    use crate::auth::auth_ticket::_common::kernel::data::{
         AuthDateTime, AuthNonceValue, ExpireDateTime,
     };
     use crate::z_details::_common::repository::data::{RegisterResult, RepositoryError};

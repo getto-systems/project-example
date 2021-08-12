@@ -1,6 +1,8 @@
 use super::super::kernel::infra::AuthTicketInfra;
 
-use crate::auth::auth_ticket::_auth::kernel::data::{AuthTicketId, ExpansionLimitDuration};
+use crate::auth::auth_ticket::{
+    _auth::kernel::data::AuthTicketId, _common::kernel::data::ExpansionLimitDuration,
+};
 
 pub trait IssueAuthTicketInfra {
     type TicketInfra: AuthTicketInfra;

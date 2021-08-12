@@ -1,13 +1,15 @@
 use crate::auth::auth_ticket::_auth::kernel::infra::CheckAuthNonceInfra;
 
-use crate::auth::{
-    auth_ticket::_auth::{
-        kernel::data::{AuthTicket, AuthTokenValue},
-        validate::data::DecodeAuthTokenError,
+use crate::{
+    auth::{
+        auth_ticket::{
+            _auth::{kernel::data::AuthTicket, validate::data::DecodeAuthTokenError},
+            _common::kernel::data::AuthTokenValue,
+        },
+        auth_user::_common::kernel::data::RequireAuthRoles,
     },
-    auth_user::_common::kernel::data::RequireAuthRoles,
+    z_details::_auth::request::data::MetadataError,
 };
-use crate::z_details::_auth::request::data::MetadataError;
 
 pub trait ValidateAuthTokenInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;

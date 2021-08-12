@@ -32,7 +32,7 @@ use crate::auth::{
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::data::{AuthDateTime, AuthNonceValue, ExpireDuration},
+    auth_ticket::_common::kernel::data::{AuthDateTime, AuthNonceValue, ExpireDuration},
     auth_user::_common::kernel::data::AuthUserId,
     login_id::_auth::data::LoginId,
     password::{
