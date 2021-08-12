@@ -1,4 +1,7 @@
-use crate::auth::auth_ticket::_api::kernel::infra::{AuthHeaderInfra, AuthTokenInfra};
+use crate::auth::{
+    auth_ticket::_api::kernel::infra::{AuthHeaderInfra, AuthTokenInfra},
+    password::reset::_common::reset::infra::ResetPasswordFieldsExtract,
+};
 
 use crate::{
     auth::{
@@ -28,14 +31,6 @@ pub trait ResetPasswordInfra {
 
 pub trait ResetPasswordRequestDecoder {
     fn decode(&self) -> Result<ResetPasswordFieldsExtract, MessageError>;
-}
-
-// TODO common にするべき
-#[derive(Clone)]
-pub struct ResetPasswordFieldsExtract {
-    pub login_id: String,
-    pub password: String,
-    pub reset_token: String,
 }
 
 #[async_trait::async_trait]

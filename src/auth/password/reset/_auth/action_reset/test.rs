@@ -36,7 +36,7 @@ use crate::auth::{
         encode::infra::EncodeAuthTicketConfig, issue::infra::IssueAuthTicketConfig,
         kernel::infra::AuthNonceConfig,
     },
-    password::reset::_auth::reset::infra::ResetPasswordFieldsExtract,
+    password::reset::_common::reset::infra::ResetPasswordFieldsExtract,
 };
 
 use super::action::{ResetPasswordAction, ResetPasswordMaterial};

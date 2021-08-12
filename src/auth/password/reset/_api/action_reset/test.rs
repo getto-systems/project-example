@@ -13,7 +13,7 @@ use crate::auth::{
     },
 };
 
-use crate::auth::password::reset::_api::reset::infra::ResetPasswordFieldsExtract;
+use crate::auth::password::reset::_common::reset::infra::ResetPasswordFieldsExtract;
 
 use super::action::{ResetPasswordAction, ResetPasswordMaterial};
 
