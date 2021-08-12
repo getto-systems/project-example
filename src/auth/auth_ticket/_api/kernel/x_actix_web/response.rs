@@ -13,7 +13,8 @@ use super::header::{
 
 use crate::auth::auth_ticket::{
     _api::kernel::data::{
-        AuthTokenMessage, AuthTokenMessageEncoded, ValidateAuthNonceError, ValidateAuthRolesError,
+        AuthTokenMessage,
+        AuthTokenMessageEncoded, // ValidateAuthNonceError, ValidateAuthRolesError,
     },
     _common::kernel::data::{AuthTokenEncoded, AuthTokenExtract, CloudfrontTokenKind},
 };
@@ -63,23 +64,23 @@ fn kind_as_name(kind: &CloudfrontTokenKind) -> &str {
     }
 }
 
-impl RespondTo for ValidateAuthNonceError {
-    fn respond_to(self, request: &HttpRequest) -> HttpResponse {
-        match self {
-            Self::HeaderError(err) => err.respond_to(request),
-            Self::RepositoryError(err) => err.respond_to(request),
-            Self::Conflict => HttpResponse::Conflict().finish(),
-        }
-    }
-}
+// impl RespondTo for ValidateAuthNonceError {
+//     fn respond_to(self, request: &HttpRequest) -> HttpResponse {
+//         match self {
+//             Self::HeaderError(err) => err.respond_to(request),
+//             Self::RepositoryError(err) => err.respond_to(request),
+//             Self::Conflict => HttpResponse::Conflict().finish(),
+//         }
+//     }
+// }
 
-impl RespondTo for ValidateAuthRolesError {
-    fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
-        match self {
-            Self::PermissionDenied(_, _) => HttpResponse::Unauthorized().finish(),
-        }
-    }
-}
+// impl RespondTo for ValidateAuthRolesError {
+//     fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
+//         match self {
+//             Self::PermissionDenied(_, _) => HttpResponse::Unauthorized().finish(),
+//         }
+//     }
+// }
 
 pub fn unauthorized(request: &HttpRequest) -> HttpResponse {
     let mut response = HttpResponse::Unauthorized();

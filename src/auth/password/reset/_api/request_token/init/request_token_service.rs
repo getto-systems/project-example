@@ -15,7 +15,7 @@ use crate::auth::password::reset::{
 
 use crate::auth::{
     _api::service::data::ServiceError,
-    auth_ticket::_api::kernel::data::{AuthNonceValue, AuthTokenValue},
+    auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
 };
 
 pub struct TonicRequestResetTokenService<'a> {
@@ -67,7 +67,7 @@ pub mod test {
 
     use crate::auth::{
         _api::service::data::ServiceError,
-        auth_ticket::_api::kernel::data::{AuthNonceValue, AuthTokenValue},
+        auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
     };
 
     pub struct StaticRequestResetTokenService;

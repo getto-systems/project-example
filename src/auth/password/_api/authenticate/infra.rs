@@ -6,9 +6,9 @@ use crate::auth::{
 use crate::{
     auth::{
         _api::service::data::ServiceError,
-        auth_ticket::{
-            _api::kernel::data::{AuthNonceValue, AuthTokenValue},
-            _common::encode::data::EncodeAuthTicketResponse,
+        auth_ticket::_common::{
+            encode::data::EncodeAuthTicketResponse,
+            kernel::data::{AuthNonceValue, AuthTokenValue},
         },
         password::_api::authenticate::data::AuthenticatePasswordMessageEncoded,
     },

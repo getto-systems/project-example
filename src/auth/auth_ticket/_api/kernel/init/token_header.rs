@@ -8,8 +8,10 @@ use crate::z_details::_api::request::helper::cookie;
 
 use crate::auth::auth_ticket::_api::kernel::infra::AuthTokenHeader;
 
-use crate::auth::auth_ticket::_api::kernel::data::AuthTokenValue;
-use crate::z_details::_api::request::data::HeaderError;
+use crate::{
+    auth::auth_ticket::_common::kernel::data::AuthTokenValue,
+    z_details::_api::request::data::HeaderError,
+};
 
 pub struct TicketAuthTokenHeader<'a> {
     request: &'a HttpRequest,
@@ -47,8 +49,10 @@ impl<'a> AuthTokenHeader for ApiAuthTokenHeader<'a> {
 pub mod test {
     use crate::auth::auth_ticket::_api::kernel::infra::AuthTokenHeader;
 
-    use crate::auth::auth_ticket::_api::kernel::data::AuthTokenValue;
-    use crate::z_details::_api::request::data::HeaderError;
+    use crate::{
+        auth::auth_ticket::_common::kernel::data::AuthTokenValue,
+        z_details::_api::request::data::HeaderError,
+    };
 
     pub enum StaticAuthTokenHeader {
         Valid(AuthTokenValue),

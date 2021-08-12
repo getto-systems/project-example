@@ -4,9 +4,9 @@ use crate::auth::auth_ticket::_api::kernel::infra::{AuthHeaderInfra, AuthTokenIn
 use crate::{
     auth::{
         _api::service::data::ServiceError,
-        auth_ticket::{
-            _api::kernel::data::{AuthNonceValue, AuthTokenValue},
-            _common::encode::data::EncodeAuthTicketResponse,
+        auth_ticket::_common::{
+            encode::data::EncodeAuthTicketResponse,
+            kernel::data::{AuthNonceValue, AuthTokenValue},
         },
     },
     z_details::_api::message::data::MessageError,

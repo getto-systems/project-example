@@ -6,7 +6,7 @@ use crate::auth::{
 use crate::{
     auth::{
         _api::service::data::ServiceError,
-        auth_ticket::_api::kernel::data::{AuthNonceValue, AuthTokenValue},
+        auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
         password::reset::_api::request_token::data::RequestResetTokenResult,
     },
     z_details::_api::message::data::MessageError,

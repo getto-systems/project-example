@@ -11,7 +11,7 @@ use crate::{
 
 use crate::auth::{
     _api::service::data::ServiceError,
-    auth_ticket::_api::kernel::data::{AuthNonceValue, AuthTokenValue},
+    auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
 };
 
 pub fn infra_error(err: impl Display) -> ServiceError {

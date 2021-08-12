@@ -12,9 +12,9 @@ use crate::auth::auth_ticket::_api::renew::infra::RenewAuthTicketService;
 
 use crate::auth::{
     _api::service::data::ServiceError,
-    auth_ticket::{
-        _api::kernel::data::{AuthNonceValue, AuthTokenValue},
-        _common::encode::data::EncodeAuthTicketResponse,
+    auth_ticket::_common::{
+        encode::data::EncodeAuthTicketResponse,
+        kernel::data::{AuthNonceValue, AuthTokenValue},
     },
 };
 
@@ -60,12 +60,9 @@ pub mod test {
 
     use crate::auth::{
         _api::service::data::ServiceError,
-        auth_ticket::{
-            _api::kernel::data::{AuthNonceValue, AuthTokenValue},
-            _common::{
-                encode::data::EncodeAuthTicketResponse,
-                kernel::data::{AuthTokenEncoded, AuthTokenExtract},
-            },
+        auth_ticket::_common::{
+            encode::data::EncodeAuthTicketResponse,
+            kernel::data::{AuthNonceValue, AuthTokenEncoded, AuthTokenExtract, AuthTokenValue},
         },
         auth_user::_common::kernel::data::AuthUser,
     };

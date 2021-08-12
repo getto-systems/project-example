@@ -18,7 +18,7 @@ use crate::auth::password::_common::authenticate::infra::AuthenticatePasswordFie
 use super::action::{AuthenticatePasswordAction, AuthenticatePasswordMaterial};
 
 use crate::auth::{
-    auth_ticket::_api::kernel::data::{AuthNonceValue, AuthTokenValue},
+    auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
     auth_user::_common::kernel::data::{AuthUser, AuthUserExtract},
 };
 

@@ -2,7 +2,7 @@ use crate::auth::auth_ticket::_api::kernel::infra::AuthHeaderInfra;
 
 use crate::auth::{
     _api::service::data::ServiceError,
-    auth_ticket::_api::kernel::data::{AuthNonceValue, AuthTokenValue},
+    auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
 };
 
 pub trait LogoutInfra {
