@@ -155,7 +155,6 @@ pub mod test {
     use crate::auth::auth_ticket::_api::kernel::infra::{
         AuthHeaderInfra, AuthNonceConfig, AuthTicketInfra, AuthTokenInfra, CheckAuthNonceInfra,
     };
-    use crate::auth::auth_ticket::_api::validate::infra::ValidateAuthTokenInfra;
 
     pub struct StaticAuthHeaderStruct {
         pub nonce_header: StaticAuthNonceHeader,
