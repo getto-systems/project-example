@@ -1,4 +1,7 @@
-use crate::auth::auth_ticket::_api::kernel::infra::{AuthHeaderInfra, AuthTokenInfra};
+use crate::auth::{
+    auth_ticket::_api::kernel::infra::{AuthHeaderInfra, AuthTokenInfra},
+    password::_common::authenticate::infra::AuthenticatePasswordFieldsExtract,
+};
 
 use crate::{
     auth::{
@@ -28,13 +31,6 @@ pub trait AuthenticatePasswordInfra {
 
 pub trait AuthenticatePasswordRequestDecoder {
     fn decode(&self) -> Result<AuthenticatePasswordFieldsExtract, MessageError>;
-}
-
-// TODO common にするべき
-#[derive(Clone)]
-pub struct AuthenticatePasswordFieldsExtract {
-    pub login_id: String,
-    pub password: String,
 }
 
 #[async_trait::async_trait]

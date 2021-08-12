@@ -8,8 +8,9 @@ use crate::auth::_api::x_outside_feature::feature::AuthOutsideService;
 
 use crate::auth::_api::service::helper::{infra_error, set_metadata};
 
-use crate::auth::password::_api::authenticate::infra::{
-    AuthenticatePasswordFieldsExtract, AuthenticatePasswordResponse, AuthenticatePasswordService,
+use crate::auth::password::{
+    _api::authenticate::infra::{AuthenticatePasswordResponse, AuthenticatePasswordService},
+    _common::authenticate::infra::AuthenticatePasswordFieldsExtract,
 };
 
 use crate::auth::{
@@ -62,9 +63,9 @@ impl<'a> AuthenticatePasswordService for TonicAuthenticatePasswordService<'a> {
 pub mod test {
     use std::collections::HashMap;
 
-    use crate::auth::password::_api::authenticate::infra::{
-        AuthenticatePasswordFieldsExtract, AuthenticatePasswordResponse,
-        AuthenticatePasswordService,
+    use crate::auth::password::{
+        _api::authenticate::infra::{AuthenticatePasswordResponse, AuthenticatePasswordService},
+        _common::authenticate::infra::AuthenticatePasswordFieldsExtract,
     };
 
     use crate::auth::{

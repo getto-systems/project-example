@@ -1,7 +1,10 @@
 use crate::auth::{
     auth_ticket::_auth::kernel::infra::CheckAuthNonceInfra,
     auth_user::_auth::kernel::infra::AuthUserInfra,
-    password::_auth::kernel::infra::AuthUserPasswordMatchInfra,
+    password::{
+        _auth::kernel::infra::AuthUserPasswordMatchInfra,
+        _common::authenticate::infra::AuthenticatePasswordFieldsExtract,
+    },
 };
 
 pub trait AuthenticatePasswordInfra {
@@ -22,9 +25,4 @@ pub trait AuthenticatePasswordInfra {
 
 pub trait AuthenticatePasswordRequestDecoder {
     fn decode(self) -> AuthenticatePasswordFieldsExtract;
-}
-
-pub struct AuthenticatePasswordFieldsExtract {
-    pub login_id: String,
-    pub password: String,
 }

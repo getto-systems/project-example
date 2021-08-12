@@ -13,7 +13,7 @@ use crate::auth::{
     },
 };
 
-use crate::auth::password::_api::authenticate::infra::AuthenticatePasswordFieldsExtract;
+use crate::auth::password::_common::authenticate::infra::AuthenticatePasswordFieldsExtract;
 
 use super::action::{AuthenticatePasswordAction, AuthenticatePasswordMaterial};
 
