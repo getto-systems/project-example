@@ -13,7 +13,8 @@ use super::header::{
 
 use crate::auth::auth_ticket::{
     _api::kernel::data::{
-        AuthTokenMessage, AuthTokenMessageEncoded, ValidateAuthNonceError, ValidateAuthRolesError,
+        AuthTokenMessage,
+        AuthTokenMessageEncoded, // ValidateAuthNonceError, ValidateAuthRolesError,
     },
     _common::kernel::data::{AuthTokenEncoded, AuthTokenExtract, CloudfrontTokenKind},
 };
@@ -61,44 +62,4 @@ fn kind_as_name(kind: &CloudfrontTokenKind) -> &str {
         CloudfrontTokenKind::Policy => COOKIE_CLOUDFRONT_POLICY,
         CloudfrontTokenKind::Signature => COOKIE_CLOUDFRONT_SIGNATURE,
     }
-}
-
-impl RespondTo for ValidateAuthNonceError {
-    fn respond_to(self, request: &HttpRequest) -> HttpResponse {
-        match self {
-            Self::HeaderError(err) => err.respond_to(request),
-            Self::RepositoryError(err) => err.respond_to(request),
-            Self::Conflict => HttpResponse::Conflict().finish(),
-        }
-    }
-}
-
-impl RespondTo for ValidateAuthRolesError {
-    fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
-        match self {
-            Self::PermissionDenied(_, _) => HttpResponse::Unauthorized().finish(),
-        }
-    }
-}
-
-pub fn unauthorized(request: &HttpRequest) -> HttpResponse {
-    let mut response = HttpResponse::Unauthorized();
-
-    if let Some(cookie) = request.cookie(COOKIE_TICKET_TOKEN) {
-        response.del_cookie(&cookie);
-    }
-    if let Some(cookie) = request.cookie(COOKIE_API_TOKEN) {
-        response.del_cookie(&cookie);
-    }
-    if let Some(cookie) = request.cookie(COOKIE_CLOUDFRONT_SIGNATURE) {
-        response.del_cookie(&cookie);
-    }
-    if let Some(cookie) = request.cookie(COOKIE_CLOUDFRONT_KEY_PAIR_ID) {
-        response.del_cookie(&cookie);
-    }
-    if let Some(cookie) = request.cookie(COOKIE_CLOUDFRONT_POLICY) {
-        response.del_cookie(&cookie);
-    }
-
-    response.finish()
 }

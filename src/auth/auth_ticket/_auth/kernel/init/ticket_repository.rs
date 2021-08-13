@@ -5,10 +5,13 @@ use crate::z_details::_common::repository::mysql::helper::mysql_error;
 
 use crate::auth::auth_ticket::_auth::kernel::infra::AuthTicketRepository;
 
-use crate::auth::auth_ticket::_auth::kernel::data::{
-    AuthDateTime, AuthTicket, ExpansionLimitDateTime,
+use crate::{
+    auth::auth_ticket::{
+        _auth::kernel::data::AuthTicket,
+        _common::kernel::data::{AuthDateTime, ExpansionLimitDateTime},
+    },
+    z_details::_common::repository::data::RepositoryError,
 };
-use crate::z_details::_common::repository::data::RepositoryError;
 
 pub struct MysqlAuthTicketRepository<'a> {
     pool: &'a MySqlPool,
@@ -141,10 +144,13 @@ pub mod test {
 
     use crate::auth::auth_ticket::_auth::kernel::infra::AuthTicketRepository;
 
-    use crate::auth::auth_ticket::_auth::kernel::data::{
-        AuthDateTime, AuthTicket, AuthTicketId, ExpansionLimitDateTime,
+    use crate::{
+        auth::auth_ticket::{
+            _auth::kernel::data::{AuthTicket, AuthTicketId},
+            _common::kernel::data::{AuthDateTime, ExpansionLimitDateTime},
+        },
+        z_details::_common::repository::data::RepositoryError,
     };
-    use crate::z_details::_common::repository::data::RepositoryError;
 
     pub struct MemoryAuthTicketRepository<'a> {
         store: &'a MemoryAuthTicketStore,

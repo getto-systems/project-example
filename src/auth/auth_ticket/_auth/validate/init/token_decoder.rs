@@ -5,9 +5,9 @@ use crate::auth::auth_ticket::_auth::{
     validate::infra::AuthTokenDecoder,
 };
 
-use crate::auth::auth_ticket::_auth::{
-    kernel::data::{AuthTicket, AuthTokenValue},
-    validate::data::DecodeAuthTokenError,
+use crate::auth::auth_ticket::{
+    _auth::{kernel::data::AuthTicket, validate::data::DecodeAuthTokenError},
+    _common::kernel::data::AuthTokenValue,
 };
 
 pub struct JwtAuthTokenDecoder<'a> {
@@ -65,9 +65,9 @@ fn validate_jwt<'a>(
 pub mod test {
     use crate::auth::auth_ticket::_auth::validate::infra::AuthTokenDecoder;
 
-    use crate::auth::auth_ticket::_auth::{
-        kernel::data::{AuthTicket, AuthTokenValue},
-        validate::data::DecodeAuthTokenError,
+    use crate::auth::auth_ticket::{
+        _auth::{kernel::data::AuthTicket, validate::data::DecodeAuthTokenError},
+        _common::kernel::data::AuthTokenValue,
     };
 
     pub enum StaticAuthTokenDecoder {

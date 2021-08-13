@@ -13,12 +13,12 @@ use crate::auth::{
     },
 };
 
-use crate::auth::password::reset::_api::reset::infra::ResetPasswordFieldsExtract;
+use crate::auth::password::reset::_common::reset::infra::ResetPasswordFieldsExtract;
 
 use super::action::{ResetPasswordAction, ResetPasswordMaterial};
 
 use crate::auth::{
-    auth_ticket::_api::kernel::data::{AuthNonceValue, AuthTokenValue},
+    auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
     auth_user::_common::kernel::data::{AuthUser, AuthUserExtract},
 };
 

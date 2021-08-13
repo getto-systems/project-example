@@ -1,7 +1,11 @@
 use std::fmt::Display;
 
-use crate::auth::auth_ticket::_auth::kernel::data::{AuthTicket, ExpansionLimitDateTime};
-use crate::z_details::_common::repository::data::RepositoryError;
+use crate::{
+    auth::auth_ticket::{
+        _auth::kernel::data::AuthTicket, _common::kernel::data::ExpansionLimitDateTime,
+    },
+    z_details::_common::repository::data::RepositoryError,
+};
 
 pub enum IssueAuthTicketEvent {
     ExpansionLimitCalculated(ExpansionLimitDateTime),

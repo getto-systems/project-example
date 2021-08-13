@@ -23,15 +23,16 @@ use crate::auth::{
 
 use crate::auth::{
     auth_ticket::_auth::kernel::infra::AuthNonceConfig,
-    password::reset::_auth::request_token::infra::{
-        RequestResetTokenConfig, RequestResetTokenFieldsExtract,
+    password::reset::{
+        _auth::request_token::infra::RequestResetTokenConfig,
+        _common::request_token::infra::RequestResetTokenFieldsExtract,
     },
 };
 
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::data::{AuthDateTime, AuthNonceValue, ExpireDuration},
+    auth_ticket::_common::kernel::data::{AuthDateTime, AuthNonceValue, ExpireDuration},
     auth_user::_common::kernel::data::AuthUserId,
     login_id::_auth::data::LoginId,
     password::{
@@ -106,7 +107,9 @@ async fn error_empty_login_id() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["request reset token error; invalid login id: empty login id"]);
+    assert_state(vec![
+        "request reset token error; invalid login id: empty login id",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -121,7 +124,9 @@ async fn error_too_long_login_id() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["request reset token error; invalid login id: too long login id"]);
+    assert_state(vec![
+        "request reset token error; invalid login id: too long login id",
+    ]);
     assert!(!result.is_ok());
 }
 

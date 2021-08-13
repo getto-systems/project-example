@@ -1,11 +1,14 @@
 use crate::auth::{
     auth_ticket::_auth::kernel::infra::{AuthClockInfra, CheckAuthNonceInfra},
-    password::_auth::kernel::infra::AuthUserPasswordInfra,
+    password::{
+        _auth::kernel::infra::AuthUserPasswordInfra,
+        reset::_common::request_token::infra::RequestResetTokenFieldsExtract,
+    },
 };
 
 use crate::{
     auth::{
-        auth_ticket::_auth::kernel::data::{ExpireDateTime, ExpireDuration},
+        auth_ticket::_common::kernel::data::{ExpireDateTime, ExpireDuration},
         login_id::_auth::data::LoginId,
         password::{
             _auth::kernel::data::ResetToken,
@@ -48,10 +51,6 @@ pub trait RequestResetTokenInfra {
 
 pub trait RequestResetTokenRequestDecoder {
     fn decode(self) -> RequestResetTokenFieldsExtract;
-}
-
-pub struct RequestResetTokenFieldsExtract {
-    pub login_id: String,
 }
 
 #[async_trait::async_trait]

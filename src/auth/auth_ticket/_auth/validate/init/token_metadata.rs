@@ -9,7 +9,7 @@ use crate::z_details::_auth::request::helper::metadata;
 use crate::auth::auth_ticket::_auth::validate::infra::AuthTokenMetadata;
 
 use crate::{
-    auth::auth_ticket::_auth::kernel::data::AuthTokenValue,
+    auth::auth_ticket::_common::kernel::data::AuthTokenValue,
     z_details::_auth::request::data::MetadataError,
 };
 
@@ -49,8 +49,10 @@ impl<'a> AuthTokenMetadata for ApiAuthTokenMetadata<'a> {
 pub mod test {
     use crate::auth::auth_ticket::_auth::validate::infra::AuthTokenMetadata;
 
-    use crate::auth::auth_ticket::_auth::kernel::data::AuthTokenValue;
-    use crate::z_details::_auth::request::data::MetadataError;
+    use crate::{
+        auth::auth_ticket::_common::kernel::data::AuthTokenValue,
+        z_details::_auth::request::data::MetadataError,
+    };
 
     pub enum StaticAuthTokenMetadata {
         Valid(AuthTokenValue),

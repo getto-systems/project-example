@@ -1,7 +1,10 @@
 use crate::auth::{
     auth_ticket::_auth::kernel::infra::{AuthClockInfra, CheckAuthNonceInfra},
     auth_user::_auth::kernel::infra::AuthUserInfra,
-    password::_auth::kernel::infra::AuthUserPasswordHashInfra,
+    password::{
+        _auth::kernel::infra::AuthUserPasswordHashInfra,
+        reset::_common::reset::infra::ResetPasswordFieldsExtract,
+    },
 };
 
 use crate::auth::password::reset::_auth::reset::event::ResetPasswordEvent;
@@ -37,12 +40,6 @@ pub trait ResetTokenDecoder {
 
 pub trait ResetPasswordRequestDecoder {
     fn decode(self) -> ResetPasswordFieldsExtract;
-}
-
-pub struct ResetPasswordFieldsExtract {
-    pub reset_token: String,
-    pub login_id: String,
-    pub password: String,
 }
 
 impl Into<ResetPasswordEvent> for PasswordHashRepositoryError {

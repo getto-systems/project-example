@@ -6,8 +6,10 @@ use crate::z_details::_api::request::helper::header;
 
 use crate::auth::auth_ticket::_api::kernel::infra::AuthNonceHeader;
 
-use crate::auth::auth_ticket::_api::kernel::data::AuthNonceValue;
-use crate::z_details::_api::request::data::HeaderError;
+use crate::{
+    auth::auth_ticket::_common::kernel::data::AuthNonceValue,
+    z_details::_api::request::data::HeaderError,
+};
 
 pub struct ActixWebAuthNonceHeader<'a> {
     request: &'a HttpRequest,
@@ -28,9 +30,11 @@ impl<'a> AuthNonceHeader for ActixWebAuthNonceHeader<'a> {
 #[cfg(test)]
 pub mod test {
     use crate::auth::auth_ticket::_api::kernel::infra::AuthNonceHeader;
-    
-    use crate::auth::auth_ticket::_api::kernel::data::AuthNonceValue;
-    use crate::z_details::_api::request::data::HeaderError;
+
+    use crate::{
+        auth::auth_ticket::_common::kernel::data::AuthNonceValue,
+        z_details::_api::request::data::HeaderError,
+    };
 
     pub enum StaticAuthNonceHeader {
         Valid(AuthNonceValue),

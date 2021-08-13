@@ -4,8 +4,9 @@ use crate::auth::password::_api::y_protobuf::api::AuthenticatePasswordPb;
 
 use crate::z_details::_api::message::helper::{decode_base64, invalid_protobuf};
 
-use crate::auth::password::_api::authenticate::infra::{
-    AuthenticatePasswordFieldsExtract, AuthenticatePasswordRequestDecoder,
+use crate::auth::password::{
+    _api::authenticate::infra::AuthenticatePasswordRequestDecoder,
+    _common::authenticate::infra::AuthenticatePasswordFieldsExtract,
 };
 
 use crate::z_details::_api::message::data::MessageError;
@@ -35,8 +36,9 @@ impl AuthenticatePasswordRequestDecoder for ProstAuthenticatePasswordRequestDeco
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::password::_api::authenticate::infra::{
-        AuthenticatePasswordFieldsExtract, AuthenticatePasswordRequestDecoder,
+    use crate::auth::password::{
+        _api::authenticate::infra::AuthenticatePasswordRequestDecoder,
+        _common::authenticate::infra::AuthenticatePasswordFieldsExtract,
     };
 
     use crate::z_details::_api::message::data::MessageError;

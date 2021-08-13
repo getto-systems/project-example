@@ -4,11 +4,23 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use getto_application_test::ActionTestRunner;
 
-use crate::auth::{auth_ticket::_auth::{encode::init::test::{
+use crate::auth::{
+    auth_ticket::_auth::{
+        encode::init::test::{
             StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder, StaticEncodeAuthTicketStruct,
-        }, issue::init::test::{StaticAuthTicketIdGenerator, StaticIssueAuthTicketStruct}, kernel::init::test::{MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore, MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore, StaticAuthNonceMetadata, StaticAuthTicketStruct, StaticCheckAuthNonceStruct, StaticChronoAuthClock}}, auth_user::_auth::kernel::init::test::{
+        },
+        issue::init::test::{StaticAuthTicketIdGenerator, StaticIssueAuthTicketStruct},
+        kernel::init::test::{
+            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+            MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+            StaticAuthNonceMetadata, StaticAuthTicketStruct, StaticCheckAuthNonceStruct,
+            StaticChronoAuthClock,
+        },
+    },
+    auth_user::_auth::kernel::init::test::{
         MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore, StaticAuthUserStruct,
-    }, password::_auth::{
+    },
+    password::_auth::{
         authenticate::init::test::{
             StaticAuthenticatePasswordRequestDecoder, StaticAuthenticatePasswordStruct,
         },
@@ -16,23 +28,28 @@ use crate::auth::{auth_ticket::_auth::{encode::init::test::{
             MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
             MemoryAuthUserPasswordStore, StaticAuthUserPasswordStruct,
         },
-    }};
+    },
+};
 
 use crate::auth::{
     auth_ticket::_auth::{
         encode::infra::EncodeAuthTicketConfig, issue::infra::IssueAuthTicketConfig,
         kernel::infra::AuthNonceConfig,
     },
-    password::_auth::{
-        authenticate::infra::AuthenticatePasswordFieldsExtract, kernel::infra::HashedPassword,
+    password::{
+        _auth::kernel::infra::HashedPassword,
+        _common::authenticate::infra::AuthenticatePasswordFieldsExtract,
     },
 };
 
 use super::action::{AuthenticatePasswordAction, AuthenticatePasswordMaterial};
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::data::{
-        AuthDateTime, AuthNonceValue, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
+    auth_ticket::{
+        _auth::kernel::data::AuthTicketId,
+        _common::kernel::data::{
+            AuthDateTime, AuthNonceValue, ExpansionLimitDuration, ExpireDuration,
+        },
     },
     auth_user::_common::kernel::data::{AuthUser, AuthUserExtract},
     login_id::_auth::data::LoginId,
@@ -108,7 +125,9 @@ async fn error_empty_login_id() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authenticate password error; invalid login id: empty login id"]);
+    assert_state(vec![
+        "authenticate password error; invalid login id: empty login id",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -123,7 +142,9 @@ async fn error_too_long_login_id() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authenticate password error; invalid login id: too long login id"]);
+    assert_state(vec![
+        "authenticate password error; invalid login id: too long login id",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -153,7 +174,9 @@ async fn error_empty_password() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authenticate password error; invalid password: empty password"]);
+    assert_state(vec![
+        "authenticate password error; invalid password: empty password",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -168,7 +191,9 @@ async fn error_too_long_password() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authenticate password error; invalid password: too long password"]);
+    assert_state(vec![
+        "authenticate password error; invalid password: too long password",
+    ]);
     assert!(!result.is_ok());
 }
 

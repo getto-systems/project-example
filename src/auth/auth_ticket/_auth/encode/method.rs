@@ -10,11 +10,11 @@ use crate::auth::auth_ticket::_auth::{
 use super::event::EncodeAuthTicketEvent;
 
 use crate::auth::auth_ticket::{
-    _auth::{
-        encode::data::AuthTokenExpires,
-        kernel::data::{AuthTicket, ExpansionLimitDateTime},
+    _auth::{encode::data::AuthTokenExpires, kernel::data::AuthTicket},
+    _common::{
+        encode::data::EncodeAuthTicketResponse,
+        kernel::data::{AuthTokenEncoded, ExpansionLimitDateTime},
     },
-    _common::{encode::data::EncodeAuthTicketResponse, kernel::data::AuthTokenEncoded},
 };
 
 pub async fn encode_auth_ticket<S>(

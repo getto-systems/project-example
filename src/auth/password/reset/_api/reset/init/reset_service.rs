@@ -8,13 +8,14 @@ use crate::auth::_api::x_outside_feature::feature::AuthOutsideService;
 
 use crate::auth::_api::service::helper::{infra_error, set_metadata};
 
-use crate::auth::password::reset::_api::reset::infra::{
-    ResetPasswordFieldsExtract, ResetPasswordResponse, ResetPasswordService,
+use crate::auth::password::reset::{
+    _api::reset::infra::{ResetPasswordResponse, ResetPasswordService},
+    _common::reset::infra::ResetPasswordFieldsExtract,
 };
 
 use crate::auth::{
     _api::service::data::ServiceError,
-    auth_ticket::_api::kernel::data::{AuthNonceValue, AuthTokenValue},
+    auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
 };
 
 pub struct TonicResetPasswordService<'a> {
@@ -60,18 +61,16 @@ impl<'a> ResetPasswordService for TonicResetPasswordService<'a> {
 pub mod test {
     use std::collections::HashMap;
 
-    use crate::auth::password::reset::_api::reset::infra::{
-        ResetPasswordFieldsExtract, ResetPasswordResponse, ResetPasswordService,
+    use crate::auth::password::reset::{
+        _api::reset::infra::{ResetPasswordResponse, ResetPasswordService},
+        _common::reset::infra::ResetPasswordFieldsExtract,
     };
 
     use crate::auth::{
         _api::service::data::ServiceError,
-        auth_ticket::{
-            _api::kernel::data::{AuthNonceValue, AuthTokenValue},
-            _common::{
-                encode::data::EncodeAuthTicketResponse,
-                kernel::data::{AuthTokenEncoded, AuthTokenExtract},
-            },
+        auth_ticket::_common::{
+            encode::data::EncodeAuthTicketResponse,
+            kernel::data::{AuthNonceValue, AuthTokenEncoded, AuthTokenExtract, AuthTokenValue},
         },
         auth_user::_common::kernel::data::AuthUser,
     };

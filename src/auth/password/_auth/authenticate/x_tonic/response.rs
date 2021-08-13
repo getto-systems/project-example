@@ -6,7 +6,7 @@ use crate::auth::password::_common::y_protobuf::service::{
 
 use crate::z_details::_common::response::tonic::RespondTo;
 
-use crate::auth::password::_auth::authenticate::infra::AuthenticatePasswordFieldsExtract;
+use crate::auth::password::_common::authenticate::infra::AuthenticatePasswordFieldsExtract;
 
 use super::super::event::AuthenticatePasswordEvent;
 

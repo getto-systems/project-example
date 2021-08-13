@@ -1,9 +1,12 @@
-use crate::auth::auth_ticket::_api::kernel::infra::AuthHeaderInfra;
+use crate::auth::{
+    auth_ticket::_api::kernel::infra::AuthHeaderInfra,
+    password::reset::_common::request_token::infra::RequestResetTokenFieldsExtract,
+};
 
 use crate::{
     auth::{
         _api::service::data::ServiceError,
-        auth_ticket::_api::kernel::data::{AuthNonceValue, AuthTokenValue},
+        auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
         password::reset::_api::request_token::data::RequestResetTokenResult,
     },
     z_details::_api::message::data::MessageError,
@@ -23,11 +26,6 @@ pub trait RequestResetTokenInfra {
 
 pub trait RequestResetTokenRequestDecoder {
     fn decode(&self) -> Result<RequestResetTokenFieldsExtract, MessageError>;
-}
-
-#[derive(Clone)]
-pub struct RequestResetTokenFieldsExtract {
-    pub login_id: String,
 }
 
 #[async_trait::async_trait]

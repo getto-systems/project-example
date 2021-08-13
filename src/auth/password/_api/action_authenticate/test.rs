@@ -13,12 +13,12 @@ use crate::auth::{
     },
 };
 
-use crate::auth::password::_api::authenticate::infra::AuthenticatePasswordFieldsExtract;
+use crate::auth::password::_common::authenticate::infra::AuthenticatePasswordFieldsExtract;
 
 use super::action::{AuthenticatePasswordAction, AuthenticatePasswordMaterial};
 
 use crate::auth::{
-    auth_ticket::_api::kernel::data::{AuthNonceValue, AuthTokenValue},
+    auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
     auth_user::_common::kernel::data::{AuthUser, AuthUserExtract},
 };
 

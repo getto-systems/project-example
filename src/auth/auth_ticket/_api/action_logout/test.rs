@@ -7,7 +7,7 @@ use crate::auth::auth_ticket::_api::{
 
 use super::action::{LogoutAction, LogoutMaterial};
 
-use crate::auth::auth_ticket::_api::kernel::data::{AuthNonceValue, AuthTokenValue};
+use crate::auth::auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue};
 
 #[tokio::test]
 async fn success_logout() {

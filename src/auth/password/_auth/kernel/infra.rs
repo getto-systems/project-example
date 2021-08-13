@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 
 use crate::{
     auth::{
-        auth_ticket::_auth::kernel::data::{AuthDateTime, ExpireDateTime},
+        auth_ticket::_common::kernel::data::{AuthDateTime, ExpireDateTime},
         auth_user::_common::kernel::data::AuthUserId,
         login_id::_auth::data::LoginId,
         password::_auth::kernel::data::{

@@ -4,8 +4,9 @@ use crate::auth::password::reset::_api::y_protobuf::api::ResetPasswordPb;
 
 use crate::z_details::_api::message::helper::{decode_base64, invalid_protobuf};
 
-use crate::auth::password::reset::_api::reset::infra::{
-    ResetPasswordFieldsExtract, ResetPasswordRequestDecoder,
+use crate::auth::password::reset::{
+    _api::reset::infra::ResetPasswordRequestDecoder,
+    _common::reset::infra::ResetPasswordFieldsExtract,
 };
 
 use crate::z_details::_api::message::data::MessageError;
@@ -36,8 +37,9 @@ impl ResetPasswordRequestDecoder for ProstResetPasswordRequestDecoder {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::password::reset::_api::reset::infra::{
-        ResetPasswordFieldsExtract, ResetPasswordRequestDecoder,
+    use crate::auth::password::reset::{
+        _api::reset::infra::ResetPasswordRequestDecoder,
+        _common::reset::infra::ResetPasswordFieldsExtract,
     };
 
     use crate::z_details::_api::message::data::MessageError;

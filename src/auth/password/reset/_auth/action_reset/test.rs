@@ -36,14 +36,17 @@ use crate::auth::{
         encode::infra::EncodeAuthTicketConfig, issue::infra::IssueAuthTicketConfig,
         kernel::infra::AuthNonceConfig,
     },
-    password::reset::_auth::reset::infra::ResetPasswordFieldsExtract,
+    password::reset::_common::reset::infra::ResetPasswordFieldsExtract,
 };
 
 use super::action::{ResetPasswordAction, ResetPasswordMaterial};
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::data::{
-        AuthDateTime, AuthNonceValue, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
+    auth_ticket::{
+        _auth::kernel::data::AuthTicketId,
+        _common::kernel::data::{
+            AuthDateTime, AuthNonceValue, ExpansionLimitDuration, ExpireDuration,
+        },
     },
     auth_user::_common::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
     login_id::_auth::data::LoginId,
@@ -118,7 +121,9 @@ async fn error_match_failed_login_id() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["reset password error; invalid reset token entry: login id not matched"]);
+    assert_state(vec![
+        "reset password error; invalid reset token entry: login id not matched",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -133,7 +138,9 @@ async fn error_empty_login_id() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["reset password error; invalid login id: empty login id"]);
+    assert_state(vec![
+        "reset password error; invalid login id: empty login id",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -148,7 +155,9 @@ async fn error_too_long_login_id() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["reset password error; invalid login id: too long login id"]);
+    assert_state(vec![
+        "reset password error; invalid login id: too long login id",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -163,7 +172,9 @@ async fn just_max_length_login_id() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["reset password error; invalid reset token entry: login id not matched"]);
+    assert_state(vec![
+        "reset password error; invalid reset token entry: login id not matched",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -178,7 +189,9 @@ async fn error_empty_password() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["reset password error; invalid password: empty password"]);
+    assert_state(vec![
+        "reset password error; invalid password: empty password",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -193,7 +206,9 @@ async fn error_too_long_password() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["reset password error; invalid password: too long password"]);
+    assert_state(vec![
+        "reset password error; invalid password: too long password",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -229,7 +244,9 @@ async fn error_empty_reset_token() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["reset password error; invalid reset token: empty reset token"]);
+    assert_state(vec![
+        "reset password error; invalid reset token: empty reset token",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -259,7 +276,9 @@ async fn error_reset_token_expired_in_store() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["reset password error; invalid reset token entry: reset token expired"]);
+    assert_state(vec![
+        "reset password error; invalid reset token entry: reset token expired",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -274,7 +293,9 @@ async fn error_reset_token_discarded() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["reset password error; invalid reset token entry: already reset"]);
+    assert_state(vec![
+        "reset password error; invalid reset token entry: already reset",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -289,7 +310,9 @@ async fn error_password_not_stored() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["reset password error; invalid reset token entry: reset token entry not found"]);
+    assert_state(vec![
+        "reset password error; invalid reset token entry: reset token entry not found",
+    ]);
     assert!(!result.is_ok());
 }
 

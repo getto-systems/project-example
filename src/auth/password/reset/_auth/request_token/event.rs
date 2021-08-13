@@ -2,7 +2,9 @@ use std::fmt::Display;
 
 use crate::{
     auth::{
-        auth_ticket::_auth::kernel::data::{ExpireDateTime, ValidateAuthNonceError},
+        auth_ticket::{
+            _auth::kernel::data::ValidateAuthNonceError, _common::kernel::data::ExpireDateTime,
+        },
         login_id::_auth::data::ValidateLoginIdError,
         password::{
             _auth::kernel::data::RegisterResetTokenError,

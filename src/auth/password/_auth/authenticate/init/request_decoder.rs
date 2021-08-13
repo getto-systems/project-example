@@ -1,7 +1,8 @@
 use crate::auth::password::_common::y_protobuf::service::AuthenticatePasswordRequestPb;
 
-use crate::auth::password::_auth::authenticate::infra::{
-    AuthenticatePasswordFieldsExtract, AuthenticatePasswordRequestDecoder,
+use crate::auth::password::{
+    _auth::authenticate::infra::AuthenticatePasswordRequestDecoder,
+    _common::authenticate::infra::AuthenticatePasswordFieldsExtract,
 };
 
 pub struct PbAuthenticatePasswordRequestDecoder {
@@ -22,8 +23,9 @@ impl AuthenticatePasswordRequestDecoder for PbAuthenticatePasswordRequestDecoder
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::password::_auth::authenticate::infra::{
-        AuthenticatePasswordFieldsExtract, AuthenticatePasswordRequestDecoder,
+    use crate::auth::password::{
+        _auth::authenticate::infra::AuthenticatePasswordRequestDecoder,
+        _common::authenticate::infra::AuthenticatePasswordFieldsExtract,
     };
 
     pub enum StaticAuthenticatePasswordRequestDecoder {
