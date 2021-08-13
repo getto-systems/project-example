@@ -33,17 +33,16 @@ impl AuthenticatePasswordResponseEncoder for ProstAuthenticatePasswordResponseEn
                     encode_protobuf_base64(message)?,
                 ))
             }
-            AuthenticatePasswordResponse::Success(response) => {
-                let (user, token) = response.extract();
+            AuthenticatePasswordResponse::Success(ticket) => {
                 let message = AuthenticatePasswordResultPb {
                     success: true,
-                    value: Some(user.into()),
+                    value: Some(ticket.user.into()),
                     ..Default::default()
                 };
                 Ok(AuthenticatePasswordResult::Success(
                     AuthTokenMessageEncoded {
                         message: encode_protobuf_base64(message)?,
-                        token,
+                        token: ticket.token,
                     },
                 ))
             }
@@ -78,15 +77,12 @@ pub mod test {
                 AuthenticatePasswordResponse::InvalidPassword => Ok(
                     AuthenticatePasswordResult::InvalidPassword("INVALID-PASSWORD".into()),
                 ),
-                AuthenticatePasswordResponse::Success(response) => {
-                    let (_user, token) = response.extract();
-                    Ok(AuthenticatePasswordResult::Success(
-                        AuthTokenMessageEncoded {
-                            message: "ENCODED".into(),
-                            token,
-                        },
-                    ))
-                }
+                AuthenticatePasswordResponse::Success(ticket) => Ok(
+                    AuthenticatePasswordResult::Success(AuthTokenMessageEncoded {
+                        message: "ENCODED".into(),
+                        token: ticket.token,
+                    }),
+                ),
             }
         }
     }

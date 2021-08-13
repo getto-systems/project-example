@@ -350,5 +350,5 @@ fn test_user_destination() -> ResetTokenDestination {
     ResetTokenDestinationExtract {
         email: USER_EMAIL.to_string(),
     }
-    .into()
+    .restore()
 }

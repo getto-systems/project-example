@@ -3,9 +3,7 @@ use crate::auth::password::_common::y_protobuf::service::AuthenticatePasswordRes
 use crate::auth::password::_api::authenticate::infra::AuthenticatePasswordResponse;
 
 use crate::auth::{
-    auth_ticket::_common::{
-        encode::data::EncodeAuthTicketResponse, kernel::data::AuthTokenEncoded,
-    },
+    auth_ticket::_common::{encode::data::AuthTicketEncoded, kernel::data::AuthTokenEncoded},
     auth_user::_common::kernel::data::AuthUserExtract,
 };
 
@@ -17,10 +15,7 @@ impl Into<Option<AuthenticatePasswordResponse>> for AuthenticatePasswordResponse
                     let user: AuthUserExtract = user.into();
                     let token: Option<AuthTokenEncoded> = token.into();
                     token.map(|token| {
-                        AuthenticatePasswordResponse::Success(EncodeAuthTicketResponse::new(
-                            user.into(),
-                            token,
-                        ))
+                        AuthenticatePasswordResponse::Success(AuthTicketEncoded { user, token })
                     })
                 }
                 _ => None,

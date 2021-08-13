@@ -142,7 +142,7 @@ impl<'pool> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'pool
                     .reset_at
                     .map(|reset_at| Utc.from_utc_datetime(&reset_at)),
             }
-            .into()
+            .restore()
         }))
     }
 
@@ -453,7 +453,7 @@ pub mod test {
                     expires: entry.expires,
                     reset_at: entry.reset_at,
                 }
-                .into()
+                .restore()
             }))
         }
 

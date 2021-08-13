@@ -69,7 +69,7 @@ pub enum CloudfrontTokenKind {
 pub struct AuthDateTime(DateTime<Utc>);
 
 impl AuthDateTime {
-    pub const fn restore(now: DateTime<Utc>) -> Self {
+    pub(in crate::auth) const fn restore(now: DateTime<Utc>) -> Self {
         Self(now)
     }
 
@@ -103,7 +103,7 @@ impl AuthDateTime {
 pub struct ExpireDateTime(DateTime<Utc>);
 
 impl ExpireDateTime {
-    pub fn restore(time: DateTime<Utc>) -> Self {
+    pub(in crate::auth) const fn restore(time: DateTime<Utc>) -> Self {
         Self(time)
     }
 
@@ -135,7 +135,7 @@ impl ExpireDuration {
 pub struct ExpansionLimitDateTime(DateTime<Utc>);
 
 impl ExpansionLimitDateTime {
-    pub fn restore(time: DateTime<Utc>) -> Self {
+    pub(in crate::auth) const fn restore(time: DateTime<Utc>) -> Self {
         Self(time)
     }
 

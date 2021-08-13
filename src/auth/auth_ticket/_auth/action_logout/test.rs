@@ -29,7 +29,7 @@ use crate::auth::{
             AuthDateTime, AuthNonceValue, AuthTokenValue, ExpansionLimitDuration, ExpireDuration,
         },
     },
-    auth_user::_common::kernel::data::RequireAuthRoles,
+    auth_user::_auth::kernel::data::RequireAuthRoles,
 };
 
 #[tokio::test]
@@ -231,7 +231,7 @@ fn standard_token_validator() -> StaticAuthTokenDecoder {
             user_id: "user-id".into(),
             granted_roles: HashSet::new(),
         }
-        .into(),
+        .restore(),
     )
 }
 

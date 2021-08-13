@@ -5,8 +5,9 @@ use std::{
 };
 
 use crate::{
-    auth::auth_user::_common::kernel::data::{
-        AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
+    auth::auth_user::{
+        _auth::kernel::data::{AuthPermission, RequireAuthRoles},
+        _common::kernel::data::{AuthUser, AuthUserExtract, GrantedAuthRoles},
     },
     z_details::{_auth::request::data::MetadataError, _common::repository::data::RepositoryError},
 };
@@ -46,7 +47,7 @@ impl AuthTicket {
         self,
         require_roles: RequireAuthRoles,
     ) -> Result<Self, ValidateAuthRolesError> {
-        if self.user.has_enough_permission(&require_roles) {
+        if AuthPermission::new(&self.user).has_enough_permission(&require_roles) {
             Ok(self)
         } else {
             Err(ValidateAuthRolesError::PermissionDenied(
@@ -69,15 +70,15 @@ pub struct AuthTicketExtract {
     pub granted_roles: HashSet<String>,
 }
 
-impl Into<AuthTicket> for AuthTicketExtract {
-    fn into(self) -> AuthTicket {
+impl AuthTicketExtract {
+    pub(in crate::auth) fn restore(self) -> AuthTicket {
         AuthTicket {
             ticket_id: AuthTicketId::new(self.ticket_id),
             user: AuthUserExtract {
                 user_id: self.user_id,
                 granted_roles: self.granted_roles,
             }
-            .into(),
+            .restore(),
         }
     }
 }

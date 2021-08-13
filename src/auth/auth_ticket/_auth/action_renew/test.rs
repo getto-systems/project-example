@@ -32,7 +32,7 @@ use crate::auth::{
             AuthDateTime, AuthNonceValue, AuthTokenValue, ExpansionLimitDuration, ExpireDuration,
         },
     },
-    auth_user::_common::kernel::data::RequireAuthRoles,
+    auth_user::_auth::kernel::data::RequireAuthRoles,
 };
 
 #[tokio::test]
@@ -85,7 +85,7 @@ async fn error_allow_for_something_role_but_not_granted() {
 
     let result = action.ignite().await;
     assert_state(vec![
-        "validate error; auth token error: user permission denied: granted: [], required: any [something]",
+        "validate error; auth token error: user permission denied: granted: [], require: any [something]",
     ]);
     assert!(!result.is_ok());
 }
@@ -333,7 +333,7 @@ fn standard_token_decoder() -> StaticAuthTokenDecoder {
             user_id: "something-role-user-id".into(),
             granted_roles,
         }
-        .into(),
+        .restore(),
     )
 }
 fn no_granted_roles_token_decoder() -> StaticAuthTokenDecoder {
@@ -343,7 +343,7 @@ fn no_granted_roles_token_decoder() -> StaticAuthTokenDecoder {
             user_id: "no-role-user-id".into(),
             granted_roles: HashSet::new(),
         }
-        .into(),
+        .restore(),
     )
 }
 fn expired_token_decoder() -> StaticAuthTokenDecoder {

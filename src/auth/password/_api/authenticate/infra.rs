@@ -7,7 +7,7 @@ use crate::{
     auth::{
         _api::service::data::ServiceError,
         auth_ticket::_common::{
-            encode::data::EncodeAuthTicketResponse,
+            encode::data::AuthTicketEncoded,
             kernel::data::{AuthNonceValue, AuthTokenValue},
         },
         password::_api::authenticate::data::AuthenticatePasswordMessageEncoded,
@@ -44,7 +44,7 @@ pub trait AuthenticatePasswordService {
 }
 
 pub enum AuthenticatePasswordResponse {
-    Success(EncodeAuthTicketResponse),
+    Success(AuthTicketEncoded),
     InvalidPassword,
 }
 

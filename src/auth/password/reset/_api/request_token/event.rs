@@ -15,7 +15,7 @@ pub enum RequestResetTokenEvent {
     MessageError(MessageError),
 }
 
-const SUCCESS: &'static str = "request reset token success";
+const SUCCESS: &'static str = "request reset token";
 const ERROR: &'static str = "request reset token error";
 
 impl Display for RequestResetTokenEvent {

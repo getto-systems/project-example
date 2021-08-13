@@ -14,7 +14,7 @@ pub enum ResetPasswordEvent {
     MessageError(MessageError),
 }
 
-const SUCCESS: &'static str = "reset password success";
+const SUCCESS: &'static str = "reset password";
 const ERROR: &'static str = "reset password error";
 
 impl Display for ResetPasswordEvent {

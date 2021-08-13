@@ -42,7 +42,7 @@ pub trait AuthUserPasswordHashInfra {
 pub struct HashedPassword(String);
 
 impl HashedPassword {
-    pub const fn restore(password: String) -> Self {
+    pub(in crate::auth) const fn restore(password: String) -> Self {
         Self(password)
     }
 
@@ -113,12 +113,6 @@ pub struct ResetTokenEntry {
     reset_at: Option<AuthDateTime>,
 }
 
-pub struct ResetTokenEntryExtract {
-    pub login_id: String,
-    pub expires: DateTime<Utc>,
-    pub reset_at: Option<DateTime<Utc>>,
-}
-
 impl ResetTokenEntry {
     pub fn verify_login_id(&self, login_id: &LoginId) -> bool {
         self.login_id.as_str() == login_id.as_str()
@@ -133,8 +127,14 @@ impl ResetTokenEntry {
     }
 }
 
-impl Into<ResetTokenEntry> for ResetTokenEntryExtract {
-    fn into(self) -> ResetTokenEntry {
+pub struct ResetTokenEntryExtract {
+    pub login_id: String,
+    pub expires: DateTime<Utc>,
+    pub reset_at: Option<DateTime<Utc>>,
+}
+
+impl ResetTokenEntryExtract {
+    pub(in crate::auth) fn restore(self) -> ResetTokenEntry {
         ResetTokenEntry {
             login_id: LoginId::restore(self.login_id),
             expires: ExpireDateTime::restore(self.expires),

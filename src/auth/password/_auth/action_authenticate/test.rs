@@ -524,7 +524,7 @@ fn test_user() -> AuthUser {
         user_id: "test-user-id".into(),
         granted_roles,
     }
-    .into()
+    .restore()
 }
 fn test_user_login_id() -> LoginId {
     LoginId::validate(LOGIN_ID.to_string()).unwrap()

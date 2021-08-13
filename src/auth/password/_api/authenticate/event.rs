@@ -15,7 +15,7 @@ pub enum AuthenticatePasswordEvent {
     MessageError(MessageError),
 }
 
-const SUCCESS: &'static str = "authenticate password success";
+const SUCCESS: &'static str = "authenticate password";
 const ERROR: &'static str = "authenticate password error";
 
 impl Display for AuthenticatePasswordEvent {

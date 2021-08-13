@@ -32,7 +32,7 @@ async fn success_authenticate() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authenticate password success"]);
+    assert_state(vec!["authenticate password"]);
     assert!(result.is_ok());
 }
 
@@ -87,5 +87,5 @@ fn standard_user() -> AuthUser {
         user_id: "USER-ID".into(),
         granted_roles: HashSet::new(),
     }
-    .into()
+    .restore()
 }
