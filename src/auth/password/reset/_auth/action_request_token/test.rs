@@ -4,8 +4,9 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     auth_ticket::_auth::kernel::init::test::{
-        MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore, StaticAuthClockStruct,
-        StaticAuthNonceMetadata, StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+        MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+        StaticAuthClockInitializer, StaticAuthNonceMetadata, StaticCheckAuthNonceStruct,
+        StaticChronoAuthClock,
     },
     password::{
         _auth::kernel::init::test::{
@@ -22,7 +23,7 @@ use crate::auth::{
 };
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::infra::AuthNonceConfig,
+    auth_ticket::_auth::kernel::infra::{AuthClockInfra, AuthNonceConfig},
     password::reset::{
         _auth::request_token::infra::RequestResetTokenConfig,
         _common::request_token::infra::RequestResetTokenFieldsExtract,
@@ -234,9 +235,9 @@ impl<'a> TestFeature<'a> {
                     nonce_metadata: standard_nonce_metadata(),
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
-                clock_infra: StaticAuthClockStruct {
+                clock_infra: AuthClockInfra::new(StaticAuthClockInitializer {
                     clock: standard_clock(),
-                },
+                }),
                 password_infra: StaticAuthUserPasswordStruct {
                     password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
                 },

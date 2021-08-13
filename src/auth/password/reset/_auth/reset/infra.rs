@@ -16,7 +16,6 @@ use crate::auth::password::{
 
 pub trait ResetPasswordInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
-    type ClockInfra: AuthClockInfra;
     type UserInfra: AuthUserInfra;
     type PasswordInfra: AuthUserPasswordHashInfra;
     type RequestDecoder: ResetPasswordRequestDecoder;
@@ -26,7 +25,7 @@ pub trait ResetPasswordInfra {
         self,
     ) -> (
         Self::CheckNonceInfra,
-        Self::ClockInfra,
+        AuthClockInfra,
         Self::UserInfra,
         Self::PasswordInfra,
         Self::RequestDecoder,

@@ -4,15 +4,11 @@ use crate::auth::auth_ticket::_auth::kernel::method::check_nonce;
 
 use crate::auth::password::reset::_auth::request_token::event::destination_not_found;
 
-use crate::auth::{
-    auth_ticket::_auth::kernel::infra::{AuthClock, AuthClockInfra},
-    password::{
-        _auth::kernel::infra::{AuthUserPasswordInfra, AuthUserPasswordRepository},
-        reset::_auth::request_token::infra::{
-            RequestResetTokenInfra, RequestResetTokenRequestDecoder,
-            ResetTokenDestinationRepository, ResetTokenEncoder, ResetTokenGenerator,
-            ResetTokenNotifier,
-        },
+use crate::auth::password::{
+    _auth::kernel::infra::{AuthUserPasswordInfra, AuthUserPasswordRepository},
+    reset::_auth::request_token::infra::{
+        RequestResetTokenInfra, RequestResetTokenRequestDecoder, ResetTokenDestinationRepository,
+        ResetTokenEncoder, ResetTokenGenerator, ResetTokenNotifier,
     },
 };
 
@@ -49,7 +45,7 @@ pub async fn request_reset_token<S>(
         .map_err(|err| post(RequestResetTokenEvent::RepositoryError(err)))?
         .ok_or_else(|| post(destination_not_found()))?;
 
-    let clock = clock_infra.extract();
+    let clock = clock_infra.clock;
     let password_repository = password_infra.extract();
 
     let reset_token = token_generator.generate();

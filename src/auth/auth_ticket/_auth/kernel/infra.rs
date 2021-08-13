@@ -16,10 +16,18 @@ use crate::{
     },
 };
 
-pub trait AuthClockInfra {
-    type Clock: AuthClock;
+pub struct AuthClockInfra {
+    pub clock: Box<dyn AuthClock>,
+}
 
-    fn extract(self) -> Self::Clock;
+impl AuthClockInfra {
+    pub fn new(init: impl AuthClockInitializer) -> Self {
+        init.new()
+    }
+}
+
+pub trait AuthClockInitializer {
+    fn new(self) -> AuthClockInfra;
 }
 
 pub trait AuthTicketInfra {
@@ -44,7 +52,7 @@ pub trait CheckAuthNonceInfra {
     );
 }
 
-pub trait AuthClock {
+pub trait AuthClock: Send + Sync {
     fn now(&self) -> AuthDateTime;
 }
 

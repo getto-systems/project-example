@@ -1,8 +1,6 @@
 use crate::auth::auth_ticket::_auth::kernel::method::check_nonce;
 
-use crate::auth::password::_auth::kernel::data::VerifyResetTokenEntryError;
 use crate::auth::{
-    auth_ticket::_auth::kernel::infra::{AuthClock, AuthClockInfra},
     auth_user::_auth::kernel::infra::{AuthUserInfra, AuthUserRepository},
     password::{
         _auth::kernel::infra::{
@@ -17,8 +15,13 @@ use crate::auth::{
 use super::event::ResetPasswordEvent;
 
 use crate::auth::{
-    auth_ticket::_common::kernel::data::AuthDateTime, auth_user::_common::kernel::data::AuthUser,
-    login_id::_auth::data::LoginId, password::reset::_auth::kernel::data::ResetTokenEncoded,
+    auth_ticket::_common::kernel::data::AuthDateTime,
+    auth_user::_common::kernel::data::AuthUser,
+    login_id::_auth::data::LoginId,
+    password::{
+        _auth::kernel::data::VerifyResetTokenEntryError,
+        reset::_auth::kernel::data::ResetTokenEncoded,
+    },
 };
 
 pub async fn reset_password<S>(
@@ -50,7 +53,7 @@ pub async fn reset_password<S>(
         .map_err(|err| post(ResetPasswordEvent::DecodeError(err)))?;
 
     let (password_repository, password_hasher) = password_infra.extract(plain_password);
-    let clock = clock_infra.extract();
+    let clock = clock_infra.clock;
 
     let reset_at = clock.now();
 

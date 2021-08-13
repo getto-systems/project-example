@@ -1,10 +1,12 @@
 mod request_decoder;
 mod token_decoder;
 
+use crate::auth::auth_ticket::_auth::kernel::infra::AuthClockInfra;
+use crate::auth::password::reset::_common::y_protobuf::service::ResetPasswordRequestPb;
+
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_auth::kernel::init::AuthClockStruct;
-use crate::auth::password::reset::_common::y_protobuf::service::ResetPasswordRequestPb;
+use crate::auth::auth_ticket::_auth::kernel::init::ChronoAuthClockInitializer;
 
 use crate::auth::{
     auth_ticket::_auth::kernel::init::CheckAuthNonceStruct,
@@ -19,7 +21,7 @@ use crate::auth::password::reset::_auth::reset::infra::ResetPasswordInfra;
 
 pub struct ResetPasswordStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
-    clock_infra: AuthClockStruct,
+    clock_infra: AuthClockInfra,
     user_infra: AuthUserStruct<'a>,
     password_infra: AuthUserPasswordStruct<'a>,
     token_decoder: JwtResetTokenDecoder<'a>,
@@ -34,7 +36,7 @@ impl<'a> ResetPasswordStruct<'a> {
     ) -> Self {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
-            clock_infra: AuthClockStruct::new(),
+            clock_infra: AuthClockInfra::new(ChronoAuthClockInitializer),
             user_infra: AuthUserStruct::new(feature),
             password_infra: AuthUserPasswordStruct::new(feature),
             token_decoder: JwtResetTokenDecoder::new(&feature.secret),
@@ -45,7 +47,6 @@ impl<'a> ResetPasswordStruct<'a> {
 
 impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
-    type ClockInfra = AuthClockStruct;
     type UserInfra = AuthUserStruct<'a>;
     type PasswordInfra = AuthUserPasswordStruct<'a>;
     type TokenDecoder = JwtResetTokenDecoder<'a>;
@@ -55,7 +56,7 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
         self,
     ) -> (
         Self::CheckNonceInfra,
-        Self::ClockInfra,
+        AuthClockInfra,
         Self::UserInfra,
         Self::PasswordInfra,
         Self::RequestDecoder,
@@ -77,18 +78,17 @@ pub mod test {
     pub use super::request_decoder::test::StaticResetPasswordRequestDecoder;
     pub use super::token_decoder::test::StaticResetTokenDecoder;
     use crate::auth::{
-        auth_ticket::_auth::kernel::init::test::{
-            StaticAuthClockStruct, StaticCheckAuthNonceStruct,
-        },
+        auth_ticket::_auth::kernel::init::test::StaticCheckAuthNonceStruct,
         auth_user::_auth::kernel::init::test::StaticAuthUserStruct,
         password::_auth::kernel::init::test::StaticAuthUserPasswordStruct,
     };
 
-    use crate::auth::password::reset::_auth::reset::infra::ResetPasswordInfra;
+    use super::super::infra::ResetPasswordInfra;
+    use crate::auth::auth_ticket::_auth::kernel::infra::AuthClockInfra;
 
     pub struct StaticResetPasswordStruct<'a> {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
-        pub clock_infra: StaticAuthClockStruct,
+        pub clock_infra: AuthClockInfra,
         pub user_infra: StaticAuthUserStruct<'a>,
         pub password_infra: StaticAuthUserPasswordStruct<'a>,
         pub request_decoder: StaticResetPasswordRequestDecoder,
@@ -97,7 +97,6 @@ pub mod test {
 
     impl<'a> ResetPasswordInfra for StaticResetPasswordStruct<'a> {
         type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
-        type ClockInfra = StaticAuthClockStruct;
         type UserInfra = StaticAuthUserStruct<'a>;
         type PasswordInfra = StaticAuthUserPasswordStruct<'a>;
         type TokenDecoder = StaticResetTokenDecoder;
@@ -107,7 +106,7 @@ pub mod test {
             self,
         ) -> (
             Self::CheckNonceInfra,
-            Self::ClockInfra,
+            AuthClockInfra,
             Self::UserInfra,
             Self::PasswordInfra,
             Self::RequestDecoder,

@@ -26,7 +26,6 @@ use crate::{
 
 pub trait RequestResetTokenInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
-    type ClockInfra: AuthClockInfra;
     type PasswordInfra: AuthUserPasswordInfra;
     type DestinationRepository: ResetTokenDestinationRepository;
     type TokenGenerator: ResetTokenGenerator;
@@ -38,7 +37,7 @@ pub trait RequestResetTokenInfra {
         self,
     ) -> (
         Self::CheckNonceInfra,
-        Self::ClockInfra,
+        AuthClockInfra,
         Self::PasswordInfra,
         Self::RequestDecoder,
         Self::DestinationRepository,
