@@ -6,7 +6,7 @@ use crate::{
             _auth::{kernel::data::AuthTicket, validate::data::DecodeAuthTokenError},
             _common::kernel::data::AuthTokenValue,
         },
-        auth_user::_common::kernel::data::RequireAuthRoles,
+        auth_user::_auth::kernel::data::RequireAuthRoles,
     },
     z_details::_auth::request::data::MetadataError,
 };

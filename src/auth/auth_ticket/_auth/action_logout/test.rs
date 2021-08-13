@@ -29,7 +29,7 @@ use crate::auth::{
             AuthDateTime, AuthNonceValue, AuthTokenValue, ExpansionLimitDuration, ExpireDuration,
         },
     },
-    auth_user::_common::kernel::data::RequireAuthRoles,
+    auth_user::_auth::kernel::data::RequireAuthRoles,
 };
 
 #[tokio::test]
