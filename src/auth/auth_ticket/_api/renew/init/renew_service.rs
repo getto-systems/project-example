@@ -13,7 +13,7 @@ use crate::auth::auth_ticket::_api::renew::infra::RenewAuthTicketService;
 use crate::auth::{
     _api::service::data::ServiceError,
     auth_ticket::_common::{
-        encode::data::EncodeAuthTicketResponse,
+        encode::data::AuthTicketEncoded,
         kernel::data::{AuthNonceValue, AuthTokenValue},
     },
 };
@@ -38,7 +38,7 @@ impl<'a> RenewAuthTicketService for TonicRenewAuthTicketService<'a> {
         &self,
         nonce: AuthNonceValue,
         token: AuthTokenValue,
-    ) -> Result<EncodeAuthTicketResponse, ServiceError> {
+    ) -> Result<AuthTicketEncoded, ServiceError> {
         let mut client = RenewAuthTicketPbClient::connect(self.auth_service_url)
             .await
             .map_err(infra_error)?;
@@ -47,7 +47,7 @@ impl<'a> RenewAuthTicketService for TonicRenewAuthTicketService<'a> {
         set_metadata(&mut request, self.request_id, nonce, token)?;
 
         let response = client.renew(request).await.map_err(ServiceError::from)?;
-        let response: Option<EncodeAuthTicketResponse> = response.into_inner().into();
+        let response: Option<AuthTicketEncoded> = response.into_inner().into();
         response.ok_or(ServiceError::InfraError("failed to decode response".into()))
     }
 }
@@ -61,7 +61,7 @@ pub mod test {
     use crate::auth::{
         _api::service::data::ServiceError,
         auth_ticket::_common::{
-            encode::data::EncodeAuthTicketResponse,
+            encode::data::AuthTicketEncoded,
             kernel::data::{AuthNonceValue, AuthTokenEncoded, AuthTokenExtract, AuthTokenValue},
         },
         auth_user::_common::kernel::data::AuthUser,
@@ -77,10 +77,10 @@ pub mod test {
             &self,
             _nonce: AuthNonceValue,
             _token: AuthTokenValue,
-        ) -> Result<EncodeAuthTicketResponse, ServiceError> {
-            Ok(EncodeAuthTicketResponse::new(
-                self.user.clone(),
-                AuthTokenEncoded {
+        ) -> Result<AuthTicketEncoded, ServiceError> {
+            Ok(AuthTicketEncoded {
+                user: self.user.clone().extract(),
+                token: AuthTokenEncoded {
                     ticket_token: AuthTokenExtract {
                         token: "TICKET-TOKEN".into(),
                         expires: 0,
@@ -91,7 +91,7 @@ pub mod test {
                     },
                     cloudfront_tokens: HashMap::new(),
                 },
-            ))
+            })
         }
     }
 }

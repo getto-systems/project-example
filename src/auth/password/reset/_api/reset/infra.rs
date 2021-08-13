@@ -7,7 +7,7 @@ use crate::{
     auth::{
         _api::service::data::ServiceError,
         auth_ticket::_common::{
-            encode::data::EncodeAuthTicketResponse,
+            encode::data::AuthTicketEncoded,
             kernel::data::{AuthNonceValue, AuthTokenValue},
         },
         password::reset::_api::reset::data::ResetPasswordMessageEncoded,
@@ -44,7 +44,7 @@ pub trait ResetPasswordService {
 }
 
 pub enum ResetPasswordResponse {
-    Success(EncodeAuthTicketResponse),
+    Success(AuthTicketEncoded),
     InvalidReset,
     AlreadyReset,
 }

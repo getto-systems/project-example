@@ -71,7 +71,7 @@ pub mod test {
     use crate::auth::{
         _api::service::data::ServiceError,
         auth_ticket::_common::{
-            encode::data::EncodeAuthTicketResponse,
+            encode::data::AuthTicketEncoded,
             kernel::data::{AuthNonceValue, AuthTokenEncoded, AuthTokenExtract, AuthTokenValue},
         },
         auth_user::_common::kernel::data::AuthUser,
@@ -89,22 +89,20 @@ pub mod test {
             _token: AuthTokenValue,
             _fields: AuthenticatePasswordFieldsExtract,
         ) -> Result<AuthenticatePasswordResponse, ServiceError> {
-            Ok(AuthenticatePasswordResponse::Success(
-                EncodeAuthTicketResponse::new(
-                    self.user.clone(),
-                    AuthTokenEncoded {
-                        ticket_token: AuthTokenExtract {
-                            token: "TICKET-TOKEN".into(),
-                            expires: 0,
-                        },
-                        api_token: AuthTokenExtract {
-                            token: "API-TOKEN".into(),
-                            expires: 0,
-                        },
-                        cloudfront_tokens: HashMap::new(),
+            Ok(AuthenticatePasswordResponse::Success(AuthTicketEncoded {
+                user: self.user.clone().extract(),
+                token: AuthTokenEncoded {
+                    ticket_token: AuthTokenExtract {
+                        token: "TICKET-TOKEN".into(),
+                        expires: 0,
                     },
-                ),
-            ))
+                    api_token: AuthTokenExtract {
+                        token: "API-TOKEN".into(),
+                        expires: 0,
+                    },
+                    cloudfront_tokens: HashMap::new(),
+                },
+            }))
         }
     }
 }

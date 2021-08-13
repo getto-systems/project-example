@@ -3,14 +3,14 @@ use std::fmt::Display;
 use crate::{
     auth::auth_ticket::{
         _auth::encode::data::{AuthTokenExpires, EncodeAuthTokenError},
-        _common::encode::data::EncodeAuthTicketResponse,
+        _common::encode::data::AuthTicketEncoded,
     },
     z_details::_common::repository::data::RepositoryError,
 };
 
 pub enum EncodeAuthTicketEvent {
     TokenExpiresCalculated(AuthTokenExpires),
-    Success(EncodeAuthTicketResponse),
+    Success(AuthTicketEncoded),
     TicketNotFound,
     RepositoryError(RepositoryError),
     EncodeError(EncodeAuthTokenError),

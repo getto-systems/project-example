@@ -1,12 +1,14 @@
-use crate::auth::auth_ticket::_api::kernel::data::AuthTokenMessageEncoded;
 use crate::auth::auth_ticket::_api::kernel::infra::{AuthHeaderInfra, AuthTokenInfra};
 
 use crate::{
     auth::{
         _api::service::data::ServiceError,
-        auth_ticket::_common::{
-            encode::data::EncodeAuthTicketResponse,
-            kernel::data::{AuthNonceValue, AuthTokenValue},
+        auth_ticket::{
+            _api::kernel::data::AuthTokenMessageEncoded,
+            _common::{
+                encode::data::AuthTicketEncoded,
+                kernel::data::{AuthNonceValue, AuthTokenValue},
+            },
         },
     },
     z_details::_api::message::data::MessageError,
@@ -30,12 +32,12 @@ pub trait RenewAuthTicketService {
         &self,
         nonce: AuthNonceValue,
         token: AuthTokenValue,
-    ) -> Result<EncodeAuthTicketResponse, ServiceError>;
+    ) -> Result<AuthTicketEncoded, ServiceError>;
 }
 
 pub trait RenewAuthTicketResponseEncoder {
     fn encode(
         &self,
-        response: EncodeAuthTicketResponse,
+        response: AuthTicketEncoded,
     ) -> Result<AuthTokenMessageEncoded, MessageError>;
 }

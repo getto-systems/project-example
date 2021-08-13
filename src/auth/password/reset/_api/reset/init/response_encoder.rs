@@ -48,16 +48,15 @@ impl ResetPasswordResponseEncoder for ProstResetPasswordResponseEncoder {
                     message,
                 )?))
             }
-            ResetPasswordResponse::Success(response) => {
-                let (user, token) = response.extract();
+            ResetPasswordResponse::Success(ticket) => {
                 let message = ResetPasswordResultPb {
                     success: true,
-                    value: Some(user.into()),
+                    value: Some(ticket.user.into()),
                     ..Default::default()
                 };
                 Ok(ResetPasswordResult::Success(AuthTokenMessageEncoded {
                     message: encode_protobuf_base64(message)?,
-                    token,
+                    token: ticket.token,
                 }))
             }
         }
@@ -94,11 +93,10 @@ pub mod test {
                 ResetPasswordResponse::AlreadyReset => {
                     Ok(ResetPasswordResult::AlreadyReset("ALREADY-RESET".into()))
                 }
-                ResetPasswordResponse::Success(response) => {
-                    let (_user, token) = response.extract();
+                ResetPasswordResponse::Success(ticket) => {
                     Ok(ResetPasswordResult::Success(AuthTokenMessageEncoded {
                         message: "ENCODED".into(),
-                        token,
+                        token: ticket.token,
                     }))
                 }
             }

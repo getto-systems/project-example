@@ -12,7 +12,7 @@ use super::event::EncodeAuthTicketEvent;
 use crate::auth::auth_ticket::{
     _auth::{encode::data::AuthTokenExpires, kernel::data::AuthTicket},
     _common::{
-        encode::data::EncodeAuthTicketResponse,
+        encode::data::AuthTicketEncoded,
         kernel::data::{AuthTokenEncoded, ExpansionLimitDateTime},
     },
 };
@@ -50,7 +50,7 @@ pub async fn encode_auth_ticket<S>(
             .map_err(|err| post(EncodeAuthTicketEvent::EncodeError(err)))?,
     };
 
-    let response = EncodeAuthTicketResponse::new(ticket.into_user(), token);
+    let response = AuthTicketEncoded { user: ticket.into_user().extract(), token };
     Ok(post(EncodeAuthTicketEvent::Success(response)))
 }
 fn calc_expires(

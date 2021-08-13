@@ -7,7 +7,7 @@ use crate::auth::auth_ticket::_api::renew::infra::RenewAuthTicketResponseEncoder
 use crate::{
     auth::auth_ticket::{
         _api::kernel::data::AuthTokenMessageEncoded,
-        _common::encode::data::EncodeAuthTicketResponse,
+        _common::encode::data::AuthTicketEncoded,
     },
     z_details::_api::message::data::MessageError,
 };
@@ -17,13 +17,12 @@ pub struct ProstRenewAuthTicketResponseEncoder;
 impl RenewAuthTicketResponseEncoder for ProstRenewAuthTicketResponseEncoder {
     fn encode(
         &self,
-        response: EncodeAuthTicketResponse,
+        ticket: AuthTicketEncoded,
     ) -> Result<AuthTokenMessageEncoded, MessageError> {
-        let (user, token) = response.extract();
-        let message: AuthenticateResponsePb = user.into();
+        let message: AuthenticateResponsePb = ticket.user.into();
         Ok(AuthTokenMessageEncoded {
             message: encode_protobuf_base64(message)?,
-            token,
+            token: ticket.token,
         })
     }
 }
@@ -35,7 +34,7 @@ pub mod test {
     use crate::{
         auth::auth_ticket::{
             _api::kernel::data::AuthTokenMessageEncoded,
-            _common::encode::data::EncodeAuthTicketResponse,
+            _common::encode::data::AuthTicketEncoded,
         },
         z_details::_api::message::data::MessageError,
     };
@@ -45,12 +44,11 @@ pub mod test {
     impl RenewAuthTicketResponseEncoder for StaticRenewAuthTicketResponseEncoder {
         fn encode(
             &self,
-            response: EncodeAuthTicketResponse,
+            ticket: AuthTicketEncoded,
         ) -> Result<AuthTokenMessageEncoded, MessageError> {
-            let (_user, token) = response.extract();
             Ok(AuthTokenMessageEncoded {
                 message: "ENCODED".into(),
-                token,
+                token: ticket.token,
             })
         }
     }
