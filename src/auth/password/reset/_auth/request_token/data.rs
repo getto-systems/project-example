@@ -37,7 +37,7 @@ pub struct ResetTokenDestinationExtract {
 }
 
 impl ResetTokenDestinationExtract {
-    pub fn restore(self) -> ResetTokenDestination {
+    pub(in crate::auth) fn restore(self) -> ResetTokenDestination {
         ResetTokenDestination { email: self.email }
     }
 }

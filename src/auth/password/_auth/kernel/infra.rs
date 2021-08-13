@@ -42,7 +42,7 @@ pub trait AuthUserPasswordHashInfra {
 pub struct HashedPassword(String);
 
 impl HashedPassword {
-    pub const fn restore(password: String) -> Self {
+    pub(in crate::auth) const fn restore(password: String) -> Self {
         Self(password)
     }
 
@@ -134,7 +134,7 @@ pub struct ResetTokenEntryExtract {
 }
 
 impl ResetTokenEntryExtract {
-    pub fn restore(self) -> ResetTokenEntry {
+    pub(in crate::auth) fn restore(self) -> ResetTokenEntry {
         ResetTokenEntry {
             login_id: LoginId::restore(self.login_id),
             expires: ExpireDateTime::restore(self.expires),

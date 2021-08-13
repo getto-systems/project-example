@@ -11,7 +11,7 @@ impl LoginId {
         Ok(Self(login_id.validate()?))
     }
 
-    pub const fn restore(login_id: String) -> Self {
+    pub(in crate::auth) const fn restore(login_id: String) -> Self {
         Self(login_id)
     }
 

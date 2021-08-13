@@ -70,7 +70,7 @@ pub struct AuthTicketExtract {
 }
 
 impl AuthTicketExtract {
-    pub fn restore(self) -> AuthTicket {
+    pub(in crate::auth) fn restore(self) -> AuthTicket {
         AuthTicket {
             ticket_id: AuthTicketId::new(self.ticket_id),
             user: AuthUserExtract {

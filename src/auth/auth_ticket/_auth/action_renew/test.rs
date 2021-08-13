@@ -85,7 +85,7 @@ async fn error_allow_for_something_role_but_not_granted() {
 
     let result = action.ignite().await;
     assert_state(vec![
-        "validate error; auth token error: user permission denied: granted: [], required: any [something]",
+        "validate error; auth token error: user permission denied: granted: [], require: any [something]",
     ]);
     assert!(!result.is_ok());
 }

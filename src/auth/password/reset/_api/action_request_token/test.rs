@@ -26,7 +26,7 @@ async fn success_request_token() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["request reset token success"]);
+    assert_state(vec!["request reset token"]);
     assert!(result.is_ok());
 }
 

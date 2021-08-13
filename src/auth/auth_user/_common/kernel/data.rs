@@ -41,7 +41,7 @@ pub struct AuthUserExtract {
 }
 
 impl AuthUserExtract {
-    pub fn restore(self) -> AuthUser {
+    pub(in crate::auth) fn restore(self) -> AuthUser {
         AuthUser {
             user_id: AuthUserId::restore(self.user_id),
             granted_roles: GrantedAuthRoles::restore(self.granted_roles),
@@ -53,7 +53,7 @@ impl AuthUserExtract {
 pub struct AuthUserId(String);
 
 impl AuthUserId {
-    pub const fn restore(user_id: String) -> Self {
+    pub(in crate::auth) const fn restore(user_id: String) -> Self {
         Self(user_id)
     }
 
