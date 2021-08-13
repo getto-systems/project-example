@@ -54,7 +54,7 @@ impl Into<Option<EncodeAuthTicketResponse>> for RenewAuthTicketResponsePb {
             (Some(user), Some(token)) => {
                 let user: AuthUserExtract = user.into();
                 let token: Option<AuthTokenEncoded> = token.into();
-                token.map(|token| EncodeAuthTicketResponse::new(user.into(), token))
+                token.map(|token| EncodeAuthTicketResponse::new(user.restore(), token))
             }
             _ => None,
         }

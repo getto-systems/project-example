@@ -1,5 +1,5 @@
 use std::{
-    collections::HashSet,
+    collections::{hash_set::Iter, HashSet},
     fmt::{Display, Formatter},
 };
 
@@ -10,10 +10,6 @@ pub struct AuthUser {
 }
 
 impl AuthUser {
-    pub fn user_id_as_str(&self) -> &str {
-        self.user_id.0.as_str()
-    }
-
     pub fn into_user_id(self) -> AuthUserId {
         self.user_id
     }
@@ -23,8 +19,8 @@ impl AuthUser {
 
     pub fn extract(self) -> AuthUserExtract {
         AuthUserExtract {
-            user_id: self.user_id.0,
-            granted_roles: self.granted_roles.0 .0,
+            user_id: self.user_id.extract(),
+            granted_roles: self.granted_roles.extract(),
         }
     }
 
@@ -44,11 +40,11 @@ pub struct AuthUserExtract {
     pub granted_roles: HashSet<String>,
 }
 
-impl Into<AuthUser> for AuthUserExtract {
-    fn into(self) -> AuthUser {
+impl AuthUserExtract {
+    pub fn restore(self) -> AuthUser {
         AuthUser {
             user_id: AuthUserId::restore(self.user_id),
-            granted_roles: self.granted_roles.into(),
+            granted_roles: GrantedAuthRoles::restore(self.granted_roles),
         }
     }
 }
@@ -61,7 +57,7 @@ impl AuthUserId {
         Self(user_id)
     }
 
-    pub fn extract(self) -> String {
+    fn extract(self) -> String {
         self.0
     }
 
@@ -80,21 +76,29 @@ impl Display for AuthUserId {
 pub struct GrantedAuthRoles(AuthRoles);
 
 impl GrantedAuthRoles {
-    pub fn has_enough_permission(&self, require_roles: &RequireAuthRoles) -> bool {
-        match require_roles {
-            RequireAuthRoles::Nothing => true,
-            RequireAuthRoles::HasAny(roles) => roles.any(|role| self.0.contains(role)),
-        }
+    fn restore(granted_roles: impl GrantedAuthRolesExtract) -> Self {
+        Self(granted_roles.restore())
     }
 
-    pub fn extract(self) -> HashSet<String> {
-        self.0 .0
+    fn extract(self) -> HashSet<String> {
+        self.0.extract()
+    }
+
+    fn has_enough_permission(&self, require_roles: &RequireAuthRoles) -> bool {
+        match require_roles {
+            RequireAuthRoles::Nothing => true,
+            RequireAuthRoles::HasAny(roles) => roles.iter().any(|role| self.0.contains(role)),
+        }
     }
 }
 
-impl Into<GrantedAuthRoles> for HashSet<String> {
-    fn into(self) -> GrantedAuthRoles {
-        GrantedAuthRoles(AuthRoles(self))
+trait GrantedAuthRolesExtract {
+    fn restore(self) -> AuthRoles;
+}
+
+impl GrantedAuthRolesExtract for HashSet<String> {
+    fn restore(self) -> AuthRoles {
+        AuthRoles(self)
     }
 }
 
@@ -138,7 +142,7 @@ impl Display for RequireAuthRoles {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             RequireAuthRoles::Nothing => write!(f, "require: nothing"),
-            RequireAuthRoles::HasAny(roles) => write!(f, "required: any {}", roles),
+            RequireAuthRoles::HasAny(roles) => write!(f, "require: any {}", roles),
         }
     }
 }
@@ -147,10 +151,14 @@ impl Display for RequireAuthRoles {
 pub struct AuthRoles(HashSet<String>);
 
 impl AuthRoles {
-    fn any(&self, f: impl FnMut(&String) -> bool) -> bool {
-        self.0.iter().any(f)
+    fn extract(self) -> HashSet<String> {
+        self.0
     }
-    fn contains(&self, role: &String) -> bool {
+
+    fn iter(&self) -> Iter<'_, String> {
+        self.0.iter()
+    }
+    fn contains(&self, role: &str) -> bool {
         self.0.contains(role)
     }
 }

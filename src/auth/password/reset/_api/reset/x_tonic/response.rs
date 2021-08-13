@@ -18,7 +18,7 @@ impl Into<Option<ResetPasswordResponse>> for ResetPasswordResponsePb {
                     let token: Option<AuthTokenEncoded> = token.into();
                     token.map(|token| {
                         ResetPasswordResponse::Success(EncodeAuthTicketResponse::new(
-                            user.into(),
+                            user.restore(),
                             token,
                         ))
                     })

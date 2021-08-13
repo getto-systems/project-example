@@ -333,7 +333,7 @@ fn standard_token_decoder() -> StaticAuthTokenDecoder {
             user_id: "something-role-user-id".into(),
             granted_roles,
         }
-        .into(),
+        .restore(),
     )
 }
 fn no_granted_roles_token_decoder() -> StaticAuthTokenDecoder {
@@ -343,7 +343,7 @@ fn no_granted_roles_token_decoder() -> StaticAuthTokenDecoder {
             user_id: "no-role-user-id".into(),
             granted_roles: HashSet::new(),
         }
-        .into(),
+        .restore(),
     )
 }
 fn expired_token_decoder() -> StaticAuthTokenDecoder {

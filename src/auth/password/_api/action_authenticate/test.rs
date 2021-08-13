@@ -87,5 +87,5 @@ fn standard_user() -> AuthUser {
         user_id: "USER-ID".into(),
         granted_roles: HashSet::new(),
     }
-    .into()
+    .restore()
 }

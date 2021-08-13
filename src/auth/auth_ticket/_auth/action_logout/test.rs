@@ -231,7 +231,7 @@ fn standard_token_validator() -> StaticAuthTokenDecoder {
             user_id: "user-id".into(),
             granted_roles: HashSet::new(),
         }
-        .into(),
+        .restore(),
     )
 }
 

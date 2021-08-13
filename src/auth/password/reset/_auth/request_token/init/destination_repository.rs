@@ -44,7 +44,7 @@ impl<'a> ResetTokenDestinationRepository for MysqlResetTokenDestinationRepositor
         .await
         .map_err(mysql_error)?;
 
-        Ok(found.map(|entry| ResetTokenDestinationExtract { email: entry.email }.into()))
+        Ok(found.map(|entry| ResetTokenDestinationExtract { email: entry.email }.restore()))
     }
 }
 

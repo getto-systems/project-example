@@ -731,7 +731,7 @@ fn test_user() -> AuthUser {
         user_id: USER_ID.into(),
         granted_roles: HashSet::new(),
     }
-    .into()
+    .restore()
 }
 fn test_user_id() -> AuthUserId {
     AuthUserId::restore(USER_ID.to_string())

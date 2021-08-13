@@ -69,15 +69,15 @@ pub struct AuthTicketExtract {
     pub granted_roles: HashSet<String>,
 }
 
-impl Into<AuthTicket> for AuthTicketExtract {
-    fn into(self) -> AuthTicket {
+impl AuthTicketExtract {
+    pub fn restore(self) -> AuthTicket {
         AuthTicket {
             ticket_id: AuthTicketId::new(self.ticket_id),
             user: AuthUserExtract {
                 user_id: self.user_id,
                 granted_roles: self.granted_roles,
             }
-            .into(),
+            .restore(),
         }
     }
 }

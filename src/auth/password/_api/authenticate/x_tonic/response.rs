@@ -18,7 +18,7 @@ impl Into<Option<AuthenticatePasswordResponse>> for AuthenticatePasswordResponse
                     let token: Option<AuthTokenEncoded> = token.into();
                     token.map(|token| {
                         AuthenticatePasswordResponse::Success(EncodeAuthTicketResponse::new(
-                            user.into(),
+                            user.restore(),
                             token,
                         ))
                     })

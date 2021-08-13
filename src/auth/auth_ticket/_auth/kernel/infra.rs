@@ -159,7 +159,7 @@ impl Into<AuthTicket> for AuthJwtClaims {
             user_id: self.user_id,
             granted_roles: self.granted_roles,
         }
-        .into()
+        .restore()
     }
 }
 

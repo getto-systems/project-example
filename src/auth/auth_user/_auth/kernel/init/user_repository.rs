@@ -66,7 +66,7 @@ impl<'a> AuthUserRepository for MysqlAuthUserRepository<'a> {
                 user_id: user_id.as_str().into(),
                 granted_roles: HashSet::from_iter(roles.into_iter().map(|entry| entry.role)),
             }
-            .into(),
+            .restore(),
         ))
     }
 }
@@ -131,7 +131,7 @@ pub mod test {
                     user_id: user_id.as_str().into(),
                     granted_roles: granted_roles.clone(),
                 }
-                .into()
+                .restore()
             }))
         }
     }
