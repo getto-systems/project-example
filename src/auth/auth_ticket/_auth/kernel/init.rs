@@ -13,26 +13,16 @@ use nonce_repository::DynamoDbAuthNonceRepository;
 use ticket_repository::MysqlAuthTicketRepository;
 
 use crate::auth::auth_ticket::_auth::kernel::infra::{
-    AuthClockInfra, AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
+    AuthClockInfra, AuthClockInitializer, AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
 };
 
-pub struct AuthClockStruct {
-    clock: ChronoAuthClock,
-}
+pub struct ChronoAuthClockInitializer;
 
-impl AuthClockStruct {
-    pub fn new() -> Self {
-        Self {
-            clock: ChronoAuthClock::new(),
+impl AuthClockInitializer for ChronoAuthClockInitializer {
+    fn new(self) -> AuthClockInfra {
+        AuthClockInfra {
+            clock: Box::new(ChronoAuthClock::new()),
         }
-    }
-}
-
-impl AuthClockInfra for AuthClockStruct {
-    type Clock = ChronoAuthClock;
-
-    fn extract(self) -> Self::Clock {
-        self.clock
     }
 }
 
@@ -116,18 +106,18 @@ pub mod test {
     };
 
     use crate::auth::auth_ticket::_auth::kernel::infra::{
-        AuthClockInfra, AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
+        AuthClockInfra, AuthClockInitializer, AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
     };
 
-    pub struct StaticAuthClockStruct {
+    pub struct StaticAuthClockInitializer {
         pub clock: StaticChronoAuthClock,
     }
 
-    impl AuthClockInfra for StaticAuthClockStruct {
-        type Clock = StaticChronoAuthClock;
-
-        fn extract(self) -> Self::Clock {
-            self.clock
+    impl AuthClockInitializer for StaticAuthClockInitializer {
+        fn new(self) -> AuthClockInfra {
+            AuthClockInfra {
+                clock: Box::new(self.clock),
+            }
         }
     }
 

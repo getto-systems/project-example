@@ -13,7 +13,7 @@ use crate::auth::{
         kernel::init::test::{
             MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
             MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
-            StaticAuthClockStruct, StaticAuthNonceMetadata, StaticAuthTicketStruct,
+            StaticAuthClockInitializer, StaticAuthNonceMetadata, StaticAuthTicketStruct,
             StaticCheckAuthNonceStruct, StaticChronoAuthClock,
         },
     },
@@ -33,8 +33,9 @@ use crate::auth::{
 
 use crate::auth::{
     auth_ticket::_auth::{
-        encode::infra::EncodeAuthTicketConfig, issue::infra::IssueAuthTicketConfig,
-        kernel::infra::AuthNonceConfig,
+        encode::infra::EncodeAuthTicketConfig,
+        issue::infra::IssueAuthTicketConfig,
+        kernel::infra::{AuthClockInfra, AuthNonceConfig},
     },
     password::reset::_common::reset::infra::ResetPasswordFieldsExtract,
 };
@@ -497,9 +498,9 @@ impl<'a> TestFeature<'a> {
                     nonce_metadata: standard_nonce_metadata(),
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
-                clock_infra: StaticAuthClockStruct {
+                clock_infra: AuthClockInfra::new(StaticAuthClockInitializer {
                     clock: standard_clock(),
-                },
+                }),
                 user_infra: StaticAuthUserStruct {
                     user_repository: MemoryAuthUserRepository::new(&store.user),
                 },

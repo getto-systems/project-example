@@ -6,12 +6,13 @@ mod token_notifier;
 
 use tonic::metadata::MetadataMap;
 
+use crate::auth::auth_ticket::_auth::kernel::infra::AuthClockInfra;
 use crate::auth::password::reset::_common::y_protobuf::service::RequestResetTokenRequestPb;
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::init::{AuthClockStruct, CheckAuthNonceStruct},
+    auth_ticket::_auth::kernel::init::{CheckAuthNonceStruct, ChronoAuthClockInitializer},
     password::_auth::kernel::init::AuthUserPasswordStruct,
 };
 use destination_repository::MysqlResetTokenDestinationRepository;
@@ -24,7 +25,7 @@ use super::infra::{RequestResetTokenConfig, RequestResetTokenInfra};
 
 pub struct RequestResetTokenStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
-    clock_infra: AuthClockStruct,
+    clock_infra: AuthClockInfra,
     password_infra: AuthUserPasswordStruct<'a>,
     destination_repository: MysqlResetTokenDestinationRepository<'a>,
     token_generator: UuidResetTokenGenerator,
@@ -42,7 +43,7 @@ impl<'a> RequestResetTokenStruct<'a> {
     ) -> Self {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
-            clock_infra: AuthClockStruct::new(),
+            clock_infra: AuthClockInfra::new(ChronoAuthClockInitializer),
             password_infra: AuthUserPasswordStruct::new(feature),
             destination_repository: MysqlResetTokenDestinationRepository::new(&feature.store.mysql),
             token_generator: UuidResetTokenGenerator,
@@ -58,7 +59,6 @@ impl<'a> RequestResetTokenStruct<'a> {
 
 impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
-    type ClockInfra = AuthClockStruct;
     type PasswordInfra = AuthUserPasswordStruct<'a>;
     type RequestDecoder = PbRequestResetTokenRequestDecoder;
     type DestinationRepository = MysqlResetTokenDestinationRepository<'a>;
@@ -70,7 +70,7 @@ impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
         self,
     ) -> (
         Self::CheckNonceInfra,
-        Self::ClockInfra,
+        AuthClockInfra,
         Self::PasswordInfra,
         Self::RequestDecoder,
         Self::DestinationRepository,
@@ -103,18 +103,18 @@ pub mod test {
     pub use super::token_encoder::test::StaticResetTokenEncoder;
     pub use super::token_generator::test::StaticResetTokenGenerator;
     pub use super::token_notifier::test::StaticResetTokenNotifier;
+
     use crate::auth::{
-        auth_ticket::_auth::kernel::init::test::{
-            StaticAuthClockStruct, StaticCheckAuthNonceStruct,
-        },
+        auth_ticket::_auth::kernel::init::test::StaticCheckAuthNonceStruct,
         password::_auth::kernel::init::test::StaticAuthUserPasswordStruct,
     };
 
     use super::super::infra::{RequestResetTokenConfig, RequestResetTokenInfra};
+    use crate::auth::auth_ticket::_auth::kernel::infra::AuthClockInfra;
 
     pub struct StaticRequestResetTokenStruct<'a> {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
-        pub clock_infra: StaticAuthClockStruct,
+        pub clock_infra: AuthClockInfra,
         pub password_infra: StaticAuthUserPasswordStruct<'a>,
         pub request_decoder: StaticRequestResetTokenRequestDecoder,
         pub destination_repository: MemoryResetTokenDestinationRepository<'a>,
@@ -126,7 +126,6 @@ pub mod test {
 
     impl<'a> RequestResetTokenInfra for StaticRequestResetTokenStruct<'a> {
         type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
-        type ClockInfra = StaticAuthClockStruct;
         type PasswordInfra = StaticAuthUserPasswordStruct<'a>;
         type RequestDecoder = StaticRequestResetTokenRequestDecoder;
         type DestinationRepository = MemoryResetTokenDestinationRepository<'a>;
@@ -138,7 +137,7 @@ pub mod test {
             self,
         ) -> (
             Self::CheckNonceInfra,
-            Self::ClockInfra,
+            AuthClockInfra,
             Self::PasswordInfra,
             Self::RequestDecoder,
             Self::DestinationRepository,
