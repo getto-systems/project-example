@@ -1,14 +1,13 @@
 use crate::auth::auth_ticket::_auth::kernel::method::check_nonce;
 
+use crate::auth::password::reset::_common::reset::infra::ResetPasswordFieldsExtract;
 use crate::auth::{
     auth_user::_auth::kernel::infra::{AuthUserInfra, AuthUserRepository},
     password::{
         _auth::kernel::infra::{
             AuthUserPasswordHashInfra, AuthUserPasswordRepository, PlainPassword, ResetTokenEntry,
         },
-        reset::_auth::reset::infra::{
-            ResetPasswordInfra, ResetPasswordRequestDecoder, ResetTokenDecoder,
-        },
+        reset::_auth::reset::infra::{ResetPasswordInfra, ResetTokenDecoder},
     },
 };
 
@@ -25,23 +24,20 @@ use crate::auth::{
 };
 
 pub async fn reset_password<S>(
-    infra: impl ResetPasswordInfra,
+    infra: &impl ResetPasswordInfra,
+    fields: ResetPasswordFieldsExtract,
     post: impl Fn(ResetPasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
-    let (
-        check_nonce_infra,
-        clock_infra,
-        user_infra,
-        password_infra,
-        request_decoder,
-        token_decoder,
-    ) = infra.extract();
+    let check_nonce_infra = infra.check_nonce_infra();
+    let clock_infra = infra.clock_infra();
+    let user_infra = infra.user_infra();
+    let password_infra = infra.password_infra();
+    let token_decoder = infra.token_decoder();
 
     check_nonce(check_nonce_infra)
         .await
         .map_err(|err| post(ResetPasswordEvent::NonceError(err)))?;
 
-    let fields = request_decoder.decode();
     let login_id = LoginId::validate(fields.login_id).map_err(|err| post(err.into()))?;
     let plain_password =
         PlainPassword::validate(fields.password).map_err(|err| post(err.into()))?;
@@ -52,8 +48,9 @@ pub async fn reset_password<S>(
         .decode(&reset_token)
         .map_err(|err| post(ResetPasswordEvent::DecodeError(err)))?;
 
-    let (password_repository, password_hasher) = password_infra.extract(plain_password);
-    let clock = clock_infra.clock;
+    let password_repository = password_infra.password_repository();
+    let password_hasher = password_infra.password_hasher(plain_password);
+    let clock = &clock_infra.clock;
 
     let reset_at = clock.now();
 
@@ -69,7 +66,7 @@ pub async fn reset_password<S>(
         .await
         .map_err(|err| post(err.into()))?;
 
-    let user_repository = user_infra.extract();
+    let user_repository = user_infra.user_repository();
     let user = user_repository
         .get(&user_id)
         .await

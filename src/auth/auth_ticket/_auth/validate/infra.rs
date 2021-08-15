@@ -16,14 +16,10 @@ pub trait ValidateAuthTokenInfra {
     type TokenMetadata: AuthTokenMetadata;
     type TokenDecoder: AuthTokenDecoder;
 
-    fn extract(
-        self,
-    ) -> (
-        Self::CheckNonceInfra,
-        Self::TokenMetadata,
-        Self::TokenDecoder,
-        ValidateAuthTokenConfig,
-    );
+    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
+    fn token_metadata(&self) -> &Self::TokenMetadata;
+    fn token_decoder(&self) -> &Self::TokenDecoder;
+    fn config(&self) -> &ValidateAuthTokenConfig;
 }
 
 pub trait AuthTokenMetadata {

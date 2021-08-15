@@ -8,13 +8,9 @@ pub trait IssueAuthTicketInfra {
     type TicketInfra: AuthTicketInfra;
     type TicketIdGenerator: AuthTicketIdGenerator;
 
-    fn extract(
-        self,
-    ) -> (
-        Self::TicketInfra,
-        Self::TicketIdGenerator,
-        IssueAuthTicketConfig,
-    );
+    fn ticket_infra(&self) -> &Self::TicketInfra;
+    fn ticket_id_generator(&self) -> &Self::TicketIdGenerator;
+    fn config(&self) -> &IssueAuthTicketConfig;
 }
 
 pub trait AuthTicketIdGenerator {

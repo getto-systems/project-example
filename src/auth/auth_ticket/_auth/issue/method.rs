@@ -10,12 +10,15 @@ use crate::auth::{
 };
 
 pub async fn issue_auth_ticket<S>(
-    infra: impl IssueAuthTicketInfra,
+    infra: &impl IssueAuthTicketInfra,
     user: AuthUser,
     post: impl Fn(IssueAuthTicketEvent) -> S,
 ) -> Result<AuthTicket, S> {
-    let (ticket_infra, ticket_id_generator, config) = infra.extract();
-    let (clock, ticket_repository) = ticket_infra.extract();
+    let ticket_infra = infra.ticket_infra();
+    let ticket_id_generator = infra.ticket_id_generator();
+    let config = infra.config();
+    let clock = ticket_infra.clock();
+    let ticket_repository = ticket_infra.ticket_repository();
 
     let ticket = AuthTicket::new(ticket_id_generator.generate(), user);
 

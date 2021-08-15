@@ -1,13 +1,12 @@
-mod destination_repository;
-mod request_decoder;
-mod token_encoder;
-mod token_generator;
-mod token_notifier;
+pub(in crate::auth) mod destination_repository;
+pub(in crate::auth) mod request_decoder;
+pub(in crate::auth) mod token_encoder;
+pub(in crate::auth) mod token_generator;
+pub(in crate::auth) mod token_notifier;
 
 use tonic::metadata::MetadataMap;
 
 use crate::auth::auth_ticket::_auth::kernel::infra::AuthClockInfra;
-use crate::auth::password::reset::_common::y_protobuf::service::RequestResetTokenRequestPb;
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
@@ -16,7 +15,6 @@ use crate::auth::{
     password::_auth::kernel::init::AuthUserPasswordStruct,
 };
 use destination_repository::MysqlResetTokenDestinationRepository;
-use request_decoder::PbRequestResetTokenRequestDecoder;
 use token_encoder::JwtResetTokenEncoder;
 use token_generator::UuidResetTokenGenerator;
 use token_notifier::EmailResetTokenNotifier;
@@ -31,16 +29,11 @@ pub struct RequestResetTokenStruct<'a> {
     token_generator: UuidResetTokenGenerator,
     token_encoder: JwtResetTokenEncoder<'a>,
     token_notifier: EmailResetTokenNotifier<'a>,
-    request_decoder: PbRequestResetTokenRequestDecoder,
     config: RequestResetTokenConfig,
 }
 
 impl<'a> RequestResetTokenStruct<'a> {
-    pub fn new(
-        feature: &'a AuthOutsideFeature,
-        metadata: MetadataMap,
-        request: RequestResetTokenRequestPb,
-    ) -> Self {
+    pub fn new(feature: &'a AuthOutsideFeature, metadata: MetadataMap) -> Self {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
             clock_infra: AuthClockInfra::new(ChronoAuthClockInitializer),
@@ -49,7 +42,6 @@ impl<'a> RequestResetTokenStruct<'a> {
             token_generator: UuidResetTokenGenerator,
             token_encoder: JwtResetTokenEncoder::new(&feature.secret),
             token_notifier: EmailResetTokenNotifier::new(&feature.email),
-            request_decoder: PbRequestResetTokenRequestDecoder::new(request),
             config: RequestResetTokenConfig {
                 token_expires: feature.config.reset_token_expires,
             },
@@ -60,36 +52,34 @@ impl<'a> RequestResetTokenStruct<'a> {
 impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
     type PasswordInfra = AuthUserPasswordStruct<'a>;
-    type RequestDecoder = PbRequestResetTokenRequestDecoder;
     type DestinationRepository = MysqlResetTokenDestinationRepository<'a>;
     type TokenGenerator = UuidResetTokenGenerator;
     type TokenEncoder = JwtResetTokenEncoder<'a>;
     type TokenNotifier = EmailResetTokenNotifier<'a>;
 
-    fn extract(
-        self,
-    ) -> (
-        Self::CheckNonceInfra,
-        AuthClockInfra,
-        Self::PasswordInfra,
-        Self::RequestDecoder,
-        Self::DestinationRepository,
-        Self::TokenGenerator,
-        Self::TokenEncoder,
-        Self::TokenNotifier,
-        RequestResetTokenConfig,
-    ) {
-        (
-            self.check_nonce_infra,
-            self.clock_infra,
-            self.password_infra,
-            self.request_decoder,
-            self.destination_repository,
-            self.token_generator,
-            self.token_encoder,
-            self.token_notifier,
-            self.config,
-        )
+    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
+        &self.check_nonce_infra
+    }
+    fn clock_infra(&self) -> &AuthClockInfra {
+        &self.clock_infra
+    }
+    fn password_infra(&self) -> &Self::PasswordInfra {
+        &self.password_infra
+    }
+    fn destination_repository(&self) -> &Self::DestinationRepository {
+        &self.destination_repository
+    }
+    fn token_generator(&self) -> &Self::TokenGenerator {
+        &self.token_generator
+    }
+    fn token_encoder(&self) -> &Self::TokenEncoder {
+        &self.token_encoder
+    }
+    fn token_notifier(&self) -> &Self::TokenNotifier {
+        &self.token_notifier
+    }
+    fn config(&self) -> &RequestResetTokenConfig {
+        &self.config
     }
 }
 
@@ -116,7 +106,6 @@ pub mod test {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
         pub clock_infra: AuthClockInfra,
         pub password_infra: StaticAuthUserPasswordStruct<'a>,
-        pub request_decoder: StaticRequestResetTokenRequestDecoder,
         pub destination_repository: MemoryResetTokenDestinationRepository<'a>,
         pub token_generator: StaticResetTokenGenerator,
         pub token_encoder: StaticResetTokenEncoder,
@@ -127,36 +116,34 @@ pub mod test {
     impl<'a> RequestResetTokenInfra for StaticRequestResetTokenStruct<'a> {
         type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
         type PasswordInfra = StaticAuthUserPasswordStruct<'a>;
-        type RequestDecoder = StaticRequestResetTokenRequestDecoder;
         type DestinationRepository = MemoryResetTokenDestinationRepository<'a>;
         type TokenGenerator = StaticResetTokenGenerator;
         type TokenEncoder = StaticResetTokenEncoder;
         type TokenNotifier = StaticResetTokenNotifier;
 
-        fn extract(
-            self,
-        ) -> (
-            Self::CheckNonceInfra,
-            AuthClockInfra,
-            Self::PasswordInfra,
-            Self::RequestDecoder,
-            Self::DestinationRepository,
-            Self::TokenGenerator,
-            Self::TokenEncoder,
-            Self::TokenNotifier,
-            RequestResetTokenConfig,
-        ) {
-            (
-                self.check_nonce_infra,
-                self.clock_infra,
-                self.password_infra,
-                self.request_decoder,
-                self.destination_repository,
-                self.token_generator,
-                self.token_encoder,
-                self.token_notifier,
-                self.config,
-            )
+        fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
+            &self.check_nonce_infra
+        }
+        fn clock_infra(&self) -> &AuthClockInfra {
+            &self.clock_infra
+        }
+        fn password_infra(&self) -> &Self::PasswordInfra {
+            &self.password_infra
+        }
+        fn destination_repository(&self) -> &Self::DestinationRepository {
+            &self.destination_repository
+        }
+        fn token_generator(&self) -> &Self::TokenGenerator {
+            &self.token_generator
+        }
+        fn token_encoder(&self) -> &Self::TokenEncoder {
+            &self.token_encoder
+        }
+        fn token_notifier(&self) -> &Self::TokenNotifier {
+            &self.token_notifier
+        }
+        fn config(&self) -> &RequestResetTokenConfig {
+            &self.config
         }
     }
 }

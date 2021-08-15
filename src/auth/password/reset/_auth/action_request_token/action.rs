@@ -3,7 +3,9 @@ use std::fmt::Display;
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::password::reset::_auth::request_token::{
-    event::RequestResetTokenEvent, infra::RequestResetTokenInfra, method::request_reset_token,
+    event::RequestResetTokenEvent,
+    infra::{RequestResetTokenInfra, RequestResetTokenRequestDecoder},
+    method::request_reset_token,
 };
 
 pub enum RequestResetTokenState {
@@ -41,11 +43,16 @@ impl<M: RequestResetTokenMaterial> RequestResetTokenAction<M> {
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<RequestResetTokenState> {
+    pub async fn ignite(
+        self,
+        request_decoder: impl RequestResetTokenRequestDecoder,
+    ) -> MethodResult<RequestResetTokenState> {
         let pubsub = self.pubsub;
         let request_token = self.material.extract();
 
-        request_reset_token(request_token, |event| {
+        let fields = request_decoder.decode();
+
+        request_reset_token(&request_token, fields, |event| {
             pubsub.post(RequestResetTokenState::RequestToken(event))
         })
         .await

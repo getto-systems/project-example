@@ -65,6 +65,7 @@ pub enum CloudfrontTokenKind {
     Signature,
 }
 
+// TODO これは _auth に移動できるはず
 #[derive(Clone)]
 pub struct AuthDateTime(DateTime<Utc>);
 

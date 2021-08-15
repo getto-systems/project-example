@@ -38,20 +38,17 @@ impl<'a> ValidateAuthTokenInfra for TicketValidateAuthTokenStruct<'a> {
     type TokenMetadata = TicketAuthTokenMetadata<'a>;
     type TokenDecoder = JwtAuthTokenDecoder<'a>;
 
-    fn extract(
-        self,
-    ) -> (
-        Self::CheckNonceInfra,
-        Self::TokenMetadata,
-        Self::TokenDecoder,
-        ValidateAuthTokenConfig,
-    ) {
-        (
-            self.check_nonce_infra,
-            self.token_metadata,
-            self.token_decoder,
-            self.config,
-        )
+    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
+        &self.check_nonce_infra
+    }
+    fn token_metadata(&self) -> &Self::TokenMetadata {
+        &self.token_metadata
+    }
+    fn token_decoder(&self) -> &Self::TokenDecoder {
+        &self.token_decoder
+    }
+    fn config(&self) -> &ValidateAuthTokenConfig {
+        &self.config
     }
 }
 
@@ -82,20 +79,17 @@ impl<'a> ValidateAuthTokenInfra for ApiValidateAuthTokenStruct<'a> {
     type TokenMetadata = ApiAuthTokenMetadata<'a>;
     type TokenDecoder = JwtApiTokenDecoder<'a>;
 
-    fn extract(
-        self,
-    ) -> (
-        Self::CheckNonceInfra,
-        Self::TokenMetadata,
-        Self::TokenDecoder,
-        ValidateAuthTokenConfig,
-    ) {
-        (
-            self.check_nonce_infra,
-            self.token_metadata,
-            self.token_decoder,
-            self.config,
-        )
+    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
+        &self.check_nonce_infra
+    }
+    fn token_metadata(&self) -> &Self::TokenMetadata {
+        &self.token_metadata
+    }
+    fn token_decoder(&self) -> &Self::TokenDecoder {
+        &self.token_decoder
+    }
+    fn config(&self) -> &ValidateAuthTokenConfig {
+        &self.config
     }
 }
 
@@ -119,20 +113,17 @@ pub mod test {
         type TokenMetadata = StaticAuthTokenMetadata;
         type TokenDecoder = StaticAuthTokenDecoder;
 
-        fn extract(
-            self,
-        ) -> (
-            Self::CheckNonceInfra,
-            Self::TokenMetadata,
-            Self::TokenDecoder,
-            ValidateAuthTokenConfig,
-        ) {
-            (
-                self.check_nonce_infra,
-                self.token_metadata,
-                self.token_decoder,
-                self.config,
-            )
+        fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
+            &self.check_nonce_infra
+        }
+        fn token_metadata(&self) -> &Self::TokenMetadata {
+            &self.token_metadata
+        }
+        fn token_decoder(&self) -> &Self::TokenDecoder {
+            &self.token_decoder
+        }
+        fn config(&self) -> &ValidateAuthTokenConfig {
+            &self.config
         }
     }
 }

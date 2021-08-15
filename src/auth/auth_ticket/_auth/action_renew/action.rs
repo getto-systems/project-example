@@ -53,12 +53,12 @@ impl<M: RenewAuthTicketMaterial> RenewAuthTicketAction<M> {
         let pubsub = self.pubsub;
         let (validate, encode) = self.material.extract();
 
-        let ticket = validate_auth_token(validate, |event| {
+        let ticket = validate_auth_token(&validate, |event| {
             pubsub.post(RenewAuthTicketState::Validate(event))
         })
         .await?;
 
-        encode_auth_ticket(encode, ticket, |event| {
+        encode_auth_ticket(&encode, ticket, |event| {
             pubsub.post(RenewAuthTicketState::Encode(event))
         })
         .await

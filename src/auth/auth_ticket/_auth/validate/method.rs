@@ -11,10 +11,13 @@ use crate::auth::auth_ticket::_auth::{
 };
 
 pub async fn validate_auth_token<S>(
-    infra: impl ValidateAuthTokenInfra,
+    infra: &impl ValidateAuthTokenInfra,
     post: impl Fn(ValidateAuthTokenEvent) -> S,
 ) -> Result<AuthTicket, S> {
-    let (check_nonce_infra, token_metadata, token_decoder, config) = infra.extract();
+    let check_nonce_infra = infra.check_nonce_infra();
+    let token_metadata = infra.token_metadata();
+    let token_decoder = infra.token_decoder();
+    let config = infra.config();
 
     check_nonce(check_nonce_infra)
         .await
@@ -29,9 +32,9 @@ pub async fn validate_auth_token<S>(
 }
 
 fn validate_token(
-    token_metadata: impl AuthTokenMetadata,
-    token_decoder: impl AuthTokenDecoder,
-    config: ValidateAuthTokenConfig,
+    token_metadata: &impl AuthTokenMetadata,
+    token_decoder: &impl AuthTokenDecoder,
+    config: &ValidateAuthTokenConfig,
 ) -> Result<AuthTicket, ValidateAuthTokenError> {
     let token = token_metadata
         .token()

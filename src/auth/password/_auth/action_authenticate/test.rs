@@ -60,12 +60,13 @@ async fn success_authenticate() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec![
         "authenticate password success; user: test-user-id (granted: [something])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
@@ -81,12 +82,13 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let feature = TestFeature::standard(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec![
         "authenticate password success; user: test-user-id (granted: [something])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
@@ -102,12 +104,13 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let feature = TestFeature::standard(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec![
         "authenticate password error; auth nonce error: conflict",
     ]);
@@ -119,12 +122,13 @@ async fn error_empty_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::empty_login_id(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = empty_login_id_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec![
         "authenticate password error; invalid login id: empty login id",
     ]);
@@ -136,12 +140,13 @@ async fn error_too_long_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::too_long_login_id(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = too_long_login_id_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec![
         "authenticate password error; invalid login id: too long login id",
     ]);
@@ -153,12 +158,13 @@ async fn just_max_length_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::just_max_length_login_id(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = just_max_length_login_id_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec!["authenticate password error; password not found"]);
     assert!(!result.is_ok());
 }
@@ -168,12 +174,13 @@ async fn error_empty_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::empty_password(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = empty_password_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec![
         "authenticate password error; invalid password: empty password",
     ]);
@@ -185,12 +192,13 @@ async fn error_too_long_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::too_long_password(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = too_long_password_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec![
         "authenticate password error; invalid password: too long password",
     ]);
@@ -202,12 +210,13 @@ async fn just_max_length_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::just_max_length_password(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = just_max_length_password_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec!["authenticate password error; password not matched"]);
     assert!(!result.is_ok());
 }
@@ -217,12 +226,13 @@ async fn error_failed_to_match_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::match_fail_password();
-    let feature = TestFeature::standard(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec!["authenticate password error; password not matched"]);
     assert!(!result.is_ok());
 }
@@ -232,12 +242,13 @@ async fn error_password_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::password_not_stored();
-    let feature = TestFeature::standard(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec!["authenticate password error; password not found"]);
     assert!(!result.is_ok());
 }
@@ -247,12 +258,13 @@ async fn error_user_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::user_not_stored();
-    let feature = TestFeature::standard(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec!["authenticate password error; user not found"]);
     assert!(!result.is_ok());
 }
@@ -332,31 +344,7 @@ impl TestStore {
 }
 
 impl<'a> TestFeature<'a> {
-    fn standard(store: &'a TestStore) -> Self {
-        Self::with_messenger(store, standard_messenger())
-    }
-    fn empty_login_id(store: &'a TestStore) -> Self {
-        Self::with_messenger(store, empty_login_id_messenger())
-    }
-    fn too_long_login_id(store: &'a TestStore) -> Self {
-        Self::with_messenger(store, too_long_login_id_messenger())
-    }
-    fn just_max_length_login_id(store: &'a TestStore) -> Self {
-        Self::with_messenger(store, just_max_length_login_id_messenger())
-    }
-    fn empty_password(store: &'a TestStore) -> Self {
-        Self::with_messenger(store, empty_password_messenger())
-    }
-    fn too_long_password(store: &'a TestStore) -> Self {
-        Self::with_messenger(store, too_long_password_messenger())
-    }
-    fn just_max_length_password(store: &'a TestStore) -> Self {
-        Self::with_messenger(store, just_max_length_password_messenger())
-    }
-    fn with_messenger(
-        store: &'a TestStore,
-        messenger: StaticAuthenticatePasswordRequestDecoder,
-    ) -> Self {
+    fn new(store: &'a TestStore) -> Self {
         Self {
             authenticate: StaticAuthenticatePasswordStruct {
                 check_nonce_infra: StaticCheckAuthNonceStruct {
@@ -371,7 +359,6 @@ impl<'a> TestFeature<'a> {
                 password_infra: StaticAuthUserPasswordStruct {
                     password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
                 },
-                request_decoder: messenger,
             },
             issue: StaticIssueAuthTicketStruct {
                 ticket_infra: standard_ticket_infra(store),
@@ -432,43 +419,43 @@ fn standard_nonce_metadata() -> StaticAuthNonceMetadata {
     StaticAuthNonceMetadata::Valid(AuthNonceValue::new(NONCE.into()))
 }
 
-fn standard_messenger() -> StaticAuthenticatePasswordRequestDecoder {
+fn standard_request_decoder() -> StaticAuthenticatePasswordRequestDecoder {
     StaticAuthenticatePasswordRequestDecoder::Valid(AuthenticatePasswordFieldsExtract {
         login_id: "login-id".into(),
         password: "password".into(),
     })
 }
-fn empty_login_id_messenger() -> StaticAuthenticatePasswordRequestDecoder {
+fn empty_login_id_request_decoder() -> StaticAuthenticatePasswordRequestDecoder {
     StaticAuthenticatePasswordRequestDecoder::Valid(AuthenticatePasswordFieldsExtract {
         login_id: "".into(),
         password: "password".into(),
     })
 }
-fn too_long_login_id_messenger() -> StaticAuthenticatePasswordRequestDecoder {
+fn too_long_login_id_request_decoder() -> StaticAuthenticatePasswordRequestDecoder {
     StaticAuthenticatePasswordRequestDecoder::Valid(AuthenticatePasswordFieldsExtract {
         login_id: vec!["a"; 100 + 1].join(""),
         password: "password".into(),
     })
 }
-fn just_max_length_login_id_messenger() -> StaticAuthenticatePasswordRequestDecoder {
+fn just_max_length_login_id_request_decoder() -> StaticAuthenticatePasswordRequestDecoder {
     StaticAuthenticatePasswordRequestDecoder::Valid(AuthenticatePasswordFieldsExtract {
         login_id: vec!["a"; 100].join(""),
         password: "password".into(),
     })
 }
-fn empty_password_messenger() -> StaticAuthenticatePasswordRequestDecoder {
+fn empty_password_request_decoder() -> StaticAuthenticatePasswordRequestDecoder {
     StaticAuthenticatePasswordRequestDecoder::Valid(AuthenticatePasswordFieldsExtract {
         login_id: "login-id".into(),
         password: "".into(),
     })
 }
-fn too_long_password_messenger() -> StaticAuthenticatePasswordRequestDecoder {
+fn too_long_password_request_decoder() -> StaticAuthenticatePasswordRequestDecoder {
     StaticAuthenticatePasswordRequestDecoder::Valid(AuthenticatePasswordFieldsExtract {
         login_id: "login-id".into(),
         password: vec!["a"; 100 + 1].join(""),
     })
 }
-fn just_max_length_password_messenger() -> StaticAuthenticatePasswordRequestDecoder {
+fn just_max_length_password_request_decoder() -> StaticAuthenticatePasswordRequestDecoder {
     StaticAuthenticatePasswordRequestDecoder::Valid(AuthenticatePasswordFieldsExtract {
         login_id: "login-id".into(),
         password: vec!["a"; 100].join(""),

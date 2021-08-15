@@ -12,7 +12,8 @@ use crate::auth::{
         },
     },
     password::_auth::authenticate::{
-        event::AuthenticatePasswordEvent, infra::AuthenticatePasswordInfra,
+        event::AuthenticatePasswordEvent,
+        infra::{AuthenticatePasswordInfra, AuthenticatePasswordRequestDecoder},
         method::authenticate_password,
     },
 };
@@ -61,21 +62,26 @@ impl<M: AuthenticatePasswordMaterial> AuthenticatePasswordAction<M> {
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<AuthenticatePasswordState> {
+    pub async fn ignite(
+        self,
+        request: impl AuthenticatePasswordRequestDecoder,
+    ) -> MethodResult<AuthenticatePasswordState> {
         let pubsub = self.pubsub;
         let (authenticate, issue, encode) = self.material.extract();
 
-        let user = authenticate_password(authenticate, |event| {
+        let fields = request.decode();
+
+        let user = authenticate_password(&authenticate, fields, |event| {
             pubsub.post(AuthenticatePasswordState::Authenticate(event))
         })
         .await?;
 
-        let ticket = issue_auth_ticket(issue, user, |event| {
+        let ticket = issue_auth_ticket(&issue, user, |event| {
             pubsub.post(AuthenticatePasswordState::Issue(event))
         })
         .await?;
 
-        encode_auth_ticket(encode, ticket, |event| {
+        encode_auth_ticket(&encode, ticket, |event| {
             pubsub.post(AuthenticatePasswordState::Encode(event))
         })
         .await

@@ -1,16 +1,14 @@
-mod request_decoder;
+pub(in crate::auth) mod request_decoder;
 
 use tonic::metadata::MetadataMap;
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::password::_common::y_protobuf::service::AuthenticatePasswordRequestPb;
 use crate::auth::{
     auth_ticket::_auth::kernel::init::CheckAuthNonceStruct,
     auth_user::_auth::kernel::init::AuthUserStruct,
     password::_auth::kernel::init::AuthUserPasswordStruct,
 };
-use request_decoder::PbAuthenticatePasswordRequestDecoder;
 
 use super::infra::AuthenticatePasswordInfra;
 
@@ -18,20 +16,14 @@ pub struct AuthenticatePasswordStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
     user_infra: AuthUserStruct<'a>,
     password_infra: AuthUserPasswordStruct<'a>,
-    request_decoder: PbAuthenticatePasswordRequestDecoder,
 }
 
 impl<'a> AuthenticatePasswordStruct<'a> {
-    pub fn new(
-        feature: &'a AuthOutsideFeature,
-        metadata: &'a MetadataMap,
-        request: AuthenticatePasswordRequestPb,
-    ) -> Self {
+    pub fn new(feature: &'a AuthOutsideFeature, metadata: &'a MetadataMap) -> Self {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata.clone()),
             user_infra: AuthUserStruct::new(feature),
             password_infra: AuthUserPasswordStruct::new(feature),
-            request_decoder: PbAuthenticatePasswordRequestDecoder::new(request),
         }
     }
 }
@@ -40,22 +32,15 @@ impl<'a> AuthenticatePasswordInfra for AuthenticatePasswordStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
     type UserInfra = AuthUserStruct<'a>;
     type PasswordInfra = AuthUserPasswordStruct<'a>;
-    type RequestDecoder = PbAuthenticatePasswordRequestDecoder;
 
-    fn extract(
-        self,
-    ) -> (
-        Self::CheckNonceInfra,
-        Self::UserInfra,
-        Self::PasswordInfra,
-        Self::RequestDecoder,
-    ) {
-        (
-            self.check_nonce_infra,
-            self.user_infra,
-            self.password_infra,
-            self.request_decoder,
-        )
+    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
+        &self.check_nonce_infra
+    }
+    fn user_infra(&self) -> &Self::UserInfra {
+        &self.user_infra
+    }
+    fn password_infra(&self) -> &Self::PasswordInfra {
+        &self.password_infra
     }
 }
 
@@ -74,29 +59,21 @@ pub mod test {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
         pub user_infra: StaticAuthUserStruct<'a>,
         pub password_infra: StaticAuthUserPasswordStruct<'a>,
-        pub request_decoder: StaticAuthenticatePasswordRequestDecoder,
     }
 
     impl<'a> AuthenticatePasswordInfra for StaticAuthenticatePasswordStruct<'a> {
         type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
         type UserInfra = StaticAuthUserStruct<'a>;
         type PasswordInfra = StaticAuthUserPasswordStruct<'a>;
-        type RequestDecoder = StaticAuthenticatePasswordRequestDecoder;
 
-        fn extract(
-            self,
-        ) -> (
-            Self::CheckNonceInfra,
-            Self::UserInfra,
-            Self::PasswordInfra,
-            Self::RequestDecoder,
-        ) {
-            (
-                self.check_nonce_infra,
-                self.user_infra,
-                self.password_infra,
-                self.request_decoder,
-            )
+        fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
+            &self.check_nonce_infra
+        }
+        fn user_infra(&self) -> &Self::UserInfra {
+            &self.user_infra
+        }
+        fn password_infra(&self) -> &Self::PasswordInfra {
+            &self.password_infra
         }
     }
 }

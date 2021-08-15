@@ -16,27 +16,27 @@ use crate::{
 pub trait AuthUserPasswordInfra {
     type PasswordRepository: AuthUserPasswordRepository;
 
-    fn extract(self) -> Self::PasswordRepository;
+    fn password_repository(&self) -> &Self::PasswordRepository;
 }
 
 pub trait AuthUserPasswordMatchInfra {
     type PasswordRepository: AuthUserPasswordRepository;
     type PasswordMatcher: AuthUserPasswordMatcher;
 
-    fn extract(
-        self,
-        plain_password: PlainPassword,
-    ) -> (Self::PasswordRepository, Self::PasswordMatcher);
+    fn password_repository(&self) -> &Self::PasswordRepository;
+    fn password_matcher(&self, plain_password: PlainPassword) -> Self::PasswordMatcher {
+        Self::PasswordMatcher::new(plain_password)
+    }
 }
 
 pub trait AuthUserPasswordHashInfra {
     type PasswordRepository: AuthUserPasswordRepository;
     type PasswordHasher: AuthUserPasswordHasher;
 
-    fn extract(
-        self,
-        plain_password: PlainPassword,
-    ) -> (Self::PasswordRepository, Self::PasswordHasher);
+    fn password_repository(&self) -> &Self::PasswordRepository;
+    fn password_hasher(&self, plain_password: PlainPassword) -> Self::PasswordHasher {
+        Self::PasswordHasher::new(plain_password)
+    }
 }
 
 pub struct HashedPassword(String);

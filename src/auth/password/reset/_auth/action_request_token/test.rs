@@ -47,12 +47,13 @@ async fn success_request_token() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = standard_request_decoder();
 
     let mut action = RequestResetTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec![
         "token expires calculated; 2021-01-02 10:00:00 UTC",
         "token notified; message-id: message-id",
@@ -66,12 +67,13 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let feature = TestFeature::standard(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = standard_request_decoder();
 
     let mut action = RequestResetTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec![
         "token expires calculated; 2021-01-02 10:00:00 UTC",
         "token notified; message-id: message-id",
@@ -85,12 +87,13 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let feature = TestFeature::standard(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = standard_request_decoder();
 
     let mut action = RequestResetTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec![
         "request reset token error; auth nonce error: conflict",
     ]);
@@ -102,12 +105,13 @@ async fn error_empty_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::empty_login_id(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = empty_login_id_request_decoder();
 
     let mut action = RequestResetTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec![
         "request reset token error; invalid login id: empty login id",
     ]);
@@ -119,12 +123,13 @@ async fn error_too_long_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::too_long_login_id(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = too_long_login_id_request_decoder();
 
     let mut action = RequestResetTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec![
         "request reset token error; invalid login id: too long login id",
     ]);
@@ -136,12 +141,13 @@ async fn just_max_length_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::just_max_length_login_id(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = just_max_length_login_id_request_decoder();
 
     let mut action = RequestResetTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec!["request reset token error; destination not found"]);
     assert!(!result.is_ok());
 }
@@ -151,12 +157,13 @@ async fn error_destination_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::destination_not_stored();
-    let feature = TestFeature::standard(&store);
+    let feature = TestFeature::new(&store);
+    let request_decoder = standard_request_decoder();
 
     let mut action = RequestResetTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec!["request reset token error; destination not found"]);
     assert!(!result.is_ok());
 }
@@ -211,22 +218,7 @@ impl TestStore {
 }
 
 impl<'a> TestFeature<'a> {
-    fn standard(store: &'a TestStore) -> Self {
-        Self::with_request_decoder(store, standard_request_decoder())
-    }
-    fn empty_login_id(store: &'a TestStore) -> Self {
-        Self::with_request_decoder(store, empty_login_id_request_decoder())
-    }
-    fn too_long_login_id(store: &'a TestStore) -> Self {
-        Self::with_request_decoder(store, too_long_login_id_request_decoder())
-    }
-    fn just_max_length_login_id(store: &'a TestStore) -> Self {
-        Self::with_request_decoder(store, just_max_length_login_id_request_decoder())
-    }
-    fn with_request_decoder(
-        store: &'a TestStore,
-        request_decoder: StaticRequestResetTokenRequestDecoder,
-    ) -> Self {
+    fn new(store: &'a TestStore) -> Self {
         Self {
             request_token: StaticRequestResetTokenStruct {
                 check_nonce_infra: StaticCheckAuthNonceStruct {
@@ -247,7 +239,6 @@ impl<'a> TestFeature<'a> {
                 token_generator: standard_token_generator(),
                 token_encoder: StaticResetTokenEncoder::new(),
                 token_notifier: StaticResetTokenNotifier::new(),
-                request_decoder,
                 config: standard_request_token_config(),
             },
         }

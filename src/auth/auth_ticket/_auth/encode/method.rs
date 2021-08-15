@@ -18,12 +18,17 @@ use crate::auth::auth_ticket::{
 };
 
 pub async fn encode_auth_ticket<S>(
-    infra: impl EncodeAuthTicketInfra,
+    infra: &impl EncodeAuthTicketInfra,
     ticket: AuthTicket,
     post: impl Fn(EncodeAuthTicketEvent) -> S,
 ) -> MethodResult<S> {
-    let (ticket_infra, ticket_encoder, api_encoder, cloudfront_encoder, config) = infra.extract();
-    let (clock, ticket_repository) = ticket_infra.extract();
+    let ticket_infra = infra.ticket_infra();
+    let ticket_encoder = infra.ticket_encoder();
+    let api_encoder = infra.api_encoder();
+    let cloudfront_encoder = infra.cloudfront_encoder();
+    let config = infra.config();
+    let clock = ticket_infra.clock();
+    let ticket_repository = ticket_infra.ticket_repository();
 
     let limit = ticket_repository
         .expansion_limit(&ticket)
@@ -31,7 +36,7 @@ pub async fn encode_auth_ticket<S>(
         .map_err(|err| post(EncodeAuthTicketEvent::RepositoryError(err)))?
         .ok_or_else(|| post(EncodeAuthTicketEvent::TicketNotFound))?;
 
-    let expires = calc_expires(&clock, &config, limit);
+    let expires = calc_expires(clock, &config, limit);
     post(EncodeAuthTicketEvent::TokenExpiresCalculated(
         expires.clone(),
     ));

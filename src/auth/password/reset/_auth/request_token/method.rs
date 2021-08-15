@@ -4,11 +4,12 @@ use crate::auth::auth_ticket::_auth::kernel::method::check_nonce;
 
 use crate::auth::password::reset::_auth::request_token::event::destination_not_found;
 
+use crate::auth::password::reset::_common::request_token::infra::RequestResetTokenFieldsExtract;
 use crate::auth::password::{
     _auth::kernel::infra::{AuthUserPasswordInfra, AuthUserPasswordRepository},
     reset::_auth::request_token::infra::{
-        RequestResetTokenInfra, RequestResetTokenRequestDecoder, ResetTokenDestinationRepository,
-        ResetTokenEncoder, ResetTokenGenerator, ResetTokenNotifier,
+        RequestResetTokenInfra, ResetTokenDestinationRepository, ResetTokenEncoder,
+        ResetTokenGenerator, ResetTokenNotifier,
     },
 };
 
@@ -17,26 +18,23 @@ use super::event::RequestResetTokenEvent;
 use crate::auth::login_id::_auth::data::LoginId;
 
 pub async fn request_reset_token<S>(
-    infra: impl RequestResetTokenInfra,
+    infra: &impl RequestResetTokenInfra,
+    fields: RequestResetTokenFieldsExtract,
     post: impl Fn(RequestResetTokenEvent) -> S,
 ) -> MethodResult<S> {
-    let (
-        check_nonce_infra,
-        clock_infra,
-        password_infra,
-        request_decoder,
-        destination_repository,
-        token_generator,
-        token_encoder,
-        token_notifier,
-        config,
-    ) = infra.extract();
+    let check_nonce_infra = infra.check_nonce_infra();
+    let clock_infra = infra.clock_infra();
+    let password_infra = infra.password_infra();
+    let destination_repository = infra.destination_repository();
+    let token_generator = infra.token_generator();
+    let token_encoder = infra.token_encoder();
+    let token_notifier = infra.token_notifier();
+    let config = infra.config();
 
     check_nonce(check_nonce_infra)
         .await
         .map_err(|err| post(RequestResetTokenEvent::NonceError(err)))?;
 
-    let fields = request_decoder.decode();
     let login_id = LoginId::validate(fields.login_id).map_err(|err| post(err.into()))?;
 
     let destination = destination_repository
@@ -45,8 +43,8 @@ pub async fn request_reset_token<S>(
         .map_err(|err| post(RequestResetTokenEvent::RepositoryError(err)))?
         .ok_or_else(|| post(destination_not_found()))?;
 
-    let clock = clock_infra.clock;
-    let password_repository = password_infra.extract();
+    let clock = &clock_infra.clock;
+    let password_repository = password_infra.password_repository();
 
     let reset_token = token_generator.generate();
 
