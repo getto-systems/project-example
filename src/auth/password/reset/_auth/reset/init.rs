@@ -26,7 +26,7 @@ pub struct ResetPasswordStruct<'a> {
 }
 
 impl<'a> ResetPasswordStruct<'a> {
-    pub fn new(feature: &'a AuthOutsideFeature, metadata: MetadataMap) -> Self {
+    pub fn new(feature: &'a AuthOutsideFeature, metadata: &'a MetadataMap) -> Self {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
             clock_infra: AuthClockInfra::new(ChronoAuthClockInitializer),

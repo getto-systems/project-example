@@ -22,21 +22,25 @@ impl AppFeature {
     }
 }
 
-pub fn extract_request<T>(request: Request<T>) -> (AppData, MetadataMap, T) {
+pub struct TonicRequest<T> {
+    pub data: AppData,
+    pub metadata: MetadataMap,
+    pub request: T,
+}
+
+pub fn extract_request<T>(request: Request<T>) -> TonicRequest<T> {
     let data = request
         .extensions()
         .get::<AppData>()
         .expect("failed to get AppFeature")
         .clone();
 
-    // request が metadata と inner の両方を into してくれるやつが無いため、to_owned する
-    // TODO into_inner_and_metadata みたいなメソッドを pull request したい
-    // layer に metadata を配る必要があるため、metadata を owned で返すのは難しいかもしれない
-    let metadata = request.metadata().to_owned();
-
-    let request = request.into_inner();
-
-    (data, metadata, request)
+    TonicRequest {
+        data,
+        // metadata と inner の両方を into してくれるやつが無いため、to_owned する
+        metadata: request.metadata().to_owned(),
+        request: request.into_inner(),
+    }
 }
 
 pub fn app_data(extensions: &Extensions) -> &AppData {

@@ -24,7 +24,7 @@ pub struct ResetPasswordFeature<'a> {
 impl<'a> ResetPasswordFeature<'a> {
     pub fn action(
         feature: &'a AuthOutsideFeature,
-        metadata: MetadataMap,
+        metadata: &'a MetadataMap,
     ) -> ResetPasswordAction<Self> {
         ResetPasswordAction::with_material(Self {
             reset: ResetPasswordStruct::new(feature, metadata),

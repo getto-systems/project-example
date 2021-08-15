@@ -1,7 +1,7 @@
 mod token_decoder;
 mod token_metadata;
 
-use tonic::Request;
+use tonic::{metadata::MetadataMap, Request};
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
@@ -21,10 +21,10 @@ pub struct TicketValidateAuthTokenStruct<'a> {
 }
 
 impl<'a> TicketValidateAuthTokenStruct<'a> {
-    pub fn new<T>(feature: &'a AuthOutsideFeature, request: &'a Request<T>) -> Self {
+    pub fn new(feature: &'a AuthOutsideFeature, metadata: &'a MetadataMap) -> Self {
         Self {
-            check_nonce_infra: CheckAuthNonceStruct::new(feature, request.metadata().clone()),
-            token_metadata: TicketAuthTokenMetadata::new(request.metadata()),
+            check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
+            token_metadata: TicketAuthTokenMetadata::new(metadata),
             token_decoder: JwtAuthTokenDecoder::new(&feature.secret.ticket.decoding_key),
             config: ValidateAuthTokenConfig {
                 require_roles: RequireAuthRoles::Nothing, // ticket 検証では role は不問
@@ -60,15 +60,15 @@ pub struct ApiValidateAuthTokenStruct<'a> {
 }
 
 impl<'a> ApiValidateAuthTokenStruct<'a> {
-    pub fn new<T>(
+    pub fn new(
         feature: &'a AuthOutsideFeature,
-        request: &'a Request<T>,
+        metadata: &'a MetadataMap,
         require_roles: RequireAuthRoles,
     ) -> Self {
         Self {
-            check_nonce_infra: CheckAuthNonceStruct::new(feature, request.metadata().clone()),
+            check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
             config: ValidateAuthTokenConfig { require_roles },
-            token_metadata: ApiAuthTokenMetadata::new(request.metadata()),
+            token_metadata: ApiAuthTokenMetadata::new(metadata),
             token_decoder: JwtApiTokenDecoder::new(&feature.secret.api.decoding_key),
         }
     }

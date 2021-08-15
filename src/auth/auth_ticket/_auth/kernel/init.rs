@@ -55,13 +55,13 @@ impl<'a> AuthTicketInfra for AuthTicketStruct<'a> {
 pub struct CheckAuthNonceStruct<'a> {
     config: AuthNonceConfig,
     clock: ChronoAuthClock,
-    nonce_metadata: TonicAuthNonceMetadata,
+    nonce_metadata: TonicAuthNonceMetadata<'a>,
     nonce_repository: DynamoDbAuthNonceRepository<'a>,
 }
 
 impl<'a> CheckAuthNonceInfra for CheckAuthNonceStruct<'a> {
     type Clock = ChronoAuthClock;
-    type NonceMetadata = TonicAuthNonceMetadata;
+    type NonceMetadata = TonicAuthNonceMetadata<'a>;
     type NonceRepository = DynamoDbAuthNonceRepository<'a>;
 
     fn clock(&self) -> &Self::Clock {
@@ -79,7 +79,7 @@ impl<'a> CheckAuthNonceInfra for CheckAuthNonceStruct<'a> {
 }
 
 impl<'a> CheckAuthNonceStruct<'a> {
-    pub fn new(feature: &'a AuthOutsideFeature, metadata: MetadataMap) -> Self {
+    pub fn new(feature: &'a AuthOutsideFeature, metadata: &'a MetadataMap) -> Self {
         Self {
             config: AuthNonceConfig {
                 nonce_expires: feature.config.ticket_expires,

@@ -2,7 +2,7 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::x_outside_feature::_auth::{feature::extract_request, logger::app_logger};
+use crate::z_details::_common::{logger::Logger, response::tonic::RespondTo};
 
 use crate::auth::password::reset::_common::y_protobuf::service::{
     request_reset_token_pb_server::{RequestResetTokenPb, RequestResetTokenPbServer},
@@ -11,7 +11,10 @@ use crate::auth::password::reset::_common::y_protobuf::service::{
     ResetPasswordResponsePb,
 };
 
-use crate::z_details::_common::{logger::Logger, response::tonic::RespondTo};
+use crate::x_outside_feature::_auth::{
+    feature::{extract_request, TonicRequest},
+    logger::app_logger,
+};
 
 use crate::auth::password::reset::_auth::{
     action_request_token::init::RequestResetTokenFeature, action_reset::init::ResetPasswordFeature,
@@ -36,10 +39,14 @@ impl RequestResetTokenPb for RequestToken {
         &self,
         request: Request<RequestResetTokenRequestPb>,
     ) -> Result<Response<RequestResetTokenResponsePb>, Status> {
-        let (data, metadata, request) = extract_request(request);
+        let TonicRequest {
+            data,
+            metadata,
+            request,
+        } = extract_request(request);
 
         let logger = app_logger("auth.password.reset.request_token", &metadata);
-        let mut action = RequestResetTokenFeature::action(&data.auth, metadata);
+        let mut action = RequestResetTokenFeature::action(&data.auth, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         let request_decoder = RequestResetTokenFeature::request_decoder(request);
@@ -55,10 +62,14 @@ impl ResetPasswordPb for Reset {
         &self,
         request: Request<ResetPasswordRequestPb>,
     ) -> Result<Response<ResetPasswordResponsePb>, Status> {
-        let (data, metadata, request) = extract_request(request);
+        let TonicRequest {
+            data,
+            metadata,
+            request,
+        } = extract_request(request);
 
         let logger = app_logger("auth.password.reset.reset", &metadata);
-        let mut action = ResetPasswordFeature::action(&data.auth, metadata);
+        let mut action = ResetPasswordFeature::action(&data.auth, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         let request_decoder = ResetPasswordFeature::request_decoder(request);
