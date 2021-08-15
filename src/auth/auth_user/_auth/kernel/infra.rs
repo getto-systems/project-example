@@ -6,7 +6,7 @@ use crate::{
 pub trait AuthUserInfra {
     type UserRepository: AuthUserRepository;
 
-    fn extract(self) -> Self::UserRepository;
+    fn user_repository(&self) -> &Self::UserRepository;
 }
 
 #[async_trait::async_trait]

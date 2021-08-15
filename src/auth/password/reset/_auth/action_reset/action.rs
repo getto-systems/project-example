@@ -12,7 +12,9 @@ use crate::auth::{
         },
     },
     password::reset::_auth::reset::{
-        event::ResetPasswordEvent, infra::ResetPasswordInfra, method::reset_password,
+        event::ResetPasswordEvent,
+        infra::{ResetPasswordInfra, ResetPasswordRequestDecoder},
+        method::reset_password,
     },
 };
 
@@ -57,19 +59,26 @@ impl<M: ResetPasswordMaterial> ResetPasswordAction<M> {
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<ResetPasswordState> {
+    pub async fn ignite(
+        self,
+        request_decoder: impl ResetPasswordRequestDecoder,
+    ) -> MethodResult<ResetPasswordState> {
         let pubsub = self.pubsub;
         let (reset, issue, encode) = self.material.extract();
 
-        let user =
-            reset_password(reset, |event| pubsub.post(ResetPasswordState::Reset(event))).await?;
+        let fields = request_decoder.decode();
 
-        let ticket = issue_auth_ticket(issue, user, |event| {
+        let user = reset_password(&reset, fields, |event| {
+            pubsub.post(ResetPasswordState::Reset(event))
+        })
+        .await?;
+
+        let ticket = issue_auth_ticket(&issue, user, |event| {
             pubsub.post(ResetPasswordState::Issue(event))
         })
         .await?;
 
-        encode_auth_ticket(encode, ticket, |event| {
+        encode_auth_ticket(&encode, ticket, |event| {
             pubsub.post(ResetPasswordState::Encode(event))
         })
         .await

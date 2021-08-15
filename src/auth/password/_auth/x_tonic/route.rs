@@ -13,7 +13,7 @@ use crate::x_outside_feature::_auth::{feature::extract_request, logger::app_logg
 
 use crate::z_details::_common::{logger::Logger, response::tonic::RespondTo};
 
-use crate::auth::password::_auth::action_authenticate::action::AuthenticatePasswordAction;
+use crate::auth::password::_auth::action_authenticate::init::AuthenticatePasswordFeature;
 
 pub struct PasswordServer {
     pub reset: ResetServer,
@@ -36,11 +36,14 @@ impl AuthenticatePasswordPb for Authenticate {
         &self,
         request: Request<AuthenticatePasswordRequestPb>,
     ) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
+        // TODO TonicRequest とかの struct にしたい
         let (data, metadata, request) = extract_request(request);
 
         let logger = app_logger("auth.password.authenticate", &metadata);
-        let mut action = AuthenticatePasswordAction::new(&data.auth, &metadata, request);
+        let mut action = AuthenticatePasswordFeature::action(&data.auth, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
-        flatten(action.ignite().await).respond_to()
+
+        let request_decoder = AuthenticatePasswordFeature::request_decoder(request);
+        flatten(action.ignite(request_decoder).await).respond_to()
     }
 }

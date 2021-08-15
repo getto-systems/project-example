@@ -14,8 +14,7 @@ use crate::auth::password::reset::_common::y_protobuf::service::{
 use crate::z_details::_common::{logger::Logger, response::tonic::RespondTo};
 
 use crate::auth::password::reset::_auth::{
-    action_request_token::action::RequestResetTokenAction,
-    action_reset::action::ResetPasswordAction,
+    action_request_token::init::RequestResetTokenFeature, action_reset::init::ResetPasswordFeature,
 };
 
 pub struct ResetServer;
@@ -40,9 +39,11 @@ impl RequestResetTokenPb for RequestToken {
         let (data, metadata, request) = extract_request(request);
 
         let logger = app_logger("auth.password.reset.request_token", &metadata);
-        let mut action = RequestResetTokenAction::new(&data.auth, metadata, request);
+        let mut action = RequestResetTokenFeature::action(&data.auth, metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
-        flatten(action.ignite().await).respond_to()
+
+        let request_decoder = RequestResetTokenFeature::request_decoder(request);
+        flatten(action.ignite(request_decoder).await).respond_to()
     }
 }
 
@@ -57,8 +58,10 @@ impl ResetPasswordPb for Reset {
         let (data, metadata, request) = extract_request(request);
 
         let logger = app_logger("auth.password.reset.reset", &metadata);
-        let mut action = ResetPasswordAction::new(&data.auth, metadata, request);
+        let mut action = ResetPasswordFeature::action(&data.auth, metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
-        flatten(action.ignite().await).respond_to()
+
+        let request_decoder = ResetPasswordFeature::request_decoder(request);
+        flatten(action.ignite(request_decoder).await).respond_to()
     }
 }

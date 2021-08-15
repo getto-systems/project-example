@@ -54,10 +54,10 @@ impl<M: LogoutMaterial> LogoutAction<M> {
         let (validate, discard) = self.material.extract();
 
         let ticket =
-            validate_auth_token(validate, |event| pubsub.post(LogoutState::Validate(event)))
+            validate_auth_token(&validate, |event| pubsub.post(LogoutState::Validate(event)))
                 .await?;
 
-        discard_auth_ticket(discard, ticket, |event| {
+        discard_auth_ticket(&discard, ticket, |event| {
             pubsub.post(LogoutState::Discard(event))
         })
         .await

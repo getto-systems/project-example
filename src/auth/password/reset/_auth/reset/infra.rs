@@ -18,19 +18,13 @@ pub trait ResetPasswordInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
     type UserInfra: AuthUserInfra;
     type PasswordInfra: AuthUserPasswordHashInfra;
-    type RequestDecoder: ResetPasswordRequestDecoder;
     type TokenDecoder: ResetTokenDecoder;
 
-    fn extract(
-        self,
-    ) -> (
-        Self::CheckNonceInfra,
-        AuthClockInfra,
-        Self::UserInfra,
-        Self::PasswordInfra,
-        Self::RequestDecoder,
-        Self::TokenDecoder,
-    );
+    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
+    fn clock_infra(&self) -> &AuthClockInfra;
+    fn user_infra(&self) -> &Self::UserInfra;
+    fn password_infra(&self) -> &Self::PasswordInfra;
+    fn token_decoder(&self) -> &Self::TokenDecoder;
 }
 
 pub trait ResetTokenDecoder {

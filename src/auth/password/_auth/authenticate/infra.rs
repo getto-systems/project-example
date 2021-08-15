@@ -11,16 +11,10 @@ pub trait AuthenticatePasswordInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
     type UserInfra: AuthUserInfra;
     type PasswordInfra: AuthUserPasswordMatchInfra;
-    type RequestDecoder: AuthenticatePasswordRequestDecoder;
 
-    fn extract(
-        self,
-    ) -> (
-        Self::CheckNonceInfra,
-        Self::UserInfra,
-        Self::PasswordInfra,
-        Self::RequestDecoder,
-    );
+    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
+    fn user_infra(&self) -> &Self::UserInfra;
+    fn password_infra(&self) -> &Self::PasswordInfra;
 }
 
 pub trait AuthenticatePasswordRequestDecoder {

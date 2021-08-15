@@ -31,21 +31,15 @@ pub trait RequestResetTokenInfra {
     type TokenGenerator: ResetTokenGenerator;
     type TokenEncoder: ResetTokenEncoder;
     type TokenNotifier: ResetTokenNotifier;
-    type RequestDecoder: RequestResetTokenRequestDecoder;
 
-    fn extract(
-        self,
-    ) -> (
-        Self::CheckNonceInfra,
-        AuthClockInfra,
-        Self::PasswordInfra,
-        Self::RequestDecoder,
-        Self::DestinationRepository,
-        Self::TokenGenerator,
-        Self::TokenEncoder,
-        Self::TokenNotifier,
-        RequestResetTokenConfig,
-    );
+    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
+    fn clock_infra(&self) -> &AuthClockInfra;
+    fn password_infra(&self) -> &Self::PasswordInfra;
+    fn destination_repository(&self) -> &Self::DestinationRepository;
+    fn token_generator(&self) -> &Self::TokenGenerator;
+    fn token_encoder(&self) -> &Self::TokenEncoder;
+    fn token_notifier(&self) -> &Self::TokenNotifier;
+    fn config(&self) -> &RequestResetTokenConfig;
 }
 
 pub trait RequestResetTokenRequestDecoder {

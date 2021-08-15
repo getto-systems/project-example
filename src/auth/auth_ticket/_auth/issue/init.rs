@@ -29,14 +29,14 @@ impl<'a> IssueAuthTicketInfra for IssueAuthTicketStruct<'a> {
     type TicketInfra = AuthTicketStruct<'a>;
     type TicketIdGenerator = UuidAuthTicketIdGenerator;
 
-    fn extract(
-        self,
-    ) -> (
-        Self::TicketInfra,
-        Self::TicketIdGenerator,
-        IssueAuthTicketConfig,
-    ) {
-        (self.ticket_infra, self.ticket_id_generator, self.config)
+    fn ticket_infra(&self) -> &Self::TicketInfra {
+        &self.ticket_infra
+    }
+    fn ticket_id_generator(&self) -> &Self::TicketIdGenerator {
+        &self.ticket_id_generator
+    }
+    fn config(&self) -> &IssueAuthTicketConfig {
+        &self.config
     }
 }
 
@@ -57,14 +57,14 @@ pub mod test {
         type TicketInfra = StaticAuthTicketStruct<'a>;
         type TicketIdGenerator = StaticAuthTicketIdGenerator;
 
-        fn extract(
-            self,
-        ) -> (
-            Self::TicketInfra,
-            Self::TicketIdGenerator,
-            IssueAuthTicketConfig,
-        ) {
-            (self.ticket_infra, self.ticket_id_generator, self.config)
+        fn ticket_infra(&self) -> &Self::TicketInfra {
+            &self.ticket_infra
+        }
+        fn ticket_id_generator(&self) -> &Self::TicketIdGenerator {
+            &self.ticket_id_generator
+        }
+        fn config(&self) -> &IssueAuthTicketConfig {
+            &self.config
         }
     }
 }

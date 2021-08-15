@@ -21,8 +21,8 @@ impl<'a> AuthUserStruct<'a> {
 impl<'a> AuthUserInfra for AuthUserStruct<'a> {
     type UserRepository = MysqlAuthUserRepository<'a>;
 
-    fn extract(self) -> Self::UserRepository {
-        self.user_repository
+    fn user_repository(&self) -> &Self::UserRepository {
+        &self.user_repository
     }
 }
 
@@ -41,8 +41,8 @@ pub mod test {
     impl<'a> AuthUserInfra for StaticAuthUserStruct<'a> {
         type UserRepository = MemoryAuthUserRepository<'a>;
 
-        fn extract(self) -> Self::UserRepository {
-            self.user_repository
+        fn user_repository(&self) -> &Self::UserRepository {
+            &self.user_repository
         }
     }
 }

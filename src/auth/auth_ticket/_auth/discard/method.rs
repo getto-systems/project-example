@@ -10,12 +10,13 @@ use super::event::DiscardAuthTicketEvent;
 use crate::auth::auth_ticket::_auth::kernel::data::AuthTicket;
 
 pub async fn discard_auth_ticket<S>(
-    infra: impl DiscardAuthTicketInfra,
+    infra: &impl DiscardAuthTicketInfra,
     auth_ticket: AuthTicket,
     post: impl Fn(DiscardAuthTicketEvent) -> S,
 ) -> MethodResult<S> {
-    let ticket_infra = infra.extract();
-    let (clock, ticket_repository) = ticket_infra.extract();
+    let ticket_infra = infra.ticket_infra();
+    let clock = ticket_infra.clock();
+    let ticket_repository = ticket_infra.ticket_repository();
 
     ticket_repository
         .discard(auth_ticket, clock.now())

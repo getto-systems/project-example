@@ -1,8 +1,7 @@
-mod request_decoder;
-mod token_decoder;
+pub(in crate::auth) mod request_decoder;
+pub(in crate::auth) mod token_decoder;
 
 use crate::auth::auth_ticket::_auth::kernel::infra::AuthClockInfra;
-use crate::auth::password::reset::_common::y_protobuf::service::ResetPasswordRequestPb;
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
@@ -13,7 +12,6 @@ use crate::auth::{
     auth_user::_auth::kernel::init::AuthUserStruct,
     password::_auth::kernel::init::AuthUserPasswordStruct,
 };
-use request_decoder::PbResetPasswordRequestDecoder;
 use token_decoder::JwtResetTokenDecoder;
 use tonic::metadata::MetadataMap;
 
@@ -25,22 +23,16 @@ pub struct ResetPasswordStruct<'a> {
     user_infra: AuthUserStruct<'a>,
     password_infra: AuthUserPasswordStruct<'a>,
     token_decoder: JwtResetTokenDecoder<'a>,
-    request_decoder: PbResetPasswordRequestDecoder,
 }
 
 impl<'a> ResetPasswordStruct<'a> {
-    pub fn new(
-        feature: &'a AuthOutsideFeature,
-        metadata: MetadataMap,
-        request: ResetPasswordRequestPb,
-    ) -> Self {
+    pub fn new(feature: &'a AuthOutsideFeature, metadata: MetadataMap) -> Self {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
             clock_infra: AuthClockInfra::new(ChronoAuthClockInitializer),
             user_infra: AuthUserStruct::new(feature),
             password_infra: AuthUserPasswordStruct::new(feature),
             token_decoder: JwtResetTokenDecoder::new(&feature.secret),
-            request_decoder: PbResetPasswordRequestDecoder::new(request),
         }
     }
 }
@@ -50,26 +42,21 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
     type UserInfra = AuthUserStruct<'a>;
     type PasswordInfra = AuthUserPasswordStruct<'a>;
     type TokenDecoder = JwtResetTokenDecoder<'a>;
-    type RequestDecoder = PbResetPasswordRequestDecoder;
 
-    fn extract(
-        self,
-    ) -> (
-        Self::CheckNonceInfra,
-        AuthClockInfra,
-        Self::UserInfra,
-        Self::PasswordInfra,
-        Self::RequestDecoder,
-        Self::TokenDecoder,
-    ) {
-        (
-            self.check_nonce_infra,
-            self.clock_infra,
-            self.user_infra,
-            self.password_infra,
-            self.request_decoder,
-            self.token_decoder,
-        )
+    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
+        &self.check_nonce_infra
+    }
+    fn clock_infra(&self) -> &AuthClockInfra {
+        &self.clock_infra
+    }
+    fn user_infra(&self) -> &Self::UserInfra {
+        &self.user_infra
+    }
+    fn password_infra(&self) -> &Self::PasswordInfra {
+        &self.password_infra
+    }
+    fn token_decoder(&self) -> &Self::TokenDecoder {
+        &self.token_decoder
     }
 }
 
@@ -91,7 +78,6 @@ pub mod test {
         pub clock_infra: AuthClockInfra,
         pub user_infra: StaticAuthUserStruct<'a>,
         pub password_infra: StaticAuthUserPasswordStruct<'a>,
-        pub request_decoder: StaticResetPasswordRequestDecoder,
         pub token_decoder: StaticResetTokenDecoder,
     }
 
@@ -100,26 +86,21 @@ pub mod test {
         type UserInfra = StaticAuthUserStruct<'a>;
         type PasswordInfra = StaticAuthUserPasswordStruct<'a>;
         type TokenDecoder = StaticResetTokenDecoder;
-        type RequestDecoder = StaticResetPasswordRequestDecoder;
 
-        fn extract(
-            self,
-        ) -> (
-            Self::CheckNonceInfra,
-            AuthClockInfra,
-            Self::UserInfra,
-            Self::PasswordInfra,
-            Self::RequestDecoder,
-            Self::TokenDecoder,
-        ) {
-            (
-                self.check_nonce_infra,
-                self.clock_infra,
-                self.user_infra,
-                self.password_infra,
-                self.request_decoder,
-                self.token_decoder,
-            )
+        fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
+            &self.check_nonce_infra
+        }
+        fn clock_infra(&self) -> &AuthClockInfra {
+            &self.clock_infra
+        }
+        fn user_infra(&self) -> &Self::UserInfra {
+            &self.user_infra
+        }
+        fn password_infra(&self) -> &Self::PasswordInfra {
+            &self.password_infra
+        }
+        fn token_decoder(&self) -> &Self::TokenDecoder {
+            &self.token_decoder
         }
     }
 }
