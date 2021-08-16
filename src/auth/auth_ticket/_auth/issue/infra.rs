@@ -1,10 +1,10 @@
-use crate::auth::auth_ticket::_auth::kernel::infra::{AuthClock, AuthTicketRepository};
+use crate::auth::auth_ticket::_auth::kernel::infra::{AuthClock, IssueAuthTicketRepository};
 
 use crate::auth::auth_ticket::_auth::kernel::data::{AuthTicketId, ExpansionLimitDuration};
 
 pub trait IssueAuthTicketInfra {
     type Clock: AuthClock;
-    type TicketRepository: AuthTicketRepository;
+    type TicketRepository: IssueAuthTicketRepository;
     type TicketIdGenerator: AuthTicketIdGenerator;
 
     fn clock(&self) -> &Self::Clock;

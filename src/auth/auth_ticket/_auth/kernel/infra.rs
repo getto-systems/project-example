@@ -37,20 +37,26 @@ pub trait AuthNonceMetadata {
 }
 
 #[async_trait::async_trait]
-pub trait AuthTicketRepository {
+pub trait IssueAuthTicketRepository {
     async fn issue(
         &self,
         ticket: AuthTicket,
         limit: ExpansionLimitDateTime,
         issued_at: AuthDateTime,
     ) -> Result<(), RepositoryError>;
+}
 
+#[async_trait::async_trait]
+pub trait DiscardAuthTicketRepository {
     async fn discard(
         &self,
         auth_ticket: AuthTicket,
         discard_at: AuthDateTime,
     ) -> Result<(), RepositoryError>;
+}
 
+#[async_trait::async_trait]
+pub trait AuthTicketRepository {
     async fn expansion_limit(
         &self,
         ticket: &AuthTicket,

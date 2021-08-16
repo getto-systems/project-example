@@ -1,6 +1,6 @@
 use crate::auth::auth_ticket::_auth::{
     issue::infra::{AuthTicketIdGenerator, IssueAuthTicketInfra},
-    kernel::infra::{AuthClock, AuthTicketRepository},
+    kernel::infra::{AuthClock, IssueAuthTicketRepository},
 };
 
 use super::event::IssueAuthTicketEvent;

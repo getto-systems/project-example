@@ -53,13 +53,16 @@ pub trait PlainPasswordExtract {
 }
 
 #[async_trait::async_trait]
-pub trait AuthUserPasswordRepository {
+pub trait VerifyPasswordRepository {
     async fn verify_password<'a>(
         &self,
         login_id: &'a LoginId,
         matcher: impl AuthUserPasswordMatcher + 'a,
     ) -> Result<AuthUserId, VerifyPasswordError>;
+}
 
+#[async_trait::async_trait]
+pub trait RegisterResetTokenRepository {
     async fn register_reset_token(
         &self,
         login_id: LoginId,
@@ -67,7 +70,10 @@ pub trait AuthUserPasswordRepository {
         expires: ExpireDateTime,
         requested_at: AuthDateTime,
     ) -> Result<(), RegisterResetTokenError>;
+}
 
+#[async_trait::async_trait]
+pub trait ResetPasswordRepository {
     async fn reset_token_entry(
         &self,
         reset_token: &ResetToken,

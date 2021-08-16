@@ -6,8 +6,9 @@ use sqlx::{query, MySqlPool};
 use crate::z_details::_common::repository::{helper::infra_error, mysql::helper::mysql_error};
 
 use crate::auth::password::_auth::kernel::infra::{
-    AuthUserPasswordHasher, AuthUserPasswordMatcher, AuthUserPasswordRepository, HashedPassword,
-    ResetTokenEntry, ResetTokenEntryExtract,
+    AuthUserPasswordHasher, AuthUserPasswordMatcher, ResetPasswordRepository, HashedPassword,
+    RegisterResetTokenRepository, ResetTokenEntry, ResetTokenEntryExtract,
+    VerifyPasswordRepository,
 };
 
 use crate::{
@@ -33,7 +34,7 @@ impl<'a> MysqlAuthUserPasswordRepository<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'pool> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'pool> {
+impl<'pool> VerifyPasswordRepository for MysqlAuthUserPasswordRepository<'pool> {
     async fn verify_password<'a>(
         &self,
         login_id: &'a LoginId,
@@ -67,7 +68,10 @@ impl<'pool> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'pool
             Err(VerifyPasswordError::PasswordNotMatched)
         }
     }
+}
 
+#[async_trait::async_trait]
+impl<'pool> RegisterResetTokenRepository for MysqlAuthUserPasswordRepository<'pool> {
     async fn register_reset_token(
         &self,
         login_id: LoginId,
@@ -112,7 +116,10 @@ impl<'pool> AuthUserPasswordRepository for MysqlAuthUserPasswordRepository<'pool
 
         Ok(())
     }
+}
 
+#[async_trait::async_trait]
+impl<'pool> ResetPasswordRepository for MysqlAuthUserPasswordRepository<'pool> {
     async fn reset_token_entry(
         &self,
         reset_token: &ResetToken,
@@ -240,8 +247,9 @@ pub mod test {
     use crate::z_details::_common::repository::helper::infra_error;
 
     use crate::auth::password::_auth::kernel::infra::{
-        AuthUserPasswordHasher, AuthUserPasswordMatcher, AuthUserPasswordRepository,
-        HashedPassword, ResetTokenEntry, ResetTokenEntryExtract,
+        AuthUserPasswordHasher, AuthUserPasswordMatcher, ResetPasswordRepository,
+        HashedPassword, RegisterResetTokenRepository, ResetTokenEntry, ResetTokenEntryExtract,
+        VerifyPasswordRepository,
     };
 
     use crate::{
@@ -368,7 +376,7 @@ pub mod test {
     }
 
     #[async_trait::async_trait]
-    impl<'store> AuthUserPasswordRepository for MemoryAuthUserPasswordRepository<'store> {
+    impl<'store> VerifyPasswordRepository for MemoryAuthUserPasswordRepository<'store> {
         async fn verify_password<'a>(
             &self,
             login_id: &'a LoginId,
@@ -394,7 +402,10 @@ pub mod test {
                 Err(VerifyPasswordError::PasswordNotMatched)
             }
         }
+    }
 
+    #[async_trait::async_trait]
+    impl<'store> RegisterResetTokenRepository for MemoryAuthUserPasswordRepository<'store> {
         async fn register_reset_token(
             &self,
             login_id: LoginId,
@@ -439,7 +450,10 @@ pub mod test {
 
             Ok(())
         }
+    }
 
+    #[async_trait::async_trait]
+    impl<'store> ResetPasswordRepository for MemoryAuthUserPasswordRepository<'store> {
         async fn reset_token_entry(
             &self,
             reset_token: &ResetToken,

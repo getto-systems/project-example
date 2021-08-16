@@ -5,7 +5,7 @@ use crate::auth::{
     auth_user::_auth::kernel::infra::AuthUserRepository,
     password::_auth::{
         authenticate::infra::AuthenticatePasswordInfra,
-        kernel::infra::{AuthUserPasswordRepository, PlainPassword},
+        kernel::infra::{PlainPassword, VerifyPasswordRepository},
     },
 };
 
