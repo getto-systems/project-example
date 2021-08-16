@@ -5,7 +5,7 @@ use crate::auth::{
 
 use crate::{
     auth::{
-        _api::service::data::ServiceError,
+        _api::service::data::AuthServiceError,
         auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
         password::reset::_api::request_token::data::RequestResetTokenResult,
     },
@@ -37,7 +37,7 @@ pub trait RequestResetTokenService {
         nonce: Option<AuthNonceValue>,
         token: Option<AuthTokenValue>,
         fields: RequestResetTokenFieldsExtract,
-    ) -> Result<RequestResetTokenResponse, ServiceError>;
+    ) -> Result<RequestResetTokenResponse, AuthServiceError>;
 }
 
 pub enum RequestResetTokenResponse {

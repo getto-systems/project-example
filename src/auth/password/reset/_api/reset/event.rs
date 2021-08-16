@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use crate::{
     auth::{
-        _api::service::data::ServiceError, password::reset::_api::reset::data::ResetPasswordMessage,
+        _api::service::data::AuthServiceError, password::reset::_api::reset::data::ResetPasswordMessage,
     },
     z_details::_api::{message::data::MessageError, request::data::HeaderError},
 };
@@ -10,7 +10,7 @@ use crate::{
 pub enum ResetPasswordEvent {
     Result(ResetPasswordMessage),
     HeaderError(HeaderError),
-    ServiceError(ServiceError),
+    ServiceError(AuthServiceError),
     MessageError(MessageError),
 }
 

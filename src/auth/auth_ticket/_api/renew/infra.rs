@@ -4,7 +4,7 @@ use crate::auth::auth_ticket::_api::kernel::infra::{
 
 use crate::{
     auth::{
-        _api::service::data::ServiceError,
+        _api::service::data::AuthServiceError,
         auth_ticket::{
             _api::kernel::data::AuthTokenMessage,
             _common::{
@@ -36,7 +36,7 @@ pub trait RenewAuthTicketService {
         &self,
         nonce: Option<AuthNonceValue>,
         token: Option<AuthTokenValue>,
-    ) -> Result<AuthTicketEncoded, ServiceError>;
+    ) -> Result<AuthTicketEncoded, AuthServiceError>;
 }
 
 pub trait RenewAuthTicketResponseEncoder {

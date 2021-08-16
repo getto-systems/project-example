@@ -10,12 +10,12 @@ use crate::{
 };
 
 use crate::auth::{
-    _api::service::data::ServiceError,
+    _api::service::data::AuthServiceError,
     auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
 };
 
-pub fn infra_error(err: impl Display) -> ServiceError {
-    ServiceError::InfraError(format!("service infra error; {}", err))
+pub fn infra_error(err: impl Display) -> AuthServiceError {
+    AuthServiceError::InfraError(format!("service infra error; {}", err))
 }
 
 pub fn set_metadata<T>(
@@ -23,7 +23,7 @@ pub fn set_metadata<T>(
     request_id: &str,
     nonce: Option<AuthNonceValue>,
     token: Option<AuthTokenValue>,
-) -> Result<(), ServiceError> {
+) -> Result<(), AuthServiceError> {
     request.metadata_mut().append(
         METADATA_REQUEST_ID,
         MetadataValue::from_str(request_id).map_err(infra_error)?,

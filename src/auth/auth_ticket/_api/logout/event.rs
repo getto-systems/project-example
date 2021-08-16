@@ -1,10 +1,10 @@
 use std::fmt::Display;
 
-use crate::{auth::_api::service::data::ServiceError, z_details::_api::request::data::HeaderError};
+use crate::{auth::_api::service::data::AuthServiceError, z_details::_api::request::data::HeaderError};
 
 pub enum LogoutEvent {
     Success,
-    ServiceError(ServiceError),
+    ServiceError(AuthServiceError),
     HeaderError(HeaderError),
 }
 

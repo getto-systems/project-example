@@ -11,7 +11,7 @@ use crate::auth::_api::service::helper::{infra_error, set_metadata};
 use crate::auth::auth_ticket::_api::logout::infra::LogoutService;
 
 use crate::auth::{
-    _api::service::data::ServiceError,
+    _api::service::data::AuthServiceError,
     auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
 };
 
@@ -35,7 +35,7 @@ impl<'a> LogoutService for TonicLogoutService<'a> {
         &self,
         nonce: Option<AuthNonceValue>,
         token: Option<AuthTokenValue>,
-    ) -> Result<(), ServiceError> {
+    ) -> Result<(), AuthServiceError> {
         let mut client = LogoutPbClient::connect(self.auth_service_url)
             .await
             .map_err(infra_error)?;
@@ -43,7 +43,7 @@ impl<'a> LogoutService for TonicLogoutService<'a> {
         let mut request = Request::new(LogoutRequestPb {});
         set_metadata(&mut request, self.request_id, nonce, token)?;
 
-        client.logout(request).await.map_err(ServiceError::from)?;
+        client.logout(request).await.map_err(AuthServiceError::from)?;
         Ok(())
     }
 }
@@ -53,7 +53,7 @@ pub mod test {
     use crate::auth::auth_ticket::_api::logout::infra::LogoutService;
 
     use crate::auth::{
-        _api::service::data::ServiceError,
+        _api::service::data::AuthServiceError,
         auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
     };
 
@@ -65,7 +65,7 @@ pub mod test {
             &self,
             _nonce: Option<AuthNonceValue>,
             _token: Option<AuthTokenValue>,
-        ) -> Result<(), ServiceError> {
+        ) -> Result<(), AuthServiceError> {
             Ok(())
         }
     }

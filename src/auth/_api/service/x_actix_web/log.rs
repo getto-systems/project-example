@@ -1,8 +1,8 @@
 use crate::z_details::_common::logger::LogLevel;
 
-use crate::auth::_api::service::data::ServiceError;
+use crate::auth::_api::service::data::AuthServiceError;
 
-impl ServiceError {
+impl AuthServiceError {
     pub const fn log_level(&self) -> LogLevel {
         match self {
             Self::InvalidArgument(_) => LogLevel::Error,
