@@ -21,7 +21,7 @@ pub struct AuthenticatePasswordStruct<'a> {
 impl<'a> AuthenticatePasswordStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature, metadata: &'a MetadataMap) -> Self {
         Self {
-            check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata.clone()),
+            check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
             user_infra: AuthUserStruct::new(feature),
             password_infra: AuthUserPasswordStruct::new(feature),
         }

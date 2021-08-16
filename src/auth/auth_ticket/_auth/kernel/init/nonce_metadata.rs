@@ -11,17 +11,17 @@ use crate::{
     z_details::_auth::request::data::MetadataError,
 };
 
-pub struct TonicAuthNonceMetadata {
-    metadata: MetadataMap,
+pub struct TonicAuthNonceMetadata<'a> {
+    metadata: &'a MetadataMap,
 }
 
-impl TonicAuthNonceMetadata {
-    pub const fn new(metadata: MetadataMap) -> Self {
+impl<'a> TonicAuthNonceMetadata<'a> {
+    pub const fn new(metadata: &'a MetadataMap) -> Self {
         Self { metadata }
     }
 }
 
-impl AuthNonceMetadata for TonicAuthNonceMetadata {
+impl<'a> AuthNonceMetadata for TonicAuthNonceMetadata<'a> {
     fn nonce(&self) -> Result<AuthNonceValue, MetadataError> {
         metadata(&self.metadata, METADATA_NONCE).map(AuthNonceValue::new)
     }

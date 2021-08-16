@@ -20,7 +20,7 @@ pub struct RequestResetTokenFeature<'a> {
 impl<'a> RequestResetTokenFeature<'a> {
     pub fn action(
         feature: &'a AuthOutsideFeature,
-        metadata: MetadataMap,
+        metadata: &'a MetadataMap,
     ) -> RequestResetTokenAction<Self> {
         RequestResetTokenAction::with_material(Self {
             request_token: RequestResetTokenStruct::new(feature, metadata),
