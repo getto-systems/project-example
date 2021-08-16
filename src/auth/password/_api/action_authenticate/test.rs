@@ -5,9 +5,8 @@ use getto_application_test::ActionTestRunner;
 use crate::auth::{
     auth_ticket::_api::kernel::init::{
         nonce_header::test::StaticAuthNonceHeader,
-        test::{StaticAuthHeaderStruct, StaticAuthTokenStruct},
+        response_builder::test::StaticAuthTokenResponseBuilder,
         token_header::test::StaticAuthTokenHeader,
-        token_messenger::test::StaticAuthTokenMessenger,
     },
     password::_api::authenticate::init::{
         authenticate_service::test::StaticAuthenticatePasswordService,
@@ -56,10 +55,9 @@ impl<'a> TestFeature {
     fn standard() -> Self {
         Self {
             authenticate: StaticAuthenticatePasswordStruct {
-                header_infra: standard_header_infra(),
-                token_infra: StaticAuthTokenStruct {
-                    token_messenger: StaticAuthTokenMessenger,
-                },
+                nonce_header: StaticAuthNonceHeader::Valid(AuthNonceValue::new("NONCE".into())),
+                token_header: StaticAuthTokenHeader::Valid(AuthTokenValue::new("TOKEN".into())),
+                response_builder: StaticAuthTokenResponseBuilder,
                 request_decoder: standard_request_decoder(),
                 authenticate_service: StaticAuthenticatePasswordService {
                     user: standard_user(),
@@ -67,13 +65,6 @@ impl<'a> TestFeature {
                 response_encoder: StaticAuthenticatePasswordResponseEncoder,
             },
         }
-    }
-}
-
-fn standard_header_infra() -> StaticAuthHeaderStruct {
-    StaticAuthHeaderStruct {
-        nonce_header: StaticAuthNonceHeader::Valid(AuthNonceValue::new("NONCE".into())),
-        token_header: StaticAuthTokenHeader::Valid(AuthTokenValue::new("TOKEN".into())),
     }
 }
 

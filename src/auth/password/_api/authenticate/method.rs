@@ -2,7 +2,7 @@ use getto_application::data::MethodResult;
 
 use crate::auth::{
     auth_ticket::_api::kernel::infra::{
-        AuthHeaderInfra, AuthNonceHeader, AuthTokenHeader, AuthTokenInfra, AuthTokenMessenger,
+        AuthNonceHeader, AuthTokenHeader, AuthTokenResponseBuilder,
     },
     password::_api::authenticate::infra::{
         AuthenticatePasswordInfra, AuthenticatePasswordRequestDecoder,
@@ -16,13 +16,11 @@ pub async fn authenticate_password<S>(
     infra: &impl AuthenticatePasswordInfra,
     post: impl Fn(AuthenticatePasswordEvent) -> S,
 ) -> MethodResult<S> {
-    let header_infra = infra.header_infra();
-    let nonce_header = header_infra.nonce_header();
-    let token_header = header_infra.token_header();
+    let nonce_header = infra.nonce_header();
+    let token_header = infra.token_header();
     let authenticate_service = infra.authenticate_service();
-    let token_infra = infra.token_infra();
-    let token_messenger = token_infra.token_messenger();
     let response_encoder = infra.response_encoder();
+    let response_builder = infra.response_builder();
 
     let request_decoder = infra.request_decoder();
 
@@ -47,7 +45,7 @@ pub async fn authenticate_password<S>(
         .encode(response)
         .map_err(|err| post(AuthenticatePasswordEvent::MessageError(err)))?;
 
-    let message = message.map(|message| token_messenger.to_message(message));
+    let message = message.map(|message| response_builder.build(message));
 
     Ok(post(AuthenticatePasswordEvent::Result(message)))
 }

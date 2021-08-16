@@ -21,21 +21,25 @@ pub fn infra_error(err: impl Display) -> ServiceError {
 pub fn set_metadata<T>(
     request: &mut Request<T>,
     request_id: &str,
-    nonce: AuthNonceValue,
-    token: AuthTokenValue,
+    nonce: Option<AuthNonceValue>,
+    token: Option<AuthTokenValue>,
 ) -> Result<(), ServiceError> {
     request.metadata_mut().append(
         METADATA_REQUEST_ID,
         MetadataValue::from_str(request_id).map_err(infra_error)?,
     );
-    request.metadata_mut().append(
-        METADATA_NONCE,
-        MetadataValue::from_str(&nonce.extract()).map_err(infra_error)?,
-    );
-    request.metadata_mut().append(
-        METADATA_TICKET_TOKEN,
-        MetadataValue::from_str(&token.extract()).map_err(infra_error)?,
-    );
+    if let Some(nonce) = nonce {
+        request.metadata_mut().append(
+            METADATA_NONCE,
+            MetadataValue::from_str(&nonce.extract()).map_err(infra_error)?,
+        );
+    }
+    if let Some(token) = token {
+        request.metadata_mut().append(
+            METADATA_TICKET_TOKEN,
+            MetadataValue::from_str(&token.extract()).map_err(infra_error)?,
+        );
+    }
 
     Ok(())
 }

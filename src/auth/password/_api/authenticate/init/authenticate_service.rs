@@ -36,8 +36,8 @@ impl<'a> TonicAuthenticatePasswordService<'a> {
 impl<'a> AuthenticatePasswordService for TonicAuthenticatePasswordService<'a> {
     async fn authenticate(
         &self,
-        nonce: AuthNonceValue,
-        token: AuthTokenValue,
+        nonce: Option<AuthNonceValue>,
+        token: Option<AuthTokenValue>,
         fields: AuthenticatePasswordFieldsExtract,
     ) -> Result<AuthenticatePasswordResponse, ServiceError> {
         let mut client = AuthenticatePasswordPbClient::connect(self.auth_service_url)
@@ -85,8 +85,8 @@ pub mod test {
     impl AuthenticatePasswordService for StaticAuthenticatePasswordService {
         async fn authenticate(
             &self,
-            _nonce: AuthNonceValue,
-            _token: AuthTokenValue,
+            _nonce: Option<AuthNonceValue>,
+            _token: Option<AuthTokenValue>,
             _fields: AuthenticatePasswordFieldsExtract,
         ) -> Result<AuthenticatePasswordResponse, ServiceError> {
             Ok(AuthenticatePasswordResponse::Success(AuthTicketEncoded {

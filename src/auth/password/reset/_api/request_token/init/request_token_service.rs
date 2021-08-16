@@ -36,8 +36,8 @@ impl<'a> TonicRequestResetTokenService<'a> {
 impl<'a> RequestResetTokenService for TonicRequestResetTokenService<'a> {
     async fn request_token(
         &self,
-        nonce: AuthNonceValue,
-        token: AuthTokenValue,
+        nonce: Option<AuthNonceValue>,
+        token: Option<AuthTokenValue>,
         fields: RequestResetTokenFieldsExtract,
     ) -> Result<RequestResetTokenResponse, ServiceError> {
         let mut client = RequestResetTokenPbClient::connect(self.auth_service_url)
@@ -76,8 +76,8 @@ pub mod test {
     impl RequestResetTokenService for StaticRequestResetTokenService {
         async fn request_token(
             &self,
-            _nonce: AuthNonceValue,
-            _token: AuthTokenValue,
+            _nonce: Option<AuthNonceValue>,
+            _token: Option<AuthTokenValue>,
             _fields: RequestResetTokenFieldsExtract,
         ) -> Result<RequestResetTokenResponse, ServiceError> {
             Ok(RequestResetTokenResponse::Success)

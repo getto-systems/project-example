@@ -33,8 +33,8 @@ impl<'a> TonicLogoutService<'a> {
 impl<'a> LogoutService for TonicLogoutService<'a> {
     async fn logout(
         &self,
-        nonce: AuthNonceValue,
-        token: AuthTokenValue,
+        nonce: Option<AuthNonceValue>,
+        token: Option<AuthTokenValue>,
     ) -> Result<(), ServiceError> {
         let mut client = LogoutPbClient::connect(self.auth_service_url)
             .await
@@ -63,8 +63,8 @@ pub mod test {
     impl LogoutService for StaticLogoutService {
         async fn logout(
             &self,
-            _nonce: AuthNonceValue,
-            _token: AuthTokenValue,
+            _nonce: Option<AuthNonceValue>,
+            _token: Option<AuthTokenValue>,
         ) -> Result<(), ServiceError> {
             Ok(())
         }

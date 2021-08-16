@@ -1,7 +1,7 @@
 use getto_application::data::MethodResult;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::{AuthHeaderInfra, AuthNonceHeader, AuthTokenHeader},
+    auth_ticket::_api::kernel::infra::{AuthNonceHeader, AuthTokenHeader},
     password::reset::_api::request_token::infra::{
         RequestResetTokenInfra, RequestResetTokenRequestDecoder, RequestResetTokenResponseEncoder,
         RequestResetTokenService,
@@ -14,9 +14,8 @@ pub async fn request_reset_token<S>(
     infra: &impl RequestResetTokenInfra,
     post: impl Fn(RequestResetTokenEvent) -> S,
 ) -> MethodResult<S> {
-    let header_infra = infra.header_infra();
-    let nonce_header = header_infra.nonce_header();
-    let token_header = header_infra.token_header();
+    let nonce_header = infra.nonce_header();
+    let token_header = infra.token_header();
     let request_token_service = infra.request_token_service();
     let response_encoder = infra.response_encoder();
 

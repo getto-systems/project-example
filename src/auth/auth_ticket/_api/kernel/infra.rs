@@ -15,19 +15,19 @@ pub trait AuthHeaderInfra {
 }
 
 pub trait AuthTokenInfra {
-    type TokenMessenger: AuthTokenMessenger;
+    type ResponseBuilder: AuthTokenResponseBuilder;
 
-    fn token_messenger(&self) -> &Self::TokenMessenger;
+    fn response_builder(&self) -> &Self::ResponseBuilder;
 }
 
-pub trait AuthTokenMessenger {
-    fn to_message(&self, message: AuthTokenMessage) -> AuthTokenResponse;
+pub trait AuthTokenResponseBuilder {
+    fn build(&self, message: AuthTokenMessage) -> AuthTokenResponse;
 }
 
 pub trait AuthNonceHeader {
-    fn nonce(&self) -> Result<AuthNonceValue, HeaderError>;
+    fn nonce(&self) -> Result<Option<AuthNonceValue>, HeaderError>;
 }
 
 pub trait AuthTokenHeader {
-    fn token(&self) -> Result<AuthTokenValue, HeaderError>;
+    fn token(&self) -> Result<Option<AuthTokenValue>, HeaderError>;
 }

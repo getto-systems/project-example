@@ -7,7 +7,7 @@ use crate::auth::{
         nonce_header::test::StaticAuthNonceHeader,
         test::{StaticAuthHeaderStruct, StaticAuthTokenStruct},
         token_header::test::StaticAuthTokenHeader,
-        token_messenger::test::StaticAuthTokenMessenger,
+        response_builder::test::StaticAuthTokenResponseBuilder,
     },
     password::reset::_api::reset::init::{
         request_decoder::test::StaticResetPasswordRequestDecoder,
@@ -58,7 +58,7 @@ impl TestFeature {
             reset: StaticResetPasswordStruct {
                 header_infra: standard_header_infra(),
                 token_infra: StaticAuthTokenStruct {
-                    token_messenger: StaticAuthTokenMessenger,
+                    response_builder: StaticAuthTokenResponseBuilder,
                 },
                 request_decoder: standard_request_decoder(),
                 reset_service: StaticResetPasswordService {

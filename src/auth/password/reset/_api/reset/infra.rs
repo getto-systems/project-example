@@ -37,8 +37,8 @@ pub trait ResetPasswordRequestDecoder {
 pub trait ResetPasswordService {
     async fn reset(
         &self,
-        nonce: AuthNonceValue,
-        token: AuthTokenValue,
+        nonce: Option<AuthNonceValue>,
+        token: Option<AuthTokenValue>,
         fields: ResetPasswordFieldsExtract,
     ) -> Result<ResetPasswordResponse, ServiceError>;
 }

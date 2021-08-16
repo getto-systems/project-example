@@ -17,6 +17,7 @@ impl ValidateAuthTokenEvent {
 impl ValidateAuthTokenError {
     pub const fn log_level(&self) -> LogLevel {
         match self {
+            Self::TokenNotSent => LogLevel::Info,
             Self::MetadataError(err) => err.log_level(),
             Self::DecodeError(err) => err.log_level(),
             Self::RepositoryError(err) => err.log_level(),

@@ -36,8 +36,8 @@ impl<'a> TonicRenewAuthTicketService<'a> {
 impl<'a> RenewAuthTicketService for TonicRenewAuthTicketService<'a> {
     async fn renew(
         &self,
-        nonce: AuthNonceValue,
-        token: AuthTokenValue,
+        nonce: Option<AuthNonceValue>,
+        token: Option<AuthTokenValue>,
     ) -> Result<AuthTicketEncoded, ServiceError> {
         let mut client = RenewAuthTicketPbClient::connect(self.auth_service_url)
             .await
@@ -75,8 +75,8 @@ pub mod test {
     impl RenewAuthTicketService for StaticRenewAuthTicketService {
         async fn renew(
             &self,
-            _nonce: AuthNonceValue,
-            _token: AuthTokenValue,
+            _nonce: Option<AuthNonceValue>,
+            _token: Option<AuthTokenValue>,
         ) -> Result<AuthTicketEncoded, ServiceError> {
             Ok(AuthTicketEncoded {
                 user: self.user.clone().extract(),

@@ -36,8 +36,8 @@ impl<'a> TonicResetPasswordService<'a> {
 impl<'a> ResetPasswordService for TonicResetPasswordService<'a> {
     async fn reset(
         &self,
-        nonce: AuthNonceValue,
-        token: AuthTokenValue,
+        nonce: Option<AuthNonceValue>,
+        token: Option<AuthTokenValue>,
         fields: ResetPasswordFieldsExtract,
     ) -> Result<ResetPasswordResponse, ServiceError> {
         let mut client = ResetPasswordPbClient::connect(self.auth_service_url)
@@ -83,8 +83,8 @@ pub mod test {
     impl ResetPasswordService for StaticResetPasswordService {
         async fn reset(
             &self,
-            _nonce: AuthNonceValue,
-            _token: AuthTokenValue,
+            _nonce: Option<AuthNonceValue>,
+            _token: Option<AuthTokenValue>,
             _fields: ResetPasswordFieldsExtract,
         ) -> Result<ResetPasswordResponse, ServiceError> {
             Ok(ResetPasswordResponse::Success(AuthTicketEncoded {

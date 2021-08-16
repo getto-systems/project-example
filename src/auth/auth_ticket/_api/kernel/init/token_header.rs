@@ -24,8 +24,8 @@ impl<'a> TicketAuthTokenHeader<'a> {
 }
 
 impl<'a> AuthTokenHeader for TicketAuthTokenHeader<'a> {
-    fn token(&self) -> Result<AuthTokenValue, HeaderError> {
-        cookie(&self.request, COOKIE_TICKET_TOKEN).map(AuthTokenValue::new)
+    fn token(&self) -> Result<Option<AuthTokenValue>, HeaderError> {
+        Ok(cookie(&self.request, COOKIE_TICKET_TOKEN).map(AuthTokenValue::new))
     }
 }
 
@@ -40,8 +40,8 @@ impl<'a> ApiAuthTokenHeader<'a> {
 }
 
 impl<'a> AuthTokenHeader for ApiAuthTokenHeader<'a> {
-    fn token(&self) -> Result<AuthTokenValue, HeaderError> {
-        cookie(&self.request, COOKIE_API_TOKEN).map(AuthTokenValue::new)
+    fn token(&self) -> Result<Option<AuthTokenValue>, HeaderError> {
+        Ok(cookie(&self.request, COOKIE_API_TOKEN).map(AuthTokenValue::new))
     }
 }
 
@@ -59,9 +59,9 @@ pub mod test {
     }
 
     impl AuthTokenHeader for StaticAuthTokenHeader {
-        fn token(&self) -> Result<AuthTokenValue, HeaderError> {
+        fn token(&self) -> Result<Option<AuthTokenValue>, HeaderError> {
             match self {
-                Self::Valid(token) => Ok(token.clone()),
+                Self::Valid(token) => Ok(Some(token.clone())),
             }
         }
     }

@@ -19,7 +19,7 @@ pub trait LogoutInfra {
 pub trait LogoutService {
     async fn logout(
         &self,
-        nonce: AuthNonceValue,
-        token: AuthTokenValue,
+        nonce: Option<AuthNonceValue>,
+        token: Option<AuthTokenValue>,
     ) -> Result<(), ServiceError>;
 }

@@ -7,7 +7,8 @@ use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::auth_ticket::_api::{
     kernel::init::{
-        nonce_header::ActixWebAuthNonceHeader, token_header::TicketAuthTokenHeader, AuthTokenStruct,
+        nonce_header::ActixWebAuthNonceHeader, response_builder::CookieAuthTokenResponseBuilder,
+        token_header::TicketAuthTokenHeader,
     },
     renew::init::response_encoder::ProstRenewAuthTicketResponseEncoder,
 };
@@ -18,7 +19,7 @@ use super::infra::RenewAuthTicketInfra;
 pub struct RenewAuthTicketStruct<'a> {
     nonce_header: ActixWebAuthNonceHeader<'a>,
     token_header: TicketAuthTokenHeader<'a>,
-    token_infra: AuthTokenStruct<'a>,
+    response_builder: CookieAuthTokenResponseBuilder<'a>,
     renew_service: TonicRenewAuthTicketService<'a>,
     response_encoder: ProstRenewAuthTicketResponseEncoder,
 }
@@ -32,7 +33,7 @@ impl<'a> RenewAuthTicketStruct<'a> {
         Self {
             nonce_header: ActixWebAuthNonceHeader::new(request),
             token_header: TicketAuthTokenHeader::new(request),
-            token_infra: AuthTokenStruct::new(feature),
+            response_builder: CookieAuthTokenResponseBuilder::new(&feature.cookie),
             renew_service: TonicRenewAuthTicketService::new(&feature.service, request_id),
             response_encoder: ProstRenewAuthTicketResponseEncoder,
         }
@@ -42,7 +43,7 @@ impl<'a> RenewAuthTicketStruct<'a> {
 impl<'a> RenewAuthTicketInfra for RenewAuthTicketStruct<'a> {
     type NonceHeader = ActixWebAuthNonceHeader<'a>;
     type TokenHeader = TicketAuthTokenHeader<'a>;
-    type TokenInfra = AuthTokenStruct<'a>;
+    type ResponseBuilder = CookieAuthTokenResponseBuilder<'a>;
     type RenewService = TonicRenewAuthTicketService<'a>;
     type ResponseEncoder = ProstRenewAuthTicketResponseEncoder;
 
@@ -52,8 +53,8 @@ impl<'a> RenewAuthTicketInfra for RenewAuthTicketStruct<'a> {
     fn token_header(&self) -> &Self::TokenHeader {
         &self.token_header
     }
-    fn token_infra(&self) -> &Self::TokenInfra {
-        &self.token_infra
+    fn response_builder(&self) -> &Self::ResponseBuilder {
+        &self.response_builder
     }
     fn renew_service(&self) -> &Self::RenewService {
         &self.renew_service
@@ -68,7 +69,8 @@ pub mod test {
     use super::renew_service::test::StaticRenewAuthTicketService;
     use super::response_encoder::test::StaticRenewAuthTicketResponseEncoder;
     use crate::auth::auth_ticket::_api::kernel::init::{
-        nonce_header::test::StaticAuthNonceHeader, test::StaticAuthTokenStruct,
+        nonce_header::test::StaticAuthNonceHeader,
+        response_builder::test::StaticAuthTokenResponseBuilder,
         token_header::test::StaticAuthTokenHeader,
     };
 
@@ -77,7 +79,7 @@ pub mod test {
     pub struct StaticRenewAuthTicketStruct {
         pub nonce_header: StaticAuthNonceHeader,
         pub token_header: StaticAuthTokenHeader,
-        pub token_infra: StaticAuthTokenStruct,
+        pub response_builder: StaticAuthTokenResponseBuilder,
         pub renew_service: StaticRenewAuthTicketService,
         pub response_encoder: StaticRenewAuthTicketResponseEncoder,
     }
@@ -85,7 +87,7 @@ pub mod test {
     impl RenewAuthTicketInfra for StaticRenewAuthTicketStruct {
         type NonceHeader = StaticAuthNonceHeader;
         type TokenHeader = StaticAuthTokenHeader;
-        type TokenInfra = StaticAuthTokenStruct;
+        type ResponseBuilder = StaticAuthTokenResponseBuilder;
         type RenewService = StaticRenewAuthTicketService;
         type ResponseEncoder = StaticRenewAuthTicketResponseEncoder;
 
@@ -95,8 +97,8 @@ pub mod test {
         fn token_header(&self) -> &Self::TokenHeader {
             &self.token_header
         }
-        fn token_infra(&self) -> &Self::TokenInfra {
-            &self.token_infra
+        fn response_builder(&self) -> &Self::ResponseBuilder {
+            &self.response_builder
         }
         fn renew_service(&self) -> &Self::RenewService {
             &self.renew_service

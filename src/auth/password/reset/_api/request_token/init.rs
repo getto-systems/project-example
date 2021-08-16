@@ -6,7 +6,9 @@ use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_api::kernel::init::TicketAuthHeaderStruct;
+use crate::auth::auth_ticket::_api::kernel::init::{
+    nonce_header::ActixWebAuthNonceHeader, token_header::TicketAuthTokenHeader,
+};
 use request_decoder::ProtobufRequestResetTokenRequestDecoder;
 use request_token_service::TonicRequestResetTokenService;
 use response_encoder::ProstRequestResetTokenResponseEncoder;
@@ -14,7 +16,8 @@ use response_encoder::ProstRequestResetTokenResponseEncoder;
 use super::infra::RequestResetTokenInfra;
 
 pub struct RequestResetTokenStruct<'a> {
-    header_infra: TicketAuthHeaderStruct<'a>,
+    nonce_header: ActixWebAuthNonceHeader<'a>,
+    token_header: TicketAuthTokenHeader<'a>,
     request_decoder: ProtobufRequestResetTokenRequestDecoder,
     request_token_service: TonicRequestResetTokenService<'a>,
     response_encoder: ProstRequestResetTokenResponseEncoder,
@@ -28,7 +31,8 @@ impl<'a> RequestResetTokenStruct<'a> {
         body: String,
     ) -> Self {
         Self {
-            header_infra: TicketAuthHeaderStruct::new(request),
+            nonce_header: ActixWebAuthNonceHeader::new(request),
+            token_header: TicketAuthTokenHeader::new(request),
             request_decoder: ProtobufRequestResetTokenRequestDecoder::new(body),
             request_token_service: TonicRequestResetTokenService::new(&feature.service, request_id),
             response_encoder: ProstRequestResetTokenResponseEncoder,
@@ -37,13 +41,17 @@ impl<'a> RequestResetTokenStruct<'a> {
 }
 
 impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
-    type HeaderInfra = TicketAuthHeaderStruct<'a>;
+    type NonceHeader = ActixWebAuthNonceHeader<'a>;
+    type TokenHeader = TicketAuthTokenHeader<'a>;
     type RequestDecoder = ProtobufRequestResetTokenRequestDecoder;
     type RequestTokenService = TonicRequestResetTokenService<'a>;
     type ResponseEncoder = ProstRequestResetTokenResponseEncoder;
 
-    fn header_infra(&self) -> &Self::HeaderInfra {
-        &self.header_infra
+    fn nonce_header(&self) -> &Self::NonceHeader {
+        &self.nonce_header
+    }
+    fn token_header(&self) -> &Self::TokenHeader {
+        &self.token_header
     }
     fn request_decoder(&self) -> &Self::RequestDecoder {
         &self.request_decoder
@@ -61,26 +69,32 @@ pub mod test {
     use super::request_decoder::test::StaticRequestResetTokenRequestDecoder;
     use super::request_token_service::test::StaticRequestResetTokenService;
     use super::response_encoder::test::StaticRequestResetTokenResponseEncoder;
-
-    use crate::auth::auth_ticket::_api::kernel::init::test::StaticAuthHeaderStruct;
+    use crate::auth::auth_ticket::_api::kernel::init::{
+        nonce_header::test::StaticAuthNonceHeader, token_header::test::StaticAuthTokenHeader,
+    };
 
     use super::super::infra::RequestResetTokenInfra;
 
     pub struct StaticRequestResetTokenStruct {
-        pub header_infra: StaticAuthHeaderStruct,
+        pub nonce_header: StaticAuthNonceHeader,
+        pub token_header: StaticAuthTokenHeader,
         pub request_decoder: StaticRequestResetTokenRequestDecoder,
         pub request_token_service: StaticRequestResetTokenService,
         pub response_encoder: StaticRequestResetTokenResponseEncoder,
     }
 
     impl RequestResetTokenInfra for StaticRequestResetTokenStruct {
-        type HeaderInfra = StaticAuthHeaderStruct;
+        type NonceHeader = StaticAuthNonceHeader;
+        type TokenHeader = StaticAuthTokenHeader;
         type RequestDecoder = StaticRequestResetTokenRequestDecoder;
         type RequestTokenService = StaticRequestResetTokenService;
         type ResponseEncoder = StaticRequestResetTokenResponseEncoder;
 
-        fn header_infra(&self) -> &Self::HeaderInfra {
-            &self.header_infra
+        fn nonce_header(&self) -> &Self::NonceHeader {
+            &self.nonce_header
+        }
+        fn token_header(&self) -> &Self::TokenHeader {
+            &self.token_header
         }
         fn request_decoder(&self) -> &Self::RequestDecoder {
             &self.request_decoder

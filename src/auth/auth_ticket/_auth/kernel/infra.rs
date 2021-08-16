@@ -32,7 +32,7 @@ pub trait AuthClock {
 }
 
 pub trait AuthNonceMetadata {
-    fn nonce(&self) -> Result<AuthNonceValue, MetadataError>;
+    fn nonce(&self) -> Result<Option<AuthNonceValue>, MetadataError>;
 }
 
 #[async_trait::async_trait]
