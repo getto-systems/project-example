@@ -1,4 +1,4 @@
-use crate::auth::auth_ticket::_api::kernel::infra::AuthHeaderInfra;
+use crate::auth::auth_ticket::_api::kernel::infra::{AuthNonceHeader, AuthTokenHeader};
 
 use crate::auth::{
     _api::service::data::ServiceError,
@@ -6,10 +6,12 @@ use crate::auth::{
 };
 
 pub trait LogoutInfra {
-    type HeaderInfra: AuthHeaderInfra;
+    type NonceHeader: AuthNonceHeader;
+    type TokenHeader: AuthTokenHeader;
     type LogoutService: LogoutService;
 
-    fn header_infra(&self) -> &Self::HeaderInfra;
+    fn nonce_header(&self) -> &Self::NonceHeader;
+    fn token_header(&self) -> &Self::TokenHeader;
     fn logout_service(&self) -> &Self::LogoutService;
 }
 

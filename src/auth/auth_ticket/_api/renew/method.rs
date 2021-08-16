@@ -1,9 +1,7 @@
 use getto_application::data::MethodResult;
 
 use crate::auth::auth_ticket::_api::{
-    kernel::infra::{
-        AuthHeaderInfra, AuthNonceHeader, AuthTokenHeader, AuthTokenInfra, AuthTokenMessenger,
-    },
+    kernel::infra::{AuthNonceHeader, AuthTokenHeader, AuthTokenInfra, AuthTokenMessenger},
     renew::infra::{RenewAuthTicketInfra, RenewAuthTicketResponseEncoder, RenewAuthTicketService},
 };
 
@@ -13,9 +11,8 @@ pub async fn renew<S>(
     infra: &impl RenewAuthTicketInfra,
     post: impl Fn(RenewAuthTicketEvent) -> S,
 ) -> MethodResult<S> {
-    let header_infra = infra.header_infra();
-    let nonce_header = header_infra.nonce_header();
-    let token_header = header_infra.token_header();
+    let nonce_header = infra.nonce_header();
+    let token_header = infra.token_header();
     let renew_service = infra.renew_service();
     let token_infra = infra.token_infra();
     let token_messenger = token_infra.token_messenger();

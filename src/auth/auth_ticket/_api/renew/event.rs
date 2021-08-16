@@ -1,12 +1,12 @@
 use std::fmt::Display;
 
 use crate::{
-    auth::{_api::service::data::ServiceError, auth_ticket::_api::kernel::data::AuthTokenMessage},
+    auth::{_api::service::data::ServiceError, auth_ticket::_api::kernel::data::AuthTokenResponse},
     z_details::_api::{message::data::MessageError, request::data::HeaderError},
 };
 
 pub enum RenewAuthTicketEvent {
-    Success(AuthTokenMessage),
+    Success(AuthTokenResponse),
     HeaderError(HeaderError),
     ServiceError(ServiceError),
     MessageError(MessageError),

@@ -5,8 +5,7 @@ use getto_application_test::ActionTestRunner;
 use crate::auth::{
     auth_ticket::_api::{
         kernel::init::{
-            nonce_header::test::StaticAuthNonceHeader,
-            test::{StaticAuthHeaderStruct, StaticAuthTokenStruct},
+            nonce_header::test::StaticAuthNonceHeader, test::StaticAuthTokenStruct,
             token_header::test::StaticAuthTokenHeader,
             token_messenger::test::StaticAuthTokenMessenger,
         },
@@ -53,7 +52,8 @@ impl TestFeature {
     fn standard() -> Self {
         Self {
             renew: StaticRenewAuthTicketStruct {
-                header_infra: standard_header_infra(),
+                nonce_header: StaticAuthNonceHeader::Valid(AuthNonceValue::new("NONCE".into())),
+                token_header: StaticAuthTokenHeader::Valid(AuthTokenValue::new("TOKEN".into())),
                 token_infra: StaticAuthTokenStruct {
                     token_messenger: StaticAuthTokenMessenger,
                 },
@@ -63,13 +63,6 @@ impl TestFeature {
                 response_encoder: StaticRenewAuthTicketResponseEncoder,
             },
         }
-    }
-}
-
-fn standard_header_infra() -> StaticAuthHeaderStruct {
-    StaticAuthHeaderStruct {
-        nonce_header: StaticAuthNonceHeader::Valid(AuthNonceValue::new("NONCE".into())),
-        token_header: StaticAuthTokenHeader::Valid(AuthTokenValue::new("TOKEN".into())),
     }
 }
 

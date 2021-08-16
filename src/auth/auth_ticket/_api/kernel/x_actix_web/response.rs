@@ -13,17 +13,17 @@ use super::header::{
 
 use crate::auth::auth_ticket::{
     _api::kernel::data::{
-        AuthTokenMessage,
-        AuthTokenMessageEncoded, // ValidateAuthNonceError, ValidateAuthRolesError,
+        AuthTokenResponse,
+        AuthTokenMessage, // ValidateAuthNonceError, ValidateAuthRolesError,
     },
     _common::kernel::data::{AuthTokenEncoded, AuthTokenExtract, CloudfrontTokenKind},
 };
 
-impl RespondTo for AuthTokenMessage {
+impl RespondTo for AuthTokenResponse {
     fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
-        let AuthTokenMessage {
+        let AuthTokenResponse {
             domain,
-            message: AuthTokenMessageEncoded { message, token },
+            message: AuthTokenMessage { body: message, token },
         } = self;
         let AuthTokenEncoded {
             ticket_token,

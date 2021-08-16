@@ -10,7 +10,7 @@ use crate::auth::password::reset::_api::reset::infra::{
 
 use crate::{
     auth::{
-        auth_ticket::_api::kernel::data::AuthTokenMessageEncoded,
+        auth_ticket::_api::kernel::data::AuthTokenMessage,
         password::reset::_api::reset::data::{ResetPasswordMessageEncoded, ResetPasswordResult},
     },
     z_details::_api::message::data::MessageError,
@@ -54,8 +54,8 @@ impl ResetPasswordResponseEncoder for ProstResetPasswordResponseEncoder {
                     value: Some(ticket.user.into()),
                     ..Default::default()
                 };
-                Ok(ResetPasswordResult::Success(AuthTokenMessageEncoded {
-                    message: encode_protobuf_base64(message)?,
+                Ok(ResetPasswordResult::Success(AuthTokenMessage {
+                    body: encode_protobuf_base64(message)?,
                     token: ticket.token,
                 }))
             }
@@ -71,7 +71,7 @@ pub mod test {
 
     use crate::{
         auth::{
-            auth_ticket::_api::kernel::data::AuthTokenMessageEncoded,
+            auth_ticket::_api::kernel::data::AuthTokenMessage,
             password::reset::_api::reset::data::{
                 ResetPasswordMessageEncoded, ResetPasswordResult,
             },
@@ -94,8 +94,8 @@ pub mod test {
                     Ok(ResetPasswordResult::AlreadyReset("ALREADY-RESET".into()))
                 }
                 ResetPasswordResponse::Success(ticket) => {
-                    Ok(ResetPasswordResult::Success(AuthTokenMessageEncoded {
-                        message: "ENCODED".into(),
+                    Ok(ResetPasswordResult::Success(AuthTokenMessage {
+                        body: "ENCODED".into(),
                         token: ticket.token,
                     }))
                 }

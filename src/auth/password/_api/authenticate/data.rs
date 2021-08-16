@@ -1,7 +1,7 @@
-use crate::auth::auth_ticket::_api::kernel::data::{AuthTokenMessage, AuthTokenMessageEncoded};
+use crate::auth::auth_ticket::_api::kernel::data::{AuthTokenResponse, AuthTokenMessage};
 
-pub type AuthenticatePasswordMessage = AuthenticatePasswordResult<AuthTokenMessage>;
-pub type AuthenticatePasswordMessageEncoded = AuthenticatePasswordResult<AuthTokenMessageEncoded>;
+pub type AuthenticatePasswordMessage = AuthenticatePasswordResult<AuthTokenResponse>;
+pub type AuthenticatePasswordMessageEncoded = AuthenticatePasswordResult<AuthTokenMessage>;
 
 pub enum AuthenticatePasswordResult<T> {
     Success(T),

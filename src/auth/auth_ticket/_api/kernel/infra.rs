@@ -1,6 +1,6 @@
 use crate::{
     auth::auth_ticket::{
-        _api::kernel::data::{AuthTokenMessage, AuthTokenMessageEncoded},
+        _api::kernel::data::{AuthTokenResponse, AuthTokenMessage},
         _common::kernel::data::{AuthNonceValue, AuthTokenValue},
     },
     z_details::_api::request::data::HeaderError,
@@ -21,7 +21,7 @@ pub trait AuthTokenInfra {
 }
 
 pub trait AuthTokenMessenger {
-    fn to_message(&self, message: AuthTokenMessageEncoded) -> AuthTokenMessage;
+    fn to_message(&self, message: AuthTokenMessage) -> AuthTokenResponse;
 }
 
 pub trait AuthNonceHeader {
