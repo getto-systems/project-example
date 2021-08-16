@@ -14,7 +14,7 @@ use crate::auth::password::reset::{
 };
 
 use crate::auth::{
-    _api::service::data::ServiceError,
+    _api::service::data::AuthServiceError,
     auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
 };
 
@@ -36,10 +36,10 @@ impl<'a> TonicResetPasswordService<'a> {
 impl<'a> ResetPasswordService for TonicResetPasswordService<'a> {
     async fn reset(
         &self,
-        nonce: AuthNonceValue,
-        token: AuthTokenValue,
+        nonce: Option<AuthNonceValue>,
+        token: Option<AuthTokenValue>,
         fields: ResetPasswordFieldsExtract,
-    ) -> Result<ResetPasswordResponse, ServiceError> {
+    ) -> Result<ResetPasswordResponse, AuthServiceError> {
         let mut client = ResetPasswordPbClient::connect(self.auth_service_url)
             .await
             .map_err(infra_error)?;
@@ -51,9 +51,9 @@ impl<'a> ResetPasswordService for TonicResetPasswordService<'a> {
         });
         set_metadata(&mut request, self.request_id, nonce, token)?;
 
-        let response = client.reset(request).await.map_err(ServiceError::from)?;
+        let response = client.reset(request).await.map_err(AuthServiceError::from)?;
         let response: Option<ResetPasswordResponse> = response.into_inner().into();
-        response.ok_or(ServiceError::InfraError("failed to decode response".into()))
+        response.ok_or(AuthServiceError::InfraError("failed to decode response".into()))
     }
 }
 
@@ -67,7 +67,7 @@ pub mod test {
     };
 
     use crate::auth::{
-        _api::service::data::ServiceError,
+        _api::service::data::AuthServiceError,
         auth_ticket::_common::{
             encode::data::AuthTicketEncoded,
             kernel::data::{AuthNonceValue, AuthTokenEncoded, AuthTokenExtract, AuthTokenValue},
@@ -83,10 +83,10 @@ pub mod test {
     impl ResetPasswordService for StaticResetPasswordService {
         async fn reset(
             &self,
-            _nonce: AuthNonceValue,
-            _token: AuthTokenValue,
+            _nonce: Option<AuthNonceValue>,
+            _token: Option<AuthTokenValue>,
             _fields: ResetPasswordFieldsExtract,
-        ) -> Result<ResetPasswordResponse, ServiceError> {
+        ) -> Result<ResetPasswordResponse, AuthServiceError> {
             Ok(ResetPasswordResponse::Success(AuthTicketEncoded {
                 user: self.user.clone().extract(),
                 token: AuthTokenEncoded {

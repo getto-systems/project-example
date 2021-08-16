@@ -1,17 +1,14 @@
 use std::fmt::Display;
 
-use crate::{
-    auth::{
-        _api::service::data::ServiceError,
+use crate::{auth::{
+        _api::service::data::AuthServiceError,
         password::_api::authenticate::data::AuthenticatePasswordMessage,
-    },
-    z_details::_api::{message::data::MessageError, request::data::HeaderError},
-};
+    }, z_details::_api::{message::data::MessageError, request::data::HeaderError}};
 
 pub enum AuthenticatePasswordEvent {
     Result(AuthenticatePasswordMessage),
     HeaderError(HeaderError),
-    ServiceError(ServiceError),
+    ServiceError(AuthServiceError),
     MessageError(MessageError),
 }
 

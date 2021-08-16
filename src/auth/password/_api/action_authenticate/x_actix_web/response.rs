@@ -7,6 +7,7 @@ use super::super::action::AuthenticatePasswordState;
 impl RespondTo for AuthenticatePasswordState {
     fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
+            Self::MessageError(err) => err.respond_to(request),
             Self::Authenticate(event) => event.respond_to(request),
         }
     }

@@ -24,8 +24,8 @@ impl<'a> TicketAuthTokenMetadata<'a> {
 }
 
 impl<'a> AuthTokenMetadata for TicketAuthTokenMetadata<'a> {
-    fn token(&self) -> Result<AuthTokenValue, MetadataError> {
-        metadata(&self.metadata, METADATA_TICKET_TOKEN).map(AuthTokenValue::new)
+    fn token(&self) -> Result<Option<AuthTokenValue>, MetadataError> {
+        metadata(&self.metadata, METADATA_TICKET_TOKEN).map(|value| value.map(AuthTokenValue::new))
     }
 }
 
@@ -40,8 +40,8 @@ impl<'a> ApiAuthTokenMetadata<'a> {
 }
 
 impl<'a> AuthTokenMetadata for ApiAuthTokenMetadata<'a> {
-    fn token(&self) -> Result<AuthTokenValue, MetadataError> {
-        metadata(&self.metadata, METADATA_API_TOKEN).map(AuthTokenValue::new)
+    fn token(&self) -> Result<Option<AuthTokenValue>, MetadataError> {
+        metadata(&self.metadata, METADATA_API_TOKEN).map(|value| value.map(AuthTokenValue::new))
     }
 }
 
@@ -59,9 +59,9 @@ pub mod test {
     }
 
     impl AuthTokenMetadata for StaticAuthTokenMetadata {
-        fn token(&self) -> Result<AuthTokenValue, MetadataError> {
+        fn token(&self) -> Result<Option<AuthTokenValue>, MetadataError> {
             match self {
-                Self::Valid(token) => Ok(token.clone()),
+                Self::Valid(token) => Ok(Some(token.clone())),
             }
         }
     }

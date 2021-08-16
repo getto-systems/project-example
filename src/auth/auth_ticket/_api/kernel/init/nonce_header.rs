@@ -22,8 +22,8 @@ impl<'a> ActixWebAuthNonceHeader<'a> {
 }
 
 impl<'a> AuthNonceHeader for ActixWebAuthNonceHeader<'a> {
-    fn nonce(&self) -> Result<AuthNonceValue, HeaderError> {
-        header(self.request, HEADER_NONCE).map(AuthNonceValue::new)
+    fn nonce(&self) -> Result<Option<AuthNonceValue>, HeaderError> {
+        header(self.request, HEADER_NONCE).map(|value| value.map(AuthNonceValue::new))
     }
 }
 
@@ -41,9 +41,9 @@ pub mod test {
     }
 
     impl AuthNonceHeader for StaticAuthNonceHeader {
-        fn nonce(&self) -> Result<AuthNonceValue, HeaderError> {
+        fn nonce(&self) -> Result<Option<AuthNonceValue>, HeaderError> {
             match self {
-                Self::Valid(nonce) => Ok(nonce.clone()),
+                Self::Valid(nonce) => Ok(Some(nonce.clone())),
             }
         }
     }

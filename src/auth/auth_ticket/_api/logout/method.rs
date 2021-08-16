@@ -1,7 +1,7 @@
 use getto_application::data::MethodResult;
 
 use crate::auth::auth_ticket::_api::{
-    kernel::infra::{AuthHeaderInfra, AuthNonceHeader, AuthTokenHeader},
+    kernel::infra::{AuthNonceHeader, AuthTokenHeader},
     logout::infra::{LogoutInfra, LogoutService},
 };
 
@@ -11,9 +11,8 @@ pub async fn logout<S>(
     infra: &impl LogoutInfra,
     post: impl Fn(LogoutEvent) -> S,
 ) -> MethodResult<S> {
-    let header_infra = infra.header_infra();
-    let nonce_header = header_infra.nonce_header();
-    let token_header = header_infra.token_header();
+    let nonce_header = infra.nonce_header();
+    let token_header = infra.token_header();
     let logout_service = infra.logout_service();
 
     let nonce = nonce_header

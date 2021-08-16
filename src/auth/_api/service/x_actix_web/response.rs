@@ -7,9 +7,9 @@ use crate::auth::_api::service::x_actix_web::header::{
 
 use crate::z_details::_common::response::actix_web::RespondTo;
 
-use crate::auth::_api::service::data::ServiceError;
+use crate::auth::_api::service::data::AuthServiceError;
 
-impl RespondTo for ServiceError {
+impl RespondTo for AuthServiceError {
     fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
             Self::InvalidArgument(_) => HttpResponse::BadRequest().finish(),

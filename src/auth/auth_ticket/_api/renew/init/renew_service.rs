@@ -11,7 +11,7 @@ use crate::auth::_api::service::helper::{infra_error, set_metadata};
 use crate::auth::auth_ticket::_api::renew::infra::RenewAuthTicketService;
 
 use crate::auth::{
-    _api::service::data::ServiceError,
+    _api::service::data::AuthServiceError,
     auth_ticket::_common::{
         encode::data::AuthTicketEncoded,
         kernel::data::{AuthNonceValue, AuthTokenValue},
@@ -36,9 +36,9 @@ impl<'a> TonicRenewAuthTicketService<'a> {
 impl<'a> RenewAuthTicketService for TonicRenewAuthTicketService<'a> {
     async fn renew(
         &self,
-        nonce: AuthNonceValue,
-        token: AuthTokenValue,
-    ) -> Result<AuthTicketEncoded, ServiceError> {
+        nonce: Option<AuthNonceValue>,
+        token: Option<AuthTokenValue>,
+    ) -> Result<AuthTicketEncoded, AuthServiceError> {
         let mut client = RenewAuthTicketPbClient::connect(self.auth_service_url)
             .await
             .map_err(infra_error)?;
@@ -46,9 +46,9 @@ impl<'a> RenewAuthTicketService for TonicRenewAuthTicketService<'a> {
         let mut request = Request::new(RenewAuthTicketRequestPb {});
         set_metadata(&mut request, self.request_id, nonce, token)?;
 
-        let response = client.renew(request).await.map_err(ServiceError::from)?;
+        let response = client.renew(request).await.map_err(AuthServiceError::from)?;
         let response: Option<AuthTicketEncoded> = response.into_inner().into();
-        response.ok_or(ServiceError::InfraError("failed to decode response".into()))
+        response.ok_or(AuthServiceError::InfraError("failed to decode response".into()))
     }
 }
 
@@ -59,7 +59,7 @@ pub mod test {
     use crate::auth::auth_ticket::_api::renew::infra::RenewAuthTicketService;
 
     use crate::auth::{
-        _api::service::data::ServiceError,
+        _api::service::data::AuthServiceError,
         auth_ticket::_common::{
             encode::data::AuthTicketEncoded,
             kernel::data::{AuthNonceValue, AuthTokenEncoded, AuthTokenExtract, AuthTokenValue},
@@ -75,9 +75,9 @@ pub mod test {
     impl RenewAuthTicketService for StaticRenewAuthTicketService {
         async fn renew(
             &self,
-            _nonce: AuthNonceValue,
-            _token: AuthTokenValue,
-        ) -> Result<AuthTicketEncoded, ServiceError> {
+            _nonce: Option<AuthNonceValue>,
+            _token: Option<AuthTokenValue>,
+        ) -> Result<AuthTicketEncoded, AuthServiceError> {
             Ok(AuthTicketEncoded {
                 user: self.user.clone().extract(),
                 token: AuthTokenEncoded {

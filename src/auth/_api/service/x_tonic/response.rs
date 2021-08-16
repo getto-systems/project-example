@@ -1,8 +1,8 @@
 use tonic::{Code, Status};
 
-use crate::auth::_api::service::data::ServiceError;
+use crate::auth::_api::service::data::AuthServiceError;
 
-impl From<Status> for ServiceError {
+impl From<Status> for AuthServiceError {
     fn from(status: Status) -> Self {
         match status.code() {
             Code::InvalidArgument => Self::InvalidArgument(status.message().into()),

@@ -22,10 +22,9 @@ impl ProtobufRequestResetTokenRequestDecoder {
 }
 
 impl RequestResetTokenRequestDecoder for ProtobufRequestResetTokenRequestDecoder {
-    fn decode(&self) -> Result<RequestResetTokenFieldsExtract, MessageError> {
-        // TODO body は clone したくない
-        let message = RequestResetTokenPb::decode(decode_base64(self.body.clone())?)
-            .map_err(invalid_protobuf)?;
+    fn decode(self) -> Result<RequestResetTokenFieldsExtract, MessageError> {
+        let message =
+            RequestResetTokenPb::decode(decode_base64(self.body)?).map_err(invalid_protobuf)?;
 
         Ok(RequestResetTokenFieldsExtract {
             login_id: message.login_id,
@@ -47,9 +46,8 @@ pub mod test {
     }
 
     impl RequestResetTokenRequestDecoder for StaticRequestResetTokenRequestDecoder {
-        fn decode(&self) -> Result<RequestResetTokenFieldsExtract, MessageError> {
-            // TODO self を consume する api にすれば clone しなくて良くなる
-            Ok(self.fields.clone())
+        fn decode(self) -> Result<RequestResetTokenFieldsExtract, MessageError> {
+            Ok(self.fields)
         }
     }
 }

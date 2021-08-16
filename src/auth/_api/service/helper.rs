@@ -10,32 +10,36 @@ use crate::{
 };
 
 use crate::auth::{
-    _api::service::data::ServiceError,
+    _api::service::data::AuthServiceError,
     auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
 };
 
-pub fn infra_error(err: impl Display) -> ServiceError {
-    ServiceError::InfraError(format!("service infra error; {}", err))
+pub fn infra_error(err: impl Display) -> AuthServiceError {
+    AuthServiceError::InfraError(format!("service infra error; {}", err))
 }
 
 pub fn set_metadata<T>(
     request: &mut Request<T>,
     request_id: &str,
-    nonce: AuthNonceValue,
-    token: AuthTokenValue,
-) -> Result<(), ServiceError> {
+    nonce: Option<AuthNonceValue>,
+    token: Option<AuthTokenValue>,
+) -> Result<(), AuthServiceError> {
     request.metadata_mut().append(
         METADATA_REQUEST_ID,
         MetadataValue::from_str(request_id).map_err(infra_error)?,
     );
-    request.metadata_mut().append(
-        METADATA_NONCE,
-        MetadataValue::from_str(&nonce.extract()).map_err(infra_error)?,
-    );
-    request.metadata_mut().append(
-        METADATA_TICKET_TOKEN,
-        MetadataValue::from_str(&token.extract()).map_err(infra_error)?,
-    );
+    if let Some(nonce) = nonce {
+        request.metadata_mut().append(
+            METADATA_NONCE,
+            MetadataValue::from_str(&nonce.extract()).map_err(infra_error)?,
+        );
+    }
+    if let Some(token) = token {
+        request.metadata_mut().append(
+            METADATA_TICKET_TOKEN,
+            MetadataValue::from_str(&token.extract()).map_err(infra_error)?,
+        );
+    }
 
     Ok(())
 }

@@ -14,7 +14,7 @@ use crate::auth::password::{
 };
 
 use crate::auth::{
-    _api::service::data::ServiceError,
+    _api::service::data::AuthServiceError,
     auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
 };
 
@@ -36,10 +36,10 @@ impl<'a> TonicAuthenticatePasswordService<'a> {
 impl<'a> AuthenticatePasswordService for TonicAuthenticatePasswordService<'a> {
     async fn authenticate(
         &self,
-        nonce: AuthNonceValue,
-        token: AuthTokenValue,
+        nonce: Option<AuthNonceValue>,
+        token: Option<AuthTokenValue>,
         fields: AuthenticatePasswordFieldsExtract,
-    ) -> Result<AuthenticatePasswordResponse, ServiceError> {
+    ) -> Result<AuthenticatePasswordResponse, AuthServiceError> {
         let mut client = AuthenticatePasswordPbClient::connect(self.auth_service_url)
             .await
             .map_err(infra_error)?;
@@ -53,9 +53,9 @@ impl<'a> AuthenticatePasswordService for TonicAuthenticatePasswordService<'a> {
         let response = client
             .authenticate(request)
             .await
-            .map_err(ServiceError::from)?;
+            .map_err(AuthServiceError::from)?;
         let response: Option<AuthenticatePasswordResponse> = response.into_inner().into();
-        response.ok_or(ServiceError::InfraError("failed to decode response".into()))
+        response.ok_or(AuthServiceError::InfraError("failed to decode response".into()))
     }
 }
 
@@ -69,7 +69,7 @@ pub mod test {
     };
 
     use crate::auth::{
-        _api::service::data::ServiceError,
+        _api::service::data::AuthServiceError,
         auth_ticket::_common::{
             encode::data::AuthTicketEncoded,
             kernel::data::{AuthNonceValue, AuthTokenEncoded, AuthTokenExtract, AuthTokenValue},
@@ -85,10 +85,10 @@ pub mod test {
     impl AuthenticatePasswordService for StaticAuthenticatePasswordService {
         async fn authenticate(
             &self,
-            _nonce: AuthNonceValue,
-            _token: AuthTokenValue,
+            _nonce: Option<AuthNonceValue>,
+            _token: Option<AuthTokenValue>,
             _fields: AuthenticatePasswordFieldsExtract,
-        ) -> Result<AuthenticatePasswordResponse, ServiceError> {
+        ) -> Result<AuthenticatePasswordResponse, AuthServiceError> {
             Ok(AuthenticatePasswordResponse::Success(AuthTicketEncoded {
                 user: self.user.clone().extract(),
                 token: AuthTokenEncoded {

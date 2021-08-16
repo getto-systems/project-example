@@ -23,7 +23,7 @@ pub trait ValidateAuthTokenInfra {
 }
 
 pub trait AuthTokenMetadata {
-    fn token(&self) -> Result<AuthTokenValue, MetadataError>;
+    fn token(&self) -> Result<Option<AuthTokenValue>, MetadataError>;
 }
 
 pub trait AuthTokenDecoder {

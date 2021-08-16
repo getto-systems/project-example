@@ -8,7 +8,7 @@ use crate::auth::password::_api::authenticate::infra::{
 
 use crate::{
     auth::{
-        auth_ticket::_api::kernel::data::AuthTokenMessageEncoded,
+        auth_ticket::_api::kernel::data::AuthTokenMessage,
         password::_api::authenticate::data::{
             AuthenticatePasswordMessageEncoded, AuthenticatePasswordResult,
         },
@@ -40,8 +40,8 @@ impl AuthenticatePasswordResponseEncoder for ProstAuthenticatePasswordResponseEn
                     ..Default::default()
                 };
                 Ok(AuthenticatePasswordResult::Success(
-                    AuthTokenMessageEncoded {
-                        message: encode_protobuf_base64(message)?,
+                    AuthTokenMessage {
+                        body: encode_protobuf_base64(message)?,
                         token: ticket.token,
                     },
                 ))
@@ -58,7 +58,7 @@ pub mod test {
 
     use crate::{
         auth::{
-            auth_ticket::_api::kernel::data::AuthTokenMessageEncoded,
+            auth_ticket::_api::kernel::data::AuthTokenMessage,
             password::_api::authenticate::data::{
                 AuthenticatePasswordMessageEncoded, AuthenticatePasswordResult,
             },
@@ -78,8 +78,8 @@ pub mod test {
                     AuthenticatePasswordResult::InvalidPassword("INVALID-PASSWORD".into()),
                 ),
                 AuthenticatePasswordResponse::Success(ticket) => Ok(
-                    AuthenticatePasswordResult::Success(AuthTokenMessageEncoded {
-                        message: "ENCODED".into(),
+                    AuthenticatePasswordResult::Success(AuthTokenMessage {
+                        body: "ENCODED".into(),
                         token: ticket.token,
                     }),
                 ),

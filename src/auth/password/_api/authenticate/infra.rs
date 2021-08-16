@@ -1,11 +1,13 @@
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::{AuthHeaderInfra, AuthTokenInfra},
+    auth_ticket::_api::kernel::infra::{
+        AuthNonceHeader, AuthTokenHeader, AuthTokenResponseBuilder,
+    },
     password::_common::authenticate::infra::AuthenticatePasswordFieldsExtract,
 };
 
 use crate::{
     auth::{
-        _api::service::data::ServiceError,
+        _api::service::data::AuthServiceError,
         auth_ticket::_common::{
             encode::data::AuthTicketEncoded,
             kernel::data::{AuthNonceValue, AuthTokenValue},
@@ -16,31 +18,31 @@ use crate::{
 };
 
 pub trait AuthenticatePasswordInfra {
-    type HeaderInfra: AuthHeaderInfra;
-    type TokenInfra: AuthTokenInfra;
-    type RequestDecoder: AuthenticatePasswordRequestDecoder;
+    type NonceHeader: AuthNonceHeader;
+    type TokenHeader: AuthTokenHeader;
+    type ResponseBuilder: AuthTokenResponseBuilder;
     type AuthenticateService: AuthenticatePasswordService;
     type ResponseEncoder: AuthenticatePasswordResponseEncoder;
 
-    fn header_infra(&self) -> &Self::HeaderInfra;
-    fn token_infra(&self) -> &Self::TokenInfra;
-    fn request_decoder(&self) -> &Self::RequestDecoder;
+    fn nonce_header(&self) -> &Self::NonceHeader;
+    fn token_header(&self) -> &Self::TokenHeader;
+    fn response_builder(&self) -> &Self::ResponseBuilder;
     fn authenticate_service(&self) -> &Self::AuthenticateService;
     fn response_encoder(&self) -> &Self::ResponseEncoder;
 }
 
 pub trait AuthenticatePasswordRequestDecoder {
-    fn decode(&self) -> Result<AuthenticatePasswordFieldsExtract, MessageError>;
+    fn decode(self) -> Result<AuthenticatePasswordFieldsExtract, MessageError>;
 }
 
 #[async_trait::async_trait]
 pub trait AuthenticatePasswordService {
     async fn authenticate(
         &self,
-        nonce: AuthNonceValue,
-        token: AuthTokenValue,
+        nonce: Option<AuthNonceValue>,
+        token: Option<AuthTokenValue>,
         fields: AuthenticatePasswordFieldsExtract,
-    ) -> Result<AuthenticatePasswordResponse, ServiceError>;
+    ) -> Result<AuthenticatePasswordResponse, AuthServiceError>;
 }
 
 pub enum AuthenticatePasswordResponse {

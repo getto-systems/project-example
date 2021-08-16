@@ -34,6 +34,7 @@ impl RespondTo<RenewAuthTicketResponsePb> for ValidateAuthTokenEvent {
 impl<T> RespondTo<T> for ValidateAuthTokenError {
     fn respond_to(self) -> Result<Response<T>, Status> {
         match self {
+            Self::TokenNotSent => Err(Status::unauthenticated(format!("{}", self))),
             Self::MetadataError(err) => err.respond_to(),
             Self::DecodeError(err) => err.respond_to(),
             Self::RepositoryError(err) => err.respond_to(),

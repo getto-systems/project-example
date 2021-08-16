@@ -13,7 +13,8 @@ pub async fn check_nonce(infra: &impl CheckAuthNonceInfra) -> Result<(), Validat
 
     let nonce = nonce_metadata
         .nonce()
-        .map_err(ValidateAuthNonceError::MetadataError)?;
+        .map_err(ValidateAuthNonceError::MetadataError)?
+        .ok_or(ValidateAuthNonceError::NonceNotSent)?;
 
     let registered_at = clock.now();
     let expires = registered_at.clone().expires(&config.nonce_expires);

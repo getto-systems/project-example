@@ -2,11 +2,14 @@ use getto_application::data::MethodResult;
 
 use crate::auth::{
     auth_ticket::_api::kernel::infra::{
-        AuthHeaderInfra, AuthNonceHeader, AuthTokenHeader, AuthTokenInfra, AuthTokenMessenger,
+        AuthNonceHeader, AuthTokenHeader, AuthTokenResponseBuilder,
     },
-    password::_api::authenticate::infra::{
-        AuthenticatePasswordInfra, AuthenticatePasswordRequestDecoder,
-        AuthenticatePasswordResponseEncoder, AuthenticatePasswordService,
+    password::{
+        _api::authenticate::infra::{
+            AuthenticatePasswordInfra, AuthenticatePasswordResponseEncoder,
+            AuthenticatePasswordService,
+        },
+        _common::authenticate::infra::AuthenticatePasswordFieldsExtract,
     },
 };
 
@@ -14,17 +17,14 @@ use super::event::AuthenticatePasswordEvent;
 
 pub async fn authenticate_password<S>(
     infra: &impl AuthenticatePasswordInfra,
+    fields: AuthenticatePasswordFieldsExtract,
     post: impl Fn(AuthenticatePasswordEvent) -> S,
 ) -> MethodResult<S> {
-    let header_infra = infra.header_infra();
-    let nonce_header = header_infra.nonce_header();
-    let token_header = header_infra.token_header();
+    let nonce_header = infra.nonce_header();
+    let token_header = infra.token_header();
     let authenticate_service = infra.authenticate_service();
-    let token_infra = infra.token_infra();
-    let token_messenger = token_infra.token_messenger();
     let response_encoder = infra.response_encoder();
-
-    let request_decoder = infra.request_decoder();
+    let response_builder = infra.response_builder();
 
     let nonce = nonce_header
         .nonce()
@@ -33,10 +33,6 @@ pub async fn authenticate_password<S>(
     let token = token_header
         .token()
         .map_err(|err| post(AuthenticatePasswordEvent::HeaderError(err)))?;
-
-    let fields = request_decoder
-        .decode()
-        .map_err(|err| post(AuthenticatePasswordEvent::MessageError(err)))?;
 
     let response = authenticate_service
         .authenticate(nonce, token, fields)
@@ -47,7 +43,7 @@ pub async fn authenticate_password<S>(
         .encode(response)
         .map_err(|err| post(AuthenticatePasswordEvent::MessageError(err)))?;
 
-    let message = message.map(|message| token_messenger.to_message(message));
+    let message = message.map(|message| response_builder.build(message));
 
     Ok(post(AuthenticatePasswordEvent::Result(message)))
 }

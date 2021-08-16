@@ -7,7 +7,6 @@ use actix_web::HttpRequest;
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::auth_ticket::_api::kernel::init::{AuthTokenStruct, TicketAuthHeaderStruct};
-use request_decoder::ProstResetPasswordRequestDecoder;
 use reset_service::TonicResetPasswordService;
 use response_encoder::ProstResetPasswordResponseEncoder;
 
@@ -16,7 +15,6 @@ use crate::auth::password::reset::_api::reset::infra::ResetPasswordInfra;
 pub struct ResetPasswordStruct<'a> {
     header_infra: TicketAuthHeaderStruct<'a>,
     token_infra: AuthTokenStruct<'a>,
-    request_decoder: ProstResetPasswordRequestDecoder,
     reset_service: TonicResetPasswordService<'a>,
     response_encoder: ProstResetPasswordResponseEncoder,
 }
@@ -26,12 +24,10 @@ impl<'a> ResetPasswordStruct<'a> {
         feature: &'a AuthOutsideFeature,
         request_id: &'a str,
         request: &'a HttpRequest,
-        body: String,
     ) -> Self {
         Self {
             header_infra: TicketAuthHeaderStruct::new(request),
             token_infra: AuthTokenStruct::new(feature),
-            request_decoder: ProstResetPasswordRequestDecoder::new(body),
             reset_service: TonicResetPasswordService::new(&feature.service, request_id),
             response_encoder: ProstResetPasswordResponseEncoder,
         }
@@ -41,7 +37,6 @@ impl<'a> ResetPasswordStruct<'a> {
 impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
     type HeaderInfra = TicketAuthHeaderStruct<'a>;
     type TokenInfra = AuthTokenStruct<'a>;
-    type RequestDecoder = ProstResetPasswordRequestDecoder;
     type ResetService = TonicResetPasswordService<'a>;
     type ResponseEncoder = ProstResetPasswordResponseEncoder;
 
@@ -50,9 +45,6 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
     }
     fn token_infra(&self) -> &Self::TokenInfra {
         &self.token_infra
-    }
-    fn request_decoder(&self) -> &Self::RequestDecoder {
-        &self.request_decoder
     }
     fn reset_service(&self) -> &Self::ResetService {
         &self.reset_service
@@ -65,7 +57,6 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
 #[cfg(test)]
 pub mod test {
     use super::reset_service::test::StaticResetPasswordService;
-    use super::request_decoder::test::StaticResetPasswordRequestDecoder;
     use super::response_encoder::test::StaticResetPasswordResponseEncoder;
 
     use crate::auth::auth_ticket::_api::kernel::init::test::{
@@ -77,7 +68,6 @@ pub mod test {
     pub struct StaticResetPasswordStruct {
         pub header_infra: StaticAuthHeaderStruct,
         pub token_infra: StaticAuthTokenStruct,
-        pub request_decoder: StaticResetPasswordRequestDecoder,
         pub reset_service: StaticResetPasswordService,
         pub response_encoder: StaticResetPasswordResponseEncoder,
     }
@@ -85,7 +75,6 @@ pub mod test {
     impl ResetPasswordInfra for StaticResetPasswordStruct {
         type HeaderInfra = StaticAuthHeaderStruct;
         type TokenInfra = StaticAuthTokenStruct;
-        type RequestDecoder = StaticResetPasswordRequestDecoder;
         type ResetService = StaticResetPasswordService;
         type ResponseEncoder = StaticResetPasswordResponseEncoder;
 
@@ -94,9 +83,6 @@ pub mod test {
         }
         fn token_infra(&self) -> &Self::TokenInfra {
             &self.token_infra
-        }
-        fn request_decoder(&self) -> &Self::RequestDecoder {
-            &self.request_decoder
         }
         fn reset_service(&self) -> &Self::ResetService {
             &self.reset_service

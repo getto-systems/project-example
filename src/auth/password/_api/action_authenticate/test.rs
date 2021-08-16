@@ -5,9 +5,8 @@ use getto_application_test::ActionTestRunner;
 use crate::auth::{
     auth_ticket::_api::kernel::init::{
         nonce_header::test::StaticAuthNonceHeader,
-        test::{StaticAuthHeaderStruct, StaticAuthTokenStruct},
+        response_builder::test::StaticAuthTokenResponseBuilder,
         token_header::test::StaticAuthTokenHeader,
-        token_messenger::test::StaticAuthTokenMessenger,
     },
     password::_api::authenticate::init::{
         authenticate_service::test::StaticAuthenticatePasswordService,
@@ -31,11 +30,12 @@ async fn success_authenticate() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let feature = TestFeature::standard();
+    let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec!["authenticate password"]);
     assert!(result.is_ok());
 }
@@ -56,24 +56,15 @@ impl<'a> TestFeature {
     fn standard() -> Self {
         Self {
             authenticate: StaticAuthenticatePasswordStruct {
-                header_infra: standard_header_infra(),
-                token_infra: StaticAuthTokenStruct {
-                    token_messenger: StaticAuthTokenMessenger,
-                },
-                request_decoder: standard_request_decoder(),
+                nonce_header: StaticAuthNonceHeader::Valid(AuthNonceValue::new("NONCE".into())),
+                token_header: StaticAuthTokenHeader::Valid(AuthTokenValue::new("TOKEN".into())),
+                response_builder: StaticAuthTokenResponseBuilder,
                 authenticate_service: StaticAuthenticatePasswordService {
                     user: standard_user(),
                 },
                 response_encoder: StaticAuthenticatePasswordResponseEncoder,
             },
         }
-    }
-}
-
-fn standard_header_infra() -> StaticAuthHeaderStruct {
-    StaticAuthHeaderStruct {
-        nonce_header: StaticAuthNonceHeader::Valid(AuthNonceValue::new("NONCE".into())),
-        token_header: StaticAuthTokenHeader::Valid(AuthTokenValue::new("TOKEN".into())),
     }
 }
 

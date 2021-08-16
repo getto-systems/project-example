@@ -14,7 +14,7 @@ use crate::auth::password::reset::{
 };
 
 use crate::auth::{
-    _api::service::data::ServiceError,
+    _api::service::data::AuthServiceError,
     auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
 };
 
@@ -36,10 +36,10 @@ impl<'a> TonicRequestResetTokenService<'a> {
 impl<'a> RequestResetTokenService for TonicRequestResetTokenService<'a> {
     async fn request_token(
         &self,
-        nonce: AuthNonceValue,
-        token: AuthTokenValue,
+        nonce: Option<AuthNonceValue>,
+        token: Option<AuthTokenValue>,
         fields: RequestResetTokenFieldsExtract,
-    ) -> Result<RequestResetTokenResponse, ServiceError> {
+    ) -> Result<RequestResetTokenResponse, AuthServiceError> {
         let mut client = RequestResetTokenPbClient::connect(self.auth_service_url)
             .await
             .map_err(infra_error)?;
@@ -52,9 +52,9 @@ impl<'a> RequestResetTokenService for TonicRequestResetTokenService<'a> {
         let response = client
             .request_token(request)
             .await
-            .map_err(ServiceError::from)?;
+            .map_err(AuthServiceError::from)?;
         let response: Option<RequestResetTokenResponse> = response.into_inner().into();
-        response.ok_or(ServiceError::InfraError("failed to decode response".into()))
+        response.ok_or(AuthServiceError::InfraError("failed to decode response".into()))
     }
 }
 
@@ -66,7 +66,7 @@ pub mod test {
     };
 
     use crate::auth::{
-        _api::service::data::ServiceError,
+        _api::service::data::AuthServiceError,
         auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
     };
 
@@ -76,10 +76,10 @@ pub mod test {
     impl RequestResetTokenService for StaticRequestResetTokenService {
         async fn request_token(
             &self,
-            _nonce: AuthNonceValue,
-            _token: AuthTokenValue,
+            _nonce: Option<AuthNonceValue>,
+            _token: Option<AuthTokenValue>,
             _fields: RequestResetTokenFieldsExtract,
-        ) -> Result<RequestResetTokenResponse, ServiceError> {
+        ) -> Result<RequestResetTokenResponse, AuthServiceError> {
             Ok(RequestResetTokenResponse::Success)
         }
     }

@@ -22,10 +22,9 @@ impl ProstResetPasswordRequestDecoder {
 }
 
 impl ResetPasswordRequestDecoder for ProstResetPasswordRequestDecoder {
-    fn decode(&self) -> Result<ResetPasswordFieldsExtract, MessageError> {
-        // TODO body は clone したくない
+    fn decode(self) -> Result<ResetPasswordFieldsExtract, MessageError> {
         let message =
-            ResetPasswordPb::decode(decode_base64(self.body.clone())?).map_err(invalid_protobuf)?;
+            ResetPasswordPb::decode(decode_base64(self.body)?).map_err(invalid_protobuf)?;
 
         Ok(ResetPasswordFieldsExtract {
             reset_token: message.reset_token,
@@ -49,9 +48,8 @@ pub mod test {
     }
 
     impl ResetPasswordRequestDecoder for StaticResetPasswordRequestDecoder {
-        fn decode(&self) -> Result<ResetPasswordFieldsExtract, MessageError> {
-            // TODO self を consume する api にすれば clone しなくて良くなる
-            Ok(self.fields.clone())
+        fn decode(self) -> Result<ResetPasswordFieldsExtract, MessageError> {
+            Ok(self.fields)
         }
     }
 }

@@ -2,35 +2,30 @@ use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::password::reset::_api::request_token::init::RequestResetTokenStruct;
+use crate::auth::password::reset::_api::request_token::init::{
+    request_decoder::ProtobufRequestResetTokenRequestDecoder, RequestResetTokenStruct,
+};
 
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 
-impl<'a> RequestResetTokenAction<RequestResetTokenFeature<'a>> {
-    pub fn new(
-        feature: &'a AuthOutsideFeature,
-        request_id: &'a str,
-        request: &'a HttpRequest,
-        body: String,
-    ) -> Self {
-        Self::with_material(RequestResetTokenFeature::new(feature, request_id, request, body))
-    }
-}
+use crate::auth::password::reset::_api::request_token::infra::RequestResetTokenRequestDecoder;
 
 pub struct RequestResetTokenFeature<'a> {
     request_token: RequestResetTokenStruct<'a>,
 }
 
 impl<'a> RequestResetTokenFeature<'a> {
-    fn new(
+    pub fn action(
         feature: &'a AuthOutsideFeature,
         request_id: &'a str,
         request: &'a HttpRequest,
-        body: String,
-    ) -> Self {
-        Self {
-            request_token: RequestResetTokenStruct::new(feature, request_id, request, body),
-        }
+    ) -> RequestResetTokenAction<Self> {
+        RequestResetTokenAction::with_material(Self {
+            request_token: RequestResetTokenStruct::new(feature, request_id, request),
+        })
+    }
+    pub fn request_decoder(body: String) -> impl RequestResetTokenRequestDecoder {
+        ProtobufRequestResetTokenRequestDecoder::new(body)
     }
 }
 

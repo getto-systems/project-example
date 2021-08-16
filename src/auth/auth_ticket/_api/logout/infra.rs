@@ -1,15 +1,17 @@
-use crate::auth::auth_ticket::_api::kernel::infra::AuthHeaderInfra;
+use crate::auth::auth_ticket::_api::kernel::infra::{AuthNonceHeader, AuthTokenHeader};
 
 use crate::auth::{
-    _api::service::data::ServiceError,
+    _api::service::data::AuthServiceError,
     auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
 };
 
 pub trait LogoutInfra {
-    type HeaderInfra: AuthHeaderInfra;
+    type NonceHeader: AuthNonceHeader;
+    type TokenHeader: AuthTokenHeader;
     type LogoutService: LogoutService;
 
-    fn header_infra(&self) -> &Self::HeaderInfra;
+    fn nonce_header(&self) -> &Self::NonceHeader;
+    fn token_header(&self) -> &Self::TokenHeader;
     fn logout_service(&self) -> &Self::LogoutService;
 }
 
@@ -17,7 +19,7 @@ pub trait LogoutInfra {
 pub trait LogoutService {
     async fn logout(
         &self,
-        nonce: AuthNonceValue,
-        token: AuthTokenValue,
-    ) -> Result<(), ServiceError>;
+        nonce: Option<AuthNonceValue>,
+        token: Option<AuthTokenValue>,
+    ) -> Result<(), AuthServiceError>;
 }

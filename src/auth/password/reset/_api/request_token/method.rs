@@ -1,10 +1,12 @@
 use getto_application::data::MethodResult;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::{AuthHeaderInfra, AuthNonceHeader, AuthTokenHeader},
-    password::reset::_api::request_token::infra::{
-        RequestResetTokenInfra, RequestResetTokenRequestDecoder, RequestResetTokenResponseEncoder,
-        RequestResetTokenService,
+    auth_ticket::_api::kernel::infra::{AuthNonceHeader, AuthTokenHeader},
+    password::reset::{
+        _api::request_token::infra::{
+            RequestResetTokenInfra, RequestResetTokenResponseEncoder, RequestResetTokenService,
+        },
+        _common::request_token::infra::RequestResetTokenFieldsExtract,
     },
 };
 
@@ -12,15 +14,13 @@ use super::event::RequestResetTokenEvent;
 
 pub async fn request_reset_token<S>(
     infra: &impl RequestResetTokenInfra,
+    fields: RequestResetTokenFieldsExtract,
     post: impl Fn(RequestResetTokenEvent) -> S,
 ) -> MethodResult<S> {
-    let header_infra = infra.header_infra();
-    let nonce_header = header_infra.nonce_header();
-    let token_header = header_infra.token_header();
+    let nonce_header = infra.nonce_header();
+    let token_header = infra.token_header();
     let request_token_service = infra.request_token_service();
     let response_encoder = infra.response_encoder();
-
-    let request_decoder = infra.request_decoder();
 
     let nonce = nonce_header
         .nonce()
@@ -29,10 +29,6 @@ pub async fn request_reset_token<S>(
     let token = token_header
         .token()
         .map_err(|err| post(RequestResetTokenEvent::HeaderError(err)))?;
-
-    let fields = request_decoder
-        .decode()
-        .map_err(|err| post(RequestResetTokenEvent::MessageError(err)))?;
 
     let response = request_token_service
         .request_token(nonce, token, fields)

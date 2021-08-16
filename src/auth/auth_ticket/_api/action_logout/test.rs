@@ -2,8 +2,7 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::auth_ticket::_api::{
     kernel::init::{
-        nonce_header::test::StaticAuthNonceHeader, test::StaticAuthHeaderStruct,
-        token_header::test::StaticAuthTokenHeader,
+        nonce_header::test::StaticAuthNonceHeader, token_header::test::StaticAuthTokenHeader,
     },
     logout::init::{logout_service::test::StaticLogoutService, test::StaticLogoutStruct},
 };
@@ -42,16 +41,10 @@ impl TestFeature {
     fn standard() -> Self {
         Self {
             logout: StaticLogoutStruct {
-                header_infra: standard_header_infra(),
+                nonce_header: StaticAuthNonceHeader::Valid(AuthNonceValue::new("NONCE".into())),
+                token_header: StaticAuthTokenHeader::Valid(AuthTokenValue::new("TOKEN".into())),
                 logout_service: StaticLogoutService,
             },
         }
-    }
-}
-
-fn standard_header_infra() -> StaticAuthHeaderStruct {
-    StaticAuthHeaderStruct {
-        nonce_header: StaticAuthNonceHeader::Valid(AuthNonceValue::new("NONCE".into())),
-        token_header: StaticAuthTokenHeader::Valid(AuthTokenValue::new("TOKEN".into())),
     }
 }

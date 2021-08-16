@@ -29,10 +29,9 @@ pub async fn reset_password<S>(
     fields: ResetPasswordFieldsExtract,
     post: impl Fn(ResetPasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
-    let check_nonce_infra = infra.check_nonce_infra();
     let token_decoder = infra.token_decoder();
 
-    check_nonce(check_nonce_infra)
+    check_nonce(infra.check_nonce_infra())
         .await
         .map_err(|err| post(ResetPasswordEvent::NonceError(err)))?;
 

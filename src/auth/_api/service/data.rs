@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-pub enum ServiceError {
+pub enum AuthServiceError {
     InvalidArgument(String),
     AlreadyExists(String),
     Unauthenticated(String),
@@ -10,7 +10,7 @@ pub enum ServiceError {
     InfraError(String),
 }
 
-impl Display for ServiceError {
+impl Display for AuthServiceError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::InvalidArgument(err) => write!(f, "invalid argument; {}", err),

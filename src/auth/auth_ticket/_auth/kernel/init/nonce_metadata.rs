@@ -22,8 +22,8 @@ impl<'a> TonicAuthNonceMetadata<'a> {
 }
 
 impl<'a> AuthNonceMetadata for TonicAuthNonceMetadata<'a> {
-    fn nonce(&self) -> Result<AuthNonceValue, MetadataError> {
-        metadata(&self.metadata, METADATA_NONCE).map(AuthNonceValue::new)
+    fn nonce(&self) -> Result<Option<AuthNonceValue>, MetadataError> {
+        metadata(&self.metadata, METADATA_NONCE).map(|value| value.map(AuthNonceValue::new))
     }
 }
 
@@ -39,9 +39,9 @@ pub mod test {
     }
 
     impl AuthNonceMetadata for StaticAuthNonceMetadata {
-        fn nonce(&self) -> Result<AuthNonceValue, MetadataError> {
+        fn nonce(&self) -> Result<Option<AuthNonceValue>, MetadataError> {
             match self {
-                Self::Valid(nonce) => Ok(nonce.clone()),
+                Self::Valid(nonce) => Ok(Some(nonce.clone())),
             }
         }
     }

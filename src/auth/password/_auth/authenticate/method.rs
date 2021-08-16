@@ -18,9 +18,7 @@ pub async fn authenticate_password<S>(
     fields: AuthenticatePasswordFieldsExtract,
     post: impl Fn(AuthenticatePasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
-    let check_nonce_infra = infra.check_nonce_infra();
-
-    check_nonce(check_nonce_infra)
+    check_nonce(infra.check_nonce_infra())
         .await
         .map_err(|err| post(AuthenticatePasswordEvent::NonceError(err)))?;
 

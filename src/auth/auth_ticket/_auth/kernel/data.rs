@@ -108,6 +108,7 @@ impl Display for AuthTicketId {
 
 #[derive(Debug)]
 pub enum ValidateAuthNonceError {
+    NonceNotSent,
     MetadataError(MetadataError),
     RepositoryError(RepositoryError),
     Conflict,
@@ -117,6 +118,7 @@ impl Display for ValidateAuthNonceError {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         let label = "auth nonce error";
         match self {
+            Self::NonceNotSent => write!(f, "{}: nonce not sent", label),
             Self::MetadataError(err) => write!(f, "{}: {}", label, err),
             Self::RepositoryError(err) => write!(f, "{}: {}", label, err),
             Self::Conflict => write!(f, "{}: conflict", label),

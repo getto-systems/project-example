@@ -1,7 +1,7 @@
-use crate::auth::auth_ticket::_api::kernel::data::{AuthTokenMessage, AuthTokenMessageEncoded};
+use crate::auth::auth_ticket::_api::kernel::data::{AuthTokenResponse, AuthTokenMessage};
 
-pub type ResetPasswordMessage = ResetPasswordResult<AuthTokenMessage>;
-pub type ResetPasswordMessageEncoded = ResetPasswordResult<AuthTokenMessageEncoded>;
+pub type ResetPasswordMessage = ResetPasswordResult<AuthTokenResponse>;
+pub type ResetPasswordMessageEncoded = ResetPasswordResult<AuthTokenMessage>;
 
 pub enum ResetPasswordResult<T> {
     Success(T),
