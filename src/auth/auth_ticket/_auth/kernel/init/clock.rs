@@ -2,7 +2,7 @@ use chrono::Utc;
 
 use crate::auth::auth_ticket::_auth::kernel::infra::AuthClock;
 
-use crate::auth::auth_ticket::_common::kernel::data::AuthDateTime;
+use crate::auth::auth_ticket::_auth::kernel::data::AuthDateTime;
 
 pub struct ChronoAuthClock;
 
@@ -24,7 +24,7 @@ pub mod test {
 
     use crate::auth::auth_ticket::_auth::kernel::infra::AuthClock;
 
-    use crate::auth::auth_ticket::_common::kernel::data::AuthDateTime;
+    use crate::auth::auth_ticket::_auth::kernel::data::AuthDateTime;
 
     #[derive(Clone)]
     pub struct StaticChronoAuthClock {

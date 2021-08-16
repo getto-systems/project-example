@@ -3,7 +3,7 @@ use std::{
     fmt::{Display, Formatter},
 };
 
-use crate::auth::auth_ticket::_common::kernel::data::ExpireDateTime;
+use crate::auth::auth_ticket::_auth::kernel::data::ExpireDateTime;
 
 #[derive(Clone)]
 pub struct AuthTokenExpires {

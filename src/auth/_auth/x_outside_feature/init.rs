@@ -15,7 +15,7 @@ use super::feature::{
     AuthOutsideJwtSecret, AuthOutsideSecret, AuthOutsideStore,
 };
 
-use crate::auth::auth_ticket::_common::kernel::data::{ExpansionLimitDuration, ExpireDuration};
+use crate::auth::auth_ticket::_auth::kernel::data::{ExpansionLimitDuration, ExpireDuration};
 
 pub async fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
     AuthOutsideFeature {

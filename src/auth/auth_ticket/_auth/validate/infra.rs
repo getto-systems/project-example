@@ -4,7 +4,7 @@ use crate::{
     auth::{
         auth_ticket::{
             _auth::{kernel::data::AuthTicket, validate::data::DecodeAuthTokenError},
-            _common::kernel::data::AuthTokenValue,
+            _common::kernel::data::AuthToken,
         },
         auth_user::_auth::kernel::data::RequireAuthRoles,
     },
@@ -23,11 +23,11 @@ pub trait ValidateAuthTokenInfra {
 }
 
 pub trait AuthTokenMetadata {
-    fn token(&self) -> Result<Option<AuthTokenValue>, MetadataError>;
+    fn token(&self) -> Result<Option<AuthToken>, MetadataError>;
 }
 
 pub trait AuthTokenDecoder {
-    fn decode(&self, token: &AuthTokenValue) -> Result<AuthTicket, DecodeAuthTokenError>;
+    fn decode(&self, token: &AuthToken) -> Result<AuthTicket, DecodeAuthTokenError>;
 }
 
 pub struct ValidateAuthTokenConfig {

@@ -12,7 +12,7 @@ use crate::auth::auth_ticket::_api::logout::infra::LogoutService;
 
 use crate::auth::{
     _api::service::data::AuthServiceError,
-    auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
+    auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
 };
 
 pub struct TonicLogoutService<'a> {
@@ -33,8 +33,8 @@ impl<'a> TonicLogoutService<'a> {
 impl<'a> LogoutService for TonicLogoutService<'a> {
     async fn logout(
         &self,
-        nonce: Option<AuthNonceValue>,
-        token: Option<AuthTokenValue>,
+        nonce: Option<AuthNonce>,
+        token: Option<AuthToken>,
     ) -> Result<(), AuthServiceError> {
         let mut client = LogoutPbClient::connect(self.auth_service_url)
             .await
@@ -54,7 +54,7 @@ pub mod test {
 
     use crate::auth::{
         _api::service::data::AuthServiceError,
-        auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
+        auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
     };
 
     pub struct StaticLogoutService;
@@ -63,8 +63,8 @@ pub mod test {
     impl LogoutService for StaticLogoutService {
         async fn logout(
             &self,
-            _nonce: Option<AuthNonceValue>,
-            _token: Option<AuthTokenValue>,
+            _nonce: Option<AuthNonce>,
+            _token: Option<AuthToken>,
         ) -> Result<(), AuthServiceError> {
             Ok(())
         }

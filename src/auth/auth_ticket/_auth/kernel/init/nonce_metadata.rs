@@ -7,7 +7,7 @@ use crate::z_details::_auth::request::helper::metadata;
 use crate::auth::auth_ticket::_auth::kernel::infra::AuthNonceMetadata;
 
 use crate::{
-    auth::auth_ticket::_common::kernel::data::AuthNonceValue,
+    auth::auth_ticket::_common::kernel::data::AuthNonce,
     z_details::_auth::request::data::MetadataError,
 };
 
@@ -22,8 +22,8 @@ impl<'a> TonicAuthNonceMetadata<'a> {
 }
 
 impl<'a> AuthNonceMetadata for TonicAuthNonceMetadata<'a> {
-    fn nonce(&self) -> Result<Option<AuthNonceValue>, MetadataError> {
-        metadata(&self.metadata, METADATA_NONCE).map(|value| value.map(AuthNonceValue::new))
+    fn nonce(&self) -> Result<Option<AuthNonce>, MetadataError> {
+        metadata(&self.metadata, METADATA_NONCE).map(|value| value.map(AuthNonce::new))
     }
 }
 
@@ -31,15 +31,15 @@ impl<'a> AuthNonceMetadata for TonicAuthNonceMetadata<'a> {
 pub mod test {
     use crate::auth::auth_ticket::_auth::kernel::infra::AuthNonceMetadata;
 
-    use crate::auth::auth_ticket::_common::kernel::data::AuthNonceValue;
+    use crate::auth::auth_ticket::_common::kernel::data::AuthNonce;
     use crate::z_details::_auth::request::data::MetadataError;
 
     pub enum StaticAuthNonceMetadata {
-        Valid(AuthNonceValue),
+        Valid(AuthNonce),
     }
 
     impl AuthNonceMetadata for StaticAuthNonceMetadata {
-        fn nonce(&self) -> Result<Option<AuthNonceValue>, MetadataError> {
+        fn nonce(&self) -> Result<Option<AuthNonce>, MetadataError> {
             match self {
                 Self::Valid(nonce) => Ok(Some(nonce.clone())),
             }

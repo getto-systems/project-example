@@ -31,10 +31,10 @@ use super::action::{LogoutAction, LogoutMaterial};
 
 use crate::auth::{
     auth_ticket::{
-        _auth::kernel::data::{AuthTicketExtract, AuthTicketId},
-        _common::kernel::data::{
-            AuthDateTime, AuthNonceValue, AuthTokenValue, ExpansionLimitDuration, ExpireDuration,
+        _auth::kernel::data::{
+            AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
         },
+        _common::kernel::data::{AuthNonce, AuthToken},
     },
     auth_user::_auth::kernel::data::RequireAuthRoles,
 };
@@ -222,10 +222,10 @@ fn standard_clock() -> StaticChronoAuthClock {
 }
 
 fn standard_nonce_metadata() -> StaticAuthNonceMetadata {
-    StaticAuthNonceMetadata::Valid(AuthNonceValue::new(NONCE.into()))
+    StaticAuthNonceMetadata::Valid(AuthNonce::new(NONCE.into()))
 }
 fn standard_token_metadata() -> StaticAuthTokenMetadata {
-    StaticAuthTokenMetadata::Valid(AuthTokenValue::new("TOKEN".into()))
+    StaticAuthTokenMetadata::Valid(AuthToken::new("TOKEN".into()))
 }
 
 fn standard_token_validator() -> StaticAuthTokenDecoder {

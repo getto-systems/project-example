@@ -12,8 +12,11 @@ use crate::auth::auth_ticket::_auth::{
 };
 
 use crate::auth::auth_ticket::{
-    _auth::{encode::data::EncodeAuthTokenError, kernel::data::AuthTicket},
-    _common::kernel::data::{AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime},
+    _auth::{
+        encode::data::EncodeAuthTokenError,
+        kernel::data::{AuthTicket, ExpireDateTime},
+    },
+    _common::kernel::data::{AuthTokenExtract, CloudfrontTokenKind},
 };
 
 pub struct TicketJwtAuthTokenEncoder<'a> {
@@ -151,8 +154,11 @@ pub mod test {
     };
 
     use crate::auth::auth_ticket::{
-        _auth::{encode::data::EncodeAuthTokenError, kernel::data::AuthTicket},
-        _common::kernel::data::{AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime},
+        _auth::{
+            encode::data::EncodeAuthTokenError,
+            kernel::data::{AuthTicket, ExpireDateTime},
+        },
+        _common::kernel::data::{AuthTokenExtract, CloudfrontTokenKind},
     };
 
     pub struct StaticAuthTokenEncoder;

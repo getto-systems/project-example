@@ -1,9 +1,7 @@
 use std::fmt::Display;
 
 use crate::{
-    auth::auth_ticket::{
-        _auth::kernel::data::AuthTicket, _common::kernel::data::ExpansionLimitDateTime,
-    },
+    auth::auth_ticket::_auth::kernel::data::{AuthTicket, ExpansionLimitDateTime},
     z_details::_common::repository::data::RepositoryError,
 };
 

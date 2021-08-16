@@ -10,7 +10,7 @@ use crate::{
         _api::service::data::AuthServiceError,
         auth_ticket::_common::{
             encode::data::AuthTicketEncoded,
-            kernel::data::{AuthNonceValue, AuthTokenValue},
+            kernel::data::{AuthNonce, AuthToken},
         },
         password::_api::authenticate::data::AuthenticatePasswordMessageEncoded,
     },
@@ -39,8 +39,8 @@ pub trait AuthenticatePasswordRequestDecoder {
 pub trait AuthenticatePasswordService {
     async fn authenticate(
         &self,
-        nonce: Option<AuthNonceValue>,
-        token: Option<AuthTokenValue>,
+        nonce: Option<AuthNonce>,
+        token: Option<AuthToken>,
         fields: AuthenticatePasswordFieldsExtract,
     ) -> Result<AuthenticatePasswordResponse, AuthServiceError>;
 }

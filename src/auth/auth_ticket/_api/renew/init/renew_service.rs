@@ -14,7 +14,7 @@ use crate::auth::{
     _api::service::data::AuthServiceError,
     auth_ticket::_common::{
         encode::data::AuthTicketEncoded,
-        kernel::data::{AuthNonceValue, AuthTokenValue},
+        kernel::data::{AuthNonce, AuthToken},
     },
 };
 
@@ -36,8 +36,8 @@ impl<'a> TonicRenewAuthTicketService<'a> {
 impl<'a> RenewAuthTicketService for TonicRenewAuthTicketService<'a> {
     async fn renew(
         &self,
-        nonce: Option<AuthNonceValue>,
-        token: Option<AuthTokenValue>,
+        nonce: Option<AuthNonce>,
+        token: Option<AuthToken>,
     ) -> Result<AuthTicketEncoded, AuthServiceError> {
         let mut client = RenewAuthTicketPbClient::connect(self.auth_service_url)
             .await
@@ -62,7 +62,7 @@ pub mod test {
         _api::service::data::AuthServiceError,
         auth_ticket::_common::{
             encode::data::AuthTicketEncoded,
-            kernel::data::{AuthNonceValue, AuthTokenEncoded, AuthTokenExtract, AuthTokenValue},
+            kernel::data::{AuthNonce, AuthTokenEncoded, AuthTokenExtract, AuthToken},
         },
         auth_user::_common::kernel::data::AuthUser,
     };
@@ -75,8 +75,8 @@ pub mod test {
     impl RenewAuthTicketService for StaticRenewAuthTicketService {
         async fn renew(
             &self,
-            _nonce: Option<AuthNonceValue>,
-            _token: Option<AuthTokenValue>,
+            _nonce: Option<AuthNonce>,
+            _token: Option<AuthToken>,
         ) -> Result<AuthTicketEncoded, AuthServiceError> {
             Ok(AuthTicketEncoded {
                 user: self.user.clone().extract(),

@@ -20,7 +20,7 @@ use crate::auth::{
 
 use super::action::{RenewAuthTicketAction, RenewAuthTicketMaterial};
 
-use crate::auth::auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue};
+use crate::auth::auth_ticket::_common::kernel::data::{AuthNonce, AuthToken};
 
 #[tokio::test]
 async fn success_renew_ticket() {
@@ -52,8 +52,8 @@ impl TestFeature {
     fn standard() -> Self {
         Self {
             renew: StaticRenewAuthTicketStruct {
-                nonce_header: StaticAuthNonceHeader::Valid(AuthNonceValue::new("NONCE".into())),
-                token_header: StaticAuthTokenHeader::Valid(AuthTokenValue::new("TOKEN".into())),
+                nonce_header: StaticAuthNonceHeader::Valid(AuthNonce::new("NONCE".into())),
+                token_header: StaticAuthTokenHeader::Valid(AuthToken::new("TOKEN".into())),
                 response_builder: StaticAuthTokenResponseBuilder,
                 renew_service: StaticRenewAuthTicketService {
                     user: standard_user(),

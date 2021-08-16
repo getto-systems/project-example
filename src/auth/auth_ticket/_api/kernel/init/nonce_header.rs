@@ -7,7 +7,7 @@ use crate::z_details::_api::request::helper::header;
 use crate::auth::auth_ticket::_api::kernel::infra::AuthNonceHeader;
 
 use crate::{
-    auth::auth_ticket::_common::kernel::data::AuthNonceValue,
+    auth::auth_ticket::_common::kernel::data::AuthNonce,
     z_details::_api::request::data::HeaderError,
 };
 
@@ -22,8 +22,8 @@ impl<'a> ActixWebAuthNonceHeader<'a> {
 }
 
 impl<'a> AuthNonceHeader for ActixWebAuthNonceHeader<'a> {
-    fn nonce(&self) -> Result<Option<AuthNonceValue>, HeaderError> {
-        header(self.request, HEADER_NONCE).map(|value| value.map(AuthNonceValue::new))
+    fn nonce(&self) -> Result<Option<AuthNonce>, HeaderError> {
+        header(self.request, HEADER_NONCE).map(|value| value.map(AuthNonce::new))
     }
 }
 
@@ -32,16 +32,16 @@ pub mod test {
     use crate::auth::auth_ticket::_api::kernel::infra::AuthNonceHeader;
 
     use crate::{
-        auth::auth_ticket::_common::kernel::data::AuthNonceValue,
+        auth::auth_ticket::_common::kernel::data::AuthNonce,
         z_details::_api::request::data::HeaderError,
     };
 
     pub enum StaticAuthNonceHeader {
-        Valid(AuthNonceValue),
+        Valid(AuthNonce),
     }
 
     impl AuthNonceHeader for StaticAuthNonceHeader {
-        fn nonce(&self) -> Result<Option<AuthNonceValue>, HeaderError> {
+        fn nonce(&self) -> Result<Option<AuthNonce>, HeaderError> {
             match self {
                 Self::Valid(nonce) => Ok(Some(nonce.clone())),
             }

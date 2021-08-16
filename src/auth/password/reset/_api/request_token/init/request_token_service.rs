@@ -15,7 +15,7 @@ use crate::auth::password::reset::{
 
 use crate::auth::{
     _api::service::data::AuthServiceError,
-    auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
+    auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
 };
 
 pub struct TonicRequestResetTokenService<'a> {
@@ -36,8 +36,8 @@ impl<'a> TonicRequestResetTokenService<'a> {
 impl<'a> RequestResetTokenService for TonicRequestResetTokenService<'a> {
     async fn request_token(
         &self,
-        nonce: Option<AuthNonceValue>,
-        token: Option<AuthTokenValue>,
+        nonce: Option<AuthNonce>,
+        token: Option<AuthToken>,
         fields: RequestResetTokenFieldsExtract,
     ) -> Result<RequestResetTokenResponse, AuthServiceError> {
         let mut client = RequestResetTokenPbClient::connect(self.auth_service_url)
@@ -67,7 +67,7 @@ pub mod test {
 
     use crate::auth::{
         _api::service::data::AuthServiceError,
-        auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
+        auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
     };
 
     pub struct StaticRequestResetTokenService;
@@ -76,8 +76,8 @@ pub mod test {
     impl RequestResetTokenService for StaticRequestResetTokenService {
         async fn request_token(
             &self,
-            _nonce: Option<AuthNonceValue>,
-            _token: Option<AuthTokenValue>,
+            _nonce: Option<AuthNonce>,
+            _token: Option<AuthToken>,
             _fields: RequestResetTokenFieldsExtract,
         ) -> Result<RequestResetTokenResponse, AuthServiceError> {
             Ok(RequestResetTokenResponse::Success)

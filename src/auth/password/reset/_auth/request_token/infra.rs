@@ -8,7 +8,7 @@ use crate::auth::{
 
 use crate::{
     auth::{
-        auth_ticket::_common::kernel::data::{ExpireDateTime, ExpireDuration},
+        auth_ticket::_auth::kernel::data::{ExpireDateTime, ExpireDuration},
         login_id::_auth::data::LoginId,
         password::{
             _auth::kernel::data::ResetToken,
