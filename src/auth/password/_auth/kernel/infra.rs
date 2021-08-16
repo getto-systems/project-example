@@ -19,16 +19,6 @@ pub trait AuthUserPasswordInfra {
     fn password_repository(&self) -> &Self::PasswordRepository;
 }
 
-pub trait AuthUserPasswordMatchInfra {
-    type PasswordRepository: AuthUserPasswordRepository;
-    type PasswordMatcher: AuthUserPasswordMatcher;
-
-    fn password_repository(&self) -> &Self::PasswordRepository;
-    fn password_matcher(&self, plain_password: PlainPassword) -> Self::PasswordMatcher {
-        Self::PasswordMatcher::new(plain_password)
-    }
-}
-
 pub trait AuthUserPasswordHashInfra {
     type PasswordRepository: AuthUserPasswordRepository;
     type PasswordHasher: AuthUserPasswordHasher;
