@@ -7,7 +7,7 @@ use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 use password_hasher::Argon2PasswordHasher;
 use password_repository::MysqlAuthUserPasswordRepository;
 
-use super::infra::{AuthUserPasswordHashInfra, AuthUserPasswordInfra};
+use super::infra::AuthUserPasswordHashInfra;
 
 pub struct AuthUserPasswordStruct<'a> {
     password_repository: MysqlAuthUserPasswordRepository<'a>,
@@ -18,14 +18,6 @@ impl<'a> AuthUserPasswordStruct<'a> {
         Self {
             password_repository: MysqlAuthUserPasswordRepository::new(&feature.store.mysql),
         }
-    }
-}
-
-impl<'a> AuthUserPasswordInfra for AuthUserPasswordStruct<'a> {
-    type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
-
-    fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.password_repository
     }
 }
 
@@ -45,18 +37,10 @@ pub mod test {
         MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository, MemoryAuthUserPasswordStore,
     };
 
-    use super::super::infra::{AuthUserPasswordHashInfra, AuthUserPasswordInfra};
+    use super::super::infra::AuthUserPasswordHashInfra;
 
     pub struct StaticAuthUserPasswordStruct<'a> {
         pub password_repository: MemoryAuthUserPasswordRepository<'a>,
-    }
-
-    impl<'a> AuthUserPasswordInfra for StaticAuthUserPasswordStruct<'a> {
-        type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
-
-        fn password_repository(&self) -> &Self::PasswordRepository {
-            &self.password_repository
-        }
     }
 
     impl<'a> AuthUserPasswordHashInfra for StaticAuthUserPasswordStruct<'a> {

@@ -12,7 +12,7 @@ use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::{
     auth_ticket::_auth::kernel::init::{CheckAuthNonceStruct, ChronoAuthClockInitializer},
-    password::_auth::kernel::init::AuthUserPasswordStruct,
+    password::_auth::kernel::init::password_repository::MysqlAuthUserPasswordRepository,
 };
 use destination_repository::MysqlResetTokenDestinationRepository;
 use token_encoder::JwtResetTokenEncoder;
@@ -24,7 +24,7 @@ use super::infra::{RequestResetTokenConfig, RequestResetTokenInfra};
 pub struct RequestResetTokenStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
     clock_infra: AuthClockInfra,
-    password_infra: AuthUserPasswordStruct<'a>,
+    password_repository: MysqlAuthUserPasswordRepository<'a>,
     destination_repository: MysqlResetTokenDestinationRepository<'a>,
     token_generator: UuidResetTokenGenerator,
     token_encoder: JwtResetTokenEncoder<'a>,
@@ -37,7 +37,7 @@ impl<'a> RequestResetTokenStruct<'a> {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
             clock_infra: AuthClockInfra::new(ChronoAuthClockInitializer),
-            password_infra: AuthUserPasswordStruct::new(feature),
+            password_repository: MysqlAuthUserPasswordRepository::new(&feature.store.mysql),
             destination_repository: MysqlResetTokenDestinationRepository::new(&feature.store.mysql),
             token_generator: UuidResetTokenGenerator,
             token_encoder: JwtResetTokenEncoder::new(&feature.secret),
@@ -51,7 +51,7 @@ impl<'a> RequestResetTokenStruct<'a> {
 
 impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
-    type PasswordInfra = AuthUserPasswordStruct<'a>;
+    type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
     type DestinationRepository = MysqlResetTokenDestinationRepository<'a>;
     type TokenGenerator = UuidResetTokenGenerator;
     type TokenEncoder = JwtResetTokenEncoder<'a>;
@@ -63,8 +63,8 @@ impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
     fn clock_infra(&self) -> &AuthClockInfra {
         &self.clock_infra
     }
-    fn password_infra(&self) -> &Self::PasswordInfra {
-        &self.password_infra
+    fn password_repository(&self) -> &Self::PasswordRepository {
+        &self.password_repository
     }
     fn destination_repository(&self) -> &Self::DestinationRepository {
         &self.destination_repository
@@ -96,7 +96,7 @@ pub mod test {
 
     use crate::auth::{
         auth_ticket::_auth::kernel::init::test::StaticCheckAuthNonceStruct,
-        password::_auth::kernel::init::test::StaticAuthUserPasswordStruct,
+        password::_auth::kernel::init::test::MemoryAuthUserPasswordRepository,
     };
 
     use super::super::infra::{RequestResetTokenConfig, RequestResetTokenInfra};
@@ -105,7 +105,7 @@ pub mod test {
     pub struct StaticRequestResetTokenStruct<'a> {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
         pub clock_infra: AuthClockInfra,
-        pub password_infra: StaticAuthUserPasswordStruct<'a>,
+        pub password_repository: MemoryAuthUserPasswordRepository<'a>,
         pub destination_repository: MemoryResetTokenDestinationRepository<'a>,
         pub token_generator: StaticResetTokenGenerator,
         pub token_encoder: StaticResetTokenEncoder,
@@ -115,7 +115,7 @@ pub mod test {
 
     impl<'a> RequestResetTokenInfra for StaticRequestResetTokenStruct<'a> {
         type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
-        type PasswordInfra = StaticAuthUserPasswordStruct<'a>;
+        type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
         type DestinationRepository = MemoryResetTokenDestinationRepository<'a>;
         type TokenGenerator = StaticResetTokenGenerator;
         type TokenEncoder = StaticResetTokenEncoder;
@@ -127,8 +127,8 @@ pub mod test {
         fn clock_infra(&self) -> &AuthClockInfra {
             &self.clock_infra
         }
-        fn password_infra(&self) -> &Self::PasswordInfra {
-            &self.password_infra
+        fn password_repository(&self) -> &Self::PasswordRepository {
+            &self.password_repository
         }
         fn destination_repository(&self) -> &Self::DestinationRepository {
             &self.destination_repository

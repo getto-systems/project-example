@@ -11,7 +11,7 @@ use crate::auth::{
     password::{
         _auth::kernel::init::test::{
             MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-            MemoryAuthUserPasswordStore, StaticAuthUserPasswordStruct,
+            MemoryAuthUserPasswordStore,
         },
         reset::_auth::request_token::init::test::{
             MemoryResetTokenDestinationMap, MemoryResetTokenDestinationRepository,
@@ -230,9 +230,7 @@ impl<'a> TestFeature<'a> {
                 clock_infra: AuthClockInfra::new(StaticAuthClockInitializer {
                     clock: standard_clock(),
                 }),
-                password_infra: StaticAuthUserPasswordStruct {
-                    password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
-                },
+                password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
                 destination_repository: MemoryResetTokenDestinationRepository::new(
                     &store.destination,
                 ),
