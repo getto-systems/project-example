@@ -30,11 +30,12 @@ async fn success_authenticate() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let feature = TestFeature::standard();
+    let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec!["authenticate password"]);
     assert!(result.is_ok());
 }
@@ -58,7 +59,6 @@ impl<'a> TestFeature {
                 nonce_header: StaticAuthNonceHeader::Valid(AuthNonceValue::new("NONCE".into())),
                 token_header: StaticAuthTokenHeader::Valid(AuthTokenValue::new("TOKEN".into())),
                 response_builder: StaticAuthTokenResponseBuilder,
-                request_decoder: standard_request_decoder(),
                 authenticate_service: StaticAuthenticatePasswordService {
                     user: standard_user(),
                 },

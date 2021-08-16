@@ -21,20 +21,18 @@ pub trait AuthenticatePasswordInfra {
     type NonceHeader: AuthNonceHeader;
     type TokenHeader: AuthTokenHeader;
     type ResponseBuilder: AuthTokenResponseBuilder;
-    type RequestDecoder: AuthenticatePasswordRequestDecoder;
     type AuthenticateService: AuthenticatePasswordService;
     type ResponseEncoder: AuthenticatePasswordResponseEncoder;
 
     fn nonce_header(&self) -> &Self::NonceHeader;
     fn token_header(&self) -> &Self::TokenHeader;
     fn response_builder(&self) -> &Self::ResponseBuilder;
-    fn request_decoder(&self) -> &Self::RequestDecoder;
     fn authenticate_service(&self) -> &Self::AuthenticateService;
     fn response_encoder(&self) -> &Self::ResponseEncoder;
 }
 
 pub trait AuthenticatePasswordRequestDecoder {
-    fn decode(&self) -> Result<AuthenticatePasswordFieldsExtract, MessageError>;
+    fn decode(self) -> Result<AuthenticatePasswordFieldsExtract, MessageError>;
 }
 
 #[async_trait::async_trait]

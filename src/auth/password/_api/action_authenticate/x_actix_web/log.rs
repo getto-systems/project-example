@@ -11,6 +11,7 @@ impl LogMessage for &AuthenticatePasswordState {
 impl AuthenticatePasswordState {
     pub const fn log_level(&self) -> LogLevel {
         match self {
+            Self::MessageError(err) => err.log_level(),
             Self::Authenticate(event) => event.log_level(),
         }
     }
