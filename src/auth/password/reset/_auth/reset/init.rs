@@ -1,12 +1,13 @@
 pub(in crate::auth) mod request_decoder;
 pub(in crate::auth) mod token_decoder;
 
-use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
-
-use crate::auth::auth_user::_auth::kernel::init::user_repository::MysqlAuthUserRepository;
 use crate::auth::{
+    _auth::x_outside_feature::feature::AuthOutsideFeature,
     auth_ticket::_auth::kernel::init::{clock::ChronoAuthClock, CheckAuthNonceStruct},
-    password::_auth::kernel::init::AuthUserPasswordStruct,
+    auth_user::_auth::kernel::init::user_repository::MysqlAuthUserRepository,
+    password::_auth::kernel::init::{
+        password_hasher::Argon2PasswordHasher, password_repository::MysqlAuthUserPasswordRepository,
+    },
 };
 use token_decoder::JwtResetTokenDecoder;
 use tonic::metadata::MetadataMap;
@@ -17,7 +18,7 @@ pub struct ResetPasswordStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
     clock: ChronoAuthClock,
     user_repository: MysqlAuthUserRepository<'a>,
-    password_infra: AuthUserPasswordStruct<'a>,
+    password_repository: MysqlAuthUserPasswordRepository<'a>,
     token_decoder: JwtResetTokenDecoder<'a>,
 }
 
@@ -27,7 +28,7 @@ impl<'a> ResetPasswordStruct<'a> {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
             clock: ChronoAuthClock::new(),
             user_repository: MysqlAuthUserRepository::new(&feature.store.mysql),
-            password_infra: AuthUserPasswordStruct::new(feature),
+            password_repository: MysqlAuthUserPasswordRepository::new(&feature.store.mysql),
             token_decoder: JwtResetTokenDecoder::new(&feature.secret),
         }
     }
@@ -37,7 +38,8 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
     type Clock = ChronoAuthClock;
     type UserRepository = MysqlAuthUserRepository<'a>;
-    type PasswordInfra = AuthUserPasswordStruct<'a>;
+    type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
+    type PasswordHasher = Argon2PasswordHasher;
     type TokenDecoder = JwtResetTokenDecoder<'a>;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
@@ -49,8 +51,8 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
     fn user_repository(&self) -> &Self::UserRepository {
         &self.user_repository
     }
-    fn password_infra(&self) -> &Self::PasswordInfra {
-        &self.password_infra
+    fn password_repository(&self) -> &Self::PasswordRepository {
+        &self.password_repository
     }
     fn token_decoder(&self) -> &Self::TokenDecoder {
         &self.token_decoder
@@ -65,7 +67,10 @@ pub mod test {
             clock::test::StaticChronoAuthClock, test::StaticCheckAuthNonceStruct,
         },
         auth_user::_auth::kernel::init::user_repository::test::MemoryAuthUserRepository,
-        password::_auth::kernel::init::test::StaticAuthUserPasswordStruct,
+        password::_auth::kernel::init::{
+            password_hasher::test::PlainPasswordHasher,
+            password_repository::test::MemoryAuthUserPasswordRepository,
+        },
     };
 
     use super::super::infra::ResetPasswordInfra;
@@ -74,7 +79,7 @@ pub mod test {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
         pub clock: StaticChronoAuthClock,
         pub user_repository: MemoryAuthUserRepository<'a>,
-        pub password_infra: StaticAuthUserPasswordStruct<'a>,
+        pub password_repository: MemoryAuthUserPasswordRepository<'a>,
         pub token_decoder: StaticResetTokenDecoder,
     }
 
@@ -82,7 +87,8 @@ pub mod test {
         type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
         type Clock = StaticChronoAuthClock;
         type UserRepository = MemoryAuthUserRepository<'a>;
-        type PasswordInfra = StaticAuthUserPasswordStruct<'a>;
+        type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
+        type PasswordHasher = PlainPasswordHasher;
         type TokenDecoder = StaticResetTokenDecoder;
 
         fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
@@ -94,8 +100,8 @@ pub mod test {
         fn user_repository(&self) -> &Self::UserRepository {
             &self.user_repository
         }
-        fn password_infra(&self) -> &Self::PasswordInfra {
-            &self.password_infra
+        fn password_repository(&self) -> &Self::PasswordRepository {
+            &self.password_repository
         }
         fn token_decoder(&self) -> &Self::TokenDecoder {
             &self.token_decoder

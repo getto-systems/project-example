@@ -29,12 +29,9 @@ use crate::auth::{
         MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
     },
     password::{
-        _auth::kernel::init::{
-            password_repository::test::{
-                MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-                MemoryAuthUserPasswordStore,
-            },
-            test::StaticAuthUserPasswordStruct,
+        _auth::kernel::init::password_repository::test::{
+            MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
+            MemoryAuthUserPasswordStore,
         },
         reset::_auth::reset::init::{
             request_decoder::test::StaticResetPasswordRequestDecoder,
@@ -459,9 +456,7 @@ impl<'a> TestFeature<'a> {
                 },
                 clock: standard_clock(),
                 user_repository: MemoryAuthUserRepository::new(&store.user),
-                password_infra: StaticAuthUserPasswordStruct {
-                    password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
-                },
+                password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
                 token_decoder,
             },
             issue: StaticIssueAuthTicketStruct {

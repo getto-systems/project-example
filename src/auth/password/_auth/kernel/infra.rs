@@ -13,16 +13,6 @@ use crate::{
     z_details::_common::repository::data::RepositoryError,
 };
 
-pub trait AuthUserPasswordHashInfra {
-    type PasswordRepository: AuthUserPasswordRepository;
-    type PasswordHasher: AuthUserPasswordHasher;
-
-    fn password_repository(&self) -> &Self::PasswordRepository;
-    fn password_hasher(&self, plain_password: PlainPassword) -> Self::PasswordHasher {
-        Self::PasswordHasher::new(plain_password)
-    }
-}
-
 pub struct HashedPassword(String);
 
 impl HashedPassword {
