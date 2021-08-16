@@ -27,14 +27,13 @@ pub async fn request_reset_token<S>(
     fields: RequestResetTokenFieldsExtract,
     post: impl Fn(RequestResetTokenEvent) -> S,
 ) -> MethodResult<S> {
-    let check_nonce_infra = infra.check_nonce_infra();
     let destination_repository = infra.destination_repository();
     let token_generator = infra.token_generator();
     let token_encoder = infra.token_encoder();
     let token_notifier = infra.token_notifier();
     let config = infra.config();
 
-    check_nonce(check_nonce_infra)
+    check_nonce(infra.check_nonce_infra())
         .await
         .map_err(|err| post(RequestResetTokenEvent::NonceError(err)))?;
 
