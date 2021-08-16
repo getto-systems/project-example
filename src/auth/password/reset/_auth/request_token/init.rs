@@ -6,12 +6,10 @@ pub(in crate::auth) mod token_notifier;
 
 use tonic::metadata::MetadataMap;
 
-use crate::auth::auth_ticket::_auth::kernel::infra::AuthClockInfra;
-
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::init::{CheckAuthNonceStruct, ChronoAuthClockInitializer},
+    auth_ticket::_auth::kernel::init::{clock::ChronoAuthClock, CheckAuthNonceStruct},
     password::_auth::kernel::init::password_repository::MysqlAuthUserPasswordRepository,
 };
 use destination_repository::MysqlResetTokenDestinationRepository;
@@ -23,7 +21,7 @@ use super::infra::{RequestResetTokenConfig, RequestResetTokenInfra};
 
 pub struct RequestResetTokenStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
-    clock_infra: AuthClockInfra,
+    clock: ChronoAuthClock,
     password_repository: MysqlAuthUserPasswordRepository<'a>,
     destination_repository: MysqlResetTokenDestinationRepository<'a>,
     token_generator: UuidResetTokenGenerator,
@@ -36,7 +34,7 @@ impl<'a> RequestResetTokenStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature, metadata: &'a MetadataMap) -> Self {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
-            clock_infra: AuthClockInfra::new(ChronoAuthClockInitializer),
+            clock: ChronoAuthClock::new(),
             password_repository: MysqlAuthUserPasswordRepository::new(&feature.store.mysql),
             destination_repository: MysqlResetTokenDestinationRepository::new(&feature.store.mysql),
             token_generator: UuidResetTokenGenerator,
@@ -51,6 +49,7 @@ impl<'a> RequestResetTokenStruct<'a> {
 
 impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
+    type Clock = ChronoAuthClock;
     type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
     type DestinationRepository = MysqlResetTokenDestinationRepository<'a>;
     type TokenGenerator = UuidResetTokenGenerator;
@@ -60,8 +59,8 @@ impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
         &self.check_nonce_infra
     }
-    fn clock_infra(&self) -> &AuthClockInfra {
-        &self.clock_infra
+    fn clock(&self) -> &Self::Clock {
+        &self.clock
     }
     fn password_repository(&self) -> &Self::PasswordRepository {
         &self.password_repository
@@ -95,16 +94,17 @@ pub mod test {
     pub use super::token_notifier::test::StaticResetTokenNotifier;
 
     use crate::auth::{
-        auth_ticket::_auth::kernel::init::test::StaticCheckAuthNonceStruct,
+        auth_ticket::_auth::kernel::init::test::{
+            StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+        },
         password::_auth::kernel::init::test::MemoryAuthUserPasswordRepository,
     };
 
     use super::super::infra::{RequestResetTokenConfig, RequestResetTokenInfra};
-    use crate::auth::auth_ticket::_auth::kernel::infra::AuthClockInfra;
 
     pub struct StaticRequestResetTokenStruct<'a> {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
-        pub clock_infra: AuthClockInfra,
+        pub clock: StaticChronoAuthClock,
         pub password_repository: MemoryAuthUserPasswordRepository<'a>,
         pub destination_repository: MemoryResetTokenDestinationRepository<'a>,
         pub token_generator: StaticResetTokenGenerator,
@@ -115,6 +115,7 @@ pub mod test {
 
     impl<'a> RequestResetTokenInfra for StaticRequestResetTokenStruct<'a> {
         type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
+        type Clock = StaticChronoAuthClock;
         type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
         type DestinationRepository = MemoryResetTokenDestinationRepository<'a>;
         type TokenGenerator = StaticResetTokenGenerator;
@@ -124,8 +125,8 @@ pub mod test {
         fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
             &self.check_nonce_infra
         }
-        fn clock_infra(&self) -> &AuthClockInfra {
-            &self.clock_infra
+        fn clock(&self) -> &Self::Clock {
+            &self.clock
         }
         fn password_repository(&self) -> &Self::PasswordRepository {
             &self.password_repository

@@ -1,5 +1,5 @@
 use crate::auth::{
-    auth_ticket::_auth::kernel::infra::{AuthClockInfra, CheckAuthNonceInfra},
+    auth_ticket::_auth::kernel::infra::{AuthClock, CheckAuthNonceInfra},
     password::{
         _auth::kernel::infra::AuthUserPasswordRepository,
         reset::_common::request_token::infra::RequestResetTokenFieldsExtract,
@@ -26,6 +26,7 @@ use crate::{
 
 pub trait RequestResetTokenInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
+    type Clock: AuthClock;
     type PasswordRepository: AuthUserPasswordRepository;
     type DestinationRepository: ResetTokenDestinationRepository;
     type TokenGenerator: ResetTokenGenerator;
@@ -33,7 +34,7 @@ pub trait RequestResetTokenInfra {
     type TokenNotifier: ResetTokenNotifier;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
-    fn clock_infra(&self) -> &AuthClockInfra;
+    fn clock(&self) -> &Self::Clock;
     fn password_repository(&self) -> &Self::PasswordRepository;
     fn destination_repository(&self) -> &Self::DestinationRepository;
     fn token_generator(&self) -> &Self::TokenGenerator;
