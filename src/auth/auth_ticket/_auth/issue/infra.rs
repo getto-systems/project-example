@@ -1,8 +1,6 @@
 use crate::auth::auth_ticket::_auth::kernel::infra::{AuthClock, AuthTicketRepository};
 
-use crate::auth::auth_ticket::{
-    _auth::kernel::data::AuthTicketId, _common::kernel::data::ExpansionLimitDuration,
-};
+use crate::auth::auth_ticket::_auth::kernel::data::{AuthTicketId, ExpansionLimitDuration};
 
 pub trait IssueAuthTicketInfra {
     type Clock: AuthClock;

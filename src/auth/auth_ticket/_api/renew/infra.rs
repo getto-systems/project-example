@@ -9,7 +9,7 @@ use crate::{
             _api::kernel::data::AuthTokenMessage,
             _common::{
                 encode::data::AuthTicketEncoded,
-                kernel::data::{AuthNonceValue, AuthTokenValue},
+                kernel::data::{AuthNonce, AuthToken},
             },
         },
     },
@@ -34,8 +34,8 @@ pub trait RenewAuthTicketInfra {
 pub trait RenewAuthTicketService {
     async fn renew(
         &self,
-        nonce: Option<AuthNonceValue>,
-        token: Option<AuthTokenValue>,
+        nonce: Option<AuthNonce>,
+        token: Option<AuthToken>,
     ) -> Result<AuthTicketEncoded, AuthServiceError>;
 }
 

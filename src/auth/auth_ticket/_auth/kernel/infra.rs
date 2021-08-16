@@ -5,10 +5,11 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     auth::auth_ticket::{
-        _auth::kernel::data::{AuthTicket, AuthTicketExtract},
-        _common::kernel::data::{
-            AuthDateTime, AuthNonceValue, ExpansionLimitDateTime, ExpireDateTime, ExpireDuration,
+        _auth::kernel::data::{
+            AuthDateTime, AuthTicket, AuthTicketExtract, ExpansionLimitDateTime, ExpireDateTime,
+            ExpireDuration,
         },
+        _common::kernel::data::AuthNonce,
     },
     z_details::{
         _auth::request::data::MetadataError,
@@ -32,7 +33,7 @@ pub trait AuthClock {
 }
 
 pub trait AuthNonceMetadata {
-    fn nonce(&self) -> Result<Option<AuthNonceValue>, MetadataError>;
+    fn nonce(&self) -> Result<Option<AuthNonce>, MetadataError>;
 }
 
 #[async_trait::async_trait]
@@ -66,12 +67,12 @@ pub trait AuthNonceRepository {
 }
 
 pub struct AuthNonceEntry {
-    nonce: AuthNonceValue,
+    nonce: AuthNonce,
     expires: Option<ExpireDateTime>,
 }
 
 impl AuthNonceEntry {
-    pub const fn new(nonce: AuthNonceValue, expires: ExpireDateTime) -> Self {
+    pub const fn new(nonce: AuthNonce, expires: ExpireDateTime) -> Self {
         Self {
             nonce,
             expires: Some(expires),
@@ -79,7 +80,7 @@ impl AuthNonceEntry {
     }
 
     #[cfg(test)]
-    pub fn nonce(&self) -> &AuthNonceValue {
+    pub fn nonce(&self) -> &AuthNonce {
         &self.nonce
     }
 
@@ -100,7 +101,7 @@ pub struct AuthNonceEntryExtract {
 impl From<AuthNonceEntryExtract> for AuthNonceEntry {
     fn from(src: AuthNonceEntryExtract) -> Self {
         Self {
-            nonce: AuthNonceValue::new(src.nonce),
+            nonce: AuthNonce::new(src.nonce),
             expires: src.expires.map(|expires| ExpireDateTime::restore(expires)),
         }
     }

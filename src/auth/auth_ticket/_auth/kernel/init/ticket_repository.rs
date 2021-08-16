@@ -6,10 +6,7 @@ use crate::z_details::_common::repository::mysql::helper::mysql_error;
 use crate::auth::auth_ticket::_auth::kernel::infra::AuthTicketRepository;
 
 use crate::{
-    auth::auth_ticket::{
-        _auth::kernel::data::AuthTicket,
-        _common::kernel::data::{AuthDateTime, ExpansionLimitDateTime},
-    },
+    auth::auth_ticket::_auth::kernel::data::{AuthDateTime, AuthTicket, ExpansionLimitDateTime},
     z_details::_common::repository::data::RepositoryError,
 };
 
@@ -145,9 +142,8 @@ pub mod test {
     use crate::auth::auth_ticket::_auth::kernel::infra::AuthTicketRepository;
 
     use crate::{
-        auth::auth_ticket::{
-            _auth::kernel::data::{AuthTicket, AuthTicketId},
-            _common::kernel::data::{AuthDateTime, ExpansionLimitDateTime},
+        auth::auth_ticket::_auth::kernel::data::{
+            AuthDateTime, AuthTicket, AuthTicketId, ExpansionLimitDateTime,
         },
         z_details::_common::repository::data::RepositoryError,
     };

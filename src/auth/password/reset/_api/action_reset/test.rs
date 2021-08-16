@@ -22,7 +22,7 @@ use crate::auth::password::reset::_common::reset::infra::ResetPasswordFieldsExtr
 use super::action::{ResetPasswordAction, ResetPasswordMaterial};
 
 use crate::auth::{
-    auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
+    auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
     auth_user::_common::kernel::data::{AuthUser, AuthUserExtract},
 };
 
@@ -72,8 +72,8 @@ impl TestFeature {
 
 fn standard_header_infra() -> StaticAuthHeaderStruct {
     StaticAuthHeaderStruct {
-        nonce_header: StaticAuthNonceHeader::Valid(AuthNonceValue::new("NONCE".into())),
-        token_header: StaticAuthTokenHeader::Valid(AuthTokenValue::new("TOKEN".into())),
+        nonce_header: StaticAuthNonceHeader::Valid(AuthNonce::new("NONCE".into())),
+        token_header: StaticAuthTokenHeader::Valid(AuthToken::new("TOKEN".into())),
     }
 }
 

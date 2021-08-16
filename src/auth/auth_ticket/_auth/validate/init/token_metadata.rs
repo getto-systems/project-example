@@ -9,7 +9,7 @@ use crate::z_details::_auth::request::helper::metadata;
 use crate::auth::auth_ticket::_auth::validate::infra::AuthTokenMetadata;
 
 use crate::{
-    auth::auth_ticket::_common::kernel::data::AuthTokenValue,
+    auth::auth_ticket::_common::kernel::data::AuthToken,
     z_details::_auth::request::data::MetadataError,
 };
 
@@ -24,8 +24,8 @@ impl<'a> TicketAuthTokenMetadata<'a> {
 }
 
 impl<'a> AuthTokenMetadata for TicketAuthTokenMetadata<'a> {
-    fn token(&self) -> Result<Option<AuthTokenValue>, MetadataError> {
-        metadata(&self.metadata, METADATA_TICKET_TOKEN).map(|value| value.map(AuthTokenValue::new))
+    fn token(&self) -> Result<Option<AuthToken>, MetadataError> {
+        metadata(&self.metadata, METADATA_TICKET_TOKEN).map(|value| value.map(AuthToken::new))
     }
 }
 
@@ -40,8 +40,8 @@ impl<'a> ApiAuthTokenMetadata<'a> {
 }
 
 impl<'a> AuthTokenMetadata for ApiAuthTokenMetadata<'a> {
-    fn token(&self) -> Result<Option<AuthTokenValue>, MetadataError> {
-        metadata(&self.metadata, METADATA_API_TOKEN).map(|value| value.map(AuthTokenValue::new))
+    fn token(&self) -> Result<Option<AuthToken>, MetadataError> {
+        metadata(&self.metadata, METADATA_API_TOKEN).map(|value| value.map(AuthToken::new))
     }
 }
 
@@ -50,16 +50,16 @@ pub mod test {
     use crate::auth::auth_ticket::_auth::validate::infra::AuthTokenMetadata;
 
     use crate::{
-        auth::auth_ticket::_common::kernel::data::AuthTokenValue,
+        auth::auth_ticket::_common::kernel::data::AuthToken,
         z_details::_auth::request::data::MetadataError,
     };
 
     pub enum StaticAuthTokenMetadata {
-        Valid(AuthTokenValue),
+        Valid(AuthToken),
     }
 
     impl AuthTokenMetadata for StaticAuthTokenMetadata {
-        fn token(&self) -> Result<Option<AuthTokenValue>, MetadataError> {
+        fn token(&self) -> Result<Option<AuthToken>, MetadataError> {
             match self {
                 Self::Valid(token) => Ok(Some(token.clone())),
             }

@@ -6,7 +6,7 @@ use crate::auth::{
 use crate::{
     auth::{
         _api::service::data::AuthServiceError,
-        auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
+        auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
         password::reset::_api::request_token::data::RequestResetTokenResult,
     },
     z_details::_api::message::data::MessageError,
@@ -32,8 +32,8 @@ pub trait RequestResetTokenRequestDecoder {
 pub trait RequestResetTokenService {
     async fn request_token(
         &self,
-        nonce: Option<AuthNonceValue>,
-        token: Option<AuthTokenValue>,
+        nonce: Option<AuthNonce>,
+        token: Option<AuthToken>,
         fields: RequestResetTokenFieldsExtract,
     ) -> Result<RequestResetTokenResponse, AuthServiceError>;
 }

@@ -2,7 +2,7 @@ use crate::auth::auth_ticket::_api::kernel::infra::{AuthNonceHeader, AuthTokenHe
 
 use crate::auth::{
     _api::service::data::AuthServiceError,
-    auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
+    auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
 };
 
 pub trait LogoutInfra {
@@ -19,7 +19,7 @@ pub trait LogoutInfra {
 pub trait LogoutService {
     async fn logout(
         &self,
-        nonce: Option<AuthNonceValue>,
-        token: Option<AuthTokenValue>,
+        nonce: Option<AuthNonce>,
+        token: Option<AuthToken>,
     ) -> Result<(), AuthServiceError>;
 }

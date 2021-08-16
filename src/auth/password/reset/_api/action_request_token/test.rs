@@ -16,7 +16,7 @@ use crate::auth::password::reset::_common::request_token::infra::RequestResetTok
 
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 
-use crate::auth::auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue};
+use crate::auth::auth_ticket::_common::kernel::data::{AuthNonce, AuthToken};
 
 #[tokio::test]
 async fn success_request_token() {
@@ -49,8 +49,8 @@ impl TestFeature {
     fn standard() -> Self {
         Self {
             request_token: StaticRequestResetTokenStruct {
-                nonce_header: StaticAuthNonceHeader::Valid(AuthNonceValue::new("NONCE".into())),
-                token_header: StaticAuthTokenHeader::Valid(AuthTokenValue::new("TOKEN".into())),
+                nonce_header: StaticAuthNonceHeader::Valid(AuthNonce::new("NONCE".into())),
+                token_header: StaticAuthTokenHeader::Valid(AuthToken::new("TOKEN".into())),
                 request_token_service: StaticRequestResetTokenService,
                 response_encoder: StaticRequestResetTokenResponseEncoder,
             },

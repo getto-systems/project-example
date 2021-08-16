@@ -15,7 +15,7 @@ use crate::auth::password::{
 
 use crate::auth::{
     _api::service::data::AuthServiceError,
-    auth_ticket::_common::kernel::data::{AuthNonceValue, AuthTokenValue},
+    auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
 };
 
 pub struct TonicAuthenticatePasswordService<'a> {
@@ -36,8 +36,8 @@ impl<'a> TonicAuthenticatePasswordService<'a> {
 impl<'a> AuthenticatePasswordService for TonicAuthenticatePasswordService<'a> {
     async fn authenticate(
         &self,
-        nonce: Option<AuthNonceValue>,
-        token: Option<AuthTokenValue>,
+        nonce: Option<AuthNonce>,
+        token: Option<AuthToken>,
         fields: AuthenticatePasswordFieldsExtract,
     ) -> Result<AuthenticatePasswordResponse, AuthServiceError> {
         let mut client = AuthenticatePasswordPbClient::connect(self.auth_service_url)
@@ -72,7 +72,7 @@ pub mod test {
         _api::service::data::AuthServiceError,
         auth_ticket::_common::{
             encode::data::AuthTicketEncoded,
-            kernel::data::{AuthNonceValue, AuthTokenEncoded, AuthTokenExtract, AuthTokenValue},
+            kernel::data::{AuthNonce, AuthTokenEncoded, AuthTokenExtract, AuthToken},
         },
         auth_user::_common::kernel::data::AuthUser,
     };
@@ -85,8 +85,8 @@ pub mod test {
     impl AuthenticatePasswordService for StaticAuthenticatePasswordService {
         async fn authenticate(
             &self,
-            _nonce: Option<AuthNonceValue>,
-            _token: Option<AuthTokenValue>,
+            _nonce: Option<AuthNonce>,
+            _token: Option<AuthToken>,
             _fields: AuthenticatePasswordFieldsExtract,
         ) -> Result<AuthenticatePasswordResponse, AuthServiceError> {
             Ok(AuthenticatePasswordResponse::Success(AuthTicketEncoded {

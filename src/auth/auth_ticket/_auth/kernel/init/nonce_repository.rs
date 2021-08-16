@@ -8,8 +8,10 @@ use crate::z_details::_common::repository::helper::infra_error;
 
 use crate::auth::auth_ticket::_auth::kernel::infra::{AuthNonceEntry, AuthNonceRepository};
 
-use crate::auth::auth_ticket::_common::kernel::data::AuthDateTime;
-use crate::z_details::_common::repository::data::{RegisterResult, RepositoryError};
+use crate::{
+    auth::auth_ticket::_auth::kernel::data::AuthDateTime,
+    z_details::_common::repository::data::{RegisterResult, RepositoryError},
+};
 
 pub struct DynamoDbAuthNonceRepository<'a> {
     client: &'a DynamoDbClient,
@@ -113,10 +115,13 @@ pub mod test {
         AuthNonceEntry, AuthNonceEntryExtract, AuthNonceRepository,
     };
 
-    use crate::auth::auth_ticket::_common::kernel::data::{
-        AuthDateTime, AuthNonceValue, ExpireDateTime,
+    use crate::{
+        auth::auth_ticket::{
+            _auth::kernel::data::{AuthDateTime, ExpireDateTime},
+            _common::kernel::data::AuthNonce,
+        },
+        z_details::_common::repository::data::{RegisterResult, RepositoryError},
     };
-    use crate::z_details::_common::repository::data::{RegisterResult, RepositoryError};
 
     pub type MemoryAuthNonceStore = Mutex<MemoryAuthNonceMap>;
     pub struct MemoryAuthNonceMap(HashMap<String, AuthNonceEntryExtract>);
@@ -142,7 +147,7 @@ pub mod test {
             Mutex::new(self)
         }
 
-        fn get(&self, nonce: &AuthNonceValue) -> Option<&AuthNonceEntryExtract> {
+        fn get(&self, nonce: &AuthNonce) -> Option<&AuthNonceEntryExtract> {
             self.0.get(nonce.as_str())
         }
         fn insert(&mut self, entry: AuthNonceEntry) {

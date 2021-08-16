@@ -7,7 +7,7 @@ use crate::auth::password::reset::_auth::{
 };
 
 use crate::auth::{
-    auth_ticket::_common::kernel::data::ExpireDateTime,
+    auth_ticket::_auth::kernel::data::ExpireDateTime,
     password::{
         _auth::kernel::data::ResetToken,
         reset::_auth::{
@@ -70,7 +70,7 @@ pub mod test {
 
     use super::super::super::data::EncodeResetTokenError;
     use crate::auth::{
-        auth_ticket::_common::kernel::data::ExpireDateTime,
+        auth_ticket::_auth::kernel::data::ExpireDateTime,
         password::{
             _auth::kernel::data::ResetToken, reset::_auth::kernel::data::ResetTokenEncoded,
         },

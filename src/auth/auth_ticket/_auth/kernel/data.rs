@@ -4,6 +4,8 @@ use std::{
     fmt::{Display, Formatter},
 };
 
+use chrono::{DateTime, Duration, Utc};
+
 use crate::{
     auth::auth_user::{
         _auth::kernel::data::{AuthPermission, RequireAuthRoles},
@@ -103,6 +105,101 @@ impl AuthTicketId {
 impl Display for AuthTicketId {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "ticket: {}", self.0)
+    }
+}
+
+// TODO これは _auth に移動できるはず
+#[derive(Clone)]
+pub struct AuthDateTime(DateTime<Utc>);
+
+impl AuthDateTime {
+    pub(in crate::auth) const fn restore(now: DateTime<Utc>) -> Self {
+        Self(now)
+    }
+
+    pub fn extract(self) -> DateTime<Utc> {
+        self.0
+    }
+
+    pub fn expires(self, duration: &ExpireDuration) -> ExpireDateTime {
+        ExpireDateTime(self.0 + duration.0)
+    }
+
+    pub fn expansion_limit(self, duration: &ExpansionLimitDuration) -> ExpansionLimitDateTime {
+        ExpansionLimitDateTime(self.0 + duration.0)
+    }
+
+    pub fn expires_with_limit(
+        self,
+        duration: &ExpireDuration,
+        limit: ExpansionLimitDateTime,
+    ) -> ExpireDateTime {
+        let expires = self.0 + duration.0;
+        if expires > limit.0 {
+            ExpireDateTime(limit.0)
+        } else {
+            ExpireDateTime(expires)
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct ExpireDateTime(DateTime<Utc>);
+
+impl ExpireDateTime {
+    pub(in crate::auth) const fn restore(time: DateTime<Utc>) -> Self {
+        Self(time)
+    }
+
+    pub fn has_elapsed(&self, now: &AuthDateTime) -> bool {
+        self.0 < now.0
+    }
+
+    pub fn extract(self) -> DateTime<Utc> {
+        self.0
+    }
+}
+
+impl Display for ExpireDateTime {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        self.0.fmt(f)
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct ExpireDuration(Duration);
+
+impl ExpireDuration {
+    pub fn with_duration(duration: Duration) -> Self {
+        Self(duration)
+    }
+}
+
+#[derive(Clone)]
+pub struct ExpansionLimitDateTime(DateTime<Utc>);
+
+impl ExpansionLimitDateTime {
+    pub(in crate::auth) const fn restore(time: DateTime<Utc>) -> Self {
+        Self(time)
+    }
+
+    pub fn extract(self) -> DateTime<Utc> {
+        self.0
+    }
+}
+
+impl Display for ExpansionLimitDateTime {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        self.0.fmt(f)
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct ExpansionLimitDuration(Duration);
+
+impl ExpansionLimitDuration {
+    pub fn with_duration(duration: Duration) -> Self {
+        Self(duration)
     }
 }
 

@@ -41,7 +41,10 @@ use crate::auth::{
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 
 use crate::auth::{
-    auth_ticket::_common::kernel::data::{AuthDateTime, AuthNonceValue, ExpireDuration},
+    auth_ticket::{
+        _auth::kernel::data::{AuthDateTime, ExpireDuration},
+        _common::kernel::data::AuthNonce,
+    },
     auth_user::_common::kernel::data::AuthUserId,
     login_id::_auth::data::LoginId,
     password::{
@@ -274,7 +277,7 @@ fn standard_clock() -> StaticChronoAuthClock {
 }
 
 fn standard_nonce_metadata() -> StaticAuthNonceMetadata {
-    StaticAuthNonceMetadata::Valid(AuthNonceValue::new(NONCE.into()))
+    StaticAuthNonceMetadata::Valid(AuthNonce::new(NONCE.into()))
 }
 
 fn standard_token_generator() -> StaticResetTokenGenerator {

@@ -1,7 +1,7 @@
 use crate::{
     auth::auth_ticket::{
         _api::kernel::data::{AuthTokenResponse, AuthTokenMessage},
-        _common::kernel::data::{AuthNonceValue, AuthTokenValue},
+        _common::kernel::data::{AuthNonce, AuthToken},
     },
     z_details::_api::request::data::HeaderError,
 };
@@ -25,9 +25,9 @@ pub trait AuthTokenResponseBuilder {
 }
 
 pub trait AuthNonceHeader {
-    fn nonce(&self) -> Result<Option<AuthNonceValue>, HeaderError>;
+    fn nonce(&self) -> Result<Option<AuthNonce>, HeaderError>;
 }
 
 pub trait AuthTokenHeader {
-    fn token(&self) -> Result<Option<AuthTokenValue>, HeaderError>;
+    fn token(&self) -> Result<Option<AuthToken>, HeaderError>;
 }

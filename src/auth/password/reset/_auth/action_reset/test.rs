@@ -52,10 +52,8 @@ use super::action::{ResetPasswordAction, ResetPasswordMaterial};
 
 use crate::auth::{
     auth_ticket::{
-        _auth::kernel::data::AuthTicketId,
-        _common::kernel::data::{
-            AuthDateTime, AuthNonceValue, ExpansionLimitDuration, ExpireDuration,
-        },
+        _auth::kernel::data::{AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration},
+        _common::kernel::data::AuthNonce,
     },
     auth_user::_common::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
     login_id::_auth::data::LoginId,
@@ -516,7 +514,7 @@ fn standard_clock() -> StaticChronoAuthClock {
 }
 
 fn standard_nonce_metadata() -> StaticAuthNonceMetadata {
-    StaticAuthNonceMetadata::Valid(AuthNonceValue::new(NONCE.into()))
+    StaticAuthNonceMetadata::Valid(AuthNonce::new(NONCE.into()))
 }
 
 fn standard_request_decoder() -> StaticResetPasswordRequestDecoder {
