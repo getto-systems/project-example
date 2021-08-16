@@ -18,13 +18,11 @@ use crate::{
 pub trait ResetPasswordInfra {
     type HeaderInfra: AuthHeaderInfra;
     type TokenInfra: AuthTokenInfra;
-    type RequestDecoder: ResetPasswordRequestDecoder;
     type ResetService: ResetPasswordService;
     type ResponseEncoder: ResetPasswordResponseEncoder;
 
     fn header_infra(&self) -> &Self::HeaderInfra;
     fn token_infra(&self) -> &Self::TokenInfra;
-    fn request_decoder(&self) -> &Self::RequestDecoder;
     fn reset_service(&self) -> &Self::ResetService;
     fn response_encoder(&self) -> &Self::ResponseEncoder;
 }

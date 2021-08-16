@@ -5,9 +5,9 @@ use getto_application_test::ActionTestRunner;
 use crate::auth::{
     auth_ticket::_api::kernel::init::{
         nonce_header::test::StaticAuthNonceHeader,
+        response_builder::test::StaticAuthTokenResponseBuilder,
         test::{StaticAuthHeaderStruct, StaticAuthTokenStruct},
         token_header::test::StaticAuthTokenHeader,
-        response_builder::test::StaticAuthTokenResponseBuilder,
     },
     password::reset::_api::reset::init::{
         request_decoder::test::StaticResetPasswordRequestDecoder,
@@ -31,11 +31,12 @@ async fn success_request_token() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let feature = TestFeature::standard();
+    let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec!["reset password"]);
     assert!(result.is_ok());
 }
@@ -60,7 +61,6 @@ impl TestFeature {
                 token_infra: StaticAuthTokenStruct {
                     response_builder: StaticAuthTokenResponseBuilder,
                 },
-                request_decoder: standard_request_decoder(),
                 reset_service: StaticResetPasswordService {
                     user: standard_user(),
                 },
