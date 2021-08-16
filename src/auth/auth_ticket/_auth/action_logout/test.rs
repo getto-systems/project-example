@@ -6,13 +6,20 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::auth_ticket::_auth::{
     discard::init::test::StaticDiscardAuthTicketStruct,
-    kernel::init::test::{
-        MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore, MemoryAuthTicketMap,
-        MemoryAuthTicketRepository, MemoryAuthTicketStore, StaticAuthNonceMetadata,
-        StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+    kernel::init::{
+        clock::test::StaticChronoAuthClock,
+        nonce_metadata::test::StaticAuthNonceMetadata,
+        nonce_repository::test::{
+            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+        },
+        test::StaticCheckAuthNonceStruct,
+        ticket_repository::test::{
+            MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+        },
     },
-    validate::init::test::{
-        StaticAuthTokenDecoder, StaticAuthTokenMetadata, StaticValidateAuthTokenStruct,
+    validate::init::{
+        test::StaticValidateAuthTokenStruct, token_decoder::test::StaticAuthTokenDecoder,
+        token_metadata::test::StaticAuthTokenMetadata,
     },
 };
 

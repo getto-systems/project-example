@@ -124,12 +124,6 @@ pub mod test {
 
     pub struct StaticResetTokenNotifier;
 
-    impl StaticResetTokenNotifier {
-        pub fn new() -> Self {
-            Self
-        }
-    }
-
     #[async_trait::async_trait]
     impl ResetTokenNotifier for StaticResetTokenNotifier {
         async fn notify(

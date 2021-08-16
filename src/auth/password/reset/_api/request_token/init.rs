@@ -58,9 +58,9 @@ impl<'a> RequestResetTokenInfra for RequestResetTokenStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    pub use super::request_decoder::test::StaticRequestResetTokenRequestDecoder;
-    pub use super::request_token_service::test::StaticRequestResetTokenService;
-    pub use super::response_encoder::test::StaticRequestResetTokenResponseEncoder;
+    use super::request_decoder::test::StaticRequestResetTokenRequestDecoder;
+    use super::request_token_service::test::StaticRequestResetTokenService;
+    use super::response_encoder::test::StaticRequestResetTokenResponseEncoder;
 
     use crate::auth::auth_ticket::_api::kernel::init::test::StaticAuthHeaderStruct;
 

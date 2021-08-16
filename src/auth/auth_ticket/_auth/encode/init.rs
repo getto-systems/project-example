@@ -66,9 +66,9 @@ impl<'a> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    pub use super::token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder};
-    use crate::auth::auth_ticket::_auth::kernel::init::test::{
-        MemoryAuthTicketRepository, StaticChronoAuthClock,
+    use super::token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder};
+    use crate::auth::auth_ticket::_auth::kernel::init::{
+        clock::test::StaticChronoAuthClock, ticket_repository::test::MemoryAuthTicketRepository,
     };
 
     use crate::auth::auth_ticket::_auth::encode::infra::{

@@ -55,8 +55,8 @@ impl<'a> RenewAuthTicketInfra for RenewAuthTicketStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    pub use super::renew_service::test::StaticRenewAuthTicketService;
-    pub use super::response_encoder::test::StaticRenewAuthTicketResponseEncoder;
+    use super::renew_service::test::StaticRenewAuthTicketService;
+    use super::response_encoder::test::StaticRenewAuthTicketResponseEncoder;
     use crate::auth::auth_ticket::_api::kernel::init::test::{
         StaticAuthHeaderStruct, StaticAuthTokenStruct,
     };

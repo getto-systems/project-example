@@ -6,24 +6,34 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     auth_ticket::_auth::{
-        encode::init::test::{
-            StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder, StaticEncodeAuthTicketStruct,
+        encode::init::{
+            test::StaticEncodeAuthTicketStruct,
+            token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
         },
-        issue::init::test::{StaticAuthTicketIdGenerator, StaticIssueAuthTicketStruct},
-        kernel::init::test::{
-            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-            MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
-            StaticAuthNonceMetadata, StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+        issue::init::{
+            id_generator::test::StaticAuthTicketIdGenerator, test::StaticIssueAuthTicketStruct,
+        },
+        kernel::init::{
+            clock::test::StaticChronoAuthClock,
+            nonce_metadata::test::StaticAuthNonceMetadata,
+            nonce_repository::test::{
+                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+            },
+            test::StaticCheckAuthNonceStruct,
+            ticket_repository::test::{
+                MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+            },
         },
     },
-    auth_user::_auth::kernel::init::test::{
+    auth_user::_auth::kernel::init::user_repository::test::{
         MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
     },
     password::_auth::{
-        authenticate::init::test::{
-            StaticAuthenticatePasswordRequestDecoder, StaticAuthenticatePasswordStruct,
+        authenticate::init::{
+            request_decoder::test::StaticAuthenticatePasswordRequestDecoder,
+            test::StaticAuthenticatePasswordStruct,
         },
-        kernel::init::test::{
+        kernel::init::password_repository::test::{
             MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
             MemoryAuthUserPasswordStore,
         },

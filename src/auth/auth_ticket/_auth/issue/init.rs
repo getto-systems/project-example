@@ -50,9 +50,9 @@ impl<'a> IssueAuthTicketInfra for IssueAuthTicketStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    pub use super::id_generator::test::StaticAuthTicketIdGenerator;
-    use crate::auth::auth_ticket::_auth::kernel::init::test::{
-        MemoryAuthTicketRepository, StaticChronoAuthClock,
+    use super::id_generator::test::StaticAuthTicketIdGenerator;
+    use crate::auth::auth_ticket::_auth::kernel::init::{
+        clock::test::StaticChronoAuthClock, ticket_repository::test::MemoryAuthTicketRepository,
     };
 
     use super::super::infra::{IssueAuthTicketConfig, IssueAuthTicketInfra};

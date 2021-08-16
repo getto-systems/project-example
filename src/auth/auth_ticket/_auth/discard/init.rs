@@ -34,8 +34,8 @@ impl<'a> DiscardAuthTicketInfra for DiscardAuthTicketStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::auth_ticket::_auth::kernel::init::test::{
-        MemoryAuthTicketRepository, StaticChronoAuthClock,
+    use crate::auth::auth_ticket::_auth::kernel::init::{
+        clock::test::StaticChronoAuthClock, ticket_repository::test::MemoryAuthTicketRepository,
     };
 
     use super::super::infra::DiscardAuthTicketInfra;

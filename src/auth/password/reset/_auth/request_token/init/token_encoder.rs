@@ -78,12 +78,6 @@ pub mod test {
 
     pub struct StaticResetTokenEncoder;
 
-    impl<'a> StaticResetTokenEncoder {
-        pub fn new() -> Self {
-            Self
-        }
-    }
-
     impl<'a> ResetTokenEncoder for StaticResetTokenEncoder {
         fn encode(
             &self,

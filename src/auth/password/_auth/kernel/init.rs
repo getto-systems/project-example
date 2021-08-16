@@ -33,9 +33,7 @@ impl<'a> AuthUserPasswordHashInfra for AuthUserPasswordStruct<'a> {
 #[cfg(test)]
 pub mod test {
     use super::password_hasher::test::PlainPasswordHasher;
-    pub use super::password_repository::test::{
-        MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository, MemoryAuthUserPasswordStore,
-    };
+    use super::password_repository::test::MemoryAuthUserPasswordRepository;
 
     use super::super::infra::AuthUserPasswordHashInfra;
 

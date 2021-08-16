@@ -1,6 +1,6 @@
 use crate::auth::{
-    auth_ticket::_auth::kernel::infra::{AuthClockInfra, CheckAuthNonceInfra},
-    auth_user::_auth::kernel::infra::AuthUserInfra,
+    auth_ticket::_auth::kernel::infra::{AuthClock, CheckAuthNonceInfra},
+    auth_user::_auth::kernel::infra::AuthUserRepository,
     password::{
         _auth::kernel::infra::AuthUserPasswordHashInfra,
         reset::_common::reset::infra::ResetPasswordFieldsExtract,
@@ -16,13 +16,14 @@ use crate::auth::password::{
 
 pub trait ResetPasswordInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
-    type UserInfra: AuthUserInfra;
+    type Clock: AuthClock;
+    type UserRepository: AuthUserRepository;
     type PasswordInfra: AuthUserPasswordHashInfra;
     type TokenDecoder: ResetTokenDecoder;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
-    fn clock_infra(&self) -> &AuthClockInfra;
-    fn user_infra(&self) -> &Self::UserInfra;
+    fn clock(&self) -> &Self::Clock;
+    fn user_repository(&self) -> &Self::UserRepository;
     fn password_infra(&self) -> &Self::PasswordInfra;
     fn token_decoder(&self) -> &Self::TokenDecoder;
 }

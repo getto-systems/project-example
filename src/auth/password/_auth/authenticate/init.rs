@@ -51,16 +51,16 @@ impl<'a> AuthenticatePasswordInfra for AuthenticatePasswordStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    pub use super::request_decoder::test::StaticAuthenticatePasswordRequestDecoder;
-
-    use super::super::infra::AuthenticatePasswordInfra;
     use crate::auth::{
         auth_ticket::_auth::kernel::init::test::StaticCheckAuthNonceStruct,
-        auth_user::_auth::kernel::init::test::MemoryAuthUserRepository,
+        auth_user::_auth::kernel::init::user_repository::test::MemoryAuthUserRepository,
         password::_auth::kernel::init::{
-            password_matcher::test::PlainPasswordMatcher, test::MemoryAuthUserPasswordRepository,
+            password_matcher::test::PlainPasswordMatcher,
+            password_repository::test::MemoryAuthUserPasswordRepository,
         },
     };
+
+    use super::super::infra::AuthenticatePasswordInfra;
 
     pub struct StaticAuthenticatePasswordStruct<'a> {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,

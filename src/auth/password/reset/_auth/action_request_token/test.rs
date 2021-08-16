@@ -3,20 +3,29 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::init::test::{
-        MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-        StaticAuthNonceMetadata, StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+    auth_ticket::_auth::kernel::init::{
+        clock::test::StaticChronoAuthClock,
+        nonce_metadata::test::StaticAuthNonceMetadata,
+        nonce_repository::test::{
+            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+        },
+        test::StaticCheckAuthNonceStruct,
     },
     password::{
-        _auth::kernel::init::test::{
+        _auth::kernel::init::password_repository::test::{
             MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
             MemoryAuthUserPasswordStore,
         },
-        reset::_auth::request_token::init::test::{
-            MemoryResetTokenDestinationMap, MemoryResetTokenDestinationRepository,
-            MemoryResetTokenDestinationStore, StaticRequestResetTokenRequestDecoder,
-            StaticRequestResetTokenStruct, StaticResetTokenEncoder, StaticResetTokenGenerator,
-            StaticResetTokenNotifier,
+        reset::_auth::request_token::init::{
+            destination_repository::test::{
+                MemoryResetTokenDestinationMap, MemoryResetTokenDestinationRepository,
+                MemoryResetTokenDestinationStore,
+            },
+            request_decoder::test::StaticRequestResetTokenRequestDecoder,
+            test::StaticRequestResetTokenStruct,
+            token_encoder::test::StaticResetTokenEncoder,
+            token_generator::test::StaticResetTokenGenerator,
+            token_notifier::test::StaticResetTokenNotifier,
         },
     },
 };
@@ -232,8 +241,8 @@ impl<'a> TestFeature<'a> {
                     &store.destination,
                 ),
                 token_generator: standard_token_generator(),
-                token_encoder: StaticResetTokenEncoder::new(),
-                token_notifier: StaticResetTokenNotifier::new(),
+                token_encoder: StaticResetTokenEncoder,
+                token_notifier: StaticResetTokenNotifier,
                 config: standard_request_token_config(),
             },
         }

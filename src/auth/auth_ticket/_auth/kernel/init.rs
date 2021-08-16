@@ -11,19 +11,7 @@ use clock::ChronoAuthClock;
 use nonce_metadata::TonicAuthNonceMetadata;
 use nonce_repository::DynamoDbAuthNonceRepository;
 
-use crate::auth::auth_ticket::_auth::kernel::infra::{
-    AuthClockInfra, AuthClockInitializer, AuthNonceConfig, CheckAuthNonceInfra,
-};
-
-pub struct ChronoAuthClockInitializer;
-
-impl AuthClockInitializer for ChronoAuthClockInitializer {
-    fn new(self) -> AuthClockInfra {
-        AuthClockInfra {
-            clock: Box::new(ChronoAuthClock::new()),
-        }
-    }
-}
+use crate::auth::auth_ticket::_auth::kernel::infra::{AuthNonceConfig, CheckAuthNonceInfra};
 
 pub struct CheckAuthNonceStruct<'a> {
     config: AuthNonceConfig,
@@ -69,30 +57,11 @@ impl<'a> CheckAuthNonceStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    pub use super::clock::test::StaticChronoAuthClock;
-    pub use super::nonce_metadata::test::StaticAuthNonceMetadata;
-    pub use super::nonce_repository::test::{
-        MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-    };
-    pub use super::ticket_repository::test::{
-        MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
-    };
+    use super::clock::test::StaticChronoAuthClock;
+    use super::nonce_metadata::test::StaticAuthNonceMetadata;
+    use super::nonce_repository::test::MemoryAuthNonceRepository;
 
-    use crate::auth::auth_ticket::_auth::kernel::infra::{
-        AuthClockInfra, AuthClockInitializer, AuthNonceConfig, CheckAuthNonceInfra,
-    };
-
-    pub struct StaticAuthClockInitializer {
-        pub clock: StaticChronoAuthClock,
-    }
-
-    impl AuthClockInitializer for StaticAuthClockInitializer {
-        fn new(self) -> AuthClockInfra {
-            AuthClockInfra {
-                clock: Box::new(self.clock),
-            }
-        }
-    }
+    use crate::auth::auth_ticket::_auth::kernel::infra::{AuthNonceConfig, CheckAuthNonceInfra};
 
     pub struct StaticCheckAuthNonceStruct<'a> {
         pub config: AuthNonceConfig,

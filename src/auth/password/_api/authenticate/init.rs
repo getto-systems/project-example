@@ -67,9 +67,9 @@ impl<'a> AuthenticatePasswordInfra for AuthenticatePasswordStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    pub use super::authenticate_service::test::StaticAuthenticatePasswordService;
-    pub use super::request_decoder::test::StaticAuthenticatePasswordRequestDecoder;
-    pub use super::response_encoder::test::StaticAuthenticatePasswordResponseEncoder;
+    use super::authenticate_service::test::StaticAuthenticatePasswordService;
+    use super::request_decoder::test::StaticAuthenticatePasswordRequestDecoder;
+    use super::response_encoder::test::StaticAuthenticatePasswordResponseEncoder;
 
     use crate::auth::auth_ticket::_api::kernel::init::test::{
         StaticAuthHeaderStruct, StaticAuthTokenStruct,

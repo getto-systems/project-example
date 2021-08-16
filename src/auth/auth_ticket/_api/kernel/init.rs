@@ -62,9 +62,9 @@ impl<'a> AuthTokenInfra for AuthTokenStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    pub use super::nonce_header::test::StaticAuthNonceHeader;
-    pub use super::token_header::test::StaticAuthTokenHeader;
-    pub use super::token_messenger::test::StaticAuthTokenMessenger;
+    use super::nonce_header::test::StaticAuthNonceHeader;
+    use super::token_header::test::StaticAuthTokenHeader;
+    use super::token_messenger::test::StaticAuthTokenMessenger;
 
     use crate::auth::auth_ticket::_api::kernel::infra::{AuthHeaderInfra, AuthTokenInfra};
 
