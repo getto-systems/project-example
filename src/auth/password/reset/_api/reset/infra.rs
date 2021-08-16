@@ -28,7 +28,7 @@ pub trait ResetPasswordInfra {
 }
 
 pub trait ResetPasswordRequestDecoder {
-    fn decode(&self) -> Result<ResetPasswordFieldsExtract, MessageError>;
+    fn decode(self) -> Result<ResetPasswordFieldsExtract, MessageError>;
 }
 
 #[async_trait::async_trait]
