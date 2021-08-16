@@ -1,4 +1,4 @@
-mod user_repository;
+pub(in crate::auth) mod user_repository;
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 

@@ -1,4 +1,4 @@
-mod logout_service;
+pub(in crate::auth) mod logout_service;
 
 use actix_web::HttpRequest;
 

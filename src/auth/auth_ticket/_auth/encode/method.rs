@@ -1,10 +1,8 @@
 use getto_application::data::MethodResult;
 
 use crate::auth::auth_ticket::_auth::{
-    encode::infra::{
-        AuthTokenEncoder, CloudfrontTokenEncoder, EncodeAuthTicketConfig, EncodeAuthTicketInfra,
-    },
-    kernel::infra::{AuthClock, AuthTicketInfra, AuthTicketRepository},
+    encode::infra::{AuthTokenEncoder, CloudfrontTokenEncoder, EncodeAuthTicketInfra},
+    kernel::infra::{AuthClock, AuthTicketRepository},
 };
 
 use super::event::EncodeAuthTicketEvent;
@@ -22,13 +20,10 @@ pub async fn encode_auth_ticket<S>(
     ticket: AuthTicket,
     post: impl Fn(EncodeAuthTicketEvent) -> S,
 ) -> MethodResult<S> {
-    let ticket_infra = infra.ticket_infra();
     let ticket_encoder = infra.ticket_encoder();
     let api_encoder = infra.api_encoder();
     let cloudfront_encoder = infra.cloudfront_encoder();
-    let config = infra.config();
-    let clock = ticket_infra.clock();
-    let ticket_repository = ticket_infra.ticket_repository();
+    let ticket_repository = infra.ticket_repository();
 
     let limit = ticket_repository
         .expansion_limit(&ticket)
@@ -36,7 +31,7 @@ pub async fn encode_auth_ticket<S>(
         .map_err(|err| post(EncodeAuthTicketEvent::RepositoryError(err)))?
         .ok_or_else(|| post(EncodeAuthTicketEvent::TicketNotFound))?;
 
-    let expires = calc_expires(clock, &config, limit);
+    let expires = calc_expires(infra, limit);
     post(EncodeAuthTicketEvent::TokenExpiresCalculated(
         expires.clone(),
     ));
@@ -55,14 +50,19 @@ pub async fn encode_auth_ticket<S>(
             .map_err(|err| post(EncodeAuthTicketEvent::EncodeError(err)))?,
     };
 
-    let response = AuthTicketEncoded { user: ticket.into_user().extract(), token };
+    let response = AuthTicketEncoded {
+        user: ticket.into_user().extract(),
+        token,
+    };
     Ok(post(EncodeAuthTicketEvent::Success(response)))
 }
 fn calc_expires(
-    clock: &impl AuthClock,
-    config: &EncodeAuthTicketConfig,
+    infra: &impl EncodeAuthTicketInfra,
     limit: ExpansionLimitDateTime,
 ) -> AuthTokenExpires {
+    let clock = infra.clock();
+    let config = infra.config();
+
     AuthTokenExpires {
         ticket: clock
             .now()

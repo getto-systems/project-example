@@ -1,6 +1,6 @@
-mod nonce_header;
-mod token_header;
-mod token_messenger;
+pub(in crate::auth) mod nonce_header;
+pub(in crate::auth) mod token_header;
+pub(in crate::auth) mod token_messenger;
 
 use actix_web::HttpRequest;
 

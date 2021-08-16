@@ -1,6 +1,6 @@
-mod password_hasher;
-mod password_matcher;
-mod password_repository;
+pub(in crate::auth) mod password_hasher;
+pub(in crate::auth) mod password_matcher;
+pub(in crate::auth) mod password_repository;
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::auth::auth_ticket::_auth::kernel::infra::AuthTicketInfra;
+use crate::auth::auth_ticket::_auth::kernel::infra::{AuthClock, AuthTicketRepository};
 
 use crate::auth::auth_ticket::{
     _auth::{encode::data::EncodeAuthTokenError, kernel::data::AuthTicket},
@@ -10,12 +10,14 @@ use crate::auth::auth_ticket::{
 };
 
 pub trait EncodeAuthTicketInfra {
-    type TicketInfra: AuthTicketInfra;
+    type Clock: AuthClock;
+    type TicketRepository: AuthTicketRepository;
     type TicketEncoder: AuthTokenEncoder;
     type ApiEncoder: AuthTokenEncoder;
     type CloudfrontEncoder: CloudfrontTokenEncoder;
 
-    fn ticket_infra(&self) -> &Self::TicketInfra;
+    fn clock(&self) -> &Self::Clock;
+    fn ticket_repository(&self) -> &Self::TicketRepository;
     fn ticket_encoder(&self) -> &Self::TicketEncoder;
     fn api_encoder(&self) -> &Self::ApiEncoder;
     fn cloudfront_encoder(&self) -> &Self::CloudfrontEncoder;

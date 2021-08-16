@@ -13,8 +13,7 @@ use crate::auth::{
         kernel::init::test::{
             MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
             MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
-            StaticAuthNonceMetadata, StaticAuthTicketStruct, StaticCheckAuthNonceStruct,
-            StaticChronoAuthClock,
+            StaticAuthNonceMetadata, StaticCheckAuthNonceStruct, StaticChronoAuthClock,
         },
     },
     auth_user::_auth::kernel::init::test::{
@@ -361,27 +360,22 @@ impl<'a> TestFeature<'a> {
                 },
             },
             issue: StaticIssueAuthTicketStruct {
-                ticket_infra: standard_ticket_infra(store),
+                clock: standard_clock(),
+                ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
                 ticket_id_generator: StaticAuthTicketIdGenerator::new(AuthTicketId::new(
                     "ticket-id".into(),
                 )),
                 config: standard_issue_config(),
             },
             encode: StaticEncodeAuthTicketStruct {
-                ticket_infra: standard_ticket_infra(store),
+                clock: standard_clock(),
+                ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
                 ticket_encoder: StaticAuthTokenEncoder,
                 api_encoder: StaticAuthTokenEncoder,
                 cloudfront_encoder: StaticCloudfrontTokenEncoder,
                 config: standard_encode_config(),
             },
         }
-    }
-}
-
-fn standard_ticket_infra<'a>(store: &'a TestStore) -> StaticAuthTicketStruct<'a> {
-    StaticAuthTicketStruct {
-        clock: standard_clock(),
-        ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
     }
 }
 

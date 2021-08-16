@@ -11,7 +11,7 @@ use crate::auth::auth_ticket::_auth::{
     kernel::init::test::{
         MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore, MemoryAuthTicketMap,
         MemoryAuthTicketRepository, MemoryAuthTicketStore, StaticAuthNonceMetadata,
-        StaticAuthTicketStruct, StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+        StaticCheckAuthNonceStruct, StaticChronoAuthClock,
     },
     validate::init::test::{
         StaticAuthTokenDecoder, StaticAuthTokenMetadata, StaticValidateAuthTokenStruct,
@@ -276,20 +276,14 @@ impl<'a> TestFeature<'a> {
                 token_decoder: token_validator,
             },
             encode: StaticEncodeAuthTicketStruct {
-                ticket_infra: standard_ticket_infra(store),
+                clock: standard_clock(),
+                ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
                 ticket_encoder: StaticAuthTokenEncoder,
                 api_encoder: StaticAuthTokenEncoder,
                 cloudfront_encoder: StaticCloudfrontTokenEncoder,
                 config: standard_encode_config(),
             },
         }
-    }
-}
-
-fn standard_ticket_infra<'a>(store: &'a TestStore) -> StaticAuthTicketStruct<'a> {
-    StaticAuthTicketStruct {
-        clock: standard_clock(),
-        ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
     }
 }
 

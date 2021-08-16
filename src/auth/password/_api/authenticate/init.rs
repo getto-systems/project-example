@@ -1,6 +1,6 @@
-mod authenticate_service;
-mod request_decoder;
-mod response_encoder;
+pub(in crate::auth) mod authenticate_service;
+pub(in crate::auth) mod request_decoder;
+pub(in crate::auth) mod response_encoder;
 
 use actix_web::HttpRequest;
 

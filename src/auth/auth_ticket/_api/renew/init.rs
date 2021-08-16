@@ -1,5 +1,5 @@
-mod renew_service;
-mod response_encoder;
+pub(in crate::auth) mod renew_service;
+pub(in crate::auth) mod response_encoder;
 
 use actix_web::HttpRequest;
 

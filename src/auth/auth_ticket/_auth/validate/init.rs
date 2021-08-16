@@ -1,5 +1,5 @@
-mod token_decoder;
-mod token_metadata;
+pub(in crate::auth) mod token_decoder;
+pub(in crate::auth) mod token_metadata;
 
 use tonic::{metadata::MetadataMap, Request};
 
