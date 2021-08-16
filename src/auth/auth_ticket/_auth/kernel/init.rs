@@ -10,10 +10,9 @@ use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 use clock::ChronoAuthClock;
 use nonce_metadata::TonicAuthNonceMetadata;
 use nonce_repository::DynamoDbAuthNonceRepository;
-use ticket_repository::MysqlAuthTicketRepository;
 
 use crate::auth::auth_ticket::_auth::kernel::infra::{
-    AuthClockInfra, AuthClockInitializer, AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
+    AuthClockInfra, AuthClockInitializer, AuthNonceConfig, CheckAuthNonceInfra,
 };
 
 pub struct ChronoAuthClockInitializer;
@@ -23,32 +22,6 @@ impl AuthClockInitializer for ChronoAuthClockInitializer {
         AuthClockInfra {
             clock: Box::new(ChronoAuthClock::new()),
         }
-    }
-}
-
-pub struct AuthTicketStruct<'a> {
-    clock: ChronoAuthClock,
-    ticket_repository: MysqlAuthTicketRepository<'a>,
-}
-
-impl<'a> AuthTicketStruct<'a> {
-    pub fn new(feature: &'a AuthOutsideFeature) -> Self {
-        Self {
-            clock: ChronoAuthClock::new(),
-            ticket_repository: MysqlAuthTicketRepository::new(&feature.store.mysql),
-        }
-    }
-}
-
-impl<'a> AuthTicketInfra for AuthTicketStruct<'a> {
-    type Clock = ChronoAuthClock;
-    type TicketRepository = MysqlAuthTicketRepository<'a>;
-
-    fn clock(&self) -> &Self::Clock {
-        &self.clock
-    }
-    fn ticket_repository(&self) -> &Self::TicketRepository {
-        &self.ticket_repository
     }
 }
 
@@ -106,7 +79,7 @@ pub mod test {
     };
 
     use crate::auth::auth_ticket::_auth::kernel::infra::{
-        AuthClockInfra, AuthClockInitializer, AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
+        AuthClockInfra, AuthClockInitializer, AuthNonceConfig, CheckAuthNonceInfra,
     };
 
     pub struct StaticAuthClockInitializer {
@@ -118,23 +91,6 @@ pub mod test {
             AuthClockInfra {
                 clock: Box::new(self.clock),
             }
-        }
-    }
-
-    pub struct StaticAuthTicketStruct<'a> {
-        pub clock: StaticChronoAuthClock,
-        pub ticket_repository: MemoryAuthTicketRepository<'a>,
-    }
-
-    impl<'a> AuthTicketInfra for StaticAuthTicketStruct<'a> {
-        type Clock = StaticChronoAuthClock;
-        type TicketRepository = MemoryAuthTicketRepository<'a>;
-
-        fn clock(&self) -> &Self::Clock {
-            &self.clock
-        }
-        fn ticket_repository(&self) -> &Self::TicketRepository {
-            &self.ticket_repository
         }
     }
 

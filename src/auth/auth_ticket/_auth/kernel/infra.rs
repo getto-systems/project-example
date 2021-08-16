@@ -29,14 +29,6 @@ pub trait AuthClockInitializer {
     fn new(self) -> AuthClockInfra;
 }
 
-pub trait AuthTicketInfra {
-    type Clock: AuthClock;
-    type TicketRepository: AuthTicketRepository;
-
-    fn clock(&self) -> &Self::Clock;
-    fn ticket_repository(&self) -> &Self::TicketRepository;
-}
-
 pub trait CheckAuthNonceInfra {
     type Clock: AuthClock;
     type NonceMetadata: AuthNonceMetadata;
