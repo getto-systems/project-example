@@ -29,7 +29,8 @@ pub trait LogoutMaterial {
     type Validate: ValidateAuthTokenInfra;
     type Discard: DiscardAuthTicketInfra;
 
-    fn extract(self) -> (Self::Validate, Self::Discard);
+    fn validate(&self) -> &Self::Validate;
+    fn discard(&self) -> &Self::Discard;
 }
 
 pub struct LogoutAction<M: LogoutMaterial> {
@@ -51,13 +52,13 @@ impl<M: LogoutMaterial> LogoutAction<M> {
 
     pub async fn ignite(self) -> MethodResult<LogoutState> {
         let pubsub = self.pubsub;
-        let (validate, discard) = self.material.extract();
+        let m = self.material;
 
         let ticket =
-            validate_auth_token(&validate, |event| pubsub.post(LogoutState::Validate(event)))
+            validate_auth_token(m.validate(), |event| pubsub.post(LogoutState::Validate(event)))
                 .await?;
 
-        discard_auth_ticket(&discard, ticket, |event| {
+        discard_auth_ticket(m.discard(), ticket, |event| {
             pubsub.post(LogoutState::Discard(event))
         })
         .await

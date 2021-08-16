@@ -39,7 +39,9 @@ pub trait AuthenticatePasswordMaterial {
     type Issue: IssueAuthTicketInfra;
     type Encode: EncodeAuthTicketInfra;
 
-    fn extract(self) -> (Self::Authenticate, Self::Issue, Self::Encode);
+    fn authenticate(&self) -> &Self::Authenticate;
+    fn issue(&self) -> &Self::Issue;
+    fn encode(&self) -> &Self::Encode;
 }
 
 pub struct AuthenticatePasswordAction<M: AuthenticatePasswordMaterial> {
@@ -67,21 +69,21 @@ impl<M: AuthenticatePasswordMaterial> AuthenticatePasswordAction<M> {
         request: impl AuthenticatePasswordRequestDecoder,
     ) -> MethodResult<AuthenticatePasswordState> {
         let pubsub = self.pubsub;
-        let (authenticate, issue, encode) = self.material.extract();
+        let m = self.material;
 
         let fields = request.decode();
 
-        let user = authenticate_password(&authenticate, fields, |event| {
+        let user = authenticate_password(m.authenticate(), fields, |event| {
             pubsub.post(AuthenticatePasswordState::Authenticate(event))
         })
         .await?;
 
-        let ticket = issue_auth_ticket(&issue, user, |event| {
+        let ticket = issue_auth_ticket(m.issue(), user, |event| {
             pubsub.post(AuthenticatePasswordState::Issue(event))
         })
         .await?;
 
-        encode_auth_ticket(&encode, ticket, |event| {
+        encode_auth_ticket(m.encode(), ticket, |event| {
             pubsub.post(AuthenticatePasswordState::Encode(event))
         })
         .await

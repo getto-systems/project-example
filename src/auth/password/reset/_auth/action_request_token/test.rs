@@ -183,8 +183,8 @@ struct TestFeature<'a> {
 impl<'a> RequestResetTokenMaterial for TestFeature<'a> {
     type RequestToken = StaticRequestResetTokenStruct<'a>;
 
-    fn extract(self) -> Self::RequestToken {
-        self.request_token
+    fn request_token(&self) -> &Self::RequestToken {
+        &self.request_token
     }
 }
 

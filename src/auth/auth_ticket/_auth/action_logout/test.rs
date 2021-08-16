@@ -135,8 +135,11 @@ impl<'a> LogoutMaterial for TestFeature<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
     type Discard = StaticDiscardAuthTicketStruct<'a>;
 
-    fn extract(self) -> (Self::Validate, Self::Discard) {
-        (self.validate, self.discard)
+    fn validate(&self) -> &Self::Validate {
+        &self.validate
+    }
+    fn discard(&self) -> &Self::Discard {
+        &self.discard
     }
 }
 

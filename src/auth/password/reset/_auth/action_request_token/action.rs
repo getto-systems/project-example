@@ -23,7 +23,7 @@ impl Display for RequestResetTokenState {
 pub trait RequestResetTokenMaterial {
     type RequestToken: RequestResetTokenInfra;
 
-    fn extract(self) -> Self::RequestToken;
+    fn request_token(&self) -> &Self::RequestToken;
 }
 
 pub struct RequestResetTokenAction<M: RequestResetTokenMaterial> {
@@ -48,11 +48,11 @@ impl<M: RequestResetTokenMaterial> RequestResetTokenAction<M> {
         request_decoder: impl RequestResetTokenRequestDecoder,
     ) -> MethodResult<RequestResetTokenState> {
         let pubsub = self.pubsub;
-        let request_token = self.material.extract();
+        let m = self.material;
 
         let fields = request_decoder.decode();
 
-        request_reset_token(&request_token, fields, |event| {
+        request_reset_token(m.request_token(), fields, |event| {
             pubsub.post(RequestResetTokenState::RequestToken(event))
         })
         .await

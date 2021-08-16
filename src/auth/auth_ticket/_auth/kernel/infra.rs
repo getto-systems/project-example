@@ -27,7 +27,7 @@ pub trait CheckAuthNonceInfra {
     fn config(&self) -> &AuthNonceConfig;
 }
 
-pub trait AuthClock: Send + Sync {
+pub trait AuthClock {
     fn now(&self) -> AuthDateTime;
 }
 

@@ -193,8 +193,11 @@ impl<'a> RenewAuthTicketMaterial for TestFeature<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
-    fn extract(self) -> (Self::Validate, Self::Encode) {
-        (self.validate, self.encode)
+    fn validate(&self) -> &Self::Validate {
+        &self.validate
+    }
+    fn encode(&self) -> &Self::Encode {
+        &self.encode
     }
 }
 

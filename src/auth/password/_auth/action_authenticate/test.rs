@@ -289,8 +289,14 @@ impl<'a> AuthenticatePasswordMaterial for TestFeature<'a> {
     type Issue = StaticIssueAuthTicketStruct<'a>;
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
-    fn extract(self) -> (Self::Authenticate, Self::Issue, Self::Encode) {
-        (self.authenticate, self.issue, self.encode)
+    fn authenticate(&self) -> &Self::Authenticate {
+        &self.authenticate
+    }
+    fn issue(&self) -> &Self::Issue {
+        &self.issue
+    }
+    fn encode(&self) -> &Self::Encode {
+        &self.encode
     }
 }
 

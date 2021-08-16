@@ -25,11 +25,15 @@ impl<'a> LogoutFeature<'a> {
     }
 }
 
+#[async_trait::async_trait]
 impl<'a> LogoutMaterial for LogoutFeature<'a> {
     type Validate = TicketValidateAuthTokenStruct<'a>;
     type Discard = DiscardAuthTicketStruct<'a>;
 
-    fn extract(self) -> (Self::Validate, Self::Discard) {
-        (self.validate, self.discard)
+    fn validate(&self) -> &Self::Validate {
+        &self.validate
+    }
+    fn discard(&self) -> &Self::Discard {
+        &self.discard
     }
 }
