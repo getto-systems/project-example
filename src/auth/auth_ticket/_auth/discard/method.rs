@@ -2,7 +2,7 @@ use getto_application::data::MethodResult;
 
 use crate::auth::auth_ticket::_auth::{
     discard::infra::DiscardAuthTicketInfra,
-    kernel::infra::{AuthClock, AuthTicketInfra, AuthTicketRepository},
+    kernel::infra::{AuthClock, AuthTicketRepository},
 };
 
 use super::event::DiscardAuthTicketEvent;
@@ -14,9 +14,8 @@ pub async fn discard_auth_ticket<S>(
     auth_ticket: AuthTicket,
     post: impl Fn(DiscardAuthTicketEvent) -> S,
 ) -> MethodResult<S> {
-    let ticket_infra = infra.ticket_infra();
-    let clock = ticket_infra.clock();
-    let ticket_repository = ticket_infra.ticket_repository();
+    let clock = infra.clock();
+    let ticket_repository = infra.ticket_repository();
 
     ticket_repository
         .discard(auth_ticket, clock.now())

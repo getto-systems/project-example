@@ -1,44 +1,59 @@
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_auth::kernel::init::AuthTicketStruct;
+use crate::auth::auth_ticket::_auth::kernel::init::{
+    clock::ChronoAuthClock, ticket_repository::MysqlAuthTicketRepository,
+};
 
 use super::infra::DiscardAuthTicketInfra;
 
 pub struct DiscardAuthTicketStruct<'a> {
-    ticket_infra: AuthTicketStruct<'a>,
+    clock: ChronoAuthClock,
+    ticket_repository: MysqlAuthTicketRepository<'a>,
 }
 
 impl<'a> DiscardAuthTicketStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature) -> Self {
         Self {
-            ticket_infra: AuthTicketStruct::new(feature),
+            clock: ChronoAuthClock::new(),
+            ticket_repository: MysqlAuthTicketRepository::new(&feature.store.mysql),
         }
     }
 }
 
 impl<'a> DiscardAuthTicketInfra for DiscardAuthTicketStruct<'a> {
-    type TicketInfra = AuthTicketStruct<'a>;
+    type Clock = ChronoAuthClock;
+    type TicketRepository = MysqlAuthTicketRepository<'a>;
 
-    fn ticket_infra(&self) -> &Self::TicketInfra {
-        &self.ticket_infra
+    fn clock(&self) -> &Self::Clock {
+        &self.clock
+    }
+    fn ticket_repository(&self) -> &Self::TicketRepository {
+        &self.ticket_repository
     }
 }
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::auth_ticket::_auth::kernel::init::test::StaticAuthTicketStruct;
+    use crate::auth::auth_ticket::_auth::kernel::init::test::{
+        MemoryAuthTicketRepository, StaticChronoAuthClock,
+    };
 
     use super::super::infra::DiscardAuthTicketInfra;
 
     pub struct StaticDiscardAuthTicketStruct<'a> {
-        pub ticket_infra: StaticAuthTicketStruct<'a>,
+        pub clock: StaticChronoAuthClock,
+        pub ticket_repository: MemoryAuthTicketRepository<'a>,
     }
 
     impl<'a> DiscardAuthTicketInfra for StaticDiscardAuthTicketStruct<'a> {
-        type TicketInfra = StaticAuthTicketStruct<'a>;
+        type Clock = StaticChronoAuthClock;
+        type TicketRepository = MemoryAuthTicketRepository<'a>;
 
-        fn ticket_infra(&self) -> &Self::TicketInfra {
-            &self.ticket_infra
+        fn clock(&self) -> &Self::Clock {
+            &self.clock
+        }
+        fn ticket_repository(&self) -> &Self::TicketRepository {
+            &self.ticket_repository
         }
     }
 }

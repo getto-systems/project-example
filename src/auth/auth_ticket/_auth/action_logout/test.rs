@@ -9,7 +9,7 @@ use crate::auth::auth_ticket::_auth::{
     kernel::init::test::{
         MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore, MemoryAuthTicketMap,
         MemoryAuthTicketRepository, MemoryAuthTicketStore, StaticAuthNonceMetadata,
-        StaticAuthTicketStruct, StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+        StaticCheckAuthNonceStruct, StaticChronoAuthClock,
     },
     validate::init::test::{
         StaticAuthTokenDecoder, StaticAuthTokenMetadata, StaticValidateAuthTokenStruct,
@@ -188,16 +188,10 @@ impl<'a> TestFeature<'a> {
                 },
             },
             discard: StaticDiscardAuthTicketStruct {
-                ticket_infra: standard_ticket_infra(store),
+                clock: standard_clock(),
+                ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
             },
         }
-    }
-}
-
-fn standard_ticket_infra<'a>(store: &'a TestStore) -> StaticAuthTicketStruct<'a> {
-    StaticAuthTicketStruct {
-        clock: standard_clock(),
-        ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
     }
 }
 
