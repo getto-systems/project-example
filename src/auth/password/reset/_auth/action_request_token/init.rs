@@ -36,7 +36,7 @@ impl<'a> RequestResetTokenFeature<'a> {
 impl<'a> RequestResetTokenMaterial for RequestResetTokenFeature<'a> {
     type RequestToken = RequestResetTokenStruct<'a>;
 
-    fn extract(self) -> Self::RequestToken {
-        self.request_token
+    fn request_token(&self) -> &Self::RequestToken {
+        &self.request_token
     }
 }

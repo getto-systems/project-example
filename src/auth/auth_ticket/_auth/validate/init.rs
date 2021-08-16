@@ -1,7 +1,7 @@
-mod token_decoder;
-mod token_metadata;
+pub(in crate::auth) mod token_decoder;
+pub(in crate::auth) mod token_metadata;
 
-use tonic::{metadata::MetadataMap, Request};
+use tonic::metadata::MetadataMap;
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
@@ -95,8 +95,8 @@ impl<'a> ValidateAuthTokenInfra for ApiValidateAuthTokenStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    pub use super::token_decoder::test::StaticAuthTokenDecoder;
-    pub use super::token_metadata::test::StaticAuthTokenMetadata;
+    use super::token_decoder::test::StaticAuthTokenDecoder;
+    use super::token_metadata::test::StaticAuthTokenMetadata;
     use crate::auth::auth_ticket::_auth::kernel::init::test::StaticCheckAuthNonceStruct;
 
     use super::super::infra::{ValidateAuthTokenConfig, ValidateAuthTokenInfra};

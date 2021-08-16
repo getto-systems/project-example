@@ -1,12 +1,15 @@
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::init::test::{
-        StaticAuthHeaderStruct, StaticAuthNonceHeader, StaticAuthTokenHeader,
+    auth_ticket::_api::kernel::init::{
+        nonce_header::test::StaticAuthNonceHeader, test::StaticAuthHeaderStruct,
+        token_header::test::StaticAuthTokenHeader,
     },
-    password::reset::_api::request_token::init::test::{
-        StaticRequestResetTokenRequestDecoder, StaticRequestResetTokenResponseEncoder,
-        StaticRequestResetTokenService, StaticRequestResetTokenStruct,
+    password::reset::_api::request_token::init::{
+        request_decoder::test::StaticRequestResetTokenRequestDecoder,
+        request_token_service::test::StaticRequestResetTokenService,
+        response_encoder::test::StaticRequestResetTokenResponseEncoder,
+        test::StaticRequestResetTokenStruct,
     },
 };
 

@@ -1,8 +1,10 @@
-mod token_encoder;
+pub(in crate::auth) mod token_encoder;
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_auth::kernel::init::AuthTicketStruct;
+use crate::auth::auth_ticket::_auth::kernel::init::{
+    clock::ChronoAuthClock, ticket_repository::MysqlAuthTicketRepository,
+};
 use token_encoder::{
     ApiJwtAuthTokenEncoder, CookieCloudfrontTokenEncoder, TicketJwtAuthTokenEncoder,
 };
@@ -10,7 +12,8 @@ use token_encoder::{
 use super::infra::{EncodeAuthTicketConfig, EncodeAuthTicketInfra};
 
 pub struct EncodeAuthTicketStruct<'a> {
-    ticket_infra: AuthTicketStruct<'a>,
+    clock: ChronoAuthClock,
+    ticket_repository: MysqlAuthTicketRepository<'a>,
     ticket_encoder: TicketJwtAuthTokenEncoder<'a>,
     api_encoder: ApiJwtAuthTokenEncoder<'a>,
     cloudfront_encoder: CookieCloudfrontTokenEncoder<'a>,
@@ -20,7 +23,8 @@ pub struct EncodeAuthTicketStruct<'a> {
 impl<'a> EncodeAuthTicketStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature) -> Self {
         Self {
-            ticket_infra: AuthTicketStruct::new(feature),
+            clock: ChronoAuthClock::new(),
+            ticket_repository: MysqlAuthTicketRepository::new(&feature.store.mysql),
             ticket_encoder: TicketJwtAuthTokenEncoder::new(&feature.secret.ticket.encoding_key),
             api_encoder: ApiJwtAuthTokenEncoder::new(&feature.secret.api.encoding_key),
             cloudfront_encoder: CookieCloudfrontTokenEncoder::new(&feature.secret.cloudfront),
@@ -34,13 +38,17 @@ impl<'a> EncodeAuthTicketStruct<'a> {
 }
 
 impl<'a> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a> {
-    type TicketInfra = AuthTicketStruct<'a>;
+    type Clock = ChronoAuthClock;
+    type TicketRepository = MysqlAuthTicketRepository<'a>;
     type TicketEncoder = TicketJwtAuthTokenEncoder<'a>;
     type ApiEncoder = ApiJwtAuthTokenEncoder<'a>;
     type CloudfrontEncoder = CookieCloudfrontTokenEncoder<'a>;
 
-    fn ticket_infra(&self) -> &Self::TicketInfra {
-        &self.ticket_infra
+    fn clock(&self) -> &Self::Clock {
+        &self.clock
+    }
+    fn ticket_repository(&self) -> &Self::TicketRepository {
+        &self.ticket_repository
     }
     fn ticket_encoder(&self) -> &Self::TicketEncoder {
         &self.ticket_encoder
@@ -58,15 +66,18 @@ impl<'a> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    pub use super::token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder};
-    use crate::auth::auth_ticket::_auth::kernel::init::test::StaticAuthTicketStruct;
+    use super::token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder};
+    use crate::auth::auth_ticket::_auth::kernel::init::{
+        clock::test::StaticChronoAuthClock, ticket_repository::test::MemoryAuthTicketRepository,
+    };
 
     use crate::auth::auth_ticket::_auth::encode::infra::{
         EncodeAuthTicketConfig, EncodeAuthTicketInfra,
     };
 
     pub struct StaticEncodeAuthTicketStruct<'a> {
-        pub ticket_infra: StaticAuthTicketStruct<'a>,
+        pub clock: StaticChronoAuthClock,
+        pub ticket_repository: MemoryAuthTicketRepository<'a>,
         pub ticket_encoder: StaticAuthTokenEncoder,
         pub api_encoder: StaticAuthTokenEncoder,
         pub cloudfront_encoder: StaticCloudfrontTokenEncoder,
@@ -74,13 +85,17 @@ pub mod test {
     }
 
     impl<'a> EncodeAuthTicketInfra for StaticEncodeAuthTicketStruct<'a> {
-        type TicketInfra = StaticAuthTicketStruct<'a>;
+        type Clock = StaticChronoAuthClock;
+        type TicketRepository = MemoryAuthTicketRepository<'a>;
         type TicketEncoder = StaticAuthTokenEncoder;
         type ApiEncoder = StaticAuthTokenEncoder;
         type CloudfrontEncoder = StaticCloudfrontTokenEncoder;
 
-        fn ticket_infra(&self) -> &Self::TicketInfra {
-            &self.ticket_infra
+        fn clock(&self) -> &Self::Clock {
+            &self.clock
+        }
+        fn ticket_repository(&self) -> &Self::TicketRepository {
+            &self.ticket_repository
         }
         fn ticket_encoder(&self) -> &Self::TicketEncoder {
             &self.ticket_encoder

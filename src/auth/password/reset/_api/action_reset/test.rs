@@ -3,13 +3,17 @@ use std::collections::HashSet;
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::init::test::{
-        StaticAuthHeaderStruct, StaticAuthNonceHeader, StaticAuthTokenHeader,
-        StaticAuthTokenMessenger, StaticAuthTokenStruct,
+    auth_ticket::_api::kernel::init::{
+        nonce_header::test::StaticAuthNonceHeader,
+        test::{StaticAuthHeaderStruct, StaticAuthTokenStruct},
+        token_header::test::StaticAuthTokenHeader,
+        token_messenger::test::StaticAuthTokenMessenger,
     },
-    password::reset::_api::reset::init::test::{
-        StaticResetPasswordRequestDecoder, StaticResetPasswordResponseEncoder,
-        StaticResetPasswordService, StaticResetPasswordStruct,
+    password::reset::_api::reset::init::{
+        request_decoder::test::StaticResetPasswordRequestDecoder,
+        reset_service::test::StaticResetPasswordService,
+        response_encoder::test::StaticResetPasswordResponseEncoder,
+        test::StaticResetPasswordStruct,
     },
 };
 

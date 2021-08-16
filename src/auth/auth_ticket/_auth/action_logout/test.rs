@@ -6,13 +6,20 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::auth_ticket::_auth::{
     discard::init::test::StaticDiscardAuthTicketStruct,
-    kernel::init::test::{
-        MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore, MemoryAuthTicketMap,
-        MemoryAuthTicketRepository, MemoryAuthTicketStore, StaticAuthNonceMetadata,
-        StaticAuthTicketStruct, StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+    kernel::init::{
+        clock::test::StaticChronoAuthClock,
+        nonce_metadata::test::StaticAuthNonceMetadata,
+        nonce_repository::test::{
+            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+        },
+        test::StaticCheckAuthNonceStruct,
+        ticket_repository::test::{
+            MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+        },
     },
-    validate::init::test::{
-        StaticAuthTokenDecoder, StaticAuthTokenMetadata, StaticValidateAuthTokenStruct,
+    validate::init::{
+        test::StaticValidateAuthTokenStruct, token_decoder::test::StaticAuthTokenDecoder,
+        token_metadata::test::StaticAuthTokenMetadata,
     },
 };
 
@@ -128,8 +135,11 @@ impl<'a> LogoutMaterial for TestFeature<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
     type Discard = StaticDiscardAuthTicketStruct<'a>;
 
-    fn extract(self) -> (Self::Validate, Self::Discard) {
-        (self.validate, self.discard)
+    fn validate(&self) -> &Self::Validate {
+        &self.validate
+    }
+    fn discard(&self) -> &Self::Discard {
+        &self.discard
     }
 }
 
@@ -188,16 +198,10 @@ impl<'a> TestFeature<'a> {
                 },
             },
             discard: StaticDiscardAuthTicketStruct {
-                ticket_infra: standard_ticket_infra(store),
+                clock: standard_clock(),
+                ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
             },
         }
-    }
-}
-
-fn standard_ticket_infra<'a>(store: &'a TestStore) -> StaticAuthTicketStruct<'a> {
-    StaticAuthTicketStruct {
-        clock: standard_clock(),
-        ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
     }
 }
 

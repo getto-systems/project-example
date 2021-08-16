@@ -1,7 +1,7 @@
-mod clock;
-mod nonce_metadata;
-mod nonce_repository;
-mod ticket_repository;
+pub(in crate::auth) mod clock;
+pub(in crate::auth) mod nonce_metadata;
+pub(in crate::auth) mod nonce_repository;
+pub(in crate::auth) mod ticket_repository;
 
 use tonic::metadata::MetadataMap;
 
@@ -10,47 +10,8 @@ use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 use clock::ChronoAuthClock;
 use nonce_metadata::TonicAuthNonceMetadata;
 use nonce_repository::DynamoDbAuthNonceRepository;
-use ticket_repository::MysqlAuthTicketRepository;
 
-use crate::auth::auth_ticket::_auth::kernel::infra::{
-    AuthClockInfra, AuthClockInitializer, AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
-};
-
-pub struct ChronoAuthClockInitializer;
-
-impl AuthClockInitializer for ChronoAuthClockInitializer {
-    fn new(self) -> AuthClockInfra {
-        AuthClockInfra {
-            clock: Box::new(ChronoAuthClock::new()),
-        }
-    }
-}
-
-pub struct AuthTicketStruct<'a> {
-    clock: ChronoAuthClock,
-    ticket_repository: MysqlAuthTicketRepository<'a>,
-}
-
-impl<'a> AuthTicketStruct<'a> {
-    pub fn new(feature: &'a AuthOutsideFeature) -> Self {
-        Self {
-            clock: ChronoAuthClock::new(),
-            ticket_repository: MysqlAuthTicketRepository::new(&feature.store.mysql),
-        }
-    }
-}
-
-impl<'a> AuthTicketInfra for AuthTicketStruct<'a> {
-    type Clock = ChronoAuthClock;
-    type TicketRepository = MysqlAuthTicketRepository<'a>;
-
-    fn clock(&self) -> &Self::Clock {
-        &self.clock
-    }
-    fn ticket_repository(&self) -> &Self::TicketRepository {
-        &self.ticket_repository
-    }
-}
+use crate::auth::auth_ticket::_auth::kernel::infra::{AuthNonceConfig, CheckAuthNonceInfra};
 
 pub struct CheckAuthNonceStruct<'a> {
     config: AuthNonceConfig,
@@ -96,47 +57,11 @@ impl<'a> CheckAuthNonceStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    pub use super::clock::test::StaticChronoAuthClock;
-    pub use super::nonce_metadata::test::StaticAuthNonceMetadata;
-    pub use super::nonce_repository::test::{
-        MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-    };
-    pub use super::ticket_repository::test::{
-        MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
-    };
+    use super::clock::test::StaticChronoAuthClock;
+    use super::nonce_metadata::test::StaticAuthNonceMetadata;
+    use super::nonce_repository::test::MemoryAuthNonceRepository;
 
-    use crate::auth::auth_ticket::_auth::kernel::infra::{
-        AuthClockInfra, AuthClockInitializer, AuthNonceConfig, AuthTicketInfra, CheckAuthNonceInfra,
-    };
-
-    pub struct StaticAuthClockInitializer {
-        pub clock: StaticChronoAuthClock,
-    }
-
-    impl AuthClockInitializer for StaticAuthClockInitializer {
-        fn new(self) -> AuthClockInfra {
-            AuthClockInfra {
-                clock: Box::new(self.clock),
-            }
-        }
-    }
-
-    pub struct StaticAuthTicketStruct<'a> {
-        pub clock: StaticChronoAuthClock,
-        pub ticket_repository: MemoryAuthTicketRepository<'a>,
-    }
-
-    impl<'a> AuthTicketInfra for StaticAuthTicketStruct<'a> {
-        type Clock = StaticChronoAuthClock;
-        type TicketRepository = MemoryAuthTicketRepository<'a>;
-
-        fn clock(&self) -> &Self::Clock {
-            &self.clock
-        }
-        fn ticket_repository(&self) -> &Self::TicketRepository {
-            &self.ticket_repository
-        }
-    }
+    use crate::auth::auth_ticket::_auth::kernel::infra::{AuthNonceConfig, CheckAuthNonceInfra};
 
     pub struct StaticCheckAuthNonceStruct<'a> {
         pub config: AuthNonceConfig,

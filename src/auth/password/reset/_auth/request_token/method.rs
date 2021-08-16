@@ -4,12 +4,17 @@ use crate::auth::auth_ticket::_auth::kernel::method::check_nonce;
 
 use crate::auth::password::reset::_auth::request_token::event::destination_not_found;
 
-use crate::auth::password::reset::_common::request_token::infra::RequestResetTokenFieldsExtract;
-use crate::auth::password::{
-    _auth::kernel::infra::{AuthUserPasswordInfra, AuthUserPasswordRepository},
-    reset::_auth::request_token::infra::{
-        RequestResetTokenInfra, ResetTokenDestinationRepository, ResetTokenEncoder,
-        ResetTokenGenerator, ResetTokenNotifier,
+use crate::auth::{
+    auth_ticket::_auth::kernel::infra::AuthClock,
+    password::{
+        _auth::kernel::infra::AuthUserPasswordRepository,
+        reset::{
+            _auth::request_token::infra::{
+                RequestResetTokenInfra, ResetTokenDestinationRepository, ResetTokenEncoder,
+                ResetTokenGenerator, ResetTokenNotifier,
+            },
+            _common::request_token::infra::RequestResetTokenFieldsExtract,
+        },
     },
 };
 
@@ -23,8 +28,6 @@ pub async fn request_reset_token<S>(
     post: impl Fn(RequestResetTokenEvent) -> S,
 ) -> MethodResult<S> {
     let check_nonce_infra = infra.check_nonce_infra();
-    let clock_infra = infra.clock_infra();
-    let password_infra = infra.password_infra();
     let destination_repository = infra.destination_repository();
     let token_generator = infra.token_generator();
     let token_encoder = infra.token_encoder();
@@ -43,8 +46,8 @@ pub async fn request_reset_token<S>(
         .map_err(|err| post(RequestResetTokenEvent::RepositoryError(err)))?
         .ok_or_else(|| post(destination_not_found()))?;
 
-    let clock = &clock_infra.clock;
-    let password_repository = password_infra.password_repository();
+    let clock = infra.clock();
+    let password_repository = infra.password_repository();
 
     let reset_token = token_generator.generate();
 

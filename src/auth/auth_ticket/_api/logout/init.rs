@@ -1,4 +1,4 @@
-mod logout_service;
+pub(in crate::auth) mod logout_service;
 
 use actix_web::HttpRequest;
 
@@ -43,7 +43,7 @@ impl<'a> LogoutInfra for LogoutStruct<'a> {
 #[cfg(test)]
 pub mod test {
     use crate::auth::auth_ticket::_api::kernel::init::test::StaticAuthHeaderStruct;
-    pub use crate::auth::auth_ticket::_api::logout::init::logout_service::test::StaticLogoutService;
+    use super::logout_service::test::StaticLogoutService;
 
     use super::super::infra::LogoutInfra;
 

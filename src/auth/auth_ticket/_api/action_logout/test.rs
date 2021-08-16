@@ -1,8 +1,11 @@
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::auth_ticket::_api::{
-    kernel::init::test::{StaticAuthHeaderStruct, StaticAuthNonceHeader, StaticAuthTokenHeader},
-    logout::init::test::{StaticLogoutService, StaticLogoutStruct},
+    kernel::init::{
+        nonce_header::test::StaticAuthNonceHeader, test::StaticAuthHeaderStruct,
+        token_header::test::StaticAuthTokenHeader,
+    },
+    logout::init::{logout_service::test::StaticLogoutService, test::StaticLogoutStruct},
 };
 
 use super::action::{LogoutAction, LogoutMaterial};

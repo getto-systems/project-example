@@ -5,16 +5,24 @@ use getto_application_test::ActionTestRunner;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::auth_ticket::_auth::{
-    encode::init::test::{
-        StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder, StaticEncodeAuthTicketStruct,
+    encode::init::{
+        test::StaticEncodeAuthTicketStruct,
+        token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
     },
-    kernel::init::test::{
-        MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore, MemoryAuthTicketMap,
-        MemoryAuthTicketRepository, MemoryAuthTicketStore, StaticAuthNonceMetadata,
-        StaticAuthTicketStruct, StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+    kernel::init::{
+        clock::test::StaticChronoAuthClock,
+        nonce_metadata::test::StaticAuthNonceMetadata,
+        nonce_repository::test::{
+            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+        },
+        test::StaticCheckAuthNonceStruct,
+        ticket_repository::test::{
+            MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+        },
     },
-    validate::init::test::{
-        StaticAuthTokenDecoder, StaticAuthTokenMetadata, StaticValidateAuthTokenStruct,
+    validate::init::{
+        test::StaticValidateAuthTokenStruct, token_decoder::test::StaticAuthTokenDecoder,
+        token_metadata::test::StaticAuthTokenMetadata,
     },
 };
 
@@ -185,8 +193,11 @@ impl<'a> RenewAuthTicketMaterial for TestFeature<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
-    fn extract(self) -> (Self::Validate, Self::Encode) {
-        (self.validate, self.encode)
+    fn validate(&self) -> &Self::Validate {
+        &self.validate
+    }
+    fn encode(&self) -> &Self::Encode {
+        &self.encode
     }
 }
 
@@ -276,20 +287,14 @@ impl<'a> TestFeature<'a> {
                 token_decoder: token_validator,
             },
             encode: StaticEncodeAuthTicketStruct {
-                ticket_infra: standard_ticket_infra(store),
+                clock: standard_clock(),
+                ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
                 ticket_encoder: StaticAuthTokenEncoder,
                 api_encoder: StaticAuthTokenEncoder,
                 cloudfront_encoder: StaticCloudfrontTokenEncoder,
                 config: standard_encode_config(),
             },
         }
-    }
-}
-
-fn standard_ticket_infra<'a>(store: &'a TestStore) -> StaticAuthTicketStruct<'a> {
-    StaticAuthTicketStruct {
-        clock: standard_clock(),
-        ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
     }
 }
 

@@ -1,6 +1,6 @@
-mod request_decoder;
-mod reset_service;
-mod response_encoder;
+pub(in crate::auth) mod request_decoder;
+pub(in crate::auth) mod reset_service;
+pub(in crate::auth) mod response_encoder;
 
 use actix_web::HttpRequest;
 
@@ -64,9 +64,9 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    pub use super::reset_service::test::StaticResetPasswordService;
-    pub use super::request_decoder::test::StaticResetPasswordRequestDecoder;
-    pub use super::response_encoder::test::StaticResetPasswordResponseEncoder;
+    use super::reset_service::test::StaticResetPasswordService;
+    use super::request_decoder::test::StaticResetPasswordRequestDecoder;
+    use super::response_encoder::test::StaticResetPasswordResponseEncoder;
 
     use crate::auth::auth_ticket::_api::kernel::init::test::{
         StaticAuthHeaderStruct, StaticAuthTokenStruct,

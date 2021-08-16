@@ -56,13 +56,11 @@ pub mod test {
 
     pub enum StaticAuthTokenMetadata {
         Valid(AuthTokenValue),
-        NotFound, // TODO これのテスト
     }
 
     impl AuthTokenMetadata for StaticAuthTokenMetadata {
         fn token(&self) -> Result<AuthTokenValue, MetadataError> {
             match self {
-                Self::NotFound => Err(MetadataError::NotFound),
                 Self::Valid(token) => Ok(token.clone()),
             }
         }

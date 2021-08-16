@@ -2,10 +2,10 @@ use crate::auth::auth_ticket::_auth::kernel::method::check_nonce;
 
 use crate::auth::password::_common::authenticate::infra::AuthenticatePasswordFieldsExtract;
 use crate::auth::{
-    auth_user::_auth::kernel::infra::{AuthUserInfra, AuthUserRepository},
+    auth_user::_auth::kernel::infra::AuthUserRepository,
     password::_auth::{
         authenticate::infra::AuthenticatePasswordInfra,
-        kernel::infra::{AuthUserPasswordMatchInfra, AuthUserPasswordRepository, PlainPassword},
+        kernel::infra::{AuthUserPasswordRepository, PlainPassword},
     },
 };
 
@@ -19,8 +19,6 @@ pub async fn authenticate_password<S>(
     post: impl Fn(AuthenticatePasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
     let check_nonce_infra = infra.check_nonce_infra();
-    let user_infra = infra.user_infra();
-    let password_infra = infra.password_infra();
 
     check_nonce(check_nonce_infra)
         .await
@@ -30,15 +28,15 @@ pub async fn authenticate_password<S>(
     let plain_password =
         PlainPassword::validate(fields.password).map_err(|err| post(err.into()))?;
 
-    let password_repository = password_infra.password_repository();
-    let password_matcher = password_infra.password_matcher(plain_password);
+    let password_repository = infra.password_repository();
+    let password_matcher = infra.password_matcher(plain_password);
 
     let user_id = password_repository
         .verify_password(&login_id, password_matcher)
         .await
         .map_err(|err| post(err.into()))?;
 
-    let user_repository = user_infra.user_repository();
+    let user_repository = infra.user_repository();
     let user = user_repository
         .get(&user_id)
         .await

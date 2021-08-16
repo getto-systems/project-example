@@ -1,6 +1,6 @@
-mod authenticate_service;
-mod request_decoder;
-mod response_encoder;
+pub(in crate::auth) mod authenticate_service;
+pub(in crate::auth) mod request_decoder;
+pub(in crate::auth) mod response_encoder;
 
 use actix_web::HttpRequest;
 
@@ -67,9 +67,9 @@ impl<'a> AuthenticatePasswordInfra for AuthenticatePasswordStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    pub use super::authenticate_service::test::StaticAuthenticatePasswordService;
-    pub use super::request_decoder::test::StaticAuthenticatePasswordRequestDecoder;
-    pub use super::response_encoder::test::StaticAuthenticatePasswordResponseEncoder;
+    use super::authenticate_service::test::StaticAuthenticatePasswordService;
+    use super::request_decoder::test::StaticAuthenticatePasswordRequestDecoder;
+    use super::response_encoder::test::StaticAuthenticatePasswordResponseEncoder;
 
     use crate::auth::auth_ticket::_api::kernel::init::test::{
         StaticAuthHeaderStruct, StaticAuthTokenStruct,

@@ -4,13 +4,16 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     auth_ticket::_api::{
-        kernel::init::test::{
-            StaticAuthHeaderStruct, StaticAuthNonceHeader, StaticAuthTokenMessenger,
-            StaticAuthTokenHeader, StaticAuthTokenStruct,
+        kernel::init::{
+            nonce_header::test::StaticAuthNonceHeader,
+            test::{StaticAuthHeaderStruct, StaticAuthTokenStruct},
+            token_header::test::StaticAuthTokenHeader,
+            token_messenger::test::StaticAuthTokenMessenger,
         },
-        renew::init::test::{
-            StaticRenewAuthTicketResponseEncoder, StaticRenewAuthTicketService,
-            StaticRenewAuthTicketStruct,
+        renew::init::{
+            renew_service::test::StaticRenewAuthTicketService,
+            response_encoder::test::StaticRenewAuthTicketResponseEncoder,
+            test::StaticRenewAuthTicketStruct,
         },
     },
     auth_user::_common::kernel::data::{AuthUser, AuthUserExtract},

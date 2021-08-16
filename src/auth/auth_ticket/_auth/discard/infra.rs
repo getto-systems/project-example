@@ -1,7 +1,9 @@
-use crate::auth::auth_ticket::_auth::kernel::infra::AuthTicketInfra;
+use crate::auth::auth_ticket::_auth::kernel::infra::{AuthClock, AuthTicketRepository};
 
 pub trait DiscardAuthTicketInfra {
-    type TicketInfra: AuthTicketInfra;
+    type Clock: AuthClock;
+    type TicketRepository: AuthTicketRepository;
 
-    fn ticket_infra(&self) -> &Self::TicketInfra;
+    fn clock(&self) -> &Self::Clock;
+    fn ticket_repository(&self) -> &Self::TicketRepository;
 }

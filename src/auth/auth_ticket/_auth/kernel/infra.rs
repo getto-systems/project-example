@@ -16,27 +16,6 @@ use crate::{
     },
 };
 
-// TODO あとで削除
-pub struct AuthClockInfra {
-    pub clock: Box<dyn AuthClock>,
-}
-impl AuthClockInfra {
-    pub fn new(init: impl AuthClockInitializer) -> Self {
-        init.new()
-    }
-}
-pub trait AuthClockInitializer {
-    fn new(self) -> AuthClockInfra;
-}
-
-pub trait AuthTicketInfra {
-    type Clock: AuthClock;
-    type TicketRepository: AuthTicketRepository;
-
-    fn clock(&self) -> &Self::Clock;
-    fn ticket_repository(&self) -> &Self::TicketRepository;
-}
-
 pub trait CheckAuthNonceInfra {
     type Clock: AuthClock;
     type NonceMetadata: AuthNonceMetadata;
@@ -48,7 +27,7 @@ pub trait CheckAuthNonceInfra {
     fn config(&self) -> &AuthNonceConfig;
 }
 
-pub trait AuthClock: Send + Sync {
+pub trait AuthClock {
     fn now(&self) -> AuthDateTime;
 }
 

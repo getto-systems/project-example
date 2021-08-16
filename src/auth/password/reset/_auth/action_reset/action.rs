@@ -39,7 +39,9 @@ pub trait ResetPasswordMaterial {
     type Issue: IssueAuthTicketInfra;
     type Encode: EncodeAuthTicketInfra;
 
-    fn extract(self) -> (Self::Reset, Self::Issue, Self::Encode);
+    fn reset(&self) -> &Self::Reset;
+    fn issue(&self) -> &Self::Issue;
+    fn encode(&self) -> &Self::Encode;
 }
 
 pub struct ResetPasswordAction<M: ResetPasswordMaterial> {
@@ -64,21 +66,21 @@ impl<M: ResetPasswordMaterial> ResetPasswordAction<M> {
         request_decoder: impl ResetPasswordRequestDecoder,
     ) -> MethodResult<ResetPasswordState> {
         let pubsub = self.pubsub;
-        let (reset, issue, encode) = self.material.extract();
+        let m = self.material;
 
         let fields = request_decoder.decode();
 
-        let user = reset_password(&reset, fields, |event| {
+        let user = reset_password(m.reset(), fields, |event| {
             pubsub.post(ResetPasswordState::Reset(event))
         })
         .await?;
 
-        let ticket = issue_auth_ticket(&issue, user, |event| {
+        let ticket = issue_auth_ticket(m.issue(), user, |event| {
             pubsub.post(ResetPasswordState::Issue(event))
         })
         .await?;
 
-        encode_auth_ticket(&encode, ticket, |event| {
+        encode_auth_ticket(m.encode(), ticket, |event| {
             pubsub.post(ResetPasswordState::Encode(event))
         })
         .await

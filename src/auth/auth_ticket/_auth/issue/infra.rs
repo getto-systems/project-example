@@ -1,14 +1,16 @@
-use super::super::kernel::infra::AuthTicketInfra;
+use crate::auth::auth_ticket::_auth::kernel::infra::{AuthClock, AuthTicketRepository};
 
 use crate::auth::auth_ticket::{
     _auth::kernel::data::AuthTicketId, _common::kernel::data::ExpansionLimitDuration,
 };
 
 pub trait IssueAuthTicketInfra {
-    type TicketInfra: AuthTicketInfra;
+    type Clock: AuthClock;
+    type TicketRepository: AuthTicketRepository;
     type TicketIdGenerator: AuthTicketIdGenerator;
 
-    fn ticket_infra(&self) -> &Self::TicketInfra;
+    fn clock(&self) -> &Self::Clock;
+    fn ticket_repository(&self) -> &Self::TicketRepository;
     fn ticket_id_generator(&self) -> &Self::TicketIdGenerator;
     fn config(&self) -> &IssueAuthTicketConfig;
 }

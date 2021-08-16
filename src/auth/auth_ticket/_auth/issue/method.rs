@@ -1,6 +1,6 @@
 use crate::auth::auth_ticket::_auth::{
     issue::infra::{AuthTicketIdGenerator, IssueAuthTicketInfra},
-    kernel::infra::{AuthClock, AuthTicketInfra, AuthTicketRepository},
+    kernel::infra::{AuthClock, AuthTicketRepository},
 };
 
 use super::event::IssueAuthTicketEvent;
@@ -14,11 +14,10 @@ pub async fn issue_auth_ticket<S>(
     user: AuthUser,
     post: impl Fn(IssueAuthTicketEvent) -> S,
 ) -> Result<AuthTicket, S> {
-    let ticket_infra = infra.ticket_infra();
     let ticket_id_generator = infra.ticket_id_generator();
     let config = infra.config();
-    let clock = ticket_infra.clock();
-    let ticket_repository = ticket_infra.ticket_repository();
+    let clock = infra.clock();
+    let ticket_repository = infra.ticket_repository();
 
     let ticket = AuthTicket::new(ticket_id_generator.generate(), user);
 

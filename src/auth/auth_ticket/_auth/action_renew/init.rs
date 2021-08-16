@@ -29,7 +29,10 @@ impl<'a> RenewAuthTicketMaterial for RenewAuthTicketFeature<'a> {
     type Validate = TicketValidateAuthTokenStruct<'a>;
     type Encode = EncodeAuthTicketStruct<'a>;
 
-    fn extract(self) -> (Self::Validate, Self::Encode) {
-        (self.validate, self.encode)
+    fn validate(&self) -> &Self::Validate {
+        &self.validate
+    }
+    fn encode(&self) -> &Self::Encode {
+        &self.encode
     }
 }

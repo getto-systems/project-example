@@ -3,27 +3,35 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::init::test::{
-        MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-        StaticAuthClockInitializer, StaticAuthNonceMetadata, StaticCheckAuthNonceStruct,
-        StaticChronoAuthClock,
+    auth_ticket::_auth::kernel::init::{
+        clock::test::StaticChronoAuthClock,
+        nonce_metadata::test::StaticAuthNonceMetadata,
+        nonce_repository::test::{
+            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+        },
+        test::StaticCheckAuthNonceStruct,
     },
     password::{
-        _auth::kernel::init::test::{
+        _auth::kernel::init::password_repository::test::{
             MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-            MemoryAuthUserPasswordStore, StaticAuthUserPasswordStruct,
+            MemoryAuthUserPasswordStore,
         },
-        reset::_auth::request_token::init::test::{
-            MemoryResetTokenDestinationMap, MemoryResetTokenDestinationRepository,
-            MemoryResetTokenDestinationStore, StaticRequestResetTokenRequestDecoder,
-            StaticRequestResetTokenStruct, StaticResetTokenEncoder, StaticResetTokenGenerator,
-            StaticResetTokenNotifier,
+        reset::_auth::request_token::init::{
+            destination_repository::test::{
+                MemoryResetTokenDestinationMap, MemoryResetTokenDestinationRepository,
+                MemoryResetTokenDestinationStore,
+            },
+            request_decoder::test::StaticRequestResetTokenRequestDecoder,
+            test::StaticRequestResetTokenStruct,
+            token_encoder::test::StaticResetTokenEncoder,
+            token_generator::test::StaticResetTokenGenerator,
+            token_notifier::test::StaticResetTokenNotifier,
         },
     },
 };
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::infra::{AuthClockInfra, AuthNonceConfig},
+    auth_ticket::_auth::kernel::infra::AuthNonceConfig,
     password::reset::{
         _auth::request_token::infra::RequestResetTokenConfig,
         _common::request_token::infra::RequestResetTokenFieldsExtract,
@@ -175,8 +183,8 @@ struct TestFeature<'a> {
 impl<'a> RequestResetTokenMaterial for TestFeature<'a> {
     type RequestToken = StaticRequestResetTokenStruct<'a>;
 
-    fn extract(self) -> Self::RequestToken {
-        self.request_token
+    fn request_token(&self) -> &Self::RequestToken {
+        &self.request_token
     }
 }
 
@@ -227,18 +235,14 @@ impl<'a> TestFeature<'a> {
                     nonce_metadata: standard_nonce_metadata(),
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
-                clock_infra: AuthClockInfra::new(StaticAuthClockInitializer {
-                    clock: standard_clock(),
-                }),
-                password_infra: StaticAuthUserPasswordStruct {
-                    password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
-                },
+                clock: standard_clock(),
+                password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
                 destination_repository: MemoryResetTokenDestinationRepository::new(
                     &store.destination,
                 ),
                 token_generator: standard_token_generator(),
-                token_encoder: StaticResetTokenEncoder::new(),
-                token_notifier: StaticResetTokenNotifier::new(),
+                token_encoder: StaticResetTokenEncoder,
+                token_notifier: StaticResetTokenNotifier,
                 config: standard_request_token_config(),
             },
         }

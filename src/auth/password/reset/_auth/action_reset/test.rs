@@ -6,36 +6,44 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     auth_ticket::_auth::{
-        encode::init::test::{
-            StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder, StaticEncodeAuthTicketStruct,
+        encode::init::{
+            test::StaticEncodeAuthTicketStruct,
+            token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
         },
-        issue::init::test::{StaticAuthTicketIdGenerator, StaticIssueAuthTicketStruct},
-        kernel::init::test::{
-            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-            MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
-            StaticAuthClockInitializer, StaticAuthNonceMetadata, StaticAuthTicketStruct,
-            StaticCheckAuthNonceStruct, StaticChronoAuthClock,
+        issue::init::{
+            id_generator::test::StaticAuthTicketIdGenerator, test::StaticIssueAuthTicketStruct,
+        },
+        kernel::init::{
+            clock::test::StaticChronoAuthClock,
+            nonce_metadata::test::StaticAuthNonceMetadata,
+            nonce_repository::test::{
+                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+            },
+            test::StaticCheckAuthNonceStruct,
+            ticket_repository::test::{
+                MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+            },
         },
     },
-    auth_user::_auth::kernel::init::test::{
-        MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore, StaticAuthUserStruct,
+    auth_user::_auth::kernel::init::user_repository::test::{
+        MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
     },
     password::{
-        _auth::kernel::init::test::{
+        _auth::kernel::init::password_repository::test::{
             MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-            MemoryAuthUserPasswordStore, StaticAuthUserPasswordStruct,
+            MemoryAuthUserPasswordStore,
         },
-        reset::_auth::reset::init::test::{
-            StaticResetPasswordRequestDecoder, StaticResetPasswordStruct, StaticResetTokenDecoder,
+        reset::_auth::reset::init::{
+            request_decoder::test::StaticResetPasswordRequestDecoder,
+            test::StaticResetPasswordStruct, token_decoder::test::StaticResetTokenDecoder,
         },
     },
 };
 
 use crate::auth::{
     auth_ticket::_auth::{
-        encode::infra::EncodeAuthTicketConfig,
-        issue::infra::IssueAuthTicketConfig,
-        kernel::infra::{AuthClockInfra, AuthNonceConfig},
+        encode::infra::EncodeAuthTicketConfig, issue::infra::IssueAuthTicketConfig,
+        kernel::infra::AuthNonceConfig,
     },
     password::reset::_common::reset::infra::ResetPasswordFieldsExtract,
 };
@@ -359,8 +367,14 @@ impl<'a> ResetPasswordMaterial for TestFeature<'a> {
     type Issue = StaticIssueAuthTicketStruct<'a>;
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
-    fn extract(self) -> (Self::Reset, Self::Issue, Self::Encode) {
-        (self.reset, self.issue, self.encode)
+    fn reset(&self) -> &Self::Reset {
+        &self.reset
+    }
+    fn issue(&self) -> &Self::Issue {
+        &self.issue
+    }
+    fn encode(&self) -> &Self::Encode {
+        &self.encode
     }
 }
 
@@ -446,39 +460,28 @@ impl<'a> TestFeature<'a> {
                     nonce_metadata: standard_nonce_metadata(),
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
-                clock_infra: AuthClockInfra::new(StaticAuthClockInitializer {
-                    clock: standard_clock(),
-                }),
-                user_infra: StaticAuthUserStruct {
-                    user_repository: MemoryAuthUserRepository::new(&store.user),
-                },
-                password_infra: StaticAuthUserPasswordStruct {
-                    password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
-                },
+                clock: standard_clock(),
+                user_repository: MemoryAuthUserRepository::new(&store.user),
+                password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
                 token_decoder,
             },
             issue: StaticIssueAuthTicketStruct {
-                ticket_infra: standard_ticket_infra(store),
+                clock: standard_clock(),
+                ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
                 ticket_id_generator: StaticAuthTicketIdGenerator::new(AuthTicketId::new(
                     "ticket-id".into(),
                 )),
                 config: standard_issue_config(),
             },
             encode: StaticEncodeAuthTicketStruct {
-                ticket_infra: standard_ticket_infra(store),
+                clock: standard_clock(),
+                ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
                 ticket_encoder: StaticAuthTokenEncoder,
                 api_encoder: StaticAuthTokenEncoder,
                 cloudfront_encoder: StaticCloudfrontTokenEncoder,
                 config: standard_encode_config(),
             },
         }
-    }
-}
-
-fn standard_ticket_infra<'a>(store: &'a TestStore) -> StaticAuthTicketStruct<'a> {
-    StaticAuthTicketStruct {
-        clock: standard_clock(),
-        ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
     }
 }
 

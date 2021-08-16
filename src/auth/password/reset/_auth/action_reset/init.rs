@@ -42,7 +42,13 @@ impl<'a> ResetPasswordMaterial for ResetPasswordFeature<'a> {
     type Issue = IssueAuthTicketStruct<'a>;
     type Encode = EncodeAuthTicketStruct<'a>;
 
-    fn extract(self) -> (Self::Reset, Self::Issue, Self::Encode) {
-        (self.reset, self.issue, self.encode)
+    fn reset(&self) -> &Self::Reset {
+        &self.reset
+    }
+    fn issue(&self) -> &Self::Issue {
+        &self.issue
+    }
+    fn encode(&self) -> &Self::Encode {
+        &self.encode
     }
 }
