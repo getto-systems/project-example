@@ -15,19 +15,17 @@ use crate::{
 pub trait RequestResetTokenInfra {
     type NonceHeader: AuthNonceHeader;
     type TokenHeader: AuthTokenHeader;
-    type RequestDecoder: RequestResetTokenRequestDecoder;
     type RequestTokenService: RequestResetTokenService;
     type ResponseEncoder: RequestResetTokenResponseEncoder;
 
     fn nonce_header(&self) -> &Self::NonceHeader;
     fn token_header(&self) -> &Self::TokenHeader;
-    fn request_decoder(&self) -> &Self::RequestDecoder;
     fn request_token_service(&self) -> &Self::RequestTokenService;
     fn response_encoder(&self) -> &Self::ResponseEncoder;
 }
 
 pub trait RequestResetTokenRequestDecoder {
-    fn decode(&self) -> Result<RequestResetTokenFieldsExtract, MessageError>;
+    fn decode(self) -> Result<RequestResetTokenFieldsExtract, MessageError>;
 }
 
 #[async_trait::async_trait]

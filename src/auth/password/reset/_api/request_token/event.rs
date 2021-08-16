@@ -1,18 +1,15 @@
 use std::fmt::Display;
 
-use crate::{
-    auth::{
+use crate::{auth::{
         _api::service::data::AuthServiceError,
         password::reset::_api::request_token::data::RequestResetTokenResult,
-    },
-    z_details::_api::{message::data::MessageError, request::data::HeaderError},
-};
+    }, z_details::_api::{message::data::MessageError, request::data::HeaderError}};
 
 pub enum RequestResetTokenEvent {
     Result(RequestResetTokenResult),
     HeaderError(HeaderError),
     ServiceError(AuthServiceError),
-    MessageError(MessageError),
+    MessageError(MessageError)
 }
 
 const SUCCESS: &'static str = "request reset token";

@@ -11,8 +11,8 @@ use crate::auth::password::_api::authenticate::{
 use crate::z_details::_api::message::data::MessageError;
 
 pub enum AuthenticatePasswordState {
-    MessageError(MessageError),
     Authenticate(AuthenticatePasswordEvent),
+    MessageError(MessageError),
 }
 
 impl Display for AuthenticatePasswordState {

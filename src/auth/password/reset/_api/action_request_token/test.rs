@@ -23,11 +23,12 @@ async fn success_request_token() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let feature = TestFeature::standard();
+    let request_decoder = standard_request_decoder();
 
     let mut action = RequestResetTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite().await;
+    let result = action.ignite(request_decoder).await;
     assert_state(vec!["request reset token"]);
     assert!(result.is_ok());
 }
@@ -50,7 +51,6 @@ impl TestFeature {
             request_token: StaticRequestResetTokenStruct {
                 nonce_header: StaticAuthNonceHeader::Valid(AuthNonceValue::new("NONCE".into())),
                 token_header: StaticAuthTokenHeader::Valid(AuthTokenValue::new("TOKEN".into())),
-                request_decoder: standard_request_decoder(),
                 request_token_service: StaticRequestResetTokenService,
                 response_encoder: StaticRequestResetTokenResponseEncoder,
             },

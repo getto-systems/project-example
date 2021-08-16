@@ -2,17 +2,24 @@ use std::fmt::Display;
 
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
+use crate::auth::password::reset::_api::request_token::infra::RequestResetTokenRequestDecoder;
 use crate::auth::password::reset::_api::request_token::{
     event::RequestResetTokenEvent, infra::RequestResetTokenInfra, method::request_reset_token,
 };
 
+use crate::z_details::_api::message::data::MessageError;
+
 pub enum RequestResetTokenState {
     RequestToken(RequestResetTokenEvent),
+    MessageError(MessageError),
 }
 
 impl Display for RequestResetTokenState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::MessageError(err) => {
+                write!(f, "request reset token error; message error: {}", err)
+            }
             Self::RequestToken(event) => write!(f, "{}", event),
         }
     }
@@ -41,11 +48,18 @@ impl<M: RequestResetTokenMaterial> RequestResetTokenAction<M> {
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<RequestResetTokenState> {
+    pub async fn ignite(
+        self,
+        request_decoder: impl RequestResetTokenRequestDecoder,
+    ) -> MethodResult<RequestResetTokenState> {
         let pubsub = self.pubsub;
         let m = self.material;
 
-        request_reset_token(m.request_token(), |event| {
+        let fields = request_decoder
+            .decode()
+            .map_err(RequestResetTokenState::MessageError)?;
+
+        request_reset_token(m.request_token(), fields, |event| {
             pubsub.post(RequestResetTokenState::RequestToken(event))
         })
         .await

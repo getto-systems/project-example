@@ -12,6 +12,7 @@ impl RequestResetTokenState {
     pub const fn log_level(&self) -> LogLevel {
         match self {
             Self::RequestToken(event) => event.log_level(),
+            Self::MessageError(err) => err.log_level(),
         }
     }
 }

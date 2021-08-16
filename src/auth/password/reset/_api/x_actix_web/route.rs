@@ -9,10 +9,8 @@ use crate::x_outside_feature::_api::{
     logger::{app_logger, generate_request_id},
 };
 
-use crate::auth::password::reset::_api::{
-    action_request_token::action::RequestResetTokenAction,
-    action_reset::action::ResetPasswordAction,
-};
+use crate::auth::password::reset::_api::action_request_token::init::RequestResetTokenFeature;
+use crate::auth::password::reset::_api::action_reset::action::ResetPasswordAction;
 
 pub fn scope_reset() -> Scope {
     web::scope("/reset").service(request_token).service(reset)
@@ -22,9 +20,11 @@ pub fn scope_reset() -> Scope {
 async fn request_token(data: AppData, request: HttpRequest, body: String) -> impl Responder {
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
-    let mut action = RequestResetTokenAction::new(&data.auth, &request_id, &request, body);
+    let mut action = RequestResetTokenFeature::action(&data.auth, &request_id, &request);
     action.subscribe(move |state| logger.log(state.log_level(), state));
-    flatten(action.ignite().await).respond_to(&request)
+
+    let request_decoder = RequestResetTokenFeature::request_decoder(body);
+    flatten(action.ignite(request_decoder).await).respond_to(&request)
 }
 
 #[post("")]
