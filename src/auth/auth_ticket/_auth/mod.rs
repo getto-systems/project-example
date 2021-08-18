@@ -1,5 +1,6 @@
 pub mod action_logout;
 pub mod action_renew;
+pub mod action_validate;
 pub mod discard;
 pub mod encode;
 pub mod issue;

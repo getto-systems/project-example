@@ -30,6 +30,7 @@ async fn main() {
         )
         .add_service(server.auth.auth_ticket.logout())
         .add_service(server.auth.auth_ticket.renew())
+        .add_service(server.auth.auth_ticket.validate())
         .add_service(server.auth.password.authenticate())
         .add_service(server.auth.password.reset.request_token())
         .add_service(server.auth.password.reset.reset())

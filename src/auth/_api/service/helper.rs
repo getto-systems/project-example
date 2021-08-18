@@ -4,7 +4,7 @@ use tonic::{metadata::MetadataValue, Request};
 
 use crate::{
     auth::auth_ticket::_common::kernel::x_tonic::metadata::{
-        METADATA_NONCE, METADATA_TICKET_TOKEN,
+        METADATA_NONCE, METADATA_TOKEN,
     },
     x_outside_feature::_common::metadata::METADATA_REQUEST_ID,
 };
@@ -36,7 +36,7 @@ pub fn set_metadata<T>(
     }
     if let Some(token) = token {
         request.metadata_mut().append(
-            METADATA_TICKET_TOKEN,
+            METADATA_TOKEN,
             MetadataValue::from_str(&token.extract()).map_err(infra_error)?,
         );
     }

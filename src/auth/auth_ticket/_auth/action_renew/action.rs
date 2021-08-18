@@ -11,6 +11,8 @@ use crate::auth::auth_ticket::_auth::{
     },
 };
 
+use crate::auth::auth_user::_common::kernel::data::RequireAuthRoles;
+
 pub enum RenewAuthTicketState {
     Validate(ValidateAuthTokenEvent),
     Encode(EncodeAuthTicketEvent),
@@ -54,7 +56,7 @@ impl<M: RenewAuthTicketMaterial> RenewAuthTicketAction<M> {
         let pubsub = self.pubsub;
         let m = self.material;
 
-        let ticket = validate_auth_token(m.validate(), |event| {
+        let ticket = validate_auth_token(m.validate(), RequireAuthRoles::Nothing, |event| {
             pubsub.post(RenewAuthTicketState::Validate(event))
         })
         .await?;

@@ -10,6 +10,7 @@ impl ValidateAuthTokenEvent {
             Self::Success(_) => LogLevel::Audit,
             Self::NonceError(err) => err.log_level(),
             Self::TokenError(err) => err.log_level(),
+            Self::PermissionError(err) => err.log_level(),
         }
     }
 }
@@ -21,7 +22,6 @@ impl ValidateAuthTokenError {
             Self::MetadataError(err) => err.log_level(),
             Self::DecodeError(err) => err.log_level(),
             Self::RepositoryError(err) => err.log_level(),
-            Self::PermissionError(err) => err.log_level(),
         }
     }
 }
