@@ -4,7 +4,7 @@ use crate::auth::{
     auth_ticket::_auth::kernel::infra::AuthClock,
     auth_user::_auth::kernel::infra::AuthUserRepository,
     password::{
-        _auth::kernel::infra::{AuthUserPasswordRepository, PlainPassword, ResetTokenEntry},
+        _auth::kernel::infra::{ResetPasswordRepository, PlainPassword, ResetTokenEntry},
         reset::{
             _auth::reset::infra::{ResetPasswordInfra, ResetTokenDecoder},
             _common::reset::infra::ResetPasswordFieldsExtract,
@@ -29,8 +29,6 @@ pub async fn reset_password<S>(
     fields: ResetPasswordFieldsExtract,
     post: impl Fn(ResetPasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
-    let token_decoder = infra.token_decoder();
-
     check_nonce(infra.check_nonce_infra())
         .await
         .map_err(|err| post(ResetPasswordEvent::NonceError(err)))?;
@@ -40,6 +38,8 @@ pub async fn reset_password<S>(
         PlainPassword::validate(fields.password).map_err(|err| post(err.into()))?;
     let reset_token =
         ResetTokenEncoded::validate(fields.reset_token).map_err(|err| post(err.into()))?;
+
+    let token_decoder = infra.token_decoder();
 
     let reset_token = token_decoder
         .decode(&reset_token)

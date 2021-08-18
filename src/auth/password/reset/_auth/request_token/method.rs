@@ -7,7 +7,7 @@ use crate::auth::password::reset::_auth::request_token::event::destination_not_f
 use crate::auth::{
     auth_ticket::_auth::kernel::infra::AuthClock,
     password::{
-        _auth::kernel::infra::AuthUserPasswordRepository,
+        _auth::kernel::infra::RegisterResetTokenRepository,
         reset::{
             _auth::request_token::infra::{
                 RequestResetTokenInfra, ResetTokenDestinationRepository, ResetTokenEncoder,

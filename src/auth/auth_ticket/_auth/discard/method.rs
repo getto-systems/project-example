@@ -2,7 +2,7 @@ use getto_application::data::MethodResult;
 
 use crate::auth::auth_ticket::_auth::{
     discard::infra::DiscardAuthTicketInfra,
-    kernel::infra::{AuthClock, AuthTicketRepository},
+    kernel::infra::{AuthClock, DiscardAuthTicketRepository},
 };
 
 use super::event::DiscardAuthTicketEvent;

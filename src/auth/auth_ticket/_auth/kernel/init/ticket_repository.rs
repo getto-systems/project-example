@@ -3,7 +3,9 @@ use sqlx::{query, MySqlPool};
 
 use crate::z_details::_common::repository::mysql::helper::mysql_error;
 
-use crate::auth::auth_ticket::_auth::kernel::infra::AuthTicketRepository;
+use crate::auth::auth_ticket::_auth::kernel::infra::{
+    AuthTicketRepository, DiscardAuthTicketRepository, IssueAuthTicketRepository,
+};
 
 use crate::{
     auth::auth_ticket::_auth::kernel::data::{AuthDateTime, AuthTicket, ExpansionLimitDateTime},
@@ -21,7 +23,7 @@ impl<'a> MysqlAuthTicketRepository<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
+impl<'a> IssueAuthTicketRepository for MysqlAuthTicketRepository<'a> {
     async fn issue(
         &self,
         ticket: AuthTicket,
@@ -50,7 +52,10 @@ impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
 
         Ok(())
     }
+}
 
+#[async_trait::async_trait]
+impl<'a> DiscardAuthTicketRepository for MysqlAuthTicketRepository<'a> {
     async fn discard(
         &self,
         ticket: AuthTicket,
@@ -109,7 +114,10 @@ impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
 
         Ok(())
     }
+}
 
+#[async_trait::async_trait]
+impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
     async fn expansion_limit(
         &self,
         ticket: &AuthTicket,
@@ -139,7 +147,9 @@ pub mod test {
 
     use crate::z_details::_common::repository::helper::infra_error;
 
-    use crate::auth::auth_ticket::_auth::kernel::infra::AuthTicketRepository;
+    use crate::auth::auth_ticket::_auth::kernel::infra::{
+        AuthTicketRepository, DiscardAuthTicketRepository, IssueAuthTicketRepository,
+    };
 
     use crate::{
         auth::auth_ticket::_auth::kernel::data::{
@@ -194,7 +204,7 @@ pub mod test {
     }
 
     #[async_trait::async_trait]
-    impl<'a> AuthTicketRepository for MemoryAuthTicketRepository<'a> {
+    impl<'a> IssueAuthTicketRepository for MemoryAuthTicketRepository<'a> {
         async fn issue(
             &self,
             ticket: AuthTicket,
@@ -212,7 +222,10 @@ pub mod test {
 
             Ok(())
         }
+    }
 
+    #[async_trait::async_trait]
+    impl<'a> DiscardAuthTicketRepository for MemoryAuthTicketRepository<'a> {
         async fn discard(
             &self,
             auth_ticket: AuthTicket,
@@ -226,7 +239,10 @@ pub mod test {
 
             Ok(())
         }
+    }
 
+    #[async_trait::async_trait]
+    impl<'a> AuthTicketRepository for MemoryAuthTicketRepository<'a> {
         async fn expansion_limit(
             &self,
             ticket: &AuthTicket,

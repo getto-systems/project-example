@@ -2,9 +2,7 @@ use crate::auth::{
     auth_ticket::_auth::kernel::infra::CheckAuthNonceInfra,
     auth_user::_auth::kernel::infra::AuthUserRepository,
     password::{
-        _auth::kernel::infra::{
-            AuthUserPasswordMatcher, AuthUserPasswordRepository, PlainPassword,
-        },
+        _auth::kernel::infra::{AuthUserPasswordMatcher, PlainPassword, VerifyPasswordRepository},
         _common::authenticate::infra::AuthenticatePasswordFieldsExtract,
     },
 };
@@ -12,7 +10,7 @@ use crate::auth::{
 pub trait AuthenticatePasswordInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;
     type UserRepository: AuthUserRepository;
-    type PasswordRepository: AuthUserPasswordRepository;
+    type PasswordRepository: VerifyPasswordRepository;
     type PasswordMatcher: AuthUserPasswordMatcher;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
