@@ -1,3 +1,4 @@
+pub(in crate::auth) mod request_decoder;
 pub(in crate::auth) mod token_decoder;
 pub(in crate::auth) mod token_metadata;
 
@@ -7,35 +8,29 @@ use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::auth_ticket::_auth::kernel::init::CheckAuthNonceStruct;
 use token_decoder::{JwtApiTokenDecoder, JwtAuthTokenDecoder};
-use token_metadata::{ApiAuthTokenMetadata, TicketAuthTokenMetadata};
+use token_metadata::TonicAuthTokenMetadata;
 
-use super::infra::{ValidateAuthTokenConfig, ValidateAuthTokenInfra};
-
-use crate::auth::auth_user::_auth::kernel::data::RequireAuthRoles;
+use super::infra::ValidateAuthTokenInfra;
 
 pub struct TicketValidateAuthTokenStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
-    token_metadata: TicketAuthTokenMetadata<'a>,
+    token_metadata: TonicAuthTokenMetadata<'a>,
     token_decoder: JwtAuthTokenDecoder<'a>,
-    config: ValidateAuthTokenConfig,
 }
 
 impl<'a> TicketValidateAuthTokenStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature, metadata: &'a MetadataMap) -> Self {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
-            token_metadata: TicketAuthTokenMetadata::new(metadata),
+            token_metadata: TonicAuthTokenMetadata::new(metadata),
             token_decoder: JwtAuthTokenDecoder::new(&feature.secret.ticket.decoding_key),
-            config: ValidateAuthTokenConfig {
-                require_roles: RequireAuthRoles::Nothing, // ticket 検証では role は不問
-            },
         }
     }
 }
 
 impl<'a> ValidateAuthTokenInfra for TicketValidateAuthTokenStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
-    type TokenMetadata = TicketAuthTokenMetadata<'a>;
+    type TokenMetadata = TonicAuthTokenMetadata<'a>;
     type TokenDecoder = JwtAuthTokenDecoder<'a>;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
@@ -47,28 +42,19 @@ impl<'a> ValidateAuthTokenInfra for TicketValidateAuthTokenStruct<'a> {
     fn token_decoder(&self) -> &Self::TokenDecoder {
         &self.token_decoder
     }
-    fn config(&self) -> &ValidateAuthTokenConfig {
-        &self.config
-    }
 }
 
 pub struct ApiValidateAuthTokenStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
-    token_metadata: ApiAuthTokenMetadata<'a>,
+    token_metadata: TonicAuthTokenMetadata<'a>,
     token_decoder: JwtApiTokenDecoder<'a>,
-    config: ValidateAuthTokenConfig,
 }
 
 impl<'a> ApiValidateAuthTokenStruct<'a> {
-    pub fn new(
-        feature: &'a AuthOutsideFeature,
-        metadata: &'a MetadataMap,
-        require_roles: RequireAuthRoles,
-    ) -> Self {
+    pub fn new(feature: &'a AuthOutsideFeature, metadata: &'a MetadataMap) -> Self {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
-            config: ValidateAuthTokenConfig { require_roles },
-            token_metadata: ApiAuthTokenMetadata::new(metadata),
+            token_metadata: TonicAuthTokenMetadata::new(metadata),
             token_decoder: JwtApiTokenDecoder::new(&feature.secret.api.decoding_key),
         }
     }
@@ -76,7 +62,7 @@ impl<'a> ApiValidateAuthTokenStruct<'a> {
 
 impl<'a> ValidateAuthTokenInfra for ApiValidateAuthTokenStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
-    type TokenMetadata = ApiAuthTokenMetadata<'a>;
+    type TokenMetadata = TonicAuthTokenMetadata<'a>;
     type TokenDecoder = JwtApiTokenDecoder<'a>;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
@@ -88,9 +74,6 @@ impl<'a> ValidateAuthTokenInfra for ApiValidateAuthTokenStruct<'a> {
     fn token_decoder(&self) -> &Self::TokenDecoder {
         &self.token_decoder
     }
-    fn config(&self) -> &ValidateAuthTokenConfig {
-        &self.config
-    }
 }
 
 #[cfg(test)]
@@ -99,13 +82,12 @@ pub mod test {
     use super::token_metadata::test::StaticAuthTokenMetadata;
     use crate::auth::auth_ticket::_auth::kernel::init::test::StaticCheckAuthNonceStruct;
 
-    use super::super::infra::{ValidateAuthTokenConfig, ValidateAuthTokenInfra};
+    use super::super::infra::ValidateAuthTokenInfra;
 
     pub struct StaticValidateAuthTokenStruct<'a> {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
         pub token_metadata: StaticAuthTokenMetadata,
         pub token_decoder: StaticAuthTokenDecoder,
-        pub config: ValidateAuthTokenConfig,
     }
 
     impl<'a> ValidateAuthTokenInfra for StaticValidateAuthTokenStruct<'a> {
@@ -121,9 +103,6 @@ pub mod test {
         }
         fn token_decoder(&self) -> &Self::TokenDecoder {
             &self.token_decoder
-        }
-        fn config(&self) -> &ValidateAuthTokenConfig {
-            &self.config
         }
     }
 }

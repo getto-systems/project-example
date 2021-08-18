@@ -1,8 +1,6 @@
 use tonic::metadata::MetadataMap;
 
-use crate::auth::auth_ticket::_common::kernel::x_tonic::metadata::{
-    METADATA_API_TOKEN, METADATA_TICKET_TOKEN,
-};
+use crate::auth::auth_ticket::_common::kernel::x_tonic::metadata::METADATA_TOKEN;
 
 use crate::z_details::_auth::request::helper::metadata;
 
@@ -13,35 +11,19 @@ use crate::{
     z_details::_auth::request::data::MetadataError,
 };
 
-pub struct TicketAuthTokenMetadata<'a> {
+pub struct TonicAuthTokenMetadata<'a> {
     metadata: &'a MetadataMap,
 }
 
-impl<'a> TicketAuthTokenMetadata<'a> {
+impl<'a> TonicAuthTokenMetadata<'a> {
     pub const fn new(metadata: &'a MetadataMap) -> Self {
         Self { metadata }
     }
 }
 
-impl<'a> AuthTokenMetadata for TicketAuthTokenMetadata<'a> {
+impl<'a> AuthTokenMetadata for TonicAuthTokenMetadata<'a> {
     fn token(&self) -> Result<Option<AuthToken>, MetadataError> {
-        metadata(&self.metadata, METADATA_TICKET_TOKEN).map(|value| value.map(AuthToken::new))
-    }
-}
-
-pub struct ApiAuthTokenMetadata<'a> {
-    metadata: &'a MetadataMap,
-}
-
-impl<'a> ApiAuthTokenMetadata<'a> {
-    pub const fn new(metadata: &'a MetadataMap) -> Self {
-        Self { metadata }
-    }
-}
-
-impl<'a> AuthTokenMetadata for ApiAuthTokenMetadata<'a> {
-    fn token(&self) -> Result<Option<AuthToken>, MetadataError> {
-        metadata(&self.metadata, METADATA_API_TOKEN).map(|value| value.map(AuthToken::new))
+        metadata(&self.metadata, METADATA_TOKEN).map(|value| value.map(AuthToken::new))
     }
 }
 

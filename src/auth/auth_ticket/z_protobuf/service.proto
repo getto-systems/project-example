@@ -36,3 +36,14 @@ enum CloudfrontTokenKindPb {
     Policy = 1;
     Signature = 2;
 }
+
+service ValidateApiTokenPb {
+    rpc Validate (ValidateApiTokenRequestPb) returns (ValidateApiTokenResponsePb);
+}
+message ValidateApiTokenRequestPb {
+    bool allow_any_role = 1;
+    repeated string require_roles = 2;
+}
+message ValidateApiTokenResponsePb {
+    auth.auth_user.service.AuthUserPb user = 1;
+}

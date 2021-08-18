@@ -8,8 +8,8 @@ use chrono::{DateTime, Duration, Utc};
 
 use crate::{
     auth::auth_user::{
-        _auth::kernel::data::{AuthPermission, RequireAuthRoles},
-        _common::kernel::data::{AuthUser, AuthUserExtract, GrantedAuthRoles},
+        _auth::kernel::data::AuthPermission,
+        _common::kernel::data::{AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles},
     },
     z_details::{_auth::request::data::MetadataError, _common::repository::data::RepositoryError},
 };
@@ -108,7 +108,6 @@ impl Display for AuthTicketId {
     }
 }
 
-// TODO これは _auth に移動できるはず
 #[derive(Clone)]
 pub struct AuthDateTime(DateTime<Utc>);
 

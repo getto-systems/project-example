@@ -28,19 +28,15 @@ use crate::auth::auth_ticket::_auth::{
 
 use crate::auth::auth_ticket::_auth::{
     encode::infra::EncodeAuthTicketConfig, kernel::infra::AuthNonceConfig,
-    validate::infra::ValidateAuthTokenConfig,
 };
 
 use super::action::{RenewAuthTicketAction, RenewAuthTicketMaterial};
 
-use crate::auth::{
-    auth_ticket::{
-        _auth::kernel::data::{
-            AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
-        },
-        _common::kernel::data::{AuthNonce, AuthToken},
+use crate::auth::auth_ticket::{
+    _auth::kernel::data::{
+        AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
     },
-    auth_user::_auth::kernel::data::RequireAuthRoles,
+    _common::kernel::data::{AuthNonce, AuthToken},
 };
 
 #[tokio::test]
@@ -48,7 +44,7 @@ async fn success_allow_for_any_role() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::allow_for_any_role(&store);
+    let feature = TestFeature::standard(&store);
 
     let mut action = RenewAuthTicketAction::with_material(feature);
     action.subscribe(handler);
@@ -60,42 +56,6 @@ async fn success_allow_for_any_role() {
         "encode success",
     ]);
     assert!(result.is_ok());
-}
-
-#[tokio::test]
-async fn success_allow_for_something_role() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::standard();
-    let feature = TestFeature::allow_for_something_role(&store);
-
-    let mut action = RenewAuthTicketAction::with_material(feature);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
-        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
-        "encode success",
-    ]);
-    assert!(result.is_ok());
-}
-
-#[tokio::test]
-async fn error_allow_for_something_role_but_not_granted() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::standard();
-    let feature = TestFeature::allow_for_something_role_but_not_granted(&store);
-
-    let mut action = RenewAuthTicketAction::with_material(feature);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "validate error; auth token error: user permission denied: granted: [], require: any [something]",
-    ]);
-    assert!(!result.is_ok());
 }
 
 #[tokio::test]
@@ -118,7 +78,7 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let feature = TestFeature::allow_for_any_role(&store);
+    let feature = TestFeature::standard(&store);
 
     let mut action = RenewAuthTicketAction::with_material(feature);
     action.subscribe(handler);
@@ -137,7 +97,7 @@ async fn success_limited_ticket() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::limited_ticket();
-    let feature = TestFeature::allow_for_any_role(&store);
+    let feature = TestFeature::standard(&store);
 
     let mut action = RenewAuthTicketAction::with_material(feature);
     action.subscribe(handler);
@@ -156,7 +116,7 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let feature = TestFeature::allow_for_any_role(&store);
+    let feature = TestFeature::standard(&store);
 
     let mut action = RenewAuthTicketAction::with_material(feature);
     action.subscribe(handler);
@@ -171,7 +131,7 @@ async fn error_no_ticket() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::no_ticket();
-    let feature = TestFeature::allow_for_any_role(&store);
+    let feature = TestFeature::standard(&store);
 
     let mut action = RenewAuthTicketAction::with_material(feature);
     action.subscribe(handler);
@@ -240,40 +200,14 @@ impl TestStore {
 }
 
 impl<'a> TestFeature<'a> {
-    fn allow_for_any_role(store: &'a TestStore) -> Self {
-        Self::with_require_roles_and_validator(
-            store,
-            RequireAuthRoles::Nothing,
-            standard_token_decoder(),
-        )
-    }
-    fn allow_for_something_role(store: &'a TestStore) -> Self {
-        Self::with_require_roles_and_validator(
-            store,
-            RequireAuthRoles::has_any(&["something"]),
-            standard_token_decoder(),
-        )
-    }
-    fn allow_for_something_role_but_not_granted(store: &'a TestStore) -> Self {
-        Self::with_require_roles_and_validator(
-            store,
-            RequireAuthRoles::has_any(&["something"]),
-            no_granted_roles_token_decoder(),
-        )
+    fn standard(store: &'a TestStore) -> Self {
+        Self::with_token_validator(store, standard_token_decoder())
     }
     fn token_expired(store: &'a TestStore) -> Self {
-        Self::with_require_roles_and_validator(
-            store,
-            RequireAuthRoles::Nothing,
-            expired_token_decoder(),
-        )
+        Self::with_token_validator(store, expired_token_decoder())
     }
 
-    fn with_require_roles_and_validator(
-        store: &'a TestStore,
-        require_roles: RequireAuthRoles,
-        token_validator: StaticAuthTokenDecoder,
-    ) -> Self {
+    fn with_token_validator(store: &'a TestStore, token_validator: StaticAuthTokenDecoder) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
                 check_nonce_infra: StaticCheckAuthNonceStruct {
@@ -282,7 +216,6 @@ impl<'a> TestFeature<'a> {
                     nonce_metadata: standard_nonce_header(),
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
-                config: ValidateAuthTokenConfig { require_roles },
                 token_metadata: standard_token_header(),
                 token_decoder: token_validator,
             },
@@ -337,16 +270,6 @@ fn standard_token_decoder() -> StaticAuthTokenDecoder {
             ticket_id: TICKET_ID.into(),
             user_id: "something-role-user-id".into(),
             granted_roles,
-        }
-        .restore(),
-    )
-}
-fn no_granted_roles_token_decoder() -> StaticAuthTokenDecoder {
-    StaticAuthTokenDecoder::Valid(
-        AuthTicketExtract {
-            ticket_id: TICKET_ID.into(),
-            user_id: "no-role-user-id".into(),
-            granted_roles: HashSet::new(),
         }
         .restore(),
     )

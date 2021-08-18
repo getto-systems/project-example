@@ -3,7 +3,6 @@ use std::{
     fmt::{Display, Formatter},
 };
 
-use crate::auth::auth_ticket::_auth::kernel::data::ValidateAuthRolesError;
 use crate::z_details::{
     _auth::request::data::MetadataError, _common::repository::data::RepositoryError,
 };
@@ -14,7 +13,6 @@ pub enum ValidateAuthTokenError {
     MetadataError(MetadataError),
     DecodeError(DecodeAuthTokenError),
     RepositoryError(RepositoryError),
-    PermissionError(ValidateAuthRolesError),
 }
 
 impl Display for ValidateAuthTokenError {
@@ -25,7 +23,6 @@ impl Display for ValidateAuthTokenError {
             Self::MetadataError(err) => write!(f, "{}: {}", label, err),
             Self::DecodeError(err) => write!(f, "{}: {}", label, err),
             Self::RepositoryError(err) => write!(f, "{}: {}", label, err),
-            Self::PermissionError(err) => write!(f, "{}: {}", label, err),
         }
     }
 }

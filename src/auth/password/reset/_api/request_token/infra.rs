@@ -1,12 +1,11 @@
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::{AuthNonceHeader, AuthTokenHeader},
+    auth_ticket::_api::kernel::infra::AuthNonceHeader,
     password::reset::_common::request_token::infra::RequestResetTokenFieldsExtract,
 };
 
 use crate::{
     auth::{
-        _api::service::data::AuthServiceError,
-        auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
+        _api::service::data::AuthServiceError, auth_ticket::_common::kernel::data::AuthNonce,
         password::reset::_api::request_token::data::RequestResetTokenResult,
     },
     z_details::_api::message::data::MessageError,
@@ -14,12 +13,10 @@ use crate::{
 
 pub trait RequestResetTokenInfra {
     type NonceHeader: AuthNonceHeader;
-    type TokenHeader: AuthTokenHeader;
     type RequestTokenService: RequestResetTokenService;
     type ResponseEncoder: RequestResetTokenResponseEncoder;
 
     fn nonce_header(&self) -> &Self::NonceHeader;
-    fn token_header(&self) -> &Self::TokenHeader;
     fn request_token_service(&self) -> &Self::RequestTokenService;
     fn response_encoder(&self) -> &Self::ResponseEncoder;
 }
@@ -33,7 +30,6 @@ pub trait RequestResetTokenService {
     async fn request_token(
         &self,
         nonce: Option<AuthNonce>,
-        token: Option<AuthToken>,
         fields: RequestResetTokenFieldsExtract,
     ) -> Result<RequestResetTokenResponse, AuthServiceError>;
 }

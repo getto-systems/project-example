@@ -2,6 +2,13 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
+use crate::auth::auth_ticket::_auth::action_validate::init::ValidateApiTokenFeature;
+use crate::auth::auth_ticket::_common::y_protobuf::service::validate_api_token_pb_server::{
+    ValidateApiTokenPb, ValidateApiTokenPbServer,
+};
+use crate::auth::auth_ticket::_common::y_protobuf::service::{
+    ValidateApiTokenRequestPb, ValidateApiTokenResponsePb,
+};
 use crate::z_details::_common::{logger::Logger, response::tonic::RespondTo};
 
 use crate::auth::auth_ticket::_common::y_protobuf::service::{
@@ -27,6 +34,9 @@ impl AuthTicketServer {
     }
     pub fn renew(&self) -> RenewAuthTicketPbServer<Renew> {
         RenewAuthTicketPbServer::new(Renew)
+    }
+    pub fn validate(&self) -> ValidateApiTokenPbServer<Validate> {
+        ValidateApiTokenPbServer::new(Validate)
     }
 }
 
@@ -63,5 +73,28 @@ impl RenewAuthTicketPb for Renew {
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         flatten(action.ignite().await).respond_to()
+    }
+}
+
+pub struct Validate;
+
+#[async_trait::async_trait]
+impl ValidateApiTokenPb for Validate {
+    async fn validate(
+        &self,
+        request: Request<ValidateApiTokenRequestPb>,
+    ) -> Result<Response<ValidateApiTokenResponsePb>, Status> {
+        let TonicRequest {
+            data,
+            metadata,
+            request,
+        } = extract_request(request);
+
+        let logger = app_logger("auth.auth_ticket.renew", &metadata);
+        let mut action = ValidateApiTokenFeature::action(&data.auth, &metadata);
+        action.subscribe(move |state| logger.log(state.log_level(), state));
+
+        let request_decoder = ValidateApiTokenFeature::request_decoder(request);
+        flatten(action.ignite(request_decoder).await).respond_to()
     }
 }

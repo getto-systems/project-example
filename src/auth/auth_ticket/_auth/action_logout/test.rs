@@ -23,20 +23,15 @@ use crate::auth::auth_ticket::_auth::{
     },
 };
 
-use crate::auth::auth_ticket::_auth::{
-    kernel::infra::AuthNonceConfig, validate::infra::ValidateAuthTokenConfig,
-};
+use crate::auth::auth_ticket::_auth::kernel::infra::AuthNonceConfig;
 
 use super::action::{LogoutAction, LogoutMaterial};
 
-use crate::auth::{
-    auth_ticket::{
-        _auth::kernel::data::{
-            AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
-        },
-        _common::kernel::data::{AuthNonce, AuthToken},
+use crate::auth::auth_ticket::{
+    _auth::kernel::data::{
+        AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
     },
-    auth_user::_auth::kernel::data::RequireAuthRoles,
+    _common::kernel::data::{AuthNonce, AuthToken},
 };
 
 #[tokio::test]
@@ -62,24 +57,6 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let feature = TestFeature::standard(&store);
-
-    let mut action = LogoutAction::with_material(feature);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "discard success",
-    ]);
-    assert!(result.is_ok());
-}
-
-#[tokio::test]
-async fn success_limited_ticket() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::limited_ticket();
     let feature = TestFeature::standard(&store);
 
     let mut action = LogoutAction::with_material(feature);
@@ -161,12 +138,6 @@ impl TestStore {
             ticket: standard_ticket_store(),
         }
     }
-    fn limited_ticket() -> Self {
-        Self {
-            nonce: standard_nonce_store(),
-            ticket: limited_ticket_store(),
-        }
-    }
     fn conflict_nonce() -> Self {
         Self {
             nonce: conflict_nonce_store(),
@@ -193,9 +164,6 @@ impl<'a> TestFeature<'a> {
                 },
                 token_metadata: standard_token_metadata(),
                 token_decoder: standard_token_validator(),
-                config: ValidateAuthTokenConfig {
-                    require_roles: RequireAuthRoles::Nothing,
-                },
             },
             discard: StaticDiscardAuthTicketStruct {
                 clock: standard_clock(),
@@ -256,11 +224,6 @@ fn conflict_nonce_store() -> MemoryAuthNonceStore {
 fn standard_ticket_store() -> MemoryAuthTicketStore {
     let limit = AuthDateTime::restore(standard_now())
         .expansion_limit(&ExpansionLimitDuration::with_duration(Duration::days(10)));
-    MemoryAuthTicketMap::with_ticket(AuthTicketId::new(TICKET_ID.into()), limit).to_store()
-}
-fn limited_ticket_store() -> MemoryAuthTicketStore {
-    let limit = AuthDateTime::restore(standard_now())
-        .expansion_limit(&ExpansionLimitDuration::with_duration(Duration::hours(1)));
     MemoryAuthTicketMap::with_ticket(AuthTicketId::new(TICKET_ID.into()), limit).to_store()
 }
 fn no_ticket_store() -> MemoryAuthTicketStore {

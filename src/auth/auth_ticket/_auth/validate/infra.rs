@@ -6,7 +6,7 @@ use crate::{
             _auth::{kernel::data::AuthTicket, validate::data::DecodeAuthTokenError},
             _common::kernel::data::AuthToken,
         },
-        auth_user::_auth::kernel::data::RequireAuthRoles,
+        auth_user::_common::kernel::data::RequireAuthRoles,
     },
     z_details::_auth::request::data::MetadataError,
 };
@@ -19,7 +19,10 @@ pub trait ValidateAuthTokenInfra {
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
     fn token_metadata(&self) -> &Self::TokenMetadata;
     fn token_decoder(&self) -> &Self::TokenDecoder;
-    fn config(&self) -> &ValidateAuthTokenConfig;
+}
+
+pub trait ValidateApiTokenRequestDecoder {
+    fn decode(self) -> RequireAuthRoles;
 }
 
 pub trait AuthTokenMetadata {
@@ -28,8 +31,4 @@ pub trait AuthTokenMetadata {
 
 pub trait AuthTokenDecoder {
     fn decode(&self, token: &AuthToken) -> Result<AuthTicket, DecodeAuthTokenError>;
-}
-
-pub struct ValidateAuthTokenConfig {
-    pub require_roles: RequireAuthRoles,
 }

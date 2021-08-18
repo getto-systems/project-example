@@ -11,6 +11,8 @@ use crate::auth::auth_ticket::_auth::{
     },
 };
 
+use crate::auth::auth_user::_common::kernel::data::RequireAuthRoles;
+
 pub enum LogoutState {
     Validate(ValidateAuthTokenEvent),
     Discard(DiscardAuthTicketEvent),
@@ -54,9 +56,10 @@ impl<M: LogoutMaterial> LogoutAction<M> {
         let pubsub = self.pubsub;
         let m = self.material;
 
-        let ticket =
-            validate_auth_token(m.validate(), |event| pubsub.post(LogoutState::Validate(event)))
-                .await?;
+        let ticket = validate_auth_token(m.validate(), RequireAuthRoles::Nothing, |event| {
+            pubsub.post(LogoutState::Validate(event))
+        })
+        .await?;
 
         discard_auth_ticket(m.discard(), ticket, |event| {
             pubsub.post(LogoutState::Discard(event))
