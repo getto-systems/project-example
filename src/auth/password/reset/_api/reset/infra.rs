@@ -1,5 +1,7 @@
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::{AuthHeaderInfra, AuthTokenInfra},
+    auth_ticket::_api::kernel::infra::{
+        AuthNonceHeader, AuthTokenHeader, AuthTokenResponseBuilder,
+    },
     password::reset::_common::reset::infra::ResetPasswordFieldsExtract,
 };
 
@@ -16,15 +18,17 @@ use crate::{
 };
 
 pub trait ResetPasswordInfra {
-    type HeaderInfra: AuthHeaderInfra;
-    type TokenInfra: AuthTokenInfra;
+    type NonceHeader: AuthNonceHeader;
+    type TokenHeader: AuthTokenHeader;
     type ResetService: ResetPasswordService;
     type ResponseEncoder: ResetPasswordResponseEncoder;
+    type ResponseBuilder: AuthTokenResponseBuilder;
 
-    fn header_infra(&self) -> &Self::HeaderInfra;
-    fn token_infra(&self) -> &Self::TokenInfra;
+    fn nonce_header(&self) -> &Self::NonceHeader;
+    fn token_header(&self) -> &Self::TokenHeader;
     fn reset_service(&self) -> &Self::ResetService;
     fn response_encoder(&self) -> &Self::ResponseEncoder;
+    fn response_builder(&self) -> &Self::ResponseBuilder;
 }
 
 pub trait ResetPasswordRequestDecoder {

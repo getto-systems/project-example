@@ -6,28 +6,13 @@ use crate::{
     z_details::_api::request::data::HeaderError,
 };
 
-pub trait AuthHeaderInfra {
-    type NonceHeader: AuthNonceHeader;
-    type TokenHeader: AuthTokenHeader;
-
-    fn nonce_header(&self) -> &Self::NonceHeader;
-    fn token_header(&self) -> &Self::TokenHeader;
+pub trait AuthNonceHeader {
+    fn nonce(&self) -> Result<Option<AuthNonce>, HeaderError>;
 }
-
-pub trait AuthTokenInfra {
-    type ResponseBuilder: AuthTokenResponseBuilder;
-
-    fn response_builder(&self) -> &Self::ResponseBuilder;
+pub trait AuthTokenHeader {
+    fn token(&self) -> Result<Option<AuthToken>, HeaderError>;
 }
 
 pub trait AuthTokenResponseBuilder {
     fn build(&self, message: AuthTokenMessage) -> AuthTokenResponse;
-}
-
-pub trait AuthNonceHeader {
-    fn nonce(&self) -> Result<Option<AuthNonce>, HeaderError>;
-}
-
-pub trait AuthTokenHeader {
-    fn token(&self) -> Result<Option<AuthToken>, HeaderError>;
 }

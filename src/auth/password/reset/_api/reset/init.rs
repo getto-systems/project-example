@@ -6,17 +6,21 @@ use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_api::kernel::init::{AuthTokenStruct, TicketAuthHeaderStruct};
+use crate::auth::auth_ticket::_api::kernel::init::response_builder::CookieAuthTokenResponseBuilder;
+use crate::auth::auth_ticket::_api::kernel::init::{
+    nonce_header::ActixWebAuthNonceHeader, token_header::TicketAuthTokenHeader,
+};
 use reset_service::TonicResetPasswordService;
 use response_encoder::ProstResetPasswordResponseEncoder;
 
 use crate::auth::password::reset::_api::reset::infra::ResetPasswordInfra;
 
 pub struct ResetPasswordStruct<'a> {
-    header_infra: TicketAuthHeaderStruct<'a>,
-    token_infra: AuthTokenStruct<'a>,
+    nonce_header: ActixWebAuthNonceHeader<'a>,
+    token_header: TicketAuthTokenHeader<'a>,
     reset_service: TonicResetPasswordService<'a>,
     response_encoder: ProstResetPasswordResponseEncoder,
+    response_builder: CookieAuthTokenResponseBuilder<'a>,
 }
 
 impl<'a> ResetPasswordStruct<'a> {
@@ -26,31 +30,36 @@ impl<'a> ResetPasswordStruct<'a> {
         request: &'a HttpRequest,
     ) -> Self {
         Self {
-            header_infra: TicketAuthHeaderStruct::new(request),
-            token_infra: AuthTokenStruct::new(feature),
+            nonce_header: ActixWebAuthNonceHeader::new(request),
+            token_header: TicketAuthTokenHeader::new(request),
             reset_service: TonicResetPasswordService::new(&feature.service, request_id),
             response_encoder: ProstResetPasswordResponseEncoder,
+            response_builder: CookieAuthTokenResponseBuilder::new(&feature.cookie),
         }
     }
 }
 
 impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
-    type HeaderInfra = TicketAuthHeaderStruct<'a>;
-    type TokenInfra = AuthTokenStruct<'a>;
+    type NonceHeader = ActixWebAuthNonceHeader<'a>;
+    type TokenHeader = TicketAuthTokenHeader<'a>;
     type ResetService = TonicResetPasswordService<'a>;
     type ResponseEncoder = ProstResetPasswordResponseEncoder;
+    type ResponseBuilder = CookieAuthTokenResponseBuilder<'a>;
 
-    fn header_infra(&self) -> &Self::HeaderInfra {
-        &self.header_infra
+    fn nonce_header(&self) -> &Self::NonceHeader {
+        &self.nonce_header
     }
-    fn token_infra(&self) -> &Self::TokenInfra {
-        &self.token_infra
+    fn token_header(&self) -> &Self::TokenHeader {
+        &self.token_header
     }
     fn reset_service(&self) -> &Self::ResetService {
         &self.reset_service
     }
     fn response_encoder(&self) -> &Self::ResponseEncoder {
         &self.response_encoder
+    }
+    fn response_builder(&self) -> &Self::ResponseBuilder {
+        &self.response_builder
     }
 }
 
@@ -59,36 +68,43 @@ pub mod test {
     use super::reset_service::test::StaticResetPasswordService;
     use super::response_encoder::test::StaticResetPasswordResponseEncoder;
 
-    use crate::auth::auth_ticket::_api::kernel::init::test::{
-        StaticAuthHeaderStruct, StaticAuthTokenStruct,
+    use crate::auth::auth_ticket::_api::kernel::init::{
+        nonce_header::test::StaticAuthNonceHeader,
+        response_builder::test::StaticAuthTokenResponseBuilder,
+        token_header::test::StaticAuthTokenHeader,
     };
 
     use super::super::infra::ResetPasswordInfra;
 
     pub struct StaticResetPasswordStruct {
-        pub header_infra: StaticAuthHeaderStruct,
-        pub token_infra: StaticAuthTokenStruct,
+        pub nonce_header: StaticAuthNonceHeader,
+        pub token_header: StaticAuthTokenHeader,
         pub reset_service: StaticResetPasswordService,
         pub response_encoder: StaticResetPasswordResponseEncoder,
+        pub response_builder: StaticAuthTokenResponseBuilder,
     }
 
     impl ResetPasswordInfra for StaticResetPasswordStruct {
-        type HeaderInfra = StaticAuthHeaderStruct;
-        type TokenInfra = StaticAuthTokenStruct;
+        type NonceHeader = StaticAuthNonceHeader;
+        type TokenHeader = StaticAuthTokenHeader;
         type ResetService = StaticResetPasswordService;
         type ResponseEncoder = StaticResetPasswordResponseEncoder;
+        type ResponseBuilder = StaticAuthTokenResponseBuilder;
 
-        fn header_infra(&self) -> &Self::HeaderInfra {
-            &self.header_infra
+        fn nonce_header(&self) -> &Self::NonceHeader {
+            &self.nonce_header
         }
-        fn token_infra(&self) -> &Self::TokenInfra {
-            &self.token_infra
+        fn token_header(&self) -> &Self::TokenHeader {
+            &self.token_header
         }
         fn reset_service(&self) -> &Self::ResetService {
             &self.reset_service
         }
         fn response_encoder(&self) -> &Self::ResponseEncoder {
             &self.response_encoder
+        }
+        fn response_builder(&self) -> &Self::ResponseBuilder {
+            &self.response_builder
         }
     }
 }

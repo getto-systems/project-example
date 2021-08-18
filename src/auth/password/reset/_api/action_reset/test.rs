@@ -6,7 +6,6 @@ use crate::auth::{
     auth_ticket::_api::kernel::init::{
         nonce_header::test::StaticAuthNonceHeader,
         response_builder::test::StaticAuthTokenResponseBuilder,
-        test::{StaticAuthHeaderStruct, StaticAuthTokenStruct},
         token_header::test::StaticAuthTokenHeader,
     },
     password::reset::_api::reset::init::{
@@ -57,23 +56,15 @@ impl TestFeature {
     fn standard() -> Self {
         Self {
             reset: StaticResetPasswordStruct {
-                header_infra: standard_header_infra(),
-                token_infra: StaticAuthTokenStruct {
-                    response_builder: StaticAuthTokenResponseBuilder,
-                },
+                nonce_header: StaticAuthNonceHeader::Valid(AuthNonce::new("NONCE".into())),
+                token_header: StaticAuthTokenHeader::Valid(AuthToken::new("TOKEN".into())),
                 reset_service: StaticResetPasswordService {
                     user: standard_user(),
                 },
                 response_encoder: StaticResetPasswordResponseEncoder,
+                response_builder: StaticAuthTokenResponseBuilder,
             },
         }
-    }
-}
-
-fn standard_header_infra() -> StaticAuthHeaderStruct {
-    StaticAuthHeaderStruct {
-        nonce_header: StaticAuthNonceHeader::Valid(AuthNonce::new("NONCE".into())),
-        token_header: StaticAuthTokenHeader::Valid(AuthToken::new("TOKEN".into())),
     }
 }
 
