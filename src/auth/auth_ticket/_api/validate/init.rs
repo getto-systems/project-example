@@ -9,15 +9,15 @@ use crate::auth::auth_ticket::_api::{
     validate::init::validate_service::TonicValidateService,
 };
 
-use super::infra::ValidateInfra;
+use super::infra::ValidateApiTokenInfra;
 
-pub struct ValidateStruct<'a> {
+pub struct ValidateApiTokenStruct<'a> {
     nonce_header: ActixWebAuthNonceHeader<'a>,
     token_header: ApiAuthTokenHeader<'a>,
     validate_service: TonicValidateService<'a>,
 }
 
-impl<'a> ValidateStruct<'a> {
+impl<'a> ValidateApiTokenStruct<'a> {
     pub fn new(
         feature: &'a AuthOutsideFeature,
         request_id: &'a str,
@@ -31,7 +31,7 @@ impl<'a> ValidateStruct<'a> {
     }
 }
 
-impl<'a> ValidateInfra for ValidateStruct<'a> {
+impl<'a> ValidateApiTokenInfra for ValidateApiTokenStruct<'a> {
     type NonceHeader = ActixWebAuthNonceHeader<'a>;
     type TokenHeader = ApiAuthTokenHeader<'a>;
     type ValidateService = TonicValidateService<'a>;
@@ -54,7 +54,7 @@ pub mod test {
         nonce_header::test::StaticAuthNonceHeader, token_header::test::StaticAuthTokenHeader,
     };
 
-    use super::super::infra::ValidateInfra;
+    use super::super::infra::ValidateApiTokenInfra;
 
     pub struct StaticLogoutStruct {
         pub nonce_header: StaticAuthNonceHeader,
@@ -62,7 +62,7 @@ pub mod test {
         pub validate_service: StaticValidateService,
     }
 
-    impl ValidateInfra for StaticLogoutStruct {
+    impl ValidateApiTokenInfra for StaticLogoutStruct {
         type NonceHeader = StaticAuthNonceHeader;
         type TokenHeader = StaticAuthTokenHeader;
         type ValidateService = StaticValidateService;

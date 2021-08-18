@@ -1,7 +1,7 @@
 use crate::auth::{
     auth_ticket::_api::{
         kernel::infra::{AuthNonceHeader, AuthTokenHeader},
-        validate::infra::{ValidateInfra, ValidateService},
+        validate::infra::{ValidateApiTokenInfra, ValidateService},
     },
     auth_user::_common::kernel::data::{AuthUserId, RequireAuthRoles},
 };
@@ -9,7 +9,7 @@ use crate::auth::{
 use super::event::ValidateApiTokenEvent;
 
 pub async fn validate_api_token<S>(
-    infra: &impl ValidateInfra,
+    infra: &impl ValidateApiTokenInfra,
     require_roles: RequireAuthRoles,
     post: impl Fn(ValidateApiTokenEvent) -> S,
 ) -> Result<AuthUserId, S> {

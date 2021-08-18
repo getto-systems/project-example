@@ -6,7 +6,7 @@ use crate::auth::{
     auth_user::_common::kernel::data::{AuthUserId, RequireAuthRoles},
 };
 
-pub trait ValidateInfra {
+pub trait ValidateApiTokenInfra {
     type NonceHeader: AuthNonceHeader;
     type TokenHeader: AuthTokenHeader;
     type ValidateService: ValidateService;
