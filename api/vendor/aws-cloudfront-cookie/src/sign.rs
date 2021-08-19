@@ -1,8 +1,3 @@
-use std::{
-    error::Error,
-    fmt::{Display, Formatter},
-};
-
 use base64::{encode_config, STANDARD};
 use digest::Digest;
 use rsa::{errors::Error as RsaError, Hash, PaddingScheme, RSAPrivateKey};
@@ -51,18 +46,16 @@ fn cloudfront_base64(source: impl AsRef<[u8]>) -> String {
         .replace("/", "~")
 }
 
-#[derive(Debug)]
 pub enum KeyError {
     SerializeError(SerdeJsonError),
     SignError(RsaError),
 }
 
-impl Display for KeyError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for KeyError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::SerializeError(err) => write!(f, "{}", err),
             Self::SignError(err) => write!(f, "{}", err),
         }
     }
 }
-impl Error for KeyError {}

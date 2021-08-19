@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::auth_ticket::_api::renew::{
@@ -10,7 +8,7 @@ pub enum RenewAuthTicketState {
     Renew(RenewAuthTicketEvent),
 }
 
-impl Display for RenewAuthTicketState {
+impl std::fmt::Display for RenewAuthTicketState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Renew(event) => write!(f, "{}", event),

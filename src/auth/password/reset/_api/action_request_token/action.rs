@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::password::reset::_api::request_token::infra::RequestResetTokenRequestDecoder;
@@ -14,7 +12,7 @@ pub enum RequestResetTokenState {
     MessageError(MessageError),
 }
 
-impl Display for RequestResetTokenState {
+impl std::fmt::Display for RequestResetTokenState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::MessageError(err) => {

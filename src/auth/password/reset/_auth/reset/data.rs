@@ -1,8 +1,3 @@
-use std::{
-    error::Error,
-    fmt::{Display, Formatter},
-};
-
 use crate::auth::{
     login_id::_auth::data::ValidateLoginIdError,
     password::{
@@ -18,8 +13,8 @@ pub enum ResetPasswordError {
     InvalidResetTokenEntry(VerifyResetTokenEntryError),
 }
 
-impl Display for ResetPasswordError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for ResetPasswordError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::InvalidLoginId(err) => write!(f, "invalid login id: {}", err),
             Self::InvalidPassword(err) => write!(f, "invalid password: {}", err),
@@ -29,18 +24,16 @@ impl Display for ResetPasswordError {
     }
 }
 
-#[derive(Debug)]
 pub enum DecodeResetTokenError {
     Expired,
     Invalid(String),
 }
 
-impl Display for DecodeResetTokenError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for DecodeResetTokenError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::Expired => write!(f, "reset token expired"),
             Self::Invalid(err) => write!(f, "decode error; {}", err),
         }
     }
 }
-impl Error for DecodeResetTokenError {}

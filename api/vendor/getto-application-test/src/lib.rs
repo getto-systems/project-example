@@ -1,7 +1,4 @@
-use std::{
-    fmt::Display,
-    sync::{Arc, Mutex},
-};
+use std::sync::{Arc, Mutex};
 
 use pretty_assertions::assert_eq;
 
@@ -10,7 +7,7 @@ pub struct ActionTestRunner {
 }
 
 impl ActionTestRunner {
-    pub fn new<S: Display>() -> (impl 'static + Fn(&S) + Send + Sync, impl Fn(Vec<&str>)) {
+    pub fn new<S: std::fmt::Display>() -> (impl 'static + Fn(&S) + Send + Sync, impl Fn(Vec<&str>)) {
         let runner = Arc::new(Self {
             store: Mutex::new(vec![]),
         });
@@ -21,7 +18,7 @@ impl ActionTestRunner {
         )
     }
 
-    fn push(&self, state: &impl Display) {
+    fn push(&self, state: &impl std::fmt::Display) {
         let mut store = self.store.lock().unwrap();
         store.push(format!("{}", state))
     }

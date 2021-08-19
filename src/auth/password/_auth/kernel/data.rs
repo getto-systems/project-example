@@ -1,8 +1,3 @@
-use std::{
-    error::Error,
-    fmt::{Display, Formatter},
-};
-
 use crate::z_details::_common::repository::data::RepositoryError;
 
 #[derive(Clone)]
@@ -29,8 +24,8 @@ pub enum VerifyResetTokenEntryError {
     AlreadyReset,
 }
 
-impl Display for VerifyResetTokenEntryError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for VerifyResetTokenEntryError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::ResetTokenEntryNotFound => write!(f, "reset token entry not found"),
             Self::LoginIdNotMatched => write!(f, "login id not matched"),
@@ -57,32 +52,28 @@ pub enum PasswordHashRepositoryError {
     PasswordHashError(PasswordHashError),
 }
 
-#[derive(Debug)]
 pub enum ValidatePasswordError {
     Empty,
     TooLong,
 }
 
-impl Display for ValidatePasswordError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for ValidatePasswordError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::Empty => write!(f, "empty password"),
             Self::TooLong => write!(f, "too long password"),
         }
     }
 }
-impl Error for ValidatePasswordError {}
 
-#[derive(Debug)]
 pub enum PasswordHashError {
     InfraError(String),
 }
 
-impl Display for PasswordHashError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for PasswordHashError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::InfraError(err) => write!(f, "password hash error: {}", err),
         }
     }
 }
-impl Error for PasswordHashError {}

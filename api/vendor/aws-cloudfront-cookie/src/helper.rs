@@ -1,8 +1,3 @@
-use std::{
-    error::Error,
-    fmt::{Display, Formatter},
-};
-
 use pem::{parse, PemError};
 use rsa::{errors::Error as RsaError, RSAPrivateKey};
 
@@ -28,15 +23,14 @@ pub enum KeyParseError {
     KeyError(RsaError),
 }
 
-impl Display for KeyParseError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for KeyParseError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::PemError(err) => write!(f, "{}", err),
             Self::KeyError(err) => write!(f, "{}", err),
         }
     }
 }
-impl Error for KeyParseError {}
 
 impl Policy {
     pub fn from_resource(resource: String, expires: i64) -> Self {

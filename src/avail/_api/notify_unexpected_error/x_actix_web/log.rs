@@ -1,11 +1,13 @@
 use crate::z_details::_common::logger::LogLevel;
 
-use super::super::event::LogoutEvent;
+use super::super::event::NotifyUnexpectedErrorEvent;
 
-impl LogoutEvent {
+impl NotifyUnexpectedErrorEvent {
     pub const fn log_level(&self) -> LogLevel {
         match self {
-            Self::Success => LogLevel::Audit,
+            Self::Authorized(_) => LogLevel::Info,
+            Self::Notice(_) => LogLevel::Error,
+            Self::ValidateApiTokenError(err) => err.log_level(),
             Self::ServiceError(err) => err.log_level(),
             Self::HeaderError(err) => err.log_level(),
         }

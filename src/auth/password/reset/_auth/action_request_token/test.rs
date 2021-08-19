@@ -277,7 +277,7 @@ fn standard_clock() -> StaticChronoAuthClock {
 }
 
 fn standard_nonce_metadata() -> StaticAuthNonceMetadata {
-    StaticAuthNonceMetadata::Valid(AuthNonce::new(NONCE.into()))
+    StaticAuthNonceMetadata::Valid(AuthNonce::restore(NONCE.into()))
 }
 
 fn standard_token_generator() -> StaticResetTokenGenerator {
@@ -340,14 +340,14 @@ fn standard_password_store() -> MemoryAuthUserPasswordStore {
 }
 
 fn test_user_id() -> AuthUserId {
-    AuthUserId::restore(USER_ID.to_string())
+    AuthUserId::restore(USER_ID.into())
 }
 fn test_user_login_id() -> LoginId {
-    LoginId::validate(LOGIN_ID.to_string()).unwrap()
+    LoginId::restore(LOGIN_ID.into())
 }
 fn test_user_destination() -> ResetTokenDestination {
     ResetTokenDestinationExtract {
-        email: USER_EMAIL.to_string(),
+        email: USER_EMAIL.into(),
     }
     .restore()
 }

@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::password::reset::_auth::request_token::{
@@ -12,7 +10,7 @@ pub enum RequestResetTokenState {
     RequestToken(RequestResetTokenEvent),
 }
 
-impl Display for RequestResetTokenState {
+impl std::fmt::Display for RequestResetTokenState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::RequestToken(event) => write!(f, "{}", event),

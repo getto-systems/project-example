@@ -1,8 +1,3 @@
-use std::{
-    error::Error,
-    fmt::{Display, Formatter},
-};
-
 pub struct ResetTokenEncoded(String);
 
 impl ResetTokenEncoded {
@@ -23,16 +18,14 @@ pub trait ResetTokenEncodedExtract {
     fn validate(self) -> Result<String, ValidateResetTokenError>;
 }
 
-#[derive(Debug)]
 pub enum ValidateResetTokenError {
     Empty,
 }
 
-impl Display for ValidateResetTokenError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for ValidateResetTokenError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::Empty => write!(f, "empty reset token"),
         }
     }
 }
-impl Error for ValidateResetTokenError {}

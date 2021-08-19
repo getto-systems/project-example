@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use crate::{
     auth::{
         auth_ticket::_auth::kernel::data::{ExpireDateTime, ValidateAuthNonceError},
@@ -29,7 +27,7 @@ pub enum RequestResetTokenEvent {
 const SUCCESS: &'static str = "request reset token success";
 const ERROR: &'static str = "request reset token error";
 
-impl Display for RequestResetTokenEvent {
+impl std::fmt::Display for RequestResetTokenEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::TokenExpiresCalculated(expires) => {

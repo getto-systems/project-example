@@ -25,7 +25,7 @@ impl<'a> TicketAuthTokenHeader<'a> {
 
 impl<'a> AuthTokenHeader for TicketAuthTokenHeader<'a> {
     fn token(&self) -> Result<Option<AuthToken>, HeaderError> {
-        Ok(cookie(&self.request, COOKIE_TICKET_TOKEN).map(AuthToken::new))
+        Ok(cookie(&self.request, COOKIE_TICKET_TOKEN).map(AuthToken::restore))
     }
 }
 
@@ -41,7 +41,7 @@ impl<'a> ApiAuthTokenHeader<'a> {
 
 impl<'a> AuthTokenHeader for ApiAuthTokenHeader<'a> {
     fn token(&self) -> Result<Option<AuthToken>, HeaderError> {
-        Ok(cookie(&self.request, COOKIE_API_TOKEN).map(AuthToken::new))
+        Ok(cookie(&self.request, COOKIE_API_TOKEN).map(AuthToken::restore))
     }
 }
 
@@ -54,15 +54,20 @@ pub mod test {
         z_details::_api::request::data::HeaderError,
     };
 
-    pub enum StaticAuthTokenHeader {
-        Valid(AuthToken),
+    pub struct StaticAuthTokenHeader {
+        token: AuthToken,
+    }
+    impl StaticAuthTokenHeader {
+        pub fn new(token: &str) -> Self {
+            Self {
+                token: AuthToken::restore(token.into()),
+            }
+        }
     }
 
     impl AuthTokenHeader for StaticAuthTokenHeader {
         fn token(&self) -> Result<Option<AuthToken>, HeaderError> {
-            match self {
-                Self::Valid(token) => Ok(Some(token.clone())),
-            }
+            Ok(Some(self.token.clone()))
         }
     }
 }

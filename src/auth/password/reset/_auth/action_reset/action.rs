@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::{
@@ -24,7 +22,7 @@ pub enum ResetPasswordState {
     Encode(EncodeAuthTicketEvent),
 }
 
-impl Display for ResetPasswordState {
+impl std::fmt::Display for ResetPasswordState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Reset(event) => write!(f, "{}", event),

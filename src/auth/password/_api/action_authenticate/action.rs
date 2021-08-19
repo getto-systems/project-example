@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::password::_api::authenticate::{
@@ -15,7 +13,7 @@ pub enum AuthenticatePasswordState {
     MessageError(MessageError),
 }
 
-impl Display for AuthenticatePasswordState {
+impl std::fmt::Display for AuthenticatePasswordState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::MessageError(err) => {

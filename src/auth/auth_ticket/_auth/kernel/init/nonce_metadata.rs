@@ -23,7 +23,7 @@ impl<'a> TonicAuthNonceMetadata<'a> {
 
 impl<'a> AuthNonceMetadata for TonicAuthNonceMetadata<'a> {
     fn nonce(&self) -> Result<Option<AuthNonce>, MetadataError> {
-        metadata(&self.metadata, METADATA_NONCE).map(|value| value.map(AuthNonce::new))
+        metadata(&self.metadata, METADATA_NONCE).map(|value| value.map(AuthNonce::restore))
     }
 }
 

@@ -1,8 +1,3 @@
-use std::{
-    error::Error,
-    fmt::{Display, Formatter},
-};
-
 use crate::auth::auth_ticket::_auth::kernel::data::ExpireDateTime;
 
 #[derive(Clone)]
@@ -12,8 +7,8 @@ pub struct AuthTokenExpires {
     pub cloudfront: ExpireDateTime,
 }
 
-impl Display for AuthTokenExpires {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for AuthTokenExpires {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
             "ticket: {} / api: {} / cloudfront: {}",
@@ -22,16 +17,14 @@ impl Display for AuthTokenExpires {
     }
 }
 
-#[derive(Debug)]
 pub enum EncodeAuthTokenError {
     InfraError(String),
 }
 
-impl Display for EncodeAuthTokenError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for EncodeAuthTokenError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::InfraError(err) => write!(f, "encode error: {}", err),
         }
     }
 }
-impl Error for EncodeAuthTokenError {}

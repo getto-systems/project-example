@@ -1,6 +1,6 @@
-use std::fmt::Display;
-
-use crate::{auth::_api::service::data::AuthServiceError, z_details::_api::request::data::HeaderError};
+use crate::{
+    auth::_api::service::data::AuthServiceError, z_details::_api::request::data::HeaderError,
+};
 
 pub enum LogoutEvent {
     Success,
@@ -11,7 +11,7 @@ pub enum LogoutEvent {
 const SUCCESS: &'static str = "logout success";
 const ERROR: &'static str = "logout error";
 
-impl Display for LogoutEvent {
+impl std::fmt::Display for LogoutEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Success => write!(f, "{}", SUCCESS),

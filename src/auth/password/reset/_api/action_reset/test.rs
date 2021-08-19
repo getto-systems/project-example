@@ -20,10 +20,7 @@ use crate::auth::password::reset::_common::reset::infra::ResetPasswordFieldsExtr
 
 use super::action::{ResetPasswordAction, ResetPasswordMaterial};
 
-use crate::auth::{
-    auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
-    auth_user::_common::kernel::data::{AuthUser, AuthUserExtract},
-};
+use crate::auth::auth_user::_common::kernel::data::{AuthUser, AuthUserExtract};
 
 #[tokio::test]
 async fn success_request_token() {
@@ -56,8 +53,8 @@ impl TestFeature {
     fn standard() -> Self {
         Self {
             reset: StaticResetPasswordStruct {
-                nonce_header: StaticAuthNonceHeader::Valid(AuthNonce::new("NONCE".into())),
-                token_header: StaticAuthTokenHeader::Valid(AuthToken::new("TOKEN".into())),
+                nonce_header: StaticAuthNonceHeader::new("NONCE"),
+                token_header: StaticAuthTokenHeader::new("TOKEN"),
                 reset_service: StaticResetPasswordService {
                     user: standard_user(),
                 },

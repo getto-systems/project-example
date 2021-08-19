@@ -190,10 +190,10 @@ fn standard_clock() -> StaticChronoAuthClock {
 }
 
 fn standard_nonce_metadata() -> StaticAuthNonceMetadata {
-    StaticAuthNonceMetadata::Valid(AuthNonce::new(NONCE.into()))
+    StaticAuthNonceMetadata::Valid(AuthNonce::restore(NONCE.into()))
 }
 fn standard_token_metadata() -> StaticAuthTokenMetadata {
-    StaticAuthTokenMetadata::Valid(AuthToken::new("TOKEN".into()))
+    StaticAuthTokenMetadata::Valid(AuthToken::restore("TOKEN".into()))
 }
 
 fn standard_token_validator() -> StaticAuthTokenDecoder {

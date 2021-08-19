@@ -1,7 +1,4 @@
-use std::{
-    collections::{hash_set::Iter, HashSet},
-    fmt::{Display, Formatter},
-};
+use std::collections::{hash_set::Iter, HashSet};
 
 #[derive(Clone)]
 pub struct AuthUser {
@@ -29,8 +26,8 @@ impl AuthUser {
     }
 }
 
-impl Display for AuthUser {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for AuthUser {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "{} ({})", self.user_id, self.granted_roles)
     }
 }
@@ -66,13 +63,13 @@ impl AuthUserId {
     }
 }
 
-impl Display for AuthUserId {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for AuthUserId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "user: {}", self.0)
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct GrantedAuthRoles(AuthRoles);
 
 impl GrantedAuthRoles {
@@ -99,13 +96,13 @@ impl GrantedAuthRolesExtract for HashSet<String> {
     }
 }
 
-impl Display for GrantedAuthRoles {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for GrantedAuthRoles {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "granted: {}", self.0)
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub enum RequireAuthRoles {
     Nothing,
     HasAny(AuthRoles),
@@ -135,8 +132,8 @@ impl RequireAuthRoles {
     }
 }
 
-impl Display for RequireAuthRoles {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for RequireAuthRoles {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             RequireAuthRoles::Nothing => write!(f, "require: nothing"),
             RequireAuthRoles::HasAny(roles) => write!(f, "require: any {}", roles),
@@ -144,7 +141,7 @@ impl Display for RequireAuthRoles {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct AuthRoles(HashSet<String>);
 
 impl AuthRoles {
@@ -164,8 +161,8 @@ impl AuthRoles {
     }
 }
 
-impl Display for AuthRoles {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for AuthRoles {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
             "[{}]",

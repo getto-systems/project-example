@@ -23,7 +23,7 @@ impl<'a> ActixWebAuthNonceHeader<'a> {
 
 impl<'a> AuthNonceHeader for ActixWebAuthNonceHeader<'a> {
     fn nonce(&self) -> Result<Option<AuthNonce>, HeaderError> {
-        header(self.request, HEADER_NONCE).map(|value| value.map(AuthNonce::new))
+        header(self.request, HEADER_NONCE).map(|value| value.map(AuthNonce::restore))
     }
 }
 
@@ -36,15 +36,20 @@ pub mod test {
         z_details::_api::request::data::HeaderError,
     };
 
-    pub enum StaticAuthNonceHeader {
-        Valid(AuthNonce),
+    pub struct StaticAuthNonceHeader {
+        nonce: AuthNonce,
+    }
+    impl StaticAuthNonceHeader {
+        pub fn new(nonce: &str) -> Self {
+            Self {
+                nonce: AuthNonce::restore(nonce.into()),
+            }
+        }
     }
 
     impl AuthNonceHeader for StaticAuthNonceHeader {
         fn nonce(&self) -> Result<Option<AuthNonce>, HeaderError> {
-            match self {
-                Self::Valid(nonce) => Ok(Some(nonce.clone())),
-            }
+            Ok(Some(self.nonce.clone()))
         }
     }
 }
