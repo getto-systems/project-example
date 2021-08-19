@@ -1,15 +1,14 @@
 use actix_web::HttpRequest;
 
-use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
+use crate::x_outside_feature::_api::feature::AppFeature;
 
-use crate::avail::_api::notify_unexpected_error::{
-    infra::NotifyUnexpectedErrorRequestDecoder,
-    init::request_decoder::ProstNotifyUnexpectedErrorRequestDecoder,
+use crate::avail::_api::notify_unexpected_error::init::{
+    request_decoder::ProstNotifyUnexpectedErrorRequestDecoder, NotifyUnexpectedErrorStruct,
 };
 
-use crate::avail::_api::notify_unexpected_error::init::NotifyUnexpectedErrorStruct;
-
 use super::action::{NotifyUnexpectedErrorAction, NotifyUnexpectedErrorMaterial};
+
+use crate::avail::_api::notify_unexpected_error::infra::NotifyUnexpectedErrorRequestDecoder;
 
 pub struct NotifyUnexpectedErrorFeature<'a> {
     notify: NotifyUnexpectedErrorStruct<'a>,
@@ -17,12 +16,12 @@ pub struct NotifyUnexpectedErrorFeature<'a> {
 
 impl<'a> NotifyUnexpectedErrorFeature<'a> {
     pub fn action(
-        feature: &'a AuthOutsideFeature,
+        feature: &'a AppFeature,
         request_id: &'a str,
         request: &'a HttpRequest,
     ) -> NotifyUnexpectedErrorAction<Self> {
         NotifyUnexpectedErrorAction::with_material(Self {
-            notify: NotifyUnexpectedErrorStruct::new(feature, request_id, request),
+            notify: NotifyUnexpectedErrorStruct::new(&feature.auth, request_id, request),
         })
     }
     pub fn request_decoder(body: String) -> impl NotifyUnexpectedErrorRequestDecoder {

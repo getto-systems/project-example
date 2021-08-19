@@ -1,6 +1,6 @@
 use actix_web::HttpRequest;
 
-use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
+use crate::x_outside_feature::_api::feature::AppFeature;
 
 use crate::auth::auth_ticket::_api::renew::init::RenewAuthTicketStruct;
 
@@ -12,12 +12,12 @@ pub struct RenewAuthTicketFeature<'a> {
 
 impl<'a> RenewAuthTicketFeature<'a> {
     pub fn action(
-        feature: &'a AuthOutsideFeature,
+        feature: &'a AppFeature,
         request_id: &'a str,
         request: &'a HttpRequest,
     ) -> RenewAuthTicketAction<Self> {
         RenewAuthTicketAction::with_material(Self {
-            renew: RenewAuthTicketStruct::new(feature, request_id, request),
+            renew: RenewAuthTicketStruct::new(&feature.auth, request_id, request),
         })
     }
 }

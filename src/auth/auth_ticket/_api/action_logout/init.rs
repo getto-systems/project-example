@@ -1,6 +1,6 @@
 use actix_web::HttpRequest;
 
-use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
+use crate::x_outside_feature::_api::feature::AppFeature;
 
 use crate::auth::auth_ticket::_api::logout::init::LogoutStruct;
 
@@ -12,12 +12,12 @@ pub struct LogoutFeature<'a> {
 
 impl<'a> LogoutFeature<'a> {
     pub fn action(
-        feature: &'a AuthOutsideFeature,
+        feature: &'a AppFeature,
         request_id: &'a str,
         request: &'a HttpRequest,
     ) -> LogoutAction<Self> {
         LogoutAction::with_material(Self {
-            logout: LogoutStruct::new(feature, request_id, request),
+            logout: LogoutStruct::new(&feature.auth, request_id, request),
         })
     }
 }

@@ -21,7 +21,7 @@ pub fn scope_auth_ticket() -> Scope {
 async fn renew(data: AppData, request: HttpRequest) -> impl Responder {
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
-    let mut action = RenewAuthTicketFeature::action(&data.auth, &request_id, &request);
+    let mut action = RenewAuthTicketFeature::action(&data, &request_id, &request);
     action.subscribe(move |state| logger.log(state.log_level(), state));
 
     flatten(action.ignite().await).respond_to(&request)
@@ -31,7 +31,7 @@ async fn renew(data: AppData, request: HttpRequest) -> impl Responder {
 async fn logout(data: AppData, request: HttpRequest) -> impl Responder {
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
-    let mut action = LogoutFeature::action(&data.auth, &request_id, &request);
+    let mut action = LogoutFeature::action(&data, &request_id, &request);
     action.subscribe(move |state| logger.log(state.log_level(), state));
 
     flatten(action.ignite().await).respond_to(&request)

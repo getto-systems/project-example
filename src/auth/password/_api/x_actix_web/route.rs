@@ -23,7 +23,7 @@ pub fn scope_password() -> Scope {
 async fn authenticate(data: AppData, request: HttpRequest, body: String) -> impl Responder {
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
-    let mut action = AuthenticatePasswordFeature::action(&data.auth, &request_id, &request);
+    let mut action = AuthenticatePasswordFeature::action(&data, &request_id, &request);
     action.subscribe(move |state| logger.log(state.log_level(), state));
 
     let request_decoder = AuthenticatePasswordFeature::request_decoder(body);

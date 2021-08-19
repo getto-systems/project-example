@@ -1,19 +1,21 @@
 use tonic::metadata::MetadataMap;
 
-use crate::auth::password::reset::_auth::reset::infra::ResetPasswordRequestDecoder;
-use crate::auth::password::reset::_auth::reset::init::request_decoder::PbResetPasswordRequestDecoder;
 use crate::auth::password::reset::_common::y_protobuf::service::ResetPasswordRequestPb;
 
-use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
+use crate::x_outside_feature::_auth::feature::AppFeature;
 
 use crate::auth::{
     auth_ticket::_auth::{
         encode::init::EncodeAuthTicketStruct, issue::init::IssueAuthTicketStruct,
     },
-    password::reset::_auth::reset::init::ResetPasswordStruct,
+    password::reset::_auth::reset::init::{
+        request_decoder::PbResetPasswordRequestDecoder, ResetPasswordStruct,
+    },
 };
 
 use super::action::{ResetPasswordAction, ResetPasswordMaterial};
+
+use crate::auth::password::reset::_auth::reset::infra::ResetPasswordRequestDecoder;
 
 pub struct ResetPasswordFeature<'a> {
     reset: ResetPasswordStruct<'a>,
@@ -22,14 +24,11 @@ pub struct ResetPasswordFeature<'a> {
 }
 
 impl<'a> ResetPasswordFeature<'a> {
-    pub fn action(
-        feature: &'a AuthOutsideFeature,
-        metadata: &'a MetadataMap,
-    ) -> ResetPasswordAction<Self> {
+    pub fn action(feature: &'a AppFeature, metadata: &'a MetadataMap) -> ResetPasswordAction<Self> {
         ResetPasswordAction::with_material(Self {
-            reset: ResetPasswordStruct::new(feature, metadata),
-            issue: IssueAuthTicketStruct::new(feature),
-            encode: EncodeAuthTicketStruct::new(feature),
+            reset: ResetPasswordStruct::new(&feature.auth, metadata),
+            issue: IssueAuthTicketStruct::new(&feature.auth),
+            encode: EncodeAuthTicketStruct::new(&feature.auth),
         })
     }
     pub fn request_decoder(request: ResetPasswordRequestPb) -> impl ResetPasswordRequestDecoder {

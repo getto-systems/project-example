@@ -46,7 +46,7 @@ impl AuthenticatePasswordPb for Authenticate {
         } = extract_request(request);
 
         let logger = app_logger("auth.password.authenticate", &metadata);
-        let mut action = AuthenticatePasswordFeature::action(&data.auth, &metadata);
+        let mut action = AuthenticatePasswordFeature::action(&data, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         let request_decoder = AuthenticatePasswordFeature::request_decoder(request);

@@ -21,7 +21,7 @@ pub fn scope_reset() -> Scope {
 async fn request_token(data: AppData, request: HttpRequest, body: String) -> impl Responder {
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
-    let mut action = RequestResetTokenFeature::action(&data.auth, &request_id, &request);
+    let mut action = RequestResetTokenFeature::action(&data, &request_id, &request);
     action.subscribe(move |state| logger.log(state.log_level(), state));
 
     let request_decoder = RequestResetTokenFeature::request_decoder(body);
@@ -32,7 +32,7 @@ async fn request_token(data: AppData, request: HttpRequest, body: String) -> imp
 async fn reset(data: AppData, request: HttpRequest, body: String) -> impl Responder {
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
-    let mut action = ResetPasswordFeature::action(&data.auth, &request_id, &request);
+    let mut action = ResetPasswordFeature::action(&data, &request_id, &request);
     action.subscribe(move |state| logger.log(state.log_level(), state));
 
     let request_decoder = ResetPasswordFeature::request_decoder(body);
