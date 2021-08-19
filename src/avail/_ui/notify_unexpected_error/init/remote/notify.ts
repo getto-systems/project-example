@@ -18,22 +18,21 @@ export function newNotifyUnexpectedErrorRemote(
 ): NotifyUnexpectedErrorRemote {
     return async (err) => {
         try {
-            const mock = true
+            const mock = false
             if (mock) {
-                // TODO api の実装が終わったらつなぐ
                 return { success: true, value: true }
             }
 
             const opts = fetchOptions({
                 serverURL: env.apiServerURL,
-                path: "/avail/error/unexpected",
+                path: "/avail/unexpected-error",
                 method: "POST",
                 headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
             })
             const response = await fetch(opts.url, {
                 ...opts.options,
                 body: encodeProtobuf(pb.avail.api.NotifyUnexpectedError_pb, (message) => {
-                    message.json = JSON.stringify(err)
+                    message.json = JSON.stringify({ message: `${err}`, err })
                 }),
             })
 

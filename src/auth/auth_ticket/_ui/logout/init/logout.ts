@@ -16,7 +16,6 @@ export function newLogoutRemote(feature: RemoteOutsideFeature): LogoutRemote {
         try {
             const mock = false
             if (mock) {
-                // TODO api の実装が終わったらつなぐ
                 return { success: true, value: true }
             }
 

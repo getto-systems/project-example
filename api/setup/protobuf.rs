@@ -27,7 +27,7 @@ impl ProtobufTarget {
         let target = Path::new(&target);
 
         let source = target.join("z_protobuf");
-        let dist = target.join("_api/y_protobuf"); // TODO _api の部分を指定できるようにしたい
+        let dist = target.join("_api/y_protobuf");
         let index = dist.join("mod.rs");
 
         Self {
