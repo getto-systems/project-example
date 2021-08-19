@@ -1,6 +1,6 @@
 use actix_web::HttpRequest;
 
-use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
+use crate::x_outside_feature::_api::feature::AppFeature;
 
 use crate::auth::password::_api::authenticate::init::{
     request_decoder::ProstAuthenticatePasswordRequestDecoder, AuthenticatePasswordStruct,
@@ -16,12 +16,12 @@ pub struct AuthenticatePasswordFeature<'a> {
 
 impl<'a> AuthenticatePasswordFeature<'a> {
     pub fn action(
-        feature: &'a AuthOutsideFeature,
+        feature: &'a AppFeature,
         request_id: &'a str,
         request: &'a HttpRequest,
     ) -> AuthenticatePasswordAction<Self> {
         AuthenticatePasswordAction::with_material(Self {
-            authenticate: AuthenticatePasswordStruct::new(feature, request_id, request),
+            authenticate: AuthenticatePasswordStruct::new(&feature.auth, request_id, request),
         })
     }
     pub fn request_decoder(body: String) -> impl AuthenticatePasswordRequestDecoder {

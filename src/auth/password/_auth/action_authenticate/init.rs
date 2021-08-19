@@ -1,19 +1,21 @@
 use tonic::metadata::MetadataMap;
 
-use crate::auth::password::_auth::authenticate::infra::AuthenticatePasswordRequestDecoder;
-use crate::auth::password::_auth::authenticate::init::request_decoder::PbAuthenticatePasswordRequestDecoder;
 use crate::auth::password::_common::y_protobuf::service::AuthenticatePasswordRequestPb;
 
-use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
+use crate::x_outside_feature::_auth::feature::AppFeature;
 
 use crate::auth::{
     auth_ticket::_auth::{
         encode::init::EncodeAuthTicketStruct, issue::init::IssueAuthTicketStruct,
     },
-    password::_auth::authenticate::init::AuthenticatePasswordStruct,
+    password::_auth::authenticate::init::{
+        request_decoder::PbAuthenticatePasswordRequestDecoder, AuthenticatePasswordStruct,
+    },
 };
 
 use super::action::{AuthenticatePasswordAction, AuthenticatePasswordMaterial};
+
+use crate::auth::password::_auth::authenticate::infra::AuthenticatePasswordRequestDecoder;
 
 pub struct AuthenticatePasswordFeature<'a> {
     authenticate: AuthenticatePasswordStruct<'a>,
@@ -23,13 +25,13 @@ pub struct AuthenticatePasswordFeature<'a> {
 
 impl<'a> AuthenticatePasswordFeature<'a> {
     pub fn action(
-        feature: &'a AuthOutsideFeature,
+        feature: &'a AppFeature,
         metadata: &'a MetadataMap,
     ) -> AuthenticatePasswordAction<Self> {
         AuthenticatePasswordAction::with_material(Self {
-            authenticate: AuthenticatePasswordStruct::new(feature, metadata),
-            issue: IssueAuthTicketStruct::new(feature),
-            encode: EncodeAuthTicketStruct::new(feature),
+            authenticate: AuthenticatePasswordStruct::new(&feature.auth, metadata),
+            issue: IssueAuthTicketStruct::new(&feature.auth),
+            encode: EncodeAuthTicketStruct::new(&feature.auth),
         })
     }
     pub fn request_decoder(

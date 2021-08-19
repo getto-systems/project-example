@@ -1,6 +1,6 @@
 use actix_web::HttpRequest;
 
-use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
+use crate::x_outside_feature::_api::feature::AppFeature;
 
 use crate::auth::password::reset::_api::reset::init::{
     request_decoder::ProstResetPasswordRequestDecoder, ResetPasswordStruct,
@@ -16,12 +16,12 @@ pub struct ResetPasswordFeature<'a> {
 
 impl<'a> ResetPasswordFeature<'a> {
     pub fn action(
-        feature: &'a AuthOutsideFeature,
+        feature: &'a AppFeature,
         request_id: &'a str,
         request: &'a HttpRequest,
     ) -> ResetPasswordAction<Self> {
         ResetPasswordAction::with_material(Self {
-            reset: ResetPasswordStruct::new(feature, request_id, request),
+            reset: ResetPasswordStruct::new(&feature.auth, request_id, request),
         })
     }
     pub fn request_decoder(body: String) -> impl ResetPasswordRequestDecoder {

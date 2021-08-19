@@ -51,7 +51,7 @@ impl LogoutPb for Logout {
         let TonicRequest { data, metadata, .. } = extract_request(request);
 
         let logger = app_logger("auth.auth_ticket.logout", &metadata);
-        let mut action = LogoutFeature::action(&data.auth, &metadata);
+        let mut action = LogoutFeature::action(&data, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         flatten(action.ignite().await).respond_to()
@@ -69,7 +69,7 @@ impl RenewAuthTicketPb for Renew {
         let TonicRequest { data, metadata, .. } = extract_request(request);
 
         let logger = app_logger("auth.auth_ticket.renew", &metadata);
-        let mut action = RenewAuthTicketFeature::action(&data.auth, &metadata);
+        let mut action = RenewAuthTicketFeature::action(&data, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         flatten(action.ignite().await).respond_to()
@@ -91,7 +91,7 @@ impl ValidateApiTokenPb for Validate {
         } = extract_request(request);
 
         let logger = app_logger("auth.auth_ticket.renew", &metadata);
-        let mut action = ValidateApiTokenFeature::action(&data.auth, &metadata);
+        let mut action = ValidateApiTokenFeature::action(&data, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         let request_decoder = ValidateApiTokenFeature::request_decoder(request);

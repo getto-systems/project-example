@@ -1,11 +1,8 @@
 use tonic::metadata::MetadataMap;
 
-use crate::auth::password::reset::{
-    _auth::request_token::infra::RequestResetTokenRequestDecoder,
-    _common::y_protobuf::service::RequestResetTokenRequestPb,
-};
+use crate::auth::password::reset::_common::y_protobuf::service::RequestResetTokenRequestPb;
 
-use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
+use crate::x_outside_feature::_auth::feature::AppFeature;
 
 use crate::auth::password::reset::_auth::request_token::init::{
     request_decoder::PbRequestResetTokenRequestDecoder, RequestResetTokenStruct,
@@ -13,17 +10,19 @@ use crate::auth::password::reset::_auth::request_token::init::{
 
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 
+use crate::auth::password::reset::_auth::request_token::infra::RequestResetTokenRequestDecoder;
+
 pub struct RequestResetTokenFeature<'a> {
     request_token: RequestResetTokenStruct<'a>,
 }
 
 impl<'a> RequestResetTokenFeature<'a> {
     pub fn action(
-        feature: &'a AuthOutsideFeature,
+        feature: &'a AppFeature,
         metadata: &'a MetadataMap,
     ) -> RequestResetTokenAction<Self> {
         RequestResetTokenAction::with_material(Self {
-            request_token: RequestResetTokenStruct::new(feature, metadata),
+            request_token: RequestResetTokenStruct::new(&feature.auth, metadata),
         })
     }
     pub fn request_decoder(
