@@ -1,8 +1,4 @@
-use std::{
-    collections::HashSet,
-    error::Error,
-    fmt::{Display, Formatter},
-};
+use std::collections::HashSet;
 
 use chrono::{DateTime, Duration, Utc};
 
@@ -60,8 +56,8 @@ impl AuthTicket {
     }
 }
 
-impl Display for AuthTicket {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for AuthTicket {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "{} / {}", self.ticket_id, self.user)
     }
 }
@@ -102,8 +98,8 @@ impl AuthTicketId {
     }
 }
 
-impl Display for AuthTicketId {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for AuthTicketId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "ticket: {}", self.0)
     }
 }
@@ -159,8 +155,8 @@ impl ExpireDateTime {
     }
 }
 
-impl Display for ExpireDateTime {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for ExpireDateTime {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         self.0.fmt(f)
     }
 }
@@ -187,8 +183,8 @@ impl ExpansionLimitDateTime {
     }
 }
 
-impl Display for ExpansionLimitDateTime {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for ExpansionLimitDateTime {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         self.0.fmt(f)
     }
 }
@@ -202,7 +198,6 @@ impl ExpansionLimitDuration {
     }
 }
 
-#[derive(Debug)]
 pub enum ValidateAuthNonceError {
     NonceNotSent,
     MetadataError(MetadataError),
@@ -210,8 +205,8 @@ pub enum ValidateAuthNonceError {
     Conflict,
 }
 
-impl Display for ValidateAuthNonceError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for ValidateAuthNonceError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         let label = "auth nonce error";
         match self {
             Self::NonceNotSent => write!(f, "{}: nonce not sent", label),
@@ -221,15 +216,13 @@ impl Display for ValidateAuthNonceError {
         }
     }
 }
-impl Error for ValidateAuthNonceError {}
 
-#[derive(Debug)]
 pub enum ValidateAuthRolesError {
     PermissionDenied(GrantedAuthRoles, RequireAuthRoles),
 }
 
-impl Display for ValidateAuthRolesError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for ValidateAuthRolesError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::PermissionDenied(granted_roles, require_roles) => {
                 write!(
@@ -241,4 +234,3 @@ impl Display for ValidateAuthRolesError {
         }
     }
 }
-impl Error for ValidateAuthRolesError {}

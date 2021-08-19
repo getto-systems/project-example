@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use crate::{
     auth::auth_ticket::_auth::kernel::data::{AuthTicket, ExpansionLimitDateTime},
     z_details::_common::repository::data::RepositoryError,
@@ -14,7 +12,7 @@ pub enum IssueAuthTicketEvent {
 const SUCCESS: &'static str = "issue success";
 const ERROR: &'static str = "issue error";
 
-impl Display for IssueAuthTicketEvent {
+impl std::fmt::Display for IssueAuthTicketEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::ExpansionLimitCalculated(limit) => {

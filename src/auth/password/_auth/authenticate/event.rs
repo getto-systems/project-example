@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use crate::{
     auth::{
         auth_ticket::_auth::kernel::data::ValidateAuthNonceError,
@@ -25,7 +23,7 @@ pub enum AuthenticatePasswordEvent {
 const SUCCESS: &'static str = "authenticate password success";
 const ERROR: &'static str = "authenticate password error";
 
-impl Display for AuthenticatePasswordEvent {
+impl std::fmt::Display for AuthenticatePasswordEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Success(user) => write!(f, "{}; {}", SUCCESS, user),

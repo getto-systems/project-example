@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::{
@@ -16,7 +14,7 @@ pub enum ValidateApiTokenState {
     Success(AuthUser),
 }
 
-impl Display for ValidateApiTokenState {
+impl std::fmt::Display for ValidateApiTokenState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Validate(event) => write!(f, "{}", event),

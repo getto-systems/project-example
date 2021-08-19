@@ -1,8 +1,3 @@
-use std::{
-    error::Error,
-    fmt::{Display, Formatter},
-};
-
 use crate::auth::login_id::_auth::data::ValidateLoginIdError;
 
 pub enum RequestResetTokenError {
@@ -11,8 +6,8 @@ pub enum RequestResetTokenError {
     UserNotFound,
 }
 
-impl Display for RequestResetTokenError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for RequestResetTokenError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::InvalidLoginId(err) => write!(f, "invalid login id: {}", err),
             Self::DestinationNotFound => write!(f, "destination not found"),
@@ -52,36 +47,32 @@ impl NotifyResetTokenResponse {
     }
 }
 
-impl Display for NotifyResetTokenResponse {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for NotifyResetTokenResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "message-id: {}", self.message_id)
     }
 }
 
-#[derive(Debug)]
 pub enum EncodeResetTokenError {
     InfraError(String),
 }
 
-impl Display for EncodeResetTokenError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for EncodeResetTokenError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::InfraError(err) => write!(f, "encode error: {}", err),
         }
     }
 }
-impl Error for EncodeResetTokenError {}
 
-#[derive(Debug)]
 pub enum NotifyResetTokenError {
     InfraError(String),
 }
 
-impl Display for NotifyResetTokenError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+impl std::fmt::Display for NotifyResetTokenError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::InfraError(err) => write!(f, "notify reset token error; {}", err),
         }
     }
 }
-impl Error for NotifyResetTokenError {}

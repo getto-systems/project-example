@@ -23,7 +23,7 @@ impl<'a> TonicAuthTokenMetadata<'a> {
 
 impl<'a> AuthTokenMetadata for TonicAuthTokenMetadata<'a> {
     fn token(&self) -> Result<Option<AuthToken>, MetadataError> {
-        metadata(&self.metadata, METADATA_TOKEN).map(|value| value.map(AuthToken::new))
+        metadata(&self.metadata, METADATA_TOKEN).map(|value| value.map(AuthToken::restore))
     }
 }
 

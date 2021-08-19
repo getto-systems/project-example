@@ -56,13 +56,13 @@ pub mod test {
 
     use super::super::infra::ValidateApiTokenInfra;
 
-    pub struct StaticLogoutStruct {
+    pub struct StaticValidateApiTokenStruct {
         pub nonce_header: StaticAuthNonceHeader,
         pub token_header: StaticAuthTokenHeader,
         pub validate_service: StaticValidateService,
     }
 
-    impl ValidateApiTokenInfra for StaticLogoutStruct {
+    impl ValidateApiTokenInfra for StaticValidateApiTokenStruct {
         type NonceHeader = StaticAuthNonceHeader;
         type TokenHeader = StaticAuthTokenHeader;
         type ValidateService = StaticValidateService;

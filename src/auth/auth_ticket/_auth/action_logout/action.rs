@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::auth_ticket::_auth::{
@@ -18,7 +16,7 @@ pub enum LogoutState {
     Discard(DiscardAuthTicketEvent),
 }
 
-impl Display for LogoutState {
+impl std::fmt::Display for LogoutState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Validate(event) => write!(f, "{}", event),

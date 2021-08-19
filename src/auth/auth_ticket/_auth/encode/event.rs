@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use crate::{
     auth::auth_ticket::{
         _auth::encode::data::{AuthTokenExpires, EncodeAuthTokenError},
@@ -19,7 +17,7 @@ pub enum EncodeAuthTicketEvent {
 const SUCCESS: &'static str = "encode success";
 const ERROR: &'static str = "encode error";
 
-impl Display for EncodeAuthTicketEvent {
+impl std::fmt::Display for EncodeAuthTicketEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::TokenExpiresCalculated(expires) => {

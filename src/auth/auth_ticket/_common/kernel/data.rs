@@ -4,7 +4,7 @@ use std::collections::HashMap;
 pub struct AuthNonce(String);
 
 impl AuthNonce {
-    pub const fn new(nonce: String) -> Self {
+    pub const fn restore(nonce: String) -> Self {
         Self(nonce)
     }
 
@@ -22,7 +22,7 @@ impl AuthNonce {
 pub struct AuthToken(String);
 
 impl AuthToken {
-    pub const fn new(token: String) -> Self {
+    pub const fn restore(token: String) -> Self {
         Self(token)
     }
 

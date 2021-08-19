@@ -1,35 +1,39 @@
-use std::fmt::Display;
-
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::avail::_api::notify_unexpected_error::{
-    event::LogoutEvent, infra::LogoutInfra, method::logout,
+    event::NotifyUnexpectedErrorEvent,
+    infra::{NotifyUnexpectedErrorInfra, NotifyUnexpectedErrorRequestDecoder},
+    method::notify_unexpected_error,
 };
 
-pub enum LogoutState {
-    Logout(LogoutEvent),
+use crate::z_details::_api::message::data::MessageError;
+
+pub enum NotifyUnexpectedErrorState {
+    Notify(NotifyUnexpectedErrorEvent),
+    MessageError(MessageError),
 }
 
-impl Display for LogoutState {
+impl std::fmt::Display for NotifyUnexpectedErrorState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Logout(event) => write!(f, "{}", event),
+            Self::Notify(event) => write!(f, "{}", event),
+            Self::MessageError(err) => write!(f, "{}", err),
         }
     }
 }
 
-pub trait LogoutMaterial {
-    type Logout: LogoutInfra;
+pub trait NotifyUnexpectedErrorMaterial {
+    type Notify: NotifyUnexpectedErrorInfra;
 
-    fn logout(&self) -> &Self::Logout;
+    fn notify(&self) -> &Self::Notify;
 }
 
-pub struct LogoutAction<M: LogoutMaterial> {
-    pubsub: ActionStatePubSub<LogoutState>,
+pub struct NotifyUnexpectedErrorAction<M: NotifyUnexpectedErrorMaterial> {
+    pubsub: ActionStatePubSub<NotifyUnexpectedErrorState>,
     material: M,
 }
 
-impl<M: LogoutMaterial> LogoutAction<M> {
+impl<M: NotifyUnexpectedErrorMaterial> NotifyUnexpectedErrorAction<M> {
     pub fn with_material(material: M) -> Self {
         Self {
             pubsub: ActionStatePubSub::new(),
@@ -37,14 +41,27 @@ impl<M: LogoutMaterial> LogoutAction<M> {
         }
     }
 
-    pub fn subscribe(&mut self, handler: impl 'static + Fn(&LogoutState) + Send + Sync) {
+    pub fn subscribe(
+        &mut self,
+        handler: impl 'static + Fn(&NotifyUnexpectedErrorState) + Send + Sync,
+    ) {
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<LogoutState> {
+    pub async fn ignite(
+        self,
+        request_decoder: impl NotifyUnexpectedErrorRequestDecoder,
+    ) -> MethodResult<NotifyUnexpectedErrorState> {
         let pubsub = self.pubsub;
         let m = self.material;
 
-        logout(m.logout(), |event| pubsub.post(LogoutState::Logout(event))).await
+        let err = request_decoder
+            .decode()
+            .map_err(|err| pubsub.post(NotifyUnexpectedErrorState::MessageError(err)))?;
+
+        notify_unexpected_error(m.notify(), err, |event| {
+            pubsub.post(NotifyUnexpectedErrorState::Notify(event))
+        })
+        .await
     }
 }

@@ -1,80 +1,52 @@
-pub(in crate::auth) mod logout_service;
+pub(in crate::avail) mod request_decoder;
 
 use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_api::{
-    kernel::init::{nonce_header::ActixWebAuthNonceHeader, token_header::TicketAuthTokenHeader},
-    logout::init::logout_service::TonicLogoutService,
-};
+use crate::auth::_api::common::init::ValidateApiTokenStruct;
 
-use super::infra::LogoutInfra;
+use super::infra::NotifyUnexpectedErrorInfra;
 
-pub struct LogoutStruct<'a> {
-    nonce_header: ActixWebAuthNonceHeader<'a>,
-    token_header: TicketAuthTokenHeader<'a>,
-    logout_service: TonicLogoutService<'a>,
+pub struct NotifyUnexpectedErrorStruct<'a> {
+    validate_infra: ValidateApiTokenStruct<'a>,
 }
 
-impl<'a> LogoutStruct<'a> {
+impl<'a> NotifyUnexpectedErrorStruct<'a> {
     pub fn new(
         feature: &'a AuthOutsideFeature,
         request_id: &'a str,
         request: &'a HttpRequest,
     ) -> Self {
         Self {
-            nonce_header: ActixWebAuthNonceHeader::new(request),
-            token_header: TicketAuthTokenHeader::new(request),
-            logout_service: TonicLogoutService::new(&feature.service, request_id),
+            validate_infra: ValidateApiTokenStruct::new(feature, request_id, request),
         }
     }
 }
 
-impl<'a> LogoutInfra for LogoutStruct<'a> {
-    type NonceHeader = ActixWebAuthNonceHeader<'a>;
-    type TokenHeader = TicketAuthTokenHeader<'a>;
-    type LogoutService = TonicLogoutService<'a>;
+impl<'a> NotifyUnexpectedErrorInfra for NotifyUnexpectedErrorStruct<'a> {
+    type ValidateInfra = ValidateApiTokenStruct<'a>;
 
-    fn nonce_header(&self) -> &Self::NonceHeader {
-        &self.nonce_header
-    }
-    fn token_header(&self) -> &Self::TokenHeader {
-        &self.token_header
-    }
-    fn logout_service(&self) -> &Self::LogoutService {
-        &self.logout_service
+    fn validate_infra(&self) -> &Self::ValidateInfra {
+        &self.validate_infra
     }
 }
 
 #[cfg(test)]
 pub mod test {
-    use super::logout_service::test::StaticLogoutService;
-    use crate::auth::auth_ticket::_api::kernel::init::{
-        nonce_header::test::StaticAuthNonceHeader, token_header::test::StaticAuthTokenHeader,
-    };
+    use crate::auth::_api::common::init::test::StaticValidateApiTokenStruct;
 
-    use super::super::infra::LogoutInfra;
+    use super::super::infra::NotifyUnexpectedErrorInfra;
 
-    pub struct StaticLogoutStruct {
-        pub nonce_header: StaticAuthNonceHeader,
-        pub token_header: StaticAuthTokenHeader,
-        pub logout_service: StaticLogoutService,
+    pub struct StaticNotifyUnexpectedErrorStruct {
+        pub validate_infra: StaticValidateApiTokenStruct,
     }
 
-    impl LogoutInfra for StaticLogoutStruct {
-        type NonceHeader = StaticAuthNonceHeader;
-        type TokenHeader = StaticAuthTokenHeader;
-        type LogoutService = StaticLogoutService;
+    impl NotifyUnexpectedErrorInfra for StaticNotifyUnexpectedErrorStruct {
+        type ValidateInfra = StaticValidateApiTokenStruct;
 
-        fn nonce_header(&self) -> &Self::NonceHeader {
-            &self.nonce_header
-        }
-        fn token_header(&self) -> &Self::TokenHeader {
-            &self.token_header
-        }
-        fn logout_service(&self) -> &Self::LogoutService {
-            &self.logout_service
+        fn validate_infra(&self) -> &Self::ValidateInfra {
+            &self.validate_infra
         }
     }
 }

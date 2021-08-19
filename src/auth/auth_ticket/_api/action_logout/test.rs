@@ -9,8 +9,6 @@ use crate::auth::auth_ticket::_api::{
 
 use super::action::{LogoutAction, LogoutMaterial};
 
-use crate::auth::auth_ticket::_common::kernel::data::{AuthNonce, AuthToken};
-
 #[tokio::test]
 async fn success_logout() {
     let (handler, assert_state) = ActionTestRunner::new();
@@ -41,8 +39,8 @@ impl TestFeature {
     fn standard() -> Self {
         Self {
             logout: StaticLogoutStruct {
-                nonce_header: StaticAuthNonceHeader::Valid(AuthNonce::new("NONCE".into())),
-                token_header: StaticAuthTokenHeader::Valid(AuthToken::new("TOKEN".into())),
+                nonce_header: StaticAuthNonceHeader::new("NONCE"),
+                token_header: StaticAuthTokenHeader::new("TOKEN"),
                 logout_service: StaticLogoutService,
             },
         }

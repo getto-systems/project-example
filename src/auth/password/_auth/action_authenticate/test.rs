@@ -420,7 +420,7 @@ fn standard_clock() -> StaticChronoAuthClock {
 }
 
 fn standard_nonce_metadata() -> StaticAuthNonceMetadata {
-    StaticAuthNonceMetadata::Valid(AuthNonce::new(NONCE.into()))
+    StaticAuthNonceMetadata::Valid(AuthNonce::restore(NONCE.into()))
 }
 
 fn standard_request_decoder() -> StaticAuthenticatePasswordRequestDecoder {
@@ -518,7 +518,7 @@ fn test_user() -> AuthUser {
     .restore()
 }
 fn test_user_login_id() -> LoginId {
-    LoginId::validate(LOGIN_ID.to_string()).unwrap()
+    LoginId::restore(LOGIN_ID.into())
 }
 fn test_user_password() -> HashedPassword {
     HashedPassword::restore(PASSWORD.into())

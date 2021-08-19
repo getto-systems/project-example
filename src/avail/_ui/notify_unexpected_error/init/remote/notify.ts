@@ -1,5 +1,5 @@
 import { env } from "../../../../../y_environment/_ui/env"
-import { NotifyUnexpectedError_pb } from "../../../../../y_protobuf/proto.js"
+import pb from "../../../../../y_protobuf/proto.js"
 
 import {
     fetchOptions,
@@ -32,7 +32,7 @@ export function newNotifyUnexpectedErrorRemote(
             })
             const response = await fetch(opts.url, {
                 ...opts.options,
-                body: encodeProtobuf(NotifyUnexpectedError_pb, (message) => {
+                body: encodeProtobuf(pb.avail.api.NotifyUnexpectedError_pb, (message) => {
                     message.json = JSON.stringify(err)
                 }),
             })

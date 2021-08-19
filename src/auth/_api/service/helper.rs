@@ -1,11 +1,7 @@
-use std::fmt::Display;
-
 use tonic::{metadata::MetadataValue, Request};
 
 use crate::{
-    auth::auth_ticket::_common::kernel::x_tonic::metadata::{
-        METADATA_NONCE, METADATA_TOKEN,
-    },
+    auth::auth_ticket::_common::kernel::x_tonic::metadata::{METADATA_NONCE, METADATA_TOKEN},
     x_outside_feature::_common::metadata::METADATA_REQUEST_ID,
 };
 
@@ -14,7 +10,7 @@ use crate::auth::{
     auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
 };
 
-pub fn infra_error(err: impl Display) -> AuthServiceError {
+pub fn infra_error(err: impl std::fmt::Display) -> AuthServiceError {
     AuthServiceError::InfraError(format!("service infra error; {}", err))
 }
 

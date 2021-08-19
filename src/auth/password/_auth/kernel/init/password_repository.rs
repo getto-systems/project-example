@@ -1,14 +1,11 @@
-use std::fmt::Display;
-
 use chrono::{TimeZone, Utc};
 use sqlx::{query, MySqlPool};
 
 use crate::z_details::_common::repository::{helper::infra_error, mysql::helper::mysql_error};
 
 use crate::auth::password::_auth::kernel::infra::{
-    AuthUserPasswordHasher, AuthUserPasswordMatcher, ResetPasswordRepository, HashedPassword,
-    RegisterResetTokenRepository, ResetTokenEntry, ResetTokenEntryExtract,
-    VerifyPasswordRepository,
+    AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword, RegisterResetTokenRepository,
+    ResetPasswordRepository, ResetTokenEntry, ResetTokenEntryExtract, VerifyPasswordRepository,
 };
 
 use crate::{
@@ -234,7 +231,7 @@ fn request_mysql_error(err: sqlx::Error) -> RegisterResetTokenError {
 fn reset_mysql_error(err: sqlx::Error) -> PasswordHashRepositoryError {
     PasswordHashRepositoryError::RepositoryError(mysql_error(err))
 }
-fn reset_infra_error(err: impl Display) -> PasswordHashRepositoryError {
+fn reset_infra_error(err: impl std::fmt::Display) -> PasswordHashRepositoryError {
     PasswordHashRepositoryError::RepositoryError(infra_error(err))
 }
 
@@ -247,9 +244,9 @@ pub mod test {
     use crate::z_details::_common::repository::helper::infra_error;
 
     use crate::auth::password::_auth::kernel::infra::{
-        AuthUserPasswordHasher, AuthUserPasswordMatcher, ResetPasswordRepository,
-        HashedPassword, RegisterResetTokenRepository, ResetTokenEntry, ResetTokenEntryExtract,
-        VerifyPasswordRepository,
+        AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword,
+        RegisterResetTokenRepository, ResetPasswordRepository, ResetTokenEntry,
+        ResetTokenEntryExtract, VerifyPasswordRepository,
     };
 
     use crate::{

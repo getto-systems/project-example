@@ -107,7 +107,7 @@ pub struct AuthNonceEntryExtract {
 impl From<AuthNonceEntryExtract> for AuthNonceEntry {
     fn from(src: AuthNonceEntryExtract) -> Self {
         Self {
-            nonce: AuthNonce::new(src.nonce),
+            nonce: AuthNonce::restore(src.nonce),
             expires: src.expires.map(|expires| ExpireDateTime::restore(expires)),
         }
     }

@@ -70,8 +70,15 @@ pub mod test {
         auth_user::_common::kernel::data::{AuthUserId, RequireAuthRoles},
     };
 
-    pub enum StaticValidateService {
-        Valid(AuthUserId),
+    pub struct StaticValidateService {
+        user_id: AuthUserId,
+    }
+    impl StaticValidateService {
+        pub fn new(user_id: &str) -> Self {
+            Self {
+                user_id: AuthUserId::restore(user_id.into()),
+            }
+        }
     }
 
     #[async_trait::async_trait]
@@ -82,9 +89,7 @@ pub mod test {
             _token: Option<AuthToken>,
             _require_roles: RequireAuthRoles,
         ) -> Result<AuthUserId, AuthServiceError> {
-            match self {
-                Self::Valid(user_id) => Ok(user_id.clone()),
-            }
+            Ok(self.user_id.clone())
         }
     }
 }

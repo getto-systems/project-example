@@ -20,10 +20,7 @@ use crate::auth::password::_common::authenticate::infra::AuthenticatePasswordFie
 
 use super::action::{AuthenticatePasswordAction, AuthenticatePasswordMaterial};
 
-use crate::auth::{
-    auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
-    auth_user::_common::kernel::data::{AuthUser, AuthUserExtract},
-};
+use crate::auth::auth_user::_common::kernel::data::{AuthUser, AuthUserExtract};
 
 #[tokio::test]
 async fn success_authenticate() {
@@ -56,8 +53,8 @@ impl<'a> TestFeature {
     fn standard() -> Self {
         Self {
             authenticate: StaticAuthenticatePasswordStruct {
-                nonce_header: StaticAuthNonceHeader::Valid(AuthNonce::new("NONCE".into())),
-                token_header: StaticAuthTokenHeader::Valid(AuthToken::new("TOKEN".into())),
+                nonce_header: StaticAuthNonceHeader::new("NONCE"),
+                token_header: StaticAuthTokenHeader::new("TOKEN"),
                 response_builder: StaticAuthTokenResponseBuilder,
                 authenticate_service: StaticAuthenticatePasswordService {
                     user: standard_user(),
