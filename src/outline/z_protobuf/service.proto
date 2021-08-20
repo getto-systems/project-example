@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package outline.service;
+
+service GetMenuPb {
+    rpc GetMenu (GetMenuRequestPb) returns (GetMenuResponsePb);
+}
+message GetMenuRequestPb {}
+message GetMenuResponsePb {
+    int32 index = 1;
+}

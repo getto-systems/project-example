@@ -1,3 +1,0 @@
-syntax = "proto3";
-
-message NotifyUnexpectedError_pb { string json = 1; }

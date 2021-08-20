@@ -10,7 +10,6 @@ default-run = "api"
 name = "api"
 path = "main/_api/main.rs"
 
-
 [[bin]]
 name = "auth"
 path = "main/_auth/main.rs"
