@@ -1,4 +1,5 @@
 import {
+    docsAction,
     docsDescription,
     docsDomain,
     docsModule,
@@ -7,30 +8,50 @@ import {
     docsUsecase,
 } from "../../ui/vendor/getto-application/docs/helper"
 
+import { docs_notifyUnexpectedError } from "./unexpected_error/_ui/action_notify/docs"
+import { docs_findNextVersion } from "./version/_ui/action_find_next/docs"
+
 import {
     DocsSection,
     DocsUsecase,
     DocsUsecaseDescription,
 } from "../../ui/vendor/getto-application/docs/data"
-import { docs_notifyUnexpectedError } from "./unexpected_error/_ui/action_notify_unexpected_error/docs"
 
 export const docs_avail = docsDomain<AvailUsecase, AvailAction, AvailData>(
     "保守・運用",
     ["業務で必要な時に使用できる", "業務に合ったコストで運用できる"],
-    ["notifyUnexpectedError"],
+    ["guaranteeOnTimeAccess", "notifyUnexpectedError", "findNextVersion"],
     (name) => usecase[name],
 )
 
 const usecase = {
+    guaranteeOnTimeAccess: docsAvailUsecase(
+        "guaranteeOnTimeAccess",
+        ["業務で必要な時に使用できる"],
+        { action: ["guaranteeOnTimeAccess"], data: [] },
+    ),
     notifyUnexpectedError: docsAvailUsecase(
         "notifyUnexpectedError",
         ["業務で必要な時に使用できる"],
         { action: ["notifyUnexpectedError"], data: [] },
     ),
+    findNextVersion: docsAvailUsecase("findNextVersion", ["業務で必要な時に使用できる"], {
+        action: ["findNextVersion"],
+        data: [],
+    }),
 } as const
 
 const action = {
+    guaranteeOnTimeAccess: docsAction("業務時間内のアクセスを保証", ({ item }) => [
+        item("check", ["停止許容時間", "5分/10h (業務時間内)"], ["業務時間外の停止は連絡後に実施"]),
+        item(
+            "check",
+            ["レスポンスの最大待ち時間", "1秒"],
+            ["処理に時間がかかる場合は完了時に通知"],
+        ),
+    ]),
     notifyUnexpectedError: docs_notifyUnexpectedError,
+    findNextVersion: docs_findNextVersion,
 } as const
 
 const data = {} as const

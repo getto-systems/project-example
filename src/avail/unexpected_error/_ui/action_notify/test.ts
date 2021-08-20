@@ -1,7 +1,7 @@
 import { initNotifyUnexpectedErrorCoreAction } from "./core/impl"
 import { initNotifyUnexpectedErrorResource } from "./impl"
 
-import { NotifyUnexpectedErrorRemote } from "../notify_unexpected_error/infra"
+import { NotifyUnexpectedErrorRemote } from "../notify/infra"
 
 describe("NotifyUnexpectedError", () => {
     test("notify", () => {

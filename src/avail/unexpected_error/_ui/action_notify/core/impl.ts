@@ -1,6 +1,6 @@
-import { notifyUnexpectedError } from "../../notify_unexpected_error/method"
+import { notifyUnexpectedError } from "../../notify/method"
 
-import { NotifyUnexpectedErrorInfra } from "../../notify_unexpected_error/infra"
+import { NotifyUnexpectedErrorInfra } from "../../notify/infra"
 
 import { NotifyUnexpectedErrorCoreAction } from "./action"
 
