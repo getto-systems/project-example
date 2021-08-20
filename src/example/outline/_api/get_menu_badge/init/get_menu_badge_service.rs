@@ -4,7 +4,7 @@ use crate::example::outline::_common::y_protobuf::service::{
     get_menu_badge_pb_client::GetMenuBadgePbClient, GetMenuBadgeRequestPb,
 };
 
-use crate::example::_api::x_outside_feature::feature::OutlineOutsideService;
+use crate::example::_api::x_outside_feature::feature::ExampleOutsideService;
 
 use crate::example::_api::service::helper::{infra_error, set_metadata};
 
@@ -20,7 +20,7 @@ pub struct TonicGetOutlineMenuBadgeService<'a> {
 }
 
 impl<'a> TonicGetOutlineMenuBadgeService<'a> {
-    pub const fn new(service: &'a OutlineOutsideService, request_id: &'a str) -> Self {
+    pub const fn new(service: &'a ExampleOutsideService, request_id: &'a str) -> Self {
         Self {
             outline_service_url: service.outline_service_url,
             request_id,
