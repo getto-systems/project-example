@@ -8,6 +8,7 @@ export type DocsDomainContent = Readonly<{
     title: string
     purpose: string[]
     usecase: DocsUsecaseContent[]
+    data: DocsData[]
 }>
 export interface DocsUsecaseMap<U, A, D> {
     (usecase: U): DocsUsecase<A, D>

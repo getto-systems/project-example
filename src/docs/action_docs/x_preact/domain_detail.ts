@@ -16,7 +16,7 @@ import { container } from "../../../../ui/vendor/getto-css/preact/design/box"
 import { v_small } from "../../../../ui/vendor/getto-css/preact/design/alignment"
 
 import { copyright, siteInfo } from "../../../example/site"
-import { dataBox, domainBox, usecaseAbstractBox } from "./helper"
+import { actionBox, dataBox, domainBox } from "./helper"
 
 import { ApplicationErrorComponent } from "../../../avail/_ui/x_preact/application_error"
 import { LoadMenuEntry } from "../../../outline/_ui/action_load_menu/x_preact/load_menu"
@@ -29,7 +29,7 @@ type EntryProps = Readonly<{
     view: DocsView
     docs: DocsDomainContent
 }>
-export function DocsDomainEntry(props: EntryProps): VNode {
+export function DocsDomainDetailEntry(props: EntryProps): VNode {
     const resource = useApplicationView(props.view)
 
     const err = useNotifyUnexpectedError(resource)
@@ -37,11 +37,11 @@ export function DocsDomainEntry(props: EntryProps): VNode {
         return h(ApplicationErrorComponent, { err: `${err}` })
     }
 
-    return h(DocsDomainComponent, { ...resource, docs: props.docs })
+    return h(DocsDomainDetailComponent, { ...resource, docs: props.docs })
 }
 
 type Props = DocsResource & Readonly<{ docs: DocsDomainContent }>
-export function DocsDomainComponent(resource: Props): VNode {
+export function DocsDomainDetailComponent(resource: Props): VNode {
     useDocumentTitle(title())
 
     return appLayout({
@@ -56,14 +56,14 @@ export function DocsDomainComponent(resource: Props): VNode {
     })
 
     function title() {
-        return `${resource.docs.title}概要`
+        return resource.docs.title
     }
 }
 
 function content(docs: DocsDomainContent): VNode {
     return html`${[
         container(domainBox(docs)),
-        container(docs.usecase.map(usecaseAbstractBox)),
+        container(docs.usecase.flatMap((usecase) => usecase.action.map(actionBox))),
         v_small(),
         container(docs.data.map(dataBox)),
     ]}`

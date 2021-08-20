@@ -4,17 +4,15 @@ import { foregroundOutsideFeature } from "../../../../../src/x_outside_feature/_
 
 import { newDocsView } from "../../../../../src/docs/action_docs/init"
 
-import { docs_avail_legacy, docs_avail_detail } from "../../../../../src/avail/docs"
+import { DocsDomainDetailEntry } from "../../../../../src/docs/action_docs/x_preact/domain_detail"
 
-import { DocsEntry } from "../../../../../src/docs/action_docs/x_preact/docs"
+import { docsDomainContent } from "../../../../../ui/vendor/getto-application/docs/helper"
+import { docs_avail } from "../../../../../src/avail/docs"
 
 render(
-    h(DocsEntry, {
+    h(DocsDomainDetailEntry, {
         view: newDocsView(foregroundOutsideFeature()),
-        docs: {
-            title: "保守・運用",
-            contents: [[[...docs_avail_legacy]], [docs_avail_detail]],
-        },
+        docs: docsDomainContent(docs_avail),
     }),
     document.body,
 )

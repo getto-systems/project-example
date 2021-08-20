@@ -5,6 +5,7 @@ import { lnir } from "../../../../z_details/_ui/icon/line_icon"
 import { assertMenuPath, category, item } from "./common"
 
 import { docs_auth } from "../../../../auth/docs"
+import { docs_avail } from "../../../../avail/docs"
 
 import { MenuContent, MenuPermission, MenuTreeNode } from "../infra"
 
@@ -23,7 +24,7 @@ export function docsMenuContent(): MenuContent {
             ]),
             category("ドキュメント", allow, [
                 docsMenuNode(docs_auth, "auth"),
-                item("保守・運用", lnir("files-alt"), "/docs/avail.html"),
+                item(docs_avail.title, lnir("files-alt"), "/docs/avail.html"),
             ]),
             ...(env.isProduction
                 ? []

@@ -23,10 +23,19 @@ import {
 } from "./data"
 
 export function docsDomainContent<U, A, D>(domain: DocsDomain<U, A, D>): DocsDomainContent {
+    const usecase = domain.usecase.map((name) => toUsecaseContent(domain.toUsecase(name)))
     return {
         title: domain.title,
         purpose: domain.purpose,
-        usecase: domain.usecase.map((name) => toUsecaseContent(domain.toUsecase(name))),
+        usecase,
+        data: usecase
+            .flatMap((usecase) => usecase.data)
+            .reduce((acc, data) => {
+                if (!acc.includes(data)) {
+                    acc.push(data)
+                }
+                return acc
+            }, <DocsData[]>[]),
     }
 }
 export function docsUsecaseContent<U, A, D>(

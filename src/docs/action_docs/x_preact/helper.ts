@@ -28,7 +28,7 @@ export function domainBox(docs: DocsDomainContent): VNode[] {
             body: docs.purpose.map(notice_info),
         }),
         box({
-            title: "操作",
+            title: "項目",
             body: usecase(docs.usecase),
         }),
     ]

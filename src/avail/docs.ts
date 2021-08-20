@@ -20,7 +20,7 @@ import {
 export const docs_avail = docsDomain<AvailUsecase, AvailAction, AvailData>(
     "保守・運用",
     ["業務で必要な時に使用できる", "業務に合ったコストで運用できる"],
-    ["guaranteeOnTimeAccess", "notifyUnexpectedError", "findNextVersion"],
+    ["guaranteeOnTimeAccess", "notifyUnexpectedError", "findNextVersion", "server"],
     (name) => usecase[name],
 )
 
@@ -39,6 +39,11 @@ const usecase = {
         action: ["findNextVersion"],
         data: [],
     }),
+    server: docsAvailUsecase(
+        "server",
+        ["業務で必要な時に使用できる", "業務に合ったコストで運用できる"],
+        { action: ["server"], data: [] },
+    ),
 } as const
 
 const action = {
@@ -52,6 +57,13 @@ const action = {
     ]),
     notifyUnexpectedError: docs_notifyUnexpectedError,
     findNextVersion: docs_findNextVersion,
+    server: docsAction("サーバー構成", ({ item }) => [
+        item(
+            "check",
+            ["コストを抑えた構成", "冗長構成"],
+            ["Google Cloud Run", "K8s", "Cloud SQL", "AWS RDS"],
+        ),
+    ]),
 } as const
 
 const data = {} as const
