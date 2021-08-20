@@ -1,5 +1,5 @@
 import { env } from "../../../../../../y_environment/_ui/env"
-import { GetMenuBadgeResult_pb } from "../../../../../../y_protobuf/proto.js"
+import pb from "../../../../../../y_protobuf/proto.js"
 
 import {
     fetchOptions,
@@ -19,14 +19,14 @@ export function newGetMenuBadgeRemote(feature: RemoteOutsideFeature): GetMenuBad
     return async () => {
         try {
             // TODO api の実装が終わったらつなぐ
-            const mock = true
+            const mock = false
             if (mock) {
                 return { success: true, value: convertMenuBadgeRemote([]) }
             }
 
             const opts = fetchOptions({
                 serverURL: env.apiServerURL,
-                path: "/outline/menu/badge",
+                path: "/outline/menu-badge",
                 method: "GET",
                 headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
             })
@@ -36,15 +36,15 @@ export function newGetMenuBadgeRemote(feature: RemoteOutsideFeature): GetMenuBad
                 return remoteCommonError(response.status)
             }
 
-            const result = decodeProtobuf(GetMenuBadgeResult_pb, await response.text())
+            const result = decodeProtobuf(pb.outline.api.GetMenuBadgeResult_pb, await response.text())
             return {
                 success: true,
-                value: convertMenuBadgeRemote(
-                    result.badge.map((item) => ({
-                        path: item.path || "",
-                        count: item.count || 0,
-                    })),
-                ),
+                value: convertMenuBadgeRemote([
+                    {
+                        path: "/index.html",
+                        count: result.index,
+                    },
+                ]),
             }
         } catch (err) {
             return remoteInfraError(err)

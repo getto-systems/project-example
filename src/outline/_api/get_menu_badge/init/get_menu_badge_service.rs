@@ -1,7 +1,7 @@
 use tonic::Request;
 
 use crate::outline::_common::y_protobuf::service::{
-    get_menu_pb_client::GetMenuPbClient, GetMenuRequestPb,
+    get_menu_badge_pb_client::GetMenuBadgePbClient, GetMenuBadgeRequestPb,
 };
 
 use crate::outline::_api::x_outside_feature::feature::OutlineOutsideService;
@@ -29,15 +29,15 @@ impl<'a> TonicGetOutlineMenuBadgeService<'a> {
 #[async_trait::async_trait]
 impl<'a> GetOutlineMenuBadgeService for TonicGetOutlineMenuBadgeService<'a> {
     async fn get_menu(&self) -> Result<OutlineMenuBadge, OutlineServiceError> {
-        let mut client = GetMenuPbClient::connect(self.outline_service_url)
+        let mut client = GetMenuBadgePbClient::connect(self.outline_service_url)
             .await
             .map_err(infra_error)?;
 
-        let mut request = Request::new(GetMenuRequestPb {});
+        let mut request = Request::new(GetMenuBadgeRequestPb {});
         set_metadata(&mut request, self.request_id)?;
 
         let response = client
-            .get_menu(request)
+            .get_menu_badge(request)
             .await
             .map_err(OutlineServiceError::from)?
             .into_inner();
