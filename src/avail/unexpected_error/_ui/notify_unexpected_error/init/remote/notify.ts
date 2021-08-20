@@ -1,15 +1,15 @@
-import { env } from "../../../../../y_environment/_ui/env"
-import pb from "../../../../../y_protobuf/proto.js"
+import { env } from "../../../../../../y_environment/_ui/env"
+import pb from "../../../../../../y_protobuf/proto.js"
 
 import {
     fetchOptions,
     generateNonce,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../z_details/_ui/remote/helper"
-import { encodeProtobuf } from "../../../../../../ui/vendor/protobuf/helper"
+} from "../../../../../../z_details/_ui/remote/helper"
+import { encodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 
-import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/feature"
+import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/feature"
 
 import { NotifyUnexpectedErrorRemote } from "../../infra"
 

@@ -3,7 +3,7 @@ import { newNotifyUnexpectedErrorInfra } from "../notify_unexpected_error/init"
 import { initNotifyUnexpectedErrorResource } from "./impl"
 import { initNotifyUnexpectedErrorCoreAction } from "./core/impl"
 
-import { RemoteOutsideFeature } from "../../../z_details/_ui/remote/feature"
+import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"
 
 import { NotifyUnexpectedErrorResource } from "./resource"
 

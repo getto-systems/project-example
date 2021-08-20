@@ -10,6 +10,6 @@ fn main() {
     protobuf::generate("auth.auth_ticket");
     protobuf::generate("auth.password");
     protobuf::generate("auth.password.reset");
-    protobuf::generate("avail");
+    protobuf::generate("avail.unexpected_error");
     environment::generate();
 }

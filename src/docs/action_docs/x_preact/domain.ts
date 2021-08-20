@@ -2,7 +2,7 @@ import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
 import { useApplicationView } from "../../../../ui/vendor/getto-application/action/x_preact/hooks"
-import { useNotifyUnexpectedError } from "../../../avail/_ui/action_notify_unexpected_error/x_preact/hooks"
+import { useNotifyUnexpectedError } from "../../../avail/unexpected_error/_ui/action_notify_unexpected_error/x_preact/hooks"
 import { useDocumentTitle } from "../../../example/_ui/x_preact/hooks"
 
 import {
