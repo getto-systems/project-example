@@ -1,10 +1,10 @@
 use prost::Message;
 
-use crate::avail::_api::y_protobuf::api::NotifyUnexpectedErrorPb;
+use crate::avail::unexpected_error::_api::y_protobuf::api::NotifyUnexpectedErrorPb;
 
 use crate::z_details::_api::message::helper::{decode_base64, invalid_protobuf};
 
-use crate::avail::_api::notify_unexpected_error::infra::NotifyUnexpectedErrorRequestDecoder;
+use crate::avail::unexpected_error::_api::notify::infra::NotifyUnexpectedErrorRequestDecoder;
 
 use crate::z_details::_api::message::data::MessageError;
 
@@ -29,7 +29,7 @@ impl NotifyUnexpectedErrorRequestDecoder for ProstNotifyUnexpectedErrorRequestDe
 
 #[cfg(test)]
 pub mod test {
-    use crate::avail::_api::notify_unexpected_error::infra::NotifyUnexpectedErrorRequestDecoder;
+    use crate::avail::unexpected_error::_api::notify::infra::NotifyUnexpectedErrorRequestDecoder;
 
     use crate::z_details::_api::message::data::MessageError;
 

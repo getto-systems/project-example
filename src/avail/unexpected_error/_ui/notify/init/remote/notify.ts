@@ -1,15 +1,15 @@
-import { env } from "../../../../../y_environment/_ui/env"
-import pb from "../../../../../y_protobuf/proto.js"
+import { env } from "../../../../../../y_environment/_ui/env"
+import pb from "../../../../../../y_protobuf/proto.js"
 
 import {
     fetchOptions,
     generateNonce,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../z_details/_ui/remote/helper"
-import { encodeProtobuf } from "../../../../../../ui/vendor/protobuf/helper"
+} from "../../../../../../z_details/_ui/remote/helper"
+import { encodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 
-import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/feature"
+import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/feature"
 
 import { NotifyUnexpectedErrorRemote } from "../../infra"
 
@@ -18,22 +18,21 @@ export function newNotifyUnexpectedErrorRemote(
 ): NotifyUnexpectedErrorRemote {
     return async (err) => {
         try {
-            const mock = true
+            const mock = false
             if (mock) {
-                // TODO api の実装が終わったらつなぐ
                 return { success: true, value: true }
             }
 
             const opts = fetchOptions({
                 serverURL: env.apiServerURL,
-                path: "/avail/error/unexpected",
+                path: "/avail/unexpected-error",
                 method: "POST",
                 headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
             })
             const response = await fetch(opts.url, {
                 ...opts.options,
-                body: encodeProtobuf(pb.avail.api.NotifyUnexpectedError_pb, (message) => {
-                    message.json = JSON.stringify(err)
+                body: encodeProtobuf(pb.avail.unexpected_error.api.NotifyUnexpectedError_pb, (message) => {
+                    message.json = JSON.stringify({ message: `${err}`, err })
                 }),
             })
 

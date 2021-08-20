@@ -2,13 +2,13 @@ use actix_web::HttpRequest;
 
 use crate::x_outside_feature::_api::feature::AppFeature;
 
-use crate::avail::_api::notify_unexpected_error::init::{
+use crate::avail::unexpected_error::_api::notify::init::{
     request_decoder::ProstNotifyUnexpectedErrorRequestDecoder, NotifyUnexpectedErrorStruct,
 };
 
 use super::action::{NotifyUnexpectedErrorAction, NotifyUnexpectedErrorMaterial};
 
-use crate::avail::_api::notify_unexpected_error::infra::NotifyUnexpectedErrorRequestDecoder;
+use crate::avail::unexpected_error::_api::notify::infra::NotifyUnexpectedErrorRequestDecoder;
 
 pub struct NotifyUnexpectedErrorFeature<'a> {
     notify: NotifyUnexpectedErrorStruct<'a>,

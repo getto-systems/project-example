@@ -28,7 +28,6 @@ export function newResetPasswordRemote(
         try {
             const mock = false
             if (mock) {
-                // TODO api の実装が終わったらつなぐ
                 return {
                     success: true,
                     value: convertAuthRemote(clock, { roles: ["admin", "dev-docs"] }),

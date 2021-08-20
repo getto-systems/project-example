@@ -5,7 +5,7 @@ use crate::{
         StaticAuthNonceHeader, StaticAuthTokenHeader, StaticValidateApiTokenStruct,
         StaticValidateService,
     },
-    avail::_api::notify_unexpected_error::init::{
+    avail::unexpected_error::_api::notify::init::{
         request_decoder::test::StaticNotifyUnexpectedErrorRequestDecoder,
         test::StaticNotifyUnexpectedErrorStruct,
     },

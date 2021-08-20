@@ -18,9 +18,9 @@ import { convertMenuBadgeRemote } from "../../../convert"
 export function newGetMenuBadgeRemote(feature: RemoteOutsideFeature): GetMenuBadgeRemote {
     return async () => {
         try {
+            // TODO api の実装が終わったらつなぐ
             const mock = true
             if (mock) {
-                // TODO api の実装が終わったらつなぐ
                 return { success: true, value: convertMenuBadgeRemote([]) }
             }
 

@@ -9,7 +9,9 @@ use example_api::x_outside_feature::_api::{
     feature::{AppData, AppFeature},
 };
 
-use example_api::auth::_api::x_actix_web::route::scope_auth;
+use example_api::{
+    auth::_api::x_actix_web::route::scope_auth, avail::_api::x_actix_web::route::scope_avail,
+};
 
 lazy_static! {
     static ref ENV: Env = Env::new();
@@ -32,6 +34,7 @@ async fn main() -> io::Result<()> {
             .app_data(data.clone())
             .service(root::index)
             .service(scope_auth())
+            .service(scope_avail())
     })
     .bind(format!("0.0.0.0:{}", &ENV.port))?
     .run()

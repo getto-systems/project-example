@@ -1,6 +1,6 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::avail::_api::notify_unexpected_error::{
+use crate::avail::unexpected_error::_api::notify::{
     event::NotifyUnexpectedErrorEvent,
     infra::{NotifyUnexpectedErrorInfra, NotifyUnexpectedErrorRequestDecoder},
     method::notify_unexpected_error,
