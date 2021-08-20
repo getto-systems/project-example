@@ -4,7 +4,7 @@ use super::env::Env;
 
 use crate::{
     auth::_api::x_outside_feature::{feature::AuthOutsideFeature, init::new_auth_outside_feature},
-    outline::_api::x_outside_feature::{
+    example::_api::x_outside_feature::{
         feature::OutlineOutsideFeature, init::new_outline_outside_feature,
     },
 };

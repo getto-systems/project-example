@@ -5,8 +5,8 @@ import { storyTemplate } from "../../../../../ui/vendor/storybook/preact/story"
 import { ProfileComponent } from "./profile"
 
 import { mockNotifyUnexpectedErrorResource } from "../../../../avail/unexpected_error/_ui/action_notify/mock"
-import { mockLoadBreadcrumbListResource } from "../../../../outline/_ui/action_load_breadcrumb_list/mock"
-import { mockLoadMenuResource } from "../../../../outline/_ui/action_load_menu/mock"
+import { mockLoadBreadcrumbListResource } from "../../../../example/outline/_ui/action_load_breadcrumb_list/mock"
+import { mockLoadMenuResource } from "../../../../example/outline/_ui/action_load_menu/mock"
 import { mockLoadSeasonResource } from "../../../../example/_ui/common/action_load_season/mock"
 import { mockLogoutResource } from "../../../auth_ticket/_ui/action_logout/mock"
 

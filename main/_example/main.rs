@@ -28,7 +28,7 @@ async fn main() {
                 }))
                 .into_inner(),
         )
-        .add_service(server.outline.get_menu_badge())
+        .add_service(server.example.outline.get_menu_badge())
         .serve(
             format!("127.0.0.1:{}", &ENV.port)
                 .parse()
@@ -39,16 +39,16 @@ async fn main() {
 }
 
 mod route {
-    use example_api::outline::_example::x_tonic::route::OutlineServer;
+    use example_api::example::_example::x_tonic::route::ExampleServer;
 
     pub struct Server {
-        pub outline: OutlineServer,
+        pub example: ExampleServer,
     }
 
     impl Server {
         pub const fn new() -> Self {
             Self {
-                outline: OutlineServer,
+                example: ExampleServer::new(),
             }
         }
     }
