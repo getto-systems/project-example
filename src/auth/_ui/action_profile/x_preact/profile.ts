@@ -17,8 +17,8 @@ import { copyright, siteInfo } from "../../../../example/site"
 
 import { ApplicationErrorComponent } from "../../../../avail/_ui/x_preact/application_error"
 import { LoadSeasonEntry } from "../../../../example/_ui/common/action_load_season/x_preact/load_season"
-import { LoadMenuEntry } from "../../../../outline/_ui/action_load_menu/x_preact/load_menu"
-import { LoadBreadcrumbListComponent } from "../../../../outline/_ui/action_load_breadcrumb_list/x_preact/load_breadcrumb_list"
+import { LoadMenuEntry } from "../../../../example/outline/_ui/action_load_menu/x_preact/load_menu"
+import { LoadBreadcrumbListComponent } from "../../../../example/outline/_ui/action_load_breadcrumb_list/x_preact/load_breadcrumb_list"
 import { LogoutEntry } from "../../../auth_ticket/_ui/action_logout/x_preact/logout"
 
 import { ProfileView, ProfileResource } from "../resource"

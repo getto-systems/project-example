@@ -21,7 +21,7 @@ impl<'a> NotifyUnexpectedErrorFeature<'a> {
         request: &'a HttpRequest,
     ) -> NotifyUnexpectedErrorAction<Self> {
         NotifyUnexpectedErrorAction::with_material(Self {
-            notify: NotifyUnexpectedErrorStruct::new(&feature.auth, request_id, request),
+            notify: NotifyUnexpectedErrorStruct::new(feature, request_id, request),
         })
     }
     pub fn request_decoder(body: String) -> impl NotifyUnexpectedErrorRequestDecoder {

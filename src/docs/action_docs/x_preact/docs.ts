@@ -15,8 +15,8 @@ import {
 import { copyright, siteInfo } from "../../../example/site"
 
 import { ApplicationErrorComponent } from "../../../avail/_ui/x_preact/application_error"
-import { LoadMenuEntry } from "../../../outline/_ui/action_load_menu/x_preact/load_menu"
-import { LoadBreadcrumbListComponent } from "../../../outline/_ui/action_load_breadcrumb_list/x_preact/load_breadcrumb_list"
+import { LoadMenuEntry } from "../../../example/outline/_ui/action_load_menu/x_preact/load_menu"
+import { LoadBreadcrumbListComponent } from "../../../example/outline/_ui/action_load_breadcrumb_list/x_preact/load_breadcrumb_list"
 import { docsArticle } from "./content"
 
 import { DocsView, DocsResource } from "../resource"

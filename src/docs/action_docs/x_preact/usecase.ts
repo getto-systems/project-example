@@ -18,8 +18,8 @@ import { copyright, siteInfo } from "../../../example/site"
 import { actionBox, dataBox, usecaseBox } from "./helper"
 
 import { ApplicationErrorComponent } from "../../../avail/_ui/x_preact/application_error"
-import { LoadMenuEntry } from "../../../outline/_ui/action_load_menu/x_preact/load_menu"
-import { LoadBreadcrumbListComponent } from "../../../outline/_ui/action_load_breadcrumb_list/x_preact/load_breadcrumb_list"
+import { LoadMenuEntry } from "../../../example/outline/_ui/action_load_menu/x_preact/load_menu"
+import { LoadBreadcrumbListComponent } from "../../../example/outline/_ui/action_load_breadcrumb_list/x_preact/load_breadcrumb_list"
 
 import { DocsView, DocsResource } from "../resource"
 import { DocsUsecaseContent } from "../../../../ui/vendor/getto-application/docs/data"

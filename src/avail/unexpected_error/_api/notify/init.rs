@@ -2,7 +2,7 @@ pub(in crate::avail) mod request_decoder;
 
 use actix_web::HttpRequest;
 
-use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
+use crate::x_outside_feature::_api::feature::AppFeature;
 
 use crate::auth::_api::common::init::ValidateApiTokenStruct;
 
@@ -14,12 +14,12 @@ pub struct NotifyUnexpectedErrorStruct<'a> {
 
 impl<'a> NotifyUnexpectedErrorStruct<'a> {
     pub fn new(
-        feature: &'a AuthOutsideFeature,
+        feature: &'a AppFeature,
         request_id: &'a str,
         request: &'a HttpRequest,
     ) -> Self {
         Self {
-            validate_infra: ValidateApiTokenStruct::new(feature, request_id, request),
+            validate_infra: ValidateApiTokenStruct::new(&feature.auth, request_id, request),
         }
     }
 }

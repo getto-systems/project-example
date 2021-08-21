@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package example.outline.api;
+
+message GetMenuBadgeResult_pb {
+  int32 index = 1;
+}

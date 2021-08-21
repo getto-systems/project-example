@@ -1,2 +1,2 @@
 pub mod _api;
-pub mod unexpected_error;
+mod unexpected_error;

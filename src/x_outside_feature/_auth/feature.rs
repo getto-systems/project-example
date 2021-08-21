@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use tonic::{metadata::MetadataMap, Extensions, Request};
+use tonic::{metadata::MetadataMap, Request};
 
 use super::env::Env;
 
@@ -41,10 +41,4 @@ pub fn extract_request<T>(request: Request<T>) -> TonicRequest<T> {
         metadata: request.metadata().to_owned(),
         request: request.into_inner(),
     }
-}
-
-pub fn app_data(extensions: &Extensions) -> &AppData {
-    extensions
-        .get::<AppData>()
-        .expect("failed to get AppFeature")
 }
