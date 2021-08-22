@@ -1,5 +1,5 @@
-import { initInputBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_input/impl"
-import { initValidateBoardFieldAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/core/impl"
+import { initInputBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_input/init"
+import { initValidateBoardFieldAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/init"
 
 import { checkPasswordCharacter } from "../../check_character/method"
 

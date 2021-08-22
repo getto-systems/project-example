@@ -1,8 +1,8 @@
 import { setupActionTestRunner } from "../../action/test_helper"
 
-import { initValidateBoardFieldAction } from "./core/impl"
+import { initValidateBoardFieldAction } from "./init"
 
-import { ValidateBoardFieldAction } from "./core/action"
+import { ValidateBoardFieldAction } from "./action"
 
 import { ConvertBoardFieldResult } from "../validate_field/data"
 

@@ -1,5 +1,5 @@
-import { mockValidateBoardFieldAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/core/mock"
-import { initInputBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_input/impl"
+import { mockValidateBoardFieldAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/mock"
+import { initInputBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_input/init"
 
 import { InputPasswordAction } from "./action"
 

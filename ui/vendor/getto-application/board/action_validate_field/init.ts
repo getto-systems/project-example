@@ -1,6 +1,6 @@
-import { ApplicationAbstractStateAction } from "../../../action/impl"
+import { ApplicationAbstractStateAction } from "../../action/impl"
 
-import { convertBoardField } from "../../validate_field/method"
+import { convertBoardField } from "../validate_field/method"
 
 import {
     ValidateBoardFieldAction,
@@ -8,8 +8,8 @@ import {
     ValidateBoardFieldMaterial,
 } from "./action"
 
-import { ConvertBoardFieldResult } from "../../validate_field/data"
-import { ValidateBoardFieldInfra } from "../../validate_field/infra"
+import { ConvertBoardFieldResult } from "../validate_field/data"
+import { ValidateBoardFieldInfra } from "../validate_field/infra"
 
 export function initValidateBoardFieldAction<T, E>(
     infra: ValidateBoardFieldInfra<T, E>,
@@ -38,5 +38,8 @@ class Action<T, E>
         return new Promise((resolve) => {
             this.material.convert((state) => resolve(this.post(state)))
         })
+    }
+    clear(): void {
+        this.post({ valid: true })
     }
 }

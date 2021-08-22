@@ -3,7 +3,7 @@ import { InputBoardAction } from "../../../../../../ui/vendor/getto-application/
 import {
     ValidateBoardFieldAction,
     ValidateBoardFieldState,
-} from "../../../../../../ui/vendor/getto-application/board/action_validate_field/core/action"
+} from "../../../../../../ui/vendor/getto-application/board/action_validate_field/action"
 
 import { LoginID, ValidateLoginIDError } from "../../data"
 

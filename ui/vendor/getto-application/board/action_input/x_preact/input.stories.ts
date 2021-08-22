@@ -5,7 +5,7 @@ import { storyTemplate } from "../../../../storybook/preact/story"
 import { InputBoardComponent } from "./input"
 
 import { markBoardValue } from "../../kernel/mock"
-import { initInputBoardAction } from "../impl"
+import { initInputBoardAction } from "../init"
 
 import { InputType, inputTypes } from "./input"
 

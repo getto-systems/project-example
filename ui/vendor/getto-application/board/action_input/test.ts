@@ -3,7 +3,7 @@ import { setupActionTestRunner } from "../../action/test_helper"
 import { mockBoardValueStore } from "../input/init/mock"
 import { markBoardValue } from "../kernel/mock"
 
-import { initInputBoardAction } from "./impl"
+import { initInputBoardAction } from "./init"
 
 describe("InputBoard", () => {
     test("get / set; store connected", async () => {

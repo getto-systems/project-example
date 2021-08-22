@@ -1,6 +1,6 @@
 import { ApplicationStateAction } from "../../../action/action"
 
-import { ValidateBoardFieldStateHandler } from "../../action_validate_field/core/action"
+import { ValidateBoardFieldStateHandler } from "../../action_validate_field/action"
 
 import { UpdateBoardValidateStateMethod } from "../../validate_board/method"
 

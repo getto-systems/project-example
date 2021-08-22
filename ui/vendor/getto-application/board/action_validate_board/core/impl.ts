@@ -7,7 +7,7 @@ import { updateBoardValidateState } from "../../validate_board/method"
 import { ValidateBoardStore } from "../../validate_board/infra"
 import { BoardConverter } from "../../kernel/infra"
 
-import { ValidateBoardFieldStateHandler } from "../../action_validate_field/core/action"
+import { ValidateBoardFieldStateHandler } from "../../action_validate_field/action"
 import {
     initialValidateBoardState,
     ValidateBoardAction,

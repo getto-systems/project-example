@@ -1,8 +1,8 @@
-import { ApplicationAbstractStateAction } from "../../../action/impl"
+import { ApplicationAbstractStateAction } from "../../action/impl"
 
 import { ValidateBoardFieldAction, ValidateBoardFieldState } from "./action"
 
-import { ConvertBoardFieldResult } from "../../validate_field/data"
+import { ConvertBoardFieldResult } from "../validate_field/data"
 
 export function mockValidateBoardFieldAction<N extends string, T, E>(
     name: N,
@@ -30,5 +30,8 @@ class Mock<T, E>
     }
     async check(): Promise<ValidateBoardFieldState<E>> {
         return this.initialState
+    }
+    clear(): void {
+        return
     }
 }

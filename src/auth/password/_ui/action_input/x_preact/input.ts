@@ -12,7 +12,7 @@ import { VNodeContent } from "../../../../../example/_ui/x_preact/design/common"
 
 import { InputBoardComponent } from "../../../../../../ui/vendor/getto-application/board/action_input/x_preact/input"
 
-import { ValidateBoardFieldState } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/core/action"
+import { ValidateBoardFieldState } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/action"
 import { InputPasswordResource, InputPasswordResourceState } from "../resource"
 
 import { ValidatePasswordError } from "../../data"
