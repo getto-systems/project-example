@@ -1,4 +1,4 @@
-import { initSignLinkResource } from "../../../../_ui/common/nav/action_nav/impl"
+import { initSignLinkResource } from "../../../../_ui/common/nav/action_nav/init"
 
 import { ResetPasswordAction, ResetPasswordView } from "./resource"
 import { ResetPasswordCoreAction } from "./core/action"

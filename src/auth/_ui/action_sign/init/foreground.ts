@@ -3,13 +3,13 @@ import { toApplicationView } from "../../../../../ui/vendor/getto-application/ac
 import { newCheckAuthTicketView } from "../../../auth_ticket/_ui/action_check/init/resource"
 import { newRequestResetTokenView } from "../../../password/reset/_ui/action_request_token/init/foreground"
 import { newResetPasswordView } from "../../../password/reset/_ui/action_reset/init"
-import { newAuthenticatePasswordView } from "../../../password/_ui/action_authenticate/init"
+import { newAuthenticatePasswordView } from "../../../password/_ui/action_authenticate/init/resource"
 import { newSignViewLocationDetecter } from "../../common/switch_view/init"
 
 import { initSignAction } from "../init"
 
 import { SignView } from "../resource"
-import { initSignLinkResource } from "../../common/nav/action_nav/impl"
+import { initSignLinkResource } from "../../common/nav/action_nav/init"
 
 import { RepositoryOutsideFeature } from "../../../../z_details/_ui/repository/feature"
 import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"

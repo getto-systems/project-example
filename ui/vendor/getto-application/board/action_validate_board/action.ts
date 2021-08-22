@@ -9,6 +9,7 @@ import { ConvertBoardResult } from "../kernel/data"
 
 export interface ValidateBoardAction<N extends string, T>
     extends ApplicationStateAction<ValidateBoardActionState> {
+    // TODO これは init で infra として返すべき
     updateValidateState<E>(name: N): ValidateBoardFieldStateHandler<E>
     get(): ConvertBoardResult<T>
     clear(): void

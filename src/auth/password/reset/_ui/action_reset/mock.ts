@@ -1,4 +1,4 @@
-import { initSignLinkResource } from "../../../../_ui/common/nav/action_nav/impl"
+import { initSignLinkResource } from "../../../../_ui/common/nav/action_nav/init"
 
 import { mockResetPasswordFormAction } from "./form/mock"
 import { mockResetPasswordCoreAction } from "./core/mock"

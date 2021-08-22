@@ -1,4 +1,4 @@
-import { initSignLinkResource } from "../../../../_ui/common/nav/action_nav/impl"
+import { initSignLinkResource } from "../../../../_ui/common/nav/action_nav/init"
 
 import { mockRequestResetTokenCoreAction } from "./core/mock"
 import { mockRequestResetTokenFormAction } from "./form/mock"

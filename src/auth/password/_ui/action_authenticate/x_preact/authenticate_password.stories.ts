@@ -4,10 +4,11 @@ import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/stor
 
 import { AuthenticatePasswordComponent } from "./authenticate_password"
 
-import { mockAuthenticatePasswordResource } from "../mock"
+import { mockAuthenticatePasswordAction } from "../mock"
 
-import { AuthenticatePasswordCoreState } from "../core/action"
+import { AuthenticatePasswordState } from "../action"
 import { ValidateBoardActionState } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
+
 import { validateBoardStates } from "../../../../../../ui/vendor/getto-application/board/validate_board/data"
 
 const options = [
@@ -37,16 +38,17 @@ export default {
 
 export type Props = Readonly<{
     authenticate: typeof options[number]
-    form: ValidateBoardActionState
+    validate: ValidateBoardActionState
     err: string
 }>
 const template = storyTemplate<Props>((props) => {
     return h(AuthenticatePasswordComponent, {
-        ...mockAuthenticatePasswordResource(),
-        state: { core: state(), form: props.form },
+        authenticate: mockAuthenticatePasswordAction(),
+        state: state(),
+        validate: props.validate,
     })
 
-    function state(): AuthenticatePasswordCoreState {
+    function state(): AuthenticatePasswordState {
         switch (props.authenticate) {
             case "initial":
                 return { type: "initial-login" }
@@ -78,4 +80,4 @@ const template = storyTemplate<Props>((props) => {
     }
 })
 
-export const Authenticate = template({ authenticate: "initial", form: "valid", err: "" })
+export const Authenticate = template({ authenticate: "initial", validate: "valid", err: "" })

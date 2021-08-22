@@ -37,13 +37,11 @@ import { AuthenticatePasswordError } from "../../authenticate/data"
 import { remoteCommonErrorReason } from "../../../../../z_details/_ui/remote/helper"
 
 export function AuthenticatePasswordEntry(view: AuthenticatePasswordView): VNode {
-    const resource = useApplicationView(view)
+    const action = useApplicationView(view)
     return h(AuthenticatePasswordComponent, {
-        ...resource,
-        state: {
-            core: useApplicationAction(resource.authenticate.core),
-            form: useApplicationAction(resource.authenticate.form.validate),
-        },
+        authenticate: action,
+        state: useApplicationAction(action),
+        validate: useApplicationAction(action.validate),
     })
 }
 
@@ -51,33 +49,33 @@ type Props = AuthenticatePasswordResource & AuthenticatePasswordResourceState
 export function AuthenticatePasswordComponent(props: Props): VNode {
     useLayoutEffect(() => {
         // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
-        switch (props.state.core.type) {
+        switch (props.state.type) {
             case "try-to-load":
-                if (!props.state.core.scriptPath.valid) {
-                    props.authenticate.core.loadError({
+                if (!props.state.scriptPath.valid) {
+                    props.authenticate.loadError({
                         type: "infra-error",
-                        err: `スクリプトのロードに失敗しました: ${props.state.core.type}`,
+                        err: `スクリプトのロードに失敗しました: ${props.state.type}`,
                     })
                     break
                 }
-                appendScript(props.state.core.scriptPath.value, (script) => {
+                appendScript(props.state.scriptPath.value, (script) => {
                     script.onerror = () => {
-                        props.authenticate.core.loadError({
+                        props.authenticate.loadError({
                             type: "infra-error",
-                            err: `スクリプトのロードに失敗しました: ${props.state.core.type}`,
+                            err: `スクリプトのロードに失敗しました: ${props.state.type}`,
                         })
                     }
                 })
                 break
         }
-    }, [props.authenticate.core, props.state.core])
+    }, [props.authenticate, props.state])
 
-    switch (props.state.core.type) {
+    switch (props.state.type) {
         case "initial-login":
             return authenticateForm({ state: "login" })
 
         case "failed-to-login":
-            return authenticateForm({ state: "login", error: loginError(props.state.core.err) })
+            return authenticateForm({ state: "login", error: loginError(props.state.err) })
 
         case "try-to-login":
             return authenticateForm({ state: "connecting" })
@@ -99,7 +97,7 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
 
         case "repository-error":
         case "load-error":
-            return h(ApplicationErrorComponent, { err: props.state.core.err.err })
+            return h(ApplicationErrorComponent, { err: props.state.err.err })
     }
 
     type AuthenticateFormState = "login" | "connecting"
@@ -120,8 +118,8 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
             loginBox(siteInfo, {
                 title: authenticateTitle(),
                 body: [
-                    h(InputLoginIDEntry, { field: props.authenticate.form.loginID, help: [] }),
-                    h(InputPasswordEntry, { field: props.authenticate.form.password, help: [] }),
+                    h(InputLoginIDEntry, { field: props.authenticate.loginID, help: [] }),
+                    h(InputPasswordEntry, { field: props.authenticate.password, help: [] }),
                     buttons({ left: button(), right: clearButton() }),
                 ],
                 footer: [footerLinks(), error()],
@@ -130,7 +128,7 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
 
         function clearButton() {
             const label = "入力内容をクリア"
-            switch (props.state.form) {
+            switch (props.validate) {
                 case "initial":
                     return button_disabled({ label })
 
@@ -141,7 +139,7 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
-                props.authenticate.form.clear()
+                props.authenticate.clear()
             }
         }
 
@@ -157,7 +155,7 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
             function loginButton() {
                 const label = "ログイン"
 
-                switch (props.state.form) {
+                switch (props.validate) {
                     case "initial":
                         return button_send({ state: "normal", label, onClick })
 
@@ -170,7 +168,7 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
 
                 function onClick(e: Event) {
                     e.preventDefault()
-                    props.authenticate.core.submit(props.authenticate.form.validate.get())
+                    props.authenticate.submit(props.authenticate.validate.get())
                 }
             }
             function connectingButton(): VNode {
@@ -186,7 +184,7 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
                 return fieldError(content.error)
             }
 
-            switch (props.state.form) {
+            switch (props.validate) {
                 case "initial":
                 case "valid":
                     return ""
@@ -215,10 +213,10 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
         return buttons({ left: privacyPolicyLink(), right: resetLink() })
     }
     function privacyPolicyLink() {
-        return signNav(props.link.getNav_static_privacyPolicy())
+        return signNav(props.authenticate.link.getNav_static_privacyPolicy())
     }
     function resetLink() {
-        return signNav(props.link.getNav_password_reset_requestToken())
+        return signNav(props.authenticate.link.getNav_password_reset_requestToken())
     }
 }
 

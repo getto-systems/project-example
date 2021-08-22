@@ -1,4 +1,4 @@
-import { initSignLinkResource } from "../../../../_ui/common/nav/action_nav/impl"
+import { initSignLinkResource } from "../../../../_ui/common/nav/action_nav/init"
 import { RequestResetTokenAction, RequestResetTokenView } from "./resource"
 import { RequestResetTokenCoreAction } from "./core/action"
 import { RequestResetTokenFormAction } from "./form/action"

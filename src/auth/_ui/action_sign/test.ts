@@ -1,13 +1,13 @@
 import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
 import { toApplicationView } from "../../../../ui/vendor/getto-application/action/helper"
 
-import { mockAuthenticatePasswordView } from "../../password/_ui/action_authenticate/mock"
+import { mockAuthenticatePasswordAction } from "../../password/_ui/action_authenticate/mock"
 import { mockRequestResetTokenView } from "../../password/reset/_ui/action_request_token/mock"
 import { mockResetPasswordView } from "../../password/reset/_ui/action_reset/mock"
 import { mockCheckAuthTicketAction } from "../../auth_ticket/_ui/action_check/mock"
 import { mockSignViewLocationDetecter } from "../common/switch_view/mock"
 
-import { initSignLinkResource } from "../common/nav/action_nav/impl"
+import { initSignLinkResource } from "../common/nav/action_nav/init"
 
 import { initSignAction } from "./init"
 
@@ -148,7 +148,7 @@ function initAction(currentURL: URL): SignAction {
 
         check: () => toApplicationView(mockCheckAuthTicketAction()),
 
-        password_authenticate: () => mockAuthenticatePasswordView(),
+        password_authenticate: () => toApplicationView(mockAuthenticatePasswordAction()),
         password_reset: () => mockResetPasswordView(),
         password_reset_requestToken: () => mockRequestResetTokenView(),
     })

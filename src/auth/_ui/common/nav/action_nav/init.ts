@@ -5,7 +5,7 @@ import {
     LocationSearchParam,
 } from "../../../../../z_details/_ui/location/helper"
 
-import { SignLinkResource } from "./resource"
+import { SignLink, SignLinkResource } from "./resource"
 
 import {
     AuthenticatePasswordVariantKey,
@@ -19,33 +19,37 @@ import {
 
 export function initSignLinkResource(): SignLinkResource {
     return {
-        link: {
-            getNav_static_privacyPolicy: () =>
-                markSignNavItem(
-                    "プライバシーポリシー",
-                    lnir("key-alt"),
-                    staticSignViewHref("privacy-policy"),
-                ),
+        link: initSignLink(),
+    }
+}
 
-            getNav_password_authenticate: () =>
-                markSignNavItem(
-                    "ログインIDとパスワードでログイン",
-                    lnir("arrow-left"),
-                    authenticatePasswordHref("authenticate"),
-                ),
-            getNav_password_reset_requestToken: () =>
-                markSignNavItem(
-                    "パスワードがわからない方",
-                    lnir("question-circle"),
-                    resetPasswordHref("request-token", []),
-                ),
-            getNav_password_reset_requestToken_retry: () =>
-                markSignNavItem(
-                    "リセットトークン送信からやり直す",
-                    lnir("arrow-left"),
-                    resetPasswordHref("request-token", []),
-                ),
-        },
+export function initSignLink(): SignLink {
+    return {
+        getNav_static_privacyPolicy: () =>
+            markSignNavItem(
+                "プライバシーポリシー",
+                lnir("key-alt"),
+                staticSignViewHref("privacy-policy"),
+            ),
+
+        getNav_password_authenticate: () =>
+            markSignNavItem(
+                "ログインIDとパスワードでログイン",
+                lnir("arrow-left"),
+                authenticatePasswordHref("authenticate"),
+            ),
+        getNav_password_reset_requestToken: () =>
+            markSignNavItem(
+                "パスワードがわからない方",
+                lnir("question-circle"),
+                resetPasswordHref("request-token", []),
+            ),
+        getNav_password_reset_requestToken_retry: () =>
+            markSignNavItem(
+                "リセットトークン送信からやり直す",
+                lnir("arrow-left"),
+                resetPasswordHref("request-token", []),
+            ),
     }
 }
 
