@@ -1,4 +1,4 @@
-import { ApplicationAbstractStateAction } from "../../../../../../../ui/vendor/getto-application/action/impl"
+import { ApplicationAbstractStateAction } from "../../../../../../../ui/vendor/getto-application/action/init"
 
 import { resetPassword } from "../../reset/method"
 import {

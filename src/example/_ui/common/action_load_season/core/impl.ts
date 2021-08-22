@@ -1,4 +1,4 @@
-import { ApplicationAbstractStateAction } from "../../../../../../ui/vendor/getto-application/action/impl"
+import { ApplicationAbstractStateAction } from "../../../../../../ui/vendor/getto-application/action/init"
 
 import { loadSeason } from "../../load_season/method"
 

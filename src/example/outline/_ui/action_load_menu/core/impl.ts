@@ -1,4 +1,4 @@
-import { ApplicationAbstractStateAction } from "../../../../../../ui/vendor/getto-application/action/impl"
+import { ApplicationAbstractStateAction } from "../../../../../../ui/vendor/getto-application/action/init"
 
 import { loadMenu } from "../../load_menu/method"
 import { updateMenuBadge } from "../../update_menu_badge/method"

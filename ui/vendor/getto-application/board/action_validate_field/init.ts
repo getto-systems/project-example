@@ -1,4 +1,4 @@
-import { ApplicationAbstractStateAction } from "../../action/impl"
+import { ApplicationAbstractStateAction } from "../../action/init"
 
 import { convertBoardField } from "../validate_field/method"
 
