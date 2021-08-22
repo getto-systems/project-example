@@ -3,7 +3,7 @@ import { setupActionTestRunner } from "../../../../../ui/vendor/getto-applicatio
 import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/init/mock"
 
-import { initInputLoginIDAction } from "./core/impl"
+import { initInputLoginIDAction } from "./init"
 
 describe("InputLoginID", () => {
     test("validate; valid input", async () => {
