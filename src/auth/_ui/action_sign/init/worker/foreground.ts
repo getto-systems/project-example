@@ -7,8 +7,7 @@ import {
     RequestPasswordResetTokenProxy,
 } from "../../../../password/reset/_ui/action_request_token/init/worker/foreground"
 
-import { initSignView } from "../../impl"
-import { initSignAction } from "../../core/impl"
+import { initSignAction, initSignView } from "../../init"
 import { initSignLinkResource } from "../../../common/nav/action_nav/impl"
 
 import { ForegroundMessage, BackgroundMessage } from "./message"

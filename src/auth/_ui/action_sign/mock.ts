@@ -1,4 +1,4 @@
-import { ApplicationMockStateAction } from "../../../../../ui/vendor/getto-application/action/mock"
+import { ApplicationMockStateAction } from "../../../../ui/vendor/getto-application/action/mock"
 
 import { initialSignViewState, SignAction, SignActionState } from "./action"
 

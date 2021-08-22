@@ -4,8 +4,7 @@ import { newResetPasswordView } from "../../../password/reset/_ui/action_reset/i
 import { newAuthenticatePasswordView } from "../../../password/_ui/action_authenticate/init"
 import { newSignViewLocationDetecter } from "../../common/switch_view/init"
 
-import { initSignView } from "../impl"
-import { initSignAction } from "../core/impl"
+import { initSignAction, initSignView } from "../init"
 
 import { SignView } from "../resource"
 import { initSignLinkResource } from "../../common/nav/action_nav/impl"

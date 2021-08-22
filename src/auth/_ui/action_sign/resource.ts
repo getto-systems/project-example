@@ -1,5 +1,5 @@
 import { ApplicationView } from "../../../../ui/vendor/getto-application/action/action"
-import { SignAction, SignActionState } from "./core/action"
+import { SignAction, SignActionState } from "./action"
 
 export type SignView = ApplicationView<SignResource>
 

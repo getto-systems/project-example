@@ -4,9 +4,9 @@ import { storyTemplate } from "../../../../../ui/vendor/storybook/preact/story"
 
 import { SignComponent } from "./sign"
 
-import { mockSignAction } from "../core/mock"
+import { mockSignAction } from "../mock"
 
-import { SignActionState } from "../core/action"
+import { SignActionState } from "../action"
 
 export default {
     title: "main/Auth/Sign/Error",

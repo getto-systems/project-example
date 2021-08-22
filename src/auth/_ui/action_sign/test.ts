@@ -8,10 +8,9 @@ import { mockSignViewLocationDetecter } from "../common/switch_view/mock"
 
 import { initSignLinkResource } from "../common/nav/action_nav/impl"
 
-import { initSignAction } from "./core/impl"
-import { initSignView } from "./impl"
+import { initSignAction, initSignView } from "./init"
 
-import { SignAction } from "./core/action"
+import { SignAction } from "./action"
 
 describe("SignView", () => {
     test("redirect password authenticate", async () => {
