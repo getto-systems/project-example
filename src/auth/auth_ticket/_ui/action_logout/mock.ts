@@ -2,19 +2,19 @@ import { ApplicationMockStateAction } from "../../../../../ui/vendor/getto-appli
 
 import { LogoutResource } from "./resource"
 
-import { initialLogoutCoreState, LogoutCoreAction, LogoutCoreState } from "./action"
+import { initialLogoutState, LogoutAction, LogoutState } from "./action"
 
 export function mockLogoutResource(): LogoutResource {
-    return { logout: mockLogoutCoreAction() }
+    return { logout: mockLogoutAction() }
 }
 
-export function mockLogoutCoreAction(): LogoutCoreAction {
+export function mockLogoutAction(): LogoutAction {
     return new Action()
 }
 
-class Action extends ApplicationMockStateAction<LogoutCoreState> implements LogoutCoreAction {
-    readonly initialState = initialLogoutCoreState
-    async submit(): Promise<LogoutCoreState> {
+class Action extends ApplicationMockStateAction<LogoutState> implements LogoutAction {
+    readonly initialState = initialLogoutState
+    async submit(): Promise<LogoutState> {
         return this.initialState
     }
 }

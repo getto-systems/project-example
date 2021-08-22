@@ -6,7 +6,7 @@ import { LogoutComponent } from "./logout"
 
 import { mockLogoutResource } from "../mock"
 
-import { LogoutCoreState } from "../action"
+import { LogoutState } from "../action"
 
 const options = ["initial", "failed"] as const
 
@@ -30,7 +30,7 @@ const template = storyTemplate<Props>((props) => {
         state: state(),
     })
 
-    function state(): LogoutCoreState {
+    function state(): LogoutState {
         switch (props.logout) {
             case "initial":
                 return { type: "initial-logout" }

@@ -5,33 +5,33 @@ import { logout } from "../logout/method"
 import { LogoutInfra } from "../logout/infra"
 
 import {
-    initialLogoutCoreState,
-    LogoutCoreAction,
-    LogoutCoreMaterial,
-    LogoutCoreState,
+    initialLogoutState,
+    LogoutAction,
+    LogoutMaterial,
+    LogoutState,
 } from "./action"
 
-export function initLogoutCoreMaterial(infra: LogoutInfra): LogoutCoreMaterial {
+export function initLogoutMaterial(infra: LogoutInfra): LogoutMaterial {
     return {
         clear: logout(infra),
     }
 }
 
-export function initLogoutCoreAction(material: LogoutCoreMaterial): LogoutCoreAction {
+export function initLogoutAction(material: LogoutMaterial): LogoutAction {
     return new Action(material)
 }
 
-class Action extends ApplicationAbstractStateAction<LogoutCoreState> implements LogoutCoreAction {
-    readonly initialState = initialLogoutCoreState
+class Action extends ApplicationAbstractStateAction<LogoutState> implements LogoutAction {
+    readonly initialState = initialLogoutState
 
-    material: LogoutCoreMaterial
+    material: LogoutMaterial
 
-    constructor(material: LogoutCoreMaterial) {
+    constructor(material: LogoutMaterial) {
         super()
         this.material = material
     }
 
-    submit(): Promise<LogoutCoreState> {
+    submit(): Promise<LogoutState> {
         return this.material.clear(this.post)
     }
 }

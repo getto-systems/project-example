@@ -4,14 +4,14 @@ import { LogoutMethod } from "../logout/method"
 
 import { LogoutEvent } from "../logout/event"
 
-export interface LogoutCoreAction extends ApplicationStateAction<LogoutCoreState> {
-    submit(): Promise<LogoutCoreState>
+export interface LogoutAction extends ApplicationStateAction<LogoutState> {
+    submit(): Promise<LogoutState>
 }
 
-export type LogoutCoreMaterial = Readonly<{
+export type LogoutMaterial = Readonly<{
     clear: LogoutMethod
 }>
 
-export type LogoutCoreState = Readonly<{ type: "initial-logout" }> | LogoutEvent
+export type LogoutState = Readonly<{ type: "initial-logout" }> | LogoutEvent
 
-export const initialLogoutCoreState: LogoutCoreState = { type: "initial-logout" }
+export const initialLogoutState: LogoutState = { type: "initial-logout" }
