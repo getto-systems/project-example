@@ -1,5 +1,5 @@
 import { mockInputLoginIDAction } from "../../../../login_id/_ui/action_input/mock"
-import { mockInputPasswordAction } from "../../action_input/core/mock"
+import { mockInputPasswordAction } from "../../action_input/mock"
 import { mockValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/mock"
 
 import { AuthenticatePasswordFormAction } from "./action"

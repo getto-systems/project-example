@@ -1,6 +1,6 @@
 import { ApplicationAction } from "../../../../../../../ui/vendor/getto-application/action/action"
 import { InputLoginIDAction } from "../../../../../login_id/_ui/action_input/action"
-import { InputPasswordAction } from "../../../../_ui/action_input/core/action"
+import { InputPasswordAction } from "../../../../_ui/action_input/action"
 import { ValidateBoardAction } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
 
 import { ResetPasswordFields } from "../../reset/data"

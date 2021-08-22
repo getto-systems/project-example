@@ -6,11 +6,11 @@ import { InputPasswordComponent } from "./input"
 
 import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
 
-import { mockInputPasswordAction } from "../core/mock"
+import { mockInputPasswordAction } from "../mock"
 
 import { PASSWORD_MAX_LENGTH } from "../../convert"
 
-import { ValidatePasswordState } from "../core/action"
+import { ValidatePasswordState } from "../action"
 
 import { PasswordCharacterState } from "../../data"
 
