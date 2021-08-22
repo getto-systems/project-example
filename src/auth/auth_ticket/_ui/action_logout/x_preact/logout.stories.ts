@@ -6,7 +6,7 @@ import { LogoutComponent } from "./logout"
 
 import { mockLogoutResource } from "../mock"
 
-import { LogoutCoreState } from "../core/action"
+import { LogoutCoreState } from "../action"
 
 const options = ["initial", "failed"] as const
 

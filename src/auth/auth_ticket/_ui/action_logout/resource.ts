@@ -1,4 +1,4 @@
-import { LogoutCoreAction, LogoutCoreState } from "./core/action"
+import { LogoutCoreAction, LogoutCoreState } from "./action"
 
 export type LogoutResource = Readonly<{
     logout: LogoutCoreAction

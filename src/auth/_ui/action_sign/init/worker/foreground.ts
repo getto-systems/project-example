@@ -1,6 +1,6 @@
 import { toApplicationView } from "../../../../../../ui/vendor/getto-application/action/helper"
 
-import { newCheckAuthTicketView } from "../../../../auth_ticket/_ui/action_check/view"
+import { newCheckAuthTicketView } from "../../../../auth_ticket/_ui/action_check/init/resource"
 import { newSignViewLocationDetecter } from "../../../common/switch_view/init"
 import { newAuthenticatePasswordView } from "../../../../password/_ui/action_authenticate/init"
 import { newResetPasswordView } from "../../../../password/reset/_ui/action_reset/init"

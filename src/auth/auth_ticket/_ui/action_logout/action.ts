@@ -1,8 +1,8 @@
-import { ApplicationStateAction } from "../../../../../../ui/vendor/getto-application/action/action"
+import { ApplicationStateAction } from "../../../../../ui/vendor/getto-application/action/action"
 
-import { LogoutMethod } from "../../logout/method"
+import { LogoutMethod } from "../logout/method"
 
-import { LogoutEvent } from "../../logout/event"
+import { LogoutEvent } from "../logout/event"
 
 export interface LogoutCoreAction extends ApplicationStateAction<LogoutCoreState> {
     submit(): Promise<LogoutCoreState>
