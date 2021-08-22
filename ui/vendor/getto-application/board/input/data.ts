@@ -1,3 +1,4 @@
+// TODO 削除予定
 export const inputBoardValueTypes = [
     "text",
     "password",

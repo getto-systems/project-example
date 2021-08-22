@@ -30,6 +30,7 @@ import {
     mockAuthnRepository,
     mockAuthzRepository,
 } from "../../../../auth_ticket/_ui/kernel/init/repository/mock"
+import { BoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/infra"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")
@@ -44,7 +45,7 @@ const VALID_LOGIN = { loginID: "login-id", password: "password" } as const
 
 describe("RegisterPassword", () => {
     test("submit valid login-id and password", async () => {
-        const { clock, view } = standard()
+        const { clock, view, store } = standard()
         const action = view.resource.reset
 
         action.core.subscriber.subscribe((state) => {
@@ -58,7 +59,7 @@ describe("RegisterPassword", () => {
         const runner = setupActionTestRunner(action.core.subscriber)
 
         await runner(() => {
-            action.form.loginID.board.input.set(markBoardValue(VALID_LOGIN.loginID))
+            store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
             action.form.password.board.input.set(markBoardValue(VALID_LOGIN.password))
             return action.core.submit(action.form.validate.get())
         }).then((stack) => {
@@ -77,7 +78,7 @@ describe("RegisterPassword", () => {
 
     test("submit valid login-id and password; with take longtime", async () => {
         // wait for take longtime timeout
-        const { clock, view } = takeLongtime()
+        const { clock, view, store } = takeLongtime()
         const action = view.resource.reset
 
         action.core.subscriber.subscribe((state) => {
@@ -91,7 +92,7 @@ describe("RegisterPassword", () => {
         const runner = setupActionTestRunner(action.core.subscriber)
 
         await runner(() => {
-            action.form.loginID.board.input.set(markBoardValue(VALID_LOGIN.loginID))
+            store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
             action.form.password.board.input.set(markBoardValue(VALID_LOGIN.password))
             return action.core.submit(action.form.validate.get())
         }).then((stack) => {
@@ -121,13 +122,13 @@ describe("RegisterPassword", () => {
     })
 
     test("submit without resetToken", async () => {
-        const { view } = emptyResetToken()
+        const { view, store } = emptyResetToken()
         const action = view.resource.reset
 
         const runner = setupActionTestRunner(action.core.subscriber)
 
         await runner(() => {
-            action.form.loginID.board.input.set(markBoardValue(VALID_LOGIN.loginID))
+            store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
             action.form.password.board.input.set(markBoardValue(VALID_LOGIN.password))
             return action.core.submit(action.form.validate.get())
         }).then((stack) => {
@@ -136,14 +137,14 @@ describe("RegisterPassword", () => {
     })
 
     test("clear", () => {
-        const { view } = standard()
+        const { view, store } = standard()
         const resource = view.resource.reset
 
-        resource.form.loginID.board.input.set(markBoardValue(VALID_LOGIN.loginID))
+        store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
         resource.form.password.board.input.set(markBoardValue(VALID_LOGIN.password))
         resource.form.clear()
 
-        expect(resource.form.loginID.board.input.get()).toEqual("")
+        expect(store.loginID.get()).toEqual("")
         expect(resource.form.password.board.input.get()).toEqual("")
     })
 
@@ -172,7 +173,6 @@ describe("RegisterPassword", () => {
                 action.form.validate.subscriber.subscribe(handler)
                 action.form.loginID.validate.subscriber.subscribe(handler)
                 action.form.password.validate.subscriber.subscribe(handler)
-                action.form.loginID.board.input.subscribeInputEvent(() => handler("input"))
                 action.form.password.board.input.subscribeInputEvent(() => handler("input"))
             },
             unsubscribe: () => null,
@@ -180,7 +180,6 @@ describe("RegisterPassword", () => {
 
         await runner(async () => {
             view.terminate()
-            action.form.loginID.board.input.set(markBoardValue("login-id"))
             action.form.password.board.input.set(markBoardValue("password"))
         }).then((stack) => {
             // no input/validate event after terminate
@@ -199,7 +198,7 @@ function standard() {
         clock,
     )
 
-    return { clock: clockPubSub, view }
+    return { clock: clockPubSub, ...view }
 }
 function takeLongtime() {
     const clockPubSub = mockClockPubSub()
@@ -211,19 +210,17 @@ function takeLongtime() {
         clock,
     )
 
-    return { clock: clockPubSub, view }
+    return { clock: clockPubSub, ...view }
 }
 function emptyResetToken() {
     const clockPubSub = mockClockPubSub()
     const clock = mockClock(START_AT, clockPubSub)
-    const view = initView(
+    return initView(
         emptyResetToken_URL(),
         standard_reset(clock),
         standard_renew(clock, clockPubSub),
         clock,
     )
-
-    return { view }
 }
 
 function initView(
@@ -231,7 +228,12 @@ function initView(
     reset: ResetPasswordRemote,
     renew: RenewAuthTicketRemote,
     clock: Clock,
-): ResetPasswordView {
+): Readonly<{
+    view: ResetPasswordView
+    store: Readonly<{
+        loginID: BoardValueStore
+    }>
+}> {
     const authn = standard_authn()
     const authz = standard_authz()
 
@@ -273,10 +275,13 @@ function initView(
         form: initResetPasswordFormAction(),
     })
 
-    view.resource.reset.form.loginID.board.input.storeLinker.link(mockBoardValueStore())
+    const store = {
+        loginID: mockBoardValueStore(),
+    }
+    view.resource.reset.form.loginID.input.connector.connect(store.loginID)
     view.resource.reset.form.password.board.input.storeLinker.link(mockBoardValueStore())
 
-    return view
+    return { view, store }
 }
 
 function standard_URL(): URL {

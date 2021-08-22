@@ -33,7 +33,7 @@ export function InputLoginIDComponent(props: Props): VNode {
     function content() {
         const content = {
             title: "ログインID",
-            body: h(InputBoardComponent, props.field.board),
+            body: h(InputBoardComponent, { type: "text", input: props.field.input }),
             help: props.help,
         }
 
