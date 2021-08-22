@@ -6,7 +6,7 @@ import { RequestResetTokenComponent } from "./request_reset_token"
 
 import { mockRequestResetTokenResource } from "../mock"
 
-import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/core/action"
+import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
 import { RequestResetTokenCoreState } from "../core/action"
 import { validateBoardStates } from "../../../../../../../ui/vendor/getto-application/board/validate_board/data"
 

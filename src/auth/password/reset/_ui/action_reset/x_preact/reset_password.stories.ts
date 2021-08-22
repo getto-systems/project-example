@@ -6,7 +6,7 @@ import { ResetPasswordComponent } from "./reset_password"
 
 import { mockResetPasswordResource } from "../mock"
 
-import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/core/action"
+import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
 import { ResetPasswordCoreState } from "../core/action"
 import { validateBoardStates } from "../../../../../../../ui/vendor/getto-application/board/validate_board/data"
 

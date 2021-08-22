@@ -7,7 +7,7 @@ import { AuthenticatePasswordComponent } from "./authenticate_password"
 import { mockAuthenticatePasswordResource } from "../mock"
 
 import { AuthenticatePasswordCoreState } from "../core/action"
-import { ValidateBoardActionState } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/core/action"
+import { ValidateBoardActionState } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
 import { validateBoardStates } from "../../../../../../ui/vendor/getto-application/board/validate_board/data"
 
 const options = [
