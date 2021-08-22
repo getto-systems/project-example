@@ -14,7 +14,7 @@ import { InputBoardComponent } from "../../../../../../ui/vendor/getto-applicati
 
 import { InputLoginIDResource, InputLoginIDResourceState } from "../resource"
 
-import { ValidateBoardFieldState } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/core/action"
+import { ValidateBoardFieldState } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/action"
 
 import { ValidateLoginIDError } from "../../data"
 

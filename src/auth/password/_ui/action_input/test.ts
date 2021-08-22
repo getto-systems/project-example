@@ -1,18 +1,19 @@
 import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
 
 import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
-import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/action_input/mock"
+import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/init/mock"
 
 import { initInputPasswordAction } from "./core/impl"
 
 describe("InputPassword", () => {
     test("validate; valid input", async () => {
-        const { action } = standard()
+        const { action, store } = standard()
 
         const runner = setupActionTestRunner(action.validate.subscriber)
 
         await runner(async () => {
-            action.board.input.set(markBoardValue("valid"))
+            store.set(markBoardValue("valid"))
+            action.input.publisher.post()
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: true }])
@@ -21,12 +22,13 @@ describe("InputPassword", () => {
     })
 
     test("validate; invalid : empty", async () => {
-        const { action } = standard()
+        const { action, store } = standard()
 
         const runner = setupActionTestRunner(action.validate.subscriber)
 
         await runner(async () => {
-            action.board.input.set(markBoardValue(""))
+            store.set(markBoardValue(""))
+            action.input.publisher.post()
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: false, err: [{ type: "empty" }] }])
@@ -35,12 +37,13 @@ describe("InputPassword", () => {
     })
 
     test("validate; invalid : too-long", async () => {
-        const { action } = standard()
+        const { action, store } = standard()
 
         const runner = setupActionTestRunner(action.validate.subscriber)
 
         await runner(async () => {
-            action.board.input.set(markBoardValue("a".repeat(100 + 1)))
+            store.set(markBoardValue("a".repeat(100 + 1)))
+            action.input.publisher.post()
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: false, err: [{ type: "too-long", maxLength: 100 }] }])
@@ -52,12 +55,13 @@ describe("InputPassword", () => {
     })
 
     test("validate; valid : just max-length", async () => {
-        const { action } = standard()
+        const { action, store } = standard()
 
         const runner = setupActionTestRunner(action.validate.subscriber)
 
         await runner(async () => {
-            action.board.input.set(markBoardValue("a".repeat(100)))
+            store.set(markBoardValue("a".repeat(100)))
+            action.input.publisher.post()
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: true }])
@@ -66,12 +70,13 @@ describe("InputPassword", () => {
     })
 
     test("validate; invalid : too-long : multi-byte", async () => {
-        const { action } = standard()
+        const { action, store } = standard()
 
         const runner = setupActionTestRunner(action.validate.subscriber)
 
         await runner(async () => {
-            action.board.input.set(markBoardValue("あ".repeat(100) + "a"))
+            store.set(markBoardValue("あ".repeat(100) + "a"))
+            action.input.publisher.post()
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: false, err: [{ type: "too-long", maxLength: 100 }] }])
@@ -83,12 +88,13 @@ describe("InputPassword", () => {
     })
 
     test("validate; valid : just max-length : multi-byte", async () => {
-        const { action } = standard()
+        const { action, store } = standard()
 
         const runner = setupActionTestRunner(action.validate.subscriber)
 
         await runner(async () => {
-            action.board.input.set(markBoardValue("あ".repeat(100)))
+            store.set(markBoardValue("あ".repeat(100)))
+            action.input.publisher.post()
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: true }])
@@ -97,27 +103,26 @@ describe("InputPassword", () => {
     })
 
     test("password character state : single byte", () => {
-        const { action } = standard()
+        const { action, store } = standard()
 
-        action.board.input.set(markBoardValue("password"))
-
+        store.set(markBoardValue("password"))
         expect(action.checkCharacter()).toEqual({ multiByte: false })
     })
 
     test("password character state : multi byte", () => {
-        const { action } = standard()
+        const { action, store } = standard()
 
-        action.board.input.set(markBoardValue("パスワード"))
+        store.set(markBoardValue("パスワード"))
         expect(action.checkCharacter()).toEqual({ multiByte: true })
     })
 
     test("clear", () => {
-        const { action } = standard()
+        const { action, store } = standard()
 
-        action.board.input.set(markBoardValue("valid"))
+        store.set(markBoardValue("valid"))
         action.clear()
 
-        expect(action.board.input.get()).toEqual("")
+        expect(store.get()).toEqual("")
     })
 
     test("terminate", async () => {
@@ -126,14 +131,13 @@ describe("InputPassword", () => {
         const runner = setupActionTestRunner({
             subscribe: (handler) => {
                 action.validate.subscriber.subscribe(handler)
-                action.board.input.subscribeInputEvent(() => handler(action.board.input.get()))
             },
             unsubscribe: () => null,
         })
 
         await runner(async () => {
             action.terminate()
-            action.board.input.set(markBoardValue("valid"))
+            action.input.publisher.post()
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])
@@ -143,7 +147,8 @@ describe("InputPassword", () => {
 
 function standard() {
     const action = initInputPasswordAction()
-    action.board.input.storeLinker.link(mockBoardValueStore())
+    const store = mockBoardValueStore()
+    action.input.connector.connect(store)
 
-    return { action }
+    return { action, store }
 }

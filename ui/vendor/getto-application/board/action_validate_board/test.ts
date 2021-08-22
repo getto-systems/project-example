@@ -1,9 +1,9 @@
 import { setupActionTestRunner } from "../../action/test_helper"
 
-import { initValidateBoardAction } from "./core/impl"
+import { initValidateBoardAction } from "./init"
 
 describe("ValidateBoard", () => {
-    test("validate; all valid state", async () => {
+    test("validate; all valid state; clear", async () => {
         const { action, handler } = standard()
 
         const runner = setupActionTestRunner(action.subscriber)
@@ -14,6 +14,12 @@ describe("ValidateBoard", () => {
             return action.currentState()
         }).then((stack) => {
             expect(stack).toEqual(["initial", "valid"])
+        })
+        await runner(async () => {
+            action.clear()
+            return action.currentState()
+        }).then((stack) => {
+            expect(stack).toEqual(["initial"])
         })
     })
 

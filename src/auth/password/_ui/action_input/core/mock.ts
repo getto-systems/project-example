@@ -1,5 +1,5 @@
-import { mockInputBoardValueResource } from "../../../../../../ui/vendor/getto-application/board/action_input/mock"
-import { mockValidateBoardFieldAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/core/mock"
+import { mockValidateBoardFieldAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/mock"
+import { initInputBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_input/init"
 
 import { InputPasswordAction } from "./action"
 
@@ -10,11 +10,15 @@ export function mockInputPasswordAction(
     password: BoardValue,
     characterState: PasswordCharacterState,
 ): InputPasswordAction {
+    const { input, subscriber } = initInputBoardAction()
+
     return {
-        board: mockInputBoardValueResource("password", password),
+        input,
         validate: mockValidateBoardFieldAction("password", { valid: false, err: [] }),
         clear: () => null,
         checkCharacter: () => characterState,
-        terminate: () => null,
+        terminate: () => {
+            subscriber.terminate()
+        },
     }
 }

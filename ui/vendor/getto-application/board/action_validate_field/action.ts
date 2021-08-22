@@ -1,13 +1,14 @@
-import { ApplicationStateAction } from "../../../action/action"
+import { ApplicationStateAction } from "../../action/action"
 
-import { ConvertBoardFieldMethod } from "../../validate_field/method"
+import { ConvertBoardFieldMethod } from "../validate_field/method"
 
-import { ConvertBoardFieldResult, ValidateBoardFieldResult } from "../../validate_field/data"
+import { ConvertBoardFieldResult, ValidateBoardFieldResult } from "../validate_field/data"
 
 export interface ValidateBoardFieldAction<T, E>
     extends ApplicationStateAction<ValidateBoardFieldState<E>> {
     get(): ConvertBoardFieldResult<T, E>
     check(): Promise<ValidateBoardFieldState<E>>
+    clear(): void
 }
 
 export type ValidateBoardFieldMaterial<T, E> = Readonly<{

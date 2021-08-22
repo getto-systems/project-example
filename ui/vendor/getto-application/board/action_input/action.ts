@@ -1,13 +1,4 @@
-import { InputBoardValueAction } from "./core/action"
-
 import { BoardValueStoreConnector, InputBoardEventPublisher } from "../input/infra"
-
-import { InputBoardValueType } from "../input/data"
-
-export type InputBoardValueResource = Readonly<{
-    type: InputBoardValueType
-    input: InputBoardValueAction
-}>
 
 export interface InputBoardAction {
     // 例外的に infra をそのまま公開する

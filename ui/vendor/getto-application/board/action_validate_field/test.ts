@@ -1,8 +1,8 @@
 import { setupActionTestRunner } from "../../action/test_helper"
 
-import { initValidateBoardFieldAction } from "./core/impl"
+import { initValidateBoardFieldAction } from "./init"
 
-import { ValidateBoardFieldAction } from "./core/action"
+import { ValidateBoardFieldAction } from "./action"
 
 import { ConvertBoardFieldResult } from "../validate_field/data"
 
@@ -19,7 +19,7 @@ describe("ValidateBoardField", () => {
         })
     })
 
-    test("validate; invalid input", async () => {
+    test("validate; invalid input; clear", async () => {
         // invalid input
         const { action } = standard({ valid: false, err: ["empty"] })
 
@@ -29,14 +29,18 @@ describe("ValidateBoardField", () => {
             expect(stack).toEqual([{ valid: false, err: ["empty"] }])
             expect(action.get()).toEqual({ valid: false, err: ["empty"] })
         })
+        await runner(async () => {
+            action.clear()
+            return action.currentState()
+        }).then((stack) => {
+            expect(stack).toEqual([{ valid: true }])
+        })
     })
 })
 
 function standard(result: ConvertBoardFieldResult<FieldValue, ValidateError>) {
-    const action: ValidateBoardFieldAction<
-        FieldValue,
-        ValidateError
-    > = initValidateBoardFieldAction({ converter: () => result })
+    const action: ValidateBoardFieldAction<FieldValue, ValidateError> =
+        initValidateBoardFieldAction({ converter: () => result })
 
     return { action }
 }

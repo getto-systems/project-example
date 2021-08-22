@@ -4,7 +4,7 @@ import {
 } from "../../../../../ui/vendor/getto-application/action/action"
 
 import { SignLinkResource } from "../../../_ui/common/nav/action_nav/resource"
-import { ValidateBoardActionState } from "../../../../../ui/vendor/getto-application/board/action_validate_board/core/action"
+import { ValidateBoardActionState } from "../../../../../ui/vendor/getto-application/board/action_validate_board/action"
 import { AuthenticatePasswordCoreAction, AuthenticatePasswordCoreState } from "./core/action"
 import { AuthenticatePasswordFormAction } from "./form/action"
 

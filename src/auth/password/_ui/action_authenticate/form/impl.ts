@@ -1,6 +1,6 @@
 import { initInputLoginIDAction } from "../../../../login_id/_ui/action_input/core/impl"
 import { initInputPasswordAction } from "../../action_input/core/impl"
-import { initValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/core/impl"
+import { initValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/init"
 
 import { authenticatePasswordFields, AuthenticatePasswordFormAction } from "./action"
 

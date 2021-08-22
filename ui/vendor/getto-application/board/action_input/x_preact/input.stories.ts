@@ -2,31 +2,32 @@ import { h } from "preact"
 
 import { storyTemplate } from "../../../../storybook/preact/story"
 
-import { InputBoardComponent_legacy } from "./input"
+import { InputBoardComponent } from "./input"
 
 import { markBoardValue } from "../../kernel/mock"
+import { initInputBoardAction } from "../init"
 
-import { mockInputBoardValueAction } from "../core/mock"
-
-import { InputBoardValueType, inputBoardValueTypes } from "../../input/data"
+import { InputType, inputTypes } from "./input"
 
 export default {
     title: "Getto/Board/Input",
     argTypes: {
         inputType: {
-            control: { type: "select", options: inputBoardValueTypes },
+            control: { type: "select", options: inputTypes },
         },
     },
 }
 
 type Props = Readonly<{
-    inputType: InputBoardValueType
+    inputType: InputType
     value: string
 }>
 const template = storyTemplate<Props>((props) => {
-    return h(InputBoardComponent_legacy, {
+    const { input, store } = initInputBoardAction()
+    store.set(markBoardValue(props.value))
+    return h(InputBoardComponent, {
         type: props.inputType,
-        input: mockInputBoardValueAction(markBoardValue(props.value)),
+        input,
     })
 })
 

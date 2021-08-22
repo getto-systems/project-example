@@ -1,13 +1,13 @@
-import { ApplicationAbstractStateAction } from "../../../action/impl"
+import { ApplicationAbstractStateAction } from "../../action/impl"
 
-import { initValidateBoardStack } from "../../validate_board/init/stack"
+import { initValidateBoardStack } from "../validate_board/init/stack"
 
-import { updateBoardValidateState } from "../../validate_board/method"
+import { updateBoardValidateState } from "../validate_board/method"
 
-import { ValidateBoardStore } from "../../validate_board/infra"
-import { BoardConverter } from "../../kernel/infra"
+import { ValidateBoardStore } from "../validate_board/infra"
+import { BoardConverter } from "../kernel/infra"
 
-import { ValidateBoardFieldStateHandler } from "../../action_validate_field/core/action"
+import { ValidateBoardFieldStateHandler } from "../action_validate_field/action"
 import {
     initialValidateBoardState,
     ValidateBoardAction,
@@ -15,7 +15,7 @@ import {
     ValidateBoardActionState,
 } from "./action"
 
-import { ConvertBoardResult } from "../../kernel/data"
+import { ConvertBoardResult } from "../kernel/data"
 
 export type ValidateBoardActionParams<N extends string, T> = Readonly<{
     fields: readonly N[]
@@ -55,5 +55,8 @@ class Action<N extends string, T>
 
     get(): ConvertBoardResult<T> {
         return this.converter()
+    }
+    clear(): void {
+        this.post(initialValidateBoardState)
     }
 }

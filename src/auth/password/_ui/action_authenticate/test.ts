@@ -4,7 +4,7 @@ import { ticker } from "../../../../z_details/_ui/timer/helper"
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_details/_ui/clock/mock"
 
 import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
-import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/action_input/mock"
+import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/init/mock"
 import { mockGetScriptPathDetecter } from "../../../_ui/common/secure/get_script_path/mock"
 import {
     mockAuthnRepository,
@@ -64,7 +64,7 @@ describe("AuthenticatePassword", () => {
 
         await runner(async () => {
             store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
-            resource.form.password.board.input.set(markBoardValue(VALID_LOGIN.password))
+            store.password.set(markBoardValue(VALID_LOGIN.password))
 
             return resource.core.submit(resource.form.validate.get())
         }).then((stack) => {
@@ -101,7 +101,7 @@ describe("AuthenticatePassword", () => {
 
         await runner(() => {
             store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
-            resource.form.password.board.input.set(markBoardValue(VALID_LOGIN.password))
+            store.password.set(markBoardValue(VALID_LOGIN.password))
 
             return resource.core.submit(resource.form.validate.get())
         }).then((stack) => {
@@ -138,11 +138,11 @@ describe("AuthenticatePassword", () => {
         const resource = view.resource.authenticate
 
         store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
-        resource.form.password.board.input.set(markBoardValue(VALID_LOGIN.password))
+        store.password.set(markBoardValue(VALID_LOGIN.password))
         resource.form.clear()
 
         expect(store.loginID.get()).toEqual("")
-        expect(resource.form.password.board.input.get()).toEqual("")
+        expect(store.password.get()).toEqual("")
     })
 
     test("load error", async () => {
@@ -168,14 +168,14 @@ describe("AuthenticatePassword", () => {
                 resource.form.validate.subscriber.subscribe(handler)
                 resource.form.loginID.validate.subscriber.subscribe(handler)
                 resource.form.password.validate.subscriber.subscribe(handler)
-                resource.form.password.board.input.subscribeInputEvent(() => handler("input"))
             },
             unsubscribe: () => null,
         })
 
         await runner(async () => {
             view.terminate()
-            resource.form.password.board.input.set(markBoardValue("password"))
+            resource.form.loginID.validate.check()
+            resource.form.password.validate.check()
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])
@@ -210,6 +210,7 @@ function initView(
     view: AuthenticatePasswordView
     store: Readonly<{
         loginID: BoardValueStore
+        password: BoardValueStore
     }>
 }> {
     const currentURL = new URL("https://example.com/index.html")
@@ -254,10 +255,11 @@ function initView(
 
     const store = {
         loginID: mockBoardValueStore(),
+        password: mockBoardValueStore(),
     }
 
     view.resource.authenticate.form.loginID.input.connector.connect(store.loginID)
-    view.resource.authenticate.form.password.board.input.storeLinker.link(mockBoardValueStore())
+    view.resource.authenticate.form.password.input.connector.connect(store.password)
 
     return { view, store }
 }

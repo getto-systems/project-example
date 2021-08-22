@@ -1,5 +1,5 @@
-import { initInputBoardValueResource } from "../../../../../../ui/vendor/getto-application/board/action_input/impl"
-import { initValidateBoardFieldAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/core/impl"
+import { initInputBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_input/init"
+import { initValidateBoardFieldAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/init"
 
 import { checkPasswordCharacter } from "../../check_character/method"
 
@@ -7,27 +7,33 @@ import { InputPasswordAction } from "./action"
 
 import { passwordBoardConverter } from "../../convert"
 
+import { emptyBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/data"
+
 export function initInputPasswordAction(): InputPasswordAction {
-    const board = initInputBoardValueResource("password")
+    const { input, store, subscriber } = initInputBoardAction()
 
     const validate = initValidateBoardFieldAction({
-        converter: () => passwordBoardConverter(board.input.get()),
+        converter: () => passwordBoardConverter(store.get()),
     })
 
-    const clear = () => board.input.clear()
-    const checkCharacter = () => checkPasswordCharacter(board.input.get())
+    const clear = () => {
+        store.set(emptyBoardValue)
+        // TODO validate.clear() にしたい
+        input.publisher.post()
+    }
+    const checkCharacter = () => checkPasswordCharacter(store.get())
 
-    board.input.subscribeInputEvent(() => {
+    subscriber.subscribe(() => {
         validate.check()
     })
 
     return {
-        board,
+        input,
         validate,
         clear,
         checkCharacter,
         terminate: () => {
-            board.input.terminate()
+            subscriber.terminate()
             validate.terminate()
         },
     }

@@ -2,7 +2,7 @@ import { setupActionTestRunner } from "../../../../../../ui/vendor/getto-applica
 import { ticker } from "../../../../../z_details/_ui/timer/helper"
 
 import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
-import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/action_input/mock"
+import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/init/mock"
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../../z_details/_ui/clock/mock"
 
 import { mockGetScriptPathDetecter } from "../../../../_ui/common/secure/get_script_path/mock"
@@ -60,7 +60,7 @@ describe("RegisterPassword", () => {
 
         await runner(() => {
             store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
-            action.form.password.board.input.set(markBoardValue(VALID_LOGIN.password))
+            store.password.set(markBoardValue(VALID_LOGIN.password))
             return action.core.submit(action.form.validate.get())
         }).then((stack) => {
             expect(stack).toEqual([
@@ -93,7 +93,7 @@ describe("RegisterPassword", () => {
 
         await runner(() => {
             store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
-            action.form.password.board.input.set(markBoardValue(VALID_LOGIN.password))
+            store.password.set(markBoardValue(VALID_LOGIN.password))
             return action.core.submit(action.form.validate.get())
         }).then((stack) => {
             expect(stack).toEqual([
@@ -129,7 +129,7 @@ describe("RegisterPassword", () => {
 
         await runner(() => {
             store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
-            action.form.password.board.input.set(markBoardValue(VALID_LOGIN.password))
+            store.password.set(markBoardValue(VALID_LOGIN.password))
             return action.core.submit(action.form.validate.get())
         }).then((stack) => {
             expect(stack).toEqual([{ type: "failed-to-reset", err: { type: "empty-reset-token" } }])
@@ -141,11 +141,11 @@ describe("RegisterPassword", () => {
         const resource = view.resource.reset
 
         store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
-        resource.form.password.board.input.set(markBoardValue(VALID_LOGIN.password))
+        store.password.set(markBoardValue(VALID_LOGIN.password))
         resource.form.clear()
 
         expect(store.loginID.get()).toEqual("")
-        expect(resource.form.password.board.input.get()).toEqual("")
+        expect(store.password.get()).toEqual("")
     })
 
     test("load error", async () => {
@@ -173,14 +173,14 @@ describe("RegisterPassword", () => {
                 action.form.validate.subscriber.subscribe(handler)
                 action.form.loginID.validate.subscriber.subscribe(handler)
                 action.form.password.validate.subscriber.subscribe(handler)
-                action.form.password.board.input.subscribeInputEvent(() => handler("input"))
             },
             unsubscribe: () => null,
         })
 
         await runner(async () => {
             view.terminate()
-            action.form.password.board.input.set(markBoardValue("password"))
+            action.form.loginID.validate.check()
+            action.form.password.validate.check()
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])
@@ -232,6 +232,7 @@ function initView(
     view: ResetPasswordView
     store: Readonly<{
         loginID: BoardValueStore
+        password: BoardValueStore
     }>
 }> {
     const authn = standard_authn()
@@ -277,9 +278,10 @@ function initView(
 
     const store = {
         loginID: mockBoardValueStore(),
+        password: mockBoardValueStore(),
     }
     view.resource.reset.form.loginID.input.connector.connect(store.loginID)
-    view.resource.reset.form.password.board.input.storeLinker.link(mockBoardValueStore())
+    view.resource.reset.form.password.input.connector.connect(store.password)
 
     return { view, store }
 }
