@@ -4,9 +4,9 @@ import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/stor
 
 import { CheckAuthTicketComponent } from "./check_auth_info"
 
-import { mockCheckAuthTicketResource } from "../mock"
+import { mockCheckAuthTicketAction } from "../mock"
 
-import { CheckAuthTicketCoreState } from "../core/action"
+import { CheckAuthTicketState } from "../action"
 
 const options = ["takeLongtime", "server-error", "infra-error"] as const
 
@@ -28,11 +28,11 @@ type Props = Readonly<{
 }>
 const template = storyTemplate<Props>((props) => {
     return h(CheckAuthTicketComponent, {
-        ...mockCheckAuthTicketResource(),
+        action: mockCheckAuthTicketAction(),
         state: state(),
     })
 
-    function state(): CheckAuthTicketCoreState {
+    function state(): CheckAuthTicketState {
         switch (props.check) {
             case "takeLongtime":
                 return { type: "take-longtime-to-renew" }

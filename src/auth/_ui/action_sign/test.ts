@@ -1,9 +1,10 @@
 import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
+import { toApplicationView } from "../../../../ui/vendor/getto-application/action/helper"
 
 import { mockAuthenticatePasswordView } from "../../password/_ui/action_authenticate/mock"
 import { mockRequestResetTokenView } from "../../password/reset/_ui/action_request_token/mock"
 import { mockResetPasswordView } from "../../password/reset/_ui/action_reset/mock"
-import { mockCheckAuthTicketView } from "../../auth_ticket/_ui/action_check/mock"
+import { mockCheckAuthTicketAction } from "../../auth_ticket/_ui/action_check/mock"
 import { mockSignViewLocationDetecter } from "../common/switch_view/mock"
 
 import { initSignLinkResource } from "../common/nav/action_nav/impl"
@@ -22,7 +23,7 @@ describe("SignView", () => {
             const state = await action.ignite()
             switch (state.type) {
                 case "check-authTicket":
-                    await state.view.resource.core.ignite()
+                    await state.view.resource.ignite()
             }
             return state
         }).then((stack) => {
@@ -42,7 +43,7 @@ describe("SignView", () => {
             const state = await action.ignite()
             switch (state.type) {
                 case "check-authTicket":
-                    await state.view.resource.core.ignite()
+                    await state.view.resource.ignite()
             }
             return state
         }).then((stack) => {
@@ -62,7 +63,7 @@ describe("SignView", () => {
             const state = await action.ignite()
             switch (state.type) {
                 case "check-authTicket":
-                    await state.view.resource.core.ignite()
+                    await state.view.resource.ignite()
             }
             return state
         }).then((stack) => {
@@ -82,7 +83,7 @@ describe("SignView", () => {
             const state = await action.ignite()
             switch (state.type) {
                 case "check-authTicket":
-                    await state.view.resource.core.ignite()
+                    await state.view.resource.ignite()
             }
             return state
         }).then((stack) => {
@@ -145,7 +146,7 @@ function initAction(currentURL: URL): SignAction {
     return initSignAction(mockSignViewLocationDetecter(currentURL), {
         link: () => initSignLinkResource(),
 
-        check: () => mockCheckAuthTicketView(),
+        check: () => toApplicationView(mockCheckAuthTicketAction()),
 
         password_authenticate: () => mockAuthenticatePasswordView(),
         password_reset: () => mockResetPasswordView(),

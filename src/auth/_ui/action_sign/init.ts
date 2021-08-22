@@ -28,7 +28,7 @@ class Action extends ApplicationAbstractStateAction<SignActionState> implements 
         super(async () => {
             const view = this.subView.check()
 
-            view.resource.core.subscriber.subscribe((state) => {
+            view.resource.subscriber.subscribe((state) => {
                 switch (state.type) {
                     case "required-to-login":
                         this.post(this.mapViewType(this.detecter()))
