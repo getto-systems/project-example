@@ -6,6 +6,10 @@ import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_details/_
 import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/action_input/mock"
 import { mockGetScriptPathDetecter } from "../../../_ui/common/secure/get_script_path/mock"
+import {
+    mockAuthnRepository,
+    mockAuthzRepository,
+} from "../../../auth_ticket/_ui/kernel/init/repository/mock"
 
 import { initAuthenticatePasswordView } from "./impl"
 import {
@@ -21,6 +25,7 @@ import {
     AuthzRepository,
     RenewAuthTicketRemote,
 } from "../../../auth_ticket/_ui/kernel/infra"
+import { BoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
 
 import { AuthenticatePasswordView } from "./resource"
 
@@ -30,10 +35,6 @@ import {
 } from "../../../auth_ticket/_ui/kernel/convert"
 
 import { LoadScriptError } from "../../../_ui/common/secure/get_script_path/data"
-import {
-    mockAuthnRepository,
-    mockAuthzRepository,
-} from "../../../auth_ticket/_ui/kernel/init/repository/mock"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")
@@ -48,7 +49,7 @@ const VALID_LOGIN = { loginID: "login-id", password: "password" } as const
 
 describe("AuthenticatePassword", () => {
     test("submit valid login-id and password", async () => {
-        const { clock, view } = standard()
+        const { clock, view, store } = standard()
         const resource = view.resource.authenticate
 
         resource.core.subscriber.subscribe((state) => {
@@ -62,7 +63,7 @@ describe("AuthenticatePassword", () => {
         const runner = setupActionTestRunner(resource.core.subscriber)
 
         await runner(async () => {
-            resource.form.loginID.board.input.set(markBoardValue(VALID_LOGIN.loginID))
+            store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
             resource.form.password.board.input.set(markBoardValue(VALID_LOGIN.password))
 
             return resource.core.submit(resource.form.validate.get())
@@ -85,7 +86,7 @@ describe("AuthenticatePassword", () => {
 
     test("submit valid login-id and password; take long time", async () => {
         // wait for take longtime timeout
-        const { clock, view } = takeLongtime_elements()
+        const { clock, view, store } = takeLongtime_elements()
         const resource = view.resource.authenticate
 
         resource.core.subscriber.subscribe((state) => {
@@ -99,7 +100,7 @@ describe("AuthenticatePassword", () => {
         const runner = setupActionTestRunner(resource.core.subscriber)
 
         await runner(() => {
-            resource.form.loginID.board.input.set(markBoardValue(VALID_LOGIN.loginID))
+            store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
             resource.form.password.board.input.set(markBoardValue(VALID_LOGIN.password))
 
             return resource.core.submit(resource.form.validate.get())
@@ -133,14 +134,14 @@ describe("AuthenticatePassword", () => {
     })
 
     test("clear", () => {
-        const { view } = standard()
+        const { view, store } = standard()
         const resource = view.resource.authenticate
 
-        resource.form.loginID.board.input.set(markBoardValue(VALID_LOGIN.loginID))
+        store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
         resource.form.password.board.input.set(markBoardValue(VALID_LOGIN.password))
         resource.form.clear()
 
-        expect(resource.form.loginID.board.input.get()).toEqual("")
+        expect(store.loginID.get()).toEqual("")
         expect(resource.form.password.board.input.get()).toEqual("")
     })
 
@@ -167,7 +168,6 @@ describe("AuthenticatePassword", () => {
                 resource.form.validate.subscriber.subscribe(handler)
                 resource.form.loginID.validate.subscriber.subscribe(handler)
                 resource.form.password.validate.subscriber.subscribe(handler)
-                resource.form.loginID.board.input.subscribeInputEvent(() => handler("input"))
                 resource.form.password.board.input.subscribeInputEvent(() => handler("input"))
             },
             unsubscribe: () => null,
@@ -175,7 +175,6 @@ describe("AuthenticatePassword", () => {
 
         await runner(async () => {
             view.terminate()
-            resource.form.loginID.board.input.set(markBoardValue("login-id"))
             resource.form.password.board.input.set(markBoardValue("password"))
         }).then((stack) => {
             // no input/validate event after terminate
@@ -189,7 +188,7 @@ function standard() {
     const clock = mockClock(START_AT, clockPubSub)
     const view = initView(standard_authenticate(clock), standard_renew(clock, clockPubSub), clock)
 
-    return { clock: clockPubSub, view }
+    return { clock: clockPubSub, ...view }
 }
 function takeLongtime_elements() {
     const clockPubSub = mockClockPubSub()
@@ -200,14 +199,19 @@ function takeLongtime_elements() {
         clock,
     )
 
-    return { clock: clockPubSub, view }
+    return { clock: clockPubSub, ...view }
 }
 
 function initView(
     authenticate: AuthenticatePasswordRemote,
     renew: RenewAuthTicketRemote,
     clock: Clock,
-): AuthenticatePasswordView {
+): Readonly<{
+    view: AuthenticatePasswordView
+    store: Readonly<{
+        loginID: BoardValueStore
+    }>
+}> {
     const currentURL = new URL("https://example.com/index.html")
 
     const authn = standard_authn()
@@ -248,10 +252,14 @@ function initView(
         form: initAuthenticatePasswordFormAction(),
     })
 
-    view.resource.authenticate.form.loginID.board.input.storeLinker.link(mockBoardValueStore())
+    const store = {
+        loginID: mockBoardValueStore(),
+    }
+
+    view.resource.authenticate.form.loginID.input.connector.connect(store.loginID)
     view.resource.authenticate.form.password.board.input.storeLinker.link(mockBoardValueStore())
 
-    return view
+    return { view, store }
 }
 
 function standard_authn(): AuthnRepository {

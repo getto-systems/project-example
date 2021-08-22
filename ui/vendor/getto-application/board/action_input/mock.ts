@@ -2,9 +2,10 @@ import { mockInputBoardValueAction } from "./core/mock"
 
 import { InputBoardValueResource } from "./action"
 
+import { BoardValueStore } from "../input/infra"
+
 import { BoardValue, emptyBoardValue } from "../kernel/data"
 import { InputBoardValueType } from "../input/data"
-import { BoardValueStore } from "../input/infra"
 
 export function mockInputBoardValueResource(
     type: InputBoardValueType,

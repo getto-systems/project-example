@@ -1,25 +1,31 @@
-import { initInputBoardValueResource } from "../../../../../../ui/vendor/getto-application/board/action_input/impl"
+import { initInputBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_input/impl"
 import { initValidateBoardFieldAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/core/impl"
 
 import { InputLoginIDAction } from "./action"
 
 import { loginIDBoardConverter } from "../../convert"
+import { emptyBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/data"
 
 export function initInputLoginIDAction(): InputLoginIDAction {
-    const board = initInputBoardValueResource("text")
+    const { input, store, publisher, subscriber } = initInputBoardAction()
 
     const validate = initValidateBoardFieldAction({
-        converter: () => loginIDBoardConverter(board.input.get()),
+        converter: () => loginIDBoardConverter(store.get()),
     })
 
-    board.input.subscribeInputEvent(() => validate.check())
+    subscriber.subscribe(() => validate.check())
 
     return {
-        board,
+        input,
         validate,
-        clear: () => board.input.clear(),
+        clear: () => {
+            store.set(emptyBoardValue)
+            // TODO validate.clear() にしたい
+            publisher.post()
+        },
         terminate: () => {
-            board.input.terminate()
+            // TODO subscriber の terminate のテストをしたい
+            subscriber.terminate()
             validate.terminate()
         },
     }

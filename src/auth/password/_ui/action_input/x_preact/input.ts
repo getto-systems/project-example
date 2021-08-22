@@ -10,7 +10,7 @@ import {
 
 import { VNodeContent } from "../../../../../example/_ui/x_preact/design/common"
 
-import { InputBoardComponent } from "../../../../../../ui/vendor/getto-application/board/action_input/x_preact/input"
+import { InputBoardComponent_legacy } from "../../../../../../ui/vendor/getto-application/board/action_input/x_preact/input"
 
 import { ValidateBoardFieldState } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/core/action"
 import { InputPasswordResource, InputPasswordResourceState } from "../resource"
@@ -32,7 +32,7 @@ export function InputPasswordComponent(props: Props): VNode {
     function content() {
         const content = {
             title: "パスワード",
-            body: h(InputBoardComponent, props.field.board),
+            body: h(InputBoardComponent_legacy, props.field.board),
             help: [...props.help, characterHelp()],
         }
 

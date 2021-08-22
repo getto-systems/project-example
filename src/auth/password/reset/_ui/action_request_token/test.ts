@@ -9,6 +9,7 @@ import { initRequestResetTokenCoreMaterial, initRequestResetTokenCoreAction } fr
 import { initRequestResetTokenFormAction } from "./form/impl"
 
 import { RequestResetTokenRemote, RequestResetTokenRemoteResult } from "../request_token/infra"
+import { BoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/infra"
 
 import { RequestResetTokenView } from "./resource"
 
@@ -16,13 +17,13 @@ const VALID_LOGIN = { loginID: "login-id" } as const
 
 describe("RequestResetToken", () => {
     test("submit valid login-id", async () => {
-        const { view } = standard()
+        const { view, store } = standard()
         const action = view.resource.requestToken
 
         const runner = setupActionTestRunner(action.core.subscriber)
 
         await runner(() => {
-            action.form.loginID.board.input.set(markBoardValue(VALID_LOGIN.loginID))
+            store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
             return action.core.submit(action.form.validate.get())
         }).then((stack) => {
             expect(stack).toEqual([
@@ -34,13 +35,13 @@ describe("RequestResetToken", () => {
 
     test("submit valid login-id; with take longtime", async () => {
         // wait for take longtime timeout
-        const { view } = takeLongtime()
+        const { view, store } = takeLongtime()
         const action = view.resource.requestToken
 
         const runner = setupActionTestRunner(action.core.subscriber)
 
         await runner(() => {
-            action.form.loginID.board.input.set(markBoardValue(VALID_LOGIN.loginID))
+            store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
             return action.core.submit(action.form.validate.get())
         }).then((stack) => {
             expect(stack).toEqual([
@@ -65,13 +66,13 @@ describe("RequestResetToken", () => {
     })
 
     test("clear", () => {
-        const { view } = standard()
+        const { view, store } = standard()
         const resource = view.resource.requestToken
 
-        resource.form.loginID.board.input.set(markBoardValue(VALID_LOGIN.loginID))
+        store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
         resource.form.clear()
 
-        expect(resource.form.loginID.board.input.get()).toEqual("")
+        expect(store.loginID.get()).toEqual("")
     })
 
     test("terminate", async () => {
@@ -83,14 +84,12 @@ describe("RequestResetToken", () => {
                 action.core.subscriber.subscribe(handler)
                 action.form.validate.subscriber.subscribe(handler)
                 action.form.loginID.validate.subscriber.subscribe(handler)
-                action.form.loginID.board.input.subscribeInputEvent(() => handler("input"))
             },
             unsubscribe: () => null,
         })
 
         await runner(async () => {
             view.terminate()
-            action.form.loginID.board.input.set(markBoardValue("login-id"))
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])
@@ -99,17 +98,18 @@ describe("RequestResetToken", () => {
 })
 
 function standard() {
-    const view = initView(standard_requestToken())
-
-    return { view }
+    return initView(standard_requestToken())
 }
 function takeLongtime() {
-    const view = initView(takeLongtime_requestToken())
-
-    return { view }
+    return initView(takeLongtime_requestToken())
 }
 
-function initView(requestToken: RequestResetTokenRemote): RequestResetTokenView {
+function initView(requestToken: RequestResetTokenRemote): Readonly<{
+    view: RequestResetTokenView
+    store: Readonly<{
+        loginID: BoardValueStore
+    }>
+}> {
     const view = initRequestResetTokenView({
         core: initRequestResetTokenCoreAction(
             initRequestResetTokenCoreMaterial({
@@ -123,9 +123,12 @@ function initView(requestToken: RequestResetTokenRemote): RequestResetTokenView 
         form: initRequestResetTokenFormAction(),
     })
 
-    view.resource.requestToken.form.loginID.board.input.storeLinker.link(mockBoardValueStore())
+    const store = {
+        loginID: mockBoardValueStore(),
+    }
+    view.resource.requestToken.form.loginID.input.connector.connect(store.loginID)
 
-    return view
+    return { view, store }
 }
 
 function standard_requestToken(): RequestResetTokenRemote {

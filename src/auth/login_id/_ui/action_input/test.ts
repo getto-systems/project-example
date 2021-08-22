@@ -7,12 +7,13 @@ import { initInputLoginIDAction } from "./core/impl"
 
 describe("InputLoginID", () => {
     test("validate; valid input", async () => {
-        const { action } = standard()
+        const { action, store } = standard()
 
         const runner = setupActionTestRunner(action.validate.subscriber)
 
         await runner(async () => {
-            action.board.input.set(markBoardValue("valid"))
+            store.set(markBoardValue("valid"))
+            action.input.publisher.post()
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: true }])
@@ -21,12 +22,13 @@ describe("InputLoginID", () => {
     })
 
     test("validate; invalid : empty", async () => {
-        const { action } = standard()
+        const { action, store } = standard()
 
         const runner = setupActionTestRunner(action.validate.subscriber)
 
         await runner(async () => {
-            action.board.input.set(markBoardValue(""))
+            store.set(markBoardValue(""))
+            action.input.publisher.post()
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: false, err: [{ type: "empty" }] }])
@@ -35,12 +37,13 @@ describe("InputLoginID", () => {
     })
 
     test("validate; invalid : too-long", async () => {
-        const { action } = standard()
+        const { action, store } = standard()
 
         const runner = setupActionTestRunner(action.validate.subscriber)
 
         await runner(async () => {
-            action.board.input.set(markBoardValue("a".repeat(100 + 1)))
+            store.set(markBoardValue("a".repeat(100 + 1)))
+            action.input.publisher.post()
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: false, err: [{ type: "too-long", maxLength: 100 }] }])
@@ -52,12 +55,13 @@ describe("InputLoginID", () => {
     })
 
     test("validate; valid : just max-length", async () => {
-        const { action } = standard()
+        const { action, store } = standard()
 
         const runner = setupActionTestRunner(action.validate.subscriber)
 
         await runner(async () => {
-            action.board.input.set(markBoardValue("a".repeat(100)))
+            store.set(markBoardValue("a".repeat(100)))
+            action.input.publisher.post()
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: true }])
@@ -66,12 +70,12 @@ describe("InputLoginID", () => {
     })
 
     test("clear", () => {
-        const { action } = standard()
+        const { action, store } = standard()
 
-        action.board.input.set(markBoardValue("valid"))
+        store.set(markBoardValue("valid"))
         action.clear()
 
-        expect(action.board.input.get()).toEqual("")
+        expect(store.get()).toEqual("")
     })
 
     test("terminate", async () => {
@@ -80,14 +84,13 @@ describe("InputLoginID", () => {
         const runner = setupActionTestRunner({
             subscribe: (handler) => {
                 action.validate.subscriber.subscribe(handler)
-                action.board.input.subscribeInputEvent(() => handler(action.board.input.get()))
             },
             unsubscribe: () => null,
         })
 
         await runner(async () => {
             action.terminate()
-            action.board.input.set(markBoardValue("valid"))
+            action.input.publisher.post()
             return action.validate.currentState()
         }).then((stack) => {
             // no input/validate event after terminate
@@ -98,7 +101,8 @@ describe("InputLoginID", () => {
 
 function standard() {
     const action = initInputLoginIDAction()
-    action.board.input.storeLinker.link(mockBoardValueStore())
+    const store = mockBoardValueStore()
+    action.input.connector.connect(store)
 
-    return { action }
+    return { action, store }
 }

@@ -1,5 +1,5 @@
 import { ApplicationAction } from "../../../../../../ui/vendor/getto-application/action/action"
-import { InputBoardValueResource } from "../../../../../../ui/vendor/getto-application/board/action_input/action"
+import { InputBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_input/action"
 import {
     ValidateBoardFieldAction,
     ValidateBoardFieldState,
@@ -8,7 +8,7 @@ import {
 import { LoginID, ValidateLoginIDError } from "../../data"
 
 export interface InputLoginIDAction extends ApplicationAction {
-    readonly board: InputBoardValueResource
+    readonly input: InputBoardAction
     readonly validate: ValidateLoginIDAction
     readonly clear: ClearAction
 }

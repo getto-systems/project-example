@@ -2,7 +2,7 @@ import { h } from "preact"
 
 import { storyTemplate } from "../../../../storybook/preact/story"
 
-import { InputBoardComponent } from "./input"
+import { InputBoardComponent_legacy } from "./input"
 
 import { markBoardValue } from "../../kernel/mock"
 
@@ -24,7 +24,7 @@ type Props = Readonly<{
     value: string
 }>
 const template = storyTemplate<Props>((props) => {
-    return h(InputBoardComponent, {
+    return h(InputBoardComponent_legacy, {
         type: props.inputType,
         input: mockInputBoardValueAction(markBoardValue(props.value)),
     })
