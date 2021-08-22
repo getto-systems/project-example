@@ -1,4 +1,4 @@
-import { InputBoardValueResource } from "../../../../../../ui/vendor/getto-application/board/action_input/action"
+import { InputBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_input/action"
 import {
     ValidateBoardFieldAction,
     ValidateBoardFieldState,
@@ -8,7 +8,7 @@ import { Password, PasswordCharacterState, ValidatePasswordError } from "../../d
 import { ApplicationAction } from "../../../../../../ui/vendor/getto-application/action/action"
 
 export interface InputPasswordAction extends ApplicationAction {
-    readonly board: InputBoardValueResource
+    readonly input: InputBoardAction
     readonly validate: ValidatePasswordAction
     readonly clear: ClearAction
     readonly checkCharacter: CheckPasswordCharacterAction

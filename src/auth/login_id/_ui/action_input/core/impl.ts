@@ -4,10 +4,11 @@ import { initValidateBoardFieldAction } from "../../../../../../ui/vendor/getto-
 import { InputLoginIDAction } from "./action"
 
 import { loginIDBoardConverter } from "../../convert"
+
 import { emptyBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/data"
 
 export function initInputLoginIDAction(): InputLoginIDAction {
-    const { input, store, publisher, subscriber } = initInputBoardAction()
+    const { input, store, subscriber } = initInputBoardAction()
 
     const validate = initValidateBoardFieldAction({
         converter: () => loginIDBoardConverter(store.get()),
@@ -21,7 +22,7 @@ export function initInputLoginIDAction(): InputLoginIDAction {
         clear: () => {
             store.set(emptyBoardValue)
             // TODO validate.clear() にしたい
-            publisher.post()
+            input.publisher.post()
         },
         terminate: () => {
             // TODO subscriber の terminate のテストをしたい

@@ -2,7 +2,7 @@ import { setupActionTestRunner } from "../../../../../../ui/vendor/getto-applica
 import { ticker } from "../../../../../z_details/_ui/timer/helper"
 
 import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
-import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/action_input/mock"
+import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/init/mock"
 
 import { initRequestResetTokenView } from "./impl"
 import { initRequestResetTokenCoreMaterial, initRequestResetTokenCoreAction } from "./core/impl"
@@ -90,6 +90,7 @@ describe("RequestResetToken", () => {
 
         await runner(async () => {
             view.terminate()
+            action.form.loginID.validate.check()
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])

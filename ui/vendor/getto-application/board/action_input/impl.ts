@@ -1,28 +1,13 @@
-import { initInputBoardValueAction } from "./core/impl"
 import { initBoardValueStoreConnector } from "../input/init/connector"
 import { initInputEventPubSub } from "../input/init/pubsub"
 
-import { InputBoardAction, InputBoardValueResource } from "./action"
+import { InputBoardAction } from "./action"
 
-import {
-    BoardValueStore,
-    InputBoardEventPublisher,
-    InputBoardEventSubscriber,
-} from "../input/infra"
-
-import { InputBoardValueType } from "../input/data"
-
-export function initInputBoardValueResource(type: InputBoardValueType): InputBoardValueResource {
-    return {
-        type,
-        input: initInputBoardValueAction(),
-    }
-}
+import { BoardValueStore, InputBoardEventSubscriber } from "../input/infra"
 
 export function initInputBoardAction(): Readonly<{
     input: InputBoardAction
     store: BoardValueStore
-    publisher: InputBoardEventPublisher
     subscriber: InputBoardEventSubscriber
 }> {
     const { connector, store } = initBoardValueStoreConnector()
@@ -31,7 +16,6 @@ export function initInputBoardAction(): Readonly<{
     return {
         input: { connector, publisher },
         store,
-        publisher,
         subscriber,
     }
 }
