@@ -17,8 +17,8 @@ import { SignView, SignResource, SignResourceState } from "../resource"
 import { PrivacyPolicyComponent } from "./privacy_policy"
 
 export function SignEntry(view: SignView): VNode {
-    const resource = useApplicationView(view)
-    const state = useApplicationAction(resource.sign)
+    const action = useApplicationView(view)
+    const state = useApplicationAction(action)
 
     const [err] = useErrorBoundary((err) => {
         // 認証前なのでエラーはどうしようもない
@@ -28,7 +28,7 @@ export function SignEntry(view: SignView): VNode {
         return h(ApplicationErrorComponent, { err: `${err}` })
     }
 
-    return h(SignComponent, { state, ...resource })
+    return h(SignComponent, { state, sign: action })
 }
 
 type Props = SignResource & SignResourceState

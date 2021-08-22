@@ -5,7 +5,7 @@ import { CheckAuthTicketAction, CheckAuthTicketState } from "./action"
 export type CheckAuthTicketView = ApplicationView<CheckAuthTicketAction>
 
 export type CheckAuthTicketResource = Readonly<{
-    action: CheckAuthTicketAction
+    check: CheckAuthTicketAction
 }>
 
 export type CheckAuthTicketResourceState = Readonly<{

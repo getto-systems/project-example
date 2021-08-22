@@ -9,7 +9,7 @@ import { mockSignViewLocationDetecter } from "../common/switch_view/mock"
 
 import { initSignLinkResource } from "../common/nav/action_nav/impl"
 
-import { initSignAction, initSignView } from "./init"
+import { initSignAction } from "./init"
 
 import { SignAction } from "./action"
 
@@ -103,13 +103,13 @@ describe("SignView", () => {
 
     test("terminate", async () => {
         const { action } = standard()
-        const view = initSignView(action)
+        const view = toApplicationView(action)
 
         const runner = setupActionTestRunner(action.subscriber)
 
         await runner(() => {
             view.terminate()
-            return view.resource.sign.error("view error")
+            return view.resource.error("view error")
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])

@@ -1,18 +1,9 @@
 import { ApplicationAbstractStateAction } from "../../../../ui/vendor/getto-application/action/init"
 
-import { SignView } from "./resource"
-
 import { initialSignViewState, SignAction, SignActionState, SignSubView } from "./action"
 
 import { SignViewDetecter, SignViewType } from "../common/switch_view/data"
 import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
-
-export function initSignView(action: SignAction): SignView {
-    return {
-        resource: { sign: action },
-        terminate: () => action.terminate(),
-    }
-}
 
 export function initSignAction(detecter: SignViewDetecter, subView: SignSubView): SignAction {
     return new Action(detecter, subView)

@@ -28,7 +28,7 @@ type Props = Readonly<{
 }>
 const template = storyTemplate<Props>((props) => {
     return h(CheckAuthTicketComponent, {
-        action: mockCheckAuthTicketAction(),
+        check: mockCheckAuthTicketAction(),
         state: state(),
     })
 

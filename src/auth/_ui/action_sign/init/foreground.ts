@@ -1,10 +1,12 @@
-import { newCheckAuthTicketView } from "../../../auth_ticket/_ui/action_check/init"
+import { toApplicationView } from "../../../../../ui/vendor/getto-application/action/helper"
+
+import { newCheckAuthTicketView } from "../../../auth_ticket/_ui/action_check/view"
 import { newRequestResetTokenView } from "../../../password/reset/_ui/action_request_token/init/foreground"
 import { newResetPasswordView } from "../../../password/reset/_ui/action_reset/init"
 import { newAuthenticatePasswordView } from "../../../password/_ui/action_authenticate/init"
 import { newSignViewLocationDetecter } from "../../common/switch_view/init"
 
-import { initSignAction, initSignView } from "../init"
+import { initSignAction } from "../init"
 
 import { SignView } from "../resource"
 import { initSignLinkResource } from "../../common/nav/action_nav/impl"
@@ -15,7 +17,7 @@ import { LocationOutsideFeature } from "../../../../z_details/_ui/location/featu
 
 type OutsideFeature = RepositoryOutsideFeature & RemoteOutsideFeature & LocationOutsideFeature
 export function newSignForeground(feature: OutsideFeature): SignView {
-    return initSignView(
+    return toApplicationView(
         initSignAction(newSignViewLocationDetecter(feature), {
             link: () => initSignLinkResource(),
 
