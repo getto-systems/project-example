@@ -1,4 +1,5 @@
 import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
+import { toApplicationView } from "../../../../../ui/vendor/getto-application/action/helper"
 import { ticker } from "../../../../z_details/_ui/timer/helper"
 
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_details/_ui/clock/mock"
@@ -6,8 +7,10 @@ import { mockAuthnRepository, mockAuthzRepository } from "../kernel/init/reposit
 
 import { mockGetScriptPathDetecter } from "../../../_ui/common/secure/get_script_path/mock"
 
-import { initCheckAuthTicketView } from "./impl"
-import { initCheckAuthTicketCoreAction, initCheckAuthTicketCoreMaterial } from "./core/impl"
+import {
+    initCheckAuthTicketAction,
+    initCheckAuthTicketMaterial,
+} from "./init"
 
 import { Clock } from "../../../../z_details/_ui/clock/infra"
 import { WaitTime } from "../../../../z_details/_ui/config/infra"
@@ -45,9 +48,9 @@ describe("CheckAuthTicket", () => {
         const { clock, view } = instantLoadable()
         const resource = view.resource
 
-        const runner = setupActionTestRunner(resource.core.subscriber)
+        const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.core.ignite()).then((stack) => {
+        await runner(() => resource.ignite()).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "try-to-instant-load",
@@ -58,7 +61,7 @@ describe("CheckAuthTicket", () => {
 
         clock.update(CONTINUOUS_RENEW_START_AT)
 
-        await runner(() => resource.core.succeedToInstantLoad()).then((stack) => {
+        await runner(() => resource.succeedToInstantLoad()).then((stack) => {
             expect(stack).toEqual([
                 { type: "succeed-to-start-continuous-renew", continue: true },
                 { type: "succeed-to-renew", continue: true },
@@ -73,9 +76,9 @@ describe("CheckAuthTicket", () => {
         const { clock, view } = instantLoadable()
         const resource = view.resource
 
-        const runner = setupActionTestRunner(resource.core.subscriber)
+        const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.core.ignite()).then((stack) => {
+        await runner(() => resource.ignite()).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "try-to-instant-load",
@@ -86,7 +89,7 @@ describe("CheckAuthTicket", () => {
 
         clock.update(CONTINUOUS_RENEW_START_AT)
 
-        await runner(() => resource.core.failedToInstantLoad()).then((stack) => {
+        await runner(() => resource.failedToInstantLoad()).then((stack) => {
             expect(stack).toEqual([
                 { type: "try-to-renew" },
                 {
@@ -104,7 +107,7 @@ describe("CheckAuthTicket", () => {
         const { clock, view } = standard()
         const resource = view.resource
 
-        resource.core.subscriber.subscribe((state) => {
+        resource.subscriber.subscribe((state) => {
             switch (state.type) {
                 case "try-to-load":
                     clock.update(CONTINUOUS_RENEW_START_AT)
@@ -112,9 +115,9 @@ describe("CheckAuthTicket", () => {
             }
         })
 
-        const runner = setupActionTestRunner(resource.core.subscriber)
+        const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.core.ignite()).then((stack) => {
+        await runner(() => resource.ignite()).then((stack) => {
             expect(stack).toEqual([
                 { type: "try-to-renew" },
                 {
@@ -133,7 +136,7 @@ describe("CheckAuthTicket", () => {
         const { clock, view } = takeLongtime()
         const resource = view.resource
 
-        resource.core.subscriber.subscribe((state) => {
+        resource.subscriber.subscribe((state) => {
             switch (state.type) {
                 case "try-to-load":
                     clock.update(CONTINUOUS_RENEW_START_AT)
@@ -141,9 +144,9 @@ describe("CheckAuthTicket", () => {
             }
         })
 
-        const runner = setupActionTestRunner(resource.core.subscriber)
+        const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.core.ignite()).then((stack) => {
+        await runner(() => resource.ignite()).then((stack) => {
             expect(stack).toEqual([
                 { type: "try-to-renew" },
                 { type: "take-longtime-to-renew" },
@@ -163,9 +166,9 @@ describe("CheckAuthTicket", () => {
         const { view } = noStored()
         const resource = view.resource
 
-        const runner = setupActionTestRunner(resource.core.subscriber)
+        const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.core.ignite()).then((stack) => {
+        await runner(() => resource.ignite()).then((stack) => {
             expect(stack).toEqual([{ type: "required-to-login" }])
         })
     })
@@ -174,11 +177,11 @@ describe("CheckAuthTicket", () => {
         const { view } = standard()
         const resource = view.resource
 
-        const runner = setupActionTestRunner(resource.core.subscriber)
+        const runner = setupActionTestRunner(resource.subscriber)
 
         const err: LoadScriptError = { type: "infra-error", err: "load error" }
 
-        await runner(() => resource.core.loadError(err)).then((stack) => {
+        await runner(() => resource.loadError(err)).then((stack) => {
             expect(stack).toEqual([{ type: "load-error", err }])
         })
     })
@@ -186,11 +189,11 @@ describe("CheckAuthTicket", () => {
     test("terminate", async () => {
         const { view } = standard()
 
-        const runner = setupActionTestRunner(view.resource.core.subscriber)
+        const runner = setupActionTestRunner(view.resource.subscriber)
 
         await runner(() => {
             view.terminate()
-            return view.resource.core.ignite()
+            return view.resource.ignite()
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])
@@ -248,9 +251,9 @@ function initView(
 ): CheckAuthTicketView {
     const currentURL = new URL("https://example.com/index.html")
     const getScriptPathDetecter = mockGetScriptPathDetecter(currentURL)
-    return initCheckAuthTicketView(
-        initCheckAuthTicketCoreAction(
-            initCheckAuthTicketCoreMaterial(
+    return toApplicationView(
+        initCheckAuthTicketAction(
+            initCheckAuthTicketMaterial(
                 {
                     check: {
                         authn,

@@ -1,9 +1,29 @@
-import { mockLoadBreadcrumbListCoreAction, mockBreadcrumbList_home } from "./core/mock"
+import { toMenuCategory, toMenuItem } from "../kernel/convert"
 
-import { LoadBreadcrumbListResource } from "./resource"
+import { LoadBreadcrumbListAction } from "./action"
 
-export function mockLoadBreadcrumbListResource(): LoadBreadcrumbListResource {
+import { BreadcrumbList } from "../load_breadcrumb_list/data"
+
+export function mockLoadBreadcrumbListAction(
+    breadcrumbList: BreadcrumbList,
+): LoadBreadcrumbListAction {
     return {
-        breadcrumbList: mockLoadBreadcrumbListCoreAction(mockBreadcrumbList_home()),
+        load: () => breadcrumbList,
     }
+}
+
+export function mockBreadcrumbList_home(): BreadcrumbList {
+    return mockBreadcrumbList("ホーム")
+}
+export function mockBreadcrumbList(label: string): BreadcrumbList {
+    return [
+        {
+            type: "category",
+            category: toMenuCategory({ label: "MAIN", permission: { type: "allow" } }),
+        },
+        {
+            type: "item",
+            item: toMenuItem({ icon: "home", label, path: "#" }, "1.0.0"),
+        },
+    ]
 }

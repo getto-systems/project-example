@@ -1,15 +1,16 @@
-import { newCheckAuthTicketView } from "../../../../auth_ticket/_ui/action_check/init"
+import { toApplicationView } from "../../../../../../ui/vendor/getto-application/action/helper"
+
+import { newCheckAuthTicketView } from "../../../../auth_ticket/_ui/action_check/init/resource"
 import { newSignViewLocationDetecter } from "../../../common/switch_view/init"
-import { newAuthenticatePasswordView } from "../../../../password/_ui/action_authenticate/init"
-import { newResetPasswordView } from "../../../../password/reset/_ui/action_reset/init"
+import { newAuthenticatePasswordView } from "../../../../password/_ui/action_authenticate/init/resource"
+import { newResetPasswordView } from "../../../../password/reset/_ui/action_reset/init/resource"
 import {
     newRequestPasswordResetTokenProxy,
     RequestPasswordResetTokenProxy,
 } from "../../../../password/reset/_ui/action_request_token/init/worker/foreground"
 
-import { initSignView } from "../../impl"
-import { initSignAction } from "../../core/impl"
-import { initSignLinkResource } from "../../../common/nav/action_nav/impl"
+import { initSignAction } from "../../init"
+import { initSignLinkResource } from "../../../common/nav/action_nav/init"
 
 import { ForegroundMessage, BackgroundMessage } from "./message"
 
@@ -46,7 +47,7 @@ export function newSignWorkerForeground(feature: OutsideFeature): SignView {
         messageHandler(event.data)
     })
 
-    const view = initSignView(sign)
+    const view = toApplicationView(sign)
     return {
         resource: view.resource,
         terminate: () => {

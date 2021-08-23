@@ -1,17 +1,17 @@
 import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
+import { toApplicationView } from "../../../../ui/vendor/getto-application/action/helper"
 
-import { mockAuthenticatePasswordView } from "../../password/_ui/action_authenticate/mock"
-import { mockRequestResetTokenView } from "../../password/reset/_ui/action_request_token/mock"
-import { mockResetPasswordView } from "../../password/reset/_ui/action_reset/mock"
-import { mockCheckAuthTicketView } from "../../auth_ticket/_ui/action_check/mock"
+import { mockAuthenticatePasswordAction } from "../../password/_ui/action_authenticate/mock"
+import { mockRequestResetTokenAction } from "../../password/reset/_ui/action_request_token/mock"
+import { mockResetPasswordAction } from "../../password/reset/_ui/action_reset/mock"
+import { mockCheckAuthTicketAction } from "../../auth_ticket/_ui/action_check/mock"
 import { mockSignViewLocationDetecter } from "../common/switch_view/mock"
 
-import { initSignLinkResource } from "../common/nav/action_nav/impl"
+import { initSignLinkResource } from "../common/nav/action_nav/init"
 
-import { initSignAction } from "./core/impl"
-import { initSignView } from "./impl"
+import { initSignAction } from "./init"
 
-import { SignAction } from "./core/action"
+import { SignAction } from "./action"
 
 describe("SignView", () => {
     test("redirect password authenticate", async () => {
@@ -23,7 +23,7 @@ describe("SignView", () => {
             const state = await action.ignite()
             switch (state.type) {
                 case "check-authTicket":
-                    await state.view.resource.core.ignite()
+                    await state.view.resource.ignite()
             }
             return state
         }).then((stack) => {
@@ -43,7 +43,7 @@ describe("SignView", () => {
             const state = await action.ignite()
             switch (state.type) {
                 case "check-authTicket":
-                    await state.view.resource.core.ignite()
+                    await state.view.resource.ignite()
             }
             return state
         }).then((stack) => {
@@ -63,7 +63,7 @@ describe("SignView", () => {
             const state = await action.ignite()
             switch (state.type) {
                 case "check-authTicket":
-                    await state.view.resource.core.ignite()
+                    await state.view.resource.ignite()
             }
             return state
         }).then((stack) => {
@@ -83,7 +83,7 @@ describe("SignView", () => {
             const state = await action.ignite()
             switch (state.type) {
                 case "check-authTicket":
-                    await state.view.resource.core.ignite()
+                    await state.view.resource.ignite()
             }
             return state
         }).then((stack) => {
@@ -103,13 +103,13 @@ describe("SignView", () => {
 
     test("terminate", async () => {
         const { action } = standard()
-        const view = initSignView(action)
+        const view = toApplicationView(action)
 
         const runner = setupActionTestRunner(action.subscriber)
 
         await runner(() => {
             view.terminate()
-            return view.resource.sign.error("view error")
+            return view.resource.error("view error")
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])
@@ -146,11 +146,11 @@ function initAction(currentURL: URL): SignAction {
     return initSignAction(mockSignViewLocationDetecter(currentURL), {
         link: () => initSignLinkResource(),
 
-        check: () => mockCheckAuthTicketView(),
+        check: () => toApplicationView(mockCheckAuthTicketAction()),
 
-        password_authenticate: () => mockAuthenticatePasswordView(),
-        password_reset: () => mockResetPasswordView(),
-        password_reset_requestToken: () => mockRequestResetTokenView(),
+        password_authenticate: () => toApplicationView(mockAuthenticatePasswordAction()),
+        password_reset: () => toApplicationView(mockResetPasswordAction()),
+        password_reset_requestToken: () => toApplicationView(mockRequestResetTokenAction()),
     })
 }
 

@@ -1,12 +1,11 @@
 import { setupActionTestRunner } from "../../../../../../ui/vendor/getto-application/action/test_helper"
+import { toApplicationView } from "../../../../../../ui/vendor/getto-application/action/helper"
 import { ticker } from "../../../../../z_details/_ui/timer/helper"
 
 import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/init/mock"
 
-import { initRequestResetTokenView } from "./impl"
-import { initRequestResetTokenCoreMaterial, initRequestResetTokenCoreAction } from "./core/impl"
-import { initRequestResetTokenFormAction } from "./form/impl"
+import { initRequestResetTokenAction, initRequestResetTokenMaterial } from "./init"
 
 import { RequestResetTokenRemote, RequestResetTokenRemoteResult } from "../request_token/infra"
 import { BoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/infra"
@@ -18,13 +17,13 @@ const VALID_LOGIN = { loginID: "login-id" } as const
 describe("RequestResetToken", () => {
     test("submit valid login-id", async () => {
         const { view, store } = standard()
-        const action = view.resource.requestToken
+        const action = view.resource
 
-        const runner = setupActionTestRunner(action.core.subscriber)
+        const runner = setupActionTestRunner(action.subscriber)
 
         await runner(() => {
             store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
-            return action.core.submit(action.form.validate.get())
+            return action.submit(action.validate.get())
         }).then((stack) => {
             expect(stack).toEqual([
                 { type: "try-to-request-token" },
@@ -36,13 +35,13 @@ describe("RequestResetToken", () => {
     test("submit valid login-id; with take longtime", async () => {
         // wait for take longtime timeout
         const { view, store } = takeLongtime()
-        const action = view.resource.requestToken
+        const action = view.resource
 
-        const runner = setupActionTestRunner(action.core.subscriber)
+        const runner = setupActionTestRunner(action.subscriber)
 
         await runner(() => {
             store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
-            return action.core.submit(action.form.validate.get())
+            return action.submit(action.validate.get())
         }).then((stack) => {
             expect(stack).toEqual([
                 { type: "try-to-request-token" },
@@ -54,11 +53,11 @@ describe("RequestResetToken", () => {
 
     test("submit without fields", async () => {
         const { view } = standard()
-        const action = view.resource.requestToken
+        const action = view.resource
 
-        const runner = setupActionTestRunner(action.core.subscriber)
+        const runner = setupActionTestRunner(action.subscriber)
 
-        await runner(() => action.core.submit(action.form.validate.get())).then((stack) => {
+        await runner(() => action.submit(action.validate.get())).then((stack) => {
             expect(stack).toEqual([
                 { type: "failed-to-request-token", err: { type: "validation-error" } },
             ])
@@ -67,30 +66,30 @@ describe("RequestResetToken", () => {
 
     test("clear", () => {
         const { view, store } = standard()
-        const resource = view.resource.requestToken
+        const resource = view.resource
 
         store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
-        resource.form.clear()
+        resource.clear()
 
         expect(store.loginID.get()).toEqual("")
     })
 
     test("terminate", async () => {
         const { view } = standard()
-        const action = view.resource.requestToken
+        const action = view.resource
 
         const runner = setupActionTestRunner({
             subscribe: (handler) => {
-                action.core.subscriber.subscribe(handler)
-                action.form.validate.subscriber.subscribe(handler)
-                action.form.loginID.validate.subscriber.subscribe(handler)
+                action.subscriber.subscribe(handler)
+                action.validate.subscriber.subscribe(handler)
+                action.loginID.validate.subscriber.subscribe(handler)
             },
             unsubscribe: () => null,
         })
 
         await runner(async () => {
             view.terminate()
-            action.form.loginID.validate.check()
+            action.loginID.validate.check()
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])
@@ -111,23 +110,21 @@ function initView(requestToken: RequestResetTokenRemote): Readonly<{
         loginID: BoardValueStore
     }>
 }> {
-    const view = initRequestResetTokenView({
-        core: initRequestResetTokenCoreAction(
-            initRequestResetTokenCoreMaterial({
+    const view = toApplicationView(
+        initRequestResetTokenAction(
+            initRequestResetTokenMaterial({
                 requestToken,
                 config: {
                     takeLongtimeThreshold: { delay_millisecond: 32 },
                 },
             }),
         ),
-
-        form: initRequestResetTokenFormAction(),
-    })
+    )
 
     const store = {
         loginID: mockBoardValueStore(),
     }
-    view.resource.requestToken.form.loginID.input.connector.connect(store.loginID)
+    view.resource.loginID.input.connector.connect(store.loginID)
 
     return { view, store }
 }

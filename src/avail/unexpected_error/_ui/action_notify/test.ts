@@ -1,5 +1,4 @@
-import { initNotifyUnexpectedErrorCoreAction } from "./core/impl"
-import { initNotifyUnexpectedErrorResource } from "./impl"
+import { initNotifyUnexpectedErrorAction } from "./init"
 
 import { NotifyUnexpectedErrorRemote } from "../notify/infra"
 
@@ -19,11 +18,11 @@ function standard() {
 }
 
 function initResource() {
-    return initNotifyUnexpectedErrorResource(
-        initNotifyUnexpectedErrorCoreAction({
+    return {
+        error: initNotifyUnexpectedErrorAction({
             notify: standard_notify(),
         }),
-    )
+    }
 }
 
 function standard_notify(): NotifyUnexpectedErrorRemote {

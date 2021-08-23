@@ -1,4 +1,4 @@
-import { InputPasswordAction, ValidatePasswordState } from "./core/action"
+import { InputPasswordAction, ValidatePasswordState } from "./action"
 
 export type InputPasswordResource = Readonly<{
     field: InputPasswordAction

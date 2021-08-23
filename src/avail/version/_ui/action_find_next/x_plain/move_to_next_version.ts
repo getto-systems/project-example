@@ -1,6 +1,6 @@
 import { FindNextVersionView } from "../resource"
 
-import { FindNextVersionCoreState } from "../core/action"
+import { FindNextVersionState } from "../action"
 
 import { applicationPath } from "../../find_next/helper"
 
@@ -9,7 +9,7 @@ import { ApplicationTargetPath } from "../../find_next/data"
 
 export function MoveToNextVersionEntry(view: FindNextVersionView): void {
     // /${version}/index.html とかで実行する
-    const { findNext } = view.resource
+    const findNext = view.resource
     try {
         findNext.subscriber.subscribe(handleState)
         findNext.ignite()
@@ -17,7 +17,7 @@ export function MoveToNextVersionEntry(view: FindNextVersionView): void {
         handleError(err)
     }
 
-    function handleState(state: FindNextVersionCoreState) {
+    function handleState(state: FindNextVersionState) {
         switch (state.type) {
             case "initial-next-version":
             case "take-longtime-to-find":

@@ -1,16 +1,37 @@
-import { newLogoutInfra } from "../logout/init"
+import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/init"
 
-import { initLogoutResource } from "./impl"
-import { initLogoutCoreAction, initLogoutCoreMaterial } from "./core/impl"
+import { logout } from "../logout/method"
 
-import { RepositoryOutsideFeature } from "../../../../z_details/_ui/repository/feature"
-import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"
+import { LogoutInfra } from "../logout/infra"
 
-import { LogoutResource } from "./resource"
+import {
+    initialLogoutState,
+    LogoutAction,
+    LogoutMaterial,
+    LogoutState,
+} from "./action"
 
-type OutsideFeature = RemoteOutsideFeature & RepositoryOutsideFeature
-export function newLogoutResource(feature: OutsideFeature): LogoutResource {
-    return initLogoutResource(
-        initLogoutCoreAction(initLogoutCoreMaterial(newLogoutInfra(feature))),
-    )
+export function initLogoutMaterial(infra: LogoutInfra): LogoutMaterial {
+    return {
+        clear: logout(infra),
+    }
+}
+
+export function initLogoutAction(material: LogoutMaterial): LogoutAction {
+    return new Action(material)
+}
+
+class Action extends ApplicationAbstractStateAction<LogoutState> implements LogoutAction {
+    readonly initialState = initialLogoutState
+
+    material: LogoutMaterial
+
+    constructor(material: LogoutMaterial) {
+        super()
+        this.material = material
+    }
+
+    submit(): Promise<LogoutState> {
+        return this.material.clear(this.post)
+    }
 }

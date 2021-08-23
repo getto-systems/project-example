@@ -2,7 +2,7 @@ import { setupActionTestRunner } from "../../../ui/vendor/getto-application/acti
 
 import { mockDocsResource } from "./mock"
 
-import { initDocsView } from "./impl"
+import { initDocsView } from "./init"
 
 describe("DocsContent", () => {
     test("terminate", async () => {

@@ -15,9 +15,9 @@ import { lniClass, lnir } from "../../../../../z_details/_ui/icon/line_icon"
 
 import { LoadMenuComponent } from "./load_menu"
 
-import { mockLoadMenuCoreAction, mockMenu } from "../core/mock"
+import { mockLoadMenuAction, mockMenu } from "../mock"
 
-import { LoadMenuCoreState } from "../core/action"
+import { LoadMenuState } from "../action"
 
 import { Menu } from "../../kernel/data"
 
@@ -57,12 +57,12 @@ const template = storyTemplate<MockProps>((props) => {
             copyright,
         }),
         menu: h(LoadMenuComponent, {
-            menu: mockLoadMenuCoreAction(menu()),
+            menu: mockLoadMenuAction(menu()),
             state: state(),
         }),
     })
 
-    function state(): LoadMenuCoreState {
+    function state(): LoadMenuState {
         switch (props.load) {
             case "success":
                 return { type: "succeed-to-load", menu: menu() }

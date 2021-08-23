@@ -1,9 +1,9 @@
-import { LoadSeasonCoreAction, LoadSeasonCoreState } from "./core/action"
+import { LoadSeasonAction, LoadSeasonState } from "./action"
 
 export type LoadSeasonResource = Readonly<{
-    season: LoadSeasonCoreAction
+    season: LoadSeasonAction
 }>
 
 export type LoadSeasonResourceState = Readonly<{
-    state: LoadSeasonCoreState
+    state: LoadSeasonState
 }>

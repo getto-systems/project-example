@@ -1,4 +1,4 @@
-import { ApplicationAbstractStateAction } from "../../action/impl"
+import { ApplicationAbstractStateAction } from "../../action/init"
 
 import { initValidateBoardStack } from "../validate_board/init/stack"
 

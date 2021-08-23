@@ -1,4 +1,4 @@
-import { ApplicationAbstractStateAction } from "./impl"
+import { ApplicationAbstractStateAction } from "./init"
 
 import { ApplicationStateAction } from "./action"
 import { ApplicationActionIgniteHook } from "./infra"

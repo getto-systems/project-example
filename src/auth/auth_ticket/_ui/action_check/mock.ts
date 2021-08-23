@@ -1,13 +1,28 @@
-import { mockCheckAuthTicketCoreAction } from "./core/mock"
+import { ApplicationMockStateAction } from "../../../../../ui/vendor/getto-application/action/mock"
 
-import { CheckAuthTicketView, CheckAuthTicketResource } from "./resource"
+import { CheckAuthTicketAction, CheckAuthTicketState, initialCheckAuthTicketState } from "./action"
 
-export function mockCheckAuthTicketView(): CheckAuthTicketView {
-    return {
-        resource: mockCheckAuthTicketResource(),
-        terminate: () => null,
-    }
+export function mockCheckAuthTicketAction(): CheckAuthTicketAction {
+    return new Action()
 }
-export function mockCheckAuthTicketResource(): CheckAuthTicketResource {
-    return { core: mockCheckAuthTicketCoreAction() }
+
+class Action
+    extends ApplicationMockStateAction<CheckAuthTicketState>
+    implements CheckAuthTicketAction
+{
+    readonly initialState = initialCheckAuthTicketState
+
+    constructor() {
+        super(async () => ({ type: "required-to-login" }))
+    }
+
+    async succeedToInstantLoad(): Promise<CheckAuthTicketState> {
+        return this.initialState
+    }
+    async failedToInstantLoad(): Promise<CheckAuthTicketState> {
+        return this.initialState
+    }
+    async loadError(): Promise<CheckAuthTicketState> {
+        return this.initialState
+    }
 }

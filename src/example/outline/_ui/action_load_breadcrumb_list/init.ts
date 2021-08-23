@@ -1,23 +1,23 @@
-import { newLoadMenuLocationDetecter } from "../kernel/init"
-import { newLoadBreadcrumbListInfra } from "../load_breadcrumb_list/init"
+import { loadBreadcrumbList } from "../load_breadcrumb_list/method"
+import { LoadMenuDetecter } from "../kernel/method"
 
-import { initLoadBreadcrumbListCoreAction, initLoadBreadcrumbListCoreMaterial } from "./core/impl"
+import { LoadBreadcrumbListInfra } from "../load_breadcrumb_list/infra"
 
-import { MenuContent } from "../kernel/infra"
+import { LoadBreadcrumbListAction, LoadBreadcrumbListMaterial } from "./action"
 
-import { LoadBreadcrumbListResource } from "./resource"
-import { LocationOutsideFeature } from "../../../../z_details/_ui/location/feature"
-
-export function newLoadBreadcrumbListResource(
-    feature: LocationOutsideFeature,
-    menuContent: MenuContent,
-): LoadBreadcrumbListResource {
+export function initLoadBreadcrumbListMaterial(
+    infra: LoadBreadcrumbListInfra,
+    detecter: LoadMenuDetecter,
+): LoadBreadcrumbListMaterial {
     return {
-        breadcrumbList: initLoadBreadcrumbListCoreAction(
-            initLoadBreadcrumbListCoreMaterial(
-                newLoadBreadcrumbListInfra(menuContent),
-                newLoadMenuLocationDetecter(feature),
-            ),
-        ),
+        load: loadBreadcrumbList(infra)(detecter),
+    }
+}
+
+export function initLoadBreadcrumbListAction(
+    material: LoadBreadcrumbListMaterial,
+): LoadBreadcrumbListAction {
+    return {
+        load: material.load,
     }
 }

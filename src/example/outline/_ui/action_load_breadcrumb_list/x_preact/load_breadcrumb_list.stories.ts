@@ -4,7 +4,7 @@ import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/stor
 
 import { LoadBreadcrumbListComponent } from "./load_breadcrumb_list"
 
-import { mockBreadcrumbList, mockLoadBreadcrumbListCoreAction } from "../core/mock"
+import { mockBreadcrumbList, mockLoadBreadcrumbListAction } from "../mock"
 
 const options = ["home", "empty"] as const
 
@@ -23,7 +23,7 @@ type MockProps = Readonly<{
 }>
 const template = storyTemplate<MockProps>((props) => {
     return h(LoadBreadcrumbListComponent, {
-        breadcrumbList: mockLoadBreadcrumbListCoreAction(mockBreadcrumbList(props.label)),
+        breadcrumbList: mockLoadBreadcrumbListAction(mockBreadcrumbList(props.label)),
     })
 })
 

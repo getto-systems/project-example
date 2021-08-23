@@ -1,12 +1,13 @@
 import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
 
-import { CheckAuthTicketCoreAction, CheckAuthTicketCoreState } from "./core/action"
+import { CheckAuthTicketAction, CheckAuthTicketState } from "./action"
 
-export type CheckAuthTicketView = ApplicationView<CheckAuthTicketResource>
+export type CheckAuthTicketView = ApplicationView<CheckAuthTicketAction>
 
 export type CheckAuthTicketResource = Readonly<{
-    core: CheckAuthTicketCoreAction
+    check: CheckAuthTicketAction
 }>
+
 export type CheckAuthTicketResourceState = Readonly<{
-    state: CheckAuthTicketCoreState
+    state: CheckAuthTicketState
 }>

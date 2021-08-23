@@ -2,8 +2,7 @@ import { setupActionTestRunner } from "../../../../../ui/vendor/getto-applicatio
 
 import { mockAuthnRepository, mockAuthzRepository } from "../kernel/init/repository/mock"
 
-import { initLogoutCoreAction, initLogoutCoreMaterial } from "./core/impl"
-import { initLogoutResource } from "./impl"
+import { initLogoutAction, initLogoutMaterial } from "./init"
 
 import { AuthnRepository, AuthzRepository } from "../kernel/infra"
 import { LogoutRemote } from "../logout/infra"
@@ -45,15 +44,15 @@ function standard() {
 }
 
 function initResource(authn: AuthnRepository, authz: AuthzRepository): LogoutResource {
-    return initLogoutResource(
-        initLogoutCoreAction(
-            initLogoutCoreMaterial({
+    return {
+        logout: initLogoutAction(
+            initLogoutMaterial({
                 authn,
                 authz,
                 logout: standard_clear(),
             }),
         ),
-    )
+    }
 }
 
 function standard_authn(): AuthnRepository {

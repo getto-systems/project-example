@@ -1,8 +1,8 @@
-import { LoadMenuCoreAction, LoadMenuCoreState } from "./core/action"
+import { LoadMenuAction, LoadMenuState } from "./action"
 
 export type LoadMenuResource = Readonly<{
-    menu: LoadMenuCoreAction
+    menu: LoadMenuAction
 }>
 export type LoadMenuResourceState = Readonly<{
-    state: LoadMenuCoreState
+    state: LoadMenuState
 }>

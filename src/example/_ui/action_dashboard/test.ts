@@ -2,7 +2,7 @@ import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/a
 
 import { mockBaseResource } from "../action_base/mock"
 
-import { initDashboardView } from "./impl"
+import { initDashboardView } from "./init"
 
 describe("Dashboard", () => {
     test("terminate", async () => {

@@ -32,13 +32,11 @@ import { InputLoginIDEntry } from "../../../../../login_id/_ui/action_input/x_pr
 import { remoteCommonErrorReason } from "../../../../../../z_details/_ui/remote/helper"
 
 export function RequestResetTokenEntry(view: RequestResetTokenView): VNode {
-    const resource = useApplicationView(view)
+    const action = useApplicationView(view)
     return h(RequestResetTokenComponent, {
-        ...resource,
-        state: {
-            core: useApplicationAction(resource.requestToken.core),
-            form: useApplicationAction(resource.requestToken.form.validate),
-        },
+        requestToken: action,
+        state: useApplicationAction(action),
+        validate: useApplicationAction(action.validate),
     })
 }
 
@@ -46,14 +44,14 @@ const title = "パスワードリセット"
 
 type Props = RequestResetTokenResource & RequestResetTokenResourceState
 export function RequestResetTokenComponent(props: Props): VNode {
-    switch (props.state.core.type) {
+    switch (props.state.type) {
         case "initial-request-token":
             return startSessionForm({ state: "start" })
 
         case "failed-to-request-token":
             return startSessionForm({
                 state: "start",
-                error: requestTokenError(props.state.core.err),
+                error: requestTokenError(props.state.err),
             })
 
         case "try-to-request-token":
@@ -68,6 +66,7 @@ export function RequestResetTokenComponent(props: Props): VNode {
 
     type StartSessionFormState = "start" | "connecting"
 
+    // TODO state をこの形にする
     type StartSessionFormContent =
         | StartSessionFormContent_base
         | (StartSessionFormContent_base & StartSessionFormContent_error)
@@ -80,7 +79,7 @@ export function RequestResetTokenComponent(props: Props): VNode {
                 title,
                 body: [
                     h(InputLoginIDEntry, {
-                        field: props.requestToken.form.loginID,
+                        field: props.requestToken.loginID,
                         help: ["このログインIDに設定された送信先にリセットトークンを送信します"],
                     }),
                     buttons({ left: button(), right: clearButton() }),
@@ -91,7 +90,7 @@ export function RequestResetTokenComponent(props: Props): VNode {
 
         function clearButton() {
             const label = "入力内容をクリア"
-            switch (props.state.form) {
+            switch (props.validate) {
                 case "initial":
                     return button_disabled({ label })
 
@@ -102,7 +101,7 @@ export function RequestResetTokenComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
-                props.requestToken.form.clear()
+                props.requestToken.clear()
             }
         }
 
@@ -118,7 +117,7 @@ export function RequestResetTokenComponent(props: Props): VNode {
             function startSessionButton() {
                 const label = "トークン送信"
 
-                switch (props.state.form) {
+                switch (props.validate) {
                     case "initial":
                         return button_send({ state: "normal", label, onClick })
 
@@ -131,7 +130,7 @@ export function RequestResetTokenComponent(props: Props): VNode {
 
                 function onClick(e: Event) {
                     e.preventDefault()
-                    props.requestToken.core.submit(props.requestToken.form.validate.get())
+                    props.requestToken.submit(props.requestToken.validate.get())
                 }
             }
             function connectingButton(): VNode {
@@ -181,10 +180,10 @@ export function RequestResetTokenComponent(props: Props): VNode {
         return buttons({ left: privacyPolicyLink(), right: loginLink() })
     }
     function privacyPolicyLink() {
-        return signNav(props.link.getNav_static_privacyPolicy())
+        return signNav(props.requestToken.link.getNav_static_privacyPolicy())
     }
     function loginLink(): VNode {
-        return signNav(props.link.getNav_password_authenticate())
+        return signNav(props.requestToken.link.getNav_password_authenticate())
     }
 }
 

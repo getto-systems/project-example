@@ -1,9 +1,11 @@
-import { mockLoadSeasonCoreAction } from "./core/mock"
+import { initialLoadSeasonState, LoadSeasonAction, LoadSeasonState } from "./action"
 
-import { LoadSeasonResource } from "./resource"
+import { ApplicationMockStateAction } from "../../../../../ui/vendor/getto-application/action/mock"
 
-export function mockLoadSeasonResource(): LoadSeasonResource {
-    return {
-        season: mockLoadSeasonCoreAction(),
-    }
+export function mockLoadSeasonAction(): LoadSeasonAction {
+    return new Action()
+}
+
+class Action extends ApplicationMockStateAction<LoadSeasonState> {
+    initialState = initialLoadSeasonState
 }

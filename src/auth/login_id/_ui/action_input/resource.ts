@@ -1,4 +1,4 @@
-import { InputLoginIDAction, ValidateLoginIDState } from "./core/action"
+import { InputLoginIDAction, ValidateLoginIDState } from "./action"
 
 export type InputLoginIDResource = Readonly<{
     field: InputLoginIDAction

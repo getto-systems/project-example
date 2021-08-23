@@ -1,17 +1,13 @@
-import { newNotifyUnexpectedErrorInfra } from "../notify/init"
+import { notifyUnexpectedError } from "../notify/method"
 
-import { initNotifyUnexpectedErrorResource } from "./impl"
-import { initNotifyUnexpectedErrorCoreAction } from "./core/impl"
+import { NotifyUnexpectedErrorAction } from "./action"
 
-import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"
+import { NotifyUnexpectedErrorInfra } from "../notify/infra"
 
-import { NotifyUnexpectedErrorResource } from "./resource"
-
-type OutsideFeature = RemoteOutsideFeature
-export function newNotifyUnexpectedErrorResource(
-    feature: OutsideFeature,
-): NotifyUnexpectedErrorResource {
-    return initNotifyUnexpectedErrorResource(
-        initNotifyUnexpectedErrorCoreAction(newNotifyUnexpectedErrorInfra(feature)),
-    )
+export function initNotifyUnexpectedErrorAction(
+    infra: NotifyUnexpectedErrorInfra,
+): NotifyUnexpectedErrorAction {
+    return {
+        notify: notifyUnexpectedError(infra),
+    }
 }

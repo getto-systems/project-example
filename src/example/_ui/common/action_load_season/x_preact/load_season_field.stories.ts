@@ -6,9 +6,9 @@ import { LoadSeasonFieldComponent } from "./load_season_field"
 
 import { markSeason } from "../../load_season/test_helper"
 
-import { mockLoadSeasonResource } from "../mock"
+import { mockLoadSeasonAction } from "../mock"
 
-import { LoadSeasonCoreState } from "../core/action"
+import { LoadSeasonState } from "../action"
 
 const options = ["success", "error"] as const
 
@@ -27,9 +27,9 @@ type MockProps = Readonly<{
     err: string
 }>
 const template = storyTemplate<MockProps>((props) => {
-    return h(LoadSeasonFieldComponent, { ...mockLoadSeasonResource(), state: state() })
+    return h(LoadSeasonFieldComponent, { season: mockLoadSeasonAction(), state: state() })
 
-    function state(): LoadSeasonCoreState {
+    function state(): LoadSeasonState {
         switch (props.load) {
             case "success":
                 return { type: "succeed-to-load", value: markSeason({ year: props.year }) }

@@ -1,12 +1,12 @@
 import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
+import { toApplicationView } from "../../../../../ui/vendor/getto-application/action/helper"
 import { ticker } from "../../../../z_details/_ui/timer/helper"
 
 import { markApplicationTargetPath } from "../find_next/test_helper"
 
 import { mockFindNextVersionLocationDetecter } from "../find_next/mock"
 
-import { initFindNextVersionView } from "./impl"
-import { initFindNextVersionCoreAction, initFindNextVersionCoreMaterial } from "./core/impl"
+import { initFindNextVersionAction, initFindNextVersionMaterial } from "./init"
 
 import { applicationPath } from "../find_next/helper"
 
@@ -19,9 +19,9 @@ describe("FindNextVersion", () => {
         const { view } = standard()
         const resource = view.resource
 
-        const runner = setupActionTestRunner(resource.findNext.subscriber)
+        const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.findNext.ignite()).then((stack) => {
+        await runner(() => resource.ignite()).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -37,9 +37,9 @@ describe("FindNextVersion", () => {
         const { view } = takeLongtime()
         const resource = view.resource
 
-        const runner = setupActionTestRunner(resource.findNext.subscriber)
+        const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.findNext.ignite()).then((stack) => {
+        await runner(() => resource.ignite()).then((stack) => {
             expect(stack).toEqual([
                 { type: "take-longtime-to-find" },
                 {
@@ -56,9 +56,9 @@ describe("FindNextVersion", () => {
         const { view } = found(["/1.1.0-ui/index.html"])
         const resource = view.resource
 
-        const runner = setupActionTestRunner(resource.findNext.subscriber)
+        const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.findNext.ignite()).then((stack) => {
+        await runner(() => resource.ignite()).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -74,9 +74,9 @@ describe("FindNextVersion", () => {
         const { view } = found(["/1.0.1-ui/index.html"])
         const resource = view.resource
 
-        const runner = setupActionTestRunner(resource.findNext.subscriber)
+        const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.findNext.ignite()).then((stack) => {
+        await runner(() => resource.ignite()).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -92,9 +92,9 @@ describe("FindNextVersion", () => {
         const { view } = found(["/1.1.0-ui/index.html", "/1.2.0-ui/index.html"])
         const resource = view.resource
 
-        const runner = setupActionTestRunner(resource.findNext.subscriber)
+        const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.findNext.ignite()).then((stack) => {
+        await runner(() => resource.ignite()).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -110,9 +110,9 @@ describe("FindNextVersion", () => {
         const { view } = found(["/1.0.1-ui/index.html", "/1.0.2-ui/index.html"])
         const resource = view.resource
 
-        const runner = setupActionTestRunner(resource.findNext.subscriber)
+        const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.findNext.ignite()).then((stack) => {
+        await runner(() => resource.ignite()).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -128,9 +128,9 @@ describe("FindNextVersion", () => {
         const { view } = found(["/1.1.0-ui/index.html", "/1.1.1-ui/index.html"])
         const resource = view.resource
 
-        const runner = setupActionTestRunner(resource.findNext.subscriber)
+        const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.findNext.ignite()).then((stack) => {
+        await runner(() => resource.ignite()).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -150,9 +150,9 @@ describe("FindNextVersion", () => {
         ])
         const resource = view.resource
 
-        const runner = setupActionTestRunner(resource.findNext.subscriber)
+        const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.findNext.ignite()).then((stack) => {
+        await runner(() => resource.ignite()).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -168,9 +168,9 @@ describe("FindNextVersion", () => {
         const { view } = foundComplex(["/1.1.0-ui/index.html"])
         const resource = view.resource
 
-        const runner = setupActionTestRunner(resource.findNext.subscriber)
+        const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.findNext.ignite()).then((stack) => {
+        await runner(() => resource.ignite()).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -186,9 +186,9 @@ describe("FindNextVersion", () => {
         const { view } = invalidVersion()
         const resource = view.resource
 
-        const runner = setupActionTestRunner(resource.findNext.subscriber)
+        const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.findNext.ignite()).then((stack) => {
+        await runner(() => resource.ignite()).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -216,11 +216,11 @@ describe("FindNextVersion", () => {
     test("terminate", async () => {
         const { view } = standard()
 
-        const runner = setupActionTestRunner(view.resource.findNext.subscriber)
+        const runner = setupActionTestRunner(view.resource.subscriber)
 
         await runner(() => {
             view.terminate()
-            return view.resource.findNext.ignite()
+            return view.resource.ignite()
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])
@@ -259,9 +259,9 @@ function initView(
     version: string,
     check: CheckDeployExistsRemote,
 ): FindNextVersionView {
-    return initFindNextVersionView({
-        findNext: initFindNextVersionCoreAction(
-            initFindNextVersionCoreMaterial(
+    return toApplicationView(
+        initFindNextVersionAction(
+            initFindNextVersionMaterial(
                 {
                     check,
                     version,
@@ -273,7 +273,7 @@ function initView(
                 mockFindNextVersionLocationDetecter(currentURL, version),
             ),
         ),
-    })
+    )
 }
 
 function standard_version(): string {

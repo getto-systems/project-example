@@ -1,7 +1,7 @@
 import { standard_MenuTree } from "../kernel/test_helper"
 import { mockLoadMenuLocationDetecter } from "../kernel/mock"
 
-import { initLoadBreadcrumbListCoreAction, initLoadBreadcrumbListCoreMaterial } from "./core/impl"
+import { initLoadBreadcrumbListAction, initLoadBreadcrumbListMaterial } from "./init"
 
 import { LoadBreadcrumbListResource } from "./resource"
 
@@ -43,8 +43,8 @@ function unknownTarget() {
 function newResource(currentURL: URL): LoadBreadcrumbListResource {
     const version = standard_version()
     return {
-        breadcrumbList: initLoadBreadcrumbListCoreAction(
-            initLoadBreadcrumbListCoreMaterial(
+        breadcrumbList: initLoadBreadcrumbListAction(
+            initLoadBreadcrumbListMaterial(
                 {
                     version,
                     menuTree: standard_MenuTree(),

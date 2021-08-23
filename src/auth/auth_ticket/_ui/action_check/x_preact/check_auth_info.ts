@@ -29,10 +29,10 @@ import {
 import { RenewAuthTicketError } from "../../kernel/data"
 
 export function CheckAuthTicketEntry(view: CheckAuthTicketView): VNode {
-    const resource = useApplicationView(view)
+    const action = useApplicationView(view)
     return h(CheckAuthTicketComponent, {
-        ...resource,
-        state: useApplicationAction(resource.core),
+        check: action,
+        state: useApplicationAction(action),
     })
 }
 
@@ -43,7 +43,7 @@ export function CheckAuthTicketComponent(props: Props): VNode {
         switch (props.state.type) {
             case "try-to-instant-load":
                 if (!props.state.scriptPath.valid) {
-                    props.core.loadError({
+                    props.check.loadError({
                         type: "infra-error",
                         err: `スクリプトのロードに失敗しました: ${props.state.type}`,
                     })
@@ -51,17 +51,17 @@ export function CheckAuthTicketComponent(props: Props): VNode {
                 }
                 appendScript(props.state.scriptPath.value, (script) => {
                     script.onload = () => {
-                        props.core.succeedToInstantLoad()
+                        props.check.succeedToInstantLoad()
                     }
                     script.onerror = () => {
-                        props.core.failedToInstantLoad()
+                        props.check.failedToInstantLoad()
                     }
                 })
                 break
 
             case "try-to-load":
                 if (!props.state.scriptPath.valid) {
-                    props.core.loadError({
+                    props.check.loadError({
                         type: "infra-error",
                         err: `スクリプトのロードに失敗しました: ${props.state.type}`,
                     })
@@ -69,7 +69,7 @@ export function CheckAuthTicketComponent(props: Props): VNode {
                 }
                 appendScript(props.state.scriptPath.value, (script) => {
                     script.onerror = () => {
-                        props.core.loadError({
+                        props.check.loadError({
                             type: "infra-error",
                             err: `スクリプトのロードに失敗しました: ${props.state.type}`,
                         })
@@ -77,7 +77,7 @@ export function CheckAuthTicketComponent(props: Props): VNode {
                 })
                 break
         }
-    }, [props.core, props.state])
+    }, [props.check, props.state])
 
     switch (props.state.type) {
         case "initial-check":

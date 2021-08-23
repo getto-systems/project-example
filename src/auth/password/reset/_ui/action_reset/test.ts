@@ -1,16 +1,19 @@
 import { setupActionTestRunner } from "../../../../../../ui/vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../../z_details/_ui/timer/helper"
+import { toApplicationView } from "../../../../../../ui/vendor/getto-application/action/helper"
 
 import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/init/mock"
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../../z_details/_ui/clock/mock"
+import {
+    mockAuthnRepository,
+    mockAuthzRepository,
+} from "../../../../auth_ticket/_ui/kernel/init/repository/mock"
+
+import { initResetPasswordAction, initResetPasswordMaterial } from "./init"
 
 import { mockGetScriptPathDetecter } from "../../../../_ui/common/secure/get_script_path/mock"
 import { mockResetPasswordLocationDetecter } from "../reset/mock"
-
-import { initResetPasswordView } from "./impl"
-import { initResetPasswordCoreAction, initResetPasswordCoreMaterial } from "./core/impl"
-import { initResetPasswordFormAction } from "./form/impl"
 
 import { Clock } from "../../../../../z_details/_ui/clock/infra"
 import { ResetPasswordRemote, ResetPasswordRemoteResult } from "../reset/infra"
@@ -19,6 +22,7 @@ import {
     AuthzRepository,
     RenewAuthTicketRemote,
 } from "../../../../auth_ticket/_ui/kernel/infra"
+import { BoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/infra"
 
 import { ResetPasswordView } from "./resource"
 
@@ -26,11 +30,6 @@ import {
     authzRepositoryConverter,
     convertAuthRemote,
 } from "../../../../auth_ticket/_ui/kernel/convert"
-import {
-    mockAuthnRepository,
-    mockAuthzRepository,
-} from "../../../../auth_ticket/_ui/kernel/init/repository/mock"
-import { BoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/infra"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")
@@ -46,9 +45,9 @@ const VALID_LOGIN = { loginID: "login-id", password: "password" } as const
 describe("RegisterPassword", () => {
     test("submit valid login-id and password", async () => {
         const { clock, view, store } = standard()
-        const action = view.resource.reset
+        const action = view.resource
 
-        action.core.subscriber.subscribe((state) => {
+        action.subscriber.subscribe((state) => {
             switch (state.type) {
                 case "try-to-load":
                     clock.update(CONTINUOUS_RENEW_START_AT)
@@ -56,12 +55,12 @@ describe("RegisterPassword", () => {
             }
         })
 
-        const runner = setupActionTestRunner(action.core.subscriber)
+        const runner = setupActionTestRunner(action.subscriber)
 
         await runner(() => {
             store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
             store.password.set(markBoardValue(VALID_LOGIN.password))
-            return action.core.submit(action.form.validate.get())
+            return action.submit(action.validate.get())
         }).then((stack) => {
             expect(stack).toEqual([
                 { type: "try-to-reset" },
@@ -79,9 +78,9 @@ describe("RegisterPassword", () => {
     test("submit valid login-id and password; with take longtime", async () => {
         // wait for take longtime timeout
         const { clock, view, store } = takeLongtime()
-        const action = view.resource.reset
+        const action = view.resource
 
-        action.core.subscriber.subscribe((state) => {
+        action.subscriber.subscribe((state) => {
             switch (state.type) {
                 case "try-to-load":
                     clock.update(CONTINUOUS_RENEW_START_AT)
@@ -89,12 +88,12 @@ describe("RegisterPassword", () => {
             }
         })
 
-        const runner = setupActionTestRunner(action.core.subscriber)
+        const runner = setupActionTestRunner(action.subscriber)
 
         await runner(() => {
             store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
             store.password.set(markBoardValue(VALID_LOGIN.password))
-            return action.core.submit(action.form.validate.get())
+            return action.submit(action.validate.get())
         }).then((stack) => {
             expect(stack).toEqual([
                 { type: "try-to-reset" },
@@ -112,25 +111,25 @@ describe("RegisterPassword", () => {
 
     test("submit without fields", async () => {
         const { view } = standard()
-        const action = view.resource.reset
+        const action = view.resource
 
-        const runner = setupActionTestRunner(action.core.subscriber)
+        const runner = setupActionTestRunner(action.subscriber)
 
-        await runner(() => action.core.submit(action.form.validate.get())).then((stack) => {
+        await runner(() => action.submit(action.validate.get())).then((stack) => {
             expect(stack).toEqual([{ type: "failed-to-reset", err: { type: "validation-error" } }])
         })
     })
 
     test("submit without resetToken", async () => {
         const { view, store } = emptyResetToken()
-        const action = view.resource.reset
+        const action = view.resource
 
-        const runner = setupActionTestRunner(action.core.subscriber)
+        const runner = setupActionTestRunner(action.subscriber)
 
         await runner(() => {
             store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
             store.password.set(markBoardValue(VALID_LOGIN.password))
-            return action.core.submit(action.form.validate.get())
+            return action.submit(action.validate.get())
         }).then((stack) => {
             expect(stack).toEqual([{ type: "failed-to-reset", err: { type: "empty-reset-token" } }])
         })
@@ -138,11 +137,11 @@ describe("RegisterPassword", () => {
 
     test("clear", () => {
         const { view, store } = standard()
-        const resource = view.resource.reset
+        const resource = view.resource
 
         store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
         store.password.set(markBoardValue(VALID_LOGIN.password))
-        resource.form.clear()
+        resource.clear()
 
         expect(store.loginID.get()).toEqual("")
         expect(store.password.get()).toEqual("")
@@ -150,11 +149,11 @@ describe("RegisterPassword", () => {
 
     test("load error", async () => {
         const { view } = standard()
-        const action = view.resource.reset
+        const action = view.resource
 
-        const runner = setupActionTestRunner(action.core.subscriber)
+        const runner = setupActionTestRunner(action.subscriber)
 
-        await runner(() => action.core.loadError({ type: "infra-error", err: "load error" })).then(
+        await runner(() => action.loadError({ type: "infra-error", err: "load error" })).then(
             (stack) => {
                 expect(stack).toEqual([
                     { type: "load-error", err: { type: "infra-error", err: "load error" } },
@@ -165,22 +164,22 @@ describe("RegisterPassword", () => {
 
     test("terminate", async () => {
         const { view } = standard()
-        const action = view.resource.reset
+        const action = view.resource
 
         const runner = setupActionTestRunner({
             subscribe: (handler) => {
-                action.core.subscriber.subscribe(handler)
-                action.form.validate.subscriber.subscribe(handler)
-                action.form.loginID.validate.subscriber.subscribe(handler)
-                action.form.password.validate.subscriber.subscribe(handler)
+                action.subscriber.subscribe(handler)
+                action.validate.subscriber.subscribe(handler)
+                action.loginID.validate.subscriber.subscribe(handler)
+                action.password.validate.subscriber.subscribe(handler)
             },
             unsubscribe: () => null,
         })
 
         await runner(async () => {
             view.terminate()
-            action.form.loginID.validate.check()
-            action.form.password.validate.check()
+            action.loginID.validate.check()
+            action.password.validate.check()
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])
@@ -243,9 +242,9 @@ function initView(
         reset: mockResetPasswordLocationDetecter(currentURL),
     }
 
-    const view = initResetPasswordView({
-        core: initResetPasswordCoreAction(
-            initResetPasswordCoreMaterial(
+    const view = toApplicationView(
+        initResetPasswordAction(
+            initResetPasswordMaterial(
                 {
                     startContinuousRenew: {
                         authn: authn,
@@ -272,16 +271,14 @@ function initView(
                 detecter,
             ),
         ),
-
-        form: initResetPasswordFormAction(),
-    })
+    )
 
     const store = {
         loginID: mockBoardValueStore(),
         password: mockBoardValueStore(),
     }
-    view.resource.reset.form.loginID.input.connector.connect(store.loginID)
-    view.resource.reset.form.password.input.connector.connect(store.password)
+    view.resource.loginID.input.connector.connect(store.loginID)
+    view.resource.password.input.connector.connect(store.password)
 
     return { view, store }
 }

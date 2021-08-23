@@ -2,7 +2,7 @@ import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/a
 
 import { mockAuthProfileResource } from "./mock"
 
-import { initProfileView } from "./impl"
+import { initProfileView } from "./init"
 
 describe("Profile", () => {
     test("terminate: menu", async () => {

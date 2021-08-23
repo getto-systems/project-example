@@ -4,11 +4,17 @@ import { storyTemplate } from "../../../../../ui/vendor/storybook/preact/story"
 
 import { ProfileComponent } from "./profile"
 
-import { mockNotifyUnexpectedErrorResource } from "../../../../avail/unexpected_error/_ui/action_notify/mock"
-import { mockLoadBreadcrumbListResource } from "../../../../example/outline/_ui/action_load_breadcrumb_list/mock"
-import { mockLoadMenuResource } from "../../../../example/outline/_ui/action_load_menu/mock"
-import { mockLoadSeasonResource } from "../../../../example/_ui/common/action_load_season/mock"
-import { mockLogoutResource } from "../../../auth_ticket/_ui/action_logout/mock"
+import { mockNotifyUnexpectedErrorAction } from "../../../../avail/unexpected_error/_ui/action_notify/mock"
+import {
+    mockBreadcrumbList_home,
+    mockLoadBreadcrumbListAction,
+} from "../../../../example/outline/_ui/action_load_breadcrumb_list/mock"
+import {
+    mockLoadMenuAction,
+    mockMenu_home,
+} from "../../../../example/outline/_ui/action_load_menu/mock"
+import { mockLoadSeasonAction } from "../../../../example/_ui/common/action_load_season/mock"
+import { mockLogoutAction } from "../../../auth_ticket/_ui/action_logout/mock"
 
 export default {
     title: "main/Auth/Profile",
@@ -22,11 +28,11 @@ type MockProps = {
 }
 const template = storyTemplate<MockProps>(() => {
     return h(ProfileComponent, {
-        ...mockNotifyUnexpectedErrorResource(),
-        ...mockLoadBreadcrumbListResource(),
-        ...mockLoadMenuResource(),
-        ...mockLoadSeasonResource(),
-        ...mockLogoutResource(),
+        error: mockNotifyUnexpectedErrorAction(),
+        breadcrumbList: mockLoadBreadcrumbListAction(mockBreadcrumbList_home()),
+        menu: mockLoadMenuAction(mockMenu_home()),
+        season: mockLoadSeasonAction(),
+        logout: mockLogoutAction(),
     })
 })
 

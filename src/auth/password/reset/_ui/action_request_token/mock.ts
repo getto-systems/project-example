@@ -1,23 +1,34 @@
-import { initSignLinkResource } from "../../../../_ui/common/nav/action_nav/impl"
+import { ApplicationMockStateAction } from "../../../../../../ui/vendor/getto-application/action/mock"
+import { mockValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/mock"
+import { mockInputLoginIDAction } from "../../../../login_id/_ui/action_input/mock"
+import { initSignLink } from "../../../../_ui/common/nav/action_nav/init"
 
-import { mockRequestResetTokenCoreAction } from "./core/mock"
-import { mockRequestResetTokenFormAction } from "./form/mock"
+import {
+    initialRequestResetTokenState,
+    RequestResetTokenAction,
+    RequestResetTokenState,
+    ValidateRequestTokenAction,
+} from "./action"
 
-import { RequestResetTokenView, RequestResetTokenResource } from "./resource"
-
-export function mockRequestResetTokenView(): RequestResetTokenView {
-    return {
-        resource: mockRequestResetTokenResource(),
-        terminate: () => null,
-    }
+export function mockRequestResetTokenAction(): RequestResetTokenAction {
+    return new Action()
 }
-export function mockRequestResetTokenResource(): RequestResetTokenResource {
-    return {
-        requestToken: {
-            core: mockRequestResetTokenCoreAction(),
-            form: mockRequestResetTokenFormAction(),
-            terminate: () => null,
-        },
-        ...initSignLinkResource(),
+
+export class Action
+    extends ApplicationMockStateAction<RequestResetTokenState>
+    implements RequestResetTokenAction
+{
+    readonly initialState = initialRequestResetTokenState
+
+    readonly link = initSignLink()
+
+    readonly loginID = mockInputLoginIDAction()
+    readonly validate: ValidateRequestTokenAction = mockValidateBoardAction()
+    
+    clear(): void {
+        return
+    }
+    async submit(): Promise<RequestResetTokenState> {
+        return this.initialState
     }
 }

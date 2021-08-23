@@ -5,7 +5,7 @@ import { mockSeasonRepository } from "../load_season/init/repository/mock"
 
 import { markSeason } from "../load_season/test_helper"
 
-import { initLoadSeasonCoreAction } from "./core/impl"
+import { initLoadSeasonAction } from "./init"
 
 import { SeasonRepository } from "../load_season/infra"
 
@@ -57,7 +57,7 @@ function empty() {
 function initResource(season: SeasonRepository): LoadSeasonResource {
     const clock = mockClock(new Date("2021-01-01 10:00:00"), mockClockPubSub())
     return {
-        season: initLoadSeasonCoreAction({
+        season: initLoadSeasonAction({
             season,
             clock,
         }),

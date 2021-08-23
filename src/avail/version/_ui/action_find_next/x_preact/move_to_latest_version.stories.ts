@@ -2,11 +2,11 @@ import { h } from "preact"
 
 import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
 
-import { mockFindNextVersionCoreAction } from "../core/mock"
+import { mockFindNextVersionAction } from "../mock"
 
 import { MoveToLatestVersionComponent } from "./move_to_latest_version"
 
-import { FindNextVersionCoreState } from "../core/action"
+import { FindNextVersionState } from "../action"
 
 const options = ["takeLongtime", "failed"] as const
 
@@ -28,11 +28,11 @@ type MockProps = Readonly<{
 }>
 const template = storyTemplate<MockProps>((props) => {
     return h(MoveToLatestVersionComponent, {
-        findNext: mockFindNextVersionCoreAction(),
+        findNext: mockFindNextVersionAction(),
         state: state(),
     })
 
-    function state(): FindNextVersionCoreState {
+    function state(): FindNextVersionState {
         switch (props.findNext) {
             case "takeLongtime":
                 return { type: "take-longtime-to-find" }

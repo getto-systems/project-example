@@ -4,11 +4,11 @@ import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/stor
 
 import { InputLoginIDComponent } from "./input"
 
-import { mockInputLoginIDAction } from "../core/mock"
+import { mockInputLoginIDAction } from "../mock"
 
 import { LOGIN_ID_MAX_LENGTH } from "../../convert"
 
-import { ValidateLoginIDState } from "../core/action"
+import { ValidateLoginIDState } from "../action"
 
 const options = ["valid", "empty", "too-long"] as const
 
