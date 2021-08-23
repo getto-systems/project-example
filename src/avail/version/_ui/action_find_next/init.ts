@@ -1,19 +1,42 @@
-import { newFindNextVersionInfra, newFindNextVersionLocationDetecter } from "../find_next/init"
+import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/init"
 
-import { initFindNextVersionView } from "./impl"
-import { initFindNextVersionCoreAction, initFindNextVersionCoreMaterial } from "./core/impl"
+import { findNextVersion } from "../find_next/method"
 
-import { LocationOutsideFeature } from "../../../../z_details/_ui/location/feature"
+import { FindNextVersionInfra } from "../find_next/infra"
 
-import { FindNextVersionView } from "./resource"
+import { FindNextVersionDetecter } from "../find_next/method"
 
-export function newFindNextVersionView(feature: LocationOutsideFeature): FindNextVersionView {
-    return initFindNextVersionView({
-        findNext: initFindNextVersionCoreAction(
-            initFindNextVersionCoreMaterial(
-                newFindNextVersionInfra(),
-                newFindNextVersionLocationDetecter(feature),
-            ),
-        ),
-    })
+import {
+    FindNextVersionMaterial,
+    FindNextVersionState,
+    initialFindNextVersionState,
+    FindNextVersionAction,
+} from "./action"
+
+export function initFindNextVersionMaterial(
+    infra: FindNextVersionInfra,
+    detecter: FindNextVersionDetecter,
+): FindNextVersionMaterial {
+    return {
+        find: findNextVersion(infra)(detecter),
+    }
+}
+
+export function initFindNextVersionAction(
+    material: FindNextVersionMaterial,
+): FindNextVersionAction {
+    return new Action(material)
+}
+
+class Action
+    extends ApplicationAbstractStateAction<FindNextVersionState>
+    implements FindNextVersionAction {
+    readonly initialState = initialFindNextVersionState
+
+    material: FindNextVersionMaterial
+
+    constructor(material: FindNextVersionMaterial) {
+        super(() => this.material.find(this.post))
+        this.material = material
+    }
 }
