@@ -28,9 +28,9 @@ export function newResetPasswordView(
                 },
                 {
                     getSecureScriptPath: newGetScriptPathLocationDetecter(feature),
-                    reset: newResetPasswordLocationDetecter(feature),
                 },
             ),
+            newResetPasswordLocationDetecter(feature),
         ),
     )
 }

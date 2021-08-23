@@ -45,24 +45,24 @@ export type ResetPasswordActionInfra = Readonly<{
 export type ResetPasswordCoreForegroundDetecter = Readonly<{
     getSecureScriptPath: GetScriptPathDetecter
 }>
-export type ResetPasswordCoreBackgroundDetecter = Readonly<{
-    reset: ResetPasswordDetecter
-}>
 
 export function initResetPasswordMaterial(
     infra: ResetPasswordActionInfra,
-    detecter: ResetPasswordCoreForegroundDetecter & ResetPasswordCoreBackgroundDetecter,
+    detecter: ResetPasswordCoreForegroundDetecter,
 ): ResetPasswordMaterial {
     return {
         save: saveAuthTicket(infra.startContinuousRenew),
         startContinuousRenew: startContinuousRenew(infra.startContinuousRenew),
         getSecureScriptPath: getScriptPath(infra.getSecureScriptPath)(detecter.getSecureScriptPath),
-        reset: resetPassword(infra.reset)(detecter.reset),
+        reset: resetPassword(infra.reset),
     }
 }
 
-export function initResetPasswordAction(material: ResetPasswordMaterial): ResetPasswordAction {
-    return new Action(material)
+export function initResetPasswordAction(
+    material: ResetPasswordMaterial,
+    detecter: ResetPasswordDetecter,
+): ResetPasswordAction {
+    return new Action(material, detecter)
 }
 
 class Action
@@ -78,10 +78,12 @@ class Action
     readonly validate: ValidateResetAction
 
     material: ResetPasswordMaterial
+    detecter: ResetPasswordDetecter
 
-    constructor(material: ResetPasswordMaterial) {
+    constructor(material: ResetPasswordMaterial, detecter: ResetPasswordDetecter) {
         super()
         this.material = material
+        this.detecter = detecter
 
         this.validate = initValidateBoardAction({
             fields: resetPasswordFields,
@@ -117,7 +119,8 @@ class Action
         this.validate.clear()
     }
     async submit(fields: ConvertBoardResult<ResetPasswordFields>): Promise<ResetPasswordState> {
-        return this.material.reset(fields, (event) => {
+        // TODO fields は this.validate から取得したい
+        return this.material.reset(this.detecter(), fields, (event) => {
             switch (event.type) {
                 case "succeed-to-reset":
                     return this.startContinuousRenew(event.auth)

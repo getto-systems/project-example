@@ -239,7 +239,6 @@ function initView(
 
     const detecter = {
         getSecureScriptPath: mockGetScriptPathDetecter(currentURL),
-        reset: mockResetPasswordLocationDetecter(currentURL),
     }
 
     const view = toApplicationView(
@@ -270,6 +269,7 @@ function initView(
                 },
                 detecter,
             ),
+            mockResetPasswordLocationDetecter(currentURL),
         ),
     )
 
