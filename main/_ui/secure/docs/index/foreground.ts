@@ -2,7 +2,7 @@ import { render, h } from "preact"
 
 import { foregroundOutsideFeature } from "../../../../../src/x_outside_feature/_ui/common"
 
-import { newDocsView } from "../../../../../src/docs/action_docs/init"
+import { newDocsView } from "../../../../../src/docs/action_docs/init/resource"
 
 import { docs_example } from "../../../../../src/example/docs"
 import { docs_avail_legacy } from "../../../../../src/avail/docs"
