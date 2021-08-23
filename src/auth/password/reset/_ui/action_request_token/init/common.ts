@@ -1,13 +1,13 @@
 import { newRequestResetTokenInfra } from "../../request_token/init"
 
-import { initRequestResetTokenCoreMaterial } from "../core/impl"
+import { initRequestResetTokenMaterial } from "../init"
 
 import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/feature"
 
-import { RequestResetTokenCoreMaterial } from "../core/action"
+import { RequestResetTokenMaterial } from "../action"
 
 export function newRequestResetTokenCoreMaterial(
     feature: RemoteOutsideFeature,
-): RequestResetTokenCoreMaterial {
-    return initRequestResetTokenCoreMaterial(newRequestResetTokenInfra(feature))
+): RequestResetTokenMaterial {
+    return initRequestResetTokenMaterial(newRequestResetTokenInfra(feature))
 }

@@ -4,10 +4,10 @@ import { storyTemplate } from "../../../../../../../ui/vendor/storybook/preact/s
 
 import { RequestResetTokenComponent } from "./request_reset_token"
 
-import { mockRequestResetTokenResource } from "../mock"
+import { mockRequestResetTokenAction } from "../mock"
 
 import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
-import { RequestResetTokenCoreState } from "../core/action"
+import { RequestResetTokenState } from "../action"
 import { validateBoardStates } from "../../../../../../../ui/vendor/getto-application/board/validate_board/data"
 
 const options = [
@@ -38,19 +38,17 @@ export default {
 
 type Props = Readonly<{
     request: typeof options[number]
-    form: ValidateBoardActionState
+    validate: ValidateBoardActionState
     err: string
 }>
 const template = storyTemplate<Props>((props) => {
     return h(RequestResetTokenComponent, {
-        ...mockRequestResetTokenResource(),
-        state: {
-            core: state(),
-            form: props.form,
-        },
+        requestToken: mockRequestResetTokenAction(),
+        state: state(),
+        validate: props.validate,
     })
 
-    function state(): RequestResetTokenCoreState {
+    function state(): RequestResetTokenState {
         switch (props.request) {
             case "initial":
                 return { type: "initial-request-token" }
@@ -91,4 +89,4 @@ const template = storyTemplate<Props>((props) => {
     }
 })
 
-export const RequestToken = template({ request: "initial", form: "valid", err: "" })
+export const RequestToken = template({ request: "initial", validate: "valid", err: "" })
