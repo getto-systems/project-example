@@ -5,30 +5,23 @@ import { toScriptPath } from "./convert"
 import { ConvertLocationResult } from "../../../../../z_details/_ui/location/data"
 import { ConvertScriptPathResult, LocationPathname } from "./data"
 
-export interface GetScriptPathPod {
-    (detecter: GetScriptPathDetecter): GetScriptPathMethod
+export interface GetScriptPathDetecter {
+    (): ConvertLocationResult<LocationPathname>
 }
 
-export type GetScriptPathDetecter = Detect<LocationPathname>
-
 export interface GetScriptPathMethod {
-    (): ConvertScriptPathResult
+    (pathname: ConvertLocationResult<LocationPathname>): ConvertScriptPathResult
 }
 
 interface GetSecureScriptPath {
-    (infra: GetScriptPathInfra): GetScriptPathPod
+    (infra: GetScriptPathInfra): GetScriptPathMethod
 }
-export const getScriptPath: GetSecureScriptPath = (infra) => (detecter) => () => {
+export const getScriptPath: GetSecureScriptPath = (infra) => (pathname) => {
     const { config } = infra
 
-    const pathname = detecter()
     if (!pathname.valid) {
         return { valid: false }
     }
 
     return { valid: true, value: toScriptPath(pathname.value, config) }
-}
-
-interface Detect<T> {
-    (): ConvertLocationResult<T>
 }

@@ -214,36 +214,32 @@ function initView(
     const authn = standard_authn()
     const authz = standard_authz()
 
-    const getScriptPathDetecter = mockGetScriptPathDetecter(currentURL)
-
     const view = toApplicationView(
         initAuthenticatePasswordAction(
-            initAuthenticatePasswordMaterial(
-                {
-                    startContinuousRenew: {
-                        authn,
-                        authz,
-                        renew,
-                        config: {
-                            interval: { interval_millisecond: 128 },
-                            authnExpire: { expire_millisecond: 500 },
-                        },
-                        clock,
+            initAuthenticatePasswordMaterial({
+                startContinuousRenew: {
+                    authn,
+                    authz,
+                    renew,
+                    config: {
+                        interval: { interval_millisecond: 128 },
+                        authnExpire: { expire_millisecond: 500 },
                     },
-                    getSecureScriptPath: {
-                        config: {
-                            secureServerURL: "https://secure.example.com",
-                        },
-                    },
-                    authenticate: {
-                        authenticate,
-                        config: {
-                            takeLongtimeThreshold: { delay_millisecond: 32 },
-                        },
+                    clock,
+                },
+                getSecureScriptPath: {
+                    config: {
+                        secureServerURL: "https://secure.example.com",
                     },
                 },
-                getScriptPathDetecter,
-            ),
+                authenticate: {
+                    authenticate,
+                    config: {
+                        takeLongtimeThreshold: { delay_millisecond: 32 },
+                    },
+                },
+            }),
+            mockGetScriptPathDetecter(currentURL),
         ),
     )
 

@@ -20,17 +20,15 @@ export function newResetPasswordView(
 ): ResetPasswordView {
     return toApplicationView(
         initResetPasswordAction(
-            initResetPasswordMaterial(
-                {
-                    startContinuousRenew: newStartContinuousRenewAuthnInfoInfra(feature),
-                    getSecureScriptPath: newGetSecureScriptPathInfra(),
-                    reset: newResetPasswordInfra(feature),
-                },
-                {
-                    getSecureScriptPath: newGetScriptPathLocationDetecter(feature),
-                },
-            ),
-            newResetPasswordLocationDetecter(feature),
+            initResetPasswordMaterial({
+                startContinuousRenew: newStartContinuousRenewAuthnInfoInfra(feature),
+                getSecureScriptPath: newGetSecureScriptPathInfra(),
+                reset: newResetPasswordInfra(feature),
+            }),
+            {
+                getScriptPath: newGetScriptPathLocationDetecter(feature),
+                reset: newResetPasswordLocationDetecter(feature),
+            },
         ),
     )
 }

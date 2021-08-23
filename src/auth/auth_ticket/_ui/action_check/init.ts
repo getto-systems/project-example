@@ -29,21 +29,21 @@ export type CheckAuthTicketActionInfra = Readonly<{
 
 export function initCheckAuthTicketMaterial(
     infra: CheckAuthTicketActionInfra,
-    detecter: GetScriptPathDetecter,
 ): CheckAuthTicketMaterial {
     return {
         renew: checkAuthTicket(infra.check),
         forceRenew: renewAuthTicket(infra.check),
         startContinuousRenew: startContinuousRenew(infra.startContinuousRenew),
         save: saveAuthTicket(infra.startContinuousRenew),
-        getSecureScriptPath: getScriptPath(infra.getSecureScriptPath)(detecter),
+        getSecureScriptPath: getScriptPath(infra.getSecureScriptPath),
     }
 }
 
 export function initCheckAuthTicketAction(
     material: CheckAuthTicketMaterial,
+    detecter: GetScriptPathDetecter,
 ): CheckAuthTicketAction {
-    return new Action(material)
+    return new Action(material, detecter)
 }
 
 class Action
@@ -53,8 +53,9 @@ class Action
     readonly initialState = initialCheckAuthTicketState
 
     material: CheckAuthTicketMaterial
+    detecter: GetScriptPathDetecter
 
-    constructor(material: CheckAuthTicketMaterial) {
+    constructor(material: CheckAuthTicketMaterial, detecter: GetScriptPathDetecter) {
         super(async () =>
             this.material.renew((event) => {
                 switch (event.type) {
@@ -73,6 +74,7 @@ class Action
             }),
         )
         this.material = material
+        this.detecter = detecter
     }
 
     succeedToInstantLoad(): Promise<CheckAuthTicketState> {
@@ -94,7 +96,7 @@ class Action
     }
 
     secureScriptPath() {
-        return this.material.getSecureScriptPath()
+        return this.material.getSecureScriptPath(this.detecter())
     }
 
     async startContinuousRenew(info: AuthTicket): Promise<CheckAuthTicketState> {
