@@ -261,17 +261,15 @@ function initView(
 ): FindNextVersionView {
     return toApplicationView(
         initFindNextVersionAction(
-            initFindNextVersionMaterial(
-                {
-                    check,
-                    version,
-                    versionSuffix: "-ui",
-                    config: {
-                        takeLongtimeThreshold: { delay_millisecond: 1 },
-                    },
+            initFindNextVersionMaterial({
+                check,
+                version,
+                versionSuffix: "-ui",
+                config: {
+                    takeLongtimeThreshold: { delay_millisecond: 1 },
                 },
-                mockFindNextVersionLocationDetecter(currentURL, version),
-            ),
+            }),
+            mockFindNextVersionLocationDetecter(currentURL, version),
         ),
     )
 }
