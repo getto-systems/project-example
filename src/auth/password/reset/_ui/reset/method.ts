@@ -9,28 +9,26 @@ import { ConvertLocationResult } from "../../../../../z_details/_ui/location/dat
 import { ResetToken } from "../../../_ui/data"
 import { ResetPasswordFields } from "./data"
 
-export interface ResetPasswordPod {
-    (detecter: ResetPasswordDetecter): ResetPasswordMethod
+export interface ResetPasswordDetecter {
+    (): ConvertLocationResult<ResetToken>
 }
-
-export type ResetPasswordDetecter = Detect<ResetToken>
 
 export interface ResetPasswordMethod {
     <S>(
+        resetToken: ConvertLocationResult<ResetToken>,
         fields: ConvertBoardResult<ResetPasswordFields>,
         post: Post<ResetPasswordEvent, S>,
     ): Promise<S>
 }
 
 interface Reset {
-    (infra: ResetPasswordInfra): ResetPasswordPod
+    (infra: ResetPasswordInfra): ResetPasswordMethod
 }
-export const resetPassword: Reset = (infra) => (detecter) => async (fields, post) => {
+export const resetPassword: Reset = (infra) => async (resetToken, fields, post) => {
     if (!fields.valid) {
         return post({ type: "failed-to-reset", err: { type: "validation-error" } })
     }
 
-    const resetToken = detecter()
     if (!resetToken.valid) {
         return post({ type: "failed-to-reset", err: { type: "empty-reset-token" } })
     }
@@ -54,7 +52,4 @@ export const resetPassword: Reset = (infra) => (detecter) => async (fields, post
 
 interface Post<E, S> {
     (event: E): S
-}
-interface Detect<T> {
-    (): ConvertLocationResult<T>
 }

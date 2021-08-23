@@ -4,6 +4,7 @@ import { ConvertLocationResult } from "../../../../z_details/_ui/location/data"
 import { ResetPasswordVariant, StaticSignViewVariant } from "../nav/data"
 import { SignViewType } from "./data"
 
+// TODO このファイル名 core.ts を別な名前にしたい
 export function detectSignViewType(currentURL: URL): ConvertLocationResult<SignViewType> {
     const staticView = detectStaticSignViewVariant(currentURL)
     if (staticView.valid) {

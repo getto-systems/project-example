@@ -1,23 +1,23 @@
 import { buildMenu, BuildMenuParams } from "../kernel/helper"
 
-import { LoadMenuDetecter } from "../kernel/method"
-
 import { initMenuExpand, MenuBadge } from "../kernel/infra"
 import { UpdateMenuBadgeInfra, UpdateMenuBadgeStore } from "./infra"
 
 import { UpdateMenuBadgeEvent } from "./event"
+import { ConvertLocationResult } from "../../../../z_details/_ui/location/data"
+import { MenuTargetPath } from "../kernel/data"
 
-export interface UpdateMenuBadgePod {
-    (detecter: LoadMenuDetecter): UpdateMenuBadgeMethod
-}
 export interface UpdateMenuBadgeMethod {
-    <S>(post: Post<UpdateMenuBadgeEvent, S>): Promise<S>
+    <S>(
+        menuTargetPath: ConvertLocationResult<MenuTargetPath>,
+        post: Post<UpdateMenuBadgeEvent, S>,
+    ): Promise<S>
 }
 
 interface Update {
-    (infra: UpdateMenuBadgeInfra, store: UpdateMenuBadgeStore): UpdateMenuBadgePod
+    (infra: UpdateMenuBadgeInfra, store: UpdateMenuBadgeStore): UpdateMenuBadgeMethod
 }
-export const updateMenuBadge: Update = (infra, store) => (detecter) => async (post) => {
+export const updateMenuBadge: Update = (infra, store) => async (menuTargetPath, post) => {
     const { authz } = infra
 
     const authzResult = await authz.get()
@@ -39,7 +39,7 @@ export const updateMenuBadge: Update = (infra, store) => (detecter) => async (po
         version: infra.version,
         grantedRoles: authzResult.value.roles,
         menuExpand: expand,
-        menuTargetPath: detecter(),
+        menuTargetPath,
         menuTree: infra.menuTree,
         menuBadge: EMPTY_BADGE,
     }

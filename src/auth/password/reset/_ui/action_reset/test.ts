@@ -237,39 +237,35 @@ function initView(
     const authn = standard_authn()
     const authz = standard_authz()
 
-    const detecter = {
-        getSecureScriptPath: mockGetScriptPathDetecter(currentURL),
-        reset: mockResetPasswordLocationDetecter(currentURL),
-    }
-
     const view = toApplicationView(
         initResetPasswordAction(
-            initResetPasswordMaterial(
-                {
-                    startContinuousRenew: {
-                        authn: authn,
-                        authz,
-                        renew,
-                        config: {
-                            interval: { interval_millisecond: 64 },
-                            authnExpire: { expire_millisecond: 500 },
-                        },
-                        clock,
+            initResetPasswordMaterial({
+                startContinuousRenew: {
+                    authn: authn,
+                    authz,
+                    renew,
+                    config: {
+                        interval: { interval_millisecond: 64 },
+                        authnExpire: { expire_millisecond: 500 },
                     },
-                    getSecureScriptPath: {
-                        config: {
-                            secureServerURL: "https://secure.example.com",
-                        },
-                    },
-                    reset: {
-                        reset,
-                        config: {
-                            takeLongtimeThreshold: { delay_millisecond: 32 },
-                        },
+                    clock,
+                },
+                getSecureScriptPath: {
+                    config: {
+                        secureServerURL: "https://secure.example.com",
                     },
                 },
-                detecter,
-            ),
+                reset: {
+                    reset,
+                    config: {
+                        takeLongtimeThreshold: { delay_millisecond: 32 },
+                    },
+                },
+            }),
+            {
+                getScriptPath: mockGetScriptPathDetecter(currentURL),
+                reset: mockResetPasswordLocationDetecter(currentURL),
+            },
         ),
     )
 

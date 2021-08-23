@@ -13,30 +13,26 @@ import {
     FindNextVersionAction,
 } from "./action"
 
-export function initFindNextVersionMaterial(
-    infra: FindNextVersionInfra,
-    detecter: FindNextVersionDetecter,
-): FindNextVersionMaterial {
+export function initFindNextVersionMaterial(infra: FindNextVersionInfra): FindNextVersionMaterial {
     return {
-        find: findNextVersion(infra)(detecter),
+        find: findNextVersion(infra),
     }
 }
 
 export function initFindNextVersionAction(
     material: FindNextVersionMaterial,
+    detecter: FindNextVersionDetecter,
 ): FindNextVersionAction {
-    return new Action(material)
+    return new Action(material, detecter)
 }
 
 class Action
     extends ApplicationAbstractStateAction<FindNextVersionState>
-    implements FindNextVersionAction {
+    implements FindNextVersionAction
+{
     readonly initialState = initialFindNextVersionState
 
-    material: FindNextVersionMaterial
-
-    constructor(material: FindNextVersionMaterial) {
-        super(() => this.material.find(this.post))
-        this.material = material
+    constructor(material: FindNextVersionMaterial, detecter: FindNextVersionDetecter) {
+        super(() => material.find(detecter(), this.post))
     }
 }

@@ -12,22 +12,23 @@ import { versionConfigConverter } from "./convert"
 import { ConvertLocationResult } from "../../../../z_details/_ui/location/data"
 import { ApplicationTargetPath, CheckDeployExistsRemoteError, Version } from "./data"
 
-export interface FindNextVersionPod {
-    (detecter: FindNextVersionDetecter): FindNextVersionMethod
-}
 export interface FindNextVersionMethod {
-    <S>(post: Post<FindNextVersionEvent, S>): Promise<S>
+    <S>(
+        target: ConvertLocationResult<ApplicationTargetPath>,
+        post: Post<FindNextVersionEvent, S>,
+    ): Promise<S>
 }
 
-export type FindNextVersionDetecter = Detect<ApplicationTargetPath>
+export interface FindNextVersionDetecter {
+    (): ConvertLocationResult<ApplicationTargetPath>
+}
 
 interface Find {
-    (infra: FindNextVersionInfra): FindNextVersionPod
+    (infra: FindNextVersionInfra): FindNextVersionMethod
 }
-export const findNextVersion: Find = (infra) => (detecter) => async (post) => {
+export const findNextVersion: Find = (infra) => async (target, post) => {
     const { version, versionSuffix, config } = infra
 
-    const target = detecter()
     const currentVersion = versionConfigConverter(version)
 
     if (!currentVersion.valid) {
@@ -137,7 +138,4 @@ function checkURL(version: Version): string {
 
 interface Post<E, S> {
     (event: E): S
-}
-interface Detect<T> {
-    (): ConvertLocationResult<T>
 }

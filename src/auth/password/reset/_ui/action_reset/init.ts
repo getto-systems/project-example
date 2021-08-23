@@ -41,27 +41,23 @@ export type ResetPasswordActionInfra = Readonly<{
     reset: ResetPasswordInfra
 }>
 
-export type ResetPasswordCoreForegroundDetecter = Readonly<{
-    getSecureScriptPath: GetScriptPathDetecter
-}>
-export type ResetPasswordCoreBackgroundDetecter = Readonly<{
-    reset: ResetPasswordDetecter
-}>
-
-export function initResetPasswordMaterial(
-    infra: ResetPasswordActionInfra,
-    detecter: ResetPasswordCoreForegroundDetecter & ResetPasswordCoreBackgroundDetecter,
-): ResetPasswordMaterial {
+export function initResetPasswordMaterial(infra: ResetPasswordActionInfra): ResetPasswordMaterial {
     return {
         save: saveAuthTicket(infra.startContinuousRenew),
         startContinuousRenew: startContinuousRenew(infra.startContinuousRenew),
-        getSecureScriptPath: getScriptPath(infra.getSecureScriptPath)(detecter.getSecureScriptPath),
-        reset: resetPassword(infra.reset)(detecter.reset),
+        getSecureScriptPath: getScriptPath(infra.getSecureScriptPath),
+        reset: resetPassword(infra.reset),
     }
 }
 
-export function initResetPasswordAction(material: ResetPasswordMaterial): ResetPasswordAction {
-    return new Action(material)
+export function initResetPasswordAction(
+    material: ResetPasswordMaterial,
+    detecter: Readonly<{
+        getScriptPath: GetScriptPathDetecter
+        reset: ResetPasswordDetecter
+    }>,
+): ResetPasswordAction {
+    return new Action(material, detecter)
 }
 
 class Action
@@ -77,10 +73,21 @@ class Action
     readonly validate: ValidateResetAction
 
     material: ResetPasswordMaterial
+    detecter: Readonly<{
+        getScriptPath: GetScriptPathDetecter
+        reset: ResetPasswordDetecter
+    }>
 
-    constructor(material: ResetPasswordMaterial) {
+    constructor(
+        material: ResetPasswordMaterial,
+        detecter: Readonly<{
+            getScriptPath: GetScriptPathDetecter
+            reset: ResetPasswordDetecter
+        }>,
+    ) {
         super()
         this.material = material
+        this.detecter = detecter
 
         this.validate = initValidateBoardAction({
             fields: resetPasswordFields,
@@ -116,7 +123,8 @@ class Action
         this.validate.clear()
     }
     async submit(fields: ConvertBoardResult<ResetPasswordFields>): Promise<ResetPasswordState> {
-        return this.material.reset(fields, (event) => {
+        // TODO fields は this.validate から取得したい
+        return this.material.reset(this.detecter.reset(), fields, (event) => {
             switch (event.type) {
                 case "succeed-to-reset":
                     return this.startContinuousRenew(event.auth)
@@ -154,6 +162,6 @@ class Action
     }
 
     secureScriptPath() {
-        return this.material.getSecureScriptPath()
+        return this.material.getSecureScriptPath(this.detecter.getScriptPath())
     }
 }

@@ -10,10 +10,8 @@ import { FindNextVersionView } from "../resource"
 export function newFindNextVersionView(feature: LocationOutsideFeature): FindNextVersionView {
     return toApplicationView(
         initFindNextVersionAction(
-            initFindNextVersionMaterial(
-                newFindNextVersionInfra(),
-                newFindNextVersionLocationDetecter(feature),
-            ),
+            initFindNextVersionMaterial(newFindNextVersionInfra()),
+            newFindNextVersionLocationDetecter(feature),
         ),
     )
 }

@@ -16,14 +16,12 @@ type OutsideFeature = RemoteOutsideFeature & RepositoryOutsideFeature & Location
 export function newCheckAuthTicketView(feature: OutsideFeature): CheckAuthTicketView {
     return toApplicationView(
         initCheckAuthTicketAction(
-            initCheckAuthTicketMaterial(
-                {
-                    check: newCheckAuthTicketInfra(feature),
-                    startContinuousRenew: newStartContinuousRenewAuthnInfoInfra(feature),
-                    getSecureScriptPath: newGetSecureScriptPathInfra(),
-                },
-                newGetScriptPathLocationDetecter(feature),
-            ),
+            initCheckAuthTicketMaterial({
+                check: newCheckAuthTicketInfra(feature),
+                startContinuousRenew: newStartContinuousRenewAuthnInfoInfra(feature),
+                getSecureScriptPath: newGetSecureScriptPathInfra(),
+            }),
+            newGetScriptPathLocationDetecter(feature),
         ),
     )
 }

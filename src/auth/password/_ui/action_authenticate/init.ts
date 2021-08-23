@@ -41,20 +41,20 @@ export type AuthenticatePasswordActionInfra = Readonly<{
 
 export function initAuthenticatePasswordMaterial(
     infra: AuthenticatePasswordActionInfra,
-    locationInfo: GetScriptPathDetecter,
 ): AuthenticatePasswordMaterial {
     return {
         save: saveAuthTicket(infra.startContinuousRenew),
         startContinuousRenew: startContinuousRenew(infra.startContinuousRenew),
-        getSecureScriptPath: getScriptPath(infra.getSecureScriptPath)(locationInfo),
+        getSecureScriptPath: getScriptPath(infra.getSecureScriptPath),
         authenticate: authenticatePassword(infra.authenticate),
     }
 }
 
 export function initAuthenticatePasswordAction(
     material: AuthenticatePasswordMaterial,
+    detecter: GetScriptPathDetecter,
 ): AuthenticatePasswordAction {
-    return new Action(material)
+    return new Action(material, detecter)
 }
 
 class Action
@@ -70,10 +70,12 @@ class Action
     readonly validate: ValidateAuthenticatePasswordFieldsAction
 
     material: AuthenticatePasswordMaterial
+    detecter: GetScriptPathDetecter
 
-    constructor(material: AuthenticatePasswordMaterial) {
+    constructor(material: AuthenticatePasswordMaterial, detecter: GetScriptPathDetecter) {
         super()
         this.material = material
+        this.detecter = detecter
 
         this.validate = initValidateBoardAction({
             fields: authenticatePasswordFields,
@@ -151,6 +153,6 @@ class Action
     }
 
     secureScriptPath() {
-        return this.material.getSecureScriptPath()
+        return this.material.getSecureScriptPath(this.detecter())
     }
 }

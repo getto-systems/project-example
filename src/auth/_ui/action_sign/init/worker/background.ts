@@ -9,7 +9,7 @@ import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/featur
 import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-application/action/worker/feature"
 
 type OutsideFeature = RemoteOutsideFeature & WorkerOutsideFeature
-export function newSignWorkerBackground(feature: OutsideFeature): void {
+export function newSignViewWorkerBackground(feature: OutsideFeature): void {
     const { worker } = feature
 
     const handler: Handler = {

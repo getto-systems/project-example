@@ -16,7 +16,7 @@ import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"
 import { LocationOutsideFeature } from "../../../../z_details/_ui/location/feature"
 
 type OutsideFeature = RepositoryOutsideFeature & RemoteOutsideFeature & LocationOutsideFeature
-export function newSignForeground(feature: OutsideFeature): SignView {
+export function newSignView(feature: OutsideFeature): SignView {
     return toApplicationView(
         initSignAction(newSignViewLocationDetecter(feature), {
             link: () => initSignLinkResource(),

@@ -1,5 +1,3 @@
-import { LoadMenuDetecter } from "../kernel/method"
-
 import { MenuTree, MenuTreeCategory, MenuTreeItem, MenuTreeNode } from "../kernel/infra"
 import { LoadBreadcrumbListInfra } from "./infra"
 
@@ -7,24 +5,21 @@ import { toMenuCategory, toMenuItem } from "../kernel/convert"
 
 import { BreadcrumbList, BreadcrumbNode } from "./data"
 import { MenuTargetPath } from "../kernel/data"
+import { ConvertLocationResult } from "../../../../z_details/_ui/location/data"
 
-export interface LoadBreadcrumbListPod {
-    (detecter: LoadMenuDetecter): LoadBreadcrumbListMethod
-}
 export interface LoadBreadcrumbListMethod {
-    (): BreadcrumbList
+    (menuTargetPath: ConvertLocationResult<MenuTargetPath>): BreadcrumbList
 }
 
 interface Load {
-    (infra: LoadBreadcrumbListInfra): LoadBreadcrumbListPod
+    (infra: LoadBreadcrumbListInfra): LoadBreadcrumbListMethod
 }
-export const loadBreadcrumbList: Load = (infra) => (detecter) => () => {
+export const loadBreadcrumbList: Load = (infra) => (menuTargetPath) => {
     const { version } = infra
-    const target = detecter()
-    if (!target.valid) {
+    if (!menuTargetPath.valid) {
         return EMPTY
     }
-    return build(target.value)
+    return build(menuTargetPath.value)
 
     function build(currentPath: MenuTargetPath): BreadcrumbList {
         return toBreadcrumb(infra.menuTree)

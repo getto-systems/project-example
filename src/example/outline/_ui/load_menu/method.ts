@@ -1,23 +1,24 @@
 import { buildMenu } from "../kernel/helper"
 
-import { LoadMenuDetecter } from "../kernel/method"
-
 import { initMenuExpand, MenuBadge } from "../kernel/infra"
 import { LoadMenuInfra, LoadMenuStore } from "./infra"
 
 import { LoadMenuEvent } from "./event"
 
-export interface LoadMenuPod {
-    (detecter: LoadMenuDetecter): LoadMenuMethod
-}
+import { ConvertLocationResult } from "../../../../z_details/_ui/location/data"
+import { MenuTargetPath } from "../kernel/data"
+
 export interface LoadMenuMethod {
-    <S>(post: Post<LoadMenuEvent, S>): Promise<S>
+    <S>(
+        menuTargetPath: ConvertLocationResult<MenuTargetPath>,
+        post: Post<LoadMenuEvent, S>,
+    ): Promise<S>
 }
 
 interface Load {
-    (infra: LoadMenuInfra, store: LoadMenuStore): LoadMenuPod
+    (infra: LoadMenuInfra, store: LoadMenuStore): LoadMenuMethod
 }
-export const loadMenu: Load = (infra, store) => (detecter) => async (post) => {
+export const loadMenu: Load = (infra, store) => async (menuTargetPath, post) => {
     const { menuExpand } = infra
 
     const authzResult = await infra.authz.get()
@@ -47,7 +48,7 @@ export const loadMenu: Load = (infra, store) => (detecter) => async (post) => {
         menu: buildMenu({
             version: infra.version,
             menuTree: infra.menuTree,
-            menuTargetPath: detecter(),
+            menuTargetPath,
             grantedRoles: authzResult.value.roles,
             menuExpand: expand,
             menuBadge: EMPTY_BADGE, // ロードに時間がかかる可能性があるのであとでロードする

@@ -7,10 +7,7 @@ import { mockAuthnRepository, mockAuthzRepository } from "../kernel/init/reposit
 
 import { mockGetScriptPathDetecter } from "../../../_ui/common/secure/get_script_path/mock"
 
-import {
-    initCheckAuthTicketAction,
-    initCheckAuthTicketMaterial,
-} from "./init"
+import { initCheckAuthTicketAction, initCheckAuthTicketMaterial } from "./init"
 
 import { Clock } from "../../../../z_details/_ui/clock/infra"
 import { WaitTime } from "../../../../z_details/_ui/config/infra"
@@ -253,36 +250,34 @@ function initView(
     const getScriptPathDetecter = mockGetScriptPathDetecter(currentURL)
     return toApplicationView(
         initCheckAuthTicketAction(
-            initCheckAuthTicketMaterial(
-                {
-                    check: {
-                        authn,
-                        authz,
-                        renew,
-                        config: {
-                            instantLoadExpire: { expire_millisecond: 20 * 1000 },
-                            takeLongtimeThreshold: { delay_millisecond: 32 },
-                        },
-                        clock,
+            initCheckAuthTicketMaterial({
+                check: {
+                    authn,
+                    authz,
+                    renew,
+                    config: {
+                        instantLoadExpire: { expire_millisecond: 20 * 1000 },
+                        takeLongtimeThreshold: { delay_millisecond: 32 },
                     },
-                    startContinuousRenew: {
-                        authn,
-                        authz,
-                        renew,
-                        config: {
-                            interval: { interval_millisecond: 128 },
-                            authnExpire: { expire_millisecond: 1 * 1000 },
-                        },
-                        clock,
+                    clock,
+                },
+                startContinuousRenew: {
+                    authn,
+                    authz,
+                    renew,
+                    config: {
+                        interval: { interval_millisecond: 128 },
+                        authnExpire: { expire_millisecond: 1 * 1000 },
                     },
-                    getSecureScriptPath: {
-                        config: {
-                            secureServerURL: "https://secure.example.com",
-                        },
+                    clock,
+                },
+                getSecureScriptPath: {
+                    config: {
+                        secureServerURL: "https://secure.example.com",
                     },
                 },
-                getScriptPathDetecter,
-            ),
+            }),
+            getScriptPathDetecter,
         ),
     )
 }

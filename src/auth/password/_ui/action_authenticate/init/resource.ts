@@ -20,14 +20,12 @@ export function newAuthenticatePasswordView(
 ): AuthenticatePasswordView {
     return toApplicationView(
         initAuthenticatePasswordAction(
-            initAuthenticatePasswordMaterial(
-                {
-                    startContinuousRenew: newStartContinuousRenewAuthnInfoInfra(feature),
-                    getSecureScriptPath: newGetSecureScriptPathInfra(),
-                    authenticate: newAuthenticatePasswordInfra(feature),
-                },
-                newGetScriptPathLocationDetecter(feature),
-            ),
+            initAuthenticatePasswordMaterial({
+                startContinuousRenew: newStartContinuousRenewAuthnInfoInfra(feature),
+                getSecureScriptPath: newGetSecureScriptPathInfra(),
+                authenticate: newAuthenticatePasswordInfra(feature),
+            }),
+            newGetScriptPathLocationDetecter(feature),
         ),
     )
 }
