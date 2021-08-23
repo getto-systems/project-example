@@ -20,7 +20,6 @@ import {
     ConvertScriptPathResult,
 } from "../../../_ui/common/secure/get_script_path/data"
 import { AuthenticatePasswordFields } from "../authenticate/data"
-import { ConvertBoardResult } from "../../../../../ui/vendor/getto-application/board/kernel/data"
 
 export interface AuthenticatePasswordAction
     extends ApplicationStateAction<AuthenticatePasswordState> {
@@ -31,9 +30,7 @@ export interface AuthenticatePasswordAction
     readonly validate: ValidateAuthenticatePasswordFieldsAction
 
     clear(): void
-    submit(
-        fields: ConvertBoardResult<AuthenticatePasswordFields>,
-    ): Promise<AuthenticatePasswordState>
+    submit(): Promise<AuthenticatePasswordState>
     loadError(err: LoadScriptError): Promise<AuthenticatePasswordState>
 }
 

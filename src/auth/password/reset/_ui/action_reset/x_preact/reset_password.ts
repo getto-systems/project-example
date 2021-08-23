@@ -166,7 +166,7 @@ export function ResetPasswordComponent(props: Props): VNode {
 
                 function onClick(e: Event) {
                     e.preventDefault()
-                    props.reset.submit(props.reset.validate.get())
+                    props.reset.submit()
                 }
             }
             function connectingButton(): VNode {

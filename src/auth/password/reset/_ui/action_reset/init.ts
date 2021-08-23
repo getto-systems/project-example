@@ -122,9 +122,8 @@ class Action
         this.password.clear()
         this.validate.clear()
     }
-    async submit(fields: ConvertBoardResult<ResetPasswordFields>): Promise<ResetPasswordState> {
-        // TODO fields は this.validate から取得したい
-        return this.material.reset(this.detecter.reset(), fields, (event) => {
+    async submit(): Promise<ResetPasswordState> {
+        return this.material.reset(this.detecter.reset(), this.validate.get(), (event) => {
             switch (event.type) {
                 case "succeed-to-reset":
                     return this.startContinuousRenew(event.auth)

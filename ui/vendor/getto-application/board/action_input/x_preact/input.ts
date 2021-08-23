@@ -27,7 +27,6 @@ type Props = Readonly<{
     input: InputBoardAction
 }>
 export function InputBoardComponent(props: Props): VNode {
-    // TODO これの story を作る
     return html`<input
         ref=${useInputRef(props.input.connector)}
         type=${props.type}

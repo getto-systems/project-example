@@ -60,7 +60,7 @@ describe("RegisterPassword", () => {
         await runner(() => {
             store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
             store.password.set(markBoardValue(VALID_LOGIN.password))
-            return action.submit(action.validate.get())
+            return action.submit()
         }).then((stack) => {
             expect(stack).toEqual([
                 { type: "try-to-reset" },
@@ -93,7 +93,7 @@ describe("RegisterPassword", () => {
         await runner(() => {
             store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
             store.password.set(markBoardValue(VALID_LOGIN.password))
-            return action.submit(action.validate.get())
+            return action.submit()
         }).then((stack) => {
             expect(stack).toEqual([
                 { type: "try-to-reset" },
@@ -115,7 +115,7 @@ describe("RegisterPassword", () => {
 
         const runner = setupActionTestRunner(action.subscriber)
 
-        await runner(() => action.submit(action.validate.get())).then((stack) => {
+        await runner(() => action.submit()).then((stack) => {
             expect(stack).toEqual([{ type: "failed-to-reset", err: { type: "validation-error" } }])
         })
     })
@@ -129,7 +129,7 @@ describe("RegisterPassword", () => {
         await runner(() => {
             store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
             store.password.set(markBoardValue(VALID_LOGIN.password))
-            return action.submit(action.validate.get())
+            return action.submit()
         }).then((stack) => {
             expect(stack).toEqual([{ type: "failed-to-reset", err: { type: "empty-reset-token" } }])
         })

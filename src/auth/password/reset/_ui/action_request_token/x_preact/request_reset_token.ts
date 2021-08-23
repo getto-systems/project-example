@@ -130,7 +130,7 @@ export function RequestResetTokenComponent(props: Props): VNode {
 
                 function onClick(e: Event) {
                     e.preventDefault()
-                    props.requestToken.submit(props.requestToken.validate.get())
+                    props.requestToken.submit()
                 }
             }
             function connectingButton(): VNode {
