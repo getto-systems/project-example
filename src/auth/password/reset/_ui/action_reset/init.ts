@@ -41,6 +41,7 @@ export type ResetPasswordActionInfra = Readonly<{
     reset: ResetPasswordInfra
 }>
 
+// TODO Detecter について考え直す必要がある
 export type ResetPasswordCoreForegroundDetecter = Readonly<{
     getSecureScriptPath: GetScriptPathDetecter
 }>

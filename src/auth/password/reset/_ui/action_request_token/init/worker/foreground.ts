@@ -1,7 +1,3 @@
-import { toApplicationView } from "../../../../../../../../ui/vendor/getto-application/action/helper"
-
-import { initRequestResetTokenAction } from "../../init"
-
 import {
     WorkerAbstractProxy,
     WorkerProxy,
@@ -13,14 +9,14 @@ import {
     RequestPasswordResetTokenProxyResponse,
 } from "./message"
 
-import { RequestResetTokenView } from "../../resource"
+import { RequestResetTokenMaterial } from "../../action"
 
 export interface RequestPasswordResetTokenProxy
     extends WorkerProxy<
         RequestPasswordResetTokenProxyMessage,
         RequestPasswordResetTokenProxyResponse
     > {
-    view(): RequestResetTokenView
+    material(): RequestResetTokenMaterial
 }
 export function newRequestPasswordResetTokenProxy(
     post: Post<RequestPasswordResetTokenProxyMessage>,
@@ -35,26 +31,24 @@ class Proxy
     >
     implements RequestPasswordResetTokenProxy
 {
-    material: RequestPasswordResetTokenProxyMaterial
+    proxy: RequestPasswordResetTokenProxyMaterial
 
     constructor(post: Post<RequestPasswordResetTokenProxyMessage>) {
         super(post)
-        this.material = {
+        this.proxy = {
             requestToken: this.method("requestToken", (message) => message),
         }
     }
 
-    view(): RequestResetTokenView {
-        return toApplicationView(
-            initRequestResetTokenAction({
-                requestToken: (fields, post) => this.material.requestToken.call({ fields }, post),
-            }),
-        )
+    material(): RequestResetTokenMaterial {
+        return {
+            requestToken: (fields, post) => this.proxy.requestToken.call({ fields }, post),
+        }
     }
     resolve(response: RequestPasswordResetTokenProxyResponse): void {
         switch (response.method) {
             case "requestToken":
-                this.material.requestToken.resolve(response)
+                this.proxy.requestToken.resolve(response)
                 return
         }
     }

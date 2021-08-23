@@ -7,12 +7,17 @@ import { initRequestResetTokenAction, initRequestResetTokenMaterial } from "../i
 import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/feature"
 
 import { RequestResetTokenView } from "../resource"
+import { RequestResetTokenMaterial } from "../action"
 
 type OutsideFeature = RemoteOutsideFeature
 export function newRequestResetTokenView(feature: OutsideFeature): RequestResetTokenView {
-    return toApplicationView(
-        initRequestResetTokenAction(
-            initRequestResetTokenMaterial(newRequestResetTokenInfra(feature)),
-        ),
+    return initRequestResetTokenView(
+        initRequestResetTokenMaterial(newRequestResetTokenInfra(feature)),
     )
+}
+
+export function initRequestResetTokenView(
+    material: RequestResetTokenMaterial,
+): RequestResetTokenView {
+    return toApplicationView(initRequestResetTokenAction(material))
 }

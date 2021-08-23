@@ -1,7 +1,7 @@
 import { toApplicationView } from "../../../../../../ui/vendor/getto-application/action/helper"
 
-import { newCheckAuthTicketView } from "../../../../auth_ticket/_ui/action_check/init/resource"
 import { newSignViewLocationDetecter } from "../../../common/switch_view/init"
+import { newCheckAuthTicketView } from "../../../../auth_ticket/_ui/action_check/init/resource"
 import { newAuthenticatePasswordView } from "../../../../password/_ui/action_authenticate/init/resource"
 import { newResetPasswordView } from "../../../../password/reset/_ui/action_reset/init/resource"
 import {
@@ -20,12 +20,13 @@ import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-applicat
 import { LocationOutsideFeature } from "../../../../../z_details/_ui/location/feature"
 
 import { SignView } from "../../resource"
+import { initRequestResetTokenView } from "../../../../password/reset/_ui/action_request_token/init/resource"
 
 type OutsideFeature = RemoteOutsideFeature &
     RepositoryOutsideFeature &
     WorkerOutsideFeature &
     LocationOutsideFeature
-export function newSignWorkerForeground(feature: OutsideFeature): SignView {
+export function newSignViewWorkerForeground(feature: OutsideFeature): SignView {
     const { worker } = feature
     const proxy = initProxy(postForegroundMessage)
 
@@ -35,7 +36,8 @@ export function newSignWorkerForeground(feature: OutsideFeature): SignView {
         check: () => newCheckAuthTicketView(feature),
 
         password_authenticate: () => newAuthenticatePasswordView(feature),
-        password_reset_requestToken: () => proxy.password.reset.requestToken.view(),
+        password_reset_requestToken: () =>
+            initRequestResetTokenView(proxy.password.reset.requestToken.material()),
         password_reset: () => newResetPasswordView(feature),
     })
 
