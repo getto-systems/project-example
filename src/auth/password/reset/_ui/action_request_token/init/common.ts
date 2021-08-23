@@ -6,7 +6,7 @@ import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/fea
 
 import { RequestResetTokenMaterial } from "../action"
 
-export function newRequestResetTokenCoreMaterial(
+export function newRequestResetTokenMaterial(
     feature: RemoteOutsideFeature,
 ): RequestResetTokenMaterial {
     return initRequestResetTokenMaterial(newRequestResetTokenInfra(feature))

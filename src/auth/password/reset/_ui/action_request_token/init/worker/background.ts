@@ -1,4 +1,4 @@
-import { newRequestResetTokenCoreMaterial } from "../common"
+import { newRequestResetTokenMaterial } from "../common"
 
 import { WorkerHandler } from "../../../../../../../../ui/vendor/getto-application/action/worker/background"
 
@@ -14,7 +14,7 @@ export function newRequestResetTokenHandler(
     feature: OutsideFeature,
     post: Post<RequestPasswordResetTokenProxyResponse>,
 ): WorkerHandler<RequestPasswordResetTokenProxyMessage> {
-    const material = newRequestResetTokenCoreMaterial(feature)
+    const material = newRequestResetTokenMaterial(feature)
     return async (message) => {
         switch (message.method) {
             case "requestToken":

@@ -1,5 +1,5 @@
 import { docsMenuContent } from "../../example/outline/_ui/kernel/init/docs"
-import { newNotifyUnexpectedErrorResource } from "../../avail/unexpected_error/_ui/action_notify/init"
+import { newNotifyUnexpectedErrorResource } from "../../avail/unexpected_error/_ui/action_notify/init/resource"
 import { newLoadBreadcrumbListResource } from "../../example/outline/_ui/action_load_breadcrumb_list/init"
 import { newLoadMenuResource } from "../../example/outline/_ui/action_load_menu/init"
 

@@ -1,6 +1,6 @@
-import { NotifyUnexpectedErrorCoreAction } from "./action"
+import { NotifyUnexpectedErrorAction } from "../action"
 
-export function mockNotifyUnexpectedErrorCoreAction(): NotifyUnexpectedErrorCoreAction {
+export function mockNotifyUnexpectedErrorCoreAction(): NotifyUnexpectedErrorAction {
     return {
         notify: () => {
             // mock では特に何もしない

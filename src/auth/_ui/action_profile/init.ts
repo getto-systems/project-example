@@ -1,13 +1,8 @@
-import { BaseOutsideFeature, newBaseResource } from "../../../example/_ui/action_base/init"
-import { newLogoutResource } from "../../auth_ticket/_ui/action_logout/init/resource"
+import { initBaseView } from "../../../example/_ui/action_base/impl"
+import { ProfileResource, ProfileView } from "./resource"
 
-import { initProfileView } from "./impl"
-
-import { ProfileView } from "./resource"
-
-export function newProfileView(feature: BaseOutsideFeature): ProfileView {
-    return initProfileView({
-        ...newBaseResource(feature),
-        ...newLogoutResource(feature),
+export function initProfileView(resource: ProfileResource): ProfileView {
+    return initBaseView(resource, () => {
+        resource.logout.terminate()
     })
 }

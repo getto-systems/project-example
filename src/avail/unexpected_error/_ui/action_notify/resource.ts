@@ -1,5 +1,5 @@
-import { NotifyUnexpectedErrorCoreAction } from "./core/action"
+import { NotifyUnexpectedErrorAction } from "./action"
 
 export type NotifyUnexpectedErrorResource = Readonly<{
-    error: NotifyUnexpectedErrorCoreAction
+    error: NotifyUnexpectedErrorAction
 }>
