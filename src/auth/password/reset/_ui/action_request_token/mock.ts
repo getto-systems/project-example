@@ -7,7 +7,6 @@ import {
     initialRequestResetTokenState,
     RequestResetTokenAction,
     RequestResetTokenState,
-    ValidateRequestTokenAction,
 } from "./action"
 
 export function mockRequestResetTokenAction(): RequestResetTokenAction {
@@ -23,8 +22,8 @@ export class Action
     readonly link = initSignLink()
 
     readonly loginID = mockInputLoginIDAction()
-    readonly validate: ValidateRequestTokenAction = mockValidateBoardAction()
-    
+    readonly validate = mockValidateBoardAction()
+
     clear(): void {
         return
     }

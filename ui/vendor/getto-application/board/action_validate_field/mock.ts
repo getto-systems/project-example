@@ -7,13 +7,14 @@ import { ConvertBoardFieldResult } from "../validate_field/data"
 export function mockValidateBoardFieldAction<N extends string, T, E>(
     name: N,
     value: ConvertBoardFieldResult<T, E>,
-): ValidateBoardFieldAction<T, E> {
+): ValidateBoardFieldAction<E> {
     return new Mock(name, value)
 }
 
 class Mock<T, E>
     extends ApplicationAbstractStateAction<ValidateBoardFieldState<E>>
-    implements ValidateBoardFieldAction<T, E> {
+    implements ValidateBoardFieldAction<E>
+{
     readonly initialState: ValidateBoardFieldState<E> = { valid: true }
 
     readonly name: string

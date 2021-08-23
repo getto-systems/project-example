@@ -5,27 +5,36 @@ import { InputLoginIDAction } from "./action"
 
 import { loginIDBoardConverter } from "../convert"
 
-import { emptyBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/data"
+import { BoardFieldChecker } from "../../../../../ui/vendor/getto-application/board/validate_field/infra"
 
-export function initInputLoginIDAction(): InputLoginIDAction {
+import { emptyBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/data"
+import { LoginID, ValidateLoginIDError } from "../data"
+
+export function initInputLoginIDAction(): Readonly<{
+    input: InputLoginIDAction
+    checker: BoardFieldChecker<LoginID, ValidateLoginIDError>
+}> {
     const { input, store, subscriber } = initInputBoardAction()
 
-    const validate = initValidateBoardFieldAction({
+    const { validate, checker } = initValidateBoardFieldAction({
         converter: () => loginIDBoardConverter(store.get()),
     })
 
-    subscriber.subscribe(() => validate.check())
+    subscriber.subscribe(() => checker.check())
 
     return {
-        input,
-        validate,
-        clear: () => {
-            store.set(emptyBoardValue)
-            validate.clear()
+        input: {
+            input,
+            validate,
+            clear: () => {
+                store.set(emptyBoardValue)
+                validate.clear()
+            },
+            terminate: () => {
+                subscriber.terminate()
+                validate.terminate()
+            },
         },
-        terminate: () => {
-            subscriber.terminate()
-            validate.terminate()
-        },
+        checker,
     }
 }

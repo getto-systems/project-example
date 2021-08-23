@@ -4,10 +4,9 @@ import { initValidateBoardStack } from "../validate_board/init/stack"
 
 import { updateBoardValidateState } from "../validate_board/method"
 
-import { ValidateBoardStore } from "../validate_board/infra"
+import { ValidateBoardChecker, ValidateBoardStore } from "../validate_board/infra"
 import { BoardConverter } from "../kernel/infra"
 
-import { ValidateBoardFieldStateHandler } from "../action_validate_field/action"
 import {
     initialValidateBoardState,
     ValidateBoardAction,
@@ -24,18 +23,26 @@ export type ValidateBoardActionParams<N extends string, T> = Readonly<{
 export function initValidateBoardAction<N extends string, T>({
     fields,
     converter,
-}: ValidateBoardActionParams<N, T>): ValidateBoardAction<N, T> {
+}: ValidateBoardActionParams<N, T>): Readonly<{
+    validate: ValidateBoardAction
+    checker: ValidateBoardChecker<N, T>
+}> {
     const store: ValidateBoardStore = {
         stack: initValidateBoardStack(),
     }
-    return new Action(converter, {
+    const action = new Action(converter, {
         updateValidateState: updateBoardValidateState(fields, store),
     })
+    return {
+        validate: action,
+        checker: action,
+    }
 }
 
 class Action<N extends string, T>
     extends ApplicationAbstractStateAction<ValidateBoardActionState>
-    implements ValidateBoardAction<N, T> {
+    implements ValidateBoardAction, ValidateBoardChecker<N, T>
+{
     readonly initialState: ValidateBoardActionState = initialValidateBoardState
 
     converter: BoardConverter<T>
@@ -47,15 +54,13 @@ class Action<N extends string, T>
         this.material = material
     }
 
-    updateValidateState<E>(name: N): ValidateBoardFieldStateHandler<E> {
-        return (result) => {
-            this.material.updateValidateState(name, result.valid, this.post)
-        }
+    update(name: N, result: boolean): void {
+        this.material.updateValidateState(name, result, this.post)
     }
-
     get(): ConvertBoardResult<T> {
         return this.converter()
     }
+
     clear(): void {
         this.post(initialValidateBoardState)
     }

@@ -5,12 +5,7 @@ import { mockInputLoginIDAction } from "../../../../login_id/_ui/action_input/mo
 import { mockInputPasswordAction } from "../../../_ui/action_input/mock"
 import { mockValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/mock"
 
-import {
-    initialResetPasswordState,
-    ResetPasswordAction,
-    ResetPasswordState,
-    ValidateResetAction,
-} from "./action"
+import { initialResetPasswordState, ResetPasswordAction, ResetPasswordState } from "./action"
 import { emptyBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/data"
 
 export function mockResetPasswordAction(): ResetPasswordAction {
@@ -24,7 +19,7 @@ class Action extends ApplicationMockStateAction<ResetPasswordState> implements R
 
     readonly loginID = mockInputLoginIDAction()
     readonly password = mockInputPasswordAction(emptyBoardValue, { multiByte: false })
-    readonly validate: ValidateResetAction = mockValidateBoardAction()
+    readonly validate = mockValidateBoardAction()
 
     clear(): void {
         return

@@ -4,6 +4,11 @@ export type ValidateBoardFieldInfra<T, E> = Readonly<{
     converter: BoardFieldConverter<T, E>
 }>
 
+export interface BoardFieldChecker<T, E> {
+    get(): ConvertBoardFieldResult<T, E>
+    check(): void
+}
+
 export interface BoardFieldConverter<T, E> {
     (): ConvertBoardFieldResult<T, E>
 }

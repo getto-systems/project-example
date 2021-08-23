@@ -17,7 +17,6 @@ describe("InputLoginID", () => {
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: true }])
-            expect(action.validate.get()).toEqual({ valid: true, value: "valid" })
         })
     })
 
@@ -32,7 +31,6 @@ describe("InputLoginID", () => {
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: false, err: [{ type: "empty" }] }])
-            expect(action.validate.get()).toEqual({ valid: false, err: [{ type: "empty" }] })
         })
     })
 
@@ -47,10 +45,6 @@ describe("InputLoginID", () => {
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: false, err: [{ type: "too-long", maxLength: 100 }] }])
-            expect(action.validate.get()).toEqual({
-                valid: false,
-                err: [{ type: "too-long", maxLength: 100 }],
-            })
         })
     })
 
@@ -65,7 +59,6 @@ describe("InputLoginID", () => {
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: true }])
-            expect(action.validate.get()).toEqual({ valid: true, value: "a".repeat(100) })
         })
     })
 
@@ -100,7 +93,7 @@ describe("InputLoginID", () => {
 })
 
 function standard() {
-    const action = initInputLoginIDAction()
+    const { input: action } = initInputLoginIDAction()
     const store = mockBoardValueStore()
     action.input.connector.connect(store)
 

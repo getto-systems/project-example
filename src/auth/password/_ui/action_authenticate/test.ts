@@ -170,8 +170,7 @@ describe("AuthenticatePassword", () => {
 
         await runner(async () => {
             view.terminate()
-            resource.loginID.validate.check()
-            resource.password.validate.check()
+            return resource.submit()
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])

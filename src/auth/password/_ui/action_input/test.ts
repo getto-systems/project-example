@@ -17,7 +17,6 @@ describe("InputPassword", () => {
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: true }])
-            expect(action.validate.get()).toEqual({ valid: true, value: "valid" })
         })
     })
 
@@ -32,7 +31,6 @@ describe("InputPassword", () => {
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: false, err: [{ type: "empty" }] }])
-            expect(action.validate.get()).toEqual({ valid: false, err: [{ type: "empty" }] })
         })
     })
 
@@ -47,10 +45,6 @@ describe("InputPassword", () => {
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: false, err: [{ type: "too-long", maxLength: 100 }] }])
-            expect(action.validate.get()).toEqual({
-                valid: false,
-                err: [{ type: "too-long", maxLength: 100 }],
-            })
         })
     })
 
@@ -65,7 +59,6 @@ describe("InputPassword", () => {
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: true }])
-            expect(action.validate.get()).toEqual({ valid: true, value: "a".repeat(100) })
         })
     })
 
@@ -80,10 +73,6 @@ describe("InputPassword", () => {
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: false, err: [{ type: "too-long", maxLength: 100 }] }])
-            expect(action.validate.get()).toEqual({
-                valid: false,
-                err: [{ type: "too-long", maxLength: 100 }],
-            })
         })
     })
 
@@ -98,7 +87,6 @@ describe("InputPassword", () => {
             return action.validate.currentState()
         }).then((stack) => {
             expect(stack).toEqual([{ valid: true }])
-            expect(action.validate.get()).toEqual({ valid: true, value: "あ".repeat(100) })
         })
     })
 
@@ -146,7 +134,7 @@ describe("InputPassword", () => {
 })
 
 function standard() {
-    const action = initInputPasswordAction()
+    const { input: action } = initInputPasswordAction()
     const store = mockBoardValueStore()
     action.input.connector.connect(store)
 

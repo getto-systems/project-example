@@ -24,14 +24,18 @@ import {
     AuthenticatePasswordAction,
     AuthenticatePasswordState,
     initialAuthenticatePasswordState,
-    ValidateAuthenticatePasswordFieldsAction,
-    authenticatePasswordFields,
+    authenticatePasswordFieldNames,
+    AuthenticatePasswordFieldName,
 } from "./action"
+import { ValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/action"
 
 import { LoadScriptError } from "../../../_ui/common/secure/get_script_path/data"
 import { AuthenticatePasswordFields } from "../authenticate/data"
 import { AuthTicket } from "../../../auth_ticket/_ui/kernel/data"
 import { ConvertBoardResult } from "../../../../../ui/vendor/getto-application/board/kernel/data"
+import { InputLoginIDAction } from "../../../login_id/_ui/action_input/action"
+import { InputPasswordAction } from "../action_input/action"
+import { ValidateBoardChecker } from "../../../../../ui/vendor/getto-application/board/validate_board/infra"
 
 export type AuthenticatePasswordActionInfra = Readonly<{
     startContinuousRenew: StartContinuousRenewInfra
@@ -65,24 +69,27 @@ class Action
 
     readonly link = initSignLink()
 
-    readonly loginID = initInputLoginIDAction()
-    readonly password = initInputPasswordAction()
-    readonly validate: ValidateAuthenticatePasswordFieldsAction
+    readonly loginID: InputLoginIDAction
+    readonly password: InputPasswordAction
+    readonly validate: ValidateBoardAction
 
     material: AuthenticatePasswordMaterial
     detecter: GetScriptPathDetecter
+    checker: ValidateBoardChecker<AuthenticatePasswordFieldName, AuthenticatePasswordFields>
 
     constructor(material: AuthenticatePasswordMaterial, detecter: GetScriptPathDetecter) {
         super()
         this.material = material
         this.detecter = detecter
 
-        this.validate = initValidateBoardAction({
-            fields: authenticatePasswordFields,
+        const loginID = initInputLoginIDAction()
+        const password = initInputPasswordAction()
+        const { validate, checker } = initValidateBoardAction({
+            fields: authenticatePasswordFieldNames,
             converter: (): ConvertBoardResult<AuthenticatePasswordFields> => {
                 const result = {
-                    loginID: this.loginID.validate.get(),
-                    password: this.password.validate.get(),
+                    loginID: loginID.checker.get(),
+                    password: password.checker.get(),
                 }
                 if (!result.loginID.valid || !result.password.valid) {
                     return { valid: false }
@@ -97,8 +104,17 @@ class Action
             },
         })
 
-        this.loginID.validate.subscriber.subscribe(this.validate.updateValidateState("loginID"))
-        this.password.validate.subscriber.subscribe(this.validate.updateValidateState("password"))
+        this.loginID = loginID.input
+        this.password = password.input
+        this.validate = validate
+        this.checker = checker
+
+        this.loginID.validate.subscriber.subscribe((result) =>
+            checker.update("loginID", result.valid),
+        )
+        this.password.validate.subscriber.subscribe((result) =>
+            checker.update("password", result.valid),
+        )
 
         this.terminateHook(() => {
             this.loginID.terminate()
@@ -113,7 +129,7 @@ class Action
         this.validate.clear()
     }
     async submit(): Promise<AuthenticatePasswordState> {
-        return this.material.authenticate(this.validate.get(), (event) => {
+        return this.material.authenticate(this.checker.get(), (event) => {
             switch (event.type) {
                 case "succeed-to-login":
                     return this.startContinuousRenew(event.auth)

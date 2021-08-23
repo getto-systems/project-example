@@ -15,7 +15,6 @@ import {
 import { ResetPasswordEvent } from "../reset/event"
 import { StartContinuousRenewEvent } from "../../../../auth_ticket/_ui/start_continuous_renew/event"
 
-import { ResetPasswordFields } from "../reset/data"
 import {
     LoadScriptError,
     ConvertScriptPathResult,
@@ -26,18 +25,15 @@ export interface ResetPasswordAction extends ApplicationStateAction<ResetPasswor
 
     readonly loginID: InputLoginIDAction
     readonly password: InputPasswordAction
-    readonly validate: ValidateResetAction
+    readonly validate: ValidateBoardAction
 
     clear(): void
     submit(): Promise<ResetPasswordState>
     loadError(err: LoadScriptError): Promise<ResetPasswordState>
 }
 
-export const resetPasswordFields = ["loginID", "password"] as const
-export type ValidateResetAction = ValidateBoardAction<
-    typeof resetPasswordFields[number],
-    ResetPasswordFields
->
+export const resetPasswordFieldNames = ["loginID", "password"] as const
+export type ResetPasswordFieldName = typeof resetPasswordFieldNames[number]
 
 export type ResetPasswordMaterial = Readonly<{
     save: SaveAuthTicketMethod

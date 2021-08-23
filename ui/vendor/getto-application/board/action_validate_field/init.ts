@@ -9,19 +9,24 @@ import {
 } from "./action"
 
 import { ConvertBoardFieldResult } from "../validate_field/data"
-import { ValidateBoardFieldInfra } from "../validate_field/infra"
+import { BoardFieldChecker, ValidateBoardFieldInfra } from "../validate_field/infra"
 
 export function initValidateBoardFieldAction<T, E>(
     infra: ValidateBoardFieldInfra<T, E>,
-): ValidateBoardFieldAction<T, E> {
-    return new Action({
+): Readonly<{ validate: ValidateBoardFieldAction<E>; checker: BoardFieldChecker<T, E> }> {
+    const action = new Action({
         convert: convertBoardField(infra),
     })
+    return {
+        validate: action,
+        checker: action,
+    }
 }
 
 class Action<T, E>
     extends ApplicationAbstractStateAction<ValidateBoardFieldState<E>>
-    implements ValidateBoardFieldAction<T, E> {
+    implements ValidateBoardFieldAction<E>, BoardFieldChecker<T, E>
+{
     readonly initialState: ValidateBoardFieldState<E> = { valid: true }
 
     material: ValidateBoardFieldMaterial<T, E>
@@ -39,6 +44,7 @@ class Action<T, E>
             this.material.convert((state) => resolve(this.post(state)))
         })
     }
+
     clear(): void {
         this.post({ valid: true })
     }
