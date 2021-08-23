@@ -1,5 +1,5 @@
-import { LoadBreadcrumbListCoreAction } from "./core/action"
+import { LoadBreadcrumbListAction } from "./action"
 
 export type LoadBreadcrumbListResource = Readonly<{
-    breadcrumbList: LoadBreadcrumbListCoreAction
+    breadcrumbList: LoadBreadcrumbListAction
 }>
