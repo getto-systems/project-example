@@ -9,9 +9,9 @@ import {
     mockBreadcrumbList_home,
     mockLoadBreadcrumbListAction,
 } from "../../../../example/outline/_ui/action_load_breadcrumb_list/mock"
-import { mockLoadMenuResource } from "../../../../example/outline/_ui/action_load_menu/mock"
+import { mockLoadMenuAction, mockMenu_home } from "../../../../example/outline/_ui/action_load_menu/mock"
 import { mockLoadSeasonResource } from "../../../../example/_ui/common/action_load_season/mock"
-import { mockLogoutResource } from "../../../auth_ticket/_ui/action_logout/mock"
+import { mockLogoutAction } from "../../../auth_ticket/_ui/action_logout/mock"
 
 export default {
     title: "main/Auth/Profile",
@@ -27,9 +27,9 @@ const template = storyTemplate<MockProps>(() => {
     return h(ProfileComponent, {
         error: mockNotifyUnexpectedErrorAction(),
         breadcrumbList: mockLoadBreadcrumbListAction(mockBreadcrumbList_home()),
-        ...mockLoadMenuResource(),
+        menu: mockLoadMenuAction(mockMenu_home()),
         ...mockLoadSeasonResource(),
-        ...mockLogoutResource(),
+        logout: mockLogoutAction(),
     })
 })
 

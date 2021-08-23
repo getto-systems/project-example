@@ -4,7 +4,7 @@ import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/stor
 
 import { LogoutComponent } from "./logout"
 
-import { mockLogoutResource } from "../mock"
+import { mockLogoutAction } from "../mock"
 
 import { LogoutState } from "../action"
 
@@ -26,7 +26,7 @@ type Props = Readonly<{
 
 const template = storyTemplate<Props>((props) => {
     return h(LogoutComponent, {
-        ...mockLogoutResource(),
+        logout: mockLogoutAction(),
         state: state(),
     })
 

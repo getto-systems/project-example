@@ -6,7 +6,7 @@ import { mockLoadMenuLocationDetecter } from "../kernel/mock"
 import { mockAuthzRepository } from "../../../../auth/auth_ticket/_ui/kernel/init/repository/mock"
 import { mockMenuExpandRepository } from "../kernel/init/repository/mock"
 
-import { initLoadMenuCoreAction, initLoadMenuCoreMaterial } from "./core/impl"
+import { initLoadMenuAction, initLoadMenuMaterial } from "./init"
 
 import { LoadMenuDetecter } from "../kernel/method"
 
@@ -359,8 +359,8 @@ function initResource(
 
     return [
         {
-            menu: initLoadMenuCoreAction(
-                initLoadMenuCoreMaterial(
+            menu: initLoadMenuAction(
+                initLoadMenuMaterial(
                     {
                         version,
                         menuTree: standard_MenuTree(),

@@ -14,7 +14,7 @@ import {
 import { LoadMenuEntry } from "../../../../outline/_ui/action_load_menu/x_preact/load_menu"
 import { LoadSeasonEntry } from "./load_season"
 
-import { mockLoadMenuResource } from "../../../../outline/_ui/action_load_menu/mock"
+import { mockLoadMenuAction, mockMenu_home } from "../../../../outline/_ui/action_load_menu/mock"
 
 import { mockLoadSeasonResource } from "../mock"
 
@@ -37,7 +37,7 @@ const template = storyTemplate<MockProps>(() => {
             body: mainBody("コンテンツ"),
             copyright,
         }),
-        menu: h(LoadMenuEntry, mockLoadMenuResource()),
+        menu: h(LoadMenuEntry, { menu: mockLoadMenuAction(mockMenu_home()) }),
     })
 })
 
