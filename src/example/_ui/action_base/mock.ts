@@ -4,7 +4,7 @@ import {
     mockLoadBreadcrumbListAction,
 } from "../../outline/_ui/action_load_breadcrumb_list/mock"
 import { mockLoadMenuAction, mockMenu_home } from "../../outline/_ui/action_load_menu/mock"
-import { mockLoadSeasonResource } from "../common/action_load_season/mock"
+import { mockLoadSeasonAction } from "../common/action_load_season/mock"
 
 import { BaseResource } from "./resource"
 
@@ -13,6 +13,6 @@ export function mockBaseResource(): BaseResource {
         error: mockNotifyUnexpectedErrorAction(),
         breadcrumbList: mockLoadBreadcrumbListAction(mockBreadcrumbList_home()),
         menu: mockLoadMenuAction(mockMenu_home()),
-        ...mockLoadSeasonResource(),
+        season: mockLoadSeasonAction(),
     }
 }

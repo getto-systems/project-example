@@ -15,8 +15,7 @@ import { LoadMenuEntry } from "../../../../outline/_ui/action_load_menu/x_preact
 import { LoadSeasonEntry } from "./load_season"
 
 import { mockLoadMenuAction, mockMenu_home } from "../../../../outline/_ui/action_load_menu/mock"
-
-import { mockLoadSeasonResource } from "../mock"
+import { mockLoadSeasonAction } from "../mock"
 
 export default {
     title: "library/Example/Common/Load Season",
@@ -31,7 +30,7 @@ type MockProps = {
 const template = storyTemplate<MockProps>(() => {
     return appLayout({
         siteInfo,
-        header: [h(LoadSeasonEntry, mockLoadSeasonResource())],
+        header: [h(LoadSeasonEntry, { season: mockLoadSeasonAction() })],
         main: appMain({
             header: mainHeader([mainTitle("タイトル")]),
             body: mainBody("コンテンツ"),

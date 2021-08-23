@@ -1,13 +1,29 @@
-import { newLoadSeasonInfra } from "../load_season/init"
-import { initLoadSeasonCoreAction } from "./core/impl"
+import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/init"
 
-import { RepositoryOutsideFeature } from "../../../../z_details/_ui/repository/feature"
+import { loadSeason } from "../load_season/method"
 
-import { LoadSeasonResource } from "./resource"
+import { LoadSeasonInfra } from "../load_season/infra"
 
-type OutsideFeature = RepositoryOutsideFeature
-export function newLoadSeasonResource(feature: OutsideFeature): LoadSeasonResource {
-    return {
-        season: initLoadSeasonCoreAction(newLoadSeasonInfra(feature)),
+import {
+    initialLoadSeasonState,
+    LoadSeasonAction,
+    LoadSeasonMaterial,
+    LoadSeasonState,
+} from "./action"
+
+export function initLoadSeasonAction(infra: LoadSeasonInfra): LoadSeasonAction {
+    return new Action({
+        loadSeason: loadSeason(infra),
+    })
+}
+
+class Action extends ApplicationAbstractStateAction<LoadSeasonState> {
+    readonly initialState = initialLoadSeasonState
+
+    material: LoadSeasonMaterial
+
+    constructor(material: LoadSeasonMaterial) {
+        super(() => this.material.loadSeason(this.post))
+        this.material = material
     }
 }

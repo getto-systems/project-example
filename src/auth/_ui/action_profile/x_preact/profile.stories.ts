@@ -9,8 +9,11 @@ import {
     mockBreadcrumbList_home,
     mockLoadBreadcrumbListAction,
 } from "../../../../example/outline/_ui/action_load_breadcrumb_list/mock"
-import { mockLoadMenuAction, mockMenu_home } from "../../../../example/outline/_ui/action_load_menu/mock"
-import { mockLoadSeasonResource } from "../../../../example/_ui/common/action_load_season/mock"
+import {
+    mockLoadMenuAction,
+    mockMenu_home,
+} from "../../../../example/outline/_ui/action_load_menu/mock"
+import { mockLoadSeasonAction } from "../../../../example/_ui/common/action_load_season/mock"
 import { mockLogoutAction } from "../../../auth_ticket/_ui/action_logout/mock"
 
 export default {
@@ -28,7 +31,7 @@ const template = storyTemplate<MockProps>(() => {
         error: mockNotifyUnexpectedErrorAction(),
         breadcrumbList: mockLoadBreadcrumbListAction(mockBreadcrumbList_home()),
         menu: mockLoadMenuAction(mockMenu_home()),
-        ...mockLoadSeasonResource(),
+        season: mockLoadSeasonAction(),
         logout: mockLogoutAction(),
     })
 })
