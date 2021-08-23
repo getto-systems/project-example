@@ -4,10 +4,10 @@ import { storyTemplate } from "../../../../../../../ui/vendor/storybook/preact/s
 
 import { ResetPasswordComponent } from "./reset_password"
 
-import { mockResetPasswordResource } from "../mock"
+import { mockResetPasswordAction } from "../mock"
 
 import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
-import { ResetPasswordCoreState } from "../core/action"
+import { ResetPasswordState } from "../action"
 import { validateBoardStates } from "../../../../../../../ui/vendor/getto-application/board/validate_board/data"
 
 const options = [
@@ -37,16 +37,17 @@ export default {
 
 type Props = Readonly<{
     reset: typeof options[number]
-    form: ValidateBoardActionState
+    validate: ValidateBoardActionState
     err: string
 }>
 const template = storyTemplate<Props>((props) => {
     return h(ResetPasswordComponent, {
-        ...mockResetPasswordResource(),
-        state: { core: state(), form: props.form },
+        reset: mockResetPasswordAction(),
+        state: state(),
+        validate: props.validate,
     })
 
-    function state(): ResetPasswordCoreState {
+    function state(): ResetPasswordState {
         switch (props.reset) {
             case "initial":
                 return { type: "initial-reset" }
@@ -78,4 +79,4 @@ const template = storyTemplate<Props>((props) => {
     }
 })
 
-export const Reset = template({ reset: "initial", form: "valid", err: "" })
+export const Reset = template({ reset: "initial", validate: "valid", err: "" })

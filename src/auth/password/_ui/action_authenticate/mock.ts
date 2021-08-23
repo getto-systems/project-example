@@ -6,15 +6,12 @@ import { mockValidateBoardAction } from "../../../../../ui/vendor/getto-applicat
 
 import { initSignLink } from "../../../_ui/common/nav/action_nav/init"
 
-import { SignLink } from "../../../_ui/common/nav/action_nav/resource"
 import {
     AuthenticatePasswordAction,
     AuthenticatePasswordState,
     initialAuthenticatePasswordState,
     ValidateAuthenticatePasswordFieldsAction,
 } from "./action"
-import { InputLoginIDAction } from "../../../login_id/_ui/action_input/action"
-import { InputPasswordAction } from "../action_input/action"
 
 import { emptyBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/data"
 
@@ -28,19 +25,11 @@ class Action
 {
     readonly initialState = initialAuthenticatePasswordState
 
-    readonly link: SignLink
+    readonly link = initSignLink()
 
-    readonly loginID: InputLoginIDAction
-    readonly password: InputPasswordAction
-    readonly validate: ValidateAuthenticatePasswordFieldsAction
-
-    constructor() {
-        super()
-        this.link = initSignLink()
-        this.loginID = mockInputLoginIDAction()
-        this.password = mockInputPasswordAction(emptyBoardValue, { multiByte: false })
-        this.validate = mockValidateBoardAction()
-    }
+    readonly loginID = mockInputLoginIDAction()
+    readonly password = mockInputPasswordAction(emptyBoardValue, { multiByte: false })
+    readonly validate: ValidateAuthenticatePasswordFieldsAction = mockValidateBoardAction()
 
     clear(): void {
         return

@@ -3,7 +3,7 @@ import { toApplicationView } from "../../../../../../ui/vendor/getto-application
 import { newCheckAuthTicketView } from "../../../../auth_ticket/_ui/action_check/init/resource"
 import { newSignViewLocationDetecter } from "../../../common/switch_view/init"
 import { newAuthenticatePasswordView } from "../../../../password/_ui/action_authenticate/init/resource"
-import { newResetPasswordView } from "../../../../password/reset/_ui/action_reset/init"
+import { newResetPasswordView } from "../../../../password/reset/_ui/action_reset/init/resource"
 import {
     newRequestPasswordResetTokenProxy,
     RequestPasswordResetTokenProxy,

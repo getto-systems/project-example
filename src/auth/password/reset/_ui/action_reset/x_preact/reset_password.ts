@@ -32,13 +32,11 @@ import { ResetPasswordError } from "../../reset/data"
 import { remoteCommonErrorReason } from "../../../../../../z_details/_ui/remote/helper"
 
 export function ResetPasswordEntry(view: ResetPasswordView): VNode {
-    const resource = useApplicationView(view)
+    const action = useApplicationView(view)
     return h(ResetPasswordComponent, {
-        ...resource,
-        state: {
-            core: useApplicationAction(resource.reset.core),
-            form: useApplicationAction(resource.reset.form.validate),
-        },
+        reset: action,
+        state: useApplicationAction(action),
+        validate: useApplicationAction(action.validate),
     })
 }
 
@@ -46,33 +44,33 @@ type Props = ResetPasswordResource & ResetPasswordResourceState
 export function ResetPasswordComponent(props: Props): VNode {
     useLayoutEffect(() => {
         // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
-        switch (props.state.core.type) {
+        switch (props.state.type) {
             case "try-to-load":
-                if (!props.state.core.scriptPath.valid) {
-                    props.reset.core.loadError({
+                if (!props.state.scriptPath.valid) {
+                    props.reset.loadError({
                         type: "infra-error",
-                        err: `スクリプトのロードに失敗しました: ${props.state.core.type}`,
+                        err: `スクリプトのロードに失敗しました: ${props.state.type}`,
                     })
                     break
                 }
-                appendScript(props.state.core.scriptPath.value, (script) => {
+                appendScript(props.state.scriptPath.value, (script) => {
                     script.onerror = () => {
-                        props.reset.core.loadError({
+                        props.reset.loadError({
                             type: "infra-error",
-                            err: `スクリプトのロードに失敗しました: ${props.state.core.type}`,
+                            err: `スクリプトのロードに失敗しました: ${props.state.type}`,
                         })
                     }
                 })
                 break
         }
-    }, [props.reset.core, props.state.core])
+    }, [props.reset, props.state])
 
-    switch (props.state.core.type) {
+    switch (props.state.type) {
         case "initial-reset":
             return resetForm({ state: "reset" })
 
         case "failed-to-reset":
-            return resetForm({ state: "reset", error: resetError(props.state.core.err) })
+            return resetForm({ state: "reset", error: resetError(props.state.err) })
 
         case "try-to-reset":
             return resetForm({ state: "connecting" })
@@ -94,7 +92,7 @@ export function ResetPasswordComponent(props: Props): VNode {
 
         case "repository-error":
         case "load-error":
-            return h(ApplicationErrorComponent, { err: props.state.core.err.err })
+            return h(ApplicationErrorComponent, { err: props.state.err.err })
     }
 
     type ResetFormState = "reset" | "connecting"
@@ -113,11 +111,11 @@ export function ResetPasswordComponent(props: Props): VNode {
                 title: resetTitle(),
                 body: [
                     h(InputLoginIDEntry, {
-                        field: props.reset.form.loginID,
+                        field: props.reset.loginID,
                         help: ["最初に入力したログインIDを入力してください"],
                     }),
                     h(InputPasswordEntry, {
-                        field: props.reset.form.password,
+                        field: props.reset.password,
                         help: ["新しいパスワードを入力してください"],
                     }),
                     buttons({ left: button(), right: clearButton() }),
@@ -128,7 +126,7 @@ export function ResetPasswordComponent(props: Props): VNode {
 
         function clearButton() {
             const label = "入力内容をクリア"
-            switch (props.state.form) {
+            switch (props.validate) {
                 case "initial":
                     return button_disabled({ label })
 
@@ -139,7 +137,7 @@ export function ResetPasswordComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
-                props.reset.form.clear()
+                props.reset.clear()
             }
         }
 
@@ -155,7 +153,7 @@ export function ResetPasswordComponent(props: Props): VNode {
             function resetButton() {
                 const label = "パスワードリセット"
 
-                switch (props.state.form) {
+                switch (props.validate) {
                     case "initial":
                         return button_send({ state: "normal", label, onClick })
 
@@ -168,7 +166,7 @@ export function ResetPasswordComponent(props: Props): VNode {
 
                 function onClick(e: Event) {
                     e.preventDefault()
-                    props.reset.core.submit(props.reset.form.validate.get())
+                    props.reset.submit(props.reset.validate.get())
                 }
             }
             function connectingButton(): VNode {
@@ -205,10 +203,10 @@ export function ResetPasswordComponent(props: Props): VNode {
         return buttons({ left: privacyPolicyLink(), right: sendLink() })
     }
     function privacyPolicyLink() {
-        return signNav(props.link.getNav_static_privacyPolicy())
+        return signNav(props.reset.link.getNav_static_privacyPolicy())
     }
     function sendLink() {
-        return signNav(props.link.getNav_password_reset_requestToken_retry())
+        return signNav(props.reset.link.getNav_password_reset_requestToken_retry())
     }
 }
 
