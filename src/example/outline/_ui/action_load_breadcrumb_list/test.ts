@@ -44,13 +44,11 @@ function newResource(currentURL: URL): LoadBreadcrumbListResource {
     const version = standard_version()
     return {
         breadcrumbList: initLoadBreadcrumbListAction(
-            initLoadBreadcrumbListMaterial(
-                {
-                    version,
-                    menuTree: standard_MenuTree(),
-                },
-                mockLoadMenuLocationDetecter(currentURL, version),
-            ),
+            initLoadBreadcrumbListMaterial({
+                version,
+                menuTree: standard_MenuTree(),
+            }),
+            mockLoadMenuLocationDetecter(currentURL, version),
         ),
     }
 }

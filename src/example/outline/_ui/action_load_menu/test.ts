@@ -360,16 +360,14 @@ function initResource(
     return [
         {
             menu: initLoadMenuAction(
-                initLoadMenuMaterial(
-                    {
-                        version,
-                        menuTree: standard_MenuTree(),
-                        authz,
-                        menuExpand,
-                        getMenuBadge,
-                    },
-                    detecter,
-                ),
+                initLoadMenuMaterial({
+                    version,
+                    menuTree: standard_MenuTree(),
+                    authz,
+                    menuExpand,
+                    getMenuBadge,
+                }),
+                detecter,
             ),
         },
         menuExpand,

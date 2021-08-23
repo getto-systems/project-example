@@ -19,14 +19,12 @@ export function newLoadMenuResource(
 ): LoadMenuResource {
     return {
         menu: initLoadMenuAction(
-            initLoadMenuMaterial(
-                {
-                    ...newLoadMenuInfra(feature, menuContent),
-                    ...newUpdateMenuBadgeInfra(feature, menuContent),
-                    ...newToggleMenuExpandInfra(feature, menuContent),
-                },
-                newLoadMenuLocationDetecter(feature),
-            ),
+            initLoadMenuMaterial({
+                ...newLoadMenuInfra(feature, menuContent),
+                ...newUpdateMenuBadgeInfra(feature, menuContent),
+                ...newToggleMenuExpandInfra(feature, menuContent),
+            }),
+            newLoadMenuLocationDetecter(feature),
         ),
     }
 }

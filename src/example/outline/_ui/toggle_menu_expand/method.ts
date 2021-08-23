@@ -1,23 +1,23 @@
 import { buildMenu } from "../kernel/helper"
 
-import { LoadMenuDetecter } from "../kernel/method"
-
 import { ToggleMenuExpandEvent } from "./event"
 
 import { initMenuExpand, MenuBadge, MenuExpand } from "../kernel/infra"
 import { ToggleMenuExpandInfra, ToggleMenuExpandStore } from "./infra"
 
-import { MenuCategoryPath } from "../kernel/data"
+import { MenuCategoryPath, MenuTargetPath } from "../kernel/data"
+import { ConvertLocationResult } from "../../../../z_details/_ui/location/data"
 
-export interface ToggleMenuExpandPod {
-    (detecter: LoadMenuDetecter): ToggleMenuExpandMethod
-}
 export interface ToggleMenuExpandMethod {
-    <S>(path: MenuCategoryPath, post: Post<ToggleMenuExpandEvent, S>): Promise<S>
+    <S>(
+        menuTargetPath: ConvertLocationResult<MenuTargetPath>,
+        path: MenuCategoryPath,
+        post: Post<ToggleMenuExpandEvent, S>,
+    ): Promise<S>
 }
 
 interface Toggle {
-    (infra: ToggleMenuExpandInfra, store: ToggleMenuExpandStore): ToggleMenuExpandPod
+    (infra: ToggleMenuExpandInfra, store: ToggleMenuExpandStore): ToggleMenuExpandMethod
 }
 
 export const showMenuExpand: Toggle = modifyMenuExpand((expand, path) => expand.register(path))
@@ -27,7 +27,7 @@ interface ModifyExpand {
     (expand: MenuExpand, path: MenuCategoryPath): void
 }
 function modifyMenuExpand(modify: ModifyExpand): Toggle {
-    return (infra, store) => (detecter) => async (path, post) => {
+    return (infra, store) => async (menuTargetPath, path, post) => {
         const { authz, menuExpand } = infra
 
         const authzResult = await authz.get()
@@ -64,7 +64,7 @@ function modifyMenuExpand(modify: ModifyExpand): Toggle {
             menu: buildMenu({
                 version: infra.version,
                 menuTree: infra.menuTree,
-                menuTargetPath: detecter(),
+                menuTargetPath,
                 grantedRoles: authzResult.value.roles,
                 menuExpand: expand,
                 menuBadge: badge,

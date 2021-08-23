@@ -13,9 +13,7 @@ export function newLoadBreadcrumbListAction(
     menuContent: MenuContent,
 ): LoadBreadcrumbListAction {
     return initLoadBreadcrumbListAction(
-        initLoadBreadcrumbListMaterial(
-            newLoadBreadcrumbListInfra(menuContent),
-            newLoadMenuLocationDetecter(feature),
-        ),
+        initLoadBreadcrumbListMaterial(newLoadBreadcrumbListInfra(menuContent)),
+        newLoadMenuLocationDetecter(feature),
     )
 }

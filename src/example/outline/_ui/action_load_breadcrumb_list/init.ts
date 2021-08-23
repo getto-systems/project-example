@@ -7,17 +7,17 @@ import { LoadBreadcrumbListAction, LoadBreadcrumbListMaterial } from "./action"
 
 export function initLoadBreadcrumbListMaterial(
     infra: LoadBreadcrumbListInfra,
-    detecter: LoadMenuDetecter,
 ): LoadBreadcrumbListMaterial {
     return {
-        load: loadBreadcrumbList(infra)(detecter),
+        load: loadBreadcrumbList(infra),
     }
 }
 
 export function initLoadBreadcrumbListAction(
     material: LoadBreadcrumbListMaterial,
+    detecter: LoadMenuDetecter,
 ): LoadBreadcrumbListAction {
     return {
-        load: material.load,
+        load: () => material.load(detecter()),
     }
 }
