@@ -1,6 +1,6 @@
 import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
 
-import { initBaseView } from "./impl"
+import { initBaseView } from "./init"
 
 import { mockBaseResource } from "./mock"
 

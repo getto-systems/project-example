@@ -1,8 +1,7 @@
-import { BaseOutsideFeature, newBaseResource } from "../action_base/init"
+import { initBaseView } from "../action_base/init"
 
-import { DashboardView } from "./resource"
-import { initDashboardView } from "./impl"
+import { DashboardView, DashboardResource } from "./resource"
 
-export function newDashboardView(feature: BaseOutsideFeature): DashboardView {
-    return initDashboardView(newBaseResource(feature))
+export function initDashboardView(resource: DashboardResource): DashboardView {
+    return initBaseView(resource, () => null)
 }
