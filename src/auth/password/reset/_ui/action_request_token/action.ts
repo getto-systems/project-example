@@ -7,7 +7,6 @@ import { RequestResetTokenMethod } from "../request_token/method"
 
 import { RequestResetTokenEvent } from "../request_token/event"
 
-import { ConvertBoardResult } from "../../../../../../ui/vendor/getto-application/board/kernel/data"
 import { RequestResetTokenFields } from "../request_token/data"
 
 export interface RequestResetTokenAction extends ApplicationStateAction<RequestResetTokenState> {
@@ -17,7 +16,7 @@ export interface RequestResetTokenAction extends ApplicationStateAction<RequestR
     readonly validate: ValidateRequestTokenAction
 
     clear(): void
-    submit(fields: ConvertBoardResult<RequestResetTokenFields>): Promise<RequestResetTokenState>
+    submit(): Promise<RequestResetTokenState>
 }
 
 export const requestResetTokenFields = ["loginID"] as const

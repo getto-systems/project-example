@@ -62,7 +62,7 @@ describe("AuthenticatePassword", () => {
             store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
             store.password.set(markBoardValue(VALID_LOGIN.password))
 
-            return resource.submit(resource.validate.get())
+            return resource.submit()
         }).then((stack) => {
             expect(stack).toEqual([
                 { type: "try-to-login" },
@@ -99,7 +99,7 @@ describe("AuthenticatePassword", () => {
             store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
             store.password.set(markBoardValue(VALID_LOGIN.password))
 
-            return resource.submit(resource.validate.get())
+            return resource.submit()
         }).then((stack) => {
             expect(stack).toEqual([
                 { type: "try-to-login" },
@@ -124,7 +124,7 @@ describe("AuthenticatePassword", () => {
 
         const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.submit(resource.validate.get())).then((stack) => {
+        await runner(() => resource.submit()).then((stack) => {
             expect(stack).toEqual([{ type: "failed-to-login", err: { type: "validation-error" } }])
         })
     })

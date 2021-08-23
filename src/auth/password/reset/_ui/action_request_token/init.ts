@@ -78,7 +78,7 @@ class Action
         this.loginID.clear()
         this.validate.clear()
     }
-    submit(fields: ConvertBoardResult<RequestResetTokenFields>): Promise<RequestResetTokenState> {
-        return this.material.requestToken(fields, this.post)
+    submit(): Promise<RequestResetTokenState> {
+        return this.material.requestToken(this.validate.get(), this.post)
     }
 }

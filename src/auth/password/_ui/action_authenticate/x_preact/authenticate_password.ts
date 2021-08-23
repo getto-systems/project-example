@@ -168,7 +168,7 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
 
                 function onClick(e: Event) {
                     e.preventDefault()
-                    props.authenticate.submit(props.authenticate.validate.get())
+                    props.authenticate.submit()
                 }
             }
             function connectingButton(): VNode {

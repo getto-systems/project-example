@@ -112,10 +112,8 @@ class Action
         this.password.clear()
         this.validate.clear()
     }
-    async submit(
-        fields: ConvertBoardResult<AuthenticatePasswordFields>,
-    ): Promise<AuthenticatePasswordState> {
-        return this.material.authenticate(fields, (event) => {
+    async submit(): Promise<AuthenticatePasswordState> {
+        return this.material.authenticate(this.validate.get(), (event) => {
             switch (event.type) {
                 case "succeed-to-login":
                     return this.startContinuousRenew(event.auth)
