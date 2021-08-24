@@ -24,8 +24,8 @@ import {
     ResetPasswordAction,
     ResetPasswordState,
     initialResetPasswordState,
-    resetPasswordFields,
-    ValidateResetAction,
+    resetPasswordFieldNames,
+    ResetPasswordFieldName,
 } from "./action"
 
 import { ResetPasswordDetecter } from "../reset/method"
@@ -34,6 +34,10 @@ import { LoadScriptError } from "../../../../_ui/common/secure/get_script_path/d
 import { ResetPasswordFields } from "../reset/data"
 import { AuthTicket } from "../../../../auth_ticket/_ui/kernel/data"
 import { ConvertBoardResult } from "../../../../../../ui/vendor/getto-application/board/kernel/data"
+import { InputLoginIDAction } from "../../../../login_id/_ui/action_input/action"
+import { ValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
+import { InputPasswordAction } from "../../../_ui/action_input/action"
+import { ValidateBoardChecker } from "../../../../../../ui/vendor/getto-application/board/validate_board/infra"
 
 export type ResetPasswordActionInfra = Readonly<{
     startContinuousRenew: StartContinuousRenewInfra
@@ -68,15 +72,16 @@ class Action
 
     readonly link = initSignLink()
 
-    readonly loginID = initInputLoginIDAction()
-    readonly password = initInputPasswordAction()
-    readonly validate: ValidateResetAction
+    readonly loginID: InputLoginIDAction
+    readonly password: InputPasswordAction
+    readonly validate: ValidateBoardAction
 
     material: ResetPasswordMaterial
     detecter: Readonly<{
         getScriptPath: GetScriptPathDetecter
         reset: ResetPasswordDetecter
     }>
+    checker: ValidateBoardChecker<ResetPasswordFieldName, ResetPasswordFields>
 
     constructor(
         material: ResetPasswordMaterial,
@@ -89,11 +94,14 @@ class Action
         this.material = material
         this.detecter = detecter
 
-        this.validate = initValidateBoardAction({
-            fields: resetPasswordFields,
+        const loginID = initInputLoginIDAction()
+        const password = initInputPasswordAction()
+
+        const { validate, checker } = initValidateBoardAction({
+            fields: resetPasswordFieldNames,
             converter: (): ConvertBoardResult<ResetPasswordFields> => {
-                const loginIDResult = this.loginID.validate.get()
-                const passwordResult = this.password.validate.get()
+                const loginIDResult = loginID.checker.get()
+                const passwordResult = password.checker.get()
                 if (!loginIDResult.valid || !passwordResult.valid) {
                     return { valid: false }
                 }
@@ -107,8 +115,17 @@ class Action
             },
         })
 
-        this.loginID.validate.subscriber.subscribe(this.validate.updateValidateState("loginID"))
-        this.password.validate.subscriber.subscribe(this.validate.updateValidateState("password"))
+        this.loginID = loginID.input
+        this.password = password.input
+        this.validate = validate
+        this.checker = checker
+
+        this.loginID.validate.subscriber.subscribe((result) =>
+            checker.update("loginID", result.valid),
+        )
+        this.password.validate.subscriber.subscribe((result) =>
+            checker.update("password", result.valid),
+        )
 
         this.terminateHook(() => {
             this.loginID.terminate()
@@ -123,7 +140,7 @@ class Action
         this.validate.clear()
     }
     async submit(): Promise<ResetPasswordState> {
-        return this.material.reset(this.detecter.reset(), this.validate.get(), (event) => {
+        return this.material.reset(this.detecter.reset(), this.checker.get(), (event) => {
             switch (event.type) {
                 case "succeed-to-reset":
                     return this.startContinuousRenew(event.auth)

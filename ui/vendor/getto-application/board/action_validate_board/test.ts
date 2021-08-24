@@ -4,13 +4,13 @@ import { initValidateBoardAction } from "./init"
 
 describe("ValidateBoard", () => {
     test("validate; all valid state; clear", async () => {
-        const { action, handler } = standard()
+        const { action, checker } = standard()
 
         const runner = setupActionTestRunner(action.subscriber)
 
         await runner(async () => {
-            handler.name({ valid: true })
-            handler.description({ valid: true })
+            checker.update("name", true)
+            checker.update("description", true)
             return action.currentState()
         }).then((stack) => {
             expect(stack).toEqual(["initial", "valid"])
@@ -24,13 +24,13 @@ describe("ValidateBoard", () => {
     })
 
     test("validate; invalid exists", async () => {
-        const { action, handler } = standard()
+        const { action, checker } = standard()
 
         const runner = setupActionTestRunner(action.subscriber)
 
         await runner(async () => {
-            handler.name({ valid: false, err: ["invalid"] }) // invalid
-            handler.description({ valid: true })
+            checker.update("name", false) // invalid
+            checker.update("description", true)
             return action.currentState()
         }).then((stack) => {
             expect(stack).toEqual(["invalid", "invalid"])
@@ -38,39 +38,25 @@ describe("ValidateBoard", () => {
     })
 
     test("validate; initial exists", async () => {
-        const { action, handler } = standard()
+        const { action, checker } = standard()
 
         const runner = setupActionTestRunner(action.subscriber)
 
         await runner(async () => {
-            handler.name({ valid: true })
+            checker.update("name", true)
             // description: initial state
             return action.currentState()
         }).then((stack) => {
             expect(stack).toEqual(["initial"])
         })
     })
-
-    test("get", () => {
-        const { action } = standard()
-
-        expect(action.get()).toEqual({
-            valid: true,
-            value: { name: "valid-name", value: "valid-value" },
-        })
-    })
 })
 
 function standard() {
-    const action = initValidateBoardAction({
+    const { validate: action, checker } = initValidateBoardAction({
         fields: ["name", "description"],
         converter: () => ({ valid: true, value: { name: "valid-name", value: "valid-value" } }),
     })
 
-    const handler = {
-        name: action.updateValidateState("name"),
-        description: action.updateValidateState("description"),
-    }
-
-    return { action, handler }
+    return { action, checker }
 }

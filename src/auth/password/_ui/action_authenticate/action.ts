@@ -19,7 +19,6 @@ import {
     LoadScriptError,
     ConvertScriptPathResult,
 } from "../../../_ui/common/secure/get_script_path/data"
-import { AuthenticatePasswordFields } from "../authenticate/data"
 
 export interface AuthenticatePasswordAction
     extends ApplicationStateAction<AuthenticatePasswordState> {
@@ -27,18 +26,15 @@ export interface AuthenticatePasswordAction
 
     readonly loginID: InputLoginIDAction
     readonly password: InputPasswordAction
-    readonly validate: ValidateAuthenticatePasswordFieldsAction
+    readonly validate: ValidateBoardAction
 
     clear(): void
     submit(): Promise<AuthenticatePasswordState>
     loadError(err: LoadScriptError): Promise<AuthenticatePasswordState>
 }
 
-export const authenticatePasswordFields = ["loginID", "password"] as const
-export type ValidateAuthenticatePasswordFieldsAction = ValidateBoardAction<
-    typeof authenticatePasswordFields[number],
-    AuthenticatePasswordFields
->
+export const authenticatePasswordFieldNames = ["loginID", "password"] as const
+export type AuthenticatePasswordFieldName = typeof authenticatePasswordFieldNames[number]
 
 export type AuthenticatePasswordMaterial = Readonly<{
     save: SaveAuthTicketMethod

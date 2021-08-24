@@ -10,7 +10,6 @@ import {
     AuthenticatePasswordAction,
     AuthenticatePasswordState,
     initialAuthenticatePasswordState,
-    ValidateAuthenticatePasswordFieldsAction,
 } from "./action"
 
 import { emptyBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/data"
@@ -29,7 +28,7 @@ class Action
 
     readonly loginID = mockInputLoginIDAction()
     readonly password = mockInputPasswordAction(emptyBoardValue, { multiByte: false })
-    readonly validate: ValidateAuthenticatePasswordFieldsAction = mockValidateBoardAction()
+    readonly validate = mockValidateBoardAction()
 
     clear(): void {
         return

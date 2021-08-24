@@ -178,8 +178,7 @@ describe("RegisterPassword", () => {
 
         await runner(async () => {
             view.terminate()
-            action.loginID.validate.check()
-            action.password.validate.check()
+            action.submit()
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])

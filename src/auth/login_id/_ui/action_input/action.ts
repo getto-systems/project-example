@@ -5,7 +5,7 @@ import {
     ValidateBoardFieldState,
 } from "../../../../../ui/vendor/getto-application/board/action_validate_field/action"
 
-import { LoginID, ValidateLoginIDError } from "../data"
+import { ValidateLoginIDError } from "../data"
 
 export interface InputLoginIDAction extends ApplicationAction {
     readonly input: InputBoardAction
@@ -13,5 +13,5 @@ export interface InputLoginIDAction extends ApplicationAction {
     clear(): void
 }
 
-export type ValidateLoginIDAction = ValidateBoardFieldAction<LoginID, ValidateLoginIDError>
+export type ValidateLoginIDAction = ValidateBoardFieldAction<ValidateLoginIDError>
 export type ValidateLoginIDState = ValidateBoardFieldState<ValidateLoginIDError>

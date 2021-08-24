@@ -2,32 +2,34 @@ import { setupActionTestRunner } from "../../action/test_helper"
 
 import { initValidateBoardFieldAction } from "./init"
 
-import { ValidateBoardFieldAction } from "./action"
-
 import { ConvertBoardFieldResult } from "../validate_field/data"
 
 describe("ValidateBoardField", () => {
     test("validate; valid input", async () => {
         // valid input
-        const { action } = standard({ valid: true, value: "valid" })
+        const { action, checker } = standard({ valid: true, value: "valid" })
 
         const runner = setupActionTestRunner(action.subscriber)
 
-        await runner(() => action.check()).then((stack) => {
+        await runner(async () => {
+            checker.check()
+            return action.currentState()
+        }).then((stack) => {
             expect(stack).toEqual([{ valid: true }])
-            expect(action.get()).toEqual({ valid: true, value: "valid" })
         })
     })
 
     test("validate; invalid input; clear", async () => {
         // invalid input
-        const { action } = standard({ valid: false, err: ["empty"] })
+        const { action, checker } = standard({ valid: false, err: ["empty"] })
 
         const runner = setupActionTestRunner(action.subscriber)
 
-        await runner(() => action.check()).then((stack) => {
+        await runner(async () => {
+            checker.check()
+            return action.currentState()
+        }).then((stack) => {
             expect(stack).toEqual([{ valid: false, err: ["empty"] }])
-            expect(action.get()).toEqual({ valid: false, err: ["empty"] })
         })
         await runner(async () => {
             action.clear()
@@ -39,10 +41,11 @@ describe("ValidateBoardField", () => {
 })
 
 function standard(result: ConvertBoardFieldResult<FieldValue, ValidateError>) {
-    const action: ValidateBoardFieldAction<FieldValue, ValidateError> =
-        initValidateBoardFieldAction({ converter: () => result })
+    const { validate: action, checker } = initValidateBoardFieldAction({
+        converter: () => result,
+    })
 
-    return { action }
+    return { action, checker }
 }
 
 type FieldValue = string

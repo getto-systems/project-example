@@ -9,8 +9,8 @@ import {
     RequestResetTokenAction,
     RequestResetTokenState,
     initialRequestResetTokenState,
-    ValidateRequestTokenAction,
-    requestResetTokenFields,
+    requestResetTokenFieldNames,
+    RequestResetTokenFieldName,
 } from "./action"
 
 import { RequestResetTokenFields } from "../request_token/data"
@@ -18,6 +18,9 @@ import { ConvertBoardResult } from "../../../../../../ui/vendor/getto-applicatio
 import { initInputLoginIDAction } from "../../../../login_id/_ui/action_input/init"
 import { initValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/init"
 import { initSignLink } from "../../../../_ui/common/nav/action_nav/init"
+import { ValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
+import { InputLoginIDAction } from "../../../../login_id/_ui/action_input/action"
+import { ValidateBoardChecker } from "../../../../../../ui/vendor/getto-application/board/validate_board/infra"
 
 export function initRequestResetTokenMaterial(
     infra: RequestResetTokenInfra,
@@ -41,19 +44,22 @@ class Action
 
     readonly link = initSignLink()
 
-    readonly loginID = initInputLoginIDAction()
-    readonly validate: ValidateRequestTokenAction
+    readonly loginID: InputLoginIDAction
+    readonly validate: ValidateBoardAction
 
     material: RequestResetTokenMaterial
+    checker: ValidateBoardChecker<RequestResetTokenFieldName, RequestResetTokenFields>
 
     constructor(material: RequestResetTokenMaterial) {
         super()
         this.material = material
 
-        this.validate = initValidateBoardAction({
-            fields: requestResetTokenFields,
+        const loginID = initInputLoginIDAction()
+
+        const { validate, checker } = initValidateBoardAction({
+            fields: requestResetTokenFieldNames,
             converter: (): ConvertBoardResult<RequestResetTokenFields> => {
-                const loginIDResult = this.loginID.validate.get()
+                const loginIDResult = loginID.checker.get()
                 if (!loginIDResult.valid) {
                     return { valid: false }
                 }
@@ -66,7 +72,13 @@ class Action
             },
         })
 
-        this.loginID.validate.subscriber.subscribe(this.validate.updateValidateState("loginID"))
+        this.loginID = loginID.input
+        this.validate = validate
+        this.checker = checker
+
+        this.loginID.validate.subscriber.subscribe((result) =>
+            checker.update("loginID", result.valid),
+        )
 
         this.terminateHook(() => {
             this.loginID.terminate()
@@ -79,6 +91,6 @@ class Action
         this.validate.clear()
     }
     submit(): Promise<RequestResetTokenState> {
-        return this.material.requestToken(this.validate.get(), this.post)
+        return this.material.requestToken(this.checker.get(), this.post)
     }
 }

@@ -7,23 +7,18 @@ import { RequestResetTokenMethod } from "../request_token/method"
 
 import { RequestResetTokenEvent } from "../request_token/event"
 
-import { RequestResetTokenFields } from "../request_token/data"
-
 export interface RequestResetTokenAction extends ApplicationStateAction<RequestResetTokenState> {
     readonly link: SignLink
 
     readonly loginID: InputLoginIDAction
-    readonly validate: ValidateRequestTokenAction
+    readonly validate: ValidateBoardAction
 
     clear(): void
     submit(): Promise<RequestResetTokenState>
 }
 
-export const requestResetTokenFields = ["loginID"] as const
-export type ValidateRequestTokenAction = ValidateBoardAction<
-    typeof requestResetTokenFields[number],
-    RequestResetTokenFields
->
+export const requestResetTokenFieldNames = ["loginID"] as const
+export type RequestResetTokenFieldName = typeof requestResetTokenFieldNames[number]
 
 export type RequestResetTokenMaterial = Readonly<{
     requestToken: RequestResetTokenMethod

@@ -7,30 +7,39 @@ import { InputPasswordAction } from "./action"
 
 import { passwordBoardConverter } from "../convert"
 
-import { emptyBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/data"
+import { BoardFieldChecker } from "../../../../../ui/vendor/getto-application/board/validate_field/infra"
 
-export function initInputPasswordAction(): InputPasswordAction {
+import { emptyBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/data"
+import { Password, ValidatePasswordError } from "../data"
+
+export function initInputPasswordAction(): Readonly<{
+    input: InputPasswordAction
+    checker: BoardFieldChecker<Password, ValidatePasswordError>
+}> {
     const { input, store, subscriber } = initInputBoardAction()
 
-    const validate = initValidateBoardFieldAction({
+    const { validate, checker } = initValidateBoardFieldAction({
         converter: () => passwordBoardConverter(store.get()),
     })
 
     subscriber.subscribe(() => {
-        validate.check()
+        checker.check()
     })
 
     return {
-        input,
-        validate,
-        clear: () => {
-            store.set(emptyBoardValue)
-            validate.clear()
+        input: {
+            input,
+            validate,
+            clear: () => {
+                store.set(emptyBoardValue)
+                validate.clear()
+            },
+            checkCharacter: () => checkPasswordCharacter(store.get()),
+            terminate: () => {
+                subscriber.terminate()
+                validate.terminate()
+            },
         },
-        checkCharacter: () => checkPasswordCharacter(store.get()),
-        terminate: () => {
-            subscriber.terminate()
-            validate.terminate()
-        },
+        checker,
     }
 }
