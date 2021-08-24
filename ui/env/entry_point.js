@@ -5,6 +5,7 @@ module.exports = {
     publicEntries,
     secureEntries,
     linkableHtmlFiles,
+    secureHtmlFiles,
 }
 
 const entries = {
