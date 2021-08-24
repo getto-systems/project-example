@@ -29,7 +29,7 @@ export function detectMenuTargetPath(
     }
     return {
         valid: true,
-        value: markMenuTargetPath(pathname.replace(versionPrefix, "/")),
+        value: markMenuTargetPath(pathname.replace(versionPrefix, "")),
     }
 }
 
