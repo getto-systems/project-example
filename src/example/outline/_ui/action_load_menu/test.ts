@@ -430,8 +430,8 @@ function standard_getMenuBadge(): GetMenuBadgeRemote {
     return async () => ({
         success: true,
         value: convertMenuBadgeRemote([
-            { path: "/index.html", count: 10 },
-            { path: "/docs/index.html", count: 20 },
+            { path: "index.html", count: 10 },
+            { path: "docs/index.html", count: 20 },
         ]),
     })
 }

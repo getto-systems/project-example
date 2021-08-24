@@ -7,15 +7,15 @@ export function standard_MenuTree(): MenuTree {
 
     return [
         category("MAIN", allow, [
-            item("ホーム", "home", "/index.html"),
-            item("ドキュメント", "docs", "/docs/index.html"),
+            item("ホーム", "home", "index.html"),
+            item("ドキュメント", "docs", "docs/index.html"),
         ]),
         category("DOCUMENT", allow, [
-            item("認証・認可", "auth", "/docs/auth.html"),
-            category("DETAIL", allow, [item("詳細", "detail", "/docs/auth.html")]),
+            item("認証・認可", "auth", "docs/auth.html"),
+            category("DETAIL", allow, [item("詳細", "detail", "docs/auth.html")]),
         ]),
         category("DEVELOPMENT", dev, [
-            item("配備構成", "deployment", "/docs/z-dev/deployment.html"),
+            item("配備構成", "deployment", "docs/z-dev/deployment.html"),
         ]),
     ]
 }

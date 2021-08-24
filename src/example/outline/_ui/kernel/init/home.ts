@@ -10,10 +10,10 @@ export function homeMenuContent(): MenuContent {
         loadMenuBadge: true,
         menuTree: [
             category("MAIN", allow, [
-                item("ホーム", lnir("home"), "/index.html"),
-                item("ドキュメント", lnir("files-alt"), "/docs/index.html"),
+                item("ホーム", lnir("home"), "index.html"),
+                item("ドキュメント", lnir("files-alt"), "docs/index.html"),
             ]),
-            category("SYSTEM", allow, [item("プロフィール", lnir("user"), "/auth/profile.html")]),
+            category("SYSTEM", allow, [item("プロフィール", lnir("user"), "auth/profile.html")]),
         ],
     }
 }

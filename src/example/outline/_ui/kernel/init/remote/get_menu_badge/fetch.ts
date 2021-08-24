@@ -43,7 +43,7 @@ export function newGetMenuBadgeRemote(feature: RemoteOutsideFeature): GetMenuBad
                 success: true,
                 value: convertMenuBadgeRemote([
                     {
-                        path: "/index.html",
+                        path: "index.html",
                         count: result.index,
                     },
                 ]),

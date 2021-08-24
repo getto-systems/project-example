@@ -18,21 +18,21 @@ export function docsMenuContent(): MenuContent {
         loadMenuBadge: false,
         menuTree: [
             category("MAIN", allow, [
-                item("ホーム", lnir("home"), "/index.html"),
-                item("ドキュメント", lnir("files-alt"), "/docs/index.html"),
-                item("プライバシーポリシー", lnir("files-alt"), "/docs/privacy-policy.html"),
+                item("ホーム", lnir("home"), "index.html"),
+                item("ドキュメント", lnir("files-alt"), "docs/index.html"),
+                item("プライバシーポリシー", lnir("files-alt"), "docs/privacy-policy.html"),
             ]),
             category("ドキュメント", allow, [
                 docsMenuNode(docs_auth, "auth"),
-                item(docs_avail.title, lnir("files-alt"), "/docs/avail.html"),
+                item(docs_avail.title, lnir("files-alt"), "docs/avail.html"),
             ]),
             ...(env.isProduction
                 ? []
                 : [
                       category("開発用", dev, [
-                          item("Storybook", lnir("files-alt"), "/storybook/index.html"),
-                          item("coverage api", lnir("files-alt"), "/coverage/api/index.html"),
-                          item("coverage ui", lnir("files-alt"), "/coverage/ui/lcov-report/index.html"),
+                          item("Storybook", lnir("files-alt"), "storybook/index.html"),
+                          item("coverage api", lnir("files-alt"), "coverage/api/index.html"),
+                          item("coverage ui", lnir("files-alt"), "coverage/ui/lcov-report/index.html"),
                       ]),
                   ]),
         ],
@@ -41,7 +41,7 @@ export function docsMenuContent(): MenuContent {
 
 function docsMenuNode<U, A, D>(domain: DocsDomain<U, A, D>, path: string): MenuTreeNode {
     return category(domain.title, allow, [
-        item("概要", lnir("files-alt"), assertMenuPath(`/docs/${path}/index.html`)),
+        item("概要", lnir("files-alt"), assertMenuPath(`docs/${path}/index.html`)),
         ...domain.usecase.map((name) => {
             const usecase = domain.toUsecase(name)
             const action = usecase.toAction(usecase.title)
@@ -49,7 +49,9 @@ function docsMenuNode<U, A, D>(domain: DocsDomain<U, A, D>, path: string): MenuT
                 action.title,
                 lnir("files-alt"),
                 assertMenuPath(
-                    `/docs/${path}/${`${name}`.replaceAll(
+                    // TODO href を name から生成するのではなく、パスを指定したい
+                    // TODO 例えば、checkAuthTicket => auth-ticket/check にしたい
+                    `docs/${path}/${`${name}`.replaceAll(
                         /[A-Z]/g,
                         (char) => `-${char.toLowerCase()}`,
                     )}.html`,
