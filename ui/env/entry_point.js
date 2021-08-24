@@ -10,8 +10,8 @@ module.exports = {
 
 const entries = {
     public: [
-        { name: "avail/move-to-latest-version" /* TODO "avail/version/move-to-latest" */ },
-        { name: "avail/move-to-next-version" /* TODO "avail/version/move-to-next" */ },
+        { name: "avail/version/move-to-latest" },
+        { name: "avail/version/move-to-next" },
         { name: "avail/not-found" },
         { name: "auth/sign", background: true },
     ],
