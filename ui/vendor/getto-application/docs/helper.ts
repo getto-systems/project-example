@@ -64,12 +64,16 @@ export function docsDomain<U, A, D>(
     return { title, purpose, usecase, toUsecase }
 }
 export function docsUsecase<A, D>(
+    path: string,
     title: A,
     purpose: string[],
     content: DocsUsecaseDescription<A, D>,
     map: DocsUsecaseDescriptionMap<A, D>,
 ): DocsUsecase<A, D> {
-    return { title, purpose, ...content, ...map }
+    return { path, title, purpose, ...content, ...map }
+}
+export function docsPath(title: string): string {
+    return title.replaceAll(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 }
 export function docsAction(
     title: string,

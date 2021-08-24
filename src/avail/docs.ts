@@ -3,6 +3,7 @@ import {
     docsDescription,
     docsDomain,
     docsModule,
+    docsPath,
     docsPurpose,
     docsSection,
     docsUsecase,
@@ -77,7 +78,7 @@ function docsAvailUsecase(
     purpose: string[],
     content: DocsUsecaseDescription<AvailAction, AvailData>,
 ): DocsUsecase<AvailAction, AvailData> {
-    return docsUsecase(title, purpose, content, {
+    return docsUsecase(docsPath(title), title, purpose, content, {
         toAction: (name) => action[name],
         toData: (name) => data[name],
     })

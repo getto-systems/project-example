@@ -25,9 +25,9 @@ const entries = {
 
         { name: "docs/auth/index" },
         { name: "docs/auth/logout" },
-        { name: "docs/auth/check-auth-ticket" /* TODO "docs/auth/auth-ticket/check" */ },
-        { name: "docs/auth/authenticate-password" /* TODO "docs/auth/password/authenticate" */ },
-        { name: "docs/auth/reset-password" /* TODO "docs/auth/password/reset" */ },
+        { name: "docs/auth/auth-ticket/check" },
+        { name: "docs/auth/password/authenticate" },
+        { name: "docs/auth/password/reset" },
 
         { name: "docs/avail" },
     ],
