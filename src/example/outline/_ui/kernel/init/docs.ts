@@ -26,17 +26,21 @@ export function docsMenuContent(): MenuContent {
                 docsMenuNode(docs_auth, "auth"),
                 item(docs_avail.title, lnir("files-alt"), "docs/avail.html"),
             ]),
-            ...(env.isProduction
-                ? []
-                : [
-                      category("開発用", dev, [
-                          item("Storybook", lnir("files-alt"), "storybook/index.html"),
-                          item("coverage api", lnir("files-alt"), "coverage/api/index.html"),
-                          item("coverage ui", lnir("files-alt"), "coverage/ui/lcov-report/index.html"),
-                      ]),
-                  ]),
+            ...devDocs(),
         ],
     }
+}
+function devDocs(): MenuTreeNode[] {
+    if (!env.isProduction) {
+        return []
+    }
+    return [
+        category("開発用", dev, [
+            item("Storybook", lnir("files-alt"), "storybook/index.html"),
+            item("coverage api", lnir("files-alt"), "coverage/api/index.html"),
+            item("coverage ui", lnir("files-alt"), "coverage/ui/lcov-report/index.html"),
+        ]),
+    ]
 }
 
 function docsMenuNode<U, A, D>(domain: DocsDomain<U, A, D>, path: string): MenuTreeNode {
@@ -48,14 +52,7 @@ function docsMenuNode<U, A, D>(domain: DocsDomain<U, A, D>, path: string): MenuT
             return item(
                 action.title,
                 lnir("files-alt"),
-                assertMenuPath(
-                    // TODO href を name から生成するのではなく、パスを指定したい
-                    // TODO 例えば、checkAuthTicket => auth-ticket/check にしたい
-                    `docs/${path}/${`${name}`.replaceAll(
-                        /[A-Z]/g,
-                        (char) => `-${char.toLowerCase()}`,
-                    )}.html`,
-                ),
+                assertMenuPath(`docs/${path}/${`${usecase.path}`}.html`),
             )
         }),
     ])

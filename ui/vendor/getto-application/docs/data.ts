@@ -15,6 +15,7 @@ export interface DocsUsecaseMap<U, A, D> {
 }
 
 export type DocsUsecase<A, D> = Readonly<{
+    path: string
     title: A
     purpose: string[]
 }> &

@@ -9,6 +9,7 @@ import {
     docsSection,
     docsSection_pending,
     docsAction,
+    docsPath,
 } from "../../ui/vendor/getto-application/docs/helper"
 
 import {
@@ -29,44 +30,39 @@ import { docs_resetPassword } from "./password/reset/_ui/action_reset/docs"
 export const docs_auth = docsDomain<AuthUsecase, AuthAction, AuthData>(
     "認証・認可",
     ["業務で必要な時に使用できる", "業務内容をプライベートに保つ"],
-    ["checkAuthTicket", "authenticatePassword", "resetPassword", "logout"],
+    ["authTicket/check", "password/authenticate", "password/reset", "logout"],
     (name) => usecase[name],
 )
 
 const usecase = {
-    checkAuthTicket: docsAuthUsecase(
-        "checkAuthTicket",
+    "authTicket/check": docsAuthUsecase(
+        "authTicket/check",
         ["業務で必要な時に使用できる", "業務内容をプライベートに保つ"],
-        { action: ["checkAuthTicket", "loadApplication"], data: ["authUser", "authTicket"] },
+        { action: ["authTicket/check", "loadApplication"], data: ["authUser", "authTicket"] },
     ),
-    authenticatePassword: docsAuthUsecase(
-        "authenticatePassword",
+    "password/authenticate": docsAuthUsecase(
+        "password/authenticate",
         ["業務内容をプライベートに保つ"],
         {
-            action: ["authenticatePassword", "loadApplication"],
+            action: ["password/authenticate", "loadApplication"],
             data: ["authUser", "authTicket", "loginID", "password"],
         },
     ),
-    resetPassword: docsAuthUsecase(
-        "resetPassword",
-        ["業務で必要な時に使用できる"],
-        {
-            action: ["requestResetToken", "resetPassword", "loadApplication"],
-            data: ["authUser", "loginID", "password", "reset"],
-        },
-    ),
-    logout: docsAuthUsecase(
-        "logout",
-        ["業務内容をプライベートに保つ"],
-        { action: ["logout"], data: ["authUser", "authTicket"] },
-    ),
+    "password/reset": docsAuthUsecase("password/reset", ["業務で必要な時に使用できる"], {
+        action: ["password/reset/requestResetToken", "password/reset", "loadApplication"],
+        data: ["authUser", "loginID", "password", "reset"],
+    }),
+    logout: docsAuthUsecase("logout", ["業務内容をプライベートに保つ"], {
+        action: ["logout"],
+        data: ["authUser", "authTicket"],
+    }),
 } as const
 
 const action = {
-    checkAuthTicket: docs_checkAuthTicket,
-    authenticatePassword: docs_authenticatePassword,
-    requestResetToken: docs_requestResetToken,
-    resetPassword: docs_resetPassword,
+    "authTicket/check": docs_checkAuthTicket,
+    "password/authenticate": docs_authenticatePassword,
+    "password/reset/requestResetToken": docs_requestResetToken,
+    "password/reset": docs_resetPassword,
     logout: docs_logout,
     loadApplication: docsAction("アプリケーションのロード", ({ item }) => [
         item("input", ["コンテンツアクセストークン"], ["ブラウザに保存されたデータ"]),
@@ -92,7 +88,7 @@ function docsAuthUsecase(
     purpose: string[],
     content: DocsUsecaseDescription<AuthAction, AuthData>,
 ): DocsUsecase<AuthAction, AuthData> {
-    return docsUsecase(title, purpose, content, {
+    return docsUsecase(docsPath(title), title, purpose, content, {
         toAction: (name) => action[name],
         toData: (name) => data[name],
     })
