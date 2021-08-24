@@ -1,95 +1,77 @@
 /* eslint-disable */
-const fs = require("fs")
 const path = require("path")
 
 module.exports = {
-    findPublicEntries,
-    findHtmlFiles,
-    findSecureEntries,
+    publicEntries,
+    secureEntries,
+    linkableHtmlFiles,
 }
 
-function findPublicEntries() {
+const entries = {
+    public: [
+        { name: "avail/move-to-latest-version" /* TODO "avail/version/move-to-latest" */ },
+        { name: "avail/move-to-next-version" /* TODO "avail/version/move-to-next" */ },
+        { name: "avail/not-found" },
+        { name: "auth/sign", background: true },
+    ],
+    secure: [
+        { name: "index", /* TODO background: true */ },
+
+        { name: "auth/profile", /* TODO background: true */ },
+
+        { name: "docs/index" },
+        { name: "docs/privacy-policy" },
+
+        { name: "docs/auth/index" },
+        { name: "docs/auth/logout" },
+        { name: "docs/auth/check-auth-ticket" /* TODO "docs/auth/auth-ticket/check" */ },
+        { name: "docs/auth/authenticate-password" /* TODO "docs/auth/password/authenticate" */ },
+        { name: "docs/auth/reset-password" /* TODO "docs/auth/password/reset" */ },
+
+        { name: "docs/avail" },
+    ],
+}
+
+function publicEntries() {
+    return entries.public.reduce((acc, entry) => ({ ...acc, ...toEntry("public", entry) }), {})
+}
+function secureEntries() {
+    return entries.secure.reduce((acc, entry) => ({ ...acc, ...toEntry("secure", entry) }), {})
+}
+function linkableHtmlFiles() {
     return [
-        "avail/move-to-latest-version",
-        "avail/move-to-next-version",
-        "avail/not-found",
-        "auth/sign",
-    ].reduce(toEntry("public"), {})
+        "/storybook/index.html",
+        "/coverage/api/index.html",
+        "/coverage/ui/lcov-report/index.html",
+        ...entries.secure.map((entry) => `/${entry.name}.html`)
+    ]
 }
 
-function findHtmlFiles() {
-    const root = path.join(__dirname, "../public/dist")
-    return gatherFiles(root).map((file) => file.replace(root, ""))
-
-    function gatherFiles(dir) {
-        const files = []
-        fs.readdirSync(dir, { withFileTypes: true }).forEach((file) => {
-            if (file.isDirectory()) {
-                if (isGatherDirectory(file.name)) {
-                    gatherFiles(path.join(dir, file.name)).forEach((file) => {
-                        files.push(file)
-                    })
-                }
-            }
-            if (file.isFile()) {
-                if (file.name.endsWith(".html")) {
-                    files.push(path.join(dir, file.name))
-                }
-            }
-        })
-        return files
-
-        function isGatherDirectory(name) {
-            const target = path.join(dir, name).replace(root, "")
-            switch (target) {
-                case "/coverage":
-                case "/storybook":
-                case "/css":
-                case "/fonts":
-                    return false
-
-                default:
-                    return true
-            }
+function toEntry(root, entry) {
+    if (entry.background) {
+        return {
+            ...foregroundEntry(),
+            ...backgroundEntry(),
         }
-    }
-}
-function findSecureEntries() {
-    return findHtmlFiles()
-        .map((file) => file.replace("/", "").replace(/\.html$/, ""))
-        .reduce(toEntry("secure"), {})
-}
-
-function toEntry(root) {
-    return (acc, name) => {
-        acc[name] = toForegroundPath(name)
-
-        const worker = toBackgroundPath(name)
-        if (exists(worker)) {
-            acc[`${name}.worker`] = worker
-        }
-        return acc
+    } else {
+        return foregroundEntry()
     }
 
-    function toForegroundPath(file) {
-        return toPath("foreground", file)
+    function foregroundEntry() {
+        return buildEntry(entry.name, toPath("foreground"))
     }
-    function toBackgroundPath(file) {
-        return toPath("background", file)
+    function backgroundEntry() {
+        return buildEntry(`${entry.name}.worker`, toPath("background"))
     }
-    function toPath(type, file) {
-        return path.join(__dirname, "../../main/_ui", root, toEntryPath(file), `${type}.ts`)
+    function buildEntry(name, path) {
+        const entry = {}
+        entry[name] = path
+        return entry
     }
-    function toEntryPath(file) {
-        return file.replaceAll("-", "_")
+    function toPath(type) {
+        return path.join(__dirname, "../../main/_ui", root, entryPath(), `${type}.ts`)
     }
-
-    function exists(file) {
-        try {
-            fs.accessSync(file)
-            return true
-        } catch (err) {
-            return false
-        }
+    function entryPath() {
+        return entry.name.replaceAll("-", "_")
     }
 }

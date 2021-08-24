@@ -41,22 +41,11 @@ function envContent() {
 }
 
 function pathContent() {
-    const files = ["/storybook/index.html", "/coverage/api/index.html", "/coverage/ui/lcov-report/index.html"].concat(
-        entryPoint.findHtmlFiles(),
-    )
+    const files = entryPoint.linkableHtmlFiles()
     return [
         "export const staticMenuPath = " + JSON.stringify(files) + " as const",
         "export type StaticMenuPath = typeof staticMenuPath[number]",
     ].join("\n")
-    return ["export type StaticMenuPath =" + toTypeVariant(files)].join("\n")
-
-    function toTypeVariant(files) {
-        if (files.length === 0) {
-            return " never"
-        }
-        const padding = "\n    | "
-        return padding + files.map(JSON.stringify).join(padding)
-    }
 }
 
 function dump(file, content) {

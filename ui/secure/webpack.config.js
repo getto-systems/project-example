@@ -8,7 +8,7 @@ const environment = require("../env/environment")
 const entryPoint = require("../env/entry_point")
 
 module.exports = {
-    entry: entryPoint.findSecureEntries(),
+    entry: entryPoint.secureEntries(),
     output: {
         path: path.join(__dirname, "./dist"),
         filename: "[name].js",
