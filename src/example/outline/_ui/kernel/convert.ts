@@ -69,7 +69,7 @@ export function appendMenuCategoryPath(
     return [...path, markMenuCategoryLabel(category.label)]
 }
 export function toMenuItem({ label, icon, path }: MenuTreeItem, version: string): MenuItem {
-    return { label, icon, href: `/${version}${path}` } as MenuItem
+    return { label, icon, href: `/${version}/${path}` } as MenuItem
 }
 
 function markMenuTargetPath(target: string): MenuTargetPath {

@@ -38,12 +38,15 @@ function publicEntries() {
 function secureEntries() {
     return entries.secure.reduce((acc, entry) => ({ ...acc, ...toEntry("secure", entry) }), {})
 }
+function secureHtmlFiles() {
+    return entries.secure.map((entry) => `${entry.name}.html`)
+}
 function linkableHtmlFiles() {
     return [
-        "/storybook/index.html",
-        "/coverage/api/index.html",
-        "/coverage/ui/lcov-report/index.html",
-        ...entries.secure.map((entry) => `/${entry.name}.html`)
+        "storybook/index.html",
+        "coverage/api/index.html",
+        "coverage/ui/lcov-report/index.html",
+        ...secureHtmlFiles(),
     ]
 }
 
