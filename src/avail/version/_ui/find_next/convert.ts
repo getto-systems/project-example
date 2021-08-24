@@ -8,12 +8,22 @@ export function detectApplicationTargetPath(
     const prefix = `/${version}/`
     const pathname = currentURL.pathname
     if (!pathname.startsWith(prefix)) {
-        return { valid: false }
+        // TODO これの接続テストをしていない
+        const target = currentURL.searchParams.get("-application-target")
+        if (target === null) {
+            return { valid: false }
+        } else {
+            return { valid: true, value: mark(target) }
+        }
     }
 
     return {
         valid: true,
-        value: markApplicationTargetPath(pathname.replace(prefix, "/"), currentURL.search, currentURL.hash),
+        value: mark([pathname.replace(prefix, "/"), currentURL.search, currentURL.hash].join("")),
+    }
+
+    function mark(target: string): ApplicationTargetPath {
+        return target as ApplicationTargetPath
     }
 }
 
@@ -38,10 +48,6 @@ export function versionConfigConverter(version: string): ParseVersionResult {
         const suffix = patch.replace(/^[0-9]+/, "")
         return [suffix, ...additional].join(".")
     }
-}
-
-function markApplicationTargetPath(pathname: string, search: string, hash: string): ApplicationTargetPath {
-    return [pathname, search, hash].join("") as ApplicationTargetPath
 }
 
 type Version_data = Readonly<{ major: number; minor: number; patch: number; suffix: string }>

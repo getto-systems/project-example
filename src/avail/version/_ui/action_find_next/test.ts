@@ -213,6 +213,24 @@ describe("FindNextVersion", () => {
         expect(applicationPath("1.0.0", { valid: false })).toEqual("/1.0.0/index.html")
     })
 
+    test("specify target", async () => {
+        const { view } = specifyTarget()
+        const resource = view.resource
+
+        const runner = setupActionTestRunner(resource.subscriber)
+
+        await runner(() => resource.ignite()).then((stack) => {
+            expect(stack).toEqual([
+                {
+                    type: "succeed-to-find",
+                    upToDate: true,
+                    version: "1.0.0-ui",
+                    target: { valid: true, value: "/path/to/target.html?search=parameter#hash" },
+                },
+            ])
+        })
+    })
+
     test("terminate", async () => {
         const { view } = standard()
 
@@ -230,27 +248,26 @@ describe("FindNextVersion", () => {
 
 function standard() {
     const view = initView(standard_URL(), standard_version(), standard_check())
-
     return { view }
 }
 function found(versions: string[]) {
     const view = initView(standard_URL(), standard_version(), found_check(versions))
-
     return { view }
 }
 function foundComplex(versions: string[]) {
     const view = initView(complex_URL(), complex_Version(), found_check(versions))
-
     return { view }
 }
 function invalidVersion() {
     const view = initView(invalidVersion_URL(), standard_version(), standard_check())
-
     return { view }
 }
 function takeLongtime() {
     const view = initView(standard_URL(), standard_version(), takeLongtime_check())
-
+    return { view }
+}
+function specifyTarget() {
+    const view = initView(specifyTarget_URL(), standard_version(), standard_check())
     return { view }
 }
 
@@ -289,6 +306,10 @@ function complex_URL(): URL {
 }
 function invalidVersion_URL(): URL {
     return new URL("https://example.com/invalid.html?search=parameter#hash")
+}
+function specifyTarget_URL(): URL {
+    const path = encodeURIComponent("/path/to/target.html?search=parameter#hash")
+    return new URL(`https://example.com/index.html?-application-target=${path}`)
 }
 
 function standard_check(): CheckDeployExistsRemote {
