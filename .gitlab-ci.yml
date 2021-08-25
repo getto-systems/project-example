@@ -471,16 +471,16 @@ bump_version-example:
     refs:
       - triggers
     variables:
-      - $RELEASE_AUTH
+      - $RELEASE_EXAMPLE
 
   image: buildpack-deps:buster-scm
 
   variables:
     BUMP_VERSION_SUFFIX: "-example"
-    BUMP_VERSION_FILE: $AUTH_BUMP_VERSION_FILE
-    BUMP_IGNORE_FILE: $AUTH_BUMP_IGNORE_FILE
-    BUMP_MAJOR_FILE: $AUTH_BUMP_MAJOR_FILE
-    BUMP_SCRIPT: $AUTH_BUMP_SCRIPT
+    BUMP_VERSION_FILE: $EXAMPLE_BUMP_VERSION_FILE
+    BUMP_IGNORE_FILE: $EXAMPLE_BUMP_IGNORE_FILE
+    BUMP_MAJOR_FILE: $EXAMPLE_BUMP_MAJOR_FILE
+    BUMP_SCRIPT: $EXAMPLE_BUMP_SCRIPT
 
   before_script:
     - git config user.email admin@getto.systems
@@ -506,7 +506,7 @@ release-example:
   image: buildpack-deps:buster-scm
 
   variables:
-    BUMP_VERSION_FILE: $AUTH_BUMP_VERSION_FILE
+    BUMP_VERSION_FILE: $EXAMPLE_BUMP_VERSION_FILE
 
   script:
     - curl $TRELLIS_CI_BUMP_VERSION/push_tags.sh | sh
@@ -572,7 +572,7 @@ release_success-example:
   before_script:
     - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
     - export channel=$SLACK_CHANNEL
-    - export version=example:$(cat $AUTH_BUMP_VERSION_FILE)
+    - export version=example:$(cat $EXAMPLE_BUMP_VERSION_FILE)
   script:
     - curl $TRELLIS_PSYCHER_GETTO/notify-release-success.sh | sh -s -- $url $channel $version
 
@@ -594,6 +594,6 @@ release_failure-example:
   before_script:
     - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
     - export channel=$SLACK_CHANNEL
-    - export version=example:$(cat $AUTH_BUMP_VERSION_FILE)
+    - export version=example:$(cat $EXAMPLE_BUMP_VERSION_FILE)
   script:
     - curl $TRELLIS_PSYCHER_GETTO/notify-release-failure.sh | sh -s -- $url $channel $version
