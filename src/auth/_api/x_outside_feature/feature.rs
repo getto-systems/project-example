@@ -3,7 +3,7 @@ pub struct AuthOutsideFeature {
     pub(in crate::auth) cookie: AuthOutsideCookie,
 }
 pub struct AuthOutsideService {
-    pub auth_service_url: &'static str,
+    pub service_url: &'static str,
 }
 pub struct AuthOutsideCookie {
     pub domain: &'static str,

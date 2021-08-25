@@ -19,14 +19,14 @@ use crate::auth::{
 };
 
 pub struct TonicAuthenticatePasswordService<'a> {
-    auth_service_url: &'static str,
+    service_url: &'static str,
     request_id: &'a str,
 }
 
 impl<'a> TonicAuthenticatePasswordService<'a> {
     pub const fn new(service: &'a AuthOutsideService, request_id: &'a str) -> Self {
         Self {
-            auth_service_url: service.auth_service_url,
+            service_url: service.service_url,
             request_id,
         }
     }
@@ -40,7 +40,7 @@ impl<'a> AuthenticatePasswordService for TonicAuthenticatePasswordService<'a> {
         token: Option<AuthToken>,
         fields: AuthenticatePasswordFieldsExtract,
     ) -> Result<AuthenticatePasswordResponse, AuthServiceError> {
-        let mut client = AuthenticatePasswordPbClient::connect(self.auth_service_url)
+        let mut client = AuthenticatePasswordPbClient::connect(self.service_url)
             .await
             .map_err(infra_error)?;
 

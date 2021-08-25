@@ -15,14 +15,14 @@ use crate::example::{
 };
 
 pub struct TonicGetOutlineMenuBadgeService<'a> {
-    outline_service_url: &'static str,
+    service_url: &'static str,
     request_id: &'a str,
 }
 
 impl<'a> TonicGetOutlineMenuBadgeService<'a> {
     pub const fn new(service: &'a ExampleOutsideService, request_id: &'a str) -> Self {
         Self {
-            outline_service_url: service.outline_service_url,
+            service_url: service.service_url,
             request_id,
         }
     }
@@ -31,7 +31,7 @@ impl<'a> TonicGetOutlineMenuBadgeService<'a> {
 #[async_trait::async_trait]
 impl<'a> GetOutlineMenuBadgeService for TonicGetOutlineMenuBadgeService<'a> {
     async fn get_menu(&self) -> Result<OutlineMenuBadge, ExampleServiceError> {
-        let mut client = GetMenuBadgePbClient::connect(self.outline_service_url)
+        let mut client = GetMenuBadgePbClient::connect(self.service_url)
             .await
             .map_err(infra_error)?;
 
