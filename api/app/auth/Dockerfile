@@ -14,5 +14,5 @@ RUN : && \
   :
 
 FROM gcr.io/distroless/static-debian10
-COPY --from=builder /build/target/x86_64-unknown-linux-musl/release/example-auth /app
+COPY --from=builder /build/target/x86_64-unknown-linux-musl/release/auth /app
 CMD ["/app"]
