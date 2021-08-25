@@ -18,14 +18,14 @@ use crate::auth::{
 };
 
 pub struct TonicRequestResetTokenService<'a> {
-    auth_service_url: &'static str,
+    service_url: &'static str,
     request_id: &'a str,
 }
 
 impl<'a> TonicRequestResetTokenService<'a> {
     pub const fn new(service: &'a AuthOutsideService, request_id: &'a str) -> Self {
         Self {
-            auth_service_url: service.auth_service_url,
+            service_url: service.service_url,
             request_id,
         }
     }
@@ -38,7 +38,7 @@ impl<'a> RequestResetTokenService for TonicRequestResetTokenService<'a> {
         nonce: Option<AuthNonce>,
         fields: RequestResetTokenFieldsExtract,
     ) -> Result<RequestResetTokenResponse, AuthServiceError> {
-        let mut client = RequestResetTokenPbClient::connect(self.auth_service_url)
+        let mut client = RequestResetTokenPbClient::connect(self.service_url)
             .await
             .map_err(infra_error)?;
 

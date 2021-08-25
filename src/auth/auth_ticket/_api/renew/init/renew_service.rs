@@ -19,14 +19,14 @@ use crate::auth::{
 };
 
 pub struct TonicRenewAuthTicketService<'a> {
-    auth_service_url: &'static str,
+    service_url: &'static str,
     request_id: &'a str,
 }
 
 impl<'a> TonicRenewAuthTicketService<'a> {
     pub const fn new(service: &'a AuthOutsideService, request_id: &'a str) -> Self {
         Self {
-            auth_service_url: service.auth_service_url,
+            service_url: service.service_url,
             request_id,
         }
     }
@@ -39,7 +39,7 @@ impl<'a> RenewAuthTicketService for TonicRenewAuthTicketService<'a> {
         nonce: Option<AuthNonce>,
         token: Option<AuthToken>,
     ) -> Result<AuthTicketEncoded, AuthServiceError> {
-        let mut client = RenewAuthTicketPbClient::connect(self.auth_service_url)
+        let mut client = RenewAuthTicketPbClient::connect(self.service_url)
             .await
             .map_err(infra_error)?;
 
