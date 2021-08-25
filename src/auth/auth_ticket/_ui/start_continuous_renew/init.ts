@@ -1,3 +1,5 @@
+import { auth_config } from "../../../_ui/x_outside_feature/config"
+
 import { newRenewAuthTicketRemote } from "../kernel/init/remote/renew"
 import { newAuthzRepository } from "../kernel/init/repository/authz"
 import { newAuthnRepository } from "../kernel/init/repository/authn"
@@ -7,7 +9,6 @@ import { newClock } from "../../../../z_details/_ui/clock/init"
 import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"
 import { RepositoryOutsideFeature } from "../../../../z_details/_ui/repository/feature"
 
-import { expireMinute, intervalMinute } from "../../../../z_details/_ui/config/infra"
 import { StartContinuousRenewInfra } from "./infra"
 
 type OutsideFeature = RepositoryOutsideFeature & RemoteOutsideFeature
@@ -20,8 +21,8 @@ export function newStartContinuousRenewAuthnInfoInfra(
         renew: newRenewAuthTicketRemote(feature, newClock()),
         clock: newClock(),
         config: {
-            authnExpire: expireMinute(1),
-            interval: intervalMinute(2),
+            authnExpire: auth_config.authnExpire,
+            continuousRenewInterval: auth_config.continuousRenewInterval,
         },
     }
 }

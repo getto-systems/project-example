@@ -8,7 +8,7 @@ export type StartContinuousRenewInfra = Readonly<{
     renew: RenewAuthTicketRemote
     clock: Clock
     config: Readonly<{
-        interval: IntervalTime
+        continuousRenewInterval: IntervalTime
         authnExpire: ExpireTime
     }>
 }>

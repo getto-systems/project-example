@@ -1,7 +1,7 @@
 import { env } from "../../../../../y_environment/_ui/env"
 import { toURL } from "../../../../../z_details/_ui/location/init"
 
-import { GetScriptPathInfra } from "./infra"
+import { GetScriptPathInfra, SecureServerURL } from "./infra"
 
 import { GetScriptPathDetecter } from "./method"
 import { LocationOutsideFeature } from "../../../../../z_details/_ui/location/feature"
@@ -17,7 +17,7 @@ export function newGetScriptPathLocationDetecter(
 export function newGetSecureScriptPathInfra(): GetScriptPathInfra {
     return {
         config: {
-            secureServerURL: env.secureServerURL,
+            secureServerURL: env.secureServerURL as SecureServerURL,
         },
     }
 }

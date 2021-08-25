@@ -4,8 +4,10 @@ import { ticker } from "../../../../z_details/_ui/timer/helper"
 
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_details/_ui/clock/mock"
 import { mockAuthnRepository, mockAuthzRepository } from "../kernel/init/repository/mock"
-
-import { mockGetScriptPathDetecter } from "../../../_ui/common/secure/get_script_path/mock"
+import {
+    mockGetScriptPathDetecter,
+    mockSecureServerURL,
+} from "../../../_ui/common/secure/get_script_path/mock"
 
 import { initCheckAuthTicketAction, initCheckAuthTicketMaterial } from "./init"
 
@@ -266,14 +268,14 @@ function initView(
                     authz,
                     renew,
                     config: {
-                        interval: { interval_millisecond: 128 },
+                        continuousRenewInterval: { interval_millisecond: 128 },
                         authnExpire: { expire_millisecond: 1 * 1000 },
                     },
                     clock,
                 },
                 getSecureScriptPath: {
                     config: {
-                        secureServerURL: "https://secure.example.com",
+                        secureServerURL: mockSecureServerURL("https://secure.example.com"),
                     },
                 },
             }),

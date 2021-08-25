@@ -9,11 +9,13 @@ import {
     mockAuthnRepository,
     mockAuthzRepository,
 } from "../../../../auth_ticket/_ui/kernel/init/repository/mock"
+import {
+    mockGetScriptPathDetecter,
+    mockSecureServerURL,
+} from "../../../../_ui/common/secure/get_script_path/mock"
+import { mockResetPasswordLocationDetecter } from "../reset/mock"
 
 import { initResetPasswordAction, initResetPasswordMaterial } from "./init"
-
-import { mockGetScriptPathDetecter } from "../../../../_ui/common/secure/get_script_path/mock"
-import { mockResetPasswordLocationDetecter } from "../reset/mock"
 
 import { Clock } from "../../../../../z_details/_ui/clock/infra"
 import { ResetPasswordRemote, ResetPasswordRemoteResult } from "../reset/infra"
@@ -244,14 +246,14 @@ function initView(
                     authz,
                     renew,
                     config: {
-                        interval: { interval_millisecond: 64 },
+                        continuousRenewInterval: { interval_millisecond: 64 },
                         authnExpire: { expire_millisecond: 500 },
                     },
                     clock,
                 },
                 getSecureScriptPath: {
                     config: {
-                        secureServerURL: "https://secure.example.com",
+                        secureServerURL: mockSecureServerURL("https://secure.example.com"),
                     },
                 },
                 reset: {

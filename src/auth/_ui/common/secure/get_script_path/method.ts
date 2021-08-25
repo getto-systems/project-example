@@ -23,5 +23,5 @@ export const getScriptPath: GetSecureScriptPath = (infra) => (pathname) => {
         return { valid: false }
     }
 
-    return { valid: true, value: toScriptPath(pathname.value, config) }
+    return { valid: true, value: toScriptPath(pathname.value, config.secureServerURL) }
 }

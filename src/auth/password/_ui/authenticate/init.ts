@@ -1,9 +1,10 @@
+import { auth_config } from "../../../_ui/x_outside_feature/config"
+
 import { newAuthenticatePasswordRemote } from "./init/remote/authenticate"
 import { newClock } from "../../../../z_details/_ui/clock/init"
 
 import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"
 
-import { delaySecond } from "../../../../z_details/_ui/config/infra"
 import { AuthenticatePasswordInfra } from "./infra"
 
 export function newAuthenticatePasswordInfra(
@@ -12,7 +13,7 @@ export function newAuthenticatePasswordInfra(
     return {
         authenticate: newAuthenticatePasswordRemote(feature, newClock()),
         config: {
-            takeLongtimeThreshold: delaySecond(1),
+            takeLongtimeThreshold: auth_config.takeLongtimeThreshold,
         },
     }
 }
