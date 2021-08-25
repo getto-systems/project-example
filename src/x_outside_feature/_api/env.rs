@@ -6,7 +6,6 @@ pub struct Env {
     pub domain: String,
     pub origin: String,
 
-    pub cloudfront_resource: String,
     pub cloudfront_key_pair_id: String,
 
     pub auth_service_url: String,
@@ -21,7 +20,6 @@ impl Env {
             domain: load("DOMAIN"),
             origin: load("ORIGIN"),
 
-            cloudfront_resource: load("CLOUDFRONT_RESOURCE"),
             cloudfront_key_pair_id: load("SECRET_CLOUDFRONT_KEY_PAIR_ID"),
 
             auth_service_url: load("AUTH_SERVICE_URL"),

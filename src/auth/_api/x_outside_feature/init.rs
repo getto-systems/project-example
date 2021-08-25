@@ -10,7 +10,6 @@ pub async fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
         cookie: AuthOutsideCookie {
             domain: &env.domain,
             cloudfront_key_pair_id: &env.cloudfront_key_pair_id,
-            cloudfront_resource: &env.cloudfront_resource,
         },
     }
 }
