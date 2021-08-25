@@ -22,8 +22,8 @@ build_main() {
 
   tag=${host}/${project}/${image}:${version}
 
-  docker build -t $tag . &&
-  docker push $tag
+  docker build -f api/Dockerfile -t $tag . &&
+    docker push $tag
 }
 
 build_main
