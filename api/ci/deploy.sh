@@ -27,7 +27,7 @@ deploy_main() {
 
   project=getto-projects
   image=example/${target}
-  version=$(cat $api/app/${target}/VERSION)
+  version=$(cat api/app/${target}/VERSION)
 
   tag=${host}/${project}/${image}:${version}
 
