@@ -6,6 +6,14 @@ build_main() {
     exit 1
   fi
 
+  local target
+  target=$1
+
+  if [ -z "$target" ]; then
+    echo "usage: build.sh <api | auth | example>"
+    exit 1
+  fi
+
   local host
   local project
   local image
@@ -17,13 +25,13 @@ build_main() {
   cat $GOOGLE_CLOUD_SERVICE_ACCOUNT_KEY_JSON | docker login -u _json_key --password-stdin https://${host}
 
   project=getto-projects
-  image=example/api
-  version=$(cat $API_BUMP_VERSION_FILE)
+  image=example/${target}
+  version=$(cat $api/app/${target}/VERSION)
 
   tag=${host}/${project}/${image}:${version}
 
-  docker build -f api/Dockerfile -t $tag . &&
+  docker build -f api/app/${target}/Dockerfile -t $tag . &&
     docker push $tag
 }
 
-build_main
+build_main "$@"

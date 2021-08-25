@@ -6,6 +6,14 @@ deploy_main() {
     exit 1
   fi
 
+  local target
+  target=$1
+
+  if [ -z "$target" ]; then
+    echo "usage: build.sh <api | auth | example>"
+    exit 1
+  fi
+
   local host
   local region
   local project
@@ -18,15 +26,15 @@ deploy_main() {
   region=asia-northeast1
 
   project=getto-projects
-  image=example/api
-  version=$(cat $API_BUMP_VERSION_FILE)
+  image=example/${target}
+  version=$(cat $api/app/${target}/VERSION)
 
   tag=${host}/${project}/${image}:${version}
 
   export HOME=$(pwd)
 
   gcloud auth activate-service-account --key-file=${GOOGLE_CLOUD_SERVICE_ACCOUNT_KEY_JSON}
-  gcloud run deploy example-api --image="$tag" --platform=managed --region="$region" --project="$project"
+  gcloud run deploy example-${target} --image="$tag" --platform=managed --region="$region" --project="$project"
 }
 
-deploy_main
+deploy_main "$@"
