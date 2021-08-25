@@ -8,5 +8,4 @@ pub struct AuthOutsideService {
 pub struct AuthOutsideCookie {
     pub domain: &'static str,
     pub cloudfront_key_pair_id: &'static str,
-    pub cloudfront_resource: &'static str,
 }
