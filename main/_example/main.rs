@@ -30,7 +30,7 @@ async fn main() {
         )
         .add_service(server.example.outline.get_menu_badge())
         .serve(
-            format!("127.0.0.1:{}", &ENV.port)
+            format!("0.0.0.0:{}", &ENV.port)
                 .parse()
                 .expect("failed to parse socket addr"),
         )
