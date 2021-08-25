@@ -16,13 +16,21 @@ variables:
   TRELLIS_PSYCHER_GETTO: https://trellis.getto.systems/psycher/getto/2.7.2
   BUMP_MAINT_REPO: .bump-maint-repo
   UI_BUMP_VERSION_FILE: ui/VERSION
-  UI_BUMP_IGNORE_FILE: ui/bump/ignore
-  UI_BUMP_MAJOR_FILE: ui/bump/major
-  UI_BUMP_SCRIPT: ui/bump/bump.sh
-  API_BUMP_VERSION_FILE: api/VERSION
-  API_BUMP_IGNORE_FILE: api/bump/ignore
-  API_BUMP_MAJOR_FILE: api/bump/major
-  API_BUMP_SCRIPT: api/bump/bump.sh
+  UI_BUMP_IGNORE_FILE:  ui/bump/ignore
+  UI_BUMP_MAJOR_FILE:   ui/bump/major
+  UI_BUMP_SCRIPT:       ui/bump/bump.sh
+  API_BUMP_VERSION_FILE: api/app/api/VERSION
+  API_BUMP_IGNORE_FILE:  api/app/api/bump/ignore
+  API_BUMP_MAJOR_FILE:   api/app/api/bump/major
+  API_BUMP_SCRIPT:       api/app/api/bump/bump.sh
+  AUTH_BUMP_VERSION_FILE: api/app/auth/VERSION
+  AUTH_BUMP_IGNORE_FILE:  api/app/auth/bump/ignore
+  AUTH_BUMP_MAJOR_FILE:   api/app/auth/bump/major
+  AUTH_BUMP_SCRIPT:       api/app/auth/bump/bump.sh
+  EXAMPLE_BUMP_VERSION_FILE: api/app/example/VERSION
+  EXAMPLE_BUMP_IGNORE_FILE:  api/app/example/bump/ignore
+  EXAMPLE_BUMP_MAJOR_FILE:   api/app/example/bump/major
+  EXAMPLE_BUMP_SCRIPT:       api/app/example/bump/bump.sh
 
 migrate:
   stage: migrate
@@ -225,7 +233,7 @@ release-api:
     refs:
       - release@getto-systems-base/projects/example
     changes:
-      - api/VERSION
+      - api/app/api/VERSION
   except:
     refs:
       - triggers
@@ -245,7 +253,7 @@ release_build-api:
     refs:
       - release@getto-systems-base/projects/example
     changes:
-      - api/VERSION
+      - api/app/api/VERSION
   except:
     refs:
       - triggers
@@ -269,7 +277,7 @@ release_deploy-api:
     refs:
       - release@getto-systems-base/projects/example
     changes:
-      - api/VERSION
+      - api/app/api/VERSION
   except:
     refs:
       - triggers
@@ -288,7 +296,7 @@ release_success-api:
     refs:
       - release@getto-systems-base/projects/example
     changes:
-      - api/VERSION
+      - api/app/api/VERSION
   except:
     refs:
       - triggers
@@ -310,7 +318,7 @@ release_failure-api:
     refs:
       - release@getto-systems-base/projects/example
     changes:
-      - api/VERSION
+      - api/app/api/VERSION
   except:
     refs:
       - triggers
@@ -323,5 +331,138 @@ release_failure-api:
     - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
     - export channel=$SLACK_CHANNEL
     - export version=example:$(cat $API_BUMP_VERSION_FILE)
+  script:
+    - curl $TRELLIS_PSYCHER_GETTO/notify-release-failure.sh | sh -s -- $url $channel $version
+
+bump_version-auth:
+  stage: bump_version
+  only:
+    refs:
+      - triggers
+    variables:
+      - $RELEASE_AUTH
+
+  image: buildpack-deps:buster-scm
+
+  variables:
+    BUMP_VERSION_SUFFIX: "-auth"
+    BUMP_VERSION_FILE: $AUTH_BUMP_VERSION_FILE
+    BUMP_IGNORE_FILE: $AUTH_BUMP_IGNORE_FILE
+    BUMP_MAJOR_FILE: $AUTH_BUMP_MAJOR_FILE
+    BUMP_SCRIPT: $AUTH_BUMP_SCRIPT
+
+  before_script:
+    - git config user.email admin@getto.systems
+    - git config user.name getto
+    - curl $TRELLIS_GIT_POST/setup.sh | sh -s -- ./vendor/getto-systems
+    - export PATH=$PATH:./vendor/getto-systems/git-post/bin
+  script:
+    - curl $TRELLIS_CI_BUMP_VERSION/bump_version.sh | bash
+    - curl $TRELLIS_CI_BUMP_VERSION/request.sh | bash -s -- ./auth/bump/message.sh
+
+release-auth:
+  stage: release
+  only:
+    refs:
+      - release@getto-systems-base/projects/example
+    changes:
+      - api/app/auth/VERSION
+  except:
+    refs:
+      - triggers
+      - schedules
+
+  image: buildpack-deps:buster-scm
+
+  variables:
+    BUMP_VERSION_FILE: $AUTH_BUMP_VERSION_FILE
+
+  script:
+    - curl $TRELLIS_CI_BUMP_VERSION/push_tags.sh | sh
+
+release_build-auth:
+  stage: release_build
+  only:
+    refs:
+      - release@getto-systems-base/projects/example
+    changes:
+      - api/app/auth/VERSION
+  except:
+    refs:
+      - triggers
+      - schedules
+
+  image: docker:stable
+
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+
+  services:
+    - docker:dind
+
+  script:
+    - auth/ci/build.sh
+
+release_deploy-auth:
+  stage: release_deploy
+  only:
+    refs:
+      - release@getto-systems-base/projects/example
+    changes:
+      - api/app/auth/VERSION
+  except:
+    refs:
+      - triggers
+      - schedules
+  when: on_success
+
+  image: google/cloud-sdk:latest
+
+  script:
+    - auth/ci/deploy.sh
+
+
+release_success-auth:
+  stage: release_notify
+  only:
+    refs:
+      - release@getto-systems-base/projects/example
+    changes:
+      - api/app/auth/VERSION
+  except:
+    refs:
+      - triggers
+      - schedules
+  when: on_success
+
+  image: buildpack-deps:buster-curl
+
+  before_script:
+    - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
+    - export channel=$SLACK_CHANNEL
+    - export version=example:$(cat $AUTH_BUMP_VERSION_FILE)
+  script:
+    - curl $TRELLIS_PSYCHER_GETTO/notify-release-success.sh | sh -s -- $url $channel $version
+
+release_failure-auth:
+  stage: release_notify
+  only:
+    refs:
+      - release@getto-systems-base/projects/example
+    changes:
+      - api/app/auth/VERSION
+  except:
+    refs:
+      - triggers
+      - schedules
+  when: on_failure
+
+  image: buildpack-deps:buster-curl
+
+  before_script:
+    - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
+    - export channel=$SLACK_CHANNEL
+    - export version=example:$(cat $AUTH_BUMP_VERSION_FILE)
   script:
     - curl $TRELLIS_PSYCHER_GETTO/notify-release-failure.sh | sh -s -- $url $channel $version

@@ -8,10 +8,11 @@ RUN : && \
   && \
   :
 RUN : && \
+  rustup component add rustfmt && \
   rustup target add x86_64-unknown-linux-musl && \
-  cargo build --release --target x86_64-unknown-linux-musl && \
+  cargo build --bin example --release --target x86_64-unknown-linux-musl && \
   :
 
 FROM gcr.io/distroless/static-debian10
-COPY --from=builder /build/target/x86_64-unknown-linux-musl/release/example-api /app
+COPY --from=builder /build/target/x86_64-unknown-linux-musl/release/example-example /app
 CMD ["/app"]
