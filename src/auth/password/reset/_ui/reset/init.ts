@@ -1,3 +1,5 @@
+import { auth_config } from "../../../../_ui/x_outside_feature/config"
+
 import { newResetPasswordRemote } from "./init/remote/reset"
 
 import { newClock } from "../../../../../z_details/_ui/clock/init"
@@ -8,7 +10,6 @@ import { ResetPasswordDetecter } from "./method"
 import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/feature"
 import { LocationOutsideFeature } from "../../../../../z_details/_ui/location/feature"
 
-import { delaySecond } from "../../../../../z_details/_ui/config/infra"
 import { ResetPasswordInfra } from "./infra"
 
 import { detectResetToken } from "../../../_ui/convert"
@@ -23,7 +24,7 @@ export function newResetPasswordInfra(feature: RemoteOutsideFeature): ResetPassw
     return {
         reset: newResetPasswordRemote(feature, newClock()),
         config: {
-            takeLongtimeThreshold: delaySecond(1),
+            takeLongtimeThreshold: auth_config.takeLongtimeThreshold,
         },
     }
 }

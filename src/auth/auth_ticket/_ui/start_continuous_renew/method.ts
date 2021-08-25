@@ -43,7 +43,7 @@ export const startContinuousRenew: Start = (infra) => (post) => {
                 clearInterval(timer)
                 resolve(state)
             }
-        }, config.interval.interval_millisecond)
+        }, config.continuousRenewInterval.interval_millisecond)
 
         post({ type: "succeed-to-start-continuous-renew", continue: true })
     })

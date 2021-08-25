@@ -3,10 +3,12 @@ import { toApplicationView } from "../../../../../ui/vendor/getto-application/ac
 import { ticker } from "../../../../z_details/_ui/timer/helper"
 
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_details/_ui/clock/mock"
-
 import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/init/mock"
-import { mockGetScriptPathDetecter } from "../../../_ui/common/secure/get_script_path/mock"
+import {
+    mockGetScriptPathDetecter,
+    mockSecureServerURL,
+} from "../../../_ui/common/secure/get_script_path/mock"
 import {
     mockAuthnRepository,
     mockAuthzRepository,
@@ -221,14 +223,14 @@ function initView(
                     authz,
                     renew,
                     config: {
-                        interval: { interval_millisecond: 128 },
+                        continuousRenewInterval: { interval_millisecond: 128 },
                         authnExpire: { expire_millisecond: 500 },
                     },
                     clock,
                 },
                 getSecureScriptPath: {
                     config: {
-                        secureServerURL: "https://secure.example.com",
+                        secureServerURL: mockSecureServerURL("https://secure.example.com"),
                     },
                 },
                 authenticate: {

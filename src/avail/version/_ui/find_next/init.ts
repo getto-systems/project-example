@@ -1,4 +1,5 @@
 import { env } from "../../../../y_environment/_ui/env"
+import { avail_config } from "../../../_ui/x_outside_feature/config"
 
 import { toURL } from "../../../../z_details/_ui/location/init"
 
@@ -24,7 +25,7 @@ export function newFindNextVersionInfra(): FindNextVersionInfra {
         versionSuffix: env.versionSuffix,
         check: newCheckDeployExistsRemote(),
         config: {
-            takeLongtimeThreshold: { delay_millisecond: 300 },
+            takeLongtimeThreshold: avail_config.takeLongtimeThreshold,
         },
     }
 }
