@@ -1,0 +1,13 @@
+/*
+*.ts
+*.js
+
+!/src/
+
+!/api/
+/api/*
+!/api/vendor
+
+!/ui/
+/ui/*
+!/ui/vendor
