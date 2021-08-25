@@ -35,7 +35,7 @@ async fn main() {
         .add_service(server.auth.password.reset.request_token())
         .add_service(server.auth.password.reset.reset())
         .serve(
-            format!("127.0.0.1:{}", &ENV.port)
+            format!("0.0.0.0:{}", &ENV.port)
                 .parse()
                 .expect("failed to parse socket addr"),
         )
