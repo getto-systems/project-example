@@ -35,7 +35,8 @@ export function fetchOptions(params: RemoteFetchParams): RemoteFetchOptions {
 }
 
 export function generateNonce(feature: RemoteOutsideFeature): RemoteNonce {
-    return feature.webCrypto.getRandomValues(new Uint32Array(4)).join("-")
+    const { webCrypto } = feature
+    return webCrypto.getRandomValues(new Uint32Array(4)).join("-")
 }
 
 export function remoteCommonError(status: number): RemoteErrorResult<RemoteCommonError> {
