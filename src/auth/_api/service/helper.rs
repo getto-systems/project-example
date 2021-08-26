@@ -111,6 +111,7 @@ pub fn set_authorization<T>(
     token: Option<String>,
 ) -> Result<(), AuthServiceError> {
     if let Some(token) = token {
+        panic!("{}", token);
         request.metadata_mut().append(
             "authorization",
             MetadataValue::from_str(&format!("Bearer {}", token)).map_err(infra_error)?,
