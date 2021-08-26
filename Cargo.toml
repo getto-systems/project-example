@@ -1,6 +1,6 @@
 [package]
 name = "example-api"
-version = "0.39.0-api"
+version = "0.40.0-api"
 authors = ["shun <shun.fix9@gmail.com>"]
 edition = "2018"
 build = "api/setup/build.rs"
