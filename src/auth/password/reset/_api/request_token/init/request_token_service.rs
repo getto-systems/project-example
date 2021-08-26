@@ -6,7 +6,7 @@ use crate::auth::password::reset::_common::y_protobuf::service::{
     request_reset_token_pb_client::RequestResetTokenPbClient, RequestResetTokenRequestPb,
 };
 
-use crate::auth::_api::service::helper::{infra_error, set_metadata};
+use crate::auth::_api::service::helper::{infra_error, new_endpoint, set_metadata};
 
 use crate::auth::password::reset::{
     _api::request_token::infra::{RequestResetTokenResponse, RequestResetTokenService},
@@ -38,9 +38,12 @@ impl<'a> RequestResetTokenService for TonicRequestResetTokenService<'a> {
         nonce: Option<AuthNonce>,
         fields: RequestResetTokenFieldsExtract,
     ) -> Result<RequestResetTokenResponse, AuthServiceError> {
-        let mut client = RequestResetTokenPbClient::connect(self.service_url)
-            .await
-            .map_err(infra_error)?;
+        let mut client = RequestResetTokenPbClient::new(
+            new_endpoint(self.service_url)?
+                .connect()
+                .await
+                .map_err(infra_error)?,
+        );
 
         let mut request = Request::new(RequestResetTokenRequestPb {
             login_id: fields.login_id,

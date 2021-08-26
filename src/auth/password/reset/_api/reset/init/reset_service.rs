@@ -6,7 +6,7 @@ use crate::auth::password::reset::_common::y_protobuf::service::{
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideService;
 
-use crate::auth::_api::service::helper::{infra_error, set_metadata};
+use crate::auth::_api::service::helper::{infra_error, new_endpoint, set_metadata};
 
 use crate::auth::password::reset::{
     _api::reset::infra::{ResetPasswordResponse, ResetPasswordService},
@@ -40,9 +40,12 @@ impl<'a> ResetPasswordService for TonicResetPasswordService<'a> {
         token: Option<AuthToken>,
         fields: ResetPasswordFieldsExtract,
     ) -> Result<ResetPasswordResponse, AuthServiceError> {
-        let mut client = ResetPasswordPbClient::connect(self.service_url)
-            .await
-            .map_err(infra_error)?;
+        let mut client = ResetPasswordPbClient::new(
+            new_endpoint(self.service_url)?
+                .connect()
+                .await
+                .map_err(infra_error)?,
+        );
 
         let mut request = Request::new(ResetPasswordRequestPb {
             reset_token: fields.reset_token,
@@ -51,9 +54,14 @@ impl<'a> ResetPasswordService for TonicResetPasswordService<'a> {
         });
         set_metadata(&mut request, self.request_id, nonce, token)?;
 
-        let response = client.reset(request).await.map_err(AuthServiceError::from)?;
+        let response = client
+            .reset(request)
+            .await
+            .map_err(AuthServiceError::from)?;
         let response: Option<ResetPasswordResponse> = response.into_inner().into();
-        response.ok_or(AuthServiceError::InfraError("failed to decode response".into()))
+        response.ok_or(AuthServiceError::InfraError(
+            "failed to decode response".into(),
+        ))
     }
 }
 
@@ -70,7 +78,7 @@ pub mod test {
         _api::service::data::AuthServiceError,
         auth_ticket::_common::{
             encode::data::AuthTicketEncoded,
-            kernel::data::{AuthNonce, AuthTokenEncoded, AuthTokenExtract, AuthToken},
+            kernel::data::{AuthNonce, AuthToken, AuthTokenEncoded, AuthTokenExtract},
         },
         auth_user::_common::kernel::data::AuthUser,
     };

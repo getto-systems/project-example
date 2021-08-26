@@ -6,7 +6,7 @@ use crate::auth::password::_common::y_protobuf::service::{
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideService;
 
-use crate::auth::_api::service::helper::{infra_error, set_metadata};
+use crate::auth::_api::service::helper::{infra_error, new_endpoint, set_metadata};
 
 use crate::auth::password::{
     _api::authenticate::infra::{AuthenticatePasswordResponse, AuthenticatePasswordService},
@@ -40,9 +40,12 @@ impl<'a> AuthenticatePasswordService for TonicAuthenticatePasswordService<'a> {
         token: Option<AuthToken>,
         fields: AuthenticatePasswordFieldsExtract,
     ) -> Result<AuthenticatePasswordResponse, AuthServiceError> {
-        let mut client = AuthenticatePasswordPbClient::connect(self.service_url)
-            .await
-            .map_err(infra_error)?;
+        let mut client = AuthenticatePasswordPbClient::new(
+            new_endpoint(self.service_url)?
+                .connect()
+                .await
+                .map_err(infra_error)?,
+        );
 
         let mut request = Request::new(AuthenticatePasswordRequestPb {
             login_id: fields.login_id,
@@ -55,7 +58,9 @@ impl<'a> AuthenticatePasswordService for TonicAuthenticatePasswordService<'a> {
             .await
             .map_err(AuthServiceError::from)?;
         let response: Option<AuthenticatePasswordResponse> = response.into_inner().into();
-        response.ok_or(AuthServiceError::InfraError("failed to decode response".into()))
+        response.ok_or(AuthServiceError::InfraError(
+            "failed to decode response".into(),
+        ))
     }
 }
 
@@ -72,7 +77,7 @@ pub mod test {
         _api::service::data::AuthServiceError,
         auth_ticket::_common::{
             encode::data::AuthTicketEncoded,
-            kernel::data::{AuthNonce, AuthTokenEncoded, AuthTokenExtract, AuthToken},
+            kernel::data::{AuthNonce, AuthToken, AuthTokenEncoded, AuthTokenExtract},
         },
         auth_user::_common::kernel::data::AuthUser,
     };
