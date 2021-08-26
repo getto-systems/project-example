@@ -1,6 +1,4 @@
-use tonic::transport::{Channel, ClientTlsConfig};
 use tonic::Request;
-use url::Url;
 
 use crate::auth::auth_ticket::_common::y_protobuf::service::{
     renew_auth_ticket_pb_client::RenewAuthTicketPbClient, RenewAuthTicketRequestPb,
@@ -8,7 +6,7 @@ use crate::auth::auth_ticket::_common::y_protobuf::service::{
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideService;
 
-use crate::auth::_api::service::helper::{infra_error, set_metadata};
+use crate::auth::_api::service::helper::{infra_error, new_endpoint, set_metadata};
 
 use crate::auth::auth_ticket::_api::renew::infra::RenewAuthTicketService;
 
@@ -41,7 +39,12 @@ impl<'a> RenewAuthTicketService for TonicRenewAuthTicketService<'a> {
         nonce: Option<AuthNonce>,
         token: Option<AuthToken>,
     ) -> Result<AuthTicketEncoded, AuthServiceError> {
-        let mut client = RenewAuthTicketPbClient::new(self.new_channel().await?);
+        let mut client = RenewAuthTicketPbClient::new(
+            new_endpoint(self.service_url)?
+                .connect()
+                .await
+                .map_err(infra_error)?,
+        );
 
         let mut request = Request::new(RenewAuthTicketRequestPb {});
         set_metadata(&mut request, self.request_id, nonce, token)?;
@@ -55,29 +58,6 @@ impl<'a> RenewAuthTicketService for TonicRenewAuthTicketService<'a> {
         ticket.ok_or(AuthServiceError::InfraError(
             "failed to decode response".into(),
         ))
-    }
-}
-
-impl<'a> TonicRenewAuthTicketService<'a> {
-    async fn new_channel(&self) -> Result<Channel, AuthServiceError> {
-        let url = Url::parse(self.service_url).map_err(infra_error)?;
-        if url.scheme() == "https" {
-            let config = ClientTlsConfig::new().domain_name(
-                url.host_str()
-                    .ok_or(AuthServiceError::InfraError("invalid service url".into()))?,
-            );
-            Channel::from_static(self.service_url)
-                .tls_config(config)
-                .map_err(infra_error)?
-                .connect()
-                .await
-                .map_err(infra_error)
-        } else {
-            Channel::from_static(self.service_url)
-                .connect()
-                .await
-                .map_err(infra_error)
-        }
     }
 }
 

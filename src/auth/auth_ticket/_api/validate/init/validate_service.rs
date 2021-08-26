@@ -6,7 +6,7 @@ use crate::auth::auth_ticket::_common::y_protobuf::service::{
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideService;
 
-use crate::auth::_api::service::helper::{infra_error, set_metadata};
+use crate::auth::_api::service::helper::{infra_error, new_endpoint, set_metadata};
 
 use super::super::infra::ValidateService;
 
@@ -38,9 +38,12 @@ impl<'a> ValidateService for TonicValidateService<'a> {
         token: Option<AuthToken>,
         require_roles: RequireAuthRoles,
     ) -> Result<AuthUserId, AuthServiceError> {
-        let mut client = ValidateApiTokenPbClient::connect(self.service_url)
-            .await
-            .map_err(infra_error)?;
+        let mut client = ValidateApiTokenPbClient::new(
+            new_endpoint(self.service_url)?
+                .connect()
+                .await
+                .map_err(infra_error)?,
+        );
 
         let request: ValidateApiTokenRequestPb = require_roles.into();
         let mut request = Request::new(request);

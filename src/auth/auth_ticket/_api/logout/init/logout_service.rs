@@ -6,7 +6,7 @@ use crate::auth::auth_ticket::_common::y_protobuf::service::{
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideService;
 
-use crate::auth::_api::service::helper::{infra_error, set_metadata};
+use crate::auth::_api::service::helper::{infra_error, new_endpoint, set_metadata};
 
 use crate::auth::auth_ticket::_api::logout::infra::LogoutService;
 
@@ -36,14 +36,20 @@ impl<'a> LogoutService for TonicLogoutService<'a> {
         nonce: Option<AuthNonce>,
         token: Option<AuthToken>,
     ) -> Result<(), AuthServiceError> {
-        let mut client = LogoutPbClient::connect(self.service_url)
-            .await
-            .map_err(infra_error)?;
+        let mut client = LogoutPbClient::new(
+            new_endpoint(self.service_url)?
+                .connect()
+                .await
+                .map_err(infra_error)?,
+        );
 
         let mut request = Request::new(LogoutRequestPb {});
         set_metadata(&mut request, self.request_id, nonce, token)?;
 
-        client.logout(request).await.map_err(AuthServiceError::from)?;
+        client
+            .logout(request)
+            .await
+            .map_err(AuthServiceError::from)?;
         Ok(())
     }
 }
