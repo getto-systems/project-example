@@ -97,7 +97,7 @@ impl AuthAuthorizer {
 
     async fn request_token(&self) -> Result<String, AuthServiceError> {
         let mut request_url = Url::parse("http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity").map_err(infra_error)?;
-        request_url.set_query(Some(&format!("audience={}", self.service_url)));
+        request_url.set_query(Some(&format!("audience={}", "https://example-api-tgg73fakyq-an.a.run.app"/* self.service_url */)));
         let request = Client::new()
             .get(request_url)
             .header("Metadata-Flavor", "Google");
