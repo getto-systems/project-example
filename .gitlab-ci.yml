@@ -146,8 +146,6 @@ release_deploy-ui:
       - schedules
   when: on_success
 
-  variables:
-    BUILD_ENV: production
   before_script:
     - apt-get update && apt-get install -y python3-pip
     - pip3 install awscli
