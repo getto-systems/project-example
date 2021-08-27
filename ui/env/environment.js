@@ -4,5 +4,5 @@ module.exports = {
 }
 
 function isProduction() {
-    return process.env.BUILD_ENV === "production"
+    return process.env.BUILD_ENV !== "development"
 }

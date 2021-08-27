@@ -31,7 +31,7 @@ export function docsMenuContent(): MenuContent {
     }
 }
 function devDocs(): MenuTreeNode[] {
-    if (!env.isProduction) {
+    if (env.isProduction) {
         return []
     }
     return [
