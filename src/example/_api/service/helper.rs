@@ -7,10 +7,25 @@ use url::Url;
 
 use crate::x_outside_feature::_common::metadata::METADATA_REQUEST_ID;
 
+use crate::z_details::_api::service::infra::ServiceAuthorizer;
+
 use crate::example::_api::service::data::ExampleServiceError;
 
 pub fn infra_error(err: impl std::fmt::Display) -> ExampleServiceError {
     ExampleServiceError::InfraError(format!("service infra error; {}", err))
+}
+
+pub async fn set_authorization<T>(
+    request: &mut Request<T>,
+    authorizer: &impl ServiceAuthorizer,
+) -> Result<(), ExampleServiceError> {
+    if let Some(token) = authorizer.fetch_token().await.map_err(infra_error)? {
+        request.metadata_mut().insert(
+            "authorization",
+            MetadataValue::from_str(&format!("Bearer {}", token.extract())).map_err(infra_error)?,
+        );
+    }
+    Ok(())
 }
 
 pub fn set_metadata<T>(

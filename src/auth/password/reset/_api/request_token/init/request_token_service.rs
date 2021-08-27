@@ -6,7 +6,11 @@ use crate::auth::password::reset::_common::y_protobuf::service::{
     request_reset_token_pb_client::RequestResetTokenPbClient, RequestResetTokenRequestPb,
 };
 
-use crate::auth::_api::service::helper::{infra_error, new_endpoint, set_metadata};
+use crate::z_details::_api::service::init::authorizer::GoogleServiceAuthorizer;
+
+use crate::auth::_api::service::helper::{
+    infra_error, new_endpoint, set_authorization, set_metadata,
+};
 
 use crate::auth::password::reset::{
     _api::request_token::infra::{RequestResetTokenResponse, RequestResetTokenService},
@@ -20,13 +24,15 @@ use crate::auth::{
 pub struct TonicRequestResetTokenService<'a> {
     service_url: &'static str,
     request_id: &'a str,
+    authorizer: GoogleServiceAuthorizer,
 }
 
 impl<'a> TonicRequestResetTokenService<'a> {
-    pub const fn new(service: &'a AuthOutsideService, request_id: &'a str) -> Self {
+    pub fn new(service: &'a AuthOutsideService, request_id: &'a str) -> Self {
         Self {
             service_url: service.service_url,
             request_id,
+            authorizer: GoogleServiceAuthorizer::new(service.service_url),
         }
     }
 }
@@ -48,6 +54,7 @@ impl<'a> RequestResetTokenService for TonicRequestResetTokenService<'a> {
         let mut request = Request::new(RequestResetTokenRequestPb {
             login_id: fields.login_id,
         });
+        set_authorization(&mut request, &self.authorizer).await?;
         set_metadata(&mut request, self.request_id, nonce, None)?;
 
         let response = client

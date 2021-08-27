@@ -6,8 +6,10 @@ use crate::auth::auth_ticket::_common::y_protobuf::service::{
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideService;
 
+use crate::z_details::_api::service::init::authorizer::GoogleServiceAuthorizer;
+
 use crate::auth::_api::service::helper::{
-    infra_error, new_endpoint, set_authorization, set_metadata, AuthAuthorizer,
+    infra_error, new_endpoint, set_authorization, set_metadata,
 };
 
 use crate::auth::auth_ticket::_api::renew::infra::RenewAuthTicketService;
@@ -23,7 +25,7 @@ use crate::auth::{
 pub struct TonicRenewAuthTicketService<'a> {
     service_url: &'static str,
     request_id: &'a str,
-    authorizer: AuthAuthorizer,
+    authorizer: GoogleServiceAuthorizer,
 }
 
 impl<'a> TonicRenewAuthTicketService<'a> {
@@ -31,7 +33,7 @@ impl<'a> TonicRenewAuthTicketService<'a> {
         Self {
             service_url: service.service_url,
             request_id,
-            authorizer: AuthAuthorizer::new(service.service_url),
+            authorizer: GoogleServiceAuthorizer::new(service.service_url),
         }
     }
 }
@@ -51,8 +53,7 @@ impl<'a> RenewAuthTicketService for TonicRenewAuthTicketService<'a> {
         );
 
         let mut request = Request::new(RenewAuthTicketRequestPb {});
-        // TODO authorizer は別な infra として分離するべき
-        set_authorization(&mut request, self.authorizer.fetch_token().await?)?;
+        set_authorization(&mut request, &self.authorizer).await?;
         set_metadata(&mut request, self.request_id, nonce, token)?;
 
         let response = client
