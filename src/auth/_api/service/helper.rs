@@ -97,7 +97,7 @@ impl AuthAuthorizer {
 
     async fn request_token(&self) -> Result<String, AuthServiceError> {
         let mut request_url = Url::parse("http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity").map_err(infra_error)?;
-        request_url.set_query(Some(&format!("audience={}", "https://example-api-tgg73fakyq-an.a.run.app"/* self.service_url */)));
+        request_url.set_query(Some(&format!("audience={}", self.service_url)));
         let request = Client::new()
             .get(request_url)
             .header("Metadata-Flavor", "Google");
@@ -111,7 +111,7 @@ pub fn set_authorization<T>(
     token: Option<String>,
 ) -> Result<(), AuthServiceError> {
     if let Some(token) = token {
-        request.metadata_mut().append(
+        request.metadata_mut().insert(
             "authorization",
             MetadataValue::from_str(&format!("Bearer {}", token)).map_err(infra_error)?,
         );
@@ -125,18 +125,18 @@ pub fn set_metadata<T>(
     nonce: Option<AuthNonce>,
     token: Option<AuthToken>,
 ) -> Result<(), AuthServiceError> {
-    request.metadata_mut().append(
+    request.metadata_mut().insert(
         METADATA_REQUEST_ID,
         MetadataValue::from_str(request_id).map_err(infra_error)?,
     );
     if let Some(nonce) = nonce {
-        request.metadata_mut().append(
+        request.metadata_mut().insert(
             METADATA_NONCE,
             MetadataValue::from_str(&nonce.extract()).map_err(infra_error)?,
         );
     }
     if let Some(token) = token {
-        request.metadata_mut().append(
+        request.metadata_mut().insert(
             METADATA_TOKEN,
             MetadataValue::from_str(&token.extract()).map_err(infra_error)?,
         );
