@@ -19,7 +19,7 @@ deploy_main() {
   #deploy_cp_public_index "0.8.0"
 }
 deploy_build_ui() {
-  BUILD_ENV=production npm run build
+  npm run build
 }
 deploy_rewrite_version() {
   for file in $(find $public/dist $public/root -name '*.html'); do
