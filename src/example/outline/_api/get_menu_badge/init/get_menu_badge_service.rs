@@ -6,7 +6,11 @@ use crate::example::outline::_common::y_protobuf::service::{
 
 use crate::example::_api::x_outside_feature::feature::ExampleOutsideService;
 
-use crate::example::_api::service::helper::{infra_error, new_endpoint, set_metadata};
+use crate::z_details::_api::service::init::authorizer::GoogleServiceAuthorizer;
+
+use crate::example::_api::service::helper::{
+    infra_error, new_endpoint, set_authorization, set_metadata,
+};
 
 use crate::example::outline::_api::get_menu_badge::infra::GetOutlineMenuBadgeService;
 
@@ -17,13 +21,15 @@ use crate::example::{
 pub struct TonicGetOutlineMenuBadgeService<'a> {
     service_url: &'static str,
     request_id: &'a str,
+    authorizer: GoogleServiceAuthorizer,
 }
 
 impl<'a> TonicGetOutlineMenuBadgeService<'a> {
-    pub const fn new(service: &'a ExampleOutsideService, request_id: &'a str) -> Self {
+    pub fn new(service: &'a ExampleOutsideService, request_id: &'a str) -> Self {
         Self {
             service_url: service.service_url,
             request_id,
+            authorizer: GoogleServiceAuthorizer::new(service.service_url),
         }
     }
 }
@@ -39,6 +45,7 @@ impl<'a> GetOutlineMenuBadgeService for TonicGetOutlineMenuBadgeService<'a> {
         );
 
         let mut request = Request::new(GetMenuBadgeRequestPb {});
+        set_authorization(&mut request, &self.authorizer).await?;
         set_metadata(&mut request, self.request_id)?;
 
         let response = client

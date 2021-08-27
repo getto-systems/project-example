@@ -330,7 +330,7 @@ checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 
 [[package]]
 name = "aws-cloudfront-cookie"
-version = "0.40.0-api"
+version = "0.41.0-api"
 dependencies = [
  "base64 0.13.0",
  "digest",
@@ -697,7 +697,7 @@ dependencies = [
 
 [[package]]
 name = "example-api"
-version = "0.40.0-api"
+version = "0.41.0-api"
 dependencies = [
  "actix-cors",
  "actix-web",
@@ -887,7 +887,7 @@ dependencies = [
 
 [[package]]
 name = "getto-application"
-version = "0.40.0-api"
+version = "0.41.0-api"
 
 [[package]]
 name = "getto-application-test"
