@@ -1,4 +1,7 @@
-export type ApplicationTargetPath = string & { ApplicationTargetPath: never }
+export type ApplicationTargetPath = Readonly<{
+    path: string
+    specified: boolean
+}> & { ApplicationTargetPath: never }
 
 export type Version = Version_data & { Version: never }
 type Version_data = Readonly<{ major: number; minor: number; patch: number; suffix: string }>

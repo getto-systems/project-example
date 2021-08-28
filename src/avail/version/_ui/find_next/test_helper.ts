@@ -1,5 +1,5 @@
 import { ApplicationTargetPath } from "./data"
 
-export function markApplicationTargetPath(path: string): ApplicationTargetPath {
-    return path as ApplicationTargetPath
+export function standardApplicationTargetPath(path: string): ApplicationTargetPath {
+    return { path, specified: false } as ApplicationTargetPath
 }

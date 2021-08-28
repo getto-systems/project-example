@@ -2,7 +2,7 @@ import { setupActionTestRunner } from "../../../../../ui/vendor/getto-applicatio
 import { toApplicationView } from "../../../../../ui/vendor/getto-application/action/helper"
 import { ticker } from "../../../../z_details/_ui/timer/helper"
 
-import { markApplicationTargetPath } from "../find_next/test_helper"
+import { standardApplicationTargetPath } from "../find_next/test_helper"
 
 import { mockFindNextVersionLocationDetecter } from "../find_next/mock"
 
@@ -27,7 +27,13 @@ describe("FindNextVersion", () => {
                     type: "succeed-to-find",
                     upToDate: true,
                     version: "1.0.0-ui",
-                    target: { valid: true, value: "/index.html?search=parameter#hash" },
+                    target: {
+                        valid: true,
+                        value: {
+                            specified: false,
+                            path: "/index.html?search=parameter#hash",
+                        },
+                    },
                 },
             ])
         })
@@ -46,7 +52,10 @@ describe("FindNextVersion", () => {
                     type: "succeed-to-find",
                     upToDate: true,
                     version: "1.0.0-ui",
-                    target: { valid: true, value: "/index.html?search=parameter#hash" },
+                    target: {
+                        valid: true,
+                        value: { specified: false, path: "/index.html?search=parameter#hash" },
+                    },
                 },
             ])
         })
@@ -64,7 +73,10 @@ describe("FindNextVersion", () => {
                     type: "succeed-to-find",
                     upToDate: false,
                     version: "1.1.0-ui",
-                    target: { valid: true, value: "/index.html?search=parameter#hash" },
+                    target: {
+                        valid: true,
+                        value: { specified: false, path: "/index.html?search=parameter#hash" },
+                    },
                 },
             ])
         })
@@ -82,7 +94,10 @@ describe("FindNextVersion", () => {
                     type: "succeed-to-find",
                     upToDate: false,
                     version: "1.0.1-ui",
-                    target: { valid: true, value: "/index.html?search=parameter#hash" },
+                    target: {
+                        valid: true,
+                        value: { specified: false, path: "/index.html?search=parameter#hash" },
+                    },
                 },
             ])
         })
@@ -100,7 +115,10 @@ describe("FindNextVersion", () => {
                     type: "succeed-to-find",
                     upToDate: false,
                     version: "1.2.0-ui",
-                    target: { valid: true, value: "/index.html?search=parameter#hash" },
+                    target: {
+                        valid: true,
+                        value: { specified: false, path: "/index.html?search=parameter#hash" },
+                    },
                 },
             ])
         })
@@ -118,7 +136,10 @@ describe("FindNextVersion", () => {
                     type: "succeed-to-find",
                     upToDate: false,
                     version: "1.0.2-ui",
-                    target: { valid: true, value: "/index.html?search=parameter#hash" },
+                    target: {
+                        valid: true,
+                        value: { specified: false, path: "/index.html?search=parameter#hash" },
+                    },
                 },
             ])
         })
@@ -136,7 +157,10 @@ describe("FindNextVersion", () => {
                     type: "succeed-to-find",
                     upToDate: false,
                     version: "1.1.1-ui",
-                    target: { valid: true, value: "/index.html?search=parameter#hash" },
+                    target: {
+                        valid: true,
+                        value: { specified: false, path: "/index.html?search=parameter#hash" },
+                    },
                 },
             ])
         })
@@ -158,7 +182,10 @@ describe("FindNextVersion", () => {
                     type: "succeed-to-find",
                     upToDate: false,
                     version: "1.1.1-ui",
-                    target: { valid: true, value: "/index.html?search=parameter#hash" },
+                    target: {
+                        valid: true,
+                        value: { specified: false, path: "/index.html?search=parameter#hash" },
+                    },
                 },
             ])
         })
@@ -176,7 +203,10 @@ describe("FindNextVersion", () => {
                     type: "succeed-to-find",
                     upToDate: false,
                     version: "1.1.0-ui",
-                    target: { valid: true, value: "/index.html?search=parameter#hash" },
+                    target: {
+                        valid: true,
+                        value: { specified: false, path: "/index.html?search=parameter#hash" },
+                    },
                 },
             ])
         })
@@ -204,7 +234,7 @@ describe("FindNextVersion", () => {
         expect(
             applicationPath("1.0.0", {
                 valid: true,
-                value: markApplicationTargetPath("/path/to/target.html"),
+                value: standardApplicationTargetPath("/path/to/target.html"),
             }),
         ).toEqual("/1.0.0/path/to/target.html")
     })
@@ -225,7 +255,13 @@ describe("FindNextVersion", () => {
                     type: "succeed-to-find",
                     upToDate: true,
                     version: "1.0.0-ui",
-                    target: { valid: true, value: "/path/to/target.html?search=parameter#hash" },
+                    target: {
+                        valid: true,
+                        value: {
+                            specified: true,
+                            path: "/path/to/target.html?search=parameter#hash",
+                        },
+                    },
                 },
             ])
         })
