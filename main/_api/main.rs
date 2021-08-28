@@ -27,7 +27,7 @@ async fn main() -> io::Result<()> {
             .supports_credentials()
             .allowed_origin(&ENV.origin)
             .allowed_methods(vec!["GET", "POST", "PUT", "PATCH", "DELETE"])
-            .allowed_headers(vec!["X-GETTO-EXAMPLE-NONCE"])
+            .allowed_headers(vec!["GETTO-EXAMPLE-NONCE"])
             .max_age(3600);
 
         App::new()
