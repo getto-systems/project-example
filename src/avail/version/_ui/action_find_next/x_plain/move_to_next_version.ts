@@ -41,13 +41,32 @@ export function MoveToNextVersionEntry(view: FindNextVersionView): void {
         version: string,
         target: ConvertLocationResult<ApplicationTargetPath>,
     ) {
-        // 今のバージョンが最新なら何もしない
-        if (upToDate) {
-            return
+        const path = redirectPath(upToDate, version, target)
+        if (path.redirect) {
+            location.href = path.path
         }
 
-        location.href = applicationPath(version, target)
         view.terminate()
+    }
+    function redirectPath(
+        upToDate: boolean,
+        version: string,
+        target: ConvertLocationResult<ApplicationTargetPath>,
+    ): RedirectPath {
+        // application target が指定されたらリダイレクトする
+        if (target.valid) {
+            if (target.value.specified) {
+                return { redirect: true, path: applicationPath(version, target) }
+            }
+        }
+
+        // 次のバージョンが見つかったらリダイレクトする
+        if (!upToDate) {
+            return { redirect: true, path: applicationPath(version, target) }
+        }
+
+        // 今のバージョンが最新ならリダイレクトしない
+        return { redirect: false }
     }
 
     function handleError(err: unknown) {
@@ -56,6 +75,8 @@ export function MoveToNextVersionEntry(view: FindNextVersionView): void {
         view.terminate()
     }
 }
+
+type RedirectPath = Readonly<{ redirect: false }> | Readonly<{ redirect: true; path: string }>
 
 function assertNever(_: never): never {
     throw new Error("NEVER")

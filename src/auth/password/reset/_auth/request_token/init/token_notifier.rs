@@ -81,10 +81,17 @@ fn build_message(
     })
 }
 fn build_url(reset_password_url: &str, token: ResetTokenEncoded) -> Result<Url, ParseError> {
-    let mut url = Url::parse(reset_password_url)?;
-    url.query_pairs_mut()
+    // path と query を組み立てる; ホスト名は使用されない
+    let mut target = Url::parse("http://localhost/index.html")?;
+    target
+        .query_pairs_mut()
         .append_pair("-password-reset", "reset")
         .append_pair("-password-reset-token", token.as_str());
+    let target = format!("{}?{}", target.path(), target.query().unwrap_or(""));
+
+    let mut url = Url::parse(reset_password_url)?;
+    url.query_pairs_mut()
+        .append_pair("-application-target", &target);
     Ok(url)
 }
 fn utf8_content(data: String) -> Content {

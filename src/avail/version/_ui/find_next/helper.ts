@@ -6,7 +6,7 @@ export function applicationPath(
     version: string,
     target: ConvertLocationResult<ApplicationTargetPath>,
 ): string {
-    const path = target.valid ? target.value : "/index.html"
+    const path = target.valid ? target.value.path : "/index.html"
     return `/${version}${path}`
 }
 

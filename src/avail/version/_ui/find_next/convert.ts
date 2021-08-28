@@ -5,25 +5,32 @@ export function detectApplicationTargetPath(
     currentURL: URL,
     version: string,
 ): ConvertLocationResult<ApplicationTargetPath> {
+    const target = currentURL.searchParams.get("-application-target")
+    if (target !== null) {
+        return { valid: true, value: specify(target) }
+    }
+
     const prefix = `/${version}/`
     const pathname = currentURL.pathname
+
     if (!pathname.startsWith(prefix)) {
-        // TODO これの接続テストをしていない
-        const target = currentURL.searchParams.get("-application-target")
-        if (target === null) {
-            return { valid: false }
-        } else {
-            return { valid: true, value: mark(target) }
-        }
+        return { valid: false }
     }
+    const path = pathname.replace(prefix, "/")
 
     return {
         valid: true,
-        value: mark([pathname.replace(prefix, "/"), currentURL.search, currentURL.hash].join("")),
+        value: detect(path),
     }
 
-    function mark(target: string): ApplicationTargetPath {
-        return target as ApplicationTargetPath
+    function specify(path: string): ApplicationTargetPath {
+        return { path, specified: true } as ApplicationTargetPath
+    }
+    function detect(path: string): ApplicationTargetPath {
+        return {
+            path: [path, currentURL.search, currentURL.hash].join(""),
+            specified: false,
+        } as ApplicationTargetPath
     }
 }
 
