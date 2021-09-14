@@ -49,6 +49,10 @@
         {
             "name": "ui/ci",
             "path": "ui/ci"
+        },
+        {
+            "name": "bootstrap",
+            "path": "bootstrap"
         }
     ]
 }
