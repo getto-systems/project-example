@@ -4,7 +4,7 @@ import { html } from "htm/preact"
 
 import { useApplicationAction } from "../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
 
-import { box } from "../../../../../../ui/vendor/getto-css/preact/design/box"
+import { box, container } from "../../../../../../ui/vendor/getto-css/preact/design/box"
 import { button_send, field } from "../../../../../../ui/vendor/getto-css/preact/design/form"
 import { notice_alert } from "../../../../../../ui/vendor/getto-css/preact/design/highlight"
 import { v_small } from "../../../../../../ui/vendor/getto-css/preact/design/alignment"
@@ -54,17 +54,19 @@ export function LogoutComponent(props: Props): VNode {
         | Readonly<{ type: "remote"; err: LogoutError }>
 
     function logoutBox(content: LogoutBoxContent): VNode {
-        return box({
-            body: [
-                v_small(),
-                field({
-                    title: "ログアウト",
-                    body: button_send({ label: "ログアウト", state: "normal", onClick }),
-                    help: ["作業完了後ログアウトしてください"],
-                }),
-                ...error(),
-            ],
-        })
+        return container(
+            box({
+                body: [
+                    v_small(),
+                    field({
+                        title: "ログアウト",
+                        body: button_send({ label: "ログアウト", state: "normal", onClick }),
+                        help: ["作業完了後ログアウトしてください"],
+                    }),
+                    ...error(),
+                ],
+            }),
+        )
 
         function onClick() {
             props.logout.submit()

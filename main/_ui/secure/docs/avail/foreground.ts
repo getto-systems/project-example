@@ -1,6 +1,6 @@
 import { render, h } from "preact"
 
-import { foregroundOutsideFeature } from "../../../../../src/x_outside_feature/_ui/common"
+import { newForegroundOutsideFeature } from "../../../../../src/x_outside_feature/_ui/common"
 
 import { newDocsView } from "../../../../../src/docs/action_docs/init/resource"
 
@@ -11,7 +11,7 @@ import { docs_avail } from "../../../../../src/avail/docs"
 
 render(
     h(DocsDomainDetailEntry, {
-        view: newDocsView(foregroundOutsideFeature()),
+        view: newDocsView(newForegroundOutsideFeature()),
         docs: docsDomainContent(docs_avail),
     }),
     document.body,

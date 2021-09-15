@@ -1,9 +1,9 @@
 import { newWorker } from "../../../ui/vendor/getto-application/action/worker/init"
 
 import {
-    commonOutsideFeature,
+    newCommonOutsideFeature,
     CommonOutsideFeature,
-    foregroundOutsideFeature,
+    newForegroundOutsideFeature,
     ForegroundOutsideFeature,
 } from "./common"
 
@@ -12,17 +12,17 @@ import { WorkerOutsideFeature } from "../../../ui/vendor/getto-application/actio
 type WorkerForegroundOutsideFeature = ForegroundOutsideFeature & WorkerOutsideFeature
 type WorkerBackgroundOutsideFeature = CommonOutsideFeature & WorkerOutsideFeature
 
-export function workerForegroundOutsideFeature(): WorkerForegroundOutsideFeature {
+export function newWorkerForegroundOutsideFeature(): WorkerForegroundOutsideFeature {
     return {
-        ...foregroundOutsideFeature(),
+        ...newForegroundOutsideFeature(),
         worker: newWorker({
             webDocument: document,
         }),
     }
 }
-export function workerBackgroundOutsideFeature(): WorkerBackgroundOutsideFeature {
+export function newWorkerBackgroundOutsideFeature(): WorkerBackgroundOutsideFeature {
     return {
-        ...commonOutsideFeature(),
+        ...newCommonOutsideFeature(),
         worker: (self as unknown) as Worker,
     }
 }

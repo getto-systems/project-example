@@ -18,6 +18,7 @@ const entries = {
     secure: [
         { name: "index", /* TODO background: true */ },
 
+        { name: "auth/auth-ticket/logout", /* TODO background: true */ },
         { name: "auth/profile", /* TODO background: true */ },
 
         { name: "docs/index" },

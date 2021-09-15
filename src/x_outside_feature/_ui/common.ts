@@ -6,14 +6,14 @@ export type ForegroundOutsideFeature = CommonOutsideFeature & LocationOutsideFea
 
 export type CommonOutsideFeature = RepositoryOutsideFeature & RemoteOutsideFeature
 
-export function foregroundOutsideFeature(): ForegroundOutsideFeature {
+export function newForegroundOutsideFeature(): ForegroundOutsideFeature {
     return {
-        ...commonOutsideFeature(),
+        ...newCommonOutsideFeature(),
         currentLocation: location,
     }
 }
 
-export function commonOutsideFeature(): CommonOutsideFeature {
+export function newCommonOutsideFeature(): CommonOutsideFeature {
     return {
         webDB: indexedDB,
         webCrypto: crypto,
