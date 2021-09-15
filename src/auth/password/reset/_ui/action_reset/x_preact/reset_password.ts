@@ -2,6 +2,8 @@ import { h, VNode } from "preact"
 import { useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
 
+import { remoteCommonErrorReason } from "../../../../../../z_details/_ui/remote/reason"
+
 import {
     useApplicationAction,
     useApplicationView,
@@ -29,7 +31,6 @@ import { InputPasswordEntry } from "../../../../_ui/action_input/x_preact/input"
 import { ResetPasswordView, ResetPasswordResource, ResetPasswordResourceState } from "../resource"
 
 import { ResetPasswordError } from "../../reset/data"
-import { remoteCommonErrorReason } from "../../../../../../z_details/_ui/remote/helper"
 
 export function ResetPasswordEntry(view: ResetPasswordView): VNode {
     const action = useApplicationView(view)

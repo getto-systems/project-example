@@ -2,6 +2,8 @@ import { h, VNode } from "preact"
 import { useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
 
+import { remoteCommonErrorReason } from "../../../../../z_details/_ui/remote/reason"
+
 import {
     useApplicationAction,
     useApplicationView,
@@ -34,7 +36,6 @@ import {
 } from "../resource"
 
 import { AuthenticatePasswordError } from "../../authenticate/data"
-import { remoteCommonErrorReason } from "../../../../../z_details/_ui/remote/helper"
 
 export function AuthenticatePasswordEntry(view: AuthenticatePasswordView): VNode {
     const action = useApplicationView(view)
