@@ -1,6 +1,8 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
+import { remoteCommonErrorReason } from "../../../../../../z_details/_ui/remote/reason"
+
 import {
     useApplicationAction,
     useApplicationView,
@@ -21,6 +23,8 @@ import { siteInfo } from "../../../../../../example/site"
 import { spinner } from "../../../../../../example/_ui/x_preact/design/icon"
 import { signNav } from "../../../../../_ui/common/nav/x_preact/nav"
 
+import { InputLoginIDEntry } from "../../../../../login_id/_ui/action_input/x_preact/input"
+
 import {
     RequestResetTokenView,
     RequestResetTokenResource,
@@ -28,8 +32,6 @@ import {
 } from "../resource"
 
 import { RequestResetTokenError } from "../../request_token/data"
-import { InputLoginIDEntry } from "../../../../../login_id/_ui/action_input/x_preact/input"
-import { remoteCommonErrorReason } from "../../../../../../z_details/_ui/remote/helper"
 
 export function RequestResetTokenEntry(view: RequestResetTokenView): VNode {
     const action = useApplicationView(view)

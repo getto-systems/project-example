@@ -2,6 +2,8 @@ import { h, VNode } from "preact"
 import { useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
 
+import { remoteCommonErrorReason } from "../../../../../z_details/_ui/remote/reason"
+
 import {
     useApplicationAction,
     useApplicationView,
@@ -17,8 +19,6 @@ import { spinner } from "../../../../../example/_ui/x_preact/design/icon"
 import { appendScript } from "../../../../_ui/common/x_preact/script"
 
 import { ApplicationErrorComponent } from "../../../../../avail/_ui/x_preact/application_error"
-
-import { remoteCommonErrorReason } from "../../../../../z_details/_ui/remote/helper"
 
 import {
     CheckAuthTicketView,
