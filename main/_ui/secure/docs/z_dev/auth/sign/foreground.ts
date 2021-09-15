@@ -1,6 +1,6 @@
 import { render, h } from "preact"
 
-import { foregroundOutsideFeature } from "../../../../../../../src/x_outside_feature/_ui/common"
+import { newForegroundOutsideFeature } from "../../../../../../../src/x_outside_feature/_ui/common"
 
 import { newDocsView } from "../../../../../../../src/docs/action_docs/init/resource"
 
@@ -15,7 +15,7 @@ import {
 
 render(
     h(DocsEntry, {
-        view: newDocsView(foregroundOutsideFeature()),
+        view: newDocsView(newForegroundOutsideFeature()),
         docs: {
             title: "認証",
             contents: [

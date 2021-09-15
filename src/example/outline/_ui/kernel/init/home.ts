@@ -13,7 +13,10 @@ export function homeMenuContent(): MenuContent {
                 item("ホーム", lnir("home"), "index.html"),
                 item("ドキュメント", lnir("files-alt"), "docs/index.html"),
             ]),
-            category("SYSTEM", allow, [item("プロフィール", lnir("user"), "auth/profile.html")]),
+            category("SYSTEM", allow, [
+                item("プロフィール", lnir("user"), "auth/profile.html"),
+                item("ログアウト", lnir("user"), "auth/auth-ticket/logout.html"),
+            ]),
         ],
     }
 }
