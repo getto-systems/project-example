@@ -2,6 +2,8 @@ import { h, VNode } from "preact"
 import { useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
 
+import { remoteCommonErrorReason } from "../../../../../z_details/_ui/remote/helper"
+
 import { useApplicationAction } from "../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
 
 import { box, container } from "../../../../../../ui/vendor/getto-css/preact/design/box"
@@ -13,7 +15,6 @@ import { LogoutResource, LogoutResourceState } from "../resource"
 
 import { RepositoryError } from "../../../../../z_details/_ui/repository/data"
 import { LogoutError } from "../../logout/data"
-import { remoteCommonErrorReason } from "../../../../../z_details/_ui/remote/helper"
 
 export function LogoutEntry(resource: LogoutResource): VNode {
     return h(LogoutComponent, {
@@ -34,21 +35,23 @@ export function LogoutComponent(props: Props): VNode {
     }, [props.state])
 
     switch (props.state.type) {
-        case "initial-logout":
         case "succeed-to-logout":
-            return logoutBox({ success: true })
+            // reload するので何も描画しない
+            return EMPTY_CONTENT
+
+        case "initial-logout":
+            return logoutBox({ initial: true })
 
         case "repository-error":
-            return logoutBox({ success: false, err: { type: "repository", err: props.state.err } })
+            return logoutBox({ initial: false, err: { type: "repository", err: props.state.err } })
 
         case "failed-to-logout":
-            return logoutBox({ success: false, err: { type: "remote", err: props.state.err } })
+            return logoutBox({ initial: false, err: { type: "remote", err: props.state.err } })
     }
 
-    // TODO state をこの形にするべき
     type LogoutBoxContent =
-        | Readonly<{ success: true }>
-        | Readonly<{ success: false; err: LogoutBoxError }>
+        | Readonly<{ initial: true }>
+        | Readonly<{ initial: false; err: LogoutBoxError }>
     type LogoutBoxError =
         | Readonly<{ type: "repository"; err: RepositoryError }>
         | Readonly<{ type: "remote"; err: LogoutError }>
@@ -60,7 +63,7 @@ export function LogoutComponent(props: Props): VNode {
                     v_small(),
                     field({
                         title: "ログアウト",
-                        body: button_send({ label: "ログアウト", state: "normal", onClick }),
+                        body: logoutButton(),
                         help: ["作業完了後ログアウトしてください"],
                     }),
                     ...error(),
@@ -68,12 +71,16 @@ export function LogoutComponent(props: Props): VNode {
             }),
         )
 
-        function onClick() {
-            props.logout.submit()
+        function logoutButton() {
+            return button_send({ label: "ログアウト", state: "normal", onClick })
+
+            function onClick() {
+                props.logout.submit()
+            }
         }
 
         function error(): VNode[] {
-            if (content.success) {
+            if (content.initial) {
                 return []
             }
             return [
@@ -110,3 +117,5 @@ export function LogoutComponent(props: Props): VNode {
         }
     }
 }
+
+const EMPTY_CONTENT = html``
