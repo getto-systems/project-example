@@ -2,7 +2,7 @@ import { h } from "preact"
 
 import { storyTemplate } from "../../../../../ui/vendor/storybook/preact/story"
 
-import { ProfileComponent } from "./page"
+import { ProfilePageComponent } from "./page"
 
 import { mockNotifyUnexpectedErrorAction } from "../../../../../src/avail/unexpected_error/_ui/action_notify/mock"
 import {
@@ -27,7 +27,7 @@ type MockProps = {
     // no props
 }
 const template = storyTemplate<MockProps>(() => {
-    return h(ProfileComponent, {
+    return h(ProfilePageComponent, {
         error: mockNotifyUnexpectedErrorAction(),
         breadcrumbList: mockLoadBreadcrumbListAction(mockBreadcrumbList_home()),
         menu: mockLoadMenuAction(mockMenu_home()),
