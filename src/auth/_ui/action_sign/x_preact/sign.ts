@@ -19,15 +19,14 @@ import { PrivacyPolicyComponent } from "./privacy_policy"
 export function SignEntry(view: SignView): VNode {
     const action = useApplicationView(view)
     const state = useApplicationAction(action)
-
     const [err] = useErrorBoundary((err) => {
         // 認証前なのでエラーはどうしようもない
         console.log(err)
     })
+
     if (err) {
         return h(ApplicationErrorComponent, { err: `${err}` })
     }
-
     return h(SignComponent, { state, sign: action })
 }
 

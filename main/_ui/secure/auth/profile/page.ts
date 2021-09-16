@@ -24,7 +24,7 @@ import { LogoutEntry } from "../../../../../src/auth/auth_ticket/_ui/action_logo
 import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
 import { ProfilePageResource } from "./resource"
 
-export function ProfileEntry(view: ApplicationView<ProfilePageResource>): VNode {
+export function ProfilePageEntry(view: ApplicationView<ProfilePageResource>): VNode {
     const resource = useApplicationView(view)
 
     const err = useNotifyUnexpectedError(resource)
@@ -32,12 +32,12 @@ export function ProfileEntry(view: ApplicationView<ProfilePageResource>): VNode 
         return h(ApplicationErrorComponent, { err: `${err}` })
     }
 
-    return h(ProfileComponent, resource)
+    return h(ProfilePageComponent, resource)
 }
 
 const pageTitle = "プロフィール" as const
 
-export function ProfileComponent(props: ProfilePageResource): VNode {
+export function ProfilePageComponent(props: ProfilePageResource): VNode {
     useDocumentTitle(pageTitle)
 
     return appLayout({
