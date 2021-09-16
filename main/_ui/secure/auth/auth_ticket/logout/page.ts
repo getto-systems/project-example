@@ -27,12 +27,11 @@ const pageTitle = "ログアウト" as const
 
 export function LogoutPageEntry(view: ApplicationView<LogoutPageResource>): VNode {
     const resource = useApplicationView(view)
-
     const err = useNotifyUnexpectedError(resource)
+
     if (err) {
         return h(ApplicationErrorComponent, { err: `${err}` })
     }
-
     return h(LogoutPageComponent, resource)
 }
 

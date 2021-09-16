@@ -2,7 +2,7 @@ import { h } from "preact"
 
 import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
 
-import { LogoutPageComponent } from "./entry"
+import { LogoutPageComponent } from "./page"
 
 import { mockNotifyUnexpectedErrorAction } from "../../../../../../src/avail/unexpected_error/_ui/action_notify/mock"
 import {
