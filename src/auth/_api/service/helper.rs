@@ -48,7 +48,12 @@ pub async fn set_authorization<T>(
     }
     Ok(())
 }
-
+pub fn set_request_id<T>(
+    request: &mut Request<T>,
+    request_id: &str,
+) -> Result<(), AuthServiceError> {
+    set_metadata(request, request_id, None, None)
+}
 pub fn set_metadata<T>(
     request: &mut Request<T>,
     request_id: &str,

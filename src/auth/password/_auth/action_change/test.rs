@@ -1,44 +1,23 @@
 use std::collections::HashSet;
 
-use chrono::{DateTime, Duration, TimeZone, Utc};
-
 use getto_application_test::ActionTestRunner;
 
-use crate::auth::{
-    auth_ticket::_auth::kernel::init::{
-        clock::test::StaticChronoAuthClock,
-        nonce_metadata::test::StaticAuthNonceMetadata,
-        nonce_repository::test::{
-            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-        },
-        test::StaticCheckAuthNonceStruct,
+use crate::auth::password::_auth::{
+    change::init::{
+        request_decoder::test::StaticChangePasswordRequestDecoder, test::StaticChangePasswordStruct,
     },
-    password::_auth::{
-        change::init::{
-            request_decoder::test::StaticChangePasswordRequestDecoder,
-            test::StaticChangePasswordStruct,
-        },
-        kernel::init::password_repository::test::{
-            MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-            MemoryAuthUserPasswordStore,
-        },
+    kernel::init::password_repository::test::{
+        MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository, MemoryAuthUserPasswordStore,
     },
 };
 
-use crate::auth::{
-    auth_ticket::_auth::kernel::infra::AuthNonceConfig,
-    password::{
-        _auth::kernel::infra::HashedPassword, _common::change::infra::ChangePasswordFieldsExtract,
-    },
+use crate::auth::password::{
+    _auth::kernel::infra::HashedPassword, _common::change::infra::ChangePasswordFieldsExtract,
 };
 
 use super::action::{ChangePasswordAction, ChangePasswordMaterial};
 
 use crate::auth::{
-    auth_ticket::{
-        _auth::kernel::data::{AuthDateTime, ExpireDuration},
-        _common::kernel::data::AuthNonce,
-    },
     auth_user::_common::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
     login_id::_auth::data::LoginId,
 };
@@ -57,38 +36,6 @@ async fn success_change() {
     let result = action.ignite(request_decoder).await;
     assert_state(vec!["change password success"]);
     assert!(result.is_ok());
-}
-
-#[tokio::test]
-async fn success_expired_nonce() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::expired_nonce();
-    let feature = TestFeature::new(&store);
-    let request_decoder = standard_request_decoder();
-
-    let mut action = ChangePasswordAction::with_material(feature);
-    action.subscribe(handler);
-
-    let result = action.ignite(request_decoder).await;
-    assert_state(vec!["change password success"]);
-    assert!(result.is_ok());
-}
-
-#[tokio::test]
-async fn error_conflict_nonce() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::conflict_nonce();
-    let feature = TestFeature::new(&store);
-    let request_decoder = standard_request_decoder();
-
-    let mut action = ChangePasswordAction::with_material(feature);
-    action.subscribe(handler);
-
-    let result = action.ignite(request_decoder).await;
-    assert_state(vec!["change password error; auth nonce error: conflict"]);
-    assert!(!result.is_ok());
 }
 
 #[tokio::test]
@@ -240,38 +187,22 @@ impl<'a> ChangePasswordMaterial for TestFeature<'a> {
 }
 
 struct TestStore {
-    nonce: MemoryAuthNonceStore,
     password: MemoryAuthUserPasswordStore,
 }
 
 impl TestStore {
     fn standard() -> Self {
         Self {
-            nonce: standard_nonce_store(),
-            password: standard_password_store(),
-        }
-    }
-    fn expired_nonce() -> Self {
-        Self {
-            nonce: expired_nonce_store(),
-            password: standard_password_store(),
-        }
-    }
-    fn conflict_nonce() -> Self {
-        Self {
-            nonce: conflict_nonce_store(),
             password: standard_password_store(),
         }
     }
     fn match_fail_password() -> Self {
         Self {
-            nonce: standard_nonce_store(),
             password: match_fail_password_store(),
         }
     }
     fn password_not_stored() -> Self {
         Self {
-            nonce: standard_nonce_store(),
             password: not_stored_password_store(),
         }
     }
@@ -281,40 +212,16 @@ impl<'a> TestFeature<'a> {
     fn new(store: &'a TestStore) -> Self {
         Self {
             change: StaticChangePasswordStruct {
-                check_nonce_infra: StaticCheckAuthNonceStruct {
-                    config: standard_nonce_config(),
-                    clock: standard_clock(),
-                    nonce_metadata: standard_nonce_metadata(),
-                    nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
-                },
                 password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
             },
         }
     }
 }
 
-const NONCE: &'static str = "nonce";
 const USER_ID: &'static str = "user-id";
 const LOGIN_ID: &'static str = "login-id";
 const PASSWORD: &'static str = "current-password";
 const ANOTHER_PASSWORD: &'static str = "another-password";
-
-fn standard_nonce_config() -> AuthNonceConfig {
-    AuthNonceConfig {
-        nonce_expires: ExpireDuration::with_duration(Duration::days(1)),
-    }
-}
-
-fn standard_now() -> DateTime<Utc> {
-    Utc.ymd(2021, 1, 1).and_hms(10, 0, 0)
-}
-fn standard_clock() -> StaticChronoAuthClock {
-    StaticChronoAuthClock::new(standard_now())
-}
-
-fn standard_nonce_metadata() -> StaticAuthNonceMetadata {
-    StaticAuthNonceMetadata::Valid(AuthNonce::restore(NONCE.into()))
-}
 
 fn standard_request_decoder() -> StaticChangePasswordRequestDecoder {
     StaticChangePasswordRequestDecoder::Valid(
@@ -378,20 +285,6 @@ fn just_max_length_new_password_request_decoder() -> StaticChangePasswordRequest
             new_password: vec!["a"; 100].join(""),
         },
     )
-}
-
-fn standard_nonce_store() -> MemoryAuthNonceStore {
-    MemoryAuthNonceMap::new().to_store()
-}
-fn expired_nonce_store() -> MemoryAuthNonceStore {
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(-1)));
-    MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
-}
-fn conflict_nonce_store() -> MemoryAuthNonceStore {
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(1)));
-    MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
 }
 
 fn standard_password_store() -> MemoryAuthUserPasswordStore {

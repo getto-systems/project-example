@@ -16,7 +16,7 @@ use crate::auth::password::_auth::change::data::ChangePasswordError;
 impl RespondTo<ChangePasswordResponsePb> for ChangePasswordEvent {
     fn respond_to(self) -> Result<Response<ChangePasswordResponsePb>, Status> {
         match self {
-            Self::Success => Err(Status::cancelled("change password cancelled")),
+            Self::Success => Ok(Response::new(ChangePasswordResponsePb { success: true })),
             Self::UserNotFound => Err(Status::internal("user not found")),
             Self::InvalidPassword(err) => err.respond_to(),
             Self::NonceError(err) => err.respond_to(),
@@ -28,10 +28,7 @@ impl RespondTo<ChangePasswordResponsePb> for ChangePasswordEvent {
 
 impl RespondTo<ChangePasswordResponsePb> for ChangePasswordError {
     fn respond_to(self) -> Result<Response<ChangePasswordResponsePb>, Status> {
-        Ok(Response::new(ChangePasswordResponsePb {
-            success: false,
-            ..Default::default()
-        }))
+        Ok(Response::new(ChangePasswordResponsePb { success: false }))
     }
 }
 

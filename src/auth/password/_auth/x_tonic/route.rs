@@ -76,7 +76,7 @@ impl ChangePasswordPb for Change {
         } = extract_request(request);
 
         let logger = app_logger("auth.password.change", &metadata);
-        let mut action = ChangePasswordFeature::action(&data, &metadata);
+        let mut action = ChangePasswordFeature::action(&data);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         let request_decoder = ChangePasswordFeature::request_decoder(request);

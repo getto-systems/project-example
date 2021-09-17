@@ -1,13 +1,21 @@
 use getto_application_test::ActionTestRunner;
 
-use crate::auth::{auth_ticket::_api::{kernel::init::{
-        nonce_header::test::StaticAuthNonceHeader, token_header::test::StaticAuthTokenHeader,
-    }, validate::init::{test::StaticValidateApiTokenStruct, validate_service::test::StaticValidateService}}, password::_api::change::init::{
+use crate::auth::{
+    auth_ticket::_api::{
+        kernel::init::{
+            nonce_header::test::StaticAuthNonceHeader, token_header::test::StaticAuthTokenHeader,
+        },
+        validate::init::{
+            test::StaticValidateApiTokenStruct, validate_service::test::StaticValidateService,
+        },
+    },
+    password::_api::change::init::{
         change_service::test::StaticChangePasswordService,
         request_decoder::test::StaticChangePasswordRequestDecoder,
         response_encoder::test::StaticChangePasswordResponseEncoder,
         test::StaticChangePasswordStruct,
-    }};
+    },
+};
 
 use crate::auth::password::_common::change::infra::ChangePasswordFieldsExtract;
 
@@ -44,8 +52,6 @@ impl<'a> TestFeature {
     fn standard() -> Self {
         Self {
             change: StaticChangePasswordStruct {
-                nonce_header: StaticAuthNonceHeader::new("NONCE"),
-                token_header: StaticAuthTokenHeader::new("TOKEN"),
                 validate_infra: StaticValidateApiTokenStruct {
                     nonce_header: StaticAuthNonceHeader::new("NONCE"),
                     token_header: StaticAuthTokenHeader::new("TOKEN"),

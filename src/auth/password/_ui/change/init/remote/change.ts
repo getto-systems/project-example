@@ -19,7 +19,7 @@ export function newChangePasswordRemote(feature: RemoteOutsideFeature): ChangePa
         const ChangePasswordResultPb = pb.auth.password.api.ChangePasswordResultPb
 
         try {
-            const mock = true
+            const mock = false
             if (mock) {
                 return {
                     success: true,

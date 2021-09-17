@@ -1,5 +1,4 @@
 use crate::auth::{
-    auth_ticket::_auth::kernel::infra::CheckAuthNonceInfra,
     auth_user::_common::kernel::data::AuthUserId,
     password::{
         _auth::kernel::infra::{
@@ -11,12 +10,10 @@ use crate::auth::{
 };
 
 pub trait ChangePasswordInfra {
-    type CheckNonceInfra: CheckAuthNonceInfra;
     type PasswordRepository: ChangePasswordRepository;
     type PasswordMatcher: AuthUserPasswordMatcher;
     type PasswordHasher: AuthUserPasswordHasher;
 
-    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
     fn password_repository(&self) -> &Self::PasswordRepository;
     fn password_matcher(&self, plain_password: PlainPassword) -> Self::PasswordMatcher {
         Self::PasswordMatcher::new(plain_password)

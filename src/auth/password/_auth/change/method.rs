@@ -1,5 +1,3 @@
-use crate::auth::auth_ticket::_auth::kernel::method::check_nonce;
-
 use crate::auth::password::{
     _auth::{
         change::infra::ChangePasswordInfra,
@@ -19,10 +17,6 @@ pub async fn change_password<S>(
     fields: ChangePasswordFieldsExtract,
     post: impl Fn(ChangePasswordEvent) -> S,
 ) -> MethodResult<S> {
-    check_nonce(infra.check_nonce_infra())
-        .await
-        .map_err(|err| post(ChangePasswordEvent::NonceError(err)))?;
-
     let current_password = PlainPassword::validate(fields.current_password)
         .map_err(|err| post((err, ChangePasswordKind::Current).into()))?;
     let new_password = PlainPassword::validate(fields.new_password)

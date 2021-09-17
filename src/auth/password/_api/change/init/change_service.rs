@@ -1,6 +1,5 @@
 use tonic::Request;
 
-use crate::auth::auth_user::_common::kernel::data::AuthUserId;
 use crate::auth::password::_common::y_protobuf::service::{
     change_password_pb_client::ChangePasswordPbClient, ChangePasswordRequestPb,
 };
@@ -10,7 +9,7 @@ use crate::auth::_api::x_outside_feature::feature::AuthOutsideService;
 use crate::z_details::_api::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::auth::_api::service::helper::{
-    infra_error, new_endpoint, set_authorization, set_metadata,
+    infra_error, new_endpoint, set_authorization, set_request_id,
 };
 
 use crate::auth::password::{
@@ -19,8 +18,7 @@ use crate::auth::password::{
 };
 
 use crate::auth::{
-    _api::service::data::AuthServiceError,
-    auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
+    _api::service::data::AuthServiceError, auth_user::_common::kernel::data::AuthUserId,
 };
 
 pub struct TonicChangePasswordService<'a> {
@@ -43,8 +41,6 @@ impl<'a> TonicChangePasswordService<'a> {
 impl<'a> ChangePasswordService for TonicChangePasswordService<'a> {
     async fn change(
         &self,
-        nonce: Option<AuthNonce>,
-        token: Option<AuthToken>,
         user_id: AuthUserId,
         fields: ChangePasswordFieldsExtract,
     ) -> Result<ChangePasswordResponse, AuthServiceError> {
@@ -61,7 +57,7 @@ impl<'a> ChangePasswordService for TonicChangePasswordService<'a> {
             new_password: fields.new_password,
         });
         set_authorization(&mut request, &self.authorizer).await?;
-        set_metadata(&mut request, self.request_id, nonce, token)?;
+        set_request_id(&mut request, self.request_id)?;
 
         let response = client
             .change(request)
@@ -84,10 +80,7 @@ pub mod test {
         },
     };
 
-    use crate::auth::{
-        _api::service::data::AuthServiceError,
-        auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
-    };
+    use crate::auth::_api::service::data::AuthServiceError;
 
     pub struct StaticChangePasswordService;
 
@@ -95,8 +88,6 @@ pub mod test {
     impl ChangePasswordService for StaticChangePasswordService {
         async fn change(
             &self,
-            _nonce: Option<AuthNonce>,
-            _token: Option<AuthToken>,
             _user_id: AuthUserId,
             _fields: ChangePasswordFieldsExtract,
         ) -> Result<ChangePasswordResponse, AuthServiceError> {
