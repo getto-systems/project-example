@@ -18,7 +18,15 @@ import { ValidateBoardFieldState } from "../../../../../../ui/vendor/getto-appli
 
 import { ValidateLoginIDError } from "../../data"
 
-type Resource = InputLoginIDResource & Readonly<{ help: VNodeContent[] }>
+type InputLoginIDOptions =
+    | Readonly<{ title: VNodeContent; help: VNodeContent[] }>
+    | Readonly<{ title: VNodeContent }>
+    | Readonly<{ help: VNodeContent[] }>
+    | {
+          /* no props */
+      }
+
+type Resource = InputLoginIDResource & InputLoginIDOptions
 export function InputLoginIDEntry(resource: Resource): VNode {
     return h(InputLoginIDComponent, {
         ...resource,
@@ -34,7 +42,7 @@ export function InputLoginIDComponent(props: Props): VNode {
         const content = {
             title: "ログインID",
             body: h(InputBoardComponent, { type: "text", input: props.field.input }),
-            help: props.help,
+            help: help(),
         }
 
         if (props.state.valid) {
@@ -42,6 +50,12 @@ export function InputLoginIDComponent(props: Props): VNode {
         } else {
             return field_error({ ...content, notice: loginIDValidationError(props.state) })
         }
+    }
+    function help(): VNodeContent[] {
+        if ("help" in props) {
+            return props.help
+        }
+        return []
     }
 }
 

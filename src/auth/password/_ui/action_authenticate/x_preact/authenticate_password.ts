@@ -71,66 +71,66 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
         }
     }, [props.authenticate, props.state])
 
-    switch (props.state.type) {
-        case "initial-login":
-            return authenticateForm({ state: "login" })
+    return basedOn(props)
 
-        case "failed-to-login":
-            return authenticateForm({ state: "login", error: loginError(props.state.err) })
+    function basedOn({ state, validate }: AuthenticatePasswordResourceState): VNode {
+        switch (state.type) {
+            case "initial-login":
+                return authenticateForm({ state: validate })
 
-        case "try-to-login":
-            return authenticateForm({ state: "connecting" })
+            case "failed-to-login":
+                return authenticateForm({ state: validate, err: loginError(state.err) })
 
-        case "take-longtime-to-login":
-            return takeLongtimeMessage()
+            case "try-to-login":
+                return authenticateForm({ state: "connecting" })
 
-        case "try-to-load":
-            // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
-            return EMPTY_CONTENT
+            case "take-longtime-to-login":
+                return takeLongtimeMessage()
 
-        case "succeed-to-renew":
-        case "authn-not-expired":
-        case "required-to-login":
-        case "failed-to-renew":
-            // これらはスクリプトがロードされた後に発行される
-            // したがって、un-mount されているのでここには来ない
-            return EMPTY_CONTENT
+            case "try-to-load":
+                // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
+                return EMPTY_CONTENT
 
-        case "repository-error":
-        case "load-error":
-            return h(ApplicationErrorComponent, { err: props.state.err.err })
+            case "succeed-to-renew":
+            case "authn-not-expired":
+            case "required-to-login":
+            case "failed-to-renew":
+                // これらはスクリプトがロードされた後に発行される
+                // したがって、un-mount されているのでここには来ない
+                return EMPTY_CONTENT
+
+            case "repository-error":
+            case "load-error":
+                return h(ApplicationErrorComponent, { err: state.err.err })
+        }
     }
 
-    type AuthenticateFormState = "login" | "connecting"
+    type State = "initial" | "valid" | "invalid" | "connecting"
 
-    type AuthenticateFormContent =
-        | AuthenticateFormContent_base
-        | (AuthenticateFormContent_base & AuthenticateFormContent_error)
-
-    type AuthenticateFormContent_base = Readonly<{ state: AuthenticateFormState }>
-    type AuthenticateFormContent_error = Readonly<{ error: VNodeContent[] }>
+    type Content = Readonly<{ state: State }> | Readonly<{ state: State; err: VNodeContent[] }>
 
     function authenticateTitle() {
         return "ログイン"
     }
 
-    function authenticateForm(content: AuthenticateFormContent): VNode {
+    function authenticateForm(content: Content): VNode {
         return form(
             loginBox(siteInfo, {
                 title: authenticateTitle(),
                 body: [
-                    h(InputLoginIDEntry, { field: props.authenticate.loginID, help: [] }),
-                    h(InputPasswordEntry, { field: props.authenticate.password, help: [] }),
+                    h(InputLoginIDEntry, { field: props.authenticate.loginID }),
+                    h(InputPasswordEntry, { field: props.authenticate.password }),
                     buttons({ left: button(), right: clearButton() }),
                 ],
                 footer: [footerLinks(), error()],
             }),
         )
 
-        function clearButton() {
+        function clearButton(): VNode {
             const label = "入力内容をクリア"
-            switch (props.validate) {
+            switch (content.state) {
                 case "initial":
+                case "connecting":
                     return button_disabled({ label })
 
                 case "invalid":
@@ -145,50 +145,41 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
         }
 
         function button() {
+            const label = "ログイン"
+
             switch (content.state) {
-                case "login":
-                    return loginButton()
+                case "initial":
+                    return button_send({ state: "normal", label, onClick })
+
+                case "valid":
+                    return button_send({ state: "confirm", label, onClick })
+
+                case "invalid":
+                    return button_disabled({ label })
 
                 case "connecting":
-                    return connectingButton()
+                    return button_send({
+                        state: "connect",
+                        label: html`ログインしています ${spinner}`,
+                    })
             }
 
-            function loginButton() {
-                const label = "ログイン"
-
-                switch (props.validate) {
-                    case "initial":
-                        return button_send({ state: "normal", label, onClick })
-
-                    case "valid":
-                        return button_send({ state: "confirm", label, onClick })
-
-                    case "invalid":
-                        return button_disabled({ label })
-                }
-
-                function onClick(e: Event) {
-                    e.preventDefault()
-                    props.authenticate.submit()
-                }
-            }
-            function connectingButton(): VNode {
-                return button_send({
-                    state: "connect",
-                    label: html`ログインしています ${spinner}`,
-                })
+            function onClick(e: Event) {
+                e.preventDefault()
+                props.authenticate.submit()
             }
         }
 
-        function error() {
-            if ("error" in content) {
-                return fieldError(content.error)
+        function error(): VNode {
+            if ("err" in content) {
+                return fieldError(content.err)
             }
 
-            switch (props.validate) {
+            switch (content.state) {
                 case "initial":
                 case "valid":
-                    return ""
+                case "connecting":
+                    return EMPTY_CONTENT
 
                 case "invalid":
                     return fieldError(["正しく入力されていません"])

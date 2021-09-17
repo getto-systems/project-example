@@ -28,7 +28,7 @@ export interface AuthenticatePasswordAction
     readonly password: InputPasswordAction
     readonly validate: ValidateBoardAction
 
-    clear(): void
+    clear(): AuthenticatePasswordState
     submit(): Promise<AuthenticatePasswordState>
     loadError(err: LoadScriptError): Promise<AuthenticatePasswordState>
 }

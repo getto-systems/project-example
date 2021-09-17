@@ -11,6 +11,7 @@ import {
     mainHeader,
     mainTitle,
 } from "../../../../../../ui/vendor/getto-css/preact/layout/app"
+import { container } from "../../../../../../ui/vendor/getto-css/preact/design/box"
 
 import { copyright, siteInfo } from "../../../../../../src/example/site"
 
@@ -43,7 +44,7 @@ export function LogoutPageComponent(props: LogoutPageResource): VNode {
         header: [h(LoadSeasonEntry, props)],
         main: appMain({
             header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbListComponent, props)]),
-            body: mainBody(h(LogoutEntry, props)),
+            body: mainBody(container(h(LogoutEntry, props))),
             copyright,
         }),
         menu: h(LoadMenuEntry, props),
