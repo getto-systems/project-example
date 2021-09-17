@@ -67,7 +67,7 @@ function fieldContent(field: FieldContent): VNode {
     }
     return html`<dl class="${mapFieldType(field.type)}">
         <dt class="field__title">${field.content.title}</dt>
-        <dd class="field__body">${field.content.body} ${fieldHelp(help)}</dd>
+        <dd class="field__body">${field.content.body} ${fieldHelpContent(help)}</dd>
     </dl>`
 
     function helpContent(): VNodeContent[] {
@@ -117,7 +117,7 @@ function fieldSectionContent(field: FieldSectionContent): VNode {
         notice: noticeContent(),
     }
     return html`<section class="${mapFieldType(field.type)}">
-        ${field.content.body} ${fieldHelp(help)}
+        ${field.content.body} ${fieldHelpContent(help)}
     </section>`
 
     function helpContent(): VNodeContent[] {
@@ -138,6 +138,9 @@ function fieldSectionContent(field: FieldSectionContent): VNode {
     }
 }
 
+export function fieldHelp(help: VNodeContent[]): VNode {
+    return html`<aside class="field__help">${help.map(toFieldHelp)}</aside>`
+}
 export function fieldError(notice: VNodeContent[]): VNode {
     return html`<aside class="field__help field_error">${notice.map(toFieldNotice)}</aside>`
 }
@@ -146,7 +149,7 @@ type FieldHelpContent = Readonly<{
     help: VNodeContent[]
     notice: VNodeContent[]
 }>
-function fieldHelp({ help, notice }: FieldHelpContent) {
+function fieldHelpContent({ help, notice }: FieldHelpContent) {
     if (help.length + notice.length == 0) {
         return ""
     }

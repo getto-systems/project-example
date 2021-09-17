@@ -17,7 +17,15 @@ import { InputPasswordResource, InputPasswordResourceState } from "../resource"
 
 import { ValidatePasswordError } from "../../data"
 
-type Resource = InputPasswordResource & Readonly<{ help: VNodeContent[] }>
+type InputPasswordOptions =
+    | Readonly<{ title: VNodeContent; help: VNodeContent[] }>
+    | Readonly<{ title: VNodeContent }>
+    | Readonly<{ help: VNodeContent[] }>
+    | {
+          /* no props */
+      }
+
+type Resource = InputPasswordResource & InputPasswordOptions
 export function InputPasswordEntry(resource: Resource): VNode {
     return h(InputPasswordComponent, {
         ...resource,
@@ -29,11 +37,17 @@ type Props = Resource & InputPasswordResourceState
 export function InputPasswordComponent(props: Props): VNode {
     return label_password_fill(content())
 
+    function title() {
+        if ("title" in props) {
+            return props.title
+        }
+        return "パスワード"
+    }
     function content() {
         const content = {
-            title: "パスワード",
+            title: title(),
             body: h(InputBoardComponent, { type: "password", input: props.field.input }),
-            help: [...props.help, characterHelp()],
+            help: [...help(), characterHelp()],
         }
 
         if (props.state.valid) {
@@ -44,6 +58,12 @@ export function InputPasswordComponent(props: Props): VNode {
                 notice: passwordValidationError(props.state),
             })
         }
+    }
+    function help(): VNodeContent[] {
+        if ("help" in props) {
+            return props.help
+        }
+        return []
     }
 
     function characterHelp(): string {

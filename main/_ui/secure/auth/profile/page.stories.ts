@@ -4,17 +4,8 @@ import { storyTemplate } from "../../../../../ui/vendor/storybook/preact/story"
 
 import { ProfilePageComponent } from "./page"
 
-import { mockNotifyUnexpectedErrorAction } from "../../../../../src/avail/unexpected_error/_ui/action_notify/mock"
-import {
-    mockBreadcrumbList_home,
-    mockLoadBreadcrumbListAction,
-} from "../../../../../src/example/outline/_ui/action_load_breadcrumb_list/mock"
-import {
-    mockLoadMenuAction,
-    mockMenu_home,
-} from "../../../../../src/example/outline/_ui/action_load_menu/mock"
-import { mockLoadSeasonAction } from "../../../../../src/example/_ui/common/action_load_season/mock"
-import { mockLogoutAction } from "../../../../../src/auth/auth_ticket/_ui/action_logout/mock"
+import { mockBaseResource } from "../../../../../src/example/_ui/action_base/mock"
+import { mockChangePasswordResource } from "../../../../../src/auth/password/_ui/action_change/mock"
 
 export default {
     title: "main/Auth/Profile",
@@ -28,11 +19,8 @@ type MockProps = {
 }
 const template = storyTemplate<MockProps>(() => {
     return h(ProfilePageComponent, {
-        error: mockNotifyUnexpectedErrorAction(),
-        breadcrumbList: mockLoadBreadcrumbListAction(mockBreadcrumbList_home()),
-        menu: mockLoadMenuAction(mockMenu_home()),
-        season: mockLoadSeasonAction(),
-        logout: mockLogoutAction(),
+        ...mockBaseResource(),
+        ...mockChangePasswordResource(),
     })
 })
 

@@ -22,7 +22,7 @@ export function ApplicationErrorComponent(props: Props): VNode {
             </p>`,
             v_small(),
             field({ title: "画面", body: html`<pre>${location.pathname}</pre>`, help: [location.host] }),
-            field({ title: "詳細", body: detail(props.err), help: [] }),
+            field({ title: "詳細", body: detail(props.err) }),
             html`<p>
                 お手数ですが、管理者に詳細をお伝えください<br />
                 直前まで行っていた作業も教えていただけると助かります

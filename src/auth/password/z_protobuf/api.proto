@@ -20,3 +20,16 @@ message AuthenticatePasswordErrorPb {
 enum AuthenticatePasswordErrorKindPb {
     INVALID_PASSWORD = 0;
 }
+
+message ChangePasswordPb {
+    string current_password = 1;
+    string new_password = 2;
+}
+
+message ChangePasswordResultPb {
+    bool success = 1;
+    ChangePasswordErrorPb err = 2;
+}
+message ChangePasswordErrorPb {
+    AuthenticatePasswordErrorKindPb kind = 1;
+}
