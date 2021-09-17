@@ -11,7 +11,6 @@ import {
     button_send,
     button_undo,
     fieldError,
-    fieldHelp,
     form,
 } from "../../../../../../ui/vendor/getto-css/preact/design/form"
 import { box } from "../../../../../../ui/vendor/getto-css/preact/design/box"
@@ -24,6 +23,8 @@ import { InputPasswordEntry } from "../../action_input/x_preact/input"
 import { ChangePasswordResource, ChangePasswordResourceState } from "../resource"
 
 import { ChangePasswordError } from "../../change/data"
+import { notice_success } from "../../../../../../ui/vendor/getto-css/preact/design/highlight"
+import { v_small } from "../../../../../../ui/vendor/getto-css/preact/design/alignment"
 
 export function ChangePasswordEntry({ change }: ChangePasswordResource): VNode {
     return h(ChangePasswordComponent, {
@@ -81,12 +82,12 @@ export function ChangePasswordComponent(props: Props): VNode {
                         left: submitButton(),
                         right: clearButton(),
                     }),
-                    message(),
+                    ...message(),
                 ],
             }),
         )
 
-        function submitButton() {
+        function submitButton(): VNode {
             const label = "パスワード変更"
 
             switch (content.state) {
@@ -96,10 +97,12 @@ export function ChangePasswordComponent(props: Props): VNode {
                 case "valid":
                     return button_send({ state: "confirm", label, onClick })
 
+                case "success":
                 case "invalid":
                     return button_disabled({ label })
 
                 case "connecting":
+                case "take-longtime":
                     return button_send({
                         state: "connect",
                         label: html`パスワード変更中 ${spinner}`,
@@ -116,13 +119,15 @@ export function ChangePasswordComponent(props: Props): VNode {
             const label = "入力内容をクリア"
             switch (content.state) {
                 case "initial":
+                    return button_disabled({ label })
+
                 case "connecting":
                 case "take-longtime":
-                case "success":
-                    return button_disabled({ label })
+                    return EMPTY_CONTENT
 
                 case "invalid":
                 case "valid":
+                case "success":
                     return button_undo({ label, onClick })
             }
 
@@ -132,28 +137,30 @@ export function ChangePasswordComponent(props: Props): VNode {
             }
         }
 
-        function message(): VNode {
+        function message(): VNode[] {
             if ("err" in content) {
-                return fieldError(content.err)
+                return [fieldError(content.err)]
             }
 
             switch (content.state) {
                 case "initial":
                 case "valid":
                 case "connecting":
-                    return EMPTY_CONTENT
+                    return []
 
                 case "take-longtime":
-                    return fieldHelp([
-                        html`${spinner} パスワード変更中です`,
-                        html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
-                    ])
+                    return [
+                        fieldError([
+                            html`${spinner} パスワード変更中です`,
+                            html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
+                        ]),
+                    ]
 
                 case "success":
-                    return fieldHelp(["パスワードを変更しました"])
+                    return [v_small(), notice_success(["パスワードを変更しました"])]
 
                 case "invalid":
-                    return fieldError(["正しく入力されていません"])
+                    return [fieldError(["正しく入力されていません"])]
             }
         }
     }

@@ -123,10 +123,11 @@ class Action
         })
     }
 
-    clear(): void {
+    clear(): AuthenticatePasswordState {
         this.loginID.clear()
         this.password.clear()
         this.validate.clear()
+        return this.initialState
     }
     async submit(): Promise<AuthenticatePasswordState> {
         return this.material.authenticate(this.checker.get(), (event) => {

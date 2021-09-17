@@ -12,7 +12,7 @@ export interface ChangePasswordAction extends ApplicationStateAction<ChangePassw
     readonly newPassword: InputPasswordAction
     readonly validate: ValidateBoardAction
 
-    clear(): void
+    clear(): ChangePasswordState
     submit(): Promise<ChangePasswordState>
 }
 

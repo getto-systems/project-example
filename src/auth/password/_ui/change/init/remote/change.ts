@@ -12,6 +12,7 @@ import { decodeProtobuf, encodeProtobuf } from "../../../../../../../ui/vendor/p
 import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/feature"
 
 import { ChangePasswordRemote } from "../../infra"
+import { ticker } from "../../../../../../z_details/_ui/timer/helper"
 
 export function newChangePasswordRemote(feature: RemoteOutsideFeature): ChangePasswordRemote {
     return async (fields) => {
@@ -21,6 +22,7 @@ export function newChangePasswordRemote(feature: RemoteOutsideFeature): ChangePa
         try {
             const mock = true
             if (mock) {
+                await ticker({ wait_millisecond: 3000 }, () => null)
                 return {
                     success: true,
                     value: true,

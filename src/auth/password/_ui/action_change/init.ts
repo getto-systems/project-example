@@ -96,10 +96,11 @@ class Action
         })
     }
 
-    clear(): void {
+    clear(): ChangePasswordState {
         this.currentPassword.clear()
         this.newPassword.clear()
         this.validate.clear()
+        return this.post(this.initialState)
     }
     async submit(): Promise<ChangePasswordState> {
         return this.material.change(this.checker.get(), this.post)
