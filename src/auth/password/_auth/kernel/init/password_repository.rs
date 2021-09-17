@@ -1,11 +1,13 @@
 use chrono::{TimeZone, Utc};
-use sqlx::{query, MySqlPool};
+use sqlx::{query, MySql, MySqlPool, Transaction};
 
+use crate::auth::password::_auth::kernel::data::ChangePasswordRepositoryError;
 use crate::z_details::_common::repository::{helper::infra_error, mysql::helper::mysql_error};
 
 use crate::auth::password::_auth::kernel::infra::{
-    AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword, RegisterResetTokenRepository,
-    ResetPasswordRepository, ResetTokenEntry, ResetTokenEntryExtract, VerifyPasswordRepository,
+    AuthUserPasswordHasher, AuthUserPasswordMatcher, ChangePasswordRepository, HashedPassword,
+    RegisterResetTokenRepository, ResetPasswordRepository, ResetTokenEntry, ResetTokenEntryExtract,
+    VerifyPasswordRepository,
 };
 
 use crate::{
@@ -14,7 +16,8 @@ use crate::{
         auth_user::_common::kernel::data::AuthUserId,
         login_id::_auth::data::LoginId,
         password::_auth::kernel::data::{
-            PasswordHashRepositoryError, RegisterResetTokenError, ResetToken, VerifyPasswordError,
+            RegisterResetTokenRepositoryError, ResetPasswordRepositoryError, ResetToken,
+            VerifyPasswordRepositoryError,
         },
     },
     z_details::_common::repository::data::RepositoryError,
@@ -36,7 +39,7 @@ impl<'pool> VerifyPasswordRepository for MysqlAuthUserPasswordRepository<'pool> 
         &self,
         login_id: &'a LoginId,
         matcher: impl 'a + AuthUserPasswordMatcher,
-    ) -> Result<AuthUserId, VerifyPasswordError> {
+    ) -> Result<AuthUserId, VerifyPasswordRepositoryError> {
         let conn = self.pool;
 
         let found = query!(
@@ -52,19 +55,71 @@ impl<'pool> VerifyPasswordRepository for MysqlAuthUserPasswordRepository<'pool> 
         )
         .fetch_optional(conn)
         .await
-        .map_err(verify_mysql_error)?
-        .ok_or(VerifyPasswordError::PasswordNotFound)?;
+        .map_err(verify_password_error)?
+        .ok_or(VerifyPasswordRepositoryError::PasswordNotFound)?;
 
-        let is_matched = matcher
+        let matched = matcher
             .match_password(&HashedPassword::restore(found.hashed_password))
-            .map_err(VerifyPasswordError::PasswordHashError)?;
+            .map_err(VerifyPasswordRepositoryError::PasswordHashError)?;
 
-        if is_matched {
-            Ok(AuthUserId::restore(found.user_id))
-        } else {
-            Err(VerifyPasswordError::PasswordNotMatched)
+        if !matched {
+            return Err(VerifyPasswordRepositoryError::PasswordNotMatched);
         }
+
+        Ok(AuthUserId::restore(found.user_id))
     }
+}
+fn verify_password_error(err: sqlx::Error) -> VerifyPasswordRepositoryError {
+    VerifyPasswordRepositoryError::RepositoryError(mysql_error(err))
+}
+
+#[async_trait::async_trait]
+impl<'pool> ChangePasswordRepository for MysqlAuthUserPasswordRepository<'pool> {
+    async fn change_password<'a>(
+        &self,
+        user_id: &'a AuthUserId,
+        matcher: impl 'a + AuthUserPasswordMatcher,
+        hasher: impl 'a + AuthUserPasswordHasher,
+    ) -> Result<(), ChangePasswordRepositoryError> {
+        let mut conn = self.pool.begin().await.map_err(change_password_error)?;
+
+        let found = query!(
+            r"#####
+            select
+                hashed_password
+            from user_password
+            where user_id = ?
+            #####",
+            user_id.as_str(),
+        )
+        .fetch_optional(&mut conn)
+        .await
+        .map_err(change_password_error)?
+        .ok_or(ChangePasswordRepositoryError::PasswordNotFound)?;
+
+        let matched = matcher
+            .match_password(&HashedPassword::restore(found.hashed_password))
+            .map_err(ChangePasswordRepositoryError::PasswordHashError)?;
+
+        if !matched {
+            return Err(ChangePasswordRepositoryError::PasswordNotMatched);
+        }
+
+        let hashed_password = hasher
+            .hash_password()
+            .map_err(ChangePasswordRepositoryError::PasswordHashError)?;
+
+        let conn = update_password(conn, user_id.as_str(), &hashed_password.extract())
+            .await
+            .map_err(change_password_error)?;
+
+        conn.commit().await.map_err(change_password_error)?;
+
+        Ok(())
+    }
+}
+fn change_password_error(err: sqlx::Error) -> ChangePasswordRepositoryError {
+    ChangePasswordRepositoryError::RepositoryError(mysql_error(err))
 }
 
 #[async_trait::async_trait]
@@ -75,8 +130,8 @@ impl<'pool> RegisterResetTokenRepository for MysqlAuthUserPasswordRepository<'po
         reset_token: ResetToken,
         expires: ExpireDateTime,
         requested_at: AuthDateTime,
-    ) -> Result<(), RegisterResetTokenError> {
-        let mut conn = self.pool.begin().await.map_err(request_mysql_error)?;
+    ) -> Result<(), RegisterResetTokenRepositoryError> {
+        let mut conn = self.pool.begin().await.map_err(request_reset_token_error)?;
 
         let found = query!(
             r"#####
@@ -89,8 +144,8 @@ impl<'pool> RegisterResetTokenRepository for MysqlAuthUserPasswordRepository<'po
         )
         .fetch_optional(&mut conn)
         .await
-        .map_err(request_mysql_error)?
-        .ok_or(RegisterResetTokenError::UserNotFound)?;
+        .map_err(request_reset_token_error)?
+        .ok_or(RegisterResetTokenRepositoryError::UserNotFound)?;
 
         query!(
             r"#####
@@ -107,12 +162,15 @@ impl<'pool> RegisterResetTokenRepository for MysqlAuthUserPasswordRepository<'po
         )
         .execute(&mut conn)
         .await
-        .map_err(request_mysql_error)?;
+        .map_err(request_reset_token_error)?;
 
-        conn.commit().await.map_err(request_mysql_error)?;
+        conn.commit().await.map_err(request_reset_token_error)?;
 
         Ok(())
     }
+}
+fn request_reset_token_error(err: sqlx::Error) -> RegisterResetTokenRepositoryError {
+    RegisterResetTokenRepositoryError::RepositoryError(mysql_error(err))
 }
 
 #[async_trait::async_trait]
@@ -155,10 +213,10 @@ impl<'pool> ResetPasswordRepository for MysqlAuthUserPasswordRepository<'pool> {
         reset_token: &'a ResetToken,
         hasher: impl 'a + AuthUserPasswordHasher,
         reset_at: AuthDateTime,
-    ) -> Result<AuthUserId, PasswordHashRepositoryError> {
+    ) -> Result<AuthUserId, ResetPasswordRepositoryError> {
         // reset_token が正しいことが前提; reset_token_entry() で事前に確認する
 
-        let mut conn = self.pool.begin().await.map_err(reset_mysql_error)?;
+        let mut conn = self.pool.begin().await.map_err(reset_password_error)?;
 
         let found = query!(
             r"#####
@@ -171,8 +229,8 @@ impl<'pool> ResetPasswordRepository for MysqlAuthUserPasswordRepository<'pool> {
         )
         .fetch_optional(&mut conn)
         .await
-        .map_err(reset_mysql_error)?
-        .ok_or(reset_infra_error("reset token not found"))?;
+        .map_err(reset_password_error)?
+        .ok_or(reset_password_infra_error("reset token not found"))?;
 
         query!(
             r"#####
@@ -185,54 +243,57 @@ impl<'pool> ResetPasswordRepository for MysqlAuthUserPasswordRepository<'pool> {
         )
         .execute(&mut conn)
         .await
-        .map_err(reset_mysql_error)?;
+        .map_err(reset_password_error)?;
 
         let hashed_password = hasher
             .hash_password()
-            .map_err(PasswordHashRepositoryError::PasswordHashError)?;
+            .map_err(ResetPasswordRepositoryError::PasswordHashError)?;
 
-        query!(
-            r"#####
-            delete from user_password
-            where user_id = ?
-            #####",
-            &found.user_id,
-        )
-        .execute(&mut conn)
-        .await
-        .map_err(reset_mysql_error)?;
+        let conn = update_password(conn, &found.user_id, &hashed_password.extract())
+            .await
+            .map_err(reset_password_error)?;
 
-        query!(
-            r"#####
-            insert into user_password
-                (user_id, hashed_password)
-            values
-                (?, ?)
-            #####",
-            &found.user_id,
-            hashed_password.extract(),
-        )
-        .execute(&mut conn)
-        .await
-        .map_err(reset_mysql_error)?;
-
-        conn.commit().await.map_err(reset_mysql_error)?;
+        conn.commit().await.map_err(reset_password_error)?;
 
         Ok(AuthUserId::restore(found.user_id))
     }
 }
+fn reset_password_error(err: sqlx::Error) -> ResetPasswordRepositoryError {
+    ResetPasswordRepositoryError::RepositoryError(mysql_error(err))
+}
+fn reset_password_infra_error(err: impl std::fmt::Display) -> ResetPasswordRepositoryError {
+    ResetPasswordRepositoryError::RepositoryError(infra_error(err))
+}
 
-fn verify_mysql_error(err: sqlx::Error) -> VerifyPasswordError {
-    VerifyPasswordError::RepositoryError(mysql_error(err))
-}
-fn request_mysql_error(err: sqlx::Error) -> RegisterResetTokenError {
-    RegisterResetTokenError::RepositoryError(mysql_error(err))
-}
-fn reset_mysql_error(err: sqlx::Error) -> PasswordHashRepositoryError {
-    PasswordHashRepositoryError::RepositoryError(mysql_error(err))
-}
-fn reset_infra_error(err: impl std::fmt::Display) -> PasswordHashRepositoryError {
-    PasswordHashRepositoryError::RepositoryError(infra_error(err))
+async fn update_password<'a>(
+    mut conn: Transaction<'a, MySql>,
+    user_id: &str,
+    hashed_password: &str,
+) -> Result<Transaction<'a, MySql>, sqlx::Error> {
+    query!(
+        r"#####
+        delete from user_password
+        where user_id = ?
+        #####",
+        user_id,
+    )
+    .execute(&mut conn)
+    .await?;
+
+    query!(
+        r"#####
+        insert into user_password
+            (user_id, hashed_password)
+        values
+            (?, ?)
+        #####",
+        user_id,
+        hashed_password,
+    )
+    .execute(&mut conn)
+    .await?;
+
+    Ok(conn)
 }
 
 #[cfg(test)]
@@ -241,10 +302,11 @@ pub mod test {
 
     use chrono::{DateTime, Utc};
 
+    use crate::auth::password::_auth::kernel::data::ChangePasswordRepositoryError;
     use crate::z_details::_common::repository::helper::infra_error;
 
     use crate::auth::password::_auth::kernel::infra::{
-        AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword,
+        AuthUserPasswordHasher, AuthUserPasswordMatcher, ChangePasswordRepository, HashedPassword,
         RegisterResetTokenRepository, ResetPasswordRepository, ResetTokenEntry,
         ResetTokenEntryExtract, VerifyPasswordRepository,
     };
@@ -255,8 +317,8 @@ pub mod test {
             auth_user::_common::kernel::data::{AuthUser, AuthUserId},
             login_id::_auth::data::LoginId,
             password::_auth::kernel::data::{
-                PasswordHashRepositoryError, RegisterResetTokenError, ResetToken,
-                VerifyPasswordError,
+                RegisterResetTokenRepositoryError, ResetPasswordRepositoryError, ResetToken,
+                VerifyPasswordRepositoryError,
             },
         },
         z_details::_common::repository::data::RepositoryError,
@@ -302,9 +364,10 @@ pub mod test {
         }
         pub fn with_password(login_id: LoginId, user: AuthUser, password: HashedPassword) -> Self {
             let mut store = Self::new();
+            let user_id = user.into_user_id();
             store
-                .insert_login_id(login_id.clone(), user.into_user_id())
-                .insert_password(login_id, password);
+                .insert_login_id(login_id.clone(), user_id.clone())
+                .insert_password(user_id, password);
             store
         }
         pub fn with_reset_token(
@@ -343,14 +406,14 @@ pub mod test {
 
         fn insert_password(
             &mut self,
-            login_id: LoginId,
+            user_id: AuthUserId,
             hashed_password: HashedPassword,
         ) -> &mut Self {
-            self.password.insert(login_id.extract(), hashed_password);
+            self.password.insert(user_id.extract(), hashed_password);
             self
         }
-        fn get_password(&self, login_id: &LoginId) -> Option<&HashedPassword> {
-            self.password.get(login_id.as_str())
+        fn get_password(&self, user_id: &AuthUserId) -> Option<&HashedPassword> {
+            self.password.get(user_id.as_str())
         }
 
         fn insert_reset_token(&mut self, token: ResetToken, entry: ResetEntry) -> &mut Self {
@@ -378,26 +441,65 @@ pub mod test {
             &self,
             login_id: &'a LoginId,
             matcher: impl AuthUserPasswordMatcher + 'a,
-        ) -> Result<AuthUserId, VerifyPasswordError> {
+        ) -> Result<AuthUserId, VerifyPasswordRepositoryError> {
             let store = self.store.lock().unwrap();
 
             let user_id = store
                 .get_user_id(login_id)
-                .ok_or(VerifyPasswordError::PasswordNotFound)?;
+                .ok_or(VerifyPasswordRepositoryError::PasswordNotFound)?;
 
             let password = store
-                .get_password(login_id)
-                .ok_or(VerifyPasswordError::PasswordNotFound)?;
+                .get_password(user_id)
+                .ok_or(VerifyPasswordRepositoryError::PasswordNotFound)?;
 
-            let is_matched = matcher
+            let matched = matcher
                 .match_password(password)
-                .map_err(VerifyPasswordError::PasswordHashError)?;
+                .map_err(VerifyPasswordRepositoryError::PasswordHashError)?;
 
-            if is_matched {
-                Ok(user_id.clone())
-            } else {
-                Err(VerifyPasswordError::PasswordNotMatched)
+            if !matched {
+                return Err(VerifyPasswordRepositoryError::PasswordNotMatched);
             }
+
+            Ok(user_id.clone())
+        }
+    }
+
+    #[async_trait::async_trait]
+    impl<'store> ChangePasswordRepository for MemoryAuthUserPasswordRepository<'store> {
+        async fn change_password<'a>(
+            &self,
+            user_id: &'a AuthUserId,
+            matcher: impl 'a + AuthUserPasswordMatcher,
+            hasher: impl 'a + AuthUserPasswordHasher,
+        ) -> Result<(), ChangePasswordRepositoryError> {
+            {
+                let store = self.store.lock().unwrap();
+
+                let password = store
+                    .get_password(user_id)
+                    .ok_or(ChangePasswordRepositoryError::PasswordNotFound)?;
+
+                let matched = matcher
+                    .match_password(password)
+                    .map_err(ChangePasswordRepositoryError::PasswordHashError)?;
+
+                if !matched {
+                    return Err(ChangePasswordRepositoryError::PasswordNotMatched);
+                }
+            }
+
+            {
+                let hashed_password = hasher
+                    .hash_password()
+                    .map_err(ChangePasswordRepositoryError::PasswordHashError)?;
+
+                let mut store = self.store.lock().unwrap();
+
+                // 実際のデータベースには registered_at も保存する必要がある
+                store.insert_password(user_id.clone(), hashed_password);
+            }
+
+            Ok(())
         }
     }
 
@@ -409,7 +511,7 @@ pub mod test {
             reset_token: ResetToken,
             expires: ExpireDateTime,
             _requested_at: AuthDateTime,
-        ) -> Result<(), RegisterResetTokenError> {
+        ) -> Result<(), RegisterResetTokenRepositoryError> {
             let target_user_id: AuthUserId;
 
             {
@@ -417,14 +519,14 @@ pub mod test {
 
                 let user_id = store
                     .get_user_id(&login_id)
-                    .ok_or(RegisterResetTokenError::UserNotFound)?;
+                    .ok_or(RegisterResetTokenRepositoryError::UserNotFound)?;
 
                 // 有効期限が切れていても削除しない
                 // もし衝突したら token generator の桁数を増やす
                 if store.get_reset_entry(&reset_token).is_some() {
-                    return Err(RegisterResetTokenError::RepositoryError(infra_error(
-                        "reset token conflict",
-                    )));
+                    return Err(RegisterResetTokenRepositoryError::RepositoryError(
+                        infra_error("reset token conflict"),
+                    ));
                 }
 
                 target_user_id = user_id.clone();
@@ -473,14 +575,14 @@ pub mod test {
             reset_token: &'a ResetToken,
             hasher: impl AuthUserPasswordHasher + 'a,
             reset_at: AuthDateTime,
-        ) -> Result<AuthUserId, PasswordHashRepositoryError> {
+        ) -> Result<AuthUserId, ResetPasswordRepositoryError> {
             let target_entry: ResetEntry;
 
             {
                 let store = self.store.lock().unwrap();
 
                 let entry = store.get_reset_entry(&reset_token).ok_or(
-                    PasswordHashRepositoryError::RepositoryError(infra_error(
+                    ResetPasswordRepositoryError::RepositoryError(infra_error(
                         "reset token not found",
                     )),
                 )?;
@@ -491,16 +593,13 @@ pub mod test {
             {
                 let hashed_password = hasher
                     .hash_password()
-                    .map_err(PasswordHashRepositoryError::PasswordHashError)?;
+                    .map_err(ResetPasswordRepositoryError::PasswordHashError)?;
 
                 let mut store = self.store.lock().unwrap();
 
                 // 実際のデータベースには registered_at も保存する必要がある
                 store
-                    .insert_password(
-                        LoginId::restore(target_entry.login_id.clone()),
-                        hashed_password,
-                    )
+                    .insert_password(target_entry.user_id.clone(), hashed_password)
                     .insert_reset_token(reset_token.clone(), target_entry.clone());
             }
 

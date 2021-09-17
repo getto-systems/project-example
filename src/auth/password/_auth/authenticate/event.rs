@@ -5,7 +5,7 @@ use crate::{
         login_id::_auth::data::ValidateLoginIdError,
         password::_auth::{
             authenticate::data::AuthenticatePasswordError,
-            kernel::data::{PasswordHashError, ValidatePasswordError, VerifyPasswordError},
+            kernel::data::{PasswordHashError, ValidatePasswordError, VerifyPasswordRepositoryError},
         },
     },
     z_details::_common::repository::data::RepositoryError,
@@ -36,7 +36,7 @@ impl std::fmt::Display for AuthenticatePasswordEvent {
     }
 }
 
-impl Into<AuthenticatePasswordEvent> for VerifyPasswordError {
+impl Into<AuthenticatePasswordEvent> for VerifyPasswordRepositoryError {
     fn into(self) -> AuthenticatePasswordEvent {
         match self {
             Self::PasswordHashError(err) => AuthenticatePasswordEvent::PasswordHashError(err),

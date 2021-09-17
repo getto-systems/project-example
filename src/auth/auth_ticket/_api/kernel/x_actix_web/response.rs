@@ -23,7 +23,7 @@ impl RespondTo for AuthTokenResponse {
     fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
         let AuthTokenResponse {
             domain,
-            message: AuthTokenMessage { body: message, token },
+            message: AuthTokenMessage { body, token },
         } = self;
         let AuthTokenEncoded {
             ticket_token,
@@ -41,7 +41,7 @@ impl RespondTo for AuthTokenResponse {
                 response.cookie(auth_cookie(kind_as_name(&kind), &domain, cloudfront_token));
             });
 
-        response.body(message)
+        response.body(body)
     }
 }
 

@@ -10,7 +10,7 @@ use crate::auth::{
 use crate::auth::password::reset::_auth::reset::event::ResetPasswordEvent;
 
 use crate::auth::password::{
-    _auth::kernel::data::{PasswordHashRepositoryError, ResetToken},
+    _auth::kernel::data::{ResetPasswordRepositoryError, ResetToken},
     reset::_auth::{kernel::data::ResetTokenEncoded, reset::data::DecodeResetTokenError},
 };
 
@@ -40,7 +40,7 @@ pub trait ResetPasswordRequestDecoder {
     fn decode(self) -> ResetPasswordFieldsExtract;
 }
 
-impl Into<ResetPasswordEvent> for PasswordHashRepositoryError {
+impl Into<ResetPasswordEvent> for ResetPasswordRepositoryError {
     fn into(self) -> ResetPasswordEvent {
         match self {
             Self::RepositoryError(err) => ResetPasswordEvent::RepositoryError(err),

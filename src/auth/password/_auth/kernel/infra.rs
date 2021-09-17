@@ -6,8 +6,8 @@ use crate::{
         auth_user::_common::kernel::data::AuthUserId,
         login_id::_auth::data::LoginId,
         password::_auth::kernel::data::{
-            PasswordHashError, PasswordHashRepositoryError, RegisterResetTokenError, ResetToken,
-            ValidatePasswordError, VerifyPasswordError,
+            ChangePasswordRepositoryError, PasswordHashError, ResetPasswordRepositoryError,
+            RegisterResetTokenRepositoryError, ResetToken, ValidatePasswordError, VerifyPasswordRepositoryError,
         },
     },
     z_details::_common::repository::data::RepositoryError,
@@ -58,7 +58,17 @@ pub trait VerifyPasswordRepository {
         &self,
         login_id: &'a LoginId,
         matcher: impl AuthUserPasswordMatcher + 'a,
-    ) -> Result<AuthUserId, VerifyPasswordError>;
+    ) -> Result<AuthUserId, VerifyPasswordRepositoryError>;
+}
+
+#[async_trait::async_trait]
+pub trait ChangePasswordRepository {
+    async fn change_password<'a>(
+        &self,
+        user_id: &'a AuthUserId,
+        matcher: impl 'a + AuthUserPasswordMatcher,
+        hasher: impl 'a + AuthUserPasswordHasher,
+    ) -> Result<(), ChangePasswordRepositoryError>;
 }
 
 #[async_trait::async_trait]
@@ -69,7 +79,7 @@ pub trait RegisterResetTokenRepository {
         reset_token: ResetToken,
         expires: ExpireDateTime,
         requested_at: AuthDateTime,
-    ) -> Result<(), RegisterResetTokenError>;
+    ) -> Result<(), RegisterResetTokenRepositoryError>;
 }
 
 #[async_trait::async_trait]
@@ -84,7 +94,7 @@ pub trait ResetPasswordRepository {
         reset_token: &'a ResetToken,
         hasher: impl AuthUserPasswordHasher + 'a,
         reset_at: AuthDateTime,
-    ) -> Result<AuthUserId, PasswordHashRepositoryError>;
+    ) -> Result<AuthUserId, ResetPasswordRepositoryError>;
 }
 
 pub struct ResetTokenEntry {

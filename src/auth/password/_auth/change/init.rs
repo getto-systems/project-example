@@ -4,44 +4,39 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
+use crate::auth::password::_auth::kernel::init::password_hasher::Argon2PasswordHasher;
 use crate::auth::{
     auth_ticket::_auth::kernel::init::CheckAuthNonceStruct,
-    auth_user::_auth::kernel::init::user_repository::MysqlAuthUserRepository,
     password::_auth::kernel::init::{
         password_matcher::Argon2PasswordMatcher,
         password_repository::MysqlAuthUserPasswordRepository,
     },
 };
 
-use super::infra::AuthenticatePasswordInfra;
+use super::infra::ChangePasswordInfra;
 
-pub struct AuthenticatePasswordStruct<'a> {
+pub struct ChangePasswordStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
-    user_repository: MysqlAuthUserRepository<'a>,
     password_repository: MysqlAuthUserPasswordRepository<'a>,
 }
 
-impl<'a> AuthenticatePasswordStruct<'a> {
+impl<'a> ChangePasswordStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature, metadata: &'a MetadataMap) -> Self {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
-            user_repository: MysqlAuthUserRepository::new(&feature.store.mysql),
             password_repository: MysqlAuthUserPasswordRepository::new(&feature.store.mysql),
         }
     }
 }
 
-impl<'a> AuthenticatePasswordInfra for AuthenticatePasswordStruct<'a> {
+impl<'a> ChangePasswordInfra for ChangePasswordStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
-    type UserRepository = MysqlAuthUserRepository<'a>;
     type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
     type PasswordMatcher = Argon2PasswordMatcher;
+    type PasswordHasher = Argon2PasswordHasher;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
         &self.check_nonce_infra
-    }
-    fn user_repository(&self) -> &Self::UserRepository {
-        &self.user_repository
     }
     fn password_repository(&self) -> &Self::PasswordRepository {
         &self.password_repository
@@ -52,32 +47,28 @@ impl<'a> AuthenticatePasswordInfra for AuthenticatePasswordStruct<'a> {
 pub mod test {
     use crate::auth::{
         auth_ticket::_auth::kernel::init::test::StaticCheckAuthNonceStruct,
-        auth_user::_auth::kernel::init::user_repository::test::MemoryAuthUserRepository,
         password::_auth::kernel::init::{
+            password_hasher::test::PlainPasswordHasher,
             password_matcher::test::PlainPasswordMatcher,
             password_repository::test::MemoryAuthUserPasswordRepository,
         },
     };
 
-    use super::super::infra::AuthenticatePasswordInfra;
+    use super::super::infra::ChangePasswordInfra;
 
-    pub struct StaticAuthenticatePasswordStruct<'a> {
+    pub struct StaticChangePasswordStruct<'a> {
         pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
-        pub user_repository: MemoryAuthUserRepository<'a>,
         pub password_repository: MemoryAuthUserPasswordRepository<'a>,
     }
 
-    impl<'a> AuthenticatePasswordInfra for StaticAuthenticatePasswordStruct<'a> {
+    impl<'a> ChangePasswordInfra for StaticChangePasswordStruct<'a> {
         type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
-        type UserRepository = MemoryAuthUserRepository<'a>;
         type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
         type PasswordMatcher = PlainPasswordMatcher;
+        type PasswordHasher = PlainPasswordHasher;
 
         fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
             &self.check_nonce_infra
-        }
-        fn user_repository(&self) -> &Self::UserRepository {
-            &self.user_repository
         }
         fn password_repository(&self) -> &Self::PasswordRepository {
             &self.password_repository
