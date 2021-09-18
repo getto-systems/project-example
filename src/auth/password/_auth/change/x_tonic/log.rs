@@ -9,6 +9,7 @@ impl ChangePasswordEvent {
         match self {
             Self::Success => LogLevel::Audit,
             Self::UserNotFound => LogLevel::Error,
+            Self::Validate(event) => event.log_level(),
             Self::InvalidPassword(err) => err.log_level(),
             Self::NonceError(err) => err.log_level(),
             Self::PasswordHashError(err) => err.log_level(),

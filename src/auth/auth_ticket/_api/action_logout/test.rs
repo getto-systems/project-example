@@ -1,10 +1,11 @@
 use getto_application_test::ActionTestRunner;
 
-use crate::auth::auth_ticket::_api::{
-    kernel::init::{
-        nonce_header::test::StaticAuthNonceHeader, token_header::test::StaticAuthTokenHeader,
+use crate::auth::auth_ticket::{
+    _api::logout::init::{logout_service::test::StaticLogoutService, test::StaticLogoutStruct},
+    _common::kernel::init::{
+        nonce_metadata::test::StaticAuthNonceMetadata,
+        token_metadata::test::StaticAuthTokenMetadata,
     },
-    logout::init::{logout_service::test::StaticLogoutService, test::StaticLogoutStruct},
 };
 
 use super::action::{LogoutAction, LogoutMaterial};
@@ -39,8 +40,8 @@ impl TestFeature {
     fn standard() -> Self {
         Self {
             logout: StaticLogoutStruct {
-                nonce_header: StaticAuthNonceHeader::new("NONCE"),
-                token_header: StaticAuthTokenHeader::new("TOKEN"),
+                nonce_metadata: StaticAuthNonceMetadata::new("NONCE".into()),
+                token_metadata: StaticAuthTokenMetadata::new("TOKEN".into()),
                 logout_service: StaticLogoutService,
             },
         }

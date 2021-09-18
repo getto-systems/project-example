@@ -7,7 +7,7 @@ use url::Url;
 
 use crate::x_outside_feature::_common::metadata::METADATA_REQUEST_ID;
 
-use crate::z_details::_api::service::infra::ServiceAuthorizer;
+use crate::z_details::_common::service::infra::ServiceAuthorizer;
 
 use crate::example::_api::service::data::ExampleServiceError;
 

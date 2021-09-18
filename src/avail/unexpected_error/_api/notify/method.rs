@@ -1,6 +1,6 @@
 use getto_application::data::MethodResult;
 
-use crate::auth::_api::common::{data::RequireAuthRoles, method::validate_api_token};
+use crate::auth::_common::{data::RequireAuthRoles, method::validate_api_token};
 
 use super::{event::NotifyUnexpectedErrorEvent, infra::NotifyUnexpectedErrorInfra};
 

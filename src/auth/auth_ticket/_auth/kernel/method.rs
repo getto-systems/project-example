@@ -1,6 +1,5 @@
-use super::infra::{
-    AuthClock, AuthNonceEntry, AuthNonceMetadata, AuthNonceRepository, CheckAuthNonceInfra,
-};
+use super::infra::{AuthClock, AuthNonceEntry, AuthNonceRepository, CheckAuthNonceInfra};
+use crate::auth::auth_ticket::_common::kernel::infra::AuthNonceMetadata;
 
 use super::data::ValidateAuthNonceError;
 use crate::z_details::_common::repository::data::RegisterResult;

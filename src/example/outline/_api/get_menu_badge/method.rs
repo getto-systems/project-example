@@ -1,6 +1,6 @@
 use getto_application::data::MethodResult;
 
-use crate::auth::_api::common::{data::RequireAuthRoles, method::validate_api_token};
+use crate::auth::_common::{data::RequireAuthRoles, method::validate_api_token};
 
 use super::{
     event::GetOutlineMenuBadgeEvent,
@@ -16,6 +16,7 @@ pub async fn get_outline_menu_badge<S>(
     let get_menu_service = infra.get_menu_service();
     let response_encoder = infra.response_encoder();
 
+    // TODO これはもっと処理に近いところでやるべき
     let user_id = validate_api_token(infra.validate_infra(), RequireAuthRoles::Nothing)
         .await
         .map_err(|err| post(GetOutlineMenuBadgeEvent::ValidateApiTokenError(err)))?;

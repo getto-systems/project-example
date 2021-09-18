@@ -48,9 +48,9 @@ impl<M: ChangePasswordMaterial> ChangePasswordAction<M> {
         let pubsub = self.pubsub;
         let m = self.material;
 
-        let (user_id, fields) = request.decode();
+        let fields = request.decode();
 
-        change_password(m.change(), user_id, fields, |event| {
+        change_password(m.change(), fields, |event| {
             pubsub.post(ChangePasswordState::Change(event))
         })
         .await

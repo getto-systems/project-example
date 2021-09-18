@@ -1,4 +1,4 @@
-use crate::auth::_api::common::infra::ValidateApiTokenInfra;
+use crate::auth::_common::infra::ValidateApiTokenInfra;
 
 use crate::z_details::_api::message::data::MessageError;
 

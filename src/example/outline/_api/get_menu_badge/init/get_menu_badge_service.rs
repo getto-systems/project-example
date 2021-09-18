@@ -6,7 +6,7 @@ use crate::example::outline::_common::y_protobuf::service::{
 
 use crate::example::_api::x_outside_feature::feature::ExampleOutsideService;
 
-use crate::z_details::_api::service::init::authorizer::GoogleServiceAuthorizer;
+use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::example::_api::service::helper::{
     infra_error, new_endpoint, set_authorization, set_metadata,

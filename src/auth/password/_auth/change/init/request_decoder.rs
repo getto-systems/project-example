@@ -1,4 +1,3 @@
-use crate::auth::auth_user::_common::kernel::data::AuthUserId;
 use crate::auth::password::_common::y_protobuf::service::ChangePasswordRequestPb;
 
 use crate::auth::password::{
@@ -17,29 +16,26 @@ impl PbChangePasswordRequestDecoder {
 }
 
 impl ChangePasswordRequestDecoder for PbChangePasswordRequestDecoder {
-    fn decode(self) -> (AuthUserId, ChangePasswordFieldsExtract) {
+    fn decode(self) -> ChangePasswordFieldsExtract {
         self.request.into()
     }
 }
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::{
-        auth_user::_common::kernel::data::AuthUserId,
-        password::{
-            _auth::change::infra::ChangePasswordRequestDecoder,
-            _common::change::infra::ChangePasswordFieldsExtract,
-        },
+    use crate::auth::password::{
+        _auth::change::infra::ChangePasswordRequestDecoder,
+        _common::change::infra::ChangePasswordFieldsExtract,
     };
 
     pub enum StaticChangePasswordRequestDecoder {
-        Valid(AuthUserId, ChangePasswordFieldsExtract),
+        Valid(ChangePasswordFieldsExtract),
     }
 
     impl ChangePasswordRequestDecoder for StaticChangePasswordRequestDecoder {
-        fn decode(self) -> (AuthUserId, ChangePasswordFieldsExtract) {
+        fn decode(self) -> ChangePasswordFieldsExtract {
             match self {
-                Self::Valid(user_id, fields) => (user_id, fields),
+                Self::Valid(fields) => fields,
             }
         }
     }

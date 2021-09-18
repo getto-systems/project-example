@@ -1,15 +1,15 @@
 use actix_web::HttpRequest;
 
-use super::data::HeaderError;
+use crate::z_details::_common::request::data::MetadataError;
 
-pub fn header(request: &HttpRequest, key: &str) -> Result<Option<String>, HeaderError> {
+pub fn header(request: &HttpRequest, key: &str) -> Result<Option<String>, MetadataError> {
     let header = request.headers().get(key);
     match header {
         None => Ok(None),
         Some(header) => header
             .to_str()
             .map(|value| Some(value.into()))
-            .map_err(|err| HeaderError::Invalid(format!("{}", err))),
+            .map_err(|err| MetadataError::Invalid(format!("{}", err))),
     }
 }
 pub fn cookie(request: &HttpRequest, key: &str) -> Option<String> {

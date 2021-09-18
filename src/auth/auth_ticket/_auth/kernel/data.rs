@@ -7,7 +7,7 @@ use crate::{
         _auth::kernel::data::AuthPermission,
         _common::kernel::data::{AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles},
     },
-    z_details::{_auth::request::data::MetadataError, _common::repository::data::RepositoryError},
+    z_details::_common::{repository::data::RepositoryError, request::data::MetadataError},
 };
 
 #[derive(Clone)]

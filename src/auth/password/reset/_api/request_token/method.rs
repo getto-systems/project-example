@@ -1,7 +1,7 @@
 use getto_application::data::MethodResult;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::AuthNonceHeader,
+    auth_ticket::_common::kernel::infra::AuthNonceMetadata,
     password::reset::{
         _api::request_token::infra::{
             RequestResetTokenInfra, RequestResetTokenResponseEncoder, RequestResetTokenService,
@@ -17,13 +17,13 @@ pub async fn request_reset_token<S>(
     fields: RequestResetTokenFieldsExtract,
     post: impl Fn(RequestResetTokenEvent) -> S,
 ) -> MethodResult<S> {
-    let nonce_header = infra.nonce_header();
+    let nonce_metadata = infra.nonce_metadata();
     let request_token_service = infra.request_token_service();
     let response_encoder = infra.response_encoder();
 
-    let nonce = nonce_header
+    let nonce = nonce_metadata
         .nonce()
-        .map_err(|err| post(RequestResetTokenEvent::HeaderError(err)))?;
+        .map_err(|err| post(RequestResetTokenEvent::MetadataError(err)))?;
 
     let response = request_token_service
         .request_token(nonce, fields)

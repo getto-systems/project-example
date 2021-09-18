@@ -1,7 +1,8 @@
 use crate::auth::auth_ticket::_auth::kernel::method::check_nonce;
 
-use crate::auth::auth_ticket::_auth::validate::infra::{
-    AuthTokenDecoder, AuthTokenMetadata, ValidateAuthTokenInfra,
+use crate::auth::auth_ticket::{
+    _auth::validate::infra::{AuthTokenDecoder, ValidateAuthTokenInfra},
+    _common::kernel::infra::AuthTokenMetadata,
 };
 
 use super::event::ValidateAuthTokenEvent;
@@ -11,6 +12,12 @@ use crate::auth::{
     auth_user::_common::kernel::data::RequireAuthRoles,
 };
 
+pub async fn validate_ticket_token<S>(
+    infra: &impl ValidateAuthTokenInfra,
+    post: impl Fn(ValidateAuthTokenEvent) -> S,
+) -> Result<AuthTicket, S> {
+    validate_auth_token(infra, RequireAuthRoles::Nothing, post).await
+}
 pub async fn validate_auth_token<S>(
     infra: &impl ValidateAuthTokenInfra,
     require_roles: RequireAuthRoles,

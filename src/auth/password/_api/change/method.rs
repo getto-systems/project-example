@@ -1,8 +1,7 @@
 use getto_application::data::MethodResult;
 
 use crate::auth::{
-    auth_ticket::_api::validate::method::validate_api_token,
-    auth_user::_common::kernel::data::RequireAuthRoles,
+    auth_ticket::_common::kernel::infra::{AuthNonceMetadata, AuthTokenMetadata},
     password::{
         _api::change::infra::{
             ChangePasswordInfra, ChangePasswordResponseEncoder, ChangePasswordService,
@@ -18,18 +17,21 @@ pub async fn change_password<S>(
     fields: ChangePasswordFieldsExtract,
     post: impl Fn(ChangePasswordEvent) -> S,
 ) -> MethodResult<S> {
-    let validate_infra = infra.validate_infra();
+    let nonce_metadata = infra.nonce_metadata();
+    let token_metadata = infra.token_metadata();
     let change_service = infra.change_service();
     let response_encoder = infra.response_encoder();
 
-    let require_roles = RequireAuthRoles::Nothing;
+    let nonce = nonce_metadata
+        .nonce()
+        .map_err(|err| post(ChangePasswordEvent::MetadataError(err)))?;
 
-    let user_id = validate_api_token(validate_infra, require_roles)
-        .await
-        .map_err(|err| post(ChangePasswordEvent::ValidateError(err)))?;
+    let token = token_metadata
+        .token()
+        .map_err(|err| post(ChangePasswordEvent::MetadataError(err)))?;
 
     let response = change_service
-        .change(user_id, fields)
+        .change(nonce, token, fields)
         .await
         .map_err(|err| post(ChangePasswordEvent::ServiceError(err)))?;
 

@@ -1,13 +1,9 @@
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
-    auth_ticket::_api::{
-        kernel::init::{
-            nonce_header::test::StaticAuthNonceHeader, token_header::test::StaticAuthTokenHeader,
-        },
-        validate::init::{
-            test::StaticValidateApiTokenStruct, validate_service::test::StaticValidateService,
-        },
+    auth_ticket::_common::kernel::init::{
+        nonce_metadata::test::StaticAuthNonceMetadata,
+        token_metadata::test::StaticAuthTokenMetadata,
     },
     password::_api::change::init::{
         change_service::test::StaticChangePasswordService,
@@ -52,11 +48,8 @@ impl<'a> TestFeature {
     fn standard() -> Self {
         Self {
             change: StaticChangePasswordStruct {
-                validate_infra: StaticValidateApiTokenStruct {
-                    nonce_header: StaticAuthNonceHeader::new("NONCE"),
-                    token_header: StaticAuthTokenHeader::new("TOKEN"),
-                    validate_service: StaticValidateService::new("USER-ID"),
-                },
+                nonce_metadata: StaticAuthNonceMetadata::new("NONCE".into()),
+                token_metadata: StaticAuthTokenMetadata::new("TOKEN".into()),
                 change_service: StaticChangePasswordService,
                 response_encoder: StaticChangePasswordResponseEncoder,
             },

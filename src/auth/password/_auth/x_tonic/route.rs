@@ -3,8 +3,12 @@ use tonic::{Request, Response, Status};
 use getto_application::helper::flatten;
 
 use crate::auth::password::_auth::action_change::init::ChangePasswordFeature;
-use crate::auth::password::_common::y_protobuf::service::{ChangePasswordRequestPb, ChangePasswordResponsePb};
-use crate::auth::password::_common::y_protobuf::service::change_password_pb_server::{ChangePasswordPb, ChangePasswordPbServer};
+use crate::auth::password::_common::y_protobuf::service::change_password_pb_server::{
+    ChangePasswordPb, ChangePasswordPbServer,
+};
+use crate::auth::password::_common::y_protobuf::service::{
+    ChangePasswordRequestPb, ChangePasswordResponsePb,
+};
 
 use crate::z_details::_common::{logger::Logger, response::tonic::RespondTo};
 
@@ -76,7 +80,7 @@ impl ChangePasswordPb for Change {
         } = extract_request(request);
 
         let logger = app_logger("auth.password.change", &metadata);
-        let mut action = ChangePasswordFeature::action(&data);
+        let mut action = ChangePasswordFeature::action(&data, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         let request_decoder = ChangePasswordFeature::request_decoder(request);

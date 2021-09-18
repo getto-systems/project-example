@@ -12,9 +12,12 @@ use crate::{
     z_details::_common::repository::data::RepositoryError,
 };
 
+use crate::auth::auth_ticket::_auth::validate::event::ValidateAuthTokenEvent;
+
 pub enum ChangePasswordEvent {
     Success,
     UserNotFound,
+    Validate(ValidateAuthTokenEvent),
     InvalidPassword(ChangePasswordError),
     NonceError(ValidateAuthNonceError),
     PasswordHashError(PasswordHashError),
@@ -28,6 +31,7 @@ impl std::fmt::Display for ChangePasswordEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Success => write!(f, "{}", SUCCESS),
+            Self::Validate(event) => event.fmt(f),
             Self::InvalidPassword(response) => write!(f, "{}; {}", ERROR, response),
             Self::UserNotFound => write!(f, "{}; user not found", ERROR),
             Self::NonceError(err) => write!(f, "{}; {}", ERROR, err),

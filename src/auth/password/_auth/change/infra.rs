@@ -1,5 +1,5 @@
 use crate::auth::{
-    auth_user::_common::kernel::data::AuthUserId,
+    auth_ticket::_auth::validate::infra::ValidateAuthTokenInfra,
     password::{
         _auth::kernel::infra::{
             AuthUserPasswordHasher, AuthUserPasswordMatcher, ChangePasswordRepository,
@@ -10,10 +10,12 @@ use crate::auth::{
 };
 
 pub trait ChangePasswordInfra {
+    type ValidateInfra: ValidateAuthTokenInfra;
     type PasswordRepository: ChangePasswordRepository;
     type PasswordMatcher: AuthUserPasswordMatcher;
     type PasswordHasher: AuthUserPasswordHasher;
 
+    fn validate_infra(&self) -> &Self::ValidateInfra;
     fn password_repository(&self) -> &Self::PasswordRepository;
     fn password_matcher(&self, plain_password: PlainPassword) -> Self::PasswordMatcher {
         Self::PasswordMatcher::new(plain_password)
@@ -24,5 +26,5 @@ pub trait ChangePasswordInfra {
 }
 
 pub trait ChangePasswordRequestDecoder {
-    fn decode(self) -> (AuthUserId, ChangePasswordFieldsExtract);
+    fn decode(self) -> ChangePasswordFieldsExtract;
 }

@@ -11,7 +11,7 @@ impl RespondTo for AuthenticatePasswordEvent {
     fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
             Self::Result(message) => message.respond_to(request),
-            Self::HeaderError(err) => err.respond_to(request),
+            Self::MetadataError(err) => err.respond_to(request),
             Self::ServiceError(err) => err.respond_to(request),
             Self::MessageError(err) => err.respond_to(request),
         }

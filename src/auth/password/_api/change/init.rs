@@ -6,14 +6,17 @@ use actix_web::HttpRequest;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_api::validate::init::ValidateApiTokenStruct;
+use crate::auth::auth_ticket::_api::kernel::init::{
+    nonce_metadata::ActixWebAuthNonceMetadata, token_metadata::TicketAuthTokenMetadata,
+};
 use change_service::TonicChangePasswordService;
 use response_encoder::ProstChangePasswordResponseEncoder;
 
 use super::infra::ChangePasswordInfra;
 
 pub struct ChangePasswordStruct<'a> {
-    validate_infra: ValidateApiTokenStruct<'a>,
+    nonce_metadata: ActixWebAuthNonceMetadata<'a>,
+    token_metadata: TicketAuthTokenMetadata<'a>,
     change_service: TonicChangePasswordService<'a>,
     response_encoder: ProstChangePasswordResponseEncoder,
 }
@@ -25,7 +28,8 @@ impl<'a> ChangePasswordStruct<'a> {
         request: &'a HttpRequest,
     ) -> Self {
         Self {
-            validate_infra: ValidateApiTokenStruct::new(&feature, request_id, request),
+            nonce_metadata: ActixWebAuthNonceMetadata::new(request),
+            token_metadata: TicketAuthTokenMetadata::new(request),
             change_service: TonicChangePasswordService::new(&feature.service, request_id),
             response_encoder: ProstChangePasswordResponseEncoder,
         }
@@ -33,12 +37,16 @@ impl<'a> ChangePasswordStruct<'a> {
 }
 
 impl<'a> ChangePasswordInfra for ChangePasswordStruct<'a> {
-    type ValidateInfra = ValidateApiTokenStruct<'a>;
+    type NonceMetadata = ActixWebAuthNonceMetadata<'a>;
+    type TokenMetadata = TicketAuthTokenMetadata<'a>;
     type ChangeService = TonicChangePasswordService<'a>;
     type ResponseEncoder = ProstChangePasswordResponseEncoder;
 
-    fn validate_infra(&self) -> &Self::ValidateInfra {
-        &self.validate_infra
+    fn nonce_metadata(&self) -> &Self::NonceMetadata {
+        &self.nonce_metadata
+    }
+    fn token_metadata(&self) -> &Self::TokenMetadata {
+        &self.token_metadata
     }
     fn change_service(&self) -> &Self::ChangeService {
         &self.change_service
@@ -53,23 +61,31 @@ pub mod test {
     use super::change_service::test::StaticChangePasswordService;
     use super::response_encoder::test::StaticChangePasswordResponseEncoder;
 
-    use crate::auth::auth_ticket::_api::validate::init::test::StaticValidateApiTokenStruct;
+    use crate::auth::auth_ticket::_common::kernel::init::{
+        nonce_metadata::test::StaticAuthNonceMetadata,
+        token_metadata::test::StaticAuthTokenMetadata,
+    };
 
     use super::super::infra::ChangePasswordInfra;
 
     pub struct StaticChangePasswordStruct {
-        pub validate_infra: StaticValidateApiTokenStruct,
+        pub nonce_metadata: StaticAuthNonceMetadata,
+        pub token_metadata: StaticAuthTokenMetadata,
         pub change_service: StaticChangePasswordService,
         pub response_encoder: StaticChangePasswordResponseEncoder,
     }
 
     impl ChangePasswordInfra for StaticChangePasswordStruct {
-        type ValidateInfra = StaticValidateApiTokenStruct;
+        type NonceMetadata = StaticAuthNonceMetadata;
+        type TokenMetadata = StaticAuthTokenMetadata;
         type ChangeService = StaticChangePasswordService;
         type ResponseEncoder = StaticChangePasswordResponseEncoder;
 
-        fn validate_infra(&self) -> &Self::ValidateInfra {
-            &self.validate_infra
+        fn nonce_metadata(&self) -> &Self::NonceMetadata {
+            &self.nonce_metadata
+        }
+        fn token_metadata(&self) -> &Self::TokenMetadata {
+            &self.token_metadata
         }
         fn change_service(&self) -> &Self::ChangeService {
             &self.change_service

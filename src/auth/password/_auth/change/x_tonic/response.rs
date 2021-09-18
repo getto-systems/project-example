@@ -1,6 +1,5 @@
 use tonic::{Response, Status};
 
-use crate::auth::auth_user::_common::kernel::data::AuthUserId;
 use crate::auth::password::_common::y_protobuf::service::{
     ChangePasswordRequestPb, ChangePasswordResponsePb,
 };
@@ -18,6 +17,7 @@ impl RespondTo<ChangePasswordResponsePb> for ChangePasswordEvent {
         match self {
             Self::Success => Ok(Response::new(ChangePasswordResponsePb { success: true })),
             Self::UserNotFound => Err(Status::internal("user not found")),
+            Self::Validate(_) => Err(Status::cancelled("change password cancelled")),
             Self::InvalidPassword(err) => err.respond_to(),
             Self::NonceError(err) => err.respond_to(),
             Self::PasswordHashError(err) => err.respond_to(),
@@ -32,14 +32,11 @@ impl RespondTo<ChangePasswordResponsePb> for ChangePasswordError {
     }
 }
 
-impl Into<(AuthUserId, ChangePasswordFieldsExtract)> for ChangePasswordRequestPb {
-    fn into(self) -> (AuthUserId, ChangePasswordFieldsExtract) {
-        (
-            AuthUserId::restore(self.user_id),
-            ChangePasswordFieldsExtract {
-                current_password: self.current_password,
-                new_password: self.new_password,
-            },
-        )
+impl Into<ChangePasswordFieldsExtract> for ChangePasswordRequestPb {
+    fn into(self) -> ChangePasswordFieldsExtract {
+        ChangePasswordFieldsExtract {
+            current_password: self.current_password,
+            new_password: self.new_password,
+        }
     }
 }

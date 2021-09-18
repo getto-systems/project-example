@@ -1,11 +1,12 @@
 use crate::{
-    auth::_api::service::data::AuthServiceError, z_details::_api::request::data::HeaderError,
+    auth::_common::service::data::AuthServiceError,
+    z_details::_common::request::data::MetadataError,
 };
 
 pub enum LogoutEvent {
     Success,
     ServiceError(AuthServiceError),
-    HeaderError(HeaderError),
+    MetadataError(MetadataError),
 }
 
 const SUCCESS: &'static str = "logout success";
@@ -16,7 +17,7 @@ impl std::fmt::Display for LogoutEvent {
         match self {
             Self::Success => write!(f, "{}", SUCCESS),
             Self::ServiceError(err) => write!(f, "{}: {}", ERROR, err),
-            Self::HeaderError(err) => write!(f, "{}: {}", ERROR, err),
+            Self::MetadataError(err) => write!(f, "{}: {}", ERROR, err),
         }
     }
 }

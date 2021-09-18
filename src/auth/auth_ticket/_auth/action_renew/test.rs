@@ -4,24 +4,28 @@ use getto_application_test::ActionTestRunner;
 
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
-use crate::auth::auth_ticket::_auth::{
-    encode::init::{
-        test::StaticEncodeAuthTicketStruct,
-        token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
+use crate::auth::auth_ticket::{
+    _auth::{
+        encode::init::{
+            test::StaticEncodeAuthTicketStruct,
+            token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
+        },
+        kernel::init::{
+            clock::test::StaticChronoAuthClock,
+            nonce_repository::test::{
+                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+            },
+            test::StaticCheckAuthNonceStruct,
+            ticket_repository::test::{
+                MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+            },
+        },
+        validate::init::{
+            test::StaticValidateAuthTokenStruct, token_decoder::test::StaticAuthTokenDecoder,
+        },
     },
-    kernel::init::{
-        clock::test::StaticChronoAuthClock,
+    _common::kernel::init::{
         nonce_metadata::test::StaticAuthNonceMetadata,
-        nonce_repository::test::{
-            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-        },
-        test::StaticCheckAuthNonceStruct,
-        ticket_repository::test::{
-            MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
-        },
-    },
-    validate::init::{
-        test::StaticValidateAuthTokenStruct, token_decoder::test::StaticAuthTokenDecoder,
         token_metadata::test::StaticAuthTokenMetadata,
     },
 };
@@ -32,11 +36,8 @@ use crate::auth::auth_ticket::_auth::{
 
 use super::action::{RenewAuthTicketAction, RenewAuthTicketMaterial};
 
-use crate::auth::auth_ticket::{
-    _auth::kernel::data::{
-        AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
-    },
-    _common::kernel::data::{AuthNonce, AuthToken},
+use crate::auth::auth_ticket::_auth::kernel::data::{
+    AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
 };
 
 #[tokio::test]
@@ -255,10 +256,10 @@ fn standard_clock() -> StaticChronoAuthClock {
 }
 
 fn standard_nonce_header() -> StaticAuthNonceMetadata {
-    StaticAuthNonceMetadata::Valid(AuthNonce::restore(NONCE.into()))
+    StaticAuthNonceMetadata::new(NONCE.into())
 }
 fn standard_token_header() -> StaticAuthTokenMetadata {
-    StaticAuthTokenMetadata::Valid(AuthToken::restore("TOKEN".into()))
+    StaticAuthTokenMetadata::new("TOKEN".into())
 }
 
 fn standard_token_decoder() -> StaticAuthTokenDecoder {

@@ -6,7 +6,7 @@ impl RequestResetTokenEvent {
     pub const fn log_level(&self) -> LogLevel {
         match self {
             Self::Result(_) => LogLevel::Audit,
-            Self::HeaderError(err) => err.log_level(),
+            Self::MetadataError(err) => err.log_level(),
             Self::ServiceError(err) => err.log_level(),
             Self::MessageError(err) => err.log_level(),
         }

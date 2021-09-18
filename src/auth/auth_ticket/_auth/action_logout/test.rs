@@ -4,21 +4,25 @@ use getto_application_test::ActionTestRunner;
 
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
-use crate::auth::auth_ticket::_auth::{
-    discard::init::test::StaticDiscardAuthTicketStruct,
-    kernel::init::{
-        clock::test::StaticChronoAuthClock,
-        nonce_metadata::test::StaticAuthNonceMetadata,
-        nonce_repository::test::{
-            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+use crate::auth::auth_ticket::{
+    _auth::{
+        discard::init::test::StaticDiscardAuthTicketStruct,
+        kernel::init::{
+            clock::test::StaticChronoAuthClock,
+            nonce_repository::test::{
+                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+            },
+            test::StaticCheckAuthNonceStruct,
+            ticket_repository::test::{
+                MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+            },
         },
-        test::StaticCheckAuthNonceStruct,
-        ticket_repository::test::{
-            MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+        validate::init::{
+            test::StaticValidateAuthTokenStruct, token_decoder::test::StaticAuthTokenDecoder,
         },
     },
-    validate::init::{
-        test::StaticValidateAuthTokenStruct, token_decoder::test::StaticAuthTokenDecoder,
+    _common::kernel::init::{
+        nonce_metadata::test::StaticAuthNonceMetadata,
         token_metadata::test::StaticAuthTokenMetadata,
     },
 };
@@ -27,11 +31,8 @@ use crate::auth::auth_ticket::_auth::kernel::infra::AuthNonceConfig;
 
 use super::action::{LogoutAction, LogoutMaterial};
 
-use crate::auth::auth_ticket::{
-    _auth::kernel::data::{
-        AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
-    },
-    _common::kernel::data::{AuthNonce, AuthToken},
+use crate::auth::auth_ticket::_auth::kernel::data::{
+    AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
 };
 
 #[tokio::test]
@@ -190,10 +191,10 @@ fn standard_clock() -> StaticChronoAuthClock {
 }
 
 fn standard_nonce_metadata() -> StaticAuthNonceMetadata {
-    StaticAuthNonceMetadata::Valid(AuthNonce::restore(NONCE.into()))
+    StaticAuthNonceMetadata::new(NONCE.into())
 }
 fn standard_token_metadata() -> StaticAuthTokenMetadata {
-    StaticAuthTokenMetadata::Valid(AuthToken::restore("TOKEN".into()))
+    StaticAuthTokenMetadata::new("TOKEN".into())
 }
 
 fn standard_token_validator() -> StaticAuthTokenDecoder {

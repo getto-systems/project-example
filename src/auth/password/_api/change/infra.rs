@@ -1,22 +1,25 @@
 use crate::auth::{
-    auth_ticket::_api::validate::infra::ValidateApiTokenInfra,
-    auth_user::_common::kernel::data::AuthUserId,
+    auth_ticket::_common::kernel::infra::{AuthNonceMetadata, AuthTokenMetadata},
     password::_common::change::infra::ChangePasswordFieldsExtract,
 };
 
 use crate::{
     auth::{
-        _api::service::data::AuthServiceError, password::_api::change::data::ChangePasswordResult,
+        _common::service::data::AuthServiceError,
+        auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
+        password::_api::change::data::ChangePasswordResult,
     },
     z_details::_api::message::data::MessageError,
 };
 
 pub trait ChangePasswordInfra {
-    type ValidateInfra: ValidateApiTokenInfra;
+    type NonceMetadata: AuthNonceMetadata;
+    type TokenMetadata: AuthTokenMetadata;
     type ChangeService: ChangePasswordService;
     type ResponseEncoder: ChangePasswordResponseEncoder;
 
-    fn validate_infra(&self) -> &Self::ValidateInfra;
+    fn nonce_metadata(&self) -> &Self::NonceMetadata;
+    fn token_metadata(&self) -> &Self::TokenMetadata;
     fn change_service(&self) -> &Self::ChangeService;
     fn response_encoder(&self) -> &Self::ResponseEncoder;
 }
@@ -29,7 +32,8 @@ pub trait ChangePasswordRequestDecoder {
 pub trait ChangePasswordService {
     async fn change(
         &self,
-        user_id: AuthUserId,
+        nonce: Option<AuthNonce>,
+        token: Option<AuthToken>,
         fields: ChangePasswordFieldsExtract,
     ) -> Result<ChangePasswordResponse, AuthServiceError>;
 }

@@ -1,16 +1,14 @@
 use crate::{
     auth::{
-        _api::service::data::AuthServiceError,
-        auth_ticket::_api::validate::data::ValidateApiTokenError,
+        _common::service::data::AuthServiceError,
         password::_api::change::data::ChangePasswordResult,
     },
-    z_details::_api::{message::data::MessageError, request::data::HeaderError},
+    z_details::{_api::message::data::MessageError, _common::request::data::MetadataError},
 };
 
 pub enum ChangePasswordEvent {
     Result(ChangePasswordResult),
-    HeaderError(HeaderError),
-    ValidateError(ValidateApiTokenError),
+    MetadataError(MetadataError),
     ServiceError(AuthServiceError),
     MessageError(MessageError),
 }
@@ -22,8 +20,7 @@ impl std::fmt::Display for ChangePasswordEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Result(result) => result.fmt(f),
-            Self::HeaderError(err) => write!(f, "{}; {}", ERROR, err),
-            Self::ValidateError(err) => write!(f, "{}; {}", ERROR, err),
+            Self::MetadataError(err) => write!(f, "{}; {}", ERROR, err),
             Self::ServiceError(err) => write!(f, "{}; {}", ERROR, err),
             Self::MessageError(err) => write!(f, "{}; {}", ERROR, err),
         }
