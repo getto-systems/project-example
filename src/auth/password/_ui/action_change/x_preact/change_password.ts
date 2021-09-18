@@ -172,7 +172,7 @@ function changePasswordError(err: ChangePasswordError): VNodeContent[] {
             return ["正しく入力してください"]
 
         case "invalid-password":
-            return ["ログインIDかパスワードが違います"]
+            return ["現在のパスワードが違います"]
 
         default:
             return remoteCommonErrorReason(err, (reason) => [

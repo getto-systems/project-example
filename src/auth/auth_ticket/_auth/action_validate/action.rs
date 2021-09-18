@@ -55,6 +55,7 @@ impl<M: ValidateApiTokenMaterial> ValidateApiTokenAction<M> {
 
         let require_roles = request_decoder.decode();
 
+        // TODO discard auth ticket で呼ぶ
         let ticket = validate_auth_token(m.validate(), require_roles, |event| {
             pubsub.post(ValidateApiTokenState::Validate(event))
         })

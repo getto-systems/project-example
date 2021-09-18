@@ -7,7 +7,7 @@ use actix_web::HttpRequest;
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::auth_ticket::_api::kernel::init::{
-    nonce_metadata::ActixWebAuthNonceMetadata, token_metadata::TicketAuthTokenMetadata,
+    nonce_metadata::ActixWebAuthNonceMetadata, token_metadata::ApiAuthTokenMetadata,
 };
 use change_service::TonicChangePasswordService;
 use response_encoder::ProstChangePasswordResponseEncoder;
@@ -16,7 +16,7 @@ use super::infra::ChangePasswordInfra;
 
 pub struct ChangePasswordStruct<'a> {
     nonce_metadata: ActixWebAuthNonceMetadata<'a>,
-    token_metadata: TicketAuthTokenMetadata<'a>,
+    token_metadata: ApiAuthTokenMetadata<'a>,
     change_service: TonicChangePasswordService<'a>,
     response_encoder: ProstChangePasswordResponseEncoder,
 }
@@ -29,7 +29,7 @@ impl<'a> ChangePasswordStruct<'a> {
     ) -> Self {
         Self {
             nonce_metadata: ActixWebAuthNonceMetadata::new(request),
-            token_metadata: TicketAuthTokenMetadata::new(request),
+            token_metadata: ApiAuthTokenMetadata::new(request),
             change_service: TonicChangePasswordService::new(&feature.service, request_id),
             response_encoder: ProstChangePasswordResponseEncoder,
         }
@@ -38,7 +38,7 @@ impl<'a> ChangePasswordStruct<'a> {
 
 impl<'a> ChangePasswordInfra for ChangePasswordStruct<'a> {
     type NonceMetadata = ActixWebAuthNonceMetadata<'a>;
-    type TokenMetadata = TicketAuthTokenMetadata<'a>;
+    type TokenMetadata = ApiAuthTokenMetadata<'a>;
     type ChangeService = TonicChangePasswordService<'a>;
     type ResponseEncoder = ProstChangePasswordResponseEncoder;
 
