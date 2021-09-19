@@ -15,7 +15,7 @@ lazy_static! {
 
 #[tokio::main]
 async fn main() {
-    let data: AppData = Arc::new(AppFeature::new().await);
+    let data: AppData = Arc::new(AppFeature::new(&ENV).await);
 
     let server = route::Server::new();
 

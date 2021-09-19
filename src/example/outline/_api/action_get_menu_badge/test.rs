@@ -21,10 +21,7 @@ async fn success_get_menu_badge() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec![
-        "authorized; user: USER-ID",
-        "get outline menu badge success",
-    ]);
+    assert_state(vec!["get outline menu badge success"]);
     assert!(result.is_ok());
 }
 
