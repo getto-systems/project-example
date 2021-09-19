@@ -52,7 +52,7 @@ impl<M: RenewAuthTicketMaterial> RenewAuthTicketAction<M> {
         let pubsub = self.pubsub;
         let m = self.material;
 
-        // TODO discard auth ticket で呼ぶ
+        // encode_auth_ticket は環境から ticket を取り出すのではなく、 ticket を encode するのだ
         let ticket = validate_ticket_token(m.validate(), |event| {
             pubsub.post(RenewAuthTicketState::Validate(event))
         })
