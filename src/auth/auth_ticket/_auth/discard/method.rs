@@ -5,15 +5,19 @@ use crate::auth::auth_ticket::_auth::{
     kernel::infra::{AuthClock, DiscardAuthTicketRepository},
 };
 
-use super::event::DiscardAuthTicketEvent;
+use crate::auth::auth_ticket::_auth::validate::method::validate_ticket_token;
 
-use crate::auth::auth_ticket::_auth::kernel::data::AuthTicket;
+use super::event::DiscardAuthTicketEvent;
 
 pub async fn discard_auth_ticket<S>(
     infra: &impl DiscardAuthTicketInfra,
-    ticket: AuthTicket,
     post: impl Fn(DiscardAuthTicketEvent) -> S,
 ) -> MethodResult<S> {
+    let ticket = validate_ticket_token(infra.validate_infra(), |event| {
+        post(DiscardAuthTicketEvent::Validate(event))
+    })
+    .await?;
+
     let clock = infra.clock();
     let ticket_repository = infra.ticket_repository();
 

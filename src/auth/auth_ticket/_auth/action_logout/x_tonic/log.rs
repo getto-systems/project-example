@@ -11,7 +11,6 @@ impl LogMessage for &LogoutState {
 impl LogoutState {
     pub const fn log_level(&self) -> LogLevel {
         match self {
-            Self::Validate(event) => event.log_level(),
             Self::Discard(event) => event.log_level(),
         }
     }

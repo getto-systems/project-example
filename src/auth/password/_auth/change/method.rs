@@ -1,6 +1,6 @@
 use crate::auth::{
     _common::data::RequireAuthRoles,
-    auth_ticket::_auth::validate::method::validate_auth_token,
+    auth_ticket::_auth::validate::method::validate_api_token,
     password::{
         _auth::{
             change::infra::ChangePasswordInfra,
@@ -19,11 +19,9 @@ pub async fn change_password<S>(
     fields: ChangePasswordFieldsExtract,
     post: impl Fn(ChangePasswordEvent) -> S,
 ) -> MethodResult<S> {
-    let ticket = validate_auth_token(
-        infra.validate_infra(),
-        RequireAuthRoles::Nothing,
-        |event| post(ChangePasswordEvent::Validate(event)),
-    )
+    let ticket = validate_api_token(infra.validate_infra(), RequireAuthRoles::Nothing, |event| {
+        post(ChangePasswordEvent::Validate(event))
+    })
     .await?;
 
     let current_password = PlainPassword::validate(fields.current_password)
