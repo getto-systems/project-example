@@ -12,8 +12,10 @@ export interface ChangePasswordAction extends ApplicationStateAction<ChangePassw
     readonly newPassword: InputPasswordAction
     readonly validate: ValidateBoardAction
 
+    open(): ChangePasswordState
     clear(): ChangePasswordState
     submit(): Promise<ChangePasswordState>
+    close(): ChangePasswordState
 }
 
 export const changePasswordFieldNames = ["currentPassword", "newPassword"] as const
@@ -25,6 +27,7 @@ export type ChangePasswordMaterial = Readonly<{
 
 export type ChangePasswordState =
     | Readonly<{ type: "initial-change-password" }>
+    | Readonly<{ type: "input-password" }>
     | ChangePasswordEvent
 
 export const initialChangePasswordState: ChangePasswordState = {

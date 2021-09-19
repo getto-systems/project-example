@@ -14,6 +14,7 @@ import {
     form,
 } from "../../../../../../ui/vendor/getto-css/preact/design/form"
 import { box } from "../../../../../../ui/vendor/getto-css/preact/design/box"
+import { notice_success } from "../../../../../../ui/vendor/getto-css/preact/design/highlight"
 
 import { VNodeContent } from "../../../../../example/_ui/x_preact/design/common"
 import { spinner } from "../../../../../example/_ui/x_preact/design/icon"
@@ -23,8 +24,6 @@ import { InputPasswordEntry } from "../../action_input/x_preact/input"
 import { ChangePasswordResource, ChangePasswordResourceState } from "../resource"
 
 import { ChangePasswordError } from "../../change/data"
-import { notice_success } from "../../../../../../ui/vendor/getto-css/preact/design/highlight"
-import { v_small } from "../../../../../../ui/vendor/getto-css/preact/design/alignment"
 
 export function ChangePasswordEntry({ change }: ChangePasswordResource): VNode {
     return h(ChangePasswordComponent, {
@@ -41,27 +40,67 @@ export function ChangePasswordComponent(props: Props): VNode {
     function basedOn({ state, validate }: ChangePasswordResourceState): VNode {
         switch (state.type) {
             case "initial-change-password":
-                return changePasswordBox({ state: validate })
+                return buttonBox({ type: "initial" })
+
+            case "input-password":
+                return formBox({ type: validate })
 
             case "try-to-change-password":
-                return changePasswordBox({ state: "connecting" })
+                return formBox({ type: "connecting" })
 
             case "take-longtime-to-change-password":
-                return changePasswordBox({ state: "take-longtime" })
+                return formBox({ type: "take-longtime" })
 
             case "succeed-to-change-password":
-                return changePasswordBox({ state: "success" })
+                return buttonBox({ type: "success" })
 
             case "failed-to-change-password":
-                return changePasswordBox({ state: validate, err: changePasswordError(state.err) })
+                return formBox({ type: validate, err: changePasswordError(state.err) })
         }
     }
 
-    type State = "initial" | "valid" | "invalid" | "connecting" | "take-longtime" | "success"
+    type ButtonContentType = "initial" | "success"
+    type ButtonContent = Readonly<{ type: ButtonContentType }>
+    function buttonBox(state: ButtonContent): VNode {
+        return form(box(content()))
 
-    type Content = Readonly<{ state: State }> | Readonly<{ state: State; err: VNodeContent[] }>
+        type BoxContent =
+            | Readonly<{ title: VNodeContent; body: VNodeContent }>
+            | Readonly<{ title: VNodeContent; body: VNodeContent; footer: VNodeContent }>
+        function content(): BoxContent {
+            switch (state.type) {
+                case "initial":
+                    return {
+                        title: title(),
+                        body: openButton(),
+                    }
 
-    function changePasswordBox(content: Content): VNode {
+                case "success":
+                    return {
+                        title: title(),
+                        body: openButton(),
+                        footer: notice_success(["パスワードを変更しました"]),
+                    }
+            }
+        }
+        function title() {
+            return "パスワード変更"
+        }
+        function openButton(): VNode {
+            return button_send({ state: "normal", label: "変更", onClick })
+
+            function onClick(e: Event) {
+                e.preventDefault()
+                props.change.open()
+            }
+        }
+    }
+
+    type FormContentType = "initial" | "valid" | "invalid" | "connecting" | "take-longtime"
+    type FormContent =
+        | Readonly<{ type: FormContentType }>
+        | Readonly<{ type: FormContentType; err: VNodeContent[] }>
+    function formBox(state: FormContent): VNode {
         return form(
             box({
                 title: "パスワード変更",
@@ -83,6 +122,9 @@ export function ChangePasswordComponent(props: Props): VNode {
                         right: clearButton(),
                     }),
                     ...message(),
+                    buttons({
+                        right: closeButton(),
+                    }),
                 ],
             }),
         )
@@ -90,14 +132,13 @@ export function ChangePasswordComponent(props: Props): VNode {
         function submitButton(): VNode {
             const label = "パスワード変更"
 
-            switch (content.state) {
+            switch (state.type) {
                 case "initial":
                     return button_send({ state: "normal", label, onClick })
 
                 case "valid":
                     return button_send({ state: "confirm", label, onClick })
 
-                case "success":
                 case "invalid":
                     return button_disabled({ label })
 
@@ -117,7 +158,7 @@ export function ChangePasswordComponent(props: Props): VNode {
 
         function clearButton(): VNode {
             const label = "入力内容をクリア"
-            switch (content.state) {
+            switch (state.type) {
                 case "initial":
                     return button_disabled({ label })
 
@@ -127,7 +168,6 @@ export function ChangePasswordComponent(props: Props): VNode {
 
                 case "invalid":
                 case "valid":
-                case "success":
                     return button_undo({ label, onClick })
             }
 
@@ -136,13 +176,21 @@ export function ChangePasswordComponent(props: Props): VNode {
                 props.change.clear()
             }
         }
+        function closeButton(): VNode {
+            return button_undo({ label: "閉じる", onClick })
+
+            function onClick(e: Event) {
+                e.preventDefault()
+                props.change.close()
+            }
+        }
 
         function message(): VNode[] {
-            if ("err" in content) {
-                return [fieldError(content.err)]
+            if ("err" in state) {
+                return [fieldError(state.err)]
             }
 
-            switch (content.state) {
+            switch (state.type) {
                 case "initial":
                 case "valid":
                 case "connecting":
@@ -155,9 +203,6 @@ export function ChangePasswordComponent(props: Props): VNode {
                             html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
                         ]),
                     ]
-
-                case "success":
-                    return [v_small(), notice_success(["パスワードを変更しました"])]
 
                 case "invalid":
                     return [fieldError(["正しく入力されていません"])]
