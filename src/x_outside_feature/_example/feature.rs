@@ -2,13 +2,24 @@ use std::sync::Arc;
 
 use tonic::{metadata::MetadataMap, Request};
 
+use crate::{
+    auth::_example::x_outside_feature::{
+        feature::AuthOutsideFeature, init::new_auth_outside_feature,
+    },
+    x_outside_feature::_example::env::Env,
+};
+
 pub type AppData = Arc<AppFeature>;
 
-pub struct AppFeature {}
+pub struct AppFeature {
+    pub auth: AuthOutsideFeature,
+}
 
 impl AppFeature {
-    pub async fn new() -> Self {
-        Self {}
+    pub async fn new(env: &'static Env) -> Self {
+        Self {
+            auth: new_auth_outside_feature(env).await,
+        }
     }
 }
 

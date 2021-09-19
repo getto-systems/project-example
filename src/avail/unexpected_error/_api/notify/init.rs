@@ -4,24 +4,24 @@ use actix_web::HttpRequest;
 
 use crate::x_outside_feature::_api::feature::AppFeature;
 
-use crate::auth::_common::init::ValidateApiTokenStruct;
+use crate::auth::_common::init::ValidateApiTokenStructForApi;
 
 use super::infra::NotifyUnexpectedErrorInfra;
 
 pub struct NotifyUnexpectedErrorStruct<'a> {
-    validate_infra: ValidateApiTokenStruct<'a>,
+    validate_infra: ValidateApiTokenStructForApi<'a>,
 }
 
 impl<'a> NotifyUnexpectedErrorStruct<'a> {
     pub fn new(feature: &'a AppFeature, request_id: &'a str, request: &'a HttpRequest) -> Self {
         Self {
-            validate_infra: ValidateApiTokenStruct::new(&feature.auth, request_id, request),
+            validate_infra: ValidateApiTokenStructForApi::new(&feature.auth, request_id, request),
         }
     }
 }
 
 impl<'a> NotifyUnexpectedErrorInfra for NotifyUnexpectedErrorStruct<'a> {
-    type ValidateInfra = ValidateApiTokenStruct<'a>;
+    type ValidateInfra = ValidateApiTokenStructForApi<'a>;
 
     fn validate_infra(&self) -> &Self::ValidateInfra {
         &self.validate_infra

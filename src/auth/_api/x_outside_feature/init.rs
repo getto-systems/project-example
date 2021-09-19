@@ -1,9 +1,11 @@
 use crate::{
-    auth::_api::x_outside_feature::feature::AuthOutsideKey, x_outside_feature::_api::env::Env,
+    auth::{
+        _api::x_outside_feature::feature::{AuthOutsideCookie, AuthOutsideFeature, AuthOutsideKey},
+        _common::x_outside_feature::feature::AuthOutsideService,
+    },
+    x_outside_feature::_api::env::Env,
     z_details::_common::jwt::helper::decoding_key_from_ec_pem,
 };
-
-use super::feature::{AuthOutsideCookie, AuthOutsideFeature, AuthOutsideService};
 
 pub async fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
     AuthOutsideFeature {
@@ -17,7 +19,6 @@ pub async fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
         key: AuthOutsideKey {
             ticket: decoding_key_from_ec_pem(&env.ticket_public_key),
             api: decoding_key_from_ec_pem(&env.api_public_key),
-            reset_token: decoding_key_from_ec_pem(&env.reset_token_public_key),
         },
     }
 }

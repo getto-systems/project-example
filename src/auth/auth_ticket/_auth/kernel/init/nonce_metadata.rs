@@ -1,8 +1,8 @@
 use tonic::metadata::MetadataMap;
 
-use crate::auth::auth_ticket::_common::kernel::x_tonic::metadata::METADATA_NONCE;
+use crate::auth::_common::metadata::METADATA_NONCE;
 
-use crate::z_details::_auth::request::helper::metadata;
+use crate::z_details::_common::request::x_tonic::metadata::metadata;
 
 use crate::auth::auth_ticket::_common::kernel::infra::AuthNonceMetadata;
 
@@ -23,6 +23,7 @@ impl<'a> TonicAuthNonceMetadata<'a> {
 
 impl<'a> AuthNonceMetadata for TonicAuthNonceMetadata<'a> {
     fn nonce(&self) -> Result<Option<AuthNonce>, MetadataError> {
-        metadata(&self.metadata, METADATA_NONCE).map(|value| value.map(AuthNonce::restore))
+        metadata(&self.metadata, METADATA_NONCE)
+            .map(|value| value.map(|nonce| AuthNonce::restore(nonce.into())))
     }
 }

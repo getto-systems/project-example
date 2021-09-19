@@ -4,7 +4,7 @@ use crate::auth::auth_ticket::_common::y_protobuf::service::{
     logout_pb_client::LogoutPbClient, LogoutRequestPb,
 };
 
-use crate::auth::_api::x_outside_feature::feature::AuthOutsideService;
+use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
 
 use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
 

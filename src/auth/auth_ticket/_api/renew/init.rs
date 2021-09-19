@@ -29,7 +29,7 @@ impl<'a> RenewAuthTicketStruct<'a> {
         request: &'a HttpRequest,
     ) -> Self {
         Self {
-            service_metadata: TicketServiceMetadata::new(request, &feature.key),
+            service_metadata: TicketServiceMetadata::new(&feature.key, request),
             renew_service: TonicRenewAuthTicketService::new(&feature.service, request_id),
             response_builder: CookieAuthTokenResponseBuilder::new(&feature.cookie),
             response_encoder: ProstRenewAuthTicketResponseEncoder,

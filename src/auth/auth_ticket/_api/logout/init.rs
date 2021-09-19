@@ -23,7 +23,7 @@ impl<'a> LogoutStruct<'a> {
         request: &'a HttpRequest,
     ) -> Self {
         Self {
-            service_metadata: TicketServiceMetadata::new(request, &feature.key),
+            service_metadata: TicketServiceMetadata::new(&feature.key, request),
             logout_service: TonicLogoutService::new(&feature.service, request_id),
         }
     }

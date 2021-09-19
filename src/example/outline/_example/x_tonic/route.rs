@@ -2,6 +2,7 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
+use crate::x_outside_feature::_common::metadata::metadata_request_id;
 use crate::z_details::_common::{logger::Logger, response::tonic::RespondTo};
 
 use crate::x_outside_feature::_example::{
@@ -32,10 +33,11 @@ impl GetMenuBadgePb for GetMenuBadge {
         &self,
         request: Request<GetMenuBadgeRequestPb>,
     ) -> Result<Response<GetMenuBadgeResponsePb>, Status> {
-        let TonicRequest { metadata, .. } = extract_request(request);
+        let TonicRequest { metadata, data, .. } = extract_request(request);
+        let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("outline.get_menu_badge", &metadata);
-        let mut action = GetOutlineMenuBadgeFeature::action();
+        let logger = app_logger("outline.get_menu_badge", &request_id);
+        let mut action = GetOutlineMenuBadgeFeature::action(&data, &request_id, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         flatten(action.ignite().await).respond_to()

@@ -13,6 +13,7 @@ impl RespondTo<GetMenuBadgeResponsePb> for GetOutlineMenuBadgeEvent {
                 let response: GetMenuBadgeResponsePb = menu_badge.into();
                 Ok(Response::new(response))
             }
+            Self::ValidateError(_) => Err(Status::cancelled("get outline menu cancelled")),
             Self::RepositoryError(err) => err.respond_to(),
         }
     }

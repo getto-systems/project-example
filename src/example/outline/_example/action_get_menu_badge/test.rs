@@ -1,8 +1,13 @@
 use getto_application_test::ActionTestRunner;
 
-use crate::example::outline::_example::get_menu_badge::init::{
-    menu_badge_repository::test::StaticOutlineMenuBadgeRepository,
-    test::StaticGetOutlineMenuBadgeStruct,
+use crate::{
+    auth::_common::init::test::{
+        StaticAuthServiceMetadata, StaticValidateApiTokenStruct, StaticValidateService,
+    },
+    example::outline::_example::get_menu_badge::init::{
+        menu_badge_repository::test::StaticOutlineMenuBadgeRepository,
+        test::StaticGetOutlineMenuBadgeStruct,
+    },
 };
 
 use super::action::{GetOutlineMenuBadgeAction, GetOutlineMenuBadgeMaterial};
@@ -46,6 +51,13 @@ impl TestFeature {
     fn standard(_store: &TestStore) -> Self {
         Self {
             get_menu_badge: StaticGetOutlineMenuBadgeStruct {
+                validate_infra: StaticValidateApiTokenStruct {
+                    service_metadata: StaticAuthServiceMetadata {
+                        nonce: "NONCE".into(),
+                        token: "TOKEN".into(),
+                    },
+                    validate_service: StaticValidateService::new("USER-ID".into()),
+                },
                 menu_badge_repository: StaticOutlineMenuBadgeRepository,
             },
         }

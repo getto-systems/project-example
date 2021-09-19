@@ -5,9 +5,15 @@ use tonic::{
 };
 use url::Url;
 
-use crate::x_outside_feature::_common::metadata::METADATA_REQUEST_ID;
+use crate::{
+    auth::_common::metadata::{METADATA_NONCE, METADATA_TOKEN},
+    x_outside_feature::_common::metadata::METADATA_REQUEST_ID,
+};
 
-use crate::z_details::_common::service::infra::ServiceAuthorizer;
+use crate::{
+    auth::_common::infra::AuthServiceMetadataContent,
+    z_details::_common::service::infra::ServiceAuthorizer,
+};
 
 use crate::example::_api::service::data::ExampleServiceError;
 
@@ -31,11 +37,24 @@ pub async fn set_authorization<T>(
 pub fn set_metadata<T>(
     request: &mut Request<T>,
     request_id: &str,
+    metadata: AuthServiceMetadataContent,
 ) -> Result<(), ExampleServiceError> {
     request.metadata_mut().append(
         METADATA_REQUEST_ID,
         MetadataValue::from_str(request_id).map_err(infra_error)?,
     );
+    if let Some(nonce) = metadata.nonce {
+        request.metadata_mut().insert(
+            METADATA_NONCE,
+            MetadataValue::from_str(&nonce.extract()).map_err(infra_error)?,
+        );
+    }
+    if let Some(token) = metadata.token {
+        request.metadata_mut().insert(
+            METADATA_TOKEN,
+            MetadataValue::from_str(&token.extract()).map_err(infra_error)?,
+        );
+    }
 
     Ok(())
 }

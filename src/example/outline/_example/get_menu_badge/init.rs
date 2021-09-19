@@ -1,24 +1,39 @@
 pub(in crate::example) mod menu_badge_repository;
 
 use menu_badge_repository::UnitedOutlineMenuBadgeRepository;
+use tonic::metadata::MetadataMap;
+
+use crate::x_outside_feature::_example::feature::AppFeature;
+
+use crate::auth::_common::init::ValidateApiTokenStruct;
 
 use super::infra::GetOutlineMenuBadgeInfra;
 
-pub struct GetOutlineMenuBadgeStruct {
+pub struct GetOutlineMenuBadgeStruct<'a> {
+    validate_infra: ValidateApiTokenStruct<'a>,
     menu_badge_repository: UnitedOutlineMenuBadgeRepository,
 }
 
-impl GetOutlineMenuBadgeStruct {
-    pub fn new() -> Self {
+impl<'a> GetOutlineMenuBadgeStruct<'a> {
+    pub fn new(feature: &'a AppFeature, request_id: &'a str, metadata: &'a MetadataMap) -> Self {
         Self {
+            validate_infra: ValidateApiTokenStruct::new(
+                &feature.auth.service,
+                request_id,
+                metadata,
+            ),
             menu_badge_repository: UnitedOutlineMenuBadgeRepository,
         }
     }
 }
 
-impl GetOutlineMenuBadgeInfra for GetOutlineMenuBadgeStruct {
+impl<'a> GetOutlineMenuBadgeInfra for GetOutlineMenuBadgeStruct<'a> {
+    type ValidateInfra = ValidateApiTokenStruct<'a>;
     type MenuBadgeRepository = UnitedOutlineMenuBadgeRepository;
 
+    fn validate_infra(&self) -> &Self::ValidateInfra {
+        &self.validate_infra
+    }
     fn menu_badge_repository(&self) -> &Self::MenuBadgeRepository {
         &self.menu_badge_repository
     }
@@ -27,16 +42,22 @@ impl GetOutlineMenuBadgeInfra for GetOutlineMenuBadgeStruct {
 #[cfg(test)]
 pub mod test {
     use super::menu_badge_repository::test::StaticOutlineMenuBadgeRepository;
+    use crate::auth::_common::init::test::StaticValidateApiTokenStruct;
 
     use super::super::infra::GetOutlineMenuBadgeInfra;
 
     pub struct StaticGetOutlineMenuBadgeStruct {
+        pub validate_infra: StaticValidateApiTokenStruct,
         pub menu_badge_repository: StaticOutlineMenuBadgeRepository,
     }
 
     impl GetOutlineMenuBadgeInfra for StaticGetOutlineMenuBadgeStruct {
+        type ValidateInfra = StaticValidateApiTokenStruct;
         type MenuBadgeRepository = StaticOutlineMenuBadgeRepository;
 
+        fn validate_infra(&self) -> &Self::ValidateInfra {
+            &self.validate_infra
+        }
         fn menu_badge_repository(&self) -> &Self::MenuBadgeRepository {
             &self.menu_badge_repository
         }

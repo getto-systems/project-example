@@ -26,7 +26,7 @@ pub struct TicketServiceMetadata<'a> {
 }
 
 impl<'a> TicketServiceMetadata<'a> {
-    pub const fn new(request: &'a HttpRequest, key: &'a AuthOutsideKey) -> Self {
+    pub const fn new(key: &'a AuthOutsideKey, request: &'a HttpRequest) -> Self {
         Self {
             nonce_metadata: ActixWebAuthNonceMetadata::new(request),
             token_metadata: TicketAuthTokenMetadata::new(request),
@@ -51,7 +51,7 @@ pub struct ApiServiceMetadata<'a> {
 }
 
 impl<'a> ApiServiceMetadata<'a> {
-    pub const fn new(request: &'a HttpRequest, key: &'a AuthOutsideKey) -> Self {
+    pub const fn new(key: &'a AuthOutsideKey, request: &'a HttpRequest) -> Self {
         Self {
             nonce_metadata: ActixWebAuthNonceMetadata::new(request),
             token_metadata: ApiAuthTokenMetadata::new(request),

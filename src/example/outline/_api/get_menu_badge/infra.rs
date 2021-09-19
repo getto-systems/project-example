@@ -1,4 +1,4 @@
-use crate::auth::_common::infra::ValidateApiTokenInfra;
+use crate::auth::_common::infra::{AuthServiceMetadata, AuthServiceMetadataContent};
 
 use crate::{
     example::{_api::service::data::ExampleServiceError, outline::_common::data::OutlineMenuBadge},
@@ -6,18 +6,21 @@ use crate::{
 };
 
 pub trait GetOutlineMenuBadgeInfra {
-    type ValidateInfra: ValidateApiTokenInfra;
+    type ServiceMetadata: AuthServiceMetadata;
     type GetMenuService: GetOutlineMenuBadgeService;
     type ResponseEncoder: GetOutlineMenuBadgeResponseEncoder;
 
-    fn validate_infra(&self) -> &Self::ValidateInfra;
+    fn service_metadata(&self) -> &Self::ServiceMetadata;
     fn get_menu_service(&self) -> &Self::GetMenuService;
     fn response_encoder(&self) -> &Self::ResponseEncoder;
 }
 
 #[async_trait::async_trait]
 pub trait GetOutlineMenuBadgeService {
-    async fn get_menu(&self) -> Result<OutlineMenuBadge, ExampleServiceError>;
+    async fn get_menu(
+        &self,
+        metadata: AuthServiceMetadataContent,
+    ) -> Result<OutlineMenuBadge, ExampleServiceError>;
 }
 
 pub trait GetOutlineMenuBadgeResponseEncoder {

@@ -1,6 +1,6 @@
 use tonic::Request;
 
-use crate::auth::_api::x_outside_feature::feature::AuthOutsideService;
+use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
 
 use crate::auth::password::reset::_common::y_protobuf::service::{
     request_reset_token_pb_client::RequestResetTokenPbClient, RequestResetTokenRequestPb,

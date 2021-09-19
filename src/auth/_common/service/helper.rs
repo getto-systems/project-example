@@ -6,7 +6,7 @@ use tonic::{
 use url::Url;
 
 use crate::{
-    auth::auth_ticket::_common::kernel::x_tonic::metadata::{METADATA_NONCE, METADATA_TOKEN},
+    auth::_common::metadata::{METADATA_NONCE, METADATA_TOKEN},
     x_outside_feature::_common::metadata::METADATA_REQUEST_ID,
 };
 

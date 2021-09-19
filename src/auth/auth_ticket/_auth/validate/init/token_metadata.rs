@@ -1,8 +1,8 @@
 use tonic::metadata::MetadataMap;
 
-use crate::auth::auth_ticket::_common::kernel::x_tonic::metadata::METADATA_TOKEN;
+use crate::auth::_common::metadata::METADATA_TOKEN;
 
-use crate::z_details::_auth::request::helper::metadata;
+use crate::z_details::_common::request::x_tonic::metadata::metadata;
 
 use crate::auth::auth_ticket::_common::kernel::infra::AuthTokenMetadata;
 
@@ -23,6 +23,7 @@ impl<'a> TonicAuthTokenMetadata<'a> {
 
 impl<'a> AuthTokenMetadata for TonicAuthTokenMetadata<'a> {
     fn token(&self) -> Result<Option<AuthToken>, MetadataError> {
-        metadata(&self.metadata, METADATA_TOKEN).map(|value| value.map(AuthToken::restore))
+        metadata(&self.metadata, METADATA_TOKEN)
+            .map(|value| value.map(|token| AuthToken::restore(token.into())))
     }
 }

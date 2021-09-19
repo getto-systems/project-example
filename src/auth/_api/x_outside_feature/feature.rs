@@ -1,12 +1,11 @@
 use jsonwebtoken::DecodingKey;
 
+use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
+
 pub struct AuthOutsideFeature {
     pub(in crate::auth) service: AuthOutsideService,
     pub(in crate::auth) cookie: AuthOutsideCookie,
-    pub(in crate::auth) key: AuthOutsideKey,
-}
-pub struct AuthOutsideService {
-    pub service_url: &'static str,
+    pub key: AuthOutsideKey,
 }
 pub struct AuthOutsideCookie {
     pub domain: &'static str,
@@ -15,5 +14,4 @@ pub struct AuthOutsideCookie {
 pub struct AuthOutsideKey {
     pub ticket: DecodingKey<'static>,
     pub api: DecodingKey<'static>,
-    pub reset_token: DecodingKey<'static>,
 }

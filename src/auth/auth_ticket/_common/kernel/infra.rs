@@ -11,9 +11,8 @@ use crate::{
 };
 
 pub struct AuthServiceMetadataContent {
-    // TODO Option じゃなくできるはず
+    // TODO nonce は Option じゃなくできるはず : metadata error に unauthenticated みたいなのを追加かな
     pub nonce: Option<AuthNonce>,
-    // TODO こっちは unauthorized なリクエストがあるんだけどなんとかならんかね？
     pub token: Option<AuthToken>,
 }
 

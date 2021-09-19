@@ -28,7 +28,7 @@ impl<'a> AuthenticatePasswordStruct<'a> {
         request: &'a HttpRequest,
     ) -> Self {
         Self {
-            service_metadata: TicketServiceMetadata::new(request, &feature.key),
+            service_metadata: TicketServiceMetadata::new(&feature.key, request),
             authenticate_service: TonicAuthenticatePasswordService::new(
                 &feature.service,
                 request_id,

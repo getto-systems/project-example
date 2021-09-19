@@ -25,7 +25,7 @@ impl<'a> ChangePasswordStruct<'a> {
         request: &'a HttpRequest,
     ) -> Self {
         Self {
-            service_metadata: ApiServiceMetadata::new(request, &feature.key),
+            service_metadata: ApiServiceMetadata::new(&feature.key, request),
             change_service: TonicChangePasswordService::new(&feature.service, request_id),
             response_encoder: ProstChangePasswordResponseEncoder,
         }
