@@ -1,8 +1,9 @@
 use getto_application::data::MethodResult;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::{
-        AuthNonceHeader, AuthTokenHeader, AuthTokenResponseBuilder,
+    auth_ticket::{
+        _api::kernel::infra::AuthTokenResponseBuilder,
+        _common::kernel::infra::{AuthNonceMetadata, AuthTokenMetadata},
     },
     password::reset::{
         _api::reset::infra::{
@@ -19,19 +20,19 @@ pub async fn reset_password<S>(
     fields: ResetPasswordFieldsExtract,
     post: impl Fn(ResetPasswordEvent) -> S,
 ) -> MethodResult<S> {
-    let nonce_header = infra.nonce_header();
-    let token_header = infra.token_header();
+    let nonce_metadata = infra.nonce_metadata();
+    let token_metadata = infra.token_metadata();
     let reset_service = infra.reset_service();
     let response_encoder = infra.response_encoder();
     let response_builder = infra.response_builder();
 
-    let nonce = nonce_header
+    let nonce = nonce_metadata
         .nonce()
-        .map_err(|err| post(ResetPasswordEvent::HeaderError(err)))?;
+        .map_err(|err| post(ResetPasswordEvent::MetadataError(err)))?;
 
-    let token = token_header
+    let token = token_metadata
         .token()
-        .map_err(|err| post(ResetPasswordEvent::HeaderError(err)))?;
+        .map_err(|err| post(ResetPasswordEvent::MetadataError(err)))?;
 
     let response = reset_service
         .reset(nonce, token, fields)

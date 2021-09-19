@@ -1,6 +1,6 @@
 use tonic::metadata::MetadataMap;
 
-use super::data::MetadataError;
+use crate::z_details::_common::request::data::MetadataError;
 
 pub fn metadata(metadata: &MetadataMap, key: &str) -> Result<Option<String>, MetadataError> {
     let value = metadata.get(key);

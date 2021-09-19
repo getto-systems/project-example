@@ -1,4 +1,4 @@
-use crate::auth::_api::common::infra::ValidateApiTokenInfra;
+use crate::auth::_common::infra::ValidateApiTokenInfra;
 
 use crate::{
     example::{_api::service::data::ExampleServiceError, outline::_common::data::OutlineMenuBadge},

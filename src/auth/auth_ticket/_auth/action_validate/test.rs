@@ -4,18 +4,22 @@ use getto_application_test::ActionTestRunner;
 
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
-use crate::auth::auth_ticket::_auth::{
-    kernel::init::{
-        clock::test::StaticChronoAuthClock,
-        nonce_metadata::test::StaticAuthNonceMetadata,
-        nonce_repository::test::{
-            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+use crate::auth::auth_ticket::{
+    _auth::{
+        kernel::init::{
+            clock::test::StaticChronoAuthClock,
+            nonce_repository::test::{
+                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+            },
+            test::StaticCheckAuthNonceStruct,
         },
-        test::StaticCheckAuthNonceStruct,
+        validate::init::{
+            request_decoder::test::StaticValidateApiTokenRequestDecoder,
+            test::StaticValidateAuthTokenStruct, token_decoder::test::StaticAuthTokenDecoder,
+        },
     },
-    validate::init::{
-        request_decoder::test::StaticValidateApiTokenRequestDecoder,
-        test::StaticValidateAuthTokenStruct, token_decoder::test::StaticAuthTokenDecoder,
+    _common::kernel::init::{
+        nonce_metadata::test::StaticAuthNonceMetadata,
         token_metadata::test::StaticAuthTokenMetadata,
     },
 };
@@ -25,10 +29,7 @@ use crate::auth::auth_ticket::_auth::kernel::infra::AuthNonceConfig;
 use super::action::{ValidateApiTokenAction, ValidateApiTokenMaterial};
 
 use crate::auth::{
-    auth_ticket::{
-        _auth::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
-        _common::kernel::data::{AuthNonce, AuthToken},
-    },
+    auth_ticket::_auth::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
     auth_user::_common::kernel::data::RequireAuthRoles,
 };
 
@@ -184,7 +185,7 @@ impl<'a> TestFeature<'a> {
         Self::with_token_validator(store, expired_token_decoder())
     }
 
-    fn with_token_validator(store: &'a TestStore, token_validator: StaticAuthTokenDecoder) -> Self {
+    fn with_token_validator(store: &'a TestStore, token_decoder: StaticAuthTokenDecoder) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
                 check_nonce_infra: StaticCheckAuthNonceStruct {
@@ -194,7 +195,7 @@ impl<'a> TestFeature<'a> {
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
                 token_metadata: standard_token_header(),
-                token_decoder: token_validator,
+                token_decoder,
             },
         }
     }
@@ -228,10 +229,10 @@ fn standard_clock() -> StaticChronoAuthClock {
 }
 
 fn standard_nonce_header() -> StaticAuthNonceMetadata {
-    StaticAuthNonceMetadata::Valid(AuthNonce::restore(NONCE.into()))
+    StaticAuthNonceMetadata::new(NONCE.into())
 }
 fn standard_token_header() -> StaticAuthTokenMetadata {
-    StaticAuthTokenMetadata::Valid(AuthToken::restore("TOKEN".into()))
+    StaticAuthTokenMetadata::new("TOKEN".into())
 }
 
 fn standard_token_decoder() -> StaticAuthTokenDecoder {

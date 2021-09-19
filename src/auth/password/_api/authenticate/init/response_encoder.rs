@@ -1,4 +1,6 @@
-use crate::auth::password::_api::y_protobuf::api::AuthenticatePasswordResultPb;
+use crate::auth::password::_api::y_protobuf::api::{
+    AuthenticatePasswordErrorKindPb, AuthenticatePasswordErrorPb, AuthenticatePasswordResultPb,
+};
 
 use crate::z_details::_api::message::helper::encode_protobuf_base64;
 
@@ -27,6 +29,9 @@ impl AuthenticatePasswordResponseEncoder for ProstAuthenticatePasswordResponseEn
             AuthenticatePasswordResponse::InvalidPassword => {
                 let message = AuthenticatePasswordResultPb {
                     success: false,
+                    err: Some(AuthenticatePasswordErrorPb {
+                        kind: AuthenticatePasswordErrorKindPb::InvalidPassword as i32,
+                    }),
                     ..Default::default()
                 };
                 Ok(AuthenticatePasswordResult::InvalidPassword(
@@ -39,12 +44,10 @@ impl AuthenticatePasswordResponseEncoder for ProstAuthenticatePasswordResponseEn
                     value: Some(ticket.user.into()),
                     ..Default::default()
                 };
-                Ok(AuthenticatePasswordResult::Success(
-                    AuthTokenMessage {
-                        body: encode_protobuf_base64(message)?,
-                        token: ticket.token,
-                    },
-                ))
+                Ok(AuthenticatePasswordResult::Success(AuthTokenMessage {
+                    body: encode_protobuf_base64(message)?,
+                    token: ticket.token,
+                }))
             }
         }
     }
@@ -77,12 +80,12 @@ pub mod test {
                 AuthenticatePasswordResponse::InvalidPassword => Ok(
                     AuthenticatePasswordResult::InvalidPassword("INVALID-PASSWORD".into()),
                 ),
-                AuthenticatePasswordResponse::Success(ticket) => Ok(
-                    AuthenticatePasswordResult::Success(AuthTokenMessage {
+                AuthenticatePasswordResponse::Success(ticket) => {
+                    Ok(AuthenticatePasswordResult::Success(AuthTokenMessage {
                         body: "ENCODED".into(),
                         token: ticket.token,
-                    }),
-                ),
+                    }))
+                }
             }
         }
     }

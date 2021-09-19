@@ -54,7 +54,7 @@ impl AuthUserId {
         Self(user_id)
     }
 
-    fn extract(self) -> String {
+    pub(in crate::auth) fn extract(self) -> String {
         self.0
     }
 

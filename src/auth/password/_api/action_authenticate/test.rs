@@ -3,10 +3,12 @@ use std::collections::HashSet;
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::init::{
-        nonce_header::test::StaticAuthNonceHeader,
-        response_builder::test::StaticAuthTokenResponseBuilder,
-        token_header::test::StaticAuthTokenHeader,
+    auth_ticket::{
+        _api::kernel::init::response_builder::test::StaticAuthTokenResponseBuilder,
+        _common::kernel::init::{
+            nonce_metadata::test::StaticAuthNonceMetadata,
+            token_metadata::test::StaticAuthTokenMetadata,
+        },
     },
     password::_api::authenticate::init::{
         authenticate_service::test::StaticAuthenticatePasswordService,
@@ -53,8 +55,8 @@ impl<'a> TestFeature {
     fn standard() -> Self {
         Self {
             authenticate: StaticAuthenticatePasswordStruct {
-                nonce_header: StaticAuthNonceHeader::new("NONCE"),
-                token_header: StaticAuthTokenHeader::new("TOKEN"),
+                nonce_metadata: StaticAuthNonceMetadata::new("NONCE".into()),
+                token_metadata: StaticAuthTokenMetadata::new("TOKEN".into()),
                 response_builder: StaticAuthTokenResponseBuilder,
                 authenticate_service: StaticAuthenticatePasswordService {
                     user: standard_user(),

@@ -10,7 +10,7 @@ impl RespondTo for NotifyUnexpectedErrorEvent {
             Self::Authorized(_) => HttpResponse::Accepted().finish(),
             Self::Notice(_) => HttpResponse::Ok().finish(),
             Self::ValidateApiTokenError(err) => err.respond_to(request),
-            Self::HeaderError(err) => err.respond_to(request),
+            Self::MetadataError(err) => err.respond_to(request),
         }
     }
 }

@@ -43,7 +43,6 @@ impl<'a> AuthenticatePasswordInfra for AuthenticatePasswordStruct<'a> {
     fn user_repository(&self) -> &Self::UserRepository {
         &self.user_repository
     }
-
     fn password_repository(&self) -> &Self::PasswordRepository {
         &self.password_repository
     }

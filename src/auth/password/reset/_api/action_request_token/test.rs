@@ -1,7 +1,7 @@
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::init::nonce_header::test::StaticAuthNonceHeader,
+    auth_ticket::_common::kernel::init::nonce_metadata::test::StaticAuthNonceMetadata,
     password::reset::_api::request_token::init::{
         request_decoder::test::StaticRequestResetTokenRequestDecoder,
         request_token_service::test::StaticRequestResetTokenService,
@@ -45,7 +45,7 @@ impl TestFeature {
     fn standard() -> Self {
         Self {
             request_token: StaticRequestResetTokenStruct {
-                nonce_header: StaticAuthNonceHeader::new("NONCE"),
+                nonce_metadata: StaticAuthNonceMetadata::new("NONCE".into()),
                 request_token_service: StaticRequestResetTokenService,
                 response_encoder: StaticRequestResetTokenResponseEncoder,
             },

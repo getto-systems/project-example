@@ -8,7 +8,7 @@ use crate::x_outside_feature::_api::feature::AppFeature;
 use crate::example::outline::_api::get_menu_badge::init::response_encoder::ProstGetOutlineMenuBadgeResponseEncoder;
 
 use crate::{
-    auth::_api::common::init::ValidateApiTokenStruct,
+    auth::_common::init::ValidateApiTokenStruct,
     example::outline::_api::get_menu_badge::init::get_menu_badge_service::TonicGetOutlineMenuBadgeService,
 };
 
@@ -52,7 +52,7 @@ impl<'a> GetOutlineMenuBadgeInfra for GetOutlineMenuBadgeStruct<'a> {
 #[cfg(test)]
 pub mod test {
     use crate::{
-        auth::_api::common::init::test::StaticValidateApiTokenStruct,
+        auth::_common::init::test::StaticValidateApiTokenStruct,
         example::outline::_api::get_menu_badge::init::{
             get_menu_badge_service::test::StaticGetOutlineMenuBadgeService,
             response_encoder::test::StaticGetOutlineMenuBadgeResponseEncoder,

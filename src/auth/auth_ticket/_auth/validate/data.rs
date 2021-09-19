@@ -1,6 +1,4 @@
-use crate::z_details::{
-    _auth::request::data::MetadataError, _common::repository::data::RepositoryError,
-};
+use crate::z_details::_common::{repository::data::RepositoryError, request::data::MetadataError};
 
 pub enum ValidateAuthTokenError {
     TokenNotSent,

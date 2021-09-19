@@ -3,6 +3,8 @@ use std::collections::HashSet;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+use crate::auth::auth_ticket::_common::kernel::infra::AuthNonceMetadata;
+
 use crate::{
     auth::auth_ticket::{
         _auth::kernel::data::{
@@ -11,10 +13,7 @@ use crate::{
         },
         _common::kernel::data::AuthNonce,
     },
-    z_details::{
-        _auth::request::data::MetadataError,
-        _common::repository::data::{RegisterResult, RepositoryError},
-    },
+    z_details::_common::repository::data::{RegisterResult, RepositoryError},
 };
 
 pub trait CheckAuthNonceInfra {
@@ -30,10 +29,6 @@ pub trait CheckAuthNonceInfra {
 
 pub trait AuthClock {
     fn now(&self) -> AuthDateTime;
-}
-
-pub trait AuthNonceMetadata {
-    fn nonce(&self) -> Result<Option<AuthNonce>, MetadataError>;
 }
 
 #[async_trait::async_trait]

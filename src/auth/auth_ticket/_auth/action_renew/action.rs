@@ -54,6 +54,7 @@ impl<M: RenewAuthTicketMaterial> RenewAuthTicketAction<M> {
         let pubsub = self.pubsub;
         let m = self.material;
 
+        // TODO discard auth ticket で呼ぶ
         let ticket = validate_auth_token(m.validate(), RequireAuthRoles::Nothing, |event| {
             pubsub.post(RenewAuthTicketState::Validate(event))
         })

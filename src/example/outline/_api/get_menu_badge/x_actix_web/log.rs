@@ -9,7 +9,7 @@ impl GetOutlineMenuBadgeEvent {
             Self::Success(_) => LogLevel::Info,
             Self::ValidateApiTokenError(err) => err.log_level(),
             Self::ServiceError(err) => err.log_level(),
-            Self::HeaderError(err) => err.log_level(),
+            Self::MetadataError(err) => err.log_level(),
             Self::MessageError(err) => err.log_level(),
         }
     }

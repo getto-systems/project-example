@@ -6,9 +6,9 @@ use crate::auth::password::reset::_common::y_protobuf::service::{
     request_reset_token_pb_client::RequestResetTokenPbClient, RequestResetTokenRequestPb,
 };
 
-use crate::z_details::_api::service::init::authorizer::GoogleServiceAuthorizer;
+use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
 
-use crate::auth::_api::service::helper::{
+use crate::auth::_common::service::helper::{
     infra_error, new_endpoint, set_authorization, set_metadata,
 };
 
@@ -18,7 +18,7 @@ use crate::auth::password::reset::{
 };
 
 use crate::auth::{
-    _api::service::data::AuthServiceError, auth_ticket::_common::kernel::data::AuthNonce,
+    _common::service::data::AuthServiceError, auth_ticket::_common::kernel::data::AuthNonce,
 };
 
 pub struct TonicRequestResetTokenService<'a> {
@@ -76,7 +76,7 @@ pub mod test {
     };
 
     use crate::auth::{
-        _api::service::data::AuthServiceError, auth_ticket::_common::kernel::data::AuthNonce,
+        _common::service::data::AuthServiceError, auth_ticket::_common::kernel::data::AuthNonce,
     };
 
     pub struct StaticRequestResetTokenService;

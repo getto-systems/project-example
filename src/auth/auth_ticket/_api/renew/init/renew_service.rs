@@ -6,16 +6,16 @@ use crate::auth::auth_ticket::_common::y_protobuf::service::{
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideService;
 
-use crate::z_details::_api::service::init::authorizer::GoogleServiceAuthorizer;
+use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
 
-use crate::auth::_api::service::helper::{
+use crate::auth::_common::service::helper::{
     infra_error, new_endpoint, set_authorization, set_metadata,
 };
 
 use crate::auth::auth_ticket::_api::renew::infra::RenewAuthTicketService;
 
 use crate::auth::{
-    _api::service::data::AuthServiceError,
+    _common::service::data::AuthServiceError,
     auth_ticket::_common::{
         encode::data::AuthTicketEncoded,
         kernel::data::{AuthNonce, AuthToken},
@@ -75,7 +75,7 @@ pub mod test {
     use crate::auth::auth_ticket::_api::renew::infra::RenewAuthTicketService;
 
     use crate::auth::{
-        _api::service::data::AuthServiceError,
+        _common::service::data::AuthServiceError,
         auth_ticket::_common::{
             encode::data::AuthTicketEncoded,
             kernel::data::{AuthNonce, AuthToken, AuthTokenEncoded, AuthTokenExtract},

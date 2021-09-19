@@ -2,7 +2,13 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::auth::password::reset::_auth::x_tonic::route::ResetServer;
+use crate::auth::password::_auth::action_change::init::ChangePasswordFeature;
+use crate::auth::password::_common::y_protobuf::service::change_password_pb_server::{
+    ChangePasswordPb, ChangePasswordPbServer,
+};
+use crate::auth::password::_common::y_protobuf::service::{
+    ChangePasswordRequestPb, ChangePasswordResponsePb,
+};
 
 use crate::z_details::_common::{logger::Logger, response::tonic::RespondTo};
 
@@ -16,6 +22,8 @@ use crate::x_outside_feature::_auth::{
     logger::app_logger,
 };
 
+use crate::auth::password::reset::_auth::x_tonic::route::ResetServer;
+
 use crate::auth::password::_auth::action_authenticate::init::AuthenticatePasswordFeature;
 
 pub struct PasswordServer {
@@ -28,6 +36,9 @@ impl PasswordServer {
     }
     pub fn authenticate(&self) -> AuthenticatePasswordPbServer<Authenticate> {
         AuthenticatePasswordPbServer::new(Authenticate)
+    }
+    pub fn change(&self) -> ChangePasswordPbServer<Change> {
+        ChangePasswordPbServer::new(Change)
     }
 }
 
@@ -50,6 +61,29 @@ impl AuthenticatePasswordPb for Authenticate {
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         let request_decoder = AuthenticatePasswordFeature::request_decoder(request);
+        flatten(action.ignite(request_decoder).await).respond_to()
+    }
+}
+
+pub struct Change;
+
+#[async_trait::async_trait]
+impl ChangePasswordPb for Change {
+    async fn change(
+        &self,
+        request: Request<ChangePasswordRequestPb>,
+    ) -> Result<Response<ChangePasswordResponsePb>, Status> {
+        let TonicRequest {
+            data,
+            metadata,
+            request,
+        } = extract_request(request);
+
+        let logger = app_logger("auth.password.change", &metadata);
+        let mut action = ChangePasswordFeature::action(&data, &metadata);
+        action.subscribe(move |state| logger.log(state.log_level(), state));
+
+        let request_decoder = ChangePasswordFeature::request_decoder(request);
         flatten(action.ignite(request_decoder).await).respond_to()
     }
 }

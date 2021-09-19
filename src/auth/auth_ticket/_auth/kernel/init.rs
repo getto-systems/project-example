@@ -58,8 +58,8 @@ impl<'a> CheckAuthNonceStruct<'a> {
 #[cfg(test)]
 pub mod test {
     use super::clock::test::StaticChronoAuthClock;
-    use super::nonce_metadata::test::StaticAuthNonceMetadata;
     use super::nonce_repository::test::MemoryAuthNonceRepository;
+    use crate::auth::auth_ticket::_common::kernel::init::nonce_metadata::test::StaticAuthNonceMetadata;
 
     use crate::auth::auth_ticket::_auth::kernel::infra::{AuthNonceConfig, CheckAuthNonceInfra};
 

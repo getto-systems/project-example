@@ -7,7 +7,7 @@ impl LogoutEvent {
         match self {
             Self::Success => LogLevel::Audit,
             Self::ServiceError(err) => err.log_level(),
-            Self::HeaderError(err) => err.log_level(),
+            Self::MetadataError(err) => err.log_level(),
         }
     }
 }

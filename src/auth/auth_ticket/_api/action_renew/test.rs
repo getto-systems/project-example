@@ -3,16 +3,18 @@ use std::collections::HashSet;
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
-    auth_ticket::_api::{
-        kernel::init::{
-            nonce_header::test::StaticAuthNonceHeader,
-            response_builder::test::StaticAuthTokenResponseBuilder,
-            token_header::test::StaticAuthTokenHeader,
+    auth_ticket::{
+        _api::{
+            kernel::init::response_builder::test::StaticAuthTokenResponseBuilder,
+            renew::init::{
+                renew_service::test::StaticRenewAuthTicketService,
+                response_encoder::test::StaticRenewAuthTicketResponseEncoder,
+                test::StaticRenewAuthTicketStruct,
+            },
         },
-        renew::init::{
-            renew_service::test::StaticRenewAuthTicketService,
-            response_encoder::test::StaticRenewAuthTicketResponseEncoder,
-            test::StaticRenewAuthTicketStruct,
+        _common::kernel::init::{
+            nonce_metadata::test::StaticAuthNonceMetadata,
+            token_metadata::test::StaticAuthTokenMetadata,
         },
     },
     auth_user::_common::kernel::data::{AuthUser, AuthUserExtract},
@@ -50,8 +52,8 @@ impl TestFeature {
     fn standard() -> Self {
         Self {
             renew: StaticRenewAuthTicketStruct {
-                nonce_header: StaticAuthNonceHeader::new("NONCE"),
-                token_header: StaticAuthTokenHeader::new("TOKEN"),
+                nonce_metadata: StaticAuthNonceMetadata::new("NONCE".into()),
+                token_metadata: StaticAuthTokenMetadata::new("TOKEN".into()),
                 response_builder: StaticAuthTokenResponseBuilder,
                 renew_service: StaticRenewAuthTicketService {
                     user: standard_user(),

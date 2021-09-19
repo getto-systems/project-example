@@ -35,19 +35,26 @@ impl std::fmt::Display for VerifyResetTokenEntryError {
     }
 }
 
-pub enum VerifyPasswordError {
+pub enum VerifyPasswordRepositoryError {
     PasswordHashError(PasswordHashError),
     RepositoryError(RepositoryError),
     PasswordNotFound,
     PasswordNotMatched,
 }
 
-pub enum RegisterResetTokenError {
+pub enum ChangePasswordRepositoryError {
+    PasswordHashError(PasswordHashError),
+    RepositoryError(RepositoryError),
+    PasswordNotFound,
+    PasswordNotMatched,
+}
+
+pub enum RegisterResetTokenRepositoryError {
     RepositoryError(RepositoryError),
     UserNotFound,
 }
 
-pub enum PasswordHashRepositoryError {
+pub enum ResetPasswordRepositoryError {
     RepositoryError(RepositoryError),
     PasswordHashError(PasswordHashError),
 }

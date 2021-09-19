@@ -1,10 +1,11 @@
-use crate::auth::auth_ticket::_api::kernel::infra::{
-    AuthNonceHeader, AuthTokenHeader, AuthTokenResponseBuilder,
+use crate::auth::auth_ticket::{
+    _api::kernel::infra::AuthTokenResponseBuilder,
+    _common::kernel::infra::{AuthNonceMetadata, AuthTokenMetadata},
 };
 
 use crate::{
     auth::{
-        _api::service::data::AuthServiceError,
+        _common::service::data::AuthServiceError,
         auth_ticket::{
             _api::kernel::data::AuthTokenMessage,
             _common::{
@@ -17,14 +18,14 @@ use crate::{
 };
 
 pub trait RenewAuthTicketInfra {
-    type NonceHeader: AuthNonceHeader;
-    type TokenHeader: AuthTokenHeader;
+    type NonceMetadata: AuthNonceMetadata;
+    type TokenMetadata: AuthTokenMetadata;
     type RenewService: RenewAuthTicketService;
     type ResponseEncoder: RenewAuthTicketResponseEncoder;
     type ResponseBuilder: AuthTokenResponseBuilder;
 
-    fn nonce_header(&self) -> &Self::NonceHeader;
-    fn token_header(&self) -> &Self::TokenHeader;
+    fn nonce_metadata(&self) -> &Self::NonceMetadata;
+    fn token_metadata(&self) -> &Self::TokenMetadata;
     fn renew_service(&self) -> &Self::RenewService;
     fn response_encoder(&self) -> &Self::ResponseEncoder;
     fn response_builder(&self) -> &Self::ResponseBuilder;

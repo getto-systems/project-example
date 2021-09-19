@@ -79,8 +79,10 @@ impl<'a> ValidateAuthTokenInfra for ApiValidateAuthTokenStruct<'a> {
 #[cfg(test)]
 pub mod test {
     use super::token_decoder::test::StaticAuthTokenDecoder;
-    use super::token_metadata::test::StaticAuthTokenMetadata;
-    use crate::auth::auth_ticket::_auth::kernel::init::test::StaticCheckAuthNonceStruct;
+    use crate::auth::auth_ticket::{
+        _auth::kernel::init::test::StaticCheckAuthNonceStruct,
+        _common::kernel::init::token_metadata::test::StaticAuthTokenMetadata,
+    };
 
     use super::super::infra::ValidateAuthTokenInfra;
 

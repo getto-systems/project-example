@@ -9,7 +9,7 @@ impl RespondTo for LogoutEvent {
         match self {
             Self::Success => HttpResponse::Ok().finish(),
             Self::ServiceError(err) => err.respond_to(request),
-            Self::HeaderError(err) => err.respond_to(request),
+            Self::MetadataError(err) => err.respond_to(request),
         }
     }
 }

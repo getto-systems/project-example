@@ -81,14 +81,9 @@ test-api:
   image: rust:1-buster
 
   before_script:
-    - rustup install nightly
-    - rustup component add --toolchain nightly llvm-tools-preview
-    - rustup component add --toolchain nightly rustfmt
-    - cargo install rustfilt
-    - mkdir tmp
-    - ./api/ci/setup-test.sh
+    - rustup component add rustfmt
   script:
-    - ./api/ci/test.sh
+    - cargo test
 
 bump_version-ui:
   stage: bump_version

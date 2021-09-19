@@ -3,13 +3,15 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::init::{
-        clock::test::StaticChronoAuthClock,
-        nonce_metadata::test::StaticAuthNonceMetadata,
-        nonce_repository::test::{
-            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+    auth_ticket::{
+        _auth::kernel::init::{
+            clock::test::StaticChronoAuthClock,
+            nonce_repository::test::{
+                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+            },
+            test::StaticCheckAuthNonceStruct,
         },
-        test::StaticCheckAuthNonceStruct,
+        _common::kernel::init::nonce_metadata::test::StaticAuthNonceMetadata,
     },
     password::{
         _auth::kernel::init::password_repository::test::{
@@ -41,10 +43,7 @@ use crate::auth::{
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 
 use crate::auth::{
-    auth_ticket::{
-        _auth::kernel::data::{AuthDateTime, ExpireDuration},
-        _common::kernel::data::AuthNonce,
-    },
+    auth_ticket::_auth::kernel::data::{AuthDateTime, ExpireDuration},
     auth_user::_common::kernel::data::AuthUserId,
     login_id::_auth::data::LoginId,
     password::{
@@ -277,7 +276,7 @@ fn standard_clock() -> StaticChronoAuthClock {
 }
 
 fn standard_nonce_metadata() -> StaticAuthNonceMetadata {
-    StaticAuthNonceMetadata::Valid(AuthNonce::restore(NONCE.into()))
+    StaticAuthNonceMetadata::new(NONCE.into())
 }
 
 fn standard_token_generator() -> StaticResetTokenGenerator {

@@ -17,3 +17,14 @@ message AuthenticatePasswordResponsePb {
     auth.auth_user.service.AuthUserPb user = 2;
     auth.auth_ticket.service.AuthTokenEncodedPb token = 3;
 }
+
+service ChangePasswordPb {
+    rpc Change (ChangePasswordRequestPb) returns (ChangePasswordResponsePb);
+}
+message ChangePasswordRequestPb {
+    string current_password = 1;
+    string new_password = 2;
+}
+message ChangePasswordResponsePb {
+    bool success = 1;
+}

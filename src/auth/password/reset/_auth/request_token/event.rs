@@ -3,7 +3,7 @@ use crate::{
         auth_ticket::_auth::kernel::data::{ExpireDateTime, ValidateAuthNonceError},
         login_id::_auth::data::ValidateLoginIdError,
         password::{
-            _auth::kernel::data::RegisterResetTokenError,
+            _auth::kernel::data::RegisterResetTokenRepositoryError,
             reset::_auth::request_token::data::{
                 EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
                 RequestResetTokenError,
@@ -56,7 +56,7 @@ impl Into<RequestResetTokenEvent> for ValidateLoginIdError {
     }
 }
 
-impl Into<RequestResetTokenEvent> for RegisterResetTokenError {
+impl Into<RequestResetTokenEvent> for RegisterResetTokenRepositoryError {
     fn into(self) -> RequestResetTokenEvent {
         match self {
             Self::RepositoryError(err) => RequestResetTokenEvent::RepositoryError(err),

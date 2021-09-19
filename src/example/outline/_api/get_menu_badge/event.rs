@@ -1,7 +1,7 @@
 use crate::{
-    auth::_api::common::data::{AuthUserId, ValidateApiTokenError},
+    auth::_common::data::{AuthUserId, ValidateApiTokenError},
     example::_api::service::data::ExampleServiceError,
-    z_details::_api::{message::data::MessageError, request::data::HeaderError},
+    z_details::{_api::{message::data::MessageError, }, _common::request::data::MetadataError},
 };
 
 pub enum GetOutlineMenuBadgeEvent {
@@ -9,7 +9,7 @@ pub enum GetOutlineMenuBadgeEvent {
     Success(String),
     ValidateApiTokenError(ValidateApiTokenError),
     ServiceError(ExampleServiceError),
-    HeaderError(HeaderError),
+    MetadataError(MetadataError),
     MessageError(MessageError),
 }
 
@@ -23,7 +23,7 @@ impl std::fmt::Display for GetOutlineMenuBadgeEvent {
             Self::Success(_) => write!(f, "{}", SUCCESS),
             Self::ValidateApiTokenError(err) => write!(f, "{}: {}", ERROR, err),
             Self::ServiceError(err) => write!(f, "{}: {}", ERROR, err),
-            Self::HeaderError(err) => write!(f, "{}: {}", ERROR, err),
+            Self::MetadataError(err) => write!(f, "{}: {}", ERROR, err),
             Self::MessageError(err) => write!(f, "{}: {}", ERROR, err),
         }
     }

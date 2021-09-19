@@ -2,19 +2,14 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::auth::auth_ticket::_auth::action_validate::init::ValidateApiTokenFeature;
-use crate::auth::auth_ticket::_common::y_protobuf::service::validate_api_token_pb_server::{
-    ValidateApiTokenPb, ValidateApiTokenPbServer,
-};
-use crate::auth::auth_ticket::_common::y_protobuf::service::{
-    ValidateApiTokenRequestPb, ValidateApiTokenResponsePb,
-};
 use crate::z_details::_common::{logger::Logger, response::tonic::RespondTo};
 
 use crate::auth::auth_ticket::_common::y_protobuf::service::{
     logout_pb_server::{LogoutPb, LogoutPbServer},
     renew_auth_ticket_pb_server::{RenewAuthTicketPb, RenewAuthTicketPbServer},
+    validate_api_token_pb_server::{ValidateApiTokenPb, ValidateApiTokenPbServer},
     LogoutRequestPb, LogoutResponsePb, RenewAuthTicketRequestPb, RenewAuthTicketResponsePb,
+    ValidateApiTokenRequestPb, ValidateApiTokenResponsePb,
 };
 
 use crate::x_outside_feature::_auth::{
@@ -24,6 +19,7 @@ use crate::x_outside_feature::_auth::{
 
 use crate::auth::auth_ticket::_auth::{
     action_logout::init::LogoutFeature, action_renew::init::RenewAuthTicketFeature,
+    action_validate::init::ValidateApiTokenFeature,
 };
 
 pub struct AuthTicketServer;

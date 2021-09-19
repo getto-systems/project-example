@@ -1,8 +1,8 @@
 use getto_application_test::ActionTestRunner;
 
 use crate::{
-    auth::_api::common::init::test::{
-        StaticAuthNonceHeader, StaticAuthTokenHeader, StaticValidateApiTokenStruct,
+    auth::_common::init::test::{
+        StaticAuthNonceMetadata, StaticAuthTokenMetadata, StaticValidateApiTokenStruct,
         StaticValidateService,
     },
     avail::unexpected_error::_api::notify::init::{
@@ -45,9 +45,9 @@ impl TestFeature {
         Self {
             notify: StaticNotifyUnexpectedErrorStruct {
                 validate_infra: StaticValidateApiTokenStruct {
-                    nonce_header: StaticAuthNonceHeader::new("NONCE"),
-                    token_header: StaticAuthTokenHeader::new("TOKEN"),
-                    validate_service: StaticValidateService::new("USER-ID"),
+                    nonce_metadata: StaticAuthNonceMetadata::new("NONCE".into()),
+                    token_metadata: StaticAuthTokenMetadata::new("TOKEN".into()),
+                    validate_service: StaticValidateService::new("USER-ID".into()),
                 },
             },
         }

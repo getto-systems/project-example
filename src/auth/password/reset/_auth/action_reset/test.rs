@@ -5,25 +5,27 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
-    auth_ticket::_auth::{
-        encode::init::{
-            test::StaticEncodeAuthTicketStruct,
-            token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
-        },
-        issue::init::{
-            id_generator::test::StaticAuthTicketIdGenerator, test::StaticIssueAuthTicketStruct,
-        },
-        kernel::init::{
-            clock::test::StaticChronoAuthClock,
-            nonce_metadata::test::StaticAuthNonceMetadata,
-            nonce_repository::test::{
-                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+    auth_ticket::{
+        _auth::{
+            encode::init::{
+                test::StaticEncodeAuthTicketStruct,
+                token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
             },
-            test::StaticCheckAuthNonceStruct,
-            ticket_repository::test::{
-                MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+            issue::init::{
+                id_generator::test::StaticAuthTicketIdGenerator, test::StaticIssueAuthTicketStruct,
+            },
+            kernel::init::{
+                clock::test::StaticChronoAuthClock,
+                nonce_repository::test::{
+                    MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+                },
+                test::StaticCheckAuthNonceStruct,
+                ticket_repository::test::{
+                    MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+                },
             },
         },
+        _common::kernel::init::nonce_metadata::test::StaticAuthNonceMetadata,
     },
     auth_user::_auth::kernel::init::user_repository::test::{
         MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
@@ -51,9 +53,8 @@ use crate::auth::{
 use super::action::{ResetPasswordAction, ResetPasswordMaterial};
 
 use crate::auth::{
-    auth_ticket::{
-        _auth::kernel::data::{AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration},
-        _common::kernel::data::AuthNonce,
+    auth_ticket::_auth::kernel::data::{
+        AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
     },
     auth_user::_common::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
     login_id::_auth::data::LoginId,
@@ -514,7 +515,7 @@ fn standard_clock() -> StaticChronoAuthClock {
 }
 
 fn standard_nonce_metadata() -> StaticAuthNonceMetadata {
-    StaticAuthNonceMetadata::Valid(AuthNonce::restore(NONCE.into()))
+    StaticAuthNonceMetadata::new(NONCE.into())
 }
 
 fn standard_request_decoder() -> StaticResetPasswordRequestDecoder {
