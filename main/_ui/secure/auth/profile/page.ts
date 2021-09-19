@@ -9,6 +9,7 @@ import {
     mainHeader,
     mainTitle,
 } from "../../../../../ui/vendor/getto-css/preact/layout/app"
+import { container } from "../../../../../ui/vendor/getto-css/preact/design/box"
 
 import { useNotifyUnexpectedError } from "../../../../../src/avail/unexpected_error/_ui/action_notify/x_preact/hooks"
 import { useDocumentTitle } from "../../../../../src/example/_ui/x_preact/hooks"
@@ -45,7 +46,7 @@ export function ProfilePageComponent(props: ProfilePageResource): VNode {
         header: [h(LoadSeasonEntry, props)],
         main: appMain({
             header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbListComponent, props)]),
-            body: mainBody(h(ChangePasswordEntry, props)),
+            body: mainBody(container([h(ChangePasswordEntry, props)])),
             copyright,
         }),
         menu: h(LoadMenuEntry, props),

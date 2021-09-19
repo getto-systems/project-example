@@ -22,10 +22,16 @@ class Action
     readonly newPassword = mockInputPasswordAction(emptyBoardValue, { multiByte: false })
     readonly validate = mockValidateBoardAction()
 
+    open(): ChangePasswordState {
+        return this.initialState
+    }
     clear(): ChangePasswordState {
         return this.initialState
     }
     async submit(): Promise<ChangePasswordState> {
+        return this.initialState
+    }
+    close(): ChangePasswordState {
         return this.initialState
     }
 }

@@ -96,13 +96,25 @@ class Action
         })
     }
 
+    open(): ChangePasswordState {
+        this.clearInput()
+        return this.post({ type: "input-password" })
+    }
     clear(): ChangePasswordState {
-        this.currentPassword.clear()
-        this.newPassword.clear()
-        this.validate.clear()
-        return this.post(this.initialState)
+        this.clearInput()
+        return this.post({ type: "input-password" })
     }
     async submit(): Promise<ChangePasswordState> {
         return this.material.change(this.checker.get(), this.post)
+    }
+    close(): ChangePasswordState {
+        this.clearInput()
+        return this.post(this.initialState)
+    }
+
+    clearInput(): void {
+        this.currentPassword.clear()
+        this.newPassword.clear()
+        this.validate.clear()
     }
 }
