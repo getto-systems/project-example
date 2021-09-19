@@ -1,6 +1,8 @@
 #!/bin/sh
 
 coverage_main() {
+    # TODO ci 環境だと compile で失敗するので止めてあるが、なんとかしたい
+    # インクリメンタルビルド的なことをしてるはずで、それが悪さをしていると推測
     if [ -z "$RUSTUP_HOME" ]; then
         RUSTUP_HOME="${HOME}/.rustup"
     fi

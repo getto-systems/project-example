@@ -80,6 +80,8 @@ test-api:
 
   image: rust:1-buster
 
+  before_script:
+    - rustup component add rustfmt
   script:
     - cargo test
 
