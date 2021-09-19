@@ -105,17 +105,12 @@ async fn error_no_ticket() {
 }
 
 struct TestFeature<'a> {
-    validate: StaticValidateAuthTokenStruct<'a>,
     discard: StaticDiscardAuthTicketStruct<'a>,
 }
 
 impl<'a> LogoutMaterial for TestFeature<'a> {
-    type Validate = StaticValidateAuthTokenStruct<'a>;
     type Discard = StaticDiscardAuthTicketStruct<'a>;
 
-    fn validate(&self) -> &Self::Validate {
-        &self.validate
-    }
     fn discard(&self) -> &Self::Discard {
         &self.discard
     }
@@ -156,17 +151,17 @@ impl TestStore {
 impl<'a> TestFeature<'a> {
     fn standard(store: &'a TestStore) -> Self {
         Self {
-            validate: StaticValidateAuthTokenStruct {
-                check_nonce_infra: StaticCheckAuthNonceStruct {
-                    config: standard_nonce_config(),
-                    clock: standard_clock(),
-                    nonce_metadata: standard_nonce_metadata(),
-                    nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
-                },
-                token_metadata: standard_token_metadata(),
-                token_decoder: standard_token_validator(),
-            },
             discard: StaticDiscardAuthTicketStruct {
+                validate_infra: StaticValidateAuthTokenStruct {
+                    check_nonce_infra: StaticCheckAuthNonceStruct {
+                        config: standard_nonce_config(),
+                        clock: standard_clock(),
+                        nonce_metadata: standard_nonce_metadata(),
+                        nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
+                    },
+                    token_metadata: standard_token_metadata(),
+                    token_decoder: standard_token_validator(),
+                },
                 clock: standard_clock(),
                 ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
             },
