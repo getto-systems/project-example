@@ -2,14 +2,9 @@
 const fs = require("fs")
 const path = require("path")
 
-const api = JSON.parse(readData("api"))
-const auth = JSON.parse(readData("auth"))
-const example = JSON.parse(readData("example"))
-
 fs.writeFileSync(path.join(__dirname, "../../sqlx-data.json"), JSON.stringify({
-    ...api,
-    ...auth,
-    ...example,
+    ...JSON.parse(readData("auth")),
+    ...JSON.parse(readData("example")),
 }))
 
 function readData(target) {

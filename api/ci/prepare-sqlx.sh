@@ -1,7 +1,6 @@
 #!/bin/sh
 
 prepare_main() {
-    prepare_app api
     prepare_app auth
     prepare_app example
 
