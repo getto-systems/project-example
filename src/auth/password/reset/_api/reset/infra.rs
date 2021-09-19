@@ -1,7 +1,7 @@
 use crate::auth::{
     auth_ticket::{
         _api::kernel::infra::AuthTokenResponseBuilder,
-        _common::kernel::infra::{AuthNonceMetadata, AuthTokenMetadata},
+        _common::kernel::infra::{AuthServiceMetadata, AuthServiceMetadataContent},
     },
     password::reset::_common::reset::infra::ResetPasswordFieldsExtract,
 };
@@ -9,24 +9,19 @@ use crate::auth::{
 use crate::{
     auth::{
         _common::service::data::AuthServiceError,
-        auth_ticket::_common::{
-            encode::data::AuthTicketEncoded,
-            kernel::data::{AuthNonce, AuthToken},
-        },
+        auth_ticket::_common::encode::data::AuthTicketEncoded,
         password::reset::_api::reset::data::ResetPasswordMessageEncoded,
     },
     z_details::_api::message::data::MessageError,
 };
 
 pub trait ResetPasswordInfra {
-    type NonceMetadata: AuthNonceMetadata;
-    type TokenMetadata: AuthTokenMetadata;
+    type ServiceMetadata: AuthServiceMetadata;
     type ResetService: ResetPasswordService;
     type ResponseEncoder: ResetPasswordResponseEncoder;
     type ResponseBuilder: AuthTokenResponseBuilder;
 
-    fn nonce_metadata(&self) -> &Self::NonceMetadata;
-    fn token_metadata(&self) -> &Self::TokenMetadata;
+    fn service_metadata(&self) -> &Self::ServiceMetadata;
     fn reset_service(&self) -> &Self::ResetService;
     fn response_encoder(&self) -> &Self::ResponseEncoder;
     fn response_builder(&self) -> &Self::ResponseBuilder;
@@ -40,8 +35,7 @@ pub trait ResetPasswordRequestDecoder {
 pub trait ResetPasswordService {
     async fn reset(
         &self,
-        nonce: Option<AuthNonce>,
-        token: Option<AuthToken>,
+        metadata: AuthServiceMetadataContent,
         fields: ResetPasswordFieldsExtract,
     ) -> Result<ResetPasswordResponse, AuthServiceError>;
 }

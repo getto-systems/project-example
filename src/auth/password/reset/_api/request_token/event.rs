@@ -1,14 +1,15 @@
 use crate::{
     auth::{
         _common::service::data::AuthServiceError,
+        auth_ticket::_common::kernel::data::AuthServiceMetadataError,
         password::reset::_api::request_token::data::RequestResetTokenResult,
     },
-    z_details::{_api::message::data::MessageError, _common::request::data::MetadataError},
+    z_details::_api::message::data::MessageError,
 };
 
 pub enum RequestResetTokenEvent {
     Result(RequestResetTokenResult),
-    MetadataError(MetadataError),
+    MetadataError(AuthServiceMetadataError),
     ServiceError(AuthServiceError),
     MessageError(MessageError),
 }

@@ -12,12 +12,11 @@ use crate::auth::_common::service::helper::{
     infra_error, new_endpoint, set_authorization, set_metadata,
 };
 
-use crate::auth::auth_ticket::_api::logout::infra::LogoutService;
-
-use crate::auth::{
-    _common::service::data::AuthServiceError,
-    auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
+use crate::auth::auth_ticket::{
+    _api::logout::infra::LogoutService, _common::kernel::infra::AuthServiceMetadataContent,
 };
+
+use crate::auth::_common::service::data::AuthServiceError;
 
 pub struct TonicLogoutService<'a> {
     service_url: &'static str,
@@ -37,11 +36,7 @@ impl<'a> TonicLogoutService<'a> {
 
 #[async_trait::async_trait]
 impl<'a> LogoutService for TonicLogoutService<'a> {
-    async fn logout(
-        &self,
-        nonce: Option<AuthNonce>,
-        token: Option<AuthToken>,
-    ) -> Result<(), AuthServiceError> {
+    async fn logout(&self, metadata: AuthServiceMetadataContent) -> Result<(), AuthServiceError> {
         let mut client = LogoutPbClient::new(
             new_endpoint(self.service_url)?
                 .connect()
@@ -51,7 +46,7 @@ impl<'a> LogoutService for TonicLogoutService<'a> {
 
         let mut request = Request::new(LogoutRequestPb {});
         set_authorization(&mut request, &self.authorizer).await?;
-        set_metadata(&mut request, self.request_id, nonce, token)?;
+        set_metadata(&mut request, self.request_id, metadata)?;
 
         client
             .logout(request)
@@ -63,12 +58,11 @@ impl<'a> LogoutService for TonicLogoutService<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::auth_ticket::_api::logout::infra::LogoutService;
-
-    use crate::auth::{
-        _common::service::data::AuthServiceError,
-        auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
+    use crate::auth::auth_ticket::{
+        _api::logout::infra::LogoutService, _common::kernel::infra::AuthServiceMetadataContent,
     };
+
+    use crate::auth::_common::service::data::AuthServiceError;
 
     pub struct StaticLogoutService;
 
@@ -76,8 +70,7 @@ pub mod test {
     impl LogoutService for StaticLogoutService {
         async fn logout(
             &self,
-            _nonce: Option<AuthNonce>,
-            _token: Option<AuthToken>,
+            _metadata: AuthServiceMetadataContent,
         ) -> Result<(), AuthServiceError> {
             Ok(())
         }

@@ -12,15 +12,15 @@ use crate::auth::_common::service::helper::{
     infra_error, new_endpoint, set_authorization, set_metadata,
 };
 
-use crate::auth::password::{
-    _api::change::infra::{ChangePasswordResponse, ChangePasswordService},
-    _common::change::infra::ChangePasswordFieldsExtract,
+use crate::auth::{
+    auth_ticket::_common::kernel::infra::AuthServiceMetadataContent,
+    password::{
+        _api::change::infra::{ChangePasswordResponse, ChangePasswordService},
+        _common::change::infra::ChangePasswordFieldsExtract,
+    },
 };
 
-use crate::auth::{
-    _common::service::data::AuthServiceError,
-    auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
-};
+use crate::auth::_common::service::data::AuthServiceError;
 
 pub struct TonicChangePasswordService<'a> {
     service_url: &'static str,
@@ -42,8 +42,7 @@ impl<'a> TonicChangePasswordService<'a> {
 impl<'a> ChangePasswordService for TonicChangePasswordService<'a> {
     async fn change(
         &self,
-        nonce: Option<AuthNonce>,
-        token: Option<AuthToken>,
+        metadata: AuthServiceMetadataContent,
         fields: ChangePasswordFieldsExtract,
     ) -> Result<ChangePasswordResponse, AuthServiceError> {
         let mut client = ChangePasswordPbClient::new(
@@ -58,7 +57,7 @@ impl<'a> ChangePasswordService for TonicChangePasswordService<'a> {
             new_password: fields.new_password,
         });
         set_authorization(&mut request, &self.authorizer).await?;
-        set_metadata(&mut request, self.request_id, nonce, token)?;
+        set_metadata(&mut request, self.request_id, metadata)?;
 
         let response = client
             .change(request)
@@ -73,15 +72,15 @@ impl<'a> ChangePasswordService for TonicChangePasswordService<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::password::{
-        _api::change::infra::{ChangePasswordResponse, ChangePasswordService},
-        _common::change::infra::ChangePasswordFieldsExtract,
+    use crate::auth::{
+        auth_ticket::_common::kernel::infra::AuthServiceMetadataContent,
+        password::{
+            _api::change::infra::{ChangePasswordResponse, ChangePasswordService},
+            _common::change::infra::ChangePasswordFieldsExtract,
+        },
     };
 
-    use crate::auth::{
-        _common::service::data::AuthServiceError,
-        auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
-    };
+    use crate::auth::_common::service::data::AuthServiceError;
 
     pub struct StaticChangePasswordService;
 
@@ -89,8 +88,7 @@ pub mod test {
     impl ChangePasswordService for StaticChangePasswordService {
         async fn change(
             &self,
-            _nonce: Option<AuthNonce>,
-            _token: Option<AuthToken>,
+            _metadata: AuthServiceMetadataContent,
             _fields: ChangePasswordFieldsExtract,
         ) -> Result<ChangePasswordResponse, AuthServiceError> {
             Ok(ChangePasswordResponse::Success)

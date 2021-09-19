@@ -15,11 +15,11 @@ use crate::auth::auth_ticket::{
         },
         validate::init::{
             request_decoder::test::StaticValidateApiTokenRequestDecoder,
-            test::StaticValidateAuthTokenStruct, token_decoder::test::StaticAuthTokenDecoder,
+            test::StaticValidateAuthTokenStruct,
         },
     },
     _common::kernel::init::{
-        nonce_metadata::test::StaticAuthNonceMetadata,
+        nonce_metadata::test::StaticAuthNonceMetadata, token_decoder::test::StaticAuthTokenDecoder,
         token_metadata::test::StaticAuthTokenMetadata,
     },
 };
@@ -29,7 +29,10 @@ use crate::auth::auth_ticket::_auth::kernel::infra::AuthNonceConfig;
 use super::action::{ValidateApiTokenAction, ValidateApiTokenMaterial};
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
+    auth_ticket::{
+        _auth::kernel::data::{AuthDateTime, ExpireDuration},
+        _common::kernel::data::AuthTicketExtract,
+    },
     auth_user::_common::kernel::data::RequireAuthRoles,
 };
 
@@ -239,24 +242,18 @@ fn standard_token_decoder() -> StaticAuthTokenDecoder {
     let mut granted_roles = HashSet::new();
     granted_roles.insert("something".into());
 
-    StaticAuthTokenDecoder::Valid(
-        AuthTicketExtract {
-            ticket_id: TICKET_ID.into(),
-            user_id: "something-role-user-id".into(),
-            granted_roles,
-        }
-        .restore(),
-    )
+    StaticAuthTokenDecoder::Valid(AuthTicketExtract {
+        ticket_id: TICKET_ID.into(),
+        user_id: "something-role-user-id".into(),
+        granted_roles,
+    })
 }
 fn no_granted_roles_token_decoder() -> StaticAuthTokenDecoder {
-    StaticAuthTokenDecoder::Valid(
-        AuthTicketExtract {
-            ticket_id: TICKET_ID.into(),
-            user_id: "no-role-user-id".into(),
-            granted_roles: HashSet::new(),
-        }
-        .restore(),
-    )
+    StaticAuthTokenDecoder::Valid(AuthTicketExtract {
+        ticket_id: TICKET_ID.into(),
+        user_id: "no-role-user-id".into(),
+        granted_roles: HashSet::new(),
+    })
 }
 fn expired_token_decoder() -> StaticAuthTokenDecoder {
     StaticAuthTokenDecoder::Expired

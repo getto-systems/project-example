@@ -1,3 +1,4 @@
+pub mod jwt;
 pub mod logger;
 pub mod repository;
 pub mod request;

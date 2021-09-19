@@ -12,14 +12,15 @@ use crate::auth::_common::service::helper::{
     infra_error, new_endpoint, set_authorization, set_metadata,
 };
 
-use crate::auth::password::reset::{
-    _api::request_token::infra::{RequestResetTokenResponse, RequestResetTokenService},
-    _common::request_token::infra::RequestResetTokenFieldsExtract,
+use crate::auth::{
+    auth_ticket::_common::kernel::infra::AuthServiceMetadataContent,
+    password::reset::{
+        _api::request_token::infra::{RequestResetTokenResponse, RequestResetTokenService},
+        _common::request_token::infra::RequestResetTokenFieldsExtract,
+    },
 };
 
-use crate::auth::{
-    _common::service::data::AuthServiceError, auth_ticket::_common::kernel::data::AuthNonce,
-};
+use crate::auth::_common::service::data::AuthServiceError;
 
 pub struct TonicRequestResetTokenService<'a> {
     service_url: &'static str,
@@ -41,7 +42,7 @@ impl<'a> TonicRequestResetTokenService<'a> {
 impl<'a> RequestResetTokenService for TonicRequestResetTokenService<'a> {
     async fn request_token(
         &self,
-        nonce: Option<AuthNonce>,
+        metadata: AuthServiceMetadataContent,
         fields: RequestResetTokenFieldsExtract,
     ) -> Result<RequestResetTokenResponse, AuthServiceError> {
         let mut client = RequestResetTokenPbClient::new(
@@ -55,7 +56,7 @@ impl<'a> RequestResetTokenService for TonicRequestResetTokenService<'a> {
             login_id: fields.login_id,
         });
         set_authorization(&mut request, &self.authorizer).await?;
-        set_metadata(&mut request, self.request_id, nonce, None)?;
+        set_metadata(&mut request, self.request_id, metadata)?;
 
         let response = client
             .request_token(request)
@@ -70,14 +71,15 @@ impl<'a> RequestResetTokenService for TonicRequestResetTokenService<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::password::reset::{
-        _api::request_token::infra::{RequestResetTokenResponse, RequestResetTokenService},
-        _common::request_token::infra::RequestResetTokenFieldsExtract,
+    use crate::auth::{
+        auth_ticket::_common::kernel::infra::AuthServiceMetadataContent,
+        password::reset::{
+            _api::request_token::infra::{RequestResetTokenResponse, RequestResetTokenService},
+            _common::request_token::infra::RequestResetTokenFieldsExtract,
+        },
     };
 
-    use crate::auth::{
-        _common::service::data::AuthServiceError, auth_ticket::_common::kernel::data::AuthNonce,
-    };
+    use crate::auth::_common::service::data::AuthServiceError;
 
     pub struct StaticRequestResetTokenService;
 
@@ -85,7 +87,7 @@ pub mod test {
     impl RequestResetTokenService for StaticRequestResetTokenService {
         async fn request_token(
             &self,
-            _nonce: Option<AuthNonce>,
+            _metadata: AuthServiceMetadataContent,
             _fields: RequestResetTokenFieldsExtract,
         ) -> Result<RequestResetTokenResponse, AuthServiceError> {
             Ok(RequestResetTokenResponse::Success)

@@ -6,13 +6,13 @@ use rusoto_dynamodb::DynamoDbClient;
 use rusoto_ses::SesClient;
 use sqlx::mysql::MySqlPoolOptions;
 
-use crate::z_details::_auth::jwt::helper::{decoding_key_from_ec_pem, encoding_key_from_ec_pem};
+use crate::z_details::_common::jwt::helper::{decoding_key_from_ec_pem, encoding_key_from_ec_pem};
 
 use crate::x_outside_feature::_auth::env::Env;
 
 use super::feature::{
-    AuthOutsideCloudfrontSecret, AuthOutsideConfig, AuthOutsideEmail, AuthOutsideFeature,
-    AuthOutsideJwtSecret, AuthOutsideSecret, AuthOutsideStore,
+    AuthOutsideCloudfrontKey, AuthOutsideConfig, AuthOutsideEmail, AuthOutsideFeature,
+    AuthOutsideJwtKey, AuthOutsideKey, AuthOutsideStore,
 };
 
 use crate::auth::auth_ticket::_auth::kernel::data::{ExpansionLimitDuration, ExpireDuration};
@@ -41,22 +41,22 @@ pub async fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
                 .await
                 .expect("failed to connect mysql auth server"),
         },
-        secret: AuthOutsideSecret {
-            ticket: AuthOutsideJwtSecret {
+        key: AuthOutsideKey {
+            ticket: AuthOutsideJwtKey {
                 decoding_key: decoding_key_from_ec_pem(&env.ticket_public_key),
                 encoding_key: encoding_key_from_ec_pem(&env.ticket_private_key),
             },
-            api: AuthOutsideJwtSecret {
+            api: AuthOutsideJwtKey {
                 decoding_key: decoding_key_from_ec_pem(&env.api_public_key),
                 encoding_key: encoding_key_from_ec_pem(&env.api_private_key),
             },
-            cloudfront: AuthOutsideCloudfrontSecret {
+            cloudfront: AuthOutsideCloudfrontKey {
                 key: CloudfrontKey::from_pem(&env.cloudfront_private_key)
                     .expect("failed to parse cloudfront private key"),
                 key_pair_id: &env.cloudfront_key_pair_id,
                 resource: &env.cloudfront_resource,
             },
-            reset_token: AuthOutsideJwtSecret {
+            reset_token: AuthOutsideJwtKey {
                 decoding_key: decoding_key_from_ec_pem(&env.reset_token_public_key),
                 encoding_key: encoding_key_from_ec_pem(&env.reset_token_private_key),
             },

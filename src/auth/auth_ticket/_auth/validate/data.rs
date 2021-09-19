@@ -1,4 +1,7 @@
-use crate::z_details::_common::{repository::data::RepositoryError, request::data::MetadataError};
+use crate::{
+    auth::auth_ticket::_common::kernel::data::DecodeAuthTokenError,
+    z_details::_common::{repository::data::RepositoryError, request::data::MetadataError},
+};
 
 pub enum ValidateAuthTokenError {
     TokenNotSent,
@@ -15,20 +18,6 @@ impl std::fmt::Display for ValidateAuthTokenError {
             Self::MetadataError(err) => write!(f, "{}: {}", label, err),
             Self::DecodeError(err) => write!(f, "{}: {}", label, err),
             Self::RepositoryError(err) => write!(f, "{}: {}", label, err),
-        }
-    }
-}
-
-pub enum DecodeAuthTokenError {
-    Expired,
-    Invalid(String),
-}
-
-impl std::fmt::Display for DecodeAuthTokenError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        match self {
-            Self::Expired => write!(f, "token expired"),
-            Self::Invalid(err) => write!(f, "invalid token: {}", err),
         }
     }
 }

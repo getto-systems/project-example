@@ -1,13 +1,14 @@
 pub(in crate::auth) mod request_decoder;
-pub(in crate::auth) mod token_decoder;
 pub(in crate::auth) mod token_metadata;
 
 use tonic::metadata::MetadataMap;
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_auth::kernel::init::CheckAuthNonceStruct;
-use token_decoder::{JwtApiTokenDecoder, JwtAuthTokenDecoder};
+use crate::auth::auth_ticket::{
+    _auth::kernel::init::CheckAuthNonceStruct,
+    _common::kernel::init::token_decoder::{JwtApiTokenDecoder, JwtTicketTokenDecoder},
+};
 use token_metadata::TonicAuthTokenMetadata;
 
 use super::infra::ValidateAuthTokenInfra;
@@ -15,7 +16,7 @@ use super::infra::ValidateAuthTokenInfra;
 pub struct TicketValidateAuthTokenStruct<'a> {
     check_nonce_infra: CheckAuthNonceStruct<'a>,
     token_metadata: TonicAuthTokenMetadata<'a>,
-    token_decoder: JwtAuthTokenDecoder<'a>,
+    token_decoder: JwtTicketTokenDecoder<'a>,
 }
 
 impl<'a> TicketValidateAuthTokenStruct<'a> {
@@ -23,7 +24,7 @@ impl<'a> TicketValidateAuthTokenStruct<'a> {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
             token_metadata: TonicAuthTokenMetadata::new(metadata),
-            token_decoder: JwtAuthTokenDecoder::new(&feature.secret.ticket.decoding_key),
+            token_decoder: JwtTicketTokenDecoder::new(&feature.key.ticket.decoding_key),
         }
     }
 }
@@ -31,7 +32,7 @@ impl<'a> TicketValidateAuthTokenStruct<'a> {
 impl<'a> ValidateAuthTokenInfra for TicketValidateAuthTokenStruct<'a> {
     type CheckNonceInfra = CheckAuthNonceStruct<'a>;
     type TokenMetadata = TonicAuthTokenMetadata<'a>;
-    type TokenDecoder = JwtAuthTokenDecoder<'a>;
+    type TokenDecoder = JwtTicketTokenDecoder<'a>;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
         &self.check_nonce_infra
@@ -55,7 +56,7 @@ impl<'a> ApiValidateAuthTokenStruct<'a> {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
             token_metadata: TonicAuthTokenMetadata::new(metadata),
-            token_decoder: JwtApiTokenDecoder::new(&feature.secret.api.decoding_key),
+            token_decoder: JwtApiTokenDecoder::new(&feature.key.api.decoding_key),
         }
     }
 }
@@ -78,10 +79,12 @@ impl<'a> ValidateAuthTokenInfra for ApiValidateAuthTokenStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use super::token_decoder::test::StaticAuthTokenDecoder;
     use crate::auth::auth_ticket::{
         _auth::kernel::init::test::StaticCheckAuthNonceStruct,
-        _common::kernel::init::token_metadata::test::StaticAuthTokenMetadata,
+        _common::kernel::init::{
+            token_decoder::test::StaticAuthTokenDecoder,
+            token_metadata::test::StaticAuthTokenMetadata,
+        },
     };
 
     use super::super::infra::ValidateAuthTokenInfra;

@@ -1,6 +1,6 @@
 use jsonwebtoken::{decode, errors::ErrorKind, Algorithm, DecodingKey, Validation};
 
-use crate::auth::_auth::x_outside_feature::feature::AuthOutsideSecret;
+use crate::auth::_auth::x_outside_feature::feature::AuthOutsideKey;
 
 use crate::auth::password::reset::_auth::{
     kernel::infra::ResetTokenJwtClaims, reset::infra::ResetTokenDecoder,
@@ -16,7 +16,7 @@ pub struct JwtResetTokenDecoder<'a> {
 }
 
 impl<'a> JwtResetTokenDecoder<'a> {
-    pub const fn new(secret: &'a AuthOutsideSecret) -> Self {
+    pub const fn new(secret: &'a AuthOutsideKey) -> Self {
         Self {
             key: &secret.reset_token.decoding_key,
         }

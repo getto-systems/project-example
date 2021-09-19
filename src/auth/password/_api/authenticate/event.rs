@@ -1,14 +1,15 @@
 use crate::{
     auth::{
         _common::service::data::AuthServiceError,
+        auth_ticket::_common::kernel::data::AuthServiceMetadataError,
         password::_api::authenticate::data::AuthenticatePasswordMessage,
     },
-    z_details::{_api::message::data::MessageError, _common::request::data::MetadataError},
+    z_details::_api::message::data::MessageError,
 };
 
 pub enum AuthenticatePasswordEvent {
     Result(AuthenticatePasswordMessage),
-    MetadataError(MetadataError),
+    MetadataError(AuthServiceMetadataError),
     ServiceError(AuthServiceError),
     MessageError(MessageError),
 }

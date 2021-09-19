@@ -1,11 +1,15 @@
 use std::collections::HashMap;
 
+use tonic::{Response, Status};
+
+use crate::z_details::_common::response::tonic::RespondTo;
+
 use crate::auth::auth_ticket::_common::y_protobuf::service::{
     AuthTokenEncodedPb, AuthTokenPb, CloudfrontTokenKindPb, CloudfrontTokenPb,
 };
 
 use crate::auth::auth_ticket::_common::kernel::data::{
-    AuthTokenEncoded, AuthTokenExtract, CloudfrontTokenKind,
+    AuthTokenEncoded, AuthTokenExtract, CloudfrontTokenKind, DecodeAuthTokenError,
 };
 
 impl Into<AuthTokenEncodedPb> for AuthTokenEncoded {
@@ -97,5 +101,11 @@ impl Into<CloudfrontTokenKind> for CloudfrontTokenKindPb {
             Self::Policy => CloudfrontTokenKind::Policy,
             Self::Signature => CloudfrontTokenKind::Signature,
         }
+    }
+}
+
+impl<T> RespondTo<T> for DecodeAuthTokenError {
+    fn respond_to(self) -> Result<Response<T>, Status> {
+        Err(Status::unauthenticated(format!("{}", self)))
     }
 }

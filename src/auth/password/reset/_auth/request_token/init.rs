@@ -38,7 +38,7 @@ impl<'a> RequestResetTokenStruct<'a> {
             password_repository: MysqlAuthUserPasswordRepository::new(&feature.store.mysql),
             destination_repository: MysqlResetTokenDestinationRepository::new(&feature.store.mysql),
             token_generator: UuidResetTokenGenerator,
-            token_encoder: JwtResetTokenEncoder::new(&feature.secret),
+            token_encoder: JwtResetTokenEncoder::new(&feature.key),
             token_notifier: EmailResetTokenNotifier::new(&feature.email),
             config: RequestResetTokenConfig {
                 token_expires: feature.config.reset_token_expires,

@@ -1,4 +1,6 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+
+use crate::z_details::_common::request::data::MetadataError;
 
 #[derive(Clone)]
 pub struct AuthNonce(String);
@@ -52,4 +54,39 @@ pub enum CloudfrontTokenKind {
     KeyPairId,
     Policy,
     Signature,
+}
+
+#[derive(Clone)]
+pub struct AuthTicketExtract {
+    pub ticket_id: String,
+    pub user_id: String,
+    pub granted_roles: HashSet<String>,
+}
+
+pub enum AuthServiceMetadataError {
+    MetadataError(MetadataError),
+    DecodeError(DecodeAuthTokenError),
+}
+
+impl std::fmt::Display for AuthServiceMetadataError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::MetadataError(err) => err.fmt(f),
+            Self::DecodeError(err) => err.fmt(f),
+        }
+    }
+}
+
+pub enum DecodeAuthTokenError {
+    Expired,
+    Invalid(String),
+}
+
+impl std::fmt::Display for DecodeAuthTokenError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::Expired => write!(f, "token expired"),
+            Self::Invalid(err) => write!(f, "invalid token: {}", err),
+        }
+    }
 }

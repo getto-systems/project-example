@@ -2,8 +2,7 @@ use getto_application_test::ActionTestRunner;
 
 use crate::{
     auth::_common::init::test::{
-        StaticAuthNonceMetadata, StaticAuthTokenMetadata, StaticValidateApiTokenStruct,
-        StaticValidateService,
+        StaticAuthServiceMetadata, StaticValidateApiTokenStruct, StaticValidateService,
     },
     example::outline::_api::get_menu_badge::init::{
         get_menu_badge_service::test::StaticGetOutlineMenuBadgeService,
@@ -48,8 +47,10 @@ impl TestFeature {
         Self {
             get_menu_badge: StaticGetOutlineMenuBadgeStruct {
                 validate_infra: StaticValidateApiTokenStruct {
-                    nonce_metadata: StaticAuthNonceMetadata::new("NONCE".into()),
-                    token_metadata: StaticAuthTokenMetadata::new("TOKEN".into()),
+                    service_metadata: StaticAuthServiceMetadata {
+                        nonce: "NONCE".into(),
+                        token: "TOKEN".into(),
+                    },
                     validate_service: StaticValidateService::new("USER-ID".into()),
                 },
                 get_menu_service: StaticGetOutlineMenuBadgeService,

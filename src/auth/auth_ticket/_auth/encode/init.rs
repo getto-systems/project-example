@@ -25,9 +25,9 @@ impl<'a> EncodeAuthTicketStruct<'a> {
         Self {
             clock: ChronoAuthClock::new(),
             ticket_repository: MysqlAuthTicketRepository::new(&feature.store.mysql),
-            ticket_encoder: TicketJwtAuthTokenEncoder::new(&feature.secret.ticket.encoding_key),
-            api_encoder: ApiJwtAuthTokenEncoder::new(&feature.secret.api.encoding_key),
-            cloudfront_encoder: CookieCloudfrontTokenEncoder::new(&feature.secret.cloudfront),
+            ticket_encoder: TicketJwtAuthTokenEncoder::new(&feature.key.ticket.encoding_key),
+            api_encoder: ApiJwtAuthTokenEncoder::new(&feature.key.api.encoding_key),
+            cloudfront_encoder: CookieCloudfrontTokenEncoder::new(&feature.key.cloudfront),
             config: EncodeAuthTicketConfig {
                 ticket_expires: feature.config.ticket_expires,
                 api_expires: feature.config.api_expires,
