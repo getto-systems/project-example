@@ -13,7 +13,7 @@ use crate::auth::_common::service::helper::{
 };
 
 use crate::auth::{
-    auth_ticket::_common::kernel::infra::AuthServiceMetadataContent,
+    auth_ticket::_common::kernel::infra::AuthMetadataContent,
     password::reset::{
         _api::reset::infra::{ResetPasswordResponse, ResetPasswordService},
         _common::reset::infra::ResetPasswordFieldsExtract,
@@ -42,7 +42,7 @@ impl<'a> TonicResetPasswordService<'a> {
 impl<'a> ResetPasswordService for TonicResetPasswordService<'a> {
     async fn reset(
         &self,
-        metadata: AuthServiceMetadataContent,
+        metadata: AuthMetadataContent,
         fields: ResetPasswordFieldsExtract,
     ) -> Result<ResetPasswordResponse, AuthServiceError> {
         let mut client = ResetPasswordPbClient::new(
@@ -76,7 +76,7 @@ pub mod test {
     use std::collections::HashMap;
 
     use crate::auth::{
-        auth_ticket::_common::kernel::infra::AuthServiceMetadataContent,
+        auth_ticket::_common::kernel::infra::AuthMetadataContent,
         password::reset::{
             _api::reset::infra::{ResetPasswordResponse, ResetPasswordService},
             _common::reset::infra::ResetPasswordFieldsExtract,
@@ -100,7 +100,7 @@ pub mod test {
     impl ResetPasswordService for StaticResetPasswordService {
         async fn reset(
             &self,
-            _metadata: AuthServiceMetadataContent,
+            _metadata: AuthMetadataContent,
             _fields: ResetPasswordFieldsExtract,
         ) -> Result<ResetPasswordResponse, AuthServiceError> {
             Ok(ResetPasswordResponse::Success(AuthTicketEncoded {

@@ -1,7 +1,7 @@
 use getto_application::data::MethodResult;
 
 use crate::auth::{
-    auth_ticket::_common::kernel::infra::AuthServiceMetadata,
+    auth_ticket::_common::kernel::infra::AuthMetadata,
     password::{
         _api::change::infra::{
             ChangePasswordInfra, ChangePasswordResponseEncoder, ChangePasswordService,
@@ -17,11 +17,11 @@ pub async fn change_password<S>(
     fields: ChangePasswordFieldsExtract,
     post: impl Fn(ChangePasswordEvent) -> S,
 ) -> MethodResult<S> {
-    let service_metadata = infra.service_metadata();
+    let auth_metadata = infra.auth_metadata();
     let change_service = infra.change_service();
     let response_encoder = infra.response_encoder();
 
-    let metadata = service_metadata
+    let metadata = auth_metadata
         .metadata()
         .map_err(|err| post(ChangePasswordEvent::MetadataError(err)))?;
 

@@ -1,6 +1,6 @@
 use tonic::Request;
 
-use crate::auth::_common::infra::AuthServiceMetadataContent;
+use crate::auth::_common::infra::AuthMetadataContent;
 use crate::example::outline::_common::y_protobuf::service::{
     get_menu_badge_pb_client::GetMenuBadgePbClient, GetMenuBadgeRequestPb,
 };
@@ -39,7 +39,7 @@ impl<'a> TonicGetOutlineMenuBadgeService<'a> {
 impl<'a> GetOutlineMenuBadgeService for TonicGetOutlineMenuBadgeService<'a> {
     async fn get_menu(
         &self,
-        metadata: AuthServiceMetadataContent,
+        metadata: AuthMetadataContent,
     ) -> Result<OutlineMenuBadge, ExampleServiceError> {
         let mut client = GetMenuBadgePbClient::new(
             new_endpoint(self.service_url)?
@@ -64,7 +64,7 @@ impl<'a> GetOutlineMenuBadgeService for TonicGetOutlineMenuBadgeService<'a> {
 #[cfg(test)]
 pub mod test {
     use crate::{
-        auth::_common::infra::AuthServiceMetadataContent,
+        auth::_common::infra::AuthMetadataContent,
         example::outline::_api::get_menu_badge::infra::GetOutlineMenuBadgeService,
     };
 
@@ -79,7 +79,7 @@ pub mod test {
     impl GetOutlineMenuBadgeService for StaticGetOutlineMenuBadgeService {
         async fn get_menu(
             &self,
-            _metadata: AuthServiceMetadataContent,
+            _metadata: AuthMetadataContent,
         ) -> Result<OutlineMenuBadge, ExampleServiceError> {
             Ok(OutlineMenuBadge {
                 index: OutlineMenuBadgeCount::restore(0),

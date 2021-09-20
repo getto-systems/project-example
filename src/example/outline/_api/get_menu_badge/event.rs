@@ -1,12 +1,12 @@
 use crate::{
-    auth::_common::data::AuthServiceMetadataError,
+    auth::_common::data::AuthMetadataError,
     example::_api::service::data::ExampleServiceError,
     z_details::_api::message::data::MessageError,
 };
 
 pub enum GetOutlineMenuBadgeEvent {
     Success(String),
-    MetadataError(AuthServiceMetadataError),
+    MetadataError(AuthMetadataError),
     ServiceError(ExampleServiceError),
     MessageError(MessageError),
 }

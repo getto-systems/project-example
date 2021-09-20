@@ -1,9 +1,9 @@
 use crate::{
-    auth::auth_ticket::_common::kernel::data::AuthServiceMetadataError,
+    auth::auth_ticket::_common::kernel::data::AuthMetadataError,
     z_details::_common::logger::LogLevel,
 };
 
-impl AuthServiceMetadataError {
+impl AuthMetadataError {
     pub const fn log_level(&self) -> LogLevel {
         match self {
             Self::MetadataError(_) => LogLevel::Error,

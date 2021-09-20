@@ -5,19 +5,19 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     auth::auth_ticket::_common::kernel::data::{
-        AuthNonce, AuthServiceMetadataError, AuthTicketExtract, AuthToken, DecodeAuthTokenError,
+        AuthNonce, AuthMetadataError, AuthTicketExtract, AuthToken, DecodeAuthTokenError,
     },
     z_details::_common::request::data::MetadataError,
 };
 
-pub struct AuthServiceMetadataContent {
+pub struct AuthMetadataContent {
     // TODO nonce は Option じゃなくできるはず : metadata error に unauthenticated みたいなのを追加かな
     pub nonce: Option<AuthNonce>,
     pub token: Option<AuthToken>,
 }
 
-pub trait AuthServiceMetadata {
-    fn metadata(&self) -> Result<AuthServiceMetadataContent, AuthServiceMetadataError>;
+pub trait AuthMetadata {
+    fn metadata(&self) -> Result<AuthMetadataContent, AuthMetadataError>;
 }
 
 pub trait AuthNonceMetadata {

@@ -13,7 +13,7 @@ use crate::auth::_common::service::helper::{
 };
 
 use crate::auth::{
-    auth_ticket::_common::kernel::infra::AuthServiceMetadataContent,
+    auth_ticket::_common::kernel::infra::AuthMetadataContent,
     password::{
         _api::change::infra::{ChangePasswordResponse, ChangePasswordService},
         _common::change::infra::ChangePasswordFieldsExtract,
@@ -42,7 +42,7 @@ impl<'a> TonicChangePasswordService<'a> {
 impl<'a> ChangePasswordService for TonicChangePasswordService<'a> {
     async fn change(
         &self,
-        metadata: AuthServiceMetadataContent,
+        metadata: AuthMetadataContent,
         fields: ChangePasswordFieldsExtract,
     ) -> Result<ChangePasswordResponse, AuthServiceError> {
         let mut client = ChangePasswordPbClient::new(
@@ -73,7 +73,7 @@ impl<'a> ChangePasswordService for TonicChangePasswordService<'a> {
 #[cfg(test)]
 pub mod test {
     use crate::auth::{
-        auth_ticket::_common::kernel::infra::AuthServiceMetadataContent,
+        auth_ticket::_common::kernel::infra::AuthMetadataContent,
         password::{
             _api::change::infra::{ChangePasswordResponse, ChangePasswordService},
             _common::change::infra::ChangePasswordFieldsExtract,
@@ -88,7 +88,7 @@ pub mod test {
     impl ChangePasswordService for StaticChangePasswordService {
         async fn change(
             &self,
-            _metadata: AuthServiceMetadataContent,
+            _metadata: AuthMetadataContent,
             _fields: ChangePasswordFieldsExtract,
         ) -> Result<ChangePasswordResponse, AuthServiceError> {
             Ok(ChangePasswordResponse::Success)

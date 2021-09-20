@@ -1,5 +1,5 @@
 use crate::auth::{
-    auth_ticket::_common::kernel::infra::{AuthServiceMetadata, AuthServiceMetadataContent},
+    auth_ticket::_common::kernel::infra::{AuthMetadata, AuthMetadataContent},
     password::_common::change::infra::ChangePasswordFieldsExtract,
 };
 
@@ -12,11 +12,11 @@ use crate::{
 };
 
 pub trait ChangePasswordInfra {
-    type ServiceMetadata: AuthServiceMetadata;
+    type AuthMetadata: AuthMetadata;
     type ChangeService: ChangePasswordService;
     type ResponseEncoder: ChangePasswordResponseEncoder;
 
-    fn service_metadata(&self) -> &Self::ServiceMetadata;
+    fn auth_metadata(&self) -> &Self::AuthMetadata;
     fn change_service(&self) -> &Self::ChangeService;
     fn response_encoder(&self) -> &Self::ResponseEncoder;
 }
@@ -29,7 +29,7 @@ pub trait ChangePasswordRequestDecoder {
 pub trait ChangePasswordService {
     async fn change(
         &self,
-        metadata: AuthServiceMetadataContent,
+        metadata: AuthMetadataContent,
         fields: ChangePasswordFieldsExtract,
     ) -> Result<ChangePasswordResponse, AuthServiceError>;
 }

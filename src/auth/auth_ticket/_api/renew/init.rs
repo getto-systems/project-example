@@ -7,7 +7,7 @@ use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::auth_ticket::_api::{
     kernel::init::{
-        response_builder::CookieAuthTokenResponseBuilder, service_metadata::TicketServiceMetadata,
+        response_builder::CookieAuthTokenResponseBuilder, auth_metadata::TicketAuthMetadata,
     },
     renew::init::response_encoder::ProstRenewAuthTicketResponseEncoder,
 };
@@ -16,7 +16,7 @@ use renew_service::TonicRenewAuthTicketService;
 use super::infra::RenewAuthTicketInfra;
 
 pub struct RenewAuthTicketStruct<'a> {
-    service_metadata: TicketServiceMetadata<'a>,
+    auth_metadata: TicketAuthMetadata<'a>,
     renew_service: TonicRenewAuthTicketService<'a>,
     response_builder: CookieAuthTokenResponseBuilder<'a>,
     response_encoder: ProstRenewAuthTicketResponseEncoder,
@@ -29,7 +29,7 @@ impl<'a> RenewAuthTicketStruct<'a> {
         request: &'a HttpRequest,
     ) -> Self {
         Self {
-            service_metadata: TicketServiceMetadata::new(&feature.key, request),
+            auth_metadata: TicketAuthMetadata::new(&feature.key, request),
             renew_service: TonicRenewAuthTicketService::new(&feature.service, request_id),
             response_builder: CookieAuthTokenResponseBuilder::new(&feature.cookie),
             response_encoder: ProstRenewAuthTicketResponseEncoder,
@@ -38,13 +38,13 @@ impl<'a> RenewAuthTicketStruct<'a> {
 }
 
 impl<'a> RenewAuthTicketInfra for RenewAuthTicketStruct<'a> {
-    type ServiceMetadata = TicketServiceMetadata<'a>;
+    type AuthMetadata = TicketAuthMetadata<'a>;
     type RenewService = TonicRenewAuthTicketService<'a>;
     type ResponseBuilder = CookieAuthTokenResponseBuilder<'a>;
     type ResponseEncoder = ProstRenewAuthTicketResponseEncoder;
 
-    fn service_metadata(&self) -> &Self::ServiceMetadata {
-        &self.service_metadata
+    fn auth_metadata(&self) -> &Self::AuthMetadata {
+        &self.auth_metadata
     }
     fn renew_service(&self) -> &Self::RenewService {
         &self.renew_service
@@ -63,26 +63,26 @@ pub mod test {
     use super::response_encoder::test::StaticRenewAuthTicketResponseEncoder;
     use crate::auth::auth_ticket::{
         _api::kernel::init::response_builder::test::StaticAuthTokenResponseBuilder,
-        _common::kernel::init::service_metadata::test::StaticAuthServiceMetadata,
+        _common::kernel::init::auth_metadata::test::StaticAuthMetadata,
     };
 
     use super::super::infra::RenewAuthTicketInfra;
 
     pub struct StaticRenewAuthTicketStruct {
-        pub service_metadata: StaticAuthServiceMetadata,
+        pub auth_metadata: StaticAuthMetadata,
         pub response_builder: StaticAuthTokenResponseBuilder,
         pub renew_service: StaticRenewAuthTicketService,
         pub response_encoder: StaticRenewAuthTicketResponseEncoder,
     }
 
     impl RenewAuthTicketInfra for StaticRenewAuthTicketStruct {
-        type ServiceMetadata = StaticAuthServiceMetadata;
+        type AuthMetadata = StaticAuthMetadata;
         type RenewService = StaticRenewAuthTicketService;
         type ResponseBuilder = StaticAuthTokenResponseBuilder;
         type ResponseEncoder = StaticRenewAuthTicketResponseEncoder;
 
-        fn service_metadata(&self) -> &Self::ServiceMetadata {
-            &self.service_metadata
+        fn auth_metadata(&self) -> &Self::AuthMetadata {
+            &self.auth_metadata
         }
         fn renew_service(&self) -> &Self::RenewService {
             &self.renew_service

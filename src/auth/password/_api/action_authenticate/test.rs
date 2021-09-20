@@ -5,7 +5,7 @@ use getto_application_test::ActionTestRunner;
 use crate::auth::{
     auth_ticket::{
         _api::kernel::init::response_builder::test::StaticAuthTokenResponseBuilder,
-        _common::kernel::init::service_metadata::test::StaticAuthServiceMetadata,
+        _common::kernel::init::auth_metadata::test::StaticAuthMetadata,
     },
     password::_api::authenticate::init::{
         authenticate_service::test::StaticAuthenticatePasswordService,
@@ -52,7 +52,7 @@ impl<'a> TestFeature {
     fn standard() -> Self {
         Self {
             authenticate: StaticAuthenticatePasswordStruct {
-                service_metadata: StaticAuthServiceMetadata {
+                auth_metadata: StaticAuthMetadata {
                     nonce: "NONCE".into(),
                     token: "TOKEN".into(),
                 },

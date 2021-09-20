@@ -2,7 +2,7 @@ use crate::{
     auth::{
         _common::service::data::AuthServiceError,
         auth_ticket::{
-            _api::kernel::data::AuthTokenResponse, _common::kernel::data::AuthServiceMetadataError,
+            _api::kernel::data::AuthTokenResponse, _common::kernel::data::AuthMetadataError,
         },
     },
     z_details::_api::message::data::MessageError,
@@ -10,7 +10,7 @@ use crate::{
 
 pub enum RenewAuthTicketEvent {
     Success(AuthTokenResponse),
-    MetadataError(AuthServiceMetadataError),
+    MetadataError(AuthMetadataError),
     ServiceError(AuthServiceError),
     MessageError(MessageError),
 }

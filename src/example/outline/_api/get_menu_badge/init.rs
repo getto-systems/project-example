@@ -8,14 +8,14 @@ use crate::x_outside_feature::_api::feature::AppFeature;
 use crate::example::outline::_api::get_menu_badge::init::response_encoder::ProstGetOutlineMenuBadgeResponseEncoder;
 
 use crate::{
-    auth::_api::init::ApiServiceMetadata,
+    auth::_api::init::ApiAuthMetadata,
     example::outline::_api::get_menu_badge::init::get_menu_badge_service::TonicGetOutlineMenuBadgeService,
 };
 
 use super::infra::GetOutlineMenuBadgeInfra;
 
 pub struct GetOutlineMenuBadgeStruct<'a> {
-    service_metadata: ApiServiceMetadata<'a>,
+    auth_metadata: ApiAuthMetadata<'a>,
     get_menu_service: TonicGetOutlineMenuBadgeService<'a>,
     response_encoder: ProstGetOutlineMenuBadgeResponseEncoder,
 }
@@ -23,7 +23,7 @@ pub struct GetOutlineMenuBadgeStruct<'a> {
 impl<'a> GetOutlineMenuBadgeStruct<'a> {
     pub fn new(feature: &'a AppFeature, request_id: &'a str, request: &'a HttpRequest) -> Self {
         Self {
-            service_metadata: ApiServiceMetadata::new(&feature.auth.key, request),
+            auth_metadata: ApiAuthMetadata::new(&feature.auth.key, request),
             get_menu_service: TonicGetOutlineMenuBadgeService::new(
                 &feature.outline.service,
                 request_id,
@@ -34,12 +34,12 @@ impl<'a> GetOutlineMenuBadgeStruct<'a> {
 }
 
 impl<'a> GetOutlineMenuBadgeInfra for GetOutlineMenuBadgeStruct<'a> {
-    type ServiceMetadata = ApiServiceMetadata<'a>;
+    type AuthMetadata = ApiAuthMetadata<'a>;
     type GetMenuService = TonicGetOutlineMenuBadgeService<'a>;
     type ResponseEncoder = ProstGetOutlineMenuBadgeResponseEncoder;
 
-    fn service_metadata(&self) -> &Self::ServiceMetadata {
-        &self.service_metadata
+    fn auth_metadata(&self) -> &Self::AuthMetadata {
+        &self.auth_metadata
     }
     fn get_menu_service(&self) -> &Self::GetMenuService {
         &self.get_menu_service
@@ -52,7 +52,7 @@ impl<'a> GetOutlineMenuBadgeInfra for GetOutlineMenuBadgeStruct<'a> {
 #[cfg(test)]
 pub mod test {
     use crate::{
-        auth::_common::init::test::StaticAuthServiceMetadata,
+        auth::_common::init::test::StaticAuthMetadata,
         example::outline::_api::get_menu_badge::init::{
             get_menu_badge_service::test::StaticGetOutlineMenuBadgeService,
             response_encoder::test::StaticGetOutlineMenuBadgeResponseEncoder,
@@ -62,18 +62,18 @@ pub mod test {
     use super::super::infra::GetOutlineMenuBadgeInfra;
 
     pub struct StaticGetOutlineMenuBadgeStruct {
-        pub service_metadata: StaticAuthServiceMetadata,
+        pub auth_metadata: StaticAuthMetadata,
         pub get_menu_service: StaticGetOutlineMenuBadgeService,
         pub response_encoder: StaticGetOutlineMenuBadgeResponseEncoder,
     }
 
     impl GetOutlineMenuBadgeInfra for StaticGetOutlineMenuBadgeStruct {
-        type ServiceMetadata = StaticAuthServiceMetadata;
+        type AuthMetadata = StaticAuthMetadata;
         type GetMenuService = StaticGetOutlineMenuBadgeService;
         type ResponseEncoder = StaticGetOutlineMenuBadgeResponseEncoder;
 
-        fn service_metadata(&self) -> &Self::ServiceMetadata {
-            &self.service_metadata
+        fn auth_metadata(&self) -> &Self::AuthMetadata {
+            &self.auth_metadata
         }
         fn get_menu_service(&self) -> &Self::GetMenuService {
             &self.get_menu_service

@@ -1,7 +1,7 @@
 use crate::auth::{
     auth_ticket::{
         _api::kernel::infra::AuthTokenResponseBuilder,
-        _common::kernel::infra::{AuthServiceMetadata, AuthServiceMetadataContent},
+        _common::kernel::infra::{AuthMetadata, AuthMetadataContent},
     },
     password::_common::authenticate::infra::AuthenticatePasswordFieldsExtract,
 };
@@ -16,12 +16,12 @@ use crate::{
 };
 
 pub trait AuthenticatePasswordInfra {
-    type ServiceMetadata: AuthServiceMetadata;
+    type AuthMetadata: AuthMetadata;
     type AuthenticateService: AuthenticatePasswordService;
     type ResponseEncoder: AuthenticatePasswordResponseEncoder;
     type ResponseBuilder: AuthTokenResponseBuilder;
 
-    fn service_metadata(&self) -> &Self::ServiceMetadata;
+    fn auth_metadata(&self) -> &Self::AuthMetadata;
     fn authenticate_service(&self) -> &Self::AuthenticateService;
     fn response_encoder(&self) -> &Self::ResponseEncoder;
     fn response_builder(&self) -> &Self::ResponseBuilder;
@@ -35,7 +35,7 @@ pub trait AuthenticatePasswordRequestDecoder {
 pub trait AuthenticatePasswordService {
     async fn authenticate(
         &self,
-        metadata: AuthServiceMetadataContent,
+        metadata: AuthMetadataContent,
         fields: AuthenticatePasswordFieldsExtract,
     ) -> Result<AuthenticatePasswordResponse, AuthServiceError>;
 }

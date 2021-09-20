@@ -1,5 +1,5 @@
 use crate::auth::auth_ticket::_common::kernel::infra::{
-    AuthServiceMetadata, AuthServiceMetadataContent,
+    AuthMetadata, AuthMetadataContent,
 };
 
 use crate::auth::{
@@ -8,10 +8,10 @@ use crate::auth::{
 };
 
 pub trait ValidateApiTokenInfra {
-    type ServiceMetadata: AuthServiceMetadata;
+    type AuthMetadata: AuthMetadata;
     type ValidateService: ValidateService;
 
-    fn service_metadata(&self) -> &Self::ServiceMetadata;
+    fn auth_metadata(&self) -> &Self::AuthMetadata;
     fn validate_service(&self) -> &Self::ValidateService;
 }
 
@@ -19,7 +19,7 @@ pub trait ValidateApiTokenInfra {
 pub trait ValidateService {
     async fn validate(
         &self,
-        metadata: AuthServiceMetadataContent,
+        metadata: AuthMetadataContent,
         require_roles: RequireAuthRoles,
     ) -> Result<AuthUserId, AuthServiceError>;
 }

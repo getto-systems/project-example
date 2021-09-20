@@ -1,5 +1,5 @@
 use crate::auth::{
-    auth_ticket::_common::kernel::infra::{AuthServiceMetadata, AuthServiceMetadataContent},
+    auth_ticket::_common::kernel::infra::{AuthMetadata, AuthMetadataContent},
     password::reset::_common::request_token::infra::RequestResetTokenFieldsExtract,
 };
 
@@ -12,11 +12,11 @@ use crate::{
 };
 
 pub trait RequestResetTokenInfra {
-    type ServiceMetadata: AuthServiceMetadata;
+    type AuthMetadata: AuthMetadata;
     type RequestTokenService: RequestResetTokenService;
     type ResponseEncoder: RequestResetTokenResponseEncoder;
 
-    fn service_metadata(&self) -> &Self::ServiceMetadata;
+    fn auth_metadata(&self) -> &Self::AuthMetadata;
     fn request_token_service(&self) -> &Self::RequestTokenService;
     fn response_encoder(&self) -> &Self::ResponseEncoder;
 }
@@ -29,7 +29,7 @@ pub trait RequestResetTokenRequestDecoder {
 pub trait RequestResetTokenService {
     async fn request_token(
         &self,
-        metadata: AuthServiceMetadataContent,
+        metadata: AuthMetadataContent,
         fields: RequestResetTokenFieldsExtract,
     ) -> Result<RequestResetTokenResponse, AuthServiceError>;
 }

@@ -1,7 +1,7 @@
 use getto_application::data::MethodResult;
 
 use crate::{
-    auth::_common::infra::AuthServiceMetadata,
+    auth::_common::infra::AuthMetadata,
     example::outline::_api::get_menu_badge::infra::{
         GetOutlineMenuBadgeInfra, GetOutlineMenuBadgeResponseEncoder, GetOutlineMenuBadgeService,
     },
@@ -13,11 +13,11 @@ pub async fn get_outline_menu_badge<S>(
     infra: &impl GetOutlineMenuBadgeInfra,
     post: impl Fn(GetOutlineMenuBadgeEvent) -> S,
 ) -> MethodResult<S> {
-    let service_metadata = infra.service_metadata();
+    let auth_metadata = infra.auth_metadata();
     let get_menu_service = infra.get_menu_service();
     let response_encoder = infra.response_encoder();
 
-    let metadata = service_metadata
+    let metadata = auth_metadata
         .metadata()
         .map_err(|err| post(GetOutlineMenuBadgeEvent::MetadataError(err)))?;
 

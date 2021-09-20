@@ -13,7 +13,7 @@ use crate::auth::_common::service::helper::{
 };
 
 use crate::auth::auth_ticket::{
-    _api::renew::infra::RenewAuthTicketService, _common::kernel::infra::AuthServiceMetadataContent,
+    _api::renew::infra::RenewAuthTicketService, _common::kernel::infra::AuthMetadataContent,
 };
 
 use crate::auth::{
@@ -40,7 +40,7 @@ impl<'a> TonicRenewAuthTicketService<'a> {
 impl<'a> RenewAuthTicketService for TonicRenewAuthTicketService<'a> {
     async fn renew(
         &self,
-        metadata: AuthServiceMetadataContent,
+        metadata: AuthMetadataContent,
     ) -> Result<AuthTicketEncoded, AuthServiceError> {
         let mut client = RenewAuthTicketPbClient::new(
             new_endpoint(self.service_url)?
@@ -71,7 +71,7 @@ pub mod test {
 
     use crate::auth::auth_ticket::{
         _api::renew::infra::RenewAuthTicketService,
-        _common::kernel::infra::AuthServiceMetadataContent,
+        _common::kernel::infra::AuthMetadataContent,
     };
 
     use crate::auth::{
@@ -91,7 +91,7 @@ pub mod test {
     impl RenewAuthTicketService for StaticRenewAuthTicketService {
         async fn renew(
             &self,
-            _metadata: AuthServiceMetadataContent,
+            _metadata: AuthMetadataContent,
         ) -> Result<AuthTicketEncoded, AuthServiceError> {
             Ok(AuthTicketEncoded {
                 user: self.user.clone().extract(),

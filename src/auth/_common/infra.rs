@@ -1,4 +1,4 @@
 pub use crate::auth::auth_ticket::_common::{
-    kernel::infra::{AuthServiceMetadata, AuthServiceMetadataContent},
+    kernel::infra::{AuthMetadata, AuthMetadataContent},
     validate::infra::ValidateApiTokenInfra,
 };

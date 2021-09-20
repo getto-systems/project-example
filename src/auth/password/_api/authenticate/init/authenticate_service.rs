@@ -13,7 +13,7 @@ use crate::auth::_common::service::helper::{
 };
 
 use crate::auth::{
-    auth_ticket::_common::kernel::infra::AuthServiceMetadataContent,
+    auth_ticket::_common::kernel::infra::AuthMetadataContent,
     password::{
         _api::authenticate::infra::{AuthenticatePasswordResponse, AuthenticatePasswordService},
         _common::authenticate::infra::AuthenticatePasswordFieldsExtract,
@@ -42,7 +42,7 @@ impl<'a> TonicAuthenticatePasswordService<'a> {
 impl<'a> AuthenticatePasswordService for TonicAuthenticatePasswordService<'a> {
     async fn authenticate(
         &self,
-        metadata: AuthServiceMetadataContent,
+        metadata: AuthMetadataContent,
         fields: AuthenticatePasswordFieldsExtract,
     ) -> Result<AuthenticatePasswordResponse, AuthServiceError> {
         let mut client = AuthenticatePasswordPbClient::new(
@@ -75,7 +75,7 @@ pub mod test {
     use std::collections::HashMap;
 
     use crate::auth::{
-        auth_ticket::_common::kernel::infra::AuthServiceMetadataContent,
+        auth_ticket::_common::kernel::infra::AuthMetadataContent,
         password::{
             _api::authenticate::infra::{
                 AuthenticatePasswordResponse, AuthenticatePasswordService,
@@ -101,7 +101,7 @@ pub mod test {
     impl AuthenticatePasswordService for StaticAuthenticatePasswordService {
         async fn authenticate(
             &self,
-            _metadata: AuthServiceMetadataContent,
+            _metadata: AuthMetadataContent,
             _fields: AuthenticatePasswordFieldsExtract,
         ) -> Result<AuthenticatePasswordResponse, AuthServiceError> {
             Ok(AuthenticatePasswordResponse::Success(AuthTicketEncoded {

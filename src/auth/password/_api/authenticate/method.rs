@@ -2,7 +2,7 @@ use getto_application::data::MethodResult;
 
 use crate::auth::{
     auth_ticket::{
-        _api::kernel::infra::AuthTokenResponseBuilder, _common::kernel::infra::AuthServiceMetadata,
+        _api::kernel::infra::AuthTokenResponseBuilder, _common::kernel::infra::AuthMetadata,
     },
     password::{
         _api::authenticate::infra::{
@@ -20,12 +20,12 @@ pub async fn authenticate_password<S>(
     fields: AuthenticatePasswordFieldsExtract,
     post: impl Fn(AuthenticatePasswordEvent) -> S,
 ) -> MethodResult<S> {
-    let service_metadata = infra.service_metadata();
+    let auth_metadata = infra.auth_metadata();
     let authenticate_service = infra.authenticate_service();
     let response_encoder = infra.response_encoder();
     let response_builder = infra.response_builder();
 
-    let metadata = service_metadata
+    let metadata = auth_metadata
         .metadata()
         .map_err(|err| post(AuthenticatePasswordEvent::MetadataError(err)))?;
 

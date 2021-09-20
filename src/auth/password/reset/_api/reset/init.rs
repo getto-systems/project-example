@@ -7,7 +7,7 @@ use actix_web::HttpRequest;
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::auth_ticket::_api::kernel::init::{
-    response_builder::CookieAuthTokenResponseBuilder, service_metadata::NoAuthorizedServiceMetadata,
+    response_builder::CookieAuthTokenResponseBuilder, auth_metadata::NoAuthMetadata,
 };
 use reset_service::TonicResetPasswordService;
 use response_encoder::ProstResetPasswordResponseEncoder;
@@ -15,7 +15,7 @@ use response_encoder::ProstResetPasswordResponseEncoder;
 use crate::auth::password::reset::_api::reset::infra::ResetPasswordInfra;
 
 pub struct ResetPasswordStruct<'a> {
-    service_metadata: NoAuthorizedServiceMetadata<'a>,
+    auth_metadata: NoAuthMetadata<'a>,
     reset_service: TonicResetPasswordService<'a>,
     response_encoder: ProstResetPasswordResponseEncoder,
     response_builder: CookieAuthTokenResponseBuilder<'a>,
@@ -28,7 +28,7 @@ impl<'a> ResetPasswordStruct<'a> {
         request: &'a HttpRequest,
     ) -> Self {
         Self {
-            service_metadata: NoAuthorizedServiceMetadata::new(request),
+            auth_metadata: NoAuthMetadata::new(request),
             reset_service: TonicResetPasswordService::new(&feature.service, request_id),
             response_encoder: ProstResetPasswordResponseEncoder,
             response_builder: CookieAuthTokenResponseBuilder::new(&feature.cookie),
@@ -37,13 +37,13 @@ impl<'a> ResetPasswordStruct<'a> {
 }
 
 impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
-    type ServiceMetadata = NoAuthorizedServiceMetadata<'a>;
+    type AuthMetadata = NoAuthMetadata<'a>;
     type ResetService = TonicResetPasswordService<'a>;
     type ResponseEncoder = ProstResetPasswordResponseEncoder;
     type ResponseBuilder = CookieAuthTokenResponseBuilder<'a>;
 
-    fn service_metadata(&self) -> &Self::ServiceMetadata {
-        &self.service_metadata
+    fn auth_metadata(&self) -> &Self::AuthMetadata {
+        &self.auth_metadata
     }
     fn reset_service(&self) -> &Self::ResetService {
         &self.reset_service
@@ -63,26 +63,26 @@ pub mod test {
 
     use crate::auth::auth_ticket::{
         _api::kernel::init::response_builder::test::StaticAuthTokenResponseBuilder,
-        _common::kernel::init::service_metadata::test::StaticAuthServiceMetadata,
+        _common::kernel::init::auth_metadata::test::StaticAuthMetadata,
     };
 
     use super::super::infra::ResetPasswordInfra;
 
     pub struct StaticResetPasswordStruct {
-        pub service_metadata: StaticAuthServiceMetadata,
+        pub auth_metadata: StaticAuthMetadata,
         pub reset_service: StaticResetPasswordService,
         pub response_encoder: StaticResetPasswordResponseEncoder,
         pub response_builder: StaticAuthTokenResponseBuilder,
     }
 
     impl ResetPasswordInfra for StaticResetPasswordStruct {
-        type ServiceMetadata = StaticAuthServiceMetadata;
+        type AuthMetadata = StaticAuthMetadata;
         type ResetService = StaticResetPasswordService;
         type ResponseEncoder = StaticResetPasswordResponseEncoder;
         type ResponseBuilder = StaticAuthTokenResponseBuilder;
 
-        fn service_metadata(&self) -> &Self::ServiceMetadata {
-            &self.service_metadata
+        fn auth_metadata(&self) -> &Self::AuthMetadata {
+            &self.auth_metadata
         }
         fn reset_service(&self) -> &Self::ResetService {
             &self.reset_service

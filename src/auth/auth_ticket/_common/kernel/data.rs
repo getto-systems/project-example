@@ -63,12 +63,12 @@ pub struct AuthTicketExtract {
     pub granted_roles: HashSet<String>,
 }
 
-pub enum AuthServiceMetadataError {
+pub enum AuthMetadataError {
     MetadataError(MetadataError),
     DecodeError(DecodeAuthTokenError),
 }
 
-impl std::fmt::Display for AuthServiceMetadataError {
+impl std::fmt::Display for AuthMetadataError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::MetadataError(err) => err.fmt(f),

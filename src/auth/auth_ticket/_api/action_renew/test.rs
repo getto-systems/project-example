@@ -12,7 +12,7 @@ use crate::auth::{
                 test::StaticRenewAuthTicketStruct,
             },
         },
-        _common::kernel::init::service_metadata::test::StaticAuthServiceMetadata,
+        _common::kernel::init::auth_metadata::test::StaticAuthMetadata,
     },
     auth_user::_common::kernel::data::{AuthUser, AuthUserExtract},
 };
@@ -49,7 +49,7 @@ impl TestFeature {
     fn standard() -> Self {
         Self {
             renew: StaticRenewAuthTicketStruct {
-                service_metadata: StaticAuthServiceMetadata {
+                auth_metadata: StaticAuthMetadata {
                     nonce: "NONCE".into(),
                     token: "TOKEN".into(),
                 },

@@ -1,7 +1,7 @@
 use getto_application_test::ActionTestRunner;
 
 use crate::{
-    auth::_common::init::test::StaticAuthServiceMetadata,
+    auth::_common::init::test::StaticAuthMetadata,
     example::outline::_api::get_menu_badge::init::{
         get_menu_badge_service::test::StaticGetOutlineMenuBadgeService,
         response_encoder::test::StaticGetOutlineMenuBadgeResponseEncoder,
@@ -41,7 +41,7 @@ impl TestFeature {
     fn standard() -> Self {
         Self {
             get_menu_badge: StaticGetOutlineMenuBadgeStruct {
-                service_metadata: StaticAuthServiceMetadata {
+                auth_metadata: StaticAuthMetadata {
                     nonce: "NONCE".into(),
                     token: "TOKEN".into(),
                 },

@@ -3,7 +3,7 @@ pub use crate::auth::auth_ticket::_common::validate::init::ValidateApiTokenStruc
 #[cfg(test)]
 pub mod test {
     pub use crate::auth::auth_ticket::_common::{
-        kernel::init::service_metadata::test::StaticAuthServiceMetadata,
+        kernel::init::auth_metadata::test::StaticAuthMetadata,
         validate::init::{
             test::StaticValidateApiTokenStruct, validate_service::test::StaticValidateService,
         },
@@ -16,14 +16,14 @@ use actix_web::HttpRequest;
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::auth_ticket::{
-    _api::kernel::init::service_metadata::ApiServiceMetadata,
+    _api::kernel::init::auth_metadata::ApiAuthMetadata,
     _common::validate::init::validate_service::TonicValidateService,
 };
 
 use crate::auth::_common::infra::ValidateApiTokenInfra;
 
 pub struct ValidateApiTokenStructForApi<'a> {
-    service_metadata: ApiServiceMetadata<'a>,
+    auth_metadata: ApiAuthMetadata<'a>,
     validate_service: TonicValidateService<'a>,
 }
 
@@ -34,18 +34,18 @@ impl<'a> ValidateApiTokenStructForApi<'a> {
         request: &'a HttpRequest,
     ) -> Self {
         Self {
-            service_metadata: ApiServiceMetadata::new(&feature.key, request),
+            auth_metadata: ApiAuthMetadata::new(&feature.key, request),
             validate_service: TonicValidateService::new(&feature.service, request_id),
         }
     }
 }
 
 impl<'a> ValidateApiTokenInfra for ValidateApiTokenStructForApi<'a> {
-    type ServiceMetadata = ApiServiceMetadata<'a>;
+    type AuthMetadata = ApiAuthMetadata<'a>;
     type ValidateService = TonicValidateService<'a>;
 
-    fn service_metadata(&self) -> &Self::ServiceMetadata {
-        &self.service_metadata
+    fn auth_metadata(&self) -> &Self::AuthMetadata {
+        &self.auth_metadata
     }
     fn validate_service(&self) -> &Self::ValidateService {
         &self.validate_service

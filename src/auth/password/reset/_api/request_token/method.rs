@@ -1,7 +1,7 @@
 use getto_application::data::MethodResult;
 
 use crate::auth::{
-    auth_ticket::_common::kernel::infra::AuthServiceMetadata,
+    auth_ticket::_common::kernel::infra::AuthMetadata,
     password::reset::{
         _api::request_token::infra::{
             RequestResetTokenInfra, RequestResetTokenResponseEncoder, RequestResetTokenService,
@@ -17,11 +17,11 @@ pub async fn request_reset_token<S>(
     fields: RequestResetTokenFieldsExtract,
     post: impl Fn(RequestResetTokenEvent) -> S,
 ) -> MethodResult<S> {
-    let service_metadata = infra.service_metadata();
+    let auth_metadata = infra.auth_metadata();
     let request_token_service = infra.request_token_service();
     let response_encoder = infra.response_encoder();
 
-    let metadata = service_metadata
+    let metadata = auth_metadata
         .metadata()
         .map_err(|err| post(RequestResetTokenEvent::MetadataError(err)))?;
 

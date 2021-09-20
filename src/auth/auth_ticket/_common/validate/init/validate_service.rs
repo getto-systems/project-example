@@ -13,7 +13,7 @@ use crate::auth::_common::service::helper::{
 };
 
 use super::super::infra::ValidateService;
-use crate::auth::auth_ticket::_common::kernel::infra::AuthServiceMetadataContent;
+use crate::auth::auth_ticket::_common::kernel::infra::AuthMetadataContent;
 
 use crate::auth::{
     _common::service::data::AuthServiceError,
@@ -40,7 +40,7 @@ impl<'a> TonicValidateService<'a> {
 impl<'a> ValidateService for TonicValidateService<'a> {
     async fn validate(
         &self,
-        metadata: AuthServiceMetadataContent,
+        metadata: AuthMetadataContent,
         require_roles: RequireAuthRoles,
     ) -> Result<AuthUserId, AuthServiceError> {
         let mut client = ValidateApiTokenPbClient::new(
@@ -72,7 +72,7 @@ impl<'a> ValidateService for TonicValidateService<'a> {
 #[cfg(test)]
 pub mod test {
     use super::super::super::infra::ValidateService;
-    use crate::auth::auth_ticket::_common::kernel::infra::AuthServiceMetadataContent;
+    use crate::auth::auth_ticket::_common::kernel::infra::AuthMetadataContent;
 
     use crate::auth::{
         _common::service::data::AuthServiceError,
@@ -94,7 +94,7 @@ pub mod test {
     impl ValidateService for StaticValidateService {
         async fn validate(
             &self,
-            _metadata: AuthServiceMetadataContent,
+            _metadata: AuthMetadataContent,
             _require_roles: RequireAuthRoles,
         ) -> Result<AuthUserId, AuthServiceError> {
             Ok(self.user_id.clone())
