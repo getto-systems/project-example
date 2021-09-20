@@ -34,11 +34,15 @@ impl<'a> LogoutProxyService<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthProxyService<()> for LogoutProxyService<'a> {
+impl<'a> AuthProxyService<(), ()> for LogoutProxyService<'a> {
     fn name(&self) -> &str {
         "auth.auth_ticket.logout"
     }
-    async fn call(&self, metadata: AuthMetadataContent) -> Result<(), AuthServiceError> {
+    async fn call(
+        &self,
+        metadata: AuthMetadataContent,
+        _params: (),
+    ) -> Result<(), AuthServiceError> {
         let mut client = LogoutPbClient::new(
             new_endpoint(self.service_url)?
                 .connect()

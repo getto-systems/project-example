@@ -64,9 +64,9 @@ impl<T> LogMessage for &AuthProxyState<T> {
     }
 }
 
-pub trait AuthProxyMaterial<T, R> {
+pub trait AuthProxyMaterial<P, T, R> {
     type AuthMetadata: AuthMetadata;
-    type ProxyService: AuthProxyService<T>;
+    type ProxyService: AuthProxyService<P, T>;
     type ResponseEncoder: AuthProxyResponseEncoder<T, R>;
 
     fn auth_metadata(&self) -> &Self::AuthMetadata;
@@ -77,21 +77,24 @@ pub trait AuthProxyMaterial<T, R> {
 }
 
 #[async_trait::async_trait]
-pub trait AuthProxyService<T> {
+pub trait AuthProxyService<P, T> {
     fn name(&self) -> &str;
-    async fn call(&self, metadata: AuthMetadataContent) -> Result<T, AuthServiceError>;
+    async fn call(&self, metadata: AuthMetadataContent, params: P) -> Result<T, AuthServiceError>;
 }
 
 pub trait AuthProxyResponseEncoder<T, R> {
     fn encode(&self, response: T) -> Result<R, MessageError>;
 }
 
-pub async fn call_proxy<T, R>(
-    material: &impl AuthProxyMaterial<T, R>,
+pub async fn call_proxy<P, T, R>(
+    material: &impl AuthProxyMaterial<P, T, R>,
+    params: Result<P, MessageError>,
 ) -> MethodResult<AuthProxyState<R>> {
     let auth_metadata = material.auth_metadata();
     let proxy_service = material.proxy_service();
     let response_encoder = material.response_encoder();
+
+    let params = params.map_err(|err| material.post(AuthProxyState::MessageError(err)))?;
 
     let metadata = auth_metadata
         .metadata()
@@ -100,7 +103,7 @@ pub async fn call_proxy<T, R>(
     material.post(AuthProxyState::TryToCall(proxy_service.name().into()));
 
     let response = proxy_service
-        .call(metadata)
+        .call(metadata, params)
         .await
         .map_err(|err| material.post(AuthProxyState::ServiceError(err)))?;
 

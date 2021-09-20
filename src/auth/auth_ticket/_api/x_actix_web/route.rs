@@ -27,7 +27,7 @@ async fn renew(data: AppData, request: HttpRequest) -> impl Responder {
     let mut material = RenewAuthTicketProxyFeature::new(&data.auth, &request_id, &request);
     material.subscribe(move |state| logger.log(state.log_level(), state));
 
-    flatten(call_proxy(&material).await).respond_to(&request)
+    flatten(call_proxy(&material, Ok(())).await).respond_to(&request)
 }
 
 #[delete("")]
@@ -38,5 +38,5 @@ async fn logout(data: AppData, request: HttpRequest) -> impl Responder {
     let mut material = LogoutProxyFeature::new(&data.auth, &request_id, &request);
     material.subscribe(move |state| logger.log(state.log_level(), state));
 
-    flatten(call_proxy(&material).await).respond_to(&request)
+    flatten(call_proxy(&material, Ok(())).await).respond_to(&request)
 }

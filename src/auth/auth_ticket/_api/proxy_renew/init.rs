@@ -47,7 +47,7 @@ impl<'a> RenewAuthTicketProxyFeature<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthProxyMaterial<AuthTicketEncoded, AuthTokenResponse>
+impl<'a> AuthProxyMaterial<(), AuthTicketEncoded, AuthTokenResponse>
     for RenewAuthTicketProxyFeature<'a>
 {
     type AuthMetadata = TicketAuthMetadata<'a>;

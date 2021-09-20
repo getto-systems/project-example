@@ -43,7 +43,7 @@ impl<'a> LogoutProxyFeature<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthProxyMaterial<(), LogoutProxyResponse> for LogoutProxyFeature<'a> {
+impl<'a> AuthProxyMaterial<(), (), LogoutProxyResponse> for LogoutProxyFeature<'a> {
     type AuthMetadata = TicketAuthMetadata<'a>;
     type ProxyService = LogoutProxyService<'a>;
     type ResponseEncoder = LogoutProxyResponseEncoder;

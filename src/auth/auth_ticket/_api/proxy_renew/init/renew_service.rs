@@ -1,6 +1,5 @@
 use tonic::Request;
 
-use crate::auth::_api::proxy::AuthProxyService;
 use crate::auth::auth_ticket::_common::y_protobuf::service::{
     renew_auth_ticket_pb_client::RenewAuthTicketPbClient, RenewAuthTicketRequestPb,
 };
@@ -12,6 +11,8 @@ use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorize
 use crate::auth::_common::service::helper::{
     infra_error, new_endpoint, set_authorization, set_metadata,
 };
+
+use crate::auth::_api::proxy::AuthProxyService;
 
 use crate::auth::auth_ticket::_common::kernel::infra::AuthMetadataContent;
 
@@ -36,13 +37,14 @@ impl<'a> RenewProxyService<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthProxyService<AuthTicketEncoded> for RenewProxyService<'a> {
+impl<'a> AuthProxyService<(), AuthTicketEncoded> for RenewProxyService<'a> {
     fn name(&self) -> &str {
         "auth.auth_ticket.renew"
     }
     async fn call(
         &self,
         metadata: AuthMetadataContent,
+        _params: (),
     ) -> Result<AuthTicketEncoded, AuthServiceError> {
         let mut client = RenewAuthTicketPbClient::new(
             new_endpoint(self.service_url)?
