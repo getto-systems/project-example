@@ -14,13 +14,15 @@ use crate::auth::_common::service::helper::{
 
 use crate::auth::_api::proxy::AuthProxyService;
 
-use super::AuthenticatePasswordResponse;
 use crate::auth::{
     auth_ticket::_common::kernel::infra::AuthMetadataContent,
     password::_common::authenticate::infra::AuthenticatePasswordFieldsExtract,
 };
 
-use crate::auth::_common::service::data::AuthServiceError;
+use crate::auth::{
+    _common::service::data::AuthServiceError,
+    password::_api::proxy_authenticate::data::AuthenticatePasswordResponse,
+};
 
 pub struct AuthenticateProxyService<'a> {
     service_url: &'static str,

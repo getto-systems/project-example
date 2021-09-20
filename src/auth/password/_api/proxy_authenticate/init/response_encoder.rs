@@ -11,13 +11,16 @@ use crate::auth::auth_ticket::_api::kernel::init::response_builder::CookieAuthTo
 
 use crate::auth::_api::proxy::AuthProxyResponseEncoder;
 
-use super::{
-    AuthenticatePasswordMessageEncoded, AuthenticatePasswordResponse, AuthenticatePasswordResult,
-};
 use crate::auth::auth_ticket::_api::kernel::infra::AuthTokenResponseBuilder;
 
 use crate::{
-    auth::auth_ticket::_api::kernel::data::AuthTokenMessage,
+    auth::{
+        auth_ticket::_api::kernel::data::AuthTokenMessage,
+        password::_api::proxy_authenticate::data::{
+            AuthenticatePasswordMessageEncoded, AuthenticatePasswordResponse,
+            AuthenticatePasswordResult,
+        },
+    },
     z_details::_api::message::data::MessageError,
 };
 

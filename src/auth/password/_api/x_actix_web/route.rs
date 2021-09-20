@@ -2,8 +2,6 @@ use actix_web::{post, web, HttpRequest, Responder, Scope};
 
 use getto_application::helper::flatten;
 
-use crate::auth::_api::proxy::call_proxy;
-use crate::auth::password::_api::proxy_authenticate::init::AuthenticatePasswordProxyFeature;
 use crate::z_details::_common::{logger::Logger, response::actix_web::RespondTo};
 
 use crate::x_outside_feature::_api::{
@@ -13,10 +11,13 @@ use crate::x_outside_feature::_api::{
 
 use crate::auth::password::reset::_api::x_actix_web::route::scope_reset;
 
-use crate::auth::password::_api::{
-    action_change::init::ChangePasswordFeature,
-    proxy_authenticate::init::AuthenticatePasswordRequestDecoder,
+use crate::auth::_api::proxy::call_proxy;
+
+use crate::auth::password::_api::proxy_authenticate::{
+    infra::AuthenticatePasswordProxyRequestDecoder, init::AuthenticatePasswordProxyFeature,
 };
+
+use crate::auth::password::_api::action_change::init::ChangePasswordFeature;
 
 pub fn scope_password() -> Scope {
     web::scope("/password")

@@ -1,8 +1,11 @@
 use actix_web::{HttpRequest, HttpResponse};
+
 use getto_application::data::MethodResult;
 
-use crate::z_details::_common::logger::LogMessage;
-use crate::z_details::_common::{logger::LogLevel, response::actix_web::RespondTo};
+use crate::z_details::_common::{
+    logger::{LogLevel, LogMessage},
+    response::actix_web::RespondTo,
+};
 
 use crate::auth::_common::infra::{AuthMetadata, AuthMetadataContent};
 
