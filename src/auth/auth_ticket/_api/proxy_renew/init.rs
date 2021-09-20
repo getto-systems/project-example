@@ -1,4 +1,4 @@
-mod logout_service;
+mod renew_service;
 mod response_encoder;
 
 use actix_web::HttpRequest;
@@ -6,21 +6,25 @@ use actix_web::HttpRequest;
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::auth_ticket::_api::kernel::init::auth_metadata::TicketAuthMetadata;
-use logout_service::LogoutProxyService;
-use response_encoder::{LogoutProxyResponse, LogoutProxyResponseEncoder};
+use renew_service::RenewProxyService;
+use response_encoder::RenewProxyResponseEncoder;
 
 use crate::auth::_api::proxy::{AuthProxyMaterial, AuthProxyState};
 
 use getto_application::infra::ActionStatePubSub;
 
-pub struct LogoutProxyFeature<'a> {
-    pubsub: ActionStatePubSub<AuthProxyState<LogoutProxyResponse>>,
+use crate::auth::auth_ticket::{
+    _api::kernel::data::AuthTokenResponse, _common::encode::data::AuthTicketEncoded,
+};
+
+pub struct RenewAuthTicketProxyFeature<'a> {
+    pubsub: ActionStatePubSub<AuthProxyState<AuthTokenResponse>>,
     auth_metadata: TicketAuthMetadata<'a>,
-    proxy_service: LogoutProxyService<'a>,
-    response_encoder: LogoutProxyResponseEncoder,
+    proxy_service: RenewProxyService<'a>,
+    response_encoder: RenewProxyResponseEncoder<'a>,
 }
 
-impl<'a> LogoutProxyFeature<'a> {
+impl<'a> RenewAuthTicketProxyFeature<'a> {
     pub fn new(
         feature: &'a AuthOutsideFeature,
         request_id: &'a str,
@@ -29,24 +33,26 @@ impl<'a> LogoutProxyFeature<'a> {
         Self {
             pubsub: ActionStatePubSub::new(),
             auth_metadata: TicketAuthMetadata::new(&feature.key, request),
-            proxy_service: LogoutProxyService::new(&feature.service, request_id),
-            response_encoder: LogoutProxyResponseEncoder,
+            proxy_service: RenewProxyService::new(&feature.service, request_id),
+            response_encoder: RenewProxyResponseEncoder::new(&feature.cookie),
         }
     }
 
     pub fn subscribe(
         &mut self,
-        handler: impl 'static + Fn(&AuthProxyState<LogoutProxyResponse>) + Send + Sync,
+        handler: impl 'static + Fn(&AuthProxyState<AuthTokenResponse>) + Send + Sync,
     ) {
         self.pubsub.subscribe(handler);
     }
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthProxyMaterial<(), LogoutProxyResponse> for LogoutProxyFeature<'a> {
+impl<'a> AuthProxyMaterial<AuthTicketEncoded, AuthTokenResponse>
+    for RenewAuthTicketProxyFeature<'a>
+{
     type AuthMetadata = TicketAuthMetadata<'a>;
-    type ProxyService = LogoutProxyService<'a>;
-    type ResponseEncoder = LogoutProxyResponseEncoder;
+    type ProxyService = RenewProxyService<'a>;
+    type ResponseEncoder = RenewProxyResponseEncoder<'a>;
 
     fn auth_metadata(&self) -> &Self::AuthMetadata {
         &self.auth_metadata
@@ -58,10 +64,7 @@ impl<'a> AuthProxyMaterial<(), LogoutProxyResponse> for LogoutProxyFeature<'a> {
         &self.response_encoder
     }
 
-    fn post(
-        &self,
-        state: AuthProxyState<LogoutProxyResponse>,
-    ) -> AuthProxyState<LogoutProxyResponse> {
+    fn post(&self, state: AuthProxyState<AuthTokenResponse>) -> AuthProxyState<AuthTokenResponse> {
         self.pubsub.post(state)
     }
 }
