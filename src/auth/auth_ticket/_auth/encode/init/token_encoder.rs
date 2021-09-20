@@ -4,7 +4,7 @@ use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 
 use aws_cloudfront_cookie::CloudfrontPolicy;
 
-use crate::auth::_auth::x_outside_feature::feature::AuthOutsideCloudfrontSecret;
+use crate::auth::_auth::x_outside_feature::feature::AuthOutsideCloudfrontKey;
 
 use crate::auth::auth_ticket::_auth::{
     encode::infra::{AuthTokenEncoder, CloudfrontTokenEncoder},
@@ -92,11 +92,11 @@ fn encode_jwt<'a>(config: JwtConfig<'a>) -> Result<AuthTokenExtract, EncodeAuthT
 }
 
 pub struct CookieCloudfrontTokenEncoder<'a> {
-    secret: &'a AuthOutsideCloudfrontSecret,
+    secret: &'a AuthOutsideCloudfrontKey,
 }
 
 impl<'a> CookieCloudfrontTokenEncoder<'a> {
-    pub fn new(secret: &'a AuthOutsideCloudfrontSecret) -> Self {
+    pub fn new(secret: &'a AuthOutsideCloudfrontKey) -> Self {
         Self { secret }
     }
 }

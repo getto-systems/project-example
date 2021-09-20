@@ -1,7 +1,7 @@
 use getto_application::data::MethodResult;
 
 use crate::auth::{
-    auth_ticket::_common::kernel::infra::{AuthNonceMetadata, AuthTokenMetadata},
+    auth_ticket::_common::kernel::infra::AuthServiceMetadata,
     password::{
         _api::change::infra::{
             ChangePasswordInfra, ChangePasswordResponseEncoder, ChangePasswordService,
@@ -17,21 +17,16 @@ pub async fn change_password<S>(
     fields: ChangePasswordFieldsExtract,
     post: impl Fn(ChangePasswordEvent) -> S,
 ) -> MethodResult<S> {
-    let nonce_metadata = infra.nonce_metadata();
-    let token_metadata = infra.token_metadata();
+    let service_metadata = infra.service_metadata();
     let change_service = infra.change_service();
     let response_encoder = infra.response_encoder();
 
-    let nonce = nonce_metadata
-        .nonce()
-        .map_err(|err| post(ChangePasswordEvent::MetadataError(err)))?;
-
-    let token = token_metadata
-        .token()
+    let metadata = service_metadata
+        .metadata()
         .map_err(|err| post(ChangePasswordEvent::MetadataError(err)))?;
 
     let response = change_service
-        .change(nonce, token, fields)
+        .change(metadata, fields)
         .await
         .map_err(|err| post(ChangePasswordEvent::ServiceError(err)))?;
 

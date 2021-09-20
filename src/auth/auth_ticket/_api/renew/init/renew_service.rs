@@ -4,7 +4,7 @@ use crate::auth::auth_ticket::_common::y_protobuf::service::{
     renew_auth_ticket_pb_client::RenewAuthTicketPbClient, RenewAuthTicketRequestPb,
 };
 
-use crate::auth::_api::x_outside_feature::feature::AuthOutsideService;
+use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
 
 use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
 
@@ -12,14 +12,12 @@ use crate::auth::_common::service::helper::{
     infra_error, new_endpoint, set_authorization, set_metadata,
 };
 
-use crate::auth::auth_ticket::_api::renew::infra::RenewAuthTicketService;
+use crate::auth::auth_ticket::{
+    _api::renew::infra::RenewAuthTicketService, _common::kernel::infra::AuthServiceMetadataContent,
+};
 
 use crate::auth::{
-    _common::service::data::AuthServiceError,
-    auth_ticket::_common::{
-        encode::data::AuthTicketEncoded,
-        kernel::data::{AuthNonce, AuthToken},
-    },
+    _common::service::data::AuthServiceError, auth_ticket::_common::encode::data::AuthTicketEncoded,
 };
 
 pub struct TonicRenewAuthTicketService<'a> {
@@ -42,8 +40,7 @@ impl<'a> TonicRenewAuthTicketService<'a> {
 impl<'a> RenewAuthTicketService for TonicRenewAuthTicketService<'a> {
     async fn renew(
         &self,
-        nonce: Option<AuthNonce>,
-        token: Option<AuthToken>,
+        metadata: AuthServiceMetadataContent,
     ) -> Result<AuthTicketEncoded, AuthServiceError> {
         let mut client = RenewAuthTicketPbClient::new(
             new_endpoint(self.service_url)?
@@ -54,7 +51,7 @@ impl<'a> RenewAuthTicketService for TonicRenewAuthTicketService<'a> {
 
         let mut request = Request::new(RenewAuthTicketRequestPb {});
         set_authorization(&mut request, &self.authorizer).await?;
-        set_metadata(&mut request, self.request_id, nonce, token)?;
+        set_metadata(&mut request, self.request_id, metadata)?;
 
         let response = client
             .renew(request)
@@ -72,13 +69,16 @@ impl<'a> RenewAuthTicketService for TonicRenewAuthTicketService<'a> {
 pub mod test {
     use std::collections::HashMap;
 
-    use crate::auth::auth_ticket::_api::renew::infra::RenewAuthTicketService;
+    use crate::auth::auth_ticket::{
+        _api::renew::infra::RenewAuthTicketService,
+        _common::kernel::infra::AuthServiceMetadataContent,
+    };
 
     use crate::auth::{
         _common::service::data::AuthServiceError,
         auth_ticket::_common::{
             encode::data::AuthTicketEncoded,
-            kernel::data::{AuthNonce, AuthToken, AuthTokenEncoded, AuthTokenExtract},
+            kernel::data::{AuthTokenEncoded, AuthTokenExtract},
         },
         auth_user::_common::kernel::data::AuthUser,
     };
@@ -91,8 +91,7 @@ pub mod test {
     impl RenewAuthTicketService for StaticRenewAuthTicketService {
         async fn renew(
             &self,
-            _nonce: Option<AuthNonce>,
-            _token: Option<AuthToken>,
+            _metadata: AuthServiceMetadataContent,
         ) -> Result<AuthTicketEncoded, AuthServiceError> {
             Ok(AuthTicketEncoded {
                 user: self.user.clone().extract(),

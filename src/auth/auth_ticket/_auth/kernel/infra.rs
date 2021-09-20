@@ -8,10 +8,9 @@ use crate::auth::auth_ticket::_common::kernel::infra::AuthNonceMetadata;
 use crate::{
     auth::auth_ticket::{
         _auth::kernel::data::{
-            AuthDateTime, AuthTicket, AuthTicketExtract, ExpansionLimitDateTime, ExpireDateTime,
-            ExpireDuration,
+            AuthDateTime, AuthTicket, ExpansionLimitDateTime, ExpireDateTime, ExpireDuration,
         },
-        _common::kernel::data::AuthNonce,
+        _common::kernel::data::{AuthNonce, AuthTicketExtract},
     },
     z_details::_common::repository::data::{RegisterResult, RepositoryError},
 };

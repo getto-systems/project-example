@@ -6,16 +6,16 @@ use tonic::{
 use url::Url;
 
 use crate::{
-    auth::auth_ticket::_common::kernel::x_tonic::metadata::{METADATA_NONCE, METADATA_TOKEN},
+    auth::_common::metadata::{METADATA_NONCE, METADATA_TOKEN},
     x_outside_feature::_common::metadata::METADATA_REQUEST_ID,
 };
 
-use crate::z_details::_common::service::infra::ServiceAuthorizer;
-
-use crate::auth::{
-    _common::service::data::AuthServiceError,
-    auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
+use crate::{
+    auth::auth_ticket::_common::kernel::infra::AuthServiceMetadataContent,
+    z_details::_common::service::infra::ServiceAuthorizer,
 };
+
+use crate::auth::_common::service::data::AuthServiceError;
 
 pub fn infra_error(err: impl std::fmt::Display) -> AuthServiceError {
     AuthServiceError::InfraError(format!("service infra error; {}", err))
@@ -51,20 +51,19 @@ pub async fn set_authorization<T>(
 pub fn set_metadata<T>(
     request: &mut Request<T>,
     request_id: &str,
-    nonce: Option<AuthNonce>,
-    token: Option<AuthToken>,
+    metadata: AuthServiceMetadataContent,
 ) -> Result<(), AuthServiceError> {
     request.metadata_mut().insert(
         METADATA_REQUEST_ID,
         MetadataValue::from_str(request_id).map_err(infra_error)?,
     );
-    if let Some(nonce) = nonce {
+    if let Some(nonce) = metadata.nonce {
         request.metadata_mut().insert(
             METADATA_NONCE,
             MetadataValue::from_str(&nonce.extract()).map_err(infra_error)?,
         );
     }
-    if let Some(token) = token {
+    if let Some(token) = metadata.token {
         request.metadata_mut().insert(
             METADATA_TOKEN,
             MetadataValue::from_str(&token.extract()).map_err(infra_error)?,

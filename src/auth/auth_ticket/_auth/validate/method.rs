@@ -1,8 +1,8 @@
 use crate::auth::auth_ticket::_auth::kernel::method::check_nonce;
 
 use crate::auth::auth_ticket::{
-    _auth::validate::infra::{AuthTokenDecoder, ValidateAuthTokenInfra},
-    _common::kernel::infra::AuthTokenMetadata,
+    _auth::validate::infra::ValidateAuthTokenInfra,
+    _common::kernel::infra::{AuthTokenDecoder, AuthTokenMetadata},
 };
 
 use super::event::ValidateAuthTokenEvent;
@@ -59,5 +59,6 @@ fn decode_ticket(
 
     token_decoder
         .decode(&token)
+        .map(|ticket| ticket.restore())
         .map_err(ValidateAuthTokenError::DecodeError)
 }

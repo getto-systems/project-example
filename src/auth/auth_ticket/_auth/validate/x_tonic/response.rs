@@ -1,14 +1,14 @@
 use tonic::{Response, Status};
 
-use crate::auth::auth_ticket::_common::y_protobuf::service::{LogoutResponsePb, RenewAuthTicketResponsePb, ValidateApiTokenResponsePb};
+use crate::auth::auth_ticket::_common::y_protobuf::service::{
+    LogoutResponsePb, RenewAuthTicketResponsePb, ValidateApiTokenResponsePb,
+};
 
 use crate::z_details::_common::response::tonic::RespondTo;
 
 use crate::auth::auth_ticket::_auth::validate::event::ValidateAuthTokenEvent;
 
-use crate::auth::auth_ticket::_auth::validate::data::{
-    DecodeAuthTokenError, ValidateAuthTokenError,
-};
+use crate::auth::auth_ticket::_auth::validate::data::ValidateAuthTokenError;
 
 impl RespondTo<LogoutResponsePb> for ValidateAuthTokenEvent {
     fn respond_to(self) -> Result<Response<LogoutResponsePb>, Status> {
@@ -49,11 +49,5 @@ impl<T> RespondTo<T> for ValidateAuthTokenError {
             Self::DecodeError(err) => err.respond_to(),
             Self::RepositoryError(err) => err.respond_to(),
         }
-    }
-}
-
-impl<T> RespondTo<T> for DecodeAuthTokenError {
-    fn respond_to(self) -> Result<Response<T>, Status> {
-        Err(Status::unauthenticated(format!("{}", self)))
     }
 }

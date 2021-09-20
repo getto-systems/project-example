@@ -4,7 +4,7 @@ use crate::auth::password::reset::_common::y_protobuf::service::{
     reset_password_pb_client::ResetPasswordPbClient, ResetPasswordRequestPb,
 };
 
-use crate::auth::_api::x_outside_feature::feature::AuthOutsideService;
+use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
 
 use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
 
@@ -12,15 +12,15 @@ use crate::auth::_common::service::helper::{
     infra_error, new_endpoint, set_authorization, set_metadata,
 };
 
-use crate::auth::password::reset::{
-    _api::reset::infra::{ResetPasswordResponse, ResetPasswordService},
-    _common::reset::infra::ResetPasswordFieldsExtract,
+use crate::auth::{
+    auth_ticket::_common::kernel::infra::AuthServiceMetadataContent,
+    password::reset::{
+        _api::reset::infra::{ResetPasswordResponse, ResetPasswordService},
+        _common::reset::infra::ResetPasswordFieldsExtract,
+    },
 };
 
-use crate::auth::{
-    _common::service::data::AuthServiceError,
-    auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
-};
+use crate::auth::_common::service::data::AuthServiceError;
 
 pub struct TonicResetPasswordService<'a> {
     service_url: &'static str,
@@ -42,8 +42,7 @@ impl<'a> TonicResetPasswordService<'a> {
 impl<'a> ResetPasswordService for TonicResetPasswordService<'a> {
     async fn reset(
         &self,
-        nonce: Option<AuthNonce>,
-        token: Option<AuthToken>,
+        metadata: AuthServiceMetadataContent,
         fields: ResetPasswordFieldsExtract,
     ) -> Result<ResetPasswordResponse, AuthServiceError> {
         let mut client = ResetPasswordPbClient::new(
@@ -59,7 +58,7 @@ impl<'a> ResetPasswordService for TonicResetPasswordService<'a> {
             password: fields.password,
         });
         set_authorization(&mut request, &self.authorizer).await?;
-        set_metadata(&mut request, self.request_id, nonce, token)?;
+        set_metadata(&mut request, self.request_id, metadata)?;
 
         let response = client
             .reset(request)
@@ -76,16 +75,19 @@ impl<'a> ResetPasswordService for TonicResetPasswordService<'a> {
 pub mod test {
     use std::collections::HashMap;
 
-    use crate::auth::password::reset::{
-        _api::reset::infra::{ResetPasswordResponse, ResetPasswordService},
-        _common::reset::infra::ResetPasswordFieldsExtract,
+    use crate::auth::{
+        auth_ticket::_common::kernel::infra::AuthServiceMetadataContent,
+        password::reset::{
+            _api::reset::infra::{ResetPasswordResponse, ResetPasswordService},
+            _common::reset::infra::ResetPasswordFieldsExtract,
+        },
     };
 
     use crate::auth::{
         _common::service::data::AuthServiceError,
         auth_ticket::_common::{
             encode::data::AuthTicketEncoded,
-            kernel::data::{AuthNonce, AuthToken, AuthTokenEncoded, AuthTokenExtract},
+            kernel::data::{AuthTokenEncoded, AuthTokenExtract},
         },
         auth_user::_common::kernel::data::AuthUser,
     };
@@ -98,8 +100,7 @@ pub mod test {
     impl ResetPasswordService for StaticResetPasswordService {
         async fn reset(
             &self,
-            _nonce: Option<AuthNonce>,
-            _token: Option<AuthToken>,
+            _metadata: AuthServiceMetadataContent,
             _fields: ResetPasswordFieldsExtract,
         ) -> Result<ResetPasswordResponse, AuthServiceError> {
             Ok(ResetPasswordResponse::Success(AuthTicketEncoded {

@@ -23,7 +23,7 @@ impl RespondTo for AuthServiceError {
     }
 }
 
-fn unauthorized(request: &HttpRequest) -> HttpResponse {
+pub fn unauthorized(request: &HttpRequest) -> HttpResponse {
     let mut response = HttpResponse::Unauthorized();
 
     if let Some(cookie) = request.cookie(COOKIE_TICKET_TOKEN) {

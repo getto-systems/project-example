@@ -20,12 +20,10 @@ use crate::auth::auth_ticket::{
                 MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
             },
         },
-        validate::init::{
-            test::StaticValidateAuthTokenStruct, token_decoder::test::StaticAuthTokenDecoder,
-        },
+        validate::init::test::StaticValidateAuthTokenStruct,
     },
     _common::kernel::init::{
-        nonce_metadata::test::StaticAuthNonceMetadata,
+        nonce_metadata::test::StaticAuthNonceMetadata, token_decoder::test::StaticAuthTokenDecoder,
         token_metadata::test::StaticAuthTokenMetadata,
     },
 };
@@ -36,8 +34,9 @@ use crate::auth::auth_ticket::_auth::{
 
 use super::action::{RenewAuthTicketAction, RenewAuthTicketMaterial};
 
-use crate::auth::auth_ticket::_auth::kernel::data::{
-    AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
+use crate::auth::auth_ticket::{
+    _auth::kernel::data::{AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration},
+    _common::kernel::data::AuthTicketExtract,
 };
 
 #[tokio::test]
@@ -266,14 +265,11 @@ fn standard_token_decoder() -> StaticAuthTokenDecoder {
     let mut granted_roles = HashSet::new();
     granted_roles.insert("something".into());
 
-    StaticAuthTokenDecoder::Valid(
-        AuthTicketExtract {
-            ticket_id: TICKET_ID.into(),
-            user_id: "something-role-user-id".into(),
-            granted_roles,
-        }
-        .restore(),
-    )
+    StaticAuthTokenDecoder::Valid(AuthTicketExtract {
+        ticket_id: TICKET_ID.into(),
+        user_id: "something-role-user-id".into(),
+        granted_roles,
+    })
 }
 fn expired_token_decoder() -> StaticAuthTokenDecoder {
     StaticAuthTokenDecoder::Expired

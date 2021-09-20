@@ -1,7 +1,7 @@
 use crate::auth::{
     auth_ticket::{
         _api::kernel::infra::AuthTokenResponseBuilder,
-        _common::kernel::infra::{AuthNonceMetadata, AuthTokenMetadata},
+        _common::kernel::infra::{AuthServiceMetadata, AuthServiceMetadataContent},
     },
     password::_common::authenticate::infra::AuthenticatePasswordFieldsExtract,
 };
@@ -9,24 +9,19 @@ use crate::auth::{
 use crate::{
     auth::{
         _common::service::data::AuthServiceError,
-        auth_ticket::_common::{
-            encode::data::AuthTicketEncoded,
-            kernel::data::{AuthNonce, AuthToken},
-        },
+        auth_ticket::_common::encode::data::AuthTicketEncoded,
         password::_api::authenticate::data::AuthenticatePasswordMessageEncoded,
     },
     z_details::_api::message::data::MessageError,
 };
 
 pub trait AuthenticatePasswordInfra {
-    type NonceMetadata: AuthNonceMetadata;
-    type TokenMetadata: AuthTokenMetadata;
+    type ServiceMetadata: AuthServiceMetadata;
     type AuthenticateService: AuthenticatePasswordService;
     type ResponseEncoder: AuthenticatePasswordResponseEncoder;
     type ResponseBuilder: AuthTokenResponseBuilder;
 
-    fn nonce_metadata(&self) -> &Self::NonceMetadata;
-    fn token_metadata(&self) -> &Self::TokenMetadata;
+    fn service_metadata(&self) -> &Self::ServiceMetadata;
     fn authenticate_service(&self) -> &Self::AuthenticateService;
     fn response_encoder(&self) -> &Self::ResponseEncoder;
     fn response_builder(&self) -> &Self::ResponseBuilder;
@@ -40,8 +35,7 @@ pub trait AuthenticatePasswordRequestDecoder {
 pub trait AuthenticatePasswordService {
     async fn authenticate(
         &self,
-        nonce: Option<AuthNonce>,
-        token: Option<AuthToken>,
+        metadata: AuthServiceMetadataContent,
         fields: AuthenticatePasswordFieldsExtract,
     ) -> Result<AuthenticatePasswordResponse, AuthServiceError>;
 }

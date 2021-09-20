@@ -10,6 +10,9 @@ pub struct Env {
 
     pub auth_service_url: String,
     pub domain_service_url: String,
+
+    pub ticket_public_key: String,
+    pub api_public_key: String,
 }
 
 impl Env {
@@ -24,6 +27,9 @@ impl Env {
 
             auth_service_url: load("AUTH_SERVICE_URL"),
             domain_service_url: load("DOMAIN_SERVICE_URL"),
+
+            ticket_public_key: load("SECRET_TICKET_PUBLIC_KEY"),
+            api_public_key: load("SECRET_API_PUBLIC_KEY"),
         }
     }
 }

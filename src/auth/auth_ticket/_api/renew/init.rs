@@ -7,8 +7,7 @@ use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::auth_ticket::_api::{
     kernel::init::{
-        nonce_metadata::ActixWebAuthNonceMetadata,
-        response_builder::CookieAuthTokenResponseBuilder, token_metadata::TicketAuthTokenMetadata,
+        response_builder::CookieAuthTokenResponseBuilder, service_metadata::TicketServiceMetadata,
     },
     renew::init::response_encoder::ProstRenewAuthTicketResponseEncoder,
 };
@@ -17,8 +16,7 @@ use renew_service::TonicRenewAuthTicketService;
 use super::infra::RenewAuthTicketInfra;
 
 pub struct RenewAuthTicketStruct<'a> {
-    nonce_metadata: ActixWebAuthNonceMetadata<'a>,
-    token_metadata: TicketAuthTokenMetadata<'a>,
+    service_metadata: TicketServiceMetadata<'a>,
     renew_service: TonicRenewAuthTicketService<'a>,
     response_builder: CookieAuthTokenResponseBuilder<'a>,
     response_encoder: ProstRenewAuthTicketResponseEncoder,
@@ -31,8 +29,7 @@ impl<'a> RenewAuthTicketStruct<'a> {
         request: &'a HttpRequest,
     ) -> Self {
         Self {
-            nonce_metadata: ActixWebAuthNonceMetadata::new(request),
-            token_metadata: TicketAuthTokenMetadata::new(request),
+            service_metadata: TicketServiceMetadata::new(&feature.key, request),
             renew_service: TonicRenewAuthTicketService::new(&feature.service, request_id),
             response_builder: CookieAuthTokenResponseBuilder::new(&feature.cookie),
             response_encoder: ProstRenewAuthTicketResponseEncoder,
@@ -41,17 +38,13 @@ impl<'a> RenewAuthTicketStruct<'a> {
 }
 
 impl<'a> RenewAuthTicketInfra for RenewAuthTicketStruct<'a> {
-    type NonceMetadata = ActixWebAuthNonceMetadata<'a>;
-    type TokenMetadata = TicketAuthTokenMetadata<'a>;
+    type ServiceMetadata = TicketServiceMetadata<'a>;
     type RenewService = TonicRenewAuthTicketService<'a>;
     type ResponseBuilder = CookieAuthTokenResponseBuilder<'a>;
     type ResponseEncoder = ProstRenewAuthTicketResponseEncoder;
 
-    fn nonce_metadata(&self) -> &Self::NonceMetadata {
-        &self.nonce_metadata
-    }
-    fn token_metadata(&self) -> &Self::TokenMetadata {
-        &self.token_metadata
+    fn service_metadata(&self) -> &Self::ServiceMetadata {
+        &self.service_metadata
     }
     fn renew_service(&self) -> &Self::RenewService {
         &self.renew_service
@@ -70,34 +63,26 @@ pub mod test {
     use super::response_encoder::test::StaticRenewAuthTicketResponseEncoder;
     use crate::auth::auth_ticket::{
         _api::kernel::init::response_builder::test::StaticAuthTokenResponseBuilder,
-        _common::kernel::init::{
-            nonce_metadata::test::StaticAuthNonceMetadata,
-            token_metadata::test::StaticAuthTokenMetadata,
-        },
+        _common::kernel::init::service_metadata::test::StaticAuthServiceMetadata,
     };
 
     use super::super::infra::RenewAuthTicketInfra;
 
     pub struct StaticRenewAuthTicketStruct {
-        pub nonce_metadata: StaticAuthNonceMetadata,
-        pub token_metadata: StaticAuthTokenMetadata,
+        pub service_metadata: StaticAuthServiceMetadata,
         pub response_builder: StaticAuthTokenResponseBuilder,
         pub renew_service: StaticRenewAuthTicketService,
         pub response_encoder: StaticRenewAuthTicketResponseEncoder,
     }
 
     impl RenewAuthTicketInfra for StaticRenewAuthTicketStruct {
-        type NonceMetadata = StaticAuthNonceMetadata;
-        type TokenMetadata = StaticAuthTokenMetadata;
+        type ServiceMetadata = StaticAuthServiceMetadata;
         type RenewService = StaticRenewAuthTicketService;
         type ResponseBuilder = StaticAuthTokenResponseBuilder;
         type ResponseEncoder = StaticRenewAuthTicketResponseEncoder;
 
-        fn nonce_metadata(&self) -> &Self::NonceMetadata {
-            &self.nonce_metadata
-        }
-        fn token_metadata(&self) -> &Self::TokenMetadata {
-            &self.token_metadata
+        fn service_metadata(&self) -> &Self::ServiceMetadata {
+            &self.service_metadata
         }
         fn renew_service(&self) -> &Self::RenewService {
             &self.renew_service

@@ -1,14 +1,16 @@
 use crate::{
     auth::{
         _common::service::data::AuthServiceError,
-        auth_ticket::_api::kernel::data::AuthTokenResponse,
+        auth_ticket::{
+            _api::kernel::data::AuthTokenResponse, _common::kernel::data::AuthServiceMetadataError,
+        },
     },
-    z_details::{_api::message::data::MessageError, _common::request::data::MetadataError},
+    z_details::_api::message::data::MessageError,
 };
 
 pub enum RenewAuthTicketEvent {
     Success(AuthTokenResponse),
-    MetadataError(MetadataError),
+    MetadataError(AuthServiceMetadataError),
     ServiceError(AuthServiceError),
     MessageError(MessageError),
 }

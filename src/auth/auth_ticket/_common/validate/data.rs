@@ -1,10 +1,11 @@
-use crate::{
-    auth::_common::service::data::AuthServiceError, z_details::_common::request::data::MetadataError,
+use crate::auth::{
+    _common::service::data::AuthServiceError,
+    auth_ticket::_common::kernel::data::AuthServiceMetadataError,
 };
 
 pub enum ValidateApiTokenError {
     ServiceError(AuthServiceError),
-    MetadataError(MetadataError),
+    MetadataError(AuthServiceMetadataError),
 }
 
 const ERROR: &'static str = "validate api token error";

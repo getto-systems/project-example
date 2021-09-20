@@ -17,12 +17,10 @@ use crate::auth::auth_ticket::{
                 MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
             },
         },
-        validate::init::{
-            test::StaticValidateAuthTokenStruct, token_decoder::test::StaticAuthTokenDecoder,
-        },
+        validate::init::test::StaticValidateAuthTokenStruct,
     },
     _common::kernel::init::{
-        nonce_metadata::test::StaticAuthNonceMetadata,
+        nonce_metadata::test::StaticAuthNonceMetadata, token_decoder::test::StaticAuthTokenDecoder,
         token_metadata::test::StaticAuthTokenMetadata,
     },
 };
@@ -31,8 +29,9 @@ use crate::auth::auth_ticket::_auth::kernel::infra::AuthNonceConfig;
 
 use super::action::{LogoutAction, LogoutMaterial};
 
-use crate::auth::auth_ticket::_auth::kernel::data::{
-    AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
+use crate::auth::auth_ticket::{
+    _auth::kernel::data::{AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration},
+    _common::kernel::data::AuthTicketExtract,
 };
 
 #[tokio::test]
@@ -193,14 +192,11 @@ fn standard_token_metadata() -> StaticAuthTokenMetadata {
 }
 
 fn standard_token_validator() -> StaticAuthTokenDecoder {
-    StaticAuthTokenDecoder::Valid(
-        AuthTicketExtract {
-            ticket_id: TICKET_ID.into(),
-            user_id: "user-id".into(),
-            granted_roles: HashSet::new(),
-        }
-        .restore(),
-    )
+    StaticAuthTokenDecoder::Valid(AuthTicketExtract {
+        ticket_id: TICKET_ID.into(),
+        user_id: "user-id".into(),
+        granted_roles: HashSet::new(),
+    })
 }
 
 fn standard_nonce_store() -> MemoryAuthNonceStore {

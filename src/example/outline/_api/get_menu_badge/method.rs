@@ -1,29 +1,28 @@
 use getto_application::data::MethodResult;
 
-use crate::auth::_common::{data::RequireAuthRoles, method::validate_api_token};
-
-use super::{
-    event::GetOutlineMenuBadgeEvent,
-    infra::{
+use crate::{
+    auth::_common::infra::AuthServiceMetadata,
+    example::outline::_api::get_menu_badge::infra::{
         GetOutlineMenuBadgeInfra, GetOutlineMenuBadgeResponseEncoder, GetOutlineMenuBadgeService,
     },
 };
+
+use super::event::GetOutlineMenuBadgeEvent;
 
 pub async fn get_outline_menu_badge<S>(
     infra: &impl GetOutlineMenuBadgeInfra,
     post: impl Fn(GetOutlineMenuBadgeEvent) -> S,
 ) -> MethodResult<S> {
+    let service_metadata = infra.service_metadata();
     let get_menu_service = infra.get_menu_service();
     let response_encoder = infra.response_encoder();
 
-    // TODO これはもっと処理に近いところでやるべき
-    let user_id = validate_api_token(infra.validate_infra(), RequireAuthRoles::Nothing)
-        .await
-        .map_err(|err| post(GetOutlineMenuBadgeEvent::ValidateApiTokenError(err)))?;
-    post(GetOutlineMenuBadgeEvent::Authorized(user_id));
+    let metadata = service_metadata
+        .metadata()
+        .map_err(|err| post(GetOutlineMenuBadgeEvent::MetadataError(err)))?;
 
     let menu = get_menu_service
-        .get_menu()
+        .get_menu(metadata)
         .await
         .map_err(|err| post(GetOutlineMenuBadgeEvent::ServiceError(err)))?;
 

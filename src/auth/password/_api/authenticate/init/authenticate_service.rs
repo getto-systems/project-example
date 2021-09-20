@@ -4,7 +4,7 @@ use crate::auth::password::_common::y_protobuf::service::{
     authenticate_password_pb_client::AuthenticatePasswordPbClient, AuthenticatePasswordRequestPb,
 };
 
-use crate::auth::_api::x_outside_feature::feature::AuthOutsideService;
+use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
 
 use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
 
@@ -12,15 +12,15 @@ use crate::auth::_common::service::helper::{
     infra_error, new_endpoint, set_authorization, set_metadata,
 };
 
-use crate::auth::password::{
-    _api::authenticate::infra::{AuthenticatePasswordResponse, AuthenticatePasswordService},
-    _common::authenticate::infra::AuthenticatePasswordFieldsExtract,
+use crate::auth::{
+    auth_ticket::_common::kernel::infra::AuthServiceMetadataContent,
+    password::{
+        _api::authenticate::infra::{AuthenticatePasswordResponse, AuthenticatePasswordService},
+        _common::authenticate::infra::AuthenticatePasswordFieldsExtract,
+    },
 };
 
-use crate::auth::{
-    _common::service::data::AuthServiceError,
-    auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
-};
+use crate::auth::_common::service::data::AuthServiceError;
 
 pub struct TonicAuthenticatePasswordService<'a> {
     service_url: &'static str,
@@ -42,8 +42,7 @@ impl<'a> TonicAuthenticatePasswordService<'a> {
 impl<'a> AuthenticatePasswordService for TonicAuthenticatePasswordService<'a> {
     async fn authenticate(
         &self,
-        nonce: Option<AuthNonce>,
-        token: Option<AuthToken>,
+        metadata: AuthServiceMetadataContent,
         fields: AuthenticatePasswordFieldsExtract,
     ) -> Result<AuthenticatePasswordResponse, AuthServiceError> {
         let mut client = AuthenticatePasswordPbClient::new(
@@ -58,7 +57,7 @@ impl<'a> AuthenticatePasswordService for TonicAuthenticatePasswordService<'a> {
             password: fields.password,
         });
         set_authorization(&mut request, &self.authorizer).await?;
-        set_metadata(&mut request, self.request_id, nonce, token)?;
+        set_metadata(&mut request, self.request_id, metadata)?;
 
         let response = client
             .authenticate(request)
@@ -75,16 +74,21 @@ impl<'a> AuthenticatePasswordService for TonicAuthenticatePasswordService<'a> {
 pub mod test {
     use std::collections::HashMap;
 
-    use crate::auth::password::{
-        _api::authenticate::infra::{AuthenticatePasswordResponse, AuthenticatePasswordService},
-        _common::authenticate::infra::AuthenticatePasswordFieldsExtract,
+    use crate::auth::{
+        auth_ticket::_common::kernel::infra::AuthServiceMetadataContent,
+        password::{
+            _api::authenticate::infra::{
+                AuthenticatePasswordResponse, AuthenticatePasswordService,
+            },
+            _common::authenticate::infra::AuthenticatePasswordFieldsExtract,
+        },
     };
 
     use crate::auth::{
         _common::service::data::AuthServiceError,
         auth_ticket::_common::{
             encode::data::AuthTicketEncoded,
-            kernel::data::{AuthNonce, AuthToken, AuthTokenEncoded, AuthTokenExtract},
+            kernel::data::{AuthTokenEncoded, AuthTokenExtract},
         },
         auth_user::_common::kernel::data::AuthUser,
     };
@@ -97,8 +101,7 @@ pub mod test {
     impl AuthenticatePasswordService for StaticAuthenticatePasswordService {
         async fn authenticate(
             &self,
-            _nonce: Option<AuthNonce>,
-            _token: Option<AuthToken>,
+            _metadata: AuthServiceMetadataContent,
             _fields: AuthenticatePasswordFieldsExtract,
         ) -> Result<AuthenticatePasswordResponse, AuthServiceError> {
             Ok(AuthenticatePasswordResponse::Success(AuthTicketEncoded {

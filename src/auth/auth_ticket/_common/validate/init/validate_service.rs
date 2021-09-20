@@ -4,7 +4,7 @@ use crate::auth::auth_ticket::_common::y_protobuf::service::{
     validate_api_token_pb_client::ValidateApiTokenPbClient, ValidateApiTokenRequestPb,
 };
 
-use crate::auth::_api::x_outside_feature::feature::AuthOutsideService;
+use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
 
 use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
 
@@ -13,10 +13,10 @@ use crate::auth::_common::service::helper::{
 };
 
 use super::super::infra::ValidateService;
+use crate::auth::auth_ticket::_common::kernel::infra::AuthServiceMetadataContent;
 
 use crate::auth::{
     _common::service::data::AuthServiceError,
-    auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
     auth_user::_common::kernel::data::{AuthUserExtract, AuthUserId, RequireAuthRoles},
 };
 
@@ -40,8 +40,7 @@ impl<'a> TonicValidateService<'a> {
 impl<'a> ValidateService for TonicValidateService<'a> {
     async fn validate(
         &self,
-        nonce: Option<AuthNonce>,
-        token: Option<AuthToken>,
+        metadata: AuthServiceMetadataContent,
         require_roles: RequireAuthRoles,
     ) -> Result<AuthUserId, AuthServiceError> {
         let mut client = ValidateApiTokenPbClient::new(
@@ -54,7 +53,7 @@ impl<'a> ValidateService for TonicValidateService<'a> {
         let request: ValidateApiTokenRequestPb = require_roles.into();
         let mut request = Request::new(request);
         set_authorization(&mut request, &self.authorizer).await?;
-        set_metadata(&mut request, self.request_id, nonce, token)?;
+        set_metadata(&mut request, self.request_id, metadata)?;
 
         let response = client
             .validate(request)
@@ -73,10 +72,10 @@ impl<'a> ValidateService for TonicValidateService<'a> {
 #[cfg(test)]
 pub mod test {
     use super::super::super::infra::ValidateService;
+    use crate::auth::auth_ticket::_common::kernel::infra::AuthServiceMetadataContent;
 
     use crate::auth::{
         _common::service::data::AuthServiceError,
-        auth_ticket::_common::kernel::data::{AuthNonce, AuthToken},
         auth_user::_common::kernel::data::{AuthUserId, RequireAuthRoles},
     };
 
@@ -95,8 +94,7 @@ pub mod test {
     impl ValidateService for StaticValidateService {
         async fn validate(
             &self,
-            _nonce: Option<AuthNonce>,
-            _token: Option<AuthToken>,
+            _metadata: AuthServiceMetadataContent,
             _require_roles: RequireAuthRoles,
         ) -> Result<AuthUserId, AuthServiceError> {
             Ok(self.user_id.clone())

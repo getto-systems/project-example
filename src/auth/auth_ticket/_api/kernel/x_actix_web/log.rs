@@ -1,21 +1,13 @@
-// use crate::z_details::_common::logger::LogLevel;
+use crate::{
+    auth::auth_ticket::_common::kernel::data::AuthServiceMetadataError,
+    z_details::_common::logger::LogLevel,
+};
 
-// use super::super::data::{ValidateAuthNonceError, ValidateAuthRolesError};
-
-// impl ValidateAuthNonceError {
-//     pub const fn log_level(&self) -> LogLevel {
-//         match self {
-//             Self::HeaderError(err) => err.log_level(),
-//             Self::RepositoryError(err) => err.log_level(),
-//             Self::Conflict => LogLevel::Audit,
-//         }
-//     }
-// }
-
-// impl ValidateAuthRolesError {
-//     pub const fn log_level(&self) -> LogLevel {
-//         match self {
-//             Self::PermissionDenied(_, _) => LogLevel::Audit,
-//         }
-//     }
-// }
+impl AuthServiceMetadataError {
+    pub const fn log_level(&self) -> LogLevel {
+        match self {
+            Self::MetadataError(_) => LogLevel::Error,
+            Self::DecodeError(err) => err.log_level(),
+        }
+    }
+}

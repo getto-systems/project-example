@@ -4,17 +4,21 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
-    _common::init::test::{StaticAuthNonceMetadata, StaticAuthTokenMetadata},
-    auth_ticket::_auth::{
-        kernel::init::{
-            clock::test::StaticChronoAuthClock,
-            nonce_repository::test::{
-                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+    auth_ticket::{
+        _auth::{
+            kernel::init::{
+                clock::test::StaticChronoAuthClock,
+                nonce_repository::test::{
+                    MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+                },
+                test::StaticCheckAuthNonceStruct,
             },
-            test::StaticCheckAuthNonceStruct,
+            validate::init::test::StaticValidateAuthTokenStruct,
         },
-        validate::init::{
-            test::StaticValidateAuthTokenStruct, token_decoder::test::StaticAuthTokenDecoder,
+        _common::kernel::init::{
+            nonce_metadata::test::StaticAuthNonceMetadata,
+            token_decoder::test::StaticAuthTokenDecoder,
+            token_metadata::test::StaticAuthTokenMetadata,
         },
     },
     password::_auth::{
@@ -39,7 +43,10 @@ use crate::auth::{
 use super::action::{ChangePasswordAction, ChangePasswordMaterial};
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
+    auth_ticket::{
+        _auth::kernel::data::{AuthDateTime, ExpireDuration},
+        _common::kernel::data::AuthTicketExtract,
+    },
     auth_user::_common::kernel::data::{AuthUser, AuthUserExtract},
     login_id::_auth::data::LoginId,
 };
@@ -341,14 +348,11 @@ fn standard_token_header() -> StaticAuthTokenMetadata {
 }
 
 fn standard_token_decoder() -> StaticAuthTokenDecoder {
-    StaticAuthTokenDecoder::Valid(
-        AuthTicketExtract {
-            ticket_id: TICKET_ID.into(),
-            user_id: USER_ID.into(),
-            granted_roles: HashSet::new(),
-        }
-        .restore(),
-    )
+    StaticAuthTokenDecoder::Valid(AuthTicketExtract {
+        ticket_id: TICKET_ID.into(),
+        user_id: USER_ID.into(),
+        granted_roles: HashSet::new(),
+    })
 }
 
 const NONCE: &'static str = "nonce";

@@ -1,11 +1,14 @@
-use std::collections::HashSet;
-
 use chrono::{DateTime, Duration, Utc};
 
 use crate::{
-    auth::auth_user::{
-        _auth::kernel::data::AuthPermission,
-        _common::kernel::data::{AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles},
+    auth::{
+        auth_ticket::_common::kernel::data::AuthTicketExtract,
+        auth_user::{
+            _auth::kernel::data::AuthPermission,
+            _common::kernel::data::{
+                AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
+            },
+        },
     },
     z_details::_common::{repository::data::RepositoryError, request::data::MetadataError},
 };
@@ -60,12 +63,6 @@ impl std::fmt::Display for AuthTicket {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "{} / {}", self.ticket_id, self.user)
     }
-}
-
-pub struct AuthTicketExtract {
-    pub ticket_id: String,
-    pub user_id: String,
-    pub granted_roles: HashSet<String>,
 }
 
 impl AuthTicketExtract {

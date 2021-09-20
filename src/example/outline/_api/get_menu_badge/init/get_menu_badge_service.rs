@@ -1,5 +1,6 @@
 use tonic::Request;
 
+use crate::auth::_common::infra::AuthServiceMetadataContent;
 use crate::example::outline::_common::y_protobuf::service::{
     get_menu_badge_pb_client::GetMenuBadgePbClient, GetMenuBadgeRequestPb,
 };
@@ -36,7 +37,10 @@ impl<'a> TonicGetOutlineMenuBadgeService<'a> {
 
 #[async_trait::async_trait]
 impl<'a> GetOutlineMenuBadgeService for TonicGetOutlineMenuBadgeService<'a> {
-    async fn get_menu(&self) -> Result<OutlineMenuBadge, ExampleServiceError> {
+    async fn get_menu(
+        &self,
+        metadata: AuthServiceMetadataContent,
+    ) -> Result<OutlineMenuBadge, ExampleServiceError> {
         let mut client = GetMenuBadgePbClient::new(
             new_endpoint(self.service_url)?
                 .connect()
@@ -46,7 +50,7 @@ impl<'a> GetOutlineMenuBadgeService for TonicGetOutlineMenuBadgeService<'a> {
 
         let mut request = Request::new(GetMenuBadgeRequestPb {});
         set_authorization(&mut request, &self.authorizer).await?;
-        set_metadata(&mut request, self.request_id)?;
+        set_metadata(&mut request, self.request_id, metadata)?;
 
         let response = client
             .get_menu_badge(request)
@@ -59,7 +63,10 @@ impl<'a> GetOutlineMenuBadgeService for TonicGetOutlineMenuBadgeService<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::example::outline::_api::get_menu_badge::infra::GetOutlineMenuBadgeService;
+    use crate::{
+        auth::_common::infra::AuthServiceMetadataContent,
+        example::outline::_api::get_menu_badge::infra::GetOutlineMenuBadgeService,
+    };
 
     use crate::example::{
         _api::service::data::ExampleServiceError,
@@ -70,7 +77,10 @@ pub mod test {
 
     #[async_trait::async_trait]
     impl GetOutlineMenuBadgeService for StaticGetOutlineMenuBadgeService {
-        async fn get_menu(&self) -> Result<OutlineMenuBadge, ExampleServiceError> {
+        async fn get_menu(
+            &self,
+            _metadata: AuthServiceMetadataContent,
+        ) -> Result<OutlineMenuBadge, ExampleServiceError> {
             Ok(OutlineMenuBadge {
                 index: OutlineMenuBadgeCount::restore(0),
             })

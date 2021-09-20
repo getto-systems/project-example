@@ -1,10 +1,11 @@
 use crate::{
-    example::outline::_common::data::OutlineMenuBadge,
+    auth::_common::data::ValidateApiTokenError, example::outline::_common::data::OutlineMenuBadge,
     z_details::_common::repository::data::RepositoryError,
 };
 
 pub enum GetOutlineMenuBadgeEvent {
     Success(OutlineMenuBadge),
+    ValidateError(ValidateApiTokenError),
     RepositoryError(RepositoryError),
 }
 
@@ -15,6 +16,7 @@ impl std::fmt::Display for GetOutlineMenuBadgeEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Success(_) => write!(f, "{}", SUCCESS),
+            Self::ValidateError(err) => write!(f, "{}: {}", ERROR, err),
             Self::RepositoryError(err) => write!(f, "{}: {}", ERROR, err),
         }
     }

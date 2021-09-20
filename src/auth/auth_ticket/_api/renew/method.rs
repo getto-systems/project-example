@@ -7,7 +7,7 @@ use crate::auth::auth_ticket::{
             RenewAuthTicketInfra, RenewAuthTicketResponseEncoder, RenewAuthTicketService,
         },
     },
-    _common::kernel::infra::{AuthNonceMetadata, AuthTokenMetadata},
+    _common::kernel::infra::AuthServiceMetadata,
 };
 
 use super::event::RenewAuthTicketEvent;
@@ -16,22 +16,17 @@ pub async fn renew<S>(
     infra: &impl RenewAuthTicketInfra,
     post: impl Fn(RenewAuthTicketEvent) -> S,
 ) -> MethodResult<S> {
-    let nonce_metadata = infra.nonce_metadata();
-    let token_metadata = infra.token_metadata();
+    let service_metadata = infra.service_metadata();
     let renew_service = infra.renew_service();
     let response_encoder = infra.response_encoder();
     let response_builder = infra.response_builder();
 
-    let nonce = nonce_metadata
-        .nonce()
-        .map_err(|err| post(RenewAuthTicketEvent::MetadataError(err)))?;
-
-    let token = token_metadata
-        .token()
+    let metadata = service_metadata
+        .metadata()
         .map_err(|err| post(RenewAuthTicketEvent::MetadataError(err)))?;
 
     let response = renew_service
-        .renew(nonce, token)
+        .renew(metadata)
         .await
         .map_err(|err| post(RenewAuthTicketEvent::ServiceError(err)))?;
 
