@@ -6,9 +6,9 @@ use crate::auth::_api::proxy::AuthProxyResponseEncoder;
 
 use crate::z_details::_api::message::data::MessageError;
 
-pub struct LogoutProxyResponseEncoder;
+pub struct ResponseEncoder;
 
-impl AuthProxyResponseEncoder<(), LogoutProxyResponse> for LogoutProxyResponseEncoder {
+impl AuthProxyResponseEncoder<(), LogoutProxyResponse> for ResponseEncoder {
     fn encode(&self, _response: ()) -> Result<LogoutProxyResponse, MessageError> {
         Ok(LogoutProxyResponse)
     }

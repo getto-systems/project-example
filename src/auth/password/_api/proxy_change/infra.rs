@@ -1,7 +1,6 @@
-use crate::{
-    auth::password::_common::change::infra::ChangePasswordFieldsExtract,
-    z_details::_api::message::data::MessageError,
-};
+use crate::auth::password::_common::change::infra::ChangePasswordFieldsExtract;
+
+use crate::z_details::_api::message::data::MessageError;
 
 pub enum ChangePasswordProxyResponse {
     Success,

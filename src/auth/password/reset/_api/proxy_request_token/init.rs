@@ -8,28 +8,28 @@ use getto_application::infra::ActionStatePubSub;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::_api::init::ApiAuthMetadata;
+use crate::auth::auth_ticket::_api::kernel::init::auth_metadata::NoAuthMetadata;
+use crate::auth::password::reset::_common::request_token::infra::RequestResetTokenFieldsExtract;
 use proxy_service::ProxyService;
 use request_decoder::RequestDecoder;
 use response_encoder::ResponseEncoder;
 
 use crate::auth::_api::proxy::{AuthProxyMaterial, AuthProxyState};
 
-use crate::auth::password::{
-    _api::proxy_change::infra::{ChangePasswordProxyRequestDecoder, ChangePasswordProxyResponse},
-    _common::change::infra::ChangePasswordFieldsExtract,
+use crate::auth::password::reset::_api::proxy_request_token::infra::{
+    RequestResetTokenProxyRequestDecoder, RequestResetTokenProxyResponse,
 };
 
-use crate::auth::password::_api::proxy_change::data::ChangePasswordProxyMessage;
+use crate::auth::password::reset::_api::proxy_request_token::data::RequestResetTokenProxyMessage;
 
-pub struct ChangePasswordProxyFeature<'a> {
-    pubsub: ActionStatePubSub<AuthProxyState<ChangePasswordProxyMessage>>,
-    auth_metadata: ApiAuthMetadata<'a>,
+pub struct RequestResetTokenProxyFeature<'a> {
+    pubsub: ActionStatePubSub<AuthProxyState<RequestResetTokenProxyMessage>>,
+    auth_metadata: NoAuthMetadata<'a>,
     proxy_service: ProxyService<'a>,
     response_encoder: ResponseEncoder,
 }
 
-impl<'a> ChangePasswordProxyFeature<'a> {
+impl<'a> RequestResetTokenProxyFeature<'a> {
     pub fn new(
         feature: &'a AuthOutsideFeature,
         request_id: &'a str,
@@ -37,7 +37,7 @@ impl<'a> ChangePasswordProxyFeature<'a> {
     ) -> Self {
         Self {
             pubsub: ActionStatePubSub::new(),
-            auth_metadata: ApiAuthMetadata::new(&feature.key, request),
+            auth_metadata: NoAuthMetadata::new(request),
             proxy_service: ProxyService::new(&feature.service, request_id),
             response_encoder: ResponseEncoder,
         }
@@ -45,12 +45,12 @@ impl<'a> ChangePasswordProxyFeature<'a> {
 
     pub fn subscribe(
         &mut self,
-        handler: impl 'static + Fn(&AuthProxyState<ChangePasswordProxyMessage>) + Send + Sync,
+        handler: impl 'static + Fn(&AuthProxyState<RequestResetTokenProxyMessage>) + Send + Sync,
     ) {
         self.pubsub.subscribe(handler);
     }
 
-    pub fn request_decoder(body: String) -> impl ChangePasswordProxyRequestDecoder {
+    pub fn request_decoder(body: String) -> impl RequestResetTokenProxyRequestDecoder {
         RequestDecoder::new(body)
     }
 }
@@ -58,12 +58,12 @@ impl<'a> ChangePasswordProxyFeature<'a> {
 #[async_trait::async_trait]
 impl<'a>
     AuthProxyMaterial<
-        ChangePasswordFieldsExtract,
-        ChangePasswordProxyResponse,
-        ChangePasswordProxyMessage,
-    > for ChangePasswordProxyFeature<'a>
+        RequestResetTokenFieldsExtract,
+        RequestResetTokenProxyResponse,
+        RequestResetTokenProxyMessage,
+    > for RequestResetTokenProxyFeature<'a>
 {
-    type AuthMetadata = ApiAuthMetadata<'a>;
+    type AuthMetadata = NoAuthMetadata<'a>;
     type ProxyService = ProxyService<'a>;
     type ResponseEncoder = ResponseEncoder;
 
@@ -79,8 +79,8 @@ impl<'a>
 
     fn post(
         &self,
-        state: AuthProxyState<ChangePasswordProxyMessage>,
-    ) -> AuthProxyState<ChangePasswordProxyMessage> {
+        state: AuthProxyState<RequestResetTokenProxyMessage>,
+    ) -> AuthProxyState<RequestResetTokenProxyMessage> {
         self.pubsub.post(state)
     }
 }

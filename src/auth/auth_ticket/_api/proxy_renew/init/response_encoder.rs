@@ -18,11 +18,11 @@ use crate::{
     z_details::_api::message::data::MessageError,
 };
 
-pub struct RenewProxyResponseEncoder<'a> {
+pub struct ResponseEncoder<'a> {
     response_builder: CookieAuthTokenResponseBuilder<'a>,
 }
 
-impl<'a> RenewProxyResponseEncoder<'a> {
+impl<'a> ResponseEncoder<'a> {
     pub const fn new(feature: &'a AuthOutsideCookie) -> Self {
         Self {
             response_builder: CookieAuthTokenResponseBuilder::new(feature),
@@ -31,7 +31,7 @@ impl<'a> RenewProxyResponseEncoder<'a> {
 }
 
 impl<'a> AuthProxyResponseEncoder<AuthTicketEncoded, AuthTokenResponse>
-    for RenewProxyResponseEncoder<'a>
+    for ResponseEncoder<'a>
 {
     fn encode(&self, ticket: AuthTicketEncoded) -> Result<AuthTokenResponse, MessageError> {
         let message: AuthenticateResponsePb = ticket.user.into();

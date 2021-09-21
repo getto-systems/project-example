@@ -1,4 +1,4 @@
-mod authenticate_service;
+mod proxy_service;
 mod request_decoder;
 mod response_encoder;
 
@@ -9,9 +9,9 @@ use getto_application::infra::ActionStatePubSub;
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::auth_ticket::_api::kernel::init::auth_metadata::TicketAuthMetadata;
-use authenticate_service::AuthenticateProxyService;
-use request_decoder::AuthenticateProxyRequestDecoder;
-use response_encoder::AuthenticateProxyResponseEncoder;
+use proxy_service::ProxyService;
+use request_decoder::RequestDecoder;
+use response_encoder::ResponseEncoder;
 
 use crate::auth::_api::proxy::{AuthProxyMaterial, AuthProxyState};
 
@@ -27,8 +27,8 @@ use crate::auth::password::_api::proxy_authenticate::data::AuthenticatePasswordP
 pub struct AuthenticatePasswordProxyFeature<'a> {
     pubsub: ActionStatePubSub<AuthProxyState<AuthenticatePasswordProxyMessage>>,
     auth_metadata: TicketAuthMetadata<'a>,
-    proxy_service: AuthenticateProxyService<'a>,
-    response_encoder: AuthenticateProxyResponseEncoder<'a>,
+    proxy_service: ProxyService<'a>,
+    response_encoder: ResponseEncoder<'a>,
 }
 
 impl<'a> AuthenticatePasswordProxyFeature<'a> {
@@ -40,8 +40,8 @@ impl<'a> AuthenticatePasswordProxyFeature<'a> {
         Self {
             pubsub: ActionStatePubSub::new(),
             auth_metadata: TicketAuthMetadata::new(&feature.key, request),
-            proxy_service: AuthenticateProxyService::new(&feature.service, request_id),
-            response_encoder: AuthenticateProxyResponseEncoder::new(&feature.cookie),
+            proxy_service: ProxyService::new(&feature.service, request_id),
+            response_encoder: ResponseEncoder::new(&feature.cookie),
         }
     }
 
@@ -53,7 +53,7 @@ impl<'a> AuthenticatePasswordProxyFeature<'a> {
     }
 
     pub fn request_decoder(body: String) -> impl AuthenticatePasswordProxyRequestDecoder {
-        AuthenticateProxyRequestDecoder::new(body)
+        RequestDecoder::new(body)
     }
 }
 
@@ -66,8 +66,8 @@ impl<'a>
     > for AuthenticatePasswordProxyFeature<'a>
 {
     type AuthMetadata = TicketAuthMetadata<'a>;
-    type ProxyService = AuthenticateProxyService<'a>;
-    type ResponseEncoder = AuthenticateProxyResponseEncoder<'a>;
+    type ProxyService = ProxyService<'a>;
+    type ResponseEncoder = ResponseEncoder<'a>;
 
     fn auth_metadata(&self) -> &Self::AuthMetadata {
         &self.auth_metadata

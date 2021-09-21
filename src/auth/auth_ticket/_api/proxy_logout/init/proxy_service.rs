@@ -1,0 +1,63 @@
+use tonic::Request;
+
+use crate::auth::auth_ticket::_common::y_protobuf::service::{
+    logout_pb_client::LogoutPbClient, LogoutRequestPb,
+};
+
+use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
+use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
+
+use crate::auth::_common::service::helper::{
+    infra_error, new_endpoint, set_authorization, set_metadata,
+};
+
+use crate::auth::_common::infra::AuthMetadataContent;
+
+use crate::auth::_api::proxy::AuthProxyService;
+
+use crate::auth::_common::service::data::AuthServiceError;
+
+pub struct ProxyService<'a> {
+    service_url: &'static str,
+    request_id: &'a str,
+    authorizer: GoogleServiceAuthorizer,
+}
+
+impl<'a> ProxyService<'a> {
+    pub fn new(service: &'a AuthOutsideService, request_id: &'a str) -> Self {
+        Self {
+            service_url: service.service_url,
+            request_id,
+            authorizer: GoogleServiceAuthorizer::new(service.service_url),
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl<'a> AuthProxyService<(), ()> for ProxyService<'a> {
+    fn name(&self) -> &str {
+        "auth.auth_ticket.logout"
+    }
+    async fn call(
+        &self,
+        metadata: AuthMetadataContent,
+        _params: (),
+    ) -> Result<(), AuthServiceError> {
+        let mut client = LogoutPbClient::new(
+            new_endpoint(self.service_url)?
+                .connect()
+                .await
+                .map_err(infra_error)?,
+        );
+
+        let mut request = Request::new(LogoutRequestPb {});
+        set_authorization(&mut request, &self.authorizer).await?;
+        set_metadata(&mut request, self.request_id, metadata)?;
+
+        client
+            .logout(request)
+            .await
+            .map_err(AuthServiceError::from)?;
+        Ok(())
+    }
+}

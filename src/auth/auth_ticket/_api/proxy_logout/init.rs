@@ -1,4 +1,4 @@
-mod logout_service;
+mod proxy_service;
 mod response_encoder;
 
 use actix_web::HttpRequest;
@@ -6,8 +6,8 @@ use actix_web::HttpRequest;
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::auth_ticket::_api::kernel::init::auth_metadata::TicketAuthMetadata;
-use logout_service::LogoutProxyService;
-use response_encoder::{LogoutProxyResponse, LogoutProxyResponseEncoder};
+use proxy_service::ProxyService;
+use response_encoder::{LogoutProxyResponse, ResponseEncoder};
 
 use crate::auth::_api::proxy::{AuthProxyMaterial, AuthProxyState};
 
@@ -16,8 +16,8 @@ use getto_application::infra::ActionStatePubSub;
 pub struct LogoutProxyFeature<'a> {
     pubsub: ActionStatePubSub<AuthProxyState<LogoutProxyResponse>>,
     auth_metadata: TicketAuthMetadata<'a>,
-    proxy_service: LogoutProxyService<'a>,
-    response_encoder: LogoutProxyResponseEncoder,
+    proxy_service: ProxyService<'a>,
+    response_encoder: ResponseEncoder,
 }
 
 impl<'a> LogoutProxyFeature<'a> {
@@ -29,8 +29,8 @@ impl<'a> LogoutProxyFeature<'a> {
         Self {
             pubsub: ActionStatePubSub::new(),
             auth_metadata: TicketAuthMetadata::new(&feature.key, request),
-            proxy_service: LogoutProxyService::new(&feature.service, request_id),
-            response_encoder: LogoutProxyResponseEncoder,
+            proxy_service: ProxyService::new(&feature.service, request_id),
+            response_encoder: ResponseEncoder,
         }
     }
 
@@ -45,8 +45,8 @@ impl<'a> LogoutProxyFeature<'a> {
 #[async_trait::async_trait]
 impl<'a> AuthProxyMaterial<(), (), LogoutProxyResponse> for LogoutProxyFeature<'a> {
     type AuthMetadata = TicketAuthMetadata<'a>;
-    type ProxyService = LogoutProxyService<'a>;
-    type ResponseEncoder = LogoutProxyResponseEncoder;
+    type ProxyService = ProxyService<'a>;
+    type ResponseEncoder = ResponseEncoder;
 
     fn auth_metadata(&self) -> &Self::AuthMetadata {
         &self.auth_metadata

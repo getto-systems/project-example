@@ -13,10 +13,10 @@ use crate::{
     z_details::_api::message::data::MessageError,
 };
 
-pub struct ChangeProxyResponseEncoder;
+pub struct ResponseEncoder;
 
 impl<'a> AuthProxyResponseEncoder<ChangePasswordProxyResponse, ChangePasswordProxyMessage>
-    for ChangeProxyResponseEncoder
+    for ResponseEncoder
 {
     fn encode(
         &self,
