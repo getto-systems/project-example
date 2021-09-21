@@ -6,31 +6,29 @@ use actix_web::HttpRequest;
 
 use getto_application::infra::ActionStatePubSub;
 
-use crate::auth::password::_api::proxy_authenticate::infra::AuthenticatePasswordProxyRequestDecoder;
-
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::auth_ticket::_api::kernel::init::auth_metadata::TicketAuthMetadata;
 use authenticate_service::AuthenticateProxyService;
-use request_decoder::AuthenticateRequestDecoder;
-use response_encoder::AuthenticateResponseEncoder;
+use request_decoder::AuthenticateProxyRequestDecoder;
+use response_encoder::AuthenticateProxyResponseEncoder;
 
 use crate::auth::_api::proxy::{AuthProxyMaterial, AuthProxyState};
 
-use crate::auth::password::_common::authenticate::infra::AuthenticatePasswordFieldsExtract;
-
-use crate::auth::{
-    auth_ticket::_api::kernel::data::AuthTokenResponse,
-    password::_api::proxy_authenticate::data::{
-        AuthenticatePasswordResponse, AuthenticatePasswordResult,
+use crate::auth::password::{
+    _api::proxy_authenticate::infra::{
+        AuthenticatePasswordProxyRequestDecoder, AuthenticatePasswordProxyResponse,
     },
+    _common::authenticate::infra::AuthenticatePasswordFieldsExtract,
 };
 
+use crate::auth::password::_api::proxy_authenticate::data::AuthenticatePasswordProxyMessage;
+
 pub struct AuthenticatePasswordProxyFeature<'a> {
-    pubsub: ActionStatePubSub<AuthProxyState<AuthenticatePasswordResult<AuthTokenResponse>>>,
+    pubsub: ActionStatePubSub<AuthProxyState<AuthenticatePasswordProxyMessage>>,
     auth_metadata: TicketAuthMetadata<'a>,
     proxy_service: AuthenticateProxyService<'a>,
-    response_encoder: AuthenticateResponseEncoder<'a>,
+    response_encoder: AuthenticateProxyResponseEncoder<'a>,
 }
 
 impl<'a> AuthenticatePasswordProxyFeature<'a> {
@@ -43,22 +41,19 @@ impl<'a> AuthenticatePasswordProxyFeature<'a> {
             pubsub: ActionStatePubSub::new(),
             auth_metadata: TicketAuthMetadata::new(&feature.key, request),
             proxy_service: AuthenticateProxyService::new(&feature.service, request_id),
-            response_encoder: AuthenticateResponseEncoder::new(&feature.cookie),
+            response_encoder: AuthenticateProxyResponseEncoder::new(&feature.cookie),
         }
     }
 
     pub fn subscribe(
         &mut self,
-        handler: impl 'static
-            + Fn(&AuthProxyState<AuthenticatePasswordResult<AuthTokenResponse>>)
-            + Send
-            + Sync,
+        handler: impl 'static + Fn(&AuthProxyState<AuthenticatePasswordProxyMessage>) + Send + Sync,
     ) {
         self.pubsub.subscribe(handler);
     }
 
     pub fn request_decoder(body: String) -> impl AuthenticatePasswordProxyRequestDecoder {
-        AuthenticateRequestDecoder::new(body)
+        AuthenticateProxyRequestDecoder::new(body)
     }
 }
 
@@ -66,13 +61,13 @@ impl<'a> AuthenticatePasswordProxyFeature<'a> {
 impl<'a>
     AuthProxyMaterial<
         AuthenticatePasswordFieldsExtract,
-        AuthenticatePasswordResponse,
-        AuthenticatePasswordResult<AuthTokenResponse>,
+        AuthenticatePasswordProxyResponse,
+        AuthenticatePasswordProxyMessage,
     > for AuthenticatePasswordProxyFeature<'a>
 {
     type AuthMetadata = TicketAuthMetadata<'a>;
     type ProxyService = AuthenticateProxyService<'a>;
-    type ResponseEncoder = AuthenticateResponseEncoder<'a>;
+    type ResponseEncoder = AuthenticateProxyResponseEncoder<'a>;
 
     fn auth_metadata(&self) -> &Self::AuthMetadata {
         &self.auth_metadata
@@ -86,8 +81,8 @@ impl<'a>
 
     fn post(
         &self,
-        state: AuthProxyState<AuthenticatePasswordResult<AuthTokenResponse>>,
-    ) -> AuthProxyState<AuthenticatePasswordResult<AuthTokenResponse>> {
+        state: AuthProxyState<AuthenticatePasswordProxyMessage>,
+    ) -> AuthProxyState<AuthenticatePasswordProxyMessage> {
         self.pubsub.post(state)
     }
 }

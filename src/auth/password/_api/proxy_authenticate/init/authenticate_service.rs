@@ -16,13 +16,13 @@ use crate::auth::_api::proxy::AuthProxyService;
 
 use crate::auth::{
     auth_ticket::_common::kernel::infra::AuthMetadataContent,
-    password::_common::authenticate::infra::AuthenticatePasswordFieldsExtract,
+    password::{
+        _api::proxy_authenticate::infra::AuthenticatePasswordProxyResponse,
+        _common::authenticate::infra::AuthenticatePasswordFieldsExtract,
+    },
 };
 
-use crate::auth::{
-    _common::service::data::AuthServiceError,
-    password::_api::proxy_authenticate::data::AuthenticatePasswordResponse,
-};
+use crate::auth::_common::service::data::AuthServiceError;
 
 pub struct AuthenticateProxyService<'a> {
     service_url: &'static str,
@@ -41,7 +41,7 @@ impl<'a> AuthenticateProxyService<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthProxyService<AuthenticatePasswordFieldsExtract, AuthenticatePasswordResponse>
+impl<'a> AuthProxyService<AuthenticatePasswordFieldsExtract, AuthenticatePasswordProxyResponse>
     for AuthenticateProxyService<'a>
 {
     fn name(&self) -> &str {
@@ -51,7 +51,7 @@ impl<'a> AuthProxyService<AuthenticatePasswordFieldsExtract, AuthenticatePasswor
         &self,
         metadata: AuthMetadataContent,
         params: AuthenticatePasswordFieldsExtract,
-    ) -> Result<AuthenticatePasswordResponse, AuthServiceError> {
+    ) -> Result<AuthenticatePasswordProxyResponse, AuthServiceError> {
         let mut client = AuthenticatePasswordPbClient::new(
             new_endpoint(self.service_url)?
                 .connect()
@@ -70,7 +70,7 @@ impl<'a> AuthProxyService<AuthenticatePasswordFieldsExtract, AuthenticatePasswor
             .authenticate(request)
             .await
             .map_err(AuthServiceError::from)?;
-        let response: Option<AuthenticatePasswordResponse> = response.into_inner().into();
+        let response: Option<AuthenticatePasswordProxyResponse> = response.into_inner().into();
         response.ok_or(AuthServiceError::InfraError(
             "failed to decode response".into(),
         ))

@@ -13,11 +13,12 @@ use crate::auth::password::reset::_api::x_actix_web::route::scope_reset;
 
 use crate::auth::_api::proxy::call_proxy;
 
-use crate::auth::password::_api::proxy_authenticate::{
-    infra::AuthenticatePasswordProxyRequestDecoder, init::AuthenticatePasswordProxyFeature,
+use crate::auth::password::_api::{
+    proxy_authenticate::{
+        infra::AuthenticatePasswordProxyRequestDecoder, init::AuthenticatePasswordProxyFeature,
+    },
+    proxy_change::{infra::ChangePasswordProxyRequestDecoder, init::ChangePasswordProxyFeature},
 };
-
-use crate::auth::password::_api::action_change::init::ChangePasswordFeature;
 
 pub fn scope_password() -> Scope {
     web::scope("/password")
@@ -43,9 +44,9 @@ async fn change(data: AppData, request: HttpRequest, body: String) -> impl Respo
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut action = ChangePasswordFeature::action(&data, &request_id, &request);
-    action.subscribe(move |state| logger.log(state.log_level(), state));
+    let mut material = ChangePasswordProxyFeature::new(&data.auth, &request_id, &request);
+    material.subscribe(move |state| logger.log(state.log_level(), state));
 
-    let request_decoder = ChangePasswordFeature::request_decoder(body);
-    flatten(action.ignite(request_decoder).await).respond_to(&request)
+    let params = ChangePasswordProxyFeature::request_decoder(body).decode();
+    flatten(call_proxy(&material, params).await).respond_to(&request)
 }

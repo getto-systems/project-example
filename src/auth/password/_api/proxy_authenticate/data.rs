@@ -1,28 +1,21 @@
-use crate::auth::auth_ticket::{
-    _api::kernel::data::{AuthTokenMessage, AuthTokenResponse},
-    _common::encode::data::AuthTicketEncoded,
-};
+use crate::auth::auth_ticket::_api::kernel::data::{AuthTokenMessage, AuthTokenResponse};
 
-pub type AuthenticatePasswordMessage = AuthenticatePasswordResult<AuthTokenResponse>;
-pub type AuthenticatePasswordMessageEncoded = AuthenticatePasswordResult<AuthTokenMessage>;
+pub type AuthenticatePasswordProxyMessage = AuthenticatePasswordProxyResult<AuthTokenResponse>;
+pub type AuthenticatePasswordProxyMessageEncoded =
+    AuthenticatePasswordProxyResult<AuthTokenMessage>;
 
-pub enum AuthenticatePasswordResult<T> {
+pub enum AuthenticatePasswordProxyResult<T> {
     Success(T),
     InvalidPassword(String),
 }
 
-impl<T> AuthenticatePasswordResult<T> {
-    pub fn map<M>(self, mapper: impl Fn(T) -> M) -> AuthenticatePasswordResult<M> {
+impl<T> AuthenticatePasswordProxyResult<T> {
+    pub fn map<M>(self, mapper: impl Fn(T) -> M) -> AuthenticatePasswordProxyResult<M> {
         match self {
             Self::InvalidPassword(response) => {
-                AuthenticatePasswordResult::InvalidPassword(response)
+                AuthenticatePasswordProxyResult::InvalidPassword(response)
             }
-            Self::Success(response) => AuthenticatePasswordResult::Success(mapper(response)),
+            Self::Success(response) => AuthenticatePasswordProxyResult::Success(mapper(response)),
         }
     }
-}
-
-pub enum AuthenticatePasswordResponse {
-    Success(AuthTicketEncoded),
-    InvalidPassword,
 }

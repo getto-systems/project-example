@@ -52,8 +52,8 @@ impl<T: RespondTo> RespondTo for AuthProxyState<T> {
 impl<T> AuthProxyState<T> {
     pub fn log_level(&self) -> LogLevel {
         match self {
-            Self::TryToCall(_) => LogLevel::Debug,
-            Self::Response(_) => LogLevel::Info,
+            Self::TryToCall(_) => LogLevel::Info,
+            Self::Response(_) => LogLevel::Debug,
             Self::MetadataError(_) => LogLevel::Error,
             Self::ServiceError(_) => LogLevel::Error,
             Self::MessageError(_) => LogLevel::Error,

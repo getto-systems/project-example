@@ -11,17 +11,17 @@ use crate::auth::password::{
 
 use crate::z_details::_api::message::data::MessageError;
 
-pub struct AuthenticateRequestDecoder {
+pub struct AuthenticateProxyRequestDecoder {
     body: String,
 }
 
-impl AuthenticateRequestDecoder {
+impl AuthenticateProxyRequestDecoder {
     pub const fn new(body: String) -> Self {
         Self { body }
     }
 }
 
-impl AuthenticatePasswordProxyRequestDecoder for AuthenticateRequestDecoder {
+impl AuthenticatePasswordProxyRequestDecoder for AuthenticateProxyRequestDecoder {
     fn decode(self) -> Result<AuthenticatePasswordFieldsExtract, MessageError> {
         let message =
             AuthenticatePasswordPb::decode(decode_base64(self.body)?).map_err(invalid_protobuf)?;

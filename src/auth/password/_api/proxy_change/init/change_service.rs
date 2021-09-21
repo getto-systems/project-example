@@ -1,34 +1,36 @@
 use tonic::Request;
 
+use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
+
 use crate::auth::password::_common::y_protobuf::service::{
     change_password_pb_client::ChangePasswordPbClient, ChangePasswordRequestPb,
 };
 
 use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
 
-use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
-
 use crate::auth::_common::service::helper::{
     infra_error, new_endpoint, set_authorization, set_metadata,
 };
 
+use crate::auth::_api::proxy::AuthProxyService;
+
 use crate::auth::{
     auth_ticket::_common::kernel::infra::AuthMetadataContent,
     password::{
-        _api::change::infra::{ChangePasswordResponse, ChangePasswordService},
+        _api::proxy_change::infra::ChangePasswordProxyResponse,
         _common::change::infra::ChangePasswordFieldsExtract,
     },
 };
 
 use crate::auth::_common::service::data::AuthServiceError;
 
-pub struct TonicChangePasswordService<'a> {
+pub struct ChangeProxyService<'a> {
     service_url: &'static str,
     request_id: &'a str,
     authorizer: GoogleServiceAuthorizer,
 }
 
-impl<'a> TonicChangePasswordService<'a> {
+impl<'a> ChangeProxyService<'a> {
     pub fn new(service: &'a AuthOutsideService, request_id: &'a str) -> Self {
         Self {
             service_url: service.service_url,
@@ -39,12 +41,17 @@ impl<'a> TonicChangePasswordService<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> ChangePasswordService for TonicChangePasswordService<'a> {
-    async fn change(
+impl<'a> AuthProxyService<ChangePasswordFieldsExtract, ChangePasswordProxyResponse>
+    for ChangeProxyService<'a>
+{
+    fn name(&self) -> &str {
+        "auth.password.change"
+    }
+    async fn call(
         &self,
         metadata: AuthMetadataContent,
-        fields: ChangePasswordFieldsExtract,
-    ) -> Result<ChangePasswordResponse, AuthServiceError> {
+        params: ChangePasswordFieldsExtract,
+    ) -> Result<ChangePasswordProxyResponse, AuthServiceError> {
         let mut client = ChangePasswordPbClient::new(
             new_endpoint(self.service_url)?
                 .connect()
@@ -53,8 +60,8 @@ impl<'a> ChangePasswordService for TonicChangePasswordService<'a> {
         );
 
         let mut request = Request::new(ChangePasswordRequestPb {
-            current_password: fields.current_password,
-            new_password: fields.new_password,
+            current_password: params.current_password,
+            new_password: params.new_password,
         });
         set_authorization(&mut request, &self.authorizer).await?;
         set_metadata(&mut request, self.request_id, metadata)?;
@@ -63,35 +70,9 @@ impl<'a> ChangePasswordService for TonicChangePasswordService<'a> {
             .change(request)
             .await
             .map_err(AuthServiceError::from)?;
-        let response: Option<ChangePasswordResponse> = response.into_inner().into();
+        let response: Option<ChangePasswordProxyResponse> = response.into_inner().into();
         response.ok_or(AuthServiceError::InfraError(
             "failed to decode response".into(),
         ))
-    }
-}
-
-#[cfg(test)]
-pub mod test {
-    use crate::auth::{
-        auth_ticket::_common::kernel::infra::AuthMetadataContent,
-        password::{
-            _api::change::infra::{ChangePasswordResponse, ChangePasswordService},
-            _common::change::infra::ChangePasswordFieldsExtract,
-        },
-    };
-
-    use crate::auth::_common::service::data::AuthServiceError;
-
-    pub struct StaticChangePasswordService;
-
-    #[async_trait::async_trait]
-    impl ChangePasswordService for StaticChangePasswordService {
-        async fn change(
-            &self,
-            _metadata: AuthMetadataContent,
-            _fields: ChangePasswordFieldsExtract,
-        ) -> Result<ChangePasswordResponse, AuthServiceError> {
-            Ok(ChangePasswordResponse::Success)
-        }
     }
 }

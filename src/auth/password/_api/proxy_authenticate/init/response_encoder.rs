@@ -1,4 +1,3 @@
-use crate::auth::auth_ticket::_api::kernel::data::AuthTokenResponse;
 use crate::auth::password::_api::y_protobuf::api::{
     AuthenticatePasswordErrorKindPb, AuthenticatePasswordErrorPb, AuthenticatePasswordResultPb,
 };
@@ -11,24 +10,27 @@ use crate::auth::auth_ticket::_api::kernel::init::response_builder::CookieAuthTo
 
 use crate::auth::_api::proxy::AuthProxyResponseEncoder;
 
-use crate::auth::auth_ticket::_api::kernel::infra::AuthTokenResponseBuilder;
+use crate::auth::{
+    auth_ticket::_api::kernel::infra::AuthTokenResponseBuilder,
+    password::_api::proxy_authenticate::infra::AuthenticatePasswordProxyResponse,
+};
 
 use crate::{
     auth::{
         auth_ticket::_api::kernel::data::AuthTokenMessage,
         password::_api::proxy_authenticate::data::{
-            AuthenticatePasswordMessageEncoded, AuthenticatePasswordResponse,
-            AuthenticatePasswordResult,
+            AuthenticatePasswordProxyMessage, AuthenticatePasswordProxyMessageEncoded,
+            AuthenticatePasswordProxyResult,
         },
     },
     z_details::_api::message::data::MessageError,
 };
 
-pub struct AuthenticateResponseEncoder<'a> {
+pub struct AuthenticateProxyResponseEncoder<'a> {
     response_builder: CookieAuthTokenResponseBuilder<'a>,
 }
 
-impl<'a> AuthenticateResponseEncoder<'a> {
+impl<'a> AuthenticateProxyResponseEncoder<'a> {
     pub const fn new(feature: &'a AuthOutsideCookie) -> Self {
         Self {
             response_builder: CookieAuthTokenResponseBuilder::new(feature),
@@ -37,10 +39,10 @@ impl<'a> AuthenticateResponseEncoder<'a> {
 
     fn encode_message(
         &self,
-        response: AuthenticatePasswordResponse,
-    ) -> Result<AuthenticatePasswordMessageEncoded, MessageError> {
+        response: AuthenticatePasswordProxyResponse,
+    ) -> Result<AuthenticatePasswordProxyMessageEncoded, MessageError> {
         match response {
-            AuthenticatePasswordResponse::InvalidPassword => {
+            AuthenticatePasswordProxyResponse::InvalidPassword => {
                 let message = AuthenticatePasswordResultPb {
                     success: false,
                     err: Some(AuthenticatePasswordErrorPb {
@@ -48,17 +50,17 @@ impl<'a> AuthenticateResponseEncoder<'a> {
                     }),
                     ..Default::default()
                 };
-                Ok(AuthenticatePasswordResult::InvalidPassword(
+                Ok(AuthenticatePasswordProxyResult::InvalidPassword(
                     encode_protobuf_base64(message)?,
                 ))
             }
-            AuthenticatePasswordResponse::Success(ticket) => {
+            AuthenticatePasswordProxyResponse::Success(ticket) => {
                 let message = AuthenticatePasswordResultPb {
                     success: true,
                     value: Some(ticket.user.into()),
                     ..Default::default()
                 };
-                Ok(AuthenticatePasswordResult::Success(AuthTokenMessage {
+                Ok(AuthenticatePasswordProxyResult::Success(AuthTokenMessage {
                     body: encode_protobuf_base64(message)?,
                     token: ticket.token,
                 }))
@@ -67,16 +69,13 @@ impl<'a> AuthenticateResponseEncoder<'a> {
     }
 }
 
-impl<'a>
-    AuthProxyResponseEncoder<
-        AuthenticatePasswordResponse,
-        AuthenticatePasswordResult<AuthTokenResponse>,
-    > for AuthenticateResponseEncoder<'a>
+impl<'a> AuthProxyResponseEncoder<AuthenticatePasswordProxyResponse, AuthenticatePasswordProxyMessage>
+    for AuthenticateProxyResponseEncoder<'a>
 {
     fn encode(
         &self,
-        response: AuthenticatePasswordResponse,
-    ) -> Result<AuthenticatePasswordResult<AuthTokenResponse>, MessageError> {
+        response: AuthenticatePasswordProxyResponse,
+    ) -> Result<AuthenticatePasswordProxyMessage, MessageError> {
         let message = self.encode_message(response)?;
         Ok(message.map(|message| self.response_builder.build(message)))
     }
