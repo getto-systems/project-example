@@ -5,7 +5,7 @@ use getto_application::helper::flatten;
 use crate::z_details::_common::{logger::Logger, response::actix_web::RespondTo};
 
 use crate::x_outside_feature::_api::{
-    feature::AppData,
+    feature::ApiAppData,
     logger::{app_logger, generate_request_id},
 };
 
@@ -16,7 +16,7 @@ pub fn scope_unexpected_error() -> Scope {
 }
 
 #[post("")]
-async fn notify(data: AppData, request: HttpRequest, body: String) -> impl Responder {
+async fn notify(data: ApiAppData, request: HttpRequest, body: String) -> impl Responder {
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
     let mut action = NotifyUnexpectedErrorFeature::action(&data, &request_id, &request);

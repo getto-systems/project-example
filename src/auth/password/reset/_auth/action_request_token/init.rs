@@ -2,7 +2,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::password::reset::_common::y_protobuf::service::RequestResetTokenRequestPb;
 
-use crate::x_outside_feature::_auth::feature::AppFeature;
+use crate::x_outside_feature::_auth::feature::AuthAppFeature;
 
 use crate::auth::password::reset::_auth::request_token::init::{
     request_decoder::PbRequestResetTokenRequestDecoder, RequestResetTokenStruct,
@@ -18,7 +18,7 @@ pub struct RequestResetTokenFeature<'a> {
 
 impl<'a> RequestResetTokenFeature<'a> {
     pub fn action(
-        feature: &'a AppFeature,
+        feature: &'a AuthAppFeature,
         metadata: &'a MetadataMap,
     ) -> RequestResetTokenAction<Self> {
         RequestResetTokenAction::with_material(Self {

@@ -8,7 +8,7 @@ use sqlx::mysql::MySqlPoolOptions;
 
 use crate::z_details::_common::jwt::helper::{decoding_key_from_ec_pem, encoding_key_from_ec_pem};
 
-use crate::x_outside_feature::_auth::env::Env;
+use crate::x_outside_feature::_auth::env::AuthEnv;
 
 use super::feature::{
     AuthOutsideCloudfrontKey, AuthOutsideConfig, AuthOutsideEmail, AuthOutsideFeature,
@@ -17,7 +17,7 @@ use super::feature::{
 
 use crate::auth::auth_ticket::_auth::kernel::data::{ExpansionLimitDuration, ExpireDuration};
 
-pub async fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
+pub async fn new_auth_outside_feature(env: &'static AuthEnv) -> AuthOutsideFeature {
     AuthOutsideFeature {
         config: AuthOutsideConfig {
             // ticket の有効期限: 切れると再ログインが必要; renew で延長; 週末を挟めるように１桁日程度

@@ -3,7 +3,7 @@ pub(in crate::example) mod menu_badge_repository;
 use menu_badge_repository::UnitedOutlineMenuBadgeRepository;
 use tonic::metadata::MetadataMap;
 
-use crate::x_outside_feature::_example::feature::AppFeature;
+use crate::x_outside_feature::_example::feature::ExampleAppFeature;
 
 use crate::auth::_common::init::ValidateApiTokenStruct;
 
@@ -15,7 +15,7 @@ pub struct GetOutlineMenuBadgeStruct<'a> {
 }
 
 impl<'a> GetOutlineMenuBadgeStruct<'a> {
-    pub fn new(feature: &'a AppFeature, request_id: &'a str, metadata: &'a MetadataMap) -> Self {
+    pub fn new(feature: &'a ExampleAppFeature, request_id: &'a str, metadata: &'a MetadataMap) -> Self {
         Self {
             validate_infra: ValidateApiTokenStruct::new(
                 &feature.auth.service,

@@ -12,9 +12,8 @@ use crate::auth::_common::service::helper::{
     infra_error, new_endpoint, set_authorization, set_metadata,
 };
 
-use crate::auth::_api::proxy::AuthProxyService;
-
 use crate::auth::{
+    _api::proxy::AuthProxyService,
     auth_ticket::_common::kernel::infra::AuthMetadataContent,
     password::reset::{
         _api::proxy_reset::infra::ResetPasswordProxyResponse,

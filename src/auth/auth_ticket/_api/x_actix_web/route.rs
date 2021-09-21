@@ -5,7 +5,7 @@ use getto_application::helper::flatten;
 use crate::z_details::_common::{logger::Logger, response::actix_web::RespondTo};
 
 use crate::x_outside_feature::_api::{
-    feature::AppData,
+    feature::ApiAppData,
     logger::{app_logger, generate_request_id},
 };
 
@@ -20,7 +20,7 @@ pub fn scope_auth_ticket() -> Scope {
 }
 
 #[patch("")]
-async fn renew(data: AppData, request: HttpRequest) -> impl Responder {
+async fn renew(data: ApiAppData, request: HttpRequest) -> impl Responder {
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
@@ -31,7 +31,7 @@ async fn renew(data: AppData, request: HttpRequest) -> impl Responder {
 }
 
 #[delete("")]
-async fn logout(data: AppData, request: HttpRequest) -> impl Responder {
+async fn logout(data: ApiAppData, request: HttpRequest) -> impl Responder {
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 

@@ -12,9 +12,9 @@ use crate::auth::_common::service::helper::{
     infra_error, new_endpoint, set_authorization, set_metadata,
 };
 
-use crate::auth::_api::proxy::AuthProxyService;
-
-use crate::auth::auth_ticket::_common::kernel::infra::AuthMetadataContent;
+use crate::auth::{
+    _api::proxy::AuthProxyService, auth_ticket::_common::kernel::infra::AuthMetadataContent,
+};
 
 use crate::auth::{
     _common::service::data::AuthServiceError, auth_ticket::_common::encode::data::AuthTicketEncoded,

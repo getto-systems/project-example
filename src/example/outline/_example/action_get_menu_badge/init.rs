@@ -2,7 +2,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::{
     example::outline::_example::get_menu_badge::init::GetOutlineMenuBadgeStruct,
-    x_outside_feature::_example::feature::AppFeature,
+    x_outside_feature::_example::feature::ExampleAppFeature,
 };
 
 use super::action::{GetOutlineMenuBadgeAction, GetOutlineMenuBadgeMaterial};
@@ -13,7 +13,7 @@ pub struct GetOutlineMenuBadgeFeature<'a> {
 
 impl<'a> GetOutlineMenuBadgeFeature<'a> {
     pub fn action(
-        feature: &'a AppFeature,
+        feature: &'a ExampleAppFeature,
         request_id: &'a str,
         metadata: &'a MetadataMap,
     ) -> GetOutlineMenuBadgeAction<Self> {

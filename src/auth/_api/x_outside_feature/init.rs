@@ -3,11 +3,11 @@ use crate::{
         _api::x_outside_feature::feature::{AuthOutsideCookie, AuthOutsideFeature, AuthOutsideKey},
         _common::x_outside_feature::feature::AuthOutsideService,
     },
-    x_outside_feature::_api::env::Env,
+    x_outside_feature::_api::env::ApiEnv,
     z_details::_common::jwt::helper::decoding_key_from_ec_pem,
 };
 
-pub async fn new_auth_outside_feature(env: &'static Env) -> AuthOutsideFeature {
+pub async fn new_auth_outside_feature(env: &'static ApiEnv) -> AuthOutsideFeature {
     AuthOutsideFeature {
         service: AuthOutsideService {
             service_url: &env.auth_service_url,

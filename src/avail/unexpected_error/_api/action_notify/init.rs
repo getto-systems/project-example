@@ -1,6 +1,6 @@
 use actix_web::HttpRequest;
 
-use crate::x_outside_feature::_api::feature::AppFeature;
+use crate::x_outside_feature::_api::feature::ApiAppFeature;
 
 use crate::avail::unexpected_error::_api::notify::init::{
     request_decoder::ProstNotifyUnexpectedErrorRequestDecoder, NotifyUnexpectedErrorStruct,
@@ -16,7 +16,7 @@ pub struct NotifyUnexpectedErrorFeature<'a> {
 
 impl<'a> NotifyUnexpectedErrorFeature<'a> {
     pub fn action(
-        feature: &'a AppFeature,
+        feature: &'a ApiAppFeature,
         request_id: &'a str,
         request: &'a HttpRequest,
     ) -> NotifyUnexpectedErrorAction<Self> {

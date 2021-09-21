@@ -2,7 +2,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::auth_ticket::_common::y_protobuf::service::ValidateApiTokenRequestPb;
 
-use crate::x_outside_feature::_auth::feature::AppFeature;
+use crate::x_outside_feature::_auth::feature::AuthAppFeature;
 
 use crate::auth::auth_ticket::_auth::validate::init::{
     request_decoder::PbValidateApiTokenRequestDecoder, ApiValidateAuthTokenStruct,
@@ -18,7 +18,7 @@ pub struct ValidateApiTokenFeature<'a> {
 
 impl<'a> ValidateApiTokenFeature<'a> {
     pub fn action(
-        feature: &'a AppFeature,
+        feature: &'a AuthAppFeature,
         metadata: &'a MetadataMap,
     ) -> ValidateApiTokenAction<Self> {
         ValidateApiTokenAction::with_material(Self {

@@ -6,17 +6,17 @@ use crate::{
     auth::_example::x_outside_feature::{
         feature::AuthOutsideFeature, init::new_auth_outside_feature,
     },
-    x_outside_feature::_example::env::Env,
+    x_outside_feature::_example::env::ExampleEnv,
 };
 
-pub type AppData = Arc<AppFeature>;
+pub type ExampleAppData = Arc<ExampleAppFeature>;
 
-pub struct AppFeature {
+pub struct ExampleAppFeature {
     pub auth: AuthOutsideFeature,
 }
 
-impl AppFeature {
-    pub async fn new(env: &'static Env) -> Self {
+impl ExampleAppFeature {
+    pub async fn new(env: &'static ExampleEnv) -> Self {
         Self {
             auth: new_auth_outside_feature(env).await,
         }
@@ -24,7 +24,7 @@ impl AppFeature {
 }
 
 pub struct TonicRequest<T> {
-    pub data: AppData,
+    pub data: ExampleAppData,
     pub metadata: MetadataMap,
     pub request: T,
 }
@@ -32,7 +32,7 @@ pub struct TonicRequest<T> {
 pub fn extract_request<T>(request: Request<T>) -> TonicRequest<T> {
     let data = request
         .extensions()
-        .get::<AppData>()
+        .get::<ExampleAppData>()
         .expect("failed to get AppFeature")
         .clone();
 

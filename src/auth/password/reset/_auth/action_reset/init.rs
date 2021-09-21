@@ -2,7 +2,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::password::reset::_common::y_protobuf::service::ResetPasswordRequestPb;
 
-use crate::x_outside_feature::_auth::feature::AppFeature;
+use crate::x_outside_feature::_auth::feature::AuthAppFeature;
 
 use crate::auth::{
     auth_ticket::_auth::{
@@ -24,7 +24,7 @@ pub struct ResetPasswordFeature<'a> {
 }
 
 impl<'a> ResetPasswordFeature<'a> {
-    pub fn action(feature: &'a AppFeature, metadata: &'a MetadataMap) -> ResetPasswordAction<Self> {
+    pub fn action(feature: &'a AuthAppFeature, metadata: &'a MetadataMap) -> ResetPasswordAction<Self> {
         ResetPasswordAction::with_material(Self {
             reset: ResetPasswordStruct::new(&feature.auth, metadata),
             issue: IssueAuthTicketStruct::new(&feature.auth),

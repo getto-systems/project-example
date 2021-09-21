@@ -1,6 +1,6 @@
 use tonic::metadata::MetadataMap;
 
-use crate::x_outside_feature::_auth::feature::AppFeature;
+use crate::x_outside_feature::_auth::feature::AuthAppFeature;
 
 use crate::auth::auth_ticket::_auth::discard::init::DiscardAuthTicketStruct;
 
@@ -11,7 +11,7 @@ pub struct LogoutFeature<'a> {
 }
 
 impl<'a> LogoutFeature<'a> {
-    pub fn action(feature: &'a AppFeature, metadata: &'a MetadataMap) -> LogoutAction<Self> {
+    pub fn action(feature: &'a AuthAppFeature, metadata: &'a MetadataMap) -> LogoutAction<Self> {
         LogoutAction::with_material(Self {
             discard: DiscardAuthTicketStruct::new(&feature.auth, metadata),
         })

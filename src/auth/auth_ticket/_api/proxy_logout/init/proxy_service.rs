@@ -11,9 +11,7 @@ use crate::auth::_common::service::helper::{
     infra_error, new_endpoint, set_authorization, set_metadata,
 };
 
-use crate::auth::_common::infra::AuthMetadataContent;
-
-use crate::auth::_api::proxy::AuthProxyService;
+use crate::auth::{_api::proxy::AuthProxyService, _common::infra::AuthMetadataContent};
 
 use crate::auth::_common::service::data::AuthServiceError;
 
