@@ -1,11 +1,12 @@
-use crate::auth::{
-    _common::service::data::AuthServiceError,
-    auth_ticket::_common::kernel::data::AuthServiceMetadataError,
+use crate::{
+    auth::_common::{data::DecodeAuthTokenError, service::data::AuthServiceError},
+    z_details::_common::request::data::MetadataError,
 };
 
 pub enum ValidateApiTokenError {
     ServiceError(AuthServiceError),
-    MetadataError(AuthServiceMetadataError),
+    MetadataError(MetadataError),
+    DecodeError(DecodeAuthTokenError),
 }
 
 const ERROR: &'static str = "validate api token error";
@@ -15,6 +16,7 @@ impl std::fmt::Display for ValidateApiTokenError {
         match self {
             Self::ServiceError(err) => write!(f, "{}; {}", ERROR, err),
             Self::MetadataError(err) => write!(f, "{}; {}", ERROR, err),
+            Self::DecodeError(err) => write!(f, "{}; {}", ERROR, err),
         }
     }
 }

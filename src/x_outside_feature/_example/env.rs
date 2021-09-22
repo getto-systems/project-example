@@ -1,15 +1,16 @@
 use std::env::var;
 
-pub struct Env {
+pub struct ExampleEnv {
     pub port: String,
 
     pub auth_service_url: String,
 }
 
-impl Env {
+impl ExampleEnv {
     pub fn new() -> Self {
         Self {
             port: load("PORT"),
+
             auth_service_url: load("AUTH_SERVICE_URL"),
         }
     }

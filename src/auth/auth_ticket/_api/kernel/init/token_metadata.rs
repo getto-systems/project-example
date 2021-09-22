@@ -13,33 +13,33 @@ use crate::{
     z_details::_common::request::data::MetadataError,
 };
 
-pub struct TicketAuthTokenMetadata<'a> {
+pub struct TicketTokenMetadata<'a> {
     request: &'a HttpRequest,
 }
 
-impl<'a> TicketAuthTokenMetadata<'a> {
+impl<'a> TicketTokenMetadata<'a> {
     pub const fn new(request: &'a HttpRequest) -> Self {
         Self { request }
     }
 }
 
-impl<'a> AuthTokenMetadata for TicketAuthTokenMetadata<'a> {
+impl<'a> AuthTokenMetadata for TicketTokenMetadata<'a> {
     fn token(&self) -> Result<Option<AuthToken>, MetadataError> {
         Ok(cookie(&self.request, COOKIE_TICKET_TOKEN).map(AuthToken::restore))
     }
 }
 
-pub struct ApiAuthTokenMetadata<'a> {
+pub struct ApiTokenMetadata<'a> {
     request: &'a HttpRequest,
 }
 
-impl<'a> ApiAuthTokenMetadata<'a> {
+impl<'a> ApiTokenMetadata<'a> {
     pub const fn new(request: &'a HttpRequest) -> Self {
         Self { request }
     }
 }
 
-impl<'a> AuthTokenMetadata for ApiAuthTokenMetadata<'a> {
+impl<'a> AuthTokenMetadata for ApiTokenMetadata<'a> {
     fn token(&self) -> Result<Option<AuthToken>, MetadataError> {
         Ok(cookie(&self.request, COOKIE_API_TOKEN).map(AuthToken::restore))
     }

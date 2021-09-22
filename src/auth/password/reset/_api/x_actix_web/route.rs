@@ -5,12 +5,17 @@ use getto_application::helper::flatten;
 use crate::z_details::_common::{logger::Logger, response::actix_web::RespondTo};
 
 use crate::x_outside_feature::_api::{
-    feature::AppData,
+    feature::ApiAppData,
     logger::{app_logger, generate_request_id},
 };
 
+use crate::auth::_api::proxy::call_proxy;
+
 use crate::auth::password::reset::_api::{
-    action_request_token::init::RequestResetTokenFeature, action_reset::init::ResetPasswordFeature,
+    proxy_request_token::{
+        infra::RequestResetTokenProxyRequestDecoder, init::RequestResetTokenProxyStruct,
+    },
+    proxy_reset::{infra::ResetPasswordProxyRequestDecoder, init::ResetPasswordProxyStruct},
 };
 
 pub fn scope_reset() -> Scope {
@@ -18,23 +23,25 @@ pub fn scope_reset() -> Scope {
 }
 
 #[post("/token")]
-async fn request_token(data: AppData, request: HttpRequest, body: String) -> impl Responder {
+async fn request_token(data: ApiAppData, request: HttpRequest, body: String) -> impl Responder {
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
-    let mut action = RequestResetTokenFeature::action(&data, &request_id, &request);
-    action.subscribe(move |state| logger.log(state.log_level(), state));
 
-    let request_decoder = RequestResetTokenFeature::request_decoder(body);
-    flatten(action.ignite(request_decoder).await).respond_to(&request)
+    let mut proxy = RequestResetTokenProxyStruct::new(&data.auth, &request_id, &request);
+    proxy.subscribe(move |state| logger.log(state.log_level(), state));
+
+    let params = RequestResetTokenProxyStruct::request_decoder(body).decode();
+    flatten(call_proxy(&proxy, params).await).respond_to(&request)
 }
 
 #[post("")]
-async fn reset(data: AppData, request: HttpRequest, body: String) -> impl Responder {
+async fn reset(data: ApiAppData, request: HttpRequest, body: String) -> impl Responder {
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
-    let mut action = ResetPasswordFeature::action(&data, &request_id, &request);
-    action.subscribe(move |state| logger.log(state.log_level(), state));
 
-    let request_decoder = ResetPasswordFeature::request_decoder(body);
-    flatten(action.ignite(request_decoder).await).respond_to(&request)
+    let mut proxy = ResetPasswordProxyStruct::new(&data.auth, &request_id, &request);
+    proxy.subscribe(move |state| logger.log(state.log_level(), state));
+
+    let params = ResetPasswordProxyStruct::request_decoder(body).decode();
+    flatten(call_proxy(&proxy, params).await).respond_to(&request)
 }

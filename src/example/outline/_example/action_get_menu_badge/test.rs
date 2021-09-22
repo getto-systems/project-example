@@ -1,8 +1,11 @@
+use std::collections::HashSet;
+
 use getto_application_test::ActionTestRunner;
 
 use crate::{
     auth::_common::init::test::{
-        StaticAuthServiceMetadata, StaticValidateApiTokenStruct, StaticValidateService,
+        StaticAuthMetadata, StaticAuthTokenDecoder, StaticValidateApiTokenStruct,
+        StaticValidateService,
     },
     example::outline::_example::get_menu_badge::init::{
         menu_badge_repository::test::StaticOutlineMenuBadgeRepository,
@@ -52,10 +55,15 @@ impl TestFeature {
         Self {
             get_menu_badge: StaticGetOutlineMenuBadgeStruct {
                 validate_infra: StaticValidateApiTokenStruct {
-                    service_metadata: StaticAuthServiceMetadata {
+                    auth_metadata: StaticAuthMetadata {
                         nonce: "NONCE".into(),
                         token: "TOKEN".into(),
                     },
+                    token_decoder: StaticAuthTokenDecoder::valid(
+                        "TICKET-ID".into(),
+                        "USER-ID".into(),
+                        HashSet::new(),
+                    ),
                     validate_service: StaticValidateService::new("USER-ID".into()),
                 },
                 menu_badge_repository: StaticOutlineMenuBadgeRepository,

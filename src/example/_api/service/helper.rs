@@ -11,7 +11,7 @@ use crate::{
 };
 
 use crate::{
-    auth::_common::infra::AuthServiceMetadataContent,
+    auth::_common::infra::AuthMetadataContent,
     z_details::_common::service::infra::ServiceAuthorizer,
 };
 
@@ -37,7 +37,7 @@ pub async fn set_authorization<T>(
 pub fn set_metadata<T>(
     request: &mut Request<T>,
     request_id: &str,
-    metadata: AuthServiceMetadataContent,
+    metadata: AuthMetadataContent,
 ) -> Result<(), ExampleServiceError> {
     request.metadata_mut().append(
         METADATA_REQUEST_ID,

@@ -1,6 +1,6 @@
 use tonic::metadata::MetadataMap;
 
-use crate::x_outside_feature::_auth::feature::AppFeature;
+use crate::x_outside_feature::_auth::feature::AuthAppFeature;
 
 use crate::auth::auth_ticket::_auth::{
     encode::init::EncodeAuthTicketStruct, validate::init::TicketValidateAuthTokenStruct,
@@ -15,7 +15,7 @@ pub struct RenewAuthTicketFeature<'a> {
 
 impl<'a> RenewAuthTicketFeature<'a> {
     pub fn action(
-        feature: &'a AppFeature,
+        feature: &'a AuthAppFeature,
         metadata: &'a MetadataMap,
     ) -> RenewAuthTicketAction<Self> {
         RenewAuthTicketAction::with_material(Self {

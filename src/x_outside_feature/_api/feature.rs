@@ -1,6 +1,6 @@
 use actix_web::web::Data;
 
-use super::env::Env;
+use super::env::ApiEnv;
 
 use crate::{
     auth::_api::x_outside_feature::{feature::AuthOutsideFeature, init::new_auth_outside_feature},
@@ -9,18 +9,18 @@ use crate::{
     },
 };
 
-pub type AppData = Data<AppFeature>;
+pub type ApiAppData = Data<ApiAppFeature>;
 
-pub struct AppFeature {
+pub struct ApiAppFeature {
     pub auth: AuthOutsideFeature,
-    pub outline: ExampleOutsideFeature,
+    pub example: ExampleOutsideFeature,
 }
 
-impl AppFeature {
-    pub async fn new(env: &'static Env) -> Self {
+impl ApiAppFeature {
+    pub async fn new(env: &'static ApiEnv) -> Self {
         Self {
             auth: new_auth_outside_feature(env).await,
-            outline: new_example_outside_feature(env),
+            example: new_example_outside_feature(env),
         }
     }
 }

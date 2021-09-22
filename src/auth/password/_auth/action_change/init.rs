@@ -2,7 +2,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::password::_common::y_protobuf::service::ChangePasswordRequestPb;
 
-use crate::x_outside_feature::_auth::feature::AppFeature;
+use crate::x_outside_feature::_auth::feature::AuthAppFeature;
 
 use crate::auth::password::_auth::change::init::{
     request_decoder::PbChangePasswordRequestDecoder, ChangePasswordStruct,
@@ -18,7 +18,7 @@ pub struct ChangePasswordFeature<'a> {
 
 impl<'a> ChangePasswordFeature<'a> {
     pub fn action(
-        feature: &'a AppFeature,
+        feature: &'a AuthAppFeature,
         metadata: &'a MetadataMap,
     ) -> ChangePasswordAction<Self> {
         ChangePasswordAction::with_material(Self {

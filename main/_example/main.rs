@@ -5,17 +5,17 @@ use tonic::{service::interceptor_fn, transport::Server};
 use tower::ServiceBuilder;
 
 use example_api::x_outside_feature::_example::{
-    env::Env,
-    feature::{AppData, AppFeature},
+    env::ExampleEnv,
+    feature::{ExampleAppData, ExampleAppFeature},
 };
 
 lazy_static! {
-    static ref ENV: Env = Env::new();
+    static ref ENV: ExampleEnv = ExampleEnv::new();
 }
 
 #[tokio::main]
 async fn main() {
-    let data: AppData = Arc::new(AppFeature::new(&ENV).await);
+    let data: ExampleAppData = Arc::new(ExampleAppFeature::new(&ENV).await);
 
     let server = route::Server::new();
 
@@ -28,6 +28,7 @@ async fn main() {
                 }))
                 .into_inner(),
         )
+        .add_service(server.avail.unexpected_error.notify())
         .add_service(server.example.outline.get_menu_badge())
         .serve(
             format!("0.0.0.0:{}", &ENV.port)
@@ -39,15 +40,20 @@ async fn main() {
 }
 
 mod route {
-    use example_api::example::_example::x_tonic::route::ExampleServer;
+    use example_api::{
+        avail::_example::x_tonic::route::AvailServer,
+        example::_example::x_tonic::route::ExampleServer,
+    };
 
     pub struct Server {
+        pub avail: AvailServer,
         pub example: ExampleServer,
     }
 
     impl Server {
         pub const fn new() -> Self {
             Self {
+                avail: AvailServer::new(),
                 example: ExampleServer::new(),
             }
         }

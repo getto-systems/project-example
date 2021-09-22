@@ -1,6 +1,6 @@
 use std::env::var;
 
-pub struct Env {
+pub struct ApiEnv {
     pub port: String,
 
     pub domain: String,
@@ -15,7 +15,7 @@ pub struct Env {
     pub api_public_key: String,
 }
 
-impl Env {
+impl ApiEnv {
     pub fn new() -> Self {
         Self {
             port: load("PORT"),

@@ -29,7 +29,7 @@ impl<'a> ResetPasswordStruct<'a> {
             clock: ChronoAuthClock::new(),
             user_repository: MysqlAuthUserRepository::new(&feature.store.mysql),
             password_repository: MysqlAuthUserPasswordRepository::new(&feature.store.mysql),
-            token_decoder: JwtResetTokenDecoder::new(&feature.key),
+            token_decoder: JwtResetTokenDecoder::new(&feature.reset_token_key),
         }
     }
 }

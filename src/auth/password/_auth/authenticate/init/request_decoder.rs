@@ -17,7 +17,10 @@ impl PbAuthenticatePasswordRequestDecoder {
 
 impl AuthenticatePasswordRequestDecoder for PbAuthenticatePasswordRequestDecoder {
     fn decode(self) -> AuthenticatePasswordFieldsExtract {
-        self.request.into()
+        AuthenticatePasswordFieldsExtract {
+            login_id: self.request.login_id,
+            password: self.request.password,
+        }
     }
 }
 

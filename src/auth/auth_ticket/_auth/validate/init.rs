@@ -24,7 +24,7 @@ impl<'a> TicketValidateAuthTokenStruct<'a> {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
             token_metadata: TonicAuthTokenMetadata::new(metadata),
-            token_decoder: JwtTicketTokenDecoder::new(&feature.key.ticket.decoding_key),
+            token_decoder: JwtTicketTokenDecoder::new(&feature.decoding_key),
         }
     }
 }
@@ -56,7 +56,7 @@ impl<'a> ApiValidateAuthTokenStruct<'a> {
         Self {
             check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
             token_metadata: TonicAuthTokenMetadata::new(metadata),
-            token_decoder: JwtApiTokenDecoder::new(&feature.key.api.decoding_key),
+            token_decoder: JwtApiTokenDecoder::new(&feature.decoding_key),
         }
     }
 }

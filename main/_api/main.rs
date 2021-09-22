@@ -5,8 +5,8 @@ use actix_web::{web::Data, App, HttpServer};
 use lazy_static::lazy_static;
 
 use example_api::x_outside_feature::_api::{
-    env::Env,
-    feature::{AppData, AppFeature},
+    env::ApiEnv,
+    feature::{ApiAppData, ApiAppFeature},
 };
 
 use example_api::{
@@ -15,12 +15,12 @@ use example_api::{
 };
 
 lazy_static! {
-    static ref ENV: Env = Env::new();
+    static ref ENV: ApiEnv = ApiEnv::new();
 }
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
-    let data: AppData = Data::new(AppFeature::new(&ENV).await);
+    let data: ApiAppData = Data::new(ApiAppFeature::new(&ENV).await);
 
     HttpServer::new(move || {
         let cors = Cors::default()

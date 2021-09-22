@@ -13,19 +13,8 @@ use super::header::{
 
 use crate::auth::auth_ticket::{
     _api::kernel::data::{AuthTokenMessage, AuthTokenResponse},
-    _common::kernel::data::{
-        AuthServiceMetadataError, AuthTokenEncoded, AuthTokenExtract, CloudfrontTokenKind,
-    },
+    _common::kernel::data::{AuthTokenEncoded, AuthTokenExtract, CloudfrontTokenKind},
 };
-
-impl RespondTo for AuthServiceMetadataError {
-    fn respond_to(self, request: &HttpRequest) -> HttpResponse {
-        match self {
-            Self::MetadataError(err) => err.respond_to(request),
-            Self::DecodeError(err) => err.respond_to(request),
-        }
-    }
-}
 
 impl RespondTo for AuthTokenResponse {
     fn respond_to(self, _request: &HttpRequest) -> HttpResponse {

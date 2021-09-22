@@ -12,20 +12,7 @@ use crate::auth::{
     auth_user::_common::kernel::data::RequireAuthRoles,
 };
 
-pub async fn validate_ticket_token<S>(
-    infra: &impl ValidateAuthTokenInfra,
-    post: impl Fn(ValidateAuthTokenEvent) -> S,
-) -> Result<AuthTicket, S> {
-    validate_auth_token(infra, RequireAuthRoles::Nothing, post).await
-}
-pub async fn validate_api_token<S>(
-    infra: &impl ValidateAuthTokenInfra,
-    require_roles: RequireAuthRoles,
-    post: impl Fn(ValidateAuthTokenEvent) -> S,
-) -> Result<AuthTicket, S> {
-    validate_auth_token(infra, require_roles, post).await
-}
-async fn validate_auth_token<S>(
+pub async fn validate_auth_token<S>(
     infra: &impl ValidateAuthTokenInfra,
     require_roles: RequireAuthRoles,
     post: impl Fn(ValidateAuthTokenEvent) -> S,

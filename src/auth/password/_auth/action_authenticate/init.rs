@@ -2,7 +2,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::password::_common::y_protobuf::service::AuthenticatePasswordRequestPb;
 
-use crate::x_outside_feature::_auth::feature::AppFeature;
+use crate::x_outside_feature::_auth::feature::AuthAppFeature;
 
 use crate::auth::{
     auth_ticket::_auth::{
@@ -25,7 +25,7 @@ pub struct AuthenticatePasswordFeature<'a> {
 
 impl<'a> AuthenticatePasswordFeature<'a> {
     pub fn action(
-        feature: &'a AppFeature,
+        feature: &'a AuthAppFeature,
         metadata: &'a MetadataMap,
     ) -> AuthenticatePasswordAction<Self> {
         AuthenticatePasswordAction::with_material(Self {

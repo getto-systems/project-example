@@ -5,9 +5,11 @@ use crate::auth::auth_ticket::_auth::{
         event::EncodeAuthTicketEvent, infra::EncodeAuthTicketInfra, method::encode_auth_ticket,
     },
     validate::{
-        event::ValidateAuthTokenEvent, infra::ValidateAuthTokenInfra, method::validate_ticket_token,
+        event::ValidateAuthTokenEvent, infra::ValidateAuthTokenInfra, method::validate_auth_token,
     },
 };
+
+use crate::auth::auth_user::_common::kernel::data::RequireAuthRoles;
 
 pub enum RenewAuthTicketState {
     Validate(ValidateAuthTokenEvent),
@@ -53,7 +55,7 @@ impl<M: RenewAuthTicketMaterial> RenewAuthTicketAction<M> {
         let m = self.material;
 
         // encode_auth_ticket は環境から ticket を取り出すのではなく、 ticket を encode するのだ
-        let ticket = validate_ticket_token(m.validate(), |event| {
+        let ticket = validate_auth_token(m.validate(), RequireAuthRoles::Nothing, |event| {
             pubsub.post(RenewAuthTicketState::Validate(event))
         })
         .await?;

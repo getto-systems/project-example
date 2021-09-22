@@ -1,6 +1,6 @@
 use std::env::var;
 
-pub struct Env {
+pub struct AuthEnv {
     pub port: String,
 
     pub reset_password_url: String,
@@ -22,7 +22,7 @@ pub struct Env {
     pub mysql_auth_url: String,
 }
 
-impl Env {
+impl AuthEnv {
     pub fn new() -> Self {
         Self {
             port: load("PORT"),

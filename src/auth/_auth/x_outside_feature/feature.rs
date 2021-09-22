@@ -5,12 +5,15 @@ use sqlx::MySqlPool;
 
 use aws_cloudfront_cookie::CloudfrontKey;
 
-use crate::auth::auth_ticket::_auth::kernel::data::{ExpansionLimitDuration, ExpireDuration};
+use crate::auth::{_common::x_outside_feature::feature::AuthOutsideDecodingKey, auth_ticket::_auth::kernel::data::{ExpansionLimitDuration, ExpireDuration}};
 
 pub struct AuthOutsideFeature {
     pub(in crate::auth) config: AuthOutsideConfig,
     pub(in crate::auth) store: AuthOutsideStore,
-    pub(in crate::auth) key: AuthOutsideKey,
+    pub decoding_key: AuthOutsideDecodingKey,
+    pub(in crate::auth) encoding_key: AuthOutsideEncodingKey,
+    pub(in crate::auth) cloudfront_key: AuthOutsideCloudfrontKey,
+    pub(in crate::auth) reset_token_key: AuthOutsideResetTokenKey,
     pub(in crate::auth) email: AuthOutsideEmail,
 }
 pub struct AuthOutsideConfig {
@@ -25,13 +28,11 @@ pub struct AuthOutsideStore {
     pub nonce_table_name: &'static str,
     pub mysql: MySqlPool,
 }
-pub struct AuthOutsideKey {
-    pub ticket: AuthOutsideJwtKey,
-    pub api: AuthOutsideJwtKey,
-    pub cloudfront: AuthOutsideCloudfrontKey,
-    pub reset_token: AuthOutsideJwtKey,
+pub struct AuthOutsideEncodingKey {
+    pub ticket: EncodingKey,
+    pub api: EncodingKey,
 }
-pub struct AuthOutsideJwtKey {
+pub struct AuthOutsideResetTokenKey {
     pub decoding_key: DecodingKey<'static>,
     pub encoding_key: EncodingKey,
 }
