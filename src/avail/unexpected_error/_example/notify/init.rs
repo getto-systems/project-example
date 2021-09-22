@@ -2,16 +2,11 @@ pub(in crate::avail) mod request_decoder;
 
 use tonic::metadata::MetadataMap;
 
-use crate::avail::unexpected_error::_common::y_protobuf::service::NotifyRequestPb;
-
 use crate::x_outside_feature::_example::feature::ExampleAppFeature;
 
 use crate::auth::_common::init::ValidateApiTokenStruct;
-use request_decoder::PbNotifyUnexpectedErrorRequestDecoder;
 
-use crate::avail::unexpected_error::_example::notify::infra::{
-    NotifyUnexpectedErrorInfra, NotifyUnexpectedErrorRequestDecoder,
-};
+use crate::avail::unexpected_error::_example::notify::infra::NotifyUnexpectedErrorInfra;
 
 pub struct NotifyUnexpectedErrorStruct<'a> {
     validate_infra: ValidateApiTokenStruct<'a>,
@@ -30,10 +25,6 @@ impl<'a> NotifyUnexpectedErrorStruct<'a> {
                 metadata,
             ),
         }
-    }
-
-    pub fn request_decoder(request: NotifyRequestPb) -> impl NotifyUnexpectedErrorRequestDecoder {
-        PbNotifyUnexpectedErrorRequestDecoder::new(request)
     }
 }
 

@@ -28,6 +28,7 @@ async fn main() {
                 }))
                 .into_inner(),
         )
+        .add_service(server.avail.unexpected_error.notify())
         .add_service(server.example.outline.get_menu_badge())
         .serve(
             format!("0.0.0.0:{}", &ENV.port)
@@ -39,15 +40,20 @@ async fn main() {
 }
 
 mod route {
-    use example_api::example::_example::x_tonic::route::ExampleServer;
+    use example_api::{
+        avail::_example::x_tonic::route::AvailServer,
+        example::_example::x_tonic::route::ExampleServer,
+    };
 
     pub struct Server {
+        pub avail: AvailServer,
         pub example: ExampleServer,
     }
 
     impl Server {
         pub const fn new() -> Self {
             Self {
+                avail: AvailServer::new(),
                 example: ExampleServer::new(),
             }
         }

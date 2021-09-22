@@ -32,7 +32,7 @@ export function newNotifyUnexpectedErrorRemote(
             const response = await fetch(opts.url, {
                 ...opts.options,
                 body: encodeProtobuf(pb.avail.unexpected_error.api.NotifyUnexpectedError_pb, (message) => {
-                    message.json = JSON.stringify({ message: `${err}`, err })
+                    message.json = JSON.stringify({ type: "UI ERROR", message: `${err}`, err })
                 }),
             })
 

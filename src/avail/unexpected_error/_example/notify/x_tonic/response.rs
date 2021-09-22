@@ -10,7 +10,7 @@ impl RespondTo<NotifyResponsePb> for NotifyUnexpectedErrorEvent {
     fn respond_to(self) -> Result<Response<NotifyResponsePb>, Status> {
         match self {
             Self::Error(_) => Ok(Response::new(NotifyResponsePb {})),
-            Self::ValidateError(err) => Err(Status::unauthenticated("unauthenticated")),
+            Self::ValidateError(_) => Err(Status::unauthenticated("unauthenticated")),
         }
     }
 }
