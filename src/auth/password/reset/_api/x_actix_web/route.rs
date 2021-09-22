@@ -13,9 +13,9 @@ use crate::auth::_api::proxy::call_proxy;
 
 use crate::auth::password::reset::_api::{
     proxy_request_token::{
-        infra::RequestResetTokenProxyRequestDecoder, init::RequestResetTokenProxyFeature,
+        infra::RequestResetTokenProxyRequestDecoder, init::RequestResetTokenProxyStruct,
     },
-    proxy_reset::{infra::ResetPasswordProxyRequestDecoder, init::ResetPasswordProxyFeature},
+    proxy_reset::{infra::ResetPasswordProxyRequestDecoder, init::ResetPasswordProxyStruct},
 };
 
 pub fn scope_reset() -> Scope {
@@ -27,11 +27,11 @@ async fn request_token(data: ApiAppData, request: HttpRequest, body: String) -> 
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut material = RequestResetTokenProxyFeature::new(&data.auth, &request_id, &request);
-    material.subscribe(move |state| logger.log(state.log_level(), state));
+    let mut proxy = RequestResetTokenProxyStruct::new(&data.auth, &request_id, &request);
+    proxy.subscribe(move |state| logger.log(state.log_level(), state));
 
-    let params = RequestResetTokenProxyFeature::request_decoder(body).decode();
-    flatten(call_proxy(&material, params).await).respond_to(&request)
+    let params = RequestResetTokenProxyStruct::request_decoder(body).decode();
+    flatten(call_proxy(&proxy, params).await).respond_to(&request)
 }
 
 #[post("")]
@@ -39,9 +39,9 @@ async fn reset(data: ApiAppData, request: HttpRequest, body: String) -> impl Res
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut material = ResetPasswordProxyFeature::new(&data.auth, &request_id, &request);
-    material.subscribe(move |state| logger.log(state.log_level(), state));
+    let mut proxy = ResetPasswordProxyStruct::new(&data.auth, &request_id, &request);
+    proxy.subscribe(move |state| logger.log(state.log_level(), state));
 
-    let params = ResetPasswordProxyFeature::request_decoder(body).decode();
-    flatten(call_proxy(&material, params).await).respond_to(&request)
+    let params = ResetPasswordProxyStruct::request_decoder(body).decode();
+    flatten(call_proxy(&proxy, params).await).respond_to(&request)
 }

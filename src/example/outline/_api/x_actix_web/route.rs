@@ -11,7 +11,7 @@ use crate::x_outside_feature::_api::{
 
 use crate::example::_api::proxy::call_proxy;
 
-use crate::example::outline::_api::proxy_get_menu_badge::init::GetOutlineMenuBadgeProxyFeature;
+use crate::example::outline::_api::proxy_get_menu_badge::init::GetOutlineMenuBadgeProxyStruct;
 
 pub fn scope_outline() -> Scope {
     web::scope("/outline").service(get_menu_badge)
@@ -22,8 +22,8 @@ async fn get_menu_badge(data: ApiAppData, request: HttpRequest) -> impl Responde
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut material = GetOutlineMenuBadgeProxyFeature::new(&data, &request_id, &request);
-    material.subscribe(move |state| logger.log(state.log_level(), state));
+    let mut proxy = GetOutlineMenuBadgeProxyStruct::new(&data, &request_id, &request);
+    proxy.subscribe(move |state| logger.log(state.log_level(), state));
 
-    flatten(call_proxy(&material, Ok(())).await).respond_to(&request)
+    flatten(call_proxy(&proxy, Ok(())).await).respond_to(&request)
 }

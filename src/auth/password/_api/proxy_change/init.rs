@@ -8,12 +8,12 @@ use getto_application::infra::ActionStatePubSub;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::_api::init::ApiAuthMetadata;
+use crate::auth::_api::init::{ApiAuthMetadata, JwtApiTokenDecoder};
 use proxy_service::ProxyService;
 use request_decoder::RequestDecoder;
 use response_encoder::ResponseEncoder;
 
-use crate::auth::_api::proxy::{AuthProxyMaterial, AuthProxyState};
+use crate::auth::_api::proxy::{AuthProxyEvent, AuthProxyInfra};
 
 use crate::auth::password::{
     _api::proxy_change::infra::{ChangePasswordProxyRequestDecoder, ChangePasswordProxyResponse},
@@ -22,14 +22,15 @@ use crate::auth::password::{
 
 use crate::auth::password::_api::proxy_change::data::ChangePasswordProxyMessage;
 
-pub struct ChangePasswordProxyFeature<'a> {
-    pubsub: ActionStatePubSub<AuthProxyState<ChangePasswordProxyMessage>>,
+pub struct ChangePasswordProxyStruct<'a> {
+    pubsub: ActionStatePubSub<AuthProxyEvent<ChangePasswordProxyMessage>>,
     auth_metadata: ApiAuthMetadata<'a>,
+    token_decoder: JwtApiTokenDecoder<'a>,
     proxy_service: ProxyService<'a>,
     response_encoder: ResponseEncoder,
 }
 
-impl<'a> ChangePasswordProxyFeature<'a> {
+impl<'a> ChangePasswordProxyStruct<'a> {
     pub fn new(
         feature: &'a AuthOutsideFeature,
         request_id: &'a str,
@@ -37,7 +38,8 @@ impl<'a> ChangePasswordProxyFeature<'a> {
     ) -> Self {
         Self {
             pubsub: ActionStatePubSub::new(),
-            auth_metadata: ApiAuthMetadata::new(&feature.key, request),
+            auth_metadata: ApiAuthMetadata::new(request),
+            token_decoder: JwtApiTokenDecoder::new(&feature.decoding_key),
             proxy_service: ProxyService::new(&feature.service, request_id),
             response_encoder: ResponseEncoder,
         }
@@ -45,7 +47,7 @@ impl<'a> ChangePasswordProxyFeature<'a> {
 
     pub fn subscribe(
         &mut self,
-        handler: impl 'static + Fn(&AuthProxyState<ChangePasswordProxyMessage>) + Send + Sync,
+        handler: impl 'static + Fn(&AuthProxyEvent<ChangePasswordProxyMessage>) + Send + Sync,
     ) {
         self.pubsub.subscribe(handler);
     }
@@ -57,18 +59,22 @@ impl<'a> ChangePasswordProxyFeature<'a> {
 
 #[async_trait::async_trait]
 impl<'a>
-    AuthProxyMaterial<
+    AuthProxyInfra<
         ChangePasswordFieldsExtract,
         ChangePasswordProxyResponse,
         ChangePasswordProxyMessage,
-    > for ChangePasswordProxyFeature<'a>
+    > for ChangePasswordProxyStruct<'a>
 {
     type AuthMetadata = ApiAuthMetadata<'a>;
+    type TokenDecoder = JwtApiTokenDecoder<'a>;
     type ProxyService = ProxyService<'a>;
     type ResponseEncoder = ResponseEncoder;
 
     fn auth_metadata(&self) -> &Self::AuthMetadata {
         &self.auth_metadata
+    }
+    fn token_decoder(&self) -> &Self::TokenDecoder {
+        &self.token_decoder
     }
     fn proxy_service(&self) -> &Self::ProxyService {
         &self.proxy_service
@@ -79,8 +85,8 @@ impl<'a>
 
     fn post(
         &self,
-        state: AuthProxyState<ChangePasswordProxyMessage>,
-    ) -> AuthProxyState<ChangePasswordProxyMessage> {
+        state: AuthProxyEvent<ChangePasswordProxyMessage>,
+    ) -> AuthProxyEvent<ChangePasswordProxyMessage> {
         self.pubsub.post(state)
     }
 }

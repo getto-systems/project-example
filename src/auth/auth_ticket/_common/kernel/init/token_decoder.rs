@@ -1,4 +1,8 @@
+use std::collections::HashSet;
+
 use jsonwebtoken::{decode, errors::ErrorKind, Algorithm, DecodingKey, Validation};
+
+use crate::auth::_common::x_outside_feature::feature::AuthOutsideDecodingKey;
 
 use crate::auth::auth_ticket::_common::kernel::infra::{
     AuthJwtClaims, AuthTokenDecoder, AUTH_JWT_AUDIENCE_API, AUTH_JWT_AUDIENCE_TICKET,
@@ -13,8 +17,8 @@ pub struct JwtTicketTokenDecoder<'a> {
 }
 
 impl<'a> JwtTicketTokenDecoder<'a> {
-    pub const fn new(key: &'a DecodingKey<'a>) -> Self {
-        Self { key }
+    pub const fn new(key: &'a AuthOutsideDecodingKey) -> Self {
+        Self { key: &key.ticket }
     }
 }
 
@@ -29,8 +33,8 @@ pub struct JwtApiTokenDecoder<'a> {
 }
 
 impl<'a> JwtApiTokenDecoder<'a> {
-    pub const fn new(key: &'a DecodingKey<'a>) -> Self {
-        Self { key }
+    pub const fn new(key: &'a AuthOutsideDecodingKey) -> Self {
+        Self { key: &key.api }
     }
 }
 
@@ -59,8 +63,22 @@ fn validate_jwt<'a>(
     Ok(data.claims.into())
 }
 
+pub struct NoopTokenDecoder;
+
+impl<'a> AuthTokenDecoder for NoopTokenDecoder {
+    fn decode(&self, _token: &AuthToken) -> Result<AuthTicketExtract, DecodeAuthTokenError> {
+        Ok(AuthTicketExtract {
+            ticket_id: "noop-decoder".into(),
+            user_id: "noop-decoder".into(),
+            granted_roles: HashSet::new(),
+        })
+    }
+}
+
 #[cfg(test)]
 pub mod test {
+    use std::collections::HashSet;
+
     use crate::auth::auth_ticket::_common::kernel::infra::AuthTokenDecoder;
 
     use crate::auth::auth_ticket::_common::kernel::data::{
@@ -70,6 +88,16 @@ pub mod test {
     pub enum StaticAuthTokenDecoder {
         Valid(AuthTicketExtract),
         Expired,
+    }
+
+    impl StaticAuthTokenDecoder {
+        pub fn valid(ticket_id: String, user_id: String, granted_roles: HashSet<String>) -> Self {
+            Self::Valid(AuthTicketExtract {
+                ticket_id,
+                user_id,
+                granted_roles,
+            })
+        }
     }
 
     impl AuthTokenDecoder for StaticAuthTokenDecoder {

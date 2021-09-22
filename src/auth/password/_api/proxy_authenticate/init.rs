@@ -8,12 +8,15 @@ use getto_application::infra::ActionStatePubSub;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_api::kernel::init::auth_metadata::TicketAuthMetadata;
+use crate::auth::auth_ticket::{
+    _api::kernel::init::auth_metadata::TicketAuthMetadata,
+    _common::kernel::init::token_decoder::JwtTicketTokenDecoder,
+};
 use proxy_service::ProxyService;
 use request_decoder::RequestDecoder;
 use response_encoder::ResponseEncoder;
 
-use crate::auth::_api::proxy::{AuthProxyMaterial, AuthProxyState};
+use crate::auth::_api::proxy::{AuthProxyEvent, AuthProxyInfra};
 
 use crate::auth::password::{
     _api::proxy_authenticate::infra::{
@@ -24,14 +27,15 @@ use crate::auth::password::{
 
 use crate::auth::password::_api::proxy_authenticate::data::AuthenticatePasswordProxyMessage;
 
-pub struct AuthenticatePasswordProxyFeature<'a> {
-    pubsub: ActionStatePubSub<AuthProxyState<AuthenticatePasswordProxyMessage>>,
+pub struct AuthenticatePasswordProxyStruct<'a> {
+    pubsub: ActionStatePubSub<AuthProxyEvent<AuthenticatePasswordProxyMessage>>,
     auth_metadata: TicketAuthMetadata<'a>,
+    token_decoder: JwtTicketTokenDecoder<'a>,
     proxy_service: ProxyService<'a>,
     response_encoder: ResponseEncoder<'a>,
 }
 
-impl<'a> AuthenticatePasswordProxyFeature<'a> {
+impl<'a> AuthenticatePasswordProxyStruct<'a> {
     pub fn new(
         feature: &'a AuthOutsideFeature,
         request_id: &'a str,
@@ -39,7 +43,8 @@ impl<'a> AuthenticatePasswordProxyFeature<'a> {
     ) -> Self {
         Self {
             pubsub: ActionStatePubSub::new(),
-            auth_metadata: TicketAuthMetadata::new(&feature.key, request),
+            auth_metadata: TicketAuthMetadata::new(request),
+            token_decoder: JwtTicketTokenDecoder::new(&feature.decoding_key),
             proxy_service: ProxyService::new(&feature.service, request_id),
             response_encoder: ResponseEncoder::new(&feature.cookie),
         }
@@ -47,7 +52,7 @@ impl<'a> AuthenticatePasswordProxyFeature<'a> {
 
     pub fn subscribe(
         &mut self,
-        handler: impl 'static + Fn(&AuthProxyState<AuthenticatePasswordProxyMessage>) + Send + Sync,
+        handler: impl 'static + Fn(&AuthProxyEvent<AuthenticatePasswordProxyMessage>) + Send + Sync,
     ) {
         self.pubsub.subscribe(handler);
     }
@@ -59,18 +64,22 @@ impl<'a> AuthenticatePasswordProxyFeature<'a> {
 
 #[async_trait::async_trait]
 impl<'a>
-    AuthProxyMaterial<
+    AuthProxyInfra<
         AuthenticatePasswordFieldsExtract,
         AuthenticatePasswordProxyResponse,
         AuthenticatePasswordProxyMessage,
-    > for AuthenticatePasswordProxyFeature<'a>
+    > for AuthenticatePasswordProxyStruct<'a>
 {
     type AuthMetadata = TicketAuthMetadata<'a>;
+    type TokenDecoder = JwtTicketTokenDecoder<'a>;
     type ProxyService = ProxyService<'a>;
     type ResponseEncoder = ResponseEncoder<'a>;
 
     fn auth_metadata(&self) -> &Self::AuthMetadata {
         &self.auth_metadata
+    }
+    fn token_decoder(&self) -> &Self::TokenDecoder {
+        &self.token_decoder
     }
     fn proxy_service(&self) -> &Self::ProxyService {
         &self.proxy_service
@@ -81,8 +90,8 @@ impl<'a>
 
     fn post(
         &self,
-        state: AuthProxyState<AuthenticatePasswordProxyMessage>,
-    ) -> AuthProxyState<AuthenticatePasswordProxyMessage> {
+        state: AuthProxyEvent<AuthenticatePasswordProxyMessage>,
+    ) -> AuthProxyEvent<AuthenticatePasswordProxyMessage> {
         self.pubsub.post(state)
     }
 }

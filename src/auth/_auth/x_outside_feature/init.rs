@@ -8,11 +8,15 @@ use sqlx::mysql::MySqlPoolOptions;
 
 use crate::z_details::_common::jwt::helper::{decoding_key_from_ec_pem, encoding_key_from_ec_pem};
 
-use crate::x_outside_feature::_auth::env::AuthEnv;
-
-use super::feature::{
-    AuthOutsideCloudfrontKey, AuthOutsideConfig, AuthOutsideEmail, AuthOutsideFeature,
-    AuthOutsideJwtKey, AuthOutsideKey, AuthOutsideStore,
+use crate::{
+    auth::{
+        _auth::x_outside_feature::feature::{
+            AuthOutsideCloudfrontKey, AuthOutsideConfig, AuthOutsideEmail, AuthOutsideEncodingKey,
+            AuthOutsideFeature, AuthOutsideResetTokenKey, AuthOutsideStore,
+        },
+        _common::x_outside_feature::feature::AuthOutsideDecodingKey,
+    },
+    x_outside_feature::_auth::env::AuthEnv,
 };
 
 use crate::auth::auth_ticket::_auth::kernel::data::{ExpansionLimitDuration, ExpireDuration};
@@ -41,25 +45,23 @@ pub async fn new_auth_outside_feature(env: &'static AuthEnv) -> AuthOutsideFeatu
                 .await
                 .expect("failed to connect mysql auth server"),
         },
-        key: AuthOutsideKey {
-            ticket: AuthOutsideJwtKey {
-                decoding_key: decoding_key_from_ec_pem(&env.ticket_public_key),
-                encoding_key: encoding_key_from_ec_pem(&env.ticket_private_key),
-            },
-            api: AuthOutsideJwtKey {
-                decoding_key: decoding_key_from_ec_pem(&env.api_public_key),
-                encoding_key: encoding_key_from_ec_pem(&env.api_private_key),
-            },
-            cloudfront: AuthOutsideCloudfrontKey {
-                key: CloudfrontKey::from_pem(&env.cloudfront_private_key)
-                    .expect("failed to parse cloudfront private key"),
-                key_pair_id: &env.cloudfront_key_pair_id,
-                resource: &env.cloudfront_resource,
-            },
-            reset_token: AuthOutsideJwtKey {
-                decoding_key: decoding_key_from_ec_pem(&env.reset_token_public_key),
-                encoding_key: encoding_key_from_ec_pem(&env.reset_token_private_key),
-            },
+        decoding_key: AuthOutsideDecodingKey {
+            ticket: decoding_key_from_ec_pem(&env.ticket_public_key),
+            api: decoding_key_from_ec_pem(&env.api_public_key),
+        },
+        encoding_key: AuthOutsideEncodingKey {
+            ticket: encoding_key_from_ec_pem(&env.ticket_private_key),
+            api: encoding_key_from_ec_pem(&env.api_private_key),
+        },
+        cloudfront_key: AuthOutsideCloudfrontKey {
+            key: CloudfrontKey::from_pem(&env.cloudfront_private_key)
+                .expect("failed to parse cloudfront private key"),
+            key_pair_id: &env.cloudfront_key_pair_id,
+            resource: &env.cloudfront_resource,
+        },
+        reset_token_key: AuthOutsideResetTokenKey {
+            decoding_key: decoding_key_from_ec_pem(&env.reset_token_public_key),
+            encoding_key: encoding_key_from_ec_pem(&env.reset_token_private_key),
         },
         email: AuthOutsideEmail {
             ses: SesClient::new(Region::ApNortheast1),

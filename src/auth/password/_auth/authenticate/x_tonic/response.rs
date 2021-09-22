@@ -1,12 +1,8 @@
 use tonic::{Response, Status};
 
-use crate::auth::password::_common::y_protobuf::service::{
-    AuthenticatePasswordRequestPb, AuthenticatePasswordResponsePb,
-};
+use crate::auth::password::_common::y_protobuf::service::AuthenticatePasswordResponsePb;
 
 use crate::z_details::_common::response::tonic::RespondTo;
-
-use crate::auth::password::_common::authenticate::infra::AuthenticatePasswordFieldsExtract;
 
 use super::super::event::AuthenticatePasswordEvent;
 
@@ -31,14 +27,5 @@ impl RespondTo<AuthenticatePasswordResponsePb> for AuthenticatePasswordError {
             success: false,
             ..Default::default()
         }))
-    }
-}
-
-impl Into<AuthenticatePasswordFieldsExtract> for AuthenticatePasswordRequestPb {
-    fn into(self) -> AuthenticatePasswordFieldsExtract {
-        AuthenticatePasswordFieldsExtract {
-            login_id: self.login_id,
-            password: self.password,
-        }
     }
 }

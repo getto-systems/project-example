@@ -8,28 +8,34 @@ use getto_application::infra::ActionStatePubSub;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_api::kernel::init::auth_metadata::NoAuthMetadata;
-use crate::auth::password::reset::_common::request_token::infra::RequestResetTokenFieldsExtract;
+use crate::auth::auth_ticket::{
+    _api::kernel::init::auth_metadata::NoAuthMetadata,
+    _common::kernel::init::token_decoder::NoopTokenDecoder,
+};
 use proxy_service::ProxyService;
 use request_decoder::RequestDecoder;
 use response_encoder::ResponseEncoder;
 
-use crate::auth::_api::proxy::{AuthProxyMaterial, AuthProxyState};
+use crate::auth::_api::proxy::{AuthProxyEvent, AuthProxyInfra};
 
-use crate::auth::password::reset::_api::proxy_request_token::infra::{
-    RequestResetTokenProxyRequestDecoder, RequestResetTokenProxyResponse,
+use crate::auth::password::reset::{
+    _api::proxy_request_token::infra::{
+        RequestResetTokenProxyRequestDecoder, RequestResetTokenProxyResponse,
+    },
+    _common::request_token::infra::RequestResetTokenFieldsExtract,
 };
 
 use crate::auth::password::reset::_api::proxy_request_token::data::RequestResetTokenProxyMessage;
 
-pub struct RequestResetTokenProxyFeature<'a> {
-    pubsub: ActionStatePubSub<AuthProxyState<RequestResetTokenProxyMessage>>,
+pub struct RequestResetTokenProxyStruct<'a> {
+    pubsub: ActionStatePubSub<AuthProxyEvent<RequestResetTokenProxyMessage>>,
     auth_metadata: NoAuthMetadata<'a>,
+    token_decoder: NoopTokenDecoder,
     proxy_service: ProxyService<'a>,
     response_encoder: ResponseEncoder,
 }
 
-impl<'a> RequestResetTokenProxyFeature<'a> {
+impl<'a> RequestResetTokenProxyStruct<'a> {
     pub fn new(
         feature: &'a AuthOutsideFeature,
         request_id: &'a str,
@@ -38,6 +44,7 @@ impl<'a> RequestResetTokenProxyFeature<'a> {
         Self {
             pubsub: ActionStatePubSub::new(),
             auth_metadata: NoAuthMetadata::new(request),
+            token_decoder: NoopTokenDecoder,
             proxy_service: ProxyService::new(&feature.service, request_id),
             response_encoder: ResponseEncoder,
         }
@@ -45,7 +52,7 @@ impl<'a> RequestResetTokenProxyFeature<'a> {
 
     pub fn subscribe(
         &mut self,
-        handler: impl 'static + Fn(&AuthProxyState<RequestResetTokenProxyMessage>) + Send + Sync,
+        handler: impl 'static + Fn(&AuthProxyEvent<RequestResetTokenProxyMessage>) + Send + Sync,
     ) {
         self.pubsub.subscribe(handler);
     }
@@ -57,18 +64,22 @@ impl<'a> RequestResetTokenProxyFeature<'a> {
 
 #[async_trait::async_trait]
 impl<'a>
-    AuthProxyMaterial<
+    AuthProxyInfra<
         RequestResetTokenFieldsExtract,
         RequestResetTokenProxyResponse,
         RequestResetTokenProxyMessage,
-    > for RequestResetTokenProxyFeature<'a>
+    > for RequestResetTokenProxyStruct<'a>
 {
     type AuthMetadata = NoAuthMetadata<'a>;
+    type TokenDecoder = NoopTokenDecoder;
     type ProxyService = ProxyService<'a>;
     type ResponseEncoder = ResponseEncoder;
 
     fn auth_metadata(&self) -> &Self::AuthMetadata {
         &self.auth_metadata
+    }
+    fn token_decoder(&self) -> &Self::TokenDecoder {
+        &self.token_decoder
     }
     fn proxy_service(&self) -> &Self::ProxyService {
         &self.proxy_service
@@ -79,8 +90,8 @@ impl<'a>
 
     fn post(
         &self,
-        state: AuthProxyState<RequestResetTokenProxyMessage>,
-    ) -> AuthProxyState<RequestResetTokenProxyMessage> {
+        state: AuthProxyEvent<RequestResetTokenProxyMessage>,
+    ) -> AuthProxyEvent<RequestResetTokenProxyMessage> {
         self.pubsub.post(state)
     }
 }

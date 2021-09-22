@@ -4,7 +4,7 @@ use crate::auth::{
     auth_ticket::_auth::validate::{
         event::ValidateAuthTokenEvent,
         infra::{ValidateApiTokenRequestDecoder, ValidateAuthTokenInfra},
-        method::validate_api_token,
+        method::validate_auth_token,
     },
     auth_user::_common::kernel::data::AuthUser,
 };
@@ -55,7 +55,7 @@ impl<M: ValidateApiTokenMaterial> ValidateApiTokenAction<M> {
 
         let require_roles = request_decoder.decode();
 
-        let ticket = validate_api_token(m.validate(), require_roles, |event| {
+        let ticket = validate_auth_token(m.validate(), require_roles, |event| {
             pubsub.post(ValidateApiTokenState::Validate(event))
         })
         .await?;

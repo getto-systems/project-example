@@ -15,9 +15,9 @@ use crate::auth::_api::proxy::call_proxy;
 
 use crate::auth::password::_api::{
     proxy_authenticate::{
-        infra::AuthenticatePasswordProxyRequestDecoder, init::AuthenticatePasswordProxyFeature,
+        infra::AuthenticatePasswordProxyRequestDecoder, init::AuthenticatePasswordProxyStruct,
     },
-    proxy_change::{infra::ChangePasswordProxyRequestDecoder, init::ChangePasswordProxyFeature},
+    proxy_change::{infra::ChangePasswordProxyRequestDecoder, init::ChangePasswordProxyStruct},
 };
 
 pub fn scope_password() -> Scope {
@@ -32,11 +32,11 @@ async fn authenticate(data: ApiAppData, request: HttpRequest, body: String) -> i
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut material = AuthenticatePasswordProxyFeature::new(&data.auth, &request_id, &request);
-    material.subscribe(move |state| logger.log(state.log_level(), state));
+    let mut proxy = AuthenticatePasswordProxyStruct::new(&data.auth, &request_id, &request);
+    proxy.subscribe(move |state| logger.log(state.log_level(), state));
 
-    let params = AuthenticatePasswordProxyFeature::request_decoder(body).decode();
-    flatten(call_proxy(&material, params).await).respond_to(&request)
+    let params = AuthenticatePasswordProxyStruct::request_decoder(body).decode();
+    flatten(call_proxy(&proxy, params).await).respond_to(&request)
 }
 
 #[post("/change")]
@@ -44,9 +44,9 @@ async fn change(data: ApiAppData, request: HttpRequest, body: String) -> impl Re
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut material = ChangePasswordProxyFeature::new(&data.auth, &request_id, &request);
-    material.subscribe(move |state| logger.log(state.log_level(), state));
+    let mut proxy = ChangePasswordProxyStruct::new(&data.auth, &request_id, &request);
+    proxy.subscribe(move |state| logger.log(state.log_level(), state));
 
-    let params = ChangePasswordProxyFeature::request_decoder(body).decode();
-    flatten(call_proxy(&material, params).await).respond_to(&request)
+    let params = ChangePasswordProxyStruct::request_decoder(body).decode();
+    flatten(call_proxy(&proxy, params).await).respond_to(&request)
 }

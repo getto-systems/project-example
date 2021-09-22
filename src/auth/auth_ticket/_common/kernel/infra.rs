@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     auth::auth_ticket::_common::kernel::data::{
-        AuthNonce, AuthMetadataError, AuthTicketExtract, AuthToken, DecodeAuthTokenError,
+        AuthNonce, AuthTicketExtract, AuthToken, DecodeAuthTokenError,
     },
     z_details::_common::request::data::MetadataError,
 };
@@ -17,7 +17,7 @@ pub struct AuthMetadataContent {
 }
 
 pub trait AuthMetadata {
-    fn metadata(&self) -> Result<AuthMetadataContent, AuthMetadataError>;
+    fn metadata(&self) -> Result<AuthMetadataContent, MetadataError>;
 }
 
 pub trait AuthNonceMetadata {

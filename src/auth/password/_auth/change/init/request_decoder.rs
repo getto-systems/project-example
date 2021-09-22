@@ -17,7 +17,10 @@ impl PbChangePasswordRequestDecoder {
 
 impl ChangePasswordRequestDecoder for PbChangePasswordRequestDecoder {
     fn decode(self) -> ChangePasswordFieldsExtract {
-        self.request.into()
+        ChangePasswordFieldsExtract {
+            current_password: self.request.current_password,
+            new_password: self.request.new_password,
+        }
     }
 }
 

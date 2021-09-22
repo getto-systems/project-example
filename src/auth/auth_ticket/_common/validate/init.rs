@@ -5,7 +5,7 @@ use tonic::metadata::MetadataMap;
 use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
 
 use crate::auth::auth_ticket::_common::{
-    kernel::init::auth_metadata::TonicAuthMetadata,
+    kernel::init::{auth_metadata::TonicAuthMetadata, token_decoder::NoopTokenDecoder},
     validate::init::validate_service::TonicValidateService,
 };
 
@@ -13,6 +13,7 @@ use crate::auth::_common::infra::ValidateApiTokenInfra;
 
 pub struct ValidateApiTokenStruct<'a> {
     auth_metadata: TonicAuthMetadata<'a>,
+    token_decoder: NoopTokenDecoder,
     validate_service: TonicValidateService<'a>,
 }
 
@@ -24,17 +25,22 @@ impl<'a> ValidateApiTokenStruct<'a> {
     ) -> Self {
         Self {
             auth_metadata: TonicAuthMetadata::new(metadata),
-            validate_service: TonicValidateService::new(service, request_id),
+            token_decoder: NoopTokenDecoder,
+            validate_service: TonicValidateService::new(&service, request_id),
         }
     }
 }
 
 impl<'a> ValidateApiTokenInfra for ValidateApiTokenStruct<'a> {
     type AuthMetadata = TonicAuthMetadata<'a>;
+    type TokenDecoder = NoopTokenDecoder;
     type ValidateService = TonicValidateService<'a>;
 
     fn auth_metadata(&self) -> &Self::AuthMetadata {
         &self.auth_metadata
+    }
+    fn token_decoder(&self) -> &Self::TokenDecoder {
+        &self.token_decoder
     }
     fn validate_service(&self) -> &Self::ValidateService {
         &self.validate_service
@@ -44,21 +50,28 @@ impl<'a> ValidateApiTokenInfra for ValidateApiTokenStruct<'a> {
 #[cfg(test)]
 pub mod test {
     use super::validate_service::test::StaticValidateService;
-    use crate::auth::auth_ticket::_common::kernel::init::auth_metadata::test::StaticAuthMetadata;
+    use crate::auth::auth_ticket::_common::kernel::init::{
+        auth_metadata::test::StaticAuthMetadata, token_decoder::test::StaticAuthTokenDecoder,
+    };
 
     use super::super::infra::ValidateApiTokenInfra;
 
     pub struct StaticValidateApiTokenStruct {
         pub auth_metadata: StaticAuthMetadata,
+        pub token_decoder: StaticAuthTokenDecoder,
         pub validate_service: StaticValidateService,
     }
 
     impl ValidateApiTokenInfra for StaticValidateApiTokenStruct {
         type AuthMetadata = StaticAuthMetadata;
+        type TokenDecoder = StaticAuthTokenDecoder;
         type ValidateService = StaticValidateService;
 
         fn auth_metadata(&self) -> &Self::AuthMetadata {
             &self.auth_metadata
+        }
+        fn token_decoder(&self) -> &Self::TokenDecoder {
+            &self.token_decoder
         }
         fn validate_service(&self) -> &Self::ValidateService {
             &self.validate_service
