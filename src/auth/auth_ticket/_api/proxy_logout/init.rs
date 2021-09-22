@@ -7,10 +7,7 @@ use getto_application::infra::ActionStatePubSub;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::{
-    _api::kernel::init::auth_metadata::TicketAuthMetadata,
-    _common::kernel::init::token_decoder::JwtTicketTokenDecoder,
-};
+use crate::auth::auth_ticket::_api::validate_metadata::init::ValidateTicketMetadataStruct;
 use proxy_service::ProxyService;
 use response_encoder::{LogoutProxyResponse, ResponseEncoder};
 
@@ -18,8 +15,7 @@ use crate::auth::_api::proxy::{AuthProxyEvent, AuthProxyInfra};
 
 pub struct LogoutProxyStruct<'a> {
     pubsub: ActionStatePubSub<AuthProxyEvent<LogoutProxyResponse>>,
-    auth_metadata: TicketAuthMetadata<'a>,
-    token_decoder: JwtTicketTokenDecoder<'a>,
+    validate_infra: ValidateTicketMetadataStruct<'a>,
     proxy_service: ProxyService<'a>,
     response_encoder: ResponseEncoder,
 }
@@ -32,8 +28,7 @@ impl<'a> LogoutProxyStruct<'a> {
     ) -> Self {
         Self {
             pubsub: ActionStatePubSub::new(),
-            auth_metadata: TicketAuthMetadata::new(request),
-            token_decoder: JwtTicketTokenDecoder::new(&feature.decoding_key),
+            validate_infra: ValidateTicketMetadataStruct::new(&feature.decoding_key, request),
             proxy_service: ProxyService::new(&feature.service, request_id),
             response_encoder: ResponseEncoder,
         }
@@ -49,16 +44,12 @@ impl<'a> LogoutProxyStruct<'a> {
 
 #[async_trait::async_trait]
 impl<'a> AuthProxyInfra<(), (), LogoutProxyResponse> for LogoutProxyStruct<'a> {
-    type AuthMetadata = TicketAuthMetadata<'a>;
-    type TokenDecoder = JwtTicketTokenDecoder<'a>;
+    type ValidateInfra = ValidateTicketMetadataStruct<'a>;
     type ProxyService = ProxyService<'a>;
     type ResponseEncoder = ResponseEncoder;
 
-    fn auth_metadata(&self) -> &Self::AuthMetadata {
-        &self.auth_metadata
-    }
-    fn token_decoder(&self) -> &Self::TokenDecoder {
-        &self.token_decoder
+    fn validate_infra(&self) -> &Self::ValidateInfra {
+        &self.validate_infra
     }
     fn proxy_service(&self) -> &Self::ProxyService {
         &self.proxy_service

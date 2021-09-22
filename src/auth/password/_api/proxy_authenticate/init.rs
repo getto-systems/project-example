@@ -8,10 +8,7 @@ use getto_application::infra::ActionStatePubSub;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::{
-    _api::kernel::init::auth_metadata::TicketAuthMetadata,
-    _common::kernel::init::token_decoder::JwtTicketTokenDecoder,
-};
+use crate::auth::auth_ticket::_api::validate_metadata::init::ValidateTicketMetadataStruct;
 use proxy_service::ProxyService;
 use request_decoder::RequestDecoder;
 use response_encoder::ResponseEncoder;
@@ -29,8 +26,7 @@ use crate::auth::password::_api::proxy_authenticate::data::AuthenticatePasswordP
 
 pub struct AuthenticatePasswordProxyStruct<'a> {
     pubsub: ActionStatePubSub<AuthProxyEvent<AuthenticatePasswordProxyMessage>>,
-    auth_metadata: TicketAuthMetadata<'a>,
-    token_decoder: JwtTicketTokenDecoder<'a>,
+    validate_infra: ValidateTicketMetadataStruct<'a>,
     proxy_service: ProxyService<'a>,
     response_encoder: ResponseEncoder<'a>,
 }
@@ -43,8 +39,7 @@ impl<'a> AuthenticatePasswordProxyStruct<'a> {
     ) -> Self {
         Self {
             pubsub: ActionStatePubSub::new(),
-            auth_metadata: TicketAuthMetadata::new(request),
-            token_decoder: JwtTicketTokenDecoder::new(&feature.decoding_key),
+            validate_infra: ValidateTicketMetadataStruct::new(&feature.decoding_key, request),
             proxy_service: ProxyService::new(&feature.service, request_id),
             response_encoder: ResponseEncoder::new(&feature.cookie),
         }
@@ -70,16 +65,12 @@ impl<'a>
         AuthenticatePasswordProxyMessage,
     > for AuthenticatePasswordProxyStruct<'a>
 {
-    type AuthMetadata = TicketAuthMetadata<'a>;
-    type TokenDecoder = JwtTicketTokenDecoder<'a>;
+    type ValidateInfra = ValidateTicketMetadataStruct<'a>;
     type ProxyService = ProxyService<'a>;
     type ResponseEncoder = ResponseEncoder<'a>;
 
-    fn auth_metadata(&self) -> &Self::AuthMetadata {
-        &self.auth_metadata
-    }
-    fn token_decoder(&self) -> &Self::TokenDecoder {
-        &self.token_decoder
+    fn validate_infra(&self) -> &Self::ValidateInfra {
+        &self.validate_infra
     }
     fn proxy_service(&self) -> &Self::ProxyService {
         &self.proxy_service

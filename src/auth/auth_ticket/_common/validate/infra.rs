@@ -1,6 +1,5 @@
-use crate::auth::_common::infra::AuthTokenDecoder;
 use crate::auth::auth_ticket::_common::kernel::infra::{
-    AuthMetadata, AuthMetadataContent,
+    AuthMetadata, AuthMetadataContent, AuthTokenDecoder,
 };
 
 use crate::auth::{

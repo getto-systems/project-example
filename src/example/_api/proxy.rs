@@ -4,22 +4,23 @@ use getto_application::data::MethodResult;
 
 use crate::z_details::_common::{
     logger::{LogLevel, LogMessage},
-    request::data::MetadataError,
     response::actix_web::RespondTo,
 };
 
-use crate::auth::_common::infra::{AuthMetadata, AuthMetadataContent, AuthTokenDecoder};
+use crate::auth::_api::{
+    data::ValidateAuthMetadataError, infra::ValidateAuthMetadataInfra,
+    method::validate_auth_metadata,
+};
+use crate::auth::_common::infra::AuthMetadataContent;
 
 use crate::{
-    auth::_common::data::DecodeAuthTokenError, example::_api::service::data::ExampleServiceError,
-    z_details::_api::message::data::MessageError,
+    example::_api::service::data::ExampleServiceError, z_details::_api::message::data::MessageError,
 };
 
 pub enum ExampleProxyEvent<T> {
     TryToCall(String),
     Response(T),
-    MetadataError(MetadataError),
-    DecodeError(DecodeAuthTokenError),
+    MetadataError(ValidateAuthMetadataError),
     ServiceError(ExampleServiceError),
     MessageError(MessageError),
 }
@@ -33,7 +34,6 @@ impl<T> std::fmt::Display for ExampleProxyEvent<T> {
             Self::TryToCall(target) => write!(f, "try to proxy call: {}", target),
             Self::Response(_) => write!(f, "{}", SUCCESS),
             Self::MetadataError(err) => write!(f, "{}; {}", ERROR, err),
-            Self::DecodeError(err) => write!(f, "{}; {}", ERROR, err),
             Self::ServiceError(err) => write!(f, "{}; {}", ERROR, err),
             Self::MessageError(err) => write!(f, "{}; {}", ERROR, err),
         }
@@ -46,7 +46,6 @@ impl<T: RespondTo> RespondTo for ExampleProxyEvent<T> {
             Self::TryToCall(_) => HttpResponse::Accepted().finish(),
             Self::Response(response) => response.respond_to(request),
             Self::MetadataError(err) => err.respond_to(request),
-            Self::DecodeError(err) => err.respond_to(request),
             Self::ServiceError(err) => err.respond_to(request),
             Self::MessageError(err) => err.respond_to(request),
         }
@@ -59,7 +58,6 @@ impl<T> ExampleProxyEvent<T> {
             Self::TryToCall(_) => LogLevel::Info,
             Self::Response(_) => LogLevel::Debug,
             Self::MetadataError(err) => err.log_level(),
-            Self::DecodeError(err) => err.log_level(),
             Self::ServiceError(err) => err.log_level(),
             Self::MessageError(err) => err.log_level(),
         }
@@ -73,13 +71,11 @@ impl<T> LogMessage for &ExampleProxyEvent<T> {
 }
 
 pub trait ExampleProxyInfra<P, T, R> {
-    type AuthMetadata: AuthMetadata;
-    type TokenDecoder: AuthTokenDecoder;
+    type ValidateInfra: ValidateAuthMetadataInfra;
     type ProxyService: ExampleProxyService<P, T>;
     type ResponseEncoder: ExampleProxyResponseEncoder<T, R>;
 
-    fn auth_metadata(&self) -> &Self::AuthMetadata;
-    fn token_decoder(&self) -> &Self::TokenDecoder;
+    fn validate_infra(&self) -> &Self::ValidateInfra;
     fn proxy_service(&self) -> &Self::ProxyService;
     fn response_encoder(&self) -> &Self::ResponseEncoder;
 
@@ -104,22 +100,13 @@ pub async fn call_proxy<P, T, R>(
     infra: &impl ExampleProxyInfra<P, T, R>,
     params: Result<P, MessageError>,
 ) -> MethodResult<ExampleProxyEvent<R>> {
-    let auth_metadata = infra.auth_metadata();
-    let token_decoder = infra.token_decoder();
     let proxy_service = infra.proxy_service();
     let response_encoder = infra.response_encoder();
 
     let params = params.map_err(|err| infra.post(ExampleProxyEvent::MessageError(err)))?;
 
-    let metadata = auth_metadata
-        .metadata()
+    let metadata = validate_auth_metadata(infra.validate_infra())
         .map_err(|err| infra.post(ExampleProxyEvent::MetadataError(err)))?;
-
-    if let Some(ref token) = metadata.token {
-        token_decoder
-            .decode(token)
-            .map_err(|err| infra.post(ExampleProxyEvent::DecodeError(err)))?;
-    }
 
     infra.post(ExampleProxyEvent::TryToCall(proxy_service.name().into()));
 

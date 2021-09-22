@@ -8,7 +8,7 @@ use getto_application::infra::ActionStatePubSub;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::_api::init::{ApiAuthMetadata, JwtApiTokenDecoder};
+use crate::auth::auth_ticket::_api::validate_metadata::init::ValidateTicketMetadataStruct;
 use proxy_service::ProxyService;
 use request_decoder::RequestDecoder;
 use response_encoder::ResponseEncoder;
@@ -24,8 +24,7 @@ use crate::auth::password::_api::proxy_change::data::ChangePasswordProxyMessage;
 
 pub struct ChangePasswordProxyStruct<'a> {
     pubsub: ActionStatePubSub<AuthProxyEvent<ChangePasswordProxyMessage>>,
-    auth_metadata: ApiAuthMetadata<'a>,
-    token_decoder: JwtApiTokenDecoder<'a>,
+    validate_infra: ValidateTicketMetadataStruct<'a>,
     proxy_service: ProxyService<'a>,
     response_encoder: ResponseEncoder,
 }
@@ -38,8 +37,7 @@ impl<'a> ChangePasswordProxyStruct<'a> {
     ) -> Self {
         Self {
             pubsub: ActionStatePubSub::new(),
-            auth_metadata: ApiAuthMetadata::new(request),
-            token_decoder: JwtApiTokenDecoder::new(&feature.decoding_key),
+            validate_infra: ValidateTicketMetadataStruct::new(&feature.decoding_key, request),
             proxy_service: ProxyService::new(&feature.service, request_id),
             response_encoder: ResponseEncoder,
         }
@@ -65,16 +63,12 @@ impl<'a>
         ChangePasswordProxyMessage,
     > for ChangePasswordProxyStruct<'a>
 {
-    type AuthMetadata = ApiAuthMetadata<'a>;
-    type TokenDecoder = JwtApiTokenDecoder<'a>;
+    type ValidateInfra = ValidateTicketMetadataStruct<'a>;
     type ProxyService = ProxyService<'a>;
     type ResponseEncoder = ResponseEncoder;
 
-    fn auth_metadata(&self) -> &Self::AuthMetadata {
-        &self.auth_metadata
-    }
-    fn token_decoder(&self) -> &Self::TokenDecoder {
-        &self.token_decoder
+    fn validate_infra(&self) -> &Self::ValidateInfra {
+        &self.validate_infra
     }
     fn proxy_service(&self) -> &Self::ProxyService {
         &self.proxy_service

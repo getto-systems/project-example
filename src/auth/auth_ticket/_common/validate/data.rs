@@ -1,5 +1,8 @@
 use crate::{
-    auth::_common::{data::DecodeAuthTokenError, service::data::AuthServiceError},
+    auth::{
+        _common::service::data::AuthServiceError,
+        auth_ticket::_common::kernel::data::DecodeAuthTokenError,
+    },
     z_details::_common::request::data::MetadataError,
 };
 

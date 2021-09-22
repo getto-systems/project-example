@@ -8,10 +8,7 @@ use getto_application::infra::ActionStatePubSub;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::{
-    _api::kernel::init::auth_metadata::NoAuthMetadata,
-    _common::kernel::init::token_decoder::NoopTokenDecoder,
-};
+use crate::auth::auth_ticket::_api::validate_metadata::init::NoValidateMetadataStruct;
 use proxy_service::ProxyService;
 use request_decoder::RequestDecoder;
 use response_encoder::ResponseEncoder;
@@ -27,8 +24,7 @@ use crate::auth::password::reset::_api::proxy_reset::data::ResetPasswordProxyMes
 
 pub struct ResetPasswordProxyStruct<'a> {
     pubsub: ActionStatePubSub<AuthProxyEvent<ResetPasswordProxyMessage>>,
-    auth_metadata: NoAuthMetadata<'a>,
-    token_decoder: NoopTokenDecoder,
+    validate_infra: NoValidateMetadataStruct<'a>,
     proxy_service: ProxyService<'a>,
     response_encoder: ResponseEncoder<'a>,
 }
@@ -41,8 +37,7 @@ impl<'a> ResetPasswordProxyStruct<'a> {
     ) -> Self {
         Self {
             pubsub: ActionStatePubSub::new(),
-            auth_metadata: NoAuthMetadata::new(request),
-            token_decoder: NoopTokenDecoder,
+            validate_infra: NoValidateMetadataStruct::new(request),
             proxy_service: ProxyService::new(&feature.service, request_id),
             response_encoder: ResponseEncoder::new(&feature.cookie),
         }
@@ -68,16 +63,12 @@ impl<'a>
         ResetPasswordProxyMessage,
     > for ResetPasswordProxyStruct<'a>
 {
-    type AuthMetadata = NoAuthMetadata<'a>;
-    type TokenDecoder = NoopTokenDecoder;
+    type ValidateInfra = NoValidateMetadataStruct<'a>;
     type ProxyService = ProxyService<'a>;
     type ResponseEncoder = ResponseEncoder<'a>;
 
-    fn auth_metadata(&self) -> &Self::AuthMetadata {
-        &self.auth_metadata
-    }
-    fn token_decoder(&self) -> &Self::TokenDecoder {
-        &self.token_decoder
+    fn validate_infra(&self) -> &Self::ValidateInfra {
+        &self.validate_infra
     }
     fn proxy_service(&self) -> &Self::ProxyService {
         &self.proxy_service
