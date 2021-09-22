@@ -7,7 +7,7 @@ use getto_application::infra::ActionStatePubSub;
 
 use crate::x_outside_feature::_api::feature::ApiAppFeature;
 
-use crate::auth::_api::init::{ApiAuthMetadata, JwtApiTokenDecoder};
+use crate::auth::_api::init::ValidateApiMetadataStruct;
 use proxy_service::ProxyService;
 use response_encoder::ResponseEncoder;
 
@@ -20,8 +20,7 @@ use crate::example::outline::{
 
 pub struct GetOutlineMenuBadgeProxyStruct<'a> {
     pubsub: ActionStatePubSub<ExampleProxyEvent<GetOutlineMenuBadgeProxyMessage>>,
-    auth_metadata: ApiAuthMetadata<'a>,
-    token_decoder: JwtApiTokenDecoder<'a>,
+    validate_infra: ValidateApiMetadataStruct<'a>,
     proxy_service: ProxyService<'a>,
     response_encoder: ResponseEncoder,
 }
@@ -30,8 +29,7 @@ impl<'a> GetOutlineMenuBadgeProxyStruct<'a> {
     pub fn new(feature: &'a ApiAppFeature, request_id: &'a str, request: &'a HttpRequest) -> Self {
         Self {
             pubsub: ActionStatePubSub::new(),
-            auth_metadata: ApiAuthMetadata::new(request),
-            token_decoder: JwtApiTokenDecoder::new(&feature.auth.decoding_key),
+            validate_infra: ValidateApiMetadataStruct::new(&feature.auth.decoding_key, request),
             proxy_service: ProxyService::new(&feature.example.service, request_id),
             response_encoder: ResponseEncoder,
         }
@@ -49,16 +47,12 @@ impl<'a> GetOutlineMenuBadgeProxyStruct<'a> {
 impl<'a> ExampleProxyInfra<(), OutlineMenuBadge, GetOutlineMenuBadgeProxyMessage>
     for GetOutlineMenuBadgeProxyStruct<'a>
 {
-    type AuthMetadata = ApiAuthMetadata<'a>;
-    type TokenDecoder = JwtApiTokenDecoder<'a>;
+    type ValidateInfra = ValidateApiMetadataStruct<'a>;
     type ProxyService = ProxyService<'a>;
     type ResponseEncoder = ResponseEncoder;
 
-    fn auth_metadata(&self) -> &Self::AuthMetadata {
-        &self.auth_metadata
-    }
-    fn token_decoder(&self) -> &Self::TokenDecoder {
-        &self.token_decoder
+    fn validate_infra(&self) -> &Self::ValidateInfra {
+        &self.validate_infra
     }
     fn proxy_service(&self) -> &Self::ProxyService {
         &self.proxy_service

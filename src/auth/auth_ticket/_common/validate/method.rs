@@ -1,13 +1,12 @@
-use crate::auth::{
-    _common::infra::AuthTokenDecoder,
-    auth_ticket::_common::{
-        kernel::infra::AuthMetadata,
-        validate::infra::{ValidateApiTokenInfra, ValidateService},
-    },
+use crate::auth::auth_ticket::_common::{
+    kernel::infra::{AuthMetadata, AuthTokenDecoder},
+    validate::infra::{ValidateApiTokenInfra, ValidateService},
 };
 
-use super::data::ValidateApiTokenError;
-use crate::auth::auth_user::_common::kernel::data::{AuthUserId, RequireAuthRoles};
+use crate::auth::{
+    _common::data::ValidateApiTokenError,
+    auth_user::_common::kernel::data::{AuthUserId, RequireAuthRoles},
+};
 
 pub async fn validate_api_token(
     infra: &impl ValidateApiTokenInfra,
