@@ -10,7 +10,7 @@ use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::{
     auth_ticket::_auth::kernel::init::{clock::ChronoAuthClock, CheckAuthNonceStruct},
-    password::_auth::kernel::init::password_repository::MysqlAuthUserPasswordRepository,
+    password::remote::kernel::init::password_repository::MysqlAuthUserPasswordRepository,
 };
 use destination_repository::MysqlResetTokenDestinationRepository;
 use token_encoder::JwtResetTokenEncoder;
@@ -93,7 +93,7 @@ pub mod test {
         auth_ticket::_auth::kernel::init::{
             clock::test::StaticChronoAuthClock, test::StaticCheckAuthNonceStruct,
         },
-        password::_auth::kernel::init::password_repository::test::MemoryAuthUserPasswordRepository,
+        password::remote::kernel::init::password_repository::test::MemoryAuthUserPasswordRepository,
     };
 
     use super::super::infra::{RequestResetTokenConfig, RequestResetTokenInfra};

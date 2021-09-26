@@ -9,7 +9,7 @@ use crate::auth::password::reset::remote::{
 use crate::auth::{
     auth_ticket::_auth::kernel::data::ExpireDateTime,
     password::{
-        _auth::kernel::data::ResetToken,
+        remote::kernel::data::ResetToken,
         reset::remote::{
             kernel::data::ResetTokenEncoded, request_token::data::EncodeResetTokenError,
         },
@@ -72,7 +72,7 @@ pub mod test {
     use crate::auth::{
         auth_ticket::_auth::kernel::data::ExpireDateTime,
         password::{
-            _auth::kernel::data::ResetToken, reset::remote::kernel::data::ResetTokenEncoded,
+            remote::kernel::data::ResetToken, reset::remote::kernel::data::ResetTokenEncoded,
         },
     };
 

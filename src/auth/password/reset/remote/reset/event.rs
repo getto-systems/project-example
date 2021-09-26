@@ -4,7 +4,7 @@ use crate::{
         auth_user::_common::kernel::data::AuthUser,
         login_id::_auth::data::ValidateLoginIdError,
         password::{
-            _auth::kernel::data::{
+            remote::kernel::data::{
                 PasswordHashError, ValidatePasswordError, VerifyResetTokenEntryError,
             },
             reset::remote::{

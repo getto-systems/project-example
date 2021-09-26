@@ -14,7 +14,7 @@ use crate::auth::{
         _common::kernel::init::nonce_metadata::test::StaticAuthNonceMetadata,
     },
     password::{
-        _auth::kernel::init::password_repository::test::{
+        remote::kernel::init::password_repository::test::{
             MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
             MemoryAuthUserPasswordStore,
         },
@@ -47,7 +47,7 @@ use crate::auth::{
     auth_user::_common::kernel::data::AuthUserId,
     login_id::_auth::data::LoginId,
     password::{
-        _auth::kernel::data::ResetToken,
+        remote::kernel::data::ResetToken,
         reset::remote::request_token::data::{ResetTokenDestination, ResetTokenDestinationExtract},
     },
 };

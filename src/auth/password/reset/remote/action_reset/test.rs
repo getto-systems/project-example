@@ -31,7 +31,7 @@ use crate::auth::{
         MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
     },
     password::{
-        _auth::kernel::init::password_repository::test::{
+        remote::kernel::init::password_repository::test::{
             MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
             MemoryAuthUserPasswordStore,
         },
@@ -58,7 +58,7 @@ use crate::auth::{
     },
     auth_user::_common::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
     login_id::_auth::data::LoginId,
-    password::_auth::kernel::data::ResetToken,
+    password::remote::kernel::data::ResetToken,
 };
 
 #[tokio::test]

@@ -4,7 +4,7 @@ use crate::auth::{
     auth_ticket::_auth::kernel::infra::AuthClock,
     auth_user::_auth::kernel::infra::AuthUserRepository,
     password::{
-        _auth::kernel::infra::{PlainPassword, ResetPasswordRepository, ResetTokenEntry},
+        remote::kernel::infra::{PlainPassword, ResetPasswordRepository, ResetTokenEntry},
         reset::remote::{
             proxy_reset::infra::ResetPasswordFieldsExtract,
             reset::infra::{ResetPasswordInfra, ResetTokenDecoder},
@@ -19,7 +19,7 @@ use crate::auth::{
     auth_user::_common::kernel::data::AuthUser,
     login_id::_auth::data::LoginId,
     password::{
-        _auth::kernel::data::VerifyResetTokenEntryError,
+        remote::kernel::data::VerifyResetTokenEntryError,
         reset::remote::kernel::data::ResetTokenEncoded,
     },
 };

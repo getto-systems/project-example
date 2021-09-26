@@ -2,7 +2,7 @@ import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-a
 
 import { initSignLink } from "../../../_ui/common/nav/action_nav/init"
 import { initInputLoginIDAction } from "../../../login_id/_ui/action_input/init"
-import { initInputPasswordAction } from "../../_ui/action_input/init"
+import { initInputPasswordAction } from "../../action_input/init"
 import { initValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/init"
 
 import { resetPassword } from "../reset/method"
@@ -36,7 +36,7 @@ import { AuthTicket } from "../../../auth_ticket/_ui/kernel/data"
 import { ConvertBoardResult } from "../../../../../ui/vendor/getto-application/board/kernel/data"
 import { InputLoginIDAction } from "../../../login_id/_ui/action_input/action"
 import { ValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/action"
-import { InputPasswordAction } from "../../_ui/action_input/action"
+import { InputPasswordAction } from "../../action_input/action"
 import { ValidateBoardChecker } from "../../../../../ui/vendor/getto-application/board/validate_board/infra"
 
 export type ResetPasswordActionInfra = Readonly<{

@@ -7,7 +7,7 @@ use crate::auth::password::reset::remote::request_token::event::destination_not_
 use crate::auth::{
     auth_ticket::_auth::kernel::infra::AuthClock,
     password::{
-        _auth::kernel::infra::RegisterResetTokenRepository,
+        remote::kernel::infra::RegisterResetTokenRepository,
         reset::remote::{
             proxy_request_token::infra::RequestResetTokenFieldsExtract,
             request_token::infra::{

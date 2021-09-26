@@ -19,7 +19,7 @@ import {
 import {
     docs_auth_authenticatePassword,
     docs_auth_authenticatePassword_description,
-} from "../../password/_ui/action_authenticate/docs"
+} from "../../password/action_authenticate/docs"
 import {
     docs_auth_resetPassword,
     docs_auth_resetPassword_data,

@@ -9,7 +9,7 @@ use crate::z_details::_common::response::tonic::RespondTo;
 use super::super::event::ResetPasswordEvent;
 
 use crate::auth::password::{
-    _auth::kernel::data::VerifyResetTokenEntryError,
+    remote::kernel::data::VerifyResetTokenEntryError,
     reset::remote::reset::data::{DecodeResetTokenError, ResetPasswordError},
 };
 

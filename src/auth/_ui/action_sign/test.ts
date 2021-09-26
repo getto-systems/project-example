@@ -1,7 +1,7 @@
 import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
 import { toApplicationView } from "../../../../ui/vendor/getto-application/action/helper"
 
-import { mockAuthenticatePasswordAction } from "../../password/_ui/action_authenticate/mock"
+import { mockAuthenticatePasswordAction } from "../../password/action_authenticate/mock"
 import { mockRequestResetTokenAction } from "../../password/reset/action_request_token/mock"
 import { mockResetPasswordAction } from "../../password/reset/action_reset/mock"
 import { mockCheckAuthTicketAction } from "../../auth_ticket/_ui/action_check/mock"

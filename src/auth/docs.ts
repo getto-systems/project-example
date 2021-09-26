@@ -18,7 +18,7 @@ import {
     DocsUsecaseDescription,
 } from "../../ui/vendor/getto-application/docs/data"
 import { docs_authTicket } from "./auth_ticket/docs"
-import { docs_authenticatePassword } from "./password/_ui/action_authenticate/docs"
+import { docs_authenticatePassword } from "./password/action_authenticate/docs"
 import { docs_loginID } from "./login_id/docs"
 import { docs_password } from "./password/docs"
 import { docs_authUser } from "./auth_user/docs"

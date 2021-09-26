@@ -20,7 +20,7 @@ import { ApplicationErrorComponent } from "../../../../../src/avail/_ui/x_preact
 import { LoadSeasonEntry } from "../../../../../src/example/_ui/common/action_load_season/x_preact/load_season"
 import { LoadMenuEntry } from "../../../../../src/example/outline/_ui/action_load_menu/x_preact/load_menu"
 import { LoadBreadcrumbListComponent } from "../../../../../src/example/outline/_ui/action_load_breadcrumb_list/x_preact/load_breadcrumb_list"
-import { ChangePasswordEntry } from "../../../../../src/auth/password/_ui/action_change/x_preact/change_password"
+import { ChangePasswordEntry } from "../../../../../src/auth/password/action_change/x_preact/change_password"
 
 import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
 import { ProfilePageResource } from "./resource"

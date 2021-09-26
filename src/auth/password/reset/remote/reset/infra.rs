@@ -2,7 +2,7 @@ use crate::auth::{
     auth_ticket::_auth::kernel::infra::{AuthClock, CheckAuthNonceInfra},
     auth_user::_auth::kernel::infra::AuthUserRepository,
     password::{
-        _auth::kernel::infra::{AuthUserPasswordHasher, ResetPasswordRepository, PlainPassword},
+        remote::kernel::infra::{AuthUserPasswordHasher, ResetPasswordRepository, PlainPassword},
         reset::remote::proxy_reset::infra::ResetPasswordFieldsExtract,
     },
 };
@@ -10,7 +10,7 @@ use crate::auth::{
 use crate::auth::password::reset::remote::reset::event::ResetPasswordEvent;
 
 use crate::auth::password::{
-    _auth::kernel::data::{ResetPasswordRepositoryError, ResetToken},
+    remote::kernel::data::{ResetPasswordRepositoryError, ResetToken},
     reset::remote::{kernel::data::ResetTokenEncoded, reset::data::DecodeResetTokenError},
 };
 

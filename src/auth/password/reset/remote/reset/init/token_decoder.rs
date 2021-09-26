@@ -7,7 +7,7 @@ use crate::auth::password::reset::remote::{
 };
 
 use crate::auth::password::{
-    _auth::kernel::data::ResetToken,
+    remote::kernel::data::ResetToken,
     reset::remote::{kernel::data::ResetTokenEncoded, reset::data::DecodeResetTokenError},
 };
 
@@ -51,7 +51,7 @@ pub mod test {
     use crate::auth::password::reset::remote::reset::infra::ResetTokenDecoder;
 
     use crate::auth::password::{
-        _auth::kernel::data::ResetToken,
+        remote::kernel::data::ResetToken,
         reset::remote::{kernel::data::ResetTokenEncoded, reset::data::DecodeResetTokenError},
     };
 

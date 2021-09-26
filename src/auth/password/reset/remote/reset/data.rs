@@ -1,7 +1,7 @@
 use crate::auth::{
     login_id::_auth::data::ValidateLoginIdError,
     password::{
-        _auth::kernel::data::{ValidatePasswordError, VerifyResetTokenEntryError},
+        remote::kernel::data::{ValidatePasswordError, VerifyResetTokenEntryError},
         reset::remote::kernel::data::ValidateResetTokenError,
     },
 };

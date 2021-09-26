@@ -6,7 +6,7 @@ import { ResetPasswordEvent } from "./event"
 
 import { ConvertBoardResult } from "../../../../../ui/vendor/getto-application/board/kernel/data"
 import { ConvertLocationResult } from "../../../../z_details/_ui/location/data"
-import { ResetToken } from "../../_ui/data"
+import { ResetToken } from "../../input/data"
 import { ResetPasswordFields } from "./data"
 
 export interface ResetPasswordDetecter {

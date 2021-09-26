@@ -2,7 +2,7 @@ use actix_web::{web, Scope};
 
 use crate::auth::{
     auth_ticket::_api::x_actix_web::route::scope_auth_ticket,
-    password::_api::x_actix_web::route::scope_password,
+    password::remote::x_actix_web::route::scope_password,
 };
 
 pub fn scope_auth() -> Scope {

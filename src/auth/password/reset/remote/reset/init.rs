@@ -5,7 +5,7 @@ use crate::auth::{
     _auth::x_outside_feature::feature::AuthOutsideFeature,
     auth_ticket::_auth::kernel::init::{clock::ChronoAuthClock, CheckAuthNonceStruct},
     auth_user::_auth::kernel::init::user_repository::MysqlAuthUserRepository,
-    password::_auth::kernel::init::{
+    password::remote::kernel::init::{
         password_hasher::Argon2PasswordHasher, password_repository::MysqlAuthUserPasswordRepository,
     },
 };
@@ -67,7 +67,7 @@ pub mod test {
             clock::test::StaticChronoAuthClock, test::StaticCheckAuthNonceStruct,
         },
         auth_user::_auth::kernel::init::user_repository::test::MemoryAuthUserRepository,
-        password::_auth::kernel::init::{
+        password::remote::kernel::init::{
             password_hasher::test::PlainPasswordHasher,
             password_repository::test::MemoryAuthUserPasswordRepository,
         },

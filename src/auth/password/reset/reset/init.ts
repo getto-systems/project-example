@@ -12,7 +12,7 @@ import { LocationOutsideFeature } from "../../../../z_details/_ui/location/featu
 
 import { ResetPasswordInfra } from "./infra"
 
-import { detectResetToken } from "../../_ui/convert"
+import { detectResetToken } from "../../input/convert"
 
 export function newResetPasswordLocationDetecter(
     feature: LocationOutsideFeature,
