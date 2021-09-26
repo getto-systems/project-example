@@ -1,4 +1,4 @@
-import { AuthTicket } from "../../../auth_ticket/_ui/kernel/data"
+import { AuthTicket } from "../../../auth_ticket/kernel/data"
 import { ResetPasswordError } from "./data"
 
 export type ResetPasswordEvent =

@@ -13,9 +13,9 @@ import {
 import {
     saveAuthTicket,
     startContinuousRenew,
-} from "../../../auth_ticket/_ui/start_continuous_renew/method"
+} from "../../../auth_ticket/start_continuous_renew/method"
 
-import { StartContinuousRenewInfra } from "../../../auth_ticket/_ui/start_continuous_renew/infra"
+import { StartContinuousRenewInfra } from "../../../auth_ticket/start_continuous_renew/infra"
 import { GetScriptPathInfra } from "../../../_ui/common/secure/get_script_path/infra"
 import { ResetPasswordInfra } from "../reset/infra"
 
@@ -32,7 +32,7 @@ import { ResetPasswordDetecter } from "../reset/method"
 
 import { LoadScriptError } from "../../../_ui/common/secure/get_script_path/data"
 import { ResetPasswordFields } from "../reset/data"
-import { AuthTicket } from "../../../auth_ticket/_ui/kernel/data"
+import { AuthTicket } from "../../../auth_ticket/kernel/data"
 import { ConvertBoardResult } from "../../../../../ui/vendor/getto-application/board/kernel/data"
 import { InputLoginIDAction } from "../../../login_id/input/action_input/action"
 import { ValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/action"

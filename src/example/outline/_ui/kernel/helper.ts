@@ -11,7 +11,7 @@ import {
 } from "./infra"
 
 import { ConvertLocationResult } from "../../../../z_details/_ui/location/data"
-import { GrantedRoles } from "../../../../auth/auth_ticket/_ui/kernel/data"
+import { GrantedRoles } from "../../../../auth/auth_ticket/kernel/data"
 import { Menu, MenuCategoryPath, MenuNode, MenuTargetPath } from "./data"
 
 export type BuildMenuParams = Readonly<{

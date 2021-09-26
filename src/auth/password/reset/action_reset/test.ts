@@ -8,7 +8,7 @@ import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_details/_
 import {
     mockAuthnRepository,
     mockAuthzRepository,
-} from "../../../auth_ticket/_ui/kernel/init/repository/mock"
+} from "../../../auth_ticket/kernel/init/repository/mock"
 import {
     mockGetScriptPathDetecter,
     mockSecureServerURL,
@@ -23,7 +23,7 @@ import {
     AuthnRepository,
     AuthzRepository,
     RenewAuthTicketRemote,
-} from "../../../auth_ticket/_ui/kernel/infra"
+} from "../../../auth_ticket/kernel/infra"
 import { BoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
 
 import { ResetPasswordView } from "./resource"
@@ -31,7 +31,7 @@ import { ResetPasswordView } from "./resource"
 import {
     authzRepositoryConverter,
     convertAuthRemote,
-} from "../../../auth_ticket/_ui/kernel/convert"
+} from "../../../auth_ticket/kernel/convert"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")

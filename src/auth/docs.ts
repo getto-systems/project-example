@@ -1,5 +1,5 @@
 import { docs_auth_sign, docs_auth_sign_action, docs_auth_sign_data } from "./_ui/action_sign/docs"
-import { docs_checkAuthTicket } from "./auth_ticket/_ui/action_check/docs"
+import { docs_checkAuthTicket } from "./auth_ticket/action_check/docs"
 
 import {
     docsUsecase,
@@ -22,7 +22,7 @@ import { docs_authenticatePassword } from "./password/action_authenticate/docs"
 import { docs_loginID } from "./login_id/docs"
 import { docs_password } from "./password/docs"
 import { docs_authUser } from "./auth_user/docs"
-import { docs_logout } from "./auth_ticket/_ui/action_logout/docs"
+import { docs_logout } from "./auth_ticket/action_logout/docs"
 import { docs_requestResetToken } from "./password/reset/action_request_token/docs"
 import { docs_reset } from "./password/reset/docs"
 import { docs_resetPassword } from "./password/reset/action_reset/docs"

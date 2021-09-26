@@ -11,11 +11,11 @@ import {
 import {
     docs_auth_checkAuthTicket,
     docs_auth_checkAuthTicket_description,
-} from "../../auth_ticket/_ui/action_check/docs"
+} from "../../auth_ticket/action_check/docs"
 import {
     docs_auth_logout,
     docs_auth_logout_description,
-} from "../../auth_ticket/_ui/action_logout/docs"
+} from "../../auth_ticket/action_logout/docs"
 import {
     docs_auth_authenticatePassword,
     docs_auth_authenticatePassword_description,

@@ -1,7 +1,7 @@
 import { DelayTime } from "../../../z_details/_ui/config/infra"
 import { RemoteResult } from "../../../z_details/_ui/remote/infra"
 
-import { AuthTicket } from "../../auth_ticket/_ui/kernel/data"
+import { AuthTicket } from "../../auth_ticket/kernel/data"
 import { AuthenticatePasswordFields, AuthenticatePasswordRemoteError } from "./data"
 
 export type AuthenticatePasswordInfra = Readonly<{
