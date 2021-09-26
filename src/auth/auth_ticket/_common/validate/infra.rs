@@ -4,7 +4,7 @@ use crate::auth::auth_ticket::_common::kernel::infra::{
 
 use crate::auth::{
     _common::service::data::AuthServiceError,
-    auth_user::_common::kernel::data::{AuthUserId, RequireAuthRoles},
+    auth_user::remote::kernel::data::{AuthUserId, RequireAuthRoles},
 };
 
 pub trait ValidateApiTokenInfra {

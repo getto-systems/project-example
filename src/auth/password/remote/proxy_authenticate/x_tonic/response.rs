@@ -4,7 +4,7 @@ use crate::auth::password::remote::proxy_authenticate::infra::AuthenticatePasswo
 
 use crate::auth::{
     auth_ticket::_common::{encode::data::AuthTicketEncoded, kernel::data::AuthTokenEncoded},
-    auth_user::_common::kernel::data::AuthUserExtract,
+    auth_user::remote::kernel::data::AuthUserExtract,
 };
 
 impl Into<Option<AuthenticatePasswordProxyResponse>> for AuthenticatePasswordResponsePb {

@@ -10,7 +10,7 @@ use crate::z_details::_common::response::tonic::RespondTo;
 
 use crate::auth::{
     auth_ticket::_common::{encode::data::AuthTicketEncoded, kernel::data::AuthTokenEncoded},
-    auth_user::_common::kernel::data::AuthUserExtract,
+    auth_user::remote::kernel::data::AuthUserExtract,
 };
 
 impl RespondTo<RenewAuthTicketResponsePb> for AuthTicketEncoded {

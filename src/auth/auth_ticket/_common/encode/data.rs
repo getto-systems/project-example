@@ -1,6 +1,6 @@
 use crate::auth::{
     auth_ticket::_common::kernel::data::AuthTokenEncoded,
-    auth_user::_common::kernel::data::AuthUserExtract,
+    auth_user::remote::kernel::data::AuthUserExtract,
 };
 
 pub struct AuthTicketEncoded {

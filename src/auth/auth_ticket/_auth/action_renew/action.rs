@@ -9,7 +9,7 @@ use crate::auth::auth_ticket::_auth::{
     },
 };
 
-use crate::auth::auth_user::_common::kernel::data::RequireAuthRoles;
+use crate::auth::auth_user::remote::kernel::data::RequireAuthRoles;
 
 pub enum RenewAuthTicketState {
     Validate(ValidateAuthTokenEvent),

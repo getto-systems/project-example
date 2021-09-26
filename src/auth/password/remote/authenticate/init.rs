@@ -6,7 +6,7 @@ use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::{
     auth_ticket::_auth::kernel::init::CheckAuthNonceStruct,
-    auth_user::_auth::kernel::init::user_repository::MysqlAuthUserRepository,
+    auth_user::remote::kernel::init::user_repository::MysqlAuthUserRepository,
     password::remote::kernel::init::{
         password_matcher::Argon2PasswordMatcher,
         password_repository::MysqlAuthUserPasswordRepository,
@@ -52,7 +52,7 @@ impl<'a> AuthenticatePasswordInfra for AuthenticatePasswordStruct<'a> {
 pub mod test {
     use crate::auth::{
         auth_ticket::_auth::kernel::init::test::StaticCheckAuthNonceStruct,
-        auth_user::_auth::kernel::init::user_repository::test::MemoryAuthUserRepository,
+        auth_user::remote::kernel::init::user_repository::test::MemoryAuthUserRepository,
         password::remote::kernel::init::{
             password_matcher::test::PlainPasswordMatcher,
             password_repository::test::MemoryAuthUserPasswordRepository,

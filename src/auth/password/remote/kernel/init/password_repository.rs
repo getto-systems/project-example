@@ -12,7 +12,7 @@ use crate::auth::password::remote::kernel::infra::{
 use crate::{
     auth::{
         auth_ticket::_auth::kernel::data::{AuthDateTime, ExpireDateTime},
-        auth_user::_common::kernel::data::AuthUserId,
+        auth_user::remote::kernel::data::AuthUserId,
         login_id::remote::data::LoginId,
         password::remote::kernel::data::{
             ChangePasswordRepositoryError, RegisterResetTokenRepositoryError,
@@ -312,7 +312,7 @@ pub mod test {
     use crate::{
         auth::{
             auth_ticket::_auth::kernel::data::{AuthDateTime, ExpireDateTime},
-            auth_user::_common::kernel::data::{AuthUser, AuthUserId},
+            auth_user::remote::kernel::data::{AuthUser, AuthUserId},
             login_id::remote::data::LoginId,
             password::remote::kernel::data::{
                 ChangePasswordRepositoryError, RegisterResetTokenRepositoryError,

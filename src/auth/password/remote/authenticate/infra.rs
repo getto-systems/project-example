@@ -1,6 +1,6 @@
 use crate::auth::{
     auth_ticket::_auth::kernel::infra::CheckAuthNonceInfra,
-    auth_user::_auth::kernel::infra::AuthUserRepository,
+    auth_user::remote::kernel::infra::AuthUserRepository,
     password::remote::{
         kernel::infra::{AuthUserPasswordMatcher, PlainPassword, VerifyPasswordRepository},
         proxy_authenticate::infra::AuthenticatePasswordFieldsExtract,

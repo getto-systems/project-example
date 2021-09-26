@@ -9,7 +9,7 @@ use crate::auth::auth_ticket::_auth::validate::method::validate_auth_token;
 
 use super::event::DiscardAuthTicketEvent;
 
-use crate::auth::auth_user::_common::kernel::data::RequireAuthRoles;
+use crate::auth::auth_user::remote::kernel::data::RequireAuthRoles;
 
 pub async fn discard_auth_ticket<S>(
     infra: &impl DiscardAuthTicketInfra,

@@ -33,7 +33,7 @@ use crate::auth::{
         _auth::kernel::data::{AuthDateTime, ExpireDuration},
         _common::kernel::data::AuthTicketExtract,
     },
-    auth_user::_common::kernel::data::RequireAuthRoles,
+    auth_user::remote::kernel::data::RequireAuthRoles,
 };
 
 #[tokio::test]

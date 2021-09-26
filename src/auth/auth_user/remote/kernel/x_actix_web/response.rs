@@ -1,9 +1,8 @@
 use std::iter::FromIterator;
 
-use crate::auth::{
-    auth_ticket::_api::y_protobuf::api::AuthenticateResponsePb,
-    auth_user::_common::kernel::data::AuthUserExtract,
-};
+use crate::auth::auth_ticket::_api::y_protobuf::api::AuthenticateResponsePb;
+
+use crate::auth::auth_user::remote::kernel::data::AuthUserExtract;
 
 impl Into<AuthenticateResponsePb> for AuthUserExtract {
     fn into(self) -> AuthenticateResponsePb {

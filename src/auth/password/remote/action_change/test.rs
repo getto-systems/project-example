@@ -47,7 +47,7 @@ use crate::auth::{
         _auth::kernel::data::{AuthDateTime, ExpireDuration},
         _common::kernel::data::AuthTicketExtract,
     },
-    auth_user::_common::kernel::data::{AuthUser, AuthUserExtract},
+    auth_user::remote::kernel::data::{AuthUser, AuthUserExtract},
     login_id::remote::data::LoginId,
 };
 

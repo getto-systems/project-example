@@ -3,7 +3,7 @@ use crate::auth::auth_ticket::{
     _auth::kernel::infra::CheckAuthNonceInfra, _common::kernel::infra::AuthTokenMetadata,
 };
 
-use crate::auth::auth_user::_common::kernel::data::RequireAuthRoles;
+use crate::auth::auth_user::remote::kernel::data::RequireAuthRoles;
 
 pub trait ValidateAuthTokenInfra {
     type CheckNonceInfra: CheckAuthNonceInfra;

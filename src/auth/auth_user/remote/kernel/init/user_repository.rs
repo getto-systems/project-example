@@ -4,10 +4,10 @@ use sqlx::{query, MySqlPool};
 
 use crate::z_details::_common::repository::mysql::helper::mysql_error;
 
-use crate::auth::auth_user::_auth::kernel::infra::AuthUserRepository;
+use crate::auth::auth_user::remote::kernel::infra::AuthUserRepository;
 
 use crate::{
-    auth::auth_user::_common::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
+    auth::auth_user::remote::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
     z_details::_common::repository::data::RepositoryError,
 };
 
@@ -78,10 +78,10 @@ pub mod test {
         sync::Mutex,
     };
 
-    use crate::auth::auth_user::_auth::kernel::infra::AuthUserRepository;
+    use crate::auth::auth_user::remote::kernel::infra::AuthUserRepository;
 
     use crate::{
-        auth::auth_user::_common::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
+        auth::auth_user::remote::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
         z_details::_common::repository::data::RepositoryError,
     };
 

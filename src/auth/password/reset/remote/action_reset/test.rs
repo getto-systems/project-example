@@ -27,7 +27,7 @@ use crate::auth::{
         },
         _common::kernel::init::nonce_metadata::test::StaticAuthNonceMetadata,
     },
-    auth_user::_auth::kernel::init::user_repository::test::{
+    auth_user::remote::kernel::init::user_repository::test::{
         MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
     },
     password::{
@@ -56,7 +56,7 @@ use crate::auth::{
     auth_ticket::_auth::kernel::data::{
         AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
     },
-    auth_user::_common::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
+    auth_user::remote::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
     login_id::remote::data::LoginId,
     password::remote::kernel::data::ResetToken,
 };

@@ -1,3 +1,2 @@
-pub mod _api;
-pub mod _auth;
+pub mod remote;
 pub mod _common;

@@ -2,14 +2,16 @@ use std::{collections::HashSet, iter::FromIterator};
 
 use tonic::{Response, Status};
 
-use crate::auth::auth_ticket::_common::y_protobuf::service::ValidateApiTokenRequestPb;
+use crate::z_details::_common::response::tonic::RespondTo;
+
 use crate::auth::{
-    auth_ticket::_common::y_protobuf::service::ValidateApiTokenResponsePb,
+    auth_ticket::_common::y_protobuf::service::{
+        ValidateApiTokenRequestPb, ValidateApiTokenResponsePb,
+    },
     auth_user::_common::y_protobuf::service::AuthUserPb,
 };
 
-use crate::auth::auth_user::_common::kernel::data::{AuthUser, AuthUserExtract, RequireAuthRoles};
-use crate::z_details::_common::response::tonic::RespondTo;
+use crate::auth::auth_user::remote::kernel::data::{AuthUser, AuthUserExtract, RequireAuthRoles};
 
 impl RespondTo<ValidateApiTokenResponsePb> for AuthUser {
     fn respond_to(self) -> Result<Response<ValidateApiTokenResponsePb>, Status> {

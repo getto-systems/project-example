@@ -5,7 +5,7 @@ use crate::auth::auth_ticket::_common::{
 
 use crate::auth::{
     _common::data::ValidateApiTokenError,
-    auth_user::_common::kernel::data::{AuthUserId, RequireAuthRoles},
+    auth_user::remote::kernel::data::{AuthUserId, RequireAuthRoles},
 };
 
 pub async fn validate_api_token(

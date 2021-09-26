@@ -3,11 +3,8 @@ use chrono::{DateTime, Duration, Utc};
 use crate::{
     auth::{
         auth_ticket::_common::kernel::data::AuthTicketExtract,
-        auth_user::{
-            _auth::kernel::data::AuthPermission,
-            _common::kernel::data::{
-                AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
-            },
+        auth_user::remote::kernel::data::{
+            AuthPermission, AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
         },
     },
     z_details::_common::{repository::data::RepositoryError, request::data::MetadataError},
