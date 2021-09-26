@@ -1,5 +1,5 @@
 import { RemoteCommonError } from "../../../../z_details/_ui/remote/data"
-import { LoginID } from "../../../login_id/_ui/data"
+import { LoginID } from "../../../login_id/input/data"
 import { Password } from "../../input/data"
 
 export type ResetPasswordFields = Readonly<{

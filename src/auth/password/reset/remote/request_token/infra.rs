@@ -9,7 +9,7 @@ use crate::auth::{
 use crate::{
     auth::{
         auth_ticket::_auth::kernel::data::{ExpireDateTime, ExpireDuration},
-        login_id::_auth::data::LoginId,
+        login_id::remote::data::LoginId,
         password::{
             remote::kernel::data::ResetToken,
             reset::remote::{

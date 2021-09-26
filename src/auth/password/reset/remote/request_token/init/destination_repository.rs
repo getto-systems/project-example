@@ -5,7 +5,7 @@ use crate::z_details::_common::repository::mysql::helper::mysql_error;
 use crate::auth::password::reset::remote::request_token::infra::ResetTokenDestinationRepository;
 
 use crate::auth::{
-    login_id::_auth::data::LoginId,
+    login_id::remote::data::LoginId,
     password::reset::remote::request_token::data::{
         ResetTokenDestination, ResetTokenDestinationExtract,
     },
@@ -56,7 +56,7 @@ pub mod test {
 
     use crate::{
         auth::{
-            login_id::_auth::data::LoginId,
+            login_id::remote::data::LoginId,
             password::reset::remote::request_token::data::ResetTokenDestination,
         },
         z_details::_common::repository::data::RepositoryError,

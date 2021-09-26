@@ -1,4 +1,4 @@
-use crate::auth::login_id::_auth::data::ValidateLoginIdError;
+use crate::auth::login_id::remote::data::ValidateLoginIdError;
 
 pub enum RequestResetTokenError {
     InvalidLoginId(ValidateLoginIdError),

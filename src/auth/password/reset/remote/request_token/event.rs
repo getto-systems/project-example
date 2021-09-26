@@ -1,7 +1,7 @@
 use crate::{
     auth::{
         auth_ticket::_auth::kernel::data::{ExpireDateTime, ValidateAuthNonceError},
-        login_id::_auth::data::ValidateLoginIdError,
+        login_id::remote::data::ValidateLoginIdError,
         password::{
             remote::kernel::data::RegisterResetTokenRepositoryError,
             reset::remote::request_token::data::{

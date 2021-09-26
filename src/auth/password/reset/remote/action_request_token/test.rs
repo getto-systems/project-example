@@ -45,7 +45,7 @@ use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 use crate::auth::{
     auth_ticket::_auth::kernel::data::{AuthDateTime, ExpireDuration},
     auth_user::_common::kernel::data::AuthUserId,
-    login_id::_auth::data::LoginId,
+    login_id::remote::data::LoginId,
     password::{
         remote::kernel::data::ResetToken,
         reset::remote::request_token::data::{ResetTokenDestination, ResetTokenDestinationExtract},

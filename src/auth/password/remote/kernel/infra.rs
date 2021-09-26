@@ -4,7 +4,7 @@ use crate::{
     auth::{
         auth_ticket::_auth::kernel::data::{AuthDateTime, ExpireDateTime},
         auth_user::_common::kernel::data::AuthUserId,
-        login_id::_auth::data::LoginId,
+        login_id::remote::data::LoginId,
         password::remote::kernel::data::{
             ChangePasswordRepositoryError, PasswordHashError, ResetPasswordRepositoryError,
             RegisterResetTokenRepositoryError, ResetToken, ValidatePasswordError, VerifyPasswordRepositoryError,

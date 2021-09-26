@@ -25,7 +25,7 @@ import { appendScript } from "../../../../_ui/common/x_preact/script"
 import { signNav } from "../../../../_ui/common/nav/x_preact/nav"
 
 import { ApplicationErrorComponent } from "../../../../../avail/_ui/x_preact/application_error"
-import { InputLoginIDEntry } from "../../../../login_id/_ui/action_input/x_preact/input"
+import { InputLoginIDEntry } from "../../../../login_id/input/action_input/x_preact/input"
 import { InputPasswordEntry } from "../../../action_input/x_preact/input"
 
 import { ResetPasswordView, ResetPasswordResource, ResetPasswordResourceState } from "../resource"

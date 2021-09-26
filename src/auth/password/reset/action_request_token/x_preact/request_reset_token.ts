@@ -23,7 +23,7 @@ import { siteInfo } from "../../../../../example/site"
 import { spinner } from "../../../../../example/_ui/x_preact/design/icon"
 import { signNav } from "../../../../_ui/common/nav/x_preact/nav"
 
-import { InputLoginIDEntry } from "../../../../login_id/_ui/action_input/x_preact/input"
+import { InputLoginIDEntry } from "../../../../login_id/input/action_input/x_preact/input"
 
 import {
     RequestResetTokenView,

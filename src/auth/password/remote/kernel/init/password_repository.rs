@@ -13,7 +13,7 @@ use crate::{
     auth::{
         auth_ticket::_auth::kernel::data::{AuthDateTime, ExpireDateTime},
         auth_user::_common::kernel::data::AuthUserId,
-        login_id::_auth::data::LoginId,
+        login_id::remote::data::LoginId,
         password::remote::kernel::data::{
             ChangePasswordRepositoryError, RegisterResetTokenRepositoryError,
             ResetPasswordRepositoryError, ResetToken, VerifyPasswordRepositoryError,
@@ -313,7 +313,7 @@ pub mod test {
         auth::{
             auth_ticket::_auth::kernel::data::{AuthDateTime, ExpireDateTime},
             auth_user::_common::kernel::data::{AuthUser, AuthUserId},
-            login_id::_auth::data::LoginId,
+            login_id::remote::data::LoginId,
             password::remote::kernel::data::{
                 ChangePasswordRepositoryError, RegisterResetTokenRepositoryError,
                 ResetPasswordRepositoryError, ResetToken, VerifyPasswordRepositoryError,

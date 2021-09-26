@@ -48,7 +48,7 @@ use crate::auth::{
         _common::kernel::data::AuthTicketExtract,
     },
     auth_user::_common::kernel::data::{AuthUser, AuthUserExtract},
-    login_id::_auth::data::LoginId,
+    login_id::remote::data::LoginId,
 };
 
 #[tokio::test]

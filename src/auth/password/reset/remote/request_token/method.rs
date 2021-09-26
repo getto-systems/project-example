@@ -20,7 +20,7 @@ use crate::auth::{
 
 use super::event::RequestResetTokenEvent;
 
-use crate::auth::login_id::_auth::data::LoginId;
+use crate::auth::login_id::remote::data::LoginId;
 
 pub async fn request_reset_token<S>(
     infra: &impl RequestResetTokenInfra,
