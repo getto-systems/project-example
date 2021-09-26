@@ -2,8 +2,8 @@ import { ApplicationStateAction } from "../../../../ui/vendor/getto-application/
 
 import { CheckAuthTicketView } from "../../auth_ticket/_ui/action_check/resource"
 import { AuthenticatePasswordView } from "../../password/_ui/action_authenticate/resource"
-import { RequestResetTokenView } from "../../password/reset/_ui/action_request_token/resource"
-import { ResetPasswordView } from "../../password/reset/_ui/action_reset/resource"
+import { RequestResetTokenView } from "../../password/reset/action_request_token/resource"
+import { ResetPasswordView } from "../../password/reset/action_reset/resource"
 import { SignLinkResource } from "../common/nav/action_nav/resource"
 
 export interface SignAction extends ApplicationStateAction<SignActionState> {

@@ -9,7 +9,7 @@ use crate::x_outside_feature::_api::{
     logger::{app_logger, generate_request_id},
 };
 
-use crate::auth::password::reset::_api::x_actix_web::route::scope_reset;
+use crate::auth::password::reset::remote::x_actix_web::route::scope_reset;
 
 use crate::auth::_api::proxy::call_proxy;
 

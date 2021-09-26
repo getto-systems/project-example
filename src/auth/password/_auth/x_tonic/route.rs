@@ -22,7 +22,7 @@ use crate::x_outside_feature::_auth::{
     logger::app_logger,
 };
 
-use crate::auth::password::reset::_auth::x_tonic::route::ResetServer;
+use crate::auth::password::reset::remote::x_tonic::route::ResetServer;
 
 use crate::auth::password::_auth::action_authenticate::init::AuthenticatePasswordFeature;
 

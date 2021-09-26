@@ -1,8 +1,8 @@
 import { toApplicationView } from "../../../../../ui/vendor/getto-application/action/helper"
 
 import { newCheckAuthTicketView } from "../../../auth_ticket/_ui/action_check/init/resource"
-import { newRequestResetTokenView } from "../../../password/reset/_ui/action_request_token/init/resource"
-import { newResetPasswordView } from "../../../password/reset/_ui/action_reset/init/resource"
+import { newRequestResetTokenView } from "../../../password/reset/action_request_token/init/resource"
+import { newResetPasswordView } from "../../../password/reset/action_reset/init/resource"
 import { newAuthenticatePasswordView } from "../../../password/_ui/action_authenticate/init/resource"
 import { newSignViewLocationDetecter } from "../../common/switch_view/init"
 

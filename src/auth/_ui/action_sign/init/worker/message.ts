@@ -1,7 +1,7 @@
 import {
     RequestPasswordResetTokenProxyMessage,
     RequestPasswordResetTokenProxyResponse,
-} from "../../../../password/reset/_ui/action_request_token/init/worker/message"
+} from "../../../../password/reset/action_request_token/init/worker/message"
 
 export type ForegroundMessage = Readonly<{
     type: "password-reset-requestToken"

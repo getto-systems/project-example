@@ -3,11 +3,11 @@ import { toApplicationView } from "../../../../../../ui/vendor/getto-application
 import { newSignViewLocationDetecter } from "../../../common/switch_view/init"
 import { newCheckAuthTicketView } from "../../../../auth_ticket/_ui/action_check/init/resource"
 import { newAuthenticatePasswordView } from "../../../../password/_ui/action_authenticate/init/resource"
-import { newResetPasswordView } from "../../../../password/reset/_ui/action_reset/init/resource"
+import { newResetPasswordView } from "../../../../password/reset/action_reset/init/resource"
 import {
     newRequestPasswordResetTokenProxy,
     RequestPasswordResetTokenProxy,
-} from "../../../../password/reset/_ui/action_request_token/init/worker/foreground"
+} from "../../../../password/reset/action_request_token/init/worker/foreground"
 
 import { initSignAction } from "../../init"
 import { initSignLinkResource } from "../../../common/nav/action_nav/init"
@@ -20,7 +20,7 @@ import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-applicat
 import { LocationOutsideFeature } from "../../../../../z_details/_ui/location/feature"
 
 import { SignView } from "../../resource"
-import { initRequestResetTokenView } from "../../../../password/reset/_ui/action_request_token/init/resource"
+import { initRequestResetTokenView } from "../../../../password/reset/action_request_token/init/resource"
 
 type OutsideFeature = RemoteOutsideFeature &
     RepositoryOutsideFeature &
