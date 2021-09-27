@@ -21,8 +21,8 @@ export function newAuthenticatePasswordRemote(
     clock: Clock,
 ): AuthenticatePasswordRemote {
     return async (fields) => {
-        const AuthenticatePasswordPb = pb.auth.password.api.AuthenticatePasswordPb
-        const AuthenticatePasswordResultPb = pb.auth.password.api.AuthenticatePasswordResultPb
+        const AuthenticatePasswordPb = pb.auth.user.password.api.AuthenticatePasswordPb
+        const AuthenticatePasswordResultPb = pb.auth.user.password.api.AuthenticatePasswordResultPb
 
         try {
             const mock = false

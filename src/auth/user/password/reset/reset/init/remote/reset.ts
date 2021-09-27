@@ -21,9 +21,9 @@ export function newResetPasswordRemote(
     clock: Clock,
 ): ResetPasswordRemote {
     return async (resetToken, fields) => {
-        const ResetPasswordPb = pb.auth.password.reset.api.ResetPasswordPb
-        const ResetPasswordResultPb = pb.auth.password.reset.api.ResetPasswordResultPb
-        const ResetPasswordErrorKind = pb.auth.password.reset.api.ResetPasswordErrorKindPb
+        const ResetPasswordPb = pb.auth.user.password.reset.api.ResetPasswordPb
+        const ResetPasswordResultPb = pb.auth.user.password.reset.api.ResetPasswordResultPb
+        const ResetPasswordErrorKind = pb.auth.user.password.reset.api.ResetPasswordErrorKindPb
 
         try {
             const mock = false

@@ -15,8 +15,8 @@ import { RequestResetTokenRemote } from "../../infra"
 
 export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): RequestResetTokenRemote {
     return async (fields) => {
-        const RequestResetTokenPb = pb.auth.password.reset.api.RequestResetTokenPb
-        const RequestResetTokenResultPb = pb.auth.password.reset.api.RequestResetTokenResultPb
+        const RequestResetTokenPb = pb.auth.user.password.reset.api.RequestResetTokenPb
+        const RequestResetTokenResultPb = pb.auth.user.password.reset.api.RequestResetTokenResultPb
 
         try {
             const mock = false

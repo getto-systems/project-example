@@ -21,7 +21,7 @@ export function newLogoutRemote(feature: RemoteOutsideFeature): LogoutRemote {
 
             const opts = fetchOptions({
                 serverURL: env.apiServerURL,
-                path: "/auth/auth-ticket",
+                path: "/auth/ticket",
                 method: "DELETE",
                 headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
             })

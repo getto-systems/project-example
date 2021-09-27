@@ -15,8 +15,8 @@ use crate::auth::ticket::remote::{
     proxy_logout::init::LogoutProxyStruct, proxy_renew::init::RenewAuthTicketProxyStruct,
 };
 
-pub fn scope_auth_ticket() -> Scope {
-    web::scope("/auth-ticket").service(renew).service(logout)
+pub fn scope_ticket() -> Scope {
+    web::scope("/ticket").service(renew).service(logout)
 }
 
 #[patch("")]

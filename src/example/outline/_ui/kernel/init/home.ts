@@ -15,7 +15,7 @@ export function homeMenuContent(): MenuContent {
             ]),
             category("SYSTEM", allow, [
                 item("プロフィール", lnir("user"), "auth/profile.html"),
-                item("ログアウト", lnir("user"), "auth/auth-ticket/logout.html"),
+                item("ログアウト", lnir("user"), "auth/ticket/logout.html"),
             ]),
         ],
     }

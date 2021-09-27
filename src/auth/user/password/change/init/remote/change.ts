@@ -15,8 +15,8 @@ import { ChangePasswordRemote } from "../../infra"
 
 export function newChangePasswordRemote(feature: RemoteOutsideFeature): ChangePasswordRemote {
     return async (fields) => {
-        const ChangePasswordPb = pb.auth.password.api.ChangePasswordPb
-        const ChangePasswordResultPb = pb.auth.password.api.ChangePasswordResultPb
+        const ChangePasswordPb = pb.auth.user.password.api.ChangePasswordPb
+        const ChangePasswordResultPb = pb.auth.user.password.api.ChangePasswordResultPb
 
         try {
             const mock = false
