@@ -1,4 +1,4 @@
-pub(in crate::auth) mod request_decoder;
+pub mod request_decoder;
 
 use tonic::metadata::MetadataMap;
 

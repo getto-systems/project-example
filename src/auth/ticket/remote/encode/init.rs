@@ -1,4 +1,4 @@
-pub(in crate::auth) mod token_encoder;
+pub mod token_encoder;
 
 use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideFeature;
 

@@ -1,3 +1,3 @@
-pub(in crate::auth) mod password_hasher;
-pub(in crate::auth) mod password_matcher;
-pub(in crate::auth) mod password_repository;
+pub mod password_hasher;
+pub mod password_matcher;
+pub mod password_repository;

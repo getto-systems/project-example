@@ -1,4 +1,4 @@
-pub(in crate::auth) mod id_generator;
+pub mod id_generator;
 
 use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideFeature;
 

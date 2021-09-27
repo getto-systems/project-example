@@ -1,4 +1,4 @@
-pub(in crate::auth) mod validate_service;
+pub mod validate_service;
 
 use tonic::metadata::MetadataMap;
 

@@ -1,1 +1,1 @@
-pub(in crate::auth) mod user_repository;
+pub mod user_repository;

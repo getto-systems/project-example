@@ -1,4 +1,4 @@
-pub(in crate::example) mod menu_badge_repository;
+pub mod menu_badge_repository;
 
 use menu_badge_repository::UnitedOutlineMenuBadgeRepository;
 use tonic::metadata::MetadataMap;

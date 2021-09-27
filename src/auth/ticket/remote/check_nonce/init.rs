@@ -1,4 +1,4 @@
-pub(in crate::auth) mod nonce_repository;
+pub mod nonce_repository;
 
 use tonic::metadata::MetadataMap;
 

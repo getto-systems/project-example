@@ -1,8 +1,8 @@
-pub(in crate::auth) mod destination_repository;
-pub(in crate::auth) mod request_decoder;
-pub(in crate::auth) mod token_encoder;
-pub(in crate::auth) mod token_generator;
-pub(in crate::auth) mod token_notifier;
+pub mod destination_repository;
+pub mod request_decoder;
+pub mod token_encoder;
+pub mod token_generator;
+pub mod token_notifier;
 
 use tonic::metadata::MetadataMap;
 

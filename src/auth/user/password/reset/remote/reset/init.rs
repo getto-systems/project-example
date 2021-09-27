@@ -1,5 +1,5 @@
-pub(in crate::auth) mod request_decoder;
-pub(in crate::auth) mod token_decoder;
+pub mod request_decoder;
+pub mod token_decoder;
 
 use crate::auth::{
     remote::x_outside_feature::auth::feature::AuthOutsideFeature,
