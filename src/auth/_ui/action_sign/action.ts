@@ -1,6 +1,6 @@
 import { ApplicationStateAction } from "../../../../ui/vendor/getto-application/action/action"
 
-import { CheckAuthTicketView } from "../../auth_ticket/action_check/resource"
+import { CheckAuthTicketView } from "../../ticket/action_check/resource"
 import { AuthenticatePasswordView } from "../../password/action_authenticate/resource"
 import { RequestResetTokenView } from "../../password/reset/action_request_token/resource"
 import { ResetPasswordView } from "../../password/reset/action_reset/resource"

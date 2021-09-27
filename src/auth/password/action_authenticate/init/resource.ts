@@ -1,6 +1,6 @@
 import { toApplicationView } from "../../../../../ui/vendor/getto-application/action/helper"
 
-import { newStartContinuousRenewAuthnInfoInfra } from "../../../auth_ticket/start_continuous_renew/init"
+import { newStartContinuousRenewAuthnInfoInfra } from "../../../ticket/start_continuous_renew/init"
 import {
     newGetScriptPathLocationDetecter,
     newGetSecureScriptPathInfra,

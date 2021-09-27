@@ -1,6 +1,6 @@
 use crate::{
     auth::{
-        auth_ticket::remote::check_nonce::data::ValidateAuthNonceError,
+        ticket::remote::check_nonce::data::ValidateAuthNonceError,
         password::remote::{
             change::data::ChangePasswordError,
             kernel::data::{
@@ -12,7 +12,7 @@ use crate::{
     z_details::_common::repository::data::RepositoryError,
 };
 
-use crate::auth::auth_ticket::remote::validate::event::ValidateAuthTokenEvent;
+use crate::auth::ticket::remote::validate::event::ValidateAuthTokenEvent;
 
 pub enum ChangePasswordEvent {
     Success,

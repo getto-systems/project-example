@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package auth.password.reset.api;
 
-import "auth/auth_ticket/z_protobuf/api.proto";
+import "auth/ticket/z_protobuf/api.proto";
 
 message RequestResetTokenPb {
     string login_id = 1;
@@ -29,7 +29,7 @@ message ResetPasswordPb {
 }
 message ResetPasswordResultPb {
     bool success = 1;
-    auth.auth_ticket.api.AuthenticateResponsePb value = 2;
+    auth.ticket.api.AuthenticateResponsePb value = 2;
     ResetPasswordErrorPb err = 3;
 }
 message ResetPasswordErrorPb {

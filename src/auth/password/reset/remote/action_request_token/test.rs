@@ -3,7 +3,7 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
-    auth_ticket::remote::{
+    ticket::remote::{
         check_nonce::init::{
             nonce_repository::test::{
                 MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
@@ -34,7 +34,7 @@ use crate::auth::{
 };
 
 use crate::auth::{
-    auth_ticket::remote::check_nonce::infra::AuthNonceConfig,
+    ticket::remote::check_nonce::infra::AuthNonceConfig,
     password::reset::remote::{
         proxy_request_token::infra::RequestResetTokenFieldsExtract,
         request_token::infra::RequestResetTokenConfig,
@@ -44,7 +44,7 @@ use crate::auth::{
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 
 use crate::auth::{
-    auth_ticket::remote::kernel::data::{AuthDateTime, ExpireDuration},
+    ticket::remote::kernel::data::{AuthDateTime, ExpireDuration},
     auth_user::remote::kernel::data::AuthUserId,
     login_id::remote::data::LoginId,
     password::{

@@ -1,5 +1,5 @@
 use crate::{
-    auth::auth_ticket::remote::encode::data::AuthTicketEncoded,
+    auth::ticket::remote::encode::data::AuthTicketEncoded,
     z_details::_api::message::data::MessageError,
 };
 

@@ -12,7 +12,7 @@ import {
 import {
     mockAuthnRepository,
     mockAuthzRepository,
-} from "../../auth_ticket/kernel/init/repository/mock"
+} from "../../ticket/kernel/init/repository/mock"
 
 import { initAuthenticatePasswordAction, initAuthenticatePasswordMaterial } from "./init"
 
@@ -22,7 +22,7 @@ import {
     AuthnRepository,
     AuthzRepository,
     RenewAuthTicketRemote,
-} from "../../auth_ticket/kernel/infra"
+} from "../../ticket/kernel/infra"
 import { BoardValueStore } from "../../../../ui/vendor/getto-application/board/input/infra"
 
 import { AuthenticatePasswordView } from "./resource"
@@ -30,7 +30,7 @@ import { AuthenticatePasswordView } from "./resource"
 import {
     authzRepositoryConverter,
     convertAuthRemote,
-} from "../../auth_ticket/kernel/convert"
+} from "../../ticket/kernel/convert"
 
 import { LoadScriptError } from "../../_ui/common/secure/get_script_path/data"
 

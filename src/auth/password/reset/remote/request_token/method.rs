@@ -1,11 +1,11 @@
 use getto_application::data::MethodResult;
 
-use crate::auth::auth_ticket::remote::check_nonce::method::check_auth_nonce;
+use crate::auth::ticket::remote::check_nonce::method::check_auth_nonce;
 
 use crate::auth::password::reset::remote::request_token::event::destination_not_found;
 
 use crate::auth::{
-    auth_ticket::remote::kernel::infra::AuthClock,
+    ticket::remote::kernel::infra::AuthClock,
     password::{
         remote::kernel::infra::RegisterResetTokenRepository,
         reset::remote::{

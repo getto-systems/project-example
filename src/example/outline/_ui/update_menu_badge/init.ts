@@ -1,6 +1,6 @@
 import { env } from "../../../../y_environment/_ui/env"
 
-import { newAuthzRepository } from "../../../../auth/auth_ticket/kernel/init/repository/authz"
+import { newAuthzRepository } from "../../../../auth/ticket/kernel/init/repository/authz"
 import { newGetMenuBadgeRemote } from "../kernel/init/remote/get_menu_badge/fetch"
 import { newGetMenuBadgeNoopRemote } from "../kernel/init/remote/get_menu_badge/noop"
 

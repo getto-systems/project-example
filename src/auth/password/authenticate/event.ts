@@ -1,4 +1,4 @@
-import { AuthTicket } from "../../auth_ticket/kernel/data"
+import { AuthTicket } from "../../ticket/kernel/data"
 import { AuthenticatePasswordError } from "./data"
 
 export type AuthenticatePasswordEvent =

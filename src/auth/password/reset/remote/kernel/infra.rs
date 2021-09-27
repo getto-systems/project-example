@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::auth::{
-    auth_ticket::remote::kernel::data::ExpireDateTime, password::remote::kernel::data::ResetToken,
+    ticket::remote::kernel::data::ExpireDateTime, password::remote::kernel::data::ResetToken,
 };
 
 #[derive(Serialize, Deserialize)]

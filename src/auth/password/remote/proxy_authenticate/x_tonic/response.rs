@@ -3,7 +3,7 @@ use crate::auth::password::_common::y_protobuf::service::AuthenticatePasswordRes
 use crate::auth::password::remote::proxy_authenticate::infra::AuthenticatePasswordProxyResponse;
 
 use crate::auth::{
-    auth_ticket::remote::{encode::data::AuthTicketEncoded, kernel::data::AuthTokenEncoded},
+    ticket::remote::{encode::data::AuthTicketEncoded, kernel::data::AuthTokenEncoded},
     auth_user::remote::kernel::data::AuthUserExtract,
 };
 

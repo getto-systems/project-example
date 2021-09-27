@@ -1,5 +1,5 @@
 use crate::auth::{
-    auth_ticket::remote::{check_nonce::infra::CheckAuthNonceInfra, kernel::infra::AuthClock},
+    ticket::remote::{check_nonce::infra::CheckAuthNonceInfra, kernel::infra::AuthClock},
     password::{
         remote::kernel::infra::RegisterResetTokenRepository,
         reset::remote::proxy_request_token::infra::RequestResetTokenFieldsExtract,
@@ -8,7 +8,7 @@ use crate::auth::{
 
 use crate::{
     auth::{
-        auth_ticket::remote::kernel::data::{ExpireDateTime, ExpireDuration},
+        ticket::remote::kernel::data::{ExpireDateTime, ExpireDuration},
         login_id::remote::data::LoginId,
         password::{
             remote::kernel::data::ResetToken,

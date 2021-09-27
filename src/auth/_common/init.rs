@@ -1,8 +1,8 @@
-pub use crate::auth::auth_ticket::remote::validate_api_token::init::ValidateApiTokenStruct;
+pub use crate::auth::ticket::remote::validate_api_token::init::ValidateApiTokenStruct;
 
 #[cfg(test)]
 pub mod test {
-    pub use crate::auth::auth_ticket::remote::{
+    pub use crate::auth::ticket::remote::{
         kernel::init::{
             auth_metadata::test::StaticAuthMetadata, token_decoder::test::StaticAuthTokenDecoder,
         },

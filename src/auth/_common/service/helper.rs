@@ -11,7 +11,7 @@ use crate::{
 };
 
 use crate::{
-    auth::auth_ticket::remote::kernel::infra::AuthMetadataContent,
+    auth::ticket::remote::kernel::infra::AuthMetadataContent,
     z_details::_common::service::infra::ServiceAuthorizer,
 };
 

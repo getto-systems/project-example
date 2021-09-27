@@ -3,20 +3,20 @@ import { setupActionTestRunner } from "../../../../../ui/vendor/getto-applicatio
 import { markMenuCategoryLabel, standard_MenuTree } from "../kernel/test_helper"
 
 import { mockLoadMenuLocationDetecter } from "../kernel/mock"
-import { mockAuthzRepository } from "../../../../auth/auth_ticket/kernel/init/repository/mock"
+import { mockAuthzRepository } from "../../../../auth/ticket/kernel/init/repository/mock"
 import { mockMenuExpandRepository } from "../kernel/init/repository/mock"
 
 import { initLoadMenuAction, initLoadMenuMaterial } from "./init"
 
 import { LoadMenuDetecter } from "../kernel/method"
 
-import { AuthzRepository } from "../../../../auth/auth_ticket/kernel/infra"
+import { AuthzRepository } from "../../../../auth/ticket/kernel/infra"
 import { GetMenuBadgeRemote, MenuExpandRepository } from "../kernel/infra"
 
 import { LoadMenuResource } from "./resource"
 
 import { convertMenuBadgeRemote, menuExpandRepositoryConverter } from "../kernel/convert"
-import { authzRepositoryConverter } from "../../../../auth/auth_ticket/kernel/convert"
+import { authzRepositoryConverter } from "../../../../auth/ticket/kernel/convert"
 
 describe("Menu", () => {
     test("load menu", async () => {

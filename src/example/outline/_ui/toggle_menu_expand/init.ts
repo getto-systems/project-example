@@ -1,6 +1,6 @@
 import { env } from "../../../../y_environment/_ui/env"
 
-import { newAuthzRepository } from "../../../../auth/auth_ticket/kernel/init/repository/authz"
+import { newAuthzRepository } from "../../../../auth/ticket/kernel/init/repository/authz"
 import { newMenuExpandRepository } from "../kernel/init/repository/menu_expand"
 
 import { RepositoryOutsideFeature } from "../../../../z_details/_ui/repository/feature"

@@ -14,7 +14,7 @@ import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/featur
 import { Clock } from "../../../../../z_details/_ui/clock/infra"
 import { AuthenticatePasswordRemote } from "../../infra"
 
-import { convertAuthRemote } from "../../../../auth_ticket/kernel/convert"
+import { convertAuthRemote } from "../../../../ticket/kernel/convert"
 
 export function newAuthenticatePasswordRemote(
     feature: RemoteOutsideFeature,

@@ -1,4 +1,4 @@
-use crate::auth::auth_ticket::remote::check_nonce::method::check_auth_nonce;
+use crate::auth::ticket::remote::check_nonce::method::check_auth_nonce;
 
 use crate::auth::{
     auth_user::remote::kernel::infra::AuthUserRepository,

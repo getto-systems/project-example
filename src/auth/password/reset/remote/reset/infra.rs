@@ -1,5 +1,5 @@
 use crate::auth::{
-    auth_ticket::remote::{check_nonce::infra::CheckAuthNonceInfra, kernel::infra::AuthClock},
+    ticket::remote::{check_nonce::infra::CheckAuthNonceInfra, kernel::infra::AuthClock},
     auth_user::remote::kernel::infra::AuthUserRepository,
     password::{
         remote::kernel::infra::{AuthUserPasswordHasher, PlainPassword, ResetPasswordRepository},

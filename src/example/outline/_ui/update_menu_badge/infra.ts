@@ -1,4 +1,4 @@
-import { AuthzRepository } from "../../../../auth/auth_ticket/kernel/infra"
+import { AuthzRepository } from "../../../../auth/ticket/kernel/infra"
 import { GetMenuBadgeRemote, MenuBadgeStore, MenuExpandStore, MenuTree } from "../kernel/infra"
 
 export type UpdateMenuBadgeInfra = Readonly<{

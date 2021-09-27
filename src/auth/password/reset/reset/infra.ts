@@ -1,7 +1,7 @@
 import { DelayTime } from "../../../../z_details/_ui/config/infra"
 import { RemoteResult } from "../../../../z_details/_ui/remote/infra"
 
-import { AuthTicket } from "../../../auth_ticket/kernel/data"
+import { AuthTicket } from "../../../ticket/kernel/data"
 import { ResetPasswordFields, ResetPasswordRemoteError } from "./data"
 import { ResetToken } from "../../input/data"
 

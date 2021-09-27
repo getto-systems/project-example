@@ -5,7 +5,7 @@ use tonic::metadata::MetadataMap;
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::{
-    auth_ticket::remote::check_nonce::init::CheckAuthNonceStruct,
+    ticket::remote::check_nonce::init::CheckAuthNonceStruct,
     auth_user::remote::kernel::init::user_repository::MysqlAuthUserRepository,
     password::remote::kernel::init::{
         password_matcher::Argon2PasswordMatcher,
@@ -51,7 +51,7 @@ impl<'a> AuthenticatePasswordInfra for AuthenticatePasswordStruct<'a> {
 #[cfg(test)]
 pub mod test {
     use crate::auth::{
-        auth_ticket::remote::check_nonce::init::test::StaticCheckAuthNonceStruct,
+        ticket::remote::check_nonce::init::test::StaticCheckAuthNonceStruct,
         auth_user::remote::kernel::init::user_repository::test::MemoryAuthUserRepository,
         password::remote::kernel::init::{
             password_matcher::test::PlainPasswordMatcher,

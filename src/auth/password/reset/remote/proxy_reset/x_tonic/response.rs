@@ -6,7 +6,7 @@ use crate::auth::password::reset::{
 use crate::auth::password::reset::remote::proxy_reset::infra::ResetPasswordProxyResponse;
 
 use crate::auth::{
-    auth_ticket::remote::{encode::data::AuthTicketEncoded, kernel::data::AuthTokenEncoded},
+    ticket::remote::{encode::data::AuthTicketEncoded, kernel::data::AuthTokenEncoded},
     auth_user::remote::kernel::data::AuthUserExtract,
 };
 

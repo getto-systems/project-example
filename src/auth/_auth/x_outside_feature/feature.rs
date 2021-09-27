@@ -7,7 +7,7 @@ use aws_cloudfront_cookie::CloudfrontKey;
 
 use crate::auth::{
     _common::x_outside_feature::feature::AuthOutsideDecodingKey,
-    auth_ticket::remote::kernel::data::{ExpansionLimitDuration, ExpireDuration},
+    ticket::remote::kernel::data::{ExpansionLimitDuration, ExpireDuration},
 };
 
 pub struct AuthOutsideFeature {

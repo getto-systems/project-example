@@ -10,10 +10,10 @@ import { GetScriptPathMethod } from "../../../_ui/common/secure/get_script_path/
 import {
     SaveAuthTicketMethod,
     StartContinuousRenewMethod,
-} from "../../../auth_ticket/start_continuous_renew/method"
+} from "../../../ticket/start_continuous_renew/method"
 
 import { ResetPasswordEvent } from "../reset/event"
-import { StartContinuousRenewEvent } from "../../../auth_ticket/start_continuous_renew/event"
+import { StartContinuousRenewEvent } from "../../../ticket/start_continuous_renew/event"
 
 import {
     LoadScriptError,

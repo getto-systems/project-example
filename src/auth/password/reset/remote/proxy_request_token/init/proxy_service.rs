@@ -14,7 +14,7 @@ use crate::auth::_common::service::helper::{
 
 use crate::auth::{
     _api::proxy::AuthProxyService,
-    auth_ticket::remote::kernel::infra::AuthMetadataContent,
+    ticket::remote::kernel::infra::AuthMetadataContent,
     password::reset::remote::proxy_request_token::infra::{
         RequestResetTokenFieldsExtract, RequestResetTokenProxyResponse,
     },

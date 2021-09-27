@@ -9,7 +9,7 @@ use tonic::metadata::MetadataMap;
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::{
-    auth_ticket::remote::{
+    ticket::remote::{
         check_nonce::init::CheckAuthNonceStruct, kernel::init::clock::ChronoAuthClock,
     },
     password::remote::kernel::init::password_repository::MysqlAuthUserPasswordRepository,
@@ -92,7 +92,7 @@ pub mod test {
     use super::token_notifier::test::StaticResetTokenNotifier;
 
     use crate::auth::{
-        auth_ticket::remote::{
+        ticket::remote::{
             check_nonce::init::test::StaticCheckAuthNonceStruct,
             kernel::init::clock::test::StaticChronoAuthClock,
         },

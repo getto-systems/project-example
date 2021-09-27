@@ -1,5 +1,5 @@
 use crate::auth::{
-    auth_ticket::remote::x_tonic::route::AuthTicketServer,
+    ticket::remote::x_tonic::route::AuthTicketServer,
     password::remote::x_tonic::route::PasswordServer,
 };
 

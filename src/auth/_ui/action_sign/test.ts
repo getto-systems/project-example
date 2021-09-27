@@ -4,7 +4,7 @@ import { toApplicationView } from "../../../../ui/vendor/getto-application/actio
 import { mockAuthenticatePasswordAction } from "../../password/action_authenticate/mock"
 import { mockRequestResetTokenAction } from "../../password/reset/action_request_token/mock"
 import { mockResetPasswordAction } from "../../password/reset/action_reset/mock"
-import { mockCheckAuthTicketAction } from "../../auth_ticket/action_check/mock"
+import { mockCheckAuthTicketAction } from "../../ticket/action_check/mock"
 import { mockSignViewLocationDetecter } from "../common/switch_view/mock"
 
 import { initSignLinkResource } from "../common/nav/action_nav/init"

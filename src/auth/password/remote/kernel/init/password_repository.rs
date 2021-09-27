@@ -11,7 +11,7 @@ use crate::auth::password::remote::kernel::infra::{
 
 use crate::{
     auth::{
-        auth_ticket::remote::kernel::data::{AuthDateTime, ExpireDateTime},
+        ticket::remote::kernel::data::{AuthDateTime, ExpireDateTime},
         auth_user::remote::kernel::data::AuthUserId,
         login_id::remote::data::LoginId,
         password::remote::kernel::data::{
@@ -311,7 +311,7 @@ pub mod test {
 
     use crate::{
         auth::{
-            auth_ticket::remote::kernel::data::{AuthDateTime, ExpireDateTime},
+            ticket::remote::kernel::data::{AuthDateTime, ExpireDateTime},
             auth_user::remote::kernel::data::{AuthUser, AuthUserId},
             login_id::remote::data::LoginId,
             password::remote::kernel::data::{

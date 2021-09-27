@@ -19,7 +19,7 @@ import { ApplicationErrorComponent } from "../../../../../../src/avail/_ui/x_pre
 import { LoadSeasonEntry } from "../../../../../../src/example/_ui/common/action_load_season/x_preact/load_season"
 import { LoadMenuEntry } from "../../../../../../src/example/outline/_ui/action_load_menu/x_preact/load_menu"
 import { LoadBreadcrumbListComponent } from "../../../../../../src/example/outline/_ui/action_load_breadcrumb_list/x_preact/load_breadcrumb_list"
-import { LogoutEntry } from "../../../../../../src/auth/auth_ticket/action_logout/x_preact/logout"
+import { LogoutEntry } from "../../../../../../src/auth/ticket/action_logout/x_preact/logout"
 
 import { ApplicationView } from "../../../../../../ui/vendor/getto-application/action/action"
 import { LogoutPageResource } from "./resource"
