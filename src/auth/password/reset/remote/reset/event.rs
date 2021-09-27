@@ -1,7 +1,7 @@
 use crate::{
     auth::{
         ticket::remote::check_nonce::data::ValidateAuthNonceError,
-        auth_user::remote::kernel::data::AuthUser,
+        user::remote::kernel::data::AuthUser,
         login_id::remote::data::ValidateLoginIdError,
         password::{
             remote::kernel::data::{

@@ -1,6 +1,6 @@
 use crate::auth::{
     ticket::remote::{check_nonce::infra::CheckAuthNonceInfra, kernel::infra::AuthClock},
-    auth_user::remote::kernel::infra::AuthUserRepository,
+    user::remote::kernel::infra::AuthUserRepository,
     password::{
         remote::kernel::infra::{AuthUserPasswordHasher, PlainPassword, ResetPasswordRepository},
         reset::remote::proxy_reset::infra::ResetPasswordFieldsExtract,

@@ -1,6 +1,6 @@
 use crate::auth::{
     ticket::remote::kernel::data::{AuthTokenEncoded, ExpireDateTime},
-    auth_user::remote::kernel::data::AuthUserExtract,
+    user::remote::kernel::data::AuthUserExtract,
 };
 
 pub struct AuthTicketEncoded {

@@ -27,7 +27,7 @@ use super::action::{ValidateApiTokenAction, ValidateApiTokenMaterial};
 
 use crate::auth::{
     ticket::remote::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
-    auth_user::remote::kernel::data::RequireAuthRoles,
+    user::remote::kernel::data::RequireAuthRoles,
 };
 
 #[tokio::test]

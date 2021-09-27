@@ -1,7 +1,7 @@
 use crate::auth::ticket::remote::check_nonce::method::check_auth_nonce;
 
 use crate::auth::{
-    auth_user::remote::kernel::infra::AuthUserRepository,
+    user::remote::kernel::infra::AuthUserRepository,
     password::remote::{
         authenticate::infra::AuthenticatePasswordInfra,
         kernel::infra::{PlainPassword, VerifyPasswordRepository},
@@ -11,7 +11,7 @@ use crate::auth::{
 
 use super::event::AuthenticatePasswordEvent;
 
-use crate::auth::{auth_user::remote::kernel::data::AuthUser, login_id::remote::data::LoginId};
+use crate::auth::{user::remote::kernel::data::AuthUser, login_id::remote::data::LoginId};
 
 pub async fn authenticate_password<S>(
     infra: &impl AuthenticatePasswordInfra,

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package auth.auth_user.service;
+package auth.user.service;
 
 message AuthUserPb {
     string user_id = 1;

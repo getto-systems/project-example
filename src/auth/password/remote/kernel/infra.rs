@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use crate::{
     auth::{
         ticket::remote::kernel::data::{AuthDateTime, ExpireDateTime},
-        auth_user::remote::kernel::data::AuthUserId,
+        user::remote::kernel::data::AuthUserId,
         login_id::remote::data::LoginId,
         password::remote::kernel::data::{
             ChangePasswordRepositoryError, PasswordHashError, ResetPasswordRepositoryError,

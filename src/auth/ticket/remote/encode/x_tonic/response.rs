@@ -17,7 +17,7 @@ use crate::auth::{
         encode::data::{AuthTicketEncoded, EncodeAuthTokenError},
         kernel::data::AuthTokenEncoded,
     },
-    auth_user::remote::kernel::data::AuthUserExtract,
+    user::remote::kernel::data::AuthUserExtract,
 };
 
 impl RespondTo<RenewAuthTicketResponsePb> for AuthTicketEncoded {

@@ -2,7 +2,7 @@ use std::iter::FromIterator;
 
 use crate::auth::ticket::_api::y_protobuf::api::AuthenticateResponsePb;
 
-use crate::auth::auth_user::remote::kernel::data::AuthUserExtract;
+use crate::auth::user::remote::kernel::data::AuthUserExtract;
 
 impl Into<AuthenticateResponsePb> for AuthUserExtract {
     fn into(self) -> AuthenticateResponsePb {

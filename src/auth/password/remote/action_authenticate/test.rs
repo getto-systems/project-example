@@ -27,7 +27,7 @@ use crate::auth::{
             },
         },
     },
-    auth_user::remote::kernel::init::user_repository::test::{
+    user::remote::kernel::init::user_repository::test::{
         MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
     },
     password::remote::{
@@ -58,7 +58,7 @@ use crate::auth::{
     ticket::remote::kernel::data::{
         AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
     },
-    auth_user::remote::kernel::data::{AuthUser, AuthUserExtract},
+    user::remote::kernel::data::{AuthUser, AuthUserExtract},
     login_id::remote::data::LoginId,
 };
 

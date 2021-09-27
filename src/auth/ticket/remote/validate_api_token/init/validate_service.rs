@@ -17,7 +17,7 @@ use crate::auth::ticket::remote::kernel::infra::AuthMetadataContent;
 
 use crate::auth::{
     _common::service::data::AuthServiceError,
-    auth_user::remote::kernel::data::{AuthUserExtract, AuthUserId, RequireAuthRoles},
+    user::remote::kernel::data::{AuthUserExtract, AuthUserId, RequireAuthRoles},
 };
 
 pub struct TonicValidateService<'a> {
@@ -76,7 +76,7 @@ pub mod test {
 
     use crate::auth::{
         _common::service::data::AuthServiceError,
-        auth_user::remote::kernel::data::{AuthUserId, RequireAuthRoles},
+        user::remote::kernel::data::{AuthUserId, RequireAuthRoles},
     };
 
     pub struct StaticValidateService {

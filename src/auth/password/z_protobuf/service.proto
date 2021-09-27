@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package auth.password.service;
 
-import "auth/auth_user/z_protobuf/service.proto";
+import "auth/user/z_protobuf/service.proto";
 import "auth/ticket/z_protobuf/service.proto";
 
 service AuthenticatePasswordPb {
@@ -14,7 +14,7 @@ message AuthenticatePasswordRequestPb {
 }
 message AuthenticatePasswordResponsePb {
     bool success = 1;
-    auth.auth_user.service.AuthUserPb user = 2;
+    auth.user.service.AuthUserPb user = 2;
     auth.ticket.service.AuthTokenEncodedPb token = 3;
 }
 

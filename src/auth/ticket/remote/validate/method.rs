@@ -9,7 +9,7 @@ use super::event::ValidateAuthTokenEvent;
 
 use crate::auth::{
     ticket::remote::{kernel::data::AuthTicket, validate::data::ValidateAuthTokenError},
-    auth_user::remote::kernel::data::RequireAuthRoles,
+    user::remote::kernel::data::RequireAuthRoles,
 };
 
 pub async fn validate_auth_token<S>(

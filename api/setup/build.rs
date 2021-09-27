@@ -4,7 +4,7 @@ mod protobuf;
 
 fn main() {
     grpc::generate("auth.ticket");
-    grpc::generate("auth.auth_user");
+    grpc::generate("auth.user");
     grpc::generate("auth.password");
     grpc::generate("auth.password.reset");
     grpc::generate("avail.unexpected_error");

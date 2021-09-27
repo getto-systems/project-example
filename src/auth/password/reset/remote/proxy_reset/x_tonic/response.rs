@@ -7,7 +7,7 @@ use crate::auth::password::reset::remote::proxy_reset::infra::ResetPasswordProxy
 
 use crate::auth::{
     ticket::remote::{encode::data::AuthTicketEncoded, kernel::data::AuthTokenEncoded},
-    auth_user::remote::kernel::data::AuthUserExtract,
+    user::remote::kernel::data::AuthUserExtract,
 };
 
 impl Into<Option<ResetPasswordProxyResponse>> for ResetPasswordResponsePb {

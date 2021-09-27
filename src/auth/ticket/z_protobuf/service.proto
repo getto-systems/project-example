@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package auth.ticket.service;
 
-import "auth/auth_user/z_protobuf/service.proto";
+import "auth/user/z_protobuf/service.proto";
 
 service LogoutPb {
     rpc Logout (LogoutRequestPb) returns (LogoutResponsePb);
@@ -15,7 +15,7 @@ service RenewAuthTicketPb {
 }
 message RenewAuthTicketRequestPb {}
 message RenewAuthTicketResponsePb {
-    auth.auth_user.service.AuthUserPb user = 1;
+    auth.user.service.AuthUserPb user = 1;
     AuthTokenEncodedPb token = 2;
 }
 message AuthTokenEncodedPb {
@@ -45,5 +45,5 @@ message ValidateApiTokenRequestPb {
     repeated string require_roles = 2;
 }
 message ValidateApiTokenResponsePb {
-    auth.auth_user.service.AuthUserPb user = 1;
+    auth.user.service.AuthUserPb user = 1;
 }

@@ -2,7 +2,7 @@ use crate::auth::ticket::remote::check_nonce::method::check_auth_nonce;
 
 use crate::auth::{
     ticket::remote::kernel::infra::AuthClock,
-    auth_user::remote::kernel::infra::AuthUserRepository,
+    user::remote::kernel::infra::AuthUserRepository,
     password::{
         remote::kernel::infra::{PlainPassword, ResetPasswordRepository, ResetTokenEntry},
         reset::remote::{
@@ -16,7 +16,7 @@ use super::event::ResetPasswordEvent;
 
 use crate::auth::{
     ticket::remote::kernel::data::AuthDateTime,
-    auth_user::remote::kernel::data::AuthUser,
+    user::remote::kernel::data::AuthUser,
     login_id::remote::data::LoginId,
     password::{
         remote::kernel::data::VerifyResetTokenEntryError,
