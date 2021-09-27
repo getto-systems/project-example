@@ -1,4 +1,4 @@
-import { docs_auth_sign, docs_auth_sign_action, docs_auth_sign_data } from "./_ui/action_sign/docs"
+import { docs_auth_sign, docs_auth_sign_action, docs_auth_sign_data } from "./sign/action_sign/docs"
 import { docs_checkAuthTicket } from "./ticket/action_check/docs"
 
 import {

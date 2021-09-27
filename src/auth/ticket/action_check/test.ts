@@ -7,7 +7,7 @@ import { mockAuthnRepository, mockAuthzRepository } from "../kernel/init/reposit
 import {
     mockGetScriptPathDetecter,
     mockSecureServerURL,
-} from "../../_ui/common/secure/get_script_path/mock"
+} from "../../sign/get_script_path/mock"
 
 import { initCheckAuthTicketAction, initCheckAuthTicketMaterial } from "./init"
 
@@ -23,7 +23,7 @@ import {
     convertAuthRemote,
 } from "../kernel/convert"
 
-import { LoadScriptError } from "../../_ui/common/secure/get_script_path/data"
+import { LoadScriptError } from "../../sign/get_script_path/data"
 
 // last auth at : テスト開始時刻と expire 設定によって instant load の可否が決まる
 const STORED_LAST_AUTH_AT = new Date("2020-01-01 10:00:00").toISOString()

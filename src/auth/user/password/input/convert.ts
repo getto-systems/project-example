@@ -1,7 +1,7 @@
 import { BoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/data"
 import { BoardFieldValueConverter } from "../../../../../ui/vendor/getto-application/board/validate_field/infra"
 import { ConvertLocationResult } from "../../../../z_details/_ui/location/data"
-import { SignNav, signNavKey } from "../../../_ui/common/nav/data"
+import { SignNav, signNavKey } from "../../../sign/nav/data"
 import { Password, ResetToken, ValidatePasswordError } from "./data"
 
 // password には技術的な制限はないが、使用可能な最大文字数は定義しておく

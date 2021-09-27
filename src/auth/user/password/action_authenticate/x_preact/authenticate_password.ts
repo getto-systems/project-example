@@ -22,8 +22,8 @@ import {
 import { VNodeContent } from "../../../../../example/_ui/x_preact/design/common"
 import { siteInfo } from "../../../../../example/site"
 import { spinner } from "../../../../../example/_ui/x_preact/design/icon"
-import { appendScript } from "../../../../_ui/common/x_preact/script"
-import { signNav } from "../../../../_ui/common/nav/x_preact/nav"
+import { appendScript } from "../../../../sign/x_preact/script"
+import { signNav } from "../../../../sign/action_nav/x_preact/nav"
 
 import { ApplicationErrorComponent } from "../../../../../avail/_ui/x_preact/application_error"
 import { InputLoginIDEntry } from "../../../login_id/input/action_input/x_preact/input"

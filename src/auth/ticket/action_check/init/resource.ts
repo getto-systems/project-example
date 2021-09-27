@@ -3,8 +3,8 @@ import { toApplicationView } from "../../../../../ui/vendor/getto-application/ac
 import { initCheckAuthTicketAction, initCheckAuthTicketMaterial } from "../init"
 import { newCheckAuthTicketInfra } from "../../check/init"
 import { newStartContinuousRenewAuthnInfoInfra } from "../../start_continuous_renew/init"
-import { newGetSecureScriptPathInfra } from "../../../_ui/common/secure/get_script_path/init"
-import { newGetScriptPathLocationDetecter } from "../../../_ui/common/secure/get_script_path/init"
+import { newGetSecureScriptPathInfra } from "../../../sign/get_script_path/init"
+import { newGetScriptPathLocationDetecter } from "../../../sign/get_script_path/init"
 
 import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"
 import { RepositoryOutsideFeature } from "../../../../z_details/_ui/repository/feature"

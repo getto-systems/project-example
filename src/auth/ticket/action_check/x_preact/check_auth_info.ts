@@ -16,7 +16,7 @@ import { VNodeContent } from "../../../../example/_ui/x_preact/design/common"
 import { siteInfo } from "../../../../example/site"
 import { spinner } from "../../../../example/_ui/x_preact/design/icon"
 
-import { appendScript } from "../../../_ui/common/x_preact/script"
+import { appendScript } from "../../../sign/x_preact/script"
 
 import { ApplicationErrorComponent } from "../../../../avail/_ui/x_preact/application_error"
 

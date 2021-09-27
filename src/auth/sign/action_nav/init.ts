@@ -1,9 +1,9 @@
-import { LineIcon, lniClass, lnir } from "../../../../../z_details/_ui/icon/line_icon"
+import { LineIcon, lniClass, lnir } from "../../../z_details/_ui/icon/line_icon"
 
 import {
     encodeLocationSearchQuery,
     LocationSearchParam,
-} from "../../../../../z_details/_ui/location/helper"
+} from "../../../z_details/_ui/location/helper"
 
 import { SignLink, SignLinkResource } from "./resource"
 
@@ -15,7 +15,7 @@ import {
     SignNavItem,
     signNavKey,
     StaticSignViewVariantKey,
-} from "../data"
+} from "../nav/data"
 
 export function initSignLinkResource(): SignLinkResource {
     return {

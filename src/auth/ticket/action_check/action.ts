@@ -1,6 +1,6 @@
 import { ApplicationStateAction } from "../../../../ui/vendor/getto-application/action/action"
 
-import { GetScriptPathMethod } from "../../_ui/common/secure/get_script_path/method"
+import { GetScriptPathMethod } from "../../sign/get_script_path/method"
 import {
     SaveAuthTicketMethod,
     StartContinuousRenewMethod,
@@ -13,7 +13,7 @@ import { CheckAuthTicketEvent } from "../check/event"
 import {
     ConvertScriptPathResult,
     LoadScriptError,
-} from "../../_ui/common/secure/get_script_path/data"
+} from "../../sign/get_script_path/data"
 
 export interface CheckAuthTicketAction extends ApplicationStateAction<CheckAuthTicketState> {
     succeedToInstantLoad(): Promise<CheckAuthTicketState>

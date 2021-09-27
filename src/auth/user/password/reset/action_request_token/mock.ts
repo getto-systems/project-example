@@ -1,7 +1,7 @@
 import { ApplicationMockStateAction } from "../../../../../../ui/vendor/getto-application/action/mock"
 import { mockValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/mock"
 import { mockInputLoginIDAction } from "../../../login_id/input/action_input/mock"
-import { initSignLink } from "../../../../_ui/common/nav/action_nav/init"
+import { initSignLink } from "../../../../sign/action_nav/init"
 
 import {
     initialRequestResetTokenState,

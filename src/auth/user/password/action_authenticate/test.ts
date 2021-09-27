@@ -8,7 +8,7 @@ import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/
 import {
     mockGetScriptPathDetecter,
     mockSecureServerURL,
-} from "../../../_ui/common/secure/get_script_path/mock"
+} from "../../../sign/get_script_path/mock"
 import {
     mockAuthnRepository,
     mockAuthzRepository,
@@ -32,7 +32,7 @@ import {
     convertAuthRemote,
 } from "../../../ticket/kernel/convert"
 
-import { LoadScriptError } from "../../../_ui/common/secure/get_script_path/data"
+import { LoadScriptError } from "../../../sign/get_script_path/data"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")

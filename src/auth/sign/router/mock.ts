@@ -1,4 +1,4 @@
-import { detectSignViewType } from "./core"
+import { detectSignViewType } from "./convert"
 
 import { SignViewDetecter } from "./data"
 

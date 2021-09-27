@@ -21,7 +21,7 @@ import { loginBox } from "../../../../../../../ui/vendor/getto-css/preact/layout
 import { VNodeContent } from "../../../../../../example/_ui/x_preact/design/common"
 import { siteInfo } from "../../../../../../example/site"
 import { spinner } from "../../../../../../example/_ui/x_preact/design/icon"
-import { signNav } from "../../../../../_ui/common/nav/x_preact/nav"
+import { signNav } from "../../../../../sign/action_nav/x_preact/nav"
 
 import { InputLoginIDEntry } from "../../../../login_id/input/action_input/x_preact/input"
 

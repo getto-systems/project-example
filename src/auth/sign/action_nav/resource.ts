@@ -1,4 +1,4 @@
-import { SignNavItem } from "../data"
+import { SignNavItem } from "../nav/data"
 
 export type SignLinkResource = Readonly<{
     link: SignLink

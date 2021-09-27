@@ -1,6 +1,6 @@
 import { ApplicationAbstractStateAction } from "../../../../../../ui/vendor/getto-application/action/init"
 
-import { initSignLink } from "../../../../_ui/common/nav/action_nav/init"
+import { initSignLink } from "../../../../sign/action_nav/init"
 import { initInputLoginIDAction } from "../../../login_id/input/action_input/init"
 import { initInputPasswordAction } from "../../action_input/init"
 import { initValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/init"
@@ -9,14 +9,14 @@ import { resetPassword } from "../reset/method"
 import {
     GetScriptPathDetecter,
     getScriptPath,
-} from "../../../../_ui/common/secure/get_script_path/method"
+} from "../../../../sign/get_script_path/method"
 import {
     saveAuthTicket,
     startContinuousRenew,
 } from "../../../../ticket/start_continuous_renew/method"
 
 import { StartContinuousRenewInfra } from "../../../../ticket/start_continuous_renew/infra"
-import { GetScriptPathInfra } from "../../../../_ui/common/secure/get_script_path/infra"
+import { GetScriptPathInfra } from "../../../../sign/get_script_path/infra"
 import { ResetPasswordInfra } from "../reset/infra"
 
 import {
@@ -30,7 +30,7 @@ import {
 
 import { ResetPasswordDetecter } from "../reset/method"
 
-import { LoadScriptError } from "../../../../_ui/common/secure/get_script_path/data"
+import { LoadScriptError } from "../../../../sign/get_script_path/data"
 import { ResetPasswordFields } from "../reset/data"
 import { AuthTicket } from "../../../../ticket/kernel/data"
 import { ConvertBoardResult } from "../../../../../../ui/vendor/getto-application/board/kernel/data"

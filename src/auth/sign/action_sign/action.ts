@@ -4,7 +4,7 @@ import { CheckAuthTicketView } from "../../ticket/action_check/resource"
 import { AuthenticatePasswordView } from "../../user/password/action_authenticate/resource"
 import { RequestResetTokenView } from "../../user/password/reset/action_request_token/resource"
 import { ResetPasswordView } from "../../user/password/reset/action_reset/resource"
-import { SignLinkResource } from "../common/nav/action_nav/resource"
+import { SignLinkResource } from "../action_nav/resource"
 
 export interface SignAction extends ApplicationStateAction<SignActionState> {
     error(err: string): Promise<SignActionState>

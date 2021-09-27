@@ -2,7 +2,7 @@ import { GetScriptPathInfra } from "./infra"
 
 import { toScriptPath } from "./convert"
 
-import { ConvertLocationResult } from "../../../../../z_details/_ui/location/data"
+import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
 import { ConvertScriptPathResult, LocationPathname } from "./data"
 
 export interface GetScriptPathDetecter {

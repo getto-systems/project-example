@@ -1,12 +1,12 @@
 import { ApplicationStateAction } from "../../../../../ui/vendor/getto-application/action/action"
 
-import { SignLink } from "../../../_ui/common/nav/action_nav/resource"
+import { SignLink } from "../../../sign/action_nav/resource"
 import { InputLoginIDAction } from "../../login_id/input/action_input/action"
 import { InputPasswordAction } from "../action_input/action"
 import { ValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/action"
 
 import { AuthenticatePasswordMethod } from "../authenticate/method"
-import { GetScriptPathMethod } from "../../../_ui/common/secure/get_script_path/method"
+import { GetScriptPathMethod } from "../../../sign/get_script_path/method"
 import {
     SaveAuthTicketMethod,
     StartContinuousRenewMethod,
@@ -18,7 +18,7 @@ import { StartContinuousRenewEvent } from "../../../ticket/start_continuous_rene
 import {
     LoadScriptError,
     ConvertScriptPathResult,
-} from "../../../_ui/common/secure/get_script_path/data"
+} from "../../../sign/get_script_path/data"
 
 export interface AuthenticatePasswordAction
     extends ApplicationStateAction<AuthenticatePasswordState> {

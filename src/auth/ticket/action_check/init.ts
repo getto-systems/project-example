@@ -10,16 +10,16 @@ import {
 import {
     GetScriptPathDetecter,
     getScriptPath,
-} from "../../_ui/common/secure/get_script_path/method"
+} from "../../sign/get_script_path/method"
 import { startContinuousRenew, saveAuthTicket } from "../start_continuous_renew/method"
 import { renewAuthTicket, checkAuthTicket } from "../check/method"
 
-import { GetScriptPathInfra } from "../../_ui/common/secure/get_script_path/infra"
+import { GetScriptPathInfra } from "../../sign/get_script_path/infra"
 import { StartContinuousRenewInfra } from "../start_continuous_renew/infra"
 import { CheckAuthTicketInfra } from "../check/infra"
 
 import { AuthTicket } from "../kernel/data"
-import { LoadScriptError } from "../../_ui/common/secure/get_script_path/data"
+import { LoadScriptError } from "../../sign/get_script_path/data"
 
 export type CheckAuthTicketActionInfra = Readonly<{
     check: CheckAuthTicketInfra

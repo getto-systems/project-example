@@ -4,7 +4,7 @@ import { mockInputLoginIDAction } from "../../login_id/input/action_input/mock"
 import { mockInputPasswordAction } from "../action_input/mock"
 import { mockValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/mock"
 
-import { initSignLink } from "../../../_ui/common/nav/action_nav/init"
+import { initSignLink } from "../../../sign/action_nav/init"
 
 import {
     AuthenticatePasswordAction,

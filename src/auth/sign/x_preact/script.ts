@@ -1,4 +1,4 @@
-import { ScriptPath } from "../secure/get_script_path/data"
+import { ScriptPath } from "../get_script_path/data"
 
 export function appendScript(scriptPath: ScriptPath, setup: Setup<HTMLScriptElement>): void {
     const script = document.createElement("script")

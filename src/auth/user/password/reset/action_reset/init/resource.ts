@@ -4,7 +4,7 @@ import { newStartContinuousRenewAuthnInfoInfra } from "../../../../../ticket/sta
 import {
     newGetScriptPathLocationDetecter,
     newGetSecureScriptPathInfra,
-} from "../../../../../_ui/common/secure/get_script_path/init"
+} from "../../../../../sign/get_script_path/init"
 import { newResetPasswordInfra, newResetPasswordLocationDetecter } from "../../reset/init"
 
 import { initResetPasswordAction, initResetPasswordMaterial } from "../init"

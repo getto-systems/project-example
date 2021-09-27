@@ -4,12 +4,12 @@ import { newCheckAuthTicketView } from "../../../ticket/action_check/init/resour
 import { newRequestResetTokenView } from "../../../user/password/reset/action_request_token/init/resource"
 import { newResetPasswordView } from "../../../user/password/reset/action_reset/init/resource"
 import { newAuthenticatePasswordView } from "../../../user/password/action_authenticate/init/resource"
-import { newSignViewLocationDetecter } from "../../common/switch_view/init"
+import { newSignViewLocationDetecter } from "../../router/init"
 
 import { initSignAction } from "../init"
 
 import { SignView } from "../resource"
-import { initSignLinkResource } from "../../common/nav/action_nav/init"
+import { initSignLinkResource } from "../../action_nav/init"
 
 import { RepositoryOutsideFeature } from "../../../../z_details/_ui/repository/feature"
 import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"

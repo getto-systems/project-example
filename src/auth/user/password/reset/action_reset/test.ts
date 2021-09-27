@@ -12,7 +12,7 @@ import {
 import {
     mockGetScriptPathDetecter,
     mockSecureServerURL,
-} from "../../../../_ui/common/secure/get_script_path/mock"
+} from "../../../../sign/get_script_path/mock"
 import { mockResetPasswordLocationDetecter } from "../reset/mock"
 
 import { initResetPasswordAction, initResetPasswordMaterial } from "./init"

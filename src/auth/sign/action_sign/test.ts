@@ -5,9 +5,9 @@ import { mockAuthenticatePasswordAction } from "../../user/password/action_authe
 import { mockRequestResetTokenAction } from "../../user/password/reset/action_request_token/mock"
 import { mockResetPasswordAction } from "../../user/password/reset/action_reset/mock"
 import { mockCheckAuthTicketAction } from "../../ticket/action_check/mock"
-import { mockSignViewLocationDetecter } from "../common/switch_view/mock"
+import { mockSignViewLocationDetecter } from "../router/mock"
 
-import { initSignLinkResource } from "../common/nav/action_nav/init"
+import { initSignLinkResource } from "../action_nav/init"
 
 import { initSignAction } from "./init"
 
