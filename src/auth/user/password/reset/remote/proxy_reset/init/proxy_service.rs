@@ -15,7 +15,7 @@ use crate::{
 
 use crate::{
     auth::{
-        _api::proxy::AuthProxyService,
+        remote::service::proxy::AuthProxyService,
         ticket::remote::kernel::infra::AuthMetadataContent,
         user::password::reset::remote::proxy_reset::infra::{
             ResetPasswordFieldsExtract, ResetPasswordProxyResponse,

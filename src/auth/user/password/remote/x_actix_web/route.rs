@@ -11,7 +11,7 @@ use crate::x_outside_feature::_api::{
 
 use crate::auth::user::password::reset::remote::x_actix_web::route::scope_reset;
 
-use crate::auth::_api::proxy::call_proxy;
+use crate::auth::remote::service::proxy::call_proxy;
 
 use crate::auth::user::password::remote::{
     proxy_authenticate::{

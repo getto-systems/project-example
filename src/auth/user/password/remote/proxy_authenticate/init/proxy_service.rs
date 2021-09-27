@@ -1,6 +1,5 @@
 use tonic::Request;
 
-
 use crate::auth::user::password::_common::y_protobuf::service::{
     authenticate_password_pb_client::AuthenticatePasswordPbClient, AuthenticatePasswordRequestPb,
 };
@@ -16,7 +15,7 @@ use crate::{
 
 use crate::{
     auth::{
-        _api::proxy::AuthProxyService,
+        remote::service::proxy::AuthProxyService,
         ticket::remote::kernel::infra::AuthMetadataContent,
         user::password::remote::proxy_authenticate::infra::{
             AuthenticatePasswordFieldsExtract, AuthenticatePasswordProxyResponse,

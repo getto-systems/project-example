@@ -8,7 +8,7 @@ use crate::auth::user::password::reset::_api::y_protobuf::api::{
 
 use crate::auth::ticket::remote::kernel::init::response_builder::CookieAuthTokenResponseBuilder;
 
-use crate::auth::_api::proxy::AuthProxyResponseEncoder;
+use crate::auth::remote::service::proxy::AuthProxyResponseEncoder;
 
 use crate::auth::{
     ticket::remote::kernel::infra::AuthTokenResponseBuilder,

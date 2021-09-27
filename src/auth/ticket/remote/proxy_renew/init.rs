@@ -11,7 +11,7 @@ use crate::auth::ticket::remote::validate_metadata::init::ValidateTicketMetadata
 use proxy_service::ProxyService;
 use response_encoder::ResponseEncoder;
 
-use crate::auth::_api::proxy::{AuthProxyEvent, AuthProxyInfra};
+use crate::auth::remote::service::proxy::{AuthProxyEvent, AuthProxyInfra};
 
 use crate::auth::ticket::remote::{
     encode::data::AuthTicketEncoded, kernel::data::AuthTokenResponse,

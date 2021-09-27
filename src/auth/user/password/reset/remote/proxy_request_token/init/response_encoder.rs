@@ -4,7 +4,7 @@ use crate::auth::user::password::reset::_api::y_protobuf::api::{
     RequestResetTokenErrorKindPb, RequestResetTokenErrorPb, RequestResetTokenResultPb,
 };
 
-use crate::auth::_api::proxy::AuthProxyResponseEncoder;
+use crate::auth::remote::service::proxy::AuthProxyResponseEncoder;
 
 use crate::auth::user::password::reset::remote::proxy_request_token::infra::RequestResetTokenProxyResponse;
 

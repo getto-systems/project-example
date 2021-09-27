@@ -4,7 +4,7 @@ use crate::auth::user::password::_api::y_protobuf::api::{
     AuthenticatePasswordErrorKindPb, ChangePasswordErrorPb, ChangePasswordResultPb,
 };
 
-use crate::auth::_api::proxy::AuthProxyResponseEncoder;
+use crate::auth::remote::service::proxy::AuthProxyResponseEncoder;
 
 use crate::auth::user::password::remote::proxy_change::infra::ChangePasswordProxyResponse;
 

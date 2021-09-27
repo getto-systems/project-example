@@ -13,7 +13,7 @@ use proxy_service::ProxyService;
 use request_decoder::RequestDecoder;
 use response_encoder::ResponseEncoder;
 
-use crate::auth::_api::proxy::{AuthProxyEvent, AuthProxyInfra};
+use crate::auth::remote::service::proxy::{AuthProxyEvent, AuthProxyInfra};
 
 use crate::auth::user::password::reset::remote::proxy_request_token::infra::{
     RequestResetTokenFieldsExtract, RequestResetTokenProxyRequestDecoder,

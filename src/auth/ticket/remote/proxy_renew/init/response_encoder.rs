@@ -6,7 +6,7 @@ use crate::auth::_api::x_outside_feature::feature::AuthOutsideCookie;
 
 use crate::auth::ticket::remote::kernel::init::response_builder::CookieAuthTokenResponseBuilder;
 
-use crate::auth::_api::proxy::AuthProxyResponseEncoder;
+use crate::auth::remote::service::proxy::AuthProxyResponseEncoder;
 
 use crate::auth::ticket::remote::kernel::infra::AuthTokenResponseBuilder;
 

@@ -9,7 +9,7 @@ use crate::x_outside_feature::_api::{
     logger::{app_logger, generate_request_id},
 };
 
-use crate::auth::_api::proxy::call_proxy;
+use crate::auth::remote::service::proxy::call_proxy;
 
 use crate::auth::user::password::reset::remote::{
     proxy_request_token::{

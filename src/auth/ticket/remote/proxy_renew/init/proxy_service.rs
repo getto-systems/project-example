@@ -14,7 +14,10 @@ use crate::{
 };
 
 use crate::{
-    auth::{_api::proxy::AuthProxyService, ticket::remote::kernel::infra::AuthMetadataContent},
+    auth::{
+        remote::service::proxy::AuthProxyService,
+        ticket::remote::kernel::infra::AuthMetadataContent,
+    },
     z_details::_common::service::infra::ServiceAuthorizer,
 };
 

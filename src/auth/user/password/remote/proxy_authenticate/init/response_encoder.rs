@@ -8,7 +8,7 @@ use crate::z_details::_api::message::helper::encode_protobuf_base64;
 
 use crate::auth::ticket::remote::kernel::init::response_builder::CookieAuthTokenResponseBuilder;
 
-use crate::auth::_api::proxy::AuthProxyResponseEncoder;
+use crate::auth::remote::service::proxy::AuthProxyResponseEncoder;
 
 use crate::auth::{
     ticket::remote::kernel::infra::AuthTokenResponseBuilder,
@@ -69,7 +69,8 @@ impl<'a> ResponseEncoder<'a> {
     }
 }
 
-impl<'a> AuthProxyResponseEncoder<AuthenticatePasswordProxyResponse, AuthenticatePasswordProxyMessage>
+impl<'a>
+    AuthProxyResponseEncoder<AuthenticatePasswordProxyResponse, AuthenticatePasswordProxyMessage>
     for ResponseEncoder<'a>
 {
     fn encode(

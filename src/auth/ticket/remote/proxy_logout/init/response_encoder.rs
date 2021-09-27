@@ -2,7 +2,7 @@ use actix_web::{HttpRequest, HttpResponse};
 
 use crate::z_details::_common::response::actix_web::RespondTo;
 
-use crate::auth::_api::proxy::AuthProxyResponseEncoder;
+use crate::auth::remote::service::proxy::AuthProxyResponseEncoder;
 
 use crate::z_details::_api::message::data::MessageError;
 

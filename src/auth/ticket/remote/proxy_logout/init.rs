@@ -11,7 +11,7 @@ use crate::auth::ticket::remote::validate_metadata::init::ValidateTicketMetadata
 use proxy_service::ProxyService;
 use response_encoder::{LogoutProxyResponse, ResponseEncoder};
 
-use crate::auth::_api::proxy::{AuthProxyEvent, AuthProxyInfra};
+use crate::auth::remote::service::proxy::{AuthProxyEvent, AuthProxyInfra};
 
 pub struct LogoutProxyStruct<'a> {
     pubsub: ActionStatePubSub<AuthProxyEvent<LogoutProxyResponse>>,
