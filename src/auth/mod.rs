@@ -4,4 +4,3 @@ pub mod _common;
 pub mod _example;
 mod ticket;
 mod user;
-mod password;

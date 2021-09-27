@@ -4,7 +4,7 @@ use crate::z_details::_common::response::tonic::RespondTo;
 
 use crate::auth::{
     ticket::_common::y_protobuf::service::RenewAuthTicketResponsePb,
-    password::{
+    user::password::{
         _common::y_protobuf::service::AuthenticatePasswordResponsePb,
         reset::_common::y_protobuf::service::ResetPasswordResponsePb,
     },

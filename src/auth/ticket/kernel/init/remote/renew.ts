@@ -21,7 +21,7 @@ export function newRenewAuthTicketRemote(
     clock: Clock,
 ): RenewAuthTicketRemote {
     return async () => {
-        const AuthenticateResponsePb = pb.auth.auth_ticket.api.AuthenticateResponsePb
+        const AuthenticateResponsePb = pb.auth.ticket.api.AuthenticateResponsePb
 
         try {
             const mock = false

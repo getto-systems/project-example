@@ -19,16 +19,16 @@ import {
 import {
     docs_auth_authenticatePassword,
     docs_auth_authenticatePassword_description,
-} from "../../password/action_authenticate/docs"
+} from "../../user/password/action_authenticate/docs"
 import {
     docs_auth_resetPassword,
     docs_auth_resetPassword_data,
     docs_auth_resetPassword_description,
-} from "../../password/reset/docs"
+} from "../../user/password/reset/docs"
 
 import { docs_auth_ticket } from "../../ticket/docs"
 import { docs_auth_loginID } from "../../user/login_id/docs"
-import { docs_auth_password } from "../../password/docs"
+import { docs_auth_password } from "../../user/password/docs"
 
 import { DocsSection } from "../../../../ui/vendor/getto-application/docs/data"
 

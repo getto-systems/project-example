@@ -5,7 +5,7 @@ import { storyTemplate } from "../../../../../ui/vendor/storybook/preact/story"
 import { ProfilePageComponent } from "./page"
 
 import { mockBaseResource } from "../../../../../src/example/_ui/action_base/mock"
-import { mockChangePasswordResource } from "../../../../../src/auth/password/action_change/mock"
+import { mockChangePasswordResource } from "../../../../../src/auth/user/password/action_change/mock"
 
 export default {
     title: "main/Auth/Profile",

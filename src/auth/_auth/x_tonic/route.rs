@@ -1,6 +1,6 @@
 use crate::auth::{
     ticket::remote::x_tonic::route::AuthTicketServer,
-    password::remote::x_tonic::route::PasswordServer,
+    user::password::remote::x_tonic::route::PasswordServer,
 };
 
 pub struct AuthServer {

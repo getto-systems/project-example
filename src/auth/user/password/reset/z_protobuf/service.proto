@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package auth.user.password.reset.service;
+
+import "auth/user/z_protobuf/service.proto";
+import "auth/ticket/z_protobuf/service.proto";
+
+service RequestResetTokenPb {
+    rpc RequestToken (RequestResetTokenRequestPb) returns (RequestResetTokenResponsePb);
+}
+message RequestResetTokenRequestPb {
+    string login_id = 1;
+}
+message RequestResetTokenResponsePb {
+    bool success = 1;
+}
+
+service ResetPasswordPb {
+    rpc Reset (ResetPasswordRequestPb) returns (ResetPasswordResponsePb);
+}
+message ResetPasswordRequestPb {
+    string reset_token = 1;
+    string login_id = 2;
+    string password = 3;
+}
+message ResetPasswordResponsePb {
+    bool success = 1;
+    auth.user.service.AuthUserPb user = 2;
+    auth.ticket.service.AuthTokenEncodedPb token = 3;
+    ResetPasswordErrorKindPb error = 4;
+}
+enum ResetPasswordErrorKindPb {
+    INVALID_RESET = 0;
+    ALREADY_RESET = 1;
+}

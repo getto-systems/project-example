@@ -5,7 +5,7 @@ import { ProfilePageEntry } from "./page"
 import { newForegroundOutsideFeature } from "../../../../../src/x_outside_feature/_ui/common"
 
 import { newBaseResource } from "../../../../../src/example/_ui/action_base/init/resource"
-import { newChangePasswordResource } from "../../../../../src/auth/password/action_change/init/resource"
+import { newChangePasswordResource } from "../../../../../src/auth/user/password/action_change/init/resource"
 import { initBaseView } from "../../../../../src/example/_ui/action_base/init"
 
 import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"

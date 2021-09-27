@@ -1,9 +1,9 @@
-import { newRequestResetTokenHandler } from "../../../../password/reset/action_request_token/init/worker/background"
+import { newRequestResetTokenHandler } from "../../../../user/password/reset/action_request_token/init/worker/background"
 
 import { WorkerHandler } from "../../../../../../ui/vendor/getto-application/action/worker/background"
 
 import { ForegroundMessage, BackgroundMessage } from "./message"
-import { RequestPasswordResetTokenProxyMessage } from "../../../../password/reset/action_request_token/init/worker/message"
+import { RequestPasswordResetTokenProxyMessage } from "../../../../user/password/reset/action_request_token/init/worker/message"
 
 import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/feature"
 import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-application/action/worker/feature"
