@@ -5,19 +5,21 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     auth_ticket::{
-        _auth::kernel::init::{
-            clock::test::StaticChronoAuthClock,
-            nonce_repository::test::{
-                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-            },
-            test::StaticCheckAuthNonceStruct,
-        },
+        _auth::kernel::init::clock::test::StaticChronoAuthClock,
         _common::kernel::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
         },
-        remote::validate::init::test::StaticValidateAuthTokenStruct,
+        remote::{
+            check_nonce::init::{
+                nonce_repository::test::{
+                    MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+                },
+                test::StaticCheckAuthNonceStruct,
+            },
+            validate::init::test::StaticValidateAuthTokenStruct,
+        },
     },
     password::remote::{
         change::init::{
@@ -32,7 +34,7 @@ use crate::auth::{
 };
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::infra::AuthNonceConfig,
+    auth_ticket::remote::check_nonce::infra::AuthNonceConfig,
     password::remote::{
         kernel::infra::HashedPassword, proxy_change::infra::ChangePasswordFieldsExtract,
     },

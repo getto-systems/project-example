@@ -1,4 +1,4 @@
-use crate::auth::auth_ticket::_auth::kernel::method::check_nonce;
+use crate::auth::auth_ticket::remote::check_nonce::method::check_auth_nonce;
 
 use crate::auth::{
     auth_ticket::_auth::kernel::infra::AuthClock,
@@ -29,7 +29,7 @@ pub async fn reset_password<S>(
     fields: ResetPasswordFieldsExtract,
     post: impl Fn(ResetPasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
-    check_nonce(infra.check_nonce_infra())
+    check_auth_nonce(infra.check_nonce_infra())
         .await
         .map_err(|err| post(ResetPasswordEvent::NonceError(err)))?;
 

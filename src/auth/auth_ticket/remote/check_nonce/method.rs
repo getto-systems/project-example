@@ -1,10 +1,17 @@
-use super::infra::{AuthClock, AuthNonceEntry, AuthNonceRepository, CheckAuthNonceInfra};
-use crate::auth::auth_ticket::_common::kernel::infra::AuthNonceMetadata;
+use crate::auth::auth_ticket::{
+    _auth::kernel::infra::AuthClock,
+    _common::kernel::infra::AuthNonceMetadata,
+    remote::check_nonce::infra::{AuthNonceEntry, AuthNonceRepository, CheckAuthNonceInfra},
+};
 
-use super::data::ValidateAuthNonceError;
-use crate::z_details::_common::repository::data::RegisterResult;
+use crate::{
+    auth::auth_ticket::remote::check_nonce::data::ValidateAuthNonceError,
+    z_details::_common::repository::data::RegisterResult,
+};
 
-pub async fn check_nonce(infra: &impl CheckAuthNonceInfra) -> Result<(), ValidateAuthNonceError> {
+pub async fn check_auth_nonce(
+    infra: &impl CheckAuthNonceInfra,
+) -> Result<(), ValidateAuthNonceError> {
     let clock = infra.clock();
     let nonce_metadata = infra.nonce_metadata();
     let nonce_repository = infra.nonce_repository();

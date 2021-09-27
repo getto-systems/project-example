@@ -1,6 +1,6 @@
 use crate::{
     auth::{
-        auth_ticket::_auth::kernel::data::ValidateAuthNonceError,
+        auth_ticket::remote::check_nonce::data::ValidateAuthNonceError,
         password::remote::{
             change::data::ChangePasswordError,
             kernel::data::{

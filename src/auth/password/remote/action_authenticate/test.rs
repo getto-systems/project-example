@@ -8,16 +8,18 @@ use crate::auth::{
     auth_ticket::{
         _auth::kernel::init::{
             clock::test::StaticChronoAuthClock,
-            nonce_repository::test::{
-                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-            },
-            test::StaticCheckAuthNonceStruct,
             ticket_repository::test::{
                 MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
             },
         },
         _common::kernel::init::nonce_metadata::test::StaticAuthNonceMetadata,
         remote::{
+            check_nonce::init::{
+                nonce_repository::test::{
+                    MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+                },
+                test::StaticCheckAuthNonceStruct,
+            },
             encode::init::{
                 test::StaticEncodeAuthTicketStruct,
                 token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
@@ -43,9 +45,9 @@ use crate::auth::{
 };
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::infra::AuthNonceConfig,
     auth_ticket::remote::{
-        encode::infra::EncodeAuthTicketConfig, issue::infra::IssueAuthTicketConfig,
+        check_nonce::infra::AuthNonceConfig, encode::infra::EncodeAuthTicketConfig,
+        issue::infra::IssueAuthTicketConfig,
     },
     password::{
         remote::kernel::infra::HashedPassword,

@@ -7,10 +7,6 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 use crate::auth::auth_ticket::{
     _auth::kernel::init::{
         clock::test::StaticChronoAuthClock,
-        nonce_repository::test::{
-            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-        },
-        test::StaticCheckAuthNonceStruct,
         ticket_repository::test::{
             MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
         },
@@ -20,6 +16,12 @@ use crate::auth::auth_ticket::{
         token_metadata::test::StaticAuthTokenMetadata,
     },
     remote::{
+        check_nonce::init::{
+            nonce_repository::test::{
+                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+            },
+            test::StaticCheckAuthNonceStruct,
+        },
         encode::init::{
             test::StaticEncodeAuthTicketStruct,
             token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
@@ -29,7 +31,7 @@ use crate::auth::auth_ticket::{
 };
 
 use crate::auth::auth_ticket::{
-    _auth::kernel::infra::AuthNonceConfig, remote::encode::infra::EncodeAuthTicketConfig,
+    remote::check_nonce::infra::AuthNonceConfig, remote::encode::infra::EncodeAuthTicketConfig,
 };
 
 use super::action::{RenewAuthTicketAction, RenewAuthTicketMaterial};

@@ -1,4 +1,4 @@
-use crate::auth::auth_ticket::_auth::kernel::method::check_nonce;
+use crate::auth::auth_ticket::remote::check_nonce::method::check_auth_nonce;
 
 use crate::auth::{
     auth_user::remote::kernel::infra::AuthUserRepository,
@@ -18,7 +18,7 @@ pub async fn authenticate_password<S>(
     fields: AuthenticatePasswordFieldsExtract,
     post: impl Fn(AuthenticatePasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
-    check_nonce(infra.check_nonce_infra())
+    check_auth_nonce(infra.check_nonce_infra())
         .await
         .map_err(|err| post(AuthenticatePasswordEvent::NonceError(err)))?;
 

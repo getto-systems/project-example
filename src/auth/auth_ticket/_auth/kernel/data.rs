@@ -1,13 +1,10 @@
 use chrono::{DateTime, Duration, Utc};
 
-use crate::{
-    auth::{
-        auth_ticket::_common::kernel::data::AuthTicketExtract,
-        auth_user::remote::kernel::data::{
-            AuthPermission, AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
-        },
+use crate::auth::{
+    auth_ticket::_common::kernel::data::AuthTicketExtract,
+    auth_user::remote::kernel::data::{
+        AuthPermission, AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
     },
-    z_details::_common::{repository::data::RepositoryError, request::data::MetadataError},
 };
 
 #[derive(Clone)]
@@ -189,25 +186,6 @@ pub struct ExpansionLimitDuration(Duration);
 impl ExpansionLimitDuration {
     pub fn with_duration(duration: Duration) -> Self {
         Self(duration)
-    }
-}
-
-pub enum ValidateAuthNonceError {
-    NonceNotSent,
-    MetadataError(MetadataError),
-    RepositoryError(RepositoryError),
-    Conflict,
-}
-
-impl std::fmt::Display for ValidateAuthNonceError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        let label = "auth nonce error";
-        match self {
-            Self::NonceNotSent => write!(f, "{}: nonce not sent", label),
-            Self::MetadataError(err) => write!(f, "{}: {}", label, err),
-            Self::RepositoryError(err) => write!(f, "{}: {}", label, err),
-            Self::Conflict => write!(f, "{}: conflict", label),
-        }
     }
 }
 

@@ -1,4 +1,4 @@
-use crate::auth::auth_ticket::_auth::kernel::method::check_nonce;
+use crate::auth::auth_ticket::remote::check_nonce::method::check_auth_nonce;
 
 use crate::auth::auth_ticket::{
     _common::kernel::infra::{AuthTokenDecoder, AuthTokenMetadata},
@@ -19,7 +19,7 @@ pub async fn validate_auth_token<S>(
     require_roles: RequireAuthRoles,
     post: impl Fn(ValidateAuthTokenEvent) -> S,
 ) -> Result<AuthTicket, S> {
-    check_nonce(infra.check_nonce_infra())
+    check_auth_nonce(infra.check_nonce_infra())
         .await
         .map_err(|err| post(ValidateAuthTokenEvent::NonceError(err)))?;
 

@@ -1,6 +1,6 @@
 use getto_application::data::MethodResult;
 
-use crate::auth::auth_ticket::_auth::kernel::method::check_nonce;
+use crate::auth::auth_ticket::remote::check_nonce::method::check_auth_nonce;
 
 use crate::auth::password::reset::remote::request_token::event::destination_not_found;
 
@@ -33,7 +33,7 @@ pub async fn request_reset_token<S>(
     let token_notifier = infra.token_notifier();
     let config = infra.config();
 
-    check_nonce(infra.check_nonce_infra())
+    check_auth_nonce(infra.check_nonce_infra())
         .await
         .map_err(|err| post(RequestResetTokenEvent::NonceError(err)))?;
 
