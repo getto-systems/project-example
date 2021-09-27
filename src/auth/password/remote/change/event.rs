@@ -12,7 +12,7 @@ use crate::{
     z_details::_common::repository::data::RepositoryError,
 };
 
-use crate::auth::auth_ticket::_auth::validate::event::ValidateAuthTokenEvent;
+use crate::auth::auth_ticket::remote::validate::event::ValidateAuthTokenEvent;
 
 pub enum ChangePasswordEvent {
     Success,

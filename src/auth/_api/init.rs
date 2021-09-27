@@ -1,1 +1,1 @@
-pub use crate::auth::auth_ticket::_api::validate_metadata::init::ValidateApiMetadataStruct;
+pub use crate::auth::auth_ticket::remote::validate_metadata::init::ValidateApiMetadataStruct;

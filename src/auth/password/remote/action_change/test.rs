@@ -5,21 +5,19 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     auth_ticket::{
-        _auth::{
-            kernel::init::{
-                clock::test::StaticChronoAuthClock,
-                nonce_repository::test::{
-                    MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-                },
-                test::StaticCheckAuthNonceStruct,
+        _auth::kernel::init::{
+            clock::test::StaticChronoAuthClock,
+            nonce_repository::test::{
+                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
             },
-            validate::init::test::StaticValidateAuthTokenStruct,
+            test::StaticCheckAuthNonceStruct,
         },
         _common::kernel::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
         },
+        remote::validate::init::test::StaticValidateAuthTokenStruct,
     },
     password::remote::{
         change::init::{

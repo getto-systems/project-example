@@ -6,7 +6,18 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     auth_ticket::{
-        _auth::{
+        _auth::kernel::init::{
+            clock::test::StaticChronoAuthClock,
+            nonce_repository::test::{
+                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+            },
+            test::StaticCheckAuthNonceStruct,
+            ticket_repository::test::{
+                MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+            },
+        },
+        _common::kernel::init::nonce_metadata::test::StaticAuthNonceMetadata,
+        remote::{
             encode::init::{
                 test::StaticEncodeAuthTicketStruct,
                 token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
@@ -14,18 +25,7 @@ use crate::auth::{
             issue::init::{
                 id_generator::test::StaticAuthTicketIdGenerator, test::StaticIssueAuthTicketStruct,
             },
-            kernel::init::{
-                clock::test::StaticChronoAuthClock,
-                nonce_repository::test::{
-                    MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-                },
-                test::StaticCheckAuthNonceStruct,
-                ticket_repository::test::{
-                    MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
-                },
-            },
         },
-        _common::kernel::init::nonce_metadata::test::StaticAuthNonceMetadata,
     },
     auth_user::remote::kernel::init::user_repository::test::{
         MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
@@ -43,9 +43,9 @@ use crate::auth::{
 };
 
 use crate::auth::{
-    auth_ticket::_auth::{
-        encode::infra::EncodeAuthTicketConfig, issue::infra::IssueAuthTicketConfig,
-        kernel::infra::AuthNonceConfig,
+    auth_ticket::{
+        _auth::kernel::infra::AuthNonceConfig,
+        remote::{encode::infra::EncodeAuthTicketConfig, issue::infra::IssueAuthTicketConfig},
     },
     password::reset::remote::proxy_reset::infra::ResetPasswordFieldsExtract,
 };

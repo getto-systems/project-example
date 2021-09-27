@@ -1,5 +1,5 @@
 use crate::auth::{
-    auth_ticket::_auth::validate::infra::ValidateAuthTokenInfra,
+    auth_ticket::remote::validate::infra::ValidateAuthTokenInfra,
     password::remote::{
         kernel::infra::{
             AuthUserPasswordHasher, AuthUserPasswordMatcher, ChangePasswordRepository,

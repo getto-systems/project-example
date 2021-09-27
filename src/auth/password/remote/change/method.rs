@@ -6,7 +6,7 @@ use crate::auth::password::remote::{
     proxy_change::infra::ChangePasswordFieldsExtract,
 };
 
-use crate::auth::auth_ticket::_auth::validate::method::validate_auth_token;
+use crate::auth::auth_ticket::remote::validate::method::validate_auth_token;
 
 use super::event::{ChangePasswordEvent, ChangePasswordKind};
 

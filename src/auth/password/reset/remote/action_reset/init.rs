@@ -5,7 +5,7 @@ use crate::auth::password::reset::_common::y_protobuf::service::ResetPasswordReq
 use crate::x_outside_feature::_auth::feature::AuthAppFeature;
 
 use crate::auth::{
-    auth_ticket::_auth::{
+    auth_ticket::remote::{
         encode::init::EncodeAuthTicketStruct, issue::init::IssueAuthTicketStruct,
     },
     password::reset::remote::reset::init::{

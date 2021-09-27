@@ -5,7 +5,7 @@ use tonic::metadata::MetadataMap;
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::{
-    auth_ticket::_auth::validate::init::ApiValidateAuthTokenStruct,
+    auth_ticket::remote::validate::init::ApiValidateAuthTokenStruct,
     password::remote::kernel::init::{
         password_hasher::Argon2PasswordHasher, password_matcher::Argon2PasswordMatcher,
         password_repository::MysqlAuthUserPasswordRepository,
@@ -45,7 +45,7 @@ impl<'a> ChangePasswordInfra for ChangePasswordStruct<'a> {
 #[cfg(test)]
 pub mod test {
     use crate::auth::{
-        auth_ticket::_auth::validate::init::test::StaticValidateAuthTokenStruct,
+        auth_ticket::remote::validate::init::test::StaticValidateAuthTokenStruct,
         password::remote::kernel::init::{
             password_hasher::test::PlainPasswordHasher,
             password_matcher::test::PlainPasswordMatcher,
