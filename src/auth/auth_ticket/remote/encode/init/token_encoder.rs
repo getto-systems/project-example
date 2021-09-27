@@ -6,15 +6,14 @@ use aws_cloudfront_cookie::CloudfrontPolicy;
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideCloudfrontKey;
 
-use crate::auth::auth_ticket::{
-    _auth::kernel::infra::{AuthJwtClaims, AUTH_JWT_AUDIENCE_API, AUTH_JWT_AUDIENCE_TICKET},
-    remote::encode::infra::{AuthTokenEncoder, CloudfrontTokenEncoder},
+use crate::auth::auth_ticket::remote::{
+    encode::infra::{AuthTokenEncoder, CloudfrontTokenEncoder},
+    kernel::infra::AuthJwtClaims,
 };
 
-use crate::auth::auth_ticket::{
-    _auth::kernel::data::{AuthTicket, ExpireDateTime},
-    _common::kernel::data::{AuthTokenExtract, CloudfrontTokenKind},
-    remote::encode::data::EncodeAuthTokenError,
+use crate::auth::auth_ticket::remote::{
+    encode::data::EncodeAuthTokenError,
+    kernel::data::{AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime},
 };
 
 pub struct TicketJwtAuthTokenEncoder<'a> {
@@ -33,9 +32,9 @@ impl<'a> AuthTokenEncoder for TicketJwtAuthTokenEncoder<'a> {
         ticket: AuthTicket,
         expires: ExpireDateTime,
     ) -> Result<AuthTokenExtract, EncodeAuthTokenError> {
+        let (claims, expires) = AuthJwtClaims::new_ticket(ticket, expires);
         encode_jwt(JwtConfig {
-            aud: AUTH_JWT_AUDIENCE_TICKET,
-            ticket,
+            claims,
             expires,
             key: self.key,
         })
@@ -58,9 +57,9 @@ impl<'a> AuthTokenEncoder for ApiJwtAuthTokenEncoder<'a> {
         ticket: AuthTicket,
         expires: ExpireDateTime,
     ) -> Result<AuthTokenExtract, EncodeAuthTokenError> {
+        let (claims, expires) = AuthJwtClaims::new_api(ticket, expires);
         encode_jwt(JwtConfig {
-            aud: AUTH_JWT_AUDIENCE_API,
-            ticket,
+            claims,
             expires,
             key: self.key,
         })
@@ -68,20 +67,16 @@ impl<'a> AuthTokenEncoder for ApiJwtAuthTokenEncoder<'a> {
 }
 
 struct JwtConfig<'a> {
-    aud: &'static str,
-    ticket: AuthTicket,
-    expires: ExpireDateTime,
+    claims: AuthJwtClaims,
+    expires: i64,
     key: &'a EncodingKey,
 }
 fn encode_jwt<'a>(config: JwtConfig<'a>) -> Result<AuthTokenExtract, EncodeAuthTokenError> {
     let JwtConfig {
-        aud,
-        ticket,
+        claims,
         expires,
         key,
     } = config;
-
-    let (claims, expires) = AuthJwtClaims::from_ticket(ticket, aud.into(), expires);
 
     let token = encode(&Header::new(Algorithm::ES384), &claims, key)
         .map_err(|err| EncodeAuthTokenError::InfraError(format!("{}", err)))?;
@@ -151,10 +146,9 @@ pub mod test {
         AuthTokenEncoder, CloudfrontTokenEncoder,
     };
 
-    use crate::auth::auth_ticket::{
-        _auth::kernel::data::{AuthTicket, ExpireDateTime},
-        _common::kernel::data::{AuthTokenExtract, CloudfrontTokenKind},
-        remote::encode::data::EncodeAuthTokenError,
+    use crate::auth::auth_ticket::remote::{
+        encode::data::EncodeAuthTokenError,
+        kernel::data::{AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime},
     };
 
     pub struct StaticAuthTokenEncoder;

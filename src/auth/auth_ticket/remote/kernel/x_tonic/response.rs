@@ -8,8 +8,9 @@ use crate::auth::auth_ticket::_common::y_protobuf::service::{
     AuthTokenEncodedPb, AuthTokenPb, CloudfrontTokenKindPb, CloudfrontTokenPb,
 };
 
-use crate::auth::auth_ticket::_common::kernel::data::{
+use crate::auth::auth_ticket::remote::kernel::data::{
     AuthTokenEncoded, AuthTokenExtract, CloudfrontTokenKind, DecodeAuthTokenError,
+    ValidateAuthRolesError,
 };
 
 impl Into<AuthTokenEncodedPb> for AuthTokenEncoded {
@@ -107,5 +108,13 @@ impl Into<CloudfrontTokenKind> for CloudfrontTokenKindPb {
 impl<T> RespondTo<T> for DecodeAuthTokenError {
     fn respond_to(self) -> Result<Response<T>, Status> {
         Err(Status::unauthenticated(format!("{}", self)))
+    }
+}
+
+impl<T> RespondTo<T> for ValidateAuthRolesError {
+    fn respond_to(self) -> Result<Response<T>, Status> {
+        match self {
+            Self::PermissionDenied(_, _) => Err(Status::permission_denied(format!("{}", self))),
+        }
     }
 }

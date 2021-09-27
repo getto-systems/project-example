@@ -4,10 +4,10 @@ use crate::auth::_common::metadata::METADATA_TOKEN;
 
 use crate::z_details::_common::request::x_tonic::metadata::metadata;
 
-use crate::auth::auth_ticket::_common::kernel::infra::AuthTokenMetadata;
+use crate::auth::auth_ticket::remote::kernel::infra::AuthTokenMetadata;
 
 use crate::{
-    auth::auth_ticket::_common::kernel::data::AuthToken,
+    auth::auth_ticket::remote::kernel::data::AuthToken,
     z_details::_common::request::data::MetadataError,
 };
 

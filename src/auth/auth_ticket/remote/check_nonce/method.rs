@@ -1,7 +1,6 @@
-use crate::auth::auth_ticket::{
-    _auth::kernel::infra::AuthClock,
-    _common::kernel::infra::AuthNonceMetadata,
-    remote::check_nonce::infra::{AuthNonceEntry, AuthNonceRepository, CheckAuthNonceInfra},
+use crate::auth::auth_ticket::remote::{
+    check_nonce::infra::{AuthNonceEntry, AuthNonceRepository, CheckAuthNonceInfra},
+    kernel::infra::{AuthClock, AuthNonceMetadata},
 };
 
 use crate::{

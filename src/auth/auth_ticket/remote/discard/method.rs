@@ -1,8 +1,8 @@
 use getto_application::data::MethodResult;
 
-use crate::auth::auth_ticket::{
-    _auth::kernel::infra::{AuthClock, DiscardAuthTicketRepository},
-    remote::discard::infra::DiscardAuthTicketInfra,
+use crate::auth::auth_ticket::remote::{
+    discard::infra::DiscardAuthTicketInfra,
+    kernel::infra::{AuthClock, DiscardAuthTicketRepository},
 };
 
 use crate::auth::auth_ticket::remote::validate::method::validate_auth_token;

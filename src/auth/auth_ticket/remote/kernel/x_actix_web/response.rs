@@ -11,9 +11,11 @@ use super::header::{
     COOKIE_CLOUDFRONT_SIGNATURE, COOKIE_TICKET_TOKEN,
 };
 
-use crate::auth::auth_ticket::{
-    _api::kernel::data::{AuthTokenMessage, AuthTokenResponse},
-    _common::kernel::data::{AuthTokenEncoded, AuthTokenExtract, CloudfrontTokenKind},
+use crate::auth::_common::service::x_actix_web::response::unauthorized;
+
+use crate::auth::auth_ticket::remote::kernel::data::{
+    AuthTokenEncoded, AuthTokenExtract, AuthTokenMessage, AuthTokenResponse, CloudfrontTokenKind,
+    DecodeAuthTokenError,
 };
 
 impl RespondTo for AuthTokenResponse {
@@ -58,5 +60,11 @@ fn kind_as_name(kind: &CloudfrontTokenKind) -> &str {
         CloudfrontTokenKind::KeyPairId => COOKIE_CLOUDFRONT_KEY_PAIR_ID,
         CloudfrontTokenKind::Policy => COOKIE_CLOUDFRONT_POLICY,
         CloudfrontTokenKind::Signature => COOKIE_CLOUDFRONT_SIGNATURE,
+    }
+}
+
+impl RespondTo for DecodeAuthTokenError {
+    fn respond_to(self, request: &HttpRequest) -> HttpResponse {
+        unauthorized(request)
     }
 }

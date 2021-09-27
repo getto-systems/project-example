@@ -4,11 +4,11 @@ use jsonwebtoken::{decode, errors::ErrorKind, Algorithm, DecodingKey, Validation
 
 use crate::auth::_common::x_outside_feature::feature::AuthOutsideDecodingKey;
 
-use crate::auth::auth_ticket::_common::kernel::infra::{
+use crate::auth::auth_ticket::remote::kernel::infra::{
     AuthJwtClaims, AuthTokenDecoder, AUTH_JWT_AUDIENCE_API, AUTH_JWT_AUDIENCE_TICKET,
 };
 
-use crate::auth::auth_ticket::_common::kernel::data::{
+use crate::auth::auth_ticket::remote::kernel::data::{
     AuthTicketExtract, AuthToken, DecodeAuthTokenError,
 };
 
@@ -79,9 +79,9 @@ impl<'a> AuthTokenDecoder for NoopTokenDecoder {
 pub mod test {
     use std::collections::HashSet;
 
-    use crate::auth::auth_ticket::_common::kernel::infra::AuthTokenDecoder;
+    use crate::auth::auth_ticket::remote::kernel::infra::AuthTokenDecoder;
 
-    use crate::auth::auth_ticket::_common::kernel::data::{
+    use crate::auth::auth_ticket::remote::kernel::data::{
         AuthTicketExtract, AuthToken, DecodeAuthTokenError,
     };
 

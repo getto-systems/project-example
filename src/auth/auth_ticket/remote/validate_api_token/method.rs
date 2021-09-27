@@ -1,6 +1,6 @@
-use crate::auth::auth_ticket::{
-    _common::kernel::infra::{AuthMetadata, AuthTokenDecoder},
-    remote::validate_api_token::infra::{ValidateApiTokenInfra, ValidateService},
+use crate::auth::auth_ticket::remote::{
+    kernel::infra::{AuthMetadata, AuthTokenDecoder},
+    validate_api_token::infra::{ValidateApiTokenInfra, ValidateService},
 };
 
 use crate::auth::{

@@ -1,8 +1,8 @@
 use crate::auth::{
     _common::infra::AuthMetadataContent,
-    auth_ticket::{
-        remote::validate_metadata::infra::ValidateAuthMetadataInfra,
-        _common::kernel::infra::{AuthMetadata, AuthTokenDecoder},
+    auth_ticket::remote::{
+        kernel::infra::{AuthMetadata, AuthTokenDecoder},
+        validate_metadata::infra::ValidateAuthMetadataInfra,
     },
 };
 

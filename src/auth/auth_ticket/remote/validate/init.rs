@@ -5,9 +5,9 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::{
-    remote::check_nonce::init::CheckAuthNonceStruct,
-    _common::kernel::init::token_decoder::{JwtApiTokenDecoder, JwtTicketTokenDecoder},
+use crate::auth::auth_ticket::remote::{
+    check_nonce::init::CheckAuthNonceStruct,
+    kernel::init::token_decoder::{JwtApiTokenDecoder, JwtTicketTokenDecoder},
 };
 use token_metadata::TonicAuthTokenMetadata;
 
@@ -79,9 +79,9 @@ impl<'a> ValidateAuthTokenInfra for ApiValidateAuthTokenStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::auth_ticket::{
-        remote::check_nonce::init::test::StaticCheckAuthNonceStruct,
-        _common::kernel::init::{
+    use crate::auth::auth_ticket::remote::{
+        check_nonce::init::test::StaticCheckAuthNonceStruct,
+        kernel::init::{
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
         },

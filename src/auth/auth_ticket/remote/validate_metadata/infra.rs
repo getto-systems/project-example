@@ -1,4 +1,4 @@
-use crate::auth::auth_ticket::_common::kernel::infra::{AuthMetadata, AuthTokenDecoder};
+use crate::auth::auth_ticket::remote::kernel::infra::{AuthMetadata, AuthTokenDecoder};
 
 pub trait ValidateAuthMetadataInfra {
     type AuthMetadata: AuthMetadata;

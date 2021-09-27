@@ -3,7 +3,7 @@ use actix_web::{HttpRequest, HttpResponse};
 use crate::z_details::_common::{logger::LogLevel, response::actix_web::RespondTo};
 
 use crate::{
-    auth::auth_ticket::_common::kernel::data::DecodeAuthTokenError,
+    auth::auth_ticket::remote::kernel::data::DecodeAuthTokenError,
     z_details::_common::request::data::MetadataError,
 };
 

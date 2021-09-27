@@ -1,11 +1,95 @@
+use std::collections::{HashMap, HashSet};
+
 use chrono::{DateTime, Duration, Utc};
 
-use crate::auth::{
-    auth_ticket::_common::kernel::data::AuthTicketExtract,
-    auth_user::remote::kernel::data::{
-        AuthPermission, AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
-    },
+use crate::auth::auth_user::remote::kernel::data::{
+    AuthPermission, AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
 };
+
+#[derive(Clone)]
+pub struct AuthNonce(String);
+
+impl AuthNonce {
+    pub const fn restore(nonce: String) -> Self {
+        Self(nonce)
+    }
+
+    pub fn extract(self) -> String {
+        self.0
+    }
+
+    #[cfg(test)]
+    pub fn as_str(&self) -> &str {
+        self.0.as_str()
+    }
+}
+
+#[derive(Clone)]
+pub struct AuthToken(String);
+
+impl AuthToken {
+    pub const fn restore(token: String) -> Self {
+        Self(token)
+    }
+
+    pub fn extract(self) -> String {
+        self.0
+    }
+
+    pub fn as_str(&self) -> &str {
+        self.0.as_str()
+    }
+}
+
+#[derive(Clone)]
+pub struct AuthTokenExtract {
+    pub token: String,
+    pub expires: i64,
+}
+
+pub struct AuthTokenEncoded {
+    pub ticket_token: AuthTokenExtract,
+    pub api_token: AuthTokenExtract,
+    pub cloudfront_tokens: HashMap<CloudfrontTokenKind, AuthTokenExtract>,
+}
+
+#[derive(Eq, PartialEq, Hash)]
+pub enum CloudfrontTokenKind {
+    KeyPairId,
+    Policy,
+    Signature,
+}
+
+pub struct AuthTokenResponse {
+    pub domain: String,
+    pub message: AuthTokenMessage,
+}
+
+pub struct AuthTokenMessage {
+    pub body: String,
+    pub token: AuthTokenEncoded,
+}
+
+#[derive(Clone)]
+pub struct AuthTicketExtract {
+    pub ticket_id: String,
+    pub user_id: String,
+    pub granted_roles: HashSet<String>,
+}
+
+pub enum DecodeAuthTokenError {
+    Expired,
+    Invalid(String),
+}
+
+impl std::fmt::Display for DecodeAuthTokenError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::Expired => write!(f, "token expired"),
+            Self::Invalid(err) => write!(f, "invalid token: {}", err),
+        }
+    }
+}
 
 #[derive(Clone)]
 pub struct AuthTicket {

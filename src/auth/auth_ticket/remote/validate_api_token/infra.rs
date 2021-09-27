@@ -1,4 +1,4 @@
-use crate::auth::auth_ticket::_common::kernel::infra::{
+use crate::auth::auth_ticket::remote::kernel::infra::{
     AuthMetadata, AuthMetadataContent, AuthTokenDecoder,
 };
 

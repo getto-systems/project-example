@@ -1,7 +1,8 @@
-use crate::auth::auth_ticket::{
-    _auth::kernel::infra::{AuthClock, DiscardAuthTicketRepository},
-    remote::validate::infra::ValidateAuthTokenInfra,
+use crate::auth::auth_ticket::remote::{
+    kernel::infra::{AuthClock, DiscardAuthTicketRepository},
+    validate::infra::ValidateAuthTokenInfra,
 };
+
 pub trait DiscardAuthTicketInfra {
     type ValidateInfra: ValidateAuthTokenInfra;
     type Clock: AuthClock;

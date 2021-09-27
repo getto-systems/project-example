@@ -1,13 +1,10 @@
 use chrono::{DateTime, Utc};
 
-use crate::auth::auth_ticket::{
-    _auth::kernel::infra::AuthClock, _common::kernel::infra::AuthNonceMetadata,
-};
+use crate::auth::auth_ticket::remote::kernel::infra::{AuthClock, AuthNonceMetadata};
 
 use crate::{
-    auth::auth_ticket::{
-        _auth::kernel::data::{AuthDateTime, ExpireDateTime, ExpireDuration},
-        _common::kernel::data::AuthNonce,
+    auth::auth_ticket::remote::kernel::data::{
+        AuthDateTime, AuthNonce, ExpireDateTime, ExpireDuration,
     },
     z_details::_common::repository::data::{RegisterResult, RepositoryError},
 };

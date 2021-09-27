@@ -1,8 +1,8 @@
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideCookie;
 
-use crate::auth::auth_ticket::_api::kernel::infra::AuthTokenResponseBuilder;
+use crate::auth::auth_ticket::remote::kernel::infra::AuthTokenResponseBuilder;
 
-use crate::auth::auth_ticket::_api::kernel::data::{AuthTokenResponse, AuthTokenMessage};
+use crate::auth::auth_ticket::remote::kernel::data::{AuthTokenResponse, AuthTokenMessage};
 
 pub struct CookieAuthTokenResponseBuilder<'a> {
     domain: &'a str,
@@ -27,9 +27,9 @@ impl<'a> AuthTokenResponseBuilder for CookieAuthTokenResponseBuilder<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::auth_ticket::_api::kernel::infra::AuthTokenResponseBuilder;
+    use crate::auth::auth_ticket::remote::kernel::infra::AuthTokenResponseBuilder;
 
-    use crate::auth::auth_ticket::_api::kernel::data::{AuthTokenResponse, AuthTokenMessage};
+    use crate::auth::auth_ticket::remote::kernel::data::{AuthTokenResponse, AuthTokenMessage};
 
     pub struct StaticAuthTokenResponseBuilder;
 

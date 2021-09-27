@@ -4,9 +4,9 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
 
-use crate::auth::auth_ticket::{
-    _common::kernel::init::{auth_metadata::TonicAuthMetadata, token_decoder::NoopTokenDecoder},
-    remote::validate_api_token::init::validate_service::TonicValidateService,
+use crate::auth::auth_ticket::remote::{
+    kernel::init::{auth_metadata::TonicAuthMetadata, token_decoder::NoopTokenDecoder},
+    validate_api_token::init::validate_service::TonicValidateService,
 };
 
 use crate::auth::auth_ticket::remote::validate_api_token::infra::ValidateApiTokenInfra;
@@ -50,7 +50,7 @@ impl<'a> ValidateApiTokenInfra for ValidateApiTokenStruct<'a> {
 #[cfg(test)]
 pub mod test {
     use super::validate_service::test::StaticValidateService;
-    use crate::auth::auth_ticket::_common::kernel::init::{
+    use crate::auth::auth_ticket::remote::kernel::init::{
         auth_metadata::test::StaticAuthMetadata, token_decoder::test::StaticAuthTokenDecoder,
     };
 

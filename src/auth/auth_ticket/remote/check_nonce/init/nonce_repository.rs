@@ -9,7 +9,7 @@ use crate::z_details::_common::repository::helper::infra_error;
 use crate::auth::auth_ticket::remote::check_nonce::infra::{AuthNonceEntry, AuthNonceRepository};
 
 use crate::{
-    auth::auth_ticket::_auth::kernel::data::AuthDateTime,
+    auth::auth_ticket::remote::kernel::data::AuthDateTime,
     z_details::_common::repository::data::{RegisterResult, RepositoryError},
 };
 
@@ -116,10 +116,7 @@ pub mod test {
     };
 
     use crate::{
-        auth::auth_ticket::{
-            _auth::kernel::data::{AuthDateTime, ExpireDateTime},
-            _common::kernel::data::AuthNonce,
-        },
+        auth::auth_ticket::remote::kernel::data::{AuthDateTime, AuthNonce, ExpireDateTime},
         z_details::_common::repository::data::{RegisterResult, RepositoryError},
     };
 

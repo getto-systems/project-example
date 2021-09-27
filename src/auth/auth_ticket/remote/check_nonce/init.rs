@@ -4,7 +4,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_auth::kernel::init::{
+use crate::auth::auth_ticket::remote::kernel::init::{
     clock::ChronoAuthClock, nonce_metadata::TonicAuthNonceMetadata,
 };
 use nonce_repository::DynamoDbAuthNonceRepository;
@@ -56,9 +56,8 @@ impl<'a> CheckAuthNonceStruct<'a> {
 #[cfg(test)]
 pub mod test {
     use super::nonce_repository::test::MemoryAuthNonceRepository;
-    use crate::auth::auth_ticket::{
-        _auth::kernel::init::clock::test::StaticChronoAuthClock,
-        _common::kernel::init::nonce_metadata::test::StaticAuthNonceMetadata,
+    use crate::auth::auth_ticket::remote::kernel::init::{
+        clock::test::StaticChronoAuthClock, nonce_metadata::test::StaticAuthNonceMetadata,
     };
 
     use crate::auth::auth_ticket::remote::check_nonce::infra::{

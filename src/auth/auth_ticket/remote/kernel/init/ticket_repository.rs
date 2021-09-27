@@ -3,12 +3,12 @@ use sqlx::{query, MySqlPool};
 
 use crate::z_details::_common::repository::mysql::helper::mysql_error;
 
-use crate::auth::auth_ticket::_auth::kernel::infra::{
+use crate::auth::auth_ticket::remote::kernel::infra::{
     AuthTicketRepository, DiscardAuthTicketRepository, IssueAuthTicketRepository,
 };
 
 use crate::{
-    auth::auth_ticket::_auth::kernel::data::{AuthDateTime, AuthTicket, ExpansionLimitDateTime},
+    auth::auth_ticket::remote::kernel::data::{AuthDateTime, AuthTicket, ExpansionLimitDateTime},
     z_details::_common::repository::data::RepositoryError,
 };
 
@@ -147,12 +147,12 @@ pub mod test {
 
     use crate::z_details::_common::repository::helper::infra_error;
 
-    use crate::auth::auth_ticket::_auth::kernel::infra::{
+    use crate::auth::auth_ticket::remote::kernel::infra::{
         AuthTicketRepository, DiscardAuthTicketRepository, IssueAuthTicketRepository,
     };
 
     use crate::{
-        auth::auth_ticket::_auth::kernel::data::{
+        auth::auth_ticket::remote::kernel::data::{
             AuthDateTime, AuthTicket, AuthTicketId, ExpansionLimitDateTime,
         },
         z_details::_common::repository::data::RepositoryError,

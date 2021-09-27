@@ -1,6 +1,7 @@
-use crate::auth::auth_ticket::{
-    _auth::kernel::data::{AuthTicket, ValidateAuthRolesError},
-    remote::{check_nonce::data::ValidateAuthNonceError, validate::data::ValidateAuthTokenError},
+use crate::auth::auth_ticket::remote::{
+    check_nonce::data::ValidateAuthNonceError,
+    kernel::data::{AuthTicket, ValidateAuthRolesError},
+    validate::data::ValidateAuthTokenError,
 };
 
 pub enum ValidateAuthTokenEvent {

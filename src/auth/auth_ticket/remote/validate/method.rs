@@ -1,16 +1,14 @@
 use crate::auth::auth_ticket::remote::check_nonce::method::check_auth_nonce;
 
-use crate::auth::auth_ticket::{
-    _common::kernel::infra::{AuthTokenDecoder, AuthTokenMetadata},
-    remote::validate::infra::ValidateAuthTokenInfra,
+use crate::auth::auth_ticket::remote::{
+    kernel::infra::{AuthTokenDecoder, AuthTokenMetadata},
+    validate::infra::ValidateAuthTokenInfra,
 };
 
 use super::event::ValidateAuthTokenEvent;
 
 use crate::auth::{
-    auth_ticket::{
-        _auth::kernel::data::AuthTicket, remote::validate::data::ValidateAuthTokenError,
-    },
+    auth_ticket::remote::{kernel::data::AuthTicket, validate::data::ValidateAuthTokenError},
     auth_user::remote::kernel::data::RequireAuthRoles,
 };
 

@@ -2,11 +2,9 @@ use actix_web::HttpRequest;
 
 use crate::auth::_common::x_outside_feature::feature::AuthOutsideDecodingKey;
 
-use crate::auth::auth_ticket::{
-    _api::kernel::init::auth_metadata::{ApiAuthMetadata, NoAuthMetadata, TicketAuthMetadata},
-    _common::kernel::init::token_decoder::{
-        JwtApiTokenDecoder, JwtTicketTokenDecoder, NoopTokenDecoder,
-    },
+use crate::auth::auth_ticket::remote::kernel::init::{
+    auth_metadata::{ApiAuthMetadata, NoAuthMetadata, TicketAuthMetadata},
+    token_decoder::{JwtApiTokenDecoder, JwtTicketTokenDecoder, NoopTokenDecoder},
 };
 
 use crate::auth::auth_ticket::remote::validate_metadata::infra::ValidateAuthMetadataInfra;

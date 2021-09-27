@@ -13,9 +13,9 @@ use crate::auth::{
 use crate::auth::auth_ticket::remote::encode::event::EncodeAuthTicketEvent;
 
 use crate::auth::{
-    auth_ticket::{
-        _common::kernel::data::AuthTokenEncoded,
-        remote::encode::data::{AuthTicketEncoded, EncodeAuthTokenError},
+    auth_ticket::remote::{
+        encode::data::{AuthTicketEncoded, EncodeAuthTokenError},
+        kernel::data::AuthTokenEncoded,
     },
     auth_user::remote::kernel::data::AuthUserExtract,
 };

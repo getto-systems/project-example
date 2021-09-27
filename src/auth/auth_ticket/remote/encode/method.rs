@@ -1,16 +1,15 @@
 use getto_application::data::MethodResult;
 
-use crate::auth::auth_ticket::{
-    _auth::kernel::infra::{AuthClock, AuthTicketRepository},
-    remote::encode::infra::{AuthTokenEncoder, CloudfrontTokenEncoder, EncodeAuthTicketInfra},
+use crate::auth::auth_ticket::remote::{
+    encode::infra::{AuthTokenEncoder, CloudfrontTokenEncoder, EncodeAuthTicketInfra},
+    kernel::infra::{AuthClock, AuthTicketRepository},
 };
 
 use super::event::EncodeAuthTicketEvent;
 
-use crate::auth::auth_ticket::{
-    _auth::kernel::data::{AuthTicket, ExpansionLimitDateTime},
-    _common::kernel::data::AuthTokenEncoded,
-    remote::encode::data::{AuthTicketEncoded, AuthTokenExpires},
+use crate::auth::auth_ticket::remote::{
+    encode::data::{AuthTicketEncoded, AuthTokenExpires},
+    kernel::data::{AuthTicket, AuthTokenEncoded, ExpansionLimitDateTime},
 };
 
 pub async fn encode_auth_ticket<S>(

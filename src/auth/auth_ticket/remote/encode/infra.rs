@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 
-use crate::auth::auth_ticket::_auth::kernel::infra::{AuthClock, AuthTicketRepository};
+use crate::auth::auth_ticket::remote::kernel::infra::{AuthClock, AuthTicketRepository};
 
-use crate::auth::auth_ticket::{
-    _auth::kernel::data::{AuthTicket, ExpireDateTime, ExpireDuration},
-    _common::kernel::data::{AuthTokenExtract, CloudfrontTokenKind},
-    remote::encode::data::EncodeAuthTokenError,
+use crate::auth::auth_ticket::remote::{
+    encode::data::EncodeAuthTokenError,
+    kernel::data::{
+        AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime, ExpireDuration,
+    },
 };
 
 pub trait EncodeAuthTicketInfra {

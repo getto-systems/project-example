@@ -13,7 +13,7 @@ use crate::auth::_common::service::helper::{
 };
 
 use super::super::infra::ValidateService;
-use crate::auth::auth_ticket::_common::kernel::infra::AuthMetadataContent;
+use crate::auth::auth_ticket::remote::kernel::infra::AuthMetadataContent;
 
 use crate::auth::{
     _common::service::data::AuthServiceError,
@@ -72,7 +72,7 @@ impl<'a> ValidateService for TonicValidateService<'a> {
 #[cfg(test)]
 pub mod test {
     use super::super::super::infra::ValidateService;
-    use crate::auth::auth_ticket::_common::kernel::infra::AuthMetadataContent;
+    use crate::auth::auth_ticket::remote::kernel::infra::AuthMetadataContent;
 
     use crate::auth::{
         _common::service::data::AuthServiceError,

@@ -1,12 +1,12 @@
-use crate::auth::auth_ticket::{
-    _auth::kernel::infra::{AuthClock, IssueAuthTicketRepository},
-    remote::issue::infra::{AuthTicketIdGenerator, IssueAuthTicketInfra},
+use crate::auth::auth_ticket::remote::{
+    issue::infra::{AuthTicketIdGenerator, IssueAuthTicketInfra},
+    kernel::infra::{AuthClock, IssueAuthTicketRepository},
 };
 
 use super::event::IssueAuthTicketEvent;
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::data::AuthTicket, auth_user::remote::kernel::data::AuthUser,
+    auth_ticket::remote::kernel::data::AuthTicket, auth_user::remote::kernel::data::AuthUser,
 };
 
 pub async fn issue_auth_ticket<S>(

@@ -3,7 +3,7 @@ use tonic::metadata::MetadataMap;
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
 use crate::auth::auth_ticket::{
-    _auth::kernel::init::{clock::ChronoAuthClock, ticket_repository::MysqlAuthTicketRepository},
+    remote::kernel::init::{clock::ChronoAuthClock, ticket_repository::MysqlAuthTicketRepository},
     remote::validate::init::TicketValidateAuthTokenStruct,
 };
 
@@ -43,11 +43,11 @@ impl<'a> DiscardAuthTicketInfra for DiscardAuthTicketStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::auth_ticket::{
-        _auth::kernel::init::{
+    use crate::auth::auth_ticket::remote::{
+        kernel::init::{
             clock::test::StaticChronoAuthClock, ticket_repository::test::MemoryAuthTicketRepository,
         },
-        remote::validate::init::test::StaticValidateAuthTokenStruct,
+        validate::init::test::StaticValidateAuthTokenStruct,
     };
 
     use super::super::infra::DiscardAuthTicketInfra;

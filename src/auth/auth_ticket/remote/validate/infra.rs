@@ -1,6 +1,6 @@
-use crate::auth::auth_ticket::_common::kernel::infra::AuthTokenDecoder;
-use crate::auth::auth_ticket::{
-    _common::kernel::infra::AuthTokenMetadata, remote::check_nonce::infra::CheckAuthNonceInfra,
+use crate::auth::auth_ticket::remote::{
+    check_nonce::infra::CheckAuthNonceInfra,
+    kernel::infra::{AuthTokenDecoder, AuthTokenMetadata},
 };
 
 use crate::auth::auth_user::remote::kernel::data::RequireAuthRoles;

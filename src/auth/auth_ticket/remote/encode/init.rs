@@ -2,7 +2,7 @@ pub(in crate::auth) mod token_encoder;
 
 use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
 
-use crate::auth::auth_ticket::_auth::kernel::init::{
+use crate::auth::auth_ticket::remote::kernel::init::{
     clock::ChronoAuthClock, ticket_repository::MysqlAuthTicketRepository,
 };
 use token_encoder::{
@@ -67,7 +67,7 @@ impl<'a> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a> {
 #[cfg(test)]
 pub mod test {
     use super::token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder};
-    use crate::auth::auth_ticket::_auth::kernel::init::{
+    use crate::auth::auth_ticket::remote::kernel::init::{
         clock::test::StaticChronoAuthClock, ticket_repository::test::MemoryAuthTicketRepository,
     };
 

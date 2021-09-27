@@ -1,5 +1,5 @@
 use crate::auth::{
-    auth_ticket::{_auth::kernel::data::ExpireDateTime, _common::kernel::data::AuthTokenEncoded},
+    auth_ticket::remote::kernel::data::{AuthTokenEncoded, ExpireDateTime},
     auth_user::remote::kernel::data::AuthUserExtract,
 };
 
