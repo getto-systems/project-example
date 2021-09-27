@@ -4,7 +4,7 @@ use crate::auth::ticket::_common::y_protobuf::service::{
     renew_auth_ticket_pb_client::RenewAuthTicketPbClient, RenewAuthTicketRequestPb,
 };
 
-use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
+use crate::auth::remote::x_outside_feature::common::feature::AuthOutsideService;
 
 use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
 

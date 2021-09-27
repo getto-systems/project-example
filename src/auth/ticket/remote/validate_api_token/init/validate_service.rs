@@ -4,7 +4,7 @@ use crate::auth::ticket::_common::y_protobuf::service::{
     validate_api_token_pb_client::ValidateApiTokenPbClient, ValidateApiTokenRequestPb,
 };
 
-use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
+use crate::auth::remote::x_outside_feature::common::feature::AuthOutsideService;
 
 use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
 

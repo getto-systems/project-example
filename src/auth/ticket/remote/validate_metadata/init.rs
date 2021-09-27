@@ -1,6 +1,6 @@
 use actix_web::HttpRequest;
 
-use crate::auth::_common::x_outside_feature::feature::AuthOutsideDecodingKey;
+use crate::auth::remote::x_outside_feature::common::feature::AuthOutsideDecodingKey;
 
 use crate::auth::ticket::remote::kernel::init::{
     auth_metadata::{ApiAuthMetadata, NoAuthMetadata, TicketAuthMetadata},

@@ -1,4 +1,4 @@
-import { auth_config } from "../../_ui/x_outside_feature/config"
+import { auth_config } from "../../x_outside_feature/config"
 
 import { newRenewAuthTicketRemote } from "../kernel/init/remote/renew"
 import { newAuthzRepository } from "../kernel/init/repository/authz"

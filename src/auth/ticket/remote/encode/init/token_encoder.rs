@@ -4,7 +4,7 @@ use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 
 use aws_cloudfront_cookie::CloudfrontPolicy;
 
-use crate::auth::_auth::x_outside_feature::feature::AuthOutsideCloudfrontKey;
+use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideCloudfrontKey;
 
 use crate::auth::ticket::remote::{
     encode::infra::{AuthTokenEncoder, CloudfrontTokenEncoder},

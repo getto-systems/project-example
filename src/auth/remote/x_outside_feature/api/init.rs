@@ -1,9 +1,9 @@
 use crate::z_details::_common::jwt::helper::decoding_key_from_ec_pem;
 
 use crate::{
-    auth::{
-        _api::x_outside_feature::feature::{AuthOutsideCookie, AuthOutsideFeature},
-        _common::x_outside_feature::feature::{AuthOutsideDecodingKey, AuthOutsideService},
+    auth::remote::x_outside_feature::{
+        api::feature::{AuthOutsideCookie, AuthOutsideFeature},
+        common::feature::{AuthOutsideDecodingKey, AuthOutsideService},
     },
     x_outside_feature::_api::env::ApiEnv,
 };

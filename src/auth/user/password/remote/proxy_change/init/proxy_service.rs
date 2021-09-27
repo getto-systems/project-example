@@ -4,7 +4,7 @@ use crate::auth::user::password::_common::y_protobuf::service::{
     change_password_pb_client::ChangePasswordPbClient, ChangePasswordRequestPb,
 };
 
-use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
+use crate::auth::remote::x_outside_feature::common::feature::AuthOutsideService;
 
 use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
 

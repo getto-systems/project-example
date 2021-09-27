@@ -9,12 +9,12 @@ use sqlx::mysql::MySqlPoolOptions;
 use crate::z_details::_common::jwt::helper::{decoding_key_from_ec_pem, encoding_key_from_ec_pem};
 
 use crate::{
-    auth::{
-        _auth::x_outside_feature::feature::{
+    auth::remote::x_outside_feature::{
+        auth::feature::{
             AuthOutsideCloudfrontKey, AuthOutsideConfig, AuthOutsideEmail, AuthOutsideEncodingKey,
             AuthOutsideFeature, AuthOutsideResetTokenKey, AuthOutsideStore,
         },
-        _common::x_outside_feature::feature::AuthOutsideDecodingKey,
+        common::feature::AuthOutsideDecodingKey,
     },
     x_outside_feature::_auth::env::AuthEnv,
 };

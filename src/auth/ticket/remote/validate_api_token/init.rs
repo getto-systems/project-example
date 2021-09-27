@@ -2,7 +2,7 @@ pub(in crate::auth) mod validate_service;
 
 use tonic::metadata::MetadataMap;
 
-use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
+use crate::auth::remote::x_outside_feature::common::feature::AuthOutsideService;
 
 use crate::auth::ticket::remote::{
     kernel::init::{auth_metadata::TonicAuthMetadata, token_decoder::NoopTokenDecoder},

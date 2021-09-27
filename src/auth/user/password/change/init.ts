@@ -1,4 +1,4 @@
-import { auth_config } from "../../../_ui/x_outside_feature/config"
+import { auth_config } from "../../../x_outside_feature/config"
 
 import { newChangePasswordRemote } from "./init/remote/change"
 

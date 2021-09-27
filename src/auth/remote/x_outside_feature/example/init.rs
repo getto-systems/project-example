@@ -1,7 +1,6 @@
 use crate::{
-    auth::{
-        _common::x_outside_feature::feature::AuthOutsideService,
-        _example::x_outside_feature::feature::AuthOutsideFeature,
+    auth::remote::x_outside_feature::{
+        common::feature::AuthOutsideService, example::feature::AuthOutsideFeature,
     },
     x_outside_feature::_example::env::ExampleEnv,
 };

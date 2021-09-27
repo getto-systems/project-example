@@ -1,6 +1,6 @@
 use tonic::metadata::MetadataMap;
 
-use crate::auth::_auth::x_outside_feature::feature::AuthOutsideFeature;
+use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideFeature;
 
 use crate::auth::ticket::{
     remote::kernel::init::{clock::ChronoAuthClock, ticket_repository::MysqlAuthTicketRepository},

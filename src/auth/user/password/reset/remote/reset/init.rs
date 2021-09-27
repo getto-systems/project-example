@@ -2,7 +2,7 @@ pub(in crate::auth) mod request_decoder;
 pub(in crate::auth) mod token_decoder;
 
 use crate::auth::{
-    _auth::x_outside_feature::feature::AuthOutsideFeature,
+    remote::x_outside_feature::auth::feature::AuthOutsideFeature,
     ticket::remote::{
         check_nonce::init::CheckAuthNonceStruct, kernel::init::clock::ChronoAuthClock,
     },

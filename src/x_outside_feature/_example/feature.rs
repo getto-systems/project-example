@@ -3,7 +3,7 @@ use std::sync::Arc;
 use tonic::{metadata::MetadataMap, Request};
 
 use crate::{
-    auth::_example::x_outside_feature::{
+    auth::remote::x_outside_feature::example::{
         feature::AuthOutsideFeature, init::new_auth_outside_feature,
     },
     x_outside_feature::_example::env::ExampleEnv,

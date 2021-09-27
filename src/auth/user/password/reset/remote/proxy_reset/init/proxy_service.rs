@@ -4,7 +4,7 @@ use crate::auth::user::password::reset::_common::y_protobuf::service::{
     reset_password_pb_client::ResetPasswordPbClient, ResetPasswordRequestPb,
 };
 
-use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
+use crate::auth::remote::x_outside_feature::common::feature::AuthOutsideService;
 
 use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
 

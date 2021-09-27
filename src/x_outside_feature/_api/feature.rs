@@ -3,7 +3,9 @@ use actix_web::web::Data;
 use super::env::ApiEnv;
 
 use crate::{
-    auth::_api::x_outside_feature::{feature::AuthOutsideFeature, init::new_auth_outside_feature},
+    auth::remote::x_outside_feature::api::{
+        feature::AuthOutsideFeature, init::new_auth_outside_feature,
+    },
     example::_api::x_outside_feature::{
         feature::ExampleOutsideFeature, init::new_example_outside_feature,
     },

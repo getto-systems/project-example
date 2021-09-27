@@ -1,6 +1,6 @@
 use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 
-use crate::auth::_auth::x_outside_feature::feature::AuthOutsideResetTokenKey;
+use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideResetTokenKey;
 
 use crate::auth::user::password::reset::remote::{
     kernel::infra::ResetTokenJwtClaims, request_token::infra::ResetTokenEncoder,

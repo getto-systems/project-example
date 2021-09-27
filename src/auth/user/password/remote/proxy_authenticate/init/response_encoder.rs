@@ -2,7 +2,7 @@ use crate::auth::user::password::_api::y_protobuf::api::{
     AuthenticatePasswordErrorKindPb, AuthenticatePasswordErrorPb, AuthenticatePasswordResultPb,
 };
 
-use crate::auth::_api::x_outside_feature::feature::AuthOutsideCookie;
+use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideCookie;
 
 use crate::z_details::_api::message::helper::encode_protobuf_base64;
 

@@ -2,7 +2,7 @@ use crate::z_details::_api::message::helper::encode_protobuf_base64;
 
 use crate::auth::ticket::_api::y_protobuf::api::AuthenticateResponsePb;
 
-use crate::auth::_api::x_outside_feature::feature::AuthOutsideCookie;
+use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideCookie;
 
 use crate::auth::ticket::remote::kernel::init::response_builder::CookieAuthTokenResponseBuilder;
 

@@ -1,4 +1,4 @@
-import { delaySecond, expireMinute, intervalMinute } from "../../../z_details/_ui/config/infra"
+import { delaySecond, expireMinute, intervalMinute } from "../../z_details/_ui/config/infra"
 
 export const auth_config = {
     instantLoadExpire: expireMinute(3),

@@ -6,7 +6,7 @@ use sqlx::MySqlPool;
 use aws_cloudfront_cookie::CloudfrontKey;
 
 use crate::auth::{
-    _common::x_outside_feature::feature::AuthOutsideDecodingKey,
+    remote::x_outside_feature::common::feature::AuthOutsideDecodingKey,
     ticket::remote::kernel::data::{ExpansionLimitDuration, ExpireDuration},
 };
 
