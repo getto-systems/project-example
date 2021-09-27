@@ -4,16 +4,16 @@ use crate::auth::auth_ticket::_api::y_protobuf::api::AuthenticateResponsePb;
 
 use crate::auth::_api::x_outside_feature::feature::AuthOutsideCookie;
 
-use crate::auth::auth_ticket::_api::kernel::init::response_builder::CookieAuthTokenResponseBuilder;
+use crate::auth::auth_ticket::remote::kernel::init::response_builder::CookieAuthTokenResponseBuilder;
 
 use crate::auth::_api::proxy::AuthProxyResponseEncoder;
 
-use crate::auth::auth_ticket::_api::kernel::infra::AuthTokenResponseBuilder;
+use crate::auth::auth_ticket::remote::kernel::infra::AuthTokenResponseBuilder;
 
 use crate::{
-    auth::auth_ticket::{
-        _api::kernel::data::{AuthTokenMessage, AuthTokenResponse},
-        remote::encode::data::AuthTicketEncoded,
+    auth::auth_ticket::remote::{
+        encode::data::AuthTicketEncoded,
+        kernel::data::{AuthTokenMessage, AuthTokenResponse},
     },
     z_details::_api::message::data::MessageError,
 };
@@ -30,9 +30,7 @@ impl<'a> ResponseEncoder<'a> {
     }
 }
 
-impl<'a> AuthProxyResponseEncoder<AuthTicketEncoded, AuthTokenResponse>
-    for ResponseEncoder<'a>
-{
+impl<'a> AuthProxyResponseEncoder<AuthTicketEncoded, AuthTokenResponse> for ResponseEncoder<'a> {
     fn encode(&self, ticket: AuthTicketEncoded) -> Result<AuthTokenResponse, MessageError> {
         let message: AuthenticateResponsePb = ticket.user.into();
         let message = AuthTokenMessage {

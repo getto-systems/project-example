@@ -1,7 +1,7 @@
 use crate::{
     auth::{
-        auth_ticket::{
-            _auth::kernel::data::ExpireDateTime, remote::check_nonce::data::ValidateAuthNonceError,
+        auth_ticket::remote::{
+            check_nonce::data::ValidateAuthNonceError, kernel::data::ExpireDateTime,
         },
         login_id::remote::data::ValidateLoginIdError,
         password::{

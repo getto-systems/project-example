@@ -6,18 +6,18 @@ use crate::auth::password::reset::_api::y_protobuf::api::{
     ResetPasswordErrorKindPb, ResetPasswordErrorPb, ResetPasswordResultPb,
 };
 
-use crate::auth::auth_ticket::_api::kernel::init::response_builder::CookieAuthTokenResponseBuilder;
+use crate::auth::auth_ticket::remote::kernel::init::response_builder::CookieAuthTokenResponseBuilder;
 
 use crate::auth::_api::proxy::AuthProxyResponseEncoder;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::AuthTokenResponseBuilder,
+    auth_ticket::remote::kernel::infra::AuthTokenResponseBuilder,
     password::reset::remote::proxy_reset::infra::ResetPasswordProxyResponse,
 };
 
 use crate::{
     auth::{
-        auth_ticket::_api::kernel::data::AuthTokenMessage,
+        auth_ticket::remote::kernel::data::AuthTokenMessage,
         password::reset::remote::proxy_reset::data::{
             ResetPasswordProxyMessage, ResetPasswordProxyMessageEncoded, ResetPasswordProxyResult,
         },

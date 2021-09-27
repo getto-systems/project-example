@@ -4,22 +4,19 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
-    auth_ticket::{
-        _auth::kernel::init::clock::test::StaticChronoAuthClock,
-        _common::kernel::init::{
-            nonce_metadata::test::StaticAuthNonceMetadata,
+    auth_ticket::remote::{
+        check_nonce::init::{
+            nonce_repository::test::{
+                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+            },
+            test::StaticCheckAuthNonceStruct,
+        },
+        kernel::init::{
+            clock::test::StaticChronoAuthClock, nonce_metadata::test::StaticAuthNonceMetadata,
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
         },
-        remote::{
-            check_nonce::init::{
-                nonce_repository::test::{
-                    MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-                },
-                test::StaticCheckAuthNonceStruct,
-            },
-            validate::init::test::StaticValidateAuthTokenStruct,
-        },
+        validate::init::test::StaticValidateAuthTokenStruct,
     },
     password::remote::{
         change::init::{
@@ -43,10 +40,7 @@ use crate::auth::{
 use super::action::{ChangePasswordAction, ChangePasswordMaterial};
 
 use crate::auth::{
-    auth_ticket::{
-        _auth::kernel::data::{AuthDateTime, ExpireDuration},
-        _common::kernel::data::AuthTicketExtract,
-    },
+    auth_ticket::remote::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
     auth_user::remote::kernel::data::{AuthUser, AuthUserExtract},
     login_id::remote::data::LoginId,
 };

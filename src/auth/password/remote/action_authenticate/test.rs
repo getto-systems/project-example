@@ -5,27 +5,25 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
-    auth_ticket::{
-        _auth::kernel::init::{
+    auth_ticket::remote::{
+        check_nonce::init::{
+            nonce_repository::test::{
+                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+            },
+            test::StaticCheckAuthNonceStruct,
+        },
+        encode::init::{
+            test::StaticEncodeAuthTicketStruct,
+            token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
+        },
+        issue::init::{
+            id_generator::test::StaticAuthTicketIdGenerator, test::StaticIssueAuthTicketStruct,
+        },
+        kernel::init::{
             clock::test::StaticChronoAuthClock,
+            nonce_metadata::test::StaticAuthNonceMetadata,
             ticket_repository::test::{
                 MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
-            },
-        },
-        _common::kernel::init::nonce_metadata::test::StaticAuthNonceMetadata,
-        remote::{
-            check_nonce::init::{
-                nonce_repository::test::{
-                    MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-                },
-                test::StaticCheckAuthNonceStruct,
-            },
-            encode::init::{
-                test::StaticEncodeAuthTicketStruct,
-                token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
-            },
-            issue::init::{
-                id_generator::test::StaticAuthTicketIdGenerator, test::StaticIssueAuthTicketStruct,
             },
         },
     },
@@ -49,16 +47,15 @@ use crate::auth::{
         check_nonce::infra::AuthNonceConfig, encode::infra::EncodeAuthTicketConfig,
         issue::infra::IssueAuthTicketConfig,
     },
-    password::{
-        remote::kernel::infra::HashedPassword,
-        remote::proxy_authenticate::infra::AuthenticatePasswordFieldsExtract,
+    password::remote::{
+        kernel::infra::HashedPassword, proxy_authenticate::infra::AuthenticatePasswordFieldsExtract,
     },
 };
 
 use super::action::{AuthenticatePasswordAction, AuthenticatePasswordMaterial};
 
 use crate::auth::{
-    auth_ticket::_auth::kernel::data::{
+    auth_ticket::remote::kernel::data::{
         AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
     },
     auth_user::remote::kernel::data::{AuthUser, AuthUserExtract},

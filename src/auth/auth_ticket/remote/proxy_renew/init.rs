@@ -13,8 +13,8 @@ use response_encoder::ResponseEncoder;
 
 use crate::auth::_api::proxy::{AuthProxyEvent, AuthProxyInfra};
 
-use crate::auth::auth_ticket::{
-    _api::kernel::data::AuthTokenResponse, remote::encode::data::AuthTicketEncoded,
+use crate::auth::auth_ticket::remote::{
+    encode::data::AuthTicketEncoded, kernel::data::AuthTokenResponse,
 };
 
 pub struct RenewAuthTicketProxyStruct<'a> {

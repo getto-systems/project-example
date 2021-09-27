@@ -4,23 +4,20 @@ use getto_application_test::ActionTestRunner;
 
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
-use crate::auth::auth_ticket::{
-    _auth::kernel::init::clock::test::StaticChronoAuthClock,
-    _common::kernel::init::{
-        nonce_metadata::test::StaticAuthNonceMetadata, token_decoder::test::StaticAuthTokenDecoder,
-        token_metadata::test::StaticAuthTokenMetadata,
+use crate::auth::auth_ticket::remote::{
+    check_nonce::init::{
+        nonce_repository::test::{
+            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+        },
+        test::StaticCheckAuthNonceStruct,
     },
-    remote::{
-        check_nonce::init::{
-            nonce_repository::test::{
-                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-            },
-            test::StaticCheckAuthNonceStruct,
-        },
-        validate::init::{
-            request_decoder::test::StaticValidateApiTokenRequestDecoder,
-            test::StaticValidateAuthTokenStruct,
-        },
+    kernel::init::{
+        clock::test::StaticChronoAuthClock, nonce_metadata::test::StaticAuthNonceMetadata,
+        token_decoder::test::StaticAuthTokenDecoder, token_metadata::test::StaticAuthTokenMetadata,
+    },
+    validate::init::{
+        request_decoder::test::StaticValidateApiTokenRequestDecoder,
+        test::StaticValidateAuthTokenStruct,
     },
 };
 
@@ -29,10 +26,7 @@ use crate::auth::auth_ticket::remote::check_nonce::infra::AuthNonceConfig;
 use super::action::{ValidateApiTokenAction, ValidateApiTokenMaterial};
 
 use crate::auth::{
-    auth_ticket::{
-        _auth::kernel::data::{AuthDateTime, ExpireDuration},
-        _common::kernel::data::AuthTicketExtract,
-    },
+    auth_ticket::remote::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
     auth_user::remote::kernel::data::RequireAuthRoles,
 };
 

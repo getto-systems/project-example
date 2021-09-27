@@ -13,7 +13,7 @@ use crate::auth::_common::service::helper::{
 };
 
 use crate::auth::{
-    _api::proxy::AuthProxyService, auth_ticket::_common::kernel::infra::AuthMetadataContent,
+    _api::proxy::AuthProxyService, auth_ticket::remote::kernel::infra::AuthMetadataContent,
 };
 
 use crate::auth::{

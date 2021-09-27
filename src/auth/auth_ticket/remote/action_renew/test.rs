@@ -4,30 +4,27 @@ use getto_application_test::ActionTestRunner;
 
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
-use crate::auth::auth_ticket::{
-    _auth::kernel::init::{
+use crate::auth::auth_ticket::remote::{
+    check_nonce::init::{
+        nonce_repository::test::{
+            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+        },
+        test::StaticCheckAuthNonceStruct,
+    },
+    encode::init::{
+        test::StaticEncodeAuthTicketStruct,
+        token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
+    },
+    kernel::init::{
         clock::test::StaticChronoAuthClock,
+        nonce_metadata::test::StaticAuthNonceMetadata,
         ticket_repository::test::{
             MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
         },
-    },
-    _common::kernel::init::{
-        nonce_metadata::test::StaticAuthNonceMetadata, token_decoder::test::StaticAuthTokenDecoder,
+        token_decoder::test::StaticAuthTokenDecoder,
         token_metadata::test::StaticAuthTokenMetadata,
     },
-    remote::{
-        check_nonce::init::{
-            nonce_repository::test::{
-                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-            },
-            test::StaticCheckAuthNonceStruct,
-        },
-        encode::init::{
-            test::StaticEncodeAuthTicketStruct,
-            token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
-        },
-        validate::init::test::StaticValidateAuthTokenStruct,
-    },
+    validate::init::test::StaticValidateAuthTokenStruct,
 };
 
 use crate::auth::auth_ticket::{
@@ -36,9 +33,8 @@ use crate::auth::auth_ticket::{
 
 use super::action::{RenewAuthTicketAction, RenewAuthTicketMaterial};
 
-use crate::auth::auth_ticket::{
-    _auth::kernel::data::{AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration},
-    _common::kernel::data::AuthTicketExtract,
+use crate::auth::auth_ticket::remote::kernel::data::{
+    AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
 };
 
 #[tokio::test]

@@ -6,18 +6,18 @@ use crate::auth::_api::x_outside_feature::feature::AuthOutsideCookie;
 
 use crate::z_details::_api::message::helper::encode_protobuf_base64;
 
-use crate::auth::auth_ticket::_api::kernel::init::response_builder::CookieAuthTokenResponseBuilder;
+use crate::auth::auth_ticket::remote::kernel::init::response_builder::CookieAuthTokenResponseBuilder;
 
 use crate::auth::_api::proxy::AuthProxyResponseEncoder;
 
 use crate::auth::{
-    auth_ticket::_api::kernel::infra::AuthTokenResponseBuilder,
+    auth_ticket::remote::kernel::infra::AuthTokenResponseBuilder,
     password::remote::proxy_authenticate::infra::AuthenticatePasswordProxyResponse,
 };
 
 use crate::{
     auth::{
-        auth_ticket::_api::kernel::data::AuthTokenMessage,
+        auth_ticket::remote::kernel::data::AuthTokenMessage,
         password::remote::proxy_authenticate::data::{
             AuthenticatePasswordProxyMessage, AuthenticatePasswordProxyMessageEncoded,
             AuthenticatePasswordProxyResult,

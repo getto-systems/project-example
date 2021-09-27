@@ -1,4 +1,4 @@
-use crate::auth::auth_ticket::_api::kernel::data::{AuthTokenMessage, AuthTokenResponse};
+use crate::auth::auth_ticket::remote::kernel::data::{AuthTokenMessage, AuthTokenResponse};
 
 pub type AuthenticatePasswordProxyMessage = AuthenticatePasswordProxyResult<AuthTokenResponse>;
 pub type AuthenticatePasswordProxyMessageEncoded =

@@ -3,9 +3,8 @@ pub(in crate::auth) mod token_decoder;
 
 use crate::auth::{
     _auth::x_outside_feature::feature::AuthOutsideFeature,
-    auth_ticket::{
-        _auth::kernel::init::clock::ChronoAuthClock,
-        remote::check_nonce::init::CheckAuthNonceStruct,
+    auth_ticket::remote::{
+        check_nonce::init::CheckAuthNonceStruct, kernel::init::clock::ChronoAuthClock,
     },
     auth_user::remote::kernel::init::user_repository::MysqlAuthUserRepository,
     password::remote::kernel::init::{
@@ -66,9 +65,9 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
 pub mod test {
     use super::token_decoder::test::StaticResetTokenDecoder;
     use crate::auth::{
-        auth_ticket::{
-            _auth::kernel::init::clock::test::StaticChronoAuthClock,
-            remote::check_nonce::init::test::StaticCheckAuthNonceStruct,
+        auth_ticket::remote::{
+            check_nonce::init::test::StaticCheckAuthNonceStruct,
+            kernel::init::clock::test::StaticChronoAuthClock,
         },
         auth_user::remote::kernel::init::user_repository::test::MemoryAuthUserRepository,
         password::remote::kernel::init::{
