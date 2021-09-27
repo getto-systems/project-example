@@ -1,9 +1,9 @@
-import { ApplicationAction } from "../../../../../ui/vendor/getto-application/action/action"
-import { InputBoardAction } from "../../../../../ui/vendor/getto-application/board/action_input/action"
+import { ApplicationAction } from "../../../../../../ui/vendor/getto-application/action/action"
+import { InputBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_input/action"
 import {
     ValidateBoardFieldAction,
     ValidateBoardFieldState,
-} from "../../../../../ui/vendor/getto-application/board/action_validate_field/action"
+} from "../../../../../../ui/vendor/getto-application/board/action_validate_field/action"
 
 import { ValidateLoginIDError } from "../data"
 

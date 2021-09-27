@@ -1,7 +1,7 @@
 import { ApplicationAbstractStateAction } from "../../../../ui/vendor/getto-application/action/init"
 
 import { initSignLink } from "../../_ui/common/nav/action_nav/init"
-import { initInputLoginIDAction } from "../../login_id/input/action_input/init"
+import { initInputLoginIDAction } from "../../user/login_id/input/action_input/init"
 import { initInputPasswordAction } from "../action_input/init"
 import { initValidateBoardAction } from "../../../../ui/vendor/getto-application/board/action_validate_board/init"
 
@@ -33,7 +33,7 @@ import { LoadScriptError } from "../../_ui/common/secure/get_script_path/data"
 import { AuthenticatePasswordFields } from "../authenticate/data"
 import { AuthTicket } from "../../ticket/kernel/data"
 import { ConvertBoardResult } from "../../../../ui/vendor/getto-application/board/kernel/data"
-import { InputLoginIDAction } from "../../login_id/input/action_input/action"
+import { InputLoginIDAction } from "../../user/login_id/input/action_input/action"
 import { InputPasswordAction } from "../action_input/action"
 import { ValidateBoardChecker } from "../../../../ui/vendor/getto-application/board/validate_board/infra"
 

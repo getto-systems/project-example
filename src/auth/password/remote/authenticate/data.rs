@@ -1,5 +1,5 @@
 use crate::auth::{
-    login_id::remote::data::ValidateLoginIdError,
+    user::login_id::remote::data::ValidateLoginIdError,
     password::remote::kernel::data::ValidatePasswordError,
 };
 

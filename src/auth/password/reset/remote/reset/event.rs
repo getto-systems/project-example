@@ -1,8 +1,5 @@
 use crate::{
     auth::{
-        ticket::remote::check_nonce::data::ValidateAuthNonceError,
-        user::remote::kernel::data::AuthUser,
-        login_id::remote::data::ValidateLoginIdError,
         password::{
             remote::kernel::data::{
                 PasswordHashError, ValidatePasswordError, VerifyResetTokenEntryError,
@@ -12,6 +9,8 @@ use crate::{
                 reset::data::{DecodeResetTokenError, ResetPasswordError},
             },
         },
+        ticket::remote::check_nonce::data::ValidateAuthNonceError,
+        user::{login_id::remote::data::ValidateLoginIdError, remote::kernel::data::AuthUser},
     },
     z_details::_common::repository::data::RepositoryError,
 };

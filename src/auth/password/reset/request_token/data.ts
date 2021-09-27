@@ -1,6 +1,6 @@
 import { RemoteCommonError } from "../../../../z_details/_ui/remote/data"
 
-import { LoginID } from "../../../login_id/input/data"
+import { LoginID } from "../../../user/login_id/input/data"
 
 export type RequestResetTokenFields = Readonly<{
     loginID: LoginID

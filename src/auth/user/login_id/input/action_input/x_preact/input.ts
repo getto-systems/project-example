@@ -1,20 +1,20 @@
 import { h, VNode } from "preact"
 
-import { useApplicationAction } from "../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
 
 import {
     field,
     field_error,
     label_text_fill,
-} from "../../../../../../ui/vendor/getto-css/preact/design/form"
+} from "../../../../../../../ui/vendor/getto-css/preact/design/form"
 
-import { VNodeContent } from "../../../../../example/_ui/x_preact/design/common"
+import { VNodeContent } from "../../../../../../example/_ui/x_preact/design/common"
 
-import { InputBoardComponent } from "../../../../../../ui/vendor/getto-application/board/action_input/x_preact/input"
+import { InputBoardComponent } from "../../../../../../../ui/vendor/getto-application/board/action_input/x_preact/input"
 
 import { InputLoginIDResource, InputLoginIDResourceState } from "../resource"
 
-import { ValidateBoardFieldState } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/action"
+import { ValidateBoardFieldState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_field/action"
 
 import { ValidateLoginIDError } from "../../data"
 

@@ -2,9 +2,9 @@ import {
     docsData,
     docsDescription,
     docsSection,
-} from "../../../ui/vendor/getto-application/docs/helper"
+} from "../../../../ui/vendor/getto-application/docs/helper"
 
-import { DocsSection } from "../../../ui/vendor/getto-application/docs/data"
+import { DocsSection } from "../../../../ui/vendor/getto-application/docs/data"
 
 export const docs_loginID = docsData("ログインIDデータ", ({ data }) => [
     data("ログインID", [

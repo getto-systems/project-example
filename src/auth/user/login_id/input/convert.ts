@@ -1,6 +1,6 @@
-import { BoardFieldValueConverter } from "../../../../ui/vendor/getto-application/board/validate_field/infra"
+import { BoardFieldValueConverter } from "../../../../../ui/vendor/getto-application/board/validate_field/infra"
 
-import { BoardValue } from "../../../../ui/vendor/getto-application/board/kernel/data"
+import { BoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/data"
 import { LoginID, ValidateLoginIDError } from "./data"
 
 // login id には技術的な制限はないが、使用可能な最大文字数は定義しておく

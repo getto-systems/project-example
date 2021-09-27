@@ -27,7 +27,7 @@ import {
 } from "../../password/reset/docs"
 
 import { docs_auth_ticket } from "../../ticket/docs"
-import { docs_auth_loginID } from "../../login_id/docs"
+import { docs_auth_loginID } from "../../user/login_id/docs"
 import { docs_auth_password } from "../../password/docs"
 
 import { DocsSection } from "../../../../ui/vendor/getto-application/docs/data"

@@ -2,7 +2,7 @@ use actix_web::{HttpRequest, HttpResponse};
 
 use crate::z_details::_common::response::actix_web::RespondTo;
 
-use crate::auth::login_id::remote::data::ValidateLoginIdError;
+use crate::auth::user::login_id::remote::data::ValidateLoginIdError;
 
 impl RespondTo for ValidateLoginIdError {
     fn respond_to(self, _request: &HttpRequest) -> HttpResponse {

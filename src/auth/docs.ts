@@ -19,7 +19,7 @@ import {
 } from "../../ui/vendor/getto-application/docs/data"
 import { docs_authTicket } from "./ticket/docs"
 import { docs_authenticatePassword } from "./password/action_authenticate/docs"
-import { docs_loginID } from "./login_id/docs"
+import { docs_loginID } from "./user/login_id/docs"
 import { docs_password } from "./password/docs"
 import { docs_authUser } from "./user/docs"
 import { docs_logout } from "./ticket/action_logout/docs"

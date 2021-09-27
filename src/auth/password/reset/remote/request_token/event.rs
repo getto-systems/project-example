@@ -3,7 +3,7 @@ use crate::{
         ticket::remote::{
             check_nonce::data::ValidateAuthNonceError, kernel::data::ExpireDateTime,
         },
-        login_id::remote::data::ValidateLoginIdError,
+        user::login_id::remote::data::ValidateLoginIdError,
         password::{
             remote::kernel::data::RegisterResetTokenRepositoryError,
             reset::remote::request_token::data::{

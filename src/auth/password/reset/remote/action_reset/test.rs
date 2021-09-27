@@ -5,6 +5,16 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
+    password::{
+        remote::kernel::init::password_repository::test::{
+            MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
+            MemoryAuthUserPasswordStore,
+        },
+        reset::remote::reset::init::{
+            request_decoder::test::StaticResetPasswordRequestDecoder,
+            test::StaticResetPasswordStruct, token_decoder::test::StaticResetTokenDecoder,
+        },
+    },
     ticket::remote::{
         check_nonce::init::{
             nonce_repository::test::{
@@ -30,35 +40,27 @@ use crate::auth::{
     user::remote::kernel::init::user_repository::test::{
         MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
     },
-    password::{
-        remote::kernel::init::password_repository::test::{
-            MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-            MemoryAuthUserPasswordStore,
-        },
-        reset::remote::reset::init::{
-            request_decoder::test::StaticResetPasswordRequestDecoder,
-            test::StaticResetPasswordStruct, token_decoder::test::StaticResetTokenDecoder,
-        },
-    },
 };
 
 use crate::auth::{
+    password::reset::remote::proxy_reset::infra::ResetPasswordFieldsExtract,
     ticket::remote::{
         check_nonce::infra::AuthNonceConfig, encode::infra::EncodeAuthTicketConfig,
         issue::infra::IssueAuthTicketConfig,
     },
-    password::reset::remote::proxy_reset::infra::ResetPasswordFieldsExtract,
 };
 
 use super::action::{ResetPasswordAction, ResetPasswordMaterial};
 
 use crate::auth::{
+    password::remote::kernel::data::ResetToken,
     ticket::remote::kernel::data::{
         AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
     },
-    user::remote::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
-    login_id::remote::data::LoginId,
-    password::remote::kernel::data::ResetToken,
+    user::{
+        login_id::remote::data::LoginId,
+        remote::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
+    },
 };
 
 #[tokio::test]

@@ -15,11 +15,11 @@ import {
 
 import { RequestResetTokenFields } from "../request_token/data"
 import { ConvertBoardResult } from "../../../../../ui/vendor/getto-application/board/kernel/data"
-import { initInputLoginIDAction } from "../../../login_id/input/action_input/init"
+import { initInputLoginIDAction } from "../../../user/login_id/input/action_input/init"
 import { initValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/init"
 import { initSignLink } from "../../../_ui/common/nav/action_nav/init"
 import { ValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/action"
-import { InputLoginIDAction } from "../../../login_id/input/action_input/action"
+import { InputLoginIDAction } from "../../../user/login_id/input/action_input/action"
 import { ValidateBoardChecker } from "../../../../../ui/vendor/getto-application/board/validate_board/infra"
 
 export function initRequestResetTokenMaterial(

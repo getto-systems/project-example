@@ -1,6 +1,6 @@
 import { SignLink } from "../../../_ui/common/nav/action_nav/resource"
 import { ApplicationStateAction } from "../../../../../ui/vendor/getto-application/action/action"
-import { InputLoginIDAction } from "../../../login_id/input/action_input/action"
+import { InputLoginIDAction } from "../../../user/login_id/input/action_input/action"
 import { ValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/action"
 
 import { RequestResetTokenMethod } from "../request_token/method"

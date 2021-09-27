@@ -5,6 +5,16 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
+    password::remote::{
+        authenticate::init::{
+            request_decoder::test::StaticAuthenticatePasswordRequestDecoder,
+            test::StaticAuthenticatePasswordStruct,
+        },
+        kernel::init::password_repository::test::{
+            MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
+            MemoryAuthUserPasswordStore,
+        },
+    },
     ticket::remote::{
         check_nonce::init::{
             nonce_repository::test::{
@@ -30,25 +40,15 @@ use crate::auth::{
     user::remote::kernel::init::user_repository::test::{
         MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
     },
-    password::remote::{
-        authenticate::init::{
-            request_decoder::test::StaticAuthenticatePasswordRequestDecoder,
-            test::StaticAuthenticatePasswordStruct,
-        },
-        kernel::init::password_repository::test::{
-            MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-            MemoryAuthUserPasswordStore,
-        },
-    },
 };
 
 use crate::auth::{
+    password::remote::{
+        kernel::infra::HashedPassword, proxy_authenticate::infra::AuthenticatePasswordFieldsExtract,
+    },
     ticket::remote::{
         check_nonce::infra::AuthNonceConfig, encode::infra::EncodeAuthTicketConfig,
         issue::infra::IssueAuthTicketConfig,
-    },
-    password::remote::{
-        kernel::infra::HashedPassword, proxy_authenticate::infra::AuthenticatePasswordFieldsExtract,
     },
 };
 
@@ -58,8 +58,10 @@ use crate::auth::{
     ticket::remote::kernel::data::{
         AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
     },
-    user::remote::kernel::data::{AuthUser, AuthUserExtract},
-    login_id::remote::data::LoginId,
+    user::{
+        login_id::remote::data::LoginId,
+        remote::kernel::data::{AuthUser, AuthUserExtract},
+    },
 };
 
 #[tokio::test]
