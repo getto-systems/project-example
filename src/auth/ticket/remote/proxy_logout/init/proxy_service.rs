@@ -5,15 +5,20 @@ use crate::auth::ticket::_common::y_protobuf::service::{
 };
 
 use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
+
 use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
 
-use crate::auth::_common::service::helper::{
-    infra_error, new_endpoint, set_authorization, set_metadata,
+use crate::{
+    auth::remote::service::helper::{infra_error, set_metadata},
+    z_details::_common::service::helper::new_endpoint,
 };
 
-use crate::auth::{_api::proxy::AuthProxyService, _common::infra::AuthMetadataContent};
+use crate::{
+    auth::{_api::proxy::AuthProxyService, remote::infra::AuthMetadataContent},
+    z_details::_common::service::infra::ServiceAuthorizer,
+};
 
-use crate::auth::_common::service::data::AuthServiceError;
+use crate::auth::remote::service::data::AuthServiceError;
 
 pub struct ProxyService<'a> {
     service_url: &'static str,
@@ -42,15 +47,21 @@ impl<'a> AuthProxyService<(), ()> for ProxyService<'a> {
         _params: (),
     ) -> Result<(), AuthServiceError> {
         let mut client = LogoutPbClient::new(
-            new_endpoint(self.service_url)?
+            new_endpoint(self.service_url)
+                .map_err(infra_error)?
                 .connect()
                 .await
                 .map_err(infra_error)?,
         );
 
         let mut request = Request::new(LogoutRequestPb {});
-        set_authorization(&mut request, &self.authorizer).await?;
-        set_metadata(&mut request, self.request_id, metadata)?;
+        set_metadata(
+            &mut request,
+            self.request_id,
+            self.authorizer.fetch_token().await.map_err(infra_error)?,
+            metadata,
+        )
+        .map_err(infra_error)?;
 
         client
             .logout(request)

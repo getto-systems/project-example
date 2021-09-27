@@ -10,7 +10,7 @@ use crate::auth::ticket::remote::validate::method::validate_auth_token;
 
 use super::event::{ChangePasswordEvent, ChangePasswordKind};
 
-use crate::auth::_common::data::RequireAuthRoles;
+use crate::auth::remote::data::RequireAuthRoles;
 
 pub async fn change_password<S>(
     infra: &impl ChangePasswordInfra,

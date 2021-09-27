@@ -1,13 +1,13 @@
 use actix_web::{HttpRequest, HttpResponse};
 
-use crate::auth::_common::service::x_actix_web::header::{
+use crate::auth::ticket::remote::kernel::x_actix_web::header::{
     COOKIE_API_TOKEN, COOKIE_CLOUDFRONT_KEY_PAIR_ID, COOKIE_CLOUDFRONT_POLICY,
     COOKIE_CLOUDFRONT_SIGNATURE, COOKIE_TICKET_TOKEN,
 };
 
 use crate::z_details::_common::response::actix_web::RespondTo;
 
-use crate::auth::_common::service::data::AuthServiceError;
+use crate::auth::remote::service::data::AuthServiceError;
 
 impl RespondTo for AuthServiceError {
     fn respond_to(self, request: &HttpRequest) -> HttpResponse {

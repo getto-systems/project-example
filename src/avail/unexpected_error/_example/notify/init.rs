@@ -4,7 +4,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::x_outside_feature::_example::feature::ExampleAppFeature;
 
-use crate::auth::_common::init::ValidateApiTokenStruct;
+use crate::auth::remote::init::ValidateApiTokenStruct;
 
 use crate::avail::unexpected_error::_example::notify::infra::NotifyUnexpectedErrorInfra;
 
@@ -38,7 +38,7 @@ impl<'a> NotifyUnexpectedErrorInfra for NotifyUnexpectedErrorStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::_common::init::test::StaticValidateApiTokenStruct;
+    use crate::auth::remote::init::test::StaticValidateApiTokenStruct;
 
     use crate::avail::unexpected_error::_example::notify::infra::NotifyUnexpectedErrorInfra;
 

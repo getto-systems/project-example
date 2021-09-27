@@ -1,6 +1,6 @@
 use tonic::{Code, Status};
 
-use crate::auth::_common::service::data::AuthServiceError;
+use crate::auth::remote::service::data::AuthServiceError;
 
 impl From<Status> for AuthServiceError {
     fn from(status: Status) -> Self {

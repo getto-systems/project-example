@@ -1,26 +1,30 @@
 use tonic::Request;
 
-use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
-
 use crate::auth::user::password::_common::y_protobuf::service::{
     change_password_pb_client::ChangePasswordPbClient, ChangePasswordRequestPb,
 };
 
 use crate::auth::_common::x_outside_feature::feature::AuthOutsideService;
 
-use crate::auth::_common::service::helper::{
-    infra_error, new_endpoint, set_authorization, set_metadata,
+use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
+
+use crate::{
+    auth::remote::service::helper::{infra_error, set_metadata},
+    z_details::_common::service::helper::new_endpoint,
 };
 
-use crate::auth::{
-    _api::proxy::AuthProxyService,
-    ticket::remote::kernel::infra::AuthMetadataContent,
-    user::password::remote::proxy_change::infra::{
-        ChangePasswordFieldsExtract, ChangePasswordProxyResponse,
+use crate::{
+    auth::{
+        _api::proxy::AuthProxyService,
+        ticket::remote::kernel::infra::AuthMetadataContent,
+        user::password::remote::proxy_change::infra::{
+            ChangePasswordFieldsExtract, ChangePasswordProxyResponse,
+        },
     },
+    z_details::_common::service::infra::ServiceAuthorizer,
 };
 
-use crate::auth::_common::service::data::AuthServiceError;
+use crate::auth::remote::service::data::AuthServiceError;
 
 pub struct ProxyService<'a> {
     service_url: &'static str,
@@ -51,7 +55,8 @@ impl<'a> AuthProxyService<ChangePasswordFieldsExtract, ChangePasswordProxyRespon
         params: ChangePasswordFieldsExtract,
     ) -> Result<ChangePasswordProxyResponse, AuthServiceError> {
         let mut client = ChangePasswordPbClient::new(
-            new_endpoint(self.service_url)?
+            new_endpoint(self.service_url)
+                .map_err(infra_error)?
                 .connect()
                 .await
                 .map_err(infra_error)?,
@@ -61,8 +66,13 @@ impl<'a> AuthProxyService<ChangePasswordFieldsExtract, ChangePasswordProxyRespon
             current_password: params.current_password,
             new_password: params.new_password,
         });
-        set_authorization(&mut request, &self.authorizer).await?;
-        set_metadata(&mut request, self.request_id, metadata)?;
+        set_metadata(
+            &mut request,
+            self.request_id,
+            self.authorizer.fetch_token().await.map_err(infra_error)?,
+            metadata,
+        )
+        .map_err(infra_error)?;
 
         let response = client
             .change(request)

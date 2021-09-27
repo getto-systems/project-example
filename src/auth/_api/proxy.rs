@@ -7,15 +7,15 @@ use crate::z_details::_common::{
     response::actix_web::RespondTo,
 };
 
-use crate::auth::_api::{
+use crate::auth::remote::{
     data::ValidateAuthMetadataError, infra::ValidateAuthMetadataInfra,
     method::validate_auth_metadata,
 };
 
-use crate::auth::_common::infra::AuthMetadataContent;
+use crate::auth::remote::infra::AuthMetadataContent;
 
 use crate::{
-    auth::_common::service::data::AuthServiceError, z_details::_api::message::data::MessageError,
+    auth::remote::service::data::AuthServiceError, z_details::_api::message::data::MessageError,
 };
 
 pub enum AuthProxyEvent<T> {

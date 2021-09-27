@@ -1,21 +1,23 @@
 use tonic::Request;
 
-use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
-
 use crate::avail::unexpected_error::_common::y_protobuf::service::{
     notify_pb_client::NotifyPbClient, NotifyRequestPb,
 };
 
 use crate::example::_api::x_outside_feature::feature::ExampleOutsideService;
 
-use crate::example::_api::service::helper::{
-    infra_error, new_endpoint, set_authorization, set_metadata,
+use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
+
+use crate::{
+    auth::remote::helper::set_metadata, example::_api::service::helper::infra_error,
+    z_details::_common::service::helper::new_endpoint,
 };
 
 use crate::{
-    auth::_common::infra::AuthMetadataContent,
+    auth::remote::infra::AuthMetadataContent,
     avail::unexpected_error::_common::notify::infra::NotifyUnexpectedErrorFieldsExtract,
     example::_api::proxy::ExampleProxyService,
+    z_details::_common::service::infra::ServiceAuthorizer,
 };
 
 use crate::example::_api::service::data::ExampleServiceError;
@@ -47,15 +49,21 @@ impl<'a> ExampleProxyService<NotifyUnexpectedErrorFieldsExtract, ()> for ProxySe
         params: NotifyUnexpectedErrorFieldsExtract,
     ) -> Result<(), ExampleServiceError> {
         let mut client = NotifyPbClient::new(
-            new_endpoint(self.service_url)?
+            new_endpoint(self.service_url)
+                .map_err(infra_error)?
                 .connect()
                 .await
                 .map_err(infra_error)?,
         );
 
         let mut request = Request::new(NotifyRequestPb { err: params.err });
-        set_authorization(&mut request, &self.authorizer).await?;
-        set_metadata(&mut request, self.request_id, metadata)?;
+        set_metadata(
+            &mut request,
+            self.request_id,
+            self.authorizer.fetch_token().await.map_err(infra_error)?,
+            metadata,
+        )
+        .map_err(infra_error)?;
 
         client
             .notify(request)

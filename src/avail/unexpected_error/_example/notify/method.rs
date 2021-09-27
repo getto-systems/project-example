@@ -1,6 +1,6 @@
 use getto_application::data::MethodResult;
 
-use crate::auth::_common::{data::RequireAuthRoles, method::validate_api_token};
+use crate::auth::remote::{data::RequireAuthRoles, method::validate_api_token};
 
 use crate::avail::unexpected_error::{
     _common::notify::infra::NotifyUnexpectedErrorFieldsExtract,

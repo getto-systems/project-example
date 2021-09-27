@@ -11,7 +11,7 @@ use super::header::{
     COOKIE_CLOUDFRONT_SIGNATURE, COOKIE_TICKET_TOKEN,
 };
 
-use crate::auth::_common::service::x_actix_web::response::unauthorized;
+use crate::auth::remote::service::x_actix_web::response::unauthorized;
 
 use crate::auth::ticket::remote::kernel::data::{
     AuthTokenEncoded, AuthTokenExtract, AuthTokenMessage, AuthTokenResponse, CloudfrontTokenKind,

@@ -1,4 +1,7 @@
-pub use crate::auth::ticket::remote::validate_api_token::init::ValidateApiTokenStruct;
+pub use crate::auth::ticket::remote::{
+    validate_api_token::init::ValidateApiTokenStruct,
+    validate_metadata::init::ValidateApiMetadataStruct,
+};
 
 #[cfg(test)]
 pub mod test {

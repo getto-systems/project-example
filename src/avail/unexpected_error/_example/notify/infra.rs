@@ -1,5 +1,5 @@
 use crate::{
-    auth::_common::infra::ValidateApiTokenInfra,
+    auth::remote::infra::ValidateApiTokenInfra,
     avail::unexpected_error::_common::notify::infra::NotifyUnexpectedErrorFieldsExtract,
 };
 

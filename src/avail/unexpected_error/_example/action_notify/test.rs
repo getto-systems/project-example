@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use getto_application_test::ActionTestRunner;
 
 use crate::{
-    auth::_common::init::test::{
+    auth::remote::init::test::{
         StaticAuthMetadata, StaticAuthTokenDecoder, StaticValidateApiTokenStruct,
         StaticValidateService,
     },

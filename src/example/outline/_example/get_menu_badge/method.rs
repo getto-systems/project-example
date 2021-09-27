@@ -1,7 +1,7 @@
 use getto_application::data::MethodResult;
 
 use crate::{
-    auth::_common::{data::RequireAuthRoles, method::validate_api_token},
+    auth::remote::{data::RequireAuthRoles, method::validate_api_token},
     example::outline::_example::get_menu_badge::infra::{
         GetOutlineMenuBadgeInfra, OutlineMenuBadgeRepository,
     },

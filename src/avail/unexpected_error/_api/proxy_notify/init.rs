@@ -8,7 +8,7 @@ use getto_application::infra::ActionStatePubSub;
 
 use crate::x_outside_feature::_api::feature::ApiAppFeature;
 
-use crate::auth::_api::init::ValidateApiMetadataStruct;
+use crate::auth::remote::init::ValidateApiMetadataStruct;
 use proxy_service::ProxyService;
 use request_decoder::RequestDecoder;
 use response_encoder::ResponseEncoder;

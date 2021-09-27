@@ -3,7 +3,7 @@ use crate::auth::ticket::remote::kernel::infra::{
 };
 
 use crate::auth::{
-    _common::service::data::AuthServiceError,
+    remote::service::data::AuthServiceError,
     user::remote::kernel::data::{AuthUserId, RequireAuthRoles},
 };
 

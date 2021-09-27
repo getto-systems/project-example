@@ -5,7 +5,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::x_outside_feature::_example::feature::ExampleAppFeature;
 
-use crate::auth::_common::init::ValidateApiTokenStruct;
+use crate::auth::remote::init::ValidateApiTokenStruct;
 
 use super::infra::GetOutlineMenuBadgeInfra;
 
@@ -42,7 +42,7 @@ impl<'a> GetOutlineMenuBadgeInfra for GetOutlineMenuBadgeStruct<'a> {
 #[cfg(test)]
 pub mod test {
     use super::menu_badge_repository::test::StaticOutlineMenuBadgeRepository;
-    use crate::auth::_common::init::test::StaticValidateApiTokenStruct;
+    use crate::auth::remote::init::test::StaticValidateApiTokenStruct;
 
     use super::super::infra::GetOutlineMenuBadgeInfra;
 

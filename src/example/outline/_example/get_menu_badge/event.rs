@@ -1,5 +1,5 @@
 use crate::{
-    auth::_common::data::ValidateApiTokenError, example::outline::_common::data::OutlineMenuBadge,
+    auth::remote::data::ValidateApiTokenError, example::outline::_common::data::OutlineMenuBadge,
     z_details::_common::repository::data::RepositoryError,
 };
 

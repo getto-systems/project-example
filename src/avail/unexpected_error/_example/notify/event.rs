@@ -1,4 +1,4 @@
-use crate::auth::_common::data::ValidateApiTokenError;
+use crate::auth::remote::data::ValidateApiTokenError;
 
 pub enum NotifyUnexpectedErrorEvent {
     Error(String),

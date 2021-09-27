@@ -1,9 +1,8 @@
 use actix_web::HttpRequest;
 use tonic::metadata::MetadataMap;
 
-use crate::auth::{
-    _common::metadata::METADATA_NONCE,
-    ticket::remote::kernel::x_actix_web::header::HEADER_NONCE,
+use crate::auth::ticket::remote::kernel::{
+    x_actix_web::header::HEADER_NONCE, x_tonic::metadata::METADATA_NONCE,
 };
 
 use crate::z_details::{
@@ -13,8 +12,7 @@ use crate::z_details::{
 use crate::auth::ticket::remote::kernel::infra::AuthNonceMetadata;
 
 use crate::{
-    auth::ticket::remote::kernel::data::AuthNonce,
-    z_details::_common::request::data::MetadataError,
+    auth::ticket::remote::kernel::data::AuthNonce, z_details::_common::request::data::MetadataError,
 };
 
 pub struct ActixWebAuthNonceMetadata<'a> {

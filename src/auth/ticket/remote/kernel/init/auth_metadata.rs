@@ -1,9 +1,9 @@
 use actix_web::HttpRequest;
 use tonic::metadata::MetadataMap;
 
-use crate::auth::_common::metadata::{METADATA_NONCE, METADATA_TOKEN};
-
 use crate::z_details::_common::request::x_tonic::metadata::metadata;
+
+use crate::auth::ticket::remote::kernel::x_tonic::metadata::{METADATA_NONCE, METADATA_TOKEN};
 
 use crate::auth::ticket::remote::kernel::init::{
     nonce_metadata::ActixWebAuthNonceMetadata,

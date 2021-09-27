@@ -7,11 +7,11 @@ use crate::z_details::_common::{
     response::actix_web::RespondTo,
 };
 
-use crate::auth::_api::{
-    data::ValidateAuthMetadataError, infra::ValidateAuthMetadataInfra,
+use crate::auth::remote::{
+    data::ValidateAuthMetadataError,
+    infra::{AuthMetadataContent, ValidateAuthMetadataInfra},
     method::validate_auth_metadata,
 };
-use crate::auth::_common::infra::AuthMetadataContent;
 
 use crate::{
     example::_api::service::data::ExampleServiceError, z_details::_api::message::data::MessageError,
