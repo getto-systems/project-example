@@ -1,6 +1,6 @@
-use crate::example::outline::{
-    _api::y_protobuf::api::GetMenuBadgeResultPb, _common::data::OutlineMenuBadge,
-};
+use crate::example::outline::_api::y_protobuf::api::GetMenuBadgeResultPb;
+
+use crate::example::outline::remote::get_menu_badge::data::OutlineMenuBadge;
 
 impl Into<GetMenuBadgeResultPb> for OutlineMenuBadge {
     fn into(self) -> GetMenuBadgeResultPb {

@@ -1,4 +1,4 @@
-use crate::example::outline::_example::x_tonic::route::OutlineServer;
+use crate::example::outline::remote::x_tonic::route::OutlineServer;
 
 pub struct ExampleServer {
     pub outline: OutlineServer,

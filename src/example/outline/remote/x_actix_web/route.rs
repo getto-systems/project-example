@@ -11,7 +11,7 @@ use crate::x_outside_feature::_api::{
 
 use crate::example::_api::proxy::call_proxy;
 
-use crate::example::outline::_api::proxy_get_menu_badge::init::GetOutlineMenuBadgeProxyStruct;
+use crate::example::outline::remote::proxy_get_menu_badge::init::GetOutlineMenuBadgeProxyStruct;
 
 pub fn scope_outline() -> Scope {
     web::scope("/outline").service(get_menu_badge)

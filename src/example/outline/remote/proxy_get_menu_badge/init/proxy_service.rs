@@ -19,7 +19,8 @@ use crate::{
 };
 
 use crate::example::{
-    _api::service::data::ExampleServiceError, outline::_common::data::OutlineMenuBadge,
+    _api::service::data::ExampleServiceError,
+    outline::remote::get_menu_badge::data::OutlineMenuBadge,
 };
 
 pub struct ProxyService<'a> {

@@ -7,7 +7,7 @@ use crate::{
         StaticAuthMetadata, StaticAuthTokenDecoder, StaticValidateApiTokenStruct,
         StaticValidateService,
     },
-    example::outline::_example::get_menu_badge::init::{
+    example::outline::remote::get_menu_badge::init::{
         menu_badge_repository::test::StaticOutlineMenuBadgeRepository,
         test::StaticGetOutlineMenuBadgeStruct,
     },

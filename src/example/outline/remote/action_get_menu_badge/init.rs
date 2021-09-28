@@ -2,7 +2,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::x_outside_feature::_example::feature::ExampleAppFeature;
 
-use crate::example::outline::_example::get_menu_badge::init::GetOutlineMenuBadgeStruct;
+use crate::example::outline::remote::get_menu_badge::init::GetOutlineMenuBadgeStruct;
 
 use super::action::{GetOutlineMenuBadgeAction, GetOutlineMenuBadgeMaterial};
 

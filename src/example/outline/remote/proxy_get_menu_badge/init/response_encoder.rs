@@ -5,9 +5,9 @@ use crate::z_details::_api::message::helper::encode_protobuf_base64;
 use crate::example::_api::proxy::ExampleProxyResponseEncoder;
 
 use crate::{
-    example::outline::{
-        _api::proxy_get_menu_badge::data::GetOutlineMenuBadgeProxyMessage,
-        _common::data::OutlineMenuBadge,
+    example::outline::remote::{
+        get_menu_badge::data::OutlineMenuBadge,
+        proxy_get_menu_badge::data::GetOutlineMenuBadgeProxyMessage,
     },
     z_details::_api::message::data::MessageError,
 };

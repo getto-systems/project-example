@@ -1,6 +1,6 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::example::outline::_example::get_menu_badge::{
+use crate::example::outline::remote::get_menu_badge::{
     event::GetOutlineMenuBadgeEvent, infra::GetOutlineMenuBadgeInfra,
     method::get_outline_menu_badge,
 };
