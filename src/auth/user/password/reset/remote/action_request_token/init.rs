@@ -2,7 +2,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::user::password::reset::_common::y_protobuf::service::RequestResetTokenRequestPb;
 
-use crate::x_outside_feature::_auth::feature::AuthAppFeature;
+use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 
 use crate::auth::user::password::reset::remote::request_token::init::{
     request_decoder::PbRequestResetTokenRequestDecoder, RequestResetTokenStruct,

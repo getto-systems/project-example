@@ -2,7 +2,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::avail::unexpected_error::_common::y_protobuf::service::NotifyRequestPb;
 
-use crate::x_outside_feature::_example::feature::ExampleAppFeature;
+use crate::x_outside_feature::remote::example::feature::ExampleAppFeature;
 
 use crate::avail::unexpected_error::remote::notify::init::{
     request_decoder::PbNotifyUnexpectedErrorRequestDecoder, NotifyUnexpectedErrorStruct,

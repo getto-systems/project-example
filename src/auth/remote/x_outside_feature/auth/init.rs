@@ -16,7 +16,7 @@ use crate::{
         },
         common::feature::AuthOutsideDecodingKey,
     },
-    x_outside_feature::_auth::env::AuthEnv,
+    x_outside_feature::remote::auth::env::AuthEnv,
 };
 
 use crate::auth::ticket::remote::kernel::data::{ExpansionLimitDuration, ExpireDuration};

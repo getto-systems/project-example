@@ -1,7 +1,7 @@
 use serde::Serialize;
 use tonic::metadata::MetadataMap;
 
-use crate::x_outside_feature::_common::metadata::METADATA_REQUEST_ID;
+use crate::x_outside_feature::remote::common::metadata::METADATA_REQUEST_ID;
 
 use crate::z_details::_common::logger::{InfoLogger, Logger, QuietLogger, VerboseLogger};
 

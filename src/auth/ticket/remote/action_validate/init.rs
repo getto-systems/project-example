@@ -2,7 +2,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::ticket::_common::y_protobuf::service::ValidateApiTokenRequestPb;
 
-use crate::x_outside_feature::_auth::feature::AuthAppFeature;
+use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 
 use crate::auth::ticket::remote::validate::init::{
     request_decoder::PbValidateApiTokenRequestDecoder, ApiValidateAuthTokenStruct,

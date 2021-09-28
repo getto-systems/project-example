@@ -1,4 +1,4 @@
-use crate::x_outside_feature::_api::env::ApiEnv;
+use crate::x_outside_feature::remote::api::env::ApiEnv;
 
 use super::feature::{ExampleOutsideFeature, ExampleOutsideService};
 

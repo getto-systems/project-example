@@ -4,7 +4,7 @@ use lazy_static::lazy_static;
 use tonic::{service::interceptor_fn, transport::Server};
 use tower::ServiceBuilder;
 
-use example_api::x_outside_feature::_example::{
+use example_api::x_outside_feature::remote::example::{
     env::ExampleEnv,
     feature::{ExampleAppData, ExampleAppFeature},
 };

@@ -2,7 +2,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::user::password::_common::y_protobuf::service::AuthenticatePasswordRequestPb;
 
-use crate::x_outside_feature::_auth::feature::AuthAppFeature;
+use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 
 use crate::auth::{
     ticket::remote::{

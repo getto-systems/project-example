@@ -2,7 +2,7 @@ pub mod request_decoder;
 
 use tonic::metadata::MetadataMap;
 
-use crate::x_outside_feature::_example::feature::ExampleAppFeature;
+use crate::x_outside_feature::remote::example::feature::ExampleAppFeature;
 
 use crate::auth::remote::init::ValidateApiTokenStruct;
 

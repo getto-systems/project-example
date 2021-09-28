@@ -5,7 +5,7 @@ use crate::{
         api::feature::{AuthOutsideCookie, AuthOutsideFeature},
         common::feature::{AuthOutsideDecodingKey, AuthOutsideService},
     },
-    x_outside_feature::_api::env::ApiEnv,
+    x_outside_feature::remote::api::env::ApiEnv,
 };
 
 pub async fn new_auth_outside_feature(env: &'static ApiEnv) -> AuthOutsideFeature {

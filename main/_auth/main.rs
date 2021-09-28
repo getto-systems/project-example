@@ -4,7 +4,7 @@ use lazy_static::lazy_static;
 use tonic::{service::interceptor_fn, transport::Server};
 use tower::ServiceBuilder;
 
-use example_api::x_outside_feature::_auth::{
+use example_api::x_outside_feature::remote::auth::{
     env::AuthEnv,
     feature::{AuthAppData, AuthAppFeature},
 };

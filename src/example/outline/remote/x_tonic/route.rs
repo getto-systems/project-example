@@ -2,12 +2,14 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::x_outside_feature::_common::metadata::metadata_request_id;
 use crate::z_details::_common::{logger::Logger, response::tonic::RespondTo};
 
-use crate::x_outside_feature::_example::{
-    feature::{extract_request, TonicRequest},
-    logger::app_logger,
+use crate::x_outside_feature::remote::{
+    common::metadata::metadata_request_id,
+    example::{
+        feature::{extract_request, TonicRequest},
+        logger::app_logger,
+    },
 };
 
 use crate::example::outline::_common::y_protobuf::service::{

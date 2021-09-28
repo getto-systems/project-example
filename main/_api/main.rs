@@ -4,7 +4,7 @@ use actix_cors::Cors;
 use actix_web::{web::Data, App, HttpServer};
 use lazy_static::lazy_static;
 
-use example_api::x_outside_feature::_api::{
+use example_api::x_outside_feature::remote::api::{
     env::ApiEnv,
     feature::{ApiAppData, ApiAppFeature},
 };

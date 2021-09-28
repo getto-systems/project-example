@@ -6,7 +6,7 @@ use actix_web::HttpRequest;
 
 use getto_application::infra::ActionStatePubSub;
 
-use crate::x_outside_feature::_api::feature::ApiAppFeature;
+use crate::x_outside_feature::remote::api::feature::ApiAppFeature;
 
 use crate::auth::remote::init::ValidateApiMetadataStruct;
 use proxy_service::ProxyService;

@@ -1,6 +1,6 @@
 use tonic::metadata::MetadataMap;
 
-use crate::x_outside_feature::_auth::feature::AuthAppFeature;
+use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 
 use crate::auth::ticket::remote::discard::init::DiscardAuthTicketStruct;
 

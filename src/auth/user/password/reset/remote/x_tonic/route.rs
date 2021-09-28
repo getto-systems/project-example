@@ -11,7 +11,7 @@ use crate::auth::user::password::reset::_common::y_protobuf::service::{
     ResetPasswordResponsePb,
 };
 
-use crate::x_outside_feature::_auth::{
+use crate::x_outside_feature::remote::auth::{
     feature::{extract_request, TonicRequest},
     logger::app_logger,
 };

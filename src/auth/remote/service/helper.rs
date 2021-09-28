@@ -5,7 +5,7 @@ use tonic::{
 
 use crate::{
     auth::ticket::remote::kernel::x_tonic::metadata::{METADATA_NONCE, METADATA_TOKEN},
-    x_outside_feature::_common::metadata::METADATA_REQUEST_ID,
+    x_outside_feature::remote::common::metadata::METADATA_REQUEST_ID,
 };
 
 use crate::auth::ticket::remote::kernel::infra::AuthMetadataContent;

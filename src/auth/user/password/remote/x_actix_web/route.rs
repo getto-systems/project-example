@@ -4,7 +4,7 @@ use getto_application::helper::flatten;
 
 use crate::z_details::_common::{logger::Logger, response::actix_web::RespondTo};
 
-use crate::x_outside_feature::_api::{
+use crate::x_outside_feature::remote::api::{
     feature::ApiAppData,
     logger::{app_logger, generate_request_id},
 };
