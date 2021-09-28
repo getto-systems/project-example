@@ -9,7 +9,7 @@ use crate::x_outside_feature::_api::{
     logger::{app_logger, generate_request_id},
 };
 
-use crate::example::_api::proxy::call_proxy;
+use crate::example::remote::proxy::call_proxy;
 
 use crate::avail::unexpected_error::remote::proxy_notify::{
     infra::NotifyUnexpectedErrorProxyRequestDecoder, init::NotifyUnexpectedErrorProxyStruct,

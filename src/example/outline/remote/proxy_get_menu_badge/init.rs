@@ -11,7 +11,7 @@ use crate::auth::remote::init::ValidateApiMetadataStruct;
 use proxy_service::ProxyService;
 use response_encoder::ResponseEncoder;
 
-use crate::example::_api::proxy::{ExampleProxyEvent, ExampleProxyInfra};
+use crate::example::remote::proxy::{ExampleProxyEvent, ExampleProxyInfra};
 
 use crate::example::outline::remote::{
     get_menu_badge::data::OutlineMenuBadge,

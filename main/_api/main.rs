@@ -11,7 +11,7 @@ use example_api::x_outside_feature::_api::{
 
 use example_api::{
     auth::remote::x_actix_web::route::scope_auth, avail::remote::x_actix_web::route::scope_avail,
-    example::_api::x_actix_web::route::scope_example,
+    example::remote::x_actix_web::route::scope_example,
 };
 
 lazy_static! {

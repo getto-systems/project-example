@@ -4,22 +4,22 @@ use crate::example::outline::_common::y_protobuf::service::{
     get_menu_badge_pb_client::GetMenuBadgePbClient, GetMenuBadgeRequestPb,
 };
 
-use crate::example::_api::x_outside_feature::feature::ExampleOutsideService;
+use crate::example::remote::x_outside_feature::feature::ExampleOutsideService;
 
 use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::{
-    auth::remote::helper::set_metadata, example::_api::service::helper::infra_error,
+    auth::remote::helper::set_metadata, example::remote::service::helper::infra_error,
     z_details::_common::service::helper::new_endpoint,
 };
 
 use crate::{
-    auth::remote::infra::AuthMetadataContent, example::_api::proxy::ExampleProxyService,
+    auth::remote::infra::AuthMetadataContent, example::remote::proxy::ExampleProxyService,
     z_details::_common::service::infra::ServiceAuthorizer,
 };
 
 use crate::example::{
-    _api::service::data::ExampleServiceError,
+    remote::service::data::ExampleServiceError,
     outline::remote::get_menu_badge::data::OutlineMenuBadge,
 };
 

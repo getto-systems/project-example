@@ -1,6 +1,6 @@
 use tonic::{Code, Status};
 
-use crate::example::_api::service::data::ExampleServiceError;
+use crate::example::remote::service::data::ExampleServiceError;
 
 impl From<Status> for ExampleServiceError {
     fn from(status: Status) -> Self {

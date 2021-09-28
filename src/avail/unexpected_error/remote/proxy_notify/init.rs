@@ -13,7 +13,7 @@ use proxy_service::ProxyService;
 use request_decoder::RequestDecoder;
 use response_encoder::ResponseEncoder;
 
-use crate::example::_api::proxy::{ExampleProxyEvent, ExampleProxyInfra};
+use crate::example::remote::proxy::{ExampleProxyEvent, ExampleProxyInfra};
 
 use crate::avail::unexpected_error::remote::proxy_notify::infra::{
     NotifyUnexpectedErrorFieldsExtract, NotifyUnexpectedErrorProxyRequestDecoder,

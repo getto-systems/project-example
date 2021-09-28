@@ -6,7 +6,7 @@ use crate::{
     auth::remote::x_outside_feature::api::{
         feature::AuthOutsideFeature, init::new_auth_outside_feature,
     },
-    example::_api::x_outside_feature::{
+    example::remote::x_outside_feature::{
         feature::ExampleOutsideFeature, init::new_example_outside_feature,
     },
 };

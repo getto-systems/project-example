@@ -1,6 +1,6 @@
 use crate::z_details::_common::logger::LogLevel;
 
-use crate::example::_api::service::data::ExampleServiceError;
+use crate::example::remote::service::data::ExampleServiceError;
 
 impl ExampleServiceError {
     pub const fn log_level(&self) -> LogLevel {

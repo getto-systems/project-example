@@ -9,7 +9,7 @@ use crate::x_outside_feature::_api::{
     logger::{app_logger, generate_request_id},
 };
 
-use crate::example::_api::proxy::call_proxy;
+use crate::example::remote::proxy::call_proxy;
 
 use crate::example::outline::remote::proxy_get_menu_badge::init::GetOutlineMenuBadgeProxyStruct;
 

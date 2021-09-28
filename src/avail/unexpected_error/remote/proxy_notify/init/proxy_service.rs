@@ -4,23 +4,23 @@ use crate::avail::unexpected_error::_common::y_protobuf::service::{
     notify_pb_client::NotifyPbClient, NotifyRequestPb,
 };
 
-use crate::example::_api::x_outside_feature::feature::ExampleOutsideService;
+use crate::example::remote::x_outside_feature::feature::ExampleOutsideService;
 
 use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::{
-    auth::remote::helper::set_metadata, example::_api::service::helper::infra_error,
+    auth::remote::helper::set_metadata, example::remote::helper::infra_error,
     z_details::_common::service::helper::new_endpoint,
 };
 
 use crate::{
     auth::remote::infra::AuthMetadataContent,
     avail::unexpected_error::remote::proxy_notify::infra::NotifyUnexpectedErrorFieldsExtract,
-    example::_api::proxy::ExampleProxyService,
+    example::remote::proxy::ExampleProxyService,
     z_details::_common::service::infra::ServiceAuthorizer,
 };
 
-use crate::example::_api::service::data::ExampleServiceError;
+use crate::example::remote::data::ExampleServiceError;
 
 pub struct ProxyService<'a> {
     service_url: &'static str,

@@ -2,7 +2,7 @@ use crate::example::outline::_api::y_protobuf::api::GetMenuBadgeResultPb;
 
 use crate::z_details::_api::message::helper::encode_protobuf_base64;
 
-use crate::example::_api::proxy::ExampleProxyResponseEncoder;
+use crate::example::remote::proxy::ExampleProxyResponseEncoder;
 
 use crate::{
     example::outline::remote::{

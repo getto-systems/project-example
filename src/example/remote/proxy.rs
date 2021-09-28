@@ -14,7 +14,7 @@ use crate::auth::remote::{
 };
 
 use crate::{
-    example::_api::service::data::ExampleServiceError, z_details::_api::message::data::MessageError,
+    example::remote::service::data::ExampleServiceError, z_details::_api::message::data::MessageError,
 };
 
 pub enum ExampleProxyEvent<T> {
