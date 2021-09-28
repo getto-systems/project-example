@@ -2,8 +2,8 @@ import { mockNotifyUnexpectedErrorAction } from "../../avail/unexpected_error/ac
 import {
     mockLoadBreadcrumbListAction,
     mockBreadcrumbList_home,
-} from "../../example/outline/_ui/action_load_breadcrumb_list/mock"
-import { mockLoadMenuAction, mockMenu_home } from "../../example/outline/_ui/action_load_menu/mock"
+} from "../../example/outline/action_load_breadcrumb_list/mock"
+import { mockLoadMenuAction, mockMenu_home } from "../../example/outline/action_load_menu/mock"
 
 import { DocsResource } from "./resource"
 

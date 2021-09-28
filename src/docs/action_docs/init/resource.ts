@@ -1,7 +1,7 @@
-import { docsMenuContent } from "../../../example/outline/_ui/kernel/init/docs"
+import { docsMenuContent } from "../../../example/outline/kernel/init/docs"
 import { newNotifyUnexpectedErrorResource } from "../../../avail/unexpected_error/action_notify/init/resource"
-import { newLoadBreadcrumbListAction } from "../../../example/outline/_ui/action_load_breadcrumb_list/init/resource"
-import { newLoadMenuResource } from "../../../example/outline/_ui/action_load_menu/init/resource"
+import { newLoadBreadcrumbListAction } from "../../../example/outline/action_load_breadcrumb_list/init/resource"
+import { newLoadMenuResource } from "../../../example/outline/action_load_menu/init/resource"
 
 import { initDocsView } from "../init"
 

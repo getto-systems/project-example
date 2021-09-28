@@ -2,8 +2,8 @@ import { mockNotifyUnexpectedErrorAction } from "../../../avail/unexpected_error
 import {
     mockBreadcrumbList_home,
     mockLoadBreadcrumbListAction,
-} from "../../outline/_ui/action_load_breadcrumb_list/mock"
-import { mockLoadMenuAction, mockMenu_home } from "../../outline/_ui/action_load_menu/mock"
+} from "../../outline/action_load_breadcrumb_list/mock"
+import { mockLoadMenuAction, mockMenu_home } from "../../outline/action_load_menu/mock"
 import { mockLoadSeasonAction } from "../common/action_load_season/mock"
 
 import { BaseResource } from "./resource"

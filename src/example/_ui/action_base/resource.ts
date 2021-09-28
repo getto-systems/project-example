@@ -1,8 +1,8 @@
 import { ApplicationView } from "../../../../ui/vendor/getto-application/action/action"
 
 import { NotifyUnexpectedErrorResource } from "../../../avail/unexpected_error/action_notify/resource"
-import { LoadBreadcrumbListResource } from "../../outline/_ui/action_load_breadcrumb_list/resource"
-import { LoadMenuResource } from "../../outline/_ui/action_load_menu/resource"
+import { LoadBreadcrumbListResource } from "../../outline/action_load_breadcrumb_list/resource"
+import { LoadMenuResource } from "../../outline/action_load_menu/resource"
 import { LoadSeasonResource } from "../common/action_load_season/resource"
 
 // TODO 多分必要ない

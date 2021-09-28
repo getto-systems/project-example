@@ -18,8 +18,8 @@ import { copyright, siteInfo } from "../../../../../src/example/site"
 
 import { ApplicationErrorComponent } from "../../../../../src/avail/x_preact/application_error"
 import { LoadSeasonEntry } from "../../../../../src/example/_ui/common/action_load_season/x_preact/load_season"
-import { LoadMenuEntry } from "../../../../../src/example/outline/_ui/action_load_menu/x_preact/load_menu"
-import { LoadBreadcrumbListComponent } from "../../../../../src/example/outline/_ui/action_load_breadcrumb_list/x_preact/load_breadcrumb_list"
+import { LoadMenuEntry } from "../../../../../src/example/outline/action_load_menu/x_preact/load_menu"
+import { LoadBreadcrumbListComponent } from "../../../../../src/example/outline/action_load_breadcrumb_list/x_preact/load_breadcrumb_list"
 import { ChangePasswordEntry } from "../../../../../src/auth/user/password/action_change/x_preact/change_password"
 
 import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
