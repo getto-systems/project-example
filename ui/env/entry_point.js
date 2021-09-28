@@ -74,7 +74,7 @@ function toEntry(root, entry) {
         return entry
     }
     function toPath(type) {
-        return path.join(__dirname, "../../main/_ui", root, entryPath(), `${type}.ts`)
+        return path.join(__dirname, "../../main/ui", root, entryPath(), `${type}.ts`)
     }
     function entryPath() {
         return entry.name.replaceAll("-", "_")
