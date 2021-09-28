@@ -17,7 +17,7 @@ import { container } from "../../../../ui/vendor/getto-css/preact/design/box"
 import { copyright, siteInfo } from "../../../example/site"
 import { actionBox, dataBox, usecaseBox } from "./helper"
 
-import { ApplicationErrorComponent } from "../../../avail/_ui/x_preact/application_error"
+import { ApplicationErrorComponent } from "../../../avail/x_preact/application_error"
 import { LoadMenuEntry } from "../../../example/outline/_ui/action_load_menu/x_preact/load_menu"
 import { LoadBreadcrumbListComponent } from "../../../example/outline/_ui/action_load_breadcrumb_list/x_preact/load_breadcrumb_list"
 

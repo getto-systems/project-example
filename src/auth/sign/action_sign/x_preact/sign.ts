@@ -7,7 +7,7 @@ import {
     useApplicationView,
 } from "../../../../../ui/vendor/getto-application/action/x_preact/hooks"
 
-import { ApplicationErrorComponent } from "../../../../avail/_ui/x_preact/application_error"
+import { ApplicationErrorComponent } from "../../../../avail/x_preact/application_error"
 import { CheckAuthTicketEntry } from "../../../ticket/action_check/x_preact/check_auth_info"
 import { AuthenticatePasswordEntry } from "../../../user/password/action_authenticate/x_preact/authenticate_password"
 import { RequestResetTokenEntry } from "../../../user/password/reset/action_request_token/x_preact/request_reset_token"

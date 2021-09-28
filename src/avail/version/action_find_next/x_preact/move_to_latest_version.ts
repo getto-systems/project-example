@@ -11,7 +11,7 @@ import { loginBox } from "../../../../../ui/vendor/getto-css/preact/layout/login
 import { siteInfo } from "../../../../example/site"
 import { spinner } from "../../../../example/_ui/x_preact/design/icon"
 
-import { ApplicationErrorComponent } from "../../../_ui/x_preact/application_error"
+import { ApplicationErrorComponent } from "../../../x_preact/application_error"
 
 import { applicationPath } from "../../find_next/helper"
 

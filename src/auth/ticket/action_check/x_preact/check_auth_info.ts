@@ -18,7 +18,7 @@ import { spinner } from "../../../../example/_ui/x_preact/design/icon"
 
 import { appendScript } from "../../../sign/x_preact/script"
 
-import { ApplicationErrorComponent } from "../../../../avail/_ui/x_preact/application_error"
+import { ApplicationErrorComponent } from "../../../../avail/x_preact/application_error"
 
 import {
     CheckAuthTicketView,

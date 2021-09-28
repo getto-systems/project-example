@@ -16,7 +16,7 @@ import { useDocumentTitle } from "../../../../../src/example/_ui/x_preact/hooks"
 
 import { copyright, siteInfo } from "../../../../../src/example/site"
 
-import { ApplicationErrorComponent } from "../../../../../src/avail/_ui/x_preact/application_error"
+import { ApplicationErrorComponent } from "../../../../../src/avail/x_preact/application_error"
 import { LoadSeasonEntry } from "../../../../../src/example/_ui/common/action_load_season/x_preact/load_season"
 import { LoadMenuEntry } from "../../../../../src/example/outline/_ui/action_load_menu/x_preact/load_menu"
 import { LoadBreadcrumbListComponent } from "../../../../../src/example/outline/_ui/action_load_breadcrumb_list/x_preact/load_breadcrumb_list"

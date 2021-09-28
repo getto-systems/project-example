@@ -41,7 +41,7 @@ async fn main() {
 
 mod route {
     use example_api::{
-        avail::_example::x_tonic::route::AvailServer,
+        avail::remote::x_tonic::route::AvailServer,
         example::_example::x_tonic::route::ExampleServer,
     };
 
