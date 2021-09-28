@@ -8,15 +8,15 @@ default-run = "api"
 
 [[bin]]
 name = "api"
-path = "main/_api/main.rs"
+path = "main/api/main.rs"
 
 [[bin]]
 name = "auth"
-path = "main/_auth/main.rs"
+path = "main/auth/main.rs"
 
 [[bin]]
 name = "example"
-path = "main/_example/main.rs"
+path = "main/example/main.rs"
 
 [dependencies]
 async-trait = "0.1"

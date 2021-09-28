@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package auth.user.password.reset.api;
+
+import "auth/ticket/z_protobuf/api.proto";
+
+message RequestResetTokenPb {
+    string login_id = 1;
+}
+message RequestResetTokenResultPb {
+    bool success = 1;
+    RequestResetTokenValuePb value = 2;
+    RequestResetTokenErrorPb err = 3;
+}
+message RequestResetTokenValuePb {
+    string session_id = 1;
+}
+message RequestResetTokenErrorPb {
+    RequestResetTokenErrorKindPb kind = 1;
+}
+enum RequestResetTokenErrorKindPb {
+    INVALID_REQUEST = 0;
+}
+
+message ResetPasswordPb {
+    string reset_token = 1;
+    string login_id = 2;
+    string password = 3;
+}
+message ResetPasswordResultPb {
+    bool success = 1;
+    auth.ticket.api.AuthenticateResponsePb value = 2;
+    ResetPasswordErrorPb err = 3;
+}
+message ResetPasswordErrorPb {
+    ResetPasswordErrorKindPb kind = 1;
+}
+enum ResetPasswordErrorKindPb {
+    INVALID_RESET = 0;
+    ALREADY_RESET = 1;
+}

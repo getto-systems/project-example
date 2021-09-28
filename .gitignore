@@ -14,6 +14,7 @@
 
 /ui/public/dist/coverage/
 /ui/public/dist/storybook/
+/ui/public/dist/**/*.html
 
 /public/dist/css/*
 !/public/dist/css/.keep
@@ -22,3 +23,4 @@
 /secure/dist/**/*.js
 
 /src/**/y_*/*
+!/src/**/y_protobuf/mod.rs

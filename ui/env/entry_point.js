@@ -18,7 +18,7 @@ const entries = {
     secure: [
         { name: "index", /* TODO background: true */ },
 
-        { name: "auth/auth-ticket/logout", /* TODO background: true */ },
+        { name: "auth/ticket/logout", /* TODO background: true */ },
         { name: "auth/profile", /* TODO background: true */ },
 
         { name: "docs/index" },
@@ -74,7 +74,7 @@ function toEntry(root, entry) {
         return entry
     }
     function toPath(type) {
-        return path.join(__dirname, "../../main/_ui", root, entryPath(), `${type}.ts`)
+        return path.join(__dirname, "../../main/ui", root, entryPath(), `${type}.ts`)
     }
     function entryPath() {
         return entry.name.replaceAll("-", "_")

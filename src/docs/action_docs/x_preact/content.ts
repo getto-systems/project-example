@@ -12,7 +12,7 @@ import {
 } from "../../../../ui/vendor/getto-css/preact/design/highlight"
 import { field } from "../../../../ui/vendor/getto-css/preact/design/form"
 
-import { icon } from "../../../example/_ui/x_preact/design/icon"
+import { icon } from "../../../example/x_preact/design/icon"
 
 import {
     DocsAction_legacy,

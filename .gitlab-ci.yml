@@ -80,6 +80,9 @@ test-api:
 
   image: rust:1-buster
 
+  variables:
+    RUN_CODE_BUILDER: "TRUE"
+
   before_script:
     - rustup component add rustfmt
   script:
