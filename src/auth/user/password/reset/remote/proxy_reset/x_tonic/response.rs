@@ -1,6 +1,5 @@
-use crate::auth::user::password::reset::{
-    _api::y_protobuf::api::ResetPasswordErrorKindPb,
-    _common::y_protobuf::service::ResetPasswordResponsePb,
+use crate::auth::user::password::reset::remote::y_protobuf::{
+    api::ResetPasswordErrorKindPb, service::ResetPasswordResponsePb,
 };
 
 use crate::auth::user::password::reset::remote::proxy_reset::infra::ResetPasswordProxyResponse;

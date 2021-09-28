@@ -1,6 +1,6 @@
 use tonic::{Response, Status};
 
-use crate::auth::user::password::reset::_common::y_protobuf::service::{
+use crate::auth::user::password::reset::remote::y_protobuf::service::{
     ResetPasswordErrorKindPb, ResetPasswordResponsePb,
 };
 

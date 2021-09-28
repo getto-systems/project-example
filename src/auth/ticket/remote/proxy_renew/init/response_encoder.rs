@@ -1,6 +1,6 @@
 use crate::z_lib::remote::message::helper::encode_protobuf_base64;
 
-use crate::auth::ticket::_api::y_protobuf::api::AuthenticateResponsePb;
+use crate::auth::ticket::remote::y_protobuf::api::AuthenticateResponsePb;
 
 use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideCookie;
 

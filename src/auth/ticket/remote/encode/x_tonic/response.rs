@@ -3,10 +3,10 @@ use tonic::{Response, Status};
 use crate::z_lib::remote::response::tonic::RespondTo;
 
 use crate::auth::{
-    ticket::_common::y_protobuf::service::RenewAuthTicketResponsePb,
+    ticket::remote::y_protobuf::service::RenewAuthTicketResponsePb,
     user::password::{
-        _common::y_protobuf::service::AuthenticatePasswordResponsePb,
-        reset::_common::y_protobuf::service::ResetPasswordResponsePb,
+        remote::y_protobuf::service::AuthenticatePasswordResponsePb,
+        reset::remote::y_protobuf::service::ResetPasswordResponsePb,
     },
 };
 

@@ -2,7 +2,7 @@ use tonic::{Response, Status};
 
 use crate::z_lib::remote::response::tonic::RespondTo;
 
-use crate::auth::ticket::_common::y_protobuf::service::RenewAuthTicketResponsePb;
+use crate::auth::ticket::remote::y_protobuf::service::RenewAuthTicketResponsePb;
 
 use super::super::action::RenewAuthTicketState;
 

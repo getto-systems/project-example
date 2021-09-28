@@ -1,6 +1,6 @@
 use prost::Message;
 
-use crate::auth::user::password::reset::_api::y_protobuf::api::ResetPasswordPb;
+use crate::auth::user::password::reset::remote::y_protobuf::api::ResetPasswordPb;
 
 use crate::z_lib::remote::message::helper::{decode_base64, invalid_protobuf};
 

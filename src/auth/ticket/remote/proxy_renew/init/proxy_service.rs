@@ -1,6 +1,6 @@
 use tonic::Request;
 
-use crate::auth::ticket::_common::y_protobuf::service::{
+use crate::auth::ticket::remote::y_protobuf::service::{
     renew_auth_ticket_pb_client::RenewAuthTicketPbClient, RenewAuthTicketRequestPb,
 };
 

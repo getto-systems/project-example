@@ -1,6 +1,6 @@
 use std::iter::FromIterator;
 
-use crate::auth::ticket::_api::y_protobuf::api::AuthenticateResponsePb;
+use crate::auth::ticket::remote::y_protobuf::api::AuthenticateResponsePb;
 
 use crate::auth::user::remote::kernel::data::AuthUserExtract;
 

@@ -2,7 +2,7 @@ use tonic::{Response, Status};
 
 use crate::z_lib::remote::response::tonic::RespondTo;
 
-use crate::example::outline::_common::y_protobuf::service::GetMenuBadgeResponsePb;
+use crate::example::outline::remote::y_protobuf::service::GetMenuBadgeResponsePb;
 
 use super::super::action::GetOutlineMenuBadgeState;
 

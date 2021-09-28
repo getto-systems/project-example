@@ -1,4 +1,4 @@
-use crate::auth::user::password::_common::y_protobuf::service::AuthenticatePasswordResponsePb;
+use crate::auth::user::password::remote::y_protobuf::service::AuthenticatePasswordResponsePb;
 
 use crate::auth::user::password::remote::proxy_authenticate::infra::AuthenticatePasswordProxyResponse;
 

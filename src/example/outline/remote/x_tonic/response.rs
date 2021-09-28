@@ -1,4 +1,4 @@
-use crate::example::outline::_common::y_protobuf::service::GetMenuBadgeResponsePb;
+use crate::example::outline::remote::y_protobuf::service::GetMenuBadgeResponsePb;
 
 use crate::example::outline::remote::get_menu_badge::data::{OutlineMenuBadge, OutlineMenuBadgeCount};
 

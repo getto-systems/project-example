@@ -12,7 +12,7 @@ use crate::x_outside_feature::remote::{
     },
 };
 
-use crate::example::outline::_common::y_protobuf::service::{
+use crate::example::outline::remote::y_protobuf::service::{
     get_menu_badge_pb_server::{GetMenuBadgePb, GetMenuBadgePbServer},
     GetMenuBadgeRequestPb, GetMenuBadgeResponsePb,
 };

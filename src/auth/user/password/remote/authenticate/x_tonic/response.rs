@@ -1,6 +1,6 @@
 use tonic::{Response, Status};
 
-use crate::auth::user::password::_common::y_protobuf::service::AuthenticatePasswordResponsePb;
+use crate::auth::user::password::remote::y_protobuf::service::AuthenticatePasswordResponsePb;
 
 use crate::z_lib::remote::response::tonic::RespondTo;
 

@@ -4,7 +4,7 @@ use getto_application::helper::flatten;
 
 use crate::z_lib::remote::{logger::Logger, response::tonic::RespondTo};
 
-use crate::avail::unexpected_error::_common::y_protobuf::service::{
+use crate::avail::unexpected_error::remote::y_protobuf::service::{
     notify_pb_server::{NotifyPb, NotifyPbServer},
     NotifyRequestPb, NotifyResponsePb,
 };

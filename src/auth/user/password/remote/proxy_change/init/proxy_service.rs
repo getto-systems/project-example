@@ -1,6 +1,6 @@
 use tonic::Request;
 
-use crate::auth::user::password::_common::y_protobuf::service::{
+use crate::auth::user::password::remote::y_protobuf::service::{
     change_password_pb_client::ChangePasswordPbClient, ChangePasswordRequestPb,
 };
 

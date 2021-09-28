@@ -1,4 +1,4 @@
-use crate::auth::user::password::_api::y_protobuf::api::{
+use crate::auth::user::password::remote::y_protobuf::api::{
     AuthenticatePasswordErrorKindPb, AuthenticatePasswordErrorPb, AuthenticatePasswordResultPb,
 };
 

@@ -1,4 +1,4 @@
-use crate::auth::user::password::_common::y_protobuf::service::ChangePasswordResponsePb;
+use crate::auth::user::password::remote::y_protobuf::service::ChangePasswordResponsePb;
 
 use crate::auth::user::password::remote::proxy_change::infra::ChangePasswordProxyResponse;
 

@@ -1,6 +1,6 @@
 use crate::z_lib::remote::message::helper::encode_protobuf_base64;
 
-use crate::auth::user::password::reset::_api::y_protobuf::api::{
+use crate::auth::user::password::reset::remote::y_protobuf::api::{
     RequestResetTokenErrorKindPb, RequestResetTokenErrorPb, RequestResetTokenResultPb,
 };
 

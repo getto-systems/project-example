@@ -1,4 +1,4 @@
-use crate::example::outline::_api::y_protobuf::api::GetMenuBadgeResultPb;
+use crate::example::outline::remote::y_protobuf::api::GetMenuBadgeResultPb;
 
 use crate::z_lib::remote::message::helper::encode_protobuf_base64;
 

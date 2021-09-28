@@ -1,6 +1,6 @@
 use tonic::metadata::MetadataMap;
 
-use crate::auth::ticket::_common::y_protobuf::service::ValidateApiTokenRequestPb;
+use crate::auth::ticket::remote::y_protobuf::service::ValidateApiTokenRequestPb;
 
 use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 

@@ -1,4 +1,4 @@
-use crate::auth::user::password::reset::_common::y_protobuf::service::RequestResetTokenRequestPb;
+use crate::auth::user::password::reset::remote::y_protobuf::service::RequestResetTokenRequestPb;
 
 use crate::auth::user::password::reset::remote::{
     proxy_request_token::infra::RequestResetTokenFieldsExtract,

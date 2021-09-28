@@ -1,4 +1,4 @@
-use crate::auth::user::password::reset::_common::y_protobuf::service::ResetPasswordRequestPb;
+use crate::auth::user::password::reset::remote::y_protobuf::service::ResetPasswordRequestPb;
 
 use crate::auth::user::password::reset::remote::{
     proxy_reset::infra::ResetPasswordFieldsExtract, reset::infra::ResetPasswordRequestDecoder,

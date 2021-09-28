@@ -1,4 +1,4 @@
-use crate::auth::user::password::_common::y_protobuf::service::AuthenticatePasswordRequestPb;
+use crate::auth::user::password::remote::y_protobuf::service::AuthenticatePasswordRequestPb;
 
 use crate::auth::user::password::remote::{
     authenticate::infra::AuthenticatePasswordRequestDecoder,

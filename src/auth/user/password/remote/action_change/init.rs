@@ -1,6 +1,6 @@
 use tonic::metadata::MetadataMap;
 
-use crate::auth::user::password::_common::y_protobuf::service::ChangePasswordRequestPb;
+use crate::auth::user::password::remote::y_protobuf::service::ChangePasswordRequestPb;
 
 use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 

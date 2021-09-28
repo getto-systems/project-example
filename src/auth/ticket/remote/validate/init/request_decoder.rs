@@ -1,9 +1,9 @@
 use std::collections::HashSet;
 
 use crate::auth::{
-    ticket::{
-        remote::validate::infra::ValidateApiTokenRequestDecoder,
-        _common::y_protobuf::service::ValidateApiTokenRequestPb,
+    ticket::remote::{
+        validate::infra::ValidateApiTokenRequestDecoder,
+        y_protobuf::service::ValidateApiTokenRequestPb,
     },
     user::remote::kernel::data::{AuthRoles, RequireAuthRoles},
 };

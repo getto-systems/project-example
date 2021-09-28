@@ -5,10 +5,10 @@ use tonic::{Response, Status};
 use crate::z_lib::remote::response::tonic::RespondTo;
 
 use crate::auth::{
-    ticket::_common::y_protobuf::service::{
+    ticket::remote::y_protobuf::service::{
         ValidateApiTokenRequestPb, ValidateApiTokenResponsePb,
     },
-    user::_common::y_protobuf::service::AuthUserPb,
+    user::remote::y_protobuf::service::AuthUserPb,
 };
 
 use crate::auth::user::remote::kernel::data::{AuthUser, AuthUserExtract, RequireAuthRoles};

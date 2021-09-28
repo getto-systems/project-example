@@ -1,6 +1,6 @@
 use tonic::Request;
 
-use crate::auth::user::password::reset::_common::y_protobuf::service::{
+use crate::auth::user::password::reset::remote::y_protobuf::service::{
     request_reset_token_pb_client::RequestResetTokenPbClient, RequestResetTokenRequestPb,
 };
 
