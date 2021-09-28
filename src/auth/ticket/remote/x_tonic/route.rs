@@ -12,9 +12,12 @@ use crate::auth::ticket::_common::y_protobuf::service::{
     ValidateApiTokenRequestPb, ValidateApiTokenResponsePb,
 };
 
-use crate::x_outside_feature::remote::auth::{
-    feature::{extract_request, TonicRequest},
-    logger::app_logger,
+use crate::x_outside_feature::remote::{
+    auth::{
+        feature::{extract_request, TonicRequest},
+        logger::app_logger,
+    },
+    common::metadata::metadata_request_id,
 };
 
 use crate::auth::ticket::remote::{
@@ -45,8 +48,9 @@ impl LogoutPb for Logout {
         request: Request<LogoutRequestPb>,
     ) -> Result<Response<LogoutResponsePb>, Status> {
         let TonicRequest { data, metadata, .. } = extract_request(request);
+        let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("auth.auth_ticket.logout", &metadata);
+        let logger = app_logger("auth.auth_ticket.logout", request_id.into());
         let mut action = LogoutFeature::action(&data, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
@@ -63,8 +67,9 @@ impl RenewAuthTicketPb for Renew {
         request: Request<RenewAuthTicketRequestPb>,
     ) -> Result<Response<RenewAuthTicketResponsePb>, Status> {
         let TonicRequest { data, metadata, .. } = extract_request(request);
+        let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("auth.auth_ticket.renew", &metadata);
+        let logger = app_logger("auth.auth_ticket.renew", request_id.into());
         let mut action = RenewAuthTicketFeature::action(&data, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
@@ -85,8 +90,9 @@ impl ValidateApiTokenPb for Validate {
             metadata,
             request,
         } = extract_request(request);
+        let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("auth.auth_ticket.renew", &metadata);
+        let logger = app_logger("auth.auth_ticket.renew", request_id.into());
         let mut action = ValidateApiTokenFeature::action(&data, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 

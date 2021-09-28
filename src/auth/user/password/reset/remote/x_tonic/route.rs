@@ -11,9 +11,12 @@ use crate::auth::user::password::reset::_common::y_protobuf::service::{
     ResetPasswordResponsePb,
 };
 
-use crate::x_outside_feature::remote::auth::{
-    feature::{extract_request, TonicRequest},
-    logger::app_logger,
+use crate::x_outside_feature::remote::{
+    auth::{
+        feature::{extract_request, TonicRequest},
+        logger::app_logger,
+    },
+    common::metadata::metadata_request_id,
 };
 
 use crate::auth::user::password::reset::remote::{
@@ -44,8 +47,9 @@ impl RequestResetTokenPb for RequestToken {
             metadata,
             request,
         } = extract_request(request);
+        let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("auth.password.reset.request_token", &metadata);
+        let logger = app_logger("auth.password.reset.request_token", request_id.into());
         let mut action = RequestResetTokenFeature::action(&data, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
@@ -67,8 +71,9 @@ impl ResetPasswordPb for Reset {
             metadata,
             request,
         } = extract_request(request);
+        let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("auth.password.reset.reset", &metadata);
+        let logger = app_logger("auth.password.reset.reset", request_id.into());
         let mut action = ResetPasswordFeature::action(&data, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 

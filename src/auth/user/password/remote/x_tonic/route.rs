@@ -11,9 +11,12 @@ use crate::auth::user::password::_common::y_protobuf::service::{
 
 use crate::z_details::_common::{logger::Logger, response::tonic::RespondTo};
 
-use crate::x_outside_feature::remote::auth::{
-    feature::{extract_request, TonicRequest},
-    logger::app_logger,
+use crate::x_outside_feature::remote::{
+    auth::{
+        feature::{extract_request, TonicRequest},
+        logger::app_logger,
+    },
+    common::metadata::metadata_request_id,
 };
 
 use crate::auth::user::password::reset::remote::x_tonic::route::ResetServer;
@@ -52,8 +55,9 @@ impl AuthenticatePasswordPb for Authenticate {
             metadata,
             request,
         } = extract_request(request);
+        let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("auth.password.authenticate", &metadata);
+        let logger = app_logger("auth.password.authenticate", request_id.into());
         let mut action = AuthenticatePasswordFeature::action(&data, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
@@ -75,8 +79,9 @@ impl ChangePasswordPb for Change {
             metadata,
             request,
         } = extract_request(request);
+        let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("auth.password.change", &metadata);
+        let logger = app_logger("auth.password.change", request_id.into());
         let mut action = ChangePasswordFeature::action(&data, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 

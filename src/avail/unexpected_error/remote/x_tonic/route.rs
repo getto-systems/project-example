@@ -41,7 +41,7 @@ impl NotifyPb for Notify {
             request,
         } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
-        let logger = app_logger("avail.unexpected_error.notify", &request_id);
+        let logger = app_logger("avail.unexpected_error.notify", request_id.into());
 
         let mut action = NotifyUnexpectedErrorFeature::action(&data, &request_id, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));

@@ -38,7 +38,7 @@ impl GetMenuBadgePb for GetMenuBadge {
         let TonicRequest { metadata, data, .. } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("example.outline.get_menu_badge", &request_id);
+        let logger = app_logger("example.outline.get_menu_badge", request_id.into());
         let mut action = GetOutlineMenuBadgeFeature::action(&data, &request_id, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
