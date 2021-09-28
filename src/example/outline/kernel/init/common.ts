@@ -1,4 +1,4 @@
-import { staticMenuPath, StaticMenuPath } from "../../../../y_environment/_ui/path"
+import { staticMenuPath, StaticMenuPath } from "../../../../y_environment/ui/path"
 
 import { LineIcon, lniClass } from "../../../../z_lib/ui/icon/line_icon"
 

@@ -1,4 +1,4 @@
-import { env } from "../../../y_environment/_ui/env"
+import { env } from "../../../y_environment/ui/env"
 import { avail_config } from "../../x_outside_feature/config"
 
 import { toURL } from "../../../z_lib/ui/location/init"

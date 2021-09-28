@@ -1,4 +1,4 @@
-import { env } from "../../../../y_environment/_ui/env"
+import { env } from "../../../../y_environment/ui/env"
 
 import {
     fetchOptions,

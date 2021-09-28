@@ -1,4 +1,4 @@
-import { env } from "../../../../../y_environment/_ui/env"
+import { env } from "../../../../../y_environment/ui/env"
 import pb from "../../../../../y_protobuf/proto.js"
 
 import {

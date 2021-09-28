@@ -1,4 +1,4 @@
-import { env } from "../../../y_environment/_ui/env"
+import { env } from "../../../y_environment/ui/env"
 
 import { MenuContent } from "../kernel/infra"
 import { LoadBreadcrumbListInfra } from "./infra"

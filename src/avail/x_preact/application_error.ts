@@ -5,7 +5,7 @@ import { v_small } from "../../../ui/vendor/getto-css/preact/design/alignment"
 import { buttons, field } from "../../../ui/vendor/getto-css/preact/design/form"
 import { loginBox } from "../../../ui/vendor/getto-css/preact/layout/login"
 
-import { env } from "../../y_environment/_ui/env"
+import { env } from "../../y_environment/ui/env"
 
 import { siteInfo } from "../../example/site"
 

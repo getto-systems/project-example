@@ -46,7 +46,7 @@ async fn main() -> io::Result<()> {
 mod root {
     use actix_web::{get, Responder};
 
-    use example_api::y_environment::_api::env::VERSION;
+    use example_api::y_environment::remote::env::VERSION;
 
     #[get("/")]
     async fn index() -> impl Responder {
