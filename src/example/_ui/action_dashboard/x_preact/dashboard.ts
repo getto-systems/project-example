@@ -9,7 +9,7 @@ import {
 } from "../../../../../ui/vendor/getto-css/preact/layout/app"
 
 import { useApplicationView } from "../../../../../ui/vendor/getto-application/action/x_preact/hooks"
-import { useNotifyUnexpectedError } from "../../../../avail/unexpected_error/_ui/action_notify/x_preact/hooks"
+import { useNotifyUnexpectedError } from "../../../../avail/unexpected_error/action_notify/x_preact/hooks"
 import { useDocumentTitle } from "../../x_preact/hooks"
 
 import { copyright, siteInfo } from "../../../site"

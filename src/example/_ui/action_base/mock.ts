@@ -1,4 +1,4 @@
-import { mockNotifyUnexpectedErrorAction } from "../../../avail/unexpected_error/_ui/action_notify/mock"
+import { mockNotifyUnexpectedErrorAction } from "../../../avail/unexpected_error/action_notify/mock"
 import {
     mockBreadcrumbList_home,
     mockLoadBreadcrumbListAction,
