@@ -1,6 +1,6 @@
 use crate::{
     auth::ticket::remote::kernel::data::{AuthTicket, ExpansionLimitDateTime},
-    z_details::_common::repository::data::RepositoryError,
+    z_lib::remote::repository::data::RepositoryError,
 };
 
 pub enum IssueAuthTicketEvent {

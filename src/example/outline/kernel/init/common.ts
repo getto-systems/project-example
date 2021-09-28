@@ -1,6 +1,6 @@
 import { staticMenuPath, StaticMenuPath } from "../../../../y_environment/_ui/path"
 
-import { LineIcon, lniClass } from "../../../../z_details/_ui/icon/line_icon"
+import { LineIcon, lniClass } from "../../../../z_lib/ui/icon/line_icon"
 
 import { MenuPermission, MenuTree, MenuTreeNode } from "../infra"
 

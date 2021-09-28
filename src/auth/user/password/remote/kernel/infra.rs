@@ -13,7 +13,7 @@ use crate::{
             remote::kernel::data::AuthUserId,
         },
     },
-    z_details::_common::repository::data::RepositoryError,
+    z_lib::remote::repository::data::RepositoryError,
 };
 
 pub struct HashedPassword(String);

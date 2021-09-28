@@ -9,7 +9,7 @@ use crate::{
             },
         },
     },
-    z_details::_common::repository::data::RepositoryError,
+    z_lib::remote::repository::data::RepositoryError,
 };
 
 use crate::auth::ticket::remote::validate::event::ValidateAuthTokenEvent;

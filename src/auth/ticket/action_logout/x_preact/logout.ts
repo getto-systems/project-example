@@ -2,8 +2,8 @@ import { h, VNode } from "preact"
 import { useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
 
-import { remoteCommonErrorReason } from "../../../../z_details/_ui/remote/reason"
-import { repositoryErrorReason } from "../../../../z_details/_ui/repository/reason"
+import { remoteCommonErrorReason } from "../../../../z_lib/ui/remote/reason"
+import { repositoryErrorReason } from "../../../../z_lib/ui/repository/reason"
 
 import { useApplicationAction } from "../../../../../ui/vendor/getto-application/action/x_preact/hooks"
 
@@ -14,7 +14,7 @@ import { v_small } from "../../../../../ui/vendor/getto-css/preact/design/alignm
 
 import { LogoutResource, LogoutResourceState } from "../resource"
 
-import { RepositoryError } from "../../../../z_details/_ui/repository/data"
+import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 import { LogoutError } from "../../logout/data"
 
 export function LogoutEntry(resource: LogoutResource): VNode {

@@ -2,7 +2,7 @@ use crate::example::outline::remote::get_menu_badge::infra::OutlineMenuBadgeRepo
 
 use crate::{
     example::outline::remote::get_menu_badge::data::{OutlineMenuBadge, OutlineMenuBadgeCount},
-    z_details::_common::repository::data::RepositoryError,
+    z_lib::remote::repository::data::RepositoryError,
 };
 
 pub struct UnitedOutlineMenuBadgeRepository;
@@ -24,7 +24,7 @@ pub mod test {
 
     use crate::{
         example::outline::remote::get_menu_badge::data::{OutlineMenuBadge, OutlineMenuBadgeCount},
-        z_details::_common::repository::data::RepositoryError,
+        z_lib::remote::repository::data::RepositoryError,
     };
 
     pub struct StaticOutlineMenuBadgeRepository;

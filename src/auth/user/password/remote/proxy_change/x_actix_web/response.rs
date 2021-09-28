@@ -1,6 +1,6 @@
 use actix_web::{HttpRequest, HttpResponse};
 
-use crate::z_details::_common::response::actix_web::RespondTo;
+use crate::z_lib::remote::response::actix_web::RespondTo;
 
 use crate::auth::user::password::remote::proxy_change::data::ChangePasswordProxyMessage;
 

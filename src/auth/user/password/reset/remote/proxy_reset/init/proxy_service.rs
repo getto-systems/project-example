@@ -6,11 +6,11 @@ use crate::auth::user::password::reset::_common::y_protobuf::service::{
 
 use crate::auth::remote::x_outside_feature::common::feature::AuthOutsideService;
 
-use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
+use crate::z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::{
     auth::remote::service::helper::{infra_error, set_metadata},
-    z_details::_common::service::helper::new_endpoint,
+    z_lib::remote::service::helper::new_endpoint,
 };
 
 use crate::{
@@ -21,7 +21,7 @@ use crate::{
             ResetPasswordFieldsExtract, ResetPasswordProxyResponse,
         },
     },
-    z_details::_common::service::infra::ServiceAuthorizer,
+    z_lib::remote::service::infra::ServiceAuthorizer,
 };
 
 use crate::auth::remote::service::data::AuthServiceError;

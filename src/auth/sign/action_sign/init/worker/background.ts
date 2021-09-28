@@ -5,7 +5,7 @@ import { WorkerHandler } from "../../../../../../ui/vendor/getto-application/act
 import { ForegroundMessage, BackgroundMessage } from "./message"
 import { RequestPasswordResetTokenProxyMessage } from "../../../../user/password/reset/action_request_token/init/worker/message"
 
-import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/feature"
+import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-application/action/worker/feature"
 
 type OutsideFeature = RemoteOutsideFeature & WorkerOutsideFeature

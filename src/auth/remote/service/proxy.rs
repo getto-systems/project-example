@@ -2,7 +2,7 @@ use actix_web::{HttpRequest, HttpResponse};
 
 use getto_application::data::MethodResult;
 
-use crate::z_details::_common::{
+use crate::z_lib::remote::{
     logger::{LogLevel, LogMessage},
     response::actix_web::RespondTo,
 };
@@ -15,7 +15,7 @@ use crate::auth::remote::{
 use crate::auth::remote::infra::AuthMetadataContent;
 
 use crate::{
-    auth::remote::service::data::AuthServiceError, z_details::_api::message::data::MessageError,
+    auth::remote::service::data::AuthServiceError, z_lib::remote::message::data::MessageError,
 };
 
 pub enum AuthProxyEvent<T> {

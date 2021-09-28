@@ -2,7 +2,7 @@ use crate::example::remote::proxy::ExampleProxyResponseEncoder;
 
 use crate::{
     avail::unexpected_error::remote::proxy_notify::data::NotifyUnexpectedErrorProxyMessage,
-    z_details::_api::message::data::MessageError,
+    z_lib::remote::message::data::MessageError,
 };
 
 pub struct ResponseEncoder;

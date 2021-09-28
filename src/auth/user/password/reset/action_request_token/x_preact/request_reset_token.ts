@@ -1,7 +1,7 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { remoteCommonErrorReason } from "../../../../../../z_details/_ui/remote/reason"
+import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/reason"
 
 import {
     useApplicationAction,

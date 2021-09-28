@@ -1,4 +1,4 @@
-import { RemoteCommonError } from "../../../../z_details/_ui/remote/data"
+import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
 import { Password } from "../input/data"
 
 export type ChangePasswordFields = Readonly<{

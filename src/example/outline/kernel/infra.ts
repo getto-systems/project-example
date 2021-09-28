@@ -1,8 +1,8 @@
 import {
     FetchRepositoryResult,
     StoreRepositoryResult,
-} from "../../../z_details/_ui/repository/infra"
-import { RemoteResult } from "../../../z_details/_ui/remote/infra"
+} from "../../../z_lib/ui/repository/infra"
+import { RemoteResult } from "../../../z_lib/ui/remote/infra"
 
 import { GetMenuBadgeRemoteError, MenuCategoryPath } from "./data"
 

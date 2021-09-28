@@ -1,4 +1,4 @@
-use crate::z_details::_api::message::helper::encode_protobuf_base64;
+use crate::z_lib::remote::message::helper::encode_protobuf_base64;
 
 use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideCookie;
 
@@ -22,7 +22,7 @@ use crate::{
             ResetPasswordProxyMessage, ResetPasswordProxyMessageEncoded, ResetPasswordProxyResult,
         },
     },
-    z_details::_api::message::data::MessageError,
+    z_lib::remote::message::data::MessageError,
 };
 
 pub struct ResponseEncoder<'a> {

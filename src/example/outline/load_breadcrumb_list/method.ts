@@ -5,7 +5,7 @@ import { toMenuCategory, toMenuItem } from "../kernel/convert"
 
 import { BreadcrumbList, BreadcrumbNode } from "./data"
 import { MenuTargetPath } from "../kernel/data"
-import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
+import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 
 export interface LoadBreadcrumbListMethod {
     (menuTargetPath: ConvertLocationResult<MenuTargetPath>): BreadcrumbList

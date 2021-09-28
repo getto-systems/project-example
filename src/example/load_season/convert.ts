@@ -1,6 +1,6 @@
-import { RepositoryConverter } from "../../z_details/_ui/repository/infra"
+import { RepositoryConverter } from "../../z_lib/ui/repository/infra"
 
-import { Clock } from "../../z_details/_ui/clock/infra"
+import { Clock } from "../../z_lib/ui/clock/infra"
 import { SeasonRepositoryValue } from "./infra"
 
 import { Season } from "./data"

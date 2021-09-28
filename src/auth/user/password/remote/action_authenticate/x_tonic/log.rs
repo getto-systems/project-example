@@ -1,4 +1,4 @@
-use crate::z_details::_common::logger::{LogLevel, LogMessage};
+use crate::z_lib::remote::logger::{LogLevel, LogMessage};
 
 use super::super::action::AuthenticatePasswordState;
 

@@ -1,7 +1,7 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { remoteCommonErrorReason } from "../../../../z_details/_ui/remote/reason"
+import { remoteCommonErrorReason } from "../../../../z_lib/ui/remote/reason"
 
 import { useApplicationAction } from "../../../../../ui/vendor/getto-application/action/x_preact/hooks"
 
@@ -22,7 +22,7 @@ import { poweredBy } from "../../../site"
 
 import { LoadMenuResource, LoadMenuResourceState } from "../resource"
 
-import { RepositoryError } from "../../../../z_details/_ui/repository/data"
+import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 import { GetMenuBadgeError, Menu, MenuCategoryNode, MenuItemNode } from "../../kernel/data"
 
 export const MENU_ID = "menu"

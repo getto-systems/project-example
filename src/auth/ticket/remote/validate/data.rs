@@ -1,6 +1,6 @@
 use crate::{
     auth::ticket::remote::kernel::data::DecodeAuthTokenError,
-    z_details::_common::{repository::data::RepositoryError, request::data::MetadataError},
+    z_lib::remote::{repository::data::RepositoryError, request::data::MetadataError},
 };
 
 pub enum ValidateAuthTokenError {

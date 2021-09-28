@@ -1,6 +1,6 @@
 use crate::{
     auth::user::remote::kernel::data::{AuthUser, AuthUserId},
-    z_details::_common::repository::data::RepositoryError,
+    z_lib::remote::repository::data::RepositoryError,
 };
 
 #[async_trait::async_trait]

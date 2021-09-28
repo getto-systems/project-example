@@ -1,10 +1,10 @@
 import { setupActionTestRunner } from "../../../../../../ui/vendor/getto-application/action/test_helper"
-import { ticker } from "../../../../../z_details/_ui/timer/helper"
+import { ticker } from "../../../../../z_lib/ui/timer/helper"
 import { toApplicationView } from "../../../../../../ui/vendor/getto-application/action/helper"
 
 import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/init/mock"
-import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../../z_details/_ui/clock/mock"
+import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../../z_lib/ui/clock/mock"
 import {
     mockAuthnRepository,
     mockAuthzRepository,
@@ -17,7 +17,7 @@ import { mockResetPasswordLocationDetecter } from "../reset/mock"
 
 import { initResetPasswordAction, initResetPasswordMaterial } from "./init"
 
-import { Clock } from "../../../../../z_details/_ui/clock/infra"
+import { Clock } from "../../../../../z_lib/ui/clock/infra"
 import { ResetPasswordRemote, ResetPasswordRemoteResult } from "../reset/infra"
 import {
     AuthnRepository,

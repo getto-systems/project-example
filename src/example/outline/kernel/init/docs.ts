@@ -1,6 +1,6 @@
 import { env } from "../../../../y_environment/_ui/env"
 
-import { lnir } from "../../../../z_details/_ui/icon/line_icon"
+import { lnir } from "../../../../z_lib/ui/icon/line_icon"
 
 import { assertMenuPath, category, item } from "./common"
 

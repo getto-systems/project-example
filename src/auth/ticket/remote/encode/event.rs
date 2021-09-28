@@ -2,7 +2,7 @@ use crate::{
     auth::ticket::remote::encode::data::{
         AuthTicketEncoded, AuthTokenExpires, EncodeAuthTokenError,
     },
-    z_details::_common::repository::data::RepositoryError,
+    z_lib::remote::repository::data::RepositoryError,
 };
 
 pub enum EncodeAuthTicketEvent {

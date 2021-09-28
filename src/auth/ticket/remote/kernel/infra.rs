@@ -7,7 +7,7 @@ use crate::{
         AuthDateTime, AuthNonce, AuthTicket, AuthTicketExtract, AuthToken, AuthTokenMessage,
         AuthTokenResponse, DecodeAuthTokenError, ExpansionLimitDateTime, ExpireDateTime,
     },
-    z_details::_common::{repository::data::RepositoryError, request::data::MetadataError},
+    z_lib::remote::{repository::data::RepositoryError, request::data::MetadataError},
 };
 
 pub struct AuthMetadataContent {

@@ -1,4 +1,4 @@
-import { remoteInfraError, remoteServerError } from "../../../../../z_details/_ui/remote/helper"
+import { remoteInfraError, remoteServerError } from "../../../../../z_lib/ui/remote/helper"
 
 import { CheckDeployExistsRemote } from "../../infra"
 

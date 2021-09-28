@@ -2,8 +2,8 @@ import { newLogoutInfra } from "../../logout/init"
 
 import { initLogoutAction, initLogoutMaterial } from "../init"
 
-import { RepositoryOutsideFeature } from "../../../../z_details/_ui/repository/feature"
-import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"
+import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/feature"
+import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
 
 import { LogoutResource } from "../resource"
 

@@ -1,4 +1,4 @@
-import { RemoteCommonError } from "../../../z_details/_ui/remote/data"
+import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
 
 export type AuthTicket = Readonly<{
     authn: Authn

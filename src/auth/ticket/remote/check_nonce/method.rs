@@ -5,7 +5,7 @@ use crate::auth::ticket::remote::{
 
 use crate::{
     auth::ticket::remote::check_nonce::data::ValidateAuthNonceError,
-    z_details::_common::repository::data::RegisterResult,
+    z_lib::remote::repository::data::RegisterResult,
 };
 
 pub async fn check_auth_nonce(

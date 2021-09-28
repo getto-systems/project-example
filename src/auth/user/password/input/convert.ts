@@ -1,6 +1,6 @@
 import { BoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/data"
 import { BoardFieldValueConverter } from "../../../../../ui/vendor/getto-application/board/validate_field/infra"
-import { ConvertLocationResult } from "../../../../z_details/_ui/location/data"
+import { ConvertLocationResult } from "../../../../z_lib/ui/location/data"
 import { SignNav, signNavKey } from "../../../sign/nav/data"
 import { Password, ResetToken, ValidatePasswordError } from "./data"
 

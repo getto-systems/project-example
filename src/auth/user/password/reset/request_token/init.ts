@@ -2,7 +2,7 @@ import { auth_config } from "../../../../x_outside_feature/config"
 
 import { newRequestResetTokenRemote } from "./init/remote/request_token"
 
-import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/feature"
+import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 
 import { RequestResetTokenInfra } from "./infra"
 

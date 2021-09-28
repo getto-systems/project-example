@@ -1,4 +1,4 @@
-import { RepositoryError } from "../../../z_details/_ui/repository/data"
+import { RepositoryError } from "../../../z_lib/ui/repository/data"
 import { LogoutError } from "./data"
 
 export type LogoutEvent =

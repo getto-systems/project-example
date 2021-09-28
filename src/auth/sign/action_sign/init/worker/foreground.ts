@@ -14,10 +14,10 @@ import { initSignLinkResource } from "../../../action_nav/init"
 
 import { ForegroundMessage, BackgroundMessage } from "./message"
 
-import { RepositoryOutsideFeature } from "../../../../../z_details/_ui/repository/feature"
-import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/feature"
+import { RepositoryOutsideFeature } from "../../../../../z_lib/ui/repository/feature"
+import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-application/action/worker/feature"
-import { LocationOutsideFeature } from "../../../../../z_details/_ui/location/feature"
+import { LocationOutsideFeature } from "../../../../../z_lib/ui/location/feature"
 
 import { SignView } from "../../resource"
 import { initRequestResetTokenView } from "../../../../user/password/reset/action_request_token/init/resource"

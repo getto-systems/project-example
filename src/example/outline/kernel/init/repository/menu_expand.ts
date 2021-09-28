@@ -3,14 +3,14 @@ import { MenuExpand_pb } from "../../../../../y_protobuf/proto.js"
 import {
     fetchRepositoryRemovedResult,
     mapFetchRepositoryResult,
-} from "../../../../../z_details/_ui/repository/helper"
+} from "../../../../../z_lib/ui/repository/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../../ui/vendor/protobuf/helper"
 import {
     IndexedDBTarget,
     initIndexedDB,
-} from "../../../../../z_details/_ui/repository/init/indexed_db"
+} from "../../../../../z_lib/ui/repository/init/indexed_db"
 
-import { RepositoryOutsideFeature } from "../../../../../z_details/_ui/repository/feature"
+import { RepositoryOutsideFeature } from "../../../../../z_lib/ui/repository/feature"
 
 import { MenuExpandRepository, MenuExpandRepositoryValue } from "../../infra"
 

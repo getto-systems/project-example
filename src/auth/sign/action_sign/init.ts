@@ -3,7 +3,7 @@ import { ApplicationAbstractStateAction } from "../../../../ui/vendor/getto-appl
 import { initialSignViewState, SignAction, SignActionState, SignSubView } from "./action"
 
 import { SignViewDetecter, SignViewType } from "../router/data"
-import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
+import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 
 export function initSignAction(detecter: SignViewDetecter, subView: SignSubView): SignAction {
     return new Action(detecter, subView)

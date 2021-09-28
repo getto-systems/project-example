@@ -5,7 +5,7 @@ use crate::auth::ticket::remote::kernel::x_actix_web::header::{
     COOKIE_CLOUDFRONT_SIGNATURE, COOKIE_TICKET_TOKEN,
 };
 
-use crate::z_details::_common::response::actix_web::RespondTo;
+use crate::z_lib::remote::response::actix_web::RespondTo;
 
 use crate::auth::remote::service::data::AuthServiceError;
 

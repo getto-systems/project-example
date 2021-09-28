@@ -10,7 +10,7 @@ import {
     MenuTreeNode,
 } from "./infra"
 
-import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
+import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 import { GrantedRoles } from "../../../auth/ticket/kernel/data"
 import { Menu, MenuCategoryPath, MenuNode, MenuTargetPath } from "./data"
 

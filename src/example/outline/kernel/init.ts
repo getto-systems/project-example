@@ -1,10 +1,10 @@
 import { env } from "../../../y_environment/_ui/env"
 
-import { toURL } from "../../../z_details/_ui/location/init"
+import { toURL } from "../../../z_lib/ui/location/init"
 
 import { LoadMenuDetecter } from "./method"
 
-import { LocationOutsideFeature } from "../../../z_details/_ui/location/feature"
+import { LocationOutsideFeature } from "../../../z_lib/ui/location/feature"
 
 import { detectMenuTargetPath } from "./convert"
 

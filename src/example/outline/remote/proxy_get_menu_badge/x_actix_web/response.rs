@@ -1,6 +1,6 @@
 use actix_web::{HttpRequest, HttpResponse};
 
-use crate::z_details::_common::response::actix_web::RespondTo;
+use crate::z_lib::remote::response::actix_web::RespondTo;
 
 use crate::example::outline::remote::proxy_get_menu_badge::data::GetOutlineMenuBadgeProxyMessage;
 

@@ -23,7 +23,7 @@ use crate::{
             },
         },
     },
-    z_details::_common::repository::data::RepositoryError,
+    z_lib::remote::repository::data::RepositoryError,
 };
 
 pub trait RequestResetTokenInfra {

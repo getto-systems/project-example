@@ -6,7 +6,7 @@ use rusoto_dynamodb::DynamoDbClient;
 use rusoto_ses::SesClient;
 use sqlx::mysql::MySqlPoolOptions;
 
-use crate::z_details::_common::jwt::helper::{decoding_key_from_ec_pem, encoding_key_from_ec_pem};
+use crate::z_lib::remote::jwt::helper::{decoding_key_from_ec_pem, encoding_key_from_ec_pem};
 
 use crate::{
     auth::remote::x_outside_feature::{

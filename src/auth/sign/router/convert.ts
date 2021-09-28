@@ -1,4 +1,4 @@
-import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
+import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 
 import {
     ResetPasswordVariant,

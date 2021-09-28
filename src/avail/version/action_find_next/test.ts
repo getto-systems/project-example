@@ -1,6 +1,6 @@
 import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
 import { toApplicationView } from "../../../../ui/vendor/getto-application/action/helper"
-import { ticker } from "../../../z_details/_ui/timer/helper"
+import { ticker } from "../../../z_lib/ui/timer/helper"
 
 import { standardApplicationTargetPath } from "../find_next/test_helper"
 

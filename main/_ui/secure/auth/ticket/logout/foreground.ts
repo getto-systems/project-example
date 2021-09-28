@@ -2,7 +2,7 @@ import { h, render } from "preact"
 
 import { LogoutPageEntry } from "./page"
 
-import { newForegroundOutsideFeature } from "../../../../../../src/x_outside_feature/_ui/common"
+import { newForegroundOutsideFeature } from "../../../../../../src/x_outside_feature/common"
 import { newBaseResource } from "../../../../../../src/example/action_base/init/resource"
 import { newLogoutResource } from "../../../../../../src/auth/ticket/action_logout/init/resource"
 import { initBaseView } from "../../../../../../src/example/action_base/init"

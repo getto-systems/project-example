@@ -11,9 +11,9 @@ import { initSignAction } from "../init"
 import { SignView } from "../resource"
 import { initSignLinkResource } from "../../action_nav/init"
 
-import { RepositoryOutsideFeature } from "../../../../z_details/_ui/repository/feature"
-import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"
-import { LocationOutsideFeature } from "../../../../z_details/_ui/location/feature"
+import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/feature"
+import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
+import { LocationOutsideFeature } from "../../../../z_lib/ui/location/feature"
 
 type OutsideFeature = RepositoryOutsideFeature & RemoteOutsideFeature & LocationOutsideFeature
 export function newSignView(feature: OutsideFeature): SignView {

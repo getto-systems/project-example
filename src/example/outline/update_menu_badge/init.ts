@@ -4,8 +4,8 @@ import { newAuthzRepository } from "../../../auth/ticket/kernel/init/repository/
 import { newGetMenuBadgeRemote } from "../kernel/init/remote/get_menu_badge/fetch"
 import { newGetMenuBadgeNoopRemote } from "../kernel/init/remote/get_menu_badge/noop"
 
-import { RepositoryOutsideFeature } from "../../../z_details/_ui/repository/feature"
-import { RemoteOutsideFeature } from "../../../z_details/_ui/remote/feature"
+import { RepositoryOutsideFeature } from "../../../z_lib/ui/repository/feature"
+import { RemoteOutsideFeature } from "../../../z_lib/ui/remote/feature"
 
 import { UpdateMenuBadgeInfra } from "./infra"
 import { MenuContent } from "../kernel/infra"

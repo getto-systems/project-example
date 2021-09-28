@@ -2,13 +2,13 @@ use prost::Message;
 
 use crate::auth::user::password::_api::y_protobuf::api::ChangePasswordPb;
 
-use crate::z_details::_api::message::helper::{decode_base64, invalid_protobuf};
+use crate::z_lib::remote::message::helper::{decode_base64, invalid_protobuf};
 
 use crate::auth::user::password::remote::proxy_change::infra::{
     ChangePasswordFieldsExtract, ChangePasswordProxyRequestDecoder,
 };
 
-use crate::z_details::_api::message::data::MessageError;
+use crate::z_lib::remote::message::data::MessageError;
 
 pub struct RequestDecoder {
     body: String,

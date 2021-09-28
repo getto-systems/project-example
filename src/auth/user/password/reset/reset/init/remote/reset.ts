@@ -6,12 +6,12 @@ import {
     generateNonce,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../../../z_details/_ui/remote/helper"
+} from "../../../../../../../z_lib/ui/remote/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../../../../ui/vendor/protobuf/helper"
 
-import { RemoteOutsideFeature } from "../../../../../../../z_details/_ui/remote/feature"
+import { RemoteOutsideFeature } from "../../../../../../../z_lib/ui/remote/feature"
 
-import { Clock } from "../../../../../../../z_details/_ui/clock/infra"
+import { Clock } from "../../../../../../../z_lib/ui/clock/infra"
 import { ResetPasswordRemote } from "../../infra"
 
 import { convertAuthRemote } from "../../../../../../ticket/kernel/convert"

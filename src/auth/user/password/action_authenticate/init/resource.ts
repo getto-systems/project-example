@@ -9,9 +9,9 @@ import { newAuthenticatePasswordInfra } from "../../authenticate/init"
 
 import { initAuthenticatePasswordAction, initAuthenticatePasswordMaterial } from "../init"
 
-import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/feature"
-import { RepositoryOutsideFeature } from "../../../../../z_details/_ui/repository/feature"
-import { LocationOutsideFeature } from "../../../../../z_details/_ui/location/feature"
+import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
+import { RepositoryOutsideFeature } from "../../../../../z_lib/ui/repository/feature"
+import { LocationOutsideFeature } from "../../../../../z_lib/ui/location/feature"
 
 import { AuthenticatePasswordView } from "../resource"
 

@@ -1,6 +1,6 @@
 use prost::Message;
 
-use crate::z_details::_api::message::helper::{decode_base64, invalid_protobuf};
+use crate::z_lib::remote::message::helper::{decode_base64, invalid_protobuf};
 
 use crate::avail::unexpected_error::_api::y_protobuf::api::NotifyUnexpectedErrorPb;
 
@@ -8,7 +8,7 @@ use crate::avail::unexpected_error::remote::proxy_notify::infra::{
     NotifyUnexpectedErrorFieldsExtract, NotifyUnexpectedErrorProxyRequestDecoder,
 };
 
-use crate::z_details::_api::message::data::MessageError;
+use crate::z_lib::remote::message::data::MessageError;
 
 pub struct RequestDecoder {
     body: String,

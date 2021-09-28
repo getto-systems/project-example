@@ -1,4 +1,4 @@
-import { delayedChecker } from "../../../z_details/_ui/timer/helper"
+import { delayedChecker } from "../../../z_lib/ui/timer/helper"
 
 import { versionToString } from "./helper"
 
@@ -9,7 +9,7 @@ import { FindNextVersionEvent } from "./event"
 import { versionStringConverter } from "../kernel/convert"
 import { versionConfigConverter } from "./convert"
 
-import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
+import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 import { ApplicationTargetPath, CheckDeployExistsRemoteError, Version } from "./data"
 
 export interface FindNextVersionMethod {

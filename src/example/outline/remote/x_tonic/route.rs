@@ -2,7 +2,7 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::z_details::_common::{logger::Logger, response::tonic::RespondTo};
+use crate::z_lib::remote::{logger::Logger, response::tonic::RespondTo};
 
 use crate::x_outside_feature::remote::{
     common::metadata::metadata_request_id,

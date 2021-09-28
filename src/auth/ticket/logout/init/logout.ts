@@ -5,9 +5,9 @@ import {
     generateNonce,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../z_details/_ui/remote/helper"
+} from "../../../../z_lib/ui/remote/helper"
 
-import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"
+import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
 
 import { LogoutRemote } from "../infra"
 

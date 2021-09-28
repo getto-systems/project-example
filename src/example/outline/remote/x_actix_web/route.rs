@@ -2,7 +2,7 @@ use actix_web::{get, web, HttpRequest, Responder, Scope};
 
 use getto_application::helper::flatten;
 
-use crate::z_details::_common::{logger::Logger, response::actix_web::RespondTo};
+use crate::z_lib::remote::{logger::Logger, response::actix_web::RespondTo};
 
 use crate::x_outside_feature::remote::api::{
     feature::ApiAppData,

@@ -1,4 +1,4 @@
-use crate::z_details::_common::logger::LogLevel;
+use crate::z_lib::remote::logger::LogLevel;
 
 use super::super::event::DiscardAuthTicketEvent;
 

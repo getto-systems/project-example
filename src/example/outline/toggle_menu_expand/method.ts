@@ -6,7 +6,7 @@ import { initMenuExpand, MenuBadge, MenuExpand } from "../kernel/infra"
 import { ToggleMenuExpandInfra, ToggleMenuExpandStore } from "./infra"
 
 import { MenuCategoryPath, MenuTargetPath } from "../kernel/data"
-import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
+import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 
 export interface ToggleMenuExpandMethod {
     <S>(

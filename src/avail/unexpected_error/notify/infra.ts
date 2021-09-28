@@ -1,4 +1,4 @@
-import { RemoteResult } from "../../../z_details/_ui/remote/infra"
+import { RemoteResult } from "../../../z_lib/ui/remote/infra"
 
 import { NotifyUnexpectedErrorRemoteError } from "./data"
 

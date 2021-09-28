@@ -1,8 +1,8 @@
 import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
 import { toApplicationView } from "../../../../../ui/vendor/getto-application/action/helper"
-import { ticker } from "../../../../z_details/_ui/timer/helper"
+import { ticker } from "../../../../z_lib/ui/timer/helper"
 
-import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_details/_ui/clock/mock"
+import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_lib/ui/clock/mock"
 import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/init/mock"
 import {
@@ -16,7 +16,7 @@ import {
 
 import { initAuthenticatePasswordAction, initAuthenticatePasswordMaterial } from "./init"
 
-import { Clock } from "../../../../z_details/_ui/clock/infra"
+import { Clock } from "../../../../z_lib/ui/clock/infra"
 import { AuthenticatePasswordRemote, AuthenticatePasswordRemoteResult } from "../authenticate/infra"
 import {
     AuthnRepository,

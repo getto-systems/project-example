@@ -11,7 +11,7 @@ import {
 } from "../../../../../ui/vendor/getto-css/preact/layout/app"
 
 import { copyright, siteInfo } from "../../../site"
-import { lniClass, lnir } from "../../../../z_details/_ui/icon/line_icon"
+import { lniClass, lnir } from "../../../../z_lib/ui/icon/line_icon"
 
 import { LoadMenuComponent } from "./load_menu"
 

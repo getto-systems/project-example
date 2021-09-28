@@ -5,13 +5,13 @@ import { decodeProtobuf, encodeProtobuf } from "../../../../../../ui/vendor/prot
 import {
     fetchRepositoryRemovedResult,
     mapFetchRepositoryResult,
-} from "../../../../../z_details/_ui/repository/helper"
+} from "../../../../../z_lib/ui/repository/helper"
 import {
     IndexedDBTarget,
     initIndexedDB,
-} from "../../../../../z_details/_ui/repository/init/indexed_db"
+} from "../../../../../z_lib/ui/repository/init/indexed_db"
 
-import { RepositoryOutsideFeature } from "../../../../../z_details/_ui/repository/feature"
+import { RepositoryOutsideFeature } from "../../../../../z_lib/ui/repository/feature"
 
 import { AuthzRepository, AuthzRepositoryValue } from "../../infra"
 

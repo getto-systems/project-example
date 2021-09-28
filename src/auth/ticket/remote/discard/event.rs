@@ -1,6 +1,6 @@
 use crate::auth::ticket::remote::validate::event::ValidateAuthTokenEvent;
 
-use crate::z_details::_common::repository::data::RepositoryError;
+use crate::z_lib::remote::repository::data::RepositoryError;
 
 pub enum DiscardAuthTicketEvent {
     Success,

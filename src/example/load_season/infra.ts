@@ -1,8 +1,8 @@
-import { Clock } from "../../z_details/_ui/clock/infra"
+import { Clock } from "../../z_lib/ui/clock/infra"
 import {
     FetchRepositoryResult,
     StoreRepositoryResult,
-} from "../../z_details/_ui/repository/infra"
+} from "../../z_lib/ui/repository/infra"
 
 import { Season } from "./data"
 

@@ -1,10 +1,10 @@
 use actix_web::{HttpRequest, HttpResponse};
 
-use crate::z_details::_common::{logger::LogLevel, response::actix_web::RespondTo};
+use crate::z_lib::remote::{logger::LogLevel, response::actix_web::RespondTo};
 
 use crate::{
     auth::ticket::remote::kernel::data::DecodeAuthTokenError,
-    z_details::_common::request::data::MetadataError,
+    z_lib::remote::request::data::MetadataError,
 };
 
 pub enum ValidateAuthMetadataError {

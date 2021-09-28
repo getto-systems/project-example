@@ -1,4 +1,4 @@
-use crate::z_details::_api::message::data::MessageError;
+use crate::z_lib::remote::message::data::MessageError;
 
 pub struct RequestResetTokenFieldsExtract {
     pub login_id: String,

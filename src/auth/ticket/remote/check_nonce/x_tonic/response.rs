@@ -1,6 +1,6 @@
 use tonic::{Response, Status};
 
-use crate::z_details::_common::response::tonic::RespondTo;
+use crate::z_lib::remote::response::tonic::RespondTo;
 
 use super::super::data::ValidateAuthNonceError;
 

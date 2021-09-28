@@ -4,7 +4,7 @@ import { newRequestResetTokenInfra } from "../../request_token/init"
 
 import { initRequestResetTokenAction, initRequestResetTokenMaterial } from "../init"
 
-import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/feature"
+import { RemoteOutsideFeature } from "../../../../../../z_lib/ui/remote/feature"
 
 import { RequestResetTokenView } from "../resource"
 import { RequestResetTokenMaterial } from "../action"

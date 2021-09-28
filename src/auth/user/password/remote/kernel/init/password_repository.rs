@@ -1,7 +1,7 @@
 use chrono::{TimeZone, Utc};
 use sqlx::{query, MySql, MySqlPool, Transaction};
 
-use crate::z_details::_common::repository::{helper::infra_error, mysql::helper::mysql_error};
+use crate::z_lib::remote::repository::{helper::infra_error, mysql::helper::mysql_error};
 
 use crate::auth::user::password::remote::kernel::infra::{
     AuthUserPasswordHasher, AuthUserPasswordMatcher, ChangePasswordRepository, HashedPassword,
@@ -21,7 +21,7 @@ use crate::{
             remote::kernel::data::AuthUserId,
         },
     },
-    z_details::_common::repository::data::RepositoryError,
+    z_lib::remote::repository::data::RepositoryError,
 };
 
 pub struct MysqlAuthUserPasswordRepository<'a> {
@@ -303,7 +303,7 @@ pub mod test {
 
     use chrono::{DateTime, Utc};
 
-    use crate::z_details::_common::repository::helper::infra_error;
+    use crate::z_lib::remote::repository::helper::infra_error;
 
     use crate::auth::user::password::remote::kernel::infra::{
         AuthUserPasswordHasher, AuthUserPasswordMatcher, ChangePasswordRepository, HashedPassword,
@@ -323,7 +323,7 @@ pub mod test {
                 remote::kernel::data::{AuthUser, AuthUserId},
             },
         },
-        z_details::_common::repository::data::RepositoryError,
+        z_lib::remote::repository::data::RepositoryError,
     };
 
     pub type MemoryAuthUserPasswordStore = Mutex<MemoryAuthUserPasswordMap>;

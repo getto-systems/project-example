@@ -2,7 +2,7 @@ import { auth_config } from "../../../x_outside_feature/config"
 
 import { newChangePasswordRemote } from "./init/remote/change"
 
-import { RemoteOutsideFeature } from "../../../../z_details/_ui/remote/feature"
+import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
 
 import { ChangePasswordInfra } from "./infra"
 

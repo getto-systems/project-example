@@ -4,7 +4,7 @@ import { initMenuExpand, MenuBadge } from "../kernel/infra"
 import { UpdateMenuBadgeInfra, UpdateMenuBadgeStore } from "./infra"
 
 import { UpdateMenuBadgeEvent } from "./event"
-import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
+import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 import { MenuTargetPath } from "../kernel/data"
 
 export interface UpdateMenuBadgeMethod {

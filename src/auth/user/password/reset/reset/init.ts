@@ -2,13 +2,13 @@ import { auth_config } from "../../../../x_outside_feature/config"
 
 import { newResetPasswordRemote } from "./init/remote/reset"
 
-import { newClock } from "../../../../../z_details/_ui/clock/init"
-import { toURL } from "../../../../../z_details/_ui/location/init"
+import { newClock } from "../../../../../z_lib/ui/clock/init"
+import { toURL } from "../../../../../z_lib/ui/location/init"
 
 import { ResetPasswordDetecter } from "./method"
 
-import { RemoteOutsideFeature } from "../../../../../z_details/_ui/remote/feature"
-import { LocationOutsideFeature } from "../../../../../z_details/_ui/location/feature"
+import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
+import { LocationOutsideFeature } from "../../../../../z_lib/ui/location/feature"
 
 import { ResetPasswordInfra } from "./infra"
 

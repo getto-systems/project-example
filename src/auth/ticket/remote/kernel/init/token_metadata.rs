@@ -1,6 +1,6 @@
 use actix_web::HttpRequest;
 
-use crate::z_details::_api::request::helper::cookie;
+use crate::z_lib::remote::request::helper::cookie;
 
 use crate::auth::ticket::remote::kernel::x_actix_web::header::{
     COOKIE_API_TOKEN, COOKIE_TICKET_TOKEN,
@@ -10,7 +10,7 @@ use crate::auth::ticket::remote::kernel::infra::AuthTokenMetadata;
 
 use crate::{
     auth::ticket::remote::kernel::data::AuthToken,
-    z_details::_common::request::data::MetadataError,
+    z_lib::remote::request::data::MetadataError,
 };
 
 pub struct TicketTokenMetadata<'a> {
@@ -51,7 +51,7 @@ pub mod test {
 
     use crate::{
         auth::ticket::remote::kernel::data::AuthToken,
-        z_details::_common::request::data::MetadataError,
+        z_lib::remote::request::data::MetadataError,
     };
 
     pub struct StaticAuthTokenMetadata {

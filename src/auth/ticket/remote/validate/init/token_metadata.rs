@@ -2,13 +2,13 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::ticket::remote::kernel::x_tonic::metadata::METADATA_TOKEN;
 
-use crate::z_details::_common::request::x_tonic::metadata::metadata;
+use crate::z_lib::remote::request::x_tonic::metadata::metadata;
 
 use crate::auth::ticket::remote::kernel::infra::AuthTokenMetadata;
 
 use crate::{
     auth::ticket::remote::kernel::data::AuthToken,
-    z_details::_common::request::data::MetadataError,
+    z_lib::remote::request::data::MetadataError,
 };
 
 pub struct TonicAuthTokenMetadata<'a> {

@@ -1,7 +1,7 @@
 use chrono::{TimeZone, Utc};
 use sqlx::{query, MySqlPool};
 
-use crate::z_details::_common::repository::mysql::helper::mysql_error;
+use crate::z_lib::remote::repository::mysql::helper::mysql_error;
 
 use crate::auth::ticket::remote::kernel::infra::{
     AuthTicketRepository, DiscardAuthTicketRepository, IssueAuthTicketRepository,
@@ -9,7 +9,7 @@ use crate::auth::ticket::remote::kernel::infra::{
 
 use crate::{
     auth::ticket::remote::kernel::data::{AuthDateTime, AuthTicket, ExpansionLimitDateTime},
-    z_details::_common::repository::data::RepositoryError,
+    z_lib::remote::repository::data::RepositoryError,
 };
 
 pub struct MysqlAuthTicketRepository<'a> {
@@ -145,7 +145,7 @@ impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
 pub mod test {
     use std::{collections::HashMap, sync::Mutex};
 
-    use crate::z_details::_common::repository::helper::infra_error;
+    use crate::z_lib::remote::repository::helper::infra_error;
 
     use crate::auth::ticket::remote::kernel::infra::{
         AuthTicketRepository, DiscardAuthTicketRepository, IssueAuthTicketRepository,
@@ -155,7 +155,7 @@ pub mod test {
         auth::ticket::remote::kernel::data::{
             AuthDateTime, AuthTicket, AuthTicketId, ExpansionLimitDateTime,
         },
-        z_details::_common::repository::data::RepositoryError,
+        z_lib::remote::repository::data::RepositoryError,
     };
 
     pub struct MemoryAuthTicketRepository<'a> {

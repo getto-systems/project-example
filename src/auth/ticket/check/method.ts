@@ -1,4 +1,4 @@
-import { delayedChecker } from "../../../z_details/_ui/timer/helper"
+import { delayedChecker } from "../../../z_lib/ui/timer/helper"
 
 import { CheckAuthTicketInfra } from "./infra"
 

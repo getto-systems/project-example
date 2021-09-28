@@ -1,6 +1,6 @@
 use crate::example::outline::_api::y_protobuf::api::GetMenuBadgeResultPb;
 
-use crate::z_details::_api::message::helper::encode_protobuf_base64;
+use crate::z_lib::remote::message::helper::encode_protobuf_base64;
 
 use crate::example::remote::proxy::ExampleProxyResponseEncoder;
 
@@ -9,7 +9,7 @@ use crate::{
         get_menu_badge::data::OutlineMenuBadge,
         proxy_get_menu_badge::data::GetOutlineMenuBadgeProxyMessage,
     },
-    z_details::_api::message::data::MessageError,
+    z_lib::remote::message::data::MessageError,
 };
 
 pub struct ResponseEncoder;

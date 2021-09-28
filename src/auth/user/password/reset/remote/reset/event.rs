@@ -15,7 +15,7 @@ use crate::{
             remote::kernel::data::AuthUser,
         },
     },
-    z_details::_common::repository::data::RepositoryError,
+    z_lib::remote::repository::data::RepositoryError,
 };
 
 pub enum ResetPasswordEvent {

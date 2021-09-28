@@ -1,4 +1,4 @@
-use crate::z_details::_api::message::helper::encode_protobuf_base64;
+use crate::z_lib::remote::message::helper::encode_protobuf_base64;
 
 use crate::auth::user::password::_api::y_protobuf::api::{
     AuthenticatePasswordErrorKindPb, ChangePasswordErrorPb, ChangePasswordResultPb,
@@ -10,7 +10,7 @@ use crate::auth::user::password::remote::proxy_change::infra::ChangePasswordProx
 
 use crate::{
     auth::user::password::remote::proxy_change::data::ChangePasswordProxyMessage,
-    z_details::_api::message::data::MessageError,
+    z_lib::remote::message::data::MessageError,
 };
 
 pub struct ResponseEncoder;

@@ -2,7 +2,7 @@ use actix_web::HttpRequest;
 use serde::Serialize;
 use uuid::Uuid;
 
-use crate::z_details::_common::logger::{InfoLogger, Logger, QuietLogger, VerboseLogger};
+use crate::z_lib::remote::logger::{InfoLogger, Logger, QuietLogger, VerboseLogger};
 
 pub fn generate_request_id() -> String {
     Uuid::new_v4().to_string()

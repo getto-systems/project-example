@@ -1,5 +1,5 @@
 import { env } from "../../../../y_environment/_ui/env"
-import { lnir } from "../../../../z_details/_ui/icon/line_icon"
+import { lnir } from "../../../../z_lib/ui/icon/line_icon"
 import { MenuContent, MenuPermission } from "../infra"
 import { category, item } from "./common"
 

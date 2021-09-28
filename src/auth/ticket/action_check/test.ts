@@ -1,8 +1,8 @@
 import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
 import { toApplicationView } from "../../../../ui/vendor/getto-application/action/helper"
-import { ticker } from "../../../z_details/_ui/timer/helper"
+import { ticker } from "../../../z_lib/ui/timer/helper"
 
-import { ClockPubSub, mockClock, mockClockPubSub } from "../../../z_details/_ui/clock/mock"
+import { ClockPubSub, mockClock, mockClockPubSub } from "../../../z_lib/ui/clock/mock"
 import { mockAuthnRepository, mockAuthzRepository } from "../kernel/init/repository/mock"
 import {
     mockGetScriptPathDetecter,
@@ -11,8 +11,8 @@ import {
 
 import { initCheckAuthTicketAction, initCheckAuthTicketMaterial } from "./init"
 
-import { Clock } from "../../../z_details/_ui/clock/infra"
-import { WaitTime } from "../../../z_details/_ui/config/infra"
+import { Clock } from "../../../z_lib/ui/clock/infra"
+import { WaitTime } from "../../../z_lib/ui/config/infra"
 import { AuthnRepository, AuthzRepository, RenewAuthTicketRemote } from "../kernel/infra"
 
 import { CheckAuthTicketView } from "./resource"

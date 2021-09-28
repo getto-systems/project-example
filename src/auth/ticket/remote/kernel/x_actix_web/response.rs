@@ -4,7 +4,7 @@ use actix_web::{
 };
 use time::OffsetDateTime;
 
-use crate::z_details::_common::response::actix_web::RespondTo;
+use crate::z_lib::remote::response::actix_web::RespondTo;
 
 use super::header::{
     COOKIE_API_TOKEN, COOKIE_CLOUDFRONT_KEY_PAIR_ID, COOKIE_CLOUDFRONT_POLICY,

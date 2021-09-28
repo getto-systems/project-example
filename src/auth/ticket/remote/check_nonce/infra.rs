@@ -6,7 +6,7 @@ use crate::{
     auth::ticket::remote::kernel::data::{
         AuthDateTime, AuthNonce, ExpireDateTime, ExpireDuration,
     },
-    z_details::_common::repository::data::{RegisterResult, RepositoryError},
+    z_lib::remote::repository::data::{RegisterResult, RepositoryError},
 };
 
 pub trait CheckAuthNonceInfra {

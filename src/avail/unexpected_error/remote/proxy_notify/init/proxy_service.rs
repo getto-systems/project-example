@@ -6,18 +6,18 @@ use crate::avail::unexpected_error::_common::y_protobuf::service::{
 
 use crate::example::remote::x_outside_feature::feature::ExampleOutsideService;
 
-use crate::z_details::_common::service::init::authorizer::GoogleServiceAuthorizer;
+use crate::z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::{
     auth::remote::helper::set_metadata, example::remote::helper::infra_error,
-    z_details::_common::service::helper::new_endpoint,
+    z_lib::remote::service::helper::new_endpoint,
 };
 
 use crate::{
     auth::remote::infra::AuthMetadataContent,
     avail::unexpected_error::remote::proxy_notify::infra::NotifyUnexpectedErrorFieldsExtract,
     example::remote::proxy::ExampleProxyService,
-    z_details::_common::service::infra::ServiceAuthorizer,
+    z_lib::remote::service::infra::ServiceAuthorizer,
 };
 
 use crate::example::remote::data::ExampleServiceError;

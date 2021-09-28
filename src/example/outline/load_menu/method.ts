@@ -5,7 +5,7 @@ import { LoadMenuInfra, LoadMenuStore } from "./infra"
 
 import { LoadMenuEvent } from "./event"
 
-import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
+import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 import { MenuTargetPath } from "../kernel/data"
 
 export interface LoadMenuMethod {

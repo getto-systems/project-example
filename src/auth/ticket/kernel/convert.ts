@@ -1,7 +1,7 @@
-import { RepositoryConverter } from "../../../z_details/_ui/repository/infra"
+import { RepositoryConverter } from "../../../z_lib/ui/repository/infra"
 
 import { AuthzRepositoryValue } from "./infra"
-import { Clock } from "../../../z_details/_ui/clock/infra"
+import { Clock } from "../../../z_lib/ui/clock/infra"
 import { AuthRemoteValue, AuthnRepositoryValue } from "./infra"
 
 import { Authn, Authz, GrantedRoles } from "./data"

@@ -1,4 +1,4 @@
-use crate::z_details::_common::repository::data::RepositoryError;
+use crate::z_lib::remote::repository::data::RepositoryError;
 
 #[derive(Clone)]
 pub struct ResetToken(String);

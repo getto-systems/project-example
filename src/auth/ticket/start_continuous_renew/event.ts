@@ -1,4 +1,4 @@
-import { RepositoryError } from "../../../z_details/_ui/repository/data"
+import { RepositoryError } from "../../../z_lib/ui/repository/data"
 import { RenewAuthTicketError } from "../kernel/data"
 
 export type SaveAuthTicketEvent =

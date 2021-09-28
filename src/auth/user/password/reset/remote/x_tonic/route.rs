@@ -2,7 +2,7 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::z_details::_common::{logger::Logger, response::tonic::RespondTo};
+use crate::z_lib::remote::{logger::Logger, response::tonic::RespondTo};
 
 use crate::auth::user::password::reset::_common::y_protobuf::service::{
     request_reset_token_pb_server::{RequestResetTokenPb, RequestResetTokenPbServer},

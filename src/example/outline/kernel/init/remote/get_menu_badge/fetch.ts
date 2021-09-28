@@ -6,10 +6,10 @@ import {
     generateNonce,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../../z_details/_ui/remote/helper"
+} from "../../../../../../z_lib/ui/remote/helper"
 import { decodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 
-import { RemoteOutsideFeature } from "../../../../../../z_details/_ui/remote/feature"
+import { RemoteOutsideFeature } from "../../../../../../z_lib/ui/remote/feature"
 
 import { GetMenuBadgeRemote } from "../../../infra"
 

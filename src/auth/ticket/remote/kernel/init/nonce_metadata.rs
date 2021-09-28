@@ -5,14 +5,12 @@ use crate::auth::ticket::remote::kernel::{
     x_actix_web::header::HEADER_NONCE, x_tonic::metadata::METADATA_NONCE,
 };
 
-use crate::z_details::{
-    _api::request::helper::header, _common::request::x_tonic::metadata::metadata,
-};
+use crate::z_lib::remote::request::{helper::header, x_tonic::metadata::metadata};
 
 use crate::auth::ticket::remote::kernel::infra::AuthNonceMetadata;
 
 use crate::{
-    auth::ticket::remote::kernel::data::AuthNonce, z_details::_common::request::data::MetadataError,
+    auth::ticket::remote::kernel::data::AuthNonce, z_lib::remote::request::data::MetadataError,
 };
 
 pub struct ActixWebAuthNonceMetadata<'a> {
@@ -53,8 +51,7 @@ pub mod test {
     use crate::auth::ticket::remote::kernel::infra::AuthNonceMetadata;
 
     use crate::{
-        auth::ticket::remote::kernel::data::AuthNonce,
-        z_details::_common::request::data::MetadataError,
+        auth::ticket::remote::kernel::data::AuthNonce, z_lib::remote::request::data::MetadataError,
     };
 
     pub struct StaticAuthNonceMetadata {

@@ -1,4 +1,4 @@
-use crate::z_details::_common::logger::LogLevel;
+use crate::z_lib::remote::logger::LogLevel;
 
 use crate::auth::user::password::reset::remote::request_token::event::RequestResetTokenEvent;
 

@@ -2,7 +2,7 @@ use actix_web::{HttpRequest, HttpResponse};
 
 use getto_application::data::MethodResult;
 
-use crate::z_details::_common::{
+use crate::z_lib::remote::{
     logger::{LogLevel, LogMessage},
     response::actix_web::RespondTo,
 };
@@ -14,7 +14,7 @@ use crate::auth::remote::{
 };
 
 use crate::{
-    example::remote::service::data::ExampleServiceError, z_details::_api::message::data::MessageError,
+    example::remote::service::data::ExampleServiceError, z_lib::remote::message::data::MessageError,
 };
 
 pub enum ExampleProxyEvent<T> {

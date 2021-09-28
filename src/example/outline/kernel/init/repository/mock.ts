@@ -1,4 +1,4 @@
-import { initMemoryDB } from "../../../../../z_details/_ui/repository/init/memory"
+import { initMemoryDB } from "../../../../../z_lib/ui/repository/init/memory"
 
 import { MenuExpandRepository } from "../../infra"
 

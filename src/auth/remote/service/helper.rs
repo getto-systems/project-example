@@ -12,7 +12,7 @@ use crate::auth::ticket::remote::kernel::infra::AuthMetadataContent;
 
 use crate::{
     auth::remote::service::data::AuthServiceError,
-    z_details::_common::service::data::ServiceAuthorizeToken,
+    z_lib::remote::service::data::ServiceAuthorizeToken,
 };
 
 pub fn infra_error(err: impl std::fmt::Display) -> AuthServiceError {
@@ -29,6 +29,7 @@ pub fn set_metadata<T>(
         .metadata_mut()
         .insert(METADATA_REQUEST_ID, MetadataValue::from_str(request_id)?);
 
+    // TODO None だったらエラーにしたい
     if let Some(token) = token {
         request.metadata_mut().insert(
             "authorization",
@@ -36,12 +37,14 @@ pub fn set_metadata<T>(
         );
     }
 
+    // TODO None だったらエラーにしたい
     if let Some(nonce) = metadata.nonce {
         request
             .metadata_mut()
             .insert(METADATA_NONCE, MetadataValue::from_str(&nonce.extract())?);
     }
 
+    // token は None のことがある
     if let Some(token) = metadata.token {
         request
             .metadata_mut()

@@ -1,4 +1,4 @@
-import { RepositoryConverter } from "../../../z_details/_ui/repository/infra"
+import { RepositoryConverter } from "../../../z_lib/ui/repository/infra"
 import {
     initMenuExpand,
     MenuBadge,
@@ -9,7 +9,7 @@ import {
     MenuTreeItem,
 } from "./infra"
 
-import { ConvertLocationResult } from "../../../z_details/_ui/location/data"
+import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 import {
     MenuCategory,
     MenuCategoryLabel,

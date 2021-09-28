@@ -1,7 +1,7 @@
-import { newClock } from "../../z_details/_ui/clock/init"
+import { newClock } from "../../z_lib/ui/clock/init"
 import { newSeasonRepository } from "./init/repository/season"
 
-import { RepositoryOutsideFeature } from "../../z_details/_ui/repository/feature"
+import { RepositoryOutsideFeature } from "../../z_lib/ui/repository/feature"
 
 import { LoadSeasonInfra } from "./infra"
 

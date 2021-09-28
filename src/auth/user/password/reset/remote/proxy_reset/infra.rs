@@ -1,6 +1,6 @@
 use crate::{
     auth::ticket::remote::encode::data::AuthTicketEncoded,
-    z_details::_api::message::data::MessageError,
+    z_lib::remote::message::data::MessageError,
 };
 
 pub struct ResetPasswordFieldsExtract {

@@ -1,6 +1,6 @@
 use prost::Message;
 
-use crate::z_details::_api::message::helper::{decode_base64, invalid_protobuf};
+use crate::z_lib::remote::message::helper::{decode_base64, invalid_protobuf};
 
 use crate::auth::user::password::reset::_api::y_protobuf::api::RequestResetTokenPb;
 
@@ -8,7 +8,7 @@ use crate::auth::user::password::reset::remote::proxy_request_token::infra::{
     RequestResetTokenFieldsExtract, RequestResetTokenProxyRequestDecoder,
 };
 
-use crate::z_details::_api::message::data::MessageError;
+use crate::z_lib::remote::message::data::MessageError;
 
 pub struct RequestDecoder {
     body: String,

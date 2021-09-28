@@ -2,8 +2,8 @@ import { newAuthzRepository } from "../kernel/init/repository/authz"
 import { newAuthnRepository } from "../kernel/init/repository/authn"
 import { newLogoutRemote } from "./init/logout"
 
-import { RemoteOutsideFeature } from "../../../z_details/_ui/remote/feature"
-import { RepositoryOutsideFeature } from "../../../z_details/_ui/repository/feature"
+import { RemoteOutsideFeature } from "../../../z_lib/ui/remote/feature"
+import { RepositoryOutsideFeature } from "../../../z_lib/ui/repository/feature"
 
 import { LogoutInfra } from "./infra"
 

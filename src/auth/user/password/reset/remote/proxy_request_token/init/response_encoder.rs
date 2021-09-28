@@ -1,4 +1,4 @@
-use crate::z_details::_api::message::helper::encode_protobuf_base64;
+use crate::z_lib::remote::message::helper::encode_protobuf_base64;
 
 use crate::auth::user::password::reset::_api::y_protobuf::api::{
     RequestResetTokenErrorKindPb, RequestResetTokenErrorPb, RequestResetTokenResultPb,
@@ -10,7 +10,7 @@ use crate::auth::user::password::reset::remote::proxy_request_token::infra::Requ
 
 use crate::{
     auth::user::password::reset::remote::proxy_request_token::data::RequestResetTokenProxyMessage,
-    z_details::_api::message::data::MessageError,
+    z_lib::remote::message::data::MessageError,
 };
 
 pub struct ResponseEncoder;

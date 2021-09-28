@@ -1,7 +1,7 @@
 use crate::{
     auth::remote::data::ValidateApiTokenError,
     example::outline::remote::get_menu_badge::data::OutlineMenuBadge,
-    z_details::_common::repository::data::RepositoryError,
+    z_lib::remote::repository::data::RepositoryError,
 };
 
 pub enum GetOutlineMenuBadgeEvent {

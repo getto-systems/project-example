@@ -1,8 +1,8 @@
-import { RemoteResult } from "../../../z_details/_ui/remote/infra"
+import { RemoteResult } from "../../../z_lib/ui/remote/infra"
 import {
     FetchRepositoryResult,
     StoreRepositoryResult,
-} from "../../../z_details/_ui/repository/infra"
+} from "../../../z_lib/ui/repository/infra"
 
 import { AuthTicket, Authn, Authz, RenewAuthTicketRemoteError } from "./data"
 

@@ -9,7 +9,7 @@ use crate::auth::user::password::_common::y_protobuf::service::{
     ChangePasswordResponsePb,
 };
 
-use crate::z_details::_common::{logger::Logger, response::tonic::RespondTo};
+use crate::z_lib::remote::{logger::Logger, response::tonic::RespondTo};
 
 use crate::x_outside_feature::remote::{
     auth::{

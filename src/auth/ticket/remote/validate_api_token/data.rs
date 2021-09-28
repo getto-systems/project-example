@@ -3,7 +3,7 @@ use crate::{
         remote::service::data::AuthServiceError,
         ticket::remote::kernel::data::DecodeAuthTokenError,
     },
-    z_details::_common::request::data::MetadataError,
+    z_lib::remote::request::data::MetadataError,
 };
 
 pub enum ValidateApiTokenError {

@@ -1,4 +1,4 @@
-import { delaySecond } from "../../z_details/_ui/config/infra"
+import { delaySecond } from "../../z_lib/ui/config/infra"
 
 export const avail_config = {
     takeLongtimeThreshold: delaySecond(1),
