@@ -9,7 +9,7 @@ import {
 import { linky } from "../../../../../ui/vendor/getto-css/preact/design/highlight"
 
 import { siteInfo } from "../../../site"
-import { icon } from "../../../_ui/x_preact/design/icon"
+import { icon } from "../../../x_preact/design/icon"
 
 import { MENU_ID } from "../../action_load_menu/x_preact/load_menu"
 

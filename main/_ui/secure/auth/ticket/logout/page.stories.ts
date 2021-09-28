@@ -4,7 +4,7 @@ import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/stor
 
 import { LogoutPageComponent } from "./page"
 
-import { mockBaseResource } from "../../../../../../src/example/_ui/action_base/mock"
+import { mockBaseResource } from "../../../../../../src/example/action_base/mock"
 import { mockLogoutResource } from "../../../../../../src/auth/ticket/action_logout/mock"
 
 export default {

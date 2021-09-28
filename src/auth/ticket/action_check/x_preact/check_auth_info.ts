@@ -12,9 +12,9 @@ import {
 import { loginBox } from "../../../../../ui/vendor/getto-css/preact/layout/login"
 import { v_medium } from "../../../../../ui/vendor/getto-css/preact/design/alignment"
 
-import { VNodeContent } from "../../../../example/_ui/x_preact/design/common"
+import { VNodeContent } from "../../../../example/x_preact/design/common"
 import { siteInfo } from "../../../../example/site"
-import { spinner } from "../../../../example/_ui/x_preact/design/icon"
+import { spinner } from "../../../../example/x_preact/design/icon"
 
 import { appendScript } from "../../../sign/x_preact/script"
 

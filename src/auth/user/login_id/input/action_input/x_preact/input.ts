@@ -8,7 +8,7 @@ import {
     label_text_fill,
 } from "../../../../../../../ui/vendor/getto-css/preact/design/form"
 
-import { VNodeContent } from "../../../../../../example/_ui/x_preact/design/common"
+import { VNodeContent } from "../../../../../../example/x_preact/design/common"
 
 import { InputBoardComponent } from "../../../../../../../ui/vendor/getto-application/board/action_input/x_preact/input"
 
