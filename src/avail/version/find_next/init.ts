@@ -1,13 +1,13 @@
-import { env } from "../../../../y_environment/_ui/env"
-import { avail_config } from "../../../_ui/x_outside_feature/config"
+import { env } from "../../../y_environment/_ui/env"
+import { avail_config } from "../../_ui/x_outside_feature/config"
 
-import { toURL } from "../../../../z_details/_ui/location/init"
+import { toURL } from "../../../z_details/_ui/location/init"
 
 import { newCheckDeployExistsRemote } from "./init/remote/check_deploy_exists"
 
 import { FindNextVersionDetecter } from "./method"
 
-import { LocationOutsideFeature } from "../../../../z_details/_ui/location/feature"
+import { LocationOutsideFeature } from "../../../z_details/_ui/location/feature"
 
 import { FindNextVersionInfra } from "./infra"
 

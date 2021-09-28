@@ -1,4 +1,4 @@
-import { ApplicationStateAction } from "../../../../../ui/vendor/getto-application/action/action"
+import { ApplicationStateAction } from "../../../../ui/vendor/getto-application/action/action"
 
 import { FindNextVersionMethod } from "../find_next/method"
 

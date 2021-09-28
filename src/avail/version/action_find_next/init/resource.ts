@@ -1,9 +1,9 @@
-import { toApplicationView } from "../../../../../../ui/vendor/getto-application/action/helper"
+import { toApplicationView } from "../../../../../ui/vendor/getto-application/action/helper"
 
 import { initFindNextVersionAction, initFindNextVersionMaterial } from "../init"
 import { newFindNextVersionInfra, newFindNextVersionLocationDetecter } from "../../find_next/init"
 
-import { LocationOutsideFeature } from "../../../../../z_details/_ui/location/feature"
+import { LocationOutsideFeature } from "../../../../z_details/_ui/location/feature"
 
 import { FindNextVersionView } from "../resource"
 

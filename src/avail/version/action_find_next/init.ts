@@ -1,4 +1,4 @@
-import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/init"
+import { ApplicationAbstractStateAction } from "../../../../ui/vendor/getto-application/action/init"
 
 import { findNextVersion } from "../find_next/method"
 

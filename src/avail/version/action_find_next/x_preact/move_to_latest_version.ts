@@ -5,13 +5,13 @@ import { html } from "htm/preact"
 import {
     useApplicationAction,
     useApplicationView,
-} from "../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+} from "../../../../../ui/vendor/getto-application/action/x_preact/hooks"
 
-import { loginBox } from "../../../../../../ui/vendor/getto-css/preact/layout/login"
-import { siteInfo } from "../../../../../example/site"
-import { spinner } from "../../../../../example/_ui/x_preact/design/icon"
+import { loginBox } from "../../../../../ui/vendor/getto-css/preact/layout/login"
+import { siteInfo } from "../../../../example/site"
+import { spinner } from "../../../../example/_ui/x_preact/design/icon"
 
-import { ApplicationErrorComponent } from "../../../../_ui/x_preact/application_error"
+import { ApplicationErrorComponent } from "../../../_ui/x_preact/application_error"
 
 import { applicationPath } from "../../find_next/helper"
 

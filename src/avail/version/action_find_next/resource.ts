@@ -1,4 +1,4 @@
-import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
+import { ApplicationView } from "../../../../ui/vendor/getto-application/action/action"
 
 import { FindNextVersionAction, FindNextVersionState } from "./action"
 
