@@ -10,7 +10,7 @@ RUN : && \
 RUN : && \
   rustup component add rustfmt && \
   rustup target add x86_64-unknown-linux-musl && \
-  GETTO_EXAMPLE_RUN_BUILD=TRUE cargo build --bin api --release --target x86_64-unknown-linux-musl && \
+  RUN_PROTOBUF_BUILDER=TRUE cargo build --bin api --release --target x86_64-unknown-linux-musl && \
   :
 
 FROM gcr.io/distroless/static-debian10

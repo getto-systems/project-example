@@ -27,7 +27,7 @@ impl GrpcTarget {
         let target = Path::new(&target);
 
         let source = target.join("z_protobuf");
-        let dist = target.join("_common/y_protobuf");
+        let dist = target.join("remote/y_protobuf");
         let index = dist.join("mod.rs");
 
         Self {
@@ -81,7 +81,7 @@ impl GrpcBuilder {
 
         configure().compile(&inputs, &[Path::new("src/").into()])?;
 
-        // 他の proto は _common::y_protobuf を追加して参照しないといけない
+        // 他の proto は remote::y_protobuf を追加して参照しないといけない
         self.source_proto_basename()?.fold(Ok(()), |acc, name| {
             acc?;
 
@@ -95,7 +95,7 @@ impl GrpcBuilder {
                 "{}",
                 import_ref_regex.replace_all(
                     &content,
-                    format!("super::super::super::$1::_common::y_protobuf::{}::", name)
+                    format!("super::super::super::$1::remote::y_protobuf::{}::", name)
                 ),
             )?;
             file.flush()

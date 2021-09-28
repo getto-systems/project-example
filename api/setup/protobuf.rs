@@ -27,7 +27,7 @@ impl ProtobufTarget {
         let target = Path::new(&target);
 
         let source = target.join("z_protobuf");
-        let dist = target.join("_api/y_protobuf");
+        let dist = target.join("remote/y_protobuf");
         let index = dist.join("mod.rs");
 
         Self {
@@ -80,7 +80,7 @@ impl ProtobufBuilder {
         let inputs: Vec<PathBuf> = self.source_proto()?.collect();
         compile_protos(&inputs, &["src/"])?;
 
-        // 他の proto は _api::y_protobuf を追加して参照しないといけない
+        // 他の proto は remote::y_protobuf を追加して参照しないといけない
         self.source_proto_basename()?.fold(Ok(()), |acc, name| {
             acc?;
 
@@ -94,7 +94,7 @@ impl ProtobufBuilder {
                 "{}",
                 import_ref_regex.replace_all(
                     &content,
-                    format!("super::super::super::$1::_api::y_protobuf::{}::", name)
+                    format!("super::super::super::$1::remote::y_protobuf::{}::", name)
                 ),
             )?;
             file.flush()

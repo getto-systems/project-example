@@ -81,7 +81,7 @@ test-api:
   image: rust:1-buster
 
   variables:
-    GETTO_EXAMPLE_RUN_BUILD: "TRUE"
+    RUN_PROTOBUF_BUILDER: "TRUE"
 
   before_script:
     - rustup component add rustfmt

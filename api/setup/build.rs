@@ -5,7 +5,7 @@ mod protobuf;
 use std::env::var;
 
 fn main() {
-    if build_required() {
+    if protobuf_build_required() {
         grpc::generate("auth.ticket");
         grpc::generate("auth.user");
         grpc::generate("auth.user.password");
@@ -21,8 +21,8 @@ fn main() {
     }
 }
 
-fn build_required() -> bool {
-    match var("GETTO_EXAMPLE_RUN_BUILD") {
+fn protobuf_build_required() -> bool {
+    match var("RUN_PROTOBUF_BUILDER") {
         Ok(build) => build == "TRUE".to_string(),
         Err(_) => false,
     }
