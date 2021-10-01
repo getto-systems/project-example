@@ -15,9 +15,7 @@ import { ProfilePageResource } from "./resource"
 render(h(ProfilePageEntry, props()), document.body)
 
 function props(): ApplicationView<ProfilePageResource> {
-    return toProfileView(newResource(), () => {
-        // noop
-    })
+    return toProfileView({ resource: newResource() })
 }
 function newResource() {
     const feature = newForegroundOutsideFeature()

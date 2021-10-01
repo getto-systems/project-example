@@ -29,8 +29,7 @@ async function renderEntry() {
 }
 
 async function props(): Promise<ApplicationView<ProfilePageResource>> {
-    const { resource, terminate } = await newResource()
-    return toProfileView(resource, terminate)
+    return toProfileView(await newResource())
 }
 async function newResource() {
     const feature = await newWorkerForegroundOutsideFeature()
