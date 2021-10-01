@@ -1,5 +1,7 @@
 import { h, render } from "preact"
 
+import { handleWorkerProxyError } from "../../../../../../ui/vendor/getto-application/action/worker/foreground"
+
 import { ApplicationErrorComponent } from "../../../../../../src/avail/x_preact/application_error"
 import { ProfilePageEntry } from "../page"
 
@@ -36,9 +38,7 @@ async function newResource() {
     const { worker } = feature
     const proxy = initProxy(postForegroundMessage)
 
-    const messageHandler = initBackgroundMessageHandler(proxy, (err: string) => {
-        throw new Error(err)
-    })
+    const messageHandler = initBackgroundMessageHandler(proxy)
 
     worker.addEventListener("message", (event) => {
         messageHandler(event.data)
@@ -48,9 +48,7 @@ async function newResource() {
         resource: {
             ...newBaseResource(feature),
             ...newChangePasswordResource(feature),
-            requestToken: initRequestResetTokenProfileAction(
-                proxy.password.reset.requestToken.material(),
-            ),
+            ...newRequestResetTokenProfileResource(proxy),
         },
         terminate: () => {
             worker.terminate()
@@ -59,6 +57,14 @@ async function newResource() {
 
     function postForegroundMessage(message: ProfileForegroundMessage) {
         worker.postMessage(message)
+    }
+}
+
+function newRequestResetTokenProfileResource(proxy: Proxy) {
+    return {
+        requestToken: initRequestResetTokenProfileAction(
+            proxy.password.reset.requestToken.material(),
+        ),
     }
 }
 
@@ -80,32 +86,18 @@ function initProxy(post: Post<ProfileForegroundMessage>): Proxy {
         },
     }
 }
-function initBackgroundMessageHandler(
-    proxy: Proxy,
-    errorHandler: Post<string>,
-): Post<ProfileBackgroundMessage> {
+function initBackgroundMessageHandler(proxy: Proxy): Post<ProfileBackgroundMessage> {
     return (message) => {
-        try {
-            switch (message.type) {
-                case "password-reset-requestToken":
-                    proxy.password.reset.requestToken.resolve(message.response)
-                    break
+        switch (message.type) {
+            case "password-reset-requestToken":
+                proxy.password.reset.requestToken.resolve(message.response)
+                return
 
-                case "error":
-                    errorHandler(message.err)
-                    break
-
-                default:
-                    assertNever(message)
-            }
-        } catch (err) {
-            errorHandler(`${err}`)
+            default:
+                handleWorkerProxyError(message)
+                return
         }
     }
-}
-
-function assertNever(_: never): never {
-    throw new Error("NEVER")
 }
 
 interface Post<T> {
