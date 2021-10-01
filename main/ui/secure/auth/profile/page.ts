@@ -21,6 +21,7 @@ import { LoadSeasonEntry } from "../../../../../src/example/action_load_season/x
 import { LoadMenuEntry } from "../../../../../src/example/outline/action_load_menu/x_preact/load_menu"
 import { LoadBreadcrumbListComponent } from "../../../../../src/example/outline/action_load_breadcrumb_list/x_preact/load_breadcrumb_list"
 import { ChangePasswordEntry } from "../../../../../src/auth/user/password/action_change/x_preact/change_password"
+import { RequestResetTokenProfileEntry } from "../../../../../src/auth/user/password/reset/action_request_token_profile/x_preact/request_token"
 
 import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
 import { ProfilePageResource } from "./resource"
@@ -46,7 +47,10 @@ export function ProfilePageComponent(props: ProfilePageResource): VNode {
         header: [h(LoadSeasonEntry, props)],
         main: appMain({
             header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbListComponent, props)]),
-            body: mainBody(container([h(ChangePasswordEntry, props)])),
+            body: mainBody(container([
+                h(ChangePasswordEntry, props),
+                h(RequestResetTokenProfileEntry, props),
+            ])),
             copyright,
         }),
         menu: h(LoadMenuEntry, props),

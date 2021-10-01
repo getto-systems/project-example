@@ -4,12 +4,11 @@ import { mockInputPasswordAction } from "../action_input/mock"
 import { mockValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/mock"
 
 import { ChangePasswordAction, ChangePasswordState, initialChangePasswordState } from "./action"
-import { ChangePasswordResource } from "./resource"
 
 import { emptyBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/data"
 
-export function mockChangePasswordResource(): ChangePasswordResource {
-    return { change: new Action() }
+export function mockChangePasswordAction(): ChangePasswordAction {
+    return new Action()
 }
 
 class Action

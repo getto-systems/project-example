@@ -4,7 +4,7 @@ import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/stor
 
 import { ChangePasswordComponent } from "./change_password"
 
-import { mockChangePasswordResource } from "../mock"
+import { mockChangePasswordAction } from "../mock"
 
 import { ChangePasswordState } from "../action"
 import { ValidateBoardActionState } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
@@ -13,6 +13,7 @@ import { validateBoardStates } from "../../../../../../ui/vendor/getto-applicati
 
 const options = [
     "initial",
+    "input",
     "try",
     "takeLongtime",
     "validation-error",
@@ -23,9 +24,6 @@ const options = [
 
 export default {
     title: "main/Auth/Password/Change",
-    parameters: {
-        layout: "fullscreen",
-    },
     argTypes: {
         change: {
             control: { type: "select", options },
@@ -43,7 +41,7 @@ export type Props = Readonly<{
 }>
 const template = storyTemplate<Props>((props) => {
     return h(ChangePasswordComponent, {
-        ...mockChangePasswordResource(),
+        change: mockChangePasswordAction(),
         state: state(),
         validate: props.validate,
     })
@@ -52,6 +50,9 @@ const template = storyTemplate<Props>((props) => {
         switch (props.change) {
             case "initial":
                 return { type: "initial-change-password" }
+
+            case "input":
+                return { type: "input-password" }
 
             case "try":
                 return { type: "try-to-change-password" }
