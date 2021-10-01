@@ -5,14 +5,14 @@ import { newCheckAuthTicketView } from "../../../../ticket/action_check/init/res
 import { newAuthenticatePasswordView } from "../../../../user/password/action_authenticate/init/resource"
 import { newResetPasswordView } from "../../../../user/password/reset/action_reset/init/resource"
 import {
-    newRequestPasswordResetTokenProxy,
-    RequestPasswordResetTokenProxy,
+    newRequestResetTokenProxy,
+    RequestResetTokenProxy,
 } from "../../../../user/password/reset/action_request_token/init/worker/foreground"
 
 import { initSignAction } from "../../init"
 import { initSignLinkResource } from "../../../action_nav/init"
 
-import { ForegroundMessage, BackgroundMessage } from "./message"
+import { SignForegroundMessage, SignBackgroundMessage } from "./message"
 
 import { RepositoryOutsideFeature } from "../../../../../z_lib/ui/repository/feature"
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
@@ -58,7 +58,7 @@ export function newSignViewWorkerForeground(feature: OutsideFeature): SignView {
         },
     }
 
-    function postForegroundMessage(message: ForegroundMessage) {
+    function postForegroundMessage(message: SignForegroundMessage) {
         worker.postMessage(message)
     }
 }
@@ -66,15 +66,15 @@ export function newSignViewWorkerForeground(feature: OutsideFeature): SignView {
 type Proxy = Readonly<{
     password: Readonly<{
         reset: Readonly<{
-            requestToken: RequestPasswordResetTokenProxy
+            requestToken: RequestResetTokenProxy
         }>
     }>
 }>
-function initProxy(post: Post<ForegroundMessage>): Proxy {
+function initProxy(post: Post<SignForegroundMessage>): Proxy {
     return {
         password: {
             reset: {
-                requestToken: newRequestPasswordResetTokenProxy((message) =>
+                requestToken: newRequestResetTokenProxy((message) =>
                     post({ type: "password-reset-requestToken", message }),
                 ),
             },
@@ -84,7 +84,7 @@ function initProxy(post: Post<ForegroundMessage>): Proxy {
 function initBackgroundMessageHandler(
     proxy: Proxy,
     errorHandler: Post<string>,
-): Post<BackgroundMessage> {
+): Post<SignBackgroundMessage> {
     return (message) => {
         try {
             switch (message.type) {

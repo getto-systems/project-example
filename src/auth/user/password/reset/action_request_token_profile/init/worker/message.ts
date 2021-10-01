@@ -5,11 +5,11 @@ import { RequestResetTokenEvent } from "../../../request_token/event"
 import { ConvertBoardResult } from "../../../../../../../../ui/vendor/getto-application/board/kernel/data"
 import { RequestResetTokenFields } from "../../../request_token/data"
 
-export type RequestPasswordResetTokenProfileProxyMaterial = Readonly<{
+export type RequestResetTokenProfileProxyMaterial = Readonly<{
     requestToken: RequestTokenProfile["method"]
 }>
-export type RequestPasswordResetTokenProfileProxyMessage = RequestTokenProfile["message"]
-export type RequestPasswordResetTokenProfileProxyResponse = RequestTokenProfile["response"]
+export type RequestResetTokenProfileProxyMessage = RequestTokenProfile["message"]
+export type RequestResetTokenProfileProxyResponse = RequestTokenProfile["response"]
 
 type RequestTokenProfile = WorkerProxySpec<
     "requestToken",

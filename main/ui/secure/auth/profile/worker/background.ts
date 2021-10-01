@@ -1,21 +1,22 @@
-import { newRequestResetTokenHandler } from "../../../../user/password/reset/action_request_token/init/worker/background"
+import { newWorkerBackgroundOutsideFeature } from "../../../../../../src/x_outside_feature/worker"
+
+import { newRequestResetTokenProfileHandler } from "../../../../../../src/auth/user/password/reset/action_request_token_profile/init/worker/background"
 
 import { WorkerHandler } from "../../../../../../ui/vendor/getto-application/action/worker/background"
 
-import { SignForegroundMessage, SignBackgroundMessage } from "./message"
-import { RequestResetTokenProxyMessage } from "../../../../user/password/reset/action_request_token/init/worker/message"
+import { ProfileForegroundMessage, ProfileBackgroundMessage } from "./message"
+import { RequestResetTokenProfileProxyMessage } from "../../../../../../src/auth/user/password/reset/action_request_token_profile/init/worker/message"
 
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
-import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-application/action/worker/feature"
+newBackground()
 
-type OutsideFeature = RemoteOutsideFeature & WorkerOutsideFeature
-export function newSignViewWorkerBackground(feature: OutsideFeature): void {
+function newBackground(): void {
+    const feature = newWorkerBackgroundOutsideFeature()
     const { worker } = feature
 
     const handler: Handler = {
         password: {
             reset: {
-                requestToken: newRequestResetTokenHandler(feature, (response) =>
+                requestToken: newRequestResetTokenProfileHandler(feature, (response) =>
                     postBackgroundMessage({ type: "password-reset-requestToken", response }),
                 ),
             },
@@ -30,7 +31,7 @@ export function newSignViewWorkerBackground(feature: OutsideFeature): void {
         messageHandler(event.data)
     })
 
-    function postBackgroundMessage(message: SignBackgroundMessage) {
+    function postBackgroundMessage(message: ProfileBackgroundMessage) {
         worker.postMessage(message)
     }
 }
@@ -38,7 +39,7 @@ export function newSignViewWorkerBackground(feature: OutsideFeature): void {
 type Handler = Readonly<{
     password: Readonly<{
         reset: Readonly<{
-            requestToken: WorkerHandler<RequestResetTokenProxyMessage>
+            requestToken: WorkerHandler<RequestResetTokenProfileProxyMessage>
         }>
     }>
 }>
@@ -46,7 +47,7 @@ type Handler = Readonly<{
 function initForegroundMessageHandler(
     handler: Handler,
     errorHandler: Post<string>,
-): Post<SignForegroundMessage> {
+): Post<ProfileForegroundMessage> {
     return (message) => {
         try {
             handler.password.reset.requestToken(message.message)

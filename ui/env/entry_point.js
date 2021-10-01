@@ -19,7 +19,7 @@ const entries = {
         { name: "index", /* TODO worker: true */ },
 
         { name: "auth/ticket/logout", /* TODO worker: true */ },
-        { name: "auth/profile", /* TODO worker: true */ },
+        { name: "auth/profile", worker: true },
 
         { name: "docs/index" },
         { name: "docs/privacy-policy" },

@@ -4,36 +4,36 @@ import {
 } from "../../../../../../../../ui/vendor/getto-application/action/worker/foreground"
 
 import {
-    RequestPasswordResetTokenProfileProxyMaterial,
-    RequestPasswordResetTokenProfileProxyMessage,
-    RequestPasswordResetTokenProfileProxyResponse,
+    RequestResetTokenProfileProxyMaterial,
+    RequestResetTokenProfileProxyMessage,
+    RequestResetTokenProfileProxyResponse,
 } from "./message"
 
 import { RequestResetTokenProfileMaterial } from "../../action"
 
-export interface RequestPasswordResetTokenProfileProxy
+export interface RequestResetTokenProfileProxy
     extends WorkerProxy<
-        RequestPasswordResetTokenProfileProxyMessage,
-        RequestPasswordResetTokenProfileProxyResponse
+        RequestResetTokenProfileProxyMessage,
+        RequestResetTokenProfileProxyResponse
     > {
     material(): RequestResetTokenProfileMaterial
 }
-export function newRequestPasswordResetTokenProfileProxy(
-    post: Post<RequestPasswordResetTokenProfileProxyMessage>,
-): RequestPasswordResetTokenProfileProxy {
+export function newRequestResetTokenProfileProxy(
+    post: Post<RequestResetTokenProfileProxyMessage>,
+): RequestResetTokenProfileProxy {
     return new Proxy(post)
 }
 
 class Proxy
     extends WorkerAbstractProxy<
-        RequestPasswordResetTokenProfileProxyMessage,
-        RequestPasswordResetTokenProfileProxyResponse
+        RequestResetTokenProfileProxyMessage,
+        RequestResetTokenProfileProxyResponse
     >
-    implements RequestPasswordResetTokenProfileProxy
+    implements RequestResetTokenProfileProxy
 {
-    proxy: RequestPasswordResetTokenProfileProxyMaterial
+    proxy: RequestResetTokenProfileProxyMaterial
 
-    constructor(post: Post<RequestPasswordResetTokenProfileProxyMessage>) {
+    constructor(post: Post<RequestResetTokenProfileProxyMessage>) {
         super(post)
         this.proxy = {
             requestToken: this.method("requestToken", (message) => message),
@@ -45,7 +45,7 @@ class Proxy
             requestToken: (fields, post) => this.proxy.requestToken.call({ fields }, post),
         }
     }
-    resolve(response: RequestPasswordResetTokenProfileProxyResponse): void {
+    resolve(response: RequestResetTokenProfileProxyResponse): void {
         switch (response.method) {
             case "requestToken":
                 this.proxy.requestToken.resolve(response)
