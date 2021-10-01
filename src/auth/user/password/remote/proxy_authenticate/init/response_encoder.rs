@@ -1,5 +1,6 @@
 use crate::auth::user::password::remote::y_protobuf::api::{
-    AuthenticatePasswordErrorKindPb, AuthenticatePasswordErrorPb, AuthenticatePasswordResultPb,
+    AuthenticatePasswordApiErrorKindPb, AuthenticatePasswordApiErrorPb,
+    AuthenticatePasswordApiResponsePb,
 };
 
 use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideCookie;
@@ -43,10 +44,10 @@ impl<'a> ResponseEncoder<'a> {
     ) -> Result<AuthenticatePasswordProxyMessageEncoded, MessageError> {
         match response {
             AuthenticatePasswordProxyResponse::InvalidPassword => {
-                let message = AuthenticatePasswordResultPb {
+                let message = AuthenticatePasswordApiResponsePb {
                     success: false,
-                    err: Some(AuthenticatePasswordErrorPb {
-                        kind: AuthenticatePasswordErrorKindPb::InvalidPassword as i32,
+                    err: Some(AuthenticatePasswordApiErrorPb {
+                        kind: AuthenticatePasswordApiErrorKindPb::InvalidPassword as i32,
                     }),
                     ..Default::default()
                 };
@@ -55,7 +56,7 @@ impl<'a> ResponseEncoder<'a> {
                 ))
             }
             AuthenticatePasswordProxyResponse::Success(ticket) => {
-                let message = AuthenticatePasswordResultPb {
+                let message = AuthenticatePasswordApiResponsePb {
                     success: true,
                     value: Some(ticket.user.into()),
                     ..Default::default()

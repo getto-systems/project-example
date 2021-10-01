@@ -2,4 +2,4 @@ syntax = "proto3";
 
 package avail.unexpected_error.api;
 
-message NotifyUnexpectedError_pb { string json = 1; }
+message NotifyUnexpectedErrorApiRequestPb { string json = 1; }

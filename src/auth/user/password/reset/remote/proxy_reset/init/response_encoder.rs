@@ -1,7 +1,7 @@
 use crate::z_lib::remote::message::helper::encode_protobuf_base64;
 
 use crate::auth::user::password::reset::remote::y_protobuf::api::{
-    ResetPasswordErrorKindPb, ResetPasswordErrorPb, ResetPasswordResultPb,
+    ResetPasswordApiErrorKindPb, ResetPasswordApiErrorPb, ResetPasswordApiResponsePb,
 };
 
 use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideCookie;
@@ -42,10 +42,10 @@ impl<'a> ResponseEncoder<'a> {
     ) -> Result<ResetPasswordProxyMessageEncoded, MessageError> {
         match response {
             ResetPasswordProxyResponse::InvalidReset => {
-                let message = ResetPasswordResultPb {
+                let message = ResetPasswordApiResponsePb {
                     success: false,
-                    err: Some(ResetPasswordErrorPb {
-                        kind: ResetPasswordErrorKindPb::InvalidReset as i32,
+                    err: Some(ResetPasswordApiErrorPb {
+                        kind: ResetPasswordApiErrorKindPb::InvalidReset as i32,
                     }),
                     ..Default::default()
                 };
@@ -54,10 +54,10 @@ impl<'a> ResponseEncoder<'a> {
                 ))
             }
             ResetPasswordProxyResponse::AlreadyReset => {
-                let message = ResetPasswordResultPb {
+                let message = ResetPasswordApiResponsePb {
                     success: false,
-                    err: Some(ResetPasswordErrorPb {
-                        kind: ResetPasswordErrorKindPb::AlreadyReset as i32,
+                    err: Some(ResetPasswordApiErrorPb {
+                        kind: ResetPasswordApiErrorKindPb::AlreadyReset as i32,
                     }),
                     ..Default::default()
                 };
@@ -66,7 +66,7 @@ impl<'a> ResponseEncoder<'a> {
                 ))
             }
             ResetPasswordProxyResponse::Success(ticket) => {
-                let message = ResetPasswordResultPb {
+                let message = ResetPasswordApiResponsePb {
                     success: true,
                     value: Some(ticket.user.into()),
                     ..Default::default()

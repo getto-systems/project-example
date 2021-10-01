@@ -1,5 +1,5 @@
 use crate::auth::user::password::reset::remote::y_protobuf::{
-    api::ResetPasswordErrorKindPb, service::ResetPasswordResponsePb,
+    api::ResetPasswordApiErrorKindPb, service::ResetPasswordResponsePb,
 };
 
 use crate::auth::user::password::reset::remote::proxy_reset::infra::ResetPasswordProxyResponse;
@@ -23,11 +23,11 @@ impl Into<Option<ResetPasswordProxyResponse>> for ResetPasswordResponsePb {
                 _ => None,
             }
         } else {
-            match ResetPasswordErrorKindPb::from_i32(self.error) {
-                Some(ResetPasswordErrorKindPb::AlreadyReset) => {
+            match ResetPasswordApiErrorKindPb::from_i32(self.error) {
+                Some(ResetPasswordApiErrorKindPb::AlreadyReset) => {
                     Some(ResetPasswordProxyResponse::AlreadyReset)
                 }
-                Some(ResetPasswordErrorKindPb::InvalidReset) => {
+                Some(ResetPasswordApiErrorKindPb::InvalidReset) => {
                     Some(ResetPasswordProxyResponse::InvalidReset)
                 }
                 _ => Some(ResetPasswordProxyResponse::InvalidReset),

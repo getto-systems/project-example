@@ -36,7 +36,7 @@ export function newGetMenuBadgeRemote(feature: RemoteOutsideFeature): GetMenuBad
             }
 
             const result = decodeProtobuf(
-                pb.example.outline.api.GetMenuBadgeResult_pb,
+                pb.example.outline.api.GetMenuBadgeApiResponsePb,
                 await response.text(),
             )
             return {

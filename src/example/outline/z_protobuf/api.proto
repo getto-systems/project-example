@@ -2,6 +2,6 @@ syntax = "proto3";
 
 package example.outline.api;
 
-message GetMenuBadgeResult_pb {
+message GetMenuBadgeApiResponsePb {
   int32 index = 1;
 }

@@ -1,17 +1,17 @@
-import { env } from "../../../../../y_environment/ui/env"
-import pb from "../../../../../y_protobuf/proto.js"
+import { env } from "../../../../y_environment/ui/env"
+import pb from "../../../../y_protobuf/proto.js"
 
 import {
     fetchOptions,
     generateNonce,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../z_lib/ui/remote/helper"
-import { encodeProtobuf } from "../../../../../../ui/vendor/protobuf/helper"
+} from "../../../../z_lib/ui/remote/helper"
+import { encodeProtobuf } from "../../../../../ui/vendor/protobuf/helper"
 
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
+import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
 
-import { NotifyUnexpectedErrorRemote } from "../../infra"
+import { NotifyUnexpectedErrorRemote } from "../infra"
 
 export function newNotifyUnexpectedErrorRemote(
     feature: RemoteOutsideFeature,
@@ -31,9 +31,12 @@ export function newNotifyUnexpectedErrorRemote(
             })
             const response = await fetch(opts.url, {
                 ...opts.options,
-                body: encodeProtobuf(pb.avail.unexpected_error.api.NotifyUnexpectedError_pb, (message) => {
-                    message.json = JSON.stringify({ type: "UI ERROR", message: `${err}`, err })
-                }),
+                body: encodeProtobuf(
+                    pb.avail.unexpected_error.api.NotifyUnexpectedErrorApiRequestPb,
+                    (message) => {
+                        message.json = JSON.stringify({ type: "UI ERROR", message: `${err}`, err })
+                    },
+                ),
             })
 
             if (!response.ok) {

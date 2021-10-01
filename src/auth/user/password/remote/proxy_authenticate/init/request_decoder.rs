@@ -1,6 +1,6 @@
 use prost::Message;
 
-use crate::auth::user::password::remote::y_protobuf::api::AuthenticatePasswordPb;
+use crate::auth::user::password::remote::y_protobuf::api::AuthenticatePasswordApiRequestPb;
 
 use crate::z_lib::remote::message::helper::{decode_base64, invalid_protobuf};
 
@@ -22,8 +22,8 @@ impl RequestDecoder {
 
 impl AuthenticatePasswordProxyRequestDecoder for RequestDecoder {
     fn decode(self) -> Result<AuthenticatePasswordFieldsExtract, MessageError> {
-        let message =
-            AuthenticatePasswordPb::decode(decode_base64(self.body)?).map_err(invalid_protobuf)?;
+        let message = AuthenticatePasswordApiRequestPb::decode(decode_base64(self.body)?)
+            .map_err(invalid_protobuf)?;
 
         Ok(AuthenticatePasswordFieldsExtract {
             login_id: message.login_id,

@@ -1,7 +1,7 @@
 use crate::z_lib::remote::message::helper::encode_protobuf_base64;
 
 use crate::auth::user::password::remote::y_protobuf::api::{
-    AuthenticatePasswordErrorKindPb, ChangePasswordErrorPb, ChangePasswordResultPb,
+    AuthenticatePasswordApiErrorKindPb, ChangePasswordApiErrorPb, ChangePasswordApiResponsePb,
 };
 
 use crate::auth::remote::service::proxy::AuthProxyResponseEncoder;
@@ -24,10 +24,10 @@ impl<'a> AuthProxyResponseEncoder<ChangePasswordProxyResponse, ChangePasswordPro
     ) -> Result<ChangePasswordProxyMessage, MessageError> {
         match response {
             ChangePasswordProxyResponse::InvalidPassword => {
-                let message = ChangePasswordResultPb {
+                let message = ChangePasswordApiResponsePb {
                     success: false,
-                    err: Some(ChangePasswordErrorPb {
-                        kind: AuthenticatePasswordErrorKindPb::InvalidPassword as i32,
+                    err: Some(ChangePasswordApiErrorPb {
+                        kind: AuthenticatePasswordApiErrorKindPb::InvalidPassword as i32,
                     }),
                     ..Default::default()
                 };
@@ -36,7 +36,7 @@ impl<'a> AuthProxyResponseEncoder<ChangePasswordProxyResponse, ChangePasswordPro
                 ))
             }
             ChangePasswordProxyResponse::Success => {
-                let message = ChangePasswordResultPb {
+                let message = ChangePasswordApiResponsePb {
                     success: true,
                     ..Default::default()
                 };

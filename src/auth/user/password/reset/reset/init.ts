@@ -1,6 +1,6 @@
 import { auth_config } from "../../../../x_outside_feature/config"
 
-import { newResetPasswordRemote } from "./init/remote/reset"
+import { newResetPasswordRemote } from "./init/remote"
 
 import { newClock } from "../../../../../z_lib/ui/clock/init"
 import { toURL } from "../../../../../z_lib/ui/location/init"

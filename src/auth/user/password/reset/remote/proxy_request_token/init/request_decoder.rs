@@ -2,7 +2,7 @@ use prost::Message;
 
 use crate::z_lib::remote::message::helper::{decode_base64, invalid_protobuf};
 
-use crate::auth::user::password::reset::remote::y_protobuf::api::RequestResetTokenPb;
+use crate::auth::user::password::reset::remote::y_protobuf::api::RequestResetTokenApiRequestPb;
 
 use crate::auth::user::password::reset::remote::proxy_request_token::infra::{
     RequestResetTokenFieldsExtract, RequestResetTokenProxyRequestDecoder,
@@ -22,8 +22,8 @@ impl RequestDecoder {
 
 impl RequestResetTokenProxyRequestDecoder for RequestDecoder {
     fn decode(self) -> Result<RequestResetTokenFieldsExtract, MessageError> {
-        let message =
-            RequestResetTokenPb::decode(decode_base64(self.body)?).map_err(invalid_protobuf)?;
+        let message = RequestResetTokenApiRequestPb::decode(decode_base64(self.body)?)
+            .map_err(invalid_protobuf)?;
 
         Ok(RequestResetTokenFieldsExtract {
             login_id: message.login_id,
