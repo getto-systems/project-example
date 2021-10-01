@@ -13,13 +13,13 @@ const entries = {
         { name: "avail/version/move-to-latest" },
         { name: "avail/version/move-to-next" },
         { name: "avail/not-found" },
-        { name: "auth/sign", background: true },
+        { name: "auth/sign", worker: true },
     ],
     secure: [
-        { name: "index", /* TODO background: true */ },
+        { name: "index", /* TODO worker: true */ },
 
-        { name: "auth/ticket/logout", /* TODO background: true */ },
-        { name: "auth/profile", /* TODO background: true */ },
+        { name: "auth/ticket/logout", /* TODO worker: true */ },
+        { name: "auth/profile", /* TODO worker: true */ },
 
         { name: "docs/index" },
         { name: "docs/privacy-policy" },
@@ -53,25 +53,22 @@ function linkableHtmlFiles() {
 }
 
 function toEntry(root, entry) {
-    if (entry.background) {
-        return {
-            ...foregroundEntry(),
-            ...backgroundEntry(),
-        }
+    if (entry.worker) {
+        return workerEntry()
     } else {
-        return foregroundEntry()
+        return simpleEntry()
     }
 
-    function foregroundEntry() {
-        return buildEntry(entry.name, toPath("foreground"))
+    function simpleEntry() {
+        const map = {}
+        map[entry.name] = toPath("entry")
+        return map
     }
-    function backgroundEntry() {
-        return buildEntry(`${entry.name}.worker`, toPath("background"))
-    }
-    function buildEntry(name, path) {
-        const entry = {}
-        entry[name] = path
-        return entry
+    function workerEntry() {
+        const map = {}
+        map[entry.name] = toPath("worker/foreground")
+        map[`${entry.name}.worker`] = toPath("worker/background")
+        return map
     }
     function toPath(type) {
         return path.join(__dirname, "../../main/ui", root, entryPath(), `${type}.ts`)
