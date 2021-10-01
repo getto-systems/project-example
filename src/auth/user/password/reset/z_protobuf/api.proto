@@ -4,38 +4,34 @@ package auth.user.password.reset.api;
 
 import "auth/ticket/z_protobuf/api.proto";
 
-message RequestResetTokenPb {
+message RequestResetTokenApiRequestPb {
     string login_id = 1;
 }
-message RequestResetTokenResultPb {
+message RequestResetTokenApiResponsePb {
     bool success = 1;
-    RequestResetTokenValuePb value = 2;
-    RequestResetTokenErrorPb err = 3;
+    RequestResetTokenApiErrorPb err = 3;
 }
-message RequestResetTokenValuePb {
-    string session_id = 1;
+message RequestResetTokenApiErrorPb {
+    RequestResetTokenApiErrorKindPb kind = 1;
 }
-message RequestResetTokenErrorPb {
-    RequestResetTokenErrorKindPb kind = 1;
-}
-enum RequestResetTokenErrorKindPb {
+enum RequestResetTokenApiErrorKindPb {
     INVALID_REQUEST = 0;
 }
 
-message ResetPasswordPb {
+message ResetPasswordApiRequestPb {
     string reset_token = 1;
     string login_id = 2;
     string password = 3;
 }
-message ResetPasswordResultPb {
+message ResetPasswordApiResponsePb {
     bool success = 1;
-    auth.ticket.api.AuthenticateResponsePb value = 2;
-    ResetPasswordErrorPb err = 3;
+    auth.ticket.api.AuthenticateApiResponsePb value = 2;
+    ResetPasswordApiErrorPb err = 3;
 }
-message ResetPasswordErrorPb {
-    ResetPasswordErrorKindPb kind = 1;
+message ResetPasswordApiErrorPb {
+    ResetPasswordApiErrorKindPb kind = 1;
 }
-enum ResetPasswordErrorKindPb {
+enum ResetPasswordApiErrorKindPb {
     INVALID_RESET = 0;
     ALREADY_RESET = 1;
 }

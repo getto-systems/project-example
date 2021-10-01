@@ -1,4 +1,4 @@
-import { newNotifyUnexpectedErrorRemote } from "./init/remote/notify"
+import { newNotifyUnexpectedErrorRemote } from "./init/remote"
 
 import { RemoteOutsideFeature } from "../../../z_lib/ui/remote/feature"
 

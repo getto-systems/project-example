@@ -4,32 +4,32 @@ package auth.user.password.api;
 
 import "auth/ticket/z_protobuf/api.proto";
 
-message AuthenticatePasswordPb {
+message AuthenticatePasswordApiRequestPb {
     string login_id = 1;
     string password = 2;
 }
 
-message AuthenticatePasswordResultPb {
+message AuthenticatePasswordApiResponsePb {
     bool success = 1;
-    auth.ticket.api.AuthenticateResponsePb value = 2;
-    AuthenticatePasswordErrorPb err = 3;
+    auth.ticket.api.AuthenticateApiResponsePb value = 2;
+    AuthenticatePasswordApiErrorPb err = 3;
 }
-message AuthenticatePasswordErrorPb {
-    AuthenticatePasswordErrorKindPb kind = 1;
+message AuthenticatePasswordApiErrorPb {
+    AuthenticatePasswordApiErrorKindPb kind = 1;
 }
-enum AuthenticatePasswordErrorKindPb {
+enum AuthenticatePasswordApiErrorKindPb {
     INVALID_PASSWORD = 0;
 }
 
-message ChangePasswordPb {
+message ChangePasswordApiRequestPb {
     string current_password = 1;
     string new_password = 2;
 }
 
-message ChangePasswordResultPb {
+message ChangePasswordApiResponsePb {
     bool success = 1;
-    ChangePasswordErrorPb err = 2;
+    ChangePasswordApiErrorPb err = 2;
 }
-message ChangePasswordErrorPb {
-    AuthenticatePasswordErrorKindPb kind = 1;
+message ChangePasswordApiErrorPb {
+    AuthenticatePasswordApiErrorKindPb kind = 1;
 }

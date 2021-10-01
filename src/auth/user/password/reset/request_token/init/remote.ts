@@ -1,23 +1,20 @@
-import { env } from "../../../../../../../y_environment/ui/env"
-import pb from "../../../../../../../y_protobuf/proto.js"
+import { env } from "../../../../../../y_environment/ui/env"
+import pb from "../../../../../../y_protobuf/proto.js"
 
 import {
     fetchOptions,
     generateNonce,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../../../z_lib/ui/remote/helper"
-import { decodeProtobuf, encodeProtobuf } from "../../../../../../../../ui/vendor/protobuf/helper"
+} from "../../../../../../z_lib/ui/remote/helper"
+import { decodeProtobuf, encodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 
-import { RemoteOutsideFeature } from "../../../../../../../z_lib/ui/remote/feature"
+import { RemoteOutsideFeature } from "../../../../../../z_lib/ui/remote/feature"
 
-import { RequestResetTokenRemote } from "../../infra"
+import { RequestResetTokenRemote } from "../infra"
 
 export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): RequestResetTokenRemote {
     return async (fields) => {
-        const RequestResetTokenPb = pb.auth.user.password.reset.api.RequestResetTokenPb
-        const RequestResetTokenResultPb = pb.auth.user.password.reset.api.RequestResetTokenResultPb
-
         try {
             const mock = false
             if (mock) {
@@ -32,16 +29,22 @@ export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): Reque
             })
             const response = await fetch(opts.url, {
                 ...opts.options,
-                body: encodeProtobuf(RequestResetTokenPb, (message) => {
-                    message.loginId = fields.loginID
-                }),
+                body: encodeProtobuf(
+                    pb.auth.user.password.reset.api.RequestResetTokenApiRequestPb,
+                    (message) => {
+                        message.loginId = fields.loginID
+                    },
+                ),
             })
 
             if (!response.ok) {
                 return remoteCommonError(response.status)
             }
 
-            const result = decodeProtobuf(RequestResetTokenResultPb, await response.text())
+            const result = decodeProtobuf(
+                pb.auth.user.password.reset.api.RequestResetTokenApiResponsePb,
+                await response.text(),
+            )
             if (!result.success) {
                 return { success: false, err: { type: "invalid-reset" } }
             }

@@ -1,6 +1,6 @@
 use prost::Message;
 
-use crate::auth::user::password::reset::remote::y_protobuf::api::ResetPasswordPb;
+use crate::auth::user::password::reset::remote::y_protobuf::api::ResetPasswordApiRequestPb;
 
 use crate::z_lib::remote::message::helper::{decode_base64, invalid_protobuf};
 
@@ -22,8 +22,8 @@ impl RequestDecoder {
 
 impl ResetPasswordProxyRequestDecoder for RequestDecoder {
     fn decode(self) -> Result<ResetPasswordFieldsExtract, MessageError> {
-        let message =
-            ResetPasswordPb::decode(decode_base64(self.body)?).map_err(invalid_protobuf)?;
+        let message = ResetPasswordApiRequestPb::decode(decode_base64(self.body)?)
+            .map_err(invalid_protobuf)?;
 
         Ok(ResetPasswordFieldsExtract {
             reset_token: message.reset_token,

@@ -1,4 +1,4 @@
-use crate::example::outline::remote::y_protobuf::api::GetMenuBadgeResultPb;
+use crate::example::outline::remote::y_protobuf::api::GetMenuBadgeApiResponsePb;
 
 use crate::z_lib::remote::message::helper::encode_protobuf_base64;
 
@@ -21,7 +21,7 @@ impl<'a> ExampleProxyResponseEncoder<OutlineMenuBadge, GetOutlineMenuBadgeProxyM
         &self,
         badge: OutlineMenuBadge,
     ) -> Result<GetOutlineMenuBadgeProxyMessage, MessageError> {
-        let message: GetMenuBadgeResultPb = badge.into();
+        let message: GetMenuBadgeApiResponsePb = badge.into();
         Ok(GetOutlineMenuBadgeProxyMessage::Success(
             encode_protobuf_base64(message)?,
         ))

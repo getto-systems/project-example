@@ -1,6 +1,6 @@
 import { auth_config } from "../../../x_outside_feature/config"
 
-import { newAuthenticatePasswordRemote } from "./init/remote/authenticate"
+import { newAuthenticatePasswordRemote } from "./init/remote"
 import { newClock } from "../../../../z_lib/ui/clock/init"
 
 import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"

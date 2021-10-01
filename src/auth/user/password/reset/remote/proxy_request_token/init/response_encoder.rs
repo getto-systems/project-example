@@ -1,7 +1,7 @@
 use crate::z_lib::remote::message::helper::encode_protobuf_base64;
 
 use crate::auth::user::password::reset::remote::y_protobuf::api::{
-    RequestResetTokenErrorKindPb, RequestResetTokenErrorPb, RequestResetTokenResultPb,
+    RequestResetTokenApiErrorKindPb, RequestResetTokenApiErrorPb, RequestResetTokenApiResponsePb,
 };
 
 use crate::auth::remote::service::proxy::AuthProxyResponseEncoder;
@@ -24,10 +24,10 @@ impl<'a> AuthProxyResponseEncoder<RequestResetTokenProxyResponse, RequestResetTo
     ) -> Result<RequestResetTokenProxyMessage, MessageError> {
         match response {
             RequestResetTokenProxyResponse::InvalidRequest => {
-                let message = RequestResetTokenResultPb {
+                let message = RequestResetTokenApiResponsePb {
                     success: false,
-                    err: Some(RequestResetTokenErrorPb {
-                        kind: RequestResetTokenErrorKindPb::InvalidRequest as i32,
+                    err: Some(RequestResetTokenApiErrorPb {
+                        kind: RequestResetTokenApiErrorKindPb::InvalidRequest as i32,
                     }),
                     ..Default::default()
                 };
@@ -36,7 +36,7 @@ impl<'a> AuthProxyResponseEncoder<RequestResetTokenProxyResponse, RequestResetTo
                 ))
             }
             RequestResetTokenProxyResponse::Success => {
-                let message = RequestResetTokenResultPb {
+                let message = RequestResetTokenApiResponsePb {
                     success: true,
                     ..Default::default()
                 };

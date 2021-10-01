@@ -21,8 +21,6 @@ export function newRenewAuthTicketRemote(
     clock: Clock,
 ): RenewAuthTicketRemote {
     return async () => {
-        const AuthenticateResponsePb = pb.auth.ticket.api.AuthenticateResponsePb
-
         try {
             const mock = false
             if (mock) {
@@ -48,7 +46,10 @@ export function newRenewAuthTicketRemote(
                 success: true,
                 value: convertAuthRemote(
                     clock,
-                    decodeProtobuf(AuthenticateResponsePb, await response.text()),
+                    decodeProtobuf(
+                        pb.auth.ticket.api.AuthenticateApiResponsePb,
+                        await response.text(),
+                    ),
                 ),
             }
         } catch (err) {

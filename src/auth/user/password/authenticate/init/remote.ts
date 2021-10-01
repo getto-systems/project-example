@@ -1,29 +1,26 @@
-import { env } from "../../../../../../y_environment/ui/env"
-import pb from "../../../../../../y_protobuf/proto.js"
+import { env } from "../../../../../y_environment/ui/env"
+import pb from "../../../../../y_protobuf/proto.js"
 
 import {
     generateNonce,
     fetchOptions,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../../z_lib/ui/remote/helper"
-import { decodeProtobuf, encodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
+} from "../../../../../z_lib/ui/remote/helper"
+import { decodeProtobuf, encodeProtobuf } from "../../../../../../ui/vendor/protobuf/helper"
 
-import { RemoteOutsideFeature } from "../../../../../../z_lib/ui/remote/feature"
+import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 
-import { Clock } from "../../../../../../z_lib/ui/clock/infra"
-import { AuthenticatePasswordRemote } from "../../infra"
+import { Clock } from "../../../../../z_lib/ui/clock/infra"
+import { AuthenticatePasswordRemote } from "../infra"
 
-import { convertAuthRemote } from "../../../../../ticket/kernel/convert"
+import { convertAuthRemote } from "../../../../ticket/kernel/convert"
 
 export function newAuthenticatePasswordRemote(
     feature: RemoteOutsideFeature,
     clock: Clock,
 ): AuthenticatePasswordRemote {
     return async (fields) => {
-        const AuthenticatePasswordPb = pb.auth.user.password.api.AuthenticatePasswordPb
-        const AuthenticatePasswordResultPb = pb.auth.user.password.api.AuthenticatePasswordResultPb
-
         try {
             const mock = false
             if (mock) {
@@ -41,17 +38,23 @@ export function newAuthenticatePasswordRemote(
             })
             const response = await fetch(opts.url, {
                 ...opts.options,
-                body: encodeProtobuf(AuthenticatePasswordPb, (message) => {
-                    message.loginId = fields.loginID
-                    message.password = fields.password
-                }),
+                body: encodeProtobuf(
+                    pb.auth.user.password.api.AuthenticatePasswordApiRequestPb,
+                    (message) => {
+                        message.loginId = fields.loginID
+                        message.password = fields.password
+                    },
+                ),
             })
 
             if (!response.ok) {
                 return remoteCommonError(response.status)
             }
 
-            const result = decodeProtobuf(AuthenticatePasswordResultPb, await response.text())
+            const result = decodeProtobuf(
+                pb.auth.user.password.api.AuthenticatePasswordApiResponsePb,
+                await response.text(),
+            )
             if (!result.success) {
                 return { success: false, err: { type: "invalid-password" } }
             }

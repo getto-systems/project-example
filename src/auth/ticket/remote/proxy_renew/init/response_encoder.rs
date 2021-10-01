@@ -1,6 +1,6 @@
 use crate::z_lib::remote::message::helper::encode_protobuf_base64;
 
-use crate::auth::ticket::remote::y_protobuf::api::AuthenticateResponsePb;
+use crate::auth::ticket::remote::y_protobuf::api::AuthenticateApiResponsePb;
 
 use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideCookie;
 
@@ -32,7 +32,7 @@ impl<'a> ResponseEncoder<'a> {
 
 impl<'a> AuthProxyResponseEncoder<AuthTicketEncoded, AuthTokenResponse> for ResponseEncoder<'a> {
     fn encode(&self, ticket: AuthTicketEncoded) -> Result<AuthTokenResponse, MessageError> {
-        let message: AuthenticateResponsePb = ticket.user.into();
+        let message: AuthenticateApiResponsePb = ticket.user.into();
         let message = AuthTokenMessage {
             body: encode_protobuf_base64(message)?,
             token: ticket.token,
