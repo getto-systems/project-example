@@ -6,9 +6,7 @@ import { RequestResetTokenView } from "../../user/password/reset/action_request_
 import { ResetPasswordView } from "../../user/password/reset/action_reset/resource"
 import { SignLinkResource } from "../action_nav/resource"
 
-export interface SignAction extends ApplicationStateAction<SignActionState> {
-    error(err: string): Promise<SignActionState>
-}
+export type SignAction = ApplicationStateAction<SignActionState>
 
 export interface SignSubView {
     link(): SignLinkResource

@@ -42,7 +42,7 @@ export function newSignViewWorkerForeground(feature: OutsideFeature): SignView {
     })
 
     const messageHandler = initBackgroundMessageHandler(proxy, (err: string) => {
-        sign.error(err)
+        throw new Error(err)
     })
 
     worker.addEventListener("message", (event) => {

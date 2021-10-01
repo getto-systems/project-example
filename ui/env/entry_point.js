@@ -18,7 +18,7 @@ const entries = {
     secure: [
         { name: "index", /* TODO worker: true */ },
 
-        { name: "auth/ticket/logout", /* TODO worker: true */ },
+        { name: "auth/ticket/logout" },
         { name: "auth/profile", worker: true },
 
         { name: "docs/index" },
