@@ -46,36 +46,39 @@ const title = "パスワードリセット"
 
 type Props = RequestResetTokenResource & RequestResetTokenResourceState
 export function RequestResetTokenComponent(props: Props): VNode {
-    switch (props.state.type) {
-        case "initial-request-token":
-            return startSessionForm({ state: "start" })
+    return basedOn(props)
 
-        case "failed-to-request-token":
-            return startSessionForm({
-                state: "start",
-                error: requestTokenError(props.state.err),
-            })
+    function basedOn({ state }: RequestResetTokenResourceState): VNode {
+        switch (state.type) {
+            case "initial-request-token":
+                return requestTokenForm({ state: "start" })
 
-        case "try-to-request-token":
-            return startSessionForm({ state: "connecting" })
+            case "failed-to-request-token":
+                return requestTokenForm({
+                    state: "start",
+                    error: requestTokenError(state.err),
+                })
 
-        case "take-longtime-to-request-token":
-            return takeLongtimeMessage()
+            case "try-to-request-token":
+                return requestTokenForm({ state: "connecting" })
 
-        case "succeed-to-request-token":
-            return successMessage()
+            case "take-longtime-to-request-token":
+                return takeLongtimeMessage()
+
+            case "succeed-to-request-token":
+                return successMessage()
+        }
     }
 
-    type StartSessionFormState = "start" | "connecting"
+    type FormState = "start" | "connecting"
 
-    // TODO state をこの形にする
-    type StartSessionFormContent =
-        | StartSessionFormContent_base
-        | (StartSessionFormContent_base & StartSessionFormContent_error)
-    type StartSessionFormContent_base = Readonly<{ state: StartSessionFormState }>
-    type StartSessionFormContent_error = Readonly<{ error: VNodeContent[] }>
+    type FormContent =
+        | FormContent_base
+        | (FormContent_base & FormContent_error)
+    type FormContent_base = Readonly<{ state: FormState }>
+    type FormContent_error = Readonly<{ error: VNodeContent[] }>
 
-    function startSessionForm(content: StartSessionFormContent): VNode {
+    function requestTokenForm(content: FormContent): VNode {
         return form(
             loginBox(siteInfo, {
                 title,

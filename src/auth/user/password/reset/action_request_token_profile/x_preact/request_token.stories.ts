@@ -2,16 +2,17 @@ import { h } from "preact"
 
 import { storyTemplate } from "../../../../../../../ui/vendor/storybook/preact/story"
 
-import { RequestResetTokenComponent } from "./request_reset_token"
+import { RequestResetTokenProfileComponent } from "./request_token"
 
-import { mockRequestResetTokenAction } from "../mock"
+import { mockRequestResetTokenProfileAction } from "../mock"
 
 import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
-import { RequestResetTokenState } from "../action"
+import { RequestResetTokenProfileState } from "../action"
 import { validateBoardStates } from "../../../../../../../ui/vendor/getto-application/board/validate_board/data"
 
 const options = [
     "initial",
+    "input",
     "try",
     "takeLongtime",
     "success",
@@ -22,10 +23,7 @@ const options = [
 ] as const
 
 export default {
-    title: "main/Auth/Password/Reset/Request Token",
-    parameters: {
-        layout: "fullscreen",
-    },
+    title: "main/Auth/Password/Reset/Request Token Profile",
     argTypes: {
         request: {
             control: { type: "select", options },
@@ -42,16 +40,19 @@ type Props = Readonly<{
     err: string
 }>
 const template = storyTemplate<Props>((props) => {
-    return h(RequestResetTokenComponent, {
-        requestToken: mockRequestResetTokenAction(),
+    return h(RequestResetTokenProfileComponent, {
+        requestToken: mockRequestResetTokenProfileAction(),
         state: state(),
         validate: props.validate,
     })
 
-    function state(): RequestResetTokenState {
+    function state(): RequestResetTokenProfileState {
         switch (props.request) {
             case "initial":
                 return { type: "initial-request-token" }
+
+            case "input":
+                return { type: "input-login-id" }
 
             case "try":
                 return { type: "try-to-request-token" }
