@@ -6,7 +6,7 @@ import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
 
 import { ChangePasswordInfra } from "./infra"
 
-export function newAuthenticatePasswordInfra(feature: RemoteOutsideFeature): ChangePasswordInfra {
+export function newChangePasswordInfra(feature: RemoteOutsideFeature): ChangePasswordInfra {
     return {
         change: newChangePasswordRemote(feature),
         config: {

@@ -115,11 +115,9 @@ function initResource(change: ChangePasswordRemote): Readonly<{
     const resource = {
         change: initChangePasswordAction(
             initChangePasswordMaterial({
-                change: {
-                    change,
-                    config: {
-                        takeLongtimeThreshold: { delay_millisecond: 32 },
-                    },
+                change,
+                config: {
+                    takeLongtimeThreshold: { delay_millisecond: 32 },
                 },
             }),
         ),

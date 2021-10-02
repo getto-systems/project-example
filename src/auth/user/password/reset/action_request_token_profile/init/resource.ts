@@ -1,6 +1,6 @@
-import { newRequestResetTokenInfra } from "../../request_token/init"
+import { newRequestResetTokenProfileMaterial } from "./common"
 
-import { initRequestResetTokenProfileAction, initRequestResetTokenProfileMaterial } from "../init"
+import { initRequestResetTokenProfileAction } from "../init"
 
 import { RemoteOutsideFeature } from "../../../../../../z_lib/ui/remote/feature"
 
@@ -12,7 +12,7 @@ export function newRequestResetTokenProfileResource(
 ): RequestResetTokenProfileResource {
     return {
         requestToken: initRequestResetTokenProfileAction(
-            initRequestResetTokenProfileMaterial(newRequestResetTokenInfra(feature)),
+            newRequestResetTokenProfileMaterial(feature),
         ),
     }
 }

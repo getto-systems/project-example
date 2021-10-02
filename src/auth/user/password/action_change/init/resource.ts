@@ -1,6 +1,6 @@
-import { newAuthenticatePasswordInfra } from "../../change/init"
+import { newChangePasswordMaterial } from "./common"
 
-import { initChangePasswordAction, initChangePasswordMaterial } from "../init"
+import { initChangePasswordAction } from "../init"
 
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 import { RepositoryOutsideFeature } from "../../../../../z_lib/ui/repository/feature"
@@ -12,10 +12,6 @@ export function newChangePasswordResource(
     feature: RemoteOutsideFeature & RepositoryOutsideFeature & LocationOutsideFeature,
 ): ChangePasswordResource {
     return {
-        change: initChangePasswordAction(
-            initChangePasswordMaterial({
-                change: newAuthenticatePasswordInfra(feature),
-            }),
-        ),
+        change: initChangePasswordAction(newChangePasswordMaterial(feature)),
     }
 }

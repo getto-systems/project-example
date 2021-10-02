@@ -22,15 +22,11 @@ import { ConvertBoardResult } from "../../../../../ui/vendor/getto-application/b
 import { InputPasswordAction } from "../action_input/action"
 import { ValidateBoardChecker } from "../../../../../ui/vendor/getto-application/board/validate_board/infra"
 
-export type ChangePasswordActionInfra = Readonly<{
-    change: ChangePasswordInfra
-}>
-
 export function initChangePasswordMaterial(
-    infra: ChangePasswordActionInfra,
+    infra: ChangePasswordInfra,
 ): ChangePasswordMaterial {
     return {
-        change: changePassword(infra.change),
+        change: changePassword(infra),
     }
 }
 
