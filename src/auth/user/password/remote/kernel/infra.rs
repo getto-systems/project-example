@@ -1,20 +1,6 @@
 use chrono::{DateTime, Utc};
 
-use crate::{
-    auth::{
-        ticket::remote::kernel::data::{AuthDateTime, ExpireDateTime},
-        user::{
-            login_id::remote::data::LoginId,
-            password::remote::kernel::data::{
-                ChangePasswordRepositoryError, PasswordHashError,
-                RegisterResetTokenRepositoryError, ResetPasswordRepositoryError, ResetToken,
-                ValidatePasswordError, VerifyPasswordRepositoryError,
-            },
-            remote::kernel::data::AuthUserId,
-        },
-    },
-    z_lib::remote::repository::data::RepositoryError,
-};
+use crate::{auth::{ticket::remote::kernel::data::{AuthDateTime, ExpireDateTime}, user::{login_id::remote::data::LoginId, password::remote::kernel::data::{ChangePasswordRepositoryError, PasswordHashError, RegisterResetTokenRepositoryError, ResetPasswordRepositoryError, ResetToken, ResetTokenDestination, ResetTokenDestinationExtract, ValidatePasswordError, VerifyPasswordRepositoryError}, remote::kernel::data::AuthUserId}}, z_lib::remote::repository::data::RepositoryError};
 
 pub struct HashedPassword(String);
 
@@ -80,6 +66,7 @@ pub trait RegisterResetTokenRepository {
         &self,
         login_id: LoginId,
         reset_token: ResetToken,
+        destination: ResetTokenDestination,
         expires: ExpireDateTime,
         requested_at: AuthDateTime,
     ) -> Result<(), RegisterResetTokenRepositoryError>;
@@ -102,6 +89,7 @@ pub trait ResetPasswordRepository {
 
 pub struct ResetTokenEntry {
     login_id: LoginId,
+    destination: ResetTokenDestination,
     expires: ExpireDateTime,
     reset_at: Option<AuthDateTime>,
 }
@@ -118,10 +106,15 @@ impl ResetTokenEntry {
     pub fn has_already_reset(&self) -> bool {
         self.reset_at.is_some()
     }
+
+    pub fn into_destination(self) -> ResetTokenDestination {
+        self.destination
+    }
 }
 
 pub struct ResetTokenEntryExtract {
     pub login_id: String,
+    pub destination: ResetTokenDestinationExtract,
     pub expires: DateTime<Utc>,
     pub reset_at: Option<DateTime<Utc>>,
 }
@@ -130,6 +123,7 @@ impl ResetTokenEntryExtract {
     pub(in crate::auth) fn restore(self) -> ResetTokenEntry {
         ResetTokenEntry {
             login_id: LoginId::restore(self.login_id),
+            destination: self.destination.restore(),
             expires: ExpireDateTime::restore(self.expires),
             reset_at: self.reset_at.map(AuthDateTime::restore),
         }

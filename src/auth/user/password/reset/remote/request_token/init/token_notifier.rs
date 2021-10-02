@@ -5,9 +5,12 @@ use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideEmail;
 
 use crate::auth::user::password::reset::remote::request_token::infra::ResetTokenNotifier;
 
-use crate::auth::user::password::reset::remote::{
-    kernel::data::ResetTokenEncoded,
-    request_token::data::{NotifyResetTokenError, NotifyResetTokenResponse, ResetTokenDestination},
+use crate::auth::user::password::{
+    remote::kernel::data::ResetTokenDestination,
+    reset::remote::{
+        kernel::data::ResetTokenEncoded,
+        request_token::data::{NotifyResetTokenError, NotifyResetTokenResponse},
+    },
 };
 
 pub struct EmailResetTokenNotifier<'a> {
@@ -115,17 +118,18 @@ GETTO Example システムです
 #################################
 GETTO Example
 email: labo@message.getto.systems
----------------------------------
+#################################
 "#####;
 
 #[cfg(test)]
 pub mod test {
     use crate::auth::user::password::reset::remote::request_token::infra::ResetTokenNotifier;
 
-    use crate::auth::user::password::reset::remote::{
-        kernel::data::ResetTokenEncoded,
-        request_token::data::{
-            NotifyResetTokenError, NotifyResetTokenResponse, ResetTokenDestination,
+    use crate::auth::user::password::{
+        remote::kernel::data::ResetTokenDestination,
+        reset::remote::{
+            kernel::data::ResetTokenEncoded,
+            request_token::data::{NotifyResetTokenError, NotifyResetTokenResponse},
         },
     };
 

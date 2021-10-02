@@ -12,12 +12,11 @@ use crate::{
         user::{
             login_id::remote::data::LoginId,
             password::{
-                remote::kernel::data::ResetToken,
+                remote::kernel::data::{ResetToken, ResetTokenDestination},
                 reset::remote::{
                     kernel::data::ResetTokenEncoded,
                     request_token::data::{
                         EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
-                        ResetTokenDestination,
                     },
                 },
             },

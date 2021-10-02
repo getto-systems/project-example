@@ -6,6 +6,34 @@ use crate::auth::user::{
     },
 };
 
+pub struct NotifyResetPasswordResponse {
+    message_id: String,
+}
+
+impl NotifyResetPasswordResponse {
+    pub fn new(message_id: String) -> Self {
+        Self { message_id }
+    }
+}
+
+impl std::fmt::Display for NotifyResetPasswordResponse {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "message-id: {}", self.message_id)
+    }
+}
+
+pub enum NotifyResetPasswordError {
+    InfraError(String),
+}
+
+impl std::fmt::Display for NotifyResetPasswordError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::InfraError(err) => write!(f, "notify reset token error; {}", err),
+        }
+    }
+}
+
 pub enum ResetPasswordError {
     InvalidLoginId(ValidateLoginIdError),
     InvalidPassword(ValidatePasswordError),

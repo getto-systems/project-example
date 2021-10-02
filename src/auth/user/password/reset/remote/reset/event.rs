@@ -9,7 +9,10 @@ use crate::{
                 },
                 reset::remote::{
                     kernel::data::ValidateResetTokenError,
-                    reset::data::{DecodeResetTokenError, ResetPasswordError},
+                    reset::data::{
+                        DecodeResetTokenError, NotifyResetPasswordError,
+                        NotifyResetPasswordResponse, ResetPasswordError,
+                    },
                 },
             },
             remote::kernel::data::AuthUser,
@@ -19,6 +22,7 @@ use crate::{
 };
 
 pub enum ResetPasswordEvent {
+    ResetNotified(NotifyResetPasswordResponse),
     Success(AuthUser),
     InvalidReset(ResetPasswordError),
     UserNotFound,
@@ -26,6 +30,7 @@ pub enum ResetPasswordEvent {
     RepositoryError(RepositoryError),
     PasswordHashError(PasswordHashError),
     DecodeError(DecodeResetTokenError),
+    NotifyError(NotifyResetPasswordError),
 }
 
 const SUCCESS: &'static str = "reset password success";
@@ -34,6 +39,7 @@ const ERROR: &'static str = "reset password error";
 impl std::fmt::Display for ResetPasswordEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::ResetNotified(response) => write!(f, "reset token notified; {}", response),
             Self::Success(user) => write!(f, "{}; {}", SUCCESS, user),
             Self::InvalidReset(err) => write!(f, "{}; {}", ERROR, err),
             Self::UserNotFound => write!(f, "{}; user not found", ERROR),
@@ -41,6 +47,7 @@ impl std::fmt::Display for ResetPasswordEvent {
             Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
             Self::PasswordHashError(err) => write!(f, "{}; {}", ERROR, err),
             Self::DecodeError(err) => write!(f, "{}; {}", ERROR, err),
+            Self::NotifyError(err) => write!(f, "{}; {}", ERROR, err),
         }
     }
 }

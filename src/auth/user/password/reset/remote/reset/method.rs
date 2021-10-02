@@ -1,5 +1,6 @@
 use crate::auth::ticket::remote::check_nonce::method::check_auth_nonce;
 
+use crate::auth::user::password::remote::kernel::data::ResetTokenDestination;
 use crate::auth::{
     ticket::remote::kernel::infra::AuthClock,
     user::{
@@ -7,7 +8,7 @@ use crate::auth::{
             remote::kernel::infra::{PlainPassword, ResetPasswordRepository, ResetTokenEntry},
             reset::remote::{
                 proxy_reset::infra::ResetPasswordFieldsExtract,
-                reset::infra::{ResetPasswordInfra, ResetTokenDecoder},
+                reset::infra::{ResetPasswordInfra, ResetTokenDecoder, ResetPasswordNotifier},
             },
         },
         remote::kernel::infra::AuthUserRepository,
@@ -44,6 +45,7 @@ pub async fn reset_password<S>(
         ResetTokenEncoded::validate(fields.reset_token).map_err(|err| post(err.into()))?;
 
     let token_decoder = infra.token_decoder();
+    let reset_notifier = infra.reset_notifier();
 
     let reset_token = token_decoder
         .decode(&reset_token)
@@ -60,7 +62,8 @@ pub async fn reset_password<S>(
         .await
         .map_err(|err| post(ResetPasswordEvent::RepositoryError(err)))?;
 
-    verify_reset_token_entry(entry, &reset_at, &login_id).map_err(|err| post(err.into()))?;
+    let destination =
+        verify_reset_token_entry(entry, &reset_at, &login_id).map_err(|err| post(err.into()))?;
 
     let user_id = password_repository
         .reset_password(&reset_token, password_hasher, reset_at)
@@ -74,6 +77,13 @@ pub async fn reset_password<S>(
         .map_err(|err| post(ResetPasswordEvent::RepositoryError(err)))?
         .ok_or_else(|| post(ResetPasswordEvent::UserNotFound))?;
 
+    let notify_response = reset_notifier
+        .notify(destination)
+        .await
+        .map_err(|err| post(ResetPasswordEvent::NotifyError(err)))?;
+
+    post(ResetPasswordEvent::ResetNotified(notify_response));
+
     // 呼び出し側を簡単にするため、例外的に State ではなく AuthUser を返す
     post(ResetPasswordEvent::Success(user.clone()));
     Ok(user)
@@ -83,7 +93,7 @@ fn verify_reset_token_entry(
     entry: Option<ResetTokenEntry>,
     reset_at: &AuthDateTime,
     login_id: &LoginId,
-) -> Result<(), VerifyResetTokenEntryError> {
+) -> Result<ResetTokenDestination, VerifyResetTokenEntryError> {
     let entry = entry.ok_or(VerifyResetTokenEntryError::ResetTokenEntryNotFound)?;
     if entry.has_already_reset() {
         return Err(VerifyResetTokenEntryError::AlreadyReset);
@@ -94,5 +104,5 @@ fn verify_reset_token_entry(
     if !entry.verify_login_id(login_id) {
         return Err(VerifyResetTokenEntryError::LoginIdNotMatched);
     }
-    Ok(())
+    Ok(entry.into_destination())
 }
