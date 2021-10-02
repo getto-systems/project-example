@@ -3,8 +3,8 @@ import { newRequestResetTokenProfileMaterial } from "../common"
 import { WorkerHandler } from "../../../../../../../../ui/vendor/getto-application/action/worker/background"
 
 import {
-    RequestPasswordResetTokenProfileProxyMessage,
-    RequestPasswordResetTokenProfileProxyResponse,
+    RequestResetTokenProfileProxyMessage,
+    RequestResetTokenProfileProxyResponse,
 } from "./message"
 
 import { RemoteOutsideFeature } from "../../../../../../../z_lib/ui/remote/feature"
@@ -12,8 +12,8 @@ import { RemoteOutsideFeature } from "../../../../../../../z_lib/ui/remote/featu
 type OutsideFeature = RemoteOutsideFeature
 export function newRequestResetTokenProfileHandler(
     feature: OutsideFeature,
-    post: Post<RequestPasswordResetTokenProfileProxyResponse>,
-): WorkerHandler<RequestPasswordResetTokenProfileProxyMessage> {
+    post: Post<RequestResetTokenProfileProxyResponse>,
+): WorkerHandler<RequestResetTokenProfileProxyMessage> {
     const material = newRequestResetTokenProfileMaterial(feature)
     return async (message) => {
         switch (message.method) {

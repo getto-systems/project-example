@@ -12,10 +12,10 @@ import { WorkerOutsideFeature } from "../../ui/vendor/getto-application/action/w
 type WorkerForegroundOutsideFeature = ForegroundOutsideFeature & WorkerOutsideFeature
 type WorkerBackgroundOutsideFeature = CommonOutsideFeature & WorkerOutsideFeature
 
-export function newWorkerForegroundOutsideFeature(): WorkerForegroundOutsideFeature {
+export async function newWorkerForegroundOutsideFeature(): Promise<WorkerForegroundOutsideFeature> {
     return {
         ...newForegroundOutsideFeature(),
-        worker: newWorker({
+        worker: await newWorker({
             webDocument: document,
         }),
     }

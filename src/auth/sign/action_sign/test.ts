@@ -90,31 +90,6 @@ describe("SignView", () => {
             expect(stack.map((state) => state.type)).toEqual(["check-authTicket", "password-reset"])
         })
     })
-
-    test("error", async () => {
-        const { action } = standard()
-
-        const runner = setupActionTestRunner(action.subscriber)
-
-        await runner(() => action.error("view error")).then((stack) => {
-            expect(stack).toEqual([{ type: "error", err: "view error" }])
-        })
-    })
-
-    test("terminate", async () => {
-        const { action } = standard()
-        const view = toApplicationView(action)
-
-        const runner = setupActionTestRunner(action.subscriber)
-
-        await runner(() => {
-            view.terminate()
-            return view.resource.error("view error")
-        }).then((stack) => {
-            // no input/validate event after terminate
-            expect(stack).toEqual([])
-        })
-    })
 })
 
 function standard() {

@@ -2,8 +2,8 @@ import { newRequestResetTokenHandler } from "../../../../user/password/reset/act
 
 import { WorkerHandler } from "../../../../../../ui/vendor/getto-application/action/worker/background"
 
-import { ForegroundMessage, BackgroundMessage } from "./message"
-import { RequestPasswordResetTokenProxyMessage } from "../../../../user/password/reset/action_request_token/init/worker/message"
+import { SignForegroundMessage, SignBackgroundMessage } from "./message"
+import { RequestResetTokenProxyMessage } from "../../../../user/password/reset/action_request_token/init/worker/message"
 
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-application/action/worker/feature"
@@ -30,7 +30,7 @@ export function newSignViewWorkerBackground(feature: OutsideFeature): void {
         messageHandler(event.data)
     })
 
-    function postBackgroundMessage(message: BackgroundMessage) {
+    function postBackgroundMessage(message: SignBackgroundMessage) {
         worker.postMessage(message)
     }
 }
@@ -38,7 +38,7 @@ export function newSignViewWorkerBackground(feature: OutsideFeature): void {
 type Handler = Readonly<{
     password: Readonly<{
         reset: Readonly<{
-            requestToken: WorkerHandler<RequestPasswordResetTokenProxyMessage>
+            requestToken: WorkerHandler<RequestResetTokenProxyMessage>
         }>
     }>
 }>
@@ -46,7 +46,7 @@ type Handler = Readonly<{
 function initForegroundMessageHandler(
     handler: Handler,
     errorHandler: Post<string>,
-): Post<ForegroundMessage> {
+): Post<SignForegroundMessage> {
     return (message) => {
         try {
             handler.password.reset.requestToken(message.message)

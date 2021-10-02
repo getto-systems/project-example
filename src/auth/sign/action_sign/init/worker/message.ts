@@ -1,16 +1,16 @@
 import {
-    RequestPasswordResetTokenProxyMessage,
-    RequestPasswordResetTokenProxyResponse,
+    RequestResetTokenProxyMessage,
+    RequestResetTokenProxyResponse,
 } from "../../../../user/password/reset/action_request_token/init/worker/message"
 
-export type ForegroundMessage = Readonly<{
+export type SignForegroundMessage = Readonly<{
     type: "password-reset-requestToken"
-    message: RequestPasswordResetTokenProxyMessage
+    message: RequestResetTokenProxyMessage
 }>
 
-export type BackgroundMessage =
+export type SignBackgroundMessage =
     | Readonly<{
           type: "password-reset-requestToken"
-          response: RequestPasswordResetTokenProxyResponse
+          response: RequestResetTokenProxyResponse
       }>
     | Readonly<{ type: "error"; err: string }>

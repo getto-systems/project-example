@@ -28,12 +28,11 @@ import { ProfilePageResource } from "./resource"
 
 export function ProfilePageEntry(view: ApplicationView<ProfilePageResource>): VNode {
     const resource = useApplicationView(view)
-
     const err = useNotifyUnexpectedError(resource)
+
     if (err) {
         return h(ApplicationErrorComponent, { err: `${err}` })
     }
-
     return h(ProfilePageComponent, resource)
 }
 
@@ -47,10 +46,9 @@ export function ProfilePageComponent(props: ProfilePageResource): VNode {
         header: [h(LoadSeasonEntry, props)],
         main: appMain({
             header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbListComponent, props)]),
-            body: mainBody(container([
-                h(ChangePasswordEntry, props),
-                h(RequestResetTokenProfileEntry, props),
-            ])),
+            body: mainBody(
+                container([h(ChangePasswordEntry, props), h(RequestResetTokenProfileEntry, props)]),
+            ),
             copyright,
         }),
         menu: h(LoadMenuEntry, props),

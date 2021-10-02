@@ -5,6 +5,16 @@ import {
     WorkerProxyCallResponse,
 } from "./message"
 
+export type WorkerProxyErrorMessage<T> = Readonly<{ type: "error"; err: string }> | T
+export function handleWorkerProxyError<T>(message: WorkerProxyErrorMessage<T>): void {
+    if ("type" in message) {
+        if (message.type === "error") {
+            throw new Error(message.err)
+        }
+    }
+    throw new Error(JSON.stringify(message))
+}
+
 export interface WorkerProxy<M, R> {
     method<N, P, E>(method: N, map: WorkerProxyMessageMapper<N, M, P>): WorkerProxyMethod<N, P, E>
     resolve(response: R): void

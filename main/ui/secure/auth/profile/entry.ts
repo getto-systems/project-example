@@ -7,7 +7,7 @@ import { newForegroundOutsideFeature } from "../../../../../src/x_outside_featur
 import { newBaseResource } from "../../../../../src/example/action_base/init/resource"
 import { newChangePasswordResource } from "../../../../../src/auth/user/password/action_change/init/resource"
 import { newRequestResetTokenProfileResource } from "../../../../../src/auth/user/password/reset/action_request_token_profile/init/resource"
-import { initBaseView } from "../../../../../src/example/action_base/init"
+import { toProfileView } from "./common"
 
 import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
 import { ProfilePageResource } from "./resource"
@@ -15,10 +15,7 @@ import { ProfilePageResource } from "./resource"
 render(h(ProfilePageEntry, props()), document.body)
 
 function props(): ApplicationView<ProfilePageResource> {
-    const resource = newResource()
-    return initBaseView(resource, () => {
-        resource.change.terminate()
-    })
+    return toProfileView({ resource: newResource() })
 }
 function newResource() {
     const feature = newForegroundOutsideFeature()

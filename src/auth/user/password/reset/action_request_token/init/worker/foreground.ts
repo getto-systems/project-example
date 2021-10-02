@@ -4,36 +4,36 @@ import {
 } from "../../../../../../../../ui/vendor/getto-application/action/worker/foreground"
 
 import {
-    RequestPasswordResetTokenProxyMaterial,
-    RequestPasswordResetTokenProxyMessage,
-    RequestPasswordResetTokenProxyResponse,
+    RequestResetTokenProxyMaterial,
+    RequestResetTokenProxyMessage,
+    RequestResetTokenProxyResponse,
 } from "./message"
 
 import { RequestResetTokenMaterial } from "../../action"
 
-export interface RequestPasswordResetTokenProxy
+export interface RequestResetTokenProxy
     extends WorkerProxy<
-        RequestPasswordResetTokenProxyMessage,
-        RequestPasswordResetTokenProxyResponse
+        RequestResetTokenProxyMessage,
+        RequestResetTokenProxyResponse
     > {
     material(): RequestResetTokenMaterial
 }
-export function newRequestPasswordResetTokenProxy(
-    post: Post<RequestPasswordResetTokenProxyMessage>,
-): RequestPasswordResetTokenProxy {
+export function newRequestResetTokenProxy(
+    post: Post<RequestResetTokenProxyMessage>,
+): RequestResetTokenProxy {
     return new Proxy(post)
 }
 
 class Proxy
     extends WorkerAbstractProxy<
-        RequestPasswordResetTokenProxyMessage,
-        RequestPasswordResetTokenProxyResponse
+        RequestResetTokenProxyMessage,
+        RequestResetTokenProxyResponse
     >
-    implements RequestPasswordResetTokenProxy
+    implements RequestResetTokenProxy
 {
-    proxy: RequestPasswordResetTokenProxyMaterial
+    proxy: RequestResetTokenProxyMaterial
 
-    constructor(post: Post<RequestPasswordResetTokenProxyMessage>) {
+    constructor(post: Post<RequestResetTokenProxyMessage>) {
         super(post)
         this.proxy = {
             requestToken: this.method("requestToken", (message) => message),
@@ -45,7 +45,7 @@ class Proxy
             requestToken: (fields, post) => this.proxy.requestToken.call({ fields }, post),
         }
     }
-    resolve(response: RequestPasswordResetTokenProxyResponse): void {
+    resolve(response: RequestResetTokenProxyResponse): void {
         switch (response.method) {
             case "requestToken":
                 this.proxy.requestToken.resolve(response)

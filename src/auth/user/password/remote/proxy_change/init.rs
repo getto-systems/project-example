@@ -8,7 +8,7 @@ use getto_application::infra::ActionStatePubSub;
 
 use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideFeature;
 
-use crate::auth::ticket::remote::validate_metadata::init::ValidateTicketMetadataStruct;
+use crate::auth::ticket::remote::validate_metadata::init::ValidateApiMetadataStruct;
 use proxy_service::ProxyService;
 use request_decoder::RequestDecoder;
 use response_encoder::ResponseEncoder;
@@ -23,7 +23,7 @@ use crate::auth::user::password::remote::proxy_change::data::ChangePasswordProxy
 
 pub struct ChangePasswordProxyStruct<'a> {
     pubsub: ActionStatePubSub<AuthProxyEvent<ChangePasswordProxyMessage>>,
-    validate_infra: ValidateTicketMetadataStruct<'a>,
+    validate_infra: ValidateApiMetadataStruct<'a>,
     proxy_service: ProxyService<'a>,
     response_encoder: ResponseEncoder,
 }
@@ -36,7 +36,7 @@ impl<'a> ChangePasswordProxyStruct<'a> {
     ) -> Self {
         Self {
             pubsub: ActionStatePubSub::new(),
-            validate_infra: ValidateTicketMetadataStruct::new(&feature.decoding_key, request),
+            validate_infra: ValidateApiMetadataStruct::new(&feature.decoding_key, request),
             proxy_service: ProxyService::new(&feature.service, request_id),
             response_encoder: ResponseEncoder,
         }
@@ -62,7 +62,7 @@ impl<'a>
         ChangePasswordProxyMessage,
     > for ChangePasswordProxyStruct<'a>
 {
-    type ValidateInfra = ValidateTicketMetadataStruct<'a>;
+    type ValidateInfra = ValidateApiMetadataStruct<'a>;
     type ProxyService = ProxyService<'a>;
     type ResponseEncoder = ResponseEncoder;
 
