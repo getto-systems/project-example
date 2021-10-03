@@ -80,14 +80,9 @@ describe("SignView", () => {
         const runner = setupActionTestRunner(action.subscriber)
 
         await runner(async () => {
-            const state = await action.ignite()
-            switch (state.type) {
-                case "check-authTicket":
-                    await state.view.resource.ignite()
-            }
-            return state
+            return await action.ignite()
         }).then((stack) => {
-            expect(stack.map((state) => state.type)).toEqual(["check-authTicket", "password-reset"])
+            expect(stack.map((state) => state.type)).toEqual(["password-reset"])
         })
     })
 })

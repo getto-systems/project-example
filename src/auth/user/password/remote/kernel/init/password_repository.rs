@@ -1,6 +1,9 @@
 use chrono::{TimeZone, Utc};
 use sqlx::{query, MySql, MySqlPool, Transaction};
 
+use crate::auth::user::password::remote::kernel::data::{
+    ResetTokenDestination, ResetTokenDestinationExtract,
+};
 use crate::z_lib::remote::repository::{helper::infra_error, mysql::helper::mysql_error};
 
 use crate::auth::user::password::remote::kernel::infra::{
@@ -129,6 +132,7 @@ impl<'pool> RegisterResetTokenRepository for MysqlAuthUserPasswordRepository<'po
         &self,
         login_id: LoginId,
         reset_token: ResetToken,
+        destination: ResetTokenDestination,
         expires: ExpireDateTime,
         requested_at: AuthDateTime,
     ) -> Result<(), RegisterResetTokenRepositoryError> {
@@ -156,10 +160,25 @@ impl<'pool> RegisterResetTokenRepository for MysqlAuthUserPasswordRepository<'po
                 (?, ?, ?, ?, ?)
             #####",
             found.user_id,
-            reset_token.extract(),
+            reset_token.as_str(),
             login_id.extract(),
             expires.extract().naive_utc(),
             requested_at.extract().naive_utc(),
+        )
+        .execute(&mut conn)
+        .await
+        .map_err(request_reset_token_error)?;
+
+        query!(
+            r"#####
+            insert into user_password_reset_token_registered_destination
+                (user_id, reset_token, email)
+            values
+                (?, ?, ?)
+            #####",
+            found.user_id,
+            reset_token.as_str(),
+            destination.into_email(),
         )
         .execute(&mut conn)
         .await
@@ -197,16 +216,35 @@ impl<'pool> ResetPasswordRepository for MysqlAuthUserPasswordRepository<'pool> {
         .await
         .map_err(mysql_error)?;
 
-        Ok(found.map(|entry| {
-            ResetTokenEntryExtract {
-                login_id: entry.login_id,
-                expires: Utc.from_utc_datetime(&entry.expires),
-                reset_at: entry
-                    .reset_at
-                    .map(|reset_at| Utc.from_utc_datetime(&reset_at)),
-            }
-            .restore()
-        }))
+        let destination = query!(
+            r"#####
+            select
+                email
+            from user_password_reset_token_registered_destination
+            where reset_token = ?
+            #####",
+            reset_token.as_str(),
+        )
+        .fetch_optional(conn)
+        .await
+        .map_err(mysql_error)?;
+
+        match (found, destination) {
+            (Some(entry), Some(destination)) => Ok(Some(
+                ResetTokenEntryExtract {
+                    login_id: entry.login_id,
+                    destination: ResetTokenDestinationExtract {
+                        email: destination.email,
+                    },
+                    expires: Utc.from_utc_datetime(&entry.expires),
+                    reset_at: entry
+                        .reset_at
+                        .map(|reset_at| Utc.from_utc_datetime(&reset_at)),
+                }
+                .restore(),
+            )),
+            _ => Ok(None),
+        }
     }
 
     async fn reset_password<'a>(
@@ -303,6 +341,7 @@ pub mod test {
 
     use chrono::{DateTime, Utc};
 
+    use crate::auth::user::password::remote::kernel::data::{ResetTokenDestination, ResetTokenDestinationExtract};
     use crate::z_lib::remote::repository::helper::infra_error;
 
     use crate::auth::user::password::remote::kernel::infra::{
@@ -337,6 +376,7 @@ pub mod test {
     struct ResetEntry {
         user_id: AuthUserId,
         login_id: String,
+        destination: ResetTokenDestinationExtract,
         expires: DateTime<Utc>,
         reset_at: Option<DateTime<Utc>>,
     }
@@ -376,6 +416,7 @@ pub mod test {
             login_id: LoginId,
             user_id: AuthUserId,
             reset_token: ResetToken,
+            destination: ResetTokenDestination,
             expires: ExpireDateTime,
             discard_at: Option<AuthDateTime>,
         ) -> Self {
@@ -387,6 +428,7 @@ pub mod test {
                     ResetEntry {
                         user_id,
                         login_id: login_id.extract(),
+                        destination: destination.extract(),
                         expires: expires.extract(),
                         reset_at: discard_at.map(|discard_at| discard_at.extract()),
                     },
@@ -511,6 +553,7 @@ pub mod test {
             &self,
             login_id: LoginId,
             reset_token: ResetToken,
+            destination: ResetTokenDestination,
             expires: ExpireDateTime,
             _requested_at: AuthDateTime,
         ) -> Result<(), RegisterResetTokenRepositoryError> {
@@ -543,6 +586,7 @@ pub mod test {
                     ResetEntry {
                         user_id: target_user_id,
                         login_id: login_id.extract(),
+                        destination: destination.extract(),
                         expires: expires.extract(),
                         reset_at: None,
                     },
@@ -565,6 +609,7 @@ pub mod test {
                 let entry = entry.clone();
                 ResetTokenEntryExtract {
                     login_id: entry.login_id,
+                    destination: entry.destination,
                     expires: entry.expires,
                     reset_at: entry.reset_at,
                 }

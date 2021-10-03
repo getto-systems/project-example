@@ -16,27 +16,6 @@ impl std::fmt::Display for RequestResetTokenError {
     }
 }
 
-#[derive(Clone)]
-pub struct ResetTokenDestination {
-    email: String,
-}
-
-impl ResetTokenDestination {
-    pub fn into_email(self) -> String {
-        self.email
-    }
-}
-
-pub struct ResetTokenDestinationExtract {
-    pub email: String,
-}
-
-impl ResetTokenDestinationExtract {
-    pub(in crate::auth) fn restore(self) -> ResetTokenDestination {
-        ResetTokenDestination { email: self.email }
-    }
-}
-
 pub struct NotifyResetTokenResponse {
     message_id: String,
 }

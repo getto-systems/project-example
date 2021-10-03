@@ -10,12 +10,15 @@ use super::super::event::ResetPasswordEvent;
 
 use crate::auth::user::password::{
     remote::kernel::data::VerifyResetTokenEntryError,
-    reset::remote::reset::data::{DecodeResetTokenError, ResetPasswordError},
+    reset::remote::reset::data::{
+        DecodeResetTokenError, NotifyResetPasswordError, ResetPasswordError,
+    },
 };
 
 impl RespondTo<ResetPasswordResponsePb> for ResetPasswordEvent {
     fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
         match self {
+            Self::ResetNotified(_) => Err(Status::cancelled("reset password cancelled")),
             Self::Success(_) => Err(Status::cancelled("reset password cancelled")),
             Self::InvalidReset(err) => err.respond_to(),
             Self::UserNotFound => Err(Status::internal("user not found")),
@@ -23,6 +26,7 @@ impl RespondTo<ResetPasswordResponsePb> for ResetPasswordEvent {
             Self::RepositoryError(err) => err.respond_to(),
             Self::PasswordHashError(err) => err.respond_to(),
             Self::DecodeError(err) => err.respond_to(),
+            Self::NotifyError(err) => err.respond_to(),
         }
     }
 }
@@ -63,5 +67,13 @@ impl Into<ResetPasswordErrorKindPb> for VerifyResetTokenEntryError {
 impl<T> RespondTo<T> for DecodeResetTokenError {
     fn respond_to(self) -> Result<Response<T>, Status> {
         Err(Status::unauthenticated("failed to decode reset token"))
+    }
+}
+
+impl<T> RespondTo<T> for NotifyResetPasswordError {
+    fn respond_to(self) -> Result<Response<T>, Status> {
+        match self {
+            Self::InfraError(_) => Err(Status::internal("notify reset password error")),
+        }
     }
 }

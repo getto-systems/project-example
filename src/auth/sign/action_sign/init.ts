@@ -12,24 +12,29 @@ export function initSignAction(detecter: SignViewDetecter, subView: SignSubView)
 class Action extends ApplicationAbstractStateAction<SignActionState> implements SignAction {
     readonly initialState = initialSignViewState
 
-    detecter: SignViewDetecter
     subView: SignSubView
 
     constructor(detecter: SignViewDetecter, subView: SignSubView) {
         super(async () => {
             const view = this.subView.check()
+            const viewType = detecter()
 
             view.resource.subscriber.subscribe((state) => {
                 switch (state.type) {
                     case "required-to-login":
-                        this.post(this.mapViewType(this.detecter()))
+                        this.post(this.mapViewType(viewType))
                         return
                 }
             })
 
+            if (viewType.valid) {
+                switch (viewType.value) {
+                    case "password-reset":
+                        return this.post(this.mapViewType(viewType))
+                }
+            }
             return this.post({ type: "check-authTicket", view: view })
         })
-        this.detecter = detecter
         this.subView = subView
     }
 

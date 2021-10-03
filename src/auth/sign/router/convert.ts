@@ -11,7 +11,21 @@ import {
 
 import { SignViewType } from "./data"
 
-export function detectStaticSignViewVariant(
+export function detectSignViewType(currentURL: URL): ConvertLocationResult<SignViewType> {
+    const staticView = detectStaticSignViewVariant(currentURL)
+    if (staticView.valid) {
+        return { valid: true, value: staticViewType(staticView.value) }
+    }
+
+    const resetPassword = detectResetPasswordVariant(currentURL)
+    if (resetPassword.valid) {
+        return { valid: true, value: resetPasswordViewType(resetPassword.value) }
+    }
+
+    return { valid: false }
+}
+
+function detectStaticSignViewVariant(
     currentURL: URL,
 ): ConvertLocationResult<StaticSignViewVariant> {
     const search = currentURL.searchParams.get(signNavKey(SignNav.static))
@@ -25,7 +39,7 @@ export function detectStaticSignViewVariant(
     return { valid: false }
 }
 
-export function detectResetPasswordVariant(
+function detectResetPasswordVariant(
     currentURL: URL,
 ): ConvertLocationResult<ResetPasswordVariant> {
     const search = currentURL.searchParams.get(signNavKey(SignNav.passwordReset))
@@ -36,20 +50,6 @@ export function detectResetPasswordVariant(
         // search が ResetPasswordVariant のメンバーなら、string は ResetPasswordVariantKey である
         return { valid: true, value: ResetPasswordVariant[search as ResetPasswordVariantKey] }
     }
-    return { valid: false }
-}
-
-export function detectSignViewType(currentURL: URL): ConvertLocationResult<SignViewType> {
-    const staticView = detectStaticSignViewVariant(currentURL)
-    if (staticView.valid) {
-        return { valid: true, value: staticViewType(staticView.value) }
-    }
-
-    const resetPassword = detectResetPasswordVariant(currentURL)
-    if (resetPassword.valid) {
-        return { valid: true, value: resetPasswordViewType(resetPassword.value) }
-    }
-
     return { valid: false }
 }
 

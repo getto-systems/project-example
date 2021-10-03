@@ -35,7 +35,8 @@ use crate::auth::{
             },
             reset::remote::reset::init::{
                 request_decoder::test::StaticResetPasswordRequestDecoder,
-                test::StaticResetPasswordStruct, token_decoder::test::StaticResetTokenDecoder,
+                reset_notifier::test::StaticResetPasswordNotifier, test::StaticResetPasswordStruct,
+                token_decoder::test::StaticResetTokenDecoder,
             },
         },
         remote::kernel::init::user_repository::test::{
@@ -60,7 +61,7 @@ use crate::auth::{
     },
     user::{
         login_id::remote::data::LoginId,
-        password::remote::kernel::data::ResetToken,
+        password::remote::kernel::data::{ResetToken, ResetTokenDestinationExtract},
         remote::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
     },
 };
@@ -78,6 +79,7 @@ async fn success_request_token() {
 
     let result = action.ignite(request_decoder).await;
     assert_state(vec![
+        "reset password notified; message-id: message-id",
         "reset password success; user: user-id (granted: [])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
         "issue success; ticket: ticket-id / user: user-id (granted: [])",
@@ -100,6 +102,7 @@ async fn success_expired_nonce() {
 
     let result = action.ignite(request_decoder).await;
     assert_state(vec![
+        "reset password notified; message-id: message-id",
         "reset password success; user: user-id (granted: [])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
         "issue success; ticket: ticket-id / user: user-id (granted: [])",
@@ -246,6 +249,7 @@ async fn just_max_length_password() {
 
     let result = action.ignite(request_decoder).await;
     assert_state(vec![
+        "reset password notified; message-id: message-id",
         "reset password success; user: user-id (granted: [])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
         "issue success; ticket: ticket-id / user: user-id (granted: [])",
@@ -467,6 +471,7 @@ impl<'a> TestFeature<'a> {
                 user_repository: MemoryAuthUserRepository::new(&store.user),
                 password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
                 token_decoder,
+                reset_notifier: StaticResetPasswordNotifier,
             },
             issue: StaticIssueAuthTicketStruct {
                 clock: standard_clock(),
@@ -492,6 +497,7 @@ const NONCE: &'static str = "nonce";
 const USER_ID: &'static str = "user-id";
 const LOGIN_ID: &'static str = "login-id";
 const RESET_TOKEN: &'static str = "reset-token";
+const EMAIL: &'static str = "email@example.com";
 
 fn standard_nonce_config() -> AuthNonceConfig {
     AuthNonceConfig {
@@ -631,12 +637,17 @@ fn standard_ticket_store() -> MemoryAuthTicketStore {
 
 fn standard_password_store() -> MemoryAuthUserPasswordStore {
     let reset_token = ResetToken::new(RESET_TOKEN.into());
+    let destination = ResetTokenDestinationExtract {
+        email: EMAIL.into(),
+    }
+    .restore();
     let expires = AuthDateTime::restore(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(1)));
     MemoryAuthUserPasswordMap::with_reset_token(
         test_user_login_id(),
         test_user_id(),
         reset_token,
+        destination,
         expires,
         None,
     )
@@ -647,12 +658,17 @@ fn not_stored_password_store() -> MemoryAuthUserPasswordStore {
 }
 fn expired_reset_token_password_store() -> MemoryAuthUserPasswordStore {
     let reset_token = ResetToken::new(RESET_TOKEN.into());
+    let destination = ResetTokenDestinationExtract {
+        email: EMAIL.into(),
+    }
+    .restore();
     let expires = AuthDateTime::restore(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(-1)));
     MemoryAuthUserPasswordMap::with_reset_token(
         test_user_login_id(),
         test_user_id(),
         reset_token,
+        destination,
         expires,
         None,
     )
@@ -660,6 +676,10 @@ fn expired_reset_token_password_store() -> MemoryAuthUserPasswordStore {
 }
 fn discarded_reset_token_password_store() -> MemoryAuthUserPasswordStore {
     let reset_token = ResetToken::new(RESET_TOKEN.into());
+    let destination = ResetTokenDestinationExtract {
+        email: EMAIL.into(),
+    }
+    .restore();
     let expires = AuthDateTime::restore(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(1)));
     let discarded_at = AuthDateTime::restore(standard_now() - Duration::days(1));
@@ -667,6 +687,7 @@ fn discarded_reset_token_password_store() -> MemoryAuthUserPasswordStore {
         test_user_login_id(),
         test_user_id(),
         reset_token,
+        destination,
         expires,
         Some(discarded_at),
     )

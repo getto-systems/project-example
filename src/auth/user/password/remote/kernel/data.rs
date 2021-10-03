@@ -17,6 +17,33 @@ impl ResetToken {
     }
 }
 
+#[derive(Clone)]
+pub struct ResetTokenDestination {
+    email: String,
+}
+
+impl ResetTokenDestination {
+    #[cfg(test)]
+    pub fn extract(self) -> ResetTokenDestinationExtract {
+        ResetTokenDestinationExtract { email: self.email }
+    }
+
+    pub fn into_email(self) -> String {
+        self.email
+    }
+}
+
+#[derive(Clone)]
+pub struct ResetTokenDestinationExtract {
+    pub email: String,
+}
+
+impl ResetTokenDestinationExtract {
+    pub(in crate::auth) fn restore(self) -> ResetTokenDestination {
+        ResetTokenDestination { email: self.email }
+    }
+}
+
 pub enum VerifyResetTokenEntryError {
     ResetTokenEntryNotFound,
     LoginIdNotMatched,

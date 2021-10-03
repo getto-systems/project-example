@@ -58,7 +58,13 @@ pub async fn request_reset_token<S>(
     ));
 
     password_repository
-        .register_reset_token(login_id, reset_token.clone(), expires.clone(), requested_at)
+        .register_reset_token(
+            login_id,
+            reset_token.clone(),
+            destination.clone(),
+            expires.clone(),
+            requested_at,
+        )
         .await
         .map_err(|err| post(err.into()))?;
 

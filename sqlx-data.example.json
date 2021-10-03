@@ -10,6 +10,16 @@
       "nullable": []
     }
   },
+  "0937aa48fcb58f32fa633995d54355b2fe8e028015bac72f5e99463bbc4afb08": {
+    "query": "#####\n            insert into user_password_reset_token_registered_destination\n                (user_id, reset_token, email)\n            values\n                (?, ?, ?)\n            #####",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Right": 3
+      },
+      "nullable": []
+    }
+  },
   "117a9d9e282d9cb39a0ba129af1ecde88bec09979364250c8e7bcbf2762d766e": {
     "query": "#####\n        delete from user_password\n        where user_id = ?\n        #####",
     "describe": {
@@ -272,6 +282,31 @@
         "Right": 1
       },
       "nullable": []
+    }
+  },
+  "dff3a87dddef8486d63ee6a66fe85a7e5afb29d4e7c5fcc05d676c4223efdfd0": {
+    "query": "#####\n            select\n                email\n            from user_password_reset_token_registered_destination\n            where reset_token = ?\n            #####",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "email",
+          "type_info": {
+            "type": "VarString",
+            "flags": {
+              "bits": 4097
+            },
+            "char_set": 224,
+            "max_size": 1000
+          }
+        }
+      ],
+      "parameters": {
+        "Right": 1
+      },
+      "nullable": [
+        false
+      ]
     }
   },
   "e35023ae18c6b874c27e75fd9ec06640cd41174b706c6d5b73650c2306223a07": {

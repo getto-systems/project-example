@@ -1,4 +1,5 @@
 pub mod request_decoder;
+pub mod reset_notifier;
 pub mod token_decoder;
 
 use crate::auth::{
@@ -7,9 +8,12 @@ use crate::auth::{
         check_nonce::init::CheckAuthNonceStruct, kernel::init::clock::ChronoAuthClock,
     },
     user::{
-        password::remote::kernel::init::{
-            password_hasher::Argon2PasswordHasher,
-            password_repository::MysqlAuthUserPasswordRepository,
+        password::{
+            remote::kernel::init::{
+                password_hasher::Argon2PasswordHasher,
+                password_repository::MysqlAuthUserPasswordRepository,
+            },
+            reset::remote::reset::init::reset_notifier::EmailResetPasswordNotifier,
         },
         remote::kernel::init::user_repository::MysqlAuthUserRepository,
     },
@@ -25,6 +29,7 @@ pub struct ResetPasswordStruct<'a> {
     user_repository: MysqlAuthUserRepository<'a>,
     password_repository: MysqlAuthUserPasswordRepository<'a>,
     token_decoder: JwtResetTokenDecoder<'a>,
+    reset_notifier: EmailResetPasswordNotifier<'a>,
 }
 
 impl<'a> ResetPasswordStruct<'a> {
@@ -35,6 +40,7 @@ impl<'a> ResetPasswordStruct<'a> {
             user_repository: MysqlAuthUserRepository::new(&feature.store.mysql),
             password_repository: MysqlAuthUserPasswordRepository::new(&feature.store.mysql),
             token_decoder: JwtResetTokenDecoder::new(&feature.reset_token_key),
+            reset_notifier: EmailResetPasswordNotifier::new(&feature.email),
         }
     }
 }
@@ -46,6 +52,7 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
     type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
     type PasswordHasher = Argon2PasswordHasher;
     type TokenDecoder = JwtResetTokenDecoder<'a>;
+    type ResetNotifier = EmailResetPasswordNotifier<'a>;
 
     fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
         &self.check_nonce_infra
@@ -62,6 +69,9 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
     fn token_decoder(&self) -> &Self::TokenDecoder {
         &self.token_decoder
     }
+    fn reset_notifier(&self) -> &Self::ResetNotifier {
+        &self.reset_notifier
+    }
 }
 
 #[cfg(test)]
@@ -73,9 +83,12 @@ pub mod test {
             kernel::init::clock::test::StaticChronoAuthClock,
         },
         user::{
-            password::remote::kernel::init::{
-                password_hasher::test::PlainPasswordHasher,
-                password_repository::test::MemoryAuthUserPasswordRepository,
+            password::{
+                remote::kernel::init::{
+                    password_hasher::test::PlainPasswordHasher,
+                    password_repository::test::MemoryAuthUserPasswordRepository,
+                },
+                reset::remote::reset::init::reset_notifier::test::StaticResetPasswordNotifier,
             },
             remote::kernel::init::user_repository::test::MemoryAuthUserRepository,
         },
@@ -89,6 +102,7 @@ pub mod test {
         pub user_repository: MemoryAuthUserRepository<'a>,
         pub password_repository: MemoryAuthUserPasswordRepository<'a>,
         pub token_decoder: StaticResetTokenDecoder,
+        pub reset_notifier: StaticResetPasswordNotifier,
     }
 
     impl<'a> ResetPasswordInfra for StaticResetPasswordStruct<'a> {
@@ -98,6 +112,7 @@ pub mod test {
         type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
         type PasswordHasher = PlainPasswordHasher;
         type TokenDecoder = StaticResetTokenDecoder;
+        type ResetNotifier = StaticResetPasswordNotifier;
 
         fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
             &self.check_nonce_infra
@@ -113,6 +128,9 @@ pub mod test {
         }
         fn token_decoder(&self) -> &Self::TokenDecoder {
             &self.token_decoder
+        }
+        fn reset_notifier(&self) -> &Self::ResetNotifier {
+            &self.reset_notifier
         }
     }
 }
