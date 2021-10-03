@@ -79,6 +79,7 @@ async fn success_request_token() {
 
     let result = action.ignite(request_decoder).await;
     assert_state(vec![
+        "reset password notified; message-id: message-id",
         "reset password success; user: user-id (granted: [])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
         "issue success; ticket: ticket-id / user: user-id (granted: [])",
@@ -101,6 +102,7 @@ async fn success_expired_nonce() {
 
     let result = action.ignite(request_decoder).await;
     assert_state(vec![
+        "reset password notified; message-id: message-id",
         "reset password success; user: user-id (granted: [])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
         "issue success; ticket: ticket-id / user: user-id (granted: [])",
@@ -247,6 +249,7 @@ async fn just_max_length_password() {
 
     let result = action.ignite(request_decoder).await;
     assert_state(vec![
+        "reset password notified; message-id: message-id",
         "reset password success; user: user-id (granted: [])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
         "issue success; ticket: ticket-id / user: user-id (granted: [])",

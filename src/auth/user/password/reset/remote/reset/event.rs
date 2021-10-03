@@ -39,7 +39,7 @@ const ERROR: &'static str = "reset password error";
 impl std::fmt::Display for ResetPasswordEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::ResetNotified(response) => write!(f, "reset token notified; {}", response),
+            Self::ResetNotified(response) => write!(f, "reset password notified; {}", response),
             Self::Success(user) => write!(f, "{}; {}", SUCCESS, user),
             Self::InvalidReset(err) => write!(f, "{}; {}", ERROR, err),
             Self::UserNotFound => write!(f, "{}; user not found", ERROR),

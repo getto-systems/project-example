@@ -113,7 +113,7 @@ export function ResetPasswordComponent(props: Props): VNode {
                 body: [
                     h(InputLoginIDEntry, {
                         field: props.reset.loginID,
-                        help: ["入力したログインIDを入力してください"],
+                        help: ["入力したログインIDをもう一度入力してください"],
                     }),
                     h(InputPasswordEntry, {
                         field: props.reset.password,
