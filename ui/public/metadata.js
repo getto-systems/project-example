@@ -8,6 +8,7 @@ const headers = {
     "connect-src " + [
       "'self'",
       "https://api.example.getto.systems/",
+      "https://secure.example.getto.systems/",
     ].join(" "),
     "frame-src 'none'",
     "frame-ancestors 'none'",
@@ -16,7 +17,6 @@ const headers = {
     "manifest-src 'self'",
     "script-src " + [
       "'self'",
-      "https://example.getto.systems/",
       "https://secure.example.getto.systems/",
     ].join(" "),
     "worker-src blob:",
