@@ -17,6 +17,7 @@ const headers = {
     "script-src " + [
       "'self'",
       "https://example.getto.systems/",
+      "https://secure.example.getto.systems/",
     ].join(" "),
     "worker-src blob:",
     "style-src " + [
