@@ -1,5 +1,6 @@
 const headers = {
   "access-control-allow-origin": "https://example.getto.systems",
+  "access-control-allow-credentials": "true",
   "strict-transport-security": "max-age=31536000",
   "content-security-policy": [
     "default-src 'none'",
