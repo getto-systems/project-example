@@ -1,20 +1,20 @@
-import { env } from "../../../../../y_environment/ui/env"
-import pb from "../../../../../y_protobuf/proto.js"
+import { env } from "../../../../y_environment/ui/env"
+import pb from "../../../../y_protobuf/proto.js"
 
 import {
     fetchOptions,
     generateNonce,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../z_lib/ui/remote/helper"
-import { decodeProtobuf } from "../../../../../../ui/vendor/protobuf/helper"
+} from "../../../../z_lib/ui/remote/helper"
+import { decodeProtobuf } from "../../../../../ui/vendor/protobuf/helper"
 
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
+import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
 
-import { Clock } from "../../../../../z_lib/ui/clock/infra"
-import { RenewAuthTicketRemote } from "../../infra"
+import { Clock } from "../../../../z_lib/ui/clock/infra"
+import { RenewAuthTicketRemote } from "../infra"
 
-import { convertAuthRemote } from "../../convert"
+import { convertAuthRemote } from "../convert"
 
 export function newRenewAuthTicketRemote(
     feature: RemoteOutsideFeature,

@@ -1,6 +1,6 @@
-import { remoteInfraError, remoteServerError } from "../../../../../z_lib/ui/remote/helper"
+import { remoteInfraError, remoteServerError } from "../../../../z_lib/ui/remote/helper"
 
-import { CheckDeployExistsRemote } from "../../infra"
+import { CheckDeployExistsRemote } from "../infra"
 
 export function newCheckDeployExistsRemote(): CheckDeployExistsRemote {
     return async (url) => {
