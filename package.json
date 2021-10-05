@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "getto-project-example-ui",
-  "version": "0.20.2-ui",
+  "version": "0.20.3-ui",
   "scripts": {
     "storybook": "cd storybook && npm run build",
     "start:public": "webpack serve --mode development --config ui/public/webpack.config.js",
