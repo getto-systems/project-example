@@ -2,7 +2,7 @@ import { auth_config } from "../../x_outside_feature/config"
 
 import { newAuthnRepository } from "../kernel/init/repository/authn"
 import { newAuthzRepository } from "../kernel/init/repository/authz"
-import { newRenewAuthTicketRemote } from "../kernel/init/remote/renew"
+import { newRenewAuthTicketRemote } from "../kernel/init/remote"
 
 import { newClock } from "../../../z_lib/ui/clock/init"
 

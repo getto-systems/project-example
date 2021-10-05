@@ -3,7 +3,7 @@ import { avail_config } from "../../x_outside_feature/config"
 
 import { toURL } from "../../../z_lib/ui/location/init"
 
-import { newCheckDeployExistsRemote } from "./init/remote/check_deploy_exists"
+import { newCheckDeployExistsRemote } from "./init/remote"
 
 import { FindNextVersionDetecter } from "./method"
 
