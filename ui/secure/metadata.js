@@ -1,6 +1,7 @@
 const headers = {
+  // worker.js は fetch されるので cors ヘッダが必要
   "access-control-allow-origin": "https://example.getto.systems",
-  "access-control-allow-credentials": "true",
+  "access-control-allow-credentials": "true", // secure 用の cookie を送信する
   "strict-transport-security": "max-age=31536000",
   "content-security-policy": [
     "default-src 'none'",
