@@ -16,7 +16,8 @@ const headers = {
     "manifest-src 'self'",
     "script-src " + [
       "'self'",
-      "https://secure.example.getto.systems/",
+      "blob:https://example.getto.systems/",
+      "blob:https://secure.example.getto.systems/",
     ].join(" "),
     "style-src " + [
       "'self'",

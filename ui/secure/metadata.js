@@ -11,12 +11,8 @@ const headers = {
     "img-src 'self'",
     "font-src 'self'",
     "manifest-src 'self'",
-    "script-src " + [
-      "'self'",
-    ].join(" "),
-    "style-src " + [
-      "'self'",
-    ].join(" "),
+    "script-src 'self'",
+    "style-src 'self'",
   ].join(";"),
   "x-content-type-options": "nosniff",
   "x-frame-options": "DENY",
