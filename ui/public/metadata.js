@@ -17,9 +17,8 @@ const headers = {
     "script-src " + [
       "'self'",
       "https://example.getto.systems/",
-      "blob:https://example.getto.systems/",
-      "blob:https://secure.example.getto.systems/",
     ].join(" "),
+    "worker-src blob:",
     "style-src " + [
       "'self'",
       "https://trellis.getto.systems/css/",
