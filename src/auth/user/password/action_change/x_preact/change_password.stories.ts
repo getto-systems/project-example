@@ -23,7 +23,7 @@ const options = [
 ] as const
 
 export default {
-    title: "main/Auth/Password/Change",
+    title: "main/Auth/User/Password/Change",
     argTypes: {
         change: {
             control: { type: "select", options },

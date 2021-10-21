@@ -1,4 +1,4 @@
-import { FindNextVersionDetecter } from "./method"
+import { FindNextVersionDetecter } from "./infra"
 
 import { detectApplicationTargetPath } from "./convert"
 

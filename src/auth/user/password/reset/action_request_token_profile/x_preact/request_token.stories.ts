@@ -23,7 +23,7 @@ const options = [
 ] as const
 
 export default {
-    title: "main/Auth/Password/Reset/Request Token Profile",
+    title: "main/Auth/User/Password/Reset/Request Token Profile",
     argTypes: {
         request: {
             control: { type: "select", options },

@@ -2,9 +2,7 @@ import { ApplicationAbstractStateAction } from "../../../../ui/vendor/getto-appl
 
 import { findNextVersion } from "../find_next/method"
 
-import { FindNextVersionInfra } from "../find_next/infra"
-
-import { FindNextVersionDetecter } from "../find_next/method"
+import { FindNextVersionInfra, FindNextVersionDetecter } from "../find_next/infra"
 
 import {
     FindNextVersionMaterial,

@@ -1,6 +1,6 @@
-import { detectMenuTargetPath } from "./convert"
+import { LoadMenuDetecter } from "./infra"
 
-import { LoadMenuDetecter } from "./method"
+import { detectMenuTargetPath } from "./convert"
 
 export function mockLoadMenuLocationDetecter(currentURL: URL, version: string): LoadMenuDetecter {
     return () => detectMenuTargetPath(currentURL, version)

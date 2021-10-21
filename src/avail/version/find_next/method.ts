@@ -19,10 +19,6 @@ export interface FindNextVersionMethod {
     ): Promise<S>
 }
 
-export interface FindNextVersionDetecter {
-    (): ConvertLocationResult<ApplicationTargetPath>
-}
-
 interface Find {
     (infra: FindNextVersionInfra): FindNextVersionMethod
 }

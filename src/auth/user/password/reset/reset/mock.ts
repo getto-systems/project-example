@@ -1,4 +1,4 @@
-import { ResetPasswordDetecter } from "./method"
+import { ResetPasswordDetecter } from "./infra"
 
 import { detectResetToken } from "../../input/convert"
 

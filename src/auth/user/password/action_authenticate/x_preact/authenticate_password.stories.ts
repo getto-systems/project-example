@@ -22,7 +22,7 @@ const options = [
 ] as const
 
 export default {
-    title: "main/Auth/Password/Authenticate",
+    title: "main/Auth/User/Password/Authenticate",
     parameters: {
         layout: "fullscreen",
     },

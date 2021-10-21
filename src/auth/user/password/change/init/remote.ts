@@ -26,6 +26,7 @@ export function newChangePasswordRemote(feature: RemoteOutsideFeature): ChangePa
 
             const opts = fetchOptions({
                 serverURL: env.apiServerURL,
+                // TODO /auth/user/password/change にしたい
                 path: "/auth/password/change",
                 method: "POST",
                 headers: [[env.apiServerNonceHeader, generateNonce(feature)]],

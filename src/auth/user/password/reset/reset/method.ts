@@ -9,10 +9,6 @@ import { ConvertLocationResult } from "../../../../../z_lib/ui/location/data"
 import { ResetToken } from "../../input/data"
 import { ResetPasswordFields } from "./data"
 
-export interface ResetPasswordDetecter {
-    (): ConvertLocationResult<ResetToken>
-}
-
 export interface ResetPasswordMethod {
     <S>(
         resetToken: ConvertLocationResult<ResetToken>,

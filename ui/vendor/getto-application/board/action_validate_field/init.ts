@@ -8,8 +8,9 @@ import {
     ValidateBoardFieldMaterial,
 } from "./action"
 
-import { ConvertBoardFieldResult } from "../validate_field/data"
 import { BoardFieldChecker, ValidateBoardFieldInfra } from "../validate_field/infra"
+
+import { ConvertBoardFieldResult } from "../validate_field/data"
 
 export function initValidateBoardFieldAction<T, E>(
     infra: ValidateBoardFieldInfra<T, E>,

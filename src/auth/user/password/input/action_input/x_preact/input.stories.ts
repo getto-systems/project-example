@@ -1,24 +1,24 @@
 import { h } from "preact"
 
-import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
+import { storyTemplate } from "../../../../../../../ui/vendor/storybook/preact/story"
 
 import { InputPasswordComponent } from "./input"
 
-import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
+import { markBoardValue } from "../../../../../../../ui/vendor/getto-application/board/kernel/mock"
 
 import { mockInputPasswordAction } from "../mock"
 
-import { PASSWORD_MAX_LENGTH } from "../../input/convert"
+import { PASSWORD_MAX_LENGTH } from "../../convert"
 
 import { ValidatePasswordState } from "../action"
 
-import { PasswordCharacterState } from "../../input/data"
+import { PasswordCharacterState } from "../../data"
 
 const validateOptions = ["valid", "empty", "too-long"] as const
 const characterOptions = ["singleByte", "multiByte"] as const
 
 export default {
-    title: "library/Auth/Common/Fields/Input Password",
+    title: "library/Auth/User/Password/Input/Input Password",
     argTypes: {
         validate: {
             control: { type: "select", options: validateOptions },

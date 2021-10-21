@@ -5,11 +5,9 @@ import { toURL } from "../../../z_lib/ui/location/init"
 
 import { newCheckDeployExistsRemote } from "./init/remote"
 
-import { FindNextVersionDetecter } from "./method"
-
 import { LocationOutsideFeature } from "../../../z_lib/ui/location/feature"
 
-import { FindNextVersionInfra } from "./infra"
+import { FindNextVersionInfra, FindNextVersionDetecter } from "./infra"
 
 import { detectApplicationTargetPath } from "./convert"
 

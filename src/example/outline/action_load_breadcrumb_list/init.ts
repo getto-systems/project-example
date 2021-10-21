@@ -1,6 +1,6 @@
 import { loadBreadcrumbList } from "../load_breadcrumb_list/method"
-import { LoadMenuDetecter } from "../kernel/method"
 
+import { LoadMenuDetecter } from "../kernel/infra"
 import { LoadBreadcrumbListInfra } from "../load_breadcrumb_list/infra"
 
 import { LoadBreadcrumbListAction, LoadBreadcrumbListMaterial } from "./action"

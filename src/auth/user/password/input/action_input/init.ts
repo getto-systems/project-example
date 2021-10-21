@@ -1,16 +1,16 @@
-import { initInputBoardAction } from "../../../../../ui/vendor/getto-application/board/action_input/init"
-import { initValidateBoardFieldAction } from "../../../../../ui/vendor/getto-application/board/action_validate_field/init"
+import { initInputBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_input/init"
+import { initValidateBoardFieldAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/init"
 
-import { checkPasswordCharacter } from "../check_character/method"
+import { checkPasswordCharacter } from "../../check_character/method"
 
 import { InputPasswordAction } from "./action"
 
-import { passwordBoardConverter } from "../input/convert"
+import { passwordBoardConverter } from "../convert"
 
-import { BoardFieldChecker } from "../../../../../ui/vendor/getto-application/board/validate_field/infra"
+import { BoardFieldChecker } from "../../../../../../ui/vendor/getto-application/board/validate_field/infra"
 
-import { emptyBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/data"
-import { Password, ValidatePasswordError } from "../input/data"
+import { emptyBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/data"
+import { Password, ValidatePasswordError } from "../data"
 
 export function initInputPasswordAction(): Readonly<{
     input: InputPasswordAction

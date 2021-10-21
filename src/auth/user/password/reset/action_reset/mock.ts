@@ -2,7 +2,7 @@ import { ApplicationMockStateAction } from "../../../../../../ui/vendor/getto-ap
 
 import { initSignLink } from "../../../../sign/action_nav/init"
 import { mockInputLoginIDAction } from "../../../login_id/input/action_input/mock"
-import { mockInputPasswordAction } from "../../action_input/mock"
+import { mockInputPasswordAction } from "../../input/action_input/mock"
 import { mockValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/mock"
 
 import { initialResetPasswordState, ResetPasswordAction, ResetPasswordState } from "./action"

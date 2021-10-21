@@ -1,6 +1,6 @@
 import { ApplicationStateAction } from "../../../../../ui/vendor/getto-application/action/action"
 
-import { InputPasswordAction } from "../action_input/action"
+import { InputPasswordAction } from "../input/action_input/action"
 import { ValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/action"
 
 import { ChangePasswordMethod } from "../change/method"

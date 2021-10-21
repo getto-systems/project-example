@@ -6,13 +6,13 @@ import { loadMenu } from "../load_menu/method"
 import { updateMenuBadge } from "../update_menu_badge/method"
 import { hideMenuExpand, showMenuExpand } from "../toggle_menu_expand/method"
 
+import { LoadMenuDetecter } from "../kernel/infra"
 import { LoadMenuInfra, LoadMenuStore } from "../load_menu/infra"
 import { UpdateMenuBadgeInfra, UpdateMenuBadgeStore } from "../update_menu_badge/infra"
 import { ToggleMenuExpandInfra, ToggleMenuExpandStore } from "../toggle_menu_expand/infra"
 
 import { LoadMenuMaterial, LoadMenuAction, LoadMenuState, initialLoadMenuState } from "./action"
 
-import { LoadMenuDetecter } from "../kernel/method"
 
 import { MenuCategoryPath } from "../kernel/data"
 

@@ -16,7 +16,7 @@ import { InputLoginIDResource, InputLoginIDResourceState } from "../resource"
 
 import { ValidateBoardFieldState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_field/action"
 
-import { ValidateLoginIDError } from "../../data"
+import { loginIDLabel, ValidateLoginIDError } from "../../data"
 
 type InputLoginIDOptions =
     | Readonly<{ title: VNodeContent; help: VNodeContent[] }>
@@ -40,7 +40,7 @@ export function InputLoginIDComponent(props: Props): VNode {
 
     function content() {
         const content = {
-            title: "ログインID",
+            title: loginIDLabel,
             body: h(InputBoardComponent, { type: "text", input: props.field.input }),
             help: help(),
         }

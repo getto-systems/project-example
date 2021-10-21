@@ -32,6 +32,7 @@ export function newAuthenticatePasswordRemote(
 
             const opts = fetchOptions({
                 serverURL: env.apiServerURL,
+                // TODO /auth/user/password/authenticate にしたい
                 path: "/auth/password/authenticate",
                 method: "POST",
                 headers: [[env.apiServerNonceHeader, generateNonce(feature)]],

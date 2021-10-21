@@ -3,7 +3,7 @@ import { toURL } from "../../../z_lib/ui/location/init"
 
 import { GetScriptPathInfra, SecureServerURL } from "./infra"
 
-import { GetScriptPathDetecter } from "./method"
+import { GetScriptPathDetecter } from "./infra"
 import { LocationOutsideFeature } from "../../../z_lib/ui/location/feature"
 
 import { detectPathname } from "./convert"

@@ -4,7 +4,12 @@ import {
 } from "../../../z_lib/ui/repository/infra"
 import { RemoteResult } from "../../../z_lib/ui/remote/infra"
 
-import { GetMenuBadgeRemoteError, MenuCategoryPath } from "./data"
+import { GetMenuBadgeRemoteError, MenuCategoryPath, MenuTargetPath } from "./data"
+import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
+
+export interface LoadMenuDetecter {
+    (): ConvertLocationResult<MenuTargetPath>
+}
 
 export type MenuContent = Readonly<{
     database: string

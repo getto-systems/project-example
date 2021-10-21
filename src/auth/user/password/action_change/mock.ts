@@ -1,6 +1,6 @@
 import { ApplicationMockStateAction } from "../../../../../ui/vendor/getto-application/action/mock"
 
-import { mockInputPasswordAction } from "../action_input/mock"
+import { mockInputPasswordAction } from "../input/action_input/mock"
 import { mockValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/mock"
 
 import { ChangePasswordAction, ChangePasswordState, initialChangePasswordState } from "./action"

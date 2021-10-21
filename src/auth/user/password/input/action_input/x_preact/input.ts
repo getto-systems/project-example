@@ -1,21 +1,21 @@
 import { h, VNode } from "preact"
 
-import { useApplicationAction } from "../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
 
 import {
     field,
     field_error,
     label_password_fill,
-} from "../../../../../../ui/vendor/getto-css/preact/design/form"
+} from "../../../../../../../ui/vendor/getto-css/preact/design/form"
 
-import { VNodeContent } from "../../../../../example/x_preact/design/common"
+import { VNodeContent } from "../../../../../../example/x_preact/design/common"
 
-import { InputBoardComponent } from "../../../../../../ui/vendor/getto-application/board/action_input/x_preact/input"
+import { InputBoardComponent } from "../../../../../../../ui/vendor/getto-application/board/action_input/x_preact/input"
 
-import { ValidateBoardFieldState } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/action"
+import { ValidateBoardFieldState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_field/action"
 import { InputPasswordResource, InputPasswordResourceState } from "../resource"
 
-import { ValidatePasswordError } from "../../input/data"
+import { ValidatePasswordError } from "../../data"
 
 type InputPasswordOptions =
     | Readonly<{ title: VNodeContent; help: VNodeContent[] }>
