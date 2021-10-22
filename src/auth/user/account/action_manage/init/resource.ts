@@ -15,15 +15,15 @@ import {
     newUpdateSearchUserAccountFieldsQuery,
 } from "../../search/init"
 
-import { ManageUserAccountView } from "../resource"
+import { ManageUserAccountResource } from "../resource"
 
-export function newManageUserAccountView(
+export function newManageUserAccountResource(
     feature: RemoteOutsideFeature &
         RepositoryOutsideFeature &
         LocationOutsideFeature &
         HistoryOutsideFeature,
-): ManageUserAccountView {
-    const resource = {
+): ManageUserAccountResource {
+    return {
         search: initSearchUserAccountAction(
             initSearchUserAccountMaterial({
                 search: newSearchUserAccountInfra(feature),
@@ -31,11 +31,5 @@ export function newManageUserAccountView(
             newSearchUserAccountFieldsDetecter(feature),
             newUpdateSearchUserAccountFieldsQuery(feature),
         ),
-    }
-    return {
-        resource,
-        terminate: () => {
-            resource.search.terminate()
-        },
     }
 }

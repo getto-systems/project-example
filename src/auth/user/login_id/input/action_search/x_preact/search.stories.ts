@@ -4,7 +4,7 @@ import { storyTemplate } from "../../../../../../../ui/vendor/storybook/preact/s
 
 import { SearchLoginIDComponent } from "./search"
 
-import { mockInputLoginIDAction } from "../mock"
+import { mockSearchLoginIDAction } from "../mock"
 
 export default {
     title: "library/Auth/User/Login Id/Input/Search Login ID",
@@ -15,7 +15,7 @@ type Props = Readonly<{
 }>
 const template = storyTemplate<Props>((props) => {
     return h(SearchLoginIDComponent, {
-        field: mockInputLoginIDAction(),
+        field: mockSearchLoginIDAction(),
         help: [props.help],
         state: { hasChanged: false },
     })

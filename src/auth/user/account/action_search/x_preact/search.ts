@@ -11,7 +11,6 @@ import {
     button_search,
     button_undo,
     fieldError,
-    form,
 } from "../../../../../../ui/vendor/getto-css/preact/design/form"
 import { box_grow, container } from "../../../../../../ui/vendor/getto-css/preact/design/box"
 
@@ -65,15 +64,14 @@ export function SearchUserAccountComponent(props: Props): VNode {
         | Readonly<{ type: "failed"; err: SearchUserAccountError }>
 
     function searchForm(content: Content): VNode {
-        return form(
-            box_grow({
-                body: [
-                    h(SearchLoginIDComponent, { field: props.search.loginID }),
-                    // TODO granted role (checkbox)
-                ],
-                footer: buttons({ left: button(), right: clearButton() }),
-            }),
-        )
+        return box_grow({
+            body: [
+                h(SearchLoginIDComponent, { field: props.search.loginID }),
+                // TODO granted role (checkbox)
+            ],
+            footer: buttons({ left: button(), right: clearButton() }),
+            form: true,
+        })
 
         function clearButton(): VNode {
             const label = "検索項目をクリア"
@@ -107,10 +105,7 @@ export function SearchUserAccountComponent(props: Props): VNode {
                     ]
 
                 case "failed":
-                    return [
-                        button_search({ state: "confirm", label, onClick }),
-                        error(content.err),
-                    ]
+                    return [button_search({ state: "confirm", label, onClick }), error(content.err)]
             }
 
             function onClick(e: Event) {
