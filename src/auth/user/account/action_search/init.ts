@@ -4,11 +4,11 @@ import { initObserveBoardAction } from "../../../../../ui/vendor/getto-applicati
 import { initSearchLoginIDAction } from "../../login_id/input/action_search/init"
 
 import {
-    ManageUserAccountMaterial,
-    ManageUserAccountAction,
-    ManageUserAccountState,
-    initialManageUserAccountState,
-    manageUserAccountFieldNames,
+    SearchUserAccountMaterial,
+    SearchUserAccountAction,
+    SearchUserAccountState,
+    initialSearchUserAccountState,
+    searchUserAccountFieldNames,
 } from "./action"
 import { SearchLoginIDAction } from "../../login_id/input/action_search/action"
 import { ObserveBoardAction } from "../../../../../ui/vendor/getto-application/board/action_observe_board/action"
@@ -23,41 +23,41 @@ import {
 
 import { SearchUserAccountFields } from "../search/data"
 
-export type ManageUserAccountActionInfra = Readonly<{
+export type SearchUserAccountActionInfra = Readonly<{
     search: SearchUserAccountInfra
 }>
 
-export function initAuthenticatePasswordMaterial(
-    infra: ManageUserAccountActionInfra,
-): ManageUserAccountMaterial {
+export function initSearchUserAccountMaterial(
+    infra: SearchUserAccountActionInfra,
+): SearchUserAccountMaterial {
     return {
         search: searchUserAccount(infra.search),
     }
 }
 
-export function initAuthenticatePasswordAction(
-    material: ManageUserAccountMaterial,
+export function initSearchUserAccountAction(
+    material: SearchUserAccountMaterial,
     detecter: SearchUserAccountFieldsDetecter,
     updateQuery: UpdateSearchUserAccountFieldsQuery,
-): ManageUserAccountAction {
+): SearchUserAccountAction {
     return new Action(material, detecter, updateQuery)
 }
 
 class Action
-    extends ApplicationAbstractStateAction<ManageUserAccountState>
-    implements ManageUserAccountAction
+    extends ApplicationAbstractStateAction<SearchUserAccountState>
+    implements SearchUserAccountAction
 {
-    readonly initialState = initialManageUserAccountState
+    readonly initialState = initialSearchUserAccountState
 
     readonly loginID: SearchLoginIDAction
     readonly observe: ObserveBoardAction
 
-    material: ManageUserAccountMaterial
+    material: SearchUserAccountMaterial
 
     fields: { (): SearchUserAccountFields }
 
     constructor(
-        material: ManageUserAccountMaterial,
+        material: SearchUserAccountMaterial,
         detecter: SearchUserAccountFieldsDetecter,
         updateQuery: UpdateSearchUserAccountFieldsQuery,
     ) {
@@ -67,7 +67,7 @@ class Action
         const initialFields = detecter()
         const loginID = initSearchLoginIDAction(initialFields.loginID)
         const { observe, checker } = initObserveBoardAction({
-            fields: manageUserAccountFieldNames,
+            fields: searchUserAccountFieldNames,
         })
 
         this.fields = () => {
@@ -91,11 +91,11 @@ class Action
         })
     }
 
-    clear(): ManageUserAccountState {
+    clear(): SearchUserAccountState {
         this.loginID.clear()
         return this.initialState
     }
-    async submit(): Promise<ManageUserAccountState> {
+    async submit(): Promise<SearchUserAccountState> {
         return this.material.search(this.fields(), this.post)
     }
 }

@@ -3,7 +3,7 @@ import { initInputBoardAction } from "../../../../../../ui/vendor/getto-applicat
 
 import { SearchLoginIDAction } from "./action"
 
-export function mockInputLoginIDAction(): SearchLoginIDAction {
+export function mockSearchLoginIDAction(): SearchLoginIDAction {
     const { input, subscriber } = initInputBoardAction()
 
     return {

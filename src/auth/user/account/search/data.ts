@@ -6,6 +6,4 @@ export type SearchUserAccountFields = Readonly<{
 }>
 
 export type SearchUserAccountError = SearchUserAccountRemoteError
-export type SearchUserAccountRemoteError =
-    | RemoteCommonError
-    | Readonly<{ type: "invalid-search" }>
+export type SearchUserAccountRemoteError = RemoteCommonError

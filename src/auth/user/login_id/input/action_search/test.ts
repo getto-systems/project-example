@@ -37,7 +37,7 @@ describe("SearchLoginID", () => {
 })
 
 function standard() {
-    const { input: action } = initSearchLoginIDAction()
+    const { input: action } = initSearchLoginIDAction(markBoardValue(""))
     const store = mockBoardValueStore()
     action.input.connector.connect(store)
 

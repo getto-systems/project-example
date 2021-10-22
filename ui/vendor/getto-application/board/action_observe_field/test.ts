@@ -32,7 +32,7 @@ describe("ObserveBoardField", () => {
             action.check()
             return action.currentState()
         }).then((stack) => {
-            expect(stack).toEqual([{ hasChanged: false }])
+            expect(stack).toEqual([{ hasChanged: true }])
         })
     })
 

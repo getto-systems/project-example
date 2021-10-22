@@ -1,31 +1,41 @@
-import { toApplicationView } from "../../../../../../ui/vendor/getto-application/action/helper"
-
-import { newStartContinuousRenewAuthnInfoInfra } from "../../../../ticket/start_continuous_renew/init"
-import {
-    newGetScriptPathLocationDetecter,
-    newGetSecureScriptPathInfra,
-} from "../../../../sign/get_script_path/init"
-import { newAuthenticatePasswordInfra } from "../../../password/authenticate/init"
-
-import { initAuthenticatePasswordAction, initAuthenticatePasswordMaterial } from "../init"
-
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 import { RepositoryOutsideFeature } from "../../../../../z_lib/ui/repository/feature"
-import { LocationOutsideFeature } from "../../../../../z_lib/ui/location/feature"
+import {
+    HistoryOutsideFeature,
+    LocationOutsideFeature,
+} from "../../../../../z_lib/ui/location/feature"
+
+import {
+    initSearchUserAccountAction,
+    initSearchUserAccountMaterial,
+} from "../../action_search/init"
+import {
+    newSearchUserAccountFieldsDetecter,
+    newSearchUserAccountInfra,
+    newUpdateSearchUserAccountFieldsQuery,
+} from "../../search/init"
 
 import { ManageUserAccountView } from "../resource"
 
-export function newAuthenticatePasswordView(
-    feature: RemoteOutsideFeature & RepositoryOutsideFeature & LocationOutsideFeature,
+export function newManageUserAccountView(
+    feature: RemoteOutsideFeature &
+        RepositoryOutsideFeature &
+        LocationOutsideFeature &
+        HistoryOutsideFeature,
 ): ManageUserAccountView {
-    return toApplicationView(
-        initAuthenticatePasswordAction(
-            initAuthenticatePasswordMaterial({
-                startContinuousRenew: newStartContinuousRenewAuthnInfoInfra(feature),
-                getSecureScriptPath: newGetSecureScriptPathInfra(),
-                search: newAuthenticatePasswordInfra(feature),
+    const resource = {
+        search: initSearchUserAccountAction(
+            initSearchUserAccountMaterial({
+                search: newSearchUserAccountInfra(feature),
             }),
-            newGetScriptPathLocationDetecter(feature),
+            newSearchUserAccountFieldsDetecter(feature),
+            newUpdateSearchUserAccountFieldsQuery(feature),
         ),
-    )
+    }
+    return {
+        resource,
+        terminate: () => {
+            resource.search.terminate()
+        },
+    }
 }
