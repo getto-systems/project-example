@@ -1,10 +1,10 @@
-import { BoardValueStore, BoardValueStoreConnector } from "../infra"
+import { MultipleBoardValueStore, MultipleBoardValueStoreConnector } from "../infra"
 
-import { BoardValue, emptyBoardValue } from "../../kernel/data"
+import { BoardValue } from "../../kernel/data"
 
-export function initBoardValueStoreConnector(): Readonly<{
-    connector: BoardValueStoreConnector
-    store: BoardValueStore
+export function initMultipleBoardValueStoreConnector(): Readonly<{
+    connector: MultipleBoardValueStoreConnector
+    store: MultipleBoardValueStore
 }> {
     const connector = new Connector()
     return {
@@ -15,24 +15,24 @@ export function initBoardValueStoreConnector(): Readonly<{
 
 type Connection =
     | Readonly<{ connect: false; hasValue: false }>
-    | Readonly<{ connect: false; hasValue: true; value: BoardValue }>
-    | Readonly<{ connect: true; store: BoardValueStore }>
+    | Readonly<{ connect: false; hasValue: true; value: BoardValue[] }>
+    | Readonly<{ connect: true; store: MultipleBoardValueStore }>
 
 const initialConnection: Connection = { connect: false, hasValue: false }
 
-class Connector implements BoardValueStoreConnector, BoardValueStore {
+class Connector implements MultipleBoardValueStoreConnector, MultipleBoardValueStore {
     conn = initialConnection
 
-    get(): BoardValue {
+    get(): BoardValue[] {
         if (this.conn.connect) {
             return this.conn.store.get()
         }
         if (this.conn.hasValue) {
             return this.conn.value
         }
-        return emptyBoardValue
+        return []
     }
-    set(value: BoardValue): void {
+    set(value: BoardValue[]): void {
         if (this.conn.connect) {
             this.conn.store.set(value)
         } else {
@@ -40,7 +40,7 @@ class Connector implements BoardValueStoreConnector, BoardValueStore {
         }
     }
 
-    connect(store: BoardValueStore): void {
+    connect(store: MultipleBoardValueStore): void {
         if (this.conn.connect) {
             return
         }

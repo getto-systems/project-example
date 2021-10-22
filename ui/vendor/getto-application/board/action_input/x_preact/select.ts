@@ -15,7 +15,9 @@ type Props = Readonly<{
     options: VNode[]
 }>
 export function SelectBoardComponent({ input, options }: Props): VNode {
-    return html`<select ref=${useInputRef(input.connector)} onInput=${onInput}>${options}</select>`
+    return html`<select ref=${useInputRef(input.connector)} onInput=${onInput}>
+        ${options}
+    </select>`
 
     function onInput() {
         input.publisher.post()
