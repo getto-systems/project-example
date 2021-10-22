@@ -1,6 +1,6 @@
 import { BoardFieldObserver } from "../infra"
 
-import { BoardValue } from "../../kernel/data"
+import { BoardValue, emptyBoardValue } from "../../kernel/data"
 
 export function initBoardFieldObserver(value: BoardValueGetter): BoardFieldObserver {
     return new Observer(value)
@@ -22,6 +22,12 @@ class Observer implements BoardFieldObserver {
 
     pin(): void {
         this.store = { stored: true, value: this.value() }
+    }
+    peek(): BoardValue {
+        if (!this.store.stored) {
+            return emptyBoardValue
+        }
+        return this.store.value
     }
     hasChanged(): boolean {
         if (!this.store.stored) {

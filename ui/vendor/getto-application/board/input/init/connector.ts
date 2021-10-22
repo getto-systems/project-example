@@ -19,10 +19,13 @@ class Connector implements BoardValueStoreConnector, BoardValueStore {
     conn = initialConnection
 
     get(): BoardValue {
-        if (!this.conn.connect) {
-            return emptyBoardValue
+        if (this.conn.connect) {
+            return this.conn.store.get()
         }
-        return this.conn.store.get()
+        if (this.conn.hasValue) {
+            return this.conn.value
+        }
+        return emptyBoardValue
     }
     set(value: BoardValue): void {
         if (this.conn.connect) {

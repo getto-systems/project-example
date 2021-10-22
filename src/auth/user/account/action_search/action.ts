@@ -2,6 +2,7 @@ import { ApplicationStateAction } from "../../../../../ui/vendor/getto-applicati
 
 import { SearchLoginIDAction } from "../../login_id/input/action_search/action"
 import { ObserveBoardAction } from "../../../../../ui/vendor/getto-application/board/action_observe_board/action"
+import { SearchOffsetAction } from "../../../../z_lib/ui/remote/search/action_search/action"
 
 import { SearchUserAccountMethod } from "../search/method"
 
@@ -9,10 +10,12 @@ import { SearchUserAccountEvent } from "../search/event"
 
 export interface SearchUserAccountAction extends ApplicationStateAction<SearchUserAccountState> {
     readonly loginID: SearchLoginIDAction
+    readonly offset: SearchOffsetAction
     readonly observe: ObserveBoardAction
 
     clear(): SearchUserAccountState
     submit(): Promise<SearchUserAccountState>
+    move(): Promise<SearchUserAccountState>
 }
 
 export const searchUserAccountFieldNames = ["loginID"] as const

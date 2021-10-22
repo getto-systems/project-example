@@ -21,11 +21,17 @@ type SearchLoginIDOptions =
 type Props = SearchLoginIDResource & SearchLoginIDOptions
 export function SearchLoginIDComponent(props: Props): VNode {
     return search({
-        title: loginIDLabel,
+        title: title(),
         body: h(InputBoardComponent, { type: "text", input: props.field.input }),
         help: help(),
     })
 
+    function title(): VNodeContent {
+        if ("title" in props) {
+            return props.title
+        }
+        return loginIDLabel
+    }
     function help(): VNodeContent[] {
         if ("help" in props) {
             return props.help

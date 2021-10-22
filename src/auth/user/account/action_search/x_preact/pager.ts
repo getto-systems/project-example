@@ -1,16 +1,10 @@
 import { h, VNode } from "preact"
-import { html } from "htm/preact"
 
 import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/reason"
 
 import { useApplicationAction } from "../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
 
-import {
-    button_search,
-    field,
-    fieldError,
-    pager,
-} from "../../../../../../ui/vendor/getto-css/preact/design/form"
+import { button_search, fieldError } from "../../../../../../ui/vendor/getto-css/preact/design/form"
 import { box } from "../../../../../../ui/vendor/getto-css/preact/design/box"
 
 import { pagerCount, pagerParams } from "../../../../../example/x_preact/design/table"
@@ -19,7 +13,8 @@ import { SearchUserAccountPagerResourceState, SearchUserAccountResource } from "
 
 import { SearchUserAccountError } from "../../search/data"
 import { pagerOptions } from "../../../../../../ui/vendor/getto-css/preact/design/data"
-import { SearchPage } from "../../../../../z_lib/ui/remote/data"
+import { SearchOffsetComponent } from "../../../../../z_lib/ui/remote/search/action_search/x_preact/search"
+import { SearchPageResponse } from "../../../../../z_lib/ui/remote/search/data"
 
 export function SearchUserAccountPagerEntry({ search }: SearchUserAccountResource): VNode {
     return h(SearchUserAccountPagerComponent, {
@@ -51,25 +46,24 @@ export function SearchUserAccountPagerComponent(props: Props): VNode {
         }
     }
 
-    type Content = Readonly<{ page: SearchPage }>
+    type Content = Readonly<{ page: SearchPageResponse }>
 
     function pagerForm({ page }: Content): VNode {
         return box({
-            body: [field({ title: pagerCount(page.all), body: [pagerSelect(), pagerButton()] })],
+            body: [
+                h(SearchOffsetComponent, {
+                    field: props.search.offset,
+                    title: pagerCount(page.all),
+                    options: pagerOptions(pagerParams(page)),
+                    button: button_search({ state: "normal", label: "読み込み", onClick }),
+                }),
+            ],
             form: true,
         })
 
-        function pagerSelect() {
-            return pager(html`<select value=${page.offset}>
-                ${options()}
-            </select>`)
-
-            function options() {
-                return pagerOptions(pagerParams(page))
-            }
-        }
-        function pagerButton() {
-            return button_search({ state: "normal", label: "移動", onClick: () => null })
+        function onClick(e: Event) {
+            e.preventDefault()
+            props.search.move()
         }
     }
 

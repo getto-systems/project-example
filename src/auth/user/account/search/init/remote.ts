@@ -25,7 +25,7 @@ export function newSearchUserAccountRemote(feature: RemoteOutsideFeature): Searc
                 return {
                     success: true,
                     value: {
-                        page: { offset: 0, limit: 1000, all: 1 },
+                        page: { offset: 0, limit: 10, all: 25 },
                         users: [
                             {
                                 loginID: "admin" as LoginID,

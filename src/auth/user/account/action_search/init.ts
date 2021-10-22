@@ -2,6 +2,7 @@ import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-a
 
 import { initObserveBoardAction } from "../../../../../ui/vendor/getto-application/board/action_observe_board/init"
 import { initSearchLoginIDAction } from "../../login_id/input/action_search/init"
+import { initSearchOffsetAction } from "../../../../z_lib/ui/remote/search/action_search/init"
 
 import {
     SearchUserAccountMaterial,
@@ -11,6 +12,7 @@ import {
     searchUserAccountFieldNames,
 } from "./action"
 import { SearchLoginIDAction } from "../../login_id/input/action_search/action"
+import { SearchOffsetAction } from "../../../../z_lib/ui/remote/search/action_search/action"
 import { ObserveBoardAction } from "../../../../../ui/vendor/getto-application/board/action_observe_board/action"
 
 import { searchUserAccount } from "../search/method"
@@ -50,35 +52,48 @@ class Action
     readonly initialState = initialSearchUserAccountState
 
     readonly loginID: SearchLoginIDAction
+    readonly offset: SearchOffsetAction
     readonly observe: ObserveBoardAction
 
     material: SearchUserAccountMaterial
 
-    fields: { (): SearchUserAccountFields }
+    searchFields: { (): SearchUserAccountFields }
+    moveFields: { (): SearchUserAccountFields }
 
     constructor(
         material: SearchUserAccountMaterial,
         detecter: SearchUserAccountFieldsDetecter,
         updateQuery: UpdateSearchUserAccountFieldsQuery,
     ) {
-        super(async () => this.submit())
+        super(async () => this.move())
         this.material = material
 
         const initialFields = detecter()
         const loginID = initSearchLoginIDAction(initialFields.loginID)
+        const offset = initSearchOffsetAction(initialFields.offset)
         const { observe, checker } = initObserveBoardAction({
             fields: searchUserAccountFieldNames,
         })
 
-        this.fields = () => {
+        this.searchFields = () => {
             const fields = {
+                offset: offset.reset(),
                 loginID: loginID.pin(),
+            }
+            updateQuery(fields)
+            return fields
+        }
+        this.moveFields = () => {
+            const fields = {
+                offset: offset.pin(),
+                loginID: loginID.peek(),
             }
             updateQuery(fields)
             return fields
         }
 
         this.loginID = loginID.input
+        this.offset = offset.input
         this.observe = observe
 
         this.loginID.observe.subscriber.subscribe((result) =>
@@ -96,6 +111,9 @@ class Action
         return this.initialState
     }
     async submit(): Promise<SearchUserAccountState> {
-        return this.material.search(this.fields(), this.post)
+        return this.material.search(this.searchFields(), this.post)
+    }
+    async move(): Promise<SearchUserAccountState> {
+        return this.material.search(this.moveFields(), this.post)
     }
 }

@@ -2,24 +2,24 @@ import { initInputBoardAction } from "../../../../../../ui/vendor/getto-applicat
 import { initObserveBoardFieldAction } from "../../../../../../ui/vendor/getto-application/board/action_observe_field/init"
 import { initBoardFieldObserver } from "../../../../../../ui/vendor/getto-application/board/observe_field/init/observer"
 
-import { SearchLoginIDAction } from "./action"
+import { SearchOffsetAction } from "./action"
 
 import {
     BoardValue,
-    emptyBoardValue,
+    zeroBoardValue,
 } from "../../../../../../ui/vendor/getto-application/board/kernel/data"
 
-export function initSearchLoginIDAction(initial: BoardValue): Readonly<{
-    input: SearchLoginIDAction
+export function initSearchOffsetAction(initial: BoardValue): Readonly<{
+    input: SearchOffsetAction
     pin: { (): BoardValue }
-    peek: { (): BoardValue }
+    reset: { (): BoardValue }
 }> {
     const { input, store, subscriber } = initInputBoardAction()
 
     store.set(initial)
 
-    const value = () => store.get()
-    const observer = initBoardFieldObserver(value)
+    const storeValue = () => store.get()
+    const observer = initBoardFieldObserver(storeValue)
     const observe = initObserveBoardFieldAction({ observer })
 
     subscriber.subscribe(() => observe.check())
@@ -28,20 +28,18 @@ export function initSearchLoginIDAction(initial: BoardValue): Readonly<{
         input: {
             input,
             observe,
-            clear: () => {
-                store.set(emptyBoardValue)
-                observe.check()
-            },
             terminate: () => {
                 subscriber.terminate()
             },
         },
         pin: () => {
             observer.pin()
-            return value()
+            return storeValue()
         },
-        peek: () => {
-            return observer.peek()
+        reset: () => {
+            store.set(zeroBoardValue)
+            observer.pin()
+            return storeValue()
         },
     }
 }

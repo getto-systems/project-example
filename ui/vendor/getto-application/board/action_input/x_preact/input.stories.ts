@@ -2,12 +2,10 @@ import { h } from "preact"
 
 import { storyTemplate } from "../../../../storybook/preact/story"
 
-import { InputBoardComponent } from "./input"
+import { InputBoardComponent, InputType, inputTypes } from "./input"
 
 import { markBoardValue } from "../../kernel/mock"
 import { initInputBoardAction } from "../init"
-
-import { InputType, inputTypes } from "./input"
 
 export default {
     title: "Getto/Board/Input",

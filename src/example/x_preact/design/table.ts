@@ -1,5 +1,5 @@
 import { PagerOptionsContent, SortSign } from "../../../../ui/vendor/getto-css/preact/design/data"
-import { SearchPage } from "../../../z_lib/ui/remote/data"
+import { SearchPageResponse } from "../../../z_lib/ui/remote/search/data"
 
 import { VNodeContent } from "./common"
 import { icon } from "./icon"
@@ -12,7 +12,7 @@ export const sortSign: SortSign = {
 export function pagerCount(all: number): VNodeContent {
     return `全 ${pageCountFormat(all)} 件中`
 }
-export function pagerParams(page: SearchPage): PagerOptionsContent {
+export function pagerParams(page: SearchPageResponse): PagerOptionsContent {
     return {
         all: page.all,
         step: page.limit,
