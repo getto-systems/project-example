@@ -25,9 +25,15 @@ describe("SearchUserAccount", () => {
             store.loginID.set(markBoardValue("MY-LOGIN-ID"))
             return resource.search.submit()
         }).then((stack) => {
-            expect(stack).toEqual([{ type: "try-to-search" }, { type: "succeed-to-search" }])
+            expect(stack).toEqual([
+                { type: "try-to-search" },
+                {
+                    type: "succeed-to-search",
+                    response: { page: { offset: 0, limit: 1000, all: 245 }, users: [] },
+                },
+            ])
             expect(url.current.toString()).toEqual(
-                "https://example.com/index.html?login-id=MY-LOGIN-ID",
+                "https://example.com/index.html?login-id=MY-LOGIN-ID&search-offset=0",
             )
         })
     })
@@ -43,7 +49,10 @@ describe("SearchUserAccount", () => {
             expect(stack).toEqual([
                 { type: "try-to-search" },
                 { type: "take-longtime-to-search" },
-                { type: "succeed-to-search" },
+                {
+                    type: "succeed-to-search",
+                    response: { page: { offset: 0, limit: 1000, all: 245 }, users: [] },
+                },
             ])
         })
     })
