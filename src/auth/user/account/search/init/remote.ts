@@ -12,15 +12,27 @@ import {
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 
 import { SearchUserAccountRemote } from "../infra"
+import { LoginID } from "../../../login_id/input/data"
+import { GrantedRoles } from "../../../../ticket/kernel/data"
+import { ticker } from "../../../../../z_lib/ui/timer/helper"
 
 export function newSearchUserAccountRemote(feature: RemoteOutsideFeature): SearchUserAccountRemote {
     return async (_fields) => {
         try {
-            const mock = false
+            const mock = true
             if (mock) {
+                await ticker({ wait_millisecond: 3000 }, () => null)
                 return {
                     success: true,
-                    value: true,
+                    value: {
+                        page: { offset: 0, limit: 1000, all: 1 },
+                        users: [
+                            {
+                                loginID: "admin" as LoginID,
+                                grantedRoles: ["dev-docs"] as GrantedRoles,
+                            },
+                        ],
+                    },
                 }
             }
 
@@ -47,7 +59,7 @@ export function newSearchUserAccountRemote(feature: RemoteOutsideFeature): Searc
             }
             return {
                 success: true,
-                value: true,
+                value: { page: { offset: 0, limit: 1000, all: 245 }, users: [] },
             }
 
             // TODO response を受け取る

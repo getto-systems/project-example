@@ -5,7 +5,10 @@ export type SearchUserAccountResource = Readonly<{
     search: SearchUserAccountAction
 }>
 
-export type SearchUserAccountResourceState = Readonly<{
+export type SearchUserAccountFormResourceState = Readonly<{
     state: SearchUserAccountState
     observe: ObserveBoardActionState
+}>
+export type SearchUserAccountPagerResourceState = Readonly<{
+    state: SearchUserAccountState
 }>

@@ -61,7 +61,7 @@ class Action
         detecter: SearchUserAccountFieldsDetecter,
         updateQuery: UpdateSearchUserAccountFieldsQuery,
     ) {
-        super()
+        super(async () => this.submit())
         this.material = material
 
         const initialFields = detecter()

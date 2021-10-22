@@ -132,6 +132,6 @@ function takeLongtime_search(): SearchUserAccountRemote {
 function standard_searchRemoteResult(): SearchUserAccountRemoteResult {
     return {
         success: true,
-        value: true,
+        value: { page: { offset: 0, limit: 1000, all: 245 }, users: [] },
     }
 }

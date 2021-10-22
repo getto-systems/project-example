@@ -2,37 +2,31 @@ import { h } from "preact"
 
 import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
 
-import { SearchUserAccountComponent } from "./search"
+import { SearchUserAccountPagerComponent } from "./pager"
 
 import { mockSearchUserAccountAction } from "../mock"
 
 import { SearchUserAccountState } from "../action"
 
 const options = ["initial", "try", "take-longtime", "server-error", "infra-error"] as const
-const changes = ["initial", "has-changed"] as const
 
 export default {
-    title: "main/Auth/User/Account/Search",
+    title: "main/Auth/User/Account/Search/Pager",
     argTypes: {
         search: {
             control: { type: "select", options },
-        },
-        form: {
-            control: { type: "select", options: changes },
         },
     },
 }
 
 export type Props = Readonly<{
     search: typeof options[number]
-    form: typeof changes[number]
     err: string
 }>
 const template = storyTemplate<Props>((props) => {
-    return h(SearchUserAccountComponent, {
+    return h(SearchUserAccountPagerComponent, {
         search: mockSearchUserAccountAction(),
         state: state(),
-        observe: { hasChanged: props.form === "has-changed" },
     })
 
     function state(): SearchUserAccountState {
@@ -58,4 +52,4 @@ const template = storyTemplate<Props>((props) => {
     }
 })
 
-export const Search = template({ search: "initial", form: "initial", err: "" })
+export const Pager = template({ search: "initial", err: "" })

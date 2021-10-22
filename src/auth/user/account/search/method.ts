@@ -28,7 +28,7 @@ export const searchUserAccount: Search = (infra) => async (fields, post) => {
         return post({ type: "failed-to-search", err: response.err })
     }
 
-    return post({ type: "succeed-to-search" })
+    return post({ type: "succeed-to-search", response: response.value })
 }
 
 interface Post<E, S> {

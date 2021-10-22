@@ -1,7 +1,11 @@
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
 import { RemoteResult } from "../../../../z_lib/ui/remote/infra"
 
-import { SearchUserAccountFields, SearchUserAccountRemoteError } from "./data"
+import {
+    SearchUserAccountFields,
+    SearchUserAccountRemoteError,
+    SearchUserAccountRemoteResponse,
+} from "./data"
 
 export interface SearchUserAccountFieldsDetecter {
     (): SearchUserAccountFields
@@ -21,6 +25,6 @@ export interface SearchUserAccountRemote {
     (fields: SearchUserAccountFields): Promise<SearchUserAccountRemoteResult>
 }
 export type SearchUserAccountRemoteResult = RemoteResult<
-    true, // TODO Readonly<{ page: SearchPage, users: UserAccount[] }>
+    SearchUserAccountRemoteResponse,
     SearchUserAccountRemoteError
 >
