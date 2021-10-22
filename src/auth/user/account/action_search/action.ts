@@ -15,7 +15,7 @@ export interface SearchUserAccountAction extends ApplicationStateAction<SearchUs
 
     clear(): SearchUserAccountState
     submit(): Promise<SearchUserAccountState>
-    move(): Promise<SearchUserAccountState>
+    load(): Promise<SearchUserAccountState>
 }
 
 export const searchUserAccountFieldNames = ["loginID"] as const

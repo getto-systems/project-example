@@ -119,7 +119,7 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
     header({
         visibleKeys,
         base,
-        model,
+        summary: model,
     }: TableDataStyledParams<M>): TableDataHeaderExpansion | TableDataInvisible {
         if (!this.isVisible(visibleKeys)) {
             return { type: "invisible" }
@@ -149,7 +149,7 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
         visibleKeys,
         base,
         row,
-        model,
+        summary: model,
     }: TableDataRelatedParams<M, R>): TableDataColumnExpansion | TableDataInvisible {
         if (!this.isVisible(visibleKeys)) {
             return { type: "invisible" }
@@ -198,7 +198,7 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
     }
 
     summaryContent(
-        { visibleKeys, base, model }: TableDataStyledParams<M>,
+        { visibleKeys, base, summary: model }: TableDataStyledParams<M>,
         { style, content }: SummaryContentParams<M>,
     ): TableDataSummaryExpansion | TableDataInvisible {
         if (!this.isVisible(visibleKeys)) {

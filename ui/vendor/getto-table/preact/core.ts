@@ -12,7 +12,7 @@ export interface TableStructure<M, R> {
     sticky(): TableDataSticky
 }
 
-export type TableDataParams<M> = Readonly<{ model: M; visibleKeys: TableDataVisibleKeys }>
+export type TableDataParams<M> = Readonly<{ summary: M; visibleKeys: TableDataVisibleKeys }>
 export type TableDataCellKey = VNodeKey
 export type TableDataVisibleKeys =
     | Readonly<{ type: "all" }>

@@ -173,7 +173,7 @@ class Cell<M, R> implements TableCellSimple<M, R> {
         }
     }
     summaryContent(
-        { visibleKeys, base, model }: TableDataStyledParams<M>,
+        { visibleKeys, base, summary: model }: TableDataStyledParams<M>,
         { style, content }: SummaryContentParams<M>,
     ): TableDataSummarySimple | TableDataInvisible {
         if (!this.isVisible(visibleKeys)) {

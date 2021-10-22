@@ -58,14 +58,14 @@ class Action
     material: SearchUserAccountMaterial
 
     searchFields: { (): SearchUserAccountFields }
-    moveFields: { (): SearchUserAccountFields }
+    loadFields: { (): SearchUserAccountFields }
 
     constructor(
         material: SearchUserAccountMaterial,
         detecter: SearchUserAccountFieldsDetecter,
         updateQuery: UpdateSearchUserAccountFieldsQuery,
     ) {
-        super(async () => this.move())
+        super(async () => this.load())
         this.material = material
 
         const initialFields = detecter()
@@ -83,7 +83,7 @@ class Action
             updateQuery(fields)
             return fields
         }
-        this.moveFields = () => {
+        this.loadFields = () => {
             const fields = {
                 offset: offset.pin(),
                 loginID: loginID.peek(),
@@ -113,7 +113,7 @@ class Action
     async submit(): Promise<SearchUserAccountState> {
         return this.material.search(this.searchFields(), this.post)
     }
-    async move(): Promise<SearchUserAccountState> {
-        return this.material.search(this.moveFields(), this.post)
+    async load(): Promise<SearchUserAccountState> {
+        return this.material.search(this.loadFields(), this.post)
     }
 }

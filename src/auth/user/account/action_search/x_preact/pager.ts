@@ -63,7 +63,7 @@ export function SearchUserAccountPagerComponent(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.search.move()
+            props.search.load()
         }
     }
 

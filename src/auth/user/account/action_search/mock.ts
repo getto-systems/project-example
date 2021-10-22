@@ -30,7 +30,7 @@ class Action
     async submit(): Promise<SearchUserAccountState> {
         return this.initialState
     }
-    async move(): Promise<SearchUserAccountState> {
+    async load(): Promise<SearchUserAccountState> {
         return this.initialState
     }
 }

@@ -125,7 +125,7 @@ class Cell<M, R, C> implements TableCellTree<M, R> {
         const rowMutable = this.mutable.tree.rowMutable()
         const { decorators } = this.mutable.core.columnMutable()
 
-        const data = this.content.data(params.row, params.model)
+        const data = this.content.data(params.row, params.summary)
         const dataLength = data.length
         return data.map((row, index) => {
             return {

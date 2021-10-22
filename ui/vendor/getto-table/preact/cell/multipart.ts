@@ -58,24 +58,24 @@ class Cell<M, R, P> implements TableCellMultipart<M, R> {
     }
 
     view(params: TableDataParams<M>): TableDataView[] {
-        return tableCellView(params, this.cells(params.model))
+        return tableCellView(params, this.cells(params.summary))
     }
     header(params: TableDataStyledParams<M>): TableDataHeader[] {
         const { style } = this.mutable.core.headerStyleMutable()
-        return tableCellHeader(params, style, this.cells(params.model))
+        return tableCellHeader(params, style, this.cells(params.summary))
     }
     summary(params: TableDataStyledParams<M>): TableDataSummary[] {
         const { style } = this.mutable.core.summaryStyleMutable()
-        return tableCellSummary(params, style, this.cells(params.model))
+        return tableCellSummary(params, style, this.cells(params.summary))
     }
     column(params: TableDataRelatedParams<M, R>): TableDataColumn[] {
         const { style } = this.mutable.core.columnStyleMutable()
         const { decorators } = this.mutable.core.columnMutable()
-        return tableCellColumn(params, style, decorators, this.cells(params.model))
+        return tableCellColumn(params, style, decorators, this.cells(params.summary))
     }
     footer(params: TableDataStyledParams<M>): TableDataSummary[] {
         const { style } = this.mutable.core.footerStyleMutable()
-        return tableCellFooter(params, style, this.cells(params.model))
+        return tableCellFooter(params, style, this.cells(params.summary))
     }
 
     horizontalBorder(borders: TableDataHorizontalBorder[]): TableCellMultipart<M, R> {
