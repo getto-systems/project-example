@@ -2,7 +2,7 @@ import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-a
 
 import { initObserveBoardAction } from "../../../../../ui/vendor/getto-application/board/action_observe_board/init"
 import { initSearchLoginIDAction } from "../../login_id/input/action_search/init"
-import { initSearchOffsetAction } from "../../../../z_lib/ui/remote/search/action_search/init"
+import { initSearchOffsetAction } from "../../../../z_lib/ui/search/action_offset/init"
 
 import {
     SearchUserAccountMaterial,
@@ -12,7 +12,7 @@ import {
     searchUserAccountFieldNames,
 } from "./action"
 import { SearchLoginIDAction } from "../../login_id/input/action_search/action"
-import { SearchOffsetAction } from "../../../../z_lib/ui/remote/search/action_search/action"
+import { SearchOffsetAction } from "../../../../z_lib/ui/search/action_offset/action"
 import { ObserveBoardAction } from "../../../../../ui/vendor/getto-application/board/action_observe_board/action"
 
 import { searchUserAccount } from "../search/method"
@@ -85,7 +85,7 @@ class Action
         }
         this.loadFields = () => {
             const fields = {
-                offset: offset.pin(),
+                offset: offset.get(),
                 loginID: loginID.peek(),
             }
             updateQuery(fields)

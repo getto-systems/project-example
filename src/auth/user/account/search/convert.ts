@@ -1,5 +1,5 @@
 import { readSearchParams } from "../../../../../ui/vendor/getto-application/board/kernel/convert"
-import { readSearchOffset, updateSearchOffsetQuery } from "../../../../z_lib/ui/remote/search/convert"
+import { readSearchOffset, updateSearchOffsetQuery } from "../../../../z_lib/ui/search/convert"
 
 import { SearchUserAccountFields } from "./data"
 

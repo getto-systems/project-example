@@ -1,7 +1,7 @@
 import { ApplicationMockStateAction } from "../../../../../ui/vendor/getto-application/action/mock"
 
 import { mockObserveBoardFieldAction } from "../../../../../ui/vendor/getto-application/board/action_observe_field/mock"
-import { mockSearchOffsetAction } from "../../../../z_lib/ui/remote/search/action_search/mock"
+import { mockSearchOffsetAction } from "../../../../z_lib/ui/search/action_offset/mock"
 import { mockSearchLoginIDAction } from "../../login_id/input/action_search/mock"
 
 import {

@@ -1,4 +1,4 @@
-import { BoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/data"
+import { BoardValue } from "../../../../ui/vendor/getto-application/board/kernel/data"
 
 export type SearchPageRequest = Readonly<{
     offset: BoardValue

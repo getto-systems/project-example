@@ -1,6 +1,6 @@
 import { BoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/data"
 import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
-import { SearchPageResponse } from "../../../../z_lib/ui/remote/search/data"
+import { SearchPageResponse } from "../../../../z_lib/ui/search/data"
 import { UserAccount } from "../kernel/data"
 
 export type SearchUserAccountFields = Readonly<{

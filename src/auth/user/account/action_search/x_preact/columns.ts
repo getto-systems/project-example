@@ -16,15 +16,15 @@ import { pagerOptions } from "../../../../../../ui/vendor/getto-css/preact/desig
 import { SearchOffsetComponent } from "../../../../../z_lib/ui/search/action_offset/x_preact/offset"
 import { SearchPageResponse } from "../../../../../z_lib/ui/search/data"
 
-export function SearchUserAccountPagerEntry({ search }: SearchUserAccountResource): VNode {
-    return h(SearchUserAccountPagerComponent, {
+export function SearchUserAccountColumnsEntry({ search }: SearchUserAccountResource): VNode {
+    return h(SearchUserAccountColumnsComponent, {
         search,
         state: useApplicationAction(search),
     })
 }
 
 type Props = SearchUserAccountResource & SearchUserAccountPagerResourceState
-export function SearchUserAccountPagerComponent(props: Props): VNode {
+export function SearchUserAccountColumnsComponent(props: Props): VNode {
     return basedOn(props)
 
     function basedOn({ state }: SearchUserAccountPagerResourceState): VNode {

@@ -1,9 +1,9 @@
 import { h } from "preact"
 import { html } from "htm/preact"
 
-import { storyTemplate } from "../../../../../../../ui/vendor/storybook/preact/story"
+import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
 
-import { SearchOffsetComponent } from "./search"
+import { SearchOffsetComponent } from "./offset"
 
 import { mockSearchOffsetAction } from "../mock"
 
@@ -13,13 +13,11 @@ export default {
 
 type Props = Readonly<{
     title: string
-    help: string
 }>
 const template = storyTemplate<Props>((props) => {
     return h(SearchOffsetComponent, {
         field: mockSearchOffsetAction(),
         title: props.title,
-        help: [props.help],
         options: [
             html`<option value="">すべて</option>`,
             html`<option value="0">1 - 1000</option>`,
@@ -30,4 +28,4 @@ const template = storyTemplate<Props>((props) => {
     })
 })
 
-export const Offset = template({ title: "全 2583件中", help: "" })
+export const Offset = template({ title: "全 2583件中" })

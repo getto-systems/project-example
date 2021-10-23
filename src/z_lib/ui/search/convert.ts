@@ -1,5 +1,5 @@
-import { readSearchParams } from "../../../../../ui/vendor/getto-application/board/kernel/convert"
-import { BoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/data"
+import { readSearchParams } from "../../../../ui/vendor/getto-application/board/kernel/convert"
+import { BoardValue } from "../../../../ui/vendor/getto-application/board/kernel/data"
 
 const SEARCH_OFFSET = "search-offset"
 

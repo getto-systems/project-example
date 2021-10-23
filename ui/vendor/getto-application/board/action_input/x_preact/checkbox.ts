@@ -1,5 +1,5 @@
 import { VNode } from "preact"
-import { useLayoutEffect, useState } from "preact/hooks"
+import { useLayoutEffect, useMemo, useState } from "preact/hooks"
 import { html } from "htm/preact"
 
 import { VNodeContent } from "../../../../getto-css/preact/common"
@@ -11,33 +11,27 @@ import { MultipleBoardValueStoreConnector } from "../../input/infra"
 
 import { BoardValue } from "../../kernel/data"
 
+export type CheckboxBoardContent = Readonly<{ key: string; value: BoardValue; label: VNodeContent }>
+
 type Props =
-    | Readonly<{
-          input: MultipleInputBoardAction
-          options: Readonly<{ key: string; value: BoardValue; label: VNodeContent }>[]
-      }>
-    | Readonly<{
-          input: MultipleInputBoardAction
-          options: Readonly<{ key: string; value: BoardValue; label: VNodeContent }>[]
-          block: boolean
-      }>
+    | Readonly<{ input: MultipleInputBoardAction; options: CheckboxBoardContent[] }>
+    | Readonly<{ input: MultipleInputBoardAction; options: CheckboxBoardContent[]; block: boolean }>
 export function CheckboxBoardComponent(props: Props): VNode {
-    const [values, setValues] = useMultipleBoardValueState(props.input.connector)
+    const store = useCheckboxStore(props.input.connector)
 
     return html`${content()}`
 
     function content(): VNode[] {
         return props.options.map(({ key, value, label }) => {
-            const isChecked = values.has(value)
-            const content = {
-                isChecked,
-                input: html`<input
-                        type="checkbox"
-                        checked=${isChecked}
-                        onInput=${onInput}
-                    />${label}`,
-                key,
-            }
+            const isChecked = store.has(value)
+
+            const input = html`<input
+                    type="checkbox"
+                    checked=${isChecked}
+                    onInput=${onInput}
+                />${label}`
+
+            const content = { isChecked, input, key }
 
             if ("block" in props && props.block) {
                 return checkbox_block(content)
@@ -48,12 +42,7 @@ export function CheckboxBoardComponent(props: Props): VNode {
             function onInput(e: Event) {
                 const target = e.target
                 if (target instanceof HTMLInputElement) {
-                    if (target.checked) {
-                        values.add(value)
-                    } else {
-                        values.delete(value)
-                    }
-                    setValues(values)
+                    store.setMember(value, target.checked)
                     props.input.publisher.post()
                 }
             }
@@ -61,16 +50,66 @@ export function CheckboxBoardComponent(props: Props): VNode {
     }
 }
 
-function useMultipleBoardValueState(connector: MultipleBoardValueStoreConnector) {
-    const [values, setValues] = useState<Set<BoardValue>>(new Set())
+interface CheckboxStore {
+    has(value: BoardValue): boolean
+    setMember(value: BoardValue, isSelected: boolean): void
+}
 
+function useCheckboxStore(connector: MultipleBoardValueStoreConnector): CheckboxStore {
+    const store = useMemo(() => new ValuesStore(), [])
     useLayoutEffect(() => {
-        connector.connect({
-            get: () => Array.from(values.values()),
-            set: (values) => setValues(new Set(values)),
-        })
+        connector.connect(store)
         return () => connector.terminate()
-    }, [connector, values])
+    }, [connector, store])
 
-    return [values, setValues] as const
+    const [values, setValues] = useState<BoardValue[]>([])
+    useLayoutEffect(() => {
+        store.connect(values, setValues)
+    }, [store, values, setValues])
+
+    return store
+}
+
+type PendingStore =
+    | Readonly<{ hasValue: false }>
+    | Readonly<{ hasValue: true; values: BoardValue[] }>
+
+class ValuesStore implements CheckboxStore {
+    values: Set<BoardValue> = new Set()
+    setValues: { (values: BoardValue[]): void } = (values) => {
+        this.pendingStore = { hasValue: true, values }
+    }
+
+    pendingStore: PendingStore = { hasValue: false }
+
+    connect(values: BoardValue[], setValues: { (values: BoardValue[]): void }): void {
+        if (this.pendingStore.hasValue) {
+            const pendingValues = this.pendingStore.values
+            this.pendingStore = { hasValue: false }
+            setValues(pendingValues)
+        }
+
+        this.setValues = setValues
+        this.values = new Set(values)
+    }
+
+    has(value: BoardValue): boolean {
+        return this.values.has(value)
+    }
+    setMember(value: BoardValue, isSelected: boolean): void {
+        if (isSelected) {
+            this.values.add(value)
+        } else {
+            this.values.delete(value)
+        }
+        this.setValues(this.get())
+    }
+
+    get(): BoardValue[] {
+        return Array.from(this.values.values())
+    }
+    set(values: BoardValue[]): void {
+        this.setValues(values)
+        this.values = new Set(values)
+    }
 }

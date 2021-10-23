@@ -1,5 +1,5 @@
 import { PagerOptionsContent, SortSign } from "../../../../ui/vendor/getto-css/preact/design/data"
-import { SearchPageResponse } from "../../../z_lib/ui/remote/search/data"
+import { SearchPageResponse } from "../../../z_lib/ui/search/data"
 
 import { VNodeContent } from "./common"
 import { icon } from "./icon"
