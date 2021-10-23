@@ -64,6 +64,8 @@ class Action
     searchFields: { (): SearchUserAccountFields }
     loadFields: { (): SearchUserAccountFields }
 
+    updateQuery: UpdateSearchUserAccountFieldsQuery
+
     constructor(
         material: SearchUserAccountMaterial,
         detecter: SearchUserAccountFieldsDetecter,
@@ -82,27 +84,21 @@ class Action
             fields: searchUserAccountFieldNames,
         })
 
-        this.searchFields = () => {
-            const fields = {
-                offset: offset.reset(),
-                loginID: loginID.pin(),
-            }
-            updateQuery(fields)
-            return fields
-        }
-        this.loadFields = () => {
-            const fields = {
-                offset: offset.get(),
-                loginID: loginID.peek(),
-            }
-            updateQuery(fields)
-            return fields
-        }
+        this.searchFields = () => ({
+            offset: offset.reset(),
+            loginID: loginID.pin(),
+        })
+        this.loadFields = () => ({
+            offset: offset.get(),
+            loginID: loginID.peek(),
+        })
 
         this.loginID = loginID.input
         this.offset = offset.input
         this.columns = columns
         this.observe = observe
+
+        this.updateQuery = updateQuery
 
         this.loginID.observe.subscriber.subscribe((result) =>
             checker.update("loginID", result.hasChanged),
@@ -119,9 +115,9 @@ class Action
         return this.initialState
     }
     async submit(): Promise<SearchUserAccountState> {
-        return this.material.search(this.searchFields(), this.post)
+        return this.material.search(this.updateQuery, this.searchFields(), this.post)
     }
     async load(): Promise<SearchUserAccountState> {
-        return this.material.search(this.loadFields(), this.post)
+        return this.material.search(this.updateQuery, this.loadFields(), this.post)
     }
 }

@@ -1,19 +1,20 @@
 import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 
-import { SearchUserAccountInfra } from "./infra"
+import { SearchUserAccountInfra, UpdateSearchUserAccountFieldsQuery } from "./infra"
 
 import { SearchUserAccountEvent } from "./event"
 
 import { SearchUserAccountFields } from "./data"
 
 export interface SearchUserAccountMethod {
-    <S>(fields: SearchUserAccountFields, post: Post<SearchUserAccountEvent, S>): Promise<S>
+    <S>(updater: UpdateSearchUserAccountFieldsQuery, fields: SearchUserAccountFields, post: Post<SearchUserAccountEvent, S>): Promise<S>
 }
 
 interface Search {
     (infra: SearchUserAccountInfra): SearchUserAccountMethod
 }
-export const searchUserAccount: Search = (infra) => async (fields, post) => {
+export const searchUserAccount: Search = (infra) => async (updater, fields, post) => {
+    updater(fields)
     post({ type: "try-to-search" })
 
     const { config } = infra
