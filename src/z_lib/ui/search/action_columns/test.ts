@@ -60,9 +60,8 @@ function initResource(): Readonly<{
         columns: MultipleBoardValueStore
     }>
 }> {
-    const { input } = initSearchColumnsAction([])
     const resource = {
-        field: input,
+        field: initSearchColumnsAction(["column-a", "column-b"], []),
     }
 
     const store = {

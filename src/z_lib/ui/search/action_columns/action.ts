@@ -4,6 +4,7 @@ import { BoardValue } from "../../../../../ui/vendor/getto-application/board/ker
 
 export interface SearchColumnsAction extends ApplicationStateAction<SearchColumnsState> {
     readonly input: MultipleInputBoardAction
+    readonly full: readonly string[]
 }
 
 export type SearchColumnsState = Readonly<{ columns: BoardValue[] }>

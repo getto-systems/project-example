@@ -1,6 +1,7 @@
 import { ApplicationMockStateAction } from "../../../../../ui/vendor/getto-application/action/mock"
 
 import { mockObserveBoardFieldAction } from "../../../../../ui/vendor/getto-application/board/action_observe_field/mock"
+import { mockSearchColumnsAction } from "../../../../z_lib/ui/search/action_columns/mock"
 import { mockSearchOffsetAction } from "../../../../z_lib/ui/search/action_offset/mock"
 import { mockSearchLoginIDAction } from "../../login_id/input/action_search/mock"
 
@@ -8,6 +9,7 @@ import {
     SearchUserAccountAction,
     SearchUserAccountState,
     initialSearchUserAccountState,
+    fullUserAccountColumns,
 } from "./action"
 
 export function mockSearchUserAccountAction(): SearchUserAccountAction {
@@ -22,6 +24,7 @@ class Action
 
     readonly loginID = mockSearchLoginIDAction()
     readonly offset = mockSearchOffsetAction()
+    readonly columns = mockSearchColumnsAction(fullUserAccountColumns)
     readonly observe = mockObserveBoardFieldAction()
 
     clear(): SearchUserAccountState {

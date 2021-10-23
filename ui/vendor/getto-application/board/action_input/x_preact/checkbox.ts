@@ -11,7 +11,7 @@ import { MultipleBoardValueStoreConnector } from "../../input/infra"
 
 import { BoardValue } from "../../kernel/data"
 
-export type CheckboxBoardContent = Readonly<{ key: string; value: BoardValue; label: VNodeContent }>
+export type CheckboxBoardContent = Readonly<{ key: string; value: string; label: VNodeContent }>
 
 type Props =
     | Readonly<{ input: MultipleInputBoardAction; options: CheckboxBoardContent[] }>
@@ -51,8 +51,8 @@ export function CheckboxBoardComponent(props: Props): VNode {
 }
 
 interface CheckboxStore {
-    has(value: BoardValue): boolean
-    setMember(value: BoardValue, isSelected: boolean): void
+    has(value: string): boolean
+    setMember(value: string, isSelected: boolean): void
 }
 
 function useCheckboxStore(connector: MultipleBoardValueStoreConnector): CheckboxStore {

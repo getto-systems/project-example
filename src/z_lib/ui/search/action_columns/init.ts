@@ -6,16 +6,8 @@ import { BoardValue } from "../../../../../ui/vendor/getto-application/board/ker
 import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/init"
 import { MultipleInputBoardAction } from "../../../../../ui/vendor/getto-application/board/action_input/action"
 
-export function initSearchColumnsAction(initial: BoardValue[]): Readonly<{
-    input: SearchColumnsAction
-    get: { (): BoardValue[] }
-}> {
-    const input = new Action(initial)
-
-    return {
-        input,
-        get: input.get,
-    }
+export function initSearchColumnsAction(full: string[], initial: BoardValue[]): SearchColumnsAction {
+    return new Action(full, initial)
 }
 
 class Action
@@ -25,18 +17,17 @@ class Action
     readonly initialState = initialSearchColumnsState
 
     readonly input: MultipleInputBoardAction
+    readonly full: readonly string[]
 
-    get: { (): BoardValue[] }
-
-    constructor(initial: BoardValue[]) {
+    constructor(full: string[], initial: BoardValue[]) {
         super()
 
         const { input, store, subscriber } = initMultipleInputBoardAction()
 
         store.set(initial)
 
-        this.get = () => store.get()
         this.input = input
+        this.full = full
 
         subscriber.subscribe(() => {
             this.post({ columns: store.get() })

@@ -3,6 +3,7 @@ import { ApplicationStateAction } from "../../../../../ui/vendor/getto-applicati
 import { SearchLoginIDAction } from "../../login_id/input/action_search/action"
 import { ObserveBoardAction } from "../../../../../ui/vendor/getto-application/board/action_observe_board/action"
 import { SearchOffsetAction } from "../../../../z_lib/ui/search/action_offset/action"
+import { SearchColumnsAction } from "../../../../z_lib/ui/search/action_columns/action"
 
 import { SearchUserAccountMethod } from "../search/method"
 
@@ -11,6 +12,7 @@ import { SearchUserAccountEvent } from "../search/event"
 export interface SearchUserAccountAction extends ApplicationStateAction<SearchUserAccountState> {
     readonly loginID: SearchLoginIDAction
     readonly offset: SearchOffsetAction
+    readonly columns: SearchColumnsAction
     readonly observe: ObserveBoardAction
 
     clear(): SearchUserAccountState
@@ -28,3 +30,5 @@ export type SearchUserAccountMaterial = Readonly<{
 export type SearchUserAccountState = Readonly<{ type: "initial-search" }> | SearchUserAccountEvent
 
 export const initialSearchUserAccountState: SearchUserAccountState = { type: "initial-search" }
+
+export const fullUserAccountColumns: string[] = ["login-id", "granted-roles"]

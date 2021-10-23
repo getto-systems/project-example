@@ -4,9 +4,7 @@ import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/stor
 
 import { SearchColumnsComponent } from "./columns"
 
-import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
-
-import { initSearchColumnsAction } from "../init"
+import { mockSearchColumnsAction } from "../mock"
 
 const options = ["inline", "block"] as const
 
@@ -24,15 +22,10 @@ type Props = Readonly<{
     block: typeof options[number]
 }>
 const template = storyTemplate<Props>((props) => {
-    const { input } = initSearchColumnsAction([])
     return h(SearchColumnsComponent, {
-        field: input,
+        field: mockSearchColumnsAction(["a", "b", "c"]),
         title: props.title,
-        options: [
-            { key: "a", value: markBoardValue("a"), label: "カラムA" },
-            { key: "b", value: markBoardValue("b"), label: "カラムB" },
-            { key: "c", value: markBoardValue("c"), label: "カラムC" },
-        ],
+        label: (key) => `カラム-${key}`,
         block: props.block === "block",
     })
 })
