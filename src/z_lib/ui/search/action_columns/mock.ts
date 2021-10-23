@@ -4,7 +4,7 @@ import { initMultipleInputBoardAction } from "../../../../../ui/vendor/getto-app
 
 import { initialSearchColumnsState, SearchColumnsAction, SearchColumnsState } from "./action"
 
-export function mockSearchColumnsAction(full: string[]): SearchColumnsAction {
+export function mockSearchColumnsAction(full: readonly string[]): SearchColumnsAction {
     return new Mock(full)
 }
 
@@ -17,7 +17,7 @@ class Mock
     readonly input: MultipleInputBoardAction
     readonly full: readonly string[]
 
-    constructor(full: string[]) {
+    constructor(full: readonly string[]) {
         super()
 
         const { input, subscriber } = initMultipleInputBoardAction()

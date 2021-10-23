@@ -31,4 +31,4 @@ export type SearchUserAccountState = Readonly<{ type: "initial-search" }> | Sear
 
 export const initialSearchUserAccountState: SearchUserAccountState = { type: "initial-search" }
 
-export const fullUserAccountColumns: string[] = ["login-id", "granted-roles"]
+export const fullUserAccountColumns = ["login-id", "granted-roles"] as const

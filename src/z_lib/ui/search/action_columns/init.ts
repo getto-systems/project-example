@@ -6,7 +6,7 @@ import { BoardValue } from "../../../../../ui/vendor/getto-application/board/ker
 import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/init"
 import { MultipleInputBoardAction } from "../../../../../ui/vendor/getto-application/board/action_input/action"
 
-export function initSearchColumnsAction(full: string[], initial: BoardValue[]): SearchColumnsAction {
+export function initSearchColumnsAction(full: readonly string[], initial: BoardValue[]): SearchColumnsAction {
     return new Action(full, initial)
 }
 
@@ -19,7 +19,7 @@ class Action
     readonly input: MultipleInputBoardAction
     readonly full: readonly string[]
 
-    constructor(full: string[], initial: BoardValue[]) {
+    constructor(full: readonly string[], initial: BoardValue[]) {
         super()
 
         const { input, store, subscriber } = initMultipleInputBoardAction()

@@ -76,7 +76,7 @@ class Action
         const loginID = initSearchLoginIDAction(initialFields.loginID)
         const offset = initSearchOffsetAction(initialFields.offset)
         const columns = initSearchColumnsAction(fullUserAccountColumns, [
-            /* "login-id", "granted-roles" */
+            /* TODO detect する "login-id", "granted-roles" */
         ])
         const { observe, checker } = initObserveBoardAction({
             fields: searchUserAccountFieldNames,
