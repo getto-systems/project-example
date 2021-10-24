@@ -10,6 +10,7 @@ import {
     TableCell,
     TableDataRowKeyProvider,
     TableStructure_hot,
+    tableCellInitiallyVisibleCells,
 } from "../cell"
 import {
     TableDataColumnDecorator,
@@ -22,6 +23,7 @@ import {
 } from "../decorator"
 import { TableDataHorizontalBorder, TableDataSticky } from "../style"
 import {
+    TableDataCellKey,
     TableDataColumnRow,
     TableDataFooterRow,
     TableDataHeaderKeyProvider,
@@ -30,7 +32,6 @@ import {
     TableDataParams,
     TableDataSummaryRow,
     TableDataView,
-    TableDataViewParams,
     TableStructure,
 } from "../core"
 import { tableDataMutable_row } from "../mutable/row"
@@ -42,8 +43,8 @@ export function tableStructure<M, R>(
     return new Structure(key, cells)
 }
 class Structure<M, R> implements TableStructure<M, R>, TableStructure_hot<M, R> {
-        key: TableDataRowKeyProvider<R>
-        cells: TableCell<M, R>[]
+    key: TableDataRowKeyProvider<R>
+    cells: TableCell<M, R>[]
     mutable: Readonly<{
         core: TableDataMutable_base<R>
         tree: TableDataMutable_tree<R>
@@ -60,8 +61,12 @@ class Structure<M, R> implements TableStructure<M, R>, TableStructure_hot<M, R> 
         }
     }
 
-    view(params: TableDataViewParams<M>): TableDataView[] {
-        return tableCellView(params, this.cells)
+    initiallyVisibleCells(): TableDataCellKey[] {
+        return tableCellInitiallyVisibleCells(this.cells)
+    }
+
+    view(): TableDataView[] {
+        return tableCellView(this.cells)
     }
     header(params: TableDataParams<M>): TableDataHeaderRow {
         const { style } = this.mutable.core.headerStyleMutable()
@@ -69,7 +74,7 @@ class Structure<M, R> implements TableStructure<M, R>, TableStructure_hot<M, R> 
         return {
             key: headerRow.key,
             className: headerRow.style.className,
-            headers: tableCellBaseHeader(params, style, this.cells),
+            headers: tableCellBaseHeader({ isInMultipart: false }, params, style, this.cells),
         }
     }
     summary(params: TableDataParams<M>): TableDataSummaryRow {
@@ -78,7 +83,7 @@ class Structure<M, R> implements TableStructure<M, R>, TableStructure_hot<M, R> 
         return {
             key: summaryRow.key(),
             className: summaryRow.style.className,
-            summaries: tableCellBaseSummary(params, style, this.cells),
+            summaries: tableCellBaseSummary({ isInMultipart: false }, params, style, this.cells),
         }
     }
     column(params: TableDataParams<M>, row: R): TableDataColumnRow {
@@ -88,7 +93,14 @@ class Structure<M, R> implements TableStructure<M, R>, TableStructure_hot<M, R> 
         return {
             key: this.key(row),
             className: treeRow.style.className,
-            columns: tableCellBaseColumn(params, style, decorators, this.cells, row),
+            columns: tableCellBaseColumn(
+                { isInMultipart: false },
+                params,
+                style,
+                decorators,
+                this.cells,
+                row,
+            ),
         }
     }
     footer(params: TableDataParams<M>): TableDataFooterRow {
@@ -97,7 +109,7 @@ class Structure<M, R> implements TableStructure<M, R>, TableStructure_hot<M, R> 
         return {
             key: footerRow.key(),
             className: footerRow.style.className,
-            footers: tableCellBaseFooter(params, style, this.cells),
+            footers: tableCellBaseFooter({ isInMultipart: false }, params, style, this.cells),
         }
     }
 

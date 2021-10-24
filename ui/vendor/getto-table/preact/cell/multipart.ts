@@ -1,7 +1,7 @@
 import {
+    TableDataCellKey,
     TableDataColumn,
     TableDataHeader,
-    TableDataParams,
     TableDataSummary,
     TableDataView,
 } from "../core"
@@ -13,12 +13,12 @@ import {
     tableCellFooter,
     tableCellHeader,
     tableCellSummary,
-    tableCellView,
     TableCell,
     TableCellMultipart,
     TableDataMultipartProvider,
     TableDataRelatedParams,
     TableDataStyledParams,
+    TableDataInherit,
 } from "../cell"
 import {
     TableDataColumnDecorator,
@@ -34,7 +34,7 @@ export type TableDataMultipartContent<M, R, P> = Readonly<{
     cells: TableDataMultipartCellProvider<M, R, P>
 }>
 export function tableCell_multipart<M, R, P>(
-    content: TableDataMultipartContent<M, R, P>
+    content: TableDataMultipartContent<M, R, P>,
 ): TableCellMultipart<M, R> {
     return new Cell(content)
 }
@@ -53,36 +53,69 @@ class Cell<M, R, P> implements TableCellMultipart<M, R> {
         }
     }
 
-    cells(model: M): TableCell<M, R>[] {
-        return this.content.data(model).flatMap((part) => this.content.cells(part))
+    cells(summary: M): TableCell<M, R>[] {
+        return this.content.data(summary).flatMap((part) => this.content.cells(part))
     }
 
-    view(params: TableDataParams<M>): TableDataView[] {
-        return tableCellView(params, this.cells(params.summary))
+    initiallyVisibleCells(): TableDataCellKey[] {
+        // multipart の cell はデータを取得しないといけない
+        // データを取得してから初期表示セルを判定していたのでは遅いので、
+        // multipart の cell は always visible 扱いとする
+        return []
     }
-    header(params: TableDataStyledParams<M>): TableDataHeader[] {
+
+    view(): TableDataView[] {
+        // multipart の cell はデータを取得しないといけない
+        // データを取得してから初期表示セルを判定していたのでは遅いので、
+        // multipart の cell は always visible 扱いとする
+        return []
+    }
+    header(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataHeader[] {
         const { style } = this.mutable.core.headerStyleMutable()
-        return tableCellHeader(params, style, this.cells(params.summary))
+        return tableCellHeader(
+            { ...inherit, isInMultipart: true },
+            params,
+            style,
+            this.cells(params.summary),
+        )
     }
-    summary(params: TableDataStyledParams<M>): TableDataSummary[] {
+    summary(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[] {
         const { style } = this.mutable.core.summaryStyleMutable()
-        return tableCellSummary(params, style, this.cells(params.summary))
+        return tableCellSummary(
+            { ...inherit, isInMultipart: true },
+            params,
+            style,
+            this.cells(params.summary),
+        )
     }
-    column(params: TableDataRelatedParams<M, R>): TableDataColumn[] {
+    column(inherit: TableDataInherit, params: TableDataRelatedParams<M, R>): TableDataColumn[] {
         const { style } = this.mutable.core.columnStyleMutable()
         const { decorators } = this.mutable.core.columnMutable()
-        return tableCellColumn(params, style, decorators, this.cells(params.summary))
+        return tableCellColumn(
+            { ...inherit, isInMultipart: true },
+            params,
+            style,
+            decorators,
+            this.cells(params.summary),
+        )
     }
-    footer(params: TableDataStyledParams<M>): TableDataSummary[] {
+    footer(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[] {
         const { style } = this.mutable.core.footerStyleMutable()
-        return tableCellFooter(params, style, this.cells(params.summary))
+        return tableCellFooter(
+            { ...inherit, isInMultipart: true },
+            params,
+            style,
+            this.cells(params.summary),
+        )
     }
 
     horizontalBorder(borders: TableDataHorizontalBorder[]): TableCellMultipart<M, R> {
         this.mutable.core.horizontalBorder(borders)
         return this
     }
-    horizontalBorderRelated(borders: TableDataHorizontalBorderProvider<R>): TableCellMultipart<M, R> {
+    horizontalBorderRelated(
+        borders: TableDataHorizontalBorderProvider<R>,
+    ): TableCellMultipart<M, R> {
         this.mutable.core.horizontalBorderRelated(borders)
         return this
     }

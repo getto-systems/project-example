@@ -15,8 +15,6 @@ import { SearchUserAccountTableStructure } from "./structure"
 import { SearchUserAccountColumnsResourceState, SearchUserAccountResource } from "../resource"
 
 import { RepositoryError } from "../../../../../z_lib/ui/repository/data"
-import { SearchUserAccountRemoteResponse } from "../../search/data"
-import { html } from "htm/preact"
 
 type Resource = SearchUserAccountResource & Readonly<{ structure: SearchUserAccountTableStructure }>
 
@@ -31,42 +29,28 @@ export function SearchUserAccountColumnsEntry(resource: Resource): VNode {
 type Props = Resource & SearchUserAccountColumnsResourceState
 export function SearchUserAccountColumnsComponent(props: Props): VNode {
     useLayoutEffect(() => {
-        switch (props.state.type) {
-            case "succeed-to-search":
-                props.search.columns.load(initialColumns(props.state.response))
-        }
-
-        function initialColumns(response: SearchUserAccountRemoteResponse): string[] {
-            return props.structure
-                .view({ summary: response.summary })
-                .filter((column) => column.isInitiallyVisible && !column.isAlwaysVisible)
-                .map((column) => `${column.key}`)
-        }
-    }, [props.search.columns, props.structure, props.state])
+        props.search.columns.load(props.structure.initiallyVisibleCells())
+    }, [props.search.columns, props.structure])
 
     return basedOn(props)
 
-    function basedOn({ state, columns }: SearchUserAccountColumnsResourceState): VNode {
-        if (columns.type === "repository-error") {
-            return errorMessage(columns.err)
-        }
+    function basedOn({ columns }: SearchUserAccountColumnsResourceState): VNode {
+        switch (columns.type) {
+            case "initial-search":
+            case "succeed-to-load":
+            case "succeed-to-save":
+                return columnsBox()
 
-        switch (state.type) {
-            case "succeed-to-search":
-                return columnsBox({ response: state.response })
-
-            default:
-                return EMPTY_CONTENT
+            case "repository-error":
+                return errorMessage(columns.err)
         }
     }
 
-    type Content = Readonly<{ response: SearchUserAccountRemoteResponse }>
-
-    function columnsBox({ response }: Content): VNode {
+    function columnsBox(): VNode {
         return box_grow({
             body: h(SearchColumnsComponent, {
                 field: props.search.columns,
-                columns: props.structure.view({ summary: response.summary }),
+                columns: props.structure.view(),
             }),
         })
     }
@@ -80,5 +64,3 @@ function repositoryError(err: RepositoryError): string[] {
         ...reason.detail,
     ])
 }
-
-const EMPTY_CONTENT = html``

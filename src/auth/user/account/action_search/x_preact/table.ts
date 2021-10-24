@@ -40,23 +40,10 @@ export function SearchUserAccountTableComponent(props: Props): VNode {
 
             case "succeed-to-load":
             case "succeed-to-save":
-                switch (state.type) {
-                    case "initial-search":
-                    case "failed-to-search":
-                        return EMPTY_CONTENT
-
-                    case "try-to-search":
-                    case "take-longtime-to-search":
-                        // TODO 前回の結果をそのまま表示したかったけど、どうだろうか
-                        return html`前回の結果のままにするか？`
-
-                    case "succeed-to-search":
-                        return content({
-                            columns: columns.columns,
-                            response: state.response,
-                        })
-
+                if (state.type === "succeed-to-search") {
+                    return content({ columns: columns.columns, response: state.response })
                 }
+                return EMPTY_CONTENT
         }
     }
 

@@ -3,7 +3,9 @@ import { VNodeContent, VNodeKey } from "./common"
 import { TableDataClassName, TableDataFullStyle, TableDataSticky } from "./style"
 
 export interface TableStructure<M, R> {
-    view(params: TableDataViewParams<M>): TableDataView[]
+    initiallyVisibleCells(): TableDataCellKey[]
+
+    view(): TableDataView[]
     header(params: TableDataParams<M>): TableDataHeaderRow
     summary(params: TableDataParams<M>): TableDataSummaryRow
     column(params: TableDataParams<M>, row: R): TableDataColumnRow
@@ -12,15 +14,12 @@ export interface TableStructure<M, R> {
     sticky(): TableDataSticky
 }
 
-export type TableDataViewParams<M> = Readonly<{ summary: M }>
 export type TableDataParams<M> = Readonly<{ summary: M; visibleKeys: readonly TableDataCellKey[] }>
 export type TableDataCellKey = string
 
 export type TableDataView = Readonly<{
-    type: "view"
-    key: VNodeKey
+    key: TableDataCellKey
     content: VNodeContent
-    isAlwaysVisible: boolean
     isInitiallyVisible: boolean
 }>
 

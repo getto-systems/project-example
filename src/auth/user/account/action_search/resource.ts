@@ -14,7 +14,6 @@ export type SearchUserAccountPagerResourceState = Readonly<{
     state: SearchUserAccountState
 }>
 export type SearchUserAccountColumnsResourceState = Readonly<{
-    state: SearchUserAccountState
     columns: SearchColumnsState
 }>
 export type SearchUserAccountTableResourceState = Readonly<{

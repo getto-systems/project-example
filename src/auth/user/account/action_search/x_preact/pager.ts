@@ -15,7 +15,6 @@ import { SearchUserAccountError } from "../../search/data"
 import { pagerOptions } from "../../../../../../ui/vendor/getto-css/preact/design/data"
 import { SearchOffsetComponent } from "../../../../../z_lib/ui/search/action_offset/x_preact/offset"
 import { SearchPageResponse } from "../../../../../z_lib/ui/search/data"
-import { html } from "htm/preact"
 
 export function SearchUserAccountPagerEntry({ search }: SearchUserAccountResource): VNode {
     return h(SearchUserAccountPagerComponent, {
@@ -32,7 +31,7 @@ export function SearchUserAccountPagerComponent(props: Props): VNode {
         switch (state.type) {
             case "initial-search":
             case "try-to-search":
-                return EMPTY_CONTENT
+                return EMPTY_BOX
 
             case "succeed-to-search":
                 return pagerForm({ page: state.response.page })
@@ -82,7 +81,7 @@ export function SearchUserAccountPagerComponent(props: Props): VNode {
     }
 }
 
-const EMPTY_CONTENT = html``
+const EMPTY_BOX = box({ body: "" })
 
 function searchError(err: SearchUserAccountError) {
     return remoteCommonErrorReason(err, (reason) => [
