@@ -15,6 +15,7 @@ import { SearchUserAccountError } from "../../search/data"
 import { pagerOptions } from "../../../../../../ui/vendor/getto-css/preact/design/data"
 import { SearchOffsetComponent } from "../../../../../z_lib/ui/search/action_offset/x_preact/offset"
 import { SearchPageResponse } from "../../../../../z_lib/ui/search/data"
+import { html } from "htm/preact"
 
 export function SearchUserAccountPagerEntry({ search }: SearchUserAccountResource): VNode {
     return h(SearchUserAccountPagerComponent, {
@@ -30,16 +31,14 @@ export function SearchUserAccountPagerComponent(props: Props): VNode {
     function basedOn({ state }: SearchUserAccountPagerResourceState): VNode {
         switch (state.type) {
             case "initial-search":
+            case "try-to-search":
                 return EMPTY_CONTENT
 
             case "succeed-to-search":
                 return pagerForm({ page: state.response.page })
 
-            case "try-to-search":
-                return connectingMessage({ hasTakeLongtime: false })
-
             case "take-longtime-to-search":
-                return connectingMessage({ hasTakeLongtime: true })
+                return connectingMessage()
 
             case "failed-to-search":
                 return errorMessage({ err: state.err })
@@ -67,11 +66,7 @@ export function SearchUserAccountPagerComponent(props: Props): VNode {
         }
     }
 
-    type ConnectingContent = Readonly<{ hasTakeLongtime: boolean }>
-    function connectingMessage({ hasTakeLongtime }: ConnectingContent): VNode {
-        if (!hasTakeLongtime) {
-            return EMPTY_CONTENT
-        }
+    function connectingMessage(): VNode {
         return box({
             body: fieldError([
                 "検索中です",
@@ -87,7 +82,7 @@ export function SearchUserAccountPagerComponent(props: Props): VNode {
     }
 }
 
-const EMPTY_CONTENT = box({ body: "" })
+const EMPTY_CONTENT = html``
 
 function searchError(err: SearchUserAccountError) {
     return remoteCommonErrorReason(err, (reason) => [

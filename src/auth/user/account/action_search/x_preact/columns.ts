@@ -16,6 +16,7 @@ import { SearchUserAccountColumnsResourceState, SearchUserAccountResource } from
 
 import { RepositoryError } from "../../../../../z_lib/ui/repository/data"
 import { SearchUserAccountRemoteResponse } from "../../search/data"
+import { html } from "htm/preact"
 
 type Resource = SearchUserAccountResource & Readonly<{ structure: SearchUserAccountTableStructure }>
 
@@ -46,22 +47,16 @@ export function SearchUserAccountColumnsComponent(props: Props): VNode {
     return basedOn(props)
 
     function basedOn({ state, columns }: SearchUserAccountColumnsResourceState): VNode {
-        switch (columns.type) {
-            case "initial-search":
+        if (columns.type === "repository-error") {
+            return errorMessage(columns.err)
+        }
+
+        switch (state.type) {
+            case "succeed-to-search":
+                return columnsBox({ response: state.response })
+
+            default:
                 return EMPTY_CONTENT
-
-            case "repository-error":
-                return errorMessage(columns.err)
-
-            case "succeed-to-load":
-            case "succeed-to-save":
-                switch (state.type) {
-                    case "succeed-to-search":
-                        return columnsBox({ response: state.response })
-
-                    default:
-                        return EMPTY_CONTENT
-                }
         }
     }
 
@@ -86,4 +81,4 @@ function repositoryError(err: RepositoryError): string[] {
     ])
 }
 
-const EMPTY_CONTENT = box_grow({ body: "" })
+const EMPTY_CONTENT = html``
