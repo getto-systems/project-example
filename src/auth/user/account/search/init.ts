@@ -27,7 +27,8 @@ export function newSearchUserAccountInfra(feature: RemoteOutsideFeature): Search
 export function newSearchUserAccountFieldsDetecter(
     feature: LocationOutsideFeature,
 ): SearchUserAccountFieldsDetecter {
-    return () => detectSearchUserAccountFields(new URL(feature.currentLocation.toString()))
+    return (params) =>
+        detectSearchUserAccountFields(new URL(feature.currentLocation.toString()), params)
 }
 export function newUpdateSearchUserAccountFieldsQuery(
     feature: LocationOutsideFeature & HistoryOutsideFeature,

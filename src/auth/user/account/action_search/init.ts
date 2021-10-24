@@ -30,6 +30,8 @@ import {
     initSearchColumnsMaterial,
 } from "../../../../z_lib/ui/search/action_columns/init"
 import { SearchColumnsInfra } from "../../../../z_lib/ui/search/columns/infra"
+import { SearchSort } from "../../../../z_lib/ui/search/sort/data"
+import { nextSort } from "../../../../z_lib/ui/search/sort/helper"
 
 export type SearchUserAccountActionInfra = Readonly<{
     search: SearchUserAccountInfra
@@ -68,8 +70,10 @@ class Action
 
     searchFields: { (): SearchUserAccountFields }
     loadFields: { (): SearchUserAccountFields }
+    sortFields: { (key: string): SearchUserAccountFields }
 
     updateQuery: UpdateSearchUserAccountFieldsQuery
+    sortStore: SearchSort
 
     constructor(
         material: SearchUserAccountMaterial,
@@ -79,7 +83,7 @@ class Action
         super(async () => this.load())
         this.material = material
 
-        const initialFields = detecter()
+        const initialFields = detecter({ defaultSortKey: "login-id" })
         const loginID = initSearchLoginIDAction(initialFields.loginID)
         const offset = initSearchOffsetAction(initialFields.offset)
         const columns = initSearchColumnsAction(this.material.columns)
@@ -89,10 +93,17 @@ class Action
 
         this.searchFields = () => ({
             offset: offset.reset(),
+            sort: this.currentSort(),
             loginID: loginID.pin(),
         })
         this.loadFields = () => ({
             offset: offset.get(),
+            sort: this.currentSort(),
+            loginID: loginID.peek(),
+        })
+        this.sortFields = (key: string) => ({
+            offset: offset.reset(),
+            sort: this.updateSort(key),
             loginID: loginID.peek(),
         })
 
@@ -102,6 +113,7 @@ class Action
         this.observe = observe
 
         this.updateQuery = updateQuery
+        this.sortStore = initialFields.sort
 
         this.loginID.observe.subscriber.subscribe((result) =>
             checker.update("loginID", result.hasChanged),
@@ -113,6 +125,14 @@ class Action
         })
     }
 
+    currentSort(): SearchSort {
+        return this.sortStore
+    }
+    updateSort(key: string): SearchSort {
+        this.sortStore = nextSort(this.currentSort(), key)
+        return this.sortStore
+    }
+
     clear(): SearchUserAccountState {
         this.loginID.clear()
         return this.initialState
@@ -122,5 +142,8 @@ class Action
     }
     async load(): Promise<SearchUserAccountState> {
         return this.material.search(this.updateQuery, this.loadFields(), this.post)
+    }
+    async sort(key: string): Promise<SearchUserAccountState> {
+        return this.material.search(this.updateQuery, this.sortFields(key), this.post)
     }
 }

@@ -26,6 +26,7 @@ export function newSearchUserAccountRemote(feature: RemoteOutsideFeature): Searc
                     success: true,
                     value: {
                         page: { offset: 0, limit: 10, all: 25 },
+                        summary: {},
                         users: [
                             {
                                 loginID: "admin" as LoginID,
@@ -59,7 +60,7 @@ export function newSearchUserAccountRemote(feature: RemoteOutsideFeature): Searc
             }
             return {
                 success: true,
-                value: { page: { offset: 0, limit: 1000, all: 245 }, users: [] },
+                value: { page: { offset: 0, limit: 1000, all: 245 }, summary: {}, users: [] },
             }
 
             // TODO response を受け取る

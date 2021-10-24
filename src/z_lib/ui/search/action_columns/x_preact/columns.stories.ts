@@ -27,9 +27,9 @@ const template = storyTemplate<Props>((props) => {
         title: props.title,
         block: props.block === "block",
         columns: [
-            { key: "a", content: "カラムA", isVisible: true },
-            { key: "b", content: "カラムB", isVisible: true },
-            { key: "c", content: "カラムC", isVisible: false },
+            { key: "a", content: "カラムA", isInitiallyVisible: true },
+            { key: "b", content: "カラムB", isInitiallyVisible: true },
+            { key: "c", content: "カラムC", isInitiallyVisible: false },
         ],
     })
 })

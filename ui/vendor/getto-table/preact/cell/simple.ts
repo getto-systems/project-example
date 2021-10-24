@@ -4,17 +4,14 @@ import {
     TableDataCellKey,
     TableDataColumnSimple,
     TableDataHeaderSimple,
-    TableDataParams,
     TableDataSummarySimple,
     TableDataView,
-    TableDataVisibleKeys,
 } from "../core"
 
 import { tableDataMutable_base } from "../mutable/base"
 import { tableDataMutable_leaf } from "../mutable/leaf"
 import { TableDataMutable_base, TableDataMutable_leaf } from "../mutable"
 import {
-    isVisibleKey,
     TableDataAlwaysVisible,
     TableDataColumnContentProvider,
     TableDataInvisible,
@@ -85,27 +82,29 @@ class Cell<M, R> implements TableCellSimple<M, R> {
         }
     }
 
-    isVisible(visibleKeys: TableDataVisibleKeys): boolean {
+    isVisible(visibleKeys: readonly TableDataCellKey[]): boolean {
         const { visibleType: visible } = this.mutable.leaf.visibleMutable()
-        return visible === "always" || isVisibleKey(this.key, visibleKeys)
+        return visible === "always" || visibleKeys.includes(this.key)
     }
 
     verticalBorder(): TableDataVerticalBorderStyle {
         return this.mutable.leaf.verticalBorderMutable().border
     }
 
-    view({ visibleKeys }: TableDataParams<M>): TableDataView | TableDataAlwaysVisible {
+    view(): TableDataView | TableDataAlwaysVisible {
         const { visibleType: visible } = this.mutable.leaf.visibleMutable()
         if (visible === "always") {
             return { type: "always-visible" }
         }
 
         const { decorator } = this.mutable.leaf.viewMutable()
+        const { visibleType } = this.mutable.leaf.visibleMutable()
         return {
             type: "view",
             key: this.key,
             content: decorateContent(this.content.label, decorator),
-            isVisible: this.isVisible(visibleKeys),
+            isAlwaysVisible: visibleType === "always",
+            isInitiallyVisible: visibleType !== "initially-hidden",
         }
     }
     header({

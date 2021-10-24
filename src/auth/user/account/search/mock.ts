@@ -3,7 +3,7 @@ import { detectSearchUserAccountFields, updateSearchUserAccountFieldsQuery } fro
 import { SearchUserAccountFieldsDetecter, UpdateSearchUserAccountFieldsQuery } from "./infra"
 
 export function mockSearchUserAccountFieldsDetecter(url: URL): SearchUserAccountFieldsDetecter {
-    return () => detectSearchUserAccountFields(url)
+    return (params) => detectSearchUserAccountFields(url, params)
 }
 export function mockUpdateSearchUserAccountFieldsQuery(
     url: URL,

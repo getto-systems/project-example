@@ -7,8 +7,11 @@ import {
     SearchUserAccountRemoteResponse,
 } from "./data"
 
+export type SearchUserAccountFieldsDetectParams = Readonly<{
+    defaultSortKey: string
+}>
 export interface SearchUserAccountFieldsDetecter {
-    (): SearchUserAccountFields
+    (params: SearchUserAccountFieldsDetectParams): SearchUserAccountFields
 }
 export interface UpdateSearchUserAccountFieldsQuery {
     (fields: SearchUserAccountFields): void

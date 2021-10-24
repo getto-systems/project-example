@@ -8,6 +8,7 @@ import { SearchColumnsAction, SearchColumnsMaterial } from "../../../../z_lib/ui
 import { SearchUserAccountMethod } from "../search/method"
 
 import { SearchUserAccountEvent } from "../search/event"
+import { SearchSort } from "../../../../z_lib/ui/search/sort/data"
 
 export interface SearchUserAccountAction extends ApplicationStateAction<SearchUserAccountState> {
     readonly loginID: SearchLoginIDAction
@@ -15,9 +16,12 @@ export interface SearchUserAccountAction extends ApplicationStateAction<SearchUs
     readonly columns: SearchColumnsAction
     readonly observe: ObserveBoardAction
 
+    currentSort(): SearchSort
+
     clear(): SearchUserAccountState
     submit(): Promise<SearchUserAccountState>
     load(): Promise<SearchUserAccountState>
+    sort(key: string): Promise<SearchUserAccountState>
 }
 
 export const searchUserAccountFieldNames = ["loginID"] as const

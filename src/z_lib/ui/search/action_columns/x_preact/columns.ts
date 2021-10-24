@@ -3,7 +3,7 @@ import { h, VNode } from "preact"
 import { field } from "../../../../../../ui/vendor/getto-css/preact/design/form"
 import { tableViewColumns } from "../../../../../../ui/vendor/getto-css/preact/design/data"
 
-import { VNodeContent } from "../../../../../example/x_preact/design/common"
+import { VNodeContent, VNodeKey } from "../../../../../example/x_preact/design/common"
 
 import {
     CheckboxBoardComponent,
@@ -11,22 +11,17 @@ import {
 } from "../../../../../../ui/vendor/getto-application/board/action_input/x_preact/checkbox"
 
 import { SearchColumnsResource } from "../resource"
-import { useLayoutEffect } from "preact/hooks"
 
-type SearchProps = CheckboxProps | (Readonly<{ title: VNodeContent }> & CheckboxProps)
-type CheckboxProps = ColumnProps | (ColumnProps & Readonly<{ block: boolean }>)
-type ColumnProps = Readonly<{ columns: SearchColumnState[] }>
+export type SearchColumnState = Readonly<{
+    key: VNodeKey
+    content: VNodeContent
+}>
 
-export type SearchColumnState = Readonly<{ key: string; content: VNodeContent; isVisible: boolean }>
-
-type Props = SearchColumnsResource & SearchProps
+type Props = SearchColumnsResource & SearchColumnsProps
+type SearchColumnsProps = CheckboxProps | (CheckboxProps & Readonly<{ title: VNodeContent }>)
+type CheckboxProps = ColumnsProps | (ColumnsProps & Readonly<{ block: boolean }>)
+type ColumnsProps = Readonly<{ columns: SearchColumnState[] }>
 export function SearchColumnsComponent(props: Props): VNode {
-    useLayoutEffect(() => {
-        props.field.load(
-            props.columns.filter((column) => column.isVisible).map((column) => `${column.key}`),
-        )
-    }, [props.field, props.columns])
-
     return field({
         title: title(),
         body: [

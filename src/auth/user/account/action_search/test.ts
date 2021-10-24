@@ -30,11 +30,15 @@ describe("SearchUserAccount", () => {
                 { type: "try-to-search" },
                 {
                     type: "succeed-to-search",
-                    response: { page: { offset: 0, limit: 1000, all: 245 }, users: [] },
+                    response: {
+                        page: { offset: 0, limit: 1000, all: 245 },
+                        summary: {},
+                        users: [],
+                    },
                 },
             ])
             expect(url.current.toString()).toEqual(
-                "https://example.com/index.html?login-id=MY-LOGIN-ID&search-offset=0",
+                "https://example.com/index.html?login-id=MY-LOGIN-ID&search-offset=0&search-sort-key=login-id&search-sort-order=normal",
             )
         })
     })
@@ -52,7 +56,11 @@ describe("SearchUserAccount", () => {
                 { type: "take-longtime-to-search" },
                 {
                     type: "succeed-to-search",
-                    response: { page: { offset: 0, limit: 1000, all: 245 }, users: [] },
+                    response: {
+                        page: { offset: 0, limit: 1000, all: 245 },
+                        summary: {},
+                        users: [],
+                    },
                 },
             ])
         })
@@ -145,6 +153,6 @@ function takeLongtime_search(): SearchUserAccountRemote {
 function standard_searchRemoteResult(): SearchUserAccountRemoteResult {
     return {
         success: true,
-        value: { page: { offset: 0, limit: 1000, all: 245 }, users: [] },
+        value: { page: { offset: 0, limit: 1000, all: 245 }, summary: {}, users: [] },
     }
 }

@@ -30,6 +30,7 @@ import {
     TableDataParams,
     TableDataSummaryRow,
     TableDataView,
+    TableDataViewParams,
     TableStructure,
 } from "../core"
 import { tableDataMutable_row } from "../mutable/row"
@@ -41,8 +42,8 @@ export function tableStructure<M, R>(
     return new Structure(key, cells)
 }
 class Structure<M, R> implements TableStructure<M, R>, TableStructure_hot<M, R> {
-    key: TableDataRowKeyProvider<R>
-    cells: TableCell<M, R>[]
+        key: TableDataRowKeyProvider<R>
+        cells: TableCell<M, R>[]
     mutable: Readonly<{
         core: TableDataMutable_base<R>
         tree: TableDataMutable_tree<R>
@@ -59,7 +60,7 @@ class Structure<M, R> implements TableStructure<M, R>, TableStructure_hot<M, R> 
         }
     }
 
-    view(params: TableDataParams<M>): TableDataView[] {
+    view(params: TableDataViewParams<M>): TableDataView[] {
         return tableCellView(params, this.cells)
     }
     header(params: TableDataParams<M>): TableDataHeaderRow {

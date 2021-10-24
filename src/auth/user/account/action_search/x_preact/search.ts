@@ -7,18 +7,20 @@ import { SearchUserAccountResource } from "../resource"
 
 import { SearchUserAccountFormEntry } from "./form"
 import { SearchUserAccountPagerEntry } from "./pager"
-import { SearchUserAccountColumnsComponent } from "./columns"
+import { SearchUserAccountColumnsEntry } from "./columns"
+import { SearchUserAccountTableEntry } from "./table"
+
+import { useSearchUserAccountTableStructure } from "./structure"
 
 export function SearchUserAccountEntry(resource: SearchUserAccountResource): VNode {
+    const structure = useSearchUserAccountTableStructure(resource.search)
+
     return html`
         ${container([h(SearchUserAccountFormEntry, resource)])}
         ${container([
             h(SearchUserAccountPagerEntry, resource),
-            // TODO label は table の structure からヘッダの内容を取得するようにする
-            h(SearchUserAccountColumnsComponent, {
-                ...resource,
-                columns: [{ key: "a", content: "カラムA", isVisible: true }],
-            }),
+            h(SearchUserAccountColumnsEntry, { structure, ...resource }),
         ])}
+        ${h(SearchUserAccountTableEntry, { structure, ...resource })}
     `
 }
