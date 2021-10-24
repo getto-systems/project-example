@@ -1,4 +1,3 @@
-import { env } from "../../../../y_environment/ui/env"
 import { lnir } from "../../../../z_lib/ui/icon/line_icon"
 import { MenuContent, MenuPermission } from "../infra"
 import { category, item } from "./common"
@@ -7,7 +6,6 @@ import { category, item } from "./common"
 
 export function homeMenuContent(): MenuContent {
     return {
-        database: env.database.menuExpand,
         key: "home",
         loadMenuBadge: true,
         menuTree: [

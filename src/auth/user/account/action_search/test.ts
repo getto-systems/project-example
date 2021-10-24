@@ -1,6 +1,7 @@
 import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 
+import { mockSearchColumnsRepository } from "../../../../z_lib/ui/search/columns/init/repository/mock"
 import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/init/mock"
 import {
@@ -114,6 +115,9 @@ function initResource(search: SearchUserAccountRemote): Readonly<{
                     config: {
                         takeLongtimeThreshold: { delay_millisecond: 32 },
                     },
+                },
+                columns: {
+                    columns: mockSearchColumnsRepository(),
                 },
             }),
             mockSearchUserAccountFieldsDetecter(currentURL),

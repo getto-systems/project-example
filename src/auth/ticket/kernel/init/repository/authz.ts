@@ -1,5 +1,5 @@
 import { env } from "../../../../../y_environment/ui/env"
-import { Authz_pb } from "../../../../../y_protobuf/proto.js"
+import pb from "../../../../../y_protobuf/proto.js"
 
 import { decodeProtobuf, encodeProtobuf } from "../../../../../../ui/vendor/protobuf/helper"
 import {
@@ -50,12 +50,12 @@ export function newAuthzRepository({ webDB }: RepositoryOutsideFeature): AuthzRe
         }
 
         function toDB(value: AuthzRepositoryValue): string {
-            return encodeProtobuf(Authz_pb, (message) => {
+            return encodeProtobuf(pb.auth.ticket.db.Authz_pb, (message) => {
                 message.roles = value.roles
             })
         }
         function fromDB(raw: string): AuthzRepositoryValue {
-            return decodeProtobuf(Authz_pb, raw)
+            return decodeProtobuf(pb.auth.ticket.db.Authz_pb, raw)
         }
     }
 }

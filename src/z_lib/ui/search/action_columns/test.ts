@@ -1,9 +1,10 @@
 import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
 
+import { mockSearchColumnsRepository } from "../columns/init/repository/mock"
 import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockMultipleBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/init/mock"
 
-import { initSearchColumnsAction } from "./init"
+import { initSearchColumnsAction, initSearchColumnsMaterial } from "./init"
 
 import { MultipleBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
 
@@ -16,6 +17,7 @@ describe("SearchColumns", () => {
         const runner = setupActionTestRunner(resource.field.subscriber)
 
         await runner(async () => {
+            resource.field.load(["column-initial"])
             store.columns.set([markBoardValue("column-a")])
             resource.field.input.publisher.post()
             store.columns.set([markBoardValue("column-a"), markBoardValue("column-b")])
@@ -23,8 +25,9 @@ describe("SearchColumns", () => {
             return resource.field.currentState()
         }).then((stack) => {
             expect(stack).toEqual([
-                { columns: ["column-a"] },
-                { columns: ["column-a", "column-b"] },
+                { type: "succeed-to-load", columns: ["column-initial"] },
+                { type: "succeed-to-save", columns: ["column-a"] },
+                { type: "succeed-to-save", columns: ["column-a", "column-b"] },
             ])
         })
     })
@@ -61,7 +64,11 @@ function initResource(): Readonly<{
     }>
 }> {
     const resource = {
-        field: initSearchColumnsAction(["column-a", "column-b"], []),
+        field: initSearchColumnsAction(
+            initSearchColumnsMaterial({
+                columns: mockSearchColumnsRepository(),
+            }),
+        ),
     }
 
     const store = {

@@ -1,13 +1,31 @@
+import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/init"
+
 import { initMultipleInputBoardAction } from "../../../../../ui/vendor/getto-application/board/action_input/init"
 
-import { initialSearchColumnsState, SearchColumnsAction, SearchColumnsState } from "./action"
-
-import { BoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/data"
-import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/init"
+import {
+    initialSearchColumnsState,
+    SearchColumnsAction,
+    SearchColumnsMaterial,
+    SearchColumnsState,
+} from "./action"
 import { MultipleInputBoardAction } from "../../../../../ui/vendor/getto-application/board/action_input/action"
 
-export function initSearchColumnsAction(full: readonly string[], initial: BoardValue[]): SearchColumnsAction {
-    return new Action(full, initial)
+import { loadSearchColumns, saveSearchColumns } from "../columns/method"
+
+import { MultipleBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
+import { SearchColumnsInfra } from "../columns/infra"
+
+export type LoadSearchColumnsInfra = SearchColumnsInfra
+
+export function initSearchColumnsMaterial(infra: LoadSearchColumnsInfra): SearchColumnsMaterial {
+    return {
+        load: loadSearchColumns(infra),
+        save: saveSearchColumns(infra),
+    }
+}
+
+export function initSearchColumnsAction(material: SearchColumnsMaterial): SearchColumnsAction {
+    return new Action(material)
 }
 
 class Action
@@ -17,24 +35,36 @@ class Action
     readonly initialState = initialSearchColumnsState
 
     readonly input: MultipleInputBoardAction
-    readonly full: readonly string[]
 
-    constructor(full: readonly string[], initial: BoardValue[]) {
+    material: SearchColumnsMaterial
+    store: MultipleBoardValueStore
+
+    constructor(material: SearchColumnsMaterial) {
         super()
 
         const { input, store, subscriber } = initMultipleInputBoardAction()
 
-        store.set(initial)
-
         this.input = input
-        this.full = full
+        this.material = material
+        this.store = store
 
         subscriber.subscribe(() => {
-            this.post({ columns: store.get() })
+            material.save(store.get(), this.post)
         })
 
         this.terminateHook(() => {
             subscriber.terminate()
+        })
+    }
+
+    load(initial: readonly string[]): Promise<SearchColumnsState> {
+        return this.material.load(initial, (event) => {
+            switch (event.type) {
+                case "succeed-to-load":
+                    this.store.set(event.columns)
+                    break
+            }
+            return this.post(event)
         })
     }
 }

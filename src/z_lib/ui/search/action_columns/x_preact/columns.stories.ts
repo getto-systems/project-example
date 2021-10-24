@@ -23,10 +23,14 @@ type Props = Readonly<{
 }>
 const template = storyTemplate<Props>((props) => {
     return h(SearchColumnsComponent, {
-        field: mockSearchColumnsAction(["a", "b", "c"]),
+        field: mockSearchColumnsAction(),
         title: props.title,
-        label: (key) => `カラム-${key}`,
         block: props.block === "block",
+        columns: [
+            { key: "a", content: "カラムA", isVisible: true },
+            { key: "b", content: "カラムB", isVisible: true },
+            { key: "c", content: "カラムC", isVisible: false },
+        ],
     })
 })
 

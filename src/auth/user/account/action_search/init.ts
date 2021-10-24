@@ -10,7 +10,6 @@ import {
     SearchUserAccountState,
     initialSearchUserAccountState,
     searchUserAccountFieldNames,
-    fullUserAccountColumns,
 } from "./action"
 import { SearchLoginIDAction } from "../../login_id/input/action_search/action"
 import { SearchOffsetAction } from "../../../../z_lib/ui/search/action_offset/action"
@@ -26,10 +25,15 @@ import {
 } from "../search/infra"
 
 import { SearchUserAccountFields } from "../search/data"
-import { initSearchColumnsAction } from "../../../../z_lib/ui/search/action_columns/init"
+import {
+    initSearchColumnsAction,
+    initSearchColumnsMaterial,
+} from "../../../../z_lib/ui/search/action_columns/init"
+import { SearchColumnsInfra } from "../../../../z_lib/ui/search/columns/infra"
 
 export type SearchUserAccountActionInfra = Readonly<{
     search: SearchUserAccountInfra
+    columns: SearchColumnsInfra
 }>
 
 export function initSearchUserAccountMaterial(
@@ -37,6 +41,7 @@ export function initSearchUserAccountMaterial(
 ): SearchUserAccountMaterial {
     return {
         search: searchUserAccount(infra.search),
+        columns: initSearchColumnsMaterial(infra.columns),
     }
 }
 
@@ -77,9 +82,7 @@ class Action
         const initialFields = detecter()
         const loginID = initSearchLoginIDAction(initialFields.loginID)
         const offset = initSearchOffsetAction(initialFields.offset)
-        const columns = initSearchColumnsAction(fullUserAccountColumns, [
-            /* TODO detect する "login-id", "granted-roles" */
-        ])
+        const columns = initSearchColumnsAction(this.material.columns)
         const { observe, checker } = initObserveBoardAction({
             fields: searchUserAccountFieldNames,
         })

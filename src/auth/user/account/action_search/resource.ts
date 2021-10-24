@@ -1,5 +1,3 @@
-import { VNodeContent } from "../../../../example/x_preact/design/common"
-
 import { ObserveBoardActionState } from "../../../../../ui/vendor/getto-application/board/action_observe_board/action"
 import { SearchUserAccountAction, SearchUserAccountState } from "./action"
 
@@ -13,7 +11,4 @@ export type SearchUserAccountFormResourceState = Readonly<{
 }>
 export type SearchUserAccountPagerResourceState = Readonly<{
     state: SearchUserAccountState
-}>
-export type SearchUserAccountColumnsResourceState = Readonly<{
-    label: { (key: string): VNodeContent }
 }>

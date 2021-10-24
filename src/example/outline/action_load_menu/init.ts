@@ -13,7 +13,6 @@ import { ToggleMenuExpandInfra, ToggleMenuExpandStore } from "../toggle_menu_exp
 
 import { LoadMenuMaterial, LoadMenuAction, LoadMenuState, initialLoadMenuState } from "./action"
 
-
 import { MenuCategoryPath } from "../kernel/data"
 
 export type LoadMenuActionInfra = LoadMenuInfra & UpdateMenuBadgeInfra & ToggleMenuExpandInfra
@@ -21,6 +20,7 @@ export type LoadMenuActionInfra = LoadMenuInfra & UpdateMenuBadgeInfra & ToggleM
 type Store = LoadMenuStore & UpdateMenuBadgeStore & ToggleMenuExpandStore
 
 export function initLoadMenuMaterial(infra: LoadMenuActionInfra): LoadMenuMaterial {
+    // TODO infra に含めるべきな気がする
     const store: Store = {
         menuExpand: initMenuExpandStore(),
         menuBadge: initMenuBadgeStore(),

@@ -2,7 +2,7 @@ import { VNode } from "preact"
 import { useLayoutEffect, useMemo, useState } from "preact/hooks"
 import { html } from "htm/preact"
 
-import { VNodeContent } from "../../../../getto-css/preact/common"
+import { VNodeContent, VNodeKey } from "../../../../getto-css/preact/common"
 import { checkbox, checkbox_block } from "../../../../getto-css/preact/design/form"
 
 import { MultipleInputBoardAction } from "../action"
@@ -11,7 +11,7 @@ import { MultipleBoardValueStoreConnector } from "../../input/infra"
 
 import { BoardValue } from "../../kernel/data"
 
-export type CheckboxBoardContent = Readonly<{ key: string; value: string; label: VNodeContent }>
+export type CheckboxBoardContent = Readonly<{ key: VNodeKey; value: string; label: VNodeContent }>
 
 type Props =
     | Readonly<{ input: MultipleInputBoardAction; options: CheckboxBoardContent[] }>

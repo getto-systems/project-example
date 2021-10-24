@@ -11,8 +11,8 @@ export interface BoardValueStoreConnector {
 }
 
 export interface MultipleBoardValueStore {
-    get(): BoardValue[]
-    set(value: BoardValue[]): void
+    get(): readonly BoardValue[]
+    set(value: readonly BoardValue[]): void
 }
 
 export interface MultipleBoardValueStoreConnector {

@@ -1,5 +1,5 @@
 import { env } from "../../../../../y_environment/ui/env"
-import { Authn_pb } from "../../../../../y_protobuf/proto.js"
+import pb from "../../../../../y_protobuf/proto.js"
 
 import {
     fetchRepositoryRemovedResult,
@@ -49,12 +49,12 @@ export function newAuthnRepository({ webDB }: RepositoryOutsideFeature): AuthnRe
         }
 
         function toDB(value: AuthnRepositoryValue): string {
-            return encodeProtobuf(Authn_pb, (message) => {
+            return encodeProtobuf(pb.auth.ticket.db.Authn_pb, (message) => {
                 message.authAt = value.authAt
             })
         }
         function fromDB(raw: string): AuthnRepositoryValue {
-            return decodeProtobuf(Authn_pb, raw)
+            return decodeProtobuf(pb.auth.ticket.db.Authn_pb, raw)
         }
     }
 }

@@ -11,14 +11,22 @@ import {
 } from "../../../../../../ui/vendor/getto-application/board/action_input/x_preact/checkbox"
 
 import { SearchColumnsResource } from "../resource"
+import { useLayoutEffect } from "preact/hooks"
 
-type SearchProps = SearchOptions | (Readonly<{ title: VNodeContent }> & SearchOptions)
-type SearchOptions =
-    | Readonly<{ label: { (key: string): VNodeContent } }>
-    | Readonly<{ label: { (key: string): VNodeContent }; block: boolean }>
+type SearchProps = CheckboxProps | (Readonly<{ title: VNodeContent }> & CheckboxProps)
+type CheckboxProps = ColumnProps | (ColumnProps & Readonly<{ block: boolean }>)
+type ColumnProps = Readonly<{ columns: SearchColumnState[] }>
+
+export type SearchColumnState = Readonly<{ key: string; content: VNodeContent; isVisible: boolean }>
 
 type Props = SearchColumnsResource & SearchProps
 export function SearchColumnsComponent(props: Props): VNode {
+    useLayoutEffect(() => {
+        props.field.load(
+            props.columns.filter((column) => column.isVisible).map((column) => `${column.key}`),
+        )
+    }, [props.field, props.columns])
+
     return field({
         title: title(),
         body: [
@@ -39,10 +47,10 @@ export function SearchColumnsComponent(props: Props): VNode {
         return "表示する列"
     }
     function options(): CheckboxBoardContent[] {
-        return props.field.full.map((key) => ({
-            key,
-            value: key,
-            label: props.label(key),
+        return props.columns.map((column) => ({
+            key: column.key,
+            value: `${column.key}`,
+            label: column.content,
         }))
     }
     function block(): boolean {

@@ -15,7 +15,7 @@ export function initMultipleBoardValueStoreConnector(): Readonly<{
 
 type Connection =
     | Readonly<{ connect: false; hasValue: false }>
-    | Readonly<{ connect: false; hasValue: true; value: BoardValue[] }>
+    | Readonly<{ connect: false; hasValue: true; value: readonly BoardValue[] }>
     | Readonly<{ connect: true; store: MultipleBoardValueStore }>
 
 const initialConnection: Connection = { connect: false, hasValue: false }
@@ -23,7 +23,7 @@ const initialConnection: Connection = { connect: false, hasValue: false }
 class Connector implements MultipleBoardValueStoreConnector, MultipleBoardValueStore {
     conn = initialConnection
 
-    get(): BoardValue[] {
+    get(): readonly BoardValue[] {
         if (this.conn.connect) {
             return this.conn.store.get()
         }
@@ -32,7 +32,7 @@ class Connector implements MultipleBoardValueStoreConnector, MultipleBoardValueS
         }
         return []
     }
-    set(value: BoardValue[]): void {
+    set(value: readonly BoardValue[]): void {
         if (this.conn.connect) {
             this.conn.store.set(value)
         } else {

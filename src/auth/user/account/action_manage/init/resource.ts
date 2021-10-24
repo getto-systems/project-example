@@ -16,6 +16,7 @@ import {
 } from "../../search/init"
 
 import { ManageUserAccountResource } from "../resource"
+import { newSearchColumnsInfra } from "../../../../../z_lib/ui/search/columns/init"
 
 export function newManageUserAccountResource(
     feature: RemoteOutsideFeature &
@@ -27,6 +28,7 @@ export function newManageUserAccountResource(
         search: initSearchUserAccountAction(
             initSearchUserAccountMaterial({
                 search: newSearchUserAccountInfra(feature),
+                columns: newSearchColumnsInfra(feature, "auth/user/account.search")
             }),
             newSearchUserAccountFieldsDetecter(feature),
             newUpdateSearchUserAccountFieldsQuery(feature),

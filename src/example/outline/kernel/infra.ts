@@ -12,7 +12,6 @@ export interface LoadMenuDetecter {
 }
 
 export type MenuContent = Readonly<{
-    database: string
     key: string
     loadMenuBadge: boolean
     menuTree: MenuTree

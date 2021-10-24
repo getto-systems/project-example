@@ -13,7 +13,7 @@ export function mockBoardValueStore(): BoardValueStore {
 }
 
 export function mockMultipleBoardValueStore(): MultipleBoardValueStore {
-    let store: BoardValue[] = []
+    let store: readonly BoardValue[] = []
     return {
         get: () => store,
         set: (value) => {

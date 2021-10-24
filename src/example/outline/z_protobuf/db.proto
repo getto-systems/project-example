@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package example.outline.db;
+
 message MenuExpand_pb {
   repeated Path paths = 1;
 

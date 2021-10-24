@@ -16,7 +16,11 @@ export type Props = Readonly<{
 const template = storyTemplate<Props>((_props) => {
     return h(SearchUserAccountColumnsComponent, {
         search: mockSearchUserAccountAction(),
-        label: (key) => `カラム-${key}`,
+        columns: [
+            { key: "a", content: "カラムA", isVisible: true },
+            { key: "b", content: "カラムB", isVisible: true },
+            { key: "c", content: "カラムC", isVisible: false },
+        ],
     })
 })
 

@@ -9,7 +9,6 @@ import {
     SearchUserAccountAction,
     SearchUserAccountState,
     initialSearchUserAccountState,
-    fullUserAccountColumns,
 } from "./action"
 
 export function mockSearchUserAccountAction(): SearchUserAccountAction {
@@ -24,7 +23,7 @@ class Action
 
     readonly loginID = mockSearchLoginIDAction()
     readonly offset = mockSearchOffsetAction()
-    readonly columns = mockSearchColumnsAction(fullUserAccountColumns)
+    readonly columns = mockSearchColumnsAction()
     readonly observe = mockObserveBoardFieldAction()
 
     clear(): SearchUserAccountState {
