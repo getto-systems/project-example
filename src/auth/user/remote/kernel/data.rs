@@ -86,6 +86,12 @@ impl GrantedAuthRoles {
     }
 }
 
+impl std::fmt::Display for GrantedAuthRoles {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "granted: {}", self.0)
+    }
+}
+
 trait GrantedAuthRolesExtract {
     fn restore(self) -> GrantedAuthRoles;
 }
@@ -96,9 +102,15 @@ impl GrantedAuthRolesExtract for HashSet<String> {
     }
 }
 
-impl std::fmt::Display for GrantedAuthRoles {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "granted: {}", self.0)
+pub struct GrantedAuthRolesBasket(HashSet<String>);
+
+impl GrantedAuthRolesBasket {
+    pub fn new(granted_roles: HashSet<String>) -> Self {
+        Self(granted_roles)
+    }
+
+    pub fn extract(self) -> HashSet<String> {
+        self.0
     }
 }
 
@@ -112,15 +124,8 @@ impl RequireAuthRoles {
     // TODO 例えばこんな感じで許可する role を構築するヘルパーを追加していく
     // TODO ここが role を列挙する場所になるけど、これは適切な場所ではない気がする
     // TODO 特に、user の role 管理でこの値が必要になるはずで・・・
-    pub fn user() -> Self {
-        Self::api(&["user"])
-    }
-
-    // admin ロールを持っていれば api アクセスが可能
-    fn api(roles: &[&str]) -> Self {
-        let mut roles = Vec::from(roles);
-        roles.push("admin");
-        Self::has_any(roles.as_ref())
+    pub fn manage_auth_user() -> Self {
+        Self::has_any(&["manage_auth_user"])
     }
 
     pub fn has_any(roles: &[&str]) -> Self {

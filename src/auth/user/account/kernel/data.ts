@@ -1,7 +1,6 @@
-import { GrantedRoles } from "../../../ticket/kernel/data"
-import { LoginID } from "../../login_id/input/data"
-
+// TODO UserAccountBasket
 export type UserAccount = Readonly<{
-    loginID: LoginID
-    grantedRoles: GrantedRoles
+    // TODO LoginID / GrantedRoles は機能を持っているので、data transfer object 的な何かにするべき
+    loginID: string // TODO LoginIDBasket
+    grantedRoles: string[] // TODO GrantedRolesBasket
 }>

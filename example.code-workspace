@@ -54,5 +54,11 @@
             "name": "bootstrap",
             "path": "bootstrap"
         }
-    ]
+    ],
+    "settings": {
+        "cSpell.words": [
+            "cust",
+            "Iden"
+        ]
+    }
 }

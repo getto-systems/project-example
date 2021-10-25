@@ -1,12 +1,9 @@
+use crate::auth::user::password::remote::authenticate::infra::AuthenticatePasswordFieldsExtract;
+
 use crate::{
     auth::ticket::remote::encode::data::AuthTicketEncoded,
     z_lib::remote::message::data::MessageError,
 };
-
-pub struct AuthenticatePasswordFieldsExtract {
-    pub login_id: String,
-    pub password: String,
-}
 
 pub enum AuthenticatePasswordProxyResponse {
     Success(AuthTicketEncoded),

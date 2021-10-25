@@ -86,7 +86,13 @@ pub mod test {
     };
 
     pub type MemoryAuthUserStore = Mutex<MemoryAuthUserMap>;
+    // user_id => granted_roles
     pub struct MemoryAuthUserMap(HashMap<String, HashSet<String>>);
+
+    pub struct AuthUserEntry {
+        pub user_id: String,
+        pub granted_roles: HashSet<String>,
+    }
 
     impl MemoryAuthUserMap {
         pub fn new() -> Self {
@@ -109,6 +115,15 @@ pub mod test {
         }
         fn get(&self, user_id: &AuthUserId) -> Option<&HashSet<String>> {
             self.0.get(user_id.as_str())
+        }
+        pub fn all(&self) -> Vec<AuthUserEntry> {
+            self.0
+                .iter()
+                .map(|(user_id, granted_roles)| AuthUserEntry {
+                    user_id: user_id.clone(),
+                    granted_roles: granted_roles.clone(),
+                })
+                .collect()
         }
     }
 
