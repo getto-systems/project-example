@@ -23,4 +23,4 @@ export function homeMenuContent(): MenuContent {
 }
 
 const allow: MenuPermission = { type: "allow" }
-const user: MenuPermission = { type: "allow" } // TODO { type: "role", role: "user" } ロールの編集ができるようになったら制限する
+const user: MenuPermission = { type: "allow" } // TODO { type: "role", role: "manage_auth_user" } ロールの編集ができるようになったら制限する

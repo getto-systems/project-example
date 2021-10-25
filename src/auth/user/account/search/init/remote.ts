@@ -35,7 +35,7 @@ export function newSearchAuthUserAccountRemote(
             const body = encodeProtobuf(
                 pb.auth.user.account.api.SearchAuthUserAccountApiRequestPb,
                 (message) => {
-                    message.offset = parseInt(fields.offset) // TODO parseInt しなくて済むようにできないか？
+                    message.offset = parseInt(fields.offset)
                     message.sortKey = fields.sort.key
                     message.sortOrder = fields.sort.order
                     message.loginId = fields.loginID
