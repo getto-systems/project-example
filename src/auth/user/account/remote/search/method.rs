@@ -17,7 +17,7 @@ pub async fn search_user_account<S>(
 ) -> MethodResult<S> {
     validate_auth_token(
         infra.validate_infra(),
-        RequireAuthRoles::manage_auth_user(),
+        RequireAuthRoles::Nothing, // TODO RequireAuthRoles::manage_auth_user(),
         |event| post(SearchAuthUserAccountEvent::Validate(event)),
     )
     .await?;

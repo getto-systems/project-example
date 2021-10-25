@@ -8,15 +8,15 @@ message AuthUserAccountApiPb {
 }
 
 message SearchAuthUserAccountApiRequestPb {
-    uint32 offset = 1;
+    int32 offset = 1;
     string sort_key = 2;
     string sort_order = 3;
     string login_id = 4;
 }
 
 message SearchAuthUserAccountApiResponsePb {
-    uint32 offset = 1;
-    uint32 limit = 2;
-    uint32 all = 3;
+    int32 offset = 1;
+    int32 limit = 2;
+    int32 all = 3;
     repeated AuthUserAccountApiPb users = 4;
 }

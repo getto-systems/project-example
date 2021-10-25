@@ -8,7 +8,7 @@ use getto_application::infra::ActionStatePubSub;
 
 use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideFeature;
 
-use crate::auth::ticket::remote::validate_metadata::init::ValidateTicketMetadataStruct;
+use crate::auth::ticket::remote::validate_metadata::init::ValidateApiMetadataStruct;
 use proxy_service::ProxyService;
 use request_decoder::RequestDecoder;
 use response_encoder::ResponseEncoder;
@@ -16,7 +16,9 @@ use response_encoder::ResponseEncoder;
 use crate::auth::remote::service::proxy::{AuthProxyEvent, AuthProxyInfra};
 
 use crate::auth::user::account::remote::{
-    proxy_search::infra::{SearchAuthUserAccountProxyRequestDecoder, SearchAuthUserAccountProxyResponse},
+    proxy_search::infra::{
+        SearchAuthUserAccountProxyRequestDecoder, SearchAuthUserAccountProxyResponse,
+    },
     search::infra::SearchAuthUserAccountFieldsExtract,
 };
 
@@ -24,7 +26,7 @@ use crate::auth::user::account::remote::proxy_search::data::SearchAuthUserAccoun
 
 pub struct SearchAuthUserAccountProxyStruct<'a> {
     pubsub: ActionStatePubSub<AuthProxyEvent<SearchAuthUserAccountProxyMessage>>,
-    validate_infra: ValidateTicketMetadataStruct<'a>,
+    validate_infra: ValidateApiMetadataStruct<'a>,
     proxy_service: ProxyService<'a>,
     response_encoder: ResponseEncoder,
 }
@@ -37,7 +39,7 @@ impl<'a> SearchAuthUserAccountProxyStruct<'a> {
     ) -> Self {
         Self {
             pubsub: ActionStatePubSub::new(),
-            validate_infra: ValidateTicketMetadataStruct::new(&feature.decoding_key, request),
+            validate_infra: ValidateApiMetadataStruct::new(&feature.decoding_key, request),
             proxy_service: ProxyService::new(&feature.service, request_id),
             response_encoder: ResponseEncoder,
         }
@@ -63,7 +65,7 @@ impl<'a>
         SearchAuthUserAccountProxyMessage,
     > for SearchAuthUserAccountProxyStruct<'a>
 {
-    type ValidateInfra = ValidateTicketMetadataStruct<'a>;
+    type ValidateInfra = ValidateApiMetadataStruct<'a>;
     type ProxyService = ProxyService<'a>;
     type ResponseEncoder = ResponseEncoder;
 

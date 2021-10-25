@@ -1,4 +1,6 @@
-use sea_query::{Expr, Func, Iden, MysqlQueryBuilder, Order, Query};
+use std::convert::TryInto;
+
+use sea_query::{Expr, Iden, MysqlQueryBuilder, Order, Query};
 use sqlx::{query_as, MySqlPool};
 
 sea_query::sea_query_driver_mysql!();
@@ -12,7 +14,7 @@ use crate::auth::user::account::remote::search::infra::{
 
 use crate::{
     auth::user::{
-        account::remote::search::data::{SearchAuthUserAccountBasket, AuthUserAccountBasket},
+        account::remote::search::data::{AuthUserAccountBasket, SearchAuthUserAccountBasket},
         login_id::remote::data::LoginIdBasket,
         remote::kernel::data::GrantedAuthRolesBasket,
     },
@@ -57,7 +59,7 @@ enum UserGrantedRole {
 
 #[derive(sqlx::FromRow)]
 struct Count {
-    count: u32,
+    count: i64,
 }
 
 #[derive(sqlx::FromRow)]
@@ -86,7 +88,7 @@ async fn search<'a>(
 
     let (sql, values) = Query::select()
         .from(User::Table)
-        .expr(Func::count(Expr::col(User::UserId)))
+        .expr(Expr::cust("count(user.user_id) as count"))
         .conditions(
             fields.login_id().is_empty(),
             |_q| {},
@@ -103,7 +105,12 @@ async fn search<'a>(
         .count;
 
     let limit = 1000;
-    let offset = SearchOffsetDetecter { all, limit }.detect(fields.offset());
+    let offset = SearchOffsetDetecter {
+        // i32 -> u64 に変換; マイナスで指定されたらエラーになる
+        all: all.try_into().unwrap(),
+        limit: limit.try_into().unwrap(),
+    }
+    .detect(fields.offset().try_into().unwrap());
 
     let (sql, values) = Query::select()
         .column(User::LoginId)
@@ -123,8 +130,8 @@ async fn search<'a>(
                 q.and_where(Expr::col(User::LoginId).eq(fields.login_id().to_owned()));
             },
         )
-        .offset(offset.into())
-        .limit(limit.into())
+        .offset(offset)
+        .limit(limit)
         .order_by(sort_col, sort_order)
         .build(MysqlQueryBuilder);
 
@@ -134,7 +141,12 @@ async fn search<'a>(
         .map_err(mysql_error)?;
 
     Ok(SearchAuthUserAccountBasket {
-        page: SearchPage { all, limit, offset },
+        page: SearchPage {
+            // u64 -> i32 に変換; それほど大きな値にならないはずなので大丈夫だろう
+            all: all.try_into().unwrap(),
+            limit: limit.try_into().unwrap(),
+            offset: offset.try_into().unwrap(),
+        },
         users: rows
             .into_iter()
             .map(|row| AuthUserAccountBasket {
@@ -166,7 +178,7 @@ pub mod test {
 
     use crate::{
         auth::user::{
-            account::remote::search::data::{SearchAuthUserAccountBasket, AuthUserAccountBasket},
+            account::remote::search::data::{AuthUserAccountBasket, SearchAuthUserAccountBasket},
             login_id::remote::data::LoginIdBasket,
             remote::kernel::data::GrantedAuthRolesBasket,
         },

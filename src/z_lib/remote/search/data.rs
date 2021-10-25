@@ -1,17 +1,17 @@
 pub struct SearchOffsetDetecter {
-    pub all: u32,
-    pub limit: u32,
+    pub all: u64,
+    pub limit: u64,
 }
 
 impl SearchOffsetDetecter {
-    pub fn detect(&self, offset: u32) -> u32 {
+    pub fn detect(&self, offset: u64) -> u64 {
         if offset >= self.all {
             self.offset_floor(self.all)
         } else {
             self.offset_floor(offset)
         }
     }
-    fn offset_floor(&self, offset: u32) -> u32 {
+    fn offset_floor(&self, offset: u64) -> u64 {
         offset - (offset % self.limit)
     }
 }
@@ -67,7 +67,7 @@ pub enum SearchSortOrder {
 }
 
 pub struct SearchPage {
-    pub offset: u32,
-    pub limit: u32,
-    pub all: u32,
+    pub offset: i32,
+    pub limit: i32,
+    pub all: i32,
 }

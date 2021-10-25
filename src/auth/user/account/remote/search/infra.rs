@@ -17,13 +17,13 @@ pub trait SearchAuthUserAccountInfra {
 }
 
 pub struct SearchAuthUserAccountFields {
-    offset: u32,
+    offset: i32,
     sort: SearchSort,
     login_id: String,
 }
 
 impl SearchAuthUserAccountFields {
-    pub fn offset(&self) -> u32 {
+    pub fn offset(&self) -> i32 {
         self.offset
     }
     pub fn sort(&self) -> &SearchSort {
@@ -35,7 +35,7 @@ impl SearchAuthUserAccountFields {
 }
 
 pub struct SearchAuthUserAccountFieldsExtract {
-    pub offset: u32,
+    pub offset: i32,
     pub sort: SearchSortExtract,
     pub login_id: String,
 }
