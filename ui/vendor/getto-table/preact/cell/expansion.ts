@@ -92,8 +92,8 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
         return Math.max(1, this.content.length(model))
     }
 
-    isVisible(inherit: TableDataInherit, visibleKeys: readonly TableDataCellKey[]): boolean {
-        return isVisible(this.key, this.mutable.leaf.visibleMutable(), inherit, visibleKeys)
+    isVisible(inherit: TableDataInherit, params: TableDataStyledParams<M>): boolean {
+        return isVisible(this.key, this.mutable.leaf.visibleMutable(), inherit, params)
     }
 
     verticalBorder(): TableDataVerticalBorderStyle {
@@ -122,18 +122,19 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
     }
     header(
         inherit: TableDataInherit,
-        { visibleKeys, base, summary: model }: TableDataStyledParams<M>,
+        params: TableDataStyledParams<M>,
     ): TableDataHeaderExpansion | TableDataInvisible {
-        if (!this.isVisible(inherit, visibleKeys)) {
+        if (!this.isVisible(inherit, params)) {
             return { type: "invisible" }
         }
+        const { base, summary } = params
         const { style } = this.mutable.base.headerStyleMutable()
         return {
             type: "expansion",
             key: this.key,
             style: mergeVerticalBorder(extendStyle({ base, style }), this.verticalBorder()),
             content: this.content.header(this.content.label),
-            length: this.length(model),
+            length: this.length(summary),
             height: 1,
         }
     }
@@ -153,14 +154,15 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
     }
     column(
         inherit: TableDataInherit,
-        { visibleKeys, base, row, summary: model }: TableDataRelatedParams<M, R>,
+        params: TableDataRelatedParams<M, R>,
     ): TableDataColumnExpansion | TableDataInvisible {
-        if (!this.isVisible(inherit, visibleKeys)) {
+        if (!this.isVisible(inherit, params)) {
             return { type: "invisible" }
         }
+        const { base, row, summary } = params
         const { style } = this.mutable.base.columnStyleMutable()
         const { decorators } = this.mutable.base.columnMutable()
-        const length = this.length(model)
+        const length = this.length(summary)
         const contents = this.content.column(row).slice(0, length)
         const columnStyle = mergeVerticalBorder(
             decorators.reduce(
@@ -204,16 +206,17 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
 
     summaryContent(
         inherit: TableDataInherit,
-        { visibleKeys, base, summary: model }: TableDataStyledParams<M>,
+        params: TableDataStyledParams<M>,
         { style, content }: SummaryContentParams<M>,
     ): TableDataSummaryExpansion | TableDataInvisible {
-        if (!this.isVisible(inherit, visibleKeys)) {
+        if (!this.isVisible(inherit, params)) {
             return { type: "invisible" }
         }
+        const { base, summary } = params
         const shared = {
             key: this.key,
             style: mergeVerticalBorder(extendStyle({ base, style }), this.verticalBorder()),
-            length: this.length(model),
+            length: this.length(summary),
         }
         switch (content.type) {
             case "none":
@@ -223,7 +226,7 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
                 return {
                     type: "expansion",
                     ...shared,
-                    content: content.content(model),
+                    content: content.content(summary),
                 }
         }
     }

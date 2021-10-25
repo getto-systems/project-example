@@ -2,11 +2,16 @@ import { TableDataInherit } from "../cell"
 import { TableDataCellKey } from "../core"
 import { TableDataVisibleMutable } from "../mutable"
 
+type VisibleParams =
+    | {
+          // no props
+      }
+    | Readonly<{ visibleKeys: readonly TableDataCellKey[] }>
 export function isVisible(
     key: TableDataCellKey,
     { visibleType }: TableDataVisibleMutable,
     inherit: TableDataInherit,
-    visibleKeys: readonly TableDataCellKey[],
+    params: VisibleParams,
 ): boolean {
     if (inherit.isInMultipart) {
         // multipart の場合、データ取得前にセルを特定できない
@@ -14,7 +19,14 @@ export function isVisible(
         // multipart の配下なら常に visible とする
         return true
     }
-    return visibleType === "always" || visibleKeys.includes(key)
+    if (visibleType === "always") {
+        return true
+    }
+    if ("visibleKeys" in params) {
+        return params.visibleKeys.includes(key)
+    } else {
+        return true
+    }
 }
 
 export function initiallyVisibleCells(

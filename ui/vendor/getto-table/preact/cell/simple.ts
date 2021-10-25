@@ -84,8 +84,8 @@ class Cell<M, R> implements TableCellSimple<M, R> {
         }
     }
 
-    isVisible(inherit: TableDataInherit, visibleKeys: readonly TableDataCellKey[]): boolean {
-        return isVisible(this.key, this.mutable.leaf.visibleMutable(), inherit, visibleKeys)
+    isVisible(inherit: TableDataInherit, params: TableDataStyledParams<M>): boolean {
+        return isVisible(this.key, this.mutable.leaf.visibleMutable(), inherit, params)
     }
 
     verticalBorder(): TableDataVerticalBorderStyle {
@@ -114,11 +114,12 @@ class Cell<M, R> implements TableCellSimple<M, R> {
     }
     header(
         inherit: TableDataInherit,
-        { visibleKeys, base }: TableDataStyledParams<M>,
+        params: TableDataStyledParams<M>,
     ): TableDataHeaderSimple | TableDataInvisible {
-        if (!this.isVisible(inherit, visibleKeys)) {
+        if (!this.isVisible(inherit, params)) {
             return { type: "invisible" }
         }
+        const { base } = params
         const { style } = this.mutable.base.headerStyleMutable()
         return {
             type: "simple",
@@ -145,11 +146,12 @@ class Cell<M, R> implements TableCellSimple<M, R> {
     }
     column(
         inherit: TableDataInherit,
-        { visibleKeys, base, row }: TableDataRelatedParams<M, R>,
+        params: TableDataRelatedParams<M, R>,
     ): TableDataColumnSimple | TableDataInvisible {
-        if (!this.isVisible(inherit, visibleKeys)) {
+        if (!this.isVisible(inherit, params)) {
             return { type: "invisible" }
         }
+        const { base, row } = params
         const { style } = this.mutable.base.columnStyleMutable()
         const { decorators } = this.mutable.base.columnMutable()
         return {
@@ -183,12 +185,13 @@ class Cell<M, R> implements TableCellSimple<M, R> {
     }
     summaryContent(
         inherit: TableDataInherit,
-        { visibleKeys, base, summary: model }: TableDataStyledParams<M>,
+        params: TableDataStyledParams<M>,
         { style, content }: SummaryContentParams<M>,
     ): TableDataSummarySimple | TableDataInvisible {
-        if (!this.isVisible(inherit, visibleKeys)) {
+        if (!this.isVisible(inherit, params)) {
             return { type: "invisible" }
         }
+        const { base, summary } = params
         const shared = {
             key: this.key,
             style: mergeVerticalBorder(extendStyle({ base, style }), this.verticalBorder()),
@@ -202,7 +205,7 @@ class Cell<M, R> implements TableCellSimple<M, R> {
                 return {
                     type: "simple",
                     ...shared,
-                    content: content.content(model),
+                    content: content.content(summary),
                 }
         }
     }
