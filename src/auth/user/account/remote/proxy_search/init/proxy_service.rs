@@ -1,7 +1,8 @@
 use tonic::Request;
 
 use crate::auth::user::account::remote::y_protobuf::service::{
-    search_user_account_pb_client::SearchUserAccountPbClient, SearchUserAccountRequestPb,
+    search_auth_user_account_pb_client::SearchAuthUserAccountPbClient,
+    SearchAuthUserAccountRequestPb,
 };
 
 use crate::auth::remote::x_outside_feature::common::feature::AuthOutsideService;
@@ -11,7 +12,7 @@ use crate::z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer;
 use crate::{
     auth::{
         remote::service::helper::{infra_error, set_metadata},
-        user::account::remote::search::infra::SearchUserAccountFieldsExtract,
+        user::account::remote::search::infra::SearchAuthUserAccountFieldsExtract,
     },
     z_lib::remote::service::helper::new_endpoint,
 };
@@ -20,7 +21,7 @@ use crate::{
     auth::{
         remote::service::proxy::AuthProxyService,
         ticket::remote::kernel::infra::AuthMetadataContent,
-        user::account::remote::proxy_search::infra::SearchUserAccountProxyResponse,
+        user::account::remote::proxy_search::infra::SearchAuthUserAccountProxyResponse,
     },
     z_lib::remote::service::infra::ServiceAuthorizer,
 };
@@ -44,7 +45,7 @@ impl<'a> ProxyService<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthProxyService<SearchUserAccountFieldsExtract, SearchUserAccountProxyResponse>
+impl<'a> AuthProxyService<SearchAuthUserAccountFieldsExtract, SearchAuthUserAccountProxyResponse>
     for ProxyService<'a>
 {
     fn name(&self) -> &str {
@@ -53,9 +54,9 @@ impl<'a> AuthProxyService<SearchUserAccountFieldsExtract, SearchUserAccountProxy
     async fn call(
         &self,
         metadata: AuthMetadataContent,
-        params: SearchUserAccountFieldsExtract,
-    ) -> Result<SearchUserAccountProxyResponse, AuthServiceError> {
-        let mut client = SearchUserAccountPbClient::new(
+        params: SearchAuthUserAccountFieldsExtract,
+    ) -> Result<SearchAuthUserAccountProxyResponse, AuthServiceError> {
+        let mut client = SearchAuthUserAccountPbClient::new(
             new_endpoint(self.service_url)
                 .map_err(infra_error)?
                 .connect()
@@ -63,7 +64,7 @@ impl<'a> AuthProxyService<SearchUserAccountFieldsExtract, SearchUserAccountProxy
                 .map_err(infra_error)?,
         );
 
-        let mut request = Request::new(SearchUserAccountRequestPb {
+        let mut request = Request::new(SearchAuthUserAccountRequestPb {
             offset: params.offset,
             sort_key: params.sort.key,
             sort_order: params.sort.order,

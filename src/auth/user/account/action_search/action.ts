@@ -5,12 +5,12 @@ import { ObserveBoardAction } from "../../../../../ui/vendor/getto-application/b
 import { SearchOffsetAction } from "../../../../z_lib/ui/search/action_offset/action"
 import { SearchColumnsAction, SearchColumnsMaterial } from "../../../../z_lib/ui/search/action_columns/action"
 
-import { SearchUserAccountMethod } from "../search/method"
+import { SearchAuthUserAccountMethod as SearchAuthUserAccountMethod } from "../search/method"
 
-import { SearchUserAccountEvent } from "../search/event"
+import { SearchAuthUserAccountEvent } from "../search/event"
 import { SearchSort } from "../../../../z_lib/ui/search/sort/data"
 
-export interface SearchUserAccountAction extends ApplicationStateAction<SearchUserAccountState> {
+export interface SearchAuthUserAccountAction extends ApplicationStateAction<SearchAuthUserAccountState> {
     readonly loginID: SearchLoginIDAction
     readonly offset: SearchOffsetAction
     readonly columns: SearchColumnsAction
@@ -18,20 +18,20 @@ export interface SearchUserAccountAction extends ApplicationStateAction<SearchUs
 
     currentSort(): SearchSort
 
-    clear(): SearchUserAccountState
-    submit(): Promise<SearchUserAccountState>
-    load(): Promise<SearchUserAccountState>
-    sort(key: string): Promise<SearchUserAccountState>
+    clear(): SearchAuthUserAccountState
+    submit(): Promise<SearchAuthUserAccountState>
+    load(): Promise<SearchAuthUserAccountState>
+    sort(key: string): Promise<SearchAuthUserAccountState>
 }
 
-export const searchUserAccountFieldNames = ["loginID"] as const
-export type SearchUserAccountFieldName = typeof searchUserAccountFieldNames[number]
+export const searchAuthUserAccountFieldNames = ["loginID"] as const
+export type SearchAuthUserAccountFieldName = typeof searchAuthUserAccountFieldNames[number]
 
-export type SearchUserAccountMaterial = Readonly<{
-    search: SearchUserAccountMethod
+export type SearchAuthUserAccountMaterial = Readonly<{
+    search: SearchAuthUserAccountMethod
     columns: SearchColumnsMaterial
 }>
 
-export type SearchUserAccountState = Readonly<{ type: "initial-search" }> | SearchUserAccountEvent
+export type SearchAuthUserAccountState = Readonly<{ type: "initial-search" }> | SearchAuthUserAccountEvent
 
-export const initialSearchUserAccountState: SearchUserAccountState = { type: "initial-search" }
+export const initialSearchAuthUserAccountState: SearchAuthUserAccountState = { type: "initial-search" }

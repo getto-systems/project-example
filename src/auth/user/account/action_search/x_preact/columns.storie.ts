@@ -2,10 +2,10 @@ import { h } from "preact"
 
 import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
 
-import { useSearchUserAccountTableStructure } from "./structure"
-import { SearchUserAccountColumnsComponent } from "./columns"
+import { useSearchAuthUserAccountTableStructure } from "./structure"
+import { SearchAuthUserAccountColumnsComponent } from "./columns"
 
-import { mockSearchUserAccountAction } from "../mock"
+import { mockSearchAuthUserAccountAction } from "../mock"
 
 import { toSearchColumns } from "../../../../../z_lib/ui/search/columns/convert"
 
@@ -27,10 +27,10 @@ export type Props = Readonly<{
     err: string
 }>
 const template = storyTemplate<Props>((props) => {
-    const search = mockSearchUserAccountAction()
-    const structure = useSearchUserAccountTableStructure(search)
+    const search = mockSearchAuthUserAccountAction()
+    const structure = useSearchAuthUserAccountTableStructure(search)
 
-    return h(SearchUserAccountColumnsComponent, {
+    return h(SearchAuthUserAccountColumnsComponent, {
         search,
         structure,
         state: {

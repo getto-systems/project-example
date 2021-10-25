@@ -5,26 +5,26 @@ import { initSearchLoginIDAction } from "../../login_id/input/action_search/init
 import { initSearchOffsetAction } from "../../../../z_lib/ui/search/action_offset/init"
 
 import {
-    SearchUserAccountMaterial,
-    SearchUserAccountAction,
-    SearchUserAccountState,
-    initialSearchUserAccountState,
-    searchUserAccountFieldNames,
+    SearchAuthUserAccountMaterial,
+    SearchAuthUserAccountAction,
+    SearchAuthUserAccountState,
+    initialSearchAuthUserAccountState,
+    searchAuthUserAccountFieldNames,
 } from "./action"
 import { SearchLoginIDAction } from "../../login_id/input/action_search/action"
 import { SearchOffsetAction } from "../../../../z_lib/ui/search/action_offset/action"
 import { SearchColumnsAction } from "../../../../z_lib/ui/search/action_columns/action"
 import { ObserveBoardAction } from "../../../../../ui/vendor/getto-application/board/action_observe_board/action"
 
-import { searchUserAccount } from "../search/method"
+import { searchAuthUserAccount } from "../search/method"
 
 import {
-    SearchUserAccountFieldsDetecter,
-    SearchUserAccountInfra,
-    UpdateSearchUserAccountFieldsQuery,
+    SearchAuthUserAccountFieldsDetecter,
+    SearchAuthUserAccountInfra,
+    UpdateSearchAuthUserAccountFieldsQuery,
 } from "../search/infra"
 
-import { SearchUserAccountFields } from "../search/data"
+import { SearchAuthUserAccountFields } from "../search/data"
 import {
     initSearchColumnsAction,
     initSearchColumnsMaterial,
@@ -33,52 +33,52 @@ import { SearchColumnsInfra } from "../../../../z_lib/ui/search/columns/infra"
 import { SearchSort } from "../../../../z_lib/ui/search/sort/data"
 import { nextSort } from "../../../../z_lib/ui/search/sort/helper"
 
-export type SearchUserAccountActionInfra = Readonly<{
-    search: SearchUserAccountInfra
+export type SearchAuthUserAccountActionInfra = Readonly<{
+    search: SearchAuthUserAccountInfra
     columns: SearchColumnsInfra
 }>
 
-export function initSearchUserAccountMaterial(
-    infra: SearchUserAccountActionInfra,
-): SearchUserAccountMaterial {
+export function initSearchAuthUserAccountMaterial(
+    infra: SearchAuthUserAccountActionInfra,
+): SearchAuthUserAccountMaterial {
     return {
-        search: searchUserAccount(infra.search),
+        search: searchAuthUserAccount(infra.search),
         columns: initSearchColumnsMaterial(infra.columns),
     }
 }
 
-export function initSearchUserAccountAction(
-    material: SearchUserAccountMaterial,
-    detecter: SearchUserAccountFieldsDetecter,
-    updateQuery: UpdateSearchUserAccountFieldsQuery,
-): SearchUserAccountAction {
+export function initSearchAuthUserAccountAction(
+    material: SearchAuthUserAccountMaterial,
+    detecter: SearchAuthUserAccountFieldsDetecter,
+    updateQuery: UpdateSearchAuthUserAccountFieldsQuery,
+): SearchAuthUserAccountAction {
     return new Action(material, detecter, updateQuery)
 }
 
 class Action
-    extends ApplicationAbstractStateAction<SearchUserAccountState>
-    implements SearchUserAccountAction
+    extends ApplicationAbstractStateAction<SearchAuthUserAccountState>
+    implements SearchAuthUserAccountAction
 {
-    readonly initialState = initialSearchUserAccountState
+    readonly initialState = initialSearchAuthUserAccountState
 
     readonly loginID: SearchLoginIDAction
     readonly offset: SearchOffsetAction
     readonly columns: SearchColumnsAction
     readonly observe: ObserveBoardAction
 
-    material: SearchUserAccountMaterial
+    material: SearchAuthUserAccountMaterial
 
-    searchFields: { (): SearchUserAccountFields }
-    loadFields: { (): SearchUserAccountFields }
-    sortFields: { (key: string): SearchUserAccountFields }
+    searchFields: { (): SearchAuthUserAccountFields }
+    loadFields: { (): SearchAuthUserAccountFields }
+    sortFields: { (key: string): SearchAuthUserAccountFields }
 
-    updateQuery: UpdateSearchUserAccountFieldsQuery
+    updateQuery: UpdateSearchAuthUserAccountFieldsQuery
     sortStore: SearchSort
 
     constructor(
-        material: SearchUserAccountMaterial,
-        detecter: SearchUserAccountFieldsDetecter,
-        updateQuery: UpdateSearchUserAccountFieldsQuery,
+        material: SearchAuthUserAccountMaterial,
+        detecter: SearchAuthUserAccountFieldsDetecter,
+        updateQuery: UpdateSearchAuthUserAccountFieldsQuery,
     ) {
         super(async () => this.load())
         this.material = material
@@ -88,7 +88,7 @@ class Action
         const offset = initSearchOffsetAction(initialFields.offset)
         const columns = initSearchColumnsAction(this.material.columns)
         const { observe, checker } = initObserveBoardAction({
-            fields: searchUserAccountFieldNames,
+            fields: searchAuthUserAccountFieldNames,
         })
 
         this.searchFields = () => ({
@@ -133,17 +133,17 @@ class Action
         return this.sortStore
     }
 
-    clear(): SearchUserAccountState {
+    clear(): SearchAuthUserAccountState {
         this.loginID.clear()
         return this.initialState
     }
-    async submit(): Promise<SearchUserAccountState> {
+    async submit(): Promise<SearchAuthUserAccountState> {
         return this.material.search(this.updateQuery, this.searchFields(), this.post)
     }
-    async load(): Promise<SearchUserAccountState> {
+    async load(): Promise<SearchAuthUserAccountState> {
         return this.material.search(this.updateQuery, this.loadFields(), this.post)
     }
-    async sort(key: string): Promise<SearchUserAccountState> {
+    async sort(key: string): Promise<SearchAuthUserAccountState> {
         return this.material.search(this.updateQuery, this.sortFields(key), this.post)
     }
 }

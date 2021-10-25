@@ -1,22 +1,22 @@
 import { ObserveBoardActionState } from "../../../../../ui/vendor/getto-application/board/action_observe_board/action"
 import { SearchColumnsState } from "../../../../z_lib/ui/search/action_columns/action"
-import { SearchUserAccountAction, SearchUserAccountState } from "./action"
+import { SearchAuthUserAccountAction, SearchAuthUserAccountState } from "./action"
 
-export type SearchUserAccountResource = Readonly<{
-    search: SearchUserAccountAction
+export type SearchAuthUserAccountResource = Readonly<{
+    search: SearchAuthUserAccountAction
 }>
 
-export type SearchUserAccountFormResourceState = Readonly<{
-    state: SearchUserAccountState
+export type SearchAuthUserAccountFormResourceState = Readonly<{
+    state: SearchAuthUserAccountState
     observe: ObserveBoardActionState
 }>
-export type SearchUserAccountPagerResourceState = Readonly<{
-    state: SearchUserAccountState
+export type SearchAuthUserAccountPagerResourceState = Readonly<{
+    state: SearchAuthUserAccountState
 }>
-export type SearchUserAccountColumnsResourceState = Readonly<{
+export type SearchAuthUserAccountColumnsResourceState = Readonly<{
     columns: SearchColumnsState
 }>
-export type SearchUserAccountTableResourceState = Readonly<{
-    state: SearchUserAccountState
+export type SearchAuthUserAccountTableResourceState = Readonly<{
+    state: SearchAuthUserAccountState
     columns: SearchColumnsState
 }>

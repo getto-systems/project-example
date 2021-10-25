@@ -6,13 +6,13 @@ import {
 } from "../../../../../z_lib/ui/location/feature"
 
 import {
-    initSearchUserAccountAction,
-    initSearchUserAccountMaterial,
+    initSearchAuthUserAccountAction,
+    initSearchAuthUserAccountMaterial,
 } from "../../action_search/init"
 import {
-    newSearchUserAccountFieldsDetecter,
-    newSearchUserAccountInfra,
-    newUpdateSearchUserAccountFieldsQuery,
+    newSearchAuthUserAccountFieldsDetecter,
+    newSearchAuthUserAccountInfra,
+    newUpdateSearchAuthUserAccountFieldsQuery,
 } from "../../search/init"
 
 import { ManageUserAccountResource } from "../resource"
@@ -25,13 +25,13 @@ export function newManageUserAccountResource(
         HistoryOutsideFeature,
 ): ManageUserAccountResource {
     return {
-        search: initSearchUserAccountAction(
-            initSearchUserAccountMaterial({
-                search: newSearchUserAccountInfra(feature),
+        search: initSearchAuthUserAccountAction(
+            initSearchAuthUserAccountMaterial({
+                search: newSearchAuthUserAccountInfra(feature),
                 columns: newSearchColumnsInfra(feature, "auth/user/account.search")
             }),
-            newSearchUserAccountFieldsDetecter(feature),
-            newUpdateSearchUserAccountFieldsQuery(feature),
+            newSearchAuthUserAccountFieldsDetecter(feature),
+            newUpdateSearchAuthUserAccountFieldsQuery(feature),
         ),
     }
 }

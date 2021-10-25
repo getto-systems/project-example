@@ -1,23 +1,23 @@
-use crate::auth::user::account::remote::y_protobuf::service::SearchUserAccountRequestPb;
+use crate::auth::user::account::remote::y_protobuf::service::SearchAuthUserAccountRequestPb;
 
 use crate::auth::user::account::remote::search::infra::{
-    SearchUserAccountFieldsExtract, SearchUserAccountRequestDecoder,
+    SearchAuthUserAccountFieldsExtract, SearchAuthUserAccountRequestDecoder,
 };
 use crate::z_lib::remote::search::data::SearchSortExtract;
 
-pub struct PbSearchUserAccountRequestDecoder {
-    request: SearchUserAccountRequestPb,
+pub struct PbSearchAuthUserAccountRequestDecoder {
+    request: SearchAuthUserAccountRequestPb,
 }
 
-impl PbSearchUserAccountRequestDecoder {
-    pub const fn new(request: SearchUserAccountRequestPb) -> Self {
+impl PbSearchAuthUserAccountRequestDecoder {
+    pub const fn new(request: SearchAuthUserAccountRequestPb) -> Self {
         Self { request }
     }
 }
 
-impl SearchUserAccountRequestDecoder for PbSearchUserAccountRequestDecoder {
-    fn decode(self) -> SearchUserAccountFieldsExtract {
-        SearchUserAccountFieldsExtract {
+impl SearchAuthUserAccountRequestDecoder for PbSearchAuthUserAccountRequestDecoder {
+    fn decode(self) -> SearchAuthUserAccountFieldsExtract {
+        SearchAuthUserAccountFieldsExtract {
             offset: self.request.offset,
             sort: SearchSortExtract {
                 key: self.request.sort_key,
@@ -31,15 +31,15 @@ impl SearchUserAccountRequestDecoder for PbSearchUserAccountRequestDecoder {
 #[cfg(test)]
 pub mod test {
     use crate::auth::user::account::remote::search::infra::{
-        SearchUserAccountFieldsExtract, SearchUserAccountRequestDecoder,
+        SearchAuthUserAccountFieldsExtract, SearchAuthUserAccountRequestDecoder,
     };
 
-    pub enum StaticSearchUserAccountRequestDecoder {
-        Valid(SearchUserAccountFieldsExtract),
+    pub enum StaticSearchAuthUserAccountRequestDecoder {
+        Valid(SearchAuthUserAccountFieldsExtract),
     }
 
-    impl SearchUserAccountRequestDecoder for StaticSearchUserAccountRequestDecoder {
-        fn decode(self) -> SearchUserAccountFieldsExtract {
+    impl SearchAuthUserAccountRequestDecoder for StaticSearchAuthUserAccountRequestDecoder {
+        fn decode(self) -> SearchAuthUserAccountFieldsExtract {
             match self {
                 Self::Valid(fields) => fields,
             }

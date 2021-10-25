@@ -1,28 +1,28 @@
 use crate::auth::ticket::remote::validate::infra::ValidateAuthTokenInfra;
 
 use crate::{
-    auth::user::account::remote::search::data::SearchUserAccountBasket,
+    auth::user::account::remote::search::data::SearchAuthUserAccountBasket,
     z_lib::remote::{
         repository::data::RepositoryError,
         search::data::{SearchSort, SearchSortExtract},
     },
 };
 
-pub trait SearchUserAccountInfra {
+pub trait SearchAuthUserAccountInfra {
     type ValidateInfra: ValidateAuthTokenInfra;
-    type SearchRepository: SearchUserAccountRepository;
+    type SearchRepository: SearchAuthUserAccountRepository;
 
     fn validate_infra(&self) -> &Self::ValidateInfra;
     fn search_repository(&self) -> &Self::SearchRepository;
 }
 
-pub struct SearchUserAccountFields {
+pub struct SearchAuthUserAccountFields {
     offset: u32,
     sort: SearchSort,
     login_id: String,
 }
 
-impl SearchUserAccountFields {
+impl SearchAuthUserAccountFields {
     pub fn offset(&self) -> u32 {
         self.offset
     }
@@ -34,14 +34,14 @@ impl SearchUserAccountFields {
     }
 }
 
-pub struct SearchUserAccountFieldsExtract {
+pub struct SearchAuthUserAccountFieldsExtract {
     pub offset: u32,
     pub sort: SearchSortExtract,
     pub login_id: String,
 }
-impl Into<SearchUserAccountFields> for SearchUserAccountFieldsExtract {
-    fn into(self) -> SearchUserAccountFields {
-        SearchUserAccountFields {
+impl Into<SearchAuthUserAccountFields> for SearchAuthUserAccountFieldsExtract {
+    fn into(self) -> SearchAuthUserAccountFields {
+        SearchAuthUserAccountFields {
             offset: self.offset,
             sort: self.sort.into(),
             login_id: self.login_id,
@@ -49,14 +49,14 @@ impl Into<SearchUserAccountFields> for SearchUserAccountFieldsExtract {
     }
 }
 
-pub trait SearchUserAccountRequestDecoder {
-    fn decode(self) -> SearchUserAccountFieldsExtract;
+pub trait SearchAuthUserAccountRequestDecoder {
+    fn decode(self) -> SearchAuthUserAccountFieldsExtract;
 }
 
 #[async_trait::async_trait]
-pub trait SearchUserAccountRepository {
+pub trait SearchAuthUserAccountRepository {
     async fn search(
         &self,
-        fields: &SearchUserAccountFields,
-    ) -> Result<SearchUserAccountBasket, RepositoryError>;
+        fields: &SearchAuthUserAccountFields,
+    ) -> Result<SearchAuthUserAccountBasket, RepositoryError>;
 }

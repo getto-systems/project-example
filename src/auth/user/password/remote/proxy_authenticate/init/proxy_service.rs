@@ -48,7 +48,7 @@ impl<'a> AuthProxyService<AuthenticatePasswordFieldsExtract, AuthenticatePasswor
     for ProxyService<'a>
 {
     fn name(&self) -> &str {
-        "auth.password.authenticate"
+        "auth.user.password.authenticate"
     }
     async fn call(
         &self,

@@ -14,21 +14,21 @@ import { spinner } from "../../../../../example/x_preact/design/icon"
 
 import { SearchLoginIDComponent } from "../../../login_id/input/action_search/x_preact/search"
 
-import { SearchUserAccountResource, SearchUserAccountFormResourceState } from "../resource"
+import { SearchAuthUserAccountResource, SearchAuthUserAccountFormResourceState } from "../resource"
 
-export function SearchUserAccountFormEntry({ search }: SearchUserAccountResource): VNode {
-    return h(SearchUserAccountFormComponent, {
+export function SearchAuthUserAccountFormEntry({ search }: SearchAuthUserAccountResource): VNode {
+    return h(SearchAuthUserAccountFormComponent, {
         search,
         state: useApplicationAction(search),
         observe: useApplicationAction(search.observe),
     })
 }
 
-type Props = SearchUserAccountResource & SearchUserAccountFormResourceState
-export function SearchUserAccountFormComponent(props: Props): VNode {
+type Props = SearchAuthUserAccountResource & SearchAuthUserAccountFormResourceState
+export function SearchAuthUserAccountFormComponent(props: Props): VNode {
     return basedOn(props)
 
-    function basedOn({ state, observe }: SearchUserAccountFormResourceState): VNode {
+    function basedOn({ state, observe }: SearchAuthUserAccountFormResourceState): VNode {
         if (observe.hasChanged) {
             return searchForm({ type: "has-changed" })
         }

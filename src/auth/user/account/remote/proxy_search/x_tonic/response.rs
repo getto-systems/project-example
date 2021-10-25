@@ -1,19 +1,19 @@
-use crate::auth::user::account::remote::y_protobuf::service::SearchUserAccountResponsePb;
+use crate::auth::user::account::remote::y_protobuf::service::SearchAuthUserAccountResponsePb;
 
-use crate::auth::user::account::remote::proxy_search::infra::SearchUserAccountProxyResponse;
+use crate::auth::user::account::remote::proxy_search::infra::SearchAuthUserAccountProxyResponse;
 
 use crate::{
     auth::user::{
-        account::remote::search::data::{SearchUserAccountBasket, UserAccountBasket},
+        account::remote::search::data::{SearchAuthUserAccountBasket, AuthUserAccountBasket},
         login_id::remote::data::LoginIdBasket,
         remote::kernel::data::GrantedAuthRolesBasket,
     },
     z_lib::remote::search::data::SearchPage,
 };
 
-impl Into<SearchUserAccountProxyResponse> for SearchUserAccountResponsePb {
-    fn into(self) -> SearchUserAccountProxyResponse {
-        SearchUserAccountProxyResponse::Success(SearchUserAccountBasket {
+impl Into<SearchAuthUserAccountProxyResponse> for SearchAuthUserAccountResponsePb {
+    fn into(self) -> SearchAuthUserAccountProxyResponse {
+        SearchAuthUserAccountProxyResponse::Success(SearchAuthUserAccountBasket {
             page: SearchPage {
                 offset: self.offset,
                 limit: self.limit,
@@ -22,7 +22,7 @@ impl Into<SearchUserAccountProxyResponse> for SearchUserAccountResponsePb {
             users: self
                 .users
                 .into_iter()
-                .map(|user| UserAccountBasket {
+                .map(|user| AuthUserAccountBasket {
                     login_id: LoginIdBasket::new(user.login_id),
                     granted_roles: GrantedAuthRolesBasket::new(
                         user.granted_roles.into_iter().collect(),

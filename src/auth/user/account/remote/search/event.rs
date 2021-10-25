@@ -1,12 +1,12 @@
 use crate::auth::ticket::remote::validate::event::ValidateAuthTokenEvent;
 
 use crate::{
-    auth::user::account::remote::search::data::SearchUserAccountBasket,
+    auth::user::account::remote::search::data::SearchAuthUserAccountBasket,
     z_lib::remote::repository::data::RepositoryError,
 };
 
-pub enum SearchUserAccountEvent {
-    Success(SearchUserAccountBasket),
+pub enum SearchAuthUserAccountEvent {
+    Success(SearchAuthUserAccountBasket),
     Validate(ValidateAuthTokenEvent),
     RepositoryError(RepositoryError),
 }
@@ -14,7 +14,7 @@ pub enum SearchUserAccountEvent {
 const SUCCESS: &'static str = "search user account success";
 const ERROR: &'static str = "search user account error";
 
-impl std::fmt::Display for SearchUserAccountEvent {
+impl std::fmt::Display for SearchAuthUserAccountEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Success(_) => write!(f, "{}", SUCCESS),

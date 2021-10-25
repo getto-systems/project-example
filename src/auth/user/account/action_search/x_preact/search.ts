@@ -3,24 +3,24 @@ import { html } from "htm/preact"
 
 import { container } from "../../../../../../ui/vendor/getto-css/preact/design/box"
 
-import { SearchUserAccountResource } from "../resource"
+import { SearchAuthUserAccountResource } from "../resource"
 
-import { SearchUserAccountFormEntry } from "./form"
-import { SearchUserAccountPagerEntry } from "./pager"
-import { SearchUserAccountColumnsEntry } from "./columns"
-import { SearchUserAccountTableEntry } from "./table"
+import { SearchAuthUserAccountFormEntry } from "./form"
+import { SearchAuthUserAccountPagerEntry } from "./pager"
+import { SearchAuthUserAccountColumnsEntry } from "./columns"
+import { SearchAuthUserAccountTableEntry } from "./table"
 
-import { useSearchUserAccountTableStructure } from "./structure"
+import { useSearchAuthUserAccountTableStructure } from "./structure"
 
-export function SearchUserAccountEntry(resource: SearchUserAccountResource): VNode {
-    const structure = useSearchUserAccountTableStructure(resource.search)
+export function SearchAuthUserAccountEntry(resource: SearchAuthUserAccountResource): VNode {
+    const structure = useSearchAuthUserAccountTableStructure(resource.search)
 
     return html`
-        ${container([h(SearchUserAccountFormEntry, resource)])}
+        ${container([h(SearchAuthUserAccountFormEntry, resource)])}
         ${container([
-            h(SearchUserAccountPagerEntry, resource),
-            h(SearchUserAccountColumnsEntry, { structure, ...resource }),
+            h(SearchAuthUserAccountPagerEntry, resource),
+            h(SearchAuthUserAccountColumnsEntry, { structure, ...resource }),
         ])}
-        ${h(SearchUserAccountTableEntry, { structure, ...resource })}
+        ${h(SearchAuthUserAccountTableEntry, { structure, ...resource })}
     `
 }

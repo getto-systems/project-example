@@ -5,16 +5,16 @@ import {
     updateSearchQuery,
 } from "../../../../z_lib/ui/search/convert"
 
-import { SearchUserAccountFieldsDetectParams } from "./infra"
+import { SearchAuthUserAccountFieldsDetectParams } from "./infra"
 
-import { SearchUserAccountFields } from "./data"
+import { SearchAuthUserAccountFields } from "./data"
 
 const SEARCH_LOGIN_ID = "login-id" as const
 
-export function detectSearchUserAccountFields(
+export function detectSearchAuthUserAccountFields(
     currentURL: URL,
-    { defaultSortKey }: SearchUserAccountFieldsDetectParams,
-): SearchUserAccountFields {
+    { defaultSortKey }: SearchAuthUserAccountFieldsDetectParams,
+): SearchAuthUserAccountFields {
     const params = currentURL.searchParams
     return {
         offset: readSearchOffset(params),
@@ -22,9 +22,9 @@ export function detectSearchUserAccountFields(
         loginID: readSearchParams(params, { name: SEARCH_LOGIN_ID }),
     }
 }
-export function updateSearchUserAccountFieldsQuery(
+export function updateSearchAuthUserAccountFieldsQuery(
     currentURL: URL,
-    fields: SearchUserAccountFields,
+    fields: SearchAuthUserAccountFields,
 ): URL {
     const url = new URL(currentURL.toString())
     const params = url.searchParams

@@ -1,5 +1,5 @@
-import { SearchUserAccountAction } from "../action_search/action"
+import { SearchAuthUserAccountAction } from "../action_search/action"
 
 export type ManageUserAccountResource = Readonly<{
-    search: SearchUserAccountAction
+    search: SearchAuthUserAccountAction
 }>

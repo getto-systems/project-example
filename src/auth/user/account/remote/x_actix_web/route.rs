@@ -12,7 +12,7 @@ use crate::x_outside_feature::remote::api::{
 use crate::auth::remote::service::proxy::call_proxy;
 
 use crate::auth::user::account::remote::proxy_search::{
-    infra::SearchUserAccountProxyRequestDecoder, init::SearchUserAccountProxyStruct,
+    infra::SearchAuthUserAccountProxyRequestDecoder, init::SearchAuthUserAccountProxyStruct,
 };
 
 pub fn scope_account() -> Scope {
@@ -24,9 +24,9 @@ async fn search(data: ApiAppData, request: HttpRequest, body: String) -> impl Re
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut proxy = SearchUserAccountProxyStruct::new(&data.auth, &request_id, &request);
+    let mut proxy = SearchAuthUserAccountProxyStruct::new(&data.auth, &request_id, &request);
     proxy.subscribe(move |state| logger.log(state.log_level(), state));
 
-    let params = SearchUserAccountProxyStruct::request_decoder(body).decode();
+    let params = SearchAuthUserAccountProxyStruct::request_decoder(body).decode();
     flatten(call_proxy(&proxy, params).await).respond_to(&request)
 }

@@ -7,28 +7,28 @@ use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideFeature;
 
 use crate::auth::{
     ticket::remote::validate::init::ApiValidateAuthTokenStruct,
-    user::account::remote::search::init::search_repository::MysqlSearchUserAccountRepository,
+    user::account::remote::search::init::search_repository::MysqlSearchAuthUserAccountRepository,
 };
 
-use super::infra::SearchUserAccountInfra;
+use super::infra::SearchAuthUserAccountInfra;
 
-pub struct SearchUserAccountStruct<'a> {
+pub struct SearchAuthUserAccountStruct<'a> {
     validate_infra: ApiValidateAuthTokenStruct<'a>,
-    search_repository: MysqlSearchUserAccountRepository<'a>,
+    search_repository: MysqlSearchAuthUserAccountRepository<'a>,
 }
 
-impl<'a> SearchUserAccountStruct<'a> {
+impl<'a> SearchAuthUserAccountStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature, metadata: &'a MetadataMap) -> Self {
         Self {
             validate_infra: ApiValidateAuthTokenStruct::new(feature, metadata),
-            search_repository: MysqlSearchUserAccountRepository::new(&feature.store.mysql),
+            search_repository: MysqlSearchAuthUserAccountRepository::new(&feature.store.mysql),
         }
     }
 }
 
-impl<'a> SearchUserAccountInfra for SearchUserAccountStruct<'a> {
+impl<'a> SearchAuthUserAccountInfra for SearchAuthUserAccountStruct<'a> {
     type ValidateInfra = ApiValidateAuthTokenStruct<'a>;
-    type SearchRepository = MysqlSearchUserAccountRepository<'a>;
+    type SearchRepository = MysqlSearchAuthUserAccountRepository<'a>;
 
     fn validate_infra(&self) -> &Self::ValidateInfra {
         &self.validate_infra
@@ -42,19 +42,19 @@ impl<'a> SearchUserAccountInfra for SearchUserAccountStruct<'a> {
 pub mod test {
     use crate::auth::{
         ticket::remote::validate::init::test::StaticValidateAuthTokenStruct,
-        user::account::remote::search::init::search_repository::test::MemorySearchUserAccountRepository,
+        user::account::remote::search::init::search_repository::test::MemorySearchAuthUserAccountRepository,
     };
 
-    use super::super::infra::SearchUserAccountInfra;
+    use super::super::infra::SearchAuthUserAccountInfra;
 
-    pub struct StaticSearchUserAccountStruct<'a> {
+    pub struct StaticSearchAuthUserAccountStruct<'a> {
         pub validate_infra: StaticValidateAuthTokenStruct<'a>,
-        pub search_repository: MemorySearchUserAccountRepository<'a>,
+        pub search_repository: MemorySearchAuthUserAccountRepository<'a>,
     }
 
-    impl<'a> SearchUserAccountInfra for StaticSearchUserAccountStruct<'a> {
+    impl<'a> SearchAuthUserAccountInfra for StaticSearchAuthUserAccountStruct<'a> {
         type ValidateInfra = StaticValidateAuthTokenStruct<'a>;
-        type SearchRepository = MemorySearchUserAccountRepository<'a>;
+        type SearchRepository = MemorySearchAuthUserAccountRepository<'a>;
 
         fn validate_infra(&self) -> &Self::ValidateInfra {
             &self.validate_infra

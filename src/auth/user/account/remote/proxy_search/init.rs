@@ -16,20 +16,20 @@ use response_encoder::ResponseEncoder;
 use crate::auth::remote::service::proxy::{AuthProxyEvent, AuthProxyInfra};
 
 use crate::auth::user::account::remote::{
-    proxy_search::infra::{SearchUserAccountProxyRequestDecoder, SearchUserAccountProxyResponse},
-    search::infra::SearchUserAccountFieldsExtract,
+    proxy_search::infra::{SearchAuthUserAccountProxyRequestDecoder, SearchAuthUserAccountProxyResponse},
+    search::infra::SearchAuthUserAccountFieldsExtract,
 };
 
-use crate::auth::user::account::remote::proxy_search::data::SearchUserAccountProxyMessage;
+use crate::auth::user::account::remote::proxy_search::data::SearchAuthUserAccountProxyMessage;
 
-pub struct SearchUserAccountProxyStruct<'a> {
-    pubsub: ActionStatePubSub<AuthProxyEvent<SearchUserAccountProxyMessage>>,
+pub struct SearchAuthUserAccountProxyStruct<'a> {
+    pubsub: ActionStatePubSub<AuthProxyEvent<SearchAuthUserAccountProxyMessage>>,
     validate_infra: ValidateTicketMetadataStruct<'a>,
     proxy_service: ProxyService<'a>,
     response_encoder: ResponseEncoder,
 }
 
-impl<'a> SearchUserAccountProxyStruct<'a> {
+impl<'a> SearchAuthUserAccountProxyStruct<'a> {
     pub fn new(
         feature: &'a AuthOutsideFeature,
         request_id: &'a str,
@@ -45,12 +45,12 @@ impl<'a> SearchUserAccountProxyStruct<'a> {
 
     pub fn subscribe(
         &mut self,
-        handler: impl 'static + Fn(&AuthProxyEvent<SearchUserAccountProxyMessage>) + Send + Sync,
+        handler: impl 'static + Fn(&AuthProxyEvent<SearchAuthUserAccountProxyMessage>) + Send + Sync,
     ) {
         self.pubsub.subscribe(handler);
     }
 
-    pub fn request_decoder(body: String) -> impl SearchUserAccountProxyRequestDecoder {
+    pub fn request_decoder(body: String) -> impl SearchAuthUserAccountProxyRequestDecoder {
         RequestDecoder::new(body)
     }
 }
@@ -58,10 +58,10 @@ impl<'a> SearchUserAccountProxyStruct<'a> {
 #[async_trait::async_trait]
 impl<'a>
     AuthProxyInfra<
-        SearchUserAccountFieldsExtract,
-        SearchUserAccountProxyResponse,
-        SearchUserAccountProxyMessage,
-    > for SearchUserAccountProxyStruct<'a>
+        SearchAuthUserAccountFieldsExtract,
+        SearchAuthUserAccountProxyResponse,
+        SearchAuthUserAccountProxyMessage,
+    > for SearchAuthUserAccountProxyStruct<'a>
 {
     type ValidateInfra = ValidateTicketMetadataStruct<'a>;
     type ProxyService = ProxyService<'a>;
@@ -79,8 +79,8 @@ impl<'a>
 
     fn post(
         &self,
-        state: AuthProxyEvent<SearchUserAccountProxyMessage>,
-    ) -> AuthProxyEvent<SearchUserAccountProxyMessage> {
+        state: AuthProxyEvent<SearchAuthUserAccountProxyMessage>,
+    ) -> AuthProxyEvent<SearchAuthUserAccountProxyMessage> {
         self.pubsub.post(state)
     }
 }

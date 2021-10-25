@@ -1,40 +1,40 @@
 import { auth_config } from "../../../x_outside_feature/config"
 
-import { newSearchUserAccountRemote } from "./init/remote"
+import { newSearchAuthUserAccountRemote } from "./init/remote"
 
 import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
 
 import {
-    SearchUserAccountFieldsDetecter,
-    SearchUserAccountInfra,
-    UpdateSearchUserAccountFieldsQuery,
+    SearchAuthUserAccountFieldsDetecter,
+    SearchAuthUserAccountInfra,
+    UpdateSearchAuthUserAccountFieldsQuery,
 } from "./infra"
 import {
     HistoryOutsideFeature,
     LocationOutsideFeature,
 } from "../../../../z_lib/ui/location/feature"
-import { detectSearchUserAccountFields, updateSearchUserAccountFieldsQuery } from "./convert"
+import { detectSearchAuthUserAccountFields, updateSearchAuthUserAccountFieldsQuery } from "./convert"
 
-export function newSearchUserAccountInfra(feature: RemoteOutsideFeature): SearchUserAccountInfra {
+export function newSearchAuthUserAccountInfra(feature: RemoteOutsideFeature): SearchAuthUserAccountInfra {
     return {
-        search: newSearchUserAccountRemote(feature),
+        search: newSearchAuthUserAccountRemote(feature),
         config: {
             takeLongtimeThreshold: auth_config.takeLongtimeThreshold,
         },
     }
 }
 
-export function newSearchUserAccountFieldsDetecter(
+export function newSearchAuthUserAccountFieldsDetecter(
     feature: LocationOutsideFeature,
-): SearchUserAccountFieldsDetecter {
+): SearchAuthUserAccountFieldsDetecter {
     return (params) =>
-        detectSearchUserAccountFields(new URL(feature.currentLocation.toString()), params)
+        detectSearchAuthUserAccountFields(new URL(feature.currentLocation.toString()), params)
 }
-export function newUpdateSearchUserAccountFieldsQuery(
+export function newUpdateSearchAuthUserAccountFieldsQuery(
     feature: LocationOutsideFeature & HistoryOutsideFeature,
-): UpdateSearchUserAccountFieldsQuery {
+): UpdateSearchAuthUserAccountFieldsQuery {
     return (fields) => {
-        const url = updateSearchUserAccountFieldsQuery(
+        const url = updateSearchAuthUserAccountFieldsQuery(
             new URL(feature.currentLocation.toString()),
             fields,
         )

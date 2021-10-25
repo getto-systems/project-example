@@ -1,3 +1,3 @@
-pub enum SearchUserAccountProxyMessage {
+pub enum SearchAuthUserAccountProxyMessage {
     Success(String),
 }

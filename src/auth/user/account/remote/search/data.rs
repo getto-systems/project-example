@@ -5,11 +5,11 @@ use crate::{
     z_lib::remote::search::data::SearchPage,
 };
 
-pub struct SearchUserAccountBasket {
+pub struct SearchAuthUserAccountBasket {
     pub page: SearchPage,
-    pub users: Vec<UserAccountBasket>,
+    pub users: Vec<AuthUserAccountBasket>,
 }
-pub struct UserAccountBasket {
+pub struct AuthUserAccountBasket {
     pub login_id: LoginIdBasket,
     pub granted_roles: GrantedAuthRolesBasket,
 }

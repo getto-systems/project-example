@@ -47,7 +47,7 @@ impl<'a> AuthProxyService<ResetPasswordFieldsExtract, ResetPasswordProxyResponse
     for ProxyService<'a>
 {
     fn name(&self) -> &str {
-        "auth.password.reset"
+        "auth.user.password.reset"
     }
     async fn call(
         &self,

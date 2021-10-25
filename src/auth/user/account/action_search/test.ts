@@ -5,18 +5,18 @@ import { mockSearchColumnsRepository } from "../../../../z_lib/ui/search/columns
 import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/init/mock"
 import {
-    mockSearchUserAccountFieldsDetecter,
-    mockUpdateSearchUserAccountFieldsQuery,
+    mockSearchAuthUserAccountFieldsDetecter,
+    mockUpdateSearchAuthUserAccountFieldsQuery,
 } from "../search/mock"
 
-import { initSearchUserAccountAction, initSearchUserAccountMaterial } from "./init"
+import { initSearchAuthUserAccountAction, initSearchAuthUserAccountMaterial } from "./init"
 
 import { BoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
-import { SearchUserAccountRemote, SearchUserAccountRemoteResult } from "../search/infra"
+import { SearchAuthUserAccountRemote, SearchAuthUserAccountRemoteResult } from "../search/infra"
 
-import { SearchUserAccountResource } from "./resource"
+import { SearchAuthUserAccountResource } from "./resource"
 
-describe("SearchUserAccount", () => {
+describe("SearchAuthUserAccount", () => {
     test("search", async () => {
         const { resource, store, url } = standard()
 
@@ -104,8 +104,8 @@ function takeLongtime() {
     return initResource(takeLongtime_search())
 }
 
-function initResource(search: SearchUserAccountRemote): Readonly<{
-    resource: SearchUserAccountResource
+function initResource(search: SearchAuthUserAccountRemote): Readonly<{
+    resource: SearchAuthUserAccountResource
     store: Readonly<{
         loginID: BoardValueStore
     }>
@@ -116,8 +116,8 @@ function initResource(search: SearchUserAccountRemote): Readonly<{
     const urlStore = { current: currentURL }
 
     const resource = {
-        search: initSearchUserAccountAction(
-            initSearchUserAccountMaterial({
+        search: initSearchAuthUserAccountAction(
+            initSearchAuthUserAccountMaterial({
                 search: {
                     search,
                     config: {
@@ -128,8 +128,8 @@ function initResource(search: SearchUserAccountRemote): Readonly<{
                     columns: mockSearchColumnsRepository(),
                 },
             }),
-            mockSearchUserAccountFieldsDetecter(currentURL),
-            mockUpdateSearchUserAccountFieldsQuery(currentURL, (url) => {
+            mockSearchAuthUserAccountFieldsDetecter(currentURL),
+            mockUpdateSearchAuthUserAccountFieldsQuery(currentURL, (url) => {
                 urlStore.current = url
             }),
         ),
@@ -144,13 +144,13 @@ function initResource(search: SearchUserAccountRemote): Readonly<{
     return { resource, store, url: urlStore }
 }
 
-function standard_search(): SearchUserAccountRemote {
+function standard_search(): SearchAuthUserAccountRemote {
     return async () => standard_searchRemoteResult()
 }
-function takeLongtime_search(): SearchUserAccountRemote {
+function takeLongtime_search(): SearchAuthUserAccountRemote {
     return async () => ticker({ wait_millisecond: 64 }, () => standard_searchRemoteResult())
 }
-function standard_searchRemoteResult(): SearchUserAccountRemoteResult {
+function standard_searchRemoteResult(): SearchAuthUserAccountRemoteResult {
     return {
         success: true,
         value: { page: { offset: 0, limit: 1000, all: 245 }, summary: {}, users: [] },

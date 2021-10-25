@@ -2,11 +2,11 @@ import { h } from "preact"
 
 import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
 
-import { SearchUserAccountPagerComponent } from "./pager"
+import { SearchAuthUserAccountPagerComponent } from "./pager"
 
-import { mockSearchUserAccountAction } from "../mock"
+import { mockSearchAuthUserAccountAction } from "../mock"
 
-import { SearchUserAccountState } from "../action"
+import { SearchAuthUserAccountState } from "../action"
 
 const options = ["initial", "try", "take-longtime", "server-error", "infra-error"] as const
 
@@ -24,12 +24,12 @@ export type Props = Readonly<{
     err: string
 }>
 const template = storyTemplate<Props>((props) => {
-    return h(SearchUserAccountPagerComponent, {
-        search: mockSearchUserAccountAction(),
+    return h(SearchAuthUserAccountPagerComponent, {
+        search: mockSearchAuthUserAccountAction(),
         state: state(),
     })
 
-    function state(): SearchUserAccountState {
+    function state(): SearchAuthUserAccountState {
         switch (props.search) {
             case "initial":
                 return { type: "initial-search" }

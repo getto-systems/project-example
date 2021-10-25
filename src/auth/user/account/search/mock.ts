@@ -1,15 +1,15 @@
-import { detectSearchUserAccountFields, updateSearchUserAccountFieldsQuery } from "./convert"
+import { detectSearchAuthUserAccountFields, updateSearchAuthUserAccountFieldsQuery } from "./convert"
 
-import { SearchUserAccountFieldsDetecter, UpdateSearchUserAccountFieldsQuery } from "./infra"
+import { SearchAuthUserAccountFieldsDetecter, UpdateSearchAuthUserAccountFieldsQuery } from "./infra"
 
-export function mockSearchUserAccountFieldsDetecter(url: URL): SearchUserAccountFieldsDetecter {
-    return (params) => detectSearchUserAccountFields(url, params)
+export function mockSearchAuthUserAccountFieldsDetecter(url: URL): SearchAuthUserAccountFieldsDetecter {
+    return (params) => detectSearchAuthUserAccountFields(url, params)
 }
-export function mockUpdateSearchUserAccountFieldsQuery(
+export function mockUpdateSearchAuthUserAccountFieldsQuery(
     url: URL,
     updater: { (url: URL): void },
-): UpdateSearchUserAccountFieldsQuery {
+): UpdateSearchAuthUserAccountFieldsQuery {
     return (fields) => {
-        updater(updateSearchUserAccountFieldsQuery(url, fields))
+        updater(updateSearchAuthUserAccountFieldsQuery(url, fields))
     }
 }

@@ -1,8 +1,8 @@
 use crate::z_lib::remote::logger::LogLevel;
 
-use super::super::event::SearchUserAccountEvent;
+use super::super::event::SearchAuthUserAccountEvent;
 
-impl SearchUserAccountEvent {
+impl SearchAuthUserAccountEvent {
     pub const fn log_level(&self) -> LogLevel {
         match self {
             Self::Success(_) => LogLevel::Audit,

@@ -1,7 +1,7 @@
-import { SearchUserAccountError, SearchUserAccountRemoteResponse } from "./data"
+import { SearchAuthUserAccountError, SearchAuthUserAccountRemoteResponse } from "./data"
 
-export type SearchUserAccountEvent =
+export type SearchAuthUserAccountEvent =
     | Readonly<{ type: "try-to-search" }>
     | Readonly<{ type: "take-longtime-to-search" }>
-    | Readonly<{ type: "failed-to-search"; err: SearchUserAccountError }>
-    | Readonly<{ type: "succeed-to-search"; response: SearchUserAccountRemoteResponse }>
+    | Readonly<{ type: "failed-to-search"; err: SearchAuthUserAccountError }>
+    | Readonly<{ type: "succeed-to-search"; response: SearchAuthUserAccountRemoteResponse }>

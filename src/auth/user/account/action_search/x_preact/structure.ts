@@ -15,23 +15,23 @@ import { tableStructure } from "../../../../../../ui/vendor/getto-table/preact/c
 import { tableCell } from "../../../../../../ui/vendor/getto-table/preact/cell/simple"
 import { tableClassName } from "../../../../../../ui/vendor/getto-table/preact/decorator"
 
-import { SearchUserAccountAction } from "../action"
+import { SearchAuthUserAccountAction } from "../action"
 
-import { UserAccount } from "../../kernel/data"
+import { AuthUserAccountBasket } from "../../kernel/data"
 
-export type SearchUserAccountTableStructure = TableStructure<Summary, UserAccount>
+export type SearchAuthUserAccountTableStructure = TableStructure<Summary, AuthUserAccountBasket>
 
 type Summary = {
     // no props
 }
 
-export function useSearchUserAccountTableStructure(
-    search: SearchUserAccountAction,
-): SearchUserAccountTableStructure {
+export function useSearchAuthUserAccountTableStructure(
+    search: SearchAuthUserAccountAction,
+): SearchAuthUserAccountTableStructure {
     return useMemo(() => build(search), [search])
 }
 
-function build(search: SearchUserAccountAction): SearchUserAccountTableStructure {
+function build(search: SearchAuthUserAccountAction): SearchAuthUserAccountTableStructure {
     return tableStructure(rowKey, [
         // TODO builder にしたいかな
         tableCell("login-id", (key) => ({
@@ -73,18 +73,18 @@ function build(search: SearchUserAccountAction): SearchUserAccountTableStructure
         }
     }
 
-    function rowKey(row: UserAccount): string {
+    function rowKey(row: AuthUserAccountBasket): string {
         return row.loginID
     }
 
-    function loginID(row: UserAccount): VNodeContent {
+    function loginID(row: AuthUserAccountBasket): VNodeContent {
         return row.loginID
     }
-    function grantedRoles(row: UserAccount): VNodeContent {
+    function grantedRoles(row: AuthUserAccountBasket): VNodeContent {
         return row.grantedRoles.join(" / ")
     }
 
-    function editLink(_row: UserAccount): VNodeContent {
+    function editLink(_row: AuthUserAccountBasket): VNodeContent {
         return html`<a href="#">${icon("pencil")} 編集</a>`
     }
 }

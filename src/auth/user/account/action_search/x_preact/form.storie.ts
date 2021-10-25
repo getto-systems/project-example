@@ -2,11 +2,11 @@ import { h } from "preact"
 
 import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
 
-import { SearchUserAccountFormComponent } from "./form"
+import { SearchAuthUserAccountFormComponent } from "./form"
 
-import { mockSearchUserAccountAction } from "../mock"
+import { mockSearchAuthUserAccountAction } from "../mock"
 
-import { SearchUserAccountState } from "../action"
+import { SearchAuthUserAccountState } from "../action"
 
 const options = ["initial", "try", "take-longtime", "server-error", "infra-error"] as const
 const changes = ["initial", "has-changed"] as const
@@ -29,13 +29,13 @@ export type Props = Readonly<{
     err: string
 }>
 const template = storyTemplate<Props>((props) => {
-    return h(SearchUserAccountFormComponent, {
-        search: mockSearchUserAccountAction(),
+    return h(SearchAuthUserAccountFormComponent, {
+        search: mockSearchAuthUserAccountAction(),
         state: state(),
         observe: { hasChanged: props.form === "has-changed" },
     })
 
-    function state(): SearchUserAccountState {
+    function state(): SearchAuthUserAccountState {
         switch (props.search) {
             case "initial":
                 return { type: "initial-search" }

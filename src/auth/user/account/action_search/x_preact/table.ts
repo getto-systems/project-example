@@ -11,28 +11,28 @@ import {
     thead,
 } from "../../../../../../ui/vendor/getto-css/preact/design/data"
 
-import { SearchUserAccountTableStructure } from "./structure"
+import { SearchAuthUserAccountTableStructure } from "./structure"
 
-import { SearchUserAccountResource, SearchUserAccountTableResourceState } from "../resource"
+import { SearchAuthUserAccountResource, SearchAuthUserAccountTableResourceState } from "../resource"
 
 import { SearchColumns } from "../../../../../z_lib/ui/search/columns/data"
-import { SearchUserAccountRemoteResponse } from "../../search/data"
+import { SearchAuthUserAccountRemoteResponse } from "../../search/data"
 
-type Resource = SearchUserAccountResource & Readonly<{ structure: SearchUserAccountTableStructure }>
+type Resource = SearchAuthUserAccountResource & Readonly<{ structure: SearchAuthUserAccountTableStructure }>
 
-export function SearchUserAccountTableEntry(resource: Resource): VNode {
-    return h(SearchUserAccountTableComponent, {
+export function SearchAuthUserAccountTableEntry(resource: Resource): VNode {
+    return h(SearchAuthUserAccountTableComponent, {
         ...resource,
         state: useApplicationAction(resource.search),
         columns: useApplicationAction(resource.search.columns),
     })
 }
 
-type Props = Resource & SearchUserAccountTableResourceState
-export function SearchUserAccountTableComponent(props: Props): VNode {
+type Props = Resource & SearchAuthUserAccountTableResourceState
+export function SearchAuthUserAccountTableComponent(props: Props): VNode {
     return basedOn(props)
 
-    function basedOn({ state, columns }: SearchUserAccountTableResourceState): VNode {
+    function basedOn({ state, columns }: SearchAuthUserAccountTableResourceState): VNode {
         switch (columns.type) {
             case "repository-error":
             case "initial-search":
@@ -47,7 +47,7 @@ export function SearchUserAccountTableComponent(props: Props): VNode {
         }
     }
 
-    type Content = Readonly<{ columns: SearchColumns; response: SearchUserAccountRemoteResponse }>
+    type Content = Readonly<{ columns: SearchColumns; response: SearchAuthUserAccountRemoteResponse }>
 
     function content({ columns, response }: Content): VNode {
         const params = { summary: response.summary, visibleKeys: columns }

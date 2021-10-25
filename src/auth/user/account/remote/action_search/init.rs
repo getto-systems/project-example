@@ -1,39 +1,39 @@
 use tonic::metadata::MetadataMap;
 
-use crate::auth::user::account::remote::y_protobuf::service::SearchUserAccountRequestPb;
+use crate::auth::user::account::remote::y_protobuf::service::SearchAuthUserAccountRequestPb;
 
 use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 
 use crate::auth::user::account::remote::search::init::{
-    request_decoder::PbSearchUserAccountRequestDecoder, SearchUserAccountStruct,
+    request_decoder::PbSearchAuthUserAccountRequestDecoder, SearchAuthUserAccountStruct,
 };
 
-use super::action::{SearchUserAccountAction, SearchUserAccountMaterial};
+use super::action::{SearchAuthUserAccountAction, SearchAuthUserAccountMaterial};
 
-use crate::auth::user::account::remote::search::infra::SearchUserAccountRequestDecoder;
+use crate::auth::user::account::remote::search::infra::SearchAuthUserAccountRequestDecoder;
 
-pub struct SearchUserAccountFeature<'a> {
-    search: SearchUserAccountStruct<'a>,
+pub struct SearchAuthUserAccountFeature<'a> {
+    search: SearchAuthUserAccountStruct<'a>,
 }
 
-impl<'a> SearchUserAccountFeature<'a> {
+impl<'a> SearchAuthUserAccountFeature<'a> {
     pub fn action(
         feature: &'a AuthAppFeature,
         metadata: &'a MetadataMap,
-    ) -> SearchUserAccountAction<Self> {
-        SearchUserAccountAction::with_material(Self {
-            search: SearchUserAccountStruct::new(&feature.auth, metadata),
+    ) -> SearchAuthUserAccountAction<Self> {
+        SearchAuthUserAccountAction::with_material(Self {
+            search: SearchAuthUserAccountStruct::new(&feature.auth, metadata),
         })
     }
     pub fn request_decoder(
-        request: SearchUserAccountRequestPb,
-    ) -> impl SearchUserAccountRequestDecoder {
-        PbSearchUserAccountRequestDecoder::new(request)
+        request: SearchAuthUserAccountRequestPb,
+    ) -> impl SearchAuthUserAccountRequestDecoder {
+        PbSearchAuthUserAccountRequestDecoder::new(request)
     }
 }
 
-impl<'a> SearchUserAccountMaterial for SearchUserAccountFeature<'a> {
-    type Search = SearchUserAccountStruct<'a>;
+impl<'a> SearchAuthUserAccountMaterial for SearchAuthUserAccountFeature<'a> {
+    type Search = SearchAuthUserAccountStruct<'a>;
 
     fn search(&self) -> &Self::Search {
         &self.search

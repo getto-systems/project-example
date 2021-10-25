@@ -3,8 +3,8 @@ use tonic::{Request, Response, Status};
 use getto_application::helper::flatten;
 
 use crate::auth::user::account::remote::y_protobuf::service::{
-    search_user_account_pb_server::{SearchUserAccountPb, SearchUserAccountPbServer},
-    SearchUserAccountRequestPb, SearchUserAccountResponsePb,
+    search_auth_user_account_pb_server::{SearchAuthUserAccountPb, SearchAuthUserAccountPbServer},
+    SearchAuthUserAccountRequestPb, SearchAuthUserAccountResponsePb,
 };
 
 use crate::z_lib::remote::{logger::Logger, response::tonic::RespondTo};
@@ -17,24 +17,24 @@ use crate::x_outside_feature::remote::{
     common::metadata::metadata_request_id,
 };
 
-use crate::auth::user::account::remote::action_search::init::SearchUserAccountFeature;
+use crate::auth::user::account::remote::action_search::init::SearchAuthUserAccountFeature;
 
 pub struct AccountServer;
 
 impl AccountServer {
-    pub fn search(&self) -> SearchUserAccountPbServer<Search> {
-        SearchUserAccountPbServer::new(Search)
+    pub fn search(&self) -> SearchAuthUserAccountPbServer<Search> {
+        SearchAuthUserAccountPbServer::new(Search)
     }
 }
 
 pub struct Search;
 
 #[async_trait::async_trait]
-impl SearchUserAccountPb for Search {
+impl SearchAuthUserAccountPb for Search {
     async fn search(
         &self,
-        request: Request<SearchUserAccountRequestPb>,
-    ) -> Result<Response<SearchUserAccountResponsePb>, Status> {
+        request: Request<SearchAuthUserAccountRequestPb>,
+    ) -> Result<Response<SearchAuthUserAccountResponsePb>, Status> {
         let TonicRequest {
             data,
             metadata,
@@ -43,10 +43,10 @@ impl SearchUserAccountPb for Search {
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger("auth.user.account.search", request_id.into());
-        let mut action = SearchUserAccountFeature::action(&data, &metadata);
+        let mut action = SearchAuthUserAccountFeature::action(&data, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
-        let request_decoder = SearchUserAccountFeature::request_decoder(request);
+        let request_decoder = SearchAuthUserAccountFeature::request_decoder(request);
         flatten(action.ignite(request_decoder).await).respond_to()
     }
 }

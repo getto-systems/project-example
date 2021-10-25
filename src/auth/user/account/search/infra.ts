@@ -2,32 +2,32 @@ import { DelayTime } from "../../../../z_lib/ui/config/infra"
 import { RemoteResult } from "../../../../z_lib/ui/remote/infra"
 
 import {
-    SearchUserAccountFields,
-    SearchUserAccountRemoteError,
-    SearchUserAccountRemoteResponse,
+    SearchAuthUserAccountFields,
+    SearchAuthUserAccountRemoteError,
+    SearchAuthUserAccountRemoteResponse,
 } from "./data"
 
-export type SearchUserAccountFieldsDetectParams = Readonly<{
+export type SearchAuthUserAccountFieldsDetectParams = Readonly<{
     defaultSortKey: string
 }>
-export interface SearchUserAccountFieldsDetecter {
-    (params: SearchUserAccountFieldsDetectParams): SearchUserAccountFields
+export interface SearchAuthUserAccountFieldsDetecter {
+    (params: SearchAuthUserAccountFieldsDetectParams): SearchAuthUserAccountFields
 }
-export interface UpdateSearchUserAccountFieldsQuery {
-    (fields: SearchUserAccountFields): void
+export interface UpdateSearchAuthUserAccountFieldsQuery {
+    (fields: SearchAuthUserAccountFields): void
 }
 
-export type SearchUserAccountInfra = Readonly<{
-    search: SearchUserAccountRemote
+export type SearchAuthUserAccountInfra = Readonly<{
+    search: SearchAuthUserAccountRemote
     config: Readonly<{
         takeLongtimeThreshold: DelayTime
     }>
 }>
 
-export interface SearchUserAccountRemote {
-    (fields: SearchUserAccountFields): Promise<SearchUserAccountRemoteResult>
+export interface SearchAuthUserAccountRemote {
+    (fields: SearchAuthUserAccountFields): Promise<SearchAuthUserAccountRemoteResult>
 }
-export type SearchUserAccountRemoteResult = RemoteResult<
-    SearchUserAccountRemoteResponse,
-    SearchUserAccountRemoteError
+export type SearchAuthUserAccountRemoteResult = RemoteResult<
+    SearchAuthUserAccountRemoteResponse,
+    SearchAuthUserAccountRemoteError
 >

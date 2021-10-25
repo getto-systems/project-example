@@ -2,21 +2,21 @@ import { BoardValue } from "../../../../../ui/vendor/getto-application/board/ker
 import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
 import { SearchPageResponse } from "../../../../z_lib/ui/search/data"
 import { SearchSort } from "../../../../z_lib/ui/search/sort/data"
-import { UserAccount } from "../kernel/data"
+import { AuthUserAccountBasket } from "../kernel/data"
 
-export type SearchUserAccountFields = Readonly<{
+export type SearchAuthUserAccountFields = Readonly<{
     offset: BoardValue
     sort: SearchSort
     loginID: BoardValue
 }>
 
-export type SearchUserAccountError = SearchUserAccountRemoteError
-export type SearchUserAccountRemoteError = RemoteCommonError
+export type SearchAuthUserAccountError = SearchAuthUserAccountRemoteError
+export type SearchAuthUserAccountRemoteError = RemoteCommonError
 
-export type SearchUserAccountRemoteResponse = Readonly<{
+export type SearchAuthUserAccountRemoteResponse = Readonly<{
     page: SearchPageResponse
     summary: {
         /* no props */
     }
-    users: UserAccount[]
+    users: AuthUserAccountBasket[]
 }>

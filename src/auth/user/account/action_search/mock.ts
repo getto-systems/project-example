@@ -7,20 +7,20 @@ import { SearchSort } from "../../../../z_lib/ui/search/sort/data"
 import { mockSearchLoginIDAction } from "../../login_id/input/action_search/mock"
 
 import {
-    SearchUserAccountAction,
-    SearchUserAccountState,
-    initialSearchUserAccountState,
+    SearchAuthUserAccountAction,
+    SearchAuthUserAccountState,
+    initialSearchAuthUserAccountState,
 } from "./action"
 
-export function mockSearchUserAccountAction(): SearchUserAccountAction {
+export function mockSearchAuthUserAccountAction(): SearchAuthUserAccountAction {
     return new Action()
 }
 
 class Action
-    extends ApplicationMockStateAction<SearchUserAccountState>
-    implements SearchUserAccountAction
+    extends ApplicationMockStateAction<SearchAuthUserAccountState>
+    implements SearchAuthUserAccountAction
 {
-    readonly initialState = initialSearchUserAccountState
+    readonly initialState = initialSearchAuthUserAccountState
 
     readonly loginID = mockSearchLoginIDAction()
     readonly offset = mockSearchOffsetAction()
@@ -31,16 +31,16 @@ class Action
         return { key: "login-id", order: "normal" }
     }
 
-    clear(): SearchUserAccountState {
+    clear(): SearchAuthUserAccountState {
         return this.initialState
     }
-    async submit(): Promise<SearchUserAccountState> {
+    async submit(): Promise<SearchAuthUserAccountState> {
         return this.initialState
     }
-    async load(): Promise<SearchUserAccountState> {
+    async load(): Promise<SearchAuthUserAccountState> {
         return this.initialState
     }
-    async sort(): Promise<SearchUserAccountState> {
+    async sort(): Promise<SearchAuthUserAccountState> {
         return this.initialState
     }
 }

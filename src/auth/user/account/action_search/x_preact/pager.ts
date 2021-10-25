@@ -9,25 +9,25 @@ import { box } from "../../../../../../ui/vendor/getto-css/preact/design/box"
 
 import { pagerCount, pagerParams } from "../../../../../example/x_preact/design/table"
 
-import { SearchUserAccountPagerResourceState, SearchUserAccountResource } from "../resource"
+import { SearchAuthUserAccountPagerResourceState, SearchAuthUserAccountResource } from "../resource"
 
-import { SearchUserAccountError } from "../../search/data"
+import { SearchAuthUserAccountError } from "../../search/data"
 import { pagerOptions } from "../../../../../../ui/vendor/getto-css/preact/design/data"
 import { SearchOffsetComponent } from "../../../../../z_lib/ui/search/action_offset/x_preact/offset"
 import { SearchPageResponse } from "../../../../../z_lib/ui/search/data"
 
-export function SearchUserAccountPagerEntry({ search }: SearchUserAccountResource): VNode {
-    return h(SearchUserAccountPagerComponent, {
+export function SearchAuthUserAccountPagerEntry({ search }: SearchAuthUserAccountResource): VNode {
+    return h(SearchAuthUserAccountPagerComponent, {
         search,
         state: useApplicationAction(search),
     })
 }
 
-type Props = SearchUserAccountResource & SearchUserAccountPagerResourceState
-export function SearchUserAccountPagerComponent(props: Props): VNode {
+type Props = SearchAuthUserAccountResource & SearchAuthUserAccountPagerResourceState
+export function SearchAuthUserAccountPagerComponent(props: Props): VNode {
     return basedOn(props)
 
-    function basedOn({ state }: SearchUserAccountPagerResourceState): VNode {
+    function basedOn({ state }: SearchAuthUserAccountPagerResourceState): VNode {
         switch (state.type) {
             case "initial-search":
             case "try-to-search":
@@ -75,7 +75,7 @@ export function SearchUserAccountPagerComponent(props: Props): VNode {
         })
     }
 
-    type ErrorContent = Readonly<{ err: SearchUserAccountError }>
+    type ErrorContent = Readonly<{ err: SearchAuthUserAccountError }>
     function errorMessage({ err }: ErrorContent): VNode {
         return box({ body: fieldError(searchError(err)) })
     }
@@ -83,7 +83,7 @@ export function SearchUserAccountPagerComponent(props: Props): VNode {
 
 const EMPTY_BOX = box({ body: "" })
 
-function searchError(err: SearchUserAccountError) {
+function searchError(err: SearchAuthUserAccountError) {
     return remoteCommonErrorReason(err, (reason) => [
         `${reason.message}により検索に失敗しました`,
         ...reason.detail,

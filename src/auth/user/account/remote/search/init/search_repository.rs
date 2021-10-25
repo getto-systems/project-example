@@ -7,12 +7,12 @@ use sea_query_driver_mysql::bind_query_as;
 use crate::z_lib::remote::repository::mysql::helper::mysql_error;
 
 use crate::auth::user::account::remote::search::infra::{
-    SearchUserAccountFields, SearchUserAccountRepository,
+    SearchAuthUserAccountFields, SearchAuthUserAccountRepository,
 };
 
 use crate::{
     auth::user::{
-        account::remote::search::data::{SearchUserAccountBasket, UserAccountBasket},
+        account::remote::search::data::{SearchAuthUserAccountBasket, AuthUserAccountBasket},
         login_id::remote::data::LoginIdBasket,
         remote::kernel::data::GrantedAuthRolesBasket,
     },
@@ -22,22 +22,22 @@ use crate::{
     },
 };
 
-pub struct MysqlSearchUserAccountRepository<'a> {
+pub struct MysqlSearchAuthUserAccountRepository<'a> {
     pool: &'a MySqlPool,
 }
 
-impl<'a> MysqlSearchUserAccountRepository<'a> {
+impl<'a> MysqlSearchAuthUserAccountRepository<'a> {
     pub const fn new(pool: &'a MySqlPool) -> Self {
         Self { pool }
     }
 }
 
 #[async_trait::async_trait]
-impl<'a> SearchUserAccountRepository for MysqlSearchUserAccountRepository<'a> {
+impl<'a> SearchAuthUserAccountRepository for MysqlSearchAuthUserAccountRepository<'a> {
     async fn search(
         &self,
-        fields: &SearchUserAccountFields,
-    ) -> Result<SearchUserAccountBasket, RepositoryError> {
+        fields: &SearchAuthUserAccountFields,
+    ) -> Result<SearchAuthUserAccountBasket, RepositoryError> {
         search(&self, fields).await
     }
 }
@@ -61,15 +61,15 @@ struct Count {
 }
 
 #[derive(sqlx::FromRow)]
-struct UserAccount {
+struct AuthUserAccount {
     login_id: String,
     granted_roles: String,
 }
 
 async fn search<'a>(
-    repository: &MysqlSearchUserAccountRepository<'a>,
-    fields: &SearchUserAccountFields,
-) -> Result<SearchUserAccountBasket, RepositoryError> {
+    repository: &MysqlSearchAuthUserAccountRepository<'a>,
+    fields: &SearchAuthUserAccountFields,
+) -> Result<SearchAuthUserAccountBasket, RepositoryError> {
     let mut conn = repository.pool.begin().await.map_err(mysql_error)?;
 
     let (sort_col, sort_order) = fields
@@ -128,16 +128,16 @@ async fn search<'a>(
         .order_by(sort_col, sort_order)
         .build(MysqlQueryBuilder);
 
-    let rows = bind_query_as(query_as::<_, UserAccount>(&sql), &values)
+    let rows = bind_query_as(query_as::<_, AuthUserAccount>(&sql), &values)
         .fetch_all(&mut conn)
         .await
         .map_err(mysql_error)?;
 
-    Ok(SearchUserAccountBasket {
+    Ok(SearchAuthUserAccountBasket {
         page: SearchPage { all, limit, offset },
         users: rows
             .into_iter()
-            .map(|row| UserAccountBasket {
+            .map(|row| AuthUserAccountBasket {
                 login_id: LoginIdBasket::new(row.login_id),
                 granted_roles: GrantedAuthRolesBasket::new(
                     row.granted_roles
@@ -161,54 +161,54 @@ pub mod test {
     };
 
     use crate::auth::user::account::remote::search::infra::{
-        SearchUserAccountFields, SearchUserAccountRepository,
+        SearchAuthUserAccountFields, SearchAuthUserAccountRepository,
     };
 
     use crate::{
         auth::user::{
-            account::remote::search::data::{SearchUserAccountBasket, UserAccountBasket},
+            account::remote::search::data::{SearchAuthUserAccountBasket, AuthUserAccountBasket},
             login_id::remote::data::LoginIdBasket,
             remote::kernel::data::GrantedAuthRolesBasket,
         },
         z_lib::remote::{repository::data::RepositoryError, search::data::SearchPage},
     };
 
-    pub type MemorySearchUserAccountStore = Mutex<MemorySearchUserAccountMap>;
-    pub struct MemorySearchUserAccountMap {
+    pub type MemorySearchAuthUserAccountStore = Mutex<MemorySearchAuthUserAccountMap>;
+    pub struct MemorySearchAuthUserAccountMap {
         pub user: MemoryAuthUserMap,
         pub password: MemoryAuthUserPasswordMap,
     }
 
-    impl MemorySearchUserAccountMap {
-        pub fn to_store(self) -> MemorySearchUserAccountStore {
+    impl MemorySearchAuthUserAccountMap {
+        pub fn to_store(self) -> MemorySearchAuthUserAccountStore {
             Mutex::new(self)
         }
     }
 
-    pub struct MemorySearchUserAccountRepository<'a> {
-        store: &'a MemorySearchUserAccountStore,
+    pub struct MemorySearchAuthUserAccountRepository<'a> {
+        store: &'a MemorySearchAuthUserAccountStore,
     }
 
-    impl<'a> MemorySearchUserAccountRepository<'a> {
-        pub const fn new(store: &'a MemorySearchUserAccountStore) -> Self {
+    impl<'a> MemorySearchAuthUserAccountRepository<'a> {
+        pub const fn new(store: &'a MemorySearchAuthUserAccountStore) -> Self {
             Self { store }
         }
     }
 
     #[async_trait::async_trait]
-    impl<'a> SearchUserAccountRepository for MemorySearchUserAccountRepository<'a> {
+    impl<'a> SearchAuthUserAccountRepository for MemorySearchAuthUserAccountRepository<'a> {
         async fn search(
             &self,
-            fields: &SearchUserAccountFields,
-        ) -> Result<SearchUserAccountBasket, RepositoryError> {
+            fields: &SearchAuthUserAccountFields,
+        ) -> Result<SearchAuthUserAccountBasket, RepositoryError> {
             search(&self, fields).await
         }
     }
 
     async fn search<'a>(
-        repository: &MemorySearchUserAccountRepository<'a>,
-        _fields: &SearchUserAccountFields,
-    ) -> Result<SearchUserAccountBasket, RepositoryError> {
+        repository: &MemorySearchAuthUserAccountRepository<'a>,
+        _fields: &SearchAuthUserAccountFields,
+    ) -> Result<SearchAuthUserAccountBasket, RepositoryError> {
         let store = repository.store.lock().unwrap();
         let users = store
             .user
@@ -219,7 +219,7 @@ pub mod test {
                 store
                     .password
                     .get_login_id(&user.user_id)
-                    .map(|login_id| UserAccountBasket {
+                    .map(|login_id| AuthUserAccountBasket {
                         login_id: LoginIdBasket::new(login_id.clone().extract()),
                         granted_roles: GrantedAuthRolesBasket::new(
                             user.granted_roles.into_iter().collect(),
@@ -228,7 +228,7 @@ pub mod test {
             })
             .collect();
 
-        Ok(SearchUserAccountBasket {
+        Ok(SearchAuthUserAccountBasket {
             page: SearchPage {
                 offset: 0,
                 limit: 0,

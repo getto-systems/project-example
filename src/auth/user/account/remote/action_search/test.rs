@@ -22,12 +22,12 @@ use crate::{
         },
         user::{
             account::remote::search::init::{
-                request_decoder::test::StaticSearchUserAccountRequestDecoder,
+                request_decoder::test::StaticSearchAuthUserAccountRequestDecoder,
                 search_repository::test::{
-                    MemorySearchUserAccountMap, MemorySearchUserAccountRepository,
-                    MemorySearchUserAccountStore,
+                    MemorySearchAuthUserAccountMap, MemorySearchAuthUserAccountRepository,
+                    MemorySearchAuthUserAccountStore,
                 },
-                test::StaticSearchUserAccountStruct,
+                test::StaticSearchAuthUserAccountStruct,
             },
             password::remote::kernel::init::password_repository::test::MemoryAuthUserPasswordMap,
             remote::kernel::init::user_repository::test::MemoryAuthUserMap,
@@ -39,12 +39,12 @@ use crate::{
 use crate::auth::{
     ticket::remote::check_nonce::infra::AuthNonceConfig,
     user::{
-        account::remote::search::infra::SearchUserAccountFieldsExtract,
+        account::remote::search::infra::SearchAuthUserAccountFieldsExtract,
         password::remote::kernel::infra::HashedPassword,
     },
 };
 
-use super::action::{SearchUserAccountAction, SearchUserAccountMaterial};
+use super::action::{SearchAuthUserAccountAction, SearchAuthUserAccountMaterial};
 
 use crate::auth::{
     ticket::remote::kernel::data::{AuthTicketExtract, ExpireDuration},
@@ -62,7 +62,7 @@ async fn success_search() {
     let feature = TestFeature::new(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = SearchUserAccountAction::with_material(feature);
+    let mut action = SearchAuthUserAccountAction::with_material(feature);
     action.subscribe(handler);
 
     let result = action.ignite(request_decoder).await;
@@ -74,11 +74,11 @@ async fn success_search() {
 }
 
 struct TestFeature<'a> {
-    search: StaticSearchUserAccountStruct<'a>,
+    search: StaticSearchAuthUserAccountStruct<'a>,
 }
 
-impl<'a> SearchUserAccountMaterial for TestFeature<'a> {
-    type Search = StaticSearchUserAccountStruct<'a>;
+impl<'a> SearchAuthUserAccountMaterial for TestFeature<'a> {
+    type Search = StaticSearchAuthUserAccountStruct<'a>;
 
     fn search(&self) -> &Self::Search {
         &self.search
@@ -87,7 +87,7 @@ impl<'a> SearchUserAccountMaterial for TestFeature<'a> {
 
 struct TestStore {
     nonce: MemoryAuthNonceStore,
-    search: MemorySearchUserAccountStore,
+    search: MemorySearchAuthUserAccountStore,
 }
 
 impl TestStore {
@@ -102,7 +102,7 @@ impl TestStore {
 impl<'a> TestFeature<'a> {
     fn new(store: &'a TestStore) -> Self {
         Self {
-            search: StaticSearchUserAccountStruct {
+            search: StaticSearchAuthUserAccountStruct {
                 validate_infra: StaticValidateAuthTokenStruct {
                     check_nonce_infra: StaticCheckAuthNonceStruct {
                         config: standard_nonce_config(),
@@ -113,7 +113,7 @@ impl<'a> TestFeature<'a> {
                     token_metadata: standard_token_header(),
                     token_decoder: standard_token_decoder(),
                 },
-                search_repository: MemorySearchUserAccountRepository::new(&store.search),
+                search_repository: MemorySearchAuthUserAccountRepository::new(&store.search),
             },
         }
     }
@@ -156,8 +156,8 @@ fn standard_token_decoder() -> StaticAuthTokenDecoder {
     })
 }
 
-fn standard_request_decoder() -> StaticSearchUserAccountRequestDecoder {
-    StaticSearchUserAccountRequestDecoder::Valid(SearchUserAccountFieldsExtract {
+fn standard_request_decoder() -> StaticSearchAuthUserAccountRequestDecoder {
+    StaticSearchAuthUserAccountRequestDecoder::Valid(SearchAuthUserAccountFieldsExtract {
         offset: 0,
         sort: SearchSortExtract {
             key: "login-id".into(),
@@ -171,8 +171,8 @@ fn standard_nonce_store() -> MemoryAuthNonceStore {
     MemoryAuthNonceMap::new().to_store()
 }
 
-fn standard_search_store() -> MemorySearchUserAccountStore {
-    MemorySearchUserAccountMap {
+fn standard_search_store() -> MemorySearchAuthUserAccountStore {
+    MemorySearchAuthUserAccountMap {
         password: MemoryAuthUserPasswordMap::with_password(
             test_user_login_id(),
             test_user(),

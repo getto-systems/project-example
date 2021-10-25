@@ -11,10 +11,12 @@ import { decodeProtobuf, encodeProtobuf } from "../../../../../../ui/vendor/prot
 
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 
-import { SearchUserAccountRemote } from "../infra"
+import { SearchAuthUserAccountRemote } from "../infra"
 import { ticker } from "../../../../../z_lib/ui/timer/helper"
 
-export function newSearchUserAccountRemote(feature: RemoteOutsideFeature): SearchUserAccountRemote {
+export function newSearchAuthUserAccountRemote(
+    feature: RemoteOutsideFeature,
+): SearchAuthUserAccountRemote {
     return async (fields) => {
         try {
             const mock = true
@@ -31,7 +33,7 @@ export function newSearchUserAccountRemote(feature: RemoteOutsideFeature): Searc
             }
 
             const body = encodeProtobuf(
-                pb.auth.user.account.api.SearchUserAccountApiRequestPb,
+                pb.auth.user.account.api.SearchAuthUserAccountApiRequestPb,
                 (message) => {
                     message.offset = parseInt(fields.offset) // TODO parseInt しなくて済むようにできないか？
                     message.sortKey = fields.sort.key
@@ -53,7 +55,7 @@ export function newSearchUserAccountRemote(feature: RemoteOutsideFeature): Searc
             }
 
             const result = decodeProtobuf(
-                pb.auth.user.account.api.SearchUserAccountApiResponsePb,
+                pb.auth.user.account.api.SearchAuthUserAccountApiResponsePb,
                 await response.text(),
             )
             return {

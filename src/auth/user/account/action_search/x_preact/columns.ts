@@ -10,31 +10,31 @@ import { SearchColumnsComponent } from "../../../../../z_lib/ui/search/action_co
 
 import { repositoryErrorReason } from "../../../../../z_lib/ui/repository/reason"
 
-import { SearchUserAccountTableStructure } from "./structure"
+import { SearchAuthUserAccountTableStructure } from "./structure"
 
-import { SearchUserAccountColumnsResourceState, SearchUserAccountResource } from "../resource"
+import { SearchAuthUserAccountColumnsResourceState, SearchAuthUserAccountResource } from "../resource"
 
 import { RepositoryError } from "../../../../../z_lib/ui/repository/data"
 
-type Resource = SearchUserAccountResource & Readonly<{ structure: SearchUserAccountTableStructure }>
+type Resource = SearchAuthUserAccountResource & Readonly<{ structure: SearchAuthUserAccountTableStructure }>
 
-export function SearchUserAccountColumnsEntry(resource: Resource): VNode {
-    return h(SearchUserAccountColumnsComponent, {
+export function SearchAuthUserAccountColumnsEntry(resource: Resource): VNode {
+    return h(SearchAuthUserAccountColumnsComponent, {
         ...resource,
         state: useApplicationAction(resource.search),
         columns: useApplicationAction(resource.search.columns),
     })
 }
 
-type Props = Resource & SearchUserAccountColumnsResourceState
-export function SearchUserAccountColumnsComponent(props: Props): VNode {
+type Props = Resource & SearchAuthUserAccountColumnsResourceState
+export function SearchAuthUserAccountColumnsComponent(props: Props): VNode {
     useLayoutEffect(() => {
         props.search.columns.load(props.structure.initiallyVisibleCells())
     }, [props.search.columns, props.structure])
 
     return basedOn(props)
 
-    function basedOn({ columns }: SearchUserAccountColumnsResourceState): VNode {
+    function basedOn({ columns }: SearchAuthUserAccountColumnsResourceState): VNode {
         switch (columns.type) {
             case "initial-search":
             case "succeed-to-load":

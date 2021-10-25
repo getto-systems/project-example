@@ -1,17 +1,17 @@
 use tonic::{Response, Status};
 
 use crate::auth::user::account::remote::y_protobuf::service::{
-    SearchUserAccountResponsePb, UserAccountPb,
+    SearchAuthUserAccountResponsePb, AuthUserAccountPb,
 };
 
 use crate::z_lib::remote::response::tonic::RespondTo;
 
-use super::super::event::SearchUserAccountEvent;
+use super::super::event::SearchAuthUserAccountEvent;
 
-use crate::auth::user::account::remote::search::data::SearchUserAccountBasket;
+use crate::auth::user::account::remote::search::data::SearchAuthUserAccountBasket;
 
-impl RespondTo<SearchUserAccountResponsePb> for SearchUserAccountEvent {
-    fn respond_to(self) -> Result<Response<SearchUserAccountResponsePb>, Status> {
+impl RespondTo<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountEvent {
+    fn respond_to(self) -> Result<Response<SearchAuthUserAccountResponsePb>, Status> {
         match self {
             Self::Success(response) => response.respond_to(),
             Self::Validate(_) => Err(Status::cancelled("change password cancelled")),
@@ -20,22 +20,22 @@ impl RespondTo<SearchUserAccountResponsePb> for SearchUserAccountEvent {
     }
 }
 
-impl RespondTo<SearchUserAccountResponsePb> for SearchUserAccountBasket {
-    fn respond_to(self) -> Result<Response<SearchUserAccountResponsePb>, Status> {
+impl RespondTo<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountBasket {
+    fn respond_to(self) -> Result<Response<SearchAuthUserAccountResponsePb>, Status> {
         Ok(Response::new(self.into()))
     }
 }
 
-impl Into<SearchUserAccountResponsePb> for SearchUserAccountBasket {
-    fn into(self) -> SearchUserAccountResponsePb {
-        SearchUserAccountResponsePb {
+impl Into<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountBasket {
+    fn into(self) -> SearchAuthUserAccountResponsePb {
+        SearchAuthUserAccountResponsePb {
             offset: self.page.offset,
             limit: self.page.limit,
             all: self.page.all,
             users: self
                 .users
                 .into_iter()
-                .map(|user| UserAccountPb {
+                .map(|user| AuthUserAccountPb {
                     login_id: user.login_id.extract(),
                     granted_roles: user.granted_roles.extract().into_iter().collect(),
                 })
