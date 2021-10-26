@@ -15,9 +15,11 @@ use response_encoder::ResponseEncoder;
 
 use crate::auth::remote::service::proxy::{AuthProxyEvent, AuthProxyInfra};
 
-use crate::auth::user::password::remote::proxy_authenticate::infra::{
-    AuthenticatePasswordFieldsExtract, AuthenticatePasswordProxyRequestDecoder,
-    AuthenticatePasswordProxyResponse,
+use crate::auth::user::password::remote::{
+    authenticate::infra::AuthenticatePasswordFieldsExtract,
+    proxy_authenticate::infra::{
+        AuthenticatePasswordProxyRequestDecoder, AuthenticatePasswordProxyResponse,
+    },
 };
 
 use crate::auth::user::password::remote::proxy_authenticate::data::AuthenticatePasswordProxyMessage;

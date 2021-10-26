@@ -13,7 +13,6 @@ import { DocsDomain } from "../../../../../ui/vendor/getto-application/docs/data
 
 export function docsMenuContent(): MenuContent {
     return {
-        database: env.database.menuExpand,
         key: "docs",
         loadMenuBadge: false,
         menuTree: [

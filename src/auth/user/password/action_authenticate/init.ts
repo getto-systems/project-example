@@ -2,22 +2,12 @@ import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-a
 
 import { initSignLink } from "../../../sign/action_nav/init"
 import { initInputLoginIDAction } from "../../login_id/input/action_input/init"
-import { initInputPasswordAction } from "../action_input/init"
+import { initInputPasswordAction } from "../input/action_input/init"
 import { initValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/init"
 
-import {
-    saveAuthTicket,
-    startContinuousRenew,
-} from "../../../ticket/start_continuous_renew/method"
-import {
-    GetScriptPathDetecter,
-    getScriptPath,
-} from "../../../sign/get_script_path/method"
+import { saveAuthTicket, startContinuousRenew } from "../../../ticket/start_continuous_renew/method"
+import { getScriptPath } from "../../../sign/get_script_path/method"
 import { authenticatePassword } from "../authenticate/method"
-
-import { AuthenticatePasswordInfra } from "../authenticate/infra"
-import { StartContinuousRenewInfra } from "../../../ticket/start_continuous_renew/infra"
-import { GetScriptPathInfra } from "../../../sign/get_script_path/infra"
 
 import {
     AuthenticatePasswordMaterial,
@@ -28,14 +18,18 @@ import {
     AuthenticatePasswordFieldName,
 } from "./action"
 import { ValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/action"
+import { InputLoginIDAction } from "../../login_id/input/action_input/action"
+import { InputPasswordAction } from "../input/action_input/action"
+
+import { AuthenticatePasswordInfra } from "../authenticate/infra"
+import { StartContinuousRenewInfra } from "../../../ticket/start_continuous_renew/infra"
+import { GetScriptPathInfra, GetScriptPathDetecter } from "../../../sign/get_script_path/infra"
+import { ValidateBoardChecker } from "../../../../../ui/vendor/getto-application/board/validate_board/infra"
 
 import { LoadScriptError } from "../../../sign/get_script_path/data"
 import { AuthenticatePasswordFields } from "../authenticate/data"
 import { AuthTicket } from "../../../ticket/kernel/data"
 import { ConvertBoardResult } from "../../../../../ui/vendor/getto-application/board/kernel/data"
-import { InputLoginIDAction } from "../../login_id/input/action_input/action"
-import { InputPasswordAction } from "../action_input/action"
-import { ValidateBoardChecker } from "../../../../../ui/vendor/getto-application/board/validate_board/infra"
 
 export type AuthenticatePasswordActionInfra = Readonly<{
     startContinuousRenew: StartContinuousRenewInfra

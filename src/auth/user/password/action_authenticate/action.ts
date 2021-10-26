@@ -2,7 +2,7 @@ import { ApplicationStateAction } from "../../../../../ui/vendor/getto-applicati
 
 import { SignLink } from "../../../sign/action_nav/resource"
 import { InputLoginIDAction } from "../../login_id/input/action_input/action"
-import { InputPasswordAction } from "../action_input/action"
+import { InputPasswordAction } from "../input/action_input/action"
 import { ValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/action"
 
 import { AuthenticatePasswordMethod } from "../authenticate/method"

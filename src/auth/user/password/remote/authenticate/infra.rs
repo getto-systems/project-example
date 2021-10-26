@@ -1,9 +1,8 @@
 use crate::auth::{
     ticket::remote::check_nonce::infra::CheckAuthNonceInfra,
     user::{
-        password::remote::{
-            kernel::infra::{AuthUserPasswordMatcher, PlainPassword, VerifyPasswordRepository},
-            proxy_authenticate::infra::AuthenticatePasswordFieldsExtract,
+        password::remote::kernel::infra::{
+            AuthUserPasswordMatcher, PlainPassword, VerifyPasswordRepository,
         },
         remote::kernel::infra::AuthUserRepository,
     },
@@ -21,6 +20,11 @@ pub trait AuthenticatePasswordInfra {
     fn password_matcher(&self, plain_password: PlainPassword) -> Self::PasswordMatcher {
         Self::PasswordMatcher::new(plain_password)
     }
+}
+
+pub struct AuthenticatePasswordFieldsExtract {
+    pub login_id: String,
+    pub password: String,
 }
 
 pub trait AuthenticatePasswordRequestDecoder {

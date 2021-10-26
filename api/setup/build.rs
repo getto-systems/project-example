@@ -8,12 +8,14 @@ fn main() {
     if code_build_required() {
         grpc::generate("auth.ticket");
         grpc::generate("auth.user");
+        grpc::generate("auth.user.account");
         grpc::generate("auth.user.password");
         grpc::generate("auth.user.password.reset");
         grpc::generate("avail.unexpected_error");
         grpc::generate("example.outline");
 
         protobuf::generate("auth.ticket");
+        protobuf::generate("auth.user.account");
         protobuf::generate("auth.user.password");
         protobuf::generate("auth.user.password.reset");
         protobuf::generate("avail.unexpected_error");

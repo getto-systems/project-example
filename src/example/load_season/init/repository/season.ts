@@ -1,5 +1,5 @@
 import { env } from "../../../../y_environment/ui/env"
-import { Season_pb } from "../../../../y_protobuf/proto.js"
+import pb from "../../../../y_protobuf/proto.js"
 
 import {
     fetchRepositoryRemovedResult,
@@ -48,12 +48,12 @@ export function newSeasonRepository({ webDB }: RepositoryOutsideFeature): Season
         }
 
         function toDB(value: SeasonRepositoryValue): string {
-            return encodeProtobuf(Season_pb, (message) => {
+            return encodeProtobuf(pb.example.db.Season_pb, (message) => {
                 message.year = value.year
             })
         }
         function fromDB(raw: string): SeasonRepositoryValue {
-            return decodeProtobuf(Season_pb, raw)
+            return decodeProtobuf(pb.example.db.Season_pb, raw)
         }
     }
 }

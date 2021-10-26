@@ -47,7 +47,7 @@ impl<'a> AuthProxyService<RequestResetTokenFieldsExtract, RequestResetTokenProxy
     for ProxyService<'a>
 {
     fn name(&self) -> &str {
-        "auth.password.reset.request_token"
+        "auth.user.password.reset.request_token"
     }
     async fn call(
         &self,

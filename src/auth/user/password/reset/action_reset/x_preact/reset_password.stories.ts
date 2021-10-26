@@ -21,7 +21,7 @@ const options = [
 ] as const
 
 export default {
-    title: "main/Auth/Password/Reset/Reset",
+    title: "main/Auth/User/Password/Reset/Reset",
     parameters: {
         layout: "fullscreen",
     },

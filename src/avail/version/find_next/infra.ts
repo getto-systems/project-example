@@ -1,7 +1,12 @@
 import { DelayTime } from "../../../z_lib/ui/config/infra"
 import { RemoteResult } from "../../../z_lib/ui/remote/infra"
 
-import { CheckDeployExistsRemoteError } from "./data"
+import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
+import { ApplicationTargetPath, CheckDeployExistsRemoteError } from "./data"
+
+export interface FindNextVersionDetecter {
+    (): ConvertLocationResult<ApplicationTargetPath>
+}
 
 export type FindNextVersionInfra = Readonly<{
     version: string

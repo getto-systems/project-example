@@ -1,9 +1,10 @@
-import { PagerOptionsContent, SortSign } from "../../../../ui/vendor/getto-css/preact/design/data"
-
 import { VNodeContent } from "./common"
 import { icon } from "./icon"
 
-export const sortSign: SortSign = {
+import { PagerOptionsContent, SortSign } from "../../../../ui/vendor/getto-css/preact/design/data"
+import { SearchPageResponse } from "../../../z_lib/ui/search/data"
+
+export const siteSortSign: SortSign = {
     normal: icon("angle-double-down"),
     reverse: icon("angle-double-up"),
 }
@@ -11,10 +12,10 @@ export const sortSign: SortSign = {
 export function pagerCount(all: number): VNodeContent {
     return `全 ${pageCountFormat(all)} 件中`
 }
-export function pagerParams(all: number): PagerOptionsContent {
+export function pagerParams(page: SearchPageResponse): PagerOptionsContent {
     return {
-        all,
-        step: 1000,
+        all: page.all,
+        step: page.limit,
         content: ({ start, end }) => `${pageCountFormat(start)} ～ ${pageCountFormat(end)} 件`,
     }
 }

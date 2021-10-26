@@ -32,7 +32,7 @@ export function newResetPasswordRemote(
 
             const opts = fetchOptions({
                 serverURL: env.apiServerURL,
-                path: "/auth/password/reset",
+                path: "/auth/user/password/reset",
                 method: "POST",
                 headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
             })

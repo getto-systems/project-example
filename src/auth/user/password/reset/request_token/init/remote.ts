@@ -23,7 +23,7 @@ export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): Reque
 
             const opts = fetchOptions({
                 serverURL: env.apiServerURL,
-                path: "/auth/password/reset/token",
+                path: "/auth/user/password/reset/token",
                 method: "POST",
                 headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
             })

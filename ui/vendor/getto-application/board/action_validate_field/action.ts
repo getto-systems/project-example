@@ -6,8 +6,6 @@ import { ValidateBoardFieldResult } from "../validate_field/data"
 
 export interface ValidateBoardFieldAction<E>
     extends ApplicationStateAction<ValidateBoardFieldState<E>> {
-    //get(): ConvertBoardFieldResult<T, E>
-    //check(): Promise<ValidateBoardFieldState<E>>
     clear(): void
 }
 
@@ -16,7 +14,3 @@ export type ValidateBoardFieldMaterial<T, E> = Readonly<{
 }>
 
 export type ValidateBoardFieldState<E> = ValidateBoardFieldResult<E>
-
-export interface ValidateBoardFieldStateHandler<E> {
-    (state: ValidateBoardFieldState<E>): void
-}

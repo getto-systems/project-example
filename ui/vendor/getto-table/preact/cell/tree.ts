@@ -1,8 +1,8 @@
 import {
+    TableDataCellKey,
     TableDataColumnRow,
     TableDataColumnTree,
     TableDataHeader,
-    TableDataParams,
     TableDataSummary,
     TableDataView,
 } from "../core"
@@ -22,6 +22,8 @@ import {
     TableDataRowKeyProvider,
     TableDataStyledParams,
     TableCellTree,
+    TableDataInherit,
+    tableCellInitiallyVisibleCells,
 } from "../cell"
 import {
     decorateRowStyle,
@@ -46,7 +48,9 @@ export type TableDataTreeContent<M, R, C> = Readonly<{
     key: TableDataRowKeyProvider<C>
     cells: TableCell<M, C>[]
 }>
-export function tableCell_tree<M, R, C>(content: TableDataTreeContent<M, R, C>): TableCellTree<M, R> {
+export function tableCell_tree<M, R, C>(
+    content: TableDataTreeContent<M, R, C>,
+): TableCellTree<M, R> {
     return new Cell(content)
 }
 class Cell<M, R, C> implements TableCellTree<M, R> {
@@ -66,26 +70,30 @@ class Cell<M, R, C> implements TableCellTree<M, R> {
         }
     }
 
-    view(params: TableDataParams<M>): TableDataView[] {
-        return tableCellView(params, this.content.cells)
+    initiallyVisibleCells(): TableDataCellKey[] {
+        return tableCellInitiallyVisibleCells(this.content.cells)
     }
-    header(params: TableDataStyledParams<M>): TableDataHeader[] {
+
+    view(): TableDataView[] {
+        return tableCellView(this.content.cells)
+    }
+    header(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataHeader[] {
         const { style } = this.mutable.core.headerStyleMutable()
-        return tableCellHeader(params, style, this.content.cells)
+        return tableCellHeader(inherit, params, style, this.content.cells)
     }
-    summary(params: TableDataStyledParams<M>): TableDataSummary[] {
+    summary(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[] {
         const { style } = this.mutable.core.summaryStyleMutable()
-        return tableCellSummary(params, style, this.content.cells)
+        return tableCellSummary(inherit, params, style, this.content.cells)
     }
-    footer(params: TableDataStyledParams<M>): TableDataSummary[] {
+    footer(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[] {
         const { style } = this.mutable.core.footerStyleMutable()
-        return tableCellFooter(params, style, this.content.cells)
+        return tableCellFooter(inherit, params, style, this.content.cells)
     }
-    column(params: TableDataRelatedParams<M, R>): TableDataColumnTree {
-        const children = this.children(params)
+    column(inherit: TableDataInherit, params: TableDataRelatedParams<M, R>): TableDataColumnTree {
+        const children = this.children(inherit, params)
         // 幅とスタイルを取得するために summary を構築する
         // summary が一番軽いだろうという判断
-        const summaries = this.summary(params)
+        const summaries = this.summary(inherit, params)
         return {
             type: "tree",
             children,
@@ -113,33 +121,40 @@ class Cell<M, R, C> implements TableCellTree<M, R> {
                                     case "tree":
                                         return height(column.children)
                                 }
-                            })
-                        )
+                            }),
+                        ),
                     )
-                    .reduce((acc, height) => acc + height, 0)
+                    .reduce((acc, height) => acc + height, 0),
             )
         }
     }
-    children(params: TableDataRelatedParams<M, R>): TableDataColumnRow[] {
+    children(
+        inherit: TableDataInherit,
+        params: TableDataRelatedParams<M, R>,
+    ): TableDataColumnRow[] {
         const { style } = this.mutable.core.columnStyleMutable()
         const rowMutable = this.mutable.tree.rowMutable()
         const { decorators } = this.mutable.core.columnMutable()
 
-        const data = this.content.data(params.row, params.model)
+        const data = this.content.data(params.row, params.summary)
         const dataLength = data.length
         return data.map((row, index) => {
             return {
                 key: this.content.key(row),
                 className: rowMutable.decorators.reduce(
                     (acc, decorator) => decorateRowStyle(acc, decorator(params.row)),
-                    rowMutable.style
+                    rowMutable.style,
                 ).className,
                 columns: tableCellChildColumn(
+                    inherit,
                     params,
                     style,
                     decorators,
                     this.content.cells,
-                    { row, last: index === dataLength - 1 }
+                    {
+                        row,
+                        last: index === dataLength - 1,
+                    },
                 ),
             }
         })

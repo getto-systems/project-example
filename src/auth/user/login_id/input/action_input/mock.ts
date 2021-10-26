@@ -8,7 +8,7 @@ export function mockInputLoginIDAction(): InputLoginIDAction {
 
     return {
         input,
-        validate: mockValidateBoardFieldAction("loginID", { valid: false, err: [] }),
+        validate: mockValidateBoardFieldAction({ valid: false, err: [] }),
         clear: () => null,
         terminate: () => {
             subscriber.terminate()

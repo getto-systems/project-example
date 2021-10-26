@@ -2,21 +2,18 @@ import { ApplicationAbstractStateAction } from "../../../../../../ui/vendor/gett
 
 import { initSignLink } from "../../../../sign/action_nav/init"
 import { initInputLoginIDAction } from "../../../login_id/input/action_input/init"
-import { initInputPasswordAction } from "../../action_input/init"
+import { initInputPasswordAction } from "../../input/action_input/init"
 import { initValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/init"
 
 import { resetPassword } from "../reset/method"
-import {
-    GetScriptPathDetecter,
-    getScriptPath,
-} from "../../../../sign/get_script_path/method"
+import { getScriptPath } from "../../../../sign/get_script_path/method"
 import {
     saveAuthTicket,
     startContinuousRenew,
 } from "../../../../ticket/start_continuous_renew/method"
 
 import { StartContinuousRenewInfra } from "../../../../ticket/start_continuous_renew/infra"
-import { GetScriptPathInfra } from "../../../../sign/get_script_path/infra"
+import { GetScriptPathInfra, GetScriptPathDetecter } from "../../../../sign/get_script_path/infra"
 import { ResetPasswordInfra } from "../reset/infra"
 
 import {
@@ -28,7 +25,7 @@ import {
     ResetPasswordFieldName,
 } from "./action"
 
-import { ResetPasswordDetecter } from "../reset/method"
+import { ResetPasswordDetecter } from "../reset/infra"
 
 import { LoadScriptError } from "../../../../sign/get_script_path/data"
 import { ResetPasswordFields } from "../reset/data"
@@ -36,7 +33,7 @@ import { AuthTicket } from "../../../../ticket/kernel/data"
 import { ConvertBoardResult } from "../../../../../../ui/vendor/getto-application/board/kernel/data"
 import { InputLoginIDAction } from "../../../login_id/input/action_input/action"
 import { ValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
-import { InputPasswordAction } from "../../action_input/action"
+import { InputPasswordAction } from "../../input/action_input/action"
 import { ValidateBoardChecker } from "../../../../../../ui/vendor/getto-application/board/validate_board/infra"
 
 export type ResetPasswordActionInfra = Readonly<{

@@ -7,14 +7,11 @@ import {
     initialCheckAuthTicketState,
 } from "./action"
 
-import {
-    GetScriptPathDetecter,
-    getScriptPath,
-} from "../../sign/get_script_path/method"
+import { getScriptPath } from "../../sign/get_script_path/method"
 import { startContinuousRenew, saveAuthTicket } from "../start_continuous_renew/method"
 import { renewAuthTicket, checkAuthTicket } from "../check/method"
 
-import { GetScriptPathInfra } from "../../sign/get_script_path/infra"
+import { GetScriptPathInfra, GetScriptPathDetecter } from "../../sign/get_script_path/infra"
 import { StartContinuousRenewInfra } from "../start_continuous_renew/infra"
 import { CheckAuthTicketInfra } from "../check/infra"
 

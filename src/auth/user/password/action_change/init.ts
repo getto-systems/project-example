@@ -1,6 +1,6 @@
 import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/init"
 
-import { initInputPasswordAction } from "../action_input/init"
+import { initInputPasswordAction } from "../input/action_input/init"
 import { initValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/init"
 
 import { changePassword } from "../change/method"
@@ -19,7 +19,7 @@ import { ValidateBoardAction } from "../../../../../ui/vendor/getto-application/
 
 import { ChangePasswordFields } from "../change/data"
 import { ConvertBoardResult } from "../../../../../ui/vendor/getto-application/board/kernel/data"
-import { InputPasswordAction } from "../action_input/action"
+import { InputPasswordAction } from "../input/action_input/action"
 import { ValidateBoardChecker } from "../../../../../ui/vendor/getto-application/board/validate_board/infra"
 
 export function initChangePasswordMaterial(

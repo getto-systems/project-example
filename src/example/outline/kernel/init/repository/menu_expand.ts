@@ -1,14 +1,12 @@
-import { MenuExpand_pb } from "../../../../../y_protobuf/proto.js"
+import { env } from "../../../../../y_environment/ui/env"
+import pb from "../../../../../y_protobuf/proto.js"
 
 import {
     fetchRepositoryRemovedResult,
     mapFetchRepositoryResult,
 } from "../../../../../z_lib/ui/repository/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../../ui/vendor/protobuf/helper"
-import {
-    IndexedDBTarget,
-    initIndexedDB,
-} from "../../../../../z_lib/ui/repository/init/indexed_db"
+import { IndexedDBTarget, initIndexedDB } from "../../../../../z_lib/ui/repository/init/indexed_db"
 
 import { RepositoryOutsideFeature } from "../../../../../z_lib/ui/repository/feature"
 
@@ -17,7 +15,6 @@ import { MenuExpandRepository, MenuExpandRepositoryValue } from "../../infra"
 import { menuExpandRepositoryConverter } from "../../convert"
 
 export type MenuExpandRepositoryParams = Readonly<{
-    database: string
     key: string
 }>
 
@@ -45,7 +42,7 @@ export function newMenuExpandRepository(
             key: params.key,
         }
         const db = initIndexedDB(webDB, {
-            database: params.database,
+            database: env.database.menuExpand,
             stores: [menuExpand.store],
         })
 
@@ -56,16 +53,18 @@ export function newMenuExpandRepository(
         }
 
         function toDB(value: MenuExpandRepositoryValue): string {
-            return encodeProtobuf(MenuExpand_pb, (message) => {
+            return encodeProtobuf(pb.example.outline.db.MenuExpand_pb, (message) => {
                 message.paths = value.map((labels) => {
-                    const message = new MenuExpand_pb.Path()
+                    const message = new pb.example.outline.db.MenuExpand_pb.Path()
                     message.labels = labels
                     return message
                 })
             })
         }
         function fromDB(raw: string): MenuExpandRepositoryValue {
-            return decodeProtobuf(MenuExpand_pb, raw).paths.map((path) => path.labels || [])
+            return decodeProtobuf(pb.example.outline.db.MenuExpand_pb, raw).paths.map(
+                (path) => path.labels || [],
+            )
         }
     }
 }

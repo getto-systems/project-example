@@ -5,12 +5,10 @@ import { newResetPasswordRemote } from "./init/remote"
 import { newClock } from "../../../../../z_lib/ui/clock/init"
 import { toURL } from "../../../../../z_lib/ui/location/init"
 
-import { ResetPasswordDetecter } from "./method"
-
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 import { LocationOutsideFeature } from "../../../../../z_lib/ui/location/feature"
 
-import { ResetPasswordInfra } from "./infra"
+import { ResetPasswordInfra, ResetPasswordDetecter } from "./infra"
 
 import { detectResetToken } from "../../input/convert"
 

@@ -47,7 +47,7 @@ impl<'a> AuthProxyService<ChangePasswordFieldsExtract, ChangePasswordProxyRespon
     for ProxyService<'a>
 {
     fn name(&self) -> &str {
-        "auth.password.change"
+        "auth.user.password.change"
     }
     async fn call(
         &self,

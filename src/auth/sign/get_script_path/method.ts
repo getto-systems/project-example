@@ -5,10 +5,6 @@ import { toScriptPath } from "./convert"
 import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 import { ConvertScriptPathResult, LocationPathname } from "./data"
 
-export interface GetScriptPathDetecter {
-    (): ConvertLocationResult<LocationPathname>
-}
-
 export interface GetScriptPathMethod {
     (pathname: ConvertLocationResult<LocationPathname>): ConvertScriptPathResult
 }

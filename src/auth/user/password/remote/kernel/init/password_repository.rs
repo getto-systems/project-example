@@ -341,7 +341,6 @@ pub mod test {
 
     use chrono::{DateTime, Utc};
 
-    use crate::auth::user::password::remote::kernel::data::{ResetTokenDestination, ResetTokenDestinationExtract};
     use crate::z_lib::remote::repository::helper::infra_error;
 
     use crate::auth::user::password::remote::kernel::infra::{
@@ -357,7 +356,8 @@ pub mod test {
                 login_id::remote::data::LoginId,
                 password::remote::kernel::data::{
                     ChangePasswordRepositoryError, RegisterResetTokenRepositoryError,
-                    ResetPasswordRepositoryError, ResetToken, VerifyPasswordRepositoryError,
+                    ResetPasswordRepositoryError, ResetToken, ResetTokenDestination,
+                    ResetTokenDestinationExtract, VerifyPasswordRepositoryError,
                 },
                 remote::kernel::data::{AuthUser, AuthUserId},
             },
@@ -368,6 +368,7 @@ pub mod test {
     pub type MemoryAuthUserPasswordStore = Mutex<MemoryAuthUserPasswordMap>;
     pub struct MemoryAuthUserPasswordMap {
         login_id: HashMap<String, AuthUserId>, // login-id => user-id
+        user_id: HashMap<String, LoginId>,     // login-id => user-id
         password: HashMap<String, HashedPassword>, // user-id => hashed-password
         reset_token: HashMap<String, ResetEntry>, // reset-token => reset entry
     }
@@ -394,6 +395,7 @@ pub mod test {
         pub fn new() -> Self {
             Self {
                 login_id: HashMap::new(),
+                user_id: HashMap::new(),
                 password: HashMap::new(),
                 reset_token: HashMap::new(),
             }
@@ -441,11 +443,15 @@ pub mod test {
         }
 
         fn insert_login_id(&mut self, login_id: LoginId, user_id: AuthUserId) -> &mut Self {
-            self.login_id.insert(login_id.extract(), user_id);
+            self.login_id.insert(login_id.clone().extract(), user_id.clone());
+            self.user_id.insert(user_id.extract(), login_id);
             self
         }
         fn get_user_id(&self, login_id: &LoginId) -> Option<&AuthUserId> {
             self.login_id.get(login_id.as_str())
+        }
+        pub fn get_login_id(&self, user_id: &str) -> Option<&LoginId> {
+            self.user_id.get(user_id)
         }
 
         fn insert_password(

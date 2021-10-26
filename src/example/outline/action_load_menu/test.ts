@@ -8,10 +8,8 @@ import { mockMenuExpandRepository } from "../kernel/init/repository/mock"
 
 import { initLoadMenuAction, initLoadMenuMaterial } from "./init"
 
-import { LoadMenuDetecter } from "../kernel/method"
-
 import { AuthzRepository } from "../../../auth/ticket/kernel/infra"
-import { GetMenuBadgeRemote, MenuExpandRepository } from "../kernel/infra"
+import { GetMenuBadgeRemote, MenuExpandRepository, LoadMenuDetecter } from "../kernel/infra"
 
 import { LoadMenuResource } from "./resource"
 

@@ -2,9 +2,8 @@ use crate::auth::ticket::remote::check_nonce::method::check_auth_nonce;
 
 use crate::auth::user::{
     password::remote::{
-        authenticate::infra::AuthenticatePasswordInfra,
+        authenticate::infra::{AuthenticatePasswordFieldsExtract, AuthenticatePasswordInfra},
         kernel::infra::{PlainPassword, VerifyPasswordRepository},
-        proxy_authenticate::infra::AuthenticatePasswordFieldsExtract,
     },
     remote::kernel::infra::AuthUserRepository,
 };

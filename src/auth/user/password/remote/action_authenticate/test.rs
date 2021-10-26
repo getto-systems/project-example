@@ -50,7 +50,7 @@ use crate::auth::{
         issue::infra::IssueAuthTicketConfig,
     },
     user::password::remote::{
-        kernel::infra::HashedPassword, proxy_authenticate::infra::AuthenticatePasswordFieldsExtract,
+        authenticate::infra::AuthenticatePasswordFieldsExtract, kernel::infra::HashedPassword,
     },
 };
 

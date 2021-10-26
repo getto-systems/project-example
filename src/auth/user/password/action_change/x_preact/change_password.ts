@@ -19,7 +19,7 @@ import { notice_success } from "../../../../../../ui/vendor/getto-css/preact/des
 import { VNodeContent } from "../../../../../example/x_preact/design/common"
 import { spinner } from "../../../../../example/x_preact/design/icon"
 
-import { InputPasswordEntry } from "../../action_input/x_preact/input"
+import { InputPasswordEntry } from "../../input/action_input/x_preact/input"
 
 import { ChangePasswordResource, ChangePasswordResourceState } from "../resource"
 

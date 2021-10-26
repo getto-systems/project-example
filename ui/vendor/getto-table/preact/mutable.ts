@@ -47,6 +47,7 @@ export interface TableDataMutable_leaf {
     verticalBorderMutable(): TableDataVerticalBorderMutable
 
     alwaysVisible(): void
+    initiallyHidden(): void
     border(borders: TableDataVerticalBorder[]): void
 
     decorateView(decorator: TableDataViewDecorator): void

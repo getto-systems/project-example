@@ -1,18 +1,17 @@
 use crate::auth::{
-    ticket::remote::x_tonic::route::AuthTicketServer,
-    user::password::remote::x_tonic::route::PasswordServer,
+    ticket::remote::x_tonic::route::AuthTicketServer, user::remote::x_tonic::route::AuthUserServer,
 };
 
 pub struct AuthServer {
-    pub auth_ticket: AuthTicketServer,
-    pub password: PasswordServer,
+    pub ticket: AuthTicketServer,
+    pub user: AuthUserServer,
 }
 
 impl AuthServer {
     pub const fn new() -> Self {
         Self {
-            auth_ticket: AuthTicketServer,
-            password: PasswordServer::new(),
+            ticket: AuthTicketServer,
+            user: AuthUserServer::new(),
         }
     }
 }
