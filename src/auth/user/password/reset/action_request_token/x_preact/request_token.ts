@@ -18,7 +18,7 @@ import {
 } from "../../../../../../../ui/vendor/getto-css/preact/design/form"
 import { loginBox } from "../../../../../../../ui/vendor/getto-css/preact/layout/login"
 
-import { VNodeContent } from "../../../../../../example/x_preact/design/common"
+import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../../../example/site"
 import { spinner } from "../../../../../../example/x_preact/design/icon"
 import { signNav } from "../../../../../sign/action_nav/x_preact/nav"

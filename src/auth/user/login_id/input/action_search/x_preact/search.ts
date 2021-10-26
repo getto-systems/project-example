@@ -2,7 +2,7 @@ import { h, VNode } from "preact"
 
 import { search } from "../../../../../../../ui/vendor/getto-css/preact/design/form"
 
-import { VNodeContent } from "../../../../../../example/x_preact/design/common"
+import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
 import { InputBoardComponent } from "../../../../../../../ui/vendor/getto-application/board/action_input/x_preact/input"
 

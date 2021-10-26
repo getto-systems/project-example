@@ -6,7 +6,7 @@ import { label_alert, label_pending } from "../../../../../ui/vendor/getto-css/p
 import { box } from "../../../../../ui/vendor/getto-css/preact/design/box"
 import { field } from "../../../../../ui/vendor/getto-css/preact/design/form"
 
-import { VNodeContent } from "../../design/common"
+import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 import { icon } from "../../design/icon"
 
 export function itemsSection(title: VNodeContent, list: VNodeContent[]): VNode {

@@ -1,4 +1,4 @@
-import { VNodeContent } from "./common"
+import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
 import { icon } from "./icon"
 
 import { PagerOptionsContent, SortSign } from "../../../../ui/vendor/getto-css/preact/design/data"

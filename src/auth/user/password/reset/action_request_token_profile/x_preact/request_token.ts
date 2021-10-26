@@ -14,7 +14,7 @@ import {
     form,
 } from "../../../../../../../ui/vendor/getto-css/preact/design/form"
 import { spinner } from "../../../../../../example/x_preact/design/icon"
-import { VNodeContent } from "../../../../../../example/x_preact/design/common"
+import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
 import { InputLoginIDEntry } from "../../../../login_id/input/action_input/x_preact/input"
 
