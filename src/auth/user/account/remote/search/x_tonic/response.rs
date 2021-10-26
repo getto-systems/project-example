@@ -14,7 +14,7 @@ impl RespondTo<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountEvent {
     fn respond_to(self) -> Result<Response<SearchAuthUserAccountResponsePb>, Status> {
         match self {
             Self::Success(response) => response.respond_to(),
-            Self::Validate(_) => Err(Status::cancelled("change password cancelled")),
+            Self::Validate(_) => Err(Status::permission_denied("permission denied")),
             Self::RepositoryError(err) => err.respond_to(),
         }
     }

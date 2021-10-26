@@ -1,6 +1,6 @@
 use std::convert::TryInto;
 
-use sea_query::{Expr, Iden, MysqlQueryBuilder, Order, Query};
+use sea_query::{Expr, Iden, MysqlQueryBuilder, Order, Query, SelectStatement};
 use sqlx::{query_as, MySqlPool};
 
 sea_query::sea_query_driver_mysql!();
@@ -74,6 +74,41 @@ async fn search<'a>(
 ) -> Result<SearchAuthUserAccountBasket, RepositoryError> {
     let mut conn = repository.pool.begin().await.map_err(mysql_error)?;
 
+    let (sql, values) = search_conditions(
+        Query::select()
+            .from(User::Table)
+            .expr(Expr::cust("count(user.user_id) as count")),
+        fields,
+    )
+    .build(MysqlQueryBuilder);
+
+    let all = bind_query_as(query_as::<_, Count>(&sql), &values)
+        .fetch_one(&mut conn)
+        .await
+        .map_err(mysql_error)?
+        .count;
+
+    let limit = 1000;
+
+    if all == 0 {
+        return Ok(SearchAuthUserAccountBasket {
+            page: SearchPage {
+                // i64 -> i32 に変換; それほど大きな値にならないはず
+                all: all.try_into().unwrap(),
+                limit: limit.try_into().unwrap(),
+                offset: 0,
+            },
+            users: vec![],
+        });
+    }
+
+    let offset = SearchOffsetDetecter {
+        // i64 -> u64; count() はマイナスにならないので、unwrap に失敗しない
+        all: all.try_into().unwrap(),
+        limit,
+    }
+    .detect(fields.offset());
+
     let (sort_col, sort_order) = fields
         .sort()
         .detect(vec![(
@@ -86,54 +121,24 @@ async fn search<'a>(
         )])
         .unwrap_or((User::LoginId, Order::Asc));
 
-    let (sql, values) = Query::select()
-        .from(User::Table)
-        .expr(Expr::cust("count(user.user_id) as count"))
-        .conditions(
-            fields.login_id().is_empty(),
-            |_q| {},
-            |q| {
-                q.and_where(Expr::col(User::LoginId).eq(fields.login_id().to_owned()));
-            },
-        )
-        .build(MysqlQueryBuilder);
-
-    let all = bind_query_as(query_as::<_, Count>(&sql), &values)
-        .fetch_one(&mut conn)
-        .await
-        .map_err(mysql_error)?
-        .count;
-
-    let limit = 1000;
-    let offset = SearchOffsetDetecter {
-        // i32 -> u64 に変換; マイナスで指定されたらエラーになる
-        all: all.try_into().unwrap(),
-        limit: limit.try_into().unwrap(),
-    }
-    .detect(fields.offset().try_into().unwrap());
-
-    let (sql, values) = Query::select()
-        .column(User::LoginId)
-        .expr(Expr::cust(
-            "group_concat(user_granted_role.role) as granted_roles",
-        ))
-        .from(User::Table)
-        .inner_join(
-            UserGrantedRole::Table,
-            Expr::tbl(User::Table, User::UserId)
-                .equals(UserGrantedRole::Table, UserGrantedRole::UserId),
-        )
-        .conditions(
-            fields.login_id().is_empty(),
-            |_q| {},
-            |q| {
-                q.and_where(Expr::col(User::LoginId).eq(fields.login_id().to_owned()));
-            },
-        )
-        .offset(offset)
-        .limit(limit)
-        .order_by(sort_col, sort_order)
-        .build(MysqlQueryBuilder);
+    let (sql, values) = search_conditions(
+        Query::select()
+            .column(User::LoginId)
+            .expr(Expr::cust(
+                "group_concat(user_granted_role.role) as granted_roles",
+            ))
+            .from(User::Table)
+            .inner_join(
+                UserGrantedRole::Table,
+                Expr::tbl(User::Table, User::UserId)
+                    .equals(UserGrantedRole::Table, UserGrantedRole::UserId),
+            )
+            .offset(offset)
+            .limit(limit)
+            .order_by(sort_col, sort_order),
+        fields,
+    )
+    .build(MysqlQueryBuilder);
 
     let rows = bind_query_as(query_as::<_, AuthUserAccount>(&sql), &values)
         .fetch_all(&mut conn)
@@ -142,7 +147,7 @@ async fn search<'a>(
 
     Ok(SearchAuthUserAccountBasket {
         page: SearchPage {
-            // u64 -> i32 に変換; それほど大きな値にならないはずなので大丈夫だろう
+            // i64 -> i32 に変換; それほど大きな値にならないはず
             all: all.try_into().unwrap(),
             limit: limit.try_into().unwrap(),
             offset: offset.try_into().unwrap(),
@@ -155,12 +160,25 @@ async fn search<'a>(
                     row.granted_roles
                         .split(",")
                         .into_iter()
-                        .map(|str| str.to_string())
+                        .map(|str| str.to_owned())
                         .collect(),
                 ),
             })
             .collect(),
     })
+}
+
+fn search_conditions<'a>(
+    query: &'a mut SelectStatement,
+    fields: &SearchAuthUserAccountFields,
+) -> &'a mut SelectStatement {
+    query.conditions(
+        fields.login_id().is_empty(),
+        |_q| {},
+        |q| {
+            q.and_where(Expr::col(User::LoginId).eq(fields.login_id().to_owned()));
+        },
+    )
 }
 
 #[cfg(test)]

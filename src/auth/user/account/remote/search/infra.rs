@@ -29,7 +29,7 @@ impl SearchAuthUserAccountFields {
     pub fn sort(&self) -> &SearchSort {
         &self.sort
     }
-    pub fn login_id(&self) -> &String {
+    pub fn login_id(&self) -> &str {
         &self.login_id
     }
 }
