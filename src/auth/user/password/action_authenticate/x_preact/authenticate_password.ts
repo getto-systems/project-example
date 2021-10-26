@@ -19,7 +19,7 @@ import {
     form,
 } from "../../../../../../ui/vendor/getto-css/preact/design/form"
 
-import { VNodeContent } from "../../../../../example/x_preact/design/common"
+import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../../example/site"
 import { spinner } from "../../../../../example/x_preact/design/icon"
 import { appendScript } from "../../../../sign/x_preact/script"

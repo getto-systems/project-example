@@ -5,7 +5,7 @@ import { useApplicationAction } from "../../../../ui/vendor/getto-application/ac
 
 import { label_alert } from "../../../../ui/vendor/getto-css/preact/design/highlight"
 
-import { VNodeContent } from "../../x_preact/design/common"
+import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
 
 import { LoadSeasonResource, LoadSeasonResourceState } from "../resource"
 

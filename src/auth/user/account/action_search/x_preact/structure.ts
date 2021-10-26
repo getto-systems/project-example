@@ -1,7 +1,7 @@
 import { useMemo } from "preact/hooks"
 import { html } from "htm/preact"
 
-import { VNodeContent } from "../../../../../example/x_preact/design/common"
+import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
 import { sortSign } from "../../../../../../ui/vendor/getto-css/preact/design/data"
 import { linky } from "../../../../../../ui/vendor/getto-css/preact/design/highlight"

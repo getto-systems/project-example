@@ -3,7 +3,7 @@ import { h, VNode } from "preact"
 import { field } from "../../../../../../ui/vendor/getto-css/preact/design/form"
 import { tableViewColumns } from "../../../../../../ui/vendor/getto-css/preact/design/data"
 
-import { VNodeContent, VNodeKey } from "../../../../../example/x_preact/design/common"
+import { VNodeContent, VNodeKey } from "../../../x_preact/common"
 
 import {
     CheckboxBoardComponent,
