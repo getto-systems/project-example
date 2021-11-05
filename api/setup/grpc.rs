@@ -72,8 +72,9 @@ impl GrpcBuilder {
         let out_dir = var("OUT_DIR").expect("OUT_DIR is not defined");
 
         let inputs: Vec<PathBuf> = self.source_proto()?.collect();
+        let paths: Vec<PathBuf> = vec![Path::new("src/").into()];
 
-        configure().compile(&inputs, &[Path::new("src/").into()])?;
+        configure().compile(&inputs, &paths)?;
 
         // 他の proto は remote::y_protobuf を追加して参照しないといけない
         self.source_proto_basename()?.fold(Ok(()), |acc, name| {

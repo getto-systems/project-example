@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use lazy_static::lazy_static;
-use tonic::{service::interceptor_fn, transport::Server};
+use tonic::{service::interceptor, transport::Server, Request};
 use tower::ServiceBuilder;
 
 use example_api::x_outside_feature::remote::auth::{
@@ -22,7 +22,7 @@ async fn main() {
     Server::builder()
         .layer(
             ServiceBuilder::new()
-                .layer(interceptor_fn(move |mut request| {
+                .layer(interceptor(move |mut request: Request<()>| {
                     request.extensions_mut().insert(data.clone());
                     Ok(request)
                 }))
