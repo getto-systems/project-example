@@ -2,7 +2,7 @@
 name = "example-api"
 version = "0.44.0-api"
 authors = ["shun <shun.fix9@gmail.com>"]
-edition = "2018"
+edition = "2021"
 build = "api/setup/build.rs"
 default-run = "api"
 
