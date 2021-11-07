@@ -1,6 +1,6 @@
 use std::{
     env::var,
-    fs::{create_dir, read_dir, read_to_string, remove_dir_all, DirEntry, File},
+    fs::{create_dir, read_dir, read_to_string, remove_file, DirEntry, File},
     io::{Error as IoError, Result as IoResult, Write},
     path::{Path, PathBuf},
 };
@@ -18,7 +18,6 @@ struct ProtobufTarget {
     package: String,
     dist: PathBuf,
     source: PathBuf,
-    index: PathBuf,
 }
 
 impl ProtobufTarget {
@@ -27,14 +26,12 @@ impl ProtobufTarget {
         let target = Path::new(&target);
 
         let source = target.join("z_protobuf");
-        let dist = target.join("_api/y_protobuf");
-        let index = dist.join("mod.rs");
+        let dist = target.join("remote/y_protobuf");
 
         Self {
             package,
             source,
             dist,
-            index,
         }
     }
 }
@@ -51,28 +48,25 @@ impl ProtobufBuilder {
     fn build(&self) -> IoResult<()> {
         self.cleanup()?;
         self.protobuf()?;
-        self.module_index()?;
         Ok(())
     }
 
     fn cleanup(&self) -> IoResult<()> {
         if self.target.dist.exists() {
-            remove_dir_all(self.target.dist.as_path())?;
+            self.source_proto_basename()?.fold(Ok(()), |acc, name| {
+                acc?;
+                let file = self.target.dist.join(name);
+                if file.exists() {
+                    remove_file(file)
+                } else {
+                    Ok(())
+                }
+            })?;
+        } else {
+            create_dir(self.target.dist.as_path())?;
         }
-        create_dir(self.target.dist.as_path())?;
 
         Ok(())
-    }
-    fn module_index(&self) -> IoResult<()> {
-        let mut file = File::create(self.target.index.as_path())?;
-        write!(
-            file,
-            "{}",
-            self.source_proto_basename()?
-                .map(|name| format!("pub mod {};\n", name))
-                .collect::<String>()
-        )?;
-        file.flush()
     }
     fn protobuf(&self) -> IoResult<()> {
         let out_dir = var("OUT_DIR").expect("OUT_DIR is not defined");
@@ -80,7 +74,7 @@ impl ProtobufBuilder {
         let inputs: Vec<PathBuf> = self.source_proto()?.collect();
         compile_protos(&inputs, &["src/"])?;
 
-        // 他の proto は _api::y_protobuf を追加して参照しないといけない
+        // 他の proto は remote::y_protobuf を追加して参照しないといけない
         self.source_proto_basename()?.fold(Ok(()), |acc, name| {
             acc?;
 
@@ -94,7 +88,7 @@ impl ProtobufBuilder {
                 "{}",
                 import_ref_regex.replace_all(
                     &content,
-                    format!("super::super::super::$1::_api::y_protobuf::{}::", name)
+                    format!("super::super::super::$1::remote::y_protobuf::{}::", name)
                 ),
             )?;
             file.flush()

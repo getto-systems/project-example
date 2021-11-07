@@ -16,8 +16,10 @@ export type BoxContent =
     | (BoxContent_body & BoxContent_footer)
     | (BoxContent_title & BoxContent_body & BoxContent_footer)
 
+type BoxContent_body =
+    | Readonly<{ body: VNodeContent }>
+    | Readonly<{ body: VNodeContent; form: boolean }>
 type BoxContent_title = Readonly<{ title: VNodeContent }>
-type BoxContent_body = Readonly<{ body: VNodeContent }>
 type BoxContent_footer = Readonly<{ footer: VNodeContent }>
 
 type BoxClass = "single" | "double" | "grow"
@@ -52,10 +54,21 @@ export function box_grow_transparent(content: VNodeContent): VNode {
 }
 
 function boxContent(boxClass: BoxClass, content: BoxContent): VNode {
-    return html`<article class="box ${mapBoxClass(boxClass)}">
-        <main>${header()} ${boxBody(content.body)}</main>
-        ${footer()}
-    </article>`
+    if ("form" in content && content.form) {
+        return html`<form class="${classAttribute()}">${inner()}</form>`
+    } else {
+        return html`<article class="${classAttribute()}">${inner()}</article>`
+    }
+
+    function classAttribute(): string {
+        return `box ${mapBoxClass(boxClass)}`
+    }
+    function inner(): VNode {
+        return html`
+            <main>${header()} ${boxBody(content.body)}</main>
+            ${footer()}
+        `
+    }
 
     function header(): VNodeContent {
         if ("title" in content) {

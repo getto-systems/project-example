@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package auth.user.password.service;
+
+import "auth/user/z_protobuf/service.proto";
+import "auth/ticket/z_protobuf/service.proto";
+
+service AuthenticatePasswordPb {
+    rpc Authenticate (AuthenticatePasswordRequestPb) returns (AuthenticatePasswordResponsePb);
+}
+message AuthenticatePasswordRequestPb {
+    string login_id = 1;
+    string password = 2;
+}
+message AuthenticatePasswordResponsePb {
+    bool success = 1;
+    auth.user.service.AuthUserPb user = 2;
+    auth.ticket.service.AuthTokenEncodedPb token = 3;
+}
+
+service ChangePasswordPb {
+    rpc Change (ChangePasswordRequestPb) returns (ChangePasswordResponsePb);
+}
+message ChangePasswordRequestPb {
+    string current_password = 1;
+    string new_password = 2;
+}
+message ChangePasswordResponsePb {
+    bool success = 1;
+}

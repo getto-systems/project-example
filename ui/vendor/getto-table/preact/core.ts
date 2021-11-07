@@ -3,7 +3,9 @@ import { VNodeContent, VNodeKey } from "./common"
 import { TableDataClassName, TableDataFullStyle, TableDataSticky } from "./style"
 
 export interface TableStructure<M, R> {
-    view(params: TableDataParams<M>): TableDataView[]
+    initiallyVisibleCells(): TableDataCellKey[]
+
+    view(): TableDataView[]
     header(params: TableDataParams<M>): TableDataHeaderRow
     summary(params: TableDataParams<M>): TableDataSummaryRow
     column(params: TableDataParams<M>, row: R): TableDataColumnRow
@@ -12,25 +14,21 @@ export interface TableStructure<M, R> {
     sticky(): TableDataSticky
 }
 
-export type TableDataParams<M> = Readonly<{ model: M; visibleKeys: TableDataVisibleKeys }>
-export type TableDataCellKey = VNodeKey
-export type TableDataVisibleKeys =
-    | Readonly<{ type: "all" }>
-    | Readonly<{ type: "keys"; keys: TableDataCellKey[] }>
-
-export const visibleAll: TableDataVisibleKeys = { type: "all" }
-export function visibleKeys(keys: TableDataCellKey[]): TableDataVisibleKeys {
-    return { type: "keys", keys }
-}
+export type TableDataParams<M> =
+    | Readonly<{ summary: M }>
+    | Readonly<{ summary: M; visibleKeys: readonly TableDataCellKey[] }>
+export type TableDataCellKey = string
 
 export type TableDataView = Readonly<{
-    type: "view"
-    key: VNodeKey
+    key: TableDataCellKey
     content: VNodeContent
-    isVisible: boolean
+    isInitiallyVisible: boolean
 }>
 
-export type TableDataHeader = TableDataHeaderSimple | TableDataHeaderExpansion | TableDataHeaderGroup
+export type TableDataHeader =
+    | TableDataHeaderSimple
+    | TableDataHeaderExpansion
+    | TableDataHeaderGroup
 
 export type TableDataHeaderSimple = Readonly<{
     type: "simple"

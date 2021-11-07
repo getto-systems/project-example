@@ -8,6 +8,7 @@ const headers = {
     "connect-src " + [
       "'self'",
       "https://api.example.getto.systems/",
+      "https://secure.example.getto.systems/",
     ].join(" "),
     "frame-src 'none'",
     "frame-ancestors 'none'",
@@ -18,6 +19,7 @@ const headers = {
       "'self'",
       "https://secure.example.getto.systems/",
     ].join(" "),
+    "worker-src blob:",
     "style-src " + [
       "'self'",
       "https://trellis.getto.systems/css/",

@@ -1,6 +1,6 @@
 import { ApplicationStateAction } from "../../action/action"
 
-import { UpdateBoardValidateStateMethod } from "../validate_board/method"
+import { UpdateValidateBoardStateMethod } from "../validate_board/method"
 
 import { ValidateBoardState } from "../validate_board/data"
 
@@ -9,7 +9,7 @@ export interface ValidateBoardAction extends ApplicationStateAction<ValidateBoar
 }
 
 export type ValidateBoardMaterial<N extends string> = Readonly<{
-    updateValidateState: UpdateBoardValidateStateMethod<N>
+    update: UpdateValidateBoardStateMethod<N>
 }>
 
 export type ValidateBoardActionState = ValidateBoardState

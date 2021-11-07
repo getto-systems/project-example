@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package auth.ticket.service;
+
+import "auth/user/z_protobuf/service.proto";
+
+service LogoutPb {
+    rpc Logout (LogoutRequestPb) returns (LogoutResponsePb);
+}
+message LogoutRequestPb {}
+message LogoutResponsePb {}
+
+service RenewAuthTicketPb {
+    rpc Renew (RenewAuthTicketRequestPb) returns (RenewAuthTicketResponsePb);
+}
+message RenewAuthTicketRequestPb {}
+message RenewAuthTicketResponsePb {
+    auth.user.service.AuthUserPb user = 1;
+    AuthTokenEncodedPb token = 2;
+}
+message AuthTokenEncodedPb {
+    AuthTokenPb ticket_token = 1;
+    AuthTokenPb api_token = 2;
+    repeated CloudfrontTokenPb cloudfront_tokens = 3;
+}
+message AuthTokenPb {
+    string token = 1;
+    int64 expires = 2;
+}
+message CloudfrontTokenPb {
+    CloudfrontTokenKindPb kind = 1;
+    AuthTokenPb token = 2;
+}
+enum CloudfrontTokenKindPb {
+    KeyPairId = 0;
+    Policy = 1;
+    Signature = 2;
+}
+
+service ValidateApiTokenPb {
+    rpc Validate (ValidateApiTokenRequestPb) returns (ValidateApiTokenResponsePb);
+}
+message ValidateApiTokenRequestPb {
+    bool allow_any_role = 1;
+    repeated string require_roles = 2;
+}
+message ValidateApiTokenResponsePb {
+    auth.user.service.AuthUserPb user = 1;
+}

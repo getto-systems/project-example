@@ -1,8 +1,8 @@
 import { h, VNode } from "preact"
 
 import { useApplicationView } from "../../../../ui/vendor/getto-application/action/x_preact/hooks"
-import { useNotifyUnexpectedError } from "../../../avail/unexpected_error/_ui/action_notify/x_preact/hooks"
-import { useDocumentTitle } from "../../../example/_ui/x_preact/hooks"
+import { useNotifyUnexpectedError } from "../../../avail/unexpected_error/action_notify/x_preact/hooks"
+import { useDocumentTitle } from "../../../example/x_preact/hooks"
 
 import {
     appLayout,
@@ -14,9 +14,9 @@ import {
 
 import { copyright, siteInfo } from "../../../example/site"
 
-import { ApplicationErrorComponent } from "../../../avail/_ui/x_preact/application_error"
-import { LoadMenuEntry } from "../../../example/outline/_ui/action_load_menu/x_preact/load_menu"
-import { LoadBreadcrumbListComponent } from "../../../example/outline/_ui/action_load_breadcrumb_list/x_preact/load_breadcrumb_list"
+import { ApplicationErrorComponent } from "../../../avail/x_preact/application_error"
+import { LoadMenuEntry } from "../../../example/outline/action_load_menu/x_preact/load_menu"
+import { LoadBreadcrumbListComponent } from "../../../example/outline/action_load_breadcrumb_list/x_preact/load_breadcrumb_list"
 import { docsArticle } from "./content"
 
 import { DocsView, DocsResource } from "../resource"

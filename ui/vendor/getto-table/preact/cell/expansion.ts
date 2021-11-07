@@ -5,23 +5,20 @@ import {
     TableDataColumnExpansion,
     TableDataColumnSimple,
     TableDataHeaderExpansion,
-    TableDataParams,
     TableDataSummaryExpansion,
     TableDataView,
-    TableDataVisibleKeys,
 } from "../core"
 
 import { tableDataMutable_base } from "../mutable/base"
 import { tableDataMutable_leaf } from "../mutable/leaf"
 import { TableDataMutable_base, TableDataMutable_leaf } from "../mutable"
 import {
-    isVisibleKey,
-    TableDataAlwaysVisible,
     TableCellExpansion,
     TableDataExpansionColumnContentProvider,
     TableDataInvisible,
     TableDataRelatedParams,
     TableDataStyledParams,
+    TableDataInherit,
 } from "../cell"
 import {
     decorateContent,
@@ -44,6 +41,8 @@ import {
     TableDataVerticalBorder,
     TableDataVerticalBorderStyle,
 } from "../style"
+
+import { initiallyVisibleCells, isVisible } from "./helper"
 
 export type TableDataExpansionContent<M, R> =
     | TableDataExpansionContent_base<M, R>
@@ -93,50 +92,58 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
         return Math.max(1, this.content.length(model))
     }
 
-    isVisible(visibleKeys: TableDataVisibleKeys): boolean {
-        const { visibleType: visible } = this.mutable.leaf.visibleMutable()
-        return visible === "always" || isVisibleKey(this.key, visibleKeys)
+    isVisible(inherit: TableDataInherit, params: TableDataStyledParams<M>): boolean {
+        return isVisible(this.key, this.mutable.leaf.visibleMutable(), inherit, params)
     }
 
     verticalBorder(): TableDataVerticalBorderStyle {
         return this.mutable.leaf.verticalBorderMutable().border
     }
 
-    view({ visibleKeys }: TableDataParams<M>): TableDataView | TableDataAlwaysVisible {
-        const { visibleType: visible } = this.mutable.leaf.visibleMutable()
-        if (visible === "always") {
-            return { type: "always-visible" }
+    initiallyVisibleCells(): TableDataCellKey[] {
+        return initiallyVisibleCells(this.key, this.mutable.leaf.visibleMutable())
+    }
+
+    view(): TableDataView[] {
+        const { visibleType } = this.mutable.leaf.visibleMutable()
+        if (visibleType === "always") {
+            // always visible なセルは view に含めない
+            return []
         }
 
         const { decorator } = this.mutable.leaf.viewMutable()
-        return {
-            type: "view",
-            key: this.key,
-            content: decorateContent(this.content.label, decorator),
-            isVisible: this.isVisible(visibleKeys),
-        }
+        return [
+            {
+                key: this.key,
+                content: decorateContent(this.content.label, decorator),
+                isInitiallyVisible: visibleType !== "initially-hidden",
+            },
+        ]
     }
-    header({
-        visibleKeys,
-        base,
-        model,
-    }: TableDataStyledParams<M>): TableDataHeaderExpansion | TableDataInvisible {
-        if (!this.isVisible(visibleKeys)) {
+    header(
+        inherit: TableDataInherit,
+        params: TableDataStyledParams<M>,
+    ): TableDataHeaderExpansion | TableDataInvisible {
+        if (!this.isVisible(inherit, params)) {
             return { type: "invisible" }
         }
+        const { base, summary } = params
         const { style } = this.mutable.base.headerStyleMutable()
         return {
             type: "expansion",
             key: this.key,
             style: mergeVerticalBorder(extendStyle({ base, style }), this.verticalBorder()),
             content: this.content.header(this.content.label),
-            length: this.length(model),
+            length: this.length(summary),
             height: 1,
         }
     }
-    summary(params: TableDataStyledParams<M>): TableDataSummaryExpansion | TableDataInvisible {
+    summary(
+        inherit: TableDataInherit,
+        params: TableDataStyledParams<M>,
+    ): TableDataSummaryExpansion | TableDataInvisible {
         const { style } = this.mutable.base.summaryStyleMutable()
-        return this.summaryContent(params, { style, content: content(this.content) })
+        return this.summaryContent(inherit, params, { style, content: content(this.content) })
 
         function content(content: TableDataExpansionContent<M, R>): TableDataSummaryProvider<M> {
             if ("summary" in content) {
@@ -145,18 +152,17 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
             return { type: "none" }
         }
     }
-    column({
-        visibleKeys,
-        base,
-        row,
-        model,
-    }: TableDataRelatedParams<M, R>): TableDataColumnExpansion | TableDataInvisible {
-        if (!this.isVisible(visibleKeys)) {
+    column(
+        inherit: TableDataInherit,
+        params: TableDataRelatedParams<M, R>,
+    ): TableDataColumnExpansion | TableDataInvisible {
+        if (!this.isVisible(inherit, params)) {
             return { type: "invisible" }
         }
+        const { base, row, summary } = params
         const { style } = this.mutable.base.columnStyleMutable()
         const { decorators } = this.mutable.base.columnMutable()
-        const length = this.length(model)
+        const length = this.length(summary)
         const contents = this.content.column(row).slice(0, length)
         const columnStyle = mergeVerticalBorder(
             decorators.reduce(
@@ -171,23 +177,24 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
             style: columnStyle,
             length,
             height: 1,
-            columns: contents.map(
-                (content, index): TableDataColumnSimple => {
-                    return {
-                        type: "simple",
-                        key: [this.key, index].join(" "),
-                        style: columnStyle,
-                        content,
-                        length: 1,
-                        height: 1,
-                    }
-                },
-            ),
+            columns: contents.map((content, index): TableDataColumnSimple => {
+                return {
+                    type: "simple",
+                    key: [this.key, index].join(" "),
+                    style: columnStyle,
+                    content,
+                    length: 1,
+                    height: 1,
+                }
+            }),
         }
     }
-    footer(params: TableDataStyledParams<M>): TableDataSummaryExpansion | TableDataInvisible {
+    footer(
+        inherit: TableDataInherit,
+        params: TableDataStyledParams<M>,
+    ): TableDataSummaryExpansion | TableDataInvisible {
         const { style } = this.mutable.base.footerStyleMutable()
-        return this.summaryContent(params, { style, content: content(this.content) })
+        return this.summaryContent(inherit, params, { style, content: content(this.content) })
 
         function content(content: TableDataExpansionContent<M, R>): TableDataSummaryProvider<M> {
             if ("summary" in content) {
@@ -198,16 +205,18 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
     }
 
     summaryContent(
-        { visibleKeys, base, model }: TableDataStyledParams<M>,
+        inherit: TableDataInherit,
+        params: TableDataStyledParams<M>,
         { style, content }: SummaryContentParams<M>,
     ): TableDataSummaryExpansion | TableDataInvisible {
-        if (!this.isVisible(visibleKeys)) {
+        if (!this.isVisible(inherit, params)) {
             return { type: "invisible" }
         }
+        const { base, summary } = params
         const shared = {
             key: this.key,
             style: mergeVerticalBorder(extendStyle({ base, style }), this.verticalBorder()),
-            length: this.length(model),
+            length: this.length(summary),
         }
         switch (content.type) {
             case "none":
@@ -217,7 +226,7 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
                 return {
                     type: "expansion",
                     ...shared,
-                    content: content.content(model),
+                    content: content.content(summary),
                 }
         }
     }

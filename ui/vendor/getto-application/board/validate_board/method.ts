@@ -2,7 +2,7 @@ import { ValidateBoardStateFound, ValidateBoardStore } from "./infra"
 
 import { ValidateBoardState } from "./data"
 
-export interface UpdateBoardValidateStateMethod<N extends string> {
+export interface UpdateValidateBoardStateMethod<N extends string> {
     (name: N, valid: boolean, post: Post<ValidateBoardState>): void
 }
 
@@ -10,9 +10,9 @@ interface Update {
     <N extends string>(
         fields: readonly N[],
         store: ValidateBoardStore,
-    ): UpdateBoardValidateStateMethod<N>
+    ): UpdateValidateBoardStateMethod<N>
 }
-export const updateBoardValidateState: Update = (fields, infra) => (name, valid, post) => {
+export const updateValidateBoardState: Update = (fields, infra) => (name, valid, post) => {
     const { stack } = infra
 
     stack.set(name, valid)

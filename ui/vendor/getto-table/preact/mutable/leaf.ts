@@ -41,6 +41,9 @@ class Mutable implements TableDataMutable_leaf {
     alwaysVisible(): void {
         this.visible = { ...this.visible, visibleType: "always" }
     }
+    initiallyHidden(): void {
+        this.visible = { ...this.visible, visibleType: "initially-hidden" }
+    }
     border(borders: TableDataVerticalBorder[]): void {
         this.verticalBorder = {
             ...this.verticalBorder,

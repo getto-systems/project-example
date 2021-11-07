@@ -1,10 +1,15 @@
 import { InitWorkerOutsideFeature } from "./feature"
 
-export function newWorker(feature: InitWorkerOutsideFeature): Worker {
+export async function newWorker(feature: InitWorkerOutsideFeature): Promise<Worker> {
     const { webDocument } = feature
     const src = webDocument.currentScript?.getAttribute("src")
     if (!src) {
         throw new Error("invalid script src")
     }
-    return new Worker(src.replace(/\.js$/, ".worker.js"))
+
+    const response = await fetch(src.replace(/\.js$/, ".worker.js"), {
+        credentials: "include",
+    })
+    const code = new Blob([await response.text()], { type: "application/javascript" })
+    return new Worker(URL.createObjectURL(code))
 }

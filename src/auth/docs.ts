@@ -1,5 +1,5 @@
-import { docs_auth_sign, docs_auth_sign_action, docs_auth_sign_data } from "./_ui/action_sign/docs"
-import { docs_checkAuthTicket } from "./auth_ticket/_ui/action_check/docs"
+import { docs_auth_sign, docs_auth_sign_action, docs_auth_sign_data } from "./sign/action_sign/docs"
+import { docs_checkAuthTicket } from "./ticket/action_check/docs"
 
 import {
     docsUsecase,
@@ -17,15 +17,15 @@ import {
     DocsSection,
     DocsUsecaseDescription,
 } from "../../ui/vendor/getto-application/docs/data"
-import { docs_authTicket } from "./auth_ticket/docs"
-import { docs_authenticatePassword } from "./password/_ui/action_authenticate/docs"
-import { docs_loginID } from "./login_id/docs"
-import { docs_password } from "./password/docs"
-import { docs_authUser } from "./auth_user/docs"
-import { docs_logout } from "./auth_ticket/_ui/action_logout/docs"
-import { docs_requestResetToken } from "./password/reset/_ui/action_request_token/docs"
-import { docs_reset } from "./password/reset/docs"
-import { docs_resetPassword } from "./password/reset/_ui/action_reset/docs"
+import { docs_authTicket } from "./ticket/docs"
+import { docs_authenticatePassword } from "./user/password/action_authenticate/docs"
+import { docs_loginID } from "./user/login_id/docs"
+import { docs_password } from "./user/password/docs"
+import { docs_authUser } from "./user/docs"
+import { docs_logout } from "./ticket/action_logout/docs"
+import { docs_requestResetToken } from "./user/password/reset/action_request_token/docs"
+import { docs_reset } from "./user/password/reset/docs"
+import { docs_resetPassword } from "./user/password/reset/action_reset/docs"
 
 export const docs_auth = docsDomain<AuthUsecase, AuthAction, AuthData>(
     "認証・認可",

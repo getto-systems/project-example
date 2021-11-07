@@ -5,7 +5,7 @@ const path = require("path")
 const environment = require("../env/environment")
 const entryPoint = require("../env/entry_point")
 
-const environmentRoot = path.join(__dirname, "../../src/y_environment/_ui")
+const environmentRoot = path.join(__dirname, "../../src/y_environment/ui")
 dump(path.join(environmentRoot, "env.ts"), envContent())
 dump(path.join(environmentRoot, "path.ts"), pathContent())
 
@@ -27,13 +27,14 @@ function envContent() {
 
         secureServerURL: process.env.SECURE_SERVER_URL,
         apiServerURL: process.env.API_SERVER_URL,
-        apiServerNonceHeader: "X-GETTO-EXAMPLE-NONCE",
+        apiServerNonceHeader: "GETTO-EXAMPLE-NONCE",
 
         database: {
             authn: "GETTO-EXAMPLE-AUTHN",
             authz: "GETTO-EXAMPLE-AUTHZ",
             season: "GETTO-EXAMPLE-SEASON",
             menuExpand: "GETTO-EXAMPLE-MENU-EXPAND",
+            searchColumns: "GETTO-EXAMPLE-SEARCH-COLUMNS",
         },
     }
 

@@ -5,7 +5,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../_db/y_prisma"
+  output   = "../y_prisma"
 }
 
 // テーブル名は単数で; schema.prisma を読みやすくするため
@@ -45,6 +45,14 @@ model user_password_reset_token {
   expires      DateTime
   requested_at DateTime
   reset_at     DateTime?
+
+  @@id([user_id, reset_token])
+}
+
+model user_password_reset_token_registered_destination {
+  user_id     String @db.VarChar(36)
+  reset_token String @unique @db.VarChar(36)
+  email       String @db.VarChar(250)
 
   @@id([user_id, reset_token])
 }

@@ -1,22 +1,22 @@
 [package]
 name = "example-api"
-version = "0.34.0-api"
+version = "0.45.1-api"
 authors = ["shun <shun.fix9@gmail.com>"]
-edition = "2018"
+edition = "2021"
 build = "api/setup/build.rs"
 default-run = "api"
 
 [[bin]]
 name = "api"
-path = "main/_api/main.rs"
+path = "main/api/main.rs"
 
 [[bin]]
 name = "auth"
-path = "main/_auth/main.rs"
+path = "main/auth/main.rs"
 
 [[bin]]
 name = "example"
-path = "main/_example/main.rs"
+path = "main/example/main.rs"
 
 [dependencies]
 async-trait = "0.1"
@@ -32,15 +32,16 @@ rusoto_core = { version = "0.46", default_features = false, features = ["rustls"
 rusoto_ses = { version = "0.46", default_features = false, features = ["rustls"] }
 rusoto_dynamodb = { version = "0.46", default_features = false, features = ["rustls"] }
 sqlx = { version = "0.5", default_features = false, features = ["macros", "offline", "runtime-tokio-rustls", "mysql", "chrono"] }
+sea-query = { version = "0.18.0", default_features = false, features = ["derive", "backend-mysql", "sqlx-mysql"] }
 funty = "=1.1.0"
 
 jsonwebtoken = "7"
 argon2 = "0.2"
 
-tonic = { version = "0.5", features = ["transport", "tls", "tls-roots"] }
+tonic = { version = "0.6", features = ["transport", "tls", "tls-roots"] }
 tower = "0.4"
-reqwest = "0.11"
-prost = "0.8"
+reqwest = { version = "0.11", default_features = false, features = ["rustls"] }
+prost = "0.9"
 bytes = "1"
 base64 = "0.13"
 
@@ -56,7 +57,7 @@ rand_core = { version = "0.6", features = ["std"] }
 getto-application-test = { path = "api/vendor/getto-application-test" }
 
 [build-dependencies]
-tonic-build = "0.5"
-prost-build = "0.8"
+tonic-build = "0.6"
+prost-build = "0.9"
 
 regex = "1"

@@ -27,9 +27,27 @@ import {
     TableDataSticky,
 } from "../../../getto-table/preact/style"
 
+export type SortQuery = Readonly<{
+    key: SortKey
+    order: SortOrder
+}>
+export type SortOrder = "normal" | "reverse"
+
+export type SortSign = Readonly<{
+    normal: VNodeContent
+    reverse: VNodeContent
+}>
+export function sortSign(sign: SortSign, currentSort: SortQuery, key: SortKey): VNodeContent {
+    if (currentSort.key !== key) {
+        return ""
+    }
+    return sign[currentSort.order]
+}
+
 export interface SortLink {
     (key: SortKey): { (content: VNodeContent): VNode }
 }
+
 export type Sort = Readonly<{
     key: SortKey
     order: SortOrder
@@ -37,16 +55,7 @@ export type Sort = Readonly<{
     sign: SortSign
 }>
 export type SortKey = VNodeKey
-export type SortOrder = "normal" | "reverse"
-export type SortQuery = Readonly<{
-    key: SortKey
-    order: SortOrder
-}>
 export type SortHref = string
-export type SortSign = Readonly<{
-    normal: VNodeContent
-    reverse: VNodeContent
-}>
 export function sortLink(sort: Sort): SortLink {
     return (key) => (content) =>
         html`<a href=${sort.href(sortQuery(key))}>${content} ${sortSign(key)}</a>`

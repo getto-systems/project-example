@@ -2,7 +2,7 @@ import { ApplicationAbstractStateAction } from "../../action/init"
 
 import { initValidateBoardStack } from "../validate_board/init/stack"
 
-import { updateBoardValidateState } from "../validate_board/method"
+import { updateValidateBoardState } from "../validate_board/method"
 
 import { ValidateBoardChecker, ValidateBoardStore } from "../validate_board/infra"
 import { BoardConverter } from "../kernel/infra"
@@ -31,7 +31,7 @@ export function initValidateBoardAction<N extends string, T>({
         stack: initValidateBoardStack(),
     }
     const action = new Action(converter, {
-        updateValidateState: updateBoardValidateState(fields, store),
+        update: updateValidateBoardState(fields, store),
     })
     return {
         validate: action,
@@ -55,7 +55,7 @@ class Action<N extends string, T>
     }
 
     update(name: N, result: boolean): void {
-        this.material.updateValidateState(name, result, this.post)
+        this.material.update(name, result, this.post)
     }
     get(): ConvertBoardResult<T> {
         return this.converter()

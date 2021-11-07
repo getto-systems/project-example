@@ -10,6 +10,16 @@ export interface BoardValueStoreConnector {
     terminate(): void
 }
 
+export interface MultipleBoardValueStore {
+    get(): readonly BoardValue[]
+    set(value: readonly BoardValue[]): void
+}
+
+export interface MultipleBoardValueStoreConnector {
+    connect(store: MultipleBoardValueStore): void
+    terminate(): void
+}
+
 export interface InputBoardEventPublisher {
     post(): void
 }

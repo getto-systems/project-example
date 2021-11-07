@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package auth.user.password.api;
+
+import "auth/ticket/z_protobuf/api.proto";
+
+message AuthenticatePasswordApiRequestPb {
+    string login_id = 1;
+    string password = 2;
+}
+
+message AuthenticatePasswordApiResponsePb {
+    bool success = 1;
+    auth.ticket.api.AuthenticateApiResponsePb value = 2;
+    AuthenticatePasswordApiErrorPb err = 3;
+}
+message AuthenticatePasswordApiErrorPb {
+    AuthenticatePasswordApiErrorKindPb kind = 1;
+}
+enum AuthenticatePasswordApiErrorKindPb {
+    INVALID_PASSWORD = 0;
+}
+
+message ChangePasswordApiRequestPb {
+    string current_password = 1;
+    string new_password = 2;
+}
+
+message ChangePasswordApiResponsePb {
+    bool success = 1;
+    ChangePasswordApiErrorPb err = 2;
+}
+message ChangePasswordApiErrorPb {
+    AuthenticatePasswordApiErrorKindPb kind = 1;
+}

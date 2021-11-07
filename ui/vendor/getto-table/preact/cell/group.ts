@@ -5,7 +5,6 @@ import {
     TableDataColumn,
     TableDataHeader,
     TableDataHeaderGroup,
-    TableDataParams,
     TableDataSummary,
     TableDataView,
 } from "../core"
@@ -24,6 +23,8 @@ import {
     tableCellHeader,
     tableCellFooter,
     TableDataInvisible,
+    TableDataInherit,
+    tableCellInitiallyVisibleCells,
 } from "../cell"
 import {
     TableDataColumnDecorator,
@@ -67,11 +68,18 @@ class Cell<M, R> implements TableCellGroup<M, R> {
         }
     }
 
-    view(params: TableDataParams<M>): TableDataView[] {
-        return tableCellView(params, this.content.cells)
+    initiallyVisibleCells(): TableDataCellKey[] {
+        return tableCellInitiallyVisibleCells(this.content.cells)
     }
-    header(params: TableDataStyledParams<M>): TableDataHeaderGroup | TableDataInvisible {
-        const children = this.children(params)
+
+    view(): TableDataView[] {
+        return tableCellView(this.content.cells)
+    }
+    header(
+        inherit: TableDataInherit,
+        params: TableDataStyledParams<M>,
+    ): TableDataHeaderGroup | TableDataInvisible {
+        const children = this.children(inherit, params)
         if (children.length === 0) {
             return { type: "invisible" }
         }
@@ -126,26 +134,27 @@ class Cell<M, R> implements TableCellGroup<M, R> {
             )
         }
     }
-    children(params: TableDataStyledParams<M>): TableDataHeader[] {
+    children(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataHeader[] {
         const { style } = this.mutable.core.headerStyleMutable()
         return tableCellHeader(
+            inherit,
             { ...params, base: baseGroupMemberStyle(params.base) },
             style,
             this.content.cells,
         )
     }
-    summary(params: TableDataStyledParams<M>): TableDataSummary[] {
+    summary(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[] {
         const { style } = this.mutable.core.summaryStyleMutable()
-        return tableCellSummary(params, style, this.content.cells)
+        return tableCellSummary(inherit, params, style, this.content.cells)
     }
-    footer(params: TableDataStyledParams<M>): TableDataSummary[] {
+    footer(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[] {
         const { style } = this.mutable.core.footerStyleMutable()
-        return tableCellFooter(params, style, this.content.cells)
+        return tableCellFooter(inherit, params, style, this.content.cells)
     }
-    column(params: TableDataRelatedParams<M, R>): TableDataColumn[] {
+    column(inherit: TableDataInherit, params: TableDataRelatedParams<M, R>): TableDataColumn[] {
         const { style } = this.mutable.core.columnStyleMutable()
         const { decorators } = this.mutable.core.columnMutable()
-        return tableCellColumn(params, style, decorators, this.content.cells)
+        return tableCellColumn(inherit, params, style, decorators, this.content.cells)
     }
 
     horizontalBorder(borders: TableDataHorizontalBorder[]): TableCellGroup<M, R> {

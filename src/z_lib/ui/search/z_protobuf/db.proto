@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package lib.search.db;
+
+message Columns_pb {
+  repeated string columns = 1;
+}

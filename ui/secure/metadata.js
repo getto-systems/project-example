@@ -1,4 +1,7 @@
 const headers = {
+  // worker.js は fetch されるので cors ヘッダが必要
+  "access-control-allow-origin": "https://example.getto.systems",
+  "access-control-allow-credentials": "true", // secure 用の cookie を送信する
   "strict-transport-security": "max-age=31536000",
   "content-security-policy": [
     "default-src 'none'",
@@ -11,12 +14,8 @@ const headers = {
     "img-src 'self'",
     "font-src 'self'",
     "manifest-src 'self'",
-    "script-src " + [
-      "'self'",
-    ].join(" "),
-    "style-src " + [
-      "'self'",
-    ].join(" "),
+    "script-src 'self'",
+    "style-src 'self'",
   ].join(";"),
   "x-content-type-options": "nosniff",
   "x-frame-options": "DENY",

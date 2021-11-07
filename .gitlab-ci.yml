@@ -1,9 +1,9 @@
 image: node:15.12.0-buster
 
 stages:
-  - migrate
   - test
   - bump_version
+  - migrate
   - release
   - release_build
   - release_deploy
@@ -14,7 +14,7 @@ variables:
   TRELLIS_GIT_POST: https://trellis.getto.systems/git/post/1.5.2
   TRELLIS_CI_BUMP_VERSION: https://trellis.getto.systems/ci/bump-version/1.14.3
   TRELLIS_PSYCHER_GETTO: https://trellis.getto.systems/psycher/getto/2.7.2
-  BUMP_MAINT_REPO: .bump-maint-repo
+  BUMP_MAINT_REPO_FILE: .bump-maint-repo
   UI_BUMP_VERSION_FILE: ui/VERSION
   UI_BUMP_IGNORE_FILE:  ui/bump/ignore
   UI_BUMP_MAJOR_FILE:   ui/bump/major
@@ -38,7 +38,10 @@ migrate:
     refs:
       - release@getto-systems-base/projects/example
     changes:
-      - "src/**/z_prisma/*"
+      - "api/app/*/VERSION"
+  except:
+    refs:
+      - triggers
 
   before_script:
     - npm clean-install
@@ -77,15 +80,13 @@ test-api:
 
   image: rust:1-buster
 
+  variables:
+    RUN_CODE_BUILDER: "TRUE"
+
   before_script:
-    - rustup install nightly
-    - rustup component add --toolchain nightly llvm-tools-preview
-    - rustup component add --toolchain nightly rustfmt
-    - cargo install rustfilt
-    - mkdir tmp
-    - ./api/ci/setup-test.sh
+    - rustup component add rustfmt
   script:
-    - ./api/ci/test.sh
+    - cargo test
 
 bump_version-ui:
   stage: bump_version
@@ -146,8 +147,6 @@ release_deploy-ui:
       - schedules
   when: on_success
 
-  variables:
-    BUILD_ENV: production
   before_script:
     - apt-get update && apt-get install -y python3-pip
     - pip3 install awscli
