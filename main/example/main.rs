@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use lazy_static::lazy_static;
 use tonic::{service::interceptor, transport::Server, Request};
-use tower::ServiceBuilder;
 
 use example_api::x_outside_feature::remote::example::{
     env::ExampleEnv,
@@ -20,14 +19,10 @@ async fn main() {
     let server = route::Server::new();
 
     Server::builder()
-        .layer(
-            ServiceBuilder::new()
-                .layer(interceptor(move |mut request: Request<()>| {
-                    request.extensions_mut().insert(data.clone());
-                    Ok(request)
-                }))
-                .into_inner(),
-        )
+        .layer(interceptor(move |mut request: Request<()>| {
+            request.extensions_mut().insert(data.clone());
+            Ok(request)
+        }))
         .add_service(server.avail.unexpected_error.notify())
         .add_service(server.example.outline.get_menu_badge())
         .serve(
