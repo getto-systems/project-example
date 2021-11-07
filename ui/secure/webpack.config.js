@@ -33,17 +33,28 @@ module.exports = {
         ignored: ["**/.git", "**/node_modules", "**/storybook"],
     },
     devServer: {
-        contentBase: path.join(__dirname, "."),
-        publicPath: "/dist/",
+        static: {
+            directory: path.join(__dirname, "dist"),
+            publicPath: "/dist/",
+        },
 
         host: "0.0.0.0",
         port: process.env.SECURE_APP_PORT,
 
-        hot: true,
-        sockPort: "443",
-        sockHost: new URL(process.env.SECURE_SERVER_URL).host,
+        proxy: [
+            {
+                context: ["/dist"],
+                target: `http://localhost:${process.env.SECURE_APP_PORT}`,
+                pathRewrite: { '^/dist': '' },
+            },
+        ],
 
-        disableHostCheck: true,
+        hot: true,
+        client: {
+            webSocketURL: `wss://${new URL(process.env.SECURE_SERVER_URL).host}/ws`,
+        },
+        allowedHosts: "all",
+
         headers: {
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
