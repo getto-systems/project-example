@@ -52,8 +52,15 @@ module.exports = {
 
         hot: true,
         client: {
-            webSocketURL: `wss://${new URL(process.env.PUBLIC_SERVER_URL).host}/ws`,
+            webSocketURL: `wss://${webSocketHost()}/ws`,
         },
         allowedHosts: "all",
     },
+}
+
+function webSocketHost() {
+    if (!process.env.PUBLIC_SERVER_URL) {
+        return "localhost"
+    }
+    return new URL(process.env.PUBLIC_SERVER_URL).host
 }

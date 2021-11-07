@@ -51,7 +51,7 @@ module.exports = {
 
         hot: true,
         client: {
-            webSocketURL: `wss://${new URL(process.env.SECURE_SERVER_URL).host}/ws`,
+            webSocketURL: `wss://${webSocketHost()}/ws`,
         },
         allowedHosts: "all",
 
@@ -61,4 +61,11 @@ module.exports = {
             "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization",
         },
     },
+}
+
+function webSocketHost() {
+    if (!process.env.SECURE_SERVER_URL) {
+        return "localhost"
+    }
+    return new URL(process.env.SECURE_SERVER_URL).host
 }
