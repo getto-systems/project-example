@@ -4,9 +4,11 @@ import { storyTemplate } from "../../../../../ui/vendor/storybook/preact/story"
 
 import { LogoutComponent } from "./logout"
 
-import { mockLogoutResource } from "../mock"
+import { initMemoryDB } from "../../../../z_lib/ui/repository/init/memory"
 
-import { LogoutState } from "../action"
+import { initLogoutAction, LogoutState } from "../action"
+
+import { AuthProfile } from "../../kernel/data"
 
 const options = ["initial", "failed"] as const
 
@@ -26,7 +28,10 @@ type Props = Readonly<{
 
 const template = storyTemplate<Props>((props) => {
     return h(LogoutComponent, {
-        ...mockLogoutResource(),
+        logout: initLogoutAction({
+            profileRepository: initMemoryDB<AuthProfile>(),
+            logoutRemote: async () => ({ success: true, value: true }),
+        }),
         state: state(),
     })
 

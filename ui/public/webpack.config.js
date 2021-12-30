@@ -44,7 +44,7 @@ module.exports = {
 
         proxy: [
             {
-                context: ["/dist/auth", "/dist/avail"],
+                context: ["/dist/auth/sign", "/dist/avail"],
                 target: `http://localhost:${process.env.PUBLIC_APP_PORT}`,
                 pathRewrite: { '^/dist': '' },
             },

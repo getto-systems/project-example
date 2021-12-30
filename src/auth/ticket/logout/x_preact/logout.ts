@@ -12,19 +12,22 @@ import { button_send, field } from "../../../../../ui/vendor/getto-css/preact/de
 import { notice_alert } from "../../../../../ui/vendor/getto-css/preact/design/highlight"
 import { v_small } from "../../../../../ui/vendor/getto-css/preact/design/alignment"
 
-import { LogoutResource, LogoutResourceState } from "../resource"
+import { LogoutAction, LogoutState } from "../action"
 
 import { RepositoryError } from "../../../../z_lib/ui/repository/data"
-import { LogoutError } from "../../logout/data"
+import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
 
-export function LogoutEntry(resource: LogoutResource): VNode {
-    return h(LogoutComponent, {
+type Resource = Readonly<{
+    logout: LogoutAction
+}>
+export function LogoutEntry(resource: Resource): VNode {
+    return h(LogoutComponent, <Props>{
         ...resource,
         state: useApplicationAction(resource.logout),
     })
 }
 
-type Props = LogoutResource & LogoutResourceState
+type Props = Resource & Readonly<{ state: LogoutState }>
 export function LogoutComponent(props: Props): VNode {
     useLayoutEffect(() => {
         switch (props.state.type) {
@@ -37,38 +40,23 @@ export function LogoutComponent(props: Props): VNode {
 
     return basedOn(props)
 
-    function basedOn({ state }: LogoutResourceState): VNode {
+    function basedOn({ state }: Readonly<{ state: LogoutState }>): VNode {
         switch (state.type) {
             case "succeed-to-logout":
-                // reload するので何も描画しない
-                return EMPTY_CONTENT
-
             case "initial-logout":
-                return logoutBox({ initial: true })
+                return logoutBox({ type: "initial" })
 
             case "repository-error":
-                return logoutBox({ initial: false, err: repositoryError(state.err) })
+                return logoutBox({ type: "error", err: repositoryError(state.err) })
 
             case "failed-to-logout":
-                return logoutBox({ initial: false, err: logoutError(state.err) })
-        }
-        function repositoryError(err: RepositoryError): string[] {
-            return repositoryErrorReason(err, (reason) => [
-                `${reason.message}によりログアウトに失敗しました`,
-                ...reason.detail,
-            ])
-        }
-        function logoutError(err: LogoutError): string[] {
-            return remoteCommonErrorReason(err, (reason) => [
-                `${reason.message}によりログアウトに失敗しました`,
-                ...reason.detail,
-            ])
+                return logoutBox({ type: "error", err: logoutError(state.err) })
         }
     }
 
     type LogoutBoxContent =
-        | Readonly<{ initial: true }>
-        | Readonly<{ initial: false; err: string[] }>
+        | Readonly<{ type: "initial" }>
+        | Readonly<{ type: "error"; err: string[] }>
     function logoutBox(content: LogoutBoxContent): VNode {
         return box({
             body: [
@@ -91,7 +79,7 @@ export function LogoutComponent(props: Props): VNode {
         }
 
         function error(): VNode[] {
-            if (content.initial) {
+            if (content.type === "initial") {
                 return []
             }
             return [
@@ -103,4 +91,15 @@ export function LogoutComponent(props: Props): VNode {
     }
 }
 
-const EMPTY_CONTENT = html``
+function repositoryError(err: RepositoryError): string[] {
+    return repositoryErrorReason(err, (reason) => [
+        `${reason.message}によりログアウトに失敗しました`,
+        ...reason.detail,
+    ])
+}
+function logoutError(err: RemoteCommonError): string[] {
+    return remoteCommonErrorReason(err, (reason) => [
+        `${reason.message}によりログアウトに失敗しました`,
+        ...reason.detail,
+    ])
+}

@@ -15,7 +15,7 @@ import {
 import {
     docs_auth_logout,
     docs_auth_logout_description,
-} from "../../ticket/action_logout/docs"
+} from "../../ticket/logout/docs"
 import {
     docs_auth_authenticatePassword,
     docs_auth_authenticatePassword_description,

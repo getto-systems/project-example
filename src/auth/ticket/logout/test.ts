@@ -1,18 +1,15 @@
 import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
 
-import { initLogoutAction, initLogoutMaterial } from "./init"
-
 import { AuthProfileRepository } from "../kernel/infra"
-import { LogoutRemote } from "../logout/infra"
-
-import { LogoutResource } from "./resource"
 
 import { authProfileRepositoryConverter } from "../kernel/convert"
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 import { AuthProfile } from "../kernel/data"
+import { initLogoutAction, LogoutAction } from "./action"
+import { LogoutRemote } from "./infra"
 
 describe("Logout", () => {
-    test("clear", async () => {
+    test("logout", async () => {
         const { resource } = standard()
 
         const runner = setupActionTestRunner(resource.logout.subscriber)
@@ -38,23 +35,23 @@ describe("Logout", () => {
 })
 
 function standard() {
-    const resource = initResource(standard_profile_repository())
+    const resource = initResource(standard_profileRepository())
 
     return { resource }
 }
 
-function initResource(profileRepository: AuthProfileRepository): LogoutResource {
+function initResource(
+    profileRepository: AuthProfileRepository,
+): Readonly<{ logout: LogoutAction }> {
     return {
-        logout: initLogoutAction(
-            initLogoutMaterial({
-                profileRepository,
-                logoutRemote: standard_logout_remote(),
-            }),
-        ),
+        logout: initLogoutAction({
+            profileRepository,
+            logoutRemote: standard_logoutRemote(),
+        }),
     }
 }
 
-function standard_profile_repository(): AuthProfileRepository {
+function standard_profileRepository(): AuthProfileRepository {
     const result = authProfileRepositoryConverter.fromRepository({
         authAt: new Date("2020-01-01 09:00:00").toISOString(),
         roles: ["role"],
@@ -68,6 +65,6 @@ function standard_profile_repository(): AuthProfileRepository {
     return repository
 }
 
-function standard_logout_remote(): LogoutRemote {
+function standard_logoutRemote(): LogoutRemote {
     return async () => ({ success: true, value: true })
 }
