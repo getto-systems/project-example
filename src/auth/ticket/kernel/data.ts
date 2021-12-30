@@ -1,23 +1,12 @@
 import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
 
-export type AuthTicket = Readonly<{
-    authn: Authn
-    authz: Authz
-}>
-
-export type Authn = Readonly<{
-    authAt: AuthAt
-}>
-
-export type Authz = Readonly<{
-    roles: GrantedRoles
-}>
-
-export type AuthAt = Date & { AuthAt: never }
-export type GrantedRoles = string[] & { GrantedRoles: never }
+export type AuthProfile = Readonly<{
+    authAt: Date
+    roles: string[]
+}> & { AuthProfile: never }
 
 export function hasExpired(
-    authAt: AuthAt,
+    { authAt }: AuthProfile,
     target: { now: Date; expire_millisecond: number },
 ): boolean {
     return target.now.getTime() > authAt.getTime() + target.expire_millisecond

@@ -1,11 +1,11 @@
 import { StartContinuousRenewInfra } from "./infra"
 
-import { SaveAuthTicketEvent, StartContinuousRenewEvent } from "./event"
+import { SaveAuthProfileEvent, StartContinuousRenewEvent } from "./event"
 
-import { AuthTicket, hasExpired } from "../kernel/data"
+import { AuthProfile, hasExpired } from "../kernel/data"
 
-export interface SaveAuthTicketMethod {
-    <S>(auth: AuthTicket, post: Post<SaveAuthTicketEvent, S>): Promise<S>
+export interface SaveAuthProfileMethod {
+    <S>(profile: AuthProfile, post: Post<SaveAuthProfileEvent, S>): Promise<S>
 }
 
 export interface StartContinuousRenewMethod {
@@ -13,16 +13,14 @@ export interface StartContinuousRenewMethod {
 }
 
 interface Save {
-    (infra: StartContinuousRenewInfra): SaveAuthTicketMethod
+    (infra: StartContinuousRenewInfra): SaveAuthProfileMethod
 }
-export const saveAuthTicket: Save = (infra) => async (info, post) => {
-    const authnResult = await infra.authn.set(info.authn)
+export const saveAuthProfile: Save = (infra) => async (profile, post) => {
+    const { profileRepository } = infra
+
+    const authnResult = await profileRepository.set(profile)
     if (!authnResult.success) {
         return post({ type: "failed-to-save", err: authnResult.err })
-    }
-    const authzResult = await infra.authz.set(info.authz)
-    if (!authzResult.success) {
-        return post({ type: "failed-to-save", err: authzResult.err })
     }
 
     return post({ type: "succeed-to-save" })
@@ -49,52 +47,42 @@ export const startContinuousRenew: Start = (infra) => (post) => {
     })
 
     async function continuousRenew(): Promise<StartContinuousRenewEvent> {
-        const { clock, config } = infra
+        const { clock, config, profileRepository, renewRemote } = infra
 
-        const result = await infra.authn.get()
+        const result = await profileRepository.get()
         if (!result.success) {
             return { type: "repository-error", continue: false, err: result.err }
         }
         if (!result.found) {
-            return clearTicket()
+            return clearProfile()
         }
 
         // 前回の更新時刻が新しければ今回は通信しない
         const time = { now: clock.now(), ...config.authnExpire }
-        if (!hasExpired(result.value.authAt, time)) {
+        if (!hasExpired(result.value, time)) {
             return { type: "authn-not-expired", continue: true }
         }
 
-        const response = await infra.renew()
+        const response = await renewRemote()
         if (!response.success) {
             if (response.err.type === "unauthorized") {
-                return clearTicket()
+                return clearProfile()
             } else {
                 return { type: "failed-to-renew", continue: false, err: response.err }
             }
         }
 
-        const authnStoreResult = await infra.authn.set(response.value.authn)
-        if (!authnStoreResult.success) {
-            return { type: "repository-error", continue: false, err: authnStoreResult.err }
-        }
-
-        const authzStoreResult = await infra.authn.set(response.value.authn)
-        if (!authzStoreResult.success) {
-            return { type: "repository-error", continue: false, err: authzStoreResult.err }
+        const saveProfileResult = await profileRepository.set(response.value)
+        if (!saveProfileResult.success) {
+            return { type: "repository-error", continue: false, err: saveProfileResult.err }
         }
 
         return { type: "succeed-to-renew", continue: true }
 
-        async function clearTicket(): Promise<StartContinuousRenewEvent> {
-            const authnRemoveResult = await infra.authn.remove()
-            if (!authnRemoveResult.success) {
-                return { type: "repository-error", continue: false, err: authnRemoveResult.err }
-            }
-
-            const authzRemoveResult = await infra.authz.remove()
-            if (!authzRemoveResult.success) {
-                return { type: "repository-error", continue: false, err: authzRemoveResult.err }
+        async function clearProfile(): Promise<StartContinuousRenewEvent> {
+            const removeProfileResult = await profileRepository.remove()
+            if (!removeProfileResult.success) {
+                return { type: "repository-error", continue: false, err: removeProfileResult.err }
             }
 
             return { type: "required-to-login", continue: false }

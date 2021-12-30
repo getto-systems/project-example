@@ -1,15 +1,15 @@
 import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
 
-import { mockAuthnRepository, mockAuthzRepository } from "../kernel/init/repository/mock"
-
 import { initLogoutAction, initLogoutMaterial } from "./init"
 
-import { AuthnRepository, AuthzRepository } from "../kernel/infra"
+import { AuthProfileRepository } from "../kernel/infra"
 import { LogoutRemote } from "../logout/infra"
 
 import { LogoutResource } from "./resource"
 
-import { authnRepositoryConverter, authzRepositoryConverter } from "../kernel/convert"
+import { authProfileRepositoryConverter } from "../kernel/convert"
+import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
+import { AuthProfile } from "../kernel/data"
 
 describe("Logout", () => {
     test("clear", async () => {
@@ -38,48 +38,36 @@ describe("Logout", () => {
 })
 
 function standard() {
-    const resource = initResource(standard_authn(), standard_authz())
+    const resource = initResource(standard_profile_repository())
 
     return { resource }
 }
 
-function initResource(authn: AuthnRepository, authz: AuthzRepository): LogoutResource {
+function initResource(profileRepository: AuthProfileRepository): LogoutResource {
     return {
         logout: initLogoutAction(
             initLogoutMaterial({
-                authn,
-                authz,
-                logout: standard_clear(),
+                profileRepository,
+                logoutRemote: standard_logout_remote(),
             }),
         ),
     }
 }
 
-function standard_authn(): AuthnRepository {
-    const result = authnRepositoryConverter.fromRepository({
+function standard_profile_repository(): AuthProfileRepository {
+    const result = authProfileRepositoryConverter.fromRepository({
         authAt: new Date("2020-01-01 09:00:00").toISOString(),
+        roles: ["role"],
     })
     if (!result.valid) {
         throw new Error("invalid authn")
     }
 
-    const repository = mockAuthnRepository()
-    repository.set(result.value)
-    return repository
-}
-function standard_authz(): AuthzRepository {
-    const result = authzRepositoryConverter.fromRepository({
-        roles: ["role"],
-    })
-    if (!result.valid) {
-        throw new Error("invalid authz")
-    }
-
-    const repository = mockAuthzRepository()
+    const repository = initMemoryDB<AuthProfile>()
     repository.set(result.value)
     return repository
 }
 
-function standard_clear(): LogoutRemote {
+function standard_logout_remote(): LogoutRemote {
     return async () => ({ success: true, value: true })
 }

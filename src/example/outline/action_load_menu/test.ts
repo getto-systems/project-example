@@ -3,18 +3,18 @@ import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/a
 import { markMenuCategoryLabel, standard_MenuTree } from "../kernel/test_helper"
 
 import { mockLoadMenuLocationDetecter } from "../kernel/mock"
-import { mockAuthzRepository } from "../../../auth/ticket/kernel/init/repository/mock"
-import { mockMenuExpandRepository } from "../kernel/init/repository/mock"
 
 import { initLoadMenuAction, initLoadMenuMaterial } from "./init"
 
-import { AuthzRepository } from "../../../auth/ticket/kernel/infra"
-import { GetMenuBadgeRemote, MenuExpandRepository, LoadMenuDetecter } from "../kernel/infra"
+import { AuthProfileRepository } from "../../../auth/ticket/kernel/infra"
+import { GetMenuBadgeRemote, MenuExpandRepository, LoadMenuDetecter, MenuExpand } from "../kernel/infra"
 
 import { LoadMenuResource } from "./resource"
 
 import { convertMenuBadgeRemote, menuExpandRepositoryConverter } from "../kernel/convert"
-import { authzRepositoryConverter } from "../../../auth/ticket/kernel/convert"
+import { authProfileRepositoryConverter } from "../../../auth/ticket/kernel/convert"
+import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
+import { AuthProfile } from "../../../auth/ticket/kernel/data"
 
 describe("Menu", () => {
     test("load menu", async () => {
@@ -327,33 +327,33 @@ describe("Menu", () => {
 })
 
 function standard() {
-    const [resource, menuExpand] = initResource(standard_authz(), empty_menuExpand())
+    const [resource, menuExpand] = initResource(standard_profileRepository(), empty_menuExpandRepository())
 
     return { resource, menuExpand }
 }
 function empty() {
-    const [resource] = initResource(empty_authz(), empty_menuExpand())
+    const [resource] = initResource(empty_profileRepository(), empty_menuExpandRepository())
 
     return { resource }
 }
 function devDocs() {
-    const [resource] = initResource(devDocs_authz(), empty_menuExpand())
+    const [resource] = initResource(devDocs_authz(), empty_menuExpandRepository())
 
     return { resource }
 }
 function expand() {
-    const [resource] = initResource(standard_authz(), expand_menuExpand())
+    const [resource] = initResource(standard_profileRepository(), expand_menuExpandRepository())
 
     return { resource }
 }
 
 function initResource(
-    authz: AuthzRepository,
-    menuExpand: MenuExpandRepository,
+    profileRepository: AuthProfileRepository,
+    menuExpandRepository: MenuExpandRepository,
 ): [LoadMenuResource, MenuExpandRepository] {
     const version = standard_version()
     const detecter = standard_detecter()
-    const getMenuBadge = standard_getMenuBadge()
+    const getMenuBadgeRemote = standard_getMenuBadgeRemote()
 
     return [
         {
@@ -361,14 +361,14 @@ function initResource(
                 initLoadMenuMaterial({
                     version,
                     menuTree: standard_MenuTree(),
-                    authz,
-                    menuExpand,
-                    getMenuBadge,
+                    profileRepository,
+                    menuExpandRepository,
+                    getMenuBadgeRemote,
                 }),
                 detecter,
             ),
         },
-        menuExpand,
+        menuExpandRepository,
     ]
 }
 
@@ -382,49 +382,51 @@ function standard_version(): string {
     return "1.0.0"
 }
 
-function standard_authz(): AuthzRepository {
-    const result = authzRepositoryConverter.fromRepository({
+function standard_profileRepository(): AuthProfileRepository {
+    const result = authProfileRepositoryConverter.fromRepository({
+        authAt: "2020-01-01 00:00:00",
         roles: ["admin"],
     })
     if (!result.valid) {
-        throw new Error("invalid authz")
+        throw new Error("invalid auth profile")
     }
 
-    const repository = mockAuthzRepository()
+    const repository = initMemoryDB<AuthProfile>()
     repository.set(result.value)
     return repository
 }
-function empty_authz(): AuthzRepository {
-    return mockAuthzRepository()
+function empty_profileRepository(): AuthProfileRepository {
+    return initMemoryDB<AuthProfile>()
 }
-function devDocs_authz(): AuthzRepository {
-    const result = authzRepositoryConverter.fromRepository({
+function devDocs_authz(): AuthProfileRepository {
+    const result = authProfileRepositoryConverter.fromRepository({
+        authAt: "2020-01-01 00:00:00",
         roles: ["admin", "dev-docs"],
     })
     if (!result.valid) {
-        throw new Error("invalid authz")
+        throw new Error("invalid auth profile")
     }
 
-    const repository = mockAuthzRepository()
+    const repository = initMemoryDB<AuthProfile>()
     repository.set(result.value)
     return repository
 }
 
-function empty_menuExpand(): MenuExpandRepository {
-    return mockMenuExpandRepository()
+function empty_menuExpandRepository(): MenuExpandRepository {
+    return initMemoryDB<MenuExpand>()
 }
-function expand_menuExpand(): MenuExpandRepository {
+function expand_menuExpandRepository(): MenuExpandRepository {
     const result = menuExpandRepositoryConverter.fromRepository([["DOCUMENT"]])
     if (!result.valid) {
         throw new Error("invalid menu expand")
     }
 
-    const repository = mockMenuExpandRepository()
+    const repository = initMemoryDB<MenuExpand>()
     repository.set(result.value)
     return repository
 }
 
-function standard_getMenuBadge(): GetMenuBadgeRemote {
+function standard_getMenuBadgeRemote(): GetMenuBadgeRemote {
     return async () => ({
         success: true,
         value: convertMenuBadgeRemote([

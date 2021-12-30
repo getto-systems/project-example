@@ -1,11 +1,11 @@
-import { AuthzRepository } from "../../../auth/ticket/kernel/infra"
+import { AuthProfileRepository } from "../../../auth/ticket/kernel/infra"
 import { MenuBadgeStore, MenuExpandRepository, MenuExpandStore, MenuTree } from "../kernel/infra"
 
 export type ToggleMenuExpandInfra = Readonly<{
     version: string
     menuTree: MenuTree
-    authz: AuthzRepository
-    menuExpand: MenuExpandRepository
+    profileRepository: AuthProfileRepository
+    menuExpandRepository: MenuExpandRepository
 }>
 
 export type ToggleMenuExpandStore = Readonly<{

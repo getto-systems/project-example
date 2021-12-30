@@ -8,14 +8,14 @@ import {
 } from "./action"
 
 import { getScriptPath } from "../../sign/get_script_path/method"
-import { startContinuousRenew, saveAuthTicket } from "../start_continuous_renew/method"
+import { startContinuousRenew, saveAuthProfile } from "../start_continuous_renew/method"
 import { renewAuthTicket, checkAuthTicket } from "../check/method"
 
 import { GetScriptPathInfra, GetScriptPathDetecter } from "../../sign/get_script_path/infra"
 import { StartContinuousRenewInfra } from "../start_continuous_renew/infra"
 import { CheckAuthTicketInfra } from "../check/infra"
 
-import { AuthTicket } from "../kernel/data"
+import { AuthProfile } from "../kernel/data"
 import { LoadScriptError } from "../../sign/get_script_path/data"
 
 export type CheckAuthTicketActionInfra = Readonly<{
@@ -31,7 +31,7 @@ export function initCheckAuthTicketMaterial(
         renew: checkAuthTicket(infra.check),
         forceRenew: renewAuthTicket(infra.check),
         startContinuousRenew: startContinuousRenew(infra.startContinuousRenew),
-        save: saveAuthTicket(infra.startContinuousRenew),
+        save: saveAuthProfile(infra.startContinuousRenew),
         getSecureScriptPath: getScriptPath(infra.getSecureScriptPath),
     }
 }
@@ -96,7 +96,7 @@ class Action
         return this.material.getSecureScriptPath(this.detecter())
     }
 
-    async startContinuousRenew(info: AuthTicket): Promise<CheckAuthTicketState> {
+    async startContinuousRenew(info: AuthProfile): Promise<CheckAuthTicketState> {
         return this.material.save(info, (event) => {
             switch (event.type) {
                 case "failed-to-save":

@@ -8,7 +8,7 @@ import { initValidateBoardAction } from "../../../../../../ui/vendor/getto-appli
 import { resetPassword } from "../reset/method"
 import { getScriptPath } from "../../../../sign/get_script_path/method"
 import {
-    saveAuthTicket,
+    saveAuthProfile,
     startContinuousRenew,
 } from "../../../../ticket/start_continuous_renew/method"
 
@@ -29,7 +29,7 @@ import { ResetPasswordDetecter } from "../reset/infra"
 
 import { LoadScriptError } from "../../../../sign/get_script_path/data"
 import { ResetPasswordFields } from "../reset/data"
-import { AuthTicket } from "../../../../ticket/kernel/data"
+import { AuthProfile } from "../../../../ticket/kernel/data"
 import { ConvertBoardResult } from "../../../../../../ui/vendor/getto-application/board/kernel/data"
 import { InputLoginIDAction } from "../../../login_id/input/action_input/action"
 import { ValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
@@ -44,7 +44,7 @@ export type ResetPasswordActionInfra = Readonly<{
 
 export function initResetPasswordMaterial(infra: ResetPasswordActionInfra): ResetPasswordMaterial {
     return {
-        save: saveAuthTicket(infra.startContinuousRenew),
+        save: saveAuthProfile(infra.startContinuousRenew),
         startContinuousRenew: startContinuousRenew(infra.startContinuousRenew),
         getSecureScriptPath: getScriptPath(infra.getSecureScriptPath),
         reset: resetPassword(infra.reset),
@@ -147,7 +147,7 @@ class Action
             }
         })
     }
-    async startContinuousRenew(info: AuthTicket): Promise<ResetPasswordState> {
+    async startContinuousRenew(info: AuthProfile): Promise<ResetPasswordState> {
         return this.material.save(info, (event) => {
             switch (event.type) {
                 case "failed-to-save":

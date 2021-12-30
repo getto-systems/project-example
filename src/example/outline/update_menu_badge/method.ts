@@ -18,17 +18,13 @@ interface Update {
     (infra: UpdateMenuBadgeInfra, store: UpdateMenuBadgeStore): UpdateMenuBadgeMethod
 }
 export const updateMenuBadge: Update = (infra, store) => async (menuTargetPath, post) => {
-    const { authz } = infra
+    const { version, menuTree, profileRepository, getMenuBadgeRemote } = infra
 
-    const authzResult = await authz.get()
-    if (!authzResult.success) {
-        return post({ type: "repository-error", err: authzResult.err })
+    const profileResult = await profileRepository.get()
+    if (!profileResult.success) {
+        return post({ type: "repository-error", err: profileResult.err })
     }
-    if (!authzResult.found) {
-        const authzRemoveResult = await authz.remove()
-        if (!authzRemoveResult.success) {
-            return post({ type: "repository-error", err: authzRemoveResult.err })
-        }
+    if (!profileResult.found) {
         return post({ type: "required-to-login" })
     }
 
@@ -36,15 +32,15 @@ export const updateMenuBadge: Update = (infra, store) => async (menuTargetPath, 
     const expand = fetchResult.found ? fetchResult.value : initMenuExpand()
 
     const buildParams: BuildMenuParams = {
-        version: infra.version,
-        grantedRoles: authzResult.value.roles,
+        version,
+        profile: profileResult.value,
         menuExpand: expand,
         menuTargetPath,
-        menuTree: infra.menuTree,
+        menuTree,
         menuBadge: EMPTY_BADGE,
     }
 
-    const response = await infra.getMenuBadge()
+    const response = await getMenuBadgeRemote()
     if (!response.success) {
         return post({ type: "failed-to-update", menu: buildMenu(buildParams), err: response.err })
     }

@@ -1,15 +1,17 @@
 import { RepositoryConverter } from "../../../z_lib/ui/repository/infra"
 
-import { AuthzRepositoryValue } from "./infra"
 import { Clock } from "../../../z_lib/ui/clock/infra"
-import { AuthRemoteValue, AuthnRepositoryValue } from "./infra"
+import { AuthRemoteValue, AuthProfileRepositoryValue } from "./infra"
 
-import { Authn, Authz, GrantedRoles } from "./data"
-import { AuthAt, AuthTicket } from "./data"
+import { AuthProfile } from "./data"
 
-export const authnRepositoryConverter: RepositoryConverter<Authn, AuthnRepositoryValue> = {
+export const authProfileRepositoryConverter: RepositoryConverter<
+    AuthProfile,
+    AuthProfileRepositoryValue
+> = {
     toRepository: (value) => ({
         authAt: value.authAt.toISOString(),
+        roles: value.roles,
     }),
     fromRepository: (value) => {
         const authAt = new Date(value.authAt)
@@ -20,49 +22,16 @@ export const authnRepositoryConverter: RepositoryConverter<Authn, AuthnRepositor
 
         return {
             valid: true,
-            value: {
-                authAt: markAuthAt(authAt),
-            },
+            value: markAuthProfile(authAt, value.roles),
         }
     },
 }
 
-export function convertAuthRemote(clock: Clock, value: AuthRemoteValue): AuthTicket {
+export function convertAuthRemote(clock: Clock, value: AuthRemoteValue): AuthProfile {
     // remote からの値はバリデーションせずに受け取る
-    return {
-        authn: {
-            authAt: markAuthAt(clock.now()),
-        },
-        authz: authzRemoteConverter(value.roles),
-    }
+    return markAuthProfile(clock.now(), value.roles)
 }
 
-export const authzRepositoryConverter: RepositoryConverter<Authz, AuthzRepositoryValue> = {
-    toRepository: (value) => value,
-    fromRepository: (value) => {
-        const roles = value.roles
-
-        // roles のバリデーションは特にしない
-
-        return {
-            valid: true,
-            found: true,
-            value: {
-                roles: markAuthzRoles(roles),
-            },
-        }
-    },
-}
-
-export function authzRemoteConverter(roles: string[]): Authz {
-    return {
-        roles: markAuthzRoles(roles),
-    }
-}
-
-function markAuthAt(date: Date): AuthAt {
-    return date as AuthAt
-}
-function markAuthzRoles(roles: string[]): GrantedRoles {
-    return roles as GrantedRoles
+function markAuthProfile(authAt: Date, roles: string[]): AuthProfile {
+    return { authAt, roles } as AuthProfile
 }

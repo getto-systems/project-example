@@ -20,7 +20,7 @@ export function newResetPasswordLocationDetecter(
 
 export function newResetPasswordInfra(feature: RemoteOutsideFeature): ResetPasswordInfra {
     return {
-        reset: newResetPasswordRemote(feature, newClock()),
+        resetRemote: newResetPasswordRemote(feature, newClock()),
         config: {
             takeLongtimeThreshold: auth_config.takeLongtimeThreshold,
         },

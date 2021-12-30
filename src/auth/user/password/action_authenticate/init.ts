@@ -5,7 +5,7 @@ import { initInputLoginIDAction } from "../../login_id/input/action_input/init"
 import { initInputPasswordAction } from "../input/action_input/init"
 import { initValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/init"
 
-import { saveAuthTicket, startContinuousRenew } from "../../../ticket/start_continuous_renew/method"
+import { saveAuthProfile, startContinuousRenew } from "../../../ticket/start_continuous_renew/method"
 import { getScriptPath } from "../../../sign/get_script_path/method"
 import { authenticatePassword } from "../authenticate/method"
 
@@ -28,7 +28,7 @@ import { ValidateBoardChecker } from "../../../../../ui/vendor/getto-application
 
 import { LoadScriptError } from "../../../sign/get_script_path/data"
 import { AuthenticatePasswordFields } from "../authenticate/data"
-import { AuthTicket } from "../../../ticket/kernel/data"
+import { AuthProfile } from "../../../ticket/kernel/data"
 import { ConvertBoardResult } from "../../../../../ui/vendor/getto-application/board/kernel/data"
 
 export type AuthenticatePasswordActionInfra = Readonly<{
@@ -41,7 +41,7 @@ export function initAuthenticatePasswordMaterial(
     infra: AuthenticatePasswordActionInfra,
 ): AuthenticatePasswordMaterial {
     return {
-        save: saveAuthTicket(infra.startContinuousRenew),
+        save: saveAuthProfile(infra.startContinuousRenew),
         startContinuousRenew: startContinuousRenew(infra.startContinuousRenew),
         getSecureScriptPath: getScriptPath(infra.getSecureScriptPath),
         authenticate: authenticatePassword(infra.authenticate),
@@ -134,7 +134,7 @@ class Action
             }
         })
     }
-    async startContinuousRenew(info: AuthTicket): Promise<AuthenticatePasswordState> {
+    async startContinuousRenew(info: AuthProfile): Promise<AuthenticatePasswordState> {
         return this.material.save(info, (event) => {
             switch (event.type) {
                 case "failed-to-save":

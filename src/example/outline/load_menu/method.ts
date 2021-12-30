@@ -19,21 +19,17 @@ interface Load {
     (infra: LoadMenuInfra, store: LoadMenuStore): LoadMenuMethod
 }
 export const loadMenu: Load = (infra, store) => async (menuTargetPath, post) => {
-    const { menuExpand } = infra
+    const { version, menuTree, profileRepository, menuExpandRepository } = infra
 
-    const authzResult = await infra.authz.get()
-    if (!authzResult.success) {
-        return post({ type: "repository-error", err: authzResult.err })
+    const profileResult = await profileRepository.get()
+    if (!profileResult.success) {
+        return post({ type: "repository-error", err: profileResult.err })
     }
-    if (!authzResult.found) {
-        const authzRemoveResult = await infra.authz.remove()
-        if (!authzRemoveResult.success) {
-            return post({ type: "repository-error", err: authzRemoveResult.err })
-        }
+    if (!profileResult.found) {
         return post({ type: "required-to-login" })
     }
 
-    const menuExpandResult = await menuExpand.get()
+    const menuExpandResult = await menuExpandRepository.get()
     if (!menuExpandResult.success) {
         return post({ type: "repository-error", err: menuExpandResult.err })
     }
@@ -46,10 +42,10 @@ export const loadMenu: Load = (infra, store) => async (menuTargetPath, post) => 
     return post({
         type: "succeed-to-load",
         menu: buildMenu({
-            version: infra.version,
-            menuTree: infra.menuTree,
+            version,
+            menuTree,
             menuTargetPath,
-            grantedRoles: authzResult.value.roles,
+            profile: profileResult.value,
             menuExpand: expand,
             menuBadge: EMPTY_BADGE, // ロードに時間がかかる可能性があるのであとでロードする
         }),

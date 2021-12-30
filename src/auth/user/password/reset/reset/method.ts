@@ -31,11 +31,11 @@ export const resetPassword: Reset = (infra) => async (resetToken, fields, post) 
 
     post({ type: "try-to-reset" })
 
-    const { config } = infra
+    const { config, resetRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(
-        infra.reset(resetToken.value, fields.value),
+        resetRemote(resetToken.value, fields.value),
         config.takeLongtimeThreshold,
         () => post({ type: "take-longtime-to-reset" }),
     )

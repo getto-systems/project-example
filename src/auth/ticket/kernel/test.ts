@@ -1,25 +1,14 @@
-import { authnRepositoryConverter, authzRepositoryConverter } from "./convert"
+import { authProfileRepositoryConverter } from "./convert"
 
-test("authnRepositoryConverter", () => {
+test("authProfileRepositoryConverter", () => {
     const authAt = new Date("2020-01-01 10:00:00").toISOString()
-
-    const result = authnRepositoryConverter.fromRepository({ authAt })
-    if (!result.valid) {
-        throw new Error("convert failed")
-    }
-
-    const value = authnRepositoryConverter.toRepository(result.value)
-    expect(value).toEqual({ authAt })
-})
-
-test("authzRepositoryConverter", () => {
     const roles = ["admin"]
 
-    const result = authzRepositoryConverter.fromRepository({ roles })
+    const result = authProfileRepositoryConverter.fromRepository({ authAt, roles })
     if (!result.valid) {
         throw new Error("convert failed")
     }
 
-    const value = authzRepositoryConverter.toRepository(result.value)
-    expect(value).toEqual({ roles })
+    const value = authProfileRepositoryConverter.toRepository(result.value)
+    expect(value).toEqual({ authAt, roles })
 })

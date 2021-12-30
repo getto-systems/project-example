@@ -5,34 +5,22 @@ import { ticker } from "../../../../z_lib/ui/timer/helper"
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_lib/ui/clock/mock"
 import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/init/mock"
-import {
-    mockGetScriptPathDetecter,
-    mockSecureServerURL,
-} from "../../../sign/get_script_path/mock"
-import {
-    mockAuthnRepository,
-    mockAuthzRepository,
-} from "../../../ticket/kernel/init/repository/mock"
+import { mockGetScriptPathDetecter, mockSecureServerURL } from "../../../sign/get_script_path/mock"
 
 import { initAuthenticatePasswordAction, initAuthenticatePasswordMaterial } from "./init"
 
 import { Clock } from "../../../../z_lib/ui/clock/infra"
 import { AuthenticatePasswordRemote, AuthenticatePasswordRemoteResult } from "../authenticate/infra"
-import {
-    AuthnRepository,
-    AuthzRepository,
-    RenewAuthTicketRemote,
-} from "../../../ticket/kernel/infra"
+import { AuthProfileRepository, RenewAuthTicketRemote } from "../../../ticket/kernel/infra"
 import { BoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
 
 import { AuthenticatePasswordView } from "./resource"
 
-import {
-    authzRepositoryConverter,
-    convertAuthRemote,
-} from "../../../ticket/kernel/convert"
+import { authProfileRepositoryConverter, convertAuthRemote } from "../../../ticket/kernel/convert"
 
 import { LoadScriptError } from "../../../sign/get_script_path/data"
+import { initMemoryDB } from "../../../../z_lib/ui/repository/init/memory"
+import { AuthProfile } from "../../../ticket/kernel/data"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")
@@ -200,8 +188,8 @@ function takeLongtime_elements() {
 }
 
 function initView(
-    authenticate: AuthenticatePasswordRemote,
-    renew: RenewAuthTicketRemote,
+    authenticateRemote: AuthenticatePasswordRemote,
+    renewRemote: RenewAuthTicketRemote,
     clock: Clock,
 ): Readonly<{
     view: AuthenticatePasswordView
@@ -212,16 +200,14 @@ function initView(
 }> {
     const currentURL = new URL("https://example.com/index.html")
 
-    const authn = standard_authn()
-    const authz = standard_authz()
+    const profileRepository = standard_profileRepository()
 
     const view = toApplicationView(
         initAuthenticatePasswordAction(
             initAuthenticatePasswordMaterial({
                 startContinuousRenew: {
-                    authn,
-                    authz,
-                    renew,
+                    profileRepository,
+                    renewRemote,
                     config: {
                         continuousRenewInterval: { interval_millisecond: 128 },
                         authnExpire: { expire_millisecond: 500 },
@@ -234,7 +220,7 @@ function initView(
                     },
                 },
                 authenticate: {
-                    authenticate,
+                    authenticateRemote,
                     config: {
                         takeLongtimeThreshold: { delay_millisecond: 32 },
                     },
@@ -255,18 +241,16 @@ function initView(
     return { view, store }
 }
 
-function standard_authn(): AuthnRepository {
-    return mockAuthnRepository()
-}
-function standard_authz(): AuthzRepository {
-    const result = authzRepositoryConverter.fromRepository({
+function standard_profileRepository(): AuthProfileRepository {
+    const result = authProfileRepositoryConverter.fromRepository({
+        authAt: "2020-01-01 00:00:00",
         roles: ["role"],
     })
     if (!result.valid) {
-        throw new Error("invalid authz")
+        throw new Error("invalid auth profile")
     }
 
-    const repository = mockAuthzRepository()
+    const repository = initMemoryDB<AuthProfile>()
     repository.set(result.value)
     return repository
 }

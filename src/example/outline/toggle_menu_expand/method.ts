@@ -28,17 +28,13 @@ interface ModifyExpand {
 }
 function modifyMenuExpand(modify: ModifyExpand): Toggle {
     return (infra, store) => async (menuTargetPath, path, post) => {
-        const { authz, menuExpand } = infra
+        const { version, menuTree, profileRepository, menuExpandRepository } = infra
 
-        const authzResult = await authz.get()
-        if (!authzResult.success) {
-            return post({ type: "repository-error", err: authzResult.err })
+        const profileResult = await profileRepository.get()
+        if (!profileResult.success) {
+            return post({ type: "repository-error", err: profileResult.err })
         }
-        if (!authzResult.found) {
-            const authzRemoveResult = await authz.remove()
-            if (!authzRemoveResult.success) {
-                return post({ type: "repository-error", err: authzRemoveResult.err })
-            }
+        if (!profileResult.found) {
             return post({ type: "required-to-login" })
         }
 
@@ -49,7 +45,7 @@ function modifyMenuExpand(modify: ModifyExpand): Toggle {
 
         // 別なタブで expand を変更した場合は上書き合戦になるが、マージは大変なのでさぼる
         // 対応が必要になったらストレージに update を追加してトランザクション内でマージする必要がある
-        const storeResult = await menuExpand.set(expand)
+        const storeResult = await menuExpandRepository.set(expand)
         if (!storeResult.success) {
             return post({ type: "repository-error", err: storeResult.err })
         }
@@ -62,10 +58,10 @@ function modifyMenuExpand(modify: ModifyExpand): Toggle {
         return post({
             type: "succeed-to-toggle",
             menu: buildMenu({
-                version: infra.version,
-                menuTree: infra.menuTree,
+                version,
+                menuTree,
                 menuTargetPath,
-                grantedRoles: authzResult.value.roles,
+                profile: profileResult.value,
                 menuExpand: expand,
                 menuBadge: badge,
             }),

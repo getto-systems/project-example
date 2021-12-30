@@ -1,4 +1,4 @@
-import { GetMenuBadgeRemote, MenuBadge } from "../../../infra"
+import { GetMenuBadgeRemote, MenuBadge } from "../../infra"
 
 export function newGetMenuBadgeNoopRemote(): GetMenuBadgeRemote {
     return async () => ({ success: true, value: EMPTY_BADGE })

@@ -1,13 +1,11 @@
 import { RemoteResult } from "../../../z_lib/ui/remote/infra"
-import { AuthzRepository } from "../kernel/infra"
-import { AuthnRepository } from "../kernel/infra"
+import { AuthProfileRepository } from "../kernel/infra"
 
 import { LogoutRemoteError } from "./data"
 
 export type LogoutInfra = Readonly<{
-    authn: AuthnRepository
-    authz: AuthzRepository
-    logout: LogoutRemote
+    profileRepository: AuthProfileRepository
+    logoutRemote: LogoutRemote
 }>
 
 export interface LogoutRemote {
