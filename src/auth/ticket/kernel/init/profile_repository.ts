@@ -38,7 +38,7 @@ export function newAuthProfileRepository({ webDB }: RepositoryOutsideFeature): A
             key: "last",
         }
         const db = initIndexedDB(webDB, {
-            database: env.database.authn,
+            database: env.database.authProfile,
             stores: [lastAuth.store],
         })
 
