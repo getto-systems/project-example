@@ -1,12 +1,14 @@
 import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
 
-import { AuthProfileRepository } from "../kernel/infra"
-
-import { authProfileRepositoryConverter } from "../kernel/convert"
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
-import { AuthProfile } from "../kernel/data"
-import { initLogoutAction, LogoutAction } from "./action"
+
+import { convertDB } from "../../../z_lib/ui/repository/init/convert"
+import { authProfileRepositoryConverter } from "../kernel/convert"
+
+import { AuthProfileRepository, AuthProfileRepositoryValue } from "../kernel/infra"
 import { LogoutRemote } from "./infra"
+
+import { initLogoutAction, LogoutAction } from "./action"
 
 describe("Logout", () => {
     test("logout", async () => {
@@ -35,34 +37,27 @@ describe("Logout", () => {
 })
 
 function standard() {
-    const resource = initResource(standard_profileRepository())
+    const resource = initResource()
 
     return { resource }
 }
 
-function initResource(
-    profileRepository: AuthProfileRepository,
-): Readonly<{ logout: LogoutAction }> {
+function initResource(): Readonly<{ logout: LogoutAction }> {
     return {
         logout: initLogoutAction({
-            profileRepository,
+            profileRepository: standard_profileRepository(),
             logoutRemote: standard_logoutRemote(),
         }),
     }
 }
 
 function standard_profileRepository(): AuthProfileRepository {
-    const result = authProfileRepositoryConverter.fromRepository({
-        authAt: new Date("2020-01-01 09:00:00").toISOString(),
+    const db = initMemoryDB<AuthProfileRepositoryValue>()
+    db.set({
+        authAt: "2020-01-01 09:00:00",
         roles: ["role"],
     })
-    if (!result.valid) {
-        throw new Error("invalid authn")
-    }
-
-    const repository = initMemoryDB<AuthProfile>()
-    repository.set(result.value)
-    return repository
+    return convertDB(db, authProfileRepositoryConverter)
 }
 
 function standard_logoutRemote(): LogoutRemote {
