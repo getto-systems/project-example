@@ -22,7 +22,7 @@ import { docs_authenticatePassword } from "./user/password/action_authenticate/d
 import { docs_loginID } from "./user/login_id/docs"
 import { docs_password } from "./user/password/docs"
 import { docs_authUser } from "./user/docs"
-import { docs_logout } from "./ticket/action_logout/docs"
+import { docs_logout } from "./ticket/logout/docs"
 import { docs_requestResetToken } from "./user/password/reset/action_request_token/docs"
 import { docs_reset } from "./user/password/reset/docs"
 import { docs_resetPassword } from "./user/password/reset/action_reset/docs"
