@@ -11,7 +11,11 @@ import { initAuthenticatePasswordAction, initAuthenticatePasswordMaterial } from
 
 import { Clock } from "../../../../z_lib/ui/clock/infra"
 import { AuthenticatePasswordRemote, AuthenticatePasswordRemoteResult } from "../authenticate/infra"
-import { AuthProfileRepository, RenewAuthTicketRemote } from "../../../ticket/kernel/infra"
+import {
+    AuthProfileRepository,
+    AuthProfileRepositoryValue,
+    RenewAuthTicketRemote,
+} from "../../../ticket/kernel/infra"
 import { BoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
 
 import { AuthenticatePasswordView } from "./resource"
@@ -20,7 +24,7 @@ import { authProfileRepositoryConverter, convertAuthRemote } from "../../../tick
 
 import { LoadScriptError } from "../../../sign/get_script_path/data"
 import { initMemoryDB } from "../../../../z_lib/ui/repository/init/memory"
-import { AuthProfile } from "../../../ticket/kernel/data"
+import { convertDB } from "../../../../z_lib/ui/repository/init/convert"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")
@@ -242,17 +246,12 @@ function initView(
 }
 
 function standard_profileRepository(): AuthProfileRepository {
-    const result = authProfileRepositoryConverter.fromRepository({
+    const db = initMemoryDB<AuthProfileRepositoryValue>()
+    db.set({
         authAt: "2020-01-01 00:00:00",
         roles: ["role"],
     })
-    if (!result.valid) {
-        throw new Error("invalid auth profile")
-    }
-
-    const repository = initMemoryDB<AuthProfile>()
-    repository.set(result.value)
-    return repository
+    return convertDB(db, authProfileRepositoryConverter)
 }
 
 function standard_authenticate(clock: Clock): AuthenticatePasswordRemote {

@@ -6,8 +6,16 @@ import { mockLoadMenuLocationDetecter } from "../kernel/mock"
 
 import { initLoadMenuAction, initLoadMenuMaterial } from "./init"
 
-import { AuthProfileRepository } from "../../../auth/ticket/kernel/infra"
-import { GetMenuBadgeRemote, MenuExpandRepository, LoadMenuDetecter, MenuExpand } from "../kernel/infra"
+import {
+    AuthProfileRepository,
+    AuthProfileRepositoryValue,
+} from "../../../auth/ticket/kernel/infra"
+import {
+    GetMenuBadgeRemote,
+    MenuExpandRepository,
+    LoadMenuDetecter,
+    MenuExpand,
+} from "../kernel/infra"
 
 import { LoadMenuResource } from "./resource"
 
@@ -15,6 +23,7 @@ import { convertMenuBadgeRemote, menuExpandRepositoryConverter } from "../kernel
 import { authProfileRepositoryConverter } from "../../../auth/ticket/kernel/convert"
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 import { AuthProfile } from "../../../auth/ticket/kernel/data"
+import { convertDB } from "../../../z_lib/ui/repository/init/convert"
 
 describe("Menu", () => {
     test("load menu", async () => {
@@ -327,7 +336,10 @@ describe("Menu", () => {
 })
 
 function standard() {
-    const [resource, menuExpand] = initResource(standard_profileRepository(), empty_menuExpandRepository())
+    const [resource, menuExpand] = initResource(
+        standard_profileRepository(),
+        empty_menuExpandRepository(),
+    )
 
     return { resource, menuExpand }
 }
@@ -383,33 +395,23 @@ function standard_version(): string {
 }
 
 function standard_profileRepository(): AuthProfileRepository {
-    const result = authProfileRepositoryConverter.fromRepository({
+    const db = initMemoryDB<AuthProfileRepositoryValue>()
+    db.set({
         authAt: "2020-01-01 00:00:00",
         roles: ["admin"],
     })
-    if (!result.valid) {
-        throw new Error("invalid auth profile")
-    }
-
-    const repository = initMemoryDB<AuthProfile>()
-    repository.set(result.value)
-    return repository
+    return convertDB(db, authProfileRepositoryConverter)
 }
 function empty_profileRepository(): AuthProfileRepository {
     return initMemoryDB<AuthProfile>()
 }
 function devDocs_authz(): AuthProfileRepository {
-    const result = authProfileRepositoryConverter.fromRepository({
+    const db = initMemoryDB<AuthProfileRepositoryValue>()
+    db.set({
         authAt: "2020-01-01 00:00:00",
         roles: ["admin", "dev-docs"],
     })
-    if (!result.valid) {
-        throw new Error("invalid auth profile")
-    }
-
-    const repository = initMemoryDB<AuthProfile>()
-    repository.set(result.value)
-    return repository
+    return convertDB(db, authProfileRepositoryConverter)
 }
 
 function empty_menuExpandRepository(): MenuExpandRepository {

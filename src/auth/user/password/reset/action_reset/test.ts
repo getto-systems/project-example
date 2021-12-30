@@ -15,7 +15,11 @@ import { initResetPasswordAction, initResetPasswordMaterial } from "./init"
 
 import { Clock } from "../../../../../z_lib/ui/clock/infra"
 import { ResetPasswordRemote, ResetPasswordRemoteResult } from "../reset/infra"
-import { AuthProfileRepository, RenewAuthTicketRemote } from "../../../../ticket/kernel/infra"
+import {
+    AuthProfileRepository,
+    AuthProfileRepositoryValue,
+    RenewAuthTicketRemote,
+} from "../../../../ticket/kernel/infra"
 import { BoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/infra"
 
 import { ResetPasswordView } from "./resource"
@@ -25,7 +29,7 @@ import {
     convertAuthRemote,
 } from "../../../../ticket/kernel/convert"
 import { initMemoryDB } from "../../../../../z_lib/ui/repository/init/memory"
-import { AuthProfile } from "../../../../ticket/kernel/data"
+import { convertDB } from "../../../../../z_lib/ui/repository/init/convert"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")
@@ -280,17 +284,12 @@ function emptyResetToken_URL(): URL {
 }
 
 function standard_profileRepository(): AuthProfileRepository {
-    const result = authProfileRepositoryConverter.fromRepository({
+    const db = initMemoryDB<AuthProfileRepositoryValue>()
+    db.set({
         authAt: "2020-01-01 00:00:00",
         roles: ["role"],
     })
-    if (!result.valid) {
-        throw new Error("invalid authz")
-    }
-
-    const repository = initMemoryDB<AuthProfile>()
-    repository.set(result.value)
-    return repository
+    return convertDB(db, authProfileRepositoryConverter)
 }
 
 function standard_resetRemote(clock: Clock): ResetPasswordRemote {

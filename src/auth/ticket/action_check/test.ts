@@ -9,7 +9,11 @@ import { initCheckAuthTicketAction, initCheckAuthTicketMaterial } from "./init"
 
 import { Clock } from "../../../z_lib/ui/clock/infra"
 import { WaitTime } from "../../../z_lib/ui/config/infra"
-import { AuthProfileRepository, RenewAuthTicketRemote } from "../kernel/infra"
+import {
+    AuthProfileRepository,
+    AuthProfileRepositoryValue,
+    RenewAuthTicketRemote,
+} from "../kernel/infra"
 
 import { CheckAuthTicketView } from "./resource"
 
@@ -18,6 +22,7 @@ import { authProfileRepositoryConverter, convertAuthRemote } from "../kernel/con
 import { LoadScriptError } from "../../sign/get_script_path/data"
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 import { AuthProfile } from "../kernel/data"
+import { convertDB } from "../../../z_lib/ui/repository/init/convert"
 
 // last auth at : テスト開始時刻と expire 設定によって instant load の可否が決まる
 const STORED_LAST_AUTH_AT = new Date("2020-01-01 10:00:00").toISOString()
@@ -273,17 +278,12 @@ function initView(
 }
 
 function standard_profileRepository(): AuthProfileRepository {
-    const result = authProfileRepositoryConverter.fromRepository({
+    const db = initMemoryDB<AuthProfileRepositoryValue>()
+    db.set({
         authAt: STORED_LAST_AUTH_AT,
         roles: ["role"],
     })
-    if (!result.valid) {
-        throw new Error("invalid authn")
-    }
-
-    const repository = initMemoryDB<AuthProfile>()
-    repository.set(result.value)
-    return repository
+    return convertDB(db, authProfileRepositoryConverter)
 }
 function noStored_profileRepository(): AuthProfileRepository {
     return initMemoryDB<AuthProfile>()
