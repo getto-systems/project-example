@@ -1,10 +1,6 @@
 import { env } from "../../../../y_environment/ui/env"
 import pb from "../../../../y_protobuf/proto.js"
 
-import {
-    fetchRepositoryRemovedResult,
-    mapFetchRepositoryResult,
-} from "../../../../z_lib/ui/repository/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../ui/vendor/protobuf/helper"
 import {
     IndexedDBTarget,
@@ -15,37 +11,25 @@ import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/featur
 
 import { AuthProfileRepository, AuthProfileRepositoryValue } from "../infra"
 import { authProfileRepositoryConverter } from "../convert"
+import { convertDB } from "../../../../z_lib/ui/repository/init/convert"
 
 export function newAuthProfileRepository({ webDB }: RepositoryOutsideFeature): AuthProfileRepository {
-    const db = initDB()
-
-    return {
-        get: () =>
-            mapFetchRepositoryResult(db.get(), async (value) => {
-                const result = authProfileRepositoryConverter.fromRepository(value)
-                if (!result.valid) {
-                    return fetchRepositoryRemovedResult(await db.remove())
-                }
-                return { success: true, found: true, value: result.value }
-            }),
-        set: (value) => db.set(authProfileRepositoryConverter.toRepository(value)),
-        remove: () => db.remove(),
-    }
+    return convertDB(initDB(), authProfileRepositoryConverter)
 
     function initDB() {
-        const lastAuth: IndexedDBTarget = {
+        const target: IndexedDBTarget = {
             store: "auth-profile",
             key: "last",
         }
         const db = initIndexedDB(webDB, {
             database: env.database.authProfile,
-            stores: [lastAuth.store],
+            stores: [target.store],
         })
 
         return {
-            get: () => db.get(lastAuth, fromDB),
-            set: (value: AuthProfileRepositoryValue) => db.set(lastAuth, toDB, value),
-            remove: () => db.remove(lastAuth),
+            get: () => db.get(target, fromDB),
+            set: (value: AuthProfileRepositoryValue) => db.set(target, toDB, value),
+            remove: () => db.remove(target),
         }
 
         function toDB(value: AuthProfileRepositoryValue): string {
