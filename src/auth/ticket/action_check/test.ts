@@ -3,27 +3,21 @@ import { toApplicationView } from "../../../../ui/vendor/getto-application/actio
 import { ticker } from "../../../z_lib/ui/timer/helper"
 
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../z_lib/ui/clock/mock"
-import { mockAuthnRepository, mockAuthzRepository } from "../kernel/init/repository/mock"
-import {
-    mockGetScriptPathDetecter,
-    mockSecureServerURL,
-} from "../../sign/get_script_path/mock"
+import { mockGetScriptPathDetecter, mockSecureServerURL } from "../../sign/get_script_path/mock"
 
 import { initCheckAuthTicketAction, initCheckAuthTicketMaterial } from "./init"
 
 import { Clock } from "../../../z_lib/ui/clock/infra"
 import { WaitTime } from "../../../z_lib/ui/config/infra"
-import { AuthnRepository, AuthzRepository, RenewAuthTicketRemote } from "../kernel/infra"
+import { AuthProfileRepository, RenewAuthTicketRemote } from "../kernel/infra"
 
 import { CheckAuthTicketView } from "./resource"
 
-import {
-    authnRepositoryConverter,
-    authzRepositoryConverter,
-    convertAuthRemote,
-} from "../kernel/convert"
+import { authProfileRepositoryConverter, convertAuthRemote } from "../kernel/convert"
 
 import { LoadScriptError } from "../../sign/get_script_path/data"
+import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
+import { AuthProfile } from "../kernel/data"
 
 // last auth at : テスト開始時刻と expire 設定によって instant load の可否が決まる
 const STORED_LAST_AUTH_AT = new Date("2020-01-01 10:00:00").toISOString()
@@ -204,9 +198,8 @@ function standard() {
     const clockPubSub = mockClockPubSub()
     const clock = mockClock(START_AT, clockPubSub)
     const view = initView(
-        standard_authn(),
-        standard_authz(),
-        standard_renew(clock, clockPubSub),
+        standard_profileRepository(),
+        standard_renewRemote(clock, clockPubSub),
         clock,
     )
 
@@ -216,9 +209,8 @@ function instantLoadable() {
     const clockPubSub = mockClockPubSub()
     const clock = mockClock(START_AT_INSTANT_LOAD_AVAILABLE, clockPubSub)
     const view = initView(
-        standard_authn(),
-        standard_authz(),
-        standard_renew(clock, clockPubSub),
+        standard_profileRepository(),
+        standard_renewRemote(clock, clockPubSub),
         clock,
     )
 
@@ -227,25 +219,23 @@ function instantLoadable() {
 function takeLongtime() {
     const clockPubSub = mockClockPubSub()
     const clock = mockClock(START_AT, clockPubSub)
-    const view = initView(standard_authn(), standard_authz(), wait_renew(clock, clockPubSub), clock)
+    const view = initView(standard_profileRepository(), wait_renewRemote(clock, clockPubSub), clock)
     return { clock: clockPubSub, view }
 }
 function noStored() {
     const clockPubSub = mockClockPubSub()
     const clock = mockClock(START_AT, clockPubSub)
     const view = initView(
-        noStored_authn(),
-        noStored_authz(),
-        standard_renew(clock, clockPubSub),
+        noStored_profileRepository(),
+        standard_renewRemote(clock, clockPubSub),
         clock,
     )
     return { view }
 }
 
 function initView(
-    authn: AuthnRepository,
-    authz: AuthzRepository,
-    renew: RenewAuthTicketRemote,
+    profileRepository: AuthProfileRepository,
+    renewRemote: RenewAuthTicketRemote,
     clock: Clock,
 ): CheckAuthTicketView {
     const currentURL = new URL("https://example.com/index.html")
@@ -254,9 +244,8 @@ function initView(
         initCheckAuthTicketAction(
             initCheckAuthTicketMaterial({
                 check: {
-                    authn,
-                    authz,
-                    renew,
+                    profileRepository,
+                    renewRemote,
                     config: {
                         instantLoadExpire: { expire_millisecond: 20 * 1000 },
                         takeLongtimeThreshold: { delay_millisecond: 32 },
@@ -264,9 +253,8 @@ function initView(
                     clock,
                 },
                 startContinuousRenew: {
-                    authn,
-                    authz,
-                    renew,
+                    profileRepository,
+                    renewRemote,
                     config: {
                         continuousRenewInterval: { interval_millisecond: 128 },
                         authnExpire: { expire_millisecond: 1 * 1000 },
@@ -284,42 +272,27 @@ function initView(
     )
 }
 
-function standard_authn(): AuthnRepository {
-    const result = authnRepositoryConverter.fromRepository({
+function standard_profileRepository(): AuthProfileRepository {
+    const result = authProfileRepositoryConverter.fromRepository({
         authAt: STORED_LAST_AUTH_AT,
+        roles: ["role"],
     })
     if (!result.valid) {
         throw new Error("invalid authn")
     }
 
-    const repository = mockAuthnRepository()
+    const repository = initMemoryDB<AuthProfile>()
     repository.set(result.value)
     return repository
 }
-function noStored_authn(): AuthnRepository {
-    return mockAuthnRepository()
+function noStored_profileRepository(): AuthProfileRepository {
+    return initMemoryDB<AuthProfile>()
 }
 
-function standard_authz(): AuthzRepository {
-    const result = authzRepositoryConverter.fromRepository({
-        roles: ["role"],
-    })
-    if (!result.valid) {
-        throw new Error("invalid authz")
-    }
-
-    const repository = mockAuthzRepository()
-    repository.set(result.value)
-    return repository
-}
-function noStored_authz(): AuthzRepository {
-    return mockAuthzRepository()
-}
-
-function standard_renew(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
+function standard_renewRemote(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
     return renewRemote(clock, clockPubSub, { wait_millisecond: 0 })
 }
-function wait_renew(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
+function wait_renewRemote(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
     // wait for take longtime timeout
     return renewRemote(clock, clockPubSub, { wait_millisecond: 64 })
 }

@@ -8,7 +8,7 @@ import { ValidateBoardAction } from "../../../../../../ui/vendor/getto-applicati
 import { ResetPasswordMethod } from "../reset/method"
 import { GetScriptPathMethod } from "../../../../sign/get_script_path/method"
 import {
-    SaveAuthTicketMethod,
+    SaveAuthProfileMethod,
     StartContinuousRenewMethod,
 } from "../../../../ticket/start_continuous_renew/method"
 
@@ -36,7 +36,7 @@ export const resetPasswordFieldNames = ["loginID", "password"] as const
 export type ResetPasswordFieldName = typeof resetPasswordFieldNames[number]
 
 export type ResetPasswordMaterial = Readonly<{
-    save: SaveAuthTicketMethod
+    save: SaveAuthProfileMethod
     startContinuousRenew: StartContinuousRenewMethod
     getSecureScriptPath: GetScriptPathMethod
     reset: ResetPasswordMethod

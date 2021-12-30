@@ -1,19 +1,19 @@
-import { env } from "../../../../../../y_environment/ui/env"
-import pb from "../../../../../../y_protobuf/proto.js"
+import { env } from "../../../../../y_environment/ui/env"
+import pb from "../../../../../y_protobuf/proto.js"
 
 import {
     fetchOptions,
     generateNonce,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../../z_lib/ui/remote/helper"
-import { decodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
+} from "../../../../../z_lib/ui/remote/helper"
+import { decodeProtobuf } from "../../../../../../ui/vendor/protobuf/helper"
 
-import { RemoteOutsideFeature } from "../../../../../../z_lib/ui/remote/feature"
+import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 
-import { GetMenuBadgeRemote } from "../../../infra"
+import { GetMenuBadgeRemote } from "../../infra"
 
-import { convertMenuBadgeRemote } from "../../../convert"
+import { convertMenuBadgeRemote } from "../../convert"
 
 export function newGetMenuBadgeRemote(feature: RemoteOutsideFeature): GetMenuBadgeRemote {
     return async () => {

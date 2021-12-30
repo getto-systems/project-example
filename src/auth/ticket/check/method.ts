@@ -14,9 +14,9 @@ interface Check {
     (infra: CheckAuthTicketInfra): CheckAuthTicketMethod
 }
 export const checkAuthTicket: Check = (infra) => async (post) => {
-    const { clock, config } = infra
+    const { clock, config, profileRepository: profile_repository } = infra
 
-    const findResult = await infra.authn.get()
+    const findResult = await profile_repository.get()
     if (!findResult.success) {
         return post({ type: "repository-error", err: findResult.err })
     }
@@ -28,7 +28,7 @@ export const checkAuthTicket: Check = (infra) => async (post) => {
         now: clock.now(),
         expire_millisecond: config.instantLoadExpire.expire_millisecond,
     }
-    if (!hasExpired(findResult.value.authAt, time)) {
+    if (!hasExpired(findResult.value, time)) {
         return post({ type: "try-to-instant-load" })
     }
 
@@ -50,17 +50,17 @@ async function renewTicket<S>(
     infra: CheckAuthTicketInfra,
     post: Post<RenewAuthTicketEvent, S>,
 ): Promise<S> {
-    const { config } = infra
+    const { config, profileRepository, renewRemote } = infra
 
     post({ type: "try-to-renew" })
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
-    const response = await delayedChecker(infra.renew(), config.takeLongtimeThreshold, () =>
+    const response = await delayedChecker(renewRemote(), config.takeLongtimeThreshold, () =>
         post({ type: "take-longtime-to-renew" }),
     )
     if (!response.success) {
         if (response.err.type === "unauthorized") {
-            const removeResult = await infra.authn.remove()
+            const removeResult = await profileRepository.remove()
             if (!removeResult.success) {
                 return post({ type: "repository-error", err: removeResult.err })
             }
@@ -69,14 +69,9 @@ async function renewTicket<S>(
         return post({ type: "failed-to-renew", err: response.err })
     }
 
-    const authnResult = await infra.authn.set(response.value.authn)
-    if (!authnResult.success) {
-        return post({ type: "repository-error", err: authnResult.err })
-    }
-
-    const authzResult = await infra.authz.set(response.value.authz)
-    if (!authzResult.success) {
-        return post({ type: "repository-error", err: authzResult.err })
+    const profileResult = await profileRepository.set(response.value)
+    if (!profileResult.success) {
+        return post({ type: "repository-error", err: profileResult.err })
     }
 
     return post({ type: "succeed-to-renew", auth: response.value })

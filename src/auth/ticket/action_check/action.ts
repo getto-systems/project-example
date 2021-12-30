@@ -2,7 +2,7 @@ import { ApplicationStateAction } from "../../../../ui/vendor/getto-application/
 
 import { GetScriptPathMethod } from "../../sign/get_script_path/method"
 import {
-    SaveAuthTicketMethod,
+    SaveAuthProfileMethod,
     StartContinuousRenewMethod,
 } from "../start_continuous_renew/method"
 import { RenewAuthTicketMethod, CheckAuthTicketMethod } from "../check/method"
@@ -24,7 +24,7 @@ export interface CheckAuthTicketAction extends ApplicationStateAction<CheckAuthT
 export type CheckAuthTicketMaterial = Readonly<{
     renew: CheckAuthTicketMethod
     forceRenew: RenewAuthTicketMethod
-    save: SaveAuthTicketMethod
+    save: SaveAuthProfileMethod
     startContinuousRenew: StartContinuousRenewMethod
     getSecureScriptPath: GetScriptPathMethod
 }>

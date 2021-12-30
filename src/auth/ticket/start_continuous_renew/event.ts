@@ -1,7 +1,7 @@
 import { RepositoryError } from "../../../z_lib/ui/repository/data"
 import { RenewAuthTicketError } from "../kernel/data"
 
-export type SaveAuthTicketEvent =
+export type SaveAuthProfileEvent =
     | Readonly<{ type: "succeed-to-save" }>
     | Readonly<{ type: "failed-to-save"; err: RepositoryError }>
 

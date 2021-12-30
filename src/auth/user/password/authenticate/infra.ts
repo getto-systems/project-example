@@ -1,11 +1,11 @@
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
 import { RemoteResult } from "../../../../z_lib/ui/remote/infra"
 
-import { AuthTicket } from "../../../ticket/kernel/data"
+import { AuthProfile } from "../../../ticket/kernel/data"
 import { AuthenticatePasswordFields, AuthenticatePasswordRemoteError } from "./data"
 
 export type AuthenticatePasswordInfra = Readonly<{
-    authenticate: AuthenticatePasswordRemote
+    authenticateRemote: AuthenticatePasswordRemote
     config: Readonly<{
         takeLongtimeThreshold: DelayTime
     }>
@@ -15,6 +15,6 @@ export interface AuthenticatePasswordRemote {
     (fields: AuthenticatePasswordFields): Promise<AuthenticatePasswordRemoteResult>
 }
 export type AuthenticatePasswordRemoteResult = RemoteResult<
-    AuthTicket,
+    AuthProfile,
     AuthenticatePasswordRemoteError
 >

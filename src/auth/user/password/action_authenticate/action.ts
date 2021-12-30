@@ -8,7 +8,7 @@ import { ValidateBoardAction } from "../../../../../ui/vendor/getto-application/
 import { AuthenticatePasswordMethod } from "../authenticate/method"
 import { GetScriptPathMethod } from "../../../sign/get_script_path/method"
 import {
-    SaveAuthTicketMethod,
+    SaveAuthProfileMethod,
     StartContinuousRenewMethod,
 } from "../../../ticket/start_continuous_renew/method"
 
@@ -37,7 +37,7 @@ export const authenticatePasswordFieldNames = ["loginID", "password"] as const
 export type AuthenticatePasswordFieldName = typeof authenticatePasswordFieldNames[number]
 
 export type AuthenticatePasswordMaterial = Readonly<{
-    save: SaveAuthTicketMethod
+    save: SaveAuthProfileMethod
     startContinuousRenew: StartContinuousRenewMethod
     getSecureScriptPath: GetScriptPathMethod
     authenticate: AuthenticatePasswordMethod

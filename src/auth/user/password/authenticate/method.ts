@@ -24,11 +24,11 @@ export const authenticatePassword: Authenticate = (infra) => async (fields, post
 
     post({ type: "try-to-login" })
 
-    const { config } = infra
+    const { config, authenticateRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(
-        infra.authenticate(fields.value),
+        authenticateRemote(fields.value),
         config.takeLongtimeThreshold,
         () => post({ type: "take-longtime-to-login" }),
     )

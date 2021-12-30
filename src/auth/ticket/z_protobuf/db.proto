@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package auth.ticket.db;
 
-message Authn_pb { string authAt = 1; }
-
-message Authz_pb { repeated string roles = 1; }
+message AuthProfile_pb {
+    string authAt = 1;
+    repeated string roles = 2;
+}

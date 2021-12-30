@@ -6,10 +6,6 @@ import { markBoardValue } from "../../../../../../ui/vendor/getto-application/bo
 import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/init/mock"
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../../z_lib/ui/clock/mock"
 import {
-    mockAuthnRepository,
-    mockAuthzRepository,
-} from "../../../../ticket/kernel/init/repository/mock"
-import {
     mockGetScriptPathDetecter,
     mockSecureServerURL,
 } from "../../../../sign/get_script_path/mock"
@@ -19,19 +15,17 @@ import { initResetPasswordAction, initResetPasswordMaterial } from "./init"
 
 import { Clock } from "../../../../../z_lib/ui/clock/infra"
 import { ResetPasswordRemote, ResetPasswordRemoteResult } from "../reset/infra"
-import {
-    AuthnRepository,
-    AuthzRepository,
-    RenewAuthTicketRemote,
-} from "../../../../ticket/kernel/infra"
+import { AuthProfileRepository, RenewAuthTicketRemote } from "../../../../ticket/kernel/infra"
 import { BoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/infra"
 
 import { ResetPasswordView } from "./resource"
 
 import {
-    authzRepositoryConverter,
+    authProfileRepositoryConverter,
     convertAuthRemote,
 } from "../../../../ticket/kernel/convert"
+import { initMemoryDB } from "../../../../../z_lib/ui/repository/init/memory"
+import { AuthProfile } from "../../../../ticket/kernel/data"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")
@@ -193,8 +187,8 @@ function standard() {
     const clock = mockClock(START_AT, clockPubSub)
     const view = initView(
         standard_URL(),
-        standard_reset(clock),
-        standard_renew(clock, clockPubSub),
+        standard_resetRemote(clock),
+        standard_renewRemote(clock, clockPubSub),
         clock,
     )
 
@@ -205,8 +199,8 @@ function takeLongtime() {
     const clock = mockClock(START_AT, clockPubSub)
     const view = initView(
         standard_URL(),
-        takeLongtime_reset(clock),
-        standard_renew(clock, clockPubSub),
+        takeLongtime_resetRemote(clock),
+        standard_renewRemote(clock, clockPubSub),
         clock,
     )
 
@@ -217,16 +211,16 @@ function emptyResetToken() {
     const clock = mockClock(START_AT, clockPubSub)
     return initView(
         emptyResetToken_URL(),
-        standard_reset(clock),
-        standard_renew(clock, clockPubSub),
+        standard_resetRemote(clock),
+        standard_renewRemote(clock, clockPubSub),
         clock,
     )
 }
 
 function initView(
     currentURL: URL,
-    reset: ResetPasswordRemote,
-    renew: RenewAuthTicketRemote,
+    resetRemote: ResetPasswordRemote,
+    renewRemote: RenewAuthTicketRemote,
     clock: Clock,
 ): Readonly<{
     view: ResetPasswordView
@@ -235,16 +229,14 @@ function initView(
         password: BoardValueStore
     }>
 }> {
-    const authn = standard_authn()
-    const authz = standard_authz()
+    const profileRepository = standard_profileRepository()
 
     const view = toApplicationView(
         initResetPasswordAction(
             initResetPasswordMaterial({
                 startContinuousRenew: {
-                    authn: authn,
-                    authz,
-                    renew,
+                    profileRepository,
+                    renewRemote,
                     config: {
                         continuousRenewInterval: { interval_millisecond: 64 },
                         authnExpire: { expire_millisecond: 500 },
@@ -257,7 +249,7 @@ function initView(
                     },
                 },
                 reset: {
-                    reset,
+                    resetRemote: resetRemote,
                     config: {
                         takeLongtimeThreshold: { delay_millisecond: 32 },
                     },
@@ -287,26 +279,24 @@ function emptyResetToken_URL(): URL {
     return new URL("https://example.com/index.html")
 }
 
-function standard_authn(): AuthnRepository {
-    return mockAuthnRepository()
-}
-function standard_authz(): AuthzRepository {
-    const result = authzRepositoryConverter.fromRepository({
+function standard_profileRepository(): AuthProfileRepository {
+    const result = authProfileRepositoryConverter.fromRepository({
+        authAt: "2020-01-01 00:00:00",
         roles: ["role"],
     })
     if (!result.valid) {
         throw new Error("invalid authz")
     }
 
-    const repository = mockAuthzRepository()
+    const repository = initMemoryDB<AuthProfile>()
     repository.set(result.value)
     return repository
 }
 
-function standard_reset(clock: Clock): ResetPasswordRemote {
+function standard_resetRemote(clock: Clock): ResetPasswordRemote {
     return async () => standard_resetPasswordRemoteResult(clock)
 }
-function takeLongtime_reset(clock: Clock): ResetPasswordRemote {
+function takeLongtime_resetRemote(clock: Clock): ResetPasswordRemote {
     return async () =>
         ticker({ wait_millisecond: 64 }, () => standard_resetPasswordRemoteResult(clock))
 }
@@ -317,7 +307,7 @@ function standard_resetPasswordRemoteResult(clock: Clock): ResetPasswordRemoteRe
     }
 }
 
-function standard_renew(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
+function standard_renewRemote(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
     let count = 0
     return async () => {
         if (count > 1) {
