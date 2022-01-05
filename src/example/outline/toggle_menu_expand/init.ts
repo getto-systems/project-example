@@ -1,6 +1,6 @@
 import { env } from "../../../y_environment/ui/env"
 
-import { newAuthProfileRepository } from "../../../auth/ticket/kernel/init/profile_repository"
+import { newAuthTicketRepository } from "../../../auth/ticket/kernel/init/ticket_repository"
 import { newMenuExpandRepository } from "../kernel/init/menu_expand_repository"
 
 import { RepositoryOutsideFeature } from "../../../z_lib/ui/repository/feature"
@@ -15,7 +15,7 @@ export function newToggleMenuExpandInfra(
     return {
         version: env.version,
         menuTree: menuContent.menuTree,
-        profileRepository: newAuthProfileRepository(feature),
+        ticketRepository: newAuthTicketRepository(feature),
         menuExpandRepository: newMenuExpandRepository(feature, menuContent),
     }
 }

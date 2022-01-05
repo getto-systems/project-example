@@ -1,4 +1,4 @@
-import { auth_config } from "../../../x_outside_feature/config"
+import { AUTH_CONFIG } from "../../../x_outside_feature/config"
 
 import { newSearchAuthUserAccountRemote } from "./init/remote"
 
@@ -19,7 +19,7 @@ export function newSearchAuthUserAccountInfra(feature: RemoteOutsideFeature): Se
     return {
         search: newSearchAuthUserAccountRemote(feature),
         config: {
-            takeLongtimeThreshold: auth_config.takeLongtimeThreshold,
+            takeLongtimeThreshold: AUTH_CONFIG.takeLongtimeThreshold,
         },
     }
 }

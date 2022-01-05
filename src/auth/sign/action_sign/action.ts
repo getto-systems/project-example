@@ -1,9 +1,12 @@
-import { ApplicationStateAction } from "../../../../ui/vendor/getto-application/action/action"
+import {
+    ApplicationStateAction,
+    ApplicationView,
+} from "../../../../ui/vendor/getto-application/action/action"
+import { CheckAuthTicketAction } from "../../ticket/check/action"
+import { AuthenticatePasswordAction } from "../../user/password/authenticate/action"
 
-import { CheckAuthTicketView } from "../../ticket/action_check/resource"
-import { AuthenticatePasswordView } from "../../user/password/action_authenticate/resource"
 import { RequestResetTokenView } from "../../user/password/reset/action_request_token/resource"
-import { ResetPasswordView } from "../../user/password/reset/action_reset/resource"
+import { ResetPasswordAction } from "../../user/password/reset/reset/action"
 import { SignLinkResource } from "../action_nav/resource"
 
 export type SignAction = ApplicationStateAction<SignActionState>
@@ -11,21 +14,21 @@ export type SignAction = ApplicationStateAction<SignActionState>
 export interface SignSubView {
     link(): SignLinkResource
 
-    check(): CheckAuthTicketView
+    check(): ApplicationView<CheckAuthTicketAction>
 
-    password_authenticate(): AuthenticatePasswordView
+    password_authenticate(): ApplicationView<AuthenticatePasswordAction>
 
     password_reset_requestToken(): RequestResetTokenView
-    password_reset(): ResetPasswordView
+    password_reset(): ApplicationView<ResetPasswordAction>
 }
 
 export type SignActionState =
     | Readonly<{ type: "initial-view" }>
     | Static<"privacyPolicy">
-    | View<"check-authTicket", CheckAuthTicketView>
-    | View<"password-authenticate", AuthenticatePasswordView>
+    | View<"check-authTicket", ApplicationView<CheckAuthTicketAction>>
+    | View<"password-authenticate", ApplicationView<AuthenticatePasswordAction>>
     | View<"password-reset-requestToken", RequestResetTokenView>
-    | View<"password-reset", ResetPasswordView>
+    | View<"password-reset", ApplicationView<ResetPasswordAction>>
     | Readonly<{ type: "error"; err: string }>
 
 type Static<T extends string> = Readonly<{ type: `static-${T}`; resource: SignLinkResource }>

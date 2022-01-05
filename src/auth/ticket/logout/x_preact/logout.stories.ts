@@ -8,7 +8,7 @@ import { initMemoryDB } from "../../../../z_lib/ui/repository/init/memory"
 
 import { initLogoutAction, LogoutState } from "../action"
 
-import { AuthProfile } from "../../kernel/data"
+import { AuthTicket } from "../../kernel/data"
 
 const options = ["initial", "failed"] as const
 
@@ -29,7 +29,7 @@ type Props = Readonly<{
 const template = storyTemplate<Props>((props) => {
     return h(LogoutComponent, {
         logout: initLogoutAction({
-            profileRepository: initMemoryDB<AuthProfile>(),
+            ticketRepository: initMemoryDB<AuthTicket>(),
             logoutRemote: async () => ({ success: true, value: true }),
         }),
         state: state(),

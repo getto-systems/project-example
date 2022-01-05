@@ -8,10 +8,10 @@ import {
 } from "../../../../../ui/vendor/getto-application/action/x_preact/hooks"
 
 import { ApplicationErrorComponent } from "../../../../avail/x_preact/application_error"
-import { CheckAuthTicketEntry } from "../../../ticket/action_check/x_preact/check_auth_info"
-import { AuthenticatePasswordEntry } from "../../../user/password/action_authenticate/x_preact/authenticate_password"
+import { CheckAuthTicketEntry } from "../../../ticket/check/x_preact/check_ticket"
+import { AuthenticatePasswordEntry } from "../../../user/password/authenticate/x_preact/authenticate_password"
 import { RequestResetTokenEntry } from "../../../user/password/reset/action_request_token/x_preact/request_token"
-import { ResetPasswordEntry } from "../../../user/password/reset/action_reset/x_preact/reset_password"
+import { ResetPasswordEntry } from "../../../user/password/reset/reset/x_preact/reset_password"
 
 import { SignView, SignResource, SignResourceState } from "../resource"
 import { PrivacyPolicyComponent } from "./privacy_policy"

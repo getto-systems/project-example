@@ -18,9 +18,9 @@ interface Update {
     (infra: UpdateMenuBadgeInfra, store: UpdateMenuBadgeStore): UpdateMenuBadgeMethod
 }
 export const updateMenuBadge: Update = (infra, store) => async (menuTargetPath, post) => {
-    const { version, menuTree, profileRepository, getMenuBadgeRemote } = infra
+    const { version, menuTree, ticketRepository, getMenuBadgeRemote } = infra
 
-    const profileResult = await profileRepository.get()
+    const profileResult = await ticketRepository.get()
     if (!profileResult.success) {
         return post({ type: "repository-error", err: profileResult.err })
     }

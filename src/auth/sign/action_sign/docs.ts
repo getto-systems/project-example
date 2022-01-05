@@ -11,7 +11,7 @@ import {
 import {
     docs_auth_checkAuthTicket,
     docs_auth_checkAuthTicket_description,
-} from "../../ticket/action_check/docs"
+} from "../../ticket/check/docs"
 import {
     docs_auth_logout,
     docs_auth_logout_description,
@@ -19,7 +19,7 @@ import {
 import {
     docs_auth_authenticatePassword,
     docs_auth_authenticatePassword_description,
-} from "../../user/password/action_authenticate/docs"
+} from "../../user/password/authenticate/docs"
 import {
     docs_auth_resetPassword,
     docs_auth_resetPassword_data,
