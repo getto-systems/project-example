@@ -1,4 +1,4 @@
-import { mockGetScriptPathShell } from "../../../../../sign/get_script_path/mock"
+import { mockGetScriptPathShell } from "../../../../../sign/get_script_path/init/mock"
 
 import { detectResetToken } from "../../../input/convert"
 

@@ -5,7 +5,7 @@ import { toApplicationView } from "../../../../../../ui/vendor/getto-application
 import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/init/mock"
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../../z_lib/ui/clock/mock"
-import { mockSecureServerURL } from "../../../../sign/get_script_path/mock"
+import { mockSecureServerURL } from "../../../../sign/get_script_path/init/mock"
 import { mockResetPasswordShell } from "./init/mock"
 
 import { Clock } from "../../../../../z_lib/ui/clock/infra"

@@ -1,6 +1,6 @@
-import { detectPathname } from "./convert"
+import { detectPathname } from "../convert"
 
-import { SecureServerURL, GetScriptPathShell } from "./infra"
+import { SecureServerURL, GetScriptPathShell } from "../infra"
 
 export function mockGetScriptPathShell(currentURL: URL): GetScriptPathShell {
     return {

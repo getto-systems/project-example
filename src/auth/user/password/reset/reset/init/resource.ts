@@ -2,7 +2,7 @@ import { toApplicationView } from "../../../../../../../ui/vendor/getto-applicat
 
 import { newResetPasswordConfig } from "./config"
 
-import { newGetScriptPathShell } from "../../../../../sign/get_script_path/init"
+import { newGetScriptPathShell } from "../../../../../sign/get_script_path/init/infra"
 import { toURL } from "../../../../../../z_lib/ui/location/init"
 import { newClock } from "../../../../../../z_lib/ui/clock/init"
 import { newAuthTicketRepository } from "../../../../../ticket/kernel/init/ticket_repository"

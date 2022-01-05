@@ -2,7 +2,7 @@ import { toApplicationView } from "../../../../../ui/vendor/getto-application/ac
 
 import { newCheckAuthTicketConfig } from "./config"
 
-import { newGetScriptPathShell } from "../../../sign/get_script_path/init"
+import { newGetScriptPathShell } from "../../../sign/get_script_path/init/infra"
 import { newAuthTicketRepository } from "../../kernel/init/ticket_repository"
 import { newRenewAuthTicketRemote } from "../../kernel/init/renew_remote"
 import { newClock } from "../../../../z_lib/ui/clock/init"

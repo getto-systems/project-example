@@ -8,7 +8,7 @@ import { newCheckAuthTicketConfig } from "../../ticket/check/init/config"
 import { mockRequestResetTokenAction } from "../../user/password/reset/action_request_token/mock"
 import { mockSignViewLocationDetecter } from "../router/mock"
 import { mockResetPasswordShell } from "../../user/password/reset/reset/init/mock"
-import { mockGetScriptPathShell } from "../get_script_path/mock"
+import { mockGetScriptPathShell } from "../get_script_path/init/mock"
 import { mockRemoteInfraError } from "../../../z_lib/ui/remote/mock"
 
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"

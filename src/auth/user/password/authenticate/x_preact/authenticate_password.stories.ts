@@ -7,7 +7,7 @@ import { AuthenticatePasswordComponent } from "./authenticate_password"
 import { newAuthenticatePasswordConfig } from "../init/config"
 import { newClock } from "../../../../../z_lib/ui/clock/init"
 import { initMemoryDB } from "../../../../../z_lib/ui/repository/init/memory"
-import { mockGetScriptPathShell } from "../../../../sign/get_script_path/mock"
+import { mockGetScriptPathShell } from "../../../../sign/get_script_path/init/mock"
 import { mockRemoteInfraError } from "../../../../../z_lib/ui/remote/mock"
 
 import { AuthenticatePasswordState, initAuthenticatePasswordAction } from "../action"

@@ -3,7 +3,7 @@ import { toApplicationView } from "../../../../ui/vendor/getto-application/actio
 import { ticker } from "../../../z_lib/ui/timer/helper"
 
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../z_lib/ui/clock/mock"
-import { mockGetScriptPathShell, mockSecureServerURL } from "../../sign/get_script_path/mock"
+import { mockGetScriptPathShell, mockSecureServerURL } from "../../sign/get_script_path/init/mock"
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"

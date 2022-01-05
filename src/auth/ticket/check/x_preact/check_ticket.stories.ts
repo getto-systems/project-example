@@ -7,7 +7,7 @@ import { CheckAuthTicketComponent } from "./check_ticket"
 import { newCheckAuthTicketConfig } from "../init/config"
 
 import { mockRemoteInfraError } from "../../../../z_lib/ui/remote/mock"
-import { mockGetScriptPathShell } from "../../../sign/get_script_path/mock"
+import { mockGetScriptPathShell } from "../../../sign/get_script_path/init/mock"
 import { initMemoryDB } from "../../../../z_lib/ui/repository/init/memory"
 import { newClock } from "../../../../z_lib/ui/clock/init"
 

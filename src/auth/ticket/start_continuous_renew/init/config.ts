@@ -1,6 +1,6 @@
-import { AUTH_CONFIG } from "../../x_outside_feature/config"
+import { AUTH_CONFIG } from "../../../x_outside_feature/config"
 
-import { StartContinuousRenewConfig } from "./infra"
+import { StartContinuousRenewConfig } from "../infra"
 
 export function newStartContinuousRenewConfig(): StartContinuousRenewConfig {
     return {
