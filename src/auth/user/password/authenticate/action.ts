@@ -54,7 +54,7 @@ export type AuthenticatePasswordState =
     | Readonly<{ type: "take-longtime-to-login" }>
     | Readonly<{ type: "failed-to-login"; err: AuthenticatePasswordError }>
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
-    | StartContinuousRenewEvent
+    | Exclude<StartContinuousRenewEvent, { type: "succeed-to-start-continuous-renew" }>
     | Readonly<{ type: "try-to-load"; scriptPath: ConvertScriptPathResult }>
     | Readonly<{ type: "load-error"; err: LoadScriptError }>
 

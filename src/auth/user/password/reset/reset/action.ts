@@ -54,7 +54,7 @@ export type ResetPasswordState =
     | Readonly<{ type: "take-longtime-to-reset" }>
     | Readonly<{ type: "failed-to-reset"; err: ResetPasswordError }>
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
-    | StartContinuousRenewEvent
+    | Exclude<StartContinuousRenewEvent, { type: "succeed-to-start-continuous-renew" }>
     | Readonly<{ type: "try-to-load"; scriptPath: ConvertScriptPathResult }>
     | Readonly<{ type: "load-error"; err: LoadScriptError }>
 

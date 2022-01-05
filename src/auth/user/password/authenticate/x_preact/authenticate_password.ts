@@ -95,7 +95,6 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
                 // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
                 return EMPTY_CONTENT
 
-            case "succeed-to-start-continuous-renew":
             case "succeed-to-renew":
             case "ticket-not-expired":
             case "required-to-login":
