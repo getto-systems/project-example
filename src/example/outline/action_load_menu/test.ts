@@ -6,10 +6,7 @@ import { mockLoadMenuLocationDetecter } from "../kernel/mock"
 
 import { initLoadMenuAction, initLoadMenuMaterial } from "./init"
 
-import {
-    AuthProfileRepository,
-    AuthProfileRepositoryValue,
-} from "../../../auth/ticket/kernel/infra"
+import { AuthTicketRepository, AuthTicketRepositoryValue } from "../../../auth/ticket/kernel/infra"
 import {
     GetMenuBadgeRemote,
     MenuExpandRepository,
@@ -20,9 +17,9 @@ import {
 import { LoadMenuResource } from "./resource"
 
 import { convertMenuBadgeRemote, menuExpandRepositoryConverter } from "../kernel/convert"
-import { authProfileRepositoryConverter } from "../../../auth/ticket/kernel/convert"
+import { authTicketRepositoryConverter } from "../../../auth/ticket/kernel/convert"
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
-import { AuthProfile } from "../../../auth/ticket/kernel/data"
+import { AuthTicket } from "../../../auth/ticket/kernel/data"
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"
 
 describe("Menu", () => {
@@ -337,14 +334,14 @@ describe("Menu", () => {
 
 function standard() {
     const [resource, menuExpand] = initResource(
-        standard_profileRepository(),
+        standard_ticketRepository(),
         empty_menuExpandRepository(),
     )
 
     return { resource, menuExpand }
 }
 function empty() {
-    const [resource] = initResource(empty_profileRepository(), empty_menuExpandRepository())
+    const [resource] = initResource(empty_ticketRepository(), empty_menuExpandRepository())
 
     return { resource }
 }
@@ -354,13 +351,13 @@ function devDocs() {
     return { resource }
 }
 function expand() {
-    const [resource] = initResource(standard_profileRepository(), expand_menuExpandRepository())
+    const [resource] = initResource(standard_ticketRepository(), expand_menuExpandRepository())
 
     return { resource }
 }
 
 function initResource(
-    profileRepository: AuthProfileRepository,
+    ticketRepository: AuthTicketRepository,
     menuExpandRepository: MenuExpandRepository,
 ): [LoadMenuResource, MenuExpandRepository] {
     const version = standard_version()
@@ -373,7 +370,7 @@ function initResource(
                 initLoadMenuMaterial({
                     version,
                     menuTree: standard_MenuTree(),
-                    profileRepository,
+                    ticketRepository,
                     menuExpandRepository,
                     getMenuBadgeRemote,
                 }),
@@ -394,24 +391,24 @@ function standard_version(): string {
     return "1.0.0"
 }
 
-function standard_profileRepository(): AuthProfileRepository {
-    const db = initMemoryDB<AuthProfileRepositoryValue>()
+function standard_ticketRepository(): AuthTicketRepository {
+    const db = initMemoryDB<AuthTicketRepositoryValue>()
     db.set({
         authAt: "2020-01-01 00:00:00",
         roles: ["admin"],
     })
-    return convertDB(db, authProfileRepositoryConverter)
+    return convertDB(db, authTicketRepositoryConverter)
 }
-function empty_profileRepository(): AuthProfileRepository {
-    return initMemoryDB<AuthProfile>()
+function empty_ticketRepository(): AuthTicketRepository {
+    return initMemoryDB<AuthTicket>()
 }
-function devDocs_authz(): AuthProfileRepository {
-    const db = initMemoryDB<AuthProfileRepositoryValue>()
+function devDocs_authz(): AuthTicketRepository {
+    const db = initMemoryDB<AuthTicketRepositoryValue>()
     db.set({
         authAt: "2020-01-01 00:00:00",
         roles: ["admin", "dev-docs"],
     })
-    return convertDB(db, authProfileRepositoryConverter)
+    return convertDB(db, authTicketRepositoryConverter)
 }
 
 function empty_menuExpandRepository(): MenuExpandRepository {

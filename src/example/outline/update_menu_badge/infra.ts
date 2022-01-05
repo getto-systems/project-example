@@ -1,10 +1,10 @@
-import { AuthProfileRepository } from "../../../auth/ticket/kernel/infra"
+import { AuthTicketRepository } from "../../../auth/ticket/kernel/infra"
 import { GetMenuBadgeRemote, MenuBadgeStore, MenuExpandStore, MenuTree } from "../kernel/infra"
 
 export type UpdateMenuBadgeInfra = Readonly<{
     version: string
     menuTree: MenuTree
-    profileRepository: AuthProfileRepository
+    ticketRepository: AuthTicketRepository
     getMenuBadgeRemote: GetMenuBadgeRemote
 }>
 

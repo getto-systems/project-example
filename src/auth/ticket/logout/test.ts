@@ -3,9 +3,9 @@ import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/a
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"
-import { authProfileRepositoryConverter } from "../kernel/convert"
+import { authTicketRepositoryConverter } from "../kernel/convert"
 
-import { AuthProfileRepository, AuthProfileRepositoryValue } from "../kernel/infra"
+import { AuthTicketRepository, AuthTicketRepositoryValue } from "../kernel/infra"
 import { LogoutRemote } from "./infra"
 
 import { initLogoutAction, LogoutAction } from "./action"
@@ -45,19 +45,19 @@ function standard() {
 function initResource(): Readonly<{ logout: LogoutAction }> {
     return {
         logout: initLogoutAction({
-            profileRepository: standard_profileRepository(),
+            ticketRepository: standard_ticketRepository(),
             logoutRemote: standard_logoutRemote(),
         }),
     }
 }
 
-function standard_profileRepository(): AuthProfileRepository {
-    const db = initMemoryDB<AuthProfileRepositoryValue>()
+function standard_ticketRepository(): AuthTicketRepository {
+    const db = initMemoryDB<AuthTicketRepositoryValue>()
     db.set({
         authAt: "2020-01-01 09:00:00",
         roles: ["role"],
     })
-    return convertDB(db, authProfileRepositoryConverter)
+    return convertDB(db, authTicketRepositoryConverter)
 }
 
 function standard_logoutRemote(): LogoutRemote {

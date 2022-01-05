@@ -1,13 +1,13 @@
 import { RepositoryConverter } from "../../../z_lib/ui/repository/infra"
 
 import { Clock } from "../../../z_lib/ui/clock/infra"
-import { AuthRemoteValue, AuthProfileRepositoryValue } from "./infra"
+import { AuthRemoteValue, AuthTicketRepositoryValue } from "./infra"
 
-import { AuthProfile } from "./data"
+import { AuthTicket } from "./data"
 
-export const authProfileRepositoryConverter: RepositoryConverter<
-    AuthProfile,
-    AuthProfileRepositoryValue
+export const authTicketRepositoryConverter: RepositoryConverter<
+    AuthTicket,
+    AuthTicketRepositoryValue
 > = {
     toRepository: (value) => ({
         authAt: value.authAt.toISOString(),
@@ -27,11 +27,11 @@ export const authProfileRepositoryConverter: RepositoryConverter<
     },
 }
 
-export function convertAuthRemote(clock: Clock, value: AuthRemoteValue): AuthProfile {
+export function convertAuthRemote(clock: Clock, value: AuthRemoteValue): AuthTicket {
     // remote からの値はバリデーションせずに受け取る
     return markAuthProfile(clock.now(), value.roles)
 }
 
-function markAuthProfile(authAt: Date, roles: string[]): AuthProfile {
-    return { authAt, roles } as AuthProfile
+function markAuthProfile(authAt: Date, roles: string[]): AuthTicket {
+    return { authAt, roles } as AuthTicket
 }

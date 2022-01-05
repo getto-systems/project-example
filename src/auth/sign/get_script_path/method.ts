@@ -1,20 +1,14 @@
-import { GetScriptPathInfra } from "./infra"
+import { GetScriptPathConfig, GetScriptPathShell } from "./infra"
 
 import { toScriptPath } from "./convert"
 
-import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
-import { ConvertScriptPathResult, LocationPathname } from "./data"
+import { ConvertScriptPathResult } from "./data"
 
-export interface GetScriptPathMethod {
-    (pathname: ConvertLocationResult<LocationPathname>): ConvertScriptPathResult
-}
-
-interface GetSecureScriptPath {
-    (infra: GetScriptPathInfra): GetScriptPathMethod
-}
-export const getScriptPath: GetSecureScriptPath = (infra) => (pathname) => {
-    const { config } = infra
-
+export function getScriptPath(
+    config: GetScriptPathConfig,
+    shell: GetScriptPathShell,
+): ConvertScriptPathResult {
+    const pathname = shell.detectLocationPathname()
     if (!pathname.valid) {
         return { valid: false }
     }

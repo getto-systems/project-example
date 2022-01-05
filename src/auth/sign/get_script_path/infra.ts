@@ -1,14 +1,16 @@
 import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 import { LocationPathname } from "./data"
 
-export type GetScriptPathInfra = Readonly<{
-    config: Readonly<{
-        secureServerURL: SecureServerURL
-    }>
+export type GetScriptPathConfig = Readonly<{
+    secureServerURL: SecureServerURL
 }>
 
 export type SecureServerURL = string & { SecureServerURL: never }
 
-export interface GetScriptPathDetecter {
+export type GetScriptPathShell = Readonly<{
+    detectLocationPathname: LocationPathnameDetecter
+}>
+
+export interface LocationPathnameDetecter {
     (): ConvertLocationResult<LocationPathname>
 }

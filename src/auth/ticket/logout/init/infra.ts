@@ -1,7 +1,7 @@
 import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/feature"
 import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
 
-import { newAuthProfileRepository } from "../../kernel/init/profile_repository"
+import { newAuthTicketRepository } from "../../kernel/init/ticket_repository"
 import { newLogoutRemote } from "./logout_remote"
 
 import { LogoutInfra } from "../action"
@@ -9,7 +9,7 @@ import { LogoutInfra } from "../action"
 type OutsideFeature = RemoteOutsideFeature & RepositoryOutsideFeature
 export function newLogoutInfra(feature: OutsideFeature): LogoutInfra {
     return {
-        profileRepository: newAuthProfileRepository(feature),
+        ticketRepository: newAuthTicketRepository(feature),
         logoutRemote: newLogoutRemote(feature),
     }
 }

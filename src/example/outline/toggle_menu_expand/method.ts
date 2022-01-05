@@ -28,9 +28,9 @@ interface ModifyExpand {
 }
 function modifyMenuExpand(modify: ModifyExpand): Toggle {
     return (infra, store) => async (menuTargetPath, path, post) => {
-        const { version, menuTree, profileRepository, menuExpandRepository } = infra
+        const { version, menuTree, ticketRepository, menuExpandRepository } = infra
 
-        const profileResult = await profileRepository.get()
+        const profileResult = await ticketRepository.get()
         if (!profileResult.success) {
             return post({ type: "repository-error", err: profileResult.err })
         }

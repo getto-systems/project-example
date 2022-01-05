@@ -1,9 +1,11 @@
 import { detectPathname } from "./convert"
 
-import { SecureServerURL, GetScriptPathDetecter } from "./infra"
+import { SecureServerURL, GetScriptPathShell } from "./infra"
 
-export function mockGetScriptPathDetecter(currentURL: URL): GetScriptPathDetecter {
-    return () => detectPathname(currentURL)
+export function mockGetScriptPathShell(currentURL: URL): GetScriptPathShell {
+    return {
+        detectLocationPathname: () => detectPathname(currentURL),
+    }
 }
 
 export function mockSecureServerURL(url: string): SecureServerURL {

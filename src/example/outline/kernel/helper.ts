@@ -11,14 +11,14 @@ import {
 } from "./infra"
 
 import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
-import { AuthProfile } from "../../../auth/ticket/kernel/data"
+import { AuthTicket } from "../../../auth/ticket/kernel/data"
 import { Menu, MenuCategoryPath, MenuNode, MenuTargetPath } from "./data"
 
 export type BuildMenuParams = Readonly<{
     version: string
     menuTree: MenuTree
     menuTargetPath: ConvertLocationResult<MenuTargetPath>
-    profile: AuthProfile
+    profile: AuthTicket
     menuExpand: MenuExpand
     menuBadge: MenuBadge
 }>

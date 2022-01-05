@@ -1,5 +1,5 @@
 import { docs_auth_sign, docs_auth_sign_action, docs_auth_sign_data } from "./sign/action_sign/docs"
-import { docs_checkAuthTicket } from "./ticket/action_check/docs"
+import { docs_checkAuthTicket } from "./ticket/check/docs"
 
 import {
     docsUsecase,
@@ -18,14 +18,14 @@ import {
     DocsUsecaseDescription,
 } from "../../ui/vendor/getto-application/docs/data"
 import { docs_authTicket } from "./ticket/docs"
-import { docs_authenticatePassword } from "./user/password/action_authenticate/docs"
+import { docs_authenticatePassword } from "./user/password/authenticate/docs"
 import { docs_loginID } from "./user/login_id/docs"
 import { docs_password } from "./user/password/docs"
 import { docs_authUser } from "./user/docs"
 import { docs_logout } from "./ticket/logout/docs"
 import { docs_requestResetToken } from "./user/password/reset/action_request_token/docs"
 import { docs_reset } from "./user/password/reset/docs"
-import { docs_resetPassword } from "./user/password/reset/action_reset/docs"
+import { docs_resetPassword } from "./user/password/reset/reset/docs"
 
 export const docs_auth = docsDomain<AuthUsecase, AuthAction, AuthData>(
     "認証・認可",

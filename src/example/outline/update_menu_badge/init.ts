@@ -1,6 +1,6 @@
 import { env } from "../../../y_environment/ui/env"
 
-import { newAuthProfileRepository } from "../../../auth/ticket/kernel/init/profile_repository"
+import { newAuthTicketRepository } from "../../../auth/ticket/kernel/init/ticket_repository"
 import { newGetMenuBadgeRemote } from "../kernel/init/get_menu_badge_remote/fetch"
 import { newGetMenuBadgeNoopRemote } from "../kernel/init/get_menu_badge_remote/noop"
 
@@ -18,7 +18,7 @@ export function newUpdateMenuBadgeInfra(
     return {
         version: env.version,
         menuTree: menuContent.menuTree,
-        profileRepository: newAuthProfileRepository(feature),
+        ticketRepository: newAuthTicketRepository(feature),
         getMenuBadgeRemote: menuContent.loadMenuBadge
             ? newGetMenuBadgeRemote(feature)
             : newGetMenuBadgeNoopRemote(),

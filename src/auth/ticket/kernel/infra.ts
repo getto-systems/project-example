@@ -1,20 +1,21 @@
+import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
 import { RemoteResult } from "../../../z_lib/ui/remote/infra"
 import { FetchRepositoryResult, StoreRepositoryResult } from "../../../z_lib/ui/repository/infra"
 
-import { AuthProfile, RenewAuthTicketRemoteError } from "./data"
+import { AuthTicket } from "./data"
 
-export interface AuthProfileRepository {
-    get(): Promise<FetchRepositoryResult<AuthProfile>>
-    set(value: AuthProfile): Promise<StoreRepositoryResult>
+export interface AuthTicketRepository {
+    get(): Promise<FetchRepositoryResult<AuthTicket>>
+    set(value: AuthTicket): Promise<StoreRepositoryResult>
     remove(): Promise<StoreRepositoryResult>
 }
-export type AuthProfileRepositoryValue = Readonly<{
+export type AuthTicketRepositoryValue = Readonly<{
     authAt: string
     roles: string[]
 }>
 
 export interface RenewAuthTicketRemote {
-    (): Promise<RemoteResult<AuthProfile, RenewAuthTicketRemoteError>>
+    (): Promise<RemoteResult<AuthTicket, RemoteCommonError>>
 }
 
 export type AuthRemoteValue = Readonly<{

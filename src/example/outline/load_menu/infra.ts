@@ -1,10 +1,10 @@
-import { AuthProfileRepository } from "../../../auth/ticket/kernel/infra"
+import { AuthTicketRepository } from "../../../auth/ticket/kernel/infra"
 import { MenuExpandRepository, MenuExpandStore, MenuTree } from "../kernel/infra"
 
 export type LoadMenuInfra = Readonly<{
     version: string
     menuTree: MenuTree
-    profileRepository: AuthProfileRepository
+    ticketRepository: AuthTicketRepository
     menuExpandRepository: MenuExpandRepository
 }>
 

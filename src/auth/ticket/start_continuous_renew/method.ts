@@ -1,38 +1,27 @@
-import { StartContinuousRenewInfra } from "./infra"
+import { StartContinuousRenewConfig, StartContinuousRenewInfra } from "./infra"
 
-import { SaveAuthProfileEvent, StartContinuousRenewEvent } from "./event"
+import { StartContinuousRenewEvent } from "./event"
 
-import { AuthProfile, hasExpired } from "../kernel/data"
+import { hasExpired } from "../kernel/helper"
+import { AuthTicket } from "../kernel/data"
 
-export interface SaveAuthProfileMethod {
-    <S>(profile: AuthProfile, post: Post<SaveAuthProfileEvent, S>): Promise<S>
-}
+type AuthTicketHolder = Readonly<{ hold: false }> | Readonly<{ hold: true; ticket: AuthTicket }>
 
-export interface StartContinuousRenewMethod {
-    <S>(post: Post<StartContinuousRenewEvent, S>): Promise<S>
-}
-
-interface Save {
-    (infra: StartContinuousRenewInfra): SaveAuthProfileMethod
-}
-export const saveAuthProfile: Save = (infra) => async (profile, post) => {
-    const { profileRepository } = infra
-
-    const authnResult = await profileRepository.set(profile)
-    if (!authnResult.success) {
-        return post({ type: "failed-to-save", err: authnResult.err })
+export async function startContinuousRenew<S>(
+    config: StartContinuousRenewConfig,
+    infra: StartContinuousRenewInfra,
+    holder: AuthTicketHolder,
+    post: Post<StartContinuousRenewEvent, S>,
+): Promise<S> {
+    if (holder.hold) {
+        const { ticketRepository } = infra
+        const result = await ticketRepository.set(holder.ticket)
+        if (!result.success) {
+            return post({ type: "repository-error", continue: false, err: result.err })
+        }
     }
 
-    return post({ type: "succeed-to-save" })
-}
-
-interface Start {
-    (infra: StartContinuousRenewInfra): StartContinuousRenewMethod
-}
-export const startContinuousRenew: Start = (infra) => (post) => {
     return new Promise((resolve) => {
-        const { config } = infra
-
         const timer = setInterval(async () => {
             // 設定された interval ごとに更新
             const result = await continuousRenew()
@@ -47,9 +36,9 @@ export const startContinuousRenew: Start = (infra) => (post) => {
     })
 
     async function continuousRenew(): Promise<StartContinuousRenewEvent> {
-        const { clock, config, profileRepository, renewRemote } = infra
+        const { clock, ticketRepository, renewRemote } = infra
 
-        const result = await profileRepository.get()
+        const result = await ticketRepository.get()
         if (!result.success) {
             return { type: "repository-error", continue: false, err: result.err }
         }
@@ -58,9 +47,9 @@ export const startContinuousRenew: Start = (infra) => (post) => {
         }
 
         // 前回の更新時刻が新しければ今回は通信しない
-        const time = { now: clock.now(), ...config.authnExpire }
+        const time = { now: clock.now(), ...config.ticketExpire }
         if (!hasExpired(result.value, time)) {
-            return { type: "authn-not-expired", continue: true }
+            return { type: "ticket-not-expired", continue: true }
         }
 
         const response = await renewRemote()
@@ -72,7 +61,7 @@ export const startContinuousRenew: Start = (infra) => (post) => {
             }
         }
 
-        const saveProfileResult = await profileRepository.set(response.value)
+        const saveProfileResult = await ticketRepository.set(response.value)
         if (!saveProfileResult.success) {
             return { type: "repository-error", continue: false, err: saveProfileResult.err }
         }
@@ -80,7 +69,7 @@ export const startContinuousRenew: Start = (infra) => (post) => {
         return { type: "succeed-to-renew", continue: true }
 
         async function clearProfile(): Promise<StartContinuousRenewEvent> {
-            const removeProfileResult = await profileRepository.remove()
+            const removeProfileResult = await ticketRepository.remove()
             if (!removeProfileResult.success) {
                 return { type: "repository-error", continue: false, err: removeProfileResult.err }
             }
