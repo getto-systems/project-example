@@ -1,7 +1,7 @@
 import {
     ChangePasswordProxyMessage,
     ChangePasswordProxyResponse,
-} from "../../../../../../src/auth/user/password/action_change/init/worker/message"
+} from "../../../../../../src/auth/user/password/change/init/worker/message"
 import {
     RequestResetTokenProxyMessage,
     RequestResetTokenProxyResponse,
