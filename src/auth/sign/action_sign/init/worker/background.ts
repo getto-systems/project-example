@@ -1,9 +1,9 @@
-import { newRequestResetTokenHandler } from "../../../../user/password/reset/action_request_token/init/worker/background"
+import { newRequestResetTokenWorkerHandler } from "../../../../user/password/reset/request_token/init/worker/background"
 
 import { WorkerHandler } from "../../../../../../ui/vendor/getto-application/action/worker/background"
 
 import { SignForegroundMessage, SignBackgroundMessage } from "./message"
-import { RequestResetTokenProxyMessage } from "../../../../user/password/reset/action_request_token/init/worker/message"
+import { RequestResetTokenProxyMessage } from "../../../../user/password/reset/request_token/init/worker/message"
 
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-application/action/worker/feature"
@@ -15,7 +15,7 @@ export function newSignViewWorkerBackground(feature: OutsideFeature): void {
     const handler: Handler = {
         password: {
             reset: {
-                requestToken: newRequestResetTokenHandler(feature, (response) =>
+                requestToken: newRequestResetTokenWorkerHandler(feature, (response) =>
                     postBackgroundMessage({ type: "password-reset-requestToken", response }),
                 ),
             },

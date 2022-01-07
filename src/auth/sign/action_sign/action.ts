@@ -4,8 +4,7 @@ import {
 } from "../../../../ui/vendor/getto-application/action/action"
 import { CheckAuthTicketAction } from "../../ticket/check/action"
 import { AuthenticatePasswordAction } from "../../user/password/authenticate/action"
-
-import { RequestResetTokenView } from "../../user/password/reset/action_request_token/resource"
+import { RequestResetTokenAction } from "../../user/password/reset/request_token/action"
 import { ResetPasswordAction } from "../../user/password/reset/reset/action"
 import { SignLinkResource } from "../action_nav/resource"
 
@@ -18,7 +17,7 @@ export interface SignSubView {
 
     password_authenticate(): ApplicationView<AuthenticatePasswordAction>
 
-    password_reset_requestToken(): RequestResetTokenView
+    password_reset_requestToken(): ApplicationView<RequestResetTokenAction>
     password_reset(): ApplicationView<ResetPasswordAction>
 }
 
@@ -27,7 +26,7 @@ export type SignActionState =
     | Static<"privacyPolicy">
     | View<"check-authTicket", ApplicationView<CheckAuthTicketAction>>
     | View<"password-authenticate", ApplicationView<AuthenticatePasswordAction>>
-    | View<"password-reset-requestToken", RequestResetTokenView>
+    | View<"password-reset-requestToken", ApplicationView<RequestResetTokenAction>>
     | View<"password-reset", ApplicationView<ResetPasswordAction>>
     | Readonly<{ type: "error"; err: string }>
 

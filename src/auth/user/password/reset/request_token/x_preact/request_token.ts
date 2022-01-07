@@ -25,15 +25,12 @@ import { signNav } from "../../../../../sign/action_nav/x_preact/nav"
 
 import { InputLoginIDEntry } from "../../../../login_id/input/action_input/x_preact/input"
 
-import {
-    RequestResetTokenView,
-    RequestResetTokenResource,
-    RequestResetTokenResourceState,
-} from "../resource"
+import { RequestResetTokenError } from "../data"
+import { ApplicationView } from "../../../../../../../ui/vendor/getto-application/action/action"
+import { RequestResetTokenAction, RequestResetTokenState } from "../action"
+import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
 
-import { RequestResetTokenError } from "../../request_token/data"
-
-export function RequestResetTokenEntry(view: RequestResetTokenView): VNode {
+export function RequestResetTokenEntry(view: ApplicationView<RequestResetTokenAction>): VNode {
     const action = useApplicationView(view)
     return h(RequestResetTokenComponent, {
         requestToken: action,
@@ -44,11 +41,15 @@ export function RequestResetTokenEntry(view: RequestResetTokenView): VNode {
 
 const title = "パスワードリセット"
 
-type Props = RequestResetTokenResource & RequestResetTokenResourceState
+type Props = Readonly<{
+    requestToken: RequestResetTokenAction
+    state: RequestResetTokenState
+    validate: ValidateBoardActionState
+}>
 export function RequestResetTokenComponent(props: Props): VNode {
     return basedOn(props)
 
-    function basedOn({ state }: RequestResetTokenResourceState): VNode {
+    function basedOn({ state }: Props): VNode {
         switch (state.type) {
             case "initial-request-token":
                 return requestTokenForm({ state: "start" })
@@ -72,9 +73,7 @@ export function RequestResetTokenComponent(props: Props): VNode {
 
     type FormState = "start" | "connecting"
 
-    type FormContent =
-        | FormContent_base
-        | (FormContent_base & FormContent_error)
+    type FormContent = FormContent_base | (FormContent_base & FormContent_error)
     type FormContent_base = Readonly<{ state: FormState }>
     type FormContent_error = Readonly<{ error: VNodeContent[] }>
 

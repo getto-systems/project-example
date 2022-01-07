@@ -10,7 +10,7 @@ import {
 import { ApplicationErrorComponent } from "../../../../avail/x_preact/application_error"
 import { CheckAuthTicketEntry } from "../../../ticket/check/x_preact/check_ticket"
 import { AuthenticatePasswordEntry } from "../../../user/password/authenticate/x_preact/authenticate_password"
-import { RequestResetTokenEntry } from "../../../user/password/reset/action_request_token/x_preact/request_token"
+import { RequestResetTokenEntry } from "../../../user/password/reset/request_token/x_preact/request_token"
 import { ResetPasswordEntry } from "../../../user/password/reset/reset/x_preact/reset_password"
 
 import { SignView, SignResource, SignResourceState } from "../resource"

@@ -2,17 +2,18 @@ import { h } from "preact"
 
 import { storyTemplate } from "../../../../../../../ui/vendor/storybook/preact/story"
 
-import { RequestResetTokenProfileComponent } from "./request_token"
+import { RequestResetTokenComponent } from "./request_token"
 
-import { mockRequestResetTokenProfileAction } from "../mock"
+import { newRequestResetTokenConfig } from "../init/config"
+import { mockRemoteInfraError } from "../../../../../../z_lib/ui/remote/mock"
 
 import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
-import { RequestResetTokenProfileState } from "../action"
+import { initRequestResetTokenAction, RequestResetTokenState } from "../action"
+
 import { validateBoardStates } from "../../../../../../../ui/vendor/getto-application/board/validate_board/data"
 
 const options = [
     "initial",
-    "input",
     "try",
     "takeLongtime",
     "success",
@@ -23,7 +24,10 @@ const options = [
 ] as const
 
 export default {
-    title: "main/Auth/User/Password/Reset/Request Token Profile",
+    title: "main/Auth/User/Password/Reset/Request Token",
+    parameters: {
+        layout: "fullscreen",
+    },
     argTypes: {
         request: {
             control: { type: "select", options },
@@ -40,19 +44,18 @@ type Props = Readonly<{
     err: string
 }>
 const template = storyTemplate<Props>((props) => {
-    return h(RequestResetTokenProfileComponent, {
-        requestToken: mockRequestResetTokenProfileAction(),
+    return h(RequestResetTokenComponent, {
+        requestToken: initRequestResetTokenAction(newRequestResetTokenConfig(), {
+            requestTokenRemote: async () => mockRemoteInfraError,
+        }),
         state: state(),
         validate: props.validate,
     })
 
-    function state(): RequestResetTokenProfileState {
+    function state(): RequestResetTokenState {
         switch (props.request) {
             case "initial":
                 return { type: "initial-request-token" }
-
-            case "input":
-                return { type: "input-login-id" }
 
             case "try":
                 return { type: "try-to-request-token" }

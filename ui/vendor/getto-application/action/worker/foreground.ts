@@ -5,6 +5,46 @@ import {
     WorkerProxyCallResponse,
 } from "./message"
 
+export interface WorkerProxyMap<P> {
+    register(proxy: P): WorkerProxyCallID
+    find(id: WorkerProxyCallID): P
+    drop(id: WorkerProxyCallID): P
+}
+
+export function newWorkerProxyMap<P>(label: string): WorkerProxyMap<P> {
+    return new ProxyMap(label)
+}
+
+class ProxyMap<P> implements WorkerProxyMap<P> {
+    label: string
+
+    map: Map<WorkerProxyCallID, P> = new Map()
+    idGenerator = idGenerator()
+
+    constructor(label: string) {
+        this.label = label
+    }
+
+    register(proxy: P): WorkerProxyCallID {
+        const id = this.idGenerator()
+        this.map.set(id, proxy)
+        return id
+    }
+    find(id: WorkerProxyCallID): P {
+        const proxy = this.map.get(id)
+        if (proxy === undefined) {
+            throw new Error(`handler not registered: ${this.label}`)
+        }
+        return proxy
+    }
+    drop(id: WorkerProxyCallID): P {
+        const proxy = this.find(id)
+        this.map.delete(id)
+        return proxy
+    }
+}
+
+// TODO deprecated
 export type WorkerProxyErrorMessage<T> = Readonly<{ type: "error"; err: string }> | T
 export function handleWorkerProxyError<T>(message: WorkerProxyErrorMessage<T>): void {
     if ("type" in message) {
@@ -15,15 +55,18 @@ export function handleWorkerProxyError<T>(message: WorkerProxyErrorMessage<T>): 
     throw new Error(JSON.stringify(message))
 }
 
+// TODO deprecated
 export interface WorkerProxy<M, R> {
     method<N, P, E>(method: N, map: WorkerProxyMessageMapper<N, M, P>): WorkerProxyMethod<N, P, E>
     resolve(response: R): void
 }
 
+// TODO deprecated
 export interface WorkerProxyMessageMapper<N, M, T> {
     (message: WorkerProxyCallMessage<N, T>): M
 }
 
+// TODO deprecated
 export abstract class WorkerAbstractProxy<M, R> implements WorkerProxy<M, R> {
     post: PostMessage<M>
 
@@ -81,6 +124,7 @@ function idGenerator(): IDGenerator {
 interface IDGenerator {
     (): WorkerProxyCallID
 }
+
 interface Post<E, S> {
     (event: E): S
 }

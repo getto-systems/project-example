@@ -3,21 +3,21 @@ import {
     ChangePasswordProxyResponse,
 } from "../../../../../../src/auth/user/password/action_change/init/worker/message"
 import {
-    RequestResetTokenProfileProxyMessage,
-    RequestResetTokenProfileProxyResponse,
-} from "../../../../../../src/auth/user/password/reset/action_request_token_profile/init/worker/message"
+    RequestResetTokenProxyMessage,
+    RequestResetTokenProxyResponse,
+} from "../../../../../../src/auth/user/password/reset/request_token/init/worker/message"
 
 export type ProfileForegroundMessage =
     | Readonly<{ type: "password-change"; message: ChangePasswordProxyMessage }>
     | Readonly<{
           type: "password-reset-requestToken"
-          message: RequestResetTokenProfileProxyMessage
+          message: RequestResetTokenProxyMessage
       }>
 
 export type ProfileBackgroundMessage =
     | Readonly<{ type: "password-change"; response: ChangePasswordProxyResponse }>
     | Readonly<{
           type: "password-reset-requestToken"
-          response: RequestResetTokenProfileProxyResponse
+          response: RequestResetTokenProxyResponse
       }>
     | Readonly<{ type: "error"; err: string }>

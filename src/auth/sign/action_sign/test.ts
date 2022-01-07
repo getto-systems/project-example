@@ -5,7 +5,6 @@ import { newResetPasswordConfig } from "../../user/password/reset/reset/init/con
 import { newAuthenticatePasswordConfig } from "../../user/password/authenticate/init/config"
 import { newCheckAuthTicketConfig } from "../../ticket/check/init/config"
 
-import { mockRequestResetTokenAction } from "../../user/password/reset/action_request_token/mock"
 import { mockSignViewLocationDetecter } from "../router/mock"
 import { mockResetPasswordShell } from "../../user/password/reset/reset/init/mock"
 import { mockGetScriptPathShell } from "../get_script_path/init/mock"
@@ -22,6 +21,8 @@ import { initAuthenticatePasswordAction } from "../../user/password/authenticate
 import { initResetPasswordAction } from "../../user/password/reset/reset/action"
 
 import { AuthTicket } from "../../ticket/kernel/data"
+import { initRequestResetTokenAction } from "../../user/password/reset/request_token/action"
+import { newRequestResetTokenConfig } from "../../user/password/reset/request_token/init/config"
 
 describe("SignView", () => {
     test("redirect password authenticate", async () => {
@@ -127,6 +128,7 @@ function initAction(currentURL: URL): SignAction {
     const renewRemote = async () => mockRemoteInfraError
     const authenticateRemote = async () => mockRemoteInfraError
     const resetRemote = async () => mockRemoteInfraError
+    const requestTokenRemote = async () => mockRemoteInfraError
     const clock = newClock()
 
     return initSignAction(mockSignViewLocationDetecter(currentURL), {
@@ -175,7 +177,12 @@ function initAction(currentURL: URL): SignAction {
                     mockResetPasswordShell(currentURL),
                 ),
             ),
-        password_reset_requestToken: () => toApplicationView(mockRequestResetTokenAction()),
+        password_reset_requestToken: () =>
+            toApplicationView(
+                initRequestResetTokenAction(newRequestResetTokenConfig(), {
+                    requestTokenRemote,
+                }),
+            ),
     })
 }
 
