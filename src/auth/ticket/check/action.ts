@@ -47,13 +47,9 @@ export type CheckAuthTicketShell = GetScriptPathShell
 
 export type CheckAuthTicketState =
     | Readonly<{ type: "initial-check" }>
-    | Readonly<{ type: "try-to-instant-load"; scriptPath: ConvertScriptPathResult }>
-    | Readonly<{ type: "required-to-login" }>
-    | Readonly<{ type: "try-to-renew" }>
-    | Readonly<{ type: "take-longtime-to-renew" }>
-    | Readonly<{ type: "failed-to-renew"; err: RemoteCommonError }>
-    | Readonly<{ type: "repository-error"; err: RepositoryError }>
+    | RenewEvent
     | StartContinuousRenewEvent
+    | Readonly<{ type: "try-to-instant-load"; scriptPath: ConvertScriptPathResult }>
     | Readonly<{ type: "try-to-load"; scriptPath: ConvertScriptPathResult }>
     | Readonly<{ type: "load-error"; err: LoadScriptError }>
 
@@ -140,16 +136,23 @@ class Action
     }
 }
 
-type CheckResult =
+type RenewEvent =
+    | Readonly<{ type: "required-to-login" }>
+    | Readonly<{ type: "try-to-renew" }>
+    | Readonly<{ type: "take-longtime-to-renew" }>
+    | Readonly<{ type: "failed-to-renew"; err: RemoteCommonError }>
+    | Readonly<{ type: "repository-error"; err: RepositoryError }>
+
+type CheckResult<S> =
     | Readonly<{ success: true; expired: true; ticket: AuthTicket }>
     | Readonly<{ success: true; expired: false }>
-    | Readonly<{ success: false; state: CheckAuthTicketState }>
+    | Readonly<{ success: false; state: S }>
 
-async function check(
+async function check<S>(
     config: CheckAuthTicketConfig,
     infra: CheckAuthTicketInfra,
-    post: Post<CheckAuthTicketState>,
-): Promise<CheckResult> {
+    post: Post<RenewEvent, S>,
+): Promise<CheckResult<S>> {
     const { clock, ticketRepository } = infra
 
     const findResult = await ticketRepository.get()
@@ -176,15 +179,15 @@ async function check(
     return { success: true, expired: true, ticket: renewResult.ticket }
 }
 
-type RenewResult =
+type RenewResult<S> =
     | Readonly<{ success: true; ticket: AuthTicket }>
-    | Readonly<{ success: false; state: CheckAuthTicketState }>
+    | Readonly<{ success: false; state: S }>
 
-async function renew(
+async function renew<S>(
     config: CheckAuthTicketConfig,
     infra: CheckAuthTicketInfra,
-    post: Post<CheckAuthTicketState>,
-): Promise<RenewResult> {
+    post: Post<RenewEvent, S>,
+): Promise<RenewResult<S>> {
     const { ticketRepository, renewRemote } = infra
 
     post({ type: "try-to-renew" })
@@ -215,6 +218,6 @@ async function renew(
     return { success: true, ticket: response.value }
 }
 
-interface Post<S> {
-    (state: S): S
+interface Post<E, S> {
+    (event: E): S
 }
