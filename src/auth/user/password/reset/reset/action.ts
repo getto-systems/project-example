@@ -50,10 +50,7 @@ export type ResetPasswordFieldName = typeof resetPasswordFieldNames[number]
 
 export type ResetPasswordState =
     | Readonly<{ type: "initial-reset" }>
-    | Readonly<{ type: "try-to-reset" }>
-    | Readonly<{ type: "take-longtime-to-reset" }>
-    | Readonly<{ type: "failed-to-reset"; err: ResetPasswordError }>
-    | Readonly<{ type: "repository-error"; err: RepositoryError }>
+    | ResetEvent
     | Exclude<StartContinuousRenewEvent, { type: "succeed-to-start-continuous-renew" }>
     | Readonly<{ type: "try-to-load"; scriptPath: ConvertScriptPathResult }>
     | Readonly<{ type: "load-error"; err: LoadScriptError }>
@@ -195,17 +192,23 @@ class Action
     }
 }
 
-type ResetResult =
-    | Readonly<{ success: true; ticket: AuthTicket }>
-    | Readonly<{ success: false; state: ResetPasswordState }>
+type ResetEvent =
+    | Readonly<{ type: "try-to-reset" }>
+    | Readonly<{ type: "take-longtime-to-reset" }>
+    | Readonly<{ type: "failed-to-reset"; err: ResetPasswordError }>
+    | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
-async function reset(
+type ResetResult<S> =
+    | Readonly<{ success: true; ticket: AuthTicket }>
+    | Readonly<{ success: false; state: S }>
+
+async function reset<S>(
     config: ResetPasswordConfig,
     infra: ResetPasswordInfra,
     shell: ResetPasswordShell,
     fields: ConvertBoardResult<ResetPasswordFields>,
-    post: Post<ResetPasswordState>,
-): Promise<ResetResult> {
+    post: Post<ResetEvent, S>,
+): Promise<ResetResult<S>> {
     if (!fields.valid) {
         return {
             success: false,
@@ -238,6 +241,6 @@ async function reset(
     return { success: true, ticket: response.value }
 }
 
-interface Post<S> {
-    (state: S): S
+interface Post<E, S> {
+    (event: E): S
 }

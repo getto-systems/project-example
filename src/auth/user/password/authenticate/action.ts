@@ -50,10 +50,7 @@ export type AuthenticatePasswordFieldName = typeof authenticatePasswordFieldName
 
 export type AuthenticatePasswordState =
     | Readonly<{ type: "initial-login" }>
-    | Readonly<{ type: "try-to-login" }>
-    | Readonly<{ type: "take-longtime-to-login" }>
-    | Readonly<{ type: "failed-to-login"; err: AuthenticatePasswordError }>
-    | Readonly<{ type: "repository-error"; err: RepositoryError }>
+    | AuthenticateEvent
     | Exclude<StartContinuousRenewEvent, { type: "succeed-to-start-continuous-renew" }>
     | Readonly<{ type: "try-to-load"; scriptPath: ConvertScriptPathResult }>
     | Readonly<{ type: "load-error"; err: LoadScriptError }>
@@ -192,16 +189,22 @@ class Action
     }
 }
 
-type AuthenticateResult =
-    | Readonly<{ success: true; ticket: AuthTicket }>
-    | Readonly<{ success: false; state: AuthenticatePasswordState }>
+type AuthenticateEvent =
+    | Readonly<{ type: "try-to-login" }>
+    | Readonly<{ type: "take-longtime-to-login" }>
+    | Readonly<{ type: "failed-to-login"; err: AuthenticatePasswordError }>
+    | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
-async function authenticate(
+type AuthenticateResult<S> =
+    | Readonly<{ success: true; ticket: AuthTicket }>
+    | Readonly<{ success: false; state: S }>
+
+async function authenticate<S>(
     config: AuthenticatePasswordConfig,
     infra: AuthenticatePasswordInfra,
     fields: ConvertBoardResult<AuthenticatePasswordFields>,
-    post: Post<AuthenticatePasswordState>,
-): Promise<AuthenticateResult> {
+    post: Post<AuthenticateEvent, S>,
+): Promise<AuthenticateResult<S>> {
     if (!fields.valid) {
         return {
             success: false,
@@ -226,6 +229,6 @@ async function authenticate(
     return { success: true, ticket: response.value }
 }
 
-interface Post<S> {
-    (state: S): S
+interface Post<E, S> {
+    (event: E): S
 }
