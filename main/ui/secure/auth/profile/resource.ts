@@ -1,5 +1,9 @@
 import { BaseResource } from "../../../../../src/example/action_base/resource"
 import { ChangePasswordResource } from "../../../../../src/auth/user/password/action_change/resource"
-import { RequestResetTokenProfileResource } from "../../../../../src/auth/user/password/reset/action_request_token_profile/resource"
+import { RequestResetTokenProfileAction } from "../../../../../src/auth/user/password/reset/request_token/action"
 
-export type ProfilePageResource = BaseResource & ChangePasswordResource & RequestResetTokenProfileResource
+export type ProfilePageResource = BaseResource &
+    ChangePasswordResource &
+    Readonly<{
+        requestToken: RequestResetTokenProfileAction
+    }>

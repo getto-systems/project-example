@@ -21,7 +21,7 @@ import { LoadSeasonEntry } from "../../../../../src/example/action_load_season/x
 import { LoadMenuEntry } from "../../../../../src/example/outline/action_load_menu/x_preact/load_menu"
 import { LoadBreadcrumbListComponent } from "../../../../../src/example/outline/action_load_breadcrumb_list/x_preact/load_breadcrumb_list"
 import { ChangePasswordEntry } from "../../../../../src/auth/user/password/action_change/x_preact/change_password"
-import { RequestResetTokenProfileEntry } from "../../../../../src/auth/user/password/reset/action_request_token_profile/x_preact/request_token"
+import { RequestResetTokenProfileEntry } from "../../../../../src/auth/user/password/reset/request_token/x_preact/request_token_profile"
 
 import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
 import { ProfilePageResource } from "./resource"

@@ -7,7 +7,8 @@ import { newResetPasswordView } from "../../../../user/password/reset/reset/init
 import {
     newRequestResetTokenProxy,
     RequestResetTokenProxy,
-} from "../../../../user/password/reset/action_request_token/init/worker/foreground"
+} from "../../../../user/password/reset/request_token/init/worker/foreground"
+import { initRequestResetTokenView } from "../../../../user/password/reset/request_token/init/worker/foreground"
 
 import { initSignAction } from "../../init"
 import { initSignLinkResource } from "../../../action_nav/init"
@@ -20,7 +21,6 @@ import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-applicat
 import { LocationOutsideFeature } from "../../../../../z_lib/ui/location/feature"
 
 import { SignView } from "../../resource"
-import { initRequestResetTokenView } from "../../../../user/password/reset/action_request_token/init/resource"
 
 type OutsideFeature = RemoteOutsideFeature &
     RepositoryOutsideFeature &
@@ -37,7 +37,7 @@ export function newSignViewWorkerForeground(feature: OutsideFeature): SignView {
 
         password_authenticate: () => newAuthenticatePasswordView(feature),
         password_reset_requestToken: () =>
-            initRequestResetTokenView(proxy.password.reset.requestToken.material()),
+            initRequestResetTokenView(proxy.password.reset.requestToken.infra),
         password_reset: () => newResetPasswordView(feature),
     })
 
@@ -85,28 +85,22 @@ function initBackgroundMessageHandler(
     proxy: Proxy,
     errorHandler: Post<string>,
 ): Post<SignBackgroundMessage> {
-    return (message) => {
+    return (message): true => {
         try {
             switch (message.type) {
                 case "password-reset-requestToken":
                     proxy.password.reset.requestToken.resolve(message.response)
-                    break
+                    return true
 
                 case "error":
                     errorHandler(message.err)
-                    break
-
-                default:
-                    assertNever(message)
+                    return true
             }
         } catch (err) {
             errorHandler(`${err}`)
+            return true
         }
     }
-}
-
-function assertNever(_: never): never {
-    throw new Error("NEVER")
 }
 
 interface Post<T> {

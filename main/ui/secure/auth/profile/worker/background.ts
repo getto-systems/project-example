@@ -1,13 +1,13 @@
 import { newWorkerBackgroundOutsideFeature } from "../../../../../../src/x_outside_feature/worker"
 
 import { newChangePasswordHandler } from "../../../../../../src/auth/user/password/action_change/init/worker/background"
-import { newRequestResetTokenProfileHandler } from "../../../../../../src/auth/user/password/reset/action_request_token_profile/init/worker/background"
+import { newRequestResetTokenWorkerHandler } from "../../../../../../src/auth/user/password/reset/request_token/init/worker/background"
 
 import { WorkerHandler } from "../../../../../../ui/vendor/getto-application/action/worker/background"
 
 import { ProfileForegroundMessage, ProfileBackgroundMessage } from "./message"
 import { ChangePasswordProxyMessage } from "../../../../../../src/auth/user/password/action_change/init/worker/message"
-import { RequestResetTokenProfileProxyMessage } from "../../../../../../src/auth/user/password/reset/action_request_token_profile/init/worker/message"
+import { RequestResetTokenProxyMessage } from "../../../../../../src/auth/user/password/reset/request_token/init/worker/message"
 
 newBackground()
 
@@ -21,7 +21,7 @@ function newBackground(): void {
                 postBackgroundMessage({ type: "password-change", response }),
             ),
             reset: {
-                requestToken: newRequestResetTokenProfileHandler(feature, (response) =>
+                requestToken: newRequestResetTokenWorkerHandler(feature, (response) =>
                     postBackgroundMessage({ type: "password-reset-requestToken", response }),
                 ),
             },
@@ -45,7 +45,7 @@ type Handler = Readonly<{
     password: Readonly<{
         change: WorkerHandler<ChangePasswordProxyMessage>
         reset: Readonly<{
-            requestToken: WorkerHandler<RequestResetTokenProfileProxyMessage>
+            requestToken: WorkerHandler<RequestResetTokenProxyMessage>
         }>
     }>
 }>
@@ -54,19 +54,20 @@ function initForegroundMessageHandler(
     handler: Handler,
     errorHandler: Post<string>,
 ): Post<ProfileForegroundMessage> {
-    return (message) => {
+    return (message): true => {
         try {
             switch (message.type) {
                 case "password-change":
                     handler.password.change(message.message)
-                    return
+                    return true
 
                 case "password-reset-requestToken":
                     handler.password.reset.requestToken(message.message)
-                    return
+                    return true
             }
         } catch (err) {
             errorHandler(`${err}`)
+            return true
         }
     }
 }

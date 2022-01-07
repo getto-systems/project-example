@@ -6,7 +6,7 @@ import { newForegroundOutsideFeature } from "../../../../../src/x_outside_featur
 
 import { newBaseResource } from "../../../../../src/example/action_base/init/resource"
 import { newChangePasswordResource } from "../../../../../src/auth/user/password/action_change/init/resource"
-import { newRequestResetTokenProfileResource } from "../../../../../src/auth/user/password/reset/action_request_token_profile/init/resource"
+import { newRequestResetTokenProfileResource } from "../../../../../src/auth/user/password/reset/request_token/init/resource"
 import { toProfileView } from "./common"
 
 import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"

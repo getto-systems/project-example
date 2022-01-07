@@ -18,18 +18,16 @@ import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
 import { InputLoginIDEntry } from "../../../../login_id/input/action_input/x_preact/input"
 
-import {
-    RequestResetTokenProfileResource,
-    RequestResetTokenResourceProfileState,
-} from "../resource"
-
-import { RequestResetTokenError } from "../../request_token/data"
+import { RequestResetTokenError } from "../data"
 import { box } from "../../../../../../../ui/vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../../../ui/vendor/getto-css/preact/design/highlight"
+import { RequestResetTokenProfileAction, RequestResetTokenProfileState } from "../action"
+import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
 
-export function RequestResetTokenProfileEntry({
-    requestToken,
-}: RequestResetTokenProfileResource): VNode {
+type EntryProps = Readonly<{
+    requestToken: RequestResetTokenProfileAction
+}>
+export function RequestResetTokenProfileEntry({ requestToken }: EntryProps): VNode {
     return h(RequestResetTokenProfileComponent, {
         requestToken,
         state: useApplicationAction(requestToken),
@@ -37,11 +35,15 @@ export function RequestResetTokenProfileEntry({
     })
 }
 
-type Props = RequestResetTokenProfileResource & RequestResetTokenResourceProfileState
+type Props = Readonly<{
+    requestToken: RequestResetTokenProfileAction
+    state: RequestResetTokenProfileState
+    validate: ValidateBoardActionState
+}>
 export function RequestResetTokenProfileComponent(props: Props): VNode {
     return basedOn(props)
 
-    function basedOn({ state, validate }: RequestResetTokenResourceProfileState): VNode {
+    function basedOn({ state, validate }: Props): VNode {
         switch (state.type) {
             case "initial-request-token":
                 return buttonBox({ type: "initial" })

@@ -1,7 +1,7 @@
 import {
     RequestResetTokenProxyMessage,
     RequestResetTokenProxyResponse,
-} from "../../../../user/password/reset/action_request_token/init/worker/message"
+} from "../../../../user/password/reset/request_token/init/worker/message"
 
 export type SignForegroundMessage = Readonly<{
     type: "password-reset-requestToken"

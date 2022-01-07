@@ -1,23 +1,22 @@
 import { setupActionTestRunner } from "../../../../../../ui/vendor/getto-application/action/test_helper"
-import { toApplicationView } from "../../../../../../ui/vendor/getto-application/action/helper"
 import { ticker } from "../../../../../z_lib/ui/timer/helper"
 
 import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/init/mock"
 
-import { initRequestResetTokenAction, initRequestResetTokenMaterial } from "./init"
-
-import { RequestResetTokenRemote, RequestResetTokenRemoteResult } from "../request_token/infra"
+import { RequestResetTokenRemote, RequestResetTokenRemoteResult } from "./infra"
 import { BoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/infra"
-
-import { RequestResetTokenView } from "./resource"
+import {
+    initRequestResetTokenProfileAction,
+    RequestResetTokenProfileAction,
+} from "./action"
 
 const VALID_LOGIN = { loginID: "login-id" } as const
 
-describe("RequestResetToken", () => {
+describe("RequestResetTokenProfile", () => {
     test("submit valid login-id", async () => {
-        const { view, store } = standard()
-        const action = view.resource
+        const { resource, store } = standard()
+        const action = resource.requestToken
 
         const runner = setupActionTestRunner(action.subscriber)
 
@@ -34,8 +33,8 @@ describe("RequestResetToken", () => {
 
     test("submit valid login-id; with take longtime", async () => {
         // wait for take longtime timeout
-        const { view, store } = takeLongtime()
-        const action = view.resource
+        const { resource, store } = takeLongtime()
+        const action = resource.requestToken
 
         const runner = setupActionTestRunner(action.subscriber)
 
@@ -52,8 +51,8 @@ describe("RequestResetToken", () => {
     })
 
     test("submit without fields", async () => {
-        const { view } = standard()
-        const action = view.resource
+        const { resource } = standard()
+        const action = resource.requestToken
 
         const runner = setupActionTestRunner(action.subscriber)
 
@@ -65,18 +64,36 @@ describe("RequestResetToken", () => {
     })
 
     test("clear", () => {
-        const { view, store } = standard()
-        const resource = view.resource
+        const { resource, store } = standard()
+        const action = resource.requestToken
 
         store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
-        resource.clear()
+        action.clear()
 
         expect(store.loginID.get()).toEqual("")
     })
 
+    test("open; close", async () => {
+        const { resource } = standard()
+        const action = resource.requestToken
+
+        const runner = setupActionTestRunner(action.subscriber)
+
+        await runner(async () => {
+            action.open()
+            action.close()
+            return action.currentState()
+        }).then((stack) => {
+            expect(stack).toEqual([
+                { type: "input-login-id" },
+                { type: "initial-request-token" },
+            ])
+        })
+    })
+
     test("terminate", async () => {
-        const { view } = standard()
-        const action = view.resource
+        const { resource } = standard()
+        const action = resource.requestToken
 
         const runner = setupActionTestRunner({
             subscribe: (handler) => {
@@ -88,7 +105,7 @@ describe("RequestResetToken", () => {
         })
 
         await runner(async () => {
-            view.terminate()
+            action.terminate()
             action.submit()
         }).then((stack) => {
             // no input/validate event after terminate
@@ -104,29 +121,31 @@ function takeLongtime() {
     return initView(takeLongtime_requestToken())
 }
 
-function initView(requestToken: RequestResetTokenRemote): Readonly<{
-    view: RequestResetTokenView
+function initView(requestTokenRemote: RequestResetTokenRemote): Readonly<{
+    resource: Readonly<{
+        requestToken: RequestResetTokenProfileAction
+    }>
     store: Readonly<{
         loginID: BoardValueStore
     }>
 }> {
-    const view = toApplicationView(
-        initRequestResetTokenAction(
-            initRequestResetTokenMaterial({
-                requestToken,
-                config: {
-                    takeLongtimeThreshold: { delay_millisecond: 32 },
-                },
-            }),
+    const resource = {
+        requestToken: initRequestResetTokenProfileAction(
+            {
+                takeLongtimeThreshold: { delay_millisecond: 32 },
+            },
+            {
+                requestTokenRemote,
+            },
         ),
-    )
+    }
 
     const store = {
         loginID: mockBoardValueStore(),
     }
-    view.resource.loginID.input.connector.connect(store.loginID)
+    resource.requestToken.loginID.input.connector.connect(store.loginID)
 
-    return { view, store }
+    return { resource, store }
 }
 
 function standard_requestToken(): RequestResetTokenRemote {
