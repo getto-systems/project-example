@@ -1,40 +1,36 @@
 import { h, VNode } from "preact"
 
-import { useApplicationAction } from "../../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
 
 import {
     field,
     field_error,
     label_text_fill,
-} from "../../../../../../../ui/vendor/getto-css/preact/design/form"
+} from "../../../../../../ui/vendor/getto-css/preact/design/form"
 
-import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
-import { InputBoardComponent } from "../../../../../../../ui/vendor/getto-application/board/action_input/x_preact/input"
+import { InputBoardComponent } from "../../../../../../ui/vendor/getto-application/board/action_input/x_preact/input"
 
-import { InputLoginIDResource, InputLoginIDResourceState } from "../resource"
+import { ValidateBoardFieldState } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/action"
+import { InputLoginIDAction, ValidateLoginIDState } from "../action"
 
-import { ValidateBoardFieldState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_field/action"
+import { loginIDLabel, ValidateLoginIDError } from "../data"
 
-import { loginIDLabel, ValidateLoginIDError } from "../../data"
-
-type InputLoginIDOptions =
-    | Readonly<{ title: VNodeContent; help: VNodeContent[] }>
-    | Readonly<{ title: VNodeContent }>
-    | Readonly<{ help: VNodeContent[] }>
-    | {
-          /* no props */
-      }
-
-type Resource = InputLoginIDResource & InputLoginIDOptions
-export function InputLoginIDEntry(resource: Resource): VNode {
+type EntryProps = Readonly<{ field: InputLoginIDAction }> &
+    Partial<{ title: VNodeContent; help: VNodeContent[] }>
+export function InputLoginIDEntry(resource: EntryProps): VNode {
     return h(InputLoginIDComponent, {
         ...resource,
         state: useApplicationAction(resource.field.validate),
     })
 }
 
-type Props = Resource & InputLoginIDResourceState
+type Props = EntryProps &
+    Readonly<{
+        state: ValidateLoginIDState
+    }>
+
 export function InputLoginIDComponent(props: Props): VNode {
     return label_text_fill(content())
 
@@ -52,13 +48,13 @@ export function InputLoginIDComponent(props: Props): VNode {
         }
     }
     function title(): VNodeContent {
-        if ("title" in props) {
+        if (props.title) {
             return props.title
         }
         return loginIDLabel
     }
     function help(): VNodeContent[] {
-        if ("help" in props) {
+        if (props.help) {
             return props.help
         }
         return []

@@ -23,7 +23,7 @@ import { siteInfo } from "../../../../../../example/site"
 import { spinner } from "../../../../../../example/x_preact/design/icon"
 import { signNav } from "../../../../../sign/action_nav/x_preact/nav"
 
-import { InputLoginIDEntry } from "../../../../login_id/input/action_input/x_preact/input"
+import { InputLoginIDEntry } from "../../../../login_id/input/x_preact/input"
 
 import { RequestResetTokenError } from "../data"
 import { ApplicationView } from "../../../../../../../ui/vendor/getto-application/action/action"
