@@ -19,7 +19,7 @@ import { notice_success } from "../../../../../../ui/vendor/getto-css/preact/des
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 import { spinner } from "../../../../../example/x_preact/design/icon"
 
-import { InputPasswordEntry } from "../../input/action_input/x_preact/input"
+import { InputPasswordEntry } from "../../input/x_preact/input"
 
 import { ChangePasswordError } from "../data"
 import { ChangePasswordAction, ChangePasswordState } from "../action"
@@ -36,11 +36,11 @@ export function ChangePasswordEntry({ change }: EntryProps): VNode {
     })
 }
 
-type Props = Readonly<{
-    change: ChangePasswordAction
-    state: ChangePasswordState
-    validate: ValidateBoardActionState
-}>
+type Props = EntryProps &
+    Readonly<{
+        state: ChangePasswordState
+        validate: ValidateBoardActionState
+    }>
 export function ChangePasswordComponent(props: Props): VNode {
     return basedOn(props)
 

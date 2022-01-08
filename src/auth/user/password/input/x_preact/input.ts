@@ -1,44 +1,40 @@
 import { h, VNode } from "preact"
 
-import { useApplicationAction } from "../../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
 
 import {
     field,
     field_error,
     label_password_fill,
-} from "../../../../../../../ui/vendor/getto-css/preact/design/form"
+} from "../../../../../../ui/vendor/getto-css/preact/design/form"
 
-import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
-import { InputBoardComponent } from "../../../../../../../ui/vendor/getto-application/board/action_input/x_preact/input"
+import { InputBoardComponent } from "../../../../../../ui/vendor/getto-application/board/action_input/x_preact/input"
 
-import { ValidateBoardFieldState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_field/action"
-import { InputPasswordResource, InputPasswordResourceState } from "../resource"
+import { ValidateBoardFieldState } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/action"
 
-import { ValidatePasswordError } from "../../data"
+import { ValidatePasswordError } from "../data"
+import { InputPasswordAction, ValidatePasswordState } from "../action"
 
-type InputPasswordOptions =
-    | Readonly<{ title: VNodeContent; help: VNodeContent[] }>
-    | Readonly<{ title: VNodeContent }>
-    | Readonly<{ help: VNodeContent[] }>
-    | {
-          /* no props */
-      }
-
-type Resource = InputPasswordResource & InputPasswordOptions
-export function InputPasswordEntry(resource: Resource): VNode {
+type EntryProps = Readonly<{ field: InputPasswordAction }> &
+    Partial<{ title: VNodeContent; help: VNodeContent[] }>
+export function InputPasswordEntry(resource: EntryProps): VNode {
     return h(InputPasswordComponent, {
         ...resource,
         state: useApplicationAction(resource.field.validate),
     })
 }
 
-type Props = Resource & InputPasswordResourceState
+type Props = EntryProps &
+    Readonly<{
+        state: ValidatePasswordState
+    }>
 export function InputPasswordComponent(props: Props): VNode {
     return label_password_fill(content())
 
     function title() {
-        if ("title" in props) {
+        if (props.title) {
             return props.title
         }
         return "パスワード"
@@ -60,7 +56,7 @@ export function InputPasswordComponent(props: Props): VNode {
         }
     }
     function help(): VNodeContent[] {
-        if ("help" in props) {
+        if (props.help) {
             return props.help
         }
         return []

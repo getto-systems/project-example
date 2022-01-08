@@ -3,12 +3,12 @@ import { ApplicationStateAction } from "../../../../../../ui/vendor/getto-applic
 import { ApplicationAbstractStateAction } from "../../../../../../ui/vendor/getto-application/action/init"
 import { initSignLink } from "../../../../sign/action_nav/init"
 import { initInputLoginIDAction } from "../../../login_id/input/action_input/init"
-import { initInputPasswordAction } from "../../input/action_input/init"
+import { initInputPasswordAction } from "../../input/action"
 import { initValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/init"
 
 import { SignLink } from "../../../../sign/action_nav/resource"
 import { InputLoginIDAction } from "../../../login_id/input/action_input/action"
-import { InputPasswordAction } from "../../input/action_input/action"
+import { InputPasswordAction } from "../../input/action"
 import { ValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
 
 import { delayedChecker } from "../../../../../z_lib/ui/timer/helper"
