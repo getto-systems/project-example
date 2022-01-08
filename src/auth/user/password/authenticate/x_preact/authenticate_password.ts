@@ -23,7 +23,7 @@ import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../../example/site"
 import { spinner } from "../../../../../example/x_preact/design/icon"
 import { appendScript } from "../../../../sign/x_preact/script"
-import { signNav } from "../../../../sign/action_nav/x_preact/nav"
+import { signNav } from "../../../../sign/nav/x_preact/nav"
 
 import { ApplicationErrorComponent } from "../../../../../avail/x_preact/application_error"
 import { InputLoginIDEntry } from "../../../login_id/input/x_preact/input"

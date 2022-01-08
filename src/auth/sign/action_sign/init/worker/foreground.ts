@@ -11,7 +11,7 @@ import {
 import { initRequestResetTokenView } from "../../../../user/password/reset/request_token/init/worker/foreground"
 
 import { initSignAction } from "../../init"
-import { initSignLinkResource } from "../../../action_nav/init"
+import { initSignLinkResource } from "../../../nav/resource"
 
 import { SignForegroundMessage, SignBackgroundMessage } from "./message"
 

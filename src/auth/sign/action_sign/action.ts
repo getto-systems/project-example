@@ -6,12 +6,12 @@ import { CheckAuthTicketAction } from "../../ticket/check/action"
 import { AuthenticatePasswordAction } from "../../user/password/authenticate/action"
 import { RequestResetTokenAction } from "../../user/password/reset/request_token/action"
 import { ResetPasswordAction } from "../../user/password/reset/reset/action"
-import { SignLinkResource } from "../action_nav/resource"
+import { SignLink } from "../nav/resource"
 
 export type SignAction = ApplicationStateAction<SignActionState>
 
 export interface SignSubView {
-    link(): SignLinkResource
+    link(): Readonly<{ link: SignLink }>
 
     check(): ApplicationView<CheckAuthTicketAction>
 
@@ -30,7 +30,10 @@ export type SignActionState =
     | View<"password-reset", ApplicationView<ResetPasswordAction>>
     | Readonly<{ type: "error"; err: string }>
 
-type Static<T extends string> = Readonly<{ type: `static-${T}`; resource: SignLinkResource }>
+type Static<T extends string> = Readonly<{
+    type: `static-${T}`
+    resource: Readonly<{ link: SignLink }>
+}>
 type View<T, V> = Readonly<{ type: T; view: V }>
 
 export const initialSignViewState: SignActionState = { type: "initial-view" }

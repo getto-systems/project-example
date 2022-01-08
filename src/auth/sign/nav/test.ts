@@ -1,4 +1,4 @@
-import { initSignLinkResource } from "./init"
+import { initSignLinkResource } from "./resource"
 
 describe("SignLink", () => {
     test("link", () => {
