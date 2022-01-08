@@ -1,6 +1,6 @@
 import { setupActionTestRunner } from "../../action/test_helper"
 
-import { initValidateBoardAction } from "./init"
+import { initValidateBoardAction } from "./action"
 
 describe("ValidateBoard", () => {
     test("validate; all valid state; clear", async () => {
@@ -53,10 +53,14 @@ describe("ValidateBoard", () => {
 })
 
 function standard() {
-    const { validate: action, checker } = initValidateBoardAction({
-        fields: ["name", "description"],
-        converter: () => ({ valid: true, value: { name: "valid-name", value: "valid-value" } }),
-    })
+    const { validate: action, checker } = initValidateBoardAction(
+        {
+            fields: ["name", "description"],
+        },
+        {
+            converter: () => ({ valid: true, value: { name: "valid-name", value: "valid-value" } }),
+        },
+    )
 
     return { action, checker }
 }

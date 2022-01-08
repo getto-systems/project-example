@@ -4,12 +4,12 @@ import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-a
 import { initSignLink } from "../../../sign/nav/resource"
 import { initInputLoginIDAction } from "../../login_id/input/action"
 import { initInputPasswordAction } from "../input/action"
-import { initValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/init"
+import { initValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/validate_board/action"
 
 import { SignLink } from "../../../sign/nav/resource"
 import { InputLoginIDAction } from "../../login_id/input/action"
 import { InputPasswordAction } from "../input/action"
-import { ValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/action"
+import { ValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/validate_board/action"
 
 import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 import { getScriptPath } from "../../../sign/get_script_path/method"
@@ -109,25 +109,29 @@ class Action
 
         const loginID = initInputLoginIDAction()
         const password = initInputPasswordAction()
-        const { validate, checker } = initValidateBoardAction({
-            fields: authenticatePasswordFieldNames,
-            converter: (): ConvertBoardResult<AuthenticatePasswordFields> => {
-                const result = {
-                    loginID: loginID.checker.get(),
-                    password: password.checker.get(),
-                }
-                if (!result.loginID.valid || !result.password.valid) {
-                    return { valid: false }
-                }
-                return {
-                    valid: true,
-                    value: {
-                        loginID: result.loginID.value,
-                        password: result.password.value,
-                    },
-                }
+        const { validate, checker } = initValidateBoardAction(
+            {
+                fields: authenticatePasswordFieldNames,
             },
-        })
+            {
+                converter: (): ConvertBoardResult<AuthenticatePasswordFields> => {
+                    const result = {
+                        loginID: loginID.checker.get(),
+                        password: password.checker.get(),
+                    }
+                    if (!result.loginID.valid || !result.password.valid) {
+                        return { valid: false }
+                    }
+                    return {
+                        valid: true,
+                        value: {
+                            loginID: result.loginID.value,
+                            password: result.password.value,
+                        },
+                    }
+                },
+            },
+        )
 
         this.loginID = loginID.input
         this.password = password.input

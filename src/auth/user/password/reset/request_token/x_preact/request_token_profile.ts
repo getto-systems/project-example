@@ -22,7 +22,7 @@ import { RequestResetTokenError } from "../data"
 import { box } from "../../../../../../../ui/vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../../../ui/vendor/getto-css/preact/design/highlight"
 import { RequestResetTokenProfileAction, RequestResetTokenProfileState } from "../action"
-import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
+import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/validate_board/action"
 
 type EntryProps = Readonly<{
     requestToken: RequestResetTokenProfileAction

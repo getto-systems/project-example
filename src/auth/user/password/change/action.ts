@@ -3,10 +3,10 @@ import { ApplicationStateAction } from "../../../../../ui/vendor/getto-applicati
 import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/init"
 import { initInputPasswordAction } from "../input/action"
-import { initValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/init"
+import { initValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/validate_board/action"
 
 import { InputPasswordAction } from "../input/action"
-import { ValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/action_validate_board/action"
+import { ValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/validate_board/action"
 
 import { ChangePasswordError, ChangePasswordFields } from "./data"
 import { ConvertBoardResult } from "../../../../../ui/vendor/getto-application/board/kernel/data"
@@ -74,25 +74,29 @@ class Action
 
         const currentPassword = initInputPasswordAction()
         const newPassword = initInputPasswordAction()
-        const { validate, checker } = initValidateBoardAction({
-            fields: changePasswordFieldNames,
-            converter: (): ConvertBoardResult<ChangePasswordFields> => {
-                const result = {
-                    currentPassword: currentPassword.checker.get(),
-                    newPassword: newPassword.checker.get(),
-                }
-                if (!result.currentPassword.valid || !result.newPassword.valid) {
-                    return { valid: false }
-                }
-                return {
-                    valid: true,
-                    value: {
-                        currentPassword: result.currentPassword.value,
-                        newPassword: result.newPassword.value,
-                    },
-                }
+        const { validate, checker } = initValidateBoardAction(
+            {
+                fields: changePasswordFieldNames,
             },
-        })
+            {
+                converter: (): ConvertBoardResult<ChangePasswordFields> => {
+                    const result = {
+                        currentPassword: currentPassword.checker.get(),
+                        newPassword: newPassword.checker.get(),
+                    }
+                    if (!result.currentPassword.valid || !result.newPassword.valid) {
+                        return { valid: false }
+                    }
+                    return {
+                        valid: true,
+                        value: {
+                            currentPassword: result.currentPassword.value,
+                            newPassword: result.newPassword.value,
+                        },
+                    }
+                },
+            },
+        )
 
         this.currentPassword = currentPassword.input
         this.newPassword = newPassword.input
