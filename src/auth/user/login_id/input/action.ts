@@ -1,15 +1,15 @@
 import { loginIDBoardConverter } from "./convert"
 
 import { initValidateBoardFieldAction } from "../../../../../ui/vendor/getto-application/board/action_validate_field/init"
-import { initObserveBoardFieldAction } from "../../../../../ui/vendor/getto-application/board/action_observe_field/init"
 import { initBoardFieldObserver } from "../../../../../ui/vendor/getto-application/board/observe_field/init/observer"
 
 import { ApplicationAction } from "../../../../../ui/vendor/getto-application/action/action"
+import { initObserveBoardFieldAction } from "../../../../../ui/vendor/getto-application/board/observe_field/action"
 import {
     initInputBoardAction,
     InputBoardAction,
 } from "../../../../../ui/vendor/getto-application/board/input/action"
-import { ObserveBoardFieldAction } from "../../../../../ui/vendor/getto-application/board/action_observe_field/action"
+import { ObserveBoardFieldAction } from "../../../../../ui/vendor/getto-application/board/observe_field/action"
 import {
     ValidateBoardFieldAction,
     ValidateBoardFieldState,

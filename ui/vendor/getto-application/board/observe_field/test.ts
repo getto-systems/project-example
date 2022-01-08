@@ -3,8 +3,8 @@ import { setupActionTestRunner } from "../../action/test_helper"
 import { mockBoardValueStore } from "../input/init/mock"
 import { markBoardValue } from "../kernel/mock"
 
-import { initObserveBoardFieldAction } from "./init"
-import { initBoardFieldObserver } from "../observe_field/init/observer"
+import { initObserveBoardFieldAction } from "./action"
+import { initBoardFieldObserver } from "./init/observer"
 
 describe("ObserveBoardField", () => {
     test("observe; no change", async () => {

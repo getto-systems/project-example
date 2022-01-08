@@ -1,8 +1,4 @@
-import { BoardValue } from "../kernel/data";
-
-export type ObserveBoardFieldInfra = Readonly<{
-    observer: BoardFieldObserver
-}>
+import { BoardValue } from "../kernel/data"
 
 export interface BoardFieldObserver {
     pin(): void
