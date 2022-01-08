@@ -15,7 +15,7 @@ import { InputBoardComponent } from "../../../../../../ui/vendor/getto-applicati
 import { ValidateBoardFieldState } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/action"
 import { InputLoginIDAction, ValidateLoginIDState } from "../action"
 
-import { loginIDLabel, ValidateLoginIDError } from "../data"
+import { ValidateLoginIDError } from "../data"
 
 type EntryProps = Readonly<{ field: InputLoginIDAction }> &
     Partial<{ title: VNodeContent; help: VNodeContent[] }>
@@ -51,7 +51,7 @@ export function InputLoginIDComponent(props: Props): VNode {
         if (props.title) {
             return props.title
         }
-        return loginIDLabel
+        return "ログインID"
     }
     function help(): VNodeContent[] {
         if (props.help) {

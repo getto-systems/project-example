@@ -23,6 +23,7 @@ export default {
 }
 
 type Props = Readonly<{
+    title: string
     password: string
     validate: typeof validateOptions[number]
     help: string
@@ -36,6 +37,7 @@ const template = storyTemplate<Props>((props) => {
 
     return h(InputPasswordComponent, {
         field,
+        title: props.title,
         help: [props.help],
         state: validateState(),
     })
@@ -58,6 +60,7 @@ const template = storyTemplate<Props>((props) => {
 })
 
 export const InputPassword = template({
+    title: "",
     password: "",
     validate: "valid",
     help: "",

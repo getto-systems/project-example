@@ -1,4 +1,7 @@
 import { BaseResource } from "../../../../../../src/example/action_base/resource"
-import { ManageUserAccountResource } from "../../../../../../src/auth/user/account/action_manage/resource"
+import { SearchAuthUserAccountAction } from "../../../../../../src/auth/user/account/search/action"
 
-export type ManageUserAccountPageResource = BaseResource & ManageUserAccountResource
+export type ManageUserAccountPageResource = BaseResource &
+    Readonly<{
+        search: SearchAuthUserAccountAction
+    }>
