@@ -26,7 +26,7 @@ import { signNav } from "../../../../../sign/action_nav/x_preact/nav"
 
 import { ApplicationErrorComponent } from "../../../../../../avail/x_preact/application_error"
 import { InputLoginIDEntry } from "../../../../login_id/input/action_input/x_preact/input"
-import { InputPasswordEntry } from "../../../input/action_input/x_preact/input"
+import { InputPasswordEntry } from "../../../input/x_preact/input"
 
 import { ResetPasswordError } from "../data"
 import { ApplicationView } from "../../../../../../../ui/vendor/getto-application/action/action"

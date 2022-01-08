@@ -35,11 +35,11 @@ export function RequestResetTokenProfileEntry({ requestToken }: EntryProps): VNo
     })
 }
 
-type Props = Readonly<{
-    requestToken: RequestResetTokenProfileAction
-    state: RequestResetTokenProfileState
-    validate: ValidateBoardActionState
-}>
+type Props = EntryProps &
+    Readonly<{
+        state: RequestResetTokenProfileState
+        validate: ValidateBoardActionState
+    }>
 export function RequestResetTokenProfileComponent(props: Props): VNode {
     return basedOn(props)
 
