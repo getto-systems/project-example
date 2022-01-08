@@ -1,14 +1,15 @@
 import { h } from "preact"
 
-import { storyTemplate } from "../../../../../../../ui/vendor/storybook/preact/story"
+import { storyTemplate } from "../../../../../../ui/vendor/storybook/preact/story"
 
 import { InputLoginIDComponent } from "./input"
 
-import { mockInputLoginIDAction } from "../mock"
+import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/init/mock"
+import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
 
-import { LOGIN_ID_MAX_LENGTH } from "../../convert"
+import { LOGIN_ID_MAX_LENGTH } from "../convert"
 
-import { ValidateLoginIDState } from "../action"
+import { initInputLoginIDAction, ValidateLoginIDState } from "../action"
 
 const options = ["valid", "empty", "too-long"] as const
 
@@ -22,12 +23,19 @@ export default {
 }
 
 type Props = Readonly<{
+    loginID: string
     validate: typeof options[number]
     help: string
 }>
 const template = storyTemplate<Props>((props) => {
+    const { input: field } = initInputLoginIDAction()
+    const store = mockBoardValueStore()
+    field.input.connector.connect(store)
+
+    store.set(markBoardValue(props.loginID))
+
     return h(InputLoginIDComponent, {
-        field: mockInputLoginIDAction(),
+        field,
         help: [props.help],
         state: state(),
     })
@@ -49,4 +57,8 @@ const template = storyTemplate<Props>((props) => {
     }
 })
 
-export const InputLoginID = template({ validate: "valid", help: "" })
+export const InputLoginID = template({
+    loginID: "",
+    validate: "valid",
+    help: "",
+})

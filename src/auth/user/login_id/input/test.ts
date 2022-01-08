@@ -1,9 +1,9 @@
-import { setupActionTestRunner } from "../../../../../../ui/vendor/getto-application/action/test_helper"
+import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
 
-import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
-import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/init/mock"
+import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
+import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/init/mock"
 
-import { initInputLoginIDAction } from "./init"
+import { initInputLoginIDAction } from "./action"
 
 describe("InputLoginID", () => {
     test("validate; valid input", async () => {

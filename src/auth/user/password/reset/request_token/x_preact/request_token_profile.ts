@@ -16,7 +16,7 @@ import {
 import { spinner } from "../../../../../../example/x_preact/design/icon"
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
-import { InputLoginIDEntry } from "../../../../login_id/input/action_input/x_preact/input"
+import { InputLoginIDEntry } from "../../../../login_id/input/x_preact/input"
 
 import { RequestResetTokenError } from "../data"
 import { box } from "../../../../../../../ui/vendor/getto-css/preact/design/box"

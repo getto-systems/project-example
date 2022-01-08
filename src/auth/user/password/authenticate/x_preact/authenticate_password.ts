@@ -26,7 +26,7 @@ import { appendScript } from "../../../../sign/x_preact/script"
 import { signNav } from "../../../../sign/action_nav/x_preact/nav"
 
 import { ApplicationErrorComponent } from "../../../../../avail/x_preact/application_error"
-import { InputLoginIDEntry } from "../../../login_id/input/action_input/x_preact/input"
+import { InputLoginIDEntry } from "../../../login_id/input/x_preact/input"
 import { InputPasswordEntry } from "../../input/x_preact/input"
 
 import { ApplicationView } from "../../../../../../ui/vendor/getto-application/action/action"

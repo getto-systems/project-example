@@ -2,12 +2,12 @@ import { delayedChecker } from "../../../../../z_lib/ui/timer/helper"
 
 import { ApplicationAbstractStateAction } from "../../../../../../ui/vendor/getto-application/action/init"
 import { initSignLink } from "../../../../sign/action_nav/init"
-import { initInputLoginIDAction } from "../../../login_id/input/action_input/init"
+import { initInputLoginIDAction } from "../../../login_id/input/action"
 import { initValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/init"
 
 import { SignLink } from "../../../../sign/action_nav/resource"
 import { ApplicationStateAction } from "../../../../../../ui/vendor/getto-application/action/action"
-import { InputLoginIDAction } from "../../../login_id/input/action_input/action"
+import { InputLoginIDAction } from "../../../login_id/input/action"
 import { ValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
 
 import { RequestResetTokenRemote } from "./infra"
