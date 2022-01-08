@@ -8,7 +8,7 @@ import { VNodeContent, VNodeKey } from "../../../x_preact/common"
 import {
     CheckboxBoardComponent,
     CheckboxBoardContent,
-} from "../../../../../../ui/vendor/getto-application/board/action_input/x_preact/checkbox"
+} from "../../../../../../ui/vendor/getto-application/board/input/x_preact/checkbox"
 
 import { SearchColumnsAction } from "../action"
 

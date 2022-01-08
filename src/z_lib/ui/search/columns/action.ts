@@ -1,13 +1,17 @@
 import { ApplicationStateAction } from "../../../../../ui/vendor/getto-application/action/action"
-import { MultipleInputBoardAction } from "../../../../../ui/vendor/getto-application/board/action_input/action"
+import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/init"
+import {
+    MultipleInputBoardAction,
+    initMultipleInputBoardAction,
+} from "../../../../../ui/vendor/getto-application/board/input/action"
+
+import { toSearchColumns } from "./convert"
+
+import { SearchColumnsRepository } from "./infra"
+import { MultipleBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
 
 import { SearchColumns } from "./data"
 import { RepositoryError } from "../../repository/data"
-import { SearchColumnsRepository } from "./infra"
-import { toSearchColumns } from "./convert"
-import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/init"
-import { MultipleBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
-import { initMultipleInputBoardAction } from "../../../../../ui/vendor/getto-application/board/action_input/init"
 
 export interface SearchColumnsAction extends ApplicationStateAction<SearchColumnsState> {
     readonly input: MultipleInputBoardAction

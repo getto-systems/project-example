@@ -7,7 +7,7 @@ import { checkbox, checkbox_block } from "../../../../getto-css/preact/design/fo
 
 import { MultipleInputBoardAction } from "../action"
 
-import { MultipleBoardValueStoreConnector } from "../../input/infra"
+import { MultipleBoardValueStoreConnector } from "../infra"
 
 import { BoardValue } from "../../kernel/data"
 

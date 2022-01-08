@@ -1,6 +1,8 @@
 import { ApplicationAction } from "../../../../../ui/vendor/getto-application/action/action"
-import { InputBoardAction } from "../../../../../ui/vendor/getto-application/board/action_input/action"
-import { initInputBoardAction } from "../../../../../ui/vendor/getto-application/board/action_input/init"
+import {
+    InputBoardAction,
+    initInputBoardAction,
+} from "../../../../../ui/vendor/getto-application/board/input/action"
 
 import {
     BoardValue,

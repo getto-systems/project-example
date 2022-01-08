@@ -10,7 +10,7 @@ import {
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
-import { InputBoardComponent } from "../../../../../../ui/vendor/getto-application/board/action_input/x_preact/input"
+import { InputBoardComponent } from "../../../../../../ui/vendor/getto-application/board/input/x_preact/input"
 
 import { ValidateBoardFieldState } from "../../../../../../ui/vendor/getto-application/board/action_validate_field/action"
 import { InputLoginIDAction, ValidateLoginIDState } from "../action"
