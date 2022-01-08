@@ -2,11 +2,14 @@ import { h } from "preact"
 
 import { storyTemplate } from "../../../../../ui/vendor/storybook/preact/story"
 
-import { mockFindNextVersionAction } from "../mock"
-
 import { MoveToLatestVersionComponent } from "./move_to_latest_version"
 
+import { newFindNextVersionConfig } from "../init/config"
+import { mockRemoteInfraError } from "../../../../z_lib/ui/remote/mock"
+import { mockFindNextVersionShell } from "../init/mock"
+
 import { FindNextVersionState } from "../action"
+import { initFindNextVersionAction } from "../../find_next/action"
 
 const options = ["takeLongtime", "failed"] as const
 
@@ -28,7 +31,15 @@ type MockProps = Readonly<{
 }>
 const template = storyTemplate<MockProps>((props) => {
     return h(MoveToLatestVersionComponent, {
-        findNext: mockFindNextVersionAction(),
+        findNext: initFindNextVersionAction(
+            newFindNextVersionConfig(),
+            {
+                check: async () => mockRemoteInfraError,
+                version: "0.0.0",
+                versionSuffix: "-ui",
+            },
+            mockFindNextVersionShell(new URL("https://example.com"), "0.0.0"),
+        ),
         state: state(),
     })
 
