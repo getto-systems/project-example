@@ -1,6 +1,6 @@
 import { docsMenuContent } from "../../../example/outline/kernel/init/docs"
 import { newNotifyUnexpectedErrorResource } from "../../../avail/unexpected_error/notify/init/resource"
-import { newLoadBreadcrumbListAction } from "../../../example/outline/action_load_breadcrumb_list/init/resource"
+import { newLoadBreadcrumbListResource } from "../../../example/outline/load_breadcrumb_list/init/resource"
 import { newLoadMenuResource } from "../../../example/outline/action_load_menu/init/resource"
 
 import { initDocsView } from "../init"
@@ -16,7 +16,7 @@ export function newDocsView(
 ): DocsView {
     const menu = docsMenuContent()
     return initDocsView({
-        breadcrumbList: newLoadBreadcrumbListAction(feature, menu),
+        ...newLoadBreadcrumbListResource(feature, menu),
         ...newLoadMenuResource(feature, menu),
         ...newNotifyUnexpectedErrorResource(feature),
     })

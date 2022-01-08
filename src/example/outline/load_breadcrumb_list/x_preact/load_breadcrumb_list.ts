@@ -13,13 +13,16 @@ import { icon } from "../../../x_preact/design/icon"
 
 import { MENU_ID } from "../../action_load_menu/x_preact/load_menu"
 
-import { LoadBreadcrumbListResource } from "../resource"
+import { LoadBreadcrumbListAction } from "../action"
 
 import { BreadcrumbList, BreadcrumbNode } from "../../load_breadcrumb_list/data"
 import { MenuCategory, MenuItem } from "../../kernel/data"
 
-export function LoadBreadcrumbListComponent(resource: LoadBreadcrumbListResource): VNode {
-    return mainBreadcrumbList(toContent(resource.breadcrumbList.load()))
+type Props = Readonly<{
+    breadcrumbList: LoadBreadcrumbListAction
+}>
+export function LoadBreadcrumbListComponent({ breadcrumbList }: Props): VNode {
+    return mainBreadcrumbList(toContent(breadcrumbList.load()))
 }
 
 function toContent(breadcrumbList: BreadcrumbList): VNode[] {

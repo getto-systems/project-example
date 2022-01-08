@@ -6,7 +6,7 @@ import { loadMenu } from "../load_menu/method"
 import { updateMenuBadge } from "../update_menu_badge/method"
 import { hideMenuExpand, showMenuExpand } from "../toggle_menu_expand/method"
 
-import { LoadMenuDetecter } from "../kernel/infra"
+import { MenuTargetPathDetecter } from "../kernel/infra"
 import { LoadMenuInfra, LoadMenuStore } from "../load_menu/infra"
 import { UpdateMenuBadgeInfra, UpdateMenuBadgeStore } from "../update_menu_badge/infra"
 import { ToggleMenuExpandInfra, ToggleMenuExpandStore } from "../toggle_menu_expand/infra"
@@ -35,7 +35,7 @@ export function initLoadMenuMaterial(infra: LoadMenuActionInfra): LoadMenuMateri
 
 export function initLoadMenuAction(
     material: LoadMenuMaterial,
-    detecter: LoadMenuDetecter,
+    detecter: MenuTargetPathDetecter,
 ): LoadMenuAction {
     return new Action(material, detecter)
 }
@@ -44,9 +44,9 @@ class Action extends ApplicationAbstractStateAction<LoadMenuState> implements Lo
     readonly initialState = initialLoadMenuState
 
     material: LoadMenuMaterial
-    detecter: LoadMenuDetecter
+    detecter: MenuTargetPathDetecter
 
-    constructor(material: LoadMenuMaterial, detecter: LoadMenuDetecter) {
+    constructor(material: LoadMenuMaterial, detecter: MenuTargetPathDetecter) {
         super(async () =>
             this.material.load(detecter(), (event) => {
                 const state = this.post(event)

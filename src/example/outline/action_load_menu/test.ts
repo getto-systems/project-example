@@ -2,25 +2,27 @@ import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/a
 
 import { markMenuCategoryLabel, standard_MenuTree } from "../kernel/test_helper"
 
-import { mockLoadMenuLocationDetecter } from "../kernel/mock"
-
 import { initLoadMenuAction, initLoadMenuMaterial } from "./init"
+import {
+    convertMenuBadgeRemote,
+    detectMenuTargetPath,
+    menuExpandRepositoryConverter,
+} from "../kernel/convert"
+import { authTicketRepositoryConverter } from "../../../auth/ticket/kernel/convert"
+import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
+import { convertDB } from "../../../z_lib/ui/repository/init/convert"
 
 import { AuthTicketRepository, AuthTicketRepositoryValue } from "../../../auth/ticket/kernel/infra"
 import {
     GetMenuBadgeRemote,
     MenuExpandRepository,
-    LoadMenuDetecter,
+    MenuTargetPathDetecter,
     MenuExpand,
 } from "../kernel/infra"
 
 import { LoadMenuResource } from "./resource"
 
-import { convertMenuBadgeRemote, menuExpandRepositoryConverter } from "../kernel/convert"
-import { authTicketRepositoryConverter } from "../../../auth/ticket/kernel/convert"
-import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 import { AuthTicket } from "../../../auth/ticket/kernel/data"
-import { convertDB } from "../../../z_lib/ui/repository/init/convert"
 
 describe("Menu", () => {
     test("load menu", async () => {
@@ -381,11 +383,9 @@ function initResource(
     ]
 }
 
-function standard_detecter(): LoadMenuDetecter {
-    return mockLoadMenuLocationDetecter(
-        new URL("https://example.com/1.0.0/index.html"),
-        standard_version(),
-    )
+function standard_detecter(): MenuTargetPathDetecter {
+    return () =>
+        detectMenuTargetPath(new URL("https://example.com/1.0.0/index.html"), standard_version())
 }
 function standard_version(): string {
     return "1.0.0"

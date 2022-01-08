@@ -7,7 +7,7 @@ import { RemoteResult } from "../../../z_lib/ui/remote/infra"
 import { GetMenuBadgeRemoteError, MenuCategoryPath, MenuTargetPath } from "./data"
 import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 
-export interface LoadMenuDetecter {
+export interface MenuTargetPathDetecter {
     (): ConvertLocationResult<MenuTargetPath>
 }
 

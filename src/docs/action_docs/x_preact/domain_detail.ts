@@ -20,7 +20,7 @@ import { actionBox, dataBox, domainBox } from "./helper"
 
 import { ApplicationErrorComponent } from "../../../avail/x_preact/application_error"
 import { LoadMenuEntry } from "../../../example/outline/action_load_menu/x_preact/load_menu"
-import { LoadBreadcrumbListComponent } from "../../../example/outline/action_load_breadcrumb_list/x_preact/load_breadcrumb_list"
+import { LoadBreadcrumbListComponent } from "../../../example/outline/load_breadcrumb_list/x_preact/load_breadcrumb_list"
 
 import { DocsView, DocsResource } from "../resource"
 import { DocsDomainContent } from "../../../../ui/vendor/getto-application/docs/data"
