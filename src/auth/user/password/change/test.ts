@@ -4,12 +4,10 @@ import { ticker } from "../../../../z_lib/ui/timer/helper"
 import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/init/mock"
 
-import { initChangePasswordAction, initChangePasswordMaterial } from "./init"
+import { ChangePasswordAction, initChangePasswordAction } from "./action"
 
-import { ChangePasswordRemote, ChangePasswordRemoteResult } from "../change/infra"
+import { ChangePasswordRemote, ChangePasswordRemoteResult } from "./infra"
 import { BoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
-
-import { ChangePasswordResource } from "./resource"
 
 const VALID_PASSWORD = { currentPassword: "current-password", newPassword: "new-password" } as const
 
@@ -64,6 +62,23 @@ describe("ChangePassword", () => {
         })
     })
 
+    test("open; close", async () => {
+        const { resource } = standard()
+
+        const runner = setupActionTestRunner(resource.change.subscriber)
+
+        await runner(async () => {
+            resource.change.open()
+            resource.change.close()
+            return resource.change.currentState()
+        }).then((stack) => {
+            expect(stack).toEqual([
+                { type: "input-password" },
+                { type: "initial-change-password" },
+            ])
+        })
+    })
+
     test("clear", () => {
         const { resource, store } = standard()
 
@@ -105,8 +120,10 @@ function takeLongtime_elements() {
     return initResource(takeLongtime_change())
 }
 
-function initResource(change: ChangePasswordRemote): Readonly<{
-    resource: ChangePasswordResource
+function initResource(changePasswordRemote: ChangePasswordRemote): Readonly<{
+    resource: Readonly<{
+        change: ChangePasswordAction
+    }>
     store: Readonly<{
         currentPassword: BoardValueStore
         newPassword: BoardValueStore
@@ -114,12 +131,12 @@ function initResource(change: ChangePasswordRemote): Readonly<{
 }> {
     const resource = {
         change: initChangePasswordAction(
-            initChangePasswordMaterial({
-                change,
-                config: {
-                    takeLongtimeThreshold: { delay_millisecond: 32 },
-                },
-            }),
+            {
+                takeLongtimeThreshold: { delay_millisecond: 32 },
+            },
+            {
+                changePasswordRemote,
+            },
         ),
     }
 

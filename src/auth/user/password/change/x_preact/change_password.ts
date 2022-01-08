@@ -21,11 +21,14 @@ import { spinner } from "../../../../../example/x_preact/design/icon"
 
 import { InputPasswordEntry } from "../../input/action_input/x_preact/input"
 
-import { ChangePasswordResource, ChangePasswordResourceState } from "../resource"
+import { ChangePasswordError } from "../data"
+import { ChangePasswordAction, ChangePasswordState } from "../action"
+import { ValidateBoardActionState } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
 
-import { ChangePasswordError } from "../../change/data"
-
-export function ChangePasswordEntry({ change }: ChangePasswordResource): VNode {
+type EntryProps = Readonly<{
+    change: ChangePasswordAction
+}>
+export function ChangePasswordEntry({ change }: EntryProps): VNode {
     return h(ChangePasswordComponent, {
         change,
         state: useApplicationAction(change),
@@ -33,11 +36,15 @@ export function ChangePasswordEntry({ change }: ChangePasswordResource): VNode {
     })
 }
 
-type Props = ChangePasswordResource & ChangePasswordResourceState
+type Props = Readonly<{
+    change: ChangePasswordAction
+    state: ChangePasswordState
+    validate: ValidateBoardActionState
+}>
 export function ChangePasswordComponent(props: Props): VNode {
     return basedOn(props)
 
-    function basedOn({ state, validate }: ChangePasswordResourceState): VNode {
+    function basedOn({ state, validate }: Props): VNode {
         switch (state.type) {
             case "initial-change-password":
                 return buttonBox({ type: "initial" })

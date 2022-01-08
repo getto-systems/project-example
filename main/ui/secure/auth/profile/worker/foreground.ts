@@ -5,19 +5,27 @@ import { ProfilePageEntry } from "../page"
 
 import { newWorkerForegroundOutsideFeature } from "../../../../../../src/x_outside_feature/worker"
 
+import { newRequestResetTokenConfig } from "../../../../../../src/auth/user/password/reset/request_token/init/config"
+import { newChangePasswordConfig } from "../../../../../../src/auth/user/password/change/init/config"
+
 import { newBaseResource } from "../../../../../../src/example/action_base/init/resource"
-import { newChangePasswordResource } from "../../../../../../src/auth/user/password/action_change/init/resource"
 import {
     newRequestResetTokenProxy,
     RequestResetTokenProxy,
 } from "../../../../../../src/auth/user/password/reset/request_token/init/worker/foreground"
+import {
+    ChangePasswordProxy,
+    newChangePasswordProxy,
+} from "../../../../../../src/auth/user/password/change/init/worker/foreground"
 import { toProfileView } from "../common"
 
 import { ApplicationView } from "../../../../../../ui/vendor/getto-application/action/action"
-import { ProfilePageResource } from "../resource"
-import { ProfileBackgroundMessage, ProfileForegroundMessage } from "./message"
 import { initRequestResetTokenProfileAction } from "../../../../../../src/auth/user/password/reset/request_token/action"
-import { newRequestResetTokenConfig } from "../../../../../../src/auth/user/password/reset/request_token/init/config"
+import { initChangePasswordAction } from "../../../../../../src/auth/user/password/change/action"
+
+import { ProfilePageResource } from "../resource"
+
+import { ProfileBackgroundMessage, ProfileForegroundMessage } from "./message"
 
 renderEntry()
 
@@ -46,7 +54,7 @@ async function newResource() {
     return {
         resource: {
             ...newBaseResource(feature),
-            ...newChangePasswordResource(feature),
+            ...newChangePasswordResource(proxy),
             ...newRequestResetTokenProfileResource(proxy),
         },
         terminate: () => {
@@ -59,6 +67,11 @@ async function newResource() {
     }
 }
 
+function newChangePasswordResource(proxy: Proxy) {
+    return {
+        change: initChangePasswordAction(newChangePasswordConfig(), proxy.password.change.infra),
+    }
+}
 function newRequestResetTokenProfileResource(proxy: Proxy) {
     return {
         requestToken: initRequestResetTokenProfileAction(
@@ -70,6 +83,7 @@ function newRequestResetTokenProfileResource(proxy: Proxy) {
 
 type Proxy = Readonly<{
     password: Readonly<{
+        change: ChangePasswordProxy
         reset: Readonly<{
             requestToken: RequestResetTokenProxy
         }>
@@ -78,6 +92,7 @@ type Proxy = Readonly<{
 function initProxy(post: Post<ProfileForegroundMessage>): Proxy {
     return {
         password: {
+            change: newChangePasswordProxy((message) => post({ type: "password-change", message })),
             reset: {
                 requestToken: newRequestResetTokenProxy((message) =>
                     post({ type: "password-reset-requestToken", message }),
@@ -94,7 +109,7 @@ function initBackgroundMessageHandler(proxy: Proxy): Post<ProfileBackgroundMessa
                 return true
 
             case "password-change":
-                //proxy.password.change.resolve(message.response)
+                proxy.password.change.resolve(message.response)
                 return true
 
             case "error":

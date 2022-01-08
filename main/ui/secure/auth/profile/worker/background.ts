@@ -1,12 +1,12 @@
 import { newWorkerBackgroundOutsideFeature } from "../../../../../../src/x_outside_feature/worker"
 
-import { newChangePasswordHandler } from "../../../../../../src/auth/user/password/action_change/init/worker/background"
+import { newChangePasswordWorkerHandler } from "../../../../../../src/auth/user/password/change/init/worker/background"
 import { newRequestResetTokenWorkerHandler } from "../../../../../../src/auth/user/password/reset/request_token/init/worker/background"
 
 import { WorkerHandler } from "../../../../../../ui/vendor/getto-application/action/worker/background"
 
 import { ProfileForegroundMessage, ProfileBackgroundMessage } from "./message"
-import { ChangePasswordProxyMessage } from "../../../../../../src/auth/user/password/action_change/init/worker/message"
+import { ChangePasswordProxyMessage } from "../../../../../../src/auth/user/password/change/init/worker/message"
 import { RequestResetTokenProxyMessage } from "../../../../../../src/auth/user/password/reset/request_token/init/worker/message"
 
 newBackground()
@@ -17,7 +17,7 @@ function newBackground(): void {
 
     const handler: Handler = {
         password: {
-            change: newChangePasswordHandler(feature, (response) =>
+            change: newChangePasswordWorkerHandler(feature, (response) =>
                 postBackgroundMessage({ type: "password-change", response }),
             ),
             reset: {
