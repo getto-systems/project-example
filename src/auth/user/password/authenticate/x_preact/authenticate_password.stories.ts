@@ -11,7 +11,7 @@ import { mockGetScriptPathShell } from "../../../../sign/get_script_path/init/mo
 import { mockRemoteInfraError } from "../../../../../z_lib/ui/remote/mock"
 
 import { AuthenticatePasswordState, initAuthenticatePasswordAction } from "../action"
-import { ValidateBoardActionState } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
+import { ValidateBoardActionState } from "../../../../../../ui/vendor/getto-application/board/validate_board/action"
 
 import { validateBoardStates } from "../../../../../../ui/vendor/getto-application/board/validate_board/data"
 import { AuthTicket } from "../../../../ticket/kernel/data"

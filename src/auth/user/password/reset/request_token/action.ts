@@ -3,12 +3,12 @@ import { delayedChecker } from "../../../../../z_lib/ui/timer/helper"
 import { ApplicationAbstractStateAction } from "../../../../../../ui/vendor/getto-application/action/init"
 import { initSignLink } from "../../../../sign/nav/resource"
 import { initInputLoginIDAction } from "../../../login_id/input/action"
-import { initValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/init"
+import { initValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/validate_board/action"
 
 import { SignLink } from "../../../../sign/nav/resource"
 import { ApplicationStateAction } from "../../../../../../ui/vendor/getto-application/action/action"
 import { InputLoginIDAction } from "../../../login_id/input/action"
-import { ValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
+import { ValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/validate_board/action"
 
 import { RequestResetTokenRemote } from "./infra"
 import { DelayTime } from "../../../../../z_lib/ui/config/infra"
@@ -75,21 +75,25 @@ class Action
 
         const loginID = initInputLoginIDAction()
 
-        const { validate, checker } = initValidateBoardAction({
-            fields: requestResetTokenFieldNames,
-            converter: (): ConvertBoardResult<RequestResetTokenFields> => {
-                const loginIDResult = loginID.checker.get()
-                if (!loginIDResult.valid) {
-                    return { valid: false }
-                }
-                return {
-                    valid: true,
-                    value: {
-                        loginID: loginIDResult.value,
-                    },
-                }
+        const { validate, checker } = initValidateBoardAction(
+            {
+                fields: requestResetTokenFieldNames,
             },
-        })
+            {
+                converter: (): ConvertBoardResult<RequestResetTokenFields> => {
+                    const loginIDResult = loginID.checker.get()
+                    if (!loginIDResult.valid) {
+                        return { valid: false }
+                    }
+                    return {
+                        valid: true,
+                        value: {
+                            loginID: loginIDResult.value,
+                        },
+                    }
+                },
+            },
+        )
 
         this.loginID = loginID.input
         this.validate = validate
@@ -164,21 +168,25 @@ class ProfileAction
 
         const loginID = initInputLoginIDAction()
 
-        const { validate, checker } = initValidateBoardAction({
-            fields: requestResetTokenProfileFieldNames,
-            converter: (): ConvertBoardResult<RequestResetTokenFields> => {
-                const loginIDResult = loginID.checker.get()
-                if (!loginIDResult.valid) {
-                    return { valid: false }
-                }
-                return {
-                    valid: true,
-                    value: {
-                        loginID: loginIDResult.value,
-                    },
-                }
+        const { validate, checker } = initValidateBoardAction(
+            {
+                fields: requestResetTokenProfileFieldNames,
             },
-        })
+            {
+                converter: (): ConvertBoardResult<RequestResetTokenFields> => {
+                    const loginIDResult = loginID.checker.get()
+                    if (!loginIDResult.valid) {
+                        return { valid: false }
+                    }
+                    return {
+                        valid: true,
+                        value: {
+                            loginID: loginIDResult.value,
+                        },
+                    }
+                },
+            },
+        )
 
         this.loginID = loginID.input
         this.validate = validate

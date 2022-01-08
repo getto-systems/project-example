@@ -7,7 +7,7 @@ import { ChangePasswordComponent } from "./change_password"
 import { mockChangePasswordAction } from "../mock"
 
 import { ChangePasswordState } from "../action"
-import { ValidateBoardActionState } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
+import { ValidateBoardActionState } from "../../../../../../ui/vendor/getto-application/board/validate_board/action"
 
 import { validateBoardStates } from "../../../../../../ui/vendor/getto-application/board/validate_board/data"
 

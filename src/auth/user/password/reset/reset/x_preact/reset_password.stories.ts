@@ -4,7 +4,7 @@ import { storyTemplate } from "../../../../../../../ui/vendor/storybook/preact/s
 
 import { ResetPasswordComponent } from "./reset_password"
 
-import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
+import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/validate_board/action"
 import { initResetPasswordAction, ResetPasswordState } from "../action"
 import { validateBoardStates } from "../../../../../../../ui/vendor/getto-application/board/validate_board/data"
 import { newResetPasswordConfig } from "../init/config"

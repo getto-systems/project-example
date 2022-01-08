@@ -1,9 +1,5 @@
 import { ConvertBoardResult } from "../kernel/data"
 
-export type ValidateBoardStore = Readonly<{
-    stack: ValidateBoardStack
-}>
-
 export interface ValidateBoardStack {
     get(name: string): ValidateBoardStateFound
     set(name: string, result: boolean): void

@@ -23,7 +23,7 @@ import { InputPasswordEntry } from "../../input/x_preact/input"
 
 import { ChangePasswordError } from "../data"
 import { ChangePasswordAction, ChangePasswordState } from "../action"
-import { ValidateBoardActionState } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
+import { ValidateBoardActionState } from "../../../../../../ui/vendor/getto-application/board/validate_board/action"
 
 type EntryProps = Readonly<{
     change: ChangePasswordAction

@@ -28,7 +28,7 @@ import { InputLoginIDEntry } from "../../../../login_id/input/x_preact/input"
 import { RequestResetTokenError } from "../data"
 import { ApplicationView } from "../../../../../../../ui/vendor/getto-application/action/action"
 import { RequestResetTokenAction, RequestResetTokenState } from "../action"
-import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
+import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/validate_board/action"
 
 export function RequestResetTokenEntry(view: ApplicationView<RequestResetTokenAction>): VNode {
     const action = useApplicationView(view)

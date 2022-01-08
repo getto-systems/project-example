@@ -7,7 +7,7 @@ import { RequestResetTokenProfileComponent } from "./request_token_profile"
 import { newRequestResetTokenConfig } from "../init/config"
 import { mockRemoteInfraError } from "../../../../../../z_lib/ui/remote/mock"
 
-import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
+import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/validate_board/action"
 import { initRequestResetTokenProfileAction, RequestResetTokenProfileState } from "../action"
 
 import { validateBoardStates } from "../../../../../../../ui/vendor/getto-application/board/validate_board/data"

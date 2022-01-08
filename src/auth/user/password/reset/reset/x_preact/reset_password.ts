@@ -31,7 +31,7 @@ import { InputPasswordEntry } from "../../../input/x_preact/input"
 import { ResetPasswordError } from "../data"
 import { ApplicationView } from "../../../../../../../ui/vendor/getto-application/action/action"
 import { ResetPasswordAction, ResetPasswordState } from "../action"
-import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
+import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/validate_board/action"
 
 export function ResetPasswordEntry(view: ApplicationView<ResetPasswordAction>): VNode {
     const action = useApplicationView(view)

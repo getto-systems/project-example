@@ -4,12 +4,12 @@ import { ApplicationAbstractStateAction } from "../../../../../../ui/vendor/gett
 import { initSignLink } from "../../../../sign/nav/resource"
 import { initInputLoginIDAction } from "../../../login_id/input/action"
 import { initInputPasswordAction } from "../../input/action"
-import { initValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/init"
+import { initValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/validate_board/action"
 
 import { SignLink } from "../../../../sign/nav/resource"
 import { InputLoginIDAction } from "../../../login_id/input/action"
 import { InputPasswordAction } from "../../input/action"
-import { ValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/action_validate_board/action"
+import { ValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/validate_board/action"
 
 import { delayedChecker } from "../../../../../z_lib/ui/timer/helper"
 
@@ -109,23 +109,27 @@ class Action
         const loginID = initInputLoginIDAction()
         const password = initInputPasswordAction()
 
-        const { validate, checker } = initValidateBoardAction({
-            fields: resetPasswordFieldNames,
-            converter: (): ConvertBoardResult<ResetPasswordFields> => {
-                const loginIDResult = loginID.checker.get()
-                const passwordResult = password.checker.get()
-                if (!loginIDResult.valid || !passwordResult.valid) {
-                    return { valid: false }
-                }
-                return {
-                    valid: true,
-                    value: {
-                        loginID: loginIDResult.value,
-                        password: passwordResult.value,
-                    },
-                }
+        const { validate, checker } = initValidateBoardAction(
+            {
+                fields: resetPasswordFieldNames,
             },
-        })
+            {
+                converter: (): ConvertBoardResult<ResetPasswordFields> => {
+                    const loginIDResult = loginID.checker.get()
+                    const passwordResult = password.checker.get()
+                    if (!loginIDResult.valid || !passwordResult.valid) {
+                        return { valid: false }
+                    }
+                    return {
+                        valid: true,
+                        value: {
+                            loginID: loginIDResult.value,
+                            password: passwordResult.value,
+                        },
+                    }
+                },
+            },
+        )
 
         this.loginID = loginID.input
         this.password = password.input
