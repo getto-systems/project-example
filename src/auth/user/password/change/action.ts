@@ -81,8 +81,8 @@ class Action
             {
                 converter: (): ConvertBoardResult<ChangePasswordFields> => {
                     const result = {
-                        currentPassword: currentPassword.checker.get(),
-                        newPassword: newPassword.checker.get(),
+                        currentPassword: currentPassword.checker.check(),
+                        newPassword: newPassword.checker.check(),
                     }
                     if (!result.currentPassword.valid || !result.newPassword.valid) {
                         return { valid: false }

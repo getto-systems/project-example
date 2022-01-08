@@ -4,11 +4,11 @@ import {
     initInputBoardAction,
     InputBoardAction,
 } from "../../../../../ui/vendor/getto-application/board/input/action"
-import { initValidateBoardFieldAction } from "../../../../../ui/vendor/getto-application/board/action_validate_field/init"
 import {
+    initValidateBoardFieldAction,
     ValidateBoardFieldAction,
     ValidateBoardFieldState,
-} from "../../../../../ui/vendor/getto-application/board/action_validate_field/action"
+} from "../../../../../ui/vendor/getto-application/board/validate_field/action"
 import { ApplicationAction } from "../../../../../ui/vendor/getto-application/action/action"
 
 import { BoardFieldChecker } from "../../../../../ui/vendor/getto-application/board/validate_field/infra"
