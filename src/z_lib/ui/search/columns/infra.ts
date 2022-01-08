@@ -2,10 +2,6 @@ import { FetchRepositoryResult, StoreRepositoryResult } from "../../repository/i
 
 import { SearchColumns } from "./data";
 
-export type SearchColumnsInfra = Readonly<{
-    columns: SearchColumnsRepository
-}>
-
 export interface SearchColumnsRepository {
     get(): Promise<FetchRepositoryResult<SearchColumns>>
     set(value: SearchColumns): Promise<StoreRepositoryResult>
