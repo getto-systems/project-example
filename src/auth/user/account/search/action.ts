@@ -2,11 +2,13 @@ import { ApplicationStateAction } from "../../../../../ui/vendor/getto-applicati
 import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/init"
 
 import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
-import { initObserveBoardAction } from "../../../../../ui/vendor/getto-application/board/action_observe_board/init"
 import { nextSort } from "../../../../z_lib/ui/search/sort/helper"
 
 import { initSearchLoginIDAction, SearchLoginIDAction } from "../../login_id/input/action"
-import { ObserveBoardAction } from "../../../../../ui/vendor/getto-application/board/action_observe_board/action"
+import {
+    initObserveBoardAction,
+    ObserveBoardAction,
+} from "../../../../../ui/vendor/getto-application/board/observe_board/action"
 import {
     initSearchOffsetAction,
     SearchOffsetAction,

@@ -1,6 +1,6 @@
 import { setupActionTestRunner } from "../../action/test_helper"
 
-import { initObserveBoardAction } from "./init"
+import { initObserveBoardAction } from "./action"
 
 describe("ObserveBoard", () => {
     test("observe", async () => {
