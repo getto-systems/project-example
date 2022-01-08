@@ -81,7 +81,7 @@ class Action
             },
             {
                 converter: (): ConvertBoardResult<RequestResetTokenFields> => {
-                    const loginIDResult = loginID.checker.get()
+                    const loginIDResult = loginID.checker.check()
                     if (!loginIDResult.valid) {
                         return { valid: false }
                     }
@@ -174,7 +174,7 @@ class ProfileAction
             },
             {
                 converter: (): ConvertBoardResult<RequestResetTokenFields> => {
-                    const loginIDResult = loginID.checker.get()
+                    const loginIDResult = loginID.checker.check()
                     if (!loginIDResult.valid) {
                         return { valid: false }
                     }

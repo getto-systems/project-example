@@ -115,8 +115,8 @@ class Action
             },
             {
                 converter: (): ConvertBoardResult<ResetPasswordFields> => {
-                    const loginIDResult = loginID.checker.get()
-                    const passwordResult = password.checker.get()
+                    const loginIDResult = loginID.checker.check()
+                    const passwordResult = password.checker.check()
                     if (!loginIDResult.valid || !passwordResult.valid) {
                         return { valid: false }
                     }

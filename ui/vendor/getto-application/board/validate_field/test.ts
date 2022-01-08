@@ -1,8 +1,8 @@
 import { setupActionTestRunner } from "../../action/test_helper"
 
-import { initValidateBoardFieldAction } from "./init"
+import { initValidateBoardFieldAction } from "./action"
 
-import { ConvertBoardFieldResult } from "../validate_field/data"
+import { ConvertBoardFieldResult } from "./data"
 
 describe("ValidateBoardField", () => {
     test("validate; valid input", async () => {

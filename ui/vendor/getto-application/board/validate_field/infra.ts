@@ -1,12 +1,7 @@
 import { ConvertBoardFieldResult } from "./data"
 
-export type ValidateBoardFieldInfra<T, E> = Readonly<{
-    converter: BoardFieldConverter<T, E>
-}>
-
 export interface BoardFieldChecker<T, E> {
-    get(): ConvertBoardFieldResult<T, E>
-    check(): void
+    check(): ConvertBoardFieldResult<T, E>
 }
 
 export interface BoardFieldConverter<T, E> {

@@ -116,8 +116,8 @@ class Action
             {
                 converter: (): ConvertBoardResult<AuthenticatePasswordFields> => {
                     const result = {
-                        loginID: loginID.checker.get(),
-                        password: password.checker.get(),
+                        loginID: loginID.checker.check(),
+                        password: password.checker.check(),
                     }
                     if (!result.loginID.valid || !result.password.valid) {
                         return { valid: false }
