@@ -12,11 +12,12 @@ import { CheckAuthTicketEntry } from "../../../ticket/check/x_preact/check_ticke
 import { AuthenticatePasswordEntry } from "../../../user/password/authenticate/x_preact/authenticate_password"
 import { RequestResetTokenEntry } from "../../../user/password/reset/request_token/x_preact/request_token"
 import { ResetPasswordEntry } from "../../../user/password/reset/reset/x_preact/reset_password"
-
-import { SignView, SignResource, SignResourceState } from "../resource"
 import { PrivacyPolicyComponent } from "./privacy_policy"
 
-export function SignEntry(view: SignView): VNode {
+import { SignAction, SignActionState } from "../action"
+import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
+
+export function SignEntry(view: ApplicationView<SignAction>): VNode {
     const action = useApplicationView(view)
     const state = useApplicationAction(action)
     const [err] = useErrorBoundary((err) => {
@@ -30,7 +31,10 @@ export function SignEntry(view: SignView): VNode {
     return h(SignComponent, { state, sign: action })
 }
 
-type Props = SignResource & SignResourceState
+type Props = Readonly<{
+    sign: SignAction
+    state: SignActionState
+}>
 export function SignComponent(props: Props): VNode {
     switch (props.state.type) {
         case "initial-view":
@@ -50,9 +54,6 @@ export function SignComponent(props: Props): VNode {
 
         case "password-reset":
             return h(ResetPasswordEntry, props.state.view)
-
-        case "error":
-            return h(ApplicationErrorComponent, { err: props.state.err })
     }
 }
 

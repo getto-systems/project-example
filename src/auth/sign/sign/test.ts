@@ -4,24 +4,24 @@ import { toApplicationView } from "../../../../ui/vendor/getto-application/actio
 import { newResetPasswordConfig } from "../../user/password/reset/reset/init/config"
 import { newAuthenticatePasswordConfig } from "../../user/password/authenticate/init/config"
 import { newCheckAuthTicketConfig } from "../../ticket/check/init/config"
+import { newRequestResetTokenConfig } from "../../user/password/reset/request_token/init/config"
 
-import { mockSignViewLocationDetecter } from "../router/mock"
 import { mockResetPasswordShell } from "../../user/password/reset/reset/init/mock"
 import { mockGetScriptPathShell } from "../get_script_path/init/mock"
 import { mockRemoteInfraError } from "../../../z_lib/ui/remote/mock"
+import { mockSignActionShell } from "./init/mock"
 
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 import { newClock } from "../../../z_lib/ui/clock/init"
+
 import { initSignLinkResource } from "../nav/resource"
-import { initSignAction } from "./init"
-import { SignAction } from "./action"
+import { initSignAction, SignAction } from "./action"
 import { initCheckAuthTicketAction } from "../../ticket/check/action"
 import { initAuthenticatePasswordAction } from "../../user/password/authenticate/action"
 import { initResetPasswordAction } from "../../user/password/reset/reset/action"
+import { initRequestResetTokenAction } from "../../user/password/reset/request_token/action"
 
 import { AuthTicket } from "../../ticket/kernel/data"
-import { initRequestResetTokenAction } from "../../user/password/reset/request_token/action"
-import { newRequestResetTokenConfig } from "../../user/password/reset/request_token/init/config"
 
 describe("SignView", () => {
     test("redirect password authenticate", async () => {
@@ -130,7 +130,7 @@ function initAction(currentURL: URL): SignAction {
     const requestTokenRemote = async () => mockRemoteInfraError
     const clock = newClock()
 
-    return initSignAction(mockSignViewLocationDetecter(currentURL), {
+    return initSignAction(mockSignActionShell(currentURL), {
         link: () => initSignLinkResource(),
 
         check: () =>
