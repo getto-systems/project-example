@@ -1,9 +1,9 @@
 import { render, h } from "preact"
 
-import { SignEntry } from "../../../../../../src/auth/sign/action_sign/x_preact/sign"
+import { SignEntry } from "../../../../../../src/auth/sign/sign/x_preact/sign"
 import { ApplicationErrorComponent } from "../../../../../../src/avail/x_preact/application_error"
 
-import { newSignViewWorkerForeground } from "../../../../../../src/auth/sign/action_sign/init/worker/foreground"
+import { newSignViewWorkerForeground } from "../../../../../../src/auth/sign/sign/init/worker/foreground"
 import { newWorkerForegroundOutsideFeature } from "../../../../../../src/x_outside_feature/worker"
 
 renderEntry()

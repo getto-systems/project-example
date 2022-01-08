@@ -1,6 +1,11 @@
 import { toApplicationView } from "../../../../../../ui/vendor/getto-application/action/helper"
 
-import { newSignViewLocationDetecter } from "../../../router/init"
+import { RepositoryOutsideFeature } from "../../../../../z_lib/ui/repository/feature"
+import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
+import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-application/action/worker/feature"
+import { LocationOutsideFeature } from "../../../../../z_lib/ui/location/feature"
+
+import { newSignActionShell } from "../shell"
 import { newCheckAuthTicketView } from "../../../../ticket/check/init/view"
 import { newAuthenticatePasswordView } from "../../../../user/password/authenticate/init/view"
 import { newResetPasswordView } from "../../../../user/password/reset/reset/init/view"
@@ -10,27 +15,21 @@ import {
 } from "../../../../user/password/reset/request_token/init/worker/foreground"
 import { initRequestResetTokenView } from "../../../../user/password/reset/request_token/init/worker/foreground"
 
-import { initSignAction } from "../../init"
+import { initSignAction, SignAction } from "../../action"
 import { initSignLinkResource } from "../../../nav/resource"
 
 import { SignForegroundMessage, SignBackgroundMessage } from "./message"
-
-import { RepositoryOutsideFeature } from "../../../../../z_lib/ui/repository/feature"
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
-import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-application/action/worker/feature"
-import { LocationOutsideFeature } from "../../../../../z_lib/ui/location/feature"
-
-import { SignView } from "../../resource"
+import { ApplicationView } from "../../../../../../ui/vendor/getto-application/action/action"
 
 type OutsideFeature = RemoteOutsideFeature &
     RepositoryOutsideFeature &
     WorkerOutsideFeature &
     LocationOutsideFeature
-export function newSignViewWorkerForeground(feature: OutsideFeature): SignView {
+export function newSignViewWorkerForeground(feature: OutsideFeature): ApplicationView<SignAction> {
     const { worker } = feature
     const proxy = initProxy(postForegroundMessage)
 
-    const sign = initSignAction(newSignViewLocationDetecter(feature), {
+    const sign = initSignAction(newSignActionShell(feature), {
         link: () => initSignLinkResource(),
 
         check: () => newCheckAuthTicketView(feature),
