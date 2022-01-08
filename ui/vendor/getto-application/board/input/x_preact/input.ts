@@ -6,18 +6,28 @@ import { readBoardValue } from "../../kernel/convert"
 
 import { InputBoardAction } from "../action"
 
-import { BoardValueStoreConnector } from "../../input/infra"
+import { BoardValueStoreConnector } from "../infra"
 
 import { emptyBoardValue } from "../../kernel/data"
 
+export const inputTypes = [
+    "text",
+    "password",
+    "search",
+    "number",
+    "tel",
+    "email",
+    "date",
+    "time",
+] as const
+export type InputType = typeof inputTypes[number]
+
 type Props = Readonly<{
+    type: InputType
     input: InputBoardAction
-    options: VNode[]
 }>
-export function SelectBoardComponent({ input, options }: Props): VNode {
-    return html`<select ref=${useInputRef(input.connector)} onInput=${onInput}>
-        ${options}
-    </select>`
+export function InputBoardComponent({ type, input }: Props): VNode {
+    return html`<input ref=${useInputRef(input.connector)} type=${type} onInput=${onInput} />`
 
     function onInput() {
         input.publisher.post()
@@ -25,7 +35,7 @@ export function SelectBoardComponent({ input, options }: Props): VNode {
 }
 
 function useInputRef(connector: BoardValueStoreConnector) {
-    const REF = useRef<HTMLSelectElement>()
+    const REF = useRef<HTMLInputElement>()
 
     useLayoutEffect(() => {
         connector.connect({

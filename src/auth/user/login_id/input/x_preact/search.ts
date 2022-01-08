@@ -4,7 +4,7 @@ import { search } from "../../../../../../ui/vendor/getto-css/preact/design/form
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
-import { InputBoardComponent } from "../../../../../../ui/vendor/getto-application/board/action_input/x_preact/input"
+import { InputBoardComponent } from "../../../../../../ui/vendor/getto-application/board/input/x_preact/input"
 
 import { SearchLoginIDAction } from "../action"
 

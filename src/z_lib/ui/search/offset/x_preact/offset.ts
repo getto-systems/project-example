@@ -4,7 +4,7 @@ import { field, pager } from "../../../../../../ui/vendor/getto-css/preact/desig
 
 import { VNodeContent } from "../../../x_preact/common"
 
-import { SelectBoardComponent } from "../../../../../../ui/vendor/getto-application/board/action_input/x_preact/select"
+import { SelectBoardComponent } from "../../../../../../ui/vendor/getto-application/board/input/x_preact/select"
 
 import { SearchOffsetAction } from "../action"
 
