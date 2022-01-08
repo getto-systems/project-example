@@ -4,10 +4,10 @@ import { toURL } from "../../../z_lib/ui/location/init"
 
 import { LocationOutsideFeature } from "../../../z_lib/ui/location/feature"
 
-import { LoadMenuDetecter } from "./infra"
+import { MenuTargetPathDetecter } from "./infra"
 
 import { detectMenuTargetPath } from "./convert"
 
-export function newLoadMenuLocationDetecter(feature: LocationOutsideFeature): LoadMenuDetecter {
+export function newLoadMenuLocationDetecter(feature: LocationOutsideFeature): MenuTargetPathDetecter {
     return () => detectMenuTargetPath(toURL(feature), env.version)
 }

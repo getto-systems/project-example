@@ -1,21 +1,40 @@
-import { MenuTree, MenuTreeCategory, MenuTreeItem, MenuTreeNode } from "../kernel/infra"
-import { LoadBreadcrumbListInfra } from "./infra"
-
+import { BreadcrumbList, BreadcrumbNode } from "../load_breadcrumb_list/data"
+import {
+    MenuTargetPathDetecter,
+    MenuTree,
+    MenuTreeCategory,
+    MenuTreeItem,
+    MenuTreeNode,
+} from "../kernel/infra"
+import { MenuTargetPath } from "../kernel/data"
 import { toMenuCategory, toMenuItem } from "../kernel/convert"
 
-import { BreadcrumbList, BreadcrumbNode } from "./data"
-import { MenuTargetPath } from "../kernel/data"
-import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
-
-export interface LoadBreadcrumbListMethod {
-    (menuTargetPath: ConvertLocationResult<MenuTargetPath>): BreadcrumbList
+export interface LoadBreadcrumbListAction {
+    load(): BreadcrumbList
 }
 
-interface Load {
-    (infra: LoadBreadcrumbListInfra): LoadBreadcrumbListMethod
+export type LoadBreadcrumbListInfra = Readonly<{
+    version: string
+    menuTree: MenuTree
+}>
+export type LoadBreadcrumbListShell = Readonly<{
+    detectTargetPath: MenuTargetPathDetecter
+}>
+
+export function initLoadBreadcrumbListAction(
+    infra: LoadBreadcrumbListInfra,
+    shell: LoadBreadcrumbListShell,
+): LoadBreadcrumbListAction {
+    return {
+        load: () => load(infra, shell),
+    }
 }
-export const loadBreadcrumbList: Load = (infra) => (menuTargetPath) => {
+
+function load(infra: LoadBreadcrumbListInfra, shell: LoadBreadcrumbListShell): BreadcrumbList {
     const { version } = infra
+    const { detectTargetPath } = shell
+
+    const menuTargetPath = detectTargetPath()
     if (!menuTargetPath.valid) {
         return EMPTY
     }

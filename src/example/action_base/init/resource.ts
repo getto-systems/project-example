@@ -1,6 +1,6 @@
 import { homeMenuContent } from "../../outline/kernel/init/home"
 import { newNotifyUnexpectedErrorResource } from "../../../avail/unexpected_error/notify/init/resource"
-import { newLoadBreadcrumbListAction } from "../../outline/action_load_breadcrumb_list/init/resource"
+import { newLoadBreadcrumbListResource } from "../../outline/load_breadcrumb_list/init/resource"
 import { newLoadMenuResource } from "../../outline/action_load_menu/init/resource"
 import { newLoadSeasonResource } from "../../action_load_season/init/resource"
 
@@ -16,7 +16,7 @@ export type BaseOutsideFeature = RemoteOutsideFeature &
 export function newBaseResource(feature: BaseOutsideFeature): BaseResource {
     const menu = homeMenuContent()
     return {
-        breadcrumbList: newLoadBreadcrumbListAction(feature, menu),
+        ...newLoadBreadcrumbListResource(feature, menu),
         ...newLoadMenuResource(feature, menu),
         ...newNotifyUnexpectedErrorResource(feature),
         ...newLoadSeasonResource(feature),
