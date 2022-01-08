@@ -1,11 +1,6 @@
 import { LineIcon, lniClass, lnir } from "../../../z_lib/ui/icon/line_icon"
 
-import {
-    encodeLocationSearchQuery,
-    LocationSearchParam,
-} from "../../../z_lib/ui/location/helper"
-
-import { SignLink, SignLinkResource } from "./resource"
+import { encodeLocationSearchQuery, LocationSearchParam } from "../../../z_lib/ui/location/helper"
 
 import {
     AuthenticatePasswordVariantKey,
@@ -15,7 +10,19 @@ import {
     SignNavItem,
     signNavKey,
     StaticSignViewVariantKey,
-} from "../nav/data"
+} from "./data"
+
+export type SignLinkResource = Readonly<{
+    link: SignLink
+}>
+
+export interface SignLink {
+    getNav_static_privacyPolicy(): SignNavItem
+
+    getNav_password_authenticate(): SignNavItem
+    getNav_password_reset_requestToken(): SignNavItem
+    getNav_password_reset_requestToken_retry(): SignNavItem
+}
 
 export function initSignLinkResource(): SignLinkResource {
     return {

@@ -12,8 +12,7 @@ import { mockRemoteInfraError } from "../../../z_lib/ui/remote/mock"
 
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 import { newClock } from "../../../z_lib/ui/clock/init"
-import { initSignLinkResource } from "../action_nav/init"
-
+import { initSignLinkResource } from "../nav/resource"
 import { initSignAction } from "./init"
 import { SignAction } from "./action"
 import { initCheckAuthTicketAction } from "../../ticket/check/action"

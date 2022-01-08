@@ -4,7 +4,7 @@ import { storyTemplate } from "../../../../../ui/vendor/storybook/preact/story"
 
 import { PrivacyPolicyComponent } from "./privacy_policy"
 
-import { initSignLinkResource } from "../../action_nav/init"
+import { initSignLinkResource } from "../../nav/init"
 
 export default {
     title: "main/Auth/Sign/Privacy Policy",

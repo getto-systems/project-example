@@ -9,7 +9,7 @@ import { newSignViewLocationDetecter } from "../../router/init"
 import { initSignAction } from "../init"
 
 import { SignView } from "../resource"
-import { initSignLinkResource } from "../../action_nav/init"
+import { initSignLinkResource } from "../../nav/resource"
 
 import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/feature"
 import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
