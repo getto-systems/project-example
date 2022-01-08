@@ -9,7 +9,7 @@ import {
     docsUsecase,
 } from "../../ui/vendor/getto-application/docs/helper"
 
-import { docs_notifyUnexpectedError } from "./unexpected_error/action_notify/docs"
+import { docs_notifyUnexpectedError } from "./unexpected_error/notify/docs"
 import { docs_findNextVersion } from "./version/action_find_next/docs"
 
 import {

@@ -1,4 +1,3 @@
-import { mockNotifyUnexpectedErrorAction } from "../../avail/unexpected_error/action_notify/mock"
 import {
     mockLoadBreadcrumbListAction,
     mockBreadcrumbList_home,
@@ -9,7 +8,7 @@ import { DocsResource } from "./resource"
 
 export function mockDocsResource(): DocsResource {
     return {
-        error: mockNotifyUnexpectedErrorAction(),
+        error: { notify: () => null },
         breadcrumbList: mockLoadBreadcrumbListAction(mockBreadcrumbList_home()),
         menu: mockLoadMenuAction(mockMenu_home()),
     }

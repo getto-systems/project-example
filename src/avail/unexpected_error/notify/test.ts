@@ -1,6 +1,6 @@
-import { initNotifyUnexpectedErrorAction } from "./init"
+import { initNotifyUnexpectedErrorAction } from "./action"
 
-import { NotifyUnexpectedErrorRemote } from "../notify/infra"
+import { NotifyUnexpectedErrorRemote } from "./infra"
 
 describe("NotifyUnexpectedError", () => {
     test("notify", () => {

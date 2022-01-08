@@ -1,5 +1,5 @@
 import { homeMenuContent } from "../../outline/kernel/init/home"
-import { newNotifyUnexpectedErrorResource } from "../../../avail/unexpected_error/action_notify/init/resource"
+import { newNotifyUnexpectedErrorResource } from "../../../avail/unexpected_error/notify/init/resource"
 import { newLoadBreadcrumbListAction } from "../../outline/action_load_breadcrumb_list/init/resource"
 import { newLoadMenuResource } from "../../outline/action_load_menu/init/resource"
 import { newLoadSeasonResource } from "../../action_load_season/init/resource"

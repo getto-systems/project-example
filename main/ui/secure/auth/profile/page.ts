@@ -11,7 +11,7 @@ import {
 } from "../../../../../ui/vendor/getto-css/preact/layout/app"
 import { container } from "../../../../../ui/vendor/getto-css/preact/design/box"
 
-import { useNotifyUnexpectedError } from "../../../../../src/avail/unexpected_error/action_notify/x_preact/hooks"
+import { useNotifyUnexpectedError } from "../../../../../src/avail/unexpected_error/notify/x_preact/hooks"
 import { useDocumentTitle } from "../../../../../src/example/x_preact/hooks"
 
 import { copyright, siteInfo } from "../../../../../src/example/site"

@@ -1,15 +1,13 @@
-import { newNotifyUnexpectedErrorInfra } from "../../notify/init"
+import { newNotifyUnexpectedErrorInfra } from "./infra"
 
-import { initNotifyUnexpectedErrorAction } from "../init"
+import { initNotifyUnexpectedErrorAction, NotifyUnexpectedErrorAction } from "../../notify/action"
 
 import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
-
-import { NotifyUnexpectedErrorResource } from "../resource"
 
 type OutsideFeature = RemoteOutsideFeature
 export function newNotifyUnexpectedErrorResource(
     feature: OutsideFeature,
-): NotifyUnexpectedErrorResource {
+): Readonly<{ error: NotifyUnexpectedErrorAction }> {
     return {
         error: initNotifyUnexpectedErrorAction(newNotifyUnexpectedErrorInfra(feature)),
     }
