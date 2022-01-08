@@ -15,7 +15,7 @@ import { spinner } from "../../../../../example/x_preact/design/icon"
 import { SearchLoginIDComponent } from "../../../login_id/input/x_preact/search"
 
 import { SearchAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
-import { ObserveBoardActionState } from "../../../../../../ui/vendor/getto-application/board/action_observe_board/action"
+import { ObserveBoardActionState } from "../../../../../../ui/vendor/getto-application/board/observe_board/action"
 
 type EntryProps = Readonly<{
     search: SearchAuthUserAccountAction
