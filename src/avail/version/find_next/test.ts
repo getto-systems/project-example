@@ -1,18 +1,16 @@
 import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
+import { standardApplicationTargetPath } from "./test_helper"
+
 import { toApplicationView } from "../../../../ui/vendor/getto-application/action/helper"
 import { ticker } from "../../../z_lib/ui/timer/helper"
+import { mockFindNextVersionShell } from "./init/mock"
 
-import { standardApplicationTargetPath } from "../find_next/test_helper"
+import { applicationPath } from "./helper"
 
-import { mockFindNextVersionLocationDetecter } from "../find_next/mock"
+import { CheckDeployExistsRemote } from "./infra"
 
-import { initFindNextVersionAction, initFindNextVersionMaterial } from "./init"
-
-import { applicationPath } from "../find_next/helper"
-
-import { CheckDeployExistsRemote } from "../find_next/infra"
-
-import { FindNextVersionView } from "./resource"
+import { FindNextVersionAction, initFindNextVersionAction } from "../find_next/action"
+import { ApplicationView } from "../../../../ui/vendor/getto-application/action/action"
 
 describe("FindNextVersion", () => {
     test("up to date", async () => {
@@ -311,18 +309,18 @@ function initView(
     currentURL: URL,
     version: string,
     check: CheckDeployExistsRemote,
-): FindNextVersionView {
+): ApplicationView<FindNextVersionAction> {
     return toApplicationView(
         initFindNextVersionAction(
-            initFindNextVersionMaterial({
+            {
+                takeLongtimeThreshold: { delay_millisecond: 1 },
+            },
+            {
                 check,
                 version,
                 versionSuffix: "-ui",
-                config: {
-                    takeLongtimeThreshold: { delay_millisecond: 1 },
-                },
-            }),
-            mockFindNextVersionLocationDetecter(currentURL, version),
+            },
+            mockFindNextVersionShell(currentURL, version),
         ),
     )
 }

@@ -10,7 +10,7 @@ import {
 } from "../../ui/vendor/getto-application/docs/helper"
 
 import { docs_notifyUnexpectedError } from "./unexpected_error/notify/docs"
-import { docs_findNextVersion } from "./version/action_find_next/docs"
+import { docs_findNextVersion } from "./version/find_next/docs"
 
 import {
     DocsSection,

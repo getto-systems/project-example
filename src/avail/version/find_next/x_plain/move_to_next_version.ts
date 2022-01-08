@@ -1,13 +1,12 @@
-import { FindNextVersionView } from "../resource"
+import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
+import { FindNextVersionAction, FindNextVersionState } from "../action"
 
-import { FindNextVersionState } from "../action"
-
-import { applicationPath } from "../../find_next/helper"
+import { applicationPath } from "../helper"
 
 import { ConvertLocationResult } from "../../../../z_lib/ui/location/data"
-import { ApplicationTargetPath } from "../../find_next/data"
+import { ApplicationTargetPath } from "../data"
 
-export function MoveToNextVersionEntry(view: FindNextVersionView): void {
+export function MoveToNextVersionEntry(view: ApplicationView<FindNextVersionAction>): void {
     // /${version}/index.html とかで実行する
     const findNext = view.resource
     try {

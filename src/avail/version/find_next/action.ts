@@ -1,29 +1,80 @@
-import { delayedChecker } from "../../../z_lib/ui/timer/helper"
-
-import { versionToString } from "./helper"
-
-import { CheckDeployExistsRemote, FindNextVersionInfra } from "./infra"
-
-import { FindNextVersionEvent } from "./event"
-
-import { versionStringConverter } from "../kernel/convert"
-import { versionConfigConverter } from "./convert"
-
+import { ApplicationStateAction } from "../../../../ui/vendor/getto-application/action/action"
+import { ApplicationAbstractStateAction } from "../../../../ui/vendor/getto-application/action/init"
+import { DelayTime } from "../../../z_lib/ui/config/infra"
 import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
-import { ApplicationTargetPath, CheckDeployExistsRemoteError, Version } from "./data"
+import { delayedChecker } from "../../../z_lib/ui/timer/helper"
+import { versionStringConverter } from "../kernel/convert"
+import { VersionString } from "../kernel/data"
+import { versionConfigConverter } from "./convert"
+import {
+    ApplicationTargetPath,
+    CheckDeployExistsError,
+    CheckDeployExistsRemoteError,
+    Version,
+} from "./data"
+import { versionToString } from "./helper"
+import { ApplicationTargetPathDetecter, CheckDeployExistsRemote } from "./infra"
 
-export interface FindNextVersionMethod {
-    <S>(
-        target: ConvertLocationResult<ApplicationTargetPath>,
-        post: Post<FindNextVersionEvent, S>,
-    ): Promise<S>
+export type FindNextVersionAction = ApplicationStateAction<FindNextVersionState>
+
+export type FindNextVersionState = Readonly<{ type: "initial-next-version" }> | FindNextVersionEvent
+
+export const initialFindNextVersionState: FindNextVersionState = {
+    type: "initial-next-version",
 }
 
-interface Find {
-    (infra: FindNextVersionInfra): FindNextVersionMethod
+export type FindNextVersionConfig = Readonly<{
+    takeLongtimeThreshold: DelayTime
+}>
+export type FindNextVersionInfra = Readonly<{
+    version: string
+    versionSuffix: string
+    check: CheckDeployExistsRemote
+}>
+export type FindNextVersionShell = Readonly<{
+    detectTargetPath: ApplicationTargetPathDetecter
+}>
+
+export function initFindNextVersionAction(
+    config: FindNextVersionConfig,
+    infra: FindNextVersionInfra,
+    shell: FindNextVersionShell,
+): FindNextVersionAction {
+    return new Action(config, infra, shell)
 }
-export const findNextVersion: Find = (infra) => async (target, post) => {
-    const { version, versionSuffix, config } = infra
+
+class Action
+    extends ApplicationAbstractStateAction<FindNextVersionState>
+    implements FindNextVersionAction
+{
+    readonly initialState = initialFindNextVersionState
+
+    constructor(
+        config: FindNextVersionConfig,
+        infra: FindNextVersionInfra,
+        shell: FindNextVersionShell,
+    ) {
+        super(() => findNextVersion(config, infra, shell, this.post))
+    }
+}
+
+export type FindNextVersionEvent =
+    | Readonly<{ type: "take-longtime-to-find" }>
+    | Readonly<{ type: "failed-to-find"; err: CheckDeployExistsError }>
+    | Readonly<{
+          type: "succeed-to-find"
+          upToDate: boolean
+          version: VersionString
+          target: ConvertLocationResult<ApplicationTargetPath>
+      }>
+
+async function findNextVersion<S>(
+    config: FindNextVersionConfig,
+    infra: FindNextVersionInfra,
+    shell: FindNextVersionShell,
+    post: Post<FindNextVersionEvent, S>,
+): Promise<S> {
+    const { version, versionSuffix } = infra
 
     const currentVersion = versionConfigConverter(version)
 
@@ -32,7 +83,7 @@ export const findNextVersion: Find = (infra) => async (target, post) => {
             type: "succeed-to-find",
             upToDate: true,
             version: versionStringConverter(version),
-            target,
+            target: shell.detectTargetPath(),
         })
     }
 
@@ -51,14 +102,14 @@ export const findNextVersion: Find = (infra) => async (target, post) => {
             type: "succeed-to-find",
             upToDate: true,
             version: versionStringConverter(version),
-            target,
+            target: shell.detectTargetPath(),
         })
     } else {
         return post({
             type: "succeed-to-find",
             upToDate: false,
             version: versionToString(next.version),
-            target,
+            target: shell.detectTargetPath(),
         })
     }
 }

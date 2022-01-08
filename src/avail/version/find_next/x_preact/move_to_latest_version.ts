@@ -15,15 +15,11 @@ import { ApplicationErrorComponent } from "../../../x_preact/application_error"
 
 import { applicationPath } from "../../find_next/helper"
 
-import {
-    FindNextVersionView,
-    FindNextVersionResource,
-    FindNextVersionResourceState,
-} from "../resource"
-
 import { CheckDeployExistsError } from "../../find_next/data"
+import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
+import { FindNextVersionAction, FindNextVersionState } from "../action"
 
-export function MoveToLatestVersionEntry(view: FindNextVersionView): VNode {
+export function MoveToLatestVersionEntry(view: ApplicationView<FindNextVersionAction>): VNode {
     const action = useApplicationView(view)
     const state = useApplicationAction(action)
     const [err] = useErrorBoundary((err) => {
@@ -38,7 +34,10 @@ export function MoveToLatestVersionEntry(view: FindNextVersionView): VNode {
     return h(MoveToLatestVersionComponent, { findNext: action, state })
 }
 
-type Props = FindNextVersionResource & FindNextVersionResourceState
+type Props = Readonly<{
+    findNext: FindNextVersionAction
+    state: FindNextVersionState
+}>
 export function MoveToLatestVersionComponent(props: Props): VNode {
     useLayoutEffect(() => {
         switch (props.state.type) {
