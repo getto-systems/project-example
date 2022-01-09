@@ -8,12 +8,7 @@
 /target/
 /src/target/
 
-/storybook/node_modules/
-/storybook/src/
-/storybook/ui/
-
 /ui/public/dist/coverage/
-/ui/public/dist/storybook/
 /ui/public/dist/**/*.html
 
 /public/dist/css/*
