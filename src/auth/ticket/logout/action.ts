@@ -1,13 +1,15 @@
-import { ApplicationStateAction } from "../../../../ui/vendor/getto-application/action/action"
+import {
+    StatefulApplicationAction,
+    AbstractStatefulApplicationAction,
+} from "../../../../ui/vendor/getto-application/action/action"
 
 import { AuthTicketRepository } from "../kernel/infra"
 import { LogoutRemote } from "./infra"
 
 import { RepositoryError } from "../../../z_lib/ui/repository/data"
 import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
-import { ApplicationAbstractStateAction } from "../../../../ui/vendor/getto-application/action/init"
 
-export interface LogoutAction extends ApplicationStateAction<LogoutState> {
+export interface LogoutAction extends StatefulApplicationAction<LogoutState> {
     submit(): Promise<LogoutState>
 }
 
@@ -28,7 +30,7 @@ export type LogoutInfra = Readonly<{
     logoutRemote: LogoutRemote
 }>
 
-class Action extends ApplicationAbstractStateAction<LogoutState> implements LogoutAction {
+class Action extends AbstractStatefulApplicationAction<LogoutState> implements LogoutAction {
     readonly initialState = initialLogoutState
 
     infra: LogoutInfra

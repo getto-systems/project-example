@@ -1,5 +1,7 @@
-import { ApplicationStateAction } from "../../../../ui/vendor/getto-application/action/action"
-import { ApplicationAbstractStateAction } from "../../../../ui/vendor/getto-application/action/init"
+import {
+    StatefulApplicationAction,
+    AbstractStatefulApplicationAction,
+} from "../../../../ui/vendor/getto-application/action/action"
 
 import { buildMenu, BuildMenuParams } from "../kernel/helper"
 
@@ -11,7 +13,7 @@ import { Menu, MenuCategoryPath } from "../kernel/data"
 import { RepositoryError } from "../../../z_lib/ui/repository/data"
 import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
 
-export interface LoadMenuAction extends ApplicationStateAction<LoadMenuState> {
+export interface LoadMenuAction extends StatefulApplicationAction<LoadMenuState> {
     updateBadge(): Promise<LoadMenuState>
     show(path: MenuCategoryPath): Promise<LoadMenuState>
     hide(path: MenuCategoryPath): Promise<LoadMenuState>
@@ -42,27 +44,28 @@ export function initLoadMenuAction(infra: LoadMenuInfra, shell: LoadMenuShell): 
     return new Action(infra, shell)
 }
 
-class Action extends ApplicationAbstractStateAction<LoadMenuState> implements LoadMenuAction {
+class Action extends AbstractStatefulApplicationAction<LoadMenuState> implements LoadMenuAction {
     readonly initialState = initialLoadMenuState
 
     infra: LoadMenuInfra
     shell: LoadMenuShell
 
     constructor(infra: LoadMenuInfra, shell: LoadMenuShell) {
-        super(async () =>
-            loadMenu(this.infra, this.shell, (event) => {
-                const state = this.post(event)
+        super({
+            ignite: async () =>
+                loadMenu(this.infra, this.shell, (event) => {
+                    const state = this.post(event)
 
-                switch (event.type) {
-                    case "succeed-to-load":
-                        // 初期ロード完了で最初の badge 更新を行う
-                        return this.updateBadge()
+                    switch (event.type) {
+                        case "succeed-to-load":
+                            // 初期ロード完了で最初の badge 更新を行う
+                            return this.updateBadge()
 
-                    default:
-                        return state
-                }
-            }),
-        )
+                        default:
+                            return state
+                    }
+                }),
+        })
         this.infra = infra
         this.shell = shell
     }

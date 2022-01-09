@@ -19,7 +19,7 @@ describe("FindNextVersion", () => {
 
         const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.ignite()).then((stack) => {
+        await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -43,7 +43,7 @@ describe("FindNextVersion", () => {
 
         const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.ignite()).then((stack) => {
+        await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 { type: "take-longtime-to-find" },
                 {
@@ -65,7 +65,7 @@ describe("FindNextVersion", () => {
 
         const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.ignite()).then((stack) => {
+        await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -86,7 +86,7 @@ describe("FindNextVersion", () => {
 
         const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.ignite()).then((stack) => {
+        await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -107,7 +107,7 @@ describe("FindNextVersion", () => {
 
         const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.ignite()).then((stack) => {
+        await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -128,7 +128,7 @@ describe("FindNextVersion", () => {
 
         const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.ignite()).then((stack) => {
+        await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -149,7 +149,7 @@ describe("FindNextVersion", () => {
 
         const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.ignite()).then((stack) => {
+        await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -174,7 +174,7 @@ describe("FindNextVersion", () => {
 
         const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.ignite()).then((stack) => {
+        await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -195,7 +195,7 @@ describe("FindNextVersion", () => {
 
         const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.ignite()).then((stack) => {
+        await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -216,7 +216,7 @@ describe("FindNextVersion", () => {
 
         const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.ignite()).then((stack) => {
+        await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -247,7 +247,7 @@ describe("FindNextVersion", () => {
 
         const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.ignite()).then((stack) => {
+        await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-find",
@@ -272,7 +272,7 @@ describe("FindNextVersion", () => {
 
         await runner(() => {
             view.terminate()
-            return view.resource.ignite()
+            return view.resource.ignitionState
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])

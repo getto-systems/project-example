@@ -1,4 +1,7 @@
-import { ApplicationStateAction } from "../../../ui/vendor/getto-application/action/action"
+import {
+    StatefulApplicationAction,
+    AbstractStatefulApplicationAction,
+} from "../../../ui/vendor/getto-application/action/action"
 
 import { SeasonRepository } from "./infra"
 import { Clock } from "../../z_lib/ui/clock/infra"
@@ -7,9 +10,8 @@ import { RepositoryError } from "../../z_lib/ui/repository/data"
 import { Season } from "./data"
 
 import { defaultSeason } from "./convert"
-import { ApplicationAbstractStateAction } from "../../../ui/vendor/getto-application/action/init"
 
-export type LoadSeasonAction = ApplicationStateAction<LoadSeasonState>
+export type LoadSeasonAction = StatefulApplicationAction<LoadSeasonState>
 
 export type LoadSeasonState = Readonly<{ type: "initial-season" }> | LoadSeasonEvent
 
@@ -24,11 +26,13 @@ export function initLoadSeasonAction(infra: LoadSeasonInfra): LoadSeasonAction {
     return new Action(infra)
 }
 
-class Action extends ApplicationAbstractStateAction<LoadSeasonState> {
+class Action extends AbstractStatefulApplicationAction<LoadSeasonState> {
     readonly initialState = initialLoadSeasonState
 
     constructor(infra: LoadSeasonInfra) {
-        super(() => loadSeason(infra, this.post))
+        super({
+            ignite: () => loadSeason(infra, this.post),
+        })
     }
 }
 

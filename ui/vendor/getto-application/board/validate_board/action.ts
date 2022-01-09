@@ -1,5 +1,4 @@
-import { ApplicationStateAction } from "../../action/action"
-import { ApplicationAbstractStateAction } from "../../action/init"
+import { StatefulApplicationAction, AbstractStatefulApplicationAction } from "../../action/action"
 
 import { initValidateBoardStack } from "./init/stack"
 
@@ -9,7 +8,7 @@ import { ValidateBoardChecker, ValidateBoardStack, ValidateBoardStateFound } fro
 import { ConvertBoardResult } from "../kernel/data"
 import { ValidateBoardState } from "./data"
 
-export interface ValidateBoardAction extends ApplicationStateAction<ValidateBoardActionState> {
+export interface ValidateBoardAction extends StatefulApplicationAction<ValidateBoardActionState> {
     clear(): void
 }
 
@@ -47,7 +46,7 @@ export function initValidateBoardAction<N extends string, T>(
 }
 
 class Action<N extends string, T>
-    extends ApplicationAbstractStateAction<ValidateBoardActionState>
+    extends AbstractStatefulApplicationAction<ValidateBoardActionState>
     implements ValidateBoardAction, ValidateBoardChecker<N, T>
 {
     readonly initialState: ValidateBoardActionState = initialValidateBoardState

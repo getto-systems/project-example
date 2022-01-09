@@ -11,7 +11,6 @@ export function MoveToNextVersionEntry(view: ApplicationView<FindNextVersionActi
     const findNext = view.resource
     try {
         findNext.subscriber.subscribe(handleState)
-        findNext.ignite()
     } catch (err) {
         handleError(err)
     }

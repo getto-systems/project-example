@@ -19,7 +19,7 @@ describe("LoadSeason", () => {
 
         const runner = setupActionTestRunner(resource.season.subscriber)
 
-        await runner(() => resource.season.ignite()).then((stack) => {
+        await runner(() => resource.season.ignitionState).then((stack) => {
             expect(stack).toEqual([{ type: "succeed-to-load", value: { year: 2020 } }])
         })
     })
@@ -29,7 +29,7 @@ describe("LoadSeason", () => {
 
         const runner = setupActionTestRunner(resource.season.subscriber)
 
-        await runner(() => resource.season.ignite()).then((stack) => {
+        await runner(() => resource.season.ignitionState).then((stack) => {
             expect(stack).toEqual([{ type: "succeed-to-load", value: { year: 2021 } }])
         })
     })

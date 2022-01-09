@@ -1,7 +1,9 @@
 import { delayedChecker } from "../../../z_lib/ui/timer/helper"
 
-import { ApplicationAbstractStateAction } from "../../../../ui/vendor/getto-application/action/init"
-import { ApplicationStateAction } from "../../../../ui/vendor/getto-application/action/action"
+import {
+    StatefulApplicationAction,
+    AbstractStatefulApplicationAction,
+} from "../../../../ui/vendor/getto-application/action/action"
 
 import { startContinuousRenew } from "../start_continuous_renew/method"
 import { getScriptPath } from "../../sign/get_script_path/method"
@@ -23,7 +25,7 @@ import { ConvertScriptPathResult, LoadScriptError } from "../../sign/get_script_
 import { RepositoryError } from "../../../z_lib/ui/repository/data"
 import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
 
-export interface CheckAuthTicketAction extends ApplicationStateAction<CheckAuthTicketState> {
+export interface CheckAuthTicketAction extends StatefulApplicationAction<CheckAuthTicketState> {
     succeedToInstantLoad(): Promise<CheckAuthTicketState>
     failedToInstantLoad(): Promise<CheckAuthTicketState>
     loadError(err: LoadScriptError): Promise<CheckAuthTicketState>
@@ -66,7 +68,7 @@ export function initCheckAuthTicketAction(
 }
 
 class Action
-    extends ApplicationAbstractStateAction<CheckAuthTicketState>
+    extends AbstractStatefulApplicationAction<CheckAuthTicketState>
     implements CheckAuthTicketAction
 {
     readonly initialState = initialCheckAuthTicketState
@@ -80,18 +82,20 @@ class Action
         infra: CheckAuthTicketInfra,
         shell: CheckAuthTicketShell,
     ) {
-        super(async () => {
-            const checkResult = await check(this.config, this.infra, this.post)
-            if (!checkResult.success) {
-                return checkResult.state
-            }
-            if (!checkResult.expired) {
-                return this.post({
-                    type: "try-to-instant-load",
-                    scriptPath: this.secureScriptPath(),
-                })
-            }
-            return this.startContinuousRenew(checkResult.ticket)
+        super({
+            ignite: async () => {
+                const checkResult = await check(this.config, this.infra, this.post)
+                if (!checkResult.success) {
+                    return checkResult.state
+                }
+                if (!checkResult.expired) {
+                    return this.post({
+                        type: "try-to-instant-load",
+                        scriptPath: this.secureScriptPath(),
+                    })
+                }
+                return this.startContinuousRenew(checkResult.ticket)
+            },
         })
         this.config = config
         this.infra = infra

@@ -1,5 +1,7 @@
-import { ApplicationStateAction } from "../../../../../ui/vendor/getto-application/action/action"
-import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/init"
+import {
+    StatefulApplicationAction,
+    AbstractStatefulApplicationAction,
+} from "../../../../../ui/vendor/getto-application/action/action"
 
 import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 import { nextSort } from "../../../../z_lib/ui/search/sort/helper"
@@ -31,7 +33,7 @@ import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
 import { SearchAuthUserAccountFields, SearchAuthUserAccountRemoteResponse } from "./data"
 
 export interface SearchAuthUserAccountAction
-    extends ApplicationStateAction<SearchAuthUserAccountState> {
+    extends StatefulApplicationAction<SearchAuthUserAccountState> {
     readonly loginID: SearchLoginIDAction
     readonly offset: SearchOffsetAction
     readonly columns: SearchColumnsAction
@@ -78,7 +80,7 @@ export function initSearchAuthUserAccountAction(
 const searchAuthUserAccountFieldNames = ["loginID"] as const
 
 class Action
-    extends ApplicationAbstractStateAction<SearchAuthUserAccountState>
+    extends AbstractStatefulApplicationAction<SearchAuthUserAccountState>
     implements SearchAuthUserAccountAction
 {
     readonly initialState = initialSearchAuthUserAccountState
@@ -103,7 +105,13 @@ class Action
         infra: SearchAuthUserAccountInfra,
         shell: SearchAuthUserAccountShell,
     ) {
-        super(async () => this.load())
+        super({
+            ignite: async () => this.load(),
+            terminate: () => {
+                this.loginID.terminate()
+                this.observe.terminate()
+            },
+        })
         this.config = config
         this.infra = infra
         this.shell = shell
@@ -143,11 +151,6 @@ class Action
         this.loginID.observe.subscriber.subscribe((result) =>
             checker.update("loginID", result.hasChanged),
         )
-
-        this.terminateHook(() => {
-            this.loginID.terminate()
-            this.observe.terminate()
-        })
     }
 
     currentSort(): SearchSort {

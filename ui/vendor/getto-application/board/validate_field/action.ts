@@ -1,12 +1,11 @@
-import { ApplicationStateAction } from "../../action/action"
-import { ApplicationAbstractStateAction } from "../../action/init"
+import { StatefulApplicationAction, AbstractStatefulApplicationAction } from "../../action/action"
 
 import { BoardFieldChecker, BoardFieldConverter } from "./infra"
 
 import { ConvertBoardFieldResult, ValidateBoardFieldResult } from "../validate_field/data"
 
 export interface ValidateBoardFieldAction<E>
-    extends ApplicationStateAction<ValidateBoardFieldState<E>> {
+    extends StatefulApplicationAction<ValidateBoardFieldState<E>> {
     clear(): ValidateBoardFieldState<E>
 }
 
@@ -27,7 +26,7 @@ export function initValidateBoardFieldAction<T, E>(
 }
 
 class Action<T, E>
-    extends ApplicationAbstractStateAction<ValidateBoardFieldState<E>>
+    extends AbstractStatefulApplicationAction<ValidateBoardFieldState<E>>
     implements ValidateBoardFieldAction<E>, BoardFieldChecker<T, E>
 {
     readonly initialState: ValidateBoardFieldState<E> = { valid: true }

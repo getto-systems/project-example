@@ -30,10 +30,10 @@ describe("SignView", () => {
         const runner = setupActionTestRunner(action.subscriber)
 
         await runner(async () => {
-            const state = await action.ignite()
+            const state = await action.ignitionState
             switch (state.type) {
                 case "check-authTicket":
-                    await state.view.resource.ignite()
+                    await state.view.resource.ignitionState
             }
             return state
         }).then((stack) => {
@@ -50,10 +50,10 @@ describe("SignView", () => {
         const runner = setupActionTestRunner(action.subscriber)
 
         await runner(async () => {
-            const state = await action.ignite()
+            const state = await action.ignitionState
             switch (state.type) {
                 case "check-authTicket":
-                    await state.view.resource.ignite()
+                    await state.view.resource.ignitionState
             }
             return state
         }).then((stack) => {
@@ -70,10 +70,10 @@ describe("SignView", () => {
         const runner = setupActionTestRunner(action.subscriber)
 
         await runner(async () => {
-            const state = await action.ignite()
+            const state = await action.ignitionState
             switch (state.type) {
                 case "check-authTicket":
-                    await state.view.resource.ignite()
+                    await state.view.resource.ignitionState
             }
             return state
         }).then((stack) => {
@@ -90,7 +90,7 @@ describe("SignView", () => {
         const runner = setupActionTestRunner(action.subscriber)
 
         await runner(async () => {
-            return await action.ignite()
+            return await action.ignitionState
         }).then((stack) => {
             expect(stack.map((state) => state.type)).toEqual(["password-reset"])
         })

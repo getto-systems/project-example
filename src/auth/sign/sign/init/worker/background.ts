@@ -1,9 +1,12 @@
 import { newRequestResetTokenWorkerHandler } from "../../../../user/password/reset/request_token/init/worker/background"
 
-import { WorkerHandler } from "../../../../../../ui/vendor/getto-application/action/worker/background"
+import { WorkerBackgroundHandler } from "../../../../../../ui/vendor/getto-application/action/worker/background"
 
 import { SignForegroundMessage, SignBackgroundMessage } from "./message"
-import { RequestResetTokenProxyMessage } from "../../../../user/password/reset/request_token/init/worker/message"
+import {
+    RequestResetTokenProxyMessage,
+    RequestResetTokenProxyResponse,
+} from "../../../../user/password/reset/request_token/init/worker/message"
 
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-application/action/worker/feature"
@@ -38,7 +41,10 @@ export function newSignViewWorkerBackground(feature: OutsideFeature): void {
 type Handler = Readonly<{
     password: Readonly<{
         reset: Readonly<{
-            requestToken: WorkerHandler<RequestResetTokenProxyMessage>
+            requestToken: WorkerBackgroundHandler<
+                RequestResetTokenProxyMessage,
+                RequestResetTokenProxyResponse
+            >
         }>
     }>
 }>

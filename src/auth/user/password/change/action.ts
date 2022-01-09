@@ -1,7 +1,9 @@
-import { ApplicationStateAction } from "../../../../../ui/vendor/getto-application/action/action"
+import {
+    StatefulApplicationAction,
+    AbstractStatefulApplicationAction,
+} from "../../../../../ui/vendor/getto-application/action/action"
 
 import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
-import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/init"
 import { initInputPasswordAction } from "../input/action"
 import { initValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/validate_board/action"
 
@@ -15,7 +17,7 @@ import { ChangePasswordRemote } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
 import { ValidateBoardChecker } from "../../../../../ui/vendor/getto-application/board/validate_board/infra"
 
-export interface ChangePasswordAction extends ApplicationStateAction<ChangePasswordState> {
+export interface ChangePasswordAction extends StatefulApplicationAction<ChangePasswordState> {
     readonly currentPassword: InputPasswordAction
     readonly newPassword: InputPasswordAction
     readonly validate: ValidateBoardAction
@@ -54,7 +56,7 @@ export function initChangePasswordAction(
 }
 
 class Action
-    extends ApplicationAbstractStateAction<ChangePasswordState>
+    extends AbstractStatefulApplicationAction<ChangePasswordState>
     implements ChangePasswordAction
 {
     readonly initialState = initialChangePasswordState
@@ -68,7 +70,13 @@ class Action
     checker: ValidateBoardChecker<ChangePasswordFieldName, ChangePasswordFields>
 
     constructor(config: ChangePasswordConfig, infra: ChangePasswordInfra) {
-        super()
+        super({
+            terminate: () => {
+                this.currentPassword.terminate()
+                this.newPassword.terminate()
+                this.validate.terminate()
+            },
+        })
         this.config = config
         this.infra = infra
 
@@ -109,12 +117,6 @@ class Action
         this.newPassword.validate.subscriber.subscribe((result) =>
             checker.update("newPassword", result.valid),
         )
-
-        this.terminateHook(() => {
-            this.currentPassword.terminate()
-            this.newPassword.terminate()
-            this.validate.terminate()
-        })
     }
 
     open(): ChangePasswordState {
