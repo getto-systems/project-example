@@ -11,9 +11,8 @@ import { LocationOutsideFeature } from "../../../z_lib/ui/location/feature"
 
 import { DocsView } from "../resource"
 
-export function newDocsView(
-    feature: RemoteOutsideFeature & RepositoryOutsideFeature & LocationOutsideFeature,
-): DocsView {
+type OutsideFeature = RemoteOutsideFeature & RepositoryOutsideFeature & LocationOutsideFeature
+export function newDocsView(feature: OutsideFeature): DocsView {
     const menu = docsMenuContent()
     return initDocsView({
         ...newLoadBreadcrumbListResource(feature, menu),
