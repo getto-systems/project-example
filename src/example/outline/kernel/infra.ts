@@ -1,10 +1,4 @@
-import {
-    FetchRepositoryResult,
-    StoreRepositoryResult,
-} from "../../../z_lib/ui/repository/infra"
-import { RemoteResult } from "../../../z_lib/ui/remote/infra"
-
-import { GetMenuBadgeRemoteError, MenuCategoryPath, MenuTargetPath } from "./data"
+import { MenuCategoryPath, MenuTargetPath } from "./data"
 import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 
 export interface MenuTargetPathDetecter {
@@ -41,33 +35,10 @@ export type MenuPermission =
     | Readonly<{ type: "all"; permits: MenuPermission[] }>
     | Readonly<{ type: "role"; role: string }>
 
-export type MenuBadgeStore = MenuStore<MenuBadge>
-export type MenuExpandStore = MenuStore<MenuExpand>
-
-export interface MenuStore<T> {
-    get(): FetchMenuStoreResult<T>
-    set(value: T): void
-}
-export type FetchMenuStoreResult<T> =
-    | Readonly<{ found: true; value: T }>
-    | Readonly<{ found: false }>
-
-export interface GetMenuBadgeRemote {
-    (): Promise<GetMenuBadgeRemoteResult>
-}
-export type GetMenuBadgeRemoteResult = RemoteResult<MenuBadge, GetMenuBadgeRemoteError>
-
 export type MenuBadge = Map<string, number>
 export type MenuBadgeItem = Readonly<{ path: string; count: number }>
 
 export type MenuExpand = ArraySet<MenuCategoryPath>
-
-export interface MenuExpandRepository {
-    get(): Promise<FetchRepositoryResult<MenuExpand>>
-    set(value: MenuExpand): Promise<StoreRepositoryResult>
-    remove(): Promise<StoreRepositoryResult>
-}
-export type MenuExpandRepositoryValue = string[][]
 
 class ArraySet<T> {
     values: T[] = []

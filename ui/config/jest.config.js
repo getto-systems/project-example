@@ -14,6 +14,7 @@ module.exports = {
         "!**/z_*/**",
         "!**/test.ts",
         "!**/test_helper.ts",
+        "!**/menu/**",
         "!**/init/**",
         "!**/init.ts",
         "!**/view.ts",

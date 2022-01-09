@@ -11,7 +11,7 @@ import { linky } from "../../../../../ui/vendor/getto-css/preact/design/highligh
 import { siteInfo } from "../../../site"
 import { icon } from "../../../x_preact/design/icon"
 
-import { MENU_ID } from "../../action_load_menu/x_preact/load_menu"
+import { MENU_ID } from "../../load_menu/x_preact/load_menu"
 
 import { LoadBreadcrumbListAction } from "../action"
 

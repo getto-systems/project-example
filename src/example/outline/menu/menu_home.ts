@@ -1,8 +1,7 @@
-import { lnir } from "../../../../z_lib/ui/icon/line_icon"
-import { MenuContent, MenuPermission } from "../infra"
-import { category, item } from "./common"
+import { lnir } from "../../../z_lib/ui/icon/line_icon"
+import { category, item } from "../kernel/init/common"
 
-// TODO このファイル名とかファイルのロケーションとか考え直したい
+import { MenuContent, MenuPermission } from "../kernel/infra"
 
 export function homeMenuContent(): MenuContent {
     return {
