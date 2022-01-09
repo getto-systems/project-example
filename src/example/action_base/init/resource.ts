@@ -1,7 +1,7 @@
 import { homeMenuContent } from "../../outline/kernel/init/home"
 import { newNotifyUnexpectedErrorResource } from "../../../avail/unexpected_error/notify/init/resource"
 import { newLoadBreadcrumbListResource } from "../../outline/load_breadcrumb_list/init/resource"
-import { newLoadMenuResource } from "../../outline/action_load_menu/init/resource"
+import { newLoadMenuResource } from "../../outline/load_menu/init/resource"
 import { newLoadSeasonResource } from "../../action_load_season/init/resource"
 
 import { RepositoryOutsideFeature } from "../../../z_lib/ui/repository/feature"

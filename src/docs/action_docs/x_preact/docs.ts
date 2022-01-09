@@ -15,7 +15,7 @@ import {
 import { copyright, siteInfo } from "../../../example/site"
 
 import { ApplicationErrorComponent } from "../../../avail/x_preact/application_error"
-import { LoadMenuEntry } from "../../../example/outline/action_load_menu/x_preact/load_menu"
+import { LoadMenuEntry } from "../../../example/outline/load_menu/x_preact/load_menu"
 import { LoadBreadcrumbListComponent } from "../../../example/outline/load_breadcrumb_list/x_preact/load_breadcrumb_list"
 import { docsArticle } from "./content"
 

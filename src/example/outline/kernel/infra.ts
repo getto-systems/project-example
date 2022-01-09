@@ -1,11 +1,9 @@
-import {
-    FetchRepositoryResult,
-    StoreRepositoryResult,
-} from "../../../z_lib/ui/repository/infra"
+import { FetchRepositoryResult, StoreRepositoryResult } from "../../../z_lib/ui/repository/infra"
 import { RemoteResult } from "../../../z_lib/ui/remote/infra"
 
-import { GetMenuBadgeRemoteError, MenuCategoryPath, MenuTargetPath } from "./data"
+import { MenuCategoryPath, MenuTargetPath } from "./data"
 import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
+import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
 
 export interface MenuTargetPathDetecter {
     (): ConvertLocationResult<MenuTargetPath>
@@ -55,7 +53,7 @@ export type FetchMenuStoreResult<T> =
 export interface GetMenuBadgeRemote {
     (): Promise<GetMenuBadgeRemoteResult>
 }
-export type GetMenuBadgeRemoteResult = RemoteResult<MenuBadge, GetMenuBadgeRemoteError>
+export type GetMenuBadgeRemoteResult = RemoteResult<MenuBadge, RemoteCommonError>
 
 export type MenuBadge = Map<string, number>
 export type MenuBadgeItem = Readonly<{ path: string; count: number }>

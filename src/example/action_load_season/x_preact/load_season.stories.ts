@@ -11,7 +11,7 @@ import {
     mainTitle,
 } from "../../../../ui/vendor/getto-css/preact/layout/app"
 
-import { LoadMenuEntry } from "../../outline/action_load_menu/x_preact/load_menu"
+import { LoadMenuEntry } from "../../outline/load_menu/x_preact/load_menu"
 import { LoadSeasonEntry } from "./load_season"
 
 import { mockLoadMenuAction, mockMenu_home } from "../../outline/action_load_menu/mock"

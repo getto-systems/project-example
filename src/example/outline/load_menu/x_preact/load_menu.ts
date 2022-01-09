@@ -20,21 +20,29 @@ import {
 
 import { poweredBy } from "../../../site"
 
-import { LoadMenuResource, LoadMenuResourceState } from "../resource"
+import { LoadMenuAction, LoadMenuState } from "../action"
 
 import { RepositoryError } from "../../../../z_lib/ui/repository/data"
-import { GetMenuBadgeError, Menu, MenuCategoryNode, MenuItemNode } from "../../kernel/data"
+import { Menu, MenuCategoryNode, MenuItemNode } from "../../kernel/data"
+import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
 
 export const MENU_ID = "menu"
 
-export function LoadMenuEntry(resource: LoadMenuResource): VNode {
+type EntryProps = Readonly<{
+    menu: LoadMenuAction
+}>
+export function LoadMenuEntry({ menu }: EntryProps): VNode {
     return h(LoadMenuComponent, {
-        ...resource,
-        state: useApplicationAction(resource.menu),
+        menu,
+        state: useApplicationAction(menu),
     })
 }
 
-type Props = LoadMenuResource & LoadMenuResourceState
+type Props = EntryProps &
+    Readonly<{
+        state: LoadMenuState
+    }>
+
 export function LoadMenuComponent(props: Props): VNode {
     switch (props.state.type) {
         case "initial-menu":
@@ -138,7 +146,7 @@ function repositoryError(err: RepositoryError): VNode[] {
             return [notice_alert("ストレージエラー"), ...errorDetail(err.err)]
     }
 }
-function error(err: GetMenuBadgeError): VNode[] {
+function error(err: RemoteCommonError): VNode[] {
     return remoteCommonErrorReason(err, (reason) => [
         notice_alert(reason.message),
         ...reason.detail.map((message) => html`<small><p>${message}</p></small>`),

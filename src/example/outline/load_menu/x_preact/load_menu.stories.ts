@@ -15,7 +15,7 @@ import { lniClass, lnir } from "../../../../z_lib/ui/icon/line_icon"
 
 import { LoadMenuComponent } from "./load_menu"
 
-import { mockLoadMenuAction, mockMenu } from "../mock"
+import { mockLoadMenuAction, mockMenu } from "../../action_load_menu/mock"
 
 import { LoadMenuState } from "../action"
 

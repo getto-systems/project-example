@@ -2,15 +2,18 @@ import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/a
 
 import { markMenuCategoryLabel, standard_MenuTree } from "../kernel/test_helper"
 
-import { initLoadMenuAction, initLoadMenuMaterial } from "./init"
+import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
+import { initMenuBadgeStore, initMenuExpandStore } from "../kernel/init/store"
+
 import {
     convertMenuBadgeRemote,
     detectMenuTargetPath,
     menuExpandRepositoryConverter,
 } from "../kernel/convert"
 import { authTicketRepositoryConverter } from "../../../auth/ticket/kernel/convert"
-import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"
+
+import { initLoadMenuAction, LoadMenuAction } from "../load_menu/action"
 
 import { AuthTicketRepository, AuthTicketRepositoryValue } from "../../../auth/ticket/kernel/infra"
 import {
@@ -19,8 +22,6 @@ import {
     MenuTargetPathDetecter,
     MenuExpand,
 } from "../kernel/infra"
-
-import { LoadMenuResource } from "./resource"
 
 import { AuthTicket } from "../../../auth/ticket/kernel/data"
 
@@ -361,22 +362,26 @@ function expand() {
 function initResource(
     ticketRepository: AuthTicketRepository,
     menuExpandRepository: MenuExpandRepository,
-): [LoadMenuResource, MenuExpandRepository] {
+): [Readonly<{ menu: LoadMenuAction }>, MenuExpandRepository] {
     const version = standard_version()
-    const detecter = standard_detecter()
+    const detectTargetPath = standard_detecter()
     const getMenuBadgeRemote = standard_getMenuBadgeRemote()
 
     return [
         {
             menu: initLoadMenuAction(
-                initLoadMenuMaterial({
+                {
                     version,
                     menuTree: standard_MenuTree(),
+                    getMenuBadgeRemote,
                     ticketRepository,
                     menuExpandRepository,
-                    getMenuBadgeRemote,
-                }),
-                detecter,
+                    menuExpandStore: initMenuExpandStore(),
+                    menuBadgeStore: initMenuBadgeStore(),
+                },
+                {
+                    detectTargetPath,
+                },
             ),
         },
         menuExpandRepository,

@@ -1,5 +1,3 @@
-import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
-
 export type MenuTargetPath = string & { MenuTarget: never }
 
 export type Menu = MenuNode[]
@@ -32,6 +30,3 @@ type MenuItem_data = Readonly<{
     icon: string
     href: string
 }>
-
-export type GetMenuBadgeError = GetMenuBadgeRemoteError
-export type GetMenuBadgeRemoteError = RemoteCommonError
