@@ -1,21 +1,21 @@
-import { env } from "../../../../y_environment/ui/env"
-import pb from "../../../../y_protobuf/proto.js"
+import { env } from "../../../y_environment/ui/env"
+import pb from "../../../y_protobuf/proto.js"
 
 import {
     fetchRepositoryRemovedResult,
     mapFetchRepositoryResult,
-} from "../../../../z_lib/ui/repository/helper"
-import { decodeProtobuf, encodeProtobuf } from "../../../../../ui/vendor/protobuf/helper"
+} from "../../../z_lib/ui/repository/helper"
+import { decodeProtobuf, encodeProtobuf } from "../../../../ui/vendor/protobuf/helper"
 import {
     IndexedDBTarget,
     initIndexedDB,
-} from "../../../../z_lib/ui/repository/init/indexed_db"
+} from "../../../z_lib/ui/repository/init/indexed_db"
 
-import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/feature"
+import { RepositoryOutsideFeature } from "../../../z_lib/ui/repository/feature"
 
-import { SeasonRepository, SeasonRepositoryValue } from "../../infra"
+import { SeasonRepository, SeasonRepositoryValue } from "../infra"
 
-import { seasonRepositoryConverter } from "../../convert"
+import { seasonRepositoryConverter } from "../convert"
 
 export function newSeasonRepository({ webDB }: RepositoryOutsideFeature): SeasonRepository {
     const db = initDB()

@@ -11,15 +11,16 @@ import {
 } from "../../../../../ui/vendor/getto-css/preact/layout/app"
 
 import { copyright, siteInfo } from "../../../site"
-import { lniClass, lnir } from "../../../../z_lib/ui/icon/line_icon"
 
 import { LoadMenuComponent } from "./load_menu"
 
-import { mockLoadMenuAction, mockMenu } from "../../action_load_menu/mock"
+import { mockLoadMenuShell } from "../init/mock"
+import { mockRemoteInfraError } from "../../../../z_lib/ui/remote/mock"
 
-import { LoadMenuState } from "../action"
+import { initMemoryDB } from "../../../../z_lib/ui/repository/init/memory"
+import { initMenuBadgeStore, initMenuExpandStore } from "../init/store"
 
-import { Menu } from "../../kernel/data"
+import { initLoadMenuAction, LoadMenuState } from "../action"
 
 const options = [
     "success",
@@ -43,8 +44,6 @@ export default {
 
 type MockProps = Readonly<{
     load: typeof options[number]
-    label: string
-    badgeCount: number
     err: string
 }>
 const template = storyTemplate<MockProps>((props) => {
@@ -57,7 +56,18 @@ const template = storyTemplate<MockProps>((props) => {
             copyright,
         }),
         menu: h(LoadMenuComponent, {
-            menu: mockLoadMenuAction(menu()),
+            menu: initLoadMenuAction(
+                {
+                    version: "0.0.0",
+                    menuTree: [],
+                    getMenuBadgeRemote: async () => mockRemoteInfraError,
+                    ticketRepository: initMemoryDB(),
+                    menuExpandRepository: initMemoryDB(),
+                    menuExpandStore: initMenuExpandStore(),
+                    menuBadgeStore: initMenuBadgeStore(),
+                },
+                mockLoadMenuShell(new URL("https://example.com"), "0.0.0"),
+            ),
             state: state(),
         }),
     })
@@ -65,7 +75,7 @@ const template = storyTemplate<MockProps>((props) => {
     function state(): LoadMenuState {
         switch (props.load) {
             case "success":
-                return { type: "succeed-to-load", menu: menu() }
+                return { type: "succeed-to-load", menu: [] }
 
             case "required-to-login":
                 return { type: props.load }
@@ -79,15 +89,11 @@ const template = storyTemplate<MockProps>((props) => {
             default:
                 return {
                     type: "failed-to-update",
-                    menu: menu(),
+                    menu: [],
                     err: { type: props.load, err: props.err },
                 }
         }
     }
-
-    function menu(): Menu {
-        return mockMenu(props.label, lniClass(lnir("home")), props.badgeCount)
-    }
 })
 
-export const LoadMenu = template({ load: "success", label: "ホーム", badgeCount: 99, err: "" })
+export const LoadMenu = template({ load: "success", err: "" })
