@@ -9,12 +9,12 @@ import {
     ApplicationActionTerminateRunner,
 } from "./infra"
 
-import { ApplicationActionStateSubscriber, ApplicationStateAction } from "./action"
+import { ApplicationStateSubscriber, ApplicationStateAction } from "./action"
 
 export abstract class ApplicationAbstractStateAction<S> implements ApplicationStateAction<S> {
     abstract readonly initialState: S
 
-    readonly subscriber: ApplicationActionStateSubscriber<S>
+    readonly subscriber: ApplicationStateSubscriber<S>
 
     // this.material.doSomething(this.post) できるようにプロパティとして提供
     readonly post: Post<S>

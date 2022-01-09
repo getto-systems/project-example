@@ -1,11 +1,11 @@
-import { ApplicationActionStateSubscriber } from "./action"
+import { ApplicationStateSubscriber } from "./action"
 
 export interface ApplicationActionTestRunner<S> {
     (statement: { (): Promise<S> }): Promise<S[]>
 }
 
 export function setupActionTestRunner<S>(
-    subscriber: ApplicationActionStateSubscriber<S>,
+    subscriber: ApplicationStateSubscriber<S>,
 ): ApplicationActionTestRunner<S> {
     return async (statement) => {
         const stack: S[] = []
