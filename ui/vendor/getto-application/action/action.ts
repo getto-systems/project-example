@@ -7,15 +7,15 @@ export interface ApplicationAction {
     terminate(): void
 }
 export interface ApplicationStateAction<S> extends ApplicationAction {
-    readonly subscriber: ApplicationActionStateSubscriber<S>
+    readonly subscriber: ApplicationStateSubscriber<S>
     currentState(): S
     ignite(): Promise<S>
 }
 
-export interface ApplicationActionStateSubscriber<S> {
-    subscribe(handler: ApplicationActionStateHandler<S>): void
-    unsubscribe(target: ApplicationActionStateHandler<S>): void
+export interface ApplicationStateSubscriber<S> {
+    subscribe(handler: ApplicationStateHandler<S>): void
+    unsubscribe(target: ApplicationStateHandler<S>): void
 }
-export interface ApplicationActionStateHandler<S> {
+export interface ApplicationStateHandler<S> {
     (state: S): void
 }
