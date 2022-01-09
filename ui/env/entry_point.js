@@ -46,7 +46,6 @@ function secureHtmlFiles() {
 }
 function linkableHtmlFiles() {
     return [
-        "storybook/index.html",
         "coverage/api/index.html",
         "coverage/ui/lcov-report/index.html",
         ...secureHtmlFiles(),

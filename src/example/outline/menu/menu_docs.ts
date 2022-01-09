@@ -34,7 +34,6 @@ function devDocs(): MenuTreeNode[] {
     }
     return [
         category("開発用", dev, [
-            item("Storybook", lnir("files-alt"), "storybook/index.html"),
             item("coverage api", lnir("files-alt"), "coverage/api/index.html"),
             item("coverage ui", lnir("files-alt"), "coverage/ui/lcov-report/index.html"),
         ]),
