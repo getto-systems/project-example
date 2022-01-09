@@ -1,4 +1,4 @@
-import { homeMenuContent } from "../../outline/kernel/init/home"
+import { homeMenuContent } from "../../outline/menu/menu_home"
 import { newNotifyUnexpectedErrorResource } from "../../../avail/unexpected_error/notify/init/resource"
 import { newLoadBreadcrumbListResource } from "../../outline/load_breadcrumb_list/init/resource"
 import { newLoadMenuResource } from "../../outline/load_menu/init/resource"
