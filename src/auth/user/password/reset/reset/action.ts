@@ -1,6 +1,8 @@
-import { ApplicationStateAction } from "../../../../../../ui/vendor/getto-application/action/action"
+import {
+    StatefulApplicationAction,
+    AbstractStatefulApplicationAction,
+} from "../../../../../../ui/vendor/getto-application/action/action"
 
-import { ApplicationAbstractStateAction } from "../../../../../../ui/vendor/getto-application/action/init"
 import { initSignLink } from "../../../../sign/nav/resource"
 import { initInputLoginIDAction } from "../../../login_id/input/action"
 import { initInputPasswordAction } from "../../input/action"
@@ -33,7 +35,7 @@ import { AuthTicket } from "../../../../ticket/kernel/data"
 import { ConvertBoardResult } from "../../../../../../ui/vendor/getto-application/board/kernel/data"
 import { RepositoryError } from "../../../../../z_lib/ui/repository/data"
 
-export interface ResetPasswordAction extends ApplicationStateAction<ResetPasswordState> {
+export interface ResetPasswordAction extends StatefulApplicationAction<ResetPasswordState> {
     readonly link: SignLink
 
     readonly loginID: InputLoginIDAction
@@ -84,7 +86,7 @@ export function initResetPasswordAction(
 }
 
 class Action
-    extends ApplicationAbstractStateAction<ResetPasswordState>
+    extends AbstractStatefulApplicationAction<ResetPasswordState>
     implements ResetPasswordAction
 {
     readonly initialState = initialResetPasswordState
@@ -101,7 +103,13 @@ class Action
     checker: ValidateBoardChecker<ResetPasswordFieldName, ResetPasswordFields>
 
     constructor(config: ResetPasswordConfig, infra: ResetPasswordInfra, shell: ResetPasswordShell) {
-        super()
+        super({
+            terminate: () => {
+                this.loginID.terminate()
+                this.password.terminate()
+                this.validate.terminate()
+            },
+        })
         this.config = config
         this.infra = infra
         this.shell = shell
@@ -142,12 +150,6 @@ class Action
         this.password.validate.subscriber.subscribe((result) =>
             checker.update("password", result.valid),
         )
-
-        this.terminateHook(() => {
-            this.loginID.terminate()
-            this.password.terminate()
-            this.validate.terminate()
-        })
     }
 
     clear(): void {

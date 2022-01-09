@@ -1,12 +1,14 @@
 import { delayedChecker } from "../../../../../z_lib/ui/timer/helper"
 
-import { ApplicationAbstractStateAction } from "../../../../../../ui/vendor/getto-application/action/init"
+import {
+    StatefulApplicationAction,
+    AbstractStatefulApplicationAction,
+} from "../../../../../../ui/vendor/getto-application/action/action"
 import { initSignLink } from "../../../../sign/nav/resource"
 import { initInputLoginIDAction } from "../../../login_id/input/action"
 import { initValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/validate_board/action"
 
 import { SignLink } from "../../../../sign/nav/resource"
-import { ApplicationStateAction } from "../../../../../../ui/vendor/getto-application/action/action"
 import { InputLoginIDAction } from "../../../login_id/input/action"
 import { ValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/validate_board/action"
 
@@ -17,7 +19,7 @@ import { ValidateBoardChecker } from "../../../../../../ui/vendor/getto-applicat
 import { RequestResetTokenError, RequestResetTokenFields } from "./data"
 import { ConvertBoardResult } from "../../../../../../ui/vendor/getto-application/board/kernel/data"
 
-export interface RequestResetTokenAction extends ApplicationStateAction<RequestResetTokenState> {
+export interface RequestResetTokenAction extends StatefulApplicationAction<RequestResetTokenState> {
     readonly link: SignLink
 
     readonly loginID: InputLoginIDAction
@@ -54,7 +56,7 @@ const requestResetTokenFieldNames = ["loginID"] as const
 type RequestResetTokenFieldName = typeof requestResetTokenFieldNames[number]
 
 class Action
-    extends ApplicationAbstractStateAction<RequestResetTokenState>
+    extends AbstractStatefulApplicationAction<RequestResetTokenState>
     implements RequestResetTokenAction
 {
     readonly initialState = initialRequestResetTokenState
@@ -69,7 +71,12 @@ class Action
     checker: ValidateBoardChecker<RequestResetTokenFieldName, RequestResetTokenFields>
 
     constructor(config: RequestResetTokenConfig, infra: RequestResetTokenInfra) {
-        super()
+        super({
+            terminate: () => {
+                this.loginID.terminate()
+                this.validate.terminate()
+            },
+        })
         this.config = config
         this.infra = infra
 
@@ -102,11 +109,6 @@ class Action
         this.loginID.validate.subscriber.subscribe((result) =>
             checker.update("loginID", result.valid),
         )
-
-        this.terminateHook(() => {
-            this.loginID.terminate()
-            this.validate.terminate()
-        })
     }
 
     clear(): void {
@@ -119,7 +121,7 @@ class Action
 }
 
 export interface RequestResetTokenProfileAction
-    extends ApplicationStateAction<RequestResetTokenProfileState> {
+    extends StatefulApplicationAction<RequestResetTokenProfileState> {
     readonly loginID: InputLoginIDAction
     readonly validate: ValidateBoardAction
 
@@ -149,7 +151,7 @@ const requestResetTokenProfileFieldNames = ["loginID"] as const
 type RequestResetTokenProfileFieldName = typeof requestResetTokenProfileFieldNames[number]
 
 class ProfileAction
-    extends ApplicationAbstractStateAction<RequestResetTokenProfileState>
+    extends AbstractStatefulApplicationAction<RequestResetTokenProfileState>
     implements RequestResetTokenProfileAction
 {
     readonly initialState = initialRequestResetTokenProfileState
@@ -162,7 +164,12 @@ class ProfileAction
     checker: ValidateBoardChecker<RequestResetTokenProfileFieldName, RequestResetTokenFields>
 
     constructor(config: RequestResetTokenConfig, infra: RequestResetTokenInfra) {
-        super()
+        super({
+            terminate: () => {
+                this.loginID.terminate()
+                this.validate.terminate()
+            },
+        })
         this.config = config
         this.infra = infra
 
@@ -195,11 +202,6 @@ class ProfileAction
         this.loginID.validate.subscriber.subscribe((result) =>
             checker.update("loginID", result.valid),
         )
-
-        this.terminateHook(() => {
-            this.loginID.terminate()
-            this.validate.terminate()
-        })
     }
 
     open(): RequestResetTokenProfileState {

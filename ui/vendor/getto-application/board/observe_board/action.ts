@@ -1,11 +1,10 @@
-import { ApplicationStateAction } from "../../action/action"
-import { ApplicationAbstractStateAction } from "../../action/init"
+import { StatefulApplicationAction, AbstractStatefulApplicationAction } from "../../action/action"
 
 import { ObserveBoardFieldResult } from "../observe_field/data"
 import { ObserveBoardChecker, ObserveBoardStack, ObserveBoardStateFound } from "./infra"
 import { initObserveBoardStack } from "./init/stack"
 
-export type ObserveBoardAction = ApplicationStateAction<ObserveBoardActionState>
+export type ObserveBoardAction = StatefulApplicationAction<ObserveBoardActionState>
 
 export type ObserveBoardActionState = ObserveBoardFieldResult
 export const initialObserveBoardState: ObserveBoardActionState = { hasChanged: false }
@@ -33,7 +32,7 @@ export function initObserveBoardAction<N extends string>(
 }
 
 class Action<N extends string>
-    extends ApplicationAbstractStateAction<ObserveBoardActionState>
+    extends AbstractStatefulApplicationAction<ObserveBoardActionState>
     implements ObserveBoardAction, ObserveBoardChecker<N>
 {
     readonly initialState: ObserveBoardActionState = initialObserveBoardState

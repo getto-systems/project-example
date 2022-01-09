@@ -1,8 +1,8 @@
 import {
-    ApplicationStateAction,
+    StatefulApplicationAction,
+    AbstractStatefulApplicationAction,
     ApplicationView,
 } from "../../../../ui/vendor/getto-application/action/action"
-import { ApplicationAbstractStateAction } from "../../../../ui/vendor/getto-application/action/init"
 import { CheckAuthTicketAction } from "../../ticket/check/action"
 import { AuthenticatePasswordAction } from "../../user/password/authenticate/action"
 import { RequestResetTokenAction } from "../../user/password/reset/request_token/action"
@@ -13,7 +13,7 @@ import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 import { SignViewType } from "../router/data"
 import { SignViewTypeDetecter } from "../router/infra"
 
-export type SignAction = ApplicationStateAction<SignActionState>
+export type SignAction = StatefulApplicationAction<SignActionState>
 
 export interface SignViewFactory {
     link(): Readonly<{ link: SignLink }>
@@ -50,31 +50,33 @@ export function initSignAction(shell: SignActionShell, factory: SignViewFactory)
     return new Action(shell, factory)
 }
 
-class Action extends ApplicationAbstractStateAction<SignActionState> implements SignAction {
+class Action extends AbstractStatefulApplicationAction<SignActionState> implements SignAction {
     readonly initialState = initialSignViewState
 
     factory: SignViewFactory
 
     constructor(shell: SignActionShell, factory: SignViewFactory) {
-        super(async () => {
-            const view = this.factory.check()
-            const viewType = shell.detectViewType()
+        super({
+            ignite: async () => {
+                const view = this.factory.check()
+                const viewType = shell.detectViewType()
 
-            view.resource.subscriber.subscribe((state) => {
-                switch (state.type) {
-                    case "required-to-login":
-                        this.post(this.mapViewType(viewType))
-                        return
-                }
-            })
+                view.resource.subscriber.subscribe((state) => {
+                    switch (state.type) {
+                        case "required-to-login":
+                            this.post(this.mapViewType(viewType))
+                            return
+                    }
+                })
 
-            if (viewType.valid) {
-                switch (viewType.value) {
-                    case "password-reset":
-                        return this.post(this.mapViewType(viewType))
+                if (viewType.valid) {
+                    switch (viewType.value) {
+                        case "password-reset":
+                            return this.post(this.mapViewType(viewType))
+                    }
                 }
-            }
-            return this.post({ type: "check-authTicket", view: view })
+                return this.post({ type: "check-authTicket", view: view })
+            },
         })
         this.factory = factory
     }

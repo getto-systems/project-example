@@ -24,7 +24,7 @@ describe("Menu", () => {
 
         const runner = setupActionTestRunner(resource.menu.subscriber)
 
-        await runner(() => resource.menu.ignite()).then((stack) => {
+        await runner(() => resource.menu.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-load",
@@ -65,7 +65,7 @@ describe("Menu", () => {
 
         const runner = setupActionTestRunner(resource.menu.subscriber)
 
-        await runner(() => resource.menu.ignite()).then((stack) => {
+        await runner(() => resource.menu.ignitionState).then((stack) => {
             expect(stack).toEqual([{ type: "required-to-login" }])
         })
     })
@@ -75,7 +75,7 @@ describe("Menu", () => {
 
         const runner = setupActionTestRunner(resource.menu.subscriber)
 
-        await runner(() => resource.menu.ignite()).then((stack) => {
+        await runner(() => resource.menu.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-load",
@@ -116,7 +116,7 @@ describe("Menu", () => {
 
         const runner = setupActionTestRunner(resource.menu.subscriber)
 
-        await runner(() => resource.menu.ignite())
+        await runner(() => resource.menu.ignitionState)
         await runner(() => resource.menu.show([markMenuCategoryLabel("DOCUMENT")])).then(
             (stack) => {
                 expect(stack).toEqual([
@@ -211,7 +211,7 @@ describe("Menu", () => {
 
         const runner = setupActionTestRunner(resource.menu.subscriber)
 
-        await runner(() => resource.menu.ignite()).then((stack) => {
+        await runner(() => resource.menu.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "succeed-to-load",
@@ -260,7 +260,7 @@ describe("Menu", () => {
 
         await runner(() => {
             resource.menu.terminate()
-            return resource.menu.ignite()
+            return resource.menu.ignitionState
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])

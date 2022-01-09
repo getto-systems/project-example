@@ -1,6 +1,8 @@
-import { ApplicationStateAction } from "../../../../../ui/vendor/getto-application/action/action"
+import {
+    StatefulApplicationAction,
+    AbstractStatefulApplicationAction,
+} from "../../../../../ui/vendor/getto-application/action/action"
 
-import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/init"
 import { initSignLink } from "../../../sign/nav/resource"
 import { initInputLoginIDAction } from "../../login_id/input/action"
 import { initInputPasswordAction } from "../input/action"
@@ -33,7 +35,7 @@ import { AuthTicket } from "../../../ticket/kernel/data"
 import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 
 export interface AuthenticatePasswordAction
-    extends ApplicationStateAction<AuthenticatePasswordState> {
+    extends StatefulApplicationAction<AuthenticatePasswordState> {
     readonly link: SignLink
 
     readonly loginID: InputLoginIDAction
@@ -81,7 +83,7 @@ export function initAuthenticatePasswordAction(
 }
 
 class Action
-    extends ApplicationAbstractStateAction<AuthenticatePasswordState>
+    extends AbstractStatefulApplicationAction<AuthenticatePasswordState>
     implements AuthenticatePasswordAction
 {
     readonly initialState = initialAuthenticatePasswordState
@@ -102,7 +104,13 @@ class Action
         infra: AuthenticatePasswordInfra,
         shell: AuthenticatePasswordShell,
     ) {
-        super()
+        super({
+            terminate: () => {
+                this.loginID.terminate()
+                this.password.terminate()
+                this.validate.terminate()
+            },
+        })
         this.config = config
         this.infra = infra
         this.shell = shell
@@ -144,12 +152,6 @@ class Action
         this.password.validate.subscriber.subscribe((result) =>
             checker.update("password", result.valid),
         )
-
-        this.terminateHook(() => {
-            this.loginID.terminate()
-            this.password.terminate()
-            this.validate.terminate()
-        })
     }
 
     clear(): AuthenticatePasswordState {

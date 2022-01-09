@@ -3,11 +3,17 @@ import { newWorkerBackgroundOutsideFeature } from "../../../../../../src/x_outsi
 import { newChangePasswordWorkerHandler } from "../../../../../../src/auth/user/password/change/init/worker/background"
 import { newRequestResetTokenWorkerHandler } from "../../../../../../src/auth/user/password/reset/request_token/init/worker/background"
 
-import { WorkerHandler } from "../../../../../../ui/vendor/getto-application/action/worker/background"
+import { WorkerBackgroundHandler } from "../../../../../../ui/vendor/getto-application/action/worker/background"
 
 import { ProfileForegroundMessage, ProfileBackgroundMessage } from "./message"
-import { ChangePasswordProxyMessage } from "../../../../../../src/auth/user/password/change/init/worker/message"
-import { RequestResetTokenProxyMessage } from "../../../../../../src/auth/user/password/reset/request_token/init/worker/message"
+import {
+    ChangePasswordProxyMessage,
+    ChangePasswordProxyResponse,
+} from "../../../../../../src/auth/user/password/change/init/worker/message"
+import {
+    RequestResetTokenProxyMessage,
+    RequestResetTokenProxyResponse,
+} from "../../../../../../src/auth/user/password/reset/request_token/init/worker/message"
 
 newBackground()
 
@@ -43,9 +49,12 @@ function newBackground(): void {
 
 type Handler = Readonly<{
     password: Readonly<{
-        change: WorkerHandler<ChangePasswordProxyMessage>
+        change: WorkerBackgroundHandler<ChangePasswordProxyMessage, ChangePasswordProxyResponse>
         reset: Readonly<{
-            requestToken: WorkerHandler<RequestResetTokenProxyMessage>
+            requestToken: WorkerBackgroundHandler<
+                RequestResetTokenProxyMessage,
+                RequestResetTokenProxyResponse
+            >
         }>
     }>
 }>

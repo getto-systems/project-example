@@ -12,10 +12,31 @@ import { BoardValueStore } from "../../../../../ui/vendor/getto-application/boar
 import { SearchAuthUserAccountRemote, SearchAuthUserAccountRemoteResult } from "./infra"
 
 describe("SearchAuthUserAccount", () => {
+    test("initial load", async () => {
+        const { resource } = standard()
+
+        const runner = setupActionTestRunner(resource.search.subscriber)
+
+        await runner(async () => resource.search.ignitionState).then((stack) => {
+            expect(stack).toEqual([
+                { type: "try-to-search" },
+                {
+                    type: "succeed-to-search",
+                    response: {
+                        page: { offset: 0, limit: 1000, all: 245 },
+                        users: [],
+                    },
+                },
+            ])
+        })
+    })
+
     test("search", async () => {
         const { resource, store, url } = standard()
 
         const runner = setupActionTestRunner(resource.search.subscriber)
+
+        await resource.search.ignitionState
 
         await runner(async () => {
             store.loginID.set(markBoardValue("MY-LOGIN-ID"))
@@ -43,6 +64,8 @@ describe("SearchAuthUserAccount", () => {
 
         const runner = setupActionTestRunner(resource.search.subscriber)
 
+        await resource.search.ignitionState
+
         await runner(async () => {
             return resource.search.submit()
         }).then((stack) => {
@@ -60,57 +83,15 @@ describe("SearchAuthUserAccount", () => {
         })
     })
 
-    test("load", async () => {
-        const { resource } = standard()
-
-        const runner = setupActionTestRunner(resource.search.subscriber)
-
-        await runner(async () => {
-            return resource.search.load()
-        }).then((stack) => {
-            expect(stack).toEqual([
-                { type: "try-to-search" },
-                {
-                    type: "succeed-to-search",
-                    response: {
-                        page: { offset: 0, limit: 1000, all: 245 },
-                        users: [],
-                    },
-                },
-            ])
-        })
-    })
-
     test("sort", async () => {
         const { resource } = standard()
 
         const runner = setupActionTestRunner(resource.search.subscriber)
 
+        await resource.search.ignitionState
+
         await runner(async () => {
             return resource.search.sort("login-id")
-        }).then((stack) => {
-            expect(stack).toEqual([
-                { type: "try-to-search" },
-                {
-                    type: "succeed-to-search",
-                    response: {
-                        page: { offset: 0, limit: 1000, all: 245 },
-                        users: [],
-                    },
-                },
-            ])
-        })
-    })
-
-    test("ignite", async () => {
-        const { resource } = standard()
-
-        const runner = setupActionTestRunner(resource.search.subscriber)
-
-        await runner(async () => {
-            resource.search.ignite()
-            await ticker({ wait_millisecond: 0 }, () => null)
-            return resource.search.currentState()
         }).then((stack) => {
             expect(stack).toEqual([
                 { type: "try-to-search" },

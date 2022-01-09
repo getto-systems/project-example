@@ -1,10 +1,9 @@
-import { ApplicationStateAction } from "../../action/action"
-import { ApplicationAbstractStateAction } from "../../action/init"
+import { StatefulApplicationAction, AbstractStatefulApplicationAction } from "../../action/action"
 
 import { ObserveBoardFieldResult } from "../observe_field/data"
 import { BoardFieldObserver } from "./infra"
 
-export interface ObserveBoardFieldAction extends ApplicationStateAction<ObserveBoardFieldState> {
+export interface ObserveBoardFieldAction extends StatefulApplicationAction<ObserveBoardFieldState> {
     check(): ObserveBoardFieldResult
 }
 
@@ -22,7 +21,7 @@ export function initObserveBoardFieldAction(
 }
 
 class Action
-    extends ApplicationAbstractStateAction<ObserveBoardFieldState>
+    extends AbstractStatefulApplicationAction<ObserveBoardFieldState>
     implements ObserveBoardFieldAction
 {
     readonly initialState = initialObserveBoardFieldState

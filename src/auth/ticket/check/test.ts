@@ -47,7 +47,7 @@ describe("CheckAuthTicket", () => {
 
         const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.ignite()).then((stack) => {
+        await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "try-to-instant-load",
@@ -75,7 +75,7 @@ describe("CheckAuthTicket", () => {
 
         const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.ignite()).then((stack) => {
+        await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "try-to-instant-load",
@@ -114,7 +114,7 @@ describe("CheckAuthTicket", () => {
 
         const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.ignite()).then((stack) => {
+        await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 { type: "try-to-renew" },
                 {
@@ -143,7 +143,7 @@ describe("CheckAuthTicket", () => {
 
         const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.ignite()).then((stack) => {
+        await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 { type: "try-to-renew" },
                 { type: "take-longtime-to-renew" },
@@ -165,7 +165,7 @@ describe("CheckAuthTicket", () => {
 
         const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.ignite()).then((stack) => {
+        await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([{ type: "required-to-login" }])
         })
     })
@@ -190,7 +190,7 @@ describe("CheckAuthTicket", () => {
 
         await runner(() => {
             view.terminate()
-            return view.resource.ignite()
+            return view.resource.ignitionState
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])

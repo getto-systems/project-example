@@ -1,5 +1,7 @@
-import { ApplicationStateAction } from "../../../../../ui/vendor/getto-application/action/action"
-import { ApplicationAbstractStateAction } from "../../../../../ui/vendor/getto-application/action/init"
+import {
+    StatefulApplicationAction,
+    AbstractStatefulApplicationAction,
+} from "../../../../../ui/vendor/getto-application/action/action"
 import {
     MultipleInputBoardAction,
     initMultipleInputBoardAction,
@@ -13,7 +15,7 @@ import { MultipleBoardValueStore } from "../../../../../ui/vendor/getto-applicat
 import { SearchColumns } from "./data"
 import { RepositoryError } from "../../repository/data"
 
-export interface SearchColumnsAction extends ApplicationStateAction<SearchColumnsState> {
+export interface SearchColumnsAction extends StatefulApplicationAction<SearchColumnsState> {
     readonly input: MultipleInputBoardAction
 
     load(initial: readonly string[]): Promise<SearchColumnsState>
@@ -35,7 +37,7 @@ export function initSearchColumnsAction(infra: SearchColumnsInfra): SearchColumn
 }
 
 class Action
-    extends ApplicationAbstractStateAction<SearchColumnsState>
+    extends AbstractStatefulApplicationAction<SearchColumnsState>
     implements SearchColumnsAction
 {
     readonly initialState = initialSearchColumnsState
@@ -46,7 +48,11 @@ class Action
     store: MultipleBoardValueStore
 
     constructor(infra: SearchColumnsInfra) {
-        super()
+        super({
+            terminate: () => {
+                subscriber.terminate()
+            },
+        })
 
         const { input, store, subscriber } = initMultipleInputBoardAction()
 
@@ -56,10 +62,6 @@ class Action
 
         subscriber.subscribe(() => {
             this.save(toSearchColumns(store.get()))
-        })
-
-        this.terminateHook(() => {
-            subscriber.terminate()
         })
     }
 

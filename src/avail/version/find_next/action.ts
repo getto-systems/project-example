@@ -1,5 +1,7 @@
-import { ApplicationStateAction } from "../../../../ui/vendor/getto-application/action/action"
-import { ApplicationAbstractStateAction } from "../../../../ui/vendor/getto-application/action/init"
+import {
+    StatefulApplicationAction,
+    AbstractStatefulApplicationAction,
+} from "../../../../ui/vendor/getto-application/action/action"
 import { DelayTime } from "../../../z_lib/ui/config/infra"
 import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 import { delayedChecker } from "../../../z_lib/ui/timer/helper"
@@ -15,7 +17,7 @@ import {
 import { versionToString } from "./helper"
 import { ApplicationTargetPathDetecter, CheckDeployExistsRemote } from "./infra"
 
-export type FindNextVersionAction = ApplicationStateAction<FindNextVersionState>
+export type FindNextVersionAction = StatefulApplicationAction<FindNextVersionState>
 
 export type FindNextVersionState = Readonly<{ type: "initial-next-version" }> | FindNextVersionEvent
 
@@ -44,7 +46,7 @@ export function initFindNextVersionAction(
 }
 
 class Action
-    extends ApplicationAbstractStateAction<FindNextVersionState>
+    extends AbstractStatefulApplicationAction<FindNextVersionState>
     implements FindNextVersionAction
 {
     readonly initialState = initialFindNextVersionState
@@ -54,7 +56,9 @@ class Action
         infra: FindNextVersionInfra,
         shell: FindNextVersionShell,
     ) {
-        super(() => findNextVersion(config, infra, shell, this.post))
+        super({
+            ignite: () => findNextVersion(config, infra, shell, this.post),
+        })
     }
 }
 
