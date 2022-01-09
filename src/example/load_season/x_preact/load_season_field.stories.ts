@@ -4,11 +4,11 @@ import { storyTemplate } from "../../../../ui/vendor/storybook/preact/story"
 
 import { LoadSeasonFieldComponent } from "./load_season_field"
 
-import { markSeason } from "../../load_season/test_helper"
+import { markSeason } from "../test_helper"
 
-import { mockLoadSeasonAction } from "../mock"
-
-import { LoadSeasonState } from "../action"
+import { initLoadSeasonAction, LoadSeasonState } from "../action"
+import { newClock } from "../../../z_lib/ui/clock/init"
+import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 
 const options = ["success", "error"] as const
 
@@ -27,7 +27,13 @@ type MockProps = Readonly<{
     err: string
 }>
 const template = storyTemplate<MockProps>((props) => {
-    return h(LoadSeasonFieldComponent, { season: mockLoadSeasonAction(), state: state() })
+    return h(LoadSeasonFieldComponent, {
+        season: initLoadSeasonAction({
+            seasonRepository: initMemoryDB(),
+            clock: newClock(),
+        }),
+        state: state(),
+    })
 
     function state(): LoadSeasonState {
         switch (props.load) {
