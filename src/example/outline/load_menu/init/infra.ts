@@ -4,9 +4,9 @@ import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/featur
 import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
 
 import { newAuthTicketRepository } from "../../../../auth/ticket/kernel/init/ticket_repository"
-import { newMenuExpandRepository } from "../../kernel/init/menu_expand_repository"
-import { newGetMenuBadgeRemote } from "../../kernel/init/get_menu_badge_remote/fetch"
-import { initMenuBadgeStore, initMenuExpandStore } from "../../kernel/init/store"
+import { newMenuExpandRepository } from "./menu_expand_repository"
+import { newGetMenuBadgeRemote } from "./menu_badge_remote"
+import { initMenuBadgeStore, initMenuExpandStore } from "./store"
 
 import { LoadMenuInfra } from "../action"
 

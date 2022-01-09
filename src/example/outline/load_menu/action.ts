@@ -3,16 +3,8 @@ import { ApplicationAbstractStateAction } from "../../../../ui/vendor/getto-appl
 
 import { buildMenu, BuildMenuParams } from "../kernel/helper"
 
-import {
-    GetMenuBadgeRemote,
-    initMenuExpand,
-    MenuBadge,
-    MenuBadgeStore,
-    MenuExpandRepository,
-    MenuExpandStore,
-    MenuTargetPathDetecter,
-    MenuTree,
-} from "../kernel/infra"
+import { initMenuExpand, MenuBadge, MenuTargetPathDetecter, MenuTree } from "../kernel/infra"
+import { GetMenuBadgeRemote, MenuBadgeStore, MenuExpandStore, MenuExpandRepository } from "./infra"
 import { AuthTicketRepository } from "../../../auth/ticket/kernel/infra"
 
 import { Menu, MenuCategoryPath } from "../kernel/data"

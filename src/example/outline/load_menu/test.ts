@@ -3,25 +3,18 @@ import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/a
 import { markMenuCategoryLabel, standard_MenuTree } from "../kernel/test_helper"
 
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
-import { initMenuBadgeStore, initMenuExpandStore } from "../kernel/init/store"
+import { initMenuBadgeStore, initMenuExpandStore } from "./init/store"
 
-import {
-    convertMenuBadgeRemote,
-    detectMenuTargetPath,
-    menuExpandRepositoryConverter,
-} from "../kernel/convert"
+import { detectMenuTargetPath } from "../kernel/convert"
+import { convertMenuBadgeRemote, menuExpandRepositoryConverter } from "./convert"
 import { authTicketRepositoryConverter } from "../../../auth/ticket/kernel/convert"
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"
 
 import { initLoadMenuAction, LoadMenuAction } from "../load_menu/action"
 
 import { AuthTicketRepository, AuthTicketRepositoryValue } from "../../../auth/ticket/kernel/infra"
-import {
-    GetMenuBadgeRemote,
-    MenuExpandRepository,
-    MenuTargetPathDetecter,
-    MenuExpand,
-} from "../kernel/infra"
+import { MenuTargetPathDetecter } from "../kernel/infra"
+import { MenuExpandRepository, GetMenuBadgeRemote, MenuExpandRepositoryValue } from "./infra"
 
 import { AuthTicket } from "../../../auth/ticket/kernel/data"
 
@@ -417,17 +410,12 @@ function devDocs_authz(): AuthTicketRepository {
 }
 
 function empty_menuExpandRepository(): MenuExpandRepository {
-    return initMemoryDB<MenuExpand>()
+    return convertDB(initMemoryDB<MenuExpandRepositoryValue>(), menuExpandRepositoryConverter)
 }
 function expand_menuExpandRepository(): MenuExpandRepository {
-    const result = menuExpandRepositoryConverter.fromRepository([["DOCUMENT"]])
-    if (!result.valid) {
-        throw new Error("invalid menu expand")
-    }
-
-    const repository = initMemoryDB<MenuExpand>()
-    repository.set(result.value)
-    return repository
+    const db = initMemoryDB<MenuExpandRepositoryValue>()
+    db.set([["DOCUMENT"]])
+    return convertDB(db, menuExpandRepositoryConverter)
 }
 
 function standard_getMenuBadgeRemote(): GetMenuBadgeRemote {
