@@ -56,7 +56,7 @@ export function newMenuExpandRepository(
             return encodeProtobuf(pb.example.outline.db.MenuExpand_pb, (message) => {
                 message.paths = value.map((labels) => {
                     const message = new pb.example.outline.db.MenuExpand_pb.Path()
-                    message.labels = labels
+                    message.labels = Array.from(labels)
                     return message
                 })
             })

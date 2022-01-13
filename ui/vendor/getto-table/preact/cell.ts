@@ -52,8 +52,8 @@ export interface TableCellSimple<M, R>
         TableCell_leaf<TableCellSimple<M, R>> {
     type: "simple"
 
-    initiallyVisibleCells(): TableDataCellKey[]
-    view(): TableDataView[]
+    initiallyVisibleCells(): readonly TableDataCellKey[]
+    view(): readonly TableDataView[]
     header(
         inherit: TableDataInherit,
         params: TableDataStyledParams<M>,
@@ -76,8 +76,8 @@ export interface TableCellExpansion<M, R>
         TableCell_leaf<TableCellExpansion<M, R>> {
     type: "expansion"
 
-    initiallyVisibleCells(): TableDataCellKey[]
-    view(): TableDataView[]
+    initiallyVisibleCells(): readonly TableDataCellKey[]
+    view(): readonly TableDataView[]
     header(
         inherit: TableDataInherit,
         params: TableDataStyledParams<M>,
@@ -100,45 +100,60 @@ export interface TableCellGroup<M, R>
         TableCell_group<TableCellGroup<M, R>> {
     type: "group"
 
-    initiallyVisibleCells(): TableDataCellKey[]
-    view(): TableDataView[]
+    initiallyVisibleCells(): readonly TableDataCellKey[]
+    view(): readonly TableDataView[]
     header(
         inherit: TableDataInherit,
         params: TableDataStyledParams<M>,
     ): TableDataHeaderGroup | TableDataInvisible
-    summary(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[]
-    column(inherit: TableDataInherit, params: TableDataRelatedParams<M, R>): TableDataColumn[]
-    footer(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[]
+    summary(
+        inherit: TableDataInherit,
+        params: TableDataStyledParams<M>,
+    ): readonly TableDataSummary[]
+    column(
+        inherit: TableDataInherit,
+        params: TableDataRelatedParams<M, R>,
+    ): readonly TableDataColumn[]
+    footer(inherit: TableDataInherit, params: TableDataStyledParams<M>): readonly TableDataSummary[]
 }
 export interface TableCellMultipart<M, R> extends TableCell_base<TableCellMultipart<M, R>, R> {
     type: "multipart"
 
-    initiallyVisibleCells(): TableDataCellKey[]
-    view(): TableDataView[]
-    header(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataHeader[]
-    summary(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[]
-    column(inherit: TableDataInherit, params: TableDataRelatedParams<M, R>): TableDataColumn[]
-    footer(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[]
+    initiallyVisibleCells(): readonly TableDataCellKey[]
+    view(): readonly TableDataView[]
+    header(inherit: TableDataInherit, params: TableDataStyledParams<M>): readonly TableDataHeader[]
+    summary(
+        inherit: TableDataInherit,
+        params: TableDataStyledParams<M>,
+    ): readonly TableDataSummary[]
+    column(
+        inherit: TableDataInherit,
+        params: TableDataRelatedParams<M, R>,
+    ): readonly TableDataColumn[]
+    footer(inherit: TableDataInherit, params: TableDataStyledParams<M>): readonly TableDataSummary[]
 }
 export interface TableCellTree<M, R>
     extends TableCell_base<TableCellTree<M, R>, R>,
         TableCell_tree<TableCellTree<M, R>, R> {
     type: "tree"
 
-    initiallyVisibleCells(): TableDataCellKey[]
-    view(): TableDataView[]
-    header(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataHeader[]
-    summary(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[]
+    initiallyVisibleCells(): readonly TableDataCellKey[]
+    view(): readonly TableDataView[]
+    header(inherit: TableDataInherit, params: TableDataStyledParams<M>): readonly TableDataHeader[]
+    summary(
+        inherit: TableDataInherit,
+        params: TableDataStyledParams<M>,
+    ): readonly TableDataSummary[]
     column(inherit: TableDataInherit, params: TableDataRelatedParams<M, R>): TableDataColumnTree
-    footer(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[]
+    footer(inherit: TableDataInherit, params: TableDataStyledParams<M>): readonly TableDataSummary[]
 }
 
 interface TableCell_base<T, R> {
-    horizontalBorder(borders: TableDataHorizontalBorder[]): T
+    horizontalBorder(borders: readonly TableDataHorizontalBorder[]): T
     horizontalBorderRelated(borders: TableDataHorizontalBorderProvider<R>): T
-    horizontalBorder_header(borders: TableDataHorizontalBorder[]): T
-    horizontalBorder_summary(borders: TableDataHorizontalBorder[]): T
-    horizontalBorder_footer(borders: TableDataHorizontalBorder[]): T
+    horizontalBorder_header(borders: readonly TableDataHorizontalBorder[]): T
+    horizontalBorder_summary(borders: readonly TableDataHorizontalBorder[]): T
+    horizontalBorder_footer(borders: readonly TableDataHorizontalBorder[]): T
 
     decorateHeader(decorator: TableDataHeaderDecorator): T
     decorateSummary(decorator: TableDataSummaryDecorator): T
@@ -148,12 +163,12 @@ interface TableCell_base<T, R> {
 }
 interface TableCell_leaf<T> {
     alwaysVisible(): T
-    border(borders: TableDataVerticalBorder[]): T
+    border(borders: readonly TableDataVerticalBorder[]): T
 
     decorateView(decorator: TableDataViewDecorator): T
 }
 interface TableCell_group<T> {
-    horizontalBorder_group(borders: TableDataHorizontalBorder[]): T
+    horizontalBorder_group(borders: readonly TableDataHorizontalBorder[]): T
 
     decorateView(decorator: TableDataViewDecorator): T
     decorateGroup(decorator: TableDataGroupDecorator): T
@@ -197,64 +212,66 @@ export interface TableDataColumnContentProvider<R> {
     (row: R): VNodeContent
 }
 export interface TableDataExpansionColumnContentProvider<R> {
-    (row: R): VNodeContent[]
+    (row: R): readonly VNodeContent[]
 }
 
 export interface TableDataRowKeyProvider<R> {
     (row: R): VNodeKey
 }
 export interface TableDataMultipartProvider<M, P> {
-    (model: M): P[]
+    (model: M): readonly P[]
 }
 export interface TableDataTreeChildrenProvider<M, R, C> {
-    (row: R, model: M): C[]
+    (row: R, model: M): readonly C[]
 }
 
-export function tableCellInitiallyVisibleCells<M, R>(cells: TableCell<M, R>[]): TableDataCellKey[] {
+export function tableCellInitiallyVisibleCells<M, R>(
+    cells: readonly TableCell<M, R>[],
+): readonly TableDataCellKey[] {
     return cells.flatMap((cell) => cell.initiallyVisibleCells())
 }
-export function tableCellView<M, R>(cells: TableCell<M, R>[]): TableDataView[] {
+export function tableCellView<M, R>(cells: readonly TableCell<M, R>[]): readonly TableDataView[] {
     return cells.flatMap((cell) => cell.view())
 }
 export function tableCellHeader<M, R>(
     inherit: TableDataInherit,
     params: TableDataStyledParams<M>,
     style: TableDataStyle,
-    cells: TableCell<M, R>[],
-): TableDataHeader[] {
+    cells: readonly TableCell<M, R>[],
+): readonly TableDataHeader[] {
     return tableCellBaseHeader(inherit, params, extendStyle({ base: params.base, style }), cells)
 }
 export function tableCellBaseHeader<M, R>(
     inherit: TableDataInherit,
     params: TableDataParams<M>,
     base: TableDataStyle,
-    cells: TableCell<M, R>[],
-): TableDataHeader[] {
+    cells: readonly TableCell<M, R>[],
+): readonly TableDataHeader[] {
     return withoutInvisible(cells.flatMap((cell) => cell.header(inherit, { ...params, base })))
 }
 export function tableCellSummary<M, R>(
     inherit: TableDataInherit,
     params: TableDataStyledParams<M>,
     style: TableDataStyle,
-    cells: TableCell<M, R>[],
-): TableDataSummary[] {
+    cells: readonly TableCell<M, R>[],
+): readonly TableDataSummary[] {
     return tableCellBaseSummary(inherit, params, extendStyle({ base: params.base, style }), cells)
 }
 export function tableCellBaseSummary<M, R>(
     inherit: TableDataInherit,
     params: TableDataParams<M>,
     base: TableDataStyle,
-    cells: TableCell<M, R>[],
-): TableDataSummary[] {
+    cells: readonly TableCell<M, R>[],
+): readonly TableDataSummary[] {
     return withoutInvisible(cells.flatMap((cell) => cell.summary(inherit, { ...params, base })))
 }
 export function tableCellColumn<M, R>(
     inherit: TableDataInherit,
     params: TableDataRelatedParams<M, R>,
     style: TableDataStyle,
-    decorators: TableDataColumnRelatedDecorator<R>[],
-    cells: TableCell<M, R>[],
-): TableDataColumn[] {
+    decorators: readonly TableDataColumnRelatedDecorator<R>[],
+    cells: readonly TableCell<M, R>[],
+): readonly TableDataColumn[] {
     // decorate してから extend したいから Base は使えない
     return withoutInvisible(
         cells.flatMap((cell) =>
@@ -276,10 +293,10 @@ export function tableCellBaseColumn<M, R>(
     inherit: TableDataInherit,
     params: TableDataParams<M>,
     base: TableDataStyle,
-    decorators: TableDataColumnRelatedDecorator<R>[],
-    cells: TableCell<M, R>[],
+    decorators: readonly TableDataColumnRelatedDecorator<R>[],
+    cells: readonly TableCell<M, R>[],
     row: R,
-): TableDataColumn[] {
+): readonly TableDataColumn[] {
     return withoutInvisible(
         cells.flatMap((cell) => cell.column(inherit, { ...params, base: decorated(base), row })),
     )
@@ -292,10 +309,10 @@ export function tableCellChildColumn<M, R, C>(
     inherit: TableDataInherit,
     params: TableDataRelatedParams<M, R>,
     base: TableDataStyle,
-    decorators: TableDataColumnRelatedDecorator<R>[],
-    cells: TableCell<M, C>[],
+    decorators: readonly TableDataColumnRelatedDecorator<R>[],
+    cells: readonly TableCell<M, C>[],
     child: Readonly<{ row: C; last: boolean }>,
-): TableDataColumn[] {
+): readonly TableDataColumn[] {
     // decorate してから extend したいから Base は使えない
     return withoutInvisible(
         cells.flatMap((cell) =>
@@ -328,21 +345,23 @@ export function tableCellFooter<M, R>(
     inherit: TableDataInherit,
     params: TableDataStyledParams<M>,
     style: TableDataStyle,
-    cells: TableCell<M, R>[],
-): TableDataSummary[] {
+    cells: readonly TableCell<M, R>[],
+): readonly TableDataSummary[] {
     return tableCellBaseFooter(inherit, params, extendStyle({ base: params.base, style }), cells)
 }
 export function tableCellBaseFooter<M, R>(
     inherit: TableDataInherit,
     params: TableDataParams<M>,
     base: TableDataStyle,
-    cells: TableCell<M, R>[],
-): TableDataSummary[] {
+    cells: readonly TableCell<M, R>[],
+): readonly TableDataSummary[] {
     return withoutInvisible(cells.flatMap((cell) => cell.footer(inherit, { ...params, base })))
 }
 
-function withoutInvisible<T>(entries: (TableDataInvisible | TableDataTypedContent<T>)[]): T[] {
+function withoutInvisible<T>(
+    entries: readonly (TableDataInvisible | TableDataTypedContent<T>)[],
+): readonly T[] {
     // T と invisible の中から invisible を取り除くと T[] になる
-    return entries.filter((entry) => entry.type !== "invisible") as T[]
+    return entries.filter((entry) => entry.type !== "invisible") as readonly T[]
 }
 type TableDataTypedContent<T> = T & Readonly<{ type: string }>

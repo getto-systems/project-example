@@ -52,7 +52,7 @@ function load(infra: LoadBreadcrumbListInfra, shell: LoadBreadcrumbListShell): B
             }
             return EMPTY
         }
-        function findFocusedNode(node: MenuTreeNode): BreadcrumbNode[] {
+        function findFocusedNode(node: MenuTreeNode): readonly BreadcrumbNode[] {
             switch (node.type) {
                 case "category":
                     return categoryNode(node.category, node.children)
@@ -60,14 +60,14 @@ function load(infra: LoadBreadcrumbListInfra, shell: LoadBreadcrumbListShell): B
                     return itemNode(node.item)
             }
         }
-        function categoryNode(category: MenuTreeCategory, children: MenuTree): BreadcrumbNode[] {
+        function categoryNode(category: MenuTreeCategory, children: MenuTree): readonly BreadcrumbNode[] {
             const breadcrumb = toBreadcrumb(children)
             if (breadcrumb.length === 0) {
                 return EMPTY
             }
             return [{ type: "category", category: toMenuCategory(category) }, ...breadcrumb]
         }
-        function itemNode(item: MenuTreeItem): BreadcrumbNode[] {
+        function itemNode(item: MenuTreeItem): readonly BreadcrumbNode[] {
             if (item.path !== currentPath) {
                 return EMPTY
             }

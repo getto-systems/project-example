@@ -55,7 +55,7 @@ function seasonInfo(season: Season): VNodeContent {
 function loadError(err: RepositoryError): VNodeContent {
     return [notice_alert("ロードエラー"), ...detail()]
 
-    function detail(): VNode[] {
+    function detail(): readonly VNode[] {
         if (err.err.length === 0) {
             return []
         }

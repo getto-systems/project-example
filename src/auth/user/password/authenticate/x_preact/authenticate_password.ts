@@ -111,7 +111,9 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
 
     type State = "initial" | "valid" | "invalid" | "connecting"
 
-    type Content = Readonly<{ state: State }> | Readonly<{ state: State; err: VNodeContent[] }>
+    type Content =
+        | Readonly<{ state: State }>
+        | Readonly<{ state: State; err: readonly VNodeContent[] }>
 
     function authenticateTitle() {
         return "ログイン"
@@ -216,7 +218,7 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
     }
 }
 
-function loginError(err: AuthenticatePasswordError): VNodeContent[] {
+function loginError(err: AuthenticatePasswordError): readonly VNodeContent[] {
     switch (err.type) {
         case "validation-error":
             return ["正しく入力してください"]

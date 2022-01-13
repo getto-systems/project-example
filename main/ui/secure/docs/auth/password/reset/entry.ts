@@ -6,13 +6,13 @@ import { newDocsView } from "../../../../../../../src/docs/action_docs/init/reso
 
 import { DocsUsecaseEntry } from "../../../../../../../src/docs/action_docs/x_preact/usecase"
 
-import { docsUsecaseContent } from "../../../../../../../ui/vendor/getto-application/docs/helper"
 import { docs_auth } from "../../../../../../../src/auth/docs"
+import { docsUsecase } from "../../../../../../../ui/vendor/getto-application/docs/helper"
 
 render(
     h(DocsUsecaseEntry, {
         view: newDocsView(newForegroundOutsideFeature()),
-        docs: docsUsecaseContent(docs_auth, "password/reset"),
+        docs: docsUsecase(docs_auth, "password/reset"),
     }),
     document.body,
 )

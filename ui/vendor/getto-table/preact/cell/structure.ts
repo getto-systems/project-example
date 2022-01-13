@@ -38,20 +38,20 @@ import { tableDataMutable_row } from "../mutable/row"
 
 export function tableStructure<M, R>(
     key: TableDataRowKeyProvider<R>,
-    cells: TableCell<M, R>[],
+    cells: readonly TableCell<M, R>[],
 ): TableStructure_hot<M, R> {
     return new Structure(key, cells)
 }
 class Structure<M, R> implements TableStructure<M, R>, TableStructure_hot<M, R> {
     key: TableDataRowKeyProvider<R>
-    cells: TableCell<M, R>[]
+    cells: readonly TableCell<M, R>[]
     mutable: Readonly<{
         core: TableDataMutable_base<R>
         tree: TableDataMutable_tree<R>
         row: TableDataMutable_row
     }>
 
-    constructor(key: TableDataRowKeyProvider<R>, cells: TableCell<M, R>[]) {
+    constructor(key: TableDataRowKeyProvider<R>, cells: readonly TableCell<M, R>[]) {
         this.key = key
         this.cells = cells
         this.mutable = {
@@ -61,11 +61,11 @@ class Structure<M, R> implements TableStructure<M, R>, TableStructure_hot<M, R> 
         }
     }
 
-    initiallyVisibleCells(): TableDataCellKey[] {
+    initiallyVisibleCells(): readonly TableDataCellKey[] {
         return tableCellInitiallyVisibleCells(this.cells)
     }
 
-    view(): TableDataView[] {
+    view(): readonly TableDataView[] {
         return tableCellView(this.cells)
     }
     header(params: TableDataParams<M>): TableDataHeaderRow {
@@ -113,7 +113,7 @@ class Structure<M, R> implements TableStructure<M, R>, TableStructure_hot<M, R> 
         }
     }
 
-    horizontalBorder(borders: TableDataHorizontalBorder[]): TableStructure_hot<M, R> {
+    horizontalBorder(borders: readonly TableDataHorizontalBorder[]): TableStructure_hot<M, R> {
         this.mutable.core.horizontalBorder(borders)
         return this
     }
@@ -123,15 +123,15 @@ class Structure<M, R> implements TableStructure<M, R>, TableStructure_hot<M, R> 
         this.mutable.core.horizontalBorderRelated(borders)
         return this
     }
-    horizontalBorder_header(borders: TableDataHorizontalBorder[]): TableStructure_hot<M, R> {
+    horizontalBorder_header(borders: readonly TableDataHorizontalBorder[]): TableStructure_hot<M, R> {
         this.mutable.core.horizontalBorder_header(borders)
         return this
     }
-    horizontalBorder_summary(borders: TableDataHorizontalBorder[]): TableStructure_hot<M, R> {
+    horizontalBorder_summary(borders: readonly TableDataHorizontalBorder[]): TableStructure_hot<M, R> {
         this.mutable.core.horizontalBorder_summary(borders)
         return this
     }
-    horizontalBorder_footer(borders: TableDataHorizontalBorder[]): TableStructure_hot<M, R> {
+    horizontalBorder_footer(borders: readonly TableDataHorizontalBorder[]): TableStructure_hot<M, R> {
         this.mutable.core.horizontalBorder_footer(borders)
         return this
     }

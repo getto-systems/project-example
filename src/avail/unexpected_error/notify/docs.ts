@@ -1,7 +1,21 @@
-import { docsAction } from "../../../../ui/vendor/getto-application/docs/helper"
+import { DocsAction } from "../../../../ui/vendor/getto-application/docs/data"
 
-export const docs_notifyUnexpectedError = docsAction("エラーの通知", ({ item }) => [
-    item("input", ["エラーメッセージ"], ["発生したエラーの詳細"]),
-    item("check", ["認証済みであること"]),
-    item("success", ["エラーを通知"]),
-])
+export const docs_notifyUnexpectedError: DocsAction = {
+    title: "エラーの通知",
+    action: [
+        {
+            type: "input",
+            content: ["エラーメッセージ"],
+            help: ["発生したエラーの詳細"],
+        },
+        {
+            type: "check",
+            check: ["認証済みであること"],
+        },
+        {
+            type: "success",
+            action: ["エラーを通知"],
+        },
+    ],
+    data: [],
+}

@@ -1,126 +1,31 @@
 import {
     DocsAction_legacy,
-    DocsActionContent,
+    DocsActionContent_legacy,
     DocsActionTargetType,
     DocsAction_action,
     DocsAction_request,
-    DocsUsecase,
     DocsContent,
     DocsDescription,
-    DocsDomain,
     DocsNegativeNote,
     DocsSection,
-    DocsAction,
-    DocsActionItem,
-    DocsActionItemType,
     DocsDataDescription,
-    DocsUsecaseDescriptionMap,
-    DocsUsecaseMap,
-    DocsUsecaseDescription,
-    DocsDomainContent,
-    DocsUsecaseContent,
     DocsData,
+    DocsDomain,
+    DocsUsecase,
 } from "./data"
 
-export function docsDomainContent<U, A, D>(domain: DocsDomain<U, A, D>): DocsDomainContent {
-    const usecase = domain.usecase.map((name) => toUsecaseContent(domain.toUsecase(name)))
-    return {
-        title: domain.title,
-        purpose: domain.purpose,
-        usecase,
-        data: usecase
-            .flatMap((usecase) => usecase.data)
-            .reduce((acc, data) => {
-                if (!acc.includes(data)) {
-                    acc.push(data)
-                }
-                return acc
-            }, <DocsData[]>[]),
+export function docsUsecase(docs: DocsDomain, path: string): DocsUsecase {
+    const usecase = docs.usecase.filter((usecase) => usecase.path === path)
+    if (usecase.length === 0) {
+        throw new Error(
+            `usecase not found: ${path} (${docs.usecase.map((usecase) => usecase.path)})`,
+        )
     }
-}
-export function docsUsecaseContent<U, A, D>(
-    domain: DocsDomain<U, A, D>,
-    usecase: U,
-): DocsUsecaseContent[] {
-    return domain.usecase
-        .filter((name) => name === usecase)
-        .map((name) => toUsecaseContent(domain.toUsecase(name)))
-}
-function toUsecaseContent<A, D>(usecase: DocsUsecase<A, D>): DocsUsecaseContent {
-    return {
-        title: usecase.toAction(usecase.title).title,
-        purpose: usecase.purpose,
-        action: usecase.action.map(usecase.toAction),
-        data: usecase.data.map(usecase.toData),
-    }
+    return usecase[0]
 }
 
-export function docsDomain<U, A, D>(
-    title: string,
-    purpose: string[],
-    usecase: U[],
-    toUsecase: DocsUsecaseMap<U, A, D>,
-): DocsDomain<U, A, D> {
-    return { title, purpose, usecase, toUsecase }
-}
-export function docsUsecase<A, D>(
-    path: string,
-    title: A,
-    purpose: string[],
-    content: DocsUsecaseDescription<A, D>,
-    map: DocsUsecaseDescriptionMap<A, D>,
-): DocsUsecase<A, D> {
-    return { path, title, purpose, ...content, ...map }
-}
-export function docsPath(title: string): string {
-    return title.replaceAll(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
-}
-export function docsAction(
-    title: string,
-    item: {
-        (builder: { item: DocsActionItemBuilder }): DocsActionItem[]
-    },
-): DocsAction {
-    return {
-        title,
-        item: item({
-            item: docsActionItem,
-        }),
-    }
-}
-function docsActionItem(
-    type: DocsActionItemType,
-    content: string[],
-    help: string[] = [],
-): DocsActionItem {
-    return { type, content, help }
-}
-
-export interface DocsActionItemBuilder {
-    (type: DocsActionItemType, content: string[]): DocsActionItem
-    (type: DocsActionItemType, content: string[], help: string[]): DocsActionItem
-}
-
-export function docsData(
-    title: string,
-    data: {
-        (builder: Readonly<{ data: DocsDataDescriptionBuilder }>): DocsDataDescription[]
-    },
-): DocsData {
-    return {
-        title,
-        data: data({
-            data: docsDataDescription,
-        }),
-    }
-}
-function docsDataDescription(description: string, help: string[] = []): DocsDataDescription {
-    return { description, help }
-}
-
-export interface DocsDataDescriptionBuilder {
-    (description: string): DocsDataDescription
-    (description: string, help: string[]): DocsDataDescription
+export function docsData(title: string, data: readonly DocsDataDescription[]): DocsData {
+    return { title, data }
 }
 
 // TODO 以下削除予定
@@ -164,10 +69,10 @@ export function docsAction_legacy(content: {
     function action(content: DocsAction_action): DocsAction_legacy {
         return { type: "action", content }
     }
-    function message(messages: string[]): DocsActionContent[] {
+    function message(messages: string[]): DocsActionContent_legacy[] {
         return messages.map((message) => ({ type: "normal", message }))
     }
-    function validate(messages: string[]): DocsActionContent[] {
+    function validate(messages: string[]): DocsActionContent_legacy[] {
         return messages.map((message) => ({ type: "validate", message }))
     }
 }
@@ -178,6 +83,6 @@ export function docsNote(content: string[]): DocsContent {
 export interface DocsActionFactory {
     request(content: DocsAction_request): DocsAction_legacy
     action(content: DocsAction_action): DocsAction_legacy
-    message(messages: string[]): DocsActionContent[]
-    validate(messages: string[]): DocsActionContent[]
+    message(messages: string[]): DocsActionContent_legacy[]
+    validate(messages: string[]): DocsActionContent_legacy[]
 }

@@ -105,7 +105,7 @@ export function ResetPasswordComponent(props: Props): VNode {
 
     type ResetFormContent = ResetFormContent_base | (ResetFormContent_base & ResetFormContent_error)
     type ResetFormContent_base = Readonly<{ state: ResetFormState }>
-    type ResetFormContent_error = Readonly<{ error: VNodeContent[] }>
+    type ResetFormContent_error = Readonly<{ error: readonly VNodeContent[] }>
 
     function resetTitle() {
         return "パスワードリセット"
@@ -216,7 +216,7 @@ export function ResetPasswordComponent(props: Props): VNode {
     }
 }
 
-function resetError(err: ResetPasswordError): VNodeContent[] {
+function resetError(err: ResetPasswordError): readonly VNodeContent[] {
     switch (err.type) {
         case "validation-error":
             return ["正しく入力してください"]

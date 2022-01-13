@@ -11,7 +11,7 @@ export type MenuContent = Readonly<{
     menuTree: MenuTree
 }>
 
-export type MenuTree = MenuTreeNode[]
+export type MenuTree = readonly MenuTreeNode[]
 export type MenuTreeNode =
     | Readonly<{ type: "category"; category: MenuTreeCategory; children: MenuTree }>
     | Readonly<{ type: "item"; item: MenuTreeItem }>
@@ -31,8 +31,8 @@ export type MenuPath = string
 
 export type MenuPermission =
     | Readonly<{ type: "allow" }>
-    | Readonly<{ type: "any"; permits: MenuPermission[] }>
-    | Readonly<{ type: "all"; permits: MenuPermission[] }>
+    | Readonly<{ type: "any"; permits: readonly MenuPermission[] }>
+    | Readonly<{ type: "all"; permits: readonly MenuPermission[] }>
     | Readonly<{ type: "role"; role: string }>
 
 export type MenuBadge = Map<string, number>

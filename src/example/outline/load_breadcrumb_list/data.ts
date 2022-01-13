@@ -1,6 +1,6 @@
 import { MenuCategory, MenuItem } from "../kernel/data"
 
-export type BreadcrumbList = BreadcrumbNode[]
+export type BreadcrumbList = readonly BreadcrumbNode[]
 
 export type BreadcrumbNode =
     | Readonly<{ type: "category"; category: MenuCategory }>

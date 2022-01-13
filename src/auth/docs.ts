@@ -2,96 +2,77 @@ import { docs_auth_sign, docs_auth_sign_action, docs_auth_sign_data } from "./si
 import { docs_checkAuthTicket } from "./ticket/check/docs"
 
 import {
-    docsUsecase,
-    docsDomain,
     docsModule,
     docsPurpose,
     docsSection,
     docsSection_pending,
-    docsAction,
-    docsPath,
 } from "../../ui/vendor/getto-application/docs/helper"
 
-import {
-    DocsUsecase,
-    DocsSection,
-    DocsUsecaseDescription,
-} from "../../ui/vendor/getto-application/docs/data"
+import { DocsAction, DocsDomain, DocsSection } from "../../ui/vendor/getto-application/docs/data"
 import { docs_authTicket } from "./ticket/docs"
 import { docs_authenticatePassword } from "./user/password/authenticate/docs"
-import { docs_loginID } from "./user/login_id/docs"
-import { docs_password } from "./user/password/docs"
-import { docs_authUser } from "./user/docs"
 import { docs_logout } from "./ticket/logout/docs"
 import { docs_requestResetToken } from "./user/password/reset/request_token/docs"
-import { docs_reset } from "./user/password/reset/docs"
 import { docs_resetPassword } from "./user/password/reset/reset/docs"
+import { docs_changePassword } from "./user/password/change/docs"
 
-export const docs_auth = docsDomain<AuthUsecase, AuthAction, AuthData>(
-    "認証・認可",
-    ["業務で必要な時に使用できる", "業務内容をプライベートに保つ"],
-    ["authTicket/check", "password/authenticate", "password/reset", "logout"],
-    (name) => usecase[name],
-)
-
-const usecase = {
-    "authTicket/check": docsAuthUsecase(
-        "authTicket/check",
-        ["業務で必要な時に使用できる", "業務内容をプライベートに保つ"],
-        { action: ["authTicket/check", "loadApplication"], data: ["authUser", "authTicket"] },
-    ),
-    "password/authenticate": docsAuthUsecase(
-        "password/authenticate",
-        ["業務内容をプライベートに保つ"],
+const docs_loadApplication: DocsAction = {
+    title: "アプリケーションのロード",
+    action: [
         {
-            action: ["password/authenticate", "loadApplication"],
-            data: ["authUser", "authTicket", "loginID", "password"],
+            type: "input",
+            content: ["コンテンツアクセストークン"],
+            help: ["ブラウザに保存されたデータ"],
         },
-    ),
-    "password/reset": docsAuthUsecase("password/reset", ["業務で必要な時に使用できる"], {
-        action: ["password/reset/requestResetToken", "password/reset", "loadApplication"],
-        data: ["authUser", "loginID", "password", "reset"],
-    }),
-    logout: docsAuthUsecase("logout", ["業務内容をプライベートに保つ"], {
-        action: ["logout"],
-        data: ["authUser", "authTicket"],
-    }),
-} as const
+        {
+            type: "check",
+            check: ["コンテンツアクセストークンが有効"],
+            help: ["CDN によって判定"],
+        },
+        {
+            type: "success",
+            action: ["画面の読み込み"],
+            help: ["アプリケーションスクリプトが CDN から返される"],
+        },
+    ],
+    data: [docs_authTicket],
+}
 
-const action = {
-    "authTicket/check": docs_checkAuthTicket,
-    "password/authenticate": docs_authenticatePassword,
-    "password/reset/requestResetToken": docs_requestResetToken,
-    "password/reset": docs_resetPassword,
-    logout: docs_logout,
-    loadApplication: docsAction("アプリケーションのロード", ({ item }) => [
-        item("input", ["コンテンツアクセストークン"], ["ブラウザに保存されたデータ"]),
-        item("check", ["コンテンツアクセストークンが有効"], ["CDN によって判定"]),
-        item("success", ["画面の読み込み"], ["アプリケーションスクリプトが CDN から返される"]),
-    ]),
-} as const
-
-const data = {
-    authTicket: docs_authTicket,
-    authUser: docs_authUser,
-    loginID: docs_loginID,
-    password: docs_password,
-    reset: docs_reset,
-} as const
-
-export type AuthUsecase = keyof typeof usecase
-export type AuthAction = keyof typeof action
-export type AuthData = keyof typeof data
-
-function docsAuthUsecase(
-    title: AuthAction,
-    purpose: string[],
-    content: DocsUsecaseDescription<AuthAction, AuthData>,
-): DocsUsecase<AuthAction, AuthData> {
-    return docsUsecase(docsPath(title), title, purpose, content, {
-        toAction: (name) => action[name],
-        toData: (name) => data[name],
-    })
+export const docs_auth: DocsDomain = {
+    path: "auth",
+    title: "認証・認可",
+    usecase: [
+        {
+            path: "ticket/check",
+            title: docs_checkAuthTicket.title,
+            purpose: ["業務で必要な時に使用できる", "業務内容をプライベートに保つ"],
+            action: [docs_checkAuthTicket, docs_loadApplication],
+        },
+        {
+            path: "ticket/logout",
+            title: docs_logout.title,
+            purpose: ["業務内容をプライベートに保つ"],
+            action: [docs_logout],
+        },
+        {
+            path: "password/authenticate",
+            title: docs_authenticatePassword.title,
+            purpose: ["業務内容をプライベートに保つ"],
+            action: [docs_authenticatePassword, docs_loadApplication],
+        },
+        {
+            path: "password/reset",
+            title: docs_resetPassword.title,
+            purpose: ["業務内容をプライベートに保つ"],
+            action: [docs_requestResetToken, docs_resetPassword, docs_loadApplication],
+        },
+        {
+            path: "password/change",
+            title: docs_changePassword.title,
+            purpose: ["業務内容をプライベートに保つ"],
+            action: [docs_changePassword],
+        },
+    ],
 }
 
 export const docs_auth_legacy: DocsSection[] = [

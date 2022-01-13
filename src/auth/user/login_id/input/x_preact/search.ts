@@ -9,7 +9,7 @@ import { InputBoardComponent } from "../../../../../../ui/vendor/getto-applicati
 import { SearchLoginIDAction } from "../action"
 
 type Props = Readonly<{ field: SearchLoginIDAction }> &
-    Partial<{ title: VNodeContent; help: VNodeContent[] }>
+    Partial<{ title: VNodeContent; help: readonly VNodeContent[] }>
 export function SearchLoginIDComponent(props: Props): VNode {
     return search({
         title: title(),
@@ -23,7 +23,7 @@ export function SearchLoginIDComponent(props: Props): VNode {
         }
         return "ログインID"
     }
-    function help(): VNodeContent[] {
+    function help(): readonly VNodeContent[] {
         if (props.help) {
             return props.help
         }

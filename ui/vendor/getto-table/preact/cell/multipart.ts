@@ -53,24 +53,24 @@ class Cell<M, R, P> implements TableCellMultipart<M, R> {
         }
     }
 
-    cells(summary: M): TableCell<M, R>[] {
+    cells(summary: M): readonly TableCell<M, R>[] {
         return this.content.data(summary).flatMap((part) => this.content.cells(part))
     }
 
-    initiallyVisibleCells(): TableDataCellKey[] {
+    initiallyVisibleCells(): readonly TableDataCellKey[] {
         // multipart の cell はデータを取得しないといけない
         // データを取得してから初期表示セルを判定していたのでは遅いので、
         // multipart の cell は always visible 扱いとする
         return []
     }
 
-    view(): TableDataView[] {
+    view(): readonly TableDataView[] {
         // multipart の cell はデータを取得しないといけない
         // データを取得してから初期表示セルを判定していたのでは遅いので、
         // multipart の cell は always visible 扱いとする
         return []
     }
-    header(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataHeader[] {
+    header(inherit: TableDataInherit, params: TableDataStyledParams<M>): readonly TableDataHeader[] {
         const { style } = this.mutable.core.headerStyleMutable()
         return tableCellHeader(
             { ...inherit, isInMultipart: true },
@@ -79,7 +79,7 @@ class Cell<M, R, P> implements TableCellMultipart<M, R> {
             this.cells(params.summary),
         )
     }
-    summary(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[] {
+    summary(inherit: TableDataInherit, params: TableDataStyledParams<M>): readonly TableDataSummary[] {
         const { style } = this.mutable.core.summaryStyleMutable()
         return tableCellSummary(
             { ...inherit, isInMultipart: true },
@@ -88,7 +88,7 @@ class Cell<M, R, P> implements TableCellMultipart<M, R> {
             this.cells(params.summary),
         )
     }
-    column(inherit: TableDataInherit, params: TableDataRelatedParams<M, R>): TableDataColumn[] {
+    column(inherit: TableDataInherit, params: TableDataRelatedParams<M, R>): readonly TableDataColumn[] {
         const { style } = this.mutable.core.columnStyleMutable()
         const { decorators } = this.mutable.core.columnMutable()
         return tableCellColumn(
@@ -99,7 +99,7 @@ class Cell<M, R, P> implements TableCellMultipart<M, R> {
             this.cells(params.summary),
         )
     }
-    footer(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[] {
+    footer(inherit: TableDataInherit, params: TableDataStyledParams<M>): readonly TableDataSummary[] {
         const { style } = this.mutable.core.footerStyleMutable()
         return tableCellFooter(
             { ...inherit, isInMultipart: true },
@@ -109,7 +109,7 @@ class Cell<M, R, P> implements TableCellMultipart<M, R> {
         )
     }
 
-    horizontalBorder(borders: TableDataHorizontalBorder[]): TableCellMultipart<M, R> {
+    horizontalBorder(borders: readonly TableDataHorizontalBorder[]): TableCellMultipart<M, R> {
         this.mutable.core.horizontalBorder(borders)
         return this
     }
@@ -119,15 +119,15 @@ class Cell<M, R, P> implements TableCellMultipart<M, R> {
         this.mutable.core.horizontalBorderRelated(borders)
         return this
     }
-    horizontalBorder_header(borders: TableDataHorizontalBorder[]): TableCellMultipart<M, R> {
+    horizontalBorder_header(borders: readonly TableDataHorizontalBorder[]): TableCellMultipart<M, R> {
         this.mutable.core.horizontalBorder_header(borders)
         return this
     }
-    horizontalBorder_summary(borders: TableDataHorizontalBorder[]): TableCellMultipart<M, R> {
+    horizontalBorder_summary(borders: readonly TableDataHorizontalBorder[]): TableCellMultipart<M, R> {
         this.mutable.core.horizontalBorder_summary(borders)
         return this
     }
-    horizontalBorder_footer(borders: TableDataHorizontalBorder[]): TableCellMultipart<M, R> {
+    horizontalBorder_footer(borders: readonly TableDataHorizontalBorder[]): TableCellMultipart<M, R> {
         this.mutable.core.horizontalBorder_footer(borders)
         return this
     }
@@ -155,5 +155,5 @@ class Cell<M, R, P> implements TableCellMultipart<M, R> {
 }
 
 interface TableDataMultipartCellProvider<M, R, C> {
-    (child: C): TableCell<M, R>[]
+    (child: C): readonly TableCell<M, R>[]
 }

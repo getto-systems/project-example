@@ -7,7 +7,7 @@ import { v_small } from "../../../../../../../../ui/vendor/getto-css/preact/desi
 
 import { items, itemsSection } from "../../../box"
 
-export const content_development_auth_api = (): VNode[] => [
+export const content_development_auth_api = (): readonly VNode[] => [
     container([credential(), ticket(), user(), password(), passwordReset(), request()]),
 ]
 

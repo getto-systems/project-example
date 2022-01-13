@@ -11,7 +11,7 @@ export type AppLayoutContent =
 
 type AppLayoutContent_base = Readonly<{
     siteInfo: SiteInfo
-    header: VNodeContent[]
+    header: readonly VNodeContent[]
     main: VNodeContent
     menu: VNodeContent
 }>
@@ -54,8 +54,8 @@ function toAppLayoutClass(type: AppLayoutType): string {
 function layoutContent(
     type: AppLayoutType,
     siteInfo: SiteInfo,
-    header: VNodeContent[],
-    content: VNodeContent[],
+    header: readonly VNodeContent[],
+    content: readonly VNodeContent[],
 ) {
     return html`<main class="layout__app ${toAppLayoutClass(type)}">
         ${appHeader(siteInfo, header)}
@@ -63,7 +63,7 @@ function layoutContent(
     </main>`
 }
 
-function appHeader({ brand, title, subTitle }: SiteInfo, header: VNodeContent[]): VNode {
+function appHeader({ brand, title, subTitle }: SiteInfo, header: readonly VNodeContent[]): VNode {
     return html`<header class="app__header">${logo()} ${header.map(box)}</header>`
 
     function logo() {
@@ -77,7 +77,7 @@ function appHeader({ brand, title, subTitle }: SiteInfo, header: VNodeContent[])
         return html`<section class="app__header__box">${content}</section>`
     }
 }
-function appBodyContainer(content: VNodeContent[]): VNode {
+function appBodyContainer(content: readonly VNodeContent[]): VNode {
     return html`<section class="layout__app__body__container">${content}</section>`
 }
 

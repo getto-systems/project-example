@@ -16,7 +16,7 @@ import { icon } from "../../../example/x_preact/design/icon"
 
 import {
     DocsAction_legacy,
-    DocsActionContent,
+    DocsActionContent_legacy,
     DocsActionTargetType,
     DocsContent,
     DocsDescription,
@@ -50,10 +50,10 @@ export function docsArticle(contents: DocsSection[][][]): VNode {
         v_small(),
     )
 
-    function paddingVSpace(contents: VNodeContent[], space: VNode): VNode {
+    function paddingVSpace(contents: readonly VNodeContent[], space: VNode): VNode {
         return html`${pad()}`
 
-        function pad(): VNodeContent[] {
+        function pad(): readonly VNodeContent[] {
             return contents.reduce((acc, content) => {
                 if (acc.length > 0) {
                     acc.push(space)
@@ -192,7 +192,7 @@ function action(contents: DocsAction_legacy[]): VNodeContent {
                 return html`${content.icon} ${content.label}`
             }
         }
-        function body(contents: DocsActionContent[]): VNodeContent {
+        function body(contents: DocsActionContent_legacy[]): VNodeContent {
             return html`<ul>
                 ${contents.map((content) => li(message(content)))}
             </ul>`
@@ -200,7 +200,7 @@ function action(contents: DocsAction_legacy[]): VNodeContent {
             function li(message: VNodeContent): VNode {
                 return html`<li>${message}</li>`
             }
-            function message(content: DocsActionContent): VNodeContent {
+            function message(content: DocsActionContent_legacy): VNodeContent {
                 switch (content.type) {
                     case "normal":
                         return content.message

@@ -13,15 +13,17 @@ import { BoardValue } from "../../kernel/data"
 
 export type CheckboxBoardContent = Readonly<{ key: VNodeKey; value: string; label: VNodeContent }>
 
-type Props =
-    | Readonly<{ input: MultipleInputBoardAction; options: CheckboxBoardContent[] }>
-    | Readonly<{ input: MultipleInputBoardAction; options: CheckboxBoardContent[]; block: boolean }>
+type Props = Readonly<{
+    input: MultipleInputBoardAction
+    options: readonly CheckboxBoardContent[]
+}> &
+    Partial<{ block: boolean }>
 export function CheckboxBoardComponent(props: Props): VNode {
     const store = useCheckboxStore(props.input.connector)
 
     return html`${content()}`
 
-    function content(): VNode[] {
+    function content(): readonly VNode[] {
         return props.options.map(({ key, value, label }) => {
             const isChecked = store.has(value)
 
@@ -62,7 +64,7 @@ function useCheckboxStore(connector: MultipleBoardValueStoreConnector): Checkbox
         return () => connector.terminate()
     }, [connector, store])
 
-    const [values, setValues] = useState<BoardValue[]>([])
+    const [values, setValues] = useState<readonly BoardValue[]>([])
     useLayoutEffect(() => {
         store.connect(values, setValues)
     }, [store, values, setValues])
@@ -72,17 +74,20 @@ function useCheckboxStore(connector: MultipleBoardValueStoreConnector): Checkbox
 
 type PendingStore =
     | Readonly<{ hasValue: false }>
-    | Readonly<{ hasValue: true; values: BoardValue[] }>
+    | Readonly<{ hasValue: true; values: readonly BoardValue[] }>
 
 class ValuesStore implements CheckboxStore {
     values: Set<BoardValue> = new Set()
-    setValues: { (values: BoardValue[]): void } = (values) => {
+    setValues: { (values: readonly BoardValue[]): void } = (values) => {
         this.pendingStore = { hasValue: true, values }
     }
 
     pendingStore: PendingStore = { hasValue: false }
 
-    connect(values: BoardValue[], setValues: { (values: BoardValue[]): void }): void {
+    connect(
+        values: readonly BoardValue[],
+        setValues: { (values: readonly BoardValue[]): void },
+    ): void {
         if (this.pendingStore.hasValue) {
             const pendingValues = this.pendingStore.values
             this.pendingStore = { hasValue: false }
@@ -105,10 +110,10 @@ class ValuesStore implements CheckboxStore {
         this.setValues(this.get())
     }
 
-    get(): BoardValue[] {
+    get(): readonly BoardValue[] {
         return Array.from(this.values.values())
     }
-    set(values: BoardValue[]): void {
+    set(values: readonly BoardValue[]): void {
         this.setValues(values)
         this.values = new Set(values)
     }

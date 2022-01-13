@@ -63,7 +63,7 @@ function update<N extends string>(
     return compose(config.fields.map((field) => stack.get(field)))
 }
 
-function compose(results: ObserveBoardStateFound[]): ObserveBoardFieldResult {
+function compose(results: readonly ObserveBoardStateFound[]): ObserveBoardFieldResult {
     if (results.some((result) => result.found && result.hasChanged)) {
         return { hasChanged: true }
     }

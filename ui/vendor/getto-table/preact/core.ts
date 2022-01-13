@@ -3,9 +3,9 @@ import { VNodeContent, VNodeKey } from "./common"
 import { TableDataClassName, TableDataFullStyle, TableDataSticky } from "./style"
 
 export interface TableStructure<M, R> {
-    initiallyVisibleCells(): TableDataCellKey[]
+    initiallyVisibleCells(): readonly TableDataCellKey[]
 
-    view(): TableDataView[]
+    view(): readonly TableDataView[]
     header(params: TableDataParams<M>): TableDataHeaderRow
     summary(params: TableDataParams<M>): TableDataSummaryRow
     column(params: TableDataParams<M>, row: R): TableDataColumnRow
@@ -51,7 +51,7 @@ export type TableDataHeaderGroup = Readonly<{
     key: VNodeKey
     style: TableDataFullStyle
     content: VNodeContent
-    children: TableDataHeader[]
+    children: readonly TableDataHeader[]
     height: number
     length: number
 }>
@@ -92,11 +92,11 @@ export type TableDataColumnExpansion = Readonly<{
     style: TableDataFullStyle
     length: number
     height: 1
-    columns: TableDataColumnSimple[]
+    columns: readonly TableDataColumnSimple[]
 }>
 export type TableDataColumnTree = Readonly<{
     type: "tree"
-    children: TableDataColumnRow[]
+    children: readonly TableDataColumnRow[]
     length: number
     height: number
     style: TableDataFullStyle
@@ -111,22 +111,22 @@ export type TableCellTreePaddingContent = Readonly<{
 export type TableDataHeaderRow = Readonly<{
     key: TableDataHeaderKeyProvider
     className: TableDataClassName
-    headers: TableDataHeader[]
+    headers: readonly TableDataHeader[]
 }>
 export type TableDataSummaryRow = Readonly<{
     key: VNodeKey
     className: TableDataClassName
-    summaries: TableDataSummary[]
+    summaries: readonly TableDataSummary[]
 }>
 export type TableDataColumnRow = Readonly<{
     key: VNodeKey
     className: TableDataClassName
-    columns: TableDataColumn[]
+    columns: readonly TableDataColumn[]
 }>
 export type TableDataFooterRow = Readonly<{
     key: VNodeKey
     className: TableDataClassName
-    footers: TableDataSummary[]
+    footers: readonly TableDataSummary[]
 }>
 
 export interface TableDataHeaderKeyProvider {

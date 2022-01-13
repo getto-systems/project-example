@@ -95,7 +95,7 @@ export type PagerOptionsContent = Readonly<{
     content: { (params: PagerOptionsContentParams): VNodeContent }
 }>
 export type PagerOptionsContentParams = Readonly<{ start: number; end: number }>
-export function pagerOptions({ all, step, content }: PagerOptionsContent): VNode[] {
+export function pagerOptions({ all, step, content }: PagerOptionsContent): readonly VNode[] {
     const options: VNode[] = []
     for (let i = 0; i < Math.ceil(all / step); i++) {
         const offset = i * step
@@ -147,7 +147,11 @@ export function table_small_fill(sticky: TableDataSticky, content: VNodeContent)
 export function table_small_fill_noMargin(sticky: TableDataSticky, content: VNodeContent): VNode {
     return tableContent(["small", "fill", "noMargin"], sticky, content)
 }
-function tableContent(types: TableType[], sticky: TableDataSticky, content: VNodeContent): VNode {
+function tableContent(
+    types: readonly TableType[],
+    sticky: TableDataSticky,
+    content: VNodeContent,
+): VNode {
     return html`<table class="table ${types.map(tableClass).join(" ")} ${stickyTableClass(sticky)}">
         ${content}
     </table>`
@@ -188,10 +192,10 @@ type TableHeaderContent_base = Readonly<{
     sticky: TableDataSticky
     header: TableDataHeaderRow
 }>
-export function tableHeader(content: TableHeaderContent): VNode[] {
+export function tableHeader(content: TableHeaderContent): readonly VNode[] {
     type HeaderRow = Readonly<{
         sticky: StickyHorizontalInfo
-        containers: HeaderContainer[]
+        containers: readonly HeaderContainer[]
     }>
     type HeaderContainer = Readonly<{
         index: number
@@ -238,7 +242,7 @@ export function tableHeader(content: TableHeaderContent): VNode[] {
         }
     }
 
-    function buildHeaderRows(base: BuildInfo, headers: TableDataHeader[]): HeaderRow[] {
+    function buildHeaderRows(base: BuildInfo, headers: readonly TableDataHeader[]): HeaderRow[] {
         const rowHeight = maxHeight(headers)
         const top = gatherHeader()
         const nextBorderWidth = borderWidth(top)
@@ -247,7 +251,7 @@ export function tableHeader(content: TableHeaderContent): VNode[] {
         function gatherHeader(): HeaderRow {
             type GatherResult = Readonly<{
                 index: number
-                containers: HeaderContainer[]
+                containers: readonly HeaderContainer[]
             }>
             return {
                 sticky: base.sticky,
@@ -275,7 +279,7 @@ export function tableHeader(content: TableHeaderContent): VNode[] {
             }
         }
 
-        function gatherChildren(): HeaderRow[] {
+        function gatherChildren(): readonly HeaderRow[] {
             return headers.reduce((acc, header, index) => {
                 switch (header.type) {
                     case "simple":
@@ -300,20 +304,18 @@ export function tableHeader(content: TableHeaderContent): VNode[] {
             }, <HeaderRow[]>[])
         }
 
-        function buildHeaderRows_padding(paddingHeight: number): HeaderRow[] {
+        function buildHeaderRows_padding(paddingHeight: number): readonly HeaderRow[] {
             return Array(paddingHeight)
                 .fill(null)
-                .map(
-                    (_, i): HeaderRow => {
-                        return {
-                            sticky: {
-                                level: base.sticky.level + 1 + i,
-                                borderWidth: nextBorderWidth,
-                            },
-                            containers: [],
-                        }
-                    },
-                )
+                .map((_, i): HeaderRow => {
+                    return {
+                        sticky: {
+                            level: base.sticky.level + 1 + i,
+                            borderWidth: nextBorderWidth,
+                        },
+                        containers: [],
+                    }
+                })
         }
         function paddingHeight(header: TableDataHeader): number {
             return rowHeight - header.height
@@ -352,7 +354,7 @@ export function tableHeader(content: TableHeaderContent): VNode[] {
         }
     }
 
-    function maxHeight(headers: TableDataHeader[]): number {
+    function maxHeight(headers: readonly TableDataHeader[]): number {
         return Math.max(0, ...headers.map((header) => header.height))
     }
     function borderWidth(row: HeaderRow): number {
@@ -417,7 +419,7 @@ export type TableSummaryContent = Readonly<{
 export function tableSummary({
     sticky,
     summary: { key, className, summaries },
-}: TableSummaryContent): VNode[] {
+}: TableSummaryContent): readonly VNode[] {
     return [tr([key], className, summaries.map(summaryTd(sticky)))]
 }
 
@@ -432,20 +434,20 @@ type TableColumnContent_noBorderBottom = Readonly<{
     noLastBorderBottom: boolean
 }>
 
-export function tableColumn(content: TableColumnContent): VNode[] {
+export function tableColumn(content: TableColumnContent): readonly VNode[] {
     type ColumnEntry = ColumnEntry_simple | ColumnEntry_expansion | ColumnEntry_tree
     type ColumnEntry_simple = Readonly<{ type: "simple"; container: ColumnContainer }>
     type ColumnEntry_expansion = Readonly<{
         type: "expansion"
         index: number
         column: TableDataColumnExpansion
-        containers: ColumnContainer[]
+        containers: readonly ColumnContainer[]
     }>
     type ColumnEntry_tree = Readonly<{
         type: "tree"
         index: number
         column: TableDataColumnTree
-        rows: ColumnRow[]
+        rows: readonly ColumnRow[]
     }>
 
     type ColumnContainer = Readonly<{
@@ -458,9 +460,9 @@ export function tableColumn(content: TableColumnContent): VNode[] {
     type EmptyColumn = Readonly<{ type: "empty"; key: VNodeKey }>
 
     type ColumnRow = Readonly<{
-        key: VNodeKey[]
+        key: readonly VNodeKey[]
         className: TableDataClassName
-        containers: ColumnContainer[]
+        containers: readonly ColumnContainer[]
     }>
 
     type BuildInfo = Readonly<{
@@ -501,7 +503,7 @@ export function tableColumn(content: TableColumnContent): VNode[] {
         }
     }
 
-    function buildColumnRows(base: BuildInfo, source: TableDataColumnRow): ColumnRow[] {
+    function buildColumnRows(base: BuildInfo, source: TableDataColumnRow): readonly ColumnRow[] {
         const rowHeight = maxHeight(source)
 
         return source.columns
@@ -628,10 +630,10 @@ export function tableColumn(content: TableColumnContent): VNode[] {
                     return { ...first, containers: [...first.containers, ...expandedContainers()] }
                 }
 
-                function expandedContainers(): ColumnContainer[] {
+                function expandedContainers(): readonly ColumnContainer[] {
                     return [...containers, ...emptyContainer()]
                 }
-                function emptyContainer(): ColumnContainer[] {
+                function emptyContainer(): readonly ColumnContainer[] {
                     if (containers.length >= column.length) {
                         return []
                     }
@@ -669,7 +671,7 @@ export function tableColumn(content: TableColumnContent): VNode[] {
                     }
                 }
 
-                function appendEmptyRow(rows: ColumnRow[]): ColumnRow[] {
+                function appendEmptyRow(rows: readonly ColumnRow[]): readonly ColumnRow[] {
                     if (rows.length >= rowHeight) {
                         return rows
                     }
@@ -717,21 +719,21 @@ export type TableFooterContent = Readonly<{
 export function tableFooter({
     sticky,
     footer: { key, className, footers },
-}: TableFooterContent): VNode[] {
+}: TableFooterContent): readonly VNode[] {
     return [tr([key], className, footers.map(summaryTd(sticky)))]
 }
 
-const summaryTd = (
-    sticky: TableDataSticky,
-): { (summary: TableDataSummary, index: number): VNode } => (summary, index) => {
-    return html`<td class="${className()}" colspan=${summary.length} key=${summary.key}>
-        ${summaryContent(summary)}
-    </td>`
+const summaryTd =
+    (sticky: TableDataSticky): { (summary: TableDataSummary, index: number): VNode } =>
+    (summary, index) => {
+        return html`<td class="${className()}" colspan=${summary.length} key=${summary.key}>
+            ${summaryContent(summary)}
+        </td>`
 
-    function className(): string {
-        return [...styleClass(summary.style), ...stickyColumnClass(sticky, index)].join(" ")
+        function className(): string {
+            return [...styleClass(summary.style), ...stickyColumnClass(sticky, index)].join(" ")
+        }
     }
-}
 
 function summaryContent(summary: TableDataSummary): VNodeContent {
     switch (summary.type) {
@@ -745,23 +747,23 @@ function summaryContent(summary: TableDataSummary): VNodeContent {
     }
 }
 
-function tr(key: VNodeKey[], className: TableDataClassName, content: VNodeContent): VNode {
+function tr(key: readonly VNodeKey[], className: TableDataClassName, content: VNodeContent): VNode {
     return html`<tr class="${className.join(" ")}" key=${key.join("_")} data-root-key=${key[0]}>
         ${content}
     </tr>`
 }
 
-function styleClass(style: TableDataFullStyle): string[] {
+function styleClass(style: TableDataFullStyle): readonly string[] {
     return [...borderClass(style.border), ...alignClass(style.align), ...style.className]
 
-    function borderClass(border: TableDataBorderStyle): string[] {
+    function borderClass(border: TableDataBorderStyle): readonly string[] {
         type TypedBorder =
             | Readonly<{ type: "t"; border: TableDataBorderClass }>
             | Readonly<{ type: "b"; border: TableDataBorderClass }>
             | Readonly<{ type: "l"; border: TableDataBorderClass }>
             | Readonly<{ type: "r"; border: TableDataBorderClass }>
 
-        const borders: TypedBorder[] = [
+        const borders: readonly TypedBorder[] = [
             { type: "t", border: border.horizontal.top },
             { type: "b", border: border.horizontal.bottom },
             { type: "l", border: border.vertical.left },
@@ -780,7 +782,7 @@ function styleClass(style: TableDataFullStyle): string[] {
             }
         })
     }
-    function alignClass(align: TableDataAlignStyle): string[] {
+    function alignClass(align: TableDataAlignStyle): readonly string[] {
         return [align.horizontal, align.vertical].flatMap((type: TableDataAlign) => {
             switch (type) {
                 case "inherit":
@@ -837,7 +839,7 @@ function stickyHeaderClass(
         return ["cell_sticky", stickyTopClass({ level, borderWidth })]
     }
 }
-function stickyColumnClass(sticky: TableDataSticky, index: number): string[] {
+function stickyColumnClass(sticky: TableDataSticky, index: number): readonly string[] {
     if (!isStickyColumn(sticky, index)) {
         return []
     }

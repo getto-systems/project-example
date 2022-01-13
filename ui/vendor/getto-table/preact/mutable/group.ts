@@ -25,7 +25,7 @@ class Mutable implements TableDataMutable_group {
         return this.groupStyle
     }
 
-    horizontalBorder_group(borders: TableDataHorizontalBorder[]): void {
+    horizontalBorder_group(borders: readonly TableDataHorizontalBorder[]): void {
         this.decorateGroup(horizontalBorder(borders))
     }
 

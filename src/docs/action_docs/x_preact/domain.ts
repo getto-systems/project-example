@@ -16,18 +16,18 @@ import { container } from "../../../../ui/vendor/getto-css/preact/design/box"
 import { v_small } from "../../../../ui/vendor/getto-css/preact/design/alignment"
 
 import { copyright, siteInfo } from "../../../example/site"
-import { dataBox, domainBox, usecaseAbstractBox } from "./helper"
+import { docsDataBox, docsDomainBox, docsUsecaseAbstractBox } from "./helper"
 
 import { ApplicationErrorComponent } from "../../../avail/x_preact/application_error"
 import { LoadMenuEntry } from "../../../example/outline/load_menu/x_preact/load_menu"
 import { LoadBreadcrumbListComponent } from "../../../example/outline/load_breadcrumb_list/x_preact/load_breadcrumb_list"
 
 import { DocsView, DocsResource } from "../resource"
-import { DocsDomainContent } from "../../../../ui/vendor/getto-application/docs/data"
+import { DocsData, DocsDomain } from "../../../../ui/vendor/getto-application/docs/data"
 
 type EntryProps = Readonly<{
     view: DocsView
-    docs: DocsDomainContent
+    docs: DocsDomain
 }>
 export function DocsDomainEntry(props: EntryProps): VNode {
     const resource = useApplicationView(props.view)
@@ -40,7 +40,7 @@ export function DocsDomainEntry(props: EntryProps): VNode {
     return h(DocsDomainComponent, { ...resource, docs: props.docs })
 }
 
-type Props = DocsResource & Readonly<{ docs: DocsDomainContent }>
+type Props = DocsResource & Readonly<{ docs: DocsDomain }>
 export function DocsDomainComponent(resource: Props): VNode {
     useDocumentTitle(title())
 
@@ -60,11 +60,22 @@ export function DocsDomainComponent(resource: Props): VNode {
     }
 }
 
-function content(docs: DocsDomainContent): VNode {
+function content(docs: DocsDomain): VNode {
     return html`${[
-        container(domainBox(docs)),
-        container(docs.usecase.map(usecaseAbstractBox)),
+        container(docsDomainBox(docs)),
+        container(docs.usecase.map(docsUsecaseAbstractBox)),
         v_small(),
-        container(docs.data.map(dataBox)),
+        container(data(docs).map(docsDataBox)),
     ]}`
+
+    function data(docs: DocsDomain): readonly DocsData[] {
+        return docs.usecase
+            .flatMap((usecase) => usecase.action.flatMap((action) => action.data))
+            .reduce((acc, purpose) => {
+                if (!acc.includes(purpose)) {
+                    acc.push(purpose)
+                }
+                return acc
+            }, <DocsData[]>[])
+    }
 }

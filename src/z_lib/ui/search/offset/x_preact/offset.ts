@@ -11,7 +11,7 @@ import { SearchOffsetAction } from "../action"
 type Props = Readonly<{
     field: SearchOffsetAction
     count: VNodeContent
-    options: VNode[]
+    options: readonly VNode[]
     button: VNode
 }>
 export function SearchOffsetComponent(props: Props): VNode {

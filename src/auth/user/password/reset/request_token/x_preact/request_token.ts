@@ -75,7 +75,7 @@ export function RequestResetTokenComponent(props: Props): VNode {
 
     type FormContent = FormContent_base | (FormContent_base & FormContent_error)
     type FormContent_base = Readonly<{ state: FormState }>
-    type FormContent_error = Readonly<{ error: VNodeContent[] }>
+    type FormContent_error = Readonly<{ error: readonly VNodeContent[] }>
 
     function requestTokenForm(content: FormContent): VNode {
         return form(
@@ -191,7 +191,7 @@ export function RequestResetTokenComponent(props: Props): VNode {
     }
 }
 
-function requestTokenError(err: RequestResetTokenError): VNodeContent[] {
+function requestTokenError(err: RequestResetTokenError): readonly VNodeContent[] {
     switch (err.type) {
         case "validation-error":
             return ["正しく入力してください"]

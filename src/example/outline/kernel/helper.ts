@@ -30,7 +30,7 @@ export function buildMenu(params: BuildMenuParams): Menu {
     function toMenu(tree: MenuTree, categoryPath: MenuCategoryPath): Menu {
         return tree.flatMap((node) => toMenuNodes(node, categoryPath))
     }
-    function toMenuNodes(node: MenuTreeNode, categoryPath: MenuCategoryPath): MenuNode[] {
+    function toMenuNodes(node: MenuTreeNode, categoryPath: MenuCategoryPath): readonly MenuNode[] {
         switch (node.type) {
             case "item":
                 return [itemNode(node.item)]
@@ -57,7 +57,7 @@ export function buildMenu(params: BuildMenuParams): Menu {
         category: MenuTreeCategory,
         menuTree: MenuTree,
         path: MenuCategoryPath,
-    ): MenuNode[] {
+    ): readonly MenuNode[] {
         if (!isAllow(category.permission)) {
             return EMPTY
         }
@@ -104,4 +104,4 @@ export function buildMenu(params: BuildMenuParams): Menu {
     }
 }
 
-const EMPTY: MenuNode[] = []
+const EMPTY: readonly MenuNode[] = []

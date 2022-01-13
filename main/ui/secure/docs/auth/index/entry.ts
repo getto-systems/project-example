@@ -6,13 +6,12 @@ import { newDocsView } from "../../../../../../src/docs/action_docs/init/resourc
 
 import { DocsDomainEntry } from "../../../../../../src/docs/action_docs/x_preact/domain"
 
-import { docsDomainContent } from "../../../../../../ui/vendor/getto-application/docs/helper"
 import { docs_auth } from "../../../../../../src/auth/docs"
 
 render(
     h(DocsDomainEntry, {
         view: newDocsView(newForegroundOutsideFeature()),
-        docs: docsDomainContent(docs_auth),
+        docs: docs_auth,
     }),
     document.body,
 )

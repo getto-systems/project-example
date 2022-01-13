@@ -63,7 +63,7 @@ export function LoadMenuComponent(props: Props): VNode {
             return menu([menuBox(repositoryError(props.state.err))])
     }
 
-    function menu(content: VNode[]) {
+    function menu(content: readonly VNode[]) {
         return appMenu([...content, menuFooter(poweredBy)])
     }
 
@@ -82,7 +82,7 @@ export function LoadMenuComponent(props: Props): VNode {
             return html`<li>${content}</li>`
         }
 
-        function menuContent(menu: Menu, categoryDecorator: CategoryDecorator): VNode[] {
+        function menuContent(menu: Menu, categoryDecorator: CategoryDecorator): readonly VNode[] {
             return menu.map((node) => {
                 switch (node.type) {
                     case "category":
@@ -137,22 +137,22 @@ function badge(badgeCount: number) {
     return badge_alert(html`${badgeCount}`)
 }
 
-function requiredToLogin(): VNode[] {
+function requiredToLogin(): readonly VNode[] {
     return [notice_alert("認証エラー"), html`<small><p>もう一度ログインしてください</p></small>`]
 }
-function repositoryError(err: RepositoryError): VNode[] {
+function repositoryError(err: RepositoryError): readonly VNode[] {
     switch (err.type) {
         case "infra-error":
             return [notice_alert("ストレージエラー"), ...errorDetail(err.err)]
     }
 }
-function error(err: RemoteCommonError): VNode[] {
+function error(err: RemoteCommonError): readonly VNode[] {
     return remoteCommonErrorReason(err, (reason) => [
         notice_alert(reason.message),
         ...reason.detail.map((message) => html`<small><p>${message}</p></small>`),
     ])
 }
-function errorDetail(err: string): VNode[] {
+function errorDetail(err: string): readonly VNode[] {
     if (err.length === 0) {
         return []
     }

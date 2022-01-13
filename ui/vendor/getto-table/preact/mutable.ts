@@ -29,11 +29,11 @@ export interface TableDataMutable_base<R> {
 
     columnMutable(): TableDataColumnMutable<R>
 
-    horizontalBorder(borders: TableDataHorizontalBorder[]): void
+    horizontalBorder(borders: readonly TableDataHorizontalBorder[]): void
     horizontalBorderRelated(borders: TableDataHorizontalBorderProvider<R>): void
-    horizontalBorder_header(borders: TableDataHorizontalBorder[]): void
-    horizontalBorder_summary(borders: TableDataHorizontalBorder[]): void
-    horizontalBorder_footer(borders: TableDataHorizontalBorder[]): void
+    horizontalBorder_header(borders: readonly TableDataHorizontalBorder[]): void
+    horizontalBorder_summary(borders: readonly TableDataHorizontalBorder[]): void
+    horizontalBorder_footer(borders: readonly TableDataHorizontalBorder[]): void
 
     decorateHeader(decorator: TableDataHeaderDecorator): void
     decorateSummary(decorator: TableDataSummaryDecorator): void
@@ -48,7 +48,7 @@ export interface TableDataMutable_leaf {
 
     alwaysVisible(): void
     initiallyHidden(): void
-    border(borders: TableDataVerticalBorder[]): void
+    border(borders: readonly TableDataVerticalBorder[]): void
 
     decorateView(decorator: TableDataViewDecorator): void
 }
@@ -56,7 +56,7 @@ export interface TableDataMutable_group {
     viewMutable(): TableDataViewMutable
     groupStyleMutable(): TableDataStyleMutable
 
-    horizontalBorder_group(borders: TableDataHorizontalBorder[]): void
+    horizontalBorder_group(borders: readonly TableDataHorizontalBorder[]): void
 
     decorateView(decorator: TableDataViewDecorator): void
     decorateGroup(decorator: TableDataGroupDecorator): void
@@ -97,11 +97,11 @@ export type TableDataViewMutable = Readonly<{
     decorator: TableDataContentDecoratorProvider
 }>
 export type TableDataColumnMutable<R> = Readonly<{
-    decorators: TableDataColumnRelatedDecorator<R>[]
+    decorators: readonly TableDataColumnRelatedDecorator<R>[]
 }>
 export type TableDataRowMutable<R> = Readonly<{
     style: TableDataRowStyle
-    decorators: TableDataRowRelatedDecorator<R>[]
+    decorators: readonly TableDataRowRelatedDecorator<R>[]
 }>
 export type TableDataHeaderRowMutable = Readonly<{
     key: TableDataHeaderKeyProvider

@@ -114,7 +114,7 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
     type FormContentType = "initial" | "valid" | "invalid" | "connecting" | "take-longtime"
     type FormContent =
         | Readonly<{ type: FormContentType }>
-        | Readonly<{ type: FormContentType; err: VNodeContent[] }>
+        | Readonly<{ type: FormContentType; err: readonly VNodeContent[] }>
     function formBox(state: FormContent): VNode {
         return form(
             box({
@@ -195,7 +195,7 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
             }
         }
 
-        function message(): VNode[] {
+        function message(): readonly VNode[] {
             if ("err" in state) {
                 return [fieldError(state.err)]
             }
@@ -221,7 +221,7 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
     }
 }
 
-function requestTokenError(err: RequestResetTokenError): VNodeContent[] {
+function requestTokenError(err: RequestResetTokenError): readonly VNodeContent[] {
     switch (err.type) {
         case "validation-error":
             return ["正しく入力してください"]
