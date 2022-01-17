@@ -26,10 +26,11 @@ const entries = {
         { name: "docs/privacy-policy" },
 
         { name: "docs/auth/index" },
-        { name: "docs/auth/logout" },
-        { name: "docs/auth/auth-ticket/check" },
+        { name: "docs/auth/ticket/logout" },
+        { name: "docs/auth/ticket/check" },
         { name: "docs/auth/password/authenticate" },
         { name: "docs/auth/password/reset" },
+        { name: "docs/auth/password/change" },
 
         { name: "docs/avail" },
     ],

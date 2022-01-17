@@ -1,6 +1,6 @@
 export type MenuTargetPath = string & { MenuTarget: never }
 
-export type Menu = MenuNode[]
+export type Menu = readonly MenuNode[]
 export type MenuNode = MenuCategoryNode | MenuItemNode
 export type MenuCategoryNode = Readonly<{
     type: "category"
@@ -22,7 +22,7 @@ export type MenuCategory = Readonly<{
 }>
 export type MenuCategoryLabel = string & { MenuCategoryLabel: never }
 
-export type MenuCategoryPath = MenuCategoryLabel[]
+export type MenuCategoryPath = readonly MenuCategoryLabel[]
 
 export type MenuItem = MenuItem_data & { MenuItem: never }
 type MenuItem_data = Readonly<{

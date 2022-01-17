@@ -13,19 +13,18 @@ import { icon } from "../../../example/x_preact/design/icon"
 
 import {
     DocsAction,
-    DocsActionItem,
-    DocsActionItemType,
+    DocsActionContent,
     DocsData,
-    DocsDomainContent,
-    DocsUsecaseContent,
+    DocsDomain,
+    DocsUsecase,
 } from "../../../../ui/vendor/getto-application/docs/data"
 import { field } from "../../../../ui/vendor/getto-css/preact/design/form"
 
-export function domainBox(docs: DocsDomainContent): VNode[] {
+export function docsDomainBox(docs: DocsDomain): readonly VNode[] {
     return [
         box({
             title: "目的",
-            body: docs.purpose.map(notice_info),
+            body: purpose(docs).map(notice_info),
         }),
         box({
             title: "項目",
@@ -33,26 +32,36 @@ export function domainBox(docs: DocsDomainContent): VNode[] {
         }),
     ]
 
-    function usecase(docs: DocsUsecaseContent[]) {
+    function purpose(docs: DocsDomain): readonly string[] {
+        return docs.usecase
+            .flatMap((usecase) => usecase.purpose)
+            .reduce((acc, purpose) => {
+                if (!acc.includes(purpose)) {
+                    acc.push(purpose)
+                }
+                return acc
+            }, <string[]>[])
+    }
+    function usecase(docs: readonly DocsUsecase[]) {
         return html`<section class="paragraph">
             <ul>
                 ${docs.map(li)}
             </ul>
         </section>`
 
-        function li(usecase: DocsUsecaseContent): VNode {
+        function li(usecase: DocsUsecase): VNode {
             return html`<li>${icon("angle-double-right")} ${usecase.title}</li>`
         }
     }
 }
 
-export function usecaseAbstractBox(docs: DocsUsecaseContent): VNode {
+export function docsUsecaseAbstractBox(docs: DocsUsecase): VNode {
     return box({
         title: docs.title,
         body: action(docs.action),
     })
 
-    function action(docs: DocsAction[]) {
+    function action(docs: readonly DocsAction[]) {
         return html`<section class="paragraph">
             <ul>
                 ${docs.map(li)}
@@ -65,7 +74,7 @@ export function usecaseAbstractBox(docs: DocsUsecaseContent): VNode {
     }
 }
 
-export function usecaseBox(docs: DocsUsecaseContent): VNode[] {
+export function docsUsecaseBox(docs: DocsUsecase): readonly VNode[] {
     return [
         box({
             title: "目的",
@@ -77,7 +86,7 @@ export function usecaseBox(docs: DocsUsecaseContent): VNode[] {
         }),
     ]
 
-    function action(docs: DocsAction[]) {
+    function action(docs: readonly DocsAction[]) {
         return html`<section class="paragraph">
             <ul>
                 ${docs.map(li)}
@@ -90,21 +99,21 @@ export function usecaseBox(docs: DocsUsecaseContent): VNode[] {
     }
 }
 
-export function actionBox(docs: DocsAction): VNode {
+export function docsActionBox(docs: DocsAction): VNode {
     return box({
         title: docs.title,
-        body: docs.item.map(item),
+        body: docs.action.map(action),
     })
 
-    function item(item: DocsActionItem): VNode {
+    function action(action: DocsActionContent): VNode {
         return field({
-            title: itemType(item.type),
-            body: content(item.content),
-            help: item.help,
+            title: itemType(action),
+            body: ul(content(action)),
+            help: action.help,
         })
     }
-    function itemType(type: DocsActionItemType): VNode {
-        switch (type) {
+    function itemType(action: DocsActionContent): VNode {
+        switch (action.type) {
             case "input":
                 return label_info("入力")
 
@@ -118,7 +127,23 @@ export function actionBox(docs: DocsAction): VNode {
                 return label_alert("エラー")
         }
     }
-    function content(content: string[]) {
+    function content(action: DocsActionContent): readonly string[] {
+        switch (action.type) {
+            case "input":
+                return action.content
+
+            case "check":
+                return action.check
+
+            case "success":
+                return action.action
+
+            case "error":
+                return action.err
+        }
+    }
+
+    function ul(content: readonly string[]) {
         return html`<section class="paragraph">
             <ul>
                 ${content.map(li)}
@@ -131,14 +156,14 @@ export function actionBox(docs: DocsAction): VNode {
     }
 }
 
-export function dataBox(docs: DocsData): VNode {
+export function docsDataBox(docs: DocsData): VNode {
     return box({
         title: docs.title,
         body: docs.data.map((data) =>
             field({
                 title: "",
-                body: data.description,
-                help: data.help,
+                body: data.data,
+                help: data.help ? data.help : [],
             }),
         ),
     })

@@ -53,7 +53,7 @@ function seasonContent(season: Season) {
 function errorContent(err: RepositoryError) {
     return [label_alert("ロードエラー"), ...detail()]
 
-    function detail(): VNode[] {
+    function detail(): readonly VNode[] {
         if (err.err.length === 0) {
             return []
         }

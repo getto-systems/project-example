@@ -19,8 +19,8 @@ export const passwordBoardConverter: Converter = (value) => {
     return { valid: true, value: markPassword(value) }
 }
 
-const EMPTY: ValidatePasswordError[] = [{ type: "empty" }]
-const TOO_LONG: ValidatePasswordError[] = [{ type: "too-long", maxLength: PASSWORD_MAX_LENGTH }]
+const EMPTY: readonly ValidatePasswordError[] = [{ type: "empty" }]
+const TOO_LONG: readonly ValidatePasswordError[] = [{ type: "too-long", maxLength: PASSWORD_MAX_LENGTH }]
 
 function markPassword(password: string): Password {
     return password as Password

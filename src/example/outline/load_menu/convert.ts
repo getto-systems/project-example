@@ -4,7 +4,7 @@ import { MenuExpandRepositoryValue } from "./infra"
 
 import { MenuCategoryLabel } from "../kernel/data"
 
-export function convertMenuBadgeRemote(menuBadgeItems: MenuBadgeItem[]): MenuBadge {
+export function convertMenuBadgeRemote(menuBadgeItems: readonly MenuBadgeItem[]): MenuBadge {
     return menuBadgeItems.reduce((acc, item) => {
         acc.set(item.path, item.count)
         return acc

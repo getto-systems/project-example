@@ -11,5 +11,5 @@ export type SearchAuthUserAccountFields = Readonly<{
 
 export type SearchAuthUserAccountRemoteResponse = Readonly<{
     page: SearchPageResponse
-    users: AuthUserAccountBasket[]
+    users: readonly AuthUserAccountBasket[]
 }>

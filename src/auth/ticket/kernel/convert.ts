@@ -32,6 +32,6 @@ export function convertAuthRemote(clock: Clock, value: AuthRemoteValue): AuthTic
     return markAuthProfile(clock.now(), value.roles)
 }
 
-function markAuthProfile(authAt: Date, roles: string[]): AuthTicket {
+function markAuthProfile(authAt: Date, roles: readonly string[]): AuthTicket {
     return { authAt, roles } as AuthTicket
 }

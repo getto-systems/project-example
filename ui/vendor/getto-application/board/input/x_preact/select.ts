@@ -12,7 +12,7 @@ import { emptyBoardValue } from "../../kernel/data"
 
 type Props = Readonly<{
     input: InputBoardAction
-    options: VNode[]
+    options: readonly VNode[]
 }>
 export function SelectBoardComponent({ input, options }: Props): VNode {
     return html`<select ref=${useInputRef(input.connector)} onInput=${onInput}>

@@ -18,7 +18,7 @@ import { InputLoginIDAction, ValidateLoginIDState } from "../action"
 import { ValidateLoginIDError } from "../data"
 
 type EntryProps = Readonly<{ field: InputLoginIDAction }> &
-    Partial<{ title: VNodeContent; help: VNodeContent[] }>
+    Partial<{ title: VNodeContent; help: readonly VNodeContent[] }>
 export function InputLoginIDEntry(resource: EntryProps): VNode {
     return h(InputLoginIDComponent, {
         ...resource,
@@ -53,7 +53,7 @@ export function InputLoginIDComponent(props: Props): VNode {
         }
         return "ログインID"
     }
-    function help(): VNodeContent[] {
+    function help(): readonly VNodeContent[] {
         if (props.help) {
             return props.help
         }
@@ -63,7 +63,7 @@ export function InputLoginIDComponent(props: Props): VNode {
 
 function loginIDValidationError(
     result: ValidateBoardFieldState<ValidateLoginIDError>,
-): VNodeContent[] {
+): readonly VNodeContent[] {
     if (result.valid) {
         return []
     }

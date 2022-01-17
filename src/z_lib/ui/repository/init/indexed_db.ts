@@ -23,7 +23,7 @@ export interface FromDB<T> {
 // データベース名と作成する objectStore を指定する
 export type IndexedDBConfig = Readonly<{
     database: string
-    stores: string[]
+    stores: readonly string[]
 }>
 
 export type IndexedDBTarget = Readonly<{
@@ -32,7 +32,7 @@ export type IndexedDBTarget = Readonly<{
 }>
 
 // 構造を変えるときは migration を追加することで対応
-const MIGRATIONS: Migration[] = [
+const MIGRATIONS: readonly Migration[] = [
     (db, stores) => {
         stores.forEach((store) => {
             db.createObjectStore(store, { keyPath: "key" })
@@ -41,7 +41,7 @@ const MIGRATIONS: Migration[] = [
 ]
 
 interface Migration {
-    (db: IDBDatabase, stores: string[]): void
+    (db: IDBDatabase, stores: readonly string[]): void
 }
 
 class DB implements IndexedDB {
@@ -152,8 +152,8 @@ class DB implements IndexedDB {
         }
 
         function upgrade(
-            stores: string[],
-            migrations: Migration[],
+            stores: readonly string[],
+            migrations: readonly Migration[],
         ): { (e: IDBVersionChangeEvent): void } {
             return (e) => {
                 if (!e.target || !(e.target instanceof IDBOpenDBRequest)) {

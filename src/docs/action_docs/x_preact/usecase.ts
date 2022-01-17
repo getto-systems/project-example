@@ -15,18 +15,18 @@ import {
 import { container } from "../../../../ui/vendor/getto-css/preact/design/box"
 
 import { copyright, siteInfo } from "../../../example/site"
-import { actionBox, dataBox, usecaseBox } from "./helper"
+import { docsActionBox, docsDataBox, docsUsecaseBox } from "./helper"
 
 import { ApplicationErrorComponent } from "../../../avail/x_preact/application_error"
 import { LoadMenuEntry } from "../../../example/outline/load_menu/x_preact/load_menu"
 import { LoadBreadcrumbListComponent } from "../../../example/outline/load_breadcrumb_list/x_preact/load_breadcrumb_list"
 
 import { DocsView, DocsResource } from "../resource"
-import { DocsUsecaseContent } from "../../../../ui/vendor/getto-application/docs/data"
+import { DocsData, DocsUsecase } from "../../../../ui/vendor/getto-application/docs/data"
 
 type EntryProps = Readonly<{
     view: DocsView
-    docs: DocsUsecaseContent[]
+    docs: DocsUsecase
 }>
 export function DocsUsecaseEntry(props: EntryProps): VNode {
     const resource = useApplicationView(props.view)
@@ -39,7 +39,7 @@ export function DocsUsecaseEntry(props: EntryProps): VNode {
     return h(DocsUsecaseComponent, { ...resource, docs: props.docs })
 }
 
-type Props = DocsResource & Readonly<{ docs: DocsUsecaseContent[] }>
+type Props = DocsResource & Readonly<{ docs: DocsUsecase }>
 export function DocsUsecaseComponent(resource: Props): VNode {
     useDocumentTitle(title())
 
@@ -47,28 +47,33 @@ export function DocsUsecaseComponent(resource: Props): VNode {
         siteInfo,
         header: [],
         main: appMain({
-            header: mainHeader([
-                mainTitle(title()),
-                h(LoadBreadcrumbListComponent, resource),
-            ]),
-            body: mainBody(resource.docs.map(content)),
+            header: mainHeader([mainTitle(title()), h(LoadBreadcrumbListComponent, resource)]),
+            body: mainBody(content(resource.docs)),
             copyright,
         }),
         menu: h(LoadMenuEntry, resource),
     })
 
     function title() {
-        if (resource.docs.length === 0) {
-            return "no-title"
-        }
-        return resource.docs[0].title
+        return resource.docs.title
     }
 }
 
-function content(docs: DocsUsecaseContent): VNode {
+function content(docs: DocsUsecase): VNode {
     return html`${[
-        container(usecaseBox(docs)),
-        container(docs.action.map(actionBox)),
-        container(docs.data.map(dataBox)),
+        container(docsUsecaseBox(docs)),
+        container(docs.action.map(docsActionBox)),
+        container(data(docs).map(docsDataBox)),
     ]}`
+
+    function data(usecase: DocsUsecase): readonly DocsData[] {
+        return usecase.action
+            .flatMap((action) => action.data)
+            .reduce((acc, data) => {
+                if (!acc.includes(data)) {
+                    acc.push(data)
+                }
+                return acc
+            }, <DocsData[]>[])
+    }
 }

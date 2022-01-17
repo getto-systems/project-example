@@ -46,7 +46,7 @@ import {
 export type TableDataGroupContent<M, R> = Readonly<{
     key: TableDataCellKey
     header: VNodeContent
-    cells: TableCell<M, R>[]
+    cells: readonly TableCell<M, R>[]
 }>
 export function tableCell_group<M, R>(content: TableDataGroupContent<M, R>): TableCellGroup<M, R> {
     return new Cell(content)
@@ -68,11 +68,11 @@ class Cell<M, R> implements TableCellGroup<M, R> {
         }
     }
 
-    initiallyVisibleCells(): TableDataCellKey[] {
+    initiallyVisibleCells(): readonly TableDataCellKey[] {
         return tableCellInitiallyVisibleCells(this.content.cells)
     }
 
-    view(): TableDataView[] {
+    view(): readonly TableDataView[] {
         return tableCellView(this.content.cells)
     }
     header(
@@ -106,7 +106,7 @@ class Cell<M, R> implements TableCellGroup<M, R> {
                 right: last.style.border.vertical.right,
             }
         }
-        function length(headers: TableDataHeader[]): number {
+        function length(headers: readonly TableDataHeader[]): number {
             return headers.reduce((acc, header) => {
                 switch (header.type) {
                     case "simple":
@@ -118,7 +118,7 @@ class Cell<M, R> implements TableCellGroup<M, R> {
                 }
             }, 0)
         }
-        function height(headers: TableDataHeader[]): number {
+        function height(headers: readonly TableDataHeader[]): number {
             return Math.max(
                 0,
                 ...headers.map((header) => {
@@ -134,7 +134,10 @@ class Cell<M, R> implements TableCellGroup<M, R> {
             )
         }
     }
-    children(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataHeader[] {
+    children(
+        inherit: TableDataInherit,
+        params: TableDataStyledParams<M>,
+    ): readonly TableDataHeader[] {
         const { style } = this.mutable.core.headerStyleMutable()
         return tableCellHeader(
             inherit,
@@ -143,21 +146,30 @@ class Cell<M, R> implements TableCellGroup<M, R> {
             this.content.cells,
         )
     }
-    summary(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[] {
+    summary(
+        inherit: TableDataInherit,
+        params: TableDataStyledParams<M>,
+    ): readonly TableDataSummary[] {
         const { style } = this.mutable.core.summaryStyleMutable()
         return tableCellSummary(inherit, params, style, this.content.cells)
     }
-    footer(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[] {
+    footer(
+        inherit: TableDataInherit,
+        params: TableDataStyledParams<M>,
+    ): readonly TableDataSummary[] {
         const { style } = this.mutable.core.footerStyleMutable()
         return tableCellFooter(inherit, params, style, this.content.cells)
     }
-    column(inherit: TableDataInherit, params: TableDataRelatedParams<M, R>): TableDataColumn[] {
+    column(
+        inherit: TableDataInherit,
+        params: TableDataRelatedParams<M, R>,
+    ): readonly TableDataColumn[] {
         const { style } = this.mutable.core.columnStyleMutable()
         const { decorators } = this.mutable.core.columnMutable()
         return tableCellColumn(inherit, params, style, decorators, this.content.cells)
     }
 
-    horizontalBorder(borders: TableDataHorizontalBorder[]): TableCellGroup<M, R> {
+    horizontalBorder(borders: readonly TableDataHorizontalBorder[]): TableCellGroup<M, R> {
         this.mutable.core.horizontalBorder(borders)
         return this
     }
@@ -165,19 +177,19 @@ class Cell<M, R> implements TableCellGroup<M, R> {
         this.mutable.core.horizontalBorderRelated(borders)
         return this
     }
-    horizontalBorder_group(borders: TableDataHorizontalBorder[]): TableCellGroup<M, R> {
+    horizontalBorder_group(borders: readonly TableDataHorizontalBorder[]): TableCellGroup<M, R> {
         this.mutable.group.horizontalBorder_group(borders)
         return this
     }
-    horizontalBorder_header(borders: TableDataHorizontalBorder[]): TableCellGroup<M, R> {
+    horizontalBorder_header(borders: readonly TableDataHorizontalBorder[]): TableCellGroup<M, R> {
         this.mutable.core.horizontalBorder_header(borders)
         return this
     }
-    horizontalBorder_summary(borders: TableDataHorizontalBorder[]): TableCellGroup<M, R> {
+    horizontalBorder_summary(borders: readonly TableDataHorizontalBorder[]): TableCellGroup<M, R> {
         this.mutable.core.horizontalBorder_summary(borders)
         return this
     }
-    horizontalBorder_footer(borders: TableDataHorizontalBorder[]): TableCellGroup<M, R> {
+    horizontalBorder_footer(borders: readonly TableDataHorizontalBorder[]): TableCellGroup<M, R> {
         this.mutable.core.horizontalBorder_footer(borders)
         return this
     }

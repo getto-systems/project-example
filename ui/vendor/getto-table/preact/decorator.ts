@@ -30,7 +30,7 @@ export interface TableDataContentDecorator {
 }
 
 export interface TableDataHorizontalBorderProvider<R> {
-    (row: R): TableDataHorizontalBorder[]
+    (row: R): readonly TableDataHorizontalBorder[]
 }
 
 export type TableDataSummaryProvider<M> =
@@ -118,11 +118,11 @@ export function decorateContent(
 export const decorateNone: TableDataStyleDecorator_none = { type: "none" }
 
 export function horizontalBorder(
-    borders: TableDataHorizontalBorder[],
+    borders: readonly TableDataHorizontalBorder[],
 ): TableDataStyleDecorator_border {
     return { type: "border", decorator: decorateHorizontalBorder(borders) }
 }
-export function tableAlign(aligns: TableDataAlign[]): TableDataStyleDecorator_align {
+export function tableAlign(aligns: readonly TableDataAlign[]): TableDataStyleDecorator_align {
     return { type: "align", decorator: decorateAlign(aligns) }
 }
 export function tableClassName(className: TableDataClassName): TableDataStyleDecorator_className {

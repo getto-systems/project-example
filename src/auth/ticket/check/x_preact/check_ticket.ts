@@ -136,7 +136,7 @@ export function CheckAuthTicketComponent(props: Props): VNode {
     }
 }
 
-function renewError(err: RemoteCommonError): VNodeContent[] {
+function renewError(err: RemoteCommonError): readonly VNodeContent[] {
     return remoteCommonErrorReason(err, (reason) => [
         `${reason.message}により認証に失敗しました`,
         ...reason.detail,

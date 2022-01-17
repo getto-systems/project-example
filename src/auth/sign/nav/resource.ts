@@ -68,11 +68,11 @@ function authenticatePasswordHref(variant: AuthenticatePasswordVariantKey): Sign
 }
 function resetPasswordHref(
     variant: ResetPasswordVariantKey,
-    params: LocationSearchParam[],
+    params: readonly LocationSearchParam[],
 ): SignNavHref {
     return href([[signNavKey(SignNav.passwordReset), variant], ...params])
 }
-function href(params: LocationSearchParam[]): SignNavHref {
+function href(params: readonly LocationSearchParam[]): SignNavHref {
     return `?${encodeLocationSearchQuery(params)}` as SignNavHref
 }
 

@@ -46,7 +46,7 @@ import {
 export type TableDataTreeContent<M, R, C> = Readonly<{
     data: TableDataTreeChildrenProvider<M, R, C>
     key: TableDataRowKeyProvider<C>
-    cells: TableCell<M, C>[]
+    cells: readonly TableCell<M, C>[]
 }>
 export function tableCell_tree<M, R, C>(
     content: TableDataTreeContent<M, R, C>,
@@ -70,22 +70,31 @@ class Cell<M, R, C> implements TableCellTree<M, R> {
         }
     }
 
-    initiallyVisibleCells(): TableDataCellKey[] {
+    initiallyVisibleCells(): readonly TableDataCellKey[] {
         return tableCellInitiallyVisibleCells(this.content.cells)
     }
 
-    view(): TableDataView[] {
+    view(): readonly TableDataView[] {
         return tableCellView(this.content.cells)
     }
-    header(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataHeader[] {
+    header(
+        inherit: TableDataInherit,
+        params: TableDataStyledParams<M>,
+    ): readonly TableDataHeader[] {
         const { style } = this.mutable.core.headerStyleMutable()
         return tableCellHeader(inherit, params, style, this.content.cells)
     }
-    summary(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[] {
+    summary(
+        inherit: TableDataInherit,
+        params: TableDataStyledParams<M>,
+    ): readonly TableDataSummary[] {
         const { style } = this.mutable.core.summaryStyleMutable()
         return tableCellSummary(inherit, params, style, this.content.cells)
     }
-    footer(inherit: TableDataInherit, params: TableDataStyledParams<M>): TableDataSummary[] {
+    footer(
+        inherit: TableDataInherit,
+        params: TableDataStyledParams<M>,
+    ): readonly TableDataSummary[] {
         const { style } = this.mutable.core.footerStyleMutable()
         return tableCellFooter(inherit, params, style, this.content.cells)
     }
@@ -102,10 +111,10 @@ class Cell<M, R, C> implements TableCellTree<M, R> {
             style: this.paddingStyle(params.base, summaries),
         }
 
-        function length(summaries: TableDataSummary[]): number {
+        function length(summaries: readonly TableDataSummary[]): number {
             return summaries.reduce((acc, summary) => acc + summary.length, 0)
         }
-        function height(rows: TableDataColumnRow[]): number {
+        function height(rows: readonly TableDataColumnRow[]): number {
             return Math.max(
                 0,
                 rows
@@ -131,7 +140,7 @@ class Cell<M, R, C> implements TableCellTree<M, R> {
     children(
         inherit: TableDataInherit,
         params: TableDataRelatedParams<M, R>,
-    ): TableDataColumnRow[] {
+    ): readonly TableDataColumnRow[] {
         const { style } = this.mutable.core.columnStyleMutable()
         const rowMutable = this.mutable.tree.rowMutable()
         const { decorators } = this.mutable.core.columnMutable()
@@ -159,7 +168,7 @@ class Cell<M, R, C> implements TableCellTree<M, R> {
             }
         })
     }
-    paddingStyle(base: TableDataStyle, summaries: TableDataSummary[]): TableDataFullStyle {
+    paddingStyle(base: TableDataStyle, summaries: readonly TableDataSummary[]): TableDataFullStyle {
         const { style } = this.mutable.core.columnStyleMutable()
         return treePaddingStyle(base, style.horizontalBorder, vertical())
 
@@ -174,7 +183,7 @@ class Cell<M, R, C> implements TableCellTree<M, R> {
         }
     }
 
-    horizontalBorder(borders: TableDataHorizontalBorder[]): TableCellTree<M, R> {
+    horizontalBorder(borders: readonly TableDataHorizontalBorder[]): TableCellTree<M, R> {
         this.mutable.core.horizontalBorder(borders)
         return this
     }
@@ -182,15 +191,15 @@ class Cell<M, R, C> implements TableCellTree<M, R> {
         this.mutable.core.horizontalBorderRelated(borders)
         return this
     }
-    horizontalBorder_header(borders: TableDataHorizontalBorder[]): TableCellTree<M, R> {
+    horizontalBorder_header(borders: readonly TableDataHorizontalBorder[]): TableCellTree<M, R> {
         this.mutable.core.horizontalBorder_header(borders)
         return this
     }
-    horizontalBorder_summary(borders: TableDataHorizontalBorder[]): TableCellTree<M, R> {
+    horizontalBorder_summary(borders: readonly TableDataHorizontalBorder[]): TableCellTree<M, R> {
         this.mutable.core.horizontalBorder_summary(borders)
         return this
     }
-    horizontalBorder_footer(borders: TableDataHorizontalBorder[]): TableCellTree<M, R> {
+    horizontalBorder_footer(borders: readonly TableDataHorizontalBorder[]): TableCellTree<M, R> {
         this.mutable.core.horizontalBorder_footer(borders)
         return this
     }

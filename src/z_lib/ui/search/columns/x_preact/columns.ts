@@ -19,7 +19,7 @@ export type SearchColumnContent = Readonly<{
 
 type Props = Readonly<{
     field: SearchColumnsAction
-    columns: SearchColumnContent[]
+    columns: readonly SearchColumnContent[]
 }> &
     Partial<{
         title: VNodeContent
@@ -45,7 +45,7 @@ export function SearchColumnsComponent(props: Props): VNode {
         }
         return "表示する列"
     }
-    function options(): CheckboxBoardContent[] {
+    function options(): readonly CheckboxBoardContent[] {
         return props.columns.map((column) => ({
             key: column.key,
             value: `${column.key}`,

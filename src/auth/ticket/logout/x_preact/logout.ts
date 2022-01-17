@@ -56,7 +56,7 @@ export function LogoutComponent(props: Props): VNode {
 
     type LogoutBoxContent =
         | Readonly<{ type: "initial" }>
-        | Readonly<{ type: "error"; err: string[] }>
+        | Readonly<{ type: "error"; err: readonly string[] }>
     function logoutBox(content: LogoutBoxContent): VNode {
         return box({
             body: [
@@ -78,7 +78,7 @@ export function LogoutComponent(props: Props): VNode {
             }
         }
 
-        function error(): VNode[] {
+        function error(): readonly VNode[] {
             if (content.type === "initial") {
                 return []
             }
@@ -91,13 +91,13 @@ export function LogoutComponent(props: Props): VNode {
     }
 }
 
-function repositoryError(err: RepositoryError): string[] {
+function repositoryError(err: RepositoryError): readonly string[] {
     return repositoryErrorReason(err, (reason) => [
         `${reason.message}によりログアウトに失敗しました`,
         ...reason.detail,
     ])
 }
-function logoutError(err: RemoteCommonError): string[] {
+function logoutError(err: RemoteCommonError): readonly string[] {
     return remoteCommonErrorReason(err, (reason) => [
         `${reason.message}によりログアウトに失敗しました`,
         ...reason.detail,

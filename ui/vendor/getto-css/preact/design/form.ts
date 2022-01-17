@@ -12,17 +12,14 @@ type FieldContent =
     | Readonly<{ type: SearchFieldType; content: NormalFieldContent }>
     | Readonly<{ type: NoticeFieldType; content: NoticeFieldContent }>
 
-export type NormalFieldContent =
-    | NormalFieldContent_base
-    | (NormalFieldContent_base & FieldContent_help)
-export type NoticeFieldContent = NormalFieldContent & FieldContent_notice
+export type NormalFieldContent = NormalFieldContent_base &
+    Partial<{ help: readonly VNodeContent[] }>
+export type NoticeFieldContent = NormalFieldContent & Readonly<{ notice: readonly VNodeContent[] }>
 
 type NormalFieldContent_base = Readonly<{
     title: VNodeContent
     body: VNodeContent
 }>
-type FieldContent_help = Readonly<{ help: VNodeContent[] }>
-type FieldContent_notice = Readonly<{ notice: VNodeContent[] }>
 
 type FieldType = NormalFieldType | SearchFieldType | NoticeFieldType
 type NormalFieldType = "normal"
@@ -70,13 +67,13 @@ function fieldContent(field: FieldContent): VNode {
         <dd class="field__body">${field.content.body} ${fieldHelp(help)}</dd>
     </dl>`
 
-    function helpContent(): VNodeContent[] {
-        if ("help" in field.content) {
+    function helpContent(): readonly VNodeContent[] {
+        if (field.content.help) {
             return field.content.help
         }
         return []
     }
-    function noticeContent(): VNodeContent[] {
+    function noticeContent(): readonly VNodeContent[] {
         switch (field.type) {
             case "normal":
             case "search":
@@ -94,10 +91,10 @@ type FieldSectionContent =
     | Readonly<{ type: NormalFieldType; content: NormalFieldSectionContent }>
     | Readonly<{ type: NoticeFieldType; content: NoticeFieldSectionContent }>
 
-export type NormalFieldSectionContent =
-    | NormalFieldSectionContent_base
-    | (NormalFieldSectionContent_base & FieldContent_help)
-export type NoticeFieldSectionContent = NormalFieldSectionContent & FieldContent_notice
+export type NormalFieldSectionContent = NormalFieldSectionContent_base &
+    Partial<{ help: readonly VNodeContent[] }>
+export type NoticeFieldSectionContent = NormalFieldSectionContent &
+    Readonly<{ notice: readonly VNodeContent[] }>
 
 type NormalFieldSectionContent_base = Readonly<{ body: VNodeContent }>
 
@@ -120,13 +117,13 @@ function fieldSectionContent(field: FieldSectionContent): VNode {
         ${field.content.body} ${fieldHelp(help)}
     </section>`
 
-    function helpContent(): VNodeContent[] {
-        if ("help" in field.content) {
+    function helpContent(): readonly VNodeContent[] {
+        if (field.content.help) {
             return field.content.help
         }
         return []
     }
-    function noticeContent(): VNodeContent[] {
+    function noticeContent(): readonly VNodeContent[] {
         switch (field.type) {
             case "normal":
                 return []
@@ -138,13 +135,13 @@ function fieldSectionContent(field: FieldSectionContent): VNode {
     }
 }
 
-export function fieldError(notice: VNodeContent[]): VNode {
+export function fieldError(notice: readonly VNodeContent[]): VNode {
     return html`<aside class="field__help field_error">${notice.map(toFieldNotice)}</aside>`
 }
 
 type FieldHelpContent = Readonly<{
-    help: VNodeContent[]
-    notice: VNodeContent[]
+    help: readonly VNodeContent[]
+    notice: readonly VNodeContent[]
 }>
 function fieldHelp({ help, notice }: FieldHelpContent) {
     if (help.length + notice.length == 0) {

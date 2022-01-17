@@ -1,60 +1,32 @@
-export type DocsDomain<U, A, D> = Readonly<{
-    title: string
-    purpose: string[]
-    usecase: U[]
-    toUsecase: DocsUsecaseMap<U, A, D>
-}>
-export type DocsDomainContent = Readonly<{
-    title: string
-    purpose: string[]
-    usecase: DocsUsecaseContent[]
-    data: DocsData[]
-}>
-export interface DocsUsecaseMap<U, A, D> {
-    (usecase: U): DocsUsecase<A, D>
-}
-
-export type DocsUsecase<A, D> = Readonly<{
+export type DocsDomain = Readonly<{
     path: string
-    title: A
-    purpose: string[]
-}> &
-    DocsUsecaseDescription<A, D> &
-    DocsUsecaseDescriptionMap<A, D>
-export type DocsUsecaseContent = Readonly<{
     title: string
-    purpose: string[]
-    action: DocsAction[]
-    data: DocsData[]
+    usecase: readonly DocsUsecase[]
 }>
-export type DocsUsecaseDescription<A, D> = Readonly<{
-    action: A[]
-    data: D[]
-}>
-export type DocsUsecaseDescriptionMap<A, D> = Readonly<{
-    toAction: DocsActionMap<A>
-    toData: DocsDataMap<D>
-}>
-export interface DocsActionMap<A> {
-    (action: A): DocsAction
-}
-export interface DocsDataMap<D> {
-    (data: D): DocsData
-}
 
-export type DocsAction = Readonly<{ title: string; item: DocsActionItem[] }>
-export type DocsActionItem = Readonly<{
-    type: DocsActionItemType
-    content: string[]
-    help: string[]
+export type DocsUsecase = Readonly<{
+    path: string
+    title: string
+    purpose: readonly string[]
+    action: readonly DocsAction[]
 }>
-export type DocsActionItemType = "input" | "check" | "success" | "error"
+
+export type DocsAction = Readonly<{
+    title: string
+    action: readonly DocsActionContent[]
+    data: readonly DocsData[]
+}>
+export type DocsActionContent =
+    | Readonly<{ type: "input"; content: readonly string[]; help?: readonly string[] }>
+    | Readonly<{ type: "check"; check: readonly string[]; help?: readonly string[] }>
+    | Readonly<{ type: "success"; action: readonly string[]; help?: readonly string[] }>
+    | Readonly<{ type: "error"; err: readonly string[]; help?: readonly string[] }>
 
 export type DocsData = Readonly<{
     title: string
-    data: DocsDataDescription[]
+    data: readonly DocsDataDescription[]
 }>
-export type DocsDataDescription = Readonly<{ description: string; help: string[] }>
+export type DocsDataDescription = Readonly<{ data: string; help?: readonly string[] }>
 
 // TODO 以下削除予定
 
@@ -83,12 +55,12 @@ export type DocsAction_legacy =
 export type DocsAction_request = Readonly<{
     from: DocsActionTargetType
     to: DocsActionTargetType
-    body: DocsActionContent[]
+    body: DocsActionContent_legacy[]
     help: string[]
 }>
 export type DocsAction_action = Readonly<{
     on: DocsActionTargetType
-    body: DocsActionContent[]
+    body: DocsActionContent_legacy[]
     help: string[]
 }>
 
@@ -99,4 +71,4 @@ export enum DocsActionTarget {
     "text-client",
 }
 export type DocsActionTargetType = keyof typeof DocsActionTarget
-export type DocsActionContent = Readonly<{ type: "normal" | "validate"; message: string }>
+export type DocsActionContent_legacy = Readonly<{ type: "normal" | "validate"; message: string }>

@@ -32,7 +32,7 @@ export function isVisible(
 export function initiallyVisibleCells(
     key: TableDataCellKey,
     { visibleType }: TableDataVisibleMutable,
-): TableDataCellKey[] {
+): readonly TableDataCellKey[] {
     switch (visibleType) {
         case "always":
             // 常に表示されるセルは初期表示セルの中に含めない

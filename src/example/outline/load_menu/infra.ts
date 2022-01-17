@@ -25,4 +25,4 @@ export interface MenuExpandRepository {
     set(value: MenuExpand): Promise<StoreRepositoryResult>
     remove(): Promise<StoreRepositoryResult>
 }
-export type MenuExpandRepositoryValue = string[][]
+export type MenuExpandRepositoryValue = readonly ReadonlyArray<string>[]

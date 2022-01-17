@@ -1,4 +1,4 @@
 export type AuthTicket = Readonly<{
     authAt: Date
-    roles: string[]
+    roles: readonly string[]
 }> & { AuthProfile: never }

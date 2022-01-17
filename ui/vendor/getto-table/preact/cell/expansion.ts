@@ -100,11 +100,11 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
         return this.mutable.leaf.verticalBorderMutable().border
     }
 
-    initiallyVisibleCells(): TableDataCellKey[] {
+    initiallyVisibleCells(): readonly TableDataCellKey[] {
         return initiallyVisibleCells(this.key, this.mutable.leaf.visibleMutable())
     }
 
-    view(): TableDataView[] {
+    view(): readonly TableDataView[] {
         const { visibleType } = this.mutable.leaf.visibleMutable()
         if (visibleType === "always") {
             // always visible なセルは view に含めない
@@ -235,12 +235,12 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
         this.mutable.leaf.alwaysVisible()
         return this
     }
-    border(borders: TableDataVerticalBorder[]): TableCellExpansion<M, R> {
+    border(borders: readonly TableDataVerticalBorder[]): TableCellExpansion<M, R> {
         this.mutable.leaf.border(borders)
         return this
     }
 
-    horizontalBorder(borders: TableDataHorizontalBorder[]): TableCellExpansion<M, R> {
+    horizontalBorder(borders: readonly TableDataHorizontalBorder[]): TableCellExpansion<M, R> {
         this.mutable.base.horizontalBorder(borders)
         return this
     }
@@ -250,15 +250,21 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
         this.mutable.base.horizontalBorderRelated(borders)
         return this
     }
-    horizontalBorder_header(borders: TableDataHorizontalBorder[]): TableCellExpansion<M, R> {
+    horizontalBorder_header(
+        borders: readonly TableDataHorizontalBorder[],
+    ): TableCellExpansion<M, R> {
         this.mutable.base.horizontalBorder_header(borders)
         return this
     }
-    horizontalBorder_summary(borders: TableDataHorizontalBorder[]): TableCellExpansion<M, R> {
+    horizontalBorder_summary(
+        borders: readonly TableDataHorizontalBorder[],
+    ): TableCellExpansion<M, R> {
         this.mutable.base.horizontalBorder_summary(borders)
         return this
     }
-    horizontalBorder_footer(borders: TableDataHorizontalBorder[]): TableCellExpansion<M, R> {
+    horizontalBorder_footer(
+        borders: readonly TableDataHorizontalBorder[],
+    ): TableCellExpansion<M, R> {
         this.mutable.base.horizontalBorder_footer(borders)
         return this
     }

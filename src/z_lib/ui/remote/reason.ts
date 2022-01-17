@@ -2,12 +2,12 @@ import { RemoteCommonError } from "./data"
 
 export type RemoteCommonErrorReason = Readonly<{
     message: string
-    detail: string[]
+    detail: readonly string[]
 }>
 export function remoteCommonErrorReason<T>(
     err: RemoteCommonError,
-    message: { (reason: RemoteCommonErrorReason): T[] },
-): T[] {
+    message: { (reason: RemoteCommonErrorReason): readonly T[] },
+): readonly T[] {
     switch (err.type) {
         case "unauthorized":
             return message({
@@ -34,7 +34,7 @@ export function remoteCommonErrorReason<T>(
             return message({ message: "ネットワークエラー", detail: detail(err.err) })
     }
 
-    function detail(message: string): string[] {
+    function detail(message: string): readonly string[] {
         if (message.length === 0) {
             return []
         }

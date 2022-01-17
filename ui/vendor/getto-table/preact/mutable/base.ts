@@ -81,19 +81,19 @@ class Mutable<R> implements TableDataMutable_base<R> {
         return this.column
     }
 
-    horizontalBorder(borders: TableDataHorizontalBorder[]): void {
+    horizontalBorder(borders: readonly TableDataHorizontalBorder[]): void {
         this.decorateColumn(horizontalBorder(borders))
     }
     horizontalBorderRelated(borders: TableDataHorizontalBorderProvider<R>): void {
         this.decorateColumnRelated((row: R) => horizontalBorder(borders(row)))
     }
-    horizontalBorder_header(borders: TableDataHorizontalBorder[]): void {
+    horizontalBorder_header(borders: readonly TableDataHorizontalBorder[]): void {
         this.decorateHeader(horizontalBorder(borders))
     }
-    horizontalBorder_summary(borders: TableDataHorizontalBorder[]): void {
+    horizontalBorder_summary(borders: readonly TableDataHorizontalBorder[]): void {
         this.decorateSummary(horizontalBorder(borders))
     }
-    horizontalBorder_footer(borders: TableDataHorizontalBorder[]): void {
+    horizontalBorder_footer(borders: readonly TableDataHorizontalBorder[]): void {
         this.decorateFooter(horizontalBorder(borders))
     }
 

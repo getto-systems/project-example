@@ -1,87 +1,73 @@
 import {
-    docsAction,
     docsDescription,
-    docsDomain,
     docsModule,
-    docsPath,
     docsPurpose,
     docsSection,
-    docsUsecase,
 } from "../../ui/vendor/getto-application/docs/helper"
 
 import { docs_notifyUnexpectedError } from "./unexpected_error/notify/docs"
 import { docs_findNextVersion } from "./version/find_next/docs"
 
-import {
-    DocsSection,
-    DocsUsecase,
-    DocsUsecaseDescription,
-} from "../../ui/vendor/getto-application/docs/data"
+import { DocsAction, DocsDomain, DocsSection } from "../../ui/vendor/getto-application/docs/data"
 
-export const docs_avail = docsDomain<AvailUsecase, AvailAction, AvailData>(
-    "保守・運用",
-    ["業務で必要な時に使用できる", "業務に合ったコストで運用できる"],
-    ["guaranteeOnTimeAccess", "notifyUnexpectedError", "findNextVersion", "server"],
-    (name) => usecase[name],
-)
+const docs_guaranteeOnTimeAccess: DocsAction = {
+    title: "業務時間内のアクセスを保証",
+    action: [
+        {
+            type: "check",
+            check: ["停止許容時間", "5分/10h (業務時間内)"],
+            help: ["業務時間外の停止は連絡後に実施"],
+        },
+        {
+            type: "check",
+            check: ["レスポンスの最大待ち時間", "1秒"],
+            help: ["処理に時間がかかる場合は完了時に通知"],
+        },
+    ],
+    data: [],
+}
 
-const usecase = {
-    guaranteeOnTimeAccess: docsAvailUsecase(
-        "guaranteeOnTimeAccess",
-        ["業務で必要な時に使用できる"],
-        { action: ["guaranteeOnTimeAccess"], data: [] },
-    ),
-    notifyUnexpectedError: docsAvailUsecase(
-        "notifyUnexpectedError",
-        ["業務で必要な時に使用できる"],
-        { action: ["notifyUnexpectedError"], data: [] },
-    ),
-    findNextVersion: docsAvailUsecase("findNextVersion", ["業務で必要な時に使用できる"], {
-        action: ["findNextVersion"],
-        data: [],
-    }),
-    server: docsAvailUsecase(
-        "server",
-        ["業務で必要な時に使用できる", "業務に合ったコストで運用できる"],
-        { action: ["server"], data: [] },
-    ),
-} as const
+const docs_server: DocsAction = {
+    title: "サーバー構成",
+    action: [
+        {
+            type: "check",
+            check: ["コストを抑えた構成", "冗長構成"],
+            help: ["Google Cloud Run", "K8s", "Cloud SQL", "AWS RDS"],
+        },
+    ],
+    data: [],
+}
 
-const action = {
-    guaranteeOnTimeAccess: docsAction("業務時間内のアクセスを保証", ({ item }) => [
-        item("check", ["停止許容時間", "5分/10h (業務時間内)"], ["業務時間外の停止は連絡後に実施"]),
-        item(
-            "check",
-            ["レスポンスの最大待ち時間", "1秒"],
-            ["処理に時間がかかる場合は完了時に通知"],
-        ),
-    ]),
-    notifyUnexpectedError: docs_notifyUnexpectedError,
-    findNextVersion: docs_findNextVersion,
-    server: docsAction("サーバー構成", ({ item }) => [
-        item(
-            "check",
-            ["コストを抑えた構成", "冗長構成"],
-            ["Google Cloud Run", "K8s", "Cloud SQL", "AWS RDS"],
-        ),
-    ]),
-} as const
-
-const data = {} as const
-
-export type AvailUsecase = keyof typeof usecase
-export type AvailAction = keyof typeof action
-export type AvailData = keyof typeof data
-
-function docsAvailUsecase(
-    title: AvailAction,
-    purpose: string[],
-    content: DocsUsecaseDescription<AvailAction, AvailData>,
-): DocsUsecase<AvailAction, AvailData> {
-    return docsUsecase(docsPath(title), title, purpose, content, {
-        toAction: (name) => action[name],
-        toData: (name) => data[name],
-    })
+export const docs_avail: DocsDomain = {
+    path: "avail",
+    title: "保守・運用",
+    usecase: [
+        {
+            path: "unexpected-error/notify",
+            title: docs_notifyUnexpectedError.title,
+            purpose: ["業務で必要な時に使用できる"],
+            action: [docs_notifyUnexpectedError],
+        },
+        {
+            path: "next-version/find",
+            title: docs_findNextVersion.title,
+            purpose: ["業務で必要な時に使用できる"],
+            action: [docs_findNextVersion],
+        },
+        {
+            path: "server/operate",
+            title: docs_guaranteeOnTimeAccess.title,
+            purpose: ["業務で必要な時に使用できる"],
+            action: [docs_guaranteeOnTimeAccess],
+        },
+        {
+            path: "server/run",
+            title: docs_server.title,
+            purpose: ["業務で必要な時に使用できる", "業務に合ったコストで運用できる"],
+            action: [docs_server],
+        },
+    ],
 }
 
 export const docs_avail_legacy: DocsSection[] = [

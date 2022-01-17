@@ -21,14 +21,14 @@ export function docsMenuContent(): MenuContent {
                 item("プライバシーポリシー", lnir("files-alt"), "docs/privacy-policy.html"),
             ]),
             category("ドキュメント", allow, [
-                docsMenuNode(docs_auth, "auth"),
+                docsMenuNode(docs_auth),
                 item(docs_avail.title, lnir("files-alt"), "docs/avail.html"),
             ]),
             ...devDocs(),
         ],
     }
 }
-function devDocs(): MenuTreeNode[] {
+function devDocs(): readonly MenuTreeNode[] {
     if (env.isProduction) {
         return []
     }
@@ -40,16 +40,14 @@ function devDocs(): MenuTreeNode[] {
     ]
 }
 
-function docsMenuNode<U, A, D>(domain: DocsDomain<U, A, D>, path: string): MenuTreeNode {
-    return category(domain.title, allow, [
-        item("概要", lnir("files-alt"), assertMenuPath(`docs/${path}/index.html`)),
-        ...domain.usecase.map((name) => {
-            const usecase = domain.toUsecase(name)
-            const action = usecase.toAction(usecase.title)
+function docsMenuNode(docs: DocsDomain): MenuTreeNode {
+    return category(docs.title, allow, [
+        item("概要", lnir("files-alt"), assertMenuPath(`docs/${docs.path}/index.html`)),
+        ...docs.usecase.map((usecase) => {
             return item(
-                action.title,
+                usecase.title,
                 lnir("files-alt"),
-                assertMenuPath(`docs/${path}/${`${usecase.path}`}.html`),
+                assertMenuPath(`docs/${docs.path}/${usecase.path}.html`),
             )
         }),
     ])

@@ -14,7 +14,7 @@ export type RemoteFetchParams = Readonly<{
     serverURL: string
     path: string
     method: RemoteFetchMethod
-    headers: RemoteHeader[]
+    headers: readonly RemoteHeader[]
 }>
 
 export function fetchOptions(params: RemoteFetchParams): RemoteFetchOptions {
@@ -23,7 +23,7 @@ export function fetchOptions(params: RemoteFetchParams): RemoteFetchOptions {
         options: {
             method: params.method,
             credentials: "include",
-            headers: params.headers,
+            headers: Array.from(params.headers),
         },
     }
 

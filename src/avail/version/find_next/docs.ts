@@ -1,6 +1,16 @@
-import { docsAction } from "../../../../ui/vendor/getto-application/docs/helper"
+import { DocsAction } from "../../../../ui/vendor/getto-application/docs/data"
 
-export const docs_findNextVersion = docsAction("最新バージョンの確認", ({ item }) => [
-    item("check", ["次のバージョンの存在確認"]),
-    item("success", ["次のバージョンにアップデート"]),
-])
+export const docs_findNextVersion: DocsAction = {
+    title: "最新バージョンの確認",
+    action: [
+        {
+            type: "check",
+            check: ["次のバージョンの存在確認"],
+        },
+        {
+            type: "success",
+            action: ["次のバージョンにアップデート"],
+        },
+    ],
+    data: [],
+}

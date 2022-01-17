@@ -25,7 +25,7 @@ export function LoadBreadcrumbListComponent({ breadcrumbList }: Props): VNode {
     return mainBreadcrumbList(toContent(breadcrumbList.load()))
 }
 
-function toContent(breadcrumbList: BreadcrumbList): VNode[] {
+function toContent(breadcrumbList: BreadcrumbList): readonly VNode[] {
     return [top()].concat(breadcrumbList.map((node) => withSeparator(...content(node))))
 
     function content(node: BreadcrumbNode): [string, VNode] {

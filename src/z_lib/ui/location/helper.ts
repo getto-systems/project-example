@@ -1,5 +1,5 @@
 export type LocationSearchParam = [string, string]
-export function encodeLocationSearchQuery(params: LocationSearchParam[]): string {
+export function encodeLocationSearchQuery(params: readonly LocationSearchParam[]): string {
     return params
         .map((param) => {
             const [key, value] = param

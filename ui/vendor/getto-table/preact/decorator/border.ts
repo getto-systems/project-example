@@ -6,7 +6,7 @@ import {
 } from "../style"
 
 export const decorateVerticalBorder = (
-    borders: TableDataVerticalBorder[]
+    borders: readonly TableDataVerticalBorder[]
 ): Decorator<TableDataVerticalBorderStyle> => (style) => {
     const vertical = { ...style }
     borders.forEach((border) => {
@@ -39,7 +39,7 @@ export const decorateVerticalBorder = (
 }
 
 export const decorateHorizontalBorder = (
-    borders: TableDataHorizontalBorder[]
+    borders: readonly TableDataHorizontalBorder[]
 ): Decorator<TableDataHorizontalBorderStyle> => (style) => {
     const horizontal = { ...style }
     borders.forEach((border) => {

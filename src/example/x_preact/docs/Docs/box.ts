@@ -2,20 +2,23 @@ import { VNode } from "preact"
 import { html } from "htm/preact"
 
 import { v_medium, v_small } from "../../../../../ui/vendor/getto-css/preact/design/alignment"
-import { label_alert, label_pending } from "../../../../../ui/vendor/getto-css/preact/design/highlight"
+import {
+    label_alert,
+    label_pending,
+} from "../../../../../ui/vendor/getto-css/preact/design/highlight"
 import { box } from "../../../../../ui/vendor/getto-css/preact/design/box"
 import { field } from "../../../../../ui/vendor/getto-css/preact/design/form"
 
 import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 import { icon } from "../../design/icon"
 
-export function itemsSection(title: VNodeContent, list: VNodeContent[]): VNode {
+export function itemsSection(title: VNodeContent, list: readonly VNodeContent[]): VNode {
     return html`
         <p>${title}</p>
         ${v_small()} ${items(list)} ${v_medium()}
     `
 }
-export function items(list: VNodeContent[]): VNode {
+export function items(list: readonly VNodeContent[]): VNode {
     return html`<ul>
         ${list.map(item)}
     </ul>`
@@ -65,28 +68,28 @@ export function serverClients(): VNode {
     })
 }
 
-export function inBrowser(content: VNodeContent, help: VNodeContent[]): VNode {
+export function inBrowser(content: VNodeContent, help: readonly VNodeContent[]): VNode {
     return field({ title: browser, body: content, help })
 }
 
-export function toContentServer(content: VNodeContent, help: VNodeContent[]): VNode {
+export function toContentServer(content: VNodeContent, help: readonly VNodeContent[]): VNode {
     return toServer(contentServer, content, help)
 }
-export function inContentServer(content: VNodeContent, help: VNodeContent[]): VNode {
+export function inContentServer(content: VNodeContent, help: readonly VNodeContent[]): VNode {
     return field({ title: contentServer, body: content, help })
 }
 
-export function toApiServer(content: VNodeContent, help: VNodeContent[]): VNode {
+export function toApiServer(content: VNodeContent, help: readonly VNodeContent[]): VNode {
     return toServer(apiServer, content, help)
 }
-export function inApiServer(content: VNodeContent, help: VNodeContent[]): VNode {
+export function inApiServer(content: VNodeContent, help: readonly VNodeContent[]): VNode {
     return field({ title: apiServer, body: content, help })
 }
-export function fromApiServer(content: VNodeContent, help: VNodeContent[]): VNode {
+export function fromApiServer(content: VNodeContent, help: readonly VNodeContent[]): VNode {
     return fromServer(apiServer, content, help)
 }
 
-export function toTextMessage(content: VNodeContent, help: VNodeContent[]): VNode {
+export function toTextMessage(content: VNodeContent, help: readonly VNodeContent[]): VNode {
     return field({
         title: html`${apiServer} ${icon("arrow-right")} ${textMessage}`,
         body: content,
@@ -94,14 +97,14 @@ export function toTextMessage(content: VNodeContent, help: VNodeContent[]): VNod
     })
 }
 
-function toServer(server: VNodeContent, content: VNodeContent, help: VNodeContent[]) {
+function toServer(server: VNodeContent, content: VNodeContent, help: readonly VNodeContent[]) {
     return field({
         title: html`${browser} ${icon("arrow-right")} ${server}`,
         body: content,
         help,
     })
 }
-function fromServer(server: VNodeContent, content: VNodeContent, help: VNodeContent[]) {
+function fromServer(server: VNodeContent, content: VNodeContent, help: readonly VNodeContent[]) {
     return field({
         title: html`${server} ${icon("arrow-right")} ${browser}`,
         body: content,

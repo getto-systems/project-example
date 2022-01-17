@@ -1,28 +1,39 @@
 import {
-    docsAction,
     docsAction_legacy,
     docsModule,
     docsNote,
     docsSection,
 } from "../../../../ui/vendor/getto-application/docs/helper"
 
-import { DocsSection } from "../../../../ui/vendor/getto-application/docs/data"
+import { DocsAction, DocsSection } from "../../../../ui/vendor/getto-application/docs/data"
 
-export const docs_checkAuthTicket = docsAction("認証チケットの確認", ({ item }) => [
-    item(
-        "input",
-        ["認証チケット有効期限", "認証チケット延長トークン"],
-        ["ブラウザに保存されたデータ"],
-    ),
-    item("check", ["認証チケットが有効", "認証チケット延長トークンが有効"]),
-    item(
-        "success",
-        ["アプリケーションのロード", "認証チケット継続更新の開始"],
-        ["コンテンツアクセストークンが cookie で返される"],
-    ),
-    item("error", ["認証チケット有効期限切れ"], ["ログイン画面へ"]),
-    item("error", ["認証チケット延長トークン無効"], ["ログイン画面へ"]),
-])
+import { docs_authTicket } from "../docs"
+
+export const docs_checkAuthTicket: DocsAction = {
+    title: "認証チケットの確認",
+    action: [
+        {
+            type: "input",
+            content: ["認証チケット有効期限", "認証チケット延長トークン"],
+            help: ["ブラウザに保存されたデータ"],
+        },
+        {
+            type: "check",
+            check: ["認証チケットが有効", "認証チケット延長トークンが有効"],
+        },
+        {
+            type: "success",
+            action: ["アプリケーションのロード", "認証チケット継続更新の開始"],
+            help: ["コンテンツアクセストークンが cookie で返される"],
+        },
+        {
+            type: "error",
+            err: ["認証チケット有効期限切れ", "認証チケット延長トークン無効"],
+            help: ["ログイン画面へ"],
+        },
+    ],
+    data: [docs_authTicket],
+}
 
 export const docs_auth_checkAuthTicket: DocsSection[] = [
     docsSection("認証チケット更新", [

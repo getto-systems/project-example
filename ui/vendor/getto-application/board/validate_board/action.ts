@@ -90,7 +90,7 @@ function update<N extends string>(
     return compose(config.fields.map((field) => stack.get(field)))
 }
 
-function compose(results: ValidateBoardStateFound[]): ValidateBoardState {
+function compose(results: readonly ValidateBoardStateFound[]): ValidateBoardState {
     if (results.some((result) => result.found && !result.state)) {
         return "invalid"
     }

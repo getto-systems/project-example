@@ -11,7 +11,7 @@ export interface AuthTicketRepository {
 }
 export type AuthTicketRepositoryValue = Readonly<{
     authAt: string
-    roles: string[]
+    roles: readonly string[]
 }>
 
 export interface RenewAuthTicketRemote {
@@ -19,5 +19,5 @@ export interface RenewAuthTicketRemote {
 }
 
 export type AuthRemoteValue = Readonly<{
-    roles: string[]
+    roles: readonly string[]
 }>

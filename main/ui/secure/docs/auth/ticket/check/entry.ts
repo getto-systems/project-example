@@ -12,7 +12,7 @@ import { docsUsecase } from "../../../../../../../ui/vendor/getto-application/do
 render(
     h(DocsUsecaseEntry, {
         view: newDocsView(newForegroundOutsideFeature()),
-        docs: docsUsecase(docs_auth, "password/authenticate"),
+        docs: docsUsecase(docs_auth, "ticket/check"),
     }),
     document.body,
 )

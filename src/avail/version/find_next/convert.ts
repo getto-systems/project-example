@@ -51,7 +51,7 @@ export function versionConfigConverter(version: string): ParseVersionResult {
         }),
     }
 
-    function suffix(patch: string, additional: string[]) {
+    function suffix(patch: string, additional: readonly string[]) {
         const suffix = patch.replace(/^[0-9]+/, "")
         return [suffix, ...additional].join(".")
     }

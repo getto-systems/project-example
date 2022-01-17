@@ -18,8 +18,8 @@ export const loginIDBoardConverter: Converter = (value) => {
     return { valid: true, value: markLoginID(value) }
 }
 
-const EMPTY: ValidateLoginIDError[] = [{ type: "empty" }]
-const TOO_LONG: ValidateLoginIDError[] = [{ type: "too-long", maxLength: LOGIN_ID_MAX_LENGTH }]
+const EMPTY: readonly ValidateLoginIDError[] = [{ type: "empty" }]
+const TOO_LONG: readonly ValidateLoginIDError[] = [{ type: "too-long", maxLength: LOGIN_ID_MAX_LENGTH }]
 
 function markLoginID(loginID: string): LoginID {
     return loginID as LoginID

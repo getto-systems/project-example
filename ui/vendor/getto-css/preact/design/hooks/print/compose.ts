@@ -6,7 +6,7 @@ import { VNodeKey } from "../../../common"
 // design/print の report で出力される構造で、
 // rows が report のコンテンツの table - tbody - tr として整形される場合に使用できる
 export function useReportRowsComposition<R>(
-    rows: R[],
+    rows: readonly R[],
     content: ReportRowsCompositionContent
 ): ReportRowsComposition<R> {
     const [data, setData] = useState(initialReportRowsComposition(rows))
@@ -20,7 +20,7 @@ export function useReportRowsComposition<R>(
 }
 
 type ReportRowsComposition<R> = Readonly<{
-    pagedRows: R[][]
+    pagedRows: readonly ReadonlyArray<R>[]
     composeIndex: number
 }>
 
@@ -29,7 +29,7 @@ type ReportRowsCompositionContent = Readonly<{
     rowKey: { (tr: HTMLTableRowElement): string | null }
 }>
 
-function initialReportRowsComposition<R>(rows: R[]): ReportRowsComposition<R> {
+function initialReportRowsComposition<R>(rows: readonly R[]): ReportRowsComposition<R> {
     return { pagedRows: [rows], composeIndex: 0 }
 }
 
@@ -163,7 +163,7 @@ function nextComposition<R>(
         },
     }
 
-    function splitRows<R>(rows: R[]): R[][] {
+    function splitRows<R>(rows: readonly R[]): readonly ReadonlyArray<R>[] {
         // スペースによっては splitIndex に 0 が指定される場合がある
         // 少なくとも 1行は分割しないと無限ループになるのでその場合は index に 1 を使用する
         const index = Math.max(1, splitIndex)

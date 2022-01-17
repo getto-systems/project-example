@@ -239,7 +239,7 @@ function extendAlign({
     }
 }
 
-export type TableDataClassName = string[]
+export type TableDataClassName = readonly string[]
 
 function extendClassName({
     base,

@@ -64,7 +64,7 @@ export function SearchAuthUserAccountColumnsComponent(props: Props): VNode {
         return box_grow({ body: fieldError(repositoryError(err)) })
     }
 }
-function repositoryError(err: RepositoryError): string[] {
+function repositoryError(err: RepositoryError): readonly string[] {
     return repositoryErrorReason(err, (reason) => [
         `${reason.message}によりカラムの選択に失敗しました`,
         ...reason.detail,
