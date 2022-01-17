@@ -158,14 +158,7 @@ function toFieldHelp(message: VNodeContent) {
     return html`<p>${message}</p>`
 }
 
-export type ButtonsContent =
-    | ButtonsContent_left
-    | ButtonsContent_right
-    | (ButtonsContent_left & ButtonsContent_right)
-
-type ButtonsContent_left = Readonly<{ left: VNodeContent }>
-type ButtonsContent_right = Readonly<{ right: VNodeContent }>
-
+export type ButtonsContent = Partial<{ left: VNodeContent; right: VNodeContent }>
 export function buttons(content: ButtonsContent): VNode {
     return html`<aside class="button__container">
         <section class="button_left">${left()}</section>
@@ -173,13 +166,13 @@ export function buttons(content: ButtonsContent): VNode {
     </aside>`
 
     function left() {
-        if ("left" in content) {
+        if (content.left) {
             return content.left
         }
         return ""
     }
     function right() {
-        if ("right" in content) {
+        if (content.right) {
             return content.right
         }
         return ""

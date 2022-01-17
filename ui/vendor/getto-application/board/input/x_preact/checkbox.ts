@@ -35,7 +35,7 @@ export function CheckboxBoardComponent(props: Props): VNode {
 
             const content = { isChecked, input, key }
 
-            if ("block" in props && props.block) {
+            if (props.block) {
                 return checkbox_block(content)
             } else {
                 return checkbox(content)

@@ -112,9 +112,8 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
     }
 
     type FormContentType = "initial" | "valid" | "invalid" | "connecting" | "take-longtime"
-    type FormContent =
-        | Readonly<{ type: FormContentType }>
-        | Readonly<{ type: FormContentType; err: readonly VNodeContent[] }>
+    type FormContent = Readonly<{ type: FormContentType }> &
+        Partial<{ err: readonly VNodeContent[] }>
     function formBox(state: FormContent): VNode {
         return form(
             box({
@@ -196,7 +195,7 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
         }
 
         function message(): readonly VNode[] {
-            if ("err" in state) {
+            if (state.err) {
                 return [fieldError(state.err)]
             }
 

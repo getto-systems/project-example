@@ -4,33 +4,26 @@ import { html } from "htm/preact"
 import { VNodeContent } from "../common"
 import { SiteInfo } from "../../site"
 
-export type AppLayoutContent =
-    | AppLayoutContent_base
-    | (AppLayoutContent_base & AppLayoutContent_sidebar)
-    | (AppLayoutContent_base & AppLayoutContent_sidebar_double)
-
-type AppLayoutContent_base = Readonly<{
+export type AppLayoutContent = Readonly<{
     siteInfo: SiteInfo
     header: readonly VNodeContent[]
     main: VNodeContent
     menu: VNodeContent
-}>
-type AppLayoutContent_sidebar = Readonly<{
-    sidebar: VNodeContent
-}>
-type AppLayoutContent_sidebar_double = Readonly<{
-    sidebar_double: VNodeContent
-}>
+}> &
+    Partial<{
+        sidebar: VNodeContent
+        sidebar_double: VNodeContent
+    }>
 
 export function appLayout(content: AppLayoutContent): VNode {
     const { siteInfo, header, main, menu } = content
-    if ("sidebar" in content) {
+    if (content.sidebar) {
         return layoutContent("sidebar_single", siteInfo, header, [
             appBodyContainer([main, content.sidebar]),
             menu,
         ])
     }
-    if ("sidebar_double" in content) {
+    if (content.sidebar_double) {
         return layoutContent("sidebar_double", siteInfo, header, [
             appBodyContainer([main, content.sidebar_double]),
             menu,

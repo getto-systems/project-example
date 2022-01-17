@@ -185,13 +185,11 @@ export function tfoot(content: VNodeContent): VNode {
     </tfoot>`
 }
 
-export type TableHeaderContent =
-    | TableHeaderContent_base
-    | (TableHeaderContent_base & Readonly<{ singleLastBorderBottom: boolean }>)
-type TableHeaderContent_base = Readonly<{
+export type TableHeaderContent = Readonly<{
     sticky: TableDataSticky
     header: TableDataHeaderRow
-}>
+}> &
+    Partial<{ singleLastBorderBottom: boolean }>
 export function tableHeader(content: TableHeaderContent): readonly VNode[] {
     type HeaderRow = Readonly<{
         sticky: StickyHorizontalInfo
@@ -214,8 +212,6 @@ export function tableHeader(content: TableHeaderContent): readonly VNode[] {
         sticky,
         header: { key, className, headers },
     } = content
-    const singleLastBorderBottom =
-        "singleLastBorderBottom" in content && content.singleLastBorderBottom
 
     const base: BuildInfo = {
         sticky: { level: 0, borderWidth: 0 },
@@ -347,7 +343,7 @@ export function tableHeader(content: TableHeaderContent): readonly VNode[] {
         }
 
         function overrideLastBorderBottom(style: TableDataFullStyle): TableDataFullStyle {
-            if (!singleLastBorderBottom) {
+            if (!content.singleLastBorderBottom) {
                 return style
             }
             return overrideBorderBottomToSingle(style)
@@ -423,16 +419,13 @@ export function tableSummary({
     return [tr([key], className, summaries.map(summaryTd(sticky)))]
 }
 
-export type TableColumnContent =
-    | TableColumnContent_base
-    | (TableColumnContent_base & TableColumnContent_noBorderBottom)
-type TableColumnContent_base = Readonly<{
+export type TableColumnContent = Readonly<{
     sticky: TableDataSticky
     column: TableDataColumnRow
-}>
-type TableColumnContent_noBorderBottom = Readonly<{
-    noLastBorderBottom: boolean
-}>
+}> &
+    Partial<{
+        noLastBorderBottom: boolean
+    }>
 
 export function tableColumn(content: TableColumnContent): readonly VNode[] {
     type ColumnEntry = ColumnEntry_simple | ColumnEntry_expansion | ColumnEntry_tree
@@ -471,7 +464,6 @@ export function tableColumn(content: TableColumnContent): readonly VNode[] {
     }>
 
     const { sticky, column } = content
-    const noLastBorderBottom = "noLastBorderBottom" in content && content.noLastBorderBottom
 
     return buildColumnRows({ index: 0, bottom: true }, column).map(columnTr)
 
@@ -700,7 +692,7 @@ export function tableColumn(content: TableColumnContent): readonly VNode[] {
         }
 
         function overrideLastBorderBottom(style: TableDataFullStyle): TableDataFullStyle {
-            if (!noLastBorderBottom || !base.bottom) {
+            if (!content.noLastBorderBottom || !base.bottom) {
                 return style
             }
             return overrideBorderBottomToNone(style)

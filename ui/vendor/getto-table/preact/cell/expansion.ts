@@ -44,24 +44,16 @@ import {
 
 import { initiallyVisibleCells, isVisible } from "./helper"
 
-export type TableDataExpansionContent<M, R> =
-    | TableDataExpansionContent_base<M, R>
-    | (TableDataExpansionContent_base<M, R> & TableDataExpansionContent_summary<M>)
-    | (TableDataExpansionContent_base<M, R> & TableDataExpansionContent_footer<M>)
-    | (TableDataExpansionContent_base<M, R> &
-          TableDataExpansionContent_summary<M> &
-          TableDataExpansionContent_footer<M>)
-
-type TableDataExpansionContent_base<M, R> = Readonly<{
+export type TableDataExpansionContent<M, R> = Readonly<{
     label: VNodeContent
     header: TableDataContentDecorator
     column: TableDataExpansionColumnContentProvider<R>
     length: TableDataExpansionLengthProvider<M>
-}>
-type TableDataExpansionContent_summary<M> = Readonly<{
-    summary: TableDataSummaryContentProvider<M>
-}>
-type TableDataExpansionContent_footer<M> = Readonly<{ footer: TableDataSummaryContentProvider<M> }>
+}> &
+    Partial<{
+        summary: TableDataSummaryContentProvider<M>
+        footer: TableDataSummaryContentProvider<M>
+    }>
 
 export function tableCell_expansion<M, R>(
     key: TableDataCellKey,
@@ -146,7 +138,7 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
         return this.summaryContent(inherit, params, { style, content: content(this.content) })
 
         function content(content: TableDataExpansionContent<M, R>): TableDataSummaryProvider<M> {
-            if ("summary" in content) {
+            if (content.summary) {
                 return { type: "content", content: content.summary }
             }
             return { type: "none" }
@@ -197,8 +189,8 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
         return this.summaryContent(inherit, params, { style, content: content(this.content) })
 
         function content(content: TableDataExpansionContent<M, R>): TableDataSummaryProvider<M> {
-            if ("summary" in content) {
-                return { type: "content", content: content.summary }
+            if (content.footer) {
+                return { type: "content", content: content.footer }
             }
             return { type: "none" }
         }

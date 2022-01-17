@@ -4,10 +4,8 @@ import { html } from "htm/preact"
 import { VNodeContent } from "../common"
 import { SiteInfo } from "../../site"
 
-export type LoginBoxContent = LoginBoxContent_base | (LoginBoxContent_base & LoginBoxContent_footer)
-type LoginBoxContent_base = Readonly<{ title: VNodeContent; body: VNodeContent }>
-type LoginBoxContent_footer = Readonly<{ footer: VNodeContent }>
-
+export type LoginBoxContent = Readonly<{ title: VNodeContent; body: VNodeContent }> &
+    Partial<{ footer: VNodeContent }>
 export function loginBox(siteInfo: SiteInfo, content: LoginBoxContent): VNode {
     return html`<aside class="layout__login">
         <section class="loginBox">
@@ -30,7 +28,7 @@ export function loginBox(siteInfo: SiteInfo, content: LoginBoxContent): VNode {
         </header>`
     }
     function footer(): VNodeContent {
-        if ("footer" in content) {
+        if (content.footer) {
             return content.footer
         }
         return ""
