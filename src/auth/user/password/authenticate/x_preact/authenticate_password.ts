@@ -111,9 +111,7 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
 
     type State = "initial" | "valid" | "invalid" | "connecting"
 
-    type Content =
-        | Readonly<{ state: State }>
-        | Readonly<{ state: State; err: readonly VNodeContent[] }>
+    type Content = Readonly<{ state: State }> & Partial<{ err: readonly VNodeContent[] }>
 
     function authenticateTitle() {
         return "ログイン"
@@ -177,7 +175,7 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
         }
 
         function error(): VNode {
-            if ("err" in content) {
+            if (content.err) {
                 return fieldError(content.err)
             }
 

@@ -57,7 +57,7 @@ export function RequestResetTokenComponent(props: Props): VNode {
             case "failed-to-request-token":
                 return requestTokenForm({
                     state: "start",
-                    error: requestTokenError(state.err),
+                    err: requestTokenError(state.err),
                 })
 
             case "try-to-request-token":
@@ -73,9 +73,7 @@ export function RequestResetTokenComponent(props: Props): VNode {
 
     type FormState = "start" | "connecting"
 
-    type FormContent = FormContent_base | (FormContent_base & FormContent_error)
-    type FormContent_base = Readonly<{ state: FormState }>
-    type FormContent_error = Readonly<{ error: readonly VNodeContent[] }>
+    type FormContent = Readonly<{ state: FormState }> & Partial<{ err: readonly VNodeContent[] }>
 
     function requestTokenForm(content: FormContent): VNode {
         return form(
@@ -146,8 +144,8 @@ export function RequestResetTokenComponent(props: Props): VNode {
         }
 
         function error() {
-            if ("error" in content) {
-                return fieldError(content.error)
+            if (content.err) {
+                return fieldError(content.err)
             }
             return ""
         }

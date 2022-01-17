@@ -14,9 +14,8 @@ export interface TableStructure<M, R> {
     sticky(): TableDataSticky
 }
 
-export type TableDataParams<M> =
-    | Readonly<{ summary: M }>
-    | Readonly<{ summary: M; visibleKeys: readonly TableDataCellKey[] }>
+export type TableDataParams<M> = Readonly<{ summary: M }> &
+    Partial<{ visibleKeys: readonly TableDataCellKey[] }>
 export type TableDataCellKey = string
 
 export type TableDataView = Readonly<{

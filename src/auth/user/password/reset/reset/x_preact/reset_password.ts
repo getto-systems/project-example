@@ -76,7 +76,7 @@ export function ResetPasswordComponent(props: Props): VNode {
             return resetForm({ state: "reset" })
 
         case "failed-to-reset":
-            return resetForm({ state: "reset", error: resetError(props.state.err) })
+            return resetForm({ state: "reset", err: resetError(props.state.err) })
 
         case "try-to-reset":
             return resetForm({ state: "connecting" })
@@ -103,9 +103,8 @@ export function ResetPasswordComponent(props: Props): VNode {
 
     type ResetFormState = "reset" | "connecting"
 
-    type ResetFormContent = ResetFormContent_base | (ResetFormContent_base & ResetFormContent_error)
-    type ResetFormContent_base = Readonly<{ state: ResetFormState }>
-    type ResetFormContent_error = Readonly<{ error: readonly VNodeContent[] }>
+    type ResetFormContent = Readonly<{ state: ResetFormState }> &
+        Partial<{ err: readonly VNodeContent[] }>
 
     function resetTitle() {
         return "パスワードリセット"
@@ -184,8 +183,8 @@ export function ResetPasswordComponent(props: Props): VNode {
         }
 
         function error() {
-            if ("error" in content) {
-                return fieldError(content.error)
+            if (content.err) {
+                return fieldError(content.err)
             }
             return ""
         }

@@ -10,17 +10,12 @@ export function container_top(content: VNodeContent): VNode {
     return html`<section class="container container_top">${content}</section>`
 }
 
-export type BoxContent =
-    | BoxContent_body
-    | (BoxContent_title & BoxContent_body)
-    | (BoxContent_body & BoxContent_footer)
-    | (BoxContent_title & BoxContent_body & BoxContent_footer)
-
-type BoxContent_body =
-    | Readonly<{ body: VNodeContent }>
-    | Readonly<{ body: VNodeContent; form: boolean }>
-type BoxContent_title = Readonly<{ title: VNodeContent }>
-type BoxContent_footer = Readonly<{ footer: VNodeContent }>
+export type BoxContent = Readonly<{ body: VNodeContent }> &
+    Partial<{
+        form: boolean
+        title: VNodeContent
+        footer: VNodeContent
+    }>
 
 type BoxClass = "single" | "double" | "grow"
 function mapBoxClass(boxClass: BoxClass): string {
@@ -54,7 +49,7 @@ export function box_grow_transparent(content: VNodeContent): VNode {
 }
 
 function boxContent(boxClass: BoxClass, content: BoxContent): VNode {
-    if ("form" in content && content.form) {
+    if (content.form) {
         return html`<form class="${classAttribute()}">${inner()}</form>`
     } else {
         return html`<article class="${classAttribute()}">${inner()}</article>`
@@ -71,13 +66,13 @@ function boxContent(boxClass: BoxClass, content: BoxContent): VNode {
     }
 
     function header(): VNodeContent {
-        if ("title" in content) {
+        if (content.title) {
             return boxHeader(content.title)
         }
         return ""
     }
     function footer() {
-        if ("footer" in content) {
+        if (content.footer) {
             return boxFooter(content.footer)
         }
         return ""

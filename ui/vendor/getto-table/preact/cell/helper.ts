@@ -2,11 +2,7 @@ import { TableDataInherit } from "../cell"
 import { TableDataCellKey } from "../core"
 import { TableDataVisibleMutable } from "../mutable"
 
-type VisibleParams =
-    | {
-          // no props
-      }
-    | Readonly<{ visibleKeys: readonly TableDataCellKey[] }>
+type VisibleParams = Partial<{ visibleKeys: readonly TableDataCellKey[] }>
 export function isVisible(
     key: TableDataCellKey,
     { visibleType }: TableDataVisibleMutable,
@@ -22,7 +18,7 @@ export function isVisible(
     if (visibleType === "always") {
         return true
     }
-    if ("visibleKeys" in params) {
+    if (params.visibleKeys) {
         return params.visibleKeys.includes(key)
     } else {
         return true

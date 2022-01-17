@@ -43,21 +43,15 @@ import {
 
 import { initiallyVisibleCells, isVisible } from "./helper"
 
-export type TableDataSimpleContent<M, R> =
-    | TableDataSimpleContent_base<R>
-    | (TableDataSimpleContent_base<R> & TableDataSimpleContent_summary<M>)
-    | (TableDataSimpleContent_base<R> & TableDataSimpleContent_footer<M>)
-    | (TableDataSimpleContent_base<R> &
-          TableDataSimpleContent_summary<M> &
-          TableDataSimpleContent_footer<M>)
-
-type TableDataSimpleContent_base<R> = Readonly<{
+export type TableDataSimpleContent<M, R> = Readonly<{
     label: VNodeContent
     header: TableDataContentDecorator
     column: TableDataColumnContentProvider<R>
-}>
-type TableDataSimpleContent_summary<M> = Readonly<{ summary: TableDataSummaryContentProvider<M> }>
-type TableDataSimpleContent_footer<M> = Readonly<{ footer: TableDataSummaryContentProvider<M> }>
+}> &
+    Partial<{
+        summary: TableDataSummaryContentProvider<M>
+        footer: TableDataSummaryContentProvider<M>
+    }>
 
 export function tableCell<M, R>(
     key: TableDataCellKey,
@@ -138,7 +132,7 @@ class Cell<M, R> implements TableCellSimple<M, R> {
         return this.summaryContent(inherit, params, { style, content: content(this.content) })
 
         function content(content: TableDataSimpleContent<M, R>): TableDataSummaryProvider<M> {
-            if ("summary" in content) {
+            if (content.summary) {
                 return { type: "content", content: content.summary }
             }
             return { type: "none" }
@@ -177,7 +171,7 @@ class Cell<M, R> implements TableCellSimple<M, R> {
         return this.summaryContent(inherit, params, { style, content: content(this.content) })
 
         function content(content: TableDataSimpleContent<M, R>): TableDataSummaryProvider<M> {
-            if ("footer" in content) {
+            if (content.footer) {
                 return { type: "content", content: content.footer }
             }
             return { type: "none" }
