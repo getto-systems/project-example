@@ -4,14 +4,14 @@ import { newForegroundOutsideFeature } from "../../../../../src/x_outside_featur
 
 import { newDocsView } from "../../../../../src/docs/action_docs/init/resource"
 
-import { docs_privacyPolicy } from "../../../../../src/docs/docs"
-
 import { DocsDomainDetailEntry } from "../../../../../src/docs/action_docs/x_preact/domain_detail"
+
+import { docs_docs } from "../../../../../src/docs/docs"
 
 render(
     h(DocsDomainDetailEntry, {
         view: newDocsView(newForegroundOutsideFeature()),
-        docs: docs_privacyPolicy,
+        docs: docs_docs,
     }),
     document.body,
 )

@@ -1,20 +1,12 @@
-import { docs_auth_sign, docs_auth_sign_action, docs_auth_sign_data } from "./sign/sign/docs"
 import { docs_checkAuthTicket } from "./ticket/check/docs"
-
-import {
-    docsModule,
-    docsPurpose,
-    docsSection,
-    docsSection_pending,
-} from "../../ui/vendor/getto-application/docs/helper"
-
-import { DocsAction, DocsDomain, DocsSection } from "../../ui/vendor/getto-application/docs/data"
 import { docs_authTicket } from "./ticket/docs"
 import { docs_authenticatePassword } from "./user/password/authenticate/docs"
 import { docs_logout } from "./ticket/logout/docs"
 import { docs_requestResetToken } from "./user/password/reset/request_token/docs"
 import { docs_resetPassword } from "./user/password/reset/reset/docs"
 import { docs_changePassword } from "./user/password/change/docs"
+
+import { DocsAction, DocsDomain } from "../../ui/vendor/getto-application/docs/data"
 
 const docs_loadApplication: DocsAction = {
     title: "アプリケーションのロード",
@@ -74,41 +66,3 @@ export const docs_auth: DocsDomain = {
         },
     ],
 }
-
-export const docs_auth_legacy: DocsSection[] = [
-    docsSection("認証・認可", [
-        docsPurpose(["業務で必要な時に使用できる", "業務内容をプライベートに保つ"]),
-        docsModule(["認証", "プロフィール", "ユーザー管理"]),
-    ]),
-]
-
-const docs_auth_profile: DocsSection[] = [
-    docsSection_pending("プロフィール", [
-        docsPurpose(["業務で必要な時に使用できる", "業務内容をプライベートに保つ"]),
-        docsModule(["パスワード変更", "web 証明書再登録"]),
-    ]),
-]
-const docs_auth_user: DocsSection[] = [
-    docsSection_pending("ユーザー管理", [
-        docsPurpose(["業務で必要な時に使用できる", "業務内容をプライベートに保つ"]),
-        docsModule([
-            "ユーザーの登録",
-            "ユーザーの無効化",
-            "ユーザーの削除",
-            "ログインID 変更",
-            "アクセス権限変更",
-            "パスワード変更",
-            "web 証明書変更",
-        ]),
-    ]),
-]
-
-export const docs_auth_summary: DocsSection[] = [
-    ...docs_auth_sign,
-    ...docs_auth_profile,
-    ...docs_auth_user,
-]
-
-export const docs_auth_detail: DocsSection[][][] = [
-    [...docs_auth_sign_action, ...docs_auth_sign_data],
-]
