@@ -8,7 +8,7 @@ import { fieldError } from "../../../../../../ui/vendor/getto-css/preact/design/
 
 import { SearchColumnsComponent } from "../../../../../z_lib/ui/search/columns/x_preact/columns"
 
-import { repositoryErrorReason } from "../../../../../z_lib/ui/repository/reason"
+import { repositoryErrorReason } from "../../../../../z_lib/ui/repository/x_error/reason"
 
 import { SearchAuthUserAccountAction } from "../action"
 import { SearchColumnsState } from "../../../../../z_lib/ui/search/columns/action"

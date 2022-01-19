@@ -7,7 +7,7 @@ import { decodeProtobuf, encodeProtobuf } from "../../../../../../ui/vendor/prot
 import {
     fetchRepositoryRemovedResult,
     mapFetchRepositoryResult,
-} from "../../../repository/helper"
+} from "../../../repository/init/helper"
 
 import { RepositoryOutsideFeature } from "../../../repository/feature"
 

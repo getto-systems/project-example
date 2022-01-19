@@ -2,11 +2,14 @@ import { setupActionTestRunner } from "../../../../../ui/vendor/getto-applicatio
 
 import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockMultipleBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/init/mock"
+import { initMemoryDB } from "../../repository/init/memory"
+
+import { searchColumnsRepositoryConverter } from "./convert"
+import { convertDB } from "../../repository/init/convert"
 
 import { initSearchColumnsAction, SearchColumnsAction } from "./action"
 
 import { MultipleBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
-import { initMemoryDB } from "../../repository/init/memory"
 
 describe("SearchColumns", () => {
     test("select columns", async () => {
@@ -15,17 +18,19 @@ describe("SearchColumns", () => {
         const runner = setupActionTestRunner(resource.field.subscriber)
 
         await runner(async () => {
-            resource.field.load(["column-initial"])
+            await resource.field.load(["column-initial"])
             store.columns.set([markBoardValue("column-a")])
             resource.field.input.publisher.post()
             store.columns.set([markBoardValue("column-a"), markBoardValue("column-b")])
             resource.field.input.publisher.post()
+            await resource.field.load(["column-initial"])
             return resource.field.currentState()
         }).then((stack) => {
             expect(stack).toEqual([
                 { type: "succeed-to-load", columns: ["column-initial"] },
                 { type: "succeed-to-save", columns: ["column-a"] },
                 { type: "succeed-to-save", columns: ["column-a", "column-b"] },
+                { type: "succeed-to-load", columns: ["column-a", "column-b"] },
             ])
         })
     })
@@ -63,7 +68,7 @@ function initResource(): Readonly<{
 }> {
     const resource = {
         field: initSearchColumnsAction({
-            columnsRepository: initMemoryDB(),
+            columnsRepository: convertDB(initMemoryDB(), searchColumnsRepositoryConverter),
         }),
     }
 

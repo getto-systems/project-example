@@ -1,4 +1,4 @@
-import { RemoteOutsideFeature } from "./feature"
+import { RemoteOutsideFeature } from "../feature"
 
 import {
     RemoteFetchMethod,
@@ -6,9 +6,9 @@ import {
     RemoteHeader,
     RemoteNonce,
     RemoteErrorResult,
-} from "./infra"
+} from "../infra"
 
-import { RemoteCommonError, RemoteInfraError, RemoteServerError } from "./data"
+import { RemoteCommonError, RemoteInfraError, RemoteServerError } from "../data"
 
 export type RemoteFetchParams = Readonly<{
     serverURL: string

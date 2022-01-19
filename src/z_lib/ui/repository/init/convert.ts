@@ -1,4 +1,4 @@
-import { fetchRepositoryRemovedResult, mapFetchRepositoryResult } from "../helper"
+import { fetchRepositoryRemovedResult, mapFetchRepositoryResult } from "./helper"
 
 import { FetchRepositoryResult, RepositoryConverter, StoreRepositoryResult } from "../infra"
 

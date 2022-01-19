@@ -11,7 +11,6 @@ module.exports = {
         "!main/**",
         "!**/x_*/**",
         "!**/y_*/**",
-        "!**/z_*/**",
         "!**/test.ts",
         "!**/test_helper.ts",
         "!**/menu/**",

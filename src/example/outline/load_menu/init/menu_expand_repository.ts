@@ -4,7 +4,7 @@ import pb from "../../../../y_protobuf/proto.js"
 import {
     fetchRepositoryRemovedResult,
     mapFetchRepositoryResult,
-} from "../../../../z_lib/ui/repository/helper"
+} from "../../../../z_lib/ui/repository/init/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../ui/vendor/protobuf/helper"
 import { IndexedDBTarget, initIndexedDB } from "../../../../z_lib/ui/repository/init/indexed_db"
 

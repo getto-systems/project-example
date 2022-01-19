@@ -1,4 +1,4 @@
-import { RemoteCommonError } from "./data"
+import { RemoteCommonError } from "../data"
 
 export type RemoteCommonErrorReason = Readonly<{
     message: string

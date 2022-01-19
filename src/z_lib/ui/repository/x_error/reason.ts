@@ -1,4 +1,4 @@
-import { RepositoryError } from "./data"
+import { RepositoryError } from "../data"
 
 export type RepositoryErrorReason = Readonly<{
     message: string

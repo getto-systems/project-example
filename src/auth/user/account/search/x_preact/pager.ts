@@ -1,6 +1,6 @@
 import { h, VNode } from "preact"
 
-import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/reason"
+import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
 
 import { useApplicationAction } from "../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
 
