@@ -2,7 +2,7 @@ import { h, VNode } from "preact"
 import { useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
 
-import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/reason"
+import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_error/reason"
 
 import {
     useApplicationAction,

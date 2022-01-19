@@ -6,7 +6,7 @@ import {
     generateNonce,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../../z_lib/ui/remote/helper"
+} from "../../../../../../z_lib/ui/remote/init/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../../../ui/vendor/protobuf/helper"
 
 import { RemoteOutsideFeature } from "../../../../../../z_lib/ui/remote/feature"

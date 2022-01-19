@@ -1,4 +1,4 @@
-import { repositoryError } from "../helper"
+import { repositoryError } from "./helper"
 
 import { FetchRepositoryResult, RepositoryErrorResult, StoreRepositoryResult } from "../infra"
 

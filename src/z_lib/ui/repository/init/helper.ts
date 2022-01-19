@@ -3,7 +3,7 @@ import {
     StoreRepositoryResult,
     RepositoryErrorResult,
     FetchRepositoryRemovedResult,
-} from "./infra"
+} from "../infra"
 
 export function fetchRepositoryRemovedResult(
     result: StoreRepositoryResult,
