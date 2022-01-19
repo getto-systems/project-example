@@ -14,7 +14,7 @@ export const docs_notifyUnexpectedError: DocsAction = {
         },
         {
             type: "success",
-            action: ["エラーを通知"],
+            action: ["発生したエラーを収集", "エラーを通知"],
         },
     ],
     data: [],

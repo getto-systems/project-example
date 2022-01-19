@@ -102,16 +102,17 @@ export function docsUsecaseBox(docs: DocsUsecase): readonly VNode[] {
 export function docsActionBox(docs: DocsAction): VNode {
     return box({
         title: docs.title,
-        body: docs.action.map(action),
+        body: docs.action.map(docsActionField),
+    })
+}
+
+export function docsActionField(action: DocsActionContent): VNode {
+    return field({
+        title: itemType(action),
+        body: ul(content(action)),
+        help: action.help,
     })
 
-    function action(action: DocsActionContent): VNode {
-        return field({
-            title: itemType(action),
-            body: ul(content(action)),
-            help: action.help,
-        })
-    }
     function itemType(action: DocsActionContent): VNode {
         switch (action.type) {
             case "input":

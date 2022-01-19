@@ -9,6 +9,7 @@ import { docs_avail } from "../../../avail/docs"
 import { MenuContent, MenuPermission, MenuTreeNode } from "../kernel/infra"
 
 import { DocsDomain } from "../../../../ui/vendor/getto-application/docs/data"
+import { docs_docs } from "../../../docs/docs"
 
 export function docsMenuContent(): MenuContent {
     return {
@@ -23,6 +24,7 @@ export function docsMenuContent(): MenuContent {
             category("ドキュメント", allow, [
                 docsMenuNode(docs_auth),
                 item(docs_avail.title, lnir("files-alt"), "docs/avail.html"),
+                item(docs_docs.title, lnir("files-alt"), "docs/docs.html"),
             ]),
             ...devDocs(),
         ],

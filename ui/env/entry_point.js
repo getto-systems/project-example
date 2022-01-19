@@ -33,6 +33,7 @@ const entries = {
         { name: "docs/auth/password/change" },
 
         { name: "docs/avail" },
+        { name: "docs/docs" },
     ],
 }
 
