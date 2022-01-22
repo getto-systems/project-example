@@ -13,25 +13,27 @@ export interface LoadBreadcrumbListAction {
     load(): BreadcrumbList
 }
 
-export type LoadBreadcrumbListInfra = Readonly<{
-    version: string
-    menuTree: MenuTree
+export type LoadBreadcrumbListMaterial = Readonly<{
+    shell: LoadBreadcrumbListShell
+    config: LoadBreadcrumbListConfig
 }>
 export type LoadBreadcrumbListShell = Readonly<{
     detectTargetPath: MenuTargetPathDetecter
 }>
+export type LoadBreadcrumbListConfig = Readonly<{
+    version: string
+    menuTree: MenuTree
+}>
 
 export function initLoadBreadcrumbListAction(
-    infra: LoadBreadcrumbListInfra,
-    shell: LoadBreadcrumbListShell,
+    material: LoadBreadcrumbListMaterial,
 ): LoadBreadcrumbListAction {
     return {
-        load: () => load(infra, shell),
+        load: () => load(material),
     }
 }
 
-function load(infra: LoadBreadcrumbListInfra, shell: LoadBreadcrumbListShell): BreadcrumbList {
-    const { version } = infra
+function load({ shell, config }: LoadBreadcrumbListMaterial): BreadcrumbList {
     const { detectTargetPath } = shell
 
     const menuTargetPath = detectTargetPath()
@@ -41,7 +43,7 @@ function load(infra: LoadBreadcrumbListInfra, shell: LoadBreadcrumbListShell): B
     return build(menuTargetPath.value)
 
     function build(currentPath: MenuTargetPath): BreadcrumbList {
-        return toBreadcrumb(infra.menuTree)
+        return toBreadcrumb(config.menuTree)
 
         function toBreadcrumb(tree: MenuTree): BreadcrumbList {
             for (let i = 0; i < tree.length; i++) {
@@ -60,7 +62,10 @@ function load(infra: LoadBreadcrumbListInfra, shell: LoadBreadcrumbListShell): B
                     return itemNode(node.item)
             }
         }
-        function categoryNode(category: MenuTreeCategory, children: MenuTree): readonly BreadcrumbNode[] {
+        function categoryNode(
+            category: MenuTreeCategory,
+            children: MenuTree,
+        ): readonly BreadcrumbNode[] {
             const breadcrumb = toBreadcrumb(children)
             if (breadcrumb.length === 0) {
                 return EMPTY
@@ -71,7 +76,7 @@ function load(infra: LoadBreadcrumbListInfra, shell: LoadBreadcrumbListShell): B
             if (item.path !== currentPath) {
                 return EMPTY
             }
-            return [{ type: "item", item: toMenuItem(item, version) }]
+            return [{ type: "item", item: toMenuItem(item, config.version) }]
         }
     }
 }

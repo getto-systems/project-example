@@ -45,13 +45,13 @@ function unknownTarget() {
 function newResource(currentURL: URL): Readonly<{ breadcrumbList: LoadBreadcrumbListAction }> {
     const version = standard_version()
     return {
-        breadcrumbList: initLoadBreadcrumbListAction(
-            {
+        breadcrumbList: initLoadBreadcrumbListAction({
+            shell: mockLoadBreadcrumbListShell(currentURL, version),
+            config: {
                 version,
                 menuTree: standard_MenuTree(),
             },
-            mockLoadBreadcrumbListShell(currentURL, version),
-        ),
+        }),
     }
 }
 

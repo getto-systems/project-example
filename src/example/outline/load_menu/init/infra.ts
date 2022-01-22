@@ -1,5 +1,3 @@
-import { env } from "../../../../y_environment/ui/env"
-
 import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/feature"
 import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
 
@@ -13,13 +11,8 @@ import { LoadMenuInfra } from "../action"
 import { MenuContent } from "../../kernel/infra"
 
 type OutsideFeature = RepositoryOutsideFeature & RemoteOutsideFeature
-export function newLoadMenuInfra(
-    feature: OutsideFeature,
-    menuContent: MenuContent,
-): LoadMenuInfra {
+export function newLoadMenuInfra(feature: OutsideFeature, menuContent: MenuContent): LoadMenuInfra {
     return {
-        version: env.version,
-        menuTree: menuContent.menuTree,
         getMenuBadgeRemote: menuContent.loadMenuBadge
             ? newGetMenuBadgeRemote(feature)
             : async () => ({ success: true, value: new Map() }),

@@ -33,12 +33,17 @@ export type RequestResetTokenState =
     | Readonly<{ type: "initial-request-token" }>
     | RequestResetTokenEvent
 
-export type RequestResetTokenConfig = Readonly<{
-    takeLongtimeThreshold: DelayTime
+export type RequestResetTokenMaterial = Readonly<{
+    infra: RequestResetTokenInfra
+    config: RequestResetTokenConfig
 }>
 
 export type RequestResetTokenInfra = Readonly<{
     requestTokenRemote: RequestResetTokenRemote
+}>
+
+export type RequestResetTokenConfig = Readonly<{
+    takeLongtimeThreshold: DelayTime
 }>
 
 export const initialRequestResetTokenState: RequestResetTokenState = {
@@ -46,10 +51,9 @@ export const initialRequestResetTokenState: RequestResetTokenState = {
 }
 
 export function initRequestResetTokenAction(
-    config: RequestResetTokenConfig,
-    infra: RequestResetTokenInfra,
+    material: RequestResetTokenMaterial,
 ): RequestResetTokenAction {
-    return new Action(config, infra)
+    return new Action(material)
 }
 
 const requestResetTokenFieldNames = ["loginID"] as const
@@ -66,19 +70,17 @@ class Action
     readonly loginID: InputLoginIDAction
     readonly validate: ValidateBoardAction
 
-    config: RequestResetTokenConfig
-    infra: RequestResetTokenInfra
+    material: RequestResetTokenMaterial
     checker: ValidateBoardChecker<RequestResetTokenFieldName, RequestResetTokenFields>
 
-    constructor(config: RequestResetTokenConfig, infra: RequestResetTokenInfra) {
+    constructor(material: RequestResetTokenMaterial) {
         super({
             terminate: () => {
                 this.loginID.terminate()
                 this.validate.terminate()
             },
         })
-        this.config = config
-        this.infra = infra
+        this.material = material
 
         const loginID = initInputLoginIDAction()
 
@@ -116,7 +118,7 @@ class Action
         this.validate.clear()
     }
     submit(): Promise<RequestResetTokenState> {
-        return requestResetToken(this.config, this.infra, this.checker.get(), this.post)
+        return requestResetToken(this.material, this.checker.get(), this.post)
     }
 }
 
@@ -141,10 +143,9 @@ export const initialRequestResetTokenProfileState: RequestResetTokenProfileState
 }
 
 export function initRequestResetTokenProfileAction(
-    config: RequestResetTokenConfig,
-    infra: RequestResetTokenInfra,
+    material: RequestResetTokenMaterial,
 ): RequestResetTokenProfileAction {
-    return new ProfileAction(config, infra)
+    return new ProfileAction(material)
 }
 
 const requestResetTokenProfileFieldNames = ["loginID"] as const
@@ -159,19 +160,17 @@ class ProfileAction
     readonly loginID: InputLoginIDAction
     readonly validate: ValidateBoardAction
 
-    config: RequestResetTokenConfig
-    infra: RequestResetTokenInfra
+    material: RequestResetTokenMaterial
     checker: ValidateBoardChecker<RequestResetTokenProfileFieldName, RequestResetTokenFields>
 
-    constructor(config: RequestResetTokenConfig, infra: RequestResetTokenInfra) {
+    constructor(material: RequestResetTokenMaterial) {
         super({
             terminate: () => {
                 this.loginID.terminate()
                 this.validate.terminate()
             },
         })
-        this.config = config
-        this.infra = infra
+        this.material = material
 
         const loginID = initInputLoginIDAction()
 
@@ -213,7 +212,7 @@ class ProfileAction
         return this.post({ type: "input-login-id" })
     }
     submit(): Promise<RequestResetTokenProfileState> {
-        return requestResetToken(this.config, this.infra, this.checker.get(), this.post)
+        return requestResetToken(this.material, this.checker.get(), this.post)
     }
     close(): RequestResetTokenProfileState {
         this.clearInput()
@@ -233,8 +232,7 @@ type RequestResetTokenEvent =
     | Readonly<{ type: "succeed-to-request-token" }>
 
 async function requestResetToken<S>(
-    config: RequestResetTokenConfig,
-    infra: RequestResetTokenInfra,
+    { infra, config }: RequestResetTokenMaterial,
     fields: ConvertBoardResult<RequestResetTokenFields>,
     post: Post<RequestResetTokenEvent, S>,
 ): Promise<S> {

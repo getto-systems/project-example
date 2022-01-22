@@ -5,15 +5,21 @@ import { StartContinuousRenewEvent } from "./event"
 import { hasExpired } from "../kernel/helper"
 import { AuthTicket } from "../kernel/data"
 
-type AuthTicketHolder = Readonly<{ hold: false }> | Readonly<{ hold: true; ticket: AuthTicket }>
+export type StartContinuousRenewMaterial = Readonly<{
+    infra: StartContinuousRenewInfra
+    config: StartContinuousRenewConfig
+}>
+
+type AuthTicketHolder =
+    | Readonly<{ hasTicket: false }>
+    | Readonly<{ hasTicket: true; ticket: AuthTicket }>
 
 export async function startContinuousRenew<S>(
-    config: StartContinuousRenewConfig,
-    infra: StartContinuousRenewInfra,
+    { infra, config }: StartContinuousRenewMaterial,
     holder: AuthTicketHolder,
     post: Post<StartContinuousRenewEvent, S>,
 ): Promise<S> {
-    if (holder.hold) {
+    if (holder.hasTicket) {
         const { ticketRepository } = infra
         const result = await ticketRepository.set(holder.ticket)
         if (!result.success) {

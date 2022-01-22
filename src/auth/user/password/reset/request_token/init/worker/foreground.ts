@@ -16,7 +16,12 @@ import { RequestResetTokenProxyMessage, RequestResetTokenProxyResponse } from ".
 export function initRequestResetTokenView(
     infra: RequestResetTokenInfra,
 ): ApplicationView<RequestResetTokenAction> {
-    return toApplicationView(initRequestResetTokenAction(newRequestResetTokenConfig(), infra))
+    return toApplicationView(
+        initRequestResetTokenAction({
+            infra,
+            config: newRequestResetTokenConfig(),
+        }),
+    )
 }
 
 export type RequestResetTokenProxy = Readonly<{

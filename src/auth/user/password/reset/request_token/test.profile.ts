@@ -6,10 +6,7 @@ import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-applicati
 
 import { RequestResetTokenRemote, RequestResetTokenRemoteResult } from "./infra"
 import { BoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/infra"
-import {
-    initRequestResetTokenProfileAction,
-    RequestResetTokenProfileAction,
-} from "./action"
+import { initRequestResetTokenProfileAction, RequestResetTokenProfileAction } from "./action"
 
 const VALID_LOGIN = { loginID: "login-id" } as const
 
@@ -84,10 +81,7 @@ describe("RequestResetTokenProfile", () => {
             action.close()
             return action.currentState()
         }).then((stack) => {
-            expect(stack).toEqual([
-                { type: "input-login-id" },
-                { type: "initial-request-token" },
-            ])
+            expect(stack).toEqual([{ type: "input-login-id" }, { type: "initial-request-token" }])
         })
     })
 
@@ -130,14 +124,14 @@ function initView(requestTokenRemote: RequestResetTokenRemote): Readonly<{
     }>
 }> {
     const resource = {
-        requestToken: initRequestResetTokenProfileAction(
-            {
-                takeLongtimeThreshold: { delay_millisecond: 32 },
-            },
-            {
+        requestToken: initRequestResetTokenProfileAction({
+            infra: {
                 requestTokenRemote,
             },
-        ),
+            config: {
+                takeLongtimeThreshold: { delay_millisecond: 32 },
+            },
+        }),
     }
 
     const store = {

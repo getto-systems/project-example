@@ -135,51 +135,54 @@ function initAction(currentURL: URL): SignAction {
 
         check: () =>
             toApplicationView(
-                initCheckAuthTicketAction(
-                    newCheckAuthTicketConfig(),
-                    {
+                initCheckAuthTicketAction({
+                    infra: {
                         ticketRepository,
                         renewRemote,
                         clock,
                     },
-                    {
+                    shell: {
                         ...mockGetScriptPathShell(currentURL),
                     },
-                ),
+                    config: newCheckAuthTicketConfig(),
+                }),
             ),
 
         password_authenticate: () =>
             toApplicationView(
-                initAuthenticatePasswordAction(
-                    newAuthenticatePasswordConfig(),
-                    {
+                initAuthenticatePasswordAction({
+                    infra: {
                         ticketRepository,
                         renewRemote,
                         authenticateRemote,
                         clock,
                     },
-                    {
+                    shell: {
                         ...mockGetScriptPathShell(currentURL),
                     },
-                ),
+                    config: newAuthenticatePasswordConfig(),
+                }),
             ),
         password_reset: () =>
             toApplicationView(
-                initResetPasswordAction(
-                    newResetPasswordConfig(),
-                    {
+                initResetPasswordAction({
+                    infra: {
                         ticketRepository,
                         renewRemote,
                         resetRemote,
                         clock,
                     },
-                    mockResetPasswordShell(currentURL),
-                ),
+                    shell: mockResetPasswordShell(currentURL),
+                    config: newResetPasswordConfig(),
+                }),
             ),
         password_reset_requestToken: () =>
             toApplicationView(
-                initRequestResetTokenAction(newRequestResetTokenConfig(), {
-                    requestTokenRemote,
+                initRequestResetTokenAction({
+                    infra: {
+                        requestTokenRemote,
+                    },
+                    config: newRequestResetTokenConfig(),
                 }),
             ),
     })

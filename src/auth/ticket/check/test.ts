@@ -243,23 +243,23 @@ function initView(
     clock: Clock,
 ): ApplicationView<CheckAuthTicketAction> {
     return toApplicationView(
-        initCheckAuthTicketAction(
-            {
+        initCheckAuthTicketAction({
+            infra: {
+                ticketRepository,
+                renewRemote,
+                clock,
+            },
+            shell: {
+                ...mockGetScriptPathShell(new URL("https://example.com/index.html")),
+            },
+            config: {
                 continuousRenewInterval: { interval_millisecond: 128 },
                 ticketExpire: { expire_millisecond: 1 * 1000 },
                 instantLoadExpire: { expire_millisecond: 20 * 1000 },
                 takeLongtimeThreshold: { delay_millisecond: 32 },
                 secureServerURL: mockSecureServerURL("https://secure.example.com"),
             },
-            {
-                ticketRepository,
-                renewRemote,
-                clock,
-            },
-            {
-                ...mockGetScriptPathShell(new URL("https://example.com/index.html")),
-            },
-        ),
+        }),
     )
 }
 

@@ -61,11 +61,11 @@ export const initialAuthenticatePasswordState: AuthenticatePasswordState = {
     type: "initial-login",
 }
 
-export type AuthenticatePasswordConfig = Readonly<{
-    takeLongtimeThreshold: DelayTime
-}> &
-    StartContinuousRenewConfig &
-    GetScriptPathConfig
+export type AuthenticatePasswordMaterial = Readonly<{
+    infra: AuthenticatePasswordInfra
+    shell: AuthenticatePasswordShell
+    config: AuthenticatePasswordConfig
+}>
 
 export type AuthenticatePasswordInfra = Readonly<{
     authenticateRemote: AuthenticatePasswordRemote
@@ -74,12 +74,16 @@ export type AuthenticatePasswordInfra = Readonly<{
 
 export type AuthenticatePasswordShell = GetScriptPathShell
 
+export type AuthenticatePasswordConfig = Readonly<{
+    takeLongtimeThreshold: DelayTime
+}> &
+    StartContinuousRenewConfig &
+    GetScriptPathConfig
+
 export function initAuthenticatePasswordAction(
-    config: AuthenticatePasswordConfig,
-    infra: AuthenticatePasswordInfra,
-    shell: AuthenticatePasswordShell,
+    material: AuthenticatePasswordMaterial,
 ): AuthenticatePasswordAction {
-    return new Action(config, infra, shell)
+    return new Action(material)
 }
 
 class Action
@@ -94,16 +98,10 @@ class Action
     readonly password: InputPasswordAction
     readonly validate: ValidateBoardAction
 
-    config: AuthenticatePasswordConfig
-    infra: AuthenticatePasswordInfra
-    shell: AuthenticatePasswordShell
+    material: AuthenticatePasswordMaterial
     checker: ValidateBoardChecker<AuthenticatePasswordFieldName, AuthenticatePasswordFields>
 
-    constructor(
-        config: AuthenticatePasswordConfig,
-        infra: AuthenticatePasswordInfra,
-        shell: AuthenticatePasswordShell,
-    ) {
+    constructor(material: AuthenticatePasswordMaterial) {
         super({
             terminate: () => {
                 this.loginID.terminate()
@@ -111,9 +109,7 @@ class Action
                 this.validate.terminate()
             },
         })
-        this.config = config
-        this.infra = infra
-        this.shell = shell
+        this.material = material
 
         const loginID = initInputLoginIDAction()
         const password = initInputPasswordAction()
@@ -161,29 +157,24 @@ class Action
         return this.initialState
     }
     async submit(): Promise<AuthenticatePasswordState> {
-        const result = await authenticate(this.config, this.infra, this.checker.get(), this.post)
+        const result = await authenticate(this.material, this.checker.get(), this.post)
         if (!result.success) {
             return result.state
         }
         return this.startContinuousRenew(result.ticket)
     }
     async startContinuousRenew(ticket: AuthTicket): Promise<AuthenticatePasswordState> {
-        return await startContinuousRenew(
-            this.config,
-            this.infra,
-            { hold: true, ticket },
-            (event) => {
-                switch (event.type) {
-                    case "succeed-to-start-continuous-renew":
-                        return this.post({
-                            type: "try-to-load",
-                            scriptPath: this.secureScriptPath(),
-                        })
-                    default:
-                        return this.post(event)
-                }
-            },
-        )
+        return await startContinuousRenew(this.material, { hasTicket: true, ticket }, (event) => {
+            switch (event.type) {
+                case "succeed-to-start-continuous-renew":
+                    return this.post({
+                        type: "try-to-load",
+                        scriptPath: this.secureScriptPath(),
+                    })
+                default:
+                    return this.post(event)
+            }
+        })
     }
 
     async loadError(err: LoadScriptError): Promise<AuthenticatePasswordState> {
@@ -191,9 +182,14 @@ class Action
     }
 
     secureScriptPath() {
-        return getScriptPath(this.config, this.shell)
+        return getScriptPath(this.material)
     }
 }
+
+type AuthenticateMaterial = Readonly<{
+    infra: AuthenticatePasswordInfra
+    config: AuthenticatePasswordConfig
+}>
 
 type AuthenticateEvent =
     | Readonly<{ type: "try-to-login" }>
@@ -206,8 +202,7 @@ type AuthenticateResult<S> =
     | Readonly<{ success: false; state: S }>
 
 async function authenticate<S>(
-    config: AuthenticatePasswordConfig,
-    infra: AuthenticatePasswordInfra,
+    { infra, config }: AuthenticateMaterial,
     fields: ConvertBoardResult<AuthenticatePasswordFields>,
     post: Post<AuthenticateEvent, S>,
 ): Promise<AuthenticateResult<S>> {

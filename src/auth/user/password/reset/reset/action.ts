@@ -61,11 +61,11 @@ export const initialResetPasswordState: ResetPasswordState = {
     type: "initial-reset",
 }
 
-export type ResetPasswordConfig = Readonly<{
-    takeLongtimeThreshold: DelayTime
-}> &
-    StartContinuousRenewConfig &
-    GetScriptPathConfig
+export type ResetPasswordMaterial = Readonly<{
+    infra: ResetPasswordInfra
+    shell: ResetPasswordShell
+    config: ResetPasswordConfig
+}>
 
 export type ResetPasswordInfra = Readonly<{
     resetRemote: ResetPasswordRemote
@@ -77,12 +77,14 @@ export type ResetPasswordShell = Readonly<{
 }> &
     GetScriptPathShell
 
-export function initResetPasswordAction(
-    config: ResetPasswordConfig,
-    infra: ResetPasswordInfra,
-    shell: ResetPasswordShell,
-): ResetPasswordAction {
-    return new Action(config, infra, shell)
+export type ResetPasswordConfig = Readonly<{
+    takeLongtimeThreshold: DelayTime
+}> &
+    StartContinuousRenewConfig &
+    GetScriptPathConfig
+
+export function initResetPasswordAction(material: ResetPasswordMaterial): ResetPasswordAction {
+    return new Action(material)
 }
 
 class Action
@@ -97,12 +99,10 @@ class Action
     readonly password: InputPasswordAction
     readonly validate: ValidateBoardAction
 
-    config: ResetPasswordConfig
-    infra: ResetPasswordInfra
-    shell: ResetPasswordShell
+    material: ResetPasswordMaterial
     checker: ValidateBoardChecker<ResetPasswordFieldName, ResetPasswordFields>
 
-    constructor(config: ResetPasswordConfig, infra: ResetPasswordInfra, shell: ResetPasswordShell) {
+    constructor(material: ResetPasswordMaterial) {
         super({
             terminate: () => {
                 this.loginID.terminate()
@@ -110,9 +110,7 @@ class Action
                 this.validate.terminate()
             },
         })
-        this.config = config
-        this.infra = infra
-        this.shell = shell
+        this.material = material
 
         const loginID = initInputLoginIDAction()
         const password = initInputPasswordAction()
@@ -158,35 +156,24 @@ class Action
         this.validate.clear()
     }
     async submit(): Promise<ResetPasswordState> {
-        const result = await reset(
-            this.config,
-            this.infra,
-            this.shell,
-            this.checker.get(),
-            this.post,
-        )
+        const result = await reset(this.material, this.checker.get(), this.post)
         if (!result.success) {
             return result.state
         }
         return this.startContinuousRenew(result.ticket)
     }
     async startContinuousRenew(ticket: AuthTicket): Promise<ResetPasswordState> {
-        return await startContinuousRenew(
-            this.config,
-            this.infra,
-            { hold: true, ticket },
-            (event) => {
-                switch (event.type) {
-                    case "succeed-to-start-continuous-renew":
-                        return this.post({
-                            type: "try-to-load",
-                            scriptPath: this.secureScriptPath(),
-                        })
-                    default:
-                        return this.post(event)
-                }
-            },
-        )
+        return await startContinuousRenew(this.material, { hasTicket: true, ticket }, (event) => {
+            switch (event.type) {
+                case "succeed-to-start-continuous-renew":
+                    return this.post({
+                        type: "try-to-load",
+                        scriptPath: this.secureScriptPath(),
+                    })
+                default:
+                    return this.post(event)
+            }
+        })
     }
 
     async loadError(err: LoadScriptError): Promise<ResetPasswordState> {
@@ -194,7 +181,7 @@ class Action
     }
 
     secureScriptPath() {
-        return getScriptPath(this.config, this.shell)
+        return getScriptPath(this.material)
     }
 }
 
@@ -209,9 +196,7 @@ type ResetResult<S> =
     | Readonly<{ success: false; state: S }>
 
 async function reset<S>(
-    config: ResetPasswordConfig,
-    infra: ResetPasswordInfra,
-    shell: ResetPasswordShell,
+    { infra, shell, config }: ResetPasswordMaterial,
     fields: ConvertBoardResult<ResetPasswordFields>,
     post: Post<ResetEvent, S>,
 ): Promise<ResetResult<S>> {

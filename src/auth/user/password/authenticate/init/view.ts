@@ -19,17 +19,17 @@ export function newAuthenticatePasswordView(
     feature: RemoteOutsideFeature & RepositoryOutsideFeature & LocationOutsideFeature,
 ): ApplicationView<AuthenticatePasswordAction> {
     return toApplicationView(
-        initAuthenticatePasswordAction(
-            newAuthenticatePasswordConfig(),
-            {
+        initAuthenticatePasswordAction({
+            infra: {
                 ticketRepository: newAuthTicketRepository(feature),
                 renewRemote: newRenewAuthTicketRemote(feature, newClock()),
                 authenticateRemote: newAuthenticatePasswordRemote(feature, newClock()),
                 clock: newClock(),
             },
-            {
+            shell: {
                 ...newGetScriptPathShell(feature),
             },
-        ),
+            config: newAuthenticatePasswordConfig(),
+        }),
     )
 }

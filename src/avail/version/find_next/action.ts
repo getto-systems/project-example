@@ -25,24 +25,27 @@ export const initialFindNextVersionState: FindNextVersionState = {
     type: "initial-next-version",
 }
 
-export type FindNextVersionConfig = Readonly<{
-    takeLongtimeThreshold: DelayTime
+export type FindNextVersionMaterial = Readonly<{
+    infra: FindNextVersionInfra
+    shell: FindNextVersionShell
+    config: FindNextVersionConfig
 }>
 export type FindNextVersionInfra = Readonly<{
-    version: string
-    versionSuffix: string
     check: CheckDeployExistsRemote
 }>
 export type FindNextVersionShell = Readonly<{
     detectTargetPath: ApplicationTargetPathDetecter
 }>
+export type FindNextVersionConfig = Readonly<{
+    version: string
+    versionSuffix: string
+    takeLongtimeThreshold: DelayTime
+}>
 
 export function initFindNextVersionAction(
-    config: FindNextVersionConfig,
-    infra: FindNextVersionInfra,
-    shell: FindNextVersionShell,
+    material: FindNextVersionMaterial,
 ): FindNextVersionAction {
-    return new Action(config, infra, shell)
+    return new Action(material)
 }
 
 class Action
@@ -51,13 +54,9 @@ class Action
 {
     readonly initialState = initialFindNextVersionState
 
-    constructor(
-        config: FindNextVersionConfig,
-        infra: FindNextVersionInfra,
-        shell: FindNextVersionShell,
-    ) {
+    constructor(material: FindNextVersionMaterial) {
         super({
-            ignite: () => findNextVersion(config, infra, shell, this.post),
+            ignite: () => findNextVersion(material, this.post),
         })
     }
 }
@@ -73,27 +72,25 @@ export type FindNextVersionEvent =
       }>
 
 async function findNextVersion<S>(
-    config: FindNextVersionConfig,
-    infra: FindNextVersionInfra,
-    shell: FindNextVersionShell,
+    { infra, shell, config }: FindNextVersionMaterial,
     post: Post<FindNextVersionEvent, S>,
 ): Promise<S> {
-    const { version, versionSuffix } = infra
+    const { check } = infra
 
-    const currentVersion = versionConfigConverter(version)
+    const currentVersion = versionConfigConverter(config.version)
 
     if (!currentVersion.valid) {
         return post({
             type: "succeed-to-find",
             upToDate: true,
-            version: versionStringConverter(version),
+            version: versionStringConverter(config.version),
             target: shell.detectTargetPath(),
         })
     }
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const next = await delayedChecker(
-        findNext(infra.check, currentVersion.value, versionSuffix),
+        findNext(check, currentVersion.value, config.versionSuffix),
         config.takeLongtimeThreshold,
         () => post({ type: "take-longtime-to-find" }),
     )
@@ -105,7 +102,7 @@ async function findNextVersion<S>(
         return post({
             type: "succeed-to-find",
             upToDate: true,
-            version: versionStringConverter(version),
+            version: versionStringConverter(config.version),
             target: shell.detectTargetPath(),
         })
     } else {

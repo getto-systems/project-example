@@ -4,10 +4,12 @@ import { toScriptPath } from "./convert"
 
 import { ConvertScriptPathResult } from "./data"
 
-export function getScriptPath(
-    config: GetScriptPathConfig,
-    shell: GetScriptPathShell,
-): ConvertScriptPathResult {
+export type GetScriptPathMaterial = Readonly<{
+    shell: GetScriptPathShell
+    config: GetScriptPathConfig
+}>
+
+export function getScriptPath({ shell, config }: GetScriptPathMaterial): ConvertScriptPathResult {
     const pathname = shell.detectLocationPathname()
     if (!pathname.valid) {
         return { valid: false }

@@ -362,20 +362,22 @@ function initResource(
 
     return [
         {
-            menu: initLoadMenuAction(
-                {
-                    version,
-                    menuTree: standard_MenuTree(),
+            menu: initLoadMenuAction({
+                infra: {
                     getMenuBadgeRemote,
                     ticketRepository,
                     menuExpandRepository,
                     menuExpandStore: initMenuExpandStore(),
                     menuBadgeStore: initMenuBadgeStore(),
                 },
-                {
+                shell: {
                     detectTargetPath,
                 },
-            ),
+                config: {
+                    version,
+                    menuTree: standard_MenuTree(),
+                },
+            }),
         },
         menuExpandRepository,
     ]

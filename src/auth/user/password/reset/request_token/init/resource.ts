@@ -18,10 +18,10 @@ export function newRequestResetTokenView(
     feature: OutsideFeature,
 ): ApplicationView<RequestResetTokenAction> {
     return toApplicationView(
-        initRequestResetTokenAction(
-            newRequestResetTokenConfig(),
-            newRequestResetTokenInfra(feature),
-        ),
+        initRequestResetTokenAction({
+            infra: newRequestResetTokenInfra(feature),
+            config: newRequestResetTokenConfig(),
+        }),
     )
 }
 
@@ -29,9 +29,9 @@ export function newRequestResetTokenProfileResource(
     feature: OutsideFeature,
 ): Readonly<{ requestToken: RequestResetTokenProfileAction }> {
     return {
-        requestToken: initRequestResetTokenProfileAction(
-            newRequestResetTokenConfig(),
-            newRequestResetTokenInfra(feature),
-        ),
+        requestToken: initRequestResetTokenProfileAction({
+            infra: newRequestResetTokenInfra(feature),
+            config: newRequestResetTokenConfig(),
+        }),
     }
 }

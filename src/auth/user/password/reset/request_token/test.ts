@@ -109,14 +109,14 @@ function initView(requestTokenRemote: RequestResetTokenRemote): Readonly<{
     }>
 }> {
     const view = toApplicationView(
-        initRequestResetTokenAction(
-            {
-                takeLongtimeThreshold: { delay_millisecond: 32 },
-            },
-            {
+        initRequestResetTokenAction({
+            infra: {
                 requestTokenRemote,
             },
-        ),
+            config: {
+                takeLongtimeThreshold: { delay_millisecond: 32 },
+            },
+        }),
     )
 
     const store = {

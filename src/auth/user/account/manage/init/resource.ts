@@ -18,10 +18,10 @@ export function newManageUserAccountResource(
         HistoryOutsideFeature,
 ): Readonly<{ search: SearchAuthUserAccountAction }> {
     return {
-        search: initSearchAuthUserAccountAction(
-            newSearchAuthUserAccountConfig(),
-            newSearchAuthUserAccountInfra(feature, "auth/user/account.search"),
-            newSearchAuthUserAccountShell(feature),
-        ),
+        search: initSearchAuthUserAccountAction({
+            infra: newSearchAuthUserAccountInfra(feature, "auth/user/account.search"),
+            shell: newSearchAuthUserAccountShell(feature),
+            config: newSearchAuthUserAccountConfig(),
+        }),
     }
 }
