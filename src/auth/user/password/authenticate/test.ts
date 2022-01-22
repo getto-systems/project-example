@@ -5,7 +5,10 @@ import { ticker } from "../../../../z_lib/ui/timer/helper"
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_lib/ui/clock/mock"
 import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
 import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/init/mock"
-import { mockGetScriptPathShell, mockSecureServerURL } from "../../../sign/get_script_path/init/mock"
+import {
+    mockGetScriptPathShell,
+    mockSecureServerURL,
+} from "../../../sign/get_script_path/init/mock"
 
 import { Clock } from "../../../../z_lib/ui/clock/infra"
 import { AuthenticatePasswordRemote, AuthenticatePasswordRemoteResult } from "./infra"
@@ -205,23 +208,23 @@ function initView(
     const ticketRepository = standard_ticketRepository()
 
     const view = toApplicationView(
-        initAuthenticatePasswordAction(
-            {
-                continuousRenewInterval: { interval_millisecond: 128 },
-                ticketExpire: { expire_millisecond: 500 },
-                takeLongtimeThreshold: { delay_millisecond: 32 },
-                secureServerURL: mockSecureServerURL("https://secure.example.com"),
-            },
-            {
+        initAuthenticatePasswordAction({
+            infra: {
                 ticketRepository,
                 renewRemote,
                 authenticateRemote,
                 clock,
             },
-            {
+            shell: {
                 ...mockGetScriptPathShell(currentURL),
             },
-        ),
+            config: {
+                continuousRenewInterval: { interval_millisecond: 128 },
+                ticketExpire: { expire_millisecond: 500 },
+                takeLongtimeThreshold: { delay_millisecond: 32 },
+                secureServerURL: mockSecureServerURL("https://secure.example.com"),
+            },
+        }),
     )
 
     const store = {

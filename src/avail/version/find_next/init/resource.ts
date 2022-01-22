@@ -14,10 +14,10 @@ export function newFindNextVersionView(
     feature: LocationOutsideFeature,
 ): ApplicationView<FindNextVersionAction> {
     return toApplicationView(
-        initFindNextVersionAction(
-            newFindNextVersionConfig(),
-            newFindNextVersionInfra(),
-            newFindNextVersionShell(feature),
-        ),
+        initFindNextVersionAction({
+            infra: newFindNextVersionInfra(),
+            shell: newFindNextVersionShell(feature),
+            config: newFindNextVersionConfig(),
+        }),
     )
 }

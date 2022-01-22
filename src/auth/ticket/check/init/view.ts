@@ -19,16 +19,16 @@ export function newCheckAuthTicketView(
     feature: OutsideFeature,
 ): ApplicationView<CheckAuthTicketAction> {
     return toApplicationView(
-        initCheckAuthTicketAction(
-            newCheckAuthTicketConfig(),
-            {
+        initCheckAuthTicketAction({
+            infra: {
                 ticketRepository: newAuthTicketRepository(feature),
                 renewRemote: newRenewAuthTicketRemote(feature, newClock()),
                 clock: newClock(),
             },
-            {
+            shell: {
                 ...newGetScriptPathShell(feature),
             },
-        ),
+            config: newCheckAuthTicketConfig(),
+        }),
     )
 }

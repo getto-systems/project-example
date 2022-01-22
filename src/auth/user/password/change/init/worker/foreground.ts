@@ -13,7 +13,12 @@ import { ChangePasswordProxyMessage, ChangePasswordProxyResponse } from "./messa
 export function initChangePasswordView(
     infra: ChangePasswordInfra,
 ): ApplicationView<ChangePasswordAction> {
-    return toApplicationView(initChangePasswordAction(newChangePasswordConfig(), infra))
+    return toApplicationView(
+        initChangePasswordAction({
+            infra,
+            config: newChangePasswordConfig(),
+        }),
+    )
 }
 
 export type ChangePasswordProxy = Readonly<{

@@ -11,9 +11,9 @@ export function newChangePasswordResource(
     feature: OutsideFeature,
 ): Readonly<{ change: ChangePasswordAction }> {
     return {
-        change: initChangePasswordAction(
-            newChangePasswordConfig(),
-            newChangePasswordInfra(feature),
-        ),
+        change: initChangePasswordAction({
+            infra: newChangePasswordInfra(feature),
+            config: newChangePasswordConfig(),
+        }),
     }
 }

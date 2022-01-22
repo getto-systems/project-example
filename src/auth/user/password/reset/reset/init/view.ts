@@ -22,18 +22,18 @@ export function newResetPasswordView(
     feature: RemoteOutsideFeature & RepositoryOutsideFeature & LocationOutsideFeature,
 ): ApplicationView<ResetPasswordAction> {
     return toApplicationView(
-        initResetPasswordAction(
-            newResetPasswordConfig(),
-            {
+        initResetPasswordAction({
+            infra: {
                 ticketRepository: newAuthTicketRepository(feature),
                 renewRemote: newRenewAuthTicketRemote(feature, newClock()),
                 resetRemote: newResetPasswordRemote(feature, newClock()),
                 clock: newClock(),
             },
-            {
+            shell: {
                 ...newGetScriptPathShell(feature),
                 detectResetToken: () => detectResetToken(toURL(feature)),
             },
-        ),
+            config: newResetPasswordConfig(),
+        }),
     )
 }

@@ -40,19 +40,21 @@ export const initialChangePasswordState: ChangePasswordState = {
     type: "initial-change-password",
 }
 
-export type ChangePasswordConfig = Readonly<{
-    takeLongtimeThreshold: DelayTime
+export type ChangePasswordMaterial = Readonly<{
+    infra: ChangePasswordInfra
+    config: ChangePasswordConfig
 }>
 
 export type ChangePasswordInfra = Readonly<{
     changePasswordRemote: ChangePasswordRemote
 }>
 
-export function initChangePasswordAction(
-    config: ChangePasswordConfig,
-    infra: ChangePasswordInfra,
-): ChangePasswordAction {
-    return new Action(config, infra)
+export type ChangePasswordConfig = Readonly<{
+    takeLongtimeThreshold: DelayTime
+}>
+
+export function initChangePasswordAction(material: ChangePasswordMaterial): ChangePasswordAction {
+    return new Action(material)
 }
 
 class Action
@@ -65,11 +67,10 @@ class Action
     readonly newPassword: InputPasswordAction
     readonly validate: ValidateBoardAction
 
-    config: ChangePasswordConfig
-    infra: ChangePasswordInfra
+    material: ChangePasswordMaterial
     checker: ValidateBoardChecker<ChangePasswordFieldName, ChangePasswordFields>
 
-    constructor(config: ChangePasswordConfig, infra: ChangePasswordInfra) {
+    constructor(material: ChangePasswordMaterial) {
         super({
             terminate: () => {
                 this.currentPassword.terminate()
@@ -77,8 +78,7 @@ class Action
                 this.validate.terminate()
             },
         })
-        this.config = config
-        this.infra = infra
+        this.material = material
 
         const currentPassword = initInputPasswordAction()
         const newPassword = initInputPasswordAction()
@@ -128,7 +128,7 @@ class Action
         return this.post({ type: "input-password" })
     }
     async submit(): Promise<ChangePasswordState> {
-        return changePassword(this.config, this.infra, this.checker.get(), this.post)
+        return changePassword(this.material, this.checker.get(), this.post)
     }
     close(): ChangePasswordState {
         this.clearInput()
@@ -149,8 +149,7 @@ type ChangePasswordEvent =
     | Readonly<{ type: "succeed-to-change-password" }>
 
 async function changePassword<S>(
-    config: ChangePasswordConfig,
-    infra: ChangePasswordInfra,
+    { infra, config }: ChangePasswordMaterial,
     fields: ConvertBoardResult<ChangePasswordFields>,
     post: Post<ChangePasswordEvent, S>,
 ): Promise<S> {

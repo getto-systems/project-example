@@ -228,21 +228,21 @@ function initView(
     const ticketRepository = standard_ticketRepository()
 
     const view = toApplicationView(
-        initResetPasswordAction(
-            {
-                continuousRenewInterval: { interval_millisecond: 64 },
-                ticketExpire: { expire_millisecond: 500 },
-                takeLongtimeThreshold: { delay_millisecond: 32 },
-                secureServerURL: mockSecureServerURL("https://secure.example.com"),
-            },
-            {
+        initResetPasswordAction({
+            infra: {
                 ticketRepository,
                 renewRemote,
                 resetRemote,
                 clock,
             },
-            mockResetPasswordShell(currentURL),
-        ),
+            shell: mockResetPasswordShell(currentURL),
+            config: {
+                continuousRenewInterval: { interval_millisecond: 64 },
+                ticketExpire: { expire_millisecond: 500 },
+                takeLongtimeThreshold: { delay_millisecond: 32 },
+                secureServerURL: mockSecureServerURL("https://secure.example.com"),
+            },
+        }),
     )
 
     const store = {

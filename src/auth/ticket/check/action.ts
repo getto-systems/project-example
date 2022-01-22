@@ -31,6 +31,12 @@ export interface CheckAuthTicketAction extends StatefulApplicationAction<CheckAu
     loadError(err: LoadScriptError): Promise<CheckAuthTicketState>
 }
 
+export type CheckAuthTicketMaterial = Readonly<{
+    infra: CheckAuthTicketInfra
+    shell: CheckAuthTicketShell
+    config: CheckAuthTicketConfig
+}>
+
 export type CheckAuthTicketInfra = Readonly<{
     ticketRepository: AuthTicketRepository
     renewRemote: RenewAuthTicketRemote
@@ -38,14 +44,14 @@ export type CheckAuthTicketInfra = Readonly<{
 }> &
     StartContinuousRenewInfra
 
+export type CheckAuthTicketShell = GetScriptPathShell
+
 export type CheckAuthTicketConfig = Readonly<{
     instantLoadExpire: ExpireTime
     takeLongtimeThreshold: DelayTime
 }> &
     StartContinuousRenewConfig &
     GetScriptPathConfig
-
-export type CheckAuthTicketShell = GetScriptPathShell
 
 export type CheckAuthTicketState =
     | Readonly<{ type: "initial-check" }>
@@ -60,11 +66,9 @@ export const initialCheckAuthTicketState: CheckAuthTicketState = {
 }
 
 export function initCheckAuthTicketAction(
-    config: CheckAuthTicketConfig,
-    infra: CheckAuthTicketInfra,
-    shell: CheckAuthTicketShell,
+    material: CheckAuthTicketMaterial,
 ): CheckAuthTicketAction {
-    return new Action(config, infra, shell)
+    return new Action(material)
 }
 
 class Action
@@ -73,18 +77,12 @@ class Action
 {
     readonly initialState = initialCheckAuthTicketState
 
-    config: CheckAuthTicketConfig
-    infra: CheckAuthTicketInfra
-    shell: CheckAuthTicketShell
+    material: CheckAuthTicketMaterial
 
-    constructor(
-        config: CheckAuthTicketConfig,
-        infra: CheckAuthTicketInfra,
-        shell: CheckAuthTicketShell,
-    ) {
+    constructor(material: CheckAuthTicketMaterial) {
         super({
             ignite: async () => {
-                const checkResult = await check(this.config, this.infra, this.post)
+                const checkResult = await check(this.material, this.post)
                 if (!checkResult.success) {
                     return checkResult.state
                 }
@@ -97,16 +95,14 @@ class Action
                 return this.startContinuousRenew(checkResult.ticket)
             },
         })
-        this.config = config
-        this.infra = infra
-        this.shell = shell
+        this.material = material
     }
 
     succeedToInstantLoad(): Promise<CheckAuthTicketState> {
-        return startContinuousRenew(this.config, this.infra, { hold: false }, this.post)
+        return startContinuousRenew(this.material, { hasTicket: false }, this.post)
     }
     async failedToInstantLoad(): Promise<CheckAuthTicketState> {
-        const result = await renew(this.config, this.infra, this.post)
+        const result = await renew(this.material, this.post)
         if (!result.success) {
             return result.state
         }
@@ -117,28 +113,28 @@ class Action
     }
 
     secureScriptPath() {
-        return getScriptPath(this.config, this.shell)
+        return getScriptPath(this.material)
     }
 
     async startContinuousRenew(ticket: AuthTicket): Promise<CheckAuthTicketState> {
-        return await startContinuousRenew(
-            this.config,
-            this.infra,
-            { hold: true, ticket },
-            (event) => {
-                switch (event.type) {
-                    case "succeed-to-start-continuous-renew":
-                        return this.post({
-                            type: "try-to-load",
-                            scriptPath: this.secureScriptPath(),
-                        })
-                    default:
-                        return this.post(event)
-                }
-            },
-        )
+        return await startContinuousRenew(this.material, { hasTicket: true, ticket }, (event) => {
+            switch (event.type) {
+                case "succeed-to-start-continuous-renew":
+                    return this.post({
+                        type: "try-to-load",
+                        scriptPath: this.secureScriptPath(),
+                    })
+                default:
+                    return this.post(event)
+            }
+        })
     }
 }
+
+type CheckMaterial = Readonly<{
+    infra: CheckAuthTicketInfra
+    config: CheckAuthTicketConfig
+}>
 
 type RenewEvent =
     | Readonly<{ type: "required-to-login" }>
@@ -153,8 +149,7 @@ type CheckResult<S> =
     | Readonly<{ success: false; state: S }>
 
 async function check<S>(
-    config: CheckAuthTicketConfig,
-    infra: CheckAuthTicketInfra,
+    { infra, config }: CheckMaterial,
     post: Post<RenewEvent, S>,
 ): Promise<CheckResult<S>> {
     const { clock, ticketRepository } = infra
@@ -175,7 +170,7 @@ async function check<S>(
         return { success: true, expired: false }
     }
 
-    const renewResult = await renew(config, infra, post)
+    const renewResult = await renew({ config, infra }, post)
     if (!renewResult.success) {
         return renewResult
     }
@@ -183,13 +178,17 @@ async function check<S>(
     return { success: true, expired: true, ticket: renewResult.ticket }
 }
 
+type RenewMaterial = Readonly<{
+    config: CheckAuthTicketConfig
+    infra: CheckAuthTicketInfra
+}>
+
 type RenewResult<S> =
     | Readonly<{ success: true; ticket: AuthTicket }>
     | Readonly<{ success: false; state: S }>
 
 async function renew<S>(
-    config: CheckAuthTicketConfig,
-    infra: CheckAuthTicketInfra,
+    { infra, config }: RenewMaterial,
     post: Post<RenewEvent, S>,
 ): Promise<RenewResult<S>> {
     const { ticketRepository, renewRemote } = infra

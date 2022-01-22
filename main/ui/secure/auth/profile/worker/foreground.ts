@@ -69,15 +69,18 @@ async function newResource() {
 
 function newChangePasswordResource(proxy: Proxy) {
     return {
-        change: initChangePasswordAction(newChangePasswordConfig(), proxy.password.change.infra),
+        change: initChangePasswordAction({
+            infra: proxy.password.change.infra,
+            config: newChangePasswordConfig(),
+        }),
     }
 }
 function newRequestResetTokenProfileResource(proxy: Proxy) {
     return {
-        requestToken: initRequestResetTokenProfileAction(
-            newRequestResetTokenConfig(),
-            proxy.password.reset.requestToken.infra,
-        ),
+        requestToken: initRequestResetTokenProfileAction({
+            infra: proxy.password.reset.requestToken.infra,
+            config: newRequestResetTokenConfig(),
+        }),
     }
 }
 

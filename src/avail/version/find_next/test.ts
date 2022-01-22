@@ -311,17 +311,17 @@ function initView(
     check: CheckDeployExistsRemote,
 ): ApplicationView<FindNextVersionAction> {
     return toApplicationView(
-        initFindNextVersionAction(
-            {
-                takeLongtimeThreshold: { delay_millisecond: 1 },
-            },
-            {
+        initFindNextVersionAction({
+            infra: {
                 check,
+            },
+            shell: mockFindNextVersionShell(currentURL, version),
+            config: {
                 version,
                 versionSuffix: "-ui",
+                takeLongtimeThreshold: { delay_millisecond: 1 },
             },
-            mockFindNextVersionShell(currentURL, version),
-        ),
+        }),
     )
 }
 

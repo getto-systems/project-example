@@ -47,8 +47,10 @@ export interface SearchAuthUserAccountAction
     sort(key: string): Promise<SearchAuthUserAccountState>
 }
 
-export type SearchAuthUserAccountConfig = Readonly<{
-    takeLongtimeThreshold: DelayTime
+export type SearchAuthUserAccountMaterial = Readonly<{
+    infra: SearchAuthUserAccountInfra
+    shell: SearchAuthUserAccountShell
+    config: SearchAuthUserAccountConfig
 }>
 
 export type SearchAuthUserAccountInfra = Readonly<{
@@ -61,6 +63,10 @@ export type SearchAuthUserAccountShell = Readonly<{
     updateQuery: UpdateSearchAuthUserAccountFieldsQuery
 }>
 
+export type SearchAuthUserAccountConfig = Readonly<{
+    takeLongtimeThreshold: DelayTime
+}>
+
 export type SearchAuthUserAccountState =
     | Readonly<{ type: "initial-search" }>
     | SearchAuthUserAccountEvent
@@ -70,11 +76,9 @@ export const initialSearchAuthUserAccountState: SearchAuthUserAccountState = {
 }
 
 export function initSearchAuthUserAccountAction(
-    config: SearchAuthUserAccountConfig,
-    infra: SearchAuthUserAccountInfra,
-    shell: SearchAuthUserAccountShell,
+    material: SearchAuthUserAccountMaterial,
 ): SearchAuthUserAccountAction {
-    return new Action(config, infra, shell)
+    return new Action(material)
 }
 
 const searchAuthUserAccountFieldNames = ["loginID"] as const
@@ -90,9 +94,7 @@ class Action
     readonly columns: SearchColumnsAction
     readonly observe: ObserveBoardAction
 
-    config: SearchAuthUserAccountConfig
-    infra: SearchAuthUserAccountInfra
-    shell: SearchAuthUserAccountShell
+    material: SearchAuthUserAccountMaterial
 
     searchFields: { (): SearchAuthUserAccountFields }
     loadFields: { (): SearchAuthUserAccountFields }
@@ -100,11 +102,7 @@ class Action
 
     sortStore: SearchSort
 
-    constructor(
-        config: SearchAuthUserAccountConfig,
-        infra: SearchAuthUserAccountInfra,
-        shell: SearchAuthUserAccountShell,
-    ) {
+    constructor(material: SearchAuthUserAccountMaterial) {
         super({
             ignite: async () => this.load(),
             terminate: () => {
@@ -112,15 +110,13 @@ class Action
                 this.observe.terminate()
             },
         })
-        this.config = config
-        this.infra = infra
-        this.shell = shell
+        this.material = material
 
-        const initialFields = shell.detectFields({ defaultSortKey: "login-id" })
+        const initialFields = material.shell.detectFields({ defaultSortKey: "login-id" })
 
         const loginID = initSearchLoginIDAction(initialFields.loginID)
         const offset = initSearchOffsetAction(initialFields.offset)
-        const columns = initSearchColumnsAction(this.infra)
+        const columns = initSearchColumnsAction(this.material.infra)
         const { observe, checker } = initObserveBoardAction({
             fields: searchAuthUserAccountFieldNames,
         })
@@ -166,13 +162,13 @@ class Action
         return this.initialState
     }
     async submit(): Promise<SearchAuthUserAccountState> {
-        return search(this.config, this.infra, this.shell, this.searchFields(), this.post)
+        return search(this.material, this.searchFields(), this.post)
     }
     async load(): Promise<SearchAuthUserAccountState> {
-        return search(this.config, this.infra, this.shell, this.loadFields(), this.post)
+        return search(this.material, this.loadFields(), this.post)
     }
     async sort(key: string): Promise<SearchAuthUserAccountState> {
-        return search(this.config, this.infra, this.shell, this.sortFields(key), this.post)
+        return search(this.material, this.sortFields(key), this.post)
     }
 }
 
@@ -183,9 +179,7 @@ type SearchAuthUserAccountEvent =
     | Readonly<{ type: "succeed-to-search"; response: SearchAuthUserAccountRemoteResponse }>
 
 async function search<S>(
-    config: SearchAuthUserAccountConfig,
-    infra: SearchAuthUserAccountInfra,
-    shell: SearchAuthUserAccountShell,
+    { infra, shell, config }: SearchAuthUserAccountMaterial,
     fields: SearchAuthUserAccountFields,
     post: Post<SearchAuthUserAccountEvent, S>,
 ): Promise<S> {

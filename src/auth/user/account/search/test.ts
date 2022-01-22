@@ -156,18 +156,18 @@ function initResource(searchRemote: SearchAuthUserAccountRemote): Readonly<{
     const urlStore = { current: currentURL }
 
     const resource = {
-        search: initSearchAuthUserAccountAction(
-            {
-                takeLongtimeThreshold: { delay_millisecond: 32 },
-            },
-            {
+        search: initSearchAuthUserAccountAction({
+            infra: {
                 searchRemote,
                 columnsRepository: initMemoryDB(),
             },
-            mockSearchAuthUserAccountShell(currentURL, (url) => {
+            shell: mockSearchAuthUserAccountShell(currentURL, (url) => {
                 urlStore.current = url
             }),
-        ),
+            config: {
+                takeLongtimeThreshold: { delay_millisecond: 32 },
+            },
+        }),
     }
 
     const store = {

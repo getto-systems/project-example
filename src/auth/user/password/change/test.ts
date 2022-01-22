@@ -72,10 +72,7 @@ describe("ChangePassword", () => {
             resource.change.close()
             return resource.change.currentState()
         }).then((stack) => {
-            expect(stack).toEqual([
-                { type: "input-password" },
-                { type: "initial-change-password" },
-            ])
+            expect(stack).toEqual([{ type: "input-password" }, { type: "initial-change-password" }])
         })
     })
 
@@ -130,14 +127,14 @@ function initResource(changePasswordRemote: ChangePasswordRemote): Readonly<{
     }>
 }> {
     const resource = {
-        change: initChangePasswordAction(
-            {
-                takeLongtimeThreshold: { delay_millisecond: 32 },
-            },
-            {
+        change: initChangePasswordAction({
+            infra: {
                 changePasswordRemote,
             },
-        ),
+            config: {
+                takeLongtimeThreshold: { delay_millisecond: 32 },
+            },
+        }),
     }
 
     const store = {

@@ -27,9 +27,12 @@ export type LoadMenuState =
 
 export const initialLoadMenuState: LoadMenuState = { type: "initial-menu" }
 
+export type LoadMenuMaterial = Readonly<{
+    infra: LoadMenuInfra
+    shell: LoadMenuShell
+    config: LoadMenuConfig
+}>
 export type LoadMenuInfra = Readonly<{
-    version: string
-    menuTree: MenuTree
     getMenuBadgeRemote: GetMenuBadgeRemote
     ticketRepository: AuthTicketRepository
     menuExpandRepository: MenuExpandRepository
@@ -39,21 +42,24 @@ export type LoadMenuInfra = Readonly<{
 export type LoadMenuShell = Readonly<{
     detectTargetPath: MenuTargetPathDetecter
 }>
+export type LoadMenuConfig = Readonly<{
+    version: string
+    menuTree: MenuTree
+}>
 
-export function initLoadMenuAction(infra: LoadMenuInfra, shell: LoadMenuShell): LoadMenuAction {
-    return new Action(infra, shell)
+export function initLoadMenuAction(material: LoadMenuMaterial): LoadMenuAction {
+    return new Action(material)
 }
 
 class Action extends AbstractStatefulApplicationAction<LoadMenuState> implements LoadMenuAction {
     readonly initialState = initialLoadMenuState
 
-    infra: LoadMenuInfra
-    shell: LoadMenuShell
+    material: LoadMenuMaterial
 
-    constructor(infra: LoadMenuInfra, shell: LoadMenuShell) {
+    constructor(material: LoadMenuMaterial) {
         super({
             ignite: async () =>
-                loadMenu(this.infra, this.shell, (event) => {
+                loadMenu(this.material, (event) => {
                     const state = this.post(event)
 
                     switch (event.type) {
@@ -66,19 +72,18 @@ class Action extends AbstractStatefulApplicationAction<LoadMenuState> implements
                     }
                 }),
         })
-        this.infra = infra
-        this.shell = shell
+        this.material = material
     }
 
     updateBadge(): Promise<LoadMenuState> {
-        return updateMenuBadge(this.infra, this.shell, this.post)
+        return updateMenuBadge(this.material, this.post)
     }
 
     show(path: MenuCategoryPath): Promise<LoadMenuState> {
-        return toggleMenuExpand(this.infra, this.shell, path, true, this.post)
+        return toggleMenuExpand(this.material, path, true, this.post)
     }
     hide(path: MenuCategoryPath): Promise<LoadMenuState> {
-        return toggleMenuExpand(this.infra, this.shell, path, false, this.post)
+        return toggleMenuExpand(this.material, path, false, this.post)
     }
 }
 
@@ -88,11 +93,10 @@ type LoadMenuEvent =
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
 async function loadMenu<S>(
-    infra: LoadMenuInfra,
-    shell: LoadMenuShell,
+    { infra, shell, config }: LoadMenuMaterial,
     post: Post<LoadMenuEvent, S>,
 ): Promise<S> {
-    const { version, menuTree, ticketRepository, menuExpandRepository, menuExpandStore } = infra
+    const { ticketRepository, menuExpandRepository, menuExpandStore } = infra
 
     const profileResult = await ticketRepository.get()
     if (!profileResult.success) {
@@ -115,8 +119,8 @@ async function loadMenu<S>(
     return post({
         type: "succeed-to-load",
         menu: buildMenu({
-            version,
-            menuTree,
+            version: config.version,
+            menuTree: config.menuTree,
             menuTargetPath: shell.detectTargetPath(),
             profile: profileResult.value,
             menuExpand: expand,
@@ -131,20 +135,12 @@ type ToggleMenuExpandEvent =
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
 async function toggleMenuExpand<S>(
-    infra: LoadMenuInfra,
-    shell: LoadMenuShell,
+    { infra, shell, config }: LoadMenuMaterial,
     path: MenuCategoryPath,
     isShow: boolean,
     post: Post<ToggleMenuExpandEvent, S>,
 ): Promise<S> {
-    const {
-        version,
-        menuTree,
-        ticketRepository,
-        menuExpandRepository,
-        menuExpandStore,
-        menuBadgeStore,
-    } = infra
+    const { ticketRepository, menuExpandRepository, menuExpandStore, menuBadgeStore } = infra
 
     const ticketResult = await ticketRepository.get()
     if (!ticketResult.success) {
@@ -178,8 +174,8 @@ async function toggleMenuExpand<S>(
     return post({
         type: "succeed-to-toggle",
         menu: buildMenu({
-            version,
-            menuTree,
+            version: config.version,
+            menuTree: config.menuTree,
             menuTargetPath: shell.detectTargetPath(),
             profile: ticketResult.value,
             menuExpand: expand,
@@ -195,18 +191,10 @@ type UpdateMenuBadgeEvent =
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
 async function updateMenuBadge<S>(
-    infra: LoadMenuInfra,
-    shell: LoadMenuShell,
+    { infra, shell, config }: LoadMenuMaterial,
     post: Post<UpdateMenuBadgeEvent, S>,
 ): Promise<S> {
-    const {
-        version,
-        menuTree,
-        ticketRepository,
-        getMenuBadgeRemote,
-        menuExpandStore,
-        menuBadgeStore,
-    } = infra
+    const { ticketRepository, getMenuBadgeRemote, menuExpandStore, menuBadgeStore } = infra
 
     const profileResult = await ticketRepository.get()
     if (!profileResult.success) {
@@ -220,11 +208,11 @@ async function updateMenuBadge<S>(
     const expand = fetchResult.found ? fetchResult.value : initMenuExpand()
 
     const buildParams: BuildMenuParams = {
-        version,
+        version: config.version,
+        menuTree: config.menuTree,
         profile: profileResult.value,
         menuExpand: expand,
         menuTargetPath: shell.detectTargetPath(),
-        menuTree,
         menuBadge: EMPTY_BADGE,
     }
 
