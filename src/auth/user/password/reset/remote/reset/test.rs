@@ -29,13 +29,16 @@ use crate::auth::{
     },
     user::{
         password::{
-            remote::kernel::init::password_repository::test::{
-                MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-                MemoryAuthUserPasswordStore,
+            remote::kernel::init::{
+                password_hasher::test::PlainPasswordHasher,
+                password_repository::test::{
+                    MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
+                    MemoryAuthUserPasswordStore,
+                },
             },
             reset::remote::reset::init::{
                 request_decoder::test::StaticResetPasswordRequestDecoder,
-                reset_notifier::test::StaticResetPasswordNotifier, test::StaticResetPasswordStruct,
+                reset_notifier::test::StaticResetPasswordNotifier,
                 token_decoder::test::StaticResetTokenDecoder,
             },
         },
@@ -50,7 +53,7 @@ use crate::auth::{
         check_nonce::infra::AuthNonceConfig, encode::infra::EncodeAuthTicketConfig,
         issue::infra::IssueAuthTicketConfig,
     },
-    user::password::reset::remote::proxy_reset::infra::ResetPasswordFieldsExtract,
+    user::password::reset::remote::reset::infra::ResetPasswordFieldsExtract,
 };
 
 use super::action::{ResetPasswordAction, ResetPasswordMaterial};
@@ -71,13 +74,13 @@ async fn success_request_token() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let material = TestMaterial::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ResetPasswordAction::with_material(feature);
+    let mut action = ResetPasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "reset password notified; message-id: message-id",
         "reset password success; user: user-id (granted: [])",
@@ -94,13 +97,13 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let feature = TestFeature::standard(&store);
+    let material = TestMaterial::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ResetPasswordAction::with_material(feature);
+    let mut action = ResetPasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "reset password notified; message-id: message-id",
         "reset password success; user: user-id (granted: [])",
@@ -117,13 +120,13 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let feature = TestFeature::standard(&store);
+    let material = TestMaterial::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ResetPasswordAction::with_material(feature);
+    let mut action = ResetPasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec!["reset password error; auth nonce error: conflict"]);
     assert!(!result.is_ok());
 }
@@ -133,13 +136,13 @@ async fn error_match_failed_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let material = TestMaterial::standard(&store);
     let request_decoder = match_failed_login_id_request_decoder();
 
-    let mut action = ResetPasswordAction::with_material(feature);
+    let mut action = ResetPasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "reset password error; invalid reset token entry: login id not matched",
     ]);
@@ -151,13 +154,13 @@ async fn error_empty_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let material = TestMaterial::standard(&store);
     let request_decoder = empty_login_id_request_decoder();
 
-    let mut action = ResetPasswordAction::with_material(feature);
+    let mut action = ResetPasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "reset password error; invalid login id: empty login id",
     ]);
@@ -169,13 +172,13 @@ async fn error_too_long_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let material = TestMaterial::standard(&store);
     let request_decoder = too_long_login_id_request_decoder();
 
-    let mut action = ResetPasswordAction::with_material(feature);
+    let mut action = ResetPasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "reset password error; invalid login id: too long login id",
     ]);
@@ -187,13 +190,13 @@ async fn just_max_length_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let material = TestMaterial::standard(&store);
     let request_decoder = just_max_length_login_id_request_decoder();
 
-    let mut action = ResetPasswordAction::with_material(feature);
+    let mut action = ResetPasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "reset password error; invalid reset token entry: login id not matched",
     ]);
@@ -205,13 +208,13 @@ async fn error_empty_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let material = TestMaterial::standard(&store);
     let request_decoder = empty_password_request_decoder();
 
-    let mut action = ResetPasswordAction::with_material(feature);
+    let mut action = ResetPasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "reset password error; invalid password: empty password",
     ]);
@@ -223,13 +226,13 @@ async fn error_too_long_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let material = TestMaterial::standard(&store);
     let request_decoder = too_long_password_request_decoder();
 
-    let mut action = ResetPasswordAction::with_material(feature);
+    let mut action = ResetPasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "reset password error; invalid password: too long password",
     ]);
@@ -241,13 +244,13 @@ async fn just_max_length_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let material = TestMaterial::standard(&store);
     let request_decoder = just_max_length_password_request_decoder();
 
-    let mut action = ResetPasswordAction::with_material(feature);
+    let mut action = ResetPasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "reset password notified; message-id: message-id",
         "reset password success; user: user-id (granted: [])",
@@ -264,13 +267,13 @@ async fn error_empty_reset_token() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let material = TestMaterial::standard(&store);
     let request_decoder = empty_reset_token_request_decoder();
 
-    let mut action = ResetPasswordAction::with_material(feature);
+    let mut action = ResetPasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "reset password error; invalid reset token: empty reset token",
     ]);
@@ -282,13 +285,13 @@ async fn error_reset_token_expired_when_decode() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::expired_reset_token(&store);
+    let material = TestMaterial::expired_reset_token(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ResetPasswordAction::with_material(feature);
+    let mut action = ResetPasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec!["reset password error; reset token expired"]);
     assert!(!result.is_ok());
 }
@@ -298,13 +301,13 @@ async fn error_reset_token_expired_in_store() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_reset_token();
-    let feature = TestFeature::standard(&store);
+    let material = TestMaterial::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ResetPasswordAction::with_material(feature);
+    let mut action = ResetPasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "reset password error; invalid reset token entry: reset token expired",
     ]);
@@ -316,13 +319,13 @@ async fn error_reset_token_discarded() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::discarded_reset_token();
-    let feature = TestFeature::standard(&store);
+    let material = TestMaterial::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ResetPasswordAction::with_material(feature);
+    let mut action = ResetPasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "reset password error; invalid reset token entry: already reset",
     ]);
@@ -334,13 +337,13 @@ async fn error_password_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::password_not_stored();
-    let feature = TestFeature::standard(&store);
+    let material = TestMaterial::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ResetPasswordAction::with_material(feature);
+    let mut action = ResetPasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "reset password error; invalid reset token entry: reset token entry not found",
     ]);
@@ -352,36 +355,65 @@ async fn error_user_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::user_not_stored();
-    let feature = TestFeature::standard(&store);
+    let material = TestMaterial::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ResetPasswordAction::with_material(feature);
+    let mut action = ResetPasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec!["reset password error; user not found"]);
     assert!(!result.is_ok());
 }
 
-struct TestFeature<'a> {
-    reset: StaticResetPasswordStruct<'a>,
+struct TestMaterial<'a> {
+    check_nonce: StaticCheckAuthNonceStruct<'a>,
     issue: StaticIssueAuthTicketStruct<'a>,
     encode: StaticEncodeAuthTicketStruct<'a>,
+
+    clock: StaticChronoAuthClock,
+    user_repository: MemoryAuthUserRepository<'a>,
+    password_repository: MemoryAuthUserPasswordRepository<'a>,
+    token_decoder: StaticResetTokenDecoder,
+    reset_notifier: StaticResetPasswordNotifier,
 }
 
-impl<'a> ResetPasswordMaterial for TestFeature<'a> {
-    type Reset = StaticResetPasswordStruct<'a>;
+impl<'a> ResetPasswordMaterial for TestMaterial<'a> {
+    type CheckNonce = StaticCheckAuthNonceStruct<'a>;
     type Issue = StaticIssueAuthTicketStruct<'a>;
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
-    fn reset(&self) -> &Self::Reset {
-        &self.reset
+    type Clock = StaticChronoAuthClock;
+    type UserRepository = MemoryAuthUserRepository<'a>;
+    type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
+    type PasswordHasher = PlainPasswordHasher;
+    type TokenDecoder = StaticResetTokenDecoder;
+    type ResetNotifier = StaticResetPasswordNotifier;
+
+    fn check_nonce(&self) -> &Self::CheckNonce {
+        &self.check_nonce
     }
     fn issue(&self) -> &Self::Issue {
         &self.issue
     }
     fn encode(&self) -> &Self::Encode {
         &self.encode
+    }
+
+    fn clock(&self) -> &Self::Clock {
+        &self.clock
+    }
+    fn user_repository(&self) -> &Self::UserRepository {
+        &self.user_repository
+    }
+    fn password_repository(&self) -> &Self::PasswordRepository {
+        &self.password_repository
+    }
+    fn token_decoder(&self) -> &Self::TokenDecoder {
+        &self.token_decoder
+    }
+    fn reset_notifier(&self) -> &Self::ResetNotifier {
+        &self.reset_notifier
     }
 }
 
@@ -451,7 +483,7 @@ impl TestStore {
     }
 }
 
-impl<'a> TestFeature<'a> {
+impl<'a> TestMaterial<'a> {
     fn standard(store: &'a TestStore) -> Self {
         Self::with_token_decoder(store, standard_reset_token_decoder())
     }
@@ -460,18 +492,11 @@ impl<'a> TestFeature<'a> {
     }
     fn with_token_decoder(store: &'a TestStore, token_decoder: StaticResetTokenDecoder) -> Self {
         Self {
-            reset: StaticResetPasswordStruct {
-                check_nonce_infra: StaticCheckAuthNonceStruct {
-                    config: standard_nonce_config(),
-                    clock: standard_clock(),
-                    nonce_metadata: standard_nonce_metadata(),
-                    nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
-                },
+            check_nonce: StaticCheckAuthNonceStruct {
+                config: standard_nonce_config(),
                 clock: standard_clock(),
-                user_repository: MemoryAuthUserRepository::new(&store.user),
-                password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
-                token_decoder,
-                reset_notifier: StaticResetPasswordNotifier,
+                nonce_metadata: standard_nonce_metadata(),
+                nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
             },
             issue: StaticIssueAuthTicketStruct {
                 clock: standard_clock(),
@@ -489,6 +514,12 @@ impl<'a> TestFeature<'a> {
                 cloudfront_encoder: StaticCloudfrontTokenEncoder,
                 config: standard_encode_config(),
             },
+
+            clock: standard_clock(),
+            user_repository: MemoryAuthUserRepository::new(&store.user),
+            password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
+            token_decoder,
+            reset_notifier: StaticResetPasswordNotifier,
         }
     }
 }

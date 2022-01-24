@@ -17,8 +17,8 @@ use crate::{
     auth::{
         remote::service::proxy::AuthProxyService,
         ticket::remote::kernel::infra::AuthMetadataContent,
-        user::password::reset::remote::proxy_reset::infra::{
-            ResetPasswordFieldsExtract, ResetPasswordProxyResponse,
+        user::password::reset::remote::reset::{
+            infra::ResetPasswordFieldsExtract, proxy::infra::ResetPasswordProxyResponse,
         },
     },
     z_lib::remote::service::infra::ServiceAuthorizer,

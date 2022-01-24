@@ -1,19 +1,58 @@
 use tonic::{Response, Status};
 
+use crate::z_lib::remote::response::tonic::RespondTo;
+
 use crate::auth::user::password::reset::remote::y_protobuf::service::{
     ResetPasswordErrorKindPb, ResetPasswordResponsePb,
 };
 
-use crate::z_lib::remote::response::tonic::RespondTo;
+use super::super::action::{ResetPasswordEvent, ResetPasswordState};
 
-use super::super::event::ResetPasswordEvent;
+use crate::auth::ticket::remote::encode::event::EncodeAuthTicketEvent;
 
-use crate::auth::user::password::{
-    remote::kernel::data::VerifyResetTokenEntryError,
-    reset::remote::reset::data::{
-        DecodeResetTokenError, NotifyResetPasswordError, ResetPasswordError,
+use crate::auth::{
+    ticket::remote::encode::data::AuthTicketEncoded,
+    user::password::{
+        remote::kernel::data::VerifyResetTokenEntryError,
+        reset::remote::reset::data::{
+            DecodeResetTokenError, NotifyResetPasswordError, ResetPasswordError,
+        },
     },
 };
+
+impl RespondTo<ResetPasswordResponsePb> for ResetPasswordState {
+    fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
+        match self {
+            Self::Nonce(err) => err.respond_to(),
+            Self::Reset(event) => event.respond_to(),
+            Self::Issue(event) => event.respond_to(),
+            Self::Encode(event) => event.respond_to(),
+        }
+    }
+}
+
+impl RespondTo<ResetPasswordResponsePb> for EncodeAuthTicketEvent {
+    fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
+        match self {
+            Self::TokenExpiresCalculated(_) => Err(Status::cancelled("token expires calculated")),
+            Self::Success(response) => response.respond_to(),
+            Self::TicketNotFound => Err(Status::unauthenticated("ticket not found")),
+            Self::RepositoryError(err) => err.respond_to(),
+            Self::EncodeError(err) => err.respond_to(),
+        }
+    }
+}
+
+impl RespondTo<ResetPasswordResponsePb> for AuthTicketEncoded {
+    fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
+        Ok(Response::new(ResetPasswordResponsePb {
+            success: true,
+            user: Some(self.user.into()),
+            token: Some(self.token.into()),
+            ..Default::default()
+        }))
+    }
+}
 
 impl RespondTo<ResetPasswordResponsePb> for ResetPasswordEvent {
     fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
@@ -22,7 +61,6 @@ impl RespondTo<ResetPasswordResponsePb> for ResetPasswordEvent {
             Self::Success(_) => Err(Status::cancelled("reset password cancelled")),
             Self::InvalidReset(err) => err.respond_to(),
             Self::UserNotFound => Err(Status::internal("user not found")),
-            Self::NonceError(err) => err.respond_to(),
             Self::RepositoryError(err) => err.respond_to(),
             Self::PasswordHashError(err) => err.respond_to(),
             Self::DecodeError(err) => err.respond_to(),

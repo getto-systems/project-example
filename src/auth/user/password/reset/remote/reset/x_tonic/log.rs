@@ -1,11 +1,28 @@
-use crate::z_lib::remote::logger::LogLevel;
+use crate::z_lib::remote::logger::{LogLevel, LogMessage};
 
-use crate::auth::user::password::reset::remote::reset::event::ResetPasswordEvent;
+use super::super::action::{ResetPasswordEvent, ResetPasswordState};
 
 use crate::auth::user::password::reset::remote::{
-    kernel::data::ValidateResetTokenError,
     reset::data::{DecodeResetTokenError, NotifyResetPasswordError, ResetPasswordError},
+    kernel::data::ValidateResetTokenError,
 };
+
+impl LogMessage for &ResetPasswordState {
+    fn log_message(&self) -> String {
+        format!("{}", self)
+    }
+}
+
+impl ResetPasswordState {
+    pub const fn log_level(&self) -> LogLevel {
+        match self {
+            Self::Nonce(err) => err.log_level(),
+            Self::Reset(event) => event.log_level(),
+            Self::Issue(event) => event.log_level(),
+            Self::Encode(event) => event.log_level(),
+        }
+    }
+}
 
 impl ResetPasswordEvent {
     pub const fn log_level(&self) -> LogLevel {
@@ -14,7 +31,6 @@ impl ResetPasswordEvent {
             Self::Success(_) => LogLevel::Audit,
             Self::InvalidReset(err) => err.log_level(),
             Self::UserNotFound => LogLevel::Error,
-            Self::NonceError(err) => err.log_level(),
             Self::RepositoryError(err) => err.log_level(),
             Self::PasswordHashError(err) => err.log_level(),
             Self::DecodeError(err) => err.log_level(),

@@ -42,9 +42,9 @@ async fn success_allow_for_any_role() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
 
-    let mut action = CheckAuthTicketAction::with_material(feature);
+    let mut action = CheckAuthTicketAction::with_material(material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -61,9 +61,9 @@ async fn error_token_expired() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestStruct::token_expired(&store);
+    let material = TestStruct::token_expired(&store);
 
-    let mut action = CheckAuthTicketAction::with_material(feature);
+    let mut action = CheckAuthTicketAction::with_material(material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -76,9 +76,9 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
 
-    let mut action = CheckAuthTicketAction::with_material(feature);
+    let mut action = CheckAuthTicketAction::with_material(material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -95,9 +95,9 @@ async fn success_limited_ticket() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::limited_ticket();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
 
-    let mut action = CheckAuthTicketAction::with_material(feature);
+    let mut action = CheckAuthTicketAction::with_material(material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -114,9 +114,9 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
 
-    let mut action = CheckAuthTicketAction::with_material(feature);
+    let mut action = CheckAuthTicketAction::with_material(material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -129,9 +129,9 @@ async fn error_no_ticket() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::no_ticket();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
 
-    let mut action = CheckAuthTicketAction::with_material(feature);
+    let mut action = CheckAuthTicketAction::with_material(material);
     action.subscribe(handler);
 
     let result = action.ignite().await;

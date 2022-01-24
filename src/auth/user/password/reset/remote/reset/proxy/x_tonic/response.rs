@@ -2,7 +2,7 @@ use crate::auth::user::password::reset::remote::y_protobuf::{
     api::ResetPasswordApiErrorKindPb, service::ResetPasswordResponsePb,
 };
 
-use crate::auth::user::password::reset::remote::proxy_reset::infra::ResetPasswordProxyResponse;
+use crate::auth::user::password::reset::remote::reset::proxy::infra::ResetPasswordProxyResponse;
 
 use crate::auth::{
     ticket::remote::{encode::data::AuthTicketEncoded, kernel::data::AuthTokenEncoded},

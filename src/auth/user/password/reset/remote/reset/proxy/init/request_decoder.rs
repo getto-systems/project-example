@@ -4,8 +4,8 @@ use crate::auth::user::password::reset::remote::y_protobuf::api::ResetPasswordAp
 
 use crate::z_lib::remote::message::helper::{decode_base64, invalid_protobuf};
 
-use crate::auth::user::password::reset::remote::proxy_reset::infra::{
-    ResetPasswordFieldsExtract, ResetPasswordProxyRequestDecoder,
+use crate::auth::user::password::reset::remote::reset::{
+    infra::ResetPasswordFieldsExtract, proxy::infra::ResetPasswordProxyRequestDecoder,
 };
 
 use crate::z_lib::remote::message::data::MessageError;
