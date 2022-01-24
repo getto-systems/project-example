@@ -12,7 +12,7 @@ use crate::x_outside_feature::remote::api::{
 use crate::auth::remote::service::proxy::call_proxy;
 
 use crate::auth::ticket::remote::{
-    logout::proxy::init::LogoutProxyStruct, proxy_renew::init::RenewAuthTicketProxyStruct,
+    logout::proxy::init::LogoutProxyStruct, check::proxy::init::CheckAuthTicketProxyStruct,
 };
 
 pub fn scope_ticket() -> Scope {
@@ -24,7 +24,7 @@ async fn renew(data: ApiAppData, request: HttpRequest) -> impl Responder {
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut proxy = RenewAuthTicketProxyStruct::new(&data.auth, &request_id, &request);
+    let mut proxy = CheckAuthTicketProxyStruct::new(&data.auth, &request_id, &request);
     proxy.subscribe(move |state| logger.log(state.log_level(), state));
 
     flatten(call_proxy(&proxy, Ok(())).await).respond_to(&request)

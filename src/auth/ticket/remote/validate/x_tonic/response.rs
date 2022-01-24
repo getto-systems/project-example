@@ -1,8 +1,6 @@
 use tonic::{Response, Status};
 
-use crate::auth::ticket::remote::y_protobuf::service::{
-    LogoutResponsePb, RenewAuthTicketResponsePb, ValidateApiTokenResponsePb,
-};
+use crate::auth::ticket::remote::y_protobuf::service::ValidateApiTokenResponsePb;
 
 use crate::z_lib::remote::response::tonic::RespondTo;
 
@@ -10,26 +8,6 @@ use crate::auth::ticket::remote::validate::event::ValidateAuthTokenEvent;
 
 use crate::auth::ticket::remote::validate::data::ValidateAuthTokenError;
 
-impl RespondTo<LogoutResponsePb> for ValidateAuthTokenEvent {
-    fn respond_to(self) -> Result<Response<LogoutResponsePb>, Status> {
-        match self {
-            Self::Success(_) => Err(Status::cancelled("logout cancelled")),
-            Self::NonceError(err) => err.respond_to(),
-            Self::TokenError(err) => err.respond_to(),
-            Self::PermissionError(err) => err.respond_to(),
-        }
-    }
-}
-impl RespondTo<RenewAuthTicketResponsePb> for ValidateAuthTokenEvent {
-    fn respond_to(self) -> Result<Response<RenewAuthTicketResponsePb>, Status> {
-        match self {
-            Self::Success(_) => Err(Status::cancelled("renew auth ticket cancelled")),
-            Self::NonceError(err) => err.respond_to(),
-            Self::TokenError(err) => err.respond_to(),
-            Self::PermissionError(err) => err.respond_to(),
-        }
-    }
-}
 impl RespondTo<ValidateApiTokenResponsePb> for ValidateAuthTokenEvent {
     fn respond_to(self) -> Result<Response<ValidateApiTokenResponsePb>, Status> {
         match self {

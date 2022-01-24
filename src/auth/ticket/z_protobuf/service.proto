@@ -10,11 +10,11 @@ service LogoutPb {
 message LogoutRequestPb {}
 message LogoutResponsePb {}
 
-service RenewAuthTicketPb {
-    rpc Renew (RenewAuthTicketRequestPb) returns (RenewAuthTicketResponsePb);
+service CheckAuthTicketPb {
+    rpc Check (CheckAuthTicketRequestPb) returns (CheckAuthTicketResponsePb);
 }
-message RenewAuthTicketRequestPb {}
-message RenewAuthTicketResponsePb {
+message CheckAuthTicketRequestPb {}
+message CheckAuthTicketResponsePb {
     auth.user.service.AuthUserPb user = 1;
     AuthTokenEncodedPb token = 2;
 }

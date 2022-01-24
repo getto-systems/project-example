@@ -6,26 +6,26 @@ use crate::auth::ticket::remote::{
     encode::init::EncodeAuthTicketStruct, validate::init::TicketValidateAuthTokenStruct,
 };
 
-use super::action::{RenewAuthTicketAction, RenewAuthTicketMaterial};
+use super::action::{CheckAuthTicketAction, CheckAuthTicketMaterial};
 
-pub struct RenewAuthTicketFeature<'a> {
+pub struct CheckAuthTicketStruct<'a> {
     validate: TicketValidateAuthTokenStruct<'a>,
     encode: EncodeAuthTicketStruct<'a>,
 }
 
-impl<'a> RenewAuthTicketFeature<'a> {
+impl<'a> CheckAuthTicketStruct<'a> {
     pub fn action(
         feature: &'a AuthAppFeature,
         metadata: &'a MetadataMap,
-    ) -> RenewAuthTicketAction<Self> {
-        RenewAuthTicketAction::with_material(Self {
+    ) -> CheckAuthTicketAction<Self> {
+        CheckAuthTicketAction::with_material(Self {
             validate: TicketValidateAuthTokenStruct::new(&feature.auth, metadata),
             encode: EncodeAuthTicketStruct::new(&feature.auth),
         })
     }
 }
 
-impl<'a> RenewAuthTicketMaterial for RenewAuthTicketFeature<'a> {
+impl<'a> CheckAuthTicketMaterial for CheckAuthTicketStruct<'a> {
     type Validate = TicketValidateAuthTokenStruct<'a>;
     type Encode = EncodeAuthTicketStruct<'a>;
 

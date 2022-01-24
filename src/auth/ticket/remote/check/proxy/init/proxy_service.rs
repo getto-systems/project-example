@@ -1,7 +1,7 @@
 use tonic::Request;
 
 use crate::auth::ticket::remote::y_protobuf::service::{
-    renew_auth_ticket_pb_client::RenewAuthTicketPbClient, RenewAuthTicketRequestPb,
+    check_auth_ticket_pb_client::CheckAuthTicketPbClient, CheckAuthTicketRequestPb,
 };
 
 use crate::auth::remote::x_outside_feature::common::feature::AuthOutsideService;
@@ -44,14 +44,14 @@ impl<'a> ProxyService<'a> {
 #[async_trait::async_trait]
 impl<'a> AuthProxyService<(), AuthTicketEncoded> for ProxyService<'a> {
     fn name(&self) -> &str {
-        "auth.auth_ticket.renew"
+        "auth.ticket.check"
     }
     async fn call(
         &self,
         metadata: AuthMetadataContent,
         _params: (),
     ) -> Result<AuthTicketEncoded, AuthServiceError> {
-        let mut client = RenewAuthTicketPbClient::new(
+        let mut client = CheckAuthTicketPbClient::new(
             new_endpoint(self.service_url)
                 .map_err(infra_error)?
                 .connect()
@@ -59,7 +59,7 @@ impl<'a> AuthProxyService<(), AuthTicketEncoded> for ProxyService<'a> {
                 .map_err(infra_error)?,
         );
 
-        let mut request = Request::new(RenewAuthTicketRequestPb {});
+        let mut request = Request::new(CheckAuthTicketRequestPb {});
         set_metadata(
             &mut request,
             self.request_id,
@@ -69,7 +69,7 @@ impl<'a> AuthProxyService<(), AuthTicketEncoded> for ProxyService<'a> {
         .map_err(infra_error)?;
 
         let response = client
-            .renew(request)
+            .check(request)
             .await
             .map_err(AuthServiceError::from)?;
 

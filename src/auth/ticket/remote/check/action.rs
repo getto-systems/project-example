@@ -11,12 +11,12 @@ use crate::auth::ticket::remote::{
 
 use crate::auth::user::remote::kernel::data::RequireAuthRoles;
 
-pub enum RenewAuthTicketState {
+pub enum CheckAuthTicketState {
     Validate(ValidateAuthTokenEvent),
     Encode(EncodeAuthTicketEvent),
 }
 
-impl std::fmt::Display for RenewAuthTicketState {
+impl std::fmt::Display for CheckAuthTicketState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Validate(event) => write!(f, "{}", event),
@@ -25,7 +25,7 @@ impl std::fmt::Display for RenewAuthTicketState {
     }
 }
 
-pub trait RenewAuthTicketMaterial {
+pub trait CheckAuthTicketMaterial {
     type Validate: ValidateAuthTokenInfra;
     type Encode: EncodeAuthTicketInfra;
 
@@ -33,12 +33,12 @@ pub trait RenewAuthTicketMaterial {
     fn encode(&self) -> &Self::Encode;
 }
 
-pub struct RenewAuthTicketAction<M: RenewAuthTicketMaterial> {
-    pubsub: ActionStatePubSub<RenewAuthTicketState>,
+pub struct CheckAuthTicketAction<M: CheckAuthTicketMaterial> {
+    pubsub: ActionStatePubSub<CheckAuthTicketState>,
     material: M,
 }
 
-impl<M: RenewAuthTicketMaterial> RenewAuthTicketAction<M> {
+impl<M: CheckAuthTicketMaterial> CheckAuthTicketAction<M> {
     pub fn with_material(material: M) -> Self {
         Self {
             pubsub: ActionStatePubSub::new(),
@@ -46,22 +46,21 @@ impl<M: RenewAuthTicketMaterial> RenewAuthTicketAction<M> {
         }
     }
 
-    pub fn subscribe(&mut self, handler: impl 'static + Fn(&RenewAuthTicketState) + Send + Sync) {
+    pub fn subscribe(&mut self, handler: impl 'static + Fn(&CheckAuthTicketState) + Send + Sync) {
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<RenewAuthTicketState> {
+    pub async fn ignite(self) -> MethodResult<CheckAuthTicketState> {
         let pubsub = self.pubsub;
         let m = self.material;
 
-        // encode_auth_ticket は環境から ticket を取り出すのではなく、 ticket を encode するのだ
         let ticket = validate_auth_token(m.validate(), RequireAuthRoles::Nothing, |event| {
-            pubsub.post(RenewAuthTicketState::Validate(event))
+            pubsub.post(CheckAuthTicketState::Validate(event))
         })
         .await?;
 
         encode_auth_ticket(m.encode(), ticket, |event| {
-            pubsub.post(RenewAuthTicketState::Encode(event))
+            pubsub.post(CheckAuthTicketState::Encode(event))
         })
         .await
     }
