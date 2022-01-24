@@ -12,7 +12,7 @@ use crate::x_outside_feature::remote::api::{
 use crate::auth::remote::service::proxy::call_proxy;
 
 use crate::auth::ticket::remote::{
-    proxy_logout::init::LogoutProxyStruct, proxy_renew::init::RenewAuthTicketProxyStruct,
+    logout::proxy::init::LogoutProxyStruct, proxy_renew::init::RenewAuthTicketProxyStruct,
 };
 
 pub fn scope_ticket() -> Scope {

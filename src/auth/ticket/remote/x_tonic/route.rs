@@ -21,7 +21,7 @@ use crate::x_outside_feature::remote::{
 };
 
 use crate::auth::ticket::remote::{
-    action_logout::init::LogoutFeature, action_renew::init::RenewAuthTicketFeature,
+    logout::init::LogoutStruct, action_renew::init::RenewAuthTicketFeature,
     action_validate::init::ValidateApiTokenFeature,
 };
 
@@ -51,7 +51,7 @@ impl LogoutPb for Logout {
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger("auth.auth_ticket.logout", request_id.into());
-        let mut action = LogoutFeature::action(&data, &metadata);
+        let mut action = LogoutStruct::action(&data, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         flatten(action.ignite().await).respond_to()

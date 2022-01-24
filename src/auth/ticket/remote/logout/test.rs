@@ -11,7 +11,6 @@ use crate::auth::ticket::remote::{
         },
         test::StaticCheckAuthNonceStruct,
     },
-    discard::init::test::StaticDiscardAuthTicketStruct,
     kernel::init::{
         clock::test::StaticChronoAuthClock,
         nonce_metadata::test::StaticAuthNonceMetadata,
@@ -37,7 +36,7 @@ async fn success_logout() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
 
     let mut action = LogoutAction::with_material(feature);
     action.subscribe(handler);
@@ -45,7 +44,7 @@ async fn success_logout() {
     let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "discard success",
+        "logout success",
     ]);
     assert!(result.is_ok());
 }
@@ -55,7 +54,7 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
 
     let mut action = LogoutAction::with_material(feature);
     action.subscribe(handler);
@@ -63,7 +62,7 @@ async fn success_expired_nonce() {
     let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "discard success",
+        "logout success",
     ]);
     assert!(result.is_ok());
 }
@@ -73,7 +72,7 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
 
     let mut action = LogoutAction::with_material(feature);
     action.subscribe(handler);
@@ -88,7 +87,7 @@ async fn error_no_ticket() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::no_ticket();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
 
     let mut action = LogoutAction::with_material(feature);
     action.subscribe(handler);
@@ -96,20 +95,30 @@ async fn error_no_ticket() {
     let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "discard success",
+        "logout success",
     ]);
     assert!(result.is_ok());
 }
 
-struct TestFeature<'a> {
-    discard: StaticDiscardAuthTicketStruct<'a>,
+struct TestStruct<'a> {
+    pub validate: StaticValidateAuthTokenStruct<'a>,
+    pub clock: StaticChronoAuthClock,
+    pub ticket_repository: MemoryAuthTicketRepository<'a>,
 }
 
-impl<'a> LogoutMaterial for TestFeature<'a> {
-    type Discard = StaticDiscardAuthTicketStruct<'a>;
+impl<'a> LogoutMaterial for TestStruct<'a> {
+    type ValidateInfra = StaticValidateAuthTokenStruct<'a>;
+    type Clock = StaticChronoAuthClock;
+    type TicketRepository = MemoryAuthTicketRepository<'a>;
 
-    fn discard(&self) -> &Self::Discard {
-        &self.discard
+    fn validate(&self) -> &Self::ValidateInfra {
+        &self.validate
+    }
+    fn clock(&self) -> &Self::Clock {
+        &self.clock
+    }
+    fn ticket_repository(&self) -> &Self::TicketRepository {
+        &self.ticket_repository
     }
 }
 
@@ -145,23 +154,21 @@ impl TestStore {
     }
 }
 
-impl<'a> TestFeature<'a> {
+impl<'a> TestStruct<'a> {
     fn standard(store: &'a TestStore) -> Self {
         Self {
-            discard: StaticDiscardAuthTicketStruct {
-                validate_infra: StaticValidateAuthTokenStruct {
-                    check_nonce_infra: StaticCheckAuthNonceStruct {
-                        config: standard_nonce_config(),
-                        clock: standard_clock(),
-                        nonce_metadata: standard_nonce_metadata(),
-                        nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
-                    },
-                    token_metadata: standard_token_metadata(),
-                    token_decoder: standard_token_validator(),
+            validate: StaticValidateAuthTokenStruct {
+                check_nonce_infra: StaticCheckAuthNonceStruct {
+                    config: standard_nonce_config(),
+                    clock: standard_clock(),
+                    nonce_metadata: standard_nonce_metadata(),
+                    nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
-                clock: standard_clock(),
-                ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
+                token_metadata: standard_token_metadata(),
+                token_decoder: standard_token_validator(),
             },
+            clock: standard_clock(),
+            ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
         }
     }
 }

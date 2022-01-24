@@ -1,12 +1,10 @@
-pub mod action_logout;
+pub mod logout;
 pub mod action_renew;
 pub mod action_validate;
 pub mod check_nonce;
-pub mod discard;
 pub mod encode;
 pub mod issue;
 pub mod kernel;
-pub mod proxy_logout;
 pub mod proxy_renew;
 pub mod validate;
 pub mod validate_api_token;
