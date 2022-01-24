@@ -4,11 +4,20 @@ use crate::auth::user::password::reset::remote::y_protobuf::service::RequestRese
 
 use crate::z_lib::remote::response::tonic::RespondTo;
 
-use super::super::event::RequestResetTokenEvent;
+use super::super::action::{RequestResetTokenEvent, RequestResetTokenState};
 
 use crate::auth::user::password::reset::remote::request_token::data::{
     EncodeResetTokenError, NotifyResetTokenError, RequestResetTokenError,
 };
+
+impl RespondTo<RequestResetTokenResponsePb> for RequestResetTokenState {
+    fn respond_to(self) -> Result<Response<RequestResetTokenResponsePb>, Status> {
+        match self {
+            Self::Nonce(err) => err.respond_to(),
+            Self::RequestToken(event) => event.respond_to(),
+        }
+    }
+}
 
 impl RespondTo<RequestResetTokenResponsePb> for RequestResetTokenEvent {
     fn respond_to(self) -> Result<Response<RequestResetTokenResponsePb>, Status> {
@@ -17,7 +26,6 @@ impl RespondTo<RequestResetTokenResponsePb> for RequestResetTokenEvent {
             Self::TokenNotified(_) => cancelled(),
             Self::Success => Ok(Response::new(RequestResetTokenResponsePb { success: true })),
             Self::InvalidRequest(err) => err.respond_to(),
-            Self::NonceError(err) => err.respond_to(),
             Self::RepositoryError(err) => err.respond_to(),
             Self::EncodeError(err) => err.respond_to(),
             Self::NotifyError(err) => err.respond_to(),

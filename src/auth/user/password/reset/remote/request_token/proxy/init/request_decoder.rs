@@ -4,8 +4,8 @@ use crate::z_lib::remote::message::helper::{decode_base64, invalid_protobuf};
 
 use crate::auth::user::password::reset::remote::y_protobuf::api::RequestResetTokenApiRequestPb;
 
-use crate::auth::user::password::reset::remote::proxy_request_token::infra::{
-    RequestResetTokenFieldsExtract, RequestResetTokenProxyRequestDecoder,
+use crate::auth::user::password::reset::remote::request_token::{
+    infra::RequestResetTokenFieldsExtract, proxy::infra::RequestResetTokenProxyRequestDecoder,
 };
 
 use crate::z_lib::remote::message::data::MessageError;

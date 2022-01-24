@@ -6,10 +6,10 @@ use crate::auth::user::password::reset::remote::y_protobuf::api::{
 
 use crate::auth::remote::service::proxy::AuthProxyResponseEncoder;
 
-use crate::auth::user::password::reset::remote::proxy_request_token::infra::RequestResetTokenProxyResponse;
+use crate::auth::user::password::reset::remote::request_token::proxy::infra::RequestResetTokenProxyResponse;
 
 use crate::{
-    auth::user::password::reset::remote::proxy_request_token::data::RequestResetTokenProxyMessage,
+    auth::user::password::reset::remote::request_token::proxy::data::RequestResetTokenProxyMessage,
     z_lib::remote::message::data::MessageError,
 };
 
