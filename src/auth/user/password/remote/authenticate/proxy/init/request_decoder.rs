@@ -4,9 +4,8 @@ use crate::auth::user::password::remote::y_protobuf::api::AuthenticatePasswordAp
 
 use crate::z_lib::remote::message::helper::{decode_base64, invalid_protobuf};
 
-use crate::auth::user::password::remote::{
-    authenticate::infra::AuthenticatePasswordFieldsExtract,
-    proxy_authenticate::infra::AuthenticatePasswordProxyRequestDecoder,
+use crate::auth::user::password::remote::authenticate::{
+    infra::AuthenticatePasswordFieldsExtract, proxy::infra::AuthenticatePasswordProxyRequestDecoder,
 };
 
 use crate::z_lib::remote::message::data::MessageError;

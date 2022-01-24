@@ -13,13 +13,13 @@ use crate::auth::remote::service::proxy::AuthProxyResponseEncoder;
 
 use crate::auth::{
     ticket::remote::kernel::infra::AuthTokenResponseBuilder,
-    user::password::remote::proxy_authenticate::infra::AuthenticatePasswordProxyResponse,
+    user::password::remote::authenticate::proxy::infra::AuthenticatePasswordProxyResponse,
 };
 
 use crate::{
     auth::{
         ticket::remote::kernel::data::AuthTokenMessage,
-        user::password::remote::proxy_authenticate::data::{
+        user::password::remote::authenticate::proxy::data::{
             AuthenticatePasswordProxyMessage, AuthenticatePasswordProxyMessageEncoded,
             AuthenticatePasswordProxyResult,
         },

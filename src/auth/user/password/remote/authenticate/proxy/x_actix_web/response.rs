@@ -2,7 +2,7 @@ use actix_web::{HttpRequest, HttpResponse};
 
 use crate::z_lib::remote::response::actix_web::RespondTo;
 
-use crate::auth::user::password::remote::proxy_authenticate::data::AuthenticatePasswordProxyMessage;
+use crate::auth::user::password::remote::authenticate::proxy::data::AuthenticatePasswordProxyMessage;
 
 impl RespondTo for AuthenticatePasswordProxyMessage {
     fn respond_to(self, request: &HttpRequest) -> HttpResponse {

@@ -15,14 +15,12 @@ use response_encoder::ResponseEncoder;
 
 use crate::auth::remote::service::proxy::{AuthProxyEvent, AuthProxyInfra};
 
-use crate::auth::user::password::remote::{
-    authenticate::infra::AuthenticatePasswordFieldsExtract,
-    proxy_authenticate::infra::{
-        AuthenticatePasswordProxyRequestDecoder, AuthenticatePasswordProxyResponse,
-    },
+use crate::auth::user::password::remote::authenticate::{
+    infra::AuthenticatePasswordFieldsExtract,
+    proxy::infra::{AuthenticatePasswordProxyRequestDecoder, AuthenticatePasswordProxyResponse},
 };
 
-use crate::auth::user::password::remote::proxy_authenticate::data::AuthenticatePasswordProxyMessage;
+use crate::auth::user::password::remote::authenticate::proxy::data::AuthenticatePasswordProxyMessage;
 
 pub struct AuthenticatePasswordProxyStruct<'a> {
     pubsub: ActionStatePubSub<AuthProxyEvent<AuthenticatePasswordProxyMessage>>,

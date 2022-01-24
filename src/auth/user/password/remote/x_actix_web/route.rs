@@ -14,7 +14,7 @@ use crate::auth::user::password::reset::remote::x_actix_web::route::scope_reset;
 use crate::auth::remote::service::proxy::call_proxy;
 
 use crate::auth::user::password::remote::{
-    proxy_authenticate::{
+    authenticate::proxy::{
         infra::AuthenticatePasswordProxyRequestDecoder, init::AuthenticatePasswordProxyStruct,
     },
     proxy_change::{infra::ChangePasswordProxyRequestDecoder, init::ChangePasswordProxyStruct},
