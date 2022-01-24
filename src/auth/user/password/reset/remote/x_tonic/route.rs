@@ -20,7 +20,7 @@ use crate::x_outside_feature::remote::{
 };
 
 use crate::auth::user::password::reset::remote::{
-    action_request_token::init::RequestResetTokenFeature, action_reset::init::ResetPasswordFeature,
+    request_token::init::RequestResetTokenStruct, action_reset::init::ResetPasswordFeature,
 };
 
 pub struct ResetServer;
@@ -50,11 +50,10 @@ impl RequestResetTokenPb for RequestToken {
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger("auth.user.password.reset.request_token", request_id.into());
-        let mut action = RequestResetTokenFeature::action(&data, &metadata);
+        let mut action = RequestResetTokenStruct::action(&data, &metadata, request);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
-        let request_decoder = RequestResetTokenFeature::request_decoder(request);
-        flatten(action.ignite(request_decoder).await).respond_to()
+        flatten(action.ignite().await).respond_to()
     }
 }
 

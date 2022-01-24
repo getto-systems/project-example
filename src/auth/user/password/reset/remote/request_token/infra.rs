@@ -1,11 +1,3 @@
-use crate::auth::{
-    ticket::remote::{check_nonce::infra::CheckAuthNonceInfra, kernel::infra::AuthClock},
-    user::password::{
-        remote::kernel::infra::RegisterResetTokenRepository,
-        reset::remote::proxy_request_token::infra::RequestResetTokenFieldsExtract,
-    },
-};
-
 use crate::{
     auth::{
         ticket::remote::kernel::data::{ExpireDateTime, ExpireDuration},
@@ -25,27 +17,12 @@ use crate::{
     z_lib::remote::repository::data::RepositoryError,
 };
 
-pub trait RequestResetTokenInfra {
-    type CheckNonceInfra: CheckAuthNonceInfra;
-    type Clock: AuthClock;
-    type PasswordRepository: RegisterResetTokenRepository;
-    type DestinationRepository: ResetTokenDestinationRepository;
-    type TokenGenerator: ResetTokenGenerator;
-    type TokenEncoder: ResetTokenEncoder;
-    type TokenNotifier: ResetTokenNotifier;
-
-    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
-    fn clock(&self) -> &Self::Clock;
-    fn password_repository(&self) -> &Self::PasswordRepository;
-    fn destination_repository(&self) -> &Self::DestinationRepository;
-    fn token_generator(&self) -> &Self::TokenGenerator;
-    fn token_encoder(&self) -> &Self::TokenEncoder;
-    fn token_notifier(&self) -> &Self::TokenNotifier;
-    fn config(&self) -> &RequestResetTokenConfig;
-}
-
 pub trait RequestResetTokenRequestDecoder {
     fn decode(self) -> RequestResetTokenFieldsExtract;
+}
+
+pub struct RequestResetTokenFieldsExtract {
+    pub login_id: String,
 }
 
 #[async_trait::async_trait]

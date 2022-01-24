@@ -15,12 +15,12 @@ use response_encoder::ResponseEncoder;
 
 use crate::auth::remote::service::proxy::{AuthProxyEvent, AuthProxyInfra};
 
-use crate::auth::user::password::reset::remote::proxy_request_token::infra::{
-    RequestResetTokenFieldsExtract, RequestResetTokenProxyRequestDecoder,
-    RequestResetTokenProxyResponse,
+use crate::auth::user::password::reset::remote::request_token::{
+    infra::RequestResetTokenFieldsExtract,
+    proxy::infra::{RequestResetTokenProxyRequestDecoder, RequestResetTokenProxyResponse},
 };
 
-use crate::auth::user::password::reset::remote::proxy_request_token::data::RequestResetTokenProxyMessage;
+use crate::auth::user::password::reset::remote::request_token::proxy::data::RequestResetTokenProxyMessage;
 
 pub struct RequestResetTokenProxyStruct<'a> {
     pubsub: ActionStatePubSub<AuthProxyEvent<RequestResetTokenProxyMessage>>,

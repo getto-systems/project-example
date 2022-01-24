@@ -25,7 +25,6 @@ use crate::auth::{
                 MemoryResetTokenDestinationStore,
             },
             request_decoder::test::StaticRequestResetTokenRequestDecoder,
-            test::StaticRequestResetTokenStruct,
             token_encoder::test::StaticResetTokenEncoder,
             token_generator::test::StaticResetTokenGenerator,
             token_notifier::test::StaticResetTokenNotifier,
@@ -35,9 +34,8 @@ use crate::auth::{
 
 use crate::auth::{
     ticket::remote::check_nonce::infra::AuthNonceConfig,
-    user::password::reset::remote::{
-        proxy_request_token::infra::RequestResetTokenFieldsExtract,
-        request_token::infra::RequestResetTokenConfig,
+    user::password::reset::remote::request_token::infra::{
+        RequestResetTokenConfig, RequestResetTokenFieldsExtract,
     },
 };
 
@@ -59,13 +57,13 @@ async fn success_request_token() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = RequestResetTokenAction::with_material(feature);
+    let mut action = RequestResetTokenAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "token expires calculated; 2021-01-02 10:00:00 UTC",
         "token notified; message-id: message-id",
@@ -79,13 +77,13 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = RequestResetTokenAction::with_material(feature);
+    let mut action = RequestResetTokenAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "token expires calculated; 2021-01-02 10:00:00 UTC",
         "token notified; message-id: message-id",
@@ -99,16 +97,14 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = RequestResetTokenAction::with_material(feature);
+    let mut action = RequestResetTokenAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
-    assert_state(vec![
-        "request reset token error; auth nonce error: conflict",
-    ]);
+    let result = action.ignite().await;
+    assert_state(vec!["auth nonce error: conflict"]);
     assert!(!result.is_ok());
 }
 
@@ -117,13 +113,13 @@ async fn error_empty_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = empty_login_id_request_decoder();
 
-    let mut action = RequestResetTokenAction::with_material(feature);
+    let mut action = RequestResetTokenAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "request reset token error; invalid login id: empty login id",
     ]);
@@ -135,13 +131,13 @@ async fn error_too_long_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = too_long_login_id_request_decoder();
 
-    let mut action = RequestResetTokenAction::with_material(feature);
+    let mut action = RequestResetTokenAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "request reset token error; invalid login id: too long login id",
     ]);
@@ -153,13 +149,13 @@ async fn just_max_length_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = just_max_length_login_id_request_decoder();
 
-    let mut action = RequestResetTokenAction::with_material(feature);
+    let mut action = RequestResetTokenAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec!["request reset token error; destination not found"]);
     assert!(!result.is_ok());
 }
@@ -169,26 +165,63 @@ async fn error_destination_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::destination_not_stored();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = RequestResetTokenAction::with_material(feature);
+    let mut action = RequestResetTokenAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec!["request reset token error; destination not found"]);
     assert!(!result.is_ok());
 }
 
-struct TestFeature<'a> {
-    request_token: StaticRequestResetTokenStruct<'a>,
+struct TestStruct<'a> {
+    pub check_nonce: StaticCheckAuthNonceStruct<'a>,
+
+    pub clock: StaticChronoAuthClock,
+    pub password_repository: MemoryAuthUserPasswordRepository<'a>,
+    pub destination_repository: MemoryResetTokenDestinationRepository<'a>,
+    pub token_generator: StaticResetTokenGenerator,
+    pub token_encoder: StaticResetTokenEncoder,
+    pub token_notifier: StaticResetTokenNotifier,
+    pub config: RequestResetTokenConfig,
 }
 
-impl<'a> RequestResetTokenMaterial for TestFeature<'a> {
-    type RequestToken = StaticRequestResetTokenStruct<'a>;
+impl<'a> RequestResetTokenMaterial for TestStruct<'a> {
+    type CheckNonce = StaticCheckAuthNonceStruct<'a>;
 
-    fn request_token(&self) -> &Self::RequestToken {
-        &self.request_token
+    type Clock = StaticChronoAuthClock;
+    type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
+    type DestinationRepository = MemoryResetTokenDestinationRepository<'a>;
+    type TokenGenerator = StaticResetTokenGenerator;
+    type TokenEncoder = StaticResetTokenEncoder;
+    type TokenNotifier = StaticResetTokenNotifier;
+
+    fn check_nonce(&self) -> &Self::CheckNonce {
+        &self.check_nonce
+    }
+
+    fn clock(&self) -> &Self::Clock {
+        &self.clock
+    }
+    fn password_repository(&self) -> &Self::PasswordRepository {
+        &self.password_repository
+    }
+    fn destination_repository(&self) -> &Self::DestinationRepository {
+        &self.destination_repository
+    }
+    fn token_generator(&self) -> &Self::TokenGenerator {
+        &self.token_generator
+    }
+    fn token_encoder(&self) -> &Self::TokenEncoder {
+        &self.token_encoder
+    }
+    fn token_notifier(&self) -> &Self::TokenNotifier {
+        &self.token_notifier
+    }
+    fn config(&self) -> &RequestResetTokenConfig {
+        &self.config
     }
 }
 
@@ -229,26 +262,22 @@ impl TestStore {
     }
 }
 
-impl<'a> TestFeature<'a> {
+impl<'a> TestStruct<'a> {
     fn new(store: &'a TestStore) -> Self {
         Self {
-            request_token: StaticRequestResetTokenStruct {
-                check_nonce_infra: StaticCheckAuthNonceStruct {
-                    config: standard_nonce_config(),
-                    clock: standard_clock(),
-                    nonce_metadata: standard_nonce_metadata(),
-                    nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
-                },
+            check_nonce: StaticCheckAuthNonceStruct {
+                config: standard_nonce_config(),
                 clock: standard_clock(),
-                password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
-                destination_repository: MemoryResetTokenDestinationRepository::new(
-                    &store.destination,
-                ),
-                token_generator: standard_token_generator(),
-                token_encoder: StaticResetTokenEncoder,
-                token_notifier: StaticResetTokenNotifier,
-                config: standard_request_token_config(),
+                nonce_metadata: standard_nonce_metadata(),
+                nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
             },
+            clock: standard_clock(),
+            password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
+            destination_repository: MemoryResetTokenDestinationRepository::new(&store.destination),
+            token_generator: standard_token_generator(),
+            token_encoder: StaticResetTokenEncoder,
+            token_notifier: StaticResetTokenNotifier,
+            config: standard_request_token_config(),
         }
     }
 }

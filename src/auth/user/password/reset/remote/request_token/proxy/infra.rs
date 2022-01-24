@@ -1,8 +1,6 @@
-use crate::z_lib::remote::message::data::MessageError;
+use crate::auth::user::password::reset::remote::request_token::infra::RequestResetTokenFieldsExtract;
 
-pub struct RequestResetTokenFieldsExtract {
-    pub login_id: String,
-}
+use crate::z_lib::remote::message::data::MessageError;
 
 pub enum RequestResetTokenProxyResponse {
     Success,

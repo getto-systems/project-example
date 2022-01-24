@@ -12,10 +12,10 @@ use crate::x_outside_feature::remote::api::{
 use crate::auth::remote::service::proxy::call_proxy;
 
 use crate::auth::user::password::reset::remote::{
-    proxy_request_token::{
+    proxy_reset::{infra::ResetPasswordProxyRequestDecoder, init::ResetPasswordProxyStruct},
+    request_token::proxy::{
         infra::RequestResetTokenProxyRequestDecoder, init::RequestResetTokenProxyStruct,
     },
-    proxy_reset::{infra::ResetPasswordProxyRequestDecoder, init::ResetPasswordProxyStruct},
 };
 
 pub fn scope_reset() -> Scope {

@@ -1,10 +1,25 @@
-use crate::z_lib::remote::logger::LogLevel;
+use crate::z_lib::remote::logger::{LogLevel, LogMessage};
 
-use crate::auth::user::password::reset::remote::request_token::event::RequestResetTokenEvent;
+use super::super::action::{RequestResetTokenEvent, RequestResetTokenState};
 
 use crate::auth::user::password::reset::remote::request_token::data::{
     EncodeResetTokenError, NotifyResetTokenError, RequestResetTokenError,
 };
+
+impl LogMessage for &RequestResetTokenState {
+    fn log_message(&self) -> String {
+        format!("{}", self)
+    }
+}
+
+impl RequestResetTokenState {
+    pub const fn log_level(&self) -> LogLevel {
+        match self {
+            Self::Nonce(err) => err.log_level(),
+            Self::RequestToken(event) => event.log_level(),
+        }
+    }
+}
 
 impl RequestResetTokenEvent {
     pub const fn log_level(&self) -> LogLevel {
@@ -13,7 +28,6 @@ impl RequestResetTokenEvent {
             Self::TokenNotified(_) => LogLevel::Info,
             Self::Success => LogLevel::Audit,
             Self::InvalidRequest(err) => err.log_level(),
-            Self::NonceError(err) => err.log_level(),
             Self::RepositoryError(err) => err.log_level(),
             Self::EncodeError(err) => err.log_level(),
             Self::NotifyError(err) => err.log_level(),
