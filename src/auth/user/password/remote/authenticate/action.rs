@@ -101,10 +101,9 @@ impl<R: AuthenticatePasswordRequestDecoder, M: AuthenticatePasswordMaterial>
 
     pub async fn ignite(self) -> MethodResult<AuthenticatePasswordState> {
         let pubsub = self.pubsub;
-        let request = self.request_decoder;
         let m = self.material;
 
-        let fields = request.decode();
+        let fields = self.request_decoder.decode();
 
         check_auth_nonce(m.check_nonce())
             .await

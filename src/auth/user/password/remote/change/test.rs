@@ -19,13 +19,14 @@ use crate::auth::{
         validate::init::test::StaticValidateAuthTokenStruct,
     },
     user::password::remote::{
-        change::init::{
-            request_decoder::test::StaticChangePasswordRequestDecoder,
-            test::StaticChangePasswordStruct,
-        },
-        kernel::init::password_repository::test::{
-            MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-            MemoryAuthUserPasswordStore,
+        change::init::request_decoder::test::StaticChangePasswordRequestDecoder,
+        kernel::init::{
+            password_hasher::test::PlainPasswordHasher,
+            password_matcher::test::PlainPasswordMatcher,
+            password_repository::test::{
+                MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
+                MemoryAuthUserPasswordStore,
+            },
         },
     },
 };
@@ -33,7 +34,7 @@ use crate::auth::{
 use crate::auth::{
     ticket::remote::check_nonce::infra::AuthNonceConfig,
     user::password::remote::{
-        kernel::infra::HashedPassword, proxy_change::infra::ChangePasswordFieldsExtract,
+        change::infra::ChangePasswordFieldsExtract, kernel::infra::HashedPassword,
     },
 };
 
@@ -52,13 +53,13 @@ async fn success_change() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password success",
@@ -71,13 +72,13 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password success",
@@ -90,13 +91,13 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec!["validate error; auth nonce error: conflict"]);
     assert!(!result.is_ok());
 }
@@ -106,13 +107,13 @@ async fn error_empty_current_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
     let request_decoder = empty_current_password_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; invalid current password: empty password",
@@ -125,13 +126,13 @@ async fn error_too_long_current_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
     let request_decoder = too_long_current_password_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; invalid current password: too long password",
@@ -144,13 +145,13 @@ async fn just_max_length_current_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
     let request_decoder = just_max_length_current_password_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; password not matched",
@@ -163,13 +164,13 @@ async fn error_empty_new_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
     let request_decoder = empty_new_password_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; invalid new password: empty password",
@@ -182,13 +183,13 @@ async fn error_too_long_new_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
     let request_decoder = too_long_new_password_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; invalid new password: too long password",
@@ -201,13 +202,13 @@ async fn just_max_length_new_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
     let request_decoder = just_max_length_new_password_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password success",
@@ -220,13 +221,13 @@ async fn error_failed_to_match_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::match_fail_password();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; password not matched",
@@ -239,13 +240,13 @@ async fn error_password_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::password_not_stored();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; password not found",
@@ -253,15 +254,24 @@ async fn error_password_not_stored() {
     assert!(!result.is_ok());
 }
 
-struct TestFeature<'a> {
-    change: StaticChangePasswordStruct<'a>,
+struct TestStruct<'a> {
+    validate: StaticValidateAuthTokenStruct<'a>,
+    password_repository: MemoryAuthUserPasswordRepository<'a>,
 }
 
-impl<'a> ChangePasswordMaterial for TestFeature<'a> {
-    type Change = StaticChangePasswordStruct<'a>;
+impl<'a> ChangePasswordMaterial for TestStruct<'a> {
+    type Validate = StaticValidateAuthTokenStruct<'a>;
 
-    fn change(&self) -> &Self::Change {
-        &self.change
+    type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
+    type PasswordMatcher = PlainPasswordMatcher;
+    type PasswordHasher = PlainPasswordHasher;
+
+    fn validate(&self) -> &Self::Validate {
+        &self.validate
+    }
+
+    fn password_repository(&self) -> &Self::PasswordRepository {
+        &self.password_repository
     }
 }
 
@@ -303,22 +313,20 @@ impl TestStore {
     }
 }
 
-impl<'a> TestFeature<'a> {
+impl<'a> TestStruct<'a> {
     fn standard(store: &'a TestStore) -> Self {
         Self {
-            change: StaticChangePasswordStruct {
-                validate_infra: StaticValidateAuthTokenStruct {
-                    check_nonce_infra: StaticCheckAuthNonceStruct {
-                        config: standard_nonce_config(),
-                        clock: standard_clock(),
-                        nonce_metadata: standard_nonce_header(),
-                        nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
-                    },
-                    token_metadata: standard_token_header(),
-                    token_decoder: standard_token_decoder(),
+            validate: StaticValidateAuthTokenStruct {
+                check_nonce_infra: StaticCheckAuthNonceStruct {
+                    config: standard_nonce_config(),
+                    clock: standard_clock(),
+                    nonce_metadata: standard_nonce_header(),
+                    nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
-                password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
+                token_metadata: standard_token_header(),
+                token_decoder: standard_token_decoder(),
             },
+            password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
         }
     }
 }

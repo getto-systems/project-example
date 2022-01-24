@@ -6,10 +6,10 @@ use crate::auth::user::password::remote::y_protobuf::api::{
 
 use crate::auth::remote::service::proxy::AuthProxyResponseEncoder;
 
-use crate::auth::user::password::remote::proxy_change::infra::ChangePasswordProxyResponse;
+use crate::auth::user::password::remote::change::proxy::infra::ChangePasswordProxyResponse;
 
 use crate::{
-    auth::user::password::remote::proxy_change::data::ChangePasswordProxyMessage,
+    auth::user::password::remote::change::proxy::data::ChangePasswordProxyMessage,
     z_lib::remote::message::data::MessageError,
 };
 

@@ -4,8 +4,8 @@ use crate::auth::user::password::remote::y_protobuf::api::ChangePasswordApiReque
 
 use crate::z_lib::remote::message::helper::{decode_base64, invalid_protobuf};
 
-use crate::auth::user::password::remote::proxy_change::infra::{
-    ChangePasswordFieldsExtract, ChangePasswordProxyRequestDecoder,
+use crate::auth::user::password::remote::change::{
+    infra::ChangePasswordFieldsExtract, proxy::infra::ChangePasswordProxyRequestDecoder,
 };
 
 use crate::z_lib::remote::message::data::MessageError;

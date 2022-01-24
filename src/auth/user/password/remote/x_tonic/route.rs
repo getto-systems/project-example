@@ -22,8 +22,7 @@ use crate::x_outside_feature::remote::{
 use crate::auth::user::password::reset::remote::x_tonic::route::ResetServer;
 
 use crate::auth::user::password::remote::{
-    authenticate::init::AuthenticatePasswordStruct,
-    action_change::init::ChangePasswordFeature,
+    change::init::ChangePasswordFeature, authenticate::init::AuthenticatePasswordStruct,
 };
 
 pub struct PasswordServer {
@@ -81,10 +80,9 @@ impl ChangePasswordPb for Change {
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger("auth.user.password.change", request_id.into());
-        let mut action = ChangePasswordFeature::action(&data, &metadata);
+        let mut action = ChangePasswordFeature::action(&data, &metadata, request);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
-        let request_decoder = ChangePasswordFeature::request_decoder(request);
-        flatten(action.ignite(request_decoder).await).respond_to()
+        flatten(action.ignite().await).respond_to()
     }
 }

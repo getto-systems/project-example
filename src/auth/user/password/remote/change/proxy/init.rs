@@ -15,11 +15,12 @@ use response_encoder::ResponseEncoder;
 
 use crate::auth::remote::service::proxy::{AuthProxyEvent, AuthProxyInfra};
 
-use crate::auth::user::password::remote::proxy_change::infra::{
-    ChangePasswordFieldsExtract, ChangePasswordProxyRequestDecoder, ChangePasswordProxyResponse,
+use crate::auth::user::password::remote::change::{
+    infra::ChangePasswordFieldsExtract,
+    proxy::infra::{ChangePasswordProxyRequestDecoder, ChangePasswordProxyResponse},
 };
 
-use crate::auth::user::password::remote::proxy_change::data::ChangePasswordProxyMessage;
+use crate::auth::user::password::remote::change::proxy::data::ChangePasswordProxyMessage;
 
 pub struct ChangePasswordProxyStruct<'a> {
     pubsub: ActionStatePubSub<AuthProxyEvent<ChangePasswordProxyMessage>>,

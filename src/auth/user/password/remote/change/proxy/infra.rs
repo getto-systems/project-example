@@ -1,9 +1,6 @@
-use crate::z_lib::remote::message::data::MessageError;
+use crate::auth::user::password::remote::change::infra::ChangePasswordFieldsExtract;
 
-pub struct ChangePasswordFieldsExtract {
-    pub current_password: String,
-    pub new_password: String,
-}
+use crate::z_lib::remote::message::data::MessageError;
 
 pub enum ChangePasswordProxyResponse {
     Success,
