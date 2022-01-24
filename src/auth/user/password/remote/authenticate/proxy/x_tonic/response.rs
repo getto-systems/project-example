@@ -1,6 +1,6 @@
 use crate::auth::user::password::remote::y_protobuf::service::AuthenticatePasswordResponsePb;
 
-use crate::auth::user::password::remote::proxy_authenticate::infra::AuthenticatePasswordProxyResponse;
+use crate::auth::user::password::remote::authenticate::proxy::infra::AuthenticatePasswordProxyResponse;
 
 use crate::auth::{
     ticket::remote::{encode::data::AuthTicketEncoded, kernel::data::AuthTokenEncoded},

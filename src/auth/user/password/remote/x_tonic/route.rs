@@ -22,7 +22,7 @@ use crate::x_outside_feature::remote::{
 use crate::auth::user::password::reset::remote::x_tonic::route::ResetServer;
 
 use crate::auth::user::password::remote::{
-    action_authenticate::init::AuthenticatePasswordFeature,
+    authenticate::init::AuthenticatePasswordStruct,
     action_change::init::ChangePasswordFeature,
 };
 
@@ -58,11 +58,10 @@ impl AuthenticatePasswordPb for Authenticate {
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger("auth.user.password.authenticate", request_id.into());
-        let mut action = AuthenticatePasswordFeature::action(&data, &metadata);
+        let mut action = AuthenticatePasswordStruct::action(&data, &metadata, request);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
-        let request_decoder = AuthenticatePasswordFeature::request_decoder(request);
-        flatten(action.ignite(request_decoder).await).respond_to()
+        flatten(action.ignite().await).respond_to()
     }
 }
 

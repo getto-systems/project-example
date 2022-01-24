@@ -1,8 +1,25 @@
-use crate::z_lib::remote::logger::LogLevel;
+use crate::z_lib::remote::logger::{LogLevel, LogMessage};
 
-use crate::auth::user::password::remote::authenticate::data::AuthenticatePasswordError;
+use super::super::action::{AuthenticatePasswordEvent, AuthenticatePasswordState};
 
-use super::super::event::AuthenticatePasswordEvent;
+use super::super::data::AuthenticatePasswordError;
+
+impl LogMessage for &AuthenticatePasswordState {
+    fn log_message(&self) -> String {
+        format!("{}", self)
+    }
+}
+
+impl AuthenticatePasswordState {
+    pub const fn log_level(&self) -> LogLevel {
+        match self {
+            Self::Authenticate(event) => event.log_level(),
+            Self::Nonce(err) => err.log_level(),
+            Self::Issue(event) => event.log_level(),
+            Self::Encode(event) => event.log_level(),
+        }
+    }
+}
 
 impl AuthenticatePasswordEvent {
     pub const fn log_level(&self) -> LogLevel {
@@ -10,7 +27,6 @@ impl AuthenticatePasswordEvent {
             Self::Success(_) => LogLevel::Audit,
             Self::UserNotFound => LogLevel::Error,
             Self::InvalidPassword(err) => err.log_level(),
-            Self::NonceError(err) => err.log_level(),
             Self::PasswordHashError(err) => err.log_level(),
             Self::RepositoryError(err) => err.log_level(),
         }
