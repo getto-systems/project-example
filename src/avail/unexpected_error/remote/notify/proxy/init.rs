@@ -15,11 +15,12 @@ use response_encoder::ResponseEncoder;
 
 use crate::example::remote::proxy::{ExampleProxyEvent, ExampleProxyInfra};
 
-use crate::avail::unexpected_error::remote::proxy_notify::infra::{
-    NotifyUnexpectedErrorFieldsExtract, NotifyUnexpectedErrorProxyRequestDecoder,
+use crate::avail::unexpected_error::remote::notify::{
+    infra::NotifyUnexpectedErrorFieldsExtract,
+    proxy::infra::NotifyUnexpectedErrorProxyRequestDecoder,
 };
 
-use crate::avail::unexpected_error::remote::proxy_notify::data::NotifyUnexpectedErrorProxyMessage;
+use crate::avail::unexpected_error::remote::notify::proxy::data::NotifyUnexpectedErrorProxyMessage;
 
 pub struct NotifyUnexpectedErrorProxyStruct<'a> {
     pubsub: ActionStatePubSub<ExampleProxyEvent<NotifyUnexpectedErrorProxyMessage>>,

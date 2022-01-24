@@ -1,7 +1,7 @@
 use crate::example::remote::proxy::ExampleProxyResponseEncoder;
 
 use crate::{
-    avail::unexpected_error::remote::proxy_notify::data::NotifyUnexpectedErrorProxyMessage,
+    avail::unexpected_error::remote::notify::proxy::data::NotifyUnexpectedErrorProxyMessage,
     z_lib::remote::message::data::MessageError,
 };
 

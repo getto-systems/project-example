@@ -1,5 +1,8 @@
-pub mod event;
+pub mod action;
 pub mod infra;
 pub mod init;
-pub mod method;
+pub mod proxy;
 pub mod x_tonic;
+
+#[cfg(test)]
+mod test;

@@ -9,7 +9,7 @@ use crate::avail::unexpected_error::remote::y_protobuf::service::{
     NotifyRequestPb, NotifyResponsePb,
 };
 
-use crate::avail::unexpected_error::remote::action_notify::init::NotifyUnexpectedErrorFeature;
+use crate::avail::unexpected_error::remote::notify::init::NotifyUnexpectedErrorFeature;
 
 use crate::x_outside_feature::remote::{
     common::metadata::metadata_request_id,
@@ -43,10 +43,9 @@ impl NotifyPb for Notify {
         let request_id = metadata_request_id(&metadata);
         let logger = app_logger("avail.unexpected_error.notify", request_id.into());
 
-        let mut action = NotifyUnexpectedErrorFeature::action(&data, &request_id, &metadata);
+        let mut action = NotifyUnexpectedErrorFeature::action(&data, &request_id, &metadata, request);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
-        let request_decoder = NotifyUnexpectedErrorFeature::request_decoder(request);
-        flatten(action.ignite(request_decoder).await).respond_to()
+        flatten(action.ignite().await).respond_to()
     }
 }

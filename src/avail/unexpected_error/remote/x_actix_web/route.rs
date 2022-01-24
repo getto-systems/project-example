@@ -11,7 +11,7 @@ use crate::x_outside_feature::remote::api::{
 
 use crate::example::remote::proxy::call_proxy;
 
-use crate::avail::unexpected_error::remote::proxy_notify::{
+use crate::avail::unexpected_error::remote::notify::proxy::{
     infra::NotifyUnexpectedErrorProxyRequestDecoder, init::NotifyUnexpectedErrorProxyStruct,
 };
 

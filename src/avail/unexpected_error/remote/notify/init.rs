@@ -2,55 +2,40 @@ pub mod request_decoder;
 
 use tonic::metadata::MetadataMap;
 
+use crate::auth::remote::init::ValidateApiTokenStruct;
+use crate::avail::unexpected_error::remote::y_protobuf::service::NotifyRequestPb;
+
 use crate::x_outside_feature::remote::example::feature::ExampleAppFeature;
 
-use crate::auth::remote::init::ValidateApiTokenStruct;
+use crate::avail::unexpected_error::remote::notify::init::request_decoder::PbNotifyUnexpectedErrorRequestDecoder;
 
-use crate::avail::unexpected_error::remote::notify::infra::NotifyUnexpectedErrorInfra;
+use super::action::{NotifyUnexpectedErrorAction, NotifyUnexpectedErrorMaterial};
 
-pub struct NotifyUnexpectedErrorStruct<'a> {
-    validate_infra: ValidateApiTokenStruct<'a>,
+pub struct NotifyUnexpectedErrorFeature<'a> {
+    validate: ValidateApiTokenStruct<'a>,
 }
 
-impl<'a> NotifyUnexpectedErrorStruct<'a> {
-    pub fn new(
+impl<'a> NotifyUnexpectedErrorFeature<'a> {
+    pub fn action(
         feature: &'a ExampleAppFeature,
         request_id: &'a str,
         metadata: &'a MetadataMap,
-    ) -> Self {
-        Self {
-            validate_infra: ValidateApiTokenStruct::new(
-                &feature.auth.service,
-                request_id,
-                metadata,
-            ),
-        }
+        request: NotifyRequestPb,
+    ) -> NotifyUnexpectedErrorAction<PbNotifyUnexpectedErrorRequestDecoder, Self> {
+        NotifyUnexpectedErrorAction::with_material(
+            PbNotifyUnexpectedErrorRequestDecoder::new(request),
+            Self {
+                validate: ValidateApiTokenStruct::new(&feature.auth.service, request_id, metadata),
+            },
+        )
     }
 }
 
-impl<'a> NotifyUnexpectedErrorInfra for NotifyUnexpectedErrorStruct<'a> {
-    type ValidateInfra = ValidateApiTokenStruct<'a>;
+#[async_trait::async_trait]
+impl<'a> NotifyUnexpectedErrorMaterial for NotifyUnexpectedErrorFeature<'a> {
+    type Validate = ValidateApiTokenStruct<'a>;
 
-    fn validate_infra(&self) -> &Self::ValidateInfra {
-        &self.validate_infra
-    }
-}
-
-#[cfg(test)]
-pub mod test {
-    use crate::auth::remote::init::test::StaticValidateApiTokenStruct;
-
-    use crate::avail::unexpected_error::remote::notify::infra::NotifyUnexpectedErrorInfra;
-
-    pub struct StaticNotifyUnexpectedErrorStruct {
-        pub validate_infra: StaticValidateApiTokenStruct,
-    }
-
-    impl<'a> NotifyUnexpectedErrorInfra for StaticNotifyUnexpectedErrorStruct {
-        type ValidateInfra = StaticValidateApiTokenStruct;
-
-        fn validate_infra(&self) -> &Self::ValidateInfra {
-            &self.validate_infra
-        }
+    fn validate(&self) -> &Self::Validate {
+        &self.validate
     }
 }

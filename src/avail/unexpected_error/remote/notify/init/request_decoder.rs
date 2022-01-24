@@ -1,8 +1,7 @@
 use crate::avail::unexpected_error::remote::y_protobuf::service::NotifyRequestPb;
 
-use crate::avail::unexpected_error::remote::{
-    notify::infra::NotifyUnexpectedErrorRequestDecoder,
-    proxy_notify::infra::NotifyUnexpectedErrorFieldsExtract,
+use crate::avail::unexpected_error::remote::notify::infra::{
+    NotifyUnexpectedErrorFieldsExtract, NotifyUnexpectedErrorRequestDecoder,
 };
 
 pub struct PbNotifyUnexpectedErrorRequestDecoder {
@@ -25,9 +24,8 @@ impl NotifyUnexpectedErrorRequestDecoder for PbNotifyUnexpectedErrorRequestDecod
 
 #[cfg(test)]
 pub mod test {
-    use crate::avail::unexpected_error::remote::{
-        notify::infra::NotifyUnexpectedErrorRequestDecoder,
-        proxy_notify::infra::NotifyUnexpectedErrorFieldsExtract,
+    use crate::avail::unexpected_error::remote::notify::infra::{
+        NotifyUnexpectedErrorFieldsExtract, NotifyUnexpectedErrorRequestDecoder,
     };
 
     pub struct StaticNotifyUnexpectedErrorRequestDecoder {
