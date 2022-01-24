@@ -36,9 +36,9 @@ async fn success_logout() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
 
-    let mut action = LogoutAction::with_material(feature);
+    let mut action = LogoutAction::with_material(material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -54,9 +54,9 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
 
-    let mut action = LogoutAction::with_material(feature);
+    let mut action = LogoutAction::with_material(material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -72,9 +72,9 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
 
-    let mut action = LogoutAction::with_material(feature);
+    let mut action = LogoutAction::with_material(material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -87,9 +87,9 @@ async fn error_no_ticket() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::no_ticket();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
 
-    let mut action = LogoutAction::with_material(feature);
+    let mut action = LogoutAction::with_material(material);
     action.subscribe(handler);
 
     let result = action.ignite().await;

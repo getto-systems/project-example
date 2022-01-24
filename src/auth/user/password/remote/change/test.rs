@@ -53,10 +53,10 @@ async fn success_change() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -72,10 +72,10 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -91,10 +91,10 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -107,10 +107,10 @@ async fn error_empty_current_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = empty_current_password_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -126,10 +126,10 @@ async fn error_too_long_current_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = too_long_current_password_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -145,10 +145,10 @@ async fn just_max_length_current_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = just_max_length_current_password_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -164,10 +164,10 @@ async fn error_empty_new_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = empty_new_password_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -183,10 +183,10 @@ async fn error_too_long_new_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = too_long_new_password_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -202,10 +202,10 @@ async fn just_max_length_new_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = just_max_length_new_password_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -221,10 +221,10 @@ async fn error_failed_to_match_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::match_fail_password();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -240,10 +240,10 @@ async fn error_password_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::password_not_stored();
-    let feature = TestStruct::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(request_decoder, feature);
+    let mut action = ChangePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;

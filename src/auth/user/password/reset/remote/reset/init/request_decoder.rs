@@ -1,7 +1,7 @@
 use crate::auth::user::password::reset::remote::y_protobuf::service::ResetPasswordRequestPb;
 
-use crate::auth::user::password::reset::remote::{
-    proxy_reset::infra::ResetPasswordFieldsExtract, reset::infra::ResetPasswordRequestDecoder,
+use crate::auth::user::password::reset::remote::reset::infra::{
+    ResetPasswordFieldsExtract, ResetPasswordRequestDecoder,
 };
 
 pub struct PbResetPasswordRequestDecoder {
@@ -26,8 +26,8 @@ impl ResetPasswordRequestDecoder for PbResetPasswordRequestDecoder {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::user::password::reset::remote::{
-        proxy_reset::infra::ResetPasswordFieldsExtract, reset::infra::ResetPasswordRequestDecoder,
+    use crate::auth::user::password::reset::remote::reset::infra::{
+        ResetPasswordFieldsExtract, ResetPasswordRequestDecoder,
     };
 
     pub struct StaticResetPasswordRequestDecoder {

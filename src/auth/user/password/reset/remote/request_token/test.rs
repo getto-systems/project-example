@@ -57,10 +57,10 @@ async fn success_request_token() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestStruct::new(&store);
+    let material = TestStruct::new(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = RequestResetTokenAction::with_material(request_decoder, feature);
+    let mut action = RequestResetTokenAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -77,10 +77,10 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let feature = TestStruct::new(&store);
+    let material = TestStruct::new(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = RequestResetTokenAction::with_material(request_decoder, feature);
+    let mut action = RequestResetTokenAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -97,10 +97,10 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let feature = TestStruct::new(&store);
+    let material = TestStruct::new(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = RequestResetTokenAction::with_material(request_decoder, feature);
+    let mut action = RequestResetTokenAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -113,10 +113,10 @@ async fn error_empty_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestStruct::new(&store);
+    let material = TestStruct::new(&store);
     let request_decoder = empty_login_id_request_decoder();
 
-    let mut action = RequestResetTokenAction::with_material(request_decoder, feature);
+    let mut action = RequestResetTokenAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -131,10 +131,10 @@ async fn error_too_long_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestStruct::new(&store);
+    let material = TestStruct::new(&store);
     let request_decoder = too_long_login_id_request_decoder();
 
-    let mut action = RequestResetTokenAction::with_material(request_decoder, feature);
+    let mut action = RequestResetTokenAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -149,10 +149,10 @@ async fn just_max_length_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestStruct::new(&store);
+    let material = TestStruct::new(&store);
     let request_decoder = just_max_length_login_id_request_decoder();
 
-    let mut action = RequestResetTokenAction::with_material(request_decoder, feature);
+    let mut action = RequestResetTokenAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -165,10 +165,10 @@ async fn error_destination_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::destination_not_stored();
-    let feature = TestStruct::new(&store);
+    let material = TestStruct::new(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = RequestResetTokenAction::with_material(request_decoder, feature);
+    let mut action = RequestResetTokenAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;

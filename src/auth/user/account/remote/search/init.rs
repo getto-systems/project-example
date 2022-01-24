@@ -3,64 +3,55 @@ pub mod search_repository;
 
 use tonic::metadata::MetadataMap;
 
-use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideFeature;
+use crate::auth::user::account::remote::y_protobuf::service::SearchAuthUserAccountRequestPb;
+
+use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 
 use crate::auth::{
     ticket::remote::validate::init::ApiValidateAuthTokenStruct,
-    user::account::remote::search::init::search_repository::MysqlSearchAuthUserAccountRepository,
+    user::account::remote::search::init::{
+        request_decoder::PbSearchAuthUserAccountRequestDecoder,
+        search_repository::MysqlSearchAuthUserAccountRepository,
+    },
 };
 
-use super::infra::SearchAuthUserAccountInfra;
+use super::action::{SearchAuthUserAccountAction, SearchAuthUserAccountMaterial};
 
-pub struct SearchAuthUserAccountStruct<'a> {
-    validate_infra: ApiValidateAuthTokenStruct<'a>,
+pub struct SearchAuthUserAccountFeature<'a> {
+    validate: ApiValidateAuthTokenStruct<'a>,
+
     search_repository: MysqlSearchAuthUserAccountRepository<'a>,
 }
 
-impl<'a> SearchAuthUserAccountStruct<'a> {
-    pub fn new(feature: &'a AuthOutsideFeature, metadata: &'a MetadataMap) -> Self {
-        Self {
-            validate_infra: ApiValidateAuthTokenStruct::new(feature, metadata),
-            search_repository: MysqlSearchAuthUserAccountRepository::new(&feature.store.mysql),
-        }
+impl<'a> SearchAuthUserAccountFeature<'a> {
+    pub fn action(
+        feature: &'a AuthAppFeature,
+        metadata: &'a MetadataMap,
+        request: SearchAuthUserAccountRequestPb,
+    ) -> SearchAuthUserAccountAction<PbSearchAuthUserAccountRequestDecoder, Self> {
+        SearchAuthUserAccountAction::with_material(
+            PbSearchAuthUserAccountRequestDecoder::new(request),
+            Self {
+                validate: ApiValidateAuthTokenStruct::new(&feature.auth, metadata),
+
+                search_repository: MysqlSearchAuthUserAccountRepository::new(
+                    &feature.auth.store.mysql,
+                ),
+            },
+        )
     }
 }
 
-impl<'a> SearchAuthUserAccountInfra for SearchAuthUserAccountStruct<'a> {
-    type ValidateInfra = ApiValidateAuthTokenStruct<'a>;
+impl<'a> SearchAuthUserAccountMaterial for SearchAuthUserAccountFeature<'a> {
+    type Validate = ApiValidateAuthTokenStruct<'a>;
+
     type SearchRepository = MysqlSearchAuthUserAccountRepository<'a>;
 
-    fn validate_infra(&self) -> &Self::ValidateInfra {
-        &self.validate_infra
+    fn validate(&self) -> &Self::Validate {
+        &self.validate
     }
+
     fn search_repository(&self) -> &Self::SearchRepository {
         &self.search_repository
-    }
-}
-
-#[cfg(test)]
-pub mod test {
-    use crate::auth::{
-        ticket::remote::validate::init::test::StaticValidateAuthTokenStruct,
-        user::account::remote::search::init::search_repository::test::MemorySearchAuthUserAccountRepository,
-    };
-
-    use super::super::infra::SearchAuthUserAccountInfra;
-
-    pub struct StaticSearchAuthUserAccountStruct<'a> {
-        pub validate_infra: StaticValidateAuthTokenStruct<'a>,
-        pub search_repository: MemorySearchAuthUserAccountRepository<'a>,
-    }
-
-    impl<'a> SearchAuthUserAccountInfra for StaticSearchAuthUserAccountStruct<'a> {
-        type ValidateInfra = StaticValidateAuthTokenStruct<'a>;
-        type SearchRepository = MemorySearchAuthUserAccountRepository<'a>;
-
-        fn validate_infra(&self) -> &Self::ValidateInfra {
-            &self.validate_infra
-        }
-        fn search_repository(&self) -> &Self::SearchRepository {
-            &self.search_repository
-        }
     }
 }

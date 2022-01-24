@@ -2,10 +2,16 @@ pub mod request_decoder;
 pub mod reset_notifier;
 pub mod token_decoder;
 
+use tonic::metadata::MetadataMap;
+
+use crate::auth::user::password::reset::remote::y_protobuf::service::ResetPasswordRequestPb;
+
+use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
+
 use crate::auth::{
-    remote::x_outside_feature::auth::feature::AuthOutsideFeature,
     ticket::remote::{
-        check_nonce::init::CheckAuthNonceStruct, kernel::init::clock::ChronoAuthClock,
+        check_nonce::init::CheckAuthNonceStruct, encode::init::EncodeAuthTicketStruct,
+        issue::init::IssueAuthTicketStruct, kernel::init::clock::ChronoAuthClock,
     },
     user::{
         password::{
@@ -13,18 +19,22 @@ use crate::auth::{
                 password_hasher::Argon2PasswordHasher,
                 password_repository::MysqlAuthUserPasswordRepository,
             },
-            reset::remote::reset::init::reset_notifier::EmailResetPasswordNotifier,
+            reset::remote::reset::init::{
+                request_decoder::PbResetPasswordRequestDecoder,
+                reset_notifier::EmailResetPasswordNotifier, token_decoder::JwtResetTokenDecoder,
+            },
         },
         remote::kernel::init::user_repository::MysqlAuthUserRepository,
     },
 };
-use token_decoder::JwtResetTokenDecoder;
-use tonic::metadata::MetadataMap;
 
-use crate::auth::user::password::reset::remote::reset::infra::ResetPasswordInfra;
+use super::action::{ResetPasswordAction, ResetPasswordMaterial};
 
-pub struct ResetPasswordStruct<'a> {
-    check_nonce_infra: CheckAuthNonceStruct<'a>,
+pub struct ResetPasswordFeature<'a> {
+    check_nonce: CheckAuthNonceStruct<'a>,
+    issue: IssueAuthTicketStruct<'a>,
+    encode: EncodeAuthTicketStruct<'a>,
+
     clock: ChronoAuthClock,
     user_repository: MysqlAuthUserRepository<'a>,
     password_repository: MysqlAuthUserPasswordRepository<'a>,
@@ -32,21 +42,36 @@ pub struct ResetPasswordStruct<'a> {
     reset_notifier: EmailResetPasswordNotifier<'a>,
 }
 
-impl<'a> ResetPasswordStruct<'a> {
-    pub fn new(feature: &'a AuthOutsideFeature, metadata: &'a MetadataMap) -> Self {
-        Self {
-            check_nonce_infra: CheckAuthNonceStruct::new(feature, metadata),
-            clock: ChronoAuthClock::new(),
-            user_repository: MysqlAuthUserRepository::new(&feature.store.mysql),
-            password_repository: MysqlAuthUserPasswordRepository::new(&feature.store.mysql),
-            token_decoder: JwtResetTokenDecoder::new(&feature.reset_token_key),
-            reset_notifier: EmailResetPasswordNotifier::new(&feature.email),
-        }
+impl<'a> ResetPasswordFeature<'a> {
+    pub fn action(
+        feature: &'a AuthAppFeature,
+        metadata: &'a MetadataMap,
+        request: ResetPasswordRequestPb,
+    ) -> ResetPasswordAction<PbResetPasswordRequestDecoder, Self> {
+        ResetPasswordAction::with_material(
+            PbResetPasswordRequestDecoder::new(request),
+            Self {
+                check_nonce: CheckAuthNonceStruct::new(&feature.auth, metadata),
+                issue: IssueAuthTicketStruct::new(&feature.auth),
+                encode: EncodeAuthTicketStruct::new(&feature.auth),
+
+                clock: ChronoAuthClock::new(),
+                user_repository: MysqlAuthUserRepository::new(&feature.auth.store.mysql),
+                password_repository: MysqlAuthUserPasswordRepository::new(
+                    &feature.auth.store.mysql,
+                ),
+                token_decoder: JwtResetTokenDecoder::new(&feature.auth.reset_token_key),
+                reset_notifier: EmailResetPasswordNotifier::new(&feature.auth.email),
+            },
+        )
     }
 }
 
-impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
-    type CheckNonceInfra = CheckAuthNonceStruct<'a>;
+impl<'a> ResetPasswordMaterial for ResetPasswordFeature<'a> {
+    type CheckNonce = CheckAuthNonceStruct<'a>;
+    type Issue = IssueAuthTicketStruct<'a>;
+    type Encode = EncodeAuthTicketStruct<'a>;
+
     type Clock = ChronoAuthClock;
     type UserRepository = MysqlAuthUserRepository<'a>;
     type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
@@ -54,9 +79,16 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
     type TokenDecoder = JwtResetTokenDecoder<'a>;
     type ResetNotifier = EmailResetPasswordNotifier<'a>;
 
-    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
-        &self.check_nonce_infra
+    fn check_nonce(&self) -> &Self::CheckNonce {
+        &self.check_nonce
     }
+    fn issue(&self) -> &Self::Issue {
+        &self.issue
+    }
+    fn encode(&self) -> &Self::Encode {
+        &self.encode
+    }
+
     fn clock(&self) -> &Self::Clock {
         &self.clock
     }
@@ -71,66 +103,5 @@ impl<'a> ResetPasswordInfra for ResetPasswordStruct<'a> {
     }
     fn reset_notifier(&self) -> &Self::ResetNotifier {
         &self.reset_notifier
-    }
-}
-
-#[cfg(test)]
-pub mod test {
-    use super::token_decoder::test::StaticResetTokenDecoder;
-    use crate::auth::{
-        ticket::remote::{
-            check_nonce::init::test::StaticCheckAuthNonceStruct,
-            kernel::init::clock::test::StaticChronoAuthClock,
-        },
-        user::{
-            password::{
-                remote::kernel::init::{
-                    password_hasher::test::PlainPasswordHasher,
-                    password_repository::test::MemoryAuthUserPasswordRepository,
-                },
-                reset::remote::reset::init::reset_notifier::test::StaticResetPasswordNotifier,
-            },
-            remote::kernel::init::user_repository::test::MemoryAuthUserRepository,
-        },
-    };
-
-    use super::super::infra::ResetPasswordInfra;
-
-    pub struct StaticResetPasswordStruct<'a> {
-        pub check_nonce_infra: StaticCheckAuthNonceStruct<'a>,
-        pub clock: StaticChronoAuthClock,
-        pub user_repository: MemoryAuthUserRepository<'a>,
-        pub password_repository: MemoryAuthUserPasswordRepository<'a>,
-        pub token_decoder: StaticResetTokenDecoder,
-        pub reset_notifier: StaticResetPasswordNotifier,
-    }
-
-    impl<'a> ResetPasswordInfra for StaticResetPasswordStruct<'a> {
-        type CheckNonceInfra = StaticCheckAuthNonceStruct<'a>;
-        type Clock = StaticChronoAuthClock;
-        type UserRepository = MemoryAuthUserRepository<'a>;
-        type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
-        type PasswordHasher = PlainPasswordHasher;
-        type TokenDecoder = StaticResetTokenDecoder;
-        type ResetNotifier = StaticResetPasswordNotifier;
-
-        fn check_nonce_infra(&self) -> &Self::CheckNonceInfra {
-            &self.check_nonce_infra
-        }
-        fn clock(&self) -> &Self::Clock {
-            &self.clock
-        }
-        fn user_repository(&self) -> &Self::UserRepository {
-            &self.user_repository
-        }
-        fn password_repository(&self) -> &Self::PasswordRepository {
-            &self.password_repository
-        }
-        fn token_decoder(&self) -> &Self::TokenDecoder {
-            &self.token_decoder
-        }
-        fn reset_notifier(&self) -> &Self::ResetNotifier {
-            &self.reset_notifier
-        }
     }
 }
