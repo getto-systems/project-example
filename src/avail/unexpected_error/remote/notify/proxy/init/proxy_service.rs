@@ -15,7 +15,7 @@ use crate::{
 
 use crate::{
     auth::remote::infra::AuthMetadataContent,
-    avail::unexpected_error::remote::proxy_notify::infra::NotifyUnexpectedErrorFieldsExtract,
+    avail::unexpected_error::remote::notify::infra::NotifyUnexpectedErrorFieldsExtract,
     example::remote::proxy::ExampleProxyService,
     z_lib::remote::service::infra::ServiceAuthorizer,
 };
