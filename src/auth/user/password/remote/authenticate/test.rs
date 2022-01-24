@@ -72,7 +72,7 @@ async fn success_authenticate() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, feature);
@@ -94,7 +94,7 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, feature);
@@ -116,7 +116,7 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, feature);
@@ -134,7 +134,7 @@ async fn error_empty_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = empty_login_id_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, feature);
@@ -152,7 +152,7 @@ async fn error_too_long_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = too_long_login_id_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, feature);
@@ -170,7 +170,7 @@ async fn just_max_length_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = just_max_length_login_id_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, feature);
@@ -186,7 +186,7 @@ async fn error_empty_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = empty_password_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, feature);
@@ -204,7 +204,7 @@ async fn error_too_long_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = too_long_password_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, feature);
@@ -222,7 +222,7 @@ async fn just_max_length_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = just_max_length_password_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, feature);
@@ -238,7 +238,7 @@ async fn error_failed_to_match_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::match_fail_password();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, feature);
@@ -254,7 +254,7 @@ async fn error_password_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::password_not_stored();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, feature);
@@ -270,7 +270,7 @@ async fn error_user_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::user_not_stored();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, feature);
@@ -281,7 +281,7 @@ async fn error_user_not_stored() {
     assert!(!result.is_ok());
 }
 
-struct TestFeature<'a> {
+struct TestStruct<'a> {
     check_nonce: StaticCheckAuthNonceStruct<'a>,
     issue: StaticIssueAuthTicketStruct<'a>,
     encode: StaticEncodeAuthTicketStruct<'a>,
@@ -290,7 +290,7 @@ struct TestFeature<'a> {
     password_repository: MemoryAuthUserPasswordRepository<'a>,
 }
 
-impl<'a> AuthenticatePasswordMaterial for TestFeature<'a> {
+impl<'a> AuthenticatePasswordMaterial for TestStruct<'a> {
     type CheckNonce = StaticCheckAuthNonceStruct<'a>;
     type Issue = StaticIssueAuthTicketStruct<'a>;
     type Encode = StaticEncodeAuthTicketStruct<'a>;
@@ -375,7 +375,7 @@ impl TestStore {
     }
 }
 
-impl<'a> TestFeature<'a> {
+impl<'a> TestStruct<'a> {
     fn new(store: &'a TestStore) -> Self {
         Self {
             check_nonce: StaticCheckAuthNonceStruct {
