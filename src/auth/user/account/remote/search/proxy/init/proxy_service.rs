@@ -21,7 +21,7 @@ use crate::{
     auth::{
         remote::service::proxy::AuthProxyService,
         ticket::remote::kernel::infra::AuthMetadataContent,
-        user::account::remote::proxy_search::infra::SearchAuthUserAccountProxyResponse,
+        user::account::remote::search::proxy::infra::SearchAuthUserAccountProxyResponse,
     },
     z_lib::remote::service::infra::ServiceAuthorizer,
 };

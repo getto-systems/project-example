@@ -1,21 +1,22 @@
 use crate::z_lib::remote::message::helper::encode_protobuf_base64;
 
 use crate::auth::user::account::remote::y_protobuf::api::{
-    SearchAuthUserAccountApiResponsePb, AuthUserAccountApiPb,
+    AuthUserAccountApiPb, SearchAuthUserAccountApiResponsePb,
 };
 
 use crate::auth::remote::service::proxy::AuthProxyResponseEncoder;
 
-use crate::auth::user::account::remote::proxy_search::infra::SearchAuthUserAccountProxyResponse;
+use crate::auth::user::account::remote::search::proxy::infra::SearchAuthUserAccountProxyResponse;
 
 use crate::{
-    auth::user::account::remote::proxy_search::data::SearchAuthUserAccountProxyMessage,
+    auth::user::account::remote::search::proxy::data::SearchAuthUserAccountProxyMessage,
     z_lib::remote::message::data::MessageError,
 };
 
 pub struct ResponseEncoder;
 
-impl<'a> AuthProxyResponseEncoder<SearchAuthUserAccountProxyResponse, SearchAuthUserAccountProxyMessage>
+impl<'a>
+    AuthProxyResponseEncoder<SearchAuthUserAccountProxyResponse, SearchAuthUserAccountProxyMessage>
     for ResponseEncoder
 {
     fn encode(

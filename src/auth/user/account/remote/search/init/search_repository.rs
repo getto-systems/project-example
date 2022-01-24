@@ -14,7 +14,9 @@ use crate::auth::user::account::remote::search::infra::{
 
 use crate::{
     auth::user::{
-        account::remote::search::data::{AuthUserAccountBasket, SearchAuthUserAccountBasket},
+        account::remote::search::data::{
+            AuthUserAccountBasket, SearchAuthUserAccountBasket,
+        },
         login_id::remote::data::LoginIdBasket,
         remote::kernel::data::GrantedAuthRolesBasket,
     },
@@ -196,7 +198,9 @@ pub mod test {
 
     use crate::{
         auth::user::{
-            account::remote::search::data::{AuthUserAccountBasket, SearchAuthUserAccountBasket},
+            account::remote::search::data::{
+                AuthUserAccountBasket, SearchAuthUserAccountBasket,
+            },
             login_id::remote::data::LoginIdBasket,
             remote::kernel::data::GrantedAuthRolesBasket,
         },

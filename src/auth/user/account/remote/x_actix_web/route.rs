@@ -11,7 +11,7 @@ use crate::x_outside_feature::remote::api::{
 
 use crate::auth::remote::service::proxy::call_proxy;
 
-use crate::auth::user::account::remote::proxy_search::{
+use crate::auth::user::account::remote::search::proxy::{
     infra::SearchAuthUserAccountProxyRequestDecoder, init::SearchAuthUserAccountProxyStruct,
 };
 

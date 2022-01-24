@@ -74,7 +74,7 @@ async fn success_request_token() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestMaterial::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -97,7 +97,7 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let material = TestMaterial::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -120,14 +120,14 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let material = TestMaterial::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["reset password error; auth nonce error: conflict"]);
+    assert_state(vec!["auth nonce error: conflict"]);
     assert!(!result.is_ok());
 }
 
@@ -136,7 +136,7 @@ async fn error_match_failed_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestMaterial::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = match_failed_login_id_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -154,7 +154,7 @@ async fn error_empty_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestMaterial::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = empty_login_id_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -172,7 +172,7 @@ async fn error_too_long_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestMaterial::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = too_long_login_id_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -190,7 +190,7 @@ async fn just_max_length_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestMaterial::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = just_max_length_login_id_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -208,7 +208,7 @@ async fn error_empty_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestMaterial::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = empty_password_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -226,7 +226,7 @@ async fn error_too_long_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestMaterial::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = too_long_password_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -244,7 +244,7 @@ async fn just_max_length_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestMaterial::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = just_max_length_password_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -267,7 +267,7 @@ async fn error_empty_reset_token() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestMaterial::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = empty_reset_token_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -285,7 +285,7 @@ async fn error_reset_token_expired_when_decode() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestMaterial::expired_reset_token(&store);
+    let material = TestStruct::expired_reset_token(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -301,7 +301,7 @@ async fn error_reset_token_expired_in_store() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_reset_token();
-    let material = TestMaterial::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -319,7 +319,7 @@ async fn error_reset_token_discarded() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::discarded_reset_token();
-    let material = TestMaterial::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -337,7 +337,7 @@ async fn error_password_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::password_not_stored();
-    let material = TestMaterial::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -355,7 +355,7 @@ async fn error_user_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::user_not_stored();
-    let material = TestMaterial::standard(&store);
+    let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -366,7 +366,7 @@ async fn error_user_not_stored() {
     assert!(!result.is_ok());
 }
 
-struct TestMaterial<'a> {
+struct TestStruct<'a> {
     check_nonce: StaticCheckAuthNonceStruct<'a>,
     issue: StaticIssueAuthTicketStruct<'a>,
     encode: StaticEncodeAuthTicketStruct<'a>,
@@ -378,7 +378,7 @@ struct TestMaterial<'a> {
     reset_notifier: StaticResetPasswordNotifier,
 }
 
-impl<'a> ResetPasswordMaterial for TestMaterial<'a> {
+impl<'a> ResetPasswordMaterial for TestStruct<'a> {
     type CheckNonce = StaticCheckAuthNonceStruct<'a>;
     type Issue = StaticIssueAuthTicketStruct<'a>;
     type Encode = StaticEncodeAuthTicketStruct<'a>;
@@ -483,7 +483,7 @@ impl TestStore {
     }
 }
 
-impl<'a> TestMaterial<'a> {
+impl<'a> TestStruct<'a> {
     fn standard(store: &'a TestStore) -> Self {
         Self::with_token_decoder(store, standard_reset_token_decoder())
     }

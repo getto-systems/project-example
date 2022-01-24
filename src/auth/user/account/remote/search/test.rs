@@ -27,7 +27,6 @@ use crate::{
                     MemorySearchAuthUserAccountMap, MemorySearchAuthUserAccountRepository,
                     MemorySearchAuthUserAccountStore,
                 },
-                test::StaticSearchAuthUserAccountStruct,
             },
             password::remote::kernel::init::password_repository::test::MemoryAuthUserPasswordMap,
             remote::kernel::init::user_repository::test::MemoryAuthUserMap,
@@ -59,13 +58,13 @@ async fn success_search() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::new(&store);
+    let feature = TestStruct::new(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = SearchAuthUserAccountAction::with_material(feature);
+    let mut action = SearchAuthUserAccountAction::with_material(request_decoder, feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "validate success; ticket: ticket-id / user: user-id (granted: [manage_auth_user])",
         "search user account success",
@@ -73,15 +72,22 @@ async fn success_search() {
     assert!(result.is_ok());
 }
 
-struct TestFeature<'a> {
-    search: StaticSearchAuthUserAccountStruct<'a>,
+struct TestStruct<'a> {
+    validate: StaticValidateAuthTokenStruct<'a>,
+
+    search_repository: MemorySearchAuthUserAccountRepository<'a>,
 }
 
-impl<'a> SearchAuthUserAccountMaterial for TestFeature<'a> {
-    type Search = StaticSearchAuthUserAccountStruct<'a>;
+impl<'a> SearchAuthUserAccountMaterial for TestStruct<'a> {
+    type Validate = StaticValidateAuthTokenStruct<'a>;
+    type SearchRepository = MemorySearchAuthUserAccountRepository<'a>;
 
-    fn search(&self) -> &Self::Search {
-        &self.search
+    fn validate(&self) -> &Self::Validate {
+        &self.validate
+    }
+
+    fn search_repository(&self) -> &Self::SearchRepository {
+        &self.search_repository
     }
 }
 
@@ -99,22 +105,20 @@ impl TestStore {
     }
 }
 
-impl<'a> TestFeature<'a> {
+impl<'a> TestStruct<'a> {
     fn new(store: &'a TestStore) -> Self {
         Self {
-            search: StaticSearchAuthUserAccountStruct {
-                validate_infra: StaticValidateAuthTokenStruct {
-                    check_nonce_infra: StaticCheckAuthNonceStruct {
-                        config: standard_nonce_config(),
-                        clock: standard_clock(),
-                        nonce_metadata: standard_nonce_header(),
-                        nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
-                    },
-                    token_metadata: standard_token_header(),
-                    token_decoder: standard_token_decoder(),
+            validate: StaticValidateAuthTokenStruct {
+                check_nonce_infra: StaticCheckAuthNonceStruct {
+                    config: standard_nonce_config(),
+                    clock: standard_clock(),
+                    nonce_metadata: standard_nonce_header(),
+                    nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
-                search_repository: MemorySearchAuthUserAccountRepository::new(&store.search),
+                token_metadata: standard_token_header(),
+                token_decoder: standard_token_decoder(),
             },
+            search_repository: MemorySearchAuthUserAccountRepository::new(&store.search),
         }
     }
 }

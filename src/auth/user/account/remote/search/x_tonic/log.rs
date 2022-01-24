@@ -1,12 +1,29 @@
-use crate::z_lib::remote::logger::LogLevel;
+use crate::{
+    auth::user::account::remote::search::action::SearchAuthUserAccountEvent,
+    z_lib::remote::logger::{LogLevel, LogMessage},
+};
 
-use super::super::event::SearchAuthUserAccountEvent;
+use super::super::action::SearchAuthUserAccountState;
+
+impl LogMessage for &SearchAuthUserAccountState {
+    fn log_message(&self) -> String {
+        format!("{}", self)
+    }
+}
+
+impl SearchAuthUserAccountState {
+    pub const fn log_level(&self) -> LogLevel {
+        match self {
+            Self::Validate(event) => event.log_level(),
+            Self::Search(event) => event.log_level(),
+        }
+    }
+}
 
 impl SearchAuthUserAccountEvent {
     pub const fn log_level(&self) -> LogLevel {
         match self {
             Self::Success(_) => LogLevel::Audit,
-            Self::Validate(err) => err.log_level(),
             Self::RepositoryError(err) => err.log_level(),
         }
     }

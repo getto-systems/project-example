@@ -4,9 +4,9 @@ use crate::auth::user::account::remote::y_protobuf::api::SearchAuthUserAccountAp
 
 use crate::z_lib::remote::message::helper::{decode_base64, invalid_protobuf};
 
-use crate::auth::user::account::remote::{
-    proxy_search::infra::SearchAuthUserAccountProxyRequestDecoder,
-    search::infra::SearchAuthUserAccountFieldsExtract,
+use crate::auth::user::account::remote::search::{
+    infra::SearchAuthUserAccountFieldsExtract,
+    proxy::infra::SearchAuthUserAccountProxyRequestDecoder,
 };
 
 use crate::z_lib::remote::{message::data::MessageError, search::data::SearchSortExtract};

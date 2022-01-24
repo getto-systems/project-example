@@ -1,10 +1,10 @@
 use crate::auth::user::account::remote::y_protobuf::service::SearchAuthUserAccountResponsePb;
 
-use crate::auth::user::account::remote::proxy_search::infra::SearchAuthUserAccountProxyResponse;
+use crate::auth::user::account::remote::search::proxy::infra::SearchAuthUserAccountProxyResponse;
 
 use crate::{
     auth::user::{
-        account::remote::search::data::{SearchAuthUserAccountBasket, AuthUserAccountBasket},
+        account::remote::search::data::{AuthUserAccountBasket, SearchAuthUserAccountBasket},
         login_id::remote::data::LoginIdBasket,
         remote::kernel::data::GrantedAuthRolesBasket,
     },

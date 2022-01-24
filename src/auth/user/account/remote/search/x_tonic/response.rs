@@ -1,20 +1,28 @@
 use tonic::{Response, Status};
 
 use crate::auth::user::account::remote::y_protobuf::service::{
-    SearchAuthUserAccountResponsePb, AuthUserAccountPb,
+    AuthUserAccountPb, SearchAuthUserAccountResponsePb,
 };
 
 use crate::z_lib::remote::response::tonic::RespondTo;
 
-use super::super::event::SearchAuthUserAccountEvent;
+use super::super::action::{SearchAuthUserAccountEvent, SearchAuthUserAccountState};
 
 use crate::auth::user::account::remote::search::data::SearchAuthUserAccountBasket;
+
+impl RespondTo<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountState {
+    fn respond_to(self) -> Result<Response<SearchAuthUserAccountResponsePb>, Status> {
+        match self {
+            Self::Validate(_) => Err(Status::permission_denied("permission denied")),
+            Self::Search(event) => event.respond_to(),
+        }
+    }
+}
 
 impl RespondTo<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountEvent {
     fn respond_to(self) -> Result<Response<SearchAuthUserAccountResponsePb>, Status> {
         match self {
             Self::Success(response) => response.respond_to(),
-            Self::Validate(_) => Err(Status::permission_denied("permission denied")),
             Self::RepositoryError(err) => err.respond_to(),
         }
     }

@@ -15,14 +15,12 @@ use response_encoder::ResponseEncoder;
 
 use crate::auth::remote::service::proxy::{AuthProxyEvent, AuthProxyInfra};
 
-use crate::auth::user::account::remote::{
-    proxy_search::infra::{
-        SearchAuthUserAccountProxyRequestDecoder, SearchAuthUserAccountProxyResponse,
-    },
-    search::infra::SearchAuthUserAccountFieldsExtract,
+use crate::auth::user::account::remote::search::{
+    infra::SearchAuthUserAccountFieldsExtract,
+    proxy::infra::{SearchAuthUserAccountProxyRequestDecoder, SearchAuthUserAccountProxyResponse},
 };
 
-use crate::auth::user::account::remote::proxy_search::data::SearchAuthUserAccountProxyMessage;
+use crate::auth::user::account::remote::search::proxy::data::SearchAuthUserAccountProxyMessage;
 
 pub struct SearchAuthUserAccountProxyStruct<'a> {
     pubsub: ActionStatePubSub<AuthProxyEvent<SearchAuthUserAccountProxyMessage>>,
