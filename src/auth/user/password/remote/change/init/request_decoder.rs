@@ -1,7 +1,7 @@
 use crate::auth::user::password::remote::y_protobuf::service::ChangePasswordRequestPb;
 
-use crate::auth::user::password::remote::{
-    change::infra::ChangePasswordRequestDecoder, proxy_change::infra::ChangePasswordFieldsExtract,
+use crate::auth::user::password::remote::change::infra::{
+    ChangePasswordFieldsExtract, ChangePasswordRequestDecoder,
 };
 
 pub struct PbChangePasswordRequestDecoder {
@@ -25,9 +25,8 @@ impl ChangePasswordRequestDecoder for PbChangePasswordRequestDecoder {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::user::password::remote::{
-        change::infra::ChangePasswordRequestDecoder,
-        proxy_change::infra::ChangePasswordFieldsExtract,
+    use crate::auth::user::password::remote::change::infra::{
+        ChangePasswordFieldsExtract, ChangePasswordRequestDecoder,
     };
 
     pub enum StaticChangePasswordRequestDecoder {

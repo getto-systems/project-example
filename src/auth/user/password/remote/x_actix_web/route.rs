@@ -17,7 +17,7 @@ use crate::auth::user::password::remote::{
     authenticate::proxy::{
         infra::AuthenticatePasswordProxyRequestDecoder, init::AuthenticatePasswordProxyStruct,
     },
-    proxy_change::{infra::ChangePasswordProxyRequestDecoder, init::ChangePasswordProxyStruct},
+    change::proxy::{infra::ChangePasswordProxyRequestDecoder, init::ChangePasswordProxyStruct},
 };
 
 pub fn scope_password() -> Scope {

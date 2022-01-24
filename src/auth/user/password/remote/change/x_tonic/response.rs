@@ -4,16 +4,24 @@ use crate::auth::user::password::remote::y_protobuf::service::ChangePasswordResp
 
 use crate::z_lib::remote::response::tonic::RespondTo;
 
-use super::super::event::ChangePasswordEvent;
+use super::super::action::{ChangePasswordEvent, ChangePasswordState};
 
-use crate::auth::user::password::remote::change::data::ChangePasswordError;
+use super::super::data::ChangePasswordError;
+
+impl RespondTo<ChangePasswordResponsePb> for ChangePasswordState {
+    fn respond_to(self) -> Result<Response<ChangePasswordResponsePb>, Status> {
+        match self {
+            Self::Validate(_) => Err(Status::permission_denied("permission denied")),
+            Self::Change(event) => event.respond_to(),
+        }
+    }
+}
 
 impl RespondTo<ChangePasswordResponsePb> for ChangePasswordEvent {
     fn respond_to(self) -> Result<Response<ChangePasswordResponsePb>, Status> {
         match self {
             Self::Success => Ok(Response::new(ChangePasswordResponsePb { success: true })),
             Self::UserNotFound => Err(Status::internal("user not found")),
-            Self::Validate(_) => Err(Status::permission_denied("permission denied")),
             Self::InvalidPassword(err) => err.respond_to(),
             Self::NonceError(err) => err.respond_to(),
             Self::PasswordHashError(err) => err.respond_to(),
