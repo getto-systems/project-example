@@ -1,8 +1,7 @@
-pub mod action_logout;
+pub mod logout;
 pub mod action_renew;
 pub mod action_validate;
 pub mod check_nonce;
-pub mod discard;
 pub mod encode;
 pub mod issue;
 pub mod kernel;
