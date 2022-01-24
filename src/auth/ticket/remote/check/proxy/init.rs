@@ -17,14 +17,14 @@ use crate::auth::ticket::remote::{
     encode::data::AuthTicketEncoded, kernel::data::AuthTokenResponse,
 };
 
-pub struct RenewAuthTicketProxyStruct<'a> {
+pub struct CheckAuthTicketProxyStruct<'a> {
     pubsub: ActionStatePubSub<AuthProxyEvent<AuthTokenResponse>>,
     validate_infra: ValidateTicketMetadataStruct<'a>,
     proxy_service: ProxyService<'a>,
     response_encoder: ResponseEncoder<'a>,
 }
 
-impl<'a> RenewAuthTicketProxyStruct<'a> {
+impl<'a> CheckAuthTicketProxyStruct<'a> {
     pub fn new(
         feature: &'a AuthOutsideFeature,
         request_id: &'a str,
@@ -48,7 +48,7 @@ impl<'a> RenewAuthTicketProxyStruct<'a> {
 
 #[async_trait::async_trait]
 impl<'a> AuthProxyInfra<(), AuthTicketEncoded, AuthTokenResponse>
-    for RenewAuthTicketProxyStruct<'a>
+    for CheckAuthTicketProxyStruct<'a>
 {
     type ValidateInfra = ValidateTicketMetadataStruct<'a>;
     type ProxyService = ProxyService<'a>;

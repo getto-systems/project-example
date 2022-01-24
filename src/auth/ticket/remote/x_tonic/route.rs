@@ -5,10 +5,10 @@ use getto_application::helper::flatten;
 use crate::z_lib::remote::{logger::Logger, response::tonic::RespondTo};
 
 use crate::auth::ticket::remote::y_protobuf::service::{
+    check_auth_ticket_pb_server::{CheckAuthTicketPb, CheckAuthTicketPbServer},
     logout_pb_server::{LogoutPb, LogoutPbServer},
-    renew_auth_ticket_pb_server::{RenewAuthTicketPb, RenewAuthTicketPbServer},
     validate_api_token_pb_server::{ValidateApiTokenPb, ValidateApiTokenPbServer},
-    LogoutRequestPb, LogoutResponsePb, RenewAuthTicketRequestPb, RenewAuthTicketResponsePb,
+    CheckAuthTicketRequestPb, CheckAuthTicketResponsePb, LogoutRequestPb, LogoutResponsePb,
     ValidateApiTokenRequestPb, ValidateApiTokenResponsePb,
 };
 
@@ -21,8 +21,8 @@ use crate::x_outside_feature::remote::{
 };
 
 use crate::auth::ticket::remote::{
-    logout::init::LogoutStruct, action_renew::init::RenewAuthTicketFeature,
-    action_validate::init::ValidateApiTokenFeature,
+    action_validate::init::ValidateApiTokenFeature, check::init::CheckAuthTicketStruct,
+    logout::init::LogoutStruct,
 };
 
 pub struct AuthTicketServer;
@@ -31,8 +31,8 @@ impl AuthTicketServer {
     pub fn logout(&self) -> LogoutPbServer<Logout> {
         LogoutPbServer::new(Logout)
     }
-    pub fn renew(&self) -> RenewAuthTicketPbServer<Renew> {
-        RenewAuthTicketPbServer::new(Renew)
+    pub fn check(&self) -> CheckAuthTicketPbServer<Check> {
+        CheckAuthTicketPbServer::new(Check)
     }
     pub fn validate(&self) -> ValidateApiTokenPbServer<Validate> {
         ValidateApiTokenPbServer::new(Validate)
@@ -50,7 +50,7 @@ impl LogoutPb for Logout {
         let TonicRequest { data, metadata, .. } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("auth.auth_ticket.logout", request_id.into());
+        let logger = app_logger("auth.ticket.logout", request_id.into());
         let mut action = LogoutStruct::action(&data, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
@@ -58,19 +58,19 @@ impl LogoutPb for Logout {
     }
 }
 
-pub struct Renew;
+pub struct Check;
 
 #[async_trait::async_trait]
-impl RenewAuthTicketPb for Renew {
-    async fn renew(
+impl CheckAuthTicketPb for Check {
+    async fn check(
         &self,
-        request: Request<RenewAuthTicketRequestPb>,
-    ) -> Result<Response<RenewAuthTicketResponsePb>, Status> {
+        request: Request<CheckAuthTicketRequestPb>,
+    ) -> Result<Response<CheckAuthTicketResponsePb>, Status> {
         let TonicRequest { data, metadata, .. } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("auth.auth_ticket.renew", request_id.into());
-        let mut action = RenewAuthTicketFeature::action(&data, &metadata);
+        let logger = app_logger("auth.ticket.check", request_id.into());
+        let mut action = CheckAuthTicketStruct::action(&data, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         flatten(action.ignite().await).respond_to()
@@ -92,7 +92,7 @@ impl ValidateApiTokenPb for Validate {
         } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("auth.auth_ticket.renew", request_id.into());
+        let logger = app_logger("auth.ticket.validate", request_id.into());
         let mut action = ValidateApiTokenFeature::action(&data, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 

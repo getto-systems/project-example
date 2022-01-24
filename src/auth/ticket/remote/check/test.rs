@@ -31,7 +31,7 @@ use crate::auth::ticket::{
     remote::check_nonce::infra::AuthNonceConfig, remote::encode::infra::EncodeAuthTicketConfig,
 };
 
-use super::action::{RenewAuthTicketAction, RenewAuthTicketMaterial};
+use super::action::{CheckAuthTicketAction, CheckAuthTicketMaterial};
 
 use crate::auth::ticket::remote::kernel::data::{
     AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
@@ -42,9 +42,9 @@ async fn success_allow_for_any_role() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
 
-    let mut action = RenewAuthTicketAction::with_material(feature);
+    let mut action = CheckAuthTicketAction::with_material(feature);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -61,9 +61,9 @@ async fn error_token_expired() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::token_expired(&store);
+    let feature = TestStruct::token_expired(&store);
 
-    let mut action = RenewAuthTicketAction::with_material(feature);
+    let mut action = CheckAuthTicketAction::with_material(feature);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -76,9 +76,9 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
 
-    let mut action = RenewAuthTicketAction::with_material(feature);
+    let mut action = CheckAuthTicketAction::with_material(feature);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -95,9 +95,9 @@ async fn success_limited_ticket() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::limited_ticket();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
 
-    let mut action = RenewAuthTicketAction::with_material(feature);
+    let mut action = CheckAuthTicketAction::with_material(feature);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -114,9 +114,9 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
 
-    let mut action = RenewAuthTicketAction::with_material(feature);
+    let mut action = CheckAuthTicketAction::with_material(feature);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -129,9 +129,9 @@ async fn error_no_ticket() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::no_ticket();
-    let feature = TestFeature::standard(&store);
+    let feature = TestStruct::standard(&store);
 
-    let mut action = RenewAuthTicketAction::with_material(feature);
+    let mut action = CheckAuthTicketAction::with_material(feature);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -142,12 +142,12 @@ async fn error_no_ticket() {
     assert!(!result.is_ok());
 }
 
-struct TestFeature<'a> {
+struct TestStruct<'a> {
     validate: StaticValidateAuthTokenStruct<'a>,
     encode: StaticEncodeAuthTicketStruct<'a>,
 }
 
-impl<'a> RenewAuthTicketMaterial for TestFeature<'a> {
+impl<'a> CheckAuthTicketMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
@@ -197,7 +197,7 @@ impl TestStore {
     }
 }
 
-impl<'a> TestFeature<'a> {
+impl<'a> TestStruct<'a> {
     fn standard(store: &'a TestStore) -> Self {
         Self::with_token_validator(store, standard_token_decoder())
     }

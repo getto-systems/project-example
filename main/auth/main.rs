@@ -24,7 +24,7 @@ async fn main() {
             Ok(request)
         }))
         .add_service(server.auth.ticket.logout())
-        .add_service(server.auth.ticket.renew())
+        .add_service(server.auth.ticket.check())
         .add_service(server.auth.ticket.validate())
         .add_service(server.auth.user.password.authenticate())
         .add_service(server.auth.user.password.change())
