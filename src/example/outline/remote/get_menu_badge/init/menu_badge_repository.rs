@@ -12,9 +12,8 @@ pub struct UnitedOutlineMenuBadgeRepository;
 #[async_trait::async_trait]
 impl OutlineMenuBadgeRepository for UnitedOutlineMenuBadgeRepository {
     async fn get_menu_badge(&self) -> Result<OutlineMenuBadge, RepositoryError> {
-        // unite した Repository 実装から、badge count を取得する
+        // TODO ユーザー数を返すとかにするか
         Ok(OutlineMenuBadge {
-            // TODO example の repository から取得したい
             index: OutlineMenuBadgeCount::restore(4649),
         })
     }

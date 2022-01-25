@@ -1,15 +1,15 @@
 use crate::auth::ticket::remote::{
-    check_nonce::infra::{AuthNonceEntry, AuthNonceRepository, CheckAuthNonceInfra},
+    validate_nonce::infra::{AuthNonceEntry, AuthNonceRepository, ValidateAuthNonceInfra},
     kernel::infra::{AuthClock, AuthNonceMetadata},
 };
 
 use crate::{
-    auth::ticket::remote::check_nonce::data::ValidateAuthNonceError,
+    auth::ticket::remote::validate_nonce::data::ValidateAuthNonceError,
     z_lib::remote::repository::data::RegisterResult,
 };
 
-pub async fn check_auth_nonce(
-    infra: &impl CheckAuthNonceInfra,
+pub async fn validate_auth_nonce(
+    infra: &impl ValidateAuthNonceInfra,
 ) -> Result<(), ValidateAuthNonceError> {
     let clock = infra.clock();
     let nonce_metadata = infra.nonce_metadata();

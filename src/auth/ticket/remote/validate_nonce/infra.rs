@@ -9,7 +9,7 @@ use crate::{
     z_lib::remote::repository::data::{RegisterResult, RepositoryError},
 };
 
-pub trait CheckAuthNonceInfra {
+pub trait ValidateAuthNonceInfra {
     type Clock: AuthClock;
     type NonceMetadata: AuthNonceMetadata;
     type NonceRepository: AuthNonceRepository;

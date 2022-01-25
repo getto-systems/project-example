@@ -9,16 +9,16 @@ use crate::auth::ticket::remote::kernel::init::{
 };
 use nonce_repository::DynamoDbAuthNonceRepository;
 
-use crate::auth::ticket::remote::check_nonce::infra::{AuthNonceConfig, CheckAuthNonceInfra};
+use crate::auth::ticket::remote::validate_nonce::infra::{AuthNonceConfig, ValidateAuthNonceInfra};
 
-pub struct CheckAuthNonceStruct<'a> {
+pub struct ValidateAuthNonceStruct<'a> {
     config: AuthNonceConfig,
     clock: ChronoAuthClock,
     nonce_metadata: TonicAuthNonceMetadata<'a>,
     nonce_repository: DynamoDbAuthNonceRepository<'a>,
 }
 
-impl<'a> CheckAuthNonceInfra for CheckAuthNonceStruct<'a> {
+impl<'a> ValidateAuthNonceInfra for ValidateAuthNonceStruct<'a> {
     type Clock = ChronoAuthClock;
     type NonceMetadata = TonicAuthNonceMetadata<'a>;
     type NonceRepository = DynamoDbAuthNonceRepository<'a>;
@@ -37,7 +37,7 @@ impl<'a> CheckAuthNonceInfra for CheckAuthNonceStruct<'a> {
     }
 }
 
-impl<'a> CheckAuthNonceStruct<'a> {
+impl<'a> ValidateAuthNonceStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature, metadata: &'a MetadataMap) -> Self {
         Self {
             config: AuthNonceConfig {
@@ -60,18 +60,18 @@ pub mod test {
         clock::test::StaticChronoAuthClock, nonce_metadata::test::StaticAuthNonceMetadata,
     };
 
-    use crate::auth::ticket::remote::check_nonce::infra::{
-        AuthNonceConfig, CheckAuthNonceInfra,
+    use crate::auth::ticket::remote::validate_nonce::infra::{
+        AuthNonceConfig, ValidateAuthNonceInfra,
     };
 
-    pub struct StaticCheckAuthNonceStruct<'a> {
+    pub struct StaticValidateAuthNonceStruct<'a> {
         pub config: AuthNonceConfig,
         pub clock: StaticChronoAuthClock,
         pub nonce_metadata: StaticAuthNonceMetadata,
         pub nonce_repository: MemoryAuthNonceRepository<'a>,
     }
 
-    impl<'a> CheckAuthNonceInfra for StaticCheckAuthNonceStruct<'a> {
+    impl<'a> ValidateAuthNonceInfra for StaticValidateAuthNonceStruct<'a> {
         type Clock = StaticChronoAuthClock;
         type NonceMetadata = StaticAuthNonceMetadata;
         type NonceRepository = MemoryAuthNonceRepository<'a>;

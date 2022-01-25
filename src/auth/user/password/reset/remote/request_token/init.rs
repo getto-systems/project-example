@@ -7,7 +7,7 @@ pub mod token_notifier;
 use tonic::metadata::MetadataMap;
 
 use crate::auth::{
-    ticket::remote::check_nonce::init::CheckAuthNonceStruct,
+    ticket::remote::validate_nonce::init::ValidateAuthNonceStruct,
     user::password::reset::remote::y_protobuf::service::RequestResetTokenRequestPb,
 };
 
@@ -31,7 +31,7 @@ use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 use crate::auth::user::password::reset::remote::request_token::infra::RequestResetTokenConfig;
 
 pub struct RequestResetTokenStruct<'a> {
-    check_nonce: CheckAuthNonceStruct<'a>,
+    check_nonce: ValidateAuthNonceStruct<'a>,
 
     clock: ChronoAuthClock,
     password_repository: MysqlAuthUserPasswordRepository<'a>,
@@ -51,7 +51,7 @@ impl<'a> RequestResetTokenStruct<'a> {
         RequestResetTokenAction::with_material(
             PbRequestResetTokenRequestDecoder::new(request),
             Self {
-                check_nonce: CheckAuthNonceStruct::new(&feature.auth, metadata),
+                check_nonce: ValidateAuthNonceStruct::new(&feature.auth, metadata),
 
                 clock: ChronoAuthClock::new(),
                 password_repository: MysqlAuthUserPasswordRepository::new(
@@ -72,7 +72,7 @@ impl<'a> RequestResetTokenStruct<'a> {
 }
 
 impl<'a> RequestResetTokenMaterial for RequestResetTokenStruct<'a> {
-    type CheckNonce = CheckAuthNonceStruct<'a>;
+    type CheckNonce = ValidateAuthNonceStruct<'a>;
 
     type Clock = ChronoAuthClock;
     type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;

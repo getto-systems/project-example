@@ -8,7 +8,7 @@ use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 
 use crate::auth::{
     ticket::remote::{
-        check_nonce::init::CheckAuthNonceStruct, encode::init::EncodeAuthTicketStruct,
+        validate_nonce::init::ValidateAuthNonceStruct, encode::init::EncodeAuthTicketStruct,
         issue::init::IssueAuthTicketStruct,
     },
     user::{
@@ -26,7 +26,7 @@ use crate::auth::{
 use super::action::{AuthenticatePasswordAction, AuthenticatePasswordMaterial};
 
 pub struct AuthenticatePasswordStruct<'a> {
-    check_nonce: CheckAuthNonceStruct<'a>,
+    check_nonce: ValidateAuthNonceStruct<'a>,
     issue: IssueAuthTicketStruct<'a>,
     encode: EncodeAuthTicketStruct<'a>,
 
@@ -43,7 +43,7 @@ impl<'a> AuthenticatePasswordStruct<'a> {
         AuthenticatePasswordAction::with_material(
             PbAuthenticatePasswordRequestDecoder::new(request),
             Self {
-                check_nonce: CheckAuthNonceStruct::new(&feature.auth, metadata),
+                check_nonce: ValidateAuthNonceStruct::new(&feature.auth, metadata),
                 issue: IssueAuthTicketStruct::new(&feature.auth),
                 encode: EncodeAuthTicketStruct::new(&feature.auth),
 
@@ -57,7 +57,7 @@ impl<'a> AuthenticatePasswordStruct<'a> {
 }
 
 impl<'a> AuthenticatePasswordMaterial for AuthenticatePasswordStruct<'a> {
-    type CheckNonce = CheckAuthNonceStruct<'a>;
+    type CheckNonce = ValidateAuthNonceStruct<'a>;
     type Issue = IssueAuthTicketStruct<'a>;
     type Encode = EncodeAuthTicketStruct<'a>;
 

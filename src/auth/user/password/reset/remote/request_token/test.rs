@@ -4,11 +4,11 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     ticket::remote::{
-        check_nonce::init::{
+        validate_nonce::init::{
             nonce_repository::test::{
                 MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
             },
-            test::StaticCheckAuthNonceStruct,
+            test::StaticValidateAuthNonceStruct,
         },
         kernel::init::{
             clock::test::StaticChronoAuthClock, nonce_metadata::test::StaticAuthNonceMetadata,
@@ -33,7 +33,7 @@ use crate::auth::{
 };
 
 use crate::auth::{
-    ticket::remote::check_nonce::infra::AuthNonceConfig,
+    ticket::remote::validate_nonce::infra::AuthNonceConfig,
     user::password::reset::remote::request_token::infra::{
         RequestResetTokenConfig, RequestResetTokenFieldsExtract,
     },
@@ -177,7 +177,7 @@ async fn error_destination_not_stored() {
 }
 
 struct TestStruct<'a> {
-    pub check_nonce: StaticCheckAuthNonceStruct<'a>,
+    pub check_nonce: StaticValidateAuthNonceStruct<'a>,
 
     pub clock: StaticChronoAuthClock,
     pub password_repository: MemoryAuthUserPasswordRepository<'a>,
@@ -189,7 +189,7 @@ struct TestStruct<'a> {
 }
 
 impl<'a> RequestResetTokenMaterial for TestStruct<'a> {
-    type CheckNonce = StaticCheckAuthNonceStruct<'a>;
+    type CheckNonce = StaticValidateAuthNonceStruct<'a>;
 
     type Clock = StaticChronoAuthClock;
     type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
@@ -265,7 +265,7 @@ impl TestStore {
 impl<'a> TestStruct<'a> {
     fn new(store: &'a TestStore) -> Self {
         Self {
-            check_nonce: StaticCheckAuthNonceStruct {
+            check_nonce: StaticValidateAuthNonceStruct {
                 config: standard_nonce_config(),
                 clock: standard_clock(),
                 nonce_metadata: standard_nonce_metadata(),

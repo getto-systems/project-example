@@ -1,8 +1,8 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::ticket::remote::{
-    check_nonce::{
-        data::ValidateAuthNonceError, infra::CheckAuthNonceInfra, method::check_auth_nonce,
+    validate_nonce::{
+        data::ValidateAuthNonceError, infra::ValidateAuthNonceInfra, method::validate_auth_nonce,
     },
     encode::{
         event::EncodeAuthTicketEvent, infra::EncodeAuthTicketInfra, method::encode_auth_ticket,
@@ -70,7 +70,7 @@ impl std::fmt::Display for ResetPasswordState {
 }
 
 pub trait ResetPasswordMaterial {
-    type CheckNonce: CheckAuthNonceInfra;
+    type CheckNonce: ValidateAuthNonceInfra;
     type Issue: IssueAuthTicketInfra;
     type Encode: EncodeAuthTicketInfra;
 
@@ -120,7 +120,7 @@ impl<R: ResetPasswordRequestDecoder, M: ResetPasswordMaterial> ResetPasswordActi
 
         let fields = self.request_decoder.decode();
 
-        check_auth_nonce(m.check_nonce())
+        validate_auth_nonce(m.check_nonce())
             .await
             .map_err(|err| pubsub.post(ResetPasswordState::Nonce(err)))?;
 

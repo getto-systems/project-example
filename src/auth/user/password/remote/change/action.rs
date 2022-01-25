@@ -13,7 +13,7 @@ use crate::auth::user::password::remote::{
 
 use crate::{
     auth::{
-        ticket::remote::{check_nonce::data::ValidateAuthNonceError, kernel::data::AuthTicket},
+        ticket::remote::{validate_nonce::data::ValidateAuthNonceError, kernel::data::AuthTicket},
         user::{
             password::remote::{
                 change::data::{ChangePasswordError, ChangePasswordRepositoryError},
