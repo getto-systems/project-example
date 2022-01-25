@@ -118,7 +118,7 @@ impl<'a> DiscardAuthTicketRepository for MysqlAuthTicketRepository<'a> {
 
 #[async_trait::async_trait]
 impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
-    async fn expansion_limit(
+    async fn find_expansion_limit(
         &self,
         ticket: &AuthTicket,
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError> {
@@ -243,7 +243,7 @@ pub mod test {
 
     #[async_trait::async_trait]
     impl<'a> AuthTicketRepository for MemoryAuthTicketRepository<'a> {
-        async fn expansion_limit(
+        async fn find_expansion_limit(
             &self,
             ticket: &AuthTicket,
         ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError> {
