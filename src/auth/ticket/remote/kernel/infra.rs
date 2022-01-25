@@ -87,6 +87,7 @@ pub trait AuthClock {
     fn now(&self) -> AuthDateTime;
 }
 
+// TODO move to issue
 #[async_trait::async_trait]
 pub trait IssueAuthTicketRepository {
     async fn issue(
@@ -97,6 +98,7 @@ pub trait IssueAuthTicketRepository {
     ) -> Result<(), RepositoryError>;
 }
 
+// TODO move to logout
 #[async_trait::async_trait]
 pub trait DiscardAuthTicketRepository {
     async fn discard(
@@ -106,9 +108,10 @@ pub trait DiscardAuthTicketRepository {
     ) -> Result<(), RepositoryError>;
 }
 
+// TODO move to encode
 #[async_trait::async_trait]
 pub trait AuthTicketRepository {
-    async fn expansion_limit(
+    async fn find_expansion_limit(
         &self,
         ticket: &AuthTicket,
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError>;
