@@ -4,7 +4,9 @@ use crate::auth::ticket::remote::validate::{
     event::ValidateAuthTokenEvent, infra::ValidateAuthTokenInfra, method::validate_auth_token,
 };
 
-use crate::auth::ticket::remote::kernel::infra::{AuthClock, DiscardAuthTicketRepository};
+use crate::auth::ticket::remote::{
+    kernel::infra::AuthClock, logout::infra::LogoutAuthTicketRepository,
+};
 
 use crate::{
     auth::{
@@ -30,7 +32,7 @@ impl std::fmt::Display for LogoutState {
 pub trait LogoutMaterial {
     type ValidateInfra: ValidateAuthTokenInfra;
     type Clock: AuthClock;
-    type TicketRepository: DiscardAuthTicketRepository;
+    type TicketRepository: LogoutAuthTicketRepository;
 
     fn validate(&self) -> &Self::ValidateInfra;
     fn clock(&self) -> &Self::Clock;

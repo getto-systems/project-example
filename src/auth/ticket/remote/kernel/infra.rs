@@ -5,9 +5,9 @@ use serde::{Deserialize, Serialize};
 use crate::{
     auth::ticket::remote::kernel::data::{
         AuthDateTime, AuthNonce, AuthTicket, AuthTicketExtract, AuthToken, AuthTokenMessage,
-        AuthTokenResponse, DecodeAuthTokenError, ExpansionLimitDateTime, ExpireDateTime,
+        AuthTokenResponse, DecodeAuthTokenError, ExpireDateTime,
     },
-    z_lib::remote::{repository::data::RepositoryError, request::data::MetadataError},
+    z_lib::remote::request::data::MetadataError,
 };
 
 pub struct AuthMetadataContent {
@@ -54,11 +54,7 @@ impl AuthJwtClaims {
         to_claims(AUTH_JWT_AUDIENCE_API.into(), ticket, expires)
     }
 }
-fn to_claims(
-    aud: String,
-    ticket: AuthTicket,
-    expires: ExpireDateTime,
-) -> (AuthJwtClaims, i64) {
+fn to_claims(aud: String, ticket: AuthTicket, expires: ExpireDateTime) -> (AuthJwtClaims, i64) {
     let ticket = ticket.extract();
     let exp = expires.extract().timestamp();
     (
@@ -85,34 +81,4 @@ impl Into<AuthTicketExtract> for AuthJwtClaims {
 
 pub trait AuthClock {
     fn now(&self) -> AuthDateTime;
-}
-
-// TODO move to issue
-#[async_trait::async_trait]
-pub trait IssueAuthTicketRepository {
-    async fn issue(
-        &self,
-        ticket: AuthTicket,
-        limit: ExpansionLimitDateTime,
-        issued_at: AuthDateTime,
-    ) -> Result<(), RepositoryError>;
-}
-
-// TODO move to logout
-#[async_trait::async_trait]
-pub trait DiscardAuthTicketRepository {
-    async fn discard(
-        &self,
-        auth_ticket: AuthTicket,
-        discard_at: AuthDateTime,
-    ) -> Result<(), RepositoryError>;
-}
-
-// TODO move to encode
-#[async_trait::async_trait]
-pub trait AuthTicketRepository {
-    async fn find_expansion_limit(
-        &self,
-        ticket: &AuthTicket,
-    ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError>;
 }

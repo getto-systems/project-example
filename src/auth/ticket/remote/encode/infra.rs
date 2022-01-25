@@ -1,17 +1,21 @@
 use std::collections::HashMap;
 
-use crate::auth::ticket::remote::kernel::infra::{AuthClock, AuthTicketRepository};
+use crate::auth::ticket::remote::kernel::infra::AuthClock;
 
-use crate::auth::ticket::remote::{
-    encode::data::EncodeAuthTokenError,
-    kernel::data::{
-        AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime, ExpireDuration,
+use crate::{
+    auth::ticket::remote::{
+        encode::data::EncodeAuthTokenError,
+        kernel::data::{
+            AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpansionLimitDateTime,
+            ExpireDateTime, ExpireDuration,
+        },
     },
+    z_lib::remote::repository::data::RepositoryError,
 };
 
 pub trait EncodeAuthTicketInfra {
     type Clock: AuthClock;
-    type TicketRepository: AuthTicketRepository;
+    type TicketRepository: EncodeAuthTicketRepository;
     type TicketEncoder: AuthTokenEncoder;
     type ApiEncoder: AuthTokenEncoder;
     type CloudfrontEncoder: CloudfrontTokenEncoder;
@@ -22,6 +26,14 @@ pub trait EncodeAuthTicketInfra {
     fn api_encoder(&self) -> &Self::ApiEncoder;
     fn cloudfront_encoder(&self) -> &Self::CloudfrontEncoder;
     fn config(&self) -> &EncodeAuthTicketConfig;
+}
+
+#[async_trait::async_trait]
+pub trait EncodeAuthTicketRepository {
+    async fn find_expansion_limit(
+        &self,
+        ticket: &AuthTicket,
+    ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError>;
 }
 
 pub trait AuthTokenEncoder {
