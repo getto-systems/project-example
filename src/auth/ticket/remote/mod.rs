@@ -1,5 +1,5 @@
 pub mod action_validate;
-pub mod check_nonce;
+pub mod validate_nonce;
 pub mod encode;
 pub mod issue;
 pub mod kernel;

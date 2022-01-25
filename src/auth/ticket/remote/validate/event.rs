@@ -1,5 +1,5 @@
 use crate::auth::ticket::remote::{
-    check_nonce::data::ValidateAuthNonceError,
+    validate_nonce::data::ValidateAuthNonceError,
     kernel::data::{AuthTicket, ValidateAuthRolesError},
     validate::data::ValidateAuthTokenError,
 };

@@ -6,11 +6,11 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     ticket::remote::{
-        check_nonce::init::{
+        validate_nonce::init::{
             nonce_repository::test::{
                 MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
             },
-            test::StaticCheckAuthNonceStruct,
+            test::StaticValidateAuthNonceStruct,
         },
         encode::init::{
             test::StaticEncodeAuthTicketStruct,
@@ -50,7 +50,7 @@ use crate::auth::{
 
 use crate::auth::{
     ticket::remote::{
-        check_nonce::infra::AuthNonceConfig, encode::infra::EncodeAuthTicketConfig,
+        validate_nonce::infra::AuthNonceConfig, encode::infra::EncodeAuthTicketConfig,
         issue::infra::IssueAuthTicketConfig,
     },
     user::password::reset::remote::reset::infra::ResetPasswordFieldsExtract,
@@ -367,7 +367,7 @@ async fn error_user_not_stored() {
 }
 
 struct TestStruct<'a> {
-    check_nonce: StaticCheckAuthNonceStruct<'a>,
+    check_nonce: StaticValidateAuthNonceStruct<'a>,
     issue: StaticIssueAuthTicketStruct<'a>,
     encode: StaticEncodeAuthTicketStruct<'a>,
 
@@ -379,7 +379,7 @@ struct TestStruct<'a> {
 }
 
 impl<'a> ResetPasswordMaterial for TestStruct<'a> {
-    type CheckNonce = StaticCheckAuthNonceStruct<'a>;
+    type CheckNonce = StaticValidateAuthNonceStruct<'a>;
     type Issue = StaticIssueAuthTicketStruct<'a>;
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
@@ -492,7 +492,7 @@ impl<'a> TestStruct<'a> {
     }
     fn with_token_decoder(store: &'a TestStore, token_decoder: StaticResetTokenDecoder) -> Self {
         Self {
-            check_nonce: StaticCheckAuthNonceStruct {
+            check_nonce: StaticValidateAuthNonceStruct {
                 config: standard_nonce_config(),
                 clock: standard_clock(),
                 nonce_metadata: standard_nonce_metadata(),

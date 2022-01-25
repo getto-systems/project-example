@@ -1,7 +1,7 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::ticket::remote::check_nonce::{
-    data::ValidateAuthNonceError, infra::CheckAuthNonceInfra, method::check_auth_nonce,
+use crate::auth::ticket::remote::validate_nonce::{
+    data::ValidateAuthNonceError, infra::ValidateAuthNonceInfra, method::validate_auth_nonce,
 };
 
 use crate::auth::{
@@ -42,7 +42,7 @@ impl std::fmt::Display for RequestResetTokenState {
 }
 
 pub trait RequestResetTokenMaterial {
-    type CheckNonce: CheckAuthNonceInfra;
+    type CheckNonce: ValidateAuthNonceInfra;
 
     type Clock: AuthClock;
     type PasswordRepository: RegisterResetTokenRepository;
@@ -90,7 +90,7 @@ impl<R: RequestResetTokenRequestDecoder, M: RequestResetTokenMaterial>
 
         let fields = self.request_decoder.decode();
 
-        check_auth_nonce(m.check_nonce())
+        validate_auth_nonce(m.check_nonce())
             .await
             .map_err(|err| pubsub.post(RequestResetTokenState::Nonce(err)))?;
 

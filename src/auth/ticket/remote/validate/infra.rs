@@ -1,12 +1,12 @@
 use crate::auth::ticket::remote::{
-    check_nonce::infra::CheckAuthNonceInfra,
+    validate_nonce::infra::ValidateAuthNonceInfra,
     kernel::infra::{AuthTokenDecoder, AuthTokenMetadata},
 };
 
 use crate::auth::user::remote::kernel::data::RequireAuthRoles;
 
 pub trait ValidateAuthTokenInfra {
-    type CheckNonceInfra: CheckAuthNonceInfra;
+    type CheckNonceInfra: ValidateAuthNonceInfra;
     type TokenMetadata: AuthTokenMetadata;
     type TokenDecoder: AuthTokenDecoder;
 

@@ -10,7 +10,7 @@ use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 
 use crate::auth::{
     ticket::remote::{
-        check_nonce::init::CheckAuthNonceStruct, encode::init::EncodeAuthTicketStruct,
+        validate_nonce::init::ValidateAuthNonceStruct, encode::init::EncodeAuthTicketStruct,
         issue::init::IssueAuthTicketStruct, kernel::init::clock::ChronoAuthClock,
     },
     user::{
@@ -31,7 +31,7 @@ use crate::auth::{
 use super::action::{ResetPasswordAction, ResetPasswordMaterial};
 
 pub struct ResetPasswordFeature<'a> {
-    check_nonce: CheckAuthNonceStruct<'a>,
+    check_nonce: ValidateAuthNonceStruct<'a>,
     issue: IssueAuthTicketStruct<'a>,
     encode: EncodeAuthTicketStruct<'a>,
 
@@ -51,7 +51,7 @@ impl<'a> ResetPasswordFeature<'a> {
         ResetPasswordAction::with_material(
             PbResetPasswordRequestDecoder::new(request),
             Self {
-                check_nonce: CheckAuthNonceStruct::new(&feature.auth, metadata),
+                check_nonce: ValidateAuthNonceStruct::new(&feature.auth, metadata),
                 issue: IssueAuthTicketStruct::new(&feature.auth),
                 encode: EncodeAuthTicketStruct::new(&feature.auth),
 
@@ -68,7 +68,7 @@ impl<'a> ResetPasswordFeature<'a> {
 }
 
 impl<'a> ResetPasswordMaterial for ResetPasswordFeature<'a> {
-    type CheckNonce = CheckAuthNonceStruct<'a>;
+    type CheckNonce = ValidateAuthNonceStruct<'a>;
     type Issue = IssueAuthTicketStruct<'a>;
     type Encode = EncodeAuthTicketStruct<'a>;
 

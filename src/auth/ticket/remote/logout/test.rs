@@ -5,11 +5,11 @@ use getto_application_test::ActionTestRunner;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::ticket::remote::{
-    check_nonce::init::{
+    validate_nonce::init::{
         nonce_repository::test::{
             MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
         },
-        test::StaticCheckAuthNonceStruct,
+        test::StaticValidateAuthNonceStruct,
     },
     kernel::init::{
         clock::test::StaticChronoAuthClock,
@@ -23,7 +23,7 @@ use crate::auth::ticket::remote::{
     validate::init::test::StaticValidateAuthTokenStruct,
 };
 
-use crate::auth::ticket::remote::check_nonce::infra::AuthNonceConfig;
+use crate::auth::ticket::remote::validate_nonce::infra::AuthNonceConfig;
 
 use super::action::{LogoutAction, LogoutMaterial};
 
@@ -158,7 +158,7 @@ impl<'a> TestStruct<'a> {
     fn standard(store: &'a TestStore) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
-                check_nonce_infra: StaticCheckAuthNonceStruct {
+                check_nonce_infra: StaticValidateAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),
                     nonce_metadata: standard_nonce_metadata(),
