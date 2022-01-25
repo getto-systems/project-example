@@ -1,8 +1,10 @@
 use getto_application::data::MethodResult;
 
 use crate::auth::ticket::remote::{
-    encode::infra::{AuthTokenEncoder, CloudfrontTokenEncoder, EncodeAuthTicketInfra},
-    kernel::infra::{AuthClock, AuthTicketRepository},
+    encode::infra::{
+        EncodeAuthTicketRepository, AuthTokenEncoder, CloudfrontTokenEncoder, EncodeAuthTicketInfra,
+    },
+    kernel::infra::AuthClock,
 };
 
 use super::event::EncodeAuthTicketEvent;

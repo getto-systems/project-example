@@ -3,8 +3,9 @@ use sqlx::{query, MySqlPool};
 
 use crate::z_lib::remote::repository::mysql::helper::mysql_error;
 
-use crate::auth::ticket::remote::kernel::infra::{
-    AuthTicketRepository, DiscardAuthTicketRepository, IssueAuthTicketRepository,
+use crate::auth::ticket::remote::{
+    encode::infra::EncodeAuthTicketRepository, issue::infra::IssueAuthTicketRepository,
+    logout::infra::LogoutAuthTicketRepository,
 };
 
 use crate::{
@@ -55,7 +56,7 @@ impl<'a> IssueAuthTicketRepository for MysqlAuthTicketRepository<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> DiscardAuthTicketRepository for MysqlAuthTicketRepository<'a> {
+impl<'a> LogoutAuthTicketRepository for MysqlAuthTicketRepository<'a> {
     async fn discard(
         &self,
         ticket: AuthTicket,
@@ -117,7 +118,7 @@ impl<'a> DiscardAuthTicketRepository for MysqlAuthTicketRepository<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthTicketRepository for MysqlAuthTicketRepository<'a> {
+impl<'a> EncodeAuthTicketRepository for MysqlAuthTicketRepository<'a> {
     async fn find_expansion_limit(
         &self,
         ticket: &AuthTicket,
@@ -147,8 +148,9 @@ pub mod test {
 
     use crate::z_lib::remote::repository::helper::infra_error;
 
-    use crate::auth::ticket::remote::kernel::infra::{
-        AuthTicketRepository, DiscardAuthTicketRepository, IssueAuthTicketRepository,
+    use crate::auth::ticket::remote::{
+        encode::infra::EncodeAuthTicketRepository, issue::infra::IssueAuthTicketRepository,
+        logout::infra::LogoutAuthTicketRepository,
     };
 
     use crate::{
@@ -225,7 +227,7 @@ pub mod test {
     }
 
     #[async_trait::async_trait]
-    impl<'a> DiscardAuthTicketRepository for MemoryAuthTicketRepository<'a> {
+    impl<'a> LogoutAuthTicketRepository for MemoryAuthTicketRepository<'a> {
         async fn discard(
             &self,
             auth_ticket: AuthTicket,
@@ -242,7 +244,7 @@ pub mod test {
     }
 
     #[async_trait::async_trait]
-    impl<'a> AuthTicketRepository for MemoryAuthTicketRepository<'a> {
+    impl<'a> EncodeAuthTicketRepository for MemoryAuthTicketRepository<'a> {
         async fn find_expansion_limit(
             &self,
             ticket: &AuthTicket,
