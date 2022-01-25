@@ -1,15 +1,19 @@
 use chrono::{TimeZone, Utc};
 use sqlx::{query, MySql, MySqlPool, Transaction};
 
-use crate::auth::user::password::remote::kernel::data::{
-    ResetTokenDestination, ResetTokenDestinationExtract,
-};
 use crate::z_lib::remote::repository::{helper::infra_error, mysql::helper::mysql_error};
 
-use crate::auth::user::password::remote::kernel::infra::{
-    AuthUserPasswordHasher, AuthUserPasswordMatcher, ChangePasswordRepository, HashedPassword,
-    RegisterResetTokenRepository, ResetPasswordRepository, ResetTokenEntry, ResetTokenEntryExtract,
-    VerifyPasswordRepository,
+use crate::auth::user::password::{
+    remote::{
+        authenticate::infra::VerifyPasswordRepository,
+        change::infra::ChangePasswordRepository,
+        kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword},
+    },
+    reset::remote::{
+        kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
+        request_token::infra::RegisterResetTokenRepository,
+        reset::infra::ResetPasswordRepository,
+    },
 };
 
 use crate::{
@@ -17,9 +21,18 @@ use crate::{
         ticket::remote::kernel::data::{AuthDateTime, ExpireDateTime},
         user::{
             login_id::remote::data::LoginId,
-            password::remote::kernel::data::{
-                ChangePasswordRepositoryError, RegisterResetTokenRepositoryError,
-                ResetPasswordRepositoryError, ResetToken, VerifyPasswordRepositoryError,
+            password::{
+                remote::{
+                    authenticate::data::VerifyPasswordRepositoryError,
+                    change::data::ChangePasswordRepositoryError,
+                },
+                reset::remote::{
+                    kernel::data::{
+                        ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
+                    },
+                    request_token::data::RegisterResetTokenRepositoryError,
+                    reset::data::ResetPasswordRepositoryError,
+                },
             },
             remote::kernel::data::AuthUserId,
         },
@@ -343,10 +356,17 @@ pub mod test {
 
     use crate::z_lib::remote::repository::helper::infra_error;
 
-    use crate::auth::user::password::remote::kernel::infra::{
-        AuthUserPasswordHasher, AuthUserPasswordMatcher, ChangePasswordRepository, HashedPassword,
-        RegisterResetTokenRepository, ResetPasswordRepository, ResetTokenEntry,
-        ResetTokenEntryExtract, VerifyPasswordRepository,
+    use crate::auth::user::password::{
+        remote::{
+            authenticate::infra::VerifyPasswordRepository,
+            change::infra::ChangePasswordRepository,
+            kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword},
+        },
+        reset::remote::{
+            kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
+            request_token::infra::RegisterResetTokenRepository,
+            reset::infra::ResetPasswordRepository,
+        },
     };
 
     use crate::{
@@ -354,10 +374,18 @@ pub mod test {
             ticket::remote::kernel::data::{AuthDateTime, ExpireDateTime},
             user::{
                 login_id::remote::data::LoginId,
-                password::remote::kernel::data::{
-                    ChangePasswordRepositoryError, RegisterResetTokenRepositoryError,
-                    ResetPasswordRepositoryError, ResetToken, ResetTokenDestination,
-                    ResetTokenDestinationExtract, VerifyPasswordRepositoryError,
+                password::{
+                    remote::{
+                        authenticate::data::VerifyPasswordRepositoryError,
+                        change::data::ChangePasswordRepositoryError,
+                    },
+                    reset::remote::{
+                        kernel::data::{
+                            ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
+                        },
+                        request_token::data::RegisterResetTokenRepositoryError,
+                        reset::data::ResetPasswordRepositoryError,
+                    },
                 },
                 remote::kernel::data::{AuthUser, AuthUserId},
             },
@@ -443,7 +471,8 @@ pub mod test {
         }
 
         fn insert_login_id(&mut self, login_id: LoginId, user_id: AuthUserId) -> &mut Self {
-            self.login_id.insert(login_id.clone().extract(), user_id.clone());
+            self.login_id
+                .insert(login_id.clone().extract(), user_id.clone());
             self.user_id.insert(user_id.extract(), login_id);
             self
         }

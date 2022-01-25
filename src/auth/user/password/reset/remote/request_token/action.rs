@@ -6,13 +6,10 @@ use crate::auth::ticket::remote::check_nonce::{
 
 use crate::auth::{
     ticket::remote::kernel::infra::AuthClock,
-    user::password::{
-        remote::kernel::infra::RegisterResetTokenRepository,
-        reset::remote::request_token::infra::{
-            RequestResetTokenConfig, RequestResetTokenFieldsExtract,
-            RequestResetTokenRequestDecoder, ResetTokenDestinationRepository, ResetTokenEncoder,
-            ResetTokenGenerator, ResetTokenNotifier,
-        },
+    user::password::reset::remote::request_token::infra::{
+        RegisterResetTokenRepository, RequestResetTokenConfig, RequestResetTokenFieldsExtract,
+        RequestResetTokenRequestDecoder, ResetTokenDestinationRepository, ResetTokenEncoder,
+        ResetTokenGenerator, ResetTokenNotifier,
     },
 };
 
@@ -21,12 +18,9 @@ use crate::{
         ticket::remote::kernel::data::ExpireDateTime,
         user::{
             login_id::remote::data::{LoginId, ValidateLoginIdError},
-            password::{
-                remote::kernel::data::RegisterResetTokenRepositoryError,
-                reset::remote::request_token::data::{
-                    EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
-                    RequestResetTokenError,
-                },
+            password::reset::remote::request_token::data::{
+                EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
+                RegisterResetTokenRepositoryError, RequestResetTokenError,
             },
         },
     },

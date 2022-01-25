@@ -64,7 +64,7 @@ use crate::auth::{
     },
     user::{
         login_id::remote::data::LoginId,
-        password::remote::kernel::data::{ResetToken, ResetTokenDestinationExtract},
+        password::reset::remote::kernel::data::{ResetToken, ResetTokenDestinationExtract},
         remote::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
     },
 };

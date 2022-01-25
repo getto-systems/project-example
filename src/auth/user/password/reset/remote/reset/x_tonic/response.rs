@@ -12,11 +12,9 @@ use crate::auth::ticket::remote::encode::event::EncodeAuthTicketEvent;
 
 use crate::auth::{
     ticket::remote::encode::data::AuthTicketEncoded,
-    user::password::{
-        remote::kernel::data::VerifyResetTokenEntryError,
-        reset::remote::reset::data::{
-            DecodeResetTokenError, NotifyResetPasswordError, ResetPasswordError,
-        },
+    user::password::reset::remote::reset::data::{
+        DecodeResetTokenError, NotifyResetPasswordError, ResetPasswordError,
+        VerifyResetTokenEntryError,
     },
 };
 

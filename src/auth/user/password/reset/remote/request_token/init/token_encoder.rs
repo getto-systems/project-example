@@ -8,11 +8,9 @@ use crate::auth::user::password::reset::remote::{
 
 use crate::auth::{
     ticket::remote::kernel::data::ExpireDateTime,
-    user::password::{
-        remote::kernel::data::ResetToken,
-        reset::remote::{
-            kernel::data::ResetTokenEncoded, request_token::data::EncodeResetTokenError,
-        },
+    user::password::reset::remote::{
+        kernel::data::{ResetToken, ResetTokenEncoded},
+        request_token::data::EncodeResetTokenError,
     },
 };
 
@@ -71,9 +69,7 @@ pub mod test {
     use super::super::super::data::EncodeResetTokenError;
     use crate::auth::{
         ticket::remote::kernel::data::ExpireDateTime,
-        user::password::{
-            remote::kernel::data::ResetToken, reset::remote::kernel::data::ResetTokenEncoded,
-        },
+        user::password::reset::remote::kernel::data::{ResetToken, ResetTokenEncoded},
     };
 
     pub struct StaticResetTokenEncoder;

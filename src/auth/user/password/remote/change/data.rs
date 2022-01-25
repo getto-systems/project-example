@@ -1,4 +1,7 @@
-use crate::auth::user::password::remote::kernel::data::ValidatePasswordError;
+use crate::{
+    auth::user::password::remote::kernel::data::{PasswordHashError, ValidatePasswordError},
+    z_lib::remote::repository::data::RepositoryError,
+};
 
 pub enum ChangePasswordError {
     InvalidCurrentPassword(ValidatePasswordError),
@@ -16,4 +19,11 @@ impl std::fmt::Display for ChangePasswordError {
             Self::PasswordNotMatched => write!(f, "password not matched"),
         }
     }
+}
+
+pub enum ChangePasswordRepositoryError {
+    PasswordHashError(PasswordHashError),
+    RepositoryError(RepositoryError),
+    PasswordNotFound,
+    PasswordNotMatched,
 }
