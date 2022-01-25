@@ -283,7 +283,7 @@ impl std::fmt::Display for ValidateAuthRolesError {
             Self::PermissionDenied(granted_roles, require_roles) => {
                 write!(
                     f,
-                    "user permission denied: {}, {}",
+                    "user permission denied; granted: {}, required: {}",
                     granted_roles, require_roles
                 )
             }
