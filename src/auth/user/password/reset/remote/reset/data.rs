@@ -1,10 +1,36 @@
-use crate::auth::user::{
-    login_id::remote::data::ValidateLoginIdError,
-    password::{
-        remote::kernel::data::{ValidatePasswordError, VerifyResetTokenEntryError},
-        reset::remote::kernel::data::ValidateResetTokenError,
+use crate::{
+    auth::user::{
+        login_id::remote::data::ValidateLoginIdError,
+        password::{
+            remote::kernel::data::{PasswordHashError, ValidatePasswordError},
+            reset::remote::kernel::data::ValidateResetTokenError,
+        },
     },
+    z_lib::remote::repository::data::RepositoryError,
 };
+
+pub enum VerifyResetTokenEntryError {
+    ResetTokenEntryNotFound,
+    LoginIdNotMatched,
+    Expired,
+    AlreadyReset,
+}
+
+impl std::fmt::Display for VerifyResetTokenEntryError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::ResetTokenEntryNotFound => write!(f, "reset token entry not found"),
+            Self::LoginIdNotMatched => write!(f, "login id not matched"),
+            Self::Expired => write!(f, "reset token expired"),
+            Self::AlreadyReset => write!(f, "already reset"),
+        }
+    }
+}
+
+pub enum ResetPasswordRepositoryError {
+    RepositoryError(RepositoryError),
+    PasswordHashError(PasswordHashError),
+}
 
 pub struct NotifyResetPasswordResponse {
     message_id: String,

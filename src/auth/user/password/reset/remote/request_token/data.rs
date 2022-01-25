@@ -1,4 +1,7 @@
-use crate::auth::user::login_id::remote::data::ValidateLoginIdError;
+use crate::{
+    auth::user::login_id::remote::data::ValidateLoginIdError,
+    z_lib::remote::repository::data::RepositoryError,
+};
 
 pub enum RequestResetTokenError {
     InvalidLoginId(ValidateLoginIdError),
@@ -14,6 +17,11 @@ impl std::fmt::Display for RequestResetTokenError {
             Self::UserNotFound => write!(f, "user not found"),
         }
     }
+}
+
+pub enum RegisterResetTokenRepositoryError {
+    RepositoryError(RepositoryError),
+    UserNotFound,
 }
 
 pub struct NotifyResetTokenResponse {

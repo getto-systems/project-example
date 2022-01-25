@@ -4,9 +4,9 @@ use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideEmail;
 
 use crate::auth::user::password::reset::remote::reset::infra::ResetPasswordNotifier;
 
-use crate::auth::user::password::{
-    remote::kernel::data::ResetTokenDestination,
-    reset::remote::reset::data::{NotifyResetPasswordError, NotifyResetPasswordResponse},
+use crate::auth::user::password::reset::remote::{
+    kernel::data::ResetTokenDestination,
+    reset::data::{NotifyResetPasswordError, NotifyResetPasswordResponse},
 };
 
 pub struct EmailResetPasswordNotifier<'a> {
@@ -88,9 +88,9 @@ email: labo@message.getto.systems
 pub mod test {
     use crate::auth::user::password::reset::remote::reset::infra::ResetPasswordNotifier;
 
-    use crate::auth::user::password::{
-        remote::kernel::data::ResetTokenDestination,
-        reset::remote::reset::data::{NotifyResetPasswordError, NotifyResetPasswordResponse},
+    use crate::auth::user::password::reset::remote::{
+        kernel::data::ResetTokenDestination,
+        reset::data::{NotifyResetPasswordError, NotifyResetPasswordResponse},
     };
 
     pub struct StaticResetPasswordNotifier;

@@ -6,9 +6,9 @@ use crate::auth::user::password::reset::remote::{
     kernel::infra::ResetTokenJwtClaims, reset::infra::ResetTokenDecoder,
 };
 
-use crate::auth::user::password::{
-    remote::kernel::data::ResetToken,
-    reset::remote::{kernel::data::ResetTokenEncoded, reset::data::DecodeResetTokenError},
+use crate::auth::user::password::reset::remote::{
+    kernel::data::{ResetToken, ResetTokenEncoded},
+    reset::data::DecodeResetTokenError,
 };
 
 pub struct JwtResetTokenDecoder<'a> {
@@ -50,9 +50,9 @@ fn validate_jwt<'a>(
 pub mod test {
     use crate::auth::user::password::reset::remote::reset::infra::ResetTokenDecoder;
 
-    use crate::auth::user::password::{
-        remote::kernel::data::ResetToken,
-        reset::remote::{kernel::data::ResetTokenEncoded, reset::data::DecodeResetTokenError},
+    use crate::auth::user::password::reset::remote::{
+        kernel::data::{ResetToken, ResetTokenEncoded},
+        reset::data::DecodeResetTokenError,
     };
 
     pub enum StaticResetTokenDecoder {

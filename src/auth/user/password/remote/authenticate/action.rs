@@ -14,8 +14,9 @@ use crate::auth::user::{
     password::remote::{
         authenticate::infra::{
             AuthenticatePasswordFieldsExtract, AuthenticatePasswordRequestDecoder,
+            VerifyPasswordRepository,
         },
-        kernel::infra::{AuthUserPasswordMatcher, PlainPassword, VerifyPasswordRepository},
+        kernel::infra::{AuthUserPasswordMatcher, PlainPassword},
     },
     remote::kernel::infra::AuthUserRepository,
 };
@@ -24,10 +25,8 @@ use crate::{
     auth::user::{
         login_id::remote::data::{LoginId, ValidateLoginIdError},
         password::remote::{
-            authenticate::data::AuthenticatePasswordError,
-            kernel::data::{
-                PasswordHashError, ValidatePasswordError, VerifyPasswordRepositoryError,
-            },
+            authenticate::data::{AuthenticatePasswordError, VerifyPasswordRepositoryError},
+            kernel::data::{PasswordHashError, ValidatePasswordError},
         },
         remote::kernel::data::AuthUser,
     },

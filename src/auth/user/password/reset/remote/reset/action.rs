@@ -14,12 +14,13 @@ use crate::auth::{
     ticket::remote::kernel::infra::AuthClock,
     user::{
         password::{
-            remote::kernel::infra::{
-                AuthUserPasswordHasher, PlainPassword, ResetPasswordRepository, ResetTokenEntry,
-            },
-            reset::remote::reset::infra::{
-                ResetPasswordFieldsExtract, ResetPasswordNotifier, ResetPasswordRequestDecoder,
-                ResetTokenDecoder,
+            remote::kernel::infra::{AuthUserPasswordHasher, PlainPassword},
+            reset::remote::{
+                kernel::infra::ResetTokenEntry,
+                reset::infra::{
+                    ResetPasswordFieldsExtract, ResetPasswordNotifier, ResetPasswordRepository,
+                    ResetPasswordRequestDecoder, ResetTokenDecoder,
+                },
             },
         },
         remote::kernel::infra::AuthUserRepository,
@@ -32,15 +33,15 @@ use crate::{
         user::{
             login_id::remote::data::{LoginId, ValidateLoginIdError},
             password::{
-                remote::kernel::data::{
-                    PasswordHashError, ResetPasswordRepositoryError, ResetTokenDestination,
-                    ValidatePasswordError, VerifyResetTokenEntryError,
-                },
+                remote::kernel::data::{PasswordHashError, ValidatePasswordError},
                 reset::remote::{
-                    kernel::data::{ResetTokenEncoded, ValidateResetTokenError},
+                    kernel::data::{
+                        ResetTokenDestination, ResetTokenEncoded, ValidateResetTokenError,
+                    },
                     reset::data::{
                         DecodeResetTokenError, NotifyResetPasswordError,
                         NotifyResetPasswordResponse, ResetPasswordError,
+                        ResetPasswordRepositoryError, VerifyResetTokenEntryError,
                     },
                 },
             },

@@ -5,10 +5,10 @@ use crate::auth::ticket::remote::validate::{
 };
 
 use crate::auth::user::password::remote::{
-    change::infra::{ChangePasswordFieldsExtract, ChangePasswordRequestDecoder},
-    kernel::infra::{
-        AuthUserPasswordHasher, AuthUserPasswordMatcher, ChangePasswordRepository, PlainPassword,
+    change::infra::{
+        ChangePasswordFieldsExtract, ChangePasswordRepository, ChangePasswordRequestDecoder,
     },
+    kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, PlainPassword},
 };
 
 use crate::{
@@ -16,11 +16,8 @@ use crate::{
         ticket::remote::{check_nonce::data::ValidateAuthNonceError, kernel::data::AuthTicket},
         user::{
             password::remote::{
-                change::data::ChangePasswordError,
-                kernel::data::{
-                    ChangePasswordRepositoryError, PasswordHashError, ValidatePasswordError,
-                    VerifyPasswordRepositoryError,
-                },
+                change::data::{ChangePasswordError, ChangePasswordRepositoryError},
+                kernel::data::{PasswordHashError, ValidatePasswordError},
             },
             remote::kernel::data::RequireAuthRoles,
         },
@@ -118,21 +115,6 @@ impl std::fmt::Display for ChangePasswordEvent {
             Self::NonceError(err) => write!(f, "{}; {}", ERROR, err),
             Self::PasswordHashError(err) => write!(f, "{}; {}", ERROR, err),
             Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
-        }
-    }
-}
-
-impl Into<ChangePasswordEvent> for VerifyPasswordRepositoryError {
-    fn into(self) -> ChangePasswordEvent {
-        match self {
-            Self::PasswordHashError(err) => ChangePasswordEvent::PasswordHashError(err),
-            Self::RepositoryError(err) => ChangePasswordEvent::RepositoryError(err),
-            Self::PasswordNotFound => {
-                ChangePasswordEvent::InvalidPassword(ChangePasswordError::PasswordNotFound)
-            }
-            Self::PasswordNotMatched => {
-                ChangePasswordEvent::InvalidPassword(ChangePasswordError::PasswordNotMatched)
-            }
         }
     }
 }

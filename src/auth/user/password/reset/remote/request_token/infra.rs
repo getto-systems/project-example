@@ -1,15 +1,13 @@
 use crate::{
     auth::{
-        ticket::remote::kernel::data::{ExpireDateTime, ExpireDuration},
+        ticket::remote::kernel::data::{AuthDateTime, ExpireDateTime, ExpireDuration},
         user::{
             login_id::remote::data::LoginId,
-            password::{
-                remote::kernel::data::{ResetToken, ResetTokenDestination},
-                reset::remote::{
-                    kernel::data::ResetTokenEncoded,
-                    request_token::data::{
-                        EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
-                    },
+            password::reset::remote::{
+                kernel::data::{ResetToken, ResetTokenDestination, ResetTokenEncoded},
+                request_token::data::{
+                    EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
+                    RegisterResetTokenRepositoryError,
                 },
             },
         },
@@ -23,6 +21,18 @@ pub trait RequestResetTokenRequestDecoder {
 
 pub struct RequestResetTokenFieldsExtract {
     pub login_id: String,
+}
+
+#[async_trait::async_trait]
+pub trait RegisterResetTokenRepository {
+    async fn register_reset_token(
+        &self,
+        login_id: LoginId,
+        reset_token: ResetToken,
+        destination: ResetTokenDestination,
+        expires: ExpireDateTime,
+        requested_at: AuthDateTime,
+    ) -> Result<(), RegisterResetTokenRepositoryError>;
 }
 
 #[async_trait::async_trait]
