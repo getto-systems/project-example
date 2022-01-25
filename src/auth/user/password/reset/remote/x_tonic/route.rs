@@ -43,14 +43,14 @@ impl RequestResetTokenPb for RequestToken {
         request: Request<RequestResetTokenRequestPb>,
     ) -> Result<Response<RequestResetTokenResponsePb>, Status> {
         let TonicRequest {
-            data,
+            feature,
             metadata,
             request,
         } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger("auth.user.password.reset.request_token", request_id.into());
-        let mut action = RequestResetTokenStruct::action(&data, &metadata, request);
+        let mut action = RequestResetTokenStruct::action(&feature, &metadata, request);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         flatten(action.ignite().await).respond_to()
@@ -66,14 +66,14 @@ impl ResetPasswordPb for Reset {
         request: Request<ResetPasswordRequestPb>,
     ) -> Result<Response<ResetPasswordResponsePb>, Status> {
         let TonicRequest {
-            data,
+            feature,
             metadata,
             request,
         } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger("auth.user.password.reset.reset", request_id.into());
-        let mut action = ResetPasswordFeature::action(&data, &metadata, request);
+        let mut action = ResetPasswordFeature::action(&feature, &metadata, request);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         flatten(action.ignite().await).respond_to()

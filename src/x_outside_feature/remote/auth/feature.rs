@@ -8,8 +8,6 @@ use crate::auth::remote::x_outside_feature::auth::{
     feature::AuthOutsideFeature, init::new_auth_outside_feature,
 };
 
-pub type AuthAppData = Arc<AuthAppFeature>;
-
 pub struct AuthAppFeature {
     pub auth: AuthOutsideFeature,
 }
@@ -23,20 +21,20 @@ impl AuthAppFeature {
 }
 
 pub struct TonicRequest<T> {
-    pub data: AuthAppData,
+    pub feature: Arc<AuthAppFeature>,
     pub metadata: MetadataMap,
     pub request: T,
 }
 
 pub fn extract_request<T>(request: Request<T>) -> TonicRequest<T> {
-    let data = request
+    let feature = request
         .extensions()
-        .get::<AuthAppData>()
+        .get::<Arc<AuthAppFeature>>()
         .expect("failed to get AppFeature")
         .clone();
 
     TonicRequest {
-        data,
+        feature,
         // metadata と inner の両方を into してくれるやつが無いため、to_owned する
         metadata: request.metadata().to_owned(),
         request: request.into_inner(),

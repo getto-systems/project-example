@@ -4,10 +4,7 @@ use actix_cors::Cors;
 use actix_web::{web::Data, App, HttpServer};
 use lazy_static::lazy_static;
 
-use example_api::x_outside_feature::remote::api::{
-    env::ApiEnv,
-    feature::{ApiAppData, ApiAppFeature},
-};
+use example_api::x_outside_feature::remote::api::{env::ApiEnv, feature::ApiAppFeature};
 
 use example_api::{
     auth::remote::x_actix_web::route::scope_auth, avail::remote::x_actix_web::route::scope_avail,
@@ -20,7 +17,7 @@ lazy_static! {
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
-    let data: ApiAppData = Data::new(ApiAppFeature::new(&ENV).await);
+    let feature: Data<ApiAppFeature> = Data::new(ApiAppFeature::new(&ENV).await);
 
     HttpServer::new(move || {
         let cors = Cors::default()
@@ -32,7 +29,7 @@ async fn main() -> io::Result<()> {
 
         App::new()
             .wrap(cors)
-            .app_data(data.clone())
+            .app_data(feature.clone())
             .service(root::index)
             .service(scope_auth())
             .service(scope_avail())

@@ -37,13 +37,13 @@ impl NotifyPb for Notify {
     ) -> Result<Response<NotifyResponsePb>, Status> {
         let TonicRequest {
             metadata,
-            data,
+            feature,
             request,
         } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
         let logger = app_logger("avail.unexpected_error.notify", request_id.into());
 
-        let mut action = NotifyUnexpectedErrorFeature::action(&data, &request_id, &metadata, request);
+        let mut action = NotifyUnexpectedErrorFeature::action(&feature, &request_id, &metadata, request);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         flatten(action.ignite().await).respond_to()
