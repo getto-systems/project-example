@@ -1,14 +1,13 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::{
-    auth::remote::{
-        data::{RequireAuthRoles, ValidateApiTokenError},
-        infra::ValidateApiTokenInfra,
-        method::validate_api_token,
-    },
-    avail::unexpected_error::remote::notify::infra::{
-        NotifyUnexpectedErrorFieldsExtract, NotifyUnexpectedErrorRequestDecoder,
-    },
+use crate::auth::remote::{
+    data::{RequireAuthRoles, ValidateApiTokenError},
+    infra::ValidateApiTokenInfra,
+    method::validate_api_token,
+};
+
+use crate::avail::unexpected_error::remote::notify::infra::{
+    NotifyUnexpectedErrorFieldsExtract, NotifyUnexpectedErrorRequestDecoder,
 };
 
 pub enum NotifyUnexpectedErrorState {

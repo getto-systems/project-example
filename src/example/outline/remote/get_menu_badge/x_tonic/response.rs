@@ -4,7 +4,16 @@ use crate::z_lib::remote::response::tonic::RespondTo;
 
 use crate::example::outline::remote::y_protobuf::service::GetMenuBadgeResponsePb;
 
-use super::super::event::GetOutlineMenuBadgeEvent;
+use super::super::action::{GetOutlineMenuBadgeEvent, GetOutlineMenuBadgeState};
+
+impl RespondTo<GetMenuBadgeResponsePb> for GetOutlineMenuBadgeState {
+    fn respond_to(self) -> Result<Response<GetMenuBadgeResponsePb>, Status> {
+        match self {
+            Self::Validate(_) => Err(Status::unauthenticated("unauthenticated")),
+            Self::GetMenuBadge(event) => event.respond_to(),
+        }
+    }
+}
 
 impl RespondTo<GetMenuBadgeResponsePb> for GetOutlineMenuBadgeEvent {
     fn respond_to(self) -> Result<Response<GetMenuBadgeResponsePb>, Status> {
@@ -13,7 +22,6 @@ impl RespondTo<GetMenuBadgeResponsePb> for GetOutlineMenuBadgeEvent {
                 let response: GetMenuBadgeResponsePb = menu_badge.into();
                 Ok(Response::new(response))
             }
-            Self::ValidateError(_) => Err(Status::unauthenticated("unauthenticated")),
             Self::RepositoryError(err) => err.respond_to(),
         }
     }

@@ -5,9 +5,8 @@ use crate::z_lib::remote::message::helper::encode_protobuf_base64;
 use crate::example::remote::proxy::ExampleProxyResponseEncoder;
 
 use crate::{
-    example::outline::remote::{
-        get_menu_badge::data::OutlineMenuBadge,
-        proxy_get_menu_badge::data::GetOutlineMenuBadgeProxyMessage,
+    example::outline::remote::get_menu_badge::{
+        data::OutlineMenuBadge, proxy::data::GetOutlineMenuBadgeProxyMessage,
     },
     z_lib::remote::message::data::MessageError,
 };

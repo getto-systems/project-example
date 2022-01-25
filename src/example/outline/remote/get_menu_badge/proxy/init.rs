@@ -13,9 +13,8 @@ use response_encoder::ResponseEncoder;
 
 use crate::example::remote::proxy::{ExampleProxyEvent, ExampleProxyInfra};
 
-use crate::example::outline::remote::{
-    get_menu_badge::data::OutlineMenuBadge,
-    proxy_get_menu_badge::data::GetOutlineMenuBadgeProxyMessage,
+use crate::example::outline::remote::get_menu_badge::{
+    data::OutlineMenuBadge, proxy::data::GetOutlineMenuBadgeProxyMessage,
 };
 
 pub struct GetOutlineMenuBadgeProxyStruct<'a> {

@@ -17,7 +17,7 @@ use crate::example::outline::remote::y_protobuf::service::{
     GetMenuBadgeRequestPb, GetMenuBadgeResponsePb,
 };
 
-use crate::example::outline::remote::action_get_menu_badge::init::GetOutlineMenuBadgeFeature;
+use crate::example::outline::remote::get_menu_badge::init::GetOutlineMenuBadgeFeature;
 
 pub struct OutlineServer;
 
