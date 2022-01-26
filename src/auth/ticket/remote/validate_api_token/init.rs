@@ -9,7 +9,7 @@ use crate::auth::ticket::remote::{
     validate_api_token::init::validate_service::TonicValidateService,
 };
 
-use crate::auth::ticket::remote::validate_api_token::infra::ValidateApiTokenInfra;
+use crate::auth::ticket::remote::validate_api_token::method::ValidateApiTokenInfra;
 
 pub struct ValidateApiTokenStruct<'a> {
     auth_metadata: TonicAuthMetadata<'a>,
@@ -54,7 +54,7 @@ pub mod test {
         auth_metadata::test::StaticAuthMetadata, token_decoder::test::StaticAuthTokenDecoder,
     };
 
-    use super::super::infra::ValidateApiTokenInfra;
+    use super::super::method::ValidateApiTokenInfra;
 
     pub struct StaticValidateApiTokenStruct {
         pub auth_metadata: StaticAuthMetadata,
