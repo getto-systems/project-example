@@ -4,14 +4,14 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     ticket::remote::{
+        kernel::init::{
+            clock::test::StaticChronoAuthClock, nonce_metadata::test::StaticAuthNonceMetadata,
+        },
         validate_nonce::init::{
             nonce_repository::test::{
                 MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
             },
             test::StaticValidateAuthNonceStruct,
-        },
-        kernel::init::{
-            clock::test::StaticChronoAuthClock, nonce_metadata::test::StaticAuthNonceMetadata,
         },
     },
     user::password::{
@@ -177,19 +177,19 @@ async fn error_destination_not_stored() {
 }
 
 struct TestStruct<'a> {
-    pub check_nonce: StaticValidateAuthNonceStruct<'a>,
+    validate_nonce: StaticValidateAuthNonceStruct<'a>,
 
-    pub clock: StaticChronoAuthClock,
-    pub password_repository: MemoryAuthUserPasswordRepository<'a>,
-    pub destination_repository: MemoryResetTokenDestinationRepository<'a>,
-    pub token_generator: StaticResetTokenGenerator,
-    pub token_encoder: StaticResetTokenEncoder,
-    pub token_notifier: StaticResetTokenNotifier,
-    pub config: RequestResetTokenConfig,
+    clock: StaticChronoAuthClock,
+    password_repository: MemoryAuthUserPasswordRepository<'a>,
+    destination_repository: MemoryResetTokenDestinationRepository<'a>,
+    token_generator: StaticResetTokenGenerator,
+    token_encoder: StaticResetTokenEncoder,
+    token_notifier: StaticResetTokenNotifier,
+    config: RequestResetTokenConfig,
 }
 
 impl<'a> RequestResetTokenMaterial for TestStruct<'a> {
-    type CheckNonce = StaticValidateAuthNonceStruct<'a>;
+    type ValidateNonce = StaticValidateAuthNonceStruct<'a>;
 
     type Clock = StaticChronoAuthClock;
     type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
@@ -198,8 +198,8 @@ impl<'a> RequestResetTokenMaterial for TestStruct<'a> {
     type TokenEncoder = StaticResetTokenEncoder;
     type TokenNotifier = StaticResetTokenNotifier;
 
-    fn check_nonce(&self) -> &Self::CheckNonce {
-        &self.check_nonce
+    fn validate_nonce(&self) -> &Self::ValidateNonce {
+        &self.validate_nonce
     }
 
     fn clock(&self) -> &Self::Clock {
@@ -265,7 +265,7 @@ impl TestStore {
 impl<'a> TestStruct<'a> {
     fn new(store: &'a TestStore) -> Self {
         Self {
-            check_nonce: StaticValidateAuthNonceStruct {
+            validate_nonce: StaticValidateAuthNonceStruct {
                 config: standard_nonce_config(),
                 clock: standard_clock(),
                 nonce_metadata: standard_nonce_metadata(),

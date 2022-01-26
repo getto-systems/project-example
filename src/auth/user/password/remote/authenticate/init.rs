@@ -26,7 +26,7 @@ use crate::auth::{
 use super::action::{AuthenticatePasswordAction, AuthenticatePasswordMaterial};
 
 pub struct AuthenticatePasswordStruct<'a> {
-    check_nonce: ValidateAuthNonceStruct<'a>,
+    validate_nonce: ValidateAuthNonceStruct<'a>,
     issue: IssueAuthTicketStruct<'a>,
     encode: EncodeAuthTicketStruct<'a>,
 
@@ -43,7 +43,7 @@ impl<'a> AuthenticatePasswordStruct<'a> {
         AuthenticatePasswordAction::with_material(
             PbAuthenticatePasswordRequestDecoder::new(request),
             Self {
-                check_nonce: ValidateAuthNonceStruct::new(&feature.auth, metadata),
+                validate_nonce: ValidateAuthNonceStruct::new(&feature.auth, metadata),
                 issue: IssueAuthTicketStruct::new(&feature.auth),
                 encode: EncodeAuthTicketStruct::new(&feature.auth),
 
@@ -57,7 +57,7 @@ impl<'a> AuthenticatePasswordStruct<'a> {
 }
 
 impl<'a> AuthenticatePasswordMaterial for AuthenticatePasswordStruct<'a> {
-    type CheckNonce = ValidateAuthNonceStruct<'a>;
+    type ValidateNonce = ValidateAuthNonceStruct<'a>;
     type Issue = IssueAuthTicketStruct<'a>;
     type Encode = EncodeAuthTicketStruct<'a>;
 
@@ -65,8 +65,8 @@ impl<'a> AuthenticatePasswordMaterial for AuthenticatePasswordStruct<'a> {
     type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
     type PasswordMatcher = Argon2PasswordMatcher;
 
-    fn check_nonce(&self) -> &Self::CheckNonce {
-        &self.check_nonce
+    fn validate_nonce(&self) -> &Self::ValidateNonce {
+        &self.validate_nonce
     }
     fn issue(&self) -> &Self::Issue {
         &self.issue

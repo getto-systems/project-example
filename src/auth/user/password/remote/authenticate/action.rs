@@ -52,7 +52,7 @@ impl std::fmt::Display for AuthenticatePasswordState {
 }
 
 pub trait AuthenticatePasswordMaterial {
-    type CheckNonce: ValidateAuthNonceInfra;
+    type ValidateNonce: ValidateAuthNonceInfra;
     type Issue: IssueAuthTicketInfra;
     type Encode: EncodeAuthTicketInfra;
 
@@ -60,7 +60,7 @@ pub trait AuthenticatePasswordMaterial {
     type PasswordRepository: VerifyPasswordRepository;
     type PasswordMatcher: AuthUserPasswordMatcher;
 
-    fn check_nonce(&self) -> &Self::CheckNonce;
+    fn validate_nonce(&self) -> &Self::ValidateNonce;
     fn issue(&self) -> &Self::Issue;
     fn encode(&self) -> &Self::Encode;
 
@@ -104,7 +104,7 @@ impl<R: AuthenticatePasswordRequestDecoder, M: AuthenticatePasswordMaterial>
 
         let fields = self.request_decoder.decode();
 
-        validate_auth_nonce(m.check_nonce())
+        validate_auth_nonce(m.validate_nonce())
             .await
             .map_err(|err| pubsub.post(AuthenticatePasswordState::Nonce(err)))?;
 

@@ -208,7 +208,7 @@ impl<'a> TestStruct<'a> {
     fn with_token_validator(store: &'a TestStore, token_validator: StaticAuthTokenDecoder) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
-                check_nonce_infra: StaticValidateAuthNonceStruct {
+                validate_nonce: StaticValidateAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),
                     nonce_metadata: standard_nonce_header(),

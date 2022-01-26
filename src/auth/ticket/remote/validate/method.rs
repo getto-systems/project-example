@@ -17,7 +17,7 @@ pub async fn validate_auth_token<S>(
     require_roles: RequireAuthRoles,
     post: impl Fn(ValidateAuthTokenEvent) -> S,
 ) -> Result<AuthTicket, S> {
-    validate_auth_nonce(infra.check_nonce_infra())
+    validate_auth_nonce(infra.validate_nonce())
         .await
         .map_err(|err| post(ValidateAuthTokenEvent::NonceError(err)))?;
 

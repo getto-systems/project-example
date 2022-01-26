@@ -6,11 +6,11 @@ use crate::auth::ticket::remote::{
 use crate::auth::user::remote::kernel::data::RequireAuthRoles;
 
 pub trait ValidateAuthTokenInfra {
-    type CheckNonceInfra: ValidateAuthNonceInfra;
+    type ValidateNonce: ValidateAuthNonceInfra;
     type TokenMetadata: AuthTokenMetadata;
     type TokenDecoder: AuthTokenDecoder;
 
-    fn check_nonce_infra(&self) -> &Self::CheckNonceInfra;
+    fn validate_nonce(&self) -> &Self::ValidateNonce;
     fn token_metadata(&self) -> &Self::TokenMetadata;
     fn token_decoder(&self) -> &Self::TokenDecoder;
 }

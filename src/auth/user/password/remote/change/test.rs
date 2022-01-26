@@ -317,7 +317,7 @@ impl<'a> TestStruct<'a> {
     fn standard(store: &'a TestStore) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
-                check_nonce_infra: StaticValidateAuthNonceStruct {
+                validate_nonce: StaticValidateAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),
                     nonce_metadata: standard_nonce_header(),
