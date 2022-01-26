@@ -15,7 +15,7 @@ impl RespondTo<AuthenticatePasswordResponsePb> for AuthenticatePasswordState {
     fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
         match self {
             Self::Authenticate(event) => event.respond_to(),
-            Self::Nonce(err) => err.respond_to(),
+            Self::ValidateNonce(event) => event.respond_to(),
             Self::Issue(event) => event.respond_to(),
             Self::Encode(event) => event.respond_to(),
         }

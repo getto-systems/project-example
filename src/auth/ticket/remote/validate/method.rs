@@ -1,5 +1,5 @@
 use crate::auth::ticket::remote::validate_nonce::method::{
-    validate_auth_nonce, ValidateAuthNonceInfra,
+    validate_auth_nonce, ValidateAuthNonceEvent, ValidateAuthNonceInfra,
 };
 
 use crate::auth::ticket::remote::kernel::infra::{AuthTokenDecoder, AuthTokenMetadata};
@@ -8,14 +8,13 @@ use crate::auth::{
     ticket::remote::{
         kernel::data::{AuthTicket, ValidateAuthRolesError},
         validate::data::ValidateAuthTokenError,
-        validate_nonce::data::ValidateAuthNonceError,
     },
     user::remote::kernel::data::RequireAuthRoles,
 };
 
 pub enum ValidateAuthTokenEvent {
+    ValidateNonce(ValidateAuthNonceEvent),
     Success(AuthTicket),
-    NonceError(ValidateAuthNonceError),
     TokenError(ValidateAuthTokenError),
     PermissionError(ValidateAuthRolesError),
 }
@@ -26,8 +25,8 @@ const ERROR: &'static str = "validate error";
 impl std::fmt::Display for ValidateAuthTokenEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::ValidateNonce(event) => event.fmt(f),
             Self::Success(ticket) => write!(f, "{}; {}", SUCCESS, ticket),
-            Self::NonceError(err) => write!(f, "{}; {}", ERROR, err),
             Self::TokenError(err) => write!(f, "{}; {}", ERROR, err),
             Self::PermissionError(err) => write!(f, "{}; {}", ERROR, err),
         }
@@ -49,9 +48,10 @@ pub async fn validate_auth_token<S>(
     require_roles: RequireAuthRoles,
     post: impl Fn(ValidateAuthTokenEvent) -> S,
 ) -> Result<AuthTicket, S> {
-    validate_auth_nonce(infra.validate_nonce())
-        .await
-        .map_err(|err| post(ValidateAuthTokenEvent::NonceError(err)))?;
+    validate_auth_nonce(infra.validate_nonce(), |event| {
+        post(ValidateAuthTokenEvent::ValidateNonce(event))
+    })
+    .await?;
 
     let ticket =
         decode_ticket(infra).map_err(|err| post(ValidateAuthTokenEvent::TokenError(err)))?;

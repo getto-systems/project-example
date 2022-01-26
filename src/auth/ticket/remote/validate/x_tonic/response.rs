@@ -11,8 +11,8 @@ use crate::auth::ticket::remote::validate::data::ValidateAuthTokenError;
 impl RespondTo<ValidateApiTokenResponsePb> for ValidateAuthTokenEvent {
     fn respond_to(self) -> Result<Response<ValidateApiTokenResponsePb>, Status> {
         match self {
+            Self::ValidateNonce(event) => event.respond_to(),
             Self::Success(_) => Err(Status::cancelled("validate api token cancelled")),
-            Self::NonceError(err) => err.respond_to(),
             Self::TokenError(err) => err.respond_to(),
             Self::PermissionError(err) => err.respond_to(),
         }

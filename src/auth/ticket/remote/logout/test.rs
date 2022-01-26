@@ -5,12 +5,6 @@ use getto_application_test::ActionTestRunner;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::ticket::remote::{
-    validate_nonce::init::{
-        nonce_repository::test::{
-            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-        },
-        test::StaticValidateAuthNonceStruct,
-    },
     kernel::init::{
         clock::test::StaticChronoAuthClock,
         nonce_metadata::test::StaticAuthNonceMetadata,
@@ -21,6 +15,12 @@ use crate::auth::ticket::remote::{
         token_metadata::test::StaticAuthTokenMetadata,
     },
     validate::init::test::StaticValidateAuthTokenStruct,
+    validate_nonce::init::{
+        nonce_repository::test::{
+            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+        },
+        test::StaticValidateAuthNonceStruct,
+    },
 };
 
 use crate::auth::ticket::remote::validate_nonce::method::AuthNonceConfig;
@@ -43,6 +43,8 @@ async fn success_logout() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "logout success",
     ]);
@@ -61,6 +63,8 @@ async fn success_expired_nonce() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "logout success",
     ]);
@@ -78,7 +82,10 @@ async fn error_conflict_nonce() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["validate error; auth nonce error: conflict"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce error; conflict",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -94,6 +101,8 @@ async fn error_no_ticket() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "logout success",
     ]);

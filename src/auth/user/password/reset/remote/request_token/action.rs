@@ -1,8 +1,7 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::ticket::remote::validate_nonce::{
-    data::ValidateAuthNonceError,
-    method::{validate_auth_nonce, ValidateAuthNonceInfra},
+use crate::auth::ticket::remote::validate_nonce::method::{
+    validate_auth_nonce, ValidateAuthNonceEvent, ValidateAuthNonceInfra,
 };
 
 use crate::auth::{
@@ -29,14 +28,14 @@ use crate::{
 };
 
 pub enum RequestResetTokenState {
-    Nonce(ValidateAuthNonceError),
+    ValidateNonce(ValidateAuthNonceEvent),
     RequestToken(RequestResetTokenEvent),
 }
 
 impl std::fmt::Display for RequestResetTokenState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Nonce(err) => err.fmt(f),
+            Self::ValidateNonce(event) => event.fmt(f),
             Self::RequestToken(event) => event.fmt(f),
         }
     }
@@ -91,9 +90,10 @@ impl<R: RequestResetTokenRequestDecoder, M: RequestResetTokenMaterial>
 
         let fields = self.request_decoder.decode();
 
-        validate_auth_nonce(m.validate_nonce())
-            .await
-            .map_err(|err| pubsub.post(RequestResetTokenState::Nonce(err)))?;
+        validate_auth_nonce(m.validate_nonce(), |event| {
+            pubsub.post(RequestResetTokenState::ValidateNonce(event))
+        })
+        .await?;
 
         request_reset_token(&m, fields, |event| {
             pubsub.post(RequestResetTokenState::RequestToken(event))

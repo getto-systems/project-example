@@ -25,7 +25,6 @@ impl ChangePasswordEvent {
             Self::Success => LogLevel::Audit,
             Self::UserNotFound => LogLevel::Error,
             Self::InvalidPassword(err) => err.log_level(),
-            Self::NonceError(err) => err.log_level(),
             Self::PasswordHashError(err) => err.log_level(),
             Self::RepositoryError(err) => err.log_level(),
         }

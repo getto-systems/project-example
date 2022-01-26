@@ -3,10 +3,7 @@ use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 use crate::auth::ticket::remote::{
     encode::method::{encode_auth_ticket, EncodeAuthTicketEvent, EncodeAuthTicketInfra},
     issue::method::{issue_auth_ticket, IssueAuthTicketEvent, IssueAuthTicketInfra},
-    validate_nonce::{
-        data::ValidateAuthNonceError,
-        method::{validate_auth_nonce, ValidateAuthNonceInfra},
-    },
+    validate_nonce::method::{validate_auth_nonce, ValidateAuthNonceEvent, ValidateAuthNonceInfra},
 };
 
 use crate::auth::user::{
@@ -34,7 +31,7 @@ use crate::{
 
 pub enum AuthenticatePasswordState {
     Authenticate(AuthenticatePasswordEvent),
-    Nonce(ValidateAuthNonceError),
+    ValidateNonce(ValidateAuthNonceEvent),
     Issue(IssueAuthTicketEvent),
     Encode(EncodeAuthTicketEvent),
 }
@@ -43,7 +40,7 @@ impl std::fmt::Display for AuthenticatePasswordState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Authenticate(event) => event.fmt(f),
-            Self::Nonce(err) => err.fmt(f),
+            Self::ValidateNonce(event) => event.fmt(f),
             Self::Issue(event) => event.fmt(f),
             Self::Encode(event) => event.fmt(f),
         }
@@ -103,9 +100,10 @@ impl<R: AuthenticatePasswordRequestDecoder, M: AuthenticatePasswordMaterial>
 
         let fields = self.request_decoder.decode();
 
-        validate_auth_nonce(m.validate_nonce())
-            .await
-            .map_err(|err| pubsub.post(AuthenticatePasswordState::Nonce(err)))?;
+        validate_auth_nonce(m.validate_nonce(), |event| {
+            pubsub.post(AuthenticatePasswordState::ValidateNonce(event))
+        })
+        .await?;
 
         let user = authenticate_password(&m, fields, |event| {
             pubsub.post(AuthenticatePasswordState::Authenticate(event))

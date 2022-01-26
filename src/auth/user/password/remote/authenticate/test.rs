@@ -79,6 +79,8 @@ async fn success_authenticate() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "authenticate password success; user: test-user-id (granted: [something])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
         "issue success; ticket: ticket-id / user: test-user-id (granted: [something])",
@@ -101,6 +103,8 @@ async fn success_expired_nonce() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "authenticate password success; user: test-user-id (granted: [something])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
         "issue success; ticket: ticket-id / user: test-user-id (granted: [something])",
@@ -122,7 +126,10 @@ async fn error_conflict_nonce() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["auth nonce error: conflict"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce error; conflict",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -139,6 +146,8 @@ async fn error_empty_login_id() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "authenticate password error; invalid login id: empty login id",
     ]);
     assert!(!result.is_ok());
@@ -157,6 +166,8 @@ async fn error_too_long_login_id() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "authenticate password error; invalid login id: too long login id",
     ]);
     assert!(!result.is_ok());
@@ -174,7 +185,11 @@ async fn just_max_length_login_id() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authenticate password error; password not found"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "authenticate password error; password not found",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -191,6 +206,8 @@ async fn error_empty_password() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "authenticate password error; invalid password: empty password",
     ]);
     assert!(!result.is_ok());
@@ -209,6 +226,8 @@ async fn error_too_long_password() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "authenticate password error; invalid password: too long password",
     ]);
     assert!(!result.is_ok());
@@ -226,7 +245,11 @@ async fn just_max_length_password() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authenticate password error; password not matched"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "authenticate password error; password not matched",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -242,7 +265,11 @@ async fn error_failed_to_match_password() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authenticate password error; password not matched"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "authenticate password error; password not matched",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -258,7 +285,11 @@ async fn error_password_not_stored() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authenticate password error; password not found"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "authenticate password error; password not found",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -274,7 +305,11 @@ async fn error_user_not_stored() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authenticate password error; user not found"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "authenticate password error; user not found",
+    ]);
     assert!(!result.is_ok());
 }
 

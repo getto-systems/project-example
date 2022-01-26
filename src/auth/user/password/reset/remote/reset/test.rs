@@ -53,7 +53,6 @@ use crate::auth::ticket::remote::{
     validate_nonce::method::AuthNonceConfig,
 };
 
-
 use super::action::{ResetPasswordAction, ResetPasswordMaterial};
 
 use crate::auth::user::password::reset::remote::reset::infra::ResetPasswordFieldsExtract;
@@ -82,6 +81,8 @@ async fn success_request_token() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "reset password notified; message-id: message-id",
         "reset password success; user: user-id (granted: [])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
@@ -105,6 +106,8 @@ async fn success_expired_nonce() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "reset password notified; message-id: message-id",
         "reset password success; user: user-id (granted: [])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
@@ -127,7 +130,10 @@ async fn error_conflict_nonce() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["auth nonce error: conflict"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce error; conflict",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -144,6 +150,8 @@ async fn error_match_failed_login_id() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "reset password error; invalid reset token entry: login id not matched",
     ]);
     assert!(!result.is_ok());
@@ -162,6 +170,8 @@ async fn error_empty_login_id() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "reset password error; invalid login id: empty login id",
     ]);
     assert!(!result.is_ok());
@@ -180,6 +190,8 @@ async fn error_too_long_login_id() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "reset password error; invalid login id: too long login id",
     ]);
     assert!(!result.is_ok());
@@ -198,6 +210,8 @@ async fn just_max_length_login_id() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "reset password error; invalid reset token entry: login id not matched",
     ]);
     assert!(!result.is_ok());
@@ -216,6 +230,8 @@ async fn error_empty_password() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "reset password error; invalid password: empty password",
     ]);
     assert!(!result.is_ok());
@@ -234,6 +250,8 @@ async fn error_too_long_password() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "reset password error; invalid password: too long password",
     ]);
     assert!(!result.is_ok());
@@ -252,6 +270,8 @@ async fn just_max_length_password() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "reset password notified; message-id: message-id",
         "reset password success; user: user-id (granted: [])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
@@ -275,6 +295,8 @@ async fn error_empty_reset_token() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "reset password error; invalid reset token: empty reset token",
     ]);
     assert!(!result.is_ok());
@@ -292,7 +314,11 @@ async fn error_reset_token_expired_when_decode() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["reset password error; reset token expired"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "reset password error; reset token expired",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -309,6 +335,8 @@ async fn error_reset_token_expired_in_store() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "reset password error; invalid reset token entry: reset token expired",
     ]);
     assert!(!result.is_ok());
@@ -327,6 +355,8 @@ async fn error_reset_token_discarded() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "reset password error; invalid reset token entry: already reset",
     ]);
     assert!(!result.is_ok());
@@ -345,6 +375,8 @@ async fn error_password_not_stored() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "reset password error; invalid reset token entry: reset token entry not found",
     ]);
     assert!(!result.is_ok());
@@ -362,7 +394,11 @@ async fn error_user_not_stored() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["reset password error; user not found"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "reset password error; user not found",
+    ]);
     assert!(!result.is_ok());
 }
 

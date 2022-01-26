@@ -13,7 +13,7 @@ use crate::auth::user::password::remote::{
 
 use crate::{
     auth::{
-        ticket::remote::{kernel::data::AuthTicket, validate_nonce::data::ValidateAuthNonceError},
+        ticket::remote::kernel::data::AuthTicket,
         user::{
             password::remote::{
                 change::data::{ChangePasswordError, ChangePasswordRepositoryError},
@@ -98,7 +98,6 @@ pub enum ChangePasswordEvent {
     Success,
     UserNotFound,
     InvalidPassword(ChangePasswordError),
-    NonceError(ValidateAuthNonceError),
     PasswordHashError(PasswordHashError),
     RepositoryError(RepositoryError),
 }
@@ -112,7 +111,6 @@ impl std::fmt::Display for ChangePasswordEvent {
             Self::Success => write!(f, "{}", SUCCESS),
             Self::InvalidPassword(response) => write!(f, "{}; {}", ERROR, response),
             Self::UserNotFound => write!(f, "{}; user not found", ERROR),
-            Self::NonceError(err) => write!(f, "{}; {}", ERROR, err),
             Self::PasswordHashError(err) => write!(f, "{}; {}", ERROR, err),
             Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
         }

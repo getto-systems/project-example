@@ -5,12 +5,6 @@ use getto_application_test::ActionTestRunner;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::ticket::remote::{
-    validate_nonce::init::{
-        nonce_repository::test::{
-            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-        },
-        test::StaticValidateAuthNonceStruct,
-    },
     kernel::init::{
         clock::test::StaticChronoAuthClock, nonce_metadata::test::StaticAuthNonceMetadata,
         token_decoder::test::StaticAuthTokenDecoder, token_metadata::test::StaticAuthTokenMetadata,
@@ -18,6 +12,12 @@ use crate::auth::ticket::remote::{
     validate::init::{
         request_decoder::test::StaticValidateApiTokenRequestDecoder,
         test::StaticValidateAuthTokenStruct,
+    },
+    validate_nonce::init::{
+        nonce_repository::test::{
+            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+        },
+        test::StaticValidateAuthNonceStruct,
     },
 };
 
@@ -43,6 +43,8 @@ async fn success_allow_for_any_role() {
 
     let result = action.ignite(request_decoder).await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
         "validate api token success; user: something-role-user-id (granted: [something])",
     ]);
@@ -62,6 +64,8 @@ async fn success_allow_for_something_role() {
 
     let result = action.ignite(request_decoder).await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
         "validate api token success; user: something-role-user-id (granted: [something])",
     ]);
@@ -81,6 +85,8 @@ async fn error_allow_for_something_role_but_not_granted() {
 
     let result = action.ignite(request_decoder).await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate error; user permission denied; granted: [], require: any [something]",
     ]);
     assert!(!result.is_ok());
@@ -98,7 +104,11 @@ async fn error_token_expired() {
     action.subscribe(handler);
 
     let result = action.ignite(request_decoder).await;
-    assert_state(vec!["validate error; auth token error: token expired"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "validate error; auth token error: token expired",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -115,6 +125,8 @@ async fn success_expired_nonce() {
 
     let result = action.ignite(request_decoder).await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
         "validate api token success; user: something-role-user-id (granted: [something])",
     ]);
@@ -133,7 +145,10 @@ async fn error_conflict_nonce() {
     action.subscribe(handler);
 
     let result = action.ignite(request_decoder).await;
-    assert_state(vec!["validate error; auth nonce error: conflict"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce error; conflict",
+    ]);
     assert!(!result.is_ok());
 }
 

@@ -13,7 +13,7 @@ use crate::auth::user::password::reset::remote::request_token::data::{
 impl RespondTo<RequestResetTokenResponsePb> for RequestResetTokenState {
     fn respond_to(self) -> Result<Response<RequestResetTokenResponsePb>, Status> {
         match self {
-            Self::Nonce(err) => err.respond_to(),
+            Self::ValidateNonce(event) => event.respond_to(),
             Self::RequestToken(event) => event.respond_to(),
         }
     }
