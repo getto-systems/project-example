@@ -46,7 +46,7 @@ use crate::auth::{
 
 use crate::auth::{
     ticket::remote::{
-        encode::method::EncodeAuthTicketConfig, issue::infra::IssueAuthTicketConfig,
+        encode::method::EncodeAuthTicketConfig, issue::method::IssueAuthTicketConfig,
         validate_nonce::infra::AuthNonceConfig,
     },
     user::password::remote::{

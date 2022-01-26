@@ -1,6 +1,6 @@
 use crate::z_lib::remote::logger::LogLevel;
 
-use super::super::event::IssueAuthTicketEvent;
+use super::super::method::IssueAuthTicketEvent;
 
 impl IssueAuthTicketEvent {
     pub const fn log_level(&self) -> LogLevel {

@@ -7,7 +7,7 @@ use crate::auth::ticket::remote::kernel::init::{
 };
 use id_generator::UuidAuthTicketIdGenerator;
 
-use super::infra::{IssueAuthTicketConfig, IssueAuthTicketInfra};
+use super::method::{IssueAuthTicketConfig, IssueAuthTicketInfra};
 
 pub struct IssueAuthTicketStruct<'a> {
     clock: ChronoAuthClock,
@@ -55,7 +55,7 @@ pub mod test {
         clock::test::StaticChronoAuthClock, ticket_repository::test::MemoryAuthTicketRepository,
     };
 
-    use super::super::infra::{IssueAuthTicketConfig, IssueAuthTicketInfra};
+    use super::super::method::{IssueAuthTicketConfig, IssueAuthTicketInfra};
 
     pub struct StaticIssueAuthTicketStruct<'a> {
         pub clock: StaticChronoAuthClock,

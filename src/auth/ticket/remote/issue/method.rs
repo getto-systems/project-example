@@ -1,11 +1,51 @@
-use crate::auth::ticket::remote::{
-    issue::infra::{AuthTicketIdGenerator, IssueAuthTicketInfra, IssueAuthTicketRepository},
-    kernel::infra::AuthClock,
+use crate::{
+    auth::ticket::remote::{
+        issue::infra::{AuthTicketIdGenerator, IssueAuthTicketRepository},
+        kernel::infra::AuthClock,
+    },
+    z_lib::remote::repository::data::RepositoryError,
 };
 
-use super::event::IssueAuthTicketEvent;
+use crate::auth::{
+    ticket::remote::kernel::data::{AuthTicket, ExpansionLimitDateTime, ExpansionLimitDuration},
+    user::remote::kernel::data::AuthUser,
+};
 
-use crate::auth::{ticket::remote::kernel::data::AuthTicket, user::remote::kernel::data::AuthUser};
+pub enum IssueAuthTicketEvent {
+    ExpansionLimitCalculated(ExpansionLimitDateTime),
+    Success(AuthTicket),
+    RepositoryError(RepositoryError),
+}
+
+const SUCCESS: &'static str = "issue success";
+const ERROR: &'static str = "issue error";
+
+impl std::fmt::Display for IssueAuthTicketEvent {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::ExpansionLimitCalculated(limit) => {
+                write!(f, "expansion limit calculated; {}", limit)
+            }
+            Self::Success(ticket) => write!(f, "{}; {}", SUCCESS, ticket),
+            Self::RepositoryError(err) => write!(f, "{}: {}", ERROR, err),
+        }
+    }
+}
+
+pub trait IssueAuthTicketInfra {
+    type Clock: AuthClock;
+    type TicketRepository: IssueAuthTicketRepository;
+    type TicketIdGenerator: AuthTicketIdGenerator;
+
+    fn clock(&self) -> &Self::Clock;
+    fn ticket_repository(&self) -> &Self::TicketRepository;
+    fn ticket_id_generator(&self) -> &Self::TicketIdGenerator;
+    fn config(&self) -> &IssueAuthTicketConfig;
+}
+
+pub struct IssueAuthTicketConfig {
+    pub ticket_expansion_limit: ExpansionLimitDuration,
+}
 
 pub async fn issue_auth_ticket<S>(
     infra: &impl IssueAuthTicketInfra,
