@@ -4,8 +4,7 @@ use lazy_static::lazy_static;
 use tonic::{service::interceptor, transport::Server, Request};
 
 use example_api::x_outside_feature::remote::example::{
-    env::ExampleEnv,
-    feature::{ExampleAppData, ExampleAppFeature},
+    env::ExampleEnv, feature::ExampleAppFeature,
 };
 
 lazy_static! {
@@ -14,13 +13,13 @@ lazy_static! {
 
 #[tokio::main]
 async fn main() {
-    let data: ExampleAppData = Arc::new(ExampleAppFeature::new(&ENV).await);
+    let feature: Arc<ExampleAppFeature> = Arc::new(ExampleAppFeature::new(&ENV).await);
 
     let server = route::Server::new();
 
     Server::builder()
         .layer(interceptor(move |mut request: Request<()>| {
-            request.extensions_mut().insert(data.clone());
+            request.extensions_mut().insert(feature.clone());
             Ok(request)
         }))
         .add_service(server.avail.unexpected_error.notify())

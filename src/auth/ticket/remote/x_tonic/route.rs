@@ -47,11 +47,11 @@ impl LogoutPb for Logout {
         &self,
         request: Request<LogoutRequestPb>,
     ) -> Result<Response<LogoutResponsePb>, Status> {
-        let TonicRequest { data, metadata, .. } = extract_request(request);
+        let TonicRequest { feature, metadata, .. } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger("auth.ticket.logout", request_id.into());
-        let mut action = LogoutStruct::action(&data, &metadata);
+        let mut action = LogoutStruct::action(&feature, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         flatten(action.ignite().await).respond_to()
@@ -66,11 +66,11 @@ impl CheckAuthTicketPb for Check {
         &self,
         request: Request<CheckAuthTicketRequestPb>,
     ) -> Result<Response<CheckAuthTicketResponsePb>, Status> {
-        let TonicRequest { data, metadata, .. } = extract_request(request);
+        let TonicRequest { feature, metadata, .. } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger("auth.ticket.check", request_id.into());
-        let mut action = CheckAuthTicketStruct::action(&data, &metadata);
+        let mut action = CheckAuthTicketStruct::action(&feature, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         flatten(action.ignite().await).respond_to()
@@ -86,14 +86,14 @@ impl ValidateApiTokenPb for Validate {
         request: Request<ValidateApiTokenRequestPb>,
     ) -> Result<Response<ValidateApiTokenResponsePb>, Status> {
         let TonicRequest {
-            data,
+            feature,
             metadata,
             request,
         } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger("auth.ticket.validate", request_id.into());
-        let mut action = ValidateApiTokenFeature::action(&data, &metadata);
+        let mut action = ValidateApiTokenFeature::action(&feature, &metadata);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         let request_decoder = ValidateApiTokenFeature::request_decoder(request);

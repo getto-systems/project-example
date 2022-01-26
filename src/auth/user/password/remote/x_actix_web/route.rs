@@ -1,11 +1,15 @@
-use actix_web::{post, web, HttpRequest, Responder, Scope};
+use actix_web::{
+    post,
+    web::{scope, Data},
+    HttpRequest, Responder, Scope,
+};
 
 use getto_application::helper::flatten;
 
 use crate::z_lib::remote::{logger::Logger, response::actix_web::RespondTo};
 
 use crate::x_outside_feature::remote::api::{
-    feature::ApiAppData,
+    feature::ApiAppFeature,
     logger::{app_logger, generate_request_id},
 };
 
@@ -21,18 +25,22 @@ use crate::auth::user::password::remote::{
 };
 
 pub fn scope_password() -> Scope {
-    web::scope("/password")
+    scope("/password")
         .service(scope_reset())
         .service(authenticate)
         .service(change)
 }
 
 #[post("/authenticate")]
-async fn authenticate(data: ApiAppData, request: HttpRequest, body: String) -> impl Responder {
+async fn authenticate(
+    feature: Data<ApiAppFeature>,
+    request: HttpRequest,
+    body: String,
+) -> impl Responder {
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut proxy = AuthenticatePasswordProxyStruct::new(&data.auth, &request_id, &request);
+    let mut proxy = AuthenticatePasswordProxyStruct::new(&feature.auth, &request_id, &request);
     proxy.subscribe(move |state| logger.log(state.log_level(), state));
 
     let params = AuthenticatePasswordProxyStruct::request_decoder(body).decode();
@@ -40,11 +48,15 @@ async fn authenticate(data: ApiAppData, request: HttpRequest, body: String) -> i
 }
 
 #[post("/change")]
-async fn change(data: ApiAppData, request: HttpRequest, body: String) -> impl Responder {
+async fn change(
+    feature: Data<ApiAppFeature>,
+    request: HttpRequest,
+    body: String,
+) -> impl Responder {
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut proxy = ChangePasswordProxyStruct::new(&data.auth, &request_id, &request);
+    let mut proxy = ChangePasswordProxyStruct::new(&feature.auth, &request_id, &request);
     proxy.subscribe(move |state| logger.log(state.log_level(), state));
 
     let params = ChangePasswordProxyStruct::request_decoder(body).decode();

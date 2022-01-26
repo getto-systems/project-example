@@ -1,11 +1,15 @@
-use actix_web::{post, web, HttpRequest, Responder, Scope};
+use actix_web::{
+    post,
+    web::{scope, Data},
+    HttpRequest, Responder, Scope,
+};
 
 use getto_application::helper::flatten;
 
 use crate::z_lib::remote::{logger::Logger, response::actix_web::RespondTo};
 
 use crate::x_outside_feature::remote::api::{
-    feature::ApiAppData,
+    feature::ApiAppFeature,
     logger::{app_logger, generate_request_id},
 };
 
@@ -19,15 +23,19 @@ use crate::auth::user::password::reset::remote::{
 };
 
 pub fn scope_reset() -> Scope {
-    web::scope("/reset").service(request_token).service(reset)
+    scope("/reset").service(request_token).service(reset)
 }
 
 #[post("/token")]
-async fn request_token(data: ApiAppData, request: HttpRequest, body: String) -> impl Responder {
+async fn request_token(
+    feature: Data<ApiAppFeature>,
+    request: HttpRequest,
+    body: String,
+) -> impl Responder {
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut proxy = RequestResetTokenProxyStruct::new(&data.auth, &request_id, &request);
+    let mut proxy = RequestResetTokenProxyStruct::new(&feature.auth, &request_id, &request);
     proxy.subscribe(move |state| logger.log(state.log_level(), state));
 
     let params = RequestResetTokenProxyStruct::request_decoder(body).decode();
@@ -35,11 +43,11 @@ async fn request_token(data: ApiAppData, request: HttpRequest, body: String) -> 
 }
 
 #[post("")]
-async fn reset(data: ApiAppData, request: HttpRequest, body: String) -> impl Responder {
+async fn reset(feature: Data<ApiAppFeature>, request: HttpRequest, body: String) -> impl Responder {
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut proxy = ResetPasswordProxyStruct::new(&data.auth, &request_id, &request);
+    let mut proxy = ResetPasswordProxyStruct::new(&feature.auth, &request_id, &request);
     proxy.subscribe(move |state| logger.log(state.log_level(), state));
 
     let params = ResetPasswordProxyStruct::request_decoder(body).decode();

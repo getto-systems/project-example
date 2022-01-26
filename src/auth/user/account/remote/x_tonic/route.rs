@@ -36,14 +36,14 @@ impl SearchAuthUserAccountPb for Search {
         request: Request<SearchAuthUserAccountRequestPb>,
     ) -> Result<Response<SearchAuthUserAccountResponsePb>, Status> {
         let TonicRequest {
-            data,
+            feature,
             metadata,
             request,
         } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger("auth.user.account.search", request_id.into());
-        let mut action = SearchAuthUserAccountFeature::action(&data, &metadata, request);
+        let mut action = SearchAuthUserAccountFeature::action(&feature, &metadata, request);
         action.subscribe(move |state| logger.log(state.log_level(), state));
 
         flatten(action.ignite().await).respond_to()

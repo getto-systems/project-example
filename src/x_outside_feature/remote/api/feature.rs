@@ -1,5 +1,3 @@
-use actix_web::web::Data;
-
 use super::env::ApiEnv;
 
 use crate::{
@@ -10,8 +8,6 @@ use crate::{
         feature::ExampleOutsideFeature, init::new_example_outside_feature,
     },
 };
-
-pub type ApiAppData = Data<ApiAppFeature>;
 
 pub struct ApiAppFeature {
     pub auth: AuthOutsideFeature,

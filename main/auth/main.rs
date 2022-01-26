@@ -3,10 +3,7 @@ use std::sync::Arc;
 use lazy_static::lazy_static;
 use tonic::{service::interceptor, transport::Server, Request};
 
-use example_api::x_outside_feature::remote::auth::{
-    env::AuthEnv,
-    feature::{AuthAppData, AuthAppFeature},
-};
+use example_api::x_outside_feature::remote::auth::{env::AuthEnv, feature::AuthAppFeature};
 
 lazy_static! {
     static ref ENV: AuthEnv = AuthEnv::new();
@@ -14,13 +11,13 @@ lazy_static! {
 
 #[tokio::main]
 async fn main() {
-    let data: AuthAppData = Arc::new(AuthAppFeature::new(&ENV).await);
+    let feature: Arc<AuthAppFeature> = Arc::new(AuthAppFeature::new(&ENV).await);
 
     let server = route::Server::new();
 
     Server::builder()
         .layer(interceptor(move |mut request: Request<()>| {
-            request.extensions_mut().insert(data.clone());
+            request.extensions_mut().insert(feature.clone());
             Ok(request)
         }))
         .add_service(server.auth.ticket.logout())
