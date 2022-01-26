@@ -31,7 +31,7 @@ use crate::auth::{
 use super::action::{ResetPasswordAction, ResetPasswordMaterial};
 
 pub struct ResetPasswordFeature<'a> {
-    check_nonce: ValidateAuthNonceStruct<'a>,
+    validate_nonce: ValidateAuthNonceStruct<'a>,
     issue: IssueAuthTicketStruct<'a>,
     encode: EncodeAuthTicketStruct<'a>,
 
@@ -51,7 +51,7 @@ impl<'a> ResetPasswordFeature<'a> {
         ResetPasswordAction::with_material(
             PbResetPasswordRequestDecoder::new(request),
             Self {
-                check_nonce: ValidateAuthNonceStruct::new(&feature.auth, metadata),
+                validate_nonce: ValidateAuthNonceStruct::new(&feature.auth, metadata),
                 issue: IssueAuthTicketStruct::new(&feature.auth),
                 encode: EncodeAuthTicketStruct::new(&feature.auth),
 
@@ -68,7 +68,7 @@ impl<'a> ResetPasswordFeature<'a> {
 }
 
 impl<'a> ResetPasswordMaterial for ResetPasswordFeature<'a> {
-    type CheckNonce = ValidateAuthNonceStruct<'a>;
+    type ValidateNonce = ValidateAuthNonceStruct<'a>;
     type Issue = IssueAuthTicketStruct<'a>;
     type Encode = EncodeAuthTicketStruct<'a>;
 
@@ -79,8 +79,8 @@ impl<'a> ResetPasswordMaterial for ResetPasswordFeature<'a> {
     type TokenDecoder = JwtResetTokenDecoder<'a>;
     type ResetNotifier = EmailResetPasswordNotifier<'a>;
 
-    fn check_nonce(&self) -> &Self::CheckNonce {
-        &self.check_nonce
+    fn validate_nonce(&self) -> &Self::ValidateNonce {
+        &self.validate_nonce
     }
     fn issue(&self) -> &Self::Issue {
         &self.issue

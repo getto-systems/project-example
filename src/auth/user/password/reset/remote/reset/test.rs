@@ -367,7 +367,7 @@ async fn error_user_not_stored() {
 }
 
 struct TestStruct<'a> {
-    check_nonce: StaticValidateAuthNonceStruct<'a>,
+    validate_nonce: StaticValidateAuthNonceStruct<'a>,
     issue: StaticIssueAuthTicketStruct<'a>,
     encode: StaticEncodeAuthTicketStruct<'a>,
 
@@ -379,7 +379,7 @@ struct TestStruct<'a> {
 }
 
 impl<'a> ResetPasswordMaterial for TestStruct<'a> {
-    type CheckNonce = StaticValidateAuthNonceStruct<'a>;
+    type ValidateNonce = StaticValidateAuthNonceStruct<'a>;
     type Issue = StaticIssueAuthTicketStruct<'a>;
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
@@ -390,8 +390,8 @@ impl<'a> ResetPasswordMaterial for TestStruct<'a> {
     type TokenDecoder = StaticResetTokenDecoder;
     type ResetNotifier = StaticResetPasswordNotifier;
 
-    fn check_nonce(&self) -> &Self::CheckNonce {
-        &self.check_nonce
+    fn validate_nonce(&self) -> &Self::ValidateNonce {
+        &self.validate_nonce
     }
     fn issue(&self) -> &Self::Issue {
         &self.issue
@@ -492,7 +492,7 @@ impl<'a> TestStruct<'a> {
     }
     fn with_token_decoder(store: &'a TestStore, token_decoder: StaticResetTokenDecoder) -> Self {
         Self {
-            check_nonce: StaticValidateAuthNonceStruct {
+            validate_nonce: StaticValidateAuthNonceStruct {
                 config: standard_nonce_config(),
                 clock: standard_clock(),
                 nonce_metadata: standard_nonce_metadata(),

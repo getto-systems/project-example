@@ -42,7 +42,7 @@ impl std::fmt::Display for RequestResetTokenState {
 }
 
 pub trait RequestResetTokenMaterial {
-    type CheckNonce: ValidateAuthNonceInfra;
+    type ValidateNonce: ValidateAuthNonceInfra;
 
     type Clock: AuthClock;
     type PasswordRepository: RegisterResetTokenRepository;
@@ -51,7 +51,7 @@ pub trait RequestResetTokenMaterial {
     type TokenEncoder: ResetTokenEncoder;
     type TokenNotifier: ResetTokenNotifier;
 
-    fn check_nonce(&self) -> &Self::CheckNonce;
+    fn validate_nonce(&self) -> &Self::ValidateNonce;
 
     fn clock(&self) -> &Self::Clock;
     fn password_repository(&self) -> &Self::PasswordRepository;
@@ -90,7 +90,7 @@ impl<R: RequestResetTokenRequestDecoder, M: RequestResetTokenMaterial>
 
         let fields = self.request_decoder.decode();
 
-        validate_auth_nonce(m.check_nonce())
+        validate_auth_nonce(m.validate_nonce())
             .await
             .map_err(|err| pubsub.post(RequestResetTokenState::Nonce(err)))?;
 

@@ -31,7 +31,7 @@ use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 use crate::auth::user::password::reset::remote::request_token::infra::RequestResetTokenConfig;
 
 pub struct RequestResetTokenStruct<'a> {
-    check_nonce: ValidateAuthNonceStruct<'a>,
+    validate_nonce: ValidateAuthNonceStruct<'a>,
 
     clock: ChronoAuthClock,
     password_repository: MysqlAuthUserPasswordRepository<'a>,
@@ -51,7 +51,7 @@ impl<'a> RequestResetTokenStruct<'a> {
         RequestResetTokenAction::with_material(
             PbRequestResetTokenRequestDecoder::new(request),
             Self {
-                check_nonce: ValidateAuthNonceStruct::new(&feature.auth, metadata),
+                validate_nonce: ValidateAuthNonceStruct::new(&feature.auth, metadata),
 
                 clock: ChronoAuthClock::new(),
                 password_repository: MysqlAuthUserPasswordRepository::new(
@@ -72,7 +72,7 @@ impl<'a> RequestResetTokenStruct<'a> {
 }
 
 impl<'a> RequestResetTokenMaterial for RequestResetTokenStruct<'a> {
-    type CheckNonce = ValidateAuthNonceStruct<'a>;
+    type ValidateNonce = ValidateAuthNonceStruct<'a>;
 
     type Clock = ChronoAuthClock;
     type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
@@ -81,8 +81,8 @@ impl<'a> RequestResetTokenMaterial for RequestResetTokenStruct<'a> {
     type TokenEncoder = JwtResetTokenEncoder<'a>;
     type TokenNotifier = EmailResetTokenNotifier<'a>;
 
-    fn check_nonce(&self) -> &Self::CheckNonce {
-        &self.check_nonce
+    fn validate_nonce(&self) -> &Self::ValidateNonce {
+        &self.validate_nonce
     }
 
     fn clock(&self) -> &Self::Clock {
