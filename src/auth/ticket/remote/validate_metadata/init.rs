@@ -7,7 +7,7 @@ use crate::auth::ticket::remote::kernel::init::{
     token_decoder::{JwtApiTokenDecoder, JwtTicketTokenDecoder, NoopTokenDecoder},
 };
 
-use crate::auth::ticket::remote::validate_metadata::infra::ValidateAuthMetadataInfra;
+use crate::auth::ticket::remote::validate_metadata::method::ValidateAuthMetadataInfra;
 
 pub struct ValidateTicketMetadataStruct<'a> {
     auth_metadata: TicketAuthMetadata<'a>,
