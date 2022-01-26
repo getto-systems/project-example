@@ -25,7 +25,6 @@ impl<T> RespondTo<T> for ValidateAuthTokenError {
             Self::TokenNotSent => Err(Status::unauthenticated(format!("{}", self))),
             Self::MetadataError(err) => err.respond_to(),
             Self::DecodeError(err) => err.respond_to(),
-            Self::RepositoryError(err) => err.respond_to(),
         }
     }
 }

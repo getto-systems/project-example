@@ -21,7 +21,6 @@ impl ValidateAuthTokenError {
             Self::TokenNotSent => LogLevel::Info,
             Self::MetadataError(err) => err.log_level(),
             Self::DecodeError(err) => err.log_level(),
-            Self::RepositoryError(err) => err.log_level(),
         }
     }
 }
