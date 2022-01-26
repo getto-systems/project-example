@@ -8,9 +8,8 @@ use crate::z_lib::remote::{
 };
 
 use crate::auth::remote::{
-    data::ValidateAuthMetadataError,
-    infra::{AuthMetadataContent, ValidateAuthMetadataInfra},
-    method::validate_auth_metadata,
+    infra::AuthMetadataContent,
+    method::{validate_auth_metadata, ValidateAuthMetadataEvent, ValidateAuthMetadataInfra},
 };
 
 use crate::{
@@ -18,9 +17,9 @@ use crate::{
 };
 
 pub enum ExampleProxyEvent<T> {
+    Metadata(ValidateAuthMetadataEvent),
     TryToCall(String),
     Response(T),
-    MetadataError(ValidateAuthMetadataError),
     ServiceError(ExampleServiceError),
     MessageError(MessageError),
 }
@@ -31,9 +30,9 @@ const ERROR: &'static str = "proxy call error";
 impl<T> std::fmt::Display for ExampleProxyEvent<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            Self::Metadata(event) => event.fmt(f),
             Self::TryToCall(target) => write!(f, "try to proxy call: {}", target),
             Self::Response(_) => write!(f, "{}", SUCCESS),
-            Self::MetadataError(err) => write!(f, "{}; {}", ERROR, err),
             Self::ServiceError(err) => write!(f, "{}; {}", ERROR, err),
             Self::MessageError(err) => write!(f, "{}; {}", ERROR, err),
         }
@@ -43,9 +42,9 @@ impl<T> std::fmt::Display for ExampleProxyEvent<T> {
 impl<T: RespondTo> RespondTo for ExampleProxyEvent<T> {
     fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
+            Self::Metadata(event) => event.respond_to(request),
             Self::TryToCall(_) => HttpResponse::Accepted().finish(),
             Self::Response(response) => response.respond_to(request),
-            Self::MetadataError(err) => err.respond_to(request),
             Self::ServiceError(err) => err.respond_to(request),
             Self::MessageError(err) => err.respond_to(request),
         }
@@ -55,9 +54,9 @@ impl<T: RespondTo> RespondTo for ExampleProxyEvent<T> {
 impl<T> ExampleProxyEvent<T> {
     pub fn log_level(&self) -> LogLevel {
         match self {
+            Self::Metadata(event) => event.log_level(),
             Self::TryToCall(_) => LogLevel::Info,
             Self::Response(_) => LogLevel::Debug,
-            Self::MetadataError(err) => err.log_level(),
             Self::ServiceError(err) => err.log_level(),
             Self::MessageError(err) => err.log_level(),
         }
@@ -105,8 +104,9 @@ pub async fn call_proxy<P, T, R>(
 
     let params = params.map_err(|err| infra.post(ExampleProxyEvent::MessageError(err)))?;
 
-    let metadata = validate_auth_metadata(infra.validate_infra())
-        .map_err(|err| infra.post(ExampleProxyEvent::MetadataError(err)))?;
+    let metadata = validate_auth_metadata(infra.validate_infra(), |event| {
+        infra.post(ExampleProxyEvent::Metadata(event))
+    })?;
 
     infra.post(ExampleProxyEvent::TryToCall(proxy_service.name().into()));
 

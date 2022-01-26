@@ -6,7 +6,7 @@ impl ValidateAuthNonceEvent {
     pub const fn log_level(&self) -> LogLevel {
         match self {
             Self::NonceExpiresCalculated(_) => LogLevel::Debug,
-            Self::Success => LogLevel::Info,
+            Self::Success => LogLevel::Debug,
             Self::NonceNotSent => LogLevel::Error,
             Self::MetadataError(err) => err.log_level(),
             Self::RepositoryError(err) => err.log_level(),

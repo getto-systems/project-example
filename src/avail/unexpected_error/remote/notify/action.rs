@@ -2,8 +2,7 @@ use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::remote::{
     data::RequireAuthRoles,
-    infra::ValidateApiTokenInfra,
-    method::{validate_api_token, ValidateApiTokenEvent},
+    method::{validate_api_token, ValidateApiTokenEvent, ValidateApiTokenInfra},
 };
 
 use crate::avail::unexpected_error::remote::notify::infra::{
