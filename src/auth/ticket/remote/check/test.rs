@@ -49,6 +49,8 @@ async fn success_allow_for_any_role() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
@@ -67,7 +69,11 @@ async fn error_token_expired() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["validate error; auth token error: token expired"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "validate error; auth token error: token expired",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -83,6 +89,8 @@ async fn success_expired_nonce() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
@@ -102,6 +110,8 @@ async fn success_limited_ticket() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
         "token expires calculated; ticket: 2021-01-01 11:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
@@ -120,7 +130,10 @@ async fn error_conflict_nonce() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["validate error; auth nonce error: conflict"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce error; conflict",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -136,6 +149,8 @@ async fn error_no_ticket() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
         "encode error; ticket data not found",
     ]);

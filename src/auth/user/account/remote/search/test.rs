@@ -65,6 +65,8 @@ async fn success_search() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [manage_auth_user])",
         "search user account success",
     ]);

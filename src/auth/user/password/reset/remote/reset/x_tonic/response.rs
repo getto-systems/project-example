@@ -21,7 +21,7 @@ use crate::auth::{
 impl RespondTo<ResetPasswordResponsePb> for ResetPasswordState {
     fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
         match self {
-            Self::Nonce(err) => err.respond_to(),
+            Self::ValidateNonce(event) => event.respond_to(),
             Self::Reset(event) => event.respond_to(),
             Self::Issue(event) => event.respond_to(),
             Self::Encode(event) => event.respond_to(),

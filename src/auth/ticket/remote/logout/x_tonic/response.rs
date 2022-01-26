@@ -20,8 +20,8 @@ impl RespondTo<LogoutResponsePb> for LogoutState {
 impl RespondTo<LogoutResponsePb> for ValidateAuthTokenEvent {
     fn respond_to(self) -> Result<Response<LogoutResponsePb>, Status> {
         match self {
-            Self::Success(_) => Err(Status::cancelled("logout cancelled")),
-            Self::NonceError(err) => err.respond_to(),
+            Self::ValidateNonce(_) => Err(Status::cancelled("logout cancelled")),
+            Self::Success(_) => Err(Status::cancelled("logout succeeded")),
             Self::TokenError(err) => err.respond_to(),
             Self::PermissionError(err) => err.respond_to(),
         }

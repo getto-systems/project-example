@@ -23,7 +23,6 @@ impl RespondTo<ChangePasswordResponsePb> for ChangePasswordEvent {
             Self::Success => Ok(Response::new(ChangePasswordResponsePb { success: true })),
             Self::UserNotFound => Err(Status::internal("user not found")),
             Self::InvalidPassword(err) => err.respond_to(),
-            Self::NonceError(err) => err.respond_to(),
             Self::PasswordHashError(err) => err.respond_to(),
             Self::RepositoryError(err) => err.respond_to(),
         }

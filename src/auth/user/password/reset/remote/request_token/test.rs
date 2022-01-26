@@ -64,6 +64,8 @@ async fn success_request_token() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "token expires calculated; 2021-01-02 10:00:00 UTC",
         "token notified; message-id: message-id",
         "request reset token success",
@@ -84,6 +86,8 @@ async fn success_expired_nonce() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "token expires calculated; 2021-01-02 10:00:00 UTC",
         "token notified; message-id: message-id",
         "request reset token success",
@@ -103,7 +107,10 @@ async fn error_conflict_nonce() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["auth nonce error: conflict"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce error; conflict",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -120,6 +127,8 @@ async fn error_empty_login_id() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "request reset token error; invalid login id: empty login id",
     ]);
     assert!(!result.is_ok());
@@ -138,6 +147,8 @@ async fn error_too_long_login_id() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "request reset token error; invalid login id: too long login id",
     ]);
     assert!(!result.is_ok());
@@ -155,7 +166,11 @@ async fn just_max_length_login_id() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["request reset token error; destination not found"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "request reset token error; destination not found",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -171,7 +186,11 @@ async fn error_destination_not_stored() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["request reset token error; destination not found"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "request reset token error; destination not found",
+    ]);
     assert!(!result.is_ok());
 }
 

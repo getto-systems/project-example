@@ -15,7 +15,7 @@ impl LogMessage for &RequestResetTokenState {
 impl RequestResetTokenState {
     pub const fn log_level(&self) -> LogLevel {
         match self {
-            Self::Nonce(err) => err.log_level(),
+            Self::ValidateNonce(event) => event.log_level(),
             Self::RequestToken(event) => event.log_level(),
         }
     }

@@ -14,7 +14,7 @@ impl AuthenticatePasswordState {
     pub const fn log_level(&self) -> LogLevel {
         match self {
             Self::Authenticate(event) => event.log_level(),
-            Self::Nonce(err) => err.log_level(),
+            Self::ValidateNonce(event) => event.log_level(),
             Self::Issue(event) => event.log_level(),
             Self::Encode(event) => event.log_level(),
         }

@@ -61,8 +61,8 @@ impl RespondTo<CheckAuthTicketResponsePb> for EncodeAuthTicketEvent {
 impl RespondTo<CheckAuthTicketResponsePb> for ValidateAuthTokenEvent {
     fn respond_to(self) -> Result<Response<CheckAuthTicketResponsePb>, Status> {
         match self {
-            Self::Success(_) => Err(Status::cancelled("check auth ticket cancelled")),
-            Self::NonceError(err) => err.respond_to(),
+            Self::ValidateNonce(_) => Err(Status::cancelled("check auth ticket cancelled")),
+            Self::Success(_) => Err(Status::cancelled("check auth ticket succeeded")),
             Self::TokenError(err) => err.respond_to(),
             Self::PermissionError(err) => err.respond_to(),
         }

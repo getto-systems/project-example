@@ -3,10 +3,7 @@ use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 use crate::auth::ticket::remote::{
     encode::method::{encode_auth_ticket, EncodeAuthTicketEvent, EncodeAuthTicketInfra},
     issue::method::{issue_auth_ticket, IssueAuthTicketEvent, IssueAuthTicketInfra},
-    validate_nonce::{
-        data::ValidateAuthNonceError,
-        method::{validate_auth_nonce, ValidateAuthNonceInfra},
-    },
+    validate_nonce::method::{validate_auth_nonce, ValidateAuthNonceEvent, ValidateAuthNonceInfra},
 };
 
 use crate::auth::{
@@ -51,7 +48,7 @@ use crate::{
 };
 
 pub enum ResetPasswordState {
-    Nonce(ValidateAuthNonceError),
+    ValidateNonce(ValidateAuthNonceEvent),
     Reset(ResetPasswordEvent),
     Issue(IssueAuthTicketEvent),
     Encode(EncodeAuthTicketEvent),
@@ -60,7 +57,7 @@ pub enum ResetPasswordState {
 impl std::fmt::Display for ResetPasswordState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Nonce(err) => err.fmt(f),
+            Self::ValidateNonce(event) => event.fmt(f),
             Self::Reset(event) => event.fmt(f),
             Self::Issue(event) => event.fmt(f),
             Self::Encode(event) => event.fmt(f),
@@ -119,9 +116,10 @@ impl<R: ResetPasswordRequestDecoder, M: ResetPasswordMaterial> ResetPasswordActi
 
         let fields = self.request_decoder.decode();
 
-        validate_auth_nonce(m.validate_nonce())
-            .await
-            .map_err(|err| pubsub.post(ResetPasswordState::Nonce(err)))?;
+        validate_auth_nonce(m.validate_nonce(), |event| {
+            pubsub.post(ResetPasswordState::ValidateNonce(event))
+        })
+        .await?;
 
         let user = reset_password(&m, fields, |event| {
             pubsub.post(ResetPasswordState::Reset(event))

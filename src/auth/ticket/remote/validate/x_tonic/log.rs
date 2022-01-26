@@ -7,8 +7,8 @@ use crate::auth::ticket::remote::validate::data::ValidateAuthTokenError;
 impl ValidateAuthTokenEvent {
     pub const fn log_level(&self) -> LogLevel {
         match self {
+            Self::ValidateNonce(event) => event.log_level(),
             Self::Success(_) => LogLevel::Audit,
-            Self::NonceError(err) => err.log_level(),
             Self::TokenError(err) => err.log_level(),
             Self::PermissionError(err) => err.log_level(),
         }

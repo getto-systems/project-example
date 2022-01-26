@@ -60,6 +60,8 @@ async fn success_change() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password success",
     ]);
@@ -79,6 +81,8 @@ async fn success_expired_nonce() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password success",
     ]);
@@ -97,7 +101,10 @@ async fn error_conflict_nonce() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["validate error; auth nonce error: conflict"]);
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce error; conflict",
+    ]);
     assert!(!result.is_ok());
 }
 
@@ -114,6 +121,8 @@ async fn error_empty_current_password() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; invalid current password: empty password",
     ]);
@@ -133,6 +142,8 @@ async fn error_too_long_current_password() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; invalid current password: too long password",
     ]);
@@ -152,6 +163,8 @@ async fn just_max_length_current_password() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; password not matched",
     ]);
@@ -171,6 +184,8 @@ async fn error_empty_new_password() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; invalid new password: empty password",
     ]);
@@ -190,6 +205,8 @@ async fn error_too_long_new_password() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; invalid new password: too long password",
     ]);
@@ -209,6 +226,8 @@ async fn just_max_length_new_password() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password success",
     ]);
@@ -228,6 +247,8 @@ async fn error_failed_to_match_password() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; password not matched",
     ]);
@@ -247,6 +268,8 @@ async fn error_password_not_stored() {
 
     let result = action.ignite().await;
     assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; password not found",
     ]);
