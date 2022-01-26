@@ -1,12 +1,15 @@
-use crate::auth::ticket::remote::kernel::data::ValidateAuthRolesError;
-use crate::auth::ticket::remote::validate_nonce::data::ValidateAuthNonceError;
-use crate::auth::ticket::remote::validate_nonce::infra::ValidateAuthNonceInfra;
-use crate::auth::ticket::remote::validate_nonce::method::validate_auth_nonce;
+use crate::auth::ticket::remote::validate_nonce::method::{
+    validate_auth_nonce, ValidateAuthNonceInfra,
+};
 
 use crate::auth::ticket::remote::kernel::infra::{AuthTokenDecoder, AuthTokenMetadata};
 
 use crate::auth::{
-    ticket::remote::{kernel::data::AuthTicket, validate::data::ValidateAuthTokenError},
+    ticket::remote::{
+        kernel::data::{AuthTicket, ValidateAuthRolesError},
+        validate::data::ValidateAuthTokenError,
+        validate_nonce::data::ValidateAuthNonceError,
+    },
     user::remote::kernel::data::RequireAuthRoles,
 };
 

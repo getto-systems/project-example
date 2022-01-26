@@ -21,7 +21,7 @@ use crate::auth::ticket::remote::{
     },
 };
 
-use crate::auth::ticket::remote::validate_nonce::infra::AuthNonceConfig;
+use crate::auth::ticket::remote::validate_nonce::method::AuthNonceConfig;
 
 use super::action::{ValidateApiTokenAction, ValidateApiTokenMaterial};
 

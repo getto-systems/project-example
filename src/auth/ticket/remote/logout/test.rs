@@ -23,7 +23,7 @@ use crate::auth::ticket::remote::{
     validate::init::test::StaticValidateAuthTokenStruct,
 };
 
-use crate::auth::ticket::remote::validate_nonce::infra::AuthNonceConfig;
+use crate::auth::ticket::remote::validate_nonce::method::AuthNonceConfig;
 
 use super::action::{LogoutAction, LogoutMaterial};
 

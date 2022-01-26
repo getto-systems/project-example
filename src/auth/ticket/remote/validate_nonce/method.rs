@@ -1,12 +1,29 @@
 use crate::auth::ticket::remote::{
-    validate_nonce::infra::{AuthNonceEntry, AuthNonceRepository, ValidateAuthNonceInfra},
     kernel::infra::{AuthClock, AuthNonceMetadata},
+    validate_nonce::infra::{AuthNonceEntry, AuthNonceRepository},
 };
 
 use crate::{
-    auth::ticket::remote::validate_nonce::data::ValidateAuthNonceError,
+    auth::ticket::remote::{
+        kernel::data::ExpireDuration, validate_nonce::data::ValidateAuthNonceError,
+    },
     z_lib::remote::repository::data::RegisterResult,
 };
+
+pub trait ValidateAuthNonceInfra {
+    type Clock: AuthClock;
+    type NonceMetadata: AuthNonceMetadata;
+    type NonceRepository: AuthNonceRepository;
+
+    fn clock(&self) -> &Self::Clock;
+    fn nonce_metadata(&self) -> &Self::NonceMetadata;
+    fn nonce_repository(&self) -> &Self::NonceRepository;
+    fn config(&self) -> &AuthNonceConfig;
+}
+
+pub struct AuthNonceConfig {
+    pub nonce_expires: ExpireDuration,
+}
 
 pub async fn validate_auth_nonce(
     infra: &impl ValidateAuthNonceInfra,

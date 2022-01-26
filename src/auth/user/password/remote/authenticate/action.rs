@@ -4,7 +4,8 @@ use crate::auth::ticket::remote::{
     encode::method::{encode_auth_ticket, EncodeAuthTicketEvent, EncodeAuthTicketInfra},
     issue::method::{issue_auth_ticket, IssueAuthTicketEvent, IssueAuthTicketInfra},
     validate_nonce::{
-        data::ValidateAuthNonceError, infra::ValidateAuthNonceInfra, method::validate_auth_nonce,
+        data::ValidateAuthNonceError,
+        method::{validate_auth_nonce, ValidateAuthNonceInfra},
     },
 };
 

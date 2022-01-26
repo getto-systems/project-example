@@ -28,7 +28,7 @@ use crate::auth::ticket::remote::{
 };
 
 use crate::auth::ticket::{
-    remote::encode::method::EncodeAuthTicketConfig, remote::validate_nonce::infra::AuthNonceConfig,
+    remote::encode::method::EncodeAuthTicketConfig, remote::validate_nonce::method::AuthNonceConfig,
 };
 
 use super::action::{CheckAuthTicketAction, CheckAuthTicketMaterial};
