@@ -1,16 +1,45 @@
+use crate::auth::ticket::remote::kernel::data::ValidateAuthRolesError;
+use crate::auth::ticket::remote::validate_nonce::data::ValidateAuthNonceError;
+use crate::auth::ticket::remote::validate_nonce::infra::ValidateAuthNonceInfra;
 use crate::auth::ticket::remote::validate_nonce::method::validate_auth_nonce;
 
-use crate::auth::ticket::remote::{
-    kernel::infra::{AuthTokenDecoder, AuthTokenMetadata},
-    validate::infra::ValidateAuthTokenInfra,
-};
-
-use super::event::ValidateAuthTokenEvent;
+use crate::auth::ticket::remote::kernel::infra::{AuthTokenDecoder, AuthTokenMetadata};
 
 use crate::auth::{
     ticket::remote::{kernel::data::AuthTicket, validate::data::ValidateAuthTokenError},
     user::remote::kernel::data::RequireAuthRoles,
 };
+
+pub enum ValidateAuthTokenEvent {
+    Success(AuthTicket),
+    NonceError(ValidateAuthNonceError),
+    TokenError(ValidateAuthTokenError),
+    PermissionError(ValidateAuthRolesError),
+}
+
+const SUCCESS: &'static str = "validate success";
+const ERROR: &'static str = "validate error";
+
+impl std::fmt::Display for ValidateAuthTokenEvent {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Success(ticket) => write!(f, "{}; {}", SUCCESS, ticket),
+            Self::NonceError(err) => write!(f, "{}; {}", ERROR, err),
+            Self::TokenError(err) => write!(f, "{}; {}", ERROR, err),
+            Self::PermissionError(err) => write!(f, "{}; {}", ERROR, err),
+        }
+    }
+}
+
+pub trait ValidateAuthTokenInfra {
+    type ValidateNonce: ValidateAuthNonceInfra;
+    type TokenMetadata: AuthTokenMetadata;
+    type TokenDecoder: AuthTokenDecoder;
+
+    fn validate_nonce(&self) -> &Self::ValidateNonce;
+    fn token_metadata(&self) -> &Self::TokenMetadata;
+    fn token_decoder(&self) -> &Self::TokenDecoder;
+}
 
 pub async fn validate_auth_token<S>(
     infra: &impl ValidateAuthTokenInfra,

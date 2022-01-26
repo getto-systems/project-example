@@ -1,6 +1,6 @@
 use crate::z_lib::remote::logger::LogLevel;
 
-use crate::auth::ticket::remote::validate::event::ValidateAuthTokenEvent;
+use crate::auth::ticket::remote::validate::method::ValidateAuthTokenEvent;
 
 use crate::auth::ticket::remote::validate::data::ValidateAuthTokenError;
 

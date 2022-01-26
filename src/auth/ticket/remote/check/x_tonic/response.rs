@@ -7,7 +7,7 @@ use crate::auth::ticket::remote::y_protobuf::service::CheckAuthTicketResponsePb;
 use super::super::action::CheckAuthTicketState;
 
 use crate::auth::ticket::remote::{
-    encode::method::EncodeAuthTicketEvent, validate::event::ValidateAuthTokenEvent,
+    encode::method::EncodeAuthTicketEvent, validate::method::ValidateAuthTokenEvent,
 };
 
 use crate::auth::{

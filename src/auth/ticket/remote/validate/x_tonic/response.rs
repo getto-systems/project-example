@@ -4,7 +4,7 @@ use crate::auth::ticket::remote::y_protobuf::service::ValidateApiTokenResponsePb
 
 use crate::z_lib::remote::response::tonic::RespondTo;
 
-use crate::auth::ticket::remote::validate::event::ValidateAuthTokenEvent;
+use crate::auth::ticket::remote::validate::method::ValidateAuthTokenEvent;
 
 use crate::auth::ticket::remote::validate::data::ValidateAuthTokenError;
 
