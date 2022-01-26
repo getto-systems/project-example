@@ -23,7 +23,10 @@ async fn success_get_menu_badge() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["get menu badge success"]);
+    assert_state(vec![
+        "validate api token success; user: USER-ID",
+        "get menu badge success",
+    ]);
     assert!(result.is_ok());
 }
 

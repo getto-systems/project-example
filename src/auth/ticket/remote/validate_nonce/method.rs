@@ -1,15 +1,12 @@
 use getto_application::data::MethodResult;
 
 use crate::auth::ticket::remote::{
-    kernel::{
-        data::ExpireDateTime,
-        infra::{AuthClock, AuthNonceMetadata},
-    },
+    kernel::infra::{AuthClock, AuthNonceMetadata},
     validate_nonce::infra::{AuthNonceEntry, AuthNonceRepository},
 };
 
 use crate::{
-    auth::ticket::remote::kernel::data::ExpireDuration,
+    auth::ticket::remote::kernel::data::{ExpireDateTime, ExpireDuration},
     z_lib::remote::{
         repository::data::{RegisterResult, RepositoryError},
         request::data::MetadataError,
@@ -73,7 +70,9 @@ pub async fn validate_auth_nonce<S>(
     let registered_at = clock.now();
     let expires = registered_at.clone().expires(&config.nonce_expires);
 
-    post(ValidateAuthNonceEvent::NonceExpiresCalculated(expires.clone()));
+    post(ValidateAuthNonceEvent::NonceExpiresCalculated(
+        expires.clone(),
+    ));
 
     match nonce_repository
         .put(AuthNonceEntry::new(nonce, expires), registered_at)

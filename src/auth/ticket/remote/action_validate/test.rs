@@ -107,7 +107,7 @@ async fn error_token_expired() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate error; auth token error: token expired",
+        "validate error; token expired",
     ]);
     assert!(!result.is_ok());
 }

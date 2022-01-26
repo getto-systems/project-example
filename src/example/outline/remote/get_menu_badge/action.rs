@@ -2,23 +2,24 @@ use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::{
     auth::remote::{
-        data::{RequireAuthRoles, ValidateApiTokenError},
-        infra::ValidateApiTokenInfra,
-        method::validate_api_token,
+        data::RequireAuthRoles,
+        method::{validate_api_token, ValidateApiTokenEvent, ValidateApiTokenInfra},
     },
-    example::outline::remote::get_menu_badge::{data::OutlineMenuBadge, infra::OutlineMenuBadgeRepository},
+    example::outline::remote::get_menu_badge::{
+        data::OutlineMenuBadge, infra::OutlineMenuBadgeRepository,
+    },
     z_lib::remote::repository::data::RepositoryError,
 };
 
 pub enum GetOutlineMenuBadgeState {
-    Validate(ValidateApiTokenError),
+    Validate(ValidateApiTokenEvent),
     GetMenuBadge(GetOutlineMenuBadgeEvent),
 }
 
 impl std::fmt::Display for GetOutlineMenuBadgeState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Validate(err) => write!(f, "{}", err),
+            Self::Validate(event) => write!(f, "{}", event),
             Self::GetMenuBadge(event) => write!(f, "{}", event),
         }
     }
@@ -58,9 +59,10 @@ impl<M: GetOutlineMenuBadgeMaterial> GetOutlineMenuBadgeAction<M> {
         let pubsub = self.pubsub;
         let m = self.material;
 
-        validate_api_token(m.validate(), RequireAuthRoles::Nothing)
-            .await
-            .map_err(|err| pubsub.post(GetOutlineMenuBadgeState::Validate(err)))?;
+        validate_api_token(m.validate(), RequireAuthRoles::Nothing, |event| {
+            pubsub.post(GetOutlineMenuBadgeState::Validate(event))
+        })
+        .await?;
 
         get_outline_menu_badge(&m, |event| {
             pubsub.post(GetOutlineMenuBadgeState::GetMenuBadge(event))

@@ -14,7 +14,7 @@ impl LogMessage for &GetOutlineMenuBadgeState {
 impl GetOutlineMenuBadgeState {
     pub const fn log_level(&self) -> LogLevel {
         match self {
-            Self::Validate(err) => err.log_level(),
+            Self::Validate(event) => event.log_level(),
             Self::GetMenuBadge(event) => event.log_level(),
         }
     }

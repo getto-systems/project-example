@@ -63,7 +63,9 @@ impl RespondTo<CheckAuthTicketResponsePb> for ValidateAuthTokenEvent {
         match self {
             Self::ValidateNonce(_) => Err(Status::cancelled("check auth ticket cancelled")),
             Self::Success(_) => Err(Status::cancelled("check auth ticket succeeded")),
-            Self::TokenError(err) => err.respond_to(),
+            Self::TokenNotSent => Err(Status::unauthenticated(format!("{}", self))),
+            Self::MetadataError(err) => err.respond_to(),
+            Self::DecodeError(err) => err.respond_to(),
             Self::PermissionError(err) => err.respond_to(),
         }
     }

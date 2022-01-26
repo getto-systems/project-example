@@ -14,7 +14,7 @@ impl LogMessage for &NotifyUnexpectedErrorState {
 impl NotifyUnexpectedErrorState {
     pub const fn log_level(&self) -> LogLevel {
         match self {
-            Self::Validate(err) => err.log_level(),
+            Self::Validate(event) => event.log_level(),
             Self::Notify(event) => event.log_level(),
         }
     }

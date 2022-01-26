@@ -1,9 +1,8 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::remote::{
-    data::{RequireAuthRoles, ValidateApiTokenError},
-    infra::ValidateApiTokenInfra,
-    method::validate_api_token,
+    data::RequireAuthRoles,
+    method::{validate_api_token, ValidateApiTokenEvent, ValidateApiTokenInfra},
 };
 
 use crate::avail::unexpected_error::remote::notify::infra::{
@@ -11,14 +10,14 @@ use crate::avail::unexpected_error::remote::notify::infra::{
 };
 
 pub enum NotifyUnexpectedErrorState {
-    Validate(ValidateApiTokenError),
+    Validate(ValidateApiTokenEvent),
     Notify(NotifyUnexpectedErrorEvent),
 }
 
 impl std::fmt::Display for NotifyUnexpectedErrorState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Validate(err) => err.fmt(f),
+            Self::Validate(event) => event.fmt(f),
             Self::Notify(event) => event.fmt(f),
         }
     }
@@ -63,9 +62,10 @@ impl<R: NotifyUnexpectedErrorRequestDecoder, M: NotifyUnexpectedErrorMaterial>
 
         let fields = self.request_decoder.decode();
 
-        validate_api_token(m.validate(), RequireAuthRoles::Nothing)
-            .await
-            .map_err(|err| pubsub.post(NotifyUnexpectedErrorState::Validate(err)))?;
+        validate_api_token(m.validate(), RequireAuthRoles::Nothing, |event| {
+            pubsub.post(NotifyUnexpectedErrorState::Validate(event))
+        })
+        .await?;
 
         notify_unexpected_error(&m, fields, |event| {
             pubsub.post(NotifyUnexpectedErrorState::Notify(event))
