@@ -1,6 +1,6 @@
 use crate::z_lib::remote::logger::LogLevel;
 
-use crate::auth::ticket::remote::encode::event::EncodeAuthTicketEvent;
+use crate::auth::ticket::remote::encode::method::EncodeAuthTicketEvent;
 
 use crate::auth::ticket::remote::encode::data::EncodeAuthTokenError;
 

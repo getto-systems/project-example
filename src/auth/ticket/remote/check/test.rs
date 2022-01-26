@@ -5,12 +5,6 @@ use getto_application_test::ActionTestRunner;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::ticket::remote::{
-    validate_nonce::init::{
-        nonce_repository::test::{
-            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-        },
-        test::StaticValidateAuthNonceStruct,
-    },
     encode::init::{
         test::StaticEncodeAuthTicketStruct,
         token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
@@ -25,10 +19,16 @@ use crate::auth::ticket::remote::{
         token_metadata::test::StaticAuthTokenMetadata,
     },
     validate::init::test::StaticValidateAuthTokenStruct,
+    validate_nonce::init::{
+        nonce_repository::test::{
+            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+        },
+        test::StaticValidateAuthNonceStruct,
+    },
 };
 
 use crate::auth::ticket::{
-    remote::validate_nonce::infra::AuthNonceConfig, remote::encode::infra::EncodeAuthTicketConfig,
+    remote::encode::method::EncodeAuthTicketConfig, remote::validate_nonce::method::AuthNonceConfig,
 };
 
 use super::action::{CheckAuthTicketAction, CheckAuthTicketMaterial};

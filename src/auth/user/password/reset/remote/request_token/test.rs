@@ -32,14 +32,13 @@ use crate::auth::{
     },
 };
 
-use crate::auth::{
-    ticket::remote::validate_nonce::infra::AuthNonceConfig,
-    user::password::reset::remote::request_token::infra::{
-        RequestResetTokenConfig, RequestResetTokenFieldsExtract,
-    },
-};
+use crate::auth::ticket::remote::validate_nonce::method::AuthNonceConfig;
 
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
+
+use crate::auth::user::password::reset::remote::request_token::infra::{
+    RequestResetTokenConfig, RequestResetTokenFieldsExtract,
+};
 
 use crate::auth::{
     ticket::remote::kernel::data::{AuthDateTime, ExpireDuration},

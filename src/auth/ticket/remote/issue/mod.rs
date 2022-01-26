@@ -1,4 +1,3 @@
-pub mod event;
 pub mod infra;
 pub mod init;
 pub mod method;

@@ -9,7 +9,9 @@ use crate::auth::ticket::remote::kernel::init::{
 };
 use nonce_repository::DynamoDbAuthNonceRepository;
 
-use crate::auth::ticket::remote::validate_nonce::infra::{AuthNonceConfig, ValidateAuthNonceInfra};
+use crate::auth::ticket::remote::validate_nonce::method::{
+    AuthNonceConfig, ValidateAuthNonceInfra,
+};
 
 pub struct ValidateAuthNonceStruct<'a> {
     config: AuthNonceConfig,
@@ -60,7 +62,7 @@ pub mod test {
         clock::test::StaticChronoAuthClock, nonce_metadata::test::StaticAuthNonceMetadata,
     };
 
-    use crate::auth::ticket::remote::validate_nonce::infra::{
+    use crate::auth::ticket::remote::validate_nonce::method::{
         AuthNonceConfig, ValidateAuthNonceInfra,
     };
 

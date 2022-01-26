@@ -1,24 +1,9 @@
 use chrono::{DateTime, Utc};
 
-use crate::auth::ticket::remote::kernel::infra::{AuthClock, AuthNonceMetadata};
-
 use crate::{
-    auth::ticket::remote::kernel::data::{
-        AuthDateTime, AuthNonce, ExpireDateTime, ExpireDuration,
-    },
+    auth::ticket::remote::kernel::data::{AuthDateTime, AuthNonce, ExpireDateTime},
     z_lib::remote::repository::data::{RegisterResult, RepositoryError},
 };
-
-pub trait ValidateAuthNonceInfra {
-    type Clock: AuthClock;
-    type NonceMetadata: AuthNonceMetadata;
-    type NonceRepository: AuthNonceRepository;
-
-    fn clock(&self) -> &Self::Clock;
-    fn nonce_metadata(&self) -> &Self::NonceMetadata;
-    fn nonce_repository(&self) -> &Self::NonceRepository;
-    fn config(&self) -> &AuthNonceConfig;
-}
 
 #[async_trait::async_trait]
 pub trait AuthNonceRepository {
@@ -68,8 +53,4 @@ impl From<AuthNonceEntryExtract> for AuthNonceEntry {
             expires: src.expires.map(|expires| ExpireDateTime::restore(expires)),
         }
     }
-}
-
-pub struct AuthNonceConfig {
-    pub nonce_expires: ExpireDuration,
 }

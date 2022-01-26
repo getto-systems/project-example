@@ -2,9 +2,8 @@ use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::{
     ticket::remote::validate::{
-        event::ValidateAuthTokenEvent,
-        infra::{ValidateApiTokenRequestDecoder, ValidateAuthTokenInfra},
-        method::validate_auth_token,
+        infra::ValidateApiTokenRequestDecoder,
+        method::{validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra},
     },
     user::remote::kernel::data::AuthUser,
 };
@@ -17,7 +16,7 @@ pub enum ValidateApiTokenState {
 impl std::fmt::Display for ValidateApiTokenState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Validate(event) => write!(f, "{}", event),
+            Self::Validate(event) => event.fmt(f),
             Self::Success(user) => write!(f, "validate api token success; {}", user),
         }
     }

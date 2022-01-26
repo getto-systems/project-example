@@ -6,12 +6,6 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     ticket::remote::{
-        validate_nonce::init::{
-            nonce_repository::test::{
-                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-            },
-            test::StaticValidateAuthNonceStruct,
-        },
         encode::init::{
             test::StaticEncodeAuthTicketStruct,
             token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
@@ -25,6 +19,12 @@ use crate::auth::{
             ticket_repository::test::{
                 MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
             },
+        },
+        validate_nonce::init::{
+            nonce_repository::test::{
+                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+            },
+            test::StaticValidateAuthNonceStruct,
         },
     },
     user::{
@@ -46,12 +46,11 @@ use crate::auth::{
 
 use crate::auth::{
     ticket::remote::{
-        validate_nonce::infra::AuthNonceConfig, encode::infra::EncodeAuthTicketConfig,
-        issue::infra::IssueAuthTicketConfig,
+        encode::method::EncodeAuthTicketConfig, issue::method::IssueAuthTicketConfig,
+        validate_nonce::method::AuthNonceConfig,
     },
     user::password::remote::{
-        authenticate::infra::AuthenticatePasswordFieldsExtract,
-        kernel::infra::HashedPassword,
+        authenticate::infra::AuthenticatePasswordFieldsExtract, kernel::infra::HashedPassword,
     },
 };
 
@@ -123,9 +122,7 @@ async fn error_conflict_nonce() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec![
-        "auth nonce error: conflict",
-    ]);
+    assert_state(vec!["auth nonce error: conflict"]);
     assert!(!result.is_ok());
 }
 

@@ -11,7 +11,7 @@ use crate::auth::ticket::remote::{
 };
 use token_metadata::TonicAuthTokenMetadata;
 
-use super::infra::ValidateAuthTokenInfra;
+use super::method::ValidateAuthTokenInfra;
 
 pub struct TicketValidateAuthTokenStruct<'a> {
     validate_nonce: ValidateAuthNonceStruct<'a>,
@@ -87,7 +87,7 @@ pub mod test {
         },
     };
 
-    use super::super::infra::ValidateAuthTokenInfra;
+    use super::super::method::ValidateAuthTokenInfra;
 
     pub struct StaticValidateAuthTokenStruct<'a> {
         pub validate_nonce: StaticValidateAuthNonceStruct<'a>,

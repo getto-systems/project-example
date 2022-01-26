@@ -2,7 +2,7 @@ use tonic::{Response, Status};
 
 use crate::z_lib::remote::response::tonic::RespondTo;
 
-use super::super::event::IssueAuthTicketEvent;
+use super::super::method::IssueAuthTicketEvent;
 
 impl<T> RespondTo<T> for IssueAuthTicketEvent {
     fn respond_to(self) -> Result<Response<T>, Status> {

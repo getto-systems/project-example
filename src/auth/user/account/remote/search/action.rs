@@ -2,9 +2,8 @@ use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::{
     auth::{
-        ticket::remote::validate::{
-            event::ValidateAuthTokenEvent, infra::ValidateAuthTokenInfra,
-            method::validate_auth_token,
+        ticket::remote::validate::method::{
+            validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
         },
         user::{
             account::remote::{

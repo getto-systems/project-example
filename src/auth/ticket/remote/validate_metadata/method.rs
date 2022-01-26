@@ -1,12 +1,17 @@
 use crate::auth::{
     remote::infra::AuthMetadataContent,
-    ticket::remote::{
-        kernel::infra::{AuthMetadata, AuthTokenDecoder},
-        validate_metadata::infra::ValidateAuthMetadataInfra,
-    },
+    ticket::remote::kernel::infra::{AuthMetadata, AuthTokenDecoder},
 };
 
 use crate::auth::ticket::remote::validate_metadata::data::ValidateAuthMetadataError;
+
+pub trait ValidateAuthMetadataInfra {
+    type AuthMetadata: AuthMetadata;
+    type TokenDecoder: AuthTokenDecoder;
+
+    fn auth_metadata(&self) -> &Self::AuthMetadata;
+    fn token_decoder(&self) -> &Self::TokenDecoder;
+}
 
 pub fn validate_auth_metadata(
     infra: &impl ValidateAuthMetadataInfra,

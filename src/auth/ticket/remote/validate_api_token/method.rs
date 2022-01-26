@@ -1,12 +1,22 @@
 use crate::auth::ticket::remote::{
     kernel::infra::{AuthMetadata, AuthTokenDecoder},
-    validate_api_token::infra::{ValidateApiTokenInfra, ValidateService},
+    validate_api_token::infra::ValidateService,
 };
 
 use crate::auth::{
     ticket::remote::validate_api_token::data::ValidateApiTokenError,
     user::remote::kernel::data::{AuthUserId, RequireAuthRoles},
 };
+
+pub trait ValidateApiTokenInfra {
+    type AuthMetadata: AuthMetadata;
+    type TokenDecoder: AuthTokenDecoder;
+    type ValidateService: ValidateService;
+
+    fn auth_metadata(&self) -> &Self::AuthMetadata;
+    fn token_decoder(&self) -> &Self::TokenDecoder;
+    fn validate_service(&self) -> &Self::ValidateService;
+}
 
 pub async fn validate_api_token(
     infra: &impl ValidateApiTokenInfra,

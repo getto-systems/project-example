@@ -1,6 +1,6 @@
 use crate::z_lib::remote::logger::LogLevel;
 
-use crate::auth::ticket::remote::validate::event::ValidateAuthTokenEvent;
+use crate::auth::ticket::remote::validate::method::ValidateAuthTokenEvent;
 
 use crate::auth::ticket::remote::validate::data::ValidateAuthTokenError;
 
@@ -21,7 +21,6 @@ impl ValidateAuthTokenError {
             Self::TokenNotSent => LogLevel::Info,
             Self::MetadataError(err) => err.log_level(),
             Self::DecodeError(err) => err.log_level(),
-            Self::RepositoryError(err) => err.log_level(),
         }
     }
 }

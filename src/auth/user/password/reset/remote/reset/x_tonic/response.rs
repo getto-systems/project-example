@@ -8,7 +8,7 @@ use crate::auth::user::password::reset::remote::y_protobuf::service::{
 
 use super::super::action::{ResetPasswordEvent, ResetPasswordState};
 
-use crate::auth::ticket::remote::encode::event::EncodeAuthTicketEvent;
+use crate::auth::ticket::remote::encode::method::EncodeAuthTicketEvent;
 
 use crate::auth::{
     ticket::remote::encode::data::AuthTicketEncoded,

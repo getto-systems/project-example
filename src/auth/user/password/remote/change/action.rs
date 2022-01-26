@@ -1,7 +1,7 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::ticket::remote::validate::{
-    event::ValidateAuthTokenEvent, infra::ValidateAuthTokenInfra, method::validate_auth_token,
+use crate::auth::ticket::remote::validate::method::{
+    validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
 };
 
 use crate::auth::user::password::remote::{
@@ -13,7 +13,7 @@ use crate::auth::user::password::remote::{
 
 use crate::{
     auth::{
-        ticket::remote::{validate_nonce::data::ValidateAuthNonceError, kernel::data::AuthTicket},
+        ticket::remote::{kernel::data::AuthTicket, validate_nonce::data::ValidateAuthNonceError},
         user::{
             password::remote::{
                 change::data::{ChangePasswordError, ChangePasswordRepositoryError},

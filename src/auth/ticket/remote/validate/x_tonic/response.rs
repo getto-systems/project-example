@@ -4,7 +4,7 @@ use crate::auth::ticket::remote::y_protobuf::service::ValidateApiTokenResponsePb
 
 use crate::z_lib::remote::response::tonic::RespondTo;
 
-use crate::auth::ticket::remote::validate::event::ValidateAuthTokenEvent;
+use crate::auth::ticket::remote::validate::method::ValidateAuthTokenEvent;
 
 use crate::auth::ticket::remote::validate::data::ValidateAuthTokenError;
 
@@ -25,7 +25,6 @@ impl<T> RespondTo<T> for ValidateAuthTokenError {
             Self::TokenNotSent => Err(Status::unauthenticated(format!("{}", self))),
             Self::MetadataError(err) => err.respond_to(),
             Self::DecodeError(err) => err.respond_to(),
-            Self::RepositoryError(err) => err.respond_to(),
         }
     }
 }

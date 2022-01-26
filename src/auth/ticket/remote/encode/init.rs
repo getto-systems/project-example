@@ -9,7 +9,7 @@ use token_encoder::{
     ApiJwtAuthTokenEncoder, CookieCloudfrontTokenEncoder, TicketJwtAuthTokenEncoder,
 };
 
-use super::infra::{EncodeAuthTicketConfig, EncodeAuthTicketInfra};
+use super::method::{EncodeAuthTicketConfig, EncodeAuthTicketInfra};
 
 pub struct EncodeAuthTicketStruct<'a> {
     clock: ChronoAuthClock,
@@ -71,9 +71,7 @@ pub mod test {
         clock::test::StaticChronoAuthClock, ticket_repository::test::MemoryAuthTicketRepository,
     };
 
-    use super::super::infra::{
-        EncodeAuthTicketConfig, EncodeAuthTicketInfra,
-    };
+    use super::super::method::{EncodeAuthTicketConfig, EncodeAuthTicketInfra};
 
     pub struct StaticEncodeAuthTicketStruct<'a> {
         pub clock: StaticChronoAuthClock,
