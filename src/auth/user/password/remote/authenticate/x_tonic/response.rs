@@ -6,7 +6,7 @@ use crate::z_lib::remote::response::tonic::RespondTo;
 
 use super::super::action::{AuthenticatePasswordEvent, AuthenticatePasswordState};
 
-use crate::auth::ticket::remote::encode::event::EncodeAuthTicketEvent;
+use crate::auth::ticket::remote::encode::method::EncodeAuthTicketEvent;
 
 use super::super::data::AuthenticatePasswordError;
 use crate::auth::ticket::remote::encode::data::AuthTicketEncoded;

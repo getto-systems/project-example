@@ -6,12 +6,6 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     ticket::remote::{
-        validate_nonce::init::{
-            nonce_repository::test::{
-                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-            },
-            test::StaticValidateAuthNonceStruct,
-        },
         encode::init::{
             test::StaticEncodeAuthTicketStruct,
             token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
@@ -25,6 +19,12 @@ use crate::auth::{
             ticket_repository::test::{
                 MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
             },
+        },
+        validate_nonce::init::{
+            nonce_repository::test::{
+                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+            },
+            test::StaticValidateAuthNonceStruct,
         },
     },
     user::{
@@ -50,8 +50,8 @@ use crate::auth::{
 
 use crate::auth::{
     ticket::remote::{
-        validate_nonce::infra::AuthNonceConfig, encode::infra::EncodeAuthTicketConfig,
-        issue::infra::IssueAuthTicketConfig,
+        encode::method::EncodeAuthTicketConfig, issue::infra::IssueAuthTicketConfig,
+        validate_nonce::infra::AuthNonceConfig,
     },
     user::password::reset::remote::reset::infra::ResetPasswordFieldsExtract,
 };

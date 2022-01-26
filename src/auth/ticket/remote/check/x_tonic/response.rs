@@ -1,15 +1,19 @@
 use tonic::{Response, Status};
 
-use crate::auth::ticket::remote::encode::data::AuthTicketEncoded;
-use crate::auth::ticket::remote::encode::event::EncodeAuthTicketEvent;
-use crate::auth::ticket::remote::kernel::data::AuthTokenEncoded;
-use crate::auth::ticket::remote::validate::event::ValidateAuthTokenEvent;
-use crate::auth::user::remote::kernel::data::AuthUserExtract;
 use crate::z_lib::remote::response::tonic::RespondTo;
 
 use crate::auth::ticket::remote::y_protobuf::service::CheckAuthTicketResponsePb;
 
 use super::super::action::CheckAuthTicketState;
+
+use crate::auth::ticket::remote::{
+    encode::method::EncodeAuthTicketEvent, validate::event::ValidateAuthTokenEvent,
+};
+
+use crate::auth::{
+    ticket::remote::{encode::data::AuthTicketEncoded, kernel::data::AuthTokenEncoded},
+    user::remote::kernel::data::AuthUserExtract,
+};
 
 impl RespondTo<CheckAuthTicketResponsePb> for CheckAuthTicketState {
     fn respond_to(self) -> Result<Response<CheckAuthTicketResponsePb>, Status> {

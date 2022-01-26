@@ -17,7 +17,7 @@ pub enum ValidateApiTokenState {
 impl std::fmt::Display for ValidateApiTokenState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Validate(event) => write!(f, "{}", event),
+            Self::Validate(event) => event.fmt(f),
             Self::Success(user) => write!(f, "validate api token success; {}", user),
         }
     }
