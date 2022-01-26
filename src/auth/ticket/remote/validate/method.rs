@@ -4,18 +4,20 @@ use crate::auth::ticket::remote::validate_nonce::method::{
 
 use crate::auth::ticket::remote::kernel::infra::{AuthTokenDecoder, AuthTokenMetadata};
 
-use crate::auth::{
-    ticket::remote::{
-        kernel::data::{AuthTicket, ValidateAuthRolesError},
-        validate::data::ValidateAuthTokenError,
+use crate::{
+    auth::{
+        ticket::remote::kernel::data::{AuthTicket, DecodeAuthTokenError, ValidateAuthRolesError},
+        user::remote::kernel::data::RequireAuthRoles,
     },
-    user::remote::kernel::data::RequireAuthRoles,
+    z_lib::remote::request::data::MetadataError,
 };
 
 pub enum ValidateAuthTokenEvent {
     ValidateNonce(ValidateAuthNonceEvent),
     Success(AuthTicket),
-    TokenError(ValidateAuthTokenError),
+    TokenNotSent,
+    MetadataError(MetadataError),
+    DecodeError(DecodeAuthTokenError),
     PermissionError(ValidateAuthRolesError),
 }
 
@@ -27,7 +29,9 @@ impl std::fmt::Display for ValidateAuthTokenEvent {
         match self {
             Self::ValidateNonce(event) => event.fmt(f),
             Self::Success(ticket) => write!(f, "{}; {}", SUCCESS, ticket),
-            Self::TokenError(err) => write!(f, "{}; {}", ERROR, err),
+            Self::TokenNotSent => write!(f, "{}: token not sent", ERROR),
+            Self::MetadataError(err) => write!(f, "{}; {}", ERROR, err),
+            Self::DecodeError(err) => write!(f, "{}; {}", ERROR, err),
             Self::PermissionError(err) => write!(f, "{}; {}", ERROR, err),
         }
     }
@@ -53,8 +57,7 @@ pub async fn validate_auth_token<S>(
     })
     .await?;
 
-    let ticket =
-        decode_ticket(infra).map_err(|err| post(ValidateAuthTokenEvent::TokenError(err)))?;
+    let ticket = decode_ticket(infra).map_err(|event| post(event))?;
 
     let ticket = ticket
         .check_enough_permission(require_roles)
@@ -67,17 +70,17 @@ pub async fn validate_auth_token<S>(
 
 fn decode_ticket(
     infra: &impl ValidateAuthTokenInfra,
-) -> Result<AuthTicket, ValidateAuthTokenError> {
+) -> Result<AuthTicket, ValidateAuthTokenEvent> {
     let token_metadata = infra.token_metadata();
     let token_decoder = infra.token_decoder();
 
     let token = token_metadata
         .token()
-        .map_err(ValidateAuthTokenError::MetadataError)?
-        .ok_or(ValidateAuthTokenError::TokenNotSent)?;
+        .map_err(ValidateAuthTokenEvent::MetadataError)?
+        .ok_or(ValidateAuthTokenEvent::TokenNotSent)?;
 
     token_decoder
         .decode(&token)
         .map(|ticket| ticket.restore())
-        .map_err(ValidateAuthTokenError::DecodeError)
+        .map_err(ValidateAuthTokenEvent::DecodeError)
 }
