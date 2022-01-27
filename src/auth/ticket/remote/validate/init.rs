@@ -1,17 +1,27 @@
 pub mod request_decoder;
 pub mod token_metadata;
+pub mod validate_service;
 
 use tonic::metadata::MetadataMap;
 
-use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideFeature;
+use crate::auth::remote::x_outside_feature::{
+    auth::feature::AuthOutsideFeature, common::feature::AuthOutsideService,
+};
 
 use crate::auth::ticket::remote::{
+    kernel::init::{
+        auth_metadata::TonicAuthMetadata,
+        token_decoder::{JwtApiTokenDecoder, JwtTicketTokenDecoder, NoopTokenDecoder},
+    },
+    validate::init::{
+        token_metadata::TonicAuthTokenMetadata, validate_service::TonicValidateService,
+    },
     validate_nonce::init::ValidateAuthNonceStruct,
-    kernel::init::token_decoder::{JwtApiTokenDecoder, JwtTicketTokenDecoder},
 };
-use token_metadata::TonicAuthTokenMetadata;
 
-use super::method::ValidateAuthTokenInfra;
+use crate::auth::ticket::remote::validate::method::{
+    ValidateApiTokenInfra, ValidateAuthTokenInfra,
+};
 
 pub struct TicketValidateAuthTokenStruct<'a> {
     validate_nonce: ValidateAuthNonceStruct<'a>,
@@ -77,14 +87,53 @@ impl<'a> ValidateAuthTokenInfra for ApiValidateAuthTokenStruct<'a> {
     }
 }
 
+pub struct ValidateApiTokenStruct<'a> {
+    auth_metadata: TonicAuthMetadata<'a>,
+    token_decoder: NoopTokenDecoder,
+    validate_service: TonicValidateService<'a>,
+}
+
+impl<'a> ValidateApiTokenStruct<'a> {
+    pub fn new(
+        service: &'a AuthOutsideService,
+        request_id: &'a str,
+        metadata: &'a MetadataMap,
+    ) -> Self {
+        Self {
+            auth_metadata: TonicAuthMetadata::new(metadata),
+            token_decoder: NoopTokenDecoder,
+            validate_service: TonicValidateService::new(&service, request_id),
+        }
+    }
+}
+
+impl<'a> ValidateApiTokenInfra for ValidateApiTokenStruct<'a> {
+    type AuthMetadata = TonicAuthMetadata<'a>;
+    type TokenDecoder = NoopTokenDecoder;
+    type ValidateService = TonicValidateService<'a>;
+
+    fn auth_metadata(&self) -> &Self::AuthMetadata {
+        &self.auth_metadata
+    }
+    fn token_decoder(&self) -> &Self::TokenDecoder {
+        &self.token_decoder
+    }
+    fn validate_service(&self) -> &Self::ValidateService {
+        &self.validate_service
+    }
+}
+
 #[cfg(test)]
 pub mod test {
     use crate::auth::ticket::remote::{
-        validate_nonce::init::test::StaticValidateAuthNonceStruct,
         kernel::init::{
-            token_decoder::test::StaticAuthTokenDecoder,
+            auth_metadata::test::StaticAuthMetadata, token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
         },
+        validate::{
+            init::validate_service::test::StaticValidateService, method::ValidateApiTokenInfra,
+        },
+        validate_nonce::init::test::StaticValidateAuthNonceStruct,
     };
 
     use super::super::method::ValidateAuthTokenInfra;
@@ -108,6 +157,28 @@ pub mod test {
         }
         fn token_decoder(&self) -> &Self::TokenDecoder {
             &self.token_decoder
+        }
+    }
+
+    pub struct StaticValidateApiTokenStruct {
+        pub auth_metadata: StaticAuthMetadata,
+        pub token_decoder: StaticAuthTokenDecoder,
+        pub validate_service: StaticValidateService,
+    }
+
+    impl ValidateApiTokenInfra for StaticValidateApiTokenStruct {
+        type AuthMetadata = StaticAuthMetadata;
+        type TokenDecoder = StaticAuthTokenDecoder;
+        type ValidateService = StaticValidateService;
+
+        fn auth_metadata(&self) -> &Self::AuthMetadata {
+            &self.auth_metadata
+        }
+        fn token_decoder(&self) -> &Self::TokenDecoder {
+            &self.token_decoder
+        }
+        fn validate_service(&self) -> &Self::ValidateService {
+            &self.validate_service
         }
     }
 }
