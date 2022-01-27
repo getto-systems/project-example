@@ -1,1 +1,1 @@
-pub use crate::auth::ticket::remote::kernel::infra::AuthMetadataContent;
+pub use crate::auth::ticket::remote::validate::infra::AuthMetadataContent;

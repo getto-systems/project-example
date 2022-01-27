@@ -2,33 +2,10 @@ use std::collections::HashSet;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    auth::ticket::remote::kernel::data::{
-        AuthDateTime, AuthNonce, AuthTicket, AuthTicketExtract, AuthToken, AuthTokenMessage,
-        AuthTokenResponse, DecodeAuthTokenError, ExpireDateTime,
-    },
-    z_lib::remote::request::data::MetadataError,
+use crate::auth::ticket::remote::kernel::data::{
+    AuthDateTime, AuthTicket, AuthTicketExtract, AuthTokenMessage, AuthTokenResponse,
+    ExpireDateTime,
 };
-
-pub struct AuthMetadataContent {
-    pub nonce: Option<AuthNonce>,
-    pub token: Option<AuthToken>,
-}
-
-pub trait AuthMetadata {
-    fn metadata(&self) -> Result<AuthMetadataContent, MetadataError>;
-}
-
-pub trait AuthNonceMetadata {
-    fn nonce(&self) -> Result<Option<AuthNonce>, MetadataError>;
-}
-pub trait AuthTokenMetadata {
-    fn token(&self) -> Result<Option<AuthToken>, MetadataError>;
-}
-
-pub trait AuthTokenDecoder {
-    fn decode(&self, token: &AuthToken) -> Result<AuthTicketExtract, DecodeAuthTokenError>;
-}
 
 pub trait AuthTokenResponseBuilder {
     fn build(&self, message: AuthTokenMessage) -> AuthTokenResponse;

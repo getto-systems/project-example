@@ -5,12 +5,12 @@ use crate::z_lib::remote::request::x_tonic::metadata::metadata;
 
 use crate::auth::ticket::remote::kernel::x_tonic::metadata::{METADATA_NONCE, METADATA_TOKEN};
 
-use crate::auth::ticket::remote::kernel::init::{
+use crate::auth::ticket::remote::validate::init::{
     nonce_metadata::ActixWebAuthNonceMetadata,
     token_metadata::{ApiTokenMetadata, TicketTokenMetadata},
 };
 
-use crate::auth::ticket::remote::kernel::infra::{
+use crate::auth::ticket::remote::validate::infra::{
     AuthMetadata, AuthMetadataContent, AuthNonceMetadata, AuthTokenMetadata,
 };
 
@@ -115,7 +115,7 @@ fn fetch_metadata<T>(
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::ticket::remote::kernel::infra::{AuthMetadata, AuthMetadataContent};
+    use crate::auth::ticket::remote::validate::infra::{AuthMetadata, AuthMetadataContent};
 
     use crate::{
         auth::ticket::remote::kernel::data::{AuthNonce, AuthToken},

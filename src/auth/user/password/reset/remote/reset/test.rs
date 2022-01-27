@@ -15,12 +15,12 @@ use crate::auth::{
         },
         kernel::init::{
             clock::test::StaticChronoAuthClock,
-            nonce_metadata::test::StaticAuthNonceMetadata,
             ticket_repository::test::{
                 MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
             },
         },
         validate::init::{
+            nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::test::{
                 MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
             },
