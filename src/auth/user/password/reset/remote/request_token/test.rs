@@ -7,7 +7,7 @@ use crate::auth::{
         kernel::init::{
             clock::test::StaticChronoAuthClock, nonce_metadata::test::StaticAuthNonceMetadata,
         },
-        validate_nonce::init::{
+        validate::init::{
             nonce_repository::test::{
                 MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
             },
@@ -32,7 +32,7 @@ use crate::auth::{
     },
 };
 
-use crate::auth::ticket::remote::validate_nonce::method::AuthNonceConfig;
+use crate::auth::ticket::remote::validate::method::AuthNonceConfig;
 
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 

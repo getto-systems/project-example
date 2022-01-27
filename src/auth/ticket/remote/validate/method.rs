@@ -1,20 +1,26 @@
-use crate::auth::ticket::remote::kernel::infra::AuthMetadataContent;
-use crate::auth::ticket::remote::validate_nonce::method::{
-    validate_auth_nonce, ValidateAuthNonceEvent, ValidateAuthNonceInfra,
-};
+use getto_application::data::MethodResult;
 
 use crate::auth::ticket::remote::{
-    kernel::infra::{AuthMetadata, AuthTokenDecoder, AuthTokenMetadata},
-    validate::infra::ValidateService,
+    kernel::infra::{
+        AuthClock, AuthMetadata, AuthMetadataContent, AuthNonceMetadata, AuthTokenDecoder,
+        AuthTokenMetadata,
+    },
+    validate::infra::{AuthNonceEntry, AuthNonceRepository, ValidateService},
 };
 
 use crate::{
     auth::{
         remote::service::data::AuthServiceError,
-        ticket::remote::kernel::data::{AuthTicket, DecodeAuthTokenError, ValidateAuthRolesError},
+        ticket::remote::kernel::data::{
+            AuthTicket, DecodeAuthTokenError, ExpireDateTime, ExpireDuration,
+            ValidateAuthRolesError,
+        },
         user::remote::kernel::data::{AuthUserId, RequireAuthRoles},
     },
-    z_lib::remote::request::data::MetadataError,
+    z_lib::remote::{
+        repository::data::{RegisterResult, RepositoryError},
+        request::data::MetadataError,
+    },
 };
 
 pub enum ValidateAuthTokenEvent {
@@ -207,4 +213,81 @@ pub fn validate_auth_metadata<S>(
 
     post(ValidateAuthMetadataEvent::Success);
     Ok(metadata)
+}
+
+pub enum ValidateAuthNonceEvent {
+    NonceExpiresCalculated(ExpireDateTime),
+    Success,
+    NonceNotSent,
+    Conflict,
+    MetadataError(MetadataError),
+    RepositoryError(RepositoryError),
+}
+
+mod validate_auth_nonce_event {
+    use super::ValidateAuthNonceEvent;
+
+    const SUCCESS: &'static str = "validate nonce success";
+    const ERROR: &'static str = "validate nonce error";
+
+    impl std::fmt::Display for ValidateAuthNonceEvent {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+            match self {
+                Self::NonceExpiresCalculated(expires) => {
+                    write!(f, "nonce expires calculated; {}", expires)
+                }
+                Self::Success => write!(f, "{}", SUCCESS),
+                Self::NonceNotSent => write!(f, "{}; nonce not sent", ERROR),
+                Self::MetadataError(err) => write!(f, "{}; {}", ERROR, err),
+                Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
+                Self::Conflict => write!(f, "{}; conflict", ERROR),
+            }
+        }
+    }
+}
+
+pub trait ValidateAuthNonceInfra {
+    type Clock: AuthClock;
+    type NonceMetadata: AuthNonceMetadata;
+    type NonceRepository: AuthNonceRepository;
+
+    fn clock(&self) -> &Self::Clock;
+    fn nonce_metadata(&self) -> &Self::NonceMetadata;
+    fn nonce_repository(&self) -> &Self::NonceRepository;
+    fn config(&self) -> &AuthNonceConfig;
+}
+
+pub struct AuthNonceConfig {
+    pub nonce_expires: ExpireDuration,
+}
+
+pub async fn validate_auth_nonce<S>(
+    infra: &impl ValidateAuthNonceInfra,
+    post: impl Fn(ValidateAuthNonceEvent) -> S,
+) -> MethodResult<S> {
+    let clock = infra.clock();
+    let nonce_metadata = infra.nonce_metadata();
+    let nonce_repository = infra.nonce_repository();
+    let config = infra.config();
+
+    let nonce = nonce_metadata
+        .nonce()
+        .map_err(|err| post(ValidateAuthNonceEvent::MetadataError(err)))?
+        .ok_or_else(|| post(ValidateAuthNonceEvent::NonceNotSent))?;
+
+    let registered_at = clock.now();
+    let expires = registered_at.clone().expires(&config.nonce_expires);
+
+    post(ValidateAuthNonceEvent::NonceExpiresCalculated(
+        expires.clone(),
+    ));
+
+    match nonce_repository
+        .put(AuthNonceEntry::new(nonce, expires), registered_at)
+        .await
+        .map_err(|err| post(ValidateAuthNonceEvent::RepositoryError(err)))?
+    {
+        RegisterResult::Success(_) => Ok(post(ValidateAuthNonceEvent::Success)),
+        RegisterResult::Conflict => Err(post(ValidateAuthNonceEvent::Conflict)),
+    }
 }

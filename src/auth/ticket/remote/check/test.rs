@@ -18,17 +18,16 @@ use crate::auth::ticket::remote::{
         token_decoder::test::StaticAuthTokenDecoder,
         token_metadata::test::StaticAuthTokenMetadata,
     },
-    validate::init::test::StaticValidateAuthTokenStruct,
-    validate_nonce::init::{
+    validate::init::{
         nonce_repository::test::{
             MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
         },
-        test::StaticValidateAuthNonceStruct,
+        test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
     },
 };
 
 use crate::auth::ticket::{
-    remote::encode::method::EncodeAuthTicketConfig, remote::validate_nonce::method::AuthNonceConfig,
+    remote::encode::method::EncodeAuthTicketConfig, remote::validate::method::AuthNonceConfig,
 };
 
 use super::action::{CheckAuthTicketAction, CheckAuthTicketMaterial};

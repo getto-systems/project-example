@@ -1,7 +1,8 @@
 use crate::z_lib::remote::logger::LogLevel;
 
 use crate::auth::ticket::remote::validate::method::{
-    ValidateApiTokenEvent, ValidateAuthTokenEvent, ValidateAuthMetadataEvent,
+    ValidateApiTokenEvent, ValidateAuthMetadataEvent, ValidateAuthNonceEvent,
+    ValidateAuthTokenEvent,
 };
 
 impl ValidateAuthTokenEvent {
@@ -34,6 +35,19 @@ impl ValidateAuthMetadataEvent {
             Self::Success => LogLevel::Debug,
             Self::MetadataError(err) => err.log_level(),
             Self::DecodeError(err) => err.log_level(),
+        }
+    }
+}
+
+impl ValidateAuthNonceEvent {
+    pub const fn log_level(&self) -> LogLevel {
+        match self {
+            Self::NonceExpiresCalculated(_) => LogLevel::Debug,
+            Self::Success => LogLevel::Debug,
+            Self::NonceNotSent => LogLevel::Error,
+            Self::MetadataError(err) => err.log_level(),
+            Self::RepositoryError(err) => err.log_level(),
+            Self::Conflict => LogLevel::Audit,
         }
     }
 }

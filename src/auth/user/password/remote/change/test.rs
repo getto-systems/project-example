@@ -10,12 +10,11 @@ use crate::auth::{
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
         },
-        validate::init::test::StaticValidateAuthTokenStruct,
-        validate_nonce::init::{
+        validate::init::{
             nonce_repository::test::{
                 MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
             },
-            test::StaticValidateAuthNonceStruct,
+            test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
         },
     },
     user::password::remote::{
@@ -35,7 +34,7 @@ use crate::auth::user::password::remote::{
     change::infra::ChangePasswordFieldsExtract, kernel::infra::HashedPassword,
 };
 
-use crate::auth::ticket::remote::validate_nonce::method::AuthNonceConfig;
+use crate::auth::ticket::remote::validate::method::AuthNonceConfig;
 
 use super::action::{ChangePasswordAction, ChangePasswordMaterial};
 

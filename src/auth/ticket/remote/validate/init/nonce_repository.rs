@@ -6,7 +6,7 @@ use rusoto_dynamodb::{AttributeValue, DynamoDb, DynamoDbClient, PutItemError, Pu
 
 use crate::z_lib::remote::repository::helper::infra_error;
 
-use crate::auth::ticket::remote::validate_nonce::infra::{AuthNonceEntry, AuthNonceRepository};
+use crate::auth::ticket::remote::validate::infra::{AuthNonceEntry, AuthNonceRepository};
 
 use crate::{
     auth::ticket::remote::kernel::data::AuthDateTime,
@@ -111,7 +111,7 @@ pub mod test {
 
     use chrono::{DateTime, Utc};
 
-    use crate::auth::ticket::remote::validate_nonce::infra::{
+    use crate::auth::ticket::remote::validate::infra::{
         AuthNonceEntry, AuthNonceEntryExtract, AuthNonceRepository,
     };
 

@@ -10,18 +10,15 @@ use crate::auth::ticket::remote::{
         token_decoder::test::StaticAuthTokenDecoder, token_metadata::test::StaticAuthTokenMetadata,
     },
     validate::init::{
-        request_decoder::test::StaticValidateApiTokenRequestDecoder,
-        test::StaticValidateAuthTokenStruct,
-    },
-    validate_nonce::init::{
         nonce_repository::test::{
             MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
         },
-        test::StaticValidateAuthNonceStruct,
+        request_decoder::test::StaticValidateApiTokenRequestDecoder,
+        test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
     },
 };
 
-use crate::auth::ticket::remote::validate_nonce::method::AuthNonceConfig;
+use crate::auth::ticket::remote::validate::method::AuthNonceConfig;
 
 use super::action::{ValidateApiTokenAction, ValidateApiTokenMaterial};
 

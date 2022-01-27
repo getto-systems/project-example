@@ -8,8 +8,8 @@ use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 
 use crate::auth::{
     ticket::remote::{
-        validate_nonce::init::ValidateAuthNonceStruct, encode::init::EncodeAuthTicketStruct,
-        issue::init::IssueAuthTicketStruct,
+        encode::init::EncodeAuthTicketStruct, issue::init::IssueAuthTicketStruct,
+        validate::init::ValidateAuthNonceStruct,
     },
     user::{
         password::remote::{
