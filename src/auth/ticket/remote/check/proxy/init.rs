@@ -7,7 +7,7 @@ use getto_application::infra::ActionStatePubSub;
 
 use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideFeature;
 
-use crate::auth::ticket::remote::validate_metadata::init::ValidateTicketMetadataStruct;
+use crate::auth::ticket::remote::validate::init::ValidateTicketMetadataStruct;
 use proxy_service::ProxyService;
 use response_encoder::ResponseEncoder;
 

@@ -1,5 +1,5 @@
-pub use crate::auth::ticket::remote::{
-    validate::init::ValidateApiTokenStruct, validate_metadata::init::ValidateApiMetadataStruct,
+pub use crate::auth::ticket::remote::validate::init::{
+    ValidateApiMetadataStruct, ValidateApiTokenStruct,
 };
 
 #[cfg(test)]

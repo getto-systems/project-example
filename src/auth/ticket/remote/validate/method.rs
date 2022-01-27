@@ -1,3 +1,4 @@
+use crate::auth::ticket::remote::kernel::infra::AuthMetadataContent;
 use crate::auth::ticket::remote::validate_nonce::method::{
     validate_auth_nonce, ValidateAuthNonceEvent, ValidateAuthNonceInfra,
 };
@@ -154,4 +155,56 @@ pub async fn validate_api_token<S>(
 
     post(ValidateApiTokenEvent::Success(user_id.clone()));
     Ok(user_id)
+}
+
+pub enum ValidateAuthMetadataEvent {
+    Success,
+    MetadataError(MetadataError),
+    DecodeError(DecodeAuthTokenError),
+}
+
+mod validate_auth_metadata_event {
+    use super::ValidateAuthMetadataEvent;
+
+    const SUCCESS: &'static str = "validate metadata success";
+    const ERROR: &'static str = "validate metadata error";
+
+    impl std::fmt::Display for ValidateAuthMetadataEvent {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                Self::Success => write!(f, "{}", SUCCESS),
+                Self::MetadataError(err) => write!(f, "{}; {}", ERROR, err),
+                Self::DecodeError(err) => write!(f, "{}; {}", ERROR, err),
+            }
+        }
+    }
+}
+
+pub trait ValidateAuthMetadataInfra {
+    type AuthMetadata: AuthMetadata;
+    type TokenDecoder: AuthTokenDecoder;
+
+    fn auth_metadata(&self) -> &Self::AuthMetadata;
+    fn token_decoder(&self) -> &Self::TokenDecoder;
+}
+
+pub fn validate_auth_metadata<S>(
+    infra: &impl ValidateAuthMetadataInfra,
+    post: impl Fn(ValidateAuthMetadataEvent) -> S,
+) -> Result<AuthMetadataContent, S> {
+    let auth_metadata = infra.auth_metadata();
+    let token_decoder = infra.token_decoder();
+
+    let metadata = auth_metadata
+        .metadata()
+        .map_err(|err| post(ValidateAuthMetadataEvent::MetadataError(err)))?;
+
+    if let Some(ref token) = metadata.token {
+        token_decoder
+            .decode(token)
+            .map_err(|err| post(ValidateAuthMetadataEvent::DecodeError(err)))?;
+    }
+
+    post(ValidateAuthMetadataEvent::Success);
+    Ok(metadata)
 }

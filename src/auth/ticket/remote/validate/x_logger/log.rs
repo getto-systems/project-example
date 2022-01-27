@@ -1,7 +1,7 @@
 use crate::z_lib::remote::logger::LogLevel;
 
 use crate::auth::ticket::remote::validate::method::{
-    ValidateApiTokenEvent, ValidateAuthTokenEvent,
+    ValidateApiTokenEvent, ValidateAuthTokenEvent, ValidateAuthMetadataEvent,
 };
 
 impl ValidateAuthTokenEvent {
@@ -24,6 +24,16 @@ impl ValidateApiTokenEvent {
             Self::MetadataError(err) => err.log_level(),
             Self::DecodeError(err) => err.log_level(),
             Self::ServiceError(err) => err.log_level(),
+        }
+    }
+}
+
+impl ValidateAuthMetadataEvent {
+    pub fn log_level(&self) -> LogLevel {
+        match self {
+            Self::Success => LogLevel::Debug,
+            Self::MetadataError(err) => err.log_level(),
+            Self::DecodeError(err) => err.log_level(),
         }
     }
 }
