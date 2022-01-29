@@ -1,6 +1,6 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::ticket::remote::validate_nonce::method::{
+use crate::auth::ticket::remote::validate::method::{
     validate_auth_nonce, ValidateAuthNonceEvent, ValidateAuthNonceInfra,
 };
 

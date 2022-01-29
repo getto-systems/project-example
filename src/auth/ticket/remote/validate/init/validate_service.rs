@@ -15,7 +15,7 @@ use crate::{
 
 use super::super::infra::ValidateService;
 use crate::{
-    auth::ticket::remote::kernel::infra::AuthMetadataContent,
+    auth::ticket::remote::validate::infra::AuthMetadataContent,
     z_lib::remote::service::infra::ServiceAuthorizer,
 };
 
@@ -81,8 +81,7 @@ impl<'a> ValidateService for TonicValidateService<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use super::super::super::infra::ValidateService;
-    use crate::auth::ticket::remote::kernel::infra::AuthMetadataContent;
+    use crate::auth::ticket::remote::validate::infra::{AuthMetadataContent, ValidateService};
 
     use crate::auth::{
         remote::service::data::AuthServiceError,

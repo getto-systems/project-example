@@ -8,7 +8,7 @@ use crate::{
     x_outside_feature::remote::common::metadata::METADATA_REQUEST_ID,
 };
 
-use crate::auth::ticket::remote::kernel::infra::AuthMetadataContent;
+use crate::auth::ticket::remote::validate::infra::AuthMetadataContent;
 
 use crate::{
     auth::remote::service::data::AuthServiceError,

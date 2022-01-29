@@ -1,13 +1,10 @@
 pub mod action_validate;
-pub mod validate_nonce;
+pub mod check;
 pub mod encode;
 pub mod issue;
 pub mod kernel;
 pub mod logout;
-pub mod check;
 pub mod validate;
-pub mod validate_api_token;
-pub mod validate_metadata;
 pub mod x_actix_web;
 pub mod x_tonic;
 pub mod y_protobuf;

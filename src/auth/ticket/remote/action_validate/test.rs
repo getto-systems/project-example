@@ -5,23 +5,20 @@ use getto_application_test::ActionTestRunner;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::ticket::remote::{
-    kernel::init::{
-        clock::test::StaticChronoAuthClock, nonce_metadata::test::StaticAuthNonceMetadata,
-        token_decoder::test::StaticAuthTokenDecoder, token_metadata::test::StaticAuthTokenMetadata,
-    },
+    kernel::init::clock::test::StaticChronoAuthClock,
     validate::init::{
-        request_decoder::test::StaticValidateApiTokenRequestDecoder,
-        test::StaticValidateAuthTokenStruct,
-    },
-    validate_nonce::init::{
+        nonce_metadata::test::StaticAuthNonceMetadata,
         nonce_repository::test::{
             MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
         },
-        test::StaticValidateAuthNonceStruct,
+        request_decoder::test::StaticValidateApiTokenRequestDecoder,
+        test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
+        token_decoder::test::StaticAuthTokenDecoder,
+        token_metadata::test::StaticAuthTokenMetadata,
     },
 };
 
-use crate::auth::ticket::remote::validate_nonce::method::AuthNonceConfig;
+use crate::auth::ticket::remote::validate::method::AuthNonceConfig;
 
 use super::action::{ValidateApiTokenAction, ValidateApiTokenMaterial};
 

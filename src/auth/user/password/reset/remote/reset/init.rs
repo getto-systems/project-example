@@ -10,8 +10,8 @@ use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 
 use crate::auth::{
     ticket::remote::{
-        validate_nonce::init::ValidateAuthNonceStruct, encode::init::EncodeAuthTicketStruct,
-        issue::init::IssueAuthTicketStruct, kernel::init::clock::ChronoAuthClock,
+        encode::init::EncodeAuthTicketStruct, issue::init::IssueAuthTicketStruct,
+        kernel::init::clock::ChronoAuthClock, validate::init::ValidateAuthNonceStruct,
     },
     user::{
         password::{

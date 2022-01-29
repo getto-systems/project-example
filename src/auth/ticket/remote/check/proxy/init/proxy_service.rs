@@ -13,11 +13,10 @@ use crate::{
     z_lib::remote::service::helper::new_endpoint,
 };
 
+use crate::auth::remote::service::proxy::AuthProxyService;
+
 use crate::{
-    auth::{
-        remote::service::proxy::AuthProxyService,
-        ticket::remote::kernel::infra::AuthMetadataContent,
-    },
+    auth::ticket::remote::validate::infra::AuthMetadataContent,
     z_lib::remote::service::infra::ServiceAuthorizer,
 };
 

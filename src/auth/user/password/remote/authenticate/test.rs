@@ -15,12 +15,12 @@ use crate::auth::{
         },
         kernel::init::{
             clock::test::StaticChronoAuthClock,
-            nonce_metadata::test::StaticAuthNonceMetadata,
             ticket_repository::test::{
                 MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
             },
         },
-        validate_nonce::init::{
+        validate::init::{
+            nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::test::{
                 MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
             },
@@ -47,7 +47,7 @@ use crate::auth::{
 use crate::auth::{
     ticket::remote::{
         encode::method::EncodeAuthTicketConfig, issue::method::IssueAuthTicketConfig,
-        validate_nonce::method::AuthNonceConfig,
+        validate::method::AuthNonceConfig,
     },
     user::password::remote::{
         authenticate::infra::AuthenticatePasswordFieldsExtract, kernel::infra::HashedPassword,

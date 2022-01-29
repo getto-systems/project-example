@@ -5,17 +5,15 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     ticket::remote::{
-        kernel::init::{
-            clock::test::StaticChronoAuthClock, nonce_metadata::test::StaticAuthNonceMetadata,
-            token_decoder::test::StaticAuthTokenDecoder,
-            token_metadata::test::StaticAuthTokenMetadata,
-        },
-        validate::init::test::StaticValidateAuthTokenStruct,
-        validate_nonce::init::{
+        kernel::init::clock::test::StaticChronoAuthClock,
+        validate::init::{
+            nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::test::{
                 MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
             },
-            test::StaticValidateAuthNonceStruct,
+            test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
+            token_decoder::test::StaticAuthTokenDecoder,
+            token_metadata::test::StaticAuthTokenMetadata,
         },
     },
     user::password::remote::{
@@ -35,7 +33,7 @@ use crate::auth::user::password::remote::{
     change::infra::ChangePasswordFieldsExtract, kernel::infra::HashedPassword,
 };
 
-use crate::auth::ticket::remote::validate_nonce::method::AuthNonceConfig;
+use crate::auth::ticket::remote::validate::method::AuthNonceConfig;
 
 use super::action::{ChangePasswordAction, ChangePasswordMaterial};
 

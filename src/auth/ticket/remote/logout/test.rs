@@ -7,23 +7,22 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 use crate::auth::ticket::remote::{
     kernel::init::{
         clock::test::StaticChronoAuthClock,
-        nonce_metadata::test::StaticAuthNonceMetadata,
         ticket_repository::test::{
             MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
         },
-        token_decoder::test::StaticAuthTokenDecoder,
-        token_metadata::test::StaticAuthTokenMetadata,
     },
-    validate::init::test::StaticValidateAuthTokenStruct,
-    validate_nonce::init::{
+    validate::init::{
+        nonce_metadata::test::StaticAuthNonceMetadata,
         nonce_repository::test::{
             MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
         },
-        test::StaticValidateAuthNonceStruct,
+        test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
+        token_decoder::test::StaticAuthTokenDecoder,
+        token_metadata::test::StaticAuthTokenMetadata,
     },
 };
 
-use crate::auth::ticket::remote::validate_nonce::method::AuthNonceConfig;
+use crate::auth::ticket::remote::validate::method::AuthNonceConfig;
 
 use super::action::{LogoutAction, LogoutMaterial};
 
