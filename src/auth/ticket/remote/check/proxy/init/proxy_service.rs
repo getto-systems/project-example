@@ -54,12 +54,11 @@ impl<'a> ProxyService<'a> {
 #[async_trait::async_trait]
 impl<'a> AuthProxyService for ProxyService<'a> {
     type Response = AuthTokenResponse;
-    type Error = AuthProxyError;
 
     fn name(&self) -> &str {
         "auth.ticket.check"
     }
-    async fn call(self, metadata: AuthMetadataContent) -> Result<Self::Response, Self::Error> {
+    async fn call(self, metadata: AuthMetadataContent) -> Result<Self::Response, AuthProxyError> {
         call(self, metadata).await
     }
 }

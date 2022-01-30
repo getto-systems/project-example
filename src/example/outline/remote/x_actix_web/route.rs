@@ -13,8 +13,6 @@ use crate::x_outside_feature::remote::api::{
     logger::{app_logger, generate_request_id},
 };
 
-use crate::example::remote::proxy::call_proxy;
-
 use crate::example::outline::remote::get_menu_badge::proxy::init::GetOutlineMenuBadgeProxyStruct;
 
 pub fn scope_outline() -> Scope {
@@ -26,8 +24,8 @@ async fn get_menu_badge(feature: Data<ApiAppFeature>, request: HttpRequest) -> i
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut proxy = GetOutlineMenuBadgeProxyStruct::new(&feature, &request_id, &request);
-    proxy.subscribe(move |state| logger.log(state));
+    let mut action = GetOutlineMenuBadgeProxyStruct::action(&feature, &request_id, &request);
+    action.subscribe(move |state| logger.log(state));
 
-    flatten(call_proxy(&proxy, Ok(())).await).respond_to(&request)
+    flatten(action.ignite().await).respond_to(&request)
 }

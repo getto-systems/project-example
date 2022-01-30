@@ -13,11 +13,7 @@ use crate::x_outside_feature::remote::api::{
     logger::{app_logger, generate_request_id},
 };
 
-use crate::example::remote::proxy::call_proxy;
-
-use crate::avail::unexpected_error::remote::notify::proxy::{
-    infra::NotifyUnexpectedErrorProxyRequestDecoder, init::NotifyUnexpectedErrorProxyStruct,
-};
+use crate::avail::unexpected_error::remote::notify::proxy::init::NotifyUnexpectedErrorProxyStruct;
 
 pub fn scope_unexpected_error() -> Scope {
     scope("/unexpected-error").service(notify)
@@ -32,9 +28,9 @@ async fn notify(
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut proxy = NotifyUnexpectedErrorProxyStruct::new(&feature, &request_id, &request);
-    proxy.subscribe(move |state| logger.log(state));
+    let mut action =
+        NotifyUnexpectedErrorProxyStruct::action(&feature, &request_id, &request, body);
+    action.subscribe(move |state| logger.log(state));
 
-    let params = NotifyUnexpectedErrorProxyStruct::request_decoder(body).decode();
-    flatten(call_proxy(&proxy, params).await).respond_to(&request)
+    flatten(action.ignite().await).respond_to(&request)
 }

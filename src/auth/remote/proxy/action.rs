@@ -6,11 +6,13 @@ use crate::auth::remote::method::{
 
 use crate::auth::remote::proxy::infra::AuthProxyService;
 
-pub enum AuthProxyState<R, E> {
+use crate::auth::remote::proxy::data::AuthProxyError;
+
+pub enum AuthProxyState<R> {
     Metadata(ValidateAuthMetadataEvent),
     TryToCall(String),
     Response(R),
-    ServiceError(E),
+    ServiceError(AuthProxyError),
 }
 
 mod auth_proxy_state {
@@ -19,7 +21,7 @@ mod auth_proxy_state {
     const SUCCESS: &'static str = "proxy call success";
     const ERROR: &'static str = "proxy call error";
 
-    impl<R, E: std::fmt::Display> std::fmt::Display for AuthProxyState<R, E> {
+    impl<R> std::fmt::Display for AuthProxyState<R> {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
                 Self::Metadata(event) => event.fmt(f),
@@ -40,10 +42,7 @@ pub trait AuthProxyMaterial {
 
 pub struct AuthProxyAction<M: AuthProxyMaterial> {
     pubsub: ActionStatePubSub<
-        AuthProxyState<
-            <<M as AuthProxyMaterial>::ProxyService as AuthProxyService>::Response,
-            <<M as AuthProxyMaterial>::ProxyService as AuthProxyService>::Error,
-        >,
+        AuthProxyState<<<M as AuthProxyMaterial>::ProxyService as AuthProxyService>::Response>,
     >,
     material: M,
 }
@@ -62,7 +61,6 @@ impl<M: AuthProxyMaterial> AuthProxyAction<M> {
             + Fn(
                 &AuthProxyState<
                     <<M as AuthProxyMaterial>::ProxyService as AuthProxyService>::Response,
-                    <<M as AuthProxyMaterial>::ProxyService as AuthProxyService>::Error,
                 >,
             )
             + Send
@@ -74,10 +72,7 @@ impl<M: AuthProxyMaterial> AuthProxyAction<M> {
     pub async fn ignite(
         self,
     ) -> MethodResult<
-        AuthProxyState<
-            <<M as AuthProxyMaterial>::ProxyService as AuthProxyService>::Response,
-            <<M as AuthProxyMaterial>::ProxyService as AuthProxyService>::Error,
-        >,
+        AuthProxyState<<<M as AuthProxyMaterial>::ProxyService as AuthProxyService>::Response>,
     > {
         let pubsub = self.pubsub;
         let (validate, proxy_service) = self.material.extract();

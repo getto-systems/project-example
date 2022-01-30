@@ -1,6 +1,5 @@
 mod environment;
 mod grpc;
-mod protobuf;
 
 use std::env::var;
 
@@ -13,13 +12,6 @@ fn main() {
         grpc::generate("auth.user.password.reset");
         grpc::generate("avail.unexpected_error");
         grpc::generate("example.outline");
-
-        protobuf::generate("auth.ticket");
-        protobuf::generate("auth.user.account");
-        protobuf::generate("auth.user.password");
-        protobuf::generate("auth.user.password.reset");
-        protobuf::generate("avail.unexpected_error");
-        protobuf::generate("example.outline");
 
         environment::generate();
     }
