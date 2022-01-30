@@ -34,7 +34,7 @@ async fn search(
         &request,
         info.into_inner(),
     );
-    action.subscribe(move |state| logger.log(state.log_level(), state));
+    action.subscribe(move |state| logger.log(state));
 
     flatten(action.ignite().await).respond_to(&request)
 }

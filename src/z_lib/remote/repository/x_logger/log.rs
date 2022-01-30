@@ -1,9 +1,9 @@
-use crate::z_lib::remote::logger::LogLevel;
+use crate::z_lib::remote::logger::{LogFilter, LogLevel};
 
 use crate::z_lib::remote::repository::data::RepositoryError;
 
-impl RepositoryError {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for RepositoryError {
+    fn log_level(&self) -> LogLevel {
         LogLevel::Error
     }
 }

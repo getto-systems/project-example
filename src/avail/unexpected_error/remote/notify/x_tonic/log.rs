@@ -1,18 +1,18 @@
 use crate::{
     avail::unexpected_error::remote::notify::action::NotifyUnexpectedErrorEvent,
-    z_lib::remote::logger::{LogLevel, LogMessage},
+    z_lib::remote::logger::{LogFilter, LogLevel, LogMessage},
 };
 
 use super::super::action::NotifyUnexpectedErrorState;
 
-impl LogMessage for &NotifyUnexpectedErrorState {
+impl LogMessage for NotifyUnexpectedErrorState {
     fn log_message(&self) -> String {
         format!("{}", self)
     }
 }
 
-impl NotifyUnexpectedErrorState {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for NotifyUnexpectedErrorState {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::Validate(event) => event.log_level(),
             Self::Notify(event) => event.log_level(),
@@ -20,8 +20,8 @@ impl NotifyUnexpectedErrorState {
     }
 }
 
-impl NotifyUnexpectedErrorEvent {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for NotifyUnexpectedErrorEvent {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::Error(_) => LogLevel::Error,
         }

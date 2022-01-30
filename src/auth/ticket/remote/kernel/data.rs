@@ -102,9 +102,6 @@ impl AuthTicket {
         Self { ticket_id, user }
     }
 
-    pub fn into_ticket_id(self) -> AuthTicketId {
-        self.ticket_id
-    }
     pub fn ticket_id_as_str(&self) -> &str {
         self.ticket_id.as_str()
     }
@@ -168,6 +165,7 @@ impl AuthTicketId {
         Self(id)
     }
 
+    #[cfg(test)]
     pub fn extract(self) -> String {
         self.0
     }

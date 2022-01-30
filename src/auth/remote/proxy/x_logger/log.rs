@@ -1,17 +1,17 @@
-use crate::z_lib::remote::logger::{LogLevel, LogMessage};
+use crate::z_lib::remote::logger::{LogLevel, LogMessage, LogFilter};
 
 use crate::auth::remote::proxy::action::AuthProxyState;
 
 use crate::auth::remote::proxy::data::AuthProxyError;
 
-impl<T> LogMessage for &AuthProxyState<T> {
+impl<R, E: std::fmt::Display> LogMessage for AuthProxyState<R, E> {
     fn log_message(&self) -> String {
         format!("{}", self)
     }
 }
 
-impl<T> AuthProxyState<T> {
-    pub fn log_level(&self) -> LogLevel {
+impl<R, E: LogFilter> LogFilter for AuthProxyState<R, E> {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::Metadata(event) => event.log_level(),
             Self::TryToCall(_) => LogLevel::Info,
@@ -21,8 +21,8 @@ impl<T> AuthProxyState<T> {
     }
 }
 
-impl AuthProxyError {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for AuthProxyError {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::InvalidArgument(_) => LogLevel::Error,
             Self::AlreadyExists(_) => LogLevel::Audit,

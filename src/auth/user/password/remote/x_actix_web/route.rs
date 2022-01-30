@@ -38,7 +38,7 @@ async fn authenticate(
 
     let mut action =
         AuthenticatePasswordProxyStruct::action(&feature.auth, &request_id, &request, body);
-    action.subscribe(move |state| logger.log(state.log_level(), state));
+    action.subscribe(move |state| logger.log(state));
 
     flatten(action.ignite().await).respond_to(&request)
 }
@@ -53,7 +53,7 @@ async fn change(
     let logger = app_logger(request_id.clone(), &request);
 
     let mut action = ChangePasswordProxyStruct::action(&feature.auth, &request_id, &request, body);
-    action.subscribe(move |state| logger.log(state.log_level(), state));
+    action.subscribe(move |state| logger.log(state));
 
     flatten(action.ignite().await).respond_to(&request)
 }

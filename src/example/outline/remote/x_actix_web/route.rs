@@ -27,7 +27,7 @@ async fn get_menu_badge(feature: Data<ApiAppFeature>, request: HttpRequest) -> i
     let logger = app_logger(request_id.clone(), &request);
 
     let mut proxy = GetOutlineMenuBadgeProxyStruct::new(&feature, &request_id, &request);
-    proxy.subscribe(move |state| logger.log(state.log_level(), state));
+    proxy.subscribe(move |state| logger.log(state));
 
     flatten(call_proxy(&proxy, Ok(())).await).respond_to(&request)
 }

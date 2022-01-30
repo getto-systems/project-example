@@ -3,7 +3,7 @@ use actix_web::{HttpRequest, HttpResponse};
 use getto_application::data::MethodResult;
 
 use crate::z_lib::remote::{
-    logger::{LogLevel, LogMessage},
+    logger::{LogLevel, LogMessage, LogFilter},
     response::actix_web::RespondTo,
 };
 
@@ -51,8 +51,8 @@ impl<T: RespondTo> RespondTo for ExampleProxyEvent<T> {
     }
 }
 
-impl<T> ExampleProxyEvent<T> {
-    pub fn log_level(&self) -> LogLevel {
+impl<T> LogFilter for ExampleProxyEvent<T> {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::Metadata(event) => event.log_level(),
             Self::TryToCall(_) => LogLevel::Info,
@@ -63,7 +63,7 @@ impl<T> ExampleProxyEvent<T> {
     }
 }
 
-impl<T> LogMessage for &ExampleProxyEvent<T> {
+impl<T> LogMessage for ExampleProxyEvent<T> {
     fn log_message(&self) -> String {
         format!("{}", self)
     }

@@ -33,7 +33,7 @@ async fn notify(
     let logger = app_logger(request_id.clone(), &request);
 
     let mut proxy = NotifyUnexpectedErrorProxyStruct::new(&feature, &request_id, &request);
-    proxy.subscribe(move |state| logger.log(state.log_level(), state));
+    proxy.subscribe(move |state| logger.log(state));
 
     let params = NotifyUnexpectedErrorProxyStruct::request_decoder(body).decode();
     flatten(call_proxy(&proxy, params).await).respond_to(&request)

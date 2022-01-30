@@ -1,17 +1,17 @@
-use crate::z_lib::remote::logger::{LogLevel, LogMessage};
+use crate::z_lib::remote::logger::{LogFilter, LogLevel, LogMessage};
 
 use super::super::action::{ChangePasswordEvent, ChangePasswordState};
 
 use crate::auth::user::password::remote::change::data::ChangePasswordError;
 
-impl LogMessage for &ChangePasswordState {
+impl LogMessage for ChangePasswordState {
     fn log_message(&self) -> String {
         format!("{}", self)
     }
 }
 
-impl ChangePasswordState {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for ChangePasswordState {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::Validate(event) => event.log_level(),
             Self::Change(event) => event.log_level(),
@@ -19,8 +19,8 @@ impl ChangePasswordState {
     }
 }
 
-impl ChangePasswordEvent {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for ChangePasswordEvent {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::Success => LogLevel::Audit,
             Self::UserNotFound => LogLevel::Error,
@@ -31,8 +31,8 @@ impl ChangePasswordEvent {
     }
 }
 
-impl ChangePasswordError {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for ChangePasswordError {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::InvalidCurrentPassword(_) => LogLevel::Error,
             Self::InvalidNewPassword(_) => LogLevel::Error,

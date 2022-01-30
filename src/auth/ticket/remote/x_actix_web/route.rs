@@ -25,7 +25,7 @@ async fn check(feature: Data<ApiAppFeature>, request: HttpRequest) -> impl Respo
     let logger = app_logger(request_id.clone(), &request);
 
     let mut action = CheckAuthTicketProxyStruct::action(&feature.auth, &request_id, &request);
-    action.subscribe(move |state| logger.log(state.log_level(), state));
+    action.subscribe(move |state| logger.log(state));
 
     flatten(action.ignite().await).respond_to(&request)
 }
@@ -36,7 +36,7 @@ async fn logout(feature: Data<ApiAppFeature>, request: HttpRequest) -> impl Resp
     let logger = app_logger(request_id.clone(), &request);
 
     let mut action = LogoutProxyStruct::action(&feature.auth, &request_id, &request);
-    action.subscribe(move |state| logger.log(state.log_level(), state));
+    action.subscribe(move |state| logger.log(state));
 
     flatten(action.ignite().await).respond_to(&request)
 }

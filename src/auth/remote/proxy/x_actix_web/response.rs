@@ -11,7 +11,7 @@ use crate::auth::remote::proxy::action::AuthProxyState;
 
 use crate::auth::remote::proxy::data::{AuthProxyError, AuthProxyResponse};
 
-impl<T: RespondTo> RespondTo for AuthProxyState<T> {
+impl<R: RespondTo, E: RespondTo> RespondTo for AuthProxyState<R, E> {
     fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
             Self::Metadata(event) => event.respond_to(request),

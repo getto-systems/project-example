@@ -44,7 +44,7 @@ impl NotifyPb for Notify {
         let logger = app_logger("avail.unexpected_error.notify", request_id.into());
 
         let mut action = NotifyUnexpectedErrorFeature::action(&feature, &request_id, &metadata, request);
-        action.subscribe(move |state| logger.log(state.log_level(), state));
+        action.subscribe(move |state| logger.log(state));
 
         flatten(action.ignite().await).respond_to()
     }

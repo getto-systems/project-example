@@ -1,4 +1,4 @@
-use crate::z_lib::remote::logger::{LogLevel, LogMessage};
+use crate::z_lib::remote::logger::{LogFilter, LogLevel, LogMessage};
 
 use super::super::action::{RequestResetTokenEvent, RequestResetTokenState};
 
@@ -6,14 +6,14 @@ use crate::auth::user::password::reset::remote::request_token::data::{
     EncodeResetTokenError, NotifyResetTokenError, RequestResetTokenError,
 };
 
-impl LogMessage for &RequestResetTokenState {
+impl LogMessage for RequestResetTokenState {
     fn log_message(&self) -> String {
         format!("{}", self)
     }
 }
 
-impl RequestResetTokenState {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for RequestResetTokenState {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::ValidateNonce(event) => event.log_level(),
             Self::RequestToken(event) => event.log_level(),
@@ -21,8 +21,8 @@ impl RequestResetTokenState {
     }
 }
 
-impl RequestResetTokenEvent {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for RequestResetTokenEvent {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::TokenExpiresCalculated(_) => LogLevel::Info,
             Self::TokenNotified(_) => LogLevel::Info,
@@ -35,8 +35,8 @@ impl RequestResetTokenEvent {
     }
 }
 
-impl RequestResetTokenError {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for RequestResetTokenError {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::InvalidLoginId(_) => LogLevel::Error,
             Self::UserNotFound => LogLevel::Audit,
@@ -45,16 +45,16 @@ impl RequestResetTokenError {
     }
 }
 
-impl EncodeResetTokenError {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for EncodeResetTokenError {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::InfraError(_) => LogLevel::Error,
         }
     }
 }
 
-impl NotifyResetTokenError {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for NotifyResetTokenError {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::InfraError(_) => LogLevel::Error,
         }
