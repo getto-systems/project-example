@@ -1,4 +1,4 @@
-use std::collections::{hash_set::Iter, HashSet};
+use std::collections::HashSet;
 
 #[derive(Clone)]
 pub struct AuthUser {
@@ -70,35 +70,36 @@ impl std::fmt::Display for AuthUserId {
 }
 
 #[derive(Clone)]
-pub struct GrantedAuthRoles(AuthRoles);
+pub struct GrantedAuthRoles(HashSet<String>);
 
 impl GrantedAuthRoles {
-    fn restore(granted_roles: impl GrantedAuthRolesExtract) -> Self {
-        granted_roles.restore()
+    pub(in crate::auth) fn restore(granted_roles: HashSet<String>) -> Self {
+        Self(granted_roles)
     }
 
-    fn extract(self) -> HashSet<String> {
-        self.0.extract()
+    pub(in crate::auth) fn extract(self) -> HashSet<String> {
+        self.0
     }
 
-    pub fn as_roles(&self) -> &AuthRoles {
-        &self.0
+    pub fn has_enough_permission(&self, require_roles: &RequireAuthRoles) -> bool {
+        match require_roles {
+            RequireAuthRoles::Nothing => true,
+            RequireAuthRoles::HasAny(roles) => roles.iter().any(|role| self.0.contains(role)),
+        }
     }
 }
 
 impl std::fmt::Display for GrantedAuthRoles {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "granted: {}", self.0)
-    }
-}
-
-trait GrantedAuthRolesExtract {
-    fn restore(self) -> GrantedAuthRoles;
-}
-
-impl GrantedAuthRolesExtract for HashSet<String> {
-    fn restore(self) -> GrantedAuthRoles {
-        GrantedAuthRoles(AuthRoles::restore(self))
+        write!(
+            f,
+            "granted: [{}]",
+            self.0
+                .iter()
+                .map(|role| role.as_str())
+                .collect::<Vec<&str>>()
+                .join(",")
+        )
     }
 }
 
@@ -117,7 +118,7 @@ impl GrantedAuthRolesBasket {
 #[derive(Clone)]
 pub enum RequireAuthRoles {
     Nothing,
-    HasAny(AuthRoles),
+    HasAny(HashSet<String>),
 }
 
 impl RequireAuthRoles {
@@ -129,11 +130,11 @@ impl RequireAuthRoles {
     }
 
     pub fn has_any(roles: &[&str]) -> Self {
-        let mut hash_set = HashSet::new();
-        roles.iter().for_each(|role| {
-            hash_set.insert(role.to_string());
+        let mut set = HashSet::new();
+        roles.into_iter().for_each(|role| {
+            set.insert(role.to_string());
         });
-        Self::HasAny(AuthRoles::restore(hash_set))
+        Self::HasAny(set)
     }
 }
 
@@ -141,74 +142,15 @@ impl std::fmt::Display for RequireAuthRoles {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             RequireAuthRoles::Nothing => write!(f, "require: nothing"),
-            RequireAuthRoles::HasAny(roles) => write!(f, "require: any {}", roles),
-        }
-    }
-}
-
-#[derive(Clone)]
-pub struct AuthRoles(HashSet<String>);
-
-impl AuthRoles {
-    pub fn restore(roles: impl AuthRolesExtract) -> Self {
-        roles.restore()
-    }
-
-    pub fn extract(self) -> HashSet<String> {
-        self.0
-    }
-
-    pub fn iter(&self) -> Iter<'_, String> {
-        self.0.iter()
-    }
-    pub fn contains(&self, role: &str) -> bool {
-        self.0.contains(role)
-    }
-}
-
-impl std::fmt::Display for AuthRoles {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "[{}]",
-            self.0
-                .iter()
-                .map(|role| role.as_str())
-                .collect::<Vec<&str>>()
-                .join(",")
-        )
-    }
-}
-
-pub trait AuthRolesExtract {
-    fn restore(self) -> AuthRoles;
-}
-
-impl AuthRolesExtract for HashSet<String> {
-    fn restore(self) -> AuthRoles {
-        AuthRoles(self)
-    }
-}
-
-// TODO common と分けるために作ったからもういらんかも
-pub struct AuthPermission<'a> {
-    granted_roles: &'a GrantedAuthRoles,
-}
-
-impl<'a> AuthPermission<'a> {
-    pub fn new(user: &'a AuthUser) -> Self {
-        Self {
-            granted_roles: user.granted_roles(),
-        }
-    }
-
-    pub fn has_enough_permission(&self, require_roles: &RequireAuthRoles) -> bool {
-        match require_roles {
-            RequireAuthRoles::Nothing => true,
-            RequireAuthRoles::HasAny(roles) => {
-                let granted_roles = self.granted_roles.as_roles();
-                roles.iter().any(|role| granted_roles.contains(role))
-            }
+            RequireAuthRoles::HasAny(roles) => write!(
+                f,
+                "require: any [{}]",
+                roles
+                    .iter()
+                    .map(|role| role.as_str())
+                    .collect::<Vec<&str>>()
+                    .join(",")
+            ),
         }
     }
 }

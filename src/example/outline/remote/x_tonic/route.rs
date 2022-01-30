@@ -40,7 +40,7 @@ impl GetMenuBadgePb for GetMenuBadge {
 
         let logger = app_logger("example.outline.get_menu_badge", request_id.into());
         let mut action = GetOutlineMenuBadgeFeature::action(&feature, &request_id, &metadata);
-        action.subscribe(move |state| logger.log(state.log_level(), state));
+        action.subscribe(move |state| logger.log(state));
 
         flatten(action.ignite().await).respond_to()
     }

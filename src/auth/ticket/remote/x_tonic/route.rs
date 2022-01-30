@@ -52,7 +52,7 @@ impl LogoutPb for Logout {
 
         let logger = app_logger("auth.ticket.logout", request_id.into());
         let mut action = LogoutStruct::action(&feature, &metadata);
-        action.subscribe(move |state| logger.log(state.log_level(), state));
+        action.subscribe(move |state| logger.log(state));
 
         flatten(action.ignite().await).respond_to()
     }
@@ -71,7 +71,7 @@ impl CheckAuthTicketPb for Check {
 
         let logger = app_logger("auth.ticket.check", request_id.into());
         let mut action = CheckAuthTicketStruct::action(&feature, &metadata);
-        action.subscribe(move |state| logger.log(state.log_level(), state));
+        action.subscribe(move |state| logger.log(state));
 
         flatten(action.ignite().await).respond_to()
     }
@@ -94,7 +94,7 @@ impl ValidateApiTokenPb for Validate {
 
         let logger = app_logger("auth.ticket.validate", request_id.into());
         let mut action = ValidateApiTokenFeature::action(&feature, &metadata);
-        action.subscribe(move |state| logger.log(state.log_level(), state));
+        action.subscribe(move |state| logger.log(state));
 
         let request_decoder = ValidateApiTokenFeature::request_decoder(request);
         flatten(action.ignite(request_decoder).await).respond_to()

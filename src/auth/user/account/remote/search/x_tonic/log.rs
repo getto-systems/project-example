@@ -1,18 +1,18 @@
 use crate::{
     auth::user::account::remote::search::action::SearchAuthUserAccountEvent,
-    z_lib::remote::logger::{LogLevel, LogMessage},
+    z_lib::remote::logger::{LogLevel, LogMessage, LogFilter},
 };
 
 use super::super::action::SearchAuthUserAccountState;
 
-impl LogMessage for &SearchAuthUserAccountState {
+impl LogMessage for SearchAuthUserAccountState {
     fn log_message(&self) -> String {
         format!("{}", self)
     }
 }
 
-impl SearchAuthUserAccountState {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for SearchAuthUserAccountState {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::Validate(event) => event.log_level(),
             Self::Search(event) => event.log_level(),
@@ -20,8 +20,8 @@ impl SearchAuthUserAccountState {
     }
 }
 
-impl SearchAuthUserAccountEvent {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for SearchAuthUserAccountEvent {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::Success(_) => LogLevel::Audit,
             Self::RepositoryError(err) => err.log_level(),

@@ -11,10 +11,10 @@ use super::header::{
     COOKIE_CLOUDFRONT_SIGNATURE, COOKIE_TICKET_TOKEN,
 };
 
-use crate::auth::remote::service::x_actix_web::response::unauthorized;
+use crate::auth::remote::proxy::x_actix_web::response::unauthorized;
 
 use crate::auth::ticket::remote::kernel::data::{
-    AuthTokenEncoded, AuthTokenExtract, AuthTokenMessage, AuthTokenResponse, CloudfrontTokenKind,
+    EncodedAuthTokens, AuthTokenExtract, AuthTokenMessage, AuthTokenResponse, CloudfrontTokenKind,
     DecodeAuthTokenError,
 };
 
@@ -24,7 +24,7 @@ impl RespondTo for AuthTokenResponse {
             domain,
             message: AuthTokenMessage { body, token },
         } = self;
-        let AuthTokenEncoded {
+        let EncodedAuthTokens {
             ticket_token,
             api_token,
             cloudfront_tokens,

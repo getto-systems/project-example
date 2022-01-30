@@ -1,17 +1,17 @@
-use crate::z_lib::remote::logger::{LogLevel, LogMessage};
+use crate::z_lib::remote::logger::{LogFilter, LogLevel, LogMessage};
 
 use super::super::action::{AuthenticatePasswordEvent, AuthenticatePasswordState};
 
 use super::super::data::AuthenticatePasswordError;
 
-impl LogMessage for &AuthenticatePasswordState {
+impl LogMessage for AuthenticatePasswordState {
     fn log_message(&self) -> String {
         format!("{}", self)
     }
 }
 
-impl AuthenticatePasswordState {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for AuthenticatePasswordState {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::Authenticate(event) => event.log_level(),
             Self::ValidateNonce(event) => event.log_level(),
@@ -21,8 +21,8 @@ impl AuthenticatePasswordState {
     }
 }
 
-impl AuthenticatePasswordEvent {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for AuthenticatePasswordEvent {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::Success(_) => LogLevel::Audit,
             Self::UserNotFound => LogLevel::Error,
@@ -33,8 +33,8 @@ impl AuthenticatePasswordEvent {
     }
 }
 
-impl AuthenticatePasswordError {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for AuthenticatePasswordError {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::InvalidLoginId(_) => LogLevel::Error,
             Self::InvalidPassword(_) => LogLevel::Error,

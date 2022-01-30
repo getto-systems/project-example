@@ -24,7 +24,7 @@ async fn success_get_menu_badge() {
 
     let result = action.ignite().await;
     assert_state(vec![
-        "validate api token success; user: USER-ID",
+        "validate api token success",
         "get menu badge success",
     ]);
     assert!(result.is_ok());
@@ -71,7 +71,7 @@ impl TestStruct {
                     "USER-ID".into(),
                     HashSet::new(),
                 ),
-                validate_service: StaticValidateService::new("USER-ID".into()),
+                validate_service: StaticValidateService,
             },
             menu_badge_repository: StaticOutlineMenuBadgeRepository,
         }

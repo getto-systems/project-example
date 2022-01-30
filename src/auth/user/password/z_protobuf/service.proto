@@ -14,8 +14,12 @@ message AuthenticatePasswordRequestPb {
 }
 message AuthenticatePasswordResponsePb {
     bool success = 1;
-    auth.user.service.AuthUserPb user = 2;
-    auth.ticket.service.AuthTokenEncodedPb token = 3;
+    auth.user.service.GrantedAuthRolesPb roles = 2;
+    auth.ticket.service.EncodedAuthTokensPb token = 3;
+}
+message AuthenticatePasswordMaskedResponsePb {
+    bool success = 1;
+    auth.user.service.GrantedAuthRolesPb roles = 2;
 }
 
 service ChangePasswordPb {

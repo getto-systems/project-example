@@ -1,11 +1,11 @@
-use crate::z_lib::remote::logger::LogLevel;
+use crate::z_lib::remote::logger::{LogLevel, LogFilter};
 
 use crate::auth::ticket::remote::encode::method::EncodeAuthTicketEvent;
 
 use crate::auth::ticket::remote::encode::data::EncodeAuthTokenError;
 
-impl EncodeAuthTicketEvent {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for EncodeAuthTicketEvent {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::TokenExpiresCalculated(_) => LogLevel::Info,
             Self::Success(_) => LogLevel::Audit,
@@ -16,8 +16,8 @@ impl EncodeAuthTicketEvent {
     }
 }
 
-impl EncodeAuthTokenError {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for EncodeAuthTokenError {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::InfraError(_) => LogLevel::Error,
         }

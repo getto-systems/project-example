@@ -30,7 +30,7 @@ async fn success_notify() {
 
     let result = action.ignite().await;
     assert_state(vec![
-        "validate api token success; user: USER-ID",
+        "validate api token success",
         "UNEXPECTED-ERROR",
     ]);
     assert!(result.is_ok());
@@ -69,7 +69,7 @@ impl TestStruct {
                     "USER-ID".into(),
                     HashSet::new(),
                 ),
-                validate_service: StaticValidateService::new("USER-ID".into()),
+                validate_service: StaticValidateService,
             },
         }
     }

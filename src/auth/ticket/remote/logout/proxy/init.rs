@@ -1,67 +1,39 @@
 mod proxy_service;
-mod response_encoder;
 
 use actix_web::HttpRequest;
 
-use getto_application::infra::ActionStatePubSub;
-
 use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideFeature;
 
-use crate::auth::ticket::remote::validate::init::ValidateTicketMetadataStruct;
-use proxy_service::ProxyService;
-use response_encoder::{LogoutProxyResponse, ResponseEncoder};
+use crate::auth::ticket::remote::{
+    logout::proxy::init::proxy_service::ProxyService, validate::init::ValidateTicketMetadataStruct,
+};
 
-use crate::auth::remote::service::proxy::{AuthProxyEvent, AuthProxyInfra};
+use crate::auth::remote::proxy::action::{AuthProxyAction, AuthProxyMaterial};
 
 pub struct LogoutProxyStruct<'a> {
-    pubsub: ActionStatePubSub<AuthProxyEvent<LogoutProxyResponse>>,
-    validate_infra: ValidateTicketMetadataStruct<'a>,
+    validate: ValidateTicketMetadataStruct<'a>,
     proxy_service: ProxyService<'a>,
-    response_encoder: ResponseEncoder,
 }
 
 impl<'a> LogoutProxyStruct<'a> {
-    pub fn new(
+    pub fn action(
         feature: &'a AuthOutsideFeature,
         request_id: &'a str,
         request: &'a HttpRequest,
-    ) -> Self {
-        Self {
-            pubsub: ActionStatePubSub::new(),
-            validate_infra: ValidateTicketMetadataStruct::new(&feature.decoding_key, request),
+    ) -> AuthProxyAction<Self> {
+        AuthProxyAction::with_material(Self {
+            validate: ValidateTicketMetadataStruct::new(&feature.decoding_key, request),
             proxy_service: ProxyService::new(&feature.service, request_id),
-            response_encoder: ResponseEncoder,
-        }
-    }
-
-    pub fn subscribe(
-        &mut self,
-        handler: impl 'static + Fn(&AuthProxyEvent<LogoutProxyResponse>) + Send + Sync,
-    ) {
-        self.pubsub.subscribe(handler);
+        })
     }
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthProxyInfra<(), (), LogoutProxyResponse> for LogoutProxyStruct<'a> {
-    type ValidateInfra = ValidateTicketMetadataStruct<'a>;
+impl<'a> AuthProxyMaterial for LogoutProxyStruct<'a> {
+    type Validate = ValidateTicketMetadataStruct<'a>;
     type ProxyService = ProxyService<'a>;
-    type ResponseEncoder = ResponseEncoder;
 
-    fn validate_infra(&self) -> &Self::ValidateInfra {
-        &self.validate_infra
-    }
-    fn proxy_service(&self) -> &Self::ProxyService {
-        &self.proxy_service
-    }
-    fn response_encoder(&self) -> &Self::ResponseEncoder {
-        &self.response_encoder
-    }
-
-    fn post(
-        &self,
-        state: AuthProxyEvent<LogoutProxyResponse>,
-    ) -> AuthProxyEvent<LogoutProxyResponse> {
-        self.pubsub.post(state)
+    fn extract(self) -> (Self::Validate, Self::ProxyService) {
+        (self.validate, self.proxy_service)
     }
 }

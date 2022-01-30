@@ -2,9 +2,12 @@ use chrono::Utc;
 use serde::Serialize;
 
 pub trait Logger {
-    fn log(&self, log_level: LogLevel, message: impl LogMessage);
+    fn log(&self, message: &(impl LogFilter + LogMessage));
 }
 
+pub trait LogFilter {
+    fn log_level(&self) -> LogLevel;
+}
 pub trait LogMessage {
     fn log_message(&self) -> String;
 }
@@ -25,7 +28,7 @@ pub struct LogEntry<R: std::fmt::Debug + Serialize> {
 }
 
 impl<R: std::fmt::Debug + Serialize> LogEntry<R> {
-    pub fn with_message(level: &'static str, message: impl LogMessage, request: R) -> Self {
+    pub fn with_message(level: &'static str, message: &impl LogMessage, request: R) -> Self {
         Self {
             at: Utc::now().to_rfc3339(),
             level,
@@ -56,14 +59,14 @@ impl<R: std::fmt::Debug + Serialize + Clone> QuietLogger<R> {
         Self { request }
     }
 
-    fn message(&self, level: &'static str, message: impl LogMessage) -> String {
+    fn message(&self, level: &'static str, message: &impl LogMessage) -> String {
         log_message(level, message, self.request.clone())
     }
 }
 
 impl<R: std::fmt::Debug + Serialize + Clone> Logger for QuietLogger<R> {
-    fn log(&self, log_level: LogLevel, message: impl LogMessage) {
-        match log_level {
+    fn log(&self, message: &(impl LogFilter + LogMessage)) {
+        match message.log_level() {
             LogLevel::Error => println!("{}", self.message(ERROR, message)),
             LogLevel::Audit => println!("{}", self.message(AUDIT, message)),
             LogLevel::Info => (),
@@ -81,14 +84,14 @@ impl<R: std::fmt::Debug + Serialize + Clone> InfoLogger<R> {
         Self { request }
     }
 
-    fn message(&self, level: &'static str, message: impl LogMessage) -> String {
+    fn message(&self, level: &'static str, message: &impl LogMessage) -> String {
         log_message(level, message, self.request.clone())
     }
 }
 
 impl<R: std::fmt::Debug + Serialize + Clone> Logger for InfoLogger<R> {
-    fn log(&self, log_level: LogLevel, message: impl LogMessage) {
-        match log_level {
+    fn log(&self, message: &(impl LogFilter + LogMessage)) {
+        match message.log_level() {
             LogLevel::Error => println!("{}", self.message(ERROR, message)),
             LogLevel::Audit => println!("{}", self.message(AUDIT, message)),
             LogLevel::Info => println!("{}", self.message(INFO, message)),
@@ -106,14 +109,14 @@ impl<R: std::fmt::Debug + Serialize + Clone> VerboseLogger<R> {
         Self { request }
     }
 
-    fn message(&self, level: &'static str, message: impl LogMessage) -> String {
+    fn message(&self, level: &'static str, message: &impl LogMessage) -> String {
         log_message(level, message, self.request.clone())
     }
 }
 
 impl<R: std::fmt::Debug + Serialize + Clone> Logger for VerboseLogger<R> {
-    fn log(&self, log_level: LogLevel, message: impl LogMessage) {
-        match log_level {
+    fn log(&self, message: &(impl LogFilter + LogMessage)) {
+        match message.log_level() {
             LogLevel::Error => println!("{}", self.message(ERROR, message)),
             LogLevel::Audit => println!("{}", self.message(AUDIT, message)),
             LogLevel::Info => println!("{}", self.message(INFO, message)),
@@ -124,7 +127,7 @@ impl<R: std::fmt::Debug + Serialize + Clone> Logger for VerboseLogger<R> {
 
 fn log_message<R: std::fmt::Debug + Serialize + Clone>(
     level: &'static str,
-    message: impl LogMessage,
+    message: &impl LogMessage,
     request: R,
 ) -> String {
     LogEntry::with_message(level, message, request).to_json()

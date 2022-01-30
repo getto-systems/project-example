@@ -1,6 +1,11 @@
 use tonic::{Response, Status};
 
-use crate::auth::user::password::remote::y_protobuf::service::AuthenticatePasswordResponsePb;
+use crate::auth::{
+    ticket::remote::y_protobuf::service::EncodedAuthTokensPb,
+    user::password::remote::y_protobuf::service::{
+        AuthenticatePasswordMaskedResponsePb, AuthenticatePasswordResponsePb,
+    },
+};
 
 use crate::z_lib::remote::response::tonic::RespondTo;
 
@@ -8,8 +13,10 @@ use super::super::action::{AuthenticatePasswordEvent, AuthenticatePasswordState}
 
 use crate::auth::ticket::remote::encode::method::EncodeAuthTicketEvent;
 
-use super::super::data::AuthenticatePasswordError;
-use crate::auth::ticket::remote::encode::data::AuthTicketEncoded;
+use crate::auth::{
+    ticket::remote::encode::data::AuthTicketEncoded,
+    user::password::remote::authenticate::data::AuthenticatePasswordError,
+};
 
 impl RespondTo<AuthenticatePasswordResponsePb> for AuthenticatePasswordState {
     fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
@@ -34,11 +41,28 @@ impl RespondTo<AuthenticatePasswordResponsePb> for EncodeAuthTicketEvent {
     }
 }
 
+impl AuthenticatePasswordResponsePb {
+    pub fn extract(
+        self,
+    ) -> (
+        Option<EncodedAuthTokensPb>,
+        AuthenticatePasswordMaskedResponsePb,
+    ) {
+        (
+            self.token,
+            AuthenticatePasswordMaskedResponsePb {
+                success: self.success,
+                roles: self.roles,
+            },
+        )
+    }
+}
+
 impl RespondTo<AuthenticatePasswordResponsePb> for AuthTicketEncoded {
     fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
         Ok(Response::new(AuthenticatePasswordResponsePb {
             success: true,
-            user: Some(self.user.into()),
+            roles: Some(self.roles.into()),
             token: Some(self.token.into()),
         }))
     }

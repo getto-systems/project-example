@@ -51,7 +51,7 @@ impl RequestResetTokenPb for RequestToken {
 
         let logger = app_logger("auth.user.password.reset.request_token", request_id.into());
         let mut action = RequestResetTokenStruct::action(&feature, &metadata, request);
-        action.subscribe(move |state| logger.log(state.log_level(), state));
+        action.subscribe(move |state| logger.log(state));
 
         flatten(action.ignite().await).respond_to()
     }
@@ -74,7 +74,7 @@ impl ResetPasswordPb for Reset {
 
         let logger = app_logger("auth.user.password.reset.reset", request_id.into());
         let mut action = ResetPasswordFeature::action(&feature, &metadata, request);
-        action.subscribe(move |state| logger.log(state.log_level(), state));
+        action.subscribe(move |state| logger.log(state));
 
         flatten(action.ignite().await).respond_to()
     }

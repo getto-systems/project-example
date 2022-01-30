@@ -5,17 +5,17 @@ use tonic::{Response, Status};
 use crate::z_lib::remote::response::tonic::RespondTo;
 
 use crate::auth::ticket::remote::y_protobuf::service::{
-    AuthTokenEncodedPb, AuthTokenPb, CloudfrontTokenKindPb, CloudfrontTokenPb,
+    EncodedAuthTokensPb, AuthTokenPb, CloudfrontTokenKindPb, CloudfrontTokenPb,
 };
 
 use crate::auth::ticket::remote::kernel::data::{
-    AuthTokenEncoded, AuthTokenExtract, CloudfrontTokenKind, DecodeAuthTokenError,
+    EncodedAuthTokens, AuthTokenExtract, CloudfrontTokenKind, DecodeAuthTokenError,
     ValidateAuthRolesError,
 };
 
-impl Into<AuthTokenEncodedPb> for AuthTokenEncoded {
-    fn into(self) -> AuthTokenEncodedPb {
-        AuthTokenEncodedPb {
+impl Into<EncodedAuthTokensPb> for EncodedAuthTokens {
+    fn into(self) -> EncodedAuthTokensPb {
+        EncodedAuthTokensPb {
             ticket_token: Some(self.ticket_token.into()),
             api_token: Some(self.api_token.into()),
 
@@ -34,8 +34,8 @@ impl Into<AuthTokenEncodedPb> for AuthTokenEncoded {
     }
 }
 
-impl Into<Option<AuthTokenEncoded>> for AuthTokenEncodedPb {
-    fn into(self) -> Option<AuthTokenEncoded> {
+impl Into<Option<EncodedAuthTokens>> for EncodedAuthTokensPb {
+    fn into(self) -> Option<EncodedAuthTokens> {
         match (self.ticket_token, self.api_token) {
             (Some(ticket_token), Some(api_token)) => {
                 let mut cloudfront_tokens = HashMap::new();
@@ -47,7 +47,7 @@ impl Into<Option<AuthTokenEncoded>> for AuthTokenEncodedPb {
                         }
                     });
 
-                Some(AuthTokenEncoded {
+                Some(EncodedAuthTokens {
                     ticket_token: ticket_token.into(),
                     api_token: api_token.into(),
                     cloudfront_tokens,

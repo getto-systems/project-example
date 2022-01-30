@@ -9,19 +9,15 @@ use crate::auth::remote::x_outside_feature::common::feature::AuthOutsideService;
 use crate::z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::{
-    auth::remote::service::helper::{infra_error, set_metadata},
-    z_lib::remote::service::helper::new_endpoint,
+    auth::remote::proxy::helper::infra_error, z_lib::remote::service::helper::new_endpoint,
 };
 
-use super::super::infra::ValidateService;
-use crate::{
-    auth::ticket::remote::validate::infra::AuthMetadataContent,
-    z_lib::remote::service::infra::ServiceAuthorizer,
-};
+use crate::auth::remote::proxy::method::set_metadata;
+
+use crate::auth::ticket::remote::validate::infra::{AuthMetadataContent, ValidateService};
 
 use crate::auth::{
-    remote::service::data::AuthServiceError,
-    user::remote::kernel::data::{AuthUserExtract, AuthUserId, RequireAuthRoles},
+    remote::proxy::data::AuthProxyError, user::remote::kernel::data::RequireAuthRoles,
 };
 
 pub struct TonicValidateService<'a> {
@@ -46,37 +42,41 @@ impl<'a> ValidateService for TonicValidateService<'a> {
         &self,
         metadata: AuthMetadataContent,
         require_roles: RequireAuthRoles,
-    ) -> Result<AuthUserId, AuthServiceError> {
-        let mut client = ValidateApiTokenPbClient::new(
-            new_endpoint(self.service_url)
-                .map_err(infra_error)?
-                .connect()
-                .await
-                .map_err(infra_error)?,
-        );
-
-        let request: ValidateApiTokenRequestPb = require_roles.into();
-        let mut request = Request::new(request);
-        set_metadata(
-            &mut request,
-            self.request_id,
-            self.authorizer.fetch_token().await.map_err(infra_error)?,
-            metadata,
-        )
-        .map_err(infra_error)?;
-
-        let response = client
-            .validate(request)
-            .await
-            .map_err(AuthServiceError::from)?
-            .into_inner();
-
-        let user: Option<AuthUserExtract> = response.user.map(|user| user.into());
-        user.ok_or(AuthServiceError::InfraError(
-            "failed to decode response".into(),
-        ))
-        .map(|user| user.restore().into_user_id())
+    ) -> Result<(), AuthProxyError> {
+        validate(self, metadata, require_roles).await
     }
+}
+
+async fn validate<'a>(
+    service: &TonicValidateService<'a>,
+    metadata: AuthMetadataContent,
+    require_roles: RequireAuthRoles,
+) -> Result<(), AuthProxyError> {
+    let mut client = ValidateApiTokenPbClient::new(
+        new_endpoint(service.service_url)
+            .map_err(infra_error)?
+            .connect()
+            .await
+            .map_err(infra_error)?,
+    );
+
+    let request: ValidateApiTokenRequestPb = require_roles.into();
+    let mut request = Request::new(request);
+    set_metadata(
+        &mut request,
+        service.request_id,
+        &service.authorizer,
+        metadata,
+    )
+    .await
+    .map_err(infra_error)?;
+
+    client
+        .validate(request)
+        .await
+        .map_err(AuthProxyError::from)?;
+
+    Ok(())
 }
 
 #[cfg(test)]
@@ -84,20 +84,10 @@ pub mod test {
     use crate::auth::ticket::remote::validate::infra::{AuthMetadataContent, ValidateService};
 
     use crate::auth::{
-        remote::service::data::AuthServiceError,
-        user::remote::kernel::data::{AuthUserId, RequireAuthRoles},
+        remote::proxy::data::AuthProxyError, user::remote::kernel::data::RequireAuthRoles,
     };
 
-    pub struct StaticValidateService {
-        user_id: AuthUserId,
-    }
-    impl StaticValidateService {
-        pub fn new(user_id: String) -> Self {
-            Self {
-                user_id: AuthUserId::restore(user_id),
-            }
-        }
-    }
+    pub struct StaticValidateService;
 
     #[async_trait::async_trait]
     impl ValidateService for StaticValidateService {
@@ -105,8 +95,8 @@ pub mod test {
             &self,
             _metadata: AuthMetadataContent,
             _require_roles: RequireAuthRoles,
-        ) -> Result<AuthUserId, AuthServiceError> {
-            Ok(self.user_id.clone())
+        ) -> Result<(), AuthProxyError> {
+            Ok(())
         }
     }
 }

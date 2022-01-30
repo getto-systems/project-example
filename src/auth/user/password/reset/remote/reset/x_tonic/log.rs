@@ -1,20 +1,20 @@
-use crate::z_lib::remote::logger::{LogLevel, LogMessage};
+use crate::z_lib::remote::logger::{LogFilter, LogLevel, LogMessage};
 
 use super::super::action::{ResetPasswordEvent, ResetPasswordState};
 
 use crate::auth::user::password::reset::remote::{
-    reset::data::{DecodeResetTokenError, NotifyResetPasswordError, ResetPasswordError},
     kernel::data::ValidateResetTokenError,
+    reset::data::{DecodeResetTokenError, NotifyResetPasswordError, ResetPasswordError},
 };
 
-impl LogMessage for &ResetPasswordState {
+impl LogMessage for ResetPasswordState {
     fn log_message(&self) -> String {
         format!("{}", self)
     }
 }
 
-impl ResetPasswordState {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for ResetPasswordState {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::ValidateNonce(event) => event.log_level(),
             Self::Reset(event) => event.log_level(),
@@ -24,8 +24,8 @@ impl ResetPasswordState {
     }
 }
 
-impl ResetPasswordEvent {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for ResetPasswordEvent {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::ResetNotified(_) => LogLevel::Info,
             Self::Success(_) => LogLevel::Audit,
@@ -39,8 +39,8 @@ impl ResetPasswordEvent {
     }
 }
 
-impl ResetPasswordError {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for ResetPasswordError {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::InvalidLoginId(_) => LogLevel::Error,
             Self::InvalidPassword(_) => LogLevel::Error,
@@ -50,16 +50,16 @@ impl ResetPasswordError {
     }
 }
 
-impl NotifyResetPasswordError {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for NotifyResetPasswordError {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::InfraError(_) => LogLevel::Error,
         }
     }
 }
 
-impl DecodeResetTokenError {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for DecodeResetTokenError {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::Expired => LogLevel::Debug,
             Self::Invalid(_) => LogLevel::Audit,
@@ -67,8 +67,8 @@ impl DecodeResetTokenError {
     }
 }
 
-impl ValidateResetTokenError {
-    pub const fn log_level(&self) -> LogLevel {
+impl LogFilter for ValidateResetTokenError {
+    fn log_level(&self) -> LogLevel {
         match self {
             Self::Empty => LogLevel::Error,
         }

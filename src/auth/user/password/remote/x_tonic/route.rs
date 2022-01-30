@@ -58,7 +58,7 @@ impl AuthenticatePasswordPb for Authenticate {
 
         let logger = app_logger("auth.user.password.authenticate", request_id.into());
         let mut action = AuthenticatePasswordStruct::action(&feature, &metadata, request);
-        action.subscribe(move |state| logger.log(state.log_level(), state));
+        action.subscribe(move |state| logger.log(state));
 
         flatten(action.ignite().await).respond_to()
     }
@@ -81,7 +81,7 @@ impl ChangePasswordPb for Change {
 
         let logger = app_logger("auth.user.password.change", request_id.into());
         let mut action = ChangePasswordFeature::action(&feature, &metadata, request);
-        action.subscribe(move |state| logger.log(state.log_level(), state));
+        action.subscribe(move |state| logger.log(state));
 
         flatten(action.ignite().await).respond_to()
     }

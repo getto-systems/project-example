@@ -15,13 +15,9 @@ use crate::x_outside_feature::remote::api::{
 
 use crate::auth::user::password::reset::remote::x_actix_web::route::scope_reset;
 
-use crate::auth::remote::service::proxy::call_proxy;
-
 use crate::auth::user::password::remote::{
-    authenticate::proxy::{
-        infra::AuthenticatePasswordProxyRequestDecoder, init::AuthenticatePasswordProxyStruct,
-    },
-    change::proxy::{infra::ChangePasswordProxyRequestDecoder, init::ChangePasswordProxyStruct},
+    authenticate::proxy::init::AuthenticatePasswordProxyStruct,
+    change::proxy::init::ChangePasswordProxyStruct,
 };
 
 pub fn scope_password() -> Scope {
@@ -40,11 +36,11 @@ async fn authenticate(
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut proxy = AuthenticatePasswordProxyStruct::new(&feature.auth, &request_id, &request);
-    proxy.subscribe(move |state| logger.log(state.log_level(), state));
+    let mut action =
+        AuthenticatePasswordProxyStruct::action(&feature.auth, &request_id, &request, body);
+    action.subscribe(move |state| logger.log(state));
 
-    let params = AuthenticatePasswordProxyStruct::request_decoder(body).decode();
-    flatten(call_proxy(&proxy, params).await).respond_to(&request)
+    flatten(action.ignite().await).respond_to(&request)
 }
 
 #[post("/change")]
@@ -56,9 +52,8 @@ async fn change(
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut proxy = ChangePasswordProxyStruct::new(&feature.auth, &request_id, &request);
-    proxy.subscribe(move |state| logger.log(state.log_level(), state));
+    let mut action = ChangePasswordProxyStruct::action(&feature.auth, &request_id, &request, body);
+    action.subscribe(move |state| logger.log(state));
 
-    let params = ChangePasswordProxyStruct::request_decoder(body).decode();
-    flatten(call_proxy(&proxy, params).await).respond_to(&request)
+    flatten(action.ignite().await).respond_to(&request)
 }
