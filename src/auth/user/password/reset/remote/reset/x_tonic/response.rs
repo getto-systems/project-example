@@ -1,9 +1,10 @@
 use tonic::{Response, Status};
 
+use crate::auth::ticket::remote::y_protobuf::service::EncodedAuthTokensPb;
 use crate::z_lib::remote::response::tonic::RespondTo;
 
 use crate::auth::user::password::reset::remote::y_protobuf::service::{
-    ResetPasswordErrorKindPb, ResetPasswordResponsePb,
+    ResetPasswordErrorKindPb, ResetPasswordMaskedResponsePb, ResetPasswordResponsePb,
 };
 
 use super::super::action::{ResetPasswordEvent, ResetPasswordState};
@@ -45,7 +46,7 @@ impl RespondTo<ResetPasswordResponsePb> for AuthTicketEncoded {
     fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
         Ok(Response::new(ResetPasswordResponsePb {
             success: true,
-            user: Some(self.user.into()),
+            roles: Some(self.roles.into()),
             token: Some(self.token.into()),
             ..Default::default()
         }))
@@ -67,12 +68,25 @@ impl RespondTo<ResetPasswordResponsePb> for ResetPasswordEvent {
     }
 }
 
+impl ResetPasswordResponsePb {
+    pub fn extract(self) -> (Option<EncodedAuthTokensPb>, ResetPasswordMaskedResponsePb) {
+        (
+            self.token,
+            ResetPasswordMaskedResponsePb {
+                success: self.success,
+                roles: self.roles,
+                err: self.err,
+            },
+        )
+    }
+}
+
 impl RespondTo<ResetPasswordResponsePb> for ResetPasswordError {
     fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
         let error: ResetPasswordErrorKindPb = self.into();
         Ok(Response::new(ResetPasswordResponsePb {
             success: false,
-            error: error as i32,
+            err: error as i32,
             ..Default::default()
         }))
     }

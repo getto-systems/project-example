@@ -8,7 +8,7 @@ use crate::auth::ticket::remote::{
 use crate::{
     auth::ticket::remote::{
         encode::data::{AuthTicketEncoded, AuthTokenExpires, EncodeAuthTokenError},
-        kernel::data::{AuthTicket, AuthTokenEncoded, ExpansionLimitDateTime, ExpireDuration},
+        kernel::data::{AuthTicket, EncodedAuthTokens, ExpansionLimitDateTime, ExpireDuration},
     },
     z_lib::remote::repository::data::RepositoryError,
 };
@@ -80,7 +80,7 @@ pub async fn encode_auth_ticket<S>(
         expires.clone(),
     ));
 
-    let token = AuthTokenEncoded {
+    let token = EncodedAuthTokens {
         ticket_token: ticket_encoder
             .encode(ticket.clone(), expires.ticket)
             .map_err(|err| post(EncodeAuthTicketEvent::EncodeError(err)))?,
@@ -95,7 +95,7 @@ pub async fn encode_auth_ticket<S>(
     };
 
     let response = AuthTicketEncoded {
-        user: ticket.into_user().extract(),
+        roles: ticket.into_user().into_granted_roles(),
         token,
     };
     Ok(post(EncodeAuthTicketEvent::Success(response)))

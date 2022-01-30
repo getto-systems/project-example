@@ -7,9 +7,28 @@ use crate::auth::ticket::remote::kernel::x_actix_web::header::{
 
 use crate::z_lib::remote::response::actix_web::RespondTo;
 
-use crate::auth::remote::service::data::AuthServiceError;
+use crate::auth::remote::proxy::action::AuthProxyState;
 
-impl RespondTo for AuthServiceError {
+use crate::auth::remote::proxy::data::{AuthProxyError, AuthProxyResponse};
+
+impl<T: RespondTo> RespondTo for AuthProxyState<T> {
+    fn respond_to(self, request: &HttpRequest) -> HttpResponse {
+        match self {
+            Self::Metadata(event) => event.respond_to(request),
+            Self::TryToCall(_) => HttpResponse::Accepted().finish(),
+            Self::Response(response) => response.respond_to(request),
+            Self::ServiceError(err) => err.respond_to(request),
+        }
+    }
+}
+
+impl RespondTo for AuthProxyResponse {
+    fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
+        HttpResponse::Ok().body(self.extract())
+    }
+}
+
+impl RespondTo for AuthProxyError {
     fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
             Self::InvalidArgument(_) => HttpResponse::BadRequest().finish(),
@@ -19,6 +38,7 @@ impl RespondTo for AuthServiceError {
             Self::Internal(_) => HttpResponse::InternalServerError().finish(),
             Self::Cancelled(_) => HttpResponse::Accepted().finish(),
             Self::InfraError(_) => HttpResponse::InternalServerError().finish(),
+            Self::MessageError(err) => err.respond_to(request),
         }
     }
 }

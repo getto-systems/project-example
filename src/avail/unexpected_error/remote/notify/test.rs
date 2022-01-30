@@ -69,7 +69,7 @@ impl TestStruct {
                     "USER-ID".into(),
                     HashSet::new(),
                 ),
-                validate_service: StaticValidateService::new("USER-ID".into()),
+                validate_service: StaticValidateService,
             },
         }
     }

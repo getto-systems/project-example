@@ -13,13 +13,9 @@ use crate::x_outside_feature::remote::api::{
     logger::{app_logger, generate_request_id},
 };
 
-use crate::auth::remote::service::proxy::call_proxy;
-
 use crate::auth::user::password::reset::remote::{
-    request_token::proxy::{
-        infra::RequestResetTokenProxyRequestDecoder, init::RequestResetTokenProxyStruct,
-    },
-    reset::proxy::{infra::ResetPasswordProxyRequestDecoder, init::ResetPasswordProxyStruct},
+    request_token::proxy::init::RequestResetTokenProxyStruct,
+    reset::proxy::init::ResetPasswordProxyStruct,
 };
 
 pub fn scope_reset() -> Scope {
@@ -35,11 +31,11 @@ async fn request_token(
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut proxy = RequestResetTokenProxyStruct::new(&feature.auth, &request_id, &request);
-    proxy.subscribe(move |state| logger.log(state.log_level(), state));
+    let mut action =
+        RequestResetTokenProxyStruct::action(&feature.auth, &request_id, &request, body);
+    action.subscribe(move |state| logger.log(state.log_level(), state));
 
-    let params = RequestResetTokenProxyStruct::request_decoder(body).decode();
-    flatten(call_proxy(&proxy, params).await).respond_to(&request)
+    flatten(action.ignite().await).respond_to(&request)
 }
 
 #[post("")]
@@ -47,9 +43,8 @@ async fn reset(feature: Data<ApiAppFeature>, request: HttpRequest, body: String)
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 
-    let mut proxy = ResetPasswordProxyStruct::new(&feature.auth, &request_id, &request);
-    proxy.subscribe(move |state| logger.log(state.log_level(), state));
+    let mut action = ResetPasswordProxyStruct::action(&feature.auth, &request_id, &request, body);
+    action.subscribe(move |state| logger.log(state.log_level(), state));
 
-    let params = ResetPasswordProxyStruct::request_decoder(body).decode();
-    flatten(call_proxy(&proxy, params).await).respond_to(&request)
+    flatten(action.ignite().await).respond_to(&request)
 }

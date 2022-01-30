@@ -9,18 +9,18 @@ use crate::example::remote::x_outside_feature::feature::ExampleOutsideService;
 use crate::z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::{
-    auth::remote::helper::set_metadata, example::remote::service::helper::infra_error,
-    z_lib::remote::service::helper::new_endpoint,
+    example::remote::service::helper::infra_error, z_lib::remote::service::helper::new_endpoint,
 };
+
+use crate::auth::remote::method::set_metadata;
 
 use crate::{
     auth::remote::infra::AuthMetadataContent, example::remote::proxy::ExampleProxyService,
-    z_lib::remote::service::infra::ServiceAuthorizer,
 };
 
 use crate::example::{
-    remote::service::data::ExampleServiceError,
     outline::remote::get_menu_badge::data::OutlineMenuBadge,
+    remote::service::data::ExampleServiceError,
 };
 
 pub struct ProxyService<'a> {
@@ -58,13 +58,9 @@ impl<'a> ExampleProxyService<(), OutlineMenuBadge> for ProxyService<'a> {
         );
 
         let mut request = Request::new(GetMenuBadgeRequestPb {});
-        set_metadata(
-            &mut request,
-            self.request_id,
-            self.authorizer.fetch_token().await.map_err(infra_error)?,
-            metadata,
-        )
-        .map_err(infra_error)?;
+        set_metadata(&mut request, self.request_id, &self.authorizer, metadata)
+            .await
+            .map_err(infra_error)?;
 
         let response = client
             .get_menu_badge(request)

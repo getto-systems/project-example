@@ -15,10 +15,13 @@ service CheckAuthTicketPb {
 }
 message CheckAuthTicketRequestPb {}
 message CheckAuthTicketResponsePb {
-    auth.user.service.AuthUserPb user = 1;
-    AuthTokenEncodedPb token = 2;
+    auth.user.service.GrantedAuthRolesPb roles = 1;
+    EncodedAuthTokensPb token = 2;
 }
-message AuthTokenEncodedPb {
+message CheckAuthTicketMaskedResponsePb {
+    auth.user.service.GrantedAuthRolesPb roles = 1;
+}
+message EncodedAuthTokensPb {
     AuthTokenPb ticket_token = 1;
     AuthTokenPb api_token = 2;
     repeated CloudfrontTokenPb cloudfront_tokens = 3;
@@ -44,6 +47,4 @@ message ValidateApiTokenRequestPb {
     bool allow_any_role = 1;
     repeated string require_roles = 2;
 }
-message ValidateApiTokenResponsePb {
-    auth.user.service.AuthUserPb user = 1;
-}
+message ValidateApiTokenResponsePb {}

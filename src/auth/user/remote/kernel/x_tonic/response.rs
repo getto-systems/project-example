@@ -5,37 +5,29 @@ use tonic::{Response, Status};
 use crate::z_lib::remote::response::tonic::RespondTo;
 
 use crate::auth::{
-    ticket::remote::y_protobuf::service::{
-        ValidateApiTokenRequestPb, ValidateApiTokenResponsePb,
-    },
-    user::remote::y_protobuf::service::AuthUserPb,
+    ticket::remote::y_protobuf::service::{ValidateApiTokenRequestPb, ValidateApiTokenResponsePb},
+    user::remote::y_protobuf::service::GrantedAuthRolesPb,
 };
 
-use crate::auth::user::remote::kernel::data::{AuthUser, AuthUserExtract, RequireAuthRoles};
+use crate::auth::user::remote::kernel::data::{AuthUser, GrantedAuthRoles, RequireAuthRoles};
 
 impl RespondTo<ValidateApiTokenResponsePb> for AuthUser {
     fn respond_to(self) -> Result<Response<ValidateApiTokenResponsePb>, Status> {
-        Ok(Response::new(ValidateApiTokenResponsePb {
-            user: Some(self.extract().into()),
-        }))
+        Ok(Response::new(ValidateApiTokenResponsePb {}))
     }
 }
 
-impl Into<AuthUserPb> for AuthUserExtract {
-    fn into(self) -> AuthUserPb {
-        AuthUserPb {
-            user_id: self.user_id,
-            granted_roles: Vec::from_iter(self.granted_roles.into_iter()),
+impl Into<GrantedAuthRolesPb> for GrantedAuthRoles {
+    fn into(self) -> GrantedAuthRolesPb {
+        GrantedAuthRolesPb {
+            granted_roles: Vec::from_iter(self.extract().into_iter()),
         }
     }
 }
 
-impl Into<AuthUserExtract> for AuthUserPb {
-    fn into(self) -> AuthUserExtract {
-        AuthUserExtract {
-            user_id: self.user_id,
-            granted_roles: HashSet::from_iter(self.granted_roles.into_iter()),
-        }
+impl Into<GrantedAuthRoles> for GrantedAuthRolesPb {
+    fn into(self) -> GrantedAuthRoles {
+        GrantedAuthRoles::restore(HashSet::from_iter(self.granted_roles.into_iter()))
     }
 }
 
@@ -48,7 +40,7 @@ impl Into<ValidateApiTokenRequestPb> for RequireAuthRoles {
             },
             Self::HasAny(require_roles) => ValidateApiTokenRequestPb {
                 allow_any_role: false,
-                require_roles: Vec::from_iter(require_roles.extract().into_iter()),
+                require_roles: Vec::from_iter(require_roles.into_iter()),
             },
         }
     }

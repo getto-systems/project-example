@@ -1,11 +1,11 @@
 use crate::auth::{
-    ticket::remote::kernel::data::{AuthTokenEncoded, ExpireDateTime},
-    user::remote::kernel::data::AuthUserExtract,
+    ticket::remote::kernel::data::{EncodedAuthTokens, ExpireDateTime},
+    user::remote::kernel::data::GrantedAuthRoles,
 };
 
 pub struct AuthTicketEncoded {
-    pub user: AuthUserExtract,
-    pub token: AuthTokenEncoded,
+    pub roles: GrantedAuthRoles,
+    pub token: EncodedAuthTokens,
 }
 
 #[derive(Clone)]

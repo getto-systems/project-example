@@ -2,12 +2,12 @@ use chrono::{DateTime, Utc};
 
 use crate::{
     auth::{
-        remote::service::data::AuthServiceError,
+        remote::proxy::data::AuthProxyError,
         ticket::remote::kernel::data::{
             AuthDateTime, AuthNonce, AuthTicketExtract, AuthToken, DecodeAuthTokenError,
             ExpireDateTime,
         },
-        user::remote::kernel::data::{AuthUserId, RequireAuthRoles},
+        user::remote::kernel::data::RequireAuthRoles,
     },
     z_lib::remote::{
         repository::data::{RegisterResult, RepositoryError},
@@ -45,7 +45,7 @@ pub trait ValidateService {
         &self,
         metadata: AuthMetadataContent,
         require_roles: RequireAuthRoles,
-    ) -> Result<AuthUserId, AuthServiceError>;
+    ) -> Result<(), AuthProxyError>;
 }
 
 #[async_trait::async_trait]

@@ -2,7 +2,9 @@ use tonic::{Response, Status};
 
 use crate::z_lib::remote::response::tonic::RespondTo;
 
-use crate::auth::ticket::remote::y_protobuf::service::CheckAuthTicketResponsePb;
+use crate::auth::ticket::remote::y_protobuf::service::{
+    CheckAuthTicketMaskedResponsePb, CheckAuthTicketResponsePb, EncodedAuthTokensPb,
+};
 
 use super::super::action::CheckAuthTicketState;
 
@@ -10,10 +12,7 @@ use crate::auth::ticket::remote::{
     encode::method::EncodeAuthTicketEvent, validate::method::ValidateAuthTokenEvent,
 };
 
-use crate::auth::{
-    ticket::remote::{encode::data::AuthTicketEncoded, kernel::data::AuthTokenEncoded},
-    user::remote::kernel::data::AuthUserExtract,
-};
+use crate::auth::ticket::remote::encode::data::AuthTicketEncoded;
 
 impl RespondTo<CheckAuthTicketResponsePb> for CheckAuthTicketState {
     fn respond_to(self) -> Result<Response<CheckAuthTicketResponsePb>, Status> {
@@ -27,22 +26,18 @@ impl RespondTo<CheckAuthTicketResponsePb> for CheckAuthTicketState {
 impl RespondTo<CheckAuthTicketResponsePb> for AuthTicketEncoded {
     fn respond_to(self) -> Result<Response<CheckAuthTicketResponsePb>, Status> {
         Ok(Response::new(CheckAuthTicketResponsePb {
-            user: Some(self.user.into()),
+            roles: Some(self.roles.into()),
             token: Some(self.token.into()),
         }))
     }
 }
 
-impl Into<Option<AuthTicketEncoded>> for CheckAuthTicketResponsePb {
-    fn into(self) -> Option<AuthTicketEncoded> {
-        match (self.user, self.token) {
-            (Some(user), Some(token)) => {
-                let user: AuthUserExtract = user.into();
-                let token: Option<AuthTokenEncoded> = token.into();
-                token.map(|token| AuthTicketEncoded { user, token })
-            }
-            _ => None,
-        }
+impl CheckAuthTicketResponsePb {
+    pub fn extract(self) -> (Option<EncodedAuthTokensPb>, CheckAuthTicketMaskedResponsePb) {
+        (
+            self.token,
+            CheckAuthTicketMaskedResponsePb { roles: self.roles },
+        )
     }
 }
 

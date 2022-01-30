@@ -4,77 +4,100 @@ use crate::auth::ticket::remote::y_protobuf::service::{
     check_auth_ticket_pb_client::CheckAuthTicketPbClient, CheckAuthTicketRequestPb,
 };
 
-use crate::auth::remote::x_outside_feature::common::feature::AuthOutsideService;
-
-use crate::z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer;
+use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideFeature;
 
 use crate::{
-    auth::remote::service::helper::{infra_error, set_metadata},
-    z_lib::remote::service::helper::new_endpoint,
+    auth::ticket::remote::kernel::init::response_builder::CookieAuthTokenResponseBuilder,
+    z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer,
 };
-
-use crate::auth::remote::service::proxy::AuthProxyService;
 
 use crate::{
-    auth::ticket::remote::validate::infra::AuthMetadataContent,
-    z_lib::remote::service::infra::ServiceAuthorizer,
+    auth::remote::proxy::helper::infra_error,
+    z_lib::remote::{message::helper::encode_protobuf_base64, service::helper::new_endpoint},
 };
+
+use crate::auth::remote::proxy::method::set_metadata;
 
 use crate::auth::{
-    remote::service::data::AuthServiceError, ticket::remote::encode::data::AuthTicketEncoded,
+    remote::proxy::infra::AuthProxyService,
+    ticket::remote::{
+        kernel::infra::AuthTokenResponseBuilder, validate::infra::AuthMetadataContent,
+    },
+};
+
+use crate::{
+    auth::{
+        remote::proxy::data::AuthProxyError,
+        ticket::remote::kernel::data::{AuthTokenMessage, AuthTokenResponse},
+    },
+    z_lib::remote::message::data::MessageError,
 };
 
 pub struct ProxyService<'a> {
     service_url: &'static str,
     request_id: &'a str,
     authorizer: GoogleServiceAuthorizer,
+    response_builder: CookieAuthTokenResponseBuilder<'a>,
 }
 
 impl<'a> ProxyService<'a> {
-    pub fn new(service: &'a AuthOutsideService, request_id: &'a str) -> Self {
+    pub fn new(feature: &'a AuthOutsideFeature, request_id: &'a str) -> Self {
         Self {
-            service_url: service.service_url,
+            service_url: feature.service.service_url,
             request_id,
-            authorizer: GoogleServiceAuthorizer::new(service.service_url),
+            authorizer: GoogleServiceAuthorizer::new(feature.service.service_url),
+            response_builder: CookieAuthTokenResponseBuilder::new(&feature.cookie),
         }
     }
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthProxyService<(), AuthTicketEncoded> for ProxyService<'a> {
+impl<'a> AuthProxyService for ProxyService<'a> {
+    type Response = AuthTokenResponse;
+
     fn name(&self) -> &str {
         "auth.ticket.check"
     }
-    async fn call(
-        &self,
-        metadata: AuthMetadataContent,
-        _params: (),
-    ) -> Result<AuthTicketEncoded, AuthServiceError> {
-        let mut client = CheckAuthTicketPbClient::new(
-            new_endpoint(self.service_url)
-                .map_err(infra_error)?
-                .connect()
-                .await
-                .map_err(infra_error)?,
-        );
-
-        let mut request = Request::new(CheckAuthTicketRequestPb {});
-        set_metadata(
-            &mut request,
-            self.request_id,
-            self.authorizer.fetch_token().await.map_err(infra_error)?,
-            metadata,
-        )
-        .map_err(infra_error)?;
-
-        let response = client
-            .check(request)
-            .await
-            .map_err(AuthServiceError::from)?;
-
-        let ticket: Option<AuthTicketEncoded> = response.into_inner().into();
-        ticket.ok_or(AuthServiceError::InfraError(
-            "failed to decode response".into(),
-        ))
+    async fn call(self, metadata: AuthMetadataContent) -> Result<Self::Response, AuthProxyError> {
+        call(self, metadata).await
     }
+}
+
+async fn call<'a>(
+    service: ProxyService<'a>,
+    metadata: AuthMetadataContent,
+) -> Result<AuthTokenResponse, AuthProxyError> {
+    let mut client = CheckAuthTicketPbClient::new(
+        new_endpoint(service.service_url)
+            .map_err(infra_error)?
+            .connect()
+            .await
+            .map_err(infra_error)?,
+    );
+
+    let mut request = Request::new(CheckAuthTicketRequestPb {});
+    set_metadata(
+        &mut request,
+        service.request_id,
+        &service.authorizer,
+        metadata,
+    )
+    .await
+    .map_err(infra_error)?;
+
+    let response = client
+        .check(request)
+        .await
+        .map_err(AuthProxyError::from)?
+        .into_inner();
+
+    let (token, message) = response.extract();
+    Ok(service.response_builder.build(AuthTokenMessage {
+        body: encode_protobuf_base64(message).map_err(AuthProxyError::MessageError)?,
+        token: token
+            .and_then(|token| token.into())
+            .ok_or(AuthProxyError::MessageError(MessageError::Invalid(
+                "invalid response; token not exists".into(),
+            )))?,
+    }))
 }

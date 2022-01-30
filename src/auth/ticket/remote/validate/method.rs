@@ -10,12 +10,12 @@ use crate::auth::ticket::remote::{
 
 use crate::{
     auth::{
-        remote::service::data::AuthServiceError,
+        remote::proxy::data::AuthProxyError,
         ticket::remote::kernel::data::{
             AuthTicket, DecodeAuthTokenError, ExpireDateTime, ExpireDuration,
             ValidateAuthRolesError,
         },
-        user::remote::kernel::data::{AuthUserId, RequireAuthRoles},
+        user::remote::kernel::data::RequireAuthRoles,
     },
     z_lib::remote::{
         repository::data::{RegisterResult, RepositoryError},
@@ -101,8 +101,8 @@ fn decode_ticket(
 }
 
 pub enum ValidateApiTokenEvent {
-    Success(AuthUserId),
-    ServiceError(AuthServiceError),
+    Success,
+    ServiceError(AuthProxyError),
     MetadataError(MetadataError),
     DecodeError(DecodeAuthTokenError),
 }
@@ -116,7 +116,7 @@ mod validate_api_token_event {
     impl std::fmt::Display for ValidateApiTokenEvent {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
-                Self::Success(user_id) => write!(f, "{}; {}", SUCCESS, user_id),
+                Self::Success => write!(f, "{}", SUCCESS),
                 Self::ServiceError(err) => write!(f, "{}; {}", ERROR, err),
                 Self::MetadataError(err) => write!(f, "{}; {}", ERROR, err),
                 Self::DecodeError(err) => write!(f, "{}; {}", ERROR, err),
@@ -139,7 +139,7 @@ pub async fn validate_api_token<S>(
     infra: &impl ValidateApiTokenInfra,
     require_roles: RequireAuthRoles,
     post: impl Fn(ValidateApiTokenEvent) -> S,
-) -> Result<AuthUserId, S> {
+) -> MethodResult<S> {
     let auth_metadata = infra.auth_metadata();
     let token_decoder = infra.token_decoder();
     let validate_service = infra.validate_service();
@@ -154,13 +154,12 @@ pub async fn validate_api_token<S>(
             .map_err(|err| post(ValidateApiTokenEvent::DecodeError(err)))?;
     }
 
-    let user_id = validate_service
+    validate_service
         .validate(metadata, require_roles)
         .await
         .map_err(|err| post(ValidateApiTokenEvent::ServiceError(err)))?;
 
-    post(ValidateApiTokenEvent::Success(user_id.clone()));
-    Ok(user_id)
+    Ok(post(ValidateApiTokenEvent::Success))
 }
 
 pub enum ValidateAuthMetadataEvent {

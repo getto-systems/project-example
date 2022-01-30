@@ -1,8 +1,8 @@
 use tonic::{Code, Status};
 
-use crate::auth::remote::service::data::AuthServiceError;
+use crate::auth::remote::proxy::data::AuthProxyError;
 
-impl From<Status> for AuthServiceError {
+impl From<Status> for AuthProxyError {
     fn from(status: Status) -> Self {
         match status.code() {
             Code::InvalidArgument => Self::InvalidArgument(status.message().into()),

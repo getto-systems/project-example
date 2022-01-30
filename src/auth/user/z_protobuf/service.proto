@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package auth.user.service;
 
-message AuthUserPb {
-    string user_id = 1;
+message GrantedAuthRolesPb {
     repeated string granted_roles = 2;
 }

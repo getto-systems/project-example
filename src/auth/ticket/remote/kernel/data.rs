@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use chrono::{DateTime, Duration, Utc};
 
 use crate::auth::user::remote::kernel::data::{
-    AuthPermission, AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
+    AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
 };
 
 #[derive(Clone)]
@@ -47,7 +47,7 @@ pub struct AuthTokenExtract {
     pub expires: i64,
 }
 
-pub struct AuthTokenEncoded {
+pub struct EncodedAuthTokens {
     pub ticket_token: AuthTokenExtract,
     pub api_token: AuthTokenExtract,
     pub cloudfront_tokens: HashMap<CloudfrontTokenKind, AuthTokenExtract>,
@@ -67,7 +67,7 @@ pub struct AuthTokenResponse {
 
 pub struct AuthTokenMessage {
     pub body: String,
-    pub token: AuthTokenEncoded,
+    pub token: EncodedAuthTokens,
 }
 
 #[derive(Clone)]
@@ -126,7 +126,11 @@ impl AuthTicket {
         self,
         require_roles: RequireAuthRoles,
     ) -> Result<Self, ValidateAuthRolesError> {
-        if AuthPermission::new(&self.user).has_enough_permission(&require_roles) {
+        if self
+            .user
+            .granted_roles()
+            .has_enough_permission(&require_roles)
+        {
             Ok(self)
         } else {
             Err(ValidateAuthRolesError::PermissionDenied(

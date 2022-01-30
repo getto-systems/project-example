@@ -5,7 +5,7 @@ use crate::auth::{
         validate::infra::ValidateApiTokenRequestDecoder,
         y_protobuf::service::ValidateApiTokenRequestPb,
     },
-    user::remote::kernel::data::{AuthRoles, RequireAuthRoles},
+    user::remote::kernel::data::RequireAuthRoles,
 };
 
 pub struct PbValidateApiTokenRequestDecoder {
@@ -27,7 +27,7 @@ impl ValidateApiTokenRequestDecoder for PbValidateApiTokenRequestDecoder {
             self.request.require_roles.into_iter().for_each(|role| {
                 require_roles.insert(role);
             });
-            RequireAuthRoles::HasAny(AuthRoles::restore(require_roles))
+            RequireAuthRoles::HasAny(require_roles)
         }
     }
 }
