@@ -23,9 +23,10 @@ impl std::fmt::Display for ValidateApiTokenState {
 }
 
 pub trait ValidateApiTokenMaterial {
-    type Validate: ValidateAuthTokenInfra;
+    type RequestDecoder: ValidateApiTokenRequestDecoder;
+    type Infra: ValidateAuthTokenInfra;
 
-    fn validate(&self) -> &Self::Validate;
+    fn extract(self) -> (Self::RequestDecoder, Self::Infra);
 }
 
 pub struct ValidateApiTokenAction<M: ValidateApiTokenMaterial> {
@@ -45,16 +46,13 @@ impl<M: ValidateApiTokenMaterial> ValidateApiTokenAction<M> {
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(
-        self,
-        request_decoder: impl ValidateApiTokenRequestDecoder,
-    ) -> MethodResult<ValidateApiTokenState> {
+    pub async fn ignite(self) -> MethodResult<ValidateApiTokenState> {
         let pubsub = self.pubsub;
-        let m = self.material;
+        let (request_decoder, infra) = self.material.extract();
 
         let require_roles = request_decoder.decode();
 
-        let ticket = validate_auth_token(m.validate(), require_roles, |event| {
+        let ticket = validate_auth_token(&infra, require_roles, |event| {
             pubsub.post(ValidateApiTokenState::Validate(event))
         })
         .await?;

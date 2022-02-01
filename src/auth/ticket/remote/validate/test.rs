@@ -32,13 +32,12 @@ async fn success_allow_for_any_role() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
-    let request_decoder = allow_any_role_request_decoder();
+    let feature = TestFeature::standard(&store, allow_any_role_request_decoder());
 
     let mut action = ValidateApiTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
@@ -53,13 +52,12 @@ async fn success_allow_for_something_role() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::standard(&store);
-    let request_decoder = allow_something_role_request_decoder();
+    let feature = TestFeature::standard(&store, allow_something_role_request_decoder());
 
     let mut action = ValidateApiTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
@@ -74,13 +72,12 @@ async fn error_allow_for_something_role_but_not_granted() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::no_granted_roles(&store);
-    let request_decoder = allow_something_role_request_decoder();
+    let feature = TestFeature::no_granted_roles(&store, allow_something_role_request_decoder());
 
     let mut action = ValidateApiTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
@@ -94,13 +91,12 @@ async fn error_token_expired() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestFeature::token_expired(&store);
-    let request_decoder = allow_something_role_request_decoder();
+    let feature = TestFeature::token_expired(&store, allow_something_role_request_decoder());
 
     let mut action = ValidateApiTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
@@ -114,13 +110,12 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let feature = TestFeature::standard(&store);
-    let request_decoder = allow_something_role_request_decoder();
+    let feature = TestFeature::standard(&store, allow_something_role_request_decoder());
 
     let mut action = ValidateApiTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
@@ -135,13 +130,12 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let feature = TestFeature::standard(&store);
-    let request_decoder = allow_something_role_request_decoder();
+    let feature = TestFeature::standard(&store, allow_something_role_request_decoder());
 
     let mut action = ValidateApiTokenAction::with_material(feature);
     action.subscribe(handler);
 
-    let result = action.ignite(request_decoder).await;
+    let result = action.ignite().await;
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce error; conflict",
@@ -150,14 +144,16 @@ async fn error_conflict_nonce() {
 }
 
 struct TestFeature<'a> {
-    validate: StaticValidateAuthTokenStruct<'a>,
+    request_decoder: StaticValidateApiTokenRequestDecoder,
+    infra: StaticValidateAuthTokenStruct<'a>,
 }
 
 impl<'a> ValidateApiTokenMaterial for TestFeature<'a> {
-    type Validate = StaticValidateAuthTokenStruct<'a>;
+    type RequestDecoder = StaticValidateApiTokenRequestDecoder;
+    type Infra = StaticValidateAuthTokenStruct<'a>;
 
-    fn validate(&self) -> &Self::Validate {
-        &self.validate
+    fn extract(self) -> (Self::RequestDecoder, Self::Infra) {
+        (self.request_decoder, self.infra)
     }
 }
 
@@ -184,19 +180,33 @@ impl TestStore {
 }
 
 impl<'a> TestFeature<'a> {
-    fn standard(store: &'a TestStore) -> Self {
-        Self::with_token_validator(store, standard_token_decoder())
+    fn standard(
+        store: &'a TestStore,
+        request_decoder: StaticValidateApiTokenRequestDecoder,
+    ) -> Self {
+        Self::with_token_validator(store, request_decoder, standard_token_decoder())
     }
-    fn no_granted_roles(store: &'a TestStore) -> Self {
-        Self::with_token_validator(store, no_granted_roles_token_decoder())
+    fn no_granted_roles(
+        store: &'a TestStore,
+        request_decoder: StaticValidateApiTokenRequestDecoder,
+    ) -> Self {
+        Self::with_token_validator(store, request_decoder, no_granted_roles_token_decoder())
     }
-    fn token_expired(store: &'a TestStore) -> Self {
-        Self::with_token_validator(store, expired_token_decoder())
+    fn token_expired(
+        store: &'a TestStore,
+        request_decoder: StaticValidateApiTokenRequestDecoder,
+    ) -> Self {
+        Self::with_token_validator(store, request_decoder, expired_token_decoder())
     }
 
-    fn with_token_validator(store: &'a TestStore, token_decoder: StaticAuthTokenDecoder) -> Self {
+    fn with_token_validator(
+        store: &'a TestStore,
+        request_decoder: StaticValidateApiTokenRequestDecoder,
+        token_decoder: StaticAuthTokenDecoder,
+    ) -> Self {
         Self {
-            validate: StaticValidateAuthTokenStruct {
+            request_decoder,
+            infra: StaticValidateAuthTokenStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),

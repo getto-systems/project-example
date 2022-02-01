@@ -9,10 +9,10 @@ pub mod validate_service;
 use actix_web::HttpRequest;
 use tonic::metadata::MetadataMap;
 
-use crate::auth::remote::x_outside_feature::{
+use crate::{auth::{remote::x_outside_feature::{
     auth::feature::AuthOutsideFeature,
     common::feature::{AuthOutsideDecodingKey, AuthOutsideService},
-};
+}, ticket::remote::{validate::{init::request_decoder::PbValidateApiTokenRequestDecoder, action::{ValidateApiTokenAction, ValidateApiTokenMaterial}}, y_protobuf::service::ValidateApiTokenRequestPb}}, x_outside_feature::remote::auth::feature::AuthAppFeature};
 
 use crate::auth::ticket::remote::{
     kernel::init::clock::ChronoAuthClock,
@@ -27,9 +27,37 @@ use crate::auth::ticket::remote::{
 };
 
 use crate::auth::ticket::remote::validate::method::{
-    AuthNonceConfig, ValidateApiTokenInfra, ValidateAuthMetadataInfra, ValidateAuthNonceInfra,
+    AuthNonceConfig, CheckPermissionInfra, ValidateAuthMetadataInfra, ValidateAuthNonceInfra,
     ValidateAuthTokenInfra,
 };
+
+pub struct ValidateApiTokenStruct<'a> {
+    request_decoder: PbValidateApiTokenRequestDecoder,
+    validate: ApiValidateAuthTokenStruct<'a>,
+}
+
+impl<'a> ValidateApiTokenStruct<'a> {
+    pub fn action(
+        feature: &'a AuthAppFeature,
+        metadata: &'a MetadataMap,
+        request: ValidateApiTokenRequestPb,
+    ) -> ValidateApiTokenAction<Self> {
+        ValidateApiTokenAction::with_material(Self {
+            request_decoder: PbValidateApiTokenRequestDecoder::new(request),
+            validate: ApiValidateAuthTokenStruct::new(&feature.auth, metadata),
+        })
+    }
+}
+
+#[async_trait::async_trait]
+impl<'a> ValidateApiTokenMaterial for ValidateApiTokenStruct<'a> {
+    type RequestDecoder = PbValidateApiTokenRequestDecoder;
+    type Infra = ApiValidateAuthTokenStruct<'a>;
+
+    fn extract(self) -> (Self::RequestDecoder, Self::Infra) {
+        (self.request_decoder, self.validate)
+    }
+}
 
 pub struct TicketValidateAuthTokenStruct<'a> {
     validate_nonce: ValidateAuthNonceStruct<'a>,
@@ -95,13 +123,13 @@ impl<'a> ValidateAuthTokenInfra for ApiValidateAuthTokenStruct<'a> {
     }
 }
 
-pub struct ValidateApiTokenStruct<'a> {
+pub struct CheckPermissionStruct<'a> {
     auth_metadata: TonicAuthMetadata<'a>,
     token_decoder: NoopTokenDecoder,
     validate_service: TonicValidateService<'a>,
 }
 
-impl<'a> ValidateApiTokenStruct<'a> {
+impl<'a> CheckPermissionStruct<'a> {
     pub fn new(
         service: &'a AuthOutsideService,
         request_id: &'a str,
@@ -115,7 +143,7 @@ impl<'a> ValidateApiTokenStruct<'a> {
     }
 }
 
-impl<'a> ValidateApiTokenInfra for ValidateApiTokenStruct<'a> {
+impl<'a> CheckPermissionInfra for CheckPermissionStruct<'a> {
     type AuthMetadata = TonicAuthMetadata<'a>;
     type TokenDecoder = NoopTokenDecoder;
     type ValidateService = TonicValidateService<'a>;
@@ -268,7 +296,7 @@ pub mod test {
     };
 
     use crate::auth::ticket::remote::validate::method::{
-        AuthNonceConfig, ValidateApiTokenInfra, ValidateAuthNonceInfra, ValidateAuthTokenInfra,
+        AuthNonceConfig, CheckPermissionInfra, ValidateAuthNonceInfra, ValidateAuthTokenInfra,
     };
 
     pub struct StaticValidateAuthTokenStruct<'a> {
@@ -299,7 +327,7 @@ pub mod test {
         pub validate_service: StaticValidateService,
     }
 
-    impl ValidateApiTokenInfra for StaticValidateApiTokenStruct {
+    impl CheckPermissionInfra for StaticValidateApiTokenStruct {
         type AuthMetadata = StaticAuthMetadata;
         type TokenDecoder = StaticAuthTokenDecoder;
         type ValidateService = StaticValidateService;

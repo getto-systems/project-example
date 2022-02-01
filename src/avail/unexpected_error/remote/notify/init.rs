@@ -2,17 +2,19 @@ pub mod request_decoder;
 
 use tonic::metadata::MetadataMap;
 
-use crate::auth::remote::init::ValidateApiTokenStruct;
 use crate::avail::unexpected_error::remote::y_protobuf::service::NotifyRequestPb;
 
 use crate::x_outside_feature::remote::example::feature::ExampleAppFeature;
 
-use crate::avail::unexpected_error::remote::notify::init::request_decoder::PbNotifyUnexpectedErrorRequestDecoder;
+use crate::{
+    auth::remote::init::CheckPermissionStruct,
+    avail::unexpected_error::remote::notify::init::request_decoder::PbNotifyUnexpectedErrorRequestDecoder,
+};
 
 use super::action::{NotifyUnexpectedErrorAction, NotifyUnexpectedErrorMaterial};
 
 pub struct NotifyUnexpectedErrorFeature<'a> {
-    validate: ValidateApiTokenStruct<'a>,
+    check_permission: CheckPermissionStruct<'a>,
 }
 
 impl<'a> NotifyUnexpectedErrorFeature<'a> {
@@ -25,7 +27,11 @@ impl<'a> NotifyUnexpectedErrorFeature<'a> {
         NotifyUnexpectedErrorAction::with_material(
             PbNotifyUnexpectedErrorRequestDecoder::new(request),
             Self {
-                validate: ValidateApiTokenStruct::new(&feature.auth.service, request_id, metadata),
+                check_permission: CheckPermissionStruct::new(
+                    &feature.auth.service,
+                    request_id,
+                    metadata,
+                ),
             },
         )
     }
@@ -33,9 +39,9 @@ impl<'a> NotifyUnexpectedErrorFeature<'a> {
 
 #[async_trait::async_trait]
 impl<'a> NotifyUnexpectedErrorMaterial for NotifyUnexpectedErrorFeature<'a> {
-    type Validate = ValidateApiTokenStruct<'a>;
+    type CheckPermission = CheckPermissionStruct<'a>;
 
-    fn validate(&self) -> &Self::Validate {
-        &self.validate
+    fn check_permission(&self) -> &Self::CheckPermission {
+        &self.check_permission
     }
 }

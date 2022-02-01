@@ -1,9 +1,26 @@
-use crate::z_lib::remote::logger::{LogLevel, LogFilter};
+use crate::z_lib::remote::logger::{LogFilter, LogLevel, LogMessage};
+
+use crate::auth::ticket::remote::validate::action::ValidateApiTokenState;
 
 use crate::auth::ticket::remote::validate::method::{
-    ValidateApiTokenEvent, ValidateAuthMetadataEvent, ValidateAuthNonceEvent,
+    CheckPermissionEvent, ValidateAuthMetadataEvent, ValidateAuthNonceEvent,
     ValidateAuthTokenEvent,
 };
+
+impl LogMessage for ValidateApiTokenState {
+    fn log_message(&self) -> String {
+        format!("{}", self)
+    }
+}
+
+impl LogFilter for ValidateApiTokenState {
+    fn log_level(&self) -> LogLevel {
+        match self {
+            Self::Validate(event) => event.log_level(),
+            Self::Success(_) => LogLevel::Info,
+        }
+    }
+}
 
 impl LogFilter for ValidateAuthTokenEvent {
     fn log_level(&self) -> LogLevel {
@@ -18,7 +35,7 @@ impl LogFilter for ValidateAuthTokenEvent {
     }
 }
 
-impl LogFilter for ValidateApiTokenEvent {
+impl LogFilter for CheckPermissionEvent {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::Success => LogLevel::Info,
