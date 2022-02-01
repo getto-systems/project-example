@@ -7,19 +7,18 @@ import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-applicati
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../../z_lib/ui/clock/mock"
 import { mockSecureServerURL } from "../../../../sign/get_script_path/init/mock"
 import { mockResetPasswordShell } from "./init/mock"
+import { initMemoryDB } from "../../../../../z_lib/ui/repository/init/memory"
+
+import { authTicketRepositoryConverter } from "../../../../ticket/kernel/convert"
+import { convertCheckRemote } from "../../../../ticket/check/convert"
+import { convertDB } from "../../../../../z_lib/ui/repository/init/convert"
 
 import { Clock } from "../../../../../z_lib/ui/clock/infra"
 import { ResetPasswordRemote, ResetPasswordRemoteResult } from "./infra"
-import {
-    AuthTicketRepository,
-    AuthTicketRepositoryValue,
-    RenewAuthTicketRemote,
-} from "../../../../ticket/kernel/infra"
+import { AuthTicketRepository, AuthTicketRepositoryValue } from "../../../../ticket/kernel/infra"
+import { CheckAuthTicketRemote } from "../../../../ticket/check/infra"
 import { BoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/infra"
 
-import { authTicketRepositoryConverter, convertAuthRemote } from "../../../../ticket/kernel/convert"
-import { initMemoryDB } from "../../../../../z_lib/ui/repository/init/memory"
-import { convertDB } from "../../../../../z_lib/ui/repository/init/convert"
 import { initResetPasswordAction, ResetPasswordAction } from "./action"
 import { ApplicationView } from "../../../../../../ui/vendor/getto-application/action/action"
 
@@ -216,7 +215,7 @@ function emptyResetToken() {
 function initView(
     currentURL: URL,
     resetRemote: ResetPasswordRemote,
-    renewRemote: RenewAuthTicketRemote,
+    renewRemote: CheckAuthTicketRemote,
     clock: Clock,
 ): Readonly<{
     view: ApplicationView<ResetPasswordAction>
@@ -281,11 +280,11 @@ function takeLongtime_resetRemote(clock: Clock): ResetPasswordRemote {
 function standard_resetPasswordRemoteResult(clock: Clock): ResetPasswordRemoteResult {
     return {
         success: true,
-        value: convertAuthRemote(clock, { roles: ["role"] }),
+        value: convertCheckRemote(clock, ["role"]),
     }
 }
 
-function standard_renewRemote(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
+function standard_renewRemote(clock: Clock, clockPubSub: ClockPubSub): CheckAuthTicketRemote {
     let count = 0
     return async () => {
         if (count > 1) {
@@ -300,7 +299,7 @@ function standard_renewRemote(clock: Clock, clockPubSub: ClockPubSub): RenewAuth
         count++
         return {
             success: true,
-            value: convertAuthRemote(clock, { roles: ["role"] }),
+            value: convertCheckRemote(clock, ["role"]),
         }
     }
 }

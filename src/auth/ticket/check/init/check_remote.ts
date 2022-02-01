@@ -12,21 +12,21 @@ import { decodeProtobuf } from "../../../../../ui/vendor/protobuf/helper"
 import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
 
 import { Clock } from "../../../../z_lib/ui/clock/infra"
-import { RenewAuthTicketRemote } from "../infra"
+import { CheckAuthTicketRemote } from "../infra"
 
-import { convertAuthRemote } from "../convert"
+import { convertCheckRemote } from "../convert"
 
-export function newRenewAuthTicketRemote(
+export function newCheckAuthTicketRemote(
     feature: RemoteOutsideFeature,
     clock: Clock,
-): RenewAuthTicketRemote {
+): CheckAuthTicketRemote {
     return async () => {
         try {
             const mock = false
             if (mock) {
                 return {
                     success: true,
-                    value: convertAuthRemote(clock, { roles: ["admin", "dev-docs"] }),
+                    value: convertCheckRemote(clock, ["admin", "dev-docs"]),
                 }
             }
 
@@ -42,15 +42,14 @@ export function newRenewAuthTicketRemote(
                 return remoteCommonError(response.status)
             }
 
+            const message = decodeProtobuf(
+                pb.auth.ticket.service.CheckAuthTicketMaskedResponsePb,
+                await response.text(),
+            )
+
             return {
                 success: true,
-                value: convertAuthRemote(
-                    clock,
-                    decodeProtobuf(
-                        pb.auth.ticket.api.AuthenticateApiResponsePb,
-                        await response.text(),
-                    ),
-                ),
+                value: convertCheckRemote(clock, message.roles?.grantedRoles || []),
             }
         } catch (err) {
             return remoteInfraError(err)

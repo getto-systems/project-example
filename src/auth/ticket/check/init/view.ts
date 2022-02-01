@@ -4,7 +4,7 @@ import { newCheckAuthTicketConfig } from "./config"
 
 import { newGetScriptPathShell } from "../../../sign/get_script_path/init/infra"
 import { newAuthTicketRepository } from "../../kernel/init/ticket_repository"
-import { newRenewAuthTicketRemote } from "../../kernel/init/renew_remote"
+import { newCheckAuthTicketRemote } from "./check_remote"
 import { newClock } from "../../../../z_lib/ui/clock/init"
 
 import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
@@ -22,7 +22,7 @@ export function newCheckAuthTicketView(
         initCheckAuthTicketAction({
             infra: {
                 ticketRepository: newAuthTicketRepository(feature),
-                renewRemote: newRenewAuthTicketRemote(feature, newClock()),
+                renewRemote: newCheckAuthTicketRemote(feature, newClock()),
                 clock: newClock(),
             },
             shell: {

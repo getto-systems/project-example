@@ -1,13 +1,36 @@
-import { StartContinuousRenewConfig, StartContinuousRenewInfra } from "./infra"
-
-import { StartContinuousRenewEvent } from "./event"
+import { AuthTicketRepository } from "../kernel/infra"
+import { CheckAuthTicketRemote } from "./infra"
+import { Clock } from "../../../z_lib/ui/clock/infra"
+import { ExpireTime, IntervalTime } from "../../../z_lib/ui/config/infra"
 
 import { hasExpired } from "../kernel/helper"
+
 import { AuthTicket } from "../kernel/data"
+import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
+import { RepositoryError } from "../../../z_lib/ui/repository/data"
+
+export type StartContinuousRenewEvent =
+    | Readonly<{ type: "succeed-to-start-continuous-renew"; continue: true }>
+    | Readonly<{ type: "ticket-not-expired"; continue: true }>
+    | Readonly<{ type: "succeed-to-renew"; continue: true }>
+    | Readonly<{ type: "required-to-login"; continue: false }>
+    | Readonly<{ type: "failed-to-renew"; continue: false; err: RemoteCommonError }>
+    | Readonly<{ type: "repository-error"; continue: false; err: RepositoryError }>
 
 export type StartContinuousRenewMaterial = Readonly<{
     infra: StartContinuousRenewInfra
     config: StartContinuousRenewConfig
+}>
+
+export type StartContinuousRenewInfra = Readonly<{
+    ticketRepository: AuthTicketRepository
+    renewRemote: CheckAuthTicketRemote
+    clock: Clock
+}>
+
+export type StartContinuousRenewConfig = Readonly<{
+    continuousRenewInterval: IntervalTime
+    ticketExpire: ExpireTime
 }>
 
 type AuthTicketHolder =

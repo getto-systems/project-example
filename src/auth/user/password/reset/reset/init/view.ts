@@ -6,7 +6,7 @@ import { newGetScriptPathShell } from "../../../../../sign/get_script_path/init/
 import { toURL } from "../../../../../../z_lib/ui/location/init"
 import { newClock } from "../../../../../../z_lib/ui/clock/init"
 import { newAuthTicketRepository } from "../../../../../ticket/kernel/init/ticket_repository"
-import { newRenewAuthTicketRemote } from "../../../../../ticket/kernel/init/renew_remote"
+import { newCheckAuthTicketRemote } from "../../../../../ticket/check/init/check_remote"
 import { newResetPasswordRemote } from "./reset_remote"
 
 import { detectResetToken } from "../../../input/convert"
@@ -25,7 +25,7 @@ export function newResetPasswordView(
         initResetPasswordAction({
             infra: {
                 ticketRepository: newAuthTicketRepository(feature),
-                renewRemote: newRenewAuthTicketRemote(feature, newClock()),
+                renewRemote: newCheckAuthTicketRemote(feature, newClock()),
                 resetRemote: newResetPasswordRemote(feature, newClock()),
                 clock: newClock(),
             },

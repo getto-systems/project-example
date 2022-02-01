@@ -12,14 +12,12 @@ import {
 
 import { Clock } from "../../../../z_lib/ui/clock/infra"
 import { AuthenticatePasswordRemote, AuthenticatePasswordRemoteResult } from "./infra"
-import {
-    AuthTicketRepository,
-    AuthTicketRepositoryValue,
-    RenewAuthTicketRemote,
-} from "../../../ticket/kernel/infra"
+import { AuthTicketRepository, AuthTicketRepositoryValue } from "../../../ticket/kernel/infra"
+import { CheckAuthTicketRemote } from "../../../ticket/check/infra"
 import { BoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
 
-import { authTicketRepositoryConverter, convertAuthRemote } from "../../../ticket/kernel/convert"
+import { authTicketRepositoryConverter } from "../../../ticket/kernel/convert"
+import { convertCheckRemote } from "../../../ticket/check/convert"
 
 import { LoadScriptError } from "../../../sign/get_script_path/data"
 import { initMemoryDB } from "../../../../z_lib/ui/repository/init/memory"
@@ -194,7 +192,7 @@ function takeLongtime_elements() {
 
 function initView(
     authenticateRemote: AuthenticatePasswordRemote,
-    renewRemote: RenewAuthTicketRemote,
+    renewRemote: CheckAuthTicketRemote,
     clock: Clock,
 ): Readonly<{
     view: ApplicationView<AuthenticatePasswordAction>
@@ -257,11 +255,11 @@ function takeLongtime_authenticate(clock: Clock): AuthenticatePasswordRemote {
 function standard_authenticateRemoteResult(clock: Clock): AuthenticatePasswordRemoteResult {
     return {
         success: true,
-        value: convertAuthRemote(clock, { roles: ["role"] }),
+        value: convertCheckRemote(clock, ["role"]),
     }
 }
 
-function standard_renew(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
+function standard_renew(clock: Clock, clockPubSub: ClockPubSub): CheckAuthTicketRemote {
     let count = 0
     return async () => {
         if (count > 1) {
@@ -276,7 +274,7 @@ function standard_renew(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicket
         count++
         return {
             success: true,
-            value: convertAuthRemote(clock, { roles: ["role"] }),
+            value: convertCheckRemote(clock, ["role"]),
         }
     }
 }

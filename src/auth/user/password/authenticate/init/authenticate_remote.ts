@@ -14,7 +14,7 @@ import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 import { Clock } from "../../../../../z_lib/ui/clock/infra"
 import { AuthenticatePasswordRemote } from "../infra"
 
-import { convertAuthRemote } from "../../../../ticket/kernel/convert"
+import { convertCheckRemote } from "../../../../ticket/check/convert"
 
 export function newAuthenticatePasswordRemote(
     feature: RemoteOutsideFeature,
@@ -26,7 +26,7 @@ export function newAuthenticatePasswordRemote(
             if (mock) {
                 return {
                     success: true,
-                    value: convertAuthRemote(clock, { roles: ["admin", "dev-docs"] }),
+                    value: convertCheckRemote(clock, ["admin", "dev-docs"]),
                 }
             }
 
@@ -39,7 +39,7 @@ export function newAuthenticatePasswordRemote(
             const response = await fetch(opts.url, {
                 ...opts.options,
                 body: encodeProtobuf(
-                    pb.auth.user.password.api.AuthenticatePasswordApiRequestPb,
+                    pb.auth.user.password.service.AuthenticatePasswordRequestPb,
                     (message) => {
                         message.loginId = fields.loginID
                         message.password = fields.password
@@ -51,16 +51,16 @@ export function newAuthenticatePasswordRemote(
                 return remoteCommonError(response.status)
             }
 
-            const result = decodeProtobuf(
-                pb.auth.user.password.api.AuthenticatePasswordApiResponsePb,
+            const message = decodeProtobuf(
+                pb.auth.user.password.service.AuthenticatePasswordResponsePb,
                 await response.text(),
             )
-            if (!result.success) {
+            if (!message.success) {
                 return { success: false, err: { type: "invalid-password" } }
             }
             return {
                 success: true,
-                value: convertAuthRemote(clock, { roles: result.value?.roles || [] }),
+                value: convertCheckRemote(clock, message.roles?.grantedRoles || []),
             }
         } catch (err) {
             return remoteInfraError(err)

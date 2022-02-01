@@ -35,18 +35,13 @@ export function newGetMenuBadgeRemote(feature: RemoteOutsideFeature): GetMenuBad
                 return remoteCommonError(response.status)
             }
 
-            const result = decodeProtobuf(
-                pb.example.outline.api.GetMenuBadgeApiResponsePb,
+            const message = decodeProtobuf(
+                pb.example.outline.service.GetMenuBadgeResponsePb,
                 await response.text(),
             )
             return {
                 success: true,
-                value: convertMenuBadgeRemote([
-                    {
-                        path: "index.html",
-                        count: result.index,
-                    },
-                ]),
+                value: convertMenuBadgeRemote([{ path: "index.html", count: message.index }]),
             }
         } catch (err) {
             return remoteInfraError(err)

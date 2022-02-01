@@ -7,15 +7,13 @@ import { mockGetScriptPathShell, mockSecureServerURL } from "../../sign/get_scri
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"
-import { authTicketRepositoryConverter, convertAuthRemote } from "../kernel/convert"
+import { authTicketRepositoryConverter } from "../kernel/convert"
+import { convertCheckRemote } from "../check/convert"
 
 import { Clock } from "../../../z_lib/ui/clock/infra"
 import { WaitTime } from "../../../z_lib/ui/config/infra"
-import {
-    AuthTicketRepository,
-    AuthTicketRepositoryValue,
-    RenewAuthTicketRemote,
-} from "../kernel/infra"
+import { AuthTicketRepository, AuthTicketRepositoryValue } from "../kernel/infra"
+import { CheckAuthTicketRemote } from "./infra"
 
 import { ApplicationView } from "../../../../ui/vendor/getto-application/action/action"
 import { CheckAuthTicketAction, initCheckAuthTicketAction } from "./action"
@@ -239,7 +237,7 @@ function noStored() {
 
 function initView(
     ticketRepository: AuthTicketRepository,
-    renewRemote: RenewAuthTicketRemote,
+    renewRemote: CheckAuthTicketRemote,
     clock: Clock,
 ): ApplicationView<CheckAuthTicketAction> {
     return toApplicationView(
@@ -275,10 +273,10 @@ function noStored_ticketRepository(): AuthTicketRepository {
     return initMemoryDB<AuthTicket>()
 }
 
-function standard_renewRemote(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
+function standard_renewRemote(clock: Clock, clockPubSub: ClockPubSub): CheckAuthTicketRemote {
     return renewRemote(clock, clockPubSub, { wait_millisecond: 0 })
 }
-function wait_renewRemote(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
+function wait_renewRemote(clock: Clock, clockPubSub: ClockPubSub): CheckAuthTicketRemote {
     // wait for take longtime timeout
     return renewRemote(clock, clockPubSub, { wait_millisecond: 64 })
 }
@@ -286,7 +284,7 @@ function renewRemote(
     clock: Clock,
     clockPubSub: ClockPubSub,
     waitTime: WaitTime,
-): RenewAuthTicketRemote {
+): CheckAuthTicketRemote {
     let count = 0
     return async () =>
         ticker(waitTime, () => {
@@ -302,7 +300,7 @@ function renewRemote(
             count++
             return {
                 success: true,
-                value: convertAuthRemote(clock, { roles: ["role"] }),
+                value: convertCheckRemote(clock, ["role"]),
             }
         })
 }

@@ -6,7 +6,7 @@ import { newGetScriptPathShell } from "../../../../sign/get_script_path/init/inf
 import { newClock } from "../../../../../z_lib/ui/clock/init"
 import { newAuthenticatePasswordRemote } from "./authenticate_remote"
 import { newAuthTicketRepository } from "../../../../ticket/kernel/init/ticket_repository"
-import { newRenewAuthTicketRemote } from "../../../../ticket/kernel/init/renew_remote"
+import { newCheckAuthTicketRemote } from "../../../../ticket/check/init/check_remote"
 
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 import { RepositoryOutsideFeature } from "../../../../../z_lib/ui/repository/feature"
@@ -22,7 +22,7 @@ export function newAuthenticatePasswordView(
         initAuthenticatePasswordAction({
             infra: {
                 ticketRepository: newAuthTicketRepository(feature),
-                renewRemote: newRenewAuthTicketRemote(feature, newClock()),
+                renewRemote: newCheckAuthTicketRemote(feature, newClock()),
                 authenticateRemote: newAuthenticatePasswordRemote(feature, newClock()),
                 clock: newClock(),
             },
