@@ -7,14 +7,12 @@ import { mockGetScriptPathShell, mockSecureServerURL } from "../../sign/get_scri
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"
-import { authTicketRepositoryConverter, convertAuthRemote } from "../kernel/convert"
+import { authTicketRepositoryConverter } from "../kernel/convert"
+import { convertCheckRemote } from "../check/convert"
 
 import { Clock } from "../../../z_lib/ui/clock/infra"
 import { WaitTime } from "../../../z_lib/ui/config/infra"
-import {
-    AuthTicketRepository,
-    AuthTicketRepositoryValue,
-} from "../kernel/infra"
+import { AuthTicketRepository, AuthTicketRepositoryValue } from "../kernel/infra"
 import { CheckAuthTicketRemote } from "./infra"
 
 import { ApplicationView } from "../../../../ui/vendor/getto-application/action/action"
@@ -302,7 +300,7 @@ function renewRemote(
             count++
             return {
                 success: true,
-                value: convertAuthRemote(clock, { roles: ["role"] }),
+                value: convertCheckRemote(clock, ["role"]),
             }
         })
 }
