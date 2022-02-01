@@ -5,20 +5,21 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../../ui/vendor/getto-application/action/action"
 
-import { startContinuousRenew } from "../start_continuous_renew/method"
+import { startContinuousRenew } from "./method"
 import { getScriptPath } from "../../sign/get_script_path/method"
 import { hasExpired } from "../kernel/helper"
 
-import { GetScriptPathConfig, GetScriptPathShell } from "../../sign/get_script_path/infra"
-import { AuthTicketRepository, RenewAuthTicketRemote } from "../kernel/infra"
-import { Clock } from "../../../z_lib/ui/clock/infra"
-import { DelayTime, ExpireTime } from "../../../z_lib/ui/config/infra"
 import {
     StartContinuousRenewConfig,
     StartContinuousRenewInfra,
-} from "../start_continuous_renew/infra"
+    StartContinuousRenewEvent,
+} from "./method"
 
-import { StartContinuousRenewEvent } from "../start_continuous_renew/event"
+import { GetScriptPathConfig, GetScriptPathShell } from "../../sign/get_script_path/infra"
+import { AuthTicketRepository } from "../kernel/infra"
+import { CheckAuthTicketRemote } from "./infra"
+import { Clock } from "../../../z_lib/ui/clock/infra"
+import { DelayTime, ExpireTime } from "../../../z_lib/ui/config/infra"
 
 import { AuthTicket } from "../kernel/data"
 import { ConvertScriptPathResult, LoadScriptError } from "../../sign/get_script_path/data"
@@ -39,7 +40,7 @@ export type CheckAuthTicketMaterial = Readonly<{
 
 export type CheckAuthTicketInfra = Readonly<{
     ticketRepository: AuthTicketRepository
-    renewRemote: RenewAuthTicketRemote
+    renewRemote: CheckAuthTicketRemote
     clock: Clock
 }> &
     StartContinuousRenewInfra

@@ -13,8 +13,8 @@ import { ResetPasswordRemote, ResetPasswordRemoteResult } from "./infra"
 import {
     AuthTicketRepository,
     AuthTicketRepositoryValue,
-    RenewAuthTicketRemote,
 } from "../../../../ticket/kernel/infra"
+import { CheckAuthTicketRemote } from "../../../../ticket/check/infra"
 import { BoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/infra"
 
 import { authTicketRepositoryConverter, convertAuthRemote } from "../../../../ticket/kernel/convert"
@@ -216,7 +216,7 @@ function emptyResetToken() {
 function initView(
     currentURL: URL,
     resetRemote: ResetPasswordRemote,
-    renewRemote: RenewAuthTicketRemote,
+    renewRemote: CheckAuthTicketRemote,
     clock: Clock,
 ): Readonly<{
     view: ApplicationView<ResetPasswordAction>
@@ -285,7 +285,7 @@ function standard_resetPasswordRemoteResult(clock: Clock): ResetPasswordRemoteRe
     }
 }
 
-function standard_renewRemote(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
+function standard_renewRemote(clock: Clock, clockPubSub: ClockPubSub): CheckAuthTicketRemote {
     let count = 0
     return async () => {
         if (count > 1) {

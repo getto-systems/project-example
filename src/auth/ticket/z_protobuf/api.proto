@@ -1,5 +1,0 @@
-syntax = "proto3";
-
-package auth.ticket.api;
-
-message AuthenticateApiResponsePb { repeated string roles = 1; }

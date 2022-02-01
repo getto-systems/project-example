@@ -21,7 +21,7 @@ protobuf_main() {
         :
 }
 protobuf_find_proto() {
-    find ./src -name api.proto -o -name db.proto
+    find ./src -name service.proto -o -name db.proto
 }
 
 protobuf_main "$@"

@@ -14,7 +14,7 @@ import { RemoteOutsideFeature } from "../../../../../../z_lib/ui/remote/feature"
 import { Clock } from "../../../../../../z_lib/ui/clock/infra"
 import { ResetPasswordRemote } from "../infra"
 
-import { convertAuthRemote } from "../../../../../ticket/kernel/convert"
+import { convertCheckRemote } from "../../../../../ticket/check/convert"
 
 export function newResetPasswordRemote(
     feature: RemoteOutsideFeature,
@@ -26,7 +26,7 @@ export function newResetPasswordRemote(
             if (mock) {
                 return {
                     success: true,
-                    value: convertAuthRemote(clock, { roles: ["admin", "dev-docs"] }),
+                    value: convertCheckRemote(clock, ["admin", "dev-docs"]),
                 }
             }
 
@@ -39,7 +39,7 @@ export function newResetPasswordRemote(
             const response = await fetch(opts.url, {
                 ...opts.options,
                 body: encodeProtobuf(
-                    pb.auth.user.password.reset.api.ResetPasswordApiRequestPb,
+                    pb.auth.user.password.reset.service.ResetPasswordRequestPb,
                     (message) => {
                         message.resetToken = resetToken
                         message.loginId = fields.loginID
@@ -52,25 +52,25 @@ export function newResetPasswordRemote(
                 return remoteCommonError(response.status)
             }
 
-            const result = decodeProtobuf(
-                pb.auth.user.password.reset.api.ResetPasswordApiResponsePb,
+            const message = decodeProtobuf(
+                pb.auth.user.password.reset.service.ResetPasswordResponsePb,
                 await response.text(),
             )
-            if (!result.success) {
-                if (!result.err) {
-                    return { success: false, err: { type: "invalid-reset" } }
-                }
-                switch (result.err.kind) {
-                    case pb.auth.user.password.reset.api.ResetPasswordApiErrorKindPb.INVALID_RESET:
+            if (!message.success) {
+                switch (message.err) {
+                    case pb.auth.user.password.reset.service.ResetPasswordErrorKindPb.INVALID_RESET:
                         return { success: false, err: { type: "invalid-reset" } }
 
-                    case pb.auth.user.password.reset.api.ResetPasswordApiErrorKindPb.ALREADY_RESET:
+                    case pb.auth.user.password.reset.service.ResetPasswordErrorKindPb.ALREADY_RESET:
                         return { success: false, err: { type: "already-reset" } }
+
+                    default:
+                        return { success: false, err: { type: "invalid-reset" } }
                 }
             }
             return {
                 success: true,
-                value: convertAuthRemote(clock, { roles: result.value?.roles || [] }),
+                value: convertCheckRemote(clock, message.roles?.grantedRoles || []),
             }
         } catch (err) {
             return remoteInfraError(err)

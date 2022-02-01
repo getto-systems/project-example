@@ -33,7 +33,7 @@ export function newSearchAuthUserAccountRemote(
             }
 
             const body = encodeProtobuf(
-                pb.auth.user.account.api.SearchAuthUserAccountApiRequestPb,
+                pb.auth.user.account.service.SearchAuthUserAccountRequestPb,
                 (message) => {
                     message.offset = parseInt(fields.offset)
                     message.sortKey = fields.sort.key
@@ -54,16 +54,16 @@ export function newSearchAuthUserAccountRemote(
                 return remoteCommonError(response.status)
             }
 
-            const result = decodeProtobuf(
-                pb.auth.user.account.api.SearchAuthUserAccountApiResponsePb,
+            const message = decodeProtobuf(
+                pb.auth.user.account.service.SearchAuthUserAccountResponsePb,
                 await response.text(),
             )
             return {
                 success: true,
                 value: {
-                    page: { offset: result.offset, limit: result.limit, all: result.all },
+                    page: { offset: message.offset, limit: message.limit, all: message.all },
                     summary: {},
-                    users: result.users.map((user) => ({
+                    users: message.users.map((user) => ({
                         loginID: user.loginId || "",
                         grantedRoles: user.grantedRoles || [],
                     })),

@@ -16,18 +16,17 @@ import { ValidateBoardAction } from "../../../../../../ui/vendor/getto-applicati
 import { delayedChecker } from "../../../../../z_lib/ui/timer/helper"
 
 import { getScriptPath } from "../../../../sign/get_script_path/method"
-import { startContinuousRenew } from "../../../../ticket/start_continuous_renew/method"
-
 import {
+    startContinuousRenew,
     StartContinuousRenewConfig,
     StartContinuousRenewInfra,
-} from "../../../../ticket/start_continuous_renew/infra"
+    StartContinuousRenewEvent,
+} from "../../../../ticket/check/method"
+
 import { GetScriptPathConfig, GetScriptPathShell } from "../../../../sign/get_script_path/infra"
 import { DelayTime } from "../../../../../z_lib/ui/config/infra"
 import { ResetPasswordRemote, ResetTokenDetecter } from "./infra"
 import { ValidateBoardChecker } from "../../../../../../ui/vendor/getto-application/board/validate_board/infra"
-
-import { StartContinuousRenewEvent } from "../../../../ticket/start_continuous_renew/event"
 
 import { LoadScriptError, ConvertScriptPathResult } from "../../../../sign/get_script_path/data"
 import { ResetPasswordError, ResetPasswordFields } from "./data"

@@ -30,7 +30,7 @@ export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): Reque
             const response = await fetch(opts.url, {
                 ...opts.options,
                 body: encodeProtobuf(
-                    pb.auth.user.password.reset.api.RequestResetTokenApiRequestPb,
+                    pb.auth.user.password.reset.service.RequestResetTokenRequestPb,
                     (message) => {
                         message.loginId = fields.loginID
                     },
@@ -41,11 +41,11 @@ export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): Reque
                 return remoteCommonError(response.status)
             }
 
-            const result = decodeProtobuf(
-                pb.auth.user.password.reset.api.RequestResetTokenApiResponsePb,
+            const message = decodeProtobuf(
+                pb.auth.user.password.reset.service.RequestResetTokenResponsePb,
                 await response.text(),
             )
-            if (!result.success) {
+            if (!message.success) {
                 return { success: false, err: { type: "invalid-reset" } }
             }
             return { success: true, value: true }

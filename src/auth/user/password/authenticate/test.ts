@@ -15,8 +15,8 @@ import { AuthenticatePasswordRemote, AuthenticatePasswordRemoteResult } from "./
 import {
     AuthTicketRepository,
     AuthTicketRepositoryValue,
-    RenewAuthTicketRemote,
 } from "../../../ticket/kernel/infra"
+import { CheckAuthTicketRemote } from "../../../ticket/check/infra"
 import { BoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
 
 import { authTicketRepositoryConverter, convertAuthRemote } from "../../../ticket/kernel/convert"
@@ -194,7 +194,7 @@ function takeLongtime_elements() {
 
 function initView(
     authenticateRemote: AuthenticatePasswordRemote,
-    renewRemote: RenewAuthTicketRemote,
+    renewRemote: CheckAuthTicketRemote,
     clock: Clock,
 ): Readonly<{
     view: ApplicationView<AuthenticatePasswordAction>
@@ -261,7 +261,7 @@ function standard_authenticateRemoteResult(clock: Clock): AuthenticatePasswordRe
     }
 }
 
-function standard_renew(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
+function standard_renew(clock: Clock, clockPubSub: ClockPubSub): CheckAuthTicketRemote {
     let count = 0
     return async () => {
         if (count > 1) {

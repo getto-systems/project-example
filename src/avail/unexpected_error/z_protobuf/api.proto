@@ -1,5 +1,0 @@
-syntax = "proto3";
-
-package avail.unexpected_error.api;
-
-message NotifyUnexpectedErrorApiRequestPb { string json = 1; }

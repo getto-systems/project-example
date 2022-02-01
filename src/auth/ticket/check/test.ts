@@ -14,8 +14,8 @@ import { WaitTime } from "../../../z_lib/ui/config/infra"
 import {
     AuthTicketRepository,
     AuthTicketRepositoryValue,
-    RenewAuthTicketRemote,
 } from "../kernel/infra"
+import { CheckAuthTicketRemote } from "./infra"
 
 import { ApplicationView } from "../../../../ui/vendor/getto-application/action/action"
 import { CheckAuthTicketAction, initCheckAuthTicketAction } from "./action"
@@ -239,7 +239,7 @@ function noStored() {
 
 function initView(
     ticketRepository: AuthTicketRepository,
-    renewRemote: RenewAuthTicketRemote,
+    renewRemote: CheckAuthTicketRemote,
     clock: Clock,
 ): ApplicationView<CheckAuthTicketAction> {
     return toApplicationView(
@@ -275,10 +275,10 @@ function noStored_ticketRepository(): AuthTicketRepository {
     return initMemoryDB<AuthTicket>()
 }
 
-function standard_renewRemote(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
+function standard_renewRemote(clock: Clock, clockPubSub: ClockPubSub): CheckAuthTicketRemote {
     return renewRemote(clock, clockPubSub, { wait_millisecond: 0 })
 }
-function wait_renewRemote(clock: Clock, clockPubSub: ClockPubSub): RenewAuthTicketRemote {
+function wait_renewRemote(clock: Clock, clockPubSub: ClockPubSub): CheckAuthTicketRemote {
     // wait for take longtime timeout
     return renewRemote(clock, clockPubSub, { wait_millisecond: 64 })
 }
@@ -286,7 +286,7 @@ function renewRemote(
     clock: Clock,
     clockPubSub: ClockPubSub,
     waitTime: WaitTime,
-): RenewAuthTicketRemote {
+): CheckAuthTicketRemote {
     let count = 0
     return async () =>
         ticker(waitTime, () => {
