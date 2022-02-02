@@ -7,10 +7,12 @@ use crate::auth::user::password::{
     authenticate::remote::infra::VerifyPasswordRepository,
     change::remote::infra::ChangePasswordRepository,
     kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword},
-    reset::remote::{
-        kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
-        request_token::infra::RegisterResetTokenRepository,
-        reset::infra::ResetPasswordRepository,
+    reset::{
+        remote::{
+            kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
+            reset::infra::ResetPasswordRepository,
+        },
+        request_token::remote::infra::RegisterResetTokenRepository,
     },
 };
 
@@ -22,12 +24,14 @@ use crate::{
             password::{
                 authenticate::remote::data::VerifyPasswordRepositoryError,
                 change::remote::data::ChangePasswordRepositoryError,
-                reset::remote::{
-                    kernel::data::{
-                        ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
+                reset::{
+                    remote::{
+                        kernel::data::{
+                            ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
+                        },
+                        reset::data::ResetPasswordRepositoryError,
                     },
-                    request_token::data::RegisterResetTokenRepositoryError,
-                    reset::data::ResetPasswordRepositoryError,
+                    request_token::remote::data::RegisterResetTokenRepositoryError,
                 },
             },
             remote::kernel::data::AuthUserId,
@@ -356,10 +360,12 @@ pub mod test {
         authenticate::remote::infra::VerifyPasswordRepository,
         change::remote::infra::ChangePasswordRepository,
         kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword},
-        reset::remote::{
-            kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
-            request_token::infra::RegisterResetTokenRepository,
-            reset::infra::ResetPasswordRepository,
+        reset::{
+            remote::{
+                kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
+                reset::infra::ResetPasswordRepository,
+            },
+            request_token::remote::infra::RegisterResetTokenRepository,
         },
     };
 
@@ -371,12 +377,14 @@ pub mod test {
                 password::{
                     authenticate::remote::data::VerifyPasswordRepositoryError,
                     change::remote::data::ChangePasswordRepositoryError,
-                    reset::remote::{
-                        kernel::data::{
-                            ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
+                    reset::{
+                        remote::{
+                            kernel::data::{
+                                ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
+                            },
+                            reset::data::ResetPasswordRepositoryError,
                         },
-                        request_token::data::RegisterResetTokenRepositoryError,
-                        reset::data::ResetPasswordRepositoryError,
+                        request_token::remote::data::RegisterResetTokenRepositoryError,
                     },
                 },
                 remote::kernel::data::{AuthUser, AuthUserId},

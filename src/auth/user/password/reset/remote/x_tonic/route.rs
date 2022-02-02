@@ -5,10 +5,9 @@ use getto_application::helper::flatten;
 use crate::z_lib::remote::{logger::Logger, response::tonic::RespondTo};
 
 use crate::auth::user::password::reset::remote::y_protobuf::service::{
-    request_reset_token_pb_server::{RequestResetTokenPb, RequestResetTokenPbServer},
+    request_reset_token_pb_server::RequestResetTokenPbServer,
     reset_password_pb_server::{ResetPasswordPb, ResetPasswordPbServer},
-    RequestResetTokenRequestPb, RequestResetTokenResponsePb, ResetPasswordRequestPb,
-    ResetPasswordResponsePb,
+    ResetPasswordRequestPb, ResetPasswordResponsePb,
 };
 
 use crate::x_outside_feature::remote::{
@@ -19,41 +18,18 @@ use crate::x_outside_feature::remote::{
     common::metadata::metadata_request_id,
 };
 
-use crate::auth::user::password::reset::remote::{
-    reset::init::ResetPasswordFeature, request_token::init::RequestResetTokenStruct,
-};
+use crate::auth::user::password::reset::request_token::remote::x_tonic::route::ServiceRequestToken;
+
+use crate::auth::user::password::reset::remote::reset::init::ResetPasswordFeature;
 
 pub struct ResetServer;
 
 impl ResetServer {
-    pub fn request_token(&self) -> RequestResetTokenPbServer<RequestToken> {
-        RequestResetTokenPbServer::new(RequestToken)
+    pub fn request_token(&self) -> RequestResetTokenPbServer<ServiceRequestToken> {
+        RequestResetTokenPbServer::new(ServiceRequestToken)
     }
     pub fn reset(&self) -> ResetPasswordPbServer<Reset> {
         ResetPasswordPbServer::new(Reset)
-    }
-}
-
-pub struct RequestToken;
-
-#[async_trait::async_trait]
-impl RequestResetTokenPb for RequestToken {
-    async fn request_token(
-        &self,
-        request: Request<RequestResetTokenRequestPb>,
-    ) -> Result<Response<RequestResetTokenResponsePb>, Status> {
-        let TonicRequest {
-            feature,
-            metadata,
-            request,
-        } = extract_request(request);
-        let request_id = metadata_request_id(&metadata);
-
-        let logger = app_logger("auth.user.password.reset.request_token", request_id.into());
-        let mut action = RequestResetTokenStruct::action(&feature, &metadata, request);
-        action.subscribe(move |state| logger.log(state));
-
-        flatten(action.ignite().await).respond_to()
     }
 }
 

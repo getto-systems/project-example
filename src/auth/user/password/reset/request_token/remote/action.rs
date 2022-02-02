@@ -6,7 +6,7 @@ use crate::auth::ticket::validate::method::{
 
 use crate::auth::{
     ticket::kernel::remote::infra::AuthClock,
-    user::password::reset::remote::request_token::infra::{
+    user::password::reset::request_token::remote::infra::{
         RegisterResetTokenRepository, RequestResetTokenConfig, RequestResetTokenFieldsExtract,
         RequestResetTokenRequestDecoder, ResetTokenDestinationRepository, ResetTokenEncoder,
         ResetTokenGenerator, ResetTokenNotifier,
@@ -18,7 +18,7 @@ use crate::{
         ticket::kernel::remote::data::ExpireDateTime,
         user::{
             login_id::kernel::data::{LoginId, ValidateLoginIdError},
-            password::reset::remote::request_token::data::{
+            password::reset::request_token::remote::data::{
                 EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
                 RegisterResetTokenRepositoryError, RequestResetTokenError,
             },

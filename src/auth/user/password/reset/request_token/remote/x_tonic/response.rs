@@ -6,7 +6,7 @@ use crate::z_lib::remote::response::tonic::RespondTo;
 
 use super::super::action::{RequestResetTokenEvent, RequestResetTokenState};
 
-use crate::auth::user::password::reset::remote::request_token::data::{
+use crate::auth::user::password::reset::request_token::remote::data::{
     EncodeResetTokenError, NotifyResetTokenError, RequestResetTokenError,
 };
 

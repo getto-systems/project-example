@@ -2,15 +2,15 @@ use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 
 use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideResetTokenKey;
 
-use crate::auth::user::password::reset::remote::{
-    kernel::infra::ResetTokenJwtClaims, request_token::infra::ResetTokenEncoder,
+use crate::auth::user::password::reset::{
+    remote::kernel::infra::ResetTokenJwtClaims, request_token::remote::infra::ResetTokenEncoder,
 };
 
 use crate::auth::{
     ticket::kernel::remote::data::ExpireDateTime,
-    user::password::reset::remote::{
-        kernel::data::{ResetToken, ResetTokenEncoded},
-        request_token::data::EncodeResetTokenError,
+    user::password::reset::{
+        remote::kernel::data::{ResetToken, ResetTokenEncoded},
+        request_token::remote::data::EncodeResetTokenError,
     },
 };
 

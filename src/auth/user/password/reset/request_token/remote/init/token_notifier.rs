@@ -3,11 +3,11 @@ use url::{ParseError, Url};
 
 use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideEmail;
 
-use crate::auth::user::password::reset::remote::request_token::infra::ResetTokenNotifier;
+use crate::auth::user::password::reset::request_token::remote::infra::ResetTokenNotifier;
 
-use crate::auth::user::password::reset::remote::{
-    kernel::data::{ResetTokenDestination, ResetTokenEncoded},
-    request_token::data::{NotifyResetTokenError, NotifyResetTokenResponse},
+use crate::auth::user::password::reset::{
+    remote::kernel::data::{ResetTokenDestination, ResetTokenEncoded},
+    request_token::remote::data::{NotifyResetTokenError, NotifyResetTokenResponse},
 };
 
 pub struct EmailResetTokenNotifier<'a> {
@@ -129,11 +129,11 @@ email: labo@message.getto.systems
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::user::password::reset::remote::request_token::infra::ResetTokenNotifier;
+    use crate::auth::user::password::reset::request_token::remote::infra::ResetTokenNotifier;
 
-    use crate::auth::user::password::reset::remote::{
-        kernel::data::{ResetTokenDestination, ResetTokenEncoded},
-        request_token::data::{NotifyResetTokenError, NotifyResetTokenResponse},
+    use crate::auth::user::password::reset::{
+        remote::kernel::data::{ResetTokenDestination, ResetTokenEncoded},
+        request_token::remote::data::{NotifyResetTokenError, NotifyResetTokenResponse},
     };
 
     pub struct StaticResetTokenNotifier;

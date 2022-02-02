@@ -2,7 +2,7 @@ use sqlx::{query, MySqlPool};
 
 use crate::z_lib::remote::repository::mysql::helper::mysql_error;
 
-use crate::auth::user::password::reset::remote::request_token::infra::ResetTokenDestinationRepository;
+use crate::auth::user::password::reset::request_token::remote::infra::ResetTokenDestinationRepository;
 
 use crate::{
     auth::user::{
@@ -54,7 +54,7 @@ impl<'a> ResetTokenDestinationRepository for MysqlResetTokenDestinationRepositor
 pub mod test {
     use std::{collections::HashMap, sync::Mutex};
 
-    use crate::auth::user::password::reset::remote::request_token::infra::ResetTokenDestinationRepository;
+    use crate::auth::user::password::reset::request_token::remote::infra::ResetTokenDestinationRepository;
 
     use crate::{
         auth::user::{

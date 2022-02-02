@@ -3,9 +3,9 @@ use crate::{
         ticket::kernel::remote::data::{AuthDateTime, ExpireDateTime, ExpireDuration},
         user::{
             login_id::kernel::data::LoginId,
-            password::reset::remote::{
-                kernel::data::{ResetToken, ResetTokenDestination, ResetTokenEncoded},
-                request_token::data::{
+            password::reset::{
+                remote::kernel::data::{ResetToken, ResetTokenDestination, ResetTokenEncoded},
+                request_token::remote::data::{
                     EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
                     RegisterResetTokenRepositoryError,
                 },

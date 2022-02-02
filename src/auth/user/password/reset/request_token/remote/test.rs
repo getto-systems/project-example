@@ -18,7 +18,7 @@ use crate::auth::{
             MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
             MemoryAuthUserPasswordStore,
         },
-        reset::remote::request_token::init::{
+        reset::request_token::remote::init::{
             destination_repository::test::{
                 MemoryResetTokenDestinationMap, MemoryResetTokenDestinationRepository,
                 MemoryResetTokenDestinationStore,
@@ -35,7 +35,7 @@ use crate::auth::ticket::validate::method::AuthNonceConfig;
 
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 
-use crate::auth::user::password::reset::remote::request_token::infra::{
+use crate::auth::user::password::reset::request_token::remote::infra::{
     RequestResetTokenConfig, RequestResetTokenFieldsExtract,
 };
 

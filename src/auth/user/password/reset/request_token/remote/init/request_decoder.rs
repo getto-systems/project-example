@@ -1,6 +1,6 @@
 use crate::auth::user::password::reset::remote::y_protobuf::service::RequestResetTokenRequestPb;
 
-use crate::auth::user::password::reset::remote::request_token::infra::{
+use crate::auth::user::password::reset::request_token::remote::infra::{
     RequestResetTokenFieldsExtract, RequestResetTokenRequestDecoder,
 };
 
@@ -24,7 +24,7 @@ impl RequestResetTokenRequestDecoder for PbRequestResetTokenRequestDecoder {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::user::password::reset::remote::request_token::infra::{
+    use crate::auth::user::password::reset::request_token::remote::infra::{
         RequestResetTokenFieldsExtract, RequestResetTokenRequestDecoder,
     };
 

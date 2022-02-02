@@ -6,7 +6,7 @@ use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideFeature;
 
 use crate::auth::{
     ticket::validate::init::NoValidateMetadataStruct,
-    user::password::reset::remote::request_token::proxy::init::proxy_service::ProxyService,
+    user::password::reset::request_token::remote::proxy::init::proxy_service::ProxyService,
 };
 
 use crate::auth::remote::proxy::action::{AuthProxyAction, AuthProxyMaterial};

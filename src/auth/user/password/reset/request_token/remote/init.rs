@@ -17,7 +17,7 @@ use crate::auth::{
     ticket::kernel::remote::init::clock::ChronoAuthClock,
     user::password::{
         kernel::init::password_repository::MysqlAuthUserPasswordRepository,
-        reset::remote::request_token::init::{
+        reset::request_token::remote::init::{
             destination_repository::MysqlResetTokenDestinationRepository,
             request_decoder::PbRequestResetTokenRequestDecoder,
             token_encoder::JwtResetTokenEncoder, token_generator::UuidResetTokenGenerator,
@@ -28,7 +28,7 @@ use crate::auth::{
 
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 
-use crate::auth::user::password::reset::remote::request_token::infra::RequestResetTokenConfig;
+use crate::auth::user::password::reset::request_token::remote::infra::RequestResetTokenConfig;
 
 pub struct RequestResetTokenStruct<'a> {
     validate_nonce: ValidateAuthNonceStruct<'a>,

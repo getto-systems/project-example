@@ -1,6 +1,6 @@
 use uuid::Uuid;
 
-use crate::auth::user::password::reset::remote::request_token::infra::ResetTokenGenerator;
+use crate::auth::user::password::reset::request_token::remote::infra::ResetTokenGenerator;
 
 use crate::auth::user::password::reset::remote::kernel::data::ResetToken;
 
@@ -14,7 +14,7 @@ impl ResetTokenGenerator for UuidResetTokenGenerator {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::user::password::reset::remote::request_token::infra::ResetTokenGenerator;
+    use crate::auth::user::password::reset::request_token::remote::infra::ResetTokenGenerator;
 
     use crate::auth::user::password::reset::remote::kernel::data::ResetToken;
 
