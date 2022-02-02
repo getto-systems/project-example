@@ -6,7 +6,7 @@ use crate::auth::user::account::remote::y_protobuf::service::{
     SearchAuthUserAccountRequestPb,
 };
 
-use crate::auth::remote::x_outside_feature::common::feature::AuthOutsideService;
+use crate::auth::x_outside_feature::remote::common::feature::AuthOutsideService;
 
 use crate::z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer;
 

@@ -1,6 +1,6 @@
 pub mod id_generator;
 
-use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideFeature;
+use crate::auth::x_outside_feature::remote::auth::feature::AuthOutsideFeature;
 
 use crate::auth::ticket::{
     issue::init::id_generator::UuidAuthTicketIdGenerator,

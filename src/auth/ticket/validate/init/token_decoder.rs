@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use jsonwebtoken::{decode, errors::ErrorKind, Algorithm, DecodingKey, Validation};
 
-use crate::auth::remote::x_outside_feature::common::feature::AuthOutsideDecodingKey;
+use crate::auth::x_outside_feature::remote::common::feature::AuthOutsideDecodingKey;
 
 use crate::auth::ticket::{
     kernel::remote::infra::{AuthJwtClaims, AUTH_JWT_AUDIENCE_API, AUTH_JWT_AUDIENCE_TICKET},

@@ -4,7 +4,7 @@ use crate::auth::ticket::remote::y_protobuf::service::{
     check_auth_ticket_pb_client::CheckAuthTicketPbClient, CheckAuthTicketRequestPb,
 };
 
-use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideFeature;
+use crate::auth::x_outside_feature::remote::api::feature::AuthOutsideFeature;
 
 use crate::{
     auth::ticket::kernel::remote::init::response_builder::CookieAuthTokenResponseBuilder,

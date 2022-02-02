@@ -1,6 +1,6 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::remote::{
+use crate::auth::{
     data::RequireAuthRoles,
     method::{check_permission, CheckPermissionEvent, CheckPermissionInfra},
 };

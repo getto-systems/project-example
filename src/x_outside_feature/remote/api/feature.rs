@@ -1,7 +1,7 @@
 use super::env::ApiEnv;
 
 use crate::{
-    auth::remote::x_outside_feature::api::{
+    auth::x_outside_feature::remote::api::{
         feature::AuthOutsideFeature, init::new_auth_outside_feature,
     },
     example::remote::x_outside_feature::{

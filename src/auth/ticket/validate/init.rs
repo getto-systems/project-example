@@ -12,7 +12,7 @@ use tonic::metadata::MetadataMap;
 use crate::auth::ticket::remote::y_protobuf::service::ValidateApiTokenRequestPb;
 
 use crate::{
-    auth::remote::x_outside_feature::{
+    auth::x_outside_feature::remote::{
         auth::feature::AuthOutsideFeature,
         common::feature::{AuthOutsideDecodingKey, AuthOutsideService},
     },

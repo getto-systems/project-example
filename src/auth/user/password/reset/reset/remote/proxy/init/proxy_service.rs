@@ -1,7 +1,7 @@
 use prost::Message;
 use tonic::Request;
 
-use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideFeature;
+use crate::auth::x_outside_feature::remote::api::feature::AuthOutsideFeature;
 
 use crate::auth::user::password::reset::remote::y_protobuf::service::{
     reset_password_pb_client::ResetPasswordPbClient, ResetPasswordRequestPb,

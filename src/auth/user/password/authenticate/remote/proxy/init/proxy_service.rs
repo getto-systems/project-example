@@ -5,7 +5,7 @@ use crate::auth::user::password::remote::y_protobuf::service::{
     authenticate_password_pb_client::AuthenticatePasswordPbClient, AuthenticatePasswordRequestPb,
 };
 
-use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideFeature;
+use crate::auth::x_outside_feature::remote::api::feature::AuthOutsideFeature;
 
 use crate::{
     auth::ticket::kernel::remote::init::response_builder::CookieAuthTokenResponseBuilder,

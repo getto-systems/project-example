@@ -17,7 +17,7 @@ use crate::{auth::proxy::helper::infra_error, z_lib::remote::service::helper::ne
 
 use crate::auth::proxy::method::set_metadata;
 
-use crate::auth::{proxy::infra::AuthProxyService, remote::infra::AuthMetadataContent};
+use crate::auth::{infra::AuthMetadataContent, proxy::infra::AuthProxyService};
 
 use crate::{
     auth::proxy::data::{AuthProxyError, AuthProxyResponse},

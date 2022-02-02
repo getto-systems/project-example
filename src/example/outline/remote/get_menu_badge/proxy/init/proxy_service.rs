@@ -15,7 +15,7 @@ use crate::{
 
 use crate::auth::proxy::method::set_metadata;
 
-use crate::{auth::proxy::infra::AuthProxyService, auth::remote::infra::AuthMetadataContent};
+use crate::{auth::infra::AuthMetadataContent, auth::proxy::infra::AuthProxyService};
 
 use crate::auth::proxy::data::{AuthProxyError, AuthProxyResponse};
 

@@ -5,7 +5,7 @@ use tonic::metadata::MetadataMap;
 use crate::x_outside_feature::remote::example::feature::ExampleAppFeature;
 
 use crate::{
-    auth::remote::init::CheckPermissionStruct,
+    auth::init::CheckPermissionStruct,
     example::outline::remote::get_menu_badge::init::menu_badge_repository::UnitedOutlineMenuBadgeRepository,
 };
 
