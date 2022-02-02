@@ -2,6 +2,11 @@ use rusoto_ses::{Body, Content, Message, SendEmailRequest, Ses, SesClient};
 
 use crate::auth::x_outside_feature::remote::auth::feature::AuthOutsideEmail;
 
+use crate::x_content::mail::{
+    notify_password_reset::{BODY, SUBJECT},
+    SENDER_ADDRESS,
+};
+
 use crate::auth::user::password::reset::reset::remote::infra::ResetPasswordNotifier;
 
 use crate::auth::user::password::reset::{
@@ -64,25 +69,6 @@ fn utf8_content(data: String) -> Content {
         data,
     }
 }
-
-const SENDER_ADDRESS: &'static str = "GETTO Example <labo@message.getto.systems>";
-const SUBJECT: &'static str = "GETTO Example パスワードリセットの件 [リセット完了のお知らせ]";
-const BODY: &'static str = r#####"お世話になっております
-GETTO Example システムです
-
-パスワードリセットが完了しました
-今後は新しいパスワードを使用してログインしてください
-
-もしパスワードリセットをしていない場合は
-アカウント不正使用の可能性がありますので管理者にご連絡ください
-
-よろしくお願いいたします
-
-#################################
-GETTO Example
-email: labo@message.getto.systems
-#################################
-"#####;
 
 #[cfg(test)]
 pub mod test {

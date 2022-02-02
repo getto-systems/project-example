@@ -12,7 +12,7 @@ import { useApplicationView } from "../../../../ui/vendor/getto-application/acti
 import { useNotifyUnexpectedError } from "../../../avail/unexpected_error/notify/x_preact/hooks"
 import { useDocumentTitle } from "../../x_preact/hooks"
 
-import { copyright, siteInfo } from "../../site"
+import { copyright, siteInfo } from "../../../x_content/site"
 
 import { ApplicationErrorComponent } from "../../../avail/x_preact/application_error"
 import { LoadSeasonEntry } from "../../load_season/x_preact/load_season"

@@ -14,7 +14,7 @@ import {
 } from "../../../../ui/vendor/getto-css/preact/layout/app"
 import { container } from "../../../../ui/vendor/getto-css/preact/design/box"
 
-import { copyright, siteInfo } from "../../../example/site"
+import { copyright, siteInfo } from "../../../x_content/site"
 import { docsActionBox, docsDataBox, docsUsecaseBox } from "./helper"
 
 import { ApplicationErrorComponent } from "../../../avail/x_preact/application_error"

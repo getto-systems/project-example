@@ -3,7 +3,7 @@ import { VNode } from "preact"
 import { loginBox } from "../../../../../ui/vendor/getto-css/preact/layout/login"
 import { buttons } from "../../../../../ui/vendor/getto-css/preact/design/form"
 
-import { siteInfo } from "../../../../example/site"
+import { siteInfo } from "../../../../x_content/site"
 import { signNav } from "../../nav/x_preact/nav"
 import { docsActionField } from "../../../../docs/content/x_preact/helper"
 
