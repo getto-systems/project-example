@@ -4,8 +4,8 @@ use sqlx::{query, MySql, MySqlPool, Transaction};
 use crate::z_lib::remote::repository::{helper::infra_error, mysql::helper::mysql_error};
 
 use crate::auth::user::password::{
+    authenticate::remote::infra::VerifyPasswordRepository,
     remote::{
-        authenticate::infra::VerifyPasswordRepository,
         change::infra::ChangePasswordRepository,
         kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword},
     },
@@ -22,10 +22,8 @@ use crate::{
         user::{
             login_id::remote::data::LoginId,
             password::{
-                remote::{
-                    authenticate::data::VerifyPasswordRepositoryError,
-                    change::data::ChangePasswordRepositoryError,
-                },
+                authenticate::remote::data::VerifyPasswordRepositoryError,
+                remote::change::data::ChangePasswordRepositoryError,
                 reset::remote::{
                     kernel::data::{
                         ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
@@ -357,8 +355,8 @@ pub mod test {
     use crate::z_lib::remote::repository::helper::infra_error;
 
     use crate::auth::user::password::{
+        authenticate::remote::infra::VerifyPasswordRepository,
         remote::{
-            authenticate::infra::VerifyPasswordRepository,
             change::infra::ChangePasswordRepository,
             kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword},
         },
@@ -375,10 +373,8 @@ pub mod test {
             user::{
                 login_id::remote::data::LoginId,
                 password::{
-                    remote::{
-                        authenticate::data::VerifyPasswordRepositoryError,
-                        change::data::ChangePasswordRepositoryError,
-                    },
+                    authenticate::remote::data::VerifyPasswordRepositoryError,
+                    remote::change::data::ChangePasswordRepositoryError,
                     reset::remote::{
                         kernel::data::{
                             ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,

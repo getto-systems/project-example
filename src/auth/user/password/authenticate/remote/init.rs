@@ -12,9 +12,9 @@ use crate::auth::{
         validate::init::ValidateAuthNonceStruct,
     },
     user::{
-        password::remote::{
-            authenticate::init::request_decoder::PbAuthenticatePasswordRequestDecoder,
-            kernel::init::{
+        password::{
+            authenticate::remote::init::request_decoder::PbAuthenticatePasswordRequestDecoder,
+            remote::kernel::init::{
                 password_matcher::Argon2PasswordMatcher,
                 password_repository::MysqlAuthUserPasswordRepository,
             },

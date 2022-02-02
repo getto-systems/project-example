@@ -15,7 +15,7 @@ use crate::auth::ticket::encode::method::EncodeAuthTicketEvent;
 
 use crate::auth::{
     ticket::encode::data::AuthTicketEncoded,
-    user::password::remote::authenticate::data::AuthenticatePasswordError,
+    user::password::authenticate::remote::data::AuthenticatePasswordError,
 };
 
 impl RespondTo<AuthenticatePasswordResponsePb> for AuthenticatePasswordState {

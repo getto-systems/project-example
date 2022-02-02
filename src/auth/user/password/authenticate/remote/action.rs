@@ -7,12 +7,12 @@ use crate::auth::ticket::{
 };
 
 use crate::auth::user::{
-    password::remote::{
-        authenticate::infra::{
+    password::{
+        authenticate::remote::infra::{
             AuthenticatePasswordFieldsExtract, AuthenticatePasswordRequestDecoder,
             VerifyPasswordRepository,
         },
-        kernel::infra::{AuthUserPasswordMatcher, PlainPassword},
+        remote::kernel::infra::{AuthUserPasswordMatcher, PlainPassword},
     },
     remote::kernel::infra::AuthUserRepository,
 };
@@ -20,9 +20,11 @@ use crate::auth::user::{
 use crate::{
     auth::user::{
         login_id::remote::data::{LoginId, ValidateLoginIdError},
-        password::remote::{
-            authenticate::data::{AuthenticatePasswordError, VerifyPasswordRepositoryError},
-            kernel::data::{PasswordHashError, ValidatePasswordError},
+        password::{
+            authenticate::remote::data::{
+                AuthenticatePasswordError, VerifyPasswordRepositoryError,
+            },
+            remote::kernel::data::{PasswordHashError, ValidatePasswordError},
         },
         remote::kernel::data::AuthUser,
     },

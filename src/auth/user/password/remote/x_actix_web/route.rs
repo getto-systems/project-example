@@ -13,34 +13,18 @@ use crate::x_outside_feature::remote::api::{
     logger::{app_logger, generate_request_id},
 };
 
-use crate::auth::user::password::reset::remote::x_actix_web::route::scope_reset;
-
-use crate::auth::user::password::remote::{
-    authenticate::proxy::init::AuthenticatePasswordProxyStruct,
-    change::proxy::init::ChangePasswordProxyStruct,
+use crate::auth::user::password::{
+    authenticate::remote::x_actix_web::route::service_authenticate,
+    reset::remote::x_actix_web::route::scope_reset,
 };
+
+use crate::auth::user::password::remote::change::proxy::init::ChangePasswordProxyStruct;
 
 pub fn scope_password() -> Scope {
     scope("/password")
         .service(scope_reset())
-        .service(authenticate)
+        .service(service_authenticate)
         .service(change)
-}
-
-#[post("/authenticate")]
-async fn authenticate(
-    feature: Data<ApiAppFeature>,
-    request: HttpRequest,
-    body: String,
-) -> impl Responder {
-    let request_id = generate_request_id();
-    let logger = app_logger(request_id.clone(), &request);
-
-    let mut action =
-        AuthenticatePasswordProxyStruct::action(&feature.auth, &request_id, &request, body);
-    action.subscribe(move |state| logger.log(state));
-
-    flatten(action.ignite().await).respond_to(&request)
 }
 
 #[post("/change")]

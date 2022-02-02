@@ -28,9 +28,9 @@ use crate::auth::{
         },
     },
     user::{
-        password::remote::{
-            authenticate::init::request_decoder::test::StaticAuthenticatePasswordRequestDecoder,
-            kernel::init::{
+        password::{
+            authenticate::remote::init::request_decoder::test::StaticAuthenticatePasswordRequestDecoder,
+            remote::kernel::init::{
                 password_matcher::test::PlainPasswordMatcher,
                 password_repository::test::{
                     MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
@@ -49,8 +49,9 @@ use crate::auth::{
         encode::method::EncodeAuthTicketConfig, issue::method::IssueAuthTicketConfig,
         validate::method::AuthNonceConfig,
     },
-    user::password::remote::{
-        authenticate::infra::AuthenticatePasswordFieldsExtract, kernel::infra::HashedPassword,
+    user::password::{
+        authenticate::remote::infra::AuthenticatePasswordFieldsExtract,
+        remote::kernel::infra::HashedPassword,
     },
 };
 
