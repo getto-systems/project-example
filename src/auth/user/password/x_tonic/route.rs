@@ -5,7 +5,7 @@ use crate::auth::user::password::remote::y_protobuf::service::{
 
 use crate::auth::user::password::{
     authenticate::remote::x_tonic::route::ServiceAuthenticate,
-    change::remote::x_tonic::route::ServiceChange, reset::remote::x_tonic::route::ResetServer,
+    change::remote::x_tonic::route::ServiceChange, reset::x_tonic::route::ResetServer,
 };
 
 pub struct PasswordServer {
