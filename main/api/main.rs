@@ -7,7 +7,7 @@ use lazy_static::lazy_static;
 use example_api::x_outside_feature::remote::api::{env::ApiEnv, feature::ApiAppFeature};
 
 use example_api::{
-    auth::remote::x_actix_web::route::scope_auth, avail::remote::x_actix_web::route::scope_avail,
+    auth::x_actix_web::route::scope_auth, avail::remote::x_actix_web::route::scope_avail,
     example::remote::x_actix_web::route::scope_example,
 };
 
