@@ -14,7 +14,7 @@ use crate::auth::{
         },
     },
     user::password::{
-        remote::kernel::init::password_repository::test::{
+        kernel::init::password_repository::test::{
             MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
             MemoryAuthUserPasswordStore,
         },
@@ -42,7 +42,7 @@ use crate::auth::user::password::reset::remote::request_token::infra::{
 use crate::auth::{
     ticket::kernel::remote::data::{AuthDateTime, ExpireDuration},
     user::{
-        login_id::remote::data::LoginId,
+        login_id::kernel::data::LoginId,
         password::reset::remote::kernel::data::{
             ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
         },

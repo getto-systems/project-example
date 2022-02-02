@@ -1,7 +1,7 @@
 use crate::{
     auth::user::{
-        login_id::remote::data::ValidateLoginIdError,
-        password::remote::kernel::data::{PasswordHashError, ValidatePasswordError},
+        login_id::kernel::data::ValidateLoginIdError,
+        password::kernel::data::{PasswordHashError, ValidatePasswordError},
     },
     z_lib::remote::repository::data::RepositoryError,
 };

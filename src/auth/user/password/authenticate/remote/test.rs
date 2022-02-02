@@ -30,7 +30,7 @@ use crate::auth::{
     user::{
         password::{
             authenticate::remote::init::request_decoder::test::StaticAuthenticatePasswordRequestDecoder,
-            remote::kernel::init::{
+            kernel::init::{
                 password_matcher::test::PlainPasswordMatcher,
                 password_repository::test::{
                     MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
@@ -51,7 +51,7 @@ use crate::auth::{
     },
     user::password::{
         authenticate::remote::infra::AuthenticatePasswordFieldsExtract,
-        remote::kernel::infra::HashedPassword,
+        kernel::infra::HashedPassword,
     },
 };
 
@@ -62,7 +62,7 @@ use crate::auth::{
         AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
     },
     user::{
-        login_id::remote::data::LoginId,
+        login_id::kernel::data::LoginId,
         remote::kernel::data::{AuthUser, AuthUserExtract},
     },
 };

@@ -17,7 +17,7 @@ use crate::{
     auth::{
         ticket::kernel::remote::data::ExpireDateTime,
         user::{
-            login_id::remote::data::{LoginId, ValidateLoginIdError},
+            login_id::kernel::data::{LoginId, ValidateLoginIdError},
             password::reset::remote::request_token::data::{
                 EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
                 RegisterResetTokenRepositoryError, RequestResetTokenError,

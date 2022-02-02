@@ -14,7 +14,7 @@ use crate::auth::{
     user::{
         password::{
             authenticate::remote::init::request_decoder::PbAuthenticatePasswordRequestDecoder,
-            remote::kernel::init::{
+            kernel::init::{
                 password_matcher::Argon2PasswordMatcher,
                 password_repository::MysqlAuthUserPasswordRepository,
             },

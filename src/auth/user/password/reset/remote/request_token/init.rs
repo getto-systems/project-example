@@ -16,7 +16,7 @@ use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 use crate::auth::{
     ticket::kernel::remote::init::clock::ChronoAuthClock,
     user::password::{
-        remote::kernel::init::password_repository::MysqlAuthUserPasswordRepository,
+        kernel::init::password_repository::MysqlAuthUserPasswordRepository,
         reset::remote::request_token::init::{
             destination_repository::MysqlResetTokenDestinationRepository,
             request_decoder::PbRequestResetTokenRequestDecoder,

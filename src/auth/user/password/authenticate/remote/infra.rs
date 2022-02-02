@@ -1,8 +1,8 @@
 use crate::auth::user::{
-    login_id::remote::data::LoginId,
+    login_id::kernel::data::LoginId,
     password::{
         authenticate::remote::data::VerifyPasswordRepositoryError,
-        remote::kernel::infra::AuthUserPasswordMatcher,
+        kernel::infra::AuthUserPasswordMatcher,
     },
     remote::kernel::data::AuthUserId,
 };

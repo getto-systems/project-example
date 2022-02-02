@@ -1,6 +1,6 @@
 use crate::auth::user::{
     account::x_tonic::route::AccountServer,
-    password::remote::x_tonic::route::PasswordServer,
+    password::x_tonic::route::PasswordServer,
 };
 
 pub struct AuthUserServer {

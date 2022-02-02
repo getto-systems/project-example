@@ -1,5 +1,5 @@
 use crate::auth::user::password::{
-    remote::kernel::infra::AuthUserPasswordHasher, reset::remote::kernel::infra::ResetTokenEntry,
+    kernel::infra::AuthUserPasswordHasher, reset::remote::kernel::infra::ResetTokenEntry,
 };
 
 use crate::{

@@ -2,7 +2,7 @@ use crate::{
     auth::{
         ticket::kernel::remote::data::{AuthDateTime, ExpireDateTime, ExpireDuration},
         user::{
-            login_id::remote::data::LoginId,
+            login_id::kernel::data::LoginId,
             password::reset::remote::{
                 kernel::data::{ResetToken, ResetTokenDestination, ResetTokenEncoded},
                 request_token::data::{

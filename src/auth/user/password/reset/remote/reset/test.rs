@@ -29,7 +29,7 @@ use crate::auth::{
     },
     user::{
         password::{
-            remote::kernel::init::{
+            kernel::init::{
                 password_hasher::test::PlainPasswordHasher,
                 password_repository::test::{
                     MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
@@ -62,7 +62,7 @@ use crate::auth::{
         AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
     },
     user::{
-        login_id::remote::data::LoginId,
+        login_id::kernel::data::LoginId,
         password::reset::remote::kernel::data::{ResetToken, ResetTokenDestinationExtract},
         remote::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
     },

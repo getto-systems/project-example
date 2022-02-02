@@ -25,7 +25,7 @@ use crate::auth::{
                 MemorySearchAuthUserAccountStore,
             },
         },
-        password::remote::kernel::init::password_repository::test::MemoryAuthUserPasswordMap,
+        password::kernel::init::password_repository::test::MemoryAuthUserPasswordMap,
         remote::kernel::init::user_repository::test::MemoryAuthUserMap,
     },
 };
@@ -36,14 +36,14 @@ use super::action::{SearchAuthUserAccountAction, SearchAuthUserAccountMaterial};
 
 use crate::auth::user::{
     account::search::remote::infra::SearchAuthUserAccountFieldsExtract,
-    password::remote::kernel::infra::HashedPassword,
+    password::kernel::infra::HashedPassword,
 };
 
 use crate::{
     auth::{
         ticket::kernel::remote::data::{AuthTicketExtract, ExpireDuration},
         user::{
-            login_id::remote::data::LoginId,
+            login_id::kernel::data::LoginId,
             remote::kernel::data::{AuthUser, AuthUserExtract},
         },
     },

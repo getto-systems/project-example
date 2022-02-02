@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::login_id::remote::data::ValidateLoginIdError,
+    auth::user::login_id::kernel::data::ValidateLoginIdError,
     z_lib::remote::repository::data::RepositoryError,
 };
 

@@ -15,7 +15,7 @@ use crate::auth::user::account::search::remote::infra::{
 use crate::{
     auth::user::{
         account::search::remote::data::{AuthUserAccountBasket, SearchAuthUserAccountBasket},
-        login_id::remote::data::LoginIdBasket,
+        login_id::kernel::data::LoginIdBasket,
         remote::kernel::data::GrantedAuthRolesBasket,
     },
     z_lib::remote::{
@@ -186,7 +186,7 @@ pub mod test {
     use std::sync::Mutex;
 
     use crate::auth::user::{
-        password::remote::kernel::init::password_repository::test::MemoryAuthUserPasswordMap,
+        password::kernel::init::password_repository::test::MemoryAuthUserPasswordMap,
         remote::kernel::init::user_repository::test::MemoryAuthUserMap,
     };
 
@@ -197,7 +197,7 @@ pub mod test {
     use crate::{
         auth::user::{
             account::search::remote::data::{AuthUserAccountBasket, SearchAuthUserAccountBasket},
-            login_id::remote::data::LoginIdBasket,
+            login_id::kernel::data::LoginIdBasket,
             remote::kernel::data::GrantedAuthRolesBasket,
         },
         z_lib::remote::{repository::data::RepositoryError, search::data::SearchPage},

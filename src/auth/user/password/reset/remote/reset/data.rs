@@ -1,8 +1,8 @@
 use crate::{
     auth::user::{
-        login_id::remote::data::ValidateLoginIdError,
+        login_id::kernel::data::ValidateLoginIdError,
         password::{
-            remote::kernel::data::{PasswordHashError, ValidatePasswordError},
+            kernel::data::{PasswordHashError, ValidatePasswordError},
             reset::remote::kernel::data::ValidateResetTokenError,
         },
     },

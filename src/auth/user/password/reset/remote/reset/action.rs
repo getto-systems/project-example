@@ -10,7 +10,7 @@ use crate::auth::{
     ticket::kernel::remote::infra::AuthClock,
     user::{
         password::{
-            remote::kernel::infra::{AuthUserPasswordHasher, PlainPassword},
+            kernel::infra::{AuthUserPasswordHasher, PlainPassword},
             reset::remote::{
                 kernel::infra::ResetTokenEntry,
                 reset::infra::{
@@ -27,9 +27,9 @@ use crate::{
     auth::{
         ticket::kernel::remote::data::AuthDateTime,
         user::{
-            login_id::remote::data::{LoginId, ValidateLoginIdError},
+            login_id::kernel::data::{LoginId, ValidateLoginIdError},
             password::{
-                remote::kernel::data::{PasswordHashError, ValidatePasswordError},
+                kernel::data::{PasswordHashError, ValidatePasswordError},
                 reset::remote::{
                     kernel::data::{
                         ResetTokenDestination, ResetTokenEncoded, ValidateResetTokenError,

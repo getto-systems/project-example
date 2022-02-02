@@ -12,19 +12,19 @@ use crate::auth::user::{
             AuthenticatePasswordFieldsExtract, AuthenticatePasswordRequestDecoder,
             VerifyPasswordRepository,
         },
-        remote::kernel::infra::{AuthUserPasswordMatcher, PlainPassword},
+        kernel::infra::{AuthUserPasswordMatcher, PlainPassword},
     },
     remote::kernel::infra::AuthUserRepository,
 };
 
 use crate::{
     auth::user::{
-        login_id::remote::data::{LoginId, ValidateLoginIdError},
+        login_id::kernel::data::{LoginId, ValidateLoginIdError},
         password::{
             authenticate::remote::data::{
                 AuthenticatePasswordError, VerifyPasswordRepositoryError,
             },
-            remote::kernel::data::{PasswordHashError, ValidatePasswordError},
+            kernel::data::{PasswordHashError, ValidatePasswordError},
         },
         remote::kernel::data::AuthUser,
     },

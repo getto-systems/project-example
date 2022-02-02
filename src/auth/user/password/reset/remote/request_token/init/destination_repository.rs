@@ -6,7 +6,7 @@ use crate::auth::user::password::reset::remote::request_token::infra::ResetToken
 
 use crate::{
     auth::user::{
-        login_id::remote::data::LoginId,
+        login_id::kernel::data::LoginId,
         password::reset::remote::kernel::data::{
             ResetTokenDestination, ResetTokenDestinationExtract,
         },
@@ -58,7 +58,7 @@ pub mod test {
 
     use crate::{
         auth::user::{
-            login_id::remote::data::LoginId,
+            login_id::kernel::data::LoginId,
             password::reset::remote::kernel::data::ResetTokenDestination,
         },
         z_lib::remote::repository::data::RepositoryError,
