@@ -1,6 +1,6 @@
 use crate::auth::ticket::validate::infra::AuthMetadataContent;
 
-use crate::auth::remote::proxy::data::AuthProxyError;
+use crate::auth::proxy::data::AuthProxyError;
 
 #[async_trait::async_trait]
 pub trait AuthProxyService {

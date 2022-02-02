@@ -10,21 +10,19 @@ use crate::auth::remote::x_outside_feature::common::feature::AuthOutsideService;
 use crate::z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::{
-    auth::remote::proxy::helper::infra_error,
+    auth::proxy::helper::infra_error,
     z_lib::remote::{
         message::helper::{decode_base64, encode_protobuf_base64, invalid_protobuf},
         service::helper::new_endpoint,
     },
 };
 
-use crate::auth::remote::proxy::method::set_metadata;
+use crate::auth::proxy::method::set_metadata;
 
-use crate::auth::{
-    remote::proxy::infra::AuthProxyService, ticket::validate::infra::AuthMetadataContent,
-};
+use crate::auth::{proxy::infra::AuthProxyService, ticket::validate::infra::AuthMetadataContent};
 
 use crate::{
-    auth::remote::proxy::data::{AuthProxyError, AuthProxyResponse},
+    auth::proxy::data::{AuthProxyError, AuthProxyResponse},
     z_lib::remote::message::data::MessageError,
 };
 

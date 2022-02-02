@@ -1,3 +1,4 @@
+pub mod proxy;
 pub mod remote;
 mod ticket;
 mod user;

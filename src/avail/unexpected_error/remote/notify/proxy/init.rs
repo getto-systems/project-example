@@ -9,7 +9,7 @@ use crate::{
     avail::unexpected_error::remote::notify::proxy::init::proxy_service::ProxyService,
 };
 
-use crate::auth::remote::proxy::action::{AuthProxyAction, AuthProxyMaterial};
+use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
 
 pub struct NotifyUnexpectedErrorProxyStruct<'a> {
     validate: ValidateApiMetadataStruct<'a>,

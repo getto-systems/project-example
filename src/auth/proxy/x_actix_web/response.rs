@@ -7,9 +7,9 @@ use crate::auth::ticket::kernel::remote::x_actix_web::header::{
 
 use crate::z_lib::remote::response::actix_web::RespondTo;
 
-use crate::auth::remote::proxy::action::AuthProxyState;
+use crate::auth::proxy::action::AuthProxyState;
 
-use crate::auth::remote::proxy::data::{AuthProxyError, AuthProxyResponse};
+use crate::auth::proxy::data::{AuthProxyError, AuthProxyResponse};
 
 impl<R: RespondTo> RespondTo for AuthProxyState<R> {
     fn respond_to(self, request: &HttpRequest) -> HttpResponse {

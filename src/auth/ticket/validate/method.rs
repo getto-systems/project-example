@@ -10,7 +10,7 @@ use crate::auth::ticket::{
 
 use crate::{
     auth::{
-        remote::proxy::data::AuthProxyError,
+        proxy::data::AuthProxyError,
         ticket::kernel::remote::data::{
             AuthTicket, DecodeAuthTokenError, ExpireDateTime, ExpireDuration,
             ValidateAuthRolesError,

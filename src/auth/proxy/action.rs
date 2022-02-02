@@ -4,9 +4,9 @@ use crate::auth::ticket::validate::method::{
     validate_auth_metadata, ValidateAuthMetadataEvent, ValidateAuthMetadataInfra,
 };
 
-use crate::auth::remote::proxy::infra::AuthProxyService;
+use crate::auth::proxy::infra::AuthProxyService;
 
-use crate::auth::remote::proxy::data::AuthProxyError;
+use crate::auth::proxy::data::AuthProxyError;
 
 pub enum AuthProxyState<R> {
     Metadata(ValidateAuthMetadataEvent),

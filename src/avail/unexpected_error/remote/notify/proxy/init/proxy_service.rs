@@ -13,16 +13,14 @@ use crate::z_lib::remote::message::helper::{
 
 use crate::z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer;
 
-use crate::{
-    auth::remote::proxy::helper::infra_error, z_lib::remote::service::helper::new_endpoint,
-};
+use crate::{auth::proxy::helper::infra_error, z_lib::remote::service::helper::new_endpoint};
 
-use crate::auth::remote::proxy::method::set_metadata;
+use crate::auth::proxy::method::set_metadata;
 
-use crate::auth::remote::{infra::AuthMetadataContent, proxy::infra::AuthProxyService};
+use crate::auth::{proxy::infra::AuthProxyService, remote::infra::AuthMetadataContent};
 
 use crate::{
-    auth::remote::proxy::data::{AuthProxyError, AuthProxyResponse},
+    auth::proxy::data::{AuthProxyError, AuthProxyResponse},
     z_lib::remote::message::data::MessageError,
 };
 

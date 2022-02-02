@@ -8,15 +8,13 @@ use crate::auth::remote::x_outside_feature::common::feature::AuthOutsideService;
 
 use crate::z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer;
 
-use crate::{
-    auth::remote::proxy::helper::infra_error, z_lib::remote::service::helper::new_endpoint,
-};
+use crate::{auth::proxy::helper::infra_error, z_lib::remote::service::helper::new_endpoint};
 
-use crate::auth::remote::proxy::method::set_metadata;
+use crate::auth::proxy::method::set_metadata;
 
 use crate::auth::ticket::validate::infra::{AuthMetadataContent, ValidateService};
 
-use crate::auth::{remote::proxy::data::AuthProxyError, user::kernel::data::RequireAuthRoles};
+use crate::auth::{proxy::data::AuthProxyError, user::kernel::data::RequireAuthRoles};
 
 pub struct TonicValidateService<'a> {
     service_url: &'static str,
@@ -81,7 +79,7 @@ async fn validate<'a>(
 pub mod test {
     use crate::auth::ticket::validate::infra::{AuthMetadataContent, ValidateService};
 
-    use crate::auth::{remote::proxy::data::AuthProxyError, user::kernel::data::RequireAuthRoles};
+    use crate::auth::{proxy::data::AuthProxyError, user::kernel::data::RequireAuthRoles};
 
     pub struct StaticValidateService;
 

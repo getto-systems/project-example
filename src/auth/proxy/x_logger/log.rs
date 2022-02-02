@@ -1,8 +1,8 @@
 use crate::z_lib::remote::logger::{LogLevel, LogMessage, LogFilter};
 
-use crate::auth::remote::proxy::action::AuthProxyState;
+use crate::auth::proxy::action::AuthProxyState;
 
-use crate::auth::remote::proxy::data::AuthProxyError;
+use crate::auth::proxy::data::AuthProxyError;
 
 impl<R> LogMessage for AuthProxyState<R> {
     fn log_message(&self) -> String {

@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 
 use crate::{
     auth::{
-        remote::proxy::data::AuthProxyError,
+        proxy::data::AuthProxyError,
         ticket::kernel::remote::data::{
             AuthDateTime, AuthNonce, AuthTicketExtract, AuthToken, DecodeAuthTokenError,
             ExpireDateTime,

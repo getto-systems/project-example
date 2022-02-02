@@ -9,7 +9,7 @@ use crate::auth::ticket::{
     validate::init::ValidateTicketMetadataStruct,
 };
 
-use crate::auth::remote::proxy::action::{AuthProxyAction, AuthProxyMaterial};
+use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
 
 pub struct CheckAuthTicketProxyStruct<'a> {
     validate: ValidateTicketMetadataStruct<'a>,

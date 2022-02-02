@@ -9,7 +9,7 @@ use crate::auth::{
     user::password::authenticate::remote::proxy::init::proxy_service::ProxyService,
 };
 
-use crate::auth::remote::proxy::action::{AuthProxyAction, AuthProxyMaterial};
+use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
 
 pub struct AuthenticatePasswordProxyStruct<'a> {
     validate: NoValidateMetadataStruct<'a>,

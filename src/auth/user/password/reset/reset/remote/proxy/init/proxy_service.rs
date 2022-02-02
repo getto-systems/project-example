@@ -13,24 +13,20 @@ use crate::{
 };
 
 use crate::{
-    auth::{
-        remote::proxy::helper::infra_error, ticket::kernel::remote::infra::AuthTokenResponseBuilder,
-    },
+    auth::{proxy::helper::infra_error, ticket::kernel::remote::infra::AuthTokenResponseBuilder},
     z_lib::remote::{
         message::helper::{decode_base64, encode_protobuf_base64, invalid_protobuf},
         service::helper::new_endpoint,
     },
 };
 
-use crate::auth::remote::proxy::method::set_metadata;
+use crate::auth::proxy::method::set_metadata;
 
-use crate::auth::{
-    remote::proxy::infra::AuthProxyService, ticket::validate::infra::AuthMetadataContent,
-};
+use crate::auth::{proxy::infra::AuthProxyService, ticket::validate::infra::AuthMetadataContent};
 
 use crate::{
     auth::{
-        remote::proxy::data::AuthProxyError,
+        proxy::data::AuthProxyError,
         ticket::kernel::remote::data::{AuthTokenMessage, AuthTokenResponse},
     },
     z_lib::remote::message::data::MessageError,

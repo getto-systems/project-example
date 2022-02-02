@@ -1,6 +1,6 @@
 use tonic::{Code, Status};
 
-use crate::auth::remote::proxy::data::AuthProxyError;
+use crate::auth::proxy::data::AuthProxyError;
 
 impl From<Status> for AuthProxyError {
     fn from(status: Status) -> Self {

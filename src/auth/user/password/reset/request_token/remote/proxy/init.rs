@@ -9,7 +9,7 @@ use crate::auth::{
     user::password::reset::request_token::remote::proxy::init::proxy_service::ProxyService,
 };
 
-use crate::auth::remote::proxy::action::{AuthProxyAction, AuthProxyMaterial};
+use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
 
 pub struct RequestResetTokenProxyStruct<'a> {
     validate: NoValidateMetadataStruct<'a>,

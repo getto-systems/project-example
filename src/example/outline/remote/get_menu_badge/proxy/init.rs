@@ -9,7 +9,7 @@ use crate::{
     example::outline::remote::get_menu_badge::proxy::init::proxy_service::ProxyService,
 };
 
-use crate::auth::remote::proxy::action::{AuthProxyAction, AuthProxyMaterial};
+use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
 
 pub struct GetOutlineMenuBadgeProxyStruct<'a> {
     validate: ValidateApiMetadataStruct<'a>,
