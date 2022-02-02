@@ -21,7 +21,7 @@ use crate::x_outside_feature::remote::{
 };
 
 use crate::auth::ticket::remote::{
-    action_validate::init::ValidateApiTokenFeature, check::init::CheckAuthTicketStruct,
+    validate::init::ValidateApiTokenStruct, check::init::CheckAuthTicketStruct,
     logout::init::LogoutStruct,
 };
 
@@ -93,10 +93,9 @@ impl ValidateApiTokenPb for Validate {
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger("auth.ticket.validate", request_id.into());
-        let mut action = ValidateApiTokenFeature::action(&feature, &metadata);
+        let mut action = ValidateApiTokenStruct::action(&feature, &metadata, request);
         action.subscribe(move |state| logger.log(state));
 
-        let request_decoder = ValidateApiTokenFeature::request_decoder(request);
-        flatten(action.ignite(request_decoder).await).respond_to()
+        flatten(action.ignite().await).respond_to()
     }
 }

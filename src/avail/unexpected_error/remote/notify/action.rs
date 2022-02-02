@@ -2,7 +2,7 @@ use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::remote::{
     data::RequireAuthRoles,
-    method::{validate_api_token, ValidateApiTokenEvent, ValidateApiTokenInfra},
+    method::{check_permission, CheckPermissionEvent, CheckPermissionInfra},
 };
 
 use crate::avail::unexpected_error::remote::notify::infra::{
@@ -10,7 +10,7 @@ use crate::avail::unexpected_error::remote::notify::infra::{
 };
 
 pub enum NotifyUnexpectedErrorState {
-    Validate(ValidateApiTokenEvent),
+    Validate(CheckPermissionEvent),
     Notify(NotifyUnexpectedErrorEvent),
 }
 
@@ -24,9 +24,9 @@ impl std::fmt::Display for NotifyUnexpectedErrorState {
 }
 
 pub trait NotifyUnexpectedErrorMaterial {
-    type Validate: ValidateApiTokenInfra;
+    type CheckPermission: CheckPermissionInfra;
 
-    fn validate(&self) -> &Self::Validate;
+    fn check_permission(&self) -> &Self::CheckPermission;
 }
 
 pub struct NotifyUnexpectedErrorAction<
@@ -62,7 +62,7 @@ impl<R: NotifyUnexpectedErrorRequestDecoder, M: NotifyUnexpectedErrorMaterial>
 
         let fields = self.request_decoder.decode();
 
-        validate_api_token(m.validate(), RequireAuthRoles::Nothing, |event| {
+        check_permission(m.check_permission(), RequireAuthRoles::Nothing, |event| {
             pubsub.post(NotifyUnexpectedErrorState::Validate(event))
         })
         .await?;

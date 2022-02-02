@@ -41,9 +41,9 @@ struct TestStruct {
 }
 
 impl NotifyUnexpectedErrorMaterial for TestStruct {
-    type Validate = StaticValidateApiTokenStruct;
+    type CheckPermission = StaticValidateApiTokenStruct;
 
-    fn validate(&self) -> &Self::Validate {
+    fn check_permission(&self) -> &Self::CheckPermission {
         &self.validate
     }
 }

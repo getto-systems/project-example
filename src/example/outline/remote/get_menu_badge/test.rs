@@ -37,11 +37,11 @@ struct TestStruct {
 }
 
 impl GetOutlineMenuBadgeMaterial for TestStruct {
-    type Validate = StaticValidateApiTokenStruct;
+    type CheckPermission = StaticValidateApiTokenStruct;
 
     type MenuBadgeRepository = StaticOutlineMenuBadgeRepository;
 
-    fn validate(&self) -> &Self::Validate {
+    fn check_permission(&self) -> &Self::CheckPermission {
         &self.validate
     }
 

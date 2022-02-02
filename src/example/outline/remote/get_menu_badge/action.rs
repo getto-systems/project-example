@@ -3,7 +3,7 @@ use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 use crate::{
     auth::remote::{
         data::RequireAuthRoles,
-        method::{validate_api_token, ValidateApiTokenEvent, ValidateApiTokenInfra},
+        method::{check_permission, CheckPermissionEvent, CheckPermissionInfra},
     },
     example::outline::remote::get_menu_badge::{
         data::OutlineMenuBadge, infra::OutlineMenuBadgeRepository,
@@ -12,7 +12,7 @@ use crate::{
 };
 
 pub enum GetOutlineMenuBadgeState {
-    Validate(ValidateApiTokenEvent),
+    Validate(CheckPermissionEvent),
     GetMenuBadge(GetOutlineMenuBadgeEvent),
 }
 
@@ -26,12 +26,10 @@ impl std::fmt::Display for GetOutlineMenuBadgeState {
 }
 
 pub trait GetOutlineMenuBadgeMaterial {
-    type Validate: ValidateApiTokenInfra;
-
+    type CheckPermission: CheckPermissionInfra;
     type MenuBadgeRepository: OutlineMenuBadgeRepository;
 
-    fn validate(&self) -> &Self::Validate;
-
+    fn check_permission(&self) -> &Self::CheckPermission;
     fn menu_badge_repository(&self) -> &Self::MenuBadgeRepository;
 }
 
@@ -59,7 +57,7 @@ impl<M: GetOutlineMenuBadgeMaterial> GetOutlineMenuBadgeAction<M> {
         let pubsub = self.pubsub;
         let m = self.material;
 
-        validate_api_token(m.validate(), RequireAuthRoles::Nothing, |event| {
+        check_permission(m.check_permission(), RequireAuthRoles::Nothing, |event| {
             pubsub.post(GetOutlineMenuBadgeState::Validate(event))
         })
         .await?;

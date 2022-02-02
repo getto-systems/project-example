@@ -100,20 +100,20 @@ fn decode_ticket(
         .map_err(ValidateAuthTokenEvent::DecodeError)
 }
 
-pub enum ValidateApiTokenEvent {
+pub enum CheckPermissionEvent {
     Success,
     ServiceError(AuthProxyError),
     MetadataError(MetadataError),
     DecodeError(DecodeAuthTokenError),
 }
 
-mod validate_api_token_event {
-    use super::ValidateApiTokenEvent;
+mod check_permission_event {
+    use super::CheckPermissionEvent;
 
     const SUCCESS: &'static str = "validate api token success";
     const ERROR: &'static str = "validate api token error";
 
-    impl std::fmt::Display for ValidateApiTokenEvent {
+    impl std::fmt::Display for CheckPermissionEvent {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
                 Self::Success => write!(f, "{}", SUCCESS),
@@ -125,7 +125,7 @@ mod validate_api_token_event {
     }
 }
 
-pub trait ValidateApiTokenInfra {
+pub trait CheckPermissionInfra {
     type AuthMetadata: AuthMetadata;
     type TokenDecoder: AuthTokenDecoder;
     type ValidateService: ValidateService;
@@ -135,10 +135,10 @@ pub trait ValidateApiTokenInfra {
     fn validate_service(&self) -> &Self::ValidateService;
 }
 
-pub async fn validate_api_token<S>(
-    infra: &impl ValidateApiTokenInfra,
+pub async fn check_permission<S>(
+    infra: &impl CheckPermissionInfra,
     require_roles: RequireAuthRoles,
-    post: impl Fn(ValidateApiTokenEvent) -> S,
+    post: impl Fn(CheckPermissionEvent) -> S,
 ) -> MethodResult<S> {
     let auth_metadata = infra.auth_metadata();
     let token_decoder = infra.token_decoder();
@@ -146,20 +146,20 @@ pub async fn validate_api_token<S>(
 
     let metadata = auth_metadata
         .metadata()
-        .map_err(|err| post(ValidateApiTokenEvent::MetadataError(err)))?;
+        .map_err(|err| post(CheckPermissionEvent::MetadataError(err)))?;
 
     if let Some(ref token) = metadata.token {
         token_decoder
             .decode(token)
-            .map_err(|err| post(ValidateApiTokenEvent::DecodeError(err)))?;
+            .map_err(|err| post(CheckPermissionEvent::DecodeError(err)))?;
     }
 
     validate_service
         .validate(metadata, require_roles)
         .await
-        .map_err(|err| post(ValidateApiTokenEvent::ServiceError(err)))?;
+        .map_err(|err| post(CheckPermissionEvent::ServiceError(err)))?;
 
-    Ok(post(ValidateApiTokenEvent::Success))
+    Ok(post(CheckPermissionEvent::Success))
 }
 
 pub enum ValidateAuthMetadataEvent {
