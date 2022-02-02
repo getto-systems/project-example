@@ -6,7 +6,7 @@ use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideEmail;
 use crate::auth::user::password::reset::request_token::remote::infra::ResetTokenNotifier;
 
 use crate::auth::user::password::reset::{
-    remote::kernel::data::{ResetTokenDestination, ResetTokenEncoded},
+    kernel::data::{ResetTokenDestination, ResetTokenEncoded},
     request_token::remote::data::{NotifyResetTokenError, NotifyResetTokenResponse},
 };
 
@@ -132,7 +132,7 @@ pub mod test {
     use crate::auth::user::password::reset::request_token::remote::infra::ResetTokenNotifier;
 
     use crate::auth::user::password::reset::{
-        remote::kernel::data::{ResetTokenDestination, ResetTokenEncoded},
+        kernel::data::{ResetTokenDestination, ResetTokenEncoded},
         request_token::remote::data::{NotifyResetTokenError, NotifyResetTokenResponse},
     };
 

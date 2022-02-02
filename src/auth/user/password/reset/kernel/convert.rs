@@ -1,4 +1,4 @@
-use crate::auth::user::password::reset::remote::kernel::data::{
+use crate::auth::user::password::reset::kernel::data::{
     ResetTokenEncodedExtract, ValidateResetTokenError,
 };
 

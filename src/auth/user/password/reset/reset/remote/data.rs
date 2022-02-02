@@ -3,7 +3,7 @@ use crate::{
         login_id::kernel::data::ValidateLoginIdError,
         password::{
             kernel::data::{PasswordHashError, ValidatePasswordError},
-            reset::remote::kernel::data::ValidateResetTokenError,
+            reset::kernel::data::ValidateResetTokenError,
         },
     },
     z_lib::remote::repository::data::RepositoryError,

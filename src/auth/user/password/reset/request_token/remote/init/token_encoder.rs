@@ -3,13 +3,13 @@ use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideResetTokenKey;
 
 use crate::auth::user::password::reset::{
-    remote::kernel::infra::ResetTokenJwtClaims, request_token::remote::infra::ResetTokenEncoder,
+    kernel::infra::ResetTokenJwtClaims, request_token::remote::infra::ResetTokenEncoder,
 };
 
 use crate::auth::{
     ticket::kernel::remote::data::ExpireDateTime,
     user::password::reset::{
-        remote::kernel::data::{ResetToken, ResetTokenEncoded},
+        kernel::data::{ResetToken, ResetTokenEncoded},
         request_token::remote::data::EncodeResetTokenError,
     },
 };
@@ -69,7 +69,7 @@ pub mod test {
     use super::super::super::data::EncodeResetTokenError;
     use crate::auth::{
         ticket::kernel::remote::data::ExpireDateTime,
-        user::password::reset::remote::kernel::data::{ResetToken, ResetTokenEncoded},
+        user::password::reset::kernel::data::{ResetToken, ResetTokenEncoded},
     };
 
     pub struct StaticResetTokenEncoder;

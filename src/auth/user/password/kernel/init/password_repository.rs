@@ -8,7 +8,7 @@ use crate::auth::user::password::{
     change::remote::infra::ChangePasswordRepository,
     kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword},
     reset::{
-        remote::kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
+        kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
         request_token::remote::infra::RegisterResetTokenRepository,
         reset::remote::infra::ResetPasswordRepository,
     },
@@ -23,7 +23,7 @@ use crate::{
                 authenticate::remote::data::VerifyPasswordRepositoryError,
                 change::remote::data::ChangePasswordRepositoryError,
                 reset::{
-                    remote::kernel::data::{
+                    kernel::data::{
                         ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
                     },
                     request_token::remote::data::RegisterResetTokenRepositoryError,
@@ -357,7 +357,7 @@ pub mod test {
         change::remote::infra::ChangePasswordRepository,
         kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword},
         reset::{
-            remote::kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
+            kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
             request_token::remote::infra::RegisterResetTokenRepository,
             reset::remote::infra::ResetPasswordRepository,
         },
@@ -372,7 +372,7 @@ pub mod test {
                     authenticate::remote::data::VerifyPasswordRepositoryError,
                     change::remote::data::ChangePasswordRepositoryError,
                     reset::{
-                        remote::kernel::data::{
+                        kernel::data::{
                             ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
                         },
                         request_token::remote::data::RegisterResetTokenRepositoryError,

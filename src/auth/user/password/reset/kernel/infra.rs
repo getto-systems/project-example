@@ -1,11 +1,13 @@
-use chrono::{Utc, DateTime};
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::auth::{
     ticket::kernel::remote::data::{AuthDateTime, ExpireDateTime},
     user::{
         login_id::kernel::data::LoginId,
-        password::reset::remote::kernel::data::{ResetToken, ResetTokenDestination, ResetTokenDestinationExtract},
+        password::reset::kernel::data::{
+            ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
+        },
     },
 };
 

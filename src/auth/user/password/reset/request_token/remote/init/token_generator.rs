@@ -2,7 +2,7 @@ use uuid::Uuid;
 
 use crate::auth::user::password::reset::request_token::remote::infra::ResetTokenGenerator;
 
-use crate::auth::user::password::reset::remote::kernel::data::ResetToken;
+use crate::auth::user::password::reset::kernel::data::ResetToken;
 
 pub struct UuidResetTokenGenerator;
 
@@ -16,7 +16,7 @@ impl ResetTokenGenerator for UuidResetTokenGenerator {
 pub mod test {
     use crate::auth::user::password::reset::request_token::remote::infra::ResetTokenGenerator;
 
-    use crate::auth::user::password::reset::remote::kernel::data::ResetToken;
+    use crate::auth::user::password::reset::kernel::data::ResetToken;
 
     pub struct StaticResetTokenGenerator {
         token: ResetToken,

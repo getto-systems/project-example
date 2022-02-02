@@ -1,5 +1,5 @@
 use crate::auth::user::password::{
-    kernel::infra::AuthUserPasswordHasher, reset::remote::kernel::infra::ResetTokenEntry,
+    kernel::infra::AuthUserPasswordHasher, reset::kernel::infra::ResetTokenEntry,
 };
 
 use crate::{
@@ -7,7 +7,7 @@ use crate::{
         ticket::kernel::remote::data::AuthDateTime,
         user::{
             password::reset::{
-                remote::kernel::data::{ResetToken, ResetTokenDestination, ResetTokenEncoded},
+                kernel::data::{ResetToken, ResetTokenDestination, ResetTokenEncoded},
                 reset::remote::data::{
                     DecodeResetTokenError, NotifyResetPasswordError, NotifyResetPasswordResponse,
                     ResetPasswordRepositoryError,
