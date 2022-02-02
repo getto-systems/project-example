@@ -35,11 +35,9 @@ impl std::fmt::Display for SearchAuthUserAccountState {
 
 pub trait SearchAuthUserAccountMaterial {
     type Validate: ValidateAuthTokenInfra;
-
     type SearchRepository: SearchAuthUserAccountRepository;
 
     fn validate(&self) -> &Self::Validate;
-
     fn search_repository(&self) -> &Self::SearchRepository;
 }
 
@@ -71,7 +69,7 @@ impl<R: SearchAuthUserAccountRequestDecoder, M: SearchAuthUserAccountMaterial>
     }
 
     pub async fn ignite(self) -> MethodResult<SearchAuthUserAccountState> {
-        let pubsub = self.pubsub;
+        let p = self.pubsub;
         let m = self.material;
 
         let fields = self.request_decoder.decode();
@@ -79,12 +77,12 @@ impl<R: SearchAuthUserAccountRequestDecoder, M: SearchAuthUserAccountMaterial>
         validate_auth_token(
             m.validate(),
             RequireAuthRoles::Nothing, // TODO RequireAuthRoles::manage_auth_user(),
-            |event| pubsub.post(SearchAuthUserAccountState::Validate(event)),
+            |event| p.post(SearchAuthUserAccountState::Validate(event)),
         )
         .await?;
 
         search_user_account(&m, fields, |event| {
-            pubsub.post(SearchAuthUserAccountState::Search(event))
+            p.post(SearchAuthUserAccountState::Search(event))
         })
         .await
     }

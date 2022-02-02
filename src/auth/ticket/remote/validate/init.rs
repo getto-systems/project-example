@@ -9,10 +9,15 @@ pub mod validate_service;
 use actix_web::HttpRequest;
 use tonic::metadata::MetadataMap;
 
-use crate::{auth::{remote::x_outside_feature::{
-    auth::feature::AuthOutsideFeature,
-    common::feature::{AuthOutsideDecodingKey, AuthOutsideService},
-}, ticket::remote::{validate::{init::request_decoder::PbValidateApiTokenRequestDecoder, action::{ValidateApiTokenAction, ValidateApiTokenMaterial}}, y_protobuf::service::ValidateApiTokenRequestPb}}, x_outside_feature::remote::auth::feature::AuthAppFeature};
+use crate::auth::ticket::remote::y_protobuf::service::ValidateApiTokenRequestPb;
+
+use crate::{
+    auth::remote::x_outside_feature::{
+        auth::feature::AuthOutsideFeature,
+        common::feature::{AuthOutsideDecodingKey, AuthOutsideService},
+    },
+    x_outside_feature::remote::auth::feature::AuthAppFeature,
+};
 
 use crate::auth::ticket::remote::{
     kernel::init::clock::ChronoAuthClock,
@@ -20,42 +25,33 @@ use crate::auth::ticket::remote::{
         auth_metadata::{ApiAuthMetadata, NoAuthMetadata, TicketAuthMetadata, TonicAuthMetadata},
         nonce_metadata::TonicAuthNonceMetadata,
         nonce_repository::DynamoDbAuthNonceRepository,
+        request_decoder::PbValidateApiTokenRequestDecoder,
         token_decoder::{JwtApiTokenDecoder, JwtTicketTokenDecoder, NoopTokenDecoder},
         token_metadata::TonicAuthTokenMetadata,
         validate_service::TonicValidateService,
     },
 };
 
+use crate::auth::ticket::remote::validate::action::ValidateApiTokenAction;
+
 use crate::auth::ticket::remote::validate::method::{
     AuthNonceConfig, CheckPermissionInfra, ValidateAuthMetadataInfra, ValidateAuthNonceInfra,
     ValidateAuthTokenInfra,
 };
 
-pub struct ValidateApiTokenStruct<'a> {
-    request_decoder: PbValidateApiTokenRequestDecoder,
-    validate: ApiValidateAuthTokenStruct<'a>,
-}
+pub struct ValidateApiTokenStruct;
 
-impl<'a> ValidateApiTokenStruct<'a> {
-    pub fn action(
+impl ValidateApiTokenStruct {
+    pub fn action<'a>(
         feature: &'a AuthAppFeature,
         metadata: &'a MetadataMap,
         request: ValidateApiTokenRequestPb,
-    ) -> ValidateApiTokenAction<Self> {
-        ValidateApiTokenAction::with_material(Self {
-            request_decoder: PbValidateApiTokenRequestDecoder::new(request),
-            validate: ApiValidateAuthTokenStruct::new(&feature.auth, metadata),
-        })
-    }
-}
-
-#[async_trait::async_trait]
-impl<'a> ValidateApiTokenMaterial for ValidateApiTokenStruct<'a> {
-    type RequestDecoder = PbValidateApiTokenRequestDecoder;
-    type Infra = ApiValidateAuthTokenStruct<'a>;
-
-    fn extract(self) -> (Self::RequestDecoder, Self::Infra) {
-        (self.request_decoder, self.validate)
+    ) -> ValidateApiTokenAction<PbValidateApiTokenRequestDecoder, ApiValidateAuthTokenStruct<'a>>
+    {
+        ValidateApiTokenAction::with_material(
+            PbValidateApiTokenRequestDecoder::new(request),
+            ApiValidateAuthTokenStruct::new(&feature.auth, metadata),
+        )
     }
 }
 

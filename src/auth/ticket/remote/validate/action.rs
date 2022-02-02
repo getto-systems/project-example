@@ -22,22 +22,17 @@ impl std::fmt::Display for ValidateApiTokenState {
     }
 }
 
-pub trait ValidateApiTokenMaterial {
-    type RequestDecoder: ValidateApiTokenRequestDecoder;
-    type Infra: ValidateAuthTokenInfra;
-
-    fn extract(self) -> (Self::RequestDecoder, Self::Infra);
-}
-
-pub struct ValidateApiTokenAction<M: ValidateApiTokenMaterial> {
+pub struct ValidateApiTokenAction<R: ValidateApiTokenRequestDecoder, M: ValidateAuthTokenInfra> {
     pubsub: ActionStatePubSub<ValidateApiTokenState>,
+    request_decoder: R,
     material: M,
 }
 
-impl<M: ValidateApiTokenMaterial> ValidateApiTokenAction<M> {
-    pub fn with_material(material: M) -> Self {
+impl<R: ValidateApiTokenRequestDecoder, M: ValidateAuthTokenInfra> ValidateApiTokenAction<R, M> {
+    pub fn with_material(request_decoder: R, material: M) -> Self {
         Self {
             pubsub: ActionStatePubSub::new(),
+            request_decoder,
             material,
         }
     }
@@ -47,16 +42,16 @@ impl<M: ValidateApiTokenMaterial> ValidateApiTokenAction<M> {
     }
 
     pub async fn ignite(self) -> MethodResult<ValidateApiTokenState> {
-        let pubsub = self.pubsub;
-        let (request_decoder, infra) = self.material.extract();
+        let p = self.pubsub;
+        let m = self.material;
 
-        let require_roles = request_decoder.decode();
+        let require_roles = self.request_decoder.decode();
 
-        let ticket = validate_auth_token(&infra, require_roles, |event| {
-            pubsub.post(ValidateApiTokenState::Validate(event))
+        let ticket = validate_auth_token(&m, require_roles, |event| {
+            p.post(ValidateApiTokenState::Validate(event))
         })
         .await?;
 
-        Ok(pubsub.post(ValidateApiTokenState::Success(ticket.into_user())))
+        Ok(p.post(ValidateApiTokenState::Success(ticket.into_user())))
     }
 }

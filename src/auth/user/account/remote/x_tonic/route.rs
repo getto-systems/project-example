@@ -17,7 +17,7 @@ use crate::x_outside_feature::remote::{
     common::metadata::metadata_request_id,
 };
 
-use crate::auth::user::account::remote::search::init::SearchAuthUserAccountFeature;
+use crate::auth::user::account::remote::search::init::SearchAuthUserAccountStruct;
 
 pub struct AccountServer;
 
@@ -43,7 +43,7 @@ impl SearchAuthUserAccountPb for Search {
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger("auth.user.account.search", request_id.into());
-        let mut action = SearchAuthUserAccountFeature::action(&feature, &metadata, request);
+        let mut action = SearchAuthUserAccountStruct::action(&feature, &metadata, request);
         action.subscribe(move |state| logger.log(state));
 
         flatten(action.ignite().await).respond_to()

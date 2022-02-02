@@ -55,10 +55,10 @@ async fn success_search() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let feature = TestStruct::new(&store);
+    let material = TestStruct::new(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = SearchAuthUserAccountAction::with_material(request_decoder, feature);
+    let mut action = SearchAuthUserAccountAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -84,7 +84,6 @@ impl<'a> SearchAuthUserAccountMaterial for TestStruct<'a> {
     fn validate(&self) -> &Self::Validate {
         &self.validate
     }
-
     fn search_repository(&self) -> &Self::SearchRepository {
         &self.search_repository
     }

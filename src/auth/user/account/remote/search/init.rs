@@ -15,15 +15,16 @@ use crate::auth::{
     },
 };
 
-use super::action::{SearchAuthUserAccountAction, SearchAuthUserAccountMaterial};
+use crate::auth::user::account::remote::search::action::{
+    SearchAuthUserAccountAction, SearchAuthUserAccountMaterial,
+};
 
-pub struct SearchAuthUserAccountFeature<'a> {
+pub struct SearchAuthUserAccountStruct<'a> {
     validate: ApiValidateAuthTokenStruct<'a>,
-
     search_repository: MysqlSearchAuthUserAccountRepository<'a>,
 }
 
-impl<'a> SearchAuthUserAccountFeature<'a> {
+impl<'a> SearchAuthUserAccountStruct<'a> {
     pub fn action(
         feature: &'a AuthAppFeature,
         metadata: &'a MetadataMap,
@@ -42,15 +43,13 @@ impl<'a> SearchAuthUserAccountFeature<'a> {
     }
 }
 
-impl<'a> SearchAuthUserAccountMaterial for SearchAuthUserAccountFeature<'a> {
+impl<'a> SearchAuthUserAccountMaterial for SearchAuthUserAccountStruct<'a> {
     type Validate = ApiValidateAuthTokenStruct<'a>;
-
     type SearchRepository = MysqlSearchAuthUserAccountRepository<'a>;
 
     fn validate(&self) -> &Self::Validate {
         &self.validate
     }
-
     fn search_repository(&self) -> &Self::SearchRepository {
         &self.search_repository
     }
