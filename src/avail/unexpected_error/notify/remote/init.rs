@@ -8,7 +8,7 @@ use crate::x_outside_feature::remote::example::feature::ExampleAppFeature;
 
 use crate::{
     auth::init::CheckPermissionStruct,
-    avail::unexpected_error::remote::notify::init::request_decoder::PbNotifyUnexpectedErrorRequestDecoder,
+    avail::unexpected_error::notify::remote::init::request_decoder::PbNotifyUnexpectedErrorRequestDecoder,
 };
 
 use super::action::{NotifyUnexpectedErrorAction, NotifyUnexpectedErrorMaterial};

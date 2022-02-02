@@ -5,11 +5,8 @@ use getto_application::helper::flatten;
 use crate::z_lib::remote::{logger::Logger, response::tonic::RespondTo};
 
 use crate::avail::unexpected_error::remote::y_protobuf::service::{
-    notify_pb_server::{NotifyPb, NotifyPbServer},
-    NotifyRequestPb, NotifyResponsePb,
+    notify_pb_server::NotifyPb, NotifyRequestPb, NotifyResponsePb,
 };
-
-use crate::avail::unexpected_error::remote::notify::init::NotifyUnexpectedErrorFeature;
 
 use crate::x_outside_feature::remote::{
     common::metadata::metadata_request_id,
@@ -19,18 +16,12 @@ use crate::x_outside_feature::remote::{
     },
 };
 
-pub struct UnexpectedErrorServer;
+use crate::avail::unexpected_error::notify::remote::init::NotifyUnexpectedErrorFeature;
 
-impl UnexpectedErrorServer {
-    pub fn notify(&self) -> NotifyPbServer<Notify> {
-        NotifyPbServer::new(Notify)
-    }
-}
-
-pub struct Notify;
+pub struct ServiceNotify;
 
 #[async_trait::async_trait]
-impl NotifyPb for Notify {
+impl NotifyPb for ServiceNotify {
     async fn notify(
         &self,
         request: Request<NotifyRequestPb>,
@@ -43,7 +34,8 @@ impl NotifyPb for Notify {
         let request_id = metadata_request_id(&metadata);
         let logger = app_logger("avail.unexpected_error.notify", request_id.into());
 
-        let mut action = NotifyUnexpectedErrorFeature::action(&feature, &request_id, &metadata, request);
+        let mut action =
+            NotifyUnexpectedErrorFeature::action(&feature, &request_id, &metadata, request);
         action.subscribe(move |state| logger.log(state));
 
         flatten(action.ignite().await).respond_to()

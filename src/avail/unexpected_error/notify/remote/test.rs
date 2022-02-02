@@ -7,13 +7,12 @@ use crate::{
         StaticAuthMetadata, StaticAuthTokenDecoder, StaticValidateApiTokenStruct,
         StaticValidateService,
     },
-    avail::unexpected_error::remote::{
-        notify::infra::NotifyUnexpectedErrorRequestDecoder,
-        notify::init::request_decoder::test::StaticNotifyUnexpectedErrorRequestDecoder,
-    },
+    avail::unexpected_error::notify::remote::init::request_decoder::test::StaticNotifyUnexpectedErrorRequestDecoder,
 };
 
-use crate::avail::unexpected_error::remote::notify::infra::NotifyUnexpectedErrorFieldsExtract;
+use crate::avail::unexpected_error::notify::remote::infra::{
+    NotifyUnexpectedErrorFieldsExtract, NotifyUnexpectedErrorRequestDecoder,
+};
 
 use super::action::{NotifyUnexpectedErrorAction, NotifyUnexpectedErrorMaterial};
 

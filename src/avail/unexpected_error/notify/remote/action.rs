@@ -5,7 +5,7 @@ use crate::auth::{
     method::{check_permission, CheckPermissionEvent, CheckPermissionInfra},
 };
 
-use crate::avail::unexpected_error::remote::notify::infra::{
+use crate::avail::unexpected_error::notify::remote::infra::{
     NotifyUnexpectedErrorFieldsExtract, NotifyUnexpectedErrorRequestDecoder,
 };
 

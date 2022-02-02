@@ -1,8 +1,4 @@
-use actix_web::{
-    post,
-    web::{scope, Data},
-    HttpRequest, Responder, Scope,
-};
+use actix_web::{post, web::Data, HttpRequest, Responder};
 
 use getto_application::helper::flatten;
 
@@ -13,14 +9,10 @@ use crate::x_outside_feature::remote::api::{
     logger::{app_logger, generate_request_id},
 };
 
-use crate::avail::unexpected_error::remote::notify::proxy::init::NotifyUnexpectedErrorProxyStruct;
-
-pub fn scope_unexpected_error() -> Scope {
-    scope("/unexpected-error").service(notify)
-}
+use crate::avail::unexpected_error::notify::remote::proxy::init::NotifyUnexpectedErrorProxyStruct;
 
 #[post("")]
-async fn notify(
+async fn service_notify(
     feature: Data<ApiAppFeature>,
     request: HttpRequest,
     body: String,

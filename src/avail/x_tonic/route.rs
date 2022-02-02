@@ -1,4 +1,4 @@
-use crate::avail::unexpected_error::remote::x_tonic::route::UnexpectedErrorServer;
+use crate::avail::unexpected_error::x_tonic::route::UnexpectedErrorServer;
 
 pub struct AvailServer {
     pub unexpected_error: UnexpectedErrorServer,
