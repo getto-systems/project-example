@@ -3,6 +3,11 @@ use url::{ParseError, Url};
 
 use crate::auth::x_outside_feature::remote::auth::feature::AuthOutsideEmail;
 
+use crate::x_content::mail::{
+    notify_password_reset_token::{BODY, SUBJECT},
+    SENDER_ADDRESS,
+};
+
 use crate::auth::user::password::reset::request_token::remote::infra::ResetTokenNotifier;
 
 use crate::auth::user::password::reset::{
@@ -100,32 +105,6 @@ fn utf8_content(data: String) -> Content {
         data,
     }
 }
-
-const SENDER_ADDRESS: &'static str = "GETTO Example <labo@message.getto.systems>";
-const SUBJECT: &'static str = "GETTO Example パスワードリセットの件 [URL のご案内]";
-const BODY: &'static str = r#####"お世話になっております
-GETTO Example システムです
-
-パスワードリセットの申請を受け付けましたので
-リセットのための URL を送信いたします
-
-下記 URL より、パスワードのリセットができます
-
-{URL}
-
-パスワードリセットをキャンセルする場合は
-単にこのメールを無視してください
-
-もしパスワードリセットの申請をしていない場合は
-お手数ですが、管理者に連絡をお願いいたします
-
-よろしくお願いいたします
-
-#################################
-GETTO Example
-email: labo@message.getto.systems
-#################################
-"#####;
 
 #[cfg(test)]
 pub mod test {
