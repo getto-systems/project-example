@@ -2,9 +2,9 @@ use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::ticket::{
     encode::method::{encode_auth_ticket, EncodeAuthTicketEvent, EncodeAuthTicketInfra},
-    remote::{
-        issue::method::{issue_auth_ticket, IssueAuthTicketEvent, IssueAuthTicketInfra},
-        validate::method::{validate_auth_nonce, ValidateAuthNonceEvent, ValidateAuthNonceInfra},
+    issue::method::{issue_auth_ticket, IssueAuthTicketEvent, IssueAuthTicketInfra},
+    remote::validate::method::{
+        validate_auth_nonce, ValidateAuthNonceEvent, ValidateAuthNonceInfra,
     },
 };
 

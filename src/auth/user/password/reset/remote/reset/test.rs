@@ -10,10 +10,10 @@ use crate::auth::{
             test::StaticEncodeAuthTicketStruct,
             token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
         },
+        issue::init::{
+            id_generator::test::StaticAuthTicketIdGenerator, test::StaticIssueAuthTicketStruct,
+        },
         remote::{
-            issue::init::{
-                id_generator::test::StaticAuthTicketIdGenerator, test::StaticIssueAuthTicketStruct,
-            },
             kernel::init::{
                 clock::test::StaticChronoAuthClock,
                 ticket_repository::test::{
@@ -51,8 +51,8 @@ use crate::auth::{
 };
 
 use crate::auth::ticket::{
-    encode::method::EncodeAuthTicketConfig,
-    remote::{issue::method::IssueAuthTicketConfig, validate::method::AuthNonceConfig},
+    encode::method::EncodeAuthTicketConfig, issue::method::IssueAuthTicketConfig,
+    remote::validate::method::AuthNonceConfig,
 };
 
 use super::action::{ResetPasswordAction, ResetPasswordMaterial};

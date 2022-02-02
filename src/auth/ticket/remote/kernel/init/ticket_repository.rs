@@ -4,8 +4,8 @@ use sqlx::{query, MySqlPool};
 use crate::z_lib::remote::repository::mysql::helper::mysql_error;
 
 use crate::auth::ticket::{
-    encode::infra::EncodeAuthTicketRepository, logout::remote::infra::LogoutAuthTicketRepository,
-    remote::issue::infra::IssueAuthTicketRepository,
+    encode::infra::EncodeAuthTicketRepository, issue::infra::IssueAuthTicketRepository,
+    logout::remote::infra::LogoutAuthTicketRepository,
 };
 
 use crate::{
@@ -149,9 +149,8 @@ pub mod test {
     use crate::z_lib::remote::repository::helper::infra_error;
 
     use crate::auth::ticket::{
-        encode::infra::EncodeAuthTicketRepository,
+        encode::infra::EncodeAuthTicketRepository, issue::infra::IssueAuthTicketRepository,
         logout::remote::infra::LogoutAuthTicketRepository,
-        remote::issue::infra::IssueAuthTicketRepository,
     };
 
     use crate::{

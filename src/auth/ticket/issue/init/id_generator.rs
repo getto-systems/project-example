@@ -1,6 +1,6 @@
 use uuid::Uuid;
 
-use crate::auth::ticket::remote::issue::infra::AuthTicketIdGenerator;
+use crate::auth::ticket::issue::infra::AuthTicketIdGenerator;
 
 use crate::auth::ticket::remote::kernel::data::AuthTicketId;
 
@@ -20,7 +20,7 @@ impl AuthTicketIdGenerator for UuidAuthTicketIdGenerator {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::ticket::remote::issue::infra::AuthTicketIdGenerator;
+    use crate::auth::ticket::issue::infra::AuthTicketIdGenerator;
 
     use crate::auth::ticket::remote::kernel::data::AuthTicketId;
 

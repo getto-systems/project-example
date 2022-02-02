@@ -1,7 +1,7 @@
 use crate::{
-    auth::ticket::remote::{
+    auth::ticket::{
         issue::infra::{AuthTicketIdGenerator, IssueAuthTicketRepository},
-        kernel::infra::AuthClock,
+        remote::kernel::infra::AuthClock,
     },
     z_lib::remote::repository::data::RepositoryError,
 };
