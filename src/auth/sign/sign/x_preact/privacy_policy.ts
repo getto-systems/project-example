@@ -5,7 +5,7 @@ import { buttons } from "../../../../../ui/vendor/getto-css/preact/design/form"
 
 import { siteInfo } from "../../../../example/site"
 import { signNav } from "../../nav/x_preact/nav"
-import { docsActionField } from "../../../../docs/action_docs/x_preact/helper"
+import { docsActionField } from "../../../../docs/content/x_preact/helper"
 
 import { docs_dataHandling } from "../../../../docs/docs"
 
