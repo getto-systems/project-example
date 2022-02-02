@@ -1,6 +1,6 @@
 use crate::auth::user::account::remote::y_protobuf::service::SearchAuthUserAccountRequestPb;
 
-use crate::auth::user::account::remote::search::infra::{
+use crate::auth::user::account::search::remote::infra::{
     SearchAuthUserAccountFieldsExtract, SearchAuthUserAccountRequestDecoder,
 };
 use crate::z_lib::remote::search::data::SearchSortExtract;
@@ -30,7 +30,7 @@ impl SearchAuthUserAccountRequestDecoder for PbSearchAuthUserAccountRequestDecod
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::user::account::remote::search::infra::{
+    use crate::auth::user::account::search::remote::infra::{
         SearchAuthUserAccountFieldsExtract, SearchAuthUserAccountRequestDecoder,
     };
 

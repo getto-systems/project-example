@@ -18,7 +18,7 @@ use crate::auth::{
         },
     },
     user::{
-        account::remote::search::init::{
+        account::search::remote::init::{
             request_decoder::test::StaticSearchAuthUserAccountRequestDecoder,
             search_repository::test::{
                 MemorySearchAuthUserAccountMap, MemorySearchAuthUserAccountRepository,
@@ -35,7 +35,7 @@ use crate::auth::ticket::validate::method::AuthNonceConfig;
 use super::action::{SearchAuthUserAccountAction, SearchAuthUserAccountMaterial};
 
 use crate::auth::user::{
-    account::remote::search::infra::SearchAuthUserAccountFieldsExtract,
+    account::search::remote::infra::SearchAuthUserAccountFieldsExtract,
     password::remote::kernel::infra::HashedPassword,
 };
 

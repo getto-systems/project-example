@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::account::remote::search::data::SearchAuthUserAccountBasket,
+    auth::user::account::search::remote::data::SearchAuthUserAccountBasket,
     z_lib::remote::{
         repository::data::RepositoryError,
         search::data::{SearchSort, SearchSortExtract},

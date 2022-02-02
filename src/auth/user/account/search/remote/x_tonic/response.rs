@@ -8,7 +8,7 @@ use crate::z_lib::remote::response::tonic::RespondTo;
 
 use super::super::action::{SearchAuthUserAccountEvent, SearchAuthUserAccountState};
 
-use crate::auth::user::account::remote::search::data::SearchAuthUserAccountBasket;
+use crate::auth::user::account::search::remote::data::SearchAuthUserAccountBasket;
 
 impl RespondTo<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountState {
     fn respond_to(self) -> Result<Response<SearchAuthUserAccountResponsePb>, Status> {

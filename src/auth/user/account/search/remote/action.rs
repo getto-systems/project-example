@@ -4,14 +4,14 @@ use crate::auth::ticket::validate::method::{
     validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
 };
 
-use crate::auth::user::account::remote::search::infra::{
+use crate::auth::user::account::search::remote::infra::{
     SearchAuthUserAccountFieldsExtract, SearchAuthUserAccountRepository,
     SearchAuthUserAccountRequestDecoder,
 };
 
 use crate::{
     auth::user::{
-        account::remote::search::data::SearchAuthUserAccountBasket,
+        account::search::remote::data::SearchAuthUserAccountBasket,
         remote::kernel::data::RequireAuthRoles,
     },
     z_lib::remote::repository::data::RepositoryError,

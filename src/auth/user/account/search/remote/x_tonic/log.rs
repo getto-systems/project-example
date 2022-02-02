@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::account::remote::search::action::SearchAuthUserAccountEvent,
+    auth::user::account::search::remote::action::SearchAuthUserAccountEvent,
     z_lib::remote::logger::{LogLevel, LogMessage, LogFilter},
 };
 
