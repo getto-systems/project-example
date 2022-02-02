@@ -1,7 +1,6 @@
-use crate::{
-    auth::ticket::remote::logout::action::LogoutEvent,
-    z_lib::remote::logger::{LogLevel, LogMessage, LogFilter},
-};
+use crate::z_lib::remote::logger::{LogFilter, LogLevel, LogMessage};
+
+use crate::auth::ticket::logout::remote::action::LogoutEvent;
 
 use super::super::action::LogoutState;
 

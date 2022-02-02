@@ -4,8 +4,8 @@ use crate::auth::ticket::remote::validate::method::{
     validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
 };
 
-use crate::auth::ticket::remote::{
-    kernel::infra::AuthClock, logout::infra::LogoutAuthTicketRepository,
+use crate::auth::ticket::{
+    logout::remote::infra::LogoutAuthTicketRepository, remote::kernel::infra::AuthClock,
 };
 
 use crate::{
