@@ -2,7 +2,7 @@ import { homeMenuContent } from "../../outline/menu/menu_home"
 import { newNotifyUnexpectedErrorResource } from "../../../avail/unexpected_error/notify/init/resource"
 import { newLoadBreadcrumbListResource } from "../../outline/load_breadcrumb_list/init/resource"
 import { newLoadMenuResource } from "../../outline/load_menu/init/resource"
-import { newLoadSeasonResource } from "../../load_season/init/resource"
+import { newLoadSeasonResource } from "../../season/action_load/init/resource"
 
 import { RepositoryOutsideFeature } from "../../../z_lib/ui/repository/feature"
 import { RemoteOutsideFeature } from "../../../z_lib/ui/remote/feature"

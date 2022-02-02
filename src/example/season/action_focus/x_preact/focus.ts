@@ -1,0 +1,119 @@
+import { h, VNode } from "preact"
+import { html } from "htm/preact"
+
+import { useApplicationAction } from "../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+
+import { box } from "../../../../../ui/vendor/getto-css/preact/design/box"
+import {
+    button_edit,
+    field,
+    fieldError,
+} from "../../../../../ui/vendor/getto-css/preact/design/form"
+
+import { InputSeasonComponent } from "../../input/action_input/x_preact/input"
+
+import { repositoryErrorReason } from "../../../../z_lib/ui/repository/x_error/reason"
+import { seasonLabel } from "../../kernel/helper"
+
+import { FocusSeasonResource, FocusSeasonResourceState } from "../resource"
+
+import { Season } from "../../kernel/data"
+import { RepositoryError } from "../../../../z_lib/ui/repository/data"
+
+export function FocusSeasonEntry({ season, focusSeason }: FocusSeasonResource): VNode {
+    return h(FocusSeasonComponent, {
+        season,
+        focusSeason,
+        state: useApplicationAction(focusSeason),
+        load: useApplicationAction(season),
+    })
+}
+
+type Props = FocusSeasonResource & FocusSeasonResourceState
+export function FocusSeasonComponent(props: Props): VNode {
+    return basedOn(props)
+
+    function basedOn({ state, load }: FocusSeasonResourceState): VNode {
+        switch (load.type) {
+            case "initial-season":
+            case "failed-to-load":
+                return EMPTY_CONTENT
+
+            case "succeed-to-load":
+                switch (state.type) {
+                    case "initial-focus":
+                    case "succeed-to-focus":
+                        return seasonBox({ season: load.season })
+
+                    case "edit-season":
+                        return seasonForm({ seasons: load.availableSeasons })
+
+                    case "invalid-season":
+                        return errorMessage({ err: ["シーズンの設定に失敗しました"] })
+
+                    case "failed-to-focus":
+                        return errorMessage({ err: repositoryError(state.err) })
+                }
+        }
+    }
+
+    function title() {
+        return "シーズン設定"
+    }
+
+    type BoxContent = Readonly<{ season: Season }>
+
+    function seasonBox({ season }: BoxContent): VNode {
+        return box({
+            title: title(),
+            body: [
+                field({
+                    title: "シーズン",
+                    body: seasonLabel(season),
+                }),
+            ],
+            footer: button_edit({ state: "normal", label: "変更", onClick }),
+            form: true,
+        })
+
+        function onClick(e: Event) {
+            e.preventDefault()
+            props.focusSeason.open()
+        }
+    }
+
+    type FormContent = Readonly<{ seasons: Season[] }>
+
+    function seasonForm({ seasons }: FormContent): VNode {
+        return box({
+            body: [
+                h(InputSeasonComponent, {
+                    title: "シーズン",
+                    field: props.focusSeason.season,
+                    seasons,
+                }),
+            ],
+            footer: button_edit({ state: "confirm", label: "変更", onClick }),
+            form: true,
+        })
+
+        function onClick(e: Event) {
+            e.preventDefault()
+            props.focusSeason.focus()
+        }
+    }
+
+    type ErrorContent = Readonly<{ err: readonly string[] }>
+    function errorMessage({ err }: ErrorContent): VNode {
+        return box({ body: fieldError(err) })
+    }
+}
+
+const EMPTY_CONTENT = html``
+
+function repositoryError(err: RepositoryError): readonly string[] {
+    return repositoryErrorReason(err, (reason) => [
+        `${reason.message}によりシーズン設定に失敗しました`,
+        ...reason.detail,
+    ])
+}

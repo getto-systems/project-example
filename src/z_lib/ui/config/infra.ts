@@ -10,6 +10,12 @@ export function expireSecond(second: number): ExpireTime {
 export function expireMinute(minute: number): ExpireTime {
     return expireSecond(minute * 60)
 }
+export function expireHour(hour: number): ExpireTime {
+    return expireMinute(hour * 60)
+}
+export function expireDay(day: number): ExpireTime {
+    return expireHour(day * 24)
+}
 
 export function delaySecond(second: number): DelayTime {
     return { delay_millisecond: second * 1000 }
