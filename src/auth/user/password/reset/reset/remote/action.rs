@@ -11,9 +11,9 @@ use crate::auth::{
     user::{
         password::{
             kernel::infra::{AuthUserPasswordHasher, PlainPassword},
-            reset::remote::{
-                kernel::infra::ResetTokenEntry,
-                reset::infra::{
+            reset::{
+                remote::kernel::infra::ResetTokenEntry,
+                reset::remote::infra::{
                     ResetPasswordFieldsExtract, ResetPasswordNotifier, ResetPasswordRepository,
                     ResetPasswordRequestDecoder, ResetTokenDecoder,
                 },
@@ -30,11 +30,11 @@ use crate::{
             login_id::kernel::data::{LoginId, ValidateLoginIdError},
             password::{
                 kernel::data::{PasswordHashError, ValidatePasswordError},
-                reset::remote::{
-                    kernel::data::{
+                reset::{
+                    remote::kernel::data::{
                         ResetTokenDestination, ResetTokenEncoded, ValidateResetTokenError,
                     },
-                    reset::data::{
+                    reset::remote::data::{
                         DecodeResetTokenError, NotifyResetPasswordError,
                         NotifyResetPasswordResponse, ResetPasswordError,
                         ResetPasswordRepositoryError, VerifyResetTokenEntryError,

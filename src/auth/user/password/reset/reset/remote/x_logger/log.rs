@@ -2,9 +2,9 @@ use crate::z_lib::remote::logger::{LogFilter, LogLevel, LogMessage};
 
 use super::super::action::{ResetPasswordEvent, ResetPasswordState};
 
-use crate::auth::user::password::reset::remote::{
-    kernel::data::ValidateResetTokenError,
-    reset::data::{DecodeResetTokenError, NotifyResetPasswordError, ResetPasswordError},
+use crate::auth::user::password::reset::{
+    remote::kernel::data::ValidateResetTokenError,
+    reset::remote::data::{DecodeResetTokenError, NotifyResetPasswordError, ResetPasswordError},
 };
 
 impl LogMessage for ResetPasswordState {

@@ -19,7 +19,7 @@ use crate::auth::{
                 password_hasher::Argon2PasswordHasher,
                 password_repository::MysqlAuthUserPasswordRepository,
             },
-            reset::remote::reset::init::{
+            reset::reset::remote::init::{
                 request_decoder::PbResetPasswordRequestDecoder,
                 reset_notifier::EmailResetPasswordNotifier, token_decoder::JwtResetTokenDecoder,
             },

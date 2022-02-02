@@ -36,7 +36,7 @@ use crate::auth::{
                     MemoryAuthUserPasswordStore,
                 },
             },
-            reset::remote::reset::init::{
+            reset::reset::remote::init::{
                 request_decoder::test::StaticResetPasswordRequestDecoder,
                 reset_notifier::test::StaticResetPasswordNotifier,
                 token_decoder::test::StaticResetTokenDecoder,
@@ -55,7 +55,7 @@ use crate::auth::ticket::{
 
 use super::action::{ResetPasswordAction, ResetPasswordMaterial};
 
-use crate::auth::user::password::reset::remote::reset::infra::ResetPasswordFieldsExtract;
+use crate::auth::user::password::reset::reset::remote::infra::ResetPasswordFieldsExtract;
 
 use crate::auth::{
     ticket::kernel::remote::data::{

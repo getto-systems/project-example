@@ -2,13 +2,13 @@ use jsonwebtoken::{decode, errors::ErrorKind, Algorithm, DecodingKey, Validation
 
 use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideResetTokenKey;
 
-use crate::auth::user::password::reset::remote::{
-    kernel::infra::ResetTokenJwtClaims, reset::infra::ResetTokenDecoder,
+use crate::auth::user::password::reset::{
+    remote::kernel::infra::ResetTokenJwtClaims, reset::remote::infra::ResetTokenDecoder,
 };
 
-use crate::auth::user::password::reset::remote::{
-    kernel::data::{ResetToken, ResetTokenEncoded},
-    reset::data::DecodeResetTokenError,
+use crate::auth::user::password::reset::{
+    remote::kernel::data::{ResetToken, ResetTokenEncoded},
+    reset::remote::data::DecodeResetTokenError,
 };
 
 pub struct JwtResetTokenDecoder<'a> {
@@ -48,11 +48,11 @@ fn validate_jwt<'a>(
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::user::password::reset::remote::reset::infra::ResetTokenDecoder;
+    use crate::auth::user::password::reset::reset::remote::infra::ResetTokenDecoder;
 
-    use crate::auth::user::password::reset::remote::{
-        kernel::data::{ResetToken, ResetTokenEncoded},
-        reset::data::DecodeResetTokenError,
+    use crate::auth::user::password::reset::{
+        remote::kernel::data::{ResetToken, ResetTokenEncoded},
+        reset::remote::data::DecodeResetTokenError,
     };
 
     pub enum StaticResetTokenDecoder {

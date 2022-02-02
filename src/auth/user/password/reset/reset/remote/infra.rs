@@ -6,9 +6,9 @@ use crate::{
     auth::{
         ticket::kernel::remote::data::AuthDateTime,
         user::{
-            password::reset::remote::{
-                kernel::data::{ResetToken, ResetTokenDestination, ResetTokenEncoded},
-                reset::data::{
+            password::reset::{
+                remote::kernel::data::{ResetToken, ResetTokenDestination, ResetTokenEncoded},
+                reset::remote::data::{
                     DecodeResetTokenError, NotifyResetPasswordError, NotifyResetPasswordResponse,
                     ResetPasswordRepositoryError,
                 },

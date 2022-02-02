@@ -2,11 +2,11 @@ use rusoto_ses::{Body, Content, Message, SendEmailRequest, Ses, SesClient};
 
 use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideEmail;
 
-use crate::auth::user::password::reset::remote::reset::infra::ResetPasswordNotifier;
+use crate::auth::user::password::reset::reset::remote::infra::ResetPasswordNotifier;
 
-use crate::auth::user::password::reset::remote::{
-    kernel::data::ResetTokenDestination,
-    reset::data::{NotifyResetPasswordError, NotifyResetPasswordResponse},
+use crate::auth::user::password::reset::{
+    remote::kernel::data::ResetTokenDestination,
+    reset::remote::data::{NotifyResetPasswordError, NotifyResetPasswordResponse},
 };
 
 pub struct EmailResetPasswordNotifier<'a> {
@@ -86,11 +86,11 @@ email: labo@message.getto.systems
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::user::password::reset::remote::reset::infra::ResetPasswordNotifier;
+    use crate::auth::user::password::reset::reset::remote::infra::ResetPasswordNotifier;
 
-    use crate::auth::user::password::reset::remote::{
-        kernel::data::ResetTokenDestination,
-        reset::data::{NotifyResetPasswordError, NotifyResetPasswordResponse},
+    use crate::auth::user::password::reset::{
+        remote::kernel::data::ResetTokenDestination,
+        reset::remote::data::{NotifyResetPasswordError, NotifyResetPasswordResponse},
     };
 
     pub struct StaticResetPasswordNotifier;
