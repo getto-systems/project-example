@@ -20,9 +20,9 @@ use crate::x_outside_feature::remote::{
     common::metadata::metadata_request_id,
 };
 
-use crate::auth::ticket::remote::{
-    validate::init::ValidateApiTokenStruct, check::init::CheckAuthTicketStruct,
-    logout::init::LogoutStruct,
+use crate::auth::ticket::{
+    check::remote::init::CheckAuthTicketStruct,
+    remote::{logout::init::LogoutStruct, validate::init::ValidateApiTokenStruct},
 };
 
 pub struct AuthTicketServer;
@@ -47,7 +47,9 @@ impl LogoutPb for Logout {
         &self,
         request: Request<LogoutRequestPb>,
     ) -> Result<Response<LogoutResponsePb>, Status> {
-        let TonicRequest { feature, metadata, .. } = extract_request(request);
+        let TonicRequest {
+            feature, metadata, ..
+        } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger("auth.ticket.logout", request_id.into());
@@ -66,7 +68,9 @@ impl CheckAuthTicketPb for Check {
         &self,
         request: Request<CheckAuthTicketRequestPb>,
     ) -> Result<Response<CheckAuthTicketResponsePb>, Status> {
-        let TonicRequest { feature, metadata, .. } = extract_request(request);
+        let TonicRequest {
+            feature, metadata, ..
+        } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger("auth.ticket.check", request_id.into());

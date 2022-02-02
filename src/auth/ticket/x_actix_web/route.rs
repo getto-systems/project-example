@@ -11,8 +11,9 @@ use crate::z_lib::remote::{logger::Logger, response::actix_web::RespondTo};
 
 use crate::x_outside_feature::remote::api::logger::{app_logger, generate_request_id};
 
-use crate::auth::ticket::remote::{
-    check::proxy::init::CheckAuthTicketProxyStruct, logout::proxy::init::LogoutProxyStruct,
+use crate::auth::ticket::{
+    check::remote::proxy::init::CheckAuthTicketProxyStruct,
+    remote::logout::proxy::init::LogoutProxyStruct,
 };
 
 pub fn scope_ticket() -> Scope {
