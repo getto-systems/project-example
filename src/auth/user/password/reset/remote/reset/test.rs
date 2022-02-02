@@ -13,7 +13,7 @@ use crate::auth::{
         issue::init::{
             id_generator::test::StaticAuthTicketIdGenerator, test::StaticIssueAuthTicketStruct,
         },
-        remote::kernel::init::{
+        kernel::remote::init::{
             clock::test::StaticChronoAuthClock,
             ticket_repository::test::{
                 MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
@@ -58,7 +58,7 @@ use super::action::{ResetPasswordAction, ResetPasswordMaterial};
 use crate::auth::user::password::reset::remote::reset::infra::ResetPasswordFieldsExtract;
 
 use crate::auth::{
-    ticket::remote::kernel::data::{
+    ticket::kernel::remote::data::{
         AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
     },
     user::{

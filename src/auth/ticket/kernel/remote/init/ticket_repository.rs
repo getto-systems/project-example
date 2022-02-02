@@ -9,7 +9,7 @@ use crate::auth::ticket::{
 };
 
 use crate::{
-    auth::ticket::remote::kernel::data::{AuthDateTime, AuthTicket, ExpansionLimitDateTime},
+    auth::ticket::kernel::remote::data::{AuthDateTime, AuthTicket, ExpansionLimitDateTime},
     z_lib::remote::repository::data::RepositoryError,
 };
 
@@ -154,7 +154,7 @@ pub mod test {
     };
 
     use crate::{
-        auth::ticket::remote::kernel::data::{
+        auth::ticket::kernel::remote::data::{
             AuthDateTime, AuthTicket, AuthTicketId, ExpansionLimitDateTime,
         },
         z_lib::remote::repository::data::RepositoryError,

@@ -18,7 +18,7 @@ use crate::auth::user::password::{
 
 use crate::{
     auth::{
-        ticket::remote::kernel::data::{AuthDateTime, ExpireDateTime},
+        ticket::kernel::remote::data::{AuthDateTime, ExpireDateTime},
         user::{
             login_id::remote::data::LoginId,
             password::{
@@ -371,7 +371,7 @@ pub mod test {
 
     use crate::{
         auth::{
-            ticket::remote::kernel::data::{AuthDateTime, ExpireDateTime},
+            ticket::kernel::remote::data::{AuthDateTime, ExpireDateTime},
             user::{
                 login_id::remote::data::LoginId,
                 password::{

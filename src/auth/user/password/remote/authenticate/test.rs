@@ -13,7 +13,7 @@ use crate::auth::{
         issue::init::{
             id_generator::test::StaticAuthTicketIdGenerator, test::StaticIssueAuthTicketStruct,
         },
-        remote::kernel::init::{
+        kernel::remote::init::{
             clock::test::StaticChronoAuthClock,
             ticket_repository::test::{
                 MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
@@ -57,7 +57,7 @@ use crate::auth::{
 use super::action::{AuthenticatePasswordAction, AuthenticatePasswordMaterial};
 
 use crate::auth::{
-    ticket::remote::kernel::data::{
+    ticket::kernel::remote::data::{
         AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
     },
     user::{

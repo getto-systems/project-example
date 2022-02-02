@@ -7,7 +7,7 @@ use crate::auth::ticket::remote::y_protobuf::service::{
 use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideFeature;
 
 use crate::{
-    auth::ticket::remote::kernel::init::response_builder::CookieAuthTokenResponseBuilder,
+    auth::ticket::kernel::remote::init::response_builder::CookieAuthTokenResponseBuilder,
     z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer,
 };
 
@@ -21,14 +21,14 @@ use crate::auth::remote::proxy::method::set_metadata;
 use crate::auth::{
     remote::proxy::infra::AuthProxyService,
     ticket::{
-        remote::kernel::infra::AuthTokenResponseBuilder, validate::infra::AuthMetadataContent,
+        kernel::remote::infra::AuthTokenResponseBuilder, validate::infra::AuthMetadataContent,
     },
 };
 
 use crate::{
     auth::{
         remote::proxy::data::AuthProxyError,
-        ticket::remote::kernel::data::{AuthTokenMessage, AuthTokenResponse},
+        ticket::kernel::remote::data::{AuthTokenMessage, AuthTokenResponse},
     },
     z_lib::remote::message::data::MessageError,
 };

@@ -5,12 +5,12 @@ use crate::auth::ticket::validate::method::{
 };
 
 use crate::auth::ticket::{
-    logout::remote::infra::LogoutAuthTicketRepository, remote::kernel::infra::AuthClock,
+    kernel::remote::infra::AuthClock, logout::remote::infra::LogoutAuthTicketRepository,
 };
 
 use crate::{
     auth::{
-        ticket::remote::kernel::data::AuthTicket, user::remote::kernel::data::RequireAuthRoles,
+        ticket::kernel::remote::data::AuthTicket, user::remote::kernel::data::RequireAuthRoles,
     },
     z_lib::remote::repository::data::RepositoryError,
 };

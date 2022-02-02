@@ -13,7 +13,7 @@ use super::header::{
 
 use crate::auth::remote::proxy::x_actix_web::response::unauthorized;
 
-use crate::auth::ticket::remote::kernel::data::{
+use crate::auth::ticket::kernel::remote::data::{
     EncodedAuthTokens, AuthTokenExtract, AuthTokenMessage, AuthTokenResponse, CloudfrontTokenKind,
     DecodeAuthTokenError,
 };

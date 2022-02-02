@@ -4,15 +4,16 @@ use tonic::{
 };
 
 use crate::{
-    auth::ticket::remote::kernel::x_tonic::metadata::{METADATA_NONCE, METADATA_TOKEN},
+    auth::ticket::kernel::remote::x_tonic::metadata::{METADATA_NONCE, METADATA_TOKEN},
     x_outside_feature::remote::common::metadata::METADATA_REQUEST_ID,
-    z_lib::remote::service::data::ServiceAuthorizeError,
 };
 
 use crate::{
     auth::ticket::validate::infra::AuthMetadataContent,
     z_lib::remote::service::infra::ServiceAuthorizer,
 };
+
+use crate::z_lib::remote::service::data::ServiceAuthorizeError;
 
 pub enum AuthMetadataError {
     NonceNotFound,

@@ -9,7 +9,7 @@ use crate::z_lib::remote::repository::helper::infra_error;
 use crate::auth::ticket::validate::infra::{AuthNonceEntry, AuthNonceRepository};
 
 use crate::{
-    auth::ticket::remote::kernel::data::AuthDateTime,
+    auth::ticket::kernel::remote::data::AuthDateTime,
     z_lib::remote::repository::data::{RegisterResult, RepositoryError},
 };
 
@@ -116,7 +116,7 @@ pub mod test {
     };
 
     use crate::{
-        auth::ticket::remote::kernel::data::{AuthDateTime, AuthNonce, ExpireDateTime},
+        auth::ticket::kernel::remote::data::{AuthDateTime, AuthNonce, ExpireDateTime},
         z_lib::remote::repository::data::{RegisterResult, RepositoryError},
     };
 

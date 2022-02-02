@@ -1,5 +1,5 @@
 use crate::{
-    auth::ticket::remote::kernel::data::{
+    auth::ticket::kernel::remote::data::{
         AuthDateTime, AuthTicket, AuthTicketId, ExpansionLimitDateTime,
     },
     z_lib::remote::repository::data::RepositoryError,

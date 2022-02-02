@@ -1,7 +1,7 @@
 use actix_web::HttpRequest;
 use tonic::metadata::MetadataMap;
 
-use crate::auth::ticket::remote::kernel::{
+use crate::auth::ticket::kernel::remote::{
     x_actix_web::header::{COOKIE_API_TOKEN, COOKIE_TICKET_TOKEN},
     x_tonic::metadata::METADATA_TOKEN,
 };
@@ -11,7 +11,7 @@ use crate::z_lib::remote::request::{helper::cookie, x_tonic::metadata::metadata}
 use crate::auth::ticket::validate::infra::AuthTokenMetadata;
 
 use crate::{
-    auth::ticket::remote::kernel::data::AuthToken, z_lib::remote::request::data::MetadataError,
+    auth::ticket::kernel::remote::data::AuthToken, z_lib::remote::request::data::MetadataError,
 };
 
 pub struct TicketTokenMetadata<'a> {
@@ -68,7 +68,7 @@ pub mod test {
     use crate::auth::ticket::validate::infra::AuthTokenMetadata;
 
     use crate::{
-        auth::ticket::remote::kernel::data::AuthToken, z_lib::remote::request::data::MetadataError,
+        auth::ticket::kernel::remote::data::AuthToken, z_lib::remote::request::data::MetadataError,
     };
 
     pub struct StaticAuthTokenMetadata {

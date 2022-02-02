@@ -2,13 +2,13 @@ use getto_application::data::MethodResult;
 
 use crate::auth::ticket::{
     encode::infra::{AuthTokenEncoder, CloudfrontTokenEncoder, EncodeAuthTicketRepository},
-    remote::kernel::infra::AuthClock,
+    kernel::remote::infra::AuthClock,
 };
 
 use crate::{
     auth::ticket::{
         encode::data::{AuthTicketEncoded, AuthTokenExpires, EncodeAuthTokenError},
-        remote::kernel::data::{
+        kernel::remote::data::{
             AuthTicket, EncodedAuthTokens, ExpansionLimitDateTime, ExpireDuration,
         },
     },

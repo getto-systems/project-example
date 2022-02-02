@@ -8,13 +8,13 @@ use crate::auth::user::password::reset::remote::y_protobuf::service::{
 };
 
 use crate::{
-    auth::ticket::remote::kernel::init::response_builder::CookieAuthTokenResponseBuilder,
+    auth::ticket::kernel::remote::init::response_builder::CookieAuthTokenResponseBuilder,
     z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer,
 };
 
 use crate::{
     auth::{
-        remote::proxy::helper::infra_error, ticket::remote::kernel::infra::AuthTokenResponseBuilder,
+        remote::proxy::helper::infra_error, ticket::kernel::remote::infra::AuthTokenResponseBuilder,
     },
     z_lib::remote::{
         message::helper::{decode_base64, encode_protobuf_base64, invalid_protobuf},
@@ -31,7 +31,7 @@ use crate::auth::{
 use crate::{
     auth::{
         remote::proxy::data::AuthProxyError,
-        ticket::remote::kernel::data::{AuthTokenMessage, AuthTokenResponse},
+        ticket::kernel::remote::data::{AuthTokenMessage, AuthTokenResponse},
     },
     z_lib::remote::message::data::MessageError,
 };

@@ -4,7 +4,7 @@ use crate::auth::user::password::{
 
 use crate::{
     auth::{
-        ticket::remote::kernel::data::AuthDateTime,
+        ticket::kernel::remote::data::AuthDateTime,
         user::{
             password::reset::remote::{
                 kernel::data::{ResetToken, ResetTokenDestination, ResetTokenEncoded},

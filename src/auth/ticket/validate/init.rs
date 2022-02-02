@@ -20,7 +20,7 @@ use crate::{
 };
 
 use crate::auth::ticket::{
-    remote::kernel::init::clock::ChronoAuthClock,
+    kernel::remote::init::clock::ChronoAuthClock,
     validate::init::{
         auth_metadata::{ApiAuthMetadata, NoAuthMetadata, TicketAuthMetadata, TonicAuthMetadata},
         nonce_metadata::TonicAuthNonceMetadata,
@@ -281,7 +281,7 @@ impl<'a> ValidateAuthNonceStruct<'a> {
 #[cfg(test)]
 pub mod test {
     use crate::auth::ticket::{
-        remote::kernel::init::clock::test::StaticChronoAuthClock,
+        kernel::remote::init::clock::test::StaticChronoAuthClock,
         validate::init::{
             auth_metadata::test::StaticAuthMetadata, nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::test::MemoryAuthNonceRepository,

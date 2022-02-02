@@ -7,7 +7,7 @@ use crate::auth::ticket::{
 };
 
 use crate::auth::{
-    ticket::remote::kernel::infra::AuthClock,
+    ticket::kernel::remote::infra::AuthClock,
     user::{
         password::{
             remote::kernel::infra::{AuthUserPasswordHasher, PlainPassword},
@@ -25,7 +25,7 @@ use crate::auth::{
 
 use crate::{
     auth::{
-        ticket::remote::kernel::data::AuthDateTime,
+        ticket::kernel::remote::data::AuthDateTime,
         user::{
             login_id::remote::data::{LoginId, ValidateLoginIdError},
             password::{

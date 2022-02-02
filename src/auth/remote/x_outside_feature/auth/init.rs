@@ -19,7 +19,7 @@ use crate::{
     x_outside_feature::remote::auth::env::AuthEnv,
 };
 
-use crate::auth::ticket::remote::kernel::data::{ExpansionLimitDuration, ExpireDuration};
+use crate::auth::ticket::kernel::remote::data::{ExpansionLimitDuration, ExpireDuration};
 
 pub async fn new_auth_outside_feature(env: &'static AuthEnv) -> AuthOutsideFeature {
     AuthOutsideFeature {

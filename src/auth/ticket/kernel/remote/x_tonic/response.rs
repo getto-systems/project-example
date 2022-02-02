@@ -8,7 +8,7 @@ use crate::auth::ticket::remote::y_protobuf::service::{
     EncodedAuthTokensPb, AuthTokenPb, CloudfrontTokenKindPb, CloudfrontTokenPb,
 };
 
-use crate::auth::ticket::remote::kernel::data::{
+use crate::auth::ticket::kernel::remote::data::{
     EncodedAuthTokens, AuthTokenExtract, CloudfrontTokenKind, DecodeAuthTokenError,
     ValidateAuthRolesError,
 };

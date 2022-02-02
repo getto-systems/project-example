@@ -2,7 +2,7 @@ use uuid::Uuid;
 
 use crate::auth::ticket::issue::infra::AuthTicketIdGenerator;
 
-use crate::auth::ticket::remote::kernel::data::AuthTicketId;
+use crate::auth::ticket::kernel::remote::data::AuthTicketId;
 
 pub struct UuidAuthTicketIdGenerator;
 
@@ -22,7 +22,7 @@ impl AuthTicketIdGenerator for UuidAuthTicketIdGenerator {
 pub mod test {
     use crate::auth::ticket::issue::infra::AuthTicketIdGenerator;
 
-    use crate::auth::ticket::remote::kernel::data::AuthTicketId;
+    use crate::auth::ticket::kernel::remote::data::AuthTicketId;
 
     pub struct StaticAuthTicketIdGenerator {
         ticket_id: AuthTicketId,

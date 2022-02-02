@@ -1,6 +1,6 @@
 use crate::z_lib::remote::logger::{LogLevel, LogFilter};
 
-use crate::auth::ticket::remote::kernel::data::{DecodeAuthTokenError, ValidateAuthRolesError};
+use crate::auth::ticket::kernel::remote::data::{DecodeAuthTokenError, ValidateAuthRolesError};
 
 impl LogFilter for DecodeAuthTokenError {
     fn log_level(&self) -> LogLevel {

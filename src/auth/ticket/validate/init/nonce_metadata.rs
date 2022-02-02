@@ -1,7 +1,7 @@
 use actix_web::HttpRequest;
 use tonic::metadata::MetadataMap;
 
-use crate::auth::ticket::remote::kernel::{
+use crate::auth::ticket::kernel::remote::{
     x_actix_web::header::HEADER_NONCE, x_tonic::metadata::METADATA_NONCE,
 };
 
@@ -10,7 +10,7 @@ use crate::z_lib::remote::request::{helper::header, x_tonic::metadata::metadata}
 use crate::auth::ticket::validate::infra::AuthNonceMetadata;
 
 use crate::{
-    auth::ticket::remote::kernel::data::AuthNonce, z_lib::remote::request::data::MetadataError,
+    auth::ticket::kernel::remote::data::AuthNonce, z_lib::remote::request::data::MetadataError,
 };
 
 pub struct ActixWebAuthNonceMetadata<'a> {
@@ -51,7 +51,7 @@ pub mod test {
     use crate::auth::ticket::validate::infra::AuthNonceMetadata;
 
     use crate::{
-        auth::ticket::remote::kernel::data::AuthNonce, z_lib::remote::request::data::MetadataError,
+        auth::ticket::kernel::remote::data::AuthNonce, z_lib::remote::request::data::MetadataError,
     };
 
     pub struct StaticAuthNonceMetadata {

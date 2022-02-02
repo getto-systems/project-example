@@ -3,7 +3,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::z_lib::remote::request::x_tonic::metadata::metadata;
 
-use crate::auth::ticket::remote::kernel::x_tonic::metadata::{METADATA_NONCE, METADATA_TOKEN};
+use crate::auth::ticket::kernel::remote::x_tonic::metadata::{METADATA_NONCE, METADATA_TOKEN};
 
 use crate::auth::ticket::validate::init::{
     nonce_metadata::ActixWebAuthNonceMetadata,
@@ -15,7 +15,7 @@ use crate::auth::ticket::validate::infra::{
 };
 
 use crate::{
-    auth::ticket::remote::kernel::data::{AuthNonce, AuthToken},
+    auth::ticket::kernel::remote::data::{AuthNonce, AuthToken},
     z_lib::remote::request::data::MetadataError,
 };
 
@@ -118,7 +118,7 @@ pub mod test {
     use crate::auth::ticket::validate::infra::{AuthMetadata, AuthMetadataContent};
 
     use crate::{
-        auth::ticket::remote::kernel::data::{AuthNonce, AuthToken},
+        auth::ticket::kernel::remote::data::{AuthNonce, AuthToken},
         z_lib::remote::request::data::MetadataError,
     };
 

@@ -4,7 +4,7 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     ticket::{
-        remote::kernel::init::clock::test::StaticChronoAuthClock,
+        kernel::remote::init::clock::test::StaticChronoAuthClock,
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::test::{
@@ -40,7 +40,7 @@ use crate::auth::user::password::reset::remote::request_token::infra::{
 };
 
 use crate::auth::{
-    ticket::remote::kernel::data::{AuthDateTime, ExpireDuration},
+    ticket::kernel::remote::data::{AuthDateTime, ExpireDuration},
     user::{
         login_id::remote::data::LoginId,
         password::reset::remote::kernel::data::{

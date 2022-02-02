@@ -8,12 +8,12 @@ use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideCloudfront
 
 use crate::auth::ticket::{
     encode::infra::{AuthTokenEncoder, CloudfrontTokenEncoder},
-    remote::kernel::infra::AuthJwtClaims,
+    kernel::remote::infra::AuthJwtClaims,
 };
 
 use crate::auth::ticket::{
     encode::data::EncodeAuthTokenError,
-    remote::kernel::data::{AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime},
+    kernel::remote::data::{AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime},
 };
 
 pub struct TicketJwtAuthTokenEncoder<'a> {
@@ -146,7 +146,7 @@ pub mod test {
 
     use crate::auth::ticket::{
         encode::data::EncodeAuthTokenError,
-        remote::kernel::data::{AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime},
+        kernel::remote::data::{AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime},
     };
 
     pub struct StaticAuthTokenEncoder;

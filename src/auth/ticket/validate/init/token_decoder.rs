@@ -5,11 +5,11 @@ use jsonwebtoken::{decode, errors::ErrorKind, Algorithm, DecodingKey, Validation
 use crate::auth::remote::x_outside_feature::common::feature::AuthOutsideDecodingKey;
 
 use crate::auth::ticket::{
-    remote::kernel::infra::{AuthJwtClaims, AUTH_JWT_AUDIENCE_API, AUTH_JWT_AUDIENCE_TICKET},
+    kernel::remote::infra::{AuthJwtClaims, AUTH_JWT_AUDIENCE_API, AUTH_JWT_AUDIENCE_TICKET},
     validate::infra::AuthTokenDecoder,
 };
 
-use crate::auth::ticket::remote::kernel::data::{
+use crate::auth::ticket::kernel::remote::data::{
     AuthTicketExtract, AuthToken, DecodeAuthTokenError,
 };
 
@@ -82,7 +82,7 @@ pub mod test {
 
     use crate::auth::ticket::validate::infra::AuthTokenDecoder;
 
-    use crate::auth::ticket::remote::kernel::data::{
+    use crate::auth::ticket::kernel::remote::data::{
         AuthTicketExtract, AuthToken, DecodeAuthTokenError,
     };
 

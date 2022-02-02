@@ -2,11 +2,11 @@ pub mod token_encoder;
 
 use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideFeature;
 
-use crate::auth::ticket::remote::kernel::init::{
-    clock::ChronoAuthClock, ticket_repository::MysqlAuthTicketRepository,
-};
-use token_encoder::{
-    ApiJwtAuthTokenEncoder, CookieCloudfrontTokenEncoder, TicketJwtAuthTokenEncoder,
+use crate::auth::ticket::{
+    encode::init::token_encoder::{
+        ApiJwtAuthTokenEncoder, CookieCloudfrontTokenEncoder, TicketJwtAuthTokenEncoder,
+    },
+    kernel::remote::init::{clock::ChronoAuthClock, ticket_repository::MysqlAuthTicketRepository},
 };
 
 use super::method::{EncodeAuthTicketConfig, EncodeAuthTicketInfra};
@@ -66,9 +66,11 @@ impl<'a> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use super::token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder};
-    use crate::auth::ticket::remote::kernel::init::{
-        clock::test::StaticChronoAuthClock, ticket_repository::test::MemoryAuthTicketRepository,
+    use crate::auth::ticket::{
+        encode::init::token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
+        kernel::remote::init::{
+            clock::test::StaticChronoAuthClock, ticket_repository::test::MemoryAuthTicketRepository,
+        },
     };
 
     use super::super::method::{EncodeAuthTicketConfig, EncodeAuthTicketInfra};

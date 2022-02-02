@@ -5,7 +5,7 @@ use getto_application_test::ActionTestRunner;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::ticket::{
-    remote::kernel::init::clock::test::StaticChronoAuthClock,
+    kernel::remote::init::clock::test::StaticChronoAuthClock,
     validate::init::{
         nonce_metadata::test::StaticAuthNonceMetadata,
         nonce_repository::test::{
@@ -23,7 +23,7 @@ use crate::auth::ticket::validate::method::AuthNonceConfig;
 use super::action::ValidateApiTokenAction;
 
 use crate::auth::{
-    ticket::remote::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
+    ticket::kernel::remote::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
     user::remote::kernel::data::RequireAuthRoles,
 };
 

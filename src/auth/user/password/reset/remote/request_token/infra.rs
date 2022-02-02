@@ -1,6 +1,6 @@
 use crate::{
     auth::{
-        ticket::remote::kernel::data::{AuthDateTime, ExpireDateTime, ExpireDuration},
+        ticket::kernel::remote::data::{AuthDateTime, ExpireDateTime, ExpireDuration},
         user::{
             login_id::remote::data::LoginId,
             password::reset::remote::{

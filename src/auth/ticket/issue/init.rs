@@ -2,10 +2,10 @@ pub mod id_generator;
 
 use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideFeature;
 
-use crate::auth::ticket::remote::kernel::init::{
-    clock::ChronoAuthClock, ticket_repository::MysqlAuthTicketRepository,
+use crate::auth::ticket::{
+    issue::init::id_generator::UuidAuthTicketIdGenerator,
+    kernel::remote::init::{clock::ChronoAuthClock, ticket_repository::MysqlAuthTicketRepository},
 };
-use id_generator::UuidAuthTicketIdGenerator;
 
 use super::method::{IssueAuthTicketConfig, IssueAuthTicketInfra};
 
@@ -50,9 +50,11 @@ impl<'a> IssueAuthTicketInfra for IssueAuthTicketStruct<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use super::id_generator::test::StaticAuthTicketIdGenerator;
-    use crate::auth::ticket::remote::kernel::init::{
-        clock::test::StaticChronoAuthClock, ticket_repository::test::MemoryAuthTicketRepository,
+    use crate::auth::ticket::{
+        issue::init::id_generator::test::StaticAuthTicketIdGenerator,
+        kernel::remote::init::{
+            clock::test::StaticChronoAuthClock, ticket_repository::test::MemoryAuthTicketRepository,
+        },
     };
 
     use super::super::method::{IssueAuthTicketConfig, IssueAuthTicketInfra};

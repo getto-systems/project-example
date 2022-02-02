@@ -1,14 +1,16 @@
-use crate::{
-    auth::ticket::{
-        issue::infra::{AuthTicketIdGenerator, IssueAuthTicketRepository},
-        remote::kernel::infra::AuthClock,
-    },
-    z_lib::remote::repository::data::RepositoryError,
+use crate::auth::ticket::{
+    issue::infra::{AuthTicketIdGenerator, IssueAuthTicketRepository},
+    kernel::remote::infra::AuthClock,
 };
 
-use crate::auth::{
-    ticket::remote::kernel::data::{AuthTicket, ExpansionLimitDateTime, ExpansionLimitDuration},
-    user::remote::kernel::data::AuthUser,
+use crate::{
+    auth::{
+        ticket::kernel::remote::data::{
+            AuthTicket, ExpansionLimitDateTime, ExpansionLimitDuration,
+        },
+        user::remote::kernel::data::AuthUser,
+    },
+    z_lib::remote::repository::data::RepositoryError,
 };
 
 pub enum IssueAuthTicketEvent {

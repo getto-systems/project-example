@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::{
     auth::ticket::{
         encode::data::EncodeAuthTokenError,
-        remote::kernel::data::{
+        kernel::remote::data::{
             AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpansionLimitDateTime,
             ExpireDateTime,
         },
