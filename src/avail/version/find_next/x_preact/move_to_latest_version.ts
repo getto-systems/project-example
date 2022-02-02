@@ -8,7 +8,7 @@ import {
 } from "../../../../../ui/vendor/getto-application/action/x_preact/hooks"
 
 import { loginBox } from "../../../../../ui/vendor/getto-css/preact/layout/login"
-import { siteInfo } from "../../../../example/site"
+import { siteInfo } from "../../../../x_content/site"
 import { spinner } from "../../../../example/x_preact/design/icon"
 
 import { ApplicationErrorComponent } from "../../../x_preact/application_error"

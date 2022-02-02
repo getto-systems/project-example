@@ -13,7 +13,7 @@ import {
 import { useNotifyUnexpectedError } from "../../../../../../src/avail/unexpected_error/notify/x_preact/hooks"
 import { useDocumentTitle } from "../../../../../../src/example/x_preact/hooks"
 
-import { copyright, siteInfo } from "../../../../../../src/example/site"
+import { copyright, siteInfo } from "../../../../../../src/x_content/site"
 
 import { ApplicationErrorComponent } from "../../../../../../src/avail/x_preact/application_error"
 import { LoadSeasonEntry } from "../../../../../../src/example/load_season/x_preact/load_season"

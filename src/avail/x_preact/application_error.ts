@@ -7,7 +7,7 @@ import { loginBox } from "../../../ui/vendor/getto-css/preact/layout/login"
 
 import { env } from "../../y_environment/ui/env"
 
-import { siteInfo } from "../../example/site"
+import { siteInfo } from "../../x_content/site"
 
 type Props = Readonly<{
     err: string

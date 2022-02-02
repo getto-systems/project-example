@@ -15,7 +15,7 @@ import {
 import { container } from "../../../../ui/vendor/getto-css/preact/design/box"
 import { v_small } from "../../../../ui/vendor/getto-css/preact/design/alignment"
 
-import { copyright, siteInfo } from "../../../example/site"
+import { copyright, siteInfo } from "../../../x_content/site"
 import { docsDataBox, docsDomainBox, docsUsecaseAbstractBox } from "./helper"
 
 import { ApplicationErrorComponent } from "../../../avail/x_preact/application_error"

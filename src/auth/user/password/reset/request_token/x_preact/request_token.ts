@@ -19,7 +19,7 @@ import {
 import { loginBox } from "../../../../../../../ui/vendor/getto-css/preact/layout/login"
 
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
-import { siteInfo } from "../../../../../../example/site"
+import { siteInfo } from "../../../../../../x_content/site"
 import { spinner } from "../../../../../../example/x_preact/design/icon"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
 

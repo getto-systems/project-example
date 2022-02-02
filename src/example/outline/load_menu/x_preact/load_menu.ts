@@ -18,7 +18,7 @@ import {
     notice_alert,
 } from "../../../../../ui/vendor/getto-css/preact/design/highlight"
 
-import { poweredBy } from "../../../site"
+import { poweredBy } from "../../../../x_content/site"
 
 import { LoadMenuAction, LoadMenuState } from "../action"
 
