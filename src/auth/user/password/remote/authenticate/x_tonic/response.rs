@@ -11,10 +11,10 @@ use crate::z_lib::remote::response::tonic::RespondTo;
 
 use super::super::action::{AuthenticatePasswordEvent, AuthenticatePasswordState};
 
-use crate::auth::ticket::remote::encode::method::EncodeAuthTicketEvent;
+use crate::auth::ticket::encode::method::EncodeAuthTicketEvent;
 
 use crate::auth::{
-    ticket::remote::encode::data::AuthTicketEncoded,
+    ticket::encode::data::AuthTicketEncoded,
     user::password::remote::authenticate::data::AuthenticatePasswordError,
 };
 

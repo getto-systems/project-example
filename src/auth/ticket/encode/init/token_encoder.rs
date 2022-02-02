@@ -6,14 +6,14 @@ use aws_cloudfront_cookie::CloudfrontPolicy;
 
 use crate::auth::remote::x_outside_feature::auth::feature::AuthOutsideCloudfrontKey;
 
-use crate::auth::ticket::remote::{
+use crate::auth::ticket::{
     encode::infra::{AuthTokenEncoder, CloudfrontTokenEncoder},
-    kernel::infra::AuthJwtClaims,
+    remote::kernel::infra::AuthJwtClaims,
 };
 
-use crate::auth::ticket::remote::{
+use crate::auth::ticket::{
     encode::data::EncodeAuthTokenError,
-    kernel::data::{AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime},
+    remote::kernel::data::{AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime},
 };
 
 pub struct TicketJwtAuthTokenEncoder<'a> {
@@ -142,13 +142,11 @@ impl<'a> CloudfrontTokenEncoder for CookieCloudfrontTokenEncoder<'a> {
 pub mod test {
     use std::collections::HashMap;
 
-    use crate::auth::ticket::remote::encode::infra::{
-        AuthTokenEncoder, CloudfrontTokenEncoder,
-    };
+    use crate::auth::ticket::encode::infra::{AuthTokenEncoder, CloudfrontTokenEncoder};
 
-    use crate::auth::ticket::remote::{
+    use crate::auth::ticket::{
         encode::data::EncodeAuthTokenError,
-        kernel::data::{AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime},
+        remote::kernel::data::{AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime},
     };
 
     pub struct StaticAuthTokenEncoder;

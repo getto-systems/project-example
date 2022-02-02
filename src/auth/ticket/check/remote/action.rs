@@ -1,8 +1,10 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::ticket::remote::{
+use crate::auth::ticket::{
     encode::method::{encode_auth_ticket, EncodeAuthTicketEvent, EncodeAuthTicketInfra},
-    validate::method::{validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra},
+    remote::validate::method::{
+        validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
+    },
 };
 
 use crate::auth::user::remote::kernel::data::RequireAuthRoles;

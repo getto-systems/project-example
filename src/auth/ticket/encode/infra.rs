@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
 use crate::{
-    auth::ticket::remote::{
+    auth::ticket::{
         encode::data::EncodeAuthTokenError,
-        kernel::data::{
+        remote::kernel::data::{
             AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpansionLimitDateTime,
             ExpireDateTime,
         },

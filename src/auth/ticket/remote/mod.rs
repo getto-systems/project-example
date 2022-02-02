@@ -1,4 +1,3 @@
-pub mod encode;
 pub mod issue;
 pub mod kernel;
 pub mod validate;

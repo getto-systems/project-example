@@ -7,9 +7,9 @@ use crate::auth::user::password::remote::y_protobuf::service::AuthenticatePasswo
 use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 
 use crate::auth::{
-    ticket::remote::{
-        encode::init::EncodeAuthTicketStruct, issue::init::IssueAuthTicketStruct,
-        validate::init::ValidateAuthNonceStruct,
+    ticket::{
+        encode::init::EncodeAuthTicketStruct,
+        remote::{issue::init::IssueAuthTicketStruct, validate::init::ValidateAuthNonceStruct},
     },
     user::{
         password::remote::{

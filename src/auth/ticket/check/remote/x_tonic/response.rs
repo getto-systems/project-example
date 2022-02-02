@@ -8,11 +8,11 @@ use crate::auth::ticket::remote::y_protobuf::service::{
 
 use super::super::action::CheckAuthTicketState;
 
-use crate::auth::ticket::remote::{
-    encode::method::EncodeAuthTicketEvent, validate::method::ValidateAuthTokenEvent,
+use crate::auth::ticket::{
+    encode::method::EncodeAuthTicketEvent, remote::validate::method::ValidateAuthTokenEvent,
 };
 
-use crate::auth::ticket::remote::encode::data::AuthTicketEncoded;
+use crate::auth::ticket::encode::data::AuthTicketEncoded;
 
 impl RespondTo<CheckAuthTicketResponsePb> for CheckAuthTicketState {
     fn respond_to(self) -> Result<Response<CheckAuthTicketResponsePb>, Status> {

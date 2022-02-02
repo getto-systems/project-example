@@ -5,26 +5,28 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
-    ticket::remote::{
+    ticket::{
         encode::init::{
             test::StaticEncodeAuthTicketStruct,
             token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
         },
-        issue::init::{
-            id_generator::test::StaticAuthTicketIdGenerator, test::StaticIssueAuthTicketStruct,
-        },
-        kernel::init::{
-            clock::test::StaticChronoAuthClock,
-            ticket_repository::test::{
-                MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+        remote::{
+            issue::init::{
+                id_generator::test::StaticAuthTicketIdGenerator, test::StaticIssueAuthTicketStruct,
             },
-        },
-        validate::init::{
-            nonce_metadata::test::StaticAuthNonceMetadata,
-            nonce_repository::test::{
-                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+            kernel::init::{
+                clock::test::StaticChronoAuthClock,
+                ticket_repository::test::{
+                    MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+                },
             },
-            test::StaticValidateAuthNonceStruct,
+            validate::init::{
+                nonce_metadata::test::StaticAuthNonceMetadata,
+                nonce_repository::test::{
+                    MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+                },
+                test::StaticValidateAuthNonceStruct,
+            },
         },
     },
     user::{
@@ -45,9 +47,9 @@ use crate::auth::{
 };
 
 use crate::auth::{
-    ticket::remote::{
-        encode::method::EncodeAuthTicketConfig, issue::method::IssueAuthTicketConfig,
-        validate::method::AuthNonceConfig,
+    ticket::{
+        encode::method::EncodeAuthTicketConfig,
+        remote::{issue::method::IssueAuthTicketConfig, validate::method::AuthNonceConfig},
     },
     user::password::remote::{
         authenticate::infra::AuthenticatePasswordFieldsExtract, kernel::infra::HashedPassword,

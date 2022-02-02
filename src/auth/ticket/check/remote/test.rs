@@ -4,30 +4,32 @@ use getto_application_test::ActionTestRunner;
 
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
-use crate::auth::ticket::remote::{
+use crate::auth::ticket::{
     encode::init::{
         test::StaticEncodeAuthTicketStruct,
         token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
     },
-    kernel::init::{
-        clock::test::StaticChronoAuthClock,
-        ticket_repository::test::{
-            MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+    remote::{
+        kernel::init::{
+            clock::test::StaticChronoAuthClock,
+            ticket_repository::test::{
+                MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+            },
         },
-    },
-    validate::init::{
-        nonce_metadata::test::StaticAuthNonceMetadata,
-        nonce_repository::test::{
-            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+        validate::init::{
+            nonce_metadata::test::StaticAuthNonceMetadata,
+            nonce_repository::test::{
+                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
+            },
+            test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
+            token_decoder::test::StaticAuthTokenDecoder,
+            token_metadata::test::StaticAuthTokenMetadata,
         },
-        test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
-        token_decoder::test::StaticAuthTokenDecoder,
-        token_metadata::test::StaticAuthTokenMetadata,
     },
 };
 
 use crate::auth::ticket::{
-    remote::encode::method::EncodeAuthTicketConfig, remote::validate::method::AuthNonceConfig,
+    encode::method::EncodeAuthTicketConfig, remote::validate::method::AuthNonceConfig,
 };
 
 use super::action::{CheckAuthTicketAction, CheckAuthTicketMaterial};

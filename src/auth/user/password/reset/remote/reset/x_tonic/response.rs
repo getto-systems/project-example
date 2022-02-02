@@ -9,10 +9,10 @@ use crate::auth::user::password::reset::remote::y_protobuf::service::{
 
 use super::super::action::{ResetPasswordEvent, ResetPasswordState};
 
-use crate::auth::ticket::remote::encode::method::EncodeAuthTicketEvent;
+use crate::auth::ticket::encode::method::EncodeAuthTicketEvent;
 
 use crate::auth::{
-    ticket::remote::encode::data::AuthTicketEncoded,
+    ticket::encode::data::AuthTicketEncoded,
     user::password::reset::remote::reset::data::{
         DecodeResetTokenError, NotifyResetPasswordError, ResetPasswordError,
         VerifyResetTokenEntryError,

@@ -2,8 +2,8 @@ use tonic::metadata::MetadataMap;
 
 use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 
-use crate::auth::ticket::remote::{
-    encode::init::EncodeAuthTicketStruct, validate::init::TicketValidateAuthTokenStruct,
+use crate::auth::ticket::{
+    encode::init::EncodeAuthTicketStruct, remote::validate::init::TicketValidateAuthTokenStruct,
 };
 
 use super::action::{CheckAuthTicketAction, CheckAuthTicketMaterial};

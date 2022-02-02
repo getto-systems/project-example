@@ -1,8 +1,8 @@
 use crate::z_lib::remote::logger::{LogLevel, LogFilter};
 
-use crate::auth::ticket::remote::encode::method::EncodeAuthTicketEvent;
+use crate::auth::ticket::encode::method::EncodeAuthTicketEvent;
 
-use crate::auth::ticket::remote::encode::data::EncodeAuthTokenError;
+use crate::auth::ticket::encode::data::EncodeAuthTokenError;
 
 impl LogFilter for EncodeAuthTicketEvent {
     fn log_level(&self) -> LogLevel {

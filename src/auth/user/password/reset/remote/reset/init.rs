@@ -9,9 +9,12 @@ use crate::auth::user::password::reset::remote::y_protobuf::service::ResetPasswo
 use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 
 use crate::auth::{
-    ticket::remote::{
-        encode::init::EncodeAuthTicketStruct, issue::init::IssueAuthTicketStruct,
-        kernel::init::clock::ChronoAuthClock, validate::init::ValidateAuthNonceStruct,
+    ticket::{
+        encode::init::EncodeAuthTicketStruct,
+        remote::{
+            issue::init::IssueAuthTicketStruct, kernel::init::clock::ChronoAuthClock,
+            validate::init::ValidateAuthNonceStruct,
+        },
     },
     user::{
         password::{
