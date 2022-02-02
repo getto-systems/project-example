@@ -38,7 +38,7 @@ async fn main() {
 }
 
 mod route {
-    use example_api::auth::remote::x_tonic::route::AuthServer;
+    use example_api::auth::x_tonic::route::AuthServer;
 
     pub struct Server {
         pub auth: AuthServer,

@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use getto_application_test::ActionTestRunner;
 
 use crate::{
-    auth::remote::init::test::{
+    auth::init::test::{
         StaticAuthMetadata, StaticAuthTokenDecoder, StaticValidateApiTokenStruct,
         StaticValidateService,
     },
@@ -23,10 +23,7 @@ async fn success_get_menu_badge() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec![
-        "validate api token success",
-        "get menu badge success",
-    ]);
+    assert_state(vec!["validate api token success", "get menu badge success"]);
     assert!(result.is_ok());
 }
 

@@ -5,11 +5,11 @@ use actix_web::HttpRequest;
 use crate::x_outside_feature::remote::api::feature::ApiAppFeature;
 
 use crate::{
-    auth::remote::init::ValidateApiMetadataStruct,
+    auth::init::ValidateApiMetadataStruct,
     example::outline::remote::get_menu_badge::proxy::init::proxy_service::ProxyService,
 };
 
-use crate::auth::remote::proxy::action::{AuthProxyAction, AuthProxyMaterial};
+use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
 
 pub struct GetOutlineMenuBadgeProxyStruct<'a> {
     validate: ValidateApiMetadataStruct<'a>,
