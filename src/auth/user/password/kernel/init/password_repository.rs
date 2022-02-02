@@ -18,6 +18,7 @@ use crate::{
     auth::{
         ticket::kernel::remote::data::{AuthDateTime, ExpireDateTime},
         user::{
+            kernel::data::AuthUserId,
             login_id::kernel::data::LoginId,
             password::{
                 authenticate::remote::data::VerifyPasswordRepositoryError,
@@ -30,7 +31,6 @@ use crate::{
                     reset::remote::data::ResetPasswordRepositoryError,
                 },
             },
-            remote::kernel::data::AuthUserId,
         },
     },
     z_lib::remote::repository::data::RepositoryError,
@@ -367,6 +367,7 @@ pub mod test {
         auth::{
             ticket::kernel::remote::data::{AuthDateTime, ExpireDateTime},
             user::{
+                kernel::data::{AuthUser, AuthUserId},
                 login_id::kernel::data::LoginId,
                 password::{
                     authenticate::remote::data::VerifyPasswordRepositoryError,
@@ -379,7 +380,6 @@ pub mod test {
                         reset::remote::data::ResetPasswordRepositoryError,
                     },
                 },
-                remote::kernel::data::{AuthUser, AuthUserId},
             },
         },
         z_lib::remote::repository::data::RepositoryError,

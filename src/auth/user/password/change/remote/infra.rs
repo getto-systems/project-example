@@ -1,9 +1,7 @@
-use crate::auth::user::password::kernel::infra::{
-    AuthUserPasswordHasher, AuthUserPasswordMatcher,
-};
+use crate::auth::user::password::kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher};
 
 use crate::auth::user::{
-    password::change::remote::data::ChangePasswordRepositoryError, remote::kernel::data::AuthUserId,
+    kernel::data::AuthUserId, password::change::remote::data::ChangePasswordRepositoryError,
 };
 
 pub trait ChangePasswordRequestDecoder {

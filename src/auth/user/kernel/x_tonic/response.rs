@@ -9,7 +9,7 @@ use crate::auth::{
     user::remote::y_protobuf::service::GrantedAuthRolesPb,
 };
 
-use crate::auth::user::remote::kernel::data::{AuthUser, GrantedAuthRoles, RequireAuthRoles};
+use crate::auth::user::kernel::data::{AuthUser, GrantedAuthRoles, RequireAuthRoles};
 
 impl RespondTo<ValidateApiTokenResponsePb> for AuthUser {
     fn respond_to(self) -> Result<Response<ValidateApiTokenResponsePb>, Status> {

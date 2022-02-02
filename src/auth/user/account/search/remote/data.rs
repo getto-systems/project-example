@@ -1,7 +1,5 @@
 use crate::{
-    auth::user::{
-        login_id::kernel::data::LoginIdBasket, remote::kernel::data::GrantedAuthRolesBasket,
-    },
+    auth::user::{kernel::data::GrantedAuthRolesBasket, login_id::kernel::data::LoginIdBasket},
     z_lib::remote::search::data::SearchPage,
 };
 

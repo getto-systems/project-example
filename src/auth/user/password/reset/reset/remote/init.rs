@@ -14,6 +14,7 @@ use crate::auth::{
         kernel::remote::init::clock::ChronoAuthClock, validate::init::ValidateAuthNonceStruct,
     },
     user::{
+        kernel::init::user_repository::MysqlAuthUserRepository,
         password::{
             kernel::init::{
                 password_hasher::Argon2PasswordHasher,
@@ -24,7 +25,6 @@ use crate::auth::{
                 reset_notifier::EmailResetPasswordNotifier, token_decoder::JwtResetTokenDecoder,
             },
         },
-        remote::kernel::init::user_repository::MysqlAuthUserRepository,
     },
 };
 

@@ -42,11 +42,11 @@ use crate::auth::user::password::reset::request_token::remote::infra::{
 use crate::auth::{
     ticket::kernel::remote::data::{AuthDateTime, ExpireDuration},
     user::{
+        kernel::data::AuthUserId,
         login_id::kernel::data::LoginId,
         password::reset::kernel::data::{
             ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
         },
-        remote::kernel::data::AuthUserId,
     },
 };
 

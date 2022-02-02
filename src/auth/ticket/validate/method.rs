@@ -15,7 +15,7 @@ use crate::{
             AuthTicket, DecodeAuthTokenError, ExpireDateTime, ExpireDuration,
             ValidateAuthRolesError,
         },
-        user::remote::kernel::data::RequireAuthRoles,
+        user::kernel::data::RequireAuthRoles,
     },
     z_lib::remote::{
         repository::data::{RegisterResult, RepositoryError},

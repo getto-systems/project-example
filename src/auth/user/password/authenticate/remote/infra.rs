@@ -1,10 +1,10 @@
 use crate::auth::user::{
+    kernel::data::AuthUserId,
     login_id::kernel::data::LoginId,
     password::{
         authenticate::remote::data::VerifyPasswordRepositoryError,
         kernel::infra::AuthUserPasswordMatcher,
     },
-    remote::kernel::data::AuthUserId,
 };
 
 pub trait AuthenticatePasswordRequestDecoder {

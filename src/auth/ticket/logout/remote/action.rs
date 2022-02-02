@@ -9,9 +9,7 @@ use crate::auth::ticket::{
 };
 
 use crate::{
-    auth::{
-        ticket::kernel::remote::data::AuthTicket, user::remote::kernel::data::RequireAuthRoles,
-    },
+    auth::{ticket::kernel::remote::data::AuthTicket, user::kernel::data::RequireAuthRoles},
     z_lib::remote::repository::data::RepositoryError,
 };
 

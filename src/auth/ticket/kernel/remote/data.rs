@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use chrono::{DateTime, Duration, Utc};
 
-use crate::auth::user::remote::kernel::data::{
+use crate::auth::user::kernel::data::{
     AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
 };
 

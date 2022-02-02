@@ -8,7 +8,7 @@ use crate::{
         ticket::kernel::remote::data::{
             AuthTicket, ExpansionLimitDateTime, ExpansionLimitDuration,
         },
-        user::remote::kernel::data::AuthUser,
+        user::kernel::data::AuthUser,
     },
     z_lib::remote::repository::data::RepositoryError,
 };

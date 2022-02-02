@@ -28,6 +28,9 @@ use crate::auth::{
         },
     },
     user::{
+        kernel::init::user_repository::test::{
+            MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
+        },
         password::{
             authenticate::remote::init::request_decoder::test::StaticAuthenticatePasswordRequestDecoder,
             kernel::init::{
@@ -37,9 +40,6 @@ use crate::auth::{
                     MemoryAuthUserPasswordStore,
                 },
             },
-        },
-        remote::kernel::init::user_repository::test::{
-            MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
         },
     },
 };
@@ -62,8 +62,8 @@ use crate::auth::{
         AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
     },
     user::{
+        kernel::data::{AuthUser, AuthUserExtract},
         login_id::kernel::data::LoginId,
-        remote::kernel::data::{AuthUser, AuthUserExtract},
     },
 };
 

@@ -25,8 +25,8 @@ use crate::auth::{
                 MemorySearchAuthUserAccountStore,
             },
         },
+        kernel::init::user_repository::test::MemoryAuthUserMap,
         password::kernel::init::password_repository::test::MemoryAuthUserPasswordMap,
-        remote::kernel::init::user_repository::test::MemoryAuthUserMap,
     },
 };
 
@@ -43,8 +43,8 @@ use crate::{
     auth::{
         ticket::kernel::remote::data::{AuthTicketExtract, ExpireDuration},
         user::{
+            kernel::data::{AuthUser, AuthUserExtract},
             login_id::kernel::data::LoginId,
-            remote::kernel::data::{AuthUser, AuthUserExtract},
         },
     },
     z_lib::remote::search::data::SearchSortExtract,

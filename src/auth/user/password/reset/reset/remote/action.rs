@@ -9,6 +9,7 @@ use crate::auth::ticket::{
 use crate::auth::{
     ticket::kernel::remote::infra::AuthClock,
     user::{
+        kernel::infra::AuthUserRepository,
         password::{
             kernel::infra::{AuthUserPasswordHasher, PlainPassword},
             reset::{
@@ -19,7 +20,6 @@ use crate::auth::{
                 },
             },
         },
-        remote::kernel::infra::AuthUserRepository,
     },
 };
 
@@ -27,6 +27,7 @@ use crate::{
     auth::{
         ticket::kernel::remote::data::AuthDateTime,
         user::{
+            kernel::data::AuthUser,
             login_id::kernel::data::{LoginId, ValidateLoginIdError},
             password::{
                 kernel::data::{PasswordHashError, ValidatePasswordError},
@@ -41,7 +42,6 @@ use crate::{
                     },
                 },
             },
-            remote::kernel::data::AuthUser,
         },
     },
     z_lib::remote::repository::data::RepositoryError,

@@ -28,6 +28,9 @@ use crate::auth::{
         },
     },
     user::{
+        kernel::init::user_repository::test::{
+            MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
+        },
         password::{
             kernel::init::{
                 password_hasher::test::PlainPasswordHasher,
@@ -41,9 +44,6 @@ use crate::auth::{
                 reset_notifier::test::StaticResetPasswordNotifier,
                 token_decoder::test::StaticResetTokenDecoder,
             },
-        },
-        remote::kernel::init::user_repository::test::{
-            MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
         },
     },
 };
@@ -62,9 +62,9 @@ use crate::auth::{
         AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
     },
     user::{
+        kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
         login_id::kernel::data::LoginId,
         password::reset::kernel::data::{ResetToken, ResetTokenDestinationExtract},
-        remote::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
     },
 };
 

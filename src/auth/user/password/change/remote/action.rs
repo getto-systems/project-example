@@ -15,11 +15,11 @@ use crate::{
     auth::{
         ticket::kernel::remote::data::AuthTicket,
         user::{
+            kernel::data::RequireAuthRoles,
             password::{
                 change::remote::data::{ChangePasswordError, ChangePasswordRepositoryError},
                 kernel::data::{PasswordHashError, ValidatePasswordError},
             },
-            remote::kernel::data::RequireAuthRoles,
         },
     },
     z_lib::remote::repository::data::RepositoryError,

@@ -4,7 +4,7 @@ use crate::auth::ticket::remote::y_protobuf::service::ValidateApiTokenRequestPb;
 
 use crate::auth::ticket::validate::infra::ValidateApiTokenRequestDecoder;
 
-use crate::auth::user::remote::kernel::data::RequireAuthRoles;
+use crate::auth::user::kernel::data::RequireAuthRoles;
 
 pub struct PbValidateApiTokenRequestDecoder {
     request: ValidateApiTokenRequestPb,
@@ -34,7 +34,7 @@ impl ValidateApiTokenRequestDecoder for PbValidateApiTokenRequestDecoder {
 pub mod test {
     use crate::auth::{
         ticket::validate::infra::ValidateApiTokenRequestDecoder,
-        user::remote::kernel::data::RequireAuthRoles,
+        user::kernel::data::RequireAuthRoles,
     };
 
     pub struct StaticValidateApiTokenRequestDecoder {

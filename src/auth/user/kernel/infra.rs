@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::remote::kernel::data::{AuthUser, AuthUserId},
+    auth::user::kernel::data::{AuthUser, AuthUserId},
     z_lib::remote::repository::data::RepositoryError,
 };
 

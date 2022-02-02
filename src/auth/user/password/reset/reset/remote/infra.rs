@@ -6,6 +6,7 @@ use crate::{
     auth::{
         ticket::kernel::remote::data::AuthDateTime,
         user::{
+            kernel::data::AuthUserId,
             password::reset::{
                 kernel::data::{ResetToken, ResetTokenDestination, ResetTokenEncoded},
                 reset::remote::data::{
@@ -13,7 +14,6 @@ use crate::{
                     ResetPasswordRepositoryError,
                 },
             },
-            remote::kernel::data::AuthUserId,
         },
     },
     z_lib::remote::repository::data::RepositoryError,

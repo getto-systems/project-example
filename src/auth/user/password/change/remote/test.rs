@@ -40,8 +40,8 @@ use super::action::{ChangePasswordAction, ChangePasswordMaterial};
 use crate::auth::{
     ticket::kernel::remote::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
     user::{
+        kernel::data::{AuthUser, AuthUserExtract},
         login_id::kernel::data::LoginId,
-        remote::kernel::data::{AuthUser, AuthUserExtract},
     },
 };
 

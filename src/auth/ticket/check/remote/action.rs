@@ -5,7 +5,7 @@ use crate::auth::ticket::{
     validate::method::{validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra},
 };
 
-use crate::auth::user::remote::kernel::data::RequireAuthRoles;
+use crate::auth::user::kernel::data::RequireAuthRoles;
 
 pub enum CheckAuthTicketState {
     Validate(ValidateAuthTokenEvent),

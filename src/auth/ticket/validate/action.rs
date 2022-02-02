@@ -5,7 +5,7 @@ use crate::auth::{
         infra::ValidateApiTokenRequestDecoder,
         method::{validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra},
     },
-    user::remote::kernel::data::AuthUser,
+    user::kernel::data::AuthUser,
 };
 
 pub enum ValidateApiTokenState {

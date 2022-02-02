@@ -7,6 +7,7 @@ use crate::auth::ticket::{
 };
 
 use crate::auth::user::{
+    kernel::infra::AuthUserRepository,
     password::{
         authenticate::remote::infra::{
             AuthenticatePasswordFieldsExtract, AuthenticatePasswordRequestDecoder,
@@ -14,11 +15,11 @@ use crate::auth::user::{
         },
         kernel::infra::{AuthUserPasswordMatcher, PlainPassword},
     },
-    remote::kernel::infra::AuthUserRepository,
 };
 
 use crate::{
     auth::user::{
+        kernel::data::AuthUser,
         login_id::kernel::data::{LoginId, ValidateLoginIdError},
         password::{
             authenticate::remote::data::{
@@ -26,7 +27,6 @@ use crate::{
             },
             kernel::data::{PasswordHashError, ValidatePasswordError},
         },
-        remote::kernel::data::AuthUser,
     },
     z_lib::remote::repository::data::RepositoryError,
 };
