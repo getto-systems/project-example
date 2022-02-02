@@ -2,7 +2,7 @@ use actix_web::{HttpRequest, HttpResponse};
 
 use crate::z_lib::remote::response::actix_web::RespondTo;
 
-use crate::auth::ticket::remote::validate::method::ValidateAuthMetadataEvent;
+use crate::auth::ticket::validate::method::ValidateAuthMetadataEvent;
 
 impl RespondTo for ValidateAuthMetadataEvent {
     fn respond_to(self, request: &HttpRequest) -> HttpResponse {

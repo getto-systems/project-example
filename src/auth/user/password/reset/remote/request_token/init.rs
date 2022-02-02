@@ -7,7 +7,7 @@ pub mod token_notifier;
 use tonic::metadata::MetadataMap;
 
 use crate::auth::{
-    ticket::remote::validate::init::ValidateAuthNonceStruct,
+    ticket::validate::init::ValidateAuthNonceStruct,
     user::password::reset::remote::y_protobuf::service::RequestResetTokenRequestPb,
 };
 

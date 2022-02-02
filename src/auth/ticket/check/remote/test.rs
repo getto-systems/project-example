@@ -9,27 +9,25 @@ use crate::auth::ticket::{
         test::StaticEncodeAuthTicketStruct,
         token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
     },
-    remote::{
-        kernel::init::{
-            clock::test::StaticChronoAuthClock,
-            ticket_repository::test::{
-                MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
-            },
+    remote::kernel::init::{
+        clock::test::StaticChronoAuthClock,
+        ticket_repository::test::{
+            MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
         },
-        validate::init::{
-            nonce_metadata::test::StaticAuthNonceMetadata,
-            nonce_repository::test::{
-                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-            },
-            test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
-            token_decoder::test::StaticAuthTokenDecoder,
-            token_metadata::test::StaticAuthTokenMetadata,
+    },
+    validate::init::{
+        nonce_metadata::test::StaticAuthNonceMetadata,
+        nonce_repository::test::{
+            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
         },
+        test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
+        token_decoder::test::StaticAuthTokenDecoder,
+        token_metadata::test::StaticAuthTokenMetadata,
     },
 };
 
 use crate::auth::ticket::{
-    encode::method::EncodeAuthTicketConfig, remote::validate::method::AuthNonceConfig,
+    encode::method::EncodeAuthTicketConfig, validate::method::AuthNonceConfig,
 };
 
 use super::action::{CheckAuthTicketAction, CheckAuthTicketMaterial};

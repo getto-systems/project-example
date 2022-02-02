@@ -7,7 +7,7 @@ use crate::auth::ticket::remote::kernel::{
 
 use crate::z_lib::remote::request::{helper::header, x_tonic::metadata::metadata};
 
-use crate::auth::ticket::remote::validate::infra::AuthNonceMetadata;
+use crate::auth::ticket::validate::infra::AuthNonceMetadata;
 
 use crate::{
     auth::ticket::remote::kernel::data::AuthNonce, z_lib::remote::request::data::MetadataError,
@@ -48,7 +48,7 @@ impl<'a> AuthNonceMetadata for TonicAuthNonceMetadata<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::ticket::remote::validate::infra::AuthNonceMetadata;
+    use crate::auth::ticket::validate::infra::AuthNonceMetadata;
 
     use crate::{
         auth::ticket::remote::kernel::data::AuthNonce, z_lib::remote::request::data::MetadataError,

@@ -8,7 +8,7 @@ use crate::auth::ticket::remote::kernel::{
 
 use crate::z_lib::remote::request::{helper::cookie, x_tonic::metadata::metadata};
 
-use crate::auth::ticket::remote::validate::infra::AuthTokenMetadata;
+use crate::auth::ticket::validate::infra::AuthTokenMetadata;
 
 use crate::{
     auth::ticket::remote::kernel::data::AuthToken, z_lib::remote::request::data::MetadataError,
@@ -65,7 +65,7 @@ impl<'a> AuthTokenMetadata for TonicAuthTokenMetadata<'a> {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::ticket::remote::validate::infra::AuthTokenMetadata;
+    use crate::auth::ticket::validate::infra::AuthTokenMetadata;
 
     use crate::{
         auth::ticket::remote::kernel::data::AuthToken, z_lib::remote::request::data::MetadataError,

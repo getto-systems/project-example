@@ -7,7 +7,7 @@ use crate::auth::user::password::remote::y_protobuf::service::ChangePasswordRequ
 use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 
 use crate::auth::{
-    ticket::remote::validate::init::ApiValidateAuthTokenStruct,
+    ticket::validate::init::ApiValidateAuthTokenStruct,
     user::password::remote::{
         change::init::request_decoder::PbChangePasswordRequestDecoder,
         kernel::init::{

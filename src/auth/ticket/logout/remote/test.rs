@@ -4,8 +4,8 @@ use getto_application_test::ActionTestRunner;
 
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
-use crate::auth::ticket::remote::{
-    kernel::init::{
+use crate::auth::ticket::{
+    remote::kernel::init::{
         clock::test::StaticChronoAuthClock,
         ticket_repository::test::{
             MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
@@ -22,7 +22,7 @@ use crate::auth::ticket::remote::{
     },
 };
 
-use crate::auth::ticket::remote::validate::method::AuthNonceConfig;
+use crate::auth::ticket::validate::method::AuthNonceConfig;
 
 use super::action::{LogoutAction, LogoutMaterial};
 

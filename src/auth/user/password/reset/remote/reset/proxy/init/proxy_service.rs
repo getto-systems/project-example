@@ -25,7 +25,7 @@ use crate::{
 use crate::auth::remote::proxy::method::set_metadata;
 
 use crate::auth::{
-    remote::proxy::infra::AuthProxyService, ticket::remote::validate::infra::AuthMetadataContent,
+    remote::proxy::infra::AuthProxyService, ticket::validate::infra::AuthMetadataContent,
 };
 
 use crate::{

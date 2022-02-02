@@ -1,4 +1,4 @@
-use crate::auth::ticket::remote::validate::infra::AuthMetadataContent;
+use crate::auth::ticket::validate::infra::AuthMetadataContent;
 
 use crate::auth::remote::proxy::data::AuthProxyError;
 

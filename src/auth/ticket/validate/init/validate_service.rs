@@ -14,7 +14,7 @@ use crate::{
 
 use crate::auth::remote::proxy::method::set_metadata;
 
-use crate::auth::ticket::remote::validate::infra::{AuthMetadataContent, ValidateService};
+use crate::auth::ticket::validate::infra::{AuthMetadataContent, ValidateService};
 
 use crate::auth::{
     remote::proxy::data::AuthProxyError, user::remote::kernel::data::RequireAuthRoles,
@@ -81,7 +81,7 @@ async fn validate<'a>(
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::ticket::remote::validate::infra::{AuthMetadataContent, ValidateService};
+    use crate::auth::ticket::validate::infra::{AuthMetadataContent, ValidateService};
 
     use crate::auth::{
         remote::proxy::data::AuthProxyError, user::remote::kernel::data::RequireAuthRoles,

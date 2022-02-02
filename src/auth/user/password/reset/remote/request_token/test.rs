@@ -3,8 +3,8 @@ use chrono::{DateTime, Duration, TimeZone, Utc};
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
-    ticket::remote::{
-        kernel::init::clock::test::StaticChronoAuthClock,
+    ticket::{
+        remote::kernel::init::clock::test::StaticChronoAuthClock,
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::test::{
@@ -31,7 +31,7 @@ use crate::auth::{
     },
 };
 
-use crate::auth::ticket::remote::validate::method::AuthNonceConfig;
+use crate::auth::ticket::validate::method::AuthNonceConfig;
 
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 

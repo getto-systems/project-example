@@ -8,7 +8,7 @@ use crate::auth::user::account::remote::y_protobuf::service::SearchAuthUserAccou
 use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 
 use crate::auth::{
-    ticket::remote::validate::init::ApiValidateAuthTokenStruct,
+    ticket::validate::init::ApiValidateAuthTokenStruct,
     user::account::remote::search::init::{
         request_decoder::PbSearchAuthUserAccountRequestDecoder,
         search_repository::MysqlSearchAuthUserAccountRepository,

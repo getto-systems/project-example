@@ -1,8 +1,8 @@
 use crate::z_lib::remote::logger::{LogFilter, LogLevel, LogMessage};
 
-use crate::auth::ticket::remote::validate::action::ValidateApiTokenState;
+use crate::auth::ticket::validate::action::ValidateApiTokenState;
 
-use crate::auth::ticket::remote::validate::method::{
+use crate::auth::ticket::validate::method::{
     CheckPermissionEvent, ValidateAuthMetadataEvent, ValidateAuthNonceEvent,
     ValidateAuthTokenEvent,
 };

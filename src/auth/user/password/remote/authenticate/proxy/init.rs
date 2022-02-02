@@ -5,7 +5,7 @@ use actix_web::HttpRequest;
 use crate::auth::remote::x_outside_feature::api::feature::AuthOutsideFeature;
 
 use crate::auth::{
-    ticket::remote::validate::init::NoValidateMetadataStruct,
+    ticket::validate::init::NoValidateMetadataStruct,
     user::password::remote::authenticate::proxy::init::proxy_service::ProxyService,
 };
 

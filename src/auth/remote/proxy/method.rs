@@ -10,7 +10,7 @@ use crate::{
 };
 
 use crate::{
-    auth::ticket::remote::validate::infra::AuthMetadataContent,
+    auth::ticket::validate::infra::AuthMetadataContent,
     z_lib::remote::service::infra::ServiceAuthorizer,
 };
 

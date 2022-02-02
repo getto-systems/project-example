@@ -1,7 +1,7 @@
 use getto_application::data::MethodResult;
 
-use crate::auth::ticket::remote::{
-    kernel::infra::AuthClock,
+use crate::auth::ticket::{
+    remote::kernel::infra::AuthClock,
     validate::infra::{
         AuthMetadata, AuthMetadataContent, AuthNonceEntry, AuthNonceMetadata, AuthNonceRepository,
         AuthTokenDecoder, AuthTokenMetadata, ValidateService,

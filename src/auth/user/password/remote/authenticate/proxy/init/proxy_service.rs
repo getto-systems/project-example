@@ -24,8 +24,8 @@ use crate::auth::remote::proxy::method::set_metadata;
 
 use crate::auth::{
     remote::proxy::infra::AuthProxyService,
-    ticket::remote::{
-        kernel::infra::AuthTokenResponseBuilder, validate::infra::AuthMetadataContent,
+    ticket::{
+        remote::kernel::infra::AuthTokenResponseBuilder, validate::infra::AuthMetadataContent,
     },
 };
 
