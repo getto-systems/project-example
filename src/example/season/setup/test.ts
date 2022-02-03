@@ -18,6 +18,8 @@ import { BoardValueStore } from "../../../../ui/vendor/getto-application/board/i
 import { seasonRepositoryConverter, seasonToBoardValue } from "../kernel/convert"
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"
 
+import { Season } from "../kernel/data"
+
 describe("SetupSeason", () => {
     test("setup season", async () => {
         const { resource, store } = standard()
@@ -136,5 +138,9 @@ function initResource(seasonRepository: SeasonRepository): Readonly<{
 }
 
 function standard_season(): SeasonRepository {
-    return convertDB(initMemoryDB(), seasonRepositoryConverter)
+    return convertDB(initMemoryDB(), seasonRepositoryConverter(standard_availableSeasons()))
+}
+
+function standard_availableSeasons(): readonly Season[] {
+    return [{ year: 2021, period: "summer" } as Season]
 }

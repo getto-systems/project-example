@@ -17,7 +17,7 @@ import { seasonToBoardValue } from "../../kernel/convert"
 type Props = Readonly<{
     field: InputSeasonAction
     title: VNodeContent
-    seasons: Season[]
+    seasons: readonly Season[]
 }>
 export function InputSeasonComponent(props: Props): VNode {
     return field({
@@ -28,7 +28,7 @@ export function InputSeasonComponent(props: Props): VNode {
         }),
     })
 
-    function options(seasons: Season[]): VNode[] {
+    function options(seasons: readonly Season[]): VNode[] {
         return [
             html`<option value="">今シーズン</option>`,
             ...seasons.map((season) => {

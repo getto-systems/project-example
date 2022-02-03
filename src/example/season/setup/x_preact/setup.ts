@@ -86,7 +86,7 @@ export function SetupSeasonComponent(props: Props): VNode {
         }
     }
 
-    type FormContent = Readonly<{ seasons: Season[] }>
+    type FormContent = Readonly<{ seasons: readonly Season[] }>
 
     function seasonForm({ seasons }: FormContent): VNode {
         return box({

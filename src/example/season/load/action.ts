@@ -3,12 +3,13 @@ import {
     StatefulApplicationAction,
 } from "../../../../ui/vendor/getto-application/action/action"
 
-import { defaultSeason } from "../kernel/convert"
+import { availableSeasons } from "../kernel/init/available_seasons"
+import { defaultSeason } from "../kernel/init/default_season"
 
 import { SeasonRepository } from "../kernel/infra"
 import { Clock } from "../../../z_lib/ui/clock/infra"
 
-import { beginningOfSystemSeason, Season, seasonPeriods } from "../kernel/data"
+import { Season } from "../kernel/data"
 import { RepositoryError } from "../../../z_lib/ui/repository/data"
 
 export type LoadSeasonAction = StatefulApplicationAction<LoadSeasonState>
@@ -39,7 +40,7 @@ type LoadSeasonEvent =
           type: "succeed-to-load"
           season: Season
           default: boolean
-          availableSeasons: Season[]
+          availableSeasons: readonly Season[]
       }>
     | Readonly<{ type: "failed-to-load"; err: RepositoryError }>
 
@@ -76,19 +77,6 @@ async function loadSeason<S>(
         default: false,
         availableSeasons: availableSeasons(clock),
     })
-}
-function availableSeasons(clock: Clock): Season[] {
-    const seasons: Season[] = []
-
-    const currentYear = clock.now().getFullYear()
-
-    for (let year = beginningOfSystemSeason.year; year < currentYear; year++) {
-        seasonPeriods.forEach((period) => {
-            seasons.push({ year, period } as Season)
-        })
-    }
-
-    return seasons
 }
 
 interface Post<E, S> {

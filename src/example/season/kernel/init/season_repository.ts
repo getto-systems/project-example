@@ -11,8 +11,13 @@ import { SeasonRepository, SeasonRepositoryValue } from "../infra"
 import { seasonRepositoryConverter } from "../convert"
 import { convertDB } from "../../../../z_lib/ui/repository/init/convert"
 
-export function newSeasonRepository({ webDB }: RepositoryOutsideFeature): SeasonRepository {
-    return convertDB(initDB(), seasonRepositoryConverter)
+import { Season } from "../data"
+
+export function newSeasonRepository(
+    { webDB }: RepositoryOutsideFeature,
+    availableSeasons: readonly Season[],
+): SeasonRepository {
+    return convertDB(initDB(), seasonRepositoryConverter(availableSeasons))
 
     function initDB() {
         const currentSeason: IndexedDBTarget = {
