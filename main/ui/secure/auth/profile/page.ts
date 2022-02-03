@@ -17,7 +17,7 @@ import { useDocumentTitle } from "../../../../../src/example/x_preact/hooks"
 import { copyright, siteInfo } from "../../../../../src/x_content/site"
 
 import { ApplicationErrorComponent } from "../../../../../src/avail/x_preact/application_error"
-import { LoadSeasonEntry } from "../../../../../src/example/season/action_load/x_preact/load_season"
+import { LoadSeasonEntry } from "../../../../../src/example/season/load/x_preact/load_season"
 import { LoadMenuEntry } from "../../../../../src/example/outline/load_menu/x_preact/load_menu"
 import { LoadBreadcrumbListComponent } from "../../../../../src/example/outline/load_breadcrumb_list/x_preact/load_breadcrumb_list"
 import { ChangePasswordEntry } from "../../../../../src/auth/user/password/change/x_preact/change_password"

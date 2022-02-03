@@ -10,17 +10,21 @@ import {
     fieldError,
 } from "../../../../../ui/vendor/getto-css/preact/design/form"
 
-import { InputSeasonComponent } from "../../input/action_input/x_preact/input"
+import { InputSeasonComponent } from "../../input/x_preact/input"
 
 import { repositoryErrorReason } from "../../../../z_lib/ui/repository/x_error/reason"
 import { seasonLabel } from "../../kernel/helper"
 
-import { FocusSeasonResource, FocusSeasonResourceState } from "../resource"
-
 import { Season } from "../../kernel/data"
 import { RepositoryError } from "../../../../z_lib/ui/repository/data"
+import { LoadSeasonAction, LoadSeasonState } from "../../load/action"
+import { FocusSeasonAction, FocusSeasonState } from "../action"
 
-export function FocusSeasonEntry({ season, focusSeason }: FocusSeasonResource): VNode {
+type EntryProps = Readonly<{
+    season: LoadSeasonAction
+    focusSeason: FocusSeasonAction
+}>
+export function FocusSeasonEntry({ season, focusSeason }: EntryProps): VNode {
     return h(FocusSeasonComponent, {
         season,
         focusSeason,
@@ -29,11 +33,11 @@ export function FocusSeasonEntry({ season, focusSeason }: FocusSeasonResource): 
     })
 }
 
-type Props = FocusSeasonResource & FocusSeasonResourceState
+type Props = EntryProps & Readonly<{ load: LoadSeasonState; state: FocusSeasonState }>
 export function FocusSeasonComponent(props: Props): VNode {
     return basedOn(props)
 
-    function basedOn({ state, load }: FocusSeasonResourceState): VNode {
+    function basedOn({ state, load }: Props): VNode {
         switch (load.type) {
             case "initial-season":
             case "failed-to-load":

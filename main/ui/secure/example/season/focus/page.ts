@@ -16,10 +16,10 @@ import { useDocumentTitle } from "../../../../../../src/example/x_preact/hooks"
 import { copyright, siteInfo } from "../../../../../../src/x_content/site"
 
 import { ApplicationErrorComponent } from "../../../../../../src/avail/x_preact/application_error"
-import { LoadSeasonEntry } from "../../../../../../src/example/season/action_load/x_preact/load_season"
+import { LoadSeasonEntry } from "../../../../../../src/example/season/load/x_preact/load_season"
 import { LoadMenuEntry } from "../../../../../../src/example/outline/load_menu/x_preact/load_menu"
 import { LoadBreadcrumbListComponent } from "../../../../../../src/example/outline/load_breadcrumb_list/x_preact/load_breadcrumb_list"
-import { FocusSeasonEntry } from "../../../../../../src/example/season/action_focus/x_preact/focus"
+import { FocusSeasonEntry } from "../../../../../../src/example/season/focus/x_preact/focus"
 
 import { ApplicationView } from "../../../../../../ui/vendor/getto-application/action/action"
 import { FocusSeasonPageResource } from "./resource"

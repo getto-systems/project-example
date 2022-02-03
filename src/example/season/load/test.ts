@@ -6,12 +6,10 @@ import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 
 import { seasonLabel } from "../kernel/helper"
 
-import { initLoadSeasonAction } from "./init"
+import { initLoadSeasonAction, LoadSeasonAction } from "./action"
 
 import { SeasonRepository } from "../kernel/infra"
 import { Clock } from "../../../z_lib/ui/clock/infra"
-
-import { LoadSeasonResource } from "./resource"
 
 import { seasonRepositoryConverter } from "../kernel/convert"
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"
@@ -169,7 +167,10 @@ function empty_last_winter() {
     return { resource }
 }
 
-function initResource(clock: Clock, season: SeasonRepository): LoadSeasonResource {
+function initResource(
+    clock: Clock,
+    season: SeasonRepository,
+): Readonly<{ season: LoadSeasonAction }> {
     return {
         season: initLoadSeasonAction({
             season,

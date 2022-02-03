@@ -17,3 +17,7 @@ export type SeasonRepositoryValue = Readonly<{
     }>
     expires: number
 }>
+
+export interface AvailableSeasons {
+    (): readonly Season[]
+}

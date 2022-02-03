@@ -7,10 +7,10 @@ import { mockBoardValueStore } from "../../../../ui/vendor/getto-application/boa
 import { markBoardValue } from "../../../../ui/vendor/getto-application/board/kernel/mock"
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 
-import { initFocusSeasonAction } from "./init"
+import { initFocusSeasonAction } from "./action"
 
 import { FocusSeasonAction } from "./action"
-import { initialLoadSeasonState } from "../action_load/action"
+import { initialLoadSeasonState } from "../load/action"
 
 import { SeasonRepository } from "../kernel/infra"
 import { BoardValueStore } from "../../../../ui/vendor/getto-application/board/input/infra"
@@ -81,6 +81,16 @@ describe("FocusSeason", () => {
         })
     })
 
+    test("open", async () => {
+        const { resource } = standard()
+
+        const runner = setupActionTestRunner(resource.focusSeason.subscriber)
+
+        await runner(() => resource.focusSeason.open()).then((stack) => {
+            expect(stack).toEqual([{ type: "edit-season" }])
+        })
+    })
+
     test("convert season to board value", () => {
         expect(seasonToBoardValue(markSeason({ year: 2021, period: "summer" }))).toEqual(
             "2021.summer",
@@ -92,7 +102,7 @@ function standard() {
     return initResource(standard_season())
 }
 
-function initResource(season: SeasonRepository): Readonly<{
+function initResource(seasonRepository: SeasonRepository): Readonly<{
     resource: Readonly<{ focusSeason: FocusSeasonAction }>
     store: Readonly<{ season: BoardValueStore }>
 }> {
@@ -101,12 +111,12 @@ function initResource(season: SeasonRepository): Readonly<{
     const resource = {
         focusSeason: initFocusSeasonAction(
             {
-                focusSeason: {
-                    season,
+                infra: {
+                    seasonRepository,
                     clock,
-                    config: {
-                        focusSeasonExpire: { expire_millisecond: 1000 },
-                    },
+                },
+                config: {
+                    focusSeasonExpire: { expire_millisecond: 1000 },
                 },
             },
             Promise.resolve(initialLoadSeasonState),

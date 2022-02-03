@@ -1,10 +1,18 @@
-import { initInputBoardAction } from "../../../../../ui/vendor/getto-application/board/input/action"
-import { InputSeasonAction } from "./action"
+import { ApplicationAction } from "../../../../ui/vendor/getto-application/action/action"
+
+import {
+    InputBoardAction,
+    initInputBoardAction,
+} from "../../../../ui/vendor/getto-application/board/input/action"
 
 import {
     BoardValue,
     emptyBoardValue,
-} from "../../../../../ui/vendor/getto-application/board/kernel/data"
+} from "../../../../ui/vendor/getto-application/board/kernel/data"
+
+export interface InputSeasonAction extends ApplicationAction {
+    readonly input: InputBoardAction
+}
 
 export function initInputSeasonAction(): Readonly<{
     input: InputSeasonAction

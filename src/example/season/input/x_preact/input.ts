@@ -1,22 +1,24 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { field } from "../../../../../../ui/vendor/getto-css/preact/design/form"
+import { field } from "../../../../../ui/vendor/getto-css/preact/design/form"
 
-import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 
-import { SelectBoardComponent } from "../../../../../../ui/vendor/getto-application/board/input/x_preact/select"
+import { SelectBoardComponent } from "../../../../../ui/vendor/getto-application/board/input/x_preact/select"
 
-import { seasonLabel } from "../../../kernel/helper"
+import { seasonLabel } from "../../kernel/helper"
 
-import { InputSeasonResource } from "../resource"
+import { InputSeasonAction } from "../action"
 
-import { Season } from "../../../kernel/data"
-import { seasonToBoardValue } from "../../../kernel/convert"
+import { Season } from "../../kernel/data"
+import { seasonToBoardValue } from "../../kernel/convert"
 
-type SelectOptions = Readonly<{ title: VNodeContent; seasons: Season[] }>
-
-type Props = InputSeasonResource & SelectOptions
+type Props = Readonly<{
+    field: InputSeasonAction
+    title: VNodeContent
+    seasons: Season[]
+}>
 export function InputSeasonComponent(props: Props): VNode {
     return field({
         title: props.title,

@@ -5,7 +5,7 @@ import { FocusSeasonPageEntry } from "./page"
 import { newForegroundOutsideFeature } from "../../../../../../src/x_outside_feature/common"
 
 import { newBaseResource } from "../../../../../../src/example/action_base/init/resource"
-import { newFocusSeasonResource } from "../../../../../../src/example/season/action_focus/init/resource"
+import { newFocusSeasonResource } from "../../../../../../src/example/season/focus/init/resource"
 import { initBaseView } from "../../../../../../src/example/action_base/init"
 
 import { ApplicationView } from "../../../../../../ui/vendor/getto-application/action/action"
