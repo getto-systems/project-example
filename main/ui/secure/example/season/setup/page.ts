@@ -19,25 +19,25 @@ import { ApplicationErrorComponent } from "../../../../../../src/avail/x_preact/
 import { LoadSeasonEntry } from "../../../../../../src/example/season/load/x_preact/load_season"
 import { LoadMenuEntry } from "../../../../../../src/example/outline/load_menu/x_preact/load_menu"
 import { LoadBreadcrumbListComponent } from "../../../../../../src/example/outline/load_breadcrumb_list/x_preact/load_breadcrumb_list"
-import { FocusSeasonEntry } from "../../../../../../src/example/season/focus/x_preact/focus"
+import { SetupSeasonEntry } from "../../../../../../src/example/season/setup/x_preact/setup"
 
 import { ApplicationView } from "../../../../../../ui/vendor/getto-application/action/action"
-import { FocusSeasonPageResource } from "./resource"
+import { SetupSeasonPageResource } from "./resource"
 import { container } from "../../../../../../ui/vendor/getto-css/preact/design/box"
 
 const pageTitle = "シーズン設定" as const
 
-export function FocusSeasonPageEntry(view: ApplicationView<FocusSeasonPageResource>): VNode {
+export function SetupSeasonPageEntry(view: ApplicationView<SetupSeasonPageResource>): VNode {
     const resource = useApplicationView(view)
     const err = useNotifyUnexpectedError(resource)
 
     if (err) {
         return h(ApplicationErrorComponent, { err: `${err}` })
     }
-    return h(FocusSeasonPageComponent, resource)
+    return h(SetupSeasonPageComponent, resource)
 }
 
-export function FocusSeasonPageComponent(props: FocusSeasonPageResource): VNode {
+export function SetupSeasonPageComponent(props: SetupSeasonPageResource): VNode {
     useDocumentTitle(pageTitle)
 
     return appLayout({
@@ -45,7 +45,7 @@ export function FocusSeasonPageComponent(props: FocusSeasonPageResource): VNode 
         header: [h(LoadSeasonEntry, props)],
         main: appMain({
             header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbListComponent, props)]),
-            body: mainBody(container([h(FocusSeasonEntry, props)])),
+            body: mainBody(container([h(SetupSeasonEntry, props)])),
             copyright,
         }),
         menu: h(LoadMenuEntry, props),

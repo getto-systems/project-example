@@ -18,23 +18,23 @@ import { seasonLabel } from "../../kernel/helper"
 import { Season } from "../../kernel/data"
 import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 import { LoadSeasonAction, LoadSeasonState } from "../../load/action"
-import { FocusSeasonAction, FocusSeasonState } from "../action"
+import { SetupSeasonAction, SetupSeasonState } from "../action"
 
 type EntryProps = Readonly<{
     season: LoadSeasonAction
-    focusSeason: FocusSeasonAction
+    setupSeason: SetupSeasonAction
 }>
-export function FocusSeasonEntry({ season, focusSeason }: EntryProps): VNode {
-    return h(FocusSeasonComponent, {
+export function SetupSeasonEntry({ season, setupSeason }: EntryProps): VNode {
+    return h(SetupSeasonComponent, {
         season,
-        focusSeason,
-        state: useApplicationAction(focusSeason),
+        setupSeason,
+        state: useApplicationAction(setupSeason),
         load: useApplicationAction(season),
     })
 }
 
-type Props = EntryProps & Readonly<{ load: LoadSeasonState; state: FocusSeasonState }>
-export function FocusSeasonComponent(props: Props): VNode {
+type Props = EntryProps & Readonly<{ load: LoadSeasonState; state: SetupSeasonState }>
+export function SetupSeasonComponent(props: Props): VNode {
     return basedOn(props)
 
     function basedOn({ state, load }: Props): VNode {
@@ -45,8 +45,8 @@ export function FocusSeasonComponent(props: Props): VNode {
 
             case "succeed-to-load":
                 switch (state.type) {
-                    case "initial-focus":
-                    case "succeed-to-focus":
+                    case "initial-setup":
+                    case "succeed-to-setup":
                         return seasonBox({ season: load.season })
 
                     case "edit-season":
@@ -55,7 +55,7 @@ export function FocusSeasonComponent(props: Props): VNode {
                     case "invalid-season":
                         return errorMessage({ err: ["シーズンの設定に失敗しました"] })
 
-                    case "failed-to-focus":
+                    case "failed-to-setup":
                         return errorMessage({ err: repositoryError(state.err) })
                 }
         }
@@ -82,7 +82,7 @@ export function FocusSeasonComponent(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.focusSeason.open()
+            props.setupSeason.open()
         }
     }
 
@@ -93,7 +93,7 @@ export function FocusSeasonComponent(props: Props): VNode {
             body: [
                 h(InputSeasonComponent, {
                     title: "シーズン",
-                    field: props.focusSeason.season,
+                    field: props.setupSeason.season,
                     seasons,
                 }),
             ],
@@ -103,7 +103,7 @@ export function FocusSeasonComponent(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.focusSeason.focus()
+            props.setupSeason.setup()
         }
     }
 

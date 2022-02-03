@@ -13,49 +13,49 @@ import { seasonBoardConverter, seasonToBoardValue } from "../kernel/convert"
 import { BoardValue } from "../../../../ui/vendor/getto-application/board/kernel/data"
 import { RepositoryError } from "../../../z_lib/ui/repository/data"
 
-export interface FocusSeasonAction extends StatefulApplicationAction<FocusSeasonState> {
+export interface SetupSeasonAction extends StatefulApplicationAction<SetupSeasonState> {
     readonly season: InputSeasonAction
 
-    open(): Promise<FocusSeasonState>
-    focus(): Promise<FocusSeasonState>
+    open(): Promise<SetupSeasonState>
+    setup(): Promise<SetupSeasonState>
 }
 
-export type FocusSeasonMaterial = Readonly<{
-    infra: FocusSeasonInfra
-    config: FocusSeasonConfig
+export type SetupSeasonMaterial = Readonly<{
+    infra: SetupSeasonInfra
+    config: SetupSeasonConfig
 }>
-export type FocusSeasonInfra = Readonly<{
+export type SetupSeasonInfra = Readonly<{
     seasonRepository: SeasonRepository
     clock: Clock
 }>
-export type FocusSeasonConfig = Readonly<{
-    focusSeasonExpire: ExpireTime
+export type SetupSeasonConfig = Readonly<{
+    manualSetupSeasonExpire: ExpireTime
 }>
 
-export type FocusSeasonState =
-    | Readonly<{ type: "initial-focus" }>
+export type SetupSeasonState =
+    | Readonly<{ type: "initial-setup" }>
     | Readonly<{ type: "edit-season" }>
-    | FocusSeasonEvent
+    | SetupSeasonEvent
 
-export const initialFocusSeasonState: FocusSeasonState = { type: "initial-focus" }
+export const initialSetupSeasonState: SetupSeasonState = { type: "initial-setup" }
 
-export function initFocusSeasonAction(
-    material: FocusSeasonMaterial,
+export function initSetupSeasonAction(
+    material: SetupSeasonMaterial,
     loadState: Promise<LoadSeasonState>,
-): FocusSeasonAction {
+): SetupSeasonAction {
     return new Action(material, loadState)
 }
 
-class Action extends AbstractStatefulApplicationAction<FocusSeasonState> {
-    readonly initialState = initialFocusSeasonState
+class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
+    readonly initialState = initialSetupSeasonState
 
     readonly season: InputSeasonAction
 
-    material: FocusSeasonMaterial
+    material: SetupSeasonMaterial
 
     field: { (): BoardValue }
 
-    constructor(material: FocusSeasonMaterial, loadState: Promise<LoadSeasonState>) {
+    constructor(material: SetupSeasonMaterial, loadState: Promise<LoadSeasonState>) {
         super()
 
         const season = initInputSeasonAction()
@@ -76,23 +76,23 @@ class Action extends AbstractStatefulApplicationAction<FocusSeasonState> {
         this.field = () => season.get()
     }
 
-    async focus(): Promise<FocusSeasonState> {
-        return focusSeason(this.material, this.field(), this.post)
+    async setup(): Promise<SetupSeasonState> {
+        return setupSeason(this.material, this.field(), this.post)
     }
-    async open(): Promise<FocusSeasonState> {
+    async open(): Promise<SetupSeasonState> {
         return this.post({ type: "edit-season" })
     }
 }
 
-type FocusSeasonEvent =
-    | Readonly<{ type: "succeed-to-focus" }>
+type SetupSeasonEvent =
+    | Readonly<{ type: "succeed-to-setup" }>
     | Readonly<{ type: "invalid-season" }>
-    | Readonly<{ type: "failed-to-focus"; err: RepositoryError }>
+    | Readonly<{ type: "failed-to-setup"; err: RepositoryError }>
 
-async function focusSeason<S>(
-    { infra, config }: FocusSeasonMaterial,
+async function setupSeason<S>(
+    { infra, config }: SetupSeasonMaterial,
     value: BoardValue,
-    post: Post<FocusSeasonEvent, S>,
+    post: Post<SetupSeasonEvent, S>,
 ): Promise<S> {
     const { clock, seasonRepository } = infra
 
@@ -104,20 +104,20 @@ async function focusSeason<S>(
     if (convertResult.default) {
         const result = await seasonRepository.remove()
         if (!result.success) {
-            return post({ type: "failed-to-focus", err: result.err })
+            return post({ type: "failed-to-setup", err: result.err })
         }
-        return post({ type: "succeed-to-focus" })
+        return post({ type: "succeed-to-setup" })
     }
 
     const result = await seasonRepository.set({
         season: convertResult.season,
-        expires: clock.now().getTime() + config.focusSeasonExpire.expire_millisecond,
+        expires: clock.now().getTime() + config.manualSetupSeasonExpire.expire_millisecond,
     })
     if (!result.success) {
-        return post({ type: "failed-to-focus", err: result.err })
+        return post({ type: "failed-to-setup", err: result.err })
     }
 
-    return post({ type: "succeed-to-focus" })
+    return post({ type: "succeed-to-setup" })
 }
 
 interface Post<E, S> {
