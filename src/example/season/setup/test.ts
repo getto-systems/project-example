@@ -7,10 +7,10 @@ import { mockBoardValueStore } from "../../../../ui/vendor/getto-application/boa
 import { markBoardValue } from "../../../../ui/vendor/getto-application/board/kernel/mock"
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 
-import { initFocusSeasonAction } from "./init"
+import { initSetupSeasonAction } from "./action"
 
-import { FocusSeasonAction } from "./action"
-import { initialLoadSeasonState } from "../action_load/action"
+import { SetupSeasonAction } from "./action"
+import { initialLoadSeasonState } from "../load/action"
 
 import { SeasonRepository } from "../kernel/infra"
 import { BoardValueStore } from "../../../../ui/vendor/getto-application/board/input/infra"
@@ -18,66 +18,78 @@ import { BoardValueStore } from "../../../../ui/vendor/getto-application/board/i
 import { seasonRepositoryConverter, seasonToBoardValue } from "../kernel/convert"
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"
 
-describe("FocusSeason", () => {
-    test("focus season", async () => {
+import { Season } from "../kernel/data"
+
+describe("SetupSeason", () => {
+    test("setup season", async () => {
         const { resource, store } = standard()
 
-        const runner = setupActionTestRunner(resource.focusSeason.subscriber)
+        const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
         await runner(() => {
             store.season.set(markBoardValue("2021.summer"))
-            return resource.focusSeason.focus()
+            return resource.setupSeason.setup()
         }).then((stack) => {
-            expect(stack).toEqual([{ type: "succeed-to-focus" }])
+            expect(stack).toEqual([{ type: "succeed-to-setup" }])
         })
     })
 
-    test("focus season; default", async () => {
+    test("setup season; default", async () => {
         const { resource } = standard()
 
-        const runner = setupActionTestRunner(resource.focusSeason.subscriber)
+        const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
-        await runner(() => resource.focusSeason.focus()).then((stack) => {
-            expect(stack).toEqual([{ type: "succeed-to-focus" }])
+        await runner(() => resource.setupSeason.setup()).then((stack) => {
+            expect(stack).toEqual([{ type: "succeed-to-setup" }])
         })
     })
 
-    test("focus season; invalid input", async () => {
+    test("setup season; invalid input", async () => {
         const { resource, store } = standard()
 
-        const runner = setupActionTestRunner(resource.focusSeason.subscriber)
+        const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
         await runner(() => {
             store.season.set(markBoardValue("invalid-season"))
-            return resource.focusSeason.focus()
+            return resource.setupSeason.setup()
         }).then((stack) => {
             expect(stack).toEqual([{ type: "invalid-season" }])
         })
     })
 
-    test("focus season; invalid year", async () => {
+    test("setup season; invalid year", async () => {
         const { resource, store } = standard()
 
-        const runner = setupActionTestRunner(resource.focusSeason.subscriber)
+        const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
         await runner(() => {
             store.season.set(markBoardValue("2020.summer"))
-            return resource.focusSeason.focus()
+            return resource.setupSeason.setup()
         }).then((stack) => {
             expect(stack).toEqual([{ type: "invalid-season" }])
         })
     })
 
-    test("focus season; invalid period", async () => {
+    test("setup season; invalid period", async () => {
         const { resource, store } = standard()
 
-        const runner = setupActionTestRunner(resource.focusSeason.subscriber)
+        const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
         await runner(() => {
             store.season.set(markBoardValue("2020.unknown"))
-            return resource.focusSeason.focus()
+            return resource.setupSeason.setup()
         }).then((stack) => {
             expect(stack).toEqual([{ type: "invalid-season" }])
+        })
+    })
+
+    test("open", async () => {
+        const { resource } = standard()
+
+        const runner = setupActionTestRunner(resource.setupSeason.subscriber)
+
+        await runner(() => resource.setupSeason.open()).then((stack) => {
+            expect(stack).toEqual([{ type: "edit-season" }])
         })
     })
 
@@ -92,24 +104,27 @@ function standard() {
     return initResource(standard_season())
 }
 
-function initResource(season: SeasonRepository): Readonly<{
-    resource: Readonly<{ focusSeason: FocusSeasonAction }>
+function initResource(seasonRepository: SeasonRepository): Readonly<{
+    resource: Readonly<{ setupSeason: SetupSeasonAction }>
     store: Readonly<{ season: BoardValueStore }>
 }> {
     const clock = mockClock(new Date("2021-01-01 10:00:00"), mockClockPubSub())
 
     const resource = {
-        focusSeason: initFocusSeasonAction(
+        setupSeason: initSetupSeasonAction(
             {
-                focusSeason: {
-                    season,
+                infra: {
+                    seasonRepository,
                     clock,
-                    config: {
-                        focusSeasonExpire: { expire_millisecond: 1000 },
-                    },
+                },
+                config: {
+                    manualSetupSeasonExpire: { expire_millisecond: 1000 },
                 },
             },
-            Promise.resolve(initialLoadSeasonState),
+            {
+                ignitionState: Promise.resolve(initialLoadSeasonState),
+                load: async () => initialLoadSeasonState,
+            },
         ),
     }
 
@@ -117,7 +132,7 @@ function initResource(season: SeasonRepository): Readonly<{
         season: mockBoardValueStore(),
     }
 
-    resource.focusSeason.season.input.connector.connect(store.season)
+    resource.setupSeason.season.input.connector.connect(store.season)
 
     return {
         resource,
@@ -126,5 +141,9 @@ function initResource(season: SeasonRepository): Readonly<{
 }
 
 function standard_season(): SeasonRepository {
-    return convertDB(initMemoryDB(), seasonRepositoryConverter)
+    return convertDB(initMemoryDB(), seasonRepositoryConverter(standard_availableSeasons()))
+}
+
+function standard_availableSeasons(): readonly Season[] {
+    return [{ year: 2021, period: "summer" } as Season]
 }

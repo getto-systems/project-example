@@ -15,5 +15,5 @@ export type SeasonRepositoryValue = Readonly<{
         year: number
         period: string
     }>
-    expires: number
+    expires: number | Long.Long
 }>

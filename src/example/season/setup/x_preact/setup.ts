@@ -10,30 +10,34 @@ import {
     fieldError,
 } from "../../../../../ui/vendor/getto-css/preact/design/form"
 
-import { InputSeasonComponent } from "../../input/action_input/x_preact/input"
+import { InputSeasonComponent } from "../../input/x_preact/input"
 
 import { repositoryErrorReason } from "../../../../z_lib/ui/repository/x_error/reason"
 import { seasonLabel } from "../../kernel/helper"
 
-import { FocusSeasonResource, FocusSeasonResourceState } from "../resource"
-
 import { Season } from "../../kernel/data"
 import { RepositoryError } from "../../../../z_lib/ui/repository/data"
+import { LoadSeasonAction, LoadSeasonState } from "../../load/action"
+import { SetupSeasonAction, SetupSeasonState } from "../action"
 
-export function FocusSeasonEntry({ season, focusSeason }: FocusSeasonResource): VNode {
-    return h(FocusSeasonComponent, {
+type EntryProps = Readonly<{
+    season: LoadSeasonAction
+    setupSeason: SetupSeasonAction
+}>
+export function SetupSeasonEntry({ season, setupSeason }: EntryProps): VNode {
+    return h(SetupSeasonComponent, {
         season,
-        focusSeason,
-        state: useApplicationAction(focusSeason),
+        setupSeason,
+        state: useApplicationAction(setupSeason),
         load: useApplicationAction(season),
     })
 }
 
-type Props = FocusSeasonResource & FocusSeasonResourceState
-export function FocusSeasonComponent(props: Props): VNode {
+type Props = EntryProps & Readonly<{ load: LoadSeasonState; state: SetupSeasonState }>
+export function SetupSeasonComponent(props: Props): VNode {
     return basedOn(props)
 
-    function basedOn({ state, load }: FocusSeasonResourceState): VNode {
+    function basedOn({ state, load }: Props): VNode {
         switch (load.type) {
             case "initial-season":
             case "failed-to-load":
@@ -41,8 +45,8 @@ export function FocusSeasonComponent(props: Props): VNode {
 
             case "succeed-to-load":
                 switch (state.type) {
-                    case "initial-focus":
-                    case "succeed-to-focus":
+                    case "initial-setup":
+                    case "succeed-to-setup":
                         return seasonBox({ season: load.season })
 
                     case "edit-season":
@@ -51,7 +55,7 @@ export function FocusSeasonComponent(props: Props): VNode {
                     case "invalid-season":
                         return errorMessage({ err: ["シーズンの設定に失敗しました"] })
 
-                    case "failed-to-focus":
+                    case "failed-to-setup":
                         return errorMessage({ err: repositoryError(state.err) })
                 }
         }
@@ -78,18 +82,18 @@ export function FocusSeasonComponent(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.focusSeason.open()
+            props.setupSeason.open()
         }
     }
 
-    type FormContent = Readonly<{ seasons: Season[] }>
+    type FormContent = Readonly<{ seasons: readonly Season[] }>
 
     function seasonForm({ seasons }: FormContent): VNode {
         return box({
             body: [
                 h(InputSeasonComponent, {
                     title: "シーズン",
-                    field: props.focusSeason.season,
+                    field: props.setupSeason.season,
                     seasons,
                 }),
             ],
@@ -99,7 +103,7 @@ export function FocusSeasonComponent(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.focusSeason.focus()
+            props.setupSeason.setup()
         }
     }
 

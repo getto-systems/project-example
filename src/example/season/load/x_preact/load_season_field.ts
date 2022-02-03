@@ -9,19 +9,20 @@ import { v_small } from "../../../../../ui/vendor/getto-css/preact/design/alignm
 
 import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 
-import { LoadSeasonResource, LoadSeasonResourceState } from "../resource"
-
-import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 import { seasonLabel } from "../../kernel/helper"
 
-export function LoadSeasonFieldEntry(resource: LoadSeasonResource): VNode {
-    return h(LoadSeasonFieldComponent, {
-        ...resource,
-        state: useApplicationAction(resource.season),
-    })
+import { LoadSeasonAction, LoadSeasonState } from "../action"
+
+import { RepositoryError } from "../../../../z_lib/ui/repository/data"
+
+type EntryProps = Readonly<{
+    season: LoadSeasonAction
+}>
+export function LoadSeasonFieldEntry({ season }: EntryProps): VNode {
+    return h(LoadSeasonFieldComponent, { season, state: useApplicationAction(season) })
 }
 
-type Props = LoadSeasonResource & LoadSeasonResourceState
+type Props = EntryProps & Readonly<{ state: LoadSeasonState }>
 export function LoadSeasonFieldComponent(props: Props): VNode {
     return field({
         title: "シーズン",

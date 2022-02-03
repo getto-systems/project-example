@@ -6,15 +6,15 @@ import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 
 import { seasonLabel } from "../kernel/helper"
 
-import { initLoadSeasonAction } from "./init"
+import { initLoadSeasonAction, LoadSeasonAction } from "./action"
 
 import { SeasonRepository } from "../kernel/infra"
 import { Clock } from "../../../z_lib/ui/clock/infra"
 
-import { LoadSeasonResource } from "./resource"
-
 import { seasonRepositoryConverter } from "../kernel/convert"
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"
+
+import { Season } from "../kernel/data"
 
 describe("LoadSeason", () => {
     test("load from repository", async () => {
@@ -28,7 +28,10 @@ describe("LoadSeason", () => {
                     type: "succeed-to-load",
                     season: { year: 2022, period: "summer" },
                     default: false,
-                    availableSeasons: [],
+                    availableSeasons: [
+                        { year: 2021, period: "winter" },
+                        { year: 2021, period: "summer" },
+                    ],
                 },
             ])
         })
@@ -45,7 +48,10 @@ describe("LoadSeason", () => {
                     type: "succeed-to-load",
                     season: { year: 2021, period: "summer" },
                     default: true,
-                    availableSeasons: [],
+                    availableSeasons: [
+                        { year: 2021, period: "winter" },
+                        { year: 2021, period: "summer" },
+                    ],
                 },
             ])
         })
@@ -62,7 +68,10 @@ describe("LoadSeason", () => {
                     type: "succeed-to-load",
                     season: { year: 2021, period: "summer" },
                     default: true,
-                    availableSeasons: [],
+                    availableSeasons: [
+                        { year: 2021, period: "winter" },
+                        { year: 2021, period: "summer" },
+                    ],
                 },
             ])
         })
@@ -79,7 +88,10 @@ describe("LoadSeason", () => {
                     type: "succeed-to-load",
                     season: { year: 2021, period: "winter" },
                     default: true,
-                    availableSeasons: [],
+                    availableSeasons: [
+                        { year: 2021, period: "winter" },
+                        { year: 2021, period: "summer" },
+                    ],
                 },
             ])
         })
@@ -97,44 +109,12 @@ describe("LoadSeason", () => {
                     season: { year: 2021, period: "winter" },
                     default: true,
                     availableSeasons: [
-                        { year: 2021, period: "summer" },
                         { year: 2021, period: "winter" },
+                        { year: 2021, period: "summer" },
                     ],
                 },
             ])
         })
-    })
-
-    test("convert season from repository; before beginning of system", () => {
-        const result = seasonRepositoryConverter.fromRepository({
-            season: {
-                year: 2020,
-                period: "summer",
-            },
-            expires: summer_now().getTime() + 1000,
-        })
-        expect(result).toEqual({ valid: false })
-    })
-    test("convert season from repository; invalid period", () => {
-        const result = seasonRepositoryConverter.fromRepository({
-            season: {
-                year: 2021,
-                period: "unknown",
-            },
-            expires: summer_now().getTime() + 1000,
-        })
-        expect(result).toEqual({ valid: false })
-    })
-    test("convert season to repository", () => {
-        const value = {
-            season: markSeason({
-                year: 2021,
-                period: "summer",
-            }),
-            expires: summer_now().getTime() + 1000,
-        }
-        const result = seasonRepositoryConverter.toRepository(value)
-        expect(result).toEqual(value)
     })
 
     test("season label", () => {
@@ -169,7 +149,10 @@ function empty_last_winter() {
     return { resource }
 }
 
-function initResource(clock: Clock, season: SeasonRepository): LoadSeasonResource {
+function initResource(
+    clock: Clock,
+    season: SeasonRepository,
+): Readonly<{ season: LoadSeasonAction }> {
     return {
         season: initLoadSeasonAction({
             season,
@@ -197,7 +180,7 @@ function standard_season(): SeasonRepository {
         },
         expires: summer_now().getTime() + 1000,
     })
-    return convertDB(db, seasonRepositoryConverter)
+    return convertDB(db, seasonRepositoryConverter(standard_availableSeasons()))
 }
 function expired_season(): SeasonRepository {
     const db = initMemoryDB()
@@ -208,8 +191,16 @@ function expired_season(): SeasonRepository {
         },
         expires: summer_now().getTime() - 1000,
     })
-    return convertDB(db, seasonRepositoryConverter)
+    return convertDB(db, seasonRepositoryConverter(standard_availableSeasons()))
 }
 function empty_season(): SeasonRepository {
-    return convertDB(initMemoryDB(), seasonRepositoryConverter)
+    return convertDB(initMemoryDB(), seasonRepositoryConverter(standard_availableSeasons()))
+}
+
+function standard_availableSeasons(): readonly Season[] {
+    return [
+        { year: 2021, period: "summer" } as Season,
+        { year: 2021, period: "winter" } as Season,
+        { year: 2022, period: "summer" } as Season,
+    ]
 }

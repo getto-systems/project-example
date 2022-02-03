@@ -7,16 +7,20 @@ import { label_alert } from "../../../../../ui/vendor/getto-css/preact/design/hi
 
 import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 
-import { LoadSeasonResource, LoadSeasonResourceState } from "../resource"
-
-import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 import { seasonLabel } from "../../kernel/helper"
 
-export function LoadSeasonEntry({ season }: LoadSeasonResource): VNode {
+import { LoadSeasonAction, LoadSeasonState } from "../action"
+
+import { RepositoryError } from "../../../../z_lib/ui/repository/data"
+
+type EntryProps = Readonly<{
+    season: LoadSeasonAction
+}>
+export function LoadSeasonEntry({ season }: EntryProps): VNode {
     return h(LoadSeasonComponent, { season, state: useApplicationAction(season) })
 }
 
-type Props = LoadSeasonResource & LoadSeasonResourceState
+type Props = EntryProps & Readonly<{ state: LoadSeasonState }>
 export function LoadSeasonComponent(props: Props): VNode {
     return info(body())
 
