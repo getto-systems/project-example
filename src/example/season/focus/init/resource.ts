@@ -1,6 +1,6 @@
 import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/feature"
 
-import { newFocusSeasonInfra } from "../../focus/init/infra"
+import { newFocusSeasonInfra } from "./infra"
 import { newFocusSeasonConfig } from "./config"
 
 import { FocusSeasonAction, initFocusSeasonAction } from "../action"
