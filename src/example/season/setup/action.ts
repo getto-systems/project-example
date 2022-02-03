@@ -44,9 +44,14 @@ export const initialSetupSeasonState: SetupSeasonState = { type: "initial-setup"
 
 export function initSetupSeasonAction(
     material: SetupSeasonMaterial,
-    loadState: Promise<LoadSeasonState>,
+    load: LoadAction,
 ): SetupSeasonAction {
-    return new Action(material, loadState)
+    return new Action(material, load)
+}
+
+interface LoadAction {
+    ignitionState: Promise<LoadSeasonState>
+    load(): Promise<LoadSeasonState>
 }
 
 class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
@@ -55,17 +60,18 @@ class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
     readonly season: InputSeasonAction
 
     material: SetupSeasonMaterial
+    load: LoadAction
 
     field: { (): BoardValue }
 
-    constructor(material: SetupSeasonMaterial, loadState: Promise<LoadSeasonState>) {
+    constructor(material: SetupSeasonMaterial, load: LoadAction) {
         super()
 
         const season = initInputSeasonAction()
 
         this.season = season.input
 
-        loadState.then((state) => {
+        load.ignitionState.then((state) => {
             switch (state.type) {
                 case "succeed-to-load":
                     if (!state.default) {
@@ -76,11 +82,17 @@ class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
         })
 
         this.material = material
+        this.load = load
         this.field = () => season.get()
     }
 
-    async setup(): Promise<SetupSeasonState> {
-        return setupSeason(this.material, this.field(), this.post)
+    setup(): Promise<SetupSeasonState> {
+        return setupSeason(this.material, this.field(), (state) => {
+            if (state.type === "succeed-to-setup") {
+                this.load.load()
+            }
+            return this.post(state)
+        })
     }
     async open(): Promise<SetupSeasonState> {
         return this.post({ type: "edit-season" })

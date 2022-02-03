@@ -18,7 +18,7 @@ export function newSetupSeasonResource(
                 infra: newSetupSeasonInfra(feature),
                 config: newSetupSeasonConfig(),
             },
-            season.ignitionState,
+            season,
         ),
     }
 }

@@ -121,7 +121,10 @@ function initResource(seasonRepository: SeasonRepository): Readonly<{
                     manualSetupSeasonExpire: { expire_millisecond: 1000 },
                 },
             },
-            Promise.resolve(initialLoadSeasonState),
+            {
+                ignitionState: Promise.resolve(initialLoadSeasonState),
+                load: async () => initialLoadSeasonState,
+            },
         ),
     }
 

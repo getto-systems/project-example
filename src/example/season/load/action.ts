@@ -12,7 +12,9 @@ import { Clock } from "../../../z_lib/ui/clock/infra"
 import { Season } from "../kernel/data"
 import { RepositoryError } from "../../../z_lib/ui/repository/data"
 
-export type LoadSeasonAction = StatefulApplicationAction<LoadSeasonState>
+export interface LoadSeasonAction extends StatefulApplicationAction<LoadSeasonState> {
+    load(): Promise<LoadSeasonState>
+}
 
 export type LoadSeasonMaterial = Readonly<{
     season: SeasonRepository
@@ -30,8 +32,16 @@ export function initLoadSeasonAction(material: LoadSeasonMaterial): LoadSeasonAc
 class Action extends AbstractStatefulApplicationAction<LoadSeasonState> {
     readonly initialState = initialLoadSeasonState
 
+    material: LoadSeasonMaterial
+
     constructor(material: LoadSeasonMaterial) {
-        super({ ignite: () => loadSeason(material, this.post) })
+        super({ ignite: () => this.load() })
+
+        this.material = material
+    }
+
+    load(): Promise<LoadSeasonState> {
+        return loadSeason(this.material, this.post)
     }
 }
 

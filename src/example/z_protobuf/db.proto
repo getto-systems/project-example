@@ -5,5 +5,5 @@ package example.db;
 message Season_pb {
     int32 year = 1;
     string period = 2;
-    int32 expires = 3;
+    int64 expires = 3;
 }
