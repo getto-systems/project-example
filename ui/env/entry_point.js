@@ -22,6 +22,8 @@ const entries = {
         { name: "auth/profile", worker: true },
         { name: "auth/user/account", /* TODO worker: true */ },
 
+        { name: "example/season/focus", /* TODO worker: true */ },
+
         { name: "docs/index" },
         { name: "docs/privacy-policy" },
 

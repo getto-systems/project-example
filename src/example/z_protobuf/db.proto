@@ -2,4 +2,8 @@ syntax = "proto3";
 
 package example.db;
 
-message Season_pb { int32 year = 1; }
+message Season_pb {
+    int32 year = 1;
+    string period = 2;
+    int32 expires = 3;
+}

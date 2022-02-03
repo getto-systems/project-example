@@ -19,24 +19,25 @@ import { ApplicationErrorComponent } from "../../../../../../src/avail/x_preact/
 import { LoadSeasonEntry } from "../../../../../../src/example/season/action_load/x_preact/load_season"
 import { LoadMenuEntry } from "../../../../../../src/example/outline/load_menu/x_preact/load_menu"
 import { LoadBreadcrumbListComponent } from "../../../../../../src/example/outline/load_breadcrumb_list/x_preact/load_breadcrumb_list"
-import { ManageUserAccountEntry } from "../../../../../../src/auth/user/account/manage/x_preact/manage"
+import { FocusSeasonEntry } from "../../../../../../src/example/season/action_focus/x_preact/focus"
 
 import { ApplicationView } from "../../../../../../ui/vendor/getto-application/action/action"
-import { ManageUserAccountPageResource } from "./resource"
+import { FocusSeasonPageResource } from "./resource"
+import { container } from "../../../../../../ui/vendor/getto-css/preact/design/box"
 
-export function ManageUserAccountPageEntry(view: ApplicationView<ManageUserAccountPageResource>): VNode {
+const pageTitle = "シーズン設定" as const
+
+export function FocusSeasonPageEntry(view: ApplicationView<FocusSeasonPageResource>): VNode {
     const resource = useApplicationView(view)
     const err = useNotifyUnexpectedError(resource)
 
     if (err) {
         return h(ApplicationErrorComponent, { err: `${err}` })
     }
-    return h(ManageUserAccountPageComponent, resource)
+    return h(FocusSeasonPageComponent, resource)
 }
 
-const pageTitle = "ユーザー" as const
-
-export function ManageUserAccountPageComponent(props: ManageUserAccountPageResource): VNode {
+export function FocusSeasonPageComponent(props: FocusSeasonPageResource): VNode {
     useDocumentTitle(pageTitle)
 
     return appLayout({
@@ -44,7 +45,7 @@ export function ManageUserAccountPageComponent(props: ManageUserAccountPageResou
         header: [h(LoadSeasonEntry, props)],
         main: appMain({
             header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbListComponent, props)]),
-            body: mainBody(h(ManageUserAccountEntry, props)),
+            body: mainBody(container([h(FocusSeasonEntry, props)])),
             copyright,
         }),
         menu: h(LoadMenuEntry, props),
