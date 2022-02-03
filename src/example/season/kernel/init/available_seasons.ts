@@ -23,5 +23,6 @@ export function availableSeasons(clock: Clock): readonly Season[] {
         }
     }
 
-    return seasons
+    // 新しいやつが上に来るようにしたい
+    return seasons.reverse()
 }
