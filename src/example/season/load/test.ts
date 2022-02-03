@@ -29,8 +29,8 @@ describe("LoadSeason", () => {
                     season: { year: 2022, period: "summer" },
                     default: false,
                     availableSeasons: [
-                        { year: 2021, period: "summer" },
                         { year: 2021, period: "winter" },
+                        { year: 2021, period: "summer" },
                     ],
                 },
             ])
@@ -49,8 +49,8 @@ describe("LoadSeason", () => {
                     season: { year: 2021, period: "summer" },
                     default: true,
                     availableSeasons: [
-                        { year: 2021, period: "summer" },
                         { year: 2021, period: "winter" },
+                        { year: 2021, period: "summer" },
                     ],
                 },
             ])
@@ -69,8 +69,8 @@ describe("LoadSeason", () => {
                     season: { year: 2021, period: "summer" },
                     default: true,
                     availableSeasons: [
-                        { year: 2021, period: "summer" },
                         { year: 2021, period: "winter" },
+                        { year: 2021, period: "summer" },
                     ],
                 },
             ])
@@ -89,8 +89,8 @@ describe("LoadSeason", () => {
                     season: { year: 2021, period: "winter" },
                     default: true,
                     availableSeasons: [
-                        { year: 2021, period: "summer" },
                         { year: 2021, period: "winter" },
+                        { year: 2021, period: "summer" },
                     ],
                 },
             ])
@@ -109,8 +109,8 @@ describe("LoadSeason", () => {
                     season: { year: 2021, period: "winter" },
                     default: true,
                     availableSeasons: [
-                        { year: 2021, period: "summer" },
                         { year: 2021, period: "winter" },
+                        { year: 2021, period: "summer" },
                     ],
                 },
             ])
