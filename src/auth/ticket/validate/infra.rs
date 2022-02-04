@@ -3,13 +3,13 @@ use chrono::{DateTime, Utc};
 use crate::{
     auth::{
         proxy::data::AuthProxyError,
-        ticket::kernel::remote::data::{
+        ticket::kernel::api::data::{
             AuthDateTime, AuthNonce, AuthTicketExtract, AuthToken, DecodeAuthTokenError,
             ExpireDateTime,
         },
         user::kernel::data::RequireAuthRoles,
     },
-    z_lib::remote::{
+    z_lib::api::{
         repository::data::{RegisterResult, RepositoryError},
         request::data::MetadataError,
     },

@@ -1,7 +1,7 @@
 use getto_application::data::MethodResult;
 
 use crate::auth::ticket::{
-    kernel::remote::infra::AuthClock,
+    kernel::api::infra::AuthClock,
     validate::infra::{
         AuthMetadata, AuthMetadataContent, AuthNonceEntry, AuthNonceMetadata, AuthNonceRepository,
         AuthTokenDecoder, AuthTokenMetadata, ValidateService,
@@ -11,13 +11,13 @@ use crate::auth::ticket::{
 use crate::{
     auth::{
         proxy::data::AuthProxyError,
-        ticket::kernel::remote::data::{
+        ticket::kernel::api::data::{
             AuthTicket, DecodeAuthTokenError, ExpireDateTime, ExpireDuration,
             ValidateAuthRolesError,
         },
         user::kernel::data::RequireAuthRoles,
     },
-    z_lib::remote::{
+    z_lib::api::{
         repository::data::{RegisterResult, RepositoryError},
         request::data::MetadataError,
     },

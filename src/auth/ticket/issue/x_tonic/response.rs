@@ -1,6 +1,6 @@
 use tonic::{Response, Status};
 
-use crate::z_lib::remote::response::tonic::RespondTo;
+use crate::z_lib::api::response::tonic::RespondTo;
 
 use super::super::method::IssueAuthTicketEvent;
 

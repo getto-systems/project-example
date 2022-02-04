@@ -4,11 +4,11 @@ use crate::auth::ticket::y_protobuf::service::{
     validate_api_token_pb_client::ValidateApiTokenPbClient, ValidateApiTokenRequestPb,
 };
 
-use crate::auth::x_outside_feature::remote::common::feature::AuthOutsideService;
+use crate::auth::x_outside_feature::api::common::feature::AuthOutsideService;
 
-use crate::z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer;
+use crate::z_lib::api::service::init::authorizer::GoogleServiceAuthorizer;
 
-use crate::{auth::proxy::helper::infra_error, z_lib::remote::service::helper::new_endpoint};
+use crate::{auth::proxy::helper::infra_error, z_lib::api::service::helper::new_endpoint};
 
 use crate::auth::proxy::method::set_metadata;
 

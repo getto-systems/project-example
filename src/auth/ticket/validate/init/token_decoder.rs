@@ -2,14 +2,14 @@ use std::collections::HashSet;
 
 use jsonwebtoken::{decode, errors::ErrorKind, Algorithm, DecodingKey, Validation};
 
-use crate::auth::x_outside_feature::remote::common::feature::AuthOutsideDecodingKey;
+use crate::auth::x_outside_feature::api::common::feature::AuthOutsideDecodingKey;
 
 use crate::auth::ticket::{
-    kernel::remote::infra::{AuthJwtClaims, AUTH_JWT_AUDIENCE_API, AUTH_JWT_AUDIENCE_TICKET},
+    kernel::api::infra::{AuthJwtClaims, AUTH_JWT_AUDIENCE_API, AUTH_JWT_AUDIENCE_TICKET},
     validate::infra::AuthTokenDecoder,
 };
 
-use crate::auth::ticket::kernel::remote::data::{
+use crate::auth::ticket::kernel::api::data::{
     AuthTicketExtract, AuthToken, DecodeAuthTokenError,
 };
 
@@ -82,7 +82,7 @@ pub mod test {
 
     use crate::auth::ticket::validate::infra::AuthTokenDecoder;
 
-    use crate::auth::ticket::kernel::remote::data::{
+    use crate::auth::ticket::kernel::api::data::{
         AuthTicketExtract, AuthToken, DecodeAuthTokenError,
     };
 

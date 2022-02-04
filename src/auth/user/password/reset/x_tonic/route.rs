@@ -4,8 +4,8 @@ use crate::auth::user::password::reset::y_protobuf::service::{
 };
 
 use crate::auth::user::password::reset::{
-    request_token::remote::x_tonic::route::ServiceRequestToken,
-    reset::remote::x_tonic::route::ServiceReset,
+    request_token::api::x_tonic::route::ServiceRequestToken,
+    reset::api::x_tonic::route::ServiceReset,
 };
 
 pub struct ResetServer;

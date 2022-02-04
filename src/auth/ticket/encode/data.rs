@@ -1,5 +1,5 @@
 use crate::auth::{
-    ticket::kernel::remote::data::{EncodedAuthTokens, ExpireDateTime},
+    ticket::kernel::api::data::{EncodedAuthTokens, ExpireDateTime},
     user::kernel::data::GrantedAuthRoles,
 };
 
