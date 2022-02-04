@@ -6,7 +6,7 @@ use crate::{
     auth::x_outside_feature::api::core::{
         feature::AuthOutsideFeature, init::new_auth_outside_feature,
     },
-    x_outside_feature::api::example::env::ExampleEnv,
+    x_outside_feature::api::core::env::ExampleEnv,
 };
 
 pub struct ExampleAppFeature {

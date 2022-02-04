@@ -2,7 +2,7 @@ use crate::{
     auth::x_outside_feature::api::{
         common::feature::AuthOutsideService, core::feature::AuthOutsideFeature,
     },
-    x_outside_feature::api::example::env::ExampleEnv,
+    x_outside_feature::api::core::env::ExampleEnv,
 };
 
 pub async fn new_auth_outside_feature(env: &'static ExampleEnv) -> AuthOutsideFeature {

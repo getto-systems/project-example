@@ -2,7 +2,7 @@ pub mod menu_badge_repository;
 
 use tonic::metadata::MetadataMap;
 
-use crate::x_outside_feature::api::example::feature::ExampleAppFeature;
+use crate::x_outside_feature::api::core::feature::ExampleAppFeature;
 
 use crate::{
     auth::init::CheckPermissionStruct,

@@ -3,7 +3,7 @@ use std::sync::Arc;
 use lazy_static::lazy_static;
 use tonic::{service::interceptor, transport::Server, Request};
 
-use example_api::x_outside_feature::api::example::{
+use example_api::x_outside_feature::api::core::{
     env::ExampleEnv, feature::ExampleAppFeature,
 };
 
