@@ -10,9 +10,9 @@ RUN : && \
 RUN : && \
   rustup component add rustfmt && \
   rustup target add x86_64-unknown-linux-musl && \
-  RUN_CODE_BUILDER=TRUE cargo build --bin api --release --target x86_64-unknown-linux-musl && \
+  RUN_CODE_BUILDER=TRUE cargo build --bin proxy --release --target x86_64-unknown-linux-musl && \
   :
 
 FROM gcr.io/distroless/static-debian10
-COPY --from=builder /build/target/x86_64-unknown-linux-musl/release/api /app
+COPY --from=builder /build/target/x86_64-unknown-linux-musl/release/proxy /app
 CMD ["/app"]

@@ -10,7 +10,7 @@ deploy_main() {
   target=$1
 
   if [ -z "$target" ]; then
-    echo "usage: deploy.sh <api | auth | example>"
+    echo "usage: deploy.sh <proxy | auth | example>"
     exit 1
   fi
 

@@ -4,11 +4,11 @@ version = "0.46.0-api"
 authors = ["shun <shun.fix9@gmail.com>"]
 edition = "2021"
 build = "api/setup/build.rs"
-default-run = "api"
+default-run = "example"
 
 [[bin]]
-name = "api"
-path = "src/x_main/api/main.rs"
+name = "proxy"
+path = "src/x_main/proxy/main.rs"
 
 [[bin]]
 name = "auth"

@@ -10,7 +10,7 @@ build_main() {
   target=$1
 
   if [ -z "$target" ]; then
-    echo "usage: build.sh <api | auth | example>"
+    echo "usage: build.sh <proxy | auth | example>"
     exit 1
   fi
 
