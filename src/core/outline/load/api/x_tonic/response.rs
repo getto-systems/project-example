@@ -2,7 +2,7 @@ use tonic::{Response, Status};
 
 use crate::z_lib::api::response::tonic::RespondTo;
 
-use crate::core::outline::y_protobuf::service::LoadMenuBadgeResponsePb;
+use crate::core::outline::load::y_protobuf::service::LoadMenuBadgeResponsePb;
 
 use super::super::action::{LoadOutlineMenuBadgeEvent, LoadOutlineMenuBadgeState};
 

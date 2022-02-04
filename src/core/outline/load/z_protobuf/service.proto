@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package example.outline.service;
+package core.outline.load.service;
 
 service LoadMenuBadgePb {
     rpc LoadMenuBadge (LoadMenuBadgeRequestPb) returns (LoadMenuBadgeResponsePb);

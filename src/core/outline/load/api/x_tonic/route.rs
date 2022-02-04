@@ -4,7 +4,7 @@ use getto_application::helper::flatten;
 
 use crate::z_lib::api::{logger::Logger, response::tonic::RespondTo};
 
-use crate::core::outline::y_protobuf::service::{
+use crate::core::outline::load::y_protobuf::service::{
     load_menu_badge_pb_server::LoadMenuBadgePb, LoadMenuBadgeRequestPb, LoadMenuBadgeResponsePb,
 };
 

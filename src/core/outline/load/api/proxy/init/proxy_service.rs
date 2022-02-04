@@ -1,6 +1,6 @@
 use tonic::Request;
 
-use crate::core::outline::y_protobuf::service::{
+use crate::core::outline::load::y_protobuf::service::{
     load_menu_badge_pb_client::LoadMenuBadgePbClient, LoadMenuBadgeRequestPb,
 };
 
