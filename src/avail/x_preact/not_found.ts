@@ -6,9 +6,9 @@ import { env } from "../../y_environment/ui/env"
 import { loginBox } from "../../z_vendor/getto-css/preact/layout/login"
 import { buttons } from "../../z_vendor/getto-css/preact/design/form"
 
-import { useDocumentTitle } from "../../example/x_preact/hooks"
+import { useDocumentTitle } from "../../core/x_preact/hooks"
 import { siteInfo } from "../../x_content/site"
-import { icon } from "../../example/x_preact/design/icon"
+import { icon } from "../../core/x_preact/design/icon"
 
 const pageTitle = "Not Found" as const
 

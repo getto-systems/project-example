@@ -39,7 +39,7 @@ export function newAuthenticatePasswordRemote(
             const response = await fetch(opts.url, {
                 ...opts.options,
                 body: encodeProtobuf(
-                    pb.auth.user.password.service.AuthenticatePasswordRequestPb,
+                    pb.auth.user.password.authenticate.service.AuthenticatePasswordRequestPb,
                     (message) => {
                         message.loginId = fields.loginID
                         message.password = fields.password
@@ -52,7 +52,7 @@ export function newAuthenticatePasswordRemote(
             }
 
             const message = decodeProtobuf(
-                pb.auth.user.password.service.AuthenticatePasswordResponsePb,
+                pb.auth.user.password.authenticate.service.AuthenticatePasswordResponsePb,
                 await response.text(),
             )
             if (!message.success) {

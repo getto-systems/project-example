@@ -1,12 +1,12 @@
 use tonic::Request;
 
-use crate::example::outline::y_protobuf::service::{
+use crate::core::outline::y_protobuf::service::{
     load_menu_badge_pb_client::LoadMenuBadgePbClient, LoadMenuBadgeRequestPb,
 };
 
-use crate::example::x_outside_feature::api::feature::ExampleOutsideService;
+use crate::core::x_outside_feature::api::feature::ExampleOutsideService;
 
-use crate::example::outline::load::api::x_tonic::route::ServiceLoadMenuBadge;
+use crate::core::outline::load::api::x_tonic::route::ServiceLoadMenuBadge;
 
 use crate::z_lib::api::service::init::authorizer::GoogleServiceAuthorizer;
 

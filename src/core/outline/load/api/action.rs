@@ -5,7 +5,7 @@ use crate::{
         data::RequireAuthRoles,
         method::{check_permission, CheckPermissionEvent, CheckPermissionInfra},
     },
-    example::outline::load::api::{data::OutlineMenuBadge, infra::OutlineMenuBadgeRepository},
+    core::outline::load::api::{data::OutlineMenuBadge, infra::OutlineMenuBadgeRepository},
     z_lib::api::repository::data::RepositoryError,
 };
 

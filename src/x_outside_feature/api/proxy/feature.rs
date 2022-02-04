@@ -2,7 +2,7 @@ use crate::{
     auth::x_outside_feature::api::proxy::{
         feature::AuthOutsideFeature, init::new_auth_outside_feature,
     },
-    example::x_outside_feature::api::{
+    core::x_outside_feature::api::{
         feature::ExampleOutsideFeature, init::new_example_outside_feature,
     },
     x_outside_feature::api::proxy::env::ProxyEnv,

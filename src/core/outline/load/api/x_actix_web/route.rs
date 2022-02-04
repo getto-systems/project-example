@@ -9,7 +9,7 @@ use crate::x_outside_feature::api::proxy::{
     logger::{app_logger, generate_request_id},
 };
 
-use crate::example::outline::load::api::proxy::init::GetOutlineMenuBadgeProxyStruct;
+use crate::core::outline::load::api::proxy::init::GetOutlineMenuBadgeProxyStruct;
 
 #[get("/menu-badge")]
 pub async fn service_get_menu_badge(

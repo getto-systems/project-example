@@ -4,7 +4,7 @@ import { ManageUserAccountPageEntry } from "./page"
 
 import { newForegroundOutsideFeature } from "../../../../../x_outside_feature/common"
 
-import { newBaseResource } from "../../../../../example/action_base/init/resource"
+import { newBaseResource } from "../../../../../core/action_base/init/resource"
 import { newManageUserAccountResource } from "../../../../../auth/user/account/manage/init/resource"
 import { toManageUserAccountView } from "./common"
 

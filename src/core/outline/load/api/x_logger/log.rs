@@ -1,5 +1,5 @@
 use crate::{
-    example::outline::load::api::action::LoadOutlineMenuBadgeEvent,
+    core::outline::load::api::action::LoadOutlineMenuBadgeEvent,
     z_lib::api::logger::{LogFilter, LogLevel, LogMessage},
 };
 

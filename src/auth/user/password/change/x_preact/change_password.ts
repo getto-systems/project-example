@@ -17,7 +17,7 @@ import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
-import { spinner } from "../../../../../example/x_preact/design/icon"
+import { spinner } from "../../../../../core/x_preact/design/icon"
 
 import { InputPasswordEntry } from "../../input/x_preact/input"
 

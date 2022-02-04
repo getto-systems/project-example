@@ -33,7 +33,7 @@ export function newSearchAuthUserAccountRemote(
             }
 
             const body = encodeProtobuf(
-                pb.auth.user.account.service.SearchAuthUserAccountRequestPb,
+                pb.auth.user.account.search.service.SearchAuthUserAccountRequestPb,
                 (message) => {
                     message.offset = parseInt(fields.offset)
                     message.sortKey = fields.sort.key
@@ -55,7 +55,7 @@ export function newSearchAuthUserAccountRemote(
             }
 
             const message = decodeProtobuf(
-                pb.auth.user.account.service.SearchAuthUserAccountResponsePb,
+                pb.auth.user.account.search.service.SearchAuthUserAccountResponsePb,
                 await response.text(),
             )
             return {

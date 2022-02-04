@@ -6,7 +6,7 @@ import { newDocsView } from "../../../../docs/content/init/resource"
 
 import { DocsDomainDetailEntry } from "../../../../docs/content/x_preact/domain_detail"
 
-import { docs_example } from "../../../../example/docs"
+import { docs_example } from "../../../../core/docs"
 
 render(
     h(DocsDomainDetailEntry, {

@@ -1,5 +1,5 @@
 use crate::{
-    example::outline::load::api::data::OutlineMenuBadge,
+    core::outline::load::api::data::OutlineMenuBadge,
     z_lib::api::repository::data::RepositoryError,
 };
 

@@ -3,7 +3,7 @@ import { html } from "htm/preact"
 
 import { useApplicationView } from "../../../z_vendor/getto-application/action/x_preact/hooks"
 import { useNotifyUnexpectedError } from "../../../avail/unexpected_error/notify/x_preact/hooks"
-import { useDocumentTitle } from "../../../example/x_preact/hooks"
+import { useDocumentTitle } from "../../../core/x_preact/hooks"
 
 import {
     appLayout,
@@ -18,8 +18,8 @@ import { copyright, siteInfo } from "../../../x_content/site"
 import { docsActionBox, docsDataBox, docsUsecaseBox } from "./helper"
 
 import { ApplicationErrorComponent } from "../../../avail/x_preact/application_error"
-import { LoadMenuEntry } from "../../../example/outline/load/x_preact/load_menu"
-import { LoadBreadcrumbListComponent } from "../../../example/outline/load/x_preact/load_breadcrumb_list"
+import { LoadMenuEntry } from "../../../core/outline/load/x_preact/load_menu"
+import { LoadBreadcrumbListComponent } from "../../../core/outline/load/x_preact/load_breadcrumb_list"
 
 import { DocsView, DocsResource } from "../resource"
 import { DocsData, DocsUsecase } from "../../../z_vendor/getto-application/docs/data"

@@ -10,7 +10,7 @@ import {
 } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box_grow } from "../../../../../z_vendor/getto-css/preact/design/box"
 
-import { spinner } from "../../../../../example/x_preact/design/icon"
+import { spinner } from "../../../../../core/x_preact/design/icon"
 
 import { SearchLoginIDComponent } from "../../../login_id/input/x_preact/search"
 

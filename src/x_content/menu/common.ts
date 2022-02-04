@@ -2,7 +2,7 @@ import { staticMenuPath, StaticMenuPath } from "../../y_environment/ui/path"
 
 import { LineIcon, lniClass } from "../../z_lib/ui/icon/line_icon"
 
-import { MenuPermission, MenuTree, MenuTreeNode } from "../../example/outline/load/infra"
+import { MenuPermission, MenuTree, MenuTreeNode } from "../../core/outline/load/infra"
 
 export function category(
     label: string,

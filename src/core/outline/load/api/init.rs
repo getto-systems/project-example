@@ -6,7 +6,7 @@ use crate::x_outside_feature::api::core::feature::ExampleAppFeature;
 
 use crate::{
     auth::init::CheckPermissionStruct,
-    example::outline::load::api::init::menu_badge_repository::UnitedOutlineMenuBadgeRepository,
+    core::outline::load::api::init::menu_badge_repository::UnitedOutlineMenuBadgeRepository,
 };
 
 use super::action::{LoadOutlineMenuBadgeAction, LoadOutlineMenuBadgeMaterial};

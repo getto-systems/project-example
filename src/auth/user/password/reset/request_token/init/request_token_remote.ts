@@ -30,7 +30,7 @@ export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): Reque
             const response = await fetch(opts.url, {
                 ...opts.options,
                 body: encodeProtobuf(
-                    pb.auth.user.password.reset.service.RequestResetTokenRequestPb,
+                    pb.auth.user.password.reset.request_token.service.RequestResetTokenRequestPb,
                     (message) => {
                         message.loginId = fields.loginID
                     },
@@ -42,7 +42,7 @@ export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): Reque
             }
 
             const message = decodeProtobuf(
-                pb.auth.user.password.reset.service.RequestResetTokenResponsePb,
+                pb.auth.user.password.reset.request_token.service.RequestResetTokenResponsePb,
                 await response.text(),
             )
             if (!message.success) {

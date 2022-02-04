@@ -8,7 +8,7 @@ use example_api::x_outside_feature::api::proxy::{env::ProxyEnv, feature::ProxyAp
 
 use example_api::{
     auth::x_actix_web::route::scope_auth, avail::x_actix_web::route::scope_avail,
-    example::x_actix_web::route::scope_example,
+    core::x_actix_web::route::scope_example,
 };
 
 lazy_static! {
