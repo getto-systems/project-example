@@ -1,7 +1,10 @@
-import { docsMenuContent } from "../../../example/outline/menu/menu_docs"
+import { docsMenuContent } from "../../../x_content/menu/docs_menu"
+
 import { newNotifyUnexpectedErrorResource } from "../../../avail/unexpected_error/notify/init/resource"
-import { newLoadBreadcrumbListResource } from "../../../example/outline/load_breadcrumb_list/init/resource"
-import { newLoadMenuResource } from "../../../example/outline/load/init/resource"
+import {
+    newLoadBreadcrumbListResource,
+    newLoadMenuResource,
+} from "../../../example/outline/load/init/resource"
 
 import { initDocsView } from "../init"
 

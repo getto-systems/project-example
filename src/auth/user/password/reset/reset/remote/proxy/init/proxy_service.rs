@@ -1,11 +1,13 @@
 use prost::Message;
 use tonic::Request;
 
-use crate::auth::x_outside_feature::remote::api::feature::AuthOutsideFeature;
-
-use crate::auth::user::password::reset::remote::y_protobuf::service::{
+use crate::auth::user::password::reset::y_protobuf::service::{
     reset_password_pb_client::ResetPasswordPbClient, ResetPasswordRequestPb,
 };
+
+use crate::auth::x_outside_feature::remote::api::feature::AuthOutsideFeature;
+
+use crate::auth::user::password::reset::reset::remote::x_tonic::route::ServiceReset;
 
 use crate::{
     auth::ticket::kernel::remote::init::response_builder::CookieAuthTokenResponseBuilder,
@@ -57,7 +59,7 @@ impl<'a> AuthProxyService for ProxyService<'a> {
     type Response = AuthTokenResponse;
 
     fn name(&self) -> &str {
-        "auth.user.password.reset"
+        ServiceReset::name()
     }
     async fn call(self, metadata: AuthMetadataContent) -> Result<Self::Response, AuthProxyError> {
         call(self, metadata).await

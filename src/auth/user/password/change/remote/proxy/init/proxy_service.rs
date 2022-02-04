@@ -1,11 +1,13 @@
 use prost::Message;
 use tonic::Request;
 
-use crate::auth::user::password::remote::y_protobuf::service::{
+use crate::auth::user::password::y_protobuf::service::{
     change_password_pb_client::ChangePasswordPbClient, ChangePasswordRequestPb,
 };
 
 use crate::auth::x_outside_feature::remote::common::feature::AuthOutsideService;
+
+use crate::auth::user::password::change::remote::x_tonic::route::ServiceChange;
 
 use crate::z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer;
 
@@ -49,7 +51,7 @@ impl<'a> AuthProxyService for ProxyService<'a> {
     type Response = AuthProxyResponse;
 
     fn name(&self) -> &str {
-        "auth.user.password.change"
+        ServiceChange::name()
     }
     async fn call(self, metadata: AuthMetadataContent) -> Result<Self::Response, AuthProxyError> {
         call(self, metadata).await

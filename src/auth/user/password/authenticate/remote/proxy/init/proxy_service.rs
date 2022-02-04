@@ -1,11 +1,13 @@
 use prost::Message;
 use tonic::Request;
 
-use crate::auth::user::password::remote::y_protobuf::service::{
+use crate::auth::user::password::y_protobuf::service::{
     authenticate_password_pb_client::AuthenticatePasswordPbClient, AuthenticatePasswordRequestPb,
 };
 
 use crate::auth::x_outside_feature::remote::api::feature::AuthOutsideFeature;
+
+use crate::auth::user::password::authenticate::remote::x_tonic::route::ServiceAuthenticate;
 
 use crate::{
     auth::ticket::kernel::remote::init::response_builder::CookieAuthTokenResponseBuilder,
@@ -62,7 +64,7 @@ impl<'a> AuthProxyService for ProxyService<'a> {
     type Response = AuthTokenResponse;
 
     fn name(&self) -> &str {
-        "auth.user.password.authenticate"
+        ServiceAuthenticate::name()
     }
     async fn call(self, metadata: AuthMetadataContent) -> Result<Self::Response, AuthProxyError> {
         call(self, metadata).await

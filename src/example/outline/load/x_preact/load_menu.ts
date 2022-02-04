@@ -20,8 +20,8 @@ import { poweredBy } from "../../../../x_content/site"
 import { LoadMenuAction, LoadMenuState } from "../action"
 
 import { RepositoryError } from "../../../../z_lib/ui/repository/data"
-import { Menu, MenuCategoryNode, MenuItemNode } from "../../kernel/data"
 import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
+import { Menu, MenuCategoryNode, MenuItemNode } from "../data"
 
 export const MENU_ID = "menu"
 

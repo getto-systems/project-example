@@ -1,4 +1,4 @@
-use crate::auth::user::password::remote::y_protobuf::service::ChangePasswordRequestPb;
+use crate::auth::user::password::y_protobuf::service::ChangePasswordRequestPb;
 
 use crate::auth::user::password::change::remote::infra::{
     ChangePasswordFieldsExtract, ChangePasswordRequestDecoder,

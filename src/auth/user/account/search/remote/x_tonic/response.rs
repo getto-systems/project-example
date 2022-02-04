@@ -1,6 +1,6 @@
 use tonic::{Response, Status};
 
-use crate::auth::user::account::remote::y_protobuf::service::{
+use crate::auth::user::account::y_protobuf::service::{
     AuthUserAccountPb, SearchAuthUserAccountResponsePb,
 };
 

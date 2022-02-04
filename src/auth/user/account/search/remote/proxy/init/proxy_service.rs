@@ -1,12 +1,14 @@
 use prost::Message;
 use tonic::Request;
 
-use crate::auth::user::account::remote::y_protobuf::service::{
+use crate::auth::user::account::y_protobuf::service::{
     search_auth_user_account_pb_client::SearchAuthUserAccountPbClient,
     SearchAuthUserAccountRequestPb,
 };
 
 use crate::auth::x_outside_feature::remote::common::feature::AuthOutsideService;
+
+use crate::auth::user::account::search::remote::x_tonic::route::ServiceSearch;
 
 use crate::z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer;
 
@@ -50,7 +52,7 @@ impl<'a> AuthProxyService for ProxyService<'a> {
     type Response = AuthProxyResponse;
 
     fn name(&self) -> &str {
-        "auth.user.account.search"
+        ServiceSearch::name()
     }
     async fn call(self, metadata: AuthMetadataContent) -> Result<Self::Response, AuthProxyError> {
         call(self, metadata).await

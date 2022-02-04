@@ -1,4 +1,4 @@
-use crate::auth::user::password::reset::remote::y_protobuf::service::{
+use crate::auth::user::password::reset::y_protobuf::service::{
     request_reset_token_pb_server::RequestResetTokenPbServer,
     reset_password_pb_server::ResetPasswordPbServer,
 };

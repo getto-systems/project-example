@@ -2,7 +2,7 @@ pub mod request_decoder;
 
 use tonic::metadata::MetadataMap;
 
-use crate::avail::unexpected_error::remote::y_protobuf::service::NotifyRequestPb;
+use crate::avail::unexpected_error::y_protobuf::service::NotifyRequestPb;
 
 use crate::x_outside_feature::remote::example::feature::ExampleAppFeature;
 

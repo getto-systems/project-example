@@ -11,11 +11,11 @@ import { decodeProtobuf } from "../../../../z_vendor/protobuf/helper"
 
 import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
 
-import { GetMenuBadgeRemote } from "../infra"
+import { LoadMenuBadgeRemote } from "../infra"
 
 import { convertMenuBadgeRemote } from "../convert"
 
-export function newGetMenuBadgeRemote(feature: RemoteOutsideFeature): GetMenuBadgeRemote {
+export function newLoadMenuBadgeRemote(feature: RemoteOutsideFeature): LoadMenuBadgeRemote {
     return async () => {
         try {
             const mock = false
@@ -36,7 +36,7 @@ export function newGetMenuBadgeRemote(feature: RemoteOutsideFeature): GetMenuBad
             }
 
             const message = decodeProtobuf(
-                pb.example.outline.service.GetMenuBadgeResponsePb,
+                pb.example.outline.service.LoadMenuBadgeResponsePb,
                 await response.text(),
             )
             return {

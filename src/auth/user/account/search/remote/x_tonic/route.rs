@@ -2,7 +2,7 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::auth::user::account::remote::y_protobuf::service::{
+use crate::auth::user::account::y_protobuf::service::{
     search_auth_user_account_pb_server::SearchAuthUserAccountPb, SearchAuthUserAccountRequestPb,
     SearchAuthUserAccountResponsePb,
 };
@@ -21,6 +21,12 @@ use crate::auth::user::account::search::remote::init::SearchAuthUserAccountStruc
 
 pub struct ServiceSearch;
 
+impl ServiceSearch {
+    pub const fn name() -> &'static str {
+        "auth.user.account.search"
+    }
+}
+
 #[async_trait::async_trait]
 impl SearchAuthUserAccountPb for ServiceSearch {
     async fn search(
@@ -34,7 +40,7 @@ impl SearchAuthUserAccountPb for ServiceSearch {
         } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("auth.user.account.search", request_id.into());
+        let logger = app_logger(Self::name(), request_id.into());
         let mut action = SearchAuthUserAccountStruct::action(&feature, &metadata, request);
         action.subscribe(move |state| logger.log(state));
 

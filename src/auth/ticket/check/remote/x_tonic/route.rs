@@ -4,7 +4,7 @@ use getto_application::helper::flatten;
 
 use crate::z_lib::remote::{logger::Logger, response::tonic::RespondTo};
 
-use crate::auth::ticket::remote::y_protobuf::service::{
+use crate::auth::ticket::y_protobuf::service::{
     check_auth_ticket_pb_server::CheckAuthTicketPb, CheckAuthTicketRequestPb,
     CheckAuthTicketResponsePb,
 };
@@ -21,6 +21,12 @@ use crate::auth::ticket::check::remote::init::CheckAuthTicketStruct;
 
 pub struct ServiceCheck;
 
+impl ServiceCheck {
+    pub const fn name() -> &'static str {
+        "auth.ticket.check"
+    }
+}
+
 #[async_trait::async_trait]
 impl CheckAuthTicketPb for ServiceCheck {
     async fn check(
@@ -32,7 +38,7 @@ impl CheckAuthTicketPb for ServiceCheck {
         } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("auth.ticket.check", request_id.into());
+        let logger = app_logger(Self::name(), request_id.into());
         let mut action = CheckAuthTicketStruct::action(&feature, &metadata);
         action.subscribe(move |state| logger.log(state));
 

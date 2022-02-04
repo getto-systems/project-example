@@ -1,11 +1,13 @@
 use prost::Message;
 use tonic::Request;
 
-use crate::auth::user::password::reset::remote::y_protobuf::service::{
+use crate::auth::user::password::reset::y_protobuf::service::{
     request_reset_token_pb_client::RequestResetTokenPbClient, RequestResetTokenRequestPb,
 };
 
 use crate::auth::x_outside_feature::remote::common::feature::AuthOutsideService;
+
+use crate::auth::user::password::reset::request_token::remote::x_tonic::route::ServiceRequestToken;
 
 use crate::z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer;
 
@@ -49,7 +51,7 @@ impl<'a> AuthProxyService for ProxyService<'a> {
     type Response = AuthProxyResponse;
 
     fn name(&self) -> &str {
-        "auth.user.password.reset.request_token"
+        ServiceRequestToken::name()
     }
     async fn call(self, metadata: AuthMetadataContent) -> Result<Self::Response, AuthProxyError> {
         call(self, metadata).await

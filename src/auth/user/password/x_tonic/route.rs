@@ -1,4 +1,4 @@
-use crate::auth::user::password::remote::y_protobuf::service::{
+use crate::auth::user::password::y_protobuf::service::{
     authenticate_password_pb_server::AuthenticatePasswordPbServer,
     change_password_pb_server::ChangePasswordPbServer,
 };

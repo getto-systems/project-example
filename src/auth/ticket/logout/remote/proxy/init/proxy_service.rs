@@ -1,10 +1,12 @@
 use tonic::Request;
 
-use crate::auth::ticket::remote::y_protobuf::service::{
+use crate::auth::ticket::y_protobuf::service::{
     logout_pb_client::LogoutPbClient, LogoutRequestPb,
 };
 
 use crate::auth::x_outside_feature::remote::common::feature::AuthOutsideService;
+
+use crate::auth::ticket::logout::remote::x_tonic::route::ServiceLogout;
 
 use crate::z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer;
 
@@ -40,7 +42,7 @@ impl<'a> AuthProxyService for ProxyService<'a> {
     type Response = AuthProxyResponse;
 
     fn name(&self) -> &str {
-        "auth.auth_ticket.logout"
+        ServiceLogout::name()
     }
     async fn call(self, metadata: AuthMetadataContent) -> Result<Self::Response, AuthProxyError> {
         call(self, metadata).await

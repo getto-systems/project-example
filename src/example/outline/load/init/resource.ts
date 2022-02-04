@@ -3,16 +3,34 @@ import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
 import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/feature"
 
 import { newLoadMenuInfra } from "./infra"
-import { newLoadMenuShell } from "./shell"
-import { newLoadMenuConfig } from "./config"
+import { newLoadMenuShell, newLoadBreadcrumbListShell } from "./shell"
+import { newLoadBreadcrumbListConfig, newLoadMenuConfig } from "./config"
 
-import { initLoadMenuAction, LoadMenuAction } from "../action"
+import {
+    initLoadBreadcrumbListAction,
+    initLoadMenuAction,
+    LoadBreadcrumbListAction,
+    LoadMenuAction,
+} from "../action"
 
-import { MenuContent } from "../../kernel/infra"
+import { MenuContent } from "../infra"
 
-type OutsideFeature = RepositoryOutsideFeature & RemoteOutsideFeature & LocationOutsideFeature
+type BreadcrumbListOutsideFeature = LocationOutsideFeature
+export function newLoadBreadcrumbListResource(
+    feature: BreadcrumbListOutsideFeature,
+    menuContent: MenuContent,
+): Readonly<{ breadcrumbList: LoadBreadcrumbListAction }> {
+    return {
+        breadcrumbList: initLoadBreadcrumbListAction({
+            config: newLoadBreadcrumbListConfig(menuContent),
+            shell: newLoadBreadcrumbListShell(feature),
+        }),
+    }
+}
+
+type MenuOutsideFeature = RepositoryOutsideFeature & RemoteOutsideFeature & LocationOutsideFeature
 export function newLoadMenuResource(
-    feature: OutsideFeature,
+    feature: MenuOutsideFeature,
     menuContent: MenuContent,
 ): Readonly<{ menu: LoadMenuAction }> {
     return {

@@ -1,11 +1,11 @@
 import { setupActionTestRunner } from "../../../z_vendor/getto-application/action/test_helper"
 
-import { markMenuCategoryLabel, standard_MenuTree } from "../kernel/test_helper"
+import { markMenuCategoryLabel, standard_MenuTree } from "./test_helper"
 
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 import { initMenuBadgeStore, initMenuExpandStore } from "./init/store"
 
-import { detectMenuTargetPath } from "../kernel/convert"
+import { detectMenuTargetPath } from "./convert"
 import { convertMenuBadgeRemote, menuExpandRepositoryConverter } from "./convert"
 import { authTicketRepositoryConverter } from "../../../auth/ticket/kernel/convert"
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"
@@ -13,8 +13,12 @@ import { convertDB } from "../../../z_lib/ui/repository/init/convert"
 import { initLoadMenuAction, LoadMenuAction } from "./action"
 
 import { AuthTicketRepository, AuthTicketRepositoryValue } from "../../../auth/ticket/kernel/infra"
-import { MenuTargetPathDetecter } from "../kernel/infra"
-import { MenuExpandRepository, GetMenuBadgeRemote, MenuExpandRepositoryValue } from "./infra"
+import {
+    MenuTargetPathDetecter,
+    MenuExpandRepository,
+    LoadMenuBadgeRemote,
+    MenuExpandRepositoryValue,
+} from "./infra"
 
 import { AuthTicket } from "../../../auth/ticket/kernel/data"
 
@@ -358,13 +362,13 @@ function initResource(
 ): [Readonly<{ menu: LoadMenuAction }>, MenuExpandRepository] {
     const version = standard_version()
     const detectTargetPath = standard_detecter()
-    const getMenuBadgeRemote = standard_getMenuBadgeRemote()
+    const loadMenuBadgeRemote = standard_loadMenuBadgeRemote()
 
     return [
         {
             menu: initLoadMenuAction({
                 infra: {
-                    getMenuBadgeRemote,
+                    loadMenuBadgeRemote,
                     ticketRepository,
                     menuExpandRepository,
                     menuExpandStore: initMenuExpandStore(),
@@ -420,7 +424,7 @@ function expand_menuExpandRepository(): MenuExpandRepository {
     return convertDB(db, menuExpandRepositoryConverter)
 }
 
-function standard_getMenuBadgeRemote(): GetMenuBadgeRemote {
+function standard_loadMenuBadgeRemote(): LoadMenuBadgeRemote {
     return async () => ({
         success: true,
         value: convertMenuBadgeRemote([

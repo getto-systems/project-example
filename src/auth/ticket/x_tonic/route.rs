@@ -1,4 +1,4 @@
-use crate::auth::ticket::remote::y_protobuf::service::{
+use crate::auth::ticket::y_protobuf::service::{
     check_auth_ticket_pb_server::CheckAuthTicketPbServer, logout_pb_server::LogoutPbServer,
     validate_api_token_pb_server::ValidateApiTokenPbServer,
 };

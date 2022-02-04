@@ -19,7 +19,7 @@ import { copyright, siteInfo } from "../../../../x_content/site"
 import { ApplicationErrorComponent } from "../../../../avail/x_preact/application_error"
 import { LoadSeasonEntry } from "../../../../example/season/load/x_preact/load_season"
 import { LoadMenuEntry } from "../../../../example/outline/load/x_preact/load_menu"
-import { LoadBreadcrumbListComponent } from "../../../../example/outline/load_breadcrumb_list/x_preact/load_breadcrumb_list"
+import { LoadBreadcrumbListComponent } from "../../../../example/outline/load/x_preact/load_breadcrumb_list"
 import { ChangePasswordEntry } from "../../../../auth/user/password/change/x_preact/change_password"
 import { RequestResetTokenProfileEntry } from "../../../../auth/user/password/reset/request_token/x_preact/request_token_profile"
 

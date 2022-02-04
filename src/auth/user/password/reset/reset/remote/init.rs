@@ -4,7 +4,7 @@ pub mod token_decoder;
 
 use tonic::metadata::MetadataMap;
 
-use crate::auth::user::password::reset::remote::y_protobuf::service::ResetPasswordRequestPb;
+use crate::auth::user::password::reset::y_protobuf::service::ResetPasswordRequestPb;
 
 use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;
 

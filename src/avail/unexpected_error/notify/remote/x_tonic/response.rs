@@ -2,7 +2,7 @@ use tonic::{Response, Status};
 
 use crate::z_lib::remote::response::tonic::RespondTo;
 
-use crate::avail::unexpected_error::remote::y_protobuf::service::NotifyResponsePb;
+use crate::avail::unexpected_error::y_protobuf::service::NotifyResponsePb;
 
 use crate::avail::unexpected_error::notify::remote::action::{
     NotifyUnexpectedErrorEvent, NotifyUnexpectedErrorState,

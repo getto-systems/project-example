@@ -7,16 +7,20 @@ build = "api/setup/build.rs"
 default-run = "api"
 
 [[bin]]
+name = "build-example"
+path = "src/x_main/example.rs"
+
+[[bin]]
 name = "api"
-path = "main/api/main.rs"
+path = "src/x_main/api/main.rs"
 
 [[bin]]
 name = "auth"
-path = "main/auth/main.rs"
+path = "src/x_main/auth/main.rs"
 
 [[bin]]
 name = "example"
-path = "main/example/main.rs"
+path = "src/x_main/example/main.rs"
 
 [dependencies]
 async-trait = "0.1"

@@ -1,11 +1,13 @@
 use prost::Message;
 use tonic::Request;
 
-use crate::avail::unexpected_error::remote::y_protobuf::service::{
+use crate::avail::unexpected_error::y_protobuf::service::{
     notify_pb_client::NotifyPbClient, NotifyRequestPb,
 };
 
-use crate::example::remote::x_outside_feature::feature::ExampleOutsideService;
+use crate::example::x_outside_feature::remote::feature::ExampleOutsideService;
+
+use crate::avail::unexpected_error::notify::remote::x_tonic::route::ServiceNotify;
 
 use crate::z_lib::remote::message::helper::{
     decode_base64, encode_protobuf_base64, invalid_protobuf,
@@ -47,7 +49,7 @@ impl<'a> AuthProxyService for ProxyService<'a> {
     type Response = AuthProxyResponse;
 
     fn name(&self) -> &str {
-        "avail.unexpected_error.notify"
+        ServiceNotify::name()
     }
     async fn call(self, metadata: AuthMetadataContent) -> Result<Self::Response, AuthProxyError> {
         call(self, metadata).await
