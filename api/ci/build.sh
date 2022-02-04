@@ -25,9 +25,10 @@ build_main() {
   cat $GOOGLE_CLOUD_SERVICE_ACCOUNT_KEY_JSON | docker login -u _json_key --password-stdin https://${host}
 
   project=getto-projects
+  repository=example
   version=$(cat api/app/${target}/VERSION)
 
-  tag=${host}/${project}/example/${target}:${version}
+  tag=${host}/${project}/${repository}/${target}:${version}
 
   docker build -f api/app/${target}/Dockerfile -t $tag . &&
     docker push $tag

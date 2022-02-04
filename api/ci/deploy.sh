@@ -26,9 +26,10 @@ deploy_main() {
   region=asia-northeast1
 
   project=getto-projects
+  repository=example
   version=$(cat api/app/${target}/VERSION)
 
-  tag=${host}/${project}/example/${target}:${version}
+  tag=${host}/${project}/${repository}/${target}:${version}
 
   export HOME=$(pwd)
 
