@@ -1,7 +1,7 @@
 use prost::Message;
 use tonic::Request;
 
-use crate::auth::user::password::y_protobuf::service::{
+use crate::auth::user::password::change::y_protobuf::service::{
     change_password_pb_client::ChangePasswordPbClient, ChangePasswordRequestPb,
 };
 

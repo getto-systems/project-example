@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package auth.user.password.service;
+package auth.user.password.change.service;
 
 service ChangePasswordPb {
     rpc Change (ChangePasswordRequestPb) returns (ChangePasswordResponsePb);
