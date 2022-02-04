@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package auth.user.password.change.service;
+
+service ChangePasswordPb {
+    rpc Change (ChangePasswordRequestPb) returns (ChangePasswordResponsePb);
+}
+message ChangePasswordRequestPb {
+    string current_password = 1;
+    string new_password = 2;
+}
+message ChangePasswordResponsePb {
+    bool success = 1;
+}

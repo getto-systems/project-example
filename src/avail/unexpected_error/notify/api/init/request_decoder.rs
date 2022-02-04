@@ -1,4 +1,4 @@
-use crate::avail::unexpected_error::y_protobuf::service::NotifyRequestPb;
+use crate::avail::unexpected_error::notify::y_protobuf::service::NotifyRequestPb;
 
 use crate::avail::unexpected_error::notify::api::infra::{
     NotifyUnexpectedErrorFieldsExtract, NotifyUnexpectedErrorRequestDecoder,

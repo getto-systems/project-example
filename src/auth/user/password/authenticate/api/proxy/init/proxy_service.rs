@@ -1,7 +1,7 @@
 use prost::Message;
 use tonic::Request;
 
-use crate::auth::user::password::y_protobuf::service::{
+use crate::auth::user::password::authenticate::y_protobuf::service::{
     authenticate_password_pb_client::AuthenticatePasswordPbClient, AuthenticatePasswordRequestPb,
 };
 

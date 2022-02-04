@@ -2,25 +2,6 @@ syntax = "proto3";
 
 package auth.ticket.service;
 
-import "auth/user/z_protobuf/service.proto";
-
-service LogoutPb {
-    rpc Logout (LogoutRequestPb) returns (LogoutResponsePb);
-}
-message LogoutRequestPb {}
-message LogoutResponsePb {}
-
-service CheckAuthTicketPb {
-    rpc Check (CheckAuthTicketRequestPb) returns (CheckAuthTicketResponsePb);
-}
-message CheckAuthTicketRequestPb {}
-message CheckAuthTicketResponsePb {
-    auth.user.service.GrantedAuthRolesPb roles = 1;
-    EncodedAuthTokensPb token = 2;
-}
-message CheckAuthTicketMaskedResponsePb {
-    auth.user.service.GrantedAuthRolesPb roles = 1;
-}
 message EncodedAuthTokensPb {
     AuthTokenPb ticket_token = 1;
     AuthTokenPb api_token = 2;
@@ -39,12 +20,3 @@ enum CloudfrontTokenKindPb {
     Policy = 1;
     Signature = 2;
 }
-
-service ValidateApiTokenPb {
-    rpc Validate (ValidateApiTokenRequestPb) returns (ValidateApiTokenResponsePb);
-}
-message ValidateApiTokenRequestPb {
-    bool allow_any_role = 1;
-    repeated string require_roles = 2;
-}
-message ValidateApiTokenResponsePb {}

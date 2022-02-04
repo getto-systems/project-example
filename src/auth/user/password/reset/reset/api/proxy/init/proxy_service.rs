@@ -1,7 +1,7 @@
 use prost::Message;
 use tonic::Request;
 
-use crate::auth::user::password::reset::y_protobuf::service::{
+use crate::auth::user::password::reset::reset::y_protobuf::service::{
     reset_password_pb_client::ResetPasswordPbClient, ResetPasswordRequestPb,
 };
 

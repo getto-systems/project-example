@@ -1,12 +1,11 @@
 syntax = "proto3";
 
-package avail.unexpected_error.service;
+package avail.unexpected_error.notify.service;
 
 service NotifyPb {
     rpc Notify (NotifyRequestPb) returns (NotifyResponsePb);
 }
 message NotifyRequestPb {
     string err = 1;
-
 }
 message NotifyResponsePb {}

@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::auth::ticket::y_protobuf::service::ValidateApiTokenRequestPb;
+use crate::auth::ticket::validate::y_protobuf::service::ValidateApiTokenRequestPb;
 
 use crate::auth::ticket::validate::infra::ValidateApiTokenRequestDecoder;
 

@@ -2,7 +2,7 @@ use actix_web::{HttpRequest, HttpResponse};
 
 use crate::z_lib::api::response::actix_web::RespondTo;
 
-use crate::auth::ticket::y_protobuf::service::LogoutResponsePb;
+use crate::auth::ticket::logout::y_protobuf::service::LogoutResponsePb;
 
 impl RespondTo for LogoutResponsePb {
     fn respond_to(self, _request: &HttpRequest) -> HttpResponse {

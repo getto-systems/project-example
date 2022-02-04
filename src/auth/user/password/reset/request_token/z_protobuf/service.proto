@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package auth.user.password.reset.request_token.service;
+
+service RequestResetTokenPb {
+    rpc RequestToken (RequestResetTokenRequestPb) returns (RequestResetTokenResponsePb);
+}
+message RequestResetTokenRequestPb {
+    string login_id = 1;
+}
+message RequestResetTokenResponsePb {
+    bool success = 1;
+}

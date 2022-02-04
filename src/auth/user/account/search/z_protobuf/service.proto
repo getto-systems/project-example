@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package auth.user.account.search.service;
+
+import "auth/user/account/z_protobuf/service.proto";
+
+service SearchAuthUserAccountPb {
+    rpc Search (SearchAuthUserAccountRequestPb) returns (SearchAuthUserAccountResponsePb);
+}
+message SearchAuthUserAccountRequestPb {
+    int32 offset = 1;
+    string sort_key = 2;
+    string sort_order = 3;
+    string login_id = 4;
+}
+message SearchAuthUserAccountResponsePb {
+    int32 offset = 1;
+    int32 limit = 2;
+    int32 all = 3;
+    repeated auth.user.account.service.AuthUserAccountPb users = 4;
+}

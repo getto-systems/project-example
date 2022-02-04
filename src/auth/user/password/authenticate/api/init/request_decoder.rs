@@ -1,4 +1,4 @@
-use crate::auth::user::password::y_protobuf::service::AuthenticatePasswordRequestPb;
+use crate::auth::user::password::authenticate::y_protobuf::service::AuthenticatePasswordRequestPb;
 
 use crate::auth::user::password::authenticate::api::infra::{
     AuthenticatePasswordFieldsExtract, AuthenticatePasswordRequestDecoder,

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package auth.user.password.service;
+package auth.user.password.authenticate.service;
 
 import "auth/user/z_protobuf/service.proto";
 import "auth/ticket/z_protobuf/service.proto";
@@ -20,15 +20,4 @@ message AuthenticatePasswordResponsePb {
 message AuthenticatePasswordMaskedResponsePb {
     bool success = 1;
     auth.user.service.GrantedAuthRolesPb roles = 2;
-}
-
-service ChangePasswordPb {
-    rpc Change (ChangePasswordRequestPb) returns (ChangePasswordResponsePb);
-}
-message ChangePasswordRequestPb {
-    string current_password = 1;
-    string new_password = 2;
-}
-message ChangePasswordResponsePb {
-    bool success = 1;
 }
