@@ -21,6 +21,12 @@ use crate::auth::user::password::authenticate::remote::init::AuthenticatePasswor
 
 pub struct ServiceAuthenticate;
 
+impl ServiceAuthenticate {
+    pub const fn name() -> &'static str {
+        "auth.user.password.authenticate"
+    }
+}
+
 #[async_trait::async_trait]
 impl AuthenticatePasswordPb for ServiceAuthenticate {
     async fn authenticate(
@@ -34,7 +40,7 @@ impl AuthenticatePasswordPb for ServiceAuthenticate {
         } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("auth.user.password.authenticate", request_id.into());
+        let logger = app_logger(Self::name(), request_id.into());
         let mut action = AuthenticatePasswordStruct::action(&feature, &metadata, request);
         action.subscribe(move |state| logger.log(state));
 

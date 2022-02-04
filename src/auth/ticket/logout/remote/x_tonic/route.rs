@@ -20,6 +20,12 @@ use crate::auth::ticket::logout::remote::init::LogoutStruct;
 
 pub struct ServiceLogout;
 
+impl ServiceLogout {
+    pub const fn name() -> &'static str {
+        "auth.ticket.logout"
+    }
+}
+
 #[async_trait::async_trait]
 impl LogoutPb for ServiceLogout {
     async fn logout(
@@ -31,7 +37,7 @@ impl LogoutPb for ServiceLogout {
         } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("auth.ticket.logout", request_id.into());
+        let logger = app_logger(Self::name(), request_id.into());
         let mut action = LogoutStruct::action(&feature, &metadata);
         action.subscribe(move |state| logger.log(state));
 

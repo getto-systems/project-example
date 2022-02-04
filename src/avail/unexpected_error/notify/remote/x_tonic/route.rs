@@ -20,6 +20,12 @@ use crate::avail::unexpected_error::notify::remote::init::NotifyUnexpectedErrorF
 
 pub struct ServiceNotify;
 
+impl ServiceNotify {
+    pub const fn name() -> &'static str {
+        "avail.unexpected_error.notify"
+    }
+}
+
 #[async_trait::async_trait]
 impl NotifyPb for ServiceNotify {
     async fn notify(
@@ -32,7 +38,7 @@ impl NotifyPb for ServiceNotify {
             request,
         } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
-        let logger = app_logger("avail.unexpected_error.notify", request_id.into());
+        let logger = app_logger(Self::name(), request_id.into());
 
         let mut action =
             NotifyUnexpectedErrorFeature::action(&feature, &request_id, &metadata, request);

@@ -23,7 +23,7 @@ async fn main() {
             Ok(request)
         }))
         .add_service(server.avail.unexpected_error.notify())
-        .add_service(server.example.outline.get_menu_badge())
+        .add_service(server.example.outline.load_menu_badge())
         .serve(
             format!("0.0.0.0:{}", &ENV.port)
                 .parse()

@@ -6,6 +6,8 @@ use crate::auth::ticket::remote::y_protobuf::service::{
 
 use crate::auth::x_outside_feature::remote::api::feature::AuthOutsideFeature;
 
+use crate::auth::ticket::check::remote::x_tonic::route::ServiceCheck;
+
 use crate::{
     auth::ticket::kernel::remote::init::response_builder::CookieAuthTokenResponseBuilder,
     z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer,
@@ -56,7 +58,7 @@ impl<'a> AuthProxyService for ProxyService<'a> {
     type Response = AuthTokenResponse;
 
     fn name(&self) -> &str {
-        "auth.ticket.check"
+        ServiceCheck::name()
     }
     async fn call(self, metadata: AuthMetadataContent) -> Result<Self::Response, AuthProxyError> {
         call(self, metadata).await

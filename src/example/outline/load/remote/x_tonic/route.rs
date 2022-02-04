@@ -4,6 +4,10 @@ use getto_application::helper::flatten;
 
 use crate::z_lib::remote::{logger::Logger, response::tonic::RespondTo};
 
+use crate::example::outline::remote::y_protobuf::service::{
+    load_menu_badge_pb_server::LoadMenuBadgePb, LoadMenuBadgeRequestPb, LoadMenuBadgeResponsePb,
+};
+
 use crate::x_outside_feature::remote::{
     common::metadata::metadata_request_id,
     example::{
@@ -12,16 +16,18 @@ use crate::x_outside_feature::remote::{
     },
 };
 
-use crate::example::outline::remote::y_protobuf::service::{
-    load_menu_badge_pb_server::LoadMenuBadgePb, LoadMenuBadgeRequestPb, LoadMenuBadgeResponsePb,
-};
-
 use crate::example::outline::load::remote::init::LoadOutlineMenuBadgeStruct;
 
-pub struct ServiceGetMenuBadge;
+pub struct ServiceLoadMenuBadge;
+
+impl ServiceLoadMenuBadge {
+    pub const fn name() -> &'static str {
+        "example.outline.load_menu_badge"
+    }
+}
 
 #[async_trait::async_trait]
-impl LoadMenuBadgePb for ServiceGetMenuBadge {
+impl LoadMenuBadgePb for ServiceLoadMenuBadge {
     async fn load_menu_badge(
         &self,
         request: Request<LoadMenuBadgeRequestPb>,
@@ -31,7 +37,7 @@ impl LoadMenuBadgePb for ServiceGetMenuBadge {
         } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("example.outline.load_menu_badge", request_id.into());
+        let logger = app_logger(Self::name(), request_id.into());
         let mut action = LoadOutlineMenuBadgeStruct::action(&feature, &request_id, &metadata);
         action.subscribe(move |state| logger.log(state));
 

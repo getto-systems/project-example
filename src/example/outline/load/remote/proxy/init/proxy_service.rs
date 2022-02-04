@@ -6,6 +6,8 @@ use crate::example::outline::remote::y_protobuf::service::{
 
 use crate::example::x_outside_feature::remote::feature::ExampleOutsideService;
 
+use crate::example::outline::load::remote::x_tonic::route::ServiceLoadMenuBadge;
+
 use crate::z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::{
@@ -40,7 +42,7 @@ impl<'a> AuthProxyService for ProxyService<'a> {
     type Response = AuthProxyResponse;
 
     fn name(&self) -> &str {
-        "example.outline.get_menu_badge"
+        ServiceLoadMenuBadge::name()
     }
     async fn call(self, metadata: AuthMetadataContent) -> Result<Self::Response, AuthProxyError> {
         call(self, metadata).await
