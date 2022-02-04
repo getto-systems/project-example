@@ -1,4 +1,4 @@
-use crate::auth::x_outside_feature::api::api::feature::AuthOutsideCookie;
+use crate::auth::x_outside_feature::api::proxy::feature::AuthOutsideCookie;
 
 use crate::auth::ticket::kernel::api::infra::AuthTokenResponseBuilder;
 

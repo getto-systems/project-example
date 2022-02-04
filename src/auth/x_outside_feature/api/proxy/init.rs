@@ -2,7 +2,7 @@ use crate::z_lib::api::jwt::helper::decoding_key_from_ec_pem;
 
 use crate::{
     auth::x_outside_feature::api::{
-        api::feature::{AuthOutsideCookie, AuthOutsideFeature},
+        proxy::feature::{AuthOutsideCookie, AuthOutsideFeature},
         common::feature::{AuthOutsideDecodingKey, AuthOutsideService},
     },
     x_outside_feature::api::proxy::env::ProxyEnv,

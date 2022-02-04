@@ -1,5 +1,5 @@
 use crate::{
-    auth::x_outside_feature::api::api::{
+    auth::x_outside_feature::api::proxy::{
         feature::AuthOutsideFeature, init::new_auth_outside_feature,
     },
     example::x_outside_feature::api::{
