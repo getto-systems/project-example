@@ -27,16 +27,8 @@
             "path": "ui/secure"
         },
         {
-            "name": "ui/env",
-            "path": "ui/env"
-        },
-        {
             "name": "ui/setup",
             "path": "ui/setup"
-        },
-        {
-            "name": "ui/config",
-            "path": "ui/config"
         },
         {
             "name": "ui/ci",

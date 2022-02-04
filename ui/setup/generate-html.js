@@ -2,7 +2,7 @@
 const fs = require("fs")
 const path = require("path")
 
-const entryPoint = require("../env/entry_point")
+const entryPoint = require("./env/entry_point")
 
 generateSecureHtmlFiles()
 

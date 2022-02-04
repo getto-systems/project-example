@@ -2,8 +2,8 @@
 const fs = require("fs")
 const path = require("path")
 
-const environment = require("../env/environment")
-const entryPoint = require("../env/entry_point")
+const environment = require("./env/environment")
+const entryPoint = require("./env/entry_point")
 
 const environmentRoot = path.join(__dirname, "../../src/y_environment/ui")
 dump(path.join(environmentRoot, "env.ts"), envContent())

@@ -16,7 +16,7 @@
     "setup:css": "node ui/setup/css.js",
     "test": "npm run setup && npm run test:eslint && npm run test:jest",
     "test:eslint": "eslint src/",
-    "test:jest": "jest -c ui/config/jest.config.js"
+    "test:jest": "jest -c ui/setup/config/jest.config.js"
   },
   "author": "shun@getto.systems",
   "license": "MIT",
