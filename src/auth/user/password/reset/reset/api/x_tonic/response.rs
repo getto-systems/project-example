@@ -4,7 +4,7 @@ use crate::auth::ticket::y_protobuf::service::EncodedAuthTokensPb;
 
 use crate::z_lib::api::response::tonic::RespondTo;
 
-use crate::auth::user::password::reset::y_protobuf::service::{
+use crate::auth::user::password::reset::reset::y_protobuf::service::{
     ResetPasswordErrorKindPb, ResetPasswordMaskedResponsePb, ResetPasswordResponsePb,
 };
 

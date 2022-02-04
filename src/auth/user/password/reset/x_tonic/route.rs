@@ -1,6 +1,6 @@
 use crate::auth::user::password::reset::{
     request_token::y_protobuf::service::request_reset_token_pb_server::RequestResetTokenPbServer,
-    y_protobuf::service::reset_password_pb_server::ResetPasswordPbServer,
+    reset::y_protobuf::service::reset_password_pb_server::ResetPasswordPbServer,
 };
 
 use crate::auth::user::password::reset::{

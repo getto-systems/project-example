@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package auth.user.password.reset.service;
+package auth.user.password.reset.reset.service;
 
 import "auth/user/z_protobuf/service.proto";
 import "auth/ticket/z_protobuf/service.proto";
