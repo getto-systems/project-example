@@ -9,7 +9,7 @@ import {
     label_warning,
     notice_info,
 } from "../../../z_vendor/getto-css/preact/design/highlight"
-import { icon } from "../../../example/x_preact/design/icon"
+import { icon } from "../../../core/x_preact/design/icon"
 
 import {
     DocsAction,

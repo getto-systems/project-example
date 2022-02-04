@@ -1,9 +1,9 @@
 import { newForegroundOutsideFeature } from "../../../../../x_outside_feature/common"
-import { newBaseResource } from "../../../../../example/action_base/init/resource"
+import { newBaseResource } from "../../../../../core/action_base/init/resource"
 import { newLogoutInfra } from "../../../../../auth/ticket/logout/init/infra"
-import { initBaseView } from "../../../../../example/action_base/init"
+import { initBaseView } from "../../../../../core/action_base/init"
 
-import { BaseResource } from "../../../../../example/action_base/resource"
+import { BaseResource } from "../../../../../core/action_base/resource"
 
 import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 import { initLogoutAction, LogoutAction } from "../../../../../auth/ticket/logout/action"

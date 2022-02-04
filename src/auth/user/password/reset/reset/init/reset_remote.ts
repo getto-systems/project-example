@@ -39,7 +39,7 @@ export function newResetPasswordRemote(
             const response = await fetch(opts.url, {
                 ...opts.options,
                 body: encodeProtobuf(
-                    pb.auth.user.password.reset.service.ResetPasswordRequestPb,
+                    pb.auth.user.password.reset.reset.service.ResetPasswordRequestPb,
                     (message) => {
                         message.resetToken = resetToken
                         message.loginId = fields.loginID
@@ -53,15 +53,15 @@ export function newResetPasswordRemote(
             }
 
             const message = decodeProtobuf(
-                pb.auth.user.password.reset.service.ResetPasswordResponsePb,
+                pb.auth.user.password.reset.reset.service.ResetPasswordResponsePb,
                 await response.text(),
             )
             if (!message.success) {
                 switch (message.err) {
-                    case pb.auth.user.password.reset.service.ResetPasswordErrorKindPb.INVALID_RESET:
+                    case pb.auth.user.password.reset.reset.service.ResetPasswordErrorKindPb.INVALID_RESET:
                         return { success: false, err: { type: "invalid-reset" } }
 
-                    case pb.auth.user.password.reset.service.ResetPasswordErrorKindPb.ALREADY_RESET:
+                    case pb.auth.user.password.reset.reset.service.ResetPasswordErrorKindPb.ALREADY_RESET:
                         return { success: false, err: { type: "already-reset" } }
 
                     default:

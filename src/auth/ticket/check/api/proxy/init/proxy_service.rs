@@ -4,7 +4,7 @@ use crate::auth::ticket::check::y_protobuf::service::{
     check_auth_ticket_pb_client::CheckAuthTicketPbClient, CheckAuthTicketRequestPb,
 };
 
-use crate::auth::x_outside_feature::api::api::feature::AuthOutsideFeature;
+use crate::auth::x_outside_feature::api::proxy::feature::AuthOutsideFeature;
 
 use crate::auth::ticket::check::api::x_tonic::route::ServiceCheck;
 

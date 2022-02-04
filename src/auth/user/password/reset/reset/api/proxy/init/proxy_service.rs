@@ -5,7 +5,7 @@ use crate::auth::user::password::reset::reset::y_protobuf::service::{
     reset_password_pb_client::ResetPasswordPbClient, ResetPasswordRequestPb,
 };
 
-use crate::auth::x_outside_feature::api::api::feature::AuthOutsideFeature;
+use crate::auth::x_outside_feature::api::proxy::feature::AuthOutsideFeature;
 
 use crate::auth::user::password::reset::reset::api::x_tonic::route::ServiceReset;
 

@@ -43,7 +43,7 @@ export function newCheckAuthTicketRemote(
             }
 
             const message = decodeProtobuf(
-                pb.auth.ticket.service.CheckAuthTicketMaskedResponsePb,
+                pb.auth.ticket.check.service.CheckAuthTicketMaskedResponsePb,
                 await response.text(),
             )
 

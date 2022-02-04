@@ -33,7 +33,7 @@ export function newChangePasswordRemote(feature: RemoteOutsideFeature): ChangePa
             const response = await fetch(opts.url, {
                 ...opts.options,
                 body: encodeProtobuf(
-                    pb.auth.user.password.service.ChangePasswordRequestPb,
+                    pb.auth.user.password.change.service.ChangePasswordRequestPb,
                     (message) => {
                         message.currentPassword = fields.currentPassword
                         message.newPassword = fields.newPassword
@@ -46,7 +46,7 @@ export function newChangePasswordRemote(feature: RemoteOutsideFeature): ChangePa
             }
 
             const message = decodeProtobuf(
-                pb.auth.user.password.service.ChangePasswordResponsePb,
+                pb.auth.user.password.change.service.ChangePasswordResponsePb,
                 await response.text(),
             )
             if (!message.success) {

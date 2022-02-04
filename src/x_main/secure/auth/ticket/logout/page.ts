@@ -2,7 +2,7 @@ import { h, VNode } from "preact"
 
 import { useApplicationView } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 import { useNotifyUnexpectedError } from "../../../../../avail/unexpected_error/notify/x_preact/hooks"
-import { useDocumentTitle } from "../../../../../example/x_preact/hooks"
+import { useDocumentTitle } from "../../../../../core/x_preact/hooks"
 
 import {
     appLayout,
@@ -16,9 +16,9 @@ import { container } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { copyright, siteInfo } from "../../../../../x_content/site"
 
 import { ApplicationErrorComponent } from "../../../../../avail/x_preact/application_error"
-import { LoadSeasonEntry } from "../../../../../example/season/load/x_preact/load_season"
-import { LoadMenuEntry } from "../../../../../example/outline/load/x_preact/load_menu"
-import { LoadBreadcrumbListComponent } from "../../../../../example/outline/load/x_preact/load_breadcrumb_list"
+import { LoadSeasonEntry } from "../../../../../core/season/load/x_preact/load_season"
+import { LoadMenuEntry } from "../../../../../core/outline/load/x_preact/load_menu"
+import { LoadBreadcrumbListComponent } from "../../../../../core/outline/load/x_preact/load_breadcrumb_list"
 import { LogoutEntry } from "../../../../../auth/ticket/logout/x_preact/logout"
 
 import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"

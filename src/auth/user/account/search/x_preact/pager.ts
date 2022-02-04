@@ -6,7 +6,7 @@ import { useApplicationAction } from "../../../../../z_vendor/getto-application/
 
 import { button_search, fieldError } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
-import { pagerCount, pagerParams } from "../../../../../example/x_preact/design/table"
+import { pagerCount, pagerParams } from "../../../../../core/x_preact/design/table"
 
 import { SearchOffsetComponent } from "../../../../../z_lib/ui/search/offset/x_preact/offset"
 

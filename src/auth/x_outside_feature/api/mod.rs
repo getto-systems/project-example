@@ -1,4 +1,4 @@
-pub mod api;
 pub mod auth;
 pub mod common;
-pub mod example;
+pub mod core;
+pub mod proxy;

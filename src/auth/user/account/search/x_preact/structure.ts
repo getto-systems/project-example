@@ -6,8 +6,8 @@ import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 import { sortSign } from "../../../../../z_vendor/getto-css/preact/design/data"
 import { linky } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 
-import { siteSortSign } from "../../../../../example/x_preact/design/table"
-import { icon } from "../../../../../example/x_preact/design/icon"
+import { siteSortSign } from "../../../../../core/x_preact/design/table"
+import { icon } from "../../../../../core/x_preact/design/icon"
 
 import { TableStructure } from "../../../../../z_vendor/getto-table/preact/core"
 

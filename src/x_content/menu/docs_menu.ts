@@ -6,7 +6,7 @@ import { assertMenuPath, category, item } from "./common"
 import { docs_auth } from "../../auth/docs"
 import { docs_avail } from "../../avail/docs"
 
-import { MenuContent, MenuPermission, MenuTreeNode } from "../../example/outline/load/infra"
+import { MenuContent, MenuPermission, MenuTreeNode } from "../../core/outline/load/infra"
 
 import { DocsDomain } from "../../z_vendor/getto-application/docs/data"
 import { docs_docs } from "../../docs/docs"

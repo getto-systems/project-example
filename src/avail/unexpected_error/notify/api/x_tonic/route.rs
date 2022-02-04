@@ -10,7 +10,7 @@ use crate::avail::unexpected_error::notify::y_protobuf::service::{
 
 use crate::x_outside_feature::api::{
     common::metadata::metadata_request_id,
-    example::{
+    core::{
         feature::{extract_request, TonicRequest},
         logger::app_logger,
     },

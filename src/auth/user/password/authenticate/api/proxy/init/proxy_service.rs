@@ -5,7 +5,7 @@ use crate::auth::user::password::authenticate::y_protobuf::service::{
     authenticate_password_pb_client::AuthenticatePasswordPbClient, AuthenticatePasswordRequestPb,
 };
 
-use crate::auth::x_outside_feature::api::api::feature::AuthOutsideFeature;
+use crate::auth::x_outside_feature::api::proxy::feature::AuthOutsideFeature;
 
 use crate::auth::user::password::authenticate::api::x_tonic::route::ServiceAuthenticate;
 
