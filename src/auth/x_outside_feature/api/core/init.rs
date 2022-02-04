@@ -1,6 +1,6 @@
 use crate::{
     auth::x_outside_feature::api::{
-        common::feature::AuthOutsideService, example::feature::AuthOutsideFeature,
+        common::feature::AuthOutsideService, core::feature::AuthOutsideFeature,
     },
     x_outside_feature::api::example::env::ExampleEnv,
 };
