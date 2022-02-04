@@ -22,14 +22,13 @@ deploy_main() {
   local tag
   local account
 
-  host=asia.gcr.io
+  host=asia-docker.pkg.dev
   region=asia-northeast1
 
   project=getto-projects
-  image=example/${target}
   version=$(cat api/app/${target}/VERSION)
 
-  tag=${host}/${project}/${image}:${version}
+  tag=${host}/${project}/example/${target}:${version}
 
   export HOME=$(pwd)
 
