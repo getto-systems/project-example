@@ -4,8 +4,8 @@ use getto_application::helper::flatten;
 
 use crate::z_lib::api::{logger::Logger, response::actix_web::RespondTo};
 
-use crate::x_outside_feature::api::api::{
-    feature::ApiAppFeature,
+use crate::x_outside_feature::api::proxy::{
+    feature::ProxyAppFeature,
     logger::{app_logger, generate_request_id},
 };
 
@@ -13,7 +13,7 @@ use crate::auth::user::password::authenticate::api::proxy::init::AuthenticatePas
 
 #[post("/authenticate")]
 async fn service_authenticate(
-    feature: Data<ApiAppFeature>,
+    feature: Data<ProxyAppFeature>,
     request: HttpRequest,
     body: String,
 ) -> impl Responder {

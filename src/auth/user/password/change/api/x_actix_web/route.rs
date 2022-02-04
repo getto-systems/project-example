@@ -4,8 +4,8 @@ use getto_application::helper::flatten;
 
 use crate::z_lib::api::{logger::Logger, response::actix_web::RespondTo};
 
-use crate::x_outside_feature::api::api::{
-    feature::ApiAppFeature,
+use crate::x_outside_feature::api::proxy::{
+    feature::ProxyAppFeature,
     logger::{app_logger, generate_request_id},
 };
 
@@ -13,7 +13,7 @@ use crate::auth::user::password::change::api::proxy::init::ChangePasswordProxySt
 
 #[post("/change")]
 pub async fn service_change(
-    feature: Data<ApiAppFeature>,
+    feature: Data<ProxyAppFeature>,
     request: HttpRequest,
     body: String,
 ) -> impl Responder {

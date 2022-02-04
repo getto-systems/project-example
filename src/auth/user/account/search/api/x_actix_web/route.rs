@@ -8,8 +8,8 @@ use getto_application::helper::flatten;
 
 use crate::z_lib::api::{logger::Logger, response::actix_web::RespondTo};
 
-use crate::x_outside_feature::api::api::{
-    feature::ApiAppFeature,
+use crate::x_outside_feature::api::proxy::{
+    feature::ProxyAppFeature,
     logger::{app_logger, generate_request_id},
 };
 
@@ -17,7 +17,7 @@ use crate::auth::user::account::search::api::proxy::init::SearchAuthUserAccountP
 
 #[get("/search/{body}")]
 async fn service_search(
-    feature: Data<ApiAppFeature>,
+    feature: Data<ProxyAppFeature>,
     request: HttpRequest,
     info: Path<String>,
 ) -> impl Responder {
