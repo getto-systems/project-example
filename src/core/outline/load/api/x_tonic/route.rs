@@ -22,7 +22,7 @@ pub struct ServiceLoadMenuBadge;
 
 impl ServiceLoadMenuBadge {
     pub const fn name() -> &'static str {
-        "example.outline.load_menu_badge"
+        "core.outline.load_menu_badge"
     }
 }
 

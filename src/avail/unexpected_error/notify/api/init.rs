@@ -4,7 +4,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::avail::unexpected_error::notify::y_protobuf::service::NotifyRequestPb;
 
-use crate::x_outside_feature::api::core::feature::ExampleAppFeature;
+use crate::x_outside_feature::api::core::feature::CoreAppFeature;
 
 use crate::{
     auth::init::CheckPermissionStruct,
@@ -19,7 +19,7 @@ pub struct NotifyUnexpectedErrorFeature<'a> {
 
 impl<'a> NotifyUnexpectedErrorFeature<'a> {
     pub fn action(
-        feature: &'a ExampleAppFeature,
+        feature: &'a CoreAppFeature,
         request_id: &'a str,
         metadata: &'a MetadataMap,
         request: NotifyRequestPb,

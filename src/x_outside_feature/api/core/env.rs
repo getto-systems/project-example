@@ -1,12 +1,12 @@
 use std::env::var;
 
-pub struct ExampleEnv {
+pub struct CoreEnv {
     pub port: String,
 
     pub auth_service_url: String,
 }
 
-impl ExampleEnv {
+impl CoreEnv {
     pub fn new() -> Self {
         Self {
             port: load("PORT"),

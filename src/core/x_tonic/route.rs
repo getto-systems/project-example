@@ -1,10 +1,10 @@
 use crate::core::outline::x_tonic::route::OutlineServer;
 
-pub struct ExampleServer {
+pub struct CoreServer {
     pub outline: OutlineServer,
 }
 
-impl ExampleServer {
+impl CoreServer {
     pub const fn new() -> Self {
         Self {
             outline: OutlineServer,

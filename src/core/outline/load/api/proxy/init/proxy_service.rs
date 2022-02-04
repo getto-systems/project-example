@@ -4,7 +4,7 @@ use crate::core::outline::y_protobuf::service::{
     load_menu_badge_pb_client::LoadMenuBadgePbClient, LoadMenuBadgeRequestPb,
 };
 
-use crate::core::x_outside_feature::api::feature::ExampleOutsideService;
+use crate::core::x_outside_feature::api::feature::CoreOutsideService;
 
 use crate::core::outline::load::api::x_tonic::route::ServiceLoadMenuBadge;
 
@@ -28,7 +28,7 @@ pub struct ProxyService<'a> {
 }
 
 impl<'a> ProxyService<'a> {
-    pub fn new(service: &'a ExampleOutsideService, request_id: &'a str) -> Self {
+    pub fn new(service: &'a CoreOutsideService, request_id: &'a str) -> Self {
         Self {
             service_url: service.service_url,
             request_id,

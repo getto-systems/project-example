@@ -3,21 +3,21 @@ use crate::{
         feature::AuthOutsideFeature, init::new_auth_outside_feature,
     },
     core::x_outside_feature::api::{
-        feature::ExampleOutsideFeature, init::new_example_outside_feature,
+        feature::CoreOutsideFeature, init::new_core_outside_feature,
     },
     x_outside_feature::api::proxy::env::ProxyEnv,
 };
 
 pub struct ProxyAppFeature {
     pub auth: AuthOutsideFeature,
-    pub example: ExampleOutsideFeature,
+    pub core: CoreOutsideFeature,
 }
 
 impl ProxyAppFeature {
     pub async fn new(env: &'static ProxyEnv) -> Self {
         Self {
             auth: new_auth_outside_feature(env).await,
-            example: new_example_outside_feature(env),
+            core: new_core_outside_feature(env),
         }
     }
 }

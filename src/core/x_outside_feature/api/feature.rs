@@ -1,6 +1,6 @@
-pub struct ExampleOutsideFeature {
-    pub service: ExampleOutsideService,
+pub struct CoreOutsideFeature {
+    pub service: CoreOutsideService,
 }
-pub struct ExampleOutsideService {
+pub struct CoreOutsideService {
     pub service_url: &'static str,
 }

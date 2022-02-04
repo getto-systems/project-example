@@ -2,7 +2,7 @@ pub mod menu_badge_repository;
 
 use tonic::metadata::MetadataMap;
 
-use crate::x_outside_feature::api::core::feature::ExampleAppFeature;
+use crate::x_outside_feature::api::core::feature::CoreAppFeature;
 
 use crate::{
     auth::init::CheckPermissionStruct,
@@ -19,7 +19,7 @@ pub struct LoadOutlineMenuBadgeStruct<'a> {
 
 impl<'a> LoadOutlineMenuBadgeStruct<'a> {
     pub fn action(
-        feature: &'a ExampleAppFeature,
+        feature: &'a CoreAppFeature,
         request_id: &'a str,
         metadata: &'a MetadataMap,
     ) -> LoadOutlineMenuBadgeAction<Self> {

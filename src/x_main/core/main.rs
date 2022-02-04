@@ -4,16 +4,16 @@ use lazy_static::lazy_static;
 use tonic::{service::interceptor, transport::Server, Request};
 
 use example_api::x_outside_feature::api::core::{
-    env::ExampleEnv, feature::ExampleAppFeature,
+    env::CoreEnv, feature::CoreAppFeature,
 };
 
 lazy_static! {
-    static ref ENV: ExampleEnv = ExampleEnv::new();
+    static ref ENV: CoreEnv = CoreEnv::new();
 }
 
 #[tokio::main]
 async fn main() {
-    let feature: Arc<ExampleAppFeature> = Arc::new(ExampleAppFeature::new(&ENV).await);
+    let feature: Arc<CoreAppFeature> = Arc::new(CoreAppFeature::new(&ENV).await);
 
     let server = route::Server::new();
 
@@ -23,7 +23,7 @@ async fn main() {
             Ok(request)
         }))
         .add_service(server.avail.unexpected_error.notify())
-        .add_service(server.example.outline.load_menu_badge())
+        .add_service(server.core.outline.load_menu_badge())
         .serve(
             format!("0.0.0.0:{}", &ENV.port)
                 .parse()
@@ -35,19 +35,19 @@ async fn main() {
 
 mod route {
     use example_api::{
-        avail::x_tonic::route::AvailServer, core::x_tonic::route::ExampleServer,
+        avail::x_tonic::route::AvailServer, core::x_tonic::route::CoreServer,
     };
 
     pub struct Server {
         pub avail: AvailServer,
-        pub example: ExampleServer,
+        pub core: CoreServer,
     }
 
     impl Server {
         pub const fn new() -> Self {
             Self {
                 avail: AvailServer::new(),
-                example: ExampleServer::new(),
+                core: CoreServer::new(),
             }
         }
     }
