@@ -1,6 +1,6 @@
 server {
   listen      8443 ssl;
-  server_name dev-example-domain.$DOMAIN;
+  server_name dev-example-core.$DOMAIN;
 
   ssl_certificate     ${TLS_CERT};
   ssl_certificate_key ${TLS_KEY};

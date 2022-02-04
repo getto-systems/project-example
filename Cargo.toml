@@ -4,7 +4,7 @@ version = "0.46.0-api"
 authors = ["shun <shun.fix9@gmail.com>"]
 edition = "2021"
 build = "api/setup/build.rs"
-default-run = "example"
+default-run = "core"
 
 [[bin]]
 name = "proxy"
@@ -15,8 +15,8 @@ name = "auth"
 path = "src/x_main/auth/main.rs"
 
 [[bin]]
-name = "example"
-path = "src/x_main/example/main.rs"
+name = "core"
+path = "src/x_main/core/main.rs"
 
 [dependencies]
 async-trait = "0.1"
