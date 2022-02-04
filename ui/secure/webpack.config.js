@@ -4,8 +4,8 @@ const path = require("path")
 const WorkerPlugin = require("worker-plugin")
 const TerserPlugin = require("terser-webpack-plugin")
 
-const environment = require("../env/environment")
-const entryPoint = require("../env/entry_point")
+const environment = require("../setup/env/environment")
+const entryPoint = require("../setup/env/entry_point")
 
 module.exports = {
     entry: entryPoint.secureEntries(),
