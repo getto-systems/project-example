@@ -2,7 +2,7 @@ pub mod request_decoder;
 
 use tonic::metadata::MetadataMap;
 
-use crate::auth::user::password::y_protobuf::service::AuthenticatePasswordRequestPb;
+use crate::auth::user::password::authenticate::y_protobuf::service::AuthenticatePasswordRequestPb;
 
 use crate::x_outside_feature::api::auth::feature::AuthAppFeature;
 

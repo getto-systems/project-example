@@ -2,26 +2,6 @@ syntax = "proto3";
 
 package auth.user.password.service;
 
-import "auth/user/z_protobuf/service.proto";
-import "auth/ticket/z_protobuf/service.proto";
-
-service AuthenticatePasswordPb {
-    rpc Authenticate (AuthenticatePasswordRequestPb) returns (AuthenticatePasswordResponsePb);
-}
-message AuthenticatePasswordRequestPb {
-    string login_id = 1;
-    string password = 2;
-}
-message AuthenticatePasswordResponsePb {
-    bool success = 1;
-    auth.user.service.GrantedAuthRolesPb roles = 2;
-    auth.ticket.service.EncodedAuthTokensPb token = 3;
-}
-message AuthenticatePasswordMaskedResponsePb {
-    bool success = 1;
-    auth.user.service.GrantedAuthRolesPb roles = 2;
-}
-
 service ChangePasswordPb {
     rpc Change (ChangePasswordRequestPb) returns (ChangePasswordResponsePb);
 }

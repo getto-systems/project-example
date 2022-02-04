@@ -2,7 +2,7 @@ use tonic::{Response, Status};
 
 use crate::auth::{
     ticket::y_protobuf::service::EncodedAuthTokensPb,
-    user::password::y_protobuf::service::{
+    user::password::authenticate::y_protobuf::service::{
         AuthenticatePasswordMaskedResponsePb, AuthenticatePasswordResponsePb,
     },
 };
