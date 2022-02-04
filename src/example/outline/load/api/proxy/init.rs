@@ -2,7 +2,7 @@ mod proxy_service;
 
 use actix_web::HttpRequest;
 
-use crate::x_outside_feature::api::api::feature::ApiAppFeature;
+use crate::x_outside_feature::api::proxy::feature::ProxyAppFeature;
 
 use crate::{
     auth::init::ValidateApiMetadataStruct,
@@ -18,7 +18,7 @@ pub struct GetOutlineMenuBadgeProxyStruct<'a> {
 
 impl<'a> GetOutlineMenuBadgeProxyStruct<'a> {
     pub fn action(
-        feature: &'a ApiAppFeature,
+        feature: &'a ProxyAppFeature,
         request_id: &'a str,
         request: &'a HttpRequest,
     ) -> AuthProxyAction<Self> {

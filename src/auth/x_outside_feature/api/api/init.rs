@@ -5,10 +5,10 @@ use crate::{
         api::feature::{AuthOutsideCookie, AuthOutsideFeature},
         common::feature::{AuthOutsideDecodingKey, AuthOutsideService},
     },
-    x_outside_feature::api::api::env::ApiEnv,
+    x_outside_feature::api::proxy::env::ProxyEnv,
 };
 
-pub async fn new_auth_outside_feature(env: &'static ApiEnv) -> AuthOutsideFeature {
+pub async fn new_auth_outside_feature(env: &'static ProxyEnv) -> AuthOutsideFeature {
     AuthOutsideFeature {
         service: AuthOutsideService {
             service_url: &env.auth_service_url,

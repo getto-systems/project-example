@@ -4,7 +4,7 @@ use actix_cors::Cors;
 use actix_web::{web::Data, App, HttpServer};
 use lazy_static::lazy_static;
 
-use example_api::x_outside_feature::api::api::{env::ApiEnv, feature::ApiAppFeature};
+use example_api::x_outside_feature::api::proxy::{env::ProxyEnv, feature::ProxyAppFeature};
 
 use example_api::{
     auth::x_actix_web::route::scope_auth, avail::x_actix_web::route::scope_avail,
@@ -12,12 +12,12 @@ use example_api::{
 };
 
 lazy_static! {
-    static ref ENV: ApiEnv = ApiEnv::new();
+    static ref ENV: ProxyEnv = ProxyEnv::new();
 }
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
-    let feature: Data<ApiAppFeature> = Data::new(ApiAppFeature::new(&ENV).await);
+    let feature: Data<ProxyAppFeature> = Data::new(ProxyAppFeature::new(&ENV).await);
 
     HttpServer::new(move || {
         let cors = Cors::default()
