@@ -4,12 +4,6 @@ package auth.ticket.service;
 
 import "auth/user/z_protobuf/service.proto";
 
-service LogoutPb {
-    rpc Logout (LogoutRequestPb) returns (LogoutResponsePb);
-}
-message LogoutRequestPb {}
-message LogoutResponsePb {}
-
 service CheckAuthTicketPb {
     rpc Check (CheckAuthTicketRequestPb) returns (CheckAuthTicketResponsePb);
 }

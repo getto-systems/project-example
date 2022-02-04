@@ -1,6 +1,8 @@
 use tonic::Request;
 
-use crate::auth::ticket::y_protobuf::service::{logout_pb_client::LogoutPbClient, LogoutRequestPb};
+use crate::auth::ticket::logout::y_protobuf::service::{
+    logout_pb_client::LogoutPbClient, LogoutRequestPb,
+};
 
 use crate::auth::x_outside_feature::api::common::feature::AuthOutsideService;
 

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package auth.ticket.logout.service;
+
+service LogoutPb {
+    rpc Logout (LogoutRequestPb) returns (LogoutResponsePb);
+}
+message LogoutRequestPb {}
+message LogoutResponsePb {}

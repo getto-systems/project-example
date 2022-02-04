@@ -1,6 +1,9 @@
-use crate::auth::ticket::y_protobuf::service::{
-    check_auth_ticket_pb_server::CheckAuthTicketPbServer, logout_pb_server::LogoutPbServer,
-    validate_api_token_pb_server::ValidateApiTokenPbServer,
+use crate::auth::ticket::{
+    logout::y_protobuf::service::logout_pb_server::LogoutPbServer,
+    y_protobuf::service::{
+        check_auth_ticket_pb_server::CheckAuthTicketPbServer,
+        validate_api_token_pb_server::ValidateApiTokenPbServer,
+    },
 };
 
 use crate::auth::ticket::{
