@@ -1,14 +1,10 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { useApplicationAction } from "../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { box } from "../../../../../ui/vendor/getto-css/preact/design/box"
-import {
-    button_edit,
-    field,
-    fieldError,
-} from "../../../../../ui/vendor/getto-css/preact/design/form"
+import { box } from "../../../../z_vendor/getto-css/preact/design/box"
+import { button_edit, field, fieldError } from "../../../../z_vendor/getto-css/preact/design/form"
 
 import { InputSeasonComponent } from "../../input/x_preact/input"
 

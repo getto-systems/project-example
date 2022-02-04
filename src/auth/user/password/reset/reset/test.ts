@@ -1,9 +1,9 @@
-import { setupActionTestRunner } from "../../../../../../ui/vendor/getto-application/action/test_helper"
+import { setupActionTestRunner } from "../../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../../z_lib/ui/timer/helper"
-import { toApplicationView } from "../../../../../../ui/vendor/getto-application/action/helper"
+import { toApplicationView } from "../../../../../z_vendor/getto-application/action/helper"
 
-import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
-import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/init/mock"
+import { markBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/mock"
+import { mockBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/init/mock"
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../../z_lib/ui/clock/mock"
 import { mockSecureServerURL } from "../../../../sign/get_script_path/init/mock"
 import { mockResetPasswordShell } from "./init/mock"
@@ -17,10 +17,10 @@ import { Clock } from "../../../../../z_lib/ui/clock/infra"
 import { ResetPasswordRemote, ResetPasswordRemoteResult } from "./infra"
 import { AuthTicketRepository, AuthTicketRepositoryValue } from "../../../../ticket/kernel/infra"
 import { CheckAuthTicketRemote } from "../../../../ticket/check/infra"
-import { BoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/infra"
+import { BoardValueStore } from "../../../../../z_vendor/getto-application/board/input/infra"
 
 import { initResetPasswordAction, ResetPasswordAction } from "./action"
-import { ApplicationView } from "../../../../../../ui/vendor/getto-application/action/action"
+import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")

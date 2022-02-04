@@ -1,18 +1,18 @@
 import { h, VNode } from "preact"
 
-import { useApplicationAction } from "../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     field,
     field_error,
     label_text_fill,
-} from "../../../../../../ui/vendor/getto-css/preact/design/form"
+} from "../../../../../z_vendor/getto-css/preact/design/form"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
-import { InputBoardComponent } from "../../../../../../ui/vendor/getto-application/board/input/x_preact/input"
+import { InputBoardComponent } from "../../../../../z_vendor/getto-application/board/input/x_preact/input"
 
-import { ValidateBoardFieldState } from "../../../../../../ui/vendor/getto-application/board/validate_field/action"
+import { ValidateBoardFieldState } from "../../../../../z_vendor/getto-application/board/validate_field/action"
 import { InputLoginIDAction, ValidateLoginIDState } from "../action"
 
 import { ValidateLoginIDError } from "../data"

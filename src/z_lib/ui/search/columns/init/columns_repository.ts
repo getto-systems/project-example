@@ -3,7 +3,7 @@ import pb from "../../../../../y_protobuf/proto.js"
 
 import { IndexedDBTarget, initIndexedDB } from "../../../repository/init/indexed_db"
 
-import { decodeProtobuf, encodeProtobuf } from "../../../../../../ui/vendor/protobuf/helper"
+import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf/helper"
 import {
     fetchRepositoryRemovedResult,
     mapFetchRepositoryResult,

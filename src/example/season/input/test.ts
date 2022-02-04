@@ -1,5 +1,5 @@
-import { markBoardValue } from "../../../../ui/vendor/getto-application/board/kernel/mock"
-import { mockBoardValueStore } from "../../../../ui/vendor/getto-application/board/input/init/mock"
+import { markBoardValue } from "../../../z_vendor/getto-application/board/kernel/mock"
+import { mockBoardValueStore } from "../../../z_vendor/getto-application/board/input/init/mock"
 
 import { initInputSeasonAction } from "./action"
 

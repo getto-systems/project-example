@@ -1,11 +1,11 @@
-import { setupActionTestRunner } from "../../../../../../ui/vendor/getto-application/action/test_helper"
+import { setupActionTestRunner } from "../../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../../z_lib/ui/timer/helper"
 
-import { markBoardValue } from "../../../../../../ui/vendor/getto-application/board/kernel/mock"
-import { mockBoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/init/mock"
+import { markBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/mock"
+import { mockBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/init/mock"
 
 import { RequestResetTokenRemote, RequestResetTokenRemoteResult } from "./infra"
-import { BoardValueStore } from "../../../../../../ui/vendor/getto-application/board/input/infra"
+import { BoardValueStore } from "../../../../../z_vendor/getto-application/board/input/infra"
 import { initRequestResetTokenProfileAction, RequestResetTokenProfileAction } from "./action"
 
 const VALID_LOGIN = { loginID: "login-id" } as const

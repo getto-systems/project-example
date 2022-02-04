@@ -1,4 +1,4 @@
-import { WorkerBackgroundHandler } from "../../../../../../../ui/vendor/getto-application/action/worker/background"
+import { WorkerBackgroundHandler } from "../../../../../../z_vendor/getto-application/action/worker/background"
 
 import { RemoteOutsideFeature } from "../../../../../../z_lib/ui/remote/feature"
 

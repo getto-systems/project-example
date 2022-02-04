@@ -1,7 +1,7 @@
 import {
     StatefulApplicationAction,
     AbstractStatefulApplicationAction,
-} from "../../../../ui/vendor/getto-application/action/action"
+} from "../../../z_vendor/getto-application/action/action"
 
 import { AuthTicketRepository } from "../kernel/infra"
 import { LogoutRemote } from "./infra"

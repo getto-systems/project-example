@@ -1,7 +1,7 @@
 import {
     AbstractStatefulApplicationAction,
     StatefulApplicationAction,
-} from "../../../../ui/vendor/getto-application/action/action"
+} from "../../../z_vendor/getto-application/action/action"
 
 import { availableSeasons } from "../kernel/init/available_seasons"
 import { defaultSeason } from "../kernel/init/default_season"

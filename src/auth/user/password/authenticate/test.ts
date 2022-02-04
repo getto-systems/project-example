@@ -1,10 +1,10 @@
-import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
-import { toApplicationView } from "../../../../../ui/vendor/getto-application/action/helper"
+import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
+import { toApplicationView } from "../../../../z_vendor/getto-application/action/helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_lib/ui/clock/mock"
-import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
-import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/init/mock"
+import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/mock"
+import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/init/mock"
 import {
     mockGetScriptPathShell,
     mockSecureServerURL,
@@ -14,7 +14,7 @@ import { Clock } from "../../../../z_lib/ui/clock/infra"
 import { AuthenticatePasswordRemote, AuthenticatePasswordRemoteResult } from "./infra"
 import { AuthTicketRepository, AuthTicketRepositoryValue } from "../../../ticket/kernel/infra"
 import { CheckAuthTicketRemote } from "../../../ticket/check/infra"
-import { BoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
+import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
 import { authTicketRepositoryConverter } from "../../../ticket/kernel/convert"
 import { convertCheckRemote } from "../../../ticket/check/convert"
@@ -22,7 +22,7 @@ import { convertCheckRemote } from "../../../ticket/check/convert"
 import { LoadScriptError } from "../../../sign/get_script_path/data"
 import { initMemoryDB } from "../../../../z_lib/ui/repository/init/memory"
 import { convertDB } from "../../../../z_lib/ui/repository/init/convert"
-import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
+import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 import { AuthenticatePasswordAction, initAuthenticatePasswordAction } from "./action"
 
 // テスト開始時刻

@@ -1,4 +1,4 @@
-import { docsData } from "../../../../../ui/vendor/getto-application/docs/helper"
+import { docsData } from "../../../../z_vendor/getto-application/docs/helper"
 
 export const docs_reset = docsData("パスワードリセットデータ", [
     {

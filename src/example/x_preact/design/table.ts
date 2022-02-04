@@ -1,7 +1,7 @@
 import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
 import { icon } from "./icon"
 
-import { PagerOptionsContent, SortSign } from "../../../../ui/vendor/getto-css/preact/design/data"
+import { PagerOptionsContent, SortSign } from "../../../z_vendor/getto-css/preact/design/data"
 import { SearchPageResponse } from "../../../z_lib/ui/search/data"
 
 export const siteSortSign: SortSign = {

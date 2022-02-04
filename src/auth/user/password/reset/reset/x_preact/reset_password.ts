@@ -7,7 +7,7 @@ import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_err
 import {
     useApplicationAction,
     useApplicationView,
-} from "../../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+} from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     buttons,
@@ -15,8 +15,8 @@ import {
     button_send,
     button_undo,
     fieldError,
-} from "../../../../../../../ui/vendor/getto-css/preact/design/form"
-import { loginBox } from "../../../../../../../ui/vendor/getto-css/preact/layout/login"
+} from "../../../../../../z_vendor/getto-css/preact/design/form"
+import { loginBox } from "../../../../../../z_vendor/getto-css/preact/layout/login"
 
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../../../x_content/site"
@@ -29,9 +29,9 @@ import { InputLoginIDEntry } from "../../../../login_id/input/x_preact/input"
 import { InputPasswordEntry } from "../../../input/x_preact/input"
 
 import { ResetPasswordError } from "../data"
-import { ApplicationView } from "../../../../../../../ui/vendor/getto-application/action/action"
+import { ApplicationView } from "../../../../../../z_vendor/getto-application/action/action"
 import { ResetPasswordAction, ResetPasswordState } from "../action"
-import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/validate_board/action"
+import { ValidateBoardActionState } from "../../../../../../z_vendor/getto-application/board/validate_board/action"
 
 export function ResetPasswordEntry(view: ApplicationView<ResetPasswordAction>): VNode {
     const action = useApplicationView(view)

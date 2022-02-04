@@ -1,13 +1,10 @@
 import { VNode } from "preact"
 import { html } from "htm/preact"
 
-import { v_medium, v_small } from "../../../../../ui/vendor/getto-css/preact/design/alignment"
-import {
-    label_alert,
-    label_pending,
-} from "../../../../../ui/vendor/getto-css/preact/design/highlight"
-import { box } from "../../../../../ui/vendor/getto-css/preact/design/box"
-import { field } from "../../../../../ui/vendor/getto-css/preact/design/form"
+import { v_medium, v_small } from "../../../../z_vendor/getto-css/preact/design/alignment"
+import { label_alert, label_pending } from "../../../../z_vendor/getto-css/preact/design/highlight"
+import { box } from "../../../../z_vendor/getto-css/preact/design/box"
+import { field } from "../../../../z_vendor/getto-css/preact/design/form"
 
 import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 import { icon } from "../../design/icon"

@@ -1,14 +1,14 @@
 import { h, VNode } from "preact"
 
-import { field } from "../../../../../../ui/vendor/getto-css/preact/design/form"
-import { tableViewColumns } from "../../../../../../ui/vendor/getto-css/preact/design/data"
+import { field } from "../../../../../z_vendor/getto-css/preact/design/form"
+import { tableViewColumns } from "../../../../../z_vendor/getto-css/preact/design/data"
 
 import { VNodeContent, VNodeKey } from "../../../x_preact/common"
 
 import {
     CheckboxBoardComponent,
     CheckboxBoardContent,
-} from "../../../../../../ui/vendor/getto-application/board/input/x_preact/checkbox"
+} from "../../../../../z_vendor/getto-application/board/input/x_preact/checkbox"
 
 import { SearchColumnsAction } from "../action"
 

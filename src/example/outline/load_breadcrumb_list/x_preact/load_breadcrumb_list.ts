@@ -5,13 +5,13 @@ import {
     mainBreadcrumbLink,
     mainBreadcrumbList,
     mainBreadcrumbSeparator,
-} from "../../../../../ui/vendor/getto-css/preact/layout/app"
-import { linky } from "../../../../../ui/vendor/getto-css/preact/design/highlight"
+} from "../../../../z_vendor/getto-css/preact/layout/app"
+import { linky } from "../../../../z_vendor/getto-css/preact/design/highlight"
 
 import { siteInfo } from "../../../../x_content/site"
 import { icon } from "../../../x_preact/design/icon"
 
-import { MENU_ID } from "../../load_menu/x_preact/load_menu"
+import { MENU_ID } from "../../load/x_preact/load_menu"
 
 import { LoadBreadcrumbListAction } from "../action"
 

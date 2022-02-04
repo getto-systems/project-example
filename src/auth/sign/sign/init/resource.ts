@@ -1,5 +1,5 @@
-import { toApplicationView } from "../../../../../ui/vendor/getto-application/action/helper"
-import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
+import { toApplicationView } from "../../../../z_vendor/getto-application/action/helper"
+import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 
 import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/feature"
 import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"

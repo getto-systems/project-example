@@ -1,8 +1,8 @@
 import { VNode } from "preact"
 import { html } from "htm/preact"
 
-import { box, container } from "../../../../../../../../ui/vendor/getto-css/preact/design/box"
-import { v_medium } from "../../../../../../../../ui/vendor/getto-css/preact/design/alignment"
+import { box, container } from "../../../../../../../z_vendor/getto-css/preact/design/box"
+import { v_medium } from "../../../../../../../z_vendor/getto-css/preact/design/alignment"
 
 import {
     fromApiServer,
@@ -65,9 +65,7 @@ const passwordReset = () => [
             hr,
             html`<p>検証失敗ならリセットセッションを開始できない</p>`,
             v_medium(),
-            itemsSection("ログインID 検証", [
-                "空でないこと",
-            ]),
+            itemsSection("ログインID 検証", ["空でないこと"]),
         ],
     }),
     box({
@@ -86,9 +84,7 @@ const passwordReset = () => [
             fromApiServer("リセットセッションID", []),
             toTextMessage("リセットトークン", []),
             hr,
-            itemsSection("ログインID 検証", [
-                "リセットトークンの宛先が登録されていること",
-            ]),
+            itemsSection("ログインID 検証", ["リセットトークンの宛先が登録されていること"]),
         ],
     }),
     box({
@@ -115,9 +111,7 @@ const passwordReset = () => [
             html`<p>テキストメッセージクライアントからリセットトークンを取得</p>`,
             html`<p>検証失敗ならパスワードリセットできない</p>`,
             v_medium(),
-            itemsSection("ログインID 検証", [
-                "空でないこと",
-            ]),
+            itemsSection("ログインID 検証", ["空でないこと"]),
             itemsSection("パスワード検証", ["空でないこと", "長すぎないこと"]),
         ],
     }),
@@ -217,9 +211,7 @@ const passwordChange = () => [
             ]),
             html`<p>旧パスワードは使用できなくなる</p>`,
             v_medium(),
-            itemsSection("ログインID 検証", [
-                "ユーザーのログインID と一致すること",
-            ]),
+            itemsSection("ログインID 検証", ["ユーザーのログインID と一致すること"]),
             itemsSection("旧パスワード検証", [
                 "空でないこと",
                 "長すぎないこと",

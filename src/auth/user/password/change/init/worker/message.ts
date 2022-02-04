@@ -1,7 +1,7 @@
 import {
     WorkerProxyMessage,
     WorkerProxyResponse,
-} from "../../../../../../../ui/vendor/getto-application/action/worker/message"
+} from "../../../../../../z_vendor/getto-application/action/worker/message"
 
 import { ChangePasswordFields } from "../../data"
 import { ChangePasswordRemoteResult } from "../../infra"

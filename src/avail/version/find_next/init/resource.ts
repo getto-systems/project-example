@@ -1,11 +1,11 @@
-import { toApplicationView } from "../../../../../ui/vendor/getto-application/action/helper"
+import { toApplicationView } from "../../../../z_vendor/getto-application/action/helper"
 
 import { LocationOutsideFeature } from "../../../../z_lib/ui/location/feature"
 
 import { newFindNextVersionConfig } from "./config"
 import { newFindNextVersionShell } from "./shell"
 
-import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
+import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 import { FindNextVersionAction, initFindNextVersionAction } from "../action"
 
 import { newFindNextVersionInfra } from "./infra"

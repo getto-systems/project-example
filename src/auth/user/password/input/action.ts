@@ -3,21 +3,21 @@ import { passwordBoardConverter } from "./convert"
 import {
     initInputBoardAction,
     InputBoardAction,
-} from "../../../../../ui/vendor/getto-application/board/input/action"
+} from "../../../../z_vendor/getto-application/board/input/action"
 import {
     initValidateBoardFieldAction,
     ValidateBoardFieldAction,
     ValidateBoardFieldState,
-} from "../../../../../ui/vendor/getto-application/board/validate_field/action"
-import { ApplicationAction } from "../../../../../ui/vendor/getto-application/action/action"
+} from "../../../../z_vendor/getto-application/board/validate_field/action"
+import { ApplicationAction } from "../../../../z_vendor/getto-application/action/action"
 
-import { BoardFieldChecker } from "../../../../../ui/vendor/getto-application/board/validate_field/infra"
+import { BoardFieldChecker } from "../../../../z_vendor/getto-application/board/validate_field/infra"
 
 import { Password, PasswordCharacterState, ValidatePasswordError } from "./data"
 import {
     BoardValue,
     emptyBoardValue,
-} from "../../../../../ui/vendor/getto-application/board/kernel/data"
+} from "../../../../z_vendor/getto-application/board/kernel/data"
 
 export interface InputPasswordAction extends ApplicationAction {
     readonly input: InputBoardAction

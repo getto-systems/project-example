@@ -5,7 +5,7 @@ import { html } from "htm/preact"
 import {
     useApplicationAction,
     useApplicationView,
-} from "../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+} from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { ApplicationErrorComponent } from "../../../../avail/x_preact/application_error"
 import { CheckAuthTicketEntry } from "../../../ticket/check/x_preact/check_ticket"
@@ -15,7 +15,7 @@ import { ResetPasswordEntry } from "../../../user/password/reset/reset/x_preact/
 import { PrivacyPolicyComponent } from "./privacy_policy"
 
 import { SignAction, SignActionState } from "../action"
-import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
+import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 
 export function SignEntry(view: ApplicationView<SignAction>): VNode {
     const action = useApplicationView(view)

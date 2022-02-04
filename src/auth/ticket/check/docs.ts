@@ -1,4 +1,4 @@
-import { DocsAction } from "../../../../ui/vendor/getto-application/docs/data"
+import { DocsAction } from "../../../z_vendor/getto-application/docs/data"
 
 import { docs_authTicket } from "../docs"
 

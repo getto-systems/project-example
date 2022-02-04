@@ -1,13 +1,13 @@
-import { ApplicationAction } from "../../../../../ui/vendor/getto-application/action/action"
+import { ApplicationAction } from "../../../../z_vendor/getto-application/action/action"
 import {
     InputBoardAction,
     initInputBoardAction,
-} from "../../../../../ui/vendor/getto-application/board/input/action"
+} from "../../../../z_vendor/getto-application/board/input/action"
 
 import {
     BoardValue,
     zeroBoardValue,
-} from "../../../../../ui/vendor/getto-application/board/kernel/data"
+} from "../../../../z_vendor/getto-application/board/kernel/data"
 
 export interface SearchOffsetAction extends ApplicationAction {
     readonly input: InputBoardAction

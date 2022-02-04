@@ -1,11 +1,11 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { useApplicationAction } from "../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { field } from "../../../../../ui/vendor/getto-css/preact/design/form"
-import { notice_alert } from "../../../../../ui/vendor/getto-css/preact/design/highlight"
-import { v_small } from "../../../../../ui/vendor/getto-css/preact/design/alignment"
+import { field } from "../../../../z_vendor/getto-css/preact/design/form"
+import { notice_alert } from "../../../../z_vendor/getto-css/preact/design/highlight"
+import { v_small } from "../../../../z_vendor/getto-css/preact/design/alignment"
 
 import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 

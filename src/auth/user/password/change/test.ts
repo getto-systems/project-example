@@ -1,13 +1,13 @@
-import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
+import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 
-import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
-import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/init/mock"
+import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/mock"
+import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/init/mock"
 
 import { ChangePasswordAction, initChangePasswordAction } from "./action"
 
 import { ChangePasswordRemote, ChangePasswordRemoteResult } from "./infra"
-import { BoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
+import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
 const VALID_PASSWORD = { currentPassword: "current-password", newPassword: "new-password" } as const
 

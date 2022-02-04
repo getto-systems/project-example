@@ -1,4 +1,4 @@
-import { readSearchParams } from "../../../../../ui/vendor/getto-application/board/kernel/convert"
+import { readSearchParams } from "../../../../z_vendor/getto-application/board/kernel/convert"
 import {
     readSearchOffset,
     readSearchSort,

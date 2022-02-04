@@ -1,12 +1,12 @@
-import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
-import { mockBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/init/mock"
+import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/mock"
+import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/init/mock"
 
-import { BoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
+import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 import { initSearchOffsetAction, SearchOffsetAction } from "./action"
 import {
     BoardValue,
     zeroBoardValue,
-} from "../../../../../ui/vendor/getto-application/board/kernel/data"
+} from "../../../../z_vendor/getto-application/board/kernel/data"
 
 describe("SearchOffset", () => {
     test("get; reset", async () => {

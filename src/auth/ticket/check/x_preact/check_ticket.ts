@@ -7,10 +7,10 @@ import { remoteCommonErrorReason } from "../../../../z_lib/ui/remote/x_error/rea
 import {
     useApplicationAction,
     useApplicationView,
-} from "../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+} from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { loginBox } from "../../../../../ui/vendor/getto-css/preact/layout/login"
-import { v_medium } from "../../../../../ui/vendor/getto-css/preact/design/alignment"
+import { loginBox } from "../../../../z_vendor/getto-css/preact/layout/login"
+import { v_medium } from "../../../../z_vendor/getto-css/preact/design/alignment"
 
 import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../x_content/site"
@@ -20,7 +20,7 @@ import { appendScript } from "../../../sign/x_preact/script"
 
 import { ApplicationErrorComponent } from "../../../../avail/x_preact/application_error"
 
-import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
+import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 import { CheckAuthTicketAction, CheckAuthTicketState } from "../action"
 
 import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"

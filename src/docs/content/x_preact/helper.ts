@@ -1,14 +1,14 @@
 import { html } from "htm/preact"
 import { VNode } from "preact"
 
-import { box } from "../../../../ui/vendor/getto-css/preact/design/box"
+import { box } from "../../../z_vendor/getto-css/preact/design/box"
 import {
     label_alert,
     label_info,
     label_success,
     label_warning,
     notice_info,
-} from "../../../../ui/vendor/getto-css/preact/design/highlight"
+} from "../../../z_vendor/getto-css/preact/design/highlight"
 import { icon } from "../../../example/x_preact/design/icon"
 
 import {
@@ -17,8 +17,8 @@ import {
     DocsData,
     DocsDomain,
     DocsUsecase,
-} from "../../../../ui/vendor/getto-application/docs/data"
-import { field } from "../../../../ui/vendor/getto-css/preact/design/form"
+} from "../../../z_vendor/getto-application/docs/data"
+import { field } from "../../../z_vendor/getto-css/preact/design/form"
 
 export function docsDomainBox(docs: DocsDomain): readonly VNode[] {
     return [

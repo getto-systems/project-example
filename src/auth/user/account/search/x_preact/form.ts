@@ -1,21 +1,21 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { useApplicationAction } from "../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     buttons,
     button_search,
     button_undo,
-} from "../../../../../../ui/vendor/getto-css/preact/design/form"
-import { box_grow } from "../../../../../../ui/vendor/getto-css/preact/design/box"
+} from "../../../../../z_vendor/getto-css/preact/design/form"
+import { box_grow } from "../../../../../z_vendor/getto-css/preact/design/box"
 
 import { spinner } from "../../../../../example/x_preact/design/icon"
 
 import { SearchLoginIDComponent } from "../../../login_id/input/x_preact/search"
 
 import { SearchAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
-import { ObserveBoardActionState } from "../../../../../../ui/vendor/getto-application/board/observe_board/action"
+import { ObserveBoardActionState } from "../../../../../z_vendor/getto-application/board/observe_board/action"
 
 type EntryProps = Readonly<{
     search: SearchAuthUserAccountAction

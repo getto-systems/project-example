@@ -6,9 +6,9 @@ import {
     mainBody,
     mainHeader,
     mainTitle,
-} from "../../../../ui/vendor/getto-css/preact/layout/app"
+} from "../../../z_vendor/getto-css/preact/layout/app"
 
-import { useApplicationView } from "../../../../ui/vendor/getto-application/action/x_preact/hooks"
+import { useApplicationView } from "../../../z_vendor/getto-application/action/x_preact/hooks"
 import { useNotifyUnexpectedError } from "../../../avail/unexpected_error/notify/x_preact/hooks"
 import { useDocumentTitle } from "../../x_preact/hooks"
 
@@ -16,12 +16,12 @@ import { copyright, siteInfo } from "../../../x_content/site"
 
 import { ApplicationErrorComponent } from "../../../avail/x_preact/application_error"
 import { LoadSeasonEntry } from "../../season/load/x_preact/load_season"
-import { LoadMenuEntry } from "../../outline/load_menu/x_preact/load_menu"
+import { LoadMenuEntry } from "../../outline/load/x_preact/load_menu"
 import { LoadBreadcrumbListComponent } from "../../outline/load_breadcrumb_list/x_preact/load_breadcrumb_list"
 import { LoadSeasonFieldEntry } from "../../season/load/x_preact/load_season_field"
 
 import { DashboardView, DashboardResource } from "../resource"
-import { box_double, container } from "../../../../ui/vendor/getto-css/preact/design/box"
+import { box_double, container } from "../../../z_vendor/getto-css/preact/design/box"
 
 export function DashboardEntry(view: DashboardView): VNode {
     const resource = useApplicationView(view)

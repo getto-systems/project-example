@@ -1,9 +1,13 @@
 import { VNode } from "preact"
 import { html } from "htm/preact"
 
-import { box, box_double, container } from "../../../../../../../../ui/vendor/getto-css/preact/design/box"
-import { field } from "../../../../../../../../ui/vendor/getto-css/preact/design/form"
-import { v_small } from "../../../../../../../../ui/vendor/getto-css/preact/design/alignment"
+import {
+    box,
+    box_double,
+    container,
+} from "../../../../../../../z_vendor/getto-css/preact/design/box"
+import { field } from "../../../../../../../z_vendor/getto-css/preact/design/form"
+import { v_small } from "../../../../../../../z_vendor/getto-css/preact/design/alignment"
 
 import { items, itemsSection } from "../../../box"
 
@@ -45,10 +49,16 @@ function credential() {
                         <p>（secure, http only な cookie を想定）</p>
                     `,
                     v_small(),
-                    itemsSection("トークンには以下のデータを含める", ["Nonce", "ユーザー", "有効期限"]),
+                    itemsSection("トークンには以下のデータを含める", [
+                        "Nonce",
+                        "ユーザー",
+                        "有効期限",
+                    ]),
                     html`
                         <p>Nonce は別途クライアントに送信し、認証時に再送させる</p>
-                        <p>Nonce がトークンのものと異なる場合は認証失敗とし、認証情報を失効させる</p>
+                        <p>
+                            Nonce がトークンのものと異なる場合は認証失敗とし、認証情報を失効させる
+                        </p>
                     `,
                 ],
             }),
@@ -125,7 +135,12 @@ function ticket() {
             field({
                 title: "ACTION",
                 body: [
-                    items(["チケット登録", "チケット検証", "チケット有効期限延長", "チケット無効化"]),
+                    items([
+                        "チケット登録",
+                        "チケット検証",
+                        "チケット有効期限延長",
+                        "チケット無効化",
+                    ]),
                 ],
             }),
             field({
@@ -324,7 +339,9 @@ function passwordReset() {
             }),
             field({
                 title: "宛先",
-                body: [items(["ログメッセージに出力", "Slack Channel に送信", "メールアドレスに送信"])],
+                body: [
+                    items(["ログメッセージに出力", "Slack Channel に送信", "メールアドレスに送信"]),
+                ],
             }),
             field({
                 title: "ステータス",

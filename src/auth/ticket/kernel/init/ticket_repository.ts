@@ -1,11 +1,8 @@
 import { env } from "../../../../y_environment/ui/env"
 import pb from "../../../../y_protobuf/proto.js"
 
-import { decodeProtobuf, encodeProtobuf } from "../../../../../ui/vendor/protobuf/helper"
-import {
-    IndexedDBTarget,
-    initIndexedDB,
-} from "../../../../z_lib/ui/repository/init/indexed_db"
+import { decodeProtobuf, encodeProtobuf } from "../../../../z_vendor/protobuf/helper"
+import { IndexedDBTarget, initIndexedDB } from "../../../../z_lib/ui/repository/init/indexed_db"
 
 import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/feature"
 

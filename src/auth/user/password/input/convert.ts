@@ -1,5 +1,5 @@
-import { BoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/data"
-import { BoardFieldValueConverter } from "../../../../../ui/vendor/getto-application/board/validate_field/infra"
+import { BoardValue } from "../../../../z_vendor/getto-application/board/kernel/data"
+import { BoardFieldValueConverter } from "../../../../z_vendor/getto-application/board/validate_field/infra"
 import { ConvertLocationResult } from "../../../../z_lib/ui/location/data"
 import { SignNav, signNavKey } from "../../../sign/nav/data"
 import { Password, ResetToken, ValidatePasswordError } from "./data"
@@ -20,7 +20,9 @@ export const passwordBoardConverter: Converter = (value) => {
 }
 
 const EMPTY: readonly ValidatePasswordError[] = [{ type: "empty" }]
-const TOO_LONG: readonly ValidatePasswordError[] = [{ type: "too-long", maxLength: PASSWORD_MAX_LENGTH }]
+const TOO_LONG: readonly ValidatePasswordError[] = [
+    { type: "too-long", maxLength: PASSWORD_MAX_LENGTH },
+]
 
 function markPassword(password: string): Password {
     return password as Password

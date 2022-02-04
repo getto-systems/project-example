@@ -1,7 +1,7 @@
 import {
     StatefulApplicationAction,
     AbstractStatefulApplicationAction,
-} from "../../../../../ui/vendor/getto-application/action/action"
+} from "../../../../z_vendor/getto-application/action/action"
 
 import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 import { nextSort } from "../../../../z_lib/ui/search/sort/helper"
@@ -10,7 +10,7 @@ import { initSearchLoginIDAction, SearchLoginIDAction } from "../../login_id/inp
 import {
     initObserveBoardAction,
     ObserveBoardAction,
-} from "../../../../../ui/vendor/getto-application/board/observe_board/action"
+} from "../../../../z_vendor/getto-application/board/observe_board/action"
 import {
     initSearchOffsetAction,
     SearchOffsetAction,

@@ -1,6 +1,6 @@
 import { newRequestResetTokenWorkerHandler } from "../../../../user/password/reset/request_token/init/worker/background"
 
-import { WorkerBackgroundHandler } from "../../../../../../ui/vendor/getto-application/action/worker/background"
+import { WorkerBackgroundHandler } from "../../../../../z_vendor/getto-application/action/worker/background"
 
 import { SignForegroundMessage, SignBackgroundMessage } from "./message"
 import {
@@ -9,7 +9,7 @@ import {
 } from "../../../../user/password/reset/request_token/init/worker/message"
 
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
-import { WorkerOutsideFeature } from "../../../../../../ui/vendor/getto-application/action/worker/feature"
+import { WorkerOutsideFeature } from "../../../../../z_vendor/getto-application/action/worker/feature"
 
 type OutsideFeature = RemoteOutsideFeature & WorkerOutsideFeature
 export function newSignViewWorkerBackground(feature: OutsideFeature): void {

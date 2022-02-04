@@ -1,7 +1,7 @@
-import { setupActionTestRunner } from "../../../../../ui/vendor/getto-application/action/test_helper"
+import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
 
-import { markBoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/mock"
-import { mockMultipleBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/init/mock"
+import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/mock"
+import { mockMultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/init/mock"
 import { initMemoryDB } from "../../repository/init/memory"
 
 import { searchColumnsRepositoryConverter } from "./convert"
@@ -9,7 +9,7 @@ import { convertDB } from "../../repository/init/convert"
 
 import { initSearchColumnsAction, SearchColumnsAction } from "./action"
 
-import { MultipleBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
+import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
 describe("SearchColumns", () => {
     test("select columns", async () => {

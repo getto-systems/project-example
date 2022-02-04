@@ -1,7 +1,7 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { useApplicationView } from "../../../../ui/vendor/getto-application/action/x_preact/hooks"
+import { useApplicationView } from "../../../z_vendor/getto-application/action/x_preact/hooks"
 import { useNotifyUnexpectedError } from "../../../avail/unexpected_error/notify/x_preact/hooks"
 import { useDocumentTitle } from "../../../example/x_preact/hooks"
 
@@ -11,19 +11,19 @@ import {
     mainBody,
     mainHeader,
     mainTitle,
-} from "../../../../ui/vendor/getto-css/preact/layout/app"
-import { container } from "../../../../ui/vendor/getto-css/preact/design/box"
-import { v_small } from "../../../../ui/vendor/getto-css/preact/design/alignment"
+} from "../../../z_vendor/getto-css/preact/layout/app"
+import { container } from "../../../z_vendor/getto-css/preact/design/box"
+import { v_small } from "../../../z_vendor/getto-css/preact/design/alignment"
 
 import { copyright, siteInfo } from "../../../x_content/site"
 import { docsDataBox, docsDomainBox, docsUsecaseAbstractBox } from "./helper"
 
 import { ApplicationErrorComponent } from "../../../avail/x_preact/application_error"
-import { LoadMenuEntry } from "../../../example/outline/load_menu/x_preact/load_menu"
+import { LoadMenuEntry } from "../../../example/outline/load/x_preact/load_menu"
 import { LoadBreadcrumbListComponent } from "../../../example/outline/load_breadcrumb_list/x_preact/load_breadcrumb_list"
 
 import { DocsView, DocsResource } from "../resource"
-import { DocsData, DocsDomain } from "../../../../ui/vendor/getto-application/docs/data"
+import { DocsData, DocsDomain } from "../../../z_vendor/getto-application/docs/data"
 
 type EntryProps = Readonly<{
     view: DocsView
