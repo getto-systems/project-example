@@ -35,14 +35,14 @@ export function newSeasonRepository(
         }
 
         function toDB(value: SeasonRepositoryValue): string {
-            return encodeProtobuf(pb.example.db.Season_pb, (message) => {
+            return encodeProtobuf(pb.core.season.db.SeasonPb, (message) => {
                 message.year = value.season.year
                 message.period = value.season.period
                 message.expires = value.expires
             })
         }
         function fromDB(raw: string): SeasonRepositoryValue {
-            const value = decodeProtobuf(pb.example.db.Season_pb, raw)
+            const value = decodeProtobuf(pb.core.season.db.SeasonPb, raw)
             return {
                 season: { year: value.year, period: value.period },
                 expires: value.expires,

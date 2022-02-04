@@ -53,16 +53,16 @@ export function newMenuExpandRepository(
         }
 
         function toDB(value: MenuExpandRepositoryValue): string {
-            return encodeProtobuf(pb.example.outline.db.MenuExpand_pb, (message) => {
+            return encodeProtobuf(pb.core.outline.db.MenuExpandPb, (message) => {
                 message.paths = value.map((labels) => {
-                    const message = new pb.example.outline.db.MenuExpand_pb.Path()
+                    const message = new pb.core.outline.db.MenuExpandPb.Path()
                     message.labels = Array.from(labels)
                     return message
                 })
             })
         }
         function fromDB(raw: string): MenuExpandRepositoryValue {
-            return decodeProtobuf(pb.example.outline.db.MenuExpand_pb, raw).paths.map(
+            return decodeProtobuf(pb.core.outline.db.MenuExpandPb, raw).paths.map(
                 (path) => path.labels || [],
             )
         }
