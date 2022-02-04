@@ -19,18 +19,18 @@ variables:
   UI_BUMP_IGNORE_FILE:  ui/bump/ignore
   UI_BUMP_MAJOR_FILE:   ui/bump/major
   UI_BUMP_SCRIPT:       ui/bump/bump.sh
-  API_BUMP_VERSION_FILE: api/app/api/VERSION
-  API_BUMP_IGNORE_FILE:  api/app/api/bump/ignore
-  API_BUMP_MAJOR_FILE:   api/app/api/bump/major
-  API_BUMP_SCRIPT:       api/app/api/bump/bump.sh
+  API_BUMP_VERSION_FILE: api/app/proxy/VERSION
+  API_BUMP_IGNORE_FILE:  api/app/proxy/bump/ignore
+  API_BUMP_MAJOR_FILE:   api/app/proxy/bump/major
+  API_BUMP_SCRIPT:       api/app/proxy/bump/bump.sh
   AUTH_BUMP_VERSION_FILE: api/app/auth/VERSION
   AUTH_BUMP_IGNORE_FILE:  api/app/auth/bump/ignore
   AUTH_BUMP_MAJOR_FILE:   api/app/auth/bump/major
   AUTH_BUMP_SCRIPT:       api/app/auth/bump/bump.sh
-  EXAMPLE_BUMP_VERSION_FILE: api/app/example/VERSION
-  EXAMPLE_BUMP_IGNORE_FILE:  api/app/example/bump/ignore
-  EXAMPLE_BUMP_MAJOR_FILE:   api/app/example/bump/major
-  EXAMPLE_BUMP_SCRIPT:       api/app/example/bump/bump.sh
+  EXAMPLE_BUMP_VERSION_FILE: api/app/core/VERSION
+  EXAMPLE_BUMP_IGNORE_FILE:  api/app/core/bump/ignore
+  EXAMPLE_BUMP_MAJOR_FILE:   api/app/core/bump/major
+  EXAMPLE_BUMP_SCRIPT:       api/app/core/bump/bump.sh
 
 migrate:
   stage: migrate
@@ -198,7 +198,7 @@ release_failure-ui:
   script:
     - curl $TRELLIS_PSYCHER_GETTO/notify-release-failure.sh | sh -s -- $url $channel $version
 
-bump_version-api:
+bump_version-proxy:
   stage: bump_version
   only:
     refs:
@@ -209,7 +209,7 @@ bump_version-api:
   image: buildpack-deps:buster-scm
 
   variables:
-    BUMP_VERSION_SUFFIX: "-api"
+    BUMP_VERSION_SUFFIX: "-proxy"
     BUMP_VERSION_FILE: $API_BUMP_VERSION_FILE
     BUMP_IGNORE_FILE: $API_BUMP_IGNORE_FILE
     BUMP_MAJOR_FILE: $API_BUMP_MAJOR_FILE
@@ -222,15 +222,15 @@ bump_version-api:
     - export PATH=$PATH:./vendor/getto-systems/git-post/bin
   script:
     - curl $TRELLIS_CI_BUMP_VERSION/bump_version.sh | bash
-    - curl $TRELLIS_CI_BUMP_VERSION/request.sh | bash -s -- ./api/app/api/bump/message.sh
+    - curl $TRELLIS_CI_BUMP_VERSION/request.sh | bash -s -- ./api/app/proxy/bump/message.sh
 
-release-api:
+release-proxy:
   stage: release
   only:
     refs:
       - release@getto-systems-base/projects/example
     changes:
-      - api/app/api/VERSION
+      - api/app/proxy/VERSION
   except:
     refs:
       - triggers
@@ -244,13 +244,13 @@ release-api:
   script:
     - curl $TRELLIS_CI_BUMP_VERSION/push_tags.sh | sh
 
-release_build-api:
+release_build-proxy:
   stage: release_build
   only:
     refs:
       - release@getto-systems-base/projects/example
     changes:
-      - api/app/api/VERSION
+      - api/app/proxy/VERSION
   except:
     refs:
       - triggers
@@ -266,15 +266,15 @@ release_build-api:
     - docker:dind
 
   script:
-    - api/ci/build.sh api
+    - api/ci/build.sh proxy
 
-release_deploy-api:
+release_deploy-proxy:
   stage: release_deploy
   only:
     refs:
       - release@getto-systems-base/projects/example
     changes:
-      - api/app/api/VERSION
+      - api/app/proxy/VERSION
   except:
     refs:
       - triggers
@@ -284,16 +284,16 @@ release_deploy-api:
   image: google/cloud-sdk:latest
 
   script:
-    - api/ci/deploy.sh api
+    - api/ci/deploy.sh proxy
 
 
-release_success-api:
+release_success-proxy:
   stage: release_notify
   only:
     refs:
       - release@getto-systems-base/projects/example
     changes:
-      - api/app/api/VERSION
+      - api/app/proxy/VERSION
   except:
     refs:
       - triggers
@@ -309,13 +309,13 @@ release_success-api:
   script:
     - curl $TRELLIS_PSYCHER_GETTO/notify-release-success.sh | sh -s -- $url $channel $version
 
-release_failure-api:
+release_failure-proxy:
   stage: release_notify
   only:
     refs:
       - release@getto-systems-base/projects/example
     changes:
-      - api/app/api/VERSION
+      - api/app/proxy/VERSION
   except:
     refs:
       - triggers
@@ -475,7 +475,7 @@ bump_version-example:
   image: buildpack-deps:buster-scm
 
   variables:
-    BUMP_VERSION_SUFFIX: "-example"
+    BUMP_VERSION_SUFFIX: "-core"
     BUMP_VERSION_FILE: $EXAMPLE_BUMP_VERSION_FILE
     BUMP_IGNORE_FILE: $EXAMPLE_BUMP_IGNORE_FILE
     BUMP_MAJOR_FILE: $EXAMPLE_BUMP_MAJOR_FILE
@@ -488,7 +488,7 @@ bump_version-example:
     - export PATH=$PATH:./vendor/getto-systems/git-post/bin
   script:
     - curl $TRELLIS_CI_BUMP_VERSION/bump_version.sh | bash
-    - curl $TRELLIS_CI_BUMP_VERSION/request.sh | bash -s -- ./api/app/example/bump/message.sh
+    - curl $TRELLIS_CI_BUMP_VERSION/request.sh | bash -s -- ./api/app/core/bump/message.sh
 
 release-example:
   stage: release
@@ -496,7 +496,7 @@ release-example:
     refs:
       - release@getto-systems-base/projects/example
     changes:
-      - api/app/example/VERSION
+      - api/app/core/VERSION
   except:
     refs:
       - triggers
@@ -516,7 +516,7 @@ release_build-example:
     refs:
       - release@getto-systems-base/projects/example
     changes:
-      - api/app/example/VERSION
+      - api/app/core/VERSION
   except:
     refs:
       - triggers
@@ -532,7 +532,7 @@ release_build-example:
     - docker:dind
 
   script:
-    - api/ci/build.sh example
+    - api/ci/build.sh core
 
 release_deploy-example:
   stage: release_deploy
@@ -540,7 +540,7 @@ release_deploy-example:
     refs:
       - release@getto-systems-base/projects/example
     changes:
-      - api/app/example/VERSION
+      - api/app/core/VERSION
   except:
     refs:
       - triggers
@@ -550,7 +550,7 @@ release_deploy-example:
   image: google/cloud-sdk:latest
 
   script:
-    - api/ci/deploy.sh example
+    - api/ci/deploy.sh core
 
 
 release_success-example:
@@ -559,7 +559,7 @@ release_success-example:
     refs:
       - release@getto-systems-base/projects/example
     changes:
-      - api/app/example/VERSION
+      - api/app/core/VERSION
   except:
     refs:
       - triggers
@@ -581,7 +581,7 @@ release_failure-example:
     refs:
       - release@getto-systems-base/projects/example
     changes:
-      - api/app/example/VERSION
+      - api/app/core/VERSION
   except:
     refs:
       - triggers
