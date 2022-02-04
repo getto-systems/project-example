@@ -3,17 +3,17 @@ import { html } from "htm/preact"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
-import { sortSign } from "../../../../../../ui/vendor/getto-css/preact/design/data"
-import { linky } from "../../../../../../ui/vendor/getto-css/preact/design/highlight"
+import { sortSign } from "../../../../../z_vendor/getto-css/preact/design/data"
+import { linky } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 
 import { siteSortSign } from "../../../../../example/x_preact/design/table"
 import { icon } from "../../../../../example/x_preact/design/icon"
 
-import { TableStructure } from "../../../../../../ui/vendor/getto-table/preact/core"
+import { TableStructure } from "../../../../../z_vendor/getto-table/preact/core"
 
-import { tableStructure } from "../../../../../../ui/vendor/getto-table/preact/cell/structure"
-import { tableCell } from "../../../../../../ui/vendor/getto-table/preact/cell/simple"
-import { tableClassName } from "../../../../../../ui/vendor/getto-table/preact/decorator"
+import { tableStructure } from "../../../../../z_vendor/getto-table/preact/cell/structure"
+import { tableCell } from "../../../../../z_vendor/getto-table/preact/cell/simple"
+import { tableClassName } from "../../../../../z_vendor/getto-table/preact/decorator"
 
 import { SearchAuthUserAccountAction } from "../action"
 

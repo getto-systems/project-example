@@ -3,7 +3,7 @@ import { delayedChecker } from "../../../z_lib/ui/timer/helper"
 import {
     StatefulApplicationAction,
     AbstractStatefulApplicationAction,
-} from "../../../../ui/vendor/getto-application/action/action"
+} from "../../../z_vendor/getto-application/action/action"
 
 import { startContinuousRenew } from "./method"
 import { getScriptPath } from "../../sign/get_script_path/method"

@@ -1,4 +1,4 @@
-import { DocsAction } from "../../../../../../ui/vendor/getto-application/docs/data"
+import { DocsAction } from "../../../../../z_vendor/getto-application/docs/data"
 import { docs_authUser } from "../../../docs"
 import { docs_loginID } from "../../../login_id/docs"
 import { docs_reset } from "../docs"

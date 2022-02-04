@@ -1,8 +1,5 @@
-import { readSearchParams } from "../../../../ui/vendor/getto-application/board/kernel/convert"
-import {
-    BoardValue,
-    emptyBoardValue,
-} from "../../../../ui/vendor/getto-application/board/kernel/data"
+import { readSearchParams } from "../../../z_vendor/getto-application/board/kernel/convert"
+import { BoardValue, emptyBoardValue } from "../../../z_vendor/getto-application/board/kernel/data"
 import { normalSearchSortOrder, SearchSort } from "./sort/data"
 
 const SEARCH_OFFSET = "search-offset"

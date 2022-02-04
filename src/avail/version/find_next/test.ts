@@ -1,7 +1,7 @@
-import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
+import { setupActionTestRunner } from "../../../z_vendor/getto-application/action/test_helper"
 import { standardApplicationTargetPath } from "./test_helper"
 
-import { toApplicationView } from "../../../../ui/vendor/getto-application/action/helper"
+import { toApplicationView } from "../../../z_vendor/getto-application/action/helper"
 import { ticker } from "../../../z_lib/ui/timer/helper"
 import { mockFindNextVersionShell } from "./init/mock"
 
@@ -10,7 +10,7 @@ import { applicationPath } from "./helper"
 import { CheckDeployExistsRemote } from "./infra"
 
 import { FindNextVersionAction, initFindNextVersionAction } from "../find_next/action"
-import { ApplicationView } from "../../../../ui/vendor/getto-application/action/action"
+import { ApplicationView } from "../../../z_vendor/getto-application/action/action"
 
 describe("FindNextVersion", () => {
     test("up to date", async () => {

@@ -1,11 +1,11 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { field } from "../../../../../ui/vendor/getto-css/preact/design/form"
+import { field } from "../../../../z_vendor/getto-css/preact/design/form"
 
 import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 
-import { SelectBoardComponent } from "../../../../../ui/vendor/getto-application/board/input/x_preact/select"
+import { SelectBoardComponent } from "../../../../z_vendor/getto-application/board/input/x_preact/select"
 
 import { seasonLabel } from "../../kernel/helper"
 

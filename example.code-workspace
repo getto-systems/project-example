@@ -19,10 +19,6 @@
             "path": "api/ci"
         },
         {
-            "name": "ui/vendor",
-            "path": "ui/vendor"
-        },
-        {
             "name": "ui/css",
             "path": "ui/css"
         },

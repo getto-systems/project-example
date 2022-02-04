@@ -1,16 +1,16 @@
 import {
     StatefulApplicationAction,
     AbstractStatefulApplicationAction,
-} from "../../../../../ui/vendor/getto-application/action/action"
+} from "../../../../z_vendor/getto-application/action/action"
 import {
     MultipleInputBoardAction,
     initMultipleInputBoardAction,
-} from "../../../../../ui/vendor/getto-application/board/input/action"
+} from "../../../../z_vendor/getto-application/board/input/action"
 
 import { toSearchColumns } from "./convert"
 
 import { SearchColumnsRepository } from "./infra"
-import { MultipleBoardValueStore } from "../../../../../ui/vendor/getto-application/board/input/infra"
+import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
 import { SearchColumns } from "./data"
 import { RepositoryError } from "../../repository/data"

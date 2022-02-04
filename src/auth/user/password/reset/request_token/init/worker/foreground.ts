@@ -1,6 +1,6 @@
-import { ApplicationView } from "../../../../../../../../ui/vendor/getto-application/action/action"
-import { toApplicationView } from "../../../../../../../../ui/vendor/getto-application/action/helper"
-import { newWorkerProxyMap } from "../../../../../../../../ui/vendor/getto-application/action/worker/foreground"
+import { ApplicationView } from "../../../../../../../z_vendor/getto-application/action/action"
+import { toApplicationView } from "../../../../../../../z_vendor/getto-application/action/helper"
+import { newWorkerProxyMap } from "../../../../../../../z_vendor/getto-application/action/worker/foreground"
 
 import {
     initRequestResetTokenAction,

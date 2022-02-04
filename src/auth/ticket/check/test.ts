@@ -1,5 +1,5 @@
-import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
-import { toApplicationView } from "../../../../ui/vendor/getto-application/action/helper"
+import { setupActionTestRunner } from "../../../z_vendor/getto-application/action/test_helper"
+import { toApplicationView } from "../../../z_vendor/getto-application/action/helper"
 import { ticker } from "../../../z_lib/ui/timer/helper"
 
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../z_lib/ui/clock/mock"
@@ -15,7 +15,7 @@ import { WaitTime } from "../../../z_lib/ui/config/infra"
 import { AuthTicketRepository, AuthTicketRepositoryValue } from "../kernel/infra"
 import { CheckAuthTicketRemote } from "./infra"
 
-import { ApplicationView } from "../../../../ui/vendor/getto-application/action/action"
+import { ApplicationView } from "../../../z_vendor/getto-application/action/action"
 import { CheckAuthTicketAction, initCheckAuthTicketAction } from "./action"
 
 import { LoadScriptError } from "../../sign/get_script_path/data"

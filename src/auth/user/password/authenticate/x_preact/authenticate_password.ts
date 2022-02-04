@@ -7,9 +7,9 @@ import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/
 import {
     useApplicationAction,
     useApplicationView,
-} from "../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+} from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { loginBox } from "../../../../../../ui/vendor/getto-css/preact/layout/login"
+import { loginBox } from "../../../../../z_vendor/getto-css/preact/layout/login"
 import {
     buttons,
     button_disabled,
@@ -17,7 +17,7 @@ import {
     button_undo,
     fieldError,
     form,
-} from "../../../../../../ui/vendor/getto-css/preact/design/form"
+} from "../../../../../z_vendor/getto-css/preact/design/form"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../../x_content/site"
@@ -29,9 +29,9 @@ import { ApplicationErrorComponent } from "../../../../../avail/x_preact/applica
 import { InputLoginIDEntry } from "../../../login_id/input/x_preact/input"
 import { InputPasswordEntry } from "../../input/x_preact/input"
 
-import { ApplicationView } from "../../../../../../ui/vendor/getto-application/action/action"
+import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 import { AuthenticatePasswordAction, AuthenticatePasswordState } from "../action"
-import { ValidateBoardActionState } from "../../../../../../ui/vendor/getto-application/board/validate_board/action"
+import { ValidateBoardActionState } from "../../../../../z_vendor/getto-application/board/validate_board/action"
 
 import { AuthenticatePasswordError } from "../data"
 

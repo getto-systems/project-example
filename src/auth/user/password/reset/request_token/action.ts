@@ -3,21 +3,21 @@ import { delayedChecker } from "../../../../../z_lib/ui/timer/helper"
 import {
     StatefulApplicationAction,
     AbstractStatefulApplicationAction,
-} from "../../../../../../ui/vendor/getto-application/action/action"
+} from "../../../../../z_vendor/getto-application/action/action"
 import { initSignLink } from "../../../../sign/nav/resource"
 import { initInputLoginIDAction } from "../../../login_id/input/action"
-import { initValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/validate_board/action"
+import { initValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
 
 import { SignLink } from "../../../../sign/nav/resource"
 import { InputLoginIDAction } from "../../../login_id/input/action"
-import { ValidateBoardAction } from "../../../../../../ui/vendor/getto-application/board/validate_board/action"
+import { ValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
 
 import { RequestResetTokenRemote } from "./infra"
 import { DelayTime } from "../../../../../z_lib/ui/config/infra"
-import { ValidateBoardChecker } from "../../../../../../ui/vendor/getto-application/board/validate_board/infra"
+import { ValidateBoardChecker } from "../../../../../z_vendor/getto-application/board/validate_board/infra"
 
 import { RequestResetTokenError, RequestResetTokenFields } from "./data"
-import { ConvertBoardResult } from "../../../../../../ui/vendor/getto-application/board/kernel/data"
+import { ConvertBoardResult } from "../../../../../z_vendor/getto-application/board/kernel/data"
 
 export interface RequestResetTokenAction extends StatefulApplicationAction<RequestResetTokenState> {
     readonly link: SignLink

@@ -1,7 +1,7 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { container } from "../../../../../../ui/vendor/getto-css/preact/design/box"
+import { container } from "../../../../../z_vendor/getto-css/preact/design/box"
 
 import { SearchAuthUserAccountFormEntry } from "./form"
 import { SearchAuthUserAccountPagerEntry } from "./pager"

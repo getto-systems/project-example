@@ -1,4 +1,4 @@
-import { toApplicationView } from "../../../../../ui/vendor/getto-application/action/helper"
+import { toApplicationView } from "../../../../z_vendor/getto-application/action/helper"
 
 import { newCheckAuthTicketConfig } from "./config"
 
@@ -12,7 +12,7 @@ import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/featur
 import { LocationOutsideFeature } from "../../../../z_lib/ui/location/feature"
 
 import { CheckAuthTicketAction, initCheckAuthTicketAction } from "../action"
-import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
+import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 
 type OutsideFeature = RemoteOutsideFeature & RepositoryOutsideFeature & LocationOutsideFeature
 export function newCheckAuthTicketView(

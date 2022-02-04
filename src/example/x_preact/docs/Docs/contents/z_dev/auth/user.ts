@@ -1,8 +1,8 @@
 import { VNode } from "preact"
 import { html } from "htm/preact"
 
-import { box, container } from "../../../../../../../../ui/vendor/getto-css/preact/design/box"
-import { v_medium } from "../../../../../../../../ui/vendor/getto-css/preact/design/alignment"
+import { box, container } from "../../../../../../../z_vendor/getto-css/preact/design/box"
+import { v_medium } from "../../../../../../../z_vendor/getto-css/preact/design/alignment"
 
 import { itemsSection } from "../../../box"
 

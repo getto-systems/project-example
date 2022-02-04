@@ -3,7 +3,7 @@ import { html } from "htm/preact"
 
 import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_error/reason"
 
-import { useApplicationAction } from "../../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     buttons,
@@ -12,17 +12,17 @@ import {
     button_undo,
     fieldError,
     form,
-} from "../../../../../../../ui/vendor/getto-css/preact/design/form"
+} from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { spinner } from "../../../../../../example/x_preact/design/icon"
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
 import { InputLoginIDEntry } from "../../../../login_id/input/x_preact/input"
 
 import { RequestResetTokenError } from "../data"
-import { box } from "../../../../../../../ui/vendor/getto-css/preact/design/box"
-import { notice_success } from "../../../../../../../ui/vendor/getto-css/preact/design/highlight"
+import { box } from "../../../../../../z_vendor/getto-css/preact/design/box"
+import { notice_success } from "../../../../../../z_vendor/getto-css/preact/design/highlight"
 import { RequestResetTokenProfileAction, RequestResetTokenProfileState } from "../action"
-import { ValidateBoardActionState } from "../../../../../../../ui/vendor/getto-application/board/validate_board/action"
+import { ValidateBoardActionState } from "../../../../../../z_vendor/getto-application/board/validate_board/action"
 
 type EntryProps = Readonly<{
     requestToken: RequestResetTokenProfileAction

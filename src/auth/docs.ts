@@ -6,7 +6,7 @@ import { docs_requestResetToken } from "./user/password/reset/request_token/docs
 import { docs_resetPassword } from "./user/password/reset/reset/docs"
 import { docs_changePassword } from "./user/password/change/docs"
 
-import { DocsAction, DocsDomain } from "../../ui/vendor/getto-application/docs/data"
+import { DocsAction, DocsDomain } from "../z_vendor/getto-application/docs/data"
 
 const docs_loadApplication: DocsAction = {
     title: "アプリケーションのロード",

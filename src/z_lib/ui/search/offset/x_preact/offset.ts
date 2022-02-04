@@ -1,10 +1,10 @@
 import { h, VNode } from "preact"
 
-import { field, pager } from "../../../../../../ui/vendor/getto-css/preact/design/form"
+import { field, pager } from "../../../../../z_vendor/getto-css/preact/design/form"
 
 import { VNodeContent } from "../../../x_preact/common"
 
-import { SelectBoardComponent } from "../../../../../../ui/vendor/getto-application/board/input/x_preact/select"
+import { SelectBoardComponent } from "../../../../../z_vendor/getto-application/board/input/x_preact/select"
 
 import { SearchOffsetAction } from "../action"
 

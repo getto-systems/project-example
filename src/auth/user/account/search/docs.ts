@@ -5,9 +5,9 @@
 //     docsModule,
 //     docsNote,
 //     docsSection,
-// } from "../../../../../ui/vendor/getto-application/docs/helper"
+// } from "../../../../z_vendor/getto-application/docs/helper"
 
-// import { DocsSection } from "../../../../../ui/vendor/getto-application/docs/data"
+// import { DocsSection } from "../../../../z_vendor/getto-application/docs/data"
 
 // export const docs_authenticatePassword = docsAction("パスワード認証", ({ item }) => [
 //     item("input", ["ログインID", "パスワード"]),

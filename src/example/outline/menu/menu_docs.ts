@@ -8,7 +8,7 @@ import { docs_avail } from "../../../avail/docs"
 
 import { MenuContent, MenuPermission, MenuTreeNode } from "../kernel/infra"
 
-import { DocsDomain } from "../../../../ui/vendor/getto-application/docs/data"
+import { DocsDomain } from "../../../z_vendor/getto-application/docs/data"
 import { docs_docs } from "../../../docs/docs"
 
 export function docsMenuContent(): MenuContent {

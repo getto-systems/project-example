@@ -1,4 +1,4 @@
-import { toApplicationView } from "../../../../../../ui/vendor/getto-application/action/helper"
+import { toApplicationView } from "../../../../../z_vendor/getto-application/action/helper"
 
 import { newAuthenticatePasswordConfig } from "./config"
 
@@ -12,7 +12,7 @@ import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 import { RepositoryOutsideFeature } from "../../../../../z_lib/ui/repository/feature"
 import { LocationOutsideFeature } from "../../../../../z_lib/ui/location/feature"
 
-import { ApplicationView } from "../../../../../../ui/vendor/getto-application/action/action"
+import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 import { AuthenticatePasswordAction, initAuthenticatePasswordAction } from "../action"
 
 export function newAuthenticatePasswordView(

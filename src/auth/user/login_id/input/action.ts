@@ -1,26 +1,26 @@
 import { loginIDBoardConverter } from "./convert"
 
-import { initBoardFieldObserver } from "../../../../../ui/vendor/getto-application/board/observe_field/init/observer"
+import { initBoardFieldObserver } from "../../../../z_vendor/getto-application/board/observe_field/init/observer"
 
-import { ApplicationAction } from "../../../../../ui/vendor/getto-application/action/action"
-import { initObserveBoardFieldAction } from "../../../../../ui/vendor/getto-application/board/observe_field/action"
+import { ApplicationAction } from "../../../../z_vendor/getto-application/action/action"
+import { initObserveBoardFieldAction } from "../../../../z_vendor/getto-application/board/observe_field/action"
 import {
     initInputBoardAction,
     InputBoardAction,
-} from "../../../../../ui/vendor/getto-application/board/input/action"
-import { ObserveBoardFieldAction } from "../../../../../ui/vendor/getto-application/board/observe_field/action"
+} from "../../../../z_vendor/getto-application/board/input/action"
+import { ObserveBoardFieldAction } from "../../../../z_vendor/getto-application/board/observe_field/action"
 import {
     initValidateBoardFieldAction,
     ValidateBoardFieldAction,
     ValidateBoardFieldState,
-} from "../../../../../ui/vendor/getto-application/board/validate_field/action"
+} from "../../../../z_vendor/getto-application/board/validate_field/action"
 
-import { BoardFieldChecker } from "../../../../../ui/vendor/getto-application/board/validate_field/infra"
+import { BoardFieldChecker } from "../../../../z_vendor/getto-application/board/validate_field/infra"
 
 import {
     BoardValue,
     emptyBoardValue,
-} from "../../../../../ui/vendor/getto-application/board/kernel/data"
+} from "../../../../z_vendor/getto-application/board/kernel/data"
 import { LoginID, ValidateLoginIDError } from "./data"
 
 export interface InputLoginIDAction extends ApplicationAction {

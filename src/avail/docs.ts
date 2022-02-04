@@ -1,7 +1,7 @@
 import { docs_notifyUnexpectedError } from "./unexpected_error/notify/docs"
 import { docs_findNextVersion } from "./version/find_next/docs"
 
-import { DocsAction, DocsDomain } from "../../ui/vendor/getto-application/docs/data"
+import { DocsAction, DocsDomain } from "../z_vendor/getto-application/docs/data"
 
 const docs_guaranteeOnTimeAccess: DocsAction = {
     title: "業務時間内のアクセスを保証",

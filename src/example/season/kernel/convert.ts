@@ -2,7 +2,7 @@ import { RepositoryConverter } from "../../../z_lib/ui/repository/infra"
 import { SeasonExpires, SeasonRepositoryValue } from "./infra"
 
 import { ConvertSeasonResult, Season } from "./data"
-import { BoardValue } from "../../../../ui/vendor/getto-application/board/kernel/data"
+import { BoardValue } from "../../../z_vendor/getto-application/board/kernel/data"
 
 type SeasonBasket = Readonly<{
     year: number

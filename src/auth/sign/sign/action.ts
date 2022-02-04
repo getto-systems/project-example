@@ -2,7 +2,7 @@ import {
     StatefulApplicationAction,
     AbstractStatefulApplicationAction,
     ApplicationView,
-} from "../../../../ui/vendor/getto-application/action/action"
+} from "../../../z_vendor/getto-application/action/action"
 import { CheckAuthTicketAction } from "../../ticket/check/action"
 import { AuthenticatePasswordAction } from "../../user/password/authenticate/action"
 import { RequestResetTokenAction } from "../../user/password/reset/request_token/action"

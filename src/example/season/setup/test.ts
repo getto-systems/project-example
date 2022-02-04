@@ -1,10 +1,10 @@
-import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
+import { setupActionTestRunner } from "../../../z_vendor/getto-application/action/test_helper"
 
 import { markSeason } from "../kernel/test_helper"
 
 import { mockClock, mockClockPubSub } from "../../../z_lib/ui/clock/mock"
-import { mockBoardValueStore } from "../../../../ui/vendor/getto-application/board/input/init/mock"
-import { markBoardValue } from "../../../../ui/vendor/getto-application/board/kernel/mock"
+import { mockBoardValueStore } from "../../../z_vendor/getto-application/board/input/init/mock"
+import { markBoardValue } from "../../../z_vendor/getto-application/board/kernel/mock"
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 
 import { initSetupSeasonAction } from "./action"
@@ -13,7 +13,7 @@ import { SetupSeasonAction } from "./action"
 import { initialLoadSeasonState } from "../load/action"
 
 import { SeasonRepository } from "../kernel/infra"
-import { BoardValueStore } from "../../../../ui/vendor/getto-application/board/input/infra"
+import { BoardValueStore } from "../../../z_vendor/getto-application/board/input/infra"
 
 import { seasonRepositoryConverter, seasonToBoardValue } from "../kernel/convert"
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"

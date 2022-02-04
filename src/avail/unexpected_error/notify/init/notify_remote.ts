@@ -7,7 +7,7 @@ import {
     remoteCommonError,
     remoteInfraError,
 } from "../../../../z_lib/ui/remote/init/helper"
-import { encodeProtobuf } from "../../../../../ui/vendor/protobuf/helper"
+import { encodeProtobuf } from "../../../../z_vendor/protobuf/helper"
 
 import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
 

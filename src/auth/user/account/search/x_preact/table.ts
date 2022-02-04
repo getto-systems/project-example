@@ -1,7 +1,7 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { useApplicationAction } from "../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     table,
@@ -9,7 +9,7 @@ import {
     tableHeader,
     tbody,
     thead,
-} from "../../../../../../ui/vendor/getto-css/preact/design/data"
+} from "../../../../../z_vendor/getto-css/preact/design/data"
 
 import { SearchAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
 import { SearchColumnsState } from "../../../../../z_lib/ui/search/columns/action"

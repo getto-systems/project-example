@@ -1,5 +1,5 @@
-import { setupActionTestRunner } from "../../../../ui/vendor/getto-application/action/test_helper"
-import { toApplicationView } from "../../../../ui/vendor/getto-application/action/helper"
+import { setupActionTestRunner } from "../../../z_vendor/getto-application/action/test_helper"
+import { toApplicationView } from "../../../z_vendor/getto-application/action/helper"
 
 import { newResetPasswordConfig } from "../../user/password/reset/reset/init/config"
 import { newAuthenticatePasswordConfig } from "../../user/password/authenticate/init/config"

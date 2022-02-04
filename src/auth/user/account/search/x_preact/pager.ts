@@ -2,17 +2,17 @@ import { h, VNode } from "preact"
 
 import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
 
-import { useApplicationAction } from "../../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { button_search, fieldError } from "../../../../../../ui/vendor/getto-css/preact/design/form"
-import { box } from "../../../../../../ui/vendor/getto-css/preact/design/box"
+import { button_search, fieldError } from "../../../../../z_vendor/getto-css/preact/design/form"
+import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { pagerCount, pagerParams } from "../../../../../example/x_preact/design/table"
 
 import { SearchOffsetComponent } from "../../../../../z_lib/ui/search/offset/x_preact/offset"
 
 import { SearchAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
 
-import { pagerOptions } from "../../../../../../ui/vendor/getto-css/preact/design/data"
+import { pagerOptions } from "../../../../../z_vendor/getto-css/preact/design/data"
 import { SearchPageResponse } from "../../../../../z_lib/ui/search/data"
 import { RemoteCommonError } from "../../../../../z_lib/ui/remote/data"
 

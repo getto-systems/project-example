@@ -3,7 +3,7 @@ import { availableSeasons } from "../kernel/init/available_seasons"
 import {
     AbstractStatefulApplicationAction,
     StatefulApplicationAction,
-} from "../../../../ui/vendor/getto-application/action/action"
+} from "../../../z_vendor/getto-application/action/action"
 import { initInputSeasonAction, InputSeasonAction } from "../input/action"
 import { LoadSeasonState } from "../load/action"
 
@@ -13,7 +13,7 @@ import { SeasonRepository } from "../kernel/infra"
 import { Clock } from "../../../z_lib/ui/clock/infra"
 import { ExpireTime } from "../../../z_lib/ui/config/infra"
 
-import { BoardValue } from "../../../../ui/vendor/getto-application/board/kernel/data"
+import { BoardValue } from "../../../z_vendor/getto-application/board/kernel/data"
 import { RepositoryError } from "../../../z_lib/ui/repository/data"
 
 export interface SetupSeasonAction extends StatefulApplicationAction<SetupSeasonState> {

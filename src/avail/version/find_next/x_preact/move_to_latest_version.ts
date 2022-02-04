@@ -5,9 +5,9 @@ import { html } from "htm/preact"
 import {
     useApplicationAction,
     useApplicationView,
-} from "../../../../../ui/vendor/getto-application/action/x_preact/hooks"
+} from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { loginBox } from "../../../../../ui/vendor/getto-css/preact/layout/login"
+import { loginBox } from "../../../../z_vendor/getto-css/preact/layout/login"
 import { siteInfo } from "../../../../x_content/site"
 import { spinner } from "../../../../example/x_preact/design/icon"
 
@@ -16,7 +16,7 @@ import { ApplicationErrorComponent } from "../../../x_preact/application_error"
 import { applicationPath } from "../../find_next/helper"
 
 import { CheckDeployExistsError } from "../../find_next/data"
-import { ApplicationView } from "../../../../../ui/vendor/getto-application/action/action"
+import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 import { FindNextVersionAction, FindNextVersionState } from "../action"
 
 export function MoveToLatestVersionEntry(view: ApplicationView<FindNextVersionAction>): VNode {

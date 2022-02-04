@@ -1,14 +1,11 @@
-import { ApplicationAction } from "../../../../ui/vendor/getto-application/action/action"
+import { ApplicationAction } from "../../../z_vendor/getto-application/action/action"
 
 import {
     InputBoardAction,
     initInputBoardAction,
-} from "../../../../ui/vendor/getto-application/board/input/action"
+} from "../../../z_vendor/getto-application/board/input/action"
 
-import {
-    BoardValue,
-    emptyBoardValue,
-} from "../../../../ui/vendor/getto-application/board/kernel/data"
+import { BoardValue, emptyBoardValue } from "../../../z_vendor/getto-application/board/kernel/data"
 
 export interface InputSeasonAction extends ApplicationAction {
     readonly input: InputBoardAction

@@ -1,4 +1,4 @@
-import { BoardValue } from "../../../../../ui/vendor/getto-application/board/kernel/data"
+import { BoardValue } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { SearchPageResponse } from "../../../../z_lib/ui/search/data"
 import { SearchSort } from "../../../../z_lib/ui/search/sort/data"
 import { AuthUserAccountBasket } from "../kernel/data"

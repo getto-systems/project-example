@@ -1,7 +1,7 @@
 import {
     StatefulApplicationAction,
     AbstractStatefulApplicationAction,
-} from "../../../../ui/vendor/getto-application/action/action"
+} from "../../../z_vendor/getto-application/action/action"
 import { DelayTime } from "../../../z_lib/ui/config/infra"
 import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 import { delayedChecker } from "../../../z_lib/ui/timer/helper"

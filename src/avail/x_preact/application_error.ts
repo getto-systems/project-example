@@ -1,9 +1,9 @@
 import { VNode } from "preact"
 import { html } from "htm/preact"
 
-import { v_small } from "../../../ui/vendor/getto-css/preact/design/alignment"
-import { buttons, field } from "../../../ui/vendor/getto-css/preact/design/form"
-import { loginBox } from "../../../ui/vendor/getto-css/preact/layout/login"
+import { v_small } from "../../z_vendor/getto-css/preact/design/alignment"
+import { buttons, field } from "../../z_vendor/getto-css/preact/design/form"
+import { loginBox } from "../../z_vendor/getto-css/preact/layout/login"
 
 import { env } from "../../y_environment/ui/env"
 
@@ -21,7 +21,11 @@ export function ApplicationErrorComponent(props: Props): VNode {
                 これはシステム側の不備です
             </p>`,
             v_small(),
-            field({ title: "画面", body: html`<pre>${location.pathname}</pre>`, help: [location.host] }),
+            field({
+                title: "画面",
+                body: html`<pre>${location.pathname}</pre>`,
+                help: [location.host],
+            }),
             field({ title: "詳細", body: detail(props.err) }),
             html`<p>
                 お手数ですが、管理者に詳細をお伝えください<br />

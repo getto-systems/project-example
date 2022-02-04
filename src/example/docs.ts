@@ -1,4 +1,4 @@
-import { DocsAction, DocsDomain } from "../../ui/vendor/getto-application/docs/data"
+import { DocsAction, DocsDomain } from "../z_vendor/getto-application/docs/data"
 
 const docs_app: DocsAction = {
     title: "業務アプリケーション",

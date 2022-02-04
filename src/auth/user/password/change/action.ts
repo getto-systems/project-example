@@ -1,21 +1,21 @@
 import {
     StatefulApplicationAction,
     AbstractStatefulApplicationAction,
-} from "../../../../../ui/vendor/getto-application/action/action"
+} from "../../../../z_vendor/getto-application/action/action"
 
 import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 import { initInputPasswordAction } from "../input/action"
-import { initValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/validate_board/action"
+import { initValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
 
 import { InputPasswordAction } from "../input/action"
-import { ValidateBoardAction } from "../../../../../ui/vendor/getto-application/board/validate_board/action"
+import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
 
 import { ChangePasswordError, ChangePasswordFields } from "./data"
-import { ConvertBoardResult } from "../../../../../ui/vendor/getto-application/board/kernel/data"
+import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 
 import { ChangePasswordRemote } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
-import { ValidateBoardChecker } from "../../../../../ui/vendor/getto-application/board/validate_board/infra"
+import { ValidateBoardChecker } from "../../../../z_vendor/getto-application/board/validate_board/infra"
 
 export interface ChangePasswordAction extends StatefulApplicationAction<ChangePasswordState> {
     readonly currentPassword: InputPasswordAction
