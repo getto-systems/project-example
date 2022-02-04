@@ -5,7 +5,9 @@ use tonic::{Response, Status};
 use crate::z_lib::api::response::tonic::RespondTo;
 
 use crate::auth::{
-    ticket::y_protobuf::service::{ValidateApiTokenRequestPb, ValidateApiTokenResponsePb},
+    ticket::validate::y_protobuf::service::{
+        ValidateApiTokenRequestPb, ValidateApiTokenResponsePb,
+    },
     user::y_protobuf::service::GrantedAuthRolesPb,
 };
 

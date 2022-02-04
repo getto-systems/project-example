@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package auth.ticket.validate.service;
+
+service ValidateApiTokenPb {
+    rpc Validate (ValidateApiTokenRequestPb) returns (ValidateApiTokenResponsePb);
+}
+message ValidateApiTokenRequestPb {
+    bool allow_any_role = 1;
+    repeated string require_roles = 2;
+}
+message ValidateApiTokenResponsePb {}
