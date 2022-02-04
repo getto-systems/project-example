@@ -1,6 +1,6 @@
 use tonic::Request;
 
-use crate::auth::ticket::remote::y_protobuf::service::{
+use crate::auth::ticket::y_protobuf::service::{
     check_auth_ticket_pb_client::CheckAuthTicketPbClient, CheckAuthTicketRequestPb,
 };
 

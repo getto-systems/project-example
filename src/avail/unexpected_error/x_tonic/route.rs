@@ -1,4 +1,4 @@
-use crate::avail::unexpected_error::remote::y_protobuf::service::notify_pb_server::NotifyPbServer;
+use crate::avail::unexpected_error::y_protobuf::service::notify_pb_server::NotifyPbServer;
 
 use crate::avail::unexpected_error::notify::remote::x_tonic::route::ServiceNotify;
 

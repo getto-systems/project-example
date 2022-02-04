@@ -1,122 +1,110 @@
 use std::{
     env::var,
-    fs::{create_dir, read_dir, read_to_string, remove_file, DirEntry, File},
-    io::{Error as IoError, Result as IoResult, Write},
-    path::{Path, PathBuf},
+    ffi::OsString,
+    fs::{read_dir, read_to_string, File},
+    io::Write,
+    path::PathBuf,
 };
 
 use regex::{escape, Regex};
 use tonic_build::configure;
 
-pub fn generate(package: &str) {
-    GrpcBuilder::new(GrpcTarget::new(package.into()))
-        .build()
-        .expect(format!("failed to build grpc; {}", package).as_str());
+pub fn generate() {
+    build().expect("failed to build grpc");
 }
 
-struct GrpcTarget {
-    package: String,
-    dist: PathBuf,
-    source: PathBuf,
+fn build() -> std::io::Result<()> {
+    let files = find_proto(PathBuf::from("src"), &vec!["service.proto".into()])?;
+    configure().compile(&files, &["src/"])?;
+    rewrite(&files)?;
+    Ok(())
 }
 
-impl GrpcTarget {
-    fn new(package: String) -> Self {
-        let target = format!("src/{}", package.replace(".", "/"));
-        let target = Path::new(&target);
-
-        let source = target.join("z_protobuf");
-        let dist = target.join("remote/y_protobuf");
-
-        Self {
-            package,
-            source,
-            dist,
+fn find_proto(root: PathBuf, targets: &[OsString]) -> std::io::Result<Vec<PathBuf>> {
+    let mut files: Vec<PathBuf> = vec![];
+    for entry in read_dir(root)? {
+        let entry = entry?;
+        let file_type = entry.file_type()?;
+        if file_type.is_dir() {
+            find_proto(entry.path(), targets)?
+                .into_iter()
+                .for_each(|file| files.push(file));
         }
-    }
-}
-
-struct GrpcBuilder {
-    target: GrpcTarget,
-}
-
-impl GrpcBuilder {
-    fn new(target: GrpcTarget) -> Self {
-        Self { target }
-    }
-
-    fn build(&self) -> IoResult<()> {
-        self.cleanup()?;
-        self.protobuf()?;
-        Ok(())
-    }
-
-    fn cleanup(&self) -> IoResult<()> {
-        if self.target.dist.exists() {
-            self.source_proto_basename()?.fold(Ok(()), |acc, name| {
-                acc?;
-                let file = self.target.dist.join(format!("{}.rs", name));
-                if file.exists() {
-                    remove_file(file)
-                } else {
-                    Ok(())
+        if file_type.is_file() {
+            if let Some(file_name) = entry.path().file_name() {
+                if targets.iter().any(|target| file_name == target) {
+                    files.push(entry.path());
                 }
-            })?;
-        } else {
-            create_dir(self.target.dist.as_path())?;
+            }
         }
-
-        Ok(())
     }
-    fn protobuf(&self) -> IoResult<()> {
-        let out_dir = var("OUT_DIR").expect("OUT_DIR is not defined");
+    Ok(files)
+}
 
-        let inputs: Vec<PathBuf> = self.source_proto()?.collect();
-
-        configure().compile(&inputs, &["src/"])?;
-
-        // 他の proto は remote::y_protobuf を追加して参照しないといけない
-        self.source_proto_basename()?.fold(Ok(()), |acc, name| {
+fn rewrite(files: &[PathBuf]) -> std::io::Result<()> {
+    // rust の package として y_protobuf を追加しているので、書き換えないといけない
+    let out_dir = var("OUT_DIR").expect("OUT_DIR is not defined");
+    files
+        .iter()
+        .filter_map(|file| {
+            match (
+                dist(file),
+                package(file),
+                file.file_stem().and_then(|name| name.to_str()),
+            ) {
+                (Some(file), Some(package), Some(name)) => Some((file, package, name)),
+                _ => None,
+            }
+        })
+        .fold(Ok(()), |acc, (file, package, name)| {
             acc?;
 
-            let import_ref_regex =
-                Regex::new(&format!("super::(.*)::{}::", escape(&name))).unwrap();
-            let content =
-                read_to_string(format!("{}/{}.{}.rs", out_dir, self.target.package, name))?;
-            let mut file = File::create(self.target.dist.join(format!("{}.rs", name)))?;
+            let pattern = Regex::new(&format!("super::(.*)::{}::", escape(name))).unwrap();
+            let content = read_to_string(format!("{}/{}.rs", out_dir, package))?;
+            let mut file = File::create(file)?;
             write!(
                 file,
                 "{}",
-                import_ref_regex.replace_all(
+                pattern.replace_all(
                     &content,
-                    format!("super::super::super::$1::remote::y_protobuf::{}::", name)
+                    format!("super::super::$1::y_protobuf::{}::", name)
                 ),
             )?;
             file.flush()
         })
-    }
-
-    fn source_proto(&self) -> IoResult<impl Iterator<Item = PathBuf>> {
-        Ok(read_dir(self.target.source.as_path())?.filter_map(filter_proto))
-    }
-    fn source_proto_basename(&self) -> IoResult<impl Iterator<Item = String>> {
-        Ok(self.source_proto()?.filter_map(pickup_basename))
-    }
 }
 
-fn filter_proto(result: Result<DirEntry, IoError>) -> Option<PathBuf> {
-    result.ok().and_then(|entry| {
-        entry
-            .path()
-            .file_name()
-            .and_then(|name| match name.to_str() {
-                Some("service.proto") => Some(entry.path()),
-                _ => None,
-            })
-    })
+fn dist(path: &PathBuf) -> Option<PathBuf> {
+    match (path.parent(), path.file_stem()) {
+        (Some(parent), Some(name)) => {
+            let mut dist = path.clone();
+            dist.pop();
+            if parent.ends_with("z_protobuf") {
+                dist.pop();
+                dist.push("y_protobuf");
+            }
+            dist.push(name);
+            dist.set_extension("rs");
+            Some(dist)
+        }
+        _ => None,
+    }
 }
-fn pickup_basename(file: PathBuf) -> Option<String> {
-    file.file_stem()
-        .and_then(|name| name.to_str())
-        .map(|name| name.to_string())
+fn package(path: &PathBuf) -> Option<String> {
+    match (path.parent(), path.file_stem()) {
+        (Some(parent), Some(name)) => {
+            let mut package = path.clone();
+            package.pop();
+            if parent.ends_with("z_protobuf") {
+                package.pop();
+            }
+            package.push(name);
+            package
+                .strip_prefix("src/")
+                .ok()
+                .and_then(|path| path.to_str())
+                .map(|path| path.to_owned().replace("/", "."))
+        }
+        _ => None,
+    }
 }

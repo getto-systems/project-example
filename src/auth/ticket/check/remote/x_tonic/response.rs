@@ -2,7 +2,7 @@ use tonic::{Response, Status};
 
 use crate::z_lib::remote::response::tonic::RespondTo;
 
-use crate::auth::ticket::remote::y_protobuf::service::{
+use crate::auth::ticket::y_protobuf::service::{
     CheckAuthTicketMaskedResponsePb, CheckAuthTicketResponsePb, EncodedAuthTokensPb,
 };
 

@@ -2,7 +2,7 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::auth::user::account::remote::y_protobuf::service::{
+use crate::auth::user::account::y_protobuf::service::{
     search_auth_user_account_pb_server::SearchAuthUserAccountPb, SearchAuthUserAccountRequestPb,
     SearchAuthUserAccountResponsePb,
 };

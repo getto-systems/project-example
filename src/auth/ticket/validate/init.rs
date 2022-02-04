@@ -9,7 +9,7 @@ pub mod validate_service;
 use actix_web::HttpRequest;
 use tonic::metadata::MetadataMap;
 
-use crate::auth::ticket::remote::y_protobuf::service::ValidateApiTokenRequestPb;
+use crate::auth::ticket::y_protobuf::service::ValidateApiTokenRequestPb;
 
 use crate::{
     auth::x_outside_feature::remote::{

@@ -4,7 +4,7 @@ use getto_application::helper::flatten;
 
 use crate::z_lib::remote::{logger::Logger, response::tonic::RespondTo};
 
-use crate::auth::ticket::remote::y_protobuf::service::{
+use crate::auth::ticket::y_protobuf::service::{
     logout_pb_server::LogoutPb, LogoutRequestPb, LogoutResponsePb,
 };
 

@@ -8,7 +8,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::{
     ticket::validate::init::ValidateAuthNonceStruct,
-    user::password::reset::remote::y_protobuf::service::RequestResetTokenRequestPb,
+    user::password::reset::y_protobuf::service::RequestResetTokenRequestPb,
 };
 
 use crate::x_outside_feature::remote::auth::feature::AuthAppFeature;

@@ -7,6 +7,10 @@ build = "api/setup/build.rs"
 default-run = "api"
 
 [[bin]]
+name = "build-example"
+path = "src/x_main/example.rs"
+
+[[bin]]
 name = "api"
 path = "src/x_main/api/main.rs"
 

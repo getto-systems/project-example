@@ -5,8 +5,8 @@ use tonic::{Response, Status};
 use crate::z_lib::remote::response::tonic::RespondTo;
 
 use crate::auth::{
-    ticket::remote::y_protobuf::service::{ValidateApiTokenRequestPb, ValidateApiTokenResponsePb},
-    user::remote::y_protobuf::service::GrantedAuthRolesPb,
+    ticket::y_protobuf::service::{ValidateApiTokenRequestPb, ValidateApiTokenResponsePb},
+    user::y_protobuf::service::GrantedAuthRolesPb,
 };
 
 use crate::auth::user::kernel::data::{AuthUser, GrantedAuthRoles, RequireAuthRoles};

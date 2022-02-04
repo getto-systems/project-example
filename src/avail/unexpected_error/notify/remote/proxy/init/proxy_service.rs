@@ -1,7 +1,7 @@
 use prost::Message;
 use tonic::Request;
 
-use crate::avail::unexpected_error::remote::y_protobuf::service::{
+use crate::avail::unexpected_error::y_protobuf::service::{
     notify_pb_client::NotifyPbClient, NotifyRequestPb,
 };
 

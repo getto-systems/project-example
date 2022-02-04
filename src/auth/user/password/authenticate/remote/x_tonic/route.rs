@@ -2,7 +2,7 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::auth::user::password::remote::y_protobuf::service::{
+use crate::auth::user::password::y_protobuf::service::{
     authenticate_password_pb_server::AuthenticatePasswordPb, AuthenticatePasswordRequestPb,
     AuthenticatePasswordResponsePb,
 };

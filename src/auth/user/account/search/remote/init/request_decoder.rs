@@ -1,4 +1,4 @@
-use crate::auth::user::account::remote::y_protobuf::service::SearchAuthUserAccountRequestPb;
+use crate::auth::user::account::y_protobuf::service::SearchAuthUserAccountRequestPb;
 
 use crate::auth::user::account::search::remote::infra::{
     SearchAuthUserAccountFieldsExtract, SearchAuthUserAccountRequestDecoder,

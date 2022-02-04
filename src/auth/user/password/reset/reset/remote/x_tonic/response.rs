@@ -1,9 +1,9 @@
 use tonic::{Response, Status};
 
-use crate::auth::ticket::remote::y_protobuf::service::EncodedAuthTokensPb;
+use crate::auth::ticket::y_protobuf::service::EncodedAuthTokensPb;
 use crate::z_lib::remote::response::tonic::RespondTo;
 
-use crate::auth::user::password::reset::remote::y_protobuf::service::{
+use crate::auth::user::password::reset::y_protobuf::service::{
     ResetPasswordErrorKindPb, ResetPasswordMaskedResponsePb, ResetPasswordResponsePb,
 };
 

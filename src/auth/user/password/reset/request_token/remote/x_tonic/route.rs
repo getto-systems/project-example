@@ -4,7 +4,7 @@ use getto_application::helper::flatten;
 
 use crate::z_lib::remote::{logger::Logger, response::tonic::RespondTo};
 
-use crate::auth::user::password::reset::remote::y_protobuf::service::{
+use crate::auth::user::password::reset::y_protobuf::service::{
     request_reset_token_pb_server::RequestResetTokenPb, RequestResetTokenRequestPb,
     RequestResetTokenResponsePb,
 };
