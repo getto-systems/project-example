@@ -1,7 +1,8 @@
 use tonic::{Response, Status};
 
-use crate::auth::user::account::y_protobuf::service::{
-    AuthUserAccountPb, SearchAuthUserAccountResponsePb,
+use crate::auth::user::account::{
+    search::y_protobuf::service::SearchAuthUserAccountResponsePb,
+    y_protobuf::service::AuthUserAccountPb,
 };
 
 use crate::z_lib::api::response::tonic::RespondTo;
