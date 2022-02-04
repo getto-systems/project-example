@@ -36,7 +36,7 @@ export function newLoadMenuBadgeRemote(feature: RemoteOutsideFeature): LoadMenuB
             }
 
             const message = decodeProtobuf(
-                pb.example.outline.service.LoadMenuBadgeResponsePb,
+                pb.core.outline.load.service.LoadMenuBadgeResponsePb,
                 await response.text(),
             )
             return {
