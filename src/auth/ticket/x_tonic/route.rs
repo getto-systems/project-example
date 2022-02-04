@@ -4,7 +4,7 @@ use crate::auth::ticket::y_protobuf::service::{
 };
 
 use crate::auth::ticket::{
-    check::remote::x_tonic::route::ServiceCheck, logout::remote::x_tonic::route::ServiceLogout,
+    check::api::x_tonic::route::ServiceCheck, logout::api::x_tonic::route::ServiceLogout,
     validate::x_tonic::route::ServiceValidate,
 };
 

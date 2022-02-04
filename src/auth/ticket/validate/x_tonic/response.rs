@@ -2,7 +2,7 @@ use tonic::{Response, Status};
 
 use crate::auth::ticket::y_protobuf::service::ValidateApiTokenResponsePb;
 
-use crate::z_lib::remote::response::tonic::RespondTo;
+use crate::z_lib::api::response::tonic::RespondTo;
 
 use crate::auth::ticket::validate::action::ValidateApiTokenState;
 

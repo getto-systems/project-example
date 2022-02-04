@@ -2,7 +2,7 @@ use std::{collections::HashSet, iter::FromIterator};
 
 use tonic::{Response, Status};
 
-use crate::z_lib::remote::response::tonic::RespondTo;
+use crate::z_lib::api::response::tonic::RespondTo;
 
 use crate::auth::{
     ticket::y_protobuf::service::{ValidateApiTokenRequestPb, ValidateApiTokenResponsePb},

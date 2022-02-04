@@ -3,12 +3,12 @@ use std::collections::HashMap;
 use crate::{
     auth::ticket::{
         encode::data::EncodeAuthTokenError,
-        kernel::remote::data::{
+        kernel::api::data::{
             AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpansionLimitDateTime,
             ExpireDateTime,
         },
     },
-    z_lib::remote::repository::data::RepositoryError,
+    z_lib::api::repository::data::RepositoryError,
 };
 
 #[async_trait::async_trait]

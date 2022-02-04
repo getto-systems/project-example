@@ -2,17 +2,17 @@ use getto_application::data::MethodResult;
 
 use crate::auth::ticket::{
     encode::infra::{AuthTokenEncoder, CloudfrontTokenEncoder, EncodeAuthTicketRepository},
-    kernel::remote::infra::AuthClock,
+    kernel::api::infra::AuthClock,
 };
 
 use crate::{
     auth::ticket::{
         encode::data::{AuthTicketEncoded, AuthTokenExpires, EncodeAuthTokenError},
-        kernel::remote::data::{
+        kernel::api::data::{
             AuthTicket, EncodedAuthTokens, ExpansionLimitDateTime, ExpireDuration,
         },
     },
-    z_lib::remote::repository::data::RepositoryError,
+    z_lib::api::repository::data::RepositoryError,
 };
 
 pub enum EncodeAuthTicketEvent {

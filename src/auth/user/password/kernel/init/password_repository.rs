@@ -1,39 +1,39 @@
 use chrono::{TimeZone, Utc};
 use sqlx::{query, MySql, MySqlPool, Transaction};
 
-use crate::z_lib::remote::repository::{helper::infra_error, mysql::helper::mysql_error};
+use crate::z_lib::api::repository::{helper::infra_error, mysql::helper::mysql_error};
 
 use crate::auth::user::password::{
-    authenticate::remote::infra::VerifyPasswordRepository,
-    change::remote::infra::ChangePasswordRepository,
+    authenticate::api::infra::VerifyPasswordRepository,
+    change::api::infra::ChangePasswordRepository,
     kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword},
     reset::{
         kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
-        request_token::remote::infra::RegisterResetTokenRepository,
-        reset::remote::infra::ResetPasswordRepository,
+        request_token::api::infra::RegisterResetTokenRepository,
+        reset::api::infra::ResetPasswordRepository,
     },
 };
 
 use crate::{
     auth::{
-        ticket::kernel::remote::data::{AuthDateTime, ExpireDateTime},
+        ticket::kernel::api::data::{AuthDateTime, ExpireDateTime},
         user::{
             kernel::data::AuthUserId,
             login_id::kernel::data::LoginId,
             password::{
-                authenticate::remote::data::VerifyPasswordRepositoryError,
-                change::remote::data::ChangePasswordRepositoryError,
+                authenticate::api::data::VerifyPasswordRepositoryError,
+                change::api::data::ChangePasswordRepositoryError,
                 reset::{
                     kernel::data::{
                         ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
                     },
-                    request_token::remote::data::RegisterResetTokenRepositoryError,
-                    reset::remote::data::ResetPasswordRepositoryError,
+                    request_token::api::data::RegisterResetTokenRepositoryError,
+                    reset::api::data::ResetPasswordRepositoryError,
                 },
             },
         },
     },
-    z_lib::remote::repository::data::RepositoryError,
+    z_lib::api::repository::data::RepositoryError,
 };
 
 pub struct MysqlAuthUserPasswordRepository<'a> {
@@ -350,39 +350,39 @@ pub mod test {
 
     use chrono::{DateTime, Utc};
 
-    use crate::z_lib::remote::repository::helper::infra_error;
+    use crate::z_lib::api::repository::helper::infra_error;
 
     use crate::auth::user::password::{
-        authenticate::remote::infra::VerifyPasswordRepository,
-        change::remote::infra::ChangePasswordRepository,
+        authenticate::api::infra::VerifyPasswordRepository,
+        change::api::infra::ChangePasswordRepository,
         kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword},
         reset::{
             kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
-            request_token::remote::infra::RegisterResetTokenRepository,
-            reset::remote::infra::ResetPasswordRepository,
+            request_token::api::infra::RegisterResetTokenRepository,
+            reset::api::infra::ResetPasswordRepository,
         },
     };
 
     use crate::{
         auth::{
-            ticket::kernel::remote::data::{AuthDateTime, ExpireDateTime},
+            ticket::kernel::api::data::{AuthDateTime, ExpireDateTime},
             user::{
                 kernel::data::{AuthUser, AuthUserId},
                 login_id::kernel::data::LoginId,
                 password::{
-                    authenticate::remote::data::VerifyPasswordRepositoryError,
-                    change::remote::data::ChangePasswordRepositoryError,
+                    authenticate::api::data::VerifyPasswordRepositoryError,
+                    change::api::data::ChangePasswordRepositoryError,
                     reset::{
                         kernel::data::{
                             ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
                         },
-                        request_token::remote::data::RegisterResetTokenRepositoryError,
-                        reset::remote::data::ResetPasswordRepositoryError,
+                        request_token::api::data::RegisterResetTokenRepositoryError,
+                        reset::api::data::ResetPasswordRepositoryError,
                     },
                 },
             },
         },
-        z_lib::remote::repository::data::RepositoryError,
+        z_lib::api::repository::data::RepositoryError,
     };
 
     pub type MemoryAuthUserPasswordStore = Mutex<MemoryAuthUserPasswordMap>;

@@ -1,4 +1,4 @@
-use crate::z_lib::remote::message::data::MessageError;
+use crate::z_lib::api::message::data::MessageError;
 
 pub struct AuthProxyResponse(String);
 

@@ -2,13 +2,13 @@ use std::{collections::HashSet, iter::FromIterator};
 
 use sqlx::{query, MySqlPool};
 
-use crate::z_lib::remote::repository::mysql::helper::mysql_error;
+use crate::z_lib::api::repository::mysql::helper::mysql_error;
 
 use crate::auth::user::kernel::infra::AuthUserRepository;
 
 use crate::{
     auth::user::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
-    z_lib::remote::repository::data::RepositoryError,
+    z_lib::api::repository::data::RepositoryError,
 };
 
 pub struct MysqlAuthUserRepository<'a> {
@@ -82,7 +82,7 @@ pub mod test {
 
     use crate::{
         auth::user::kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
-        z_lib::remote::repository::data::RepositoryError,
+        z_lib::api::repository::data::RepositoryError,
     };
 
     pub type MemoryAuthUserStore = Mutex<MemoryAuthUserMap>;

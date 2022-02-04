@@ -1,11 +1,11 @@
 use actix_web::{HttpRequest, HttpResponse};
 
-use crate::auth::ticket::kernel::remote::x_actix_web::header::{
+use crate::auth::ticket::kernel::api::x_actix_web::header::{
     COOKIE_API_TOKEN, COOKIE_CLOUDFRONT_KEY_PAIR_ID, COOKIE_CLOUDFRONT_POLICY,
     COOKIE_CLOUDFRONT_SIGNATURE, COOKIE_TICKET_TOKEN,
 };
 
-use crate::z_lib::remote::response::actix_web::RespondTo;
+use crate::z_lib::api::response::actix_web::RespondTo;
 
 use crate::auth::proxy::action::AuthProxyState;
 

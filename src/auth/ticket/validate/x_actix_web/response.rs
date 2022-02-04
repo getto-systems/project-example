@@ -1,6 +1,6 @@
 use actix_web::{HttpRequest, HttpResponse};
 
-use crate::z_lib::remote::response::actix_web::RespondTo;
+use crate::z_lib::api::response::actix_web::RespondTo;
 
 use crate::auth::ticket::validate::method::ValidateAuthMetadataEvent;
 
