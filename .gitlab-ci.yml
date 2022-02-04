@@ -108,6 +108,7 @@ bump_version-ui:
   before_script:
     - git config user.email admin@getto.systems
     - git config user.name getto
+    - git config merge.renameLimit 999999
     - curl $TRELLIS_GIT_POST/setup.sh | sh -s -- ./vendor/getto-systems
     - export PATH=$PATH:./vendor/getto-systems/git-post/bin
   script:
@@ -218,6 +219,7 @@ bump_version-proxy:
   before_script:
     - git config user.email admin@getto.systems
     - git config user.name getto
+    - git config merge.renameLimit 999999
     - curl $TRELLIS_GIT_POST/setup.sh | sh -s -- ./vendor/getto-systems
     - export PATH=$PATH:./vendor/getto-systems/git-post/bin
   script:
@@ -351,6 +353,7 @@ bump_version-auth:
   before_script:
     - git config user.email admin@getto.systems
     - git config user.name getto
+    - git config merge.renameLimit 999999
     - curl $TRELLIS_GIT_POST/setup.sh | sh -s -- ./vendor/getto-systems
     - export PATH=$PATH:./vendor/getto-systems/git-post/bin
   script:
@@ -464,7 +467,7 @@ release_failure-auth:
   script:
     - curl $TRELLIS_PSYCHER_GETTO/notify-release-failure.sh | sh -s -- $url $channel $version
 
-bump_version-example:
+bump_version-core:
   stage: bump_version
   only:
     refs:
@@ -484,6 +487,7 @@ bump_version-example:
   before_script:
     - git config user.email admin@getto.systems
     - git config user.name getto
+    - git config merge.renameLimit 999999
     - curl $TRELLIS_GIT_POST/setup.sh | sh -s -- ./vendor/getto-systems
     - export PATH=$PATH:./vendor/getto-systems/git-post/bin
   script:
