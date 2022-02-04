@@ -2,19 +2,6 @@ syntax = "proto3";
 
 package auth.ticket.service;
 
-import "auth/user/z_protobuf/service.proto";
-
-service CheckAuthTicketPb {
-    rpc Check (CheckAuthTicketRequestPb) returns (CheckAuthTicketResponsePb);
-}
-message CheckAuthTicketRequestPb {}
-message CheckAuthTicketResponsePb {
-    auth.user.service.GrantedAuthRolesPb roles = 1;
-    EncodedAuthTokensPb token = 2;
-}
-message CheckAuthTicketMaskedResponsePb {
-    auth.user.service.GrantedAuthRolesPb roles = 1;
-}
 message EncodedAuthTokensPb {
     AuthTokenPb ticket_token = 1;
     AuthTokenPb api_token = 2;

@@ -2,8 +2,9 @@ use tonic::{Response, Status};
 
 use crate::z_lib::api::response::tonic::RespondTo;
 
-use crate::auth::ticket::y_protobuf::service::{
-    CheckAuthTicketMaskedResponsePb, CheckAuthTicketResponsePb, EncodedAuthTokensPb,
+use crate::auth::ticket::{
+    check::y_protobuf::service::{CheckAuthTicketMaskedResponsePb, CheckAuthTicketResponsePb},
+    y_protobuf::service::EncodedAuthTokensPb,
 };
 
 use super::super::action::CheckAuthTicketState;
