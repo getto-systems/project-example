@@ -6,7 +6,7 @@ use crate::x_outside_feature::remote::api::feature::ApiAppFeature;
 
 use crate::{
     auth::init::ValidateApiMetadataStruct,
-    example::outline::remote::get_menu_badge::proxy::init::proxy_service::ProxyService,
+    example::outline::load::remote::proxy::init::proxy_service::ProxyService,
 };
 
 use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};

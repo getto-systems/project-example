@@ -1,26 +1,26 @@
 use crate::{
-    example::outline::remote::get_menu_badge::action::GetOutlineMenuBadgeEvent,
+    example::outline::load::remote::action::LoadOutlineMenuBadgeEvent,
     z_lib::remote::logger::{LogFilter, LogLevel, LogMessage},
 };
 
-use super::super::action::GetOutlineMenuBadgeState;
+use super::super::action::LoadOutlineMenuBadgeState;
 
-impl LogMessage for GetOutlineMenuBadgeState {
+impl LogMessage for LoadOutlineMenuBadgeState {
     fn log_message(&self) -> String {
         format!("{}", self)
     }
 }
 
-impl LogFilter for GetOutlineMenuBadgeState {
+impl LogFilter for LoadOutlineMenuBadgeState {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::Validate(event) => event.log_level(),
-            Self::GetMenuBadge(event) => event.log_level(),
+            Self::LoadMenuBadge(event) => event.log_level(),
         }
     }
 }
 
-impl LogFilter for GetOutlineMenuBadgeEvent {
+impl LogFilter for LoadOutlineMenuBadgeEvent {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::Success(_) => LogLevel::Info,

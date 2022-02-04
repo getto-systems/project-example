@@ -16,7 +16,7 @@ import { AuthTicketRepository, AuthTicketRepositoryValue } from "../../../auth/t
 import {
     MenuTargetPathDetecter,
     MenuExpandRepository,
-    GetMenuBadgeRemote,
+    LoadMenuBadgeRemote,
     MenuExpandRepositoryValue,
 } from "./infra"
 
@@ -362,13 +362,13 @@ function initResource(
 ): [Readonly<{ menu: LoadMenuAction }>, MenuExpandRepository] {
     const version = standard_version()
     const detectTargetPath = standard_detecter()
-    const getMenuBadgeRemote = standard_getMenuBadgeRemote()
+    const loadMenuBadgeRemote = standard_loadMenuBadgeRemote()
 
     return [
         {
             menu: initLoadMenuAction({
                 infra: {
-                    getMenuBadgeRemote,
+                    loadMenuBadgeRemote,
                     ticketRepository,
                     menuExpandRepository,
                     menuExpandStore: initMenuExpandStore(),
@@ -424,7 +424,7 @@ function expand_menuExpandRepository(): MenuExpandRepository {
     return convertDB(db, menuExpandRepositoryConverter)
 }
 
-function standard_getMenuBadgeRemote(): GetMenuBadgeRemote {
+function standard_loadMenuBadgeRemote(): LoadMenuBadgeRemote {
     return async () => ({
         success: true,
         value: convertMenuBadgeRemote([

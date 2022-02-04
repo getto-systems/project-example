@@ -2,10 +2,10 @@ syntax = "proto3";
 
 package example.outline.service;
 
-service GetMenuBadgePb {
-    rpc GetMenuBadge (GetMenuBadgeRequestPb) returns (GetMenuBadgeResponsePb);
+service LoadMenuBadgePb {
+    rpc LoadMenuBadge (LoadMenuBadgeRequestPb) returns (LoadMenuBadgeResponsePb);
 }
-message GetMenuBadgeRequestPb {}
-message GetMenuBadgeResponsePb {
+message LoadMenuBadgeRequestPb {}
+message LoadMenuBadgeResponsePb {
     int32 index = 1;
 }

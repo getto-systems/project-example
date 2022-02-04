@@ -1,7 +1,7 @@
 use tonic::Request;
 
 use crate::example::outline::remote::y_protobuf::service::{
-    get_menu_badge_pb_client::GetMenuBadgePbClient, GetMenuBadgeRequestPb,
+    load_menu_badge_pb_client::LoadMenuBadgePbClient, LoadMenuBadgeRequestPb,
 };
 
 use crate::example::remote::x_outside_feature::feature::ExampleOutsideService;
@@ -51,7 +51,7 @@ async fn call<'a>(
     service: ProxyService<'a>,
     metadata: AuthMetadataContent,
 ) -> Result<AuthProxyResponse, AuthProxyError> {
-    let mut client = GetMenuBadgePbClient::new(
+    let mut client = LoadMenuBadgePbClient::new(
         new_endpoint(service.service_url)
             .map_err(infra_error)?
             .connect()
@@ -59,7 +59,7 @@ async fn call<'a>(
             .map_err(infra_error)?,
     );
 
-    let mut request = Request::new(GetMenuBadgeRequestPb {});
+    let mut request = Request::new(LoadMenuBadgeRequestPb {});
     set_metadata(
         &mut request,
         service.request_id,
@@ -70,7 +70,7 @@ async fn call<'a>(
     .map_err(infra_error)?;
 
     let response = client
-        .get_menu_badge(request)
+        .load_menu_badge(request)
         .await
         .map_err(AuthProxyError::from)?
         .into_inner();

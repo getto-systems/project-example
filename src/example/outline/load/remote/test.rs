@@ -7,23 +7,23 @@ use crate::{
         StaticAuthMetadata, StaticAuthTokenDecoder, StaticValidateApiTokenStruct,
         StaticValidateService,
     },
-    example::outline::remote::get_menu_badge::init::menu_badge_repository::test::StaticOutlineMenuBadgeRepository,
+    example::outline::load::remote::init::menu_badge_repository::test::StaticOutlineMenuBadgeRepository,
 };
 
-use super::action::{GetOutlineMenuBadgeAction, GetOutlineMenuBadgeMaterial};
+use super::action::{LoadOutlineMenuBadgeAction, LoadOutlineMenuBadgeMaterial};
 
 #[tokio::test]
-async fn success_get_menu_badge() {
+async fn success_load_menu_badge() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
 
-    let mut action = GetOutlineMenuBadgeAction::with_material(material);
+    let mut action = LoadOutlineMenuBadgeAction::with_material(material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["validate api token success", "get menu badge success"]);
+    assert_state(vec!["validate api token success", "load menu badge success"]);
     assert!(result.is_ok());
 }
 
@@ -33,7 +33,7 @@ struct TestStruct {
     menu_badge_repository: StaticOutlineMenuBadgeRepository,
 }
 
-impl GetOutlineMenuBadgeMaterial for TestStruct {
+impl LoadOutlineMenuBadgeMaterial for TestStruct {
     type CheckPermission = StaticValidateApiTokenStruct;
 
     type MenuBadgeRepository = StaticOutlineMenuBadgeRepository;

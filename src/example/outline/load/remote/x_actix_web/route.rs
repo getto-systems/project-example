@@ -1,8 +1,4 @@
-use actix_web::{
-    get,
-    web::{scope, Data},
-    HttpRequest, Responder, Scope,
-};
+use actix_web::{get, web::Data, HttpRequest, Responder};
 
 use getto_application::helper::flatten;
 
@@ -13,14 +9,13 @@ use crate::x_outside_feature::remote::api::{
     logger::{app_logger, generate_request_id},
 };
 
-use crate::example::outline::remote::get_menu_badge::proxy::init::GetOutlineMenuBadgeProxyStruct;
-
-pub fn scope_outline() -> Scope {
-    scope("/outline").service(get_menu_badge)
-}
+use crate::example::outline::load::remote::proxy::init::GetOutlineMenuBadgeProxyStruct;
 
 #[get("/menu-badge")]
-async fn get_menu_badge(feature: Data<ApiAppFeature>, request: HttpRequest) -> impl Responder {
+pub async fn service_get_menu_badge(
+    feature: Data<ApiAppFeature>,
+    request: HttpRequest,
+) -> impl Responder {
     let request_id = generate_request_id();
     let logger = app_logger(request_id.clone(), &request);
 

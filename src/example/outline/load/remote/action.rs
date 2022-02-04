@@ -5,27 +5,27 @@ use crate::{
         data::RequireAuthRoles,
         method::{check_permission, CheckPermissionEvent, CheckPermissionInfra},
     },
-    example::outline::remote::get_menu_badge::{
+    example::outline::load::remote::{
         data::OutlineMenuBadge, infra::OutlineMenuBadgeRepository,
     },
     z_lib::remote::repository::data::RepositoryError,
 };
 
-pub enum GetOutlineMenuBadgeState {
+pub enum LoadOutlineMenuBadgeState {
     Validate(CheckPermissionEvent),
-    GetMenuBadge(GetOutlineMenuBadgeEvent),
+    LoadMenuBadge(LoadOutlineMenuBadgeEvent),
 }
 
-impl std::fmt::Display for GetOutlineMenuBadgeState {
+impl std::fmt::Display for LoadOutlineMenuBadgeState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Validate(event) => write!(f, "{}", event),
-            Self::GetMenuBadge(event) => write!(f, "{}", event),
+            Self::LoadMenuBadge(event) => write!(f, "{}", event),
         }
     }
 }
 
-pub trait GetOutlineMenuBadgeMaterial {
+pub trait LoadOutlineMenuBadgeMaterial {
     type CheckPermission: CheckPermissionInfra;
     type MenuBadgeRepository: OutlineMenuBadgeRepository;
 
@@ -33,12 +33,12 @@ pub trait GetOutlineMenuBadgeMaterial {
     fn menu_badge_repository(&self) -> &Self::MenuBadgeRepository;
 }
 
-pub struct GetOutlineMenuBadgeAction<M: GetOutlineMenuBadgeMaterial> {
-    pubsub: ActionStatePubSub<GetOutlineMenuBadgeState>,
+pub struct LoadOutlineMenuBadgeAction<M: LoadOutlineMenuBadgeMaterial> {
+    pubsub: ActionStatePubSub<LoadOutlineMenuBadgeState>,
     material: M,
 }
 
-impl<M: GetOutlineMenuBadgeMaterial> GetOutlineMenuBadgeAction<M> {
+impl<M: LoadOutlineMenuBadgeMaterial> LoadOutlineMenuBadgeAction<M> {
     pub fn with_material(material: M) -> Self {
         Self {
             pubsub: ActionStatePubSub::new(),
@@ -48,36 +48,36 @@ impl<M: GetOutlineMenuBadgeMaterial> GetOutlineMenuBadgeAction<M> {
 
     pub fn subscribe(
         &mut self,
-        handler: impl 'static + Fn(&GetOutlineMenuBadgeState) + Send + Sync,
+        handler: impl 'static + Fn(&LoadOutlineMenuBadgeState) + Send + Sync,
     ) {
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<GetOutlineMenuBadgeState> {
+    pub async fn ignite(self) -> MethodResult<LoadOutlineMenuBadgeState> {
         let pubsub = self.pubsub;
         let m = self.material;
 
         check_permission(m.check_permission(), RequireAuthRoles::Nothing, |event| {
-            pubsub.post(GetOutlineMenuBadgeState::Validate(event))
+            pubsub.post(LoadOutlineMenuBadgeState::Validate(event))
         })
         .await?;
 
-        get_outline_menu_badge(&m, |event| {
-            pubsub.post(GetOutlineMenuBadgeState::GetMenuBadge(event))
+        load_menu_badge(&m, |event| {
+            pubsub.post(LoadOutlineMenuBadgeState::LoadMenuBadge(event))
         })
         .await
     }
 }
 
-pub enum GetOutlineMenuBadgeEvent {
+pub enum LoadOutlineMenuBadgeEvent {
     Success(OutlineMenuBadge),
     RepositoryError(RepositoryError),
 }
 
-const SUCCESS: &'static str = "get menu badge success";
-const ERROR: &'static str = "get menu badge error";
+const SUCCESS: &'static str = "load menu badge success";
+const ERROR: &'static str = "load menu badge error";
 
-impl std::fmt::Display for GetOutlineMenuBadgeEvent {
+impl std::fmt::Display for LoadOutlineMenuBadgeEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Success(_) => write!(f, "{}", SUCCESS),
@@ -86,16 +86,16 @@ impl std::fmt::Display for GetOutlineMenuBadgeEvent {
     }
 }
 
-async fn get_outline_menu_badge<S>(
-    infra: &impl GetOutlineMenuBadgeMaterial,
-    post: impl Fn(GetOutlineMenuBadgeEvent) -> S,
+async fn load_menu_badge<S>(
+    infra: &impl LoadOutlineMenuBadgeMaterial,
+    post: impl Fn(LoadOutlineMenuBadgeEvent) -> S,
 ) -> MethodResult<S> {
     let menu_badge_repository = infra.menu_badge_repository();
 
     let menu_badge = menu_badge_repository
-        .get_menu_badge()
+        .load_menu_badge()
         .await
-        .map_err(|err| post(GetOutlineMenuBadgeEvent::RepositoryError(err)))?;
+        .map_err(|err| post(LoadOutlineMenuBadgeEvent::RepositoryError(err)))?;
 
-    Ok(post(GetOutlineMenuBadgeEvent::Success(menu_badge)))
+    Ok(post(LoadOutlineMenuBadgeEvent::Success(menu_badge)))
 }
