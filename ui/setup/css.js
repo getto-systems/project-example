@@ -8,7 +8,7 @@ const autoprefixer = require("autoprefixer")
 const CleanCss = require("clean-css")
 
 compile({
-    source: path.join(__dirname, "../css/site.css"),
+    source: path.join(__dirname, "../../src/css/site.css"),
     output: path.join(__dirname, "../public/dist/css/site.css"),
     plugins: [autoprefixer()],
 })
