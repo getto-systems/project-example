@@ -14,7 +14,7 @@ struct EnvironmentCodegen {
 impl EnvironmentCodegen {
     fn new() -> Self {
         Self {
-            file: path::Path::new("src/y_environment/remote").join("env.rs"),
+            file: path::Path::new("src/y_environment/api").join("env.rs"),
         }
     }
 
