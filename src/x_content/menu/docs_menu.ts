@@ -1,15 +1,15 @@
-import { env } from "../../../y_environment/ui/env"
+import { env } from "../../y_environment/ui/env"
 
-import { lnir } from "../../../z_lib/ui/icon/line_icon"
-import { assertMenuPath, category, item } from "../kernel/init/common"
+import { lnir } from "../../z_lib/ui/icon/line_icon"
+import { assertMenuPath, category, item } from "./common"
 
-import { docs_auth } from "../../../auth/docs"
-import { docs_avail } from "../../../avail/docs"
+import { docs_auth } from "../../auth/docs"
+import { docs_avail } from "../../avail/docs"
 
-import { MenuContent, MenuPermission, MenuTreeNode } from "../kernel/infra"
+import { MenuContent, MenuPermission, MenuTreeNode } from "../../example/outline/load/infra"
 
-import { DocsDomain } from "../../../z_vendor/getto-application/docs/data"
-import { docs_docs } from "../../../docs/docs"
+import { DocsDomain } from "../../z_vendor/getto-application/docs/data"
+import { docs_docs } from "../../docs/docs"
 
 export function docsMenuContent(): MenuContent {
     return {

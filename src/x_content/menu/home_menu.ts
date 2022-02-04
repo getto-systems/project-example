@@ -1,7 +1,7 @@
-import { lnir } from "../../../z_lib/ui/icon/line_icon"
-import { category, item } from "../kernel/init/common"
+import { lnir } from "../../z_lib/ui/icon/line_icon"
+import { category, item } from "./common"
 
-import { MenuContent, MenuPermission } from "../kernel/infra"
+import { MenuContent, MenuPermission } from "../../example/outline/load/infra"
 
 export function homeMenuContent(): MenuContent {
     return {

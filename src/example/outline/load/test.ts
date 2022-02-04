@@ -1,11 +1,11 @@
 import { setupActionTestRunner } from "../../../z_vendor/getto-application/action/test_helper"
 
-import { markMenuCategoryLabel, standard_MenuTree } from "../kernel/test_helper"
+import { markMenuCategoryLabel, standard_MenuTree } from "./test_helper"
 
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 import { initMenuBadgeStore, initMenuExpandStore } from "./init/store"
 
-import { detectMenuTargetPath } from "../kernel/convert"
+import { detectMenuTargetPath } from "./convert"
 import { convertMenuBadgeRemote, menuExpandRepositoryConverter } from "./convert"
 import { authTicketRepositoryConverter } from "../../../auth/ticket/kernel/convert"
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"
@@ -13,8 +13,12 @@ import { convertDB } from "../../../z_lib/ui/repository/init/convert"
 import { initLoadMenuAction, LoadMenuAction } from "./action"
 
 import { AuthTicketRepository, AuthTicketRepositoryValue } from "../../../auth/ticket/kernel/infra"
-import { MenuTargetPathDetecter } from "../kernel/infra"
-import { MenuExpandRepository, GetMenuBadgeRemote, MenuExpandRepositoryValue } from "./infra"
+import {
+    MenuTargetPathDetecter,
+    MenuExpandRepository,
+    GetMenuBadgeRemote,
+    MenuExpandRepositoryValue,
+} from "./infra"
 
 import { AuthTicket } from "../../../auth/ticket/kernel/data"
 

@@ -8,7 +8,7 @@ import { initMenuBadgeStore, initMenuExpandStore } from "./store"
 
 import { LoadMenuInfra } from "../action"
 
-import { MenuContent } from "../../kernel/infra"
+import { MenuContent } from "../infra"
 
 type OutsideFeature = RepositoryOutsideFeature & RemoteOutsideFeature
 export function newLoadMenuInfra(feature: OutsideFeature, menuContent: MenuContent): LoadMenuInfra {

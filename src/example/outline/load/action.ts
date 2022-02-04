@@ -3,15 +3,98 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 
-import { buildMenu, BuildMenuParams } from "../kernel/helper"
+import { buildMenu, BuildMenuParams } from "./helper"
+import { toMenuCategory, toMenuItem } from "./convert"
 
-import { initMenuExpand, MenuBadge, MenuTargetPathDetecter, MenuTree } from "../kernel/infra"
+import {
+    initMenuExpand,
+    MenuBadge,
+    MenuTargetPathDetecter,
+    MenuTree,
+    MenuTreeCategory,
+    MenuTreeItem,
+    MenuTreeNode,
+} from "./infra"
 import { GetMenuBadgeRemote, MenuBadgeStore, MenuExpandStore, MenuExpandRepository } from "./infra"
 import { AuthTicketRepository } from "../../../auth/ticket/kernel/infra"
 
-import { Menu, MenuCategoryPath } from "../kernel/data"
 import { RepositoryError } from "../../../z_lib/ui/repository/data"
 import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
+import { BreadcrumbList, BreadcrumbNode, Menu, MenuCategoryPath, MenuTargetPath } from "./data"
+
+export interface LoadBreadcrumbListAction {
+    load(): BreadcrumbList
+}
+
+export type LoadBreadcrumbListMaterial = Readonly<{
+    shell: LoadBreadcrumbListShell
+    config: LoadBreadcrumbListConfig
+}>
+export type LoadBreadcrumbListShell = Readonly<{
+    detectTargetPath: MenuTargetPathDetecter
+}>
+export type LoadBreadcrumbListConfig = Readonly<{
+    version: string
+    menuTree: MenuTree
+}>
+
+export function initLoadBreadcrumbListAction(
+    material: LoadBreadcrumbListMaterial,
+): LoadBreadcrumbListAction {
+    return {
+        load: () => load(material),
+    }
+}
+
+function load({ shell, config }: LoadBreadcrumbListMaterial): BreadcrumbList {
+    const { detectTargetPath } = shell
+
+    const menuTargetPath = detectTargetPath()
+    if (!menuTargetPath.valid) {
+        return EMPTY
+    }
+    return build(menuTargetPath.value)
+
+    function build(currentPath: MenuTargetPath): BreadcrumbList {
+        return toBreadcrumb(config.menuTree)
+
+        function toBreadcrumb(tree: MenuTree): BreadcrumbList {
+            for (let i = 0; i < tree.length; i++) {
+                const breadcrumbList = findFocusedNode(tree[i])
+                if (breadcrumbList.length > 0) {
+                    return breadcrumbList
+                }
+            }
+            return EMPTY
+        }
+        function findFocusedNode(node: MenuTreeNode): readonly BreadcrumbNode[] {
+            switch (node.type) {
+                case "category":
+                    return categoryNode(node.category, node.children)
+                case "item":
+                    return itemNode(node.item)
+            }
+        }
+        function categoryNode(
+            category: MenuTreeCategory,
+            children: MenuTree,
+        ): readonly BreadcrumbNode[] {
+            const breadcrumb = toBreadcrumb(children)
+            if (breadcrumb.length === 0) {
+                return EMPTY
+            }
+            return [{ type: "category", category: toMenuCategory(category) }, ...breadcrumb]
+        }
+        function itemNode(item: MenuTreeItem): readonly BreadcrumbNode[] {
+            if (item.path !== currentPath) {
+                return EMPTY
+            }
+            return [{ type: "item", item: toMenuItem(item, config.version) }]
+        }
+    }
+}
+
+const EMPTY: BreadcrumbList = []
 
 export interface LoadMenuAction extends StatefulApplicationAction<LoadMenuState> {
     updateBadge(): Promise<LoadMenuState>

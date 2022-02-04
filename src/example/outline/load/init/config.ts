@@ -1,8 +1,15 @@
 import { env } from "../../../../y_environment/ui/env"
 
-import { LoadMenuConfig } from "../action"
+import { LoadBreadcrumbListConfig, LoadMenuConfig } from "../action"
 
-import { MenuContent } from "../../kernel/infra"
+import { MenuContent } from "../infra"
+
+export function newLoadBreadcrumbListConfig(menuContent: MenuContent): LoadBreadcrumbListConfig {
+    return {
+        version: env.version,
+        menuTree: menuContent.menuTree,
+    }
+}
 
 export function newLoadMenuConfig(menuContent: MenuContent): LoadMenuConfig {
     return {

@@ -1,11 +1,11 @@
-import { standard_MenuTree } from "../kernel/test_helper"
+import { standard_MenuTree } from "./test_helper"
 
 import { mockLoadBreadcrumbListShell } from "./init/mock"
 
 import {
     initLoadBreadcrumbListAction,
     LoadBreadcrumbListAction,
-} from "../load_breadcrumb_list/action"
+} from "./action"
 
 describe("LoadBreadcrumbList", () => {
     test("load breadcrumb", () => {

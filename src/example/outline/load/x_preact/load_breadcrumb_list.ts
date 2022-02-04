@@ -11,12 +11,11 @@ import { linky } from "../../../../z_vendor/getto-css/preact/design/highlight"
 import { siteInfo } from "../../../../x_content/site"
 import { icon } from "../../../x_preact/design/icon"
 
-import { MENU_ID } from "../../load/x_preact/load_menu"
+import { MENU_ID } from "./load_menu"
 
 import { LoadBreadcrumbListAction } from "../action"
 
-import { BreadcrumbList, BreadcrumbNode } from "../../load_breadcrumb_list/data"
-import { MenuCategory, MenuItem } from "../../kernel/data"
+import { BreadcrumbList, BreadcrumbNode, MenuCategory, MenuItem } from "../data"
 
 type Props = Readonly<{
     breadcrumbList: LoadBreadcrumbListAction

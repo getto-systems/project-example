@@ -1,3 +1,9 @@
+export type BreadcrumbList = readonly BreadcrumbNode[]
+
+export type BreadcrumbNode =
+    | Readonly<{ type: "category"; category: MenuCategory }>
+    | Readonly<{ type: "item"; item: MenuItem }>
+
 export type MenuTargetPath = string & { MenuTarget: never }
 
 export type Menu = readonly MenuNode[]

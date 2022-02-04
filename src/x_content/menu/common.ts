@@ -1,8 +1,8 @@
-import { staticMenuPath, StaticMenuPath } from "../../../../y_environment/ui/path"
+import { staticMenuPath, StaticMenuPath } from "../../y_environment/ui/path"
 
-import { LineIcon, lniClass } from "../../../../z_lib/ui/icon/line_icon"
+import { LineIcon, lniClass } from "../../z_lib/ui/icon/line_icon"
 
-import { MenuPermission, MenuTree, MenuTreeNode } from "../infra"
+import { MenuPermission, MenuTree, MenuTreeNode } from "../../example/outline/load/infra"
 
 export function category(
     label: string,
