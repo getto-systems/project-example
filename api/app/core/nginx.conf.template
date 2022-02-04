@@ -6,6 +6,6 @@ server {
   ssl_certificate_key ${TLS_KEY};
 
   location / {
-    proxy_pass http://${GETTO_EXAMPLE_DOMAIN_DEV_IP}:${GETTO_EXAMPLE_DOMAIN_PORT};
+    proxy_pass http://${GETTO_EXAMPLE_CORE_DEV_IP}:${GETTO_EXAMPLE_CORE_PORT};
   }
 }

@@ -5,7 +5,7 @@ use super::feature::{CoreOutsideFeature, CoreOutsideService};
 pub fn new_core_outside_feature(env: &'static ProxyEnv) -> CoreOutsideFeature {
     CoreOutsideFeature {
         service: CoreOutsideService {
-            service_url: &env.domain_service_url,
+            service_url: &env.core_service_url,
         },
     }
 }
