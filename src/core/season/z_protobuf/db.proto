@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package example.db;
+package core.season.db;
 
-message Season_pb {
+message SeasonPb {
     int32 year = 1;
     string period = 2;
     int64 expires = 3;

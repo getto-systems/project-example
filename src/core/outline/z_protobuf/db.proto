@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package example.outline.db;
+package core.outline.db;
 
-message MenuExpand_pb {
+message MenuExpandPb {
   repeated Path paths = 1;
 
   message Path { repeated string labels = 1; }

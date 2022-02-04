@@ -2,6 +2,6 @@ syntax = "proto3";
 
 package lib.search.db;
 
-message Columns_pb {
+message ColumnsPb {
   repeated string columns = 1;
 }
