@@ -19,18 +19,18 @@ variables:
   UI_BUMP_IGNORE_FILE:  ui/bump/ignore
   UI_BUMP_MAJOR_FILE:   ui/bump/major
   UI_BUMP_SCRIPT:       ui/bump/bump.sh
-  API_BUMP_VERSION_FILE: api/app/proxy/VERSION
-  API_BUMP_IGNORE_FILE:  api/app/proxy/bump/ignore
-  API_BUMP_MAJOR_FILE:   api/app/proxy/bump/major
-  API_BUMP_SCRIPT:       api/app/proxy/bump/bump.sh
+  PROXY_BUMP_VERSION_FILE: api/app/proxy/VERSION
+  PROXY_BUMP_IGNORE_FILE:  api/app/proxy/bump/ignore
+  PROXY_BUMP_MAJOR_FILE:   api/app/proxy/bump/major
+  PROXY_BUMP_SCRIPT:       api/app/proxy/bump/bump.sh
   AUTH_BUMP_VERSION_FILE: api/app/auth/VERSION
   AUTH_BUMP_IGNORE_FILE:  api/app/auth/bump/ignore
   AUTH_BUMP_MAJOR_FILE:   api/app/auth/bump/major
   AUTH_BUMP_SCRIPT:       api/app/auth/bump/bump.sh
-  EXAMPLE_BUMP_VERSION_FILE: api/app/core/VERSION
-  EXAMPLE_BUMP_IGNORE_FILE:  api/app/core/bump/ignore
-  EXAMPLE_BUMP_MAJOR_FILE:   api/app/core/bump/major
-  EXAMPLE_BUMP_SCRIPT:       api/app/core/bump/bump.sh
+  CORE_BUMP_VERSION_FILE: api/app/core/VERSION
+  CORE_BUMP_IGNORE_FILE:  api/app/core/bump/ignore
+  CORE_BUMP_MAJOR_FILE:   api/app/core/bump/major
+  CORE_BUMP_SCRIPT:       api/app/core/bump/bump.sh
 
 migrate:
   stage: migrate
@@ -204,16 +204,16 @@ bump_version-proxy:
     refs:
       - triggers
     variables:
-      - $RELEASE_API
+      - $RELEASE_PROXY
 
   image: buildpack-deps:buster-scm
 
   variables:
     BUMP_VERSION_SUFFIX: "-proxy"
-    BUMP_VERSION_FILE: $API_BUMP_VERSION_FILE
-    BUMP_IGNORE_FILE: $API_BUMP_IGNORE_FILE
-    BUMP_MAJOR_FILE: $API_BUMP_MAJOR_FILE
-    BUMP_SCRIPT: $API_BUMP_SCRIPT
+    BUMP_VERSION_FILE: $PROXY_BUMP_VERSION_FILE
+    BUMP_IGNORE_FILE: $PROXY_BUMP_IGNORE_FILE
+    BUMP_MAJOR_FILE: $PROXY_BUMP_MAJOR_FILE
+    BUMP_SCRIPT: $PROXY_BUMP_SCRIPT
 
   before_script:
     - git config user.email admin@getto.systems
@@ -239,7 +239,7 @@ release-proxy:
   image: buildpack-deps:buster-scm
 
   variables:
-    BUMP_VERSION_FILE: $API_BUMP_VERSION_FILE
+    BUMP_VERSION_FILE: $PROXY_BUMP_VERSION_FILE
 
   script:
     - curl $TRELLIS_CI_BUMP_VERSION/push_tags.sh | sh
@@ -305,7 +305,7 @@ release_success-proxy:
   before_script:
     - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
     - export channel=$SLACK_CHANNEL
-    - export version=example:$(cat $API_BUMP_VERSION_FILE)
+    - export version=example:$(cat $PROXY_BUMP_VERSION_FILE)
   script:
     - curl $TRELLIS_PSYCHER_GETTO/notify-release-success.sh | sh -s -- $url $channel $version
 
@@ -327,7 +327,7 @@ release_failure-proxy:
   before_script:
     - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
     - export channel=$SLACK_CHANNEL
-    - export version=example:$(cat $API_BUMP_VERSION_FILE)
+    - export version=example:$(cat $PROXY_BUMP_VERSION_FILE)
   script:
     - curl $TRELLIS_PSYCHER_GETTO/notify-release-failure.sh | sh -s -- $url $channel $version
 
@@ -470,16 +470,16 @@ bump_version-example:
     refs:
       - triggers
     variables:
-      - $RELEASE_EXAMPLE
+      - $RELEASE_CORE
 
   image: buildpack-deps:buster-scm
 
   variables:
     BUMP_VERSION_SUFFIX: "-core"
-    BUMP_VERSION_FILE: $EXAMPLE_BUMP_VERSION_FILE
-    BUMP_IGNORE_FILE: $EXAMPLE_BUMP_IGNORE_FILE
-    BUMP_MAJOR_FILE: $EXAMPLE_BUMP_MAJOR_FILE
-    BUMP_SCRIPT: $EXAMPLE_BUMP_SCRIPT
+    BUMP_VERSION_FILE: $CORE_BUMP_VERSION_FILE
+    BUMP_IGNORE_FILE: $CORE_BUMP_IGNORE_FILE
+    BUMP_MAJOR_FILE: $CORE_BUMP_MAJOR_FILE
+    BUMP_SCRIPT: $CORE_BUMP_SCRIPT
 
   before_script:
     - git config user.email admin@getto.systems
@@ -505,7 +505,7 @@ release-example:
   image: buildpack-deps:buster-scm
 
   variables:
-    BUMP_VERSION_FILE: $EXAMPLE_BUMP_VERSION_FILE
+    BUMP_VERSION_FILE: $CORE_BUMP_VERSION_FILE
 
   script:
     - curl $TRELLIS_CI_BUMP_VERSION/push_tags.sh | sh
@@ -571,7 +571,7 @@ release_success-example:
   before_script:
     - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
     - export channel=$SLACK_CHANNEL
-    - export version=example:$(cat $EXAMPLE_BUMP_VERSION_FILE)
+    - export version=example:$(cat $CORE_BUMP_VERSION_FILE)
   script:
     - curl $TRELLIS_PSYCHER_GETTO/notify-release-success.sh | sh -s -- $url $channel $version
 
@@ -593,6 +593,6 @@ release_failure-example:
   before_script:
     - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
     - export channel=$SLACK_CHANNEL
-    - export version=example:$(cat $EXAMPLE_BUMP_VERSION_FILE)
+    - export version=example:$(cat $CORE_BUMP_VERSION_FILE)
   script:
     - curl $TRELLIS_PSYCHER_GETTO/notify-release-failure.sh | sh -s -- $url $channel $version
