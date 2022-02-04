@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "getto-project-example-ui",
-  "version": "0.22.1-ui",
+  "version": "0.23.0-ui",
   "scripts": {
     "start:public": "webpack serve --mode development --config ui/public/webpack.config.js",
     "start:secure": "webpack serve --mode development --config ui/secure/webpack.config.js",
