@@ -1,5 +1,8 @@
-use io::Write;
-use std::{fs, io, path};
+use std::{
+    fs::{read_to_string, File},
+    io::Write,
+    path::{Path, PathBuf},
+};
 
 pub fn generate() {
     EnvironmentCodegen::new()
@@ -8,37 +11,30 @@ pub fn generate() {
 }
 
 struct EnvironmentCodegen {
-    file: path::PathBuf,
+    file: PathBuf,
 }
 
 impl EnvironmentCodegen {
     fn new() -> Self {
         Self {
-            file: path::Path::new("src/y_environment/api").join("env.rs"),
+            file: Path::new("src/y_environment/api").join("env.rs"),
         }
     }
 
-    fn build(&self) -> io::Result<()> {
-        self.cleanup()?;
+    fn build(&self) -> std::io::Result<()> {
         self.env()?;
         Ok(())
     }
 
-    fn cleanup(&self) -> io::Result<()> {
-        if self.file.exists() {
-            fs::remove_file(self.file.as_path())?;
-        }
-        Ok(())
-    }
-    fn env(&self) -> io::Result<()> {
-        let mut file = fs::File::create(self.file.as_path())?;
+    fn env(&self) -> std::io::Result<()> {
+        let mut file = File::create(self.file.as_path())?;
         write!(file, "{}", env_content()?)?;
         file.flush()
     }
 }
 
-fn env_content() -> io::Result<String> {
-    let version = fs::read_to_string("api/VERSION")?;
+fn env_content() -> std::io::Result<String> {
+    let version = read_to_string("api/VERSION")?;
     Ok(CONTENT.replace("{VERSION}", version.trim_end()))
 }
 
