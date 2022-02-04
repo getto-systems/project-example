@@ -1,6 +1,6 @@
 use tonic::{Response, Status};
 
-use crate::avail::unexpected_error::y_protobuf::service::NotifyResponsePb;
+use crate::avail::unexpected_error::notify::y_protobuf::service::NotifyResponsePb;
 
 use crate::z_lib::api::response::tonic::RespondTo;
 
