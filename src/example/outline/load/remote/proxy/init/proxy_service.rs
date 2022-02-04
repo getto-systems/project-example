@@ -4,7 +4,7 @@ use crate::example::outline::remote::y_protobuf::service::{
     load_menu_badge_pb_client::LoadMenuBadgePbClient, LoadMenuBadgeRequestPb,
 };
 
-use crate::example::remote::x_outside_feature::feature::ExampleOutsideService;
+use crate::example::x_outside_feature::remote::feature::ExampleOutsideService;
 
 use crate::z_lib::remote::service::init::authorizer::GoogleServiceAuthorizer;
 

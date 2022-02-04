@@ -5,7 +5,7 @@ use crate::avail::unexpected_error::remote::y_protobuf::service::{
     notify_pb_client::NotifyPbClient, NotifyRequestPb,
 };
 
-use crate::example::remote::x_outside_feature::feature::ExampleOutsideService;
+use crate::example::x_outside_feature::remote::feature::ExampleOutsideService;
 
 use crate::z_lib::remote::message::helper::{
     decode_base64, encode_protobuf_base64, invalid_protobuf,

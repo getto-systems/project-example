@@ -8,7 +8,7 @@ use example_api::x_outside_feature::remote::api::{env::ApiEnv, feature::ApiAppFe
 
 use example_api::{
     auth::x_actix_web::route::scope_auth, avail::x_actix_web::route::scope_avail,
-    example::remote::x_actix_web::route::scope_example,
+    example::x_actix_web::route::scope_example,
 };
 
 lazy_static! {
