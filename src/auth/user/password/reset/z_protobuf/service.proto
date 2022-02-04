@@ -5,16 +5,6 @@ package auth.user.password.reset.service;
 import "auth/user/z_protobuf/service.proto";
 import "auth/ticket/z_protobuf/service.proto";
 
-service RequestResetTokenPb {
-    rpc RequestToken (RequestResetTokenRequestPb) returns (RequestResetTokenResponsePb);
-}
-message RequestResetTokenRequestPb {
-    string login_id = 1;
-}
-message RequestResetTokenResponsePb {
-    bool success = 1;
-}
-
 service ResetPasswordPb {
     rpc Reset (ResetPasswordRequestPb) returns (ResetPasswordResponsePb);
 }

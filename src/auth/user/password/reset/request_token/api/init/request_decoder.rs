@@ -1,4 +1,4 @@
-use crate::auth::user::password::reset::y_protobuf::service::RequestResetTokenRequestPb;
+use crate::auth::user::password::reset::request_token::y_protobuf::service::RequestResetTokenRequestPb;
 
 use crate::auth::user::password::reset::request_token::api::infra::{
     RequestResetTokenFieldsExtract, RequestResetTokenRequestDecoder,

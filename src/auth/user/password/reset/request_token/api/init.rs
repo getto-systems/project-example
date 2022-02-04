@@ -6,15 +6,12 @@ pub mod token_notifier;
 
 use tonic::metadata::MetadataMap;
 
-use crate::auth::{
-    ticket::validate::init::ValidateAuthNonceStruct,
-    user::password::reset::y_protobuf::service::RequestResetTokenRequestPb,
-};
+use crate::auth::user::password::reset::request_token::y_protobuf::service::RequestResetTokenRequestPb;
 
 use crate::x_outside_feature::api::auth::feature::AuthAppFeature;
 
 use crate::auth::{
-    ticket::kernel::api::init::clock::ChronoAuthClock,
+    ticket::{kernel::api::init::clock::ChronoAuthClock, validate::init::ValidateAuthNonceStruct},
     user::password::{
         kernel::init::password_repository::MysqlAuthUserPasswordRepository,
         reset::request_token::api::init::{
