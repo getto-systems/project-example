@@ -7,7 +7,7 @@ use crate::auth::user::password::authenticate::y_protobuf::service::{
     AuthenticatePasswordResponsePb,
 };
 
-use crate::z_lib::api::{logger::Logger, response::tonic::RespondTo};
+use crate::z_lib::api::{logger::Logger, response::tonic::ServiceResponder};
 
 use crate::x_outside_feature::api::{
     auth::{

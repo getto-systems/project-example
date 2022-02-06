@@ -1,10 +1,10 @@
 use tonic::{Response, Status};
 
-use crate::z_lib::api::response::tonic::RespondTo;
+use crate::z_lib::api::response::tonic::ServiceResponder;
 
 use super::super::method::IssueAuthTicketEvent;
 
-impl<T> RespondTo<T> for IssueAuthTicketEvent {
+impl<T> ServiceResponder<T> for IssueAuthTicketEvent {
     fn respond_to(self) -> Result<Response<T>, Status> {
         match self {
             Self::ExpansionLimitCalculated(_) => Err(Status::cancelled("issue cancelled")),

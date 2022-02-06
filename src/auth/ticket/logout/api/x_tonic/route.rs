@@ -2,7 +2,7 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::api::{logger::Logger, response::tonic::RespondTo};
+use crate::z_lib::api::{logger::Logger, response::tonic::ServiceResponder};
 
 use crate::auth::ticket::logout::y_protobuf::service::{
     logout_pb_server::LogoutPb, LogoutRequestPb, LogoutResponsePb,

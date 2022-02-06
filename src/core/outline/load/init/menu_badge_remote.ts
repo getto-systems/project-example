@@ -25,7 +25,7 @@ export function newLoadMenuBadgeRemote(feature: RemoteOutsideFeature): LoadMenuB
 
             const opts = fetchOptions({
                 serverURL: env.apiServerURL,
-                path: "/example/outline/menu-badge",
+                path: "/core/outline/menu-badge",
                 method: "GET",
                 headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
             })

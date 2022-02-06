@@ -2,7 +2,7 @@ use tonic::{Response, Status};
 
 use crate::auth::user::password::reset::request_token::y_protobuf::service::RequestResetTokenResponsePb;
 
-use crate::z_lib::api::response::tonic::RespondTo;
+use crate::z_lib::api::response::tonic::ServiceResponder;
 
 use super::super::action::{RequestResetTokenEvent, RequestResetTokenState};
 
@@ -10,7 +10,7 @@ use crate::auth::user::password::reset::request_token::api::data::{
     EncodeResetTokenError, NotifyResetTokenError, RequestResetTokenError,
 };
 
-impl RespondTo<RequestResetTokenResponsePb> for RequestResetTokenState {
+impl ServiceResponder<RequestResetTokenResponsePb> for RequestResetTokenState {
     fn respond_to(self) -> Result<Response<RequestResetTokenResponsePb>, Status> {
         match self {
             Self::ValidateNonce(event) => event.respond_to(),
@@ -19,7 +19,7 @@ impl RespondTo<RequestResetTokenResponsePb> for RequestResetTokenState {
     }
 }
 
-impl RespondTo<RequestResetTokenResponsePb> for RequestResetTokenEvent {
+impl ServiceResponder<RequestResetTokenResponsePb> for RequestResetTokenEvent {
     fn respond_to(self) -> Result<Response<RequestResetTokenResponsePb>, Status> {
         match self {
             Self::TokenExpiresCalculated(_) => cancelled(),
@@ -37,7 +37,7 @@ fn cancelled<T>() -> Result<Response<T>, Status> {
     Err(Status::cancelled("request reset token cancelled"))
 }
 
-impl RespondTo<RequestResetTokenResponsePb> for RequestResetTokenError {
+impl ServiceResponder<RequestResetTokenResponsePb> for RequestResetTokenError {
     fn respond_to(self) -> Result<Response<RequestResetTokenResponsePb>, Status> {
         Ok(Response::new(RequestResetTokenResponsePb {
             success: false,
@@ -45,7 +45,7 @@ impl RespondTo<RequestResetTokenResponsePb> for RequestResetTokenError {
     }
 }
 
-impl<T> RespondTo<T> for EncodeResetTokenError {
+impl<T> ServiceResponder<T> for EncodeResetTokenError {
     fn respond_to(self) -> Result<Response<T>, Status> {
         match self {
             Self::InfraError(_) => Err(Status::internal("encode reset token error")),
@@ -53,7 +53,7 @@ impl<T> RespondTo<T> for EncodeResetTokenError {
     }
 }
 
-impl<T> RespondTo<T> for NotifyResetTokenError {
+impl<T> ServiceResponder<T> for NotifyResetTokenError {
     fn respond_to(self) -> Result<Response<T>, Status> {
         match self {
             Self::InfraError(_) => Err(Status::internal("notify reset token error")),

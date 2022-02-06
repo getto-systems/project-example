@@ -1,8 +1,8 @@
 use tonic::{Response, Status};
 
-use crate::z_lib::api::{request::data::MetadataError, response::tonic::RespondTo};
+use crate::z_lib::api::{request::data::MetadataError, response::tonic::ServiceResponder};
 
-impl<T> RespondTo<T> for MetadataError {
+impl<T> ServiceResponder<T> for MetadataError {
     fn respond_to(self) -> Result<Response<T>, Status> {
         Err(Status::invalid_argument(format!("{}", self)))
     }

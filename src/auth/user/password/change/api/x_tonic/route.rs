@@ -6,7 +6,7 @@ use crate::auth::user::password::change::y_protobuf::service::{
     change_password_pb_server::ChangePasswordPb, ChangePasswordRequestPb, ChangePasswordResponsePb,
 };
 
-use crate::z_lib::api::{logger::Logger, response::tonic::RespondTo};
+use crate::z_lib::api::{logger::Logger, response::tonic::ServiceResponder};
 
 use crate::x_outside_feature::api::{
     auth::{

@@ -1,10 +1,10 @@
 use tonic::{Response, Status};
 
-use crate::z_lib::api::response::tonic::RespondTo;
+use crate::z_lib::api::response::tonic::ServiceResponder;
 
 use crate::auth::ticket::encode::data::EncodeAuthTokenError;
 
-impl<T> RespondTo<T> for EncodeAuthTokenError {
+impl<T> ServiceResponder<T> for EncodeAuthTokenError {
     fn respond_to(self) -> Result<Response<T>, Status> {
         Err(Status::internal(format!("{}", self)))
     }

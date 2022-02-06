@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use tonic::{Response, Status};
 
-use crate::z_lib::api::response::tonic::RespondTo;
+use crate::z_lib::api::response::tonic::ServiceResponder;
 
 use crate::auth::ticket::y_protobuf::service::{
     EncodedAuthTokensPb, AuthTokenPb, CloudfrontTokenKindPb, CloudfrontTokenPb,
@@ -105,13 +105,13 @@ impl Into<CloudfrontTokenKind> for CloudfrontTokenKindPb {
     }
 }
 
-impl<T> RespondTo<T> for DecodeAuthTokenError {
+impl<T> ServiceResponder<T> for DecodeAuthTokenError {
     fn respond_to(self) -> Result<Response<T>, Status> {
         Err(Status::unauthenticated(format!("{}", self)))
     }
 }
 
-impl<T> RespondTo<T> for ValidateAuthRolesError {
+impl<T> ServiceResponder<T> for ValidateAuthRolesError {
     fn respond_to(self) -> Result<Response<T>, Status> {
         match self {
             Self::PermissionDenied(_, _) => Err(Status::permission_denied(format!("{}", self))),

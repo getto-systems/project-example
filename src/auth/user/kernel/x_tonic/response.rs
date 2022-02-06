@@ -2,7 +2,7 @@ use std::{collections::HashSet, iter::FromIterator};
 
 use tonic::{Response, Status};
 
-use crate::z_lib::api::response::tonic::RespondTo;
+use crate::z_lib::api::response::tonic::ServiceResponder;
 
 use crate::auth::{
     ticket::validate::y_protobuf::service::{
@@ -13,7 +13,7 @@ use crate::auth::{
 
 use crate::auth::user::kernel::data::{AuthUser, GrantedAuthRoles, RequireAuthRoles};
 
-impl RespondTo<ValidateApiTokenResponsePb> for AuthUser {
+impl ServiceResponder<ValidateApiTokenResponsePb> for AuthUser {
     fn respond_to(self) -> Result<Response<ValidateApiTokenResponsePb>, Status> {
         Ok(Response::new(ValidateApiTokenResponsePb {}))
     }

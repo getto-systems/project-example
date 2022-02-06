@@ -2,7 +2,7 @@ use actix_web::{get, web::Data, HttpRequest, Responder};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::api::{logger::Logger, response::actix_web::RespondTo};
+use crate::z_lib::api::{logger::Logger, response::actix_web::ProxyResponder};
 
 use crate::x_outside_feature::api::proxy::{
     feature::ProxyAppFeature,
@@ -22,5 +22,5 @@ pub async fn service_get_menu_badge(
     let mut action = GetOutlineMenuBadgeProxyStruct::action(&feature, &request_id, &request);
     action.subscribe(move |state| logger.log(state));
 
-    flatten(action.ignite().await).respond_to(&request)
+    flatten(action.ignite().await).respond_to()
 }

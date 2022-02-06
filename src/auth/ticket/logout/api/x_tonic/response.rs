@@ -1,6 +1,6 @@
 use tonic::{Response, Status};
 
-use crate::z_lib::api::response::tonic::RespondTo;
+use crate::z_lib::api::response::tonic::ServiceResponder;
 
 use crate::auth::ticket::logout::y_protobuf::service::LogoutResponsePb;
 
@@ -8,7 +8,7 @@ use crate::auth::ticket::validate::method::ValidateAuthTokenEvent;
 
 use super::super::action::{LogoutEvent, LogoutState};
 
-impl RespondTo<LogoutResponsePb> for LogoutState {
+impl ServiceResponder<LogoutResponsePb> for LogoutState {
     fn respond_to(self) -> Result<Response<LogoutResponsePb>, Status> {
         match self {
             Self::Validate(event) => event.respond_to(),
@@ -17,7 +17,7 @@ impl RespondTo<LogoutResponsePb> for LogoutState {
     }
 }
 
-impl RespondTo<LogoutResponsePb> for ValidateAuthTokenEvent {
+impl ServiceResponder<LogoutResponsePb> for ValidateAuthTokenEvent {
     fn respond_to(self) -> Result<Response<LogoutResponsePb>, Status> {
         match self {
             Self::ValidateNonce(_) => Err(Status::cancelled("logout cancelled")),
@@ -30,7 +30,7 @@ impl RespondTo<LogoutResponsePb> for ValidateAuthTokenEvent {
     }
 }
 
-impl RespondTo<LogoutResponsePb> for LogoutEvent {
+impl ServiceResponder<LogoutResponsePb> for LogoutEvent {
     fn respond_to(self) -> Result<Response<LogoutResponsePb>, Status> {
         match self {
             Self::Success => Ok(Response::new(LogoutResponsePb {})),

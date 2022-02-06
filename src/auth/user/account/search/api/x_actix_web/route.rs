@@ -6,7 +6,7 @@ use actix_web::{
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::api::{logger::Logger, response::actix_web::RespondTo};
+use crate::z_lib::api::{logger::Logger, response::actix_web::ProxyResponder};
 
 use crate::x_outside_feature::api::proxy::{
     feature::ProxyAppFeature,
@@ -32,5 +32,5 @@ async fn service_search(
     );
     action.subscribe(move |state| logger.log(state));
 
-    flatten(action.ignite().await).respond_to(&request)
+    flatten(action.ignite().await).respond_to()
 }

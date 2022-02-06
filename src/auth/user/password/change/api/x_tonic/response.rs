@@ -2,13 +2,13 @@ use tonic::{Response, Status};
 
 use crate::auth::user::password::change::y_protobuf::service::ChangePasswordResponsePb;
 
-use crate::z_lib::api::response::tonic::RespondTo;
+use crate::z_lib::api::response::tonic::ServiceResponder;
 
 use super::super::action::{ChangePasswordEvent, ChangePasswordState};
 
 use super::super::data::ChangePasswordError;
 
-impl RespondTo<ChangePasswordResponsePb> for ChangePasswordState {
+impl ServiceResponder<ChangePasswordResponsePb> for ChangePasswordState {
     fn respond_to(self) -> Result<Response<ChangePasswordResponsePb>, Status> {
         match self {
             Self::Validate(_) => Err(Status::permission_denied("permission denied")),
@@ -17,7 +17,7 @@ impl RespondTo<ChangePasswordResponsePb> for ChangePasswordState {
     }
 }
 
-impl RespondTo<ChangePasswordResponsePb> for ChangePasswordEvent {
+impl ServiceResponder<ChangePasswordResponsePb> for ChangePasswordEvent {
     fn respond_to(self) -> Result<Response<ChangePasswordResponsePb>, Status> {
         match self {
             Self::Success => Ok(Response::new(ChangePasswordResponsePb { success: true })),
@@ -29,7 +29,7 @@ impl RespondTo<ChangePasswordResponsePb> for ChangePasswordEvent {
     }
 }
 
-impl RespondTo<ChangePasswordResponsePb> for ChangePasswordError {
+impl ServiceResponder<ChangePasswordResponsePb> for ChangePasswordError {
     fn respond_to(self) -> Result<Response<ChangePasswordResponsePb>, Status> {
         Ok(Response::new(ChangePasswordResponsePb { success: false }))
     }

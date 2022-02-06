@@ -2,7 +2,7 @@ use tonic::{Response, Status};
 
 use crate::auth::ticket::validate::y_protobuf::service::ValidateApiTokenResponsePb;
 
-use crate::z_lib::api::response::tonic::RespondTo;
+use crate::z_lib::api::response::tonic::ServiceResponder;
 
 use crate::auth::ticket::validate::action::ValidateApiTokenState;
 
@@ -10,7 +10,7 @@ use crate::auth::ticket::validate::method::{
     ValidateAuthNonceEvent, ValidateAuthTokenEvent,
 };
 
-impl RespondTo<ValidateApiTokenResponsePb> for ValidateApiTokenState {
+impl ServiceResponder<ValidateApiTokenResponsePb> for ValidateApiTokenState {
     fn respond_to(self) -> Result<Response<ValidateApiTokenResponsePb>, Status> {
         match self {
             Self::Validate(event) => event.respond_to(),
@@ -19,7 +19,7 @@ impl RespondTo<ValidateApiTokenResponsePb> for ValidateApiTokenState {
     }
 }
 
-impl RespondTo<ValidateApiTokenResponsePb> for ValidateAuthTokenEvent {
+impl ServiceResponder<ValidateApiTokenResponsePb> for ValidateAuthTokenEvent {
     fn respond_to(self) -> Result<Response<ValidateApiTokenResponsePb>, Status> {
         match self {
             Self::ValidateNonce(event) => event.respond_to(),
@@ -32,7 +32,7 @@ impl RespondTo<ValidateApiTokenResponsePb> for ValidateAuthTokenEvent {
     }
 }
 
-impl<T> RespondTo<T> for ValidateAuthNonceEvent {
+impl<T> ServiceResponder<T> for ValidateAuthNonceEvent {
     fn respond_to(self) -> Result<Response<T>, Status> {
         match self {
             Self::NonceExpiresCalculated(_) => Err(Status::cancelled("nonce expires calculated")),
