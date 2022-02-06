@@ -35,7 +35,7 @@ pub struct AuthOutsideEncodingKey {
     pub api: EncodingKey,
 }
 pub struct AuthOutsideResetTokenKey {
-    pub decoding_key: DecodingKey<'static>,
+    pub decoding_key: DecodingKey,
     pub encoding_key: EncodingKey,
 }
 pub struct AuthOutsideCloudfrontKey {
