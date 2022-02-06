@@ -21,7 +21,7 @@ impl AuthUserPasswordHasher for Argon2PasswordHasher {
         let salt = SaltString::generate(&mut OsRng);
 
         let hash = engine
-            .hash_password_simple(self.plain_password.as_bytes(), salt.as_ref())
+            .hash_password(self.plain_password.as_bytes(), salt.as_ref())
             .map_err(|err| PasswordHashError::InfraError(format!("{}", err)))?;
 
         Ok(HashedPassword::restore(hash.to_string()))

@@ -32,7 +32,7 @@ impl RespondTo for AuthProxyError {
     fn respond_to(self, request: &HttpRequest) -> HttpResponse {
         match self {
             Self::AlreadyExists(_) => HttpResponse::Conflict().finish(),
-            Self::Unauthenticated(_) => unauthorized(request),
+            Self::Unauthenticated(_) => unauthorized(),
             Self::PermissionDenied(_) => HttpResponse::Unauthorized().finish(),
             Self::Cancelled(_) => HttpResponse::Accepted().finish(),
             Self::InfraError(_) => HttpResponse::InternalServerError().finish(),
@@ -41,24 +41,14 @@ impl RespondTo for AuthProxyError {
     }
 }
 
-pub fn unauthorized(request: &HttpRequest) -> HttpResponse {
-    let mut response = HttpResponse::Unauthorized();
+pub fn unauthorized() -> HttpResponse {
+    let mut response = HttpResponse::Unauthorized().finish();
 
-    if let Some(cookie) = request.cookie(COOKIE_TICKET_TOKEN) {
-        response.del_cookie(&cookie);
-    }
-    if let Some(cookie) = request.cookie(COOKIE_API_TOKEN) {
-        response.del_cookie(&cookie);
-    }
-    if let Some(cookie) = request.cookie(COOKIE_CLOUDFRONT_SIGNATURE) {
-        response.del_cookie(&cookie);
-    }
-    if let Some(cookie) = request.cookie(COOKIE_CLOUDFRONT_KEY_PAIR_ID) {
-        response.del_cookie(&cookie);
-    }
-    if let Some(cookie) = request.cookie(COOKIE_CLOUDFRONT_POLICY) {
-        response.del_cookie(&cookie);
-    }
+    response.del_cookie(COOKIE_TICKET_TOKEN);
+    response.del_cookie(COOKIE_API_TOKEN);
+    response.del_cookie(COOKIE_CLOUDFRONT_SIGNATURE);
+    response.del_cookie(COOKIE_CLOUDFRONT_KEY_PAIR_ID);
+    response.del_cookie(COOKIE_CLOUDFRONT_POLICY);
 
-    response.finish()
+    response
 }

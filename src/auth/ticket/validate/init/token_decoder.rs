@@ -14,7 +14,7 @@ use crate::auth::ticket::kernel::api::data::{
 };
 
 pub struct JwtTicketTokenDecoder<'a> {
-    key: &'a DecodingKey<'a>,
+    key: &'a DecodingKey,
 }
 
 impl<'a> JwtTicketTokenDecoder<'a> {
@@ -30,7 +30,7 @@ impl<'a> AuthTokenDecoder for JwtTicketTokenDecoder<'a> {
 }
 
 pub struct JwtApiTokenDecoder<'a> {
-    key: &'a DecodingKey<'a>,
+    key: &'a DecodingKey,
 }
 
 impl<'a> JwtApiTokenDecoder<'a> {
@@ -45,10 +45,10 @@ impl<'a> AuthTokenDecoder for JwtApiTokenDecoder<'a> {
     }
 }
 
-fn validate_jwt<'a>(
+fn validate_jwt(
     token: &AuthToken,
     audience: &[&str],
-    key: &DecodingKey<'a>,
+    key: &DecodingKey,
 ) -> Result<AuthTicketExtract, DecodeAuthTokenError> {
     let mut validation = Validation::new(Algorithm::ES384);
     validation.set_audience(audience);

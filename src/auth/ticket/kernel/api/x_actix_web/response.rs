@@ -1,8 +1,8 @@
 use actix_web::{
-    cookie::{Cookie, SameSite},
+    cookie::{Cookie, Expiration, SameSite},
     HttpRequest, HttpResponse,
 };
-use time::OffsetDateTime;
+use time::{error::ComponentRange, OffsetDateTime};
 
 use crate::z_lib::api::response::actix_web::RespondTo;
 
@@ -14,8 +14,8 @@ use super::header::{
 use crate::auth::proxy::x_actix_web::response::unauthorized;
 
 use crate::auth::ticket::kernel::api::data::{
-    EncodedAuthTokens, AuthTokenExtract, AuthTokenMessage, AuthTokenResponse, CloudfrontTokenKind,
-    DecodeAuthTokenError,
+    AuthTokenExtract, AuthTokenMessage, AuthTokenResponse, CloudfrontTokenKind,
+    DecodeAuthTokenError, EncodedAuthTokens,
 };
 
 impl RespondTo for AuthTokenResponse {
@@ -32,27 +32,40 @@ impl RespondTo for AuthTokenResponse {
 
         let mut response = HttpResponse::Ok();
 
-        response.cookie(auth_cookie(COOKIE_TICKET_TOKEN, &domain, ticket_token));
-        response.cookie(auth_cookie(COOKIE_API_TOKEN, &domain, api_token));
+        // これらがエラーの時は web アプリケーションが動かなくなる
+        // TODO ログを出したい
+        if let Ok(cookie) = auth_cookie(COOKIE_TICKET_TOKEN, &domain, ticket_token) {
+            response.cookie(cookie);
+        }
+        if let Ok(cookie) = auth_cookie(COOKIE_API_TOKEN, &domain, api_token) {
+            response.cookie(cookie);
+        }
         cloudfront_tokens
             .into_iter()
             .for_each(|(kind, cloudfront_token)| {
-                response.cookie(auth_cookie(kind_as_name(&kind), &domain, cloudfront_token));
+                if let Ok(cookie) = auth_cookie(kind_as_name(&kind), &domain, cloudfront_token) {
+                    response.cookie(cookie);
+                }
             });
 
         response.body(body)
     }
 }
 
-fn auth_cookie<'a>(name: &'a str, domain: &'a str, token: AuthTokenExtract) -> Cookie<'a> {
-    Cookie::build(name, token.token)
-        .expires(OffsetDateTime::from_unix_timestamp(token.expires))
+fn auth_cookie<'a>(
+    name: &'a str,
+    domain: &'a str,
+    token: AuthTokenExtract,
+) -> Result<Cookie<'a>, ComponentRange> {
+    let expiration = Expiration::DateTime(OffsetDateTime::from_unix_timestamp(token.expires)?);
+    Ok(Cookie::build(name, token.token)
+        .expires(expiration)
         .domain(domain)
         .path("/")
         .secure(true)
         .http_only(true)
         .same_site(SameSite::Strict)
-        .finish()
+        .finish())
 }
 
 fn kind_as_name(kind: &CloudfrontTokenKind) -> &str {
@@ -64,7 +77,7 @@ fn kind_as_name(kind: &CloudfrontTokenKind) -> &str {
 }
 
 impl RespondTo for DecodeAuthTokenError {
-    fn respond_to(self, request: &HttpRequest) -> HttpResponse {
-        unauthorized(request)
+    fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
+        unauthorized()
     }
 }

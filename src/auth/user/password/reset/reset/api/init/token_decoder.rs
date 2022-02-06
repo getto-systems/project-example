@@ -12,7 +12,7 @@ use crate::auth::user::password::reset::{
 };
 
 pub struct JwtResetTokenDecoder<'a> {
-    key: &'a DecodingKey<'a>,
+    key: &'a DecodingKey,
 }
 
 impl<'a> JwtResetTokenDecoder<'a> {
@@ -29,9 +29,9 @@ impl<'a> ResetTokenDecoder for JwtResetTokenDecoder<'a> {
     }
 }
 
-fn validate_jwt<'a>(
+fn validate_jwt(
     token: &ResetTokenEncoded,
-    key: &DecodingKey<'a>,
+    key: &DecodingKey,
 ) -> Result<ResetToken, DecodeResetTokenError> {
     let validation = Validation::new(Algorithm::ES384);
 
