@@ -2,7 +2,7 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::api::{logger::Logger, response::tonic::RespondTo};
+use crate::z_lib::api::{logger::Logger, response::tonic::ServiceResponder};
 
 use crate::avail::unexpected_error::notify::y_protobuf::service::{
     notify_pb_server::NotifyPb, NotifyRequestPb, NotifyResponsePb,

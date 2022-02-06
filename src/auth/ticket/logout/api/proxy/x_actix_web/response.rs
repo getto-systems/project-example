@@ -1,11 +1,11 @@
-use actix_web::{HttpRequest, HttpResponse};
+use actix_web::HttpResponse;
 
-use crate::z_lib::api::response::actix_web::RespondTo;
+use crate::z_lib::api::response::actix_web::ProxyResponder;
 
 use crate::auth::ticket::logout::y_protobuf::service::LogoutResponsePb;
 
-impl RespondTo for LogoutResponsePb {
-    fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
+impl ProxyResponder for LogoutResponsePb {
+    fn respond_to(self) -> HttpResponse {
         HttpResponse::Ok().finish()
     }
 }

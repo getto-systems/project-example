@@ -1,11 +1,11 @@
-use actix_web::{HttpRequest, HttpResponse};
+use actix_web::HttpResponse;
 
-use crate::z_lib::api::response::actix_web::RespondTo;
+use crate::z_lib::api::response::actix_web::ProxyResponder;
 
 use super::super::data::MessageError;
 
-impl RespondTo for MessageError {
-    fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
+impl ProxyResponder for MessageError {
+    fn respond_to(self) -> HttpResponse {
         HttpResponse::InternalServerError().finish()
     }
 }

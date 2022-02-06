@@ -7,7 +7,7 @@ use crate::auth::{
     },
 };
 
-use crate::z_lib::api::response::tonic::RespondTo;
+use crate::z_lib::api::response::tonic::ServiceResponder;
 
 use super::super::action::{AuthenticatePasswordEvent, AuthenticatePasswordState};
 
@@ -18,7 +18,7 @@ use crate::auth::{
     user::password::authenticate::api::data::AuthenticatePasswordError,
 };
 
-impl RespondTo<AuthenticatePasswordResponsePb> for AuthenticatePasswordState {
+impl ServiceResponder<AuthenticatePasswordResponsePb> for AuthenticatePasswordState {
     fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
         match self {
             Self::Authenticate(event) => event.respond_to(),
@@ -29,7 +29,7 @@ impl RespondTo<AuthenticatePasswordResponsePb> for AuthenticatePasswordState {
     }
 }
 
-impl RespondTo<AuthenticatePasswordResponsePb> for EncodeAuthTicketEvent {
+impl ServiceResponder<AuthenticatePasswordResponsePb> for EncodeAuthTicketEvent {
     fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
         match self {
             Self::TokenExpiresCalculated(_) => Err(Status::cancelled("token expires calculated")),
@@ -58,7 +58,7 @@ impl AuthenticatePasswordResponsePb {
     }
 }
 
-impl RespondTo<AuthenticatePasswordResponsePb> for AuthTicketEncoded {
+impl ServiceResponder<AuthenticatePasswordResponsePb> for AuthTicketEncoded {
     fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
         Ok(Response::new(AuthenticatePasswordResponsePb {
             success: true,
@@ -68,7 +68,7 @@ impl RespondTo<AuthenticatePasswordResponsePb> for AuthTicketEncoded {
     }
 }
 
-impl RespondTo<AuthenticatePasswordResponsePb> for AuthenticatePasswordEvent {
+impl ServiceResponder<AuthenticatePasswordResponsePb> for AuthenticatePasswordEvent {
     fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
         match self {
             Self::Success(_) => Err(Status::cancelled("authenticate password cancelled")),
@@ -80,7 +80,7 @@ impl RespondTo<AuthenticatePasswordResponsePb> for AuthenticatePasswordEvent {
     }
 }
 
-impl RespondTo<AuthenticatePasswordResponsePb> for AuthenticatePasswordError {
+impl ServiceResponder<AuthenticatePasswordResponsePb> for AuthenticatePasswordError {
     fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
         Ok(Response::new(AuthenticatePasswordResponsePb {
             success: false,

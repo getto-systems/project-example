@@ -2,7 +2,7 @@ use tonic::{Response, Status};
 
 use crate::auth::ticket::y_protobuf::service::EncodedAuthTokensPb;
 
-use crate::z_lib::api::response::tonic::RespondTo;
+use crate::z_lib::api::response::tonic::ServiceResponder;
 
 use crate::auth::user::password::reset::reset::y_protobuf::service::{
     ResetPasswordErrorKindPb, ResetPasswordMaskedResponsePb, ResetPasswordResponsePb,
@@ -20,7 +20,7 @@ use crate::auth::{
     },
 };
 
-impl RespondTo<ResetPasswordResponsePb> for ResetPasswordState {
+impl ServiceResponder<ResetPasswordResponsePb> for ResetPasswordState {
     fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
         match self {
             Self::ValidateNonce(event) => event.respond_to(),
@@ -31,7 +31,7 @@ impl RespondTo<ResetPasswordResponsePb> for ResetPasswordState {
     }
 }
 
-impl RespondTo<ResetPasswordResponsePb> for EncodeAuthTicketEvent {
+impl ServiceResponder<ResetPasswordResponsePb> for EncodeAuthTicketEvent {
     fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
         match self {
             Self::TokenExpiresCalculated(_) => Err(Status::cancelled("token expires calculated")),
@@ -43,7 +43,7 @@ impl RespondTo<ResetPasswordResponsePb> for EncodeAuthTicketEvent {
     }
 }
 
-impl RespondTo<ResetPasswordResponsePb> for AuthTicketEncoded {
+impl ServiceResponder<ResetPasswordResponsePb> for AuthTicketEncoded {
     fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
         Ok(Response::new(ResetPasswordResponsePb {
             success: true,
@@ -54,7 +54,7 @@ impl RespondTo<ResetPasswordResponsePb> for AuthTicketEncoded {
     }
 }
 
-impl RespondTo<ResetPasswordResponsePb> for ResetPasswordEvent {
+impl ServiceResponder<ResetPasswordResponsePb> for ResetPasswordEvent {
     fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
         match self {
             Self::ResetNotified(_) => Err(Status::cancelled("reset password cancelled")),
@@ -82,7 +82,7 @@ impl ResetPasswordResponsePb {
     }
 }
 
-impl RespondTo<ResetPasswordResponsePb> for ResetPasswordError {
+impl ServiceResponder<ResetPasswordResponsePb> for ResetPasswordError {
     fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
         let error: ResetPasswordErrorKindPb = self.into();
         Ok(Response::new(ResetPasswordResponsePb {
@@ -115,13 +115,13 @@ impl Into<ResetPasswordErrorKindPb> for VerifyResetTokenEntryError {
     }
 }
 
-impl<T> RespondTo<T> for DecodeResetTokenError {
+impl<T> ServiceResponder<T> for DecodeResetTokenError {
     fn respond_to(self) -> Result<Response<T>, Status> {
         Err(Status::unauthenticated("failed to decode reset token"))
     }
 }
 
-impl<T> RespondTo<T> for NotifyResetPasswordError {
+impl<T> ServiceResponder<T> for NotifyResetPasswordError {
     fn respond_to(self) -> Result<Response<T>, Status> {
         match self {
             Self::InfraError(_) => Err(Status::internal("notify reset password error")),

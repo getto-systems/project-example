@@ -1,6 +1,5 @@
-use actix_web::{HttpRequest, HttpResponse};
+use actix_web::HttpResponse;
 
-pub trait RespondTo {
-    // TODO request は必要無くなった
-    fn respond_to(self, request: &HttpRequest) -> HttpResponse;
+pub trait ProxyResponder {
+    fn respond_to(self) -> HttpResponse;
 }

@@ -1,10 +1,10 @@
 use actix_web::{
     cookie::{Cookie, Expiration, SameSite},
-    HttpRequest, HttpResponse,
+    HttpResponse,
 };
 use time::{error::ComponentRange, OffsetDateTime};
 
-use crate::z_lib::api::response::actix_web::RespondTo;
+use crate::z_lib::api::response::actix_web::ProxyResponder;
 
 use super::header::{
     COOKIE_API_TOKEN, COOKIE_CLOUDFRONT_KEY_PAIR_ID, COOKIE_CLOUDFRONT_POLICY,
@@ -18,8 +18,8 @@ use crate::auth::ticket::kernel::api::data::{
     DecodeAuthTokenError, EncodedAuthTokens,
 };
 
-impl RespondTo for AuthTokenResponse {
-    fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
+impl ProxyResponder for AuthTokenResponse {
+    fn respond_to(self) -> HttpResponse {
         let AuthTokenResponse {
             domain,
             message: AuthTokenMessage { body, token },
@@ -76,8 +76,8 @@ fn kind_as_name(kind: &CloudfrontTokenKind) -> &str {
     }
 }
 
-impl RespondTo for DecodeAuthTokenError {
-    fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
+impl ProxyResponder for DecodeAuthTokenError {
+    fn respond_to(self) -> HttpResponse {
         unauthorized()
     }
 }

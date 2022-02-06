@@ -1,5 +1,5 @@
 use tonic::{Response, Status};
 
-pub trait RespondTo<T> {
+pub trait ServiceResponder<T> {
     fn respond_to(self) -> Result<Response<T>, Status>;
 }

@@ -1,6 +1,6 @@
 use tonic::{Response, Status};
 
-use crate::z_lib::api::response::tonic::RespondTo;
+use crate::z_lib::api::response::tonic::ServiceResponder;
 
 use crate::auth::ticket::{
     check::y_protobuf::service::{CheckAuthTicketMaskedResponsePb, CheckAuthTicketResponsePb},
@@ -15,7 +15,7 @@ use crate::auth::ticket::{
 
 use crate::auth::ticket::encode::data::AuthTicketEncoded;
 
-impl RespondTo<CheckAuthTicketResponsePb> for CheckAuthTicketState {
+impl ServiceResponder<CheckAuthTicketResponsePb> for CheckAuthTicketState {
     fn respond_to(self) -> Result<Response<CheckAuthTicketResponsePb>, Status> {
         match self {
             Self::Validate(event) => event.respond_to(),
@@ -24,7 +24,7 @@ impl RespondTo<CheckAuthTicketResponsePb> for CheckAuthTicketState {
     }
 }
 
-impl RespondTo<CheckAuthTicketResponsePb> for AuthTicketEncoded {
+impl ServiceResponder<CheckAuthTicketResponsePb> for AuthTicketEncoded {
     fn respond_to(self) -> Result<Response<CheckAuthTicketResponsePb>, Status> {
         Ok(Response::new(CheckAuthTicketResponsePb {
             roles: Some(self.roles.into()),
@@ -42,7 +42,7 @@ impl CheckAuthTicketResponsePb {
     }
 }
 
-impl RespondTo<CheckAuthTicketResponsePb> for EncodeAuthTicketEvent {
+impl ServiceResponder<CheckAuthTicketResponsePb> for EncodeAuthTicketEvent {
     fn respond_to(self) -> Result<Response<CheckAuthTicketResponsePb>, Status> {
         match self {
             Self::TokenExpiresCalculated(_) => Err(Status::cancelled("token expires calculated")),
@@ -54,7 +54,7 @@ impl RespondTo<CheckAuthTicketResponsePb> for EncodeAuthTicketEvent {
     }
 }
 
-impl RespondTo<CheckAuthTicketResponsePb> for ValidateAuthTokenEvent {
+impl ServiceResponder<CheckAuthTicketResponsePb> for ValidateAuthTokenEvent {
     fn respond_to(self) -> Result<Response<CheckAuthTicketResponsePb>, Status> {
         match self {
             Self::ValidateNonce(_) => Err(Status::cancelled("check auth ticket cancelled")),

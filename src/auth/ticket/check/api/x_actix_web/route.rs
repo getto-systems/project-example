@@ -2,7 +2,7 @@ use actix_web::{patch, web::Data, HttpRequest, Responder};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::api::{logger::Logger, response::actix_web::RespondTo};
+use crate::z_lib::api::{logger::Logger, response::actix_web::ProxyResponder};
 
 use crate::x_outside_feature::api::proxy::{
     feature::ProxyAppFeature,
@@ -19,5 +19,5 @@ pub async fn service_check(feature: Data<ProxyAppFeature>, request: HttpRequest)
     let mut action = CheckAuthTicketProxyStruct::action(&feature.auth, &request_id, &request);
     action.subscribe(move |state| logger.log(state));
 
-    flatten(action.ignite().await).respond_to(&request)
+    flatten(action.ignite().await).respond_to()
 }

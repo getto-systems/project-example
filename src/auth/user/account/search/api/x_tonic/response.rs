@@ -5,13 +5,13 @@ use crate::auth::user::account::{
     y_protobuf::service::AuthUserAccountPb,
 };
 
-use crate::z_lib::api::response::tonic::RespondTo;
+use crate::z_lib::api::response::tonic::ServiceResponder;
 
 use super::super::action::{SearchAuthUserAccountEvent, SearchAuthUserAccountState};
 
 use crate::auth::user::account::search::api::data::SearchAuthUserAccountBasket;
 
-impl RespondTo<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountState {
+impl ServiceResponder<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountState {
     fn respond_to(self) -> Result<Response<SearchAuthUserAccountResponsePb>, Status> {
         match self {
             Self::Validate(_) => Err(Status::permission_denied("permission denied")),
@@ -20,7 +20,7 @@ impl RespondTo<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountState {
     }
 }
 
-impl RespondTo<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountEvent {
+impl ServiceResponder<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountEvent {
     fn respond_to(self) -> Result<Response<SearchAuthUserAccountResponsePb>, Status> {
         match self {
             Self::Success(response) => response.respond_to(),
@@ -29,7 +29,7 @@ impl RespondTo<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountEvent {
     }
 }
 
-impl RespondTo<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountBasket {
+impl ServiceResponder<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountBasket {
     fn respond_to(self) -> Result<Response<SearchAuthUserAccountResponsePb>, Status> {
         Ok(Response::new(self.into()))
     }

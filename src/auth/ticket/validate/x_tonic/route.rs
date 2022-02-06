@@ -2,7 +2,7 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::api::{logger::Logger, response::tonic::RespondTo};
+use crate::z_lib::api::{logger::Logger, response::tonic::ServiceResponder};
 
 use crate::auth::ticket::validate::y_protobuf::service::{
     validate_api_token_pb_server::ValidateApiTokenPb, ValidateApiTokenRequestPb,

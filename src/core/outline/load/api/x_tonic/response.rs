@@ -1,6 +1,6 @@
 use tonic::{Response, Status};
 
-use crate::z_lib::api::response::tonic::RespondTo;
+use crate::z_lib::api::response::tonic::ServiceResponder;
 
 use crate::core::outline::load::y_protobuf::service::LoadMenuBadgeResponsePb;
 
@@ -8,7 +8,7 @@ use super::super::action::{LoadOutlineMenuBadgeEvent, LoadOutlineMenuBadgeState}
 
 use crate::core::outline::load::api::data::{OutlineMenuBadge, OutlineMenuBadgeCount};
 
-impl RespondTo<LoadMenuBadgeResponsePb> for LoadOutlineMenuBadgeState {
+impl ServiceResponder<LoadMenuBadgeResponsePb> for LoadOutlineMenuBadgeState {
     fn respond_to(self) -> Result<Response<LoadMenuBadgeResponsePb>, Status> {
         match self {
             Self::Validate(_) => Err(Status::unauthenticated("unauthenticated")),
@@ -17,7 +17,7 @@ impl RespondTo<LoadMenuBadgeResponsePb> for LoadOutlineMenuBadgeState {
     }
 }
 
-impl RespondTo<LoadMenuBadgeResponsePb> for LoadOutlineMenuBadgeEvent {
+impl ServiceResponder<LoadMenuBadgeResponsePb> for LoadOutlineMenuBadgeEvent {
     fn respond_to(self) -> Result<Response<LoadMenuBadgeResponsePb>, Status> {
         match self {
             Self::Success(menu_badge) => {

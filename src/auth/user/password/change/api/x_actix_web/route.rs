@@ -2,7 +2,7 @@ use actix_web::{post, web::Data, HttpRequest, Responder};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::api::{logger::Logger, response::actix_web::RespondTo};
+use crate::z_lib::api::{logger::Logger, response::actix_web::ProxyResponder};
 
 use crate::x_outside_feature::api::proxy::{
     feature::ProxyAppFeature,
@@ -23,5 +23,5 @@ pub async fn service_change(
     let mut action = ChangePasswordProxyStruct::action(&feature.auth, &request_id, &request, body);
     action.subscribe(move |state| logger.log(state));
 
-    flatten(action.ignite().await).respond_to(&request)
+    flatten(action.ignite().await).respond_to()
 }

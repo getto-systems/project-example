@@ -1,9 +1,9 @@
-use actix_web::{HttpRequest, HttpResponse};
+use actix_web::HttpResponse;
 
-use crate::z_lib::api::{request::data::MetadataError, response::actix_web::RespondTo};
+use crate::z_lib::api::{request::data::MetadataError, response::actix_web::ProxyResponder};
 
-impl RespondTo for MetadataError {
-    fn respond_to(self, _request: &HttpRequest) -> HttpResponse {
+impl ProxyResponder for MetadataError {
+    fn respond_to(self) -> HttpResponse {
         HttpResponse::BadRequest().finish()
     }
 }
