@@ -28,9 +28,9 @@ aws-cloudfront-cookie = { path = "api/vendor/aws-cloudfront-cookie" }
 tokio = "1"
 actix-web = "4.0.0-rc"
 actix-cors = "0.6.0-beta"
-rusoto_core = { version = "0.46", default_features = false, features = ["rustls"] }
-rusoto_ses = { version = "0.46", default_features = false, features = ["rustls"] }
-rusoto_dynamodb = { version = "0.46", default_features = false, features = ["rustls"] }
+rusoto_core = { version = "0.47", default_features = false, features = ["rustls"] }
+rusoto_ses = { version = "0.47", default_features = false, features = ["rustls"] }
+rusoto_dynamodb = { version = "0.47", default_features = false, features = ["rustls"] }
 sqlx = { version = "0.5", default_features = false, features = ["macros", "offline", "runtime-tokio-rustls", "mysql", "chrono"] }
 sea-query = { version = "0.21", default_features = false, features = ["derive", "backend-mysql", "sqlx-mysql"] }
 
