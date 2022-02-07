@@ -2,7 +2,7 @@
 
 prepare_main() {
     prepare_app auth
-    prepare_app example
+    prepare_app core
 
     prepare_merge
 }
