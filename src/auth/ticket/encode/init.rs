@@ -6,7 +6,9 @@ use crate::auth::ticket::{
     encode::init::token_encoder::{
         ApiJwtAuthTokenEncoder, CookieCloudfrontTokenEncoder, TicketJwtAuthTokenEncoder,
     },
-    kernel::api::init::{clock::ChronoAuthClock, ticket_repository::MysqlAuthTicketRepository},
+    kernel::api::init::{
+        clock::ChronoAuthClock, ticket_repository::mysql::MysqlAuthTicketRepository,
+    },
 };
 
 use super::method::{EncodeAuthTicketConfig, EncodeAuthTicketInfra};
@@ -69,7 +71,7 @@ pub mod test {
     use crate::auth::ticket::{
         encode::init::token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
         kernel::api::init::{
-            clock::test::StaticChronoAuthClock, ticket_repository::test::MemoryAuthTicketRepository,
+            clock::test::StaticChronoAuthClock, ticket_repository::memory::MemoryAuthTicketRepository,
         },
     };
 

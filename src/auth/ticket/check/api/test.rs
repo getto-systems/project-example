@@ -11,7 +11,7 @@ use crate::auth::ticket::{
     },
     kernel::api::init::{
         clock::test::StaticChronoAuthClock,
-        ticket_repository::test::{
+        ticket_repository::memory::{
             MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
         },
     },

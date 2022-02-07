@@ -4,7 +4,7 @@ use crate::auth::x_outside_feature::api::auth::feature::AuthOutsideFeature;
 
 use crate::auth::ticket::{
     issue::init::id_generator::UuidAuthTicketIdGenerator,
-    kernel::api::init::{clock::ChronoAuthClock, ticket_repository::MysqlAuthTicketRepository},
+    kernel::api::init::{clock::ChronoAuthClock, ticket_repository::mysql::MysqlAuthTicketRepository},
 };
 
 use super::method::{IssueAuthTicketConfig, IssueAuthTicketInfra};
@@ -53,7 +53,7 @@ pub mod test {
     use crate::auth::ticket::{
         issue::init::id_generator::test::StaticAuthTicketIdGenerator,
         kernel::api::init::{
-            clock::test::StaticChronoAuthClock, ticket_repository::test::MemoryAuthTicketRepository,
+            clock::test::StaticChronoAuthClock, ticket_repository::memory::MemoryAuthTicketRepository,
         },
     };
 
