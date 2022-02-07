@@ -2,16 +2,14 @@ use std::collections::HashSet;
 
 use jsonwebtoken::{decode, errors::ErrorKind, Algorithm, DecodingKey, Validation};
 
-use crate::auth::x_outside_feature::api::common::feature::AuthOutsideDecodingKey;
+use crate::auth::x_outside_feature::common::feature::AuthOutsideDecodingKey;
 
 use crate::auth::ticket::{
-    kernel::api::infra::{AuthJwtClaims, AUTH_JWT_AUDIENCE_API, AUTH_JWT_AUDIENCE_TICKET},
+    kernel::infra::{AuthJwtClaims, AUTH_JWT_AUDIENCE_API, AUTH_JWT_AUDIENCE_TICKET},
     validate::infra::AuthTokenDecoder,
 };
 
-use crate::auth::ticket::kernel::api::data::{
-    AuthTicketExtract, AuthToken, DecodeAuthTokenError,
-};
+use crate::auth::ticket::kernel::data::{AuthTicketExtract, AuthToken, DecodeAuthTokenError};
 
 pub struct JwtTicketTokenDecoder<'a> {
     key: &'a DecodingKey,
@@ -82,9 +80,7 @@ pub mod test {
 
     use crate::auth::ticket::validate::infra::AuthTokenDecoder;
 
-    use crate::auth::ticket::kernel::api::data::{
-        AuthTicketExtract, AuthToken, DecodeAuthTokenError,
-    };
+    use crate::auth::ticket::kernel::data::{AuthTicketExtract, AuthToken, DecodeAuthTokenError};
 
     pub enum StaticAuthTokenDecoder {
         Valid(AuthTicketExtract),

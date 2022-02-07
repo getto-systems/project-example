@@ -5,46 +5,46 @@ use std::{
 
 use chrono::{DateTime, Utc};
 
-use crate::z_lib::api::repository::helper::infra_error;
+use crate::z_lib::repository::helper::infra_error;
 
 use crate::auth::user::{
-    account::search::api::infra::{SearchAuthUserAccountFields, SearchAuthUserAccountRepository},
+    account::search::infra::{SearchAuthUserAccountFields, SearchAuthUserAccountRepository},
     kernel::infra::AuthUserRepository,
     password::{
-        authenticate::api::infra::VerifyPasswordRepository,
-        change::api::infra::ChangePasswordRepository,
+        authenticate::infra::VerifyPasswordRepository,
+        change::infra::ChangePasswordRepository,
         kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword},
         reset::{
             kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
-            request_token::api::infra::{
+            request_token::infra::{
                 RegisterResetTokenRepository, ResetTokenDestinationRepository,
             },
-            reset::api::infra::ResetPasswordRepository,
+            reset::infra::ResetPasswordRepository,
         },
     },
 };
 
 use crate::{
     auth::{
-        ticket::kernel::api::data::{AuthDateTime, ExpireDateTime},
+        ticket::kernel::data::{AuthDateTime, ExpireDateTime},
         user::{
-            account::search::api::data::{AuthUserAccountBasket, SearchAuthUserAccountBasket},
+            account::search::data::{AuthUserAccountBasket, SearchAuthUserAccountBasket},
             kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRolesBasket},
             login_id::kernel::data::{LoginId, LoginIdBasket},
             password::{
-                authenticate::api::data::VerifyPasswordRepositoryError,
-                change::api::data::ChangePasswordRepositoryError,
+                authenticate::data::VerifyPasswordRepositoryError,
+                change::data::ChangePasswordRepositoryError,
                 reset::{
                     kernel::data::{
                         ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
                     },
-                    request_token::api::data::RegisterResetTokenRepositoryError,
-                    reset::api::data::ResetPasswordRepositoryError,
+                    request_token::data::RegisterResetTokenRepositoryError,
+                    reset::data::ResetPasswordRepositoryError,
                 },
             },
         },
     },
-    z_lib::api::{repository::data::RepositoryError, search::data::SearchPage},
+    z_lib::{repository::data::RepositoryError, search::data::SearchPage},
 };
 
 pub type MemoryAuthUserStore = Mutex<MemoryAuthUserMap>;

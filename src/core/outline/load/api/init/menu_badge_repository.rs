@@ -1,8 +1,8 @@
-use crate::core::outline::load::api::infra::OutlineMenuBadgeRepository;
+use crate::core::outline::load::infra::OutlineMenuBadgeRepository;
 
 use crate::{
-    core::outline::load::api::data::{OutlineMenuBadge, OutlineMenuBadgeCount},
-    z_lib::api::repository::data::RepositoryError,
+    core::outline::load::data::{OutlineMenuBadge, OutlineMenuBadgeCount},
+    z_lib::repository::data::RepositoryError,
 };
 
 pub struct UnitedOutlineMenuBadgeRepository;
@@ -19,11 +19,11 @@ impl OutlineMenuBadgeRepository for UnitedOutlineMenuBadgeRepository {
 
 #[cfg(test)]
 pub mod test {
-    use crate::core::outline::load::api::infra::OutlineMenuBadgeRepository;
+    use crate::core::outline::load::infra::OutlineMenuBadgeRepository;
 
     use crate::{
-        core::outline::load::api::data::{OutlineMenuBadge, OutlineMenuBadgeCount},
-        z_lib::api::repository::data::RepositoryError,
+        core::outline::load::data::{OutlineMenuBadge, OutlineMenuBadgeCount},
+        z_lib::repository::data::RepositoryError,
     };
 
     pub struct StaticOutlineMenuBadgeRepository;

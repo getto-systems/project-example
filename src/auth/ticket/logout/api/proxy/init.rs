@@ -2,11 +2,10 @@ mod proxy_service;
 
 use actix_web::HttpRequest;
 
-use crate::auth::x_outside_feature::api::proxy::feature::AuthOutsideFeature;
+use crate::auth::x_outside_feature::proxy::feature::AuthOutsideFeature;
 
 use crate::auth::ticket::{
-    logout::api::proxy::init::proxy_service::ProxyService,
-    validate::init::ValidateTicketMetadataStruct,
+    logout::proxy::init::proxy_service::ProxyService, validate::init::ValidateTicketMetadataStruct,
 };
 
 use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};

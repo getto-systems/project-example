@@ -4,11 +4,11 @@ use tonic::metadata::MetadataMap;
 
 use crate::avail::unexpected_error::notify::y_protobuf::service::NotifyRequestPb;
 
-use crate::x_outside_feature::api::core::feature::CoreAppFeature;
+use crate::x_outside_feature::core::feature::CoreAppFeature;
 
 use crate::{
     auth::init::CheckPermissionStruct,
-    avail::unexpected_error::notify::api::init::request_decoder::PbNotifyUnexpectedErrorRequestDecoder,
+    avail::unexpected_error::notify::init::request_decoder::PbNotifyUnexpectedErrorRequestDecoder,
 };
 
 use super::action::{NotifyUnexpectedErrorAction, NotifyUnexpectedErrorMaterial};

@@ -4,14 +4,14 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::user::password::change::y_protobuf::service::ChangePasswordRequestPb;
 
-use crate::x_outside_feature::api::auth::feature::AuthAppFeature;
+use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::{
     ticket::validate::init::ApiValidateAuthTokenStruct,
     user::{
         kernel::init::user_repository::mysql::MysqlAuthUserRepository,
         password::{
-            change::api::init::request_decoder::PbChangePasswordRequestDecoder,
+            change::init::request_decoder::PbChangePasswordRequestDecoder,
             kernel::init::{
                 password_hasher::Argon2PasswordHasher, password_matcher::Argon2PasswordMatcher,
             },

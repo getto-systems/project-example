@@ -1,6 +1,6 @@
 use tonic::metadata::MetadataMap;
 
-use crate::z_lib::api::request::data::MetadataError;
+use crate::z_lib::request::data::MetadataError;
 
 pub fn metadata<'a>(
     metadata: &'a MetadataMap,

@@ -7,7 +7,7 @@ use crate::auth::{
     },
 };
 
-use crate::z_lib::api::response::tonic::ServiceResponder;
+use crate::z_lib::response::tonic::ServiceResponder;
 
 use super::super::action::{AuthenticatePasswordEvent, AuthenticatePasswordState};
 
@@ -15,7 +15,7 @@ use crate::auth::ticket::encode::method::EncodeAuthTicketEvent;
 
 use crate::auth::{
     ticket::encode::data::AuthTicketEncoded,
-    user::password::authenticate::api::data::AuthenticatePasswordError,
+    user::password::authenticate::data::AuthenticatePasswordError,
 };
 
 impl ServiceResponder<AuthenticatePasswordResponsePb> for AuthenticatePasswordState {

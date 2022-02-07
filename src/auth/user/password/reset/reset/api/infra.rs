@@ -4,19 +4,19 @@ use crate::auth::user::password::{
 
 use crate::{
     auth::{
-        ticket::kernel::api::data::AuthDateTime,
+        ticket::kernel::data::AuthDateTime,
         user::{
             kernel::data::AuthUserId,
             password::reset::{
                 kernel::data::{ResetToken, ResetTokenDestination, ResetTokenEncoded},
-                reset::api::data::{
+                reset::data::{
                     DecodeResetTokenError, NotifyResetPasswordError, NotifyResetPasswordResponse,
                     ResetPasswordRepositoryError,
                 },
             },
         },
     },
-    z_lib::api::repository::data::RepositoryError,
+    z_lib::repository::data::RepositoryError,
 };
 
 pub trait ResetTokenDecoder {

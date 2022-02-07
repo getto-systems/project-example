@@ -1,9 +1,9 @@
 use tonic::metadata::MetadataMap;
 
-use crate::x_outside_feature::api::auth::feature::AuthAppFeature;
+use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::ticket::{
-    kernel::api::init::{clock::ChronoAuthClock, ticket_repository::mysql::MysqlAuthTicketRepository},
+    kernel::init::{clock::ChronoAuthClock, ticket_repository::mysql::MysqlAuthTicketRepository},
     validate::init::TicketValidateAuthTokenStruct,
 };
 

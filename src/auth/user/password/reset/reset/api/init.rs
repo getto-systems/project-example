@@ -6,18 +6,18 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::user::password::reset::reset::y_protobuf::service::ResetPasswordRequestPb;
 
-use crate::x_outside_feature::api::auth::feature::AuthAppFeature;
+use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::{
     ticket::{
         encode::init::EncodeAuthTicketStruct, issue::init::IssueAuthTicketStruct,
-        kernel::api::init::clock::ChronoAuthClock, validate::init::ValidateAuthNonceStruct,
+        kernel::init::clock::ChronoAuthClock, validate::init::ValidateAuthNonceStruct,
     },
     user::{
         kernel::init::user_repository::mysql::MysqlAuthUserRepository,
         password::{
             kernel::init::password_hasher::Argon2PasswordHasher,
-            reset::reset::api::init::{
+            reset::reset::init::{
                 request_decoder::PbResetPasswordRequestDecoder,
                 reset_notifier::EmailResetPasswordNotifier, token_decoder::JwtResetTokenDecoder,
             },

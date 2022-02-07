@@ -4,7 +4,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::user::password::authenticate::y_protobuf::service::AuthenticatePasswordRequestPb;
 
-use crate::x_outside_feature::api::auth::feature::AuthAppFeature;
+use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::{
     ticket::{
@@ -14,7 +14,7 @@ use crate::auth::{
     user::{
         kernel::init::user_repository::mysql::MysqlAuthUserRepository,
         password::{
-            authenticate::api::init::request_decoder::PbAuthenticatePasswordRequestDecoder,
+            authenticate::init::request_decoder::PbAuthenticatePasswordRequestDecoder,
             kernel::init::password_matcher::Argon2PasswordMatcher,
         },
     },

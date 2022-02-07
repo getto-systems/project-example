@@ -4,15 +4,15 @@ use crate::core::outline::load::y_protobuf::service::{
     load_menu_badge_pb_client::LoadMenuBadgePbClient, LoadMenuBadgeRequestPb,
 };
 
-use crate::core::x_outside_feature::api::feature::CoreOutsideService;
+use crate::core::x_outside_feature::feature::CoreOutsideService;
 
-use crate::core::outline::load::api::x_tonic::route::ServiceLoadMenuBadge;
+use crate::core::outline::load::x_tonic::route::ServiceLoadMenuBadge;
 
-use crate::z_lib::api::service::init::authorizer::GoogleServiceAuthorizer;
+use crate::z_lib::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::{
     auth::proxy::helper::infra_error,
-    z_lib::api::{message::helper::encode_protobuf_base64, service::helper::new_endpoint},
+    z_lib::{message::helper::encode_protobuf_base64, service::helper::new_endpoint},
 };
 
 use crate::auth::proxy::method::set_metadata;

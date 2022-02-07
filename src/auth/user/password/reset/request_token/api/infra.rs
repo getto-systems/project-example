@@ -1,18 +1,18 @@
 use crate::{
     auth::{
-        ticket::kernel::api::data::{AuthDateTime, ExpireDateTime, ExpireDuration},
+        ticket::kernel::data::{AuthDateTime, ExpireDateTime, ExpireDuration},
         user::{
             login_id::kernel::data::LoginId,
             password::reset::{
                 kernel::data::{ResetToken, ResetTokenDestination, ResetTokenEncoded},
-                request_token::api::data::{
+                request_token::data::{
                     EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
                     RegisterResetTokenRepositoryError,
                 },
             },
         },
     },
-    z_lib::api::repository::data::RepositoryError,
+    z_lib::repository::data::RepositoryError,
 };
 
 pub trait RequestResetTokenRequestDecoder {

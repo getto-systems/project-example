@@ -6,7 +6,7 @@ use crate::{
             reset::kernel::data::ValidateResetTokenError,
         },
     },
-    z_lib::api::repository::data::RepositoryError,
+    z_lib::repository::data::RepositoryError,
 };
 
 pub enum VerifyResetTokenEntryError {

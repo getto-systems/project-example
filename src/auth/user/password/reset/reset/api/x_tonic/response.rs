@@ -2,7 +2,7 @@ use tonic::{Response, Status};
 
 use crate::auth::ticket::y_protobuf::service::EncodedAuthTokensPb;
 
-use crate::z_lib::api::response::tonic::ServiceResponder;
+use crate::z_lib::response::tonic::ServiceResponder;
 
 use crate::auth::user::password::reset::reset::y_protobuf::service::{
     ResetPasswordErrorKindPb, ResetPasswordMaskedResponsePb, ResetPasswordResponsePb,
@@ -14,7 +14,7 @@ use crate::auth::ticket::encode::method::EncodeAuthTicketEvent;
 
 use crate::auth::{
     ticket::encode::data::AuthTicketEncoded,
-    user::password::reset::reset::api::data::{
+    user::password::reset::reset::data::{
         DecodeResetTokenError, NotifyResetPasswordError, ResetPasswordError,
         VerifyResetTokenEntryError,
     },

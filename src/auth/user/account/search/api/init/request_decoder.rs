@@ -1,9 +1,9 @@
 use crate::auth::user::account::search::y_protobuf::service::SearchAuthUserAccountRequestPb;
 
-use crate::auth::user::account::search::api::infra::{
+use crate::auth::user::account::search::infra::{
     SearchAuthUserAccountFieldsExtract, SearchAuthUserAccountRequestDecoder,
 };
-use crate::z_lib::api::search::data::SearchSortExtract;
+use crate::z_lib::search::data::SearchSortExtract;
 
 pub struct PbSearchAuthUserAccountRequestDecoder {
     request: SearchAuthUserAccountRequestPb,
@@ -30,7 +30,7 @@ impl SearchAuthUserAccountRequestDecoder for PbSearchAuthUserAccountRequestDecod
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::user::account::search::api::infra::{
+    use crate::auth::user::account::search::infra::{
         SearchAuthUserAccountFieldsExtract, SearchAuthUserAccountRequestDecoder,
     };
 

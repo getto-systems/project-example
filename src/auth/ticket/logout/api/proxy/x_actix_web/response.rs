@@ -1,6 +1,6 @@
 use actix_web::HttpResponse;
 
-use crate::z_lib::api::response::actix_web::ProxyResponder;
+use crate::z_lib::response::actix_web::ProxyResponder;
 
 use crate::auth::ticket::logout::y_protobuf::service::LogoutResponsePb;
 

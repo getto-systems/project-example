@@ -2,13 +2,13 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::api::{logger::Logger, response::tonic::ServiceResponder};
+use crate::z_lib::{logger::Logger, response::tonic::ServiceResponder};
 
 use crate::avail::unexpected_error::notify::y_protobuf::service::{
     notify_pb_server::NotifyPb, NotifyRequestPb, NotifyResponsePb,
 };
 
-use crate::x_outside_feature::api::{
+use crate::x_outside_feature::{
     common::metadata::metadata_request_id,
     core::{
         feature::{extract_request, TonicRequest},
@@ -16,7 +16,7 @@ use crate::x_outside_feature::api::{
     },
 };
 
-use crate::avail::unexpected_error::notify::api::init::NotifyUnexpectedErrorFeature;
+use crate::avail::unexpected_error::notify::init::NotifyUnexpectedErrorFeature;
 
 pub struct ServiceNotify;
 

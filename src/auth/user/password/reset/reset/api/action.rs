@@ -7,14 +7,14 @@ use crate::auth::ticket::{
 };
 
 use crate::auth::{
-    ticket::kernel::api::infra::AuthClock,
+    ticket::kernel::infra::AuthClock,
     user::{
         kernel::infra::AuthUserRepository,
         password::{
             kernel::infra::{AuthUserPasswordHasher, PlainPassword},
             reset::{
                 kernel::infra::ResetTokenEntry,
-                reset::api::infra::{
+                reset::infra::{
                     ResetPasswordFieldsExtract, ResetPasswordNotifier, ResetPasswordRepository,
                     ResetPasswordRequestDecoder, ResetTokenDecoder,
                 },
@@ -25,7 +25,7 @@ use crate::auth::{
 
 use crate::{
     auth::{
-        ticket::kernel::api::data::AuthDateTime,
+        ticket::kernel::data::AuthDateTime,
         user::{
             kernel::data::AuthUser,
             login_id::kernel::data::{LoginId, ValidateLoginIdError},
@@ -35,7 +35,7 @@ use crate::{
                     kernel::data::{
                         ResetTokenDestination, ResetTokenEncoded, ValidateResetTokenError,
                     },
-                    reset::api::data::{
+                    reset::data::{
                         DecodeResetTokenError, NotifyResetPasswordError,
                         NotifyResetPasswordResponse, ResetPasswordError,
                         ResetPasswordRepositoryError, VerifyResetTokenEntryError,
@@ -44,7 +44,7 @@ use crate::{
             },
         },
     },
-    z_lib::api::repository::data::RepositoryError,
+    z_lib::repository::data::RepositoryError,
 };
 
 pub enum ResetPasswordState {

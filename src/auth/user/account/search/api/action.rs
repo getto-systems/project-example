@@ -4,16 +4,16 @@ use crate::auth::ticket::validate::method::{
     validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
 };
 
-use crate::auth::user::account::search::api::infra::{
+use crate::auth::user::account::search::infra::{
     SearchAuthUserAccountFieldsExtract, SearchAuthUserAccountRepository,
     SearchAuthUserAccountRequestDecoder,
 };
 
 use crate::{
     auth::user::{
-        account::search::api::data::SearchAuthUserAccountBasket, kernel::data::RequireAuthRoles,
+        account::search::data::SearchAuthUserAccountBasket, kernel::data::RequireAuthRoles,
     },
-    z_lib::api::repository::data::RepositoryError,
+    z_lib::repository::data::RepositoryError,
 };
 
 pub enum SearchAuthUserAccountState {

@@ -13,7 +13,7 @@ use crate::auth::{
         issue::init::{
             id_generator::test::StaticAuthTicketIdGenerator, test::StaticIssueAuthTicketStruct,
         },
-        kernel::api::init::{
+        kernel::init::{
             clock::test::StaticChronoAuthClock,
             ticket_repository::memory::{
                 MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
@@ -33,7 +33,7 @@ use crate::auth::{
         },
         password::{
             kernel::init::password_hasher::test::PlainPasswordHasher,
-            reset::reset::api::init::{
+            reset::reset::init::{
                 request_decoder::test::StaticResetPasswordRequestDecoder,
                 reset_notifier::test::StaticResetPasswordNotifier,
                 token_decoder::test::StaticResetTokenDecoder,
@@ -49,12 +49,10 @@ use crate::auth::ticket::{
 
 use super::action::{ResetPasswordAction, ResetPasswordMaterial};
 
-use crate::auth::user::password::reset::reset::api::infra::ResetPasswordFieldsExtract;
+use crate::auth::user::password::reset::reset::infra::ResetPasswordFieldsExtract;
 
 use crate::auth::{
-    ticket::kernel::api::data::{
-        AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
-    },
+    ticket::kernel::data::{AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration},
     user::{
         kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
         login_id::kernel::data::LoginId,

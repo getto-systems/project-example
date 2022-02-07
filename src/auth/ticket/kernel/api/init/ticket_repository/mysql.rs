@@ -1,16 +1,16 @@
 use chrono::{TimeZone, Utc};
 use sqlx::{query, MySqlPool};
 
-use crate::z_lib::api::repository::mysql::helper::mysql_error;
+use crate::z_lib::repository::mysql::helper::mysql_error;
 
 use crate::auth::ticket::{
     encode::infra::EncodeAuthTicketRepository, issue::infra::IssueAuthTicketRepository,
-    logout::api::infra::LogoutAuthTicketRepository,
+    logout::infra::LogoutAuthTicketRepository,
 };
 
 use crate::{
-    auth::ticket::kernel::api::data::{AuthDateTime, AuthTicket, ExpansionLimitDateTime},
-    z_lib::api::repository::data::RepositoryError,
+    auth::ticket::kernel::data::{AuthDateTime, AuthTicket, ExpansionLimitDateTime},
+    z_lib::repository::data::RepositoryError,
 };
 
 pub struct MysqlAuthTicketRepository<'a> {

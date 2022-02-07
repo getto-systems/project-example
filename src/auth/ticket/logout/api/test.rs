@@ -5,7 +5,7 @@ use getto_application_test::ActionTestRunner;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::ticket::{
-    kernel::api::init::{
+    kernel::init::{
         clock::test::StaticChronoAuthClock,
         ticket_repository::memory::{
             MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
@@ -26,7 +26,7 @@ use crate::auth::ticket::validate::method::AuthNonceConfig;
 
 use super::action::{LogoutAction, LogoutMaterial};
 
-use crate::auth::ticket::kernel::api::data::{
+use crate::auth::ticket::kernel::data::{
     AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
 };
 

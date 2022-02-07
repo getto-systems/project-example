@@ -9,7 +9,7 @@ use crate::auth::ticket::{
 use crate::auth::user::{
     kernel::infra::AuthUserRepository,
     password::{
-        authenticate::api::infra::{
+        authenticate::infra::{
             AuthenticatePasswordFieldsExtract, AuthenticatePasswordRequestDecoder,
             VerifyPasswordRepository,
         },
@@ -22,13 +22,13 @@ use crate::{
         kernel::data::AuthUser,
         login_id::kernel::data::{LoginId, ValidateLoginIdError},
         password::{
-            authenticate::api::data::{
+            authenticate::data::{
                 AuthenticatePasswordError, VerifyPasswordRepositoryError,
             },
             kernel::data::{PasswordHashError, ValidatePasswordError},
         },
     },
-    z_lib::api::repository::data::RepositoryError,
+    z_lib::repository::data::RepositoryError,
 };
 
 pub enum AuthenticatePasswordState {

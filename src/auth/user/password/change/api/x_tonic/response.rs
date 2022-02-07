@@ -2,7 +2,7 @@ use tonic::{Response, Status};
 
 use crate::auth::user::password::change::y_protobuf::service::ChangePasswordResponsePb;
 
-use crate::z_lib::api::response::tonic::ServiceResponder;
+use crate::z_lib::response::tonic::ServiceResponder;
 
 use super::super::action::{ChangePasswordEvent, ChangePasswordState};
 

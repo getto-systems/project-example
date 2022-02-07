@@ -5,18 +5,18 @@ use crate::auth::user::password::authenticate::y_protobuf::service::{
     authenticate_password_pb_client::AuthenticatePasswordPbClient, AuthenticatePasswordRequestPb,
 };
 
-use crate::auth::x_outside_feature::api::proxy::feature::AuthOutsideFeature;
+use crate::auth::x_outside_feature::proxy::feature::AuthOutsideFeature;
 
-use crate::auth::user::password::authenticate::api::x_tonic::route::ServiceAuthenticate;
+use crate::auth::user::password::authenticate::x_tonic::route::ServiceAuthenticate;
 
 use crate::{
-    auth::ticket::kernel::api::init::response_builder::CookieAuthTokenResponseBuilder,
-    z_lib::api::service::init::authorizer::GoogleServiceAuthorizer,
+    auth::ticket::kernel::init::response_builder::CookieAuthTokenResponseBuilder,
+    z_lib::service::init::authorizer::GoogleServiceAuthorizer,
 };
 
 use crate::{
     auth::proxy::helper::infra_error,
-    z_lib::api::{
+    z_lib::{
         message::helper::{decode_base64, encode_protobuf_base64, invalid_protobuf},
         service::helper::new_endpoint,
     },
@@ -26,15 +26,15 @@ use crate::auth::proxy::method::set_metadata;
 
 use crate::auth::{
     proxy::infra::AuthProxyService,
-    ticket::{kernel::api::infra::AuthTokenResponseBuilder, validate::infra::AuthMetadataContent},
+    ticket::{kernel::infra::AuthTokenResponseBuilder, validate::infra::AuthMetadataContent},
 };
 
 use crate::{
     auth::{
         proxy::data::AuthProxyError,
-        ticket::kernel::api::data::{AuthTokenMessage, AuthTokenResponse},
+        ticket::kernel::data::{AuthTokenMessage, AuthTokenResponse},
     },
-    z_lib::api::message::data::MessageError,
+    z_lib::message::data::MessageError,
 };
 
 pub struct ProxyService<'a> {

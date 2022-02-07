@@ -4,17 +4,17 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::user::account::search::y_protobuf::service::SearchAuthUserAccountRequestPb;
 
-use crate::x_outside_feature::api::auth::feature::AuthAppFeature;
+use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::{
     ticket::validate::init::ApiValidateAuthTokenStruct,
     user::{
-        account::search::api::init::request_decoder::PbSearchAuthUserAccountRequestDecoder,
+        account::search::init::request_decoder::PbSearchAuthUserAccountRequestDecoder,
         kernel::init::user_repository::mysql::MysqlAuthUserRepository,
     },
 };
 
-use crate::auth::user::account::search::api::action::{
+use crate::auth::user::account::search::action::{
     SearchAuthUserAccountAction, SearchAuthUserAccountMaterial,
 };
 

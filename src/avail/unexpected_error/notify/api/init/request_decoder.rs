@@ -1,6 +1,6 @@
 use crate::avail::unexpected_error::notify::y_protobuf::service::NotifyRequestPb;
 
-use crate::avail::unexpected_error::notify::api::infra::{
+use crate::avail::unexpected_error::notify::infra::{
     NotifyUnexpectedErrorFieldsExtract, NotifyUnexpectedErrorRequestDecoder,
 };
 
@@ -24,7 +24,7 @@ impl NotifyUnexpectedErrorRequestDecoder for PbNotifyUnexpectedErrorRequestDecod
 
 #[cfg(test)]
 pub mod test {
-    use crate::avail::unexpected_error::notify::api::infra::{
+    use crate::avail::unexpected_error::notify::infra::{
         NotifyUnexpectedErrorFieldsExtract, NotifyUnexpectedErrorRequestDecoder,
     };
 

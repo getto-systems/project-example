@@ -5,7 +5,7 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     ticket::{
-        kernel::api::init::clock::test::StaticChronoAuthClock,
+        kernel::init::clock::test::StaticChronoAuthClock,
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::test::{
@@ -21,7 +21,7 @@ use crate::auth::{
             MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
         },
         password::{
-            change::api::init::request_decoder::test::StaticChangePasswordRequestDecoder,
+            change::init::request_decoder::test::StaticChangePasswordRequestDecoder,
             kernel::init::{
                 password_hasher::test::PlainPasswordHasher,
                 password_matcher::test::PlainPasswordMatcher,
@@ -31,7 +31,7 @@ use crate::auth::{
 };
 
 use crate::auth::user::password::{
-    change::api::infra::ChangePasswordFieldsExtract, kernel::infra::HashedPassword,
+    change::infra::ChangePasswordFieldsExtract, kernel::infra::HashedPassword,
 };
 
 use crate::auth::ticket::validate::method::AuthNonceConfig;
@@ -39,7 +39,7 @@ use crate::auth::ticket::validate::method::AuthNonceConfig;
 use super::action::{ChangePasswordAction, ChangePasswordMaterial};
 
 use crate::auth::{
-    ticket::kernel::api::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
+    ticket::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
     user::{
         kernel::data::{AuthUser, AuthUserExtract},
         login_id::kernel::data::LoginId,

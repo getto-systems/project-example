@@ -1,6 +1,6 @@
 use crate::auth::user::password::change::y_protobuf::service::ChangePasswordRequestPb;
 
-use crate::auth::user::password::change::api::infra::{
+use crate::auth::user::password::change::infra::{
     ChangePasswordFieldsExtract, ChangePasswordRequestDecoder,
 };
 
@@ -25,7 +25,7 @@ impl ChangePasswordRequestDecoder for PbChangePasswordRequestDecoder {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::user::password::change::api::infra::{
+    use crate::auth::user::password::change::infra::{
         ChangePasswordFieldsExtract, ChangePasswordRequestDecoder,
     };
 

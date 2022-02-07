@@ -2,13 +2,13 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::api::{logger::Logger, response::tonic::ServiceResponder};
+use crate::z_lib::{logger::Logger, response::tonic::ServiceResponder};
 
 use crate::auth::user::password::reset::reset::y_protobuf::service::{
     reset_password_pb_server::ResetPasswordPb, ResetPasswordRequestPb, ResetPasswordResponsePb,
 };
 
-use crate::x_outside_feature::api::{
+use crate::x_outside_feature::{
     auth::{
         feature::{extract_request, TonicRequest},
         logger::app_logger,
@@ -16,7 +16,7 @@ use crate::x_outside_feature::api::{
     common::metadata::metadata_request_id,
 };
 
-use crate::auth::user::password::reset::reset::api::init::ResetPasswordFeature;
+use crate::auth::user::password::reset::reset::init::ResetPasswordFeature;
 
 pub struct ServiceReset;
 

@@ -5,7 +5,7 @@ use crate::auth::ticket::{
 };
 
 use crate::auth::ticket::{
-    check::api::x_tonic::route::ServiceCheck, logout::api::x_tonic::route::ServiceLogout,
+    check::x_tonic::route::ServiceCheck, logout::x_tonic::route::ServiceLogout,
     validate::x_tonic::route::ServiceValidate,
 };
 

@@ -1,4 +1,4 @@
-use crate::x_outside_feature::api::proxy::env::ProxyEnv;
+use crate::x_outside_feature::proxy::env::ProxyEnv;
 
 use super::feature::{CoreOutsideFeature, CoreOutsideService};
 

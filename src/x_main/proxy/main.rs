@@ -4,7 +4,7 @@ use actix_cors::Cors;
 use actix_web::{web::Data, App, HttpServer};
 use lazy_static::lazy_static;
 
-use example_api::x_outside_feature::api::proxy::{env::ProxyEnv, feature::ProxyAppFeature};
+use example_api::x_outside_feature::proxy::{env::ProxyEnv, feature::ProxyAppFeature};
 
 use example_api::{
     auth::x_actix_web::route::scope_auth, avail::x_actix_web::route::scope_avail,
@@ -43,7 +43,7 @@ async fn main() -> io::Result<()> {
 mod root {
     use actix_web::{get, Responder};
 
-    use example_api::y_environment::api::env::VERSION;
+    use example_api::y_environment::env::VERSION;
 
     #[get("/")]
     async fn index() -> impl Responder {

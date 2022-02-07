@@ -7,13 +7,13 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::user::password::reset::request_token::y_protobuf::service::RequestResetTokenRequestPb;
 
-use crate::x_outside_feature::api::auth::feature::AuthAppFeature;
+use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::{
-    ticket::{kernel::api::init::clock::ChronoAuthClock, validate::init::ValidateAuthNonceStruct},
+    ticket::{kernel::init::clock::ChronoAuthClock, validate::init::ValidateAuthNonceStruct},
     user::{
         kernel::init::user_repository::mysql::MysqlAuthUserRepository,
-        password::reset::request_token::api::init::{
+        password::reset::request_token::init::{
             request_decoder::PbRequestResetTokenRequestDecoder,
             token_encoder::JwtResetTokenEncoder, token_generator::UuidResetTokenGenerator,
             token_notifier::EmailResetTokenNotifier,
@@ -23,7 +23,7 @@ use crate::auth::{
 
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 
-use crate::auth::user::password::reset::request_token::api::infra::RequestResetTokenConfig;
+use crate::auth::user::password::reset::request_token::infra::RequestResetTokenConfig;
 
 pub struct RequestResetTokenStruct<'a> {
     validate_nonce: ValidateAuthNonceStruct<'a>,

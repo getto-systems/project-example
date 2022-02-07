@@ -1,4 +1,4 @@
-use crate::z_lib::api::logger::{LogFilter, LogLevel, LogMessage};
+use crate::z_lib::logger::{LogFilter, LogLevel, LogMessage};
 
 use super::super::action::{AuthenticatePasswordEvent, AuthenticatePasswordState};
 

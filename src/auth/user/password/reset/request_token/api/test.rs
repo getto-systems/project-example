@@ -4,7 +4,7 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     ticket::{
-        kernel::api::init::clock::test::StaticChronoAuthClock,
+        kernel::init::clock::test::StaticChronoAuthClock,
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::test::{
@@ -17,7 +17,7 @@ use crate::auth::{
         kernel::init::user_repository::memory::{
             MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
         },
-        password::reset::request_token::api::init::{
+        password::reset::request_token::init::{
             request_decoder::test::StaticRequestResetTokenRequestDecoder,
             token_encoder::test::StaticResetTokenEncoder,
             token_generator::test::StaticResetTokenGenerator,
@@ -30,12 +30,12 @@ use crate::auth::ticket::validate::method::AuthNonceConfig;
 
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 
-use crate::auth::user::password::reset::request_token::api::infra::{
+use crate::auth::user::password::reset::request_token::infra::{
     RequestResetTokenConfig, RequestResetTokenFieldsExtract,
 };
 
 use crate::auth::{
-    ticket::kernel::api::data::{AuthDateTime, ExpireDuration},
+    ticket::kernel::data::{AuthDateTime, ExpireDuration},
     user::{
         kernel::data::AuthUserId,
         login_id::kernel::data::LoginId,

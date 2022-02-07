@@ -3,7 +3,7 @@ use crate::{
         login_id::kernel::data::ValidateLoginIdError,
         password::kernel::data::{PasswordHashError, ValidatePasswordError},
     },
-    z_lib::api::repository::data::RepositoryError,
+    z_lib::repository::data::RepositoryError,
 };
 
 pub enum AuthenticatePasswordError {

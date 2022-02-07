@@ -1,8 +1,6 @@
 use crate::{
-    auth::ticket::kernel::api::data::{
-        AuthDateTime, AuthTicket, AuthTicketId, ExpansionLimitDateTime,
-    },
-    z_lib::api::repository::data::RepositoryError,
+    auth::ticket::kernel::data::{AuthDateTime, AuthTicket, AuthTicketId, ExpansionLimitDateTime},
+    z_lib::repository::data::RepositoryError,
 };
 
 #[async_trait::async_trait]

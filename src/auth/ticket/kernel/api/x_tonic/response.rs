@@ -2,14 +2,14 @@ use std::collections::HashMap;
 
 use tonic::{Response, Status};
 
-use crate::z_lib::api::response::tonic::ServiceResponder;
+use crate::z_lib::response::tonic::ServiceResponder;
 
 use crate::auth::ticket::y_protobuf::service::{
-    EncodedAuthTokensPb, AuthTokenPb, CloudfrontTokenKindPb, CloudfrontTokenPb,
+    AuthTokenPb, CloudfrontTokenKindPb, CloudfrontTokenPb, EncodedAuthTokensPb,
 };
 
-use crate::auth::ticket::kernel::api::data::{
-    EncodedAuthTokens, AuthTokenExtract, CloudfrontTokenKind, DecodeAuthTokenError,
+use crate::auth::ticket::kernel::data::{
+    AuthTokenExtract, CloudfrontTokenKind, DecodeAuthTokenError, EncodedAuthTokens,
     ValidateAuthRolesError,
 };
 

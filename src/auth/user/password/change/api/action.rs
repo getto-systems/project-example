@@ -5,7 +5,7 @@ use crate::auth::ticket::validate::method::{
 };
 
 use crate::auth::user::password::{
-    change::api::infra::{
+    change::infra::{
         ChangePasswordFieldsExtract, ChangePasswordRepository, ChangePasswordRequestDecoder,
     },
     kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, PlainPassword},
@@ -13,16 +13,16 @@ use crate::auth::user::password::{
 
 use crate::{
     auth::{
-        ticket::kernel::api::data::AuthTicket,
+        ticket::kernel::data::AuthTicket,
         user::{
             kernel::data::RequireAuthRoles,
             password::{
-                change::api::data::{ChangePasswordError, ChangePasswordRepositoryError},
+                change::data::{ChangePasswordError, ChangePasswordRepositoryError},
                 kernel::data::{PasswordHashError, ValidatePasswordError},
             },
         },
     },
-    z_lib::api::repository::data::RepositoryError,
+    z_lib::repository::data::RepositoryError,
 };
 
 pub enum ChangePasswordState {

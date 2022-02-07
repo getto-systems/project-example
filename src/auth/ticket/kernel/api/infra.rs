@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use serde::{Deserialize, Serialize};
 
-use crate::auth::ticket::kernel::api::data::{
+use crate::auth::ticket::kernel::data::{
     AuthDateTime, AuthTicket, AuthTicketExtract, AuthTokenMessage, AuthTokenResponse,
     ExpireDateTime,
 };

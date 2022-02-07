@@ -6,7 +6,7 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     ticket::{
-        kernel::api::init::clock::test::StaticChronoAuthClock,
+        kernel::init::clock::test::StaticChronoAuthClock,
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::test::{
@@ -18,7 +18,7 @@ use crate::auth::{
         },
     },
     user::{
-        account::search::api::init::request_decoder::test::StaticSearchAuthUserAccountRequestDecoder,
+        account::search::init::request_decoder::test::StaticSearchAuthUserAccountRequestDecoder,
         kernel::init::user_repository::memory::{
             MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
         },
@@ -30,19 +30,19 @@ use crate::auth::ticket::validate::method::AuthNonceConfig;
 use super::action::{SearchAuthUserAccountAction, SearchAuthUserAccountMaterial};
 
 use crate::auth::user::{
-    account::search::api::infra::SearchAuthUserAccountFieldsExtract,
+    account::search::infra::SearchAuthUserAccountFieldsExtract,
     password::kernel::infra::HashedPassword,
 };
 
 use crate::{
     auth::{
-        ticket::kernel::api::data::{AuthTicketExtract, ExpireDuration},
+        ticket::kernel::data::{AuthTicketExtract, ExpireDuration},
         user::{
             kernel::data::{AuthUser, AuthUserExtract},
             login_id::kernel::data::LoginId,
         },
     },
-    z_lib::api::search::data::SearchSortExtract,
+    z_lib::search::data::SearchSortExtract,
 };
 
 #[tokio::test]

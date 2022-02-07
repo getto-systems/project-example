@@ -5,9 +5,9 @@ use sqlx::MySqlPool;
 
 use aws_cloudfront_cookie::CloudfrontKey;
 
-use crate::auth::x_outside_feature::api::common::feature::AuthOutsideDecodingKey;
+use crate::auth::x_outside_feature::common::feature::AuthOutsideDecodingKey;
 
-use crate::auth::ticket::kernel::api::data::{ExpansionLimitDuration, ExpireDuration};
+use crate::auth::ticket::kernel::data::{ExpansionLimitDuration, ExpireDuration};
 
 pub struct AuthOutsideFeature {
     pub(in crate::auth) config: AuthOutsideConfig,

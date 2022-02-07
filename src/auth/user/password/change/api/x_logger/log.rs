@@ -1,8 +1,8 @@
-use crate::z_lib::api::logger::{LogFilter, LogLevel, LogMessage};
+use crate::z_lib::logger::{LogFilter, LogLevel, LogMessage};
 
 use super::super::action::{ChangePasswordEvent, ChangePasswordState};
 
-use crate::auth::user::password::change::api::data::ChangePasswordError;
+use crate::auth::user::password::change::data::ChangePasswordError;
 
 impl LogMessage for ChangePasswordState {
     fn log_message(&self) -> String {

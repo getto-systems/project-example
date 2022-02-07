@@ -1,4 +1,4 @@
-use crate::z_lib::api::logger::{LogLevel, LogMessage, LogFilter};
+use crate::z_lib::logger::{LogLevel, LogMessage, LogFilter};
 
 use super::super::action::CheckAuthTicketState;
 

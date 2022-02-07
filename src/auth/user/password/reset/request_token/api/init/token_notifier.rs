@@ -1,18 +1,18 @@
 use rusoto_ses::{Body, Content, Destination, Message, SendEmailRequest, Ses, SesClient};
 use url::{ParseError, Url};
 
-use crate::auth::x_outside_feature::api::auth::feature::AuthOutsideEmail;
+use crate::auth::x_outside_feature::auth::feature::AuthOutsideEmail;
 
 use crate::x_content::mail::{
     notify_password_reset_token::{BODY, SUBJECT},
     SENDER_ADDRESS,
 };
 
-use crate::auth::user::password::reset::request_token::api::infra::ResetTokenNotifier;
+use crate::auth::user::password::reset::request_token::infra::ResetTokenNotifier;
 
 use crate::auth::user::password::reset::{
     kernel::data::{ResetTokenDestination, ResetTokenEncoded},
-    request_token::api::data::{NotifyResetTokenError, NotifyResetTokenResponse},
+    request_token::data::{NotifyResetTokenError, NotifyResetTokenResponse},
 };
 
 pub struct EmailResetTokenNotifier<'a> {
@@ -108,11 +108,11 @@ fn utf8_content(data: String) -> Content {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::user::password::reset::request_token::api::infra::ResetTokenNotifier;
+    use crate::auth::user::password::reset::request_token::infra::ResetTokenNotifier;
 
     use crate::auth::user::password::reset::{
         kernel::data::{ResetTokenDestination, ResetTokenEncoded},
-        request_token::api::data::{NotifyResetTokenError, NotifyResetTokenResponse},
+        request_token::data::{NotifyResetTokenError, NotifyResetTokenResponse},
     };
 
     pub struct StaticResetTokenNotifier;

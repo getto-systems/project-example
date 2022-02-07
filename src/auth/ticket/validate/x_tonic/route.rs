@@ -2,14 +2,14 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::api::{logger::Logger, response::tonic::ServiceResponder};
+use crate::z_lib::{logger::Logger, response::tonic::ServiceResponder};
 
 use crate::auth::ticket::validate::y_protobuf::service::{
     validate_api_token_pb_server::ValidateApiTokenPb, ValidateApiTokenRequestPb,
     ValidateApiTokenResponsePb,
 };
 
-use crate::x_outside_feature::api::{
+use crate::x_outside_feature::{
     auth::{
         feature::{extract_request, TonicRequest},
         logger::app_logger,

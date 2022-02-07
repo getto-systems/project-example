@@ -4,13 +4,13 @@ use chrono::{DateTime, Utc};
 use rusoto_core::RusotoError;
 use rusoto_dynamodb::{AttributeValue, DynamoDb, DynamoDbClient, PutItemError, PutItemInput};
 
-use crate::z_lib::api::repository::helper::infra_error;
+use crate::z_lib::repository::helper::infra_error;
 
 use crate::auth::ticket::validate::infra::{AuthNonceEntry, AuthNonceRepository};
 
 use crate::{
-    auth::ticket::kernel::api::data::AuthDateTime,
-    z_lib::api::repository::data::{RegisterResult, RepositoryError},
+    auth::ticket::kernel::data::AuthDateTime,
+    z_lib::repository::data::{RegisterResult, RepositoryError},
 };
 
 pub struct DynamoDbAuthNonceRepository<'a> {
@@ -116,8 +116,8 @@ pub mod test {
     };
 
     use crate::{
-        auth::ticket::kernel::api::data::{AuthDateTime, AuthNonce, ExpireDateTime},
-        z_lib::api::repository::data::{RegisterResult, RepositoryError},
+        auth::ticket::kernel::data::{AuthDateTime, AuthNonce, ExpireDateTime},
+        z_lib::repository::data::{RegisterResult, RepositoryError},
     };
 
     pub type MemoryAuthNonceStore = Mutex<MemoryAuthNonceMap>;

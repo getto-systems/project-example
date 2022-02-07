@@ -1,6 +1,6 @@
-use crate::z_lib::api::logger::{LogFilter, LogLevel, LogMessage};
+use crate::z_lib::logger::{LogFilter, LogLevel, LogMessage};
 
-use crate::auth::ticket::logout::api::action::LogoutEvent;
+use crate::auth::ticket::logout::action::LogoutEvent;
 
 use super::super::action::LogoutState;
 

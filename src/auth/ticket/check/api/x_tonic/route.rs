@@ -2,14 +2,14 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::api::{logger::Logger, response::tonic::ServiceResponder};
+use crate::z_lib::{logger::Logger, response::tonic::ServiceResponder};
 
 use crate::auth::ticket::check::y_protobuf::service::{
     check_auth_ticket_pb_server::CheckAuthTicketPb, CheckAuthTicketRequestPb,
     CheckAuthTicketResponsePb,
 };
 
-use crate::x_outside_feature::api::{
+use crate::x_outside_feature::{
     auth::{
         feature::{extract_request, TonicRequest},
         logger::app_logger,
@@ -17,7 +17,7 @@ use crate::x_outside_feature::api::{
     common::metadata::metadata_request_id,
 };
 
-use crate::auth::ticket::check::api::init::CheckAuthTicketStruct;
+use crate::auth::ticket::check::init::CheckAuthTicketStruct;
 
 pub struct ServiceCheck;
 

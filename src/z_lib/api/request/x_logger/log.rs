@@ -1,6 +1,6 @@
-use crate::z_lib::api::logger::{LogFilter, LogLevel};
+use crate::z_lib::logger::{LogFilter, LogLevel};
 
-use crate::z_lib::api::request::data::MetadataError;
+use crate::z_lib::request::data::MetadataError;
 
 impl LogFilter for MetadataError {
     fn log_level(&self) -> LogLevel {

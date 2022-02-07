@@ -2,14 +2,14 @@ use actix_web::{delete, web::Data, HttpRequest, Responder};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::api::{logger::Logger, response::actix_web::ProxyResponder};
+use crate::z_lib::{logger::Logger, response::actix_web::ProxyResponder};
 
-use crate::x_outside_feature::api::proxy::{
+use crate::x_outside_feature::proxy::{
     feature::ProxyAppFeature,
     logger::{app_logger, generate_request_id},
 };
 
-use crate::auth::ticket::logout::api::proxy::init::LogoutProxyStruct;
+use crate::auth::ticket::logout::proxy::init::LogoutProxyStruct;
 
 #[delete("")]
 async fn service_logout(feature: Data<ProxyAppFeature>, request: HttpRequest) -> impl Responder {

@@ -5,18 +5,18 @@ use crate::auth::user::password::reset::reset::y_protobuf::service::{
     reset_password_pb_client::ResetPasswordPbClient, ResetPasswordRequestPb,
 };
 
-use crate::auth::x_outside_feature::api::proxy::feature::AuthOutsideFeature;
+use crate::auth::x_outside_feature::proxy::feature::AuthOutsideFeature;
 
-use crate::auth::user::password::reset::reset::api::x_tonic::route::ServiceReset;
+use crate::auth::user::password::reset::reset::x_tonic::route::ServiceReset;
 
 use crate::{
-    auth::ticket::kernel::api::init::response_builder::CookieAuthTokenResponseBuilder,
-    z_lib::api::service::init::authorizer::GoogleServiceAuthorizer,
+    auth::ticket::kernel::init::response_builder::CookieAuthTokenResponseBuilder,
+    z_lib::service::init::authorizer::GoogleServiceAuthorizer,
 };
 
 use crate::{
-    auth::{proxy::helper::infra_error, ticket::kernel::api::infra::AuthTokenResponseBuilder},
-    z_lib::api::{
+    auth::{proxy::helper::infra_error, ticket::kernel::infra::AuthTokenResponseBuilder},
+    z_lib::{
         message::helper::{decode_base64, encode_protobuf_base64, invalid_protobuf},
         service::helper::new_endpoint,
     },
@@ -29,9 +29,9 @@ use crate::auth::{proxy::infra::AuthProxyService, ticket::validate::infra::AuthM
 use crate::{
     auth::{
         proxy::data::AuthProxyError,
-        ticket::kernel::api::data::{AuthTokenMessage, AuthTokenResponse},
+        ticket::kernel::data::{AuthTokenMessage, AuthTokenResponse},
     },
-    z_lib::api::message::data::MessageError,
+    z_lib::message::data::MessageError,
 };
 
 pub struct ProxyService<'a> {

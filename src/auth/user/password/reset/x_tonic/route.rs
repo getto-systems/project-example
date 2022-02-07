@@ -4,8 +4,8 @@ use crate::auth::user::password::reset::{
 };
 
 use crate::auth::user::password::reset::{
-    request_token::api::x_tonic::route::ServiceRequestToken,
-    reset::api::x_tonic::route::ServiceReset,
+    request_token::x_tonic::route::ServiceRequestToken,
+    reset::x_tonic::route::ServiceReset,
 };
 
 pub struct ResetServer;

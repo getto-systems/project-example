@@ -4,7 +4,7 @@ use tonic::{metadata::MetadataMap, Request};
 
 use super::env::AuthEnv;
 
-use crate::auth::x_outside_feature::api::auth::{
+use crate::auth::x_outside_feature::auth::{
     feature::AuthOutsideFeature, init::new_auth_outside_feature,
 };
 

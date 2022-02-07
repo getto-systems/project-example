@@ -12,15 +12,15 @@ use tonic::metadata::MetadataMap;
 use crate::auth::ticket::validate::y_protobuf::service::ValidateApiTokenRequestPb;
 
 use crate::{
-    auth::x_outside_feature::api::{
+    auth::x_outside_feature::{
         auth::feature::AuthOutsideFeature,
         common::feature::{AuthOutsideDecodingKey, AuthOutsideService},
     },
-    x_outside_feature::api::auth::feature::AuthAppFeature,
+    x_outside_feature::auth::feature::AuthAppFeature,
 };
 
 use crate::auth::ticket::{
-    kernel::api::init::clock::ChronoAuthClock,
+    kernel::init::clock::ChronoAuthClock,
     validate::init::{
         auth_metadata::{ApiAuthMetadata, NoAuthMetadata, TicketAuthMetadata, TonicAuthMetadata},
         nonce_metadata::TonicAuthNonceMetadata,
@@ -281,7 +281,7 @@ impl<'a> ValidateAuthNonceStruct<'a> {
 #[cfg(test)]
 pub mod test {
     use crate::auth::ticket::{
-        kernel::api::init::clock::test::StaticChronoAuthClock,
+        kernel::init::clock::test::StaticChronoAuthClock,
         validate::init::{
             auth_metadata::test::StaticAuthMetadata, nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::test::MemoryAuthNonceRepository,

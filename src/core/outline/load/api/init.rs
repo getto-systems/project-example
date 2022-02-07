@@ -2,11 +2,11 @@ pub mod menu_badge_repository;
 
 use tonic::metadata::MetadataMap;
 
-use crate::x_outside_feature::api::core::feature::CoreAppFeature;
+use crate::x_outside_feature::core::feature::CoreAppFeature;
 
 use crate::{
     auth::init::CheckPermissionStruct,
-    core::outline::load::api::init::menu_badge_repository::UnitedOutlineMenuBadgeRepository,
+    core::outline::load::init::menu_badge_repository::UnitedOutlineMenuBadgeRepository,
 };
 
 use super::action::{LoadOutlineMenuBadgeAction, LoadOutlineMenuBadgeMaterial};

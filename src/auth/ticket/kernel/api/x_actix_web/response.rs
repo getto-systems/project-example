@@ -4,7 +4,7 @@ use actix_web::{
 };
 use time::{error::ComponentRange, OffsetDateTime};
 
-use crate::z_lib::api::response::actix_web::ProxyResponder;
+use crate::z_lib::response::actix_web::ProxyResponder;
 
 use super::header::{
     COOKIE_API_TOKEN, COOKIE_CLOUDFRONT_KEY_PAIR_ID, COOKIE_CLOUDFRONT_POLICY,
@@ -13,7 +13,7 @@ use super::header::{
 
 use crate::auth::proxy::x_actix_web::response::unauthorized;
 
-use crate::auth::ticket::kernel::api::data::{
+use crate::auth::ticket::kernel::data::{
     AuthTokenExtract, AuthTokenMessage, AuthTokenResponse, CloudfrontTokenKind,
     DecodeAuthTokenError, EncodedAuthTokens,
 };

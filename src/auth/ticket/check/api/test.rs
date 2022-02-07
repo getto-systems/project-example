@@ -9,7 +9,7 @@ use crate::auth::ticket::{
         test::StaticEncodeAuthTicketStruct,
         token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
     },
-    kernel::api::init::{
+    kernel::init::{
         clock::test::StaticChronoAuthClock,
         ticket_repository::memory::{
             MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
@@ -32,7 +32,7 @@ use crate::auth::ticket::{
 
 use super::action::{CheckAuthTicketAction, CheckAuthTicketMaterial};
 
-use crate::auth::ticket::kernel::api::data::{
+use crate::auth::ticket::kernel::data::{
     AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
 };
 

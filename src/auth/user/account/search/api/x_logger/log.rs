@@ -1,6 +1,6 @@
 use crate::{
-    auth::user::account::search::api::action::SearchAuthUserAccountEvent,
-    z_lib::api::logger::{LogLevel, LogMessage, LogFilter},
+    auth::user::account::search::action::SearchAuthUserAccountEvent,
+    z_lib::logger::{LogLevel, LogMessage, LogFilter},
 };
 
 use super::super::action::SearchAuthUserAccountState;

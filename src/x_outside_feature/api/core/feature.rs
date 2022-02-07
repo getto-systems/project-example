@@ -3,10 +3,10 @@ use std::sync::Arc;
 use tonic::{metadata::MetadataMap, Request};
 
 use crate::{
-    auth::x_outside_feature::api::core::{
+    auth::x_outside_feature::core::{
         feature::AuthOutsideFeature, init::new_auth_outside_feature,
     },
-    x_outside_feature::api::core::env::CoreEnv,
+    x_outside_feature::core::env::CoreEnv,
 };
 
 pub struct CoreAppFeature {

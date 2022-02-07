@@ -4,16 +4,16 @@ use tonic::{
 };
 
 use crate::{
-    auth::ticket::kernel::api::x_tonic::metadata::{METADATA_NONCE, METADATA_TOKEN},
-    x_outside_feature::api::common::metadata::METADATA_REQUEST_ID,
+    auth::ticket::kernel::x_tonic::metadata::{METADATA_NONCE, METADATA_TOKEN},
+    x_outside_feature::common::metadata::METADATA_REQUEST_ID,
 };
 
 use crate::{
     auth::ticket::validate::infra::AuthMetadataContent,
-    z_lib::api::service::infra::ServiceAuthorizer,
+    z_lib::service::infra::ServiceAuthorizer,
 };
 
-use crate::z_lib::api::service::data::ServiceAuthorizeError;
+use crate::z_lib::service::data::ServiceAuthorizeError;
 
 pub enum AuthMetadataError {
     NonceNotFound,

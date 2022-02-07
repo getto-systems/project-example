@@ -1,4 +1,4 @@
-use crate::auth::x_outside_feature::api::common::feature::{
+use crate::auth::x_outside_feature::common::feature::{
     AuthOutsideDecodingKey, AuthOutsideService,
 };
 

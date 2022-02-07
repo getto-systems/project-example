@@ -1,6 +1,6 @@
 use crate::{
     auth::user::password::kernel::data::{PasswordHashError, ValidatePasswordError},
-    z_lib::api::repository::data::RepositoryError,
+    z_lib::repository::data::RepositoryError,
 };
 
 pub enum ChangePasswordError {

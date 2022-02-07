@@ -4,15 +4,15 @@ use crate::auth::ticket::logout::y_protobuf::service::{
     logout_pb_client::LogoutPbClient, LogoutRequestPb,
 };
 
-use crate::auth::x_outside_feature::api::common::feature::AuthOutsideService;
+use crate::auth::x_outside_feature::common::feature::AuthOutsideService;
 
-use crate::auth::ticket::logout::api::x_tonic::route::ServiceLogout;
+use crate::auth::ticket::logout::x_tonic::route::ServiceLogout;
 
-use crate::z_lib::api::service::init::authorizer::GoogleServiceAuthorizer;
+use crate::z_lib::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::{
     auth::proxy::helper::infra_error,
-    z_lib::api::{message::helper::encode_protobuf_base64, service::helper::new_endpoint},
+    z_lib::{message::helper::encode_protobuf_base64, service::helper::new_endpoint},
 };
 
 use crate::auth::proxy::method::set_metadata;

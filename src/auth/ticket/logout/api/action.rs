@@ -4,13 +4,11 @@ use crate::auth::ticket::validate::method::{
     validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
 };
 
-use crate::auth::ticket::{
-    kernel::api::infra::AuthClock, logout::api::infra::LogoutAuthTicketRepository,
-};
+use crate::auth::ticket::{kernel::infra::AuthClock, logout::infra::LogoutAuthTicketRepository};
 
 use crate::{
-    auth::{ticket::kernel::api::data::AuthTicket, user::kernel::data::RequireAuthRoles},
-    z_lib::api::repository::data::RepositoryError,
+    auth::{ticket::kernel::data::AuthTicket, user::kernel::data::RequireAuthRoles},
+    z_lib::repository::data::RepositoryError,
 };
 
 pub enum LogoutState {

@@ -6,15 +6,15 @@ use crate::auth::user::account::search::y_protobuf::service::{
     SearchAuthUserAccountRequestPb,
 };
 
-use crate::auth::x_outside_feature::api::common::feature::AuthOutsideService;
+use crate::auth::x_outside_feature::common::feature::AuthOutsideService;
 
-use crate::auth::user::account::search::api::x_tonic::route::ServiceSearch;
+use crate::auth::user::account::search::x_tonic::route::ServiceSearch;
 
-use crate::z_lib::api::service::init::authorizer::GoogleServiceAuthorizer;
+use crate::z_lib::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::{
     auth::proxy::helper::infra_error,
-    z_lib::api::{
+    z_lib::{
         message::helper::{decode_base64, encode_protobuf_base64, invalid_protobuf},
         service::helper::new_endpoint,
     },
@@ -26,7 +26,7 @@ use crate::auth::{proxy::infra::AuthProxyService, ticket::validate::infra::AuthM
 
 use crate::{
     auth::proxy::data::{AuthProxyError, AuthProxyResponse},
-    z_lib::api::message::data::MessageError,
+    z_lib::message::data::MessageError,
 };
 
 pub struct ProxyService<'a> {

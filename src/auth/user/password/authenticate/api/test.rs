@@ -13,7 +13,7 @@ use crate::auth::{
         issue::init::{
             id_generator::test::StaticAuthTicketIdGenerator, test::StaticIssueAuthTicketStruct,
         },
-        kernel::api::init::{
+        kernel::init::{
             clock::test::StaticChronoAuthClock,
             ticket_repository::memory::{
                 MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
@@ -32,7 +32,7 @@ use crate::auth::{
             MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
         },
         password::{
-            authenticate::api::init::request_decoder::test::StaticAuthenticatePasswordRequestDecoder,
+            authenticate::init::request_decoder::test::StaticAuthenticatePasswordRequestDecoder,
             kernel::init::password_matcher::test::PlainPasswordMatcher,
         },
     },
@@ -44,15 +44,13 @@ use crate::auth::ticket::{
 };
 
 use crate::auth::user::password::{
-    authenticate::api::infra::AuthenticatePasswordFieldsExtract, kernel::infra::HashedPassword,
+    authenticate::infra::AuthenticatePasswordFieldsExtract, kernel::infra::HashedPassword,
 };
 
 use super::action::{AuthenticatePasswordAction, AuthenticatePasswordMaterial};
 
 use crate::auth::{
-    ticket::kernel::api::data::{
-        AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
-    },
+    ticket::kernel::data::{AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration},
     user::{
         kernel::data::{AuthUser, AuthUserExtract},
         login_id::kernel::data::LoginId,

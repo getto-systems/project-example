@@ -7,9 +7,9 @@ use crate::auth::user::password::authenticate::y_protobuf::service::{
     AuthenticatePasswordResponsePb,
 };
 
-use crate::z_lib::api::{logger::Logger, response::tonic::ServiceResponder};
+use crate::z_lib::{logger::Logger, response::tonic::ServiceResponder};
 
-use crate::x_outside_feature::api::{
+use crate::x_outside_feature::{
     auth::{
         feature::{extract_request, TonicRequest},
         logger::app_logger,
@@ -17,7 +17,7 @@ use crate::x_outside_feature::api::{
     common::metadata::metadata_request_id,
 };
 
-use crate::auth::user::password::authenticate::api::init::AuthenticatePasswordStruct;
+use crate::auth::user::password::authenticate::init::AuthenticatePasswordStruct;
 
 pub struct ServiceAuthenticate;
 

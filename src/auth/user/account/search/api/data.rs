@@ -1,6 +1,6 @@
 use crate::{
     auth::user::{kernel::data::GrantedAuthRolesBasket, login_id::kernel::data::LoginIdBasket},
-    z_lib::api::search::data::SearchPage,
+    z_lib::search::data::SearchPage,
 };
 
 pub struct SearchAuthUserAccountBasket {
