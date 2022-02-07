@@ -13,7 +13,7 @@ use crate::x_outside_feature::api::auth::feature::AuthAppFeature;
 use crate::auth::{
     ticket::{kernel::api::init::clock::ChronoAuthClock, validate::init::ValidateAuthNonceStruct},
     user::password::{
-        kernel::init::password_repository::MysqlAuthUserPasswordRepository,
+        kernel::init::password_repository::mysql::MysqlAuthUserPasswordRepository,
         reset::request_token::api::init::{
             destination_repository::MysqlResetTokenDestinationRepository,
             request_decoder::PbRequestResetTokenRequestDecoder,

@@ -14,11 +14,11 @@ use crate::auth::{
         kernel::api::init::clock::ChronoAuthClock, validate::init::ValidateAuthNonceStruct,
     },
     user::{
-        kernel::init::user_repository::MysqlAuthUserRepository,
+        kernel::init::user_repository::mysql::MysqlAuthUserRepository,
         password::{
             kernel::init::{
                 password_hasher::Argon2PasswordHasher,
-                password_repository::MysqlAuthUserPasswordRepository,
+                password_repository::mysql::MysqlAuthUserPasswordRepository,
             },
             reset::reset::api::init::{
                 request_decoder::PbResetPasswordRequestDecoder,

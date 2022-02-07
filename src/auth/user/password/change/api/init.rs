@@ -12,7 +12,7 @@ use crate::auth::{
         change::api::init::request_decoder::PbChangePasswordRequestDecoder,
         kernel::init::{
             password_hasher::Argon2PasswordHasher, password_matcher::Argon2PasswordMatcher,
-            password_repository::MysqlAuthUserPasswordRepository,
+            password_repository::mysql::MysqlAuthUserPasswordRepository,
         },
     },
 };

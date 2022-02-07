@@ -12,12 +12,12 @@ use crate::auth::{
         validate::init::ValidateAuthNonceStruct,
     },
     user::{
-        kernel::init::user_repository::MysqlAuthUserRepository,
+        kernel::init::user_repository::mysql::MysqlAuthUserRepository,
         password::{
             authenticate::api::init::request_decoder::PbAuthenticatePasswordRequestDecoder,
             kernel::init::{
                 password_matcher::Argon2PasswordMatcher,
-                password_repository::MysqlAuthUserPasswordRepository,
+                password_repository::mysql::MysqlAuthUserPasswordRepository,
             },
         },
     },
