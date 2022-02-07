@@ -109,21 +109,16 @@ async fn error_no_ticket() {
 }
 
 struct TestStruct<'a> {
-    pub validate: StaticValidateAuthTokenStruct<'a>,
-    pub clock: StaticChronoAuthClock,
-    pub ticket_repository: MemoryAuthTicketRepository<'a>,
+    validate: StaticValidateAuthTokenStruct<'a>,
+    ticket_repository: MemoryAuthTicketRepository<'a>,
 }
 
 impl<'a> LogoutMaterial for TestStruct<'a> {
     type ValidateInfra = StaticValidateAuthTokenStruct<'a>;
-    type Clock = StaticChronoAuthClock;
     type TicketRepository = MemoryAuthTicketRepository<'a>;
 
     fn validate(&self) -> &Self::ValidateInfra {
         &self.validate
-    }
-    fn clock(&self) -> &Self::Clock {
-        &self.clock
     }
     fn ticket_repository(&self) -> &Self::TicketRepository {
         &self.ticket_repository
@@ -175,7 +170,6 @@ impl<'a> TestStruct<'a> {
                 token_metadata: standard_token_metadata(),
                 token_decoder: standard_token_validator(),
             },
-            clock: standard_clock(),
             ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
         }
     }

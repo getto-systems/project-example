@@ -59,15 +59,12 @@ pub trait AuthNonceRepository {
 
 pub struct AuthNonceEntry {
     nonce: AuthNonce,
-    expires: Option<ExpireDateTime>,
+    expires: ExpireDateTime,
 }
 
 impl AuthNonceEntry {
     pub const fn new(nonce: AuthNonce, expires: ExpireDateTime) -> Self {
-        Self {
-            nonce,
-            expires: Some(expires),
-        }
+        Self { nonce, expires }
     }
 
     #[cfg(test)]
@@ -78,7 +75,7 @@ impl AuthNonceEntry {
     pub fn extract(self) -> AuthNonceEntryExtract {
         AuthNonceEntryExtract {
             nonce: self.nonce.extract(),
-            expires: self.expires.map(|expires| expires.extract()),
+            expires: self.expires.extract(),
         }
     }
 }
@@ -86,14 +83,14 @@ impl AuthNonceEntry {
 #[derive(Clone)]
 pub struct AuthNonceEntryExtract {
     pub nonce: String,
-    pub expires: Option<DateTime<Utc>>,
+    pub expires: DateTime<Utc>,
 }
 
 impl From<AuthNonceEntryExtract> for AuthNonceEntry {
     fn from(src: AuthNonceEntryExtract) -> Self {
         Self {
             nonce: AuthNonce::restore(src.nonce),
-            expires: src.expires.map(|expires| ExpireDateTime::restore(expires)),
+            expires: ExpireDateTime::restore(src.expires),
         }
     }
 }

@@ -1,4 +1,3 @@
-
 use std::{collections::HashMap, sync::Mutex};
 
 use crate::z_lib::repository::helper::infra_error;
@@ -81,17 +80,9 @@ impl<'a> IssueAuthTicketRepository for MemoryAuthTicketRepository<'a> {
 
 #[async_trait::async_trait]
 impl<'a> LogoutAuthTicketRepository for MemoryAuthTicketRepository<'a> {
-    async fn discard(
-        &self,
-        auth_ticket: AuthTicket,
-        _discard_at: AuthDateTime,
-    ) -> Result<(), RepositoryError> {
+    async fn discard(&self, auth_ticket: AuthTicket) -> Result<(), RepositoryError> {
         let mut store = self.store.lock().unwrap();
-
         store.ticket.remove(auth_ticket.ticket_id_as_str());
-
-        // 実際のデータベースには discard_at も保存する必要がある
-
         Ok(())
     }
 }

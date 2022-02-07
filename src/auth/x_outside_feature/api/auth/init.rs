@@ -39,6 +39,7 @@ pub async fn new_auth_outside_feature(env: &'static AuthEnv) -> AuthOutsideFeatu
         store: AuthOutsideStore {
             dynamodb: DynamoDbClient::new(Region::ApNortheast1),
             nonce_table_name: &env.dynamodb_auth_nonce_table,
+            ticket_table_name: &env.dynamodb_auth_ticket_table,
             mysql: MySqlPoolOptions::new()
                 .max_connections(5)
                 .connect(&env.mysql_auth_url)

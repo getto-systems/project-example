@@ -28,6 +28,7 @@ pub struct AuthOutsideConfig {
 pub struct AuthOutsideStore {
     pub dynamodb: DynamoDbClient,
     pub nonce_table_name: &'static str,
+    pub ticket_table_name: &'static str,
     pub mysql: MySqlPool,
 }
 pub struct AuthOutsideEncodingKey {

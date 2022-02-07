@@ -1,7 +1,5 @@
 use std::{collections::HashMap, sync::Mutex};
 
-use chrono::{DateTime, Utc};
-
 use crate::auth::ticket::validate::infra::{
     AuthNonceEntry, AuthNonceEntryExtract, AuthNonceRepository,
 };
@@ -25,7 +23,7 @@ impl MemoryAuthNonceMap {
             nonce.clone(),
             AuthNonceEntryExtract {
                 nonce,
-                expires: Some(expires.extract()),
+                expires: expires.extract(),
             },
         );
         Self(hash_map)
@@ -61,22 +59,22 @@ impl<'a> AuthNonceRepository for MemoryAuthNonceRepository<'a> {
         entry: AuthNonceEntry,
         registered_at: AuthDateTime,
     ) -> Result<RegisterResult<()>, RepositoryError> {
-        let mut store = self.store.lock().unwrap();
-
-        if let Some(found) = store.get(entry.nonce()) {
-            if !has_expired(found.expires, &registered_at) {
-                return Ok(RegisterResult::Conflict);
-            }
-        }
-
-        store.insert(entry);
-        Ok(RegisterResult::Success(()))
+        put_nonce(self, entry, registered_at)
     }
 }
+fn put_nonce<'a>(
+    repository: &MemoryAuthNonceRepository<'a>,
+    entry: AuthNonceEntry,
+    registered_at: AuthDateTime,
+) -> Result<RegisterResult<()>, RepositoryError> {
+    let mut store = repository.store.lock().unwrap();
 
-fn has_expired(expires: Option<DateTime<Utc>>, now: &AuthDateTime) -> bool {
-    match expires {
-        None => false,
-        Some(expires) => ExpireDateTime::restore(expires).has_elapsed(now),
+    if let Some(found) = store.get(entry.nonce()) {
+        if !ExpireDateTime::restore(found.expires).has_elapsed(&registered_at) {
+            return Ok(RegisterResult::Conflict);
+        }
     }
+
+    store.insert(entry);
+    Ok(RegisterResult::Success(()))
 }

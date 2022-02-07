@@ -3,7 +3,9 @@ use tonic::metadata::MetadataMap;
 use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::ticket::{
-    kernel::init::{clock::ChronoAuthClock, ticket_repository::mysql::MysqlAuthTicketRepository},
+    kernel::init::{
+        new_auth_ticket_repository, ticket_repository::dynamodb::DynamoDbAuthTicketRepository,
+    },
     validate::init::TicketValidateAuthTokenStruct,
 };
 
@@ -11,16 +13,14 @@ use super::action::{LogoutAction, LogoutMaterial};
 
 pub struct LogoutStruct<'a> {
     validate: TicketValidateAuthTokenStruct<'a>,
-    clock: ChronoAuthClock,
-    ticket_repository: MysqlAuthTicketRepository<'a>,
+    ticket_repository: DynamoDbAuthTicketRepository<'a>,
 }
 
 impl<'a> LogoutStruct<'a> {
     pub fn action(feature: &'a AuthAppFeature, metadata: &'a MetadataMap) -> LogoutAction<Self> {
         LogoutAction::with_material(Self {
             validate: TicketValidateAuthTokenStruct::new(&feature.auth, metadata),
-            clock: ChronoAuthClock::new(),
-            ticket_repository: MysqlAuthTicketRepository::new(&feature.auth.store.mysql),
+            ticket_repository: new_auth_ticket_repository(&feature.auth.store),
         })
     }
 }
@@ -28,14 +28,10 @@ impl<'a> LogoutStruct<'a> {
 #[async_trait::async_trait]
 impl<'a> LogoutMaterial for LogoutStruct<'a> {
     type ValidateInfra = TicketValidateAuthTokenStruct<'a>;
-    type Clock = ChronoAuthClock;
-    type TicketRepository = MysqlAuthTicketRepository<'a>;
+    type TicketRepository = DynamoDbAuthTicketRepository<'a>;
 
     fn validate(&self) -> &Self::ValidateInfra {
         &self.validate
-    }
-    fn clock(&self) -> &Self::Clock {
-        &self.clock
     }
     fn ticket_repository(&self) -> &Self::TicketRepository {
         &self.ticket_repository

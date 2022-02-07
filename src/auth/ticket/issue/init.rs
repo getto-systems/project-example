@@ -4,14 +4,17 @@ use crate::auth::x_outside_feature::auth::feature::AuthOutsideFeature;
 
 use crate::auth::ticket::{
     issue::init::id_generator::UuidAuthTicketIdGenerator,
-    kernel::init::{clock::ChronoAuthClock, ticket_repository::mysql::MysqlAuthTicketRepository},
+    kernel::init::{
+        clock::ChronoAuthClock, new_auth_ticket_repository,
+        ticket_repository::dynamodb::DynamoDbAuthTicketRepository,
+    },
 };
 
 use super::method::{IssueAuthTicketConfig, IssueAuthTicketInfra};
 
 pub struct IssueAuthTicketStruct<'a> {
     clock: ChronoAuthClock,
-    ticket_repository: MysqlAuthTicketRepository<'a>,
+    ticket_repository: DynamoDbAuthTicketRepository<'a>,
     ticket_id_generator: UuidAuthTicketIdGenerator,
     config: IssueAuthTicketConfig,
 }
@@ -20,7 +23,7 @@ impl<'a> IssueAuthTicketStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature) -> Self {
         Self {
             clock: ChronoAuthClock::new(),
-            ticket_repository: MysqlAuthTicketRepository::new(&feature.store.mysql),
+            ticket_repository: new_auth_ticket_repository(&feature.store),
             ticket_id_generator: UuidAuthTicketIdGenerator::new(),
             config: IssueAuthTicketConfig {
                 ticket_expansion_limit: feature.config.ticket_expansion_limit,
@@ -31,7 +34,7 @@ impl<'a> IssueAuthTicketStruct<'a> {
 
 impl<'a> IssueAuthTicketInfra for IssueAuthTicketStruct<'a> {
     type Clock = ChronoAuthClock;
-    type TicketRepository = MysqlAuthTicketRepository<'a>;
+    type TicketRepository = DynamoDbAuthTicketRepository<'a>;
     type TicketIdGenerator = UuidAuthTicketIdGenerator;
 
     fn clock(&self) -> &Self::Clock {

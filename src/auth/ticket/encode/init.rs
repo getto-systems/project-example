@@ -6,14 +6,17 @@ use crate::auth::ticket::{
     encode::init::token_encoder::{
         ApiJwtAuthTokenEncoder, CookieCloudfrontTokenEncoder, TicketJwtAuthTokenEncoder,
     },
-    kernel::init::{clock::ChronoAuthClock, ticket_repository::mysql::MysqlAuthTicketRepository},
+    kernel::init::{
+        clock::ChronoAuthClock, new_auth_ticket_repository,
+        ticket_repository::dynamodb::DynamoDbAuthTicketRepository,
+    },
 };
 
 use super::method::{EncodeAuthTicketConfig, EncodeAuthTicketInfra};
 
 pub struct EncodeAuthTicketStruct<'a> {
     clock: ChronoAuthClock,
-    ticket_repository: MysqlAuthTicketRepository<'a>,
+    ticket_repository: DynamoDbAuthTicketRepository<'a>,
     ticket_encoder: TicketJwtAuthTokenEncoder<'a>,
     api_encoder: ApiJwtAuthTokenEncoder<'a>,
     cloudfront_encoder: CookieCloudfrontTokenEncoder<'a>,
@@ -24,7 +27,7 @@ impl<'a> EncodeAuthTicketStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature) -> Self {
         Self {
             clock: ChronoAuthClock::new(),
-            ticket_repository: MysqlAuthTicketRepository::new(&feature.store.mysql),
+            ticket_repository: new_auth_ticket_repository(&feature.store),
             ticket_encoder: TicketJwtAuthTokenEncoder::new(&feature.encoding_key.ticket),
             api_encoder: ApiJwtAuthTokenEncoder::new(&feature.encoding_key.api),
             cloudfront_encoder: CookieCloudfrontTokenEncoder::new(&feature.cloudfront_key),
@@ -39,7 +42,7 @@ impl<'a> EncodeAuthTicketStruct<'a> {
 
 impl<'a> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a> {
     type Clock = ChronoAuthClock;
-    type TicketRepository = MysqlAuthTicketRepository<'a>;
+    type TicketRepository = DynamoDbAuthTicketRepository<'a>;
     type TicketEncoder = TicketJwtAuthTokenEncoder<'a>;
     type ApiEncoder = ApiJwtAuthTokenEncoder<'a>;
     type CloudfrontEncoder = CookieCloudfrontTokenEncoder<'a>;

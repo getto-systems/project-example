@@ -4,7 +4,7 @@ use crate::auth::ticket::validate::method::{
     validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
 };
 
-use crate::auth::ticket::{kernel::infra::AuthClock, logout::infra::LogoutAuthTicketRepository};
+use crate::auth::ticket::logout::infra::LogoutAuthTicketRepository;
 
 use crate::{
     auth::{ticket::kernel::data::AuthTicket, user::kernel::data::RequireAuthRoles},
@@ -27,11 +27,9 @@ impl std::fmt::Display for LogoutState {
 
 pub trait LogoutMaterial {
     type ValidateInfra: ValidateAuthTokenInfra;
-    type Clock: AuthClock;
     type TicketRepository: LogoutAuthTicketRepository;
 
     fn validate(&self) -> &Self::ValidateInfra;
-    fn clock(&self) -> &Self::Clock;
     fn ticket_repository(&self) -> &Self::TicketRepository;
 }
 
@@ -87,11 +85,10 @@ async fn logout<S>(
     ticket: AuthTicket,
     post: impl Fn(LogoutEvent) -> S,
 ) -> MethodResult<S> {
-    let clock = infra.clock();
     let ticket_repository = infra.ticket_repository();
 
     ticket_repository
-        .discard(ticket, clock.now())
+        .discard(ticket)
         .await
         .map_err(|err| post(LogoutEvent::RepositoryError(err)))?;
 
