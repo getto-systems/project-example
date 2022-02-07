@@ -7,7 +7,7 @@ use crate::auth::{
         kernel::init::clock::test::StaticChronoAuthClock,
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
-            nonce_repository::test::{
+            nonce_repository::memory::{
                 MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
             },
             test::StaticValidateAuthNonceStruct,

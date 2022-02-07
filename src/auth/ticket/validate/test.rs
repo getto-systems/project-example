@@ -8,7 +8,7 @@ use crate::auth::ticket::{
     kernel::init::clock::test::StaticChronoAuthClock,
     validate::init::{
         nonce_metadata::test::StaticAuthNonceMetadata,
-        nonce_repository::test::{
+        nonce_repository::memory::{
             MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
         },
         request_decoder::test::StaticValidateApiTokenRequestDecoder,
