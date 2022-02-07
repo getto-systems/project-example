@@ -1,4 +1,3 @@
-pub mod destination_repository;
 pub mod request_decoder;
 pub mod token_encoder;
 pub mod token_generator;
@@ -12,10 +11,9 @@ use crate::x_outside_feature::api::auth::feature::AuthAppFeature;
 
 use crate::auth::{
     ticket::{kernel::api::init::clock::ChronoAuthClock, validate::init::ValidateAuthNonceStruct},
-    user::password::{
-        kernel::init::password_repository::mysql::MysqlAuthUserPasswordRepository,
-        reset::request_token::api::init::{
-            destination_repository::MysqlResetTokenDestinationRepository,
+    user::{
+        kernel::init::user_repository::mysql::MysqlAuthUserRepository,
+        password::reset::request_token::api::init::{
             request_decoder::PbRequestResetTokenRequestDecoder,
             token_encoder::JwtResetTokenEncoder, token_generator::UuidResetTokenGenerator,
             token_notifier::EmailResetTokenNotifier,
@@ -31,8 +29,7 @@ pub struct RequestResetTokenStruct<'a> {
     validate_nonce: ValidateAuthNonceStruct<'a>,
 
     clock: ChronoAuthClock,
-    password_repository: MysqlAuthUserPasswordRepository<'a>,
-    destination_repository: MysqlResetTokenDestinationRepository<'a>,
+    user_repository: MysqlAuthUserRepository<'a>,
     token_generator: UuidResetTokenGenerator,
     token_encoder: JwtResetTokenEncoder<'a>,
     token_notifier: EmailResetTokenNotifier<'a>,
@@ -51,12 +48,7 @@ impl<'a> RequestResetTokenStruct<'a> {
                 validate_nonce: ValidateAuthNonceStruct::new(&feature.auth, metadata),
 
                 clock: ChronoAuthClock::new(),
-                password_repository: MysqlAuthUserPasswordRepository::new(
-                    &feature.auth.store.mysql,
-                ),
-                destination_repository: MysqlResetTokenDestinationRepository::new(
-                    &feature.auth.store.mysql,
-                ),
+                user_repository: MysqlAuthUserRepository::new(&feature.auth.store.mysql),
                 token_generator: UuidResetTokenGenerator,
                 token_encoder: JwtResetTokenEncoder::new(&feature.auth.reset_token_key),
                 token_notifier: EmailResetTokenNotifier::new(&feature.auth.email),
@@ -72,8 +64,8 @@ impl<'a> RequestResetTokenMaterial for RequestResetTokenStruct<'a> {
     type ValidateNonce = ValidateAuthNonceStruct<'a>;
 
     type Clock = ChronoAuthClock;
-    type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
-    type DestinationRepository = MysqlResetTokenDestinationRepository<'a>;
+    type PasswordRepository = MysqlAuthUserRepository<'a>;
+    type DestinationRepository = MysqlAuthUserRepository<'a>;
     type TokenGenerator = UuidResetTokenGenerator;
     type TokenEncoder = JwtResetTokenEncoder<'a>;
     type TokenNotifier = EmailResetTokenNotifier<'a>;
@@ -86,10 +78,10 @@ impl<'a> RequestResetTokenMaterial for RequestResetTokenStruct<'a> {
         &self.clock
     }
     fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.password_repository
+        &self.user_repository
     }
     fn destination_repository(&self) -> &Self::DestinationRepository {
-        &self.destination_repository
+        &self.user_repository
     }
     fn token_generator(&self) -> &Self::TokenGenerator {
         &self.token_generator

@@ -16,10 +16,7 @@ use crate::auth::{
     user::{
         kernel::init::user_repository::mysql::MysqlAuthUserRepository,
         password::{
-            kernel::init::{
-                password_hasher::Argon2PasswordHasher,
-                password_repository::mysql::MysqlAuthUserPasswordRepository,
-            },
+            kernel::init::password_hasher::Argon2PasswordHasher,
             reset::reset::api::init::{
                 request_decoder::PbResetPasswordRequestDecoder,
                 reset_notifier::EmailResetPasswordNotifier, token_decoder::JwtResetTokenDecoder,
@@ -37,7 +34,6 @@ pub struct ResetPasswordFeature<'a> {
 
     clock: ChronoAuthClock,
     user_repository: MysqlAuthUserRepository<'a>,
-    password_repository: MysqlAuthUserPasswordRepository<'a>,
     token_decoder: JwtResetTokenDecoder<'a>,
     reset_notifier: EmailResetPasswordNotifier<'a>,
 }
@@ -57,9 +53,6 @@ impl<'a> ResetPasswordFeature<'a> {
 
                 clock: ChronoAuthClock::new(),
                 user_repository: MysqlAuthUserRepository::new(&feature.auth.store.mysql),
-                password_repository: MysqlAuthUserPasswordRepository::new(
-                    &feature.auth.store.mysql,
-                ),
                 token_decoder: JwtResetTokenDecoder::new(&feature.auth.reset_token_key),
                 reset_notifier: EmailResetPasswordNotifier::new(&feature.auth.email),
             },
@@ -74,7 +67,7 @@ impl<'a> ResetPasswordMaterial for ResetPasswordFeature<'a> {
 
     type Clock = ChronoAuthClock;
     type UserRepository = MysqlAuthUserRepository<'a>;
-    type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
+    type PasswordRepository = MysqlAuthUserRepository<'a>;
     type PasswordHasher = Argon2PasswordHasher;
     type TokenDecoder = JwtResetTokenDecoder<'a>;
     type ResetNotifier = EmailResetPasswordNotifier<'a>;
@@ -96,7 +89,7 @@ impl<'a> ResetPasswordMaterial for ResetPasswordFeature<'a> {
         &self.user_repository
     }
     fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.password_repository
+        &self.user_repository
     }
     fn token_decoder(&self) -> &Self::TokenDecoder {
         &self.token_decoder

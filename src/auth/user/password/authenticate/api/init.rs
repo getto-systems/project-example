@@ -15,10 +15,7 @@ use crate::auth::{
         kernel::init::user_repository::mysql::MysqlAuthUserRepository,
         password::{
             authenticate::api::init::request_decoder::PbAuthenticatePasswordRequestDecoder,
-            kernel::init::{
-                password_matcher::Argon2PasswordMatcher,
-                password_repository::mysql::MysqlAuthUserPasswordRepository,
-            },
+            kernel::init::password_matcher::Argon2PasswordMatcher,
         },
     },
 };
@@ -31,7 +28,6 @@ pub struct AuthenticatePasswordStruct<'a> {
     encode: EncodeAuthTicketStruct<'a>,
 
     user_repository: MysqlAuthUserRepository<'a>,
-    password_repository: MysqlAuthUserPasswordRepository<'a>,
 }
 
 impl<'a> AuthenticatePasswordStruct<'a> {
@@ -48,9 +44,6 @@ impl<'a> AuthenticatePasswordStruct<'a> {
                 encode: EncodeAuthTicketStruct::new(&feature.auth),
 
                 user_repository: MysqlAuthUserRepository::new(&feature.auth.store.mysql),
-                password_repository: MysqlAuthUserPasswordRepository::new(
-                    &feature.auth.store.mysql,
-                ),
             },
         )
     }
@@ -62,7 +55,7 @@ impl<'a> AuthenticatePasswordMaterial for AuthenticatePasswordStruct<'a> {
     type Encode = EncodeAuthTicketStruct<'a>;
 
     type UserRepository = MysqlAuthUserRepository<'a>;
-    type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
+    type PasswordRepository = MysqlAuthUserRepository<'a>;
     type PasswordMatcher = Argon2PasswordMatcher;
 
     fn validate_nonce(&self) -> &Self::ValidateNonce {
@@ -79,6 +72,6 @@ impl<'a> AuthenticatePasswordMaterial for AuthenticatePasswordStruct<'a> {
         &self.user_repository
     }
     fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.password_repository
+        &self.user_repository
     }
 }

@@ -1,5 +1,4 @@
 pub mod request_decoder;
-pub mod search_repository;
 
 use tonic::metadata::MetadataMap;
 
@@ -9,9 +8,9 @@ use crate::x_outside_feature::api::auth::feature::AuthAppFeature;
 
 use crate::auth::{
     ticket::validate::init::ApiValidateAuthTokenStruct,
-    user::account::search::api::init::{
-        request_decoder::PbSearchAuthUserAccountRequestDecoder,
-        search_repository::MysqlSearchAuthUserAccountRepository,
+    user::{
+        account::search::api::init::request_decoder::PbSearchAuthUserAccountRequestDecoder,
+        kernel::init::user_repository::mysql::MysqlAuthUserRepository,
     },
 };
 
@@ -21,7 +20,7 @@ use crate::auth::user::account::search::api::action::{
 
 pub struct SearchAuthUserAccountStruct<'a> {
     validate: ApiValidateAuthTokenStruct<'a>,
-    search_repository: MysqlSearchAuthUserAccountRepository<'a>,
+    user_repository: MysqlAuthUserRepository<'a>,
 }
 
 impl<'a> SearchAuthUserAccountStruct<'a> {
@@ -35,9 +34,7 @@ impl<'a> SearchAuthUserAccountStruct<'a> {
             Self {
                 validate: ApiValidateAuthTokenStruct::new(&feature.auth, metadata),
 
-                search_repository: MysqlSearchAuthUserAccountRepository::new(
-                    &feature.auth.store.mysql,
-                ),
+                user_repository: MysqlAuthUserRepository::new(&feature.auth.store.mysql),
             },
         )
     }
@@ -45,12 +42,12 @@ impl<'a> SearchAuthUserAccountStruct<'a> {
 
 impl<'a> SearchAuthUserAccountMaterial for SearchAuthUserAccountStruct<'a> {
     type Validate = ApiValidateAuthTokenStruct<'a>;
-    type SearchRepository = MysqlSearchAuthUserAccountRepository<'a>;
+    type SearchRepository = MysqlAuthUserRepository<'a>;
 
     fn validate(&self) -> &Self::Validate {
         &self.validate
     }
     fn search_repository(&self) -> &Self::SearchRepository {
-        &self.search_repository
+        &self.user_repository
     }
 }

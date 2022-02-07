@@ -126,7 +126,7 @@ impl MemoryAuthUserMap {
         let mut store = Self::new();
         let user_id = user.into_user_id();
         store
-            .insert_login_id(login_id.clone(), user_id.clone())
+            .insert_login_id(login_id, user_id.clone())
             .insert_password(user_id, password);
         store
     }
