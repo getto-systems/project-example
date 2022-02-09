@@ -10,6 +10,9 @@ const headers = {
       "https://api.example.getto.systems/",
       "https://secure.example.getto.systems/",
     ].join(" "),
+    "child-src " + [
+      "'self'",
+    ].join(" "),
     "frame-src 'none'",
     "frame-ancestors 'none'",
     "img-src 'self'",
