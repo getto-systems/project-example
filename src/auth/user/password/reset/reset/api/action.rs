@@ -142,6 +142,7 @@ pub enum ResetPasswordEvent {
     ResetNotified(NotifyResetPasswordResponse),
     Success(AuthUser),
     InvalidReset(ResetPasswordError),
+    ResetTokenNotFound,
     UserNotFound,
     RepositoryError(RepositoryError),
     PasswordHashError(PasswordHashError),
@@ -158,6 +159,7 @@ impl std::fmt::Display for ResetPasswordEvent {
             Self::ResetNotified(response) => write!(f, "reset password notified; {}", response),
             Self::Success(user) => write!(f, "{}; {}", SUCCESS, user),
             Self::InvalidReset(err) => write!(f, "{}; {}", ERROR, err),
+            Self::ResetTokenNotFound => write!(f, "{}; reset token not found", ERROR),
             Self::UserNotFound => write!(f, "{}; user not found", ERROR),
             Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
             Self::PasswordHashError(err) => write!(f, "{}; {}", ERROR, err),
@@ -194,6 +196,7 @@ impl Into<ResetPasswordEvent> for VerifyResetTokenEntryError {
 impl Into<ResetPasswordEvent> for ResetPasswordRepositoryError {
     fn into(self) -> ResetPasswordEvent {
         match self {
+            Self::ResetTokenNotFound => ResetPasswordEvent::ResetTokenNotFound,
             Self::RepositoryError(err) => ResetPasswordEvent::RepositoryError(err),
             Self::PasswordHashError(err) => ResetPasswordEvent::PasswordHashError(err),
         }

@@ -7,8 +7,7 @@ use crate::auth::ticket::{
         ApiJwtAuthTokenEncoder, CookieCloudfrontTokenEncoder, TicketJwtAuthTokenEncoder,
     },
     kernel::init::{
-        clock::ChronoAuthClock, new_auth_ticket_repository,
-        ticket_repository::dynamodb::DynamoDbAuthTicketRepository,
+        clock::ChronoAuthClock, ticket_repository::dynamodb::DynamoDbAuthTicketRepository,
     },
 };
 
@@ -27,7 +26,7 @@ impl<'a> EncodeAuthTicketStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature) -> Self {
         Self {
             clock: ChronoAuthClock::new(),
-            ticket_repository: new_auth_ticket_repository(&feature.store),
+            ticket_repository: DynamoDbAuthTicketRepository::new(&feature.store),
             ticket_encoder: TicketJwtAuthTokenEncoder::new(&feature.encoding_key.ticket),
             api_encoder: ApiJwtAuthTokenEncoder::new(&feature.encoding_key.api),
             cloudfront_encoder: CookieCloudfrontTokenEncoder::new(&feature.cloudfront_key),

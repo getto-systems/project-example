@@ -5,8 +5,7 @@ use crate::auth::x_outside_feature::auth::feature::AuthOutsideFeature;
 use crate::auth::ticket::{
     issue::init::id_generator::UuidAuthTicketIdGenerator,
     kernel::init::{
-        clock::ChronoAuthClock, new_auth_ticket_repository,
-        ticket_repository::dynamodb::DynamoDbAuthTicketRepository,
+        clock::ChronoAuthClock, ticket_repository::dynamodb::DynamoDbAuthTicketRepository,
     },
 };
 
@@ -23,7 +22,7 @@ impl<'a> IssueAuthTicketStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature) -> Self {
         Self {
             clock: ChronoAuthClock::new(),
-            ticket_repository: new_auth_ticket_repository(&feature.store),
+            ticket_repository: DynamoDbAuthTicketRepository::new(&feature.store),
             ticket_id_generator: UuidAuthTicketIdGenerator::new(),
             config: IssueAuthTicketConfig {
                 ticket_expansion_limit: feature.config.ticket_expansion_limit,

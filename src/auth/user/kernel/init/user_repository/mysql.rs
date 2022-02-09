@@ -18,9 +18,7 @@ use crate::auth::user::{
         kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword},
         reset::{
             kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
-            request_token::infra::{
-                RegisterResetTokenRepository, ResetTokenDestinationRepository,
-            },
+            request_token::infra::{RegisterResetTokenRepository, ResetTokenDestinationRepository},
             reset::infra::ResetPasswordRepository,
         },
     },
@@ -48,7 +46,7 @@ use crate::{
     },
     z_lib::{
         repository::data::RepositoryError,
-        search::data::{SearchOffsetDetecter, SearchPage, SearchSortOrderMap},
+        search::data::{SearchOffset, SearchPage, SearchSortOrderMap},
     },
 };
 
@@ -230,8 +228,8 @@ fn change_password_error(err: sqlx::Error) -> ChangePasswordRepositoryError {
 impl<'pool> RegisterResetTokenRepository for MysqlAuthUserRepository<'pool> {
     async fn register_reset_token(
         &self,
-        login_id: LoginId,
         reset_token: ResetToken,
+        login_id: LoginId,
         destination: ResetTokenDestination,
         expires: ExpireDateTime,
         requested_at: AuthDateTime,
@@ -559,6 +557,7 @@ async fn search<'pool>(
         .await
         .map_err(mysql_error)?
         .count;
+    let all: i32 = all.try_into().map_err(infra_error)?;
 
     let limit = 1000;
 
@@ -574,12 +573,7 @@ async fn search<'pool>(
         });
     }
 
-    let offset = SearchOffsetDetecter {
-        // i64 -> u64; count() はマイナスにならないので、unwrap に失敗しない
-        all: all.try_into().unwrap(),
-        limit,
-    }
-    .detect(fields.offset());
+    let offset = SearchOffset { all, limit }.detect(fields.offset());
 
     let (sort_col, sort_order) = fields
         .sort()
@@ -605,8 +599,8 @@ async fn search<'pool>(
                 Expr::tbl(User::Table, User::UserId)
                     .equals(UserGrantedRole::Table, UserGrantedRole::UserId),
             )
-            .offset(offset)
-            .limit(limit)
+            .offset(offset.try_into().map_err(infra_error)?)
+            .limit(limit.try_into().map_err(infra_error)?)
             .order_by(sort_col, sort_order),
         fields,
     )
@@ -618,12 +612,7 @@ async fn search<'pool>(
         .map_err(mysql_error)?;
 
     Ok(SearchAuthUserAccountBasket {
-        page: SearchPage {
-            // i64 -> i32 に変換; それほど大きな値にならないはず
-            all: all.try_into().unwrap(),
-            limit: limit.try_into().unwrap(),
-            offset: offset.try_into().unwrap(),
-        },
+        page: SearchPage { all, limit, offset },
         users: rows
             .into_iter()
             .map(|row| AuthUserAccountBasket {

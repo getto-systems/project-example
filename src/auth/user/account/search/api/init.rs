@@ -10,7 +10,7 @@ use crate::auth::{
     ticket::validate::init::ApiValidateAuthTokenStruct,
     user::{
         account::search::init::request_decoder::PbSearchAuthUserAccountRequestDecoder,
-        kernel::init::user_repository::mysql::MysqlAuthUserRepository,
+        kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,
     },
 };
 
@@ -20,7 +20,7 @@ use crate::auth::user::account::search::action::{
 
 pub struct SearchAuthUserAccountStruct<'a> {
     validate: ApiValidateAuthTokenStruct<'a>,
-    user_repository: MysqlAuthUserRepository<'a>,
+    user_repository: DynamoDbAuthUserRepository<'a>,
 }
 
 impl<'a> SearchAuthUserAccountStruct<'a> {
@@ -33,8 +33,7 @@ impl<'a> SearchAuthUserAccountStruct<'a> {
             PbSearchAuthUserAccountRequestDecoder::new(request),
             Self {
                 validate: ApiValidateAuthTokenStruct::new(&feature.auth, metadata),
-
-                user_repository: MysqlAuthUserRepository::new(&feature.auth.store.mysql),
+                user_repository: DynamoDbAuthUserRepository::new(&feature.auth.store),
             },
         )
     }
@@ -42,7 +41,7 @@ impl<'a> SearchAuthUserAccountStruct<'a> {
 
 impl<'a> SearchAuthUserAccountMaterial for SearchAuthUserAccountStruct<'a> {
     type Validate = ApiValidateAuthTokenStruct<'a>;
-    type SearchRepository = MysqlAuthUserRepository<'a>;
+    type SearchRepository = DynamoDbAuthUserRepository<'a>;
 
     fn validate(&self) -> &Self::Validate {
         &self.validate

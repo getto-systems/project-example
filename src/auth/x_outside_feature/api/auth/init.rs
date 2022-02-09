@@ -4,7 +4,6 @@ use aws_cloudfront_cookie::CloudfrontKey;
 use rusoto_core::Region;
 use rusoto_dynamodb::DynamoDbClient;
 use rusoto_ses::SesClient;
-use sqlx::mysql::MySqlPoolOptions;
 
 use crate::z_lib::jwt::helper::{decoding_key_from_ec_pem, encoding_key_from_ec_pem};
 
@@ -40,11 +39,10 @@ pub async fn new_auth_outside_feature(env: &'static AuthEnv) -> AuthOutsideFeatu
             dynamodb: DynamoDbClient::new(Region::ApNortheast1),
             nonce_table_name: &env.dynamodb_auth_nonce_table,
             ticket_table_name: &env.dynamodb_auth_ticket_table,
-            mysql: MySqlPoolOptions::new()
-                .max_connections(5)
-                .connect(&env.mysql_auth_url)
-                .await
-                .expect("failed to connect mysql auth server"),
+            user_table_name: &env.dynamodb_auth_user_table,
+            login_id_table_name: &env.dynamodb_auth_login_id_table,
+            destination_table_name: &env.dynamodb_auth_reset_token_destination_table,
+            reset_token_table_name: &env.dynamodb_auth_reset_token_table,
         },
         decoding_key: AuthOutsideDecodingKey {
             ticket: decoding_key_from_ec_pem(&env.ticket_public_key),

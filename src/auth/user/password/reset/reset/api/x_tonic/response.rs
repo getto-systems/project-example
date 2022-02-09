@@ -60,6 +60,7 @@ impl ServiceResponder<ResetPasswordResponsePb> for ResetPasswordEvent {
             Self::ResetNotified(_) => Err(Status::cancelled("reset password cancelled")),
             Self::Success(_) => Err(Status::cancelled("reset password cancelled")),
             Self::InvalidReset(err) => err.respond_to(),
+            Self::ResetTokenNotFound => Err(Status::unauthenticated("reset token not found")),
             Self::UserNotFound => Err(Status::internal("user not found")),
             Self::RepositoryError(err) => err.respond_to(),
             Self::PasswordHashError(err) => err.respond_to(),

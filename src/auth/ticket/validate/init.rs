@@ -270,10 +270,7 @@ impl<'a> ValidateAuthNonceStruct<'a> {
             },
             clock: ChronoAuthClock::new(),
             nonce_metadata: TonicAuthNonceMetadata::new(metadata),
-            nonce_repository: DynamoDbAuthNonceRepository::new(
-                &feature.store.dynamodb,
-                feature.store.nonce_table_name,
-            ),
+            nonce_repository: DynamoDbAuthNonceRepository::new(&feature.store),
         }
     }
 }

@@ -3,9 +3,7 @@ use tonic::metadata::MetadataMap;
 use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::ticket::{
-    kernel::init::{
-        new_auth_ticket_repository, ticket_repository::dynamodb::DynamoDbAuthTicketRepository,
-    },
+    kernel::init::ticket_repository::dynamodb::DynamoDbAuthTicketRepository,
     validate::init::TicketValidateAuthTokenStruct,
 };
 
@@ -20,7 +18,7 @@ impl<'a> LogoutStruct<'a> {
     pub fn action(feature: &'a AuthAppFeature, metadata: &'a MetadataMap) -> LogoutAction<Self> {
         LogoutAction::with_material(Self {
             validate: TicketValidateAuthTokenStruct::new(&feature.auth, metadata),
-            ticket_repository: new_auth_ticket_repository(&feature.auth.store),
+            ticket_repository: DynamoDbAuthTicketRepository::new(&feature.auth.store),
         })
     }
 }

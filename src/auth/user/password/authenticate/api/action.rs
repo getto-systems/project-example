@@ -22,9 +22,7 @@ use crate::{
         kernel::data::AuthUser,
         login_id::kernel::data::{LoginId, ValidateLoginIdError},
         password::{
-            authenticate::data::{
-                AuthenticatePasswordError, VerifyPasswordRepositoryError,
-            },
+            authenticate::data::{AuthenticatePasswordError, VerifyPasswordRepositoryError},
             kernel::data::{PasswordHashError, ValidatePasswordError},
         },
     },
@@ -126,7 +124,6 @@ impl<R: AuthenticatePasswordRequestDecoder, M: AuthenticatePasswordMaterial>
 
 pub enum AuthenticatePasswordEvent {
     Success(AuthUser),
-    UserNotFound,
     InvalidPassword(AuthenticatePasswordError),
     PasswordHashError(PasswordHashError),
     RepositoryError(RepositoryError),
@@ -140,7 +137,6 @@ impl std::fmt::Display for AuthenticatePasswordEvent {
         match self {
             Self::Success(user) => write!(f, "{}; {}", SUCCESS, user),
             Self::InvalidPassword(response) => write!(f, "{}; {}", ERROR, response),
-            Self::UserNotFound => write!(f, "{}; user not found", ERROR),
             Self::PasswordHashError(err) => write!(f, "{}; {}", ERROR, err),
             Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
         }
@@ -152,6 +148,9 @@ impl Into<AuthenticatePasswordEvent> for VerifyPasswordRepositoryError {
         match self {
             Self::PasswordHashError(err) => AuthenticatePasswordEvent::PasswordHashError(err),
             Self::RepositoryError(err) => AuthenticatePasswordEvent::RepositoryError(err),
+            Self::UserNotFound => {
+                AuthenticatePasswordEvent::InvalidPassword(AuthenticatePasswordError::UserNotFound)
+            }
             Self::PasswordNotFound => AuthenticatePasswordEvent::InvalidPassword(
                 AuthenticatePasswordError::PasswordNotFound,
             ),
@@ -196,7 +195,11 @@ async fn authenticate_password<S>(
         .get(&user_id)
         .await
         .map_err(|err| post(AuthenticatePasswordEvent::RepositoryError(err)))?
-        .ok_or_else(|| post(AuthenticatePasswordEvent::UserNotFound))?;
+        .ok_or_else(|| {
+            post(AuthenticatePasswordEvent::InvalidPassword(
+                AuthenticatePasswordError::UserNotFound,
+            ))
+        })?;
 
     post(AuthenticatePasswordEvent::Success(user.clone()));
     Ok(user)

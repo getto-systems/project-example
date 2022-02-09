@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use rusoto_core::RusotoError;
 use rusoto_dynamodb::{AttributeValue, DynamoDb, DynamoDbClient, PutItemError, PutItemInput};
 
+use crate::auth::x_outside_feature::auth::feature::AuthOutsideStore;
 use crate::z_lib::repository::dynamodb::helper::{string_value, timestamp_value};
 use crate::z_lib::repository::helper::infra_error;
 
@@ -15,12 +16,15 @@ use crate::{
 
 pub struct DynamoDbAuthNonceRepository<'a> {
     client: &'a DynamoDbClient,
-    table_name: &'a str,
+    nonce: &'a str,
 }
 
 impl<'a> DynamoDbAuthNonceRepository<'a> {
-    pub const fn new(client: &'a DynamoDbClient, table_name: &'a str) -> Self {
-        Self { client, table_name }
+    pub const fn new(feature: &'a AuthOutsideStore) -> Self {
+        Self {
+            client: &feature.dynamodb,
+            nonce: feature.nonce_table_name,
+        }
     }
 }
 
@@ -45,7 +49,7 @@ async fn put_nonce<'a>(
 
     // 有効期限が切れた項目は dynamodb の TTL の設定によって削除される
     let input = PutItemInput {
-        table_name: repository.table_name.into(),
+        table_name: repository.nonce.into(),
         condition_expression: Some("attribute_not_exists(nonce)".into()),
         item: item.extract(),
         ..Default::default()
@@ -74,20 +78,18 @@ impl AttributeMap {
         self.0
     }
 
+    fn add(&mut self, key: &str, attr: AttributeValue) -> &mut Self {
+        self.0.insert(key.into(), attr);
+        self
+    }
+
     fn add_entry(&mut self, entry: AuthNonceEntry) -> &mut Self {
         let extract = entry.extract();
 
-        self.0.insert("nonce".into(), string_value(extract.nonce));
-        self.0
-            .insert("expires".into(), timestamp_value(extract.expires));
-
-        self
+        self.add("nonce", string_value(extract.nonce))
+            .add("expires", timestamp_value(extract.expires))
     }
     fn add_registered_at(&mut self, registered_at: AuthDateTime) -> &mut Self {
-        self.0.insert(
-            "registered_at".into(),
-            timestamp_value(registered_at.extract()),
-        );
-        self
+        self.add("registered_at", timestamp_value(registered_at.extract()))
     }
 }

@@ -5,28 +5,34 @@ use rusoto_dynamodb::{
     AttributeValue, DeleteItemInput, DynamoDb, DynamoDbClient, GetItemInput, PutItemInput,
 };
 
+use crate::auth::x_outside_feature::auth::feature::AuthOutsideStore;
+
+use crate::z_lib::repository::{
+    dynamodb::helper::{string_value, timestamp_value},
+    helper::infra_error,
+};
+
+use crate::auth::ticket::{
+    encode::infra::EncodeAuthTicketRepository, issue::infra::IssueAuthTicketRepository,
+    logout::infra::LogoutAuthTicketRepository,
+};
+
 use crate::{
-    auth::ticket::{
-        encode::infra::EncodeAuthTicketRepository,
-        issue::infra::IssueAuthTicketRepository,
-        kernel::data::{AuthDateTime, AuthTicket, ExpansionLimitDateTime},
-        logout::infra::LogoutAuthTicketRepository,
-    },
-    z_lib::repository::{
-        data::RepositoryError,
-        dynamodb::helper::{string_value, timestamp_value},
-        helper::infra_error,
-    },
+    auth::ticket::kernel::data::{AuthDateTime, AuthTicket, ExpansionLimitDateTime},
+    z_lib::repository::data::RepositoryError,
 };
 
 pub struct DynamoDbAuthTicketRepository<'a> {
     client: &'a DynamoDbClient,
-    table_name: &'a str,
+    ticket: &'a str,
 }
 
 impl<'a> DynamoDbAuthTicketRepository<'a> {
-    pub const fn new(client: &'a DynamoDbClient, table_name: &'a str) -> Self {
-        Self { client, table_name }
+    pub const fn new(feature: &'a AuthOutsideStore) -> Self {
+        Self {
+            client: &feature.dynamodb,
+            ticket: feature.ticket_table_name,
+        }
     }
 }
 
@@ -54,7 +60,7 @@ async fn issue<'a>(
 
     // 有効期限が切れた項目は dynamodb の TTL の設定によって削除される
     let input = PutItemInput {
-        table_name: repository.table_name.into(),
+        table_name: repository.ticket.into(),
         condition_expression: Some("attribute_not_exists(ticket_id)".into()),
         item: item.extract(),
         ..Default::default()
@@ -83,7 +89,7 @@ async fn discard<'a>(
     item.add_ticket(ticket);
 
     let input = DeleteItemInput {
-        table_name: repository.table_name.into(),
+        table_name: repository.ticket.into(),
         key: item.extract(),
         ..Default::default()
     };
@@ -114,7 +120,7 @@ async fn find_expansion_limit<'a>(
     item.add_ticket(ticket.clone());
 
     let input = GetItemInput {
-        table_name: repository.table_name.into(),
+        table_name: repository.ticket.into(),
         key: item.extract(),
         projection_expression: Some("expansion_limit".into()),
         ..Default::default()
@@ -126,17 +132,18 @@ async fn find_expansion_limit<'a>(
         .await
         .map_err(infra_error)?;
 
-    Ok(response
+    let found = response
         .item
         .and_then(|mut attrs| attrs.remove("expansion_limit"))
         .and_then(|attr| attr.n)
-        .and_then(|found| found.parse::<i64>().ok())
-        .map(|found| {
-            ExpansionLimitDateTime::restore(DateTime::<Utc>::from_utc(
-                NaiveDateTime::from_timestamp(found, 0),
-                Utc,
-            ))
-        }))
+        .and_then(|found| found.parse::<i64>().ok());
+
+    Ok(found.map(|expansion_limit| {
+        ExpansionLimitDateTime::restore(DateTime::<Utc>::from_utc(
+            NaiveDateTime::from_timestamp(expansion_limit, 0),
+            Utc,
+        ))
+    }))
 }
 
 struct AttributeMap(HashMap<String, AttributeValue>);

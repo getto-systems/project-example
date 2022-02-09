@@ -30,6 +30,7 @@ impl LogFilter for ResetPasswordEvent {
             Self::ResetNotified(_) => LogLevel::Info,
             Self::Success(_) => LogLevel::Audit,
             Self::InvalidReset(err) => err.log_level(),
+            Self::ResetTokenNotFound => LogLevel::Audit,
             Self::UserNotFound => LogLevel::Error,
             Self::RepositoryError(err) => err.log_level(),
             Self::PasswordHashError(err) => err.log_level(),

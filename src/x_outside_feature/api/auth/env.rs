@@ -20,7 +20,10 @@ pub struct AuthEnv {
 
     pub dynamodb_auth_nonce_table: String,
     pub dynamodb_auth_ticket_table: String,
-    pub mysql_auth_url: String,
+    pub dynamodb_auth_user_table: String,
+    pub dynamodb_auth_login_id_table: String,
+    pub dynamodb_auth_reset_token_destination_table: String,
+    pub dynamodb_auth_reset_token_table: String,
 }
 
 impl AuthEnv {
@@ -43,9 +46,14 @@ impl AuthEnv {
             cloudfront_private_key: load("SECRET_CLOUDFRONT_PRIVATE_KEY"),
             cloudfront_key_pair_id: load("SECRET_CLOUDFRONT_KEY_PAIR_ID"),
 
-            dynamodb_auth_nonce_table: load("SECRET_DYNAMODB_AUTH_NONCE_TABLE"),
-            dynamodb_auth_ticket_table: load("SECRET_DYNAMODB_AUTH_TICKET_TABLE"),
-            mysql_auth_url: load("SECRET_MYSQL_AUTH_URL"),
+            dynamodb_auth_nonce_table: load("DYNAMODB_AUTH_NONCE_TABLE"),
+            dynamodb_auth_ticket_table: load("DYNAMODB_AUTH_TICKET_TABLE"),
+            dynamodb_auth_user_table: load("DYNAMODB_AUTH_USER_TABLE"),
+            dynamodb_auth_login_id_table: load("DYNAMODB_AUTH_LOGIN_ID_TABLE"),
+            dynamodb_auth_reset_token_destination_table: load(
+                "DYNAMODB_AUTH_RESET_TOKEN_DESTINATION_TABLE",
+            ),
+            dynamodb_auth_reset_token_table: load("DYNAMODB_AUTH_RESET_TOKEN_TABLE"),
         }
     }
 }

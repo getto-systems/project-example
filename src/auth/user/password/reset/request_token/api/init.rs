@@ -12,7 +12,7 @@ use crate::x_outside_feature::auth::feature::AuthAppFeature;
 use crate::auth::{
     ticket::{kernel::init::clock::ChronoAuthClock, validate::init::ValidateAuthNonceStruct},
     user::{
-        kernel::init::user_repository::mysql::MysqlAuthUserRepository,
+        kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,
         password::reset::request_token::init::{
             request_decoder::PbRequestResetTokenRequestDecoder,
             token_encoder::JwtResetTokenEncoder, token_generator::UuidResetTokenGenerator,
@@ -29,7 +29,7 @@ pub struct RequestResetTokenStruct<'a> {
     validate_nonce: ValidateAuthNonceStruct<'a>,
 
     clock: ChronoAuthClock,
-    user_repository: MysqlAuthUserRepository<'a>,
+    user_repository: DynamoDbAuthUserRepository<'a>,
     token_generator: UuidResetTokenGenerator,
     token_encoder: JwtResetTokenEncoder<'a>,
     token_notifier: EmailResetTokenNotifier<'a>,
@@ -48,7 +48,7 @@ impl<'a> RequestResetTokenStruct<'a> {
                 validate_nonce: ValidateAuthNonceStruct::new(&feature.auth, metadata),
 
                 clock: ChronoAuthClock::new(),
-                user_repository: MysqlAuthUserRepository::new(&feature.auth.store.mysql),
+                user_repository: DynamoDbAuthUserRepository::new(&feature.auth.store),
                 token_generator: UuidResetTokenGenerator,
                 token_encoder: JwtResetTokenEncoder::new(&feature.auth.reset_token_key),
                 token_notifier: EmailResetTokenNotifier::new(&feature.auth.email),
@@ -64,8 +64,8 @@ impl<'a> RequestResetTokenMaterial for RequestResetTokenStruct<'a> {
     type ValidateNonce = ValidateAuthNonceStruct<'a>;
 
     type Clock = ChronoAuthClock;
-    type PasswordRepository = MysqlAuthUserRepository<'a>;
-    type DestinationRepository = MysqlAuthUserRepository<'a>;
+    type PasswordRepository = DynamoDbAuthUserRepository<'a>;
+    type DestinationRepository = DynamoDbAuthUserRepository<'a>;
     type TokenGenerator = UuidResetTokenGenerator;
     type TokenEncoder = JwtResetTokenEncoder<'a>;
     type TokenNotifier = EmailResetTokenNotifier<'a>;

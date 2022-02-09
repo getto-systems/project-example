@@ -187,8 +187,8 @@ async fn request_reset_token<S>(
 
     password_repository
         .register_reset_token(
-            login_id,
             reset_token.clone(),
+            login_id,
             destination.clone(),
             expires.clone(),
             requested_at,

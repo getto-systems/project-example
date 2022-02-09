@@ -424,8 +424,8 @@ fn get_destination<'store>(
 impl<'store> RegisterResetTokenRepository for MemoryAuthUserRepository<'store> {
     async fn register_reset_token(
         &self,
-        login_id: LoginId,
         reset_token: ResetToken,
+        login_id: LoginId,
         destination: ResetTokenDestination,
         expires: ExpireDateTime,
         requested_at: AuthDateTime,
