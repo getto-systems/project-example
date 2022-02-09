@@ -29,7 +29,7 @@ use crate::auth::{proxy::infra::AuthProxyService, ticket::validate::infra::AuthM
 use crate::{
     auth::{
         proxy::data::AuthProxyError,
-        ticket::kernel::data::{AuthTokenMessage, AuthTokenResponse},
+        ticket::kernel::data::{AuthResponse, AuthTokenMessage, EncodedAuthTokens},
     },
     z_lib::message::data::MessageError,
 };
@@ -56,7 +56,7 @@ impl<'a> ProxyService<'a> {
 
 #[async_trait::async_trait]
 impl<'a> AuthProxyService for ProxyService<'a> {
-    type Response = AuthTokenResponse;
+    type Response = AuthResponse;
 
     fn name(&self) -> &str {
         ServiceReset::name()
@@ -69,7 +69,7 @@ impl<'a> AuthProxyService for ProxyService<'a> {
 async fn call<'a>(
     service: ProxyService<'a>,
     metadata: AuthMetadataContent,
-) -> Result<AuthTokenResponse, AuthProxyError> {
+) -> Result<AuthResponse, AuthProxyError> {
     let mut client = ResetPasswordPbClient::new(
         new_endpoint(service.service_url)
             .map_err(infra_error)?
@@ -96,14 +96,16 @@ async fn call<'a>(
         .into_inner();
 
     let (token, message) = response.extract();
-    Ok(service.response_builder.build(AuthTokenMessage {
-        body: encode_protobuf_base64(message).map_err(AuthProxyError::MessageError)?,
-        token: token
-            .and_then(|token| token.into())
-            .ok_or(AuthProxyError::MessageError(MessageError::Invalid(
-                "invalid response; token not exists".into(),
-            )))?,
-    }))
+    let token: Option<EncodedAuthTokens> = token.and_then(|token| token.into());
+    let body = encode_protobuf_base64(message).map_err(AuthProxyError::MessageError)?;
+    Ok(match token {
+        None => AuthResponse::Failed(body),
+        Some(token) => AuthResponse::Succeeded(
+            service
+                .response_builder
+                .build(AuthTokenMessage { body, token }),
+        ),
+    })
 }
 
 fn decode_request(body: String) -> Result<ResetPasswordRequestPb, MessageError> {

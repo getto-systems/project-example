@@ -60,6 +60,11 @@ pub enum CloudfrontTokenKind {
     Signature,
 }
 
+pub enum AuthResponse {
+    Succeeded(AuthTokenResponse),
+    Failed(String),
+}
+
 pub struct AuthTokenResponse {
     pub domain: String,
     pub message: AuthTokenMessage,

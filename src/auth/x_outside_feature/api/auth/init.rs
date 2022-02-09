@@ -41,7 +41,6 @@ pub async fn new_auth_outside_feature(env: &'static AuthEnv) -> AuthOutsideFeatu
             ticket_table_name: &env.dynamodb_auth_ticket_table,
             user_table_name: &env.dynamodb_auth_user_table,
             login_id_table_name: &env.dynamodb_auth_login_id_table,
-            destination_table_name: &env.dynamodb_auth_reset_token_destination_table,
             reset_token_table_name: &env.dynamodb_auth_reset_token_table,
         },
         decoding_key: AuthOutsideDecodingKey {

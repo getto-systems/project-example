@@ -30,7 +30,6 @@ pub struct AuthOutsideStore {
     pub ticket_table_name: &'static str,
     pub user_table_name: &'static str,
     pub login_id_table_name: &'static str,
-    pub destination_table_name: &'static str,
     pub reset_token_table_name: &'static str,
 }
 pub struct AuthOutsideEncodingKey {

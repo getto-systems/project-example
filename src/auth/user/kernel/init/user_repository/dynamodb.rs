@@ -69,7 +69,6 @@ pub struct DynamoDbAuthUserRepository<'a> {
     client: &'a DynamoDbClient,
     user: &'a str,
     login_id: &'a str,
-    destination: &'a str,
     reset_token: &'a str,
 }
 
@@ -79,7 +78,6 @@ impl<'a> DynamoDbAuthUserRepository<'a> {
             client: &feature.dynamodb,
             user: feature.user_table_name,
             login_id: feature.login_id_table_name,
-            destination: feature.destination_table_name,
             reset_token: feature.reset_token_table_name,
         }
     }
@@ -95,17 +93,25 @@ async fn get_user<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
     user_id: &AuthUserId,
 ) -> Result<Option<AuthUser>, RepositoryError> {
-    let found = get_granted_roles(repository, user_id.clone())
+    // login id が存在すればユーザーは登録されているとみなす
+    if let None = get_login_id(repository, user_id.clone())
+        .await
+        .map_err(infra_error)?
+    {
+        return Ok(None);
+    }
+
+    let roles = get_granted_roles(repository, user_id.clone())
         .await
         .map_err(infra_error)?;
 
-    Ok(found.map(|roles| {
+    Ok(Some(
         AuthUserExtract {
             user_id: user_id.clone().extract(),
             granted_roles: roles.extract(),
         }
-        .restore()
-    }))
+        .restore(),
+    ))
 }
 
 #[async_trait::async_trait]
@@ -200,9 +206,9 @@ async fn get_destination<'client>(
     key.add_login_id(login_id.clone());
 
     let input = GetItemInput {
-        table_name: repository.destination.into(),
+        table_name: repository.login_id.into(),
         key: key.extract(),
-        projection_expression: Some("email".into()),
+        projection_expression: Some("reset_token_destination_email".into()),
         ..Default::default()
     };
 
@@ -214,7 +220,7 @@ async fn get_destination<'client>(
 
     Ok(response
         .item
-        .and_then(|mut attrs| attrs.remove("email"))
+        .and_then(|mut attrs| attrs.remove("reset_token_destination_email"))
         .and_then(|attr| attr.s)
         .map(|email| ResetTokenDestinationExtract { email }.restore()))
 }
@@ -431,7 +437,7 @@ async fn get_user_id_by_reset_token<'client>(
 async fn get_granted_roles<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
     user_id: AuthUserId,
-) -> Result<Option<GrantedAuthRoles>, RusotoError<GetItemError>> {
+) -> Result<GrantedAuthRoles, RusotoError<GetItemError>> {
     let mut key = AttributeMap::new();
     key.add_user_id(user_id);
 
@@ -447,9 +453,35 @@ async fn get_granted_roles<'client>(
     let found = response
         .item
         .and_then(|mut attrs| attrs.remove("granted_roles"))
-        .and_then(|attr| attr.ss);
+        .and_then(|attr| attr.ss)
+        .map(|roles| HashSet::from_iter(roles.into_iter()));
 
-    Ok(found.map(|roles| GrantedAuthRoles::restore(HashSet::from_iter(roles.into_iter()))))
+    Ok(match found {
+        Some(roles) => GrantedAuthRoles::restore(roles),
+        None => GrantedAuthRoles::restore(HashSet::new()),
+    })
+}
+async fn get_login_id<'client>(
+    repository: &DynamoDbAuthUserRepository<'client>,
+    user_id: AuthUserId,
+) -> Result<Option<LoginId>, RusotoError<GetItemError>> {
+    let mut key = AttributeMap::new();
+    key.add_user_id(user_id);
+
+    let input = GetItemInput {
+        table_name: repository.user.into(),
+        key: key.extract(),
+        projection_expression: Some("login_id".into()),
+        ..Default::default()
+    };
+
+    let response = repository.client.get_item(input).await?;
+
+    Ok(response
+        .item
+        .and_then(|mut attrs| attrs.remove("login_id"))
+        .and_then(|attr| attr.s)
+        .map(|password| LoginId::restore(password)))
 }
 async fn get_password<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
@@ -482,7 +514,7 @@ async fn update_password<'client>(
     key.add_user_id(user_id);
 
     let mut item = AttributeMap::new();
-    item.add_password(password);
+    item.add_password_as(password, ":password");
 
     let input = UpdateItemInput {
         table_name: repository.user.into(),
@@ -505,7 +537,7 @@ async fn update_reset_at<'client, 'a>(
     key.add_reset_token(reset_token);
 
     let mut item = AttributeMap::new();
-    item.add_reset_at(reset_at);
+    item.add_reset_at_as(reset_at, ":reset_at");
 
     let input = UpdateItemInput {
         table_name: repository.reset_token.into(),
@@ -658,9 +690,6 @@ impl AttributeMap {
     fn add_user_id(&mut self, user_id: AuthUserId) -> &mut Self {
         self.add("user_id", string_value(user_id.extract()))
     }
-    fn add_password(&mut self, password: HashedPassword) -> &mut Self {
-        self.add("password", string_value(password.extract()))
-    }
     fn add_reset_token(&mut self, reset_token: ResetToken) -> &mut Self {
         self.add("reset_token", string_value(reset_token.extract()))
     }
@@ -673,7 +702,11 @@ impl AttributeMap {
     fn add_requested_at(&mut self, requested_at: AuthDateTime) -> &mut Self {
         self.add("requested_at", timestamp_value(requested_at.extract()))
     }
-    fn add_reset_at(&mut self, reset_at: AuthDateTime) -> &mut Self {
-        self.add("reset_at", timestamp_value(reset_at.extract()))
+
+    fn add_password_as(&mut self, password: HashedPassword, name: &str) -> &mut Self {
+        self.add(name, string_value(password.extract()))
+    }
+    fn add_reset_at_as(&mut self, reset_at: AuthDateTime, name: &str) -> &mut Self {
+        self.add(name, timestamp_value(reset_at.extract()))
     }
 }
