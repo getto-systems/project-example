@@ -2,13 +2,13 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::api::{logger::Logger, response::tonic::ServiceResponder};
+use crate::z_lib::{logger::Logger, response::tonic::ServiceResponder};
 
 use crate::core::outline::load::y_protobuf::service::{
     load_menu_badge_pb_server::LoadMenuBadgePb, LoadMenuBadgeRequestPb, LoadMenuBadgeResponsePb,
 };
 
-use crate::x_outside_feature::api::{
+use crate::x_outside_feature::{
     common::metadata::metadata_request_id,
     core::{
         feature::{extract_request, TonicRequest},
@@ -16,7 +16,7 @@ use crate::x_outside_feature::api::{
     },
 };
 
-use crate::core::outline::load::api::init::LoadOutlineMenuBadgeStruct;
+use crate::core::outline::load::init::LoadOutlineMenuBadgeStruct;
 
 pub struct ServiceLoadMenuBadge;
 

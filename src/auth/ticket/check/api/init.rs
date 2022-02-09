@@ -1,6 +1,6 @@
 use tonic::metadata::MetadataMap;
 
-use crate::x_outside_feature::api::auth::feature::AuthAppFeature;
+use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::ticket::{
     encode::init::EncodeAuthTicketStruct, validate::init::TicketValidateAuthTokenStruct,

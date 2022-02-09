@@ -2,9 +2,9 @@ use tonic::{Response, Status};
 
 use crate::avail::unexpected_error::notify::y_protobuf::service::NotifyResponsePb;
 
-use crate::z_lib::api::response::tonic::ServiceResponder;
+use crate::z_lib::response::tonic::ServiceResponder;
 
-use crate::avail::unexpected_error::notify::api::action::{
+use crate::avail::unexpected_error::notify::action::{
     NotifyUnexpectedErrorEvent, NotifyUnexpectedErrorState,
 };
 

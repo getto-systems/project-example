@@ -1,6 +1,6 @@
 use tonic::metadata::MetadataMap;
 
-use crate::z_lib::api::request::x_tonic::metadata::metadata;
+use crate::z_lib::request::x_tonic::metadata::metadata;
 
 pub const METADATA_REQUEST_ID: &'static str = "getto-example-request-id";
 

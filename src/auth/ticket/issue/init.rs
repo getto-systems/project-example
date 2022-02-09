@@ -1,17 +1,19 @@
 pub mod id_generator;
 
-use crate::auth::x_outside_feature::api::auth::feature::AuthOutsideFeature;
+use crate::auth::x_outside_feature::auth::feature::AuthOutsideFeature;
 
 use crate::auth::ticket::{
     issue::init::id_generator::UuidAuthTicketIdGenerator,
-    kernel::api::init::{clock::ChronoAuthClock, ticket_repository::MysqlAuthTicketRepository},
+    kernel::init::{
+        clock::ChronoAuthClock, ticket_repository::dynamodb::DynamoDbAuthTicketRepository,
+    },
 };
 
 use super::method::{IssueAuthTicketConfig, IssueAuthTicketInfra};
 
 pub struct IssueAuthTicketStruct<'a> {
     clock: ChronoAuthClock,
-    ticket_repository: MysqlAuthTicketRepository<'a>,
+    ticket_repository: DynamoDbAuthTicketRepository<'a>,
     ticket_id_generator: UuidAuthTicketIdGenerator,
     config: IssueAuthTicketConfig,
 }
@@ -20,7 +22,7 @@ impl<'a> IssueAuthTicketStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature) -> Self {
         Self {
             clock: ChronoAuthClock::new(),
-            ticket_repository: MysqlAuthTicketRepository::new(&feature.store.mysql),
+            ticket_repository: DynamoDbAuthTicketRepository::new(&feature.store),
             ticket_id_generator: UuidAuthTicketIdGenerator::new(),
             config: IssueAuthTicketConfig {
                 ticket_expansion_limit: feature.config.ticket_expansion_limit,
@@ -31,7 +33,7 @@ impl<'a> IssueAuthTicketStruct<'a> {
 
 impl<'a> IssueAuthTicketInfra for IssueAuthTicketStruct<'a> {
     type Clock = ChronoAuthClock;
-    type TicketRepository = MysqlAuthTicketRepository<'a>;
+    type TicketRepository = DynamoDbAuthTicketRepository<'a>;
     type TicketIdGenerator = UuidAuthTicketIdGenerator;
 
     fn clock(&self) -> &Self::Clock {
@@ -52,8 +54,9 @@ impl<'a> IssueAuthTicketInfra for IssueAuthTicketStruct<'a> {
 pub mod test {
     use crate::auth::ticket::{
         issue::init::id_generator::test::StaticAuthTicketIdGenerator,
-        kernel::api::init::{
-            clock::test::StaticChronoAuthClock, ticket_repository::test::MemoryAuthTicketRepository,
+        kernel::init::{
+            clock::test::StaticChronoAuthClock,
+            ticket_repository::memory::MemoryAuthTicketRepository,
         },
     };
 

@@ -1,6 +1,6 @@
 use crate::{
     auth::user::login_id::kernel::data::ValidateLoginIdError,
-    z_lib::api::repository::data::RepositoryError,
+    z_lib::repository::data::RepositoryError,
 };
 
 pub enum RequestResetTokenError {

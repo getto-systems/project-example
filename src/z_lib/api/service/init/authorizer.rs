@@ -3,7 +3,7 @@ use std::sync::Mutex;
 use chrono::{DateTime, Duration, Utc};
 use reqwest::{Client, Url};
 
-use crate::z_lib::api::service::{
+use crate::z_lib::service::{
     data::{ServiceAuthorizeError, ServiceAuthorizeToken},
     helper::infra_error,
     infra::ServiceAuthorizer,

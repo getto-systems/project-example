@@ -1,19 +1,21 @@
 pub mod token_encoder;
 
-use crate::auth::x_outside_feature::api::auth::feature::AuthOutsideFeature;
+use crate::auth::x_outside_feature::auth::feature::AuthOutsideFeature;
 
 use crate::auth::ticket::{
     encode::init::token_encoder::{
         ApiJwtAuthTokenEncoder, CookieCloudfrontTokenEncoder, TicketJwtAuthTokenEncoder,
     },
-    kernel::api::init::{clock::ChronoAuthClock, ticket_repository::MysqlAuthTicketRepository},
+    kernel::init::{
+        clock::ChronoAuthClock, ticket_repository::dynamodb::DynamoDbAuthTicketRepository,
+    },
 };
 
 use super::method::{EncodeAuthTicketConfig, EncodeAuthTicketInfra};
 
 pub struct EncodeAuthTicketStruct<'a> {
     clock: ChronoAuthClock,
-    ticket_repository: MysqlAuthTicketRepository<'a>,
+    ticket_repository: DynamoDbAuthTicketRepository<'a>,
     ticket_encoder: TicketJwtAuthTokenEncoder<'a>,
     api_encoder: ApiJwtAuthTokenEncoder<'a>,
     cloudfront_encoder: CookieCloudfrontTokenEncoder<'a>,
@@ -24,7 +26,7 @@ impl<'a> EncodeAuthTicketStruct<'a> {
     pub fn new(feature: &'a AuthOutsideFeature) -> Self {
         Self {
             clock: ChronoAuthClock::new(),
-            ticket_repository: MysqlAuthTicketRepository::new(&feature.store.mysql),
+            ticket_repository: DynamoDbAuthTicketRepository::new(&feature.store),
             ticket_encoder: TicketJwtAuthTokenEncoder::new(&feature.encoding_key.ticket),
             api_encoder: ApiJwtAuthTokenEncoder::new(&feature.encoding_key.api),
             cloudfront_encoder: CookieCloudfrontTokenEncoder::new(&feature.cloudfront_key),
@@ -39,7 +41,7 @@ impl<'a> EncodeAuthTicketStruct<'a> {
 
 impl<'a> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a> {
     type Clock = ChronoAuthClock;
-    type TicketRepository = MysqlAuthTicketRepository<'a>;
+    type TicketRepository = DynamoDbAuthTicketRepository<'a>;
     type TicketEncoder = TicketJwtAuthTokenEncoder<'a>;
     type ApiEncoder = ApiJwtAuthTokenEncoder<'a>;
     type CloudfrontEncoder = CookieCloudfrontTokenEncoder<'a>;
@@ -68,8 +70,9 @@ impl<'a> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a> {
 pub mod test {
     use crate::auth::ticket::{
         encode::init::token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
-        kernel::api::init::{
-            clock::test::StaticChronoAuthClock, ticket_repository::test::MemoryAuthTicketRepository,
+        kernel::init::{
+            clock::test::StaticChronoAuthClock,
+            ticket_repository::memory::MemoryAuthTicketRepository,
         },
     };
 

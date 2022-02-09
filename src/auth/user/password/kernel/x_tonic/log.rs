@@ -1,4 +1,4 @@
-use crate::z_lib::api::logger::{LogFilter, LogLevel};
+use crate::z_lib::logger::{LogFilter, LogLevel};
 
 use crate::auth::user::password::kernel::data::{PasswordHashError, ValidatePasswordError};
 

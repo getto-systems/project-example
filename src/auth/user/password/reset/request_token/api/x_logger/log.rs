@@ -1,8 +1,8 @@
-use crate::z_lib::api::logger::{LogFilter, LogLevel, LogMessage};
+use crate::z_lib::logger::{LogFilter, LogLevel, LogMessage};
 
 use super::super::action::{RequestResetTokenEvent, RequestResetTokenState};
 
-use crate::auth::user::password::reset::request_token::api::data::{
+use crate::auth::user::password::reset::request_token::data::{
     EncodeResetTokenError, NotifyResetTokenError, RequestResetTokenError,
 };
 

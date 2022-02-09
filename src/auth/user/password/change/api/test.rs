@@ -5,10 +5,10 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     ticket::{
-        kernel::api::init::clock::test::StaticChronoAuthClock,
+        kernel::init::clock::test::StaticChronoAuthClock,
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
-            nonce_repository::test::{
+            nonce_repository::memory::{
                 MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
             },
             test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
@@ -16,21 +16,22 @@ use crate::auth::{
             token_metadata::test::StaticAuthTokenMetadata,
         },
     },
-    user::password::{
-        change::api::init::request_decoder::test::StaticChangePasswordRequestDecoder,
-        kernel::init::{
-            password_hasher::test::PlainPasswordHasher,
-            password_matcher::test::PlainPasswordMatcher,
-            password_repository::test::{
-                MemoryAuthUserPasswordMap, MemoryAuthUserPasswordRepository,
-                MemoryAuthUserPasswordStore,
+    user::{
+        kernel::init::user_repository::memory::{
+            MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
+        },
+        password::{
+            change::init::request_decoder::test::StaticChangePasswordRequestDecoder,
+            kernel::init::{
+                password_hasher::test::PlainPasswordHasher,
+                password_matcher::test::PlainPasswordMatcher,
             },
         },
     },
 };
 
 use crate::auth::user::password::{
-    change::api::infra::ChangePasswordFieldsExtract, kernel::infra::HashedPassword,
+    change::infra::ChangePasswordFieldsExtract, kernel::infra::HashedPassword,
 };
 
 use crate::auth::ticket::validate::method::AuthNonceConfig;
@@ -38,7 +39,7 @@ use crate::auth::ticket::validate::method::AuthNonceConfig;
 use super::action::{ChangePasswordAction, ChangePasswordMaterial};
 
 use crate::auth::{
-    ticket::kernel::api::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
+    ticket::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
     user::{
         kernel::data::{AuthUser, AuthUserExtract},
         login_id::kernel::data::LoginId,
@@ -276,59 +277,58 @@ async fn error_password_not_stored() {
 
 struct TestStruct<'a> {
     validate: StaticValidateAuthTokenStruct<'a>,
-    password_repository: MemoryAuthUserPasswordRepository<'a>,
+    user_repository: MemoryAuthUserRepository<'a>,
 }
 
 impl<'a> ChangePasswordMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
 
-    type PasswordRepository = MemoryAuthUserPasswordRepository<'a>;
+    type PasswordRepository = MemoryAuthUserRepository<'a>;
     type PasswordMatcher = PlainPasswordMatcher;
     type PasswordHasher = PlainPasswordHasher;
 
     fn validate(&self) -> &Self::Validate {
         &self.validate
     }
-
     fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.password_repository
+        &self.user_repository
     }
 }
 
 struct TestStore {
     nonce: MemoryAuthNonceStore,
-    password: MemoryAuthUserPasswordStore,
+    user: MemoryAuthUserStore,
 }
 
 impl TestStore {
     fn standard() -> Self {
         Self {
             nonce: standard_nonce_store(),
-            password: standard_password_store(),
+            user: standard_password_store(),
         }
     }
     fn match_fail_password() -> Self {
         Self {
             nonce: standard_nonce_store(),
-            password: match_fail_password_store(),
+            user: match_fail_password_store(),
         }
     }
     fn password_not_stored() -> Self {
         Self {
             nonce: standard_nonce_store(),
-            password: not_stored_password_store(),
+            user: not_stored_password_store(),
         }
     }
     fn expired_nonce() -> Self {
         Self {
             nonce: expired_nonce_store(),
-            password: standard_password_store(),
+            user: standard_password_store(),
         }
     }
     fn conflict_nonce() -> Self {
         Self {
             nonce: conflict_nonce_store(),
-            password: standard_password_store(),
+            user: standard_password_store(),
         }
     }
 }
@@ -346,7 +346,7 @@ impl<'a> TestStruct<'a> {
                 token_metadata: standard_token_header(),
                 token_decoder: standard_token_decoder(),
             },
-            password_repository: MemoryAuthUserPasswordRepository::new(&store.password),
+            user_repository: MemoryAuthUserRepository::new(&store.user),
         }
     }
 }
@@ -443,20 +443,20 @@ fn conflict_nonce_store() -> MemoryAuthNonceStore {
     MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
 }
 
-fn standard_password_store() -> MemoryAuthUserPasswordStore {
-    MemoryAuthUserPasswordMap::with_password(
+fn standard_password_store() -> MemoryAuthUserStore {
+    MemoryAuthUserMap::with_user_and_password(
         test_user_login_id(),
         test_user(),
         test_user_password(),
     )
     .to_store()
 }
-fn match_fail_password_store() -> MemoryAuthUserPasswordStore {
-    MemoryAuthUserPasswordMap::with_password(test_user_login_id(), test_user(), another_password())
+fn match_fail_password_store() -> MemoryAuthUserStore {
+    MemoryAuthUserMap::with_user_and_password(test_user_login_id(), test_user(), another_password())
         .to_store()
 }
-fn not_stored_password_store() -> MemoryAuthUserPasswordStore {
-    MemoryAuthUserPasswordMap::new().to_store()
+fn not_stored_password_store() -> MemoryAuthUserStore {
+    MemoryAuthUserMap::new().to_store()
 }
 
 fn test_user() -> AuthUser {

@@ -2,13 +2,13 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::api::{logger::Logger, response::tonic::ServiceResponder};
+use crate::z_lib::{logger::Logger, response::tonic::ServiceResponder};
 
 use crate::auth::ticket::logout::y_protobuf::service::{
     logout_pb_server::LogoutPb, LogoutRequestPb, LogoutResponsePb,
 };
 
-use crate::x_outside_feature::api::{
+use crate::x_outside_feature::{
     auth::{
         feature::{extract_request, TonicRequest},
         logger::app_logger,
@@ -16,7 +16,7 @@ use crate::x_outside_feature::api::{
     common::metadata::metadata_request_id,
 };
 
-use crate::auth::ticket::logout::api::init::LogoutStruct;
+use crate::auth::ticket::logout::init::LogoutStruct;
 
 pub struct ServiceLogout;
 

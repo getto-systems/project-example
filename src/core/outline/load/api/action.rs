@@ -5,8 +5,8 @@ use crate::{
         data::RequireAuthRoles,
         method::{check_permission, CheckPermissionEvent, CheckPermissionInfra},
     },
-    core::outline::load::api::{data::OutlineMenuBadge, infra::OutlineMenuBadgeRepository},
-    z_lib::api::repository::data::RepositoryError,
+    core::outline::load::{data::OutlineMenuBadge, infra::OutlineMenuBadgeRepository},
+    z_lib::repository::data::RepositoryError,
 };
 
 pub enum LoadOutlineMenuBadgeState {

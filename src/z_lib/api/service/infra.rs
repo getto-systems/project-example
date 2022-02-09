@@ -1,4 +1,4 @@
-use crate::z_lib::api::service::data::{ServiceAuthorizeError, ServiceAuthorizeToken};
+use crate::z_lib::service::data::{ServiceAuthorizeError, ServiceAuthorizeToken};
 
 #[async_trait::async_trait]
 pub trait ServiceAuthorizer {

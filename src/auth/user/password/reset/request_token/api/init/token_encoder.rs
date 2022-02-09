@@ -1,16 +1,16 @@
 use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 
-use crate::auth::x_outside_feature::api::auth::feature::AuthOutsideResetTokenKey;
+use crate::auth::x_outside_feature::auth::feature::AuthOutsideResetTokenKey;
 
 use crate::auth::user::password::reset::{
-    kernel::infra::ResetTokenJwtClaims, request_token::api::infra::ResetTokenEncoder,
+    kernel::infra::ResetTokenJwtClaims, request_token::infra::ResetTokenEncoder,
 };
 
 use crate::auth::{
-    ticket::kernel::api::data::ExpireDateTime,
+    ticket::kernel::data::ExpireDateTime,
     user::password::reset::{
         kernel::data::{ResetToken, ResetTokenEncoded},
-        request_token::api::data::EncodeResetTokenError,
+        request_token::data::EncodeResetTokenError,
     },
 };
 
@@ -68,7 +68,7 @@ pub mod test {
 
     use super::super::super::data::EncodeResetTokenError;
     use crate::auth::{
-        ticket::kernel::api::data::ExpireDateTime,
+        ticket::kernel::data::ExpireDateTime,
         user::password::reset::kernel::data::{ResetToken, ResetTokenEncoded},
     };
 

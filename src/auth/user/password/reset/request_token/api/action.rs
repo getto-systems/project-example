@@ -5,8 +5,8 @@ use crate::auth::ticket::validate::method::{
 };
 
 use crate::auth::{
-    ticket::kernel::api::infra::AuthClock,
-    user::password::reset::request_token::api::infra::{
+    ticket::kernel::infra::AuthClock,
+    user::password::reset::request_token::infra::{
         RegisterResetTokenRepository, RequestResetTokenConfig, RequestResetTokenFieldsExtract,
         RequestResetTokenRequestDecoder, ResetTokenDestinationRepository, ResetTokenEncoder,
         ResetTokenGenerator, ResetTokenNotifier,
@@ -15,16 +15,16 @@ use crate::auth::{
 
 use crate::{
     auth::{
-        ticket::kernel::api::data::ExpireDateTime,
+        ticket::kernel::data::ExpireDateTime,
         user::{
             login_id::kernel::data::{LoginId, ValidateLoginIdError},
-            password::reset::request_token::api::data::{
+            password::reset::request_token::data::{
                 EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
                 RegisterResetTokenRepositoryError, RequestResetTokenError,
             },
         },
     },
-    z_lib::api::repository::data::RepositoryError,
+    z_lib::repository::data::RepositoryError,
 };
 
 pub enum RequestResetTokenState {
@@ -187,8 +187,8 @@ async fn request_reset_token<S>(
 
     password_repository
         .register_reset_token(
-            login_id,
             reset_token.clone(),
+            login_id,
             destination.clone(),
             expires.clone(),
             requested_at,

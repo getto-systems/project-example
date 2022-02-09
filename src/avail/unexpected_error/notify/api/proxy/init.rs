@@ -2,11 +2,11 @@ mod proxy_service;
 
 use actix_web::HttpRequest;
 
-use crate::x_outside_feature::api::proxy::feature::ProxyAppFeature;
+use crate::x_outside_feature::proxy::feature::ProxyAppFeature;
 
 use crate::{
     auth::init::ValidateApiMetadataStruct,
-    avail::unexpected_error::notify::api::proxy::init::proxy_service::ProxyService,
+    avail::unexpected_error::notify::proxy::init::proxy_service::ProxyService,
 };
 
 use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};

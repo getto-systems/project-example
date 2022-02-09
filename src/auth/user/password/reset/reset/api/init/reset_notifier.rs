@@ -1,17 +1,17 @@
 use rusoto_ses::{Body, Content, Message, SendEmailRequest, Ses, SesClient};
 
-use crate::auth::x_outside_feature::api::auth::feature::AuthOutsideEmail;
+use crate::auth::x_outside_feature::auth::feature::AuthOutsideEmail;
 
 use crate::x_content::mail::{
     notify_password_reset::{BODY, SUBJECT},
     SENDER_ADDRESS,
 };
 
-use crate::auth::user::password::reset::reset::api::infra::ResetPasswordNotifier;
+use crate::auth::user::password::reset::reset::infra::ResetPasswordNotifier;
 
 use crate::auth::user::password::reset::{
     kernel::data::ResetTokenDestination,
-    reset::api::data::{NotifyResetPasswordError, NotifyResetPasswordResponse},
+    reset::data::{NotifyResetPasswordError, NotifyResetPasswordResponse},
 };
 
 pub struct EmailResetPasswordNotifier<'a> {
@@ -72,11 +72,11 @@ fn utf8_content(data: String) -> Content {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::user::password::reset::reset::api::infra::ResetPasswordNotifier;
+    use crate::auth::user::password::reset::reset::infra::ResetPasswordNotifier;
 
     use crate::auth::user::password::reset::{
         kernel::data::ResetTokenDestination,
-        reset::api::data::{NotifyResetPasswordError, NotifyResetPasswordResponse},
+        reset::data::{NotifyResetPasswordError, NotifyResetPasswordResponse},
     };
 
     pub struct StaticResetPasswordNotifier;

@@ -2,11 +2,11 @@ use tonic::{Response, Status};
 
 use crate::auth::user::password::reset::request_token::y_protobuf::service::RequestResetTokenResponsePb;
 
-use crate::z_lib::api::response::tonic::ServiceResponder;
+use crate::z_lib::response::tonic::ServiceResponder;
 
 use super::super::action::{RequestResetTokenEvent, RequestResetTokenState};
 
-use crate::auth::user::password::reset::request_token::api::data::{
+use crate::auth::user::password::reset::request_token::data::{
     EncodeResetTokenError, NotifyResetTokenError, RequestResetTokenError,
 };
 

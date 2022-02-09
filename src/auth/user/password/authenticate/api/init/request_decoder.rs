@@ -1,6 +1,6 @@
 use crate::auth::user::password::authenticate::y_protobuf::service::AuthenticatePasswordRequestPb;
 
-use crate::auth::user::password::authenticate::api::infra::{
+use crate::auth::user::password::authenticate::infra::{
     AuthenticatePasswordFieldsExtract, AuthenticatePasswordRequestDecoder,
 };
 
@@ -25,7 +25,7 @@ impl AuthenticatePasswordRequestDecoder for PbAuthenticatePasswordRequestDecoder
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::user::password::authenticate::api::infra::{
+    use crate::auth::user::password::authenticate::infra::{
         AuthenticatePasswordFieldsExtract, AuthenticatePasswordRequestDecoder,
     };
 

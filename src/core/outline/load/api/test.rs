@@ -7,7 +7,7 @@ use crate::{
         StaticAuthMetadata, StaticAuthTokenDecoder, StaticValidateApiTokenStruct,
         StaticValidateService,
     },
-    core::outline::load::api::init::menu_badge_repository::test::StaticOutlineMenuBadgeRepository,
+    core::outline::load::init::menu_badge_repository::test::StaticOutlineMenuBadgeRepository,
 };
 
 use super::action::{LoadOutlineMenuBadgeAction, LoadOutlineMenuBadgeMaterial};

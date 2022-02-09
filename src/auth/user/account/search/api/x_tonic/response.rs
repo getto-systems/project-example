@@ -5,11 +5,11 @@ use crate::auth::user::account::{
     y_protobuf::service::AuthUserAccountPb,
 };
 
-use crate::z_lib::api::response::tonic::ServiceResponder;
+use crate::z_lib::response::tonic::ServiceResponder;
 
 use super::super::action::{SearchAuthUserAccountEvent, SearchAuthUserAccountState};
 
-use crate::auth::user::account::search::api::data::SearchAuthUserAccountBasket;
+use crate::auth::user::account::search::data::SearchAuthUserAccountBasket;
 
 impl ServiceResponder<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountState {
     fn respond_to(self) -> Result<Response<SearchAuthUserAccountResponsePb>, Status> {

@@ -3,12 +3,13 @@ use crate::{
         login_id::kernel::data::ValidateLoginIdError,
         password::kernel::data::{PasswordHashError, ValidatePasswordError},
     },
-    z_lib::api::repository::data::RepositoryError,
+    z_lib::repository::data::RepositoryError,
 };
 
 pub enum AuthenticatePasswordError {
     InvalidLoginId(ValidateLoginIdError),
     InvalidPassword(ValidatePasswordError),
+    UserNotFound,
     PasswordNotFound,
     PasswordNotMatched,
 }
@@ -18,6 +19,7 @@ impl std::fmt::Display for AuthenticatePasswordError {
         match self {
             Self::InvalidLoginId(err) => write!(f, "invalid login id: {}", err),
             Self::InvalidPassword(err) => write!(f, "invalid password: {}", err),
+            Self::UserNotFound => write!(f, "user not found"),
             Self::PasswordNotFound => write!(f, "password not found"),
             Self::PasswordNotMatched => write!(f, "password not matched"),
         }
@@ -27,6 +29,7 @@ impl std::fmt::Display for AuthenticatePasswordError {
 pub enum VerifyPasswordRepositoryError {
     PasswordHashError(PasswordHashError),
     RepositoryError(RepositoryError),
+    UserNotFound,
     PasswordNotFound,
     PasswordNotMatched,
 }

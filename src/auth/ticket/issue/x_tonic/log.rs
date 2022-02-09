@@ -1,4 +1,4 @@
-use crate::z_lib::api::logger::{LogLevel, LogFilter};
+use crate::z_lib::logger::{LogFilter, LogLevel};
 
 use super::super::method::IssueAuthTicketEvent;
 

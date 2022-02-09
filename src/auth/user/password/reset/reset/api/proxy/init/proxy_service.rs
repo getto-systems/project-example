@@ -5,18 +5,18 @@ use crate::auth::user::password::reset::reset::y_protobuf::service::{
     reset_password_pb_client::ResetPasswordPbClient, ResetPasswordRequestPb,
 };
 
-use crate::auth::x_outside_feature::api::proxy::feature::AuthOutsideFeature;
+use crate::auth::x_outside_feature::proxy::feature::AuthOutsideFeature;
 
-use crate::auth::user::password::reset::reset::api::x_tonic::route::ServiceReset;
+use crate::auth::user::password::reset::reset::x_tonic::route::ServiceReset;
 
 use crate::{
-    auth::ticket::kernel::api::init::response_builder::CookieAuthTokenResponseBuilder,
-    z_lib::api::service::init::authorizer::GoogleServiceAuthorizer,
+    auth::ticket::kernel::init::response_builder::CookieAuthTokenResponseBuilder,
+    z_lib::service::init::authorizer::GoogleServiceAuthorizer,
 };
 
 use crate::{
-    auth::{proxy::helper::infra_error, ticket::kernel::api::infra::AuthTokenResponseBuilder},
-    z_lib::api::{
+    auth::{proxy::helper::infra_error, ticket::kernel::infra::AuthTokenResponseBuilder},
+    z_lib::{
         message::helper::{decode_base64, encode_protobuf_base64, invalid_protobuf},
         service::helper::new_endpoint,
     },
@@ -29,9 +29,9 @@ use crate::auth::{proxy::infra::AuthProxyService, ticket::validate::infra::AuthM
 use crate::{
     auth::{
         proxy::data::AuthProxyError,
-        ticket::kernel::api::data::{AuthTokenMessage, AuthTokenResponse},
+        ticket::kernel::data::{AuthResponse, AuthTokenMessage, EncodedAuthTokens},
     },
-    z_lib::api::message::data::MessageError,
+    z_lib::message::data::MessageError,
 };
 
 pub struct ProxyService<'a> {
@@ -56,7 +56,7 @@ impl<'a> ProxyService<'a> {
 
 #[async_trait::async_trait]
 impl<'a> AuthProxyService for ProxyService<'a> {
-    type Response = AuthTokenResponse;
+    type Response = AuthResponse;
 
     fn name(&self) -> &str {
         ServiceReset::name()
@@ -69,7 +69,7 @@ impl<'a> AuthProxyService for ProxyService<'a> {
 async fn call<'a>(
     service: ProxyService<'a>,
     metadata: AuthMetadataContent,
-) -> Result<AuthTokenResponse, AuthProxyError> {
+) -> Result<AuthResponse, AuthProxyError> {
     let mut client = ResetPasswordPbClient::new(
         new_endpoint(service.service_url)
             .map_err(infra_error)?
@@ -96,14 +96,16 @@ async fn call<'a>(
         .into_inner();
 
     let (token, message) = response.extract();
-    Ok(service.response_builder.build(AuthTokenMessage {
-        body: encode_protobuf_base64(message).map_err(AuthProxyError::MessageError)?,
-        token: token
-            .and_then(|token| token.into())
-            .ok_or(AuthProxyError::MessageError(MessageError::Invalid(
-                "invalid response; token not exists".into(),
-            )))?,
-    }))
+    let token: Option<EncodedAuthTokens> = token.and_then(|token| token.into());
+    let body = encode_protobuf_base64(message).map_err(AuthProxyError::MessageError)?;
+    Ok(match token {
+        None => AuthResponse::Failed(body),
+        Some(token) => AuthResponse::Succeeded(
+            service
+                .response_builder
+                .build(AuthTokenMessage { body, token }),
+        ),
+    })
 }
 
 fn decode_request(body: String) -> Result<ResetPasswordRequestPb, MessageError> {

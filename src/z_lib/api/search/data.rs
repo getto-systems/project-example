@@ -1,12 +1,12 @@
 use std::convert::TryInto;
 
-pub struct SearchOffsetDetecter {
-    pub all: u64,
-    pub limit: u64,
+pub struct SearchOffset {
+    pub all: i32,
+    pub limit: i32,
 }
 
-impl SearchOffsetDetecter {
-    pub fn detect(&self, offset: i32) -> u64 {
+impl SearchOffset {
+    pub fn detect(&self, offset: i32) -> i32 {
         let offset = self.cast_offset(offset);
         if offset >= self.all {
             self.last_page()
@@ -14,7 +14,7 @@ impl SearchOffsetDetecter {
             self.offset_floor(offset)
         }
     }
-    fn cast_offset(&self, offset: i32) -> u64 {
+    fn cast_offset(&self, offset: i32) -> i32 {
         if offset < 0 {
             0
         } else {
@@ -22,10 +22,10 @@ impl SearchOffsetDetecter {
             offset.try_into().unwrap()
         }
     }
-    fn offset_floor(&self, offset: u64) -> u64 {
+    fn offset_floor(&self, offset: i32) -> i32 {
         offset - (offset % self.limit)
     }
-    fn last_page(&self) -> u64 {
+    fn last_page(&self) -> i32 {
         if self.all % self.limit > 0 {
             return self.offset_floor(self.all);
         }

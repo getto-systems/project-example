@@ -4,22 +4,21 @@ use aws_cloudfront_cookie::CloudfrontKey;
 use rusoto_core::Region;
 use rusoto_dynamodb::DynamoDbClient;
 use rusoto_ses::SesClient;
-use sqlx::mysql::MySqlPoolOptions;
 
-use crate::z_lib::api::jwt::helper::{decoding_key_from_ec_pem, encoding_key_from_ec_pem};
+use crate::z_lib::jwt::helper::{decoding_key_from_ec_pem, encoding_key_from_ec_pem};
 
 use crate::{
-    auth::x_outside_feature::api::{
+    auth::x_outside_feature::{
         auth::feature::{
             AuthOutsideCloudfrontKey, AuthOutsideConfig, AuthOutsideEmail, AuthOutsideEncodingKey,
             AuthOutsideFeature, AuthOutsideResetTokenKey, AuthOutsideStore,
         },
         common::feature::AuthOutsideDecodingKey,
     },
-    x_outside_feature::api::auth::env::AuthEnv,
+    x_outside_feature::auth::env::AuthEnv,
 };
 
-use crate::auth::ticket::kernel::api::data::{ExpansionLimitDuration, ExpireDuration};
+use crate::auth::ticket::kernel::data::{ExpansionLimitDuration, ExpireDuration};
 
 pub async fn new_auth_outside_feature(env: &'static AuthEnv) -> AuthOutsideFeature {
     AuthOutsideFeature {
@@ -39,11 +38,10 @@ pub async fn new_auth_outside_feature(env: &'static AuthEnv) -> AuthOutsideFeatu
         store: AuthOutsideStore {
             dynamodb: DynamoDbClient::new(Region::ApNortheast1),
             nonce_table_name: &env.dynamodb_auth_nonce_table,
-            mysql: MySqlPoolOptions::new()
-                .max_connections(5)
-                .connect(&env.mysql_auth_url)
-                .await
-                .expect("failed to connect mysql auth server"),
+            ticket_table_name: &env.dynamodb_auth_ticket_table,
+            user_table_name: &env.dynamodb_auth_user_table,
+            login_id_table_name: &env.dynamodb_auth_login_id_table,
+            reset_token_table_name: &env.dynamodb_auth_reset_token_table,
         },
         decoding_key: AuthOutsideDecodingKey {
             ticket: decoding_key_from_ec_pem(&env.ticket_public_key),

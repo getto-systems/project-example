@@ -1,13 +1,12 @@
 use jsonwebtoken::{DecodingKey, EncodingKey};
 use rusoto_dynamodb::DynamoDbClient;
 use rusoto_ses::SesClient;
-use sqlx::MySqlPool;
 
 use aws_cloudfront_cookie::CloudfrontKey;
 
-use crate::auth::x_outside_feature::api::common::feature::AuthOutsideDecodingKey;
+use crate::auth::x_outside_feature::common::feature::AuthOutsideDecodingKey;
 
-use crate::auth::ticket::kernel::api::data::{ExpansionLimitDuration, ExpireDuration};
+use crate::auth::ticket::kernel::data::{ExpansionLimitDuration, ExpireDuration};
 
 pub struct AuthOutsideFeature {
     pub(in crate::auth) config: AuthOutsideConfig,
@@ -28,7 +27,10 @@ pub struct AuthOutsideConfig {
 pub struct AuthOutsideStore {
     pub dynamodb: DynamoDbClient,
     pub nonce_table_name: &'static str,
-    pub mysql: MySqlPool,
+    pub ticket_table_name: &'static str,
+    pub user_table_name: &'static str,
+    pub login_id_table_name: &'static str,
+    pub reset_token_table_name: &'static str,
 }
 pub struct AuthOutsideEncodingKey {
     pub ticket: EncodingKey,

@@ -7,14 +7,14 @@ use crate::auth::ticket::{
 };
 
 use crate::auth::{
-    ticket::kernel::api::infra::AuthClock,
+    ticket::kernel::infra::AuthClock,
     user::{
         kernel::infra::AuthUserRepository,
         password::{
             kernel::infra::{AuthUserPasswordHasher, PlainPassword},
             reset::{
                 kernel::infra::ResetTokenEntry,
-                reset::api::infra::{
+                reset::infra::{
                     ResetPasswordFieldsExtract, ResetPasswordNotifier, ResetPasswordRepository,
                     ResetPasswordRequestDecoder, ResetTokenDecoder,
                 },
@@ -25,7 +25,7 @@ use crate::auth::{
 
 use crate::{
     auth::{
-        ticket::kernel::api::data::AuthDateTime,
+        ticket::kernel::data::AuthDateTime,
         user::{
             kernel::data::AuthUser,
             login_id::kernel::data::{LoginId, ValidateLoginIdError},
@@ -35,7 +35,7 @@ use crate::{
                     kernel::data::{
                         ResetTokenDestination, ResetTokenEncoded, ValidateResetTokenError,
                     },
-                    reset::api::data::{
+                    reset::data::{
                         DecodeResetTokenError, NotifyResetPasswordError,
                         NotifyResetPasswordResponse, ResetPasswordError,
                         ResetPasswordRepositoryError, VerifyResetTokenEntryError,
@@ -44,7 +44,7 @@ use crate::{
             },
         },
     },
-    z_lib::api::repository::data::RepositoryError,
+    z_lib::repository::data::RepositoryError,
 };
 
 pub enum ResetPasswordState {
@@ -142,6 +142,7 @@ pub enum ResetPasswordEvent {
     ResetNotified(NotifyResetPasswordResponse),
     Success(AuthUser),
     InvalidReset(ResetPasswordError),
+    ResetTokenNotFound,
     UserNotFound,
     RepositoryError(RepositoryError),
     PasswordHashError(PasswordHashError),
@@ -158,6 +159,7 @@ impl std::fmt::Display for ResetPasswordEvent {
             Self::ResetNotified(response) => write!(f, "reset password notified; {}", response),
             Self::Success(user) => write!(f, "{}; {}", SUCCESS, user),
             Self::InvalidReset(err) => write!(f, "{}; {}", ERROR, err),
+            Self::ResetTokenNotFound => write!(f, "{}; reset token not found", ERROR),
             Self::UserNotFound => write!(f, "{}; user not found", ERROR),
             Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
             Self::PasswordHashError(err) => write!(f, "{}; {}", ERROR, err),
@@ -194,6 +196,7 @@ impl Into<ResetPasswordEvent> for VerifyResetTokenEntryError {
 impl Into<ResetPasswordEvent> for ResetPasswordRepositoryError {
     fn into(self) -> ResetPasswordEvent {
         match self {
+            Self::ResetTokenNotFound => ResetPasswordEvent::ResetTokenNotFound,
             Self::RepositoryError(err) => ResetPasswordEvent::RepositoryError(err),
             Self::PasswordHashError(err) => ResetPasswordEvent::PasswordHashError(err),
         }

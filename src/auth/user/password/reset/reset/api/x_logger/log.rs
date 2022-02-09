@@ -1,10 +1,10 @@
-use crate::z_lib::api::logger::{LogFilter, LogLevel, LogMessage};
+use crate::z_lib::logger::{LogFilter, LogLevel, LogMessage};
 
 use super::super::action::{ResetPasswordEvent, ResetPasswordState};
 
 use crate::auth::user::password::reset::{
     kernel::data::ValidateResetTokenError,
-    reset::api::data::{DecodeResetTokenError, NotifyResetPasswordError, ResetPasswordError},
+    reset::data::{DecodeResetTokenError, NotifyResetPasswordError, ResetPasswordError},
 };
 
 impl LogMessage for ResetPasswordState {
@@ -30,6 +30,7 @@ impl LogFilter for ResetPasswordEvent {
             Self::ResetNotified(_) => LogLevel::Info,
             Self::Success(_) => LogLevel::Audit,
             Self::InvalidReset(err) => err.log_level(),
+            Self::ResetTokenNotFound => LogLevel::Audit,
             Self::UserNotFound => LogLevel::Error,
             Self::RepositoryError(err) => err.log_level(),
             Self::PasswordHashError(err) => err.log_level(),

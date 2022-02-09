@@ -1,6 +1,6 @@
 use crate::{
-    core::outline::load::api::action::LoadOutlineMenuBadgeEvent,
-    z_lib::api::logger::{LogFilter, LogLevel, LogMessage},
+    core::outline::load::action::LoadOutlineMenuBadgeEvent,
+    z_lib::logger::{LogFilter, LogLevel, LogMessage},
 };
 
 use super::super::action::LoadOutlineMenuBadgeState;

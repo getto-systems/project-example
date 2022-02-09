@@ -5,10 +5,10 @@ use getto_application_test::ActionTestRunner;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::ticket::{
-    kernel::api::init::clock::test::StaticChronoAuthClock,
+    kernel::init::clock::test::StaticChronoAuthClock,
     validate::init::{
         nonce_metadata::test::StaticAuthNonceMetadata,
-        nonce_repository::test::{
+        nonce_repository::memory::{
             MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
         },
         request_decoder::test::StaticValidateApiTokenRequestDecoder,
@@ -23,7 +23,7 @@ use crate::auth::ticket::validate::method::AuthNonceConfig;
 use super::action::ValidateApiTokenAction;
 
 use crate::auth::{
-    ticket::kernel::api::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
+    ticket::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
     user::kernel::data::RequireAuthRoles,
 };
 

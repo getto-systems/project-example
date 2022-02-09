@@ -5,15 +5,15 @@ use crate::avail::unexpected_error::notify::y_protobuf::service::{
     notify_pb_client::NotifyPbClient, NotifyRequestPb,
 };
 
-use crate::core::x_outside_feature::api::feature::CoreOutsideService;
+use crate::core::x_outside_feature::feature::CoreOutsideService;
 
-use crate::avail::unexpected_error::notify::api::x_tonic::route::ServiceNotify;
+use crate::avail::unexpected_error::notify::x_tonic::route::ServiceNotify;
 
-use crate::z_lib::api::service::init::authorizer::GoogleServiceAuthorizer;
+use crate::z_lib::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::{
     auth::proxy::helper::infra_error,
-    z_lib::api::{
+    z_lib::{
         message::helper::{decode_base64, encode_protobuf_base64, invalid_protobuf},
         service::helper::new_endpoint,
     },
@@ -25,7 +25,7 @@ use crate::auth::{infra::AuthMetadataContent, proxy::infra::AuthProxyService};
 
 use crate::{
     auth::proxy::data::{AuthProxyError, AuthProxyResponse},
-    z_lib::api::message::data::MessageError,
+    z_lib::message::data::MessageError,
 };
 
 pub struct ProxyService<'a> {

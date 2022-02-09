@@ -12,19 +12,19 @@ use tonic::metadata::MetadataMap;
 use crate::auth::ticket::validate::y_protobuf::service::ValidateApiTokenRequestPb;
 
 use crate::{
-    auth::x_outside_feature::api::{
+    auth::x_outside_feature::{
         auth::feature::AuthOutsideFeature,
         common::feature::{AuthOutsideDecodingKey, AuthOutsideService},
     },
-    x_outside_feature::api::auth::feature::AuthAppFeature,
+    x_outside_feature::auth::feature::AuthAppFeature,
 };
 
 use crate::auth::ticket::{
-    kernel::api::init::clock::ChronoAuthClock,
+    kernel::init::clock::ChronoAuthClock,
     validate::init::{
         auth_metadata::{ApiAuthMetadata, NoAuthMetadata, TicketAuthMetadata, TonicAuthMetadata},
         nonce_metadata::TonicAuthNonceMetadata,
-        nonce_repository::DynamoDbAuthNonceRepository,
+        nonce_repository::dynamodb::DynamoDbAuthNonceRepository,
         request_decoder::PbValidateApiTokenRequestDecoder,
         token_decoder::{JwtApiTokenDecoder, JwtTicketTokenDecoder, NoopTokenDecoder},
         token_metadata::TonicAuthTokenMetadata,
@@ -270,10 +270,7 @@ impl<'a> ValidateAuthNonceStruct<'a> {
             },
             clock: ChronoAuthClock::new(),
             nonce_metadata: TonicAuthNonceMetadata::new(metadata),
-            nonce_repository: DynamoDbAuthNonceRepository::new(
-                &feature.store.dynamodb,
-                feature.store.nonce_table_name,
-            ),
+            nonce_repository: DynamoDbAuthNonceRepository::new(&feature.store),
         }
     }
 }
@@ -281,10 +278,10 @@ impl<'a> ValidateAuthNonceStruct<'a> {
 #[cfg(test)]
 pub mod test {
     use crate::auth::ticket::{
-        kernel::api::init::clock::test::StaticChronoAuthClock,
+        kernel::init::clock::test::StaticChronoAuthClock,
         validate::init::{
             auth_metadata::test::StaticAuthMetadata, nonce_metadata::test::StaticAuthNonceMetadata,
-            nonce_repository::test::MemoryAuthNonceRepository,
+            nonce_repository::memory::MemoryAuthNonceRepository,
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
             validate_service::test::StaticValidateService,

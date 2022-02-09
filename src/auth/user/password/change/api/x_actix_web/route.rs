@@ -2,14 +2,14 @@ use actix_web::{post, web::Data, HttpRequest, Responder};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::api::{logger::Logger, response::actix_web::ProxyResponder};
+use crate::z_lib::{logger::Logger, response::actix_web::ProxyResponder};
 
-use crate::x_outside_feature::api::proxy::{
+use crate::x_outside_feature::proxy::{
     feature::ProxyAppFeature,
     logger::{app_logger, generate_request_id},
 };
 
-use crate::auth::user::password::change::api::proxy::init::ChangePasswordProxyStruct;
+use crate::auth::user::password::change::proxy::init::ChangePasswordProxyStruct;
 
 #[post("/change")]
 pub async fn service_change(

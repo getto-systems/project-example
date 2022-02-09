@@ -4,15 +4,17 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::user::password::change::y_protobuf::service::ChangePasswordRequestPb;
 
-use crate::x_outside_feature::api::auth::feature::AuthAppFeature;
+use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::{
     ticket::validate::init::ApiValidateAuthTokenStruct,
-    user::password::{
-        change::api::init::request_decoder::PbChangePasswordRequestDecoder,
-        kernel::init::{
-            password_hasher::Argon2PasswordHasher, password_matcher::Argon2PasswordMatcher,
-            password_repository::MysqlAuthUserPasswordRepository,
+    user::{
+        kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,
+        password::{
+            change::init::request_decoder::PbChangePasswordRequestDecoder,
+            kernel::init::{
+                password_hasher::Argon2PasswordHasher, password_matcher::Argon2PasswordMatcher,
+            },
         },
     },
 };
@@ -21,7 +23,7 @@ use super::action::{ChangePasswordAction, ChangePasswordMaterial};
 
 pub struct ChangePasswordFeature<'a> {
     validate: ApiValidateAuthTokenStruct<'a>,
-    password_repository: MysqlAuthUserPasswordRepository<'a>,
+    user_repository: DynamoDbAuthUserRepository<'a>,
 }
 
 impl<'a> ChangePasswordFeature<'a> {
@@ -34,9 +36,7 @@ impl<'a> ChangePasswordFeature<'a> {
             PbChangePasswordRequestDecoder::new(request),
             Self {
                 validate: ApiValidateAuthTokenStruct::new(&feature.auth, metadata),
-                password_repository: MysqlAuthUserPasswordRepository::new(
-                    &feature.auth.store.mysql,
-                ),
+                user_repository: DynamoDbAuthUserRepository::new(&feature.auth.store),
             },
         )
     }
@@ -45,15 +45,14 @@ impl<'a> ChangePasswordFeature<'a> {
 impl<'a> ChangePasswordMaterial for ChangePasswordFeature<'a> {
     type Validate = ApiValidateAuthTokenStruct<'a>;
 
-    type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
+    type PasswordRepository = DynamoDbAuthUserRepository<'a>;
     type PasswordMatcher = Argon2PasswordMatcher;
     type PasswordHasher = Argon2PasswordHasher;
 
     fn validate(&self) -> &Self::Validate {
         &self.validate
     }
-
     fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.password_repository
+        &self.user_repository
     }
 }

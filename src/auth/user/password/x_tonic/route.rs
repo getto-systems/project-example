@@ -4,8 +4,8 @@ use crate::auth::user::password::{
 };
 
 use crate::auth::user::password::{
-    authenticate::api::x_tonic::route::ServiceAuthenticate,
-    change::api::x_tonic::route::ServiceChange, reset::x_tonic::route::ResetServer,
+    authenticate::x_tonic::route::ServiceAuthenticate,
+    change::x_tonic::route::ServiceChange, reset::x_tonic::route::ResetServer,
 };
 
 pub struct PasswordServer {

@@ -1,6 +1,6 @@
-use crate::z_lib::api::logger::{LogLevel, LogFilter};
+use crate::z_lib::logger::{LogFilter, LogLevel};
 
-use crate::auth::ticket::kernel::api::data::{DecodeAuthTokenError, ValidateAuthRolesError};
+use crate::auth::ticket::kernel::data::{DecodeAuthTokenError, ValidateAuthRolesError};
 
 impl LogFilter for DecodeAuthTokenError {
     fn log_level(&self) -> LogLevel {

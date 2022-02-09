@@ -3,7 +3,7 @@ use std::sync::Arc;
 use lazy_static::lazy_static;
 use tonic::{service::interceptor, transport::Server, Request};
 
-use example_api::x_outside_feature::api::auth::{env::AuthEnv, feature::AuthAppFeature};
+use example_api::x_outside_feature::auth::{env::AuthEnv, feature::AuthAppFeature};
 
 lazy_static! {
     static ref ENV: AuthEnv = AuthEnv::new();

@@ -6,21 +6,18 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::user::password::reset::reset::y_protobuf::service::ResetPasswordRequestPb;
 
-use crate::x_outside_feature::api::auth::feature::AuthAppFeature;
+use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::{
     ticket::{
         encode::init::EncodeAuthTicketStruct, issue::init::IssueAuthTicketStruct,
-        kernel::api::init::clock::ChronoAuthClock, validate::init::ValidateAuthNonceStruct,
+        kernel::init::clock::ChronoAuthClock, validate::init::ValidateAuthNonceStruct,
     },
     user::{
-        kernel::init::user_repository::MysqlAuthUserRepository,
+        kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,
         password::{
-            kernel::init::{
-                password_hasher::Argon2PasswordHasher,
-                password_repository::MysqlAuthUserPasswordRepository,
-            },
-            reset::reset::api::init::{
+            kernel::init::password_hasher::Argon2PasswordHasher,
+            reset::reset::init::{
                 request_decoder::PbResetPasswordRequestDecoder,
                 reset_notifier::EmailResetPasswordNotifier, token_decoder::JwtResetTokenDecoder,
             },
@@ -36,8 +33,7 @@ pub struct ResetPasswordFeature<'a> {
     encode: EncodeAuthTicketStruct<'a>,
 
     clock: ChronoAuthClock,
-    user_repository: MysqlAuthUserRepository<'a>,
-    password_repository: MysqlAuthUserPasswordRepository<'a>,
+    user_repository: DynamoDbAuthUserRepository<'a>,
     token_decoder: JwtResetTokenDecoder<'a>,
     reset_notifier: EmailResetPasswordNotifier<'a>,
 }
@@ -56,10 +52,7 @@ impl<'a> ResetPasswordFeature<'a> {
                 encode: EncodeAuthTicketStruct::new(&feature.auth),
 
                 clock: ChronoAuthClock::new(),
-                user_repository: MysqlAuthUserRepository::new(&feature.auth.store.mysql),
-                password_repository: MysqlAuthUserPasswordRepository::new(
-                    &feature.auth.store.mysql,
-                ),
+                user_repository: DynamoDbAuthUserRepository::new(&feature.auth.store),
                 token_decoder: JwtResetTokenDecoder::new(&feature.auth.reset_token_key),
                 reset_notifier: EmailResetPasswordNotifier::new(&feature.auth.email),
             },
@@ -73,8 +66,8 @@ impl<'a> ResetPasswordMaterial for ResetPasswordFeature<'a> {
     type Encode = EncodeAuthTicketStruct<'a>;
 
     type Clock = ChronoAuthClock;
-    type UserRepository = MysqlAuthUserRepository<'a>;
-    type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
+    type UserRepository = DynamoDbAuthUserRepository<'a>;
+    type PasswordRepository = DynamoDbAuthUserRepository<'a>;
     type PasswordHasher = Argon2PasswordHasher;
     type TokenDecoder = JwtResetTokenDecoder<'a>;
     type ResetNotifier = EmailResetPasswordNotifier<'a>;
@@ -96,7 +89,7 @@ impl<'a> ResetPasswordMaterial for ResetPasswordFeature<'a> {
         &self.user_repository
     }
     fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.password_repository
+        &self.user_repository
     }
     fn token_decoder(&self) -> &Self::TokenDecoder {
         &self.token_decoder

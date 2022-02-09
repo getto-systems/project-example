@@ -1,7 +1,7 @@
 use tonic::transport::{Channel, ClientTlsConfig, Endpoint};
 use url::Url;
 
-use crate::z_lib::api::service::data::{ServiceAuthorizeError, ServiceEndpointError};
+use crate::z_lib::service::data::{ServiceAuthorizeError, ServiceEndpointError};
 
 pub fn infra_error(err: impl std::fmt::Display) -> ServiceAuthorizeError {
     ServiceAuthorizeError::InfraError(format!("service infra error; {}", err))

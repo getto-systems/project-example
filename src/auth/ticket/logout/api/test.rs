@@ -5,15 +5,15 @@ use getto_application_test::ActionTestRunner;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::ticket::{
-    kernel::api::init::{
+    kernel::init::{
         clock::test::StaticChronoAuthClock,
-        ticket_repository::test::{
+        ticket_repository::memory::{
             MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
         },
     },
     validate::init::{
         nonce_metadata::test::StaticAuthNonceMetadata,
-        nonce_repository::test::{
+        nonce_repository::memory::{
             MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
         },
         test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
@@ -26,7 +26,7 @@ use crate::auth::ticket::validate::method::AuthNonceConfig;
 
 use super::action::{LogoutAction, LogoutMaterial};
 
-use crate::auth::ticket::kernel::api::data::{
+use crate::auth::ticket::kernel::data::{
     AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
 };
 
@@ -109,21 +109,16 @@ async fn error_no_ticket() {
 }
 
 struct TestStruct<'a> {
-    pub validate: StaticValidateAuthTokenStruct<'a>,
-    pub clock: StaticChronoAuthClock,
-    pub ticket_repository: MemoryAuthTicketRepository<'a>,
+    validate: StaticValidateAuthTokenStruct<'a>,
+    ticket_repository: MemoryAuthTicketRepository<'a>,
 }
 
 impl<'a> LogoutMaterial for TestStruct<'a> {
     type ValidateInfra = StaticValidateAuthTokenStruct<'a>;
-    type Clock = StaticChronoAuthClock;
     type TicketRepository = MemoryAuthTicketRepository<'a>;
 
     fn validate(&self) -> &Self::ValidateInfra {
         &self.validate
-    }
-    fn clock(&self) -> &Self::Clock {
-        &self.clock
     }
     fn ticket_repository(&self) -> &Self::TicketRepository {
         &self.ticket_repository
@@ -175,7 +170,6 @@ impl<'a> TestStruct<'a> {
                 token_metadata: standard_token_metadata(),
                 token_decoder: standard_token_validator(),
             },
-            clock: standard_clock(),
             ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
         }
     }

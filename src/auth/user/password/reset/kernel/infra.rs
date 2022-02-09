@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::auth::{
-    ticket::kernel::api::data::{AuthDateTime, ExpireDateTime},
+    ticket::kernel::data::{AuthDateTime, ExpireDateTime},
     user::{
         login_id::kernel::data::LoginId,
         password::reset::kernel::data::{

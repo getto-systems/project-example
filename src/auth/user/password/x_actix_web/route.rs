@@ -1,8 +1,8 @@
 use actix_web::{web::scope, Scope};
 
 use crate::auth::user::password::{
-    authenticate::api::x_actix_web::route::service_authenticate,
-    change::api::x_actix_web::route::service_change,
+    authenticate::x_actix_web::route::service_authenticate,
+    change::x_actix_web::route::service_change,
     reset::x_actix_web::route::scope_reset,
 };
 

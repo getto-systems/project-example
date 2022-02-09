@@ -1,18 +1,18 @@
 use crate::{
     auth::{
-        ticket::kernel::api::data::{AuthDateTime, ExpireDateTime, ExpireDuration},
+        ticket::kernel::data::{AuthDateTime, ExpireDateTime, ExpireDuration},
         user::{
             login_id::kernel::data::LoginId,
             password::reset::{
                 kernel::data::{ResetToken, ResetTokenDestination, ResetTokenEncoded},
-                request_token::api::data::{
+                request_token::data::{
                     EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
                     RegisterResetTokenRepositoryError,
                 },
             },
         },
     },
-    z_lib::api::repository::data::RepositoryError,
+    z_lib::repository::data::RepositoryError,
 };
 
 pub trait RequestResetTokenRequestDecoder {
@@ -27,8 +27,8 @@ pub struct RequestResetTokenFieldsExtract {
 pub trait RegisterResetTokenRepository {
     async fn register_reset_token(
         &self,
-        login_id: LoginId,
         reset_token: ResetToken,
+        login_id: LoginId,
         destination: ResetTokenDestination,
         expires: ExpireDateTime,
         requested_at: AuthDateTime,

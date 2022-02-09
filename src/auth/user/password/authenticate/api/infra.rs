@@ -2,7 +2,7 @@ use crate::auth::user::{
     kernel::data::AuthUserId,
     login_id::kernel::data::LoginId,
     password::{
-        authenticate::api::data::VerifyPasswordRepositoryError,
+        authenticate::data::VerifyPasswordRepositoryError,
         kernel::infra::AuthUserPasswordMatcher,
     },
 };

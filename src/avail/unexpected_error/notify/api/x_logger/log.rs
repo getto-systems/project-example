@@ -1,6 +1,6 @@
-use crate::z_lib::api::logger::{LogFilter, LogLevel, LogMessage};
+use crate::z_lib::logger::{LogFilter, LogLevel, LogMessage};
 
-use crate::avail::unexpected_error::notify::api::action::{
+use crate::avail::unexpected_error::notify::action::{
     NotifyUnexpectedErrorEvent, NotifyUnexpectedErrorState,
 };
 

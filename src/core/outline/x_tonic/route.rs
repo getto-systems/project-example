@@ -1,6 +1,6 @@
 use crate::core::outline::load::y_protobuf::service::load_menu_badge_pb_server::LoadMenuBadgePbServer;
 
-use crate::core::outline::load::api::x_tonic::route::ServiceLoadMenuBadge;
+use crate::core::outline::load::x_tonic::route::ServiceLoadMenuBadge;
 
 pub struct OutlineServer;
 

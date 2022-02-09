@@ -1,17 +1,15 @@
 use actix_web::HttpRequest;
 use tonic::metadata::MetadataMap;
 
-use crate::auth::ticket::kernel::api::{
+use crate::auth::ticket::kernel::{
     x_actix_web::header::HEADER_NONCE, x_tonic::metadata::METADATA_NONCE,
 };
 
-use crate::z_lib::api::request::{helper::header, x_tonic::metadata::metadata};
+use crate::z_lib::request::{helper::header, x_tonic::metadata::metadata};
 
 use crate::auth::ticket::validate::infra::AuthNonceMetadata;
 
-use crate::{
-    auth::ticket::kernel::api::data::AuthNonce, z_lib::api::request::data::MetadataError,
-};
+use crate::{auth::ticket::kernel::data::AuthNonce, z_lib::request::data::MetadataError};
 
 pub struct ActixWebAuthNonceMetadata<'a> {
     request: &'a HttpRequest,
@@ -50,9 +48,7 @@ impl<'a> AuthNonceMetadata for TonicAuthNonceMetadata<'a> {
 pub mod test {
     use crate::auth::ticket::validate::infra::AuthNonceMetadata;
 
-    use crate::{
-        auth::ticket::kernel::api::data::AuthNonce, z_lib::api::request::data::MetadataError,
-    };
+    use crate::{auth::ticket::kernel::data::AuthNonce, z_lib::request::data::MetadataError};
 
     pub struct StaticAuthNonceMetadata {
         nonce: AuthNonce,

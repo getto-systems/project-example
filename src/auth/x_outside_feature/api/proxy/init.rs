@@ -1,11 +1,11 @@
-use crate::z_lib::api::jwt::helper::decoding_key_from_ec_pem;
+use crate::z_lib::jwt::helper::decoding_key_from_ec_pem;
 
 use crate::{
-    auth::x_outside_feature::api::{
+    auth::x_outside_feature::{
         proxy::feature::{AuthOutsideCookie, AuthOutsideFeature},
         common::feature::{AuthOutsideDecodingKey, AuthOutsideService},
     },
-    x_outside_feature::api::proxy::env::ProxyEnv,
+    x_outside_feature::proxy::env::ProxyEnv,
 };
 
 pub async fn new_auth_outside_feature(env: &'static ProxyEnv) -> AuthOutsideFeature {

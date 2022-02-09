@@ -1,12 +1,12 @@
 use tonic::{Response, Status};
 
-use crate::z_lib::api::response::tonic::ServiceResponder;
+use crate::z_lib::response::tonic::ServiceResponder;
 
 use crate::core::outline::load::y_protobuf::service::LoadMenuBadgeResponsePb;
 
 use super::super::action::{LoadOutlineMenuBadgeEvent, LoadOutlineMenuBadgeState};
 
-use crate::core::outline::load::api::data::{OutlineMenuBadge, OutlineMenuBadgeCount};
+use crate::core::outline::load::data::{OutlineMenuBadge, OutlineMenuBadgeCount};
 
 impl ServiceResponder<LoadMenuBadgeResponsePb> for LoadOutlineMenuBadgeState {
     fn respond_to(self) -> Result<Response<LoadMenuBadgeResponsePb>, Status> {

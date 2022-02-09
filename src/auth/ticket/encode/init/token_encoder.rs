@@ -4,16 +4,16 @@ use jsonwebtoken::{encode, Algorithm, EncodingKey, Header};
 
 use aws_cloudfront_cookie::CloudfrontPolicy;
 
-use crate::auth::x_outside_feature::api::auth::feature::AuthOutsideCloudfrontKey;
+use crate::auth::x_outside_feature::auth::feature::AuthOutsideCloudfrontKey;
 
 use crate::auth::ticket::{
     encode::infra::{AuthTokenEncoder, CloudfrontTokenEncoder},
-    kernel::api::infra::AuthJwtClaims,
+    kernel::infra::AuthJwtClaims,
 };
 
 use crate::auth::ticket::{
     encode::data::EncodeAuthTokenError,
-    kernel::api::data::{AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime},
+    kernel::data::{AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime},
 };
 
 pub struct TicketJwtAuthTokenEncoder<'a> {
@@ -146,7 +146,7 @@ pub mod test {
 
     use crate::auth::ticket::{
         encode::data::EncodeAuthTokenError,
-        kernel::api::data::{AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime},
+        kernel::data::{AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpireDateTime},
     };
 
     pub struct StaticAuthTokenEncoder;

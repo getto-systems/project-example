@@ -4,7 +4,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::user::password::authenticate::y_protobuf::service::AuthenticatePasswordRequestPb;
 
-use crate::x_outside_feature::api::auth::feature::AuthAppFeature;
+use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::{
     ticket::{
@@ -12,13 +12,10 @@ use crate::auth::{
         validate::init::ValidateAuthNonceStruct,
     },
     user::{
-        kernel::init::user_repository::MysqlAuthUserRepository,
+        kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,
         password::{
-            authenticate::api::init::request_decoder::PbAuthenticatePasswordRequestDecoder,
-            kernel::init::{
-                password_matcher::Argon2PasswordMatcher,
-                password_repository::MysqlAuthUserPasswordRepository,
-            },
+            authenticate::init::request_decoder::PbAuthenticatePasswordRequestDecoder,
+            kernel::init::password_matcher::Argon2PasswordMatcher,
         },
     },
 };
@@ -30,8 +27,7 @@ pub struct AuthenticatePasswordStruct<'a> {
     issue: IssueAuthTicketStruct<'a>,
     encode: EncodeAuthTicketStruct<'a>,
 
-    user_repository: MysqlAuthUserRepository<'a>,
-    password_repository: MysqlAuthUserPasswordRepository<'a>,
+    user_repository: DynamoDbAuthUserRepository<'a>,
 }
 
 impl<'a> AuthenticatePasswordStruct<'a> {
@@ -47,10 +43,7 @@ impl<'a> AuthenticatePasswordStruct<'a> {
                 issue: IssueAuthTicketStruct::new(&feature.auth),
                 encode: EncodeAuthTicketStruct::new(&feature.auth),
 
-                user_repository: MysqlAuthUserRepository::new(&feature.auth.store.mysql),
-                password_repository: MysqlAuthUserPasswordRepository::new(
-                    &feature.auth.store.mysql,
-                ),
+                user_repository: DynamoDbAuthUserRepository::new(&feature.auth.store),
             },
         )
     }
@@ -61,8 +54,8 @@ impl<'a> AuthenticatePasswordMaterial for AuthenticatePasswordStruct<'a> {
     type Issue = IssueAuthTicketStruct<'a>;
     type Encode = EncodeAuthTicketStruct<'a>;
 
-    type UserRepository = MysqlAuthUserRepository<'a>;
-    type PasswordRepository = MysqlAuthUserPasswordRepository<'a>;
+    type UserRepository = DynamoDbAuthUserRepository<'a>;
+    type PasswordRepository = DynamoDbAuthUserRepository<'a>;
     type PasswordMatcher = Argon2PasswordMatcher;
 
     fn validate_nonce(&self) -> &Self::ValidateNonce {
@@ -79,6 +72,6 @@ impl<'a> AuthenticatePasswordMaterial for AuthenticatePasswordStruct<'a> {
         &self.user_repository
     }
     fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.password_repository
+        &self.user_repository
     }
 }

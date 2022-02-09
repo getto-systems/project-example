@@ -1,6 +1,6 @@
 use tonic::{Response, Status};
 
-use crate::z_lib::api::response::tonic::ServiceResponder;
+use crate::z_lib::response::tonic::ServiceResponder;
 
 use crate::auth::ticket::encode::data::EncodeAuthTokenError;
 

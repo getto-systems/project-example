@@ -2,13 +2,11 @@ use tonic::{Response, Status};
 
 use crate::auth::ticket::validate::y_protobuf::service::ValidateApiTokenResponsePb;
 
-use crate::z_lib::api::response::tonic::ServiceResponder;
+use crate::z_lib::response::tonic::ServiceResponder;
 
 use crate::auth::ticket::validate::action::ValidateApiTokenState;
 
-use crate::auth::ticket::validate::method::{
-    ValidateAuthNonceEvent, ValidateAuthTokenEvent,
-};
+use crate::auth::ticket::validate::method::{ValidateAuthNonceEvent, ValidateAuthTokenEvent};
 
 impl ServiceResponder<ValidateApiTokenResponsePb> for ValidateApiTokenState {
     fn respond_to(self) -> Result<Response<ValidateApiTokenResponsePb>, Status> {
