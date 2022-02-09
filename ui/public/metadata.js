@@ -5,24 +5,21 @@ const headers = {
     "object-src 'none'",
     "base-uri 'none'",
     "form-action 'self'",
-    "connect-src " + [
-      "'self'",
-      "https://api.example.getto.systems/",
-      "https://secure.example.getto.systems/",
-    ].join(" "),
-    "child-src " + [
-      "https://example.getto.systems/",
-      "https://secure.example.getto.systems/",
-    ].join(" "),
     "frame-src 'none'",
     "frame-ancestors 'none'",
     "img-src 'self'",
     "font-src 'self'",
     "manifest-src 'self'",
+    "connect-src " + [
+      "'self'",
+      "https://api.example.getto.systems/",
+      "https://secure.example.getto.systems/",
+    ].join(" "),
     "script-src " + [
       "'self'",
       "https://secure.example.getto.systems/",
     ].join(" "),
+    "child-src blob:",
     "worker-src blob:",
     "style-src " + [
       "'self'",
