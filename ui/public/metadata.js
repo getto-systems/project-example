@@ -11,7 +11,8 @@ const headers = {
       "https://secure.example.getto.systems/",
     ].join(" "),
     "child-src " + [
-      "'self'",
+      "https://example.getto.systems/",
+      "https://secure.example.getto.systems/",
     ].join(" "),
     "frame-src 'none'",
     "frame-ancestors 'none'",

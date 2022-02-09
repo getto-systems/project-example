@@ -71,12 +71,14 @@ async fn call<'a>(
     .await
     .map_err(infra_error)?;
 
-    let response = client
-        .load_menu_badge(request)
-        .await
-        .map_err(AuthProxyError::from)?
-        .into_inner();
     Ok(AuthProxyResponse::new(
-        encode_protobuf_base64(response).map_err(infra_error)?,
+        encode_protobuf_base64(
+            client
+                .load_menu_badge(request)
+                .await
+                .map_err(AuthProxyError::from)?
+                .into_inner(),
+        )
+        .map_err(infra_error)?,
     ))
 }

@@ -6,7 +6,7 @@ use crate::core::outline::load::y_protobuf::service::LoadMenuBadgeResponsePb;
 
 use super::super::action::{LoadOutlineMenuBadgeEvent, LoadOutlineMenuBadgeState};
 
-use crate::core::outline::load::data::{OutlineMenuBadge, OutlineMenuBadgeCount};
+use crate::core::outline::load::data::OutlineMenuBadge;
 
 impl ServiceResponder<LoadMenuBadgeResponsePb> for LoadOutlineMenuBadgeState {
     fn respond_to(self) -> Result<Response<LoadMenuBadgeResponsePb>, Status> {
@@ -25,14 +25,6 @@ impl ServiceResponder<LoadMenuBadgeResponsePb> for LoadOutlineMenuBadgeEvent {
                 Ok(Response::new(response))
             }
             Self::RepositoryError(err) => err.respond_to(),
-        }
-    }
-}
-
-impl Into<OutlineMenuBadge> for LoadMenuBadgeResponsePb {
-    fn into(self) -> OutlineMenuBadge {
-        OutlineMenuBadge {
-            index: OutlineMenuBadgeCount::restore(self.index),
         }
     }
 }
