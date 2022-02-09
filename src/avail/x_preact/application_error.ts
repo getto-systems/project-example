@@ -18,7 +18,8 @@ export function ApplicationErrorComponent(props: Props): VNode {
         body: [
             html`<p>
                 エラーが発生したため、処理を中断しました<br />
-                これはシステム側の不備です
+                これはシステム側の不備です<br />
+                お手数ですが、管理者に詳細をお伝えください
             </p>`,
             v_small(),
             field({
@@ -27,10 +28,7 @@ export function ApplicationErrorComponent(props: Props): VNode {
                 help: [location.host],
             }),
             field({ title: "詳細", body: detail(props.err) }),
-            html`<p>
-                お手数ですが、管理者に詳細をお伝えください<br />
-                直前まで行っていた作業も教えていただけると助かります
-            </p>`,
+            html`<p>直前まで行っていた作業も教えていただけると助かります</p>`,
             html`<p>
                 左下のリンクで再読み込みすることで解消するかもしれません<br />
                 繰り返しエラーになる場合は右下のホームから戻ってください
