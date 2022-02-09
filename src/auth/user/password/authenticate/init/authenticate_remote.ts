@@ -52,7 +52,7 @@ export function newAuthenticatePasswordRemote(
             }
 
             const message = decodeProtobuf(
-                pb.auth.user.password.authenticate.service.AuthenticatePasswordResponsePb,
+                pb.auth.user.password.authenticate.service.AuthenticatePasswordMaskedResponsePb,
                 await response.text(),
             )
             if (!message.success) {
