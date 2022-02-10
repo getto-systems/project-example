@@ -35,7 +35,7 @@ function devDocs(): readonly MenuTreeNode[] {
         return []
     }
     return [
-        category("開発用", dev, [
+        category("開発用", allow, [
             item("coverage api", lnir("files-alt"), "coverage/api/index.html"),
             item("coverage ui", lnir("files-alt"), "coverage/ui/lcov-report/index.html"),
         ]),
@@ -56,4 +56,3 @@ function docsMenuNode(docs: DocsDomain): MenuTreeNode {
 }
 
 const allow: MenuPermission = { type: "allow" }
-const dev: MenuPermission = { type: "role", role: "dev-docs" }

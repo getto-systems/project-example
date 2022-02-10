@@ -1,4 +1,4 @@
-import { initBaseView } from "../action_base/init"
+import { initBaseView } from "../base/init"
 
 import { DashboardView, DashboardResource } from "./resource"
 

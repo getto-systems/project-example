@@ -27,7 +27,7 @@ export function newSearchAuthUserAccountRemote(
                     value: {
                         page: { offset: 0, limit: 10, all: 25 },
                         summary: {},
-                        users: [{ loginID: "admin", grantedRoles: ["dev-docs"] }],
+                        users: [{ loginID: "admin", grantedRoles: [] }],
                     },
                 }
             }

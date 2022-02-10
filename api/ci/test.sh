@@ -20,7 +20,7 @@ coverage_main() {
     prof_dir="target/coverage"
     output_dir="ui/public/dist/coverage/api"
 
-    export RUSTFLAGS="-Zinstrument-coverage"
+    export RUSTFLAGS="-C instrument-coverage"
     export LLVM_PROFILE_FILE="${prof_dir}/prof-%p-%m.profraw"
 
     cargo +nightly test
@@ -45,28 +45,34 @@ coverage_main() {
     local crate_name
     crate_name="$(cat Cargo.toml | grep name | head -1 | cut -d'"' -f2 | sed 's/-/_/g')"
 
+    local object_files
+    object_files=$(
+        cargo +nightly test --no-run --message-format=json |
+            grep '"filenames"' |
+            grep "target/debug/deps/${crate_name}" |
+            sed 's/^.*"filenames":\[\(.*\)\].*$/\1/' |
+            sed 's/[",]/ /g' |
+            sed 's/ \+/ /g' |
+            sed 's/ $//g' |
+            sed 's/ /-object /g'
+    )
+
     local ignore_regex
-    ignore_regex='(\.cargo|rustc|^api/|/[xyz]_|/init/|/(main|test|init|data|event|infra|action)\.rs)'
+    ignore_regex='(\.cargo|rustc|^api/|/[xy]_|/init/|/(main|test|init|data|infra)\.rs)'
 
-    local object_file
-    local output_file
-    for object_file in $(find "${target_dir}" -type f -perm -a+x -name "${crate_name}"'-*'); do
-        output_file="${output_dir}/$(basename "${object_file}").info"
-        $llvm_cov export "${object_file}" \
-            -Xdemangler=rustfilt \
-            -instr-profile="${prof_data}" \
-            --ignore-filename-regex="${ignore_regex}" \
-            --format=lcov >"${output_file}"
+    $llvm_cov report ${object_files} \
+        -Xdemangler=rustfilt \
+        -instr-profile="${prof_data}" \
+        --ignore-filename-regex="${ignore_regex}"
 
-        if [ -z "$(cat "${output_file}")" ]; then
-            rm -f "${output_file}"
-        fi
-    done
-
-    grcov "${output_dir}" -t html -o "${output_dir}"
+    $llvm_cov show ${object_files} \
+        -Xdemangler=rustfilt \
+        -instr-profile="${prof_data}" \
+        --ignore-filename-regex="${ignore_regex}" \
+        --format=html \
+        --output-dir=${output_dir}
 
     coverage_cleanup
-    coverage_check
 }
 coverage_setup() {
     llvm_profdata=$(find "${toolchain_dir}" -type f -name llvm-profdata | head -1)
@@ -80,20 +86,6 @@ coverage_setup() {
         echo "llvm-cov not found"
         exit 1
     fi
-}
-coverage_check() {
-    local line_coverage
-    line_coverage=$(grep abbr "${output_dir}/index.html" | head -1 | cut -d'>' -f 2 | cut -d'%' -f 1)
-    case "${line_coverage}" in
-    100* | 99*)
-        echo "OK; line coverage: ${line_coverage}"
-        ;;
-
-    *)
-        echo "NG; line coverage: ${line_coverage} < 99%"
-        exit 1
-        ;;
-    esac
 }
 coverage_cleanup() {
     echo "clean up profile files"
