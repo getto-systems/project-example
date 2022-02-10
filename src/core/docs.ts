@@ -16,7 +16,7 @@ const docs_app: DocsAction = {
     data: [],
 }
 
-export const docs_example: DocsDomain = {
+export const docs_core: DocsDomain = {
     path: "docs",
     title: "ドキュメント",
     usecase: [

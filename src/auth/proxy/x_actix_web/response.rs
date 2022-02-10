@@ -1,6 +1,6 @@
 use actix_web::HttpResponse;
 
-use crate::auth::ticket::kernel::x_actix_web::header::{
+use crate::x_content::metadata::{
     COOKIE_API_TOKEN, COOKIE_CLOUDFRONT_KEY_PAIR_ID, COOKIE_CLOUDFRONT_POLICY,
     COOKIE_CLOUDFRONT_SIGNATURE, COOKIE_TICKET_TOKEN,
 };

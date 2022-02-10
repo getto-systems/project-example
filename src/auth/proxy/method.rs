@@ -3,14 +3,10 @@ use tonic::{
     Request,
 };
 
-use crate::{
-    auth::ticket::kernel::x_tonic::metadata::{METADATA_NONCE, METADATA_TOKEN},
-    x_outside_feature::common::metadata::METADATA_REQUEST_ID,
-};
+use crate::x_content::metadata::{METADATA_NONCE, METADATA_REQUEST_ID, METADATA_TOKEN};
 
 use crate::{
-    auth::ticket::validate::infra::AuthMetadataContent,
-    z_lib::service::infra::ServiceAuthorizer,
+    auth::ticket::validate::infra::AuthMetadataContent, z_lib::service::infra::ServiceAuthorizer,
 };
 
 use crate::z_lib::service::data::ServiceAuthorizeError;

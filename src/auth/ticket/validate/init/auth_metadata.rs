@@ -3,7 +3,7 @@ use tonic::metadata::MetadataMap;
 
 use crate::z_lib::request::x_tonic::metadata::metadata;
 
-use crate::auth::ticket::kernel::x_tonic::metadata::{METADATA_NONCE, METADATA_TOKEN};
+use crate::x_content::metadata::{METADATA_NONCE, METADATA_TOKEN};
 
 use crate::auth::ticket::validate::init::{
     nonce_metadata::ActixWebAuthNonceMetadata,
