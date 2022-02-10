@@ -5,6 +5,7 @@ setup_main() {
     setup_grcov
 }
 setup_toolchain() {
+    apt-get install -y bzip2
     rustup install nightly
     rustup component add --toolchain nightly llvm-tools-preview
     rustup component add --toolchain nightly rustfmt
