@@ -84,9 +84,9 @@ test-api:
     RUN_CODE_BUILDER: "TRUE"
 
   before_script:
-    - rustup component add rustfmt
+    - ./api/ci/setup-test.sh
   script:
-    - cargo test
+    - ./api/ci/test.sh
 
 bump_version-ui:
   stage: bump_version

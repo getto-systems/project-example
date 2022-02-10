@@ -8,6 +8,7 @@ use crate::auth::proxy::infra::AuthProxyService;
 
 use crate::auth::proxy::data::AuthProxyError;
 
+// TODO テスト起動のためのコメント
 pub enum AuthProxyState<R> {
     Metadata(ValidateAuthMetadataEvent),
     TryToCall(String),

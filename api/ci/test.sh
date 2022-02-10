@@ -20,7 +20,7 @@ coverage_main() {
     prof_dir="target/coverage"
     output_dir="ui/public/dist/coverage/api"
 
-    export RUSTFLAGS="-Zinstrument-coverage"
+    export RUSTFLAGS="-C instrument-coverage"
     export LLVM_PROFILE_FILE="${prof_dir}/prof-%p-%m.profraw"
 
     cargo +nightly test
@@ -46,11 +46,17 @@ coverage_main() {
     crate_name="$(cat Cargo.toml | grep name | head -1 | cut -d'"' -f2 | sed 's/-/_/g')"
 
     local ignore_regex
-    ignore_regex='(\.cargo|rustc|^api/|/[xyz]_|/init/|/(main|test|init|data|event|infra|action)\.rs)'
+    ignore_regex='(\.cargo|rustc|^api/|/[xy]_|/init/|/(main|test|init|data|event|infra|action)\.rs)'
 
     local object_file
     local output_file
-    for object_file in $(find "${target_dir}" -type f -perm -a+x -name "${crate_name}"'-*'); do
+    for object_file in $( \
+        cargo +nightly test --no-run --message-format=json | \
+        grep '"filenames"' | \
+        grep "target/debug/deps/${crate_name}" | \
+        sed 's/^.*"filenames":\[\(.*\)\].*$/\1/' | \
+        sed 's/"/ /g' \
+    ); do
         output_file="${output_dir}/$(basename "${object_file}").info"
         $llvm_cov export "${object_file}" \
             -Xdemangler=rustfilt \

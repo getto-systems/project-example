@@ -1,4 +1,4 @@
-import { BaseOutsideFeature, newBaseResource } from "../../action_base/init/resource"
+import { BaseOutsideFeature, newBaseResource } from "../../base/init/resource"
 
 import { DashboardView } from "../resource"
 import { initDashboardView } from "../init"
