@@ -69,10 +69,10 @@ coverage_main() {
         -Xdemangler=rustfilt \
         -instr-profile="${prof_data}" \
         --ignore-filename-regex="${ignore_regex}" \
-        --region-coverage-lt=100
+        --format=html \
+        --output-dir=${output_dir}
 
     coverage_cleanup
-    coverage_check
 }
 coverage_setup() {
     llvm_profdata=$(find "${toolchain_dir}" -type f -name llvm-profdata | head -1)
@@ -86,20 +86,6 @@ coverage_setup() {
         echo "llvm-cov not found"
         exit 1
     fi
-}
-coverage_check() {
-    local line_coverage
-    line_coverage=$(grep abbr "${output_dir}/index.html" | head -1 | cut -d'>' -f 2 | cut -d'%' -f 1)
-    case "${line_coverage}" in
-    100* | 99*)
-        echo "OK; line coverage: ${line_coverage}"
-        ;;
-
-    *)
-        echo "NG; line coverage: ${line_coverage} < 99%"
-        exit 1
-        ;;
-    esac
 }
 coverage_cleanup() {
     echo "clean up profile files"
