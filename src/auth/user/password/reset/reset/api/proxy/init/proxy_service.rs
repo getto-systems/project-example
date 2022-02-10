@@ -15,14 +15,15 @@ use crate::{
 };
 
 use crate::{
-    auth::{proxy::helper::infra_error, ticket::kernel::infra::AuthTokenResponseBuilder},
+    auth::{
+        proxy::helper::{infra_error, set_metadata},
+        ticket::kernel::infra::AuthTokenResponseBuilder,
+    },
     z_lib::{
         message::helper::{decode_base64, encode_protobuf_base64, invalid_protobuf},
         service::helper::new_endpoint,
     },
 };
-
-use crate::auth::proxy::method::set_metadata;
 
 use crate::auth::{proxy::infra::AuthProxyService, ticket::validate::infra::AuthMetadataContent};
 

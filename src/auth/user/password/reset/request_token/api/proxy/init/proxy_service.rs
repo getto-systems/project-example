@@ -12,14 +12,12 @@ use crate::auth::user::password::reset::request_token::x_tonic::route::ServiceRe
 use crate::z_lib::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::{
-    auth::proxy::helper::infra_error,
+    auth::proxy::helper::{infra_error, set_metadata},
     z_lib::{
         message::helper::{decode_base64, encode_protobuf_base64, invalid_protobuf},
         service::helper::new_endpoint,
     },
 };
-
-use crate::auth::proxy::method::set_metadata;
 
 use crate::auth::{proxy::infra::AuthProxyService, ticket::validate::infra::AuthMetadataContent};
 

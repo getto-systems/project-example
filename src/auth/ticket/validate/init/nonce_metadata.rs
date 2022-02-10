@@ -1,11 +1,9 @@
 use actix_web::HttpRequest;
 use tonic::metadata::MetadataMap;
 
-use crate::auth::ticket::kernel::{
-    x_actix_web::header::HEADER_NONCE, x_tonic::metadata::METADATA_NONCE,
-};
-
 use crate::z_lib::request::{helper::header, x_tonic::metadata::metadata};
+
+use crate::x_content::metadata::{HEADER_NONCE, METADATA_NONCE};
 
 use crate::auth::ticket::validate::infra::AuthNonceMetadata;
 

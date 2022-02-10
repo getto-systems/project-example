@@ -6,12 +6,12 @@ import { newDocsView } from "../../../../docs/content/init/resource"
 
 import { DocsDomainDetailEntry } from "../../../../docs/content/x_preact/domain_detail"
 
-import { docs_example } from "../../../../core/docs"
+import { docs_core } from "../../../../core/docs"
 
 render(
     h(DocsDomainDetailEntry, {
         view: newDocsView(newForegroundOutsideFeature()),
-        docs: docs_example,
+        docs: docs_core,
     }),
     document.body,
 )

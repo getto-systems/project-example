@@ -8,9 +8,10 @@ use crate::auth::x_outside_feature::common::feature::AuthOutsideService;
 
 use crate::z_lib::service::init::authorizer::GoogleServiceAuthorizer;
 
-use crate::{auth::proxy::helper::infra_error, z_lib::service::helper::new_endpoint};
-
-use crate::auth::proxy::method::set_metadata;
+use crate::{
+    auth::proxy::helper::{infra_error, set_metadata},
+    z_lib::service::helper::new_endpoint,
+};
 
 use crate::auth::ticket::validate::infra::{AuthMetadataContent, ValidateService};
 

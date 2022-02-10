@@ -14,11 +14,9 @@ use crate::{
 };
 
 use crate::{
-    auth::proxy::helper::infra_error,
+    auth::proxy::helper::{infra_error, set_metadata},
     z_lib::{message::helper::encode_protobuf_base64, service::helper::new_endpoint},
 };
-
-use crate::auth::proxy::method::set_metadata;
 
 use crate::auth::{
     proxy::infra::AuthProxyService,

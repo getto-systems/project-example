@@ -12,7 +12,7 @@ use crate::x_outside_feature::{
         feature::{extract_request, TonicRequest},
         logger::app_logger,
     },
-    common::metadata::metadata_request_id,
+    common::helper::metadata_request_id,
 };
 
 use crate::auth::user::account::search::init::SearchAuthUserAccountStruct;

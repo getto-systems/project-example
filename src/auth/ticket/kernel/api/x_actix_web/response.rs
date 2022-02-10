@@ -6,7 +6,7 @@ use time::{error::ComponentRange, OffsetDateTime};
 
 use crate::{auth::ticket::kernel::data::AuthResponse, z_lib::response::actix_web::ProxyResponder};
 
-use super::header::{
+use crate::x_content::metadata::{
     COOKIE_API_TOKEN, COOKIE_CLOUDFRONT_KEY_PAIR_ID, COOKIE_CLOUDFRONT_POLICY,
     COOKIE_CLOUDFRONT_SIGNATURE, COOKIE_TICKET_TOKEN,
 };

@@ -1,10 +1,7 @@
 use actix_web::HttpRequest;
 use tonic::metadata::MetadataMap;
 
-use crate::auth::ticket::kernel::{
-    x_actix_web::header::{COOKIE_API_TOKEN, COOKIE_TICKET_TOKEN},
-    x_tonic::metadata::METADATA_TOKEN,
-};
+use crate::x_content::metadata::{COOKIE_API_TOKEN, COOKIE_TICKET_TOKEN, METADATA_TOKEN};
 
 use crate::z_lib::request::{helper::cookie, x_tonic::metadata::metadata};
 
