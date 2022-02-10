@@ -83,10 +83,8 @@ test-api:
   variables:
     RUN_CODE_BUILDER: "TRUE"
 
-  before_script:
-    - ./api/ci/setup-test.sh
   script:
-    - ./api/ci/test.sh
+    - cargo test
 
 bump_version-ui:
   stage: bump_version

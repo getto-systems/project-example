@@ -45,31 +45,31 @@ coverage_main() {
     local crate_name
     crate_name="$(cat Cargo.toml | grep name | head -1 | cut -d'"' -f2 | sed 's/-/_/g')"
 
+    local object_files
+    object_files=$(
+        cargo +nightly test --no-run --message-format=json |
+            grep '"filenames"' |
+            grep "target/debug/deps/${crate_name}" |
+            sed 's/^.*"filenames":\[\(.*\)\].*$/\1/' |
+            sed 's/[",]/ /g' |
+            sed 's/ \+/ /g' |
+            sed 's/ $//g' |
+            sed 's/ /-object /g'
+    )
+
     local ignore_regex
-    ignore_regex='(\.cargo|rustc|^api/|/[xy]_|/init/|/(main|test|init|data|event|infra|action)\.rs)'
+    ignore_regex='(\.cargo|rustc|^api/|/[xy]_|/init/|/(main|test|init|data|infra)\.rs)'
 
-    local object_file
-    local output_file
-    for object_file in $( \
-        cargo +nightly test --no-run --message-format=json | \
-        grep '"filenames"' | \
-        grep "target/debug/deps/${crate_name}" | \
-        sed 's/^.*"filenames":\[\(.*\)\].*$/\1/' | \
-        sed 's/"/ /g' \
-    ); do
-        output_file="${output_dir}/$(basename "${object_file}").info"
-        $llvm_cov export "${object_file}" \
-            -Xdemangler=rustfilt \
-            -instr-profile="${prof_data}" \
-            --ignore-filename-regex="${ignore_regex}" \
-            --format=lcov >"${output_file}"
+    $llvm_cov report ${object_files} \
+        -Xdemangler=rustfilt \
+        -instr-profile="${prof_data}" \
+        --ignore-filename-regex="${ignore_regex}"
 
-        if [ -z "$(cat "${output_file}")" ]; then
-            rm -f "${output_file}"
-        fi
-    done
-
-    grcov "${output_dir}" -t html -o "${output_dir}"
+    $llvm_cov show ${object_files} \
+        -Xdemangler=rustfilt \
+        -instr-profile="${prof_data}" \
+        --ignore-filename-regex="${ignore_regex}" \
+        --region-coverage-lt=100
 
     coverage_cleanup
     coverage_check

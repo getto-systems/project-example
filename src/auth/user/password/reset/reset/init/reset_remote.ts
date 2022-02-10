@@ -26,7 +26,7 @@ export function newResetPasswordRemote(
             if (mock) {
                 return {
                     success: true,
-                    value: convertCheckRemote(clock, ["admin", "dev-docs"]),
+                    value: convertCheckRemote(clock, []),
                 }
             }
 
