@@ -1,6 +1,6 @@
-use crate::z_lib::logger::{LogFilter, LogLevel};
-
 use super::super::method::IssueAuthTicketEvent;
+
+use crate::z_lib::logger::infra::{LogFilter, LogLevel};
 
 impl LogFilter for IssueAuthTicketEvent {
     fn log_level(&self) -> LogLevel {

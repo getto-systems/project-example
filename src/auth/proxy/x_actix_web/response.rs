@@ -5,9 +5,9 @@ use crate::auth::ticket::kernel::x_actix_web::header::{
     COOKIE_CLOUDFRONT_SIGNATURE, COOKIE_TICKET_TOKEN,
 };
 
-use crate::z_lib::response::actix_web::ProxyResponder;
-
 use crate::auth::proxy::action::AuthProxyState;
+
+use crate::z_lib::response::actix_web::ProxyResponder;
 
 use crate::auth::proxy::data::{AuthProxyError, AuthProxyResponse};
 

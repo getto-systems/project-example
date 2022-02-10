@@ -6,14 +6,14 @@ use actix_web::{
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::{logger::Logger, response::actix_web::ProxyResponder};
-
 use crate::x_outside_feature::proxy::{
     feature::ProxyAppFeature,
     logger::{app_logger, generate_request_id},
 };
 
 use crate::auth::user::account::search::proxy::init::SearchAuthUserAccountProxyStruct;
+
+use crate::z_lib::{logger::infra::Logger, response::actix_web::ProxyResponder};
 
 #[get("/search/{body}")]
 async fn service_search(

@@ -1,6 +1,6 @@
-use crate::z_lib::logger::{LogLevel, LogFilter};
-
 use crate::auth::ticket::encode::method::EncodeAuthTicketEvent;
+
+use crate::z_lib::logger::infra::{LogFilter, LogLevel};
 
 use crate::auth::ticket::encode::data::EncodeAuthTokenError;
 

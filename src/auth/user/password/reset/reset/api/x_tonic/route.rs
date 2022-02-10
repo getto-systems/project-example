@@ -2,8 +2,6 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::{logger::Logger, response::tonic::ServiceResponder};
-
 use crate::auth::user::password::reset::reset::y_protobuf::service::{
     reset_password_pb_server::ResetPasswordPb, ResetPasswordRequestPb, ResetPasswordResponsePb,
 };
@@ -17,6 +15,8 @@ use crate::x_outside_feature::{
 };
 
 use crate::auth::user::password::reset::reset::init::ResetPasswordFeature;
+
+use crate::z_lib::{logger::infra::Logger, response::tonic::ServiceResponder};
 
 pub struct ServiceReset;
 

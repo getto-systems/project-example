@@ -2,14 +2,14 @@ use actix_web::{post, web::Data, HttpRequest, Responder};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::{logger::Logger, response::actix_web::ProxyResponder};
-
 use crate::x_outside_feature::proxy::{
     feature::ProxyAppFeature,
     logger::{app_logger, generate_request_id},
 };
 
 use crate::auth::user::password::authenticate::proxy::init::AuthenticatePasswordProxyStruct;
+
+use crate::z_lib::{logger::infra::Logger, response::actix_web::ProxyResponder};
 
 #[post("/authenticate")]
 async fn service_authenticate(

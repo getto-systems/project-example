@@ -2,8 +2,6 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::{logger::Logger, response::tonic::ServiceResponder};
-
 use crate::auth::ticket::check::y_protobuf::service::{
     check_auth_ticket_pb_server::CheckAuthTicketPb, CheckAuthTicketRequestPb,
     CheckAuthTicketResponsePb,
@@ -18,6 +16,8 @@ use crate::x_outside_feature::{
 };
 
 use crate::auth::ticket::check::init::CheckAuthTicketStruct;
+
+use crate::z_lib::{logger::infra::Logger, response::tonic::ServiceResponder};
 
 pub struct ServiceCheck;
 

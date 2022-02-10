@@ -2,8 +2,6 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::{logger::Logger, response::tonic::ServiceResponder};
-
 use crate::auth::ticket::logout::y_protobuf::service::{
     logout_pb_server::LogoutPb, LogoutRequestPb, LogoutResponsePb,
 };
@@ -17,6 +15,8 @@ use crate::x_outside_feature::{
 };
 
 use crate::auth::ticket::logout::init::LogoutStruct;
+
+use crate::z_lib::{logger::infra::Logger, response::tonic::ServiceResponder};
 
 pub struct ServiceLogout;
 

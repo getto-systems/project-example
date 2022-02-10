@@ -1,6 +1,6 @@
-use crate::z_lib::logger::{LogLevel, LogMessage, LogFilter};
-
 use super::super::action::CheckAuthTicketState;
+
+use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
 
 impl LogMessage for CheckAuthTicketState {
     fn log_message(&self) -> String {

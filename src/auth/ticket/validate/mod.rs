@@ -8,4 +8,4 @@ pub mod x_tonic;
 pub mod y_protobuf;
 
 #[cfg(test)]
-pub mod test;
+mod test;
