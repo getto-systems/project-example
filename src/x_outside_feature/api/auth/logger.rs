@@ -1,6 +1,8 @@
 use serde::Serialize;
 
-use crate::z_lib::logger::{InfoLogger, Logger, QuietLogger, VerboseLogger};
+use crate::z_lib::logger::init::{InfoLogger, QuietLogger, VerboseLogger};
+
+use crate::z_lib::logger::infra::Logger;
 
 pub fn app_logger(target: &'static str, id: String) -> impl Logger {
     // アプリケーション全体で使用するデフォルトの logger を返す

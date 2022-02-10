@@ -1,6 +1,6 @@
-use crate::z_lib::logger::{LogLevel, LogMessage, LogFilter};
-
 use crate::auth::proxy::action::AuthProxyState;
+
+use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
 
 use crate::auth::proxy::data::AuthProxyError;
 

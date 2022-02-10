@@ -2,8 +2,6 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::{logger::Logger, response::tonic::ServiceResponder};
-
 use crate::avail::unexpected_error::notify::y_protobuf::service::{
     notify_pb_server::NotifyPb, NotifyRequestPb, NotifyResponsePb,
 };
@@ -17,6 +15,8 @@ use crate::x_outside_feature::{
 };
 
 use crate::avail::unexpected_error::notify::init::NotifyUnexpectedErrorFeature;
+
+use crate::z_lib::{logger::infra::Logger, response::tonic::ServiceResponder};
 
 pub struct ServiceNotify;
 

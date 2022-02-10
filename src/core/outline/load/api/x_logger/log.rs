@@ -1,9 +1,6 @@
-use crate::{
-    core::outline::load::action::LoadOutlineMenuBadgeEvent,
-    z_lib::logger::{LogFilter, LogLevel, LogMessage},
-};
+use crate::core::outline::load::action::{LoadOutlineMenuBadgeEvent, LoadOutlineMenuBadgeState};
 
-use super::super::action::LoadOutlineMenuBadgeState;
+use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
 
 impl LogMessage for LoadOutlineMenuBadgeState {
     fn log_message(&self) -> String {

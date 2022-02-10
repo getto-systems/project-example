@@ -2,14 +2,14 @@ use actix_web::{patch, web::Data, HttpRequest, Responder};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::{logger::Logger, response::actix_web::ProxyResponder};
-
 use crate::x_outside_feature::proxy::{
     feature::ProxyAppFeature,
     logger::{app_logger, generate_request_id},
 };
 
 use crate::auth::ticket::check::proxy::init::CheckAuthTicketProxyStruct;
+
+use crate::z_lib::{logger::infra::Logger, response::actix_web::ProxyResponder};
 
 #[patch("")]
 pub async fn service_check(feature: Data<ProxyAppFeature>, request: HttpRequest) -> impl Responder {

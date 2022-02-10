@@ -2,8 +2,6 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::{logger::Logger, response::tonic::ServiceResponder};
-
 use crate::core::outline::load::y_protobuf::service::{
     load_menu_badge_pb_server::LoadMenuBadgePb, LoadMenuBadgeRequestPb, LoadMenuBadgeResponsePb,
 };
@@ -17,6 +15,8 @@ use crate::x_outside_feature::{
 };
 
 use crate::core::outline::load::init::LoadOutlineMenuBadgeStruct;
+
+use crate::z_lib::{logger::infra::Logger, response::tonic::ServiceResponder};
 
 pub struct ServiceLoadMenuBadge;
 

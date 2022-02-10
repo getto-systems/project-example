@@ -2,8 +2,6 @@ use tonic::{Request, Response, Status};
 
 use getto_application::helper::flatten;
 
-use crate::z_lib::{logger::Logger, response::tonic::ServiceResponder};
-
 use crate::auth::ticket::validate::y_protobuf::service::{
     validate_api_token_pb_server::ValidateApiTokenPb, ValidateApiTokenRequestPb,
     ValidateApiTokenResponsePb,
@@ -18,6 +16,8 @@ use crate::x_outside_feature::{
 };
 
 use crate::auth::ticket::validate::init::ValidateApiTokenStruct;
+
+use crate::z_lib::{logger::infra::Logger, response::tonic::ServiceResponder};
 
 pub struct ServiceValidate;
 

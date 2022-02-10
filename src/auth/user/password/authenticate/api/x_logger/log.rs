@@ -1,6 +1,6 @@
-use crate::z_lib::logger::{LogFilter, LogLevel, LogMessage};
-
 use super::super::action::{AuthenticatePasswordEvent, AuthenticatePasswordState};
+
+use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
 
 use super::super::data::AuthenticatePasswordError;
 

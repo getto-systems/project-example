@@ -58,7 +58,7 @@ coverage_main() {
     )
 
     local ignore_regex
-    ignore_regex='(\.cargo|rustc|^api/|/[xy]_|/init/|/(main|test|init|data|infra)\.rs)'
+    ignore_regex='(\.cargo|rustc|^api/|/[xy]_|/init/|/(main|test|init|data|infra|helper)\.rs)'
 
     $llvm_cov report ${object_files} \
         -Xdemangler=rustfilt \

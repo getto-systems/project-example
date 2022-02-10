@@ -1,9 +1,8 @@
-use crate::{
-    auth::user::account::search::action::SearchAuthUserAccountEvent,
-    z_lib::logger::{LogLevel, LogMessage, LogFilter},
+use crate::auth::user::account::search::action::{
+    SearchAuthUserAccountEvent, SearchAuthUserAccountState,
 };
 
-use super::super::action::SearchAuthUserAccountState;
+use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
 
 impl LogMessage for SearchAuthUserAccountState {
     fn log_message(&self) -> String {

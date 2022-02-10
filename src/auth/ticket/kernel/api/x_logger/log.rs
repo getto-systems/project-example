@@ -1,4 +1,4 @@
-use crate::z_lib::logger::{LogFilter, LogLevel};
+use crate::z_lib::logger::infra::{LogFilter, LogLevel};
 
 use crate::auth::ticket::kernel::data::{DecodeAuthTokenError, ValidateAuthRolesError};
 

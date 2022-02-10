@@ -289,7 +289,8 @@ pub mod test {
     };
 
     use crate::auth::ticket::validate::method::{
-        AuthNonceConfig, CheckPermissionInfra, ValidateAuthNonceInfra, ValidateAuthTokenInfra,
+        AuthNonceConfig, CheckPermissionInfra, ValidateAuthMetadataInfra, ValidateAuthNonceInfra,
+        ValidateAuthTokenInfra,
     };
 
     pub struct StaticValidateAuthTokenStruct<'a> {
@@ -359,6 +360,24 @@ pub mod test {
         }
         fn config(&self) -> &AuthNonceConfig {
             &self.config
+        }
+    }
+
+    pub struct StaticAuthMetadataStruct {
+        pub auth_metadata: StaticAuthMetadata,
+        pub token_decoder: StaticAuthTokenDecoder,
+    }
+
+    #[async_trait::async_trait]
+    impl<'a> ValidateAuthMetadataInfra for StaticAuthMetadataStruct {
+        type AuthMetadata = StaticAuthMetadata;
+        type TokenDecoder = StaticAuthTokenDecoder;
+
+        fn auth_metadata(&self) -> &Self::AuthMetadata {
+            &self.auth_metadata
+        }
+        fn token_decoder(&self) -> &Self::TokenDecoder {
+            &self.token_decoder
         }
     }
 }

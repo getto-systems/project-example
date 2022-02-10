@@ -1,10 +1,10 @@
-use crate::z_lib::logger::{LogFilter, LogLevel, LogMessage};
-
 use crate::auth::ticket::validate::action::ValidateApiTokenState;
 
 use crate::auth::ticket::validate::method::{
     CheckPermissionEvent, ValidateAuthMetadataEvent, ValidateAuthNonceEvent, ValidateAuthTokenEvent,
 };
+
+use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
 
 impl LogMessage for ValidateApiTokenState {
     fn log_message(&self) -> String {

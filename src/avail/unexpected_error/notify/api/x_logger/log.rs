@@ -1,8 +1,8 @@
-use crate::z_lib::logger::{LogFilter, LogLevel, LogMessage};
-
 use crate::avail::unexpected_error::notify::action::{
     NotifyUnexpectedErrorEvent, NotifyUnexpectedErrorState,
 };
+
+use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
 
 impl LogMessage for NotifyUnexpectedErrorState {
     fn log_message(&self) -> String {
