@@ -19,6 +19,6 @@ export function readSearchParams(
     return markBoardValue(value)
 }
 
-function markBoardValue(input: string): BoardValue {
+export function markBoardValue(input: string): BoardValue {
     return input as BoardValue
 }
