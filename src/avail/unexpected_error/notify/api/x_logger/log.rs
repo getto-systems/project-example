@@ -13,7 +13,7 @@ impl LogMessage for NotifyUnexpectedErrorState {
 impl LogFilter for NotifyUnexpectedErrorState {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Validate(event) => event.log_level(),
+            Self::CheckPermission(event) => event.log_level(),
             Self::Notify(event) => event.log_level(),
         }
     }

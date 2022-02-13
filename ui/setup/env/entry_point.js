@@ -22,7 +22,7 @@ const entries = {
         { name: "auth/profile", worker: true },
         { name: "auth/user/account", /* TODO worker: true */ },
 
-        { name: "core/season/setup", /* TODO worker: true */ },
+        { name: "season/setup", /* TODO worker: true */ },
 
         { name: "docs/index" },
         { name: "docs/privacy-policy" },
