@@ -17,8 +17,8 @@ pub struct LogoutStruct<'a> {
 impl<'a> LogoutStruct<'a> {
     pub fn action(feature: &'a AuthAppFeature, metadata: &'a MetadataMap) -> LogoutAction<Self> {
         LogoutAction::with_material(Self {
-            validate: TicketValidateAuthTokenStruct::new(&feature.auth, metadata),
-            ticket_repository: DynamoDbAuthTicketRepository::new(&feature.auth.store),
+            validate: TicketValidateAuthTokenStruct::new(feature, metadata),
+            ticket_repository: DynamoDbAuthTicketRepository::new(&feature.store),
         })
     }
 }

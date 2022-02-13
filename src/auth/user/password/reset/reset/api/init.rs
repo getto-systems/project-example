@@ -47,14 +47,14 @@ impl<'a> ResetPasswordFeature<'a> {
         ResetPasswordAction::with_material(
             PbResetPasswordRequestDecoder::new(request),
             Self {
-                validate_nonce: ValidateAuthNonceStruct::new(&feature.auth, metadata),
-                issue: IssueAuthTicketStruct::new(&feature.auth),
-                encode: EncodeAuthTicketStruct::new(&feature.auth),
+                validate_nonce: ValidateAuthNonceStruct::new(feature, metadata),
+                issue: IssueAuthTicketStruct::new(feature),
+                encode: EncodeAuthTicketStruct::new(feature),
 
                 clock: ChronoAuthClock::new(),
-                user_repository: DynamoDbAuthUserRepository::new(&feature.auth.store),
-                token_decoder: JwtResetTokenDecoder::new(&feature.auth.reset_token_key),
-                reset_notifier: EmailResetPasswordNotifier::new(&feature.auth.email),
+                user_repository: DynamoDbAuthUserRepository::new(&feature.store),
+                token_decoder: JwtResetTokenDecoder::new(&feature.reset_token_key),
+                reset_notifier: EmailResetPasswordNotifier::new(&feature.email),
             },
         )
     }

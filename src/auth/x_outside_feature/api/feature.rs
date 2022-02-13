@@ -4,19 +4,8 @@ use rusoto_ses::SesClient;
 
 use aws_cloudfront_cookie::CloudfrontKey;
 
-use crate::auth::x_outside_feature::common::feature::AuthOutsideDecodingKey;
-
 use crate::auth::ticket::kernel::data::{ExpansionLimitDuration, ExpireDuration};
 
-pub struct AuthOutsideFeature {
-    pub(in crate::auth) config: AuthOutsideConfig,
-    pub(in crate::auth) store: AuthOutsideStore,
-    pub decoding_key: AuthOutsideDecodingKey,
-    pub(in crate::auth) encoding_key: AuthOutsideEncodingKey,
-    pub(in crate::auth) cloudfront_key: AuthOutsideCloudfrontKey,
-    pub(in crate::auth) reset_token_key: AuthOutsideResetTokenKey,
-    pub(in crate::auth) email: AuthOutsideEmail,
-}
 pub struct AuthOutsideConfig {
     pub ticket_expires: ExpireDuration,
     pub ticket_expansion_limit: ExpansionLimitDuration,
@@ -36,6 +25,10 @@ pub struct AuthOutsideEncodingKey {
     pub ticket: EncodingKey,
     pub api: EncodingKey,
 }
+pub struct AuthOutsideDecodingKey {
+    pub ticket: DecodingKey,
+    pub api: DecodingKey,
+}
 pub struct AuthOutsideResetTokenKey {
     pub decoding_key: DecodingKey,
     pub encoding_key: EncodingKey,
@@ -48,4 +41,17 @@ pub struct AuthOutsideCloudfrontKey {
 pub struct AuthOutsideEmail {
     pub ses: SesClient,
     pub reset_password_url: &'static str,
+}
+
+pub struct AuthProxyOutsideFeature {
+    pub service: AuthOutsideService,
+    pub decoding_key: AuthOutsideDecodingKey,
+    pub cookie: AuthOutsideCookie,
+}
+pub struct AuthOutsideService {
+    pub service_url: &'static str,
+}
+pub struct AuthOutsideCookie {
+    pub domain: &'static str,
+    pub cloudfront_key_pair_id: &'static str,
 }

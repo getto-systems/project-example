@@ -1,6 +1,6 @@
 use jsonwebtoken::{decode, errors::ErrorKind, Algorithm, DecodingKey, Validation};
 
-use crate::auth::x_outside_feature::auth::feature::AuthOutsideResetTokenKey;
+use crate::auth::x_outside_feature::feature::AuthOutsideResetTokenKey;
 
 use crate::auth::user::password::reset::{
     kernel::infra::ResetTokenJwtClaims, reset::infra::ResetTokenDecoder,

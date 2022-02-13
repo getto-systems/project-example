@@ -3,9 +3,12 @@ use std::collections::HashMap;
 use rusoto_core::RusotoError;
 use rusoto_dynamodb::{AttributeValue, DynamoDb, DynamoDbClient, PutItemError, PutItemInput};
 
-use crate::auth::x_outside_feature::auth::feature::AuthOutsideStore;
-use crate::z_lib::repository::dynamodb::helper::{string_value, timestamp_value};
-use crate::z_lib::repository::helper::infra_error;
+use crate::auth::x_outside_feature::feature::AuthOutsideStore;
+
+use crate::z_lib::repository::{
+    dynamodb::helper::{string_value, timestamp_value},
+    helper::infra_error,
+};
 
 use crate::auth::ticket::validate::infra::{AuthNonceEntry, AuthNonceRepository};
 

@@ -39,11 +39,11 @@ impl<'a> AuthenticatePasswordStruct<'a> {
         AuthenticatePasswordAction::with_material(
             PbAuthenticatePasswordRequestDecoder::new(request),
             Self {
-                validate_nonce: ValidateAuthNonceStruct::new(&feature.auth, metadata),
-                issue: IssueAuthTicketStruct::new(&feature.auth),
-                encode: EncodeAuthTicketStruct::new(&feature.auth),
+                validate_nonce: ValidateAuthNonceStruct::new(feature, metadata),
+                issue: IssueAuthTicketStruct::new(feature),
+                encode: EncodeAuthTicketStruct::new(feature),
 
-                user_repository: DynamoDbAuthUserRepository::new(&feature.auth.store),
+                user_repository: DynamoDbAuthUserRepository::new(&feature.store),
             },
         )
     }

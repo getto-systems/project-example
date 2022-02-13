@@ -6,7 +6,7 @@ use crate::auth::user::account::search::y_protobuf::service::{
     SearchAuthUserAccountRequestPb,
 };
 
-use crate::auth::x_outside_feature::common::feature::AuthOutsideService;
+use crate::auth::x_outside_feature::feature::AuthOutsideService;
 
 use crate::auth::user::account::search::x_tonic::route::ServiceSearch;
 

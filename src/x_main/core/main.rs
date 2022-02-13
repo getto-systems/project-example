@@ -13,7 +13,7 @@ lazy_static! {
 
 #[tokio::main]
 async fn main() {
-    let feature: Arc<CoreAppFeature> = Arc::new(CoreAppFeature::new(&ENV).await);
+    let feature: Arc<CoreAppFeature> = Arc::new(CoreAppFeature::new(&ENV));
 
     let server = route::Server::new();
 

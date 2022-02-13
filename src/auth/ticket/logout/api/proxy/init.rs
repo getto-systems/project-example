@@ -2,7 +2,7 @@ mod proxy_service;
 
 use actix_web::HttpRequest;
 
-use crate::auth::x_outside_feature::proxy::feature::AuthOutsideFeature;
+use crate::auth::x_outside_feature::feature::AuthProxyOutsideFeature;
 
 use crate::auth::ticket::{
     logout::proxy::init::proxy_service::ProxyService, validate::init::ValidateTicketMetadataStruct,
@@ -17,7 +17,7 @@ pub struct LogoutProxyStruct<'a> {
 
 impl<'a> LogoutProxyStruct<'a> {
     pub fn action(
-        feature: &'a AuthOutsideFeature,
+        feature: &'a AuthProxyOutsideFeature,
         request_id: &'a str,
         request: &'a HttpRequest,
     ) -> AuthProxyAction<Self> {

@@ -4,7 +4,7 @@ use getto_application_test::ActionTestRunner;
 
 use crate::{
     auth::init::test::{
-        StaticAuthMetadata, StaticAuthTokenDecoder, StaticValidateApiTokenStruct,
+        StaticAuthMetadata, StaticAuthTokenDecoder, StaticCheckPermissionStruct,
         StaticValidateService,
     },
     core::outline::load::init::menu_badge_repository::test::StaticOutlineMenuBadgeRepository,
@@ -28,13 +28,13 @@ async fn success_load_menu_badge() {
 }
 
 struct TestStruct {
-    validate: StaticValidateApiTokenStruct,
+    validate: StaticCheckPermissionStruct,
 
     menu_badge_repository: StaticOutlineMenuBadgeRepository,
 }
 
 impl LoadOutlineMenuBadgeMaterial for TestStruct {
-    type CheckPermission = StaticValidateApiTokenStruct;
+    type CheckPermission = StaticCheckPermissionStruct;
 
     type MenuBadgeRepository = StaticOutlineMenuBadgeRepository;
 
@@ -58,7 +58,7 @@ impl TestStore {
 impl TestStruct {
     fn standard(_store: &TestStore) -> Self {
         Self {
-            validate: StaticValidateApiTokenStruct {
+            validate: StaticCheckPermissionStruct {
                 auth_metadata: StaticAuthMetadata {
                     nonce: "NONCE".into(),
                     token: "TOKEN".into(),

@@ -6,13 +6,12 @@ use crate::auth::user::password::reset::reset::y_protobuf::service::{
     reset_password_pb_server::ResetPasswordPb, ResetPasswordRequestPb, ResetPasswordResponsePb,
 };
 
-use crate::x_outside_feature::{
-    auth::{
-        feature::{extract_request, TonicRequest},
-        logger::app_logger,
-    },
-    common::helper::metadata_request_id,
+use crate::x_outside_feature::auth::{
+    feature::{extract_request, TonicRequest},
+    logger::app_logger,
 };
+
+use crate::x_content::metadata::metadata_request_id;
 
 use crate::auth::user::password::reset::reset::init::ResetPasswordFeature;
 
