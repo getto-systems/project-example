@@ -30,7 +30,7 @@ function envContent() {
         apiServerNonceHeader: "GETTO-EXAMPLE-NONCE",
 
         database: {
-            authProfile: "GETTO-EXAMPLE-AUTH-PROFILE",
+            authTicket: "GETTO-EXAMPLE-AUTH-TICKET",
             season: "GETTO-EXAMPLE-SEASON",
             menuExpand: "GETTO-EXAMPLE-MENU-EXPAND",
             searchColumns: "GETTO-EXAMPLE-SEARCH-COLUMNS",

@@ -15,11 +15,11 @@ export function newAuthTicketRepository({ webDB }: RepositoryOutsideFeature): Au
 
     function initDB() {
         const target: IndexedDBTarget = {
-            store: "auth-profile",
+            store: "auth-ticket",
             key: "last",
         }
         const db = initIndexedDB(webDB, {
-            database: env.database.authProfile,
+            database: env.database.authTicket,
             stores: [target.store],
         })
 

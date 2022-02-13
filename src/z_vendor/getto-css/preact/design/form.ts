@@ -138,6 +138,9 @@ function fieldSectionContent(field: FieldSectionContent): VNode {
 export function fieldError(notice: readonly VNodeContent[]): VNode {
     return html`<aside class="field__help field_error">${notice.map(toFieldNotice)}</aside>`
 }
+export function fieldWarning(notice: VNodeContent[]): VNode {
+    return html`<aside class="field__help field_warning">${notice.map(toFieldNotice)}</aside>`
+}
 
 type FieldHelpContent = Readonly<{
     help: readonly VNodeContent[]
