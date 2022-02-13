@@ -10,14 +10,14 @@ use crate::{
 };
 
 pub enum LoadOutlineMenuBadgeState {
-    Validate(CheckPermissionEvent),
+    CheckPermission(CheckPermissionEvent),
     LoadMenuBadge(LoadOutlineMenuBadgeEvent),
 }
 
 impl std::fmt::Display for LoadOutlineMenuBadgeState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Validate(event) => write!(f, "{}", event),
+            Self::CheckPermission(event) => write!(f, "{}", event),
             Self::LoadMenuBadge(event) => write!(f, "{}", event),
         }
     }
@@ -56,7 +56,7 @@ impl<M: LoadOutlineMenuBadgeMaterial> LoadOutlineMenuBadgeAction<M> {
         let m = self.material;
 
         check_permission(m.check_permission(), RequireAuthRoles::Nothing, |event| {
-            pubsub.post(LoadOutlineMenuBadgeState::Validate(event))
+            pubsub.post(LoadOutlineMenuBadgeState::CheckPermission(event))
         })
         .await?;
 

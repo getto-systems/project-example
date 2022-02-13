@@ -11,7 +11,7 @@ use crate::avail::unexpected_error::notify::action::{
 impl ServiceResponder<NotifyResponsePb> for NotifyUnexpectedErrorState {
     fn respond_to(self) -> Result<Response<NotifyResponsePb>, Status> {
         match self {
-            Self::Validate(_) => Err(Status::unauthenticated("unauthenticated")),
+            Self::CheckPermission(_) => Err(Status::unauthenticated("unauthenticated")),
             Self::Notify(event) => event.respond_to(),
         }
     }

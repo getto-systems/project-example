@@ -81,18 +81,17 @@ impl AttributeMap {
         self.0
     }
 
-    fn add(&mut self, key: &str, attr: AttributeValue) -> &mut Self {
+    fn add(&mut self, key: &str, attr: AttributeValue) {
         self.0.insert(key.into(), attr);
-        self
     }
 
-    fn add_entry(&mut self, entry: AuthNonceEntry) -> &mut Self {
+    fn add_entry(&mut self, entry: AuthNonceEntry) {
         let extract = entry.extract();
 
-        self.add("nonce", string_value(extract.nonce))
-            .add("expires", timestamp_value(extract.expires))
+        self.add("nonce", string_value(extract.nonce));
+        self.add("expires", timestamp_value(extract.expires));
     }
-    fn add_registered_at(&mut self, registered_at: AuthDateTime) -> &mut Self {
-        self.add("registered_at", timestamp_value(registered_at.extract()))
+    fn add_registered_at(&mut self, registered_at: AuthDateTime) {
+        self.add("registered_at", timestamp_value(registered_at.extract()));
     }
 }

@@ -675,34 +675,33 @@ impl AttributeMap {
         self.0
     }
 
-    fn add(&mut self, key: &str, attr: AttributeValue) -> &mut Self {
+    fn add(&mut self, key: &str, attr: AttributeValue) {
         self.0.insert(key.into(), attr);
-        self
     }
 
-    fn add_login_id(&mut self, login_id: LoginId) -> &mut Self {
-        self.add("login_id", string_value(login_id.extract()))
+    fn add_login_id(&mut self, login_id: LoginId) {
+        self.add("login_id", string_value(login_id.extract()));
     }
-    fn add_user_id(&mut self, user_id: AuthUserId) -> &mut Self {
-        self.add("user_id", string_value(user_id.extract()))
+    fn add_user_id(&mut self, user_id: AuthUserId) {
+        self.add("user_id", string_value(user_id.extract()));
     }
-    fn add_reset_token(&mut self, reset_token: ResetToken) -> &mut Self {
-        self.add("reset_token", string_value(reset_token.extract()))
+    fn add_reset_token(&mut self, reset_token: ResetToken) {
+        self.add("reset_token", string_value(reset_token.extract()));
     }
-    fn add_destination(&mut self, destination: ResetTokenDestination) -> &mut Self {
-        self.add("email", string_value(destination.into_email()))
+    fn add_destination(&mut self, destination: ResetTokenDestination) {
+        self.add("email", string_value(destination.into_email()));
     }
-    fn add_expires(&mut self, expires: ExpireDateTime) -> &mut Self {
-        self.add("expires", timestamp_value(expires.extract()))
+    fn add_expires(&mut self, expires: ExpireDateTime) {
+        self.add("expires", timestamp_value(expires.extract()));
     }
-    fn add_requested_at(&mut self, requested_at: AuthDateTime) -> &mut Self {
-        self.add("requested_at", timestamp_value(requested_at.extract()))
+    fn add_requested_at(&mut self, requested_at: AuthDateTime) {
+        self.add("requested_at", timestamp_value(requested_at.extract()));
     }
 
-    fn add_password_as(&mut self, password: HashedPassword, name: &str) -> &mut Self {
-        self.add(name, string_value(password.extract()))
+    fn add_password_as(&mut self, password: HashedPassword, name: &str) {
+        self.add(name, string_value(password.extract()));
     }
-    fn add_reset_at_as(&mut self, reset_at: AuthDateTime, name: &str) -> &mut Self {
-        self.add(name, timestamp_value(reset_at.extract()))
+    fn add_reset_at_as(&mut self, reset_at: AuthDateTime, name: &str) {
+        self.add(name, timestamp_value(reset_at.extract()));
     }
 }

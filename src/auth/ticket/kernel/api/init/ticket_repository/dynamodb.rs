@@ -157,24 +157,23 @@ impl AttributeMap {
         self.0
     }
 
-    fn add(&mut self, key: &str, attr: AttributeValue) -> &mut Self {
+    fn add(&mut self, key: &str, attr: AttributeValue) {
         self.0.insert(key.into(), attr);
-        self
     }
 
-    fn add_ticket(&mut self, ticket: AuthTicket) -> &mut Self {
+    fn add_ticket(&mut self, ticket: AuthTicket) {
         let ticket = ticket.extract();
 
-        self.add("ticket_id", string_value(ticket.ticket_id))
-            .add("user_id", string_value(ticket.user_id))
+        self.add("ticket_id", string_value(ticket.ticket_id));
+        self.add("user_id", string_value(ticket.user_id));
     }
-    fn add_expansion_limit(&mut self, expansion_limit: ExpansionLimitDateTime) -> &mut Self {
+    fn add_expansion_limit(&mut self, expansion_limit: ExpansionLimitDateTime) {
         self.add(
             "expansion_limit",
             timestamp_value(expansion_limit.extract()),
-        )
+        );
     }
-    fn add_issued_at(&mut self, issued_at: AuthDateTime) -> &mut Self {
-        self.add("issued_at", timestamp_value(issued_at.extract()))
+    fn add_issued_at(&mut self, issued_at: AuthDateTime) {
+        self.add("issued_at", timestamp_value(issued_at.extract()));
     }
 }

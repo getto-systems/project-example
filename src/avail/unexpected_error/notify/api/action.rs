@@ -10,14 +10,14 @@ use crate::avail::unexpected_error::notify::infra::{
 };
 
 pub enum NotifyUnexpectedErrorState {
-    Validate(CheckPermissionEvent),
+    CheckPermission(CheckPermissionEvent),
     Notify(NotifyUnexpectedErrorEvent),
 }
 
 impl std::fmt::Display for NotifyUnexpectedErrorState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Validate(event) => event.fmt(f),
+            Self::CheckPermission(event) => event.fmt(f),
             Self::Notify(event) => event.fmt(f),
         }
     }
@@ -63,7 +63,7 @@ impl<R: NotifyUnexpectedErrorRequestDecoder, M: NotifyUnexpectedErrorMaterial>
         let fields = self.request_decoder.decode();
 
         check_permission(m.check_permission(), RequireAuthRoles::Nothing, |event| {
-            pubsub.post(NotifyUnexpectedErrorState::Validate(event))
+            pubsub.post(NotifyUnexpectedErrorState::CheckPermission(event))
         })
         .await?;
 
