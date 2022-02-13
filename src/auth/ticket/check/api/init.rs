@@ -19,8 +19,8 @@ impl<'a> CheckAuthTicketStruct<'a> {
         metadata: &'a MetadataMap,
     ) -> CheckAuthTicketAction<Self> {
         CheckAuthTicketAction::with_material(Self {
-            validate: TicketValidateAuthTokenStruct::new(&feature.auth, metadata),
-            encode: EncodeAuthTicketStruct::new(&feature.auth),
+            validate: TicketValidateAuthTokenStruct::new(feature, metadata),
+            encode: EncodeAuthTicketStruct::new(feature),
         })
     }
 }

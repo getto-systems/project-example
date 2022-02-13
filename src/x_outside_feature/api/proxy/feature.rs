@@ -1,23 +1,43 @@
 use crate::{
-    auth::x_outside_feature::proxy::{
-        feature::AuthOutsideFeature, init::new_auth_outside_feature,
+    auth::x_outside_feature::feature::{
+        AuthOutsideCookie, AuthOutsideDecodingKey, AuthOutsideService, AuthProxyOutsideFeature,
     },
-    core::x_outside_feature::{
-        feature::CoreOutsideFeature, init::new_core_outside_feature,
-    },
+    core::x_outside_feature::feature::CoreOutsideService,
     x_outside_feature::proxy::env::ProxyEnv,
 };
 
+use crate::z_lib::jwt::helper::decoding_key_from_ec_pem;
+
 pub struct ProxyAppFeature {
-    pub auth: AuthOutsideFeature,
+    pub auth: AuthProxyOutsideFeature,
     pub core: CoreOutsideFeature,
+}
+
+pub struct CoreOutsideFeature {
+    pub service: CoreOutsideService,
 }
 
 impl ProxyAppFeature {
     pub async fn new(env: &'static ProxyEnv) -> Self {
         Self {
-            auth: new_auth_outside_feature(env).await,
-            core: new_core_outside_feature(env),
+            auth: AuthProxyOutsideFeature {
+                service: AuthOutsideService {
+                    service_url: &env.auth_service_url,
+                },
+                decoding_key: AuthOutsideDecodingKey {
+                    ticket: decoding_key_from_ec_pem(&env.ticket_public_key),
+                    api: decoding_key_from_ec_pem(&env.api_public_key),
+                },
+                cookie: AuthOutsideCookie {
+                    domain: &env.domain,
+                    cloudfront_key_pair_id: &env.cloudfront_key_pair_id,
+                },
+            },
+            core: CoreOutsideFeature {
+                service: CoreOutsideService {
+                    service_url: &env.core_service_url,
+                },
+            },
         }
     }
 }

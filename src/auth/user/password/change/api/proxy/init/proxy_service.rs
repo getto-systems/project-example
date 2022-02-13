@@ -5,7 +5,7 @@ use crate::auth::user::password::change::y_protobuf::service::{
     change_password_pb_client::ChangePasswordPbClient, ChangePasswordRequestPb,
 };
 
-use crate::auth::x_outside_feature::common::feature::AuthOutsideService;
+use crate::auth::x_outside_feature::feature::AuthOutsideService;
 
 use crate::auth::user::password::change::x_tonic::route::ServiceChange;
 

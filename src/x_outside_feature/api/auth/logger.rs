@@ -27,11 +27,6 @@ struct RequestEntry {
 
 impl RequestEntry {
     fn new(target: &'static str, id: String) -> Self {
-        // let id = metadata
-        //     .get(METADATA_REQUEST_ID)
-        //     .and_then(|id| id.to_str().ok())
-        //     .map(|id| id.into());
-
         Self { id, target }
     }
 }

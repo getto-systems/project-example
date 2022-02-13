@@ -45,15 +45,15 @@ impl<'a> RequestResetTokenStruct<'a> {
         RequestResetTokenAction::with_material(
             PbRequestResetTokenRequestDecoder::new(request),
             Self {
-                validate_nonce: ValidateAuthNonceStruct::new(&feature.auth, metadata),
+                validate_nonce: ValidateAuthNonceStruct::new(feature, metadata),
 
                 clock: ChronoAuthClock::new(),
-                user_repository: DynamoDbAuthUserRepository::new(&feature.auth.store),
+                user_repository: DynamoDbAuthUserRepository::new(&feature.store),
                 token_generator: UuidResetTokenGenerator,
-                token_encoder: JwtResetTokenEncoder::new(&feature.auth.reset_token_key),
-                token_notifier: EmailResetTokenNotifier::new(&feature.auth.email),
+                token_encoder: JwtResetTokenEncoder::new(&feature.reset_token_key),
+                token_notifier: EmailResetTokenNotifier::new(&feature.email),
                 config: RequestResetTokenConfig {
-                    token_expires: feature.auth.config.reset_token_expires,
+                    token_expires: feature.config.reset_token_expires,
                 },
             },
         )

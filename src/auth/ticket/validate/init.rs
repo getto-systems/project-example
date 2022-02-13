@@ -12,10 +12,7 @@ use tonic::metadata::MetadataMap;
 use crate::auth::ticket::validate::y_protobuf::service::ValidateApiTokenRequestPb;
 
 use crate::{
-    auth::x_outside_feature::{
-        auth::feature::AuthOutsideFeature,
-        common::feature::{AuthOutsideDecodingKey, AuthOutsideService},
-    },
+    auth::x_outside_feature::feature::{AuthOutsideDecodingKey, AuthOutsideService},
     x_outside_feature::auth::feature::AuthAppFeature,
 };
 
@@ -50,7 +47,7 @@ impl ValidateApiTokenStruct {
     {
         ValidateApiTokenAction::with_material(
             PbValidateApiTokenRequestDecoder::new(request),
-            ApiValidateAuthTokenStruct::new(&feature.auth, metadata),
+            ApiValidateAuthTokenStruct::new(feature, metadata),
         )
     }
 }
@@ -62,7 +59,7 @@ pub struct TicketValidateAuthTokenStruct<'a> {
 }
 
 impl<'a> TicketValidateAuthTokenStruct<'a> {
-    pub fn new(feature: &'a AuthOutsideFeature, metadata: &'a MetadataMap) -> Self {
+    pub fn new(feature: &'a AuthAppFeature, metadata: &'a MetadataMap) -> Self {
         Self {
             validate_nonce: ValidateAuthNonceStruct::new(feature, metadata),
             token_metadata: TonicAuthTokenMetadata::new(metadata),
@@ -94,7 +91,7 @@ pub struct ApiValidateAuthTokenStruct<'a> {
 }
 
 impl<'a> ApiValidateAuthTokenStruct<'a> {
-    pub fn new(feature: &'a AuthOutsideFeature, metadata: &'a MetadataMap) -> Self {
+    pub fn new(feature: &'a AuthAppFeature, metadata: &'a MetadataMap) -> Self {
         Self {
             validate_nonce: ValidateAuthNonceStruct::new(feature, metadata),
             token_metadata: TonicAuthTokenMetadata::new(metadata),
@@ -263,7 +260,7 @@ impl<'a> ValidateAuthNonceInfra for ValidateAuthNonceStruct<'a> {
 }
 
 impl<'a> ValidateAuthNonceStruct<'a> {
-    pub fn new(feature: &'a AuthOutsideFeature, metadata: &'a MetadataMap) -> Self {
+    pub fn new(feature: &'a AuthAppFeature, metadata: &'a MetadataMap) -> Self {
         Self {
             config: AuthNonceConfig {
                 nonce_expires: feature.config.ticket_expires,
@@ -315,13 +312,13 @@ pub mod test {
         }
     }
 
-    pub struct StaticValidateApiTokenStruct {
+    pub struct StaticCheckPermissionStruct {
         pub auth_metadata: StaticAuthMetadata,
         pub token_decoder: StaticAuthTokenDecoder,
         pub validate_service: StaticValidateService,
     }
 
-    impl CheckPermissionInfra for StaticValidateApiTokenStruct {
+    impl CheckPermissionInfra for StaticCheckPermissionStruct {
         type AuthMetadata = StaticAuthMetadata;
         type TokenDecoder = StaticAuthTokenDecoder;
         type ValidateService = StaticValidateService;

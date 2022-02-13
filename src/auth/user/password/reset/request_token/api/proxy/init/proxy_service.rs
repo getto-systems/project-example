@@ -5,7 +5,7 @@ use crate::auth::user::password::reset::request_token::y_protobuf::service::{
     request_reset_token_pb_client::RequestResetTokenPbClient, RequestResetTokenRequestPb,
 };
 
-use crate::auth::x_outside_feature::common::feature::AuthOutsideService;
+use crate::auth::x_outside_feature::feature::AuthOutsideService;
 
 use crate::auth::user::password::reset::request_token::x_tonic::route::ServiceRequestToken;
 

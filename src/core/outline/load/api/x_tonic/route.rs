@@ -6,13 +6,12 @@ use crate::core::outline::load::y_protobuf::service::{
     load_menu_badge_pb_server::LoadMenuBadgePb, LoadMenuBadgeRequestPb, LoadMenuBadgeResponsePb,
 };
 
-use crate::x_outside_feature::{
-    common::helper::metadata_request_id,
-    core::{
-        feature::{extract_request, TonicRequest},
-        logger::app_logger,
-    },
+use crate::x_outside_feature::core::{
+    feature::{extract_request, TonicRequest},
+    logger::app_logger,
 };
+
+use crate::x_content::metadata::metadata_request_id;
 
 use crate::core::outline::load::init::LoadOutlineMenuBadgeStruct;
 

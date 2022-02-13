@@ -2,7 +2,7 @@ mod proxy_service;
 
 use actix_web::HttpRequest;
 
-use crate::auth::x_outside_feature::proxy::feature::AuthOutsideFeature;
+use crate::auth::x_outside_feature::feature::AuthProxyOutsideFeature;
 
 use crate::auth::{
     ticket::validate::init::ValidateApiMetadataStruct,
@@ -18,7 +18,7 @@ pub struct ChangePasswordProxyStruct<'a> {
 
 impl<'a> ChangePasswordProxyStruct<'a> {
     pub fn action(
-        feature: &'a AuthOutsideFeature,
+        feature: &'a AuthProxyOutsideFeature,
         request_id: &'a str,
         request: &'a HttpRequest,
         body: String,

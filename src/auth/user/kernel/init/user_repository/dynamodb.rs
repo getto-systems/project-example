@@ -11,15 +11,11 @@ use rusoto_dynamodb::{
     ScanInput, UpdateItemError, UpdateItemInput,
 };
 
-use crate::{
-    auth::x_outside_feature::auth::feature::AuthOutsideStore,
-    z_lib::{
-        repository::{
-            dynamodb::helper::{dynamodb_error, string_value, timestamp_value, ScanKey},
-            helper::infra_error,
-        },
-        search::data::SearchSortOrderMap,
-    },
+use crate::auth::x_outside_feature::feature::AuthOutsideStore;
+
+use crate::z_lib::repository::{
+    dynamodb::helper::{dynamodb_error, string_value, timestamp_value, ScanKey},
+    helper::infra_error,
 };
 
 use crate::auth::user::{
@@ -61,7 +57,7 @@ use crate::{
     },
     z_lib::{
         repository::data::RepositoryError,
-        search::data::{SearchOffset, SearchPage},
+        search::data::{SearchOffset, SearchPage, SearchSortOrderMap},
     },
 };
 

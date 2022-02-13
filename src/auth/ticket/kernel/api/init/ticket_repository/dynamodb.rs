@@ -5,7 +5,7 @@ use rusoto_dynamodb::{
     AttributeValue, DeleteItemInput, DynamoDb, DynamoDbClient, GetItemInput, PutItemInput,
 };
 
-use crate::auth::x_outside_feature::auth::feature::AuthOutsideStore;
+use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
 use crate::z_lib::repository::{
     dynamodb::helper::{string_value, timestamp_value},

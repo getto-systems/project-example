@@ -1,7 +1,7 @@
 use rusoto_ses::{Body, Content, Destination, Message, SendEmailRequest, Ses, SesClient};
 use url::{ParseError, Url};
 
-use crate::auth::x_outside_feature::auth::feature::AuthOutsideEmail;
+use crate::auth::x_outside_feature::feature::AuthOutsideEmail;
 
 use crate::x_content::mail::{
     notify_password_reset_token::{BODY, SUBJECT},

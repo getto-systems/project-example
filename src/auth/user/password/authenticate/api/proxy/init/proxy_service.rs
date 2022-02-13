@@ -5,7 +5,7 @@ use crate::auth::user::password::authenticate::y_protobuf::service::{
     authenticate_password_pb_client::AuthenticatePasswordPbClient, AuthenticatePasswordRequestPb,
 };
 
-use crate::auth::x_outside_feature::proxy::feature::AuthOutsideFeature;
+use crate::auth::x_outside_feature::feature::AuthProxyOutsideFeature;
 
 use crate::auth::user::password::authenticate::x_tonic::route::ServiceAuthenticate;
 
@@ -44,7 +44,7 @@ pub struct ProxyService<'a> {
 }
 
 impl<'a> ProxyService<'a> {
-    pub fn new(feature: &'a AuthOutsideFeature, request_id: &'a str, body: String) -> Self {
+    pub fn new(feature: &'a AuthProxyOutsideFeature, request_id: &'a str, body: String) -> Self {
         Self {
             service_url: feature.service.service_url,
             request_id,

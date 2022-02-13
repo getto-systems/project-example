@@ -35,8 +35,8 @@ impl<'a> ChangePasswordFeature<'a> {
         ChangePasswordAction::with_material(
             PbChangePasswordRequestDecoder::new(request),
             Self {
-                validate: ApiValidateAuthTokenStruct::new(&feature.auth, metadata),
-                user_repository: DynamoDbAuthUserRepository::new(&feature.auth.store),
+                validate: ApiValidateAuthTokenStruct::new(feature, metadata),
+                user_repository: DynamoDbAuthUserRepository::new(&feature.store),
             },
         )
     }

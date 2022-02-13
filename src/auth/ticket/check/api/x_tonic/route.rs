@@ -7,13 +7,12 @@ use crate::auth::ticket::check::y_protobuf::service::{
     CheckAuthTicketResponsePb,
 };
 
-use crate::x_outside_feature::{
-    auth::{
-        feature::{extract_request, TonicRequest},
-        logger::app_logger,
-    },
-    common::helper::metadata_request_id,
+use crate::x_outside_feature::auth::{
+    feature::{extract_request, TonicRequest},
+    logger::app_logger,
 };
+
+use crate::x_content::metadata::metadata_request_id;
 
 use crate::auth::ticket::check::init::CheckAuthTicketStruct;
 

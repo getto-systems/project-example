@@ -4,7 +4,7 @@ use crate::auth::ticket::logout::y_protobuf::service::{
     logout_pb_client::LogoutPbClient, LogoutRequestPb,
 };
 
-use crate::auth::x_outside_feature::common::feature::AuthOutsideService;
+use crate::auth::x_outside_feature::feature::AuthOutsideService;
 
 use crate::auth::ticket::logout::x_tonic::route::ServiceLogout;
 

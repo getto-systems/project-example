@@ -3,20 +3,25 @@ use std::sync::Arc;
 use tonic::{metadata::MetadataMap, Request};
 
 use crate::{
-    auth::x_outside_feature::core::{
-        feature::AuthOutsideFeature, init::new_auth_outside_feature,
-    },
-    x_outside_feature::core::env::CoreEnv,
+    auth::x_outside_feature::feature::AuthOutsideService, x_outside_feature::core::env::CoreEnv,
 };
 
 pub struct CoreAppFeature {
     pub auth: AuthOutsideFeature,
 }
 
+pub struct AuthOutsideFeature {
+    pub service: AuthOutsideService,
+}
+
 impl CoreAppFeature {
-    pub async fn new(env: &'static CoreEnv) -> Self {
+    pub fn new(env: &'static CoreEnv) -> Self {
         Self {
-            auth: new_auth_outside_feature(env).await,
+            auth: AuthOutsideFeature {
+                service: AuthOutsideService {
+                    service_url: &env.auth_service_url,
+                },
+            },
         }
     }
 }

@@ -1,6 +1,6 @@
 pub mod id_generator;
 
-use crate::auth::x_outside_feature::auth::feature::AuthOutsideFeature;
+use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::ticket::{
     issue::init::id_generator::UuidAuthTicketIdGenerator,
@@ -19,7 +19,7 @@ pub struct IssueAuthTicketStruct<'a> {
 }
 
 impl<'a> IssueAuthTicketStruct<'a> {
-    pub fn new(feature: &'a AuthOutsideFeature) -> Self {
+    pub fn new(feature: &'a AuthAppFeature) -> Self {
         Self {
             clock: ChronoAuthClock::new(),
             ticket_repository: DynamoDbAuthTicketRepository::new(&feature.store),

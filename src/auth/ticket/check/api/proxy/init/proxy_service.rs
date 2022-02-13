@@ -4,9 +4,9 @@ use crate::auth::ticket::check::y_protobuf::service::{
     check_auth_ticket_pb_client::CheckAuthTicketPbClient, CheckAuthTicketRequestPb,
 };
 
-use crate::auth::x_outside_feature::proxy::feature::AuthOutsideFeature;
-
 use crate::auth::ticket::check::x_tonic::route::ServiceCheck;
+
+use crate::auth::x_outside_feature::feature::AuthProxyOutsideFeature;
 
 use crate::{
     auth::ticket::kernel::init::response_builder::CookieAuthTokenResponseBuilder,
@@ -36,7 +36,7 @@ pub struct ProxyService<'a> {
 }
 
 impl<'a> ProxyService<'a> {
-    pub fn new(feature: &'a AuthOutsideFeature, request_id: &'a str) -> Self {
+    pub fn new(feature: &'a AuthProxyOutsideFeature, request_id: &'a str) -> Self {
         Self {
             service_url: feature.service.service_url,
             request_id,

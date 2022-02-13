@@ -6,13 +6,12 @@ use crate::avail::unexpected_error::notify::y_protobuf::service::{
     notify_pb_server::NotifyPb, NotifyRequestPb, NotifyResponsePb,
 };
 
-use crate::x_outside_feature::{
-    common::helper::metadata_request_id,
-    core::{
-        feature::{extract_request, TonicRequest},
-        logger::app_logger,
-    },
+use crate::x_outside_feature::core::{
+    feature::{extract_request, TonicRequest},
+    logger::app_logger,
 };
+
+use crate::x_content::metadata::metadata_request_id;
 
 use crate::avail::unexpected_error::notify::init::NotifyUnexpectedErrorFeature;
 
