@@ -17,7 +17,7 @@ const docs_app: DocsAction = {
 }
 
 export const docs_core: DocsDomain = {
-    path: "docs",
+    path: "index",
     title: "ドキュメント",
     usecase: [
         {

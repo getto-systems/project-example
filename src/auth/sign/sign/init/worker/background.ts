@@ -53,11 +53,13 @@ function initForegroundMessageHandler(
     handler: Handler,
     errorHandler: Post<string>,
 ): Post<SignForegroundMessage> {
-    return (message) => {
+    return async (message): Promise<true> => {
         try {
-            handler.password.reset.requestToken(message.message)
+            await handler.password.reset.requestToken(message.message)
+            return true
         } catch (err) {
             errorHandler(`${err}`)
+            return true
         }
     }
 }

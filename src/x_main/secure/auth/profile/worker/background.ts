@@ -63,15 +63,15 @@ function initForegroundMessageHandler(
     handler: Handler,
     errorHandler: Post<string>,
 ): Post<ProfileForegroundMessage> {
-    return (message): true => {
+    return async (message): Promise<true> => {
         try {
             switch (message.type) {
                 case "password-change":
-                    handler.password.change(message.message)
+                    await handler.password.change(message.message)
                     return true
 
                 case "password-reset-requestToken":
-                    handler.password.reset.requestToken(message.message)
+                    await handler.password.reset.requestToken(message.message)
                     return true
             }
         } catch (err) {
