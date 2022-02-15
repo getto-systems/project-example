@@ -1,17 +1,17 @@
 use base64::{encode_config, STANDARD};
-use digest::Digest;
-use rsa::{errors::Error as RsaError, Hash, PaddingScheme, RSAPrivateKey};
+use digest::{Digest, Update};
+use rsa::{errors::Error as RsaError, Hash, PaddingScheme, RsaPrivateKey};
 use serde_json::{to_string, Error as SerdeJsonError};
 use sha1::Sha1;
 
 use crate::data::{Policy, SignedContent};
 
 pub struct Key {
-    private_key: RSAPrivateKey,
+    private_key: RsaPrivateKey,
 }
 
 impl Key {
-    pub fn new(private_key: RSAPrivateKey) -> Self {
+    pub fn new(private_key: RsaPrivateKey) -> Self {
         Self { private_key }
     }
 
