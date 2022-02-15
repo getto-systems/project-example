@@ -53,10 +53,10 @@ async fn call<'a>(
 ) -> Result<AuthProxyResponse, AuthProxyError> {
     let mut client = LogoutPbClient::new(
         new_endpoint(service.service_url)
-            .map_err(infra_error)?
+            .map_err(|err| infra_error("service endpoint error", err))?
             .connect()
             .await
-            .map_err(infra_error)?,
+            .map_err(|err| infra_error("connect error", err))?,
     );
 
     let mut request = Request::new(LogoutRequestPb {});
@@ -67,7 +67,7 @@ async fn call<'a>(
         metadata,
     )
     .await
-    .map_err(infra_error)?;
+    .map_err(|err| infra_error("metadata error", err))?;
 
     let response = client
         .logout(request)

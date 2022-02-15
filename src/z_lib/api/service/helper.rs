@@ -1,11 +1,7 @@
 use tonic::transport::{Channel, ClientTlsConfig, Endpoint};
 use url::Url;
 
-use crate::z_lib::service::data::{ServiceAuthorizeError, ServiceEndpointError};
-
-pub fn infra_error(err: impl std::fmt::Display) -> ServiceAuthorizeError {
-    ServiceAuthorizeError::InfraError(format!("service infra error; {}", err))
-}
+use crate::z_lib::service::data::ServiceEndpointError;
 
 pub fn new_endpoint(service_url: &'static str) -> Result<Endpoint, ServiceEndpointError> {
     let url = Url::parse(service_url).map_err(ServiceEndpointError::ParseError)?;

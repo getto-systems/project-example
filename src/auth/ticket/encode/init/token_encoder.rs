@@ -79,7 +79,7 @@ fn encode_jwt<'a>(config: JwtConfig<'a>) -> Result<AuthTokenExtract, EncodeAuthT
     } = config;
 
     let token = encode(&Header::new(Algorithm::ES384), &claims, key)
-        .map_err(|err| EncodeAuthTokenError::InfraError(format!("{}", err)))?;
+        .map_err(|err| EncodeAuthTokenError::InfraError(format!("encode jwt error; {}", err)))?;
 
     Ok(AuthTokenExtract { token, expires })
 }

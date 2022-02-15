@@ -73,10 +73,10 @@ async fn call<'a>(
 ) -> Result<AuthResponse, AuthProxyError> {
     let mut client = ResetPasswordPbClient::new(
         new_endpoint(service.service_url)
-            .map_err(infra_error)?
+            .map_err(|err| infra_error("service endpoint error", err))?
             .connect()
             .await
-            .map_err(infra_error)?,
+            .map_err(|err| infra_error("connect error", err))?,
     );
 
     let mut request =
@@ -88,7 +88,7 @@ async fn call<'a>(
         metadata,
     )
     .await
-    .map_err(infra_error)?;
+    .map_err(|err| infra_error("metadata error", err))?;
 
     let response = client
         .reset(request)

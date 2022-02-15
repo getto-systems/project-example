@@ -51,10 +51,10 @@ async fn validate<'a>(
 ) -> Result<(), AuthProxyError> {
     let mut client = ValidateApiTokenPbClient::new(
         new_endpoint(service.service_url)
-            .map_err(infra_error)?
+            .map_err(|err| infra_error("service endpoint error", err))?
             .connect()
             .await
-            .map_err(infra_error)?,
+            .map_err(|err| infra_error("connect error", err))?,
     );
 
     let request: ValidateApiTokenRequestPb = require_roles.into();
@@ -66,7 +66,7 @@ async fn validate<'a>(
         metadata,
     )
     .await
-    .map_err(infra_error)?;
+    .map_err(|err| infra_error("metadata error", err))?;
 
     client
         .validate(request)
