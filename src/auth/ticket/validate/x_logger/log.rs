@@ -16,6 +16,7 @@ impl LogFilter for ValidateApiTokenState {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::Validate(event) => event.log_level(),
+            Self::PermissionError(err) => err.log_level(),
             Self::Success(_) => LogLevel::Info,
         }
     }
@@ -29,7 +30,6 @@ impl LogFilter for ValidateAuthTokenEvent {
             Self::TokenNotSent => LogLevel::Info,
             Self::MetadataError(err) => err.log_level(),
             Self::DecodeError(err) => err.log_level(),
-            Self::PermissionError(err) => err.log_level(),
         }
     }
 }

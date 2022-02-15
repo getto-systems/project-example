@@ -32,7 +32,9 @@ impl ServiceResponder<AuthenticatePasswordResponsePb> for AuthenticatePasswordSt
 impl ServiceResponder<AuthenticatePasswordResponsePb> for EncodeAuthTicketEvent {
     fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
         match self {
-            Self::TokenExpiresCalculated(_) => Err(Status::cancelled("token expires calculated")),
+            Self::TokenExpiresCalculated(_) => {
+                Err(Status::cancelled("cancelled at token expires calculated"))
+            }
             Self::Success(response) => response.respond_to(),
             Self::TicketNotFound => Err(Status::unauthenticated("ticket not found")),
             Self::RepositoryError(err) => err.respond_to(),
@@ -71,7 +73,7 @@ impl ServiceResponder<AuthenticatePasswordResponsePb> for AuthTicketEncoded {
 impl ServiceResponder<AuthenticatePasswordResponsePb> for AuthenticatePasswordEvent {
     fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
         match self {
-            Self::Success(_) => Err(Status::cancelled("authenticate password cancelled")),
+            Self::Success(_) => Err(Status::cancelled("cancelled at authenticate password")),
             Self::InvalidPassword(err) => err.respond_to(),
             Self::PasswordHashError(err) => err.respond_to(),
             Self::RepositoryError(err) => err.respond_to(),

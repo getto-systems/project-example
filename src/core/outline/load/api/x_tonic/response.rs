@@ -11,7 +11,7 @@ use crate::core::outline::load::data::OutlineMenuBadge;
 impl ServiceResponder<LoadMenuBadgeResponsePb> for LoadOutlineMenuBadgeState {
     fn respond_to(self) -> Result<Response<LoadMenuBadgeResponsePb>, Status> {
         match self {
-            Self::CheckPermission(_) => Err(Status::unauthenticated("unauthenticated")),
+            Self::CheckPermission(event) => event.respond_to(),
             Self::LoadMenuBadge(event) => event.respond_to(),
         }
     }

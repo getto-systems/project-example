@@ -22,8 +22,12 @@ impl ServiceResponder<RequestResetTokenResponsePb> for RequestResetTokenState {
 impl ServiceResponder<RequestResetTokenResponsePb> for RequestResetTokenEvent {
     fn respond_to(self) -> Result<Response<RequestResetTokenResponsePb>, Status> {
         match self {
-            Self::TokenExpiresCalculated(_) => cancelled(),
-            Self::TokenNotified(_) => cancelled(),
+            Self::TokenExpiresCalculated(_) => Err(Status::cancelled(
+                "cancelled at request reset token cancelled",
+            )),
+            Self::TokenNotified(_) => Err(Status::cancelled(
+                "cancelled at request reset token notified",
+            )),
             Self::Success => Ok(Response::new(RequestResetTokenResponsePb { success: true })),
             Self::InvalidRequest(err) => err.respond_to(),
             Self::RepositoryError(err) => err.respond_to(),
@@ -31,10 +35,6 @@ impl ServiceResponder<RequestResetTokenResponsePb> for RequestResetTokenEvent {
             Self::NotifyError(err) => err.respond_to(),
         }
     }
-}
-
-fn cancelled<T>() -> Result<Response<T>, Status> {
-    Err(Status::cancelled("request reset token cancelled"))
 }
 
 impl ServiceResponder<RequestResetTokenResponsePb> for RequestResetTokenError {

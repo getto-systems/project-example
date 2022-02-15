@@ -11,10 +11,7 @@ use crate::auth::ticket::{
 use crate::{
     auth::{
         proxy::data::AuthProxyError,
-        ticket::kernel::data::{
-            AuthTicket, DecodeAuthTokenError, ExpireDateTime, ExpireDuration,
-            ValidateAuthRolesError,
-        },
+        ticket::kernel::data::{AuthTicket, DecodeAuthTokenError, ExpireDateTime, ExpireDuration},
         user::kernel::data::RequireAuthRoles,
     },
     z_lib::{
@@ -29,7 +26,6 @@ pub enum ValidateAuthTokenEvent {
     TokenNotSent,
     MetadataError(MetadataError),
     DecodeError(DecodeAuthTokenError),
-    PermissionError(ValidateAuthRolesError),
 }
 
 mod validate_auth_token_event {
@@ -46,7 +42,6 @@ mod validate_auth_token_event {
                 Self::TokenNotSent => write!(f, "{}: token not sent", ERROR),
                 Self::MetadataError(err) => write!(f, "{}; {}", ERROR, err),
                 Self::DecodeError(err) => write!(f, "{}; {}", ERROR, err),
-                Self::PermissionError(err) => write!(f, "{}; {}", ERROR, err),
             }
         }
     }
@@ -64,7 +59,6 @@ pub trait ValidateAuthTokenInfra {
 
 pub async fn validate_auth_token<S>(
     infra: &impl ValidateAuthTokenInfra,
-    require_roles: RequireAuthRoles,
     post: impl Fn(ValidateAuthTokenEvent) -> S,
 ) -> Result<AuthTicket, S> {
     validate_auth_nonce(infra.validate_nonce(), |event| {
@@ -75,9 +69,9 @@ pub async fn validate_auth_token<S>(
     let ticket = decode_ticket(infra).map_err(|event| post(event))?;
 
     // TODO check permission は別に分けたい
-    let ticket = ticket
-        .check_enough_permission(require_roles)
-        .map_err(|err| post(ValidateAuthTokenEvent::PermissionError(err)))?;
+    // let ticket = ticket
+    //     .check_enough_permission(require_roles)
+    //     .map_err(|err| post(ValidateAuthTokenEvent::PermissionError(err)))?;
 
     // 呼び出し側を簡単にするため、例外的に State ではなく AuthTicket を返す
     post(ValidateAuthTokenEvent::Success(ticket.clone()));

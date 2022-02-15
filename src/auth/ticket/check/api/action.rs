@@ -5,8 +5,6 @@ use crate::auth::ticket::{
     validate::method::{validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra},
 };
 
-use crate::auth::user::kernel::data::RequireAuthRoles;
-
 pub enum CheckAuthTicketState {
     Validate(ValidateAuthTokenEvent),
     Encode(EncodeAuthTicketEvent),
@@ -50,7 +48,7 @@ impl<M: CheckAuthTicketMaterial> CheckAuthTicketAction<M> {
         let pubsub = self.pubsub;
         let m = self.material;
 
-        let ticket = validate_auth_token(m.validate(), RequireAuthRoles::Nothing, |event| {
+        let ticket = validate_auth_token(m.validate(), |event| {
             pubsub.post(CheckAuthTicketState::Validate(event))
         })
         .await?;

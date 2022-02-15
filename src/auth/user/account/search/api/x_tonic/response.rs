@@ -14,7 +14,8 @@ use crate::auth::user::account::search::data::SearchAuthUserAccountBasket;
 impl ServiceResponder<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountState {
     fn respond_to(self) -> Result<Response<SearchAuthUserAccountResponsePb>, Status> {
         match self {
-            Self::Validate(_) => Err(Status::permission_denied("permission denied")),
+            Self::Validate(event) => event.respond_to(),
+            Self::PermissionError(err) => err.respond_to(),
             Self::Search(event) => event.respond_to(),
         }
     }
