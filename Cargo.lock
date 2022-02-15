@@ -325,7 +325,6 @@ version = "0.47.0-proxy"
 dependencies = [
  "base64",
  "digest 0.10.2",
- "pem",
  "rsa",
  "serde",
  "serde_json",
