@@ -70,7 +70,7 @@ async fn issue<'a>(
         .client
         .put_item(input)
         .await
-        .map_err(infra_error)?;
+        .map_err(|err| infra_error("issue ticket error", err))?;
 
     Ok(())
 }
@@ -98,7 +98,7 @@ async fn discard<'a>(
         .client
         .delete_item(input)
         .await
-        .map_err(infra_error)?;
+        .map_err(|err| infra_error("discard ticket error", err))?;
 
     Ok(())
 }
@@ -130,7 +130,7 @@ async fn find_expansion_limit<'a>(
         .client
         .get_item(input)
         .await
-        .map_err(infra_error)?;
+        .map_err(|err| infra_error("find ticket error", err))?;
 
     let found = response
         .item
