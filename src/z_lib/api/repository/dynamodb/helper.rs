@@ -9,6 +9,12 @@ pub fn string_value(value: String) -> AttributeValue {
         ..Default::default()
     }
 }
+pub fn bool_value(value: bool) -> AttributeValue {
+    AttributeValue {
+        bool: Some(value),
+        ..Default::default()
+    }
+}
 pub fn timestamp_value(value: DateTime<Utc>) -> AttributeValue {
     AttributeValue {
         n: Some(value.timestamp().to_string()),
