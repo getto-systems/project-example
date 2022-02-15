@@ -84,7 +84,8 @@ async fn error_allow_for_something_role_but_not_granted() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate error; user permission denied; granted: [], require: any [something]",
+        "validate success; ticket: ticket-id / user: no-role-user-id (granted: [])",
+        "user permission denied; granted: [], require: any [something]",
     ]);
     assert!(!result.is_ok());
 }
