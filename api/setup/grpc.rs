@@ -79,7 +79,7 @@ fn dist(path: &PathBuf) -> Option<PathBuf> {
         (Some(parent), Some(name)) => {
             let mut dist = path.clone();
             dist.pop();
-            if parent.ends_with("z_protobuf") {
+            if parent.ends_with("x_protobuf") {
                 dist.pop();
                 dist.push("y_protobuf");
             }
@@ -95,7 +95,7 @@ fn package(path: &PathBuf) -> Option<String> {
         (Some(parent), Some(name)) => {
             let mut package = path.clone();
             package.pop();
-            if parent.ends_with("z_protobuf") {
+            if parent.ends_with("x_protobuf") {
                 package.pop();
             }
             package.push(name);

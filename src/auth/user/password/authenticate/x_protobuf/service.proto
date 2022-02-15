@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package auth.user.password.authenticate.service;
 
-import "auth/user/z_protobuf/service.proto";
-import "auth/ticket/z_protobuf/service.proto";
+import "auth/user/x_protobuf/service.proto";
+import "auth/ticket/x_protobuf/service.proto";
 
 service AuthenticatePasswordPb {
     rpc Authenticate (AuthenticatePasswordRequestPb) returns (AuthenticatePasswordResponsePb);

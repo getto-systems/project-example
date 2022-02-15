@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package auth.user.account.search.service;
 
-import "auth/user/account/z_protobuf/service.proto";
+import "auth/user/account/x_protobuf/service.proto";
 
 service SearchAuthUserAccountPb {
     rpc Search (SearchAuthUserAccountRequestPb) returns (SearchAuthUserAccountResponsePb);

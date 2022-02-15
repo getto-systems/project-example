@@ -13,6 +13,6 @@ fn main() {
 fn code_build_required() -> bool {
     match var("RUN_CODE_BUILDER") {
         Ok(build) => build == "TRUE".to_string(),
-        Err(_) => false,
+        Err(_) => true,
     }
 }
