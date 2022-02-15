@@ -22,7 +22,7 @@ migrate_main() {
 
     $cloudsql_proxy -instances=${SQL_INSTANCE}=tcp:0.0.0.0:3306 -credential_file=${SQL_CREDENTIAL} &
 
-    npx prisma migrate deploy --schema=src/auth/z_prisma/schema.prisma
+    npx prisma migrate deploy --schema=src/auth/x_prisma/schema.prisma
 }
 
 migrate_main $@
