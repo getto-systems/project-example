@@ -5,4 +5,4 @@ authors = ["shun <shun.fix9@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-pretty_assertions = "0.7"
+pretty_assertions = "1"

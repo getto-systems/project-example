@@ -1,5 +1,7 @@
-use pem::{parse, PemError};
-use rsa::{errors::Error as RsaError, RSAPrivateKey};
+use rsa::{
+    pkcs1::{Error as Pkcs1Error, FromRsaPrivateKey},
+    RsaPrivateKey,
+};
 
 use crate::{
     data::{Condition, ConditionDateLessThan, Policy, Statement},
@@ -7,11 +9,9 @@ use crate::{
 };
 
 impl Key {
-    pub fn from_pem(private_key_pem: impl AsRef<[u8]>) -> Result<Self, KeyParseError> {
-        let pem = parse(private_key_pem).map_err(KeyParseError::PemError)?;
-
+    pub fn from_pem(private_key_pem: &str) -> Result<Self, KeyParseError> {
         let private_key =
-            RSAPrivateKey::from_pkcs1(pem.contents.as_ref()).map_err(KeyParseError::KeyError)?;
+            RsaPrivateKey::from_pkcs1_pem(private_key_pem).map_err(KeyParseError::KeyError)?;
 
         Ok(Self::new(private_key))
     }
@@ -19,15 +19,13 @@ impl Key {
 
 #[derive(Debug)]
 pub enum KeyParseError {
-    PemError(PemError),
-    KeyError(RsaError),
+    KeyError(Pkcs1Error),
 }
 
 impl std::fmt::Display for KeyParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::PemError(err) => write!(f, "{}", err),
-            Self::KeyError(err) => write!(f, "{}", err),
+            Self::KeyError(err) => err.fmt(f),
         }
     }
 }
