@@ -62,13 +62,15 @@ async fn call<'a>(
 ) -> Result<AuthProxyResponse, AuthProxyError> {
     let mut client = NotifyPbClient::new(
         new_endpoint(service.service_url)
-            .map_err(infra_error)?
+            .map_err(|err| infra_error("service endpoint error", err))?
             .connect()
             .await
-            .map_err(infra_error)?,
+            .map_err(|err| infra_error("connect error", err))?,
     );
 
-    let mut request = Request::new(decode_request(service.body).map_err(infra_error)?);
+    let mut request = Request::new(
+        decode_request(service.body).map_err(|err| infra_error("decode request error", err))?,
+    );
     set_metadata(
         &mut request,
         service.request_id,
@@ -76,7 +78,7 @@ async fn call<'a>(
         metadata,
     )
     .await
-    .map_err(infra_error)?;
+    .map_err(|err| infra_error("metadata error", err))?;
 
     let response = client
         .notify(request)
@@ -84,7 +86,8 @@ async fn call<'a>(
         .map_err(AuthProxyError::from)?
         .into_inner();
     Ok(AuthProxyResponse::new(
-        encode_protobuf_base64(response).map_err(infra_error)?,
+        encode_protobuf_base64(response)
+            .map_err(|err| infra_error("decode response error", err))?,
     ))
 }
 

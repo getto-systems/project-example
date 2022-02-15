@@ -53,10 +53,10 @@ async fn call<'a>(
 ) -> Result<AuthProxyResponse, AuthProxyError> {
     let mut client = LoadMenuBadgePbClient::new(
         new_endpoint(service.service_url)
-            .map_err(infra_error)?
+            .map_err(|err| infra_error("service endpoint error", err))?
             .connect()
             .await
-            .map_err(infra_error)?,
+            .map_err(|err| infra_error("connect error", err))?,
     );
 
     let mut request = Request::new(LoadMenuBadgeRequestPb {});
@@ -67,7 +67,7 @@ async fn call<'a>(
         metadata,
     )
     .await
-    .map_err(infra_error)?;
+    .map_err(|err| infra_error("metadata error", err))?;
 
     Ok(AuthProxyResponse::new(
         encode_protobuf_base64(
@@ -77,6 +77,6 @@ async fn call<'a>(
                 .map_err(AuthProxyError::from)?
                 .into_inner(),
         )
-        .map_err(infra_error)?,
+        .map_err(|err| infra_error("decode response error", err))?,
     ))
 }

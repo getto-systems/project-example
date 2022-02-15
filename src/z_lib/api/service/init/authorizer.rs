@@ -5,7 +5,6 @@ use reqwest::{Client, Url};
 
 use crate::z_lib::service::{
     data::{ServiceAuthorizeError, ServiceAuthorizeToken},
-    helper::infra_error,
     infra::ServiceAuthorizer,
 };
 
@@ -28,7 +27,8 @@ impl TokenStore {
 #[async_trait::async_trait]
 impl ServiceAuthorizer for GoogleServiceAuthorizer {
     async fn fetch_token(&self) -> Result<Option<ServiceAuthorizeToken>, ServiceAuthorizeError> {
-        let url = Url::parse(self.service_url).map_err(infra_error)?;
+        let url = Url::parse(self.service_url)
+            .map_err(|err| infra_error("service url parse error", err))?;
         if url.scheme() == "https" {
             Ok(Some(self.refresh().await?))
         } else {
@@ -69,13 +69,23 @@ impl GoogleServiceAuthorizer {
     }
 
     async fn request_token(&self) -> Result<ServiceAuthorizeToken, ServiceAuthorizeError> {
-        let mut request_url = Url::parse("http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity").map_err(infra_error)?;
+        let mut request_url = Url::parse("http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity").map_err(|err| infra_error("request url parse error", err))?;
         request_url.set_query(Some(&format!("audience={}", self.service_url)));
         let request = Client::new()
             .get(request_url)
             .header("Metadata-Flavor", "Google");
-        let response = request.send().await.map_err(infra_error)?;
-        let token = response.text().await.map_err(infra_error)?;
+        let response = request
+            .send()
+            .await
+            .map_err(|err| infra_error("request token error", err))?;
+        let token = response
+            .text()
+            .await
+            .map_err(|err| infra_error("response parse error", err))?;
         Ok(ServiceAuthorizeToken::restore(token))
     }
+}
+
+fn infra_error(label: &'static str, err: impl std::fmt::Display) -> ServiceAuthorizeError {
+    ServiceAuthorizeError::InfraError(format!("service infra error; {}; {}", label, err))
 }

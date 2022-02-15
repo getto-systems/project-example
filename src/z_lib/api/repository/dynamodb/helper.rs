@@ -1,10 +1,7 @@
 use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
-use rusoto_core::RusotoError;
 use rusoto_dynamodb::AttributeValue;
-
-use crate::z_lib::repository::data::RepositoryError;
 
 pub fn string_value(value: String) -> AttributeValue {
     AttributeValue {
@@ -17,10 +14,6 @@ pub fn timestamp_value(value: DateTime<Utc>) -> AttributeValue {
         n: Some(value.timestamp().to_string()),
         ..Default::default()
     }
-}
-
-pub fn dynamodb_error<E: 'static + std::error::Error>(err: RusotoError<E>) -> RepositoryError {
-    RepositoryError::InfraError(format!("{}", err))
 }
 
 pub enum ScanKey {
