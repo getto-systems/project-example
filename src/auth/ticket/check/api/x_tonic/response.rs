@@ -9,9 +9,7 @@ use crate::auth::ticket::{
 
 use super::super::action::CheckAuthTicketState;
 
-use crate::auth::ticket::{
-    encode::method::EncodeAuthTicketEvent, validate::method::ValidateAuthTokenEvent,
-};
+use crate::auth::ticket::encode::method::EncodeAuthTicketEvent;
 
 use crate::auth::ticket::encode::data::AuthTicketEncoded;
 
@@ -45,24 +43,11 @@ impl CheckAuthTicketResponsePb {
 impl ServiceResponder<CheckAuthTicketResponsePb> for EncodeAuthTicketEvent {
     fn respond_to(self) -> Result<Response<CheckAuthTicketResponsePb>, Status> {
         match self {
-            Self::TokenExpiresCalculated(_) => Err(Status::cancelled("token expires calculated")),
+            Self::TokenExpiresCalculated(_) => Err(Status::cancelled("cancelled at token expires calculated")),
             Self::Success(response) => response.respond_to(),
             Self::TicketNotFound => Err(Status::unauthenticated("ticket not found")),
             Self::RepositoryError(err) => err.respond_to(),
             Self::EncodeError(err) => err.respond_to(),
-        }
-    }
-}
-
-impl ServiceResponder<CheckAuthTicketResponsePb> for ValidateAuthTokenEvent {
-    fn respond_to(self) -> Result<Response<CheckAuthTicketResponsePb>, Status> {
-        match self {
-            Self::ValidateNonce(_) => Err(Status::cancelled("check auth ticket cancelled")),
-            Self::Success(_) => Err(Status::cancelled("check auth ticket succeeded")),
-            Self::TokenNotSent => Err(Status::unauthenticated(format!("{}", self))),
-            Self::MetadataError(err) => err.respond_to(),
-            Self::DecodeError(err) => err.respond_to(),
-            Self::PermissionError(err) => err.respond_to(),
         }
     }
 }

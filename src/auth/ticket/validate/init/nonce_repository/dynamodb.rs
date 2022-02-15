@@ -61,11 +61,10 @@ async fn put_nonce<'a>(
     match repository.client.put_item(input).await {
         Ok(_) => Ok(RegisterResult::Success(())),
         Err(err) => match err {
-            RusotoError::Service(err) => match err {
-                PutItemError::ConditionalCheckFailed(_) => Ok(RegisterResult::Conflict),
-                _ => Err(infra_error(err)),
-            },
-            _ => Err(infra_error(err)),
+            RusotoError::Service(PutItemError::ConditionalCheckFailed(_)) => {
+                Ok(RegisterResult::Conflict)
+            }
+            _ => Err(infra_error("put nonce error", err)),
         },
     }
 }

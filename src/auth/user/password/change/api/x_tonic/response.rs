@@ -11,7 +11,7 @@ use super::super::data::ChangePasswordError;
 impl ServiceResponder<ChangePasswordResponsePb> for ChangePasswordState {
     fn respond_to(self) -> Result<Response<ChangePasswordResponsePb>, Status> {
         match self {
-            Self::Validate(_) => Err(Status::permission_denied("permission denied")),
+            Self::Validate(event) => event.respond_to(),
             Self::Change(event) => event.respond_to(),
         }
     }

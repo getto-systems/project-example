@@ -34,7 +34,9 @@ impl ServiceResponder<ResetPasswordResponsePb> for ResetPasswordState {
 impl ServiceResponder<ResetPasswordResponsePb> for EncodeAuthTicketEvent {
     fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
         match self {
-            Self::TokenExpiresCalculated(_) => Err(Status::cancelled("token expires calculated")),
+            Self::TokenExpiresCalculated(_) => {
+                Err(Status::cancelled("cancelled at token expires calculated"))
+            }
             Self::Success(response) => response.respond_to(),
             Self::TicketNotFound => Err(Status::unauthenticated("ticket not found")),
             Self::RepositoryError(err) => err.respond_to(),
@@ -57,8 +59,8 @@ impl ServiceResponder<ResetPasswordResponsePb> for AuthTicketEncoded {
 impl ServiceResponder<ResetPasswordResponsePb> for ResetPasswordEvent {
     fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
         match self {
-            Self::ResetNotified(_) => Err(Status::cancelled("reset password cancelled")),
-            Self::Success(_) => Err(Status::cancelled("reset password cancelled")),
+            Self::ResetNotified(_) => Err(Status::cancelled("cancelled at reset notified")),
+            Self::Success(_) => Err(Status::cancelled("cancelled at reset password")),
             Self::InvalidReset(err) => err.respond_to(),
             Self::ResetTokenNotFound => Err(Status::unauthenticated("reset token not found")),
             Self::UserNotFound => Err(Status::internal("user not found")),

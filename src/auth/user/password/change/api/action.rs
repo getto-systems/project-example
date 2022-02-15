@@ -14,12 +14,9 @@ use crate::auth::user::password::{
 use crate::{
     auth::{
         ticket::kernel::data::AuthTicket,
-        user::{
-            kernel::data::RequireAuthRoles,
-            password::{
-                change::data::{ChangePasswordError, ChangePasswordRepositoryError},
-                kernel::data::{PasswordHashError, ValidatePasswordError},
-            },
+        user::password::{
+            change::data::{ChangePasswordError, ChangePasswordRepositoryError},
+            kernel::data::{PasswordHashError, ValidatePasswordError},
         },
     },
     z_lib::repository::data::RepositoryError,
@@ -82,7 +79,7 @@ impl<R: ChangePasswordRequestDecoder, M: ChangePasswordMaterial> ChangePasswordA
 
         let fields = self.request_decoder.decode();
 
-        let ticket = validate_auth_token(m.validate(), RequireAuthRoles::Nothing, |event| {
+        let ticket = validate_auth_token(m.validate(), |event| {
             pubsub.post(ChangePasswordState::Validate(event))
         })
         .await?;

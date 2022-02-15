@@ -16,9 +16,7 @@ use crate::auth::user::{
         kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword},
         reset::{
             kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
-            request_token::infra::{
-                RegisterResetTokenRepository, ResetTokenDestinationRepository,
-            },
+            request_token::infra::{RegisterResetTokenRepository, ResetTokenDestinationRepository},
             reset::infra::ResetPasswordRepository,
         },
     },
@@ -461,7 +459,7 @@ fn register_reset_token<'store>(
         // もし衝突したら token generator の桁数を増やす
         if store.get_reset_entry(&reset_token).is_some() {
             return Err(RegisterResetTokenRepositoryError::RepositoryError(
-                infra_error("reset token conflict"),
+                infra_error("get reset entry error", "reset token conflict"),
             ));
         }
 
@@ -533,7 +531,10 @@ fn reset_password<'store, 'a>(
         let store = repository.store.lock().unwrap();
 
         let entry = store.get_reset_entry(&reset_token).ok_or(
-            ResetPasswordRepositoryError::RepositoryError(infra_error("reset token not found")),
+            ResetPasswordRepositoryError::RepositoryError(infra_error(
+                "get reset entry error",
+                "reset token not found",
+            )),
         )?;
 
         target_entry = entry.clone().discard(reset_at);

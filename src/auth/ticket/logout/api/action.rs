@@ -6,10 +6,7 @@ use crate::auth::ticket::validate::method::{
 
 use crate::auth::ticket::logout::infra::LogoutAuthTicketRepository;
 
-use crate::{
-    auth::{ticket::kernel::data::AuthTicket, user::kernel::data::RequireAuthRoles},
-    z_lib::repository::data::RepositoryError,
-};
+use crate::{auth::ticket::kernel::data::AuthTicket, z_lib::repository::data::RepositoryError};
 
 pub enum LogoutState {
     Validate(ValidateAuthTokenEvent),
@@ -54,7 +51,7 @@ impl<M: LogoutMaterial> LogoutAction<M> {
         let pubsub = self.pubsub;
         let m = self.material;
 
-        let ticket = validate_auth_token(m.validate(), RequireAuthRoles::Nothing, |event| {
+        let ticket = validate_auth_token(m.validate(), |event| {
             pubsub.post(LogoutState::Validate(event))
         })
         .await?;

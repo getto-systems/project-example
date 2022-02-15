@@ -92,14 +92,14 @@ async fn get_user<'client>(
     // login id が存在すればユーザーは登録されているとみなす
     if let None = get_login_id(repository, user_id.clone())
         .await
-        .map_err(infra_error)?
+        .map_err(|err| infra_error("get login id error", err))?
     {
         return Ok(None);
     }
 
     let roles = get_granted_roles(repository, user_id.clone())
         .await
-        .map_err(infra_error)?;
+        .map_err(|err| infra_error("get granted roles error", err))?;
 
     Ok(Some(
         AuthUserExtract {
@@ -127,12 +127,16 @@ async fn verify_password<'client, 'a>(
 ) -> Result<AuthUserId, VerifyPasswordRepositoryError> {
     let user_id = get_user_id(repository, login_id.clone())
         .await
-        .map_err(|err| VerifyPasswordRepositoryError::RepositoryError(infra_error(err)))?
+        .map_err(|err| {
+            VerifyPasswordRepositoryError::RepositoryError(infra_error("get user error", err))
+        })?
         .ok_or(VerifyPasswordRepositoryError::UserNotFound)?;
 
     let password = get_password(repository, user_id.clone())
         .await
-        .map_err(|err| VerifyPasswordRepositoryError::RepositoryError(infra_error(err)))?
+        .map_err(|err| {
+            VerifyPasswordRepositoryError::RepositoryError(infra_error("get password error", err))
+        })?
         .ok_or(VerifyPasswordRepositoryError::PasswordNotFound)?;
 
     let matched = matcher
@@ -165,7 +169,9 @@ async fn change_password<'client, 'a>(
 ) -> Result<(), ChangePasswordRepositoryError> {
     let password = get_password(repository, user_id.clone())
         .await
-        .map_err(|err| ChangePasswordRepositoryError::RepositoryError(infra_error(err)))?
+        .map_err(|err| {
+            ChangePasswordRepositoryError::RepositoryError(infra_error("get password error", err))
+        })?
         .ok_or(ChangePasswordRepositoryError::PasswordNotFound)?;
 
     let matched = matcher
@@ -182,7 +188,12 @@ async fn change_password<'client, 'a>(
 
     update_password(repository, user_id.clone(), password)
         .await
-        .map_err(|err| ChangePasswordRepositoryError::RepositoryError(infra_error(err)))
+        .map_err(|err| {
+            ChangePasswordRepositoryError::RepositoryError(infra_error(
+                "update password error",
+                err,
+            ))
+        })
 }
 
 #[async_trait::async_trait]
@@ -212,7 +223,7 @@ async fn get_destination<'client>(
         .client
         .get_item(input)
         .await
-        .map_err(infra_error)?;
+        .map_err(|err| infra_error("get destination error", err))?;
 
     Ok(response
         .item
@@ -252,7 +263,12 @@ async fn register_reset_token<'client>(
 ) -> Result<(), RegisterResetTokenRepositoryError> {
     let user_id = get_user_id(repository, login_id.clone())
         .await
-        .map_err(|err| RegisterResetTokenRepositoryError::RepositoryError(infra_error(err)))?
+        .map_err(|err| {
+            RegisterResetTokenRepositoryError::RepositoryError(infra_error(
+                "get user id error",
+                err,
+            ))
+        })?
         .ok_or(RegisterResetTokenRepositoryError::UserNotFound)?;
 
     let mut item = AttributeMap::new();
@@ -270,11 +286,12 @@ async fn register_reset_token<'client>(
         ..Default::default()
     };
 
-    repository
-        .client
-        .put_item(input)
-        .await
-        .map_err(|err| RegisterResetTokenRepositoryError::RepositoryError(infra_error(err)))?;
+    repository.client.put_item(input).await.map_err(|err| {
+        RegisterResetTokenRepositoryError::RepositoryError(infra_error(
+            "put reset token error",
+            err,
+        ))
+    })?;
     Ok(())
 }
 
@@ -313,7 +330,7 @@ async fn reset_token_entry<'client>(
         .client
         .get_item(input)
         .await
-        .map_err(infra_error)?;
+        .map_err(|err| infra_error("get reset token error", err))?;
 
     let found = response
         .item
@@ -368,11 +385,18 @@ async fn reset_password<'client, 'a>(
 
     update_reset_at(repository, reset_token.clone(), reset_at)
         .await
-        .map_err(|err| ResetPasswordRepositoryError::RepositoryError(infra_error(err)))?;
+        .map_err(|err| {
+            ResetPasswordRepositoryError::RepositoryError(infra_error("update reset error", err))
+        })?;
 
     let user_id = get_user_id_by_reset_token(repository, reset_token.clone())
         .await
-        .map_err(|err| ResetPasswordRepositoryError::RepositoryError(infra_error(err)))?
+        .map_err(|err| {
+            ResetPasswordRepositoryError::RepositoryError(infra_error(
+                "get user id by reset token error",
+                err,
+            ))
+        })?
         .ok_or(ResetPasswordRepositoryError::ResetTokenNotFound)?;
 
     let password = hasher
@@ -381,7 +405,9 @@ async fn reset_password<'client, 'a>(
 
     update_password(repository, user_id.clone(), password)
         .await
-        .map_err(|err| ResetPasswordRepositoryError::RepositoryError(infra_error(err)))?;
+        .map_err(|err| {
+            ResetPasswordRepositoryError::RepositoryError(infra_error("reset password error", err))
+        })?;
 
     Ok(user_id)
 }
@@ -570,8 +596,13 @@ async fn search_user_account<'client>(
 ) -> Result<SearchAuthUserAccountBasket, RepositoryError> {
     // 業務用アプリケーションなので、ユーザー数は 100を超えない
     // dynamodb から全てのデータを取得してフィルタ、ソートする
-    let mut users = scan_user(repository).await.map_err(infra_error)?;
-    let all: i32 = users.len().try_into().map_err(infra_error)?;
+    let mut users = scan_user(repository)
+        .await
+        .map_err(|err| infra_error("scan user error", err))?;
+    let all: i32 = users
+        .len()
+        .try_into()
+        .map_err(|err| infra_error("convert users length error", err))?;
 
     let (sort_col, sort_order) = fields
         .sort()
@@ -606,8 +637,16 @@ async fn search_user_account<'client>(
 
     let limit = 1000;
     let offset = SearchOffset { all, limit }.detect(fields.offset());
-    let mut users = users.split_off(offset.try_into().map_err(infra_error)?);
-    users.truncate(limit.try_into().map_err(infra_error)?);
+    let mut users = users.split_off(
+        offset
+            .try_into()
+            .map_err(|err| infra_error("convert offset error", err))?,
+    );
+    users.truncate(
+        limit
+            .try_into()
+            .map_err(|err| infra_error("convert limit error", err))?,
+    );
 
     Ok(SearchAuthUserAccountBasket {
         page: SearchPage { all, limit, offset },

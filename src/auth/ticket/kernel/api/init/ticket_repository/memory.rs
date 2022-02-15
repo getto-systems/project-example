@@ -68,7 +68,7 @@ impl<'a> IssueAuthTicketRepository for MemoryAuthTicketRepository<'a> {
         let mut store = self.store.lock().unwrap();
 
         if store.get(&ticket).is_some() {
-            return Err(infra_error("ticket id conflict"));
+            return Err(infra_error("issue ticket error", "ticket id conflict"));
         }
 
         // 実際のデータベースには user_id と registered_at も保存する必要がある

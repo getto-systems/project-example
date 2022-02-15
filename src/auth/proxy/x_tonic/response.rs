@@ -1,4 +1,6 @@
-use tonic::{Code, Status};
+use tonic::{Code, Response, Status};
+
+use crate::z_lib::response::tonic::ServiceResponder;
 
 use crate::auth::proxy::data::AuthProxyError;
 
@@ -10,6 +12,19 @@ impl From<Status> for AuthProxyError {
             Code::PermissionDenied => Self::PermissionDenied(status.message().into()),
             Code::Cancelled => Self::Cancelled(status.message().into()),
             _ => Self::InfraError(status.message().into()),
+        }
+    }
+}
+
+impl<T> ServiceResponder<T> for AuthProxyError {
+    fn respond_to(self) -> Result<Response<T>, Status> {
+        match self {
+            Self::AlreadyExists(message) => Err(Status::already_exists(message)),
+            Self::Unauthenticated(message) => Err(Status::unauthenticated(message)),
+            Self::PermissionDenied(message) => Err(Status::permission_denied(message)),
+            Self::Cancelled(message) => Err(Status::cancelled(message)),
+            Self::InfraError(message) => Err(Status::internal(message)),
+            Self::MessageError(err) => err.respond_to(),
         }
     }
 }
