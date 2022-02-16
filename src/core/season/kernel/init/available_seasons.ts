@@ -3,14 +3,10 @@ import { defaultSeason } from "./default_season"
 import { Clock } from "../../../../z_lib/ui/clock/infra"
 
 import { Season, seasonPeriods } from "../data"
+import { beginningOfSeason } from "../../../../x_content/season"
 
 export function availableSeasons(clock: Clock): readonly Season[] {
-    // サービス開始時点のつもり
-    const seasons: Season[] = [
-        { year: 2021, period: "summer" } as Season, // winter 始まりだったら summer を除く
-        { year: 2021, period: "winter" } as Season, // 動的にやろうとするとめんどくさいのでこうする
-    ]
-
+    const seasons: Season[] = Array.from(beginningOfSeason)
     const currentSeason = defaultSeason(clock)
 
     for (let year = seasons[0].year + 1; year <= currentSeason.year; year++) {
