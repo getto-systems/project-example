@@ -3,10 +3,10 @@ import { defaultSeason } from "./default_season"
 import { Clock } from "../../../../z_lib/ui/clock/infra"
 
 import { Season, seasonPeriods } from "../data"
-import { beginningOfSeason } from "../../../../x_content/season"
+import { beginningOfSystemSeason } from "../../../../x_content/season"
 
 export function availableSeasons(clock: Clock): readonly Season[] {
-    const seasons: Season[] = Array.from(beginningOfSeason)
+    const seasons: Season[] = Array.from(beginningOfSystemSeason)
     const currentSeason = defaultSeason(clock)
 
     for (let year = seasons[0].year + 1; year <= currentSeason.year; year++) {
