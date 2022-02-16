@@ -4,7 +4,7 @@ import { ticker } from "../../../../z_lib/ui/timer/helper"
 
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_lib/ui/clock/mock"
 import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/mock"
-import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/init/mock"
+import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 import {
     mockGetScriptPathShell,
     mockSecureServerURL,

@@ -1,6 +1,6 @@
-import { BoardValueStore, MultipleBoardValueStore } from "../infra"
+import { BoardValueStore, MultipleBoardValueStore, FileStore, SelectFileResult } from "./infra"
 
-import { BoardValue, emptyBoardValue } from "../../kernel/data"
+import { BoardValue, emptyBoardValue } from "../kernel/data"
 
 export function mockBoardValueStore(): BoardValueStore {
     let store: BoardValue = emptyBoardValue
@@ -19,5 +19,11 @@ export function mockMultipleBoardValueStore(): MultipleBoardValueStore {
         set: (value) => {
             store = value
         },
+    }
+}
+
+export function mockFileStore(result: SelectFileResult): FileStore {
+    return {
+        get: () => result,
     }
 }

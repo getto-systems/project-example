@@ -3,7 +3,7 @@ import { ticker } from "../../../../../z_lib/ui/timer/helper"
 import { toApplicationView } from "../../../../../z_vendor/getto-application/action/helper"
 
 import { markBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/mock"
-import { mockBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/init/mock"
+import { mockBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/test_helper"
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../../z_lib/ui/clock/mock"
 import { mockSecureServerURL } from "../../../../sign/get_script_path/init/mock"
 import { mockResetPasswordShell } from "./init/mock"

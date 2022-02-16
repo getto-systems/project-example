@@ -1,7 +1,7 @@
 import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
 
 import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/mock"
-import { mockMultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/init/mock"
+import { mockMultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 import { initMemoryDB } from "../../repository/init/memory"
 
 import { searchColumnsRepositoryConverter } from "./convert"
