@@ -8,9 +8,17 @@ import { FileStoreConnector } from "../infra"
 
 type Props = Readonly<{
     file: SelectFileAction
-}>
-export function SelectFileComponent({ file }: Props): VNode {
-    return html`<input ref=${useInputRef(file.connector)} type="file" onInput=${onInput} />`
+}> &
+    Partial<{
+        disabled: boolean
+    }>
+export function SelectFileComponent({ file, disabled }: Props): VNode {
+    return html`<input
+        ref=${useInputRef(file.connector)}
+        type="file"
+        onInput=${onInput}
+        disabled=${disabled}
+    />`
 
     function onInput() {
         file.publisher.post()
