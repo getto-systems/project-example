@@ -46,7 +46,7 @@ export function SetupSeasonComponent(props: Props): VNode {
                         return seasonBox({ season: load.season })
 
                     case "edit-season":
-                        return seasonForm({ seasons: load.availableSeasons })
+                        return seasonForm({ season: load.season, seasons: load.availableSeasons })
 
                     case "invalid-season":
                         return errorMessage({ err: ["シーズンの設定に失敗しました"] })
@@ -82,14 +82,15 @@ export function SetupSeasonComponent(props: Props): VNode {
         }
     }
 
-    type FormContent = Readonly<{ seasons: readonly Season[] }>
+    type FormContent = Readonly<{ season: Season; seasons: readonly Season[] }>
 
-    function seasonForm({ seasons }: FormContent): VNode {
+    function seasonForm({ season, seasons }: FormContent): VNode {
         return box({
             body: [
                 h(InputSeasonComponent, {
                     title: "シーズン",
                     field: props.setupSeason.season,
+                    selected: season,
                     seasons,
                 }),
             ],
