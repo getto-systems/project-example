@@ -1,6 +1,6 @@
 import { setupActionTestRunner } from "../../action/test_helper"
 
-import { mockBoardValueStore } from "../input/init/mock"
+import { mockBoardValueStore } from "../input/test_helper"
 import { markBoardValue } from "../kernel/mock"
 
 import { initObserveBoardFieldAction } from "./action"

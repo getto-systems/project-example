@@ -1,12 +1,11 @@
 import { setupActionTestRunner } from "../../action/test_helper"
 
-import { mockBoardValueStore } from "./test_helper"
-import { markBoardValue } from "../kernel/mock"
+import { mockFileStore } from "./test_helper"
 
-import { initInputBoardAction } from "./action"
+import { initSelectFileAction } from "./action"
 
-describe("InputBoard", () => {
-    test("get / set; store connected", async () => {
+describe("SelectFile", () => {
+    test("get; store connected", async () => {
         const { source_store, input, store, subscriber } = standard()
 
         input.connector.connect(source_store)
@@ -19,15 +18,14 @@ describe("InputBoard", () => {
         })
 
         await runner(async () => {
-            source_store.set(markBoardValue("value"))
             input.publisher.post()
         }).then((stack) => {
-            expect(stack).toEqual(["value"])
+            expect(stack).toEqual([{ found: true, file: "file" }])
         })
     })
 
-    test("get / set; store not connected", async () => {
-        const { source_store, input, store, subscriber } = standard()
+    test("get; store not connected", async () => {
+        const { input, store, subscriber } = standard()
 
         // store not connected
         //input.connector.connect(source_store)
@@ -40,10 +38,9 @@ describe("InputBoard", () => {
         })
 
         await runner(async () => {
-            source_store.set(markBoardValue("value"))
             input.publisher.post()
         }).then((stack) => {
-            expect(stack).toEqual([""])
+            expect(stack).toEqual([{ found: false }])
         })
     })
 
@@ -61,7 +58,6 @@ describe("InputBoard", () => {
 
         await runner(async () => {
             subscriber.terminate()
-            source_store.set(markBoardValue("value"))
             input.publisher.post()
         }).then((stack) => {
             expect(stack).toEqual([])
@@ -70,5 +66,8 @@ describe("InputBoard", () => {
 })
 
 function standard() {
-    return { source_store: mockBoardValueStore(), ...initInputBoardAction() }
+    return {
+        source_store: mockFileStore({ found: true, file: "file" as unknown as File }),
+        ...initSelectFileAction(),
+    }
 }

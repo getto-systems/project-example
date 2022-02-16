@@ -1,5 +1,5 @@
 import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/mock"
-import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/init/mock"
+import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 import { initSearchOffsetAction, SearchOffsetAction } from "./action"

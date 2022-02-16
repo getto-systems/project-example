@@ -42,6 +42,7 @@ impl ProxyResponder for AuthTokenResponse {
         let mut response = HttpResponse::Ok();
 
         // これらがエラーの時は web アプリケーションが動かなくなる
+        // TODO ログを出したい
         if let Ok(cookie) = auth_cookie(COOKIE_TICKET_TOKEN, &domain, ticket_token) {
             response.cookie(cookie);
         }

@@ -3,7 +3,7 @@ import { toApplicationView } from "../../../../../z_vendor/getto-application/act
 import { ticker } from "../../../../../z_lib/ui/timer/helper"
 
 import { markBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/mock"
-import { mockBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/init/mock"
+import { mockBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/test_helper"
 
 import { RequestResetTokenRemote, RequestResetTokenRemoteResult } from "./infra"
 import { BoardValueStore } from "../../../../../z_vendor/getto-application/board/input/infra"
