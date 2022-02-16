@@ -1,5 +1,5 @@
 import { VNode } from "preact"
-import { useLayoutEffect, useRef } from "preact/hooks"
+import { useEffect, useLayoutEffect, useRef } from "preact/hooks"
 import { html } from "htm/preact"
 
 import { readBoardValue } from "../../kernel/convert"
@@ -8,14 +8,15 @@ import { InputBoardAction } from "../action"
 
 import { BoardValueStoreConnector } from "../infra"
 
-import { emptyBoardValue } from "../../kernel/data"
+import { BoardValue, emptyBoardValue } from "../../kernel/data"
 
 type Props = Readonly<{
     input: InputBoardAction
+    selected: BoardValue
     options: readonly VNode[]
 }>
-export function SelectBoardComponent({ input, options }: Props): VNode {
-    return html`<select ref=${useInputRef(input.connector)} onInput=${onInput}>
+export function SelectBoardComponent({ input, selected, options }: Props): VNode {
+    return html`<select ref=${useInputRef(input.connector, selected)} onInput=${onInput}>
         ${options}
     </select>`
 
@@ -24,7 +25,7 @@ export function SelectBoardComponent({ input, options }: Props): VNode {
     }
 }
 
-function useInputRef(connector: BoardValueStoreConnector) {
+function useInputRef(connector: BoardValueStoreConnector, selected: BoardValue) {
     const REF = useRef<HTMLSelectElement>()
 
     useLayoutEffect(() => {
@@ -43,6 +44,12 @@ function useInputRef(connector: BoardValueStoreConnector) {
         })
         return () => connector.terminate()
     }, [connector])
+
+    useEffect(() => {
+        if (REF.current) {
+            REF.current.value = selected
+        }
+    }, [selected])
 
     return REF
 }
