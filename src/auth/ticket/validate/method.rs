@@ -68,11 +68,6 @@ pub async fn validate_auth_token<S>(
 
     let ticket = decode_ticket(infra).map_err(|event| post(event))?;
 
-    // TODO check permission は別に分けたい
-    // let ticket = ticket
-    //     .check_enough_permission(require_roles)
-    //     .map_err(|err| post(ValidateAuthTokenEvent::PermissionError(err)))?;
-
     // 呼び出し側を簡単にするため、例外的に State ではなく AuthTicket を返す
     post(ValidateAuthTokenEvent::Success(ticket.clone()));
     Ok(ticket)
