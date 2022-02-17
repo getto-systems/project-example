@@ -31,7 +31,7 @@ use crate::auth::{
 pub struct ProxyService<'a> {
     service_url: &'static str,
     request_id: &'a str,
-    authorizer: GoogleServiceAuthorizer,
+    authorizer: GoogleServiceAuthorizer<'a>,
     response_builder: CookieAuthTokenResponseBuilder<'a>,
 }
 
@@ -40,7 +40,7 @@ impl<'a> ProxyService<'a> {
         Self {
             service_url: feature.service.service_url,
             request_id,
-            authorizer: GoogleServiceAuthorizer::new(feature.service.service_url),
+            authorizer: GoogleServiceAuthorizer::new(&feature.service.google_authorizer),
             response_builder: CookieAuthTokenResponseBuilder::new(&feature.cookie),
         }
     }

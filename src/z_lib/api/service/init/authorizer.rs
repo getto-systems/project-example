@@ -3,14 +3,28 @@ use std::sync::Mutex;
 use chrono::{DateTime, Duration, Utc};
 use reqwest::{Client, Url};
 
-use crate::z_lib::service::{
-    data::{ServiceAuthorizeError, ServiceAuthorizeToken},
-    infra::ServiceAuthorizer,
-};
+use crate::z_lib::service::x_outside_feature::feature::GoogleServiceAuthorizerOutsideFeature;
 
-pub struct GoogleServiceAuthorizer {
+use crate::z_lib::service::infra::ServiceAuthorizer;
+
+use crate::z_lib::service::data::{ServiceAuthorizeError, ServiceAuthorizeToken};
+
+pub struct GoogleServiceAuthorizer<'a> {
     service_url: &'static str,
-    store: Mutex<Option<TokenStore>>,
+    store: &'a GoogleServiceAuthorizerStore,
+}
+
+pub type GoogleServiceAuthorizerStore = Mutex<GoogleServiceAuthorizerToken>;
+pub struct GoogleServiceAuthorizerToken(Option<TokenStore>);
+
+impl GoogleServiceAuthorizerToken {
+    pub const fn new() -> Self {
+        Self(None)
+    }
+
+    pub fn to_store(self) -> GoogleServiceAuthorizerStore {
+        Mutex::new(self)
+    }
 }
 
 struct TokenStore {
@@ -25,7 +39,7 @@ impl TokenStore {
 }
 
 #[async_trait::async_trait]
-impl ServiceAuthorizer for GoogleServiceAuthorizer {
+impl<'a> ServiceAuthorizer for GoogleServiceAuthorizer<'a> {
     async fn fetch_token(&self) -> Result<Option<ServiceAuthorizeToken>, ServiceAuthorizeError> {
         let url = Url::parse(self.service_url)
             .map_err(|err| infra_error("service url parse error", err))?;
@@ -37,11 +51,11 @@ impl ServiceAuthorizer for GoogleServiceAuthorizer {
     }
 }
 
-impl GoogleServiceAuthorizer {
-    pub fn new(service_url: &'static str) -> Self {
+impl<'a> GoogleServiceAuthorizer<'a> {
+    pub fn new(params: &'a GoogleServiceAuthorizerOutsideFeature) -> Self {
         Self {
-            service_url,
-            store: Mutex::new(None),
+            service_url: params.service_url,
+            store: &params.store,
         }
     }
 
@@ -50,7 +64,7 @@ impl GoogleServiceAuthorizer {
             let token = self.request_token().await?;
             {
                 let mut store = self.store.lock().unwrap();
-                store.replace(TokenStore {
+                store.0.replace(TokenStore {
                     token,
                     fetched_at: Utc::now(),
                 });
@@ -58,11 +72,11 @@ impl GoogleServiceAuthorizer {
         }
 
         let store = self.store.lock().unwrap();
-        Ok(store.as_ref().unwrap().token.clone())
+        Ok(store.0.as_ref().unwrap().token.clone())
     }
     fn refresh_required(&self) -> bool {
         let store = self.store.lock().unwrap();
-        match store.as_ref() {
+        match store.0.as_ref() {
             Some(token) => return token.has_expired(Utc::now()),
             None => return true,
         }

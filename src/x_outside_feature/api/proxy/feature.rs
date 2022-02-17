@@ -4,6 +4,7 @@ use crate::{
     },
     core::x_outside_feature::feature::CoreOutsideService,
     x_outside_feature::proxy::env::ProxyEnv,
+    z_lib::service::x_outside_feature::feature::GoogleServiceAuthorizerOutsideFeature,
 };
 
 use crate::z_lib::jwt::helper::decoding_key_from_ec_pem;
@@ -23,6 +24,9 @@ impl ProxyAppFeature {
             auth: AuthProxyOutsideFeature {
                 service: AuthOutsideService {
                     service_url: &env.auth_service_url,
+                    google_authorizer: GoogleServiceAuthorizerOutsideFeature::new(
+                        &env.auth_service_url,
+                    ),
                 },
                 decoding_key: AuthOutsideDecodingKey {
                     ticket: decoding_key_from_ec_pem(&env.ticket_public_key),
@@ -36,6 +40,9 @@ impl ProxyAppFeature {
             core: CoreOutsideFeature {
                 service: CoreOutsideService {
                     service_url: &env.core_service_url,
+                    google_authorizer: GoogleServiceAuthorizerOutsideFeature::new(
+                        &env.core_service_url,
+                    ),
                 },
             },
         }

@@ -4,7 +4,10 @@ use rusoto_ses::SesClient;
 
 use aws_cloudfront_cookie::CloudfrontKey;
 
-use crate::auth::ticket::kernel::data::{ExpansionLimitDuration, ExpireDuration};
+use crate::{
+    auth::ticket::kernel::data::{ExpansionLimitDuration, ExpireDuration},
+    z_lib::service::x_outside_feature::feature::GoogleServiceAuthorizerOutsideFeature,
+};
 
 pub struct AuthOutsideConfig {
     pub ticket_expires: ExpireDuration,
@@ -50,6 +53,7 @@ pub struct AuthProxyOutsideFeature {
 }
 pub struct AuthOutsideService {
     pub service_url: &'static str,
+    pub google_authorizer: GoogleServiceAuthorizerOutsideFeature,
 }
 pub struct AuthOutsideCookie {
     pub domain: &'static str,
