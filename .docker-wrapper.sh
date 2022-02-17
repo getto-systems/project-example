@@ -1,5 +1,5 @@
 DOCKER_WRAPPER_IMAGE_node(){ head -1 $APP_ROOT/.gitlab-ci.yml | sed "s/.*node:\(.*\)/\1/"; }
-DOCKER_WRAPPER_IMAGE_rust(){ echo "rust:1-buster"; }
+DOCKER_WRAPPER_IMAGE_rust(){ echo "rust:1-bullseye"; }
 DOCKER_WRAPPER_IMAGE_cloudsql(){ echo "gcr.io/cloudsql-docker/gce-proxy:1.23.0"; }
 DOCKER_WRAPPER_IMAGE_mysql(){ echo "8.0.25"; }
 
