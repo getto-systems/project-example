@@ -20,7 +20,7 @@ use crate::auth::{proxy::data::AuthProxyError, user::kernel::data::RequireAuthRo
 pub struct TonicValidateService<'a> {
     service_url: &'static str,
     request_id: &'a str,
-    authorizer: GoogleServiceAuthorizer,
+    authorizer: GoogleServiceAuthorizer<'a>,
 }
 
 impl<'a> TonicValidateService<'a> {
@@ -28,7 +28,7 @@ impl<'a> TonicValidateService<'a> {
         Self {
             service_url: service.service_url,
             request_id,
-            authorizer: GoogleServiceAuthorizer::new(service.service_url),
+            authorizer: GoogleServiceAuthorizer::new(&service.google_authorizer),
         }
     }
 }

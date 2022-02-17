@@ -11,8 +11,9 @@ use tonic::metadata::MetadataMap;
 
 use crate::auth::ticket::validate::y_protobuf::service::ValidateApiTokenRequestPb;
 
+use crate::auth::x_outside_feature::feature::AuthOutsideService;
 use crate::{
-    auth::x_outside_feature::feature::{AuthOutsideDecodingKey, AuthOutsideService},
+    auth::x_outside_feature::feature::AuthOutsideDecodingKey,
     x_outside_feature::auth::feature::AuthAppFeature,
 };
 
@@ -131,7 +132,7 @@ impl<'a> CheckPermissionStruct<'a> {
         Self {
             auth_metadata: TonicAuthMetadata::new(metadata),
             token_decoder: NoopTokenDecoder,
-            validate_service: TonicValidateService::new(&service, request_id),
+            validate_service: TonicValidateService::new(service, request_id),
         }
     }
 }

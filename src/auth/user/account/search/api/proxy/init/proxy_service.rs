@@ -30,7 +30,7 @@ use crate::{
 pub struct ProxyService<'a> {
     service_url: &'static str,
     request_id: &'a str,
-    authorizer: GoogleServiceAuthorizer,
+    authorizer: GoogleServiceAuthorizer<'a>,
     body: String,
 }
 
@@ -39,7 +39,7 @@ impl<'a> ProxyService<'a> {
         Self {
             service_url: service.service_url,
             request_id,
-            authorizer: GoogleServiceAuthorizer::new(service.service_url),
+            authorizer: GoogleServiceAuthorizer::new(&service.google_authorizer),
             body,
         }
     }
