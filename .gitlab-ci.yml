@@ -1,4 +1,4 @@
-image: node:16-buster
+image: node:16-bullseye
 
 stages:
   - test
@@ -78,7 +78,7 @@ test-api:
       - "src/**/*.rs"
       - "api/vendor/**/*.rs"
 
-  image: rust:1-buster
+  image: rust:1-bullseye
 
   variables:
     RUN_CODE_BUILDER: "TRUE"
@@ -96,7 +96,7 @@ bump_version-ui:
     variables:
       - $RELEASE_UI
 
-  image: buildpack-deps:buster-scm
+  image: buildpack-deps:bullseye-scm
 
   variables:
     BUMP_VERSION_SUFFIX: "-ui"
@@ -127,7 +127,7 @@ release-ui:
       - triggers
       - schedules
 
-  image: buildpack-deps:buster-scm
+  image: buildpack-deps:bullseye-scm
 
   variables:
     BUMP_VERSION_FILE: $UI_BUMP_VERSION_FILE
@@ -168,7 +168,7 @@ release_success-ui:
       - schedules
   when: on_success
 
-  image: buildpack-deps:buster-curl
+  image: buildpack-deps:bullseye-curl
 
   before_script:
     - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
@@ -190,7 +190,7 @@ release_failure-ui:
       - schedules
   when: on_failure
 
-  image: buildpack-deps:buster-curl
+  image: buildpack-deps:bullseye-curl
 
   before_script:
     - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
@@ -207,7 +207,7 @@ bump_version-proxy:
     variables:
       - $RELEASE_PROXY
 
-  image: buildpack-deps:buster-scm
+  image: buildpack-deps:bullseye-scm
 
   variables:
     BUMP_VERSION_SUFFIX: "-proxy"
@@ -238,7 +238,7 @@ release-proxy:
       - triggers
       - schedules
 
-  image: buildpack-deps:buster-scm
+  image: buildpack-deps:bullseye-scm
 
   variables:
     BUMP_VERSION_FILE: $PROXY_BUMP_VERSION_FILE
@@ -302,7 +302,7 @@ release_success-proxy:
       - schedules
   when: on_success
 
-  image: buildpack-deps:buster-curl
+  image: buildpack-deps:bullseye-curl
 
   before_script:
     - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
@@ -324,7 +324,7 @@ release_failure-proxy:
       - schedules
   when: on_failure
 
-  image: buildpack-deps:buster-curl
+  image: buildpack-deps:bullseye-curl
 
   before_script:
     - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
@@ -341,7 +341,7 @@ bump_version-auth:
     variables:
       - $RELEASE_AUTH
 
-  image: buildpack-deps:buster-scm
+  image: buildpack-deps:bullseye-scm
 
   variables:
     BUMP_VERSION_SUFFIX: "-auth"
@@ -372,7 +372,7 @@ release-auth:
       - triggers
       - schedules
 
-  image: buildpack-deps:buster-scm
+  image: buildpack-deps:bullseye-scm
 
   variables:
     BUMP_VERSION_FILE: $AUTH_BUMP_VERSION_FILE
@@ -436,7 +436,7 @@ release_success-auth:
       - schedules
   when: on_success
 
-  image: buildpack-deps:buster-curl
+  image: buildpack-deps:bullseye-curl
 
   before_script:
     - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
@@ -458,7 +458,7 @@ release_failure-auth:
       - schedules
   when: on_failure
 
-  image: buildpack-deps:buster-curl
+  image: buildpack-deps:bullseye-curl
 
   before_script:
     - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
@@ -475,7 +475,7 @@ bump_version-core:
     variables:
       - $RELEASE_CORE
 
-  image: buildpack-deps:buster-scm
+  image: buildpack-deps:bullseye-scm
 
   variables:
     BUMP_VERSION_SUFFIX: "-core"
@@ -506,7 +506,7 @@ release-example:
       - triggers
       - schedules
 
-  image: buildpack-deps:buster-scm
+  image: buildpack-deps:bullseye-scm
 
   variables:
     BUMP_VERSION_FILE: $CORE_BUMP_VERSION_FILE
@@ -570,7 +570,7 @@ release_success-example:
       - schedules
   when: on_success
 
-  image: buildpack-deps:buster-curl
+  image: buildpack-deps:bullseye-curl
 
   before_script:
     - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true
@@ -592,7 +592,7 @@ release_failure-example:
       - schedules
   when: on_failure
 
-  image: buildpack-deps:buster-curl
+  image: buildpack-deps:bullseye-curl
 
   before_script:
     - export url=$GETTO_PSYCHER_URL?$GETTO_PSYCHER_TOKEN=true

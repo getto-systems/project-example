@@ -1,4 +1,4 @@
-FROM rust:1-buster as builder
+FROM rust:1-bullseye as builder
 COPY . /build
 WORKDIR /build
 RUN : && \
