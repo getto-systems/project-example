@@ -1,0 +1,22 @@
+[
+    { "name": "index" },
+
+    { "name": "auth/ticket/logout" },
+    { "name": "auth/profile", "worker": true },
+    { "name": "auth/user/account" },
+
+    { "name": "season/setup" },
+
+    { "name": "docs/index" },
+    { "name": "docs/privacy-policy" },
+
+    { "name": "docs/auth/index" },
+    { "name": "docs/auth/ticket/logout" },
+    { "name": "docs/auth/ticket/check" },
+    { "name": "docs/auth/password/authenticate" },
+    { "name": "docs/auth/password/reset" },
+    { "name": "docs/auth/password/change" },
+
+    { "name": "docs/avail" },
+    { "name": "docs/docs" }
+]

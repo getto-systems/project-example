@@ -1,5 +1,6 @@
 /* eslint-disable */
 const path = require("path")
+const fs = require("fs")
 
 module.exports = {
     publicEntries,
@@ -8,35 +9,10 @@ module.exports = {
     secureHtmlFiles,
 }
 
+const main = "../../../src/x_main/";
 const entries = {
-    public: [
-        { name: "avail/version/move-to-latest" },
-        { name: "avail/version/move-to-next" },
-        { name: "avail/not-found" },
-        { name: "auth/sign", worker: true },
-    ],
-    secure: [
-        { name: "index" },
-
-        { name: "auth/ticket/logout" },
-        { name: "auth/profile", worker: true },
-        { name: "auth/user/account", /* TODO worker: true */ },
-
-        { name: "season/setup" },
-
-        { name: "docs/index" },
-        { name: "docs/privacy-policy" },
-
-        { name: "docs/auth/index" },
-        { name: "docs/auth/ticket/logout" },
-        { name: "docs/auth/ticket/check" },
-        { name: "docs/auth/password/authenticate" },
-        { name: "docs/auth/password/reset" },
-        { name: "docs/auth/password/change" },
-
-        { name: "docs/avail" },
-        { name: "docs/docs" },
-    ],
+    public: JSON.parse(fs.readFileSync(path.join(__dirname, main, "public/entry_point.json"))),
+    secure: JSON.parse(fs.readFileSync(path.join(__dirname, main, "secure/entry_point.json"))),
 }
 
 function publicEntries() {
