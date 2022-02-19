@@ -9,11 +9,10 @@ module.exports = {
     secureHtmlFiles,
 }
 
-const main_root = "../../../src/x_main/";
-
+const main = "../../../src/x_main/";
 const entries = {
-    public: JSON.parse(fs.readFileSync(path.join(__dirname, main_root, "public/entry_point.json"))),
-    secure: JSON.parse(fs.readFileSync(path.join(__dirname, main_root, "secure/entry_point.json"))),
+    public: JSON.parse(fs.readFileSync(path.join(__dirname, main, "public/entry_point.json"))),
+    secure: JSON.parse(fs.readFileSync(path.join(__dirname, main, "secure/entry_point.json"))),
 }
 
 function publicEntries() {
