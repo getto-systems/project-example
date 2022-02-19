@@ -1,0 +1,6 @@
+[
+    { "name": "avail/version/move-to-latest" },
+    { "name": "avail/version/move-to-next" },
+    { "name": "avail/not-found" },
+    { "name": "auth/sign", "worker": true }
+]

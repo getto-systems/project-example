@@ -11,6 +11,7 @@ import { newSearchAuthUserAccountInfra } from "../../search/init/infra"
 
 import { initSearchAuthUserAccountAction, SearchAuthUserAccountAction } from "../../search/action"
 
+// TODO worker 対応
 export function newManageUserAccountResource(
     feature: RemoteOutsideFeature &
         RepositoryOutsideFeature &
