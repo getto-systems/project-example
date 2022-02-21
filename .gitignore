@@ -2,7 +2,6 @@
 /tmp/
 
 /.secret/
-/.env
 
 /node_modules/
 /target/
@@ -13,9 +12,6 @@
 
 /ui/public/dist/css/*
 !/ui/public/dist/css/.keep
-
-/ui/public/dist/**/*.js
-/ui/secure/dist/**/*.js
 
 /src/**/y_*/*
 !/src/**/y_protobuf/mod.rs
