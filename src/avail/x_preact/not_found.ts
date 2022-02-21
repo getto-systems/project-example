@@ -5,7 +5,7 @@ import { env } from "../../y_environment/ui/env"
 
 import { loginBox } from "../../z_vendor/getto-css/preact/layout/login"
 import { buttons } from "../../z_vendor/getto-css/preact/design/form"
-import { lnir } from "../../z_lib/ui/icon/line_icon"
+import { lnir } from "../../z_lib/ui/icon/init/line_icon"
 
 import { useDocumentTitle } from "../../core/x_preact/hooks"
 import { siteInfo } from "../../x_content/site"

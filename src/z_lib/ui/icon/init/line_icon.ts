@@ -1,4 +1,4 @@
-import { Icon } from "./data"
+import { Icon } from "../data"
 
 export function lnir(name: readonly string[]): Icon {
     return { toString: () => lni("lni", name) } as Icon

@@ -5,7 +5,7 @@ import { v_small } from "../../z_vendor/getto-css/preact/design/alignment"
 import { buttons, field } from "../../z_vendor/getto-css/preact/design/form"
 import { loginBox } from "../../z_vendor/getto-css/preact/layout/login"
 
-import { lnil, lnir } from "../../z_lib/ui/icon/line_icon"
+import { lnil, lnir } from "../../z_lib/ui/icon/init/line_icon"
 
 import { env } from "../../y_environment/ui/env"
 

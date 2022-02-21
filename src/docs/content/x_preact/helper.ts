@@ -9,7 +9,7 @@ import {
     label_warning,
     notice_info,
 } from "../../../z_vendor/getto-css/preact/design/highlight"
-import { lnir } from "../../../z_lib/ui/icon/line_icon"
+import { lnir } from "../../../z_lib/ui/icon/init/line_icon"
 import { icon } from "../../../core/x_preact/design/icon"
 
 import {

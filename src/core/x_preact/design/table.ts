@@ -3,7 +3,7 @@ import { icon } from "./icon"
 
 import { PagerOptionsContent, SortSign } from "../../../z_vendor/getto-css/preact/design/data"
 import { SearchPageResponse } from "../../../z_lib/ui/search/data"
-import { lnir } from "../../../z_lib/ui/icon/line_icon"
+import { lnir } from "../../../z_lib/ui/icon/init/line_icon"
 
 export const siteSortSign: SortSign = {
     normal: icon(lnir(["angle-double-down"])),

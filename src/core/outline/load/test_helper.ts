@@ -29,7 +29,7 @@ function item(label: string, icon: Icon, path: string): MenuTreeNode {
 }
 
 function icon(icon: string): Icon {
-    return { toString: () => icon } as Icon
+    return icon as unknown as Icon
 }
 
 export function markMenuCategoryLabel(label: string): MenuCategoryLabel {

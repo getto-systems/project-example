@@ -7,7 +7,7 @@ import {
     mainBreadcrumbSeparator,
 } from "../../../../z_vendor/getto-css/preact/layout/app"
 import { linky } from "../../../../z_vendor/getto-css/preact/design/highlight"
-import { lnir } from "../../../../z_lib/ui/icon/line_icon"
+import { lnir } from "../../../../z_lib/ui/icon/init/line_icon"
 
 import { siteInfo } from "../../../../x_content/site"
 import { icon } from "../../../x_preact/design/icon"

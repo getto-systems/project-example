@@ -1,4 +1,4 @@
-import { lnir } from "../../z_lib/ui/icon/line_icon"
+import { lnir } from "../../z_lib/ui/icon/init/line_icon"
 import { category, item } from "./common"
 
 import { MenuContent, MenuPermission } from "../../core/outline/load/infra"
