@@ -14,8 +14,8 @@
 /ui/public/dist/css/*
 !/ui/public/dist/css/.keep
 
-/public/dist/**/*.js
-/secure/dist/**/*.js
+/ui/public/dist/**/*.js
+/ui/secure/dist/**/*.js
 
 /src/**/y_*/*
 !/src/**/y_protobuf/mod.rs
