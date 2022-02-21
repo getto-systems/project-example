@@ -15,8 +15,8 @@ export function homeMenuContent(): MenuContent {
                 item("ホーム", home, "index.html"),
                 item("ドキュメント", lnir(["files-alt"]), "docs/index.html"),
             ]),
-            category("ACCOUNT", user, [item("ユーザー", lnir(["friends"]), "auth/user/account.html")]),
             category("シーズン", allow, [item("設定", lnir(["cog"]), "season/setup.html")]),
+            category("ACCOUNT", user, [item("ユーザー", lnir(["friends"]), "auth/user/account.html")]),
             category("SYSTEM", allow, [
                 item("プロフィール", lnir(["user"]), "auth/profile.html"),
                 item("ログアウト", lnir(["exit"]), "auth/ticket/logout.html"),
