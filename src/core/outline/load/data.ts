@@ -1,3 +1,5 @@
+import { Icon } from "../../../z_lib/ui/icon/data"
+
 export type BreadcrumbList = readonly BreadcrumbNode[]
 
 export type BreadcrumbNode =
@@ -33,6 +35,6 @@ export type MenuCategoryPath = readonly MenuCategoryLabel[]
 export type MenuItem = MenuItem_data & { MenuItem: never }
 type MenuItem_data = Readonly<{
     label: string
-    icon: string
+    icon: Icon
     href: string
 }>

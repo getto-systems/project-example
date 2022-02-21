@@ -1,9 +1,12 @@
-export type LineIcon = Readonly<{ name: string }> & { LineIcon: never }
+import { Icon } from "./data"
 
-export function lnir(name: string): LineIcon {
-    return { name } as LineIcon
+export function lnir(name: readonly string[]): Icon {
+    return { toString: () => lni("lni", name) } as Icon
+}
+export function lnil(name: readonly string[]): Icon {
+    return { toString: () => lni("lnil", name) } as Icon
 }
 
-export function lniClass(icon: LineIcon): string {
-    return `lnir lnir-${icon.name}`
+function lni(type: string, name: readonly string[]): string {
+    return [type, ...name.map((name) => `${type}-${name}`)].join(" ")
 }

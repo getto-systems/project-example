@@ -9,6 +9,7 @@ import {
     label_warning,
     notice_info,
 } from "../../../z_vendor/getto-css/preact/design/highlight"
+import { lnir } from "../../../z_lib/ui/icon/line_icon"
 import { icon } from "../../../core/x_preact/design/icon"
 
 import {
@@ -50,7 +51,7 @@ export function docsDomainBox(docs: DocsDomain): readonly VNode[] {
         </section>`
 
         function li(usecase: DocsUsecase): VNode {
-            return html`<li>${icon("angle-double-right")} ${usecase.title}</li>`
+            return html`<li>${icon(lnir(["angle-double-right"]))} ${usecase.title}</li>`
         }
     }
 }
@@ -69,7 +70,7 @@ export function docsUsecaseAbstractBox(docs: DocsUsecase): VNode {
         </section>`
 
         function li(action: DocsAction): VNode {
-            return html`<li>${icon("chevron-right")} ${action.title}</li>`
+            return html`<li>${icon(lnir(["chevron-right"]))} ${action.title}</li>`
         }
     }
 }
@@ -94,7 +95,7 @@ export function docsUsecaseBox(docs: DocsUsecase): readonly VNode[] {
         </section>`
 
         function li(action: DocsAction): VNode {
-            return html`<li>${icon("chevron-right")} ${action.title}</li>`
+            return html`<li>${icon(lnir(["chevron-right"]))} ${action.title}</li>`
         }
     }
 }

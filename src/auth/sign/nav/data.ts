@@ -1,7 +1,9 @@
+import { Icon } from "../../../z_lib/ui/icon/data"
+
 export type SignNavHref = string & { SignNavHref: never }
 export type SignNavItem = { SignNavItem: never } & Readonly<{
     label: string
-    icon: string
+    icon: Icon
     href: SignNavHref
 }>
 

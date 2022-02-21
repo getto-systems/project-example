@@ -9,14 +9,14 @@ export function homeMenuContent(): MenuContent {
         loadMenuBadge: true,
         menuTree: [
             category("MAIN", allow, [
-                item("ホーム", lnir("home"), "index.html"),
-                item("ドキュメント", lnir("files-alt"), "docs/index.html"),
+                item("ホーム", lnir(["home"]), "index.html"),
+                item("ドキュメント", lnir(["files-alt"]), "docs/index.html"),
             ]),
-            category("ACCOUNT", user, [item("ユーザー", lnir("user"), "auth/user/account.html")]),
-            category("シーズン", allow, [item("設定", lnir("cog"), "season/setup.html")]),
+            category("ACCOUNT", user, [item("ユーザー", lnir(["user"]), "auth/user/account.html")]),
+            category("シーズン", allow, [item("設定", lnir(["cog"]), "season/setup.html")]),
             category("SYSTEM", allow, [
-                item("プロフィール", lnir("user"), "auth/profile.html"),
-                item("ログアウト", lnir("user"), "auth/ticket/logout.html"),
+                item("プロフィール", lnir(["user"]), "auth/profile.html"),
+                item("ログアウト", lnir(["user"]), "auth/ticket/logout.html"),
             ]),
         ],
     }

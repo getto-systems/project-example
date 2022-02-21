@@ -17,9 +17,9 @@ export function docsMenuContent(): MenuContent {
         loadMenuBadge: false,
         menuTree: [
             category("MAIN", allow, [
-                item("ホーム", lnir("home"), "index.html"),
-                item("ドキュメント", lnir("files-alt"), "docs/index.html"),
-                item("プライバシーポリシー", lnir("files-alt"), "docs/privacy-policy.html"),
+                item("ホーム", lnir(["home"]), "index.html"),
+                item("ドキュメント", lnir(["files-alt"]), "docs/index.html"),
+                item("プライバシーポリシー", lnir(["files-alt"]), "docs/privacy-policy.html"),
             ]),
             ...devDocs(),
         ],
@@ -32,21 +32,21 @@ function devDocs(): readonly MenuTreeNode[] {
     return [
         category("開発用", allow, [
             docsMenuNode(docs_auth),
-            item(docs_avail.title, lnir("files-alt"), "docs/avail.html"),
-            item(docs_docs.title, lnir("files-alt"), "docs/docs.html"),
-            item("coverage api", lnir("files-alt"), "coverage/api/index.html"),
-            item("coverage ui", lnir("files-alt"), "coverage/ui/lcov-report/index.html"),
+            item(docs_avail.title, lnir(["files-alt"]), "docs/avail.html"),
+            item(docs_docs.title, lnir(["files-alt"]), "docs/docs.html"),
+            item("coverage api", lnir(["files-alt"]), "coverage/api/index.html"),
+            item("coverage ui", lnir(["files-alt"]), "coverage/ui/lcov-report/index.html"),
         ]),
     ]
 }
 
 function docsMenuNode(docs: DocsDomain): MenuTreeNode {
     return category(docs.title, allow, [
-        item("概要", lnir("files-alt"), assertMenuPath(`docs/${docs.path}/index.html`)),
+        item("概要", lnir(["files-alt"]), assertMenuPath(`docs/${docs.path}/index.html`)),
         ...docs.usecase.map((usecase) => {
             return item(
                 usecase.title,
-                lnir("files-alt"),
+                lnir(["files-alt"]),
                 assertMenuPath(`docs/${docs.path}/${usecase.path}.html`),
             )
         }),
