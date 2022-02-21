@@ -5,11 +5,10 @@ import { env } from "../../y_environment/ui/env"
 
 import { loginBox } from "../../z_vendor/getto-css/preact/layout/login"
 import { buttons } from "../../z_vendor/getto-css/preact/design/form"
-import { lnir } from "../../z_lib/ui/icon/init/line_icon"
 
 import { useDocumentTitle } from "../../core/x_preact/hooks"
 import { siteInfo } from "../../x_content/site"
-import { icon } from "../../core/x_preact/design/icon"
+import { home, icon } from "../../core/x_preact/design/icon"
 
 const pageTitle = "Not Found" as const
 
@@ -33,7 +32,7 @@ export function NotFoundComponent(_props: Props): VNode {
             html`<p>作業は左下のリンクからホームに戻って続けられます</p>`,
         ],
         footer: buttons({
-            left: [html`<a href="${homeHref()}">${icon(lnir(["home"]))} ホームへ</a>`],
+            left: [html`<a href="${homeHref()}">${icon(home)} ホームへ</a>`],
         }),
     })
 

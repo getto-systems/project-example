@@ -7,4 +7,5 @@ import { lnir } from "../../../z_lib/ui/icon/init/line_icon"
 export function icon(icon: Icon): VNode {
     return html`<i class="${icon}"></i>`
 }
-export const spinner: VNode = icon(lnir(["spinner", "is-spinning"]))
+export const home: Icon = lnir(["flags"])
+export const spinner: Icon = lnir(["spinner", "is-spinning"])

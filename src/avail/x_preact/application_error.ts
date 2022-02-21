@@ -5,11 +5,11 @@ import { v_small } from "../../z_vendor/getto-css/preact/design/alignment"
 import { buttons, field } from "../../z_vendor/getto-css/preact/design/form"
 import { loginBox } from "../../z_vendor/getto-css/preact/layout/login"
 
-import { lnil, lnir } from "../../z_lib/ui/icon/init/line_icon"
+import { lnir } from "../../z_lib/ui/icon/init/line_icon"
 
 import { env } from "../../y_environment/ui/env"
 
-import { icon } from "../../core/x_preact/design/icon"
+import { home, icon } from "../../core/x_preact/design/icon"
 import { siteInfo } from "../../x_content/site"
 
 type Props = Readonly<{
@@ -48,7 +48,7 @@ export function ApplicationErrorComponent(props: Props): VNode {
     }
 
     function topLink() {
-        return html`<a href="/${env.version}/index.html">${icon(lnil(["home"]))} ホーム</a>`
+        return html`<a href="/${env.version}/index.html">${icon(home)} ホーム</a>`
     }
     function reloadLink() {
         // search param をリセットしてやり直してみる
