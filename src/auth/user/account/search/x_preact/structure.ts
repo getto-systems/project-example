@@ -5,6 +5,7 @@ import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
 import { sortSign } from "../../../../../z_vendor/getto-css/preact/design/data"
 import { linky } from "../../../../../z_vendor/getto-css/preact/design/highlight"
+import { lnir } from "../../../../../z_lib/ui/icon/init/line_icon"
 
 import { siteSortSign } from "../../../../../core/x_preact/design/table"
 import { icon } from "../../../../../core/x_preact/design/icon"
@@ -85,7 +86,7 @@ function build(search: SearchAuthUserAccountAction): SearchAuthUserAccountTableS
     }
 
     function editLink(_row: AuthUserAccountBasket): VNodeContent {
-        return html`<a href="#">${icon("pencil")} 編集</a>`
+        return html`<a href="#">${icon(lnir(["pencil"]))} 編集</a>`
     }
 }
 

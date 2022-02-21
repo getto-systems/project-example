@@ -4,6 +4,7 @@ import { FetchRepositoryResult, StoreRepositoryResult } from "../../../z_lib/ui/
 import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
 import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 import { MenuCategoryPath, MenuTargetPath } from "./data"
+import { Icon } from "../../../z_lib/ui/icon/data"
 
 export interface MenuTargetPathDetecter {
     (): ConvertLocationResult<MenuTargetPath>
@@ -27,7 +28,7 @@ export type MenuTreeCategory = Readonly<{
 export type MenuTreeItem = Readonly<{
     path: MenuPath
     label: string
-    icon: string
+    icon: Icon
 }>
 
 export type MenuTreeLabel = string

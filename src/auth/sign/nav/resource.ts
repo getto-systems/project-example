@@ -1,7 +1,7 @@
-import { LineIcon, lniClass, lnir } from "../../../z_lib/ui/icon/line_icon"
-
+import { lnir } from "../../../z_lib/ui/icon/init/line_icon"
 import { encodeLocationSearchQuery, LocationSearchParam } from "../../../z_lib/ui/location/helper"
 
+import { Icon } from "../../../z_lib/ui/icon/data"
 import {
     AuthenticatePasswordVariantKey,
     ResetPasswordVariantKey,
@@ -35,26 +35,26 @@ export function initSignLink(): SignLink {
         getNav_static_privacyPolicy: () =>
             markSignNavItem(
                 "プライバシーポリシー",
-                lnir("key-alt"),
+                lnir(["key-alt"]),
                 staticSignViewHref("privacy-policy"),
             ),
 
         getNav_password_authenticate: () =>
             markSignNavItem(
                 "ログインIDとパスワードでログイン",
-                lnir("arrow-left"),
+                lnir(["arrow-left"]),
                 authenticatePasswordHref("authenticate"),
             ),
         getNav_password_reset_requestToken: () =>
             markSignNavItem(
                 "パスワードがわからない方",
-                lnir("question-circle"),
+                lnir(["question-circle"]),
                 resetPasswordHref("request-token", []),
             ),
         getNav_password_reset_requestToken_retry: () =>
             markSignNavItem(
                 "リセットトークン送信からやり直す",
-                lnir("arrow-left"),
+                lnir(["arrow-left"]),
                 resetPasswordHref("request-token", []),
             ),
     }
@@ -76,6 +76,6 @@ function href(params: readonly LocationSearchParam[]): SignNavHref {
     return `?${encodeLocationSearchQuery(params)}` as SignNavHref
 }
 
-function markSignNavItem(label: string, icon: LineIcon, href: SignNavHref): SignNavItem {
-    return { label, icon: lniClass(icon), href } as SignNavItem
+function markSignNavItem(label: string, icon: Icon, href: SignNavHref): SignNavItem {
+    return { label, icon, href } as SignNavItem
 }

@@ -5,8 +5,11 @@ import { v_small } from "../../z_vendor/getto-css/preact/design/alignment"
 import { buttons, field } from "../../z_vendor/getto-css/preact/design/form"
 import { loginBox } from "../../z_vendor/getto-css/preact/layout/login"
 
+import { lnir } from "../../z_lib/ui/icon/init/line_icon"
+
 import { env } from "../../y_environment/ui/env"
 
+import { home, icon } from "../../core/x_preact/design/icon"
 import { siteInfo } from "../../x_content/site"
 
 type Props = Readonly<{
@@ -45,10 +48,10 @@ export function ApplicationErrorComponent(props: Props): VNode {
     }
 
     function topLink() {
-        return html`<a href="/${env.version}/index.html"><i class="lnir lnir-home"></i> ホーム</a>`
+        return html`<a href="/${env.version}/index.html">${icon(home)} ホーム</a>`
     }
     function reloadLink() {
         // search param をリセットしてやり直してみる
-        return html`<a href="?"><i class="lnir lnir-reload"></i> 再読み込み</a>`
+        return html`<a href="?">${icon(lnir(["reload"]))} 再読み込み</a>`
     }
 }

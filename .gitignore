@@ -2,7 +2,6 @@
 /tmp/
 
 /.secret/
-/.env
 
 /node_modules/
 /target/
@@ -11,11 +10,8 @@
 /ui/public/dist/coverage/
 /ui/public/dist/**/*.html
 
-/public/dist/css/*
-!/public/dist/css/.keep
-
-/public/dist/**/*.js
-/secure/dist/**/*.js
+/ui/public/dist/css/*
+!/ui/public/dist/css/.keep
 
 /src/**/y_*/*
 !/src/**/y_protobuf/mod.rs
