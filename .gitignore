@@ -11,8 +11,8 @@
 /ui/public/dist/coverage/
 /ui/public/dist/**/*.html
 
-/public/dist/css/*
-!/public/dist/css/.keep
+/ui/public/dist/css/*
+!/ui/public/dist/css/.keep
 
 /public/dist/**/*.js
 /secure/dist/**/*.js
