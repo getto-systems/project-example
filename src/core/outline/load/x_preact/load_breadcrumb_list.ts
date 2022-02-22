@@ -10,7 +10,7 @@ import { linky } from "../../../../z_vendor/getto-css/preact/design/highlight"
 import { lnir } from "../../../../z_lib/ui/icon/init/line_icon"
 
 import { siteInfo } from "../../../../x_content/site"
-import { icon } from "../../../x_preact/design/icon"
+import { home, iconHtml } from "../../../x_preact/design/icon"
 
 import { MENU_ID } from "./load_menu"
 
@@ -46,14 +46,17 @@ function toContent(breadcrumbList: BreadcrumbList): readonly VNode[] {
 function top(): VNode {
     // トップリンク href="#menu" は menu の id="menu" と対応
     // mobile レイアウトで menu の位置に移動
-    return mainBreadcrumbLink(`#${MENU_ID}`, html`${icon(lnir(["menu-alt-3"]))} ${siteInfo.title}`)
+    return item({
+        label: siteInfo.title,
+        icon: home,
+        href: `#${MENU_ID}`,
+    } as MenuItem)
 }
 function category({ label }: MenuCategory): VNode {
     return linky(label)
 }
 function item({ label, icon, href }: MenuItem): VNode {
-    const content = html`<i class="${icon}"></i> ${label}`
-    return mainBreadcrumbLink(href, content)
+    return mainBreadcrumbLink(href, html`${iconHtml(icon)} ${label}`)
 }
 
-const SEPARATOR = mainBreadcrumbSeparator(icon(lnir(["chevron-right"])))
+const SEPARATOR = mainBreadcrumbSeparator(iconHtml(lnir(["chevron-right"])))

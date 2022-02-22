@@ -22,6 +22,7 @@ import { LoadMenuAction, LoadMenuState } from "../action"
 import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
 import { Menu, MenuCategoryNode, MenuItemNode } from "../data"
+import { iconHtml } from "../../../x_preact/design/icon"
 
 export const MENU_ID = "menu"
 
@@ -119,7 +120,7 @@ export function LoadMenuComponent(props: Props): VNode {
             return menuItem({
                 isActive: node.isActive,
                 href,
-                content: html`<i class="${icon}"></i> ${label}`,
+                content: html`${iconHtml(icon)} ${label}`,
                 badge: badge(node.badgeCount),
             })
         }
