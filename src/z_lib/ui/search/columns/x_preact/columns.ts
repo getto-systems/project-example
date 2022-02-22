@@ -1,23 +1,27 @@
 import { h, VNode } from "preact"
+import { html } from "htm/preact"
 
-import { field } from "../../../../../z_vendor/getto-css/preact/design/form"
-import { tableViewColumns } from "../../../../../z_vendor/getto-css/preact/design/data"
+import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { VNodeContent, VNodeKey } from "../../../x_preact/common"
 
+import { field } from "../../../../../z_vendor/getto-css/preact/design/form"
+import { tableViewColumns } from "../../../../../z_vendor/getto-css/preact/design/table"
 import {
     CheckboxBoardComponent,
     CheckboxBoardContent,
 } from "../../../../../z_vendor/getto-application/board/input/x_preact/checkbox"
 
-import { SearchColumnsAction } from "../action"
+import { markBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/convert"
+
+import { SearchColumnsAction, SearchColumnsState } from "../action"
 
 export type SearchColumnContent = Readonly<{
     key: VNodeKey
     content: VNodeContent
 }>
 
-type Props = Readonly<{
+type EntryProps = Readonly<{
     field: SearchColumnsAction
     columns: readonly SearchColumnContent[]
 }> &
@@ -25,18 +29,21 @@ type Props = Readonly<{
         title: VNodeContent
         block: boolean
     }>
+export function SearchColumnsEntry(props: EntryProps): VNode {
+    return h(SearchColumnsComponent, {
+        ...props,
+        state: useApplicationAction(props.field),
+    })
+}
+
+type Props = EntryProps &
+    Readonly<{
+        state: SearchColumnsState
+    }>
 export function SearchColumnsComponent(props: Props): VNode {
     return field({
         title: title(),
-        body: [
-            tableViewColumns(
-                h(CheckboxBoardComponent, {
-                    input: props.field.input,
-                    options: options(),
-                    block: block(),
-                }),
-            ),
-        ],
+        body: [tableViewColumns(checkbox(props))],
     })
 
     function title(): VNodeContent {
@@ -45,17 +52,36 @@ export function SearchColumnsComponent(props: Props): VNode {
         }
         return "表示する列"
     }
-    function options(): readonly CheckboxBoardContent[] {
-        return props.columns.map((column) => ({
-            key: column.key,
-            value: `${column.key}`,
-            label: column.content,
-        }))
-    }
-    function block(): boolean {
-        if (props.block) {
-            return props.block
+    function checkbox({ state }: Props): VNode {
+        switch (state.type) {
+            case "initial-search":
+            case "repository-error":
+                return EMPTY_CONTENT
+
+            case "succeed-to-load":
+            case "succeed-to-save":
+                return h(CheckboxBoardComponent, {
+                    input: props.field.input,
+                    defaultChecked: state.columns,
+                    options: options(),
+                    block: block(),
+                })
         }
-        return false
+
+        function options(): readonly CheckboxBoardContent[] {
+            return props.columns.map((column) => ({
+                key: column.key,
+                value: markBoardValue(`${column.key}`),
+                label: column.content,
+            }))
+        }
+        function block(): boolean {
+            if (props.block) {
+                return props.block
+            }
+            return false
+        }
     }
 }
+
+const EMPTY_CONTENT = html``

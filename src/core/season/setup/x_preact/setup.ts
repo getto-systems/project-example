@@ -90,7 +90,7 @@ export function SetupSeasonComponent(props: Props): VNode {
                 h(InputSeasonComponent, {
                     title: "シーズン",
                     field: props.setupSeason.season,
-                    selected: season,
+                    defaultSelected: season,
                     seasons,
                 }),
             ],

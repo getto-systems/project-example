@@ -12,7 +12,7 @@ import { SearchOffsetComponent } from "../../../../../z_lib/ui/search/offset/x_p
 
 import { SearchAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
 
-import { pagerOptions } from "../../../../../z_vendor/getto-css/preact/design/data"
+import { pagerOptions } from "../../../../../z_vendor/getto-css/preact/design/table"
 import { SearchPageResponse } from "../../../../../z_lib/ui/search/data"
 import { RemoteCommonError } from "../../../../../z_lib/ui/remote/data"
 
@@ -58,7 +58,7 @@ export function SearchAuthUserAccountPagerComponent(props: Props): VNode {
                 h(SearchOffsetComponent, {
                     field: props.search.offset,
                     count: pagerCount(page.all),
-                    selected: page.offset,
+                    defaultSelected: page.offset,
                     options: pagerOptions(pagerParams(page)),
                     button: button_search({ state: "normal", label: "読み込み", onClick }),
                 }),

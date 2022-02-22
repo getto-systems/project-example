@@ -7,7 +7,7 @@ import {
 import { initInputSeasonAction, InputSeasonAction } from "../input/action"
 import { LoadSeasonState } from "../load/action"
 
-import { seasonBoardConverter, seasonToBoardValue } from "../kernel/convert"
+import { seasonBoardConverter } from "../kernel/convert"
 
 import { SeasonRepository } from "../kernel/infra"
 import { Clock } from "../../../z_lib/ui/clock/infra"
@@ -50,7 +50,6 @@ export function initSetupSeasonAction(
 }
 
 interface LoadAction {
-    ignitionState: Promise<LoadSeasonState>
     load(): Promise<LoadSeasonState>
 }
 
@@ -70,16 +69,6 @@ class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
         const season = initInputSeasonAction()
 
         this.season = season.input
-
-        load.ignitionState.then((state) => {
-            switch (state.type) {
-                case "succeed-to-load":
-                    if (!state.default) {
-                        season.set(seasonToBoardValue(state.season))
-                    }
-                    return
-            }
-        })
 
         this.material = material
         this.load = load

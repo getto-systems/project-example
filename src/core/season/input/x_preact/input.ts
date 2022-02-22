@@ -17,7 +17,7 @@ import { Season } from "../../kernel/data"
 type Props = Readonly<{
     field: InputSeasonAction
     title: VNodeContent
-    selected: Season
+    defaultSelected: Season
     seasons: readonly Season[]
 }>
 export function InputSeasonComponent(props: Props): VNode {
@@ -25,7 +25,7 @@ export function InputSeasonComponent(props: Props): VNode {
         title: props.title,
         body: h(SelectBoardComponent, {
             input: props.field.input,
-            selected: seasonToBoardValue(props.selected),
+            defaultSelected: seasonToBoardValue(props.defaultSelected),
             options: options(props.seasons),
         }),
     })
