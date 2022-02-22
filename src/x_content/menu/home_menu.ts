@@ -1,6 +1,6 @@
 import { lnir } from "../../z_lib/ui/icon/init/line_icon"
 
-import { home } from "../../core/x_preact/design/icon"
+import { icon_home } from "../../core/x_preact/design/icon"
 
 import { category, item } from "./common"
 
@@ -12,7 +12,7 @@ export function homeMenuContent(): MenuContent {
         loadMenuBadge: true,
         menuTree: [
             category("MAIN", allow, [
-                item("ホーム", home, "index.html"),
+                item("ホーム", icon_home, "index.html"),
                 item("ドキュメント", lnir(["files-alt"]), "docs/index.html"),
             ]),
             category("シーズン", allow, [item("設定", lnir(["cog"]), "season/setup.html")]),

@@ -20,7 +20,7 @@ import { loginBox } from "../../../../../../z_vendor/getto-css/preact/layout/log
 
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../../../x_content/site"
-import { spinner } from "../../../../../../core/x_preact/design/icon"
+import { icon_spinner } from "../../../../../../core/x_preact/design/icon"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
 
 import { InputLoginIDEntry } from "../../../../login_id/input/x_preact/input"
@@ -138,7 +138,7 @@ export function RequestResetTokenComponent(props: Props): VNode {
             function connectingButton(): VNode {
                 return button_send({
                     state: "connect",
-                    label: html`トークンを送信しています ${spinner}`,
+                    label: html`トークンを送信しています ${icon_spinner}`,
                 })
             }
         }
@@ -154,7 +154,7 @@ export function RequestResetTokenComponent(props: Props): VNode {
         return loginBox(siteInfo, {
             title,
             body: [
-                html`<p>${spinner} トークンの送信に時間がかかっています</p>`,
+                html`<p>${icon_spinner} トークンの送信に時間がかかっています</p>`,
                 html`<p>
                     30秒以上かかる場合は何かがおかしいので、
                     <br />

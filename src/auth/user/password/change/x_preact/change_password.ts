@@ -17,7 +17,7 @@ import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
-import { spinner } from "../../../../../core/x_preact/design/icon"
+import { icon_spinner } from "../../../../../core/x_preact/design/icon"
 
 import { InputPasswordEntry } from "../../input/x_preact/input"
 
@@ -152,7 +152,7 @@ export function ChangePasswordComponent(props: Props): VNode {
                 case "take-longtime":
                     return button_send({
                         state: "connect",
-                        label: html`パスワード変更中 ${spinner}`,
+                        label: html`パスワード変更中 ${icon_spinner}`,
                     })
             }
 
@@ -205,7 +205,7 @@ export function ChangePasswordComponent(props: Props): VNode {
                 case "take-longtime":
                     return [
                         fieldError([
-                            html`${spinner} パスワード変更中です`,
+                            html`${icon_spinner} パスワード変更中です`,
                             html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
                         ]),
                     ]

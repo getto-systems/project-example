@@ -13,7 +13,7 @@ import {
     fieldError,
     form,
 } from "../../../../../../z_vendor/getto-css/preact/design/form"
-import { spinner } from "../../../../../../core/x_preact/design/icon"
+import { icon_spinner } from "../../../../../../core/x_preact/design/icon"
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
 import { InputLoginIDEntry } from "../../../../login_id/input/x_preact/input"
@@ -155,7 +155,7 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
                 case "take-longtime":
                     return button_send({
                         state: "connect",
-                        label: html`リセットトークン送信中 ${spinner}`,
+                        label: html`リセットトークン送信中 ${icon_spinner}`,
                     })
             }
 
@@ -208,7 +208,7 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
                 case "take-longtime":
                     return [
                         fieldError([
-                            html`${spinner} リセットトークン送信中です`,
+                            html`${icon_spinner} リセットトークン送信中です`,
                             html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
                         ]),
                     ]

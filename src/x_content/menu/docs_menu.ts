@@ -1,7 +1,7 @@
 import { env } from "../../y_environment/ui/env"
 
 import { lnir } from "../../z_lib/ui/icon/init/line_icon"
-import { home } from "../../core/x_preact/design/icon"
+import { icon_home } from "../../core/x_preact/design/icon"
 
 import { assertMenuPath, category, item } from "./common"
 
@@ -20,7 +20,7 @@ export function docsMenuContent(): MenuContent {
         loadMenuBadge: false,
         menuTree: [
             category("MAIN", allow, [
-                item("ホーム", home, "index.html"),
+                item("ホーム", icon_home, "index.html"),
                 item("ドキュメント", files, "docs/index.html"),
                 item("プライバシーポリシー", files, "docs/privacy-policy.html"),
             ]),

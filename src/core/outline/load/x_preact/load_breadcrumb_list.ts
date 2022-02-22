@@ -10,7 +10,7 @@ import { linky } from "../../../../z_vendor/getto-css/preact/design/highlight"
 import { lnir } from "../../../../z_lib/ui/icon/init/line_icon"
 
 import { siteInfo } from "../../../../x_content/site"
-import { home, iconHtml } from "../../../x_preact/design/icon"
+import { icon_home, iconHtml } from "../../../x_preact/design/icon"
 
 import { MENU_ID } from "./load_menu"
 
@@ -48,7 +48,7 @@ function top(): VNode {
     // mobile レイアウトで menu の位置に移動
     return item({
         label: siteInfo.title,
-        icon: home,
+        icon: icon_home,
         href: `#${MENU_ID}`,
     } as MenuItem)
 }

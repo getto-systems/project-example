@@ -20,7 +20,7 @@ import { loginBox } from "../../../../../../z_vendor/getto-css/preact/layout/log
 
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../../../x_content/site"
-import { spinner } from "../../../../../../core/x_preact/design/icon"
+import { icon_spinner } from "../../../../../../core/x_preact/design/icon"
 import { appendScript } from "../../../../../sign/x_preact/script"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
 
@@ -177,7 +177,7 @@ export function ResetPasswordComponent(props: Props): VNode {
             function connectingButton(): VNode {
                 return button_send({
                     state: "connect",
-                    label: html`パスワードをリセットしています ${spinner}`,
+                    label: html`パスワードをリセットしています ${icon_spinner}`,
                 })
             }
         }
@@ -193,7 +193,7 @@ export function ResetPasswordComponent(props: Props): VNode {
         return loginBox(siteInfo, {
             title: resetTitle(),
             body: [
-                html`<p>${spinner} リセットに時間がかかっています</p>`,
+                html`<p>${icon_spinner} リセットに時間がかかっています</p>`,
                 html`<p>
                     30秒以上かかる場合は何かがおかしいので、
                     <br />

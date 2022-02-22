@@ -14,7 +14,7 @@ import { v_medium } from "../../../../z_vendor/getto-css/preact/design/alignment
 
 import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../x_content/site"
-import { spinner } from "../../../../core/x_preact/design/icon"
+import { icon_spinner } from "../../../../core/x_preact/design/icon"
 
 import { appendScript } from "../../../sign/x_preact/script"
 
@@ -115,7 +115,7 @@ export function CheckAuthTicketComponent(props: Props): VNode {
         return loginBox(siteInfo, {
             title: "認証に時間がかかっています",
             body: [
-                html`<p>${spinner} 認証処理中です</p>`,
+                html`<p>${icon_spinner} 認証処理中です</p>`,
                 html`<p>
                     30秒以上かかる場合は何かがおかしいので、
                     <br />
