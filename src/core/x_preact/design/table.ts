@@ -1,13 +1,13 @@
 import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
-import { icon } from "./icon"
+import { iconHtml } from "./icon"
 
 import { PagerOptionsContent, SortSign } from "../../../z_vendor/getto-css/preact/design/data"
 import { SearchPageResponse } from "../../../z_lib/ui/search/data"
 import { lnir } from "../../../z_lib/ui/icon/init/line_icon"
 
 export const siteSortSign: SortSign = {
-    normal: icon(lnir(["angle-double-down"])),
-    reverse: icon(lnir(["angle-double-up"])),
+    normal: iconHtml(lnir(["angle-double-down"])),
+    reverse: iconHtml(lnir(["angle-double-up"])),
 }
 
 export function pagerCount(all: number): VNodeContent {
