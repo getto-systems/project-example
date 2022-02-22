@@ -6,7 +6,7 @@ import { useApplicationAction } from "../../../../../z_vendor/getto-application/
 import { box_grow } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { fieldError } from "../../../../../z_vendor/getto-css/preact/design/form"
 
-import { SearchColumnsComponent } from "../../../../../z_lib/ui/search/columns/x_preact/columns"
+import { SearchColumnsEntry } from "../../../../../z_lib/ui/search/columns/x_preact/columns"
 
 import { repositoryErrorReason } from "../../../../../z_lib/ui/repository/x_error/reason"
 
@@ -54,7 +54,7 @@ export function SearchAuthUserAccountColumnsComponent(props: Props): VNode {
 
     function columnsBox(): VNode {
         return box_grow({
-            body: h(SearchColumnsComponent, {
+            body: h(SearchColumnsEntry, {
                 field: props.search.columns,
                 columns: props.structure.view(),
             }),

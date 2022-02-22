@@ -9,7 +9,8 @@ import {
     tableHeader,
     tbody,
     thead,
-} from "../../../../../z_vendor/getto-css/preact/design/data"
+} from "../../../../../z_vendor/getto-css/preact/design/table"
+import { EMPTY_TABLE } from "../../../../../core/x_preact/design/table"
 
 import { SearchAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
 import { SearchColumnsState } from "../../../../../z_lib/ui/search/columns/action"
@@ -60,6 +61,10 @@ export function SearchAuthUserAccountTableComponent(props: Props): VNode {
     }>
 
     function content({ columns, response }: Content): VNode {
+        if (response.page.all === 0) {
+            return EMPTY_TABLE
+        }
+
         const params = { summary: {}, visibleKeys: columns }
 
         const sticky = props.structure.sticky()

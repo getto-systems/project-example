@@ -14,7 +14,7 @@ type Props = Readonly<{
     }>
 export function SelectFileComponent({ file, disabled }: Props): VNode {
     return html`<input
-        ref=${useInputRef(file.connector)}
+        ref=${useFileRef(file.connector)}
         type="file"
         onInput=${onInput}
         disabled=${disabled}
@@ -25,7 +25,7 @@ export function SelectFileComponent({ file, disabled }: Props): VNode {
     }
 }
 
-function useInputRef(connector: FileStoreConnector) {
+function useFileRef(connector: FileStoreConnector) {
     const REF = useRef<HTMLInputElement>()
 
     useLayoutEffect(() => {

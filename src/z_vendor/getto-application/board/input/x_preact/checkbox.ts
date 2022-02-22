@@ -11,15 +11,22 @@ import { MultipleBoardValueStoreConnector } from "../infra"
 
 import { BoardValue } from "../../kernel/data"
 
-export type CheckboxBoardContent = Readonly<{ key: VNodeKey; value: string; label: VNodeContent }>
+export type CheckboxBoardContent = Readonly<{
+    key: VNodeKey
+    value: BoardValue
+    label: VNodeContent
+}>
 
 type Props = Readonly<{
     input: MultipleInputBoardAction
+    defaultChecked: readonly BoardValue[]
     options: readonly CheckboxBoardContent[]
 }> &
-    Partial<{ block: boolean }>
+    Partial<{
+        block: boolean
+    }>
 export function CheckboxBoardComponent(props: Props): VNode {
-    const store = useCheckboxStore(props.input.connector)
+    const store = useCheckboxStore(props.input.connector, props.defaultChecked)
 
     return html`${content()}`
 
@@ -45,8 +52,8 @@ export function CheckboxBoardComponent(props: Props): VNode {
                 const target = e.target
                 if (target instanceof HTMLInputElement) {
                     store.setMember(value, target.checked)
-                    props.input.publisher.post()
                 }
+                props.input.publisher.post()
             }
         })
     }
@@ -57,14 +64,17 @@ interface CheckboxStore {
     setMember(value: string, isSelected: boolean): void
 }
 
-function useCheckboxStore(connector: MultipleBoardValueStoreConnector): CheckboxStore {
-    const store = useMemo(() => new ValuesStore(), [])
+function useCheckboxStore(
+    connector: MultipleBoardValueStoreConnector,
+    defaultChecked: readonly BoardValue[],
+): CheckboxStore {
+    const store = useMemo(() => new ValuesStore(defaultChecked), [defaultChecked])
     useLayoutEffect(() => {
         connector.connect(store)
         return () => connector.terminate()
     }, [connector, store])
 
-    const [values, setValues] = useState<readonly BoardValue[]>([])
+    const [values, setValues] = useState<readonly BoardValue[]>(defaultChecked)
     useLayoutEffect(() => {
         store.connect(values, setValues)
     }, [store, values, setValues])
@@ -77,7 +87,15 @@ type PendingStore =
     | Readonly<{ hasValue: true; values: readonly BoardValue[] }>
 
 class ValuesStore implements CheckboxStore {
-    values: Set<BoardValue> = new Set()
+    values: Set<BoardValue>
+
+    constructor(defaultChecked: readonly BoardValue[]) {
+        this.values = new Set()
+        defaultChecked.forEach((value) => {
+            this.values.add(value)
+        })
+    }
+
     setValues: { (values: readonly BoardValue[]): void } = (values) => {
         this.pendingStore = { hasValue: true, values }
     }

@@ -96,6 +96,10 @@ export type PagerOptionsContent = Readonly<{
 }>
 export type PagerOptionsContentParams = Readonly<{ start: number; end: number }>
 export function pagerOptions({ all, step, content }: PagerOptionsContent): readonly VNode[] {
+    if (all === 0) {
+        return [html`<option value="0">${content({ start: 0, end: 0 })}</option>`]
+    }
+
     const options: VNode[] = []
     for (let i = 0; i < Math.ceil(all / step); i++) {
         const offset = i * step

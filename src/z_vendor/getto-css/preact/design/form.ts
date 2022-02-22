@@ -446,8 +446,8 @@ function mapCheckableStyle(type: CheckableType, style: CheckableStyle): string {
         case "inline":
             return `input__${type}`
 
-        default:
-            return `input__${type} input__${type}_${style}`
+        case "block":
+            return `input__${type} input__${type}_block`
     }
 }
 

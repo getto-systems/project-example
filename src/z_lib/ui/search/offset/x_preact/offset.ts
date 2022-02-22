@@ -13,7 +13,7 @@ import { SearchOffsetAction } from "../action"
 type Props = Readonly<{
     field: SearchOffsetAction
     count: VNodeContent
-    selected: number
+    defaultSelected: number
     options: readonly VNode[]
     button: VNode
 }>
@@ -24,7 +24,7 @@ export function SearchOffsetComponent(props: Props): VNode {
             pager(
                 h(SelectBoardComponent, {
                     input: props.field.input,
-                    selected: markBoardValue(`${props.selected}`),
+                    defaultSelected: markBoardValue(`${props.defaultSelected}`),
                     options: props.options,
                 }),
             ),

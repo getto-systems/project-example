@@ -3,11 +3,11 @@ import { html } from "htm/preact"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
-import { sortSign } from "../../../../../z_vendor/getto-css/preact/design/data"
+import { sortSign } from "../../../../../z_vendor/getto-css/preact/design/table"
 import { linky } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 import { lnir } from "../../../../../z_lib/ui/icon/init/line_icon"
 
-import { siteSortSign } from "../../../../../core/x_preact/design/table"
+import { SORT_SIGN } from "../../../../../core/x_preact/design/table"
 import { iconHtml } from "../../../../../core/x_preact/design/icon"
 
 import { TableStructure } from "../../../../../z_vendor/getto-table/preact/core"
@@ -66,7 +66,7 @@ function build(search: SearchAuthUserAccountAction): SearchAuthUserAccountTableS
 
         function sign() {
             const currentSort = search.currentSort()
-            return sortSign(siteSortSign, currentSort, key)
+            return sortSign(SORT_SIGN, currentSort, key)
         }
         function onClick(e: Event) {
             e.preventDefault()
