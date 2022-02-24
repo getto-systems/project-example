@@ -9,7 +9,7 @@ import { lnir } from "../../z_lib/ui/icon/init/line_icon"
 
 import { env } from "../../y_environment/ui/env"
 
-import { home, iconHtml } from "../../core/x_preact/design/icon"
+import { icon_home, iconHtml } from "../../core/x_preact/design/icon"
 import { siteInfo } from "../../x_content/site"
 
 type Props = Readonly<{
@@ -48,7 +48,7 @@ export function ApplicationErrorComponent(props: Props): VNode {
     }
 
     function topLink() {
-        return html`<a href="/${env.version}/index.html">${iconHtml(home)} ホーム</a>`
+        return html`<a href="/${env.version}/index.html">${iconHtml(icon_home)} ホーム</a>`
     }
     function reloadLink() {
         // search param をリセットしてやり直してみる

@@ -23,7 +23,7 @@ impl LogFilter for SearchAuthUserAccountState {
 impl LogFilter for SearchAuthUserAccountEvent {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Success(_) => LogLevel::Audit,
+            Self::Success(_) => LogLevel::Info,
             Self::RepositoryError(err) => err.log_level(),
         }
     }

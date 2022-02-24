@@ -10,7 +10,7 @@ import {
 } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box_grow } from "../../../../../z_vendor/getto-css/preact/design/box"
 
-import { spinner } from "../../../../../core/x_preact/design/icon"
+import { iconHtml, icon_search, icon_spinner } from "../../../../../core/x_preact/design/icon"
 
 import { SearchLoginIDComponent } from "../../../login_id/input/x_preact/search"
 
@@ -83,20 +83,18 @@ export function SearchAuthUserAccountFormComponent(props: Props): VNode {
         }
 
         function button(): VNode {
-            const label = "検索"
-
             switch (content.type) {
                 case "has-changed":
-                    return button_search({ state: "confirm", label, onClick })
+                    return button_search({ state: "confirm", label: SEARCH_STATIC, onClick })
 
                 case "initial":
-                    return button_search({ state: "normal", label, onClick })
+                    return button_search({ state: "normal", label: SEARCH_STATIC, onClick })
 
                 case "connecting":
-                    return button_search({ state: "connect", label: html`検索中 ${spinner}` })
+                    return button_search({ state: "connect", label: SEARCH_CONNECT })
 
                 case "failed":
-                    return button_search({ state: "confirm", label, onClick })
+                    return button_search({ state: "confirm", label: SEARCH_STATIC, onClick })
             }
 
             function onClick(e: Event) {
@@ -106,3 +104,6 @@ export function SearchAuthUserAccountFormComponent(props: Props): VNode {
         }
     }
 }
+
+const SEARCH_STATIC: VNode = html`検索 ${iconHtml(icon_search)}`
+const SEARCH_CONNECT: VNode = html`検索 ${iconHtml(icon_spinner)}`

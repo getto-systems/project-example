@@ -21,7 +21,7 @@ import {
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../../x_content/site"
-import { spinner } from "../../../../../core/x_preact/design/icon"
+import { icon_spinner } from "../../../../../core/x_preact/design/icon"
 import { appendScript } from "../../../../sign/x_preact/script"
 import { signNav } from "../../../../sign/nav/x_preact/nav"
 
@@ -164,7 +164,7 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
                 case "connecting":
                     return button_send({
                         state: "connect",
-                        label: html`ログインしています ${spinner}`,
+                        label: html`ログインしています ${icon_spinner}`,
                     })
             }
 
@@ -194,7 +194,7 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
         return loginBox(siteInfo, {
             title: authenticateTitle(),
             body: [
-                html`<p>${spinner} 認証中です</p>`,
+                html`<p>${icon_spinner} 認証中です</p>`,
                 html`<p>
                     30秒以上かかる場合は何かがおかしいので、
                     <br />

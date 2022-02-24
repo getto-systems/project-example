@@ -9,7 +9,7 @@ import {
 
 import { loginBox } from "../../../../z_vendor/getto-css/preact/layout/login"
 import { siteInfo } from "../../../../x_content/site"
-import { spinner } from "../../../../core/x_preact/design/icon"
+import { icon_spinner } from "../../../../core/x_preact/design/icon"
 
 import { ApplicationErrorComponent } from "../../../x_preact/application_error"
 
@@ -68,7 +68,7 @@ export function MoveToLatestVersionComponent(props: Props): VNode {
         return loginBox(siteInfo, {
             title: "アプリケーション読み込み中",
             body: [
-                html`<p>${spinner} アプリケーションの読み込みに時間がかかっています</p>`,
+                html`<p>${icon_spinner} アプリケーションの読み込みに時間がかかっています</p>`,
                 html`<p>
                     30秒以上かかるようであれば何かがおかしいので、<br />
                     お手数ですが、管理者にお伝えください
