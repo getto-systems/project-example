@@ -21,19 +21,23 @@ export function detectSearchAuthUserAccountFilter(currentURL: URL): SearchAuthUs
         sort: readSearchSort(
             params,
             defaultSearchAuthUserAccountSort,
-            (value: string): ReadSearchSortKeyResult<SearchAuthUserAccountSortKey> => {
-                switch (value) {
-                    case "login-id":
-                        return { found: true, key: value }
-
-                    default:
-                        return { found: false }
-                }
-            },
+            readSearchAuthUserAccountSortKey,
         ),
         loginID: readSingleValueFilter(params, SEARCH_LOGIN_ID),
     }
 }
+export function readSearchAuthUserAccountSortKey(
+    key: string,
+): ReadSearchSortKeyResult<SearchAuthUserAccountSortKey> {
+    switch (key) {
+        case "login-id":
+            return { found: true, key }
+
+        default:
+            return { found: false }
+    }
+}
+
 export function updateSearchAuthUserAccountFilterQuery(
     currentURL: URL,
     fields: SearchAuthUserAccountFilter,

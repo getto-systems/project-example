@@ -73,7 +73,8 @@ export type SearchAuthUserAccountConfig = Readonly<{
 
 export type SearchAuthUserAccountState =
     | Readonly<{ type: "initial-search" }>
-    | SearchAuthUserAccountEvent
+    | (SearchAuthUserAccountEvent &
+          Readonly<{ previousResponse?: SearchAuthUserAccountRemoteResponse }>)
 
 export const initialSearchAuthUserAccountState: SearchAuthUserAccountState = {
     type: "initial-search",
@@ -105,6 +106,7 @@ class Action
     sortFields: { (key: SearchAuthUserAccountSortKey): SearchAuthUserAccountFilter }
 
     sortStore: SearchAuthUserAccountSort
+    response?: SearchAuthUserAccountRemoteResponse
 
     constructor(material: SearchAuthUserAccountMaterial) {
         super({
@@ -163,16 +165,32 @@ class Action
 
     clear(): SearchAuthUserAccountState {
         this.loginID.clear()
-        return this.initialState
+        return this.currentState()
     }
     async submit(): Promise<SearchAuthUserAccountState> {
-        return search(this.material, this.searchFields(), this.post)
+        return search(this.material, this.searchFields(), (e) => this.searchResult(e))
     }
     async load(): Promise<SearchAuthUserAccountState> {
-        return search(this.material, this.loadFields(), this.post)
+        return search(this.material, this.loadFields(), (e) => this.searchResult(e))
     }
     async sort(key: SearchAuthUserAccountSortKey): Promise<SearchAuthUserAccountState> {
-        return search(this.material, this.sortFields(key), this.post)
+        return search(this.material, this.sortFields(key), (e) => this.searchResult(e))
+    }
+
+    searchResult(e: SearchAuthUserAccountEvent): SearchAuthUserAccountState {
+        const previousInfo = {
+            previousResponse: this.response,
+        }
+        switch (e.type) {
+            case "succeed-to-search":
+                this.sortStore = e.response.sort
+                this.response = e.response
+                break
+        }
+        return this.post({
+            ...e,
+            ...previousInfo,
+        })
     }
 }
 

@@ -16,5 +16,6 @@ export const defaultSearchAuthUserAccountSort: SearchAuthUserAccountSortKey = "l
 
 export type SearchAuthUserAccountRemoteResponse = Readonly<{
     page: SearchPageResponse
+    sort: SearchAuthUserAccountSort
     users: readonly AuthUserAccountBasket[]
 }>

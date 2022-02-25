@@ -36,8 +36,14 @@ export function SearchAuthUserAccountPagerComponent(props: Props): VNode {
     function basedOn({ state }: Props): VNode {
         switch (state.type) {
             case "initial-search":
-            case "try-to-search":
                 return EMPTY_BOX
+
+            case "try-to-search":
+                if (state.previousResponse) {
+                    return pagerForm({ page: state.previousResponse.page })
+                } else {
+                    return EMPTY_BOX
+                }
 
             case "succeed-to-search":
                 return pagerForm({ page: state.response.page })

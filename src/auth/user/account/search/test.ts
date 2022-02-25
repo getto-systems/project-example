@@ -10,6 +10,7 @@ import { initSearchAuthUserAccountAction, SearchAuthUserAccountAction } from "./
 
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 import { SearchAuthUserAccountRemote, SearchAuthUserAccountRemoteResult } from "./infra"
+import { defaultSearchAuthUserAccountSort } from "./data"
 
 describe("SearchAuthUserAccount", () => {
     test("initial load", async () => {
@@ -188,6 +189,10 @@ function takeLongtime_search(): SearchAuthUserAccountRemote {
 function standard_searchRemoteResult(): SearchAuthUserAccountRemoteResult {
     return {
         success: true,
-        value: { page: { offset: 0, limit: 1000, all: 245 }, users: [] },
+        value: {
+            page: { offset: 0, limit: 1000, all: 245 },
+            sort: { key: defaultSearchAuthUserAccountSort, order: "normal" },
+            users: [],
+        },
     }
 }

@@ -1,4 +1,3 @@
-import { BoardValue } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { readSearchParams } from "../kernel/convert"
 import { ReadSearchSortKeyResult, SearchSort } from "./data"
 
@@ -6,7 +5,7 @@ const SEARCH_SORT_KEY = "search-sort-key"
 const SEARCH_SORT_ORDER = "search-sort-order"
 
 export interface ReadSearchSortKey<K> {
-    (value: BoardValue): ReadSearchSortKeyResult<K>
+    (value: string): ReadSearchSortKeyResult<K>
 }
 
 export function readSearchSort<K>(
@@ -14,22 +13,24 @@ export function readSearchSort<K>(
     defaultSortKey: K,
     readSortKey: ReadSearchSortKey<K>,
 ): SearchSort<K> {
-    const rawKey = readSearchParams(params, SEARCH_SORT_KEY)
-    if (!rawKey.found) {
+    const key = readSearchParams(params, SEARCH_SORT_KEY)
+    const order = readSearchParams(params, SEARCH_SORT_ORDER)
+    if (!key.found || !order.found) {
         return { key: defaultSortKey, order: "normal" }
     }
-
-    const key = readSortKey(rawKey.value)
+    return parseSearchSort({ key: key.value, order: order.value }, defaultSortKey, readSortKey)
+}
+export function parseSearchSort<K>(
+    { key: rawKey, order }: Readonly<{ key: string; order: string }>,
+    defaultSortKey: K,
+    readSortKey: ReadSearchSortKey<K>,
+): SearchSort<K> {
+    const key = readSortKey(rawKey)
     if (!key.found) {
         return { key: defaultSortKey, order: "normal" }
     }
 
-    const order = readSearchParams(params, SEARCH_SORT_ORDER)
-    if (!order.found) {
-        return { key: key.key, order: "normal" }
-    }
-
-    switch (order.value) {
+    switch (order) {
         case "normal":
             return { key: key.key, order: "normal" }
 

@@ -17,5 +17,7 @@ message SearchAuthUserAccountResponsePb {
     int32 offset = 1;
     int32 limit = 2;
     int32 all = 3;
-    repeated auth.user.account.service.AuthUserAccountPb users = 4;
+    string sort_key = 4;
+    string sort_order = 5;
+    repeated auth.user.account.service.AuthUserAccountPb users = 6;
 }
