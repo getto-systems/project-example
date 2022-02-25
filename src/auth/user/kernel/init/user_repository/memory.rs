@@ -8,7 +8,7 @@ use chrono::{DateTime, Utc};
 use crate::z_lib::repository::helper::infra_error;
 
 use crate::auth::user::{
-    account::search::infra::{SearchAuthUserAccountFields, SearchAuthUserAccountRepository},
+    account::search::infra::{SearchAuthUserAccountFilter, SearchAuthUserAccountRepository},
     kernel::infra::AuthUserRepository,
     password::{
         authenticate::infra::VerifyPasswordRepository,
@@ -282,14 +282,14 @@ fn get_granted_roles<'a>(
 impl<'a> SearchAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
     async fn search(
         &self,
-        fields: &SearchAuthUserAccountFields,
+        fields: &SearchAuthUserAccountFilter,
     ) -> Result<SearchAuthUserAccountBasket, RepositoryError> {
         search(&self, fields)
     }
 }
 fn search<'a>(
     repository: &MemoryAuthUserRepository<'a>,
-    _fields: &SearchAuthUserAccountFields,
+    _fields: &SearchAuthUserAccountFilter,
 ) -> Result<SearchAuthUserAccountBasket, RepositoryError> {
     let store = repository.store.lock().unwrap();
     let users = store

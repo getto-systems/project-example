@@ -6,32 +6,32 @@ use crate::{
     },
 };
 
-pub struct SearchAuthUserAccountFields {
+pub struct SearchAuthUserAccountFilter {
     offset: i32,
     sort: SearchSort,
-    login_id: String,
+    login_id: Option<String>,
 }
 
-impl SearchAuthUserAccountFields {
+impl SearchAuthUserAccountFilter {
     pub fn offset(&self) -> i32 {
         self.offset
     }
     pub fn sort(&self) -> &SearchSort {
         &self.sort
     }
-    pub fn login_id(&self) -> &str {
+    pub fn login_id(&self) -> &Option<String> {
         &self.login_id
     }
 }
 
-pub struct SearchAuthUserAccountFieldsExtract {
+pub struct SearchAuthUserAccountFilterExtract {
     pub offset: i32,
     pub sort: SearchSortExtract,
-    pub login_id: String,
+    pub login_id: Option<String>,
 }
-impl Into<SearchAuthUserAccountFields> for SearchAuthUserAccountFieldsExtract {
-    fn into(self) -> SearchAuthUserAccountFields {
-        SearchAuthUserAccountFields {
+impl Into<SearchAuthUserAccountFilter> for SearchAuthUserAccountFilterExtract {
+    fn into(self) -> SearchAuthUserAccountFilter {
+        SearchAuthUserAccountFilter {
             offset: self.offset,
             sort: self.sort.into(),
             login_id: self.login_id,
@@ -40,13 +40,13 @@ impl Into<SearchAuthUserAccountFields> for SearchAuthUserAccountFieldsExtract {
 }
 
 pub trait SearchAuthUserAccountRequestDecoder {
-    fn decode(self) -> SearchAuthUserAccountFieldsExtract;
+    fn decode(self) -> SearchAuthUserAccountFilterExtract;
 }
 
 #[async_trait::async_trait]
 pub trait SearchAuthUserAccountRepository {
     async fn search(
         &self,
-        fields: &SearchAuthUserAccountFields,
+        fields: &SearchAuthUserAccountFilter,
     ) -> Result<SearchAuthUserAccountBasket, RepositoryError>;
 }

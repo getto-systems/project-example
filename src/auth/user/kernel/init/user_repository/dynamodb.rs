@@ -19,7 +19,7 @@ use crate::z_lib::repository::{
 };
 
 use crate::auth::user::{
-    account::search::infra::{SearchAuthUserAccountFields, SearchAuthUserAccountRepository},
+    account::search::infra::{SearchAuthUserAccountFilter, SearchAuthUserAccountRepository},
     kernel::infra::AuthUserRepository,
     password::{
         authenticate::infra::VerifyPasswordRepository,
@@ -577,7 +577,7 @@ async fn update_reset_at<'client, 'a>(
 impl<'client> SearchAuthUserAccountRepository for DynamoDbAuthUserRepository<'client> {
     async fn search(
         &self,
-        fields: &SearchAuthUserAccountFields,
+        fields: &SearchAuthUserAccountFilter,
     ) -> Result<SearchAuthUserAccountBasket, RepositoryError> {
         search_user_account(&self, fields).await
     }
@@ -592,7 +592,7 @@ enum Order {
 }
 async fn search_user_account<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
-    fields: &SearchAuthUserAccountFields,
+    fields: &SearchAuthUserAccountFilter,
 ) -> Result<SearchAuthUserAccountBasket, RepositoryError> {
     // 業務用アプリケーションなので、ユーザー数は 100を超えない
     // dynamodb から全てのデータを取得してフィルタ、ソートする
@@ -626,12 +626,9 @@ async fn search_user_account<'client>(
 
     let mut users: Vec<AuthUserAccountBasket> = users
         .into_iter()
-        .filter(|user| {
-            if fields.login_id() == "" {
-                true
-            } else {
-                user.login_id.as_str() == fields.login_id()
-            }
+        .filter(|user| match fields.login_id() {
+            None => true,
+            Some(login_id) => user.login_id.as_str() == login_id,
         })
         .collect();
 
@@ -684,15 +681,17 @@ async fn scan_user_part<'client>(
         Some(items) => items
             .into_iter()
             .filter_map(|mut item| {
-                let login_id = item.remove("login_id").and_then(|attr| attr.n);
-                let granted_roles = item
-                    .remove("granted_roles")
-                    .and_then(|attr| attr.ss)
-                    .map(|roles| HashSet::from_iter(roles));
-                match (login_id, granted_roles) {
-                    (Some(login_id), Some(granted_roles)) => Some(AuthUserAccountBasket {
+                match (
+                    item.remove("login_id").and_then(|attr| attr.s),
+                    item.remove("granted_roles")
+                        .and_then(|attr| attr.ss)
+                        .map(|roles| HashSet::from_iter(roles)),
+                ) {
+                    (Some(login_id), granted_roles) => Some(AuthUserAccountBasket {
                         login_id: LoginIdBasket::new(login_id),
-                        granted_roles: GrantedAuthRolesBasket::new(granted_roles),
+                        granted_roles: GrantedAuthRolesBasket::new(
+                            granted_roles.unwrap_or(HashSet::new()),
+                        ),
                     }),
                     _ => None,
                 }

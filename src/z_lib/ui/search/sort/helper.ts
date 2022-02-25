@@ -1,6 +1,6 @@
 import { SearchSort, SearchSortOrder } from "./data"
 
-export function nextSort(currentSort: SearchSort, key: string): SearchSort {
+export function nextSort<K>(currentSort: SearchSort<K>, key: K): SearchSort<K> {
     return { key, order: order() }
 
     function order(): SearchSortOrder {

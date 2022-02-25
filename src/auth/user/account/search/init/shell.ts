@@ -4,8 +4,8 @@ import {
 } from "../../../../../z_lib/ui/location/feature"
 
 import {
-    detectSearchAuthUserAccountFields,
-    updateSearchAuthUserAccountFieldsQuery,
+    detectSearchAuthUserAccountFilter,
+    updateSearchAuthUserAccountFilterQuery,
 } from "../convert"
 
 import { SearchAuthUserAccountShell } from "../action"
@@ -13,11 +13,11 @@ import { SearchAuthUserAccountShell } from "../action"
 type OutsideFeature = LocationOutsideFeature & HistoryOutsideFeature
 export function newSearchAuthUserAccountShell(feature: OutsideFeature): SearchAuthUserAccountShell {
     return {
-        detectFields: (params) =>
-            detectSearchAuthUserAccountFields(new URL(feature.currentLocation.toString()), params),
+        detectFields: () =>
+            detectSearchAuthUserAccountFilter(new URL(feature.currentLocation.toString())),
 
         updateQuery: (fields) => {
-            const url = updateSearchAuthUserAccountFieldsQuery(
+            const url = updateSearchAuthUserAccountFilterQuery(
                 new URL(feature.currentLocation.toString()),
                 fields,
             )

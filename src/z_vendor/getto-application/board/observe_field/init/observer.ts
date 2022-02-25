@@ -1,31 +1,29 @@
 import { BoardFieldObserver } from "../infra"
 
-import { BoardValue, emptyBoardValue } from "../../kernel/data"
-
-export function initBoardFieldObserver(value: BoardValueGetter): BoardFieldObserver {
+export function initBoardFieldObserver<V>(value: ObserveValueGetter<V>): BoardFieldObserver<V> {
     return new Observer(value)
 }
 
-type BoardValueStore = Readonly<{ stored: false }> | Readonly<{ stored: true; value: BoardValue }>
+type ObserveValueStore<V> = Readonly<{ stored: false }> | Readonly<{ stored: true; value: V }>
 
-interface BoardValueGetter {
-    (): BoardValue
+interface ObserveValueGetter<V> {
+    (): V
 }
 
-class Observer implements BoardFieldObserver {
-    value: BoardValueGetter
-    store: BoardValueStore = { stored: false }
+class Observer<V> implements BoardFieldObserver<V> {
+    value: ObserveValueGetter<V>
+    store: ObserveValueStore<V> = { stored: false }
 
-    constructor(value: BoardValueGetter) {
+    constructor(value: ObserveValueGetter<V>) {
         this.value = value
     }
 
     pin(): void {
         this.store = { stored: true, value: this.value() }
     }
-    peek(): BoardValue {
+    peek(): V {
         if (!this.store.stored) {
-            return emptyBoardValue
+            return this.value()
         }
         return this.store.value
     }

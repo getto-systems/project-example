@@ -1,7 +1,7 @@
 use crate::auth::user::account::search::y_protobuf::service::SearchAuthUserAccountRequestPb;
 
 use crate::auth::user::account::search::infra::{
-    SearchAuthUserAccountFieldsExtract, SearchAuthUserAccountRequestDecoder,
+    SearchAuthUserAccountFilterExtract, SearchAuthUserAccountRequestDecoder,
 };
 use crate::z_lib::search::data::SearchSortExtract;
 
@@ -16,14 +16,14 @@ impl PbSearchAuthUserAccountRequestDecoder {
 }
 
 impl SearchAuthUserAccountRequestDecoder for PbSearchAuthUserAccountRequestDecoder {
-    fn decode(self) -> SearchAuthUserAccountFieldsExtract {
-        SearchAuthUserAccountFieldsExtract {
+    fn decode(mut self) -> SearchAuthUserAccountFilterExtract {
+        SearchAuthUserAccountFilterExtract {
             offset: self.request.offset,
             sort: SearchSortExtract {
                 key: self.request.sort_key,
                 order: self.request.sort_order,
             },
-            login_id: self.request.login_id,
+            login_id: self.request.login_id.pop(),
         }
     }
 }
@@ -31,15 +31,15 @@ impl SearchAuthUserAccountRequestDecoder for PbSearchAuthUserAccountRequestDecod
 #[cfg(test)]
 pub mod test {
     use crate::auth::user::account::search::infra::{
-        SearchAuthUserAccountFieldsExtract, SearchAuthUserAccountRequestDecoder,
+        SearchAuthUserAccountFilterExtract, SearchAuthUserAccountRequestDecoder,
     };
 
     pub enum StaticSearchAuthUserAccountRequestDecoder {
-        Valid(SearchAuthUserAccountFieldsExtract),
+        Valid(SearchAuthUserAccountFilterExtract),
     }
 
     impl SearchAuthUserAccountRequestDecoder for StaticSearchAuthUserAccountRequestDecoder {
-        fn decode(self) -> SearchAuthUserAccountFieldsExtract {
+        fn decode(self) -> SearchAuthUserAccountFilterExtract {
             match self {
                 Self::Valid(fields) => fields,
             }

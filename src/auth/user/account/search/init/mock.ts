@@ -1,6 +1,6 @@
 import {
-    detectSearchAuthUserAccountFields,
-    updateSearchAuthUserAccountFieldsQuery,
+    detectSearchAuthUserAccountFilter,
+    updateSearchAuthUserAccountFilterQuery,
 } from "../convert"
 
 import { SearchAuthUserAccountShell } from "../action"
@@ -10,10 +10,10 @@ export function mockSearchAuthUserAccountShell(
     updater: { (url: URL): void },
 ): SearchAuthUserAccountShell {
     return {
-        detectFields: (params) => detectSearchAuthUserAccountFields(url, params),
+        detectFields: () => detectSearchAuthUserAccountFilter(url),
 
         updateQuery: (fields) => {
-            updater(updateSearchAuthUserAccountFieldsQuery(url, fields))
+            updater(updateSearchAuthUserAccountFilterQuery(url, fields))
         },
     }
 }

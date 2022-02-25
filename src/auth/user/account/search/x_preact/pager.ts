@@ -13,7 +13,7 @@ import { SearchOffsetComponent } from "../../../../../z_lib/ui/search/offset/x_p
 import { SearchAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
 
 import { pagerOptions } from "../../../../../z_vendor/getto-css/preact/design/table"
-import { SearchPageResponse } from "../../../../../z_lib/ui/search/data"
+import { SearchPageResponse } from "../../../../../z_lib/ui/search/kernel/data"
 import { RemoteCommonError } from "../../../../../z_lib/ui/remote/data"
 
 type EntryProps = Readonly<{

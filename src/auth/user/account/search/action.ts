@@ -22,15 +22,19 @@ import {
 } from "../../../../z_lib/ui/search/columns/action"
 
 import {
-    SearchAuthUserAccountFieldsDetecter,
+    SearchAuthUserAccountFilterDetecter,
     SearchAuthUserAccountRemote,
     UpdateSearchAuthUserAccountFieldsQuery,
 } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
 
-import { SearchSort } from "../../../../z_lib/ui/search/sort/data"
 import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
-import { SearchAuthUserAccountFields, SearchAuthUserAccountRemoteResponse } from "./data"
+import {
+    SearchAuthUserAccountFilter,
+    SearchAuthUserAccountRemoteResponse,
+    SearchAuthUserAccountSort,
+    SearchAuthUserAccountSortKey,
+} from "./data"
 
 export interface SearchAuthUserAccountAction
     extends StatefulApplicationAction<SearchAuthUserAccountState> {
@@ -39,12 +43,12 @@ export interface SearchAuthUserAccountAction
     readonly columns: SearchColumnsAction
     readonly observe: ObserveBoardAction
 
-    currentSort(): SearchSort
+    currentSort(): SearchAuthUserAccountSort
 
     clear(): SearchAuthUserAccountState
     submit(): Promise<SearchAuthUserAccountState>
     load(): Promise<SearchAuthUserAccountState>
-    sort(key: string): Promise<SearchAuthUserAccountState>
+    sort(key: SearchAuthUserAccountSortKey): Promise<SearchAuthUserAccountState>
 }
 
 export type SearchAuthUserAccountMaterial = Readonly<{
@@ -59,7 +63,7 @@ export type SearchAuthUserAccountInfra = Readonly<{
     SearchColumnsInfra
 
 export type SearchAuthUserAccountShell = Readonly<{
-    detectFields: SearchAuthUserAccountFieldsDetecter
+    detectFields: SearchAuthUserAccountFilterDetecter
     updateQuery: UpdateSearchAuthUserAccountFieldsQuery
 }>
 
@@ -96,11 +100,11 @@ class Action
 
     material: SearchAuthUserAccountMaterial
 
-    searchFields: { (): SearchAuthUserAccountFields }
-    loadFields: { (): SearchAuthUserAccountFields }
-    sortFields: { (key: string): SearchAuthUserAccountFields }
+    searchFields: { (): SearchAuthUserAccountFilter }
+    loadFields: { (): SearchAuthUserAccountFilter }
+    sortFields: { (key: SearchAuthUserAccountSortKey): SearchAuthUserAccountFilter }
 
-    sortStore: SearchSort
+    sortStore: SearchAuthUserAccountSort
 
     constructor(material: SearchAuthUserAccountMaterial) {
         super({
@@ -112,7 +116,7 @@ class Action
         })
         this.material = material
 
-        const initialFields = material.shell.detectFields({ defaultSortKey: "login-id" })
+        const initialFields = material.shell.detectFields()
 
         const loginID = initSearchLoginIDAction(initialFields.loginID)
         const offset = initSearchOffsetAction(initialFields.offset)
@@ -131,7 +135,7 @@ class Action
             sort: this.currentSort(),
             loginID: loginID.peek(),
         })
-        this.sortFields = (key: string) => ({
+        this.sortFields = (key: SearchAuthUserAccountSortKey) => ({
             offset: offset.reset(),
             sort: this.updateSort(key),
             loginID: loginID.peek(),
@@ -149,10 +153,10 @@ class Action
         )
     }
 
-    currentSort(): SearchSort {
+    currentSort(): SearchAuthUserAccountSort {
         return this.sortStore
     }
-    updateSort(key: string): SearchSort {
+    updateSort(key: SearchAuthUserAccountSortKey): SearchAuthUserAccountSort {
         this.sortStore = nextSort(this.currentSort(), key)
         return this.sortStore
     }
@@ -167,7 +171,7 @@ class Action
     async load(): Promise<SearchAuthUserAccountState> {
         return search(this.material, this.loadFields(), this.post)
     }
-    async sort(key: string): Promise<SearchAuthUserAccountState> {
+    async sort(key: SearchAuthUserAccountSortKey): Promise<SearchAuthUserAccountState> {
         return search(this.material, this.sortFields(key), this.post)
     }
 }
@@ -180,7 +184,7 @@ type SearchAuthUserAccountEvent =
 
 async function search<S>(
     { infra, shell, config }: SearchAuthUserAccountMaterial,
-    fields: SearchAuthUserAccountFields,
+    fields: SearchAuthUserAccountFilter,
     post: Post<SearchAuthUserAccountEvent, S>,
 ): Promise<S> {
     shell.updateQuery(fields)

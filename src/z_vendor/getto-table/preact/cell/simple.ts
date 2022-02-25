@@ -53,9 +53,9 @@ export type TableDataSimpleContent<M, R> = Readonly<{
         footer: TableDataSummaryContentProvider<M>
     }>
 
-export function tableCell<M, R>(
-    key: TableDataCellKey,
-    content: { (key: TableDataCellKey): TableDataSimpleContent<M, R> },
+export function tableCell<K extends TableDataCellKey, M, R>(
+    key: K,
+    content: { (key: K): TableDataSimpleContent<M, R> },
 ): TableCellSimple<M, R> {
     return new Cell(key, content(key))
 }

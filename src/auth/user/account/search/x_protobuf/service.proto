@@ -11,7 +11,7 @@ message SearchAuthUserAccountRequestPb {
     int32 offset = 1;
     string sort_key = 2;
     string sort_order = 3;
-    string login_id = 4;
+    repeated string login_id = 4;
 }
 message SearchAuthUserAccountResponsePb {
     int32 offset = 1;

@@ -6,7 +6,7 @@ use crate::auth::ticket::validate::method::{
 };
 
 use crate::auth::user::account::search::infra::{
-    SearchAuthUserAccountFieldsExtract, SearchAuthUserAccountRepository,
+    SearchAuthUserAccountFilterExtract, SearchAuthUserAccountRepository,
     SearchAuthUserAccountRequestDecoder,
 };
 
@@ -108,7 +108,7 @@ impl std::fmt::Display for SearchAuthUserAccountEvent {
 
 async fn search_user_account<S>(
     infra: &impl SearchAuthUserAccountMaterial,
-    fields: SearchAuthUserAccountFieldsExtract,
+    fields: SearchAuthUserAccountFilterExtract,
     post: impl Fn(SearchAuthUserAccountEvent) -> S,
 ) -> MethodResult<S> {
     let fields = fields.into();
