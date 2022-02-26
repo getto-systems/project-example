@@ -2,7 +2,7 @@ import { setupActionTestRunner } from "../../../../../z_vendor/getto-application
 import { ticker } from "../../../../../z_lib/ui/timer/helper"
 import { toApplicationView } from "../../../../../z_vendor/getto-application/action/helper"
 
-import { markBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/mock"
+import { markBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/test_helper"
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../../z_lib/ui/clock/mock"
 import { mockSecureServerURL } from "../../../../sign/get_script_path/init/mock"

@@ -1,5 +1,4 @@
 import { h, VNode } from "preact"
-import { useLayoutEffect } from "preact/hooks"
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
@@ -25,30 +24,26 @@ export function SearchAuthUserAccountColumnsEntry(resource: EntryProps): VNode {
     return h(SearchAuthUserAccountColumnsComponent, {
         ...resource,
         state: useApplicationAction(resource.search),
-        columns: useApplicationAction(resource.search.columns),
+        columnsState: useApplicationAction(resource.search.columns),
     })
 }
 
 type Props = EntryProps &
     Readonly<{
-        columns: SearchColumnsState
+        columnsState: SearchColumnsState
     }>
 export function SearchAuthUserAccountColumnsComponent(props: Props): VNode {
-    useLayoutEffect(() => {
-        props.search.columns.load(props.structure.initiallyVisibleCells())
-    }, [props.search.columns, props.structure])
-
     return basedOn(props)
 
-    function basedOn({ columns }: Props): VNode {
-        switch (columns.type) {
+    function basedOn({ columnsState }: Props): VNode {
+        switch (columnsState.type) {
             case "initial-search":
             case "succeed-to-load":
             case "succeed-to-save":
                 return columnsBox()
 
             case "repository-error":
-                return errorMessage(columns.err)
+                return errorMessage(columnsState.err)
         }
     }
 

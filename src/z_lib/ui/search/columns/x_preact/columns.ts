@@ -13,6 +13,7 @@ import {
 } from "../../../../../z_vendor/getto-application/board/input/x_preact/checkbox"
 
 import { markBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/convert"
+import { searchColumns } from "./helper"
 
 import { SearchColumnsAction, SearchColumnsState } from "../action"
 
@@ -53,20 +54,16 @@ export function SearchColumnsComponent(props: Props): VNode {
         return "表示する列"
     }
     function checkbox({ state }: Props): VNode {
-        switch (state.type) {
-            case "initial-search":
-            case "repository-error":
-                return EMPTY_CONTENT
-
-            case "succeed-to-load":
-            case "succeed-to-save":
-                return h(CheckboxBoardComponent, {
-                    input: props.field.input,
-                    defaultChecked: state.columns,
-                    options: options(),
-                    block: block(),
-                })
+        const columns = searchColumns(state)
+        if (!columns.found) {
+            return EMPTY_CONTENT
         }
+        return h(CheckboxBoardComponent, {
+            input: props.field.input,
+            defaultChecked: columns.columns,
+            options: options(),
+            block: block(),
+        })
 
         function options(): readonly CheckboxBoardContent[] {
             return props.columns.map((column) => ({

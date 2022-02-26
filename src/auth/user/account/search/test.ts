@@ -1,7 +1,7 @@
 import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 
-import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/mock"
+import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 import { mockSearchAuthUserAccountShell } from "./init/mock"
 import { initMemoryDB } from "../../../../z_lib/ui/repository/init/memory"
@@ -11,6 +11,7 @@ import { initSearchAuthUserAccountAction, SearchAuthUserAccountAction } from "./
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 import { SearchAuthUserAccountRemote, SearchAuthUserAccountRemoteResult } from "./infra"
 import { defaultSearchAuthUserAccountSort } from "./data"
+import { readSearchAuthUserAccountSortKey } from "./convert"
 
 describe("SearchAuthUserAccount", () => {
     test("initial load", async () => {
@@ -20,11 +21,13 @@ describe("SearchAuthUserAccount", () => {
 
         await runner(async () => resource.search.ignitionState).then((stack) => {
             expect(stack).toEqual([
-                { type: "try-to-search" },
+                { type: "try-to-search", previousResponse: undefined },
                 {
                     type: "succeed-to-search",
+                    previousResponse: undefined,
                     response: {
                         page: { offset: 0, limit: 1000, all: 245 },
+                        sort: { key: "login-id", order: "normal" },
                         users: [],
                     },
                 },
@@ -45,11 +48,24 @@ describe("SearchAuthUserAccount", () => {
             return resource.search.submit()
         }).then((stack) => {
             expect(stack).toEqual([
-                { type: "try-to-search" },
+                {
+                    type: "try-to-search",
+                    previousResponse: {
+                        page: { offset: 0, limit: 1000, all: 245 },
+                        sort: { key: "login-id", order: "normal" },
+                        users: [],
+                    },
+                },
                 {
                     type: "succeed-to-search",
+                    previousResponse: {
+                        page: { offset: 0, limit: 1000, all: 245 },
+                        sort: { key: "login-id", order: "normal" },
+                        users: [],
+                    },
                     response: {
                         page: { offset: 0, limit: 1000, all: 245 },
+                        sort: { key: "login-id", order: "normal" },
                         users: [],
                     },
                 },
@@ -71,12 +87,32 @@ describe("SearchAuthUserAccount", () => {
             return resource.search.submit()
         }).then((stack) => {
             expect(stack).toEqual([
-                { type: "try-to-search" },
-                { type: "take-longtime-to-search" },
+                {
+                    type: "try-to-search",
+                    previousResponse: {
+                        page: { offset: 0, limit: 1000, all: 245 },
+                        sort: { key: "login-id", order: "normal" },
+                        users: [],
+                    },
+                },
+                {
+                    type: "take-longtime-to-search",
+                    previousResponse: {
+                        page: { offset: 0, limit: 1000, all: 245 },
+                        sort: { key: "login-id", order: "normal" },
+                        users: [],
+                    },
+                },
                 {
                     type: "succeed-to-search",
+                    previousResponse: {
+                        page: { offset: 0, limit: 1000, all: 245 },
+                        sort: { key: "login-id", order: "normal" },
+                        users: [],
+                    },
                     response: {
                         page: { offset: 0, limit: 1000, all: 245 },
+                        sort: { key: "login-id", order: "normal" },
                         users: [],
                     },
                 },
@@ -95,11 +131,24 @@ describe("SearchAuthUserAccount", () => {
             return resource.search.sort("login-id")
         }).then((stack) => {
             expect(stack).toEqual([
-                { type: "try-to-search" },
+                {
+                    type: "try-to-search",
+                    previousResponse: {
+                        page: { offset: 0, limit: 1000, all: 245 },
+                        sort: { key: "login-id", order: "normal" },
+                        users: [],
+                    },
+                },
                 {
                     type: "succeed-to-search",
+                    previousResponse: {
+                        page: { offset: 0, limit: 1000, all: 245 },
+                        sort: { key: "login-id", order: "normal" },
+                        users: [],
+                    },
                     response: {
                         page: { offset: 0, limit: 1000, all: 245 },
+                        sort: { key: "login-id", order: "normal" },
                         users: [],
                     },
                 },
@@ -134,6 +183,16 @@ describe("SearchAuthUserAccount", () => {
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])
+        })
+    })
+
+    test("read sort key", () => {
+        expect(readSearchAuthUserAccountSortKey("login-id")).toEqual({
+            found: true,
+            key: "login-id",
+        })
+        expect(readSearchAuthUserAccountSortKey("unknown")).toEqual({
+            found: false,
         })
     })
 })

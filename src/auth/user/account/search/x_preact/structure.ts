@@ -30,7 +30,11 @@ type Summary = {
 export function useSearchAuthUserAccountTableStructure(
     search: SearchAuthUserAccountAction,
 ): SearchAuthUserAccountTableStructure {
-    return useMemo(() => build(search), [search])
+    return useMemo(() => {
+        const structure = build(search)
+        search.columns.setInitialSearchColumns(structure.initialVisibleCells())
+        return structure
+    }, [search])
 }
 
 function build(search: SearchAuthUserAccountAction): SearchAuthUserAccountTableStructure {

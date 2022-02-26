@@ -4,7 +4,7 @@ import { markSeason } from "../kernel/test_helper"
 
 import { mockClock, mockClockPubSub } from "../../../z_lib/ui/clock/mock"
 import { mockBoardValueStore } from "../../../z_vendor/getto-application/board/input/test_helper"
-import { markBoardValue } from "../../../z_vendor/getto-application/board/kernel/mock"
+import { markBoardValue } from "../../../z_vendor/getto-application/board/kernel/test_helper"
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 
 import { initSetupSeasonAction } from "./action"

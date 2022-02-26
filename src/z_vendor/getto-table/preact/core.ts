@@ -3,7 +3,7 @@ import { VNodeContent, VNodeKey } from "./common"
 import { TableDataClassName, TableDataFullStyle, TableDataSticky } from "./style"
 
 export interface TableStructure<M, R> {
-    initiallyVisibleCells(): readonly TableDataCellKey[]
+    initialVisibleCells(): readonly TableDataCellKey[]
 
     view(): readonly TableDataView[]
     header(params: TableDataParams<M>): TableDataHeaderRow

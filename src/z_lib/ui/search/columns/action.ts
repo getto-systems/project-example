@@ -18,7 +18,7 @@ import { RepositoryError } from "../../repository/data"
 export interface SearchColumnsAction extends StatefulApplicationAction<SearchColumnsState> {
     readonly input: MultipleInputBoardAction
 
-    load(initial: readonly string[]): Promise<SearchColumnsState>
+    setInitialSearchColumns(initial: readonly string[]): Promise<SearchColumnsState>
 }
 
 export type SearchColumnsInfra = Readonly<{
@@ -47,8 +47,11 @@ class Action
     infra: SearchColumnsInfra
     store: MultipleBoardValueStore
 
+    searchColumns?: SearchColumns
+
     constructor(infra: SearchColumnsInfra) {
         super({
+            ignite: () => this.load(),
             terminate: () => {
                 subscriber.terminate()
             },
@@ -65,6 +68,13 @@ class Action
         })
     }
 
+    async setInitialSearchColumns(initial: readonly string[]): Promise<SearchColumnsState> {
+        if (!this.searchColumns) {
+            this.searchColumns = toSearchColumns(initial)
+        }
+        return this.post({ type: "succeed-to-load", columns: this.searchColumns })
+    }
+
     async save(columns: SearchColumns): Promise<SearchColumnsState> {
         const { columnsRepository } = this.infra
         const result = await columnsRepository.set(columns)
@@ -74,7 +84,7 @@ class Action
         return this.post({ type: "succeed-to-save", columns })
     }
 
-    async load(initial: readonly string[]): Promise<SearchColumnsState> {
+    async load(): Promise<SearchColumnsState> {
         const { columnsRepository } = this.infra
 
         const columnsResult = await columnsRepository.get()
@@ -82,7 +92,10 @@ class Action
             return this.post({ type: "repository-error", err: columnsResult.err })
         }
         if (!columnsResult.found) {
-            return this.post({ type: "succeed-to-load", columns: toSearchColumns(initial) })
+            return this.post({
+                type: "succeed-to-load",
+                columns: this.searchColumns || toSearchColumns([]),
+            })
         }
 
         return this.post({ type: "succeed-to-load", columns: columnsResult.value })

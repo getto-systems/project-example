@@ -61,7 +61,7 @@ class Structure<M, R> implements TableStructure<M, R>, TableStructure_hot<M, R> 
         }
     }
 
-    initiallyVisibleCells(): readonly TableDataCellKey[] {
+    initialVisibleCells(): readonly TableDataCellKey[] {
         return tableCellInitiallyVisibleCells(this.cells)
     }
 

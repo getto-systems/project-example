@@ -74,7 +74,9 @@ export type SearchAuthUserAccountConfig = Readonly<{
 export type SearchAuthUserAccountState =
     | Readonly<{ type: "initial-search" }>
     | (SearchAuthUserAccountEvent &
-          Readonly<{ previousResponse?: SearchAuthUserAccountRemoteResponse }>)
+          Readonly<{
+              previousResponse?: SearchAuthUserAccountRemoteResponse
+          }>)
 
 export const initialSearchAuthUserAccountState: SearchAuthUserAccountState = {
     type: "initial-search",
