@@ -13,7 +13,7 @@ import { SearchOffsetComponent } from "../../../../../z_lib/ui/search/offset/x_p
 import { SearchAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
 
 import { pagerOptions } from "../../../../../z_vendor/getto-css/preact/design/table"
-import { SearchPageResponse } from "../../../../../z_lib/ui/search/data"
+import { SearchPageResponse } from "../../../../../z_lib/ui/search/kernel/data"
 import { RemoteCommonError } from "../../../../../z_lib/ui/remote/data"
 
 type EntryProps = Readonly<{
@@ -36,8 +36,14 @@ export function SearchAuthUserAccountPagerComponent(props: Props): VNode {
     function basedOn({ state }: Props): VNode {
         switch (state.type) {
             case "initial-search":
-            case "try-to-search":
                 return EMPTY_BOX
+
+            case "try-to-search":
+                if (state.previousResponse) {
+                    return pagerForm({ page: state.previousResponse.page })
+                } else {
+                    return EMPTY_BOX
+                }
 
             case "succeed-to-search":
                 return pagerForm({ page: state.response.page })

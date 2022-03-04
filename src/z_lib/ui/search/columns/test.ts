@@ -1,6 +1,6 @@
 import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
 
-import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/mock"
+import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockMultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 import { initMemoryDB } from "../../repository/init/memory"
 
@@ -18,19 +18,19 @@ describe("SearchColumns", () => {
         const runner = setupActionTestRunner(resource.field.subscriber)
 
         await runner(async () => {
-            await resource.field.load(["column-initial"])
+            await resource.field.ignitionState
+            await resource.field.setInitialSearchColumns(["column-initial"])
             store.columns.set([markBoardValue("column-a")])
             resource.field.input.publisher.post()
             store.columns.set([markBoardValue("column-a"), markBoardValue("column-b")])
             resource.field.input.publisher.post()
-            await resource.field.load(["column-initial"])
             return resource.field.currentState()
         }).then((stack) => {
             expect(stack).toEqual([
+                { type: "succeed-to-load", columns: [] },
                 { type: "succeed-to-load", columns: ["column-initial"] },
                 { type: "succeed-to-save", columns: ["column-a"] },
                 { type: "succeed-to-save", columns: ["column-a", "column-b"] },
-                { type: "succeed-to-load", columns: ["column-a", "column-b"] },
             ])
         })
     })
@@ -68,7 +68,7 @@ function initResource(): Readonly<{
 }> {
     const resource = {
         field: initSearchColumnsAction({
-            columnsRepository: convertDB(initMemoryDB(), searchColumnsRepositoryConverter),
+            columnsRepository: standard_columnRepository(),
         }),
     }
 
@@ -79,4 +79,10 @@ function initResource(): Readonly<{
     resource.field.input.connector.connect(store.columns)
 
     return { resource, store }
+}
+
+function standard_columnRepository() {
+    const db = initMemoryDB()
+    db.set([])
+    return convertDB(db, searchColumnsRepositoryConverter)
 }

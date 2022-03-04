@@ -29,15 +29,13 @@ use crate::auth::ticket::validate::method::AuthNonceConfig;
 
 use super::action::{SearchAuthUserAccountAction, SearchAuthUserAccountMaterial};
 
-use crate::auth::user::{
-    account::search::infra::SearchAuthUserAccountFieldsExtract,
-    password::kernel::infra::HashedPassword,
-};
+use crate::auth::user::password::kernel::infra::HashedPassword;
 
 use crate::{
     auth::{
         ticket::kernel::data::{AuthTicketExtract, ExpireDuration},
         user::{
+            account::search::data::SearchAuthUserAccountFilterExtract,
             kernel::data::{AuthUser, AuthUserExtract},
             login_id::kernel::data::LoginId,
         },
@@ -153,13 +151,13 @@ fn standard_token_decoder() -> StaticAuthTokenDecoder {
 }
 
 fn standard_request_decoder() -> StaticSearchAuthUserAccountRequestDecoder {
-    StaticSearchAuthUserAccountRequestDecoder::Valid(SearchAuthUserAccountFieldsExtract {
+    StaticSearchAuthUserAccountRequestDecoder::Valid(SearchAuthUserAccountFilterExtract {
         offset: 0,
         sort: SearchSortExtract {
-            key: "login-id".into(),
+            key: "login-id".to_owned().into(),
             order: "normal".into(),
         },
-        login_id: "login-id".into(),
+        login_id: Some("login-id".into()),
     })
 }
 

@@ -1,7 +1,7 @@
 import { setupActionTestRunner } from "../../action/test_helper"
 
 import { mockBoardValueStore } from "./test_helper"
-import { markBoardValue } from "../kernel/mock"
+import { markBoardValue } from "../kernel/test_helper"
 
 import { initInputBoardAction } from "./action"
 

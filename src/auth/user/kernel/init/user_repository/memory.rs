@@ -8,7 +8,7 @@ use chrono::{DateTime, Utc};
 use crate::z_lib::repository::helper::infra_error;
 
 use crate::auth::user::{
-    account::search::infra::{SearchAuthUserAccountFields, SearchAuthUserAccountRepository},
+    account::search::infra::SearchAuthUserAccountRepository,
     kernel::infra::AuthUserRepository,
     password::{
         authenticate::infra::VerifyPasswordRepository,
@@ -26,7 +26,9 @@ use crate::{
     auth::{
         ticket::kernel::data::{AuthDateTime, ExpireDateTime},
         user::{
-            account::search::data::{AuthUserAccountBasket, SearchAuthUserAccountBasket},
+            account::search::data::{
+                AuthUserAccountBasket, SearchAuthUserAccountBasket, SearchAuthUserAccountFilter,
+            },
             kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRolesBasket},
             login_id::kernel::data::{LoginId, LoginIdBasket},
             password::{
@@ -282,14 +284,14 @@ fn get_granted_roles<'a>(
 impl<'a> SearchAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
     async fn search(
         &self,
-        fields: &SearchAuthUserAccountFields,
+        filter: SearchAuthUserAccountFilter,
     ) -> Result<SearchAuthUserAccountBasket, RepositoryError> {
-        search(&self, fields)
+        search(&self, filter)
     }
 }
 fn search<'a>(
     repository: &MemoryAuthUserRepository<'a>,
-    _fields: &SearchAuthUserAccountFields,
+    filter: SearchAuthUserAccountFilter,
 ) -> Result<SearchAuthUserAccountBasket, RepositoryError> {
     let store = repository.store.lock().unwrap();
     let users = store
@@ -312,7 +314,8 @@ fn search<'a>(
             limit: 0,
             all: 0,
         },
-        users: users,
+        sort: filter.into_sort(),
+        users,
     })
 }
 

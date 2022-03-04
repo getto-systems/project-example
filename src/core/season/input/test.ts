@@ -1,4 +1,4 @@
-import { markBoardValue } from "../../../z_vendor/getto-application/board/kernel/mock"
+import { markBoardValue } from "../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockBoardValueStore } from "../../../z_vendor/getto-application/board/input/test_helper"
 
 import { initInputSeasonAction } from "./action"

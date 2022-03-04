@@ -1,18 +1,22 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::ticket::kernel::data::ValidateAuthRolesError;
 use crate::auth::ticket::validate::method::{
     validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
 };
 
 use crate::auth::user::account::search::infra::{
-    SearchAuthUserAccountFieldsExtract, SearchAuthUserAccountRepository,
-    SearchAuthUserAccountRequestDecoder,
+    SearchAuthUserAccountRepository, SearchAuthUserAccountRequestDecoder,
 };
 
 use crate::{
-    auth::user::{
-        account::search::data::SearchAuthUserAccountBasket, kernel::data::RequireAuthRoles,
+    auth::{
+        ticket::kernel::data::ValidateAuthRolesError,
+        user::{
+            account::search::data::{
+                SearchAuthUserAccountBasket, SearchAuthUserAccountFilterExtract,
+            },
+            kernel::data::RequireAuthRoles,
+        },
     },
     z_lib::repository::data::RepositoryError,
 };
@@ -108,14 +112,14 @@ impl std::fmt::Display for SearchAuthUserAccountEvent {
 
 async fn search_user_account<S>(
     infra: &impl SearchAuthUserAccountMaterial,
-    fields: SearchAuthUserAccountFieldsExtract,
+    filter: SearchAuthUserAccountFilterExtract,
     post: impl Fn(SearchAuthUserAccountEvent) -> S,
 ) -> MethodResult<S> {
-    let fields = fields.into();
+    let filter = filter.into();
 
     let search_repository = infra.search_repository();
     let response = search_repository
-        .search(&fields)
+        .search(filter)
         .await
         .map_err(|err| post(SearchAuthUserAccountEvent::RepositoryError(err)))?;
 

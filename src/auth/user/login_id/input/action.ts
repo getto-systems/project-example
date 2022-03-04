@@ -17,11 +17,9 @@ import {
 
 import { BoardFieldChecker } from "../../../../z_vendor/getto-application/board/validate_field/infra"
 
-import {
-    BoardValue,
-    emptyBoardValue,
-} from "../../../../z_vendor/getto-application/board/kernel/data"
+import { emptyBoardValue } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { LoginID, ValidateLoginIDError } from "./data"
+import { SingleValueFilter } from "../../../../z_lib/ui/search/kernel/data"
 
 export interface InputLoginIDAction extends ApplicationAction {
     readonly input: InputBoardAction
@@ -67,16 +65,24 @@ export interface SearchLoginIDAction extends ApplicationAction {
     clear(): void
 }
 
-export function initSearchLoginIDAction(initial: BoardValue): Readonly<{
+export function initSearchLoginIDAction(initial: SingleValueFilter): Readonly<{
     input: SearchLoginIDAction
-    pin: { (): BoardValue }
-    peek: { (): BoardValue }
+    pin: { (): SingleValueFilter }
+    peek: { (): SingleValueFilter }
 }> {
     const { input, store, subscriber } = initInputBoardAction()
 
-    store.set(initial)
+    if (initial.search) {
+        store.set(initial.value)
+    }
 
-    const value = () => store.get()
+    const value = (): SingleValueFilter => {
+        const value = store.get()
+        if (value === "") {
+            return { search: false }
+        }
+        return { search: true, value }
+    }
     const observer = initBoardFieldObserver(value)
     const observe = initObserveBoardFieldAction({ observer })
 

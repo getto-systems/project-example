@@ -12,6 +12,9 @@ import {
 } from "../../../../../z_vendor/getto-css/preact/design/table"
 import { EMPTY_TABLE } from "../../../../../core/x_preact/design/table"
 
+import { searchResponse } from "../../../../../z_lib/ui/search/kernel/x_preact/helper"
+import { searchColumns } from "../../../../../z_lib/ui/search/columns/x_preact/helper"
+
 import { SearchAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
 import { SearchColumnsState } from "../../../../../z_lib/ui/search/columns/action"
 
@@ -28,31 +31,25 @@ export function SearchAuthUserAccountTableEntry(resource: EntryProps): VNode {
     return h(SearchAuthUserAccountTableComponent, {
         ...resource,
         state: useApplicationAction(resource.search),
-        columns: useApplicationAction(resource.search.columns),
+        columnsState: useApplicationAction(resource.search.columns),
     })
 }
 
 type Props = EntryProps &
     Readonly<{
         state: SearchAuthUserAccountState
-        columns: SearchColumnsState
+        columnsState: SearchColumnsState
     }>
 export function SearchAuthUserAccountTableComponent(props: Props): VNode {
     return basedOn(props)
 
-    function basedOn({ state, columns }: Props): VNode {
-        switch (columns.type) {
-            case "repository-error":
-            case "initial-search":
-                return EMPTY_CONTENT
-
-            case "succeed-to-load":
-            case "succeed-to-save":
-                if (state.type === "succeed-to-search") {
-                    return content({ columns: columns.columns, response: state.response })
-                }
-                return EMPTY_CONTENT
+    function basedOn({ state, columnsState }: Props): VNode {
+        const response = searchResponse(state)
+        const columns = searchColumns(columnsState)
+        if (!columns.found || !response.found) {
+            return EMPTY_CONTENT
         }
+        return content({ columns: columns.columns, response: response.response })
     }
 
     type Content = Readonly<{

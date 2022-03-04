@@ -6,7 +6,7 @@ import { lnir } from "../../../z_lib/ui/icon/init/line_icon"
 import { box_grow, container } from "../../../z_vendor/getto-css/preact/design/box"
 import { notice_gray } from "../../../z_vendor/getto-css/preact/design/highlight"
 
-import { SearchPageResponse } from "../../../z_lib/ui/search/data"
+import { SearchPageResponse } from "../../../z_lib/ui/search/kernel/data"
 import { VNode } from "preact"
 
 export const SORT_SIGN: SortSign = {

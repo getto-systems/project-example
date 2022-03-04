@@ -36,47 +36,25 @@ impl SearchOffset {
     }
 }
 
-pub struct SearchSort {
-    key: String,
+pub struct SearchSort<K> {
+    key: K,
     order: SearchSortOrder,
 }
 
-impl SearchSort {
-    pub fn detect<T, O>(&self, keys: Vec<(&str, T, SearchSortOrderMap<O>)>) -> Option<(T, O)> {
-        keys.into_iter().find_map(|(key, col, map)| {
-            if key.to_string() == self.key {
-                Some((
-                    col,
-                    match self.order {
-                        SearchSortOrder::Normal => map.normal,
-                        SearchSortOrder::Reverse => map.reverse,
-                    },
-                ))
-            } else {
-                None
-            }
-        })
+impl<K> SearchSort<K> {
+    pub fn key(&self) -> &K {
+        &self.key
+    }
+    pub fn order(&self) -> &SearchSortOrder {
+        &self.order
     }
 }
 
-pub struct SearchSortOrderMap<T> {
-    pub normal: T,
-    pub reverse: T,
-}
-
-pub struct SearchSortExtract {
-    pub key: String,
-    pub order: String,
-}
-impl Into<SearchSort> for SearchSortExtract {
-    fn into(self) -> SearchSort {
-        SearchSort {
-            key: self.key,
-            order: if self.order == "reverse".to_string() {
-                SearchSortOrder::Reverse
-            } else {
-                SearchSortOrder::Normal
-            },
+impl<K: Into<String>> SearchSort<K> {
+    pub fn extract(self) -> SearchSortExtract {
+        SearchSortExtract {
+            key: self.key.into(),
+            order: self.order.into(),
         }
     }
 }
@@ -84,6 +62,32 @@ impl Into<SearchSort> for SearchSortExtract {
 pub enum SearchSortOrder {
     Normal,
     Reverse,
+}
+
+impl Into<String> for SearchSortOrder {
+    fn into(self) -> String {
+        match self {
+            Self::Normal => "normal".to_owned(),
+            Self::Reverse => "reverse".to_owned(),
+        }
+    }
+}
+
+pub struct SearchSortExtract {
+    pub key: String,
+    pub order: String,
+}
+impl<K: From<String>> Into<SearchSort<K>> for SearchSortExtract {
+    fn into(self) -> SearchSort<K> {
+        SearchSort {
+            key: self.key.into(),
+            order: if self.order.as_str() == "reverse" {
+                SearchSortOrder::Reverse
+            } else {
+                SearchSortOrder::Normal
+            },
+        }
+    }
 }
 
 pub struct SearchPage {

@@ -3,7 +3,7 @@ import { toApplicationView } from "../../../../z_vendor/getto-application/action
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_lib/ui/clock/mock"
-import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/mock"
+import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 import {
     mockGetScriptPathShell,

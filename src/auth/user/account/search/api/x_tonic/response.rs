@@ -38,10 +38,13 @@ impl ServiceResponder<SearchAuthUserAccountResponsePb> for SearchAuthUserAccount
 
 impl Into<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountBasket {
     fn into(self) -> SearchAuthUserAccountResponsePb {
+        let sort = self.sort.extract();
         SearchAuthUserAccountResponsePb {
             offset: self.page.offset,
             limit: self.page.limit,
             all: self.page.all,
+            sort_key: sort.key,
+            sort_order: sort.order,
             users: self
                 .users
                 .into_iter()

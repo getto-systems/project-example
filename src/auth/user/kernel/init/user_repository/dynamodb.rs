@@ -11,7 +11,9 @@ use rusoto_dynamodb::{
     ScanInput, UpdateItemError, UpdateItemInput,
 };
 
-use crate::auth::x_outside_feature::feature::AuthOutsideStore;
+use crate::{
+    auth::x_outside_feature::feature::AuthOutsideStore, z_lib::search::data::SearchSortOrder,
+};
 
 use crate::z_lib::repository::{
     dynamodb::helper::{string_value, timestamp_value, ScanKey},
@@ -19,7 +21,7 @@ use crate::z_lib::repository::{
 };
 
 use crate::auth::user::{
-    account::search::infra::{SearchAuthUserAccountFields, SearchAuthUserAccountRepository},
+    account::search::infra::SearchAuthUserAccountRepository,
     kernel::infra::AuthUserRepository,
     password::{
         authenticate::infra::VerifyPasswordRepository,
@@ -37,7 +39,10 @@ use crate::{
     auth::{
         ticket::kernel::data::{AuthDateTime, ExpireDateTime},
         user::{
-            account::search::data::{AuthUserAccountBasket, SearchAuthUserAccountBasket},
+            account::search::data::{
+                AuthUserAccountBasket, SearchAuthUserAccountBasket, SearchAuthUserAccountFilter,
+                SearchAuthUserAccountSortKey,
+            },
             kernel::data::{
                 AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles, GrantedAuthRolesBasket,
             },
@@ -57,7 +62,7 @@ use crate::{
     },
     z_lib::{
         repository::data::RepositoryError,
-        search::data::{SearchOffset, SearchPage, SearchSortOrderMap},
+        search::data::{SearchOffset, SearchPage},
     },
 };
 
@@ -577,22 +582,15 @@ async fn update_reset_at<'client, 'a>(
 impl<'client> SearchAuthUserAccountRepository for DynamoDbAuthUserRepository<'client> {
     async fn search(
         &self,
-        fields: &SearchAuthUserAccountFields,
+        filter: SearchAuthUserAccountFilter,
     ) -> Result<SearchAuthUserAccountBasket, RepositoryError> {
-        search_user_account(&self, fields).await
+        search_user_account(&self, filter).await
     }
 }
 
-enum User {
-    LoginId,
-}
-enum Order {
-    Asc,
-    Desc,
-}
 async fn search_user_account<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
-    fields: &SearchAuthUserAccountFields,
+    filter: SearchAuthUserAccountFilter,
 ) -> Result<SearchAuthUserAccountBasket, RepositoryError> {
     // 業務用アプリケーションなので、ユーザー数は 100を超えない
     // dynamodb から全てのデータを取得してフィルタ、ソートする
@@ -604,39 +602,26 @@ async fn search_user_account<'client>(
         .try_into()
         .map_err(|err| infra_error("convert users length error", err))?;
 
-    let (sort_col, sort_order) = fields
-        .sort()
-        .detect(vec![(
-            "login-id",
-            User::LoginId,
-            SearchSortOrderMap {
-                normal: Order::Asc,
-                reverse: Order::Desc,
-            },
-        )])
-        .unwrap_or((User::LoginId, Order::Asc));
-
-    users.sort_by_cached_key(|user| match sort_col {
-        User::LoginId => user.login_id.as_str().to_owned(),
-    });
-    match sort_order {
-        Order::Asc => (),
-        Order::Desc => users.reverse(),
-    }
+    match filter.sort().key() {
+        SearchAuthUserAccountSortKey::LoginId => {
+            users.sort_by_cached_key(|user| user.login_id.as_str().to_owned());
+            match filter.sort().order() {
+                SearchSortOrder::Normal => (),
+                SearchSortOrder::Reverse => users.reverse(),
+            }
+        }
+    };
 
     let mut users: Vec<AuthUserAccountBasket> = users
         .into_iter()
-        .filter(|user| {
-            if fields.login_id() == "" {
-                true
-            } else {
-                user.login_id.as_str() == fields.login_id()
-            }
+        .filter(|user| match filter.login_id() {
+            None => true,
+            Some(login_id) => user.login_id.as_str() == login_id,
         })
         .collect();
 
     let limit = 1000;
-    let offset = SearchOffset { all, limit }.detect(fields.offset());
+    let offset = SearchOffset { all, limit }.detect(filter.offset());
     let mut users = users.split_off(
         offset
             .try_into()
@@ -650,6 +635,7 @@ async fn search_user_account<'client>(
 
     Ok(SearchAuthUserAccountBasket {
         page: SearchPage { all, limit, offset },
+        sort: filter.into_sort(),
         users,
     })
 }
@@ -684,15 +670,17 @@ async fn scan_user_part<'client>(
         Some(items) => items
             .into_iter()
             .filter_map(|mut item| {
-                let login_id = item.remove("login_id").and_then(|attr| attr.n);
-                let granted_roles = item
-                    .remove("granted_roles")
-                    .and_then(|attr| attr.ss)
-                    .map(|roles| HashSet::from_iter(roles));
-                match (login_id, granted_roles) {
-                    (Some(login_id), Some(granted_roles)) => Some(AuthUserAccountBasket {
+                match (
+                    item.remove("login_id").and_then(|attr| attr.s),
+                    item.remove("granted_roles")
+                        .and_then(|attr| attr.ss)
+                        .map(|roles| HashSet::from_iter(roles)),
+                ) {
+                    (Some(login_id), granted_roles) => Some(AuthUserAccountBasket {
                         login_id: LoginIdBasket::new(login_id),
-                        granted_roles: GrantedAuthRolesBasket::new(granted_roles),
+                        granted_roles: GrantedAuthRolesBasket::new(
+                            granted_roles.unwrap_or(HashSet::new()),
+                        ),
                     }),
                     _ => None,
                 }

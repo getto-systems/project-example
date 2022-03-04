@@ -1,7 +1,5 @@
-import { BoardValue } from "../kernel/data"
-
-export interface BoardFieldObserver {
+export interface BoardFieldObserver<V> {
     pin(): void
-    peek(): BoardValue
+    peek(): V
     hasChanged(): boolean
 }

@@ -19,6 +19,7 @@ import { tableClassName } from "../../../../../z_vendor/getto-table/preact/decor
 import { SearchAuthUserAccountAction } from "../action"
 
 import { AuthUserAccountBasket } from "../../kernel/data"
+import { SearchAuthUserAccountSortKey } from "../data"
 
 export type SearchAuthUserAccountTableStructure = TableStructure<Summary, AuthUserAccountBasket>
 
@@ -29,7 +30,11 @@ type Summary = {
 export function useSearchAuthUserAccountTableStructure(
     search: SearchAuthUserAccountAction,
 ): SearchAuthUserAccountTableStructure {
-    return useMemo(() => build(search), [search])
+    return useMemo(() => {
+        const structure = build(search)
+        search.columns.setInitialSearchColumns(structure.initialVisibleCells())
+        return structure
+    }, [search])
 }
 
 function build(search: SearchAuthUserAccountAction): SearchAuthUserAccountTableStructure {
@@ -43,9 +48,9 @@ function build(search: SearchAuthUserAccountAction): SearchAuthUserAccountTableS
             .alwaysVisible()
             .border(["rightDouble"]),
 
-        tableCell("granted-roles", (key) => ({
+        tableCell("granted-roles", (_key) => ({
             label: "権限",
-            header: sort(key),
+            header: linky,
             column: grantedRoles,
         })),
 
@@ -61,7 +66,7 @@ function build(search: SearchAuthUserAccountAction): SearchAuthUserAccountTableS
         .stickyHeader()
         .freeze()
 
-    function sort(key: string): Decorate {
+    function sort(key: SearchAuthUserAccountSortKey): Decorate {
         return (content) => html`<a href="#" onClick=${onClick}>${content} ${sign()}</a>`
 
         function sign() {
