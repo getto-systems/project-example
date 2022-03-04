@@ -22,10 +22,8 @@ export interface ChangePasswordAction extends StatefulApplicationAction<ChangePa
     readonly newPassword: InputPasswordAction
     readonly validate: ValidateBoardAction
 
-    open(): ChangePasswordState
     clear(): ChangePasswordState
     submit(): Promise<ChangePasswordState>
-    close(): ChangePasswordState
 }
 
 export const changePasswordFieldNames = ["currentPassword", "newPassword"] as const
@@ -33,7 +31,6 @@ export type ChangePasswordFieldName = typeof changePasswordFieldNames[number]
 
 export type ChangePasswordState =
     | Readonly<{ type: "initial-change-password" }>
-    | Readonly<{ type: "input-password" }>
     | ChangePasswordEvent
 
 const initialState: ChangePasswordState = { type: "initial-change-password" }
@@ -117,26 +114,14 @@ class Action
         )
     }
 
-    open(): ChangePasswordState {
-        this.clearInput()
-        return this.post({ type: "input-password" })
-    }
     clear(): ChangePasswordState {
-        this.clearInput()
-        return this.post({ type: "input-password" })
-    }
-    async submit(): Promise<ChangePasswordState> {
-        return changePassword(this.material, this.checker.get(), this.post)
-    }
-    close(): ChangePasswordState {
-        this.clearInput()
-        return this.post(this.initialState)
-    }
-
-    clearInput(): void {
         this.currentPassword.clear()
         this.newPassword.clear()
         this.validate.clear()
+        return this.currentState()
+    }
+    async submit(): Promise<ChangePasswordState> {
+        return changePassword(this.material, this.checker.get(), this.post)
     }
 }
 

@@ -5,7 +5,10 @@ import { EditableBoardAction } from "../../../../z_vendor/getto-application/boar
 
 export type ProfilePageResource = BaseResource &
     Readonly<{
-        change: ChangePasswordAction
+        change: Readonly<{
+            editable: EditableBoardAction
+            change: ChangePasswordAction
+        }>
         requestToken: Readonly<{
             editable: EditableBoardAction
             requestToken: RequestResetTokenAction

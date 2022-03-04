@@ -24,45 +24,54 @@ import { InputPasswordEntry } from "../../input/x_preact/input"
 import { ChangePasswordError } from "../data"
 import { ChangePasswordAction, ChangePasswordState } from "../action"
 import { ValidateBoardActionState } from "../../../../../z_vendor/getto-application/board/validate_board/action"
+import {
+    EditableBoardAction,
+    EditableBoardState,
+} from "../../../../../z_vendor/getto-application/board/editable/action"
 
 type EntryProps = Readonly<{
+    editable: EditableBoardAction
     change: ChangePasswordAction
 }>
-export function ChangePasswordEntry({ change }: EntryProps): VNode {
+export function ChangePasswordEntry({ editable, change }: EntryProps): VNode {
     return h(ChangePasswordComponent, {
+        editable,
         change,
         state: useApplicationAction(change),
-        validate: useApplicationAction(change.validate),
+        editableState: useApplicationAction(editable),
+        validateState: useApplicationAction(change.validate),
     })
 }
 
 type Props = EntryProps &
     Readonly<{
         state: ChangePasswordState
-        validate: ValidateBoardActionState
+        editableState: EditableBoardState
+        validateState: ValidateBoardActionState
     }>
 export function ChangePasswordComponent(props: Props): VNode {
     return basedOn(props)
 
-    function basedOn({ state, validate }: Props): VNode {
-        switch (state.type) {
-            case "initial-change-password":
-                return buttonBox({ type: "initial" })
+    function basedOn({ state, editableState, validateState }: Props): VNode {
+        if (editableState.isEditable) {
+            switch (state.type) {
+                case "initial-change-password":
+                    return formBox({ type: validateState })
 
-            case "input-password":
-                return formBox({ type: validate })
+                case "try-to-change-password":
+                    return formBox({ type: "connecting" })
 
-            case "try-to-change-password":
-                return formBox({ type: "connecting" })
+                case "take-longtime-to-change-password":
+                    return formBox({ type: "take-longtime" })
 
-            case "take-longtime-to-change-password":
-                return formBox({ type: "take-longtime" })
+                case "succeed-to-change-password":
+                    return buttonBox({ type: "success" })
 
-            case "succeed-to-change-password":
-                return buttonBox({ type: "success" })
-
-            case "failed-to-change-password":
-                return formBox({ type: validate, err: changePasswordError(state.err) })
+                case "failed-to-change-password":
+                    return formBox({ type: validateState, err: changePasswordError(state.err) })
+            }
+        } else {
+            return buttonBox({ type: "initial" })
         }
     }
 
@@ -98,7 +107,7 @@ export function ChangePasswordComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
-                props.change.open()
+                props.editable.open()
             }
         }
     }
@@ -158,7 +167,9 @@ export function ChangePasswordComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
-                props.change.submit()
+                props.change.submit().then(() => {
+                    props.editable.close()
+                })
             }
         }
 
@@ -187,7 +198,8 @@ export function ChangePasswordComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
-                props.change.close()
+                props.change.clear()
+                props.editable.close()
             }
         }
 

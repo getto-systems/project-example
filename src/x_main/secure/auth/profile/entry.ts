@@ -5,7 +5,7 @@ import { ProfilePageEntry } from "./page"
 import { newForegroundOutsideFeature } from "../../../../x_outside_feature/common"
 
 import { newBaseResource } from "../../../../core/base/init/resource"
-import { newChangePasswordResource } from "../../../../auth/user/password/change/init/resource"
+import { newChangePasswordAction } from "../../../../auth/user/password/change/init/resource"
 import { newRequestResetTokenAction } from "../../../../auth/user/password/reset/request_token/init/resource"
 import { toProfileView } from "./common"
 
@@ -22,7 +22,10 @@ function newResource() {
     const feature = newForegroundOutsideFeature()
     return {
         ...newBaseResource(feature),
-        ...newChangePasswordResource(feature),
+        change: {
+            editable: initEditableBoardAction(),
+            change: newChangePasswordAction(feature),
+        },
         requestToken: {
             editable: initEditableBoardAction(),
             requestToken: newRequestResetTokenAction(feature),

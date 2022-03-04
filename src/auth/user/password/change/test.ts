@@ -62,20 +62,6 @@ describe("ChangePassword", () => {
         })
     })
 
-    test("open; close", async () => {
-        const { resource } = standard()
-
-        const runner = setupActionTestRunner(resource.change.subscriber)
-
-        await runner(async () => {
-            resource.change.open()
-            resource.change.close()
-            return resource.change.currentState()
-        }).then((stack) => {
-            expect(stack).toEqual([{ type: "input-password" }, { type: "initial-change-password" }])
-        })
-    })
-
     test("clear", () => {
         const { resource, store } = standard()
 

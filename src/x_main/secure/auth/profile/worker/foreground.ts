@@ -70,10 +70,13 @@ async function newResource() {
 
 function newChangePasswordResource(proxy: Proxy) {
     return {
-        change: initChangePasswordAction({
-            infra: proxy.password.change.infra,
-            config: newChangePasswordConfig(),
-        }),
+        change: {
+            editable: initEditableBoardAction(),
+            change: initChangePasswordAction({
+                infra: proxy.password.change.infra,
+                config: newChangePasswordConfig(),
+            }),
+        },
     }
 }
 function newRequestResetTokenResource(proxy: Proxy) {

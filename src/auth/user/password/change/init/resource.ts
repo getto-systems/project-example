@@ -7,13 +7,9 @@ import { ChangePasswordAction, initChangePasswordAction } from "../action"
 import { newChangePasswordInfra } from "./infra"
 
 type OutsideFeature = RemoteOutsideFeature
-export function newChangePasswordResource(
-    feature: OutsideFeature,
-): Readonly<{ change: ChangePasswordAction }> {
-    return {
-        change: initChangePasswordAction({
-            infra: newChangePasswordInfra(feature),
-            config: newChangePasswordConfig(),
-        }),
-    }
+export function newChangePasswordAction(feature: OutsideFeature): ChangePasswordAction {
+    return initChangePasswordAction({
+        infra: newChangePasswordInfra(feature),
+        config: newChangePasswordConfig(),
+    })
 }
