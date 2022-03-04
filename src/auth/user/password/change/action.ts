@@ -36,9 +36,7 @@ export type ChangePasswordState =
     | Readonly<{ type: "input-password" }>
     | ChangePasswordEvent
 
-export const initialChangePasswordState: ChangePasswordState = {
-    type: "initial-change-password",
-}
+const initialState: ChangePasswordState = { type: "initial-change-password" }
 
 export type ChangePasswordMaterial = Readonly<{
     infra: ChangePasswordInfra
@@ -61,7 +59,7 @@ class Action
     extends AbstractStatefulApplicationAction<ChangePasswordState>
     implements ChangePasswordAction
 {
-    readonly initialState = initialChangePasswordState
+    readonly initialState = initialState
 
     readonly currentPassword: InputPasswordAction
     readonly newPassword: InputPasswordAction

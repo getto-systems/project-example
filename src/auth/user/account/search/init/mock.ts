@@ -10,7 +10,7 @@ export function mockSearchAuthUserAccountShell(
     updater: { (url: URL): void },
 ): SearchAuthUserAccountShell {
     return {
-        detectFields: () => detectSearchAuthUserAccountFilter(url),
+        detectFilter: () => detectSearchAuthUserAccountFilter(url),
 
         updateQuery: (fields) => {
             updater(updateSearchAuthUserAccountFilterQuery(url, fields))

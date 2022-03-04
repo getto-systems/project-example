@@ -62,9 +62,7 @@ export type CheckAuthTicketState =
     | Readonly<{ type: "try-to-load"; scriptPath: ConvertScriptPathResult }>
     | Readonly<{ type: "load-error"; err: LoadScriptError }>
 
-export const initialCheckAuthTicketState: CheckAuthTicketState = {
-    type: "initial-check",
-}
+const initialState: CheckAuthTicketState = { type: "initial-check" }
 
 export function initCheckAuthTicketAction(
     material: CheckAuthTicketMaterial,
@@ -76,7 +74,7 @@ class Action
     extends AbstractStatefulApplicationAction<CheckAuthTicketState>
     implements CheckAuthTicketAction
 {
-    readonly initialState = initialCheckAuthTicketState
+    readonly initialState = initialState
 
     material: CheckAuthTicketMaterial
 

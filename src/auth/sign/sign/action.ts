@@ -40,7 +40,7 @@ type Static<T extends string> = Readonly<{
 }>
 type View<T, V> = Readonly<{ type: T; view: V }>
 
-export const initialSignViewState: SignActionState = { type: "initial-view" }
+const initialState: SignActionState = { type: "initial-view" }
 
 export type SignActionShell = Readonly<{
     detectViewType: SignViewTypeDetecter
@@ -51,7 +51,7 @@ export function initSignAction(shell: SignActionShell, factory: SignViewFactory)
 }
 
 class Action extends AbstractStatefulApplicationAction<SignActionState> implements SignAction {
-    readonly initialState = initialSignViewState
+    readonly initialState = initialState
 
     factory: SignViewFactory
 

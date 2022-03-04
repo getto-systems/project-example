@@ -56,9 +56,7 @@ export type AuthenticatePasswordState =
     | Readonly<{ type: "try-to-load"; scriptPath: ConvertScriptPathResult }>
     | Readonly<{ type: "load-error"; err: LoadScriptError }>
 
-export const initialAuthenticatePasswordState: AuthenticatePasswordState = {
-    type: "initial-login",
-}
+const initialState: AuthenticatePasswordState = { type: "initial-login" }
 
 export type AuthenticatePasswordMaterial = Readonly<{
     infra: AuthenticatePasswordInfra
@@ -89,7 +87,7 @@ class Action
     extends AbstractStatefulApplicationAction<AuthenticatePasswordState>
     implements AuthenticatePasswordAction
 {
-    readonly initialState = initialAuthenticatePasswordState
+    readonly initialState = initialState
 
     readonly link = initSignLink()
 

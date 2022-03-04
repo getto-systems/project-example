@@ -108,7 +108,7 @@ export type LoadMenuState =
     | UpdateMenuBadgeEvent
     | ToggleMenuExpandEvent
 
-export const initialLoadMenuState: LoadMenuState = { type: "initial-menu" }
+const initialState: LoadMenuState = { type: "initial-menu" }
 
 export type LoadMenuMaterial = Readonly<{
     infra: LoadMenuInfra
@@ -135,7 +135,7 @@ export function initLoadMenuAction(material: LoadMenuMaterial): LoadMenuAction {
 }
 
 class Action extends AbstractStatefulApplicationAction<LoadMenuState> implements LoadMenuAction {
-    readonly initialState = initialLoadMenuState
+    readonly initialState = initialState
 
     material: LoadMenuMaterial
 

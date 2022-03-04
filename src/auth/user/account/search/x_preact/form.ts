@@ -99,7 +99,7 @@ export function SearchAuthUserAccountFormComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
-                props.search.submit()
+                props.search.search()
             }
         }
     }

@@ -56,9 +56,7 @@ export type ResetPasswordState =
     | Readonly<{ type: "try-to-load"; scriptPath: ConvertScriptPathResult }>
     | Readonly<{ type: "load-error"; err: LoadScriptError }>
 
-export const initialResetPasswordState: ResetPasswordState = {
-    type: "initial-reset",
-}
+const initialState: ResetPasswordState = { type: "initial-reset" }
 
 export type ResetPasswordMaterial = Readonly<{
     infra: ResetPasswordInfra
@@ -90,7 +88,7 @@ class Action
     extends AbstractStatefulApplicationAction<ResetPasswordState>
     implements ResetPasswordAction
 {
-    readonly initialState = initialResetPasswordState
+    readonly initialState = initialState
 
     readonly link = initSignLink()
 

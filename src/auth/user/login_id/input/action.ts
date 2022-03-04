@@ -68,7 +68,6 @@ export interface SearchLoginIDAction extends ApplicationAction {
 export function initSearchLoginIDAction(initial: SingleValueFilter): Readonly<{
     input: SearchLoginIDAction
     pin: { (): SingleValueFilter }
-    peek: { (): SingleValueFilter }
 }> {
     const { input, store, subscriber } = initInputBoardAction()
 
@@ -103,9 +102,6 @@ export function initSearchLoginIDAction(initial: SingleValueFilter): Readonly<{
         pin: () => {
             observer.pin()
             return value()
-        },
-        peek: () => {
-            return observer.peek()
         },
     }
 }

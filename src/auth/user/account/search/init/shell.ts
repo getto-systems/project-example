@@ -13,7 +13,7 @@ import { SearchAuthUserAccountShell } from "../action"
 type OutsideFeature = LocationOutsideFeature & HistoryOutsideFeature
 export function newSearchAuthUserAccountShell(feature: OutsideFeature): SearchAuthUserAccountShell {
     return {
-        detectFields: () =>
+        detectFilter: () =>
             detectSearchAuthUserAccountFilter(new URL(feature.currentLocation.toString())),
 
         updateQuery: (fields) => {

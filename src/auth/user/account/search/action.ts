@@ -6,7 +6,11 @@ import {
 import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 import { nextSort } from "../../../../z_lib/ui/search/sort/helper"
 
-import { initSearchLoginIDAction, SearchLoginIDAction } from "../../login_id/input/action"
+import {
+    initSearchLoginIDAction,
+    InputLoginIDAction,
+    SearchLoginIDAction,
+} from "../../login_id/input/action"
 import {
     initObserveBoardAction,
     ObserveBoardAction,
@@ -35,6 +39,7 @@ import {
     SearchAuthUserAccountSort,
     SearchAuthUserAccountSortKey,
 } from "./data"
+import { InputPasswordAction } from "../../password/input/action"
 
 export interface SearchAuthUserAccountAction
     extends StatefulApplicationAction<SearchAuthUserAccountState> {
@@ -46,10 +51,72 @@ export interface SearchAuthUserAccountAction
     currentSort(): SearchAuthUserAccountSort
 
     clear(): SearchAuthUserAccountState
-    submit(): Promise<SearchAuthUserAccountState>
+    search(): Promise<SearchAuthUserAccountState>
     load(): Promise<SearchAuthUserAccountState>
     sort(key: SearchAuthUserAccountSortKey): Promise<SearchAuthUserAccountState>
+
+    focus(loginID: string): Promise<SearchAuthUserAccountState>
 }
+export interface ListAuthUserAccountAction
+    extends StatefulApplicationAction<SearchAuthUserAccountState> {
+    readonly item: FocusAuthUserAccountAction
+    readonly offset: SearchOffsetAction
+
+    currentSort(): SearchAuthUserAccountSort
+
+    load(): Promise<SearchAuthUserAccountState>
+
+    focus(loginID: string): Promise<SearchAuthUserAccountState>
+}
+export interface FocusAuthUserAccountAction
+    extends StatefulApplicationAction<FocusAuthUserAccountState> {
+    readonly loginID: ChangeAuthUserLoginIDAction
+    readonly password: ChangeAuthUserPasswordAction
+    //readonly grantedRoles: ChangeAuthUserGrantedRolesAction
+
+    close(): Promise<FocusAuthUserAccountState>
+    foldSidebar(): Promise<FocusAuthUserAccountState>
+    expandSidebar(): Promise<FocusAuthUserAccountState>
+}
+export interface ChangeAuthUserLoginIDAction
+    extends StatefulApplicationAction<ChangeAuthUserLoginIDState> {
+    readonly loginID: InputLoginIDAction
+
+    open(): Promise<ChangeAuthUserLoginIDState>
+    close(): Promise<ChangeAuthUserLoginIDState>
+    changeLoginID(): Promise<ChangeAuthUserLoginIDState>
+}
+export interface ChangeAuthUserPasswordAction
+    extends StatefulApplicationAction<ChangeAuthUserPasswordState> {
+    readonly password: InputPasswordAction
+
+    open(): Promise<ChangeAuthUserPasswordState>
+    close(): Promise<ChangeAuthUserPasswordState>
+    changePassword(): Promise<ChangeAuthUserPasswordState>
+}
+
+export type SearchAuthUserAccountState =
+    | Readonly<{ type: "initial-search" }>
+    | (SearchAuthUserAccountEvent &
+          Readonly<{
+              previousResponse?: SearchAuthUserAccountRemoteResponse
+          }>)
+
+const initialSearchState: SearchAuthUserAccountState = { type: "initial-search" }
+
+export type FocusAuthUserAccountState =
+    | Readonly<{ type: "initial-focus" }>
+    | Readonly<{ type: "focus-on"; loginID: string; isSidebarExpand: boolean }>
+
+const initialFocusState: FocusAuthUserAccountState = { type: "initial-focus" }
+
+export type ChangeAuthUserLoginIDState = Readonly<{ type: "initial-change-login-id" }>
+
+const initialChangeLoginIDState: ChangeAuthUserLoginIDState = { type: "initial-change-login-id" }
+
+export type ChangeAuthUserPasswordState = Readonly<{ type: "initial-change-password" }>
+
+const initialChangePasswordState: ChangeAuthUserPasswordState = { type: "initial-change-password" }
 
 export type SearchAuthUserAccountMaterial = Readonly<{
     infra: SearchAuthUserAccountInfra
@@ -63,24 +130,13 @@ export type SearchAuthUserAccountInfra = Readonly<{
     SearchColumnsInfra
 
 export type SearchAuthUserAccountShell = Readonly<{
-    detectFields: SearchAuthUserAccountFilterDetecter
+    detectFilter: SearchAuthUserAccountFilterDetecter
     updateQuery: UpdateSearchAuthUserAccountFieldsQuery
 }>
 
 export type SearchAuthUserAccountConfig = Readonly<{
     takeLongtimeThreshold: DelayTime
 }>
-
-export type SearchAuthUserAccountState =
-    | Readonly<{ type: "initial-search" }>
-    | (SearchAuthUserAccountEvent &
-          Readonly<{
-              previousResponse?: SearchAuthUserAccountRemoteResponse
-          }>)
-
-export const initialSearchAuthUserAccountState: SearchAuthUserAccountState = {
-    type: "initial-search",
-}
 
 export function initSearchAuthUserAccountAction(
     material: SearchAuthUserAccountMaterial,
@@ -94,7 +150,7 @@ class Action
     extends AbstractStatefulApplicationAction<SearchAuthUserAccountState>
     implements SearchAuthUserAccountAction
 {
-    readonly initialState = initialSearchAuthUserAccountState
+    readonly initialState = initialSearchState
 
     readonly loginID: SearchLoginIDAction
     readonly offset: SearchOffsetAction
@@ -103,11 +159,11 @@ class Action
 
     material: SearchAuthUserAccountMaterial
 
-    searchFields: { (): SearchAuthUserAccountFilter }
-    loadFields: { (): SearchAuthUserAccountFilter }
-    sortFields: { (key: SearchAuthUserAccountSortKey): SearchAuthUserAccountFilter }
+    filter: SearchAuthUserAccountFilter
+    setFilterOnSearch: { (): SearchAuthUserAccountFilter }
+    setFilterOnLoad: { (): SearchAuthUserAccountFilter }
+    setFilterOnSort: { (key: SearchAuthUserAccountSortKey): SearchAuthUserAccountFilter }
 
-    sortStore: SearchAuthUserAccountSort
     response?: SearchAuthUserAccountRemoteResponse
 
     constructor(material: SearchAuthUserAccountMaterial) {
@@ -120,63 +176,63 @@ class Action
         })
         this.material = material
 
-        const initialFields = material.shell.detectFields()
+        const initialFilter = material.shell.detectFilter()
 
-        const loginID = initSearchLoginIDAction(initialFields.loginID)
-        const offset = initSearchOffsetAction(initialFields.offset)
+        const loginID = initSearchLoginIDAction(initialFilter.loginID)
+        const offset = initSearchOffsetAction(initialFilter.offset)
         const columns = initSearchColumnsAction(this.material.infra)
         const { observe, checker } = initObserveBoardAction({
             fields: searchAuthUserAccountFieldNames,
         })
 
-        this.searchFields = () => ({
-            offset: offset.reset(),
-            sort: this.currentSort(),
-            loginID: loginID.pin(),
-        })
-        this.loadFields = () => ({
-            offset: offset.get(),
-            sort: this.currentSort(),
-            loginID: loginID.peek(),
-        })
-        this.sortFields = (key: SearchAuthUserAccountSortKey) => ({
-            offset: offset.reset(),
-            sort: this.updateSort(key),
-            loginID: loginID.peek(),
-        })
+        this.setFilterOnSearch = () =>
+            this.setFilter({
+                offset: offset.reset(),
+                loginID: loginID.pin(),
+            })
+        this.setFilterOnLoad = () =>
+            this.setFilter({
+                offset: offset.get(),
+            })
+        this.setFilterOnSort = (key: SearchAuthUserAccountSortKey) =>
+            this.setFilter({
+                offset: offset.reset(),
+                sort: nextSort(this.currentSort(), key),
+            })
 
         this.loginID = loginID.input
         this.offset = offset.input
         this.columns = columns
         this.observe = observe
 
-        this.sortStore = initialFields.sort
+        this.filter = initialFilter
 
         this.loginID.observe.subscriber.subscribe((result) =>
             checker.update("loginID", result.hasChanged),
         )
     }
 
-    currentSort(): SearchAuthUserAccountSort {
-        return this.sortStore
+    setFilter(filter: Partial<SearchAuthUserAccountFilter>): SearchAuthUserAccountFilter {
+        this.filter = { ...this.filter, ...filter }
+        return this.filter
     }
-    updateSort(key: SearchAuthUserAccountSortKey): SearchAuthUserAccountSort {
-        this.sortStore = nextSort(this.currentSort(), key)
-        return this.sortStore
+
+    currentSort(): SearchAuthUserAccountSort {
+        return this.filter.sort
     }
 
     clear(): SearchAuthUserAccountState {
         this.loginID.clear()
         return this.currentState()
     }
-    async submit(): Promise<SearchAuthUserAccountState> {
-        return search(this.material, this.searchFields(), (e) => this.searchResult(e))
+    async search(): Promise<SearchAuthUserAccountState> {
+        return search(this.material, this.setFilterOnSearch(), (e) => this.searchResult(e))
     }
     async load(): Promise<SearchAuthUserAccountState> {
-        return search(this.material, this.loadFields(), (e) => this.searchResult(e))
+        return search(this.material, this.setFilterOnLoad(), (e) => this.searchResult(e))
     }
     async sort(key: SearchAuthUserAccountSortKey): Promise<SearchAuthUserAccountState> {
-        return search(this.material, this.sortFields(key), (e) => this.searchResult(e))
+        return search(this.material, this.setFilterOnSort(key), (e) => this.searchResult(e))
     }
 
     searchResult(e: SearchAuthUserAccountEvent): SearchAuthUserAccountState {
@@ -185,7 +241,7 @@ class Action
         }
         switch (e.type) {
             case "succeed-to-search":
-                this.sortStore = e.response.sort
+                this.setFilter({ sort: e.response.sort })
                 this.response = e.response
                 break
         }
@@ -193,6 +249,11 @@ class Action
             ...e,
             ...previousInfo,
         })
+    }
+
+    async focus(_loginID: string): Promise<SearchAuthUserAccountState> {
+        // TODO 指定された login id に focus する
+        return this.currentState()
     }
 }
 

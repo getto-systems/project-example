@@ -13,7 +13,7 @@ export interface ValidateBoardAction extends StatefulApplicationAction<ValidateB
 }
 
 export type ValidateBoardActionState = ValidateBoardState
-export const initialValidateBoardState: ValidateBoardActionState = "initial"
+const initialState: ValidateBoardActionState = "initial"
 
 export type ValidateBoardConfig<N extends string> = Readonly<{
     fields: readonly N[]
@@ -49,7 +49,7 @@ class Action<N extends string, T>
     extends AbstractStatefulApplicationAction<ValidateBoardActionState>
     implements ValidateBoardAction, ValidateBoardChecker<N, T>
 {
-    readonly initialState: ValidateBoardActionState = initialValidateBoardState
+    readonly initialState: ValidateBoardActionState = initialState
 
     config: ValidateBoardConfig<N>
     infra: ValidateBoardInfra
@@ -74,7 +74,7 @@ class Action<N extends string, T>
     }
 
     clear(): void {
-        this.post(initialValidateBoardState)
+        this.post(initialState)
     }
 }
 

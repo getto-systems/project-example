@@ -45,7 +45,7 @@ describe("SearchAuthUserAccount", () => {
         await runner(async () => {
             store.loginID.set(markBoardValue("MY-LOGIN-ID"))
             resource.search.loginID.input.publisher.post()
-            return resource.search.submit()
+            return resource.search.search()
         }).then((stack) => {
             expect(stack).toEqual([
                 {
@@ -84,7 +84,7 @@ describe("SearchAuthUserAccount", () => {
         await resource.search.ignitionState
 
         await runner(async () => {
-            return resource.search.submit()
+            return resource.search.search()
         }).then((stack) => {
             expect(stack).toEqual([
                 {
@@ -179,7 +179,7 @@ describe("SearchAuthUserAccount", () => {
 
         await runner(async () => {
             resource.search.terminate()
-            return resource.search.submit()
+            return resource.search.search()
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])

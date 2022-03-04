@@ -7,7 +7,7 @@ import { initObserveBoardStack } from "./init/stack"
 export type ObserveBoardAction = StatefulApplicationAction<ObserveBoardActionState>
 
 export type ObserveBoardActionState = ObserveBoardFieldResult
-export const initialObserveBoardState: ObserveBoardActionState = { hasChanged: false }
+const initialState: ObserveBoardActionState = { hasChanged: false }
 
 export type ObserveBoardConfig<N extends string> = Readonly<{
     fields: readonly N[]
@@ -35,7 +35,7 @@ class Action<N extends string>
     extends AbstractStatefulApplicationAction<ObserveBoardActionState>
     implements ObserveBoardAction, ObserveBoardChecker<N>
 {
-    readonly initialState: ObserveBoardActionState = initialObserveBoardState
+    readonly initialState = initialState
 
     config: ObserveBoardConfig<N>
     infra: ObserveBoardInfra

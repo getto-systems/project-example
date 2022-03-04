@@ -46,9 +46,7 @@ export type RequestResetTokenConfig = Readonly<{
     takeLongtimeThreshold: DelayTime
 }>
 
-export const initialRequestResetTokenState: RequestResetTokenState = {
-    type: "initial-request-token",
-}
+const initialState: RequestResetTokenState = { type: "initial-request-token" }
 
 export function initRequestResetTokenAction(
     material: RequestResetTokenMaterial,
@@ -63,7 +61,7 @@ class Action
     extends AbstractStatefulApplicationAction<RequestResetTokenState>
     implements RequestResetTokenAction
 {
-    readonly initialState = initialRequestResetTokenState
+    readonly initialState = initialState
 
     readonly link = initSignLink()
 
@@ -138,9 +136,7 @@ export type RequestResetTokenProfileState =
     | Readonly<{ type: "input-login-id" }>
     | RequestResetTokenEvent
 
-export const initialRequestResetTokenProfileState: RequestResetTokenProfileState = {
-    type: "initial-request-token",
-}
+const initialProfileState: RequestResetTokenProfileState = { type: "initial-request-token" }
 
 export function initRequestResetTokenProfileAction(
     material: RequestResetTokenMaterial,
@@ -155,7 +151,7 @@ class ProfileAction
     extends AbstractStatefulApplicationAction<RequestResetTokenProfileState>
     implements RequestResetTokenProfileAction
 {
-    readonly initialState = initialRequestResetTokenProfileState
+    readonly initialState = initialProfileState
 
     readonly loginID: InputLoginIDAction
     readonly validate: ValidateBoardAction

@@ -23,14 +23,14 @@ export type LoadSeasonMaterial = Readonly<{
 
 export type LoadSeasonState = Readonly<{ type: "initial-season" }> | LoadSeasonEvent
 
-export const initialLoadSeasonState: LoadSeasonState = { type: "initial-season" }
+const initialState: LoadSeasonState = { type: "initial-season" }
 
 export function initLoadSeasonAction(material: LoadSeasonMaterial): LoadSeasonAction {
     return new Action(material)
 }
 
 class Action extends AbstractStatefulApplicationAction<LoadSeasonState> {
-    readonly initialState = initialLoadSeasonState
+    readonly initialState = initialState
 
     material: LoadSeasonMaterial
 

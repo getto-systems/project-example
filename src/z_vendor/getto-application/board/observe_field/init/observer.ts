@@ -1,6 +1,6 @@
 import { BoardFieldObserver } from "../infra"
 
-export function initBoardFieldObserver<V>(value: ObserveValueGetter<V>): BoardFieldObserver<V> {
+export function initBoardFieldObserver<V>(value: ObserveValueGetter<V>): BoardFieldObserver {
     return new Observer(value)
 }
 
@@ -10,7 +10,7 @@ interface ObserveValueGetter<V> {
     (): V
 }
 
-class Observer<V> implements BoardFieldObserver<V> {
+class Observer<V> implements BoardFieldObserver {
     value: ObserveValueGetter<V>
     store: ObserveValueStore<V> = { stored: false }
 

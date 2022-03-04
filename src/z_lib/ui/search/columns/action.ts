@@ -30,7 +30,8 @@ export type SearchColumnsState =
     | Readonly<{ type: "succeed-to-save"; columns: SearchColumns }>
     | Readonly<{ type: "succeed-to-load"; columns: SearchColumns }>
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
-export const initialSearchColumnsState: SearchColumnsState = { type: "initial-search" }
+
+const initialState: SearchColumnsState = { type: "initial-search" }
 
 export function initSearchColumnsAction(infra: SearchColumnsInfra): SearchColumnsAction {
     return new Action(infra)
@@ -40,7 +41,7 @@ class Action
     extends AbstractStatefulApplicationAction<SearchColumnsState>
     implements SearchColumnsAction
 {
-    readonly initialState = initialSearchColumnsState
+    readonly initialState = initialState
 
     readonly input: MultipleInputBoardAction
 

@@ -40,7 +40,7 @@ export type SetupSeasonState =
     | Readonly<{ type: "edit-season" }>
     | SetupSeasonEvent
 
-export const initialSetupSeasonState: SetupSeasonState = { type: "initial-setup" }
+const initialState: SetupSeasonState = { type: "initial-setup" }
 
 export function initSetupSeasonAction(
     material: SetupSeasonMaterial,
@@ -54,7 +54,7 @@ interface LoadAction {
 }
 
 class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
-    readonly initialState = initialSetupSeasonState
+    readonly initialState = initialState
 
     readonly season: InputSeasonAction
 
