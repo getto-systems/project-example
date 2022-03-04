@@ -4,11 +4,9 @@ import {
     StatefulApplicationAction,
     AbstractStatefulApplicationAction,
 } from "../../../../../z_vendor/getto-application/action/action"
-import { initSignLink } from "../../../../sign/nav/resource"
 import { initInputLoginIDAction } from "../../../login_id/input/action"
 import { initValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
 
-import { SignLink } from "../../../../sign/nav/resource"
 import { InputLoginIDAction } from "../../../login_id/input/action"
 import { ValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
 
@@ -20,12 +18,10 @@ import { RequestResetTokenError, RequestResetTokenFields } from "./data"
 import { ConvertBoardResult } from "../../../../../z_vendor/getto-application/board/kernel/data"
 
 export interface RequestResetTokenAction extends StatefulApplicationAction<RequestResetTokenState> {
-    readonly link: SignLink
-
     readonly loginID: InputLoginIDAction
     readonly validate: ValidateBoardAction
 
-    clear(): void
+    clear(): RequestResetTokenState
     submit(): Promise<RequestResetTokenState>
 }
 
@@ -62,8 +58,6 @@ class Action
     implements RequestResetTokenAction
 {
     readonly initialState = initialState
-
-    readonly link = initSignLink()
 
     readonly loginID: InputLoginIDAction
     readonly validate: ValidateBoardAction
@@ -111,9 +105,10 @@ class Action
         )
     }
 
-    clear(): void {
+    clear(): RequestResetTokenState {
         this.loginID.clear()
         this.validate.clear()
+        return this.currentState()
     }
     submit(): Promise<RequestResetTokenState> {
         return requestResetToken(this.material, this.checker.get(), this.post)

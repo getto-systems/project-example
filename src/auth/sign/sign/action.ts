@@ -7,7 +7,6 @@ import { CheckAuthTicketAction } from "../../ticket/check/action"
 import { AuthenticatePasswordAction } from "../../user/password/authenticate/action"
 import { RequestResetTokenAction } from "../../user/password/reset/request_token/action"
 import { ResetPasswordAction } from "../../user/password/reset/reset/action"
-import { SignLink } from "../nav/resource"
 
 import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 import { SignViewType } from "../router/data"
@@ -16,8 +15,6 @@ import { SignViewTypeDetecter } from "../router/infra"
 export type SignAction = StatefulApplicationAction<SignActionState>
 
 export interface SignViewFactory {
-    link(): Readonly<{ link: SignLink }>
-
     check(): ApplicationView<CheckAuthTicketAction>
 
     password_authenticate(): ApplicationView<AuthenticatePasswordAction>
@@ -28,16 +25,12 @@ export interface SignViewFactory {
 
 export type SignActionState =
     | Readonly<{ type: "initial-view" }>
-    | Static<"privacyPolicy">
+    | Readonly<{ type: "static-privacyPolicy" }>
     | View<"check-authTicket", ApplicationView<CheckAuthTicketAction>>
     | View<"password-authenticate", ApplicationView<AuthenticatePasswordAction>>
     | View<"password-reset-requestToken", ApplicationView<RequestResetTokenAction>>
     | View<"password-reset", ApplicationView<ResetPasswordAction>>
 
-type Static<T extends string> = Readonly<{
-    type: `static-${T}`
-    resource: Readonly<{ link: SignLink }>
-}>
 type View<T, V> = Readonly<{ type: T; view: V }>
 
 const initialState: SignActionState = { type: "initial-view" }
@@ -93,7 +86,7 @@ class Action extends AbstractStatefulApplicationAction<SignActionState> implemen
         const type = result.value
         switch (type) {
             case "static-privacyPolicy":
-                return { type, resource: this.factory.link() }
+                return { type }
 
             case "password-reset-requestToken":
                 return { type, view: this.factory.password_reset_requestToken() }

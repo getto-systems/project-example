@@ -1,17 +1,17 @@
-import { initSignLinkResource } from "./resource"
+import { initSignLink } from "./action"
 
 describe("SignLink", () => {
     test("link", () => {
-        const resource = initSignLinkResource()
+        const link = initSignLink()
 
-        expect(resource.link.getNav_static_privacyPolicy().href).toEqual("?-static=privacy-policy")
-        expect(resource.link.getNav_password_authenticate().href).toEqual(
+        expect(link.getNav_static_privacyPolicy().href).toEqual("?-static=privacy-policy")
+        expect(link.getNav_password_authenticate().href).toEqual(
             "?-password-authenticate=authenticate",
         )
-        expect(resource.link.getNav_password_reset_requestToken().href).toEqual(
+        expect(link.getNav_password_reset_requestToken().href).toEqual(
             "?-password-reset=request-token",
         )
-        expect(resource.link.getNav_password_reset_requestToken_retry().href).toEqual(
+        expect(link.getNav_password_reset_requestToken_retry().href).toEqual(
             "?-password-reset=request-token",
         )
     })

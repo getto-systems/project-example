@@ -34,19 +34,24 @@ import { AuthenticatePasswordAction, AuthenticatePasswordState } from "../action
 import { ValidateBoardActionState } from "../../../../../z_vendor/getto-application/board/validate_board/action"
 
 import { AuthenticatePasswordError } from "../data"
+import { SignLink } from "../../../../sign/nav/action"
 
-export function AuthenticatePasswordEntry(
-    view: ApplicationView<AuthenticatePasswordAction>,
-): VNode {
-    const action = useApplicationView(view)
+type EntryProps = Readonly<{
+    link: SignLink
+    authenticate: ApplicationView<AuthenticatePasswordAction>
+}>
+export function AuthenticatePasswordEntry(props: EntryProps): VNode {
+    const authenticate = useApplicationView(props.authenticate)
     return h(AuthenticatePasswordComponent, {
-        authenticate: action,
-        state: useApplicationAction(action),
-        validate: useApplicationAction(action.validate),
+        link: props.link,
+        authenticate,
+        state: useApplicationAction(authenticate),
+        validate: useApplicationAction(authenticate.validate),
     })
 }
 
 type Props = Readonly<{
+    link: SignLink
     authenticate: AuthenticatePasswordAction
     state: AuthenticatePasswordState
     validate: ValidateBoardActionState
@@ -209,10 +214,10 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
         return buttons({ left: privacyPolicyLink(), right: resetLink() })
     }
     function privacyPolicyLink() {
-        return signNav(props.authenticate.link.getNav_static_privacyPolicy())
+        return signNav(props.link.getNav_static_privacyPolicy())
     }
     function resetLink() {
-        return signNav(props.authenticate.link.getNav_password_reset_requestToken())
+        return signNav(props.link.getNav_password_reset_requestToken())
     }
 }
 

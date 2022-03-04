@@ -16,10 +16,15 @@ import { PrivacyPolicyComponent } from "./privacy_policy"
 
 import { SignAction, SignActionState } from "../action"
 import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
+import { SignLink } from "../../nav/action"
 
-export function SignEntry(view: ApplicationView<SignAction>): VNode {
-    const action = useApplicationView(view)
-    const state = useApplicationAction(action)
+type EntryProps = Readonly<{
+    link: SignLink
+    sign: ApplicationView<SignAction>
+}>
+export function SignEntry(props: EntryProps): VNode {
+    const sign = useApplicationView(props.sign)
+    const state = useApplicationAction(sign)
     const [err] = useErrorBoundary((err) => {
         // 認証前なのでエラーはどうしようもない
         console.log(err)
@@ -28,32 +33,33 @@ export function SignEntry(view: ApplicationView<SignAction>): VNode {
     if (err) {
         return h(ApplicationErrorComponent, { err: `${err}` })
     }
-    return h(SignComponent, { state, sign: action })
+    return h(SignComponent, { link: props.link, sign, state })
 }
 
 type Props = Readonly<{
+    link: SignLink
     sign: SignAction
     state: SignActionState
 }>
-export function SignComponent(props: Props): VNode {
-    switch (props.state.type) {
+export function SignComponent({ link, state }: Props): VNode {
+    switch (state.type) {
         case "initial-view":
             return EMPTY_CONTENT
 
         case "static-privacyPolicy":
-            return h(PrivacyPolicyComponent, props.state.resource)
+            return h(PrivacyPolicyComponent, { link })
 
         case "check-authTicket":
-            return h(CheckAuthTicketEntry, props.state.view)
+            return h(CheckAuthTicketEntry, state.view)
 
         case "password-authenticate":
-            return h(AuthenticatePasswordEntry, props.state.view)
+            return h(AuthenticatePasswordEntry, { link, authenticate: state.view })
 
         case "password-reset-requestToken":
-            return h(RequestResetTokenEntry, props.state.view)
+            return h(RequestResetTokenEntry, { link, requestToken: state.view })
 
         case "password-reset":
-            return h(ResetPasswordEntry, props.state.view)
+            return h(ResetPasswordEntry, { link, reset: state.view })
     }
 }
 
