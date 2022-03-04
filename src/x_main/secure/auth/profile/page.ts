@@ -47,7 +47,10 @@ export function ProfilePageComponent(props: ProfilePageResource): VNode {
         main: appMain({
             header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbListComponent, props)]),
             body: mainBody(
-                container([h(ChangePasswordEntry, props), h(RequestResetTokenProfileEntry, props)]),
+                container([
+                    h(ChangePasswordEntry, props),
+                    h(RequestResetTokenProfileEntry, props.requestToken),
+                ]),
             ),
             copyright,
         }),

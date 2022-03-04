@@ -17,7 +17,7 @@ class Action
     extends AbstractStatefulApplicationAction<EditableBoardState>
     implements EditableBoardAction
 {
-    initialState = initialState
+    readonly initialState = initialState
 
     open(): EditableBoardState {
         return this.post({ isEditable: true })

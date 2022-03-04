@@ -12,6 +12,7 @@ export function toProfileView(props: ProfileViewProps): ApplicationView<ProfileP
             props.terminate()
         }
         resource.change.terminate()
-        resource.requestToken.terminate()
+        resource.requestToken.editable.terminate()
+        resource.requestToken.requestToken.terminate()
     })
 }

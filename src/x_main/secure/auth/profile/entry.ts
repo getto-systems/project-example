@@ -6,11 +6,12 @@ import { newForegroundOutsideFeature } from "../../../../x_outside_feature/commo
 
 import { newBaseResource } from "../../../../core/base/init/resource"
 import { newChangePasswordResource } from "../../../../auth/user/password/change/init/resource"
-import { newRequestResetTokenProfileResource } from "../../../../auth/user/password/reset/request_token/init/resource"
+import { newRequestResetTokenAction } from "../../../../auth/user/password/reset/request_token/init/resource"
 import { toProfileView } from "./common"
 
 import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 import { ProfilePageResource } from "./resource"
+import { initEditableBoardAction } from "../../../../z_vendor/getto-application/board/editable/action"
 
 render(h(ProfilePageEntry, props()), document.body)
 
@@ -22,6 +23,9 @@ function newResource() {
     return {
         ...newBaseResource(feature),
         ...newChangePasswordResource(feature),
-        ...newRequestResetTokenProfileResource(feature),
+        requestToken: {
+            editable: initEditableBoardAction(),
+            requestToken: newRequestResetTokenAction(feature),
+        },
     }
 }

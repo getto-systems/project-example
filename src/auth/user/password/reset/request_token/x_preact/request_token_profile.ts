@@ -21,47 +21,56 @@ import { InputLoginIDEntry } from "../../../../login_id/input/x_preact/input"
 import { RequestResetTokenError } from "../data"
 import { box } from "../../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../../z_vendor/getto-css/preact/design/highlight"
-import { RequestResetTokenProfileAction, RequestResetTokenProfileState } from "../action"
+import { RequestResetTokenAction, RequestResetTokenState } from "../action"
 import { ValidateBoardActionState } from "../../../../../../z_vendor/getto-application/board/validate_board/action"
+import {
+    EditableBoardAction,
+    EditableBoardState,
+} from "../../../../../../z_vendor/getto-application/board/editable/action"
 
 type EntryProps = Readonly<{
-    requestToken: RequestResetTokenProfileAction
+    editable: EditableBoardAction
+    requestToken: RequestResetTokenAction
 }>
-export function RequestResetTokenProfileEntry({ requestToken }: EntryProps): VNode {
+export function RequestResetTokenProfileEntry({ editable, requestToken }: EntryProps): VNode {
     return h(RequestResetTokenProfileComponent, {
+        editable,
         requestToken,
         state: useApplicationAction(requestToken),
-        validate: useApplicationAction(requestToken.validate),
+        editableState: useApplicationAction(editable),
+        validateState: useApplicationAction(requestToken.validate),
     })
 }
 
 type Props = EntryProps &
     Readonly<{
-        state: RequestResetTokenProfileState
-        validate: ValidateBoardActionState
+        state: RequestResetTokenState
+        editableState: EditableBoardState
+        validateState: ValidateBoardActionState
     }>
 export function RequestResetTokenProfileComponent(props: Props): VNode {
     return basedOn(props)
 
-    function basedOn({ state, validate }: Props): VNode {
-        switch (state.type) {
-            case "initial-request-token":
-                return buttonBox({ type: "initial" })
+    function basedOn({ state, editableState, validateState }: Props): VNode {
+        if (editableState.isEditable) {
+            switch (state.type) {
+                case "initial-request-token":
+                    return formBox({ type: validateState })
 
-            case "input-login-id":
-                return formBox({ type: validate })
+                case "try-to-request-token":
+                    return formBox({ type: "connecting" })
 
-            case "try-to-request-token":
-                return formBox({ type: "connecting" })
+                case "take-longtime-to-request-token":
+                    return formBox({ type: "take-longtime" })
 
-            case "take-longtime-to-request-token":
-                return formBox({ type: "take-longtime" })
+                case "succeed-to-request-token":
+                    return buttonBox({ type: "success" })
 
-            case "succeed-to-request-token":
-                return buttonBox({ type: "success" })
-
-            case "failed-to-request-token":
-                return formBox({ type: validate, err: requestTokenError(state.err) })
+                case "failed-to-request-token":
+                    return formBox({ type: validateState, err: requestTokenError(state.err) })
+            }
+        } else {
+            return buttonBox({ type: "initial" })
         }
     }
 
@@ -106,7 +115,7 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
-                props.requestToken.open()
+                props.editable.open()
             }
         }
     }
@@ -161,7 +170,9 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
-                props.requestToken.submit()
+                props.requestToken.submit().then(() => {
+                    props.editable.close()
+                })
             }
         }
 
@@ -190,7 +201,8 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
-                props.requestToken.close()
+                props.requestToken.clear()
+                props.editable.close()
             }
         }
 

@@ -6,32 +6,18 @@ import { newRequestResetTokenConfig } from "./config"
 import { newRequestResetTokenInfra } from "./infra"
 
 import { ApplicationView } from "../../../../../../z_vendor/getto-application/action/action"
-import {
-    initRequestResetTokenAction,
-    initRequestResetTokenProfileAction,
-    RequestResetTokenAction,
-    RequestResetTokenProfileAction,
-} from "../action"
+import { initRequestResetTokenAction, RequestResetTokenAction } from "../action"
 
 type OutsideFeature = RemoteOutsideFeature
 export function newRequestResetTokenView(
     feature: OutsideFeature,
 ): ApplicationView<RequestResetTokenAction> {
-    return toApplicationView(
-        initRequestResetTokenAction({
-            infra: newRequestResetTokenInfra(feature),
-            config: newRequestResetTokenConfig(),
-        }),
-    )
+    return toApplicationView(newRequestResetTokenAction(feature))
 }
 
-export function newRequestResetTokenProfileResource(
-    feature: OutsideFeature,
-): Readonly<{ requestToken: RequestResetTokenProfileAction }> {
-    return {
-        requestToken: initRequestResetTokenProfileAction({
-            infra: newRequestResetTokenInfra(feature),
-            config: newRequestResetTokenConfig(),
-        }),
-    }
+export function newRequestResetTokenAction(feature: OutsideFeature): RequestResetTokenAction {
+    return initRequestResetTokenAction({
+        infra: newRequestResetTokenInfra(feature),
+        config: newRequestResetTokenConfig(),
+    })
 }
