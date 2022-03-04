@@ -6,12 +6,9 @@ import { SearchAuthUserAccountInfra } from "../action"
 import { newSearchAuthUserAccountRemote } from "./search_remote"
 
 type OutsideFeature = RemoteOutsideFeature & RepositoryOutsideFeature
-export function newSearchAuthUserAccountInfra(
-    feature: OutsideFeature,
-    key: string,
-): SearchAuthUserAccountInfra {
+export function newSearchAuthUserAccountInfra(feature: OutsideFeature): SearchAuthUserAccountInfra {
     return {
         searchRemote: newSearchAuthUserAccountRemote(feature),
-        columnsRepository: newSearchColumnsRepository(feature, key),
+        columnsRepository: newSearchColumnsRepository(feature, "auth.user.account.search"),
     }
 }

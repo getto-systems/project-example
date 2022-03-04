@@ -1,5 +1,4 @@
 import { h, VNode } from "preact"
-import { html } from "htm/preact"
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
@@ -10,12 +9,14 @@ import {
 } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box_grow } from "../../../../../z_vendor/getto-css/preact/design/box"
 
-import { iconHtml, icon_search, icon_spinner } from "../../../../../core/x_preact/design/icon"
-
 import { SearchLoginIDComponent } from "../../../login_id/input/x_preact/search"
 
 import { SearchAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
 import { ObserveBoardActionState } from "../../../../../z_vendor/getto-application/board/observe_board/action"
+import {
+    SEARCH_BUTTON_CONNECT,
+    SEARCH_BUTTON_STATIC,
+} from "../../../../../core/x_preact/design/table"
 
 type EntryProps = Readonly<{
     search: SearchAuthUserAccountAction
@@ -85,16 +86,16 @@ export function SearchAuthUserAccountFormComponent(props: Props): VNode {
         function button(): VNode {
             switch (content.type) {
                 case "has-changed":
-                    return button_search({ state: "confirm", label: SEARCH_STATIC, onClick })
+                    return button_search({ state: "confirm", label: SEARCH_BUTTON_STATIC, onClick })
 
                 case "initial":
-                    return button_search({ state: "normal", label: SEARCH_STATIC, onClick })
+                    return button_search({ state: "normal", label: SEARCH_BUTTON_STATIC, onClick })
 
                 case "connecting":
-                    return button_search({ state: "connect", label: SEARCH_CONNECT })
+                    return button_search({ state: "connect", label: SEARCH_BUTTON_CONNECT })
 
                 case "failed":
-                    return button_search({ state: "confirm", label: SEARCH_STATIC, onClick })
+                    return button_search({ state: "confirm", label: SEARCH_BUTTON_STATIC, onClick })
             }
 
             function onClick(e: Event) {
@@ -104,6 +105,3 @@ export function SearchAuthUserAccountFormComponent(props: Props): VNode {
         }
     }
 }
-
-const SEARCH_STATIC: VNode = html`検索 ${iconHtml(icon_search)}`
-const SEARCH_CONNECT: VNode = html`検索 ${iconHtml(icon_spinner)}`

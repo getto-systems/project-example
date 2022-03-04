@@ -10,12 +10,15 @@ import {
     tbody,
     thead,
 } from "../../../../../z_vendor/getto-css/preact/design/table"
-import { EMPTY_TABLE } from "../../../../../core/x_preact/design/table"
+import {
+    EMPTY_TABLE,
+    TAKE_LONGTIME_TO_SEARCH_TABLE,
+} from "../../../../../core/x_preact/design/table"
 
 import { searchResponse } from "../../../../../z_lib/ui/search/kernel/x_preact/helper"
 import { searchColumns } from "../../../../../z_lib/ui/search/columns/x_preact/helper"
 
-import { SearchAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
+import { ListAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
 import { SearchColumnsState } from "../../../../../z_lib/ui/search/columns/action"
 
 import { SearchAuthUserAccountTableStructure } from "./structure"
@@ -24,14 +27,14 @@ import { SearchColumns } from "../../../../../z_lib/ui/search/columns/data"
 import { SearchAuthUserAccountRemoteResponse } from "../data"
 
 type EntryProps = Readonly<{
-    search: SearchAuthUserAccountAction
+    list: ListAuthUserAccountAction
     structure: SearchAuthUserAccountTableStructure
 }>
 export function SearchAuthUserAccountTableEntry(resource: EntryProps): VNode {
     return h(SearchAuthUserAccountTableComponent, {
         ...resource,
-        state: useApplicationAction(resource.search),
-        columnsState: useApplicationAction(resource.search.columns),
+        state: useApplicationAction(resource.list),
+        columnsState: useApplicationAction(resource.list.columns),
     })
 }
 
@@ -44,12 +47,19 @@ export function SearchAuthUserAccountTableComponent(props: Props): VNode {
     return basedOn(props)
 
     function basedOn({ state, columnsState }: Props): VNode {
-        const response = searchResponse(state)
-        const columns = searchColumns(columnsState)
-        if (!columns.found || !response.found) {
-            return EMPTY_CONTENT
+        if (state.type === "take-longtime-to-search") {
+            return TAKE_LONGTIME_TO_SEARCH_TABLE
+        } else {
+            const response = searchResponse(state)
+            const columns = searchColumns(columnsState)
+            if (!columns.found || !response.found) {
+                return EMPTY_CONTENT
+            }
+            if (response.response.page.all === 0) {
+                return EMPTY_TABLE
+            }
+            return content({ columns: columns.columns, response: response.response })
         }
-        return content({ columns: columns.columns, response: response.response })
     }
 
     type Content = Readonly<{
@@ -58,17 +68,11 @@ export function SearchAuthUserAccountTableComponent(props: Props): VNode {
     }>
 
     function content({ columns, response }: Content): VNode {
-        if (response.page.all === 0) {
-            return EMPTY_TABLE
-        }
-
         const params = { summary: {}, visibleKeys: columns }
 
         const sticky = props.structure.sticky()
-        const header = props.structure.header(params)
-
         return table(sticky, [
-            thead(tableHeader({ sticky, header })),
+            thead(tableHeader({ sticky, header: props.structure.header(params) })),
             tbody(
                 response.users.flatMap((row) =>
                     tableColumn({ sticky, column: props.structure.column(params, row) }),

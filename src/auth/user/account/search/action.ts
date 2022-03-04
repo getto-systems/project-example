@@ -40,58 +40,47 @@ import {
     SearchAuthUserAccountSortKey,
 } from "./data"
 import { InputPasswordAction } from "../../password/input/action"
+import { AuthUserAccountBasket } from "../kernel/data"
 
-export interface SearchAuthUserAccountAction
-    extends StatefulApplicationAction<SearchAuthUserAccountState> {
+export interface SearchAuthUserAccountAction extends ListAuthUserAccountAction {
     readonly loginID: SearchLoginIDAction
-    readonly offset: SearchOffsetAction
-    readonly columns: SearchColumnsAction
     readonly observe: ObserveBoardAction
-
-    currentSort(): SearchAuthUserAccountSort
 
     clear(): SearchAuthUserAccountState
     search(): Promise<SearchAuthUserAccountState>
-    load(): Promise<SearchAuthUserAccountState>
-    sort(key: SearchAuthUserAccountSortKey): Promise<SearchAuthUserAccountState>
-
-    focus(loginID: string): Promise<SearchAuthUserAccountState>
 }
 export interface ListAuthUserAccountAction
     extends StatefulApplicationAction<SearchAuthUserAccountState> {
-    readonly item: FocusAuthUserAccountAction
+    readonly detail: DetailAuthUserAccountAction
     readonly offset: SearchOffsetAction
+    readonly columns: SearchColumnsAction
 
     currentSort(): SearchAuthUserAccountSort
 
     load(): Promise<SearchAuthUserAccountState>
-
-    focus(loginID: string): Promise<SearchAuthUserAccountState>
+    sort(key: SearchAuthUserAccountSortKey): Promise<SearchAuthUserAccountState>
 }
-export interface FocusAuthUserAccountAction
-    extends StatefulApplicationAction<FocusAuthUserAccountState> {
-    readonly loginID: ChangeAuthUserLoginIDAction
-    readonly password: ChangeAuthUserPasswordAction
+export interface DetailAuthUserAccountAction
+    extends StatefulApplicationAction<DetailAuthUserAccountState> {
+    // readonly loginID: ChangeAuthUserLoginIDAction
+    // readonly password: ChangeAuthUserPasswordAction
     //readonly grantedRoles: ChangeAuthUserGrantedRolesAction
 
-    close(): Promise<FocusAuthUserAccountState>
-    foldSidebar(): Promise<FocusAuthUserAccountState>
-    expandSidebar(): Promise<FocusAuthUserAccountState>
+    focus(user: AuthUserAccountBasket): DetailAuthUserAccountState
+    close(): DetailAuthUserAccountState
+
+    isFocused(user: AuthUserAccountBasket): boolean
 }
 export interface ChangeAuthUserLoginIDAction
     extends StatefulApplicationAction<ChangeAuthUserLoginIDState> {
     readonly loginID: InputLoginIDAction
 
-    open(): Promise<ChangeAuthUserLoginIDState>
-    close(): Promise<ChangeAuthUserLoginIDState>
     changeLoginID(): Promise<ChangeAuthUserLoginIDState>
 }
 export interface ChangeAuthUserPasswordAction
     extends StatefulApplicationAction<ChangeAuthUserPasswordState> {
     readonly password: InputPasswordAction
 
-    open(): Promise<ChangeAuthUserPasswordState>
-    close(): Promise<ChangeAuthUserPasswordState>
     changePassword(): Promise<ChangeAuthUserPasswordState>
 }
 
@@ -104,11 +93,11 @@ export type SearchAuthUserAccountState =
 
 const initialSearchState: SearchAuthUserAccountState = { type: "initial-search" }
 
-export type FocusAuthUserAccountState =
-    | Readonly<{ type: "initial-focus" }>
-    | Readonly<{ type: "focus-on"; loginID: string; isSidebarExpand: boolean }>
+export type DetailAuthUserAccountState =
+    | Readonly<{ type: "initial-detail" }>
+    | Readonly<{ type: "focus-on"; user: AuthUserAccountBasket }>
 
-const initialFocusState: FocusAuthUserAccountState = { type: "initial-focus" }
+const initialDetailState: DetailAuthUserAccountState = { type: "initial-detail" }
 
 export type ChangeAuthUserLoginIDState = Readonly<{ type: "initial-change-login-id" }>
 
@@ -152,6 +141,8 @@ class Action
 {
     readonly initialState = initialSearchState
 
+    readonly detail: DetailAuthUserAccountAction
+
     readonly loginID: SearchLoginIDAction
     readonly offset: SearchOffsetAction
     readonly columns: SearchColumnsAction
@@ -174,13 +165,12 @@ class Action
                 this.observe.terminate()
             },
         })
-        this.material = material
 
         const initialFilter = material.shell.detectFilter()
 
         const loginID = initSearchLoginIDAction(initialFilter.loginID)
         const offset = initSearchOffsetAction(initialFilter.offset)
-        const columns = initSearchColumnsAction(this.material.infra)
+        const columns = initSearchColumnsAction(material.infra)
         const { observe, checker } = initObserveBoardAction({
             fields: searchAuthUserAccountFieldNames,
         })
@@ -199,6 +189,10 @@ class Action
                 offset: offset.reset(),
                 sort: nextSort(this.currentSort(), key),
             })
+
+        this.material = material
+
+        this.detail = new DetailAction()
 
         this.loginID = loginID.input
         this.offset = offset.input
@@ -282,6 +276,31 @@ async function search<S>(
     }
 
     return post({ type: "succeed-to-search", response: response.value })
+}
+
+class DetailAction
+    extends AbstractStatefulApplicationAction<DetailAuthUserAccountState>
+    implements DetailAuthUserAccountAction
+{
+    readonly initialState = initialDetailState
+
+    focus(user: AuthUserAccountBasket): DetailAuthUserAccountState {
+        return this.post({ type: "focus-on", user })
+    }
+    close(): DetailAuthUserAccountState {
+        return this.post({ type: "initial-detail" })
+    }
+
+    isFocused(user: AuthUserAccountBasket): boolean {
+        const state = this.currentState()
+        switch (state.type) {
+            case "initial-detail":
+                return false
+
+            case "focus-on":
+                return user.loginID === state.user.loginID
+        }
+    }
 }
 
 interface Post<E, S> {
