@@ -28,7 +28,7 @@ import { InputLoginIDEntry } from "../../../../login_id/input/x_preact/input"
 
 import { ApplicationView } from "../../../../../../z_vendor/getto-application/action/action"
 import { RequestResetTokenAction, RequestResetTokenState } from "../action"
-import { ValidateBoardActionState } from "../../../../../../z_vendor/getto-application/board/validate_board/action"
+import { ValidateBoardState } from "../../../../../../z_vendor/getto-application/board/validate_board/action"
 import { SignLink } from "../../../../../sign/nav/action"
 
 import { RequestResetTokenError } from "../data"
@@ -53,7 +53,7 @@ type Props = Readonly<{
     link: SignLink
     requestToken: RequestResetTokenAction
     state: RequestResetTokenState
-    validate: ValidateBoardActionState
+    validate: ValidateBoardState
 }>
 export function RequestResetTokenComponent(props: Props): VNode {
     return basedOn(props)

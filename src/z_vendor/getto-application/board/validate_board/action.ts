@@ -6,14 +6,14 @@ import { BoardConverter } from "../kernel/infra"
 import { ValidateBoardChecker, ValidateBoardStack, ValidateBoardStateFound } from "./infra"
 
 import { ConvertBoardResult } from "../kernel/data"
-import { ValidateBoardState } from "./data"
 
-export interface ValidateBoardAction extends StatefulApplicationAction<ValidateBoardActionState> {
-    clear(): void
+export interface ValidateBoardAction extends StatefulApplicationAction<ValidateBoardState> {
+    clear(): ValidateBoardState
 }
 
-export type ValidateBoardActionState = ValidateBoardState
-const initialState: ValidateBoardActionState = "initial"
+export type ValidateBoardState = "initial" | "valid" | "invalid"
+
+const initialState: ValidateBoardState = "initial"
 
 export type ValidateBoardConfig<N extends string> = Readonly<{
     fields: readonly N[]
@@ -46,10 +46,10 @@ export function initValidateBoardAction<N extends string, T>(
 }
 
 class Action<N extends string, T>
-    extends AbstractStatefulApplicationAction<ValidateBoardActionState>
+    extends AbstractStatefulApplicationAction<ValidateBoardState>
     implements ValidateBoardAction, ValidateBoardChecker<N, T>
 {
-    readonly initialState: ValidateBoardActionState = initialState
+    readonly initialState: ValidateBoardState = initialState
 
     config: ValidateBoardConfig<N>
     infra: ValidateBoardInfra
@@ -73,8 +73,8 @@ class Action<N extends string, T>
         return this.shell.converter()
     }
 
-    clear(): void {
-        this.post(initialState)
+    clear(): ValidateBoardState {
+        return this.post(initialState)
     }
 }
 

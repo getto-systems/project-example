@@ -22,7 +22,7 @@ import { RequestResetTokenError } from "../data"
 import { box } from "../../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../../z_vendor/getto-css/preact/design/highlight"
 import { RequestResetTokenAction, RequestResetTokenState } from "../action"
-import { ValidateBoardActionState } from "../../../../../../z_vendor/getto-application/board/validate_board/action"
+import { ValidateBoardState } from "../../../../../../z_vendor/getto-application/board/validate_board/action"
 import {
     EditableBoardAction,
     EditableBoardState,
@@ -46,7 +46,7 @@ type Props = EntryProps &
     Readonly<{
         state: RequestResetTokenState
         editableState: EditableBoardState
-        validateState: ValidateBoardActionState
+        validateState: ValidateBoardState
     }>
 export function RequestResetTokenProfileComponent(props: Props): VNode {
     return basedOn(props)

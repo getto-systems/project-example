@@ -6,11 +6,7 @@ import {
 import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 import { nextSort } from "../../../../z_lib/ui/search/sort/helper"
 
-import {
-    initSearchLoginIDAction,
-    InputLoginIDAction,
-    SearchLoginIDAction,
-} from "../../login_id/input/action"
+import { initSearchLoginIDAction, SearchLoginIDAction } from "../../login_id/input/action"
 import {
     initObserveBoardAction,
     ObserveBoardAction,
@@ -24,6 +20,8 @@ import {
     SearchColumnsAction,
     SearchColumnsInfra,
 } from "../../../../z_lib/ui/search/columns/action"
+
+import { searchResponse } from "../../../../z_lib/ui/search/kernel/x_preact/helper"
 
 import {
     FocusAuthUserAccountDetecter,
@@ -41,9 +39,7 @@ import {
     SearchAuthUserAccountSort,
     SearchAuthUserAccountSortKey,
 } from "./data"
-import { InputPasswordAction } from "../../password/input/action"
 import { AuthUserAccountBasket } from "../kernel/data"
-import { searchResponse } from "../../../../z_lib/ui/search/kernel/x_preact/helper"
 
 export interface SearchAuthUserAccountAction extends ListAuthUserAccountAction {
     readonly loginID: SearchLoginIDAction
@@ -65,26 +61,10 @@ export interface ListAuthUserAccountAction
 }
 export interface DetailAuthUserAccountAction
     extends StatefulApplicationAction<DetailAuthUserAccountState> {
-    // readonly loginID: ChangeAuthUserLoginIDAction
-    // readonly password: ChangeAuthUserPasswordAction
-    //readonly grantedRoles: ChangeAuthUserGrantedRolesAction
-
     focus(user: AuthUserAccountBasket): DetailAuthUserAccountState
     close(): DetailAuthUserAccountState
 
     isFocused(user: AuthUserAccountBasket): boolean
-}
-export interface ChangeAuthUserLoginIDAction
-    extends StatefulApplicationAction<ChangeAuthUserLoginIDState> {
-    readonly loginID: InputLoginIDAction
-
-    changeLoginID(): Promise<ChangeAuthUserLoginIDState>
-}
-export interface ChangeAuthUserPasswordAction
-    extends StatefulApplicationAction<ChangeAuthUserPasswordState> {
-    readonly password: InputPasswordAction
-
-    changePassword(): Promise<ChangeAuthUserPasswordState>
 }
 
 export type SearchAuthUserAccountState =
@@ -98,17 +78,10 @@ const initialSearchState: SearchAuthUserAccountState = { type: "initial-search" 
 
 export type DetailAuthUserAccountState =
     | Readonly<{ type: "initial-detail" }>
+    | Readonly<{ type: "focus-failed" }>
     | Readonly<{ type: "focus-on"; user: AuthUserAccountBasket }>
 
 const initialDetailState: DetailAuthUserAccountState = { type: "initial-detail" }
-
-export type ChangeAuthUserLoginIDState = Readonly<{ type: "initial-change-login-id" }>
-
-const initialChangeLoginIDState: ChangeAuthUserLoginIDState = { type: "initial-change-login-id" }
-
-export type ChangeAuthUserPasswordState = Readonly<{ type: "initial-change-password" }>
-
-const initialChangePasswordState: ChangeAuthUserPasswordState = { type: "initial-change-password" }
 
 export type SearchAuthUserAccountMaterial = Readonly<{
     infra: SearchAuthUserAccountInfra
@@ -209,7 +182,7 @@ class Action
                         return { found: false }
                     }
                     return { found: true, user }
-                }
+                },
             },
             shell: material.shell,
         })
@@ -331,10 +304,10 @@ class DetailAction
                 }
                 const user = await this.material.infra.detectUser(focus.loginID)
                 if (!user.found) {
-                    return this.currentState()
+                    return this.post({ type: "focus-failed" })
                 }
                 return this.focus(user.user)
-            }
+            },
         })
         this.material = material
     }
@@ -352,6 +325,7 @@ class DetailAction
         const state = this.currentState()
         switch (state.type) {
             case "initial-detail":
+            case "focus-failed":
                 return false
 
             case "focus-on":

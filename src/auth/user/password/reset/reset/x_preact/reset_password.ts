@@ -30,7 +30,7 @@ import { InputPasswordEntry } from "../../../input/x_preact/input"
 
 import { ApplicationView } from "../../../../../../z_vendor/getto-application/action/action"
 import { ResetPasswordAction, ResetPasswordState } from "../action"
-import { ValidateBoardActionState } from "../../../../../../z_vendor/getto-application/board/validate_board/action"
+import { ValidateBoardState } from "../../../../../../z_vendor/getto-application/board/validate_board/action"
 import { SignLink } from "../../../../../sign/nav/action"
 
 import { ResetPasswordError } from "../data"
@@ -53,7 +53,7 @@ type Props = Readonly<{
     link: SignLink
     reset: ResetPasswordAction
     state: ResetPasswordState
-    validate: ValidateBoardActionState
+    validate: ValidateBoardState
 }>
 export function ResetPasswordComponent(props: Props): VNode {
     useLayoutEffect(() => {

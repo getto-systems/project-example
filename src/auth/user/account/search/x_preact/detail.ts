@@ -1,20 +1,46 @@
 import { h, VNode } from "preact"
+import { html } from "htm/preact"
+
+import { box, box_grow, container } from "../../../../../z_vendor/getto-css/preact/design/box"
+import { notice_gray, notice_pending } from "../../../../../z_vendor/getto-css/preact/design/highlight"
+import { button_cancel } from "../../../../../z_vendor/getto-css/preact/design/form"
+
+import { BACK_TO_LIST_BUTTON } from "../../../../../core/x_preact/design/table"
+
+import { OverridePasswordEntry } from "../../../password/change/x_preact/override_password"
 
 import { DetailAuthUserAccountAction } from "../action"
-import { box_grow, container } from "../../../../../z_vendor/getto-css/preact/design/box"
-import { notice_gray } from "../../../../../z_vendor/getto-css/preact/design/highlight"
-import { button_cancel } from "../../../../../z_vendor/getto-css/preact/design/form"
-import { html } from "htm/preact"
-import { BACK_TO_LIST_BUTTON } from "../../../../../core/x_preact/design/table"
+import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
+import { OverridePasswordAction } from "../../../password/change/action"
+
+import { AuthUserAccountBasket } from "../../kernel/data"
 
 type EntryProps = Readonly<{
     detail: DetailAuthUserAccountAction
+    override: Readonly<{
+        editable: EditableBoardAction
+        override: OverridePasswordAction
+    }>
+    user: Readonly<{ found: false }> | Readonly<{ found: true; user: AuthUserAccountBasket }>
 }>
 export function DetailAuthUserAccountEntry(props: EntryProps): VNode {
-    return html`
-        ${container([h(CloseButtonComponent, props)])}
-        ${container([box_grow({ body: notice_gray(["詳細コンテンツをここに"]) })])}
-    `
+    return html`${[container([h(CloseButtonComponent, props)]), content()]}`
+
+    function content(): VNode {
+        if (!props.user.found) {
+            return container([
+                box_grow({ body: notice_gray(["指定されたユーザーが見つかりませんでした"]) }),
+            ])
+        }
+
+        const user = props.user.user
+
+        return container([
+            box({ body: notice_pending(["基本情報"]) }),
+            box({ body: notice_pending(["ログインID変更"]) }),
+            h(OverridePasswordEntry, { ...props.override, user }),
+        ])
+    }
 }
 
 type CloseButtonProps = EntryProps

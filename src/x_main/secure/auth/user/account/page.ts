@@ -72,12 +72,22 @@ export function ManageUserAccountPageComponent(props: ManageUserAccountPageResou
                 }),
             })
 
+        case "focus-failed":
         case "focus-on":
             return appLayout({
                 ...common,
                 main: appMain({
                     header: mainHeader([mainTitle(detailTitle)]),
-                    body: mainBody(h(DetailAuthUserAccountEntry, { detail: props.search.detail })),
+                    body: mainBody(
+                        h(DetailAuthUserAccountEntry, {
+                            detail: props.search.detail,
+                            override: props.override,
+                            user:
+                                detailState.type === "focus-failed"
+                                    ? { found: false }
+                                    : { found: true, user: detailState.user },
+                        }),
+                    ),
                     copyright,
                 }),
                 sidebar: appSidebar({

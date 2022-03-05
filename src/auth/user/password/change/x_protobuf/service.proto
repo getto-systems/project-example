@@ -12,3 +12,14 @@ message ChangePasswordRequestPb {
 message ChangePasswordResponsePb {
     bool success = 1;
 }
+
+service OverridePasswordPb {
+    rpc Override (OverridePasswordRequestPb) returns (OverridePasswordResponsePb);
+}
+message OverridePasswordRequestPb {
+    string login_id = 1;
+    string new_password = 2;
+}
+message OverridePasswordResponsePb {
+    bool success = 1;
+}

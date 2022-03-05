@@ -31,7 +31,7 @@ import { InputPasswordEntry } from "../../input/x_preact/input"
 
 import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 import { AuthenticatePasswordAction, AuthenticatePasswordState } from "../action"
-import { ValidateBoardActionState } from "../../../../../z_vendor/getto-application/board/validate_board/action"
+import { ValidateBoardState } from "../../../../../z_vendor/getto-application/board/validate_board/action"
 
 import { AuthenticatePasswordError } from "../data"
 import { SignLink } from "../../../../sign/nav/action"
@@ -54,7 +54,7 @@ type Props = Readonly<{
     link: SignLink
     authenticate: AuthenticatePasswordAction
     state: AuthenticatePasswordState
-    validate: ValidateBoardActionState
+    validate: ValidateBoardState
 }>
 export function AuthenticatePasswordComponent(props: Props): VNode {
     useLayoutEffect(() => {
