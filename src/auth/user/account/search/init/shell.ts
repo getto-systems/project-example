@@ -4,7 +4,10 @@ import {
 } from "../../../../../z_lib/ui/location/feature"
 
 import {
+    clearFocusAuthUserAccountQuery,
+    detectFocusAuthUserAccount,
     detectSearchAuthUserAccountFilter,
+    updateFocusAuthUserAccountQuery,
     updateSearchAuthUserAccountFilterQuery,
 } from "../convert"
 
@@ -16,12 +19,17 @@ export function newSearchAuthUserAccountShell(feature: OutsideFeature): SearchAu
         detectFilter: () =>
             detectSearchAuthUserAccountFilter(new URL(feature.currentLocation.toString())),
 
-        updateQuery: (fields) => {
-            const url = updateSearchAuthUserAccountFilterQuery(
-                new URL(feature.currentLocation.toString()),
-                fields,
-            )
-            feature.currentHistory.pushState(null, "", url)
+        updateQuery: (fields) =>
+            updateURL(feature, (url) => updateSearchAuthUserAccountFilterQuery(url, fields)),
+        detectFocus: () => detectFocusAuthUserAccount(new URL(feature.currentLocation.toString())),
+        updateFocus: {
+            focus: (user) =>
+                updateURL(feature, (url) => updateFocusAuthUserAccountQuery(url, user)),
+            clear: () => updateURL(feature, (url) => clearFocusAuthUserAccountQuery(url)),
         },
     }
+}
+
+function updateURL(feature: OutsideFeature, updater: { (url: URL): URL }): void {
+    feature.currentHistory.pushState(null, "", updater(new URL(feature.currentLocation.toString())))
 }

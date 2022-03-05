@@ -26,8 +26,10 @@ import {
 } from "../../../../z_lib/ui/search/columns/action"
 
 import {
+    FocusAuthUserAccountDetecter,
     SearchAuthUserAccountFilterDetecter,
     SearchAuthUserAccountRemote,
+    UpdateFocusAuthUserAccountQuery,
     UpdateSearchAuthUserAccountFieldsQuery,
 } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
@@ -41,6 +43,7 @@ import {
 } from "./data"
 import { InputPasswordAction } from "../../password/input/action"
 import { AuthUserAccountBasket } from "../kernel/data"
+import { searchResponse } from "../../../../z_lib/ui/search/kernel/x_preact/helper"
 
 export interface SearchAuthUserAccountAction extends ListAuthUserAccountAction {
     readonly loginID: SearchLoginIDAction
@@ -121,6 +124,8 @@ export type SearchAuthUserAccountInfra = Readonly<{
 export type SearchAuthUserAccountShell = Readonly<{
     detectFilter: SearchAuthUserAccountFilterDetecter
     updateQuery: UpdateSearchAuthUserAccountFieldsQuery
+    detectFocus: FocusAuthUserAccountDetecter
+    updateFocus: UpdateFocusAuthUserAccountQuery
 }>
 
 export type SearchAuthUserAccountConfig = Readonly<{
@@ -192,7 +197,22 @@ class Action
 
         this.material = material
 
-        this.detail = new DetailAction()
+        this.detail = new DetailAction({
+            infra: {
+                detectUser: async (loginID) => {
+                    const response = searchResponse(await this.load())
+                    if (!response.found) {
+                        return { found: false }
+                    }
+                    const user = response.response.users.find((user) => user.loginID === loginID)
+                    if (user === undefined) {
+                        return { found: false }
+                    }
+                    return { found: true, user }
+                }
+            },
+            shell: material.shell,
+        })
 
         this.loginID = loginID.input
         this.offset = offset.input
@@ -278,16 +298,53 @@ async function search<S>(
     return post({ type: "succeed-to-search", response: response.value })
 }
 
+type DetailMaterial = Readonly<{
+    infra: DetailInfra
+    shell: DetailShell
+}>
+
+type DetailInfra = Readonly<{
+    detectUser(
+        loginID: string,
+    ): Promise<Readonly<{ found: false }> | Readonly<{ found: true; user: AuthUserAccountBasket }>>
+}>
+
+type DetailShell = Readonly<{
+    detectFocus: FocusAuthUserAccountDetecter
+    updateFocus: UpdateFocusAuthUserAccountQuery
+}>
+
 class DetailAction
     extends AbstractStatefulApplicationAction<DetailAuthUserAccountState>
     implements DetailAuthUserAccountAction
 {
     readonly initialState = initialDetailState
 
+    material: DetailMaterial
+
+    constructor(material: DetailMaterial) {
+        super({
+            ignite: async () => {
+                const focus = this.material.shell.detectFocus()
+                if (!focus.found) {
+                    return this.currentState()
+                }
+                const user = await this.material.infra.detectUser(focus.loginID)
+                if (!user.found) {
+                    return this.currentState()
+                }
+                return this.focus(user.user)
+            }
+        })
+        this.material = material
+    }
+
     focus(user: AuthUserAccountBasket): DetailAuthUserAccountState {
+        this.material.shell.updateFocus.focus(user)
         return this.post({ type: "focus-on", user })
     }
     close(): DetailAuthUserAccountState {
+        this.material.shell.updateFocus.clear()
         return this.post({ type: "initial-detail" })
     }
 
