@@ -15,7 +15,7 @@ import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
-import { icon_save, icon_spinner } from "../../../../../core/x_preact/design/icon"
+import { iconHtml, icon_save, icon_spinner } from "../../../../../core/x_preact/design/icon"
 
 import { changePasswordError } from "./helper"
 import { InputPasswordEntry } from "../../input/x_preact/input"
@@ -223,8 +223,8 @@ export function OverridePasswordComponent(props: Props): VNode {
     }
 }
 
-const LABEL_STATIC = html`変更 ${icon_save}`
-const LABEL_CONNECT = html`変更 ${icon_spinner}`
+const LABEL_STATIC = html`変更 ${iconHtml(icon_save)}`
+const LABEL_CONNECT = html`変更 ${iconHtml(icon_spinner)}`
 const LABEL_CLEAR = "入力内容をクリア"
 
 const EMPTY_CONTENT = html``
