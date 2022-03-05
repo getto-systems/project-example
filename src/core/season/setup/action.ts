@@ -50,6 +50,7 @@ export function initSetupSeasonAction(
 }
 
 interface LoadAction {
+    ignitionState: Promise<LoadSeasonState>
     load(): Promise<LoadSeasonState>
 }
 
@@ -67,6 +68,13 @@ class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
         super()
 
         const season = initInputSeasonAction()
+
+        load.ignitionState.then((state) => {
+            switch (state.type) {
+                case "succeed-to-load":
+                    season.set(state.season)
+            }
+        })
 
         this.season = season.input
 

@@ -8,7 +8,7 @@ import { InputBoardAction } from "../action"
 
 import { BoardValueStore, BoardValueStoreConnector } from "../../input/infra"
 
-import { BoardValue } from "../../kernel/data"
+import { BoardValue, emptyBoardValue } from "../../kernel/data"
 import { radio, radio_block } from "../../../../getto-css/preact/design/form"
 
 export type RadioBoardContent = Readonly<{
@@ -20,7 +20,6 @@ export type RadioBoardContent = Readonly<{
 type Props = Readonly<{
     input: InputBoardAction
     name: string
-    defaultChecked: BoardValue
     options: readonly RadioBoardContent[]
 }> &
     Partial<{
@@ -29,13 +28,13 @@ type Props = Readonly<{
         onKeyDown: { (e: KeyboardEvent): void }
     }>
 export function RadioBoardComponent(props: Props): VNode {
-    const [checkedValue, store] = useRadioStore(props.input.connector, props.defaultChecked)
+    const [current, store] = useRadioStore(props.input.connector)
 
     return html`${content()}`
 
     function content(): VNode[] {
         return props.options.map(({ key, value, label }, i) => {
-            const isChecked = value === checkedValue
+            const isChecked = value === current
 
             const input = html`<input
                     type="radio"
@@ -71,47 +70,30 @@ interface RadioStore {
     set(value: string): void
 }
 
-function useRadioStore(
-    connector: BoardValueStoreConnector,
-    defaultChecked: BoardValue,
-): [string, RadioStore] {
-    const store = useMemo(() => new ValueStore(defaultChecked), [defaultChecked])
+function useRadioStore(connector: BoardValueStoreConnector): [string, RadioStore] {
+    const [current, setValue] = useState<BoardValue>(emptyBoardValue)
+    const store = useMemo(() => new ValueStore(), [])
 
     useLayoutEffect(() => {
+        store.connect(setValue)
         connector.connect(store)
         return () => connector.terminate()
     }, [connector, store])
 
-    const [value, setValue] = useState<BoardValue>(defaultChecked)
-    useLayoutEffect(() => {
-        store.connect(setValue)
-    }, [store, setValue])
-
-    return [value, store]
+    return [current, store]
 }
-
-type PendingStore = Readonly<{ hasValue: false }> | Readonly<{ hasValue: true; value: BoardValue }>
 
 class ValueStore implements RadioStore, BoardValueStore {
     value: BoardValue
 
-    constructor(defaultChecked: BoardValue) {
-        this.value = defaultChecked
+    constructor() {
+        this.value = emptyBoardValue
     }
 
-    setValue: { (value: BoardValue): void } = (value) => {
-        this.pendingStore = { hasValue: true, value }
-    }
-
-    pendingStore: PendingStore = { hasValue: false }
+    setValue: { (value: BoardValue): void } = () => null
 
     connect(setValue: { (value: BoardValue): void }): void {
-        if (this.pendingStore.hasValue) {
-            const pendingValue = this.pendingStore.value
-            this.pendingStore = { hasValue: false }
-            setValue(pendingValue)
-        }
-
+        setValue(this.get())
         this.setValue = setValue
     }
 
@@ -120,6 +102,6 @@ class ValueStore implements RadioStore, BoardValueStore {
     }
     set(value: BoardValue): void {
         this.value = value
-        this.setValue(value)
+        this.setValue(this.value)
     }
 }

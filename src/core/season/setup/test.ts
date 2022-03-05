@@ -121,6 +121,7 @@ function initResource(seasonRepository: SeasonRepository): Readonly<{
                 },
             },
             {
+                ignitionState: Promise.resolve({ type: "initial-season" }),
                 load: async () => ({ type: "initial-season" }),
             },
         ),

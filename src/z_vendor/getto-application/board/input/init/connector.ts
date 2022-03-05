@@ -21,40 +21,29 @@ export function initBoardValueStoreConnector(): Readonly<{
     }
 }
 
-type Connection =
-    | Readonly<{ connect: false; hasValue: false }>
-    | Readonly<{ connect: false; hasValue: true; value: BoardValue }>
-    | Readonly<{ connect: true; store: BoardValueStore }>
+type Connection = Readonly<{ connect: false }> | Readonly<{ connect: true; store: BoardValueStore }>
 
-const initialConnection: Connection = { connect: false, hasValue: false }
+const initialConnection: Connection = { connect: false }
 
 class Connector implements BoardValueStoreConnector, BoardValueStore {
     conn = initialConnection
+    store = emptyBoardValue
 
     get(): BoardValue {
         if (this.conn.connect) {
-            return this.conn.store.get()
+            this.store = this.conn.store.get()
         }
-        if (this.conn.hasValue) {
-            return this.conn.value
-        }
-        return emptyBoardValue
+        return this.store
     }
     set(value: BoardValue): void {
         if (this.conn.connect) {
             this.conn.store.set(value)
-        } else {
-            this.conn = { connect: false, hasValue: true, value }
         }
+        this.store = value
     }
 
     connect(store: BoardValueStore): void {
-        if (this.conn.connect) {
-            return
-        }
-        if (this.conn.hasValue) {
-            store.set(this.conn.value)
-        }
+        store.set(this.store)
         this.conn = { connect: true, store }
     }
     terminate(): void {
@@ -74,39 +63,30 @@ export function initMultipleBoardValueStoreConnector(): Readonly<{
 }
 
 type MultipleConnection =
-    | Readonly<{ connect: false; hasValue: false }>
-    | Readonly<{ connect: false; hasValue: true; value: readonly BoardValue[] }>
+    | Readonly<{ connect: false }>
     | Readonly<{ connect: true; store: MultipleBoardValueStore }>
 
-const initialMultipleConnection: MultipleConnection = { connect: false, hasValue: false }
+const initialMultipleConnection: MultipleConnection = { connect: false }
 
 class MultipleConnector implements MultipleBoardValueStoreConnector, MultipleBoardValueStore {
     conn = initialMultipleConnection
+    store: readonly BoardValue[] = []
 
     get(): readonly BoardValue[] {
         if (this.conn.connect) {
-            return this.conn.store.get()
+            this.store = this.conn.store.get()
         }
-        if (this.conn.hasValue) {
-            return this.conn.value
-        }
-        return []
+        return this.store
     }
     set(value: readonly BoardValue[]): void {
         if (this.conn.connect) {
             this.conn.store.set(value)
-        } else {
-            this.conn = { connect: false, hasValue: true, value }
         }
+        this.store = value
     }
 
     connect(store: MultipleBoardValueStore): void {
-        if (this.conn.connect) {
-            return
-        }
-        if (this.conn.hasValue) {
-            store.set(this.conn.value)
-        }
+        store.set(this.store)
         this.conn = { connect: true, store }
     }
     terminate(): void {

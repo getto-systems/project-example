@@ -30,7 +30,7 @@ export function useAuthUserAccountTableStructure(
 ): SearchAuthUserAccountTableStructure {
     return useMemo(() => {
         const structure = build(list)
-        list.columns.setInitialSearchColumns(structure.initialVisibleCells())
+        list.columns.set(structure.initialVisibleCells())
         return structure
     }, [list])
 }

@@ -8,6 +8,7 @@ import {
 } from "../../../../z_vendor/getto-application/board/input/action"
 
 import { toSearchColumns } from "./convert"
+import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/convert"
 
 import { SearchColumnsRepository } from "./infra"
 import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
@@ -18,7 +19,7 @@ import { RepositoryError } from "../../repository/data"
 export interface SearchColumnsAction extends StatefulApplicationAction<SearchColumnsState> {
     readonly input: MultipleInputBoardAction
 
-    setInitialSearchColumns(initial: readonly string[]): Promise<SearchColumnsState>
+    set(columns: readonly string[]): Promise<SearchColumnsState>
 }
 
 export type SearchColumnsInfra = Readonly<{
@@ -48,8 +49,6 @@ class Action
     infra: SearchColumnsInfra
     store: MultipleBoardValueStore
 
-    searchColumns?: SearchColumns
-
     constructor(infra: SearchColumnsInfra) {
         super({
             ignite: () => this.load(),
@@ -69,11 +68,9 @@ class Action
         })
     }
 
-    async setInitialSearchColumns(initial: readonly string[]): Promise<SearchColumnsState> {
-        if (!this.searchColumns) {
-            this.searchColumns = toSearchColumns(initial)
-        }
-        return this.post({ type: "succeed-to-load", columns: this.searchColumns })
+    async set(columns: readonly string[]): Promise<SearchColumnsState> {
+        this.store.set(columns.map(markBoardValue))
+        return this.post({ type: "succeed-to-load", columns: toSearchColumns(columns) })
     }
 
     async save(columns: SearchColumns): Promise<SearchColumnsState> {
@@ -93,10 +90,7 @@ class Action
             return this.post({ type: "repository-error", err: columnsResult.err })
         }
         if (!columnsResult.found) {
-            return this.post({
-                type: "succeed-to-load",
-                columns: this.searchColumns || toSearchColumns([]),
-            })
+            return this.post(this.currentState())
         }
 
         return this.post({ type: "succeed-to-load", columns: columnsResult.value })

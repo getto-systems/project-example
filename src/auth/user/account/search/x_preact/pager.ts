@@ -65,7 +65,6 @@ export function SearchAuthUserAccountPagerComponent(props: Props): VNode {
         return h(SearchOffsetComponent, {
             field: props.list.offset,
             count: pagerCount(page.all),
-            defaultSelected: page.offset,
             options: pagerOptions(pagerParams(page)),
             button: button(),
         })

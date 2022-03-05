@@ -9,15 +9,22 @@ export type EditableBoardState = Readonly<{ isEditable: boolean }>
 
 const initialState: EditableBoardState = { isEditable: false }
 
-export function initEditableBoardAction(): EditableBoardAction {
-    return new Action()
+export function initEditableBoardAction(
+    defaultState: EditableBoardState = initialState,
+): EditableBoardAction {
+    return new Action(defaultState)
 }
 
 class Action
     extends AbstractStatefulApplicationAction<EditableBoardState>
     implements EditableBoardAction
 {
-    readonly initialState = initialState
+    initialState: EditableBoardState
+
+    constructor(defaultState: EditableBoardState) {
+        super()
+        this.initialState = defaultState
+    }
 
     open(): EditableBoardState {
         return this.post({ isEditable: true })

@@ -12,11 +12,10 @@ import { BoardValue, emptyBoardValue } from "../../kernel/data"
 
 type Props = Readonly<{
     input: InputBoardAction
-    defaultSelected: BoardValue
     options: readonly VNode[]
 }>
-export function SelectBoardComponent({ input, defaultSelected, options }: Props): VNode {
-    return html`<select ref=${useSelectRef(input.connector, defaultSelected)} onInput=${onInput}>
+export function SelectBoardComponent({ input, options }: Props): VNode {
+    return html`<select ref=${useSelectRef(input.connector)} onInput=${onInput}>
         ${options}
     </select>`
 
@@ -25,20 +24,23 @@ export function SelectBoardComponent({ input, defaultSelected, options }: Props)
     }
 }
 
-function useSelectRef(connector: BoardValueStoreConnector, defaultSelected: BoardValue) {
+function useSelectRef(connector: BoardValueStoreConnector) {
     const REF = useRef<HTMLSelectElement>()
+    const temporaryStore = useRef<BoardValue>()
 
     useLayoutEffect(() => {
         connector.connect({
             get: () => {
-                if (!REF.current) {
-                    return emptyBoardValue
+                if (REF.current) {
+                    return readBoardValue(REF.current)
                 }
-                return readBoardValue(REF.current)
+                return emptyBoardValue
             },
             set: (value) => {
                 if (REF.current) {
                     REF.current.value = value
+                } else {
+                    temporaryStore.current = value
                 }
             },
         })
@@ -46,10 +48,10 @@ function useSelectRef(connector: BoardValueStoreConnector, defaultSelected: Boar
     }, [connector])
 
     useEffect(() => {
-        if (REF.current) {
-            REF.current.value = defaultSelected
+        if (REF.current && temporaryStore.current !== undefined) {
+            REF.current.value = temporaryStore.current
         }
-    }, [defaultSelected])
+    }, [])
 
     return REF
 }

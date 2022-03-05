@@ -19,20 +19,19 @@ export type CheckboxBoardContent = Readonly<{
 
 type Props = Readonly<{
     input: MultipleInputBoardAction
-    defaultChecked: readonly BoardValue[]
     options: readonly CheckboxBoardContent[]
 }> &
     Partial<{
         block: boolean
     }>
 export function CheckboxBoardComponent(props: Props): VNode {
-    const store = useCheckboxStore(props.input.connector, props.defaultChecked)
+    const [current, store] = useCheckboxStore(props.input.connector)
 
     return html`${content()}`
 
     function content(): readonly VNode[] {
         return props.options.map(({ key, value, label }) => {
-            const isChecked = store.has(value)
+            const isChecked = current.has(value)
 
             const input = html`<input
                     type="checkbox"
@@ -51,7 +50,7 @@ export function CheckboxBoardComponent(props: Props): VNode {
             function onInput(e: Event) {
                 const target = e.target
                 if (target instanceof HTMLInputElement) {
-                    store.setMember(value, target.checked)
+                    store.setChecked(value, target.checked)
                 }
                 props.input.publisher.post()
             }
@@ -60,79 +59,52 @@ export function CheckboxBoardComponent(props: Props): VNode {
 }
 
 interface CheckboxStore {
-    has(value: string): boolean
-    setMember(value: string, isSelected: boolean): void
+    setChecked(value: string, isChecked: boolean): void
 }
 
 function useCheckboxStore(
     connector: MultipleBoardValueStoreConnector,
-    defaultChecked: readonly BoardValue[],
-): CheckboxStore {
-    const store = useMemo(() => new ValuesStore(defaultChecked), [defaultChecked])
+): [ReadonlySet<BoardValue>, CheckboxStore] {
+    const [current, setValue] = useState<ReadonlySet<BoardValue>>(new Set())
+    const store = useMemo(() => new ValuesStore(), [])
+
     useLayoutEffect(() => {
+        store.connect(setValue)
         connector.connect(store)
         return () => connector.terminate()
     }, [connector, store])
 
-    const [values, setValues] = useState<readonly BoardValue[]>(defaultChecked)
-    useLayoutEffect(() => {
-        store.connect(values, setValues)
-    }, [store, values, setValues])
-
-    return store
+    return [current, store]
 }
 
-type PendingStore =
-    | Readonly<{ hasValue: false }>
-    | Readonly<{ hasValue: true; values: readonly BoardValue[] }>
-
 class ValuesStore implements CheckboxStore {
-    values: Set<BoardValue>
+    value: Set<BoardValue>
 
-    constructor(defaultChecked: readonly BoardValue[]) {
-        this.values = new Set()
-        defaultChecked.forEach((value) => {
-            this.values.add(value)
-        })
+    constructor() {
+        this.value = new Set()
     }
 
-    setValues: { (values: readonly BoardValue[]): void } = (values) => {
-        this.pendingStore = { hasValue: true, values }
+    setValue: { (value: ReadonlySet<BoardValue>): void } = () => null
+
+    connect(setValue: { (value: ReadonlySet<BoardValue>): void }): void {
+        setValue(this.value)
+        this.setValue = setValue
     }
 
-    pendingStore: PendingStore = { hasValue: false }
-
-    connect(
-        values: readonly BoardValue[],
-        setValues: { (values: readonly BoardValue[]): void },
-    ): void {
-        if (this.pendingStore.hasValue) {
-            const pendingValues = this.pendingStore.values
-            this.pendingStore = { hasValue: false }
-            setValues(pendingValues)
-        }
-
-        this.setValues = setValues
-        this.values = new Set(values)
-    }
-
-    has(value: BoardValue): boolean {
-        return this.values.has(value)
-    }
-    setMember(value: BoardValue, isSelected: boolean): void {
-        if (isSelected) {
-            this.values.add(value)
+    setChecked(value: BoardValue, isChecked: boolean): void {
+        if (isChecked) {
+            this.value.add(value)
         } else {
-            this.values.delete(value)
+            this.value.delete(value)
         }
-        this.setValues(this.get())
+        this.setValue(this.value)
     }
 
     get(): readonly BoardValue[] {
-        return Array.from(this.values.values())
+        return Array.from(this.value.values())
     }
-    set(values: readonly BoardValue[]): void {
-        this.setValues(values)
-        this.values = new Set(values)
+    set(value: readonly BoardValue[]): void {
+        this.value = new Set(value)
+        this.setValue(this.value)
     }
 }
