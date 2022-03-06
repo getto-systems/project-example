@@ -139,7 +139,10 @@ class Action
         super({
             ignite: async () => this.load(),
             terminate: () => {
+                this.detail.terminate()
                 this.loginID.terminate()
+                this.offset.terminate()
+                this.columns.terminate()
                 this.observe.terminate()
             },
         })
@@ -236,11 +239,6 @@ class Action
             ...e,
             ...previousInfo,
         })
-    }
-
-    async focus(_loginID: string): Promise<SearchAuthUserAccountState> {
-        // TODO 指定された login id に focus する
-        return this.currentState()
     }
 }
 
