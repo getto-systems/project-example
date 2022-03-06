@@ -2,14 +2,13 @@ import { h, VNode } from "preact"
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { box_grow } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { fieldError } from "../../../../../z_vendor/getto-css/preact/design/form"
 
 import { SearchColumnsEntry } from "../../../../../z_lib/ui/search/columns/x_preact/columns"
 
 import { repositoryErrorReason } from "../../../../../z_lib/ui/repository/x_error/reason"
 
-import { SearchAuthUserAccountAction } from "../action"
+import { ListAuthUserAccountAction } from "../action"
 import { SearchColumnsState } from "../../../../../z_lib/ui/search/columns/action"
 
 import { SearchAuthUserAccountTableStructure } from "./structure"
@@ -17,14 +16,14 @@ import { SearchAuthUserAccountTableStructure } from "./structure"
 import { RepositoryError } from "../../../../../z_lib/ui/repository/data"
 
 type EntryProps = Readonly<{
-    search: SearchAuthUserAccountAction
+    list: ListAuthUserAccountAction
     structure: SearchAuthUserAccountTableStructure
 }>
 export function SearchAuthUserAccountColumnsEntry(resource: EntryProps): VNode {
     return h(SearchAuthUserAccountColumnsComponent, {
         ...resource,
-        state: useApplicationAction(resource.search),
-        columnsState: useApplicationAction(resource.search.columns),
+        state: useApplicationAction(resource.list),
+        columnsState: useApplicationAction(resource.list.columns),
     })
 }
 
@@ -40,23 +39,21 @@ export function SearchAuthUserAccountColumnsComponent(props: Props): VNode {
             case "initial-search":
             case "succeed-to-load":
             case "succeed-to-save":
-                return columnsBox()
+                return content()
 
             case "repository-error":
                 return errorMessage(columnsState.err)
         }
     }
 
-    function columnsBox(): VNode {
-        return box_grow({
-            body: h(SearchColumnsEntry, {
-                field: props.search.columns,
-                columns: props.structure.view(),
-            }),
+    function content(): VNode {
+        return h(SearchColumnsEntry, {
+            field: props.list.columns,
+            columns: props.structure.view(),
         })
     }
     function errorMessage(err: RepositoryError): VNode {
-        return box_grow({ body: fieldError(repositoryError(err)) })
+        return fieldError(repositoryError(err))
     }
 }
 function repositoryError(err: RepositoryError): readonly string[] {

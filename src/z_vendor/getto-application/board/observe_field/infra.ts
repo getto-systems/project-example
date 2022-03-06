@@ -1,5 +1,4 @@
-export interface BoardFieldObserver<V> {
+export interface BoardFieldObserver {
     pin(): void
-    peek(): V
     hasChanged(): boolean
 }

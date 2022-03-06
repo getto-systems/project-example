@@ -13,14 +13,10 @@ import { newSignActionShell } from "./shell"
 
 import { initSignAction, SignAction } from "../action"
 
-import { initSignLinkResource } from "../../nav/resource"
-
 type OutsideFeature = RepositoryOutsideFeature & RemoteOutsideFeature & LocationOutsideFeature
 export function newSignView(feature: OutsideFeature): ApplicationView<SignAction> {
     return toApplicationView(
         initSignAction(newSignActionShell(feature), {
-            link: () => initSignLinkResource(),
-
             check: () => newCheckAuthTicketView(feature),
 
             password_authenticate: () => newAuthenticatePasswordView(feature),

@@ -5,10 +5,8 @@ import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
 import { sortSign } from "../../../../../z_vendor/getto-css/preact/design/table"
 import { linky } from "../../../../../z_vendor/getto-css/preact/design/highlight"
-import { lnir } from "../../../../../z_lib/ui/icon/init/line_icon"
 
-import { SORT_SIGN } from "../../../../../core/x_preact/design/table"
-import { iconHtml } from "../../../../../core/x_preact/design/icon"
+import { focusClass, listEditLabel, SORT_SIGN } from "../../../../../core/x_preact/design/table"
 
 import { TableStructure } from "../../../../../z_vendor/getto-table/preact/core"
 
@@ -16,7 +14,7 @@ import { tableStructure } from "../../../../../z_vendor/getto-table/preact/cell/
 import { tableCell } from "../../../../../z_vendor/getto-table/preact/cell/simple"
 import { tableClassName } from "../../../../../z_vendor/getto-table/preact/decorator"
 
-import { SearchAuthUserAccountAction } from "../action"
+import { ListAuthUserAccountAction } from "../action"
 
 import { AuthUserAccountBasket } from "../../kernel/data"
 import { SearchAuthUserAccountSortKey } from "../data"
@@ -27,18 +25,24 @@ type Summary = {
     // no props
 }
 
-export function useSearchAuthUserAccountTableStructure(
-    search: SearchAuthUserAccountAction,
+export function useAuthUserAccountTableStructure(
+    list: ListAuthUserAccountAction,
 ): SearchAuthUserAccountTableStructure {
     return useMemo(() => {
-        const structure = build(search)
-        search.columns.setInitialSearchColumns(structure.initialVisibleCells())
+        const structure = build(list)
+        list.columns.set(structure.initialVisibleCells())
         return structure
-    }, [search])
+    }, [list])
 }
 
-function build(search: SearchAuthUserAccountAction): SearchAuthUserAccountTableStructure {
+function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStructure {
     return tableStructure(rowKey, [
+        tableCell("edit", (_key) => ({
+            label: "",
+            header: linky,
+            column: editLink,
+        })).alwaysVisible(),
+
         // TODO builder にしたいかな
         tableCell("login-id", (key) => ({
             label: "ログインID",
@@ -46,21 +50,13 @@ function build(search: SearchAuthUserAccountAction): SearchAuthUserAccountTableS
             column: loginID,
         }))
             .alwaysVisible()
-            .border(["rightDouble"]),
+            .border(["leftDouble"]),
 
         tableCell("granted-roles", (_key) => ({
             label: "権限",
             header: linky,
             column: grantedRoles,
-        })),
-
-        tableCell("edit", (_key) => ({
-            label: "",
-            header: linky,
-            column: editLink,
-        }))
-            .alwaysVisible()
-            .border(["left"]),
+        })).border(["left"]),
     ])
         .decorateRow(tableClassName(["row_hover"]))
         .stickyHeader()
@@ -70,12 +66,12 @@ function build(search: SearchAuthUserAccountAction): SearchAuthUserAccountTableS
         return (content) => html`<a href="#" onClick=${onClick}>${content} ${sign()}</a>`
 
         function sign() {
-            const currentSort = search.currentSort()
+            const currentSort = list.currentSort()
             return sortSign(SORT_SIGN, currentSort, key)
         }
         function onClick(e: Event) {
             e.preventDefault()
-            search.sort(key)
+            list.sort(key)
         }
     }
 
@@ -90,8 +86,16 @@ function build(search: SearchAuthUserAccountAction): SearchAuthUserAccountTableS
         return row.grantedRoles.join(" / ")
     }
 
-    function editLink(_row: AuthUserAccountBasket): VNodeContent {
-        return html`<a href="#">${iconHtml(lnir(["pencil"]))} 編集</a>`
+    function editLink(row: AuthUserAccountBasket): VNodeContent {
+        const isFocused = list.detail.isFocused(row)
+        return html`<a href="#" class="${focusClass(isFocused)}" onClick=${onClick}>
+            ${listEditLabel(isFocused)}
+        </a>`
+
+        function onClick(e: Event) {
+            e.preventDefault()
+            list.detail.focus(row)
+        }
     }
 }
 

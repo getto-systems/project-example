@@ -5,7 +5,10 @@ import {
     initInputBoardAction,
 } from "../../../z_vendor/getto-application/board/input/action"
 
-import { BoardValue, emptyBoardValue } from "../../../z_vendor/getto-application/board/kernel/data"
+import { seasonToBoardValue } from "../kernel/convert"
+
+import { BoardValue } from "../../../z_vendor/getto-application/board/kernel/data"
+import { Season } from "../kernel/data"
 
 export interface InputSeasonAction extends ApplicationAction {
     readonly input: InputBoardAction
@@ -14,11 +17,9 @@ export interface InputSeasonAction extends ApplicationAction {
 export function initInputSeasonAction(): Readonly<{
     input: InputSeasonAction
     get: { (): BoardValue }
-    set: { (value: BoardValue): void }
+    set: { (season: Season): void }
 }> {
     const { input, store, subscriber } = initInputBoardAction()
-
-    store.set(emptyBoardValue)
 
     return {
         input: {
@@ -28,6 +29,6 @@ export function initInputSeasonAction(): Readonly<{
             },
         },
         get: () => store.get(),
-        set: (value) => store.set(value),
+        set: (season) => store.set(seasonToBoardValue(season)),
     }
 }

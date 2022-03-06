@@ -20,52 +20,56 @@ import { iconHtml, icon_save, icon_spinner } from "../../../../../core/x_preact/
 import { changePasswordError } from "./helper"
 import { InputPasswordEntry } from "../../input/x_preact/input"
 
-import { ChangePasswordAction, ChangePasswordState } from "../action"
+import { OverridePasswordAction, OverridePasswordState } from "../action"
 import { ValidateBoardState } from "../../../../../z_vendor/getto-application/board/validate_board/action"
 import {
     EditableBoardAction,
     EditableBoardState,
 } from "../../../../../z_vendor/getto-application/board/editable/action"
 
+import { AuthUserAccountBasket } from "../../../account/kernel/data"
+
 type EntryProps = Readonly<{
+    user: AuthUserAccountBasket
     editable: EditableBoardAction
-    change: ChangePasswordAction
+    override: OverridePasswordAction
 }>
-export function ChangePasswordEntry({ editable, change }: EntryProps): VNode {
-    return h(ChangePasswordComponent, {
+export function OverridePasswordEntry({ user, editable, override }: EntryProps): VNode {
+    return h(OverridePasswordComponent, {
+        user,
         editable,
-        change,
-        state: useApplicationAction(change),
+        override,
+        state: useApplicationAction(override),
         editableState: useApplicationAction(editable),
-        validateState: useApplicationAction(change.validate),
+        validateState: useApplicationAction(override.validate),
     })
 }
 
 type Props = EntryProps &
     Readonly<{
-        state: ChangePasswordState
+        state: OverridePasswordState
         editableState: EditableBoardState
         validateState: ValidateBoardState
     }>
-export function ChangePasswordComponent(props: Props): VNode {
+export function OverridePasswordComponent(props: Props): VNode {
     return basedOn(props)
 
     function basedOn({ state, editableState, validateState }: Props): VNode {
         if (editableState.isEditable) {
             switch (state.type) {
-                case "initial-change-password":
+                case "initial-override-password":
                     return formBox({ type: validateState })
 
-                case "try-to-change-password":
+                case "try-to-override-password":
                     return formBox({ type: "connecting" })
 
-                case "take-longtime-to-change-password":
+                case "take-longtime-to-override-password":
                     return formBox({ type: "take-longtime" })
 
-                case "succeed-to-change-password":
+                case "succeed-to-override-password":
                     return buttonBox({ type: "success" })
 
-                case "failed-to-change-password":
+                case "failed-to-override-password":
                     return formBox({ type: validateState, err: changePasswordError(state.err) })
             }
         } else {
@@ -119,14 +123,9 @@ export function ChangePasswordComponent(props: Props): VNode {
                 title: "パスワード変更",
                 body: [
                     h(InputPasswordEntry, {
-                        field: props.change.currentPassword,
-                        title: "現在のパスワード",
-                        help: ["変更前のパスワードを入力します"],
-                    }),
-                    h(InputPasswordEntry, {
-                        field: props.change.newPassword,
+                        field: props.override.newPassword,
                         title: "新しいパスワード",
-                        help: ["今後はこのパスワードになります"],
+                        help: ["管理者権限でパスワードを上書きします"],
                     }),
                 ],
                 footer: [
@@ -160,9 +159,9 @@ export function ChangePasswordComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
-                props.change.submit().then((state) => {
+                props.override.submit(props.user).then((state) => {
                     switch (state.type) {
-                        case "succeed-to-change-password":
+                        case "succeed-to-override-password":
                             props.editable.close()
                     }
                 })
@@ -185,7 +184,7 @@ export function ChangePasswordComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
-                props.change.clear()
+                props.override.clear()
             }
         }
         function closeButton(): VNode {
@@ -193,7 +192,7 @@ export function ChangePasswordComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
-                props.change.clear()
+                props.override.clear()
                 props.editable.close()
             }
         }

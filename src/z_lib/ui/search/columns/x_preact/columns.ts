@@ -1,5 +1,4 @@
 import { h, VNode } from "preact"
-import { html } from "htm/preact"
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
@@ -13,7 +12,6 @@ import {
 } from "../../../../../z_vendor/getto-application/board/input/x_preact/checkbox"
 
 import { markBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/convert"
-import { searchColumns } from "./helper"
 
 import { SearchColumnsAction, SearchColumnsState } from "../action"
 
@@ -44,7 +42,7 @@ type Props = EntryProps &
 export function SearchColumnsComponent(props: Props): VNode {
     return field({
         title: title(),
-        body: [tableViewColumns(checkbox(props))],
+        body: [tableViewColumns(checkbox())],
     })
 
     function title(): VNodeContent {
@@ -53,14 +51,9 @@ export function SearchColumnsComponent(props: Props): VNode {
         }
         return "表示する列"
     }
-    function checkbox({ state }: Props): VNode {
-        const columns = searchColumns(state)
-        if (!columns.found) {
-            return EMPTY_CONTENT
-        }
+    function checkbox(): VNode {
         return h(CheckboxBoardComponent, {
             input: props.field.input,
-            defaultChecked: columns.columns,
             options: options(),
             block: block(),
         })
@@ -80,5 +73,3 @@ export function SearchColumnsComponent(props: Props): VNode {
         }
     }
 }
-
-const EMPTY_CONTENT = html``

@@ -20,12 +20,13 @@ import {
 import { toProfileView } from "../common"
 
 import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
-import { initRequestResetTokenProfileAction } from "../../../../../auth/user/password/reset/request_token/action"
+import { initRequestResetTokenAction } from "../../../../../auth/user/password/reset/request_token/action"
 import { initChangePasswordAction } from "../../../../../auth/user/password/change/action"
 
 import { ProfilePageResource } from "../resource"
 
 import { ProfileBackgroundMessage, ProfileForegroundMessage } from "./message"
+import { initEditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
 
 renderEntry()
 
@@ -55,7 +56,7 @@ async function newResource() {
         resource: {
             ...newBaseResource(feature),
             ...newChangePasswordResource(proxy),
-            ...newRequestResetTokenProfileResource(proxy),
+            ...newRequestResetTokenResource(proxy),
         },
         terminate: () => {
             worker.terminate()
@@ -69,18 +70,24 @@ async function newResource() {
 
 function newChangePasswordResource(proxy: Proxy) {
     return {
-        change: initChangePasswordAction({
-            infra: proxy.password.change.infra,
-            config: newChangePasswordConfig(),
-        }),
+        change: {
+            editable: initEditableBoardAction(),
+            change: initChangePasswordAction({
+                infra: proxy.password.change.infra,
+                config: newChangePasswordConfig(),
+            }),
+        },
     }
 }
-function newRequestResetTokenProfileResource(proxy: Proxy) {
+function newRequestResetTokenResource(proxy: Proxy) {
     return {
-        requestToken: initRequestResetTokenProfileAction({
-            infra: proxy.password.reset.requestToken.infra,
-            config: newRequestResetTokenConfig(),
-        }),
+        requestToken: {
+            editable: initEditableBoardAction(),
+            requestToken: initRequestResetTokenAction({
+                infra: proxy.password.reset.requestToken.infra,
+                config: newRequestResetTokenConfig(),
+            }),
+        },
     }
 }
 

@@ -4,11 +4,9 @@ import {
     StatefulApplicationAction,
     AbstractStatefulApplicationAction,
 } from "../../../../../z_vendor/getto-application/action/action"
-import { initSignLink } from "../../../../sign/nav/resource"
 import { initInputLoginIDAction } from "../../../login_id/input/action"
 import { initValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
 
-import { SignLink } from "../../../../sign/nav/resource"
 import { InputLoginIDAction } from "../../../login_id/input/action"
 import { ValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
 
@@ -20,12 +18,10 @@ import { RequestResetTokenError, RequestResetTokenFields } from "./data"
 import { ConvertBoardResult } from "../../../../../z_vendor/getto-application/board/kernel/data"
 
 export interface RequestResetTokenAction extends StatefulApplicationAction<RequestResetTokenState> {
-    readonly link: SignLink
-
     readonly loginID: InputLoginIDAction
     readonly validate: ValidateBoardAction
 
-    clear(): void
+    clear(): RequestResetTokenState
     submit(): Promise<RequestResetTokenState>
 }
 
@@ -46,9 +42,7 @@ export type RequestResetTokenConfig = Readonly<{
     takeLongtimeThreshold: DelayTime
 }>
 
-export const initialRequestResetTokenState: RequestResetTokenState = {
-    type: "initial-request-token",
-}
+const initialState: RequestResetTokenState = { type: "initial-request-token" }
 
 export function initRequestResetTokenAction(
     material: RequestResetTokenMaterial,
@@ -63,9 +57,7 @@ class Action
     extends AbstractStatefulApplicationAction<RequestResetTokenState>
     implements RequestResetTokenAction
 {
-    readonly initialState = initialRequestResetTokenState
-
-    readonly link = initSignLink()
+    readonly initialState = initialState
 
     readonly loginID: InputLoginIDAction
     readonly validate: ValidateBoardAction
@@ -113,115 +105,13 @@ class Action
         )
     }
 
-    clear(): void {
+    clear(): RequestResetTokenState {
         this.loginID.clear()
         this.validate.clear()
+        return this.currentState()
     }
     submit(): Promise<RequestResetTokenState> {
         return requestResetToken(this.material, this.checker.get(), this.post)
-    }
-}
-
-export interface RequestResetTokenProfileAction
-    extends StatefulApplicationAction<RequestResetTokenProfileState> {
-    readonly loginID: InputLoginIDAction
-    readonly validate: ValidateBoardAction
-
-    open(): RequestResetTokenProfileState
-    clear(): RequestResetTokenProfileState
-    submit(): Promise<RequestResetTokenProfileState>
-    close(): RequestResetTokenProfileState
-}
-
-export type RequestResetTokenProfileState =
-    | Readonly<{ type: "initial-request-token" }>
-    | Readonly<{ type: "input-login-id" }>
-    | RequestResetTokenEvent
-
-export const initialRequestResetTokenProfileState: RequestResetTokenProfileState = {
-    type: "initial-request-token",
-}
-
-export function initRequestResetTokenProfileAction(
-    material: RequestResetTokenMaterial,
-): RequestResetTokenProfileAction {
-    return new ProfileAction(material)
-}
-
-const requestResetTokenProfileFieldNames = ["loginID"] as const
-type RequestResetTokenProfileFieldName = typeof requestResetTokenProfileFieldNames[number]
-
-class ProfileAction
-    extends AbstractStatefulApplicationAction<RequestResetTokenProfileState>
-    implements RequestResetTokenProfileAction
-{
-    readonly initialState = initialRequestResetTokenProfileState
-
-    readonly loginID: InputLoginIDAction
-    readonly validate: ValidateBoardAction
-
-    material: RequestResetTokenMaterial
-    checker: ValidateBoardChecker<RequestResetTokenProfileFieldName, RequestResetTokenFields>
-
-    constructor(material: RequestResetTokenMaterial) {
-        super({
-            terminate: () => {
-                this.loginID.terminate()
-                this.validate.terminate()
-            },
-        })
-        this.material = material
-
-        const loginID = initInputLoginIDAction()
-
-        const { validate, checker } = initValidateBoardAction(
-            {
-                fields: requestResetTokenProfileFieldNames,
-            },
-            {
-                converter: (): ConvertBoardResult<RequestResetTokenFields> => {
-                    const loginIDResult = loginID.checker.check()
-                    if (!loginIDResult.valid) {
-                        return { valid: false }
-                    }
-                    return {
-                        valid: true,
-                        value: {
-                            loginID: loginIDResult.value,
-                        },
-                    }
-                },
-            },
-        )
-
-        this.loginID = loginID.input
-        this.validate = validate
-        this.checker = checker
-
-        this.loginID.validate.subscriber.subscribe((result) =>
-            checker.update("loginID", result.valid),
-        )
-    }
-
-    open(): RequestResetTokenProfileState {
-        this.clearInput()
-        return this.post({ type: "input-login-id" })
-    }
-    clear(): RequestResetTokenProfileState {
-        this.clearInput()
-        return this.post({ type: "input-login-id" })
-    }
-    submit(): Promise<RequestResetTokenProfileState> {
-        return requestResetToken(this.material, this.checker.get(), this.post)
-    }
-    close(): RequestResetTokenProfileState {
-        this.clearInput()
-        return this.post(this.initialState)
-    }
-
-    clearInput(): void {
-        this.loginID.clear()
-        this.validate.clear()
     }
 }
 

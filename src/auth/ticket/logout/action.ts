@@ -19,7 +19,7 @@ export type LogoutState =
     | Readonly<{ type: "failed-to-logout"; err: RemoteCommonError }>
     | Readonly<{ type: "succeed-to-logout" }>
 
-export const initialLogoutState: LogoutState = { type: "initial-logout" }
+const initialState: LogoutState = { type: "initial-logout" }
 
 export function initLogoutAction(infra: LogoutInfra): LogoutAction {
     return new Action(infra)
@@ -31,7 +31,7 @@ export type LogoutInfra = Readonly<{
 }>
 
 class Action extends AbstractStatefulApplicationAction<LogoutState> implements LogoutAction {
-    readonly initialState = initialLogoutState
+    readonly initialState = initialState
 
     infra: LogoutInfra
 

@@ -10,7 +10,6 @@ import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 import { initSetupSeasonAction } from "./action"
 
 import { SetupSeasonAction } from "./action"
-import { initialLoadSeasonState } from "../load/action"
 
 import { SeasonRepository } from "../kernel/infra"
 import { BoardValueStore } from "../../../z_vendor/getto-application/board/input/infra"
@@ -122,7 +121,8 @@ function initResource(seasonRepository: SeasonRepository): Readonly<{
                 },
             },
             {
-                load: async () => initialLoadSeasonState,
+                ignitionState: Promise.resolve({ type: "initial-season" }),
+                load: async () => ({ type: "initial-season" }),
             },
         ),
     }

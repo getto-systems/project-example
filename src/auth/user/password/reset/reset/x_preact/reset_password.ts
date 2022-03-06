@@ -28,24 +28,32 @@ import { ApplicationErrorComponent } from "../../../../../../avail/x_preact/appl
 import { InputLoginIDEntry } from "../../../../login_id/input/x_preact/input"
 import { InputPasswordEntry } from "../../../input/x_preact/input"
 
-import { ResetPasswordError } from "../data"
 import { ApplicationView } from "../../../../../../z_vendor/getto-application/action/action"
 import { ResetPasswordAction, ResetPasswordState } from "../action"
-import { ValidateBoardActionState } from "../../../../../../z_vendor/getto-application/board/validate_board/action"
+import { ValidateBoardState } from "../../../../../../z_vendor/getto-application/board/validate_board/action"
+import { SignLink } from "../../../../../sign/nav/action"
 
-export function ResetPasswordEntry(view: ApplicationView<ResetPasswordAction>): VNode {
-    const action = useApplicationView(view)
+import { ResetPasswordError } from "../data"
+
+type EntryProps = Readonly<{
+    link: SignLink
+    reset: ApplicationView<ResetPasswordAction>
+}>
+export function ResetPasswordEntry(props: EntryProps): VNode {
+    const reset = useApplicationView(props.reset)
     return h(ResetPasswordComponent, {
-        reset: action,
-        state: useApplicationAction(action),
-        validate: useApplicationAction(action.validate),
+        link: props.link,
+        reset,
+        state: useApplicationAction(reset),
+        validate: useApplicationAction(reset.validate),
     })
 }
 
 type Props = Readonly<{
+    link: SignLink
     reset: ResetPasswordAction
     state: ResetPasswordState
-    validate: ValidateBoardActionState
+    validate: ValidateBoardState
 }>
 export function ResetPasswordComponent(props: Props): VNode {
     useLayoutEffect(() => {
@@ -208,10 +216,10 @@ export function ResetPasswordComponent(props: Props): VNode {
         return buttons({ left: privacyPolicyLink(), right: sendLink() })
     }
     function privacyPolicyLink() {
-        return signNav(props.reset.link.getNav_static_privacyPolicy())
+        return signNav(props.link.getNav_static_privacyPolicy())
     }
     function sendLink() {
-        return signNav(props.reset.link.getNav_password_reset_requestToken_retry())
+        return signNav(props.link.getNav_password_reset_requestToken_retry())
     }
 }
 

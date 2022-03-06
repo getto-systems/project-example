@@ -10,7 +10,7 @@ import { initSearchAuthUserAccountAction, SearchAuthUserAccountAction } from "./
 
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 import { SearchAuthUserAccountRemote, SearchAuthUserAccountRemoteResult } from "./infra"
-import { defaultSearchAuthUserAccountSort } from "./data"
+import { defaultSearchAuthUserAccountSort, SearchAuthUserAccountRemoteResponse } from "./data"
 import { readSearchAuthUserAccountSortKey } from "./convert"
 
 describe("SearchAuthUserAccount", () => {
@@ -25,18 +25,14 @@ describe("SearchAuthUserAccount", () => {
                 {
                     type: "succeed-to-search",
                     previousResponse: undefined,
-                    response: {
-                        page: { offset: 0, limit: 1000, all: 245 },
-                        sort: { key: "login-id", order: "normal" },
-                        users: [],
-                    },
+                    response: standard_response,
                 },
             ])
         })
     })
 
     test("search", async () => {
-        const { resource, store, url } = standard()
+        const { resource, store } = standard()
 
         const runner = setupActionTestRunner(resource.search.subscriber)
 
@@ -45,34 +41,19 @@ describe("SearchAuthUserAccount", () => {
         await runner(async () => {
             store.loginID.set(markBoardValue("MY-LOGIN-ID"))
             resource.search.loginID.input.publisher.post()
-            return resource.search.submit()
+            return resource.search.search()
         }).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "try-to-search",
-                    previousResponse: {
-                        page: { offset: 0, limit: 1000, all: 245 },
-                        sort: { key: "login-id", order: "normal" },
-                        users: [],
-                    },
+                    previousResponse: standard_response,
                 },
                 {
                     type: "succeed-to-search",
-                    previousResponse: {
-                        page: { offset: 0, limit: 1000, all: 245 },
-                        sort: { key: "login-id", order: "normal" },
-                        users: [],
-                    },
-                    response: {
-                        page: { offset: 0, limit: 1000, all: 245 },
-                        sort: { key: "login-id", order: "normal" },
-                        users: [],
-                    },
+                    previousResponse: standard_response,
+                    response: standard_response,
                 },
             ])
-            expect(url.current.toString()).toEqual(
-                "https://example.com/index.html?login-id=MY-LOGIN-ID&search-offset=0&search-sort-key=login-id&search-sort-order=normal",
-            )
         })
     })
 
@@ -84,37 +65,21 @@ describe("SearchAuthUserAccount", () => {
         await resource.search.ignitionState
 
         await runner(async () => {
-            return resource.search.submit()
+            return resource.search.search()
         }).then((stack) => {
             expect(stack).toEqual([
                 {
                     type: "try-to-search",
-                    previousResponse: {
-                        page: { offset: 0, limit: 1000, all: 245 },
-                        sort: { key: "login-id", order: "normal" },
-                        users: [],
-                    },
+                    previousResponse: standard_response,
                 },
                 {
                     type: "take-longtime-to-search",
-                    previousResponse: {
-                        page: { offset: 0, limit: 1000, all: 245 },
-                        sort: { key: "login-id", order: "normal" },
-                        users: [],
-                    },
+                    previousResponse: standard_response,
                 },
                 {
                     type: "succeed-to-search",
-                    previousResponse: {
-                        page: { offset: 0, limit: 1000, all: 245 },
-                        sort: { key: "login-id", order: "normal" },
-                        users: [],
-                    },
-                    response: {
-                        page: { offset: 0, limit: 1000, all: 245 },
-                        sort: { key: "login-id", order: "normal" },
-                        users: [],
-                    },
+                    previousResponse: standard_response,
+                    response: standard_response,
                 },
             ])
         })
@@ -133,24 +98,12 @@ describe("SearchAuthUserAccount", () => {
             expect(stack).toEqual([
                 {
                     type: "try-to-search",
-                    previousResponse: {
-                        page: { offset: 0, limit: 1000, all: 245 },
-                        sort: { key: "login-id", order: "normal" },
-                        users: [],
-                    },
+                    previousResponse: standard_response,
                 },
                 {
                     type: "succeed-to-search",
-                    previousResponse: {
-                        page: { offset: 0, limit: 1000, all: 245 },
-                        sort: { key: "login-id", order: "normal" },
-                        users: [],
-                    },
-                    response: {
-                        page: { offset: 0, limit: 1000, all: 245 },
-                        sort: { key: "login-id", order: "normal" },
-                        users: [],
-                    },
+                    previousResponse: standard_response,
+                    response: standard_response,
                 },
             ])
         })
@@ -163,6 +116,65 @@ describe("SearchAuthUserAccount", () => {
         resource.search.clear()
 
         expect(store.loginID.get()).toEqual("")
+    })
+
+    test("focus / close", async () => {
+        const { resource } = standard()
+
+        const runner = setupActionTestRunner(resource.search.detail.subscriber)
+
+        await resource.search.ignitionState
+
+        await runner(async () => {
+            const user = { loginID: "user-1", grantedRoles: [] }
+            const another = { loginID: "user-another", grantedRoles: [] }
+
+            resource.search.detail.focus(user)
+            expect(resource.search.detail.isFocused(user)).toBe(true)
+            expect(resource.search.detail.isFocused(another)).toBe(false)
+
+            resource.search.detail.close()
+            expect(resource.search.detail.isFocused(user)).toBe(false)
+            expect(resource.search.detail.isFocused(another)).toBe(false)
+
+            return resource.search.detail.currentState()
+        }).then((stack) => {
+            expect(stack).toEqual([
+                {
+                    type: "focus-on",
+                    user: { loginID: "user-1", grantedRoles: [] },
+                },
+                { type: "initial-detail" },
+            ])
+        })
+    })
+
+    test("detect user", async () => {
+        const { resource } = focused()
+
+        const runner = setupActionTestRunner(resource.search.detail.subscriber)
+
+        await runner(async () => {
+            return resource.search.detail.ignitionState
+        }).then((stack) => {
+            expect(stack).toEqual([
+                {
+                    type: "focus-on",
+                    user: { loginID: "user-1", grantedRoles: [] },
+                },
+            ])
+        })
+    })
+    test("detect user; failed", async () => {
+        const { resource } = focusFailed()
+
+        const runner = setupActionTestRunner(resource.search.detail.subscriber)
+
+        await runner(async () => {
+            return resource.search.detail.ignitionState
+        }).then((stack) => {
+            expect(stack).toEqual([{ type: "focus-failed" }])
+        })
     })
 
     test("terminate", async () => {
@@ -179,7 +191,7 @@ describe("SearchAuthUserAccount", () => {
 
         await runner(async () => {
             resource.search.terminate()
-            return resource.search.submit()
+            return resource.search.search()
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])
@@ -198,21 +210,27 @@ describe("SearchAuthUserAccount", () => {
 })
 
 function standard() {
-    return initResource(standard_search())
+    return initResource(standard_url(), standard_search())
 }
 function takeLongtime() {
-    return initResource(takeLongtime_search())
+    return initResource(standard_url(), takeLongtime_search())
+}
+function focused() {
+    return initResource(focused_url(), standard_search())
+}
+function focusFailed() {
+    return initResource(focusFailed_url(), standard_search())
 }
 
-function initResource(searchRemote: SearchAuthUserAccountRemote): Readonly<{
+function initResource(
+    currentURL: URL,
+    searchRemote: SearchAuthUserAccountRemote,
+): Readonly<{
     resource: Readonly<{ search: SearchAuthUserAccountAction }>
     store: Readonly<{
         loginID: BoardValueStore
     }>
-    url: Readonly<{ current: URL }>
 }> {
-    const currentURL = new URL("https://example.com/index.html")
-
     const urlStore = { current: currentURL }
 
     const resource = {
@@ -236,7 +254,17 @@ function initResource(searchRemote: SearchAuthUserAccountRemote): Readonly<{
 
     resource.search.loginID.input.connector.connect(store.loginID)
 
-    return { resource, store, url: urlStore }
+    return { resource, store }
+}
+
+function standard_url(): URL {
+    return new URL("https://example.com/index.html")
+}
+function focused_url(): URL {
+    return new URL("https://example.com/index.html?id=user-1")
+}
+function focusFailed_url(): URL {
+    return new URL("https://example.com/index.html?id=user-unknown")
 }
 
 function standard_search(): SearchAuthUserAccountRemote {
@@ -248,10 +276,15 @@ function takeLongtime_search(): SearchAuthUserAccountRemote {
 function standard_searchRemoteResult(): SearchAuthUserAccountRemoteResult {
     return {
         success: true,
-        value: {
-            page: { offset: 0, limit: 1000, all: 245 },
-            sort: { key: defaultSearchAuthUserAccountSort, order: "normal" },
-            users: [],
-        },
+        value: standard_response,
     }
+}
+
+const standard_response: SearchAuthUserAccountRemoteResponse = {
+    page: { offset: 0, limit: 1000, all: 245 },
+    sort: { key: defaultSearchAuthUserAccountSort, order: "normal" },
+    users: [
+        { loginID: "user-1", grantedRoles: [] },
+        { loginID: "user-2", grantedRoles: [] },
+    ],
 }

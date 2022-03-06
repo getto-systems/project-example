@@ -21,9 +21,7 @@ export type FindNextVersionAction = StatefulApplicationAction<FindNextVersionSta
 
 export type FindNextVersionState = Readonly<{ type: "initial-next-version" }> | FindNextVersionEvent
 
-export const initialFindNextVersionState: FindNextVersionState = {
-    type: "initial-next-version",
-}
+const initialState: FindNextVersionState = { type: "initial-next-version" }
 
 export type FindNextVersionMaterial = Readonly<{
     infra: FindNextVersionInfra
@@ -52,7 +50,7 @@ class Action
     extends AbstractStatefulApplicationAction<FindNextVersionState>
     implements FindNextVersionAction
 {
-    readonly initialState = initialFindNextVersionState
+    readonly initialState = initialState
 
     constructor(material: FindNextVersionMaterial) {
         super({

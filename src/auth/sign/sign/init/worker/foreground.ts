@@ -16,7 +16,6 @@ import {
 import { initRequestResetTokenView } from "../../../../user/password/reset/request_token/init/worker/foreground"
 
 import { initSignAction, SignAction } from "../../action"
-import { initSignLinkResource } from "../../../nav/resource"
 
 import { SignForegroundMessage, SignBackgroundMessage } from "./message"
 import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
@@ -30,8 +29,6 @@ export function newSignViewWorkerForeground(feature: OutsideFeature): Applicatio
     const proxy = initProxy(postForegroundMessage)
 
     const sign = initSignAction(newSignActionShell(feature), {
-        link: () => initSignLinkResource(),
-
         check: () => newCheckAuthTicketView(feature),
 
         password_authenticate: () => newAuthenticatePasswordView(feature),

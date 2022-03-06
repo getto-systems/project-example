@@ -19,7 +19,7 @@ describe("SearchColumns", () => {
 
         await runner(async () => {
             await resource.field.ignitionState
-            await resource.field.setInitialSearchColumns(["column-initial"])
+            await resource.field.set(["column-initial"])
             store.columns.set([markBoardValue("column-a")])
             resource.field.input.publisher.post()
             store.columns.set([markBoardValue("column-a"), markBoardValue("column-b")])

@@ -40,7 +40,7 @@ export type SetupSeasonState =
     | Readonly<{ type: "edit-season" }>
     | SetupSeasonEvent
 
-export const initialSetupSeasonState: SetupSeasonState = { type: "initial-setup" }
+const initialState: SetupSeasonState = { type: "initial-setup" }
 
 export function initSetupSeasonAction(
     material: SetupSeasonMaterial,
@@ -50,11 +50,12 @@ export function initSetupSeasonAction(
 }
 
 interface LoadAction {
+    ignitionState: Promise<LoadSeasonState>
     load(): Promise<LoadSeasonState>
 }
 
 class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
-    readonly initialState = initialSetupSeasonState
+    readonly initialState = initialState
 
     readonly season: InputSeasonAction
 
@@ -67,6 +68,13 @@ class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
         super()
 
         const season = initInputSeasonAction()
+
+        load.ignitionState.then((state) => {
+            switch (state.type) {
+                case "succeed-to-load":
+                    season.set(state.season)
+            }
+        })
 
         this.season = season.input
 

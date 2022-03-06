@@ -25,26 +25,35 @@ import { signNav } from "../../../../../sign/nav/x_preact/nav"
 
 import { InputLoginIDEntry } from "../../../../login_id/input/x_preact/input"
 
-import { RequestResetTokenError } from "../data"
+
 import { ApplicationView } from "../../../../../../z_vendor/getto-application/action/action"
 import { RequestResetTokenAction, RequestResetTokenState } from "../action"
-import { ValidateBoardActionState } from "../../../../../../z_vendor/getto-application/board/validate_board/action"
+import { ValidateBoardState } from "../../../../../../z_vendor/getto-application/board/validate_board/action"
+import { SignLink } from "../../../../../sign/nav/action"
 
-export function RequestResetTokenEntry(view: ApplicationView<RequestResetTokenAction>): VNode {
-    const action = useApplicationView(view)
+import { RequestResetTokenError } from "../data"
+
+type EntryProps = Readonly<{
+    link: SignLink
+    requestToken: ApplicationView<RequestResetTokenAction>
+}>
+export function RequestResetTokenEntry(props: EntryProps): VNode {
+    const requestToken = useApplicationView(props.requestToken)
     return h(RequestResetTokenComponent, {
-        requestToken: action,
-        state: useApplicationAction(action),
-        validate: useApplicationAction(action.validate),
+        link: props.link,
+        requestToken,
+        state: useApplicationAction(requestToken),
+        validate: useApplicationAction(requestToken.validate),
     })
 }
 
 const title = "パスワードリセット"
 
 type Props = Readonly<{
+    link: SignLink
     requestToken: RequestResetTokenAction
     state: RequestResetTokenState
-    validate: ValidateBoardActionState
+    validate: ValidateBoardState
 }>
 export function RequestResetTokenComponent(props: Props): VNode {
     return basedOn(props)
@@ -182,10 +191,10 @@ export function RequestResetTokenComponent(props: Props): VNode {
         return buttons({ left: privacyPolicyLink(), right: loginLink() })
     }
     function privacyPolicyLink() {
-        return signNav(props.requestToken.link.getNav_static_privacyPolicy())
+        return signNav(props.link.getNav_static_privacyPolicy())
     }
     function loginLink(): VNode {
-        return signNav(props.requestToken.link.getNav_password_authenticate())
+        return signNav(props.link.getNav_password_authenticate())
     }
 }
 

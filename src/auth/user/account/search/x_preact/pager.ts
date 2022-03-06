@@ -5,24 +5,29 @@ import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { button_search, fieldError } from "../../../../../z_vendor/getto-css/preact/design/form"
-import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
-import { pagerCount, pagerParams } from "../../../../../core/x_preact/design/table"
+import {
+    pagerCount,
+    pagerParams,
+    PAGER_BUTTON_CONNECT,
+    PAGER_BUTTON_STATIC,
+} from "../../../../../core/x_preact/design/table"
 
 import { SearchOffsetComponent } from "../../../../../z_lib/ui/search/offset/x_preact/offset"
 
-import { SearchAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
+import { ListAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
 
 import { pagerOptions } from "../../../../../z_vendor/getto-css/preact/design/table"
 import { SearchPageResponse } from "../../../../../z_lib/ui/search/kernel/data"
 import { RemoteCommonError } from "../../../../../z_lib/ui/remote/data"
+import { html } from "htm/preact"
 
 type EntryProps = Readonly<{
-    search: SearchAuthUserAccountAction
+    list: ListAuthUserAccountAction
 }>
-export function SearchAuthUserAccountPagerEntry({ search }: EntryProps): VNode {
+export function SearchAuthUserAccountPagerEntry({ list }: EntryProps): VNode {
     return h(SearchAuthUserAccountPagerComponent, {
-        search,
-        state: useApplicationAction(search),
+        list,
+        state: useApplicationAction(list),
     })
 }
 
@@ -36,65 +41,55 @@ export function SearchAuthUserAccountPagerComponent(props: Props): VNode {
     function basedOn({ state }: Props): VNode {
         switch (state.type) {
             case "initial-search":
-                return EMPTY_BOX
+                return EMPTY_CONTENT
 
             case "try-to-search":
+            case "take-longtime-to-search":
                 if (state.previousResponse) {
-                    return pagerForm({ page: state.previousResponse.page })
+                    return pagerForm({ page: state.previousResponse.page, isConnecting: true })
                 } else {
-                    return EMPTY_BOX
+                    return EMPTY_CONTENT
                 }
 
             case "succeed-to-search":
-                return pagerForm({ page: state.response.page })
-
-            case "take-longtime-to-search":
-                return connectingMessage()
+                return pagerForm({ page: state.response.page, isConnecting: false })
 
             case "failed-to-search":
                 return errorMessage({ err: state.err })
         }
     }
 
-    type Content = Readonly<{ page: SearchPageResponse }>
+    type Content = Readonly<{ page: SearchPageResponse; isConnecting: boolean }>
 
-    function pagerForm({ page }: Content): VNode {
-        return box({
-            body: [
-                h(SearchOffsetComponent, {
-                    field: props.search.offset,
-                    count: pagerCount(page.all),
-                    defaultSelected: page.offset,
-                    options: pagerOptions(pagerParams(page)),
-                    button: button_search({ state: "normal", label: "読み込み", onClick }),
-                }),
-            ],
-            form: true,
+    function pagerForm({ page, isConnecting }: Content): VNode {
+        return h(SearchOffsetComponent, {
+            field: props.list.offset,
+            count: pagerCount(page.all),
+            options: pagerOptions(pagerParams(page)),
+            button: button(),
         })
 
-        function onClick(e: Event) {
-            e.preventDefault()
-            props.search.load()
+        function button(): VNode {
+            if (isConnecting) {
+                return button_search({ state: "connect", label: PAGER_BUTTON_CONNECT })
+            } else {
+                return button_search({ state: "normal", label: PAGER_BUTTON_STATIC, onClick })
+            }
+
+            function onClick(e: Event) {
+                e.preventDefault()
+                props.list.load()
+            }
         }
-    }
-
-    function connectingMessage(): VNode {
-        return box({
-            body: fieldError([
-                "検索中です",
-                "30秒以上かかる場合は何かがおかしいので、",
-                "お手数ですが管理者に連絡お願いします",
-            ]),
-        })
     }
 
     type ErrorContent = Readonly<{ err: RemoteCommonError }>
     function errorMessage({ err }: ErrorContent): VNode {
-        return box({ body: fieldError(searchError(err)) })
+        return fieldError(searchError(err))
     }
 }
 
-const EMPTY_BOX = box({ body: "" })
+const EMPTY_CONTENT = html``
 
 function searchError(err: RemoteCommonError) {
     return remoteCommonErrorReason(err, (reason) => [

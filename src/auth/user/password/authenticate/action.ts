@@ -3,12 +3,10 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
-import { initSignLink } from "../../../sign/nav/resource"
 import { initInputLoginIDAction } from "../../login_id/input/action"
 import { initInputPasswordAction } from "../input/action"
 import { initValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
 
-import { SignLink } from "../../../sign/nav/resource"
 import { InputLoginIDAction } from "../../login_id/input/action"
 import { InputPasswordAction } from "../input/action"
 import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
@@ -35,8 +33,6 @@ import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 
 export interface AuthenticatePasswordAction
     extends StatefulApplicationAction<AuthenticatePasswordState> {
-    readonly link: SignLink
-
     readonly loginID: InputLoginIDAction
     readonly password: InputPasswordAction
     readonly validate: ValidateBoardAction
@@ -56,9 +52,7 @@ export type AuthenticatePasswordState =
     | Readonly<{ type: "try-to-load"; scriptPath: ConvertScriptPathResult }>
     | Readonly<{ type: "load-error"; err: LoadScriptError }>
 
-export const initialAuthenticatePasswordState: AuthenticatePasswordState = {
-    type: "initial-login",
-}
+const initialState: AuthenticatePasswordState = { type: "initial-login" }
 
 export type AuthenticatePasswordMaterial = Readonly<{
     infra: AuthenticatePasswordInfra
@@ -89,9 +83,7 @@ class Action
     extends AbstractStatefulApplicationAction<AuthenticatePasswordState>
     implements AuthenticatePasswordAction
 {
-    readonly initialState = initialAuthenticatePasswordState
-
-    readonly link = initSignLink()
+    readonly initialState = initialState
 
     readonly loginID: InputLoginIDAction
     readonly password: InputPasswordAction

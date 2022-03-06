@@ -1,7 +1,7 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { container } from "../../../../../z_vendor/getto-css/preact/design/box"
+import { box, box_grow, container } from "../../../../../z_vendor/getto-css/preact/design/box"
 
 import { SearchAuthUserAccountFormEntry } from "./form"
 import { SearchAuthUserAccountPagerEntry } from "./pager"
@@ -10,20 +10,22 @@ import { SearchAuthUserAccountTableEntry } from "./table"
 
 import { SearchAuthUserAccountAction } from "../action"
 
-import { useSearchAuthUserAccountTableStructure } from "./structure"
+import { useAuthUserAccountTableStructure } from "./structure"
 
 type EntryProps = Readonly<{
     search: SearchAuthUserAccountAction
 }>
 export function SearchAuthUserAccountEntry(resource: EntryProps): VNode {
-    const structure = useSearchAuthUserAccountTableStructure(resource.search)
+    const structure = useAuthUserAccountTableStructure(resource.search)
 
     return html`
         ${container([h(SearchAuthUserAccountFormEntry, resource)])}
         ${container([
-            h(SearchAuthUserAccountPagerEntry, resource),
-            h(SearchAuthUserAccountColumnsEntry, { structure, ...resource }),
+            box({ body: h(SearchAuthUserAccountPagerEntry, { list: resource.search }) }),
+            box_grow({
+                body: h(SearchAuthUserAccountColumnsEntry, { structure, list: resource.search }),
+            }),
         ])}
-        ${h(SearchAuthUserAccountTableEntry, { structure, ...resource })}
+        ${h(SearchAuthUserAccountTableEntry, { structure, list: resource.search })}
     `
 }

@@ -8,27 +8,27 @@ export interface ObserveBoardFieldAction extends StatefulApplicationAction<Obser
 }
 
 export type ObserveBoardFieldState = ObserveBoardFieldResult
-export const initialObserveBoardFieldState: ObserveBoardFieldState = { hasChanged: false }
+const initialState: ObserveBoardFieldState = { hasChanged: false }
 
-export type ObserveBoardFieldInfra<V> = Readonly<{
-    observer: BoardFieldObserver<V>
+export type ObserveBoardFieldInfra = Readonly<{
+    observer: BoardFieldObserver
 }>
 
-export function initObserveBoardFieldAction<V>(
-    infra: ObserveBoardFieldInfra<V>,
+export function initObserveBoardFieldAction(
+    infra: ObserveBoardFieldInfra,
 ): ObserveBoardFieldAction {
     return new Action(infra)
 }
 
-class Action<V>
+class Action
     extends AbstractStatefulApplicationAction<ObserveBoardFieldState>
     implements ObserveBoardFieldAction
 {
-    readonly initialState = initialObserveBoardFieldState
+    readonly initialState = initialState
 
-    infra: ObserveBoardFieldInfra<V>
+    infra: ObserveBoardFieldInfra
 
-    constructor(infra: ObserveBoardFieldInfra<V>) {
+    constructor(infra: ObserveBoardFieldInfra) {
         super()
         this.infra = infra
     }

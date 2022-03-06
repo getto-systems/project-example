@@ -9,7 +9,7 @@ import { docsActionField } from "../../../../docs/content/x_preact/helper"
 
 import { docs_dataHandling } from "../../../../docs/docs"
 
-import { SignLink } from "../../nav/resource"
+import { SignLink } from "../../nav/action"
 
 type Props = Readonly<{
     link: SignLink

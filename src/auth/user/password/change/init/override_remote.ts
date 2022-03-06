@@ -11,20 +11,22 @@ import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf
 
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 
-import { ChangePasswordRemote, ChangePasswordRemoteResult } from "../infra"
+import { ChangePasswordRemoteResult, OverridePasswordRemote } from "../infra"
+import { AuthUserAccountBasket } from "../../../account/kernel/data"
+import { OverridePasswordFields } from "../data"
 
-import { ChangePasswordFields } from "../data"
-
-export function newChangePasswordRemote(feature: RemoteOutsideFeature): ChangePasswordRemote {
-    return (fields) => fetchRemote(feature, fields)
+export function newOverridePasswordRemote(feature: RemoteOutsideFeature): OverridePasswordRemote {
+    return (user, fields) => fetchRemote(feature, user, fields)
 }
 
 async function fetchRemote(
     feature: RemoteOutsideFeature,
-    fields: ChangePasswordFields,
+    user: AuthUserAccountBasket,
+    fields: OverridePasswordFields,
 ): Promise<ChangePasswordRemoteResult> {
     try {
-        const mock = false
+        // TODO api につなぐ
+        const mock = true
         if (mock) {
             return {
                 success: true,
@@ -34,16 +36,16 @@ async function fetchRemote(
 
         const opts = fetchOptions({
             serverURL: env.apiServerURL,
-            path: "/auth/user/password/change",
+            path: "/auth/user/password/override",
             method: "POST",
             headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
         })
         const response = await fetch(opts.url, {
             ...opts.options,
             body: encodeProtobuf(
-                pb.auth.user.password.change.service.ChangePasswordRequestPb,
+                pb.auth.user.password.change.service.OverridePasswordRequestPb,
                 (message) => {
-                    message.currentPassword = fields.currentPassword
+                    message.loginId = user.loginID
                     message.newPassword = fields.newPassword
                 },
             ),
