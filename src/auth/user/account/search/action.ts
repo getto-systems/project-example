@@ -172,8 +172,8 @@ class Action
 
         this.detail = new DetailAction({
             infra: {
-                detectUser: async (loginID) => {
-                    const response = searchResponse(await this.load())
+                detectUser: async (loginID): Promise<DetectUserResult> => {
+                    const response = searchResponse(await this.ignitionState)
                     if (!response.found) {
                         return { found: false }
                     }
@@ -277,10 +277,11 @@ type DetailMaterial = Readonly<{
 }>
 
 type DetailInfra = Readonly<{
-    detectUser(
-        loginID: string,
-    ): Promise<Readonly<{ found: false }> | Readonly<{ found: true; user: AuthUserAccountBasket }>>
+    detectUser(loginID: string): Promise<DetectUserResult>
 }>
+type DetectUserResult =
+    | Readonly<{ found: false }>
+    | Readonly<{ found: true; user: AuthUserAccountBasket }>
 
 type DetailShell = Readonly<{
     detectFocus: FocusAuthUserAccountDetecter

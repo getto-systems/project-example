@@ -36,7 +36,7 @@ describe("SearchAuthUserAccount", () => {
     })
 
     test("search", async () => {
-        const { resource, store, url } = standard()
+        const { resource, store } = standard()
 
         const runner = setupActionTestRunner(resource.search.subscriber)
 
@@ -70,9 +70,6 @@ describe("SearchAuthUserAccount", () => {
                     },
                 },
             ])
-            expect(url.current.toString()).toEqual(
-                "https://example.com/index.html?login-id=MY-LOGIN-ID&search-offset=0&search-sort-key=login-id&search-sort-order=normal",
-            )
         })
     })
 
@@ -209,7 +206,6 @@ function initResource(searchRemote: SearchAuthUserAccountRemote): Readonly<{
     store: Readonly<{
         loginID: BoardValueStore
     }>
-    url: Readonly<{ current: URL }>
 }> {
     const currentURL = new URL("https://example.com/index.html")
 
@@ -236,7 +232,7 @@ function initResource(searchRemote: SearchAuthUserAccountRemote): Readonly<{
 
     resource.search.loginID.input.connector.connect(store.loginID)
 
-    return { resource, store, url: urlStore }
+    return { resource, store }
 }
 
 function standard_search(): SearchAuthUserAccountRemote {
