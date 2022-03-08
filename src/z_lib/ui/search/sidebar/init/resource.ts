@@ -8,7 +8,10 @@ export function newSearchSidebarAction(
     feature: RepositoryOutsideFeature,
     key: string,
 ): SearchSidebarAction {
-    return initSearchSidebarAction({
-        sidebarRepository: newSearchSidebarRepository(feature, key),
-    })
+    return initSearchSidebarAction(
+        {
+            sidebarRepository: newSearchSidebarRepository(feature, key),
+        },
+        { isExpand: true },
+    )
 }

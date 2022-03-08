@@ -51,9 +51,12 @@ function initResource(): Readonly<{
     sidebar: SearchSidebarAction
 }> {
     return {
-        sidebar: initSearchSidebarAction({
-            sidebarRepository: standard_sidebarRepository(),
-        }),
+        sidebar: initSearchSidebarAction(
+            {
+                sidebarRepository: standard_sidebarRepository(),
+            },
+            { isExpand: true },
+        ),
     }
 }
 
