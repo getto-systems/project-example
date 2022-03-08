@@ -27,6 +27,9 @@ import { LoadBreadcrumbListComponent } from "../../../../../core/outline/load/x_
 import { SearchAuthUserAccountEntry } from "../../../../../auth/user/account/search/x_preact/search"
 import { ListAuthUserAccountEntry } from "../../../../../auth/user/account/search/x_preact/list"
 import { DetailAuthUserAccountEntry } from "../../../../../auth/user/account/search/x_preact/detail"
+import { MainTitleWithSidebarEntry } from "../../../../../z_lib/ui/search/sidebar/x_preact/main_title"
+
+import { sidebarExpand } from "../../../../../z_lib/ui/search/sidebar/x_preact/helper"
 
 import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 import { ManageUserAccountPageResource } from "./resource"
@@ -43,13 +46,14 @@ export function ManageUserAccountPageEntry(
     return h(ManageUserAccountPageComponent, resource)
 }
 
-const pageTitle = "ユーザー" as const
-const detailTitle = "ユーザー詳細" as const
-const listTitle = "一覧" as const
+const pageTitle = "ユーザー"
+const detailTitle = "ユーザー詳細"
+const listTitle = "一覧"
 
 export function ManageUserAccountPageComponent(props: ManageUserAccountPageResource): VNode {
     useDocumentTitle(pageTitle)
 
+    const sidebarState = useApplicationAction(props.sidebar)
     const detailState = useApplicationAction(props.search.detail)
 
     const common = {
@@ -77,7 +81,13 @@ export function ManageUserAccountPageComponent(props: ManageUserAccountPageResou
             return appLayout({
                 ...common,
                 main: appMain({
-                    header: mainHeader([mainTitle(detailTitle)]),
+                    header: mainHeader([
+                        h(MainTitleWithSidebarEntry, {
+                            sidebar: props.sidebar,
+                            title: detailTitle,
+                        }),
+                        h(LoadBreadcrumbListComponent, props),
+                    ]),
                     body: mainBody(
                         h(DetailAuthUserAccountEntry, {
                             detail: props.search.detail,
@@ -90,11 +100,13 @@ export function ManageUserAccountPageComponent(props: ManageUserAccountPageResou
                     ),
                     copyright,
                 }),
-                sidebar: appSidebar({
-                    header: mainHeader([mainTitle(listTitle)]),
-                    body: sidebarBody(h(ListAuthUserAccountEntry, { list: props.search })),
-                    copyright,
-                }),
+                sidebar: sidebarExpand(sidebarState)
+                    ? appSidebar({
+                          header: mainHeader([mainTitle(listTitle)]),
+                          body: sidebarBody(h(ListAuthUserAccountEntry, props)),
+                          copyright,
+                      })
+                    : undefined,
             })
     }
 }
