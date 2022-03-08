@@ -19,28 +19,31 @@ export type SearchSidebarState =
     | Readonly<{ type: "succeed-to-load"; state: SearchSidebarExpand }>
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
-const initialState: SearchSidebarState = { type: "initial-sidebar", state: { isExpand: true } }
-
 export type SearchSidebarInfra = Readonly<{
     sidebarRepository: SearchSidebarRepository
 }>
 
-export function initSearchSidebarAction(infra: SearchSidebarInfra): SearchSidebarAction {
-    return new Action(infra)
+export function initSearchSidebarAction(
+    infra: SearchSidebarInfra,
+    state: SearchSidebarExpand,
+): SearchSidebarAction {
+    return new Action(infra, state)
 }
 
 class Action
     extends AbstractStatefulApplicationAction<SearchSidebarState>
     implements SearchSidebarAction
 {
-    readonly initialState = initialState
+    initialState: SearchSidebarState
 
     infra: SearchSidebarInfra
 
-    constructor(infra: SearchSidebarInfra) {
+    constructor(infra: SearchSidebarInfra, state: SearchSidebarExpand) {
         super({
             ignite: () => this.load(),
         })
+
+        this.initialState = { type: "initial-sidebar", state }
 
         this.infra = infra
     }
