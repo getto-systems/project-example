@@ -34,6 +34,7 @@ function envContent() {
             season: "GETTO-EXAMPLE-SEASON",
             menuExpand: "GETTO-EXAMPLE-MENU-EXPAND",
             searchColumns: "GETTO-EXAMPLE-SEARCH-COLUMNS",
+            sidebar: "GETTO-EXAMPLE-SIDEBAR",
         },
     }
 
