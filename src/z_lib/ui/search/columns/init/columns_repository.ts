@@ -49,13 +49,13 @@ export function newSearchColumnsRepository(
         }
 
         function toDB(value: SearchColumnsRepositoryValue): string {
-            return encodeProtobuf(pb.lib.search.db.ColumnsPb, (message) => {
+            return encodeProtobuf(pb.lib.search.columns.db.ColumnsPb, (message) => {
                 // value に readonly がついているため、新しく生成する
                 message.columns = Array.from(value)
             })
         }
         function fromDB(raw: string): SearchColumnsRepositoryValue {
-            const message = decodeProtobuf(pb.lib.search.db.ColumnsPb, raw)
+            const message = decodeProtobuf(pb.lib.search.columns.db.ColumnsPb, raw)
             return message.columns
         }
     }
