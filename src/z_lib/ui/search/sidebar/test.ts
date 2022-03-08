@@ -1,54 +1,41 @@
 import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
 
-import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/test_helper"
-import { mockMultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 import { initMemoryDB } from "../../repository/init/memory"
 
 import { searchSidebarRepositoryConverter } from "./convert"
 import { convertDB } from "../../repository/init/convert"
 
-import { initSearchColumnsAction, SearchColumnsAction } from "./action"
+import { initSearchSidebarAction, SearchSidebarAction } from "./action"
 
-import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
-
-describe("SearchColumns", () => {
+describe("SearchSidebar", () => {
     test("select columns", async () => {
-        const { resource, store } = standard()
+        const { sidebar } = standard()
 
-        const runner = setupActionTestRunner(resource.field.subscriber)
+        const runner = setupActionTestRunner(sidebar.subscriber)
 
         await runner(async () => {
-            await resource.field.ignitionState
-            await resource.field.set(["column-initial"])
-            store.columns.set([markBoardValue("column-a")])
-            resource.field.input.publisher.post()
-            store.columns.set([markBoardValue("column-a"), markBoardValue("column-b")])
-            resource.field.input.publisher.post()
-            return resource.field.currentState()
+            await sidebar.ignitionState
+            await sidebar.fold()
+            await sidebar.expand()
+            return sidebar.currentState()
         }).then((stack) => {
             expect(stack).toEqual([
-                { type: "succeed-to-load", columns: [] },
-                { type: "succeed-to-load", columns: ["column-initial"] },
-                { type: "succeed-to-save", columns: ["column-a"] },
-                { type: "succeed-to-save", columns: ["column-a", "column-b"] },
+                { type: "succeed-to-load", state: { isExpand: true } },
+                { type: "succeed-to-save", state: { isExpand: false } },
+                { type: "succeed-to-save", state: { isExpand: true } },
             ])
         })
     })
 
     test("terminate", async () => {
-        const { resource, store } = standard()
+        const { sidebar } = standard()
 
-        const runner = setupActionTestRunner({
-            subscribe: (handler) => {
-                resource.field.subscriber.subscribe(handler)
-            },
-            unsubscribe: () => null,
-        })
+        const runner = setupActionTestRunner(sidebar.subscriber)
 
         await runner(async () => {
-            resource.field.terminate()
-            store.columns.set([markBoardValue("column-a")])
-            return resource.field.currentState()
+            sidebar.terminate()
+            sidebar.fold()
+            return sidebar.currentState()
         }).then((stack) => {
             // no input/validate event after terminate
             expect(stack).toEqual([])
@@ -61,28 +48,17 @@ function standard() {
 }
 
 function initResource(): Readonly<{
-    resource: Readonly<{ field: SearchColumnsAction }>
-    store: Readonly<{
-        columns: MultipleBoardValueStore
-    }>
+    sidebar: SearchSidebarAction
 }> {
-    const resource = {
-        field: initSearchColumnsAction({
-            columnsRepository: standard_columnRepository(),
+    return {
+        sidebar: initSearchSidebarAction({
+            sidebarRepository: standard_sidebarRepository(),
         }),
     }
-
-    const store = {
-        columns: mockMultipleBoardValueStore(),
-    }
-
-    resource.field.input.connector.connect(store.columns)
-
-    return { resource, store }
 }
 
-function standard_columnRepository() {
+function standard_sidebarRepository() {
     const db = initMemoryDB()
-    db.set([])
+    db.set({ isExpand: true })
     return convertDB(db, searchSidebarRepositoryConverter)
 }

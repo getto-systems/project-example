@@ -29,9 +29,10 @@ import { ListAuthUserAccountEntry } from "../../../../../auth/user/account/searc
 import { DetailAuthUserAccountEntry } from "../../../../../auth/user/account/search/x_preact/detail"
 import { MainTitleWithSidebarEntry } from "../../../../../z_lib/ui/search/sidebar/x_preact/main_title"
 
+import { sidebarExpand } from "../../../../../z_lib/ui/search/sidebar/x_preact/helper"
+
 import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 import { ManageUserAccountPageResource } from "./resource"
-import { sidebarExpand } from "../../../../../z_lib/ui/search/sidebar/x_preact/helper"
 
 export function ManageUserAccountPageEntry(
     view: ApplicationView<ManageUserAccountPageResource>,
