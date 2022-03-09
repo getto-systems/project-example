@@ -25,9 +25,17 @@ export type InputType = typeof inputTypes[number]
 type Props = Readonly<{
     type: InputType
     input: InputBoardAction
-}>
-export function InputBoardComponent({ type, input }: Props): VNode {
-    return html`<input ref=${useInputRef(input.connector)} type=${type} onInput=${onInput} />`
+}> &
+    Partial<{
+        autocomplete: string
+    }>
+export function InputBoardComponent({ type, input, autocomplete }: Props): VNode {
+    return html`<input
+        ref=${useInputRef(input.connector)}
+        type=${type}
+        onInput=${onInput}
+        autocomplete=${autocomplete}
+    />`
 
     function onInput() {
         input.publisher.post()

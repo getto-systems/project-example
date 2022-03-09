@@ -127,8 +127,14 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
             loginBox(siteInfo, {
                 title: authenticateTitle(),
                 body: [
-                    h(InputLoginIDEntry, { field: props.authenticate.loginID }),
-                    h(InputPasswordEntry, { field: props.authenticate.password }),
+                    h(InputLoginIDEntry, {
+                        field: props.authenticate.loginID,
+                        autocomplete: "username",
+                    }),
+                    h(InputPasswordEntry, {
+                        field: props.authenticate.password,
+                        autocomplete: "current-password",
+                    }),
                     buttons({ left: button(), right: clearButton() }),
                 ],
                 footer: [footerLinks(), error()],

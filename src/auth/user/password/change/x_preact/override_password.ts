@@ -58,6 +58,7 @@ export function OverridePasswordComponent(props: Props): VNode {
         if (editableState.isEditable) {
             switch (state.type) {
                 case "initial-override-password":
+                case "succeed-to-override-password":
                     return formBox({ type: validateState })
 
                 case "try-to-override-password":
@@ -66,14 +67,13 @@ export function OverridePasswordComponent(props: Props): VNode {
                 case "take-longtime-to-override-password":
                     return formBox({ type: "take-longtime" })
 
-                case "succeed-to-override-password":
-                    return buttonBox({ type: "success" })
-
                 case "failed-to-override-password":
                     return formBox({ type: validateState, err: changePasswordError(state.err) })
             }
         } else {
-            return buttonBox({ type: "initial" })
+            return buttonBox({
+                type: state.type === "succeed-to-override-password" ? "success" : "initial",
+            })
         }
     }
 
@@ -109,6 +109,7 @@ export function OverridePasswordComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
+                props.override.clear()
                 props.editable.open()
             }
         }
@@ -126,6 +127,7 @@ export function OverridePasswordComponent(props: Props): VNode {
                         field: props.override.newPassword,
                         title: "新しいパスワード",
                         help: ["管理者権限でパスワードを上書きします"],
+                        autocomplete: "new-password",
                     }),
                 ],
                 footer: [
@@ -192,7 +194,6 @@ export function OverridePasswordComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
-                props.override.clear()
                 props.editable.close()
             }
         }

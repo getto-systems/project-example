@@ -18,7 +18,11 @@ import { InputLoginIDAction, ValidateLoginIDState } from "../action"
 import { ValidateLoginIDError } from "../data"
 
 type EntryProps = Readonly<{ field: InputLoginIDAction }> &
-    Partial<{ title: VNodeContent; help: readonly VNodeContent[] }>
+    Partial<{
+        title: VNodeContent
+        help: readonly VNodeContent[]
+        autocomplete: string
+    }>
 export function InputLoginIDEntry(resource: EntryProps): VNode {
     return h(InputLoginIDComponent, {
         ...resource,
@@ -37,7 +41,11 @@ export function InputLoginIDComponent(props: Props): VNode {
     function content() {
         const content = {
             title: title(),
-            body: h(InputBoardComponent, { type: "text", input: props.field.input }),
+            body: h(InputBoardComponent, {
+                type: "text",
+                input: props.field.input,
+                autocomplete: props.autocomplete,
+            }),
             help: help(),
         }
 

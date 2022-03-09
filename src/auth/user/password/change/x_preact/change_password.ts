@@ -54,6 +54,7 @@ export function ChangePasswordComponent(props: Props): VNode {
         if (editableState.isEditable) {
             switch (state.type) {
                 case "initial-change-password":
+                case "succeed-to-change-password":
                     return formBox({ type: validateState })
 
                 case "try-to-change-password":
@@ -62,14 +63,13 @@ export function ChangePasswordComponent(props: Props): VNode {
                 case "take-longtime-to-change-password":
                     return formBox({ type: "take-longtime" })
 
-                case "succeed-to-change-password":
-                    return buttonBox({ type: "success" })
-
                 case "failed-to-change-password":
                     return formBox({ type: validateState, err: changePasswordError(state.err) })
             }
         } else {
-            return buttonBox({ type: "initial" })
+            return buttonBox({
+                type: state.type === "succeed-to-change-password" ? "success" : "initial",
+            })
         }
     }
 
@@ -105,6 +105,7 @@ export function ChangePasswordComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
+                props.change.clear()
                 props.editable.open()
             }
         }
@@ -122,11 +123,13 @@ export function ChangePasswordComponent(props: Props): VNode {
                         field: props.change.currentPassword,
                         title: "現在のパスワード",
                         help: ["変更前のパスワードを入力します"],
+                        autocomplete: "current-password",
                     }),
                     h(InputPasswordEntry, {
                         field: props.change.newPassword,
                         title: "新しいパスワード",
                         help: ["今後はこのパスワードになります"],
+                        autocomplete: "new-password",
                     }),
                 ],
                 footer: [
