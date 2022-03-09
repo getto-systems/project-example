@@ -4,17 +4,10 @@ use crate::auth::ticket::validate::method::{
     validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
 };
 
-use crate::auth::user::login_id::kernel::data::LoginId;
-use crate::auth::user::password::change::data::{
-    OverridePasswordError, OverridePasswordRepositoryError,
-};
-use crate::auth::user::password::change::infra::{
-    OverridePasswordFieldsExtract, OverridePasswordRepository,
-};
 use crate::auth::user::password::{
     change::infra::{
         ChangePasswordFieldsExtract, ChangePasswordRepository, ChangePasswordRequestDecoder,
-        OverridePasswordRequestDecoder,
+        OverridePasswordFieldsExtract, OverridePasswordRepository, OverridePasswordRequestDecoder,
     },
     kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, PlainPassword},
 };
@@ -22,9 +15,15 @@ use crate::auth::user::password::{
 use crate::{
     auth::{
         ticket::kernel::data::AuthTicket,
-        user::password::{
-            change::data::{ChangePasswordError, ChangePasswordRepositoryError},
-            kernel::data::{PasswordHashError, ValidatePasswordError},
+        user::{
+            login_id::kernel::data::LoginId,
+            password::{
+                change::data::{
+                    ChangePasswordError, ChangePasswordRepositoryError, OverridePasswordError,
+                    OverridePasswordRepositoryError,
+                },
+                kernel::data::{PasswordHashError, ValidatePasswordError},
+            },
         },
     },
     z_lib::repository::data::RepositoryError,

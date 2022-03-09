@@ -7,17 +7,23 @@ import { button_cancel } from "../../../../../z_vendor/getto-css/preact/design/f
 
 import { BACK_TO_LIST_BUTTON } from "../../../../../core/x_preact/design/table"
 
+import { OverrideLoginIdEntry } from "../../../login_id/change/x_preact/override_login_id"
 import { OverridePasswordEntry } from "../../../password/change/x_preact/override_password"
 
 import { DetailAuthUserAccountAction } from "../action"
 import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
+import { OverrideLoginIdAction } from "../../../login_id/change/action"
 import { OverridePasswordAction } from "../../../password/change/action"
 
 import { AuthUserAccountBasket } from "../../kernel/data"
 
 type EntryProps = Readonly<{
     detail: DetailAuthUserAccountAction
-    override: Readonly<{
+    overrideLoginId: Readonly<{
+        editable: EditableBoardAction
+        override: OverrideLoginIdAction
+    }>
+    overridePassword: Readonly<{
         editable: EditableBoardAction
         override: OverridePasswordAction
     }>
@@ -37,8 +43,8 @@ export function DetailAuthUserAccountEntry(props: EntryProps): VNode {
 
         return container([
             box({ body: notice_pending(["基本情報"]) }),
-            box({ body: notice_pending(["ログインID変更"]) }),
-            h(OverridePasswordEntry, { ...props.override, user }),
+            h(OverrideLoginIdEntry, { ...props.overrideLoginId, user }),
+            h(OverridePasswordEntry, { ...props.overridePassword, user }),
         ])
     }
 }

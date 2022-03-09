@@ -2,9 +2,9 @@ pub mod request_decoder;
 
 use tonic::metadata::MetadataMap;
 
-use crate::auth::user::password::change::action::{OverridePasswordAction, OverridePasswordMaterial};
-use crate::auth::user::password::change::init::request_decoder::PbOverridePasswordRequestDecoder;
-use crate::auth::user::password::change::y_protobuf::service::{ChangePasswordRequestPb, OverridePasswordRequestPb};
+use crate::auth::user::password::change::y_protobuf::service::{
+    ChangePasswordRequestPb, OverridePasswordRequestPb,
+};
 
 use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
@@ -13,7 +13,9 @@ use crate::auth::{
     user::{
         kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,
         password::{
-            change::init::request_decoder::PbChangePasswordRequestDecoder,
+            change::init::request_decoder::{
+                PbChangePasswordRequestDecoder, PbOverridePasswordRequestDecoder,
+            },
             kernel::init::{
                 password_hasher::Argon2PasswordHasher, password_matcher::Argon2PasswordMatcher,
             },
@@ -21,7 +23,9 @@ use crate::auth::{
     },
 };
 
-use super::action::{ChangePasswordAction, ChangePasswordMaterial};
+use super::action::{
+    ChangePasswordAction, ChangePasswordMaterial, OverridePasswordAction, OverridePasswordMaterial,
+};
 
 pub struct ChangePasswordFeature<'a> {
     validate: ApiValidateAuthTokenStruct<'a>,

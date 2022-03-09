@@ -7,11 +7,17 @@ use std::{
 use chrono::{DateTime, NaiveDateTime, Utc};
 use rusoto_core::RusotoError;
 use rusoto_dynamodb::{
-    AttributeValue, DynamoDb, DynamoDbClient, GetItemError, GetItemInput, PutItemInput, ScanError,
-    ScanInput, UpdateItemError, UpdateItemInput,
+    AttributeValue, DeleteItemError, DeleteItemInput, DynamoDb, DynamoDbClient, GetItemError,
+    GetItemInput, PutItemError, PutItemInput, ScanError, ScanInput, UpdateItemError,
+    UpdateItemInput,
 };
 
-use crate::auth::x_outside_feature::feature::AuthOutsideStore;
+use crate::auth::{
+    user::login_id::change::{
+        data::OverrideLoginIdRepositoryError, infra::OverrideLoginIdRepository,
+    },
+    x_outside_feature::feature::AuthOutsideStore,
+};
 
 use crate::z_lib::repository::{
     dynamodb::helper::{string_value, timestamp_value, ScanKey},
@@ -111,6 +117,69 @@ async fn get_user<'client>(
         }
         .restore(),
     ))
+}
+
+#[async_trait::async_trait]
+impl<'client> OverrideLoginIdRepository for DynamoDbAuthUserRepository<'client> {
+    async fn override_login_id<'a>(
+        &self,
+        login_id: &'a LoginId,
+        new_login_id: LoginId,
+    ) -> Result<(), OverrideLoginIdRepositoryError> {
+        override_login_id(self, login_id, new_login_id).await
+    }
+}
+async fn override_login_id<'client, 'a>(
+    repository: &DynamoDbAuthUserRepository<'client>,
+    login_id: &'a LoginId,
+    new_login_id: LoginId,
+) -> Result<(), OverrideLoginIdRepositoryError> {
+    let entry = get_login_id_entry(repository, login_id.clone())
+        .await
+        .map_err(|err| {
+            OverrideLoginIdRepositoryError::RepositoryError(infra_error(
+                "get login id entry error",
+                err,
+            ))
+        })?
+        .ok_or(OverrideLoginIdRepositoryError::UserNotFound)?;
+
+    if let Some(_) = get_user_id(repository, new_login_id.clone())
+        .await
+        .map_err(|err| {
+            OverrideLoginIdRepositoryError::RepositoryError(infra_error("get user id error", err))
+        })?
+    {
+        return Err(OverrideLoginIdRepositoryError::LoginIdAlreadyRegistered);
+    }
+
+    update_login_id(repository, entry.user_id.clone(), new_login_id.clone())
+        .await
+        .map_err(|err| {
+            OverrideLoginIdRepositoryError::RepositoryError(infra_error(
+                "update login id error",
+                err,
+            ))
+        })?;
+
+    delete_login_id_entry(repository, login_id.clone())
+        .await
+        .map_err(|err| {
+            OverrideLoginIdRepositoryError::RepositoryError(infra_error(
+                "delete login id entry error",
+                err,
+            ))
+        })?;
+
+    put_login_id_entry(repository, new_login_id, entry)
+        .await
+        .map_err(|err| {
+            OverrideLoginIdRepositoryError::RepositoryError(infra_error(
+                "put login id entry error",
+                err,
+            ))
+        })?;
+    Ok(())
 }
 
 #[async_trait::async_trait]
@@ -451,6 +520,76 @@ async fn reset_password<'client, 'a>(
     Ok(user_id)
 }
 
+struct LoginIdEntry {
+    user_id: AuthUserId,
+    reset_token_destination_email: Option<String>,
+}
+
+async fn get_login_id_entry<'client>(
+    repository: &DynamoDbAuthUserRepository<'client>,
+    login_id: LoginId,
+) -> Result<Option<LoginIdEntry>, RusotoError<GetItemError>> {
+    let mut key = AttributeMap::new();
+    key.add_login_id(login_id);
+
+    let input = GetItemInput {
+        table_name: repository.login_id.into(),
+        key: key.extract(),
+        projection_expression: Some("user_id, reset_token_destination_email".into()),
+        ..Default::default()
+    };
+
+    let response = repository.client.get_item(input).await?;
+
+    Ok(response.item.and_then(|mut attrs| {
+        match (
+            attrs.remove("user_id").and_then(|attr| attr.s),
+            attrs
+                .remove("reset_token_destination_email")
+                .and_then(|attr| attr.s),
+        ) {
+            (Some(user_id), email) => Some(LoginIdEntry {
+                user_id: AuthUserId::restore(user_id),
+                reset_token_destination_email: email,
+            }),
+            _ => None,
+        }
+    }))
+}
+async fn delete_login_id_entry<'client>(
+    repository: &DynamoDbAuthUserRepository<'client>,
+    old_login_id: LoginId,
+) -> Result<(), RusotoError<DeleteItemError>> {
+    let mut key = AttributeMap::new();
+    key.add_login_id(old_login_id);
+
+    let input = DeleteItemInput {
+        table_name: repository.login_id.into(),
+        key: key.extract(),
+        ..Default::default()
+    };
+
+    repository.client.delete_item(input).await?;
+    Ok(())
+}
+async fn put_login_id_entry<'client>(
+    repository: &DynamoDbAuthUserRepository<'client>,
+    new_login_id: LoginId,
+    entry: LoginIdEntry,
+) -> Result<(), RusotoError<PutItemError>> {
+    let mut item = AttributeMap::new();
+    item.add_login_id_entry(new_login_id, entry);
+
+    let input = PutItemInput {
+        table_name: repository.login_id.into(),
+        item: item.extract(),
+        condition_expression: Some("attribute_not_exists(user_id)".into()),
+        ..Default::default()
+    };
+
+    repository.client.put_item(input).await?;
+    Ok(())
+}
 async fn get_user_id<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
     login_id: LoginId,
@@ -543,6 +682,29 @@ async fn get_login_id<'client>(
         .and_then(|mut attrs| attrs.remove("login_id"))
         .and_then(|attr| attr.s)
         .map(|password| LoginId::restore(password)))
+}
+async fn update_login_id<'client>(
+    repository: &DynamoDbAuthUserRepository<'client>,
+    user_id: AuthUserId,
+    new_login_id: LoginId,
+) -> Result<(), RusotoError<UpdateItemError>> {
+    let mut key = AttributeMap::new();
+    key.add_user_id(user_id);
+
+    let mut item = AttributeMap::new();
+    item.add_login_id_as(new_login_id, ":login_id");
+
+    let input = UpdateItemInput {
+        table_name: repository.user.into(),
+        key: key.extract(),
+        update_expression: Some("set login_id = :login_id".into()),
+        expression_attribute_values: Some(item.extract()),
+        ..Default::default()
+    };
+
+    repository.client.update_item(input).await?;
+
+    Ok(())
 }
 async fn get_password<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
@@ -741,7 +903,14 @@ impl AttributeMap {
     }
 
     fn add_login_id(&mut self, login_id: LoginId) {
-        self.add("login_id", string_value(login_id.extract()));
+        self.add_login_id_as(login_id, "login_id");
+    }
+    fn add_login_id_entry(&mut self, login_id: LoginId, entry: LoginIdEntry) {
+        self.add_login_id(login_id);
+        self.add_user_id(entry.user_id);
+        if let Some(email) = entry.reset_token_destination_email {
+            self.add("reset_token_destination_email", string_value(email));
+        }
     }
     fn add_user_id(&mut self, user_id: AuthUserId) {
         self.add("user_id", string_value(user_id.extract()));
@@ -759,6 +928,9 @@ impl AttributeMap {
         self.add("requested_at", timestamp_value(requested_at.extract()));
     }
 
+    fn add_login_id_as(&mut self, login_id: LoginId, name: &str) {
+        self.add(name, string_value(login_id.extract()));
+    }
     fn add_password_as(&mut self, password: HashedPassword, name: &str) {
         self.add(name, string_value(password.extract()));
     }

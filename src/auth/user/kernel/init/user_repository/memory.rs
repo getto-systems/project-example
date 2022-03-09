@@ -6,8 +6,13 @@ use std::{
 use chrono::{DateTime, Utc};
 
 use crate::{
-    auth::user::password::change::{
-        data::OverridePasswordRepositoryError, infra::OverridePasswordRepository,
+    auth::user::{
+        login_id::change::{
+            data::OverrideLoginIdRepositoryError, infra::OverrideLoginIdRepository,
+        },
+        password::change::{
+            data::OverridePasswordRepositoryError, infra::OverridePasswordRepository,
+        },
     },
     z_lib::repository::helper::infra_error,
 };
@@ -195,11 +200,19 @@ impl MemoryAuthUserMap {
         store
     }
 
+    fn has_login_id(&self, login_id: &LoginId) -> bool {
+        self.login_id.contains_key(login_id.as_str())
+    }
+
     fn insert_login_id(&mut self, login_id: LoginId, user_id: AuthUserId) -> &mut Self {
         self.login_id
             .insert(login_id.clone().extract(), user_id.clone());
         self.user_id.insert(user_id.extract(), login_id);
         self
+    }
+    fn update_login_id(&mut self, user_id: AuthUserId, login_id: LoginId) {
+        self.login_id.insert(login_id.clone().extract(), user_id.clone());
+        self.user_id.insert(user_id.extract(), login_id);
     }
     fn get_user_id(&self, login_id: &LoginId) -> Option<&AuthUserId> {
         self.login_id.get(login_id.as_str())
@@ -322,6 +335,39 @@ fn search<'a>(
         sort: filter.into_sort(),
         users,
     })
+}
+
+#[async_trait::async_trait]
+impl<'store> OverrideLoginIdRepository for MemoryAuthUserRepository<'store> {
+    async fn override_login_id<'a>(
+        &self,
+        login_id: &'a LoginId,
+        new_login_id: LoginId,
+    ) -> Result<(), OverrideLoginIdRepositoryError> {
+        override_login_id(self, login_id, new_login_id)
+    }
+}
+fn override_login_id<'store, 'a>(
+    repository: &MemoryAuthUserRepository<'store>,
+    login_id: &'a LoginId,
+    new_login_id: LoginId,
+) -> Result<(), OverrideLoginIdRepositoryError> {
+    {
+        let mut store = repository.store.lock().unwrap();
+
+        let user_id = store
+            .get_user_id(login_id)
+            .ok_or(OverrideLoginIdRepositoryError::UserNotFound)
+            .map(|id| id.clone())?;
+
+        if store.has_login_id(&new_login_id) {
+            return Err(OverrideLoginIdRepositoryError::LoginIdAlreadyRegistered)
+        }
+
+        store.update_login_id(user_id, new_login_id);
+    }
+
+    Ok(())
 }
 
 #[async_trait::async_trait]

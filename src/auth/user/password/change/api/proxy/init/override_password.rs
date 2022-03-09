@@ -7,7 +7,7 @@ use crate::auth::user::password::change::y_protobuf::service::{
 
 use crate::auth::x_outside_feature::feature::AuthOutsideService;
 
-use crate::auth::user::password::change::x_tonic::route::ServiceChangePassword;
+use crate::auth::user::password::change::x_tonic::route::ServiceOverridePassword;
 
 use crate::z_lib::service::init::authorizer::GoogleServiceAuthorizer;
 
@@ -49,7 +49,7 @@ impl<'a> AuthProxyService for OverridePasswordProxyService<'a> {
     type Response = AuthProxyResponse;
 
     fn name(&self) -> &str {
-        ServiceChangePassword::name()
+        ServiceOverridePassword::name()
     }
     async fn call(self, metadata: AuthMetadataContent) -> Result<Self::Response, AuthProxyError> {
         call(self, metadata).await

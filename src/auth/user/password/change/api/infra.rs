@@ -1,9 +1,9 @@
-use crate::auth::user::login_id::kernel::data::LoginId;
-use crate::auth::user::password::change::data::OverridePasswordRepositoryError;
 use crate::auth::user::password::kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher};
 
 use crate::auth::user::{
-    kernel::data::AuthUserId, password::change::data::ChangePasswordRepositoryError,
+    kernel::data::AuthUserId,
+    login_id::kernel::data::LoginId,
+    password::change::data::{ChangePasswordRepositoryError, OverridePasswordRepositoryError},
 };
 
 pub trait ChangePasswordRequestDecoder {

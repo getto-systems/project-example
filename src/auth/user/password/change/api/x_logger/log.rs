@@ -1,6 +1,7 @@
-use super::super::action::{ChangePasswordEvent, ChangePasswordState};
+use super::super::action::{
+    ChangePasswordEvent, ChangePasswordState, OverridePasswordEvent, OverridePasswordState,
+};
 
-use crate::auth::user::password::change::action::{OverridePasswordState, OverridePasswordEvent};
 use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
 
 use crate::auth::user::password::change::data::{ChangePasswordError, OverridePasswordError};

@@ -93,10 +93,10 @@ describe("OverridePassword", () => {
 })
 
 function standard() {
-    return initResource(standard_change())
+    return initResource(standard_overrideRemote())
 }
 function takeLongtime_elements() {
-    return initResource(takeLongtime_change())
+    return initResource(takeLongtime_overrideRemote())
 }
 
 function initResource(overridePasswordRemote: OverridePasswordRemote): Readonly<{
@@ -131,10 +131,10 @@ function initResource(overridePasswordRemote: OverridePasswordRemote): Readonly<
     return { resource, store, user }
 }
 
-function standard_change(): OverridePasswordRemote {
+function standard_overrideRemote(): OverridePasswordRemote {
     return async () => standard_changeRemoteResult()
 }
-function takeLongtime_change(): OverridePasswordRemote {
+function takeLongtime_overrideRemote(): OverridePasswordRemote {
     return async () => ticker({ wait_millisecond: 64 }, () => standard_changeRemoteResult())
 }
 function standard_changeRemoteResult(): ChangePasswordRemoteResult {
