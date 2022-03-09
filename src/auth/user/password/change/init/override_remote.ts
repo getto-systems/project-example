@@ -25,8 +25,7 @@ async function fetchRemote(
     fields: OverridePasswordFields,
 ): Promise<ChangePasswordRemoteResult> {
     try {
-        // TODO api につなぐ
-        const mock = true
+        const mock = false
         if (mock) {
             return {
                 success: true,
@@ -37,7 +36,7 @@ async function fetchRemote(
         const opts = fetchOptions({
             serverURL: env.apiServerURL,
             path: "/auth/user/password/override",
-            method: "POST",
+            method: "PATCH",
             headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
         })
         const response = await fetch(opts.url, {

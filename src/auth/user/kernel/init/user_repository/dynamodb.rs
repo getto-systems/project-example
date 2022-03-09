@@ -11,9 +11,7 @@ use rusoto_dynamodb::{
     ScanInput, UpdateItemError, UpdateItemInput,
 };
 
-use crate::{
-    auth::x_outside_feature::feature::AuthOutsideStore, z_lib::search::data::SearchSortOrder,
-};
+use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
 use crate::z_lib::repository::{
     dynamodb::helper::{string_value, timestamp_value, ScanKey},
@@ -25,7 +23,7 @@ use crate::auth::user::{
     kernel::infra::AuthUserRepository,
     password::{
         authenticate::infra::VerifyPasswordRepository,
-        change::infra::ChangePasswordRepository,
+        change::infra::{ChangePasswordRepository, OverridePasswordRepository},
         kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword},
         reset::{
             kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
@@ -49,7 +47,7 @@ use crate::{
             login_id::kernel::data::{LoginId, LoginIdBasket},
             password::{
                 authenticate::data::VerifyPasswordRepositoryError,
-                change::data::ChangePasswordRepositoryError,
+                change::data::{ChangePasswordRepositoryError, OverridePasswordRepositoryError},
                 reset::{
                     kernel::data::{
                         ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
@@ -62,7 +60,7 @@ use crate::{
     },
     z_lib::{
         repository::data::RepositoryError,
-        search::data::{SearchOffset, SearchPage},
+        search::data::{SearchOffset, SearchPage, SearchSortOrder},
     },
 };
 
@@ -195,6 +193,42 @@ async fn change_password<'client, 'a>(
         .await
         .map_err(|err| {
             ChangePasswordRepositoryError::RepositoryError(infra_error(
+                "update password error",
+                err,
+            ))
+        })
+}
+
+#[async_trait::async_trait]
+impl<'client> OverridePasswordRepository for DynamoDbAuthUserRepository<'client> {
+    async fn override_password<'a>(
+        &self,
+        login_id: &'a LoginId,
+        hasher: impl 'a + AuthUserPasswordHasher,
+    ) -> Result<(), OverridePasswordRepositoryError> {
+        override_password(self, login_id, hasher).await
+    }
+}
+async fn override_password<'client, 'a>(
+    repository: &DynamoDbAuthUserRepository<'client>,
+    login_id: &'a LoginId,
+    hasher: impl 'a + AuthUserPasswordHasher,
+) -> Result<(), OverridePasswordRepositoryError> {
+    let password = hasher
+        .hash_password()
+        .map_err(OverridePasswordRepositoryError::PasswordHashError)?;
+
+    let user_id = get_user_id(repository, login_id.clone())
+        .await
+        .map_err(|err| {
+            OverridePasswordRepositoryError::RepositoryError(infra_error("get user id error", err))
+        })?
+        .ok_or(OverridePasswordRepositoryError::UserNotFound)?;
+
+    update_password(repository, user_id, password)
+        .await
+        .map_err(|err| {
+            OverridePasswordRepositoryError::RepositoryError(infra_error(
                 "update password error",
                 err,
             ))

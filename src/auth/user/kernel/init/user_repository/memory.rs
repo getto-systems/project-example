@@ -5,7 +5,12 @@ use std::{
 
 use chrono::{DateTime, Utc};
 
-use crate::z_lib::repository::helper::infra_error;
+use crate::{
+    auth::user::password::change::{
+        data::OverridePasswordRepositoryError, infra::OverridePasswordRepository,
+    },
+    z_lib::repository::helper::infra_error,
+};
 
 use crate::auth::user::{
     account::search::infra::SearchAuthUserAccountRepository,
@@ -395,8 +400,40 @@ fn change_password<'store, 'a>(
 
         let mut store = repository.store.lock().unwrap();
 
-        // 実際のデータベースには registered_at も保存する必要がある
         store.insert_password(user_id.clone(), hashed_password);
+    }
+
+    Ok(())
+}
+
+#[async_trait::async_trait]
+impl<'store> OverridePasswordRepository for MemoryAuthUserRepository<'store> {
+    async fn override_password<'a>(
+        &self,
+        login_id: &'a LoginId,
+        hasher: impl 'a + AuthUserPasswordHasher,
+    ) -> Result<(), OverridePasswordRepositoryError> {
+        override_password(self, login_id, hasher)
+    }
+}
+fn override_password<'store, 'a>(
+    repository: &MemoryAuthUserRepository<'store>,
+    login_id: &'a LoginId,
+    hasher: impl 'a + AuthUserPasswordHasher,
+) -> Result<(), OverridePasswordRepositoryError> {
+    {
+        let hashed_password = hasher
+            .hash_password()
+            .map_err(OverridePasswordRepositoryError::PasswordHashError)?;
+
+        let mut store = repository.store.lock().unwrap();
+
+        let user_id = store
+            .get_user_id(login_id)
+            .ok_or(OverridePasswordRepositoryError::UserNotFound)
+            .map(|id| id.clone())?;
+
+        store.insert_password(user_id, hashed_password);
     }
 
     Ok(())

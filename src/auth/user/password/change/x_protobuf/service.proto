@@ -3,7 +3,7 @@ syntax = "proto3";
 package auth.user.password.change.service;
 
 service ChangePasswordPb {
-    rpc Change (ChangePasswordRequestPb) returns (ChangePasswordResponsePb);
+    rpc ChangePassword (ChangePasswordRequestPb) returns (ChangePasswordResponsePb);
 }
 message ChangePasswordRequestPb {
     string current_password = 1;
@@ -14,7 +14,7 @@ message ChangePasswordResponsePb {
 }
 
 service OverridePasswordPb {
-    rpc Override (OverridePasswordRequestPb) returns (OverridePasswordResponsePb);
+    rpc OverridePassword (OverridePasswordRequestPb) returns (OverridePasswordResponsePb);
 }
 message OverridePasswordRequestPb {
     string login_id = 1;

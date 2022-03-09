@@ -1,7 +1,7 @@
-use crate::auth::user::password::change::y_protobuf::service::ChangePasswordRequestPb;
+use crate::auth::user::password::change::y_protobuf::service::{ChangePasswordRequestPb, OverridePasswordRequestPb};
 
 use crate::auth::user::password::change::infra::{
-    ChangePasswordFieldsExtract, ChangePasswordRequestDecoder,
+    ChangePasswordFieldsExtract, ChangePasswordRequestDecoder, OverridePasswordRequestDecoder, OverridePasswordFieldsExtract,
 };
 
 pub struct PbChangePasswordRequestDecoder {
@@ -18,6 +18,25 @@ impl ChangePasswordRequestDecoder for PbChangePasswordRequestDecoder {
     fn decode(self) -> ChangePasswordFieldsExtract {
         ChangePasswordFieldsExtract {
             current_password: self.request.current_password,
+            new_password: self.request.new_password,
+        }
+    }
+}
+
+pub struct PbOverridePasswordRequestDecoder {
+    request: OverridePasswordRequestPb,
+}
+
+impl PbOverridePasswordRequestDecoder {
+    pub const fn new(request: OverridePasswordRequestPb) -> Self {
+        Self { request }
+    }
+}
+
+impl OverridePasswordRequestDecoder for PbOverridePasswordRequestDecoder {
+    fn decode(self) -> OverridePasswordFieldsExtract {
+        OverridePasswordFieldsExtract {
+            login_id: self.request.login_id,
             new_password: self.request.new_password,
         }
     }
