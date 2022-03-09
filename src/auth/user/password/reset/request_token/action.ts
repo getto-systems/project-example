@@ -4,10 +4,10 @@ import {
     StatefulApplicationAction,
     AbstractStatefulApplicationAction,
 } from "../../../../../z_vendor/getto-application/action/action"
-import { initInputLoginIDAction } from "../../../login_id/input/action"
+import { initInputLoginIdAction } from "../../../login_id/input/action"
 import { initValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
 
-import { InputLoginIDAction } from "../../../login_id/input/action"
+import { InputLoginIdAction } from "../../../login_id/input/action"
 import { ValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
 
 import { RequestResetTokenRemote } from "./infra"
@@ -18,7 +18,7 @@ import { RequestResetTokenError, RequestResetTokenFields } from "./data"
 import { ConvertBoardResult } from "../../../../../z_vendor/getto-application/board/kernel/data"
 
 export interface RequestResetTokenAction extends StatefulApplicationAction<RequestResetTokenState> {
-    readonly loginID: InputLoginIDAction
+    readonly loginId: InputLoginIdAction
     readonly validate: ValidateBoardAction
 
     clear(): RequestResetTokenState
@@ -50,7 +50,7 @@ export function initRequestResetTokenAction(
     return new Action(material)
 }
 
-const requestResetTokenFieldNames = ["loginID"] as const
+const requestResetTokenFieldNames = ["loginId"] as const
 type RequestResetTokenFieldName = typeof requestResetTokenFieldNames[number]
 
 class Action
@@ -59,7 +59,7 @@ class Action
 {
     readonly initialState = initialState
 
-    readonly loginID: InputLoginIDAction
+    readonly loginId: InputLoginIdAction
     readonly validate: ValidateBoardAction
 
     material: RequestResetTokenMaterial
@@ -68,13 +68,13 @@ class Action
     constructor(material: RequestResetTokenMaterial) {
         super({
             terminate: () => {
-                this.loginID.terminate()
+                this.loginId.terminate()
                 this.validate.terminate()
             },
         })
         this.material = material
 
-        const loginID = initInputLoginIDAction()
+        const loginId = initInputLoginIdAction()
 
         const { validate, checker } = initValidateBoardAction(
             {
@@ -82,31 +82,31 @@ class Action
             },
             {
                 converter: (): ConvertBoardResult<RequestResetTokenFields> => {
-                    const loginIDResult = loginID.checker.check()
-                    if (!loginIDResult.valid) {
+                    const loginIdResult = loginId.checker.check()
+                    if (!loginIdResult.valid) {
                         return { valid: false }
                     }
                     return {
                         valid: true,
                         value: {
-                            loginID: loginIDResult.value,
+                            loginId: loginIdResult.value,
                         },
                     }
                 },
             },
         )
 
-        this.loginID = loginID.input
+        this.loginId = loginId.input
         this.validate = validate
         this.checker = checker
 
-        this.loginID.validate.subscriber.subscribe((result) =>
-            checker.update("loginID", result.valid),
+        this.loginId.validate.subscriber.subscribe((result) =>
+            checker.update("loginId", result.valid),
         )
     }
 
     clear(): RequestResetTokenState {
-        this.loginID.clear()
+        this.loginId.clear()
         this.validate.clear()
         return this.currentState()
     }

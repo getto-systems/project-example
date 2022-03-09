@@ -5,7 +5,17 @@ use std::{
 
 use chrono::{DateTime, Utc};
 
-use crate::z_lib::repository::helper::infra_error;
+use crate::{
+    auth::user::{
+        login_id::change::{
+            data::OverrideLoginIdRepositoryError, infra::OverrideLoginIdRepository,
+        },
+        password::change::{
+            data::OverridePasswordRepositoryError, infra::OverridePasswordRepository,
+        },
+    },
+    z_lib::repository::helper::infra_error,
+};
 
 use crate::auth::user::{
     account::search::infra::SearchAuthUserAccountRepository,
@@ -190,11 +200,19 @@ impl MemoryAuthUserMap {
         store
     }
 
+    fn has_login_id(&self, login_id: &LoginId) -> bool {
+        self.login_id.contains_key(login_id.as_str())
+    }
+
     fn insert_login_id(&mut self, login_id: LoginId, user_id: AuthUserId) -> &mut Self {
         self.login_id
             .insert(login_id.clone().extract(), user_id.clone());
         self.user_id.insert(user_id.extract(), login_id);
         self
+    }
+    fn update_login_id(&mut self, user_id: AuthUserId, login_id: LoginId) {
+        self.login_id.insert(login_id.clone().extract(), user_id.clone());
+        self.user_id.insert(user_id.extract(), login_id);
     }
     fn get_user_id(&self, login_id: &LoginId) -> Option<&AuthUserId> {
         self.login_id.get(login_id.as_str())
@@ -320,6 +338,39 @@ fn search<'a>(
 }
 
 #[async_trait::async_trait]
+impl<'store> OverrideLoginIdRepository for MemoryAuthUserRepository<'store> {
+    async fn override_login_id<'a>(
+        &self,
+        login_id: &'a LoginId,
+        new_login_id: LoginId,
+    ) -> Result<(), OverrideLoginIdRepositoryError> {
+        override_login_id(self, login_id, new_login_id)
+    }
+}
+fn override_login_id<'store, 'a>(
+    repository: &MemoryAuthUserRepository<'store>,
+    login_id: &'a LoginId,
+    new_login_id: LoginId,
+) -> Result<(), OverrideLoginIdRepositoryError> {
+    {
+        let mut store = repository.store.lock().unwrap();
+
+        let user_id = store
+            .get_user_id(login_id)
+            .ok_or(OverrideLoginIdRepositoryError::UserNotFound)
+            .map(|id| id.clone())?;
+
+        if store.has_login_id(&new_login_id) {
+            return Err(OverrideLoginIdRepositoryError::LoginIdAlreadyRegistered)
+        }
+
+        store.update_login_id(user_id, new_login_id);
+    }
+
+    Ok(())
+}
+
+#[async_trait::async_trait]
 impl<'store> VerifyPasswordRepository for MemoryAuthUserRepository<'store> {
     async fn verify_password<'a>(
         &self,
@@ -395,8 +446,40 @@ fn change_password<'store, 'a>(
 
         let mut store = repository.store.lock().unwrap();
 
-        // 実際のデータベースには registered_at も保存する必要がある
         store.insert_password(user_id.clone(), hashed_password);
+    }
+
+    Ok(())
+}
+
+#[async_trait::async_trait]
+impl<'store> OverridePasswordRepository for MemoryAuthUserRepository<'store> {
+    async fn override_password<'a>(
+        &self,
+        login_id: &'a LoginId,
+        hasher: impl 'a + AuthUserPasswordHasher,
+    ) -> Result<(), OverridePasswordRepositoryError> {
+        override_password(self, login_id, hasher)
+    }
+}
+fn override_password<'store, 'a>(
+    repository: &MemoryAuthUserRepository<'store>,
+    login_id: &'a LoginId,
+    hasher: impl 'a + AuthUserPasswordHasher,
+) -> Result<(), OverridePasswordRepositoryError> {
+    {
+        let hashed_password = hasher
+            .hash_password()
+            .map_err(OverridePasswordRepositoryError::PasswordHashError)?;
+
+        let mut store = repository.store.lock().unwrap();
+
+        let user_id = store
+            .get_user_id(login_id)
+            .ok_or(OverridePasswordRepositoryError::UserNotFound)
+            .map(|id| id.clone())?;
+
+        store.insert_password(user_id, hashed_password);
     }
 
     Ok(())

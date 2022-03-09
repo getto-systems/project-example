@@ -18,8 +18,7 @@ export const docs_changePassword: DocsAction = {
         },
         {
             type: "success",
-            action: ["アプリケーションのロード", "認証チケット継続更新の開始"],
-            help: ["コンテンツアクセストークンが cookie で返される"],
+            action: ["パスワード変更完了の通知"],
         },
         {
             type: "error",

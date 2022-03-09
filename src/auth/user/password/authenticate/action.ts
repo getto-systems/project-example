@@ -3,11 +3,11 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
-import { initInputLoginIDAction } from "../../login_id/input/action"
+import { initInputLoginIdAction } from "../../login_id/input/action"
 import { initInputPasswordAction } from "../input/action"
 import { initValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
 
-import { InputLoginIDAction } from "../../login_id/input/action"
+import { InputLoginIdAction } from "../../login_id/input/action"
 import { InputPasswordAction } from "../input/action"
 import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
 
@@ -33,7 +33,7 @@ import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 
 export interface AuthenticatePasswordAction
     extends StatefulApplicationAction<AuthenticatePasswordState> {
-    readonly loginID: InputLoginIDAction
+    readonly loginId: InputLoginIdAction
     readonly password: InputPasswordAction
     readonly validate: ValidateBoardAction
 
@@ -42,7 +42,7 @@ export interface AuthenticatePasswordAction
     loadError(err: LoadScriptError): Promise<AuthenticatePasswordState>
 }
 
-export const authenticatePasswordFieldNames = ["loginID", "password"] as const
+export const authenticatePasswordFieldNames = ["loginId", "password"] as const
 export type AuthenticatePasswordFieldName = typeof authenticatePasswordFieldNames[number]
 
 export type AuthenticatePasswordState =
@@ -85,7 +85,7 @@ class Action
 {
     readonly initialState = initialState
 
-    readonly loginID: InputLoginIDAction
+    readonly loginId: InputLoginIdAction
     readonly password: InputPasswordAction
     readonly validate: ValidateBoardAction
 
@@ -95,14 +95,14 @@ class Action
     constructor(material: AuthenticatePasswordMaterial) {
         super({
             terminate: () => {
-                this.loginID.terminate()
+                this.loginId.terminate()
                 this.password.terminate()
                 this.validate.terminate()
             },
         })
         this.material = material
 
-        const loginID = initInputLoginIDAction()
+        const loginId = initInputLoginIdAction()
         const password = initInputPasswordAction()
         const { validate, checker } = initValidateBoardAction(
             {
@@ -111,16 +111,16 @@ class Action
             {
                 converter: (): ConvertBoardResult<AuthenticatePasswordFields> => {
                     const result = {
-                        loginID: loginID.checker.check(),
+                        loginId: loginId.checker.check(),
                         password: password.checker.check(),
                     }
-                    if (!result.loginID.valid || !result.password.valid) {
+                    if (!result.loginId.valid || !result.password.valid) {
                         return { valid: false }
                     }
                     return {
                         valid: true,
                         value: {
-                            loginID: result.loginID.value,
+                            loginId: result.loginId.value,
                             password: result.password.value,
                         },
                     }
@@ -128,13 +128,13 @@ class Action
             },
         )
 
-        this.loginID = loginID.input
+        this.loginId = loginId.input
         this.password = password.input
         this.validate = validate
         this.checker = checker
 
-        this.loginID.validate.subscriber.subscribe((result) =>
-            checker.update("loginID", result.valid),
+        this.loginId.validate.subscriber.subscribe((result) =>
+            checker.update("loginId", result.valid),
         )
         this.password.validate.subscriber.subscribe((result) =>
             checker.update("password", result.valid),
@@ -142,7 +142,7 @@ class Action
     }
 
     clear(): AuthenticatePasswordState {
-        this.loginID.clear()
+        this.loginId.clear()
         this.password.clear()
         this.validate.clear()
         return this.initialState

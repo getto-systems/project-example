@@ -1,6 +1,6 @@
 import { DocsAction } from "../../../../../z_vendor/getto-application/docs/data"
 import { docs_authUser } from "../../../docs"
-import { docs_loginID } from "../../../login_id/docs"
+import { docs_loginId } from "../../../login_id/docs"
 import { docs_reset } from "../docs"
 
 export const docs_requestResetToken: DocsAction = {
@@ -29,5 +29,5 @@ export const docs_requestResetToken: DocsAction = {
             err: ["ログインIDが無効", "ログインIDに紐付いたトークンの送信先が登録されていない"],
         },
     ],
-    data: [docs_authUser, docs_reset, docs_loginID],
+    data: [docs_authUser, docs_reset, docs_loginId],
 }

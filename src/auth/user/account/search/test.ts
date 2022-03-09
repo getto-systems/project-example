@@ -39,8 +39,8 @@ describe("SearchAuthUserAccount", () => {
         await resource.search.ignitionState
 
         await runner(async () => {
-            store.loginID.set(markBoardValue("MY-LOGIN-ID"))
-            resource.search.loginID.input.publisher.post()
+            store.loginId.set(markBoardValue("MY-LOGIN-ID"))
+            resource.search.loginId.input.publisher.post()
             return resource.search.search()
         }).then((stack) => {
             expect(stack).toEqual([
@@ -112,10 +112,10 @@ describe("SearchAuthUserAccount", () => {
     test("clear", () => {
         const { resource, store } = standard()
 
-        store.loginID.set(markBoardValue("MY-LOGIN-ID"))
+        store.loginId.set(markBoardValue("MY-LOGIN-ID"))
         resource.search.clear()
 
-        expect(store.loginID.get()).toEqual("")
+        expect(store.loginId.get()).toEqual("")
     })
 
     test("focus / close", async () => {
@@ -126,8 +126,8 @@ describe("SearchAuthUserAccount", () => {
         await resource.search.ignitionState
 
         await runner(async () => {
-            const user = { loginID: "user-1", grantedRoles: [] }
-            const another = { loginID: "user-another", grantedRoles: [] }
+            const user = { loginId: "user-1", grantedRoles: [] }
+            const another = { loginId: "user-another", grantedRoles: [] }
 
             resource.search.detail.focus(user)
             expect(resource.search.detail.isFocused(user)).toBe(true)
@@ -142,7 +142,7 @@ describe("SearchAuthUserAccount", () => {
             expect(stack).toEqual([
                 {
                     type: "focus-on",
-                    user: { loginID: "user-1", grantedRoles: [] },
+                    user: { loginId: "user-1", grantedRoles: [] },
                 },
                 { type: "initial-detail" },
             ])
@@ -160,7 +160,7 @@ describe("SearchAuthUserAccount", () => {
             expect(stack).toEqual([
                 {
                     type: "focus-detected",
-                    user: { loginID: "user-1", grantedRoles: [] },
+                    user: { loginId: "user-1", grantedRoles: [] },
                 },
             ])
         })
@@ -184,7 +184,7 @@ describe("SearchAuthUserAccount", () => {
             subscribe: (handler) => {
                 resource.search.subscriber.subscribe(handler)
                 resource.search.observe.subscriber.subscribe(handler)
-                resource.search.loginID.observe.subscriber.subscribe(handler)
+                resource.search.loginId.observe.subscriber.subscribe(handler)
             },
             unsubscribe: () => null,
         })
@@ -228,7 +228,7 @@ function initResource(
 ): Readonly<{
     resource: Readonly<{ search: SearchAuthUserAccountAction }>
     store: Readonly<{
-        loginID: BoardValueStore
+        loginId: BoardValueStore
     }>
 }> {
     const urlStore = { current: currentURL }
@@ -249,10 +249,10 @@ function initResource(
     }
 
     const store = {
-        loginID: mockBoardValueStore(),
+        loginId: mockBoardValueStore(),
     }
 
-    resource.search.loginID.input.connector.connect(store.loginID)
+    resource.search.loginId.input.connector.connect(store.loginId)
 
     return { resource, store }
 }
@@ -284,7 +284,7 @@ const standard_response: SearchAuthUserAccountRemoteResponse = {
     page: { offset: 0, limit: 1000, all: 245 },
     sort: { key: defaultSearchAuthUserAccountSort, order: "normal" },
     users: [
-        { loginID: "user-1", grantedRoles: [] },
-        { loginID: "user-2", grantedRoles: [] },
+        { loginId: "user-1", grantedRoles: [] },
+        { loginId: "user-2", grantedRoles: [] },
     ],
 }

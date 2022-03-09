@@ -34,7 +34,7 @@ const CONTINUOUS_RENEW_START_AT = new Date("2020-01-01 10:00:01")
 // renew ごとに次の時刻に移行
 const CONTINUOUS_RENEW_AT = [new Date("2020-01-01 10:01:00"), new Date("2020-01-01 11:00:00")]
 
-const VALID_LOGIN = { loginID: "login-id", password: "password" } as const
+const VALID_LOGIN = { loginId: "login-id", password: "password" } as const
 
 describe("AuthenticatePassword", () => {
     test("submit valid login-id and password", async () => {
@@ -52,7 +52,7 @@ describe("AuthenticatePassword", () => {
         const runner = setupActionTestRunner(resource.subscriber)
 
         await runner(async () => {
-            store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
+            store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
             store.password.set(markBoardValue(VALID_LOGIN.password))
 
             return resource.submit()
@@ -89,7 +89,7 @@ describe("AuthenticatePassword", () => {
         const runner = setupActionTestRunner(resource.subscriber)
 
         await runner(() => {
-            store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
+            store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
             store.password.set(markBoardValue(VALID_LOGIN.password))
 
             return resource.submit()
@@ -126,11 +126,11 @@ describe("AuthenticatePassword", () => {
         const { view, store } = standard()
         const resource = view.resource
 
-        store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
+        store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
         store.password.set(markBoardValue(VALID_LOGIN.password))
         resource.clear()
 
-        expect(store.loginID.get()).toEqual("")
+        expect(store.loginId.get()).toEqual("")
         expect(store.password.get()).toEqual("")
     })
 
@@ -155,7 +155,7 @@ describe("AuthenticatePassword", () => {
             subscribe: (handler) => {
                 resource.subscriber.subscribe(handler)
                 resource.validate.subscriber.subscribe(handler)
-                resource.loginID.validate.subscriber.subscribe(handler)
+                resource.loginId.validate.subscriber.subscribe(handler)
                 resource.password.validate.subscriber.subscribe(handler)
             },
             unsubscribe: () => null,
@@ -197,7 +197,7 @@ function initView(
 ): Readonly<{
     view: ApplicationView<AuthenticatePasswordAction>
     store: Readonly<{
-        loginID: BoardValueStore
+        loginId: BoardValueStore
         password: BoardValueStore
     }>
 }> {
@@ -226,11 +226,11 @@ function initView(
     )
 
     const store = {
-        loginID: mockBoardValueStore(),
+        loginId: mockBoardValueStore(),
         password: mockBoardValueStore(),
     }
 
-    view.resource.loginID.input.connector.connect(store.loginID)
+    view.resource.loginId.input.connector.connect(store.loginId)
     view.resource.password.input.connector.connect(store.password)
 
     return { view, store }

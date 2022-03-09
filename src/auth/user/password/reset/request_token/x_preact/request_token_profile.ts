@@ -16,7 +16,7 @@ import {
 import { icon_spinner } from "../../../../../../core/x_preact/design/icon"
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
-import { InputLoginIDEntry } from "../../../../login_id/input/x_preact/input"
+import { InputLoginIdEntry } from "../../../../login_id/input/x_preact/input"
 
 import { RequestResetTokenError } from "../data"
 import { box } from "../../../../../../z_vendor/getto-css/preact/design/box"
@@ -55,6 +55,7 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
         if (editableState.isEditable) {
             switch (state.type) {
                 case "initial-request-token":
+                case "succeed-to-request-token":
                     return formBox({ type: validateState })
 
                 case "try-to-request-token":
@@ -63,14 +64,13 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
                 case "take-longtime-to-request-token":
                     return formBox({ type: "take-longtime" })
 
-                case "succeed-to-request-token":
-                    return buttonBox({ type: "success" })
-
                 case "failed-to-request-token":
                     return formBox({ type: validateState, err: requestTokenError(state.err) })
             }
         } else {
-            return buttonBox({ type: "initial" })
+            return buttonBox({
+                type: state.type === "succeed-to-request-token" ? "success" : "initial",
+            })
         }
     }
 
@@ -96,7 +96,7 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
                         body: openButton(),
                         footer: [
                             notice_success([
-                                html`パスワードリセットのため、<br />
+                                html`パスワードリセットのための<br />
                                     トークンをメールで送信しました`,
                             ]),
                             html`<p>
@@ -115,6 +115,7 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
+                props.requestToken.clear()
                 props.editable.open()
             }
         }
@@ -128,8 +129,8 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
             box({
                 title: "パスワードリセットトークン送信",
                 body: [
-                    h(InputLoginIDEntry, {
-                        field: props.requestToken.loginID,
+                    h(InputLoginIdEntry, {
+                        field: props.requestToken.loginId,
                         title: "ログインID",
                         help: ["確認のため、ログインIDを入力します"],
                     }),

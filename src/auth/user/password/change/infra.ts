@@ -1,6 +1,6 @@
 import { RemoteResult } from "../../../../z_lib/ui/remote/infra"
-import { AuthUserAccountBasket } from "../../account/kernel/data"
 
+import { AuthUserAccountBasket } from "../../account/kernel/data"
 import { ChangePasswordFields, ChangePasswordRemoteError, OverridePasswordFields } from "./data"
 
 export interface ChangePasswordRemote {

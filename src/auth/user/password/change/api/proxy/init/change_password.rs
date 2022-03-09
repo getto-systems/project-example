@@ -7,7 +7,7 @@ use crate::auth::user::password::change::y_protobuf::service::{
 
 use crate::auth::x_outside_feature::feature::AuthOutsideService;
 
-use crate::auth::user::password::change::x_tonic::route::ServiceChange;
+use crate::auth::user::password::change::x_tonic::route::ServiceChangePassword;
 
 use crate::z_lib::service::init::authorizer::GoogleServiceAuthorizer;
 
@@ -26,14 +26,14 @@ use crate::{
     z_lib::message::data::MessageError,
 };
 
-pub struct ProxyService<'a> {
+pub struct ChangePasswordProxyService<'a> {
     service_url: &'static str,
     request_id: &'a str,
     authorizer: GoogleServiceAuthorizer<'a>,
     body: String,
 }
 
-impl<'a> ProxyService<'a> {
+impl<'a> ChangePasswordProxyService<'a> {
     pub fn new(service: &'a AuthOutsideService, request_id: &'a str, body: String) -> Self {
         Self {
             service_url: service.service_url,
@@ -45,11 +45,11 @@ impl<'a> ProxyService<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthProxyService for ProxyService<'a> {
+impl<'a> AuthProxyService for ChangePasswordProxyService<'a> {
     type Response = AuthProxyResponse;
 
     fn name(&self) -> &str {
-        ServiceChange::name()
+        ServiceChangePassword::name()
     }
     async fn call(self, metadata: AuthMetadataContent) -> Result<Self::Response, AuthProxyError> {
         call(self, metadata).await
@@ -57,7 +57,7 @@ impl<'a> AuthProxyService for ProxyService<'a> {
 }
 
 async fn call<'a>(
-    service: ProxyService<'a>,
+    service: ChangePasswordProxyService<'a>,
     metadata: AuthMetadataContent,
 ) -> Result<AuthProxyResponse, AuthProxyError> {
     let mut client = ChangePasswordPbClient::new(
@@ -80,7 +80,7 @@ async fn call<'a>(
     .map_err(|err| infra_error("metadata error", err))?;
 
     let response = client
-        .change(request)
+        .change_password(request)
         .await
         .map_err(AuthProxyError::from)?
         .into_inner();

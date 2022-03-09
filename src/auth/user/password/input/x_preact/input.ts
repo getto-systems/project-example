@@ -18,7 +18,11 @@ import { ValidatePasswordError } from "../data"
 import { InputPasswordAction, ValidatePasswordState } from "../action"
 
 type EntryProps = Readonly<{ field: InputPasswordAction }> &
-    Partial<{ title: VNodeContent; help: readonly VNodeContent[] }>
+    Partial<{
+        title: VNodeContent
+        help: readonly VNodeContent[]
+        autocomplete: string
+    }>
 export function InputPasswordEntry(resource: EntryProps): VNode {
     return h(InputPasswordComponent, {
         ...resource,
@@ -42,7 +46,11 @@ export function InputPasswordComponent(props: Props): VNode {
     function content() {
         const content = {
             title: title(),
-            body: h(InputBoardComponent, { type: "password", input: props.field.input }),
+            body: h(InputBoardComponent, {
+                type: "password",
+                input: props.field.input,
+                autocomplete: props.autocomplete,
+            }),
             help: [...help(), characterHelp()],
         }
 

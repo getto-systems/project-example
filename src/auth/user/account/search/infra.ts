@@ -12,16 +12,16 @@ export interface UpdateSearchAuthUserAccountFieldsQuery {
 }
 
 export interface FocusAuthUserAccountDetecter {
-    (): DetectLoginIDResult
+    (): DetectLoginIdResult
 }
 export interface UpdateFocusAuthUserAccountQuery {
     focus(user: AuthUserAccountBasket): void
     clear(): void
 }
 
-export type DetectLoginIDResult =
+export type DetectLoginIdResult =
     | Readonly<{ found: false }>
-    | Readonly<{ found: true; loginID: string }>
+    | Readonly<{ found: true; loginId: string }>
 
 export interface SearchAuthUserAccountRemote {
     (fields: SearchAuthUserAccountFilter): Promise<SearchAuthUserAccountRemoteResult>

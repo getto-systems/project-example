@@ -6,7 +6,7 @@ import {
 import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 import { nextSort } from "../../../../z_lib/ui/search/sort/helper"
 
-import { initSearchLoginIDAction, SearchLoginIDAction } from "../../login_id/input/action"
+import { initSearchLoginIdAction, SearchLoginIdAction } from "../../login_id/input/action"
 import {
     initObserveBoardAction,
     ObserveBoardAction,
@@ -42,7 +42,7 @@ import {
 import { AuthUserAccountBasket } from "../kernel/data"
 
 export interface SearchAuthUserAccountAction extends ListAuthUserAccountAction {
-    readonly loginID: SearchLoginIDAction
+    readonly loginId: SearchLoginIdAction
     readonly observe: ObserveBoardAction
 
     clear(): SearchAuthUserAccountState
@@ -112,7 +112,7 @@ export function initSearchAuthUserAccountAction(
     return new Action(material)
 }
 
-const searchAuthUserAccountFieldNames = ["loginID"] as const
+const searchAuthUserAccountFieldNames = ["loginId"] as const
 
 class Action
     extends AbstractStatefulApplicationAction<SearchAuthUserAccountState>
@@ -122,7 +122,7 @@ class Action
 
     readonly detail: DetailAuthUserAccountAction
 
-    readonly loginID: SearchLoginIDAction
+    readonly loginId: SearchLoginIdAction
     readonly offset: SearchOffsetAction
     readonly columns: SearchColumnsAction
     readonly observe: ObserveBoardAction
@@ -141,7 +141,7 @@ class Action
             ignite: async () => this.load(),
             terminate: () => {
                 this.detail.terminate()
-                this.loginID.terminate()
+                this.loginId.terminate()
                 this.offset.terminate()
                 this.columns.terminate()
                 this.observe.terminate()
@@ -150,7 +150,7 @@ class Action
 
         const initialFilter = material.shell.detectFilter()
 
-        const loginID = initSearchLoginIDAction(initialFilter.loginID)
+        const loginId = initSearchLoginIdAction(initialFilter.loginId)
         const offset = initSearchOffsetAction(initialFilter.offset)
         const columns = initSearchColumnsAction(material.infra)
         const { observe, checker } = initObserveBoardAction({
@@ -160,7 +160,7 @@ class Action
         this.setFilterOnSearch = () =>
             this.setFilter({
                 offset: offset.reset(),
-                loginID: loginID.pin(),
+                loginId: loginId.pin(),
             })
         this.setFilterOnLoad = () =>
             this.setFilter({
@@ -176,12 +176,12 @@ class Action
 
         this.detail = new DetailAction({
             infra: {
-                detectUser: async (loginID): Promise<DetectUserResult> => {
+                detectUser: async (loginId): Promise<DetectUserResult> => {
                     const response = searchResponse(await this.ignitionState)
                     if (!response.found) {
                         return { found: false }
                     }
-                    const user = response.response.users.find((user) => user.loginID === loginID)
+                    const user = response.response.users.find((user) => user.loginId === loginId)
                     if (user === undefined) {
                         return { found: false }
                     }
@@ -191,15 +191,15 @@ class Action
             shell: material.shell,
         })
 
-        this.loginID = loginID.input
+        this.loginId = loginId.input
         this.offset = offset.input
         this.columns = columns
         this.observe = observe
 
         this.filter = initialFilter
 
-        this.loginID.observe.subscriber.subscribe((result) =>
-            checker.update("loginID", result.hasChanged),
+        this.loginId.observe.subscriber.subscribe((result) =>
+            checker.update("loginId", result.hasChanged),
         )
     }
 
@@ -213,7 +213,7 @@ class Action
     }
 
     clear(): SearchAuthUserAccountState {
-        this.loginID.clear()
+        this.loginId.clear()
         return this.currentState()
     }
     async search(): Promise<SearchAuthUserAccountState> {
@@ -276,7 +276,7 @@ type DetailMaterial = Readonly<{
 }>
 
 type DetailInfra = Readonly<{
-    detectUser(loginID: string): Promise<DetectUserResult>
+    detectUser(loginId: string): Promise<DetectUserResult>
 }>
 type DetectUserResult =
     | Readonly<{ found: false }>
@@ -302,7 +302,7 @@ class DetailAction
                 if (!focus.found) {
                     return this.currentState()
                 }
-                const user = await this.material.infra.detectUser(focus.loginID)
+                const user = await this.material.infra.detectUser(focus.loginId)
                 if (!user.found) {
                     return this.post({ type: "focus-failed" })
                 }
@@ -330,7 +330,7 @@ class DetailAction
 
             case "focus-detected":
             case "focus-on":
-                return user.loginID === state.user.loginID
+                return user.loginId === state.user.loginId
         }
     }
 }

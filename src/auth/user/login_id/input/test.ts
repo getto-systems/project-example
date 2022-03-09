@@ -3,9 +3,9 @@ import { setupActionTestRunner } from "../../../../z_vendor/getto-application/ac
 import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 
-import { initInputLoginIDAction } from "./action"
+import { initInputLoginIdAction } from "./action"
 
-describe("InputLoginID", () => {
+describe("InputLoginId", () => {
     test("validate; valid input", async () => {
         const { action, store } = standard()
 
@@ -93,7 +93,7 @@ describe("InputLoginID", () => {
 })
 
 function standard() {
-    const { input: action } = initInputLoginIDAction()
+    const { input: action } = initInputLoginIdAction()
     const store = mockBoardValueStore()
     action.input.connector.connect(store)
 

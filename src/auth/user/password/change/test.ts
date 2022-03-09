@@ -97,10 +97,10 @@ describe("ChangePassword", () => {
 })
 
 function standard() {
-    return initResource(standard_change())
+    return initResource(standard_changeRemote())
 }
 function takeLongtime_elements() {
-    return initResource(takeLongtime_change())
+    return initResource(takeLongtime_changeRemote())
 }
 
 function initResource(changePasswordRemote: ChangePasswordRemote): Readonly<{
@@ -134,10 +134,10 @@ function initResource(changePasswordRemote: ChangePasswordRemote): Readonly<{
     return { resource, store }
 }
 
-function standard_change(): ChangePasswordRemote {
+function standard_changeRemote(): ChangePasswordRemote {
     return async () => standard_changeRemoteResult()
 }
-function takeLongtime_change(): ChangePasswordRemote {
+function takeLongtime_changeRemote(): ChangePasswordRemote {
     return async () => ticker({ wait_millisecond: 64 }, () => standard_changeRemoteResult())
 }
 function standard_changeRemoteResult(): ChangePasswordRemoteResult {

@@ -92,7 +92,8 @@ export function ManageUserAccountPageComponent(props: ManageUserAccountPageResou
                     body: mainBody(
                         h(DetailAuthUserAccountEntry, {
                             detail: props.search.detail,
-                            override: props.override,
+                            overrideLoginId: props.overrideLoginId,
+                            overridePassword: props.overridePassword,
                             user:
                                 detailState.type === "focus-failed"
                                     ? { found: false }

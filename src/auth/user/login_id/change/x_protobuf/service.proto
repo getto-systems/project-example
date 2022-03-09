@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package auth.user.loginId.change.service;
+
+service OverrideLoginIdPb {
+    rpc OverrideLoginId (OverrideLoginIdRequestPb) returns (OverrideLoginIdResponsePb);
+}
+message OverrideLoginIdRequestPb {
+    string login_id = 1;
+    string new_login_id = 2;
+}
+message OverrideLoginIdResponsePb {
+    bool success = 1;
+    OverrideLoginIdErrorKindPb err = 2;
+}
+enum OverrideLoginIdErrorKindPb {
+    INVALID_LOGIN_ID = 0;
+    ALREADY_REGISTERED = 1;
+}

@@ -47,7 +47,7 @@ function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStruc
         tableCell("login-id", (key) => ({
             label: "ログインID",
             header: sort(key),
-            column: loginID,
+            column: loginId,
         }))
             .alwaysVisible()
             .border(["leftDouble"]),
@@ -76,11 +76,11 @@ function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStruc
     }
 
     function rowKey(row: AuthUserAccountBasket): string {
-        return row.loginID
+        return row.loginId
     }
 
-    function loginID(row: AuthUserAccountBasket): VNodeContent {
-        return row.loginID
+    function loginId(row: AuthUserAccountBasket): VNodeContent {
+        return row.loginId
     }
     function grantedRoles(row: AuthUserAccountBasket): VNodeContent {
         return row.grantedRoles.join(" / ")

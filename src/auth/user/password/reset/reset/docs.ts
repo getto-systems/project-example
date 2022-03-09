@@ -1,6 +1,6 @@
 import { DocsAction } from "../../../../../z_vendor/getto-application/docs/data"
 import { docs_authUser } from "../../../docs"
-import { docs_loginID } from "../../../login_id/docs"
+import { docs_loginId } from "../../../login_id/docs"
 import { docs_password } from "../../docs"
 import { docs_reset } from "../docs"
 
@@ -41,5 +41,5 @@ export const docs_resetPassword: DocsAction = {
             err: ["リセットトークンかログインIDかパスワードが無効"],
         },
     ],
-    data: [docs_authUser, docs_reset, docs_loginID, docs_password],
+    data: [docs_authUser, docs_reset, docs_loginId, docs_password],
 }

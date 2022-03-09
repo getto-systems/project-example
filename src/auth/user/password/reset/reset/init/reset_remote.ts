@@ -11,71 +11,85 @@ import { decodeProtobuf, encodeProtobuf } from "../../../../../../z_vendor/proto
 
 import { RemoteOutsideFeature } from "../../../../../../z_lib/ui/remote/feature"
 
-import { Clock } from "../../../../../../z_lib/ui/clock/infra"
-import { ResetPasswordRemote } from "../infra"
-
 import { convertCheckRemote } from "../../../../../ticket/check/convert"
+
+import { Clock } from "../../../../../../z_lib/ui/clock/infra"
+import { ResetPasswordRemote, ResetPasswordRemoteResult } from "../infra"
+
+import { ResetToken } from "../../../input/data"
+import { ResetPasswordFields } from "../data"
 
 export function newResetPasswordRemote(
     feature: RemoteOutsideFeature,
     clock: Clock,
 ): ResetPasswordRemote {
-    return async (resetToken, fields) => {
-        try {
-            const mock = false
-            if (mock) {
-                return {
-                    success: true,
-                    value: convertCheckRemote(clock, []),
-                }
-            }
+    return (resetToken, fields) => fetchRemote(feature, clock, resetToken, fields)
+}
 
-            const opts = fetchOptions({
-                serverURL: env.apiServerURL,
-                path: "/auth/user/password/reset",
-                method: "POST",
-                headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
-            })
-            const response = await fetch(opts.url, {
-                ...opts.options,
-                body: encodeProtobuf(
-                    pb.auth.user.password.reset.reset.service.ResetPasswordRequestPb,
-                    (message) => {
-                        message.resetToken = resetToken
-                        message.loginId = fields.loginID
-                        message.password = fields.password
-                    },
-                ),
-            })
-
-            if (!response.ok) {
-                return remoteCommonError(response.status)
-            }
-
-            const message = decodeProtobuf(
-                pb.auth.user.password.reset.reset.service.ResetPasswordMaskedResponsePb,
-                await response.text(),
-            )
-            if (!message.success) {
-                switch (message.err) {
-                    case pb.auth.user.password.reset.reset.service.ResetPasswordErrorKindPb
-                        .INVALID_RESET:
-                        return { success: false, err: { type: "invalid-reset" } }
-
-                    case pb.auth.user.password.reset.reset.service.ResetPasswordErrorKindPb
-                        .ALREADY_RESET:
-                        return { success: false, err: { type: "already-reset" } }
-
-                    default:
-                        return { success: false, err: { type: "invalid-reset" } }
-                }
-            }
+async function fetchRemote(
+    feature: RemoteOutsideFeature,
+    clock: Clock,
+    resetToken: ResetToken,
+    fields: ResetPasswordFields,
+): Promise<ResetPasswordRemoteResult> {
+    try {
+        const mock = false
+        if (mock) {
             return {
                 success: true,
-                value: convertCheckRemote(clock, message.roles?.grantedRoles || []),
+                value: convertCheckRemote(clock, []),
             }
-        } catch (err) {
-            return remoteInfraError(err)
         }
+
+        const opts = fetchOptions({
+            serverURL: env.apiServerURL,
+            path: "/auth/user/password/reset",
+            method: "POST",
+            headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
+        })
+        const response = await fetch(opts.url, {
+            ...opts.options,
+            body: encodeProtobuf(
+                pb.auth.user.password.reset.reset.service.ResetPasswordRequestPb,
+                (message) => {
+                    message.resetToken = resetToken
+                    message.loginId = fields.loginId
+                    message.password = fields.password
+                },
+            ),
+        })
+
+        if (!response.ok) {
+            return remoteCommonError(response.status)
+        }
+
+        const message = decodeProtobuf(
+            pb.auth.user.password.reset.reset.service.ResetPasswordMaskedResponsePb,
+            await response.text(),
+        )
+        if (!message.success) {
+            return errorResponse(message.err)
+        }
+        return {
+            success: true,
+            value: convertCheckRemote(clock, message.roles?.grantedRoles || []),
+        }
+    } catch (err) {
+        return remoteInfraError(err)
+    }
+}
+
+function errorResponse(
+    err: pb.auth.user.password.reset.reset.service.ResetPasswordErrorKindPb,
+): ResetPasswordRemoteResult {
+    switch (err) {
+        case pb.auth.user.password.reset.reset.service.ResetPasswordErrorKindPb.INVALID_RESET:
+            return { success: false, err: { type: "invalid-reset" } }
+
+        case pb.auth.user.password.reset.reset.service.ResetPasswordErrorKindPb.ALREADY_RESET:
+            return { success: false, err: { type: "already-reset" } }
+
+        default:
+            return { success: false, err: { type: "invalid-reset" } }
     }
 }

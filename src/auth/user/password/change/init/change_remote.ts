@@ -34,8 +34,8 @@ async function fetchRemote(
 
         const opts = fetchOptions({
             serverURL: env.apiServerURL,
-            path: "/auth/user/password/change",
-            method: "POST",
+            path: "/auth/user/password",
+            method: "PATCH",
             headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
         })
         const response = await fetch(opts.url, {

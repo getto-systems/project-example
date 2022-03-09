@@ -25,7 +25,7 @@ import { appendScript } from "../../../../../sign/x_preact/script"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
 
 import { ApplicationErrorComponent } from "../../../../../../avail/x_preact/application_error"
-import { InputLoginIDEntry } from "../../../../login_id/input/x_preact/input"
+import { InputLoginIdEntry } from "../../../../login_id/input/x_preact/input"
 import { InputPasswordEntry } from "../../../input/x_preact/input"
 
 import { ApplicationView } from "../../../../../../z_vendor/getto-application/action/action"
@@ -123,13 +123,15 @@ export function ResetPasswordComponent(props: Props): VNode {
             loginBox(siteInfo, {
                 title: resetTitle(),
                 body: [
-                    h(InputLoginIDEntry, {
-                        field: props.reset.loginID,
+                    h(InputLoginIdEntry, {
+                        field: props.reset.loginId,
                         help: ["入力したログインIDをもう一度入力してください"],
+                        autocomplete: "username",
                     }),
                     h(InputPasswordEntry, {
                         field: props.reset.password,
                         help: ["新しいパスワードを入力してください"],
+                        autocomplete: "new-password",
                     }),
                     buttons({ left: button(), right: clearButton() }),
                 ],
