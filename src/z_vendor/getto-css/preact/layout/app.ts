@@ -114,11 +114,16 @@ export function mainBody(content: VNodeContent): VNode {
     return html`<section class="main__body">${content}</section>`
 }
 
-export function sidebarBody(content: VNodeContent): VNode {
-    return html`<section class="sidebar__body">${content}</section>`
+export type SidebarBodyProps = Partial<{
+    id: string
+}>
+export function sidebarBody(content: VNodeContent, props: SidebarBodyProps = {}): VNode {
+    return html`<section id="${props.id}" class="sidebar__body">${content}</section>`
 }
-export function sidebarBody_grow(content: VNodeContent): VNode {
-    return html`<section class="sidebar__body sidebar__body_grow">${content}</section>`
+export function sidebarBody_grow(content: VNodeContent, props: SidebarBodyProps = {}): VNode {
+    return html`<section id="${props.id}" class="sidebar__body sidebar__body_grow">
+        ${content}
+    </section>`
 }
 
 export function mainFooter(copyright: VNodeContent): VNode {

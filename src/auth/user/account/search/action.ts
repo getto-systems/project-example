@@ -79,6 +79,7 @@ const initialSearchState: SearchAuthUserAccountState = { type: "initial-search" 
 export type DetailAuthUserAccountState =
     | Readonly<{ type: "initial-detail" }>
     | Readonly<{ type: "focus-failed" }>
+    | Readonly<{ type: "focus-detected"; user: AuthUserAccountBasket }>
     | Readonly<{ type: "focus-on"; user: AuthUserAccountBasket }>
 
 const initialDetailState: DetailAuthUserAccountState = { type: "initial-detail" }
@@ -305,7 +306,7 @@ class DetailAction
                 if (!user.found) {
                     return this.post({ type: "focus-failed" })
                 }
-                return this.focus(user.user)
+                return this.post({ type: "focus-detected", user: user.user })
             },
         })
         this.material = material
@@ -327,6 +328,7 @@ class DetailAction
             case "focus-failed":
                 return false
 
+            case "focus-detected":
             case "focus-on":
                 return user.loginID === state.user.loginID
         }
