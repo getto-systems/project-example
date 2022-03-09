@@ -29,7 +29,7 @@ export function scrollToFocused({ sidebarId, focusedId, isFirstTime }: ScrollToF
 
         if (isFirstTime) {
             sidebar.scrollTop = scrollTop({
-                currentScrollTop: 0,
+                baseScrollTop: 0,
                 scrollDiff: scrollDiff(props, threshold),
             })
             return
@@ -38,7 +38,7 @@ export function scrollToFocused({ sidebarId, focusedId, isFirstTime }: ScrollToF
         const scrollUnder = scrollDiff(props, threshold)
         if (scrollUnder < 0) {
             sidebar.scrollTop = scrollTop({
-                currentScrollTop: sidebar.scrollTop,
+                baseScrollTop: sidebar.scrollTop,
                 scrollDiff: scrollUnder,
             })
             return
@@ -47,7 +47,7 @@ export function scrollToFocused({ sidebarId, focusedId, isFirstTime }: ScrollToF
         const scrollOver = scrollDiff(props, 1 - threshold)
         if (scrollOver > 0) {
             sidebar.scrollTop = scrollTop({
-                currentScrollTop: sidebar.scrollTop,
+                baseScrollTop: sidebar.scrollTop,
                 scrollDiff: scrollOver,
             })
             return
@@ -62,10 +62,10 @@ export function scrollToFocused({ sidebarId, focusedId, isFirstTime }: ScrollToF
         return focused.top - (sidebar.top + sidebar.height * threshold)
     }
     function scrollTop({
-        currentScrollTop,
+        baseScrollTop,
         scrollDiff,
-    }: Readonly<{ currentScrollTop: number; scrollDiff: number }>): number {
-        const scrollTop = currentScrollTop + scrollDiff
+    }: Readonly<{ baseScrollTop: number; scrollDiff: number }>): number {
+        const scrollTop = baseScrollTop + scrollDiff
         if (scrollTop < 0) {
             return 0
         } else {
