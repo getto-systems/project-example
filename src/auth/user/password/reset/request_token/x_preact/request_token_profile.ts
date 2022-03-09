@@ -55,6 +55,7 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
         if (editableState.isEditable) {
             switch (state.type) {
                 case "initial-request-token":
+                case "succeed-to-request-token":
                     return formBox({ type: validateState })
 
                 case "try-to-request-token":
@@ -63,14 +64,13 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
                 case "take-longtime-to-request-token":
                     return formBox({ type: "take-longtime" })
 
-                case "succeed-to-request-token":
-                    return buttonBox({ type: "success" })
-
                 case "failed-to-request-token":
                     return formBox({ type: validateState, err: requestTokenError(state.err) })
             }
         } else {
-            return buttonBox({ type: "initial" })
+            return buttonBox({
+                type: state.type === "succeed-to-request-token" ? "success" : "initial",
+            })
         }
     }
 
@@ -96,7 +96,7 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
                         body: openButton(),
                         footer: [
                             notice_success([
-                                html`パスワードリセットのため、<br />
+                                html`パスワードリセットのための<br />
                                     トークンをメールで送信しました`,
                             ]),
                             html`<p>
@@ -115,6 +115,7 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
 
             function onClick(e: Event) {
                 e.preventDefault()
+                props.requestToken.clear()
                 props.editable.open()
             }
         }
