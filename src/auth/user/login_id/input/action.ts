@@ -1,4 +1,4 @@
-import { loginIDBoardConverter } from "./convert"
+import { loginIdBoardConverter } from "./convert"
 
 import { initBoardFieldObserver } from "../../../../z_vendor/getto-application/board/observe_field/init/observer"
 
@@ -18,26 +18,26 @@ import {
 import { BoardFieldChecker } from "../../../../z_vendor/getto-application/board/validate_field/infra"
 
 import { emptyBoardValue } from "../../../../z_vendor/getto-application/board/kernel/data"
-import { LoginID, ValidateLoginIDError } from "./data"
+import { LoginId, ValidateLoginIdError } from "./data"
 import { SingleValueFilter } from "../../../../z_lib/ui/search/kernel/data"
 
-export interface InputLoginIDAction extends ApplicationAction {
+export interface InputLoginIdAction extends ApplicationAction {
     readonly input: InputBoardAction
-    readonly validate: ValidateLoginIDAction
+    readonly validate: ValidateLoginIdAction
     clear(): void
 }
 
-export type ValidateLoginIDAction = ValidateBoardFieldAction<ValidateLoginIDError>
-export type ValidateLoginIDState = ValidateBoardFieldState<ValidateLoginIDError>
+export type ValidateLoginIdAction = ValidateBoardFieldAction<ValidateLoginIdError>
+export type ValidateLoginIdState = ValidateBoardFieldState<ValidateLoginIdError>
 
-export function initInputLoginIDAction(): Readonly<{
-    input: InputLoginIDAction
-    checker: BoardFieldChecker<LoginID, ValidateLoginIDError>
+export function initInputLoginIdAction(): Readonly<{
+    input: InputLoginIdAction
+    checker: BoardFieldChecker<LoginId, ValidateLoginIdError>
 }> {
     const { input, store, subscriber } = initInputBoardAction()
 
     const { validate, checker } = initValidateBoardFieldAction({
-        converter: () => loginIDBoardConverter(store.get()),
+        converter: () => loginIdBoardConverter(store.get()),
     })
 
     subscriber.subscribe(() => checker.check())
@@ -59,14 +59,14 @@ export function initInputLoginIDAction(): Readonly<{
     }
 }
 
-export interface SearchLoginIDAction extends ApplicationAction {
+export interface SearchLoginIdAction extends ApplicationAction {
     readonly input: InputBoardAction
     readonly observe: ObserveBoardFieldAction
     clear(): void
 }
 
-export function initSearchLoginIDAction(initial: SingleValueFilter): Readonly<{
-    input: SearchLoginIDAction
+export function initSearchLoginIdAction(initial: SingleValueFilter): Readonly<{
+    input: SearchLoginIdAction
     pin: { (): SingleValueFilter }
 }> {
     const { input, store, subscriber } = initInputBoardAction()

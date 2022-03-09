@@ -32,7 +32,7 @@ export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): Reque
                 body: encodeProtobuf(
                     pb.auth.user.password.reset.request_token.service.RequestResetTokenRequestPb,
                     (message) => {
-                        message.loginId = fields.loginID
+                        message.loginId = fields.loginId
                     },
                 ),
             })

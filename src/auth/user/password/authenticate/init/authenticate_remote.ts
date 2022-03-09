@@ -41,7 +41,7 @@ export function newAuthenticatePasswordRemote(
                 body: encodeProtobuf(
                     pb.auth.user.password.authenticate.service.AuthenticatePasswordRequestPb,
                     (message) => {
-                        message.loginId = fields.loginID
+                        message.loginId = fields.loginId
                         message.password = fields.password
                     },
                 ),

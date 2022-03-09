@@ -1,6 +1,6 @@
 import { DocsAction } from "../../../../z_vendor/getto-application/docs/data"
 import { docs_password } from "../docs"
-import { docs_loginID } from "../../login_id/docs"
+import { docs_loginId } from "../../login_id/docs"
 import { docs_authUser } from "../../docs"
 
 export const docs_authenticatePassword: DocsAction = {
@@ -33,5 +33,5 @@ export const docs_authenticatePassword: DocsAction = {
             ],
         },
     ],
-    data: [docs_authUser, docs_loginID, docs_password],
+    data: [docs_authUser, docs_loginId, docs_password],
 }

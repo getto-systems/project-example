@@ -126,7 +126,7 @@ function initResource(overridePasswordRemote: OverridePasswordRemote): Readonly<
 
     resource.override.newPassword.input.connector.connect(store.newPassword)
 
-    const user = { loginID: "user-id", grantedRoles: [] }
+    const user = { loginId: "user-id", grantedRoles: [] }
 
     return { resource, store, user }
 }

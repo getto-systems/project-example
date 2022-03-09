@@ -10,7 +10,7 @@ import { BoardValueStore } from "../../../../../z_vendor/getto-application/board
 import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 import { initRequestResetTokenAction, RequestResetTokenAction } from "./action"
 
-const VALID_LOGIN = { loginID: "login-id" } as const
+const VALID_LOGIN = { loginId: "login-id" } as const
 
 describe("RequestResetToken", () => {
     test("submit valid login-id", async () => {
@@ -20,7 +20,7 @@ describe("RequestResetToken", () => {
         const runner = setupActionTestRunner(action.subscriber)
 
         await runner(() => {
-            store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
+            store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
             return action.submit()
         }).then((stack) => {
             expect(stack).toEqual([
@@ -38,7 +38,7 @@ describe("RequestResetToken", () => {
         const runner = setupActionTestRunner(action.subscriber)
 
         await runner(() => {
-            store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
+            store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
             return action.submit()
         }).then((stack) => {
             expect(stack).toEqual([
@@ -66,10 +66,10 @@ describe("RequestResetToken", () => {
         const { view, store } = standard()
         const resource = view.resource
 
-        store.loginID.set(markBoardValue(VALID_LOGIN.loginID))
+        store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
         resource.clear()
 
-        expect(store.loginID.get()).toEqual("")
+        expect(store.loginId.get()).toEqual("")
     })
 
     test("terminate", async () => {
@@ -80,7 +80,7 @@ describe("RequestResetToken", () => {
             subscribe: (handler) => {
                 action.subscriber.subscribe(handler)
                 action.validate.subscriber.subscribe(handler)
-                action.loginID.validate.subscriber.subscribe(handler)
+                action.loginId.validate.subscriber.subscribe(handler)
             },
             unsubscribe: () => null,
         })
@@ -105,7 +105,7 @@ function takeLongtime() {
 function initView(requestTokenRemote: RequestResetTokenRemote): Readonly<{
     view: ApplicationView<RequestResetTokenAction>
     store: Readonly<{
-        loginID: BoardValueStore
+        loginId: BoardValueStore
     }>
 }> {
     const view = toApplicationView(
@@ -120,9 +120,9 @@ function initView(requestTokenRemote: RequestResetTokenRemote): Readonly<{
     )
 
     const store = {
-        loginID: mockBoardValueStore(),
+        loginId: mockBoardValueStore(),
     }
-    view.resource.loginID.input.connector.connect(store.loginID)
+    view.resource.loginId.input.connector.connect(store.loginId)
 
     return { view, store }
 }

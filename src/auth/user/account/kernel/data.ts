@@ -1,4 +1,4 @@
 export type AuthUserAccountBasket = Readonly<{
-    loginID: string
+    loginId: string
     grantedRoles: readonly string[]
 }>

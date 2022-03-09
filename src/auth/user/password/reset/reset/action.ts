@@ -3,11 +3,11 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../../../z_vendor/getto-application/action/action"
 
-import { initInputLoginIDAction } from "../../../login_id/input/action"
+import { initInputLoginIdAction } from "../../../login_id/input/action"
 import { initInputPasswordAction } from "../../input/action"
 import { initValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
 
-import { InputLoginIDAction } from "../../../login_id/input/action"
+import { InputLoginIdAction } from "../../../login_id/input/action"
 import { InputPasswordAction } from "../../input/action"
 import { ValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
 
@@ -33,7 +33,7 @@ import { ConvertBoardResult } from "../../../../../z_vendor/getto-application/bo
 import { RepositoryError } from "../../../../../z_lib/ui/repository/data"
 
 export interface ResetPasswordAction extends StatefulApplicationAction<ResetPasswordState> {
-    readonly loginID: InputLoginIDAction
+    readonly loginId: InputLoginIdAction
     readonly password: InputPasswordAction
     readonly validate: ValidateBoardAction
 
@@ -42,7 +42,7 @@ export interface ResetPasswordAction extends StatefulApplicationAction<ResetPass
     loadError(err: LoadScriptError): Promise<ResetPasswordState>
 }
 
-export const resetPasswordFieldNames = ["loginID", "password"] as const
+export const resetPasswordFieldNames = ["loginId", "password"] as const
 export type ResetPasswordFieldName = typeof resetPasswordFieldNames[number]
 
 export type ResetPasswordState =
@@ -86,7 +86,7 @@ class Action
 {
     readonly initialState = initialState
 
-    readonly loginID: InputLoginIDAction
+    readonly loginId: InputLoginIdAction
     readonly password: InputPasswordAction
     readonly validate: ValidateBoardAction
 
@@ -96,14 +96,14 @@ class Action
     constructor(material: ResetPasswordMaterial) {
         super({
             terminate: () => {
-                this.loginID.terminate()
+                this.loginId.terminate()
                 this.password.terminate()
                 this.validate.terminate()
             },
         })
         this.material = material
 
-        const loginID = initInputLoginIDAction()
+        const loginId = initInputLoginIdAction()
         const password = initInputPasswordAction()
 
         const { validate, checker } = initValidateBoardAction(
@@ -112,15 +112,15 @@ class Action
             },
             {
                 converter: (): ConvertBoardResult<ResetPasswordFields> => {
-                    const loginIDResult = loginID.checker.check()
+                    const loginIdResult = loginId.checker.check()
                     const passwordResult = password.checker.check()
-                    if (!loginIDResult.valid || !passwordResult.valid) {
+                    if (!loginIdResult.valid || !passwordResult.valid) {
                         return { valid: false }
                     }
                     return {
                         valid: true,
                         value: {
-                            loginID: loginIDResult.value,
+                            loginId: loginIdResult.value,
                             password: passwordResult.value,
                         },
                     }
@@ -128,13 +128,13 @@ class Action
             },
         )
 
-        this.loginID = loginID.input
+        this.loginId = loginId.input
         this.password = password.input
         this.validate = validate
         this.checker = checker
 
-        this.loginID.validate.subscriber.subscribe((result) =>
-            checker.update("loginID", result.valid),
+        this.loginId.validate.subscriber.subscribe((result) =>
+            checker.update("loginId", result.valid),
         )
         this.password.validate.subscriber.subscribe((result) =>
             checker.update("password", result.valid),
@@ -142,7 +142,7 @@ class Action
     }
 
     clear(): void {
-        this.loginID.clear()
+        this.loginId.clear()
         this.password.clear()
         this.validate.clear()
     }

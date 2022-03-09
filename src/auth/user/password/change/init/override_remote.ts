@@ -44,7 +44,7 @@ async function fetchRemote(
             body: encodeProtobuf(
                 pb.auth.user.password.change.service.OverridePasswordRequestPb,
                 (message) => {
-                    message.loginId = user.loginID
+                    message.loginId = user.loginId
                     message.newPassword = fields.newPassword
                 },
             ),

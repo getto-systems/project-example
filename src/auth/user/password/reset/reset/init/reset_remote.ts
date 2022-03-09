@@ -42,7 +42,7 @@ export function newResetPasswordRemote(
                     pb.auth.user.password.reset.reset.service.ResetPasswordRequestPb,
                     (message) => {
                         message.resetToken = resetToken
-                        message.loginId = fields.loginID
+                        message.loginId = fields.loginId
                         message.password = fields.password
                     },
                 ),

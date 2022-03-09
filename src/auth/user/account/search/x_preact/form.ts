@@ -9,7 +9,7 @@ import {
 } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box_grow } from "../../../../../z_vendor/getto-css/preact/design/box"
 
-import { SearchLoginIDComponent } from "../../../login_id/input/x_preact/search"
+import { SearchLoginIdComponent } from "../../../login_id/input/x_preact/search"
 
 import { SearchAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
 import { ObserveBoardActionState } from "../../../../../z_vendor/getto-application/board/observe_board/action"
@@ -65,7 +65,7 @@ export function SearchAuthUserAccountFormComponent(props: Props): VNode {
     function searchForm(content: Content): VNode {
         return box_grow({
             body: [
-                h(SearchLoginIDComponent, { field: props.search.loginID }),
+                h(SearchLoginIdComponent, { field: props.search.loginId }),
                 // TODO granted role (checkbox)
             ],
             footer: buttons({ left: button(), right: clearButton() }),

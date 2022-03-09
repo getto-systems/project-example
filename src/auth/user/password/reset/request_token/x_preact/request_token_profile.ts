@@ -16,7 +16,7 @@ import {
 import { icon_spinner } from "../../../../../../core/x_preact/design/icon"
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
-import { InputLoginIDEntry } from "../../../../login_id/input/x_preact/input"
+import { InputLoginIdEntry } from "../../../../login_id/input/x_preact/input"
 
 import { RequestResetTokenError } from "../data"
 import { box } from "../../../../../../z_vendor/getto-css/preact/design/box"
@@ -129,8 +129,8 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
             box({
                 title: "パスワードリセットトークン送信",
                 body: [
-                    h(InputLoginIDEntry, {
-                        field: props.requestToken.loginID,
+                    h(InputLoginIdEntry, {
+                        field: props.requestToken.loginId,
                         title: "ログインID",
                         help: ["確認のため、ログインIDを入力します"],
                     }),

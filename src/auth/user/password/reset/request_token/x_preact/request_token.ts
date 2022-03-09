@@ -23,7 +23,7 @@ import { siteInfo } from "../../../../../../x_content/site"
 import { icon_spinner } from "../../../../../../core/x_preact/design/icon"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
 
-import { InputLoginIDEntry } from "../../../../login_id/input/x_preact/input"
+import { InputLoginIdEntry } from "../../../../login_id/input/x_preact/input"
 
 
 import { ApplicationView } from "../../../../../../z_vendor/getto-application/action/action"
@@ -89,8 +89,8 @@ export function RequestResetTokenComponent(props: Props): VNode {
             loginBox(siteInfo, {
                 title,
                 body: [
-                    h(InputLoginIDEntry, {
-                        field: props.requestToken.loginID,
+                    h(InputLoginIdEntry, {
+                        field: props.requestToken.loginId,
                         help: ["このログインIDに設定された送信先にリセットトークンを送信します"],
                     }),
                     buttons({ left: button(), right: clearButton() }),

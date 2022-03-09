@@ -1,6 +1,6 @@
 import { docsData } from "../../../z_vendor/getto-application/docs/helper"
 
-export const docs_loginID = docsData("ログインIDデータ", [
+export const docs_loginId = docsData("ログインIDデータ", [
     {
         data: "ログインID",
         help: [

@@ -6,7 +6,7 @@ import { AuthUserAccountBasket } from "../kernel/data"
 export type SearchAuthUserAccountFilter = Readonly<{
     offset: BoardValue
     sort: SearchAuthUserAccountSort
-    loginID: SingleValueFilter
+    loginId: SingleValueFilter
 }>
 
 export type SearchAuthUserAccountSort = SearchSort<"login-id">

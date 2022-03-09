@@ -3,9 +3,9 @@ import { setupActionTestRunner } from "../../../../z_vendor/getto-application/ac
 import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 
-import { initSearchLoginIDAction } from "./action"
+import { initSearchLoginIdAction } from "./action"
 
-describe("SearchLoginID", () => {
+describe("SearchLoginId", () => {
     test("clear", () => {
         const { action, store } = standard()
 
@@ -37,7 +37,7 @@ describe("SearchLoginID", () => {
 })
 
 function standard() {
-    const { input: action } = initSearchLoginIDAction({ search: false })
+    const { input: action } = initSearchLoginIdAction({ search: false })
     const store = mockBoardValueStore()
     action.input.connector.connect(store)
 

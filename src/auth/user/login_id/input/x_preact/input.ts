@@ -13,18 +13,18 @@ import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 import { InputBoardComponent } from "../../../../../z_vendor/getto-application/board/input/x_preact/input"
 
 import { ValidateBoardFieldState } from "../../../../../z_vendor/getto-application/board/validate_field/action"
-import { InputLoginIDAction, ValidateLoginIDState } from "../action"
+import { InputLoginIdAction, ValidateLoginIdState } from "../action"
 
-import { ValidateLoginIDError } from "../data"
+import { ValidateLoginIdError } from "../data"
 
-type EntryProps = Readonly<{ field: InputLoginIDAction }> &
+type EntryProps = Readonly<{ field: InputLoginIdAction }> &
     Partial<{
         title: VNodeContent
         help: readonly VNodeContent[]
         autocomplete: string
     }>
-export function InputLoginIDEntry(resource: EntryProps): VNode {
-    return h(InputLoginIDComponent, {
+export function InputLoginIdEntry(resource: EntryProps): VNode {
+    return h(InputLoginIdComponent, {
         ...resource,
         state: useApplicationAction(resource.field.validate),
     })
@@ -32,10 +32,10 @@ export function InputLoginIDEntry(resource: EntryProps): VNode {
 
 type Props = EntryProps &
     Readonly<{
-        state: ValidateLoginIDState
+        state: ValidateLoginIdState
     }>
 
-export function InputLoginIDComponent(props: Props): VNode {
+export function InputLoginIdComponent(props: Props): VNode {
     return label_text_fill(content())
 
     function content() {
@@ -52,7 +52,7 @@ export function InputLoginIDComponent(props: Props): VNode {
         if (props.state.valid) {
             return field(content)
         } else {
-            return field_error({ ...content, notice: loginIDValidationError(props.state) })
+            return field_error({ ...content, notice: loginIdValidationError(props.state) })
         }
     }
     function title(): VNodeContent {
@@ -69,8 +69,8 @@ export function InputLoginIDComponent(props: Props): VNode {
     }
 }
 
-function loginIDValidationError(
-    result: ValidateBoardFieldState<ValidateLoginIDError>,
+function loginIdValidationError(
+    result: ValidateBoardFieldState<ValidateLoginIdError>,
 ): readonly VNodeContent[] {
     if (result.valid) {
         return []

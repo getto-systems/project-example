@@ -26,7 +26,7 @@ import { appendScript } from "../../../../sign/x_preact/script"
 import { signNav } from "../../../../sign/nav/x_preact/nav"
 
 import { ApplicationErrorComponent } from "../../../../../avail/x_preact/application_error"
-import { InputLoginIDEntry } from "../../../login_id/input/x_preact/input"
+import { InputLoginIdEntry } from "../../../login_id/input/x_preact/input"
 import { InputPasswordEntry } from "../../input/x_preact/input"
 
 import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
@@ -127,8 +127,8 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
             loginBox(siteInfo, {
                 title: authenticateTitle(),
                 body: [
-                    h(InputLoginIDEntry, {
-                        field: props.authenticate.loginID,
+                    h(InputLoginIdEntry, {
+                        field: props.authenticate.loginId,
                         autocomplete: "username",
                     }),
                     h(InputPasswordEntry, {
