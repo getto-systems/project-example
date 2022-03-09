@@ -88,7 +88,12 @@ function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStruc
 
     function editLink(row: AuthUserAccountBasket): VNodeContent {
         const isFocused = list.detail.isFocused(row)
-        return html`<a href="#" class="${focusClass(isFocused)}" onClick=${onClick}>
+        return html`<a
+            href="#"
+            id="${isFocused ? "focused" : undefined}"
+            class="${focusClass(isFocused)}"
+            onClick=${onClick}
+        >
             ${listEditLabel(isFocused)}
         </a>`
 

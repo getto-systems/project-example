@@ -12,11 +12,11 @@ import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 
 import { SearchAuthUserAccountRemote, SearchAuthUserAccountRemoteResult } from "../infra"
-import { ticker } from "../../../../../z_lib/ui/timer/helper"
 
 import { defaultSearchAuthUserAccountSort, SearchAuthUserAccountFilter } from "../data"
 import { readSearchAuthUserAccountSortKey } from "../convert"
 import { parseSearchSort } from "../../../../../z_lib/ui/search/sort/convert"
+import { AuthUserAccountBasket } from "../../kernel/data"
 
 export function newSearchAuthUserAccountRemote(
     feature: RemoteOutsideFeature,
@@ -28,15 +28,22 @@ async function fetchRemote(
     filter: SearchAuthUserAccountFilter,
 ): Promise<SearchAuthUserAccountRemoteResult> {
     try {
-        const mock = false
+        const mock = true
         if (mock) {
-            await ticker({ wait_millisecond: 3000 }, () => null)
+            //await ticker({ wait_millisecond: 3000 }, () => null)
+            const users: AuthUserAccountBasket[] = []
+            for (let i = 0; i < 50; i++) {
+                users.push({
+                    loginID: `user-${i}`,
+                    grantedRoles: [],
+                })
+            }
             return {
                 success: true,
                 value: {
-                    page: { offset: 0, limit: 10, all: 25 },
+                    page: { offset: 0, limit: 1000, all: users.length },
                     sort: { key: defaultSearchAuthUserAccountSort, order: "normal" },
-                    users: [{ loginID: "admin", grantedRoles: [] }],
+                    users,
                 },
             }
         }

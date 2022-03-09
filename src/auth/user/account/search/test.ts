@@ -159,7 +159,7 @@ describe("SearchAuthUserAccount", () => {
         }).then((stack) => {
             expect(stack).toEqual([
                 {
-                    type: "focus-on",
+                    type: "focus-detected",
                     user: { loginID: "user-1", grantedRoles: [] },
                 },
             ])

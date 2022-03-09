@@ -77,6 +77,7 @@ export function ManageUserAccountPageComponent(props: ManageUserAccountPageResou
             })
 
         case "focus-failed":
+        case "focus-detected":
         case "focus-on":
             return appLayout({
                 ...common,
@@ -103,7 +104,7 @@ export function ManageUserAccountPageComponent(props: ManageUserAccountPageResou
                 sidebar: sidebarExpand(sidebarState)
                     ? appSidebar({
                           header: mainHeader([mainTitle(listTitle)]),
-                          body: sidebarBody(h(ListAuthUserAccountEntry, props)),
+                          body: sidebarBody(h(ListAuthUserAccountEntry, props), { id: "sidebar" }),
                           copyright,
                       })
                     : undefined,
