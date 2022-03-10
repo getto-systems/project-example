@@ -5,16 +5,16 @@ export const docs_changePassword: DocsAction = {
     action: [
         {
             type: "input",
-            content: ["ログインID", "パスワード"],
+            content: ["現在のパスワード", "新しいパスワード"],
         },
         {
             type: "check",
-            check: ["ログインIDが有効", "パスワードが有効"],
+            check: ["現在のパスワードが有効", "新しいパスワードが有効"],
             help: ["空でない", "一定の長さを超えない"],
         },
         {
             type: "check",
-            check: ["ログインIDが登録されている", "パスワードが登録されたものと一致する"],
+            check: ["現在のパスワードが登録されたものと一致する"],
         },
         {
             type: "success",
@@ -22,11 +22,36 @@ export const docs_changePassword: DocsAction = {
         },
         {
             type: "error",
-            err: [
-                "ログインIDかパスワードが無効",
-                "ログインIDが登録されていない",
-                "パスワードが登録されたものと一致しない",
-            ],
+            err: ["パスワードが無効", "パスワードが登録されたものと一致しない"],
+        },
+    ],
+    data: [],
+}
+
+export const docs_overridePassword: DocsAction = {
+    title: "パスワード上書き",
+    action: [
+        {
+            type: "check",
+            check: ["管理者権限を持っている"],
+            help: ["管理者権限でパスワードを上書きする"],
+        },
+        {
+            type: "input",
+            content: ["パスワード"],
+        },
+        {
+            type: "check",
+            check: ["パスワードが有効"],
+            help: ["空でない", "一定の長さを超えない"],
+        },
+        {
+            type: "success",
+            action: ["パスワード変更完了の通知"],
+        },
+        {
+            type: "error",
+            err: ["パスワードが無効"],
         },
     ],
     data: [],

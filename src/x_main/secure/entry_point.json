@@ -17,6 +17,9 @@
     { "name": "docs/auth/password/reset" },
     { "name": "docs/auth/password/change" },
 
+    { "name": "docs/auth/login-id/override" },
+    { "name": "docs/auth/password/override" },
+
     { "name": "docs/avail" },
     { "name": "docs/docs" }
 ]
