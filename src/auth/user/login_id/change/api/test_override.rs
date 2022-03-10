@@ -17,24 +17,22 @@ use crate::auth::{
         },
     },
     user::{
-        kernel::init::user_repository::memory::{
-            MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
+        kernel::{
+            data::AuthUserId,
+            init::user_repository::memory::{
+                MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
+            },
         },
-        password::{
-            change::init::request_decoder::test::StaticOverridePasswordRequestDecoder,
-            kernel::init::password_hasher::test::PlainPasswordHasher,
-        },
+        login_id::change::init::request_decoder::test::StaticOverrideLoginIdRequestDecoder,
     },
 };
 
-use crate::auth::user::password::change::action::{
-    OverridePasswordAction, OverridePasswordMaterial,
-};
+use crate::auth::user::login_id::change::action::{OverrideLoginIdAction, OverrideLoginIdMaterial};
 
 use crate::auth::ticket::validate::method::AuthNonceConfig;
 
-use crate::auth::user::password::{
-    change::infra::OverridePasswordFieldsExtract, kernel::infra::HashedPassword,
+use crate::auth::user::{
+    login_id::change::infra::OverrideLoginIdFieldsExtract, password::kernel::infra::HashedPassword,
 };
 
 use crate::auth::{
@@ -53,7 +51,7 @@ async fn success_override() {
     let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = OverridePasswordAction::with_material(request_decoder, material);
+    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -61,7 +59,7 @@ async fn success_override() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override password success",
+        "override login-id success",
     ]);
     assert!(result.is_ok());
 }
@@ -74,7 +72,7 @@ async fn success_expired_nonce() {
     let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = OverridePasswordAction::with_material(request_decoder, material);
+    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -82,7 +80,7 @@ async fn success_expired_nonce() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override password success",
+        "override login-id success",
     ]);
     assert!(result.is_ok());
 }
@@ -95,7 +93,7 @@ async fn error_conflict_nonce() {
     let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = OverridePasswordAction::with_material(request_decoder, material);
+    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -107,14 +105,14 @@ async fn error_conflict_nonce() {
 }
 
 #[tokio::test]
-async fn error_empty_password() {
+async fn error_empty_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
-    let request_decoder = empty_password_request_decoder();
+    let request_decoder = empty_login_id_request_decoder();
 
-    let mut action = OverridePasswordAction::with_material(request_decoder, material);
+    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -122,20 +120,20 @@ async fn error_empty_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override password error; invalid password: empty password",
+        "override login-id error; invalid login id: empty login id",
     ]);
     assert!(!result.is_ok());
 }
 
 #[tokio::test]
-async fn error_too_long_password() {
+async fn error_too_long_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
-    let request_decoder = too_long_password_request_decoder();
+    let request_decoder = too_long_login_id_request_decoder();
 
-    let mut action = OverridePasswordAction::with_material(request_decoder, material);
+    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -143,20 +141,20 @@ async fn error_too_long_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override password error; invalid password: too long password",
+        "override login-id error; invalid login id: too long login id",
     ]);
     assert!(!result.is_ok());
 }
 
 #[tokio::test]
-async fn just_max_length_password() {
+async fn just_max_length_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
-    let request_decoder = just_max_length_password_request_decoder();
+    let request_decoder = just_max_length_login_id_request_decoder();
 
-    let mut action = OverridePasswordAction::with_material(request_decoder, material);
+    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -164,9 +162,30 @@ async fn just_max_length_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override password success",
+        "override login-id success",
     ]);
     assert!(result.is_ok());
+}
+
+#[tokio::test]
+async fn error_login_id_already_registered() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::standard();
+    let material = TestStruct::standard(&store);
+    let request_decoder = already_registered_login_id_request_decoder();
+
+    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
+    action.subscribe(handler);
+
+    let result = action.ignite().await;
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "override login-id error; new login id is already registered",
+    ]);
+    assert!(!result.is_ok());
 }
 
 struct TestStruct<'a> {
@@ -174,16 +193,15 @@ struct TestStruct<'a> {
     user_repository: MemoryAuthUserRepository<'a>,
 }
 
-impl<'a> OverridePasswordMaterial for TestStruct<'a> {
+impl<'a> OverrideLoginIdMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
 
-    type PasswordRepository = MemoryAuthUserRepository<'a>;
-    type PasswordHasher = PlainPasswordHasher;
+    type LoginIdRepository = MemoryAuthUserRepository<'a>;
 
     fn validate(&self) -> &Self::Validate {
         &self.validate
     }
-    fn password_repository(&self) -> &Self::PasswordRepository {
+    fn login_id_repository(&self) -> &Self::LoginIdRepository {
         &self.user_repository
     }
 }
@@ -197,19 +215,19 @@ impl TestStore {
     fn standard() -> Self {
         Self {
             nonce: standard_nonce_store(),
-            user: standard_password_store(),
+            user: standard_login_id_store(),
         }
     }
     fn expired_nonce() -> Self {
         Self {
             nonce: expired_nonce_store(),
-            user: standard_password_store(),
+            user: standard_login_id_store(),
         }
     }
     fn conflict_nonce() -> Self {
         Self {
             nonce: conflict_nonce_store(),
-            user: standard_password_store(),
+            user: standard_login_id_store(),
         }
     }
 }
@@ -264,30 +282,38 @@ const NONCE: &'static str = "nonce";
 const TICKET_ID: &'static str = "ticket-id";
 const USER_ID: &'static str = "user-id";
 const LOGIN_ID: &'static str = "login-id";
+const REGISTERED_USER_ID: &'static str = "registered-user-id";
+const REGISTERED_LOGIN_ID: &'static str = "registered-login-id";
 const PASSWORD: &'static str = "current-password";
 
-fn standard_request_decoder() -> StaticOverridePasswordRequestDecoder {
-    StaticOverridePasswordRequestDecoder::Valid(OverridePasswordFieldsExtract {
+fn standard_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
+    StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
         login_id: LOGIN_ID.into(),
-        new_password: "new-password".into(),
+        new_login_id: "new-login-id".into(),
     })
 }
-fn empty_password_request_decoder() -> StaticOverridePasswordRequestDecoder {
-    StaticOverridePasswordRequestDecoder::Valid(OverridePasswordFieldsExtract {
+fn empty_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
+    StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
         login_id: LOGIN_ID.into(),
-        new_password: "".into(),
+        new_login_id: "".into(),
     })
 }
-fn too_long_password_request_decoder() -> StaticOverridePasswordRequestDecoder {
-    StaticOverridePasswordRequestDecoder::Valid(OverridePasswordFieldsExtract {
+fn too_long_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
+    StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
         login_id: LOGIN_ID.into(),
-        new_password: vec!["a"; 100 + 1].join(""),
+        new_login_id: vec!["a"; 100 + 1].join(""),
     })
 }
-fn just_max_length_password_request_decoder() -> StaticOverridePasswordRequestDecoder {
-    StaticOverridePasswordRequestDecoder::Valid(OverridePasswordFieldsExtract {
+fn just_max_length_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
+    StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
         login_id: LOGIN_ID.into(),
-        new_password: vec!["a"; 100].join(""),
+        new_login_id: vec!["a"; 100].join(""),
+    })
+}
+fn already_registered_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
+    StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
+        login_id: LOGIN_ID.into(),
+        new_login_id: REGISTERED_LOGIN_ID.into(),
     })
 }
 
@@ -305,12 +331,12 @@ fn conflict_nonce_store() -> MemoryAuthNonceStore {
     MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
 }
 
-fn standard_password_store() -> MemoryAuthUserStore {
+fn standard_login_id_store() -> MemoryAuthUserStore {
     MemoryAuthUserMap::with_user_and_password(
         test_user_login_id(),
         test_user(),
         test_user_password(),
-        vec![],
+        vec![(test_registered_login_id(), test_registered_user_id())],
     )
     .to_store()
 }
@@ -330,4 +356,11 @@ fn test_user_login_id() -> LoginId {
 }
 fn test_user_password() -> HashedPassword {
     HashedPassword::restore(PASSWORD.into())
+}
+
+fn test_registered_user_id() -> AuthUserId {
+    AuthUserId::restore(REGISTERED_USER_ID.into())
+}
+fn test_registered_login_id() -> LoginId {
+    LoginId::restore(REGISTERED_LOGIN_ID.into())
 }

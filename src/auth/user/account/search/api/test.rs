@@ -170,6 +170,7 @@ fn standard_search_store() -> MemoryAuthUserStore {
         test_user_login_id(),
         test_user(),
         test_user_password(),
+        vec![],
     )
     .to_store()
 }

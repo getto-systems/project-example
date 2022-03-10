@@ -448,12 +448,18 @@ fn standard_password_store() -> MemoryAuthUserStore {
         test_user_login_id(),
         test_user(),
         test_user_password(),
+        vec![],
     )
     .to_store()
 }
 fn match_fail_password_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::with_user_and_password(test_user_login_id(), test_user(), another_password())
-        .to_store()
+    MemoryAuthUserMap::with_user_and_password(
+        test_user_login_id(),
+        test_user(),
+        another_password(),
+        vec![],
+    )
+    .to_store()
 }
 fn not_stored_password_store() -> MemoryAuthUserStore {
     MemoryAuthUserMap::new().to_store()
