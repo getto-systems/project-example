@@ -4,9 +4,10 @@ import { docs_authenticatePassword } from "./user/password/authenticate/docs"
 import { docs_logout } from "./ticket/logout/docs"
 import { docs_requestResetToken } from "./user/password/reset/request_token/docs"
 import { docs_resetPassword } from "./user/password/reset/reset/docs"
-import { docs_changePassword } from "./user/password/change/docs"
+import { docs_changePassword, docs_overridePassword } from "./user/password/change/docs"
 
 import { DocsAction, DocsDomain } from "../z_vendor/getto-application/docs/data"
+import { docs_overrideLoginId } from "./user/login_id/change/docs"
 
 const docs_loadApplication: DocsAction = {
     title: "アプリケーションのロード",
@@ -63,6 +64,18 @@ export const docs_auth: DocsDomain = {
             title: docs_changePassword.title,
             purpose: ["業務内容をプライベートに保つ"],
             action: [docs_changePassword],
+        },
+        {
+            path: "login-id/override",
+            title: docs_overrideLoginId.title,
+            purpose: ["業務内容をプライベートに保つ"],
+            action: [docs_overrideLoginId],
+        },
+        {
+            path: "password/override",
+            title: docs_overridePassword.title,
+            purpose: ["業務内容をプライベートに保つ"],
+            action: [docs_overridePassword],
         },
     ],
 }
