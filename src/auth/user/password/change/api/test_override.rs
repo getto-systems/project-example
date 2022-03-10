@@ -21,22 +21,21 @@ use crate::auth::{
             MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
         },
         password::{
-            change::init::request_decoder::test::StaticChangePasswordRequestDecoder,
-            kernel::init::{
-                password_hasher::test::PlainPasswordHasher,
-                password_matcher::test::PlainPasswordMatcher,
-            },
+            change::init::request_decoder::test::StaticOverridePasswordRequestDecoder,
+            kernel::init::password_hasher::test::PlainPasswordHasher,
         },
     },
 };
 
-use crate::auth::user::password::{
-    change::infra::ChangePasswordFieldsExtract, kernel::infra::HashedPassword,
+use crate::auth::user::password::change::action::{
+    OverridePasswordAction, OverridePasswordMaterial,
 };
 
 use crate::auth::ticket::validate::method::AuthNonceConfig;
 
-use super::action::{ChangePasswordAction, ChangePasswordMaterial};
+use crate::auth::user::password::{
+    change::infra::OverridePasswordFieldsExtract, kernel::infra::HashedPassword,
+};
 
 use crate::auth::{
     ticket::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
@@ -47,14 +46,14 @@ use crate::auth::{
 };
 
 #[tokio::test]
-async fn success_change() {
+async fn success_override() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(request_decoder, material);
+    let mut action = OverridePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -62,7 +61,7 @@ async fn success_change() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password success",
+        "override password success",
     ]);
     assert!(result.is_ok());
 }
@@ -75,7 +74,7 @@ async fn success_expired_nonce() {
     let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(request_decoder, material);
+    let mut action = OverridePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -83,7 +82,7 @@ async fn success_expired_nonce() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password success",
+        "override password success",
     ]);
     assert!(result.is_ok());
 }
@@ -96,7 +95,7 @@ async fn error_conflict_nonce() {
     let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(request_decoder, material);
+    let mut action = OverridePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -108,14 +107,14 @@ async fn error_conflict_nonce() {
 }
 
 #[tokio::test]
-async fn error_empty_current_password() {
+async fn error_empty_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
-    let request_decoder = empty_current_password_request_decoder();
+    let request_decoder = empty_password_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(request_decoder, material);
+    let mut action = OverridePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -123,20 +122,20 @@ async fn error_empty_current_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password error; invalid current password: empty password",
+        "override password error; invalid password: empty password",
     ]);
     assert!(!result.is_ok());
 }
 
 #[tokio::test]
-async fn error_too_long_current_password() {
+async fn error_too_long_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
-    let request_decoder = too_long_current_password_request_decoder();
+    let request_decoder = too_long_password_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(request_decoder, material);
+    let mut action = OverridePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -144,20 +143,20 @@ async fn error_too_long_current_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password error; invalid current password: too long password",
+        "override password error; invalid password: too long password",
     ]);
     assert!(!result.is_ok());
 }
 
 #[tokio::test]
-async fn just_max_length_current_password() {
+async fn just_max_length_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
-    let request_decoder = just_max_length_current_password_request_decoder();
+    let request_decoder = just_max_length_password_request_decoder();
 
-    let mut action = ChangePasswordAction::with_material(request_decoder, material);
+    let mut action = OverridePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -165,114 +164,9 @@ async fn just_max_length_current_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password error; password not matched",
-    ]);
-    assert!(!result.is_ok());
-}
-
-#[tokio::test]
-async fn error_empty_new_password() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
-    let request_decoder = empty_new_password_request_decoder();
-
-    let mut action = ChangePasswordAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password error; invalid new password: empty password",
-    ]);
-    assert!(!result.is_ok());
-}
-
-#[tokio::test]
-async fn error_too_long_new_password() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
-    let request_decoder = too_long_new_password_request_decoder();
-
-    let mut action = ChangePasswordAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password error; invalid new password: too long password",
-    ]);
-    assert!(!result.is_ok());
-}
-
-#[tokio::test]
-async fn just_max_length_new_password() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
-    let request_decoder = just_max_length_new_password_request_decoder();
-
-    let mut action = ChangePasswordAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password success",
+        "override password success",
     ]);
     assert!(result.is_ok());
-}
-
-#[tokio::test]
-async fn error_failed_to_match_password() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::match_fail_password();
-    let material = TestStruct::standard(&store);
-    let request_decoder = standard_request_decoder();
-
-    let mut action = ChangePasswordAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password error; password not matched",
-    ]);
-    assert!(!result.is_ok());
-}
-
-#[tokio::test]
-async fn error_password_not_stored() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::password_not_stored();
-    let material = TestStruct::standard(&store);
-    let request_decoder = standard_request_decoder();
-
-    let mut action = ChangePasswordAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password error; password not found",
-    ]);
-    assert!(!result.is_ok());
 }
 
 struct TestStruct<'a> {
@@ -280,11 +174,10 @@ struct TestStruct<'a> {
     user_repository: MemoryAuthUserRepository<'a>,
 }
 
-impl<'a> ChangePasswordMaterial for TestStruct<'a> {
+impl<'a> OverridePasswordMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
 
     type PasswordRepository = MemoryAuthUserRepository<'a>;
-    type PasswordMatcher = PlainPasswordMatcher;
     type PasswordHasher = PlainPasswordHasher;
 
     fn validate(&self) -> &Self::Validate {
@@ -305,18 +198,6 @@ impl TestStore {
         Self {
             nonce: standard_nonce_store(),
             user: standard_password_store(),
-        }
-    }
-    fn match_fail_password() -> Self {
-        Self {
-            nonce: standard_nonce_store(),
-            user: match_fail_password_store(),
-        }
-    }
-    fn password_not_stored() -> Self {
-        Self {
-            nonce: standard_nonce_store(),
-            user: not_stored_password_store(),
         }
     }
     fn expired_nonce() -> Self {
@@ -384,47 +265,28 @@ const TICKET_ID: &'static str = "ticket-id";
 const USER_ID: &'static str = "user-id";
 const LOGIN_ID: &'static str = "login-id";
 const PASSWORD: &'static str = "current-password";
-const ANOTHER_PASSWORD: &'static str = "another-password";
 
-fn standard_request_decoder() -> StaticChangePasswordRequestDecoder {
-    StaticChangePasswordRequestDecoder::Valid(ChangePasswordFieldsExtract {
-        current_password: "current-password".into(),
+fn standard_request_decoder() -> StaticOverridePasswordRequestDecoder {
+    StaticOverridePasswordRequestDecoder::Valid(OverridePasswordFieldsExtract {
+        login_id: LOGIN_ID.into(),
         new_password: "new-password".into(),
     })
 }
-fn empty_current_password_request_decoder() -> StaticChangePasswordRequestDecoder {
-    StaticChangePasswordRequestDecoder::Valid(ChangePasswordFieldsExtract {
-        current_password: "".into(),
-        new_password: "new-password".into(),
-    })
-}
-fn too_long_current_password_request_decoder() -> StaticChangePasswordRequestDecoder {
-    StaticChangePasswordRequestDecoder::Valid(ChangePasswordFieldsExtract {
-        current_password: vec!["a"; 100 + 1].join(""),
-        new_password: "new-password".into(),
-    })
-}
-fn just_max_length_current_password_request_decoder() -> StaticChangePasswordRequestDecoder {
-    StaticChangePasswordRequestDecoder::Valid(ChangePasswordFieldsExtract {
-        current_password: vec!["a"; 100].join(""),
-        new_password: "new-password".into(),
-    })
-}
-fn empty_new_password_request_decoder() -> StaticChangePasswordRequestDecoder {
-    StaticChangePasswordRequestDecoder::Valid(ChangePasswordFieldsExtract {
-        current_password: "current-password".into(),
+fn empty_password_request_decoder() -> StaticOverridePasswordRequestDecoder {
+    StaticOverridePasswordRequestDecoder::Valid(OverridePasswordFieldsExtract {
+        login_id: LOGIN_ID.into(),
         new_password: "".into(),
     })
 }
-fn too_long_new_password_request_decoder() -> StaticChangePasswordRequestDecoder {
-    StaticChangePasswordRequestDecoder::Valid(ChangePasswordFieldsExtract {
-        current_password: "current-password".into(),
+fn too_long_password_request_decoder() -> StaticOverridePasswordRequestDecoder {
+    StaticOverridePasswordRequestDecoder::Valid(OverridePasswordFieldsExtract {
+        login_id: LOGIN_ID.into(),
         new_password: vec!["a"; 100 + 1].join(""),
     })
 }
-fn just_max_length_new_password_request_decoder() -> StaticChangePasswordRequestDecoder {
-    StaticChangePasswordRequestDecoder::Valid(ChangePasswordFieldsExtract {
-        current_password: "current-password".into(),
+fn just_max_length_password_request_decoder() -> StaticOverridePasswordRequestDecoder {
+    StaticOverridePasswordRequestDecoder::Valid(OverridePasswordFieldsExtract {
+        login_id: LOGIN_ID.into(),
         new_password: vec!["a"; 100].join(""),
     })
 }
@@ -452,18 +314,6 @@ fn standard_password_store() -> MemoryAuthUserStore {
     )
     .to_store()
 }
-fn match_fail_password_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::with_user_and_password(
-        test_user_login_id(),
-        test_user(),
-        another_password(),
-        vec![],
-    )
-    .to_store()
-}
-fn not_stored_password_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::new().to_store()
-}
 
 fn test_user() -> AuthUser {
     let mut granted_roles = HashSet::new();
@@ -480,7 +330,4 @@ fn test_user_login_id() -> LoginId {
 }
 fn test_user_password() -> HashedPassword {
     HashedPassword::restore(PASSWORD.into())
-}
-fn another_password() -> HashedPassword {
-    HashedPassword::restore(ANOTHER_PASSWORD.into())
 }

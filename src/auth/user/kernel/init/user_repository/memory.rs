@@ -119,6 +119,7 @@ impl MemoryAuthUserMap {
         login_id: LoginId,
         user: AuthUser,
         password: HashedPassword,
+        users: Vec<(LoginId, AuthUserId)>,
     ) -> Self {
         let mut store = Self::new();
         let user_id = user.clone().into_user_id();
@@ -126,6 +127,9 @@ impl MemoryAuthUserMap {
             .insert_granted_roles(user)
             .insert_login_id(login_id.clone(), user_id.clone())
             .insert_password(user_id, password);
+        for (login_id, user_id) in users {
+            store.insert_login_id(login_id, user_id);
+        }
         store
     }
     pub fn with_dangling_password(
@@ -211,7 +215,8 @@ impl MemoryAuthUserMap {
         self
     }
     fn update_login_id(&mut self, user_id: AuthUserId, login_id: LoginId) {
-        self.login_id.insert(login_id.clone().extract(), user_id.clone());
+        self.login_id
+            .insert(login_id.clone().extract(), user_id.clone());
         self.user_id.insert(user_id.extract(), login_id);
     }
     fn get_user_id(&self, login_id: &LoginId) -> Option<&AuthUserId> {
@@ -361,7 +366,7 @@ fn override_login_id<'store, 'a>(
             .map(|id| id.clone())?;
 
         if store.has_login_id(&new_login_id) {
-            return Err(OverrideLoginIdRepositoryError::LoginIdAlreadyRegistered)
+            return Err(OverrideLoginIdRepositoryError::LoginIdAlreadyRegistered);
         }
 
         store.update_login_id(user_id, new_login_id);

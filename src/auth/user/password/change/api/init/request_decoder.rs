@@ -1,7 +1,10 @@
-use crate::auth::user::password::change::y_protobuf::service::{ChangePasswordRequestPb, OverridePasswordRequestPb};
+use crate::auth::user::password::change::y_protobuf::service::{
+    ChangePasswordRequestPb, OverridePasswordRequestPb,
+};
 
 use crate::auth::user::password::change::infra::{
-    ChangePasswordFieldsExtract, ChangePasswordRequestDecoder, OverridePasswordRequestDecoder, OverridePasswordFieldsExtract,
+    ChangePasswordFieldsExtract, ChangePasswordRequestDecoder, OverridePasswordFieldsExtract,
+    OverridePasswordRequestDecoder,
 };
 
 pub struct PbChangePasswordRequestDecoder {
@@ -45,7 +48,8 @@ impl OverridePasswordRequestDecoder for PbOverridePasswordRequestDecoder {
 #[cfg(test)]
 pub mod test {
     use crate::auth::user::password::change::infra::{
-        ChangePasswordFieldsExtract, ChangePasswordRequestDecoder,
+        ChangePasswordFieldsExtract, ChangePasswordRequestDecoder, OverridePasswordFieldsExtract,
+        OverridePasswordRequestDecoder,
     };
 
     pub enum StaticChangePasswordRequestDecoder {
@@ -54,6 +58,18 @@ pub mod test {
 
     impl ChangePasswordRequestDecoder for StaticChangePasswordRequestDecoder {
         fn decode(self) -> ChangePasswordFieldsExtract {
+            match self {
+                Self::Valid(fields) => fields,
+            }
+        }
+    }
+
+    pub enum StaticOverridePasswordRequestDecoder {
+        Valid(OverridePasswordFieldsExtract),
+    }
+
+    impl OverridePasswordRequestDecoder for StaticOverridePasswordRequestDecoder {
+        fn decode(self) -> OverridePasswordFieldsExtract {
             match self {
                 Self::Valid(fields) => fields,
             }
