@@ -30,7 +30,7 @@ describe("ObserveBoard", () => {
 })
 
 function standard() {
-    const { observe: action, checker } = initObserveBoardAction({
+    const { observe: action, observeChecker: checker } = initObserveBoardAction({
         fields: ["name", "description"],
     })
 

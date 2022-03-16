@@ -16,7 +16,7 @@ import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board
 
 import { OverrideLoginIdRemote } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
-import { ValidateBoardChecker } from "../../../../z_vendor/getto-application/board/validate_board/infra"
+import { BoardConverter } from "../../../../z_vendor/getto-application/board/kernel/infra"
 
 import { AuthUserAccountBasket } from "../../account/kernel/data"
 
@@ -27,9 +27,6 @@ export interface OverrideLoginIdAction extends StatefulApplicationAction<Overrid
     clear(): OverrideLoginIdState
     submit(user: AuthUserAccountBasket): Promise<OverrideLoginIdState>
 }
-
-export const overrideLoginIdFieldNames = ["newLoginId"] as const
-export type OverrideLoginIdFieldName = typeof overrideLoginIdFieldNames[number]
 
 export type OverrideLoginIdState =
     | Readonly<{ type: "initial-override-login-id" }>
@@ -66,7 +63,7 @@ class OverrideAction
     readonly validate: ValidateBoardAction
 
     material: OverrideLoginIdMaterial
-    checker: ValidateBoardChecker<OverrideLoginIdFieldName, OverrideLoginIdFields>
+    convert: BoardConverter<OverrideLoginIdFields>
 
     constructor(material: OverrideLoginIdMaterial) {
         super({
@@ -77,11 +74,11 @@ class OverrideAction
         })
         this.material = material
 
+        const fields = ["newLoginId"] as const
+
         const newLoginId = initInputLoginIdAction()
-        const { validate, checker } = initValidateBoardAction(
-            {
-                fields: overrideLoginIdFieldNames,
-            },
+        const { validate, validateChecker } = initValidateBoardAction(
+            { fields },
             {
                 converter: (): ConvertBoardResult<OverrideLoginIdFields> => {
                     const result = {
@@ -102,10 +99,10 @@ class OverrideAction
 
         this.newLoginId = newLoginId.input
         this.validate = validate
-        this.checker = checker
+        this.convert = () => validateChecker.get()
 
         this.newLoginId.validate.subscriber.subscribe((result) =>
-            checker.update("newLoginId", result.valid),
+            validateChecker.update("newLoginId", result.valid),
         )
     }
 
@@ -115,7 +112,7 @@ class OverrideAction
         return this.post(this.initialState)
     }
     async submit(user: AuthUserAccountBasket): Promise<OverrideLoginIdState> {
-        return overrideLoginId(this.material, user, this.checker.get(), this.post)
+        return overrideLoginId(this.material, user, this.convert(), this.post)
     }
 }
 

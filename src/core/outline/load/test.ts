@@ -211,7 +211,7 @@ describe("Menu", () => {
     })
 
     test("load menu; dev docs", async () => {
-        const { resource } = devDocs()
+        const { resource } = user()
 
         const runner = setupActionTestRunner(resource.menu.subscriber)
 
@@ -230,8 +230,8 @@ describe("Menu", () => {
                                 item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
                             ]),
                         ]),
-                        category("DEVELOPMENT", ["DEVELOPMENT"], 0, [
-                            item("配備構成", "deployment", "/1.0.0/docs/z-dev/deployment.html", 0),
+                        category("ACCOUNT", ["ACCOUNT"], 0, [
+                            item("ユーザー", "friends", "/1.0.0/user/account.html", 0),
                         ]),
                     ],
                 },
@@ -248,8 +248,8 @@ describe("Menu", () => {
                                 item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
                             ]),
                         ]),
-                        category("DEVELOPMENT", ["DEVELOPMENT"], 0, [
-                            item("配備構成", "deployment", "/1.0.0/docs/z-dev/deployment.html", 0),
+                        category("ACCOUNT", ["ACCOUNT"], 0, [
+                            item("ユーザー", "friends", "/1.0.0/user/account.html", 0),
                         ]),
                     ],
                 },
@@ -345,8 +345,8 @@ function empty() {
 
     return { resource }
 }
-function devDocs() {
-    const [resource] = initResource(devDocs_authz(), empty_menuExpandRepository())
+function user() {
+    const [resource] = initResource(user_authz(), empty_menuExpandRepository())
 
     return { resource }
 }
@@ -399,18 +399,18 @@ function standard_ticketRepository(): AuthTicketRepository {
     const db = initMemoryDB<AuthTicketRepositoryValue>()
     db.set({
         authAt: "2020-01-01 00:00:00",
-        roles: ["admin"],
+        grantedRoles: ["admin"],
     })
     return convertDB(db, authTicketRepositoryConverter)
 }
 function empty_ticketRepository(): AuthTicketRepository {
     return initMemoryDB<AuthTicket>()
 }
-function devDocs_authz(): AuthTicketRepository {
+function user_authz(): AuthTicketRepository {
     const db = initMemoryDB<AuthTicketRepositoryValue>()
     db.set({
         authAt: "2020-01-01 00:00:00",
-        roles: ["admin", "dev-docs"],
+        grantedRoles: ["user"],
     })
     return convertDB(db, authTicketRepositoryConverter)
 }

@@ -112,8 +112,6 @@ export function initSearchAuthUserAccountAction(
     return new Action(material)
 }
 
-const searchAuthUserAccountFieldNames = ["loginId"] as const
-
 class Action
     extends AbstractStatefulApplicationAction<SearchAuthUserAccountState>
     implements SearchAuthUserAccountAction
@@ -150,12 +148,12 @@ class Action
 
         const initialFilter = material.shell.detectFilter()
 
+        const fields = ["loginId"] as const
+
         const loginId = initSearchLoginIdAction(initialFilter.loginId)
         const offset = initSearchOffsetAction(initialFilter.offset)
         const columns = initSearchColumnsAction(material.infra)
-        const { observe, checker } = initObserveBoardAction({
-            fields: searchAuthUserAccountFieldNames,
-        })
+        const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         this.setFilterOnSearch = () =>
             this.setFilter({
@@ -199,7 +197,7 @@ class Action
         this.filter = initialFilter
 
         this.loginId.observe.subscriber.subscribe((result) =>
-            checker.update("loginId", result.hasChanged),
+            observeChecker.update("loginId", result.hasChanged),
         )
     }
 

@@ -4,10 +4,12 @@ import { ObserveBoardFieldResult } from "../observe_field/data"
 import { ObserveBoardChecker, ObserveBoardStack, ObserveBoardStateFound } from "./infra"
 import { initObserveBoardStack } from "./init/stack"
 
-export type ObserveBoardAction = StatefulApplicationAction<ObserveBoardActionState>
+export interface ObserveBoardAction extends StatefulApplicationAction<ObserveBoardState> {
+    clear(): ObserveBoardState
+}
 
-export type ObserveBoardActionState = ObserveBoardFieldResult
-const initialState: ObserveBoardActionState = { hasChanged: false }
+export type ObserveBoardState = ObserveBoardFieldResult
+const initialState: ObserveBoardState = { hasChanged: false }
 
 export type ObserveBoardConfig<N extends string> = Readonly<{
     fields: readonly N[]
@@ -20,19 +22,19 @@ export function initObserveBoardAction<N extends string>(
     config: ObserveBoardConfig<N>,
 ): Readonly<{
     observe: ObserveBoardAction
-    checker: ObserveBoardChecker<N>
+    observeChecker: ObserveBoardChecker<N>
 }> {
     const action = new Action(config, {
         stack: initObserveBoardStack(),
     })
     return {
         observe: action,
-        checker: action,
+        observeChecker: action,
     }
 }
 
 class Action<N extends string>
-    extends AbstractStatefulApplicationAction<ObserveBoardActionState>
+    extends AbstractStatefulApplicationAction<ObserveBoardState>
     implements ObserveBoardAction, ObserveBoardChecker<N>
 {
     readonly initialState = initialState
@@ -46,11 +48,23 @@ class Action<N extends string>
         this.infra = infra
     }
 
-    update(name: N, hasChanged: boolean): ObserveBoardActionState {
+    clear(): ObserveBoardState {
+        return this.post(clear(this.config, this.infra))
+    }
+    update(name: N, hasChanged: boolean): ObserveBoardState {
         return this.post(update(this.config, this.infra, name, hasChanged))
     }
 }
 
+function clear<N extends string>(
+    config: ObserveBoardConfig<N>,
+    infra: ObserveBoardInfra,
+): ObserveBoardFieldResult {
+    const { stack } = infra
+
+    stack.clear()
+    return compose(config.fields.map((field) => stack.get(field)))
+}
 function update<N extends string>(
     config: ObserveBoardConfig<N>,
     infra: ObserveBoardInfra,

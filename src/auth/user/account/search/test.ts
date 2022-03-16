@@ -12,6 +12,7 @@ import { BoardValueStore } from "../../../../z_vendor/getto-application/board/in
 import { SearchAuthUserAccountRemote, SearchAuthUserAccountRemoteResult } from "./infra"
 import { defaultSearchAuthUserAccountSort, SearchAuthUserAccountRemoteResponse } from "./data"
 import { readSearchAuthUserAccountSortKey } from "./convert"
+import { AuthUserAccountBasket } from "../kernel/data"
 
 describe("SearchAuthUserAccount", () => {
     test("initial load", async () => {
@@ -126,8 +127,16 @@ describe("SearchAuthUserAccount", () => {
         await resource.search.ignitionState
 
         await runner(async () => {
-            const user = { loginId: "user-1", grantedRoles: [] }
-            const another = { loginId: "user-another", grantedRoles: [] }
+            const user: AuthUserAccountBasket = {
+                loginId: "user-1",
+                grantedRoles: [],
+                resetTokenDestination: { type: "none" },
+            }
+            const another: AuthUserAccountBasket = {
+                loginId: "user-another",
+                grantedRoles: [],
+                resetTokenDestination: { type: "none" },
+            }
 
             resource.search.detail.focus(user)
             expect(resource.search.detail.isFocused(user)).toBe(true)
@@ -284,7 +293,7 @@ const standard_response: SearchAuthUserAccountRemoteResponse = {
     page: { offset: 0, limit: 1000, all: 245 },
     sort: { key: defaultSearchAuthUserAccountSort, order: "normal" },
     users: [
-        { loginId: "user-1", grantedRoles: [] },
-        { loginId: "user-2", grantedRoles: [] },
+        { loginId: "user-1", grantedRoles: [], resetTokenDestination: { type: "none" } },
+        { loginId: "user-2", grantedRoles: [], resetTokenDestination: { type: "none" } },
     ],
 }

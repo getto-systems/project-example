@@ -22,8 +22,8 @@ import {
 
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
 import { GetScriptPathConfig, GetScriptPathShell } from "../../../sign/get_script_path/infra"
-import { ValidateBoardChecker } from "../../../../z_vendor/getto-application/board/validate_board/infra"
 import { AuthenticatePasswordRemote } from "./infra"
+import { BoardConverter } from "../../../../z_vendor/getto-application/board/kernel/infra"
 
 import { LoadScriptError, ConvertScriptPathResult } from "../../../sign/get_script_path/data"
 import { AuthenticatePasswordError, AuthenticatePasswordFields } from "./data"
@@ -41,9 +41,6 @@ export interface AuthenticatePasswordAction
     submit(): Promise<AuthenticatePasswordState>
     loadError(err: LoadScriptError): Promise<AuthenticatePasswordState>
 }
-
-export const authenticatePasswordFieldNames = ["loginId", "password"] as const
-export type AuthenticatePasswordFieldName = typeof authenticatePasswordFieldNames[number]
 
 export type AuthenticatePasswordState =
     | Readonly<{ type: "initial-login" }>
@@ -90,7 +87,7 @@ class Action
     readonly validate: ValidateBoardAction
 
     material: AuthenticatePasswordMaterial
-    checker: ValidateBoardChecker<AuthenticatePasswordFieldName, AuthenticatePasswordFields>
+    convert: BoardConverter<AuthenticatePasswordFields>
 
     constructor(material: AuthenticatePasswordMaterial) {
         super({
@@ -102,12 +99,12 @@ class Action
         })
         this.material = material
 
+        const fields = ["loginId", "password"] as const
+
         const loginId = initInputLoginIdAction()
         const password = initInputPasswordAction()
-        const { validate, checker } = initValidateBoardAction(
-            {
-                fields: authenticatePasswordFieldNames,
-            },
+        const { validate, validateChecker } = initValidateBoardAction(
+            { fields },
             {
                 converter: (): ConvertBoardResult<AuthenticatePasswordFields> => {
                     const result = {
@@ -131,13 +128,13 @@ class Action
         this.loginId = loginId.input
         this.password = password.input
         this.validate = validate
-        this.checker = checker
+        this.convert = () => validateChecker.get()
 
         this.loginId.validate.subscriber.subscribe((result) =>
-            checker.update("loginId", result.valid),
+            validateChecker.update("loginId", result.valid),
         )
         this.password.validate.subscriber.subscribe((result) =>
-            checker.update("password", result.valid),
+            validateChecker.update("password", result.valid),
         )
     }
 
@@ -148,7 +145,7 @@ class Action
         return this.initialState
     }
     async submit(): Promise<AuthenticatePasswordState> {
-        const result = await authenticate(this.material, this.checker.get(), this.post)
+        const result = await authenticate(this.material, this.convert(), this.post)
         if (!result.success) {
             return result.state
         }

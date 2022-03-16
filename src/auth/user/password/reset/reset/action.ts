@@ -24,7 +24,7 @@ import {
 import { GetScriptPathConfig, GetScriptPathShell } from "../../../../sign/get_script_path/infra"
 import { DelayTime } from "../../../../../z_lib/ui/config/infra"
 import { ResetPasswordRemote, ResetTokenDetecter } from "./infra"
-import { ValidateBoardChecker } from "../../../../../z_vendor/getto-application/board/validate_board/infra"
+import { BoardConverter } from "../../../../../z_vendor/getto-application/board/kernel/infra"
 
 import { LoadScriptError, ConvertScriptPathResult } from "../../../../sign/get_script_path/data"
 import { ResetPasswordError, ResetPasswordFields } from "./data"
@@ -41,9 +41,6 @@ export interface ResetPasswordAction extends StatefulApplicationAction<ResetPass
     submit(): Promise<ResetPasswordState>
     loadError(err: LoadScriptError): Promise<ResetPasswordState>
 }
-
-export const resetPasswordFieldNames = ["loginId", "password"] as const
-export type ResetPasswordFieldName = typeof resetPasswordFieldNames[number]
 
 export type ResetPasswordState =
     | Readonly<{ type: "initial-reset" }>
@@ -91,7 +88,7 @@ class Action
     readonly validate: ValidateBoardAction
 
     material: ResetPasswordMaterial
-    checker: ValidateBoardChecker<ResetPasswordFieldName, ResetPasswordFields>
+    convert: BoardConverter<ResetPasswordFields>
 
     constructor(material: ResetPasswordMaterial) {
         super({
@@ -103,13 +100,13 @@ class Action
         })
         this.material = material
 
+        const fields = ["loginId", "password"] as const
+
         const loginId = initInputLoginIdAction()
         const password = initInputPasswordAction()
 
-        const { validate, checker } = initValidateBoardAction(
-            {
-                fields: resetPasswordFieldNames,
-            },
+        const { validate, validateChecker } = initValidateBoardAction(
+            { fields },
             {
                 converter: (): ConvertBoardResult<ResetPasswordFields> => {
                     const loginIdResult = loginId.checker.check()
@@ -131,13 +128,13 @@ class Action
         this.loginId = loginId.input
         this.password = password.input
         this.validate = validate
-        this.checker = checker
+        this.convert = () => validateChecker.get()
 
         this.loginId.validate.subscriber.subscribe((result) =>
-            checker.update("loginId", result.valid),
+            validateChecker.update("loginId", result.valid),
         )
         this.password.validate.subscriber.subscribe((result) =>
-            checker.update("password", result.valid),
+            validateChecker.update("password", result.valid),
         )
     }
 
@@ -147,7 +144,7 @@ class Action
         this.validate.clear()
     }
     async submit(): Promise<ResetPasswordState> {
-        const result = await reset(this.material, this.checker.get(), this.post)
+        const result = await reset(this.material, this.convert(), this.post)
         if (!result.success) {
             return result.state
         }

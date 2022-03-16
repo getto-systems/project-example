@@ -1,6 +1,7 @@
 export interface ObserveBoardStack {
     get(name: string): ObserveBoardStateFound
     set(name: string, hasChanged: boolean): void
+    clear(): void
 }
 
 export interface ObserveBoardChecker<N extends string> {

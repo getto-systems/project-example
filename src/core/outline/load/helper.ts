@@ -90,7 +90,7 @@ export function buildMenu(params: BuildMenuParams): Menu {
                     return permission.permits.every(isAllow)
 
                 case "role":
-                    return ticket.roles.includes(permission.role)
+                    return ticket.grantedRoles.includes(permission.role)
             }
         }
         function hasActive(node: MenuNode): boolean {

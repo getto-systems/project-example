@@ -53,7 +53,7 @@ describe("ValidateBoard", () => {
 })
 
 function standard() {
-    const { validate: action, checker } = initValidateBoardAction(
+    const { validate: action, validateChecker: checker } = initValidateBoardAction(
         {
             fields: ["name", "description"],
         },

@@ -17,4 +17,7 @@ class Stack implements ObserveBoardStack {
     set(name: string, hasChanged: boolean): void {
         this.stack.set(name, hasChanged)
     }
+    clear(): void {
+        this.stack.clear()
+    }
 }

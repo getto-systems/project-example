@@ -52,7 +52,10 @@ describe("ObserveBoardField", () => {
 
 function standard() {
     const store = mockBoardValueStore()
-    const observer = initBoardFieldObserver(() => store.get())
+    const observer = initBoardFieldObserver({
+        current: () => store.get(),
+        isSame: (a, b) => a === b,
+    })
     const action = initObserveBoardFieldAction({ observer })
 
     return { action, observer, store }

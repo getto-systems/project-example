@@ -36,6 +36,7 @@ async function fetchRemote(
                 users.push({
                     loginId: `user-${i}`,
                     grantedRoles: [],
+                    resetTokenDestination: { type: "none" },
                 })
             }
             return {
@@ -88,10 +89,14 @@ async function fetchRemote(
                     defaultSearchAuthUserAccountSort,
                     readSearchAuthUserAccountSortKey,
                 ),
-                users: message.users.map((user) => ({
-                    loginId: user.loginId || "",
-                    grantedRoles: user.grantedRoles || [],
-                })),
+                users: message.users.map(
+                    (user): AuthUserAccountBasket => ({
+                        loginId: user.loginId || "",
+                        grantedRoles: user.grantedRoles || [],
+                        // TODO destination を返してもらう
+                        resetTokenDestination: { type: "none" },
+                    }),
+                ),
             },
         }
     } catch (err) {

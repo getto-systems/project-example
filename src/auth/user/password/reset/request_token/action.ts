@@ -12,7 +12,7 @@ import { ValidateBoardAction } from "../../../../../z_vendor/getto-application/b
 
 import { RequestResetTokenRemote } from "./infra"
 import { DelayTime } from "../../../../../z_lib/ui/config/infra"
-import { ValidateBoardChecker } from "../../../../../z_vendor/getto-application/board/validate_board/infra"
+import { BoardConverter } from "../../../../../z_vendor/getto-application/board/kernel/infra"
 
 import { RequestResetTokenError, RequestResetTokenFields } from "./data"
 import { ConvertBoardResult } from "../../../../../z_vendor/getto-application/board/kernel/data"
@@ -50,9 +50,6 @@ export function initRequestResetTokenAction(
     return new Action(material)
 }
 
-const requestResetTokenFieldNames = ["loginId"] as const
-type RequestResetTokenFieldName = typeof requestResetTokenFieldNames[number]
-
 class Action
     extends AbstractStatefulApplicationAction<RequestResetTokenState>
     implements RequestResetTokenAction
@@ -63,7 +60,7 @@ class Action
     readonly validate: ValidateBoardAction
 
     material: RequestResetTokenMaterial
-    checker: ValidateBoardChecker<RequestResetTokenFieldName, RequestResetTokenFields>
+    convert: BoardConverter<RequestResetTokenFields>
 
     constructor(material: RequestResetTokenMaterial) {
         super({
@@ -74,12 +71,12 @@ class Action
         })
         this.material = material
 
+        const fields = ["loginId"] as const
+
         const loginId = initInputLoginIdAction()
 
-        const { validate, checker } = initValidateBoardAction(
-            {
-                fields: requestResetTokenFieldNames,
-            },
+        const { validate, validateChecker } = initValidateBoardAction(
+            { fields },
             {
                 converter: (): ConvertBoardResult<RequestResetTokenFields> => {
                     const loginIdResult = loginId.checker.check()
@@ -98,10 +95,10 @@ class Action
 
         this.loginId = loginId.input
         this.validate = validate
-        this.checker = checker
+        this.convert = () => validateChecker.get()
 
         this.loginId.validate.subscriber.subscribe((result) =>
-            checker.update("loginId", result.valid),
+            validateChecker.update("loginId", result.valid),
         )
     }
 
@@ -111,7 +108,7 @@ class Action
         return this.currentState()
     }
     submit(): Promise<RequestResetTokenState> {
-        return requestResetToken(this.material, this.checker.get(), this.post)
+        return requestResetToken(this.material, this.convert(), this.post)
     }
 }
 

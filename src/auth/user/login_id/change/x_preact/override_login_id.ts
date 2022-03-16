@@ -86,23 +86,14 @@ export function OverrideLoginIdComponent(props: Props): VNode {
             | Readonly<{ title: VNodeContent; body: VNodeContent }>
             | Readonly<{ title: VNodeContent; body: VNodeContent; footer: VNodeContent }>
         function content(): BoxContent {
-            switch (state.type) {
-                case "initial":
-                    return {
-                        title: title(),
-                        body: openButton(),
-                    }
-
-                case "success":
-                    return {
-                        title: title(),
-                        body: openButton(),
-                        footer: notice_success(["ログインIDを変更しました"]),
-                    }
+            return {
+                title: BOX_TITLE,
+                body: openButton(),
+                footer:
+                    state.type === "success"
+                        ? notice_success(["ログインIDを変更しました"])
+                        : undefined,
             }
-        }
-        function title() {
-            return "ログインID変更"
         }
         function openButton(): VNode {
             return button_send({ state: "normal", label: "変更", onClick })
@@ -121,7 +112,7 @@ export function OverrideLoginIdComponent(props: Props): VNode {
     function formBox(state: FormContent): VNode {
         return form(
             box({
-                title: "ログインID変更",
+                title: BOX_TITLE,
                 body: [
                     h(InputLoginIdEntry, {
                         field: props.override.newLoginId,
@@ -223,6 +214,8 @@ export function OverrideLoginIdComponent(props: Props): VNode {
         }
     }
 }
+
+const BOX_TITLE = "ログインID"
 
 const LABEL_STATIC = html`変更 ${iconHtml(icon_save)}`
 const LABEL_CONNECT = html`変更 ${iconHtml(icon_spinner)}`

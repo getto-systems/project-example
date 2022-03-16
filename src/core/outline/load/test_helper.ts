@@ -4,7 +4,7 @@ import { MenuPermission, MenuTree, MenuTreeNode } from "./infra"
 
 export function standard_MenuTree(): MenuTree {
     const allow: MenuPermission = { type: "allow" }
-    const dev: MenuPermission = { type: "role", role: "dev-docs" }
+    const user: MenuPermission = { type: "role", role: "user" }
 
     return [
         category("MAIN", allow, [
@@ -15,8 +15,8 @@ export function standard_MenuTree(): MenuTree {
             item("認証・認可", icon("auth"), "docs/auth.html"),
             category("DETAIL", allow, [item("詳細", icon("detail"), "docs/auth.html")]),
         ]),
-        category("DEVELOPMENT", dev, [
-            item("配備構成", icon("deployment"), "docs/z-dev/deployment.html"),
+        category("ACCOUNT", user, [
+            item("ユーザー", icon("friends"), "user/account.html"),
         ]),
     ]
 }

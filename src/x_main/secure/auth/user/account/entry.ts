@@ -13,6 +13,7 @@ import { initEditableBoardAction } from "../../../../../z_vendor/getto-applicati
 import { newOverridePasswordAction } from "../../../../../auth/user/password/change/init/resource"
 import { newSearchSidebarAction } from "../../../../../z_lib/ui/search/sidebar/init/resource"
 import { newOverrideLoginIdAction } from "../../../../../auth/user/login_id/change/init/resource"
+import { newModifyAuthUserAccountAction } from "../../../../../auth/user/account/modify/init/resource"
 
 render(h(ManageUserAccountPageEntry, props()), document.body)
 
@@ -27,6 +28,11 @@ function newResource() {
         sidebar: newSearchSidebarAction(feature, "auth.user.account"),
         search,
         list: search,
+        detail: search.detail,
+        modify: {
+            editable: initEditableBoardAction(),
+            modify: newModifyAuthUserAccountAction(feature),
+        },
         overrideLoginId: {
             editable: initEditableBoardAction(),
             override: newOverrideLoginIdAction(feature),
