@@ -1,6 +1,8 @@
 import { env } from "../../../../../y_environment/ui/env"
 import pb from "../../../../../y_protobuf/proto.js"
 
+import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
+
 import {
     generateNonce,
     fetchOptions,
@@ -8,13 +10,13 @@ import {
     remoteInfraError,
 } from "../../../../../z_lib/ui/remote/init/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf/helper"
-
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
+import { toResetTokenDestinationEmail } from "../../input/convert"
 
 import { ModifyAuthUserAccountRemoteResult, ModifyAuthUserAccountRemote } from "../infra"
 
 import { AuthUserAccountBasket } from "../../kernel/data"
 import { ModifyAuthUserAccountFields } from "../data"
+import { ResetTokenDestination } from "../../input/data"
 
 export function newModifyAuthUserAccountRemote(
     feature: RemoteOutsideFeature,
@@ -25,14 +27,18 @@ export function newModifyAuthUserAccountRemote(
 async function fetchRemote(
     feature: RemoteOutsideFeature,
     user: AuthUserAccountBasket,
-    _fields: ModifyAuthUserAccountFields,
+    fields: ModifyAuthUserAccountFields,
 ): Promise<ModifyAuthUserAccountRemoteResult> {
     try {
         const mock = false
         if (mock) {
             return {
                 success: true,
-                value: user, // TODO fields の内容を反映した user を返す
+                value: {
+                    loginId: user.loginId,
+                    grantedRoles: fields.grantedRoles,
+                    resetTokenDestination: fields.resetTokenDestination,
+                },
             }
         }
 
@@ -45,10 +51,17 @@ async function fetchRemote(
         const response = await fetch(opts.url, {
             ...opts.options,
             body: encodeProtobuf(
-                // TODO Modify Request に変更してうまいことやる
-                pb.auth.user.account.modify.service.OverrideLoginIdRequestPb,
+                pb.auth.user.account.modify.service.ModifyAuthUserAccountRequestPb,
                 (message) => {
                     message.loginId = user.loginId
+                    message.from = {
+                        grantedRoles: Array.from(user.grantedRoles),
+                        resetTokenDestination: user.resetTokenDestination,
+                    }
+                    message.to = {
+                        grantedRoles: Array.from(fields.grantedRoles),
+                        resetTokenDestination: fields.resetTokenDestination,
+                    }
                 },
             ),
         })
@@ -58,31 +71,62 @@ async function fetchRemote(
         }
 
         const message = decodeProtobuf(
-            pb.auth.user.loginId.change.service.OverrideLoginIdResponsePb,
+            pb.auth.user.account.modify.service.ModifyAuthUserAccountResponsePb,
             await response.text(),
         )
         if (!message.success) {
             return errorResponse(message.err)
         }
+        if (!message.data) {
+            return {
+                success: false,
+                err: { type: "infra-error", err: "data not exists in response" },
+            }
+        }
         return {
             success: true,
-            value: user, // TODO response から AuthUserAccountBasket を構築
+            value: responseData(user, message.data),
         }
     } catch (err) {
         return remoteInfraError(err)
     }
 }
 
-function errorResponse(
-    _err: pb.auth.user.loginId.change.service.OverrideLoginIdErrorKindPb,
-): ModifyAuthUserAccountRemoteResult {
-    // TODO 正しいエラー処理にする
-    return { success: false, err: { type: "invalid-granted-role" } }
-    // switch (err) {
-    //     case pb.auth.user.loginId.change.service.OverrideLoginIdErrorKindPb.INVALID_LOGIN_ID:
-    //         return { success: false, err: { type: "invalid-login-id" } }
+function responseData(
+    user: AuthUserAccountBasket,
+    data: pb.auth.user.account.modify.service.IModifyAuthUserAccountDataPb,
+): AuthUserAccountBasket {
+    return {
+        loginId: user.loginId,
+        grantedRoles: data.grantedRoles || [],
+        resetTokenDestination: resetTokenDestination(data.resetTokenDestination || {}),
+    }
 
-    //     case pb.auth.user.loginId.change.service.OverrideLoginIdErrorKindPb.ALREADY_REGISTERED:
-    //         return { success: false, err: { type: "already-registered" } }
-    // }
+    function resetTokenDestination(
+        destination: pb.auth.user.account.modify.service.IModifyResetTokenDestinationDataPb,
+    ): ResetTokenDestination {
+        switch (destination.type) {
+            case "email":
+                return toResetTokenDestinationEmail(destination.email || "")
+
+            default:
+                return { type: "none" }
+        }
+    }
+}
+function errorResponse(
+    err: pb.auth.user.account.modify.service.ModifyAuthUserAccountErrorKindPb,
+): ModifyAuthUserAccountRemoteResult {
+    switch (err) {
+        case pb.auth.user.account.modify.service.ModifyAuthUserAccountErrorKindPb.CONFLICT:
+            return { success: false, err: { type: "conflict" } }
+
+        case pb.auth.user.account.modify.service.ModifyAuthUserAccountErrorKindPb
+            .INVALID_GRANTED_ROLE:
+            return { success: false, err: { type: "invalid-granted-role" } }
+
+        case pb.auth.user.account.modify.service.ModifyAuthUserAccountErrorKindPb
+            .INVALID_RESET_TOKEN_DESTINATION_EMAIL:
+            return { success: false, err: { type: "invalid-reset-token-destination-email" } }
+    }
 }

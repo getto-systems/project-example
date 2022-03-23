@@ -18,89 +18,49 @@ import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 import { iconHtml, icon_save, icon_spinner } from "../../../../../core/x_preact/design/icon"
 
 import { InputResetTokenDestinationEntry } from "../../input/x_preact/destination"
-import { InputGrantedRolesComponent } from "../../input/x_preact/granted_roles"
+import { InputGrantedRolesEntry } from "../../input/x_preact/granted_roles"
 
 import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
 
-import { ModifyAuthUserAccountAction, ModifyAuthUserAccountState } from "../action"
-import { ValidateBoardState } from "../../../../../z_vendor/getto-application/board/validate_board/action"
-import {
-    EditableBoardAction,
-    EditableBoardState,
-} from "../../../../../z_vendor/getto-application/board/editable/action"
-import { ObserveBoardState } from "../../../../../z_vendor/getto-application/board/observe_board/action"
+import { ModifyAuthUserAccountAction } from "../action"
+import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
 
 import { AuthUserAccountBasket } from "../../kernel/data"
 import { ModifyAuthUserAccountError } from "../data"
 
-type EntryProps = Readonly<{
+type Props = Readonly<{
     user: AuthUserAccountBasket
     editable: EditableBoardAction
     modify: ModifyAuthUserAccountAction
 }>
-export function ModifyAuthUserAccountEntry({ user, editable, modify }: EntryProps): VNode {
-    return h(ModifyAuthUserAccountComponent, {
-        user,
-        editable,
-        modify,
-        state: useApplicationAction(modify),
-        editableState: useApplicationAction(editable),
-        validateState: useApplicationAction(modify.validate),
-        observeState: useApplicationAction(modify.observe),
-    })
-}
+export function ModifyAuthUserAccount(props: Props): VNode {
+    const state = useApplicationAction(props.modify)
+    const editableState = useApplicationAction(props.editable)
+    const validateState = useApplicationAction(props.modify.validate)
+    const observeState = useApplicationAction(props.modify.observe)
 
-type Props = EntryProps &
-    Readonly<{
-        state: ModifyAuthUserAccountState
-        editableState: EditableBoardState
-        validateState: ValidateBoardState
-        observeState: ObserveBoardState
-    }>
-export function ModifyAuthUserAccountComponent(props: Props): VNode {
-    return basedOn(props)
+    return form(
+        box({
+            title: "基本情報",
+            body: [
+                h(InputGrantedRolesEntry, {
+                    user: props.user,
+                    editable: props.editable,
+                    field: props.modify.grantedRoles,
+                }),
+                h(InputResetTokenDestinationEntry, {
+                    user: props.user,
+                    editable: props.editable,
+                    field: props.modify.resetTokenDestination,
+                }),
+            ],
+            footer: editableState.isEditable ? editButtons() : staticButtons(),
+        }),
+    )
 
-    function basedOn({ state, editableState, validateState }: Props): VNode {
-        if (editableState.isEditable) {
-            switch (state.type) {
-                case "initial-modify":
-                case "succeed-to-modify":
-                    return formBox({ type: validateState })
+    function staticButtons(): VNodeContent {
+        return [openButton(), ...message()]
 
-                case "try-to-modify":
-                    return formBox({ type: "connecting" })
-
-                case "take-longtime-to-modify":
-                    return formBox({ type: "take-longtime" })
-
-                case "failed-to-modify":
-                    return formBox({ type: validateState, err: modifyError(state.err) })
-            }
-        } else {
-            return buttonBox({
-                type: state.type === "succeed-to-modify" ? "success" : "initial",
-            })
-        }
-    }
-
-    type ButtonContentType = "initial" | "success"
-    type ButtonContent = Readonly<{ type: ButtonContentType }>
-    function buttonBox(state: ButtonContent): VNode {
-        return form(box(content()))
-
-        type BoxContent =
-            | Readonly<{ title: VNodeContent; body: VNodeContent }>
-            | Readonly<{ title: VNodeContent; body: VNodeContent; footer: VNodeContent }>
-        function content(): BoxContent {
-            return {
-                title: BOX_TITLE,
-                body: openButton(),
-                footer:
-                    state.type === "success"
-                        ? notice_success(["基本情報を変更しました"])
-                        : undefined,
-            }
-        }
         function openButton(): VNode {
             return button_send({ state: "normal", label: "変更", onClick })
 
@@ -110,56 +70,42 @@ export function ModifyAuthUserAccountComponent(props: Props): VNode {
                 props.editable.open()
             }
         }
+
+        function message(): VNode[] {
+            if (state.type === "success") {
+                return [notice_success(["変更完了しました"])]
+            }
+            return []
+        }
     }
 
-    type FormContentType = "initial" | "valid" | "invalid" | "connecting" | "take-longtime"
-    type FormContent = Readonly<{ type: FormContentType }> &
-        Partial<{ err: readonly VNodeContent[] }>
-    function formBox(state: FormContent): VNode {
-        return form(
-            box({
-                title: BOX_TITLE,
-                body: [
-                    h(InputGrantedRolesComponent, {
-                        field: props.modify.grantedRoles,
-                    }),
-                    h(InputResetTokenDestinationEntry, {
-                        field: props.modify.resetTokenDestination,
-                    }),
-                ],
-                footer: [
-                    buttons({
-                        left: submitButton(),
-                        right: resetButton(),
-                    }),
-                    ...message(),
-                    buttons({
-                        right: closeButton(),
-                    }),
-                ],
+    function editButtons(): VNodeContent {
+        return [
+            buttons({
+                left: submitButton(),
+                right: resetButton(),
             }),
-        )
+            ...message(),
+            buttons({
+                right: closeButton(),
+            }),
+        ]
 
         function submitButton(): VNode {
             switch (state.type) {
                 case "initial":
-                    if (props.observeState.hasChanged) {
-                        return button_send({ state: "confirm", label: LABEL_STATIC, onClick })
-                    } else {
-                        return button_send({ state: "normal", label: LABEL_STATIC, onClick })
+                case "failed":
+                case "success":
+                    if (validateState === "invalid") {
+                        return button_disabled({ label: LABEL_STATIC })
                     }
+                    return button_send({
+                        state: observeState.hasChanged ? "confirm" : "normal",
+                        label: LABEL_STATIC,
+                        onClick,
+                    })
 
-                case "valid":
-                    if (props.observeState.hasChanged) {
-                        return button_send({ state: "confirm", label: LABEL_STATIC, onClick })
-                    } else {
-                        return button_send({ state: "normal", label: LABEL_STATIC, onClick })
-                    }
-
-                case "invalid":
-                    return button_disabled({ label: LABEL_STATIC })
-
-                case "connecting":
+                case "try":
                 case "take-longtime":
                     return button_send({ state: "connect", label: LABEL_CONNECT })
             }
@@ -167,9 +113,8 @@ export function ModifyAuthUserAccountComponent(props: Props): VNode {
             function onClick(e: Event) {
                 e.preventDefault()
                 props.modify.submit(props.user).then((state) => {
-                    switch (state.type) {
-                        case "succeed-to-modify":
-                            props.editable.close()
+                    if (state.type === "success") {
+                        props.editable.close()
                     }
                 })
             }
@@ -178,23 +123,17 @@ export function ModifyAuthUserAccountComponent(props: Props): VNode {
         function resetButton(): VNode {
             switch (state.type) {
                 case "initial":
-                    if (props.observeState.hasChanged) {
+                case "success":
+                case "failed":
+                    if (observeState.hasChanged) {
                         return button_undo({ label: LABEL_RESET, onClick })
                     } else {
                         return button_disabled({ label: LABEL_RESET })
                     }
 
-                case "connecting":
+                case "try":
                 case "take-longtime":
                     return EMPTY_CONTENT
-
-                case "invalid":
-                case "valid":
-                    if (props.observeState.hasChanged) {
-                        return button_undo({ label: LABEL_RESET, onClick })
-                    } else {
-                        return button_disabled({ label: LABEL_RESET })
-                    }
             }
 
             function onClick(e: Event) {
@@ -202,6 +141,7 @@ export function ModifyAuthUserAccountComponent(props: Props): VNode {
                 props.modify.reset(props.user)
             }
         }
+
         function closeButton(): VNode {
             return button_undo({ label: "閉じる", onClick })
 
@@ -212,14 +152,15 @@ export function ModifyAuthUserAccountComponent(props: Props): VNode {
         }
 
         function message(): readonly VNode[] {
-            if (state.err) {
-                return [fieldError(state.err)]
-            }
-
             switch (state.type) {
                 case "initial":
-                case "valid":
-                case "connecting":
+                case "success":
+                    if (validateState === "invalid") {
+                        return [fieldError(["正しく入力されていません"])]
+                    }
+                    return []
+
+                case "try":
                     return []
 
                 case "take-longtime":
@@ -230,8 +171,8 @@ export function ModifyAuthUserAccountComponent(props: Props): VNode {
                         ]),
                     ]
 
-                case "invalid":
-                    return [fieldError(["正しく入力されていません"])]
+                case "failed":
+                    return [fieldError(modifyError(state.err))]
             }
         }
     }
@@ -242,21 +183,22 @@ function modifyError(err: ModifyAuthUserAccountError): readonly VNodeContent[] {
         case "validation-error":
             return ["正しく入力してください"]
 
+        case "conflict":
+            return ["他で変更がありました", "一旦リロードしてやり直してください"]
+
         case "invalid-granted-role":
-            return ["権限が正しくありません"]
+            return ["権限が正しくありません", "一旦リロードしてやり直してください"]
 
         case "invalid-reset-token-destination-email":
             return ["メールアドレスが正しくありません"]
 
         default:
             return remoteCommonErrorReason(err, (reason) => [
-                `${reason.message}により基本情報変更に失敗しました`,
+                `${reason.message}により変更に失敗しました`,
                 ...reason.detail,
             ])
     }
 }
-
-const BOX_TITLE = "基本情報"
 
 const LABEL_STATIC = html`変更 ${iconHtml(icon_save)}`
 const LABEL_CONNECT = html`変更 ${iconHtml(icon_spinner)}`

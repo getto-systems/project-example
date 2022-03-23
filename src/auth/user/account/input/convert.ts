@@ -38,7 +38,7 @@ export const resetTokenDestinationBoardConverter: Converter = (value) => {
     if (value.length > EMAIL_MAX_LENGTH) {
         return { valid: false, err: TOO_LONG }
     }
-    return { valid: true, value: markEmail(value) }
+    return { valid: true, value: toResetTokenDestinationEmail(value) }
 }
 
 const EMPTY: readonly ValidateResetTokenDestinationError[] = [{ type: "empty-email" }]
@@ -47,6 +47,6 @@ const TOO_LONG: readonly ValidateResetTokenDestinationError[] = [
     { type: "too-long-email", maxLength: EMAIL_MAX_LENGTH },
 ]
 
-function markEmail(email: string): ResetTokenDestination {
+export function toResetTokenDestinationEmail(email: string): ResetTokenDestination {
     return { type: "email", email: email as ResetTokenDestinationEmail }
 }

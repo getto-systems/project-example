@@ -2,18 +2,29 @@ syntax = "proto3";
 
 package auth.user.account.modify.service;
 
-service OverrideLoginIdPb {
-    rpc OverrideLoginId (OverrideLoginIdRequestPb) returns (OverrideLoginIdResponsePb);
+service ModifyAuthUserAccountPb {
+    rpc ModifyUser (ModifyAuthUserAccountRequestPb) returns (ModifyAuthUserAccountResponsePb);
 }
-message OverrideLoginIdRequestPb {
+message ModifyAuthUserAccountRequestPb {
     string login_id = 1;
-    string new_login_id = 2;
+    ModifyAuthUserAccountDataPb from = 2;
+    ModifyAuthUserAccountDataPb to = 3;
 }
-message OverrideLoginIdResponsePb {
+message ModifyAuthUserAccountResponsePb {
     bool success = 1;
-    OverrideLoginIdErrorKindPb err = 2;
+    ModifyAuthUserAccountDataPb data = 2;
+    ModifyAuthUserAccountErrorKindPb err = 3;
 }
-enum OverrideLoginIdErrorKindPb {
-    INVALID_LOGIN_ID = 0;
-    ALREADY_REGISTERED = 1;
+enum ModifyAuthUserAccountErrorKindPb {
+    CONFLICT = 0;
+    INVALID_GRANTED_ROLE = 1;
+    INVALID_RESET_TOKEN_DESTINATION_EMAIL = 2;
+}
+message ModifyAuthUserAccountDataPb {
+    repeated string granted_roles = 1;
+    ModifyResetTokenDestinationDataPb reset_token_destination = 2;
+}
+message ModifyResetTokenDestinationDataPb {
+    string type = 1;
+    string email = 2;
 }

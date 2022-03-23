@@ -12,5 +12,6 @@ export type ModifyAuthUserAccountError =
 
 export type ModifyAuthUserAccountRemoteError =
     | RemoteCommonError
+    | Readonly<{ type: "conflict" }>
     | Readonly<{ type: "invalid-granted-role" }>
     | Readonly<{ type: "invalid-reset-token-destination-email" }>

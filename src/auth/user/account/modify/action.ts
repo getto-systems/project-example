@@ -43,9 +43,9 @@ export interface ModifyAuthUserAccountAction
 const modifyAuthUserAccountFieldNames = ["resetTokenDestination"] as const
 export type ModifyAuthUserAccountFieldName = typeof modifyAuthUserAccountFieldNames[number]
 
-export type ModifyAuthUserAccountState = Readonly<{ type: "initial-modify" }> | ModifyUser
+export type ModifyAuthUserAccountState = Readonly<{ type: "initial" }> | ModifyUserEvent
 
-const initialState: ModifyAuthUserAccountState = { type: "initial-modify" }
+const initialState: ModifyAuthUserAccountState = { type: "initial" }
 
 export type ModifyAuthUserAccountMaterial = Readonly<{
     infra: ModifyAuthUserAccountInfra
@@ -147,23 +147,23 @@ class Action
     }
 }
 
-type ModifyUser =
-    | Readonly<{ type: "try-to-modify" }>
-    | Readonly<{ type: "take-longtime-to-modify" }>
-    | Readonly<{ type: "failed-to-modify"; err: ModifyAuthUserAccountError }>
-    | Readonly<{ type: "succeed-to-modify" }>
+type ModifyUserEvent =
+    | Readonly<{ type: "try" }>
+    | Readonly<{ type: "take-longtime" }>
+    | Readonly<{ type: "failed"; err: ModifyAuthUserAccountError }>
+    | Readonly<{ type: "success" }>
 
 async function modifyUser<S>(
     { infra, config }: ModifyAuthUserAccountMaterial,
     user: AuthUserAccountBasket,
     fields: ConvertBoardResult<ModifyAuthUserAccountFields>,
-    post: Post<ModifyUser, S>,
+    post: Post<ModifyUserEvent, S>,
 ): Promise<S> {
     if (!fields.valid) {
-        return post({ type: "failed-to-modify", err: { type: "validation-error" } })
+        return post({ type: "failed", err: { type: "validation-error" } })
     }
 
-    post({ type: "try-to-modify" })
+    post({ type: "try" })
 
     const { modifyUserRemote } = infra
 
@@ -171,13 +171,13 @@ async function modifyUser<S>(
     const response = await delayedChecker(
         modifyUserRemote(user, fields.value),
         config.takeLongtimeThreshold,
-        () => post({ type: "take-longtime-to-modify" }),
+        () => post({ type: "take-longtime" }),
     )
     if (!response.success) {
-        return post({ type: "failed-to-modify", err: response.err })
+        return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "succeed-to-modify" })
+    return post({ type: "success" })
 }
 
 interface Post<E, S> {

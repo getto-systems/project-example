@@ -23,12 +23,22 @@ import {
     InputResetTokenDestinationState,
     ValidateResetTokenDestinationState,
 } from "../action"
+import {
+    EditableBoardAction,
+    EditableBoardState,
+} from "../../../../../z_vendor/getto-application/board/editable/action"
 
 import { toBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/convert"
 
 import { ResetTokenDestination, ValidateResetTokenDestinationError } from "../data"
+import { AuthUserAccountBasket } from "../../kernel/data"
+import { label_gray } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 
-type EntryProps = Readonly<{ field: InputResetTokenDestinationAction }> &
+type EntryProps = Readonly<{
+    user: AuthUserAccountBasket
+    editable: EditableBoardAction
+    field: InputResetTokenDestinationAction
+}> &
     Partial<{
         title: VNodeContent
         help: readonly VNodeContent[]
@@ -38,6 +48,7 @@ export function InputResetTokenDestinationEntry(resource: EntryProps): VNode {
     return h(InputResetTokenDestinationComponent, {
         ...resource,
         state: useApplicationAction(resource.field),
+        editableState: useApplicationAction(resource.editable),
         validateState: useApplicationAction(resource.field.validate),
     })
 }
@@ -45,33 +56,42 @@ export function InputResetTokenDestinationEntry(resource: EntryProps): VNode {
 type Props = EntryProps &
     Readonly<{
         state: InputResetTokenDestinationState
+        editableState: EditableBoardState
         validateState: ValidateResetTokenDestinationState
     }>
 
 export function InputResetTokenDestinationComponent(props: Props): VNode {
-    return content()
+    const content = {
+        title: props.title || "パスワードリセット用Eメール",
+        help: props.help,
+        body: body(),
+    }
 
-    function content() {
-        const content = {
-            title: title(),
-            body: [
-                label_text_fill(
-                    h(RadioBoardComponent, {
-                        input: props.field.destinationType,
-                        name: "destinationType",
-                        options: [destinationRadio("email"), destinationRadio("none")],
-                    }),
-                ),
-                email(),
-            ],
-            help: help(),
-        }
+    if (props.editableState.isEditable && !props.validateState.valid) {
+        return field_error({ ...content, notice: emailValidationError(props.validateState) })
+    }
+    return field(content)
 
-        if (props.validateState.valid) {
-            return field(content)
-        } else {
-            return field_error({ ...content, notice: emailValidationError(props.validateState) })
+    function body(): VNodeContent {
+        if (!props.editableState.isEditable) {
+            switch (props.user.resetTokenDestination.type) {
+                case "none":
+                    return label_gray("無効")
+
+                case "email":
+                    return props.user.resetTokenDestination.email
+            }
         }
+        return [
+            label_text_fill(
+                h(RadioBoardComponent, {
+                    input: props.field.destinationType,
+                    name: "destinationType",
+                    options: [destinationRadio("email"), destinationRadio("none")],
+                }),
+            ),
+            email(),
+        ]
 
         function email(): VNode {
             switch (props.state.type) {
@@ -92,31 +112,17 @@ export function InputResetTokenDestinationComponent(props: Props): VNode {
             return {
                 key: destinationType,
                 value: toBoardValue(destinationType),
-                label: label(destinationType),
-            }
-        }
-        function label(destinationType: ResetTokenDestination["type"]): VNodeContent {
-            switch (destinationType) {
-                case "none":
-                    return "無効"
+                label: (() => {
+                    switch (destinationType) {
+                        case "none":
+                            return "無効"
 
-                case "email":
-                    return "有効"
+                        case "email":
+                            return "有効"
+                    }
+                })(),
             }
         }
-    }
-    function title(): VNodeContent {
-        if (props.title) {
-            return props.title
-        }
-        // TODO 一覧のカラムと一緒にしたい
-        return "パスワードリセット用Eメール"
-    }
-    function help(): readonly VNodeContent[] {
-        if (props.help) {
-            return props.help
-        }
-        return []
     }
 }
 

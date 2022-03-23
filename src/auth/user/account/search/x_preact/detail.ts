@@ -7,7 +7,7 @@ import { button_cancel } from "../../../../../z_vendor/getto-css/preact/design/f
 
 import { BACK_TO_LIST_BUTTON } from "../../../../../core/x_preact/design/table"
 
-import { ModifyAuthUserAccountEntry } from "../../modify/x_preact/modify"
+import { ModifyAuthUserAccount } from "../../modify/x_preact/modify"
 import { OverrideLoginIdEntry } from "../../../login_id/change/x_preact/override_login_id"
 import { OverridePasswordEntry } from "../../../password/change/x_preact/override_password"
 
@@ -48,7 +48,7 @@ export function DetailAuthUserAccountEntry(props: EntryProps): VNode {
         const user = props.user.user
 
         return container([
-            h(ModifyAuthUserAccountEntry, { ...props.modify, user }),
+            h(ModifyAuthUserAccount, { ...props.modify, user }),
             h(OverrideLoginIdEntry, { ...props.overrideLoginId, user }),
             h(OverridePasswordEntry, { ...props.overridePassword, user }),
         ])
