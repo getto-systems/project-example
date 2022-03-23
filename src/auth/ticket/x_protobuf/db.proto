@@ -4,5 +4,5 @@ package auth.ticket.db;
 
 message AuthTicketPb {
     string authAt = 1;
-    repeated string roles = 2;
+    repeated string grantedRoles = 2;
 }

@@ -30,7 +30,7 @@ export function initValidateBoardAction<N extends string, T>(
     shell: ValidateBoardShell<T>,
 ): Readonly<{
     validate: ValidateBoardAction
-    checker: ValidateBoardChecker<N, T>
+    validateChecker: ValidateBoardChecker<N, T>
 }> {
     const action = new Action(
         config,
@@ -41,7 +41,7 @@ export function initValidateBoardAction<N extends string, T>(
     )
     return {
         validate: action,
-        checker: action,
+        validateChecker: action,
     }
 }
 

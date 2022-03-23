@@ -3,19 +3,19 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
-import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 import { initInputPasswordAction } from "../input/action"
 import { initValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
-
 import { InputPasswordAction } from "../input/action"
 import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
 
-import { ChangePasswordError, ChangePasswordFields, OverridePasswordFields } from "./data"
-import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
+import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 
 import { ChangePasswordRemote, OverridePasswordRemote } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
-import { ValidateBoardChecker } from "../../../../z_vendor/getto-application/board/validate_board/infra"
+import { BoardConverter } from "../../../../z_vendor/getto-application/board/kernel/infra"
+
+import { ChangePasswordError, ChangePasswordFields, OverridePasswordFields } from "./data"
+import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { AuthUserAccountBasket } from "../../account/kernel/data"
 
 export interface ChangePasswordAction extends StatefulApplicationAction<ChangePasswordState> {
@@ -26,9 +26,6 @@ export interface ChangePasswordAction extends StatefulApplicationAction<ChangePa
     clear(): ChangePasswordState
     submit(): Promise<ChangePasswordState>
 }
-
-export const changePasswordFieldNames = ["currentPassword", "newPassword"] as const
-export type ChangePasswordFieldName = typeof changePasswordFieldNames[number]
 
 export type ChangePasswordState =
     | Readonly<{ type: "initial-change-password" }>
@@ -43,9 +40,6 @@ export interface OverridePasswordAction extends StatefulApplicationAction<Overri
     clear(): OverridePasswordState
     submit(user: AuthUserAccountBasket): Promise<OverridePasswordState>
 }
-
-export const overridePasswordFieldNames = ["newPassword"] as const
-export type OverridePasswordFieldName = typeof overridePasswordFieldNames[number]
 
 export type OverridePasswordState =
     | Readonly<{ type: "initial-override-password" }>
@@ -81,7 +75,7 @@ class Action
     readonly validate: ValidateBoardAction
 
     material: ChangePasswordMaterial
-    checker: ValidateBoardChecker<ChangePasswordFieldName, ChangePasswordFields>
+    convert: BoardConverter<ChangePasswordFields>
 
     constructor(material: ChangePasswordMaterial) {
         super({
@@ -93,12 +87,12 @@ class Action
         })
         this.material = material
 
+        const fields = ["currentPassword", "newPassword"] as const
+
         const currentPassword = initInputPasswordAction()
         const newPassword = initInputPasswordAction()
-        const { validate, checker } = initValidateBoardAction(
-            {
-                fields: changePasswordFieldNames,
-            },
+        const { validate, validateChecker } = initValidateBoardAction(
+            { fields },
             {
                 converter: (): ConvertBoardResult<ChangePasswordFields> => {
                     const result = {
@@ -122,13 +116,13 @@ class Action
         this.currentPassword = currentPassword.input
         this.newPassword = newPassword.input
         this.validate = validate
-        this.checker = checker
+        this.convert = () => validateChecker.get()
 
         this.currentPassword.validate.subscriber.subscribe((result) =>
-            checker.update("currentPassword", result.valid),
+            validateChecker.update("currentPassword", result.valid),
         )
         this.newPassword.validate.subscriber.subscribe((result) =>
-            checker.update("newPassword", result.valid),
+            validateChecker.update("newPassword", result.valid),
         )
     }
 
@@ -139,7 +133,7 @@ class Action
         return this.post(this.initialState)
     }
     async submit(): Promise<ChangePasswordState> {
-        return changePassword(this.material, this.checker.get(), this.post)
+        return changePassword(this.material, this.convert(), this.post)
     }
 }
 
@@ -204,7 +198,7 @@ class OverrideAction
     readonly validate: ValidateBoardAction
 
     material: OverridePasswordMaterial
-    checker: ValidateBoardChecker<OverridePasswordFieldName, OverridePasswordFields>
+    convert: BoardConverter<OverridePasswordFields>
 
     constructor(material: OverridePasswordMaterial) {
         super({
@@ -215,11 +209,11 @@ class OverrideAction
         })
         this.material = material
 
+        const fields = ["newPassword"] as const
+
         const newPassword = initInputPasswordAction()
-        const { validate, checker } = initValidateBoardAction(
-            {
-                fields: changePasswordFieldNames,
-            },
+        const { validate, validateChecker } = initValidateBoardAction(
+            { fields },
             {
                 converter: (): ConvertBoardResult<OverridePasswordFields> => {
                     const result = {
@@ -240,10 +234,10 @@ class OverrideAction
 
         this.newPassword = newPassword.input
         this.validate = validate
-        this.checker = checker
+        this.convert = () => validateChecker.get()
 
         this.newPassword.validate.subscriber.subscribe((result) =>
-            checker.update("newPassword", result.valid),
+            validateChecker.update("newPassword", result.valid),
         )
     }
 
@@ -253,7 +247,7 @@ class OverrideAction
         return this.post(this.initialState)
     }
     async submit(user: AuthUserAccountBasket): Promise<OverridePasswordState> {
-        return overridePassword(this.material, user, this.checker.get(), this.post)
+        return overridePassword(this.material, user, this.convert(), this.post)
     }
 }
 

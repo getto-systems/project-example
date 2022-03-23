@@ -11,7 +11,7 @@ import {
     CheckboxBoardContent,
 } from "../../../../../z_vendor/getto-application/board/input/x_preact/checkbox"
 
-import { markBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/convert"
+import { toBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/convert"
 
 import { SearchColumnsAction, SearchColumnsState } from "../action"
 
@@ -61,7 +61,7 @@ export function SearchColumnsComponent(props: Props): VNode {
         function options(): readonly CheckboxBoardContent[] {
             return props.columns.map((column) => ({
                 key: column.key,
-                value: markBoardValue(`${column.key}`),
+                value: toBoardValue(`${column.key}`),
                 label: column.content,
             }))
         }

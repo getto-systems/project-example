@@ -9,5 +9,5 @@ export interface AuthTicketRepository {
 }
 export type AuthTicketRepositoryValue = Readonly<{
     authAt: string
-    roles: readonly string[]
+    grantedRoles: readonly string[]
 }>

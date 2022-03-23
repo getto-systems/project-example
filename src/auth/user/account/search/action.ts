@@ -62,6 +62,7 @@ export interface ListAuthUserAccountAction
 export interface DetailAuthUserAccountAction
     extends StatefulApplicationAction<DetailAuthUserAccountState> {
     focus(user: AuthUserAccountBasket): DetailAuthUserAccountState
+    update(user: AuthUserAccountBasket): DetailAuthUserAccountState
     close(): DetailAuthUserAccountState
 
     isFocused(user: AuthUserAccountBasket): boolean
@@ -69,10 +70,7 @@ export interface DetailAuthUserAccountAction
 
 export type SearchAuthUserAccountState =
     | Readonly<{ type: "initial-search" }>
-    | (SearchAuthUserAccountEvent &
-          Readonly<{
-              previousResponse?: SearchAuthUserAccountRemoteResponse
-          }>)
+    | SearchAuthUserAccountEvent
 
 const initialSearchState: SearchAuthUserAccountState = { type: "initial-search" }
 
@@ -112,8 +110,6 @@ export function initSearchAuthUserAccountAction(
     return new Action(material)
 }
 
-const searchAuthUserAccountFieldNames = ["loginId"] as const
-
 class Action
     extends AbstractStatefulApplicationAction<SearchAuthUserAccountState>
     implements SearchAuthUserAccountAction
@@ -150,12 +146,12 @@ class Action
 
         const initialFilter = material.shell.detectFilter()
 
+        const fields = ["loginId"] as const
+
         const loginId = initSearchLoginIdAction(initialFilter.loginId)
         const offset = initSearchOffsetAction(initialFilter.offset)
         const columns = initSearchColumnsAction(material.infra)
-        const { observe, checker } = initObserveBoardAction({
-            fields: searchAuthUserAccountFieldNames,
-        })
+        const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         this.setFilterOnSearch = () =>
             this.setFilter({
@@ -187,6 +183,7 @@ class Action
                     }
                     return { found: true, user }
                 },
+                updateUser: (user) => this.update(user),
             },
             shell: material.shell,
         })
@@ -199,7 +196,7 @@ class Action
         this.filter = initialFilter
 
         this.loginId.observe.subscriber.subscribe((result) =>
-            checker.update("loginId", result.hasChanged),
+            observeChecker.update("loginId", result.hasChanged),
         )
     }
 
@@ -216,55 +213,93 @@ class Action
         this.loginId.clear()
         return this.currentState()
     }
+
     async search(): Promise<SearchAuthUserAccountState> {
-        return search(this.material, this.setFilterOnSearch(), (e) => this.searchResult(e))
+        return this.updateResponse(
+            await search(this.material, this.setFilterOnSearch(), this.response, this.post),
+        )
     }
     async load(): Promise<SearchAuthUserAccountState> {
-        return search(this.material, this.setFilterOnLoad(), (e) => this.searchResult(e))
+        return this.updateResponse(
+            await search(this.material, this.setFilterOnLoad(), this.response, this.post),
+        )
     }
     async sort(key: SearchAuthUserAccountSortKey): Promise<SearchAuthUserAccountState> {
-        return search(this.material, this.setFilterOnSort(key), (e) => this.searchResult(e))
+        return this.updateResponse(
+            await search(this.material, this.setFilterOnSort(key), this.response, this.post),
+        )
     }
-
-    searchResult(e: SearchAuthUserAccountEvent): SearchAuthUserAccountState {
-        const previousInfo = {
-            previousResponse: this.response,
-        }
-        switch (e.type) {
+    updateResponse(state: SearchAuthUserAccountState): SearchAuthUserAccountState {
+        switch (state.type) {
             case "succeed-to-search":
-                this.setFilter({ sort: e.response.sort })
-                this.response = e.response
+                this.setFilter({ sort: state.response.sort })
+                this.response = state.response
                 break
         }
-        return this.post({
-            ...e,
-            ...previousInfo,
-        })
+        return state
+    }
+
+    update(user: AuthUserAccountBasket): SearchAuthUserAccountState {
+        if (!this.response) {
+            return this.currentState()
+        }
+
+        this.response = {
+            ...this.response,
+            users: this.response.users.map((row) => {
+                if (row.loginId !== user.loginId) {
+                    return row
+                }
+                return user
+            }),
+        }
+
+        const state = this.currentState()
+        switch (state.type) {
+            case "initial-search":
+                return state
+
+            case "try-to-search":
+            case "take-longtime-to-search":
+            case "failed-to-search":
+                return this.post({ ...state, previousResponse: this.response })
+
+            case "succeed-to-search":
+                return this.post({ ...state, response: this.response })
+        }
     }
 }
 
 type SearchAuthUserAccountEvent =
-    | Readonly<{ type: "try-to-search" }>
-    | Readonly<{ type: "take-longtime-to-search" }>
-    | Readonly<{ type: "failed-to-search"; err: RemoteCommonError }>
+    | Readonly<{ type: "try-to-search"; previousResponse?: SearchAuthUserAccountRemoteResponse }>
+    | Readonly<{
+          type: "take-longtime-to-search"
+          previousResponse?: SearchAuthUserAccountRemoteResponse
+      }>
+    | Readonly<{
+          type: "failed-to-search"
+          err: RemoteCommonError
+          previousResponse?: SearchAuthUserAccountRemoteResponse
+      }>
     | Readonly<{ type: "succeed-to-search"; response: SearchAuthUserAccountRemoteResponse }>
 
 async function search<S>(
     { infra, shell, config }: SearchAuthUserAccountMaterial,
     fields: SearchAuthUserAccountFilter,
+    previousResponse: SearchAuthUserAccountRemoteResponse | undefined,
     post: Post<SearchAuthUserAccountEvent, S>,
 ): Promise<S> {
     shell.updateQuery(fields)
-    post({ type: "try-to-search" })
+    post({ type: "try-to-search", previousResponse })
 
     const { searchRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(searchRemote(fields), config.takeLongtimeThreshold, () =>
-        post({ type: "take-longtime-to-search" }),
+        post({ type: "take-longtime-to-search", previousResponse }),
     )
     if (!response.success) {
-        return post({ type: "failed-to-search", err: response.err })
+        return post({ type: "failed-to-search", err: response.err, previousResponse })
     }
 
     return post({ type: "succeed-to-search", response: response.value })
@@ -275,9 +310,10 @@ type DetailMaterial = Readonly<{
     shell: DetailShell
 }>
 
-type DetailInfra = Readonly<{
+interface DetailInfra {
     detectUser(loginId: string): Promise<DetectUserResult>
-}>
+    updateUser(user: AuthUserAccountBasket): void
+}
 type DetectUserResult =
     | Readonly<{ found: false }>
     | Readonly<{ found: true; user: AuthUserAccountBasket }>
@@ -314,6 +350,10 @@ class DetailAction
 
     focus(user: AuthUserAccountBasket): DetailAuthUserAccountState {
         this.material.shell.updateFocus.focus(user)
+        return this.post({ type: "focus-on", user })
+    }
+    update(user: AuthUserAccountBasket): DetailAuthUserAccountState {
+        this.material.infra.updateUser(user)
         return this.post({ type: "focus-on", user })
     }
     close(): DetailAuthUserAccountState {

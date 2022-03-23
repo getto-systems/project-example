@@ -125,7 +125,11 @@ function initResource(overrideLoginIdRemote: OverrideLoginIdRemote): Readonly<{
 
     resource.override.newLoginId.input.connector.connect(store.newLoginId)
 
-    const user = { loginId: "user-id", grantedRoles: [] }
+    const user: AuthUserAccountBasket = {
+        loginId: "user-id",
+        grantedRoles: [],
+        resetTokenDestination: { type: "none" },
+    }
 
     return { resource, store, user }
 }

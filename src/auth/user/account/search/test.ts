@@ -8,204 +8,213 @@ import { initMemoryDB } from "../../../../z_lib/ui/repository/init/memory"
 
 import { initSearchAuthUserAccountAction, SearchAuthUserAccountAction } from "./action"
 
-import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
-import { SearchAuthUserAccountRemote, SearchAuthUserAccountRemoteResult } from "./infra"
-import { defaultSearchAuthUserAccountSort, SearchAuthUserAccountRemoteResponse } from "./data"
 import { readSearchAuthUserAccountSortKey } from "./convert"
 
-describe("SearchAuthUserAccount", () => {
-    test("initial load", async () => {
-        const { resource } = standard()
+import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
+import { SearchAuthUserAccountRemote, SearchAuthUserAccountRemoteResult } from "./infra"
 
-        const runner = setupActionTestRunner(resource.search.subscriber)
+import { defaultSearchAuthUserAccountSort, SearchAuthUserAccountRemoteResponse } from "./data"
+import { AuthUserAccountBasket } from "../kernel/data"
 
-        await runner(async () => resource.search.ignitionState).then((stack) => {
-            expect(stack).toEqual([
-                { type: "try-to-search", previousResponse: undefined },
-                {
-                    type: "succeed-to-search",
-                    previousResponse: undefined,
-                    response: standard_response,
-                },
-            ])
-        })
+test("initial load", async () => {
+    const { resource } = standard()
+
+    const runner = setupActionTestRunner(resource.search.subscriber)
+
+    await runner(async () => resource.search.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            { type: "try-to-search", previousResponse: undefined },
+            { type: "succeed-to-search", response: standard_response },
+        ])
     })
+})
 
-    test("search", async () => {
-        const { resource, store } = standard()
+test("search", async () => {
+    const { resource, store } = standard()
 
-        const runner = setupActionTestRunner(resource.search.subscriber)
+    const runner = setupActionTestRunner(resource.search.subscriber)
 
-        await resource.search.ignitionState
+    await resource.search.ignitionState
 
-        await runner(async () => {
-            store.loginId.set(markBoardValue("MY-LOGIN-ID"))
-            resource.search.loginId.input.publisher.post()
-            return resource.search.search()
-        }).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "try-to-search",
-                    previousResponse: standard_response,
-                },
-                {
-                    type: "succeed-to-search",
-                    previousResponse: standard_response,
-                    response: standard_response,
-                },
-            ])
-        })
-    })
-
-    test("search; take longtime", async () => {
-        const { resource } = takeLongtime()
-
-        const runner = setupActionTestRunner(resource.search.subscriber)
-
-        await resource.search.ignitionState
-
-        await runner(async () => {
-            return resource.search.search()
-        }).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "try-to-search",
-                    previousResponse: standard_response,
-                },
-                {
-                    type: "take-longtime-to-search",
-                    previousResponse: standard_response,
-                },
-                {
-                    type: "succeed-to-search",
-                    previousResponse: standard_response,
-                    response: standard_response,
-                },
-            ])
-        })
-    })
-
-    test("sort", async () => {
-        const { resource } = standard()
-
-        const runner = setupActionTestRunner(resource.search.subscriber)
-
-        await resource.search.ignitionState
-
-        await runner(async () => {
-            return resource.search.sort("login-id")
-        }).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "try-to-search",
-                    previousResponse: standard_response,
-                },
-                {
-                    type: "succeed-to-search",
-                    previousResponse: standard_response,
-                    response: standard_response,
-                },
-            ])
-        })
-    })
-
-    test("clear", () => {
-        const { resource, store } = standard()
-
+    await runner(async () => {
         store.loginId.set(markBoardValue("MY-LOGIN-ID"))
-        resource.search.clear()
-
-        expect(store.loginId.get()).toEqual("")
+        resource.search.loginId.input.publisher.post()
+        return resource.search.search()
+    }).then((stack) => {
+        expect(stack).toEqual([
+            { type: "try-to-search", previousResponse: standard_response },
+            { type: "succeed-to-search", response: standard_response },
+        ])
     })
+})
 
-    test("focus / close", async () => {
-        const { resource } = standard()
+test("search; take longtime", async () => {
+    const { resource } = takeLongtime()
 
-        const runner = setupActionTestRunner(resource.search.detail.subscriber)
+    const runner = setupActionTestRunner(resource.search.subscriber)
 
-        await resource.search.ignitionState
+    await resource.search.ignitionState
 
-        await runner(async () => {
-            const user = { loginId: "user-1", grantedRoles: [] }
-            const another = { loginId: "user-another", grantedRoles: [] }
+    await runner(async () => {
+        return resource.search.search()
+    }).then((stack) => {
+        expect(stack).toEqual([
+            { type: "try-to-search", previousResponse: standard_response },
+            { type: "take-longtime-to-search", previousResponse: standard_response },
+            { type: "succeed-to-search", response: standard_response },
+        ])
+    })
+})
 
-            resource.search.detail.focus(user)
-            expect(resource.search.detail.isFocused(user)).toBe(true)
-            expect(resource.search.detail.isFocused(another)).toBe(false)
+test("sort", async () => {
+    const { resource } = standard()
 
-            resource.search.detail.close()
-            expect(resource.search.detail.isFocused(user)).toBe(false)
-            expect(resource.search.detail.isFocused(another)).toBe(false)
+    const runner = setupActionTestRunner(resource.search.subscriber)
 
-            return resource.search.detail.currentState()
-        }).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "focus-on",
-                    user: { loginId: "user-1", grantedRoles: [] },
+    await resource.search.ignitionState
+
+    await runner(async () => {
+        return resource.search.sort("login-id")
+    }).then((stack) => {
+        expect(stack).toEqual([
+            { type: "try-to-search", previousResponse: standard_response },
+            { type: "succeed-to-search", response: standard_response },
+        ])
+    })
+})
+
+test("clear", () => {
+    const { resource, store } = standard()
+
+    store.loginId.set(markBoardValue("MY-LOGIN-ID"))
+    resource.search.clear()
+
+    expect(store.loginId.get()).toEqual("")
+})
+
+test("focus / close", async () => {
+    const { resource } = standard()
+
+    const runner = setupActionTestRunner(resource.search.detail.subscriber)
+
+    await resource.search.ignitionState
+
+    await runner(async () => {
+        const user: AuthUserAccountBasket = {
+            loginId: "user-1",
+            grantedRoles: [],
+            resetTokenDestination: { type: "none" },
+        }
+        const another: AuthUserAccountBasket = {
+            loginId: "user-another",
+            grantedRoles: [],
+            resetTokenDestination: { type: "none" },
+        }
+
+        resource.search.detail.focus(user)
+        expect(resource.search.detail.isFocused(user)).toBe(true)
+        expect(resource.search.detail.isFocused(another)).toBe(false)
+
+        resource.search.detail.close()
+        expect(resource.search.detail.isFocused(user)).toBe(false)
+        expect(resource.search.detail.isFocused(another)).toBe(false)
+
+        return resource.search.detail.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "focus-on",
+                user: {
+                    loginId: "user-1",
+                    grantedRoles: [],
+                    resetTokenDestination: { type: "none" },
                 },
-                { type: "initial-detail" },
-            ])
-        })
-    })
-
-    test("detect user", async () => {
-        const { resource } = focused()
-
-        const runner = setupActionTestRunner(resource.search.detail.subscriber)
-
-        await runner(async () => {
-            return resource.search.detail.ignitionState
-        }).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "focus-detected",
-                    user: { loginId: "user-1", grantedRoles: [] },
-                },
-            ])
-        })
-    })
-    test("detect user; failed", async () => {
-        const { resource } = focusFailed()
-
-        const runner = setupActionTestRunner(resource.search.detail.subscriber)
-
-        await runner(async () => {
-            return resource.search.detail.ignitionState
-        }).then((stack) => {
-            expect(stack).toEqual([{ type: "focus-failed" }])
-        })
-    })
-
-    test("terminate", async () => {
-        const { resource } = standard()
-
-        const runner = setupActionTestRunner({
-            subscribe: (handler) => {
-                resource.search.subscriber.subscribe(handler)
-                resource.search.observe.subscriber.subscribe(handler)
-                resource.search.loginId.observe.subscriber.subscribe(handler)
             },
-            unsubscribe: () => null,
-        })
+            { type: "initial-detail" },
+        ])
+    })
+})
 
-        await runner(async () => {
-            resource.search.terminate()
-            return resource.search.search()
-        }).then((stack) => {
-            // no input/validate event after terminate
-            expect(stack).toEqual([])
-        })
+test("detect user", async () => {
+    const { resource } = focused()
+
+    const runner = setupActionTestRunner(resource.search.detail.subscriber)
+
+    await runner(async () => {
+        return resource.search.detail.ignitionState
+    }).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "focus-detected",
+                user: {
+                    loginId: "user-1",
+                    grantedRoles: [],
+                    resetTokenDestination: { type: "none" },
+                },
+            },
+        ])
+    })
+})
+test("detect user; failed", async () => {
+    const { resource } = focusFailed()
+
+    const runner = setupActionTestRunner(resource.search.detail.subscriber)
+
+    await runner(async () => {
+        return resource.search.detail.ignitionState
+    }).then((stack) => {
+        expect(stack).toEqual([{ type: "focus-failed" }])
+    })
+})
+
+test("update user", async () => {
+    const { resource } = focused()
+
+    const runner = setupActionTestRunner(resource.search.detail.subscriber)
+
+    await resource.search.ignitionState
+
+    const user: AuthUserAccountBasket = {
+        loginId: "user-1",
+        grantedRoles: ["user"],
+        resetTokenDestination: { type: "email", email: "user@example.com" },
+    }
+
+    await runner(async () => {
+        return resource.search.detail.update(user)
+    }).then((stack) => {
+        expect(stack).toEqual([{ type: "focus-on", user }])
+    })
+})
+
+test("terminate", async () => {
+    const { resource } = standard()
+
+    const runner = setupActionTestRunner({
+        subscribe: (handler) => {
+            resource.search.subscriber.subscribe(handler)
+            resource.search.observe.subscriber.subscribe(handler)
+            resource.search.loginId.observe.subscriber.subscribe(handler)
+        },
+        unsubscribe: () => null,
     })
 
-    test("read sort key", () => {
-        expect(readSearchAuthUserAccountSortKey("login-id")).toEqual({
-            found: true,
-            key: "login-id",
-        })
-        expect(readSearchAuthUserAccountSortKey("unknown")).toEqual({
-            found: false,
-        })
+    await runner(async () => {
+        resource.search.terminate()
+        return resource.search.search()
+    }).then((stack) => {
+        // no input/validate event after terminate
+        expect(stack).toEqual([])
+    })
+})
+
+test("read sort key", () => {
+    expect(readSearchAuthUserAccountSortKey("login-id")).toEqual({
+        found: true,
+        key: "login-id",
+    })
+    expect(readSearchAuthUserAccountSortKey("unknown")).toEqual({
+        found: false,
     })
 })
 
@@ -284,7 +293,7 @@ const standard_response: SearchAuthUserAccountRemoteResponse = {
     page: { offset: 0, limit: 1000, all: 245 },
     sort: { key: defaultSearchAuthUserAccountSort, order: "normal" },
     users: [
-        { loginId: "user-1", grantedRoles: [] },
-        { loginId: "user-2", grantedRoles: [] },
+        { loginId: "user-1", grantedRoles: [], resetTokenDestination: { type: "none" } },
+        { loginId: "user-2", grantedRoles: [], resetTokenDestination: { type: "none" } },
     ],
 }

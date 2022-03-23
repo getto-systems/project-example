@@ -32,7 +32,7 @@ export function newAuthTicketRepository({ webDB }: RepositoryOutsideFeature): Au
         function toDB(value: AuthTicketRepositoryValue): string {
             return encodeProtobuf(pb.auth.ticket.db.AuthTicketPb, (message) => {
                 message.authAt = value.authAt
-                message.roles = Array.from(value.roles)
+                message.grantedRoles = Array.from(value.grantedRoles)
             })
         }
         function fromDB(raw: string): AuthTicketRepositoryValue {

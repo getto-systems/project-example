@@ -8,5 +8,5 @@ export function convertCheckRemote(clock: Clock, roles: readonly string[]): Auth
 }
 
 function markAuthTicket(authAt: Date, roles: readonly string[]): AuthTicket {
-    return { authAt, roles } as AuthTicket
+    return { authAt, grantedRoles: roles } as AuthTicket
 }

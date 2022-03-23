@@ -1,9 +1,9 @@
 import { BoardValue } from "./data"
 
 export function readBoardValue(input: HTMLInputElement | HTMLSelectElement): BoardValue {
-    return markBoardValue(input.value)
+    return toBoardValue(input.value)
 }
 
-export function markBoardValue(input: string): BoardValue {
+export function toBoardValue(input: string): BoardValue {
     return input as BoardValue
 }

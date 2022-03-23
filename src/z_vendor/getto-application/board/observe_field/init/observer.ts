@@ -1,36 +1,44 @@
 import { BoardFieldObserver } from "../infra"
 
-export function initBoardFieldObserver<V>(value: ObserveValueGetter<V>): BoardFieldObserver {
+export function initBoardFieldObserver<V>(
+    value: Readonly<{
+        current: { (): V }
+        isSame?: { (a: V, b: V): boolean }
+    }>,
+): BoardFieldObserver {
     return new Observer(value)
 }
-
-type ObserveValueStore<V> = Readonly<{ stored: false }> | Readonly<{ stored: true; value: V }>
 
 interface ObserveValueGetter<V> {
     (): V
 }
+interface ObserveValueCompare<V> {
+    (a: V, b: V): boolean
+}
 
 class Observer<V> implements BoardFieldObserver {
-    value: ObserveValueGetter<V>
-    store: ObserveValueStore<V> = { stored: false }
+    current: ObserveValueGetter<V>
+    isSame: ObserveValueCompare<V> = (a, b) => a === b
+    store: V
 
-    constructor(value: ObserveValueGetter<V>) {
-        this.value = value
+    constructor({
+        current,
+        isSame,
+    }: Readonly<{
+        current: { (): V }
+        isSame?: { (a: V, b: V): boolean }
+    }>) {
+        this.current = current
+        if (isSame) {
+            this.isSame = isSame
+        }
+        this.store = current()
     }
 
     pin(): void {
-        this.store = { stored: true, value: this.value() }
-    }
-    peek(): V {
-        if (!this.store.stored) {
-            return this.value()
-        }
-        return this.store.value
+        this.store = this.current()
     }
     hasChanged(): boolean {
-        if (!this.store.stored) {
-            return false
-        }
-        return this.store.value !== this.value()
+        return !this.isSame(this.store, this.current())
     }
 }

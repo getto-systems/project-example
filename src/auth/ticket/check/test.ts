@@ -265,7 +265,7 @@ function standard_ticketRepository(): AuthTicketRepository {
     const db = initMemoryDB<AuthTicketRepositoryValue>()
     db.set({
         authAt: STORED_LAST_AUTH_AT,
-        roles: ["role"],
+        grantedRoles: ["role"],
     })
     return convertDB(db, authTicketRepositoryConverter)
 }

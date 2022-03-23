@@ -4,7 +4,8 @@ import { ObserveBoardFieldResult } from "../observe_field/data"
 import { BoardFieldObserver } from "./infra"
 
 export interface ObserveBoardFieldAction extends StatefulApplicationAction<ObserveBoardFieldState> {
-    check(): ObserveBoardFieldResult
+    pin(): ObserveBoardFieldState
+    check(): ObserveBoardFieldState
 }
 
 export type ObserveBoardFieldState = ObserveBoardFieldResult
@@ -33,7 +34,12 @@ class Action
         this.infra = infra
     }
 
-    check(): ObserveBoardFieldResult {
+    pin(): ObserveBoardFieldState {
+        const { observer } = this.infra
+        observer.pin()
+        return this.check()
+    }
+    check(): ObserveBoardFieldState {
         const { observer } = this.infra
         return this.post({ hasChanged: observer.hasChanged() })
     }

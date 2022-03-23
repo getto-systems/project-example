@@ -1,3 +1,4 @@
+import { h } from "preact"
 import { useMemo } from "preact/hooks"
 import { html } from "htm/preact"
 
@@ -18,6 +19,7 @@ import { ListAuthUserAccountAction } from "../action"
 
 import { AuthUserAccountBasket } from "../../kernel/data"
 import { SearchAuthUserAccountSortKey } from "../data"
+import { GrantedRoleLabels } from "../../input/x_preact/granted_roles"
 
 export type SearchAuthUserAccountTableStructure = TableStructure<Summary, AuthUserAccountBasket>
 
@@ -83,7 +85,7 @@ function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStruc
         return row.loginId
     }
     function grantedRoles(row: AuthUserAccountBasket): VNodeContent {
-        return row.grantedRoles.join(" / ")
+        return h(GrantedRoleLabels, { ...row })
     }
 
     function editLink(row: AuthUserAccountBasket): VNodeContent {

@@ -17,6 +17,7 @@ import { defaultSearchAuthUserAccountSort, SearchAuthUserAccountFilter } from ".
 import { readSearchAuthUserAccountSortKey } from "../convert"
 import { parseSearchSort } from "../../../../../z_lib/ui/search/sort/convert"
 import { AuthUserAccountBasket } from "../../kernel/data"
+import { toGrantedRoles } from "../../input/convert"
 
 export function newSearchAuthUserAccountRemote(
     feature: RemoteOutsideFeature,
@@ -36,6 +37,7 @@ async function fetchRemote(
                 users.push({
                     loginId: `user-${i}`,
                     grantedRoles: [],
+                    resetTokenDestination: { type: "none" },
                 })
             }
             return {
@@ -88,10 +90,14 @@ async function fetchRemote(
                     defaultSearchAuthUserAccountSort,
                     readSearchAuthUserAccountSortKey,
                 ),
-                users: message.users.map((user) => ({
-                    loginId: user.loginId || "",
-                    grantedRoles: user.grantedRoles || [],
-                })),
+                users: message.users.map(
+                    (user): AuthUserAccountBasket => ({
+                        loginId: user.loginId || "",
+                        grantedRoles: toGrantedRoles(user.grantedRoles || []),
+                        // TODO destination を返してもらう
+                        resetTokenDestination: { type: "none" },
+                    }),
+                ),
             },
         }
     } catch (err) {

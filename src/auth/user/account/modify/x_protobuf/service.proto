@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package auth.user.account.modify.service;
+
+service ModifyAuthUserAccountPb {
+    rpc ModifyUser (ModifyAuthUserAccountRequestPb) returns (ModifyAuthUserAccountResponsePb);
+}
+message ModifyAuthUserAccountRequestPb {
+    string login_id = 1;
+    ModifyAuthUserAccountDataPb from = 2;
+    ModifyAuthUserAccountDataPb to = 3;
+}
+message ModifyAuthUserAccountResponsePb {
+    bool success = 1;
+    ModifyAuthUserAccountDataPb data = 2;
+    ModifyAuthUserAccountErrorKindPb err = 3;
+}
+enum ModifyAuthUserAccountErrorKindPb {
+    CONFLICT = 0;
+    INVALID_GRANTED_ROLE = 1;
+    INVALID_RESET_TOKEN_DESTINATION_EMAIL = 2;
+}
+message ModifyAuthUserAccountDataPb {
+    repeated string granted_roles = 1;
+    ModifyResetTokenDestinationDataPb reset_token_destination = 2;
+}
+message ModifyResetTokenDestinationDataPb {
+    string type = 1;
+    string email = 2;
+}

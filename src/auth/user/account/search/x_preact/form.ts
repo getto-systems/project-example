@@ -12,7 +12,7 @@ import { box_grow } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { SearchLoginIdComponent } from "../../../login_id/input/x_preact/search"
 
 import { SearchAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
-import { ObserveBoardActionState } from "../../../../../z_vendor/getto-application/board/observe_board/action"
+import { ObserveBoardState } from "../../../../../z_vendor/getto-application/board/observe_board/action"
 import {
     SEARCH_BUTTON_CONNECT,
     SEARCH_BUTTON_STATIC,
@@ -32,7 +32,7 @@ export function SearchAuthUserAccountFormEntry({ search }: EntryProps): VNode {
 type Props = EntryProps &
     Readonly<{
         state: SearchAuthUserAccountState
-        observe: ObserveBoardActionState
+        observe: ObserveBoardState
     }>
 export function SearchAuthUserAccountFormComponent(props: Props): VNode {
     return basedOn(props)

@@ -82,8 +82,9 @@ export function initSearchLoginIdAction(initial: SingleValueFilter): Readonly<{
         }
         return { search: true, value }
     }
-    const observer = initBoardFieldObserver(value)
-    const observe = initObserveBoardFieldAction({ observer })
+    const observe = initObserveBoardFieldAction({
+        observer: initBoardFieldObserver({ current: value }),
+    })
 
     subscriber.subscribe(() => observe.check())
 
@@ -97,10 +98,11 @@ export function initSearchLoginIdAction(initial: SingleValueFilter): Readonly<{
             },
             terminate: () => {
                 subscriber.terminate()
+                observe.terminate()
             },
         },
         pin: () => {
-            observer.pin()
+            observe.pin()
             return value()
         },
     }
