@@ -20,7 +20,7 @@ import {
 } from "../../../../z_vendor/getto-application/board/observe_field/action"
 
 import { initBoardFieldObserver } from "../../../../z_vendor/getto-application/board/observe_field/init/observer"
-import { resetTokenDestinationBoardConverter } from "./convert"
+import { resetTokenDestinationBoardConverter, toGrantedRoles } from "./convert"
 import { toBoardValue } from "../../../../z_vendor/getto-application/board/kernel/convert"
 import { isSameMultipleBoardValue } from "../../../../z_vendor/getto-application/board/observe_field/helper"
 
@@ -31,7 +31,7 @@ import {
 } from "../../../../z_vendor/getto-application/board/input/infra"
 
 import { emptyBoardValue } from "../../../../z_vendor/getto-application/board/kernel/data"
-import { ResetTokenDestination, ValidateResetTokenDestinationError } from "./data"
+import { GrantedRole, ResetTokenDestination, ValidateResetTokenDestinationError } from "./data"
 import { AuthUserAccountBasket } from "../kernel/data"
 
 export interface InputGrantedRolesAction extends ApplicationAction {
@@ -60,8 +60,15 @@ export type ValidateResetTokenDestinationAction =
 export type ValidateResetTokenDestinationState =
     ValidateBoardFieldState<ValidateResetTokenDestinationError>
 
-export function initInputGrantedRolesAction(): InputGrantedRolesAction {
-    return new GrantedRolesAction()
+export function initInputGrantedRolesAction(): Readonly<{
+    input: InputGrantedRolesAction
+    convert: { (): readonly GrantedRole[] }
+}> {
+    const input = new GrantedRolesAction()
+    return {
+        input,
+        convert: () => toGrantedRoles(input.store.grantedRoles.get()),
+    }
 }
 
 class GrantedRolesAction implements InputGrantedRolesAction {
@@ -157,7 +164,15 @@ class DestinationAction
         })
 
         const { validate, checker } = initValidateBoardFieldAction({
-            converter: () => resetTokenDestinationBoardConverter(input.store.get()),
+            converter: () => {
+                switch (destinationType.store.get()) {
+                    case "email":
+                        return resetTokenDestinationBoardConverter(input.store.get())
+
+                    default:
+                        return { valid: true, value: { type: "none" } } as const
+                }
+            },
         })
 
         destinationType.subscriber.subscribe(() => {

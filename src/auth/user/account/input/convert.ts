@@ -3,20 +3,22 @@ import { BoardFieldValueConverter } from "../../../../z_vendor/getto-application
 import { BoardValue } from "../../../../z_vendor/getto-application/board/kernel/data"
 import {
     GrantedRole,
-    isGrantedRole,
     ResetTokenDestination,
     ResetTokenDestinationEmail,
     ValidateResetTokenDestinationError,
 } from "./data"
 
 export function toGrantedRoles(roles: readonly string[]): readonly GrantedRole[] {
-    const grantedRoles: GrantedRole[] = []
-    roles.forEach((role) => {
-        if (isGrantedRole(role)) {
-            grantedRoles.push(role)
+    const converted: GrantedRole[] = []
+    const allRoles: readonly GrantedRole[] = ["user"]
+
+    allRoles.forEach((role) => {
+        if (roles.includes(role)) {
+            converted.push(role)
         }
     })
-    return grantedRoles
+
+    return converted
 }
 
 // email には技術的な制限はないが、使用可能な最大文字数は定義しておく

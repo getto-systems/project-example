@@ -21,7 +21,8 @@ import { toBoardValue } from "../../../../../z_vendor/getto-application/board/ke
 
 import { GrantedRole } from "../data"
 import { AuthUserAccountBasket } from "../../kernel/data"
-import { label_gray } from "../../../../../z_vendor/getto-css/preact/design/highlight"
+import { label_gray, label_info } from "../../../../../z_vendor/getto-css/preact/design/highlight"
+import { html } from "htm/preact"
 
 type EntryProps = Readonly<{
     user: AuthUserAccountBasket
@@ -59,10 +60,7 @@ export function InputGrantedRolesComponent(props: Props): VNode {
 
         function body(): VNodeContent {
             if (!props.editableState.isEditable) {
-                if (props.user.grantedRoles.length === 0) {
-                    return label_gray("権限なし")
-                }
-                return props.user.grantedRoles.join(" / ")
+                return h(GrantedRoleLabels, { ...props.user })
             }
             return h(CheckboxBoardComponent, {
                 input: props.field.grantedRoles,
@@ -74,15 +72,24 @@ export function InputGrantedRolesComponent(props: Props): VNode {
             return {
                 key: grantedRole,
                 value: toBoardValue(grantedRole),
-                label: label(grantedRole),
+                label: grantedRoleLabel(grantedRole),
             }
         }
-        function label(grantedRole: GrantedRole): VNodeContent {
-            switch (grantedRole) {
-                case "user":
-                    // TODO これはメニューと一緒にしたい
-                    return "ユーザー管理"
-            }
-        }
+    }
+}
+
+export function GrantedRoleLabels({
+    grantedRoles,
+}: Readonly<{ grantedRoles: readonly GrantedRole[] }>): VNode {
+    if (grantedRoles.length === 0) {
+        return label_gray("権限なし")
+    }
+    return html`${grantedRoles.map((grantedRole) => label_info(grantedRoleLabel(grantedRole)))}`
+}
+export function grantedRoleLabel(grantedRole: GrantedRole): VNodeContent {
+    switch (grantedRole) {
+        case "user":
+            // TODO これはメニューと一緒にしたい
+            return "ユーザー管理"
     }
 }

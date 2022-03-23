@@ -10,7 +10,7 @@ import {
     remoteInfraError,
 } from "../../../../../z_lib/ui/remote/init/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf/helper"
-import { toResetTokenDestinationEmail } from "../../input/convert"
+import { toGrantedRoles, toResetTokenDestinationEmail } from "../../input/convert"
 
 import { ModifyAuthUserAccountRemoteResult, ModifyAuthUserAccountRemote } from "../infra"
 
@@ -30,7 +30,7 @@ async function fetchRemote(
     fields: ModifyAuthUserAccountFields,
 ): Promise<ModifyAuthUserAccountRemoteResult> {
     try {
-        const mock = false
+        const mock = true
         if (mock) {
             return {
                 success: true,
@@ -98,7 +98,7 @@ function responseData(
 ): AuthUserAccountBasket {
     return {
         loginId: user.loginId,
-        grantedRoles: data.grantedRoles || [],
+        grantedRoles: toGrantedRoles(data.grantedRoles || []),
         resetTokenDestination: resetTokenDestination(data.resetTokenDestination || {}),
     }
 

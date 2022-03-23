@@ -22,15 +22,18 @@ import { InputGrantedRolesEntry } from "../../input/x_preact/granted_roles"
 
 import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
 
-import { ModifyAuthUserAccountAction } from "../action"
 import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
+import { ModifyAuthUserAccountAction } from "../action"
+import { DetailAuthUserAccountAction } from "../../search/action"
 
 import { AuthUserAccountBasket } from "../../kernel/data"
 import { ModifyAuthUserAccountError } from "../data"
+import { v_small } from "../../../../../z_vendor/getto-css/preact/design/alignment"
 
 type Props = Readonly<{
     user: AuthUserAccountBasket
     editable: EditableBoardAction
+    detail: DetailAuthUserAccountAction
     modify: ModifyAuthUserAccountAction
 }>
 export function ModifyAuthUserAccount(props: Props): VNode {
@@ -73,7 +76,7 @@ export function ModifyAuthUserAccount(props: Props): VNode {
 
         function message(): VNode[] {
             if (state.type === "success") {
-                return [notice_success(["変更完了しました"])]
+                return [v_small(), notice_success(["変更完了しました"])]
             }
             return []
         }
@@ -115,6 +118,7 @@ export function ModifyAuthUserAccount(props: Props): VNode {
                 props.modify.submit(props.user).then((state) => {
                     if (state.type === "success") {
                         props.editable.close()
+                        props.detail.update(state.data)
                     }
                 })
             }

@@ -48,7 +48,7 @@ export function DetailAuthUserAccountEntry(props: EntryProps): VNode {
         const user = props.user.user
 
         return container([
-            h(ModifyAuthUserAccount, { ...props.modify, user }),
+            h(ModifyAuthUserAccount, { detail: props.detail, ...props.modify, user }),
             h(OverrideLoginIdEntry, { ...props.overrideLoginId, user }),
             h(OverridePasswordEntry, { ...props.overridePassword, user }),
         ])

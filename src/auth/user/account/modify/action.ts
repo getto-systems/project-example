@@ -99,6 +99,7 @@ class Action
             {
                 converter: (): ConvertBoardResult<ModifyAuthUserAccountFields> => {
                     const result = {
+                        grantedRoles: grantedRoles.convert(),
                         resetTokenDestination: resetTokenDestination.checker.check(),
                     }
                     if (!result.resetTokenDestination.valid) {
@@ -107,7 +108,7 @@ class Action
                     return {
                         valid: true,
                         value: {
-                            grantedRoles: [], // TODO granted roles する
+                            grantedRoles: result.grantedRoles,
                             resetTokenDestination: result.resetTokenDestination.value,
                         },
                     }
@@ -117,7 +118,7 @@ class Action
 
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
-        this.grantedRoles = grantedRoles
+        this.grantedRoles = grantedRoles.input
         this.resetTokenDestination = resetTokenDestination.input
         this.validate = validate
         this.observe = observe
@@ -151,7 +152,7 @@ type ModifyUserEvent =
     | Readonly<{ type: "try" }>
     | Readonly<{ type: "take-longtime" }>
     | Readonly<{ type: "failed"; err: ModifyAuthUserAccountError }>
-    | Readonly<{ type: "success" }>
+    | Readonly<{ type: "success"; data: AuthUserAccountBasket }>
 
 async function modifyUser<S>(
     { infra, config }: ModifyAuthUserAccountMaterial,
@@ -177,7 +178,7 @@ async function modifyUser<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "success" })
+    return post({ type: "success", data: response.value })
 }
 
 interface Post<E, S> {
