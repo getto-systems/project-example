@@ -42,7 +42,11 @@ impl Into<ValidateApiTokenRequestPb> for RequireAuthRoles {
             },
             Self::HasAny(require_roles) => ValidateApiTokenRequestPb {
                 allow_any_role: false,
-                require_roles: Vec::from_iter(require_roles.into_iter()),
+                require_roles: Vec::from_iter(
+                    require_roles
+                        .into_iter()
+                        .map(|role| role.as_str().to_owned()),
+                ),
             },
         }
     }

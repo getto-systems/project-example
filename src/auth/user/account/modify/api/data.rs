@@ -3,13 +3,14 @@ use crate::{
     z_lib::repository::data::RepositoryError,
 };
 
-pub enum OverrideLoginIdError {
+pub enum ModifyAuthUserAccountError {
     InvalidLoginId(ValidateLoginIdError),
     UserNotFound,
-    LoginIdAlreadyRegistered,
+    Conflict,
+    InvalidUser(ValidateAuthUserAccountError),
 }
 
-impl std::fmt::Display for OverrideLoginIdError {
+impl std::fmt::Display for ModifyAuthUserAccountError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::InvalidLoginId(err) => write!(f, "invalid login id: {}", err),
@@ -19,8 +20,25 @@ impl std::fmt::Display for OverrideLoginIdError {
     }
 }
 
-pub enum OverrideLoginIdRepositoryError {
+pub enum ValidateAuthUserAccountError {
+    InvalidGrantedRole,
+    InvalidEmail,
+    EmptyEmail,
+    TooLongEmail,
+}
+
+impl std::fmt::Display for ValidateAuthUserAccountError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::InvalidGrantedRole => write!(f, "invalid granted role"),
+            Self::InvalidEmail => write!(f, "invalid email"),
+            Self::EmptyEmail => write!(f, "empty email"),
+            Self::TooLongEmail => write!(f, "too long email"),
+        }
+    }
+}
+
+pub enum ModifyAuthUserAccountRepositoryError {
     RepositoryError(RepositoryError),
     UserNotFound,
-    LoginIdAlreadyRegistered,
 }

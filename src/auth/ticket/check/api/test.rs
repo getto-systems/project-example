@@ -50,7 +50,7 @@ async fn success_allow_for_any_role() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
+        "validate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
     ]);
@@ -90,7 +90,7 @@ async fn success_expired_nonce() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
+        "validate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
     ]);
@@ -111,7 +111,7 @@ async fn success_limited_ticket() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
+        "validate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
         "token expires calculated; ticket: 2021-01-01 11:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
     ]);
@@ -150,7 +150,7 @@ async fn error_no_ticket() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
+        "validate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
         "encode error; ticket data not found",
     ]);
     assert!(!result.is_ok());
@@ -275,11 +275,11 @@ fn standard_token_header() -> StaticAuthTokenMetadata {
 
 fn standard_token_decoder() -> StaticAuthTokenDecoder {
     let mut granted_roles = HashSet::new();
-    granted_roles.insert("something".into());
+    granted_roles.insert("user".into());
 
     StaticAuthTokenDecoder::Valid(AuthTicketExtract {
         ticket_id: TICKET_ID.into(),
-        user_id: "something-role-user-id".into(),
+        user_id: "user-role-user-id".into(),
         granted_roles,
     })
 }

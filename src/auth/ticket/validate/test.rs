@@ -42,19 +42,19 @@ async fn success_allow_for_any_role() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
-        "validate api token success; user: something-role-user-id (granted: [something])",
+        "validate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
+        "validate api token success; user: user-role-user-id (granted: [user])",
     ]);
     assert!(result.is_ok());
 }
 
 #[tokio::test]
-async fn success_allow_for_something_role() {
+async fn success_allow_for_user_role() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
-    let request_decoder = allow_something_role_request_decoder();
+    let request_decoder = allow_user_role_request_decoder();
 
     let mut action = ValidateApiTokenAction::with_material(request_decoder, material);
     action.subscribe(handler);
@@ -63,19 +63,19 @@ async fn success_allow_for_something_role() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
-        "validate api token success; user: something-role-user-id (granted: [something])",
+        "validate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
+        "validate api token success; user: user-role-user-id (granted: [user])",
     ]);
     assert!(result.is_ok());
 }
 
 #[tokio::test]
-async fn error_allow_for_something_role_but_not_granted() {
+async fn error_allow_for_user_role_but_not_granted() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
     let material = TestStruct::no_granted_roles(&store);
-    let request_decoder = allow_something_role_request_decoder();
+    let request_decoder = allow_user_role_request_decoder();
 
     let mut action = ValidateApiTokenAction::with_material(request_decoder, material);
     action.subscribe(handler);
@@ -85,7 +85,7 @@ async fn error_allow_for_something_role_but_not_granted() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: no-role-user-id (granted: [])",
-        "user permission denied; granted: [], require: any [something]",
+        "user permission denied; granted: [], require: any [user]",
     ]);
     assert!(!result.is_ok());
 }
@@ -96,7 +96,7 @@ async fn error_token_expired() {
 
     let store = TestStore::standard();
     let material = TestStruct::token_expired(&store);
-    let request_decoder = allow_something_role_request_decoder();
+    let request_decoder = allow_user_role_request_decoder();
 
     let mut action = ValidateApiTokenAction::with_material(request_decoder, material);
     action.subscribe(handler);
@@ -116,7 +116,7 @@ async fn success_expired_nonce() {
 
     let store = TestStore::expired_nonce();
     let material = TestStruct::standard(&store);
-    let request_decoder = allow_something_role_request_decoder();
+    let request_decoder = allow_user_role_request_decoder();
 
     let mut action = ValidateApiTokenAction::with_material(request_decoder, material);
     action.subscribe(handler);
@@ -125,8 +125,8 @@ async fn success_expired_nonce() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: something-role-user-id (granted: [something])",
-        "validate api token success; user: something-role-user-id (granted: [something])",
+        "validate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
+        "validate api token success; user: user-role-user-id (granted: [user])",
     ]);
     assert!(result.is_ok());
 }
@@ -137,7 +137,7 @@ async fn error_conflict_nonce() {
 
     let store = TestStore::conflict_nonce();
     let material = TestStruct::standard(&store);
-    let request_decoder = allow_something_role_request_decoder();
+    let request_decoder = allow_user_role_request_decoder();
 
     let mut action = ValidateApiTokenAction::with_material(request_decoder, material);
     action.subscribe(handler);
@@ -210,9 +210,9 @@ fn allow_any_role_request_decoder() -> StaticValidateApiTokenRequestDecoder {
         require_roles: RequireAuthRoles::Nothing,
     }
 }
-fn allow_something_role_request_decoder() -> StaticValidateApiTokenRequestDecoder {
+fn allow_user_role_request_decoder() -> StaticValidateApiTokenRequestDecoder {
     StaticValidateApiTokenRequestDecoder {
-        require_roles: RequireAuthRoles::has_any(&["something"]),
+        require_roles: RequireAuthRoles::restore_has_any(vec!["user"]),
     }
 }
 
@@ -238,11 +238,11 @@ fn standard_token_header() -> StaticAuthTokenMetadata {
 
 fn standard_token_decoder() -> StaticAuthTokenDecoder {
     let mut granted_roles = HashSet::new();
-    granted_roles.insert("something".into());
+    granted_roles.insert("user".into());
 
     StaticAuthTokenDecoder::Valid(AuthTicketExtract {
         ticket_id: TICKET_ID.into(),
-        user_id: "something-role-user-id".into(),
+        user_id: "user-role-user-id".into(),
         granted_roles,
     })
 }

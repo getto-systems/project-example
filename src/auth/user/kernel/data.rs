@@ -1,5 +1,7 @@
 use std::collections::HashSet;
 
+use crate::x_content::role::{AuthRole, AUTH_ROLE_ALL};
+
 #[derive(Clone)]
 pub struct AuthUser {
     user_id: AuthUserId,
@@ -70,15 +72,24 @@ impl std::fmt::Display for AuthUserId {
 }
 
 #[derive(Clone)]
-pub struct GrantedAuthRoles(HashSet<String>);
+pub struct GrantedAuthRoles(HashSet<AuthRole>);
 
 impl GrantedAuthRoles {
-    pub(in crate::auth) fn restore(granted_roles: HashSet<String>) -> Self {
+    pub(in crate::auth) fn restore(roles: HashSet<String>) -> Self {
+        let mut granted_roles: HashSet<AuthRole> = HashSet::new();
+        AUTH_ROLE_ALL.iter().for_each(|role| {
+            if roles.contains(role.as_str()) {
+                granted_roles.insert(role.clone());
+            }
+        });
         Self(granted_roles)
     }
 
     pub(in crate::auth) fn extract(self) -> HashSet<String> {
         self.0
+            .into_iter()
+            .map(|role| role.as_str().to_owned())
+            .collect()
     }
 
     pub fn has_enough_permission(&self, require_roles: &RequireAuthRoles) -> bool {
@@ -103,38 +114,21 @@ impl std::fmt::Display for GrantedAuthRoles {
     }
 }
 
-pub struct GrantedAuthRolesBasket(HashSet<String>);
-
-impl GrantedAuthRolesBasket {
-    pub fn new(granted_roles: HashSet<String>) -> Self {
-        Self(granted_roles)
-    }
-
-    pub fn extract(self) -> HashSet<String> {
-        self.0
-    }
-}
-
 #[derive(Clone)]
 pub enum RequireAuthRoles {
     Nothing,
-    HasAny(HashSet<String>),
+    HasAny(HashSet<AuthRole>),
 }
 
 impl RequireAuthRoles {
-    // TODO 例えばこんな感じで許可する role を構築するヘルパーを追加していく
-    // TODO ここが role を列挙する場所になるけど、これは適切な場所ではない気がする
-    // TODO 特に、user の role 管理でこの値が必要になるはずで・・・
-    pub fn manage_auth_user() -> Self {
-        Self::has_any(&["manage_auth_user"])
-    }
-
-    pub fn has_any(roles: &[&str]) -> Self {
-        let mut set = HashSet::new();
-        roles.into_iter().for_each(|role| {
-            set.insert(role.to_string());
+    pub(in crate::auth) fn restore_has_any(roles: Vec<&str>) -> Self {
+        let mut require_roles = HashSet::new();
+        AUTH_ROLE_ALL.iter().for_each(|role| {
+            if roles.contains(&role.as_str()) {
+                require_roles.insert(role.clone());
+            }
         });
-        Self::HasAny(set)
+        Self::HasAny(require_roles)
     }
 }
 

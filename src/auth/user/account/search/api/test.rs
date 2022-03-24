@@ -58,7 +58,7 @@ async fn success_search() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [manage_auth_user])",
+        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
         "search user account success",
     ]);
     assert!(result.is_ok());
@@ -141,7 +141,7 @@ fn standard_token_header() -> StaticAuthTokenMetadata {
 
 fn standard_token_decoder() -> StaticAuthTokenDecoder {
     let mut granted_roles = HashSet::new();
-    granted_roles.insert("manage_auth_user".into());
+    granted_roles.insert("user".into());
 
     StaticAuthTokenDecoder::Valid(AuthTicketExtract {
         ticket_id: TICKET_ID.into(),
@@ -177,7 +177,7 @@ fn standard_search_store() -> MemoryAuthUserStore {
 
 fn test_user() -> AuthUser {
     let mut granted_roles = HashSet::new();
-    granted_roles.insert("manage_auth_user".into());
+    granted_roles.insert("user".into());
 
     AuthUserExtract {
         user_id: "test-user-id".into(),

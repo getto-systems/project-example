@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use crate::auth::ticket::validate::y_protobuf::service::ValidateApiTokenRequestPb;
 
 use crate::auth::ticket::validate::infra::ValidateApiTokenRequestDecoder;
@@ -21,11 +19,13 @@ impl ValidateApiTokenRequestDecoder for PbValidateApiTokenRequestDecoder {
         if self.request.allow_any_role {
             RequireAuthRoles::Nothing
         } else {
-            let mut require_roles = HashSet::new();
-            self.request.require_roles.into_iter().for_each(|role| {
-                require_roles.insert(role);
-            });
-            RequireAuthRoles::HasAny(require_roles)
+            RequireAuthRoles::restore_has_any(
+                self.request
+                    .require_roles
+                    .iter()
+                    .map(|role| role.as_str())
+                    .collect(),
+            )
         }
     }
 }

@@ -1,21 +1,32 @@
-use crate::auth::user::login_id::{
-    change::data::OverrideLoginIdRepositoryError, kernel::data::LoginId,
+use crate::auth::user::{
+    account::modify::data::{ModifyAuthUserAccountRepositoryError, ValidateAuthUserAccountError},
+    kernel::data::GrantedAuthRoles,
+    login_id::kernel::data::LoginId,
 };
 
-pub trait OverrideLoginIdRequestDecoder {
-    fn decode(self) -> OverrideLoginIdFieldsExtract;
+pub trait ModifyAuthUserAccountRequestDecoder {
+    fn decode<F: ModifyAuthUserAccountFieldsExtract>(self) -> F;
 }
 
-pub struct OverrideLoginIdFieldsExtract {
-    pub login_id: String,
-    pub new_login_id: String,
+pub struct ModifyAuthUserAccountFields {
+    pub granted_roles: GrantedAuthRoles,
+    pub reset_token_destination: ModifyResetTokenDestination,
+}
+pub enum ModifyResetTokenDestination {
+    None,
+    Email(ModifyResetTokenDestinationEmail),
+}
+pub struct ModifyResetTokenDestinationEmail(String);
+
+pub trait ModifyAuthUserAccountFieldsExtract {
+    fn validate() -> Result<ModifyAuthUserAccountFields, ValidateAuthUserAccountError>;
 }
 
 #[async_trait::async_trait]
-pub trait OverrideLoginIdRepository {
-    async fn override_login_id<'a>(
+pub trait ModifyAuthUserAccountRepository {
+    async fn modify_user<'a>(
         &self,
         login_id: &'a LoginId,
-        new_login_id: LoginId,
-    ) -> Result<(), OverrideLoginIdRepositoryError>;
+        fields: ModifyAuthUserAccountFields,
+    ) -> Result<(), ModifyAuthUserAccountRepositoryError>;
 }

@@ -72,9 +72,9 @@ async fn success_authenticate() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate password success; user: test-user-id (granted: [something])",
+        "authenticate password success; user: test-user-id (granted: [user])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
-        "issue success; ticket: ticket-id / user: test-user-id (granted: [something])",
+        "issue success; ticket: ticket-id / user: test-user-id (granted: [user])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
     ]);
@@ -96,9 +96,9 @@ async fn success_expired_nonce() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate password success; user: test-user-id (granted: [something])",
+        "authenticate password success; user: test-user-id (granted: [user])",
         "expansion limit calculated; 2021-01-11 10:00:00 UTC",
-        "issue success; ticket: ticket-id / user: test-user-id (granted: [something])",
+        "issue success; ticket: ticket-id / user: test-user-id (granted: [user])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
     ]);
@@ -548,7 +548,7 @@ fn empty_user_store() -> MemoryAuthUserStore {
 
 fn test_user() -> AuthUser {
     let mut granted_roles = HashSet::new();
-    granted_roles.insert("something".into());
+    granted_roles.insert("user".into());
 
     AuthUserExtract {
         user_id: "test-user-id".into(),
