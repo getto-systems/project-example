@@ -7,7 +7,7 @@ use crate::z_lib::response::tonic::ServiceResponder;
 
 use super::super::action::{OverrideLoginIdEvent, OverrideLoginIdState};
 
-use super::super::data::OverrideLoginIdError;
+use super::super::data::ModifyAuthUserAccountError;
 
 impl ServiceResponder<OverrideLoginIdResponsePb> for OverrideLoginIdState {
     fn respond_to(self) -> Result<Response<OverrideLoginIdResponsePb>, Status> {
@@ -31,7 +31,7 @@ impl ServiceResponder<OverrideLoginIdResponsePb> for OverrideLoginIdEvent {
     }
 }
 
-impl ServiceResponder<OverrideLoginIdResponsePb> for OverrideLoginIdError {
+impl ServiceResponder<OverrideLoginIdResponsePb> for ModifyAuthUserAccountError {
     fn respond_to(self) -> Result<Response<OverrideLoginIdResponsePb>, Status> {
         match self {
             Self::InvalidLoginId(_) => Ok(Response::new(OverrideLoginIdResponsePb {

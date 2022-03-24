@@ -23,22 +23,6 @@ pub trait LoginIdExtract {
     fn validate(self) -> Result<String, ValidateLoginIdError>;
 }
 
-pub struct LoginIdBasket(String);
-
-impl LoginIdBasket {
-    pub fn new(login_id: String) -> Self {
-        Self(login_id)
-    }
-
-    pub fn extract(self) -> String {
-        self.0
-    }
-
-    pub fn as_str(&self) -> &str {
-        self.0.as_str()
-    }
-}
-
 pub enum ValidateLoginIdError {
     Empty,
     TooLong,

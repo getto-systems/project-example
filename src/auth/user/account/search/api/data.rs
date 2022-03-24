@@ -1,5 +1,5 @@
 use crate::{
-    auth::user::{kernel::data::GrantedAuthRolesBasket, login_id::kernel::data::LoginIdBasket},
+    auth::user::account::kernel::data::AuthUserAccount,
     z_lib::search::data::{SearchPage, SearchSort, SearchSortExtract},
 };
 
@@ -63,9 +63,5 @@ impl Into<SearchAuthUserAccountFilter> for SearchAuthUserAccountFilterExtract {
 pub struct SearchAuthUserAccountBasket {
     pub page: SearchPage,
     pub sort: SearchSort<SearchAuthUserAccountSortKey>,
-    pub users: Vec<AuthUserAccountBasket>,
-}
-pub struct AuthUserAccountBasket {
-    pub login_id: LoginIdBasket,
-    pub granted_roles: GrantedAuthRolesBasket,
+    pub users: Vec<AuthUserAccount>,
 }

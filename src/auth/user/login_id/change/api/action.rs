@@ -4,13 +4,15 @@ use crate::auth::ticket::validate::method::{
     validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
 };
 
-use crate::auth::user::login_id::change::data::OverrideLoginIdRepositoryError;
 use crate::auth::user::login_id::change::infra::{
-    OverrideLoginIdRepository, OverrideLoginIdRequestDecoder, OverrideLoginIdFieldsExtract,
+    OverrideLoginIdFieldsExtract, OverrideLoginIdRepository, OverrideLoginIdRequestDecoder,
 };
 
 use crate::{
-    auth::user::login_id::{change::data::OverrideLoginIdError, kernel::data::LoginId},
+    auth::user::login_id::{
+        change::data::{OverrideLoginIdError, OverrideLoginIdRepositoryError},
+        kernel::data::LoginId,
+    },
     z_lib::repository::data::RepositoryError,
 };
 

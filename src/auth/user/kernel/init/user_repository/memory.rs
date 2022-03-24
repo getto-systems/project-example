@@ -5,24 +5,15 @@ use std::{
 
 use chrono::{DateTime, Utc};
 
-use crate::{
-    auth::user::{
-        login_id::change::{
-            data::OverrideLoginIdRepositoryError, infra::OverrideLoginIdRepository,
-        },
-        password::change::{
-            data::OverridePasswordRepositoryError, infra::OverridePasswordRepository,
-        },
-    },
-    z_lib::repository::helper::infra_error,
-};
+use crate::z_lib::repository::helper::infra_error;
 
 use crate::auth::user::{
     account::search::infra::SearchAuthUserAccountRepository,
     kernel::infra::AuthUserRepository,
+    login_id::change::infra::OverrideLoginIdRepository,
     password::{
         authenticate::infra::VerifyPasswordRepository,
-        change::infra::ChangePasswordRepository,
+        change::infra::{ChangePasswordRepository, OverridePasswordRepository},
         kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword},
         reset::{
             kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
@@ -36,14 +27,15 @@ use crate::{
     auth::{
         ticket::kernel::data::{AuthDateTime, ExpireDateTime},
         user::{
-            account::search::data::{
-                AuthUserAccountBasket, SearchAuthUserAccountBasket, SearchAuthUserAccountFilter,
+            account::{
+                kernel::data::AuthUserAccount,
+                search::data::{SearchAuthUserAccountBasket, SearchAuthUserAccountFilter},
             },
-            kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRolesBasket},
-            login_id::kernel::data::{LoginId, LoginIdBasket},
+            kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
+            login_id::{change::data::OverrideLoginIdRepositoryError, kernel::data::LoginId},
             password::{
                 authenticate::data::VerifyPasswordRepositoryError,
-                change::data::ChangePasswordRepositoryError,
+                change::data::{ChangePasswordRepositoryError, OverridePasswordRepositoryError},
                 reset::{
                     kernel::data::{
                         ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
@@ -324,9 +316,9 @@ fn search<'a>(
         .filter_map(|user| {
             store
                 .get_login_id(&user.user_id)
-                .map(|login_id| AuthUserAccountBasket {
-                    login_id: LoginIdBasket::new(login_id.clone().extract()),
-                    granted_roles: GrantedAuthRolesBasket::new(user.granted_roles),
+                .map(|login_id| AuthUserAccount {
+                    login_id: LoginId::restore(login_id.clone().extract()),
+                    granted_roles: GrantedAuthRoles::restore(user.granted_roles),
                 })
         })
         .collect();

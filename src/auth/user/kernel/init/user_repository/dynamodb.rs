@@ -12,12 +12,7 @@ use rusoto_dynamodb::{
     UpdateItemInput,
 };
 
-use crate::auth::{
-    user::login_id::change::{
-        data::OverrideLoginIdRepositoryError, infra::OverrideLoginIdRepository,
-    },
-    x_outside_feature::feature::AuthOutsideStore,
-};
+use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
 use crate::z_lib::repository::{
     dynamodb::helper::{string_value, timestamp_value, ScanKey},
@@ -27,6 +22,7 @@ use crate::z_lib::repository::{
 use crate::auth::user::{
     account::search::infra::SearchAuthUserAccountRepository,
     kernel::infra::AuthUserRepository,
+    login_id::change::infra::OverrideLoginIdRepository,
     password::{
         authenticate::infra::VerifyPasswordRepository,
         change::infra::{ChangePasswordRepository, OverridePasswordRepository},
@@ -43,14 +39,15 @@ use crate::{
     auth::{
         ticket::kernel::data::{AuthDateTime, ExpireDateTime},
         user::{
-            account::search::data::{
-                AuthUserAccountBasket, SearchAuthUserAccountBasket, SearchAuthUserAccountFilter,
-                SearchAuthUserAccountSortKey,
+            account::{
+                kernel::data::AuthUserAccount,
+                search::data::{
+                    SearchAuthUserAccountBasket, SearchAuthUserAccountFilter,
+                    SearchAuthUserAccountSortKey,
+                },
             },
-            kernel::data::{
-                AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles, GrantedAuthRolesBasket,
-            },
-            login_id::kernel::data::{LoginId, LoginIdBasket},
+            kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
+            login_id::{change::data::OverrideLoginIdRepositoryError, kernel::data::LoginId},
             password::{
                 authenticate::data::VerifyPasswordRepositoryError,
                 change::data::{ChangePasswordRepositoryError, OverridePasswordRepositoryError},
@@ -808,7 +805,7 @@ async fn search_user_account<'client>(
         }
     };
 
-    let mut users: Vec<AuthUserAccountBasket> = users
+    let mut users: Vec<AuthUserAccount> = users
         .into_iter()
         .filter(|user| match filter.login_id() {
             None => true,
@@ -838,7 +835,7 @@ async fn search_user_account<'client>(
 
 async fn scan_user<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
-) -> Result<Vec<AuthUserAccountBasket>, RusotoError<ScanError>> {
+) -> Result<Vec<AuthUserAccount>, RusotoError<ScanError>> {
     let mut acc = vec![];
     let mut scan_key = ScanKey::FirstTime;
     while scan_key.has_next() {
@@ -851,7 +848,7 @@ async fn scan_user<'client>(
 async fn scan_user_part<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
     scan_key: ScanKey,
-) -> Result<(Vec<AuthUserAccountBasket>, ScanKey), RusotoError<ScanError>> {
+) -> Result<(Vec<AuthUserAccount>, ScanKey), RusotoError<ScanError>> {
     let input = ScanInput {
         table_name: repository.user.into(),
         exclusive_start_key: scan_key.extract(),
@@ -872,9 +869,9 @@ async fn scan_user_part<'client>(
                         .and_then(|attr| attr.ss)
                         .map(|roles| HashSet::from_iter(roles)),
                 ) {
-                    (Some(login_id), granted_roles) => Some(AuthUserAccountBasket {
-                        login_id: LoginIdBasket::new(login_id),
-                        granted_roles: GrantedAuthRolesBasket::new(
+                    (Some(login_id), granted_roles) => Some(AuthUserAccount {
+                        login_id: LoginId::restore(login_id),
+                        granted_roles: GrantedAuthRoles::restore(
                             granted_roles.unwrap_or(HashSet::new()),
                         ),
                     }),
