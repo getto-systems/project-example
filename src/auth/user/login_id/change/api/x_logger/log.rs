@@ -23,7 +23,7 @@ impl LogFilter for OverrideLoginIdEvent {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::Success => LogLevel::Audit,
-            Self::InvalidLoginId(err) => err.log_level(),
+            Self::Failed(err) => err.log_level(),
             Self::RepositoryError(err) => err.log_level(),
         }
     }

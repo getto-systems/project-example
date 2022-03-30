@@ -2,7 +2,7 @@ import { RemoteResult } from "../../../../z_lib/ui/remote/infra"
 
 import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
 import { SearchAuthUserAccountFilter, SearchAuthUserAccountRemoteResponse } from "./data"
-import { AuthUserAccountBasket } from "../kernel/data"
+import { AuthUserAccount } from "../kernel/data"
 
 export interface SearchAuthUserAccountFilterDetecter {
     (): SearchAuthUserAccountFilter
@@ -15,7 +15,7 @@ export interface FocusAuthUserAccountDetecter {
     (): DetectLoginIdResult
 }
 export interface UpdateFocusAuthUserAccountQuery {
-    focus(user: AuthUserAccountBasket): void
+    focus(user: AuthUserAccount): void
     clear(): void
 }
 

@@ -9,12 +9,14 @@ import { initMemoryDB } from "../../../../z_lib/ui/repository/init/memory"
 import { initSearchAuthUserAccountAction, SearchAuthUserAccountAction } from "./action"
 
 import { readSearchAuthUserAccountSortKey } from "./convert"
+import { restoreLoginId } from "../../login_id/input/convert"
+import { restoreResetTokenDestination } from "../../password/reset/token_destination/input/convert"
 
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 import { SearchAuthUserAccountRemote, SearchAuthUserAccountRemoteResult } from "./infra"
 
 import { defaultSearchAuthUserAccountSort, SearchAuthUserAccountRemoteResponse } from "./data"
-import { AuthUserAccountBasket } from "../kernel/data"
+import { AuthUserAccount } from "../kernel/data"
 
 test("initial load", async () => {
     const { resource } = standard()
@@ -100,13 +102,13 @@ test("focus / close", async () => {
     await resource.search.ignitionState
 
     await runner(async () => {
-        const user: AuthUserAccountBasket = {
-            loginId: "user-1",
+        const user: AuthUserAccount = {
+            loginId: restoreLoginId("user-1"),
             grantedRoles: [],
             resetTokenDestination: { type: "none" },
         }
-        const another: AuthUserAccountBasket = {
-            loginId: "user-another",
+        const another: AuthUserAccount = {
+            loginId: restoreLoginId("user-another"),
             grantedRoles: [],
             resetTokenDestination: { type: "none" },
         }
@@ -174,10 +176,13 @@ test("update user", async () => {
 
     await resource.search.ignitionState
 
-    const user: AuthUserAccountBasket = {
-        loginId: "user-1",
+    const user: AuthUserAccount = {
+        loginId: restoreLoginId("user-1"),
         grantedRoles: ["user"],
-        resetTokenDestination: { type: "email", email: "user@example.com" },
+        resetTokenDestination: restoreResetTokenDestination({
+            type: "email",
+            email: "user@example.com",
+        }),
     }
 
     await runner(async () => {
@@ -293,7 +298,15 @@ const standard_response: SearchAuthUserAccountRemoteResponse = {
     page: { offset: 0, limit: 1000, all: 245 },
     sort: { key: defaultSearchAuthUserAccountSort, order: "normal" },
     users: [
-        { loginId: "user-1", grantedRoles: [], resetTokenDestination: { type: "none" } },
-        { loginId: "user-2", grantedRoles: [], resetTokenDestination: { type: "none" } },
+        {
+            loginId: restoreLoginId("user-1"),
+            grantedRoles: [],
+            resetTokenDestination: { type: "none" },
+        },
+        {
+            loginId: restoreLoginId("user-2"),
+            grantedRoles: [],
+            resetTokenDestination: { type: "none" },
+        },
     ],
 }

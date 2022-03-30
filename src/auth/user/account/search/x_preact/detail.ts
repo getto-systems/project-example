@@ -10,20 +10,26 @@ import { BACK_TO_LIST_BUTTON } from "../../../../../core/x_preact/design/table"
 import { ModifyAuthUserAccount } from "../../modify/x_preact/modify"
 import { OverrideLoginIdEntry } from "../../../login_id/change/x_preact/override_login_id"
 import { OverridePasswordEntry } from "../../../password/change/x_preact/override_password"
+import { ChangeResetTokenDestination } from "../../../password/reset/token_destination/change/x_preact/change"
 
 import { DetailAuthUserAccountAction } from "../action"
 import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
 import { OverrideLoginIdAction } from "../../../login_id/change/action"
 import { OverridePasswordAction } from "../../../password/change/action"
 import { ModifyAuthUserAccountAction } from "../../modify/action"
+import { ChangeResetTokenDestinationAction } from "../../../password/reset/token_destination/change/action"
 
-import { AuthUserAccountBasket } from "../../kernel/data"
+import { AuthUserAccount } from "../../kernel/data"
 
 type EntryProps = Readonly<{
     detail: DetailAuthUserAccountAction
     modify: Readonly<{
         editable: EditableBoardAction
         modify: ModifyAuthUserAccountAction
+    }>
+    changeResetTokenDestination: Readonly<{
+        editable: EditableBoardAction
+        change: ChangeResetTokenDestinationAction
     }>
     overrideLoginId: Readonly<{
         editable: EditableBoardAction
@@ -33,7 +39,7 @@ type EntryProps = Readonly<{
         editable: EditableBoardAction
         override: OverridePasswordAction
     }>
-    user: Readonly<{ found: false }> | Readonly<{ found: true; user: AuthUserAccountBasket }>
+    user: Readonly<{ found: false }> | Readonly<{ found: true; user: AuthUserAccount }>
 }>
 export function DetailAuthUserAccountEntry(props: EntryProps): VNode {
     return html`${[container([h(CloseButtonComponent, props)]), content()]}`
@@ -48,7 +54,20 @@ export function DetailAuthUserAccountEntry(props: EntryProps): VNode {
         const user = props.user.user
 
         return container([
-            h(ModifyAuthUserAccount, { detail: props.detail, ...props.modify, user }),
+            h(ModifyAuthUserAccount, {
+                ...props.modify,
+                user,
+                onSuccess: (fields) => {
+                    props.detail.update({ ...user, ...fields })
+                },
+            }),
+            h(ChangeResetTokenDestination, {
+                ...props.changeResetTokenDestination,
+                user,
+                onSuccess: (destination) => {
+                    props.detail.update({ ...user, resetTokenDestination: destination })
+                },
+            }),
             h(OverrideLoginIdEntry, { ...props.overrideLoginId, user }),
             h(OverridePasswordEntry, { ...props.overridePassword, user }),
         ])

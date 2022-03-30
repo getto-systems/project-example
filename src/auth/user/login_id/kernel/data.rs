@@ -1,4 +1,4 @@
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct LoginId(String);
 
 impl LoginId {
@@ -16,6 +16,12 @@ impl LoginId {
 
     pub fn as_str(&self) -> &str {
         self.0.as_str()
+    }
+}
+
+impl std::fmt::Display for LoginId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "login id: {}", self.0)
     }
 }
 

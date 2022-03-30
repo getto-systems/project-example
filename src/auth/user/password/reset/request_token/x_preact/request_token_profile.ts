@@ -13,7 +13,7 @@ import {
     fieldError,
     form,
 } from "../../../../../../z_vendor/getto-css/preact/design/form"
-import { icon_spinner } from "../../../../../../core/x_preact/design/icon"
+import { icon_spinner } from "../../../../../../x_content/icon"
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
 import { InputLoginIdEntry } from "../../../../login_id/input/x_preact/input"

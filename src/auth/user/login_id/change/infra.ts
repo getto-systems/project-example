@@ -1,11 +1,11 @@
 import { RemoteResult } from "../../../../z_lib/ui/remote/infra"
 
-import { AuthUserAccountBasket } from "../../account/kernel/data"
 import { ChangeLoginIdRemoteError, OverrideLoginIdFields } from "./data"
+import { LoginId } from "../input/data"
 
 export interface OverrideLoginIdRemote {
     (
-        user: AuthUserAccountBasket,
+        user: Readonly<{ loginId: LoginId }>,
         fields: OverrideLoginIdFields,
     ): Promise<ChangePasswordRemoteResult>
 }

@@ -56,6 +56,7 @@ impl LogFilter for EncodeResetTokenError {
 impl LogFilter for NotifyResetTokenError {
     fn log_level(&self) -> LogLevel {
         match self {
+            Self::NoDestination => LogLevel::Info,
             Self::InfraError(_) => LogLevel::Error,
         }
     }

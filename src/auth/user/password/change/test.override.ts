@@ -6,9 +6,12 @@ import { mockBoardValueStore } from "../../../../z_vendor/getto-application/boar
 
 import { OverridePasswordAction, initOverridePasswordAction } from "./action"
 
+import { restoreLoginId } from "../../login_id/input/convert"
+
 import { OverridePasswordRemote, ChangePasswordRemoteResult } from "./infra"
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
-import { AuthUserAccountBasket } from "../../account/kernel/data"
+
+import { LoginId } from "../../login_id/input/data"
 
 const VALID_PASSWORD = { currentPassword: "current-password", newPassword: "new-password" } as const
 
@@ -106,7 +109,7 @@ function initResource(overridePasswordRemote: OverridePasswordRemote): Readonly<
     store: Readonly<{
         newPassword: BoardValueStore
     }>
-    user: AuthUserAccountBasket
+    user: Readonly<{ loginId: LoginId }>
 }> {
     const resource = {
         override: initOverridePasswordAction({
@@ -126,13 +129,13 @@ function initResource(overridePasswordRemote: OverridePasswordRemote): Readonly<
 
     resource.override.newPassword.input.connector.connect(store.newPassword)
 
-    const user: AuthUserAccountBasket = {
-        loginId: "user-id",
-        grantedRoles: [],
-        resetTokenDestination: { type: "none" },
+    return {
+        resource,
+        store,
+        user: {
+            loginId: restoreLoginId("user-id"),
+        },
     }
-
-    return { resource, store, user }
 }
 
 function standard_overrideRemote(): OverridePasswordRemote {

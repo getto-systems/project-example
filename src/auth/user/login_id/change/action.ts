@@ -18,14 +18,14 @@ import { OverrideLoginIdRemote } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
 import { BoardConverter } from "../../../../z_vendor/getto-application/board/kernel/infra"
 
-import { AuthUserAccountBasket } from "../../account/kernel/data"
+import { LoginId } from "../input/data"
 
 export interface OverrideLoginIdAction extends StatefulApplicationAction<OverrideLoginIdState> {
     readonly newLoginId: InputLoginIdAction
     readonly validate: ValidateBoardAction
 
     clear(): OverrideLoginIdState
-    submit(user: AuthUserAccountBasket): Promise<OverrideLoginIdState>
+    submit(user: Readonly<{ loginId: LoginId }>): Promise<OverrideLoginIdState>
 }
 
 export type OverrideLoginIdState =
@@ -111,7 +111,7 @@ class OverrideAction
         this.validate.clear()
         return this.post(this.initialState)
     }
-    async submit(user: AuthUserAccountBasket): Promise<OverrideLoginIdState> {
+    async submit(user: Readonly<{ loginId: LoginId }>): Promise<OverrideLoginIdState> {
         return overrideLoginId(this.material, user, this.convert(), this.post)
     }
 }
@@ -124,7 +124,7 @@ type OverrideLoginIdEvent =
 
 async function overrideLoginId<S>(
     { infra, config }: OverrideLoginIdMaterial,
-    user: AuthUserAccountBasket,
+    user: Readonly<{ loginId: LoginId }>,
     fields: ConvertBoardResult<OverrideLoginIdFields>,
     post: Post<OverrideLoginIdEvent, S>,
 ): Promise<S> {

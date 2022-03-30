@@ -47,7 +47,7 @@ impl ResetTokenEntryExtract {
     pub(in crate::auth) fn restore(self) -> ResetTokenEntry {
         ResetTokenEntry {
             login_id: LoginId::restore(self.login_id),
-            destination: self.destination.restore(),
+            destination: ResetTokenDestination::restore(self.destination),
             expires: ExpireDateTime::restore(self.expires),
             reset_at: self.reset_at.map(AuthDateTime::restore),
         }

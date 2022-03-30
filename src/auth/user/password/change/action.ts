@@ -16,7 +16,7 @@ import { BoardConverter } from "../../../../z_vendor/getto-application/board/ker
 
 import { ChangePasswordError, ChangePasswordFields, OverridePasswordFields } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
-import { AuthUserAccountBasket } from "../../account/kernel/data"
+import { LoginId } from "../../login_id/input/data"
 
 export interface ChangePasswordAction extends StatefulApplicationAction<ChangePasswordState> {
     readonly currentPassword: InputPasswordAction
@@ -38,7 +38,7 @@ export interface OverridePasswordAction extends StatefulApplicationAction<Overri
     readonly validate: ValidateBoardAction
 
     clear(): OverridePasswordState
-    submit(user: AuthUserAccountBasket): Promise<OverridePasswordState>
+    submit(user: Readonly<{ loginId: LoginId }>): Promise<OverridePasswordState>
 }
 
 export type OverridePasswordState =
@@ -246,7 +246,7 @@ class OverrideAction
         this.validate.clear()
         return this.post(this.initialState)
     }
-    async submit(user: AuthUserAccountBasket): Promise<OverridePasswordState> {
+    async submit(user: Readonly<{ loginId: LoginId }>): Promise<OverridePasswordState> {
         return overridePassword(this.material, user, this.convert(), this.post)
     }
 }
@@ -259,7 +259,7 @@ type OverridePasswordEvent =
 
 async function overridePassword<S>(
     { infra, config }: OverridePasswordMaterial,
-    user: AuthUserAccountBasket,
+    user: Readonly<{ loginId: LoginId }>,
     fields: ConvertBoardResult<OverridePasswordFields>,
     post: Post<OverridePasswordEvent, S>,
 ): Promise<S> {

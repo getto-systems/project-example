@@ -33,19 +33,17 @@ pub enum ResetPasswordRepositoryError {
     PasswordHashError(PasswordHashError),
 }
 
-pub struct NotifyResetPasswordResponse {
-    message_id: String,
-}
-
-impl NotifyResetPasswordResponse {
-    pub fn new(message_id: String) -> Self {
-        Self { message_id }
-    }
+pub enum NotifyResetPasswordResponse {
+    NoDestination,
+    Send(String),
 }
 
 impl std::fmt::Display for NotifyResetPasswordResponse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "message-id: {}", self.message_id)
+        match self {
+            Self::NoDestination => write!(f, "no destination"),
+            Self::Send(message_id) => write!(f, "message-id: {}", message_id),
+        }
     }
 }
 

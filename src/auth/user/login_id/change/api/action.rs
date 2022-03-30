@@ -79,7 +79,7 @@ impl<R: OverrideLoginIdRequestDecoder, M: OverrideLoginIdMaterial> OverrideLogin
 
 pub enum OverrideLoginIdEvent {
     Success,
-    InvalidLoginId(OverrideLoginIdError),
+    Failed(OverrideLoginIdError),
     RepositoryError(RepositoryError),
 }
 
@@ -93,7 +93,7 @@ mod override_login_id_event {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
                 Self::Success => write!(f, "{}", SUCCESS),
-                Self::InvalidLoginId(response) => write!(f, "{}; {}", ERROR, response),
+                Self::Failed(err) => write!(f, "{}; {}", ERROR, err),
                 Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
             }
         }
@@ -105,10 +105,10 @@ impl Into<OverrideLoginIdEvent> for OverrideLoginIdRepositoryError {
         match self {
             Self::RepositoryError(err) => OverrideLoginIdEvent::RepositoryError(err),
             Self::UserNotFound => {
-                OverrideLoginIdEvent::InvalidLoginId(OverrideLoginIdError::UserNotFound)
+                OverrideLoginIdEvent::Failed(OverrideLoginIdError::UserNotFound)
             }
             Self::LoginIdAlreadyRegistered => {
-                OverrideLoginIdEvent::InvalidLoginId(OverrideLoginIdError::LoginIdAlreadyRegistered)
+                OverrideLoginIdEvent::Failed(OverrideLoginIdError::LoginIdAlreadyRegistered)
             }
         }
     }
@@ -120,12 +120,12 @@ async fn override_login_id<S>(
     post: impl Fn(OverrideLoginIdEvent) -> S,
 ) -> MethodResult<S> {
     let login_id = LoginId::validate(fields.login_id).map_err(|err| {
-        post(OverrideLoginIdEvent::InvalidLoginId(
+        post(OverrideLoginIdEvent::Failed(
             OverrideLoginIdError::InvalidLoginId(err),
         ))
     })?;
     let new_login_id = LoginId::validate(fields.new_login_id).map_err(|err| {
-        post(OverrideLoginIdEvent::InvalidLoginId(
+        post(OverrideLoginIdEvent::Failed(
             OverrideLoginIdError::InvalidLoginId(err),
         ))
     })?;

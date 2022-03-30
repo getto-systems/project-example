@@ -11,13 +11,15 @@ import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf
 
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 
+import { readSearchAuthUserAccountSortKey } from "../convert"
+import { parseSearchSort } from "../../../../../z_lib/ui/search/sort/convert"
+import { toGrantedRoles } from "../../input/convert"
+import { restoreLoginId } from "../../../login_id/input/convert"
+
 import { SearchAuthUserAccountRemote, SearchAuthUserAccountRemoteResult } from "../infra"
 
 import { defaultSearchAuthUserAccountSort, SearchAuthUserAccountFilter } from "../data"
-import { readSearchAuthUserAccountSortKey } from "../convert"
-import { parseSearchSort } from "../../../../../z_lib/ui/search/sort/convert"
-import { AuthUserAccountBasket } from "../../kernel/data"
-import { toGrantedRoles } from "../../input/convert"
+import { AuthUserAccount } from "../../kernel/data"
 
 export function newSearchAuthUserAccountRemote(
     feature: RemoteOutsideFeature,
@@ -32,10 +34,10 @@ async function fetchRemote(
         const mock = false
         if (mock) {
             //await ticker({ wait_millisecond: 3000 }, () => null)
-            const users: AuthUserAccountBasket[] = []
+            const users: AuthUserAccount[] = []
             for (let i = 0; i < 50; i++) {
                 users.push({
-                    loginId: `user-${i}`,
+                    loginId: restoreLoginId(`user-${i}`),
                     grantedRoles: [],
                     resetTokenDestination: { type: "none" },
                 })
@@ -91,8 +93,8 @@ async function fetchRemote(
                     readSearchAuthUserAccountSortKey,
                 ),
                 users: message.users.map(
-                    (user): AuthUserAccountBasket => ({
-                        loginId: user.loginId || "",
+                    (user): AuthUserAccount => ({
+                        loginId: restoreLoginId(user.loginId || ""),
                         grantedRoles: toGrantedRoles(user.grantedRoles || []),
                         // TODO destination を返してもらう
                         resetTokenDestination: { type: "none" },

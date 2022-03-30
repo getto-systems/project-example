@@ -14,6 +14,7 @@ import { newOverridePasswordAction } from "../../../../../auth/user/password/cha
 import { newSearchSidebarAction } from "../../../../../z_lib/ui/search/sidebar/init/resource"
 import { newOverrideLoginIdAction } from "../../../../../auth/user/login_id/change/init/resource"
 import { newModifyAuthUserAccountAction } from "../../../../../auth/user/account/modify/init/resource"
+import { newChangeResetTokenDestinationAction } from "../../../../../auth/user/password/reset/token_destination/change/init/resource"
 
 render(h(ManageUserAccountPageEntry, props()), document.body)
 
@@ -32,6 +33,10 @@ function newResource() {
         modify: {
             editable: initEditableBoardAction(),
             modify: newModifyAuthUserAccountAction(feature),
+        },
+        changeResetTokenDestination: {
+            editable: initEditableBoardAction(),
+            change: newChangeResetTokenDestinationAction(feature),
         },
         overrideLoginId: {
             editable: initEditableBoardAction(),

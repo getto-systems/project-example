@@ -33,10 +33,13 @@ use crate::auth::{
         },
         password::{
             kernel::init::password_hasher::test::PlainPasswordHasher,
-            reset::reset::init::{
-                request_decoder::test::StaticResetPasswordRequestDecoder,
-                reset_notifier::test::StaticResetPasswordNotifier,
-                token_decoder::test::StaticResetTokenDecoder,
+            reset::{
+                kernel::data::ResetTokenDestination,
+                reset::init::{
+                    request_decoder::test::StaticResetPasswordRequestDecoder,
+                    reset_notifier::test::StaticResetPasswordNotifier,
+                    token_decoder::test::StaticResetTokenDecoder,
+                },
             },
         },
     },
@@ -686,10 +689,8 @@ fn standard_ticket_store() -> MemoryAuthTicketStore {
 
 fn standard_user_store() -> MemoryAuthUserStore {
     let reset_token = ResetToken::new(RESET_TOKEN.into());
-    let destination = ResetTokenDestinationExtract {
-        email: EMAIL.into(),
-    }
-    .restore();
+    let destination =
+        ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(EMAIL.into()));
     let expires = AuthDateTime::restore(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(1)));
     MemoryAuthUserMap::with_user_and_reset_token(
@@ -705,10 +706,8 @@ fn standard_user_store() -> MemoryAuthUserStore {
 }
 fn user_not_stored_user_store() -> MemoryAuthUserStore {
     let reset_token = ResetToken::new(RESET_TOKEN.into());
-    let destination = ResetTokenDestinationExtract {
-        email: EMAIL.into(),
-    }
-    .restore();
+    let destination =
+        ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(EMAIL.into()));
     let expires = AuthDateTime::restore(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(1)));
     MemoryAuthUserMap::with_dangling_reset_token(
@@ -726,10 +725,8 @@ fn empty_user_store() -> MemoryAuthUserStore {
 }
 fn expired_reset_token_user_store() -> MemoryAuthUserStore {
     let reset_token = ResetToken::new(RESET_TOKEN.into());
-    let destination = ResetTokenDestinationExtract {
-        email: EMAIL.into(),
-    }
-    .restore();
+    let destination =
+        ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(EMAIL.into()));
     let expires = AuthDateTime::restore(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(-1)));
     MemoryAuthUserMap::with_user_and_reset_token(
@@ -745,10 +742,8 @@ fn expired_reset_token_user_store() -> MemoryAuthUserStore {
 }
 fn discarded_reset_token_user_store() -> MemoryAuthUserStore {
     let reset_token = ResetToken::new(RESET_TOKEN.into());
-    let destination = ResetTokenDestinationExtract {
-        email: EMAIL.into(),
-    }
-    .restore();
+    let destination =
+        ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(EMAIL.into()));
     let expires = AuthDateTime::restore(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(1)));
     let discarded_at = AuthDateTime::restore(standard_now() - Duration::days(1));

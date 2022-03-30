@@ -8,7 +8,8 @@ import { buttons } from "../../z_vendor/getto-css/preact/design/form"
 
 import { useDocumentTitle } from "../../core/x_preact/hooks"
 import { siteInfo } from "../../x_content/site"
-import { icon_home, iconHtml } from "../../core/x_preact/design/icon"
+import { iconHtml } from "../../core/x_preact/design/icon"
+import { icon_home } from "../../x_content/icon"
 
 const pageTitle = "Not Found" as const
 

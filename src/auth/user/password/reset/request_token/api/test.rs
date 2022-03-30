@@ -381,8 +381,5 @@ fn test_user_login_id() -> LoginId {
     LoginId::restore(LOGIN_ID.into())
 }
 fn test_user_destination() -> ResetTokenDestination {
-    ResetTokenDestinationExtract {
-        email: USER_EMAIL.into(),
-    }
-    .restore()
+    ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(USER_EMAIL.into()))
 }

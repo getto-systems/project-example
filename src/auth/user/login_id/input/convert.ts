@@ -15,7 +15,7 @@ export const loginIdBoardConverter: Converter = (value) => {
     if (value.length > LOGIN_ID_MAX_LENGTH) {
         return { valid: false, err: TOO_LONG }
     }
-    return { valid: true, value: markLoginId(value) }
+    return { valid: true, value: value as string as LoginId }
 }
 
 const EMPTY: readonly ValidateLoginIdError[] = [{ type: "empty" }]
@@ -23,6 +23,6 @@ const TOO_LONG: readonly ValidateLoginIdError[] = [
     { type: "too-long", maxLength: LOGIN_ID_MAX_LENGTH },
 ]
 
-function markLoginId(loginId: string): LoginId {
+export function restoreLoginId(loginId: string): LoginId {
     return loginId as LoginId
 }

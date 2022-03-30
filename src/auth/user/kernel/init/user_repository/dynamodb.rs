@@ -20,7 +20,10 @@ use crate::z_lib::repository::{
 };
 
 use crate::auth::user::{
-    account::search::infra::SearchAuthUserAccountRepository,
+    account::{
+        modify::infra::ModifyAuthUserAccountRepository,
+        search::infra::SearchAuthUserAccountRepository,
+    },
     kernel::infra::AuthUserRepository,
     login_id::change::infra::OverrideLoginIdRepository,
     password::{
@@ -41,6 +44,7 @@ use crate::{
         user::{
             account::{
                 kernel::data::AuthUserAccount,
+                modify::data::ModifyAuthUserAccountData,
                 search::data::{
                     SearchAuthUserAccountBasket, SearchAuthUserAccountFilter,
                     SearchAuthUserAccountSortKey,
@@ -302,6 +306,78 @@ async fn override_password<'client, 'a>(
 }
 
 #[async_trait::async_trait]
+impl<'client> ModifyAuthUserAccountRepository for DynamoDbAuthUserRepository<'client> {
+    async fn lookup_user(
+        &self,
+        login_id: &LoginId,
+    ) -> Result<Option<(AuthUserId, ModifyAuthUserAccountData)>, RepositoryError> {
+        lookup_modify_user_data(self, login_id)
+    }
+
+    async fn modify_user(
+        &self,
+        user_id: &AuthUserId,
+        login_id: &LoginId,
+        data: ModifyAuthUserAccountData,
+    ) -> Result<(), RepositoryError> {
+        modify_user(self, user_id, login_id, data)
+    }
+
+    async fn get_updated_user(
+        &self,
+        user_id: &AuthUserId,
+        login_id: &LoginId,
+    ) -> Result<ModifyAuthUserAccountData, RepositoryError> {
+        get_modify_user_data(self, user_id, login_id)
+    }
+}
+fn lookup_modify_user_data<'client>(
+    repository: &DynamoDbAuthUserRepository<'client>,
+    login_id: &LoginId,
+) -> Result<Option<(AuthUserId, ModifyAuthUserAccountData)>, RepositoryError> {
+    let mut store = repository.store.lock().unwrap();
+
+    match store.get_user_id(login_id) {
+        None => Ok(None),
+        Some(user_id) => Ok(Some((
+            user_id.clone(),
+            get_modify_user_data(repository, user_id, login_id)?,
+        ))),
+    }
+}
+fn modify_user<'client>(
+    repository: &DynamoDbAuthUserRepository<'client>,
+    user_id: &AuthUserId,
+    login_id: &LoginId,
+    data: ModifyAuthUserAccountData,
+) -> Result<(), RepositoryError> {
+    let mut store = repository.store.lock().unwrap();
+
+    store.update_granted_roles(user_id.clone(), data.granted_roles);
+    store.update_destination(login_id.clone(), data.reset_token_destination);
+
+    Ok(())
+}
+fn get_modify_user_data<'client>(
+    repository: &DynamoDbAuthUserRepository<'client>,
+    user_id: &AuthUserId,
+    login_id: &LoginId,
+) -> Result<ModifyAuthUserAccountData, RepositoryError> {
+    let store = repository.store.lock().unwrap();
+
+    Ok(ModifyAuthUserAccountData {
+        granted_roles: store
+            .get_granted_roles(user_id)
+            .map(|granted_roles| GrantedAuthRoles::restore(granted_roles.clone()))
+            .unwrap_or(GrantedAuthRoles::empty()),
+        reset_token_destination: store
+            .get_destination(login_id)
+            .map(|destination| ResetTokenDestination::restore(destination.clone()))
+            .unwrap_or(ResetTokenDestination::None),
+    })
+}
+
+#[async_trait::async_trait]
 impl<'client> ResetTokenDestinationRepository for DynamoDbAuthUserRepository<'client> {
     async fn get(
         &self,
@@ -334,7 +410,7 @@ async fn get_destination<'client>(
         .item
         .and_then(|mut attrs| attrs.remove("reset_token_destination_email"))
         .and_then(|attr| attr.s)
-        .map(|email| ResetTokenDestinationExtract { email }.restore()))
+        .map(|email| ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(email))))
 }
 
 #[async_trait::async_trait]
@@ -471,7 +547,7 @@ async fn reset_token_entry<'client>(
     Ok(found.map(|(login_id, email, expires, reset_at)| {
         ResetTokenEntryExtract {
             login_id,
-            destination: ResetTokenDestinationExtract { email },
+            destination: ResetTokenDestinationExtract::Email(email),
             expires: DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(expires, 0), Utc),
             reset_at: reset_at.map(|reset_at| {
                 DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(reset_at, 0), Utc)
@@ -852,7 +928,9 @@ async fn scan_user_part<'client>(
     let input = ScanInput {
         table_name: repository.user.into(),
         exclusive_start_key: scan_key.extract(),
-        projection_expression: Some("login_id, granted_roles".into()),
+        projection_expression: Some(
+            "user_id, login_id, granted_roles, reset_token_destination_email".into(),
+        ),
         ..Default::default()
     };
 
@@ -864,16 +942,32 @@ async fn scan_user_part<'client>(
             .into_iter()
             .filter_map(|mut item| {
                 match (
+                    item.remove("user_id").and_then(|attr| attr.s),
                     item.remove("login_id").and_then(|attr| attr.s),
                     item.remove("granted_roles")
                         .and_then(|attr| attr.ss)
                         .map(|roles| HashSet::from_iter(roles)),
+                    item.remove("reset_token_destination_email")
+                        .and_then(|attr| attr.s),
                 ) {
-                    (Some(login_id), granted_roles) => Some(AuthUserAccount {
+                    (
+                        Some(user_id),
+                        Some(login_id),
+                        granted_roles,
+                        reset_token_destination_email,
+                    ) => Some(AuthUserAccount {
                         login_id: LoginId::restore(login_id),
                         granted_roles: GrantedAuthRoles::restore(
                             granted_roles.unwrap_or(HashSet::new()),
                         ),
+                        reset_token_destination: {
+                            match reset_token_destination_email {
+                                None => ResetTokenDestination::None,
+                                Some(email) => ResetTokenDestination::restore(
+                                    ResetTokenDestinationExtract::Email(email),
+                                ),
+                            }
+                        },
                     }),
                     _ => None,
                 }
@@ -916,7 +1010,12 @@ impl AttributeMap {
         self.add("reset_token", string_value(reset_token.extract()));
     }
     fn add_destination(&mut self, destination: ResetTokenDestination) {
-        self.add("email", string_value(destination.into_email()));
+        match destination {
+            ResetTokenDestination::None => (),
+            ResetTokenDestination::Email(email) => {
+                self.add("email", string_value(email.extract()));
+            }
+        }
     }
     fn add_expires(&mut self, expires: ExpireDateTime) {
         self.add("expires", timestamp_value(expires.extract()));

@@ -8,7 +8,10 @@ use chrono::{DateTime, Utc};
 use crate::z_lib::repository::helper::infra_error;
 
 use crate::auth::user::{
-    account::search::infra::SearchAuthUserAccountRepository,
+    account::{
+        modify::infra::ModifyAuthUserAccountRepository,
+        search::infra::SearchAuthUserAccountRepository,
+    },
     kernel::infra::AuthUserRepository,
     login_id::change::infra::OverrideLoginIdRepository,
     password::{
@@ -29,6 +32,7 @@ use crate::{
         user::{
             account::{
                 kernel::data::AuthUserAccount,
+                modify::data::ModifyAuthUserAccountData,
                 search::data::{SearchAuthUserAccountBasket, SearchAuthUserAccountFilter},
             },
             kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
@@ -55,13 +59,14 @@ pub struct MemoryAuthUserMap {
     user_id: HashMap<String, LoginId>,     // login-id => user-id
     granted_roles: HashMap<String, HashSet<String>>, // user-id => granted-roles
     password: HashMap<String, HashedPassword>, // user-id => hashed-password
-    reset_token_destination: HashMap<String, ResetTokenDestination>, // login-id => destination
+    reset_token_destination: HashMap<String, ResetTokenDestinationExtract>, // login-id => destination
     reset_token: HashMap<String, ResetEntry>, // reset-token => reset entry
 }
 
 struct UserEntry {
     pub user_id: String,
     pub granted_roles: HashSet<String>,
+    pub reset_token_destination: ResetTokenDestinationExtract,
 }
 
 #[derive(Clone)]
@@ -144,7 +149,7 @@ impl MemoryAuthUserMap {
         let mut store = Self::new();
         store
             .insert_login_id(login_id.clone(), user_id)
-            .insert_destination(login_id, destination);
+            .insert_destination(login_id, destination.extract());
         store
     }
     pub fn with_user_and_reset_token(
@@ -223,6 +228,15 @@ impl MemoryAuthUserMap {
         self.granted_roles.insert(user.user_id, user.granted_roles);
         self
     }
+    fn update_granted_roles(
+        &mut self,
+        user_id: AuthUserId,
+        granted_roles: GrantedAuthRoles,
+    ) -> &mut Self {
+        self.granted_roles
+            .insert(user_id.extract(), granted_roles.extract());
+        self
+    }
     fn get_granted_roles(&self, user_id: &AuthUserId) -> Option<&HashSet<String>> {
         self.granted_roles.get(user_id.as_str())
     }
@@ -232,6 +246,17 @@ impl MemoryAuthUserMap {
             .map(|(user_id, granted_roles)| UserEntry {
                 user_id: user_id.clone(),
                 granted_roles: granted_roles.clone(),
+                reset_token_destination: {
+                    if let Some(login_id) = self.get_login_id(user_id) {
+                        if let Some(destination) = self.get_destination(login_id) {
+                            destination.clone()
+                        } else {
+                            ResetTokenDestinationExtract::None
+                        }
+                    } else {
+                        ResetTokenDestinationExtract::None
+                    }
+                },
             })
             .collect()
     }
@@ -248,11 +273,15 @@ impl MemoryAuthUserMap {
         self.password.get(user_id.as_str())
     }
 
-    fn insert_destination(&mut self, login_id: LoginId, destination: ResetTokenDestination) {
+    fn insert_destination(&mut self, login_id: LoginId, destination: ResetTokenDestinationExtract) {
         self.reset_token_destination
             .insert(login_id.extract(), destination);
     }
-    fn get_destination(&self, login_id: &LoginId) -> Option<&ResetTokenDestination> {
+    fn update_destination(&mut self, login_id: LoginId, destination: ResetTokenDestination) {
+        self.reset_token_destination
+            .insert(login_id.extract(), destination.extract());
+    }
+    fn get_destination(&self, login_id: &LoginId) -> Option<&ResetTokenDestinationExtract> {
         self.reset_token_destination.get(login_id.as_str())
     }
 
@@ -319,6 +348,9 @@ fn search<'a>(
                 .map(|login_id| AuthUserAccount {
                     login_id: LoginId::restore(login_id.clone().extract()),
                     granted_roles: GrantedAuthRoles::restore(user.granted_roles),
+                    reset_token_destination: ResetTokenDestination::restore(
+                        user.reset_token_destination,
+                    ),
                 })
         })
         .collect();
@@ -331,6 +363,78 @@ fn search<'a>(
         },
         sort: filter.into_sort(),
         users,
+    })
+}
+
+#[async_trait::async_trait]
+impl<'a> ModifyAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
+    async fn lookup_user(
+        &self,
+        login_id: &LoginId,
+    ) -> Result<Option<(AuthUserId, ModifyAuthUserAccountData)>, RepositoryError> {
+        lookup_modify_user_data(self, login_id)
+    }
+
+    async fn modify_user(
+        &self,
+        user_id: &AuthUserId,
+        login_id: &LoginId,
+        data: ModifyAuthUserAccountData,
+    ) -> Result<(), RepositoryError> {
+        modify_user(self, user_id, login_id, data)
+    }
+
+    async fn get_updated_user(
+        &self,
+        user_id: &AuthUserId,
+        login_id: &LoginId,
+    ) -> Result<ModifyAuthUserAccountData, RepositoryError> {
+        get_modify_user_data(self, user_id, login_id)
+    }
+}
+fn lookup_modify_user_data<'a>(
+    repository: &MemoryAuthUserRepository<'a>,
+    login_id: &LoginId,
+) -> Result<Option<(AuthUserId, ModifyAuthUserAccountData)>, RepositoryError> {
+    let mut store = repository.store.lock().unwrap();
+
+    match store.get_user_id(login_id) {
+        None => Ok(None),
+        Some(user_id) => Ok(Some((
+            user_id.clone(),
+            get_modify_user_data(repository, user_id, login_id)?,
+        ))),
+    }
+}
+fn modify_user<'a>(
+    repository: &MemoryAuthUserRepository<'a>,
+    user_id: &AuthUserId,
+    login_id: &LoginId,
+    data: ModifyAuthUserAccountData,
+) -> Result<(), RepositoryError> {
+    let mut store = repository.store.lock().unwrap();
+
+    store.update_granted_roles(user_id.clone(), data.granted_roles);
+    store.update_destination(login_id.clone(), data.reset_token_destination);
+
+    Ok(())
+}
+fn get_modify_user_data<'a>(
+    repository: &MemoryAuthUserRepository<'a>,
+    user_id: &AuthUserId,
+    login_id: &LoginId,
+) -> Result<ModifyAuthUserAccountData, RepositoryError> {
+    let store = repository.store.lock().unwrap();
+
+    Ok(ModifyAuthUserAccountData {
+        granted_roles: store
+            .get_granted_roles(user_id)
+            .map(|granted_roles| GrantedAuthRoles::restore(granted_roles.clone()))
+            .unwrap_or(GrantedAuthRoles::empty()),
+        reset_token_destination: store
+            .get_destination(login_id)
+            .map(|destination| ResetTokenDestination::restore(destination.clone()))
+            .unwrap_or(ResetTokenDestination::None),
     })
 }
 
@@ -498,7 +602,7 @@ fn get_destination<'store>(
     let store = repository.store.lock().unwrap();
     Ok(store
         .get_destination(login_id)
-        .map(|destination| destination.clone()))
+        .map(|destination| ResetTokenDestination::restore(destination.clone())))
 }
 
 #[async_trait::async_trait]

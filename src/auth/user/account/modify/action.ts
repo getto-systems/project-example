@@ -5,12 +5,7 @@ import {
 
 import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 
-import {
-    initInputGrantedRolesAction,
-    initInputResetTokenDestinationAction,
-    InputGrantedRolesAction,
-    InputResetTokenDestinationAction,
-} from "../input/action"
+import { initInputGrantedRolesAction, InputGrantedRolesAction } from "../input/action"
 import {
     ValidateBoardAction,
     initValidateBoardAction,
@@ -22,26 +17,25 @@ import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board
 import { ModifyAuthUserAccountRemote } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
 
-import { AuthUserAccountBasket } from "../kernel/data"
 import {
     initObserveBoardAction,
     ObserveBoardAction,
 } from "../../../../z_vendor/getto-application/board/observe_board/action"
 import { BoardConverter } from "../../../../z_vendor/getto-application/board/kernel/infra"
+import { GrantedAuthRole } from "../input/data"
+import { LoginId } from "../../login_id/input/data"
 
 export interface ModifyAuthUserAccountAction
     extends StatefulApplicationAction<ModifyAuthUserAccountState> {
     readonly grantedRoles: InputGrantedRolesAction
-    readonly resetTokenDestination: InputResetTokenDestinationAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    reset(user: AuthUserAccountBasket): ModifyAuthUserAccountState
-    submit(user: AuthUserAccountBasket): Promise<ModifyAuthUserAccountState>
+    reset(grantedRoles: readonly GrantedAuthRole[]): ModifyAuthUserAccountState
+    submit(
+        user: Readonly<{ loginId: LoginId; grantedRoles: readonly GrantedAuthRole[] }>,
+    ): Promise<ModifyAuthUserAccountState>
 }
-
-const modifyAuthUserAccountFieldNames = ["resetTokenDestination"] as const
-export type ModifyAuthUserAccountFieldName = typeof modifyAuthUserAccountFieldNames[number]
 
 export type ModifyAuthUserAccountState = Readonly<{ type: "initial" }> | ModifyUserEvent
 
@@ -73,7 +67,6 @@ class Action
     readonly initialState = initialState
 
     readonly grantedRoles: InputGrantedRolesAction
-    readonly resetTokenDestination: InputResetTokenDestinationAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -84,32 +77,25 @@ class Action
         super({
             terminate: () => {
                 this.grantedRoles.terminate()
-                this.resetTokenDestination.terminate()
                 this.validate.terminate()
             },
         })
         this.material = material
 
-        const fields = ["grantedRoles", "resetTokenDestination"] as const
+        const fields = ["grantedRoles"] as const
 
         const grantedRoles = initInputGrantedRolesAction()
-        const resetTokenDestination = initInputResetTokenDestinationAction()
         const { validate, validateChecker } = initValidateBoardAction(
             { fields },
             {
                 converter: (): ConvertBoardResult<ModifyAuthUserAccountFields> => {
                     const result = {
                         grantedRoles: grantedRoles.convert(),
-                        resetTokenDestination: resetTokenDestination.checker.check(),
-                    }
-                    if (!result.resetTokenDestination.valid) {
-                        return { valid: false }
                     }
                     return {
                         valid: true,
                         value: {
                             grantedRoles: result.grantedRoles,
-                            resetTokenDestination: result.resetTokenDestination.value,
                         },
                     }
                 },
@@ -119,31 +105,24 @@ class Action
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         this.grantedRoles = grantedRoles.input
-        this.resetTokenDestination = resetTokenDestination.input
         this.validate = validate
         this.observe = observe
         this.convert = () => validateChecker.get()
 
-        this.resetTokenDestination.validate.subscriber.subscribe((result) =>
-            validateChecker.update("resetTokenDestination", result.valid),
-        )
-
         this.grantedRoles.observe.subscriber.subscribe((result) => {
             observeChecker.update("grantedRoles", result.hasChanged)
         })
-        this.resetTokenDestination.observe.subscriber.subscribe((result) => {
-            observeChecker.update("resetTokenDestination", result.hasChanged)
-        })
     }
 
-    reset(user: AuthUserAccountBasket): ModifyAuthUserAccountState {
-        this.grantedRoles.reset(user)
-        this.resetTokenDestination.reset(user)
+    reset(grantedRoles: readonly GrantedAuthRole[]): ModifyAuthUserAccountState {
+        this.grantedRoles.reset(grantedRoles)
         this.validate.clear()
         this.observe.clear()
         return this.post(this.initialState)
     }
-    async submit(user: AuthUserAccountBasket): Promise<ModifyAuthUserAccountState> {
+    async submit(
+        user: Readonly<{ loginId: LoginId; grantedRoles: readonly GrantedAuthRole[] }>,
+    ): Promise<ModifyAuthUserAccountState> {
         return modifyUser(this.material, user, this.convert(), this.post)
     }
 }
@@ -152,11 +131,11 @@ type ModifyUserEvent =
     | Readonly<{ type: "try" }>
     | Readonly<{ type: "take-longtime" }>
     | Readonly<{ type: "failed"; err: ModifyAuthUserAccountError }>
-    | Readonly<{ type: "success"; data: AuthUserAccountBasket }>
+    | Readonly<{ type: "success"; data: ModifyAuthUserAccountFields }>
 
 async function modifyUser<S>(
     { infra, config }: ModifyAuthUserAccountMaterial,
-    user: AuthUserAccountBasket,
+    user: Readonly<{ loginId: LoginId; grantedRoles: readonly GrantedAuthRole[] }>,
     fields: ConvertBoardResult<ModifyAuthUserAccountFields>,
     post: Post<ModifyUserEvent, S>,
 ): Promise<S> {

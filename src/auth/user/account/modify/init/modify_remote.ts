@@ -10,13 +10,13 @@ import {
     remoteInfraError,
 } from "../../../../../z_lib/ui/remote/init/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf/helper"
-import { toGrantedRoles, toResetTokenDestinationEmail } from "../../input/convert"
+import { toGrantedRoles } from "../../input/convert"
 
 import { ModifyAuthUserAccountRemoteResult, ModifyAuthUserAccountRemote } from "../infra"
 
-import { AuthUserAccountBasket } from "../../kernel/data"
-import { ModifyAuthUserAccountFields } from "../data"
-import { ResetTokenDestination } from "../../input/data"
+import { ModifyAuthUserAccountFields, ModifyAuthUserAccountRemoteError } from "../data"
+import { LoginId } from "../../../login_id/input/data"
+import { GrantedAuthRole } from "../../input/data"
 
 export function newModifyAuthUserAccountRemote(
     feature: RemoteOutsideFeature,
@@ -26,22 +26,15 @@ export function newModifyAuthUserAccountRemote(
 
 async function fetchRemote(
     feature: RemoteOutsideFeature,
-    user: AuthUserAccountBasket,
+    user: Readonly<{ loginId: LoginId; grantedRoles: readonly GrantedAuthRole[] }>,
     fields: ModifyAuthUserAccountFields,
 ): Promise<ModifyAuthUserAccountRemoteResult> {
-    try {
-        const mock = true
-        if (mock) {
-            return {
-                success: true,
-                value: {
-                    loginId: user.loginId,
-                    grantedRoles: fields.grantedRoles,
-                    resetTokenDestination: fields.resetTokenDestination,
-                },
-            }
-        }
+    const mock = true
+    if (mock) {
+        return { success: true, value: fields }
+    }
 
+    try {
         const opts = fetchOptions({
             serverURL: env.apiServerURL,
             path: "/auth/user/account",
@@ -56,11 +49,9 @@ async function fetchRemote(
                     message.loginId = user.loginId
                     message.from = {
                         grantedRoles: Array.from(user.grantedRoles),
-                        resetTokenDestination: user.resetTokenDestination,
                     }
                     message.to = {
                         grantedRoles: Array.from(fields.grantedRoles),
-                        resetTokenDestination: fields.resetTokenDestination,
                     }
                 },
             ),
@@ -75,58 +66,31 @@ async function fetchRemote(
             await response.text(),
         )
         if (!message.success) {
-            return errorResponse(message.err)
-        }
-        if (!message.data) {
-            return {
-                success: false,
-                err: { type: "infra-error", err: "data not exists in response" },
-            }
+            return { success: false, err: errorResponse(message.err) }
         }
         return {
             success: true,
-            value: responseData(user, message.data),
+            value: {
+                grantedRoles: toGrantedRoles(message.data?.grantedRoles || []),
+            },
         }
     } catch (err) {
         return remoteInfraError(err)
     }
 }
 
-function responseData(
-    user: AuthUserAccountBasket,
-    data: pb.auth.user.account.modify.service.IModifyAuthUserAccountDataPb,
-): AuthUserAccountBasket {
-    return {
-        loginId: user.loginId,
-        grantedRoles: toGrantedRoles(data.grantedRoles || []),
-        resetTokenDestination: resetTokenDestination(data.resetTokenDestination || {}),
-    }
-
-    function resetTokenDestination(
-        destination: pb.auth.user.account.modify.service.IModifyResetTokenDestinationDataPb,
-    ): ResetTokenDestination {
-        switch (destination.type) {
-            case "email":
-                return toResetTokenDestinationEmail(destination.email || "")
-
-            default:
-                return { type: "none" }
-        }
-    }
-}
 function errorResponse(
     err: pb.auth.user.account.modify.service.ModifyAuthUserAccountErrorKindPb,
-): ModifyAuthUserAccountRemoteResult {
+): ModifyAuthUserAccountRemoteError {
     switch (err) {
         case pb.auth.user.account.modify.service.ModifyAuthUserAccountErrorKindPb.CONFLICT:
-            return { success: false, err: { type: "conflict" } }
+            return { type: "conflict" }
+
+        case pb.auth.user.account.modify.service.ModifyAuthUserAccountErrorKindPb.NOT_FOUND:
+            return { type: "not-found" }
 
         case pb.auth.user.account.modify.service.ModifyAuthUserAccountErrorKindPb
             .INVALID_GRANTED_ROLE:
-            return { success: false, err: { type: "invalid-granted-role" } }
-
-        case pb.auth.user.account.modify.service.ModifyAuthUserAccountErrorKindPb
-            .INVALID_RESET_TOKEN_DESTINATION_EMAIL:
-            return { success: false, err: { type: "invalid-reset-token-destination-email" } }
+            return { type: "invalid-granted-role" }
     }
 }

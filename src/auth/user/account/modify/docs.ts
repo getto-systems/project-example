@@ -1,5 +1,6 @@
 import { DocsAction } from "../../../../z_vendor/getto-application/docs/data"
 
+// TODO ドキュメントを書く
 export const docs_overrideLoginId: DocsAction = {
     title: "ログインID上書き",
     action: [

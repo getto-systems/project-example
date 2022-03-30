@@ -25,7 +25,7 @@ impl ServiceResponder<OverrideLoginIdResponsePb> for OverrideLoginIdEvent {
                 success: true,
                 ..Default::default()
             })),
-            Self::InvalidLoginId(err) => err.respond_to(),
+            Self::Failed(err) => err.respond_to(),
             Self::RepositoryError(err) => err.respond_to(),
         }
     }
@@ -40,6 +40,7 @@ impl ServiceResponder<OverrideLoginIdResponsePb> for OverrideLoginIdError {
             })),
             Self::UserNotFound => Ok(Response::new(OverrideLoginIdResponsePb {
                 success: false,
+                // ユーザーが見つからなかった場合でも invalid login id エラーを返す
                 err: OverrideLoginIdErrorKindPb::InvalidLoginId as i32,
             })),
             Self::LoginIdAlreadyRegistered => Ok(Response::new(OverrideLoginIdResponsePb {

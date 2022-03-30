@@ -12,7 +12,7 @@ import {
 } from "./data"
 import { ReadSearchSortKeyResult } from "../../../../z_lib/ui/search/sort/data"
 import { DetectLoginIdResult } from "./infra"
-import { AuthUserAccountBasket } from "../kernel/data"
+import { AuthUserAccount } from "../kernel/data"
 
 const SEARCH_LOGIN_ID = "search-login-id" as const
 
@@ -60,7 +60,7 @@ export function updateSearchAuthUserAccountFilterQuery(
     url = updateSearchSort(url, fields.sort)
     return url
 }
-export function updateFocusAuthUserAccountQuery(currentURL: URL, user: AuthUserAccountBasket): URL {
+export function updateFocusAuthUserAccountQuery(currentURL: URL, user: AuthUserAccount): URL {
     const url = new URL(currentURL.toString())
     url.searchParams.set(FOCUS_ID, user.loginId)
     return url

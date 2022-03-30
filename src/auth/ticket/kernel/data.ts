@@ -1,6 +1,6 @@
-import { GrantedRole } from "../../user/account/input/data"
+import { GrantedAuthRole } from "../../user/account/input/data"
 
 export type AuthTicket = Readonly<{
     authAt: Date
-    grantedRoles: readonly GrantedRole[]
+    grantedRoles: readonly GrantedAuthRole[]
 }> & { AuthTicket: never }

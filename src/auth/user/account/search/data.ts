@@ -1,7 +1,7 @@
 import { BoardValue } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { SingleValueFilter, SearchPageResponse } from "../../../../z_lib/ui/search/kernel/data"
 import { SearchSort } from "../../../../z_lib/ui/search/sort/data"
-import { AuthUserAccountBasket } from "../kernel/data"
+import { AuthUserAccount } from "../kernel/data"
 
 export type SearchAuthUserAccountFilter = Readonly<{
     offset: BoardValue
@@ -17,5 +17,5 @@ export const defaultSearchAuthUserAccountSort: SearchAuthUserAccountSortKey = "l
 export type SearchAuthUserAccountRemoteResponse = Readonly<{
     page: SearchPageResponse
     sort: SearchAuthUserAccountSort
-    users: readonly AuthUserAccountBasket[]
+    users: readonly AuthUserAccount[]
 }>

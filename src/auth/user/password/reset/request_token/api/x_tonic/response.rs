@@ -56,6 +56,7 @@ impl<T> ServiceResponder<T> for EncodeResetTokenError {
 impl<T> ServiceResponder<T> for NotifyResetTokenError {
     fn respond_to(self) -> Result<Response<T>, Status> {
         match self {
+            Self::NoDestination => Err(Status::internal("no reset token destination")),
             Self::InfraError(_) => Err(Status::internal("notify reset token error")),
         }
     }

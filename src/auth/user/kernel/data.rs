@@ -2,6 +2,7 @@ use std::collections::HashSet;
 
 use crate::x_content::role::{AuthRole, AUTH_ROLE_ALL};
 
+// TODO 多分なくていい
 #[derive(Clone)]
 pub struct AuthUser {
     user_id: AuthUserId,
@@ -48,7 +49,7 @@ impl AuthUserExtract {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct AuthUserId(String);
 
 impl AuthUserId {
@@ -71,10 +72,20 @@ impl std::fmt::Display for AuthUserId {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct GrantedAuthRoles(HashSet<AuthRole>);
 
 impl GrantedAuthRoles {
+    pub fn empty() -> Self {
+        Self(HashSet::new())
+    }
+
+    pub fn validate(
+        roles: impl GrantedAuthRolesExtract,
+    ) -> Result<Self, ValidateGrantedAuthRolesError> {
+        roles.validate()
+    }
+
     pub(in crate::auth) fn restore(roles: HashSet<String>) -> Self {
         let mut granted_roles: HashSet<AuthRole> = HashSet::new();
         AUTH_ROLE_ALL.iter().for_each(|role| {
@@ -111,6 +122,22 @@ impl std::fmt::Display for GrantedAuthRoles {
                 .collect::<Vec<&str>>()
                 .join(",")
         )
+    }
+}
+
+pub trait GrantedAuthRolesExtract {
+    fn validate(self) -> Result<GrantedAuthRoles, ValidateGrantedAuthRolesError>;
+}
+
+pub enum ValidateGrantedAuthRolesError {
+    InvalidRole,
+}
+
+impl std::fmt::Display for ValidateGrantedAuthRolesError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::InvalidRole => write!(f, "invalid role"),
+        }
     }
 }
 

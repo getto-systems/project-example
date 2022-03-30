@@ -12,9 +12,11 @@ import { repositoryErrorReason } from "../../../repository/x_error/reason"
 import { notice_alert } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 import {
     iconHtml,
-    icon_sidebar_expand,
-    icon_sidebar_fold,
 } from "../../../../../core/x_preact/design/icon"
+import {
+    icon_sidebar_expand,
+    icon_sidebar_fold
+} from "../../../../../x_content/icon"
 import { sidebarExpand } from "./helper"
 
 type EntryProps = Readonly<{
