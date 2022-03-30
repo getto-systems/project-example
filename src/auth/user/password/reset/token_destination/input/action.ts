@@ -124,6 +124,7 @@ class DestinationAction
                     return
 
                 default:
+                    checker.check()
                     this.post({ type: "none" })
                     return
             }

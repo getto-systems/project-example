@@ -8,8 +8,8 @@ import { button_cancel } from "../../../../../z_vendor/getto-css/preact/design/f
 import { BACK_TO_LIST_BUTTON } from "../../../../../core/x_preact/design/table"
 
 import { ModifyAuthUserAccount } from "../../modify/x_preact/modify"
-import { OverrideLoginIdEntry } from "../../../login_id/change/x_preact/override_login_id"
-import { OverridePasswordEntry } from "../../../password/change/x_preact/override_password"
+import { OverrideLoginId } from "../../../login_id/change/x_preact/override_login_id"
+import { OverridePassword } from "../../../password/change/x_preact/override_password"
 import { ChangeResetTokenDestination } from "../../../password/reset/token_destination/change/x_preact/change"
 
 import { DetailAuthUserAccountAction } from "../action"
@@ -68,8 +68,8 @@ export function DetailAuthUserAccountEntry(props: EntryProps): VNode {
                     props.detail.update({ ...user, resetTokenDestination: destination })
                 },
             }),
-            h(OverrideLoginIdEntry, { ...props.overrideLoginId, user }),
-            h(OverridePasswordEntry, { ...props.overridePassword, user }),
+            h(OverrideLoginId, { ...props.overrideLoginId, user }),
+            h(OverridePassword, { ...props.overridePassword, user }),
         ])
     }
 }

@@ -12,13 +12,12 @@ import {
     form,
 } from "../../../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../../../z_vendor/getto-css/preact/design/box"
-import { notice_success } from "../../../../../../../z_vendor/getto-css/preact/design/highlight"
-import { v_small } from "../../../../../../../z_vendor/getto-css/preact/design/alignment"
 
 import { VNodeContent } from "../../../../../../../z_lib/ui/x_preact/common"
 import { buttonLabel, icon_save, icon_spinner } from "../../../../../../../x_content/icon"
 
 import { ResetTokenDestinationField } from "../../input/x_preact/destination"
+import { SuccessButton } from "../../../../../../../core/x_preact/design/button"
 
 import { remoteCommonErrorReason } from "../../../../../../../z_lib/ui/remote/x_error/reason"
 
@@ -51,28 +50,21 @@ export function ChangeResetTokenDestination(props: Props): VNode {
                     field: props.change.destination,
                 }),
             ],
-            footer: editableState.isEditable ? editButtons() : staticButtons(),
+            footer: editableState.isEditable ? editButtons() : openButton(),
         }),
     )
 
-    function staticButtons(): VNodeContent {
-        return [openButton(), ...message()]
+    function openButton(): VNode {
+        return h(SuccessButton, {
+            label: LABEL_CHANGE.static,
+            onClick,
+            isSuccess: state.type === "success",
+        })
 
-        function openButton(): VNode {
-            return button_send({ state: "normal", label: "変更", onClick })
-
-            function onClick(e: Event) {
-                e.preventDefault()
-                props.change.reset(props.user.resetTokenDestination)
-                props.editable.open()
-            }
-        }
-
-        function message(): VNode[] {
-            if (state.type === "success") {
-                return [v_small(), notice_success(["変更完了しました"])]
-            }
-            return []
+        function onClick(e: Event) {
+            e.preventDefault()
+            props.change.reset(props.user.resetTokenDestination)
+            props.editable.open()
         }
     }
 
@@ -94,11 +86,11 @@ export function ChangeResetTokenDestination(props: Props): VNode {
                 case "failed":
                 case "success":
                     if (validateState === "invalid") {
-                        return button_disabled({ label: LABEL_CHANGE.static })
+                        return button_disabled({ label: LABEL_CHANGE.normal })
                     }
                     return button_send({
                         state: observeState.hasChanged ? "confirm" : "normal",
-                        label: LABEL_CHANGE.static,
+                        label: LABEL_CHANGE.normal,
                         onClick,
                     })
 

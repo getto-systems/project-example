@@ -12,8 +12,6 @@ import {
     form,
 } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
-import { notice_success } from "../../../../../z_vendor/getto-css/preact/design/highlight"
-import { v_small } from "../../../../../z_vendor/getto-css/preact/design/alignment"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 import { iconHtml } from "../../../../../core/x_preact/design/icon"
@@ -29,6 +27,7 @@ import { ModifyAuthUserAccountAction } from "../action"
 import { ModifyAuthUserAccountError, ModifyAuthUserAccountFields } from "../data"
 import { LoginId } from "../../../login_id/input/data"
 import { GrantedAuthRole } from "../../input/data"
+import { SuccessButton } from "../../../../../core/x_preact/design/button"
 
 type Props = Readonly<{
     user: Readonly<{ loginId: LoginId; grantedRoles: readonly GrantedAuthRole[] }>
@@ -52,28 +51,17 @@ export function ModifyAuthUserAccount(props: Props): VNode {
                     field: props.modify.grantedRoles,
                 }),
             ],
-            footer: editableState.isEditable ? editButtons() : staticButtons(),
+            footer: editableState.isEditable ? editButtons() : openButton(),
         }),
     )
 
-    function staticButtons(): VNodeContent {
-        return [openButton(), ...message()]
+    function openButton(): VNode {
+        return h(SuccessButton, { label: "変更", onClick, isSuccess: state.type === "success" })
 
-        function openButton(): VNode {
-            return button_send({ state: "normal", label: "変更", onClick })
-
-            function onClick(e: Event) {
-                e.preventDefault()
-                props.modify.reset(props.user.grantedRoles)
-                props.editable.open()
-            }
-        }
-
-        function message(): VNode[] {
-            if (state.type === "success") {
-                return [v_small(), notice_success(["変更完了しました"])]
-            }
-            return []
+        function onClick(e: Event) {
+            e.preventDefault()
+            props.modify.reset(props.user.grantedRoles)
+            props.editable.open()
         }
     }
 
