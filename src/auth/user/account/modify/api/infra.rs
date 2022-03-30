@@ -1,6 +1,6 @@
 use crate::{
     auth::user::{
-        account::modify::data::{ModifyAuthUserAccountData, ValidateAuthUserAccountError},
+        account::modify::data::{AuthUserAccountChanges, ValidateAuthUserAccountError},
         kernel::data::AuthUserId,
         login_id::kernel::data::LoginId,
     },
@@ -13,8 +13,8 @@ pub trait ModifyAuthUserAccountRequestDecoder {
 
 pub struct ModifyAuthUserAccountFields {
     pub login_id: LoginId,
-    pub from: ModifyAuthUserAccountData,
-    pub to: ModifyAuthUserAccountData,
+    pub from: AuthUserAccountChanges,
+    pub to: AuthUserAccountChanges,
 }
 
 #[async_trait::async_trait]
@@ -22,18 +22,16 @@ pub trait ModifyAuthUserAccountRepository {
     async fn lookup_user(
         &self,
         login_id: &LoginId,
-    ) -> Result<Option<(AuthUserId, ModifyAuthUserAccountData)>, RepositoryError>;
+    ) -> Result<Option<(AuthUserId, AuthUserAccountChanges)>, RepositoryError>;
 
     async fn modify_user(
         &self,
         user_id: &AuthUserId,
-        login_id: &LoginId,
-        data: ModifyAuthUserAccountData,
+        data: AuthUserAccountChanges,
     ) -> Result<(), RepositoryError>;
 
     async fn get_updated_user(
         &self,
         user_id: &AuthUserId,
-        login_id: &LoginId,
-    ) -> Result<ModifyAuthUserAccountData, RepositoryError>;
+    ) -> Result<AuthUserAccountChanges, RepositoryError>;
 }

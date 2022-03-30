@@ -13,4 +13,4 @@ export type ModifyAuthUserAccountRemoteError =
     | RemoteCommonError
     | Readonly<{ type: "conflict" }>
     | Readonly<{ type: "not-found" }>
-    | Readonly<{ type: "invalid-granted-role" }>
+    | Readonly<{ type: "invalid" }>

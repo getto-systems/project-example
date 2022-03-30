@@ -1,35 +1,28 @@
 use crate::auth::user::{
     kernel::data::{GrantedAuthRoles, ValidateGrantedAuthRolesError},
     login_id::kernel::data::ValidateLoginIdError,
-    password::reset::kernel::data::{ResetTokenDestination, ValidateResetTokenDestinationError},
 };
 
 #[derive(PartialEq, Eq)]
-pub struct ModifyAuthUserAccountData {
+pub struct AuthUserAccountChanges {
     pub granted_roles: GrantedAuthRoles,
-    pub reset_token_destination: ResetTokenDestination,
 }
 
-impl std::fmt::Display for ModifyAuthUserAccountData {
+impl std::fmt::Display for AuthUserAccountChanges {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "modify user: {} / {}",
-            self.granted_roles, self.reset_token_destination
-        )
+        write!(f, "modify user: {}", self.granted_roles)
     }
 }
 
 pub enum ValidateAuthUserAccountError {
     InvalidLoginId(ValidateLoginIdError),
-    InvalidFrom(ValidateAuthUserAccountDataError),
-    InvalidTo(ValidateAuthUserAccountDataError),
+    InvalidFrom(ValidateAuthUserAccountChangesError),
+    InvalidTo(ValidateAuthUserAccountChangesError),
 }
 
-pub enum ValidateAuthUserAccountDataError {
+pub enum ValidateAuthUserAccountChangesError {
     NotFound,
     InvalidGrantedRoles(ValidateGrantedAuthRolesError),
-    InvalidResetTokenDestination(ValidateResetTokenDestinationError),
 }
 
 impl std::fmt::Display for ValidateAuthUserAccountError {
@@ -42,12 +35,11 @@ impl std::fmt::Display for ValidateAuthUserAccountError {
     }
 }
 
-impl std::fmt::Display for ValidateAuthUserAccountDataError {
+impl std::fmt::Display for ValidateAuthUserAccountChangesError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::NotFound => write!(f, "data not found"),
             Self::InvalidGrantedRoles(err) => err.fmt(f),
-            Self::InvalidResetTokenDestination(err) => err.fmt(f),
         }
     }
 }

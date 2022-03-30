@@ -8,11 +8,10 @@ use crate::auth::user::account::modify::infra::{
 
 use crate::auth::user::{
     account::modify::data::{
-        ModifyAuthUserAccountData, ValidateAuthUserAccountDataError, ValidateAuthUserAccountError,
+        AuthUserAccountChanges, ValidateAuthUserAccountChangesError, ValidateAuthUserAccountError,
     },
     kernel::data::GrantedAuthRoles,
     login_id::kernel::data::LoginId,
-    password::reset::kernel::data::{ResetTokenDestination, ResetTokenDestinationExtract},
 };
 
 pub struct PbModifyAuthUserAccountRequestDecoder {
@@ -39,25 +38,12 @@ impl ModifyAuthUserAccountRequestDecoder for PbModifyAuthUserAccountRequestDecod
 
 fn validate_data(
     data: Option<ModifyAuthUserAccountDataPb>,
-) -> Result<ModifyAuthUserAccountData, ValidateAuthUserAccountDataError> {
+) -> Result<AuthUserAccountChanges, ValidateAuthUserAccountChangesError> {
     match data {
-        None => Err(ValidateAuthUserAccountDataError::NotFound),
-        Some(data) => Ok(ModifyAuthUserAccountData {
+        None => Err(ValidateAuthUserAccountChangesError::NotFound),
+        Some(data) => Ok(AuthUserAccountChanges {
             granted_roles: GrantedAuthRoles::validate(data.granted_roles)
-                .map_err(ValidateAuthUserAccountDataError::InvalidGrantedRoles)?,
-            reset_token_destination: ResetTokenDestination::validate(
-                match data.reset_token_destination {
-                    None => ResetTokenDestinationExtract::None,
-                    Some(destination) => {
-                        if destination.r#type == "email" {
-                            ResetTokenDestinationExtract::Email(destination.email)
-                        } else {
-                            ResetTokenDestinationExtract::None
-                        }
-                    }
-                },
-            )
-            .map_err(ValidateAuthUserAccountDataError::InvalidResetTokenDestination)?,
+                .map_err(ValidateAuthUserAccountChangesError::InvalidGrantedRoles)?,
         }),
     }
 }

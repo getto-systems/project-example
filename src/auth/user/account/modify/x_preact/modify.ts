@@ -176,8 +176,8 @@ function modifyError(err: ModifyAuthUserAccountError): readonly VNodeContent[] {
         case "not-found":
             return ["ユーザーが見つかりませんでした", "一旦リロードしてやり直してください"]
 
-        case "invalid-granted-role":
-            return ["権限が正しくありません", "一旦リロードしてやり直してください"]
+        case "invalid":
+            return ["データが正しくありません", "一旦リロードしてやり直してください"]
 
         default:
             return remoteCommonErrorReason(err, (reason) => [

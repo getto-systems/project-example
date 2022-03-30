@@ -9,6 +9,12 @@ pub fn string_value(value: String) -> AttributeValue {
         ..Default::default()
     }
 }
+pub fn string_set_value(value: Vec<String>) -> AttributeValue {
+    AttributeValue {
+        ss: Some(value),
+        ..Default::default()
+    }
+}
 pub fn bool_value(value: bool) -> AttributeValue {
     AttributeValue {
         bool: Some(value),

@@ -22,7 +22,7 @@ impl LogFilter for ModifyAuthUserAccountEvent {
         match self {
             Self::Success(_) => LogLevel::Audit,
             Self::InvalidUser(_) => LogLevel::Error,
-            Self::UserNotFound => LogLevel::Error,
+            Self::NotFound => LogLevel::Error,
             Self::Conflict => LogLevel::Error,
             Self::RepositoryError(err) => err.log_level(),
         }

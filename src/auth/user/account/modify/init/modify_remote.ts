@@ -89,8 +89,7 @@ function errorResponse(
         case pb.auth.user.account.modify.service.ModifyAuthUserAccountErrorKindPb.NOT_FOUND:
             return { type: "not-found" }
 
-        case pb.auth.user.account.modify.service.ModifyAuthUserAccountErrorKindPb
-            .INVALID_GRANTED_ROLE:
-            return { type: "invalid-granted-role" }
+        case pb.auth.user.account.modify.service.ModifyAuthUserAccountErrorKindPb.INVALID:
+            return { type: "invalid" }
     }
 }

@@ -32,7 +32,7 @@ use crate::{
         user::{
             account::{
                 kernel::data::AuthUserAccount,
-                modify::data::ModifyAuthUserAccountData,
+                modify::data::AuthUserAccountChanges,
                 search::data::{SearchAuthUserAccountBasket, SearchAuthUserAccountFilter},
             },
             kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
@@ -371,70 +371,61 @@ impl<'a> ModifyAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
     async fn lookup_user(
         &self,
         login_id: &LoginId,
-    ) -> Result<Option<(AuthUserId, ModifyAuthUserAccountData)>, RepositoryError> {
+    ) -> Result<Option<(AuthUserId, AuthUserAccountChanges)>, RepositoryError> {
         lookup_modify_user_data(self, login_id)
     }
 
     async fn modify_user(
         &self,
         user_id: &AuthUserId,
-        login_id: &LoginId,
-        data: ModifyAuthUserAccountData,
+        data: AuthUserAccountChanges,
     ) -> Result<(), RepositoryError> {
-        modify_user(self, user_id, login_id, data)
+        modify_user(self, user_id, data)
     }
 
     async fn get_updated_user(
         &self,
         user_id: &AuthUserId,
-        login_id: &LoginId,
-    ) -> Result<ModifyAuthUserAccountData, RepositoryError> {
-        get_modify_user_data(self, user_id, login_id)
+    ) -> Result<AuthUserAccountChanges, RepositoryError> {
+        get_modify_user_data(self, user_id)
     }
 }
 fn lookup_modify_user_data<'a>(
     repository: &MemoryAuthUserRepository<'a>,
     login_id: &LoginId,
-) -> Result<Option<(AuthUserId, ModifyAuthUserAccountData)>, RepositoryError> {
-    let mut store = repository.store.lock().unwrap();
+) -> Result<Option<(AuthUserId, AuthUserAccountChanges)>, RepositoryError> {
+    let store = repository.store.lock().unwrap();
 
     match store.get_user_id(login_id) {
         None => Ok(None),
         Some(user_id) => Ok(Some((
             user_id.clone(),
-            get_modify_user_data(repository, user_id, login_id)?,
+            get_modify_user_data(repository, user_id)?,
         ))),
     }
 }
 fn modify_user<'a>(
     repository: &MemoryAuthUserRepository<'a>,
     user_id: &AuthUserId,
-    login_id: &LoginId,
-    data: ModifyAuthUserAccountData,
+    data: AuthUserAccountChanges,
 ) -> Result<(), RepositoryError> {
     let mut store = repository.store.lock().unwrap();
 
     store.update_granted_roles(user_id.clone(), data.granted_roles);
-    store.update_destination(login_id.clone(), data.reset_token_destination);
 
     Ok(())
 }
 fn get_modify_user_data<'a>(
     repository: &MemoryAuthUserRepository<'a>,
     user_id: &AuthUserId,
-    login_id: &LoginId,
-) -> Result<ModifyAuthUserAccountData, RepositoryError> {
+) -> Result<AuthUserAccountChanges, RepositoryError> {
     let store = repository.store.lock().unwrap();
 
-    Ok(ModifyAuthUserAccountData {
+    Ok(AuthUserAccountChanges {
         granted_roles: store
             .get_granted_roles(user_id)
             .map(|granted_roles| GrantedAuthRoles::restore(granted_roles.clone()))
             .unwrap_or(GrantedAuthRoles::empty()),
-        reset_token_destination: store
-            .get_destination(login_id)
-            .map(|destination| ResetTokenDestination::restore(destination.clone()))
-            .unwrap_or(ResetTokenDestination::None),
     })
 }
 

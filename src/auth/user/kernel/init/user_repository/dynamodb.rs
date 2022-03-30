@@ -12,7 +12,10 @@ use rusoto_dynamodb::{
     UpdateItemInput,
 };
 
-use crate::auth::x_outside_feature::feature::AuthOutsideStore;
+use crate::{
+    auth::x_outside_feature::feature::AuthOutsideStore,
+    z_lib::repository::dynamodb::helper::string_set_value,
+};
 
 use crate::z_lib::repository::{
     dynamodb::helper::{string_value, timestamp_value, ScanKey},
@@ -44,7 +47,7 @@ use crate::{
         user::{
             account::{
                 kernel::data::AuthUserAccount,
-                modify::data::ModifyAuthUserAccountData,
+                modify::data::AuthUserAccountChanges,
                 search::data::{
                     SearchAuthUserAccountBasket, SearchAuthUserAccountFilter,
                     SearchAuthUserAccountSortKey,
@@ -310,70 +313,57 @@ impl<'client> ModifyAuthUserAccountRepository for DynamoDbAuthUserRepository<'cl
     async fn lookup_user(
         &self,
         login_id: &LoginId,
-    ) -> Result<Option<(AuthUserId, ModifyAuthUserAccountData)>, RepositoryError> {
-        lookup_modify_user_data(self, login_id)
+    ) -> Result<Option<(AuthUserId, AuthUserAccountChanges)>, RepositoryError> {
+        lookup_modify_user_data(self, login_id).await
     }
 
     async fn modify_user(
         &self,
         user_id: &AuthUserId,
-        login_id: &LoginId,
-        data: ModifyAuthUserAccountData,
+        data: AuthUserAccountChanges,
     ) -> Result<(), RepositoryError> {
-        modify_user(self, user_id, login_id, data)
+        modify_user(self, user_id, data).await
     }
 
     async fn get_updated_user(
         &self,
         user_id: &AuthUserId,
-        login_id: &LoginId,
-    ) -> Result<ModifyAuthUserAccountData, RepositoryError> {
-        get_modify_user_data(self, user_id, login_id)
+    ) -> Result<AuthUserAccountChanges, RepositoryError> {
+        get_modify_user_data(self, user_id).await
     }
 }
-fn lookup_modify_user_data<'client>(
+async fn lookup_modify_user_data<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
     login_id: &LoginId,
-) -> Result<Option<(AuthUserId, ModifyAuthUserAccountData)>, RepositoryError> {
-    let mut store = repository.store.lock().unwrap();
-
-    match store.get_user_id(login_id) {
+) -> Result<Option<(AuthUserId, AuthUserAccountChanges)>, RepositoryError> {
+    match get_user_id(repository, login_id.clone())
+        .await
+        .map_err(|err| infra_error("get login id error", err))?
+    {
         None => Ok(None),
         Some(user_id) => Ok(Some((
             user_id.clone(),
-            get_modify_user_data(repository, user_id, login_id)?,
+            get_modify_user_data(repository, &user_id).await?,
         ))),
     }
 }
-fn modify_user<'client>(
+async fn modify_user<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
     user_id: &AuthUserId,
-    login_id: &LoginId,
-    data: ModifyAuthUserAccountData,
+    data: AuthUserAccountChanges,
 ) -> Result<(), RepositoryError> {
-    let mut store = repository.store.lock().unwrap();
-
-    store.update_granted_roles(user_id.clone(), data.granted_roles);
-    store.update_destination(login_id.clone(), data.reset_token_destination);
-
-    Ok(())
+    update_granted_roles(repository, user_id.clone(), data.granted_roles)
+        .await
+        .map_err(|err| infra_error("update granted roles error", err))
 }
-fn get_modify_user_data<'client>(
+async fn get_modify_user_data<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
     user_id: &AuthUserId,
-    login_id: &LoginId,
-) -> Result<ModifyAuthUserAccountData, RepositoryError> {
-    let store = repository.store.lock().unwrap();
-
-    Ok(ModifyAuthUserAccountData {
-        granted_roles: store
-            .get_granted_roles(user_id)
-            .map(|granted_roles| GrantedAuthRoles::restore(granted_roles.clone()))
-            .unwrap_or(GrantedAuthRoles::empty()),
-        reset_token_destination: store
-            .get_destination(login_id)
-            .map(|destination| ResetTokenDestination::restore(destination.clone()))
-            .unwrap_or(ResetTokenDestination::None),
+) -> Result<AuthUserAccountChanges, RepositoryError> {
+    Ok(AuthUserAccountChanges {
+        granted_roles: get_granted_roles(repository, user_id.clone())
+            .await
+            .map_err(|err| infra_error("get granted roles error", err))?,
     })
 }
 
@@ -734,6 +724,29 @@ async fn get_granted_roles<'client>(
         None => GrantedAuthRoles::restore(HashSet::new()),
     })
 }
+async fn update_granted_roles<'client>(
+    repository: &DynamoDbAuthUserRepository<'client>,
+    user_id: AuthUserId,
+    new_granted_roles: GrantedAuthRoles,
+) -> Result<(), RusotoError<UpdateItemError>> {
+    let mut key = AttributeMap::new();
+    key.add_user_id(user_id);
+
+    let mut item = AttributeMap::new();
+    item.add_granted_roles_as(new_granted_roles, ":granted_roles");
+
+    let input = UpdateItemInput {
+        table_name: repository.user.into(),
+        key: key.extract(),
+        update_expression: Some("set granted_roles = :granted_roles".into()),
+        expression_attribute_values: Some(item.extract()),
+        ..Default::default()
+    };
+
+    repository.client.update_item(input).await?;
+
+    Ok(())
+}
 async fn get_login_id<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
     user_id: AuthUserId,
@@ -929,7 +942,7 @@ async fn scan_user_part<'client>(
         table_name: repository.user.into(),
         exclusive_start_key: scan_key.extract(),
         projection_expression: Some(
-            "user_id, login_id, granted_roles, reset_token_destination_email".into(),
+            "login_id, granted_roles, reset_token_destination_email".into(),
         ),
         ..Default::default()
     };
@@ -942,7 +955,6 @@ async fn scan_user_part<'client>(
             .into_iter()
             .filter_map(|mut item| {
                 match (
-                    item.remove("user_id").and_then(|attr| attr.s),
                     item.remove("login_id").and_then(|attr| attr.s),
                     item.remove("granted_roles")
                         .and_then(|attr| attr.ss)
@@ -950,25 +962,22 @@ async fn scan_user_part<'client>(
                     item.remove("reset_token_destination_email")
                         .and_then(|attr| attr.s),
                 ) {
-                    (
-                        Some(user_id),
-                        Some(login_id),
-                        granted_roles,
-                        reset_token_destination_email,
-                    ) => Some(AuthUserAccount {
-                        login_id: LoginId::restore(login_id),
-                        granted_roles: GrantedAuthRoles::restore(
-                            granted_roles.unwrap_or(HashSet::new()),
-                        ),
-                        reset_token_destination: {
-                            match reset_token_destination_email {
-                                None => ResetTokenDestination::None,
-                                Some(email) => ResetTokenDestination::restore(
-                                    ResetTokenDestinationExtract::Email(email),
-                                ),
-                            }
-                        },
-                    }),
+                    (Some(login_id), granted_roles, reset_token_destination_email) => {
+                        Some(AuthUserAccount {
+                            login_id: LoginId::restore(login_id),
+                            granted_roles: GrantedAuthRoles::restore(
+                                granted_roles.unwrap_or(HashSet::new()),
+                            ),
+                            reset_token_destination: {
+                                match reset_token_destination_email {
+                                    None => ResetTokenDestination::None,
+                                    Some(email) => ResetTokenDestination::restore(
+                                        ResetTokenDestinationExtract::Email(email),
+                                    ),
+                                }
+                            },
+                        })
+                    }
                     _ => None,
                 }
             })
@@ -1026,6 +1035,12 @@ impl AttributeMap {
 
     fn add_login_id_as(&mut self, login_id: LoginId, name: &str) {
         self.add(name, string_value(login_id.extract()));
+    }
+    fn add_granted_roles_as(&mut self, granted_roles: GrantedAuthRoles, name: &str) {
+        self.add(
+            name,
+            string_set_value(granted_roles.extract().into_iter().collect()),
+        );
     }
     fn add_password_as(&mut self, password: HashedPassword, name: &str) {
         self.add(name, string_value(password.extract()));

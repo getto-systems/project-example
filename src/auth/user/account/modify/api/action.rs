@@ -4,14 +4,13 @@ use crate::auth::ticket::validate::method::{
     validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
 };
 
-use crate::auth::user::account::modify::data::ModifyAuthUserAccountData;
 use crate::auth::user::account::modify::infra::{
     ModifyAuthUserAccountFields, ModifyAuthUserAccountRepository,
     ModifyAuthUserAccountRequestDecoder,
 };
 
 use crate::{
-    auth::user::account::modify::data::ValidateAuthUserAccountError,
+    auth::user::account::modify::data::{AuthUserAccountChanges, ValidateAuthUserAccountError},
     z_lib::repository::data::RepositoryError,
 };
 
@@ -85,9 +84,9 @@ impl<R: ModifyAuthUserAccountRequestDecoder, M: ModifyAuthUserAccountMaterial>
 }
 
 pub enum ModifyAuthUserAccountEvent {
-    Success(ModifyAuthUserAccountData),
+    Success(AuthUserAccountChanges),
     InvalidUser(ValidateAuthUserAccountError),
-    UserNotFound,
+    NotFound,
     Conflict,
     RepositoryError(RepositoryError),
 }
@@ -103,7 +102,7 @@ mod modify_auth_user_account_event {
             match self {
                 Self::Success(user) => write!(f, "{}; {}", SUCCESS, user),
                 Self::InvalidUser(err) => err.fmt(f),
-                Self::UserNotFound => write!(f, "user not found"),
+                Self::NotFound => write!(f, "user not found"),
                 Self::Conflict => write!(f, "user data conflict"),
                 Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
             }
@@ -124,7 +123,7 @@ async fn modify_user<S>(
         .lookup_user(&fields.login_id)
         .await
         .map_err(|err| post(ModifyAuthUserAccountEvent::RepositoryError(err)))?
-        .ok_or_else(|| post(ModifyAuthUserAccountEvent::UserNotFound))?;
+        .ok_or_else(|| post(ModifyAuthUserAccountEvent::NotFound))?;
 
     if stored_user != fields.from {
         return Err(post(ModifyAuthUserAccountEvent::Conflict));
