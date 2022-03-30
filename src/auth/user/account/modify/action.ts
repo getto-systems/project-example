@@ -31,7 +31,7 @@ export interface ModifyAuthUserAccountAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    reset(grantedRoles: readonly GrantedAuthRole[]): ModifyAuthUserAccountState
+    reset(user: Readonly<{ grantedRoles: readonly GrantedAuthRole[] }>): ModifyAuthUserAccountState
     submit(
         user: Readonly<{ loginId: LoginId; grantedRoles: readonly GrantedAuthRole[] }>,
     ): Promise<ModifyAuthUserAccountState>
@@ -114,8 +114,8 @@ class Action
         })
     }
 
-    reset(grantedRoles: readonly GrantedAuthRole[]): ModifyAuthUserAccountState {
-        this.grantedRoles.reset(grantedRoles)
+    reset(user: Readonly<{ grantedRoles: readonly GrantedAuthRole[] }>): ModifyAuthUserAccountState {
+        this.grantedRoles.reset(user.grantedRoles)
         this.validate.clear()
         this.observe.clear()
         return this.post(this.initialState)

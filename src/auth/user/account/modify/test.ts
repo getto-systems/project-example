@@ -62,7 +62,7 @@ test("reset", () => {
 
     store.grantedRoles.set(VALID_INFO.grantedRoles.map(markBoardValue))
 
-    resource.modify.reset(user.grantedRoles)
+    resource.modify.reset(user)
 
     expect(store.grantedRoles.get()).toEqual([])
 })
