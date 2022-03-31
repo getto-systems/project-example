@@ -5,7 +5,10 @@ use std::{
 
 use chrono::{DateTime, Utc};
 
-use crate::z_lib::repository::helper::infra_error;
+use crate::{
+    auth::user::password::reset::token_destination::change::infra::ChangeResetTokenDestinationRepository,
+    z_lib::repository::helper::infra_error,
+};
 
 use crate::auth::user::{
     account::{
@@ -32,7 +35,7 @@ use crate::{
         user::{
             account::{
                 kernel::data::AuthUserAccount,
-                modify::data::AuthUserAccountChanges,
+                modify::data::ModifyAuthUserAccountChanges,
                 search::data::{SearchAuthUserAccountBasket, SearchAuthUserAccountFilter},
             },
             kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
@@ -371,14 +374,14 @@ impl<'a> ModifyAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
     async fn lookup_user(
         &self,
         login_id: &LoginId,
-    ) -> Result<Option<(AuthUserId, AuthUserAccountChanges)>, RepositoryError> {
+    ) -> Result<Option<(AuthUserId, ModifyAuthUserAccountChanges)>, RepositoryError> {
         lookup_modify_user_data(self, login_id)
     }
 
     async fn modify_user(
         &self,
         user_id: &AuthUserId,
-        data: AuthUserAccountChanges,
+        data: ModifyAuthUserAccountChanges,
     ) -> Result<(), RepositoryError> {
         modify_user(self, user_id, data)
     }
@@ -386,14 +389,14 @@ impl<'a> ModifyAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
     async fn get_updated_user(
         &self,
         user_id: &AuthUserId,
-    ) -> Result<AuthUserAccountChanges, RepositoryError> {
+    ) -> Result<ModifyAuthUserAccountChanges, RepositoryError> {
         get_modify_user_data(self, user_id)
     }
 }
 fn lookup_modify_user_data<'a>(
     repository: &MemoryAuthUserRepository<'a>,
     login_id: &LoginId,
-) -> Result<Option<(AuthUserId, AuthUserAccountChanges)>, RepositoryError> {
+) -> Result<Option<(AuthUserId, ModifyAuthUserAccountChanges)>, RepositoryError> {
     let store = repository.store.lock().unwrap();
 
     match store.get_user_id(login_id) {
@@ -407,7 +410,7 @@ fn lookup_modify_user_data<'a>(
 fn modify_user<'a>(
     repository: &MemoryAuthUserRepository<'a>,
     user_id: &AuthUserId,
-    data: AuthUserAccountChanges,
+    data: ModifyAuthUserAccountChanges,
 ) -> Result<(), RepositoryError> {
     let mut store = repository.store.lock().unwrap();
 
@@ -418,15 +421,69 @@ fn modify_user<'a>(
 fn get_modify_user_data<'a>(
     repository: &MemoryAuthUserRepository<'a>,
     user_id: &AuthUserId,
-) -> Result<AuthUserAccountChanges, RepositoryError> {
+) -> Result<ModifyAuthUserAccountChanges, RepositoryError> {
     let store = repository.store.lock().unwrap();
 
-    Ok(AuthUserAccountChanges {
+    Ok(ModifyAuthUserAccountChanges {
         granted_roles: store
             .get_granted_roles(user_id)
             .map(|granted_roles| GrantedAuthRoles::restore(granted_roles.clone()))
             .unwrap_or(GrantedAuthRoles::empty()),
     })
+}
+
+#[async_trait::async_trait]
+impl<'a> ChangeResetTokenDestinationRepository for MemoryAuthUserRepository<'a> {
+    async fn lookup_destination(
+        &self,
+        login_id: &LoginId,
+    ) -> Result<Option<(AuthUserId, ResetTokenDestination)>, RepositoryError> {
+        lookup_reset_token_destination(self, login_id)
+    }
+
+    async fn change_destination(
+        &self,
+        login_id: &LoginId,
+        data: ResetTokenDestination,
+    ) -> Result<(), RepositoryError> {
+        change_reset_token_destination(self, login_id, data)
+    }
+
+    async fn get_updated_destination(
+        &self,
+        login_id: &LoginId,
+    ) -> Result<ResetTokenDestination, RepositoryError> {
+        get_destination(self, login_id).and_then(|destination| {
+            destination.ok_or(RepositoryError::InfraError(
+                "updated destination not found".into(),
+            ))
+        })
+    }
+}
+fn lookup_reset_token_destination<'a>(
+    repository: &MemoryAuthUserRepository<'a>,
+    login_id: &LoginId,
+) -> Result<Option<(AuthUserId, ResetTokenDestination)>, RepositoryError> {
+    let store = repository.store.lock().unwrap();
+
+    match (
+        store.get_user_id(login_id),
+        get_destination(repository, login_id)?,
+    ) {
+        (Some(user_id), Some(destination)) => Ok(Some((user_id.clone(), destination))),
+        _ => Ok(None),
+    }
+}
+fn change_reset_token_destination<'a>(
+    repository: &MemoryAuthUserRepository<'a>,
+    login_id: &LoginId,
+    data: ResetTokenDestination,
+) -> Result<(), RepositoryError> {
+    let mut store = repository.store.lock().unwrap();
+
+    store.update_destination(login_id.clone(), data);
+
+    Ok(())
 }
 
 #[async_trait::async_trait]

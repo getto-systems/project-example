@@ -4,28 +4,28 @@ use crate::auth::user::{
 };
 
 #[derive(PartialEq, Eq)]
-pub struct AuthUserAccountChanges {
+pub struct ModifyAuthUserAccountChanges {
     pub granted_roles: GrantedAuthRoles,
 }
 
-impl std::fmt::Display for AuthUserAccountChanges {
+impl std::fmt::Display for ModifyAuthUserAccountChanges {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "modify user: {}", self.granted_roles)
     }
 }
 
-pub enum ValidateAuthUserAccountError {
+pub enum ValidateModifyAuthUserAccountFieldsError {
     InvalidLoginId(ValidateLoginIdError),
-    InvalidFrom(ValidateAuthUserAccountChangesError),
-    InvalidTo(ValidateAuthUserAccountChangesError),
+    InvalidFrom(ValidateModifyAuthUserAccountChangesError),
+    InvalidTo(ValidateModifyAuthUserAccountChangesError),
 }
 
-pub enum ValidateAuthUserAccountChangesError {
+pub enum ValidateModifyAuthUserAccountChangesError {
     NotFound,
     InvalidGrantedRoles(ValidateGrantedAuthRolesError),
 }
 
-impl std::fmt::Display for ValidateAuthUserAccountError {
+impl std::fmt::Display for ValidateModifyAuthUserAccountFieldsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::InvalidLoginId(err) => err.fmt(f),
@@ -35,7 +35,7 @@ impl std::fmt::Display for ValidateAuthUserAccountError {
     }
 }
 
-impl std::fmt::Display for ValidateAuthUserAccountChangesError {
+impl std::fmt::Display for ValidateModifyAuthUserAccountChangesError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::NotFound => write!(f, "data not found"),

@@ -1,7 +1,7 @@
 use tonic::{Response, Status};
 
 use crate::auth::user::account::modify::y_protobuf::service::{
-    ModifyAuthUserAccountDataPb, ModifyAuthUserAccountErrorKindPb, ModifyAuthUserAccountResponsePb,
+    ModifyAuthUserAccountChangesPb, ModifyAuthUserAccountErrorKindPb, ModifyAuthUserAccountResponsePb,
 };
 
 use crate::z_lib::response::tonic::ServiceResponder;
@@ -22,7 +22,7 @@ impl ServiceResponder<ModifyAuthUserAccountResponsePb> for ModifyAuthUserAccount
         match self {
             Self::Success(user) => Ok(Response::new(ModifyAuthUserAccountResponsePb {
                 success: true,
-                data: Some(ModifyAuthUserAccountDataPb {
+                data: Some(ModifyAuthUserAccountChangesPb {
                     granted_roles: user.granted_roles.extract().into_iter().collect(),
                 }),
                 ..Default::default()
@@ -37,7 +37,7 @@ impl ServiceResponder<ModifyAuthUserAccountResponsePb> for ModifyAuthUserAccount
                 err: ModifyAuthUserAccountErrorKindPb::Conflict as i32,
                 ..Default::default()
             })),
-            Self::InvalidUser(_) => Ok(Response::new(ModifyAuthUserAccountResponsePb {
+            Self::Invalid(_) => Ok(Response::new(ModifyAuthUserAccountResponsePb {
                 success: false,
                 err: ModifyAuthUserAccountErrorKindPb::Invalid as i32,
                 ..Default::default()

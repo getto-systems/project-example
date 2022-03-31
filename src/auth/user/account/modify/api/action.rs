@@ -10,7 +10,7 @@ use crate::auth::user::account::modify::infra::{
 };
 
 use crate::{
-    auth::user::account::modify::data::{AuthUserAccountChanges, ValidateAuthUserAccountError},
+    auth::user::account::modify::data::{ModifyAuthUserAccountChanges, ValidateModifyAuthUserAccountFieldsError},
     z_lib::repository::data::RepositoryError,
 };
 
@@ -84,8 +84,8 @@ impl<R: ModifyAuthUserAccountRequestDecoder, M: ModifyAuthUserAccountMaterial>
 }
 
 pub enum ModifyAuthUserAccountEvent {
-    Success(AuthUserAccountChanges),
-    InvalidUser(ValidateAuthUserAccountError),
+    Success(ModifyAuthUserAccountChanges),
+    Invalid(ValidateModifyAuthUserAccountFieldsError),
     NotFound,
     Conflict,
     RepositoryError(RepositoryError),
@@ -101,7 +101,7 @@ mod modify_auth_user_account_event {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
                 Self::Success(user) => write!(f, "{}; {}", SUCCESS, user),
-                Self::InvalidUser(err) => err.fmt(f),
+                Self::Invalid(err) => err.fmt(f),
                 Self::NotFound => write!(f, "user not found"),
                 Self::Conflict => write!(f, "user data conflict"),
                 Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
@@ -112,10 +112,10 @@ mod modify_auth_user_account_event {
 
 async fn modify_user<S>(
     infra: &impl ModifyAuthUserAccountMaterial,
-    fields: Result<ModifyAuthUserAccountFields, ValidateAuthUserAccountError>,
+    fields: Result<ModifyAuthUserAccountFields, ValidateModifyAuthUserAccountFieldsError>,
     post: impl Fn(ModifyAuthUserAccountEvent) -> S,
 ) -> MethodResult<S> {
-    let fields = fields.map_err(|err| post(ModifyAuthUserAccountEvent::InvalidUser(err)))?;
+    let fields = fields.map_err(|err| post(ModifyAuthUserAccountEvent::Invalid(err)))?;
 
     let user_repository = infra.user_repository();
 

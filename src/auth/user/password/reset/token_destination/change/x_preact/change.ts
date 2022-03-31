@@ -179,11 +179,8 @@ function modifyError(err: ChangeResetTokenDestinationError): readonly VNodeConte
         case "not-found":
             return ["ユーザーが見つかりませんでした", "一旦リロードしてやり直してください"]
 
-        case "invalid-destination-type":
-            return ["有効/無効を選択してください"]
-
-        case "invalid-email":
-            return ["メールアドレスが正しくありません"]
+        case "invalid":
+            return ["データが正しくありません", "一旦リロードしてやり直してください"]
 
         default:
             return remoteCommonErrorReason(err, (reason) => [

@@ -4,52 +4,54 @@ use crate::auth::ticket::validate::method::{
     validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
 };
 
-use crate::auth::user::account::modify::data::ModifyAuthUserAccountData;
-use crate::auth::user::account::modify::infra::{
-    ModifyAuthUserAccountFields, ModifyAuthUserAccountRepository,
-    ModifyAuthUserAccountRequestDecoder,
+use crate::auth::user::password::reset::token_destination::change::infra::{
+    ChangeResetTokenDestinationFields, ChangeResetTokenDestinationRepository,
+    ChangeResetTokenDestinationRequestDecoder,
 };
 
 use crate::{
-    auth::user::account::modify::data::ValidateAuthUserAccountError,
+    auth::user::password::reset::{
+        kernel::data::ResetTokenDestination,
+        token_destination::change::data::ValidateChangeResetTokenDestinationFieldsError,
+    },
     z_lib::repository::data::RepositoryError,
 };
 
-pub enum ModifyAuthUserAccountState {
+pub enum ChangeResetTokenDestinationState {
     Validate(ValidateAuthTokenEvent),
-    ModifyUser(ModifyAuthUserAccountEvent),
+    ChangeDestination(ChangeResetTokenDestinationEvent),
 }
 
-impl std::fmt::Display for ModifyAuthUserAccountState {
+impl std::fmt::Display for ChangeResetTokenDestinationState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Validate(event) => event.fmt(f),
-            Self::ModifyUser(event) => event.fmt(f),
+            Self::ChangeDestination(event) => event.fmt(f),
         }
     }
 }
 
-pub trait ModifyAuthUserAccountMaterial {
+pub trait ChangeResetTokenDestinationMaterial {
     type Validate: ValidateAuthTokenInfra;
 
-    type UserRepository: ModifyAuthUserAccountRepository;
+    type DestinationRepository: ChangeResetTokenDestinationRepository;
 
     fn validate(&self) -> &Self::Validate;
 
-    fn user_repository(&self) -> &Self::UserRepository;
+    fn destination_repository(&self) -> &Self::DestinationRepository;
 }
 
-pub struct ModifyAuthUserAccountAction<
-    R: ModifyAuthUserAccountRequestDecoder,
-    M: ModifyAuthUserAccountMaterial,
+pub struct ChangeResetTokenDestinationAction<
+    R: ChangeResetTokenDestinationRequestDecoder,
+    M: ChangeResetTokenDestinationMaterial,
 > {
-    pubsub: ActionStatePubSub<ModifyAuthUserAccountState>,
+    pubsub: ActionStatePubSub<ChangeResetTokenDestinationState>,
     request_decoder: R,
     material: M,
 }
 
-impl<R: ModifyAuthUserAccountRequestDecoder, M: ModifyAuthUserAccountMaterial>
-    ModifyAuthUserAccountAction<R, M>
+impl<R: ChangeResetTokenDestinationRequestDecoder, M: ChangeResetTokenDestinationMaterial>
+    ChangeResetTokenDestinationAction<R, M>
 {
     pub fn with_material(request_decoder: R, material: M) -> Self {
         Self {
@@ -61,49 +63,49 @@ impl<R: ModifyAuthUserAccountRequestDecoder, M: ModifyAuthUserAccountMaterial>
 
     pub fn subscribe(
         &mut self,
-        handler: impl 'static + Fn(&ModifyAuthUserAccountState) + Send + Sync,
+        handler: impl 'static + Fn(&ChangeResetTokenDestinationState) + Send + Sync,
     ) {
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<ModifyAuthUserAccountState> {
+    pub async fn ignite(self) -> MethodResult<ChangeResetTokenDestinationState> {
         let pubsub = self.pubsub;
         let m = self.material;
 
         let fields = self.request_decoder.decode();
 
         validate_auth_token(m.validate(), |event| {
-            pubsub.post(ModifyAuthUserAccountState::Validate(event))
+            pubsub.post(ChangeResetTokenDestinationState::Validate(event))
         })
         .await?;
 
-        modify_user(&m, fields, |event| {
-            pubsub.post(ModifyAuthUserAccountState::ModifyUser(event))
+        change_destination(&m, fields, |event| {
+            pubsub.post(ChangeResetTokenDestinationState::ChangeDestination(event))
         })
         .await
     }
 }
 
-pub enum ModifyAuthUserAccountEvent {
-    Success(ModifyAuthUserAccountData),
-    InvalidUser(ValidateAuthUserAccountError),
-    UserNotFound,
+pub enum ChangeResetTokenDestinationEvent {
+    Success(ResetTokenDestination),
+    Invalid(ValidateChangeResetTokenDestinationFieldsError),
+    NotFound,
     Conflict,
     RepositoryError(RepositoryError),
 }
 
-mod modify_auth_user_account_event {
-    use super::ModifyAuthUserAccountEvent;
+mod change_reset_token_destination_event {
+    use super::ChangeResetTokenDestinationEvent;
 
-    const SUCCESS: &'static str = "modify auth user account success";
-    const ERROR: &'static str = "modify auth user account error";
+    const SUCCESS: &'static str = "change reset token destination success";
+    const ERROR: &'static str = "change reset token destination error";
 
-    impl std::fmt::Display for ModifyAuthUserAccountEvent {
+    impl std::fmt::Display for ChangeResetTokenDestinationEvent {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
-                Self::Success(user) => write!(f, "{}; {}", SUCCESS, user),
-                Self::InvalidUser(err) => err.fmt(f),
-                Self::UserNotFound => write!(f, "user not found"),
+                Self::Success(destination) => write!(f, "{}; {}", SUCCESS, destination),
+                Self::Invalid(err) => err.fmt(f),
+                Self::NotFound => write!(f, "user not found"),
                 Self::Conflict => write!(f, "user data conflict"),
                 Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
             }
@@ -111,34 +113,39 @@ mod modify_auth_user_account_event {
     }
 }
 
-async fn modify_user<S>(
-    infra: &impl ModifyAuthUserAccountMaterial,
-    fields: Result<ModifyAuthUserAccountFields, ValidateAuthUserAccountError>,
-    post: impl Fn(ModifyAuthUserAccountEvent) -> S,
+async fn change_destination<S>(
+    infra: &impl ChangeResetTokenDestinationMaterial,
+    fields: Result<
+        ChangeResetTokenDestinationFields,
+        ValidateChangeResetTokenDestinationFieldsError,
+    >,
+    post: impl Fn(ChangeResetTokenDestinationEvent) -> S,
 ) -> MethodResult<S> {
-    let fields = fields.map_err(|err| post(ModifyAuthUserAccountEvent::InvalidUser(err)))?;
+    let fields = fields.map_err(|err| post(ChangeResetTokenDestinationEvent::Invalid(err)))?;
 
-    let user_repository = infra.user_repository();
+    let destination_repository = infra.destination_repository();
 
-    let (user_id, stored_user) = user_repository
-        .lookup_user(&fields.login_id)
+    let (_user_id, stored_destination) = destination_repository
+        .lookup_destination(&fields.login_id)
         .await
-        .map_err(|err| post(ModifyAuthUserAccountEvent::RepositoryError(err)))?
-        .ok_or_else(|| post(ModifyAuthUserAccountEvent::UserNotFound))?;
+        .map_err(|err| post(ChangeResetTokenDestinationEvent::RepositoryError(err)))?
+        .ok_or_else(|| post(ChangeResetTokenDestinationEvent::NotFound))?;
 
-    if stored_user != fields.from {
-        return Err(post(ModifyAuthUserAccountEvent::Conflict));
+    if stored_destination != fields.from {
+        return Err(post(ChangeResetTokenDestinationEvent::Conflict));
     }
 
-    user_repository
-        .modify_user(&user_id, fields.to)
+    destination_repository
+        .change_destination(&fields.login_id, fields.to)
         .await
-        .map_err(|err| post(ModifyAuthUserAccountEvent::RepositoryError(err)))?;
+        .map_err(|err| post(ChangeResetTokenDestinationEvent::RepositoryError(err)))?;
 
-    let updated_user = user_repository
-        .get_updated_user(&user_id)
+    let updated_destination = destination_repository
+        .get_updated_destination(&fields.login_id)
         .await
-        .map_err(|err| post(ModifyAuthUserAccountEvent::RepositoryError(err)))?;
+        .map_err(|err| post(ChangeResetTokenDestinationEvent::RepositoryError(err)))?;
 
-    Ok(post(ModifyAuthUserAccountEvent::Success(updated_user)))
+    Ok(post(ChangeResetTokenDestinationEvent::Success(
+        updated_destination,
+    )))
 }

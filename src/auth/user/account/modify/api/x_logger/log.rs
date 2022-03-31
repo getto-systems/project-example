@@ -21,7 +21,7 @@ impl LogFilter for ModifyAuthUserAccountEvent {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::Success(_) => LogLevel::Audit,
-            Self::InvalidUser(_) => LogLevel::Error,
+            Self::Invalid(_) => LogLevel::Error,
             Self::NotFound => LogLevel::Error,
             Self::Conflict => LogLevel::Error,
             Self::RepositoryError(err) => err.log_level(),

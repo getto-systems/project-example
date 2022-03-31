@@ -1,39 +1,42 @@
 use crate::{
     auth::user::{
-        account::modify::data::{ModifyAuthUserAccountData, ValidateAuthUserAccountError},
         kernel::data::AuthUserId,
         login_id::kernel::data::LoginId,
+        password::reset::{
+            kernel::data::ResetTokenDestination,
+            token_destination::change::data::ValidateChangeResetTokenDestinationFieldsError,
+        },
     },
     z_lib::repository::data::RepositoryError,
 };
 
-pub trait ModifyAuthUserAccountRequestDecoder {
-    fn decode(self) -> Result<ModifyAuthUserAccountFields, ValidateAuthUserAccountError>;
+pub trait ChangeResetTokenDestinationRequestDecoder {
+    fn decode(
+        self,
+    ) -> Result<ChangeResetTokenDestinationFields, ValidateChangeResetTokenDestinationFieldsError>;
 }
 
-pub struct ModifyAuthUserAccountFields {
+pub struct ChangeResetTokenDestinationFields {
     pub login_id: LoginId,
-    pub from: ModifyAuthUserAccountData,
-    pub to: ModifyAuthUserAccountData,
+    pub from: ResetTokenDestination,
+    pub to: ResetTokenDestination,
 }
 
 #[async_trait::async_trait]
-pub trait ModifyAuthUserAccountRepository {
-    async fn lookup_user(
+pub trait ChangeResetTokenDestinationRepository {
+    async fn lookup_destination(
         &self,
         login_id: &LoginId,
-    ) -> Result<Option<(AuthUserId, ModifyAuthUserAccountData)>, RepositoryError>;
+    ) -> Result<Option<(AuthUserId, ResetTokenDestination)>, RepositoryError>;
 
-    async fn modify_user(
+    async fn change_destination(
         &self,
-        user_id: &AuthUserId,
         login_id: &LoginId,
-        data: ModifyAuthUserAccountData,
+        data: ResetTokenDestination,
     ) -> Result<(), RepositoryError>;
 
-    async fn get_updated_user(
+    async fn get_updated_destination(
         &self,
-        user_id: &AuthUserId,
         login_id: &LoginId,
-    ) -> Result<ModifyAuthUserAccountData, RepositoryError>;
+    ) -> Result<ResetTokenDestination, RepositoryError>;
 }

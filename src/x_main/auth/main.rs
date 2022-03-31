@@ -29,6 +29,15 @@ async fn main() {
         .add_service(server.auth.user.password.override_password())
         .add_service(server.auth.user.password.reset.request_token())
         .add_service(server.auth.user.password.reset.reset())
+        .add_service(
+            server
+                .auth
+                .user
+                .password
+                .reset
+                .token_destination
+                .change_destination(),
+        )
         .add_service(server.auth.user.account.search())
         .add_service(server.auth.user.account.modify_user())
         .serve(

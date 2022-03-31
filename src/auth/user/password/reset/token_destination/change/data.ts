@@ -8,5 +8,4 @@ export type ChangeResetTokenDestinationRemoteError =
     | RemoteCommonError
     | Readonly<{ type: "conflict" }>
     | Readonly<{ type: "not-found" }>
-    | Readonly<{ type: "invalid-destination-type" }>
-    | Readonly<{ type: "invalid-email" }>
+    | Readonly<{ type: "invalid" }>

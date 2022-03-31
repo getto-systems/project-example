@@ -1,38 +1,20 @@
 use crate::auth::user::{
-    kernel::data::{GrantedAuthRoles, ValidateGrantedAuthRolesError},
     login_id::kernel::data::ValidateLoginIdError,
-    password::reset::kernel::data::{ResetTokenDestination, ValidateResetTokenDestinationError},
+    password::reset::kernel::data::ValidateResetTokenDestinationError,
 };
 
-#[derive(PartialEq, Eq)]
-pub struct ModifyAuthUserAccountData {
-    pub granted_roles: GrantedAuthRoles,
-    pub reset_token_destination: ResetTokenDestination,
-}
-
-impl std::fmt::Display for ModifyAuthUserAccountData {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(
-            f,
-            "modify user: {} / {}",
-            self.granted_roles, self.reset_token_destination
-        )
-    }
-}
-
-pub enum ValidateAuthUserAccountError {
+pub enum ValidateChangeResetTokenDestinationFieldsError {
     InvalidLoginId(ValidateLoginIdError),
-    InvalidFrom(ValidateAuthUserAccountDataError),
-    InvalidTo(ValidateAuthUserAccountDataError),
+    InvalidFrom(ValidateChangeResetTokenDestinationChangesError),
+    InvalidTo(ValidateChangeResetTokenDestinationChangesError),
 }
 
-pub enum ValidateAuthUserAccountDataError {
+pub enum ValidateChangeResetTokenDestinationChangesError {
     NotFound,
-    InvalidGrantedRoles(ValidateGrantedAuthRolesError),
     InvalidResetTokenDestination(ValidateResetTokenDestinationError),
 }
 
-impl std::fmt::Display for ValidateAuthUserAccountError {
+impl std::fmt::Display for ValidateChangeResetTokenDestinationFieldsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::InvalidLoginId(err) => err.fmt(f),
@@ -42,11 +24,10 @@ impl std::fmt::Display for ValidateAuthUserAccountError {
     }
 }
 
-impl std::fmt::Display for ValidateAuthUserAccountDataError {
+impl std::fmt::Display for ValidateChangeResetTokenDestinationChangesError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::NotFound => write!(f, "data not found"),
-            Self::InvalidGrantedRoles(err) => err.fmt(f),
             Self::InvalidResetTokenDestination(err) => err.fmt(f),
         }
     }

@@ -7,21 +7,20 @@ service ChangeResetTokenDestinationPb {
 }
 message ChangeResetTokenDestinationRequestPb {
     string login_id = 1;
-    ChangeResetTokenDestinationFieldsPb from = 2;
-    ChangeResetTokenDestinationFieldsPb to = 3;
+    ResetTokenDestinationPb from = 2;
+    ResetTokenDestinationPb to = 3;
 }
 message ChangeResetTokenDestinationResponsePb {
     bool success = 1;
-    ChangeResetTokenDestinationFieldsPb data = 2;
+    ResetTokenDestinationPb data = 2;
     ChangeResetTokenDestinationErrorKindPb err = 3;
 }
 enum ChangeResetTokenDestinationErrorKindPb {
     CONFLICT = 0;
     NOT_FOUND = 1;
-    INVALID_DESTINATION_TYPE = 2;
-    INVALID_EMAIL = 3;
+    INVALID = 2;
 }
-message ChangeResetTokenDestinationFieldsPb {
+message ResetTokenDestinationPb {
     string type = 1;
     string email = 2;
 }

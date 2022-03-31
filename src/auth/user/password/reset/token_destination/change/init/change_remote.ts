@@ -94,11 +94,7 @@ function errorResponse(
             return { type: "not-found" }
 
         case pb.auth.user.password.reset.token_destination.change.service
-            .ChangeResetTokenDestinationErrorKindPb.INVALID_DESTINATION_TYPE:
-            return { type: "invalid-destination-type" }
-
-        case pb.auth.user.password.reset.token_destination.change.service
-            .ChangeResetTokenDestinationErrorKindPb.INVALID_EMAIL:
-            return { type: "invalid-email" }
+            .ChangeResetTokenDestinationErrorKindPb.INVALID:
+            return { type: "invalid" }
     }
 }
