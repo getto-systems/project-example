@@ -10,7 +10,9 @@ use crate::auth::user::account::modify::infra::{
 };
 
 use crate::{
-    auth::user::account::modify::data::{ModifyAuthUserAccountChanges, ValidateModifyAuthUserAccountFieldsError},
+    auth::user::account::modify::data::{
+        ModifyAuthUserAccountChanges, ValidateModifyAuthUserAccountFieldsError,
+    },
     z_lib::repository::data::RepositoryError,
 };
 
@@ -102,8 +104,8 @@ mod modify_auth_user_account_event {
             match self {
                 Self::Success(user) => write!(f, "{}; {}", SUCCESS, user),
                 Self::Invalid(err) => err.fmt(f),
-                Self::NotFound => write!(f, "user not found"),
-                Self::Conflict => write!(f, "user data conflict"),
+                Self::NotFound => write!(f, "{}; not found", ERROR),
+                Self::Conflict => write!(f, "{}; changes conflicted", ERROR),
                 Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
             }
         }

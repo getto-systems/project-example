@@ -10,7 +10,7 @@ pub struct ModifyAuthUserAccountChanges {
 
 impl std::fmt::Display for ModifyAuthUserAccountChanges {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "modify user: {}", self.granted_roles)
+        write!(f, "changes: {}", self.granted_roles)
     }
 }
 

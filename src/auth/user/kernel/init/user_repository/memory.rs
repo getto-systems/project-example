@@ -397,15 +397,25 @@ fn lookup_modify_user_data<'a>(
     repository: &MemoryAuthUserRepository<'a>,
     login_id: &LoginId,
 ) -> Result<Option<(AuthUserId, ModifyAuthUserAccountChanges)>, RepositoryError> {
-    let store = repository.store.lock().unwrap();
+    let target_user_id: AuthUserId;
 
-    match store.get_user_id(login_id) {
-        None => Ok(None),
-        Some(user_id) => Ok(Some((
-            user_id.clone(),
-            get_modify_user_data(repository, user_id)?,
-        ))),
+    {
+        let store = repository.store.lock().unwrap();
+
+        match store.get_user_id(login_id) {
+            None => {
+                return Ok(None);
+            }
+            Some(user_id) => {
+                target_user_id = user_id.clone();
+            }
+        }
     }
+
+    Ok(Some((
+        target_user_id.clone(),
+        get_modify_user_data(repository, &target_user_id)?,
+    )))
 }
 fn modify_user<'a>(
     repository: &MemoryAuthUserRepository<'a>,
@@ -464,13 +474,23 @@ fn lookup_reset_token_destination<'a>(
     repository: &MemoryAuthUserRepository<'a>,
     login_id: &LoginId,
 ) -> Result<Option<(AuthUserId, ResetTokenDestination)>, RepositoryError> {
-    let store = repository.store.lock().unwrap();
+    let target_user_id: AuthUserId;
 
-    match (
-        store.get_user_id(login_id),
-        get_destination(repository, login_id)?,
-    ) {
-        (Some(user_id), Some(destination)) => Ok(Some((user_id.clone(), destination))),
+    {
+        let store = repository.store.lock().unwrap();
+
+        match store.get_user_id(login_id) {
+            None => {
+                return Ok(None);
+            }
+            Some(user_id) => {
+                target_user_id = user_id.clone();
+            }
+        }
+    }
+
+    match get_destination(repository, login_id)? {
+        Some(destination) => Ok(Some((target_user_id, destination))),
         _ => Ok(None),
     }
 }

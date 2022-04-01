@@ -105,8 +105,8 @@ mod change_reset_token_destination_event {
             match self {
                 Self::Success(destination) => write!(f, "{}; {}", SUCCESS, destination),
                 Self::Invalid(err) => err.fmt(f),
-                Self::NotFound => write!(f, "user not found"),
-                Self::Conflict => write!(f, "user data conflict"),
+                Self::NotFound => write!(f, "{}; not found", ERROR),
+                Self::Conflict => write!(f, "{}; changes conflicted", ERROR),
                 Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
             }
         }

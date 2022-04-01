@@ -17,41 +17,41 @@ use crate::auth::{
         },
     },
     user::{
-        kernel::{
-            data::AuthUserId,
-            init::user_repository::memory::{
-                MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
-            },
+        account::modify::init::request_decoder::test::StaticModifyAuthUserAccountRequestDecoder,
+        kernel::init::user_repository::memory::{
+            MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
         },
-        login_id::change::init::request_decoder::test::StaticOverrideLoginIdRequestDecoder,
     },
 };
 
-use crate::auth::user::login_id::change::action::{OverrideLoginIdAction, OverrideLoginIdMaterial};
+use crate::auth::user::account::modify::action::{
+    ModifyAuthUserAccountAction, ModifyAuthUserAccountMaterial,
+};
 
 use crate::auth::ticket::validate::method::AuthNonceConfig;
 
 use crate::auth::user::{
-    login_id::change::infra::OverrideLoginIdFieldsExtract, password::kernel::infra::HashedPassword,
+    account::modify::infra::ModifyAuthUserAccountFields, password::kernel::infra::HashedPassword,
 };
 
 use crate::auth::{
     ticket::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
     user::{
-        kernel::data::{AuthUser, AuthUserExtract},
+        account::modify::data::ModifyAuthUserAccountChanges,
+        kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
         login_id::kernel::data::LoginId,
     },
 };
 
 #[tokio::test]
-async fn success_override() {
+async fn success_modify_user() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
+    let mut action = ModifyAuthUserAccountAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -59,7 +59,7 @@ async fn success_override() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override login-id success",
+        "modify auth user account success; changes: granted: []",
     ]);
     assert!(result.is_ok());
 }
@@ -72,7 +72,7 @@ async fn success_expired_nonce() {
     let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
+    let mut action = ModifyAuthUserAccountAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -80,7 +80,7 @@ async fn success_expired_nonce() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override login-id success",
+        "modify auth user account success; changes: granted: []",
     ]);
     assert!(result.is_ok());
 }
@@ -93,7 +93,7 @@ async fn error_conflict_nonce() {
     let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
+    let mut action = ModifyAuthUserAccountAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -105,14 +105,14 @@ async fn error_conflict_nonce() {
 }
 
 #[tokio::test]
-async fn error_empty_login_id() {
+async fn error_conflict_changes() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
-    let request_decoder = empty_login_id_request_decoder();
+    let request_decoder = conflict_request_decoder();
 
-    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
+    let mut action = ModifyAuthUserAccountAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -120,20 +120,20 @@ async fn error_empty_login_id() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override login-id error; invalid login id: empty login id",
+        "modify auth user account error; changes conflicted",
     ]);
     assert!(!result.is_ok());
 }
 
 #[tokio::test]
-async fn error_too_long_login_id() {
+async fn error_not_found() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
-    let request_decoder = too_long_login_id_request_decoder();
+    let request_decoder = not_found_request_decoder();
 
-    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
+    let mut action = ModifyAuthUserAccountAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -141,49 +141,7 @@ async fn error_too_long_login_id() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override login-id error; invalid login id: too long login id",
-    ]);
-    assert!(!result.is_ok());
-}
-
-#[tokio::test]
-async fn just_max_length_login_id() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
-    let request_decoder = just_max_length_login_id_request_decoder();
-
-    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override login-id success",
-    ]);
-    assert!(result.is_ok());
-}
-
-#[tokio::test]
-async fn error_login_id_already_registered() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
-    let request_decoder = already_registered_login_id_request_decoder();
-
-    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override login-id error; new login id is already registered",
+        "modify auth user account error; not found",
     ]);
     assert!(!result.is_ok());
 }
@@ -193,15 +151,15 @@ struct TestStruct<'a> {
     user_repository: MemoryAuthUserRepository<'a>,
 }
 
-impl<'a> OverrideLoginIdMaterial for TestStruct<'a> {
+impl<'a> ModifyAuthUserAccountMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
 
-    type LoginIdRepository = MemoryAuthUserRepository<'a>;
+    type UserRepository = MemoryAuthUserRepository<'a>;
 
     fn validate(&self) -> &Self::Validate {
         &self.validate
     }
-    fn login_id_repository(&self) -> &Self::LoginIdRepository {
+    fn user_repository(&self) -> &Self::UserRepository {
         &self.user_repository
     }
 }
@@ -286,34 +244,37 @@ const REGISTERED_USER_ID: &'static str = "registered-user-id";
 const REGISTERED_LOGIN_ID: &'static str = "registered-login-id";
 const PASSWORD: &'static str = "current-password";
 
-fn standard_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
-    StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
-        login_id: LOGIN_ID.into(),
-        new_login_id: "new-login-id".into(),
+fn standard_request_decoder() -> StaticModifyAuthUserAccountRequestDecoder {
+    StaticModifyAuthUserAccountRequestDecoder::Valid(ModifyAuthUserAccountFields {
+        login_id: LoginId::restore(LOGIN_ID.into()),
+        from: ModifyAuthUserAccountChanges {
+            granted_roles: GrantedAuthRoles::restore(test_granted_roles()),
+        },
+        to: ModifyAuthUserAccountChanges {
+            granted_roles: GrantedAuthRoles::empty(),
+        },
     })
 }
-fn empty_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
-    StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
-        login_id: LOGIN_ID.into(),
-        new_login_id: "".into(),
+fn conflict_request_decoder() -> StaticModifyAuthUserAccountRequestDecoder {
+    StaticModifyAuthUserAccountRequestDecoder::Valid(ModifyAuthUserAccountFields {
+        login_id: LoginId::restore(LOGIN_ID.into()),
+        from: ModifyAuthUserAccountChanges {
+            granted_roles: GrantedAuthRoles::empty(),
+        },
+        to: ModifyAuthUserAccountChanges {
+            granted_roles: GrantedAuthRoles::empty(),
+        },
     })
 }
-fn too_long_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
-    StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
-        login_id: LOGIN_ID.into(),
-        new_login_id: vec!["a"; 100 + 1].join(""),
-    })
-}
-fn just_max_length_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
-    StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
-        login_id: LOGIN_ID.into(),
-        new_login_id: vec!["a"; 100].join(""),
-    })
-}
-fn already_registered_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
-    StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
-        login_id: LOGIN_ID.into(),
-        new_login_id: REGISTERED_LOGIN_ID.into(),
+fn not_found_request_decoder() -> StaticModifyAuthUserAccountRequestDecoder {
+    StaticModifyAuthUserAccountRequestDecoder::Valid(ModifyAuthUserAccountFields {
+        login_id: LoginId::restore("unknown-user".into()),
+        from: ModifyAuthUserAccountChanges {
+            granted_roles: GrantedAuthRoles::empty(),
+        },
+        to: ModifyAuthUserAccountChanges {
+            granted_roles: GrantedAuthRoles::empty(),
+        },
     })
 }
 
@@ -342,14 +303,16 @@ fn standard_login_id_store() -> MemoryAuthUserStore {
 }
 
 fn test_user() -> AuthUser {
-    let mut granted_roles = HashSet::new();
-    granted_roles.insert("something".into());
-
     AuthUserExtract {
         user_id: USER_ID.into(),
-        granted_roles,
+        granted_roles: test_granted_roles(),
     }
     .restore()
+}
+fn test_granted_roles() -> HashSet<String> {
+    let mut granted_roles = HashSet::new();
+    granted_roles.insert("user".into());
+    granted_roles
 }
 fn test_user_login_id() -> LoginId {
     LoginId::restore(LOGIN_ID.into())

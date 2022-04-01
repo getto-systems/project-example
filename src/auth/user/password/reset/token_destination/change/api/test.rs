@@ -17,41 +17,39 @@ use crate::auth::{
         },
     },
     user::{
-        kernel::{
-            data::AuthUserId,
-            init::user_repository::memory::{
-                MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
-            },
+        kernel::init::user_repository::memory::{
+            MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
         },
-        login_id::change::init::request_decoder::test::StaticOverrideLoginIdRequestDecoder,
+        password::reset::token_destination::change::init::request_decoder::test::StaticChangeResetTokenDestinationRequestDecoder,
     },
 };
 
-use crate::auth::user::login_id::change::action::{OverrideLoginIdAction, OverrideLoginIdMaterial};
+use crate::auth::user::password::reset::token_destination::change::action::{
+    ChangeResetTokenDestinationAction, ChangeResetTokenDestinationMaterial,
+};
 
 use crate::auth::ticket::validate::method::AuthNonceConfig;
 
-use crate::auth::user::{
-    login_id::change::infra::OverrideLoginIdFieldsExtract, password::kernel::infra::HashedPassword,
-};
+use crate::auth::user::password::reset::token_destination::change::infra::ChangeResetTokenDestinationFields;
 
 use crate::auth::{
     ticket::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
     user::{
-        kernel::data::{AuthUser, AuthUserExtract},
+        kernel::data::AuthUserId,
         login_id::kernel::data::LoginId,
+        password::reset::kernel::data::{ResetTokenDestination, ResetTokenDestinationExtract},
     },
 };
 
 #[tokio::test]
-async fn success_override() {
+async fn success_change_destination() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
+    let mut action = ChangeResetTokenDestinationAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -59,7 +57,7 @@ async fn success_override() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override login-id success",
+        "change reset token destination success; reset token destination: email(user@example.com)",
     ]);
     assert!(result.is_ok());
 }
@@ -72,7 +70,7 @@ async fn success_expired_nonce() {
     let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
+    let mut action = ChangeResetTokenDestinationAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -80,7 +78,7 @@ async fn success_expired_nonce() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override login-id success",
+        "change reset token destination success; reset token destination: email(user@example.com)",
     ]);
     assert!(result.is_ok());
 }
@@ -93,7 +91,7 @@ async fn error_conflict_nonce() {
     let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
+    let mut action = ChangeResetTokenDestinationAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -105,14 +103,14 @@ async fn error_conflict_nonce() {
 }
 
 #[tokio::test]
-async fn error_empty_login_id() {
+async fn error_conflict_changes() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
-    let request_decoder = empty_login_id_request_decoder();
+    let request_decoder = conflict_request_decoder();
 
-    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
+    let mut action = ChangeResetTokenDestinationAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -120,20 +118,20 @@ async fn error_empty_login_id() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override login-id error; invalid login id: empty login id",
+        "change reset token destination error; changes conflicted",
     ]);
     assert!(!result.is_ok());
 }
 
 #[tokio::test]
-async fn error_too_long_login_id() {
+async fn error_not_found() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
-    let request_decoder = too_long_login_id_request_decoder();
+    let request_decoder = not_found_request_decoder();
 
-    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
+    let mut action = ChangeResetTokenDestinationAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -141,68 +139,26 @@ async fn error_too_long_login_id() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override login-id error; invalid login id: too long login id",
-    ]);
-    assert!(!result.is_ok());
-}
-
-#[tokio::test]
-async fn just_max_length_login_id() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
-    let request_decoder = just_max_length_login_id_request_decoder();
-
-    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override login-id success",
-    ]);
-    assert!(result.is_ok());
-}
-
-#[tokio::test]
-async fn error_login_id_already_registered() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
-    let request_decoder = already_registered_login_id_request_decoder();
-
-    let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override login-id error; new login id is already registered",
+        "change reset token destination error; not found",
     ]);
     assert!(!result.is_ok());
 }
 
 struct TestStruct<'a> {
     validate: StaticValidateAuthTokenStruct<'a>,
-    user_repository: MemoryAuthUserRepository<'a>,
+    destination_repository: MemoryAuthUserRepository<'a>,
 }
 
-impl<'a> OverrideLoginIdMaterial for TestStruct<'a> {
+impl<'a> ChangeResetTokenDestinationMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
 
-    type LoginIdRepository = MemoryAuthUserRepository<'a>;
+    type DestinationRepository = MemoryAuthUserRepository<'a>;
 
     fn validate(&self) -> &Self::Validate {
         &self.validate
     }
-    fn login_id_repository(&self) -> &Self::LoginIdRepository {
-        &self.user_repository
+    fn destination_repository(&self) -> &Self::DestinationRepository {
+        &self.destination_repository
     }
 }
 
@@ -245,7 +201,7 @@ impl<'a> TestStruct<'a> {
                 token_metadata: standard_token_header(),
                 token_decoder: standard_token_decoder(),
             },
-            user_repository: MemoryAuthUserRepository::new(&store.user),
+            destination_repository: MemoryAuthUserRepository::new(&store.user),
         }
     }
 }
@@ -282,38 +238,34 @@ const NONCE: &'static str = "nonce";
 const TICKET_ID: &'static str = "ticket-id";
 const USER_ID: &'static str = "user-id";
 const LOGIN_ID: &'static str = "login-id";
-const REGISTERED_USER_ID: &'static str = "registered-user-id";
-const REGISTERED_LOGIN_ID: &'static str = "registered-login-id";
-const PASSWORD: &'static str = "current-password";
 
-fn standard_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
-    StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
-        login_id: LOGIN_ID.into(),
-        new_login_id: "new-login-id".into(),
+fn standard_request_decoder() -> StaticChangeResetTokenDestinationRequestDecoder {
+    StaticChangeResetTokenDestinationRequestDecoder::Valid(ChangeResetTokenDestinationFields {
+        login_id: LoginId::restore(LOGIN_ID.into()),
+        from: ResetTokenDestination::None,
+        to: ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(
+            "user@example.com".into(),
+        )),
     })
 }
-fn empty_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
-    StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
-        login_id: LOGIN_ID.into(),
-        new_login_id: "".into(),
+fn conflict_request_decoder() -> StaticChangeResetTokenDestinationRequestDecoder {
+    StaticChangeResetTokenDestinationRequestDecoder::Valid(ChangeResetTokenDestinationFields {
+        login_id: LoginId::restore(LOGIN_ID.into()),
+        from: ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(
+            "user@example.com".into(),
+        )),
+        to: ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(
+            "user@example.com".into(),
+        )),
     })
 }
-fn too_long_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
-    StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
-        login_id: LOGIN_ID.into(),
-        new_login_id: vec!["a"; 100 + 1].join(""),
-    })
-}
-fn just_max_length_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
-    StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
-        login_id: LOGIN_ID.into(),
-        new_login_id: vec!["a"; 100].join(""),
-    })
-}
-fn already_registered_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
-    StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
-        login_id: LOGIN_ID.into(),
-        new_login_id: REGISTERED_LOGIN_ID.into(),
+fn not_found_request_decoder() -> StaticChangeResetTokenDestinationRequestDecoder {
+    StaticChangeResetTokenDestinationRequestDecoder::Valid(ChangeResetTokenDestinationFields {
+        login_id: LoginId::restore("unknown-user".into()),
+        from: ResetTokenDestination::None,
+        to: ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(
+            "user@example.com".into(),
+        )),
     })
 }
 
@@ -332,35 +284,20 @@ fn conflict_nonce_store() -> MemoryAuthNonceStore {
 }
 
 fn standard_login_id_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::with_user_and_password(
-        test_user_login_id(),
-        test_user(),
-        test_user_password(),
-        vec![(test_registered_login_id(), test_registered_user_id())],
+    MemoryAuthUserMap::with_user_id_and_destination(
+        test_login_id(),
+        test_user_id(),
+        test_destination(),
     )
     .to_store()
 }
 
-fn test_user() -> AuthUser {
-    let mut granted_roles = HashSet::new();
-    granted_roles.insert("something".into());
-
-    AuthUserExtract {
-        user_id: USER_ID.into(),
-        granted_roles,
-    }
-    .restore()
-}
-fn test_user_login_id() -> LoginId {
+fn test_login_id() -> LoginId {
     LoginId::restore(LOGIN_ID.into())
 }
-fn test_user_password() -> HashedPassword {
-    HashedPassword::restore(PASSWORD.into())
+fn test_user_id() -> AuthUserId {
+    AuthUserId::restore(USER_ID.into())
 }
-
-fn test_registered_user_id() -> AuthUserId {
-    AuthUserId::restore(REGISTERED_USER_ID.into())
-}
-fn test_registered_login_id() -> LoginId {
-    LoginId::restore(REGISTERED_LOGIN_ID.into())
+fn test_destination() -> ResetTokenDestination {
+    ResetTokenDestination::None
 }
