@@ -6,7 +6,10 @@ use std::{
 use chrono::{DateTime, Utc};
 
 use crate::{
-    auth::user::password::reset::token_destination::change::infra::ChangeResetTokenDestinationRepository,
+    auth::user::{
+        login_id::change::infra::OverrideUserEntry,
+        password::reset::token_destination::change::infra::ChangeResetTokenDestinationRepository,
+    },
     z_lib::repository::helper::infra_error,
 };
 
@@ -64,18 +67,6 @@ pub struct MemoryAuthUserMap {
     password: HashMap<String, HashedPassword>, // user-id => hashed-password
     reset_token_destination: HashMap<String, ResetTokenDestinationExtract>, // login-id => destination
     reset_token: HashMap<String, ResetEntry>, // reset-token => reset entry
-}
-
-pub struct UserEntry {
-    user_id: AuthUserId,
-    login_id: LoginId,
-    reset_token_destination: ResetTokenDestination,
-}
-
-impl Into<AuthUserId> for UserEntry {
-    fn into(self) -> AuthUserId {
-        self.user_id
-    }
 }
 
 struct SearchUserEntry {
@@ -229,11 +220,11 @@ impl MemoryAuthUserMap {
         self.login_id.remove(&login_id);
         self.reset_token_destination.remove(&login_id);
     }
-    fn insert_user(&mut self, login_id: LoginId, user: UserEntry) {
+    fn insert_user(&mut self, login_id: LoginId, user: OverrideUserEntry) {
         let login_id = login_id.extract();
         self.login_id.insert(login_id.clone(), user.user_id);
         self.reset_token_destination
-            .insert(login_id, user.reset_token_destination.extract());
+            .insert(login_id, user.reset_token_destination);
     }
 
     fn insert_granted_roles(&mut self, user: AuthUser) -> &mut Self {
@@ -520,12 +511,10 @@ fn change_reset_token_destination<'a>(
 
 #[async_trait::async_trait]
 impl<'store> OverrideLoginIdRepository for MemoryAuthUserRepository<'store> {
-    type User = UserEntry;
-
     async fn lookup_user<'a>(
         &self,
         login_id: &'a LoginId,
-    ) -> Result<Option<Self::User>, RepositoryError> {
+    ) -> Result<Option<OverrideUserEntry>, RepositoryError> {
         lookup_user(self, login_id)
     }
 
@@ -538,7 +527,7 @@ impl<'store> OverrideLoginIdRepository for MemoryAuthUserRepository<'store> {
 
     async fn override_login_id<'a>(
         &self,
-        user: Self::User,
+        user: OverrideUserEntry,
         new_login_id: LoginId,
     ) -> Result<(), RepositoryError> {
         override_login_id(self, user, new_login_id)
@@ -547,7 +536,7 @@ impl<'store> OverrideLoginIdRepository for MemoryAuthUserRepository<'store> {
 fn lookup_user<'store, 'a>(
     repository: &MemoryAuthUserRepository<'store>,
     login_id: &'a LoginId,
-) -> Result<Option<UserEntry>, RepositoryError> {
+) -> Result<Option<OverrideUserEntry>, RepositoryError> {
     let user_id: Option<AuthUserId>;
     let reset_token_destination: ResetTokenDestination;
     {
@@ -560,10 +549,10 @@ fn lookup_user<'store, 'a>(
             .unwrap_or(ResetTokenDestination::None);
     }
 
-    Ok(user_id.map(|user_id| UserEntry {
+    Ok(user_id.map(|user_id| OverrideUserEntry {
         user_id,
         login_id: login_id.clone(),
-        reset_token_destination,
+        reset_token_destination: reset_token_destination.extract(),
     }))
 }
 fn check_login_id_registered<'store, 'a>(
@@ -576,7 +565,7 @@ fn check_login_id_registered<'store, 'a>(
 }
 fn override_login_id<'store, 'a>(
     repository: &MemoryAuthUserRepository<'store>,
-    user: UserEntry,
+    user: OverrideUserEntry,
     new_login_id: LoginId,
 ) -> Result<(), RepositoryError> {
     let mut store = repository.store.lock().unwrap();

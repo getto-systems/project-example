@@ -14,9 +14,12 @@ use rusoto_dynamodb::{
 
 use crate::{
     auth::{
-        user::password::reset::{
-            kernel::data::ResetTokenDestinationEmail,
-            token_destination::change::infra::ChangeResetTokenDestinationRepository,
+        user::{
+            login_id::change::infra::OverrideUserEntry,
+            password::reset::{
+                kernel::data::ResetTokenDestinationEmail,
+                token_destination::change::infra::ChangeResetTokenDestinationRepository,
+            },
         },
         x_outside_feature::feature::AuthOutsideStore,
     },
@@ -97,18 +100,6 @@ impl<'a> DynamoDbAuthUserRepository<'a> {
     }
 }
 
-pub struct UserEntry {
-    user_id: AuthUserId,
-    login_id: LoginId,
-    reset_token_destination: ResetTokenDestination,
-}
-
-impl Into<AuthUserId> for UserEntry {
-    fn into(self) -> AuthUserId {
-        self.user_id
-    }
-}
-
 #[async_trait::async_trait]
 impl<'client> AuthUserRepository for DynamoDbAuthUserRepository<'client> {
     async fn get(&self, user_id: &AuthUserId) -> Result<Option<AuthUser>, RepositoryError> {
@@ -142,12 +133,10 @@ async fn get_user<'client>(
 
 #[async_trait::async_trait]
 impl<'client> OverrideLoginIdRepository for DynamoDbAuthUserRepository<'client> {
-    type User = UserEntry;
-
     async fn lookup_user<'a>(
         &self,
         login_id: &'a LoginId,
-    ) -> Result<Option<Self::User>, RepositoryError> {
+    ) -> Result<Option<OverrideUserEntry>, RepositoryError> {
         lookup_user(self, login_id).await
     }
 
@@ -160,7 +149,7 @@ impl<'client> OverrideLoginIdRepository for DynamoDbAuthUserRepository<'client> 
 
     async fn override_login_id<'a>(
         &self,
-        user: Self::User,
+        user: OverrideUserEntry,
         new_login_id: LoginId,
     ) -> Result<(), RepositoryError> {
         override_login_id(self, user, new_login_id).await
@@ -169,7 +158,7 @@ impl<'client> OverrideLoginIdRepository for DynamoDbAuthUserRepository<'client> 
 async fn lookup_user<'client, 'a>(
     repository: &DynamoDbAuthUserRepository<'client>,
     login_id: &'a LoginId,
-) -> Result<Option<UserEntry>, RepositoryError> {
+) -> Result<Option<OverrideUserEntry>, RepositoryError> {
     Ok(get_login_id_entry(repository, login_id.clone())
         .await
         .map_err(|err| infra_error("get login id entry error", err))?)
@@ -185,7 +174,7 @@ async fn check_login_id_registered<'client, 'a>(
 }
 async fn override_login_id<'client, 'a>(
     repository: &DynamoDbAuthUserRepository<'client>,
-    user: UserEntry,
+    user: OverrideUserEntry,
     new_login_id: LoginId,
 ) -> Result<(), RepositoryError> {
     update_login_id(repository, user.user_id.clone(), new_login_id.clone())
@@ -693,7 +682,7 @@ async fn reset_password<'client, 'a>(
 async fn get_login_id_entry<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
     login_id: LoginId,
-) -> Result<Option<UserEntry>, RusotoError<GetItemError>> {
+) -> Result<Option<OverrideUserEntry>, RusotoError<GetItemError>> {
     let mut key = AttributeMap::new();
     key.add_login_id(login_id.clone());
 
@@ -713,14 +702,12 @@ async fn get_login_id_entry<'client>(
                 .remove("reset_token_destination_email")
                 .and_then(|attr| attr.s),
         ) {
-            (Some(user_id), email) => Some(UserEntry {
+            (Some(user_id), email) => Some(OverrideUserEntry {
                 login_id,
                 user_id: AuthUserId::restore(user_id),
                 reset_token_destination: email
-                    .map(|email| {
-                        ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(email))
-                    })
-                    .unwrap_or(ResetTokenDestination::None),
+                    .map(|email| ResetTokenDestinationExtract::Email(email))
+                    .unwrap_or(ResetTokenDestinationExtract::None),
             }),
             _ => None,
         }
@@ -745,10 +732,10 @@ async fn delete_login_id_entry<'client>(
 async fn put_login_id_entry<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
     new_login_id: LoginId,
-    entry: UserEntry,
+    user: OverrideUserEntry,
 ) -> Result<(), RusotoError<PutItemError>> {
     let mut item = AttributeMap::new();
-    item.add_login_id_entry(new_login_id, entry);
+    item.add_login_id_entry(new_login_id, user);
 
     let input = PutItemInput {
         table_name: repository.login_id.into(),
@@ -1112,16 +1099,13 @@ impl AttributeMap {
     fn add_login_id(&mut self, login_id: LoginId) {
         self.add_login_id_as(login_id, "login_id");
     }
-    fn add_login_id_entry(&mut self, login_id: LoginId, entry: UserEntry) {
+    fn add_login_id_entry(&mut self, login_id: LoginId, user: OverrideUserEntry) {
         self.add_login_id(login_id);
-        self.add_user_id(entry.user_id);
-        match entry.reset_token_destination {
-            ResetTokenDestination::None => {}
-            ResetTokenDestination::Email(email) => {
-                self.add(
-                    "reset_token_destination_email",
-                    string_value(email.extract()),
-                );
+        self.add_user_id(user.user_id);
+        match user.reset_token_destination {
+            ResetTokenDestinationExtract::None => {}
+            ResetTokenDestinationExtract::Email(email) => {
+                self.add("reset_token_destination_email", string_value(email));
             }
         }
     }
