@@ -9,5 +9,6 @@ export type ChangeLoginIdError = Readonly<{ type: "validation-error" }> | Change
 
 export type ChangeLoginIdRemoteError =
     | RemoteCommonError
-    | Readonly<{ type: "invalid-login-id" }>
+    | Readonly<{ type: "not-found" }>
+    | Readonly<{ type: "invalid" }>
     | Readonly<{ type: "already-registered" }>

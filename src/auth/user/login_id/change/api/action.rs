@@ -9,10 +9,7 @@ use crate::auth::user::login_id::change::infra::{
 };
 
 use crate::{
-    auth::user::login_id::{
-        change::data::{OverrideLoginIdError, OverrideLoginIdRepositoryError},
-        kernel::data::LoginId,
-    },
+    auth::user::login_id::kernel::data::{LoginId, ValidateLoginIdError},
     z_lib::repository::data::RepositoryError,
 };
 
@@ -79,7 +76,9 @@ impl<R: OverrideLoginIdRequestDecoder, M: OverrideLoginIdMaterial> OverrideLogin
 
 pub enum OverrideLoginIdEvent {
     Success,
-    Failed(OverrideLoginIdError),
+    Invalid(ValidateLoginIdError),
+    NotFound,
+    AlreadyRegistered,
     RepositoryError(RepositoryError),
 }
 
@@ -93,22 +92,12 @@ mod override_login_id_event {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
                 Self::Success => write!(f, "{}", SUCCESS),
-                Self::Failed(err) => write!(f, "{}; {}", ERROR, err),
+                Self::Invalid(err) => write!(f, "{}; invalid; {}", ERROR, err),
+                Self::NotFound => write!(f, "{}; not found", ERROR),
+                Self::AlreadyRegistered => {
+                    write!(f, "{}; new login id is already registered", ERROR)
+                }
                 Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
-            }
-        }
-    }
-}
-
-impl Into<OverrideLoginIdEvent> for OverrideLoginIdRepositoryError {
-    fn into(self) -> OverrideLoginIdEvent {
-        match self {
-            Self::RepositoryError(err) => OverrideLoginIdEvent::RepositoryError(err),
-            Self::UserNotFound => {
-                OverrideLoginIdEvent::Failed(OverrideLoginIdError::UserNotFound)
-            }
-            Self::LoginIdAlreadyRegistered => {
-                OverrideLoginIdEvent::Failed(OverrideLoginIdError::LoginIdAlreadyRegistered)
             }
         }
     }
@@ -119,23 +108,31 @@ async fn override_login_id<S>(
     fields: OverrideLoginIdFieldsExtract,
     post: impl Fn(OverrideLoginIdEvent) -> S,
 ) -> MethodResult<S> {
-    let login_id = LoginId::validate(fields.login_id).map_err(|err| {
-        post(OverrideLoginIdEvent::Failed(
-            OverrideLoginIdError::InvalidLoginId(err),
-        ))
-    })?;
-    let new_login_id = LoginId::validate(fields.new_login_id).map_err(|err| {
-        post(OverrideLoginIdEvent::Failed(
-            OverrideLoginIdError::InvalidLoginId(err),
-        ))
-    })?;
+    let login_id = LoginId::validate(fields.login_id)
+        .map_err(|err| post(OverrideLoginIdEvent::Invalid(err)))?;
+    let new_login_id = LoginId::validate(fields.new_login_id)
+        .map_err(|err| post(OverrideLoginIdEvent::Invalid(err)))?;
 
     let login_id_repository = infra.login_id_repository();
 
-    login_id_repository
-        .override_login_id(&login_id, new_login_id)
+    if login_id_repository
+        .check_login_id_registered(&new_login_id)
         .await
-        .map_err(|err| post(err.into()))?;
+        .map_err(|err| post(OverrideLoginIdEvent::RepositoryError(err)))?
+    {
+        return Err(post(OverrideLoginIdEvent::AlreadyRegistered));
+    }
+
+    let user = login_id_repository
+        .lookup_user(&login_id)
+        .await
+        .map_err(|err| post(OverrideLoginIdEvent::RepositoryError(err)))?
+        .ok_or_else(|| post(OverrideLoginIdEvent::NotFound))?;
+
+    login_id_repository
+        .override_login_id(user, new_login_id)
+        .await
+        .map_err(|err| post(OverrideLoginIdEvent::RepositoryError(err)))?;
 
     Ok(post(OverrideLoginIdEvent::Success))
 }

@@ -9,7 +9,10 @@ export function changeLoginIdError(err: ChangeLoginIdError): readonly VNodeConte
         case "validation-error":
             return ["正しく入力してください"]
 
-        case "invalid-login-id":
+        case "not-found":
+            return ["ユーザーが見つかりませんでした", "一旦リロードしてやり直してください"]
+
+        case "invalid":
             return ["ログインIDが正しくありません"]
 
         case "already-registered":

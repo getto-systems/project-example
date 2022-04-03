@@ -120,7 +120,7 @@ type OverrideLoginIdEvent =
     | Readonly<{ type: "try-to-override-login-id" }>
     | Readonly<{ type: "take-longtime-to-override-login-id" }>
     | Readonly<{ type: "failed-to-override-login-id"; err: ChangeLoginIdError }>
-    | Readonly<{ type: "succeed-to-override-login-id" }>
+    | Readonly<{ type: "succeed-to-override-login-id"; loginId: LoginId }>
 
 async function overrideLoginId<S>(
     { infra, config }: OverrideLoginIdMaterial,
@@ -134,11 +134,11 @@ async function overrideLoginId<S>(
 
     post({ type: "try-to-override-login-id" })
 
-    const { overrideLoginIdRemote: overridePasswordRemote } = infra
+    const { overrideLoginIdRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(
-        overridePasswordRemote(user, fields.value),
+        overrideLoginIdRemote(user, fields.value),
         config.takeLongtimeThreshold,
         () => post({ type: "take-longtime-to-override-login-id" }),
     )
@@ -146,7 +146,7 @@ async function overrideLoginId<S>(
         return post({ type: "failed-to-override-login-id", err: response.err })
     }
 
-    return post({ type: "succeed-to-override-login-id" })
+    return post({ type: "succeed-to-override-login-id", loginId: fields.value.newLoginId })
 }
 
 interface Post<E, S> {

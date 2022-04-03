@@ -75,8 +75,11 @@ function errorResponse(
     err: pb.auth.user.loginId.change.service.OverrideLoginIdErrorKindPb,
 ): ChangePasswordRemoteResult {
     switch (err) {
-        case pb.auth.user.loginId.change.service.OverrideLoginIdErrorKindPb.INVALID_LOGIN_ID:
-            return { success: false, err: { type: "invalid-login-id" } }
+        case pb.auth.user.loginId.change.service.OverrideLoginIdErrorKindPb.NOT_FOUND:
+            return { success: false, err: { type: "not-found" } }
+
+        case pb.auth.user.loginId.change.service.OverrideLoginIdErrorKindPb.INVALID:
+            return { success: false, err: { type: "invalid" } }
 
         case pb.auth.user.loginId.change.service.OverrideLoginIdErrorKindPb.ALREADY_REGISTERED:
             return { success: false, err: { type: "already-registered" } }

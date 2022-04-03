@@ -28,6 +28,7 @@ type Props = Readonly<{
     user: Readonly<{ loginId: LoginId }>
     editable: EditableBoardAction
     override: OverrideLoginIdAction
+    onSuccess: { (loginId: LoginId): void }
 }>
 export function OverrideLoginId(props: Props): VNode {
     const state = useApplicationAction(props.override)
@@ -109,6 +110,7 @@ export function OverrideLoginId(props: Props): VNode {
                 switch (state.type) {
                     case "succeed-to-override-login-id":
                         props.editable.close()
+                        props.onSuccess(state.loginId)
                 }
             })
         }

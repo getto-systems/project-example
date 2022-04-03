@@ -64,11 +64,17 @@ export function DetailAuthUserAccountEntry(props: EntryProps): VNode {
             h(ChangeResetTokenDestination, {
                 ...props.changeResetTokenDestination,
                 user,
-                onSuccess: (destination) => {
-                    props.detail.update({ ...user, resetTokenDestination: destination })
+                onSuccess: (resetTokenDestination) => {
+                    props.detail.update({ ...user, resetTokenDestination })
                 },
             }),
-            h(OverrideLoginId, { ...props.overrideLoginId, user }),
+            h(OverrideLoginId, {
+                ...props.overrideLoginId,
+                user,
+                onSuccess: (loginId) => {
+                    props.detail.update({ ...user, loginId })
+                },
+            }),
             h(OverridePassword, { ...props.overridePassword, user }),
         ])
     }

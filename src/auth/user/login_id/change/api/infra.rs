@@ -1,5 +1,6 @@
-use crate::auth::user::login_id::{
-    change::data::OverrideLoginIdRepositoryError, kernel::data::LoginId,
+use crate::{
+    auth::user::{kernel::data::AuthUserId, login_id::kernel::data::LoginId},
+    z_lib::repository::data::RepositoryError,
 };
 
 pub trait OverrideLoginIdRequestDecoder {
@@ -13,9 +14,21 @@ pub struct OverrideLoginIdFieldsExtract {
 
 #[async_trait::async_trait]
 pub trait OverrideLoginIdRepository {
-    async fn override_login_id<'a>(
+    type User: Into<AuthUserId>;
+
+    async fn lookup_user<'a>(
         &self,
         login_id: &'a LoginId,
+    ) -> Result<Option<Self::User>, RepositoryError>;
+
+    async fn check_login_id_registered<'a>(
+        &self,
+        login_id: &'a LoginId,
+    ) -> Result<bool, RepositoryError>;
+
+    async fn override_login_id<'a>(
+        &self,
+        user: Self::User,
         new_login_id: LoginId,
-    ) -> Result<(), OverrideLoginIdRepositoryError>;
+    ) -> Result<(), RepositoryError>;
 }

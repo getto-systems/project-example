@@ -39,7 +39,7 @@ use crate::{
                 search::data::{SearchAuthUserAccountBasket, SearchAuthUserAccountFilter},
             },
             kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
-            login_id::{change::data::OverrideLoginIdRepositoryError, kernel::data::LoginId},
+            login_id::kernel::data::LoginId,
             password::{
                 authenticate::data::VerifyPasswordRepositoryError,
                 change::data::{ChangePasswordRepositoryError, OverridePasswordRepositoryError},
@@ -57,16 +57,29 @@ use crate::{
 };
 
 pub type MemoryAuthUserStore = Mutex<MemoryAuthUserMap>;
+// TODO user-id => {user} と login-id => {user} のマップにしたい
 pub struct MemoryAuthUserMap {
     login_id: HashMap<String, AuthUserId>, // login-id => user-id
-    user_id: HashMap<String, LoginId>,     // login-id => user-id
+    user_id: HashMap<String, LoginId>,     // user-id => login-id
     granted_roles: HashMap<String, HashSet<String>>, // user-id => granted-roles
     password: HashMap<String, HashedPassword>, // user-id => hashed-password
     reset_token_destination: HashMap<String, ResetTokenDestinationExtract>, // login-id => destination
     reset_token: HashMap<String, ResetEntry>, // reset-token => reset entry
 }
 
-struct UserEntry {
+pub struct UserEntry {
+    user_id: AuthUserId,
+    login_id: LoginId,
+    reset_token_destination: ResetTokenDestination,
+}
+
+impl Into<AuthUserId> for UserEntry {
+    fn into(self) -> AuthUserId {
+        self.user_id
+    }
+}
+
+struct SearchUserEntry {
     pub user_id: String,
     pub granted_roles: HashSet<String>,
     pub reset_token_destination: ResetTokenDestinationExtract,
@@ -215,8 +228,6 @@ impl MemoryAuthUserMap {
         self
     }
     fn update_login_id(&mut self, user_id: AuthUserId, login_id: LoginId) {
-        self.login_id
-            .insert(login_id.clone().extract(), user_id.clone());
         self.user_id.insert(user_id.extract(), login_id);
     }
     fn get_user_id(&self, login_id: &LoginId) -> Option<&AuthUserId> {
@@ -224,6 +235,18 @@ impl MemoryAuthUserMap {
     }
     fn get_login_id(&self, user_id: &str) -> Option<&LoginId> {
         self.user_id.get(user_id)
+    }
+
+    fn remove_user(&mut self, login_id: LoginId) {
+        let login_id = login_id.extract();
+        self.login_id.remove(&login_id);
+        self.reset_token_destination.remove(&login_id);
+    }
+    fn insert_user(&mut self, login_id: LoginId, user: UserEntry) {
+        let login_id = login_id.extract();
+        self.login_id.insert(login_id.clone(), user.user_id);
+        self.reset_token_destination
+            .insert(login_id, user.reset_token_destination.extract());
     }
 
     fn insert_granted_roles(&mut self, user: AuthUser) -> &mut Self {
@@ -243,10 +266,10 @@ impl MemoryAuthUserMap {
     fn get_granted_roles(&self, user_id: &AuthUserId) -> Option<&HashSet<String>> {
         self.granted_roles.get(user_id.as_str())
     }
-    fn all_users(&self) -> Vec<UserEntry> {
+    fn all_users(&self) -> Vec<SearchUserEntry> {
         self.granted_roles
             .iter()
-            .map(|(user_id, granted_roles)| UserEntry {
+            .map(|(user_id, granted_roles)| SearchUserEntry {
                 user_id: user_id.clone(),
                 granted_roles: granted_roles.clone(),
                 reset_token_destination: {
@@ -307,6 +330,7 @@ impl<'a> MemoryAuthUserRepository<'a> {
     }
 }
 
+// TODO (AuthUserId, GrantedAuthRoles) を返せばいい気がする
 #[async_trait::async_trait]
 impl<'a> AuthUserRepository for MemoryAuthUserRepository<'a> {
     async fn get(&self, user_id: &AuthUserId) -> Result<Option<AuthUser>, RepositoryError> {
@@ -327,6 +351,7 @@ fn get_granted_roles<'a>(
     }))
 }
 
+// TODO Basket をやめる
 #[async_trait::async_trait]
 impl<'a> SearchAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
     async fn search(
@@ -508,37 +533,75 @@ fn change_reset_token_destination<'a>(
 
 #[async_trait::async_trait]
 impl<'store> OverrideLoginIdRepository for MemoryAuthUserRepository<'store> {
-    async fn override_login_id<'a>(
+    type User = UserEntry;
+
+    async fn lookup_user<'a>(
         &self,
         login_id: &'a LoginId,
-        new_login_id: LoginId,
-    ) -> Result<(), OverrideLoginIdRepositoryError> {
-        override_login_id(self, login_id, new_login_id)
+    ) -> Result<Option<Self::User>, RepositoryError> {
+        lookup_user(self, login_id)
     }
+
+    async fn check_login_id_registered<'a>(
+        &self,
+        login_id: &'a LoginId,
+    ) -> Result<bool, RepositoryError> {
+        check_login_id_registered(self, login_id)
+    }
+
+    async fn override_login_id<'a>(
+        &self,
+        user: Self::User,
+        new_login_id: LoginId,
+    ) -> Result<(), RepositoryError> {
+        override_login_id(self, user, new_login_id)
+    }
+}
+fn lookup_user<'store, 'a>(
+    repository: &MemoryAuthUserRepository<'store>,
+    login_id: &'a LoginId,
+) -> Result<Option<UserEntry>, RepositoryError> {
+    let user_id: Option<AuthUserId>;
+    let reset_token_destination: ResetTokenDestination;
+    {
+        let store = repository.store.lock().unwrap();
+
+        user_id = store.get_user_id(login_id).map(|user_id| user_id.clone());
+        reset_token_destination = store
+            .get_destination(login_id)
+            .map(|destination| ResetTokenDestination::restore(destination.clone()))
+            .unwrap_or(ResetTokenDestination::None);
+    }
+
+    Ok(user_id.map(|user_id| UserEntry {
+        user_id,
+        login_id: login_id.clone(),
+        reset_token_destination,
+    }))
+}
+fn check_login_id_registered<'store, 'a>(
+    repository: &MemoryAuthUserRepository<'store>,
+    new_login_id: &'a LoginId,
+) -> Result<bool, RepositoryError> {
+    let store = repository.store.lock().unwrap();
+
+    Ok(store.has_login_id(new_login_id))
 }
 fn override_login_id<'store, 'a>(
     repository: &MemoryAuthUserRepository<'store>,
-    login_id: &'a LoginId,
+    user: UserEntry,
     new_login_id: LoginId,
-) -> Result<(), OverrideLoginIdRepositoryError> {
-    {
-        let mut store = repository.store.lock().unwrap();
+) -> Result<(), RepositoryError> {
+    let mut store = repository.store.lock().unwrap();
 
-        let user_id = store
-            .get_user_id(login_id)
-            .ok_or(OverrideLoginIdRepositoryError::UserNotFound)
-            .map(|id| id.clone())?;
-
-        if store.has_login_id(&new_login_id) {
-            return Err(OverrideLoginIdRepositoryError::LoginIdAlreadyRegistered);
-        }
-
-        store.update_login_id(user_id, new_login_id);
-    }
+    store.update_login_id(user.user_id.clone(), new_login_id.clone());
+    store.remove_user(user.login_id.clone());
+    store.insert_user(new_login_id, user);
 
     Ok(())
 }
 
+// TODO password を取得してマッチするのを外に出す
 #[async_trait::async_trait]
 impl<'store> VerifyPasswordRepository for MemoryAuthUserRepository<'store> {
     async fn verify_password<'a>(
@@ -575,6 +638,8 @@ fn verify_password<'store, 'a>(
     Ok(user_id.clone())
 }
 
+// TODO password を取得してマッチするのを外に出す
+// TODO password hash を外に出す
 #[async_trait::async_trait]
 impl<'store> ChangePasswordRepository for MemoryAuthUserRepository<'store> {
     async fn change_password<'a>(
@@ -621,6 +686,8 @@ fn change_password<'store, 'a>(
     Ok(())
 }
 
+// TODO password hash を外に出す
+// TODO user を取得するのを外に出す
 #[async_trait::async_trait]
 impl<'store> OverridePasswordRepository for MemoryAuthUserRepository<'store> {
     async fn override_password<'a>(
@@ -673,6 +740,7 @@ fn get_destination<'store>(
         .map(|destination| ResetTokenDestination::restore(destination.clone())))
 }
 
+// TODO reset token を取得して有効期限を確認するのを外に出す
 #[async_trait::async_trait]
 impl<'store> RegisterResetTokenRepository for MemoryAuthUserRepository<'store> {
     async fn register_reset_token(
@@ -740,6 +808,8 @@ fn register_reset_token<'store>(
     Ok(())
 }
 
+// TODO reset token を取得して有効期限を確認するのを外に出す
+// TODO password hash を外に出す
 #[async_trait::async_trait]
 impl<'store> ResetPasswordRepository for MemoryAuthUserRepository<'store> {
     async fn reset_token_entry(

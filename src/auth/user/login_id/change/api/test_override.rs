@@ -120,7 +120,7 @@ async fn error_empty_login_id() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override login-id error; invalid login id: empty login id",
+        "override login-id error; invalid; empty login id",
     ]);
     assert!(!result.is_ok());
 }
@@ -141,7 +141,7 @@ async fn error_too_long_login_id() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override login-id error; invalid login id: too long login id",
+        "override login-id error; invalid; too long login id",
     ]);
     assert!(!result.is_ok());
 }
