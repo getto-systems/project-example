@@ -28,7 +28,7 @@ describe("OverrideLoginId", () => {
         }).then((stack) => {
             expect(stack).toEqual([
                 { type: "try-to-override-login-id" },
-                { type: "succeed-to-override-login-id" },
+                { type: "succeed-to-override-login-id", loginId: "new-login-id" },
             ])
         })
     })
@@ -47,7 +47,7 @@ describe("OverrideLoginId", () => {
             expect(stack).toEqual([
                 { type: "try-to-override-login-id" },
                 { type: "take-longtime-to-override-login-id" },
-                { type: "succeed-to-override-login-id" },
+                { type: "succeed-to-override-login-id", loginId: "new-login-id" },
             ])
         })
     })

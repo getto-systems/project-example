@@ -41,7 +41,6 @@ use crate::{
             kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
             login_id::kernel::data::LoginId,
             password::{
-                authenticate::data::VerifyPasswordRepositoryError,
                 change::data::{ChangePasswordRepositoryError, OverridePasswordRepositoryError},
                 reset::{
                     kernel::data::{
@@ -601,41 +600,53 @@ fn override_login_id<'store, 'a>(
     Ok(())
 }
 
-// TODO password を取得してマッチするのを外に出す
 #[async_trait::async_trait]
 impl<'store> VerifyPasswordRepository for MemoryAuthUserRepository<'store> {
-    async fn verify_password<'a>(
+    async fn lookup_user_id<'a>(
         &self,
         login_id: &'a LoginId,
-        matcher: impl AuthUserPasswordMatcher + 'a,
-    ) -> Result<AuthUserId, VerifyPasswordRepositoryError> {
-        verify_password(self, login_id, matcher)
+    ) -> Result<Option<AuthUserId>, RepositoryError> {
+        lookup_user_id(self, login_id)
+    }
+
+    async fn lookup_granted_roles<'a>(
+        &self,
+        user_id: &'a AuthUserId,
+    ) -> Result<Option<GrantedAuthRoles>, RepositoryError> {
+        lookup_granted_roles(self, user_id)
+    }
+
+    async fn lookup_password<'a>(
+        &self,
+        user_id: &'a AuthUserId,
+    ) -> Result<Option<HashedPassword>, RepositoryError> {
+        lookup_password(self, user_id)
     }
 }
-fn verify_password<'store, 'a>(
+fn lookup_user_id<'store, 'a>(
     repository: &MemoryAuthUserRepository<'store>,
     login_id: &'a LoginId,
-    matcher: impl AuthUserPasswordMatcher + 'a,
-) -> Result<AuthUserId, VerifyPasswordRepositoryError> {
+) -> Result<Option<AuthUserId>, RepositoryError> {
     let store = repository.store.lock().unwrap();
-
-    let user_id = store
-        .get_user_id(login_id)
-        .ok_or(VerifyPasswordRepositoryError::PasswordNotFound)?;
-
-    let password = store
+    Ok(store.get_user_id(login_id).map(|user_id| user_id.clone()))
+}
+fn lookup_granted_roles<'store, 'a>(
+    repository: &MemoryAuthUserRepository<'store>,
+    user_id: &'a AuthUserId,
+) -> Result<Option<GrantedAuthRoles>, RepositoryError> {
+    let store = repository.store.lock().unwrap();
+    Ok(store
+        .get_granted_roles(user_id)
+        .map(|granted_roles| GrantedAuthRoles::restore(granted_roles.clone())))
+}
+fn lookup_password<'store, 'a>(
+    repository: &MemoryAuthUserRepository<'store>,
+    user_id: &'a AuthUserId,
+) -> Result<Option<HashedPassword>, RepositoryError> {
+    let store = repository.store.lock().unwrap();
+    Ok(store
         .get_password(user_id)
-        .ok_or(VerifyPasswordRepositoryError::PasswordNotFound)?;
-
-    let matched = matcher
-        .match_password(password)
-        .map_err(VerifyPasswordRepositoryError::PasswordHashError)?;
-
-    if !matched {
-        return Err(VerifyPasswordRepositoryError::PasswordNotMatched);
-    }
-
-    Ok(user_id.clone())
+        .map(|password| password.clone()))
 }
 
 // TODO password を取得してマッチするのを外に出す

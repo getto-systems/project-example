@@ -13,10 +13,7 @@ use super::super::action::{AuthenticatePasswordEvent, AuthenticatePasswordState}
 
 use crate::auth::ticket::encode::method::EncodeAuthTicketEvent;
 
-use crate::auth::{
-    ticket::encode::data::AuthTicketEncoded,
-    user::password::authenticate::data::AuthenticatePasswordError,
-};
+use crate::auth::ticket::encode::data::AuthTicketEncoded;
 
 impl ServiceResponder<AuthenticatePasswordResponsePb> for AuthenticatePasswordState {
     fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
@@ -74,18 +71,24 @@ impl ServiceResponder<AuthenticatePasswordResponsePb> for AuthenticatePasswordEv
     fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
         match self {
             Self::Success(_) => Err(Status::cancelled("cancelled at authenticate password")),
-            Self::InvalidPassword(err) => err.respond_to(),
+            Self::InvalidLoginId(_) => Ok(Response::new(AuthenticatePasswordResponsePb {
+                success: false,
+                ..Default::default()
+            })),
+            Self::InvalidPassword(_) => Ok(Response::new(AuthenticatePasswordResponsePb {
+                success: false,
+                ..Default::default()
+            })),
+            Self::NotFound => Ok(Response::new(AuthenticatePasswordResponsePb {
+                success: false,
+                ..Default::default()
+            })),
+            Self::PasswordNotMatched => Ok(Response::new(AuthenticatePasswordResponsePb {
+                success: false,
+                ..Default::default()
+            })),
             Self::PasswordHashError(err) => err.respond_to(),
             Self::RepositoryError(err) => err.respond_to(),
         }
-    }
-}
-
-impl ServiceResponder<AuthenticatePasswordResponsePb> for AuthenticatePasswordError {
-    fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
-        Ok(Response::new(AuthenticatePasswordResponsePb {
-            success: false,
-            ..Default::default()
-        }))
     }
 }

@@ -1,5 +1,6 @@
 use crate::auth::user::password::kernel::data::{PasswordHashError, ValidatePasswordError};
 
+#[derive(Clone)]
 pub struct HashedPassword(String);
 
 impl HashedPassword {

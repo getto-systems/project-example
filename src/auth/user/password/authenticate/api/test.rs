@@ -317,7 +317,6 @@ impl<'a> AuthenticatePasswordMaterial for TestStruct<'a> {
     type Issue = StaticIssueAuthTicketStruct<'a>;
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
-    type UserRepository = MemoryAuthUserRepository<'a>;
     type PasswordRepository = MemoryAuthUserRepository<'a>;
     type PasswordMatcher = PlainPasswordMatcher;
 
@@ -331,9 +330,6 @@ impl<'a> AuthenticatePasswordMaterial for TestStruct<'a> {
         &self.encode
     }
 
-    fn user_repository(&self) -> &Self::UserRepository {
-        &self.user_repository
-    }
     fn password_repository(&self) -> &Self::PasswordRepository {
         &self.user_repository
     }

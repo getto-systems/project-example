@@ -10,6 +10,13 @@ pub struct AuthUser {
 }
 
 impl AuthUser {
+    pub fn restore((user_id, granted_roles): (AuthUserId, GrantedAuthRoles)) -> Self {
+        Self {
+            user_id,
+            granted_roles,
+        }
+    }
+
     pub fn into_user_id(self) -> AuthUserId {
         self.user_id
     }

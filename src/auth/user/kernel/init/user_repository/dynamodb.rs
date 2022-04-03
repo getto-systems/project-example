@@ -62,7 +62,6 @@ use crate::{
             kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
             login_id::kernel::data::LoginId,
             password::{
-                authenticate::data::VerifyPasswordRepositoryError,
                 change::data::{ChangePasswordRepositoryError, OverridePasswordRepositoryError},
                 reset::{
                     kernel::data::{
@@ -206,42 +205,52 @@ async fn override_login_id<'client, 'a>(
 
 #[async_trait::async_trait]
 impl<'client> VerifyPasswordRepository for DynamoDbAuthUserRepository<'client> {
-    async fn verify_password<'a>(
+    async fn lookup_user_id<'a>(
         &self,
         login_id: &'a LoginId,
-        matcher: impl 'a + AuthUserPasswordMatcher,
-    ) -> Result<AuthUserId, VerifyPasswordRepositoryError> {
-        verify_password(self, login_id, matcher).await
+    ) -> Result<Option<AuthUserId>, RepositoryError> {
+        lookup_user_id(self, login_id).await
+    }
+
+    async fn lookup_granted_roles<'a>(
+        &self,
+        user_id: &'a AuthUserId,
+    ) -> Result<Option<GrantedAuthRoles>, RepositoryError> {
+        lookup_granted_roles(self, user_id).await
+    }
+
+    async fn lookup_password<'a>(
+        &self,
+        user_id: &'a AuthUserId,
+    ) -> Result<Option<HashedPassword>, RepositoryError> {
+        lookup_password(self, user_id).await
     }
 }
-async fn verify_password<'client, 'a>(
+async fn lookup_user_id<'client, 'a>(
     repository: &DynamoDbAuthUserRepository<'client>,
     login_id: &'a LoginId,
-    matcher: impl 'a + AuthUserPasswordMatcher,
-) -> Result<AuthUserId, VerifyPasswordRepositoryError> {
-    let user_id = get_user_id(repository, login_id.clone())
+) -> Result<Option<AuthUserId>, RepositoryError> {
+    get_user_id(repository, login_id.clone())
         .await
-        .map_err(|err| {
-            VerifyPasswordRepositoryError::RepositoryError(infra_error("get user error", err))
-        })?
-        .ok_or(VerifyPasswordRepositoryError::UserNotFound)?;
-
-    let password = get_password(repository, user_id.clone())
+        .map_err(|err| infra_error("get user error", err))
+}
+async fn lookup_granted_roles<'client, 'a>(
+    repository: &DynamoDbAuthUserRepository<'client>,
+    user_id: &'a AuthUserId,
+) -> Result<Option<GrantedAuthRoles>, RepositoryError> {
+    Ok(Some(
+        get_granted_roles(repository, user_id.clone())
+            .await
+            .map_err(|err| infra_error("get granted roles error", err))?,
+    ))
+}
+async fn lookup_password<'client, 'a>(
+    repository: &DynamoDbAuthUserRepository<'client>,
+    user_id: &'a AuthUserId,
+) -> Result<Option<HashedPassword>, RepositoryError> {
+    get_password(repository, user_id.clone())
         .await
-        .map_err(|err| {
-            VerifyPasswordRepositoryError::RepositoryError(infra_error("get password error", err))
-        })?
-        .ok_or(VerifyPasswordRepositoryError::PasswordNotFound)?;
-
-    let matched = matcher
-        .match_password(&password)
-        .map_err(VerifyPasswordRepositoryError::PasswordHashError)?;
-
-    if !matched {
-        return Err(VerifyPasswordRepositoryError::PasswordNotMatched);
-    }
-
-    Ok(user_id)
+        .map_err(|err| infra_error("get password error", err))
 }
 
 #[async_trait::async_trait]
@@ -837,8 +846,8 @@ async fn get_granted_roles<'client>(
         .map(|roles| HashSet::from_iter(roles.into_iter()));
 
     Ok(match found {
+        None => GrantedAuthRoles::empty(),
         Some(roles) => GrantedAuthRoles::restore(roles),
-        None => GrantedAuthRoles::restore(HashSet::new()),
     })
 }
 async fn update_granted_roles<'client>(
