@@ -3,13 +3,18 @@ use crate::{
     z_lib::repository::data::RepositoryError,
 };
 
-pub trait OverrideLoginIdRequestDecoder {
-    fn decode(self) -> OverrideLoginIdFieldsExtract;
+pub struct OverrideLoginIdFields {
+    pub login_id: LoginId,
+    pub new_login_id: LoginId,
 }
 
 pub struct OverrideLoginIdFieldsExtract {
     pub login_id: String,
     pub new_login_id: String,
+}
+
+pub trait OverrideLoginIdRequestDecoder {
+    fn decode(self) -> OverrideLoginIdFieldsExtract;
 }
 
 #[async_trait::async_trait]

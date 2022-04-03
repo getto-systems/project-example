@@ -2,13 +2,18 @@ use crate::{
     auth::user::{
         kernel::data::{AuthUserId, GrantedAuthRoles},
         login_id::kernel::data::LoginId,
-        password::kernel::infra::HashedPassword,
+        password::kernel::infra::{HashedPassword, PlainPassword},
     },
     z_lib::repository::data::RepositoryError,
 };
 
 pub trait AuthenticatePasswordRequestDecoder {
     fn decode(self) -> AuthenticatePasswordFieldsExtract;
+}
+
+pub struct AuthenticatePasswordFields {
+    pub login_id: LoginId,
+    pub password: PlainPassword,
 }
 
 pub struct AuthenticatePasswordFieldsExtract {

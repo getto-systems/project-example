@@ -68,6 +68,7 @@ impl AuthUserId {
         self.0
     }
 
+    #[cfg(test)]
     pub fn as_str(&self) -> &str {
         self.0.as_str()
     }

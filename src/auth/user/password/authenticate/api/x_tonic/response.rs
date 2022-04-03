@@ -71,11 +71,7 @@ impl ServiceResponder<AuthenticatePasswordResponsePb> for AuthenticatePasswordEv
     fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
         match self {
             Self::Success(_) => Err(Status::cancelled("cancelled at authenticate password")),
-            Self::InvalidLoginId(_) => Ok(Response::new(AuthenticatePasswordResponsePb {
-                success: false,
-                ..Default::default()
-            })),
-            Self::InvalidPassword(_) => Ok(Response::new(AuthenticatePasswordResponsePb {
+            Self::Invalid(_) => Ok(Response::new(AuthenticatePasswordResponsePb {
                 success: false,
                 ..Default::default()
             })),

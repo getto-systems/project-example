@@ -5,11 +5,12 @@ use crate::auth::ticket::validate::method::{
 };
 
 use crate::auth::user::login_id::change::infra::{
-    OverrideLoginIdFieldsExtract, OverrideLoginIdRepository, OverrideLoginIdRequestDecoder,
+    OverrideLoginIdFields, OverrideLoginIdFieldsExtract, OverrideLoginIdRepository,
+    OverrideLoginIdRequestDecoder,
 };
 
 use crate::{
-    auth::user::login_id::kernel::data::{LoginId, ValidateLoginIdError},
+    auth::user::login_id::change::data::ValidateOverrideLoginIdFieldsError,
     z_lib::repository::data::RepositoryError,
 };
 
@@ -76,7 +77,7 @@ impl<R: OverrideLoginIdRequestDecoder, M: OverrideLoginIdMaterial> OverrideLogin
 
 pub enum OverrideLoginIdEvent {
     Success,
-    Invalid(ValidateLoginIdError),
+    Invalid(ValidateOverrideLoginIdFieldsError),
     NotFound,
     AlreadyRegistered,
     RepositoryError(RepositoryError),
@@ -108,15 +109,13 @@ async fn override_login_id<S>(
     fields: OverrideLoginIdFieldsExtract,
     post: impl Fn(OverrideLoginIdEvent) -> S,
 ) -> MethodResult<S> {
-    let login_id = LoginId::validate(fields.login_id)
-        .map_err(|err| post(OverrideLoginIdEvent::Invalid(err)))?;
-    let new_login_id = LoginId::validate(fields.new_login_id)
+    let fields = OverrideLoginIdFields::validate(fields)
         .map_err(|err| post(OverrideLoginIdEvent::Invalid(err)))?;
 
     let login_id_repository = infra.login_id_repository();
 
     if login_id_repository
-        .check_login_id_registered(&new_login_id)
+        .check_login_id_registered(&fields.new_login_id)
         .await
         .map_err(|err| post(OverrideLoginIdEvent::RepositoryError(err)))?
     {
@@ -124,13 +123,13 @@ async fn override_login_id<S>(
     }
 
     let user = login_id_repository
-        .lookup_user(&login_id)
+        .lookup_user(&fields.login_id)
         .await
         .map_err(|err| post(OverrideLoginIdEvent::RepositoryError(err)))?
         .ok_or_else(|| post(OverrideLoginIdEvent::NotFound))?;
 
     login_id_repository
-        .override_login_id(user, new_login_id)
+        .override_login_id(user, fields.new_login_id)
         .await
         .map_err(|err| post(OverrideLoginIdEvent::RepositoryError(err)))?;
 

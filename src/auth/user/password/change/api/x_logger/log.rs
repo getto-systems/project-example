@@ -4,7 +4,9 @@ use super::super::action::{
 
 use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
 
-use crate::auth::user::password::change::data::{ChangePasswordError, OverridePasswordError};
+use crate::auth::user::password::change::data::{
+    OverridePasswordError, ValidateChangePasswordFieldsError,
+};
 
 impl LogMessage for ChangePasswordState {
     fn log_message(&self) -> String {
@@ -25,20 +27,20 @@ impl LogFilter for ChangePasswordEvent {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::Success => LogLevel::Audit,
-            Self::InvalidPassword(err) => err.log_level(),
+            Self::Invalid(err) => err.log_level(),
+            Self::NotFound => LogLevel::Error,
+            Self::PasswordNotMatched => LogLevel::Audit,
             Self::PasswordHashError(err) => err.log_level(),
             Self::RepositoryError(err) => err.log_level(),
         }
     }
 }
 
-impl LogFilter for ChangePasswordError {
+impl LogFilter for ValidateChangePasswordFieldsError {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::InvalidCurrentPassword(_) => LogLevel::Error,
             Self::InvalidNewPassword(_) => LogLevel::Error,
-            Self::PasswordNotFound => LogLevel::Error,
-            Self::PasswordNotMatched => LogLevel::Audit,
         }
     }
 }

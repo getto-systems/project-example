@@ -1,13 +1,22 @@
-use crate::auth::user::password::kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher};
+use crate::auth::user::password::kernel::infra::{
+    AuthUserPasswordHasher, HashedPassword, PlainPassword,
+};
 
-use crate::auth::user::{
-    kernel::data::AuthUserId,
-    login_id::kernel::data::LoginId,
-    password::change::data::{ChangePasswordRepositoryError, OverridePasswordRepositoryError},
+use crate::{
+    auth::user::{
+        kernel::data::AuthUserId, login_id::kernel::data::LoginId,
+        password::change::data::OverridePasswordRepositoryError,
+    },
+    z_lib::repository::data::RepositoryError,
 };
 
 pub trait ChangePasswordRequestDecoder {
     fn decode(self) -> ChangePasswordFieldsExtract;
+}
+
+pub struct ChangePasswordFields {
+    pub current_password: PlainPassword,
+    pub new_password: PlainPassword,
 }
 
 pub struct ChangePasswordFieldsExtract {
@@ -26,12 +35,16 @@ pub struct OverridePasswordFieldsExtract {
 
 #[async_trait::async_trait]
 pub trait ChangePasswordRepository {
+    async fn lookup_password<'a>(
+        &self,
+        user_id: &'a AuthUserId,
+    ) -> Result<Option<HashedPassword>, RepositoryError>;
+
     async fn change_password<'a>(
         &self,
         user_id: &'a AuthUserId,
-        matcher: impl 'a + AuthUserPasswordMatcher,
-        hasher: impl 'a + AuthUserPasswordHasher,
-    ) -> Result<(), ChangePasswordRepositoryError>;
+        new_password: HashedPassword,
+    ) -> Result<(), RepositoryError>;
 }
 
 #[async_trait::async_trait]

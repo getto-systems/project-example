@@ -123,7 +123,7 @@ async fn error_empty_current_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password error; invalid current password: empty password",
+        "change password error; invalid; current: empty password",
     ]);
     assert!(!result.is_ok());
 }
@@ -144,7 +144,7 @@ async fn error_too_long_current_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password error; invalid current password: too long password",
+        "change password error; invalid; current: too long password",
     ]);
     assert!(!result.is_ok());
 }
@@ -186,7 +186,7 @@ async fn error_empty_new_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password error; invalid new password: empty password",
+        "change password error; invalid; new: empty password",
     ]);
     assert!(!result.is_ok());
 }
@@ -207,7 +207,7 @@ async fn error_too_long_new_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password error; invalid new password: too long password",
+        "change password error; invalid; new: too long password",
     ]);
     assert!(!result.is_ok());
 }
@@ -270,7 +270,7 @@ async fn error_password_not_stored() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password error; password not found",
+        "change password error; not found",
     ]);
     assert!(!result.is_ok());
 }

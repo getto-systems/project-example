@@ -6,29 +6,18 @@ use crate::{
     z_lib::repository::data::RepositoryError,
 };
 
-pub enum ChangePasswordError {
+pub enum ValidateChangePasswordFieldsError {
     InvalidCurrentPassword(ValidatePasswordError),
     InvalidNewPassword(ValidatePasswordError),
-    PasswordNotFound,
-    PasswordNotMatched,
 }
 
-impl std::fmt::Display for ChangePasswordError {
+impl std::fmt::Display for ValidateChangePasswordFieldsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::InvalidCurrentPassword(err) => write!(f, "invalid current password: {}", err),
-            Self::InvalidNewPassword(err) => write!(f, "invalid new password: {}", err),
-            Self::PasswordNotFound => write!(f, "password not found"),
-            Self::PasswordNotMatched => write!(f, "password not matched"),
+            Self::InvalidCurrentPassword(err) => write!(f, "current: {}", err),
+            Self::InvalidNewPassword(err) => write!(f, "new: {}", err),
         }
     }
-}
-
-pub enum ChangePasswordRepositoryError {
-    PasswordHashError(PasswordHashError),
-    RepositoryError(RepositoryError),
-    PasswordNotFound,
-    PasswordNotMatched,
 }
 
 pub enum OverridePasswordError {

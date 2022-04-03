@@ -1,24 +1,26 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::{ticket::{
+use crate::auth::ticket::{
     encode::method::{encode_auth_ticket, EncodeAuthTicketEvent, EncodeAuthTicketInfra},
     issue::method::{issue_auth_ticket, IssueAuthTicketEvent, IssueAuthTicketInfra},
     validate::method::{validate_auth_nonce, ValidateAuthNonceEvent, ValidateAuthNonceInfra},
-}, user::kernel::data::GrantedAuthRoles};
+};
 
 use crate::auth::user::password::{
     authenticate::infra::{
-        AuthenticatePasswordFieldsExtract, AuthenticatePasswordRequestDecoder,
-        VerifyPasswordRepository,
+        AuthenticatePasswordFields, AuthenticatePasswordFieldsExtract,
+        AuthenticatePasswordRequestDecoder, VerifyPasswordRepository,
     },
     kernel::infra::{AuthUserPasswordMatcher, PlainPassword},
 };
 
 use crate::{
     auth::user::{
-        kernel::data::AuthUser,
-        login_id::kernel::data::{LoginId, ValidateLoginIdError},
-        password::kernel::data::{PasswordHashError, ValidatePasswordError},
+        kernel::data::{AuthUser, GrantedAuthRoles},
+        password::{
+            authenticate::data::ValidateAuthenticatePasswordFieldsError,
+            kernel::data::PasswordHashError,
+        },
     },
     z_lib::repository::data::RepositoryError,
 };
@@ -116,8 +118,7 @@ impl<R: AuthenticatePasswordRequestDecoder, M: AuthenticatePasswordMaterial>
 
 pub enum AuthenticatePasswordEvent {
     Success(AuthUser),
-    InvalidLoginId(ValidateLoginIdError),
-    InvalidPassword(ValidatePasswordError),
+    Invalid(ValidateAuthenticatePasswordFieldsError),
     NotFound,
     PasswordNotMatched,
     PasswordHashError(PasswordHashError),
@@ -131,9 +132,8 @@ impl std::fmt::Display for AuthenticatePasswordEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Success(user) => write!(f, "{}; {}", SUCCESS, user),
-            Self::InvalidLoginId(err) => write!(f, "{}; {}", ERROR, err),
-            Self::InvalidPassword(err) => write!(f, "{}; {}", ERROR, err),
-            Self::NotFound => write!(f, "{}; user not found", ERROR),
+            Self::Invalid(err) => write!(f, "{}; invalid; {}", ERROR, err),
+            Self::NotFound => write!(f, "{}; not found", ERROR),
             Self::PasswordNotMatched => write!(f, "{}; password not matched", ERROR),
             Self::PasswordHashError(err) => write!(f, "{}; {}", ERROR, err),
             Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
@@ -146,16 +146,14 @@ async fn authenticate_password<S>(
     fields: AuthenticatePasswordFieldsExtract,
     post: impl Fn(AuthenticatePasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
-    let login_id = LoginId::validate(fields.login_id)
-        .map_err(|err| post(AuthenticatePasswordEvent::InvalidLoginId(err)))?;
-    let plain_password = PlainPassword::validate(fields.password)
-        .map_err(|err| post(AuthenticatePasswordEvent::InvalidPassword(err)))?;
+    let fields = AuthenticatePasswordFields::validate(fields)
+        .map_err(|err| post(AuthenticatePasswordEvent::Invalid(err)))?;
 
     let password_repository = infra.password_repository();
-    let password_matcher = infra.password_matcher(plain_password);
+    let password_matcher = infra.password_matcher(fields.password);
 
     let user_id = password_repository
-        .lookup_user_id(&login_id)
+        .lookup_user_id(&fields.login_id)
         .await
         .map_err(|err| post(AuthenticatePasswordEvent::RepositoryError(err)))?
         .ok_or_else(|| post(AuthenticatePasswordEvent::NotFound))?;

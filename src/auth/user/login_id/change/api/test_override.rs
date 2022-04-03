@@ -110,7 +110,7 @@ async fn error_empty_login_id() {
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
-    let request_decoder = empty_login_id_request_decoder();
+    let request_decoder = empty_new_login_id_request_decoder();
 
     let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
     action.subscribe(handler);
@@ -120,7 +120,7 @@ async fn error_empty_login_id() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override login-id error; invalid; empty login id",
+        "override login-id error; invalid; new: empty login id",
     ]);
     assert!(!result.is_ok());
 }
@@ -131,7 +131,7 @@ async fn error_too_long_login_id() {
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
-    let request_decoder = too_long_login_id_request_decoder();
+    let request_decoder = too_long_new_login_id_request_decoder();
 
     let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
     action.subscribe(handler);
@@ -141,7 +141,7 @@ async fn error_too_long_login_id() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override login-id error; invalid; too long login id",
+        "override login-id error; invalid; new: too long login id",
     ]);
     assert!(!result.is_ok());
 }
@@ -152,7 +152,7 @@ async fn just_max_length_login_id() {
 
     let store = TestStore::standard();
     let material = TestStruct::standard(&store);
-    let request_decoder = just_max_length_login_id_request_decoder();
+    let request_decoder = just_max_length_new_login_id_request_decoder();
 
     let mut action = OverrideLoginIdAction::with_material(request_decoder, material);
     action.subscribe(handler);
@@ -292,19 +292,19 @@ fn standard_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
         new_login_id: "new-login-id".into(),
     })
 }
-fn empty_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
+fn empty_new_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
     StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
         login_id: LOGIN_ID.into(),
         new_login_id: "".into(),
     })
 }
-fn too_long_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
+fn too_long_new_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
     StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
         login_id: LOGIN_ID.into(),
         new_login_id: vec!["a"; 100 + 1].join(""),
     })
 }
-fn just_max_length_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
+fn just_max_length_new_login_id_request_decoder() -> StaticOverrideLoginIdRequestDecoder {
     StaticOverrideLoginIdRequestDecoder::Valid(OverrideLoginIdFieldsExtract {
         login_id: LOGIN_ID.into(),
         new_login_id: vec!["a"; 100].join(""),

@@ -38,7 +38,7 @@ use crate::auth::user::{
     password::{
         authenticate::infra::VerifyPasswordRepository,
         change::infra::{ChangePasswordRepository, OverridePasswordRepository},
-        kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword},
+        kernel::infra::{AuthUserPasswordHasher, HashedPassword},
         reset::{
             kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
             request_token::infra::{RegisterResetTokenRepository, ResetTokenDestinationRepository},
@@ -62,7 +62,7 @@ use crate::{
             kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
             login_id::kernel::data::LoginId,
             password::{
-                change::data::{ChangePasswordRepositoryError, OverridePasswordRepositoryError},
+                change::data::OverridePasswordRepositoryError,
                 reset::{
                     kernel::data::{
                         ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
@@ -255,48 +255,29 @@ async fn lookup_password<'client, 'a>(
 
 #[async_trait::async_trait]
 impl<'client> ChangePasswordRepository for DynamoDbAuthUserRepository<'client> {
+    async fn lookup_password<'a>(
+        &self,
+        user_id: &'a AuthUserId,
+    ) -> Result<Option<HashedPassword>, RepositoryError> {
+        lookup_password(self, user_id).await
+    }
+
     async fn change_password<'a>(
         &self,
         user_id: &'a AuthUserId,
-        matcher: impl 'a + AuthUserPasswordMatcher,
-        hasher: impl 'a + AuthUserPasswordHasher,
-    ) -> Result<(), ChangePasswordRepositoryError> {
-        change_password(self, user_id, matcher, hasher).await
+        new_password: HashedPassword,
+    ) -> Result<(), RepositoryError> {
+        change_password(self, user_id, new_password).await
     }
 }
 async fn change_password<'client, 'a>(
     repository: &DynamoDbAuthUserRepository<'client>,
     user_id: &'a AuthUserId,
-    matcher: impl 'a + AuthUserPasswordMatcher,
-    hasher: impl 'a + AuthUserPasswordHasher,
-) -> Result<(), ChangePasswordRepositoryError> {
-    let password = get_password(repository, user_id.clone())
+    new_password: HashedPassword,
+) -> Result<(), RepositoryError> {
+    update_password(repository, user_id.clone(), new_password)
         .await
-        .map_err(|err| {
-            ChangePasswordRepositoryError::RepositoryError(infra_error("get password error", err))
-        })?
-        .ok_or(ChangePasswordRepositoryError::PasswordNotFound)?;
-
-    let matched = matcher
-        .match_password(&password)
-        .map_err(ChangePasswordRepositoryError::PasswordHashError)?;
-
-    if !matched {
-        return Err(ChangePasswordRepositoryError::PasswordNotMatched);
-    }
-
-    let password = hasher
-        .hash_password()
-        .map_err(ChangePasswordRepositoryError::PasswordHashError)?;
-
-    update_password(repository, user_id.clone(), password)
-        .await
-        .map_err(|err| {
-            ChangePasswordRepositoryError::RepositoryError(infra_error(
-                "update password error",
-                err,
-            ))
-        })
+        .map_err(|err| infra_error("update password error", err))
 }
 
 #[async_trait::async_trait]

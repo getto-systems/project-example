@@ -20,7 +20,7 @@ use crate::auth::user::{
     password::{
         authenticate::infra::VerifyPasswordRepository,
         change::infra::{ChangePasswordRepository, OverridePasswordRepository},
-        kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, HashedPassword},
+        kernel::infra::{AuthUserPasswordHasher, HashedPassword},
         reset::{
             kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
             request_token::infra::{RegisterResetTokenRepository, ResetTokenDestinationRepository},
@@ -41,7 +41,7 @@ use crate::{
             kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
             login_id::kernel::data::LoginId,
             password::{
-                change::data::{ChangePasswordRepositoryError, OverridePasswordRepositoryError},
+                change::data::OverridePasswordRepositoryError,
                 reset::{
                     kernel::data::{
                         ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
@@ -142,18 +142,6 @@ impl MemoryAuthUserMap {
         for (login_id, user_id) in users {
             store.insert_login_id(login_id, user_id);
         }
-        store
-    }
-    pub fn with_dangling_password(
-        login_id: LoginId,
-        user: AuthUser,
-        password: HashedPassword,
-    ) -> Self {
-        let mut store = Self::new();
-        let user_id = user.into_user_id();
-        store
-            .insert_login_id(login_id, user_id.clone())
-            .insert_password(user_id, password);
         store
     }
     pub fn with_user_id_and_destination(
@@ -644,55 +632,33 @@ fn lookup_password<'store, 'a>(
     user_id: &'a AuthUserId,
 ) -> Result<Option<HashedPassword>, RepositoryError> {
     let store = repository.store.lock().unwrap();
-    Ok(store
-        .get_password(user_id)
-        .map(|password| password.clone()))
+    Ok(store.get_password(user_id).map(|password| password.clone()))
 }
 
-// TODO password を取得してマッチするのを外に出す
-// TODO password hash を外に出す
 #[async_trait::async_trait]
 impl<'store> ChangePasswordRepository for MemoryAuthUserRepository<'store> {
+    async fn lookup_password<'a>(
+        &self,
+        user_id: &'a AuthUserId,
+    ) -> Result<Option<HashedPassword>, RepositoryError> {
+        lookup_password(self, user_id)
+    }
+
     async fn change_password<'a>(
         &self,
         user_id: &'a AuthUserId,
-        matcher: impl 'a + AuthUserPasswordMatcher,
-        hasher: impl 'a + AuthUserPasswordHasher,
-    ) -> Result<(), ChangePasswordRepositoryError> {
-        change_password(self, user_id, matcher, hasher)
+        new_password: HashedPassword,
+    ) -> Result<(), RepositoryError> {
+        change_password(self, user_id, new_password)
     }
 }
 fn change_password<'store, 'a>(
     repository: &MemoryAuthUserRepository<'store>,
     user_id: &'a AuthUserId,
-    matcher: impl 'a + AuthUserPasswordMatcher,
-    hasher: impl 'a + AuthUserPasswordHasher,
-) -> Result<(), ChangePasswordRepositoryError> {
-    {
-        let store = repository.store.lock().unwrap();
-
-        let password = store
-            .get_password(user_id)
-            .ok_or(ChangePasswordRepositoryError::PasswordNotFound)?;
-
-        let matched = matcher
-            .match_password(password)
-            .map_err(ChangePasswordRepositoryError::PasswordHashError)?;
-
-        if !matched {
-            return Err(ChangePasswordRepositoryError::PasswordNotMatched);
-        }
-    }
-
-    {
-        let hashed_password = hasher
-            .hash_password()
-            .map_err(ChangePasswordRepositoryError::PasswordHashError)?;
-
-        let mut store = repository.store.lock().unwrap();
-
-        store.insert_password(user_id.clone(), hashed_password);
-    }
+    new_password: HashedPassword,
+) -> Result<(), RepositoryError> {
+    let mut store = repository.store.lock().unwrap();
+    store.insert_password(user_id.clone(), new_password);
 
     Ok(())
 }

@@ -139,7 +139,7 @@ async fn error_empty_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate password error; invalid login id: empty login id",
+        "authenticate password error; invalid; login-id: empty login id",
     ]);
     assert!(!result.is_ok());
 }
@@ -159,7 +159,7 @@ async fn error_too_long_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate password error; invalid login id: too long login id",
+        "authenticate password error; invalid; login-id: too long login id",
     ]);
     assert!(!result.is_ok());
 }
@@ -179,7 +179,7 @@ async fn just_max_length_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate password error; password not found",
+        "authenticate password error; not found",
     ]);
     assert!(!result.is_ok());
 }
@@ -199,7 +199,7 @@ async fn error_empty_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate password error; invalid password: empty password",
+        "authenticate password error; invalid; password: empty password",
     ]);
     assert!(!result.is_ok());
 }
@@ -219,7 +219,7 @@ async fn error_too_long_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate password error; invalid password: too long password",
+        "authenticate password error; invalid; password: too long password",
     ]);
     assert!(!result.is_ok());
 }
@@ -279,7 +279,7 @@ async fn error_password_not_stored() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate password error; password not found",
+        "authenticate password error; not found",
     ]);
     assert!(!result.is_ok());
 }
@@ -299,7 +299,7 @@ async fn error_user_not_stored() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate password error; user not found",
+        "authenticate password error; not found",
     ]);
     assert!(!result.is_ok());
 }
@@ -534,12 +534,7 @@ fn password_not_stored_user_store() -> MemoryAuthUserStore {
     MemoryAuthUserMap::with_user(test_user()).to_store()
 }
 fn empty_user_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::with_dangling_password(
-        test_user_login_id(),
-        test_user(),
-        test_user_password(),
-    )
-    .to_store()
+    MemoryAuthUserMap::new().to_store()
 }
 
 fn test_user() -> AuthUser {
