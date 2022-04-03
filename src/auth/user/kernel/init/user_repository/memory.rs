@@ -3,15 +3,7 @@ use std::{
     sync::Mutex,
 };
 
-use chrono::{DateTime, Utc};
-
-use crate::{
-    auth::user::{
-        login_id::change::infra::OverrideUserEntry,
-        password::reset::token_destination::change::infra::ChangeResetTokenDestinationRepository,
-    },
-    z_lib::repository::helper::infra_error,
-};
+use crate::z_lib::repository::helper::infra_error;
 
 use crate::auth::user::{
     account::{
@@ -19,15 +11,16 @@ use crate::auth::user::{
         search::infra::SearchAuthUserAccountRepository,
     },
     kernel::infra::AuthUserRepository,
-    login_id::change::infra::OverrideLoginIdRepository,
+    login_id::change::infra::{OverrideLoginIdRepository, OverrideUserEntry},
     password::{
         authenticate::infra::VerifyPasswordRepository,
         change::infra::{ChangePasswordRepository, OverridePasswordRepository},
         kernel::infra::{AuthUserPasswordHasher, HashedPassword},
         reset::{
             kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
-            request_token::infra::{RegisterResetTokenRepository, ResetTokenDestinationRepository},
+            request_token::infra::RegisterResetTokenRepository,
             reset::infra::ResetPasswordRepository,
+            token_destination::change::infra::ChangeResetTokenDestinationRepository,
         },
     },
 };
@@ -45,7 +38,6 @@ use crate::{
             login_id::kernel::data::LoginId,
             password::reset::{
                 kernel::data::{ResetToken, ResetTokenDestination, ResetTokenDestinationExtract},
-                request_token::data::RegisterResetTokenRepositoryError,
                 reset::data::ResetPasswordRepositoryError,
             },
         },
@@ -73,16 +65,17 @@ struct SearchUserEntry {
 #[derive(Clone)]
 struct ResetEntry {
     user_id: AuthUserId,
-    login_id: String,
-    destination: ResetTokenDestinationExtract,
-    expires: DateTime<Utc>,
-    reset_at: Option<DateTime<Utc>>,
+    login_id: LoginId,
+    destination: ResetTokenDestination,
+    expires: ExpireDateTime,
+    requested_at: AuthDateTime,
+    reset_at: Option<AuthDateTime>,
 }
 
 impl ResetEntry {
     fn discard(self, reset_at: AuthDateTime) -> Self {
         Self {
-            reset_at: Some(reset_at.extract()),
+            reset_at: Some(reset_at),
             ..self
         }
     }
@@ -148,7 +141,8 @@ impl MemoryAuthUserMap {
         reset_token: ResetToken,
         destination: ResetTokenDestination,
         expires: ExpireDateTime,
-        discard_at: Option<AuthDateTime>,
+        requested_at: AuthDateTime,
+        reset_at: Option<AuthDateTime>,
     ) -> Self {
         let mut store = Self::new();
         store
@@ -158,10 +152,11 @@ impl MemoryAuthUserMap {
                 reset_token,
                 ResetEntry {
                     user_id,
-                    login_id: login_id.extract(),
-                    destination: destination.extract(),
-                    expires: expires.extract(),
-                    reset_at: discard_at.map(|discard_at| discard_at.extract()),
+                    login_id,
+                    destination,
+                    expires,
+                    requested_at,
+                    reset_at,
                 },
             );
         store
@@ -172,7 +167,8 @@ impl MemoryAuthUserMap {
         reset_token: ResetToken,
         destination: ResetTokenDestination,
         expires: ExpireDateTime,
-        discard_at: Option<AuthDateTime>,
+        requested_at: AuthDateTime,
+        reset_at: Option<AuthDateTime>,
     ) -> Self {
         let mut store = Self::new();
         store
@@ -181,10 +177,11 @@ impl MemoryAuthUserMap {
                 reset_token,
                 ResetEntry {
                     user_id,
-                    login_id: login_id.extract(),
-                    destination: destination.extract(),
-                    expires: expires.extract(),
-                    reset_at: discard_at.map(|discard_at| discard_at.extract()),
+                    login_id,
+                    destination,
+                    expires,
+                    requested_at,
+                    reset_at,
                 },
             );
         store
@@ -285,6 +282,9 @@ impl MemoryAuthUserMap {
     }
 
     fn insert_reset_token(&mut self, token: ResetToken, entry: ResetEntry) -> &mut Self {
+        // requested_at は参照されない(データとして放り込んでおくだけ)
+        // warning が出るのを抑制するためにここで無駄に参照する
+        let _ = &entry.requested_at;
         self.reset_token.insert(token.extract(), entry);
         self
     }
@@ -445,8 +445,9 @@ impl<'a> ChangeResetTokenDestinationRepository for MemoryAuthUserRepository<'a> 
     async fn lookup_destination(
         &self,
         login_id: &LoginId,
-    ) -> Result<Option<(AuthUserId, ResetTokenDestination)>, RepositoryError> {
-        lookup_reset_token_destination(self, login_id)
+    ) -> Result<Option<ResetTokenDestination>, RepositoryError> {
+        lookup_reset_token_user(self, login_id)
+            .map(|user| user.map(|(_user_id, destination)| destination))
     }
 
     async fn change_destination(
@@ -456,41 +457,6 @@ impl<'a> ChangeResetTokenDestinationRepository for MemoryAuthUserRepository<'a> 
     ) -> Result<(), RepositoryError> {
         change_reset_token_destination(self, login_id, data)
     }
-
-    async fn get_updated_destination(
-        &self,
-        login_id: &LoginId,
-    ) -> Result<ResetTokenDestination, RepositoryError> {
-        get_destination(self, login_id).and_then(|destination| {
-            destination.ok_or(RepositoryError::InfraError(
-                "updated destination not found".into(),
-            ))
-        })
-    }
-}
-fn lookup_reset_token_destination<'a>(
-    repository: &MemoryAuthUserRepository<'a>,
-    login_id: &LoginId,
-) -> Result<Option<(AuthUserId, ResetTokenDestination)>, RepositoryError> {
-    let target_user_id: AuthUserId;
-
-    {
-        let store = repository.store.lock().unwrap();
-
-        match store.get_user_id(login_id) {
-            None => {
-                return Ok(None);
-            }
-            Some(user_id) => {
-                target_user_id = user_id.clone();
-            }
-        }
-    }
-
-    match get_destination(repository, login_id)? {
-        Some(destination) => Ok(Some((target_user_id, destination))),
-        _ => Ok(None),
-    }
 }
 fn change_reset_token_destination<'a>(
     repository: &MemoryAuthUserRepository<'a>,
@@ -498,7 +464,6 @@ fn change_reset_token_destination<'a>(
     data: ResetTokenDestination,
 ) -> Result<(), RepositoryError> {
     let mut store = repository.store.lock().unwrap();
-
     store.update_destination(login_id.clone(), data);
 
     Ok(())
@@ -647,8 +612,6 @@ fn change_password<'store, 'a>(
     Ok(())
 }
 
-// TODO password hash を外に出す
-// TODO user を取得するのを外に出す
 #[async_trait::async_trait]
 impl<'store> OverridePasswordRepository for MemoryAuthUserRepository<'store> {
     async fn lookup_user_id<'a>(
@@ -677,85 +640,80 @@ fn override_password<'store, 'a>(
     Ok(())
 }
 
-#[async_trait::async_trait]
-impl<'store> ResetTokenDestinationRepository for MemoryAuthUserRepository<'store> {
-    async fn get(
-        &self,
-        login_id: &LoginId,
-    ) -> Result<Option<ResetTokenDestination>, RepositoryError> {
-        get_destination(self, login_id)
-    }
-}
-fn get_destination<'store>(
-    repository: &MemoryAuthUserRepository<'store>,
-    login_id: &LoginId,
-) -> Result<Option<ResetTokenDestination>, RepositoryError> {
-    let store = repository.store.lock().unwrap();
-    Ok(store
-        .get_destination(login_id)
-        .map(|destination| ResetTokenDestination::restore(destination.clone())))
-}
-
 // TODO reset token を取得して有効期限を確認するのを外に出す
 #[async_trait::async_trait]
 impl<'store> RegisterResetTokenRepository for MemoryAuthUserRepository<'store> {
+    async fn lookup_user(
+        &self,
+        login_id: &LoginId,
+    ) -> Result<Option<(AuthUserId, ResetTokenDestination)>, RepositoryError> {
+        lookup_reset_token_user(self, login_id)
+    }
+
     async fn register_reset_token(
         &self,
         reset_token: ResetToken,
+        user_id: AuthUserId,
         login_id: LoginId,
         destination: ResetTokenDestination,
         expires: ExpireDateTime,
         requested_at: AuthDateTime,
-    ) -> Result<(), RegisterResetTokenRepositoryError> {
+    ) -> Result<(), RepositoryError> {
         register_reset_token(
             self,
-            login_id,
             reset_token,
+            user_id,
+            login_id,
             destination,
             expires,
             requested_at,
         )
     }
 }
+fn lookup_reset_token_user<'store>(
+    repository: &MemoryAuthUserRepository<'store>,
+    login_id: &LoginId,
+) -> Result<Option<(AuthUserId, ResetTokenDestination)>, RepositoryError> {
+    let store = repository.store.lock().unwrap();
+
+    match (store.get_user_id(login_id), store.get_destination(login_id)) {
+        (Some(user_id), Some(destination)) => Ok(Some((
+            user_id.clone(),
+            ResetTokenDestination::restore(destination.clone()),
+        ))),
+        _ => Ok(None),
+    }
+}
 fn register_reset_token<'store>(
     repository: &MemoryAuthUserRepository<'store>,
-    login_id: LoginId,
     reset_token: ResetToken,
+    user_id: AuthUserId,
+    login_id: LoginId,
     destination: ResetTokenDestination,
     expires: ExpireDateTime,
-    _requested_at: AuthDateTime,
-) -> Result<(), RegisterResetTokenRepositoryError> {
-    let target_user_id: AuthUserId;
-
+    requested_at: AuthDateTime,
+) -> Result<(), RepositoryError> {
     {
         let store = repository.store.lock().unwrap();
-
-        let user_id = store
-            .get_user_id(&login_id)
-            .ok_or(RegisterResetTokenRepositoryError::UserNotFound)?;
 
         // 有効期限が切れていても削除しない
         // もし衝突したら token generator の桁数を増やす
         if store.get_reset_entry(&reset_token).is_some() {
-            return Err(RegisterResetTokenRepositoryError::RepositoryError(
-                infra_error("get reset entry error", "reset token conflict"),
-            ));
+            return Err(infra_error("get reset entry error", "reset token conflict"));
         }
-
-        target_user_id = user_id.clone();
     }
 
     {
         let mut store = repository.store.lock().unwrap();
 
-        // 実際のデータベースには registered_at も保存する必要がある
         store.insert_reset_token(
             reset_token.clone(),
             ResetEntry {
-                user_id: target_user_id,
-                login_id: login_id.extract(),
-                destination: destination.extract(),
-                expires: expires.extract(),
+                user_id,
+                login_id,
+                destination,
+                expires,
+                requested_at,
                 reset_at: None,
             },
         );
@@ -792,10 +750,10 @@ fn reset_token_entry<'store>(
     Ok(store.get_reset_entry(&reset_token).map(|entry| {
         let entry = entry.clone();
         ResetTokenEntryExtract {
-            login_id: entry.login_id,
-            destination: entry.destination,
-            expires: entry.expires,
-            reset_at: entry.reset_at,
+            login_id: entry.login_id.extract(),
+            destination: entry.destination.extract(),
+            expires: entry.expires.extract(),
+            reset_at: entry.reset_at.map(|reset_at| reset_at.extract()),
         }
         .restore()
     }))

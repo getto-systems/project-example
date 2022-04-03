@@ -29,7 +29,7 @@ pub struct RequestResetTokenStruct<'a> {
     validate_nonce: ValidateAuthNonceStruct<'a>,
 
     clock: ChronoAuthClock,
-    user_repository: DynamoDbAuthUserRepository<'a>,
+    reset_token_repository: DynamoDbAuthUserRepository<'a>,
     token_generator: UuidResetTokenGenerator,
     token_encoder: JwtResetTokenEncoder<'a>,
     token_notifier: EmailResetTokenNotifier<'a>,
@@ -48,7 +48,7 @@ impl<'a> RequestResetTokenStruct<'a> {
                 validate_nonce: ValidateAuthNonceStruct::new(feature, metadata),
 
                 clock: ChronoAuthClock::new(),
-                user_repository: DynamoDbAuthUserRepository::new(&feature.store),
+                reset_token_repository: DynamoDbAuthUserRepository::new(&feature.store),
                 token_generator: UuidResetTokenGenerator,
                 token_encoder: JwtResetTokenEncoder::new(&feature.reset_token_key),
                 token_notifier: EmailResetTokenNotifier::new(&feature.email),
@@ -64,8 +64,7 @@ impl<'a> RequestResetTokenMaterial for RequestResetTokenStruct<'a> {
     type ValidateNonce = ValidateAuthNonceStruct<'a>;
 
     type Clock = ChronoAuthClock;
-    type PasswordRepository = DynamoDbAuthUserRepository<'a>;
-    type DestinationRepository = DynamoDbAuthUserRepository<'a>;
+    type ResetTokenRepository = DynamoDbAuthUserRepository<'a>;
     type TokenGenerator = UuidResetTokenGenerator;
     type TokenEncoder = JwtResetTokenEncoder<'a>;
     type TokenNotifier = EmailResetTokenNotifier<'a>;
@@ -77,11 +76,8 @@ impl<'a> RequestResetTokenMaterial for RequestResetTokenStruct<'a> {
     fn clock(&self) -> &Self::Clock {
         &self.clock
     }
-    fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.user_repository
-    }
-    fn destination_repository(&self) -> &Self::DestinationRepository {
-        &self.user_repository
+    fn reset_token_repository(&self) -> &Self::ResetTokenRepository {
+        &self.reset_token_repository
     }
     fn token_generator(&self) -> &Self::TokenGenerator {
         &self.token_generator

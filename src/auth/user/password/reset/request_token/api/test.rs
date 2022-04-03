@@ -192,7 +192,7 @@ struct TestStruct<'a> {
     validate_nonce: StaticValidateAuthNonceStruct<'a>,
 
     clock: StaticChronoAuthClock,
-    user_repository: MemoryAuthUserRepository<'a>,
+    reset_token_repository: MemoryAuthUserRepository<'a>,
     token_generator: StaticResetTokenGenerator,
     token_encoder: StaticResetTokenEncoder,
     token_notifier: StaticResetTokenNotifier,
@@ -203,8 +203,7 @@ impl<'a> RequestResetTokenMaterial for TestStruct<'a> {
     type ValidateNonce = StaticValidateAuthNonceStruct<'a>;
 
     type Clock = StaticChronoAuthClock;
-    type PasswordRepository = MemoryAuthUserRepository<'a>;
-    type DestinationRepository = MemoryAuthUserRepository<'a>;
+    type ResetTokenRepository = MemoryAuthUserRepository<'a>;
     type TokenGenerator = StaticResetTokenGenerator;
     type TokenEncoder = StaticResetTokenEncoder;
     type TokenNotifier = StaticResetTokenNotifier;
@@ -216,11 +215,8 @@ impl<'a> RequestResetTokenMaterial for TestStruct<'a> {
     fn clock(&self) -> &Self::Clock {
         &self.clock
     }
-    fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.user_repository
-    }
-    fn destination_repository(&self) -> &Self::DestinationRepository {
-        &self.user_repository
+    fn reset_token_repository(&self) -> &Self::ResetTokenRepository {
+        &self.reset_token_repository
     }
     fn token_generator(&self) -> &Self::TokenGenerator {
         &self.token_generator
@@ -278,7 +274,7 @@ impl<'a> TestStruct<'a> {
                 nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
             },
             clock: standard_clock(),
-            user_repository: MemoryAuthUserRepository::new(&store.user),
+            reset_token_repository: MemoryAuthUserRepository::new(&store.user),
             token_generator: standard_token_generator(),
             token_encoder: StaticResetTokenEncoder,
             token_notifier: StaticResetTokenNotifier,

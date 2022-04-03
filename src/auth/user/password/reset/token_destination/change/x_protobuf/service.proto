@@ -12,8 +12,7 @@ message ChangeResetTokenDestinationRequestPb {
 }
 message ChangeResetTokenDestinationResponsePb {
     bool success = 1;
-    ResetTokenDestinationPb data = 2;
-    ChangeResetTokenDestinationErrorKindPb err = 3;
+    ChangeResetTokenDestinationErrorKindPb err = 2;
 }
 enum ChangeResetTokenDestinationErrorKindPb {
     CONFLICT = 0;

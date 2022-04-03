@@ -157,7 +157,7 @@ async function changeDestination<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "success", data: response.value })
+    return post({ type: "success", data: fields.value })
 }
 
 interface Post<E, S> {

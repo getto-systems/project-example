@@ -12,6 +12,6 @@ export interface ChangeResetTokenDestinationRemote {
 }
 
 export type ChangeResetTokenDestinationRemoteResult = RemoteResult<
-    ResetTokenDestination,
+    true,
     ChangeResetTokenDestinationRemoteError
 >

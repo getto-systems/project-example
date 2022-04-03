@@ -44,7 +44,7 @@ use crate::auth::user::{
         kernel::infra::{AuthUserPasswordHasher, HashedPassword},
         reset::{
             kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
-            request_token::infra::{RegisterResetTokenRepository, ResetTokenDestinationRepository},
+            request_token::infra::RegisterResetTokenRepository,
             reset::infra::ResetPasswordRepository,
         },
     },
@@ -66,7 +66,6 @@ use crate::{
             login_id::kernel::data::LoginId,
             password::reset::{
                 kernel::data::{ResetToken, ResetTokenDestination, ResetTokenDestinationExtract},
-                request_token::data::RegisterResetTokenRepositoryError,
                 reset::data::ResetPasswordRepositoryError,
             },
         },
@@ -355,8 +354,10 @@ impl<'client> ChangeResetTokenDestinationRepository for DynamoDbAuthUserReposito
     async fn lookup_destination(
         &self,
         login_id: &LoginId,
-    ) -> Result<Option<(AuthUserId, ResetTokenDestination)>, RepositoryError> {
-        lookup_reset_token_destination(self, login_id).await
+    ) -> Result<Option<ResetTokenDestination>, RepositoryError> {
+        lookup_reset_token_user(self, login_id)
+            .await
+            .map(|user| user.map(|(_user_id, destination)| destination))
     }
 
     async fn change_destination(
@@ -365,29 +366,6 @@ impl<'client> ChangeResetTokenDestinationRepository for DynamoDbAuthUserReposito
         data: ResetTokenDestination,
     ) -> Result<(), RepositoryError> {
         change_reset_token_destination(self, login_id, data).await
-    }
-
-    async fn get_updated_destination(
-        &self,
-        login_id: &LoginId,
-    ) -> Result<ResetTokenDestination, RepositoryError> {
-        get_reset_token_destination(self, login_id).await
-    }
-}
-async fn lookup_reset_token_destination<'client>(
-    repository: &DynamoDbAuthUserRepository<'client>,
-    login_id: &LoginId,
-) -> Result<Option<(AuthUserId, ResetTokenDestination)>, RepositoryError> {
-    match (
-        get_user_id(repository, login_id.clone())
-            .await
-            .map_err(|err| infra_error("get login id error", err))?,
-        get_destination(repository, login_id)
-            .await
-            .map_err(|err| infra_error("get destination error", err))?,
-    ) {
-        (Some(user_id), Some(destination)) => Ok(Some((user_id.clone(), destination))),
-        _ => Ok(None),
     }
 }
 async fn change_reset_token_destination<'client>(
@@ -399,54 +377,7 @@ async fn change_reset_token_destination<'client>(
         .await
         .map_err(|err| infra_error("update destination error", err))
 }
-async fn get_reset_token_destination<'client>(
-    repository: &DynamoDbAuthUserRepository<'client>,
-    login_id: &LoginId,
-) -> Result<ResetTokenDestination, RepositoryError> {
-    get_destination(repository, login_id)
-        .await
-        .and_then(|destination| {
-            destination.ok_or_else(|| {
-                RepositoryError::InfraError("updated reset token destination not found".into())
-            })
-        })
-}
 
-#[async_trait::async_trait]
-impl<'client> ResetTokenDestinationRepository for DynamoDbAuthUserRepository<'client> {
-    async fn get(
-        &self,
-        login_id: &LoginId,
-    ) -> Result<Option<ResetTokenDestination>, RepositoryError> {
-        get_destination(self, login_id).await
-    }
-}
-async fn get_destination<'client>(
-    repository: &DynamoDbAuthUserRepository<'client>,
-    login_id: &LoginId,
-) -> Result<Option<ResetTokenDestination>, RepositoryError> {
-    let mut key = AttributeMap::new();
-    key.add_login_id(login_id.clone());
-
-    let input = GetItemInput {
-        table_name: repository.login_id.into(),
-        key: key.extract(),
-        projection_expression: Some("reset_token_destination_email".into()),
-        ..Default::default()
-    };
-
-    let response = repository
-        .client
-        .get_item(input)
-        .await
-        .map_err(|err| infra_error("get destination error", err))?;
-
-    Ok(response
-        .item
-        .and_then(|mut attrs| attrs.remove("reset_token_destination_email"))
-        .and_then(|attr| attr.s)
-        .map(|email| ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(email))))
-}
 async fn update_destination<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
     login_id: LoginId,
@@ -487,17 +418,26 @@ async fn update_destination<'client>(
 
 #[async_trait::async_trait]
 impl<'client> RegisterResetTokenRepository for DynamoDbAuthUserRepository<'client> {
+    async fn lookup_user(
+        &self,
+        login_id: &LoginId,
+    ) -> Result<Option<(AuthUserId, ResetTokenDestination)>, RepositoryError> {
+        lookup_reset_token_user(self, login_id).await
+    }
+
     async fn register_reset_token(
         &self,
         reset_token: ResetToken,
+        user_id: AuthUserId,
         login_id: LoginId,
         destination: ResetTokenDestination,
         expires: ExpireDateTime,
         requested_at: AuthDateTime,
-    ) -> Result<(), RegisterResetTokenRepositoryError> {
+    ) -> Result<(), RepositoryError> {
         register_reset_token(
             self,
             reset_token,
+            user_id,
             login_id,
             destination,
             expires,
@@ -506,24 +446,50 @@ impl<'client> RegisterResetTokenRepository for DynamoDbAuthUserRepository<'clien
         .await
     }
 }
+async fn lookup_reset_token_user<'client>(
+    repository: &DynamoDbAuthUserRepository<'client>,
+    login_id: &LoginId,
+) -> Result<Option<(AuthUserId, ResetTokenDestination)>, RepositoryError> {
+    let mut key = AttributeMap::new();
+    key.add_login_id(login_id.clone());
+
+    let input = GetItemInput {
+        table_name: repository.login_id.into(),
+        key: key.extract(),
+        projection_expression: Some("user_id, reset_token_destination_email".into()),
+        ..Default::default()
+    };
+
+    let response = repository
+        .client
+        .get_item(input)
+        .await
+        .map_err(|err| infra_error("get destination error", err))?;
+
+    Ok(response.item.and_then(|mut attrs| {
+        match (
+            attrs.remove("user_id").and_then(|attr| attr.s),
+            attrs
+                .remove("reset_token_destination_email")
+                .and_then(|attr| attr.s),
+        ) {
+            (Some(user_id), Some(email)) => Some((
+                AuthUserId::restore(user_id),
+                ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(email)),
+            )),
+            _ => None,
+        }
+    }))
+}
 async fn register_reset_token<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
     reset_token: ResetToken,
+    user_id: AuthUserId,
     login_id: LoginId,
     destination: ResetTokenDestination,
     expires: ExpireDateTime,
     requested_at: AuthDateTime,
-) -> Result<(), RegisterResetTokenRepositoryError> {
-    let user_id = get_user_id(repository, login_id.clone())
-        .await
-        .map_err(|err| {
-            RegisterResetTokenRepositoryError::RepositoryError(infra_error(
-                "get user id error",
-                err,
-            ))
-        })?
-        .ok_or(RegisterResetTokenRepositoryError::UserNotFound)?;
-
+) -> Result<(), RepositoryError> {
     let mut item = AttributeMap::new();
     item.add_reset_token(reset_token);
     item.add_login_id(login_id);
@@ -539,12 +505,11 @@ async fn register_reset_token<'client>(
         ..Default::default()
     };
 
-    repository.client.put_item(input).await.map_err(|err| {
-        RegisterResetTokenRepositoryError::RepositoryError(infra_error(
-            "put reset token error",
-            err,
-        ))
-    })?;
+    repository
+        .client
+        .put_item(input)
+        .await
+        .map_err(|err| infra_error("put reset token error", err))?;
     Ok(())
 }
 

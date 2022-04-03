@@ -160,9 +160,8 @@ function initResource(modifyUserRemote: ChangeResetTokenDestinationRemote): Read
 }
 
 function standard_changeDestinationRemote(): ChangeResetTokenDestinationRemote {
-    return async (_user, fields) => ({ success: true, value: fields })
+    return async () => ({ success: true, value: true })
 }
 function takeLongtime_changeDestinationRemote(): ChangeResetTokenDestinationRemote {
-    return async (_user, fields) =>
-        ticker({ wait_millisecond: 64 }, () => ({ success: true, value: fields }))
+    return async () => ticker({ wait_millisecond: 64 }, () => ({ success: true, value: true }))
 }

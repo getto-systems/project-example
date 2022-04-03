@@ -10,10 +10,7 @@ use crate::auth::user::password::reset::token_destination::change::infra::{
 };
 
 use crate::{
-    auth::user::password::reset::{
-        kernel::data::ResetTokenDestination,
-        token_destination::change::data::ValidateChangeResetTokenDestinationFieldsError,
-    },
+    auth::user::password::reset::token_destination::change::data::ValidateChangeResetTokenDestinationFieldsError,
     z_lib::repository::data::RepositoryError,
 };
 
@@ -87,7 +84,7 @@ impl<R: ChangeResetTokenDestinationRequestDecoder, M: ChangeResetTokenDestinatio
 }
 
 pub enum ChangeResetTokenDestinationEvent {
-    Success(ResetTokenDestination),
+    Success,
     Invalid(ValidateChangeResetTokenDestinationFieldsError),
     NotFound,
     Conflict,
@@ -103,7 +100,7 @@ mod change_reset_token_destination_event {
     impl std::fmt::Display for ChangeResetTokenDestinationEvent {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
-                Self::Success(destination) => write!(f, "{}; {}", SUCCESS, destination),
+                Self::Success => write!(f, "{}", SUCCESS),
                 Self::Invalid(err) => err.fmt(f),
                 Self::NotFound => write!(f, "{}; not found", ERROR),
                 Self::Conflict => write!(f, "{}; changes conflicted", ERROR),
@@ -125,7 +122,7 @@ async fn change_destination<S>(
 
     let destination_repository = infra.destination_repository();
 
-    let (_user_id, stored_destination) = destination_repository
+    let stored_destination = destination_repository
         .lookup_destination(&fields.login_id)
         .await
         .map_err(|err| post(ChangeResetTokenDestinationEvent::RepositoryError(err)))?
@@ -140,12 +137,5 @@ async fn change_destination<S>(
         .await
         .map_err(|err| post(ChangeResetTokenDestinationEvent::RepositoryError(err)))?;
 
-    let updated_destination = destination_repository
-        .get_updated_destination(&fields.login_id)
-        .await
-        .map_err(|err| post(ChangeResetTokenDestinationEvent::RepositoryError(err)))?;
-
-    Ok(post(ChangeResetTokenDestinationEvent::Success(
-        updated_destination,
-    )))
+    Ok(post(ChangeResetTokenDestinationEvent::Success))
 }

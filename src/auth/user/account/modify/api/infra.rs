@@ -30,6 +30,7 @@ pub trait ModifyAuthUserAccountRepository {
         data: ModifyAuthUserAccountChanges,
     ) -> Result<(), RepositoryError>;
 
+    // TODO これは必要ない
     async fn get_updated_user(
         &self,
         user_id: &AuthUserId,
