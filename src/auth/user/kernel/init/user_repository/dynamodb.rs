@@ -64,15 +64,10 @@ use crate::{
             },
             kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
             login_id::kernel::data::LoginId,
-            password::{
-                change::data::OverridePasswordRepositoryError,
-                reset::{
-                    kernel::data::{
-                        ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
-                    },
-                    request_token::data::RegisterResetTokenRepositoryError,
-                    reset::data::ResetPasswordRepositoryError,
-                },
+            password::reset::{
+                kernel::data::{ResetToken, ResetTokenDestination, ResetTokenDestinationExtract},
+                request_token::data::RegisterResetTokenRepositoryError,
+                reset::data::ResetPasswordRepositoryError,
             },
         },
     },
@@ -271,38 +266,29 @@ async fn change_password<'client, 'a>(
 
 #[async_trait::async_trait]
 impl<'client> OverridePasswordRepository for DynamoDbAuthUserRepository<'client> {
-    async fn override_password<'a>(
+    async fn lookup_user_id<'a>(
         &self,
         login_id: &'a LoginId,
-        hasher: impl 'a + AuthUserPasswordHasher,
-    ) -> Result<(), OverridePasswordRepositoryError> {
-        override_password(self, login_id, hasher).await
+    ) -> Result<Option<AuthUserId>, RepositoryError> {
+        lookup_user_id(self, login_id).await
+    }
+
+    async fn override_password<'a>(
+        &self,
+        user_id: &'a AuthUserId,
+        new_password: HashedPassword,
+    ) -> Result<(), RepositoryError> {
+        override_password(self, user_id, new_password).await
     }
 }
 async fn override_password<'client, 'a>(
     repository: &DynamoDbAuthUserRepository<'client>,
-    login_id: &'a LoginId,
-    hasher: impl 'a + AuthUserPasswordHasher,
-) -> Result<(), OverridePasswordRepositoryError> {
-    let password = hasher
-        .hash_password()
-        .map_err(OverridePasswordRepositoryError::PasswordHashError)?;
-
-    let user_id = get_user_id(repository, login_id.clone())
+    user_id: &'a AuthUserId,
+    new_password: HashedPassword,
+) -> Result<(), RepositoryError> {
+    update_password(repository, user_id.clone(), new_password)
         .await
-        .map_err(|err| {
-            OverridePasswordRepositoryError::RepositoryError(infra_error("get user id error", err))
-        })?
-        .ok_or(OverridePasswordRepositoryError::UserNotFound)?;
-
-    update_password(repository, user_id, password)
-        .await
-        .map_err(|err| {
-            OverridePasswordRepositoryError::RepositoryError(infra_error(
-                "update password error",
-                err,
-            ))
-        })
+        .map_err(|err| infra_error("update password error", err))
 }
 
 #[async_trait::async_trait]

@@ -43,15 +43,10 @@ use crate::{
             },
             kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
             login_id::kernel::data::LoginId,
-            password::{
-                change::data::OverridePasswordRepositoryError,
-                reset::{
-                    kernel::data::{
-                        ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
-                    },
-                    request_token::data::RegisterResetTokenRepositoryError,
-                    reset::data::ResetPasswordRepositoryError,
-                },
+            password::reset::{
+                kernel::data::{ResetToken, ResetTokenDestination, ResetTokenDestinationExtract},
+                request_token::data::RegisterResetTokenRepositoryError,
+                reset::data::ResetPasswordRepositoryError,
             },
         },
     },
@@ -656,33 +651,28 @@ fn change_password<'store, 'a>(
 // TODO user を取得するのを外に出す
 #[async_trait::async_trait]
 impl<'store> OverridePasswordRepository for MemoryAuthUserRepository<'store> {
-    async fn override_password<'a>(
+    async fn lookup_user_id<'a>(
         &self,
         login_id: &'a LoginId,
-        hasher: impl 'a + AuthUserPasswordHasher,
-    ) -> Result<(), OverridePasswordRepositoryError> {
-        override_password(self, login_id, hasher)
+    ) -> Result<Option<AuthUserId>, RepositoryError> {
+        lookup_user_id(self, login_id)
+    }
+
+    async fn override_password<'a>(
+        &self,
+        user_id: &'a AuthUserId,
+        new_password: HashedPassword,
+    ) -> Result<(), RepositoryError> {
+        override_password(self, user_id, new_password)
     }
 }
 fn override_password<'store, 'a>(
     repository: &MemoryAuthUserRepository<'store>,
-    login_id: &'a LoginId,
-    hasher: impl 'a + AuthUserPasswordHasher,
-) -> Result<(), OverridePasswordRepositoryError> {
-    {
-        let hashed_password = hasher
-            .hash_password()
-            .map_err(OverridePasswordRepositoryError::PasswordHashError)?;
-
-        let mut store = repository.store.lock().unwrap();
-
-        let user_id = store
-            .get_user_id(login_id)
-            .ok_or(OverridePasswordRepositoryError::UserNotFound)
-            .map(|id| id.clone())?;
-
-        store.insert_password(user_id, hashed_password);
-    }
+    user_id: &'a AuthUserId,
+    new_password: HashedPassword,
+) -> Result<(), RepositoryError> {
+    let mut store = repository.store.lock().unwrap();
+    store.insert_password(user_id.clone(), new_password);
 
     Ok(())
 }
