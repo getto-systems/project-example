@@ -59,7 +59,7 @@ async fn success_modify_user() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "modify auth user account success; changes: granted: []",
+        "modify auth user account success",
     ]);
     assert!(result.is_ok());
 }
@@ -80,7 +80,7 @@ async fn success_expired_nonce() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "modify auth user account success; changes: granted: []",
+        "modify auth user account success",
     ]);
     assert!(result.is_ok());
 }

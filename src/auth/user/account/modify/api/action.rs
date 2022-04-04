@@ -10,9 +10,7 @@ use crate::auth::user::account::modify::infra::{
 };
 
 use crate::{
-    auth::user::account::modify::data::{
-        ModifyAuthUserAccountChanges, ValidateModifyAuthUserAccountFieldsError,
-    },
+    auth::user::account::modify::data::ValidateModifyAuthUserAccountFieldsError,
     z_lib::repository::data::RepositoryError,
 };
 
@@ -86,7 +84,7 @@ impl<R: ModifyAuthUserAccountRequestDecoder, M: ModifyAuthUserAccountMaterial>
 }
 
 pub enum ModifyAuthUserAccountEvent {
-    Success(ModifyAuthUserAccountChanges),
+    Success,
     Invalid(ValidateModifyAuthUserAccountFieldsError),
     NotFound,
     Conflict,
@@ -102,7 +100,7 @@ mod modify_auth_user_account_event {
     impl std::fmt::Display for ModifyAuthUserAccountEvent {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
-                Self::Success(user) => write!(f, "{}; {}", SUCCESS, user),
+                Self::Success => write!(f, "{}", SUCCESS),
                 Self::Invalid(err) => err.fmt(f),
                 Self::NotFound => write!(f, "{}; not found", ERROR),
                 Self::Conflict => write!(f, "{}; changes conflicted", ERROR),
@@ -136,10 +134,5 @@ async fn modify_user<S>(
         .await
         .map_err(|err| post(ModifyAuthUserAccountEvent::RepositoryError(err)))?;
 
-    let updated_user = user_repository
-        .get_updated_user(&user_id)
-        .await
-        .map_err(|err| post(ModifyAuthUserAccountEvent::RepositoryError(err)))?;
-
-    Ok(post(ModifyAuthUserAccountEvent::Success(updated_user)))
+    Ok(post(ModifyAuthUserAccountEvent::Success))
 }

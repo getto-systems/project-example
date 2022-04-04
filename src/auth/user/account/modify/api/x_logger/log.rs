@@ -20,7 +20,7 @@ impl LogFilter for ModifyAuthUserAccountState {
 impl LogFilter for ModifyAuthUserAccountEvent {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Success(_) => LogLevel::Audit,
+            Self::Success => LogLevel::Audit,
             Self::Invalid(_) => LogLevel::Error,
             Self::NotFound => LogLevel::Error,
             Self::Conflict => LogLevel::Error,

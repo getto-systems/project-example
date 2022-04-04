@@ -10,7 +10,7 @@ use crate::{
 
 use crate::auth::user::{
     account::{
-        modify::infra::ModifyAuthUserAccountRepository, // TODO 整理
+        modify::infra::ModifyAuthUserAccountRepository,
         search::infra::SearchAuthUserAccountRepository, // TODO 整理
     },
     kernel::infra::AuthUserRepository,
@@ -22,7 +22,7 @@ use crate::auth::user::{
         reset::{
             request_token::infra::RegisterResetTokenRepository,
             reset::infra::ResetPasswordRepository,
-            token_destination::change::infra::ChangeResetTokenDestinationRepository, // TODO 整理
+            token_destination::change::infra::ChangeResetTokenDestinationRepository,
         },
     },
 };
@@ -398,13 +398,6 @@ impl<'a> ModifyAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
         data: ModifyAuthUserAccountChanges,
     ) -> Result<(), RepositoryError> {
         modify_user(self, user_id, data)
-    }
-
-    async fn get_updated_user(
-        &self,
-        user_id: &AuthUserId,
-    ) -> Result<ModifyAuthUserAccountChanges, RepositoryError> {
-        get_modify_user_data(self, user_id)
     }
 }
 fn lookup_modify_user_data<'a>(

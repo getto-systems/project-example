@@ -12,8 +12,7 @@ message ModifyAuthUserAccountRequestPb {
 }
 message ModifyAuthUserAccountResponsePb {
     bool success = 1;
-    ModifyAuthUserAccountChangesPb data = 2;
-    ModifyAuthUserAccountErrorKindPb err = 3;
+    ModifyAuthUserAccountErrorKindPb err = 2;
 }
 enum ModifyAuthUserAccountErrorKindPb {
     CONFLICT = 0;

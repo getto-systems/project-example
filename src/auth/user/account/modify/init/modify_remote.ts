@@ -10,7 +10,6 @@ import {
     remoteInfraError,
 } from "../../../../../z_lib/ui/remote/init/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf/helper"
-import { toGrantedRoles } from "../../input/convert"
 
 import { ModifyAuthUserAccountRemoteResult, ModifyAuthUserAccountRemote } from "../infra"
 
@@ -31,7 +30,7 @@ async function fetchRemote(
 ): Promise<ModifyAuthUserAccountRemoteResult> {
     const mock = true
     if (mock) {
-        return { success: true, value: fields }
+        return { success: true, value: true }
     }
 
     try {
@@ -68,12 +67,7 @@ async function fetchRemote(
         if (!message.success) {
             return { success: false, err: errorResponse(message.err) }
         }
-        return {
-            success: true,
-            value: {
-                grantedRoles: toGrantedRoles(message.data?.grantedRoles || []),
-            },
-        }
+        return { success: true, value: true }
     } catch (err) {
         return remoteInfraError(err)
     }

@@ -131,9 +131,8 @@ function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
 }
 
 function standard_modifyUserRemote(): ModifyAuthUserAccountRemote {
-    return async (user, fields) => ({ success: true, value: fields })
+    return async () => ({ success: true, value: true })
 }
 function takeLongtime_modifyUserRemote(): ModifyAuthUserAccountRemote {
-    return async (user, fields) =>
-        ticker({ wait_millisecond: 64 }, () => ({ success: true, value: fields }))
+    return async () => ticker({ wait_millisecond: 64 }, () => ({ success: true, value: true }))
 }

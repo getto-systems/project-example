@@ -1,6 +1,8 @@
 use crate::{
     auth::user::{
-        account::modify::data::{ModifyAuthUserAccountChanges, ValidateModifyAuthUserAccountFieldsError},
+        account::modify::data::{
+            ModifyAuthUserAccountChanges, ValidateModifyAuthUserAccountFieldsError,
+        },
         kernel::data::AuthUserId,
         login_id::kernel::data::LoginId,
     },
@@ -8,7 +10,9 @@ use crate::{
 };
 
 pub trait ModifyAuthUserAccountRequestDecoder {
-    fn decode(self) -> Result<ModifyAuthUserAccountFields, ValidateModifyAuthUserAccountFieldsError>;
+    fn decode(
+        self,
+    ) -> Result<ModifyAuthUserAccountFields, ValidateModifyAuthUserAccountFieldsError>;
 }
 
 pub struct ModifyAuthUserAccountFields {
@@ -29,10 +33,4 @@ pub trait ModifyAuthUserAccountRepository {
         user_id: &AuthUserId,
         data: ModifyAuthUserAccountChanges,
     ) -> Result<(), RepositoryError>;
-
-    // TODO これは必要ない
-    async fn get_updated_user(
-        &self,
-        user_id: &AuthUserId,
-    ) -> Result<ModifyAuthUserAccountChanges, RepositoryError>;
 }

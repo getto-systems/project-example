@@ -12,6 +12,6 @@ export interface ModifyAuthUserAccountRemote {
 }
 
 export type ModifyAuthUserAccountRemoteResult = RemoteResult<
-    ModifyAuthUserAccountFields,
+    true,
     ModifyAuthUserAccountRemoteError
 >

@@ -294,13 +294,6 @@ impl<'client> ModifyAuthUserAccountRepository for DynamoDbAuthUserRepository<'cl
     ) -> Result<(), RepositoryError> {
         modify_user(self, user_id, data).await
     }
-
-    async fn get_updated_user(
-        &self,
-        user_id: &AuthUserId,
-    ) -> Result<ModifyAuthUserAccountChanges, RepositoryError> {
-        get_modify_user_data(self, user_id).await
-    }
 }
 async fn lookup_modify_user_data<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
