@@ -24,7 +24,6 @@ use crate::auth::user::{
         modify::infra::ModifyAuthUserAccountRepository,
         search::infra::SearchAuthUserAccountRepository,
     },
-    kernel::infra::AuthUserRepository,
     login_id::change::infra::{OverrideLoginIdRepository, OverrideUserEntry},
     password::{
         authenticate::infra::AuthenticatePasswordRepository,
@@ -50,7 +49,7 @@ use crate::{
                     SearchAuthUserAccountSortKey,
                 },
             },
-            kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
+            kernel::data::{AuthUserId, GrantedAuthRoles},
             login_id::kernel::data::LoginId,
             password::reset::kernel::data::{
                 ResetToken, ResetTokenDestination, ResetTokenDestinationEmail,
@@ -80,37 +79,6 @@ impl<'a> DynamoDbAuthUserRepository<'a> {
             reset_token: feature.reset_token_table_name,
         }
     }
-}
-
-#[async_trait::async_trait]
-impl<'client> AuthUserRepository for DynamoDbAuthUserRepository<'client> {
-    async fn get(&self, user_id: &AuthUserId) -> Result<Option<AuthUser>, RepositoryError> {
-        get_user(self, user_id).await
-    }
-}
-async fn get_user<'client>(
-    repository: &DynamoDbAuthUserRepository<'client>,
-    user_id: &AuthUserId,
-) -> Result<Option<AuthUser>, RepositoryError> {
-    // login id が存在すればユーザーは登録されているとみなす
-    if let None = get_login_id(repository, user_id.clone())
-        .await
-        .map_err(|err| infra_error("get login id error", err))?
-    {
-        return Ok(None);
-    }
-
-    let roles = get_granted_roles(repository, user_id.clone())
-        .await
-        .map_err(|err| infra_error("get granted roles error", err))?;
-
-    Ok(Some(
-        AuthUserExtract {
-            user_id: user_id.clone().extract(),
-            granted_roles: roles.extract(),
-        }
-        .restore(),
-    ))
 }
 
 #[async_trait::async_trait]
@@ -745,28 +713,6 @@ async fn update_granted_roles<'client>(
     repository.client.update_item(input).await?;
 
     Ok(())
-}
-async fn get_login_id<'client>(
-    repository: &DynamoDbAuthUserRepository<'client>,
-    user_id: AuthUserId,
-) -> Result<Option<LoginId>, RusotoError<GetItemError>> {
-    let mut key = AttributeMap::new();
-    key.add_user_id(user_id);
-
-    let input = GetItemInput {
-        table_name: repository.user.into(),
-        key: key.extract(),
-        projection_expression: Some("login_id".into()),
-        ..Default::default()
-    };
-
-    let response = repository.client.get_item(input).await?;
-
-    Ok(response
-        .item
-        .and_then(|mut attrs| attrs.remove("login_id"))
-        .and_then(|attr| attr.s)
-        .map(|password| LoginId::restore(password)))
 }
 async fn update_login_id<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,

@@ -11,9 +11,8 @@ use crate::{
 use crate::auth::user::{
     account::{
         modify::infra::ModifyAuthUserAccountRepository,
-        search::infra::SearchAuthUserAccountRepository, // TODO 整理
+        search::infra::SearchAuthUserAccountRepository,
     },
-    kernel::infra::AuthUserRepository,
     login_id::change::infra::{OverrideLoginIdRepository, OverrideUserEntry},
     password::{
         authenticate::infra::AuthenticatePasswordRepository,
@@ -36,7 +35,7 @@ use crate::{
                 modify::data::ModifyAuthUserAccountChanges,
                 search::data::{SearchAuthUserAccountBasket, SearchAuthUserAccountFilter},
             },
-            kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
+            kernel::data::{AuthUser, AuthUserId, GrantedAuthRoles},
             login_id::kernel::data::LoginId,
             password::reset::kernel::data::{
                 ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
@@ -317,27 +316,6 @@ impl<'a> MemoryAuthUserRepository<'a> {
     pub const fn new(store: &'a MemoryAuthUserStore) -> Self {
         Self { store }
     }
-}
-
-// TODO (AuthUserId, GrantedAuthRoles) を返せばいい気がする
-#[async_trait::async_trait]
-impl<'a> AuthUserRepository for MemoryAuthUserRepository<'a> {
-    async fn get(&self, user_id: &AuthUserId) -> Result<Option<AuthUser>, RepositoryError> {
-        get_granted_roles(self, user_id)
-    }
-}
-fn get_granted_roles<'a>(
-    repository: &MemoryAuthUserRepository<'a>,
-    user_id: &AuthUserId,
-) -> Result<Option<AuthUser>, RepositoryError> {
-    let store = repository.store.lock().unwrap();
-    Ok(store.get_granted_roles(user_id).map(|granted_roles| {
-        AuthUserExtract {
-            user_id: user_id.as_str().into(),
-            granted_roles: granted_roles.clone(),
-        }
-        .restore()
-    }))
 }
 
 // TODO Basket をやめる
