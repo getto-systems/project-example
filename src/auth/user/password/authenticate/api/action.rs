@@ -9,7 +9,7 @@ use crate::auth::ticket::{
 use crate::auth::user::password::{
     authenticate::infra::{
         AuthenticatePasswordFields, AuthenticatePasswordFieldsExtract,
-        AuthenticatePasswordRequestDecoder, VerifyPasswordRepository,
+        AuthenticatePasswordRequestDecoder, AuthenticatePasswordRepository,
     },
     kernel::infra::{AuthUserPasswordMatcher, PlainPassword},
 };
@@ -48,7 +48,7 @@ pub trait AuthenticatePasswordMaterial {
     type Issue: IssueAuthTicketInfra;
     type Encode: EncodeAuthTicketInfra;
 
-    type PasswordRepository: VerifyPasswordRepository;
+    type PasswordRepository: AuthenticatePasswordRepository;
     type PasswordMatcher: AuthUserPasswordMatcher;
 
     fn validate_nonce(&self) -> &Self::ValidateNonce;

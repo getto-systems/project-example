@@ -123,7 +123,7 @@ async fn error_empty_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "request reset token error; invalid login id: empty login id",
+        "request reset token error; invalid; login-id: empty login id",
     ]);
     assert!(!result.is_ok());
 }
@@ -143,7 +143,7 @@ async fn error_too_long_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "request reset token error; invalid login id: too long login id",
+        "request reset token error; invalid; login-id: too long login id",
     ]);
     assert!(!result.is_ok());
 }
@@ -163,7 +163,7 @@ async fn just_max_length_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "request reset token error; destination not found",
+        "request reset token error; not found",
     ]);
     assert!(!result.is_ok());
 }
@@ -183,7 +183,7 @@ async fn error_destination_not_stored() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "request reset token error; destination not found",
+        "request reset token error; not found",
     ]);
     assert!(!result.is_ok());
 }

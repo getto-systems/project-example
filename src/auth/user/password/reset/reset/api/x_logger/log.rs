@@ -1,10 +1,11 @@
 use super::super::action::{ResetPasswordEvent, ResetPasswordState};
 
+use crate::auth::user::password::reset::reset::data::ValidateResetPasswordFieldsError;
 use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
 
 use crate::auth::user::password::reset::{
     kernel::data::ValidateResetTokenError,
-    reset::data::{DecodeResetTokenError, NotifyResetPasswordError, ResetPasswordError},
+    reset::data::{DecodeResetTokenError, NotifyResetPasswordError},
 };
 
 impl LogMessage for ResetPasswordState {
@@ -29,9 +30,11 @@ impl LogFilter for ResetPasswordEvent {
         match self {
             Self::ResetNotified(_) => LogLevel::Info,
             Self::Success(_) => LogLevel::Audit,
-            Self::InvalidReset(err) => err.log_level(),
-            Self::ResetTokenNotFound => LogLevel::Audit,
-            Self::UserNotFound => LogLevel::Error,
+            Self::Invalid(err) => err.log_level(),
+            Self::NotFound => LogLevel::Error,
+            Self::ResetTokenExpired => LogLevel::Audit,
+            Self::LoginIdNotMatched => LogLevel::Audit,
+            Self::AlreadyReset => LogLevel::Audit,
             Self::RepositoryError(err) => err.log_level(),
             Self::PasswordHashError(err) => err.log_level(),
             Self::DecodeError(err) => err.log_level(),
@@ -40,13 +43,12 @@ impl LogFilter for ResetPasswordEvent {
     }
 }
 
-impl LogFilter for ResetPasswordError {
+impl LogFilter for ValidateResetPasswordFieldsError {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::InvalidLoginId(_) => LogLevel::Error,
-            Self::InvalidPassword(_) => LogLevel::Error,
             Self::InvalidResetToken(_) => LogLevel::Error,
-            Self::InvalidResetTokenEntry(_) => LogLevel::Audit,
+            Self::InvalidLoginId(_) => LogLevel::Error,
+            Self::InvalidNewPassword(_) => LogLevel::Error,
         }
     }
 }
@@ -62,7 +64,7 @@ impl LogFilter for NotifyResetPasswordError {
 impl LogFilter for DecodeResetTokenError {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Expired => LogLevel::Debug,
+            Self::Expired => LogLevel::Error,
             Self::Invalid(_) => LogLevel::Audit,
         }
     }

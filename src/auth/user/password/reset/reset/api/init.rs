@@ -33,7 +33,7 @@ pub struct ResetPasswordFeature<'a> {
     encode: EncodeAuthTicketStruct<'a>,
 
     clock: ChronoAuthClock,
-    user_repository: DynamoDbAuthUserRepository<'a>,
+    reset_password_repository: DynamoDbAuthUserRepository<'a>,
     token_decoder: JwtResetTokenDecoder<'a>,
     reset_notifier: EmailResetPasswordNotifier<'a>,
 }
@@ -52,7 +52,7 @@ impl<'a> ResetPasswordFeature<'a> {
                 encode: EncodeAuthTicketStruct::new(feature),
 
                 clock: ChronoAuthClock::new(),
-                user_repository: DynamoDbAuthUserRepository::new(&feature.store),
+                reset_password_repository: DynamoDbAuthUserRepository::new(&feature.store),
                 token_decoder: JwtResetTokenDecoder::new(&feature.reset_token_key),
                 reset_notifier: EmailResetPasswordNotifier::new(&feature.email),
             },
@@ -66,8 +66,7 @@ impl<'a> ResetPasswordMaterial for ResetPasswordFeature<'a> {
     type Encode = EncodeAuthTicketStruct<'a>;
 
     type Clock = ChronoAuthClock;
-    type UserRepository = DynamoDbAuthUserRepository<'a>;
-    type PasswordRepository = DynamoDbAuthUserRepository<'a>;
+    type ResetPasswordRepository = DynamoDbAuthUserRepository<'a>;
     type PasswordHasher = Argon2PasswordHasher;
     type TokenDecoder = JwtResetTokenDecoder<'a>;
     type ResetNotifier = EmailResetPasswordNotifier<'a>;
@@ -85,11 +84,8 @@ impl<'a> ResetPasswordMaterial for ResetPasswordFeature<'a> {
     fn clock(&self) -> &Self::Clock {
         &self.clock
     }
-    fn user_repository(&self) -> &Self::UserRepository {
-        &self.user_repository
-    }
-    fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.user_repository
+    fn reset_password_repository(&self) -> &Self::ResetPasswordRepository {
+        &self.reset_password_repository
     }
     fn token_decoder(&self) -> &Self::TokenDecoder {
         &self.token_decoder

@@ -3,24 +3,26 @@ use std::{
     sync::Mutex,
 };
 
-use crate::z_lib::repository::helper::infra_error;
+use crate::{
+    auth::user::password::reset::reset::infra::ResetTokenMoment,
+    z_lib::repository::helper::infra_error,
+};
 
 use crate::auth::user::{
     account::{
-        modify::infra::ModifyAuthUserAccountRepository,
-        search::infra::SearchAuthUserAccountRepository,
+        modify::infra::ModifyAuthUserAccountRepository, // TODO 整理
+        search::infra::SearchAuthUserAccountRepository, // TODO 整理
     },
     kernel::infra::AuthUserRepository,
     login_id::change::infra::{OverrideLoginIdRepository, OverrideUserEntry},
     password::{
-        authenticate::infra::VerifyPasswordRepository,
+        authenticate::infra::AuthenticatePasswordRepository,
         change::infra::{ChangePasswordRepository, OverridePasswordRepository},
-        kernel::infra::{AuthUserPasswordHasher, HashedPassword},
+        kernel::infra::HashedPassword,
         reset::{
-            kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
             request_token::infra::RegisterResetTokenRepository,
             reset::infra::ResetPasswordRepository,
-            token_destination::change::infra::ChangeResetTokenDestinationRepository,
+            token_destination::change::infra::ChangeResetTokenDestinationRepository, // TODO 整理
         },
     },
 };
@@ -36,9 +38,8 @@ use crate::{
             },
             kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
             login_id::kernel::data::LoginId,
-            password::reset::{
-                kernel::data::{ResetToken, ResetTokenDestination, ResetTokenDestinationExtract},
-                reset::data::ResetPasswordRepositoryError,
+            password::reset::kernel::data::{
+                ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
             },
         },
     },
@@ -265,6 +266,14 @@ impl MemoryAuthUserMap {
         self.password.insert(user_id.extract(), hashed_password);
         self
     }
+    fn update_password(
+        &mut self,
+        user_id: AuthUserId,
+        hashed_password: HashedPassword,
+    ) -> &mut Self {
+        self.password.insert(user_id.extract(), hashed_password);
+        self
+    }
     fn get_password(&self, user_id: &AuthUserId) -> Option<&HashedPassword> {
         self.password.get(user_id.as_str())
     }
@@ -286,6 +295,13 @@ impl MemoryAuthUserMap {
         // warning が出るのを抑制するためにここで無駄に参照する
         let _ = &entry.requested_at;
         self.reset_token.insert(token.extract(), entry);
+        self
+    }
+    fn update_reset_at(&mut self, token: ResetToken, reset_at: AuthDateTime) -> &mut Self {
+        if let Some(entry) = self.reset_token.remove(token.as_str()) {
+            self.reset_token
+                .insert(token.extract(), entry.discard(reset_at));
+        }
         self
     }
     fn get_reset_entry(&self, token: &ResetToken) -> Option<&ResetEntry> {
@@ -538,7 +554,7 @@ fn override_login_id<'store, 'a>(
 }
 
 #[async_trait::async_trait]
-impl<'store> VerifyPasswordRepository for MemoryAuthUserRepository<'store> {
+impl<'store> AuthenticatePasswordRepository for MemoryAuthUserRepository<'store> {
     async fn lookup_user_id<'a>(
         &self,
         login_id: &'a LoginId,
@@ -640,7 +656,6 @@ fn override_password<'store, 'a>(
     Ok(())
 }
 
-// TODO reset token を取得して有効期限を確認するのを外に出す
 #[async_trait::async_trait]
 impl<'store> RegisterResetTokenRepository for MemoryAuthUserRepository<'store> {
     async fn lookup_user(
@@ -722,75 +737,63 @@ fn register_reset_token<'store>(
     Ok(())
 }
 
-// TODO reset token を取得して有効期限を確認するのを外に出す
-// TODO password hash を外に出す
 #[async_trait::async_trait]
 impl<'store> ResetPasswordRepository for MemoryAuthUserRepository<'store> {
-    async fn reset_token_entry(
+    async fn lookup_reset_token_entry(
         &self,
         reset_token: &ResetToken,
-    ) -> Result<Option<ResetTokenEntry>, RepositoryError> {
-        reset_token_entry(self, reset_token)
+    ) -> Result<
+        Option<(AuthUserId, LoginId, ResetTokenDestination, ResetTokenMoment)>,
+        RepositoryError,
+    > {
+        lookup_reset_token_entry(self, reset_token)
     }
-    async fn reset_password<'a>(
+
+    async fn lookup_granted_roles<'a>(
         &self,
-        reset_token: &'a ResetToken,
-        hasher: impl AuthUserPasswordHasher + 'a,
+        user_id: &'a AuthUserId,
+    ) -> Result<Option<GrantedAuthRoles>, RepositoryError> {
+        lookup_granted_roles(self, user_id)
+    }
+
+    async fn reset_password(
+        &self,
+        reset_token: &ResetToken,
+        user_id: &AuthUserId,
+        new_password: HashedPassword,
         reset_at: AuthDateTime,
-    ) -> Result<AuthUserId, ResetPasswordRepositoryError> {
-        reset_password(self, reset_token, hasher, reset_at)
+    ) -> Result<(), RepositoryError> {
+        reset_password(self, reset_token, user_id, new_password, reset_at)
     }
 }
-fn reset_token_entry<'store>(
+fn lookup_reset_token_entry<'store>(
     repository: &MemoryAuthUserRepository<'store>,
     reset_token: &ResetToken,
-) -> Result<Option<ResetTokenEntry>, RepositoryError> {
+) -> Result<Option<(AuthUserId, LoginId, ResetTokenDestination, ResetTokenMoment)>, RepositoryError>
+{
     let store = repository.store.lock().unwrap();
 
     Ok(store.get_reset_entry(&reset_token).map(|entry| {
-        let entry = entry.clone();
-        ResetTokenEntryExtract {
-            login_id: entry.login_id.extract(),
-            destination: entry.destination.extract(),
-            expires: entry.expires.extract(),
-            reset_at: entry.reset_at.map(|reset_at| reset_at.extract()),
-        }
-        .restore()
+        (
+            entry.user_id.clone(),
+            entry.login_id.clone(),
+            entry.destination.clone(),
+            ResetTokenMoment::restore(entry.expires.clone(), entry.reset_at.clone()),
+        )
     }))
 }
 fn reset_password<'store, 'a>(
     repository: &MemoryAuthUserRepository<'store>,
-    reset_token: &'a ResetToken,
-    hasher: impl AuthUserPasswordHasher + 'a,
+    reset_token: &ResetToken,
+    user_id: &AuthUserId,
+    new_password: HashedPassword,
     reset_at: AuthDateTime,
-) -> Result<AuthUserId, ResetPasswordRepositoryError> {
-    let target_entry: ResetEntry;
+) -> Result<(), RepositoryError> {
+    let mut store = repository.store.lock().unwrap();
 
-    {
-        let store = repository.store.lock().unwrap();
+    store
+        .update_password(user_id.clone(), new_password)
+        .update_reset_at(reset_token.clone(), reset_at);
 
-        let entry = store.get_reset_entry(&reset_token).ok_or(
-            ResetPasswordRepositoryError::RepositoryError(infra_error(
-                "get reset entry error",
-                "reset token not found",
-            )),
-        )?;
-
-        target_entry = entry.clone().discard(reset_at);
-    }
-
-    {
-        let hashed_password = hasher
-            .hash_password()
-            .map_err(ResetPasswordRepositoryError::PasswordHashError)?;
-
-        let mut store = repository.store.lock().unwrap();
-
-        // 実際のデータベースには registered_at も保存する必要がある
-        store
-            .insert_password(target_entry.user_id.clone(), hashed_password)
-            .insert_reset_token(reset_token.clone(), target_entry.clone());
-    }
-
-    Ok(target_entry.user_id)
+    Ok(())
 }

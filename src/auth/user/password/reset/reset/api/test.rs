@@ -147,7 +147,7 @@ async fn error_match_failed_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid reset token entry: login id not matched",
+        "reset password error; login id not matched",
     ]);
     assert!(!result.is_ok());
 }
@@ -167,7 +167,7 @@ async fn error_empty_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid login id: empty login id",
+        "reset password error; invalid; login-id: empty login id",
     ]);
     assert!(!result.is_ok());
 }
@@ -187,7 +187,7 @@ async fn error_too_long_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid login id: too long login id",
+        "reset password error; invalid; login-id: too long login id",
     ]);
     assert!(!result.is_ok());
 }
@@ -207,7 +207,7 @@ async fn just_max_length_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid reset token entry: login id not matched",
+        "reset password error; login id not matched",
     ]);
     assert!(!result.is_ok());
 }
@@ -227,7 +227,7 @@ async fn error_empty_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid password: empty password",
+        "reset password error; invalid; new-password: empty password",
     ]);
     assert!(!result.is_ok());
 }
@@ -247,7 +247,7 @@ async fn error_too_long_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid password: too long password",
+        "reset password error; invalid; new-password: too long password",
     ]);
     assert!(!result.is_ok());
 }
@@ -292,7 +292,7 @@ async fn error_empty_reset_token() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid reset token: empty reset token",
+        "reset password error; invalid; reset-token: empty reset token",
     ]);
     assert!(!result.is_ok());
 }
@@ -332,7 +332,7 @@ async fn error_reset_token_expired_in_store() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid reset token entry: reset token expired",
+        "reset password error; reset token expired",
     ]);
     assert!(!result.is_ok());
 }
@@ -352,7 +352,7 @@ async fn error_reset_token_discarded() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid reset token entry: already reset",
+        "reset password error; already reset",
     ]);
     assert!(!result.is_ok());
 }
@@ -372,7 +372,7 @@ async fn error_reset_token_not_stored() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid reset token entry: reset token entry not found",
+        "reset password error; not found",
     ]);
     assert!(!result.is_ok());
 }
@@ -392,7 +392,7 @@ async fn error_user_not_stored() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; user not found",
+        "reset password error; not found",
     ]);
     assert!(!result.is_ok());
 }
@@ -403,7 +403,7 @@ struct TestStruct<'a> {
     encode: StaticEncodeAuthTicketStruct<'a>,
 
     clock: StaticChronoAuthClock,
-    user_repository: MemoryAuthUserRepository<'a>,
+    reset_password_repository: MemoryAuthUserRepository<'a>,
     token_decoder: StaticResetTokenDecoder,
     reset_notifier: StaticResetPasswordNotifier,
 }
@@ -414,8 +414,7 @@ impl<'a> ResetPasswordMaterial for TestStruct<'a> {
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
     type Clock = StaticChronoAuthClock;
-    type UserRepository = MemoryAuthUserRepository<'a>;
-    type PasswordRepository = MemoryAuthUserRepository<'a>;
+    type ResetPasswordRepository = MemoryAuthUserRepository<'a>;
     type PasswordHasher = PlainPasswordHasher;
     type TokenDecoder = StaticResetTokenDecoder;
     type ResetNotifier = StaticResetPasswordNotifier;
@@ -433,11 +432,8 @@ impl<'a> ResetPasswordMaterial for TestStruct<'a> {
     fn clock(&self) -> &Self::Clock {
         &self.clock
     }
-    fn user_repository(&self) -> &Self::UserRepository {
-        &self.user_repository
-    }
-    fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.user_repository
+    fn reset_password_repository(&self) -> &Self::ResetPasswordRepository {
+        &self.reset_password_repository
     }
     fn token_decoder(&self) -> &Self::TokenDecoder {
         &self.token_decoder
@@ -538,7 +534,7 @@ impl<'a> TestStruct<'a> {
             },
 
             clock: standard_clock(),
-            user_repository: MemoryAuthUserRepository::new(&store.user),
+            reset_password_repository: MemoryAuthUserRepository::new(&store.user),
             token_decoder,
             reset_notifier: StaticResetPasswordNotifier,
         }
@@ -585,7 +581,7 @@ fn standard_request_decoder() -> StaticResetPasswordRequestDecoder {
         fields: ResetPasswordFieldsExtract {
             reset_token: RESET_TOKEN.into(),
             login_id: LOGIN_ID.into(),
-            password: "password".into(),
+            new_password: "password".into(),
         },
     }
 }
@@ -594,7 +590,7 @@ fn match_failed_login_id_request_decoder() -> StaticResetPasswordRequestDecoder 
         fields: ResetPasswordFieldsExtract {
             reset_token: RESET_TOKEN.into(),
             login_id: "unknown-login-id".into(),
-            password: "password".into(),
+            new_password: "password".into(),
         },
     }
 }
@@ -603,7 +599,7 @@ fn empty_login_id_request_decoder() -> StaticResetPasswordRequestDecoder {
         fields: ResetPasswordFieldsExtract {
             reset_token: RESET_TOKEN.into(),
             login_id: "".into(),
-            password: "password".into(),
+            new_password: "password".into(),
         },
     }
 }
@@ -612,7 +608,7 @@ fn too_long_login_id_request_decoder() -> StaticResetPasswordRequestDecoder {
         fields: ResetPasswordFieldsExtract {
             reset_token: RESET_TOKEN.into(),
             login_id: vec!["a"; 100 + 1].join(""),
-            password: "password".into(),
+            new_password: "password".into(),
         },
     }
 }
@@ -621,7 +617,7 @@ fn just_max_length_login_id_request_decoder() -> StaticResetPasswordRequestDecod
         fields: ResetPasswordFieldsExtract {
             reset_token: RESET_TOKEN.into(),
             login_id: vec!["a"; 100].join(""),
-            password: "password".into(),
+            new_password: "password".into(),
         },
     }
 }
@@ -630,7 +626,7 @@ fn empty_password_request_decoder() -> StaticResetPasswordRequestDecoder {
         fields: ResetPasswordFieldsExtract {
             reset_token: RESET_TOKEN.into(),
             login_id: LOGIN_ID.into(),
-            password: "".into(),
+            new_password: "".into(),
         },
     }
 }
@@ -639,7 +635,7 @@ fn too_long_password_request_decoder() -> StaticResetPasswordRequestDecoder {
         fields: ResetPasswordFieldsExtract {
             reset_token: RESET_TOKEN.into(),
             login_id: LOGIN_ID.into(),
-            password: vec!["a"; 100 + 1].join(""),
+            new_password: vec!["a"; 100 + 1].join(""),
         },
     }
 }
@@ -648,7 +644,7 @@ fn just_max_length_password_request_decoder() -> StaticResetPasswordRequestDecod
         fields: ResetPasswordFieldsExtract {
             reset_token: RESET_TOKEN.into(),
             login_id: LOGIN_ID.into(),
-            password: vec!["a"; 100].join(""),
+            new_password: vec!["a"; 100].join(""),
         },
     }
 }
@@ -657,7 +653,7 @@ fn empty_reset_token_request_decoder() -> StaticResetPasswordRequestDecoder {
         fields: ResetPasswordFieldsExtract {
             reset_token: "".into(),
             login_id: LOGIN_ID.into(),
-            password: "password".into(),
+            new_password: "password".into(),
         },
     }
 }

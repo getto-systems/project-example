@@ -14,10 +14,7 @@ use crate::auth::ticket::encode::method::EncodeAuthTicketEvent;
 
 use crate::auth::{
     ticket::encode::data::AuthTicketEncoded,
-    user::password::reset::reset::data::{
-        DecodeResetTokenError, NotifyResetPasswordError, ResetPasswordError,
-        VerifyResetTokenEntryError,
-    },
+    user::password::reset::reset::data::{DecodeResetTokenError, NotifyResetPasswordError},
 };
 
 impl ServiceResponder<ResetPasswordResponsePb> for ResetPasswordState {
@@ -61,9 +58,31 @@ impl ServiceResponder<ResetPasswordResponsePb> for ResetPasswordEvent {
         match self {
             Self::ResetNotified(_) => Err(Status::cancelled("cancelled at reset notified")),
             Self::Success(_) => Err(Status::cancelled("cancelled at reset password")),
-            Self::InvalidReset(err) => err.respond_to(),
-            Self::ResetTokenNotFound => Err(Status::unauthenticated("reset token not found")),
-            Self::UserNotFound => Err(Status::internal("user not found")),
+            Self::Invalid(_) => Ok(Response::new(ResetPasswordResponsePb {
+                success: false,
+                err: ResetPasswordErrorKindPb::InvalidReset as i32,
+                ..Default::default()
+            })),
+            Self::NotFound => Ok(Response::new(ResetPasswordResponsePb {
+                success: false,
+                err: ResetPasswordErrorKindPb::InvalidReset as i32,
+                ..Default::default()
+            })),
+            Self::LoginIdNotMatched => Ok(Response::new(ResetPasswordResponsePb {
+                success: false,
+                err: ResetPasswordErrorKindPb::InvalidReset as i32,
+                ..Default::default()
+            })),
+            Self::ResetTokenExpired => Ok(Response::new(ResetPasswordResponsePb {
+                success: false,
+                err: ResetPasswordErrorKindPb::InvalidReset as i32,
+                ..Default::default()
+            })),
+            Self::AlreadyReset => Ok(Response::new(ResetPasswordResponsePb {
+                success: false,
+                err: ResetPasswordErrorKindPb::AlreadyReset as i32,
+                ..Default::default()
+            })),
             Self::RepositoryError(err) => err.respond_to(),
             Self::PasswordHashError(err) => err.respond_to(),
             Self::DecodeError(err) => err.respond_to(),
@@ -82,39 +101,6 @@ impl ResetPasswordResponsePb {
                 err: self.err,
             },
         )
-    }
-}
-
-impl ServiceResponder<ResetPasswordResponsePb> for ResetPasswordError {
-    fn respond_to(self) -> Result<Response<ResetPasswordResponsePb>, Status> {
-        let error: ResetPasswordErrorKindPb = self.into();
-        Ok(Response::new(ResetPasswordResponsePb {
-            success: false,
-            err: error as i32,
-            ..Default::default()
-        }))
-    }
-}
-
-impl Into<ResetPasswordErrorKindPb> for ResetPasswordError {
-    fn into(self) -> ResetPasswordErrorKindPb {
-        match self {
-            Self::InvalidLoginId(_) => ResetPasswordErrorKindPb::InvalidReset,
-            Self::InvalidPassword(_) => ResetPasswordErrorKindPb::InvalidReset,
-            Self::InvalidResetToken(_) => ResetPasswordErrorKindPb::InvalidReset,
-            Self::InvalidResetTokenEntry(err) => err.into(),
-        }
-    }
-}
-
-impl Into<ResetPasswordErrorKindPb> for VerifyResetTokenEntryError {
-    fn into(self) -> ResetPasswordErrorKindPb {
-        match self {
-            Self::ResetTokenEntryNotFound => ResetPasswordErrorKindPb::InvalidReset,
-            Self::LoginIdNotMatched => ResetPasswordErrorKindPb::InvalidReset,
-            Self::Expired => ResetPasswordErrorKindPb::InvalidReset,
-            Self::AlreadyReset => ResetPasswordErrorKindPb::AlreadyReset,
-        }
     }
 }
 

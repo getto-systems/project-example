@@ -32,7 +32,7 @@ impl OverridePasswordFields {
             login_id: LoginId::validate(fields.login_id)
                 .map_err(ValidateOverridePasswordFieldsError::InvalidLoginId)?,
             new_password: PlainPassword::validate(fields.new_password)
-                .map_err(ValidateOverridePasswordFieldsError::InvalidPassword)?,
+                .map_err(ValidateOverridePasswordFieldsError::InvalidNewPassword)?,
         })
     }
 }

@@ -4,7 +4,7 @@ import { Password } from "../../input/data"
 
 export type ResetPasswordFields = Readonly<{
     loginId: LoginId
-    password: Password
+    newPassword: Password
 }>
 
 export type ResetPasswordError =

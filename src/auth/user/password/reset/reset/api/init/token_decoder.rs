@@ -24,8 +24,8 @@ impl<'a> JwtResetTokenDecoder<'a> {
 }
 
 impl<'a> ResetTokenDecoder for JwtResetTokenDecoder<'a> {
-    fn decode(&self, token: &ResetTokenEncoded) -> Result<ResetToken, DecodeResetTokenError> {
-        validate_jwt(token, &self.key)
+    fn decode(&self, token: ResetTokenEncoded) -> Result<ResetToken, DecodeResetTokenError> {
+        validate_jwt(&token, &self.key)
     }
 }
 
@@ -61,7 +61,7 @@ pub mod test {
     }
 
     impl ResetTokenDecoder for StaticResetTokenDecoder {
-        fn decode(&self, _token: &ResetTokenEncoded) -> Result<ResetToken, DecodeResetTokenError> {
+        fn decode(&self, _token: ResetTokenEncoded) -> Result<ResetToken, DecodeResetTokenError> {
             match self {
                 Self::Expired => Err(DecodeResetTokenError::Expired),
                 Self::Valid(token) => Ok(token.clone()),

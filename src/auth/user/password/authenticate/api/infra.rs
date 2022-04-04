@@ -22,7 +22,7 @@ pub struct AuthenticatePasswordFieldsExtract {
 }
 
 #[async_trait::async_trait]
-pub trait VerifyPasswordRepository {
+pub trait AuthenticatePasswordRepository {
     async fn lookup_user_id<'a>(
         &self,
         login_id: &'a LoginId,

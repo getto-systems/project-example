@@ -57,7 +57,7 @@ async fn success_change_destination() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change reset token destination success; reset token destination: email(user@example.com)",
+        "change reset token destination success",
     ]);
     assert!(result.is_ok());
 }
@@ -78,7 +78,7 @@ async fn success_expired_nonce() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change reset token destination success; reset token destination: email(user@example.com)",
+        "change reset token destination success",
     ]);
     assert!(result.is_ok());
 }

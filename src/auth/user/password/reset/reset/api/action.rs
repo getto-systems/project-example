@@ -8,39 +8,23 @@ use crate::auth::ticket::{
 
 use crate::auth::{
     ticket::kernel::infra::AuthClock,
-    user::{
-        kernel::infra::AuthUserRepository,
-        password::{
-            kernel::infra::{AuthUserPasswordHasher, PlainPassword},
-            reset::{
-                kernel::infra::ResetTokenEntry,
-                reset::infra::{
-                    ResetPasswordFieldsExtract, ResetPasswordNotifier, ResetPasswordRepository,
-                    ResetPasswordRequestDecoder, ResetTokenDecoder,
-                },
-            },
+    user::password::{
+        kernel::infra::{AuthUserPasswordHasher, PlainPassword},
+        reset::reset::infra::{
+            ResetPasswordFields, ResetPasswordFieldsExtract, ResetPasswordNotifier,
+            ResetPasswordRepository, ResetPasswordRequestDecoder, ResetTokenDecoder,
         },
     },
 };
 
 use crate::{
-    auth::{
-        ticket::kernel::data::AuthDateTime,
-        user::{
-            kernel::data::AuthUser,
-            login_id::kernel::data::{LoginId, ValidateLoginIdError},
-            password::{
-                kernel::data::{PasswordHashError, ValidatePasswordError},
-                reset::{
-                    kernel::data::{
-                        ResetTokenDestination, ResetTokenEncoded, ValidateResetTokenError,
-                    },
-                    reset::data::{
-                        DecodeResetTokenError, NotifyResetPasswordError,
-                        NotifyResetPasswordResponse, ResetPasswordError,
-                        ResetPasswordRepositoryError, VerifyResetTokenEntryError,
-                    },
-                },
+    auth::user::{
+        kernel::data::AuthUser,
+        password::{
+            kernel::data::PasswordHashError,
+            reset::reset::data::{
+                DecodeResetTokenError, NotifyResetPasswordError, NotifyResetPasswordResponse,
+                ValidateResetPasswordFieldsError,
             },
         },
     },
@@ -71,8 +55,7 @@ pub trait ResetPasswordMaterial {
     type Encode: EncodeAuthTicketInfra;
 
     type Clock: AuthClock;
-    type UserRepository: AuthUserRepository;
-    type PasswordRepository: ResetPasswordRepository;
+    type ResetPasswordRepository: ResetPasswordRepository;
     type PasswordHasher: AuthUserPasswordHasher;
     type TokenDecoder: ResetTokenDecoder;
     type ResetNotifier: ResetPasswordNotifier;
@@ -82,8 +65,7 @@ pub trait ResetPasswordMaterial {
     fn encode(&self) -> &Self::Encode;
 
     fn clock(&self) -> &Self::Clock;
-    fn user_repository(&self) -> &Self::UserRepository;
-    fn password_repository(&self) -> &Self::PasswordRepository;
+    fn reset_password_repository(&self) -> &Self::ResetPasswordRepository;
     fn password_hasher(&self, plain_password: PlainPassword) -> Self::PasswordHasher {
         Self::PasswordHasher::new(plain_password)
     }
@@ -141,9 +123,11 @@ impl<R: ResetPasswordRequestDecoder, M: ResetPasswordMaterial> ResetPasswordActi
 pub enum ResetPasswordEvent {
     ResetNotified(NotifyResetPasswordResponse),
     Success(AuthUser),
-    InvalidReset(ResetPasswordError),
-    ResetTokenNotFound,
-    UserNotFound,
+    Invalid(ValidateResetPasswordFieldsError),
+    NotFound,
+    LoginIdNotMatched,
+    ResetTokenExpired,
+    AlreadyReset,
     RepositoryError(RepositoryError),
     PasswordHashError(PasswordHashError),
     DecodeError(DecodeResetTokenError),
@@ -158,47 +142,15 @@ impl std::fmt::Display for ResetPasswordEvent {
         match self {
             Self::ResetNotified(response) => write!(f, "reset password notified; {}", response),
             Self::Success(user) => write!(f, "{}; {}", SUCCESS, user),
-            Self::InvalidReset(err) => write!(f, "{}; {}", ERROR, err),
-            Self::ResetTokenNotFound => write!(f, "{}; reset token not found", ERROR),
-            Self::UserNotFound => write!(f, "{}; user not found", ERROR),
+            Self::Invalid(err) => write!(f, "{}; invalid; {}", ERROR, err),
+            Self::NotFound => write!(f, "{}; not found", ERROR),
+            Self::LoginIdNotMatched => write!(f, "{}; login id not matched", ERROR),
+            Self::ResetTokenExpired => write!(f, "{}; reset token expired", ERROR),
+            Self::AlreadyReset => write!(f, "{}; already reset", ERROR),
             Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
             Self::PasswordHashError(err) => write!(f, "{}; {}", ERROR, err),
             Self::DecodeError(err) => write!(f, "{}; {}", ERROR, err),
             Self::NotifyError(err) => write!(f, "{}; {}", ERROR, err),
-        }
-    }
-}
-
-impl Into<ResetPasswordEvent> for ValidateLoginIdError {
-    fn into(self) -> ResetPasswordEvent {
-        ResetPasswordEvent::InvalidReset(ResetPasswordError::InvalidLoginId(self))
-    }
-}
-
-impl Into<ResetPasswordEvent> for ValidatePasswordError {
-    fn into(self) -> ResetPasswordEvent {
-        ResetPasswordEvent::InvalidReset(ResetPasswordError::InvalidPassword(self))
-    }
-}
-
-impl Into<ResetPasswordEvent> for ValidateResetTokenError {
-    fn into(self) -> ResetPasswordEvent {
-        ResetPasswordEvent::InvalidReset(ResetPasswordError::InvalidResetToken(self))
-    }
-}
-
-impl Into<ResetPasswordEvent> for VerifyResetTokenEntryError {
-    fn into(self) -> ResetPasswordEvent {
-        ResetPasswordEvent::InvalidReset(ResetPasswordError::InvalidResetTokenEntry(self))
-    }
-}
-
-impl Into<ResetPasswordEvent> for ResetPasswordRepositoryError {
-    fn into(self) -> ResetPasswordEvent {
-        match self {
-            Self::ResetTokenNotFound => ResetPasswordEvent::ResetTokenNotFound,
-            Self::RepositoryError(err) => ResetPasswordEvent::RepositoryError(err),
-            Self::PasswordHashError(err) => ResetPasswordEvent::PasswordHashError(err),
         }
     }
 }
@@ -208,44 +160,54 @@ async fn reset_password<S>(
     fields: ResetPasswordFieldsExtract,
     post: impl Fn(ResetPasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
-    let login_id = LoginId::validate(fields.login_id).map_err(|err| post(err.into()))?;
-    let plain_password =
-        PlainPassword::validate(fields.password).map_err(|err| post(err.into()))?;
-    let reset_token =
-        ResetTokenEncoded::validate(fields.reset_token).map_err(|err| post(err.into()))?;
+    let fields = ResetPasswordFields::validate(fields)
+        .map_err(|err| post(ResetPasswordEvent::Invalid(err)))?;
 
     let token_decoder = infra.token_decoder();
     let reset_notifier = infra.reset_notifier();
 
     let reset_token = token_decoder
-        .decode(&reset_token)
+        .decode(fields.reset_token)
         .map_err(|err| post(ResetPasswordEvent::DecodeError(err)))?;
 
-    let password_repository = infra.password_repository();
-    let password_hasher = infra.password_hasher(plain_password);
+    let reset_password_repository = infra.reset_password_repository();
+    let password_hasher = infra.password_hasher(fields.new_password);
     let clock = infra.clock();
 
     let reset_at = clock.now();
 
-    let entry = password_repository
-        .reset_token_entry(&reset_token)
-        .await
-        .map_err(|err| post(ResetPasswordEvent::RepositoryError(err)))?;
-
-    let destination =
-        verify_reset_token_entry(entry, &reset_at, &login_id).map_err(|err| post(err.into()))?;
-
-    let user_id = password_repository
-        .reset_password(&reset_token, password_hasher, reset_at)
-        .await
-        .map_err(|err| post(err.into()))?;
-
-    let user_repository = infra.user_repository();
-    let user = user_repository
-        .get(&user_id)
+    let (user_id, stored_login_id, destination, moment) = reset_password_repository
+        .lookup_reset_token_entry(&reset_token)
         .await
         .map_err(|err| post(ResetPasswordEvent::RepositoryError(err)))?
-        .ok_or_else(|| post(ResetPasswordEvent::UserNotFound))?;
+        .ok_or_else(|| post(ResetPasswordEvent::NotFound))?;
+
+    let granted_roles = reset_password_repository
+        .lookup_granted_roles(&user_id)
+        .await
+        .map_err(|err| post(ResetPasswordEvent::RepositoryError(err)))?
+        .ok_or_else(|| post(ResetPasswordEvent::NotFound))?;
+
+    if stored_login_id != fields.login_id {
+        return Err(post(ResetPasswordEvent::LoginIdNotMatched));
+    }
+
+    if moment.has_already_reset() {
+        return Err(post(ResetPasswordEvent::AlreadyReset));
+    }
+
+    if moment.has_expired(&reset_at) {
+        return Err(post(ResetPasswordEvent::ResetTokenExpired));
+    }
+
+    let hashed_password = password_hasher
+        .hash_password()
+        .map_err(|err| post(ResetPasswordEvent::PasswordHashError(err)))?;
+
+    reset_password_repository
+        .reset_password(&reset_token, &user_id, hashed_password, reset_at)
+        .await
+        .map_err(|err| post(ResetPasswordEvent::RepositoryError(err)))?;
 
     let notify_response = reset_notifier
         .notify(destination)
@@ -254,24 +216,7 @@ async fn reset_password<S>(
 
     post(ResetPasswordEvent::ResetNotified(notify_response));
 
+    let user = AuthUser::restore((user_id, granted_roles));
     post(ResetPasswordEvent::Success(user.clone()));
     Ok(user)
-}
-
-fn verify_reset_token_entry(
-    entry: Option<ResetTokenEntry>,
-    reset_at: &AuthDateTime,
-    login_id: &LoginId,
-) -> Result<ResetTokenDestination, VerifyResetTokenEntryError> {
-    let entry = entry.ok_or(VerifyResetTokenEntryError::ResetTokenEntryNotFound)?;
-    if entry.has_already_reset() {
-        return Err(VerifyResetTokenEntryError::AlreadyReset);
-    }
-    if entry.has_expired(reset_at) {
-        return Err(VerifyResetTokenEntryError::Expired);
-    }
-    if !entry.verify_login_id(login_id) {
-        return Err(VerifyResetTokenEntryError::LoginIdNotMatched);
-    }
-    Ok(entry.into_destination())
 }

@@ -76,7 +76,7 @@ impl LogFilter for ValidateOverridePasswordFieldsError {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::InvalidLoginId(_) => LogLevel::Error,
-            Self::InvalidPassword(_) => LogLevel::Error,
+            Self::InvalidNewPassword(_) => LogLevel::Error,
         }
     }
 }

@@ -18,14 +18,14 @@ impl std::fmt::Display for ValidateChangePasswordFieldsError {
 
 pub enum ValidateOverridePasswordFieldsError {
     InvalidLoginId(ValidateLoginIdError),
-    InvalidPassword(ValidatePasswordError),
+    InvalidNewPassword(ValidatePasswordError),
 }
 
 impl std::fmt::Display for ValidateOverridePasswordFieldsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::InvalidLoginId(err) => write!(f, "login-id: {}", err),
-            Self::InvalidPassword(err) => write!(f, "password: {}", err),
+            Self::InvalidNewPassword(err) => write!(f, "new-password: {}", err),
         }
     }
 }

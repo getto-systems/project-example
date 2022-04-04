@@ -12,22 +12,10 @@ use rusoto_dynamodb::{
     UpdateItemInput,
 };
 
-use crate::{
-    auth::{
-        user::{
-            login_id::change::infra::OverrideUserEntry,
-            password::reset::{
-                kernel::data::ResetTokenDestinationEmail,
-                token_destination::change::infra::ChangeResetTokenDestinationRepository,
-            },
-        },
-        x_outside_feature::feature::AuthOutsideStore,
-    },
-    z_lib::repository::dynamodb::helper::string_set_value,
-};
+use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
 use crate::z_lib::repository::{
-    dynamodb::helper::{string_value, timestamp_value, ScanKey},
+    dynamodb::helper::{string_set_value, string_value, timestamp_value, ScanKey},
     helper::infra_error,
 };
 
@@ -37,15 +25,15 @@ use crate::auth::user::{
         search::infra::SearchAuthUserAccountRepository,
     },
     kernel::infra::AuthUserRepository,
-    login_id::change::infra::OverrideLoginIdRepository,
+    login_id::change::infra::{OverrideLoginIdRepository, OverrideUserEntry},
     password::{
-        authenticate::infra::VerifyPasswordRepository,
+        authenticate::infra::AuthenticatePasswordRepository,
         change::infra::{ChangePasswordRepository, OverridePasswordRepository},
-        kernel::infra::{AuthUserPasswordHasher, HashedPassword},
+        kernel::infra::HashedPassword,
         reset::{
-            kernel::infra::{ResetTokenEntry, ResetTokenEntryExtract},
             request_token::infra::RegisterResetTokenRepository,
-            reset::infra::ResetPasswordRepository,
+            reset::infra::{ResetPasswordRepository, ResetTokenMoment},
+            token_destination::change::infra::ChangeResetTokenDestinationRepository,
         },
     },
 };
@@ -64,9 +52,9 @@ use crate::{
             },
             kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
             login_id::kernel::data::LoginId,
-            password::reset::{
-                kernel::data::{ResetToken, ResetTokenDestination, ResetTokenDestinationExtract},
-                reset::data::ResetPasswordRepositoryError,
+            password::reset::kernel::data::{
+                ResetToken, ResetTokenDestination, ResetTokenDestinationEmail,
+                ResetTokenDestinationExtract,
             },
         },
     },
@@ -187,7 +175,7 @@ async fn override_login_id<'client, 'a>(
 }
 
 #[async_trait::async_trait]
-impl<'client> VerifyPasswordRepository for DynamoDbAuthUserRepository<'client> {
+impl<'client> AuthenticatePasswordRepository for DynamoDbAuthUserRepository<'client> {
     async fn lookup_user_id<'a>(
         &self,
         login_id: &'a LoginId,
@@ -515,32 +503,45 @@ async fn register_reset_token<'client>(
 
 #[async_trait::async_trait]
 impl<'client> ResetPasswordRepository for DynamoDbAuthUserRepository<'client> {
-    async fn reset_token_entry(
+    async fn lookup_reset_token_entry(
         &self,
         reset_token: &ResetToken,
-    ) -> Result<Option<ResetTokenEntry>, RepositoryError> {
-        reset_token_entry(self, reset_token).await
+    ) -> Result<
+        Option<(AuthUserId, LoginId, ResetTokenDestination, ResetTokenMoment)>,
+        RepositoryError,
+    > {
+        lookup_reset_token_entry(self, reset_token).await
     }
-    async fn reset_password<'a>(
+
+    async fn lookup_granted_roles<'a>(
         &self,
-        reset_token: &'a ResetToken,
-        hasher: impl 'a + AuthUserPasswordHasher,
+        user_id: &'a AuthUserId,
+    ) -> Result<Option<GrantedAuthRoles>, RepositoryError> {
+        lookup_granted_roles(self, user_id).await
+    }
+
+    async fn reset_password(
+        &self,
+        reset_token: &ResetToken,
+        user_id: &AuthUserId,
+        new_password: HashedPassword,
         reset_at: AuthDateTime,
-    ) -> Result<AuthUserId, ResetPasswordRepositoryError> {
-        reset_password(self, reset_token, hasher, reset_at).await
+    ) -> Result<(), RepositoryError> {
+        reset_password(self, reset_token, user_id, new_password, reset_at).await
     }
 }
-async fn reset_token_entry<'client>(
+async fn lookup_reset_token_entry<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
     reset_token: &ResetToken,
-) -> Result<Option<ResetTokenEntry>, RepositoryError> {
+) -> Result<Option<(AuthUserId, LoginId, ResetTokenDestination, ResetTokenMoment)>, RepositoryError>
+{
     let mut key = AttributeMap::new();
     key.add_reset_token(reset_token.clone());
 
     let input = GetItemInput {
         table_name: repository.reset_token.into(),
         key: key.extract(),
-        projection_expression: Some("login_id, email, expires, reset_at".into()),
+        projection_expression: Some("user_id, login_id, email, expires, reset_at".into()),
         ..Default::default()
     };
 
@@ -550,84 +551,66 @@ async fn reset_token_entry<'client>(
         .await
         .map_err(|err| infra_error("get reset token error", err))?;
 
-    let found = response
-        .item
-        .and_then(|mut attrs| {
-            match (
-                attrs.remove("login_id"),
-                attrs.remove("email"),
-                attrs.remove("expires"),
-                attrs.remove("reset_at"),
-            ) {
-                (Some(login_id), Some(email), Some(expires), reset_at) => {
-                    Some((login_id, email, expires, reset_at))
-                }
-                _ => None,
-            }
-        })
-        .and_then(|(login_id, email, expires, reset_at)| {
-            match (
-                login_id.s,
-                email.s,
-                expires.n.and_then(|value| value.parse::<i64>().ok()),
-                reset_at
-                    .and_then(|attr| attr.n)
-                    .and_then(|value| value.parse::<i64>().ok()),
-            ) {
-                (Some(login_id), Some(email), Some(expires), reset_at) => {
-                    Some((login_id, email, expires, reset_at))
-                }
-                _ => None,
-            }
-        });
-
-    Ok(found.map(|(login_id, email, expires, reset_at)| {
-        ResetTokenEntryExtract {
-            login_id,
-            destination: ResetTokenDestinationExtract::Email(email),
-            expires: DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(expires, 0), Utc),
-            reset_at: reset_at.map(|reset_at| {
-                DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(reset_at, 0), Utc)
+    Ok(response.item.and_then(|mut attrs| {
+        match (
+            attrs
+                .remove("user_id")
+                .and_then(|attr| attr.s)
+                .map(AuthUserId::restore),
+            attrs
+                .remove("login_id")
+                .and_then(|attr| attr.s)
+                .map(LoginId::restore),
+            attrs.remove("email").and_then(|attr| attr.s).map(|email| {
+                ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(email))
             }),
+            attrs
+                .remove("expires")
+                .and_then(|attr| attr.n)
+                .and_then(|value| value.parse::<i64>().ok())
+                .map(|expires| {
+                    ExpireDateTime::restore(DateTime::<Utc>::from_utc(
+                        NaiveDateTime::from_timestamp(expires, 0),
+                        Utc,
+                    ))
+                }),
+            attrs
+                .remove("reset_at")
+                .and_then(|attr| attr.n)
+                .and_then(|value| value.parse::<i64>().ok())
+                .map(|reset_at| {
+                    AuthDateTime::restore(DateTime::<Utc>::from_utc(
+                        NaiveDateTime::from_timestamp(reset_at, 0),
+                        Utc,
+                    ))
+                }),
+        ) {
+            (Some(user_id), Some(login_id), Some(email), Some(expires), reset_at) => Some((
+                user_id,
+                login_id,
+                email,
+                ResetTokenMoment::restore(expires, reset_at),
+            )),
+            _ => None,
         }
-        .restore()
     }))
 }
 async fn reset_password<'client, 'a>(
     repository: &DynamoDbAuthUserRepository<'client>,
-    reset_token: &'a ResetToken,
-    hasher: impl 'a + AuthUserPasswordHasher,
+    reset_token: &ResetToken,
+    user_id: &AuthUserId,
+    new_password: HashedPassword,
     reset_at: AuthDateTime,
-) -> Result<AuthUserId, ResetPasswordRepositoryError> {
-    // reset_token が正しいことが前提; reset_token_entry() で事前に確認する
-
+) -> Result<(), RepositoryError> {
     update_reset_at(repository, reset_token.clone(), reset_at)
         .await
-        .map_err(|err| {
-            ResetPasswordRepositoryError::RepositoryError(infra_error("update reset error", err))
-        })?;
+        .map_err(|err| infra_error("update reset error", err))?;
 
-    let user_id = get_user_id_by_reset_token(repository, reset_token.clone())
+    update_password(repository, user_id.clone(), new_password)
         .await
-        .map_err(|err| {
-            ResetPasswordRepositoryError::RepositoryError(infra_error(
-                "get user id by reset token error",
-                err,
-            ))
-        })?
-        .ok_or(ResetPasswordRepositoryError::ResetTokenNotFound)?;
+        .map_err(|err| infra_error("reset password error", err))?;
 
-    let password = hasher
-        .hash_password()
-        .map_err(ResetPasswordRepositoryError::PasswordHashError)?;
-
-    update_password(repository, user_id.clone(), password)
-        .await
-        .map_err(|err| {
-            ResetPasswordRepositoryError::RepositoryError(infra_error("reset password error", err))
-        })?;
-
-    Ok(user_id)
+    Ok(())
 }
 
 async fn get_login_id_entry<'client>(
@@ -707,28 +690,6 @@ async fn get_user_id<'client>(
 
     let input = GetItemInput {
         table_name: repository.login_id.into(),
-        key: key.extract(),
-        projection_expression: Some("user_id".into()),
-        ..Default::default()
-    };
-
-    let response = repository.client.get_item(input).await?;
-
-    Ok(response
-        .item
-        .and_then(|mut attrs| attrs.remove("user_id"))
-        .and_then(|attr| attr.s)
-        .map(|user_id| AuthUserId::restore(user_id)))
-}
-async fn get_user_id_by_reset_token<'client>(
-    repository: &DynamoDbAuthUserRepository<'client>,
-    reset_token: ResetToken,
-) -> Result<Option<AuthUserId>, RusotoError<GetItemError>> {
-    let mut key = AttributeMap::new();
-    key.add_reset_token(reset_token);
-
-    let input = GetItemInput {
-        table_name: repository.reset_token.into(),
         key: key.extract(),
         projection_expression: Some("user_id".into()),
         ..Default::default()

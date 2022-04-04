@@ -122,7 +122,7 @@ async fn error_empty_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override password error; invalid password: empty password",
+        "override password error; invalid; new-password: empty password",
     ]);
     assert!(!result.is_ok());
 }
@@ -143,7 +143,7 @@ async fn error_too_long_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override password error; invalid password: too long password",
+        "override password error; invalid; new-password: too long password",
     ]);
     assert!(!result.is_ok());
 }

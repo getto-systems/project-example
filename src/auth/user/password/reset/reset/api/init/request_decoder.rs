@@ -19,7 +19,7 @@ impl ResetPasswordRequestDecoder for PbResetPasswordRequestDecoder {
         ResetPasswordFieldsExtract {
             reset_token: self.request.reset_token,
             login_id: self.request.login_id,
-            password: self.request.password,
+            new_password: self.request.new_password,
         }
     }
 }
