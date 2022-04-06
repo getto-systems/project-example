@@ -13,7 +13,7 @@ use crate::auth::user::{
         modify::infra::ModifyAuthUserAccountRepository,
         search::infra::SearchAuthUserAccountRepository,
     },
-    login_id::change::infra::{OverrideLoginIdRepository, OverrideUserEntry},
+    login_id::change::infra::{OverrideLoginIdEntry, OverrideLoginIdRepository},
     password::{
         authenticate::infra::AuthenticatePasswordRepository,
         change::infra::{ChangePasswordRepository, OverridePasswordRepository},
@@ -33,7 +33,7 @@ use crate::{
             account::{
                 kernel::data::AuthUserAccount,
                 modify::data::ModifyAuthUserAccountChanges,
-                search::data::{SearchAuthUserAccountBasket, SearchAuthUserAccountFilter},
+                search::data::{AuthUserAccountSearch, SearchAuthUserAccountFilter},
             },
             kernel::data::{AuthUser, AuthUserId, GrantedAuthRoles},
             login_id::kernel::data::LoginId,
@@ -212,7 +212,7 @@ impl MemoryAuthUserMap {
         self.login_id.remove(&login_id);
         self.reset_token_destination.remove(&login_id);
     }
-    fn insert_user(&mut self, login_id: LoginId, user: OverrideUserEntry) {
+    fn insert_user(&mut self, login_id: LoginId, user: OverrideLoginIdEntry) {
         let login_id = login_id.extract();
         self.login_id.insert(login_id.clone(), user.user_id);
         self.reset_token_destination
@@ -318,20 +318,19 @@ impl<'a> MemoryAuthUserRepository<'a> {
     }
 }
 
-// TODO Basket をやめる
 #[async_trait::async_trait]
 impl<'a> SearchAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
     async fn search(
         &self,
         filter: SearchAuthUserAccountFilter,
-    ) -> Result<SearchAuthUserAccountBasket, RepositoryError> {
+    ) -> Result<AuthUserAccountSearch, RepositoryError> {
         search(&self, filter)
     }
 }
 fn search<'a>(
     repository: &MemoryAuthUserRepository<'a>,
     filter: SearchAuthUserAccountFilter,
-) -> Result<SearchAuthUserAccountBasket, RepositoryError> {
+) -> Result<AuthUserAccountSearch, RepositoryError> {
     let store = repository.store.lock().unwrap();
     let users = store
         .all_users()
@@ -350,7 +349,7 @@ fn search<'a>(
         })
         .collect();
 
-    Ok(SearchAuthUserAccountBasket {
+    Ok(AuthUserAccountSearch {
         page: SearchPage {
             offset: 0,
             limit: 0,
@@ -363,11 +362,18 @@ fn search<'a>(
 
 #[async_trait::async_trait]
 impl<'a> ModifyAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
-    async fn lookup_user(
+    async fn lookup_user_id(
         &self,
         login_id: &LoginId,
-    ) -> Result<Option<(AuthUserId, ModifyAuthUserAccountChanges)>, RepositoryError> {
-        lookup_modify_user_data(self, login_id)
+    ) -> Result<Option<AuthUserId>, RepositoryError> {
+        lookup_user_id(self, login_id)
+    }
+
+    async fn lookup_changes(
+        &self,
+        user_id: &AuthUserId,
+    ) -> Result<Option<ModifyAuthUserAccountChanges>, RepositoryError> {
+        get_modify_user_data(self, user_id)
     }
 
     async fn modify_user(
@@ -377,30 +383,6 @@ impl<'a> ModifyAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
     ) -> Result<(), RepositoryError> {
         modify_user(self, user_id, data)
     }
-}
-fn lookup_modify_user_data<'a>(
-    repository: &MemoryAuthUserRepository<'a>,
-    login_id: &LoginId,
-) -> Result<Option<(AuthUserId, ModifyAuthUserAccountChanges)>, RepositoryError> {
-    let target_user_id: AuthUserId;
-
-    {
-        let store = repository.store.lock().unwrap();
-
-        match store.get_user_id(login_id) {
-            None => {
-                return Ok(None);
-            }
-            Some(user_id) => {
-                target_user_id = user_id.clone();
-            }
-        }
-    }
-
-    Ok(Some((
-        target_user_id.clone(),
-        get_modify_user_data(repository, &target_user_id)?,
-    )))
 }
 fn modify_user<'a>(
     repository: &MemoryAuthUserRepository<'a>,
@@ -461,7 +443,7 @@ impl<'store> OverrideLoginIdRepository for MemoryAuthUserRepository<'store> {
     async fn lookup_user<'a>(
         &self,
         login_id: &'a LoginId,
-    ) -> Result<Option<OverrideUserEntry>, RepositoryError> {
+    ) -> Result<Option<OverrideLoginIdEntry>, RepositoryError> {
         lookup_user(self, login_id)
     }
 
@@ -474,7 +456,7 @@ impl<'store> OverrideLoginIdRepository for MemoryAuthUserRepository<'store> {
 
     async fn override_login_id<'a>(
         &self,
-        user: OverrideUserEntry,
+        user: OverrideLoginIdEntry,
         new_login_id: LoginId,
     ) -> Result<(), RepositoryError> {
         override_login_id(self, user, new_login_id)
@@ -483,7 +465,7 @@ impl<'store> OverrideLoginIdRepository for MemoryAuthUserRepository<'store> {
 fn lookup_user<'store, 'a>(
     repository: &MemoryAuthUserRepository<'store>,
     login_id: &'a LoginId,
-) -> Result<Option<OverrideUserEntry>, RepositoryError> {
+) -> Result<Option<OverrideLoginIdEntry>, RepositoryError> {
     let user_id: Option<AuthUserId>;
     let reset_token_destination: ResetTokenDestination;
     {
@@ -496,7 +478,7 @@ fn lookup_user<'store, 'a>(
             .unwrap_or(ResetTokenDestination::None);
     }
 
-    Ok(user_id.map(|user_id| OverrideUserEntry {
+    Ok(user_id.map(|user_id| OverrideLoginIdEntry {
         user_id,
         login_id: login_id.clone(),
         reset_token_destination: reset_token_destination.extract(),
@@ -512,7 +494,7 @@ fn check_login_id_registered<'store, 'a>(
 }
 fn override_login_id<'store, 'a>(
     repository: &MemoryAuthUserRepository<'store>,
-    user: OverrideUserEntry,
+    user: OverrideLoginIdEntry,
     new_login_id: LoginId,
 ) -> Result<(), RepositoryError> {
     let mut store = repository.store.lock().unwrap();

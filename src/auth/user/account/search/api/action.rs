@@ -13,7 +13,7 @@ use crate::{
         ticket::kernel::data::ValidateAuthRolesError,
         user::{
             account::search::data::{
-                SearchAuthUserAccountBasket, SearchAuthUserAccountFilterExtract,
+                AuthUserAccountSearch, SearchAuthUserAccountFilterExtract,
             },
             kernel::data::RequireAuthRoles,
         },
@@ -94,7 +94,7 @@ impl<R: SearchAuthUserAccountRequestDecoder, M: SearchAuthUserAccountMaterial>
 }
 
 pub enum SearchAuthUserAccountEvent {
-    Success(SearchAuthUserAccountBasket),
+    Success(AuthUserAccountSearch),
     RepositoryError(RepositoryError),
 }
 

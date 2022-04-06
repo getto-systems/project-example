@@ -23,10 +23,15 @@ pub struct ModifyAuthUserAccountFields {
 
 #[async_trait::async_trait]
 pub trait ModifyAuthUserAccountRepository {
-    async fn lookup_user(
+    async fn lookup_user_id(
         &self,
         login_id: &LoginId,
-    ) -> Result<Option<(AuthUserId, ModifyAuthUserAccountChanges)>, RepositoryError>;
+    ) -> Result<Option<AuthUserId>, RepositoryError>;
+
+    async fn lookup_changes(
+        &self,
+        user_id: &AuthUserId,
+    ) -> Result<Option<ModifyAuthUserAccountChanges>, RepositoryError>;
 
     async fn modify_user(
         &self,

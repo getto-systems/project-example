@@ -1,7 +1,7 @@
 use crate::{
     auth::user::{
         kernel::data::AuthUserId, login_id::kernel::data::LoginId,
-        password::reset::kernel::data::ResetTokenDestinationExtract,
+        password::reset::kernel::data::ResetTokenDestination,
     },
     z_lib::repository::data::RepositoryError,
 };
@@ -25,7 +25,7 @@ pub trait OverrideLoginIdRepository {
     async fn lookup_user<'a>(
         &self,
         login_id: &'a LoginId,
-    ) -> Result<Option<OverrideUserEntry>, RepositoryError>;
+    ) -> Result<Option<OverrideLoginIdEntry>, RepositoryError>;
 
     async fn check_login_id_registered<'a>(
         &self,
@@ -34,13 +34,13 @@ pub trait OverrideLoginIdRepository {
 
     async fn override_login_id<'a>(
         &self,
-        user: OverrideUserEntry,
+        user: OverrideLoginIdEntry,
         new_login_id: LoginId,
     ) -> Result<(), RepositoryError>;
 }
 
-pub struct OverrideUserEntry {
+pub struct OverrideLoginIdEntry {
     pub user_id: AuthUserId,
     pub login_id: LoginId,
-    pub reset_token_destination: ResetTokenDestinationExtract,
+    pub reset_token_destination: ResetTokenDestination,
 }

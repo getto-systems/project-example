@@ -21,6 +21,6 @@ impl ResetTokenJwtClaims {
 
 impl Into<ResetToken> for ResetTokenJwtClaims {
     fn into(self) -> ResetToken {
-        ResetToken::new(self.sub)
+        ResetToken::restore(self.sub)
     }
 }

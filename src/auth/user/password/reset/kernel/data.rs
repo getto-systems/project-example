@@ -2,7 +2,7 @@
 pub struct ResetToken(String);
 
 impl ResetToken {
-    pub const fn new(token: String) -> Self {
+    pub const fn restore(token: String) -> Self {
         Self(token)
     }
 

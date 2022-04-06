@@ -36,6 +36,8 @@ impl<'a> DynamoDbAuthTicketRepository<'a> {
     }
 }
 
+// TODO スキーマを定義してやりたい
+
 #[async_trait::async_trait]
 impl<'a> IssueAuthTicketRepository for DynamoDbAuthTicketRepository<'a> {
     async fn issue(

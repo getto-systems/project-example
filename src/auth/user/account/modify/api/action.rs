@@ -119,8 +119,14 @@ async fn modify_user<S>(
 
     let user_repository = infra.user_repository();
 
-    let (user_id, stored_user) = user_repository
-        .lookup_user(&fields.login_id)
+    let user_id = user_repository
+        .lookup_user_id(&fields.login_id)
+        .await
+        .map_err(|err| post(ModifyAuthUserAccountEvent::RepositoryError(err)))?
+        .ok_or_else(|| post(ModifyAuthUserAccountEvent::NotFound))?;
+
+    let stored_user = user_repository
+        .lookup_changes(&user_id)
         .await
         .map_err(|err| post(ModifyAuthUserAccountEvent::RepositoryError(err)))?
         .ok_or_else(|| post(ModifyAuthUserAccountEvent::NotFound))?;
