@@ -40,21 +40,21 @@ export function SearchAuthUserAccountPagerComponent(props: Props): VNode {
 
     function basedOn({ state }: Props): VNode {
         switch (state.type) {
-            case "initial-search":
+            case "initial":
                 return EMPTY_CONTENT
 
-            case "try-to-search":
-            case "take-longtime-to-search":
+            case "try":
+            case "take-longtime":
                 if (state.previousResponse) {
                     return pagerForm({ page: state.previousResponse.page, isConnecting: true })
                 } else {
                     return EMPTY_CONTENT
                 }
 
-            case "succeed-to-search":
+            case "success":
                 return pagerForm({ page: state.response.page, isConnecting: false })
 
-            case "failed-to-search":
+            case "failed":
                 return errorMessage({ err: state.err })
         }
     }

@@ -63,7 +63,7 @@ export function ManageUserAccountPageComponent(props: ManageUserAccountPageResou
     }
 
     switch (detailState.type) {
-        case "initial-detail":
+        case "initial":
             return appLayout({
                 ...common,
                 main: appMain({
