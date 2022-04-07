@@ -28,6 +28,7 @@ export interface OverrideLoginIdAction extends StatefulApplicationAction<Overrid
     submit(user: Readonly<{ loginId: LoginId }>): Promise<OverrideLoginIdState>
 }
 
+// TODO type 簡略化
 export type OverrideLoginIdState =
     | Readonly<{ type: "initial-override-login-id" }>
     | OverrideLoginIdEvent

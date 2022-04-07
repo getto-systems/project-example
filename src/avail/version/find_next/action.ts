@@ -19,6 +19,7 @@ import { ApplicationTargetPathDetecter, CheckDeployExistsRemote } from "./infra"
 
 export type FindNextVersionAction = StatefulApplicationAction<FindNextVersionState>
 
+// TODO type 簡略化
 export type FindNextVersionState = Readonly<{ type: "initial-next-version" }> | FindNextVersionEvent
 
 const initialState: FindNextVersionState = { type: "initial-next-version" }

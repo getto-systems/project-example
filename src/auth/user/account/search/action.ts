@@ -68,6 +68,7 @@ export interface DetailAuthUserAccountAction
     isFocused(user: AuthUserAccount): boolean
 }
 
+// TODO type 簡略化
 export type SearchAuthUserAccountState =
     | Readonly<{ type: "initial-search" }>
     | SearchAuthUserAccountEvent

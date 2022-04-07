@@ -35,9 +35,10 @@ export type SetupSeasonConfig = Readonly<{
     manualSetupSeasonExpire: ExpireTime
 }>
 
+// TODO type 簡略化
 export type SetupSeasonState =
     | Readonly<{ type: "initial-setup" }>
-    | Readonly<{ type: "edit-season" }>
+    | Readonly<{ type: "edit-season" }> // TODO editable にする
     | SetupSeasonEvent
 
 const initialState: SetupSeasonState = { type: "initial-setup" }

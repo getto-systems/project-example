@@ -26,6 +26,7 @@ export type SearchColumnsInfra = Readonly<{
     columnsRepository: SearchColumnsRepository
 }>
 
+// TODO type 簡略化
 export type SearchColumnsState =
     | Readonly<{ type: "initial-search" }>
     | Readonly<{ type: "succeed-to-save"; columns: SearchColumns }>

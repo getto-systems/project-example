@@ -21,6 +21,7 @@ export type LoadSeasonMaterial = Readonly<{
     clock: Clock
 }>
 
+// TODO type 簡略化
 export type LoadSeasonState = Readonly<{ type: "initial-season" }> | LoadSeasonEvent
 
 const initialState: LoadSeasonState = { type: "initial-season" }

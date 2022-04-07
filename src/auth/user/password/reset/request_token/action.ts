@@ -25,6 +25,7 @@ export interface RequestResetTokenAction extends StatefulApplicationAction<Reque
     submit(): Promise<RequestResetTokenState>
 }
 
+// TODO type 簡略化
 export type RequestResetTokenState =
     | Readonly<{ type: "initial-request-token" }>
     | RequestResetTokenEvent

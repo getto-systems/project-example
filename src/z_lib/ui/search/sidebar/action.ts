@@ -13,6 +13,7 @@ export interface SearchSidebarAction extends StatefulApplicationAction<SearchSid
     expand(): Promise<SearchSidebarState>
 }
 
+// TODO type 簡略化
 export type SearchSidebarState =
     | Readonly<{ type: "initial-sidebar"; state: SearchSidebarExpand }>
     | Readonly<{ type: "succeed-to-save"; state: SearchSidebarExpand }>

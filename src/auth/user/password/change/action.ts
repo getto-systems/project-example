@@ -27,6 +27,7 @@ export interface ChangePasswordAction extends StatefulApplicationAction<ChangePa
     submit(): Promise<ChangePasswordState>
 }
 
+// TODO type 簡略化
 export type ChangePasswordState =
     | Readonly<{ type: "initial-change-password" }>
     | ChangePasswordEvent
