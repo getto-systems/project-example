@@ -3,7 +3,7 @@ use getto_application::data::MethodResult;
 use crate::auth::ticket::{
     kernel::infra::AuthClock,
     validate::infra::{
-        AuthMetadata, AuthMetadataContent, AuthNonceEntry, AuthNonceMetadata, AuthNonceRepository,
+        AuthMetadata, AuthMetadataContent, AuthNonceMetadata, AuthNonceRepository,
         AuthTokenDecoder, AuthTokenMetadata, ValidateService,
     },
 };
@@ -265,14 +265,14 @@ pub async fn validate_auth_nonce<S>(
         .ok_or_else(|| post(ValidateAuthNonceEvent::NonceNotSent))?;
 
     let registered_at = clock.now();
-    let expires = registered_at.clone().expires(&config.nonce_expires);
+    let expires = registered_at.expires(&config.nonce_expires);
 
     post(ValidateAuthNonceEvent::NonceExpiresCalculated(
         expires.clone(),
     ));
 
     match nonce_repository
-        .put(AuthNonceEntry::new(nonce, expires), registered_at)
+        .register(nonce, expires, registered_at)
         .await
         .map_err(|err| post(ValidateAuthNonceEvent::RepositoryError(err)))?
     {

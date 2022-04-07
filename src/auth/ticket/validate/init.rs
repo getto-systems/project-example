@@ -291,14 +291,14 @@ pub mod test {
         ValidateAuthTokenInfra,
     };
 
-    pub struct StaticValidateAuthTokenStruct<'a> {
-        pub validate_nonce: StaticValidateAuthNonceStruct<'a>,
+    pub struct StaticValidateAuthTokenStruct {
+        pub validate_nonce: StaticValidateAuthNonceStruct,
         pub token_metadata: StaticAuthTokenMetadata,
         pub token_decoder: StaticAuthTokenDecoder,
     }
 
-    impl<'a> ValidateAuthTokenInfra for StaticValidateAuthTokenStruct<'a> {
-        type ValidateNonce = StaticValidateAuthNonceStruct<'a>;
+    impl ValidateAuthTokenInfra for StaticValidateAuthTokenStruct {
+        type ValidateNonce = StaticValidateAuthNonceStruct;
         type TokenMetadata = StaticAuthTokenMetadata;
         type TokenDecoder = StaticAuthTokenDecoder;
 
@@ -335,17 +335,17 @@ pub mod test {
         }
     }
 
-    pub struct StaticValidateAuthNonceStruct<'a> {
+    pub struct StaticValidateAuthNonceStruct {
         pub config: AuthNonceConfig,
         pub clock: StaticChronoAuthClock,
         pub nonce_metadata: StaticAuthNonceMetadata,
-        pub nonce_repository: MemoryAuthNonceRepository<'a>,
+        pub nonce_repository: MemoryAuthNonceRepository,
     }
 
-    impl<'a> ValidateAuthNonceInfra for StaticValidateAuthNonceStruct<'a> {
+    impl ValidateAuthNonceInfra for StaticValidateAuthNonceStruct {
         type Clock = StaticChronoAuthClock;
         type NonceMetadata = StaticAuthNonceMetadata;
-        type NonceRepository = MemoryAuthNonceRepository<'a>;
+        type NonceRepository = MemoryAuthNonceRepository;
 
         fn clock(&self) -> &Self::Clock {
             &self.clock

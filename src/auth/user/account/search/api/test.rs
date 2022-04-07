@@ -9,9 +9,7 @@ use crate::auth::{
         kernel::init::clock::test::StaticChronoAuthClock,
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
-            nonce_repository::memory::{
-                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-            },
+            nonce_repository::memory::MemoryAuthNonceRepository,
             test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
@@ -45,8 +43,7 @@ use crate::{
 async fn success_search() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::standard();
-    let material = TestStruct::new(&store);
+    let material = TestStruct::standard();
     let request_decoder = standard_request_decoder();
 
     let mut action = SearchAuthUserAccountAction::with_material(request_decoder, material);
@@ -62,13 +59,13 @@ async fn success_search() {
     assert!(result.is_ok());
 }
 
-struct TestStruct<'a> {
-    validate: StaticValidateAuthTokenStruct<'a>,
+struct TestStruct {
+    validate: StaticValidateAuthTokenStruct,
     search_repository: MemoryAuthUserRepository,
 }
 
-impl<'a> SearchAuthUserAccountMaterial for TestStruct<'a> {
-    type Validate = StaticValidateAuthTokenStruct<'a>;
+impl SearchAuthUserAccountMaterial for TestStruct {
+    type Validate = StaticValidateAuthTokenStruct;
     type SearchRepository = MemoryAuthUserRepository;
 
     fn validate(&self) -> &Self::Validate {
@@ -79,27 +76,15 @@ impl<'a> SearchAuthUserAccountMaterial for TestStruct<'a> {
     }
 }
 
-struct TestStore {
-    nonce: MemoryAuthNonceStore,
-}
-
-impl TestStore {
+impl TestStruct {
     fn standard() -> Self {
-        Self {
-            nonce: standard_nonce_store(),
-        }
-    }
-}
-
-impl<'a> TestStruct<'a> {
-    fn new(store: &'a TestStore) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),
                     nonce_metadata: standard_nonce_header(),
-                    nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
+                    nonce_repository: standard_nonce_repository(),
                 },
                 token_metadata: standard_token_header(),
                 token_decoder: standard_token_decoder(),
@@ -157,8 +142,8 @@ fn standard_request_decoder() -> StaticSearchAuthUserAccountRequestDecoder {
     })
 }
 
-fn standard_nonce_store() -> MemoryAuthNonceStore {
-    MemoryAuthNonceMap::new().to_store()
+fn standard_nonce_repository() -> MemoryAuthNonceRepository {
+    MemoryAuthNonceRepository::new()
 }
 
 fn standard_search_repository() -> MemoryAuthUserRepository {

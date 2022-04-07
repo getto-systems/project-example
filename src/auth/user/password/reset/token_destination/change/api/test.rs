@@ -8,9 +8,7 @@ use crate::auth::{
         kernel::init::clock::test::StaticChronoAuthClock,
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
-            nonce_repository::memory::{
-                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-            },
+            nonce_repository::memory::MemoryAuthNonceRepository,
             test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
@@ -31,7 +29,7 @@ use crate::auth::ticket::validate::method::AuthNonceConfig;
 use crate::auth::user::password::reset::token_destination::change::infra::ChangeResetTokenDestinationFields;
 
 use crate::auth::{
-    ticket::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
+    ticket::kernel::data::{AuthTicketExtract, ExpireDuration},
     user::{
         kernel::data::AuthUserId,
         login_id::kernel::data::LoginId,
@@ -43,8 +41,7 @@ use crate::auth::{
 async fn success_change_destination() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
+    let material = TestStruct::standard();
     let request_decoder = standard_request_decoder();
 
     let mut action = ChangeResetTokenDestinationAction::with_material(request_decoder, material);
@@ -58,54 +55,13 @@ async fn success_change_destination() {
         "change reset token destination success",
     ]);
     assert!(result.is_ok());
-}
-
-#[tokio::test]
-async fn success_expired_nonce() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::expired_nonce();
-    let material = TestStruct::standard(&store);
-    let request_decoder = standard_request_decoder();
-
-    let mut action = ChangeResetTokenDestinationAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change reset token destination success",
-    ]);
-    assert!(result.is_ok());
-}
-
-#[tokio::test]
-async fn error_conflict_nonce() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::conflict_nonce();
-    let material = TestStruct::standard(&store);
-    let request_decoder = standard_request_decoder();
-
-    let mut action = ChangeResetTokenDestinationAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce error; conflict",
-    ]);
-    assert!(!result.is_ok());
 }
 
 #[tokio::test]
 async fn error_conflict_changes() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
+    let material = TestStruct::standard();
     let request_decoder = conflict_request_decoder();
 
     let mut action = ChangeResetTokenDestinationAction::with_material(request_decoder, material);
@@ -125,8 +81,7 @@ async fn error_conflict_changes() {
 async fn error_not_found() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
+    let material = TestStruct::standard();
     let request_decoder = not_found_request_decoder();
 
     let mut action = ChangeResetTokenDestinationAction::with_material(request_decoder, material);
@@ -142,13 +97,13 @@ async fn error_not_found() {
     assert!(!result.is_ok());
 }
 
-struct TestStruct<'a> {
-    validate: StaticValidateAuthTokenStruct<'a>,
+struct TestStruct {
+    validate: StaticValidateAuthTokenStruct,
     destination_repository: MemoryAuthUserRepository,
 }
 
-impl<'a> ChangeResetTokenDestinationMaterial for TestStruct<'a> {
-    type Validate = StaticValidateAuthTokenStruct<'a>;
+impl ChangeResetTokenDestinationMaterial for TestStruct {
+    type Validate = StaticValidateAuthTokenStruct;
 
     type DestinationRepository = MemoryAuthUserRepository;
 
@@ -160,37 +115,15 @@ impl<'a> ChangeResetTokenDestinationMaterial for TestStruct<'a> {
     }
 }
 
-struct TestStore {
-    nonce: MemoryAuthNonceStore,
-}
-
-impl TestStore {
+impl TestStruct {
     fn standard() -> Self {
-        Self {
-            nonce: standard_nonce_store(),
-        }
-    }
-    fn expired_nonce() -> Self {
-        Self {
-            nonce: expired_nonce_store(),
-        }
-    }
-    fn conflict_nonce() -> Self {
-        Self {
-            nonce: conflict_nonce_store(),
-        }
-    }
-}
-
-impl<'a> TestStruct<'a> {
-    fn standard(store: &'a TestStore) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),
                     nonce_metadata: standard_nonce_header(),
-                    nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
+                    nonce_repository: standard_nonce_repository(),
                 },
                 token_metadata: standard_token_header(),
                 token_decoder: standard_token_decoder(),
@@ -263,18 +196,8 @@ fn not_found_request_decoder() -> StaticChangeResetTokenDestinationRequestDecode
     })
 }
 
-fn standard_nonce_store() -> MemoryAuthNonceStore {
-    MemoryAuthNonceMap::new().to_store()
-}
-fn expired_nonce_store() -> MemoryAuthNonceStore {
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(-1)));
-    MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
-}
-fn conflict_nonce_store() -> MemoryAuthNonceStore {
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(1)));
-    MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
+fn standard_nonce_repository() -> MemoryAuthNonceRepository {
+    MemoryAuthNonceRepository::new()
 }
 
 fn standard_destination_repository() -> MemoryAuthUserRepository {

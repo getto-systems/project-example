@@ -21,9 +21,7 @@ use crate::auth::{
         },
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
-            nonce_repository::memory::{
-                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-            },
+            nonce_repository::memory::MemoryAuthNonceRepository,
             test::StaticValidateAuthNonceStruct,
         },
     },
@@ -85,52 +83,6 @@ async fn success_request_token() {
         "encode success",
     ]);
     assert!(result.is_ok());
-}
-
-#[tokio::test]
-async fn success_expired_nonce() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::expired_nonce();
-    let repository = TestRepository::standard();
-    let material = TestStruct::standard(&store, repository);
-    let request_decoder = standard_request_decoder();
-
-    let mut action = ResetPasswordAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "reset password notified; message-id: message-id",
-        "reset password success; user: user-id (granted: [])",
-        "expansion limit calculated; 2021-01-11 10:00:00 UTC",
-        "issue success; ticket: ticket-id / user: user-id (granted: [])",
-        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
-        "encode success",
-    ]);
-    assert!(result.is_ok());
-}
-
-#[tokio::test]
-async fn error_conflict_nonce() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::conflict_nonce();
-    let repository = TestRepository::standard();
-    let material = TestStruct::standard(&store, repository);
-    let request_decoder = standard_request_decoder();
-
-    let mut action = ResetPasswordAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce error; conflict",
-    ]);
-    assert!(!result.is_ok());
 }
 
 #[tokio::test]
@@ -391,7 +343,7 @@ async fn error_reset_token_not_stored() {
 }
 
 struct TestStruct<'a> {
-    validate_nonce: StaticValidateAuthNonceStruct<'a>,
+    validate_nonce: StaticValidateAuthNonceStruct,
     issue: StaticIssueAuthTicketStruct<'a>,
     encode: StaticEncodeAuthTicketStruct<'a>,
 
@@ -402,7 +354,7 @@ struct TestStruct<'a> {
 }
 
 impl<'a> ResetPasswordMaterial for TestStruct<'a> {
-    type ValidateNonce = StaticValidateAuthNonceStruct<'a>;
+    type ValidateNonce = StaticValidateAuthNonceStruct;
     type Issue = StaticIssueAuthTicketStruct<'a>;
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
@@ -437,26 +389,12 @@ impl<'a> ResetPasswordMaterial for TestStruct<'a> {
 }
 
 struct TestStore {
-    nonce: MemoryAuthNonceStore,
     ticket: MemoryAuthTicketStore,
 }
 
 impl TestStore {
     fn standard() -> Self {
         Self {
-            nonce: standard_nonce_store(),
-            ticket: standard_ticket_store(),
-        }
-    }
-    fn expired_nonce() -> Self {
-        Self {
-            nonce: expired_nonce_store(),
-            ticket: standard_ticket_store(),
-        }
-    }
-    fn conflict_nonce() -> Self {
-        Self {
-            nonce: conflict_nonce_store(),
             ticket: standard_ticket_store(),
         }
     }
@@ -506,7 +444,7 @@ impl<'a> TestStruct<'a> {
                 config: standard_nonce_config(),
                 clock: standard_clock(),
                 nonce_metadata: standard_nonce_metadata(),
-                nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
+                nonce_repository: standard_nonce_repository(),
             },
             issue: StaticIssueAuthTicketStruct {
                 clock: standard_clock(),
@@ -657,18 +595,8 @@ fn expired_reset_token_decoder() -> StaticResetTokenDecoder {
     StaticResetTokenDecoder::Expired
 }
 
-fn standard_nonce_store() -> MemoryAuthNonceStore {
-    MemoryAuthNonceMap::new().to_store()
-}
-fn expired_nonce_store() -> MemoryAuthNonceStore {
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(-1)));
-    MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
-}
-fn conflict_nonce_store() -> MemoryAuthNonceStore {
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(1)));
-    MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
+fn standard_nonce_repository() -> MemoryAuthNonceRepository {
+    MemoryAuthNonceRepository::new()
 }
 
 fn standard_ticket_store() -> MemoryAuthTicketStore {
@@ -679,9 +607,8 @@ fn standard_reset_token_repository() -> MemoryAuthUserRepository {
     let reset_token = ResetToken::restore(RESET_TOKEN.into());
     let destination =
         ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(EMAIL.into()));
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(1)));
     let requested_at = AuthDateTime::restore(standard_now());
+    let expires = requested_at.expires(&ExpireDuration::with_duration(Duration::days(1)));
     MemoryAuthUserRepository::with_user_and_reset_token(
         test_user_login_id(),
         test_user(),
@@ -699,9 +626,8 @@ fn expired_reset_token_repository() -> MemoryAuthUserRepository {
     let reset_token = ResetToken::restore(RESET_TOKEN.into());
     let destination =
         ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(EMAIL.into()));
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(-1)));
     let requested_at = AuthDateTime::restore(standard_now());
+    let expires = requested_at.expires(&ExpireDuration::with_duration(Duration::days(-1)));
     MemoryAuthUserRepository::with_user_and_reset_token(
         test_user_login_id(),
         test_user(),
@@ -716,9 +642,8 @@ fn discarded_reset_token_repository() -> MemoryAuthUserRepository {
     let reset_token = ResetToken::restore(RESET_TOKEN.into());
     let destination =
         ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(EMAIL.into()));
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(1)));
     let requested_at = AuthDateTime::restore(standard_now());
+    let expires = requested_at.expires(&ExpireDuration::with_duration(Duration::days(1)));
     let reset_at = AuthDateTime::restore(standard_now() - Duration::days(1));
     MemoryAuthUserRepository::with_user_and_reset_token(
         test_user_login_id(),

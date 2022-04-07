@@ -6,7 +6,7 @@ use crate::auth::user::kernel::data::{
     AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
 };
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct AuthNonce(String);
 
 impl AuthNonce {
@@ -200,7 +200,7 @@ impl AuthDateTime {
         self.0
     }
 
-    pub fn expires(self, duration: &ExpireDuration) -> ExpireDateTime {
+    pub fn expires(&self, duration: &ExpireDuration) -> ExpireDateTime {
         ExpireDateTime(self.0 + duration.0)
     }
 

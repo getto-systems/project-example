@@ -156,7 +156,7 @@ async fn request_reset_token<S>(
 
     let reset_token = token_generator.generate();
     let requested_at = clock.now();
-    let expires = requested_at.clone().expires(&config.token_expires);
+    let expires = requested_at.expires(&config.token_expires);
 
     post(RequestResetTokenEvent::TokenExpiresCalculated(
         expires.clone(),
