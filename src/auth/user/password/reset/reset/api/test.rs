@@ -24,7 +24,7 @@ use crate::auth::{
         },
     },
     user::{
-        kernel::init::user_repository::memory::MemoryAuthUserRepository,
+        kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
         password::{
             kernel::init::password_hasher::test::PlainPasswordHasher,
             reset::reset::init::{
@@ -332,7 +332,7 @@ struct TestStruct<'a> {
     encode: StaticEncodeAuthTicketStruct<'a>,
 
     clock: StaticChronoAuthClock,
-    reset_password_repository: MemoryAuthUserRepository,
+    reset_password_repository: MemoryAuthUserRepository<'a>,
     token_decoder: StaticResetTokenDecoder,
     reset_notifier: StaticResetPasswordNotifier,
 }
@@ -343,7 +343,7 @@ impl<'a> ResetPasswordMaterial for TestStruct<'a> {
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
     type Clock = StaticChronoAuthClock;
-    type ResetPasswordRepository = MemoryAuthUserRepository;
+    type ResetPasswordRepository = MemoryAuthUserRepository<'a>;
     type PasswordHasher = PlainPasswordHasher;
     type TokenDecoder = StaticResetTokenDecoder;
     type ResetNotifier = StaticResetPasswordNotifier;
@@ -375,6 +375,7 @@ impl<'a> ResetPasswordMaterial for TestStruct<'a> {
 struct TestStore {
     nonce: MemoryAuthNonceStore,
     ticket: MemoryAuthTicketStore,
+    reset_password: MemoryAuthUserStore,
 }
 
 impl TestStore {
@@ -382,6 +383,7 @@ impl TestStore {
         Self {
             nonce: MemoryAuthNonceStore::new(),
             ticket: MemoryAuthTicketStore::new(),
+            reset_password: MemoryAuthUserStore::new(),
         }
     }
 }
@@ -390,42 +392,42 @@ impl<'a> TestStruct<'a> {
     fn standard(store: &'a TestStore) -> Self {
         Self::new(
             store,
-            standard_reset_token_repository(),
+            standard_reset_token_repository(&store.reset_password),
             standard_reset_token_decoder(),
         )
     }
     fn expired_reset_token_at_decode(store: &'a TestStore) -> Self {
         Self::new(
             store,
-            standard_reset_token_repository(),
+            standard_reset_token_repository(&store.reset_password),
             expired_reset_token_decoder(),
         )
     }
     fn expired_reset_token_in_store(store: &'a TestStore) -> Self {
         Self::new(
             store,
-            expired_reset_token_repository(),
+            expired_reset_token_repository(&store.reset_password),
             standard_reset_token_decoder(),
         )
     }
     fn already_reset(store: &'a TestStore) -> Self {
         Self::new(
             store,
-            already_reset_token_repository(),
+            already_reset_token_repository(&store.reset_password),
             standard_reset_token_decoder(),
         )
     }
     fn no_reset_token(store: &'a TestStore) -> Self {
         Self::new(
             store,
-            no_reset_token_repository(),
+            no_reset_token_repository(&store.reset_password),
             standard_reset_token_decoder(),
         )
     }
 
     fn new(
         store: &'a TestStore,
-        reset_password_repository: MemoryAuthUserRepository,
+        reset_password_repository: MemoryAuthUserRepository<'a>,
         token_decoder: StaticResetTokenDecoder,
     ) -> Self {
         Self {
@@ -584,13 +586,16 @@ fn expired_reset_token_decoder() -> StaticResetTokenDecoder {
     StaticResetTokenDecoder::Expired
 }
 
-fn standard_reset_token_repository() -> MemoryAuthUserRepository {
+fn standard_reset_token_repository<'a>(
+    store: &'a MemoryAuthUserStore,
+) -> MemoryAuthUserRepository<'a> {
     let reset_token = ResetToken::restore(RESET_TOKEN.into());
     let destination =
         ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(EMAIL.into()));
     let requested_at = AuthDateTime::restore(standard_now());
     let expires = requested_at.expires(&ExpireDuration::with_duration(Duration::days(1)));
     MemoryAuthUserRepository::with_user_and_reset_token(
+        store,
         test_user_login_id(),
         test_user(),
         reset_token,
@@ -600,16 +605,19 @@ fn standard_reset_token_repository() -> MemoryAuthUserRepository {
         None,
     )
 }
-fn no_reset_token_repository() -> MemoryAuthUserRepository {
-    MemoryAuthUserRepository::new()
+fn no_reset_token_repository<'a>(store: &'a MemoryAuthUserStore) -> MemoryAuthUserRepository<'a> {
+    MemoryAuthUserRepository::new(store)
 }
-fn expired_reset_token_repository() -> MemoryAuthUserRepository {
+fn expired_reset_token_repository<'a>(
+    store: &'a MemoryAuthUserStore,
+) -> MemoryAuthUserRepository<'a> {
     let reset_token = ResetToken::restore(RESET_TOKEN.into());
     let destination =
         ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(EMAIL.into()));
     let requested_at = AuthDateTime::restore(standard_now());
     let expires = requested_at.expires(&ExpireDuration::with_duration(Duration::days(-1)));
     MemoryAuthUserRepository::with_user_and_reset_token(
+        store,
         test_user_login_id(),
         test_user(),
         reset_token,
@@ -619,7 +627,9 @@ fn expired_reset_token_repository() -> MemoryAuthUserRepository {
         None,
     )
 }
-fn already_reset_token_repository() -> MemoryAuthUserRepository {
+fn already_reset_token_repository<'a>(
+    store: &'a MemoryAuthUserStore,
+) -> MemoryAuthUserRepository<'a> {
     let reset_token = ResetToken::restore(RESET_TOKEN.into());
     let destination =
         ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(EMAIL.into()));
@@ -627,6 +637,7 @@ fn already_reset_token_repository() -> MemoryAuthUserRepository {
     let expires = requested_at.expires(&ExpireDuration::with_duration(Duration::days(1)));
     let reset_at = AuthDateTime::restore(standard_now() - Duration::days(1));
     MemoryAuthUserRepository::with_user_and_reset_token(
+        store,
         test_user_login_id(),
         test_user(),
         reset_token,

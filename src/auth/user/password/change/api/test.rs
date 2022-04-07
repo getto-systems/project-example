@@ -15,7 +15,7 @@ use crate::auth::{
         },
     },
     user::{
-        kernel::init::user_repository::memory::MemoryAuthUserRepository,
+        kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
         password::{
             change::init::request_decoder::test::StaticChangePasswordRequestDecoder,
             kernel::init::{
@@ -233,13 +233,13 @@ async fn error_password_not_stored() {
 
 struct TestStruct<'a> {
     validate: StaticValidateAuthTokenStruct<'a>,
-    password_repository: MemoryAuthUserRepository,
+    password_repository: MemoryAuthUserRepository<'a>,
 }
 
 impl<'a> ChangePasswordMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
 
-    type PasswordRepository = MemoryAuthUserRepository;
+    type PasswordRepository = MemoryAuthUserRepository<'a>;
     type PasswordMatcher = PlainPasswordMatcher;
     type PasswordHasher = PlainPasswordHasher;
 
@@ -253,28 +253,30 @@ impl<'a> ChangePasswordMaterial for TestStruct<'a> {
 
 struct TestStore {
     nonce: MemoryAuthNonceStore,
+    password: MemoryAuthUserStore,
 }
 
 impl TestStore {
     fn new() -> Self {
         Self {
             nonce: MemoryAuthNonceStore::new(),
+            password: MemoryAuthUserStore::new(),
         }
     }
 }
 
 impl<'a> TestStruct<'a> {
     fn standard(store: &'a TestStore) -> Self {
-        Self::new(store, standard_password_repository())
+        Self::new(store, standard_password_repository(&store.password))
     }
     fn match_fail(store: &'a TestStore) -> Self {
-        Self::new(store, match_fail_password_repository())
+        Self::new(store, match_fail_password_repository(&store.password))
     }
     fn no_user(store: &'a TestStore) -> Self {
-        Self::new(store, no_user_password_repository())
+        Self::new(store, no_user_password_repository(&store.password))
     }
 
-    fn new(store: &'a TestStore, password_repository: MemoryAuthUserRepository) -> Self {
+    fn new(store: &'a TestStore, password_repository: MemoryAuthUserRepository<'a>) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
@@ -369,24 +371,30 @@ fn just_max_length_new_password_request_decoder() -> StaticChangePasswordRequest
     })
 }
 
-fn standard_password_repository() -> MemoryAuthUserRepository {
+fn standard_password_repository<'a>(
+    store: &'a MemoryAuthUserStore,
+) -> MemoryAuthUserRepository<'a> {
     MemoryAuthUserRepository::with_user_and_password(
+        store,
         test_user_login_id(),
         test_user(),
         test_user_password(),
         vec![],
     )
 }
-fn match_fail_password_repository() -> MemoryAuthUserRepository {
+fn match_fail_password_repository<'a>(
+    store: &'a MemoryAuthUserStore,
+) -> MemoryAuthUserRepository<'a> {
     MemoryAuthUserRepository::with_user_and_password(
+        store,
         test_user_login_id(),
         test_user(),
         another_password(),
         vec![],
     )
 }
-fn no_user_password_repository() -> MemoryAuthUserRepository {
-    MemoryAuthUserRepository::new()
+fn no_user_password_repository<'a>(store: &'a MemoryAuthUserStore) -> MemoryAuthUserRepository<'a> {
+    MemoryAuthUserRepository::new(store)
 }
 
 fn test_user() -> AuthUser {

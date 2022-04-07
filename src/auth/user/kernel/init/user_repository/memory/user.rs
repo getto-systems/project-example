@@ -7,9 +7,10 @@ use crate::auth::user::{
     password::kernel::infra::HashedPassword,
 };
 
-pub struct MapUser {
-    store: Mutex<HashMap<AuthUserId, EntryUser>>,
+pub struct MapUser<'a> {
+    store: &'a StoreUser,
 }
+pub type StoreUser = Mutex<HashMap<AuthUserId, EntryUser>>;
 
 #[derive(Clone)]
 pub struct EntryUser {
@@ -18,11 +19,12 @@ pub struct EntryUser {
     pub password: Option<HashedPassword>,
 }
 
-impl MapUser {
-    pub fn new() -> Self {
-        Self {
-            store: Mutex::new(HashMap::new()),
-        }
+impl<'a> MapUser<'a> {
+    pub fn new_store() -> StoreUser {
+        Mutex::new(HashMap::new())
+    }
+    pub fn new(store: &'a StoreUser) -> Self {
+        Self { store }
     }
 
     pub fn get_password_and_granted_roles(
@@ -45,10 +47,7 @@ impl MapUser {
         let store = self.store.lock().unwrap();
         store.get(user_id).map(|entry| entry.granted_roles.clone())
     }
-    pub fn get_modify_changes(
-        &self,
-        user_id: &AuthUserId,
-    ) -> Option<ModifyAuthUserAccountChanges> {
+    pub fn get_modify_changes(&self, user_id: &AuthUserId) -> Option<ModifyAuthUserAccountChanges> {
         let store = self.store.lock().unwrap();
         store
             .get(user_id)

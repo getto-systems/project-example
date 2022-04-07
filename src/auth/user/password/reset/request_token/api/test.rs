@@ -12,7 +12,7 @@ use crate::auth::{
         },
     },
     user::{
-        kernel::init::user_repository::memory::MemoryAuthUserRepository,
+        kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
         password::reset::request_token::init::{
             request_decoder::test::StaticRequestResetTokenRequestDecoder,
             token_encoder::test::StaticResetTokenEncoder,
@@ -147,7 +147,7 @@ struct TestStruct<'a> {
     validate_nonce: StaticValidateAuthNonceStruct<'a>,
 
     clock: StaticChronoAuthClock,
-    reset_token_repository: MemoryAuthUserRepository,
+    reset_token_repository: MemoryAuthUserRepository<'a>,
     token_generator: StaticResetTokenGenerator,
     token_encoder: StaticResetTokenEncoder,
     token_notifier: StaticResetTokenNotifier,
@@ -158,7 +158,7 @@ impl<'a> RequestResetTokenMaterial for TestStruct<'a> {
     type ValidateNonce = StaticValidateAuthNonceStruct<'a>;
 
     type Clock = StaticChronoAuthClock;
-    type ResetTokenRepository = MemoryAuthUserRepository;
+    type ResetTokenRepository = MemoryAuthUserRepository<'a>;
     type TokenGenerator = StaticResetTokenGenerator;
     type TokenEncoder = StaticResetTokenEncoder;
     type TokenNotifier = StaticResetTokenNotifier;
@@ -189,25 +189,30 @@ impl<'a> RequestResetTokenMaterial for TestStruct<'a> {
 
 struct TestStore {
     nonce: MemoryAuthNonceStore,
+    reset_token: MemoryAuthUserStore,
 }
 
 impl TestStore {
     fn new() -> Self {
         Self {
             nonce: MemoryAuthNonceStore::new(),
+            reset_token: MemoryAuthUserStore::new(),
         }
     }
 }
 
 impl<'a> TestStruct<'a> {
     fn standard(store: &'a TestStore) -> Self {
-        Self::new(store, standard_reset_token_repository())
+        Self::new(store, standard_reset_token_repository(&store.reset_token))
     }
     fn no_destination(store: &'a TestStore) -> Self {
-        Self::new(store, no_destination_reset_token_repository())
+        Self::new(
+            store,
+            no_destination_reset_token_repository(&store.reset_token),
+        )
     }
 
-    fn new(store: &'a TestStore, reset_token_repository: MemoryAuthUserRepository) -> Self {
+    fn new(store: &'a TestStore, reset_token_repository: MemoryAuthUserRepository<'a>) -> Self {
         Self {
             validate_nonce: StaticValidateAuthNonceStruct {
                 config: standard_nonce_config(),
@@ -286,15 +291,20 @@ fn just_max_length_login_id_request_decoder() -> StaticRequestResetTokenRequestD
     }
 }
 
-fn standard_reset_token_repository() -> MemoryAuthUserRepository {
+fn standard_reset_token_repository<'a>(
+    store: &'a MemoryAuthUserStore,
+) -> MemoryAuthUserRepository<'a> {
     MemoryAuthUserRepository::with_user_id_and_destination(
+        store,
         test_user_login_id(),
         test_user_id(),
         test_user_destination(),
     )
 }
-fn no_destination_reset_token_repository() -> MemoryAuthUserRepository {
-    MemoryAuthUserRepository::with_user_id(test_user_login_id(), test_user_id())
+fn no_destination_reset_token_repository<'a>(
+    store: &'a MemoryAuthUserStore,
+) -> MemoryAuthUserRepository<'a> {
+    MemoryAuthUserRepository::with_user_id(store, test_user_login_id(), test_user_id())
 }
 
 fn test_user_id() -> AuthUserId {

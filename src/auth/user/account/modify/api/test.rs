@@ -16,7 +16,7 @@ use crate::auth::{
     },
     user::{
         account::modify::init::request_decoder::test::StaticModifyAuthUserAccountRequestDecoder,
-        kernel::init::user_repository::memory::MemoryAuthUserRepository,
+        kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
     },
 };
 
@@ -104,13 +104,13 @@ async fn error_not_found() {
 
 struct TestStruct<'a> {
     validate: StaticValidateAuthTokenStruct<'a>,
-    user_repository: MemoryAuthUserRepository,
+    user_repository: MemoryAuthUserRepository<'a>,
 }
 
 impl<'a> ModifyAuthUserAccountMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
 
-    type UserRepository = MemoryAuthUserRepository;
+    type UserRepository = MemoryAuthUserRepository<'a>;
 
     fn validate(&self) -> &Self::Validate {
         &self.validate
@@ -122,12 +122,14 @@ impl<'a> ModifyAuthUserAccountMaterial for TestStruct<'a> {
 
 struct TestStore {
     nonce: MemoryAuthNonceStore,
+    user: MemoryAuthUserStore,
 }
 
 impl TestStore {
     fn new() -> Self {
         Self {
             nonce: MemoryAuthNonceStore::new(),
+            user: MemoryAuthUserStore::new(),
         }
     }
 }
@@ -145,7 +147,7 @@ impl<'a> TestStruct<'a> {
                 token_metadata: standard_token_header(),
                 token_decoder: standard_token_decoder(),
             },
-            user_repository: standard_user_repository(),
+            user_repository: standard_user_repository(&store.user),
         }
     }
 }
@@ -220,8 +222,9 @@ fn not_found_request_decoder() -> StaticModifyAuthUserAccountRequestDecoder {
     })
 }
 
-fn standard_user_repository() -> MemoryAuthUserRepository {
+fn standard_user_repository<'a>(store: &'a MemoryAuthUserStore) -> MemoryAuthUserRepository<'a> {
     MemoryAuthUserRepository::with_user_and_password(
+        store,
         test_user_login_id(),
         test_user(),
         test_user_password(),

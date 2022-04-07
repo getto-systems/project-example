@@ -17,7 +17,7 @@ use crate::auth::{
     },
     user::{
         account::search::init::request_decoder::test::StaticSearchAuthUserAccountRequestDecoder,
-        kernel::init::user_repository::memory::MemoryAuthUserRepository,
+        kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
     },
 };
 
@@ -62,12 +62,12 @@ async fn success_search() {
 
 struct TestStruct<'a> {
     validate: StaticValidateAuthTokenStruct<'a>,
-    search_repository: MemoryAuthUserRepository,
+    search_repository: MemoryAuthUserRepository<'a>,
 }
 
 impl<'a> SearchAuthUserAccountMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
-    type SearchRepository = MemoryAuthUserRepository;
+    type SearchRepository = MemoryAuthUserRepository<'a>;
 
     fn validate(&self) -> &Self::Validate {
         &self.validate
@@ -79,12 +79,14 @@ impl<'a> SearchAuthUserAccountMaterial for TestStruct<'a> {
 
 struct TestStore {
     nonce: MemoryAuthNonceStore,
+    search: MemoryAuthUserStore,
 }
 
 impl TestStore {
     fn new() -> Self {
         Self {
             nonce: MemoryAuthNonceStore::new(),
+            search: MemoryAuthUserStore::new(),
         }
     }
 }
@@ -102,7 +104,7 @@ impl<'a> TestStruct<'a> {
                 token_metadata: standard_token_header(),
                 token_decoder: standard_token_decoder(),
             },
-            search_repository: standard_search_repository(),
+            search_repository: standard_search_repository(&store.search),
         }
     }
 }
@@ -155,8 +157,9 @@ fn standard_request_decoder() -> StaticSearchAuthUserAccountRequestDecoder {
     })
 }
 
-fn standard_search_repository() -> MemoryAuthUserRepository {
+fn standard_search_repository<'a>(store: &'a MemoryAuthUserStore) -> MemoryAuthUserRepository<'a> {
     MemoryAuthUserRepository::with_user_and_password(
+        store,
         test_user_login_id(),
         test_user(),
         test_user_password(),

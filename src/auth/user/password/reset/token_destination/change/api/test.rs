@@ -15,7 +15,7 @@ use crate::auth::{
         },
     },
     user::{
-        kernel::init::user_repository::memory::MemoryAuthUserRepository,
+        kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
         password::reset::token_destination::change::init::request_decoder::test::StaticChangeResetTokenDestinationRequestDecoder,
     },
 };
@@ -102,13 +102,13 @@ async fn error_not_found() {
 
 struct TestStruct<'a> {
     validate: StaticValidateAuthTokenStruct<'a>,
-    destination_repository: MemoryAuthUserRepository,
+    destination_repository: MemoryAuthUserRepository<'a>,
 }
 
 impl<'a> ChangeResetTokenDestinationMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
 
-    type DestinationRepository = MemoryAuthUserRepository;
+    type DestinationRepository = MemoryAuthUserRepository<'a>;
 
     fn validate(&self) -> &Self::Validate {
         &self.validate
@@ -120,12 +120,14 @@ impl<'a> ChangeResetTokenDestinationMaterial for TestStruct<'a> {
 
 struct TestStore {
     nonce: MemoryAuthNonceStore,
+    destination: MemoryAuthUserStore,
 }
 
 impl TestStore {
     fn new() -> Self {
         Self {
             nonce: MemoryAuthNonceStore::new(),
+            destination: MemoryAuthUserStore::new(),
         }
     }
 }
@@ -143,7 +145,7 @@ impl<'a> TestStruct<'a> {
                 token_metadata: standard_token_header(),
                 token_decoder: standard_token_decoder(),
             },
-            destination_repository: standard_destination_repository(),
+            destination_repository: standard_destination_repository(&store.destination),
         }
     }
 }
@@ -211,8 +213,11 @@ fn not_found_request_decoder() -> StaticChangeResetTokenDestinationRequestDecode
     })
 }
 
-fn standard_destination_repository() -> MemoryAuthUserRepository {
+fn standard_destination_repository<'a>(
+    store: &'a MemoryAuthUserStore,
+) -> MemoryAuthUserRepository<'a> {
     MemoryAuthUserRepository::with_user_id_and_destination(
+        store,
         test_login_id(),
         test_user_id(),
         test_destination(),

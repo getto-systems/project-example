@@ -15,7 +15,7 @@ use crate::auth::{
         },
     },
     user::{
-        kernel::init::user_repository::memory::MemoryAuthUserRepository,
+        kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
         login_id::change::init::request_decoder::test::StaticOverrideLoginIdRequestDecoder,
     },
 };
@@ -143,13 +143,13 @@ async fn error_login_id_already_registered() {
 
 struct TestStruct<'a> {
     validate: StaticValidateAuthTokenStruct<'a>,
-    login_id_repository: MemoryAuthUserRepository,
+    login_id_repository: MemoryAuthUserRepository<'a>,
 }
 
 impl<'a> OverrideLoginIdMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
 
-    type LoginIdRepository = MemoryAuthUserRepository;
+    type LoginIdRepository = MemoryAuthUserRepository<'a>;
 
     fn validate(&self) -> &Self::Validate {
         &self.validate
@@ -161,12 +161,14 @@ impl<'a> OverrideLoginIdMaterial for TestStruct<'a> {
 
 struct TestStore {
     nonce: MemoryAuthNonceStore,
+    login_id: MemoryAuthUserStore,
 }
 
 impl TestStore {
     fn new() -> Self {
         Self {
             nonce: MemoryAuthNonceStore::new(),
+            login_id: MemoryAuthUserStore::new(),
         }
     }
 }
@@ -184,7 +186,7 @@ impl<'a> TestStruct<'a> {
                 token_metadata: standard_token_header(),
                 token_decoder: standard_token_decoder(),
             },
-            login_id_repository: standard_login_id_repository(),
+            login_id_repository: standard_login_id_repository(&store.login_id),
         }
     }
 }
@@ -256,8 +258,11 @@ fn already_registered_login_id_request_decoder() -> StaticOverrideLoginIdRequest
     })
 }
 
-fn standard_login_id_repository() -> MemoryAuthUserRepository {
+fn standard_login_id_repository<'a>(
+    store: &'a MemoryAuthUserStore,
+) -> MemoryAuthUserRepository<'a> {
     MemoryAuthUserRepository::with_user_and_password(
+        store,
         test_user_login_id(),
         test_user(),
         test_user_password(),

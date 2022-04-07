@@ -15,7 +15,7 @@ use crate::auth::{
         },
     },
     user::{
-        kernel::init::user_repository::memory::MemoryAuthUserRepository,
+        kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
         password::{
             change::init::request_decoder::test::StaticOverridePasswordRequestDecoder,
             kernel::init::password_hasher::test::PlainPasswordHasher,
@@ -127,13 +127,13 @@ async fn just_max_length_password() {
 
 struct TestStruct<'a> {
     validate: StaticValidateAuthTokenStruct<'a>,
-    password_repository: MemoryAuthUserRepository,
+    password_repository: MemoryAuthUserRepository<'a>,
 }
 
 impl<'a> OverridePasswordMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
 
-    type PasswordRepository = MemoryAuthUserRepository;
+    type PasswordRepository = MemoryAuthUserRepository<'a>;
     type PasswordHasher = PlainPasswordHasher;
 
     fn validate(&self) -> &Self::Validate {
@@ -146,12 +146,14 @@ impl<'a> OverridePasswordMaterial for TestStruct<'a> {
 
 struct TestStore {
     nonce: MemoryAuthNonceStore,
+    password: MemoryAuthUserStore,
 }
 
 impl TestStore {
     fn new() -> Self {
         Self {
             nonce: MemoryAuthNonceStore::new(),
+            password: MemoryAuthUserStore::new(),
         }
     }
 }
@@ -169,7 +171,7 @@ impl<'a> TestStruct<'a> {
                 token_metadata: standard_token_header(),
                 token_decoder: standard_token_decoder(),
             },
-            password_repository: standard_password_repository(),
+            password_repository: standard_password_repository(&store.password),
         }
     }
 }
@@ -233,8 +235,11 @@ fn just_max_length_password_request_decoder() -> StaticOverridePasswordRequestDe
     })
 }
 
-fn standard_password_repository() -> MemoryAuthUserRepository {
+fn standard_password_repository<'a>(
+    store: &'a MemoryAuthUserStore,
+) -> MemoryAuthUserRepository<'a> {
     MemoryAuthUserRepository::with_user_and_password(
+        store,
         test_user_login_id(),
         test_user(),
         test_user_password(),

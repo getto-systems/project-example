@@ -12,9 +12,10 @@ use crate::auth::{
     },
 };
 
-pub struct MapResetToken {
-    store: Mutex<HashMap<ResetToken, EntryResetToken>>,
+pub struct MapResetToken<'a> {
+    store: &'a StoreResetToken,
 }
+pub type StoreResetToken = Mutex<HashMap<ResetToken, EntryResetToken>>;
 
 pub struct EntryResetToken {
     pub user_id: AuthUserId,
@@ -25,11 +26,12 @@ pub struct EntryResetToken {
     pub reset_at: Option<AuthDateTime>,
 }
 
-impl MapResetToken {
-    pub fn new() -> Self {
-        Self {
-            store: Mutex::new(HashMap::new()),
-        }
+impl<'a> MapResetToken<'a> {
+    pub fn new_store() -> StoreResetToken {
+        Mutex::new(HashMap::new())
+    }
+    pub fn new(store: &'a StoreResetToken) -> Self {
+        Self { store }
     }
 
     pub fn get_reset_token_entry(

@@ -4,14 +4,12 @@ mod user;
 
 use std::collections::HashMap;
 
-use crate::auth::user::kernel::data::AuthUser;
-use crate::auth::user::kernel::init::user_repository::memory::login_id::{
-    EntryLoginId, MapLoginId,
+use crate::auth::user::kernel::init::user_repository::memory::{
+    login_id::{EntryLoginId, MapLoginId, StoreLoginId},
+    reset_token::{EntryResetToken, MapResetToken, StoreResetToken},
+    user::{EntryUser, MapUser, StoreUser},
 };
-use crate::auth::user::kernel::init::user_repository::memory::reset_token::{
-    EntryResetToken, MapResetToken,
-};
-use crate::auth::user::kernel::init::user_repository::memory::user::{EntryUser, MapUser};
+
 use crate::z_lib::repository::helper::infra_error;
 
 use crate::auth::user::{
@@ -44,7 +42,7 @@ use crate::{
                     SearchAuthUserAccountSortKey,
                 },
             },
-            kernel::data::{AuthUserId, GrantedAuthRoles},
+            kernel::data::{AuthUser, AuthUserId, GrantedAuthRoles},
             login_id::kernel::data::LoginId,
             password::reset::kernel::data::{ResetToken, ResetTokenDestination},
         },
@@ -55,51 +53,54 @@ use crate::{
     },
 };
 
-pub struct MemoryAuthUserRepository {
-    user: MapUser,
-    login_id: MapLoginId,
-    reset_token: MapResetToken,
+pub struct MemoryAuthUserRepository<'a> {
+    user: MapUser<'a>,
+    login_id: MapLoginId<'a>,
+    reset_token: MapResetToken<'a>,
 }
 
-impl MemoryAuthUserRepository {
+pub struct MemoryAuthUserStore {
+    user: StoreUser,
+    login_id: StoreLoginId,
+    reset_token: StoreResetToken,
+}
+
+impl MemoryAuthUserStore {
     pub fn new() -> Self {
         Self {
-            user: MapUser::new(),
-            login_id: MapLoginId::new(),
-            reset_token: MapResetToken::new(),
+            user: MapUser::new_store(),
+            login_id: MapLoginId::new_store(),
+            reset_token: MapResetToken::new_store(),
+        }
+    }
+}
+
+impl<'a> MemoryAuthUserRepository<'a> {
+    pub fn new(store: &'a MemoryAuthUserStore) -> Self {
+        Self {
+            user: MapUser::new(&store.user),
+            login_id: MapLoginId::new(&store.login_id),
+            reset_token: MapResetToken::new(&store.reset_token),
         }
     }
 
-    pub fn insert_user(&self, login_id: LoginId, user_id: AuthUserId) {
-        self.login_id.insert_entry(
-            login_id.clone(),
-            EntryLoginId {
-                user_id: user_id.clone(),
-                reset_token_destination: None,
-            },
-        );
-        self.user.insert_entry(
-            user_id,
-            EntryUser {
-                login_id,
-                granted_roles: None,
-                password: None,
-            },
-        );
-    }
-
-    pub fn with_user_id(login_id: LoginId, user_id: AuthUserId) -> Self {
-        let repository = Self::new();
+    pub fn with_user_id(
+        store: &'a MemoryAuthUserStore,
+        login_id: LoginId,
+        user_id: AuthUserId,
+    ) -> Self {
+        let repository = Self::new(store);
         repository.insert_user(login_id, user_id);
         repository
     }
     pub fn with_user_and_password(
+        store: &'a MemoryAuthUserStore,
         login_id: LoginId,
         user: AuthUser,
         password: HashedPassword,
         users: Vec<(LoginId, AuthUserId)>,
     ) -> Self {
-        let repository = Self::new();
+        let repository = Self::new(store);
 
         let user = user.extract();
         let user_id = AuthUserId::restore(user.user_id);
@@ -128,11 +129,12 @@ impl MemoryAuthUserRepository {
         repository
     }
     pub fn with_user_id_and_destination(
+        store: &'a MemoryAuthUserStore,
         login_id: LoginId,
         user_id: AuthUserId,
         destination: ResetTokenDestination,
     ) -> Self {
-        let repository = Self::new();
+        let repository = Self::new(store);
 
         repository.login_id.insert_entry(
             login_id.clone(),
@@ -153,6 +155,7 @@ impl MemoryAuthUserRepository {
         repository
     }
     pub fn with_user_and_reset_token(
+        store: &'a MemoryAuthUserStore,
         login_id: LoginId,
         user: AuthUser,
         reset_token: ResetToken,
@@ -161,7 +164,7 @@ impl MemoryAuthUserRepository {
         requested_at: AuthDateTime,
         reset_at: Option<AuthDateTime>,
     ) -> Self {
-        let repository = Self::new();
+        let repository = Self::new(store);
 
         let user = user.extract();
         let user_id = AuthUserId::restore(user.user_id);
@@ -196,10 +199,28 @@ impl MemoryAuthUserRepository {
 
         repository
     }
+
+    fn insert_user(&self, login_id: LoginId, user_id: AuthUserId) {
+        self.login_id.insert_entry(
+            login_id.clone(),
+            EntryLoginId {
+                user_id: user_id.clone(),
+                reset_token_destination: None,
+            },
+        );
+        self.user.insert_entry(
+            user_id,
+            EntryUser {
+                login_id,
+                granted_roles: None,
+                password: None,
+            },
+        );
+    }
 }
 
 #[async_trait::async_trait]
-impl AuthenticatePasswordRepository for MemoryAuthUserRepository {
+impl<'a> AuthenticatePasswordRepository for MemoryAuthUserRepository<'a> {
     async fn lookup_user_id(
         &self,
         login_id: &LoginId,
@@ -216,7 +237,7 @@ impl AuthenticatePasswordRepository for MemoryAuthUserRepository {
 }
 
 #[async_trait::async_trait]
-impl OverrideLoginIdRepository for MemoryAuthUserRepository {
+impl<'a> OverrideLoginIdRepository for MemoryAuthUserRepository<'a> {
     async fn lookup_user(
         &self,
         login_id: &LoginId,
@@ -236,8 +257,8 @@ impl OverrideLoginIdRepository for MemoryAuthUserRepository {
         override_login_id(self, new_login_id, user)
     }
 }
-fn override_login_id(
-    repository: &MemoryAuthUserRepository,
+fn override_login_id<'a>(
+    repository: &MemoryAuthUserRepository<'a>,
     new_login_id: LoginId,
     user: OverrideLoginIdEntry,
 ) -> Result<(), RepositoryError> {
@@ -254,7 +275,7 @@ fn override_login_id(
 }
 
 #[async_trait::async_trait]
-impl ChangePasswordRepository for MemoryAuthUserRepository {
+impl<'a> ChangePasswordRepository for MemoryAuthUserRepository<'a> {
     async fn lookup_password(
         &self,
         user_id: &AuthUserId,
@@ -272,7 +293,7 @@ impl ChangePasswordRepository for MemoryAuthUserRepository {
 }
 
 #[async_trait::async_trait]
-impl OverridePasswordRepository for MemoryAuthUserRepository {
+impl<'a> OverridePasswordRepository for MemoryAuthUserRepository<'a> {
     async fn lookup_user_id(
         &self,
         login_id: &LoginId,
@@ -290,7 +311,7 @@ impl OverridePasswordRepository for MemoryAuthUserRepository {
 }
 
 #[async_trait::async_trait]
-impl ModifyAuthUserAccountRepository for MemoryAuthUserRepository {
+impl<'a> ModifyAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
     async fn lookup_user_id(
         &self,
         login_id: &LoginId,
@@ -315,7 +336,7 @@ impl ModifyAuthUserAccountRepository for MemoryAuthUserRepository {
 }
 
 #[async_trait::async_trait]
-impl ChangeResetTokenDestinationRepository for MemoryAuthUserRepository {
+impl<'a> ChangeResetTokenDestinationRepository for MemoryAuthUserRepository<'a> {
     async fn lookup_destination(
         &self,
         login_id: &LoginId,
@@ -335,7 +356,7 @@ impl ChangeResetTokenDestinationRepository for MemoryAuthUserRepository {
 }
 
 #[async_trait::async_trait]
-impl RegisterResetTokenRepository for MemoryAuthUserRepository {
+impl<'a> RegisterResetTokenRepository for MemoryAuthUserRepository<'a> {
     async fn lookup_user(
         &self,
         login_id: &LoginId,
@@ -364,7 +385,7 @@ impl RegisterResetTokenRepository for MemoryAuthUserRepository {
 }
 
 #[async_trait::async_trait]
-impl ResetPasswordRepository for MemoryAuthUserRepository {
+impl<'a> ResetPasswordRepository for MemoryAuthUserRepository<'a> {
     async fn lookup_reset_token_entry(
         &self,
         reset_token: &ResetToken,
@@ -392,8 +413,8 @@ impl ResetPasswordRepository for MemoryAuthUserRepository {
         reset_password(self, user_id, reset_token, new_password, reset_at)
     }
 }
-fn reset_password(
-    repository: &MemoryAuthUserRepository,
+fn reset_password<'a>(
+    repository: &MemoryAuthUserRepository<'a>,
     user_id: AuthUserId,
     reset_token: ResetToken,
     new_password: HashedPassword,
@@ -409,7 +430,7 @@ fn reset_password(
 }
 
 #[async_trait::async_trait]
-impl SearchAuthUserAccountRepository for MemoryAuthUserRepository {
+impl<'a> SearchAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
     async fn search(
         &self,
         filter: SearchAuthUserAccountFilter,
@@ -417,8 +438,8 @@ impl SearchAuthUserAccountRepository for MemoryAuthUserRepository {
         search(&self, filter)
     }
 }
-fn search(
-    repository: &MemoryAuthUserRepository,
+fn search<'a>(
+    repository: &MemoryAuthUserRepository<'a>,
     filter: SearchAuthUserAccountFilter,
 ) -> Result<AuthUserAccountSearch, RepositoryError> {
     let mut users = repository.user.all();

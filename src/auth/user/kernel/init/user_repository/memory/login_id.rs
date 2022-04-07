@@ -6,9 +6,10 @@ use crate::auth::user::{
     password::reset::kernel::data::ResetTokenDestination,
 };
 
-pub struct MapLoginId {
-    store: Mutex<HashMap<LoginId, EntryLoginId>>,
+pub struct MapLoginId<'a> {
+    store: &'a StoreLoginId,
 }
+pub type StoreLoginId = Mutex<HashMap<LoginId, EntryLoginId>>;
 
 #[derive(Clone)]
 pub struct EntryLoginId {
@@ -16,11 +17,12 @@ pub struct EntryLoginId {
     pub reset_token_destination: Option<ResetTokenDestination>,
 }
 
-impl MapLoginId {
-    pub fn new() -> Self {
-        Self {
-            store: Mutex::new(HashMap::new()),
-        }
+impl<'a> MapLoginId<'a> {
+    pub fn new_store() -> StoreLoginId {
+        Mutex::new(HashMap::new())
+    }
+    pub fn new(store: &'a StoreLoginId) -> Self {
+        Self { store }
     }
 
     pub fn get_user_id(&self, login_id: &LoginId) -> Option<AuthUserId> {
@@ -44,10 +46,7 @@ impl MapLoginId {
             .get(login_id)
             .map(|entry| (entry.user_id.clone(), entry.reset_token_destination.clone()))
     }
-    pub fn get_reset_token_destination(
-        &self,
-        login_id: &LoginId,
-    ) -> Option<ResetTokenDestination> {
+    pub fn get_reset_token_destination(&self, login_id: &LoginId) -> Option<ResetTokenDestination> {
         let store = self.store.lock().unwrap();
         store
             .get(login_id)
