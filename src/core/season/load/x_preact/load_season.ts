@@ -26,13 +26,13 @@ export function LoadSeasonComponent(props: Props): VNode {
 
     function body(): VNodeContent {
         switch (props.state.type) {
-            case "initial-season":
+            case "initial":
                 return EMPTY_CONTENT
 
-            case "succeed-to-load":
+            case "success":
                 return seasonLabel(props.state.season)
 
-            case "failed-to-load":
+            case "failed":
                 return errorContent(props.state.err)
         }
     }

@@ -25,7 +25,7 @@ describe("LoadSeason", () => {
         await runner(() => resource.season.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
-                    type: "succeed-to-load",
+                    type: "success",
                     season: { year: 2022, period: "summer" },
                     default: false,
                     availableSeasons: [
@@ -45,7 +45,7 @@ describe("LoadSeason", () => {
         await runner(() => resource.season.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
-                    type: "succeed-to-load",
+                    type: "success",
                     season: { year: 2021, period: "summer" },
                     default: true,
                     availableSeasons: [
@@ -65,7 +65,7 @@ describe("LoadSeason", () => {
         await runner(() => resource.season.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
-                    type: "succeed-to-load",
+                    type: "success",
                     season: { year: 2021, period: "summer" },
                     default: true,
                     availableSeasons: [
@@ -85,7 +85,7 @@ describe("LoadSeason", () => {
         await runner(() => resource.season.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
-                    type: "succeed-to-load",
+                    type: "success",
                     season: { year: 2021, period: "winter" },
                     default: true,
                     availableSeasons: [
@@ -105,7 +105,7 @@ describe("LoadSeason", () => {
         await runner(() => resource.season.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
-                    type: "succeed-to-load",
+                    type: "success",
                     season: { year: 2021, period: "winter" },
                     default: true,
                     availableSeasons: [

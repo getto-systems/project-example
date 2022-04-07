@@ -35,23 +35,23 @@ export function SetupSeasonComponent(props: Props): VNode {
 
     function basedOn({ state, load }: Props): VNode {
         switch (load.type) {
-            case "initial-season":
-            case "failed-to-load":
+            case "initial":
+            case "failed":
                 return EMPTY_CONTENT
 
-            case "succeed-to-load":
+            case "success":
                 switch (state.type) {
-                    case "initial-setup":
-                    case "succeed-to-setup":
+                    case "initial":
+                    case "success":
                         return seasonBox({ season: load.season })
 
                     case "edit-season":
                         return seasonForm({ seasons: load.availableSeasons })
 
-                    case "invalid-season":
+                    case "invalid":
                         return errorMessage({ err: ["シーズンの設定に失敗しました"] })
 
-                    case "failed-to-setup":
+                    case "failed":
                         return errorMessage({ err: repositoryError(state.err) })
                 }
         }

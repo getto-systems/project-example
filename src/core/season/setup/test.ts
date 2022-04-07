@@ -29,7 +29,7 @@ describe("SetupSeason", () => {
             store.season.set(markBoardValue("2021.summer"))
             return resource.setupSeason.setup()
         }).then((stack) => {
-            expect(stack).toEqual([{ type: "succeed-to-setup" }])
+            expect(stack).toEqual([{ type: "success" }])
         })
     })
 
@@ -39,7 +39,7 @@ describe("SetupSeason", () => {
         const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
         await runner(() => resource.setupSeason.setup()).then((stack) => {
-            expect(stack).toEqual([{ type: "succeed-to-setup" }])
+            expect(stack).toEqual([{ type: "success" }])
         })
     })
 
@@ -49,10 +49,10 @@ describe("SetupSeason", () => {
         const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
         await runner(() => {
-            store.season.set(markBoardValue("invalid-season"))
+            store.season.set(markBoardValue("invalid"))
             return resource.setupSeason.setup()
         }).then((stack) => {
-            expect(stack).toEqual([{ type: "invalid-season" }])
+            expect(stack).toEqual([{ type: "invalid" }])
         })
     })
 
@@ -65,7 +65,7 @@ describe("SetupSeason", () => {
             store.season.set(markBoardValue("2020.summer"))
             return resource.setupSeason.setup()
         }).then((stack) => {
-            expect(stack).toEqual([{ type: "invalid-season" }])
+            expect(stack).toEqual([{ type: "invalid" }])
         })
     })
 
@@ -78,7 +78,7 @@ describe("SetupSeason", () => {
             store.season.set(markBoardValue("2020.unknown"))
             return resource.setupSeason.setup()
         }).then((stack) => {
-            expect(stack).toEqual([{ type: "invalid-season" }])
+            expect(stack).toEqual([{ type: "invalid" }])
         })
     })
 
@@ -121,8 +121,8 @@ function initResource(seasonRepository: SeasonRepository): Readonly<{
                 },
             },
             {
-                ignitionState: Promise.resolve({ type: "initial-season" }),
-                load: async () => ({ type: "initial-season" }),
+                ignitionState: Promise.resolve({ type: "initial" }),
+                load: async () => ({ type: "initial" }),
             },
         ),
     }
