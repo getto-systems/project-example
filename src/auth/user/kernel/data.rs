@@ -2,7 +2,6 @@ use std::collections::HashSet;
 
 use crate::x_content::role::{AuthRole, AUTH_ROLE_ALL};
 
-// TODO 多分なくていい
 #[derive(Clone)]
 pub struct AuthUser {
     user_id: AuthUserId,
