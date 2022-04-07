@@ -26,14 +26,12 @@ export type SearchColumnsInfra = Readonly<{
     columnsRepository: SearchColumnsRepository
 }>
 
-// TODO type 簡略化
 export type SearchColumnsState =
-    | Readonly<{ type: "initial-search" }>
-    | Readonly<{ type: "succeed-to-save"; columns: SearchColumns }>
-    | Readonly<{ type: "succeed-to-load"; columns: SearchColumns }>
+    | Readonly<{ type: "initial" }>
+    | Readonly<{ type: "success"; columns: SearchColumns }>
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
-const initialState: SearchColumnsState = { type: "initial-search" }
+const initialState: SearchColumnsState = { type: "initial" }
 
 export function initSearchColumnsAction(infra: SearchColumnsInfra): SearchColumnsAction {
     return new Action(infra)
@@ -71,7 +69,7 @@ class Action
 
     async set(columns: readonly string[]): Promise<SearchColumnsState> {
         this.store.set(columns.map(toBoardValue))
-        return this.post({ type: "succeed-to-load", columns: toSearchColumns(columns) })
+        return this.post({ type: "success", columns: toSearchColumns(columns) })
     }
 
     async save(columns: SearchColumns): Promise<SearchColumnsState> {
@@ -80,7 +78,7 @@ class Action
         if (!result.success) {
             return this.post({ type: "repository-error", err: result.err })
         }
-        return this.post({ type: "succeed-to-save", columns })
+        return this.post({ type: "success", columns })
     }
 
     async load(): Promise<SearchColumnsState> {
@@ -94,6 +92,6 @@ class Action
             return this.post(this.currentState())
         }
 
-        return this.post({ type: "succeed-to-load", columns: columnsResult.value })
+        return this.post({ type: "success", columns: columnsResult.value })
     }
 }

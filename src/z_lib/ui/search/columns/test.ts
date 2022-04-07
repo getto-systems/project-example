@@ -27,10 +27,10 @@ describe("SearchColumns", () => {
             return resource.field.currentState()
         }).then((stack) => {
             expect(stack).toEqual([
-                { type: "succeed-to-load", columns: [] },
-                { type: "succeed-to-load", columns: ["column-initial"] },
-                { type: "succeed-to-save", columns: ["column-a"] },
-                { type: "succeed-to-save", columns: ["column-a", "column-b"] },
+                { type: "success", columns: [] },
+                { type: "success", columns: ["column-initial"] },
+                { type: "success", columns: ["column-a"] },
+                { type: "success", columns: ["column-a", "column-b"] },
             ])
         })
     })

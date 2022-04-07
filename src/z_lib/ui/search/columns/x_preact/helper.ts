@@ -8,11 +8,10 @@ export type SearchColumnsResult =
 export function searchColumns(columnsState: SearchColumnsState): SearchColumnsResult {
     switch (columnsState.type) {
         case "repository-error":
-        case "initial-search":
+        case "initial":
             return { found: false }
 
-        case "succeed-to-load":
-        case "succeed-to-save":
+        case "success":
             return { found: true, columns: columnsState.columns }
     }
 }
