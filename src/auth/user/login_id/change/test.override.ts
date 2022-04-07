@@ -27,8 +27,8 @@ describe("OverrideLoginId", () => {
             return resource.override.submit(user)
         }).then((stack) => {
             expect(stack).toEqual([
-                { type: "try-to-override-login-id" },
-                { type: "succeed-to-override-login-id", loginId: "new-login-id" },
+                { type: "try" },
+                { type: "success", loginId: "new-login-id" },
             ])
         })
     })
@@ -45,9 +45,9 @@ describe("OverrideLoginId", () => {
             return resource.override.submit(user)
         }).then((stack) => {
             expect(stack).toEqual([
-                { type: "try-to-override-login-id" },
-                { type: "take-longtime-to-override-login-id" },
-                { type: "succeed-to-override-login-id", loginId: "new-login-id" },
+                { type: "try" },
+                { type: "take-longtime" },
+                { type: "success", loginId: "new-login-id" },
             ])
         })
     })
@@ -59,7 +59,7 @@ describe("OverrideLoginId", () => {
 
         await runner(() => resource.override.submit(user)).then((stack) => {
             expect(stack).toEqual([
-                { type: "failed-to-override-login-id", err: { type: "validation-error" } },
+                { type: "failed", err: { type: "validation-error" } },
             ])
         })
     })

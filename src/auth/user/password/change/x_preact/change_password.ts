@@ -54,22 +54,22 @@ export function ChangePasswordComponent(props: Props): VNode {
     function basedOn({ state, editableState, validateState }: Props): VNode {
         if (editableState.isEditable) {
             switch (state.type) {
-                case "initial-change-password":
-                case "succeed-to-change-password":
+                case "initial":
+                case "success":
                     return formBox({ type: validateState })
 
-                case "try-to-change-password":
+                case "try":
                     return formBox({ type: "connecting" })
 
-                case "take-longtime-to-change-password":
+                case "take-longtime":
                     return formBox({ type: "take-longtime" })
 
-                case "failed-to-change-password":
+                case "failed":
                     return formBox({ type: validateState, err: changePasswordError(state.err) })
             }
         } else {
             return buttonBox({
-                type: state.type === "succeed-to-change-password" ? "success" : "initial",
+                type: state.type === "success" ? "success" : "initial",
             })
         }
     }
@@ -157,7 +157,7 @@ export function ChangePasswordComponent(props: Props): VNode {
                 e.preventDefault()
                 props.change.submit().then((state) => {
                     switch (state.type) {
-                        case "succeed-to-change-password":
+                        case "success":
                             props.editable.close()
                     }
                 })

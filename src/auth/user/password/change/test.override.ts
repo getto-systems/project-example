@@ -27,8 +27,8 @@ describe("OverridePassword", () => {
             return resource.override.submit(user)
         }).then((stack) => {
             expect(stack).toEqual([
-                { type: "try-to-override-password" },
-                { type: "succeed-to-override-password" },
+                { type: "try" },
+                { type: "success" },
             ])
         })
     })
@@ -45,9 +45,9 @@ describe("OverridePassword", () => {
             return resource.override.submit(user)
         }).then((stack) => {
             expect(stack).toEqual([
-                { type: "try-to-override-password" },
-                { type: "take-longtime-to-override-password" },
-                { type: "succeed-to-override-password" },
+                { type: "try" },
+                { type: "take-longtime" },
+                { type: "success" },
             ])
         })
     })
@@ -59,7 +59,7 @@ describe("OverridePassword", () => {
 
         await runner(() => resource.override.submit(user)).then((stack) => {
             expect(stack).toEqual([
-                { type: "failed-to-override-password", err: { type: "validation-error" } },
+                { type: "failed", err: { type: "validation-error" } },
             ])
         })
     })
