@@ -1,13 +1,14 @@
 use prost::Message;
 use tonic::Request;
 
-use crate::auth::user::login_id::change::y_protobuf::service::{
-    override_login_id_pb_client::OverrideLoginIdPbClient, OverrideLoginIdRequestPb,
+use crate::auth::user::password::reset::token_destination::change::y_protobuf::service::{
+    change_reset_token_destination_pb_client::ChangeResetTokenDestinationPbClient,
+    ChangeResetTokenDestinationRequestPb,
 };
 
 use crate::auth::x_outside_feature::feature::AuthOutsideService;
 
-use crate::auth::user::login_id::change::x_tonic::route::ServiceOverrideLoginId;
+use crate::auth::user::password::reset::token_destination::change::x_tonic::route::ServiceChangeDestination;
 
 use crate::z_lib::service::init::authorizer::GoogleServiceAuthorizer;
 
@@ -26,14 +27,14 @@ use crate::{
     z_lib::message::data::MessageError,
 };
 
-pub struct OverrideLoginIdProxyService<'a> {
+pub struct ChangeDestinationProxyService<'a> {
     service_url: &'static str,
     request_id: &'a str,
     authorizer: GoogleServiceAuthorizer<'a>,
     body: String,
 }
 
-impl<'a> OverrideLoginIdProxyService<'a> {
+impl<'a> ChangeDestinationProxyService<'a> {
     pub fn new(service: &'a AuthOutsideService, request_id: &'a str, body: String) -> Self {
         Self {
             service_url: service.service_url,
@@ -45,11 +46,11 @@ impl<'a> OverrideLoginIdProxyService<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthProxyService for OverrideLoginIdProxyService<'a> {
+impl<'a> AuthProxyService for ChangeDestinationProxyService<'a> {
     type Response = AuthProxyResponse;
 
     fn name(&self) -> &str {
-        ServiceOverrideLoginId::name()
+        ServiceChangeDestination::name()
     }
     async fn call(self, metadata: AuthMetadataContent) -> Result<Self::Response, AuthProxyError> {
         call(self, metadata).await
@@ -57,10 +58,10 @@ impl<'a> AuthProxyService for OverrideLoginIdProxyService<'a> {
 }
 
 async fn call<'a>(
-    service: OverrideLoginIdProxyService<'a>,
+    service: ChangeDestinationProxyService<'a>,
     metadata: AuthMetadataContent,
 ) -> Result<AuthProxyResponse, AuthProxyError> {
-    let mut client = OverrideLoginIdPbClient::new(
+    let mut client = ChangeResetTokenDestinationPbClient::new(
         new_endpoint(service.service_url)
             .map_err(|err| infra_error("service endpoint error", err))?
             .connect()
@@ -80,7 +81,7 @@ async fn call<'a>(
     .map_err(|err| infra_error("metadata error", err))?;
 
     let response = client
-        .override_login_id(request)
+        .change_destination(request)
         .await
         .map_err(AuthProxyError::from)?
         .into_inner();
@@ -90,6 +91,6 @@ async fn call<'a>(
     ))
 }
 
-fn decode_request(body: String) -> Result<OverrideLoginIdRequestPb, MessageError> {
-    OverrideLoginIdRequestPb::decode(decode_base64(body)?).map_err(invalid_protobuf)
+fn decode_request(body: String) -> Result<ChangeResetTokenDestinationRequestPb, MessageError> {
+    ChangeResetTokenDestinationRequestPb::decode(decode_base64(body)?).map_err(invalid_protobuf)
 }

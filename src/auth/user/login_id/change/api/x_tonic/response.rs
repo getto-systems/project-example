@@ -7,8 +7,6 @@ use crate::z_lib::response::tonic::ServiceResponder;
 
 use super::super::action::{OverrideLoginIdEvent, OverrideLoginIdState};
 
-use super::super::data::OverrideLoginIdError;
-
 impl ServiceResponder<OverrideLoginIdResponsePb> for OverrideLoginIdState {
     fn respond_to(self) -> Result<Response<OverrideLoginIdResponsePb>, Status> {
         match self {
@@ -25,27 +23,19 @@ impl ServiceResponder<OverrideLoginIdResponsePb> for OverrideLoginIdEvent {
                 success: true,
                 ..Default::default()
             })),
-            Self::InvalidLoginId(err) => err.respond_to(),
-            Self::RepositoryError(err) => err.respond_to(),
-        }
-    }
-}
-
-impl ServiceResponder<OverrideLoginIdResponsePb> for OverrideLoginIdError {
-    fn respond_to(self) -> Result<Response<OverrideLoginIdResponsePb>, Status> {
-        match self {
-            Self::InvalidLoginId(_) => Ok(Response::new(OverrideLoginIdResponsePb {
+            Self::Invalid(_) => Ok(Response::new(OverrideLoginIdResponsePb {
                 success: false,
-                err: OverrideLoginIdErrorKindPb::InvalidLoginId as i32,
+                err: OverrideLoginIdErrorKindPb::Invalid as i32,
             })),
-            Self::UserNotFound => Ok(Response::new(OverrideLoginIdResponsePb {
+            Self::NotFound => Ok(Response::new(OverrideLoginIdResponsePb {
                 success: false,
-                err: OverrideLoginIdErrorKindPb::InvalidLoginId as i32,
+                err: OverrideLoginIdErrorKindPb::NotFound as i32,
             })),
-            Self::LoginIdAlreadyRegistered => Ok(Response::new(OverrideLoginIdResponsePb {
+            Self::AlreadyRegistered => Ok(Response::new(OverrideLoginIdResponsePb {
                 success: false,
                 err: OverrideLoginIdErrorKindPb::AlreadyRegistered as i32,
             })),
+            Self::RepositoryError(err) => err.respond_to(),
         }
     }
 }

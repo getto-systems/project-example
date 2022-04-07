@@ -30,24 +30,28 @@ impl<'a> ResetPasswordNotifier for EmailResetPasswordNotifier<'a> {
         &self,
         destination: ResetTokenDestination,
     ) -> Result<NotifyResetPasswordResponse, NotifyResetPasswordError> {
-        let destination = destination.into();
-        let message = build_message();
-        let source = SENDER_ADDRESS.into();
+        match destination.into() {
+            None => Ok(NotifyResetPasswordResponse::NoDestination),
+            Some(destination) => {
+                let message = build_message();
+                let source = SENDER_ADDRESS.into();
 
-        let request = SendEmailRequest {
-            destination,
-            message,
-            source,
-            ..Default::default()
-        };
+                let request = SendEmailRequest {
+                    destination,
+                    message,
+                    source,
+                    ..Default::default()
+                };
 
-        let response = self
-            .client
-            .send_email(request)
-            .await
-            .map_err(|err| NotifyResetPasswordError::InfraError(format!("{}", err)))?;
+                let response = self
+                    .client
+                    .send_email(request)
+                    .await
+                    .map_err(|err| NotifyResetPasswordError::InfraError(format!("{}", err)))?;
 
-        Ok(NotifyResetPasswordResponse::new(response.message_id))
+                Ok(NotifyResetPasswordResponse::Send(response.message_id))
+            }
+        }
     }
 }
 
@@ -87,7 +91,7 @@ pub mod test {
             &self,
             _destination: ResetTokenDestination,
         ) -> Result<NotifyResetPasswordResponse, NotifyResetPasswordError> {
-            Ok(NotifyResetPasswordResponse::new("message-id".into()))
+            Ok(NotifyResetPasswordResponse::Send("message-id".into()))
         }
     }
 }

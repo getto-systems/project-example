@@ -12,29 +12,28 @@ import {
     form,
 } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
-import { notice_success } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
-import { iconHtml, icon_save, icon_spinner } from "../../../../../core/x_preact/design/icon"
+import { iconHtml } from "../../../../../core/x_preact/design/icon"
+import { icon_save, icon_spinner } from "../../../../../x_content/icon"
 
-import { InputResetTokenDestinationEntry } from "../../input/x_preact/destination"
 import { InputGrantedRolesEntry } from "../../input/x_preact/granted_roles"
 
 import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
 
 import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
 import { ModifyAuthUserAccountAction } from "../action"
-import { DetailAuthUserAccountAction } from "../../search/action"
 
-import { AuthUserAccountBasket } from "../../kernel/data"
-import { ModifyAuthUserAccountError } from "../data"
-import { v_small } from "../../../../../z_vendor/getto-css/preact/design/alignment"
+import { ModifyAuthUserAccountError, ModifyAuthUserAccountFields } from "../data"
+import { LoginId } from "../../../login_id/input/data"
+import { GrantedAuthRole } from "../../input/data"
+import { SuccessButton } from "../../../../../core/x_preact/design/button"
 
 type Props = Readonly<{
-    user: AuthUserAccountBasket
+    user: Readonly<{ loginId: LoginId; grantedRoles: readonly GrantedAuthRole[] }>
     editable: EditableBoardAction
-    detail: DetailAuthUserAccountAction
     modify: ModifyAuthUserAccountAction
+    onSuccess: { (fields: ModifyAuthUserAccountFields): void }
 }>
 export function ModifyAuthUserAccount(props: Props): VNode {
     const state = useApplicationAction(props.modify)
@@ -51,34 +50,18 @@ export function ModifyAuthUserAccount(props: Props): VNode {
                     editable: props.editable,
                     field: props.modify.grantedRoles,
                 }),
-                h(InputResetTokenDestinationEntry, {
-                    user: props.user,
-                    editable: props.editable,
-                    field: props.modify.resetTokenDestination,
-                }),
             ],
-            footer: editableState.isEditable ? editButtons() : staticButtons(),
+            footer: editableState.isEditable ? editButtons() : openButton(),
         }),
     )
 
-    function staticButtons(): VNodeContent {
-        return [openButton(), ...message()]
+    function openButton(): VNode {
+        return h(SuccessButton, { label: "変更", onClick, isSuccess: state.type === "success" })
 
-        function openButton(): VNode {
-            return button_send({ state: "normal", label: "変更", onClick })
-
-            function onClick(e: Event) {
-                e.preventDefault()
-                props.modify.reset(props.user)
-                props.editable.open()
-            }
-        }
-
-        function message(): VNode[] {
-            if (state.type === "success") {
-                return [v_small(), notice_success(["変更完了しました"])]
-            }
-            return []
+        function onClick(e: Event) {
+            e.preventDefault()
+            props.modify.reset(props.user)
+            props.editable.open()
         }
     }
 
@@ -118,7 +101,7 @@ export function ModifyAuthUserAccount(props: Props): VNode {
                 props.modify.submit(props.user).then((state) => {
                     if (state.type === "success") {
                         props.editable.close()
-                        props.detail.update(state.data)
+                        props.onSuccess(state.data)
                     }
                 })
             }
@@ -190,11 +173,11 @@ function modifyError(err: ModifyAuthUserAccountError): readonly VNodeContent[] {
         case "conflict":
             return ["他で変更がありました", "一旦リロードしてやり直してください"]
 
-        case "invalid-granted-role":
-            return ["権限が正しくありません", "一旦リロードしてやり直してください"]
+        case "not-found":
+            return ["ユーザーが見つかりませんでした", "一旦リロードしてやり直してください"]
 
-        case "invalid-reset-token-destination-email":
-            return ["メールアドレスが正しくありません"]
+        case "invalid":
+            return ["データが正しくありません", "一旦リロードしてやり直してください"]
 
         default:
             return remoteCommonErrorReason(err, (reason) => [

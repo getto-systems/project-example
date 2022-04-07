@@ -9,6 +9,7 @@ import { OverrideLoginIdAction } from "../../../../../auth/user/login_id/change/
 import { OverridePasswordAction } from "../../../../../auth/user/password/change/action"
 import { SearchSidebarAction } from "../../../../../z_lib/ui/search/sidebar/action"
 import { ModifyAuthUserAccountAction } from "../../../../../auth/user/account/modify/action"
+import { ChangeResetTokenDestinationAction } from "../../../../../auth/user/password/reset/token_destination/change/action"
 
 export type ManageUserAccountPageResource = BaseResource &
     Readonly<{
@@ -19,6 +20,10 @@ export type ManageUserAccountPageResource = BaseResource &
         modify: Readonly<{
             editable: EditableBoardAction
             modify: ModifyAuthUserAccountAction
+        }>
+        changeResetTokenDestination: Readonly<{
+            editable: EditableBoardAction
+            change: ChangeResetTokenDestinationAction
         }>
         overrideLoginId: Readonly<{
             editable: EditableBoardAction

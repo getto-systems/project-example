@@ -3,12 +3,14 @@ import { PagerOptionsContent, SortSign } from "../../../z_vendor/getto-css/preac
 
 import {
     iconHtml,
+} from "./icon"
+import {
     icon_edit,
     icon_edit_focused,
     icon_reload,
     icon_search,
-    icon_spinner,
-} from "./icon"
+    icon_spinner
+} from "../../../x_content/icon"
 import { lnir } from "../../../z_lib/ui/icon/init/line_icon"
 import { box_grow, container } from "../../../z_vendor/getto-css/preact/design/box"
 import { notice_gray } from "../../../z_vendor/getto-css/preact/design/highlight"

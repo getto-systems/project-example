@@ -18,14 +18,14 @@ import { OverrideLoginIdRemote } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
 import { BoardConverter } from "../../../../z_vendor/getto-application/board/kernel/infra"
 
-import { AuthUserAccountBasket } from "../../account/kernel/data"
+import { LoginId } from "../input/data"
 
 export interface OverrideLoginIdAction extends StatefulApplicationAction<OverrideLoginIdState> {
     readonly newLoginId: InputLoginIdAction
     readonly validate: ValidateBoardAction
 
     clear(): OverrideLoginIdState
-    submit(user: AuthUserAccountBasket): Promise<OverrideLoginIdState>
+    submit(user: Readonly<{ loginId: LoginId }>): Promise<OverrideLoginIdState>
 }
 
 export type OverrideLoginIdState =
@@ -111,7 +111,7 @@ class OverrideAction
         this.validate.clear()
         return this.post(this.initialState)
     }
-    async submit(user: AuthUserAccountBasket): Promise<OverrideLoginIdState> {
+    async submit(user: Readonly<{ loginId: LoginId }>): Promise<OverrideLoginIdState> {
         return overrideLoginId(this.material, user, this.convert(), this.post)
     }
 }
@@ -120,11 +120,11 @@ type OverrideLoginIdEvent =
     | Readonly<{ type: "try-to-override-login-id" }>
     | Readonly<{ type: "take-longtime-to-override-login-id" }>
     | Readonly<{ type: "failed-to-override-login-id"; err: ChangeLoginIdError }>
-    | Readonly<{ type: "succeed-to-override-login-id" }>
+    | Readonly<{ type: "succeed-to-override-login-id"; loginId: LoginId }>
 
 async function overrideLoginId<S>(
     { infra, config }: OverrideLoginIdMaterial,
-    user: AuthUserAccountBasket,
+    user: Readonly<{ loginId: LoginId }>,
     fields: ConvertBoardResult<OverrideLoginIdFields>,
     post: Post<OverrideLoginIdEvent, S>,
 ): Promise<S> {
@@ -134,11 +134,11 @@ async function overrideLoginId<S>(
 
     post({ type: "try-to-override-login-id" })
 
-    const { overrideLoginIdRemote: overridePasswordRemote } = infra
+    const { overrideLoginIdRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(
-        overridePasswordRemote(user, fields.value),
+        overrideLoginIdRemote(user, fields.value),
         config.takeLongtimeThreshold,
         () => post({ type: "take-longtime-to-override-login-id" }),
     )
@@ -146,7 +146,7 @@ async function overrideLoginId<S>(
         return post({ type: "failed-to-override-login-id", err: response.err })
     }
 
-    return post({ type: "succeed-to-override-login-id" })
+    return post({ type: "succeed-to-override-login-id", loginId: fields.value.newLoginId })
 }
 
 interface Post<E, S> {

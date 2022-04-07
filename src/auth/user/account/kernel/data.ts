@@ -1,7 +1,9 @@
-import { GrantedRole } from "../input/data"
+import { LoginId } from "../../login_id/input/data"
+import { ResetTokenDestination } from "../../password/reset/token_destination/kernel/data"
+import { GrantedAuthRole } from "../input/data"
 
-export type AuthUserAccountBasket = Readonly<{
-    loginId: string
-    grantedRoles: readonly GrantedRole[]
-    resetTokenDestination: { type: "none" } | { type: "email", email: string }
+export type AuthUserAccount = Readonly<{
+    loginId: LoginId
+    grantedRoles: readonly GrantedAuthRole[]
+    resetTokenDestination: ResetTokenDestination
 }>

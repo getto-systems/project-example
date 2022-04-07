@@ -54,7 +54,6 @@ impl<'a> AuthenticatePasswordMaterial for AuthenticatePasswordStruct<'a> {
     type Issue = IssueAuthTicketStruct<'a>;
     type Encode = EncodeAuthTicketStruct<'a>;
 
-    type UserRepository = DynamoDbAuthUserRepository<'a>;
     type PasswordRepository = DynamoDbAuthUserRepository<'a>;
     type PasswordMatcher = Argon2PasswordMatcher;
 
@@ -68,9 +67,6 @@ impl<'a> AuthenticatePasswordMaterial for AuthenticatePasswordStruct<'a> {
         &self.encode
     }
 
-    fn user_repository(&self) -> &Self::UserRepository {
-        &self.user_repository
-    }
     fn password_repository(&self) -> &Self::PasswordRepository {
         &self.user_repository
     }

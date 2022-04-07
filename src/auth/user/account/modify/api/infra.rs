@@ -1,32 +1,41 @@
-use crate::auth::user::{
-    account::modify::data::{ModifyAuthUserAccountRepositoryError, ValidateAuthUserAccountError},
-    kernel::data::GrantedAuthRoles,
-    login_id::kernel::data::LoginId,
+use crate::{
+    auth::user::{
+        account::modify::data::{
+            ModifyAuthUserAccountChanges, ValidateModifyAuthUserAccountFieldsError,
+        },
+        kernel::data::AuthUserId,
+        login_id::kernel::data::LoginId,
+    },
+    z_lib::repository::data::RepositoryError,
 };
 
 pub trait ModifyAuthUserAccountRequestDecoder {
-    fn decode<F: ModifyAuthUserAccountFieldsExtract>(self) -> F;
+    fn decode(
+        self,
+    ) -> Result<ModifyAuthUserAccountFields, ValidateModifyAuthUserAccountFieldsError>;
 }
 
 pub struct ModifyAuthUserAccountFields {
-    pub granted_roles: GrantedAuthRoles,
-    pub reset_token_destination: ModifyResetTokenDestination,
-}
-pub enum ModifyResetTokenDestination {
-    None,
-    Email(ModifyResetTokenDestinationEmail),
-}
-pub struct ModifyResetTokenDestinationEmail(String);
-
-pub trait ModifyAuthUserAccountFieldsExtract {
-    fn validate() -> Result<ModifyAuthUserAccountFields, ValidateAuthUserAccountError>;
+    pub login_id: LoginId,
+    pub from: ModifyAuthUserAccountChanges,
+    pub to: ModifyAuthUserAccountChanges,
 }
 
 #[async_trait::async_trait]
 pub trait ModifyAuthUserAccountRepository {
-    async fn modify_user<'a>(
+    async fn lookup_user_id(
         &self,
-        login_id: &'a LoginId,
-        fields: ModifyAuthUserAccountFields,
-    ) -> Result<(), ModifyAuthUserAccountRepositoryError>;
+        login_id: &LoginId,
+    ) -> Result<Option<AuthUserId>, RepositoryError>;
+
+    async fn lookup_changes(
+        &self,
+        user_id: &AuthUserId,
+    ) -> Result<Option<ModifyAuthUserAccountChanges>, RepositoryError>;
+
+    async fn modify_user(
+        &self,
+        user_id: AuthUserId,
+        data: ModifyAuthUserAccountChanges,
+    ) -> Result<(), RepositoryError>;
 }

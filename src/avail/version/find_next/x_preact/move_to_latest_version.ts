@@ -9,7 +9,7 @@ import {
 
 import { loginBox } from "../../../../z_vendor/getto-css/preact/layout/login"
 import { siteInfo } from "../../../../x_content/site"
-import { icon_spinner } from "../../../../core/x_preact/design/icon"
+import { icon_spinner } from "../../../../x_content/icon"
 
 import { ApplicationErrorComponent } from "../../../x_preact/application_error"
 

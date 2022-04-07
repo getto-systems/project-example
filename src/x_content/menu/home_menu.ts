@@ -1,6 +1,6 @@
 import { lnir } from "../../z_lib/ui/icon/init/line_icon"
 
-import { icon_home } from "../../core/x_preact/design/icon"
+import { icon_home } from "../icon"
 
 import { category, item } from "./common"
 

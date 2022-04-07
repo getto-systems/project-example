@@ -9,7 +9,8 @@ import { lnir } from "../../z_lib/ui/icon/init/line_icon"
 
 import { env } from "../../y_environment/ui/env"
 
-import { icon_home, iconHtml } from "../../core/x_preact/design/icon"
+import { iconHtml } from "../../core/x_preact/design/icon"
+import { icon_home } from "../../x_content/icon"
 import { siteInfo } from "../../x_content/site"
 
 type Props = Readonly<{

@@ -6,24 +6,20 @@ use crate::auth::ticket::{
     validate::method::{validate_auth_nonce, ValidateAuthNonceEvent, ValidateAuthNonceInfra},
 };
 
-use crate::auth::user::{
-    kernel::infra::AuthUserRepository,
-    password::{
-        authenticate::infra::{
-            AuthenticatePasswordFieldsExtract, AuthenticatePasswordRequestDecoder,
-            VerifyPasswordRepository,
-        },
-        kernel::infra::{AuthUserPasswordMatcher, PlainPassword},
+use crate::auth::user::password::{
+    authenticate::infra::{
+        AuthenticatePasswordFields, AuthenticatePasswordFieldsExtract,
+        AuthenticatePasswordRepository, AuthenticatePasswordRequestDecoder,
     },
+    kernel::infra::{AuthUserPasswordMatcher, PlainPassword},
 };
 
 use crate::{
     auth::user::{
         kernel::data::AuthUser,
-        login_id::kernel::data::{LoginId, ValidateLoginIdError},
         password::{
-            authenticate::data::{AuthenticatePasswordError, VerifyPasswordRepositoryError},
-            kernel::data::{PasswordHashError, ValidatePasswordError},
+            authenticate::data::ValidateAuthenticatePasswordFieldsError,
+            kernel::data::PasswordHashError,
         },
     },
     z_lib::repository::data::RepositoryError,
@@ -52,15 +48,13 @@ pub trait AuthenticatePasswordMaterial {
     type Issue: IssueAuthTicketInfra;
     type Encode: EncodeAuthTicketInfra;
 
-    type UserRepository: AuthUserRepository;
-    type PasswordRepository: VerifyPasswordRepository;
+    type PasswordRepository: AuthenticatePasswordRepository;
     type PasswordMatcher: AuthUserPasswordMatcher;
 
     fn validate_nonce(&self) -> &Self::ValidateNonce;
     fn issue(&self) -> &Self::Issue;
     fn encode(&self) -> &Self::Encode;
 
-    fn user_repository(&self) -> &Self::UserRepository;
     fn password_repository(&self) -> &Self::PasswordRepository;
     fn password_matcher(&self, plain_password: PlainPassword) -> Self::PasswordMatcher {
         Self::PasswordMatcher::new(plain_password)
@@ -124,7 +118,9 @@ impl<R: AuthenticatePasswordRequestDecoder, M: AuthenticatePasswordMaterial>
 
 pub enum AuthenticatePasswordEvent {
     Success(AuthUser),
-    InvalidPassword(AuthenticatePasswordError),
+    Invalid(ValidateAuthenticatePasswordFieldsError),
+    NotFound,
+    PasswordNotMatched,
     PasswordHashError(PasswordHashError),
     RepositoryError(RepositoryError),
 }
@@ -136,40 +132,12 @@ impl std::fmt::Display for AuthenticatePasswordEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Success(user) => write!(f, "{}; {}", SUCCESS, user),
-            Self::InvalidPassword(response) => write!(f, "{}; {}", ERROR, response),
+            Self::Invalid(err) => write!(f, "{}; invalid; {}", ERROR, err),
+            Self::NotFound => write!(f, "{}; not found", ERROR),
+            Self::PasswordNotMatched => write!(f, "{}; password not matched", ERROR),
             Self::PasswordHashError(err) => write!(f, "{}; {}", ERROR, err),
             Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
         }
-    }
-}
-
-impl Into<AuthenticatePasswordEvent> for VerifyPasswordRepositoryError {
-    fn into(self) -> AuthenticatePasswordEvent {
-        match self {
-            Self::PasswordHashError(err) => AuthenticatePasswordEvent::PasswordHashError(err),
-            Self::RepositoryError(err) => AuthenticatePasswordEvent::RepositoryError(err),
-            Self::UserNotFound => {
-                AuthenticatePasswordEvent::InvalidPassword(AuthenticatePasswordError::UserNotFound)
-            }
-            Self::PasswordNotFound => AuthenticatePasswordEvent::InvalidPassword(
-                AuthenticatePasswordError::PasswordNotFound,
-            ),
-            Self::PasswordNotMatched => AuthenticatePasswordEvent::InvalidPassword(
-                AuthenticatePasswordError::PasswordNotMatched,
-            ),
-        }
-    }
-}
-
-impl Into<AuthenticatePasswordEvent> for ValidateLoginIdError {
-    fn into(self) -> AuthenticatePasswordEvent {
-        AuthenticatePasswordEvent::InvalidPassword(AuthenticatePasswordError::InvalidLoginId(self))
-    }
-}
-
-impl Into<AuthenticatePasswordEvent> for ValidatePasswordError {
-    fn into(self) -> AuthenticatePasswordEvent {
-        AuthenticatePasswordEvent::InvalidPassword(AuthenticatePasswordError::InvalidPassword(self))
     }
 }
 
@@ -178,28 +146,32 @@ async fn authenticate_password<S>(
     fields: AuthenticatePasswordFieldsExtract,
     post: impl Fn(AuthenticatePasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
-    let login_id = LoginId::validate(fields.login_id).map_err(|err| post(err.into()))?;
-    let plain_password =
-        PlainPassword::validate(fields.password).map_err(|err| post(err.into()))?;
+    let fields = AuthenticatePasswordFields::validate(fields)
+        .map_err(|err| post(AuthenticatePasswordEvent::Invalid(err)))?;
 
     let password_repository = infra.password_repository();
-    let password_matcher = infra.password_matcher(plain_password);
+    let password_matcher = infra.password_matcher(fields.password);
 
     let user_id = password_repository
-        .verify_password(&login_id, password_matcher)
-        .await
-        .map_err(|err| post(err.into()))?;
-
-    let user_repository = infra.user_repository();
-    let user = user_repository
-        .get(&user_id)
+        .lookup_user_id(&fields.login_id)
         .await
         .map_err(|err| post(AuthenticatePasswordEvent::RepositoryError(err)))?
-        .ok_or_else(|| {
-            post(AuthenticatePasswordEvent::InvalidPassword(
-                AuthenticatePasswordError::UserNotFound,
-            ))
-        })?;
+        .ok_or_else(|| post(AuthenticatePasswordEvent::NotFound))?;
+
+    let (hashed_password, granted_roles) = password_repository
+        .lookup_user(&user_id)
+        .await
+        .map_err(|err| post(AuthenticatePasswordEvent::RepositoryError(err)))?
+        .ok_or_else(|| post(AuthenticatePasswordEvent::NotFound))?;
+
+    if !password_matcher
+        .match_password(&hashed_password)
+        .map_err(|err| post(AuthenticatePasswordEvent::PasswordHashError(err)))?
+    {
+        return Err(post(AuthenticatePasswordEvent::PasswordNotMatched));
+    }
+
+    let user = AuthUser::restore(user_id, granted_roles);
 
     post(AuthenticatePasswordEvent::Success(user.clone()));
     Ok(user)

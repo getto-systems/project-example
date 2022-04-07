@@ -5,12 +5,10 @@ use getto_application_test::ActionTestRunner;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::ticket::{
-    kernel::init::clock::test::StaticChronoAuthClock,
+    kernel::{data::AuthNonce, init::clock::test::StaticChronoAuthClock},
     validate::init::{
         nonce_metadata::test::StaticAuthNonceMetadata,
-        nonce_repository::memory::{
-            MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-        },
+        nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
         request_decoder::test::StaticValidateApiTokenRequestDecoder,
         test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
         token_decoder::test::StaticAuthTokenDecoder,
@@ -31,7 +29,7 @@ use crate::auth::{
 async fn success_allow_for_any_role() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::standard();
+    let store = TestStore::new();
     let material = TestStruct::standard(&store);
     let request_decoder = allow_any_role_request_decoder();
 
@@ -52,7 +50,7 @@ async fn success_allow_for_any_role() {
 async fn success_allow_for_user_role() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::standard();
+    let store = TestStore::new();
     let material = TestStruct::standard(&store);
     let request_decoder = allow_user_role_request_decoder();
 
@@ -73,7 +71,7 @@ async fn success_allow_for_user_role() {
 async fn error_allow_for_user_role_but_not_granted() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::standard();
+    let store = TestStore::new();
     let material = TestStruct::no_granted_roles(&store);
     let request_decoder = allow_user_role_request_decoder();
 
@@ -94,7 +92,7 @@ async fn error_allow_for_user_role_but_not_granted() {
 async fn error_token_expired() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::standard();
+    let store = TestStore::new();
     let material = TestStruct::token_expired(&store);
     let request_decoder = allow_user_role_request_decoder();
 
@@ -111,32 +109,11 @@ async fn error_token_expired() {
 }
 
 #[tokio::test]
-async fn success_expired_nonce() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::expired_nonce();
-    let material = TestStruct::standard(&store);
-    let request_decoder = allow_user_role_request_decoder();
-
-    let mut action = ValidateApiTokenAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
-        "validate api token success; user: user-role-user-id (granted: [user])",
-    ]);
-    assert!(result.is_ok());
-}
-
-#[tokio::test]
 async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::conflict_nonce();
-    let material = TestStruct::standard(&store);
+    let store = TestStore::new();
+    let material = TestStruct::conflict_nonce(&store);
     let request_decoder = allow_user_role_request_decoder();
 
     let mut action = ValidateApiTokenAction::with_material(request_decoder, material);
@@ -157,44 +134,49 @@ struct TestStore {
 }
 
 impl TestStore {
-    fn standard() -> Self {
+    fn new() -> Self {
         Self {
-            nonce: standard_nonce_store(),
-        }
-    }
-    fn expired_nonce() -> Self {
-        Self {
-            nonce: expired_nonce_store(),
-        }
-    }
-    fn conflict_nonce() -> Self {
-        Self {
-            nonce: conflict_nonce_store(),
+            nonce: MemoryAuthNonceStore::new(),
         }
     }
 }
 
 impl TestStruct {
     fn standard<'a>(store: &'a TestStore) -> StaticValidateAuthTokenStruct<'a> {
-        Self::with_token_validator(store, standard_token_decoder())
+        Self::with_token_validator(
+            standard_nonce_repository(&store.nonce),
+            standard_token_decoder(),
+        )
+    }
+    fn conflict_nonce<'a>(store: &'a TestStore) -> StaticValidateAuthTokenStruct<'a> {
+        Self::with_token_validator(
+            conflict_nonce_repository(&store.nonce),
+            standard_token_decoder(),
+        )
     }
     fn no_granted_roles<'a>(store: &'a TestStore) -> StaticValidateAuthTokenStruct<'a> {
-        Self::with_token_validator(store, no_granted_roles_token_decoder())
+        Self::with_token_validator(
+            standard_nonce_repository(&store.nonce),
+            no_granted_roles_token_decoder(),
+        )
     }
     fn token_expired<'a>(store: &'a TestStore) -> StaticValidateAuthTokenStruct<'a> {
-        Self::with_token_validator(store, expired_token_decoder())
+        Self::with_token_validator(
+            standard_nonce_repository(&store.nonce),
+            expired_token_decoder(),
+        )
     }
 
-    fn with_token_validator<'a>(
-        store: &'a TestStore,
+    fn with_token_validator(
+        nonce_repository: MemoryAuthNonceRepository,
         token_decoder: StaticAuthTokenDecoder,
-    ) -> StaticValidateAuthTokenStruct<'a> {
+    ) -> StaticValidateAuthTokenStruct {
         StaticValidateAuthTokenStruct {
             validate_nonce: StaticValidateAuthNonceStruct {
                 config: standard_nonce_config(),
                 clock: standard_clock(),
                 nonce_metadata: standard_nonce_header(),
-                nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
+                nonce_repository,
             },
             token_metadata: standard_token_header(),
             token_decoder,
@@ -257,16 +239,15 @@ fn expired_token_decoder() -> StaticAuthTokenDecoder {
     StaticAuthTokenDecoder::Expired
 }
 
-fn standard_nonce_store() -> MemoryAuthNonceStore {
-    MemoryAuthNonceMap::new().to_store()
+fn standard_nonce_repository<'a>(store: &'a MemoryAuthNonceStore) -> MemoryAuthNonceRepository<'a> {
+    MemoryAuthNonceRepository::new(store)
 }
-fn expired_nonce_store() -> MemoryAuthNonceStore {
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(-1)));
-    MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
+fn conflict_nonce_repository<'a>(store: &'a MemoryAuthNonceStore) -> MemoryAuthNonceRepository<'a> {
+    let registered_at = AuthDateTime::restore(standard_now());
+    let expires = registered_at.expires(&ExpireDuration::with_duration(Duration::days(1)));
+    MemoryAuthNonceRepository::with_nonce(store, test_nonce(), expires, registered_at)
 }
-fn conflict_nonce_store() -> MemoryAuthNonceStore {
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(1)));
-    MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
+
+fn test_nonce() -> AuthNonce {
+    AuthNonce::restore(NONCE.into())
 }

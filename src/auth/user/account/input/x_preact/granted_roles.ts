@@ -1,3 +1,4 @@
+import { html } from "htm/preact"
 import { h, VNode } from "preact"
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
@@ -5,6 +6,7 @@ import { useApplicationAction } from "../../../../../z_vendor/getto-application/
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
 import { field } from "../../../../../z_vendor/getto-css/preact/design/form"
+import { label_gray, label_info } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 
 import {
     CheckboxBoardComponent,
@@ -19,13 +21,11 @@ import {
 
 import { toBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/convert"
 
-import { GrantedRole } from "../data"
-import { AuthUserAccountBasket } from "../../kernel/data"
-import { label_gray, label_info } from "../../../../../z_vendor/getto-css/preact/design/highlight"
-import { html } from "htm/preact"
+import { GrantedAuthRole } from "../data"
+import { LoginId } from "../../../login_id/input/data"
 
 type EntryProps = Readonly<{
-    user: AuthUserAccountBasket
+    user: Readonly<{ loginId: LoginId; grantedRoles: readonly GrantedAuthRole[] }>
     editable: EditableBoardAction
     field: InputGrantedRolesAction
 }> &
@@ -68,7 +68,7 @@ export function InputGrantedRolesComponent(props: Props): VNode {
             })
         }
 
-        function grantedRoleCheckbox(grantedRole: GrantedRole): CheckboxBoardContent {
+        function grantedRoleCheckbox(grantedRole: GrantedAuthRole): CheckboxBoardContent {
             return {
                 key: grantedRole,
                 value: toBoardValue(grantedRole),
@@ -80,13 +80,13 @@ export function InputGrantedRolesComponent(props: Props): VNode {
 
 export function GrantedRoleLabels({
     grantedRoles,
-}: Readonly<{ grantedRoles: readonly GrantedRole[] }>): VNode {
+}: Readonly<{ grantedRoles: readonly GrantedAuthRole[] }>): VNode {
     if (grantedRoles.length === 0) {
         return label_gray("権限なし")
     }
     return html`${grantedRoles.map((grantedRole) => label_info(grantedRoleLabel(grantedRole)))}`
 }
-export function grantedRoleLabel(grantedRole: GrantedRole): VNodeContent {
+export function grantedRoleLabel(grantedRole: GrantedAuthRole): VNodeContent {
     switch (grantedRole) {
         case "user":
             // TODO これはメニューと一緒にしたい

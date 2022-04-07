@@ -1,5 +1,3 @@
-use chrono::{DateTime, Utc};
-
 use crate::{
     auth::{
         proxy::data::AuthProxyError,
@@ -50,47 +48,10 @@ pub trait ValidateService {
 
 #[async_trait::async_trait]
 pub trait AuthNonceRepository {
-    async fn put(
+    async fn register(
         &self,
-        nonce: AuthNonceEntry,
+        nonce: AuthNonce,
+        expires: ExpireDateTime,
         registered_at: AuthDateTime,
     ) -> Result<RegisterResult<()>, RepositoryError>;
-}
-
-pub struct AuthNonceEntry {
-    nonce: AuthNonce,
-    expires: ExpireDateTime,
-}
-
-impl AuthNonceEntry {
-    pub const fn new(nonce: AuthNonce, expires: ExpireDateTime) -> Self {
-        Self { nonce, expires }
-    }
-
-    #[cfg(test)]
-    pub fn nonce(&self) -> &AuthNonce {
-        &self.nonce
-    }
-
-    pub fn extract(self) -> AuthNonceEntryExtract {
-        AuthNonceEntryExtract {
-            nonce: self.nonce.extract(),
-            expires: self.expires.extract(),
-        }
-    }
-}
-
-#[derive(Clone)]
-pub struct AuthNonceEntryExtract {
-    pub nonce: String,
-    pub expires: DateTime<Utc>,
-}
-
-impl From<AuthNonceEntryExtract> for AuthNonceEntry {
-    fn from(src: AuthNonceEntryExtract) -> Self {
-        Self {
-            nonce: AuthNonce::restore(src.nonce),
-            expires: ExpireDateTime::restore(src.expires),
-        }
-    }
 }

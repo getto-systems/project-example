@@ -9,7 +9,7 @@ use crate::z_lib::response::tonic::ServiceResponder;
 
 use super::super::action::{SearchAuthUserAccountEvent, SearchAuthUserAccountState};
 
-use crate::auth::user::account::search::data::SearchAuthUserAccountBasket;
+use crate::auth::user::account::search::data::AuthUserAccountSearch;
 
 impl ServiceResponder<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountState {
     fn respond_to(self) -> Result<Response<SearchAuthUserAccountResponsePb>, Status> {
@@ -30,13 +30,13 @@ impl ServiceResponder<SearchAuthUserAccountResponsePb> for SearchAuthUserAccount
     }
 }
 
-impl ServiceResponder<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountBasket {
+impl ServiceResponder<SearchAuthUserAccountResponsePb> for AuthUserAccountSearch {
     fn respond_to(self) -> Result<Response<SearchAuthUserAccountResponsePb>, Status> {
         Ok(Response::new(self.into()))
     }
 }
 
-impl Into<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountBasket {
+impl Into<SearchAuthUserAccountResponsePb> for AuthUserAccountSearch {
     fn into(self) -> SearchAuthUserAccountResponsePb {
         let sort = self.sort.extract();
         SearchAuthUserAccountResponsePb {

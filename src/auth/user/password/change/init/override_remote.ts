@@ -12,8 +12,9 @@ import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 
 import { ChangePasswordRemoteResult, OverridePasswordRemote } from "../infra"
-import { AuthUserAccountBasket } from "../../../account/kernel/data"
+
 import { OverridePasswordFields } from "../data"
+import { LoginId } from "../../../login_id/input/data"
 
 export function newOverridePasswordRemote(feature: RemoteOutsideFeature): OverridePasswordRemote {
     return (user, fields) => fetchRemote(feature, user, fields)
@@ -21,7 +22,7 @@ export function newOverridePasswordRemote(feature: RemoteOutsideFeature): Overri
 
 async function fetchRemote(
     feature: RemoteOutsideFeature,
-    user: AuthUserAccountBasket,
+    user: Readonly<{ loginId: LoginId }>,
     fields: OverridePasswordFields,
 ): Promise<ChangePasswordRemoteResult> {
     try {

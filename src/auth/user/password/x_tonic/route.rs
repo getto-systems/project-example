@@ -18,7 +18,7 @@ pub struct PasswordServer {
 
 impl PasswordServer {
     pub const fn new() -> Self {
-        Self { reset: ResetServer }
+        Self { reset: ResetServer::new() }
     }
     pub fn authenticate(&self) -> AuthenticatePasswordPbServer<ServiceAuthenticate> {
         AuthenticatePasswordPbServer::new(ServiceAuthenticate)

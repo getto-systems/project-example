@@ -14,7 +14,7 @@ import { v_medium } from "../../../../z_vendor/getto-css/preact/design/alignment
 
 import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../x_content/site"
-import { icon_spinner } from "../../../../core/x_preact/design/icon"
+import { icon_spinner } from "../../../../x_content/icon"
 
 import { appendScript } from "../../../sign/x_preact/script"
 

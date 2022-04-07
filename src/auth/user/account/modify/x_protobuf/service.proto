@@ -7,24 +7,18 @@ service ModifyAuthUserAccountPb {
 }
 message ModifyAuthUserAccountRequestPb {
     string login_id = 1;
-    ModifyAuthUserAccountDataPb from = 2;
-    ModifyAuthUserAccountDataPb to = 3;
+    ModifyAuthUserAccountChangesPb from = 2;
+    ModifyAuthUserAccountChangesPb to = 3;
 }
 message ModifyAuthUserAccountResponsePb {
     bool success = 1;
-    ModifyAuthUserAccountDataPb data = 2;
-    ModifyAuthUserAccountErrorKindPb err = 3;
+    ModifyAuthUserAccountErrorKindPb err = 2;
 }
 enum ModifyAuthUserAccountErrorKindPb {
     CONFLICT = 0;
-    INVALID_GRANTED_ROLE = 1;
-    INVALID_RESET_TOKEN_DESTINATION_EMAIL = 2;
+    NOT_FOUND = 1;
+    INVALID = 2;
 }
-message ModifyAuthUserAccountDataPb {
+message ModifyAuthUserAccountChangesPb {
     repeated string granted_roles = 1;
-    ModifyResetTokenDestinationDataPb reset_token_destination = 2;
-}
-message ModifyResetTokenDestinationDataPb {
-    string type = 1;
-    string email = 2;
 }

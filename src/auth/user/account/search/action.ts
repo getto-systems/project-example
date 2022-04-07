@@ -39,7 +39,7 @@ import {
     SearchAuthUserAccountSort,
     SearchAuthUserAccountSortKey,
 } from "./data"
-import { AuthUserAccountBasket } from "../kernel/data"
+import { AuthUserAccount } from "../kernel/data"
 
 export interface SearchAuthUserAccountAction extends ListAuthUserAccountAction {
     readonly loginId: SearchLoginIdAction
@@ -61,11 +61,11 @@ export interface ListAuthUserAccountAction
 }
 export interface DetailAuthUserAccountAction
     extends StatefulApplicationAction<DetailAuthUserAccountState> {
-    focus(user: AuthUserAccountBasket): DetailAuthUserAccountState
-    update(user: AuthUserAccountBasket): DetailAuthUserAccountState
+    focus(user: AuthUserAccount): DetailAuthUserAccountState
+    update(user: AuthUserAccount): DetailAuthUserAccountState
     close(): DetailAuthUserAccountState
 
-    isFocused(user: AuthUserAccountBasket): boolean
+    isFocused(user: AuthUserAccount): boolean
 }
 
 export type SearchAuthUserAccountState =
@@ -77,8 +77,8 @@ const initialSearchState: SearchAuthUserAccountState = { type: "initial-search" 
 export type DetailAuthUserAccountState =
     | Readonly<{ type: "initial-detail" }>
     | Readonly<{ type: "focus-failed" }>
-    | Readonly<{ type: "focus-detected"; user: AuthUserAccountBasket }>
-    | Readonly<{ type: "focus-on"; user: AuthUserAccountBasket }>
+    | Readonly<{ type: "focus-detected"; user: AuthUserAccount }>
+    | Readonly<{ type: "focus-on"; user: AuthUserAccount }>
 
 const initialDetailState: DetailAuthUserAccountState = { type: "initial-detail" }
 
@@ -239,7 +239,7 @@ class Action
         return state
     }
 
-    update(user: AuthUserAccountBasket): SearchAuthUserAccountState {
+    update(user: AuthUserAccount): SearchAuthUserAccountState {
         if (!this.response) {
             return this.currentState()
         }
@@ -312,11 +312,11 @@ type DetailMaterial = Readonly<{
 
 interface DetailInfra {
     detectUser(loginId: string): Promise<DetectUserResult>
-    updateUser(user: AuthUserAccountBasket): void
+    updateUser(user: AuthUserAccount): void
 }
 type DetectUserResult =
     | Readonly<{ found: false }>
-    | Readonly<{ found: true; user: AuthUserAccountBasket }>
+    | Readonly<{ found: true; user: AuthUserAccount }>
 
 type DetailShell = Readonly<{
     detectFocus: FocusAuthUserAccountDetecter
@@ -348,11 +348,11 @@ class DetailAction
         this.material = material
     }
 
-    focus(user: AuthUserAccountBasket): DetailAuthUserAccountState {
+    focus(user: AuthUserAccount): DetailAuthUserAccountState {
         this.material.shell.updateFocus.focus(user)
         return this.post({ type: "focus-on", user })
     }
-    update(user: AuthUserAccountBasket): DetailAuthUserAccountState {
+    update(user: AuthUserAccount): DetailAuthUserAccountState {
         this.material.infra.updateUser(user)
         return this.post({ type: "focus-on", user })
     }
@@ -361,7 +361,7 @@ class DetailAction
         return this.post({ type: "initial-detail" })
     }
 
-    isFocused(user: AuthUserAccountBasket): boolean {
+    isFocused(user: AuthUserAccount): boolean {
         const state = this.currentState()
         switch (state.type) {
             case "initial-detail":

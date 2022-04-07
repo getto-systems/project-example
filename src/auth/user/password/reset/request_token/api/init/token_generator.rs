@@ -8,7 +8,7 @@ pub struct UuidResetTokenGenerator;
 
 impl ResetTokenGenerator for UuidResetTokenGenerator {
     fn generate(&self) -> ResetToken {
-        ResetToken::new(Uuid::new_v4().to_string())
+        ResetToken::restore(Uuid::new_v4().to_string())
     }
 }
 

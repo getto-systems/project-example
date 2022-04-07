@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package auth.user.password.reset.token_destination.change.service;
+
+service ChangeResetTokenDestinationPb {
+    rpc ChangeDestination (ChangeResetTokenDestinationRequestPb) returns (ChangeResetTokenDestinationResponsePb);
+}
+message ChangeResetTokenDestinationRequestPb {
+    string login_id = 1;
+    ResetTokenDestinationPb from = 2;
+    ResetTokenDestinationPb to = 3;
+}
+message ChangeResetTokenDestinationResponsePb {
+    bool success = 1;
+    ChangeResetTokenDestinationErrorKindPb err = 2;
+}
+enum ChangeResetTokenDestinationErrorKindPb {
+    CONFLICT = 0;
+    NOT_FOUND = 1;
+    INVALID = 2;
+}
+message ResetTokenDestinationPb {
+    string type = 1;
+    string email = 2;
+}

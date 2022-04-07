@@ -4,47 +4,52 @@ use crate::auth::ticket::validate::method::{
     validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
 };
 
-use crate::auth::user::login_id::change::data::OverrideLoginIdRepositoryError;
-use crate::auth::user::login_id::change::infra::{
-    OverrideLoginIdRepository, OverrideLoginIdRequestDecoder, OverrideLoginIdFieldsExtract,
+use crate::auth::user::account::modify::infra::{
+    ModifyAuthUserAccountFields, ModifyAuthUserAccountRepository,
+    ModifyAuthUserAccountRequestDecoder,
 };
 
 use crate::{
-    auth::user::login_id::{change::data::OverrideLoginIdError, kernel::data::LoginId},
+    auth::user::account::modify::data::ValidateModifyAuthUserAccountFieldsError,
     z_lib::repository::data::RepositoryError,
 };
 
-pub enum OverrideLoginIdState {
+pub enum ModifyAuthUserAccountState {
     Validate(ValidateAuthTokenEvent),
-    Override(OverrideLoginIdEvent),
+    ModifyUser(ModifyAuthUserAccountEvent),
 }
 
-impl std::fmt::Display for OverrideLoginIdState {
+impl std::fmt::Display for ModifyAuthUserAccountState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Validate(event) => event.fmt(f),
-            Self::Override(event) => event.fmt(f),
+            Self::ModifyUser(event) => event.fmt(f),
         }
     }
 }
 
-pub trait OverrideLoginIdMaterial {
+pub trait ModifyAuthUserAccountMaterial {
     type Validate: ValidateAuthTokenInfra;
 
-    type LoginIdRepository: OverrideLoginIdRepository;
+    type UserRepository: ModifyAuthUserAccountRepository;
 
     fn validate(&self) -> &Self::Validate;
 
-    fn login_id_repository(&self) -> &Self::LoginIdRepository;
+    fn user_repository(&self) -> &Self::UserRepository;
 }
 
-pub struct OverrideLoginIdAction<R: OverrideLoginIdRequestDecoder, M: OverrideLoginIdMaterial> {
-    pubsub: ActionStatePubSub<OverrideLoginIdState>,
+pub struct ModifyAuthUserAccountAction<
+    R: ModifyAuthUserAccountRequestDecoder,
+    M: ModifyAuthUserAccountMaterial,
+> {
+    pubsub: ActionStatePubSub<ModifyAuthUserAccountState>,
     request_decoder: R,
     material: M,
 }
 
-impl<R: OverrideLoginIdRequestDecoder, M: OverrideLoginIdMaterial> OverrideLoginIdAction<R, M> {
+impl<R: ModifyAuthUserAccountRequestDecoder, M: ModifyAuthUserAccountMaterial>
+    ModifyAuthUserAccountAction<R, M>
+{
     pub fn with_material(request_decoder: R, material: M) -> Self {
         Self {
             pubsub: ActionStatePubSub::new(),
@@ -53,87 +58,87 @@ impl<R: OverrideLoginIdRequestDecoder, M: OverrideLoginIdMaterial> OverrideLogin
         }
     }
 
-    pub fn subscribe(&mut self, handler: impl 'static + Fn(&OverrideLoginIdState) + Send + Sync) {
+    pub fn subscribe(
+        &mut self,
+        handler: impl 'static + Fn(&ModifyAuthUserAccountState) + Send + Sync,
+    ) {
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<OverrideLoginIdState> {
+    pub async fn ignite(self) -> MethodResult<ModifyAuthUserAccountState> {
         let pubsub = self.pubsub;
         let m = self.material;
 
         let fields = self.request_decoder.decode();
 
         validate_auth_token(m.validate(), |event| {
-            pubsub.post(OverrideLoginIdState::Validate(event))
+            pubsub.post(ModifyAuthUserAccountState::Validate(event))
         })
         .await?;
 
-        override_login_id(&m, fields, |event| {
-            pubsub.post(OverrideLoginIdState::Override(event))
+        modify_user(&m, fields, |event| {
+            pubsub.post(ModifyAuthUserAccountState::ModifyUser(event))
         })
         .await
     }
 }
 
-pub enum OverrideLoginIdEvent {
+pub enum ModifyAuthUserAccountEvent {
     Success,
-    InvalidLoginId(OverrideLoginIdError),
+    Invalid(ValidateModifyAuthUserAccountFieldsError),
+    NotFound,
+    Conflict,
     RepositoryError(RepositoryError),
 }
 
-mod override_login_id_event {
-    use super::OverrideLoginIdEvent;
+mod modify_auth_user_account_event {
+    use super::ModifyAuthUserAccountEvent;
 
-    const SUCCESS: &'static str = "override login-id success";
-    const ERROR: &'static str = "override login-id error";
+    const SUCCESS: &'static str = "modify auth user account success";
+    const ERROR: &'static str = "modify auth user account error";
 
-    impl std::fmt::Display for OverrideLoginIdEvent {
+    impl std::fmt::Display for ModifyAuthUserAccountEvent {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
                 Self::Success => write!(f, "{}", SUCCESS),
-                Self::InvalidLoginId(response) => write!(f, "{}; {}", ERROR, response),
+                Self::Invalid(err) => err.fmt(f),
+                Self::NotFound => write!(f, "{}; not found", ERROR),
+                Self::Conflict => write!(f, "{}; changes conflicted", ERROR),
                 Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
             }
         }
     }
 }
 
-impl Into<OverrideLoginIdEvent> for OverrideLoginIdRepositoryError {
-    fn into(self) -> OverrideLoginIdEvent {
-        match self {
-            Self::RepositoryError(err) => OverrideLoginIdEvent::RepositoryError(err),
-            Self::UserNotFound => {
-                OverrideLoginIdEvent::InvalidLoginId(OverrideLoginIdError::UserNotFound)
-            }
-            Self::LoginIdAlreadyRegistered => {
-                OverrideLoginIdEvent::InvalidLoginId(OverrideLoginIdError::LoginIdAlreadyRegistered)
-            }
-        }
-    }
-}
-
-async fn override_login_id<S>(
-    infra: &impl OverrideLoginIdMaterial,
-    fields: OverrideLoginIdFieldsExtract,
-    post: impl Fn(OverrideLoginIdEvent) -> S,
+async fn modify_user<S>(
+    infra: &impl ModifyAuthUserAccountMaterial,
+    fields: Result<ModifyAuthUserAccountFields, ValidateModifyAuthUserAccountFieldsError>,
+    post: impl Fn(ModifyAuthUserAccountEvent) -> S,
 ) -> MethodResult<S> {
-    let login_id = LoginId::validate(fields.login_id).map_err(|err| {
-        post(OverrideLoginIdEvent::InvalidLoginId(
-            OverrideLoginIdError::InvalidLoginId(err),
-        ))
-    })?;
-    let new_login_id = LoginId::validate(fields.new_login_id).map_err(|err| {
-        post(OverrideLoginIdEvent::InvalidLoginId(
-            OverrideLoginIdError::InvalidLoginId(err),
-        ))
-    })?;
+    let fields = fields.map_err(|err| post(ModifyAuthUserAccountEvent::Invalid(err)))?;
 
-    let login_id_repository = infra.login_id_repository();
+    let user_repository = infra.user_repository();
 
-    login_id_repository
-        .override_login_id(&login_id, new_login_id)
+    let user_id = user_repository
+        .lookup_user_id(&fields.login_id)
         .await
-        .map_err(|err| post(err.into()))?;
+        .map_err(|err| post(ModifyAuthUserAccountEvent::RepositoryError(err)))?
+        .ok_or_else(|| post(ModifyAuthUserAccountEvent::NotFound))?;
 
-    Ok(post(OverrideLoginIdEvent::Success))
+    let stored_user = user_repository
+        .lookup_changes(&user_id)
+        .await
+        .map_err(|err| post(ModifyAuthUserAccountEvent::RepositoryError(err)))?
+        .ok_or_else(|| post(ModifyAuthUserAccountEvent::NotFound))?;
+
+    if stored_user != fields.from {
+        return Err(post(ModifyAuthUserAccountEvent::Conflict));
+    }
+
+    user_repository
+        .modify_user(user_id, fields.to)
+        .await
+        .map_err(|err| post(ModifyAuthUserAccountEvent::RepositoryError(err)))?;
+
+    Ok(post(ModifyAuthUserAccountEvent::Success))
 }

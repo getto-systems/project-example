@@ -6,9 +6,12 @@ import { mockBoardValueStore } from "../../../../z_vendor/getto-application/boar
 
 import { OverrideLoginIdAction, initOverrideLoginIdAction } from "./action"
 
+import { restoreLoginId } from "../input/convert"
+
 import { OverrideLoginIdRemote, ChangePasswordRemoteResult } from "./infra"
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
-import { AuthUserAccountBasket } from "../../account/kernel/data"
+
+import { LoginId } from "../input/data"
 
 const VALID_LOGIN_ID = { newLoginId: "new-login-id" } as const
 
@@ -25,7 +28,7 @@ describe("OverrideLoginId", () => {
         }).then((stack) => {
             expect(stack).toEqual([
                 { type: "try-to-override-login-id" },
-                { type: "succeed-to-override-login-id" },
+                { type: "succeed-to-override-login-id", loginId: "new-login-id" },
             ])
         })
     })
@@ -44,7 +47,7 @@ describe("OverrideLoginId", () => {
             expect(stack).toEqual([
                 { type: "try-to-override-login-id" },
                 { type: "take-longtime-to-override-login-id" },
-                { type: "succeed-to-override-login-id" },
+                { type: "succeed-to-override-login-id", loginId: "new-login-id" },
             ])
         })
     })
@@ -106,7 +109,7 @@ function initResource(overrideLoginIdRemote: OverrideLoginIdRemote): Readonly<{
     store: Readonly<{
         newLoginId: BoardValueStore
     }>
-    user: AuthUserAccountBasket
+    user: Readonly<{ loginId: LoginId }>
 }> {
     const resource = {
         override: initOverrideLoginIdAction({
@@ -125,13 +128,13 @@ function initResource(overrideLoginIdRemote: OverrideLoginIdRemote): Readonly<{
 
     resource.override.newLoginId.input.connector.connect(store.newLoginId)
 
-    const user: AuthUserAccountBasket = {
-        loginId: "user-id",
-        grantedRoles: [],
-        resetTokenDestination: { type: "none" },
+    return {
+        resource,
+        store,
+        user: {
+            loginId: restoreLoginId("user-id"),
+        },
     }
-
-    return { resource, store, user }
 }
 
 function standard_overrideRemote(): OverrideLoginIdRemote {

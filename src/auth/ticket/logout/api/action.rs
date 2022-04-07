@@ -85,7 +85,7 @@ async fn logout<S>(
     let ticket_repository = infra.ticket_repository();
 
     ticket_repository
-        .discard(ticket)
+        .discard(&ticket)
         .await
         .map_err(|err| post(LogoutEvent::RepositoryError(err)))?;
 

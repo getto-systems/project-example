@@ -1,41 +1,33 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     field,
     field_error,
     label_text_fill,
-} from "../../../../../z_vendor/getto-css/preact/design/form"
+} from "../../../../../../../z_vendor/getto-css/preact/design/form"
+import { label_gray } from "../../../../../../../z_vendor/getto-css/preact/design/highlight"
 
-import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../../../z_lib/ui/x_preact/common"
 
-import { InputBoardComponent } from "../../../../../z_vendor/getto-application/board/input/x_preact/input"
+import { InputBoardComponent } from "../../../../../../../z_vendor/getto-application/board/input/x_preact/input"
 import {
     RadioBoardComponent,
     RadioBoardContent,
-} from "../../../../../z_vendor/getto-application/board/input/x_preact/radio"
+} from "../../../../../../../z_vendor/getto-application/board/input/x_preact/radio"
 
-import { ValidateBoardFieldState } from "../../../../../z_vendor/getto-application/board/validate_field/action"
-import {
-    InputResetTokenDestinationAction,
-    InputResetTokenDestinationState,
-    ValidateResetTokenDestinationState,
-} from "../action"
-import {
-    EditableBoardAction,
-    EditableBoardState,
-} from "../../../../../z_vendor/getto-application/board/editable/action"
+import { InputResetTokenDestinationAction } from "../action"
+import { EditableBoardAction } from "../../../../../../../z_vendor/getto-application/board/editable/action"
 
-import { toBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/convert"
+import { toBoardValue } from "../../../../../../../z_vendor/getto-application/board/kernel/convert"
 
-import { ResetTokenDestination, ValidateResetTokenDestinationError } from "../data"
-import { AuthUserAccountBasket } from "../../kernel/data"
-import { label_gray } from "../../../../../z_vendor/getto-css/preact/design/highlight"
+import { ValidateResetTokenDestinationError } from "../data"
+import { ResetTokenDestination } from "../../kernel/data"
 
-type EntryProps = Readonly<{
-    user: AuthUserAccountBasket
+type Props = Readonly<{
+    user: Readonly<{ resetTokenDestination: ResetTokenDestination }>
     editable: EditableBoardAction
     field: InputResetTokenDestinationAction
 }> &
@@ -44,36 +36,24 @@ type EntryProps = Readonly<{
         help: readonly VNodeContent[]
         autocomplete: string
     }>
-export function InputResetTokenDestinationEntry(resource: EntryProps): VNode {
-    return h(InputResetTokenDestinationComponent, {
-        ...resource,
-        state: useApplicationAction(resource.field),
-        editableState: useApplicationAction(resource.editable),
-        validateState: useApplicationAction(resource.field.validate),
-    })
-}
+export function ResetTokenDestinationField(props: Props): VNode {
+    const state = useApplicationAction(props.field)
+    const editableState = useApplicationAction(props.editable)
+    const validateState = useApplicationAction(props.field.validate)
 
-type Props = EntryProps &
-    Readonly<{
-        state: InputResetTokenDestinationState
-        editableState: EditableBoardState
-        validateState: ValidateResetTokenDestinationState
-    }>
-
-export function InputResetTokenDestinationComponent(props: Props): VNode {
     const content = {
         title: props.title || "パスワードリセット用Eメール",
         help: props.help,
         body: body(),
     }
 
-    if (props.editableState.isEditable && !props.validateState.valid) {
-        return field_error({ ...content, notice: emailValidationError(props.validateState) })
+    if (editableState.isEditable && !validateState.valid) {
+        return field_error({ ...content, notice: validationError(validateState.err) })
     }
     return field(content)
 
     function body(): VNodeContent {
-        if (!props.editableState.isEditable) {
+        if (!editableState.isEditable) {
             switch (props.user.resetTokenDestination.type) {
                 case "none":
                     return label_gray("無効")
@@ -94,14 +74,14 @@ export function InputResetTokenDestinationComponent(props: Props): VNode {
         ]
 
         function email(): VNode {
-            switch (props.state.type) {
+            switch (state.type) {
                 case "none":
                     return EMPTY_CONTENT
 
                 case "email":
                     return h(InputBoardComponent, {
                         type: "email",
-                        input: props.field.input,
+                        input: props.field.email,
                         autocomplete: props.autocomplete,
                     })
             }
@@ -126,15 +106,14 @@ export function InputResetTokenDestinationComponent(props: Props): VNode {
     }
 }
 
-function emailValidationError(
-    result: ValidateBoardFieldState<ValidateResetTokenDestinationError>,
+function validationError(
+    err: readonly ValidateResetTokenDestinationError[],
 ): readonly VNodeContent[] {
-    if (result.valid) {
-        return []
-    }
-
-    return result.err.map((err) => {
+    return err.map((err) => {
         switch (err.type) {
+            case "invalid-type":
+                return ["有効/無効を選択してください"]
+
             case "empty-email":
                 return ["メールアドレスを入力してください"]
 

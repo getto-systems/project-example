@@ -6,7 +6,7 @@ use crate::auth::user::kernel::data::{
     AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
 };
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct AuthNonce(String);
 
 impl AuthNonce {
@@ -107,22 +107,28 @@ impl AuthTicket {
         Self { ticket_id, user }
     }
 
+    pub fn restore(ticket: AuthTicketExtract) -> Self {
+        Self {
+            ticket_id: AuthTicketId::restore(ticket.ticket_id),
+            user: AuthUserExtract {
+                user_id: ticket.user_id,
+                granted_roles: ticket.granted_roles,
+            }
+            .restore(),
+        }
+    }
+
     #[cfg(test)]
-    pub fn ticket_id_as_str(&self) -> &str {
-        self.ticket_id.as_str()
+    pub fn as_ticket_id(&self) -> &AuthTicketId {
+        &self.ticket_id
     }
 
     pub fn into_user(self) -> AuthUser {
         self.user
     }
 
-    pub fn extract(self) -> AuthTicketExtract {
-        let user = self.user.extract();
-        AuthTicketExtract {
-            ticket_id: self.ticket_id.0,
-            user_id: user.user_id,
-            granted_roles: user.granted_roles,
-        }
+    pub fn extract(self) -> (AuthTicketId, AuthUser) {
+        (self.ticket_id, self.user)
     }
 
     pub fn check_enough_permission(
@@ -150,35 +156,16 @@ impl std::fmt::Display for AuthTicket {
     }
 }
 
-impl AuthTicketExtract {
-    pub(in crate::auth) fn restore(self) -> AuthTicket {
-        AuthTicket {
-            ticket_id: AuthTicketId::new(self.ticket_id),
-            user: AuthUserExtract {
-                user_id: self.user_id,
-                granted_roles: self.granted_roles,
-            }
-            .restore(),
-        }
-    }
-}
-
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct AuthTicketId(String);
 
 impl AuthTicketId {
-    pub const fn new(id: String) -> Self {
+    pub const fn restore(id: String) -> Self {
         Self(id)
     }
 
-    #[cfg(test)]
     pub fn extract(self) -> String {
         self.0
-    }
-
-    #[cfg(test)]
-    pub fn as_str(&self) -> &str {
-        self.0.as_str()
     }
 }
 
@@ -200,11 +187,11 @@ impl AuthDateTime {
         self.0
     }
 
-    pub fn expires(self, duration: &ExpireDuration) -> ExpireDateTime {
+    pub fn expires(&self, duration: &ExpireDuration) -> ExpireDateTime {
         ExpireDateTime(self.0 + duration.0)
     }
 
-    pub fn expansion_limit(self, duration: &ExpansionLimitDuration) -> ExpansionLimitDateTime {
+    pub fn expansion_limit(&self, duration: &ExpansionLimitDuration) -> ExpansionLimitDateTime {
         ExpansionLimitDateTime(self.0 + duration.0)
     }
 

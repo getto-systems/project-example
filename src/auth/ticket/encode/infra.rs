@@ -13,7 +13,7 @@ use crate::{
 
 #[async_trait::async_trait]
 pub trait EncodeAuthTicketRepository {
-    async fn find_expansion_limit(
+    async fn lookup_expansion_limit(
         &self,
         ticket: &AuthTicket,
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError>;

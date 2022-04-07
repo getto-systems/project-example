@@ -1,6 +1,7 @@
 use rusoto_ses::{Body, Content, Destination, Message, SendEmailRequest, Ses, SesClient};
 use url::{ParseError, Url};
 
+use crate::auth::user::password::reset::kernel::data::ResetTokenDestinationExtract;
 use crate::auth::x_outside_feature::feature::AuthOutsideEmail;
 
 use crate::x_content::mail::{
@@ -36,34 +37,41 @@ impl<'a> ResetTokenNotifier for EmailResetTokenNotifier<'a> {
         destination: ResetTokenDestination,
         token: ResetTokenEncoded,
     ) -> Result<NotifyResetTokenResponse, NotifyResetTokenError> {
-        let destination = destination.into();
-        let message = build_message(self.reset_password_url, token)
-            .map_err(|err| NotifyResetTokenError::InfraError(format!("{}", err)))?;
-        let source = SENDER_ADDRESS.into();
+        match destination.into() {
+            None => Err(NotifyResetTokenError::NoDestination),
+            Some(destination) => {
+                let message = build_message(self.reset_password_url, token)
+                    .map_err(|err| NotifyResetTokenError::InfraError(format!("{}", err)))?;
+                let source = SENDER_ADDRESS.into();
 
-        let request = SendEmailRequest {
-            destination,
-            message,
-            source,
-            ..Default::default()
-        };
+                let request = SendEmailRequest {
+                    destination,
+                    message,
+                    source,
+                    ..Default::default()
+                };
 
-        let response = self
-            .client
-            .send_email(request)
-            .await
-            .map_err(|err| NotifyResetTokenError::InfraError(format!("{}", err)))?;
+                let response = self
+                    .client
+                    .send_email(request)
+                    .await
+                    .map_err(|err| NotifyResetTokenError::InfraError(format!("{}", err)))?;
 
-        Ok(NotifyResetTokenResponse::new(response.message_id))
+                Ok(NotifyResetTokenResponse::new(response.message_id))
+            }
+        }
     }
 }
 
-impl Into<Destination> for ResetTokenDestination {
-    fn into(self) -> Destination {
-        Destination {
-            bcc_addresses: None,
-            cc_addresses: None,
-            to_addresses: Some(vec![self.into_email()]),
+impl Into<Option<Destination>> for ResetTokenDestination {
+    fn into(self) -> Option<Destination> {
+        match self.extract() {
+            ResetTokenDestinationExtract::None => None,
+            ResetTokenDestinationExtract::Email(email) => Some(Destination {
+                bcc_addresses: None,
+                cc_addresses: None,
+                to_addresses: Some(vec![email]),
+            }),
         }
     }
 }

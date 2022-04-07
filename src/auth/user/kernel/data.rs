@@ -2,6 +2,7 @@ use std::collections::HashSet;
 
 use crate::x_content::role::{AuthRole, AUTH_ROLE_ALL};
 
+// TODO 多分なくていい
 #[derive(Clone)]
 pub struct AuthUser {
     user_id: AuthUserId,
@@ -9,6 +10,13 @@ pub struct AuthUser {
 }
 
 impl AuthUser {
+    pub fn restore(user_id: AuthUserId, granted_roles: Option<GrantedAuthRoles>) -> Self {
+        Self {
+            user_id,
+            granted_roles: granted_roles.unwrap_or(GrantedAuthRoles::empty()),
+        }
+    }
+
     pub fn into_user_id(self) -> AuthUserId {
         self.user_id
     }
@@ -48,7 +56,7 @@ impl AuthUserExtract {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct AuthUserId(String);
 
 impl AuthUserId {
@@ -59,10 +67,6 @@ impl AuthUserId {
     pub(in crate::auth) fn extract(self) -> String {
         self.0
     }
-
-    pub fn as_str(&self) -> &str {
-        self.0.as_str()
-    }
 }
 
 impl std::fmt::Display for AuthUserId {
@@ -71,10 +75,20 @@ impl std::fmt::Display for AuthUserId {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct GrantedAuthRoles(HashSet<AuthRole>);
 
 impl GrantedAuthRoles {
+    pub fn empty() -> Self {
+        Self(HashSet::new())
+    }
+
+    pub fn validate(
+        roles: impl GrantedAuthRolesExtract,
+    ) -> Result<Self, ValidateGrantedAuthRolesError> {
+        roles.validate()
+    }
+
     pub(in crate::auth) fn restore(roles: HashSet<String>) -> Self {
         let mut granted_roles: HashSet<AuthRole> = HashSet::new();
         AUTH_ROLE_ALL.iter().for_each(|role| {
@@ -111,6 +125,22 @@ impl std::fmt::Display for GrantedAuthRoles {
                 .collect::<Vec<&str>>()
                 .join(",")
         )
+    }
+}
+
+pub trait GrantedAuthRolesExtract {
+    fn validate(self) -> Result<GrantedAuthRoles, ValidateGrantedAuthRolesError>;
+}
+
+pub enum ValidateGrantedAuthRolesError {
+    InvalidRole,
+}
+
+impl std::fmt::Display for ValidateGrantedAuthRolesError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::InvalidRole => write!(f, "invalid role"),
+        }
     }
 }
 

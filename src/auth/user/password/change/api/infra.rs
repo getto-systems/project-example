@@ -1,13 +1,17 @@
-use crate::auth::user::password::kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher};
+use crate::auth::user::password::kernel::infra::{HashedPassword, PlainPassword};
 
-use crate::auth::user::{
-    kernel::data::AuthUserId,
-    login_id::kernel::data::LoginId,
-    password::change::data::{ChangePasswordRepositoryError, OverridePasswordRepositoryError},
+use crate::{
+    auth::user::{kernel::data::AuthUserId, login_id::kernel::data::LoginId},
+    z_lib::repository::data::RepositoryError,
 };
 
 pub trait ChangePasswordRequestDecoder {
     fn decode(self) -> ChangePasswordFieldsExtract;
+}
+
+pub struct ChangePasswordFields {
+    pub current_password: PlainPassword,
+    pub new_password: PlainPassword,
 }
 
 pub struct ChangePasswordFieldsExtract {
@@ -19,6 +23,11 @@ pub trait OverridePasswordRequestDecoder {
     fn decode(self) -> OverridePasswordFieldsExtract;
 }
 
+pub struct OverridePasswordFields {
+    pub login_id: LoginId,
+    pub new_password: PlainPassword,
+}
+
 pub struct OverridePasswordFieldsExtract {
     pub login_id: String,
     pub new_password: String,
@@ -26,19 +35,28 @@ pub struct OverridePasswordFieldsExtract {
 
 #[async_trait::async_trait]
 pub trait ChangePasswordRepository {
-    async fn change_password<'a>(
+    async fn lookup_password(
         &self,
-        user_id: &'a AuthUserId,
-        matcher: impl 'a + AuthUserPasswordMatcher,
-        hasher: impl 'a + AuthUserPasswordHasher,
-    ) -> Result<(), ChangePasswordRepositoryError>;
+        user_id: &AuthUserId,
+    ) -> Result<Option<HashedPassword>, RepositoryError>;
+
+    async fn change_password(
+        &self,
+        user_id: AuthUserId,
+        new_password: HashedPassword,
+    ) -> Result<(), RepositoryError>;
 }
 
 #[async_trait::async_trait]
 pub trait OverridePasswordRepository {
-    async fn override_password<'a>(
+    async fn lookup_user_id(
         &self,
-        login_id: &'a LoginId,
-        hasher: impl 'a + AuthUserPasswordHasher,
-    ) -> Result<(), OverridePasswordRepositoryError>;
+        login_id: &LoginId,
+    ) -> Result<Option<AuthUserId>, RepositoryError>;
+
+    async fn override_password(
+        &self,
+        user_id: AuthUserId,
+        new_password: HashedPassword,
+    ) -> Result<(), RepositoryError>;
 }

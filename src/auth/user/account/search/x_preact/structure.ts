@@ -17,11 +17,11 @@ import { tableClassName } from "../../../../../z_vendor/getto-table/preact/decor
 
 import { ListAuthUserAccountAction } from "../action"
 
-import { AuthUserAccountBasket } from "../../kernel/data"
 import { SearchAuthUserAccountSortKey } from "../data"
 import { GrantedRoleLabels } from "../../input/x_preact/granted_roles"
+import { AuthUserAccount } from "../../kernel/data"
 
-export type SearchAuthUserAccountTableStructure = TableStructure<Summary, AuthUserAccountBasket>
+export type SearchAuthUserAccountTableStructure = TableStructure<Summary, AuthUserAccount>
 
 type Summary = {
     // no props
@@ -77,18 +77,18 @@ function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStruc
         }
     }
 
-    function rowKey(row: AuthUserAccountBasket): string {
+    function rowKey(row: AuthUserAccount): string {
         return row.loginId
     }
 
-    function loginId(row: AuthUserAccountBasket): VNodeContent {
+    function loginId(row: AuthUserAccount): VNodeContent {
         return row.loginId
     }
-    function grantedRoles(row: AuthUserAccountBasket): VNodeContent {
-        return h(GrantedRoleLabels, { ...row })
+    function grantedRoles(row: AuthUserAccount): VNodeContent {
+        return h(GrantedRoleLabels, row)
     }
 
-    function editLink(row: AuthUserAccountBasket): VNodeContent {
+    function editLink(row: AuthUserAccount): VNodeContent {
         const isFocused = list.detail.isFocused(row)
         return html`<a
             href="#"

@@ -9,9 +9,7 @@ use crate::auth::{
         kernel::init::clock::test::StaticChronoAuthClock,
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
-            nonce_repository::memory::{
-                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-            },
+            nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
             test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
@@ -19,9 +17,7 @@ use crate::auth::{
     },
     user::{
         account::search::init::request_decoder::test::StaticSearchAuthUserAccountRequestDecoder,
-        kernel::init::user_repository::memory::{
-            MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
-        },
+        kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
     },
 };
 
@@ -47,8 +43,8 @@ use crate::{
 async fn success_search() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::standard();
-    let material = TestStruct::new(&store);
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = SearchAuthUserAccountAction::with_material(request_decoder, material);
@@ -87,16 +83,16 @@ struct TestStore {
 }
 
 impl TestStore {
-    fn standard() -> Self {
+    fn new() -> Self {
         Self {
-            nonce: standard_nonce_store(),
-            search: standard_search_store(),
+            nonce: MemoryAuthNonceStore::new(),
+            search: MemoryAuthUserStore::new(),
         }
     }
 }
 
 impl<'a> TestStruct<'a> {
-    fn new(store: &'a TestStore) -> Self {
+    fn standard(store: &'a TestStore) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
@@ -108,7 +104,7 @@ impl<'a> TestStruct<'a> {
                 token_metadata: standard_token_header(),
                 token_decoder: standard_token_decoder(),
             },
-            search_repository: MemoryAuthUserRepository::new(&store.search),
+            search_repository: standard_search_repository(&store.search),
         }
     }
 }
@@ -161,18 +157,14 @@ fn standard_request_decoder() -> StaticSearchAuthUserAccountRequestDecoder {
     })
 }
 
-fn standard_nonce_store() -> MemoryAuthNonceStore {
-    MemoryAuthNonceMap::new().to_store()
-}
-
-fn standard_search_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::with_user_and_password(
+fn standard_search_repository<'a>(store: &'a MemoryAuthUserStore) -> MemoryAuthUserRepository<'a> {
+    MemoryAuthUserRepository::with_user_and_password(
+        store,
         test_user_login_id(),
         test_user(),
         test_user_password(),
         vec![],
     )
-    .to_store()
 }
 
 fn test_user() -> AuthUser {

@@ -13,8 +13,8 @@ import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 
 import { ChangePasswordRemoteResult, OverrideLoginIdRemote } from "../infra"
 
-import { AuthUserAccountBasket } from "../../../account/kernel/data"
 import { OverrideLoginIdFields } from "../data"
+import { LoginId } from "../../input/data"
 
 export function newOverrideLoginIdRemote(feature: RemoteOutsideFeature): OverrideLoginIdRemote {
     return (user, fields) => fetchRemote(feature, user, fields)
@@ -22,7 +22,7 @@ export function newOverrideLoginIdRemote(feature: RemoteOutsideFeature): Overrid
 
 async function fetchRemote(
     feature: RemoteOutsideFeature,
-    user: AuthUserAccountBasket,
+    user: Readonly<{ loginId: LoginId }>,
     fields: OverrideLoginIdFields,
 ): Promise<ChangePasswordRemoteResult> {
     try {
@@ -75,8 +75,11 @@ function errorResponse(
     err: pb.auth.user.loginId.change.service.OverrideLoginIdErrorKindPb,
 ): ChangePasswordRemoteResult {
     switch (err) {
-        case pb.auth.user.loginId.change.service.OverrideLoginIdErrorKindPb.INVALID_LOGIN_ID:
-            return { success: false, err: { type: "invalid-login-id" } }
+        case pb.auth.user.loginId.change.service.OverrideLoginIdErrorKindPb.NOT_FOUND:
+            return { success: false, err: { type: "not-found" } }
+
+        case pb.auth.user.loginId.change.service.OverrideLoginIdErrorKindPb.INVALID:
+            return { success: false, err: { type: "invalid" } }
 
         case pb.auth.user.loginId.change.service.OverrideLoginIdErrorKindPb.ALREADY_REGISTERED:
             return { success: false, err: { type: "already-registered" } }

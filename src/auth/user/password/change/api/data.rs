@@ -1,54 +1,31 @@
-use crate::{
-    auth::user::{
-        login_id::kernel::data::ValidateLoginIdError,
-        password::kernel::data::{PasswordHashError, ValidatePasswordError},
-    },
-    z_lib::repository::data::RepositoryError,
+use crate::auth::user::{
+    login_id::kernel::data::ValidateLoginIdError, password::kernel::data::ValidatePasswordError,
 };
 
-pub enum ChangePasswordError {
+pub enum ValidateChangePasswordFieldsError {
     InvalidCurrentPassword(ValidatePasswordError),
     InvalidNewPassword(ValidatePasswordError),
-    PasswordNotFound,
-    PasswordNotMatched,
 }
 
-impl std::fmt::Display for ChangePasswordError {
+impl std::fmt::Display for ValidateChangePasswordFieldsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::InvalidCurrentPassword(err) => write!(f, "invalid current password: {}", err),
-            Self::InvalidNewPassword(err) => write!(f, "invalid new password: {}", err),
-            Self::PasswordNotFound => write!(f, "password not found"),
-            Self::PasswordNotMatched => write!(f, "password not matched"),
+            Self::InvalidCurrentPassword(err) => write!(f, "current: {}", err),
+            Self::InvalidNewPassword(err) => write!(f, "new: {}", err),
         }
     }
 }
 
-pub enum ChangePasswordRepositoryError {
-    PasswordHashError(PasswordHashError),
-    RepositoryError(RepositoryError),
-    PasswordNotFound,
-    PasswordNotMatched,
-}
-
-pub enum OverridePasswordError {
+pub enum ValidateOverridePasswordFieldsError {
     InvalidLoginId(ValidateLoginIdError),
-    InvalidPassword(ValidatePasswordError),
-    UserNotFound,
+    InvalidNewPassword(ValidatePasswordError),
 }
 
-impl std::fmt::Display for OverridePasswordError {
+impl std::fmt::Display for ValidateOverridePasswordFieldsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::InvalidLoginId(err) => write!(f, "invalid login id: {}", err),
-            Self::InvalidPassword(err) => write!(f, "invalid password: {}", err),
-            Self::UserNotFound => write!(f, "user not found"),
+            Self::InvalidLoginId(err) => write!(f, "login-id: {}", err),
+            Self::InvalidNewPassword(err) => write!(f, "new-password: {}", err),
         }
     }
-}
-
-pub enum OverridePasswordRepositoryError {
-    PasswordHashError(PasswordHashError),
-    RepositoryError(RepositoryError),
-    UserNotFound,
 }

@@ -54,7 +54,7 @@ async function fetchRemote(
                 (message) => {
                     message.resetToken = resetToken
                     message.loginId = fields.loginId
-                    message.password = fields.password
+                    message.newPassword = fields.newPassword
                 },
             ),
         })

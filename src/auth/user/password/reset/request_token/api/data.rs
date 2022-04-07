@@ -1,27 +1,15 @@
-use crate::{
-    auth::user::login_id::kernel::data::ValidateLoginIdError,
-    z_lib::repository::data::RepositoryError,
-};
+use crate::auth::user::login_id::kernel::data::ValidateLoginIdError;
 
-pub enum RequestResetTokenError {
+pub enum ValidateRequestResetTokenFieldsError {
     InvalidLoginId(ValidateLoginIdError),
-    DestinationNotFound,
-    UserNotFound,
 }
 
-impl std::fmt::Display for RequestResetTokenError {
+impl std::fmt::Display for ValidateRequestResetTokenFieldsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::InvalidLoginId(err) => write!(f, "invalid login id: {}", err),
-            Self::DestinationNotFound => write!(f, "destination not found"),
-            Self::UserNotFound => write!(f, "user not found"),
+            Self::InvalidLoginId(err) => write!(f, "login-id: {}", err),
         }
     }
-}
-
-pub enum RegisterResetTokenRepositoryError {
-    RepositoryError(RepositoryError),
-    UserNotFound,
 }
 
 pub struct NotifyResetTokenResponse {
@@ -53,12 +41,14 @@ impl std::fmt::Display for EncodeResetTokenError {
 }
 
 pub enum NotifyResetTokenError {
+    NoDestination,
     InfraError(String),
 }
 
 impl std::fmt::Display for NotifyResetTokenError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
+            Self::NoDestination => write!(f, "no reset token destination"),
             Self::InfraError(err) => write!(f, "notify reset token error; {}", err),
         }
     }

@@ -6,8 +6,9 @@ use crate::auth::ticket::validate::method::{
 
 use crate::auth::user::password::{
     change::infra::{
-        ChangePasswordFieldsExtract, ChangePasswordRepository, ChangePasswordRequestDecoder,
-        OverridePasswordFieldsExtract, OverridePasswordRepository, OverridePasswordRequestDecoder,
+        ChangePasswordFields, ChangePasswordFieldsExtract, ChangePasswordRepository,
+        ChangePasswordRequestDecoder, OverridePasswordFields, OverridePasswordFieldsExtract,
+        OverridePasswordRepository, OverridePasswordRequestDecoder,
     },
     kernel::infra::{AuthUserPasswordHasher, AuthUserPasswordMatcher, PlainPassword},
 };
@@ -15,15 +16,11 @@ use crate::auth::user::password::{
 use crate::{
     auth::{
         ticket::kernel::data::AuthTicket,
-        user::{
-            login_id::kernel::data::LoginId,
-            password::{
-                change::data::{
-                    ChangePasswordError, ChangePasswordRepositoryError, OverridePasswordError,
-                    OverridePasswordRepositoryError,
-                },
-                kernel::data::{PasswordHashError, ValidatePasswordError},
+        user::password::{
+            change::data::{
+                ValidateChangePasswordFieldsError, ValidateOverridePasswordFieldsError,
             },
+            kernel::data::PasswordHashError,
         },
     },
     z_lib::repository::data::RepositoryError,
@@ -100,7 +97,9 @@ impl<R: ChangePasswordRequestDecoder, M: ChangePasswordMaterial> ChangePasswordA
 
 pub enum ChangePasswordEvent {
     Success,
-    InvalidPassword(ChangePasswordError),
+    Invalid(ValidateChangePasswordFieldsError),
+    NotFound,
+    PasswordNotMatched,
     PasswordHashError(PasswordHashError),
     RepositoryError(RepositoryError),
 }
@@ -115,42 +114,11 @@ mod change_password_event {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
                 Self::Success => write!(f, "{}", SUCCESS),
-                Self::InvalidPassword(response) => write!(f, "{}; {}", ERROR, response),
+                Self::Invalid(err) => write!(f, "{}; invalid; {}", ERROR, err),
+                Self::NotFound => write!(f, "{}; not found", ERROR),
+                Self::PasswordNotMatched => write!(f, "{}; password not matched", ERROR),
                 Self::PasswordHashError(err) => write!(f, "{}; {}", ERROR, err),
                 Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
-            }
-        }
-    }
-}
-
-impl Into<ChangePasswordEvent> for ChangePasswordRepositoryError {
-    fn into(self) -> ChangePasswordEvent {
-        match self {
-            Self::PasswordHashError(err) => ChangePasswordEvent::PasswordHashError(err),
-            Self::RepositoryError(err) => ChangePasswordEvent::RepositoryError(err),
-            Self::PasswordNotFound => {
-                ChangePasswordEvent::InvalidPassword(ChangePasswordError::PasswordNotFound)
-            }
-            Self::PasswordNotMatched => {
-                ChangePasswordEvent::InvalidPassword(ChangePasswordError::PasswordNotMatched)
-            }
-        }
-    }
-}
-
-pub enum ChangePasswordKind {
-    Current,
-    New,
-}
-
-impl Into<ChangePasswordEvent> for (ValidatePasswordError, ChangePasswordKind) {
-    fn into(self) -> ChangePasswordEvent {
-        match self {
-            (err, ChangePasswordKind::Current) => ChangePasswordEvent::InvalidPassword(
-                ChangePasswordError::InvalidCurrentPassword(err),
-            ),
-            (err, ChangePasswordKind::New) => {
-                ChangePasswordEvent::InvalidPassword(ChangePasswordError::InvalidNewPassword(err))
             }
         }
     }
@@ -162,21 +130,36 @@ async fn change_password<S>(
     fields: ChangePasswordFieldsExtract,
     post: impl Fn(ChangePasswordEvent) -> S,
 ) -> MethodResult<S> {
-    let current_password = PlainPassword::validate(fields.current_password)
-        .map_err(|err| post((err, ChangePasswordKind::Current).into()))?;
-    let new_password = PlainPassword::validate(fields.new_password)
-        .map_err(|err| post((err, ChangePasswordKind::New).into()))?;
+    let fields = ChangePasswordFields::validate(fields)
+        .map_err(|err| post(ChangePasswordEvent::Invalid(err)))?;
 
     let password_repository = infra.password_repository();
-    let password_matcher = infra.password_matcher(current_password);
-    let password_hasher = infra.password_hasher(new_password);
+    let password_matcher = infra.password_matcher(fields.current_password);
+    let password_hasher = infra.password_hasher(fields.new_password);
 
     let user_id = ticket.into_user().into_user_id();
 
-    password_repository
-        .change_password(&user_id, password_matcher, password_hasher)
+    let stored_password = password_repository
+        .lookup_password(&user_id)
         .await
-        .map_err(|err| post(err.into()))?;
+        .map_err(|err| post(ChangePasswordEvent::RepositoryError(err)))?
+        .ok_or_else(|| post(ChangePasswordEvent::NotFound))?;
+
+    if !password_matcher
+        .match_password(&stored_password)
+        .map_err(|err| post(ChangePasswordEvent::PasswordHashError(err)))?
+    {
+        return Err(post(ChangePasswordEvent::PasswordNotMatched));
+    }
+
+    let hashed_password = password_hasher
+        .hash_password()
+        .map_err(|err| post(ChangePasswordEvent::PasswordHashError(err)))?;
+
+    password_repository
+        .change_password(user_id, hashed_password)
+        .await
+        .map_err(|err| post(ChangePasswordEvent::RepositoryError(err)))?;
 
     Ok(post(ChangePasswordEvent::Success))
 }
@@ -248,7 +231,8 @@ impl<R: OverridePasswordRequestDecoder, M: OverridePasswordMaterial> OverridePas
 
 pub enum OverridePasswordEvent {
     Success,
-    InvalidPassword(OverridePasswordError),
+    Invalid(ValidateOverridePasswordFieldsError),
+    NotFound,
     PasswordHashError(PasswordHashError),
     RepositoryError(RepositoryError),
 }
@@ -263,21 +247,10 @@ mod override_password_event {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
                 Self::Success => write!(f, "{}", SUCCESS),
-                Self::InvalidPassword(response) => write!(f, "{}; {}", ERROR, response),
+                Self::Invalid(err) => write!(f, "{}; invalid; {}", ERROR, err),
+                Self::NotFound => write!(f, "{}; not found", ERROR),
                 Self::PasswordHashError(err) => write!(f, "{}; {}", ERROR, err),
                 Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
-            }
-        }
-    }
-}
-
-impl Into<OverridePasswordEvent> for OverridePasswordRepositoryError {
-    fn into(self) -> OverridePasswordEvent {
-        match self {
-            Self::PasswordHashError(err) => OverridePasswordEvent::PasswordHashError(err),
-            Self::RepositoryError(err) => OverridePasswordEvent::RepositoryError(err),
-            Self::UserNotFound => {
-                OverridePasswordEvent::InvalidPassword(OverridePasswordError::UserNotFound)
             }
         }
     }
@@ -288,24 +261,26 @@ async fn override_password<S>(
     fields: OverridePasswordFieldsExtract,
     post: impl Fn(OverridePasswordEvent) -> S,
 ) -> MethodResult<S> {
-    let login_id = LoginId::validate(fields.login_id).map_err(|err| {
-        post(OverridePasswordEvent::InvalidPassword(
-            OverridePasswordError::InvalidLoginId(err),
-        ))
-    })?;
-    let new_password = PlainPassword::validate(fields.new_password).map_err(|err| {
-        post(OverridePasswordEvent::InvalidPassword(
-            OverridePasswordError::InvalidPassword(err),
-        ))
-    })?;
+    let fields = OverridePasswordFields::validate(fields)
+        .map_err(|err| post(OverridePasswordEvent::Invalid(err)))?;
 
     let password_repository = infra.password_repository();
-    let password_hasher = infra.password_hasher(new_password);
+    let password_hasher = infra.password_hasher(fields.new_password);
+
+    let user_id = password_repository
+        .lookup_user_id(&fields.login_id)
+        .await
+        .map_err(|err| post(OverridePasswordEvent::RepositoryError(err)))?
+        .ok_or_else(|| post(OverridePasswordEvent::NotFound))?;
+
+    let hashed_password = password_hasher
+        .hash_password()
+        .map_err(|err| post(OverridePasswordEvent::PasswordHashError(err)))?;
 
     password_repository
-        .override_password(&login_id, password_hasher)
+        .override_password(user_id, hashed_password)
         .await
-        .map_err(|err| post(err.into()))?;
+        .map_err(|err| post(OverridePasswordEvent::RepositoryError(err)))?;
 
     Ok(post(OverridePasswordEvent::Success))
 }

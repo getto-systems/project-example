@@ -15,22 +15,16 @@ use crate::auth::{
         },
         kernel::init::{
             clock::test::StaticChronoAuthClock,
-            ticket_repository::memory::{
-                MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
-            },
+            ticket_repository::memory::{MemoryAuthTicketRepository, MemoryAuthTicketStore},
         },
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
-            nonce_repository::memory::{
-                MemoryAuthNonceMap, MemoryAuthNonceRepository, MemoryAuthNonceStore,
-            },
+            nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
             test::StaticValidateAuthNonceStruct,
         },
     },
     user::{
-        kernel::init::user_repository::memory::{
-            MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
-        },
+        kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
         password::{
             kernel::init::password_hasher::test::PlainPasswordHasher,
             reset::reset::init::{
@@ -54,9 +48,11 @@ use crate::auth::user::password::reset::reset::infra::ResetPasswordFieldsExtract
 use crate::auth::{
     ticket::kernel::data::{AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration},
     user::{
-        kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
+        kernel::data::{AuthUser, AuthUserExtract},
         login_id::kernel::data::LoginId,
-        password::reset::kernel::data::{ResetToken, ResetTokenDestinationExtract},
+        password::reset::kernel::data::{
+            ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
+        },
     },
 };
 
@@ -86,50 +82,6 @@ async fn success_request_token() {
 }
 
 #[tokio::test]
-async fn success_expired_nonce() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::expired_nonce();
-    let material = TestStruct::standard(&store);
-    let request_decoder = standard_request_decoder();
-
-    let mut action = ResetPasswordAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "reset password notified; message-id: message-id",
-        "reset password success; user: user-id (granted: [])",
-        "expansion limit calculated; 2021-01-11 10:00:00 UTC",
-        "issue success; ticket: ticket-id / user: user-id (granted: [])",
-        "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
-        "encode success",
-    ]);
-    assert!(result.is_ok());
-}
-
-#[tokio::test]
-async fn error_conflict_nonce() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::conflict_nonce();
-    let material = TestStruct::standard(&store);
-    let request_decoder = standard_request_decoder();
-
-    let mut action = ResetPasswordAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce error; conflict",
-    ]);
-    assert!(!result.is_ok());
-}
-
-#[tokio::test]
 async fn error_match_failed_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
@@ -144,7 +96,7 @@ async fn error_match_failed_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid reset token entry: login id not matched",
+        "reset password error; login id not matched",
     ]);
     assert!(!result.is_ok());
 }
@@ -164,7 +116,7 @@ async fn error_empty_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid login id: empty login id",
+        "reset password error; invalid; login-id: empty login id",
     ]);
     assert!(!result.is_ok());
 }
@@ -184,7 +136,7 @@ async fn error_too_long_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid login id: too long login id",
+        "reset password error; invalid; login-id: too long login id",
     ]);
     assert!(!result.is_ok());
 }
@@ -204,7 +156,7 @@ async fn just_max_length_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid reset token entry: login id not matched",
+        "reset password error; login id not matched",
     ]);
     assert!(!result.is_ok());
 }
@@ -224,7 +176,7 @@ async fn error_empty_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid password: empty password",
+        "reset password error; invalid; new-password: empty password",
     ]);
     assert!(!result.is_ok());
 }
@@ -244,7 +196,7 @@ async fn error_too_long_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid password: too long password",
+        "reset password error; invalid; new-password: too long password",
     ]);
     assert!(!result.is_ok());
 }
@@ -289,17 +241,17 @@ async fn error_empty_reset_token() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid reset token: empty reset token",
+        "reset password error; invalid; reset-token: empty reset token",
     ]);
     assert!(!result.is_ok());
 }
 
 #[tokio::test]
-async fn error_reset_token_expired_when_decode() {
+async fn error_reset_token_expired_at_decode() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::expired_reset_token(&store);
+    let material = TestStruct::expired_reset_token_at_decode(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -318,8 +270,8 @@ async fn error_reset_token_expired_when_decode() {
 async fn error_reset_token_expired_in_store() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::expired_reset_token();
-    let material = TestStruct::standard(&store);
+    let store = TestStore::standard();
+    let material = TestStruct::expired_reset_token_in_store(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -329,7 +281,7 @@ async fn error_reset_token_expired_in_store() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid reset token entry: reset token expired",
+        "reset password error; reset token expired",
     ]);
     assert!(!result.is_ok());
 }
@@ -338,8 +290,8 @@ async fn error_reset_token_expired_in_store() {
 async fn error_reset_token_discarded() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::discarded_reset_token();
-    let material = TestStruct::standard(&store);
+    let store = TestStore::standard();
+    let material = TestStruct::already_reset(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -349,7 +301,7 @@ async fn error_reset_token_discarded() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid reset token entry: already reset",
+        "reset password error; already reset",
     ]);
     assert!(!result.is_ok());
 }
@@ -358,8 +310,8 @@ async fn error_reset_token_discarded() {
 async fn error_reset_token_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::reset_token_not_stored();
-    let material = TestStruct::standard(&store);
+    let store = TestStore::standard();
+    let material = TestStruct::no_reset_token(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -369,27 +321,7 @@ async fn error_reset_token_not_stored() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid reset token entry: reset token entry not found",
-    ]);
-    assert!(!result.is_ok());
-}
-
-#[tokio::test]
-async fn error_user_not_stored() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::user_not_stored();
-    let material = TestStruct::standard(&store);
-    let request_decoder = standard_request_decoder();
-
-    let mut action = ResetPasswordAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "reset password error; user not found",
+        "reset password error; not found",
     ]);
     assert!(!result.is_ok());
 }
@@ -400,7 +332,7 @@ struct TestStruct<'a> {
     encode: StaticEncodeAuthTicketStruct<'a>,
 
     clock: StaticChronoAuthClock,
-    user_repository: MemoryAuthUserRepository<'a>,
+    reset_password_repository: MemoryAuthUserRepository<'a>,
     token_decoder: StaticResetTokenDecoder,
     reset_notifier: StaticResetPasswordNotifier,
 }
@@ -411,8 +343,7 @@ impl<'a> ResetPasswordMaterial for TestStruct<'a> {
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
     type Clock = StaticChronoAuthClock;
-    type UserRepository = MemoryAuthUserRepository<'a>;
-    type PasswordRepository = MemoryAuthUserRepository<'a>;
+    type ResetPasswordRepository = MemoryAuthUserRepository<'a>;
     type PasswordHasher = PlainPasswordHasher;
     type TokenDecoder = StaticResetTokenDecoder;
     type ResetNotifier = StaticResetPasswordNotifier;
@@ -430,11 +361,8 @@ impl<'a> ResetPasswordMaterial for TestStruct<'a> {
     fn clock(&self) -> &Self::Clock {
         &self.clock
     }
-    fn user_repository(&self) -> &Self::UserRepository {
-        &self.user_repository
-    }
-    fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.user_repository
+    fn reset_password_repository(&self) -> &Self::ResetPasswordRepository {
+        &self.reset_password_repository
     }
     fn token_decoder(&self) -> &Self::TokenDecoder {
         &self.token_decoder
@@ -447,69 +375,61 @@ impl<'a> ResetPasswordMaterial for TestStruct<'a> {
 struct TestStore {
     nonce: MemoryAuthNonceStore,
     ticket: MemoryAuthTicketStore,
-    user: MemoryAuthUserStore,
+    reset_password: MemoryAuthUserStore,
 }
 
 impl TestStore {
     fn standard() -> Self {
         Self {
-            nonce: standard_nonce_store(),
-            ticket: standard_ticket_store(),
-            user: standard_user_store(),
-        }
-    }
-    fn expired_nonce() -> Self {
-        Self {
-            nonce: expired_nonce_store(),
-            ticket: standard_ticket_store(),
-            user: standard_user_store(),
-        }
-    }
-    fn conflict_nonce() -> Self {
-        Self {
-            nonce: conflict_nonce_store(),
-            ticket: standard_ticket_store(),
-            user: standard_user_store(),
-        }
-    }
-    fn expired_reset_token() -> Self {
-        Self {
-            nonce: standard_nonce_store(),
-            ticket: standard_ticket_store(),
-            user: expired_reset_token_user_store(),
-        }
-    }
-    fn discarded_reset_token() -> Self {
-        Self {
-            nonce: standard_nonce_store(),
-            ticket: standard_ticket_store(),
-            user: discarded_reset_token_user_store(),
-        }
-    }
-    fn reset_token_not_stored() -> Self {
-        Self {
-            nonce: standard_nonce_store(),
-            ticket: standard_ticket_store(),
-            user: empty_user_store(),
-        }
-    }
-    fn user_not_stored() -> Self {
-        Self {
-            nonce: standard_nonce_store(),
-            ticket: standard_ticket_store(),
-            user: user_not_stored_user_store(),
+            nonce: MemoryAuthNonceStore::new(),
+            ticket: MemoryAuthTicketStore::new(),
+            reset_password: MemoryAuthUserStore::new(),
         }
     }
 }
 
 impl<'a> TestStruct<'a> {
     fn standard(store: &'a TestStore) -> Self {
-        Self::with_token_decoder(store, standard_reset_token_decoder())
+        Self::new(
+            store,
+            standard_reset_token_repository(&store.reset_password),
+            standard_reset_token_decoder(),
+        )
     }
-    fn expired_reset_token(store: &'a TestStore) -> Self {
-        Self::with_token_decoder(store, expired_reset_token_decoder())
+    fn expired_reset_token_at_decode(store: &'a TestStore) -> Self {
+        Self::new(
+            store,
+            standard_reset_token_repository(&store.reset_password),
+            expired_reset_token_decoder(),
+        )
     }
-    fn with_token_decoder(store: &'a TestStore, token_decoder: StaticResetTokenDecoder) -> Self {
+    fn expired_reset_token_in_store(store: &'a TestStore) -> Self {
+        Self::new(
+            store,
+            expired_reset_token_repository(&store.reset_password),
+            standard_reset_token_decoder(),
+        )
+    }
+    fn already_reset(store: &'a TestStore) -> Self {
+        Self::new(
+            store,
+            already_reset_token_repository(&store.reset_password),
+            standard_reset_token_decoder(),
+        )
+    }
+    fn no_reset_token(store: &'a TestStore) -> Self {
+        Self::new(
+            store,
+            no_reset_token_repository(&store.reset_password),
+            standard_reset_token_decoder(),
+        )
+    }
+
+    fn new(
+        store: &'a TestStore,
+        reset_password_repository: MemoryAuthUserRepository<'a>,
+        token_decoder: StaticResetTokenDecoder,
+    ) -> Self {
         Self {
             validate_nonce: StaticValidateAuthNonceStruct {
                 config: standard_nonce_config(),
@@ -520,7 +440,7 @@ impl<'a> TestStruct<'a> {
             issue: StaticIssueAuthTicketStruct {
                 clock: standard_clock(),
                 ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
-                ticket_id_generator: StaticAuthTicketIdGenerator::new(AuthTicketId::new(
+                ticket_id_generator: StaticAuthTicketIdGenerator::new(AuthTicketId::restore(
                     "ticket-id".into(),
                 )),
                 config: standard_issue_config(),
@@ -535,7 +455,7 @@ impl<'a> TestStruct<'a> {
             },
 
             clock: standard_clock(),
-            user_repository: MemoryAuthUserRepository::new(&store.user),
+            reset_password_repository,
             token_decoder,
             reset_notifier: StaticResetPasswordNotifier,
         }
@@ -582,7 +502,7 @@ fn standard_request_decoder() -> StaticResetPasswordRequestDecoder {
         fields: ResetPasswordFieldsExtract {
             reset_token: RESET_TOKEN.into(),
             login_id: LOGIN_ID.into(),
-            password: "password".into(),
+            new_password: "password".into(),
         },
     }
 }
@@ -591,7 +511,7 @@ fn match_failed_login_id_request_decoder() -> StaticResetPasswordRequestDecoder 
         fields: ResetPasswordFieldsExtract {
             reset_token: RESET_TOKEN.into(),
             login_id: "unknown-login-id".into(),
-            password: "password".into(),
+            new_password: "password".into(),
         },
     }
 }
@@ -600,7 +520,7 @@ fn empty_login_id_request_decoder() -> StaticResetPasswordRequestDecoder {
         fields: ResetPasswordFieldsExtract {
             reset_token: RESET_TOKEN.into(),
             login_id: "".into(),
-            password: "password".into(),
+            new_password: "password".into(),
         },
     }
 }
@@ -609,7 +529,7 @@ fn too_long_login_id_request_decoder() -> StaticResetPasswordRequestDecoder {
         fields: ResetPasswordFieldsExtract {
             reset_token: RESET_TOKEN.into(),
             login_id: vec!["a"; 100 + 1].join(""),
-            password: "password".into(),
+            new_password: "password".into(),
         },
     }
 }
@@ -618,7 +538,7 @@ fn just_max_length_login_id_request_decoder() -> StaticResetPasswordRequestDecod
         fields: ResetPasswordFieldsExtract {
             reset_token: RESET_TOKEN.into(),
             login_id: vec!["a"; 100].join(""),
-            password: "password".into(),
+            new_password: "password".into(),
         },
     }
 }
@@ -627,7 +547,7 @@ fn empty_password_request_decoder() -> StaticResetPasswordRequestDecoder {
         fields: ResetPasswordFieldsExtract {
             reset_token: RESET_TOKEN.into(),
             login_id: LOGIN_ID.into(),
-            password: "".into(),
+            new_password: "".into(),
         },
     }
 }
@@ -636,7 +556,7 @@ fn too_long_password_request_decoder() -> StaticResetPasswordRequestDecoder {
         fields: ResetPasswordFieldsExtract {
             reset_token: RESET_TOKEN.into(),
             login_id: LOGIN_ID.into(),
-            password: vec!["a"; 100 + 1].join(""),
+            new_password: vec!["a"; 100 + 1].join(""),
         },
     }
 }
@@ -645,7 +565,7 @@ fn just_max_length_password_request_decoder() -> StaticResetPasswordRequestDecod
         fields: ResetPasswordFieldsExtract {
             reset_token: RESET_TOKEN.into(),
             login_id: LOGIN_ID.into(),
-            password: vec!["a"; 100].join(""),
+            new_password: vec!["a"; 100].join(""),
         },
     }
 }
@@ -654,114 +574,78 @@ fn empty_reset_token_request_decoder() -> StaticResetPasswordRequestDecoder {
         fields: ResetPasswordFieldsExtract {
             reset_token: "".into(),
             login_id: LOGIN_ID.into(),
-            password: "password".into(),
+            new_password: "password".into(),
         },
     }
 }
 
 fn standard_reset_token_decoder() -> StaticResetTokenDecoder {
-    StaticResetTokenDecoder::Valid(ResetToken::new(RESET_TOKEN.into()))
+    StaticResetTokenDecoder::Valid(ResetToken::restore(RESET_TOKEN.into()))
 }
 fn expired_reset_token_decoder() -> StaticResetTokenDecoder {
     StaticResetTokenDecoder::Expired
 }
 
-fn standard_nonce_store() -> MemoryAuthNonceStore {
-    MemoryAuthNonceMap::new().to_store()
-}
-fn expired_nonce_store() -> MemoryAuthNonceStore {
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(-1)));
-    MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
-}
-fn conflict_nonce_store() -> MemoryAuthNonceStore {
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(1)));
-    MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
-}
-
-fn standard_ticket_store() -> MemoryAuthTicketStore {
-    MemoryAuthTicketMap::new().to_store()
-}
-
-fn standard_user_store() -> MemoryAuthUserStore {
-    let reset_token = ResetToken::new(RESET_TOKEN.into());
-    let destination = ResetTokenDestinationExtract {
-        email: EMAIL.into(),
-    }
-    .restore();
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(1)));
-    MemoryAuthUserMap::with_user_and_reset_token(
+fn standard_reset_token_repository<'a>(
+    store: &'a MemoryAuthUserStore,
+) -> MemoryAuthUserRepository<'a> {
+    let reset_token = ResetToken::restore(RESET_TOKEN.into());
+    let destination =
+        ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(EMAIL.into()));
+    let requested_at = AuthDateTime::restore(standard_now());
+    let expires = requested_at.expires(&ExpireDuration::with_duration(Duration::days(1)));
+    MemoryAuthUserRepository::with_user_and_reset_token(
+        store,
         test_user_login_id(),
         test_user(),
-        test_user_id(),
         reset_token,
         destination,
         expires,
+        requested_at,
         None,
     )
-    .to_store()
 }
-fn user_not_stored_user_store() -> MemoryAuthUserStore {
-    let reset_token = ResetToken::new(RESET_TOKEN.into());
-    let destination = ResetTokenDestinationExtract {
-        email: EMAIL.into(),
-    }
-    .restore();
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(1)));
-    MemoryAuthUserMap::with_dangling_reset_token(
-        test_user_login_id(),
-        test_user_id(),
-        reset_token,
-        destination,
-        expires,
-        None,
-    )
-    .to_store()
+fn no_reset_token_repository<'a>(store: &'a MemoryAuthUserStore) -> MemoryAuthUserRepository<'a> {
+    MemoryAuthUserRepository::new(store)
 }
-fn empty_user_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::new().to_store()
-}
-fn expired_reset_token_user_store() -> MemoryAuthUserStore {
-    let reset_token = ResetToken::new(RESET_TOKEN.into());
-    let destination = ResetTokenDestinationExtract {
-        email: EMAIL.into(),
-    }
-    .restore();
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(-1)));
-    MemoryAuthUserMap::with_user_and_reset_token(
+fn expired_reset_token_repository<'a>(
+    store: &'a MemoryAuthUserStore,
+) -> MemoryAuthUserRepository<'a> {
+    let reset_token = ResetToken::restore(RESET_TOKEN.into());
+    let destination =
+        ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(EMAIL.into()));
+    let requested_at = AuthDateTime::restore(standard_now());
+    let expires = requested_at.expires(&ExpireDuration::with_duration(Duration::days(-1)));
+    MemoryAuthUserRepository::with_user_and_reset_token(
+        store,
         test_user_login_id(),
         test_user(),
-        test_user_id(),
         reset_token,
         destination,
         expires,
+        requested_at,
         None,
     )
-    .to_store()
 }
-fn discarded_reset_token_user_store() -> MemoryAuthUserStore {
-    let reset_token = ResetToken::new(RESET_TOKEN.into());
-    let destination = ResetTokenDestinationExtract {
-        email: EMAIL.into(),
-    }
-    .restore();
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(1)));
-    let discarded_at = AuthDateTime::restore(standard_now() - Duration::days(1));
-    MemoryAuthUserMap::with_user_and_reset_token(
+fn already_reset_token_repository<'a>(
+    store: &'a MemoryAuthUserStore,
+) -> MemoryAuthUserRepository<'a> {
+    let reset_token = ResetToken::restore(RESET_TOKEN.into());
+    let destination =
+        ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(EMAIL.into()));
+    let requested_at = AuthDateTime::restore(standard_now());
+    let expires = requested_at.expires(&ExpireDuration::with_duration(Duration::days(1)));
+    let reset_at = AuthDateTime::restore(standard_now() - Duration::days(1));
+    MemoryAuthUserRepository::with_user_and_reset_token(
+        store,
         test_user_login_id(),
         test_user(),
-        test_user_id(),
         reset_token,
         destination,
         expires,
-        Some(discarded_at),
+        requested_at,
+        Some(reset_at),
     )
-    .to_store()
 }
 
 fn test_user() -> AuthUser {
@@ -770,9 +654,6 @@ fn test_user() -> AuthUser {
         granted_roles: HashSet::new(),
     }
     .restore()
-}
-fn test_user_id() -> AuthUserId {
-    AuthUserId::restore(USER_ID.into())
 }
 fn test_user_login_id() -> LoginId {
     LoginId::restore(LOGIN_ID.into())

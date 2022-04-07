@@ -7,8 +7,8 @@ use crate::auth::ticket::validate::method::{
 use crate::auth::{
     ticket::kernel::infra::AuthClock,
     user::password::reset::request_token::infra::{
-        RegisterResetTokenRepository, RequestResetTokenConfig, RequestResetTokenFieldsExtract,
-        RequestResetTokenRequestDecoder, ResetTokenDestinationRepository, ResetTokenEncoder,
+        RegisterResetTokenRepository, RequestResetTokenConfig, RequestResetTokenFields,
+        RequestResetTokenFieldsExtract, RequestResetTokenRequestDecoder, ResetTokenEncoder,
         ResetTokenGenerator, ResetTokenNotifier,
     },
 };
@@ -16,12 +16,9 @@ use crate::auth::{
 use crate::{
     auth::{
         ticket::kernel::data::ExpireDateTime,
-        user::{
-            login_id::kernel::data::{LoginId, ValidateLoginIdError},
-            password::reset::request_token::data::{
-                EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
-                RegisterResetTokenRepositoryError, RequestResetTokenError,
-            },
+        user::password::reset::request_token::data::{
+            EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
+            ValidateRequestResetTokenFieldsError,
         },
     },
     z_lib::repository::data::RepositoryError,
@@ -45,8 +42,7 @@ pub trait RequestResetTokenMaterial {
     type ValidateNonce: ValidateAuthNonceInfra;
 
     type Clock: AuthClock;
-    type PasswordRepository: RegisterResetTokenRepository;
-    type DestinationRepository: ResetTokenDestinationRepository;
+    type ResetTokenRepository: RegisterResetTokenRepository;
     type TokenGenerator: ResetTokenGenerator;
     type TokenEncoder: ResetTokenEncoder;
     type TokenNotifier: ResetTokenNotifier;
@@ -54,8 +50,7 @@ pub trait RequestResetTokenMaterial {
     fn validate_nonce(&self) -> &Self::ValidateNonce;
 
     fn clock(&self) -> &Self::Clock;
-    fn password_repository(&self) -> &Self::PasswordRepository;
-    fn destination_repository(&self) -> &Self::DestinationRepository;
+    fn reset_token_repository(&self) -> &Self::ResetTokenRepository;
     fn token_generator(&self) -> &Self::TokenGenerator;
     fn token_encoder(&self) -> &Self::TokenEncoder;
     fn token_notifier(&self) -> &Self::TokenNotifier;
@@ -106,7 +101,8 @@ pub enum RequestResetTokenEvent {
     TokenExpiresCalculated(ExpireDateTime),
     TokenNotified(NotifyResetTokenResponse),
     Success,
-    InvalidRequest(RequestResetTokenError),
+    Invalid(ValidateRequestResetTokenFieldsError),
+    NotFound,
     RepositoryError(RepositoryError),
     EncodeError(EncodeResetTokenError),
     NotifyError(NotifyResetTokenError),
@@ -125,31 +121,11 @@ impl std::fmt::Display for RequestResetTokenEvent {
                 write!(f, "token notified; {}", response)
             }
             Self::Success => write!(f, "{}", SUCCESS),
-            Self::InvalidRequest(err) => write!(f, "{}; {}", ERROR, err),
+            Self::Invalid(err) => write!(f, "{}; invalid; {}", ERROR, err),
+            Self::NotFound => write!(f, "{}; not found", ERROR),
             Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
             Self::EncodeError(err) => write!(f, "{}; {}", ERROR, err),
             Self::NotifyError(err) => write!(f, "{}; {}", ERROR, err),
-        }
-    }
-}
-
-fn destination_not_found() -> RequestResetTokenEvent {
-    RequestResetTokenEvent::InvalidRequest(RequestResetTokenError::DestinationNotFound)
-}
-
-impl Into<RequestResetTokenEvent> for ValidateLoginIdError {
-    fn into(self) -> RequestResetTokenEvent {
-        RequestResetTokenEvent::InvalidRequest(RequestResetTokenError::InvalidLoginId(self))
-    }
-}
-
-impl Into<RequestResetTokenEvent> for RegisterResetTokenRepositoryError {
-    fn into(self) -> RequestResetTokenEvent {
-        match self {
-            Self::RepositoryError(err) => RequestResetTokenEvent::RepositoryError(err),
-            Self::UserNotFound => {
-                RequestResetTokenEvent::InvalidRequest(RequestResetTokenError::UserNotFound)
-            }
         }
     }
 }
@@ -159,42 +135,44 @@ async fn request_reset_token<S>(
     fields: RequestResetTokenFieldsExtract,
     post: impl Fn(RequestResetTokenEvent) -> S,
 ) -> MethodResult<S> {
-    let destination_repository = infra.destination_repository();
+    let fields = RequestResetTokenFields::validate(fields)
+        .map_err(|err| post(RequestResetTokenEvent::Invalid(err)))?;
+
+    let reset_token_repository = infra.reset_token_repository();
     let token_generator = infra.token_generator();
     let token_encoder = infra.token_encoder();
     let token_notifier = infra.token_notifier();
     let config = infra.config();
 
-    let login_id = LoginId::validate(fields.login_id).map_err(|err| post(err.into()))?;
-
-    let destination = destination_repository
-        .get(&login_id)
+    let (user_id, destination) = reset_token_repository
+        .lookup_user(&fields.login_id)
         .await
         .map_err(|err| post(RequestResetTokenEvent::RepositoryError(err)))?
-        .ok_or_else(|| post(destination_not_found()))?;
+        .ok_or_else(|| post(RequestResetTokenEvent::NotFound))?;
+
+    let destination = destination.ok_or_else(|| post(RequestResetTokenEvent::NotFound))?;
 
     let clock = infra.clock();
-    let password_repository = infra.password_repository();
 
     let reset_token = token_generator.generate();
-
     let requested_at = clock.now();
-    let expires = requested_at.clone().expires(&config.token_expires);
+    let expires = requested_at.expires(&config.token_expires);
 
     post(RequestResetTokenEvent::TokenExpiresCalculated(
         expires.clone(),
     ));
 
-    password_repository
+    reset_token_repository
         .register_reset_token(
             reset_token.clone(),
-            login_id,
+            user_id,
+            fields.login_id,
             destination.clone(),
             expires.clone(),
             requested_at,
         )
         .await
-        .map_err(|err| post(err.into()))?;
+        .map_err(|err| post(RequestResetTokenEvent::RepositoryError(err)))?;
 
     let token_encoded = token_encoder
         .encode(reset_token, expires)

@@ -4,6 +4,7 @@ import { SeasonExpires, SeasonRepositoryValue } from "./infra"
 import { ConvertSeasonResult, Season } from "./data"
 import { BoardValue } from "../../../z_vendor/getto-application/board/kernel/data"
 
+// TODO Basket をやめる
 type SeasonBasket = Readonly<{
     year: number
     period: string

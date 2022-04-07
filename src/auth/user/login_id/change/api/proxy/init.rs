@@ -1,4 +1,4 @@
-mod override_password;
+mod override_login_id;
 
 use actix_web::HttpRequest;
 
@@ -6,7 +6,7 @@ use crate::auth::x_outside_feature::feature::AuthProxyOutsideFeature;
 
 use crate::auth::{
     ticket::validate::init::ValidateApiMetadataStruct,
-    user::login_id::change::proxy::init::override_password::OverrideLoginIdProxyService,
+    user::login_id::change::proxy::init::override_login_id::OverrideLoginIdProxyService,
 };
 
 use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};

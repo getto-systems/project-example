@@ -15,7 +15,8 @@ import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
-import { iconHtml, icon_save, icon_spinner } from "../../../../../core/x_preact/design/icon"
+import { iconHtml } from "../../../../../core/x_preact/design/icon"
+import { icon_save, icon_spinner } from "../../../../../x_content/icon"
 
 import { changePasswordError } from "./helper"
 import { InputPasswordEntry } from "../../input/x_preact/input"

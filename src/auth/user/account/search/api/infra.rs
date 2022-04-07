@@ -1,6 +1,6 @@
 use crate::{
     auth::user::account::search::data::{
-        SearchAuthUserAccountBasket, SearchAuthUserAccountFilter,
+        AuthUserAccountSearch, SearchAuthUserAccountFilter,
         SearchAuthUserAccountFilterExtract,
     },
     z_lib::repository::data::RepositoryError,
@@ -15,5 +15,5 @@ pub trait SearchAuthUserAccountRepository {
     async fn search(
         &self,
         fields: SearchAuthUserAccountFilter,
-    ) -> Result<SearchAuthUserAccountBasket, RepositoryError>;
+    ) -> Result<AuthUserAccountSearch, RepositoryError>;
 }

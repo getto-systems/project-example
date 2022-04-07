@@ -1,14 +1,19 @@
-use crate::auth::user::{
-    kernel::data::AuthUserId,
-    login_id::kernel::data::LoginId,
-    password::{
-        authenticate::data::VerifyPasswordRepositoryError,
-        kernel::infra::AuthUserPasswordMatcher,
+use crate::{
+    auth::user::{
+        kernel::data::{AuthUserId, GrantedAuthRoles},
+        login_id::kernel::data::LoginId,
+        password::kernel::infra::{HashedPassword, PlainPassword},
     },
+    z_lib::repository::data::RepositoryError,
 };
 
 pub trait AuthenticatePasswordRequestDecoder {
     fn decode(self) -> AuthenticatePasswordFieldsExtract;
+}
+
+pub struct AuthenticatePasswordFields {
+    pub login_id: LoginId,
+    pub password: PlainPassword,
 }
 
 pub struct AuthenticatePasswordFieldsExtract {
@@ -17,10 +22,14 @@ pub struct AuthenticatePasswordFieldsExtract {
 }
 
 #[async_trait::async_trait]
-pub trait VerifyPasswordRepository {
-    async fn verify_password<'a>(
+pub trait AuthenticatePasswordRepository {
+    async fn lookup_user_id(
         &self,
-        login_id: &'a LoginId,
-        matcher: impl AuthUserPasswordMatcher + 'a,
-    ) -> Result<AuthUserId, VerifyPasswordRepositoryError>;
+        login_id: &LoginId,
+    ) -> Result<Option<AuthUserId>, RepositoryError>;
+
+    async fn lookup_user(
+        &self,
+        user_id: &AuthUserId,
+    ) -> Result<Option<(HashedPassword, Option<GrantedAuthRoles>)>, RepositoryError>;
 }

@@ -14,6 +14,7 @@ message OverrideLoginIdResponsePb {
     OverrideLoginIdErrorKindPb err = 2;
 }
 enum OverrideLoginIdErrorKindPb {
-    INVALID_LOGIN_ID = 0;
-    ALREADY_REGISTERED = 1;
+    NOT_FOUND = 0;
+    INVALID = 1;
+    ALREADY_REGISTERED = 2;
 }

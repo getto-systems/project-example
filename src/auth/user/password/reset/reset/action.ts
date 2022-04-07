@@ -118,7 +118,7 @@ class Action
                         valid: true,
                         value: {
                             loginId: loginIdResult.value,
-                            password: passwordResult.value,
+                            newPassword: passwordResult.value,
                         },
                     }
                 },

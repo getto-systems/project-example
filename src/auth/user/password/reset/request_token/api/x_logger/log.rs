@@ -3,7 +3,7 @@ use super::super::action::{RequestResetTokenEvent, RequestResetTokenState};
 use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
 
 use crate::auth::user::password::reset::request_token::data::{
-    EncodeResetTokenError, NotifyResetTokenError, RequestResetTokenError,
+    EncodeResetTokenError, NotifyResetTokenError,
 };
 
 impl LogMessage for RequestResetTokenState {
@@ -27,20 +27,11 @@ impl LogFilter for RequestResetTokenEvent {
             Self::TokenExpiresCalculated(_) => LogLevel::Info,
             Self::TokenNotified(_) => LogLevel::Info,
             Self::Success => LogLevel::Audit,
-            Self::InvalidRequest(err) => err.log_level(),
+            Self::Invalid(_) => LogLevel::Error,
+            Self::NotFound => LogLevel::Error,
             Self::RepositoryError(err) => err.log_level(),
             Self::EncodeError(err) => err.log_level(),
             Self::NotifyError(err) => err.log_level(),
-        }
-    }
-}
-
-impl LogFilter for RequestResetTokenError {
-    fn log_level(&self) -> LogLevel {
-        match self {
-            Self::InvalidLoginId(_) => LogLevel::Error,
-            Self::UserNotFound => LogLevel::Audit,
-            Self::DestinationNotFound => LogLevel::Audit,
         }
     }
 }
@@ -56,6 +47,7 @@ impl LogFilter for EncodeResetTokenError {
 impl LogFilter for NotifyResetTokenError {
     fn log_level(&self) -> LogLevel {
         match self {
+            Self::NoDestination => LogLevel::Info,
             Self::InfraError(_) => LogLevel::Error,
         }
     }

@@ -7,7 +7,7 @@ use crate::z_lib::response::tonic::ServiceResponder;
 use super::super::action::{RequestResetTokenEvent, RequestResetTokenState};
 
 use crate::auth::user::password::reset::request_token::data::{
-    EncodeResetTokenError, NotifyResetTokenError, RequestResetTokenError,
+    EncodeResetTokenError, NotifyResetTokenError,
 };
 
 impl ServiceResponder<RequestResetTokenResponsePb> for RequestResetTokenState {
@@ -29,19 +29,16 @@ impl ServiceResponder<RequestResetTokenResponsePb> for RequestResetTokenEvent {
                 "cancelled at request reset token notified",
             )),
             Self::Success => Ok(Response::new(RequestResetTokenResponsePb { success: true })),
-            Self::InvalidRequest(err) => err.respond_to(),
+            Self::Invalid(_) => Ok(Response::new(RequestResetTokenResponsePb {
+                success: false,
+            })),
+            Self::NotFound => Ok(Response::new(RequestResetTokenResponsePb {
+                success: false,
+            })),
             Self::RepositoryError(err) => err.respond_to(),
             Self::EncodeError(err) => err.respond_to(),
             Self::NotifyError(err) => err.respond_to(),
         }
-    }
-}
-
-impl ServiceResponder<RequestResetTokenResponsePb> for RequestResetTokenError {
-    fn respond_to(self) -> Result<Response<RequestResetTokenResponsePb>, Status> {
-        Ok(Response::new(RequestResetTokenResponsePb {
-            success: false,
-        }))
     }
 }
 
@@ -56,6 +53,7 @@ impl<T> ServiceResponder<T> for EncodeResetTokenError {
 impl<T> ServiceResponder<T> for NotifyResetTokenError {
     fn respond_to(self) -> Result<Response<T>, Status> {
         match self {
+            Self::NoDestination => Err(Status::internal("no reset token destination")),
             Self::InfraError(_) => Err(Status::internal("notify reset token error")),
         }
     }

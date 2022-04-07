@@ -32,15 +32,16 @@ impl AuthJwtClaims {
     }
 }
 fn to_claims(aud: String, ticket: AuthTicket, expires: ExpireDateTime) -> (AuthJwtClaims, i64) {
-    let ticket = ticket.extract();
+    let (ticket_id, user) = ticket.extract();
+    let user = user.extract();
     let exp = expires.extract().timestamp();
     (
         AuthJwtClaims {
             aud,
             exp,
-            ticket_id: ticket.ticket_id,
-            user_id: ticket.user_id,
-            granted_roles: ticket.granted_roles,
+            ticket_id: ticket_id.extract(),
+            user_id: user.user_id,
+            granted_roles: user.granted_roles,
         },
         exp,
     )
