@@ -22,7 +22,7 @@ describe("FindNextVersion", () => {
         await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
-                    type: "succeed-to-find",
+                    type: "success",
                     upToDate: true,
                     version: "1.0.0-ui",
                     target: {
@@ -45,9 +45,9 @@ describe("FindNextVersion", () => {
 
         await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
-                { type: "take-longtime-to-find" },
+                { type: "take-longtime" },
                 {
-                    type: "succeed-to-find",
+                    type: "success",
                     upToDate: true,
                     version: "1.0.0-ui",
                     target: {
@@ -68,7 +68,7 @@ describe("FindNextVersion", () => {
         await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
-                    type: "succeed-to-find",
+                    type: "success",
                     upToDate: false,
                     version: "1.1.0-ui",
                     target: {
@@ -89,7 +89,7 @@ describe("FindNextVersion", () => {
         await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
-                    type: "succeed-to-find",
+                    type: "success",
                     upToDate: false,
                     version: "1.0.1-ui",
                     target: {
@@ -110,7 +110,7 @@ describe("FindNextVersion", () => {
         await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
-                    type: "succeed-to-find",
+                    type: "success",
                     upToDate: false,
                     version: "1.2.0-ui",
                     target: {
@@ -131,7 +131,7 @@ describe("FindNextVersion", () => {
         await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
-                    type: "succeed-to-find",
+                    type: "success",
                     upToDate: false,
                     version: "1.0.2-ui",
                     target: {
@@ -152,7 +152,7 @@ describe("FindNextVersion", () => {
         await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
-                    type: "succeed-to-find",
+                    type: "success",
                     upToDate: false,
                     version: "1.1.1-ui",
                     target: {
@@ -177,7 +177,7 @@ describe("FindNextVersion", () => {
         await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
-                    type: "succeed-to-find",
+                    type: "success",
                     upToDate: false,
                     version: "1.1.1-ui",
                     target: {
@@ -198,7 +198,7 @@ describe("FindNextVersion", () => {
         await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
-                    type: "succeed-to-find",
+                    type: "success",
                     upToDate: false,
                     version: "1.1.0-ui",
                     target: {
@@ -219,7 +219,7 @@ describe("FindNextVersion", () => {
         await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
-                    type: "succeed-to-find",
+                    type: "success",
                     upToDate: true,
                     version: "1.0.0-ui",
                     target: { valid: false },
@@ -250,7 +250,7 @@ describe("FindNextVersion", () => {
         await runner(() => resource.ignitionState).then((stack) => {
             expect(stack).toEqual([
                 {
-                    type: "succeed-to-find",
+                    type: "success",
                     upToDate: true,
                     version: "1.0.0-ui",
                     target: {

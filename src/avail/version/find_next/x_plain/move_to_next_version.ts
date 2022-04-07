@@ -15,23 +15,20 @@ export function MoveToNextVersionEntry(view: ApplicationView<FindNextVersionActi
         handleError(err)
     }
 
-    function handleState(state: FindNextVersionState) {
+    function handleState(state: FindNextVersionState): true {
         switch (state.type) {
-            case "initial-next-version":
-            case "take-longtime-to-find":
+            case "initial":
+            case "take-longtime":
                 // work in progress...
-                return
+                return true
 
-            case "succeed-to-find":
+            case "success":
                 redirect(state.upToDate, state.version, state.target)
-                return
+                return true
 
-            case "failed-to-find":
+            case "failed":
                 handleError(state.err)
-                return
-
-            default:
-                assertNever(state)
+                return true
         }
     }
     function redirect(
@@ -75,7 +72,3 @@ export function MoveToNextVersionEntry(view: ApplicationView<FindNextVersionActi
 }
 
 type RedirectPath = Readonly<{ redirect: false }> | Readonly<{ redirect: true; path: string }>
-
-function assertNever(_: never): never {
-    throw new Error("NEVER")
-}

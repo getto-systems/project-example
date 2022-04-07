@@ -19,10 +19,9 @@ import { ApplicationTargetPathDetecter, CheckDeployExistsRemote } from "./infra"
 
 export type FindNextVersionAction = StatefulApplicationAction<FindNextVersionState>
 
-// TODO type 簡略化
-export type FindNextVersionState = Readonly<{ type: "initial-next-version" }> | FindNextVersionEvent
+export type FindNextVersionState = Readonly<{ type: "initial" }> | FindNextVersionEvent
 
-const initialState: FindNextVersionState = { type: "initial-next-version" }
+const initialState: FindNextVersionState = { type: "initial" }
 
 export type FindNextVersionMaterial = Readonly<{
     infra: FindNextVersionInfra
@@ -61,10 +60,10 @@ class Action
 }
 
 export type FindNextVersionEvent =
-    | Readonly<{ type: "take-longtime-to-find" }>
-    | Readonly<{ type: "failed-to-find"; err: CheckDeployExistsError }>
+    | Readonly<{ type: "take-longtime" }>
+    | Readonly<{ type: "failed"; err: CheckDeployExistsError }>
     | Readonly<{
-          type: "succeed-to-find"
+          type: "success"
           upToDate: boolean
           version: VersionString
           target: ConvertLocationResult<ApplicationTargetPath>
@@ -80,7 +79,7 @@ async function findNextVersion<S>(
 
     if (!currentVersion.valid) {
         return post({
-            type: "succeed-to-find",
+            type: "success",
             upToDate: true,
             version: versionStringConverter(config.version),
             target: shell.detectTargetPath(),
@@ -91,22 +90,22 @@ async function findNextVersion<S>(
     const next = await delayedChecker(
         findNext(check, currentVersion.value, config.versionSuffix),
         config.takeLongtimeThreshold,
-        () => post({ type: "take-longtime-to-find" }),
+        () => post({ type: "take-longtime" }),
     )
     if (!next.success) {
-        return post({ type: "failed-to-find", err: next.err })
+        return post({ type: "failed", err: next.err })
     }
 
     if (!next.found) {
         return post({
-            type: "succeed-to-find",
+            type: "success",
             upToDate: true,
             version: versionStringConverter(config.version),
             target: shell.detectTargetPath(),
         })
     } else {
         return post({
-            type: "succeed-to-find",
+            type: "success",
             upToDate: false,
             version: versionToString(next.version),
             target: shell.detectTargetPath(),
