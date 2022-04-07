@@ -8,7 +8,7 @@ use crate::auth::{
         kernel::init::clock::test::StaticChronoAuthClock,
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
-            nonce_repository::memory::MemoryAuthNonceRepository,
+            nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
             test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
@@ -45,7 +45,8 @@ use crate::auth::{
 async fn success_override() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let material = TestStruct::standard();
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = OverridePasswordAction::with_material(request_decoder, material);
@@ -65,7 +66,8 @@ async fn success_override() {
 async fn error_empty_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let material = TestStruct::standard();
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
     let request_decoder = empty_password_request_decoder();
 
     let mut action = OverridePasswordAction::with_material(request_decoder, material);
@@ -85,7 +87,8 @@ async fn error_empty_password() {
 async fn error_too_long_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let material = TestStruct::standard();
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
     let request_decoder = too_long_password_request_decoder();
 
     let mut action = OverridePasswordAction::with_material(request_decoder, material);
@@ -105,7 +108,8 @@ async fn error_too_long_password() {
 async fn just_max_length_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let material = TestStruct::standard();
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
     let request_decoder = just_max_length_password_request_decoder();
 
     let mut action = OverridePasswordAction::with_material(request_decoder, material);
@@ -121,13 +125,13 @@ async fn just_max_length_password() {
     assert!(result.is_ok());
 }
 
-struct TestStruct {
-    validate: StaticValidateAuthTokenStruct,
+struct TestStruct<'a> {
+    validate: StaticValidateAuthTokenStruct<'a>,
     password_repository: MemoryAuthUserRepository,
 }
 
-impl OverridePasswordMaterial for TestStruct {
-    type Validate = StaticValidateAuthTokenStruct;
+impl<'a> OverridePasswordMaterial for TestStruct<'a> {
+    type Validate = StaticValidateAuthTokenStruct<'a>;
 
     type PasswordRepository = MemoryAuthUserRepository;
     type PasswordHasher = PlainPasswordHasher;
@@ -140,15 +144,27 @@ impl OverridePasswordMaterial for TestStruct {
     }
 }
 
-impl TestStruct {
-    fn standard() -> Self {
+struct TestStore {
+    nonce: MemoryAuthNonceStore,
+}
+
+impl TestStore {
+    fn new() -> Self {
+        Self {
+            nonce: MemoryAuthNonceStore::new(),
+        }
+    }
+}
+
+impl<'a> TestStruct<'a> {
+    fn standard(store: &'a TestStore) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),
                     nonce_metadata: standard_nonce_header(),
-                    nonce_repository: standard_nonce_repository(),
+                    nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
                 token_metadata: standard_token_header(),
                 token_decoder: standard_token_decoder(),
@@ -215,10 +231,6 @@ fn just_max_length_password_request_decoder() -> StaticOverridePasswordRequestDe
         login_id: LOGIN_ID.into(),
         new_password: vec!["a"; 100].join(""),
     })
-}
-
-fn standard_nonce_repository() -> MemoryAuthNonceRepository {
-    MemoryAuthNonceRepository::new()
 }
 
 fn standard_password_repository() -> MemoryAuthUserRepository {

@@ -5,20 +5,22 @@ use crate::{
     z_lib::repository::data::RegisterResult,
 };
 
-pub struct MapNonce {
-    store: Mutex<HashMap<AuthNonce, EntryNonce>>,
+pub struct MapNonce<'a> {
+    store: &'a StoreNonce,
 }
+pub type StoreNonce = Mutex<HashMap<AuthNonce, EntryNonce>>;
 
 pub struct EntryNonce {
     pub expires: ExpireDateTime,
     pub registered_at: AuthDateTime,
 }
 
-impl MapNonce {
-    pub fn new() -> Self {
-        Self {
-            store: Mutex::new(HashMap::new()),
-        }
+impl<'a> MapNonce<'a> {
+    pub fn new_store() -> StoreNonce {
+        Mutex::new(HashMap::new())
+    }
+    pub fn new(store: &'a StoreNonce) -> Self {
+        Self { store }
     }
 
     pub fn insert_entry(&self, nonce: AuthNonce, entry: EntryNonce) {

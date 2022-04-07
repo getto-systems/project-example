@@ -8,7 +8,7 @@ use crate::auth::{
         kernel::init::clock::test::StaticChronoAuthClock,
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
-            nonce_repository::memory::MemoryAuthNonceRepository,
+            nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
             test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
@@ -46,8 +46,8 @@ use crate::auth::{
 async fn success_change() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let repository = TestRepository::standard();
-    let material = TestStruct::standard(repository);
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = ChangePasswordAction::with_material(request_decoder, material);
@@ -67,8 +67,8 @@ async fn success_change() {
 async fn error_empty_current_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let repository = TestRepository::standard();
-    let material = TestStruct::standard(repository);
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
     let request_decoder = empty_current_password_request_decoder();
 
     let mut action = ChangePasswordAction::with_material(request_decoder, material);
@@ -88,8 +88,8 @@ async fn error_empty_current_password() {
 async fn error_too_long_current_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let repository = TestRepository::standard();
-    let material = TestStruct::standard(repository);
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
     let request_decoder = too_long_current_password_request_decoder();
 
     let mut action = ChangePasswordAction::with_material(request_decoder, material);
@@ -109,8 +109,8 @@ async fn error_too_long_current_password() {
 async fn just_max_length_current_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let repository = TestRepository::standard();
-    let material = TestStruct::standard(repository);
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
     let request_decoder = just_max_length_current_password_request_decoder();
 
     let mut action = ChangePasswordAction::with_material(request_decoder, material);
@@ -130,8 +130,8 @@ async fn just_max_length_current_password() {
 async fn error_empty_new_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let repository = TestRepository::standard();
-    let material = TestStruct::standard(repository);
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
     let request_decoder = empty_new_password_request_decoder();
 
     let mut action = ChangePasswordAction::with_material(request_decoder, material);
@@ -151,8 +151,8 @@ async fn error_empty_new_password() {
 async fn error_too_long_new_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let repository = TestRepository::standard();
-    let material = TestStruct::standard(repository);
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
     let request_decoder = too_long_new_password_request_decoder();
 
     let mut action = ChangePasswordAction::with_material(request_decoder, material);
@@ -172,8 +172,8 @@ async fn error_too_long_new_password() {
 async fn just_max_length_new_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let repository = TestRepository::standard();
-    let material = TestStruct::standard(repository);
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
     let request_decoder = just_max_length_new_password_request_decoder();
 
     let mut action = ChangePasswordAction::with_material(request_decoder, material);
@@ -193,8 +193,8 @@ async fn just_max_length_new_password() {
 async fn error_failed_to_match_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let repository = TestRepository::match_fail();
-    let material = TestStruct::standard(repository);
+    let store = TestStore::new();
+    let material = TestStruct::match_fail(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = ChangePasswordAction::with_material(request_decoder, material);
@@ -214,8 +214,8 @@ async fn error_failed_to_match_password() {
 async fn error_password_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let repository = TestRepository::no_user();
-    let material = TestStruct::standard(repository);
+    let store = TestStore::new();
+    let material = TestStruct::no_user(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = ChangePasswordAction::with_material(request_decoder, material);
@@ -231,13 +231,13 @@ async fn error_password_not_stored() {
     assert!(!result.is_ok());
 }
 
-struct TestStruct {
-    validate: StaticValidateAuthTokenStruct,
+struct TestStruct<'a> {
+    validate: StaticValidateAuthTokenStruct<'a>,
     password_repository: MemoryAuthUserRepository,
 }
 
-impl ChangePasswordMaterial for TestStruct {
-    type Validate = StaticValidateAuthTokenStruct;
+impl<'a> ChangePasswordMaterial for TestStruct<'a> {
+    type Validate = StaticValidateAuthTokenStruct<'a>;
 
     type PasswordRepository = MemoryAuthUserRepository;
     type PasswordMatcher = PlainPasswordMatcher;
@@ -251,42 +251,42 @@ impl ChangePasswordMaterial for TestStruct {
     }
 }
 
-struct TestRepository {
-    password: MemoryAuthUserRepository,
+struct TestStore {
+    nonce: MemoryAuthNonceStore,
 }
 
-impl TestRepository {
-    fn standard() -> Self {
+impl TestStore {
+    fn new() -> Self {
         Self {
-            password: standard_password_repository(),
-        }
-    }
-    fn match_fail() -> Self {
-        Self {
-            password: match_fail_password_repository(),
-        }
-    }
-    fn no_user() -> Self {
-        Self {
-            password: no_user_password_repository(),
+            nonce: MemoryAuthNonceStore::new(),
         }
     }
 }
 
-impl TestStruct {
-    fn standard(repository: TestRepository) -> Self {
+impl<'a> TestStruct<'a> {
+    fn standard(store: &'a TestStore) -> Self {
+        Self::new(store, standard_password_repository())
+    }
+    fn match_fail(store: &'a TestStore) -> Self {
+        Self::new(store, match_fail_password_repository())
+    }
+    fn no_user(store: &'a TestStore) -> Self {
+        Self::new(store, no_user_password_repository())
+    }
+
+    fn new(store: &'a TestStore, password_repository: MemoryAuthUserRepository) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),
                     nonce_metadata: standard_nonce_header(),
-                    nonce_repository: standard_nonce_repository(),
+                    nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
                 token_metadata: standard_token_header(),
                 token_decoder: standard_token_decoder(),
             },
-            password_repository: repository.password,
+            password_repository,
         }
     }
 }
@@ -367,10 +367,6 @@ fn just_max_length_new_password_request_decoder() -> StaticChangePasswordRequest
         current_password: "current-password".into(),
         new_password: vec!["a"; 100].join(""),
     })
-}
-
-fn standard_nonce_repository() -> MemoryAuthNonceRepository {
-    MemoryAuthNonceRepository::new()
 }
 
 fn standard_password_repository() -> MemoryAuthUserRepository {

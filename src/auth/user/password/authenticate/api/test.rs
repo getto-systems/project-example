@@ -19,7 +19,7 @@ use crate::auth::{
         },
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
-            nonce_repository::memory::MemoryAuthNonceRepository,
+            nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
             test::StaticValidateAuthNonceStruct,
         },
     },
@@ -245,7 +245,7 @@ async fn error_no_user() {
 }
 
 struct TestStruct<'a> {
-    validate_nonce: StaticValidateAuthNonceStruct,
+    validate_nonce: StaticValidateAuthNonceStruct<'a>,
     issue: StaticIssueAuthTicketStruct<'a>,
     encode: StaticEncodeAuthTicketStruct<'a>,
 
@@ -253,7 +253,7 @@ struct TestStruct<'a> {
 }
 
 impl<'a> AuthenticatePasswordMaterial for TestStruct<'a> {
-    type ValidateNonce = StaticValidateAuthNonceStruct;
+    type ValidateNonce = StaticValidateAuthNonceStruct<'a>;
     type Issue = StaticIssueAuthTicketStruct<'a>;
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
@@ -276,12 +276,14 @@ impl<'a> AuthenticatePasswordMaterial for TestStruct<'a> {
 }
 
 struct TestStore {
+    nonce: MemoryAuthNonceStore,
     ticket: MemoryAuthTicketStore,
 }
 
 impl TestStore {
     fn standard() -> Self {
         Self {
+            nonce: MemoryAuthNonceStore::new(),
             ticket: MemoryAuthTicketStore::new(),
         }
     }
@@ -316,7 +318,7 @@ impl<'a> TestStruct<'a> {
                 config: standard_nonce_config(),
                 clock: standard_clock(),
                 nonce_metadata: standard_nonce_metadata(),
-                nonce_repository: standard_nonce_repository(),
+                nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
             },
             issue: StaticIssueAuthTicketStruct {
                 clock: standard_clock(),
@@ -415,10 +417,6 @@ fn just_max_length_password_request_decoder() -> StaticAuthenticatePasswordReque
         login_id: "login-id".into(),
         password: vec!["a"; 100].join(""),
     })
-}
-
-fn standard_nonce_repository() -> MemoryAuthNonceRepository {
-    MemoryAuthNonceRepository::new()
 }
 
 fn standard_password_repository() -> MemoryAuthUserRepository {

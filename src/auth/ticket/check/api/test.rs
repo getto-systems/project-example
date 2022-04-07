@@ -18,7 +18,7 @@ use crate::auth::ticket::{
     },
     validate::init::{
         nonce_metadata::test::StaticAuthNonceMetadata,
-        nonce_repository::memory::MemoryAuthNonceRepository,
+        nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
         test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
         token_decoder::test::StaticAuthTokenDecoder,
         token_metadata::test::StaticAuthTokenMetadata,
@@ -117,12 +117,12 @@ async fn error_no_ticket() {
 }
 
 struct TestStruct<'a> {
-    validate: StaticValidateAuthTokenStruct,
+    validate: StaticValidateAuthTokenStruct<'a>,
     encode: StaticEncodeAuthTicketStruct<'a>,
 }
 
 impl<'a> CheckAuthTicketMaterial for TestStruct<'a> {
-    type Validate = StaticValidateAuthTokenStruct;
+    type Validate = StaticValidateAuthTokenStruct<'a>;
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
     fn validate(&self) -> &Self::Validate {
@@ -134,12 +134,14 @@ impl<'a> CheckAuthTicketMaterial for TestStruct<'a> {
 }
 
 struct TestStore {
+    nonce: MemoryAuthNonceStore,
     ticket: MemoryAuthTicketStore,
 }
 
 impl TestStore {
     fn new() -> Self {
         Self {
+            nonce: MemoryAuthNonceStore::new(),
             ticket: MemoryAuthTicketStore::new(),
         }
     }
@@ -148,30 +150,35 @@ impl TestStore {
 impl<'a> TestStruct<'a> {
     fn standard(store: &'a TestStore) -> Self {
         Self::new(
+            store,
             standard_ticket_repository(&store.ticket),
             standard_token_decoder(),
         )
     }
     fn token_expired(store: &'a TestStore) -> Self {
         Self::new(
+            store,
             standard_ticket_repository(&store.ticket),
             expired_token_decoder(),
         )
     }
     fn limited_ticket(store: &'a TestStore) -> Self {
         Self::new(
+            store,
             limited_ticket_repository(&store.ticket),
             standard_token_decoder(),
         )
     }
     fn no_ticket(store: &'a TestStore) -> Self {
         Self::new(
+            store,
             no_ticket_repository(&store.ticket),
             standard_token_decoder(),
         )
     }
 
     fn new(
+        store: &'a TestStore,
         ticket_repository: MemoryAuthTicketRepository<'a>,
         token_validator: StaticAuthTokenDecoder,
     ) -> Self {
@@ -181,7 +188,7 @@ impl<'a> TestStruct<'a> {
                     config: standard_nonce_config(),
                     clock: standard_clock(),
                     nonce_metadata: standard_nonce_header(),
-                    nonce_repository: standard_nonce_repository(),
+                    nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
                 token_metadata: standard_token_header(),
                 token_decoder: token_validator,
@@ -241,10 +248,6 @@ fn standard_token_decoder() -> StaticAuthTokenDecoder {
 }
 fn expired_token_decoder() -> StaticAuthTokenDecoder {
     StaticAuthTokenDecoder::Expired
-}
-
-fn standard_nonce_repository() -> MemoryAuthNonceRepository {
-    MemoryAuthNonceRepository::new()
 }
 
 fn standard_ticket_repository<'a>(

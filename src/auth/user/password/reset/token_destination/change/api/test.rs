@@ -8,7 +8,7 @@ use crate::auth::{
         kernel::init::clock::test::StaticChronoAuthClock,
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
-            nonce_repository::memory::MemoryAuthNonceRepository,
+            nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
             test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
@@ -41,7 +41,8 @@ use crate::auth::{
 async fn success_change_destination() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let material = TestStruct::standard();
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
     let mut action = ChangeResetTokenDestinationAction::with_material(request_decoder, material);
@@ -61,7 +62,8 @@ async fn success_change_destination() {
 async fn error_conflict_changes() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let material = TestStruct::standard();
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
     let request_decoder = conflict_request_decoder();
 
     let mut action = ChangeResetTokenDestinationAction::with_material(request_decoder, material);
@@ -81,7 +83,8 @@ async fn error_conflict_changes() {
 async fn error_not_found() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let material = TestStruct::standard();
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
     let request_decoder = not_found_request_decoder();
 
     let mut action = ChangeResetTokenDestinationAction::with_material(request_decoder, material);
@@ -97,13 +100,13 @@ async fn error_not_found() {
     assert!(!result.is_ok());
 }
 
-struct TestStruct {
-    validate: StaticValidateAuthTokenStruct,
+struct TestStruct<'a> {
+    validate: StaticValidateAuthTokenStruct<'a>,
     destination_repository: MemoryAuthUserRepository,
 }
 
-impl ChangeResetTokenDestinationMaterial for TestStruct {
-    type Validate = StaticValidateAuthTokenStruct;
+impl<'a> ChangeResetTokenDestinationMaterial for TestStruct<'a> {
+    type Validate = StaticValidateAuthTokenStruct<'a>;
 
     type DestinationRepository = MemoryAuthUserRepository;
 
@@ -115,15 +118,27 @@ impl ChangeResetTokenDestinationMaterial for TestStruct {
     }
 }
 
-impl TestStruct {
-    fn standard() -> Self {
+struct TestStore {
+    nonce: MemoryAuthNonceStore,
+}
+
+impl TestStore {
+    fn new() -> Self {
+        Self {
+            nonce: MemoryAuthNonceStore::new(),
+        }
+    }
+}
+
+impl<'a> TestStruct<'a> {
+    fn standard(store: &'a TestStore) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),
                     nonce_metadata: standard_nonce_header(),
-                    nonce_repository: standard_nonce_repository(),
+                    nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
                 token_metadata: standard_token_header(),
                 token_decoder: standard_token_decoder(),
@@ -194,10 +209,6 @@ fn not_found_request_decoder() -> StaticChangeResetTokenDestinationRequestDecode
             "user@example.com".into(),
         )),
     })
-}
-
-fn standard_nonce_repository() -> MemoryAuthNonceRepository {
-    MemoryAuthNonceRepository::new()
 }
 
 fn standard_destination_repository() -> MemoryAuthUserRepository {

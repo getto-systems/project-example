@@ -14,7 +14,7 @@ use crate::auth::ticket::{
     },
     validate::init::{
         nonce_metadata::test::StaticAuthNonceMetadata,
-        nonce_repository::memory::MemoryAuthNonceRepository,
+        nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
         test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
         token_decoder::test::StaticAuthTokenDecoder,
         token_metadata::test::StaticAuthTokenMetadata,
@@ -70,12 +70,12 @@ async fn error_no_ticket() {
 }
 
 struct TestStruct<'a> {
-    validate: StaticValidateAuthTokenStruct,
+    validate: StaticValidateAuthTokenStruct<'a>,
     ticket_repository: MemoryAuthTicketRepository<'a>,
 }
 
 impl<'a> LogoutMaterial for TestStruct<'a> {
-    type ValidateInfra = StaticValidateAuthTokenStruct;
+    type ValidateInfra = StaticValidateAuthTokenStruct<'a>;
     type TicketRepository = MemoryAuthTicketRepository<'a>;
 
     fn validate(&self) -> &Self::ValidateInfra {
@@ -87,12 +87,14 @@ impl<'a> LogoutMaterial for TestStruct<'a> {
 }
 
 struct TestStore {
+    nonce: MemoryAuthNonceStore,
     ticket: MemoryAuthTicketStore,
 }
 
 impl TestStore {
     fn new() -> Self {
         Self {
+            nonce: MemoryAuthNonceStore::new(),
             ticket: MemoryAuthTicketStore::new(),
         }
     }
@@ -100,19 +102,19 @@ impl TestStore {
 
 impl<'a> TestStruct<'a> {
     fn standard(store: &'a TestStore) -> Self {
-        Self::new(standard_ticket_repository(&store.ticket))
+        Self::new(store, standard_ticket_repository(&store.ticket))
     }
     fn no_ticket(store: &'a TestStore) -> Self {
-        Self::new(no_ticket_repository(&store.ticket))
+        Self::new(store, no_ticket_repository(&store.ticket))
     }
-    fn new(ticket_repository: MemoryAuthTicketRepository<'a>) -> Self {
+    fn new(store: &'a TestStore, ticket_repository: MemoryAuthTicketRepository<'a>) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),
                     nonce_metadata: standard_nonce_metadata(),
-                    nonce_repository: standard_nonce_repository(),
+                    nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
                 token_metadata: standard_token_metadata(),
                 token_decoder: standard_token_validator(),
@@ -152,10 +154,6 @@ fn standard_token_validator() -> StaticAuthTokenDecoder {
         user_id: "user-id".into(),
         granted_roles: HashSet::new(),
     })
-}
-
-fn standard_nonce_repository() -> MemoryAuthNonceRepository {
-    MemoryAuthNonceRepository::new()
 }
 
 fn standard_ticket_repository<'a>(
