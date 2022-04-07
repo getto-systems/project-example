@@ -10,13 +10,8 @@ import { mainTitleWithSidebarButton } from "../../../../../z_vendor/getto-css/pr
 import { SearchSidebarAction, SearchSidebarState } from "../action"
 import { repositoryErrorReason } from "../../../repository/x_error/reason"
 import { notice_alert } from "../../../../../z_vendor/getto-css/preact/design/highlight"
-import {
-    iconHtml,
-} from "../../../../../core/x_preact/design/icon"
-import {
-    icon_sidebar_expand,
-    icon_sidebar_fold
-} from "../../../../../x_content/icon"
+import { iconHtml } from "../../../../../core/x_preact/design/icon"
+import { icon_sidebar_expand, icon_sidebar_fold } from "../../../../../x_content/icon"
 import { sidebarExpand } from "./helper"
 
 type EntryProps = Readonly<{
@@ -72,9 +67,7 @@ function SearchSidebarButton(props: Props): VNode {
 
 function SearchSidebarError({ state }: Readonly<{ state: SearchSidebarState }>): VNode {
     switch (state.type) {
-        case "initial-sidebar":
-        case "succeed-to-load":
-        case "succeed-to-save":
+        case "success":
             return EMPTY_CONTENT
 
         case "repository-error":
