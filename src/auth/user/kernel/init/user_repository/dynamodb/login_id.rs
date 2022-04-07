@@ -7,9 +7,8 @@ use rusoto_dynamodb::{
 
 use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
-use crate::z_lib::repository::dynamodb::helper::ScanKey;
 use crate::z_lib::repository::{
-    dynamodb::helper::{string_value, DynamoDbColumn},
+    dynamodb::helper::{string_value, DynamoDbColumn, ScanKey},
     helper::infra_error,
 };
 
@@ -91,7 +90,7 @@ impl<'a> TableLoginId<'a> {
                 ColumnUserId::remove_value(&mut attrs),
                 ColumnResetTokenDestinationEmail::remove_value(&mut attrs),
             ) {
-                (Some(user_id), Some(reset_token_destination)) => Some(OverrideLoginIdEntry {
+                (Some(user_id), reset_token_destination) => Some(OverrideLoginIdEntry {
                     login_id,
                     user_id,
                     reset_token_destination,
@@ -103,7 +102,7 @@ impl<'a> TableLoginId<'a> {
     pub async fn lookup_reset_token_entry(
         &self,
         login_id: LoginId,
-    ) -> Result<Option<(AuthUserId, ResetTokenDestination)>, RepositoryError> {
+    ) -> Result<Option<(AuthUserId, Option<ResetTokenDestination>)>, RepositoryError> {
         let input = GetItemInput {
             table_name: self.table_name.into(),
             key: TableLoginId::key(login_id),
@@ -128,26 +127,53 @@ impl<'a> TableLoginId<'a> {
                 ColumnUserId::remove_value(&mut attrs),
                 ColumnResetTokenDestinationEmail::remove_value(&mut attrs),
             ) {
-                (Some(user_id), Some(email)) => Some((user_id, email)),
+                (Some(user_id), email) => Some((user_id, email)),
                 _ => None,
             }
         }))
     }
+    pub async fn lookup_reset_token_destination(
+        &self,
+        login_id: LoginId,
+    ) -> Result<Option<ResetTokenDestination>, RepositoryError> {
+        let input = GetItemInput {
+            table_name: self.table_name.into(),
+            key: TableLoginId::key(login_id),
+            projection_expression: Some(
+                vec![ColumnResetTokenDestinationEmail::as_name()].join(","),
+            ),
+            ..Default::default()
+        };
 
-    pub async fn put_login_id(
+        let response = self
+            .client
+            .get_item(input)
+            .await
+            .map_err(|err| infra_error("lookup reset token entry error", err))?;
+
+        Ok(response
+            .item
+            .and_then(|mut attrs| ColumnResetTokenDestinationEmail::remove_value(&mut attrs)))
+    }
+
+    pub async fn put_override_entry(
         &self,
         login_id: LoginId,
         user: OverrideLoginIdEntry,
     ) -> Result<(), RepositoryError> {
+        let mut item = vec![
+            ColumnLoginId::to_attr_pair(login_id),
+            ColumnUserId::to_attr_pair(user.user_id),
+        ];
+        if let Some(reset_token_destination) = user.reset_token_destination {
+            item.push(ColumnResetTokenDestinationEmail::to_attr_pair(
+                reset_token_destination,
+            ))
+        }
+
         let input = PutItemInput {
             table_name: self.table_name.into(),
-            item: vec![
-                (ColumnLoginId::to_attr_pair(login_id)),
-                (ColumnUserId::to_attr_pair(user.user_id)),
-                (ColumnResetTokenDestinationEmail::to_attr_pair(user.reset_token_destination)),
-            ]
-            .into_iter()
-            .collect(),
+            item: item.into_iter().collect(),
             condition_expression: Some(format!(
                 "attribute_not_exists({})",
                 ColumnLoginId::as_name()
@@ -162,7 +188,7 @@ impl<'a> TableLoginId<'a> {
 
         Ok(())
     }
-    pub async fn delete_login_id(&self, login_id: LoginId) -> Result<(), RepositoryError> {
+    pub async fn delete_entry(&self, login_id: LoginId) -> Result<(), RepositoryError> {
         let input = DeleteItemInput {
             table_name: self.table_name.into(),
             key: Self::key(login_id),

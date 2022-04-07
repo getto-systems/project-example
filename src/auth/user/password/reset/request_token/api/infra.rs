@@ -32,7 +32,7 @@ pub trait RegisterResetTokenRepository {
     async fn lookup_user(
         &self,
         login_id: &LoginId,
-    ) -> Result<Option<(AuthUserId, ResetTokenDestination)>, RepositoryError>;
+    ) -> Result<Option<(AuthUserId, Option<ResetTokenDestination>)>, RepositoryError>;
 
     async fn register_reset_token(
         &self,

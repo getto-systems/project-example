@@ -104,6 +104,8 @@ impl<'a> TableResetToken<'a> {
         expires: ExpireDateTime,
         requested_at: AuthDateTime,
     ) -> Result<(), RepositoryError> {
+        // reset token がすでに登録されていたらエラーになる
+        // reset token は削除しないので、衝突が発生したら reset token の桁数を増やす
         let input = PutItemInput {
             table_name: self.table_name.into(),
             item: vec![

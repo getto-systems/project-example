@@ -23,18 +23,13 @@ pub struct AuthenticatePasswordFieldsExtract {
 
 #[async_trait::async_trait]
 pub trait AuthenticatePasswordRepository {
-    async fn lookup_user_id<'a>(
+    async fn lookup_user_id(
         &self,
-        login_id: &'a LoginId,
+        login_id: &LoginId,
     ) -> Result<Option<AuthUserId>, RepositoryError>;
 
-    async fn lookup_granted_roles<'a>(
+    async fn lookup_user(
         &self,
-        user_id: &'a AuthUserId,
-    ) -> Result<Option<GrantedAuthRoles>, RepositoryError>;
-
-    async fn lookup_password<'a>(
-        &self,
-        user_id: &'a AuthUserId,
-    ) -> Result<Option<HashedPassword>, RepositoryError>;
+        user_id: &AuthUserId,
+    ) -> Result<Option<(HashedPassword, Option<GrantedAuthRoles>)>, RepositoryError>;
 }

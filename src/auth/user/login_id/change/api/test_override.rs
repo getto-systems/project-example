@@ -17,12 +17,7 @@ use crate::auth::{
         },
     },
     user::{
-        kernel::{
-            data::AuthUserId,
-            init::user_repository::memory::{
-                MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
-            },
-        },
+        kernel::init::user_repository::memory::MemoryAuthUserRepository,
         login_id::change::init::request_decoder::test::StaticOverrideLoginIdRequestDecoder,
     },
 };
@@ -38,7 +33,7 @@ use crate::auth::user::{
 use crate::auth::{
     ticket::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
     user::{
-        kernel::data::{AuthUser, AuthUserExtract},
+        kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
         login_id::kernel::data::LoginId,
     },
 };
@@ -190,44 +185,40 @@ async fn error_login_id_already_registered() {
 
 struct TestStruct<'a> {
     validate: StaticValidateAuthTokenStruct<'a>,
-    user_repository: MemoryAuthUserRepository<'a>,
+    login_id_repository: MemoryAuthUserRepository,
 }
 
 impl<'a> OverrideLoginIdMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
 
-    type LoginIdRepository = MemoryAuthUserRepository<'a>;
+    type LoginIdRepository = MemoryAuthUserRepository;
 
     fn validate(&self) -> &Self::Validate {
         &self.validate
     }
     fn login_id_repository(&self) -> &Self::LoginIdRepository {
-        &self.user_repository
+        &self.login_id_repository
     }
 }
 
 struct TestStore {
     nonce: MemoryAuthNonceStore,
-    user: MemoryAuthUserStore,
 }
 
 impl TestStore {
     fn standard() -> Self {
         Self {
             nonce: standard_nonce_store(),
-            user: standard_login_id_store(),
         }
     }
     fn expired_nonce() -> Self {
         Self {
             nonce: expired_nonce_store(),
-            user: standard_login_id_store(),
         }
     }
     fn conflict_nonce() -> Self {
         Self {
             nonce: conflict_nonce_store(),
-            user: standard_login_id_store(),
         }
     }
 }
@@ -245,7 +236,7 @@ impl<'a> TestStruct<'a> {
                 token_metadata: standard_token_header(),
                 token_decoder: standard_token_decoder(),
             },
-            user_repository: MemoryAuthUserRepository::new(&store.user),
+            login_id_repository: standard_login_id_repository(),
         }
     }
 }
@@ -331,14 +322,13 @@ fn conflict_nonce_store() -> MemoryAuthNonceStore {
     MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
 }
 
-fn standard_login_id_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::with_user_and_password(
+fn standard_login_id_repository() -> MemoryAuthUserRepository {
+    MemoryAuthUserRepository::with_user_and_password(
         test_user_login_id(),
         test_user(),
         test_user_password(),
         vec![(test_registered_login_id(), test_registered_user_id())],
     )
-    .to_store()
 }
 
 fn test_user() -> AuthUser {

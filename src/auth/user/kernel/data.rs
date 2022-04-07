@@ -10,10 +10,10 @@ pub struct AuthUser {
 }
 
 impl AuthUser {
-    pub fn restore((user_id, granted_roles): (AuthUserId, GrantedAuthRoles)) -> Self {
+    pub fn restore(user_id: AuthUserId, granted_roles: Option<GrantedAuthRoles>) -> Self {
         Self {
             user_id,
-            granted_roles,
+            granted_roles: granted_roles.unwrap_or(GrantedAuthRoles::empty()),
         }
     }
 
@@ -56,7 +56,7 @@ impl AuthUserExtract {
     }
 }
 
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct AuthUserId(String);
 
 impl AuthUserId {
@@ -66,11 +66,6 @@ impl AuthUserId {
 
     pub(in crate::auth) fn extract(self) -> String {
         self.0
-    }
-
-    #[cfg(test)]
-    pub fn as_str(&self) -> &str {
-        self.0.as_str()
     }
 }
 

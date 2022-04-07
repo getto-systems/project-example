@@ -40,6 +40,60 @@ impl<'a> TableUser<'a> {
             .collect()
     }
 
+    pub async fn lookup_granted_roles(
+        &self,
+        user_id: AuthUserId,
+    ) -> Result<Option<Option<GrantedAuthRoles>>, RepositoryError> {
+        let input = GetItemInput {
+            table_name: self.table_name.into(),
+            key: Self::key(user_id),
+            projection_expression: Some(vec![ColumnGrantedAuthRoles::as_name()].join(",")),
+            ..Default::default()
+        };
+
+        let response = self
+            .client
+            .get_item(input)
+            .await
+            .map_err(|err| infra_error("lookup user and granted roles error", err))?;
+
+        Ok(response
+            .item
+            .map(move |mut attrs| ColumnGrantedAuthRoles::remove_value(&mut attrs)))
+    }
+    pub async fn lookup_password_and_granted_roles(
+        &self,
+        user_id: AuthUserId,
+    ) -> Result<Option<(HashedPassword, Option<GrantedAuthRoles>)>, RepositoryError> {
+        let input = GetItemInput {
+            table_name: self.table_name.into(),
+            key: Self::key(user_id),
+            projection_expression: Some(
+                vec![
+                    ColumnHashedPassword::as_name(),
+                    ColumnGrantedAuthRoles::as_name(),
+                ]
+                .join(","),
+            ),
+            ..Default::default()
+        };
+
+        let response = self
+            .client
+            .get_item(input)
+            .await
+            .map_err(|err| infra_error("lookup password and granted roles error", err))?;
+
+        Ok(response.item.and_then(move |mut attrs| {
+            match (
+                ColumnHashedPassword::remove_value(&mut attrs),
+                ColumnGrantedAuthRoles::remove_value(&mut attrs),
+            ) {
+                (Some(hashed_password), granted_roles) => Some((hashed_password, granted_roles)),
+                _ => None,
+            }
+        }))
+    }
     pub async fn lookup_password(
         &self,
         user_id: AuthUserId,
@@ -61,27 +115,6 @@ impl<'a> TableUser<'a> {
             .item
             .and_then(move |mut attrs| ColumnHashedPassword::remove_value(&mut attrs)))
     }
-    pub async fn lookup_granted_roles(
-        &self,
-        user_id: AuthUserId,
-    ) -> Result<Option<GrantedAuthRoles>, RepositoryError> {
-        let input = GetItemInput {
-            table_name: self.table_name.into(),
-            key: Self::key(user_id),
-            projection_expression: Some(vec![ColumnGrantedAuthRoles::as_name()].join(",")),
-            ..Default::default()
-        };
-
-        let response = self
-            .client
-            .get_item(input)
-            .await
-            .map_err(|err| infra_error("lookup granted roles error", err))?;
-
-        Ok(response
-            .item
-            .and_then(move |mut attrs| ColumnGrantedAuthRoles::remove_value(&mut attrs)))
-    }
     pub async fn lookup_modify_changes(
         &self,
         user_id: AuthUserId,
@@ -99,12 +132,12 @@ impl<'a> TableUser<'a> {
             .await
             .map_err(|err| infra_error("lookup granted roles error", err))?;
 
-        Ok(response.item.and_then(move |mut attrs| {
-            match ColumnGrantedAuthRoles::remove_value(&mut attrs) {
-                Some(granted_roles) => Some(ModifyAuthUserAccountChanges { granted_roles }),
-                _ => None,
-            }
-        }))
+        Ok(response
+            .item
+            .map(move |mut attrs| ModifyAuthUserAccountChanges {
+                granted_roles: ColumnGrantedAuthRoles::remove_value(&mut attrs)
+                    .unwrap_or(GrantedAuthRoles::empty()),
+            }))
     }
 
     pub async fn update_password(

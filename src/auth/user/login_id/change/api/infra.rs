@@ -22,25 +22,22 @@ pub trait OverrideLoginIdRequestDecoder {
 
 #[async_trait::async_trait]
 pub trait OverrideLoginIdRepository {
-    async fn lookup_user<'a>(
+    async fn lookup_user(
         &self,
-        login_id: &'a LoginId,
+        login_id: &LoginId,
     ) -> Result<Option<OverrideLoginIdEntry>, RepositoryError>;
 
-    async fn check_login_id_registered<'a>(
-        &self,
-        login_id: &'a LoginId,
-    ) -> Result<bool, RepositoryError>;
+    async fn check_login_id_registered(&self, login_id: &LoginId) -> Result<bool, RepositoryError>;
 
-    async fn override_login_id<'a>(
+    async fn override_login_id(
         &self,
-        user: OverrideLoginIdEntry,
         new_login_id: LoginId,
+        user: OverrideLoginIdEntry,
     ) -> Result<(), RepositoryError>;
 }
 
 pub struct OverrideLoginIdEntry {
     pub user_id: AuthUserId,
     pub login_id: LoginId,
-    pub reset_token_destination: ResetTokenDestination,
+    pub reset_token_destination: Option<ResetTokenDestination>,
 }

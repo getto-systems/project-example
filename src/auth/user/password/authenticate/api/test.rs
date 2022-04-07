@@ -28,9 +28,7 @@ use crate::auth::{
         },
     },
     user::{
-        kernel::init::user_repository::memory::{
-            MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
-        },
+        kernel::init::user_repository::memory::MemoryAuthUserRepository,
         password::{
             authenticate::init::request_decoder::test::StaticAuthenticatePasswordRequestDecoder,
             kernel::init::password_matcher::test::PlainPasswordMatcher,
@@ -62,7 +60,8 @@ async fn success_authenticate() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::new(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, material);
@@ -86,7 +85,8 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let material = TestStruct::new(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, material);
@@ -110,7 +110,8 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let material = TestStruct::new(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, material);
@@ -129,7 +130,8 @@ async fn error_empty_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::new(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = empty_login_id_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, material);
@@ -149,7 +151,8 @@ async fn error_too_long_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::new(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = too_long_login_id_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, material);
@@ -169,7 +172,8 @@ async fn just_max_length_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::new(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = just_max_length_login_id_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, material);
@@ -189,7 +193,8 @@ async fn error_empty_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::new(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = empty_password_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, material);
@@ -209,7 +214,8 @@ async fn error_too_long_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::new(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = too_long_password_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, material);
@@ -229,7 +235,8 @@ async fn just_max_length_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::new(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = just_max_length_password_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, material);
@@ -248,8 +255,9 @@ async fn just_max_length_password() {
 async fn error_failed_to_match_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::match_fail_password();
-    let material = TestStruct::new(&store);
+    let store = TestStore::standard();
+    let repository = TestRepository::match_fail();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, material);
@@ -265,31 +273,12 @@ async fn error_failed_to_match_password() {
 }
 
 #[tokio::test]
-async fn error_password_not_stored() {
+async fn error_no_user() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::password_not_stored();
-    let material = TestStruct::new(&store);
-    let request_decoder = standard_request_decoder();
-
-    let mut action = AuthenticatePasswordAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "authenticate password error; not found",
-    ]);
-    assert!(!result.is_ok());
-}
-
-#[tokio::test]
-async fn error_user_not_stored() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::user_not_stored();
-    let material = TestStruct::new(&store);
+    let store = TestStore::standard();
+    let repository = TestRepository::no_user();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = standard_request_decoder();
 
     let mut action = AuthenticatePasswordAction::with_material(request_decoder, material);
@@ -309,7 +298,7 @@ struct TestStruct<'a> {
     issue: StaticIssueAuthTicketStruct<'a>,
     encode: StaticEncodeAuthTicketStruct<'a>,
 
-    user_repository: MemoryAuthUserRepository<'a>,
+    password_repository: MemoryAuthUserRepository,
 }
 
 impl<'a> AuthenticatePasswordMaterial for TestStruct<'a> {
@@ -317,7 +306,7 @@ impl<'a> AuthenticatePasswordMaterial for TestStruct<'a> {
     type Issue = StaticIssueAuthTicketStruct<'a>;
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
-    type PasswordRepository = MemoryAuthUserRepository<'a>;
+    type PasswordRepository = MemoryAuthUserRepository;
     type PasswordMatcher = PlainPasswordMatcher;
 
     fn validate_nonce(&self) -> &Self::ValidateNonce {
@@ -331,14 +320,13 @@ impl<'a> AuthenticatePasswordMaterial for TestStruct<'a> {
     }
 
     fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.user_repository
+        &self.password_repository
     }
 }
 
 struct TestStore {
     nonce: MemoryAuthNonceStore,
     ticket: MemoryAuthTicketStore,
-    user: MemoryAuthUserStore,
 }
 
 impl TestStore {
@@ -346,48 +334,46 @@ impl TestStore {
         Self {
             nonce: standard_nonce_store(),
             ticket: standard_ticket_store(),
-            user: standard_user_store(),
         }
     }
     fn expired_nonce() -> Self {
         Self {
             nonce: expired_nonce_store(),
             ticket: standard_ticket_store(),
-            user: standard_user_store(),
         }
     }
     fn conflict_nonce() -> Self {
         Self {
             nonce: conflict_nonce_store(),
             ticket: standard_ticket_store(),
-            user: standard_user_store(),
         }
     }
-    fn match_fail_password() -> Self {
+}
+
+struct TestRepository {
+    password: MemoryAuthUserRepository,
+}
+
+impl TestRepository {
+    fn standard() -> Self {
         Self {
-            nonce: standard_nonce_store(),
-            ticket: standard_ticket_store(),
-            user: match_fail_user_store(),
+            password: standard_password_repository(),
         }
     }
-    fn password_not_stored() -> Self {
+    fn match_fail() -> Self {
         Self {
-            nonce: standard_nonce_store(),
-            ticket: standard_ticket_store(),
-            user: password_not_stored_user_store(),
+            password: match_fail_password_repository(),
         }
     }
-    fn user_not_stored() -> Self {
+    fn no_user() -> Self {
         Self {
-            nonce: standard_nonce_store(),
-            ticket: standard_ticket_store(),
-            user: empty_user_store(),
+            password: empty_password_repository(),
         }
     }
 }
 
 impl<'a> TestStruct<'a> {
-    fn new(store: &'a TestStore) -> Self {
+    fn new(store: &'a TestStore, repository: TestRepository) -> Self {
         Self {
             validate_nonce: StaticValidateAuthNonceStruct {
                 config: standard_nonce_config(),
@@ -412,7 +398,7 @@ impl<'a> TestStruct<'a> {
                 config: standard_encode_config(),
             },
 
-            user_repository: MemoryAuthUserRepository::new(&store.user),
+            password_repository: repository.password,
         }
     }
 }
@@ -512,29 +498,24 @@ fn standard_ticket_store() -> MemoryAuthTicketStore {
     MemoryAuthTicketMap::new().to_store()
 }
 
-fn standard_user_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::with_user_and_password(
+fn standard_password_repository() -> MemoryAuthUserRepository {
+    MemoryAuthUserRepository::with_user_and_password(
         test_user_login_id(),
         test_user(),
         test_user_password(),
         vec![],
     )
-    .to_store()
 }
-fn match_fail_user_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::with_user_and_password(
+fn match_fail_password_repository() -> MemoryAuthUserRepository {
+    MemoryAuthUserRepository::with_user_and_password(
         test_user_login_id(),
         test_user(),
         another_password(),
         vec![],
     )
-    .to_store()
 }
-fn password_not_stored_user_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::with_user(test_user()).to_store()
-}
-fn empty_user_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::new().to_store()
+fn empty_password_repository() -> MemoryAuthUserRepository {
+    MemoryAuthUserRepository::new()
 }
 
 fn test_user() -> AuthUser {

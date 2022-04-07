@@ -17,9 +17,7 @@ use crate::auth::{
         },
     },
     user::{
-        kernel::init::user_repository::memory::{
-            MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
-        },
+        kernel::init::user_repository::memory::MemoryAuthUserRepository,
         password::reset::token_destination::change::init::request_decoder::test::StaticChangeResetTokenDestinationRequestDecoder,
     },
 };
@@ -146,13 +144,13 @@ async fn error_not_found() {
 
 struct TestStruct<'a> {
     validate: StaticValidateAuthTokenStruct<'a>,
-    destination_repository: MemoryAuthUserRepository<'a>,
+    destination_repository: MemoryAuthUserRepository,
 }
 
 impl<'a> ChangeResetTokenDestinationMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
 
-    type DestinationRepository = MemoryAuthUserRepository<'a>;
+    type DestinationRepository = MemoryAuthUserRepository;
 
     fn validate(&self) -> &Self::Validate {
         &self.validate
@@ -164,26 +162,22 @@ impl<'a> ChangeResetTokenDestinationMaterial for TestStruct<'a> {
 
 struct TestStore {
     nonce: MemoryAuthNonceStore,
-    user: MemoryAuthUserStore,
 }
 
 impl TestStore {
     fn standard() -> Self {
         Self {
             nonce: standard_nonce_store(),
-            user: standard_login_id_store(),
         }
     }
     fn expired_nonce() -> Self {
         Self {
             nonce: expired_nonce_store(),
-            user: standard_login_id_store(),
         }
     }
     fn conflict_nonce() -> Self {
         Self {
             nonce: conflict_nonce_store(),
-            user: standard_login_id_store(),
         }
     }
 }
@@ -201,7 +195,7 @@ impl<'a> TestStruct<'a> {
                 token_metadata: standard_token_header(),
                 token_decoder: standard_token_decoder(),
             },
-            destination_repository: MemoryAuthUserRepository::new(&store.user),
+            destination_repository: standard_destination_repository(),
         }
     }
 }
@@ -283,13 +277,12 @@ fn conflict_nonce_store() -> MemoryAuthNonceStore {
     MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
 }
 
-fn standard_login_id_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::with_user_id_and_destination(
+fn standard_destination_repository() -> MemoryAuthUserRepository {
+    MemoryAuthUserRepository::with_user_id_and_destination(
         test_login_id(),
         test_user_id(),
         test_destination(),
     )
-    .to_store()
 }
 
 fn test_login_id() -> LoginId {

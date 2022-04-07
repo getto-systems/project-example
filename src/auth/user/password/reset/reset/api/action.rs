@@ -205,7 +205,7 @@ async fn reset_password<S>(
         .map_err(|err| post(ResetPasswordEvent::PasswordHashError(err)))?;
 
     reset_password_repository
-        .reset_password(&reset_token, &user_id, hashed_password, reset_at)
+        .reset_password(user_id.clone(), reset_token, hashed_password, reset_at)
         .await
         .map_err(|err| post(ResetPasswordEvent::RepositoryError(err)))?;
 
@@ -216,7 +216,7 @@ async fn reset_password<S>(
 
     post(ResetPasswordEvent::ResetNotified(notify_response));
 
-    let user = AuthUser::restore((user_id, granted_roles));
+    let user = AuthUser::restore(user_id, granted_roles);
     post(ResetPasswordEvent::Success(user.clone()));
     Ok(user)
 }

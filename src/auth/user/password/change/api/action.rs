@@ -157,7 +157,7 @@ async fn change_password<S>(
         .map_err(|err| post(ChangePasswordEvent::PasswordHashError(err)))?;
 
     password_repository
-        .change_password(&user_id, hashed_password)
+        .change_password(user_id, hashed_password)
         .await
         .map_err(|err| post(ChangePasswordEvent::RepositoryError(err)))?;
 
@@ -278,7 +278,7 @@ async fn override_password<S>(
         .map_err(|err| post(OverridePasswordEvent::PasswordHashError(err)))?;
 
     password_repository
-        .override_password(&user_id, hashed_password)
+        .override_password(user_id, hashed_password)
         .await
         .map_err(|err| post(OverridePasswordEvent::RepositoryError(err)))?;
 

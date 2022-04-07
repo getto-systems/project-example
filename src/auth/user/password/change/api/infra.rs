@@ -35,28 +35,28 @@ pub struct OverridePasswordFieldsExtract {
 
 #[async_trait::async_trait]
 pub trait ChangePasswordRepository {
-    async fn lookup_password<'a>(
+    async fn lookup_password(
         &self,
-        user_id: &'a AuthUserId,
+        user_id: &AuthUserId,
     ) -> Result<Option<HashedPassword>, RepositoryError>;
 
-    async fn change_password<'a>(
+    async fn change_password(
         &self,
-        user_id: &'a AuthUserId,
+        user_id: AuthUserId,
         new_password: HashedPassword,
     ) -> Result<(), RepositoryError>;
 }
 
 #[async_trait::async_trait]
 pub trait OverridePasswordRepository {
-    async fn lookup_user_id<'a>(
+    async fn lookup_user_id(
         &self,
-        login_id: &'a LoginId,
+        login_id: &LoginId,
     ) -> Result<Option<AuthUserId>, RepositoryError>;
 
-    async fn override_password<'a>(
+    async fn override_password(
         &self,
-        user_id: &'a AuthUserId,
+        user_id: AuthUserId,
         new_password: HashedPassword,
     ) -> Result<(), RepositoryError>;
 }

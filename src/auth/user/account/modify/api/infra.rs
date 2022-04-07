@@ -35,7 +35,7 @@ pub trait ModifyAuthUserAccountRepository {
 
     async fn modify_user(
         &self,
-        user_id: &AuthUserId,
+        user_id: AuthUserId,
         data: ModifyAuthUserAccountChanges,
     ) -> Result<(), RepositoryError>;
 }

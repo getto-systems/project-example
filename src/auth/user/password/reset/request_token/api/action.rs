@@ -150,6 +150,8 @@ async fn request_reset_token<S>(
         .map_err(|err| post(RequestResetTokenEvent::RepositoryError(err)))?
         .ok_or_else(|| post(RequestResetTokenEvent::NotFound))?;
 
+    let destination = destination.ok_or_else(|| post(RequestResetTokenEvent::NotFound))?;
+
     let clock = infra.clock();
 
     let reset_token = token_generator.generate();

@@ -9,14 +9,14 @@ use crate::auth::ticket::{
 use crate::auth::user::password::{
     authenticate::infra::{
         AuthenticatePasswordFields, AuthenticatePasswordFieldsExtract,
-        AuthenticatePasswordRequestDecoder, AuthenticatePasswordRepository,
+        AuthenticatePasswordRepository, AuthenticatePasswordRequestDecoder,
     },
     kernel::infra::{AuthUserPasswordMatcher, PlainPassword},
 };
 
 use crate::{
     auth::user::{
-        kernel::data::{AuthUser, GrantedAuthRoles},
+        kernel::data::AuthUser,
         password::{
             authenticate::data::ValidateAuthenticatePasswordFieldsError,
             kernel::data::PasswordHashError,
@@ -158,14 +158,8 @@ async fn authenticate_password<S>(
         .map_err(|err| post(AuthenticatePasswordEvent::RepositoryError(err)))?
         .ok_or_else(|| post(AuthenticatePasswordEvent::NotFound))?;
 
-    let granted_roles = password_repository
-        .lookup_granted_roles(&user_id)
-        .await
-        .map_err(|err| post(AuthenticatePasswordEvent::RepositoryError(err)))?
-        .unwrap_or(GrantedAuthRoles::empty());
-
-    let hashed_password = password_repository
-        .lookup_password(&user_id)
+    let (hashed_password, granted_roles) = password_repository
+        .lookup_user(&user_id)
         .await
         .map_err(|err| post(AuthenticatePasswordEvent::RepositoryError(err)))?
         .ok_or_else(|| post(AuthenticatePasswordEvent::NotFound))?;
@@ -177,7 +171,7 @@ async fn authenticate_password<S>(
         return Err(post(AuthenticatePasswordEvent::PasswordNotMatched));
     }
 
-    let user = AuthUser::restore((user_id, granted_roles));
+    let user = AuthUser::restore(user_id, granted_roles);
 
     post(AuthenticatePasswordEvent::Success(user.clone()));
     Ok(user)

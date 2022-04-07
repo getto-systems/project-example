@@ -1,4 +1,4 @@
-#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct LoginId(String);
 
 impl LoginId {

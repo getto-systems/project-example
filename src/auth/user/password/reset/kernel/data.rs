@@ -1,14 +1,9 @@
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub struct ResetToken(String);
 
 impl ResetToken {
     pub const fn restore(token: String) -> Self {
         Self(token)
-    }
-
-    #[cfg(test)]
-    pub fn as_str(&self) -> &str {
-        self.0.as_str()
     }
 
     pub fn extract(self) -> String {

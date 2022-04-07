@@ -17,9 +17,7 @@ use crate::auth::{
         },
     },
     user::{
-        kernel::init::user_repository::memory::{
-            MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
-        },
+        kernel::init::user_repository::memory::MemoryAuthUserRepository,
         password::{
             change::init::request_decoder::test::StaticOverridePasswordRequestDecoder,
             kernel::init::password_hasher::test::PlainPasswordHasher,
@@ -171,45 +169,41 @@ async fn just_max_length_password() {
 
 struct TestStruct<'a> {
     validate: StaticValidateAuthTokenStruct<'a>,
-    user_repository: MemoryAuthUserRepository<'a>,
+    password_repository: MemoryAuthUserRepository,
 }
 
 impl<'a> OverridePasswordMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
 
-    type PasswordRepository = MemoryAuthUserRepository<'a>;
+    type PasswordRepository = MemoryAuthUserRepository;
     type PasswordHasher = PlainPasswordHasher;
 
     fn validate(&self) -> &Self::Validate {
         &self.validate
     }
     fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.user_repository
+        &self.password_repository
     }
 }
 
 struct TestStore {
     nonce: MemoryAuthNonceStore,
-    user: MemoryAuthUserStore,
 }
 
 impl TestStore {
     fn standard() -> Self {
         Self {
             nonce: standard_nonce_store(),
-            user: standard_password_store(),
         }
     }
     fn expired_nonce() -> Self {
         Self {
             nonce: expired_nonce_store(),
-            user: standard_password_store(),
         }
     }
     fn conflict_nonce() -> Self {
         Self {
             nonce: conflict_nonce_store(),
-            user: standard_password_store(),
         }
     }
 }
@@ -227,7 +221,7 @@ impl<'a> TestStruct<'a> {
                 token_metadata: standard_token_header(),
                 token_decoder: standard_token_decoder(),
             },
-            user_repository: MemoryAuthUserRepository::new(&store.user),
+            password_repository: standard_password_repository(),
         }
     }
 }
@@ -305,14 +299,13 @@ fn conflict_nonce_store() -> MemoryAuthNonceStore {
     MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
 }
 
-fn standard_password_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::with_user_and_password(
+fn standard_password_repository() -> MemoryAuthUserRepository {
+    MemoryAuthUserRepository::with_user_and_password(
         test_user_login_id(),
         test_user(),
         test_user_password(),
         vec![],
     )
-    .to_store()
 }
 
 fn test_user() -> AuthUser {

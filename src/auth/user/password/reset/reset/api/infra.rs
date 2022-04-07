@@ -47,15 +47,15 @@ pub trait ResetPasswordRepository {
         RepositoryError,
     >;
 
-    async fn lookup_granted_roles<'a>(
+    async fn lookup_granted_roles(
         &self,
-        user_id: &'a AuthUserId,
-    ) -> Result<Option<GrantedAuthRoles>, RepositoryError>;
+        user_id: &AuthUserId,
+    ) -> Result<Option<Option<GrantedAuthRoles>>, RepositoryError>;
 
     async fn reset_password(
         &self,
-        reset_token: &ResetToken,
-        user_id: &AuthUserId,
+        user_id: AuthUserId,
+        reset_token: ResetToken,
         new_password: HashedPassword,
         reset_at: AuthDateTime,
     ) -> Result<(), RepositoryError>;

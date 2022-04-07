@@ -70,18 +70,34 @@ impl<'a> DynamoDbAuthUserRepository<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'client> OverrideLoginIdRepository for DynamoDbAuthUserRepository<'client> {
-    async fn lookup_user<'a>(
+impl<'client> AuthenticatePasswordRepository for DynamoDbAuthUserRepository<'client> {
+    async fn lookup_user_id(
         &self,
-        login_id: &'a LoginId,
+        login_id: &LoginId,
+    ) -> Result<Option<AuthUserId>, RepositoryError> {
+        self.login_id.lookup_user_id(login_id.clone()).await
+    }
+
+    async fn lookup_user(
+        &self,
+        user_id: &AuthUserId,
+    ) -> Result<Option<(HashedPassword, Option<GrantedAuthRoles>)>, RepositoryError> {
+        self.user
+            .lookup_password_and_granted_roles(user_id.clone())
+            .await
+    }
+}
+
+#[async_trait::async_trait]
+impl<'client> OverrideLoginIdRepository for DynamoDbAuthUserRepository<'client> {
+    async fn lookup_user(
+        &self,
+        login_id: &LoginId,
     ) -> Result<Option<OverrideLoginIdEntry>, RepositoryError> {
         self.login_id.lookup_override_entry(login_id.clone()).await
     }
 
-    async fn check_login_id_registered<'a>(
-        &self,
-        login_id: &'a LoginId,
-    ) -> Result<bool, RepositoryError> {
+    async fn check_login_id_registered(&self, login_id: &LoginId) -> Result<bool, RepositoryError> {
         Ok(self
             .login_id
             .lookup_user_id(login_id.clone())
@@ -89,84 +105,55 @@ impl<'client> OverrideLoginIdRepository for DynamoDbAuthUserRepository<'client> 
             .is_some())
     }
 
-    async fn override_login_id<'a>(
+    async fn override_login_id(
         &self,
-        user: OverrideLoginIdEntry,
         new_login_id: LoginId,
+        user: OverrideLoginIdEntry,
     ) -> Result<(), RepositoryError> {
-        // TODO 引数がわかりにくいのをなんとかしたい
         self.user
             .update_login_id(user.user_id.clone(), new_login_id.clone())
             .await?;
 
-        self.login_id.delete_login_id(user.login_id.clone()).await?;
-        self.login_id.put_login_id(new_login_id, user).await?;
+        self.login_id.delete_entry(user.login_id.clone()).await?;
+        self.login_id.put_override_entry(new_login_id, user).await?;
 
         Ok(())
     }
 }
 
 #[async_trait::async_trait]
-impl<'client> AuthenticatePasswordRepository for DynamoDbAuthUserRepository<'client> {
-    async fn lookup_user_id<'a>(
-        &self,
-        login_id: &'a LoginId,
-    ) -> Result<Option<AuthUserId>, RepositoryError> {
-        self.login_id.lookup_user_id(login_id.clone()).await
-    }
-
-    async fn lookup_granted_roles<'a>(
-        &self,
-        user_id: &'a AuthUserId,
-    ) -> Result<Option<GrantedAuthRoles>, RepositoryError> {
-        self.user.lookup_granted_roles(user_id.clone()).await
-    }
-
-    async fn lookup_password<'a>(
-        &self,
-        user_id: &'a AuthUserId,
-    ) -> Result<Option<HashedPassword>, RepositoryError> {
-        self.user.lookup_password(user_id.clone()).await
-    }
-}
-
-#[async_trait::async_trait]
 impl<'client> ChangePasswordRepository for DynamoDbAuthUserRepository<'client> {
-    async fn lookup_password<'a>(
+    async fn lookup_password(
         &self,
-        user_id: &'a AuthUserId,
+        user_id: &AuthUserId,
     ) -> Result<Option<HashedPassword>, RepositoryError> {
         self.user.lookup_password(user_id.clone()).await
     }
 
-    async fn change_password<'a>(
+    async fn change_password(
         &self,
-        user_id: &'a AuthUserId,
+        user_id: AuthUserId,
         new_password: HashedPassword,
     ) -> Result<(), RepositoryError> {
-        self.user
-            .update_password(user_id.clone(), new_password)
-            .await
+        self.user.update_password(user_id, new_password).await
     }
 }
 
 #[async_trait::async_trait]
 impl<'client> OverridePasswordRepository for DynamoDbAuthUserRepository<'client> {
-    async fn lookup_user_id<'a>(
+    async fn lookup_user_id(
         &self,
-        login_id: &'a LoginId,
+        login_id: &LoginId,
     ) -> Result<Option<AuthUserId>, RepositoryError> {
         self.login_id.lookup_user_id(login_id.clone()).await
     }
 
-    async fn override_password<'a>(
+    async fn override_password(
         &self,
-        user_id: &'a AuthUserId,
+        user_id: AuthUserId,
         new_password: HashedPassword,
     ) -> Result<(), RepositoryError> {
-        self.user
-            .update_password(user_id.clone(), new_password)
-            .await
+        self.user.update_password(user_id, new_password).await
     }
 }
 
@@ -188,10 +175,10 @@ impl<'client> ModifyAuthUserAccountRepository for DynamoDbAuthUserRepository<'cl
 
     async fn modify_user(
         &self,
-        user_id: &AuthUserId,
+        user_id: AuthUserId,
         changes: ModifyAuthUserAccountChanges,
     ) -> Result<(), RepositoryError> {
-        self.user.update_user(user_id.clone(), changes).await
+        self.user.update_user(user_id, changes).await
     }
 }
 
@@ -202,18 +189,17 @@ impl<'client> ChangeResetTokenDestinationRepository for DynamoDbAuthUserReposito
         login_id: &LoginId,
     ) -> Result<Option<ResetTokenDestination>, RepositoryError> {
         self.login_id
-            .lookup_reset_token_entry(login_id.clone())
+            .lookup_reset_token_destination(login_id.clone())
             .await
-            .map(|user| user.map(|(_user_id, destination)| destination))
     }
 
     async fn change_destination(
         &self,
-        login_id: &LoginId,
+        login_id: LoginId,
         new_destination: ResetTokenDestination,
     ) -> Result<(), RepositoryError> {
         self.login_id
-            .update_reset_token_destination(login_id.clone(), new_destination)
+            .update_reset_token_destination(login_id, new_destination)
             .await
     }
 }
@@ -223,7 +209,7 @@ impl<'client> RegisterResetTokenRepository for DynamoDbAuthUserRepository<'clien
     async fn lookup_user(
         &self,
         login_id: &LoginId,
-    ) -> Result<Option<(AuthUserId, ResetTokenDestination)>, RepositoryError> {
+    ) -> Result<Option<(AuthUserId, Option<ResetTokenDestination>)>, RepositoryError> {
         self.login_id
             .lookup_reset_token_entry(login_id.clone())
             .await
@@ -265,38 +251,38 @@ impl<'client> ResetPasswordRepository for DynamoDbAuthUserRepository<'client> {
             .await
     }
 
-    async fn lookup_granted_roles<'a>(
+    async fn lookup_granted_roles(
         &self,
-        user_id: &'a AuthUserId,
-    ) -> Result<Option<GrantedAuthRoles>, RepositoryError> {
+        user_id: &AuthUserId,
+    ) -> Result<Option<Option<GrantedAuthRoles>>, RepositoryError> {
         self.user.lookup_granted_roles(user_id.clone()).await
     }
 
     async fn reset_password(
         &self,
-        reset_token: &ResetToken,
-        user_id: &AuthUserId,
+        user_id: AuthUserId,
+        reset_token: ResetToken,
         new_password: HashedPassword,
         reset_at: AuthDateTime,
     ) -> Result<(), RepositoryError> {
-        reset_password(self, reset_token, user_id, new_password, reset_at).await
+        reset_password(self, user_id, reset_token, new_password, reset_at).await
     }
 }
-async fn reset_password<'client, 'a>(
+async fn reset_password<'client>(
     repository: &DynamoDbAuthUserRepository<'client>,
-    reset_token: &ResetToken,
-    user_id: &AuthUserId,
+    user_id: AuthUserId,
+    reset_token: ResetToken,
     new_password: HashedPassword,
     reset_at: AuthDateTime,
 ) -> Result<(), RepositoryError> {
     repository
         .reset_token
-        .update_reset_at(reset_token.clone(), reset_at)
+        .update_reset_at(reset_token, reset_at)
         .await?;
 
     repository
         .user
-        .update_password(user_id.clone(), new_password)
+        .update_password(user_id, new_password)
         .await?;
 
     Ok(())
@@ -335,7 +321,7 @@ async fn search_user_account<'client>(
 
     match filter.sort().key() {
         SearchAuthUserAccountSortKey::LoginId => {
-            users.sort_by_cached_key(|(login_id, _)| login_id.as_str().to_owned());
+            users.sort_by_cached_key(|(login_id, _)| login_id.clone());
             match filter.sort().order() {
                 SearchSortOrder::Normal => (),
                 SearchSortOrder::Reverse => users.reverse(),
@@ -353,7 +339,6 @@ async fn search_user_account<'client>(
             let destination = destinations.remove(&login_id);
             AuthUserAccount {
                 login_id,
-                // TODO これは多分ドメイン知識
                 granted_roles: granted_roles.unwrap_or(GrantedAuthRoles::empty()),
                 reset_token_destination: destination.unwrap_or(ResetTokenDestination::None),
             }

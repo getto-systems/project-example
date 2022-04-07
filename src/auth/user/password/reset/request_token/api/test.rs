@@ -14,9 +14,7 @@ use crate::auth::{
         },
     },
     user::{
-        kernel::init::user_repository::memory::{
-            MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
-        },
+        kernel::init::user_repository::memory::MemoryAuthUserRepository,
         password::reset::request_token::init::{
             request_decoder::test::StaticRequestResetTokenRequestDecoder,
             token_encoder::test::StaticResetTokenEncoder,
@@ -50,7 +48,8 @@ async fn success_request_token() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::new(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = standard_request_decoder();
 
     let mut action = RequestResetTokenAction::with_material(request_decoder, material);
@@ -72,7 +71,8 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let material = TestStruct::new(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = standard_request_decoder();
 
     let mut action = RequestResetTokenAction::with_material(request_decoder, material);
@@ -94,7 +94,8 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let material = TestStruct::new(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = standard_request_decoder();
 
     let mut action = RequestResetTokenAction::with_material(request_decoder, material);
@@ -113,7 +114,8 @@ async fn error_empty_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::new(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = empty_login_id_request_decoder();
 
     let mut action = RequestResetTokenAction::with_material(request_decoder, material);
@@ -133,7 +135,8 @@ async fn error_too_long_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::new(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = too_long_login_id_request_decoder();
 
     let mut action = RequestResetTokenAction::with_material(request_decoder, material);
@@ -153,7 +156,8 @@ async fn just_max_length_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::new(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = just_max_length_login_id_request_decoder();
 
     let mut action = RequestResetTokenAction::with_material(request_decoder, material);
@@ -172,8 +176,9 @@ async fn just_max_length_login_id() {
 async fn error_destination_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::destination_not_stored();
-    let material = TestStruct::new(&store);
+    let store = TestStore::standard();
+    let repository = TestRepository::no_destination();
+    let material = TestStruct::new(&store, repository);
     let request_decoder = standard_request_decoder();
 
     let mut action = RequestResetTokenAction::with_material(request_decoder, material);
@@ -192,7 +197,7 @@ struct TestStruct<'a> {
     validate_nonce: StaticValidateAuthNonceStruct<'a>,
 
     clock: StaticChronoAuthClock,
-    reset_token_repository: MemoryAuthUserRepository<'a>,
+    reset_token_repository: MemoryAuthUserRepository,
     token_generator: StaticResetTokenGenerator,
     token_encoder: StaticResetTokenEncoder,
     token_notifier: StaticResetTokenNotifier,
@@ -203,7 +208,7 @@ impl<'a> RequestResetTokenMaterial for TestStruct<'a> {
     type ValidateNonce = StaticValidateAuthNonceStruct<'a>;
 
     type Clock = StaticChronoAuthClock;
-    type ResetTokenRepository = MemoryAuthUserRepository<'a>;
+    type ResetTokenRepository = MemoryAuthUserRepository;
     type TokenGenerator = StaticResetTokenGenerator;
     type TokenEncoder = StaticResetTokenEncoder;
     type TokenNotifier = StaticResetTokenNotifier;
@@ -234,38 +239,45 @@ impl<'a> RequestResetTokenMaterial for TestStruct<'a> {
 
 struct TestStore {
     nonce: MemoryAuthNonceStore,
-    user: MemoryAuthUserStore,
 }
 
 impl TestStore {
     fn standard() -> Self {
         Self {
             nonce: standard_nonce_store(),
-            user: standard_user_store(),
         }
     }
     fn expired_nonce() -> Self {
         Self {
             nonce: expired_nonce_store(),
-            user: standard_user_store(),
         }
     }
     fn conflict_nonce() -> Self {
         Self {
             nonce: conflict_nonce_store(),
-            user: standard_user_store(),
         }
     }
-    fn destination_not_stored() -> Self {
+}
+
+struct TestRepository {
+    reset_token: MemoryAuthUserRepository,
+}
+
+impl TestRepository {
+    fn standard() -> Self {
         Self {
-            nonce: standard_nonce_store(),
-            user: destination_not_stored_user_store(),
+            reset_token: standard_reset_token_repository(),
+        }
+    }
+    fn no_destination() -> Self {
+        Self {
+            reset_token: no_destination_reset_token_repository(),
         }
     }
 }
 
 impl<'a> TestStruct<'a> {
-    fn new(store: &'a TestStore) -> Self {
+    fn new(store: &'a TestStore, repository: TestRepository) -> Self {
         Self {
             validate_nonce: StaticValidateAuthNonceStruct {
                 config: standard_nonce_config(),
@@ -274,7 +286,7 @@ impl<'a> TestStruct<'a> {
                 nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
             },
             clock: standard_clock(),
-            reset_token_repository: MemoryAuthUserRepository::new(&store.user),
+            reset_token_repository: repository.reset_token,
             token_generator: standard_token_generator(),
             token_encoder: StaticResetTokenEncoder,
             token_notifier: StaticResetTokenNotifier,
@@ -312,7 +324,7 @@ fn standard_nonce_metadata() -> StaticAuthNonceMetadata {
 }
 
 fn standard_token_generator() -> StaticResetTokenGenerator {
-    StaticResetTokenGenerator::new(ResetToken::new(RESET_TOKEN.into()))
+    StaticResetTokenGenerator::new(ResetToken::restore(RESET_TOKEN.into()))
 }
 
 fn standard_request_decoder() -> StaticRequestResetTokenRequestDecoder {
@@ -358,16 +370,15 @@ fn conflict_nonce_store() -> MemoryAuthNonceStore {
     MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
 }
 
-fn standard_user_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::with_user_id_and_destination(
+fn standard_reset_token_repository() -> MemoryAuthUserRepository {
+    MemoryAuthUserRepository::with_user_id_and_destination(
         test_user_login_id(),
         test_user_id(),
         test_user_destination(),
     )
-    .to_store()
 }
-fn destination_not_stored_user_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::with_user_id(test_user_login_id(), test_user_id()).to_store()
+fn no_destination_reset_token_repository() -> MemoryAuthUserRepository {
+    MemoryAuthUserRepository::with_user_id(test_user_login_id(), test_user_id())
 }
 
 fn test_user_id() -> AuthUserId {

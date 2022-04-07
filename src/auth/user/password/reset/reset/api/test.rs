@@ -28,9 +28,7 @@ use crate::auth::{
         },
     },
     user::{
-        kernel::init::user_repository::memory::{
-            MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
-        },
+        kernel::init::user_repository::memory::MemoryAuthUserRepository,
         password::{
             kernel::init::password_hasher::test::PlainPasswordHasher,
             reset::{
@@ -57,7 +55,7 @@ use crate::auth::user::password::reset::reset::infra::ResetPasswordFieldsExtract
 use crate::auth::{
     ticket::kernel::data::{AuthDateTime, AuthTicketId, ExpansionLimitDuration, ExpireDuration},
     user::{
-        kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
+        kernel::data::{AuthUser, AuthUserExtract},
         login_id::kernel::data::LoginId,
         password::reset::kernel::data::{ResetToken, ResetTokenDestinationExtract},
     },
@@ -68,7 +66,8 @@ async fn success_request_token() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::standard(&store, repository);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -93,7 +92,8 @@ async fn success_expired_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::expired_nonce();
-    let material = TestStruct::standard(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::standard(&store, repository);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -118,7 +118,8 @@ async fn error_conflict_nonce() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::conflict_nonce();
-    let material = TestStruct::standard(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::standard(&store, repository);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -137,7 +138,8 @@ async fn error_match_failed_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::standard(&store, repository);
     let request_decoder = match_failed_login_id_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -157,7 +159,8 @@ async fn error_empty_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::standard(&store, repository);
     let request_decoder = empty_login_id_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -177,7 +180,8 @@ async fn error_too_long_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::standard(&store, repository);
     let request_decoder = too_long_login_id_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -197,7 +201,8 @@ async fn just_max_length_login_id() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::standard(&store, repository);
     let request_decoder = just_max_length_login_id_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -217,7 +222,8 @@ async fn error_empty_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::standard(&store, repository);
     let request_decoder = empty_password_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -237,7 +243,8 @@ async fn error_too_long_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::standard(&store, repository);
     let request_decoder = too_long_password_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -257,7 +264,8 @@ async fn just_max_length_password() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::standard(&store, repository);
     let request_decoder = just_max_length_password_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -282,7 +290,8 @@ async fn error_empty_reset_token() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::standard(&store, repository);
     let request_decoder = empty_reset_token_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -302,7 +311,8 @@ async fn error_reset_token_expired_when_decode() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::standard();
-    let material = TestStruct::expired_reset_token(&store);
+    let repository = TestRepository::standard();
+    let material = TestStruct::expired_reset_token(&store, repository);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -321,8 +331,9 @@ async fn error_reset_token_expired_when_decode() {
 async fn error_reset_token_expired_in_store() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::expired_reset_token();
-    let material = TestStruct::standard(&store);
+    let store = TestStore::standard();
+    let repository = TestRepository::expired_reset_token();
+    let material = TestStruct::standard(&store, repository);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -341,8 +352,9 @@ async fn error_reset_token_expired_in_store() {
 async fn error_reset_token_discarded() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::discarded_reset_token();
-    let material = TestStruct::standard(&store);
+    let store = TestStore::standard();
+    let repository = TestRepository::discarded_reset_token();
+    let material = TestStruct::standard(&store, repository);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -361,28 +373,9 @@ async fn error_reset_token_discarded() {
 async fn error_reset_token_not_stored() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::reset_token_not_stored();
-    let material = TestStruct::standard(&store);
-    let request_decoder = standard_request_decoder();
-
-    let mut action = ResetPasswordAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "reset password error; not found",
-    ]);
-    assert!(!result.is_ok());
-}
-
-#[tokio::test]
-async fn error_user_not_stored() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::user_not_stored();
-    let material = TestStruct::standard(&store);
+    let store = TestStore::standard();
+    let repository = TestRepository::reset_token_not_stored();
+    let material = TestStruct::standard(&store, repository);
     let request_decoder = standard_request_decoder();
 
     let mut action = ResetPasswordAction::with_material(request_decoder, material);
@@ -403,7 +396,7 @@ struct TestStruct<'a> {
     encode: StaticEncodeAuthTicketStruct<'a>,
 
     clock: StaticChronoAuthClock,
-    reset_password_repository: MemoryAuthUserRepository<'a>,
+    reset_password_repository: MemoryAuthUserRepository,
     token_decoder: StaticResetTokenDecoder,
     reset_notifier: StaticResetPasswordNotifier,
 }
@@ -414,7 +407,7 @@ impl<'a> ResetPasswordMaterial for TestStruct<'a> {
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
     type Clock = StaticChronoAuthClock;
-    type ResetPasswordRepository = MemoryAuthUserRepository<'a>;
+    type ResetPasswordRepository = MemoryAuthUserRepository;
     type PasswordHasher = PlainPasswordHasher;
     type TokenDecoder = StaticResetTokenDecoder;
     type ResetNotifier = StaticResetPasswordNotifier;
@@ -446,7 +439,6 @@ impl<'a> ResetPasswordMaterial for TestStruct<'a> {
 struct TestStore {
     nonce: MemoryAuthNonceStore,
     ticket: MemoryAuthTicketStore,
-    user: MemoryAuthUserStore,
 }
 
 impl TestStore {
@@ -454,61 +446,61 @@ impl TestStore {
         Self {
             nonce: standard_nonce_store(),
             ticket: standard_ticket_store(),
-            user: standard_user_store(),
         }
     }
     fn expired_nonce() -> Self {
         Self {
             nonce: expired_nonce_store(),
             ticket: standard_ticket_store(),
-            user: standard_user_store(),
         }
     }
     fn conflict_nonce() -> Self {
         Self {
             nonce: conflict_nonce_store(),
             ticket: standard_ticket_store(),
-            user: standard_user_store(),
+        }
+    }
+}
+
+struct TestRepository {
+    reset_password: MemoryAuthUserRepository,
+}
+
+impl TestRepository {
+    fn standard() -> Self {
+        Self {
+            reset_password: standard_reset_token_repository(),
         }
     }
     fn expired_reset_token() -> Self {
         Self {
-            nonce: standard_nonce_store(),
-            ticket: standard_ticket_store(),
-            user: expired_reset_token_user_store(),
+            reset_password: expired_reset_token_repository(),
         }
     }
     fn discarded_reset_token() -> Self {
         Self {
-            nonce: standard_nonce_store(),
-            ticket: standard_ticket_store(),
-            user: discarded_reset_token_user_store(),
+            reset_password: discarded_reset_token_repository(),
         }
     }
     fn reset_token_not_stored() -> Self {
         Self {
-            nonce: standard_nonce_store(),
-            ticket: standard_ticket_store(),
-            user: empty_user_store(),
-        }
-    }
-    fn user_not_stored() -> Self {
-        Self {
-            nonce: standard_nonce_store(),
-            ticket: standard_ticket_store(),
-            user: user_not_stored_user_store(),
+            reset_password: empty_reset_token_repository(),
         }
     }
 }
 
 impl<'a> TestStruct<'a> {
-    fn standard(store: &'a TestStore) -> Self {
-        Self::with_token_decoder(store, standard_reset_token_decoder())
+    fn standard(store: &'a TestStore, repository: TestRepository) -> Self {
+        Self::with_token_decoder(store, repository, standard_reset_token_decoder())
     }
-    fn expired_reset_token(store: &'a TestStore) -> Self {
-        Self::with_token_decoder(store, expired_reset_token_decoder())
+    fn expired_reset_token(store: &'a TestStore, repository: TestRepository) -> Self {
+        Self::with_token_decoder(store, repository, expired_reset_token_decoder())
     }
-    fn with_token_decoder(store: &'a TestStore, token_decoder: StaticResetTokenDecoder) -> Self {
+    fn with_token_decoder(
+        store: &'a TestStore,
+        repository: TestRepository,
+        token_decoder: StaticResetTokenDecoder,
+    ) -> Self {
         Self {
             validate_nonce: StaticValidateAuthNonceStruct {
                 config: standard_nonce_config(),
@@ -534,7 +526,7 @@ impl<'a> TestStruct<'a> {
             },
 
             clock: standard_clock(),
-            reset_password_repository: MemoryAuthUserRepository::new(&store.user),
+            reset_password_repository: repository.reset_password,
             token_decoder,
             reset_notifier: StaticResetPasswordNotifier,
         }
@@ -659,7 +651,7 @@ fn empty_reset_token_request_decoder() -> StaticResetPasswordRequestDecoder {
 }
 
 fn standard_reset_token_decoder() -> StaticResetTokenDecoder {
-    StaticResetTokenDecoder::Valid(ResetToken::new(RESET_TOKEN.into()))
+    StaticResetTokenDecoder::Valid(ResetToken::restore(RESET_TOKEN.into()))
 }
 fn expired_reset_token_decoder() -> StaticResetTokenDecoder {
     StaticResetTokenDecoder::Expired
@@ -683,84 +675,60 @@ fn standard_ticket_store() -> MemoryAuthTicketStore {
     MemoryAuthTicketMap::new().to_store()
 }
 
-fn standard_user_store() -> MemoryAuthUserStore {
-    let reset_token = ResetToken::new(RESET_TOKEN.into());
+fn standard_reset_token_repository() -> MemoryAuthUserRepository {
+    let reset_token = ResetToken::restore(RESET_TOKEN.into());
     let destination =
         ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(EMAIL.into()));
     let expires = AuthDateTime::restore(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(1)));
     let requested_at = AuthDateTime::restore(standard_now());
-    MemoryAuthUserMap::with_user_and_reset_token(
+    MemoryAuthUserRepository::with_user_and_reset_token(
         test_user_login_id(),
         test_user(),
-        test_user_id(),
         reset_token,
         destination,
         expires,
         requested_at,
         None,
     )
-    .to_store()
 }
-fn user_not_stored_user_store() -> MemoryAuthUserStore {
-    let reset_token = ResetToken::new(RESET_TOKEN.into());
-    let destination =
-        ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(EMAIL.into()));
-    let expires = AuthDateTime::restore(standard_now())
-        .expires(&ExpireDuration::with_duration(Duration::days(1)));
-    let requested_at = AuthDateTime::restore(standard_now());
-    MemoryAuthUserMap::with_dangling_reset_token(
-        test_user_login_id(),
-        test_user_id(),
-        reset_token,
-        destination,
-        expires,
-        requested_at,
-        None,
-    )
-    .to_store()
+fn empty_reset_token_repository() -> MemoryAuthUserRepository {
+    MemoryAuthUserRepository::new()
 }
-fn empty_user_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::new().to_store()
-}
-fn expired_reset_token_user_store() -> MemoryAuthUserStore {
-    let reset_token = ResetToken::new(RESET_TOKEN.into());
+fn expired_reset_token_repository() -> MemoryAuthUserRepository {
+    let reset_token = ResetToken::restore(RESET_TOKEN.into());
     let destination =
         ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(EMAIL.into()));
     let expires = AuthDateTime::restore(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(-1)));
     let requested_at = AuthDateTime::restore(standard_now());
-    MemoryAuthUserMap::with_user_and_reset_token(
+    MemoryAuthUserRepository::with_user_and_reset_token(
         test_user_login_id(),
         test_user(),
-        test_user_id(),
         reset_token,
         destination,
         expires,
         requested_at,
         None,
     )
-    .to_store()
 }
-fn discarded_reset_token_user_store() -> MemoryAuthUserStore {
-    let reset_token = ResetToken::new(RESET_TOKEN.into());
+fn discarded_reset_token_repository() -> MemoryAuthUserRepository {
+    let reset_token = ResetToken::restore(RESET_TOKEN.into());
     let destination =
         ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(EMAIL.into()));
     let expires = AuthDateTime::restore(standard_now())
         .expires(&ExpireDuration::with_duration(Duration::days(1)));
     let requested_at = AuthDateTime::restore(standard_now());
     let reset_at = AuthDateTime::restore(standard_now() - Duration::days(1));
-    MemoryAuthUserMap::with_user_and_reset_token(
+    MemoryAuthUserRepository::with_user_and_reset_token(
         test_user_login_id(),
         test_user(),
-        test_user_id(),
         reset_token,
         destination,
         expires,
         requested_at,
         Some(reset_at),
     )
-    .to_store()
 }
 
 fn test_user() -> AuthUser {
@@ -769,9 +737,6 @@ fn test_user() -> AuthUser {
         granted_roles: HashSet::new(),
     }
     .restore()
-}
-fn test_user_id() -> AuthUserId {
-    AuthUserId::restore(USER_ID.into())
 }
 fn test_user_login_id() -> LoginId {
     LoginId::restore(LOGIN_ID.into())

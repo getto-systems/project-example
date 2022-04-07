@@ -133,7 +133,7 @@ async fn change_destination<S>(
     }
 
     destination_repository
-        .change_destination(&fields.login_id, fields.to)
+        .change_destination(fields.login_id, fields.to)
         .await
         .map_err(|err| post(ChangeResetTokenDestinationEvent::RepositoryError(err)))?;
 

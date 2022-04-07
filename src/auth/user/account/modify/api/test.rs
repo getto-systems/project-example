@@ -18,9 +18,7 @@ use crate::auth::{
     },
     user::{
         account::modify::init::request_decoder::test::StaticModifyAuthUserAccountRequestDecoder,
-        kernel::init::user_repository::memory::{
-            MemoryAuthUserMap, MemoryAuthUserRepository, MemoryAuthUserStore,
-        },
+        kernel::init::user_repository::memory::MemoryAuthUserRepository,
     },
 };
 
@@ -148,13 +146,13 @@ async fn error_not_found() {
 
 struct TestStruct<'a> {
     validate: StaticValidateAuthTokenStruct<'a>,
-    user_repository: MemoryAuthUserRepository<'a>,
+    user_repository: MemoryAuthUserRepository,
 }
 
 impl<'a> ModifyAuthUserAccountMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
 
-    type UserRepository = MemoryAuthUserRepository<'a>;
+    type UserRepository = MemoryAuthUserRepository;
 
     fn validate(&self) -> &Self::Validate {
         &self.validate
@@ -166,26 +164,22 @@ impl<'a> ModifyAuthUserAccountMaterial for TestStruct<'a> {
 
 struct TestStore {
     nonce: MemoryAuthNonceStore,
-    user: MemoryAuthUserStore,
 }
 
 impl TestStore {
     fn standard() -> Self {
         Self {
             nonce: standard_nonce_store(),
-            user: standard_login_id_store(),
         }
     }
     fn expired_nonce() -> Self {
         Self {
             nonce: expired_nonce_store(),
-            user: standard_login_id_store(),
         }
     }
     fn conflict_nonce() -> Self {
         Self {
             nonce: conflict_nonce_store(),
-            user: standard_login_id_store(),
         }
     }
 }
@@ -203,7 +197,7 @@ impl<'a> TestStruct<'a> {
                 token_metadata: standard_token_header(),
                 token_decoder: standard_token_decoder(),
             },
-            user_repository: MemoryAuthUserRepository::new(&store.user),
+            user_repository: standard_user_repository(),
         }
     }
 }
@@ -292,14 +286,13 @@ fn conflict_nonce_store() -> MemoryAuthNonceStore {
     MemoryAuthNonceMap::with_nonce(NONCE.into(), expires).to_store()
 }
 
-fn standard_login_id_store() -> MemoryAuthUserStore {
-    MemoryAuthUserMap::with_user_and_password(
+fn standard_user_repository() -> MemoryAuthUserRepository {
+    MemoryAuthUserRepository::with_user_and_password(
         test_user_login_id(),
         test_user(),
         test_user_password(),
         vec![(test_registered_login_id(), test_registered_user_id())],
     )
-    .to_store()
 }
 
 fn test_user() -> AuthUser {

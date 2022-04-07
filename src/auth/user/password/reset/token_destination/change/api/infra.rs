@@ -30,7 +30,7 @@ pub trait ChangeResetTokenDestinationRepository {
 
     async fn change_destination(
         &self,
-        login_id: &LoginId,
+        login_id: LoginId,
         data: ResetTokenDestination,
     ) -> Result<(), RepositoryError>;
 }

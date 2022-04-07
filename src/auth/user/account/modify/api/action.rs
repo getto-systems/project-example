@@ -136,7 +136,7 @@ async fn modify_user<S>(
     }
 
     user_repository
-        .modify_user(&user_id, fields.to)
+        .modify_user(user_id, fields.to)
         .await
         .map_err(|err| post(ModifyAuthUserAccountEvent::RepositoryError(err)))?;
 

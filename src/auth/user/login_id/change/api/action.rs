@@ -129,7 +129,7 @@ async fn override_login_id<S>(
         .ok_or_else(|| post(OverrideLoginIdEvent::NotFound))?;
 
     login_id_repository
-        .override_login_id(user, fields.new_login_id)
+        .override_login_id(fields.new_login_id, user)
         .await
         .map_err(|err| post(OverrideLoginIdEvent::RepositoryError(err)))?;
 
