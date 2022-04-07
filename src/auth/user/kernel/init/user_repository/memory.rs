@@ -204,14 +204,14 @@ impl AuthenticatePasswordRepository for MemoryAuthUserRepository {
         &self,
         login_id: &LoginId,
     ) -> Result<Option<AuthUserId>, RepositoryError> {
-        Ok(self.login_id.lookup_user_id(login_id))
+        Ok(self.login_id.get_user_id(login_id))
     }
 
     async fn lookup_user(
         &self,
         user_id: &AuthUserId,
     ) -> Result<Option<(HashedPassword, Option<GrantedAuthRoles>)>, RepositoryError> {
-        Ok(self.user.lookup_password_and_granted_roles(user_id))
+        Ok(self.user.get_password_and_granted_roles(user_id))
     }
 }
 
@@ -221,11 +221,11 @@ impl OverrideLoginIdRepository for MemoryAuthUserRepository {
         &self,
         login_id: &LoginId,
     ) -> Result<Option<OverrideLoginIdEntry>, RepositoryError> {
-        Ok(self.login_id.lookup_override_entry(login_id))
+        Ok(self.login_id.get_override_entry(login_id))
     }
 
     async fn check_login_id_registered(&self, login_id: &LoginId) -> Result<bool, RepositoryError> {
-        Ok(self.login_id.lookup_user_id(login_id).is_some())
+        Ok(self.login_id.get_user_id(login_id).is_some())
     }
 
     async fn override_login_id(
@@ -259,7 +259,7 @@ impl ChangePasswordRepository for MemoryAuthUserRepository {
         &self,
         user_id: &AuthUserId,
     ) -> Result<Option<HashedPassword>, RepositoryError> {
-        Ok(self.user.lookup_password(user_id))
+        Ok(self.user.get_password(user_id))
     }
 
     async fn change_password(
@@ -277,7 +277,7 @@ impl OverridePasswordRepository for MemoryAuthUserRepository {
         &self,
         login_id: &LoginId,
     ) -> Result<Option<AuthUserId>, RepositoryError> {
-        Ok(self.login_id.lookup_user_id(login_id))
+        Ok(self.login_id.get_user_id(login_id))
     }
 
     async fn override_password(
@@ -295,14 +295,14 @@ impl ModifyAuthUserAccountRepository for MemoryAuthUserRepository {
         &self,
         login_id: &LoginId,
     ) -> Result<Option<AuthUserId>, RepositoryError> {
-        Ok(self.login_id.lookup_user_id(login_id))
+        Ok(self.login_id.get_user_id(login_id))
     }
 
     async fn lookup_changes(
         &self,
         user_id: &AuthUserId,
     ) -> Result<Option<ModifyAuthUserAccountChanges>, RepositoryError> {
-        Ok(self.user.lookup_modify_changes(user_id))
+        Ok(self.user.get_modify_changes(user_id))
     }
 
     async fn modify_user(
@@ -320,7 +320,7 @@ impl ChangeResetTokenDestinationRepository for MemoryAuthUserRepository {
         &self,
         login_id: &LoginId,
     ) -> Result<Option<ResetTokenDestination>, RepositoryError> {
-        Ok(self.login_id.lookup_reset_token_destination(login_id))
+        Ok(self.login_id.get_reset_token_destination(login_id))
     }
 
     async fn change_destination(
@@ -340,7 +340,7 @@ impl RegisterResetTokenRepository for MemoryAuthUserRepository {
         &self,
         login_id: &LoginId,
     ) -> Result<Option<(AuthUserId, Option<ResetTokenDestination>)>, RepositoryError> {
-        Ok(self.login_id.lookup_reset_token_entry(login_id))
+        Ok(self.login_id.get_reset_token_entry(login_id))
     }
 
     async fn register_reset_token(
@@ -372,14 +372,14 @@ impl ResetPasswordRepository for MemoryAuthUserRepository {
         Option<(AuthUserId, LoginId, ResetTokenDestination, ResetTokenMoment)>,
         RepositoryError,
     > {
-        Ok(self.reset_token.lookup_reset_token_entry(reset_token))
+        Ok(self.reset_token.get_reset_token_entry(reset_token))
     }
 
     async fn lookup_granted_roles(
         &self,
         user_id: &AuthUserId,
     ) -> Result<Option<Option<GrantedAuthRoles>>, RepositoryError> {
-        Ok(self.user.lookup_granted_roles(user_id))
+        Ok(self.user.get_granted_roles(user_id))
     }
 
     async fn reset_password(

@@ -32,7 +32,7 @@ impl MapResetToken {
         }
     }
 
-    pub fn lookup_reset_token_entry(
+    pub fn get_reset_token_entry(
         &self,
         reset_token: &ResetToken,
     ) -> Option<(AuthUserId, LoginId, ResetTokenDestination, ResetTokenMoment)> {

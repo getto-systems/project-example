@@ -14,7 +14,7 @@ impl UuidAuthTicketIdGenerator {
 
 impl AuthTicketIdGenerator for UuidAuthTicketIdGenerator {
     fn generate(&self) -> AuthTicketId {
-        AuthTicketId::new(Uuid::new_v4().to_string())
+        AuthTicketId::restore(Uuid::new_v4().to_string())
     }
 }
 

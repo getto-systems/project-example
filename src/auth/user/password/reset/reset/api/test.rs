@@ -15,9 +15,7 @@ use crate::auth::{
         },
         kernel::init::{
             clock::test::StaticChronoAuthClock,
-            ticket_repository::memory::{
-                MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
-            },
+            ticket_repository::memory::{MemoryAuthTicketRepository, MemoryAuthTicketStore},
         },
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
@@ -395,7 +393,7 @@ struct TestStore {
 impl TestStore {
     fn standard() -> Self {
         Self {
-            ticket: standard_ticket_store(),
+            ticket: MemoryAuthTicketStore::new(),
         }
     }
 }
@@ -449,7 +447,7 @@ impl<'a> TestStruct<'a> {
             issue: StaticIssueAuthTicketStruct {
                 clock: standard_clock(),
                 ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
-                ticket_id_generator: StaticAuthTicketIdGenerator::new(AuthTicketId::new(
+                ticket_id_generator: StaticAuthTicketIdGenerator::new(AuthTicketId::restore(
                     "ticket-id".into(),
                 )),
                 config: standard_issue_config(),
@@ -597,10 +595,6 @@ fn expired_reset_token_decoder() -> StaticResetTokenDecoder {
 
 fn standard_nonce_repository() -> MemoryAuthNonceRepository {
     MemoryAuthNonceRepository::new()
-}
-
-fn standard_ticket_store() -> MemoryAuthTicketStore {
-    MemoryAuthTicketMap::new().to_store()
 }
 
 fn standard_reset_token_repository() -> MemoryAuthUserRepository {

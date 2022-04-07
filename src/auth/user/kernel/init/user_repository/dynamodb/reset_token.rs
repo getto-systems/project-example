@@ -46,7 +46,7 @@ impl<'a> TableResetToken<'a> {
             .collect()
     }
 
-    pub async fn lookup_reset_token_entry(
+    pub async fn get_reset_token_entry(
         &self,
         reset_token: ResetToken,
     ) -> Result<

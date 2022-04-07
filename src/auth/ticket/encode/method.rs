@@ -70,7 +70,7 @@ pub async fn encode_auth_ticket<S>(
     let ticket_repository = infra.ticket_repository();
 
     let limit = ticket_repository
-        .find_expansion_limit(&ticket)
+        .lookup_expansion_limit(&ticket)
         .await
         .map_err(|err| post(EncodeAuthTicketEvent::RepositoryError(err)))?
         .ok_or_else(|| post(EncodeAuthTicketEvent::TicketNotFound))?;

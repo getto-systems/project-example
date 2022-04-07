@@ -25,7 +25,7 @@ impl MapUser {
         }
     }
 
-    pub fn lookup_password_and_granted_roles(
+    pub fn get_password_and_granted_roles(
         &self,
         user_id: &AuthUserId,
     ) -> Option<(HashedPassword, Option<GrantedAuthRoles>)> {
@@ -37,15 +37,15 @@ impl MapUser {
             password.map(|password| (password, granted_roles))
         })
     }
-    pub fn lookup_password(&self, user_id: &AuthUserId) -> Option<HashedPassword> {
+    pub fn get_password(&self, user_id: &AuthUserId) -> Option<HashedPassword> {
         let store = self.store.lock().unwrap();
         store.get(user_id).and_then(|entry| entry.password.clone())
     }
-    pub fn lookup_granted_roles(&self, user_id: &AuthUserId) -> Option<Option<GrantedAuthRoles>> {
+    pub fn get_granted_roles(&self, user_id: &AuthUserId) -> Option<Option<GrantedAuthRoles>> {
         let store = self.store.lock().unwrap();
         store.get(user_id).map(|entry| entry.granted_roles.clone())
     }
-    pub fn lookup_modify_changes(
+    pub fn get_modify_changes(
         &self,
         user_id: &AuthUserId,
     ) -> Option<ModifyAuthUserAccountChanges> {

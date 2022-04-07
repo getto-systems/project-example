@@ -41,7 +41,7 @@ impl<'a> TableLoginId<'a> {
             .collect()
     }
 
-    pub async fn lookup_user_id(
+    pub async fn get_user_id(
         &self,
         login_id: LoginId,
     ) -> Result<Option<AuthUserId>, RepositoryError> {
@@ -56,13 +56,13 @@ impl<'a> TableLoginId<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("lookup user id error", err))?;
+            .map_err(|err| infra_error("get user id error", err))?;
 
         Ok(response
             .item
             .and_then(|mut attrs| ColumnUserId::remove_value(&mut attrs)))
     }
-    pub async fn lookup_override_entry(
+    pub async fn get_override_entry(
         &self,
         login_id: LoginId,
     ) -> Result<Option<OverrideLoginIdEntry>, RepositoryError> {
@@ -83,7 +83,7 @@ impl<'a> TableLoginId<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("lookup override entry error", err))?;
+            .map_err(|err| infra_error("get override entry error", err))?;
 
         Ok(response.item.and_then(move |mut attrs| {
             match (
@@ -99,7 +99,7 @@ impl<'a> TableLoginId<'a> {
             }
         }))
     }
-    pub async fn lookup_reset_token_entry(
+    pub async fn get_reset_token_entry(
         &self,
         login_id: LoginId,
     ) -> Result<Option<(AuthUserId, Option<ResetTokenDestination>)>, RepositoryError> {
@@ -120,7 +120,7 @@ impl<'a> TableLoginId<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("lookup reset token entry error", err))?;
+            .map_err(|err| infra_error("get reset token entry error", err))?;
 
         Ok(response.item.and_then(|mut attrs| {
             match (
@@ -132,7 +132,7 @@ impl<'a> TableLoginId<'a> {
             }
         }))
     }
-    pub async fn lookup_reset_token_destination(
+    pub async fn get_reset_token_destination(
         &self,
         login_id: LoginId,
     ) -> Result<Option<ResetTokenDestination>, RepositoryError> {
@@ -149,7 +149,7 @@ impl<'a> TableLoginId<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("lookup reset token entry error", err))?;
+            .map_err(|err| infra_error("get reset token entry error", err))?;
 
         Ok(response
             .item

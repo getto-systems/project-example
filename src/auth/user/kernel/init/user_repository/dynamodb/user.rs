@@ -40,7 +40,7 @@ impl<'a> TableUser<'a> {
             .collect()
     }
 
-    pub async fn lookup_granted_roles(
+    pub async fn get_granted_roles(
         &self,
         user_id: AuthUserId,
     ) -> Result<Option<Option<GrantedAuthRoles>>, RepositoryError> {
@@ -55,13 +55,13 @@ impl<'a> TableUser<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("lookup user and granted roles error", err))?;
+            .map_err(|err| infra_error("get user and granted roles error", err))?;
 
         Ok(response
             .item
             .map(move |mut attrs| ColumnGrantedAuthRoles::remove_value(&mut attrs)))
     }
-    pub async fn lookup_password_and_granted_roles(
+    pub async fn get_password_and_granted_roles(
         &self,
         user_id: AuthUserId,
     ) -> Result<Option<(HashedPassword, Option<GrantedAuthRoles>)>, RepositoryError> {
@@ -82,7 +82,7 @@ impl<'a> TableUser<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("lookup password and granted roles error", err))?;
+            .map_err(|err| infra_error("get password and granted roles error", err))?;
 
         Ok(response.item.and_then(move |mut attrs| {
             match (
@@ -94,7 +94,7 @@ impl<'a> TableUser<'a> {
             }
         }))
     }
-    pub async fn lookup_password(
+    pub async fn get_password(
         &self,
         user_id: AuthUserId,
     ) -> Result<Option<HashedPassword>, RepositoryError> {
@@ -109,13 +109,13 @@ impl<'a> TableUser<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("lookup password error", err))?;
+            .map_err(|err| infra_error("get password error", err))?;
 
         Ok(response
             .item
             .and_then(move |mut attrs| ColumnHashedPassword::remove_value(&mut attrs)))
     }
-    pub async fn lookup_modify_changes(
+    pub async fn get_modify_changes(
         &self,
         user_id: AuthUserId,
     ) -> Result<Option<ModifyAuthUserAccountChanges>, RepositoryError> {
@@ -130,7 +130,7 @@ impl<'a> TableUser<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("lookup granted roles error", err))?;
+            .map_err(|err| infra_error("get granted roles error", err))?;
 
         Ok(response
             .item

@@ -75,7 +75,7 @@ impl<'client> AuthenticatePasswordRepository for DynamoDbAuthUserRepository<'cli
         &self,
         login_id: &LoginId,
     ) -> Result<Option<AuthUserId>, RepositoryError> {
-        self.login_id.lookup_user_id(login_id.clone()).await
+        self.login_id.get_user_id(login_id.clone()).await
     }
 
     async fn lookup_user(
@@ -83,7 +83,7 @@ impl<'client> AuthenticatePasswordRepository for DynamoDbAuthUserRepository<'cli
         user_id: &AuthUserId,
     ) -> Result<Option<(HashedPassword, Option<GrantedAuthRoles>)>, RepositoryError> {
         self.user
-            .lookup_password_and_granted_roles(user_id.clone())
+            .get_password_and_granted_roles(user_id.clone())
             .await
     }
 }
@@ -94,13 +94,13 @@ impl<'client> OverrideLoginIdRepository for DynamoDbAuthUserRepository<'client> 
         &self,
         login_id: &LoginId,
     ) -> Result<Option<OverrideLoginIdEntry>, RepositoryError> {
-        self.login_id.lookup_override_entry(login_id.clone()).await
+        self.login_id.get_override_entry(login_id.clone()).await
     }
 
     async fn check_login_id_registered(&self, login_id: &LoginId) -> Result<bool, RepositoryError> {
         Ok(self
             .login_id
-            .lookup_user_id(login_id.clone())
+            .get_user_id(login_id.clone())
             .await?
             .is_some())
     }
@@ -127,7 +127,7 @@ impl<'client> ChangePasswordRepository for DynamoDbAuthUserRepository<'client> {
         &self,
         user_id: &AuthUserId,
     ) -> Result<Option<HashedPassword>, RepositoryError> {
-        self.user.lookup_password(user_id.clone()).await
+        self.user.get_password(user_id.clone()).await
     }
 
     async fn change_password(
@@ -145,7 +145,7 @@ impl<'client> OverridePasswordRepository for DynamoDbAuthUserRepository<'client>
         &self,
         login_id: &LoginId,
     ) -> Result<Option<AuthUserId>, RepositoryError> {
-        self.login_id.lookup_user_id(login_id.clone()).await
+        self.login_id.get_user_id(login_id.clone()).await
     }
 
     async fn override_password(
@@ -163,14 +163,14 @@ impl<'client> ModifyAuthUserAccountRepository for DynamoDbAuthUserRepository<'cl
         &self,
         login_id: &LoginId,
     ) -> Result<Option<AuthUserId>, RepositoryError> {
-        self.login_id.lookup_user_id(login_id.clone()).await
+        self.login_id.get_user_id(login_id.clone()).await
     }
 
     async fn lookup_changes(
         &self,
         user_id: &AuthUserId,
     ) -> Result<Option<ModifyAuthUserAccountChanges>, RepositoryError> {
-        self.user.lookup_modify_changes(user_id.clone()).await
+        self.user.get_modify_changes(user_id.clone()).await
     }
 
     async fn modify_user(
@@ -189,7 +189,7 @@ impl<'client> ChangeResetTokenDestinationRepository for DynamoDbAuthUserReposito
         login_id: &LoginId,
     ) -> Result<Option<ResetTokenDestination>, RepositoryError> {
         self.login_id
-            .lookup_reset_token_destination(login_id.clone())
+            .get_reset_token_destination(login_id.clone())
             .await
     }
 
@@ -211,7 +211,7 @@ impl<'client> RegisterResetTokenRepository for DynamoDbAuthUserRepository<'clien
         login_id: &LoginId,
     ) -> Result<Option<(AuthUserId, Option<ResetTokenDestination>)>, RepositoryError> {
         self.login_id
-            .lookup_reset_token_entry(login_id.clone())
+            .get_reset_token_entry(login_id.clone())
             .await
     }
 
@@ -247,7 +247,7 @@ impl<'client> ResetPasswordRepository for DynamoDbAuthUserRepository<'client> {
         RepositoryError,
     > {
         self.reset_token
-            .lookup_reset_token_entry(reset_token.clone())
+            .get_reset_token_entry(reset_token.clone())
             .await
     }
 
@@ -255,7 +255,7 @@ impl<'client> ResetPasswordRepository for DynamoDbAuthUserRepository<'client> {
         &self,
         user_id: &AuthUserId,
     ) -> Result<Option<Option<GrantedAuthRoles>>, RepositoryError> {
-        self.user.lookup_granted_roles(user_id.clone()).await
+        self.user.get_granted_roles(user_id.clone()).await
     }
 
     async fn reset_password(

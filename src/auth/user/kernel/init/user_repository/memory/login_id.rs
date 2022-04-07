@@ -23,11 +23,11 @@ impl MapLoginId {
         }
     }
 
-    pub fn lookup_user_id(&self, login_id: &LoginId) -> Option<AuthUserId> {
+    pub fn get_user_id(&self, login_id: &LoginId) -> Option<AuthUserId> {
         let store = self.store.lock().unwrap();
         store.get(login_id).map(|entry| entry.user_id.clone())
     }
-    pub fn lookup_override_entry(&self, login_id: &LoginId) -> Option<OverrideLoginIdEntry> {
+    pub fn get_override_entry(&self, login_id: &LoginId) -> Option<OverrideLoginIdEntry> {
         let store = self.store.lock().unwrap();
         store.get(login_id).map(|entry| OverrideLoginIdEntry {
             user_id: entry.user_id.clone(),
@@ -35,7 +35,7 @@ impl MapLoginId {
             reset_token_destination: entry.reset_token_destination.clone(),
         })
     }
-    pub fn lookup_reset_token_entry(
+    pub fn get_reset_token_entry(
         &self,
         login_id: &LoginId,
     ) -> Option<(AuthUserId, Option<ResetTokenDestination>)> {
@@ -44,7 +44,7 @@ impl MapLoginId {
             .get(login_id)
             .map(|entry| (entry.user_id.clone(), entry.reset_token_destination.clone()))
     }
-    pub fn lookup_reset_token_destination(
+    pub fn get_reset_token_destination(
         &self,
         login_id: &LoginId,
     ) -> Option<ResetTokenDestination> {

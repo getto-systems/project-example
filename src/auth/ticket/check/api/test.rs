@@ -9,10 +9,11 @@ use crate::auth::ticket::{
         test::StaticEncodeAuthTicketStruct,
         token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
     },
-    kernel::init::{
-        clock::test::StaticChronoAuthClock,
-        ticket_repository::memory::{
-            MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+    kernel::{
+        data::AuthTicket,
+        init::{
+            clock::test::StaticChronoAuthClock,
+            ticket_repository::memory::{MemoryAuthTicketRepository, MemoryAuthTicketStore},
         },
     },
     validate::init::{
@@ -31,14 +32,14 @@ use crate::auth::ticket::{
 use super::action::{CheckAuthTicketAction, CheckAuthTicketMaterial};
 
 use crate::auth::ticket::kernel::data::{
-    AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
+    AuthDateTime, AuthTicketExtract, ExpansionLimitDuration, ExpireDuration,
 };
 
 #[tokio::test]
-async fn success_allow_for_any_role() {
+async fn success() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::standard();
+    let store = TestStore::new();
     let material = TestStruct::standard(&store);
 
     let mut action = CheckAuthTicketAction::with_material(material);
@@ -59,7 +60,7 @@ async fn success_allow_for_any_role() {
 async fn error_token_expired() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::standard();
+    let store = TestStore::new();
     let material = TestStruct::token_expired(&store);
 
     let mut action = CheckAuthTicketAction::with_material(material);
@@ -78,8 +79,8 @@ async fn error_token_expired() {
 async fn success_limited_ticket() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::limited_ticket();
-    let material = TestStruct::standard(&store);
+    let store = TestStore::new();
+    let material = TestStruct::limited_ticket(&store);
 
     let mut action = CheckAuthTicketAction::with_material(material);
     action.subscribe(handler);
@@ -99,8 +100,8 @@ async fn success_limited_ticket() {
 async fn error_no_ticket() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::no_ticket();
-    let material = TestStruct::standard(&store);
+    let store = TestStore::new();
+    let material = TestStruct::no_ticket(&store);
 
     let mut action = CheckAuthTicketAction::with_material(material);
     action.subscribe(handler);
@@ -137,32 +138,43 @@ struct TestStore {
 }
 
 impl TestStore {
-    fn standard() -> Self {
+    fn new() -> Self {
         Self {
-            ticket: standard_ticket_store(),
-        }
-    }
-    fn limited_ticket() -> Self {
-        Self {
-            ticket: limited_ticket_store(),
-        }
-    }
-    fn no_ticket() -> Self {
-        Self {
-            ticket: no_ticket_store(),
+            ticket: MemoryAuthTicketStore::new(),
         }
     }
 }
 
 impl<'a> TestStruct<'a> {
     fn standard(store: &'a TestStore) -> Self {
-        Self::with_token_validator(store, standard_token_decoder())
+        Self::new(
+            standard_ticket_repository(&store.ticket),
+            standard_token_decoder(),
+        )
     }
     fn token_expired(store: &'a TestStore) -> Self {
-        Self::with_token_validator(store, expired_token_decoder())
+        Self::new(
+            standard_ticket_repository(&store.ticket),
+            expired_token_decoder(),
+        )
+    }
+    fn limited_ticket(store: &'a TestStore) -> Self {
+        Self::new(
+            limited_ticket_repository(&store.ticket),
+            standard_token_decoder(),
+        )
+    }
+    fn no_ticket(store: &'a TestStore) -> Self {
+        Self::new(
+            no_ticket_repository(&store.ticket),
+            standard_token_decoder(),
+        )
     }
 
-    fn with_token_validator(store: &'a TestStore, token_validator: StaticAuthTokenDecoder) -> Self {
+    fn new(
+        ticket_repository: MemoryAuthTicketRepository<'a>,
+        token_validator: StaticAuthTokenDecoder,
+    ) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
@@ -176,7 +188,7 @@ impl<'a> TestStruct<'a> {
             },
             encode: StaticEncodeAuthTicketStruct {
                 clock: standard_clock(),
-                ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
+                ticket_repository,
                 ticket_encoder: StaticAuthTokenEncoder,
                 api_encoder: StaticAuthTokenEncoder,
                 cloudfront_encoder: StaticCloudfrontTokenEncoder,
@@ -188,6 +200,7 @@ impl<'a> TestStruct<'a> {
 
 const NONCE: &'static str = "nonce";
 const TICKET_ID: &'static str = "ticket-id";
+const USER_ID: &'static str = "user-id";
 
 fn standard_nonce_config() -> AuthNonceConfig {
     AuthNonceConfig {
@@ -234,16 +247,30 @@ fn standard_nonce_repository() -> MemoryAuthNonceRepository {
     MemoryAuthNonceRepository::new()
 }
 
-fn standard_ticket_store() -> MemoryAuthTicketStore {
-    let limit = AuthDateTime::restore(standard_now())
-        .expansion_limit(&ExpansionLimitDuration::with_duration(Duration::days(10)));
-    MemoryAuthTicketMap::with_ticket(AuthTicketId::new(TICKET_ID.into()), limit).to_store()
+fn standard_ticket_repository<'a>(
+    store: &'a MemoryAuthTicketStore,
+) -> MemoryAuthTicketRepository<'a> {
+    let issued_at = AuthDateTime::restore(standard_now());
+    let limit =
+        issued_at.expansion_limit(&ExpansionLimitDuration::with_duration(Duration::days(10)));
+    MemoryAuthTicketRepository::with_ticket(store, test_ticket(), limit, issued_at)
 }
-fn limited_ticket_store() -> MemoryAuthTicketStore {
-    let limit = AuthDateTime::restore(standard_now())
-        .expansion_limit(&ExpansionLimitDuration::with_duration(Duration::hours(1)));
-    MemoryAuthTicketMap::with_ticket(AuthTicketId::new(TICKET_ID.into()), limit).to_store()
+fn limited_ticket_repository<'a>(
+    store: &'a MemoryAuthTicketStore,
+) -> MemoryAuthTicketRepository<'a> {
+    let issued_at = AuthDateTime::restore(standard_now());
+    let limit =
+        issued_at.expansion_limit(&ExpansionLimitDuration::with_duration(Duration::hours(1)));
+    MemoryAuthTicketRepository::with_ticket(store, test_ticket(), limit, issued_at)
 }
-fn no_ticket_store() -> MemoryAuthTicketStore {
-    MemoryAuthTicketMap::new().to_store()
+fn no_ticket_repository<'a>(store: &'a MemoryAuthTicketStore) -> MemoryAuthTicketRepository<'a> {
+    MemoryAuthTicketRepository::new(store)
+}
+
+fn test_ticket() -> AuthTicket {
+    AuthTicket::restore(AuthTicketExtract {
+        ticket_id: TICKET_ID.into(),
+        user_id: USER_ID.into(),
+        granted_roles: HashSet::new(),
+    })
 }

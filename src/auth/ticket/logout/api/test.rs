@@ -5,10 +5,11 @@ use getto_application_test::ActionTestRunner;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::ticket::{
-    kernel::init::{
-        clock::test::StaticChronoAuthClock,
-        ticket_repository::memory::{
-            MemoryAuthTicketMap, MemoryAuthTicketRepository, MemoryAuthTicketStore,
+    kernel::{
+        data::AuthTicket,
+        init::{
+            clock::test::StaticChronoAuthClock,
+            ticket_repository::memory::{MemoryAuthTicketRepository, MemoryAuthTicketStore},
         },
     },
     validate::init::{
@@ -25,14 +26,14 @@ use crate::auth::ticket::validate::method::AuthNonceConfig;
 use super::action::{LogoutAction, LogoutMaterial};
 
 use crate::auth::ticket::kernel::data::{
-    AuthDateTime, AuthTicketExtract, AuthTicketId, ExpansionLimitDuration, ExpireDuration,
+    AuthDateTime, AuthTicketExtract, ExpansionLimitDuration, ExpireDuration,
 };
 
 #[tokio::test]
 async fn success_logout() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::standard();
+    let store = TestStore::new();
     let material = TestStruct::standard(&store);
 
     let mut action = LogoutAction::with_material(material);
@@ -52,8 +53,8 @@ async fn success_logout() {
 async fn error_no_ticket() {
     let (handler, assert_state) = ActionTestRunner::new();
 
-    let store = TestStore::no_ticket();
-    let material = TestStruct::standard(&store);
+    let store = TestStore::new();
+    let material = TestStruct::no_ticket(&store);
 
     let mut action = LogoutAction::with_material(material);
     action.subscribe(handler);
@@ -90,20 +91,21 @@ struct TestStore {
 }
 
 impl TestStore {
-    fn standard() -> Self {
+    fn new() -> Self {
         Self {
-            ticket: standard_ticket_store(),
-        }
-    }
-    fn no_ticket() -> Self {
-        Self {
-            ticket: no_ticket_store(),
+            ticket: MemoryAuthTicketStore::new(),
         }
     }
 }
 
 impl<'a> TestStruct<'a> {
     fn standard(store: &'a TestStore) -> Self {
+        Self::new(standard_ticket_repository(&store.ticket))
+    }
+    fn no_ticket(store: &'a TestStore) -> Self {
+        Self::new(no_ticket_repository(&store.ticket))
+    }
+    fn new(ticket_repository: MemoryAuthTicketRepository<'a>) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
@@ -115,13 +117,14 @@ impl<'a> TestStruct<'a> {
                 token_metadata: standard_token_metadata(),
                 token_decoder: standard_token_validator(),
             },
-            ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
+            ticket_repository,
         }
     }
 }
 
 const NONCE: &'static str = "nonce";
 const TICKET_ID: &'static str = "ticket-id";
+const USER_ID: &'static str = "user-id";
 
 fn standard_nonce_config() -> AuthNonceConfig {
     AuthNonceConfig {
@@ -155,11 +158,22 @@ fn standard_nonce_repository() -> MemoryAuthNonceRepository {
     MemoryAuthNonceRepository::new()
 }
 
-fn standard_ticket_store() -> MemoryAuthTicketStore {
-    let limit = AuthDateTime::restore(standard_now())
-        .expansion_limit(&ExpansionLimitDuration::with_duration(Duration::days(10)));
-    MemoryAuthTicketMap::with_ticket(AuthTicketId::new(TICKET_ID.into()), limit).to_store()
+fn standard_ticket_repository<'a>(
+    store: &'a MemoryAuthTicketStore,
+) -> MemoryAuthTicketRepository<'a> {
+    let issued_at = AuthDateTime::restore(standard_now());
+    let limit =
+        issued_at.expansion_limit(&ExpansionLimitDuration::with_duration(Duration::days(10)));
+    MemoryAuthTicketRepository::with_ticket(store, test_ticket(), limit, issued_at)
 }
-fn no_ticket_store() -> MemoryAuthTicketStore {
-    MemoryAuthTicketMap::new().to_store()
+fn no_ticket_repository<'a>(store: &'a MemoryAuthTicketStore) -> MemoryAuthTicketRepository<'a> {
+    MemoryAuthTicketRepository::new(store)
+}
+
+fn test_ticket() -> AuthTicket {
+    AuthTicket::restore(AuthTicketExtract {
+        ticket_id: TICKET_ID.into(),
+        user_id: USER_ID.into(),
+        granted_roles: HashSet::new(),
+    })
 }

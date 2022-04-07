@@ -86,7 +86,7 @@ fn decode_ticket(
 
     token_decoder
         .decode(&token)
-        .map(|ticket| ticket.restore())
+        .map(|ticket| AuthTicket::restore(ticket))
         .map_err(ValidateAuthTokenEvent::DecodeError)
 }
 
