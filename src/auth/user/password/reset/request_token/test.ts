@@ -24,8 +24,8 @@ describe("RequestResetToken", () => {
             return action.submit()
         }).then((stack) => {
             expect(stack).toEqual([
-                { type: "try-to-request-token" },
-                { type: "succeed-to-request-token" },
+                { type: "try" },
+                { type: "success" },
             ])
         })
     })
@@ -42,9 +42,9 @@ describe("RequestResetToken", () => {
             return action.submit()
         }).then((stack) => {
             expect(stack).toEqual([
-                { type: "try-to-request-token" },
-                { type: "take-longtime-to-request-token" },
-                { type: "succeed-to-request-token" },
+                { type: "try" },
+                { type: "take-longtime" },
+                { type: "success" },
             ])
         })
     })
@@ -57,7 +57,7 @@ describe("RequestResetToken", () => {
 
         await runner(() => action.submit()).then((stack) => {
             expect(stack).toEqual([
-                { type: "failed-to-request-token", err: { type: "validation-error" } },
+                { type: "failed", err: { type: "validation-error" } },
             ])
         })
     })

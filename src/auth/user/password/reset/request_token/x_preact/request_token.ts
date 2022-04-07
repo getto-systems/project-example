@@ -60,22 +60,22 @@ export function RequestResetTokenComponent(props: Props): VNode {
 
     function basedOn({ state }: Props): VNode {
         switch (state.type) {
-            case "initial-request-token":
+            case "initial":
                 return requestTokenForm({ state: "start" })
 
-            case "failed-to-request-token":
+            case "failed":
                 return requestTokenForm({
                     state: "start",
                     err: requestTokenError(state.err),
                 })
 
-            case "try-to-request-token":
+            case "try":
                 return requestTokenForm({ state: "connecting" })
 
-            case "take-longtime-to-request-token":
+            case "take-longtime":
                 return takeLongtimeMessage()
 
-            case "succeed-to-request-token":
+            case "success":
                 return successMessage()
         }
     }

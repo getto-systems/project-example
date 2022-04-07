@@ -25,10 +25,7 @@ export interface RequestResetTokenAction extends StatefulApplicationAction<Reque
     submit(): Promise<RequestResetTokenState>
 }
 
-// TODO type 簡略化
-export type RequestResetTokenState =
-    | Readonly<{ type: "initial-request-token" }>
-    | RequestResetTokenEvent
+export type RequestResetTokenState = Readonly<{ type: "initial" }> | RequestResetTokenEvent
 
 export type RequestResetTokenMaterial = Readonly<{
     infra: RequestResetTokenInfra
@@ -43,7 +40,7 @@ export type RequestResetTokenConfig = Readonly<{
     takeLongtimeThreshold: DelayTime
 }>
 
-const initialState: RequestResetTokenState = { type: "initial-request-token" }
+const initialState: RequestResetTokenState = { type: "initial" }
 
 export function initRequestResetTokenAction(
     material: RequestResetTokenMaterial,
@@ -114,10 +111,10 @@ class Action
 }
 
 type RequestResetTokenEvent =
-    | Readonly<{ type: "try-to-request-token" }>
-    | Readonly<{ type: "take-longtime-to-request-token" }>
-    | Readonly<{ type: "failed-to-request-token"; err: RequestResetTokenError }>
-    | Readonly<{ type: "succeed-to-request-token" }>
+    | Readonly<{ type: "try" }>
+    | Readonly<{ type: "take-longtime" }>
+    | Readonly<{ type: "failed"; err: RequestResetTokenError }>
+    | Readonly<{ type: "success" }>
 
 async function requestResetToken<S>(
     { infra, config }: RequestResetTokenMaterial,
@@ -125,10 +122,10 @@ async function requestResetToken<S>(
     post: Post<RequestResetTokenEvent, S>,
 ): Promise<S> {
     if (!fields.valid) {
-        return post({ type: "failed-to-request-token", err: { type: "validation-error" } })
+        return post({ type: "failed", err: { type: "validation-error" } })
     }
 
-    post({ type: "try-to-request-token" })
+    post({ type: "try" })
 
     const { requestTokenRemote } = infra
 
@@ -136,13 +133,13 @@ async function requestResetToken<S>(
     const response = await delayedChecker(
         requestTokenRemote(fields.value),
         config.takeLongtimeThreshold,
-        () => post({ type: "take-longtime-to-request-token" }),
+        () => post({ type: "take-longtime" }),
     )
     if (!response.success) {
-        return post({ type: "failed-to-request-token", err: response.err })
+        return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "succeed-to-request-token" })
+    return post({ type: "success" })
 }
 
 interface Post<E, S> {
