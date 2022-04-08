@@ -4,39 +4,37 @@ import { initValidateBoardFieldAction } from "./action"
 
 import { ConvertBoardFieldResult } from "./data"
 
-describe("ValidateBoardField", () => {
-    test("validate; valid input", async () => {
-        // valid input
-        const { action, checker } = standard({ valid: true, value: "valid" })
+test("validate; valid input", async () => {
+    // valid input
+    const { action, checker } = standard({ valid: true, value: "valid" })
 
-        const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-        await runner(async () => {
-            checker.check()
-            return action.currentState()
-        }).then((stack) => {
-            expect(stack).toEqual([{ valid: true }])
-        })
+    await runner(async () => {
+        checker.check()
+        return action.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual([{ valid: true }])
     })
+})
 
-    test("validate; invalid input; clear", async () => {
-        // invalid input
-        const { action, checker } = standard({ valid: false, err: ["empty"] })
+test("validate; invalid input; clear", async () => {
+    // invalid input
+    const { action, checker } = standard({ valid: false, err: ["empty"] })
 
-        const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-        await runner(async () => {
-            checker.check()
-            return action.currentState()
-        }).then((stack) => {
-            expect(stack).toEqual([{ valid: false, err: ["empty"] }])
-        })
-        await runner(async () => {
-            action.clear()
-            return action.currentState()
-        }).then((stack) => {
-            expect(stack).toEqual([{ valid: true }])
-        })
+    await runner(async () => {
+        checker.check()
+        return action.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual([{ valid: false, err: ["empty"] }])
+    })
+    await runner(async () => {
+        action.clear()
+        return action.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual([{ valid: true }])
     })
 })
 

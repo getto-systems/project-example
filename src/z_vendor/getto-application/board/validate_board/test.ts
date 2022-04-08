@@ -2,53 +2,51 @@ import { setupActionTestRunner } from "../../action/test_helper"
 
 import { initValidateBoardAction } from "./action"
 
-describe("ValidateBoard", () => {
-    test("validate; all valid state; clear", async () => {
-        const { action, checker } = standard()
+test("validate; all valid state; clear", async () => {
+    const { action, checker } = standard()
 
-        const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-        await runner(async () => {
-            checker.update("name", true)
-            checker.update("description", true)
-            return action.currentState()
-        }).then((stack) => {
-            expect(stack).toEqual(["initial", "valid"])
-        })
-        await runner(async () => {
-            action.clear()
-            return action.currentState()
-        }).then((stack) => {
-            expect(stack).toEqual(["initial"])
-        })
+    await runner(async () => {
+        checker.update("name", true)
+        checker.update("description", true)
+        return action.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual(["initial", "valid"])
     })
-
-    test("validate; invalid exists", async () => {
-        const { action, checker } = standard()
-
-        const runner = setupActionTestRunner(action.subscriber)
-
-        await runner(async () => {
-            checker.update("name", false) // invalid
-            checker.update("description", true)
-            return action.currentState()
-        }).then((stack) => {
-            expect(stack).toEqual(["invalid", "invalid"])
-        })
+    await runner(async () => {
+        action.clear()
+        return action.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual(["initial"])
     })
+})
 
-    test("validate; initial exists", async () => {
-        const { action, checker } = standard()
+test("validate; invalid exists", async () => {
+    const { action, checker } = standard()
 
-        const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-        await runner(async () => {
-            checker.update("name", true)
-            // description: initial state
-            return action.currentState()
-        }).then((stack) => {
-            expect(stack).toEqual(["initial"])
-        })
+    await runner(async () => {
+        checker.update("name", false) // invalid
+        checker.update("description", true)
+        return action.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual(["invalid", "invalid"])
+    })
+})
+
+test("validate; initial exists", async () => {
+    const { action, checker } = standard()
+
+    const runner = setupActionTestRunner(action.subscriber)
+
+    await runner(async () => {
+        checker.update("name", true)
+        // description: initial state
+        return action.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual(["initial"])
     })
 })
 

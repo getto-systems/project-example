@@ -5,67 +5,65 @@ import { markBoardValue } from "../kernel/test_helper"
 
 import { initInputBoardAction } from "./action"
 
-describe("InputBoard", () => {
-    test("get / set; store connected", async () => {
-        const { source_store, input, store, subscriber } = standard()
+test("get / set; store connected", async () => {
+    const { source_store, input, store, subscriber } = standard()
 
-        input.connector.connect(source_store)
+    input.connector.connect(source_store)
 
-        const runner = setupActionTestRunner({
-            subscribe: (handler) => {
-                subscriber.subscribe(() => handler(store.get()))
-            },
-            unsubscribe: () => null,
-        })
-
-        await runner(async () => {
-            source_store.set(markBoardValue("value"))
-            input.publisher.post()
-        }).then((stack) => {
-            expect(stack).toEqual(["value"])
-        })
+    const runner = setupActionTestRunner({
+        subscribe: (handler) => {
+            subscriber.subscribe(() => handler(store.get()))
+        },
+        unsubscribe: () => null,
     })
 
-    test("get / set; store not connected", async () => {
-        const { source_store, input, store, subscriber } = standard()
+    await runner(async () => {
+        source_store.set(markBoardValue("value"))
+        input.publisher.post()
+    }).then((stack) => {
+        expect(stack).toEqual(["value"])
+    })
+})
 
-        // store not connected
-        //input.connector.connect(source_store)
+test("get / set; store not connected", async () => {
+    const { source_store, input, store, subscriber } = standard()
 
-        const runner = setupActionTestRunner({
-            subscribe: (handler) => {
-                subscriber.subscribe(() => handler(store.get()))
-            },
-            unsubscribe: () => null,
-        })
+    // store not connected
+    //input.connector.connect(source_store)
 
-        await runner(async () => {
-            source_store.set(markBoardValue("value"))
-            input.publisher.post()
-        }).then((stack) => {
-            expect(stack).toEqual([""])
-        })
+    const runner = setupActionTestRunner({
+        subscribe: (handler) => {
+            subscriber.subscribe(() => handler(store.get()))
+        },
+        unsubscribe: () => null,
     })
 
-    test("terminate", async () => {
-        const { source_store, input, store, subscriber } = standard()
+    await runner(async () => {
+        source_store.set(markBoardValue("value"))
+        input.publisher.post()
+    }).then((stack) => {
+        expect(stack).toEqual([""])
+    })
+})
 
-        input.connector.connect(source_store)
+test("terminate", async () => {
+    const { source_store, input, store, subscriber } = standard()
 
-        const runner = setupActionTestRunner({
-            subscribe: (handler) => {
-                subscriber.subscribe(() => handler(store.get()))
-            },
-            unsubscribe: () => null,
-        })
+    input.connector.connect(source_store)
 
-        await runner(async () => {
-            subscriber.terminate()
-            source_store.set(markBoardValue("value"))
-            input.publisher.post()
-        }).then((stack) => {
-            expect(stack).toEqual([])
-        })
+    const runner = setupActionTestRunner({
+        subscribe: (handler) => {
+            subscriber.subscribe(() => handler(store.get()))
+        },
+        unsubscribe: () => null,
+    })
+
+    await runner(async () => {
+        subscriber.terminate()
+        source_store.set(markBoardValue("value"))
+        input.publisher.post()
+    }).then((stack) => {
+        expect(stack).toEqual([])
     })
 })
 

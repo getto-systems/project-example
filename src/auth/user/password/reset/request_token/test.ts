@@ -12,86 +12,75 @@ import { initRequestResetTokenAction, RequestResetTokenAction } from "./action"
 
 const VALID_LOGIN = { loginId: "login-id" } as const
 
-describe("RequestResetToken", () => {
-    test("submit valid login-id", async () => {
-        const { view, store } = standard()
-        const action = view.resource
+test("submit valid login-id", async () => {
+    const { view, store } = standard()
+    const action = view.resource
 
-        const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-        await runner(() => {
-            store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
-            return action.submit()
-        }).then((stack) => {
-            expect(stack).toEqual([
-                { type: "try" },
-                { type: "success" },
-            ])
-        })
-    })
-
-    test("submit valid login-id; with take longtime", async () => {
-        // wait for take longtime timeout
-        const { view, store } = takeLongtime()
-        const action = view.resource
-
-        const runner = setupActionTestRunner(action.subscriber)
-
-        await runner(() => {
-            store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
-            return action.submit()
-        }).then((stack) => {
-            expect(stack).toEqual([
-                { type: "try" },
-                { type: "take-longtime" },
-                { type: "success" },
-            ])
-        })
-    })
-
-    test("submit without fields", async () => {
-        const { view } = standard()
-        const action = view.resource
-
-        const runner = setupActionTestRunner(action.subscriber)
-
-        await runner(() => action.submit()).then((stack) => {
-            expect(stack).toEqual([
-                { type: "failed", err: { type: "validation-error" } },
-            ])
-        })
-    })
-
-    test("clear", () => {
-        const { view, store } = standard()
-        const resource = view.resource
-
+    await runner(() => {
         store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
-        resource.clear()
+        return action.submit()
+    }).then((stack) => {
+        expect(stack).toEqual([{ type: "try" }, { type: "success" }])
+    })
+})
 
-        expect(store.loginId.get()).toEqual("")
+test("submit valid login-id; with take longtime", async () => {
+    // wait for take longtime timeout
+    const { view, store } = takeLongtime()
+    const action = view.resource
+
+    const runner = setupActionTestRunner(action.subscriber)
+
+    await runner(() => {
+        store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
+        return action.submit()
+    }).then((stack) => {
+        expect(stack).toEqual([{ type: "try" }, { type: "take-longtime" }, { type: "success" }])
+    })
+})
+
+test("submit without fields", async () => {
+    const { view } = standard()
+    const action = view.resource
+
+    const runner = setupActionTestRunner(action.subscriber)
+
+    await runner(() => action.submit()).then((stack) => {
+        expect(stack).toEqual([{ type: "failed", err: { type: "validation-error" } }])
+    })
+})
+
+test("clear", () => {
+    const { view, store } = standard()
+    const resource = view.resource
+
+    store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
+    resource.clear()
+
+    expect(store.loginId.get()).toEqual("")
+})
+
+test("terminate", async () => {
+    const { view } = standard()
+    const action = view.resource
+
+    const runner = setupActionTestRunner({
+        subscribe: (handler) => {
+            action.subscriber.subscribe(handler)
+            action.validate.subscriber.subscribe(handler)
+            action.loginId.validate.subscriber.subscribe(handler)
+        },
+        unsubscribe: () => null,
     })
 
-    test("terminate", async () => {
-        const { view } = standard()
-        const action = view.resource
-
-        const runner = setupActionTestRunner({
-            subscribe: (handler) => {
-                action.subscriber.subscribe(handler)
-                action.validate.subscriber.subscribe(handler)
-                action.loginId.validate.subscriber.subscribe(handler)
-            },
-            unsubscribe: () => null,
-        })
-
-        await runner(async () => {
-            view.terminate()
-            action.submit()
-        }).then((stack) => {
-            // no input/validate event after terminate
-            expect(stack).toEqual([])
-        })
+    await runner(async () => {
+        view.terminate()
+        action.submit()
+    }).then((stack) => {
+        // no input/validate event after terminate
+        expect(stack).toEqual([])
     })
 })
 

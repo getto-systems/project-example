@@ -2,34 +2,29 @@ import { standard_MenuTree } from "./test_helper"
 
 import { mockLoadBreadcrumbListShell } from "./init/mock"
 
-import {
-    initLoadBreadcrumbListAction,
-    LoadBreadcrumbListAction,
-} from "./action"
+import { initLoadBreadcrumbListAction, LoadBreadcrumbListAction } from "./action"
 
-describe("LoadBreadcrumbList", () => {
-    test("load breadcrumb", () => {
-        const { resource } = standard()
+test("load breadcrumb", () => {
+    const { resource } = standard()
 
-        expect(resource.breadcrumbList.load()).toEqual([
-            category("MAIN"),
-            item("ホーム", "home", "/1.0.0/index.html"),
-        ])
-    })
-
-    test("load empty breadcrumb; unknown menu target", () => {
-        const { resource } = unknownTarget()
-
-        expect(resource.breadcrumbList.load()).toEqual([])
-    })
-
-    function category(label: string) {
-        return { type: "category", category: { label } }
-    }
-    function item(label: string, icon: string, href: string) {
-        return { type: "item", item: { label, icon, href } }
-    }
+    expect(resource.breadcrumbList.load()).toEqual([
+        category("MAIN"),
+        item("ホーム", "home", "/1.0.0/index.html"),
+    ])
 })
+
+test("load empty breadcrumb; unknown menu target", () => {
+    const { resource } = unknownTarget()
+
+    expect(resource.breadcrumbList.load()).toEqual([])
+})
+
+function category(label: string) {
+    return { type: "category", category: { label } }
+}
+function item(label: string, icon: string, href: string) {
+    return { type: "item", item: { label, icon, href } }
+}
 
 function standard() {
     const resource = newResource(standard_URL())

@@ -8,25 +8,23 @@ import {
     zeroBoardValue,
 } from "../../../../z_vendor/getto-application/board/kernel/data"
 
-describe("SearchOffset", () => {
-    test("get; reset", async () => {
-        const { store, get, reset } = standard()
+test("get; reset", async () => {
+    const { store, get, reset } = standard()
 
-        store.offset.set(markBoardValue("1"))
+    store.offset.set(markBoardValue("1"))
 
-        expect(get()).toEqual("1")
-        expect(reset()).toEqual("0")
-        expect(get()).toEqual("0")
-    })
+    expect(get()).toEqual("1")
+    expect(reset()).toEqual("0")
+    expect(get()).toEqual("0")
+})
 
-    test("terminate", async () => {
-        const { resource } = standard()
+test("terminate", async () => {
+    const { resource } = standard()
 
-        resource.field.terminate()
+    resource.field.terminate()
 
-        // offset action では subscribe していないのでテストする内容がない
-        expect(true).toBe(true)
-    })
+    // offset action では subscribe していないのでテストする内容がない
+    expect(true).toBe(true)
 })
 
 function standard() {

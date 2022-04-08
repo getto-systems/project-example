@@ -12,271 +12,265 @@ import { CheckDeployExistsRemote } from "./infra"
 import { FindNextVersionAction, initFindNextVersionAction } from "../find_next/action"
 import { ApplicationView } from "../../../z_vendor/getto-application/action/action"
 
-describe("FindNextVersion", () => {
-    test("up to date", async () => {
-        const { view } = standard()
-        const resource = view.resource
+test("up to date", async () => {
+    const { view } = standard()
+    const resource = view.resource
 
-        const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(resource.subscriber)
 
-        await runner(() => resource.ignitionState).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "success",
-                    upToDate: true,
-                    version: "1.0.0-ui",
-                    target: {
-                        valid: true,
-                        value: {
-                            specified: false,
-                            path: "/index.html?search=parameter#hash",
-                        },
+    await runner(() => resource.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "success",
+                upToDate: true,
+                version: "1.0.0-ui",
+                target: {
+                    valid: true,
+                    value: {
+                        specified: false,
+                        path: "/index.html?search=parameter#hash",
                     },
                 },
-            ])
-        })
-    })
-
-    test("up to date; take longtime", async () => {
-        const { view } = takeLongtime()
-        const resource = view.resource
-
-        const runner = setupActionTestRunner(resource.subscriber)
-
-        await runner(() => resource.ignitionState).then((stack) => {
-            expect(stack).toEqual([
-                { type: "take-longtime" },
-                {
-                    type: "success",
-                    upToDate: true,
-                    version: "1.0.0-ui",
-                    target: {
-                        valid: true,
-                        value: { specified: false, path: "/index.html?search=parameter#hash" },
-                    },
-                },
-            ])
-        })
-    })
-
-    test("found next minor version", async () => {
-        const { view } = found(["/1.1.0-ui/index.html"])
-        const resource = view.resource
-
-        const runner = setupActionTestRunner(resource.subscriber)
-
-        await runner(() => resource.ignitionState).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "success",
-                    upToDate: false,
-                    version: "1.1.0-ui",
-                    target: {
-                        valid: true,
-                        value: { specified: false, path: "/index.html?search=parameter#hash" },
-                    },
-                },
-            ])
-        })
-    })
-
-    test("found next patch version", async () => {
-        const { view } = found(["/1.0.1-ui/index.html"])
-        const resource = view.resource
-
-        const runner = setupActionTestRunner(resource.subscriber)
-
-        await runner(() => resource.ignitionState).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "success",
-                    upToDate: false,
-                    version: "1.0.1-ui",
-                    target: {
-                        valid: true,
-                        value: { specified: false, path: "/index.html?search=parameter#hash" },
-                    },
-                },
-            ])
-        })
-    })
-
-    test("found next minor version; recursive", async () => {
-        const { view } = found(["/1.1.0-ui/index.html", "/1.2.0-ui/index.html"])
-        const resource = view.resource
-
-        const runner = setupActionTestRunner(resource.subscriber)
-
-        await runner(() => resource.ignitionState).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "success",
-                    upToDate: false,
-                    version: "1.2.0-ui",
-                    target: {
-                        valid: true,
-                        value: { specified: false, path: "/index.html?search=parameter#hash" },
-                    },
-                },
-            ])
-        })
-    })
-
-    test("found next patch version; recursive", async () => {
-        const { view } = found(["/1.0.1-ui/index.html", "/1.0.2-ui/index.html"])
-        const resource = view.resource
-
-        const runner = setupActionTestRunner(resource.subscriber)
-
-        await runner(() => resource.ignitionState).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "success",
-                    upToDate: false,
-                    version: "1.0.2-ui",
-                    target: {
-                        valid: true,
-                        value: { specified: false, path: "/index.html?search=parameter#hash" },
-                    },
-                },
-            ])
-        })
-    })
-
-    test("found next patch version; complex", async () => {
-        const { view } = found(["/1.1.0-ui/index.html", "/1.1.1-ui/index.html"])
-        const resource = view.resource
-
-        const runner = setupActionTestRunner(resource.subscriber)
-
-        await runner(() => resource.ignitionState).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "success",
-                    upToDate: false,
-                    version: "1.1.1-ui",
-                    target: {
-                        valid: true,
-                        value: { specified: false, path: "/index.html?search=parameter#hash" },
-                    },
-                },
-            ])
-        })
-    })
-
-    test("found next patch version; complex skipped", async () => {
-        const { view } = found([
-            "/1.1.0-ui/index.html",
-            "/1.1.1-ui/index.html",
-            "/1.1.3-ui/index.html",
+            },
         ])
-        const resource = view.resource
+    })
+})
 
-        const runner = setupActionTestRunner(resource.subscriber)
+test("up to date; take longtime", async () => {
+    const { view } = takeLongtime()
+    const resource = view.resource
 
-        await runner(() => resource.ignitionState).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "success",
-                    upToDate: false,
-                    version: "1.1.1-ui",
-                    target: {
-                        valid: true,
-                        value: { specified: false, path: "/index.html?search=parameter#hash" },
+    const runner = setupActionTestRunner(resource.subscriber)
+
+    await runner(() => resource.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            { type: "take-longtime" },
+            {
+                type: "success",
+                upToDate: true,
+                version: "1.0.0-ui",
+                target: {
+                    valid: true,
+                    value: { specified: false, path: "/index.html?search=parameter#hash" },
+                },
+            },
+        ])
+    })
+})
+
+test("found next minor version", async () => {
+    const { view } = found(["/1.1.0-ui/index.html"])
+    const resource = view.resource
+
+    const runner = setupActionTestRunner(resource.subscriber)
+
+    await runner(() => resource.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "success",
+                upToDate: false,
+                version: "1.1.0-ui",
+                target: {
+                    valid: true,
+                    value: { specified: false, path: "/index.html?search=parameter#hash" },
+                },
+            },
+        ])
+    })
+})
+
+test("found next patch version", async () => {
+    const { view } = found(["/1.0.1-ui/index.html"])
+    const resource = view.resource
+
+    const runner = setupActionTestRunner(resource.subscriber)
+
+    await runner(() => resource.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "success",
+                upToDate: false,
+                version: "1.0.1-ui",
+                target: {
+                    valid: true,
+                    value: { specified: false, path: "/index.html?search=parameter#hash" },
+                },
+            },
+        ])
+    })
+})
+
+test("found next minor version; recursive", async () => {
+    const { view } = found(["/1.1.0-ui/index.html", "/1.2.0-ui/index.html"])
+    const resource = view.resource
+
+    const runner = setupActionTestRunner(resource.subscriber)
+
+    await runner(() => resource.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "success",
+                upToDate: false,
+                version: "1.2.0-ui",
+                target: {
+                    valid: true,
+                    value: { specified: false, path: "/index.html?search=parameter#hash" },
+                },
+            },
+        ])
+    })
+})
+
+test("found next patch version; recursive", async () => {
+    const { view } = found(["/1.0.1-ui/index.html", "/1.0.2-ui/index.html"])
+    const resource = view.resource
+
+    const runner = setupActionTestRunner(resource.subscriber)
+
+    await runner(() => resource.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "success",
+                upToDate: false,
+                version: "1.0.2-ui",
+                target: {
+                    valid: true,
+                    value: { specified: false, path: "/index.html?search=parameter#hash" },
+                },
+            },
+        ])
+    })
+})
+
+test("found next patch version; complex", async () => {
+    const { view } = found(["/1.1.0-ui/index.html", "/1.1.1-ui/index.html"])
+    const resource = view.resource
+
+    const runner = setupActionTestRunner(resource.subscriber)
+
+    await runner(() => resource.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "success",
+                upToDate: false,
+                version: "1.1.1-ui",
+                target: {
+                    valid: true,
+                    value: { specified: false, path: "/index.html?search=parameter#hash" },
+                },
+            },
+        ])
+    })
+})
+
+test("found next patch version; complex skipped", async () => {
+    const { view } = found(["/1.1.0-ui/index.html", "/1.1.1-ui/index.html", "/1.1.3-ui/index.html"])
+    const resource = view.resource
+
+    const runner = setupActionTestRunner(resource.subscriber)
+
+    await runner(() => resource.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "success",
+                upToDate: false,
+                version: "1.1.1-ui",
+                target: {
+                    valid: true,
+                    value: { specified: false, path: "/index.html?search=parameter#hash" },
+                },
+            },
+        ])
+    })
+})
+
+test("found next minor version; complex current version", async () => {
+    const { view } = foundComplex(["/1.1.0-ui/index.html"])
+    const resource = view.resource
+
+    const runner = setupActionTestRunner(resource.subscriber)
+
+    await runner(() => resource.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "success",
+                upToDate: false,
+                version: "1.1.0-ui",
+                target: {
+                    valid: true,
+                    value: { specified: false, path: "/index.html?search=parameter#hash" },
+                },
+            },
+        ])
+    })
+})
+
+test("invalid version url", async () => {
+    const { view } = invalidVersion()
+    const resource = view.resource
+
+    const runner = setupActionTestRunner(resource.subscriber)
+
+    await runner(() => resource.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "success",
+                upToDate: true,
+                version: "1.0.0-ui",
+                target: { valid: false },
+            },
+        ])
+    })
+})
+
+test("valid ApplicationTargetPath", () => {
+    expect(
+        applicationPath("1.0.0", {
+            valid: true,
+            value: standardApplicationTargetPath("/path/to/target.html"),
+        }),
+    ).toEqual("/1.0.0/path/to/target.html")
+})
+
+test("invalid ApplicationTargetPath", () => {
+    expect(applicationPath("1.0.0", { valid: false })).toEqual("/1.0.0/index.html")
+})
+
+test("specify target", async () => {
+    const { view } = specifyTarget()
+    const resource = view.resource
+
+    const runner = setupActionTestRunner(resource.subscriber)
+
+    await runner(() => resource.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "success",
+                upToDate: true,
+                version: "1.0.0-ui",
+                target: {
+                    valid: true,
+                    value: {
+                        specified: true,
+                        path: "/path/to/target.html?search=parameter#hash",
                     },
                 },
-            ])
-        })
+            },
+        ])
     })
+})
 
-    test("found next minor version; complex current version", async () => {
-        const { view } = foundComplex(["/1.1.0-ui/index.html"])
-        const resource = view.resource
+test("terminate", async () => {
+    const { view } = standard()
 
-        const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(view.resource.subscriber)
 
-        await runner(() => resource.ignitionState).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "success",
-                    upToDate: false,
-                    version: "1.1.0-ui",
-                    target: {
-                        valid: true,
-                        value: { specified: false, path: "/index.html?search=parameter#hash" },
-                    },
-                },
-            ])
-        })
-    })
-
-    test("invalid version url", async () => {
-        const { view } = invalidVersion()
-        const resource = view.resource
-
-        const runner = setupActionTestRunner(resource.subscriber)
-
-        await runner(() => resource.ignitionState).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "success",
-                    upToDate: true,
-                    version: "1.0.0-ui",
-                    target: { valid: false },
-                },
-            ])
-        })
-    })
-
-    test("valid ApplicationTargetPath", () => {
-        expect(
-            applicationPath("1.0.0", {
-                valid: true,
-                value: standardApplicationTargetPath("/path/to/target.html"),
-            }),
-        ).toEqual("/1.0.0/path/to/target.html")
-    })
-
-    test("invalid ApplicationTargetPath", () => {
-        expect(applicationPath("1.0.0", { valid: false })).toEqual("/1.0.0/index.html")
-    })
-
-    test("specify target", async () => {
-        const { view } = specifyTarget()
-        const resource = view.resource
-
-        const runner = setupActionTestRunner(resource.subscriber)
-
-        await runner(() => resource.ignitionState).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "success",
-                    upToDate: true,
-                    version: "1.0.0-ui",
-                    target: {
-                        valid: true,
-                        value: {
-                            specified: true,
-                            path: "/path/to/target.html?search=parameter#hash",
-                        },
-                    },
-                },
-            ])
-        })
-    })
-
-    test("terminate", async () => {
-        const { view } = standard()
-
-        const runner = setupActionTestRunner(view.resource.subscriber)
-
-        await runner(() => {
-            view.terminate()
-            return view.resource.ignitionState
-        }).then((stack) => {
-            // no input/validate event after terminate
-            expect(stack).toEqual([])
-        })
+    await runner(() => {
+        view.terminate()
+        return view.resource.ignitionState
+    }).then((stack) => {
+        // no input/validate event after terminate
+        expect(stack).toEqual([])
     })
 })
 

@@ -22,77 +22,75 @@ import { initRequestResetTokenAction } from "../../user/password/reset/request_t
 
 import { AuthTicket } from "../../ticket/kernel/data"
 
-describe("SignView", () => {
-    test("redirect password authenticate", async () => {
-        const { action } = standard()
+test("redirect password authenticate", async () => {
+    const { action } = standard()
 
-        const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-        await runner(async () => {
-            const state = await action.ignitionState
-            switch (state.type) {
-                case "check-authTicket":
-                    await state.view.resource.ignitionState
-            }
-            return state
-        }).then((stack) => {
-            expect(stack.map((state) => state.type)).toEqual([
-                "check-authTicket",
-                "password-authenticate",
-            ])
-        })
+    await runner(async () => {
+        const state = await action.ignitionState
+        switch (state.type) {
+            case "check-authTicket":
+                await state.view.resource.ignitionState
+        }
+        return state
+    }).then((stack) => {
+        expect(stack.map((state) => state.type)).toEqual([
+            "check-authTicket",
+            "password-authenticate",
+        ])
     })
+})
 
-    test("static privacy policy", async () => {
-        const { action } = static_privacyPolicy()
+test("static privacy policy", async () => {
+    const { action } = static_privacyPolicy()
 
-        const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-        await runner(async () => {
-            const state = await action.ignitionState
-            switch (state.type) {
-                case "check-authTicket":
-                    await state.view.resource.ignitionState
-            }
-            return state
-        }).then((stack) => {
-            expect(stack.map((state) => state.type)).toEqual([
-                "check-authTicket",
-                "static-privacyPolicy",
-            ])
-        })
+    await runner(async () => {
+        const state = await action.ignitionState
+        switch (state.type) {
+            case "check-authTicket":
+                await state.view.resource.ignitionState
+        }
+        return state
+    }).then((stack) => {
+        expect(stack.map((state) => state.type)).toEqual([
+            "check-authTicket",
+            "static-privacyPolicy",
+        ])
     })
+})
 
-    test("password reset request token", async () => {
-        const { action } = passwordReset_requestToken()
+test("password reset request token", async () => {
+    const { action } = passwordReset_requestToken()
 
-        const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-        await runner(async () => {
-            const state = await action.ignitionState
-            switch (state.type) {
-                case "check-authTicket":
-                    await state.view.resource.ignitionState
-            }
-            return state
-        }).then((stack) => {
-            expect(stack.map((state) => state.type)).toEqual([
-                "check-authTicket",
-                "password-reset-requestToken",
-            ])
-        })
+    await runner(async () => {
+        const state = await action.ignitionState
+        switch (state.type) {
+            case "check-authTicket":
+                await state.view.resource.ignitionState
+        }
+        return state
+    }).then((stack) => {
+        expect(stack.map((state) => state.type)).toEqual([
+            "check-authTicket",
+            "password-reset-requestToken",
+        ])
     })
+})
 
-    test("password reset", async () => {
-        const { action } = passwordReset_reset()
+test("password reset", async () => {
+    const { action } = passwordReset_reset()
 
-        const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-        await runner(async () => {
-            return await action.ignitionState
-        }).then((stack) => {
-            expect(stack.map((state) => state.type)).toEqual(["password-reset"])
-        })
+    await runner(async () => {
+        return await action.ignitionState
+    }).then((stack) => {
+        expect(stack.map((state) => state.type)).toEqual(["password-reset"])
     })
 })
 

@@ -4,64 +4,62 @@ import { mockFileStore } from "./test_helper"
 
 import { initSelectFileAction } from "./action"
 
-describe("SelectFile", () => {
-    test("get; store connected", async () => {
-        const { source_store, input, store, subscriber } = standard()
+test("get; store connected", async () => {
+    const { source_store, input, store, subscriber } = standard()
 
-        input.connector.connect(source_store)
+    input.connector.connect(source_store)
 
-        const runner = setupActionTestRunner({
-            subscribe: (handler) => {
-                subscriber.subscribe(() => handler(store.get()))
-            },
-            unsubscribe: () => null,
-        })
-
-        await runner(async () => {
-            input.publisher.post()
-        }).then((stack) => {
-            expect(stack).toEqual([{ found: true, file: "file" }])
-        })
+    const runner = setupActionTestRunner({
+        subscribe: (handler) => {
+            subscriber.subscribe(() => handler(store.get()))
+        },
+        unsubscribe: () => null,
     })
 
-    test("get; store not connected", async () => {
-        const { input, store, subscriber } = standard()
+    await runner(async () => {
+        input.publisher.post()
+    }).then((stack) => {
+        expect(stack).toEqual([{ found: true, file: "file" }])
+    })
+})
 
-        // store not connected
-        //input.connector.connect(source_store)
+test("get; store not connected", async () => {
+    const { input, store, subscriber } = standard()
 
-        const runner = setupActionTestRunner({
-            subscribe: (handler) => {
-                subscriber.subscribe(() => handler(store.get()))
-            },
-            unsubscribe: () => null,
-        })
+    // store not connected
+    //input.connector.connect(source_store)
 
-        await runner(async () => {
-            input.publisher.post()
-        }).then((stack) => {
-            expect(stack).toEqual([{ found: false }])
-        })
+    const runner = setupActionTestRunner({
+        subscribe: (handler) => {
+            subscriber.subscribe(() => handler(store.get()))
+        },
+        unsubscribe: () => null,
     })
 
-    test("terminate", async () => {
-        const { source_store, input, store, subscriber } = standard()
+    await runner(async () => {
+        input.publisher.post()
+    }).then((stack) => {
+        expect(stack).toEqual([{ found: false }])
+    })
+})
 
-        input.connector.connect(source_store)
+test("terminate", async () => {
+    const { source_store, input, store, subscriber } = standard()
 
-        const runner = setupActionTestRunner({
-            subscribe: (handler) => {
-                subscriber.subscribe(() => handler(store.get()))
-            },
-            unsubscribe: () => null,
-        })
+    input.connector.connect(source_store)
 
-        await runner(async () => {
-            subscriber.terminate()
-            input.publisher.post()
-        }).then((stack) => {
-            expect(stack).toEqual([])
-        })
+    const runner = setupActionTestRunner({
+        subscribe: (handler) => {
+            subscriber.subscribe(() => handler(store.get()))
+        },
+        unsubscribe: () => null,
+    })
+
+    await runner(async () => {
+        subscriber.terminate()
+        input.publisher.post()
+    }).then((stack) => {
+        expect(stack).toEqual([])
     })
 })
 
