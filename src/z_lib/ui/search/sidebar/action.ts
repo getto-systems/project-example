@@ -14,9 +14,7 @@ export interface SearchSidebarAction extends StatefulApplicationAction<SearchSid
 }
 
 export type SearchSidebarState =
-    | Readonly<{ type: "initial-sidebar"; state: SearchSidebarExpand }>
-    | Readonly<{ type: "succeed-to-save"; state: SearchSidebarExpand }>
-    | Readonly<{ type: "succeed-to-load"; state: SearchSidebarExpand }>
+    | Readonly<{ type: "success"; state: SearchSidebarExpand }>
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
 export type SearchSidebarInfra = Readonly<{
@@ -43,7 +41,7 @@ class Action
             ignite: () => this.load(),
         })
 
-        this.initialState = { type: "initial-sidebar", state }
+        this.initialState = { type: "success", state }
 
         this.infra = infra
     }
@@ -60,7 +58,7 @@ class Action
         if (!result.success) {
             return this.post({ type: "repository-error", err: result.err })
         }
-        return this.post({ type: "succeed-to-save", state })
+        return this.post({ type: "success", state })
     }
 
     async load(): Promise<SearchSidebarState> {
@@ -74,6 +72,6 @@ class Action
             return this.post(this.currentState())
         }
 
-        return this.post({ type: "succeed-to-load", state: sidebarResult.value })
+        return this.post({ type: "success", state: sidebarResult.value })
     }
 }

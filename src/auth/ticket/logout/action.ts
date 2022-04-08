@@ -14,12 +14,12 @@ export interface LogoutAction extends StatefulApplicationAction<LogoutState> {
 }
 
 export type LogoutState =
-    | Readonly<{ type: "initial-logout" }>
+    | Readonly<{ type: "initial" }>
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
-    | Readonly<{ type: "failed-to-logout"; err: RemoteCommonError }>
-    | Readonly<{ type: "succeed-to-logout" }>
+    | Readonly<{ type: "failed"; err: RemoteCommonError }>
+    | Readonly<{ type: "success" }>
 
-const initialState: LogoutState = { type: "initial-logout" }
+const initialState: LogoutState = { type: "initial" }
 
 export function initLogoutAction(infra: LogoutInfra): LogoutAction {
     return new Action(infra)
@@ -49,12 +49,12 @@ class Action extends AbstractStatefulApplicationAction<LogoutState> implements L
         }
         if (!findProfileResult.found) {
             // 認証情報のクリアをするのが目的なので、profile が設定されていなければ success とする
-            return this.post({ type: "succeed-to-logout" })
+            return this.post({ type: "success" })
         }
 
         const response = await logoutRemote()
         if (!response.success) {
-            return this.post({ type: "failed-to-logout", err: response.err })
+            return this.post({ type: "failed", err: response.err })
         }
 
         const removeProfileResult = await ticketRepository.remove()
@@ -62,6 +62,6 @@ class Action extends AbstractStatefulApplicationAction<LogoutState> implements L
             return this.post({ type: "repository-error", err: removeProfileResult.err })
         }
 
-        return this.post({ type: "succeed-to-logout" })
+        return this.post({ type: "success" })
     }
 }

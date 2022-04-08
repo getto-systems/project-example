@@ -21,9 +21,9 @@ export type LoadSeasonMaterial = Readonly<{
     clock: Clock
 }>
 
-export type LoadSeasonState = Readonly<{ type: "initial-season" }> | LoadSeasonEvent
+export type LoadSeasonState = Readonly<{ type: "initial" }> | LoadSeasonEvent
 
-const initialState: LoadSeasonState = { type: "initial-season" }
+const initialState: LoadSeasonState = { type: "initial" }
 
 export function initLoadSeasonAction(material: LoadSeasonMaterial): LoadSeasonAction {
     return new Action(material)
@@ -46,13 +46,13 @@ class Action extends AbstractStatefulApplicationAction<LoadSeasonState> {
 }
 
 type LoadSeasonEvent =
+    | Readonly<{ type: "failed"; err: RepositoryError }>
     | Readonly<{
-          type: "succeed-to-load"
+          type: "success"
           season: Season
           default: boolean
           availableSeasons: readonly Season[]
       }>
-    | Readonly<{ type: "failed-to-load"; err: RepositoryError }>
 
 async function loadSeason<S>(
     infra: LoadSeasonMaterial,
@@ -62,27 +62,18 @@ async function loadSeason<S>(
 
     const result = await season.get()
     if (!result.success) {
-        return post({ type: "failed-to-load", err: result.err })
+        return post({ type: "failed", err: result.err })
     }
-    if (!result.found) {
+    if (!result.found || result.value.expires < clock.now().getTime()) {
         return post({
-            type: "succeed-to-load",
+            type: "success",
             season: defaultSeason(clock),
             default: true,
             availableSeasons: availableSeasons(clock),
         })
     }
-    if (result.value.expires < clock.now().getTime()) {
-        return post({
-            type: "succeed-to-load",
-            season: defaultSeason(clock),
-            default: true,
-            availableSeasons: availableSeasons(clock),
-        })
-    }
-
     return post({
-        type: "succeed-to-load",
+        type: "success",
         season: result.value.season,
         default: false,
         availableSeasons: availableSeasons(clock),

@@ -24,8 +24,8 @@ describe("ChangePassword", () => {
             return resource.change.submit()
         }).then((stack) => {
             expect(stack).toEqual([
-                { type: "try-to-change-password" },
-                { type: "succeed-to-change-password" },
+                { type: "try" },
+                { type: "success" },
             ])
         })
     })
@@ -43,9 +43,9 @@ describe("ChangePassword", () => {
             return resource.change.submit()
         }).then((stack) => {
             expect(stack).toEqual([
-                { type: "try-to-change-password" },
-                { type: "take-longtime-to-change-password" },
-                { type: "succeed-to-change-password" },
+                { type: "try" },
+                { type: "take-longtime" },
+                { type: "success" },
             ])
         })
     })
@@ -57,7 +57,7 @@ describe("ChangePassword", () => {
 
         await runner(() => resource.change.submit()).then((stack) => {
             expect(stack).toEqual([
-                { type: "failed-to-change-password", err: { type: "validation-error" } },
+                { type: "failed", err: { type: "validation-error" } },
             ])
         })
     })

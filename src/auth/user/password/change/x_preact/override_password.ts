@@ -72,7 +72,7 @@ export function OverridePassword(props: Props): VNode {
         return h(SuccessButton, {
             label: LABEL_OVERRIDE.static,
             onClick,
-            isSuccess: state.type === "succeed-to-override-password",
+            isSuccess: state.type === "success",
         })
 
         function onClick(e: Event) {
@@ -84,9 +84,9 @@ export function OverridePassword(props: Props): VNode {
 
     function submitButton(): VNode {
         switch (state.type) {
-            case "initial-override-password":
-            case "failed-to-override-password":
-            case "succeed-to-override-password":
+            case "initial":
+            case "failed":
+            case "success":
                 switch (validateState) {
                     case "initial":
                     case "valid":
@@ -101,8 +101,8 @@ export function OverridePassword(props: Props): VNode {
                 }
                 break
 
-            case "try-to-override-password":
-            case "take-longtime-to-override-password":
+            case "try":
+            case "take-longtime":
                 return button_send({ state: "connect", label: LABEL_OVERRIDE.connect })
         }
 
@@ -110,7 +110,7 @@ export function OverridePassword(props: Props): VNode {
             e.preventDefault()
             props.override.submit(props.user).then((state) => {
                 switch (state.type) {
-                    case "succeed-to-override-password":
+                    case "success":
                         props.editable.close()
                 }
             })
@@ -119,9 +119,9 @@ export function OverridePassword(props: Props): VNode {
 
     function clearButton(): VNode {
         switch (state.type) {
-            case "initial-override-password":
-            case "failed-to-override-password":
-            case "succeed-to-override-password":
+            case "initial":
+            case "failed":
+            case "success":
                 switch (validateState) {
                     case "initial":
                         return button_disabled({ label: LABEL_CLEAR })
@@ -132,8 +132,8 @@ export function OverridePassword(props: Props): VNode {
                 }
                 break
 
-            case "try-to-override-password":
-            case "take-longtime-to-override-password":
+            case "try":
+            case "take-longtime":
                 return EMPTY_CONTENT
         }
 
@@ -153,8 +153,8 @@ export function OverridePassword(props: Props): VNode {
 
     function message(): readonly VNode[] {
         switch (state.type) {
-            case "initial-override-password":
-            case "succeed-to-override-password":
+            case "initial":
+            case "success":
                 switch (validateState) {
                     case "initial":
                     case "valid":
@@ -165,13 +165,13 @@ export function OverridePassword(props: Props): VNode {
                 }
                 break
 
-            case "failed-to-override-password":
+            case "failed":
                 return [fieldError(changePasswordError(state.err))]
 
-            case "try-to-override-password":
+            case "try":
                 return []
 
-            case "take-longtime-to-override-password":
+            case "take-longtime":
                 return [
                     fieldError([
                         html`${icon_spinner} パスワード変更中です`,

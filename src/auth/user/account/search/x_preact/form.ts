@@ -43,15 +43,15 @@ export function SearchAuthUserAccountFormComponent(props: Props): VNode {
         }
 
         switch (state.type) {
-            case "initial-search":
-            case "succeed-to-search":
+            case "initial":
+            case "success":
                 return searchForm({ type: "initial" })
 
-            case "try-to-search":
-            case "take-longtime-to-search":
+            case "try":
+            case "take-longtime":
                 return searchForm({ type: "connecting" })
 
-            case "failed-to-search":
+            case "failed":
                 return searchForm({ type: "failed" })
         }
     }

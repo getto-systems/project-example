@@ -25,8 +25,8 @@ test("initial load", async () => {
 
     await runner(async () => resource.search.ignitionState).then((stack) => {
         expect(stack).toEqual([
-            { type: "try-to-search", previousResponse: undefined },
-            { type: "succeed-to-search", response: standard_response },
+            { type: "try", previousResponse: undefined },
+            { type: "success", response: standard_response },
         ])
     })
 })
@@ -44,8 +44,8 @@ test("search", async () => {
         return resource.search.search()
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "try-to-search", previousResponse: standard_response },
-            { type: "succeed-to-search", response: standard_response },
+            { type: "try", previousResponse: standard_response },
+            { type: "success", response: standard_response },
         ])
     })
 })
@@ -61,9 +61,9 @@ test("search; take longtime", async () => {
         return resource.search.search()
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "try-to-search", previousResponse: standard_response },
-            { type: "take-longtime-to-search", previousResponse: standard_response },
-            { type: "succeed-to-search", response: standard_response },
+            { type: "try", previousResponse: standard_response },
+            { type: "take-longtime", previousResponse: standard_response },
+            { type: "success", response: standard_response },
         ])
     })
 })
@@ -79,8 +79,8 @@ test("sort", async () => {
         return resource.search.sort("login-id")
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "try-to-search", previousResponse: standard_response },
-            { type: "succeed-to-search", response: standard_response },
+            { type: "try", previousResponse: standard_response },
+            { type: "success", response: standard_response },
         ])
     })
 })
@@ -132,7 +132,7 @@ test("focus / close", async () => {
                     resetTokenDestination: { type: "none" },
                 },
             },
-            { type: "initial-detail" },
+            { type: "initial" },
         ])
     })
 })

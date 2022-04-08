@@ -17,7 +17,7 @@ describe("Logout", () => {
         const runner = setupActionTestRunner(resource.logout.subscriber)
 
         await runner(() => resource.logout.submit()).then((stack) => {
-            expect(stack).toEqual([{ type: "succeed-to-logout" }])
+            expect(stack).toEqual([{ type: "success" }])
         })
     })
 

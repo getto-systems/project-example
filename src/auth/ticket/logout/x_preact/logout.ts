@@ -31,7 +31,7 @@ type Props = Resource & Readonly<{ state: LogoutState }>
 export function LogoutComponent(props: Props): VNode {
     useLayoutEffect(() => {
         switch (props.state.type) {
-            case "succeed-to-logout":
+            case "success":
                 // credential が削除されているので、reload するとログイン画面になる
                 location.reload()
                 break
@@ -42,14 +42,14 @@ export function LogoutComponent(props: Props): VNode {
 
     function basedOn({ state }: Readonly<{ state: LogoutState }>): VNode {
         switch (state.type) {
-            case "succeed-to-logout":
-            case "initial-logout":
+            case "initial":
+            case "success":
                 return logoutBox({ type: "initial" })
 
             case "repository-error":
                 return logoutBox({ type: "error", err: repositoryError(state.err) })
 
-            case "failed-to-logout":
+            case "failed":
                 return logoutBox({ type: "error", err: logoutError(state.err) })
         }
     }

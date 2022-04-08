@@ -29,10 +29,10 @@ export interface OverrideLoginIdAction extends StatefulApplicationAction<Overrid
 }
 
 export type OverrideLoginIdState =
-    | Readonly<{ type: "initial-override-login-id" }>
+    | Readonly<{ type: "initial" }>
     | OverrideLoginIdEvent
 
-const initialOverrideState: OverrideLoginIdState = { type: "initial-override-login-id" }
+const initialOverrideState: OverrideLoginIdState = { type: "initial" }
 
 export type OverrideLoginIdMaterial = Readonly<{
     infra: OverrideLoginIdInfra
@@ -117,10 +117,10 @@ class OverrideAction
 }
 
 type OverrideLoginIdEvent =
-    | Readonly<{ type: "try-to-override-login-id" }>
-    | Readonly<{ type: "take-longtime-to-override-login-id" }>
-    | Readonly<{ type: "failed-to-override-login-id"; err: ChangeLoginIdError }>
-    | Readonly<{ type: "succeed-to-override-login-id"; loginId: LoginId }>
+    | Readonly<{ type: "try" }>
+    | Readonly<{ type: "take-longtime" }>
+    | Readonly<{ type: "failed"; err: ChangeLoginIdError }>
+    | Readonly<{ type: "success"; loginId: LoginId }>
 
 async function overrideLoginId<S>(
     { infra, config }: OverrideLoginIdMaterial,
@@ -129,10 +129,10 @@ async function overrideLoginId<S>(
     post: Post<OverrideLoginIdEvent, S>,
 ): Promise<S> {
     if (!fields.valid) {
-        return post({ type: "failed-to-override-login-id", err: { type: "validation-error" } })
+        return post({ type: "failed", err: { type: "validation-error" } })
     }
 
-    post({ type: "try-to-override-login-id" })
+    post({ type: "try" })
 
     const { overrideLoginIdRemote } = infra
 
@@ -140,13 +140,13 @@ async function overrideLoginId<S>(
     const response = await delayedChecker(
         overrideLoginIdRemote(user, fields.value),
         config.takeLongtimeThreshold,
-        () => post({ type: "take-longtime-to-override-login-id" }),
+        () => post({ type: "take-longtime" }),
     )
     if (!response.success) {
-        return post({ type: "failed-to-override-login-id", err: response.err })
+        return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "succeed-to-override-login-id", loginId: fields.value.newLoginId })
+    return post({ type: "success", loginId: fields.value.newLoginId })
 }
 
 interface Post<E, S> {

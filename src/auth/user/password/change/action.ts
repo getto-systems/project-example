@@ -27,11 +27,9 @@ export interface ChangePasswordAction extends StatefulApplicationAction<ChangePa
     submit(): Promise<ChangePasswordState>
 }
 
-export type ChangePasswordState =
-    | Readonly<{ type: "initial-change-password" }>
-    | ChangePasswordEvent
+export type ChangePasswordState = Readonly<{ type: "initial" }> | ChangePasswordEvent
 
-const initialState: ChangePasswordState = { type: "initial-change-password" }
+const initialState: ChangePasswordState = { type: "initial" }
 
 export interface OverridePasswordAction extends StatefulApplicationAction<OverridePasswordState> {
     readonly newPassword: InputPasswordAction
@@ -41,11 +39,9 @@ export interface OverridePasswordAction extends StatefulApplicationAction<Overri
     submit(user: Readonly<{ loginId: LoginId }>): Promise<OverridePasswordState>
 }
 
-export type OverridePasswordState =
-    | Readonly<{ type: "initial-override-password" }>
-    | OverridePasswordEvent
+export type OverridePasswordState = Readonly<{ type: "initial" }> | OverridePasswordEvent
 
-const initialOverrideState: OverridePasswordState = { type: "initial-override-password" }
+const initialOverrideState: OverridePasswordState = { type: "initial" }
 
 export type ChangePasswordMaterial = Readonly<{
     infra: ChangePasswordInfra
@@ -138,10 +134,10 @@ class Action
 }
 
 type ChangePasswordEvent =
-    | Readonly<{ type: "try-to-change-password" }>
-    | Readonly<{ type: "take-longtime-to-change-password" }>
-    | Readonly<{ type: "failed-to-change-password"; err: ChangePasswordError }>
-    | Readonly<{ type: "succeed-to-change-password" }>
+    | Readonly<{ type: "try" }>
+    | Readonly<{ type: "take-longtime" }>
+    | Readonly<{ type: "failed"; err: ChangePasswordError }>
+    | Readonly<{ type: "success" }>
 
 async function changePassword<S>(
     { infra, config }: ChangePasswordMaterial,
@@ -149,10 +145,10 @@ async function changePassword<S>(
     post: Post<ChangePasswordEvent, S>,
 ): Promise<S> {
     if (!fields.valid) {
-        return post({ type: "failed-to-change-password", err: { type: "validation-error" } })
+        return post({ type: "failed", err: { type: "validation-error" } })
     }
 
-    post({ type: "try-to-change-password" })
+    post({ type: "try" })
 
     const { changePasswordRemote } = infra
 
@@ -160,13 +156,13 @@ async function changePassword<S>(
     const response = await delayedChecker(
         changePasswordRemote(fields.value),
         config.takeLongtimeThreshold,
-        () => post({ type: "take-longtime-to-change-password" }),
+        () => post({ type: "take-longtime" }),
     )
     if (!response.success) {
-        return post({ type: "failed-to-change-password", err: response.err })
+        return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "succeed-to-change-password" })
+    return post({ type: "success" })
 }
 
 export type OverridePasswordMaterial = Readonly<{
@@ -252,10 +248,10 @@ class OverrideAction
 }
 
 type OverridePasswordEvent =
-    | Readonly<{ type: "try-to-override-password" }>
-    | Readonly<{ type: "take-longtime-to-override-password" }>
-    | Readonly<{ type: "failed-to-override-password"; err: ChangePasswordError }>
-    | Readonly<{ type: "succeed-to-override-password" }>
+    | Readonly<{ type: "try" }>
+    | Readonly<{ type: "take-longtime" }>
+    | Readonly<{ type: "failed"; err: ChangePasswordError }>
+    | Readonly<{ type: "success" }>
 
 async function overridePassword<S>(
     { infra, config }: OverridePasswordMaterial,
@@ -264,10 +260,10 @@ async function overridePassword<S>(
     post: Post<OverridePasswordEvent, S>,
 ): Promise<S> {
     if (!fields.valid) {
-        return post({ type: "failed-to-override-password", err: { type: "validation-error" } })
+        return post({ type: "failed", err: { type: "validation-error" } })
     }
 
-    post({ type: "try-to-override-password" })
+    post({ type: "try" })
 
     const { overridePasswordRemote } = infra
 
@@ -275,13 +271,13 @@ async function overridePassword<S>(
     const response = await delayedChecker(
         overridePasswordRemote(user, fields.value),
         config.takeLongtimeThreshold,
-        () => post({ type: "take-longtime-to-override-password" }),
+        () => post({ type: "take-longtime" }),
     )
     if (!response.success) {
-        return post({ type: "failed-to-override-password", err: response.err })
+        return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "succeed-to-override-password" })
+    return post({ type: "success" })
 }
 
 interface Post<E, S> {

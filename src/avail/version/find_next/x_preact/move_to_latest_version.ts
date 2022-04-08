@@ -41,7 +41,7 @@ type Props = Readonly<{
 export function MoveToLatestVersionComponent(props: Props): VNode {
     useLayoutEffect(() => {
         switch (props.state.type) {
-            case "succeed-to-find":
+            case "success":
                 // /index.html から呼び出されるので、最新かによらず
                 // /${version}/index.html に遷移する
                 location.href = applicationPath(props.state.version, props.state.target)
@@ -50,17 +50,17 @@ export function MoveToLatestVersionComponent(props: Props): VNode {
     }, [props.state])
 
     switch (props.state.type) {
-        case "initial-next-version":
+        case "initial":
             return EMPTY_CONTENT
 
-        case "take-longtime-to-find":
+        case "take-longtime":
             return takeLongtimeMessage()
 
-        case "succeed-to-find":
+        case "success":
             // location の変更は useLayoutEffect で行うので中身は空
             return EMPTY_CONTENT
 
-        case "failed-to-find":
+        case "failed":
             return h(ApplicationErrorComponent, { err: errorMessage(props.state.err) })
     }
 

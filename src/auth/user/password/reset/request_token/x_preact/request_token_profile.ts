@@ -54,22 +54,22 @@ export function RequestResetTokenProfileComponent(props: Props): VNode {
     function basedOn({ state, editableState, validateState }: Props): VNode {
         if (editableState.isEditable) {
             switch (state.type) {
-                case "initial-request-token":
-                case "succeed-to-request-token":
+                case "initial":
+                case "success":
                     return formBox({ type: validateState })
 
-                case "try-to-request-token":
+                case "try":
                     return formBox({ type: "connecting" })
 
-                case "take-longtime-to-request-token":
+                case "take-longtime":
                     return formBox({ type: "take-longtime" })
 
-                case "failed-to-request-token":
+                case "failed":
                     return formBox({ type: validateState, err: requestTokenError(state.err) })
             }
         } else {
             return buttonBox({
-                type: state.type === "succeed-to-request-token" ? "success" : "initial",
+                type: state.type === "success" ? "success" : "initial",
             })
         }
     }

@@ -20,9 +20,9 @@ describe("SearchSidebar", () => {
             return sidebar.currentState()
         }).then((stack) => {
             expect(stack).toEqual([
-                { type: "succeed-to-load", state: { isExpand: true } },
-                { type: "succeed-to-save", state: { isExpand: false } },
-                { type: "succeed-to-save", state: { isExpand: true } },
+                { type: "success", state: { isExpand: true } },
+                { type: "success", state: { isExpand: false } },
+                { type: "success", state: { isExpand: true } },
             ])
         })
     })

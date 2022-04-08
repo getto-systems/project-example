@@ -5,6 +5,7 @@ import { Clock } from "../../../../z_lib/ui/clock/infra"
 import { Season, seasonPeriods } from "../data"
 import { beginningOfSystemSeason } from "../../../../x_content/season"
 
+// TODO mock できるようにしたい
 export function availableSeasons(clock: Clock): readonly Season[] {
     const seasons: Season[] = Array.from(beginningOfSystemSeason)
     const currentSeason = defaultSeason(clock)

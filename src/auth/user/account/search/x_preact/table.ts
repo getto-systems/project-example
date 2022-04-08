@@ -15,7 +15,6 @@ import {
     TAKE_LONGTIME_TO_SEARCH_TABLE,
 } from "../../../../../core/x_preact/design/table"
 
-import { searchResponse } from "../../../../../z_lib/ui/search/kernel/x_preact/helper"
 import { searchColumns } from "../../../../../z_lib/ui/search/columns/x_preact/helper"
 
 import { ListAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
@@ -47,18 +46,18 @@ export function SearchAuthUserAccountTableComponent(props: Props): VNode {
     return basedOn(props)
 
     function basedOn({ state, columnsState }: Props): VNode {
-        if (state.type === "take-longtime-to-search") {
+        if (state.type === "take-longtime") {
             return TAKE_LONGTIME_TO_SEARCH_TABLE
         } else {
-            const response = searchResponse(state)
+            const result = props.list.searchResponse(state)
             const columns = searchColumns(columnsState)
-            if (!columns.found || !response.found) {
+            if (!columns.found || !result.response) {
                 return EMPTY_CONTENT
             }
-            if (response.response.page.all === 0) {
+            if (result.response.page.all === 0) {
                 return EMPTY_TABLE
             }
-            return content({ columns: columns.columns, response: response.response })
+            return content({ columns: columns.columns, response: result.response })
         }
     }
 

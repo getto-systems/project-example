@@ -36,9 +36,8 @@ export function SearchAuthUserAccountColumnsComponent(props: Props): VNode {
 
     function basedOn({ columnsState }: Props): VNode {
         switch (columnsState.type) {
-            case "initial-search":
-            case "succeed-to-load":
-            case "succeed-to-save":
+            case "initial":
+            case "success":
                 return content()
 
             case "repository-error":
