@@ -15,83 +15,76 @@ import { LoginId } from "../input/data"
 
 const VALID_LOGIN_ID = { newLoginId: "new-login-id" } as const
 
-describe("OverrideLoginId", () => {
-    test("submit valid new-login-id", async () => {
-        const { resource, store, user } = standard()
+test("submit valid new-login-id", async () => {
+    const { resource, store, user } = standard()
 
-        const runner = setupActionTestRunner(resource.override.subscriber)
+    const runner = setupActionTestRunner(resource.override.subscriber)
 
-        await runner(async () => {
-            store.newLoginId.set(markBoardValue(VALID_LOGIN_ID.newLoginId))
-
-            return resource.override.submit(user)
-        }).then((stack) => {
-            expect(stack).toEqual([
-                { type: "try" },
-                { type: "success", loginId: "new-login-id" },
-            ])
-        })
-    })
-
-    test("submit valid login-id; take long time", async () => {
-        // wait for take longtime timeout
-        const { resource, store, user } = takeLongtime_elements()
-
-        const runner = setupActionTestRunner(resource.override.subscriber)
-
-        await runner(() => {
-            store.newLoginId.set(markBoardValue(VALID_LOGIN_ID.newLoginId))
-
-            return resource.override.submit(user)
-        }).then((stack) => {
-            expect(stack).toEqual([
-                { type: "try" },
-                { type: "take-longtime" },
-                { type: "success", loginId: "new-login-id" },
-            ])
-        })
-    })
-
-    test("submit without fields", async () => {
-        const { resource, user } = standard()
-
-        const runner = setupActionTestRunner(resource.override.subscriber)
-
-        await runner(() => resource.override.submit(user)).then((stack) => {
-            expect(stack).toEqual([
-                { type: "failed", err: { type: "validation-error" } },
-            ])
-        })
-    })
-
-    test("clear", () => {
-        const { resource, store } = standard()
-
+    await runner(async () => {
         store.newLoginId.set(markBoardValue(VALID_LOGIN_ID.newLoginId))
-        resource.override.clear()
 
-        expect(store.newLoginId.get()).toEqual("")
+        return resource.override.submit(user)
+    }).then((stack) => {
+        expect(stack).toEqual([{ type: "try" }, { type: "success", loginId: "new-login-id" }])
+    })
+})
+
+test("submit valid login-id; take long time", async () => {
+    // wait for take longtime timeout
+    const { resource, store, user } = takeLongtime_elements()
+
+    const runner = setupActionTestRunner(resource.override.subscriber)
+
+    await runner(() => {
+        store.newLoginId.set(markBoardValue(VALID_LOGIN_ID.newLoginId))
+
+        return resource.override.submit(user)
+    }).then((stack) => {
+        expect(stack).toEqual([
+            { type: "try" },
+            { type: "take-longtime" },
+            { type: "success", loginId: "new-login-id" },
+        ])
+    })
+})
+
+test("submit without fields", async () => {
+    const { resource, user } = standard()
+
+    const runner = setupActionTestRunner(resource.override.subscriber)
+
+    await runner(() => resource.override.submit(user)).then((stack) => {
+        expect(stack).toEqual([{ type: "failed", err: { type: "validation-error" } }])
+    })
+})
+
+test("clear", () => {
+    const { resource, store } = standard()
+
+    store.newLoginId.set(markBoardValue(VALID_LOGIN_ID.newLoginId))
+    resource.override.clear()
+
+    expect(store.newLoginId.get()).toEqual("")
+})
+
+test("terminate", async () => {
+    const { resource, user } = standard()
+
+    const runner = setupActionTestRunner({
+        subscribe: (handler) => {
+            resource.override.subscriber.subscribe(handler)
+            resource.override.validate.subscriber.subscribe(handler)
+            resource.override.newLoginId.validate.subscriber.subscribe(handler)
+        },
+        unsubscribe: () => null,
     })
 
-    test("terminate", async () => {
-        const { resource, user } = standard()
-
-        const runner = setupActionTestRunner({
-            subscribe: (handler) => {
-                resource.override.subscriber.subscribe(handler)
-                resource.override.validate.subscriber.subscribe(handler)
-                resource.override.newLoginId.validate.subscriber.subscribe(handler)
-            },
-            unsubscribe: () => null,
-        })
-
-        await runner(async () => {
-            resource.override.terminate()
-            return resource.override.submit(user)
-        }).then((stack) => {
-            // no input/validate event after terminate
-            expect(stack).toEqual([])
-        })
+    await runner(async () => {
+        resource.override.terminate()
+        return resource.override.submit(user)
+    }).then((stack) => {
+        // no input/validate event after terminate
+        expect(stack).toEqual([])
     })
 })
 

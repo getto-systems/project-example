@@ -7,39 +7,37 @@ import { convertDB } from "../../repository/init/convert"
 
 import { initSearchSidebarAction, SearchSidebarAction } from "./action"
 
-describe("SearchSidebar", () => {
-    test("select columns", async () => {
-        const { sidebar } = standard()
+test("select columns", async () => {
+    const { sidebar } = standard()
 
-        const runner = setupActionTestRunner(sidebar.subscriber)
+    const runner = setupActionTestRunner(sidebar.subscriber)
 
-        await runner(async () => {
-            await sidebar.ignitionState
-            await sidebar.fold()
-            await sidebar.expand()
-            return sidebar.currentState()
-        }).then((stack) => {
-            expect(stack).toEqual([
-                { type: "success", state: { isExpand: true } },
-                { type: "success", state: { isExpand: false } },
-                { type: "success", state: { isExpand: true } },
-            ])
-        })
+    await runner(async () => {
+        await sidebar.ignitionState
+        await sidebar.fold()
+        await sidebar.expand()
+        return sidebar.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual([
+            { type: "success", state: { isExpand: true } },
+            { type: "success", state: { isExpand: false } },
+            { type: "success", state: { isExpand: true } },
+        ])
     })
+})
 
-    test("terminate", async () => {
-        const { sidebar } = standard()
+test("terminate", async () => {
+    const { sidebar } = standard()
 
-        const runner = setupActionTestRunner(sidebar.subscriber)
+    const runner = setupActionTestRunner(sidebar.subscriber)
 
-        await runner(async () => {
-            sidebar.terminate()
-            sidebar.fold()
-            return sidebar.currentState()
-        }).then((stack) => {
-            // no input/validate event after terminate
-            expect(stack).toEqual([])
-        })
+    await runner(async () => {
+        sidebar.terminate()
+        sidebar.fold()
+        return sidebar.currentState()
+    }).then((stack) => {
+        // no input/validate event after terminate
+        expect(stack).toEqual([])
     })
 })
 

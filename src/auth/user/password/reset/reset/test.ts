@@ -33,147 +33,145 @@ const CONTINUOUS_RENEW_AT = [new Date("2020-01-01 10:01:00"), new Date("2020-01-
 
 const VALID_LOGIN = { loginId: "login-id", password: "password" } as const
 
-describe("RegisterPassword", () => {
-    test("submit valid login-id and password", async () => {
-        const { clock, view, store } = standard()
-        const action = view.resource
+test("submit valid login-id and password", async () => {
+    const { clock, view, store } = standard()
+    const action = view.resource
 
-        action.subscriber.subscribe((state) => {
-            switch (state.type) {
-                case "try-to-load":
-                    clock.update(CONTINUOUS_RENEW_START_AT)
-                    break
-            }
-        })
-
-        const runner = setupActionTestRunner(action.subscriber)
-
-        await runner(() => {
-            store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
-            store.password.set(markBoardValue(VALID_LOGIN.password))
-            return action.submit()
-        }).then((stack) => {
-            expect(stack).toEqual([
-                { type: "try-to-reset" },
-                {
-                    type: "try-to-load",
-                    scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
-                },
-                { type: "succeed-to-renew", continue: true },
-                { type: "succeed-to-renew", continue: true },
-                { type: "required-to-login", continue: false },
-            ])
-        })
+    action.subscriber.subscribe((state) => {
+        switch (state.type) {
+            case "try-to-load":
+                clock.update(CONTINUOUS_RENEW_START_AT)
+                break
+        }
     })
 
-    test("submit valid login-id and password; with take longtime", async () => {
-        // wait for take longtime timeout
-        const { clock, view, store } = takeLongtime()
-        const action = view.resource
+    const runner = setupActionTestRunner(action.subscriber)
 
-        action.subscriber.subscribe((state) => {
-            switch (state.type) {
-                case "try-to-load":
-                    clock.update(CONTINUOUS_RENEW_START_AT)
-                    break
-            }
-        })
-
-        const runner = setupActionTestRunner(action.subscriber)
-
-        await runner(() => {
-            store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
-            store.password.set(markBoardValue(VALID_LOGIN.password))
-            return action.submit()
-        }).then((stack) => {
-            expect(stack).toEqual([
-                { type: "try-to-reset" },
-                { type: "take-longtime-to-reset" },
-                {
-                    type: "try-to-load",
-                    scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
-                },
-                { type: "succeed-to-renew", continue: true },
-                { type: "succeed-to-renew", continue: true },
-                { type: "required-to-login", continue: false },
-            ])
-        })
-    })
-
-    test("submit without fields", async () => {
-        const { view } = standard()
-        const action = view.resource
-
-        const runner = setupActionTestRunner(action.subscriber)
-
-        await runner(() => action.submit()).then((stack) => {
-            expect(stack).toEqual([{ type: "failed-to-reset", err: { type: "validation-error" } }])
-        })
-    })
-
-    test("submit without resetToken", async () => {
-        const { view, store } = emptyResetToken()
-        const action = view.resource
-
-        const runner = setupActionTestRunner(action.subscriber)
-
-        await runner(() => {
-            store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
-            store.password.set(markBoardValue(VALID_LOGIN.password))
-            return action.submit()
-        }).then((stack) => {
-            expect(stack).toEqual([{ type: "failed-to-reset", err: { type: "empty-reset-token" } }])
-        })
-    })
-
-    test("clear", () => {
-        const { view, store } = standard()
-        const resource = view.resource
-
+    await runner(() => {
         store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
         store.password.set(markBoardValue(VALID_LOGIN.password))
-        resource.clear()
+        return action.submit()
+    }).then((stack) => {
+        expect(stack).toEqual([
+            { type: "try-to-reset" },
+            {
+                type: "try-to-load",
+                scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
+            },
+            { type: "succeed-to-renew", continue: true },
+            { type: "succeed-to-renew", continue: true },
+            { type: "required-to-login", continue: false },
+        ])
+    })
+})
 
-        expect(store.loginId.get()).toEqual("")
-        expect(store.password.get()).toEqual("")
+test("submit valid login-id and password; with take longtime", async () => {
+    // wait for take longtime timeout
+    const { clock, view, store } = takeLongtime()
+    const action = view.resource
+
+    action.subscriber.subscribe((state) => {
+        switch (state.type) {
+            case "try-to-load":
+                clock.update(CONTINUOUS_RENEW_START_AT)
+                break
+        }
     })
 
-    test("load error", async () => {
-        const { view } = standard()
-        const action = view.resource
+    const runner = setupActionTestRunner(action.subscriber)
 
-        const runner = setupActionTestRunner(action.subscriber)
-
-        await runner(() => action.loadError({ type: "infra-error", err: "load error" })).then(
-            (stack) => {
-                expect(stack).toEqual([
-                    { type: "load-error", err: { type: "infra-error", err: "load error" } },
-                ])
+    await runner(() => {
+        store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
+        store.password.set(markBoardValue(VALID_LOGIN.password))
+        return action.submit()
+    }).then((stack) => {
+        expect(stack).toEqual([
+            { type: "try-to-reset" },
+            { type: "take-longtime-to-reset" },
+            {
+                type: "try-to-load",
+                scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
             },
-        )
+            { type: "succeed-to-renew", continue: true },
+            { type: "succeed-to-renew", continue: true },
+            { type: "required-to-login", continue: false },
+        ])
+    })
+})
+
+test("submit without fields", async () => {
+    const { view } = standard()
+    const action = view.resource
+
+    const runner = setupActionTestRunner(action.subscriber)
+
+    await runner(() => action.submit()).then((stack) => {
+        expect(stack).toEqual([{ type: "failed-to-reset", err: { type: "validation-error" } }])
+    })
+})
+
+test("submit without resetToken", async () => {
+    const { view, store } = emptyResetToken()
+    const action = view.resource
+
+    const runner = setupActionTestRunner(action.subscriber)
+
+    await runner(() => {
+        store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
+        store.password.set(markBoardValue(VALID_LOGIN.password))
+        return action.submit()
+    }).then((stack) => {
+        expect(stack).toEqual([{ type: "failed-to-reset", err: { type: "empty-reset-token" } }])
+    })
+})
+
+test("clear", () => {
+    const { view, store } = standard()
+    const resource = view.resource
+
+    store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
+    store.password.set(markBoardValue(VALID_LOGIN.password))
+    resource.clear()
+
+    expect(store.loginId.get()).toEqual("")
+    expect(store.password.get()).toEqual("")
+})
+
+test("load error", async () => {
+    const { view } = standard()
+    const action = view.resource
+
+    const runner = setupActionTestRunner(action.subscriber)
+
+    await runner(() => action.loadError({ type: "infra-error", err: "load error" })).then(
+        (stack) => {
+            expect(stack).toEqual([
+                { type: "load-error", err: { type: "infra-error", err: "load error" } },
+            ])
+        },
+    )
+})
+
+test("terminate", async () => {
+    const { view } = standard()
+    const action = view.resource
+
+    const runner = setupActionTestRunner({
+        subscribe: (handler) => {
+            action.subscriber.subscribe(handler)
+            action.validate.subscriber.subscribe(handler)
+            action.loginId.validate.subscriber.subscribe(handler)
+            action.password.validate.subscriber.subscribe(handler)
+        },
+        unsubscribe: () => null,
     })
 
-    test("terminate", async () => {
-        const { view } = standard()
-        const action = view.resource
-
-        const runner = setupActionTestRunner({
-            subscribe: (handler) => {
-                action.subscriber.subscribe(handler)
-                action.validate.subscriber.subscribe(handler)
-                action.loginId.validate.subscriber.subscribe(handler)
-                action.password.validate.subscriber.subscribe(handler)
-            },
-            unsubscribe: () => null,
-        })
-
-        await runner(async () => {
-            view.terminate()
-            action.submit()
-        }).then((stack) => {
-            // no input/validate event after terminate
-            expect(stack).toEqual([])
-        })
+    await runner(async () => {
+        view.terminate()
+        action.submit()
+    }).then((stack) => {
+        // no input/validate event after terminate
+        expect(stack).toEqual([])
     })
 })
 

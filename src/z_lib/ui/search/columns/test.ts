@@ -11,48 +11,46 @@ import { initSearchColumnsAction, SearchColumnsAction } from "./action"
 
 import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
-describe("SearchColumns", () => {
-    test("select columns", async () => {
-        const { resource, store } = standard()
+test("select columns", async () => {
+    const { resource, store } = standard()
 
-        const runner = setupActionTestRunner(resource.field.subscriber)
+    const runner = setupActionTestRunner(resource.field.subscriber)
 
-        await runner(async () => {
-            await resource.field.ignitionState
-            await resource.field.set(["column-initial"])
-            store.columns.set([markBoardValue("column-a")])
-            resource.field.input.publisher.post()
-            store.columns.set([markBoardValue("column-a"), markBoardValue("column-b")])
-            resource.field.input.publisher.post()
-            return resource.field.currentState()
-        }).then((stack) => {
-            expect(stack).toEqual([
-                { type: "success", columns: [] },
-                { type: "success", columns: ["column-initial"] },
-                { type: "success", columns: ["column-a"] },
-                { type: "success", columns: ["column-a", "column-b"] },
-            ])
-        })
+    await runner(async () => {
+        await resource.field.ignitionState
+        await resource.field.set(["column-initial"])
+        store.columns.set([markBoardValue("column-a")])
+        resource.field.input.publisher.post()
+        store.columns.set([markBoardValue("column-a"), markBoardValue("column-b")])
+        resource.field.input.publisher.post()
+        return resource.field.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual([
+            { type: "success", columns: [] },
+            { type: "success", columns: ["column-initial"] },
+            { type: "success", columns: ["column-a"] },
+            { type: "success", columns: ["column-a", "column-b"] },
+        ])
+    })
+})
+
+test("terminate", async () => {
+    const { resource, store } = standard()
+
+    const runner = setupActionTestRunner({
+        subscribe: (handler) => {
+            resource.field.subscriber.subscribe(handler)
+        },
+        unsubscribe: () => null,
     })
 
-    test("terminate", async () => {
-        const { resource, store } = standard()
-
-        const runner = setupActionTestRunner({
-            subscribe: (handler) => {
-                resource.field.subscriber.subscribe(handler)
-            },
-            unsubscribe: () => null,
-        })
-
-        await runner(async () => {
-            resource.field.terminate()
-            store.columns.set([markBoardValue("column-a")])
-            return resource.field.currentState()
-        }).then((stack) => {
-            // no input/validate event after terminate
-            expect(stack).toEqual([])
-        })
+    await runner(async () => {
+        resource.field.terminate()
+        store.columns.set([markBoardValue("column-a")])
+        return resource.field.currentState()
+    }).then((stack) => {
+        // no input/validate event after terminate
+        expect(stack).toEqual([])
     })
 })
 

@@ -2,13 +2,11 @@ import { initNotifyUnexpectedErrorAction } from "./action"
 
 import { NotifyUnexpectedErrorRemote } from "./infra"
 
-describe("NotifyUnexpectedError", () => {
-    test("notify", () => {
-        const { resource } = standard()
+test("notify", () => {
+    const { resource } = standard()
 
-        resource.error.notify("error")
-        expect(true).toBe(true)
-    })
+    resource.error.notify("error")
+    expect(true).toBe(true)
 })
 
 function standard() {

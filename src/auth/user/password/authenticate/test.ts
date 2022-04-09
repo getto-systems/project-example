@@ -36,138 +36,136 @@ const CONTINUOUS_RENEW_AT = [new Date("2020-01-01 10:01:00"), new Date("2020-01-
 
 const VALID_LOGIN = { loginId: "login-id", password: "password" } as const
 
-describe("AuthenticatePassword", () => {
-    test("submit valid login-id and password", async () => {
-        const { clock, view, store } = standard()
-        const resource = view.resource
+test("submit valid login-id and password", async () => {
+    const { clock, view, store } = standard()
+    const resource = view.resource
 
-        resource.subscriber.subscribe((state) => {
-            switch (state.type) {
-                case "try-to-load":
-                    clock.update(CONTINUOUS_RENEW_START_AT)
-                    break
-            }
-        })
-
-        const runner = setupActionTestRunner(resource.subscriber)
-
-        await runner(async () => {
-            store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
-            store.password.set(markBoardValue(VALID_LOGIN.password))
-
-            return resource.submit()
-        }).then((stack) => {
-            expect(stack).toEqual([
-                { type: "try-to-login" },
-                {
-                    type: "try-to-load",
-                    scriptPath: {
-                        valid: true,
-                        value: "https://secure.example.com/index.js",
-                    },
-                },
-                { type: "succeed-to-renew", continue: true },
-                { type: "succeed-to-renew", continue: true },
-                { type: "required-to-login", continue: false },
-            ])
-        })
+    resource.subscriber.subscribe((state) => {
+        switch (state.type) {
+            case "try-to-load":
+                clock.update(CONTINUOUS_RENEW_START_AT)
+                break
+        }
     })
 
-    test("submit valid login-id and password; take long time", async () => {
-        // wait for take longtime timeout
-        const { clock, view, store } = takeLongtime_elements()
-        const resource = view.resource
+    const runner = setupActionTestRunner(resource.subscriber)
 
-        resource.subscriber.subscribe((state) => {
-            switch (state.type) {
-                case "try-to-load":
-                    clock.update(CONTINUOUS_RENEW_START_AT)
-                    break
-            }
-        })
-
-        const runner = setupActionTestRunner(resource.subscriber)
-
-        await runner(() => {
-            store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
-            store.password.set(markBoardValue(VALID_LOGIN.password))
-
-            return resource.submit()
-        }).then((stack) => {
-            expect(stack).toEqual([
-                { type: "try-to-login" },
-                { type: "take-longtime-to-login" },
-                {
-                    type: "try-to-load",
-                    scriptPath: {
-                        valid: true,
-                        value: "https://secure.example.com/index.js",
-                    },
-                },
-                { type: "succeed-to-renew", continue: true },
-                { type: "succeed-to-renew", continue: true },
-                { type: "required-to-login", continue: false },
-            ])
-        })
-    })
-
-    test("submit without fields", async () => {
-        const { view } = standard()
-        const resource = view.resource
-
-        const runner = setupActionTestRunner(resource.subscriber)
-
-        await runner(() => resource.submit()).then((stack) => {
-            expect(stack).toEqual([{ type: "failed-to-login", err: { type: "validation-error" } }])
-        })
-    })
-
-    test("clear", () => {
-        const { view, store } = standard()
-        const resource = view.resource
-
+    await runner(async () => {
         store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
         store.password.set(markBoardValue(VALID_LOGIN.password))
-        resource.clear()
 
-        expect(store.loginId.get()).toEqual("")
-        expect(store.password.get()).toEqual("")
-    })
-
-    test("load error", async () => {
-        const { view } = standard()
-        const resource = view.resource
-
-        const runner = setupActionTestRunner(resource.subscriber)
-
-        const err: LoadScriptError = { type: "infra-error", err: "load error" }
-
-        await runner(() => resource.loadError(err)).then((stack) => {
-            expect(stack).toEqual([{ type: "load-error", err }])
-        })
-    })
-
-    test("terminate", async () => {
-        const { view } = standard()
-        const resource = view.resource
-
-        const runner = setupActionTestRunner({
-            subscribe: (handler) => {
-                resource.subscriber.subscribe(handler)
-                resource.validate.subscriber.subscribe(handler)
-                resource.loginId.validate.subscriber.subscribe(handler)
-                resource.password.validate.subscriber.subscribe(handler)
+        return resource.submit()
+    }).then((stack) => {
+        expect(stack).toEqual([
+            { type: "try-to-login" },
+            {
+                type: "try-to-load",
+                scriptPath: {
+                    valid: true,
+                    value: "https://secure.example.com/index.js",
+                },
             },
-            unsubscribe: () => null,
-        })
+            { type: "succeed-to-renew", continue: true },
+            { type: "succeed-to-renew", continue: true },
+            { type: "required-to-login", continue: false },
+        ])
+    })
+})
 
-        await runner(async () => {
-            view.terminate()
-            return resource.submit()
-        }).then((stack) => {
-            // no input/validate event after terminate
-            expect(stack).toEqual([])
-        })
+test("submit valid login-id and password; take long time", async () => {
+    // wait for take longtime timeout
+    const { clock, view, store } = takeLongtime_elements()
+    const resource = view.resource
+
+    resource.subscriber.subscribe((state) => {
+        switch (state.type) {
+            case "try-to-load":
+                clock.update(CONTINUOUS_RENEW_START_AT)
+                break
+        }
+    })
+
+    const runner = setupActionTestRunner(resource.subscriber)
+
+    await runner(() => {
+        store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
+        store.password.set(markBoardValue(VALID_LOGIN.password))
+
+        return resource.submit()
+    }).then((stack) => {
+        expect(stack).toEqual([
+            { type: "try-to-login" },
+            { type: "take-longtime-to-login" },
+            {
+                type: "try-to-load",
+                scriptPath: {
+                    valid: true,
+                    value: "https://secure.example.com/index.js",
+                },
+            },
+            { type: "succeed-to-renew", continue: true },
+            { type: "succeed-to-renew", continue: true },
+            { type: "required-to-login", continue: false },
+        ])
+    })
+})
+
+test("submit without fields", async () => {
+    const { view } = standard()
+    const resource = view.resource
+
+    const runner = setupActionTestRunner(resource.subscriber)
+
+    await runner(() => resource.submit()).then((stack) => {
+        expect(stack).toEqual([{ type: "failed-to-login", err: { type: "validation-error" } }])
+    })
+})
+
+test("clear", () => {
+    const { view, store } = standard()
+    const resource = view.resource
+
+    store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
+    store.password.set(markBoardValue(VALID_LOGIN.password))
+    resource.clear()
+
+    expect(store.loginId.get()).toEqual("")
+    expect(store.password.get()).toEqual("")
+})
+
+test("load error", async () => {
+    const { view } = standard()
+    const resource = view.resource
+
+    const runner = setupActionTestRunner(resource.subscriber)
+
+    const err: LoadScriptError = { type: "infra-error", err: "load error" }
+
+    await runner(() => resource.loadError(err)).then((stack) => {
+        expect(stack).toEqual([{ type: "load-error", err }])
+    })
+})
+
+test("terminate", async () => {
+    const { view } = standard()
+    const resource = view.resource
+
+    const runner = setupActionTestRunner({
+        subscribe: (handler) => {
+            resource.subscriber.subscribe(handler)
+            resource.validate.subscriber.subscribe(handler)
+            resource.loginId.validate.subscriber.subscribe(handler)
+            resource.password.validate.subscriber.subscribe(handler)
+        },
+        unsubscribe: () => null,
+    })
+
+    await runner(async () => {
+        view.terminate()
+        return resource.submit()
+    }).then((stack) => {
+        // no input/validate event after terminate
+        expect(stack).toEqual([])
     })
 })
 

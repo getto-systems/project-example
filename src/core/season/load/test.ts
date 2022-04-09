@@ -16,111 +16,109 @@ import { convertDB } from "../../../z_lib/ui/repository/init/convert"
 
 import { Season } from "../kernel/data"
 
-describe("LoadSeason", () => {
-    test("load from repository", async () => {
-        const { resource } = standard()
+test("load from repository", async () => {
+    const { resource } = standard()
 
-        const runner = setupActionTestRunner(resource.season.subscriber)
+    const runner = setupActionTestRunner(resource.season.subscriber)
 
-        await runner(() => resource.season.ignitionState).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "success",
-                    season: { year: 2022, period: "summer" },
-                    default: false,
-                    availableSeasons: [
-                        { year: 2021, period: "winter" },
-                        { year: 2021, period: "summer" },
-                    ],
-                },
-            ])
-        })
+    await runner(() => resource.season.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "success",
+                season: { year: 2022, period: "summer" },
+                default: false,
+                availableSeasons: [
+                    { year: 2021, period: "winter" },
+                    { year: 2021, period: "summer" },
+                ],
+            },
+        ])
     })
+})
 
-    test("expired; use default", async () => {
-        const { resource } = expired()
+test("expired; use default", async () => {
+    const { resource } = expired()
 
-        const runner = setupActionTestRunner(resource.season.subscriber)
+    const runner = setupActionTestRunner(resource.season.subscriber)
 
-        await runner(() => resource.season.ignitionState).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "success",
-                    season: { year: 2021, period: "summer" },
-                    default: true,
-                    availableSeasons: [
-                        { year: 2021, period: "winter" },
-                        { year: 2021, period: "summer" },
-                    ],
-                },
-            ])
-        })
+    await runner(() => resource.season.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "success",
+                season: { year: 2021, period: "summer" },
+                default: true,
+                availableSeasons: [
+                    { year: 2021, period: "winter" },
+                    { year: 2021, period: "summer" },
+                ],
+            },
+        ])
     })
+})
 
-    test("not found; use default", async () => {
-        const { resource } = empty_summer()
+test("not found; use default", async () => {
+    const { resource } = empty_summer()
 
-        const runner = setupActionTestRunner(resource.season.subscriber)
+    const runner = setupActionTestRunner(resource.season.subscriber)
 
-        await runner(() => resource.season.ignitionState).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "success",
-                    season: { year: 2021, period: "summer" },
-                    default: true,
-                    availableSeasons: [
-                        { year: 2021, period: "winter" },
-                        { year: 2021, period: "summer" },
-                    ],
-                },
-            ])
-        })
+    await runner(() => resource.season.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "success",
+                season: { year: 2021, period: "summer" },
+                default: true,
+                availableSeasons: [
+                    { year: 2021, period: "winter" },
+                    { year: 2021, period: "summer" },
+                ],
+            },
+        ])
     })
+})
 
-    test("not found; use default; winter", async () => {
-        const { resource } = empty_winter()
+test("not found; use default; winter", async () => {
+    const { resource } = empty_winter()
 
-        const runner = setupActionTestRunner(resource.season.subscriber)
+    const runner = setupActionTestRunner(resource.season.subscriber)
 
-        await runner(() => resource.season.ignitionState).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "success",
-                    season: { year: 2021, period: "winter" },
-                    default: true,
-                    availableSeasons: [
-                        { year: 2021, period: "winter" },
-                        { year: 2021, period: "summer" },
-                    ],
-                },
-            ])
-        })
+    await runner(() => resource.season.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "success",
+                season: { year: 2021, period: "winter" },
+                default: true,
+                availableSeasons: [
+                    { year: 2021, period: "winter" },
+                    { year: 2021, period: "summer" },
+                ],
+            },
+        ])
     })
+})
 
-    test("not found; use default; last winter", async () => {
-        const { resource } = empty_last_winter()
+test("not found; use default; last winter", async () => {
+    const { resource } = empty_last_winter()
 
-        const runner = setupActionTestRunner(resource.season.subscriber)
+    const runner = setupActionTestRunner(resource.season.subscriber)
 
-        await runner(() => resource.season.ignitionState).then((stack) => {
-            expect(stack).toEqual([
-                {
-                    type: "success",
-                    season: { year: 2021, period: "winter" },
-                    default: true,
-                    availableSeasons: [
-                        { year: 2021, period: "winter" },
-                        { year: 2021, period: "summer" },
-                    ],
-                },
-            ])
-        })
+    await runner(() => resource.season.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "success",
+                season: { year: 2021, period: "winter" },
+                default: true,
+                availableSeasons: [
+                    { year: 2021, period: "winter" },
+                    { year: 2021, period: "summer" },
+                ],
+            },
+        ])
     })
+})
 
-    test("season label", () => {
-        expect(seasonLabel(markSeason({ year: 2021, period: "summer" }))).toEqual("2021 夏")
-        expect(seasonLabel(markSeason({ year: 2021, period: "winter" }))).toEqual("2021 冬")
-    })
+test("season label", () => {
+    expect(seasonLabel(markSeason({ year: 2021, period: "summer" }))).toEqual("2021 夏")
+    expect(seasonLabel(markSeason({ year: 2021, period: "winter" }))).toEqual("2021 冬")
 })
 
 function standard() {

@@ -19,84 +19,80 @@ import { convertDB } from "../../../z_lib/ui/repository/init/convert"
 
 import { Season } from "../kernel/data"
 
-describe("SetupSeason", () => {
-    test("setup season", async () => {
-        const { resource, store } = standard()
+test("setup season", async () => {
+    const { resource, store } = standard()
 
-        const runner = setupActionTestRunner(resource.setupSeason.subscriber)
+    const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
-        await runner(() => {
-            store.season.set(markBoardValue("2021.summer"))
-            return resource.setupSeason.setup()
-        }).then((stack) => {
-            expect(stack).toEqual([{ type: "success" }])
-        })
+    await runner(() => {
+        store.season.set(markBoardValue("2021.summer"))
+        return resource.setupSeason.setup()
+    }).then((stack) => {
+        expect(stack).toEqual([{ type: "success" }])
     })
+})
 
-    test("setup season; default", async () => {
-        const { resource } = standard()
+test("setup season; default", async () => {
+    const { resource } = standard()
 
-        const runner = setupActionTestRunner(resource.setupSeason.subscriber)
+    const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
-        await runner(() => resource.setupSeason.setup()).then((stack) => {
-            expect(stack).toEqual([{ type: "success" }])
-        })
+    await runner(() => resource.setupSeason.setup()).then((stack) => {
+        expect(stack).toEqual([{ type: "success" }])
     })
+})
 
-    test("setup season; invalid input", async () => {
-        const { resource, store } = standard()
+test("setup season; invalid input", async () => {
+    const { resource, store } = standard()
 
-        const runner = setupActionTestRunner(resource.setupSeason.subscriber)
+    const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
-        await runner(() => {
-            store.season.set(markBoardValue("invalid"))
-            return resource.setupSeason.setup()
-        }).then((stack) => {
-            expect(stack).toEqual([{ type: "invalid" }])
-        })
+    await runner(() => {
+        store.season.set(markBoardValue("invalid"))
+        return resource.setupSeason.setup()
+    }).then((stack) => {
+        expect(stack).toEqual([{ type: "invalid" }])
     })
+})
 
-    test("setup season; invalid year", async () => {
-        const { resource, store } = standard()
+test("setup season; invalid year", async () => {
+    const { resource, store } = standard()
 
-        const runner = setupActionTestRunner(resource.setupSeason.subscriber)
+    const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
-        await runner(() => {
-            store.season.set(markBoardValue("2020.summer"))
-            return resource.setupSeason.setup()
-        }).then((stack) => {
-            expect(stack).toEqual([{ type: "invalid" }])
-        })
+    await runner(() => {
+        store.season.set(markBoardValue("2020.summer"))
+        return resource.setupSeason.setup()
+    }).then((stack) => {
+        expect(stack).toEqual([{ type: "invalid" }])
     })
+})
 
-    test("setup season; invalid period", async () => {
-        const { resource, store } = standard()
+test("setup season; invalid period", async () => {
+    const { resource, store } = standard()
 
-        const runner = setupActionTestRunner(resource.setupSeason.subscriber)
+    const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
-        await runner(() => {
-            store.season.set(markBoardValue("2020.unknown"))
-            return resource.setupSeason.setup()
-        }).then((stack) => {
-            expect(stack).toEqual([{ type: "invalid" }])
-        })
+    await runner(() => {
+        store.season.set(markBoardValue("2020.unknown"))
+        return resource.setupSeason.setup()
+    }).then((stack) => {
+        expect(stack).toEqual([{ type: "invalid" }])
     })
+})
 
-    test("open", async () => {
-        const { resource } = standard()
+test("open", async () => {
+    const { resource } = standard()
 
-        const runner = setupActionTestRunner(resource.setupSeason.subscriber)
+    const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
-        await runner(() => resource.setupSeason.open()).then((stack) => {
-            expect(stack).toEqual([{ type: "edit-season" }])
-        })
+    await runner(() => resource.setupSeason.open()).then((stack) => {
+        expect(stack).toEqual([{ type: "edit-season" }])
     })
+})
 
-    test("convert season to board value", () => {
-        expect(seasonToBoardValue(markSeason({ year: 2021, period: "summer" }))).toEqual(
-            "2021.summer",
-        )
-    })
+test("convert season to board value", () => {
+    expect(seasonToBoardValue(markSeason({ year: 2021, period: "summer" }))).toEqual("2021.summer")
 })
 
 function standard() {

@@ -10,29 +10,27 @@ import { LogoutRemote } from "./infra"
 
 import { initLogoutAction, LogoutAction } from "./action"
 
-describe("Logout", () => {
-    test("logout", async () => {
-        const { resource } = standard()
+test("logout", async () => {
+    const { resource } = standard()
 
-        const runner = setupActionTestRunner(resource.logout.subscriber)
+    const runner = setupActionTestRunner(resource.logout.subscriber)
 
-        await runner(() => resource.logout.submit()).then((stack) => {
-            expect(stack).toEqual([{ type: "success" }])
-        })
+    await runner(() => resource.logout.submit()).then((stack) => {
+        expect(stack).toEqual([{ type: "success" }])
     })
+})
 
-    test("terminate", async () => {
-        const { resource } = standard()
+test("terminate", async () => {
+    const { resource } = standard()
 
-        const runner = setupActionTestRunner(resource.logout.subscriber)
+    const runner = setupActionTestRunner(resource.logout.subscriber)
 
-        await runner(() => {
-            resource.logout.terminate()
-            return resource.logout.submit()
-        }).then((stack) => {
-            // no input/validate event after terminate
-            expect(stack).toEqual([])
-        })
+    await runner(() => {
+        resource.logout.terminate()
+        return resource.logout.submit()
+    }).then((stack) => {
+        // no input/validate event after terminate
+        expect(stack).toEqual([])
     })
 })
 

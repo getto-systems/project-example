@@ -1,32 +1,30 @@
 import { setupActionTestRunner } from "../../action/test_helper"
 import { initEditableBoardAction } from "./action"
 
-describe("EditableBoard", () => {
-    test("open / close", async () => {
-        const { action } = standard()
+test("open / close", async () => {
+    const { action } = standard()
 
-        const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-        await runner(async () => {
-            action.open()
-            action.close()
-            return action.currentState()
-        }).then((stack) => {
-            expect(stack).toEqual([{ isEditable: true }, { isEditable: false }])
-        })
+    await runner(async () => {
+        action.open()
+        action.close()
+        return action.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual([{ isEditable: true }, { isEditable: false }])
     })
+})
 
-    test("terminate", async () => {
-        const { action } = standard()
+test("terminate", async () => {
+    const { action } = standard()
 
-        const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-        await runner(async () => {
-            action.terminate()
-            return action.open()
-        }).then((stack) => {
-            expect(stack).toEqual([])
-        })
+    await runner(async () => {
+        action.terminate()
+        return action.open()
+    }).then((stack) => {
+        expect(stack).toEqual([])
     })
 })
 
