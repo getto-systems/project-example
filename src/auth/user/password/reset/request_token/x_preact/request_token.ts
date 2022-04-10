@@ -23,167 +23,124 @@ import { siteInfo } from "../../../../../../x_content/site"
 import { icon_spinner } from "../../../../../../x_content/icon"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
 
-import { InputLoginIdEntry } from "../../../../login_id/input/x_preact/input"
-
+import { InputLoginId } from "../../../../login_id/input/x_preact/input"
 
 import { ApplicationView } from "../../../../../../z_vendor/getto-application/action/action"
-import { RequestResetTokenAction, RequestResetTokenState } from "../action"
-import { ValidateBoardState } from "../../../../../../z_vendor/getto-application/board/validate_board/action"
+import { RequestResetTokenAction } from "../action"
 import { SignLink } from "../../../../../sign/nav/action"
 
 import { RequestResetTokenError } from "../data"
 
-type EntryProps = Readonly<{
+type Props = Readonly<{
     link: SignLink
     requestToken: ApplicationView<RequestResetTokenAction>
 }>
-export function RequestResetTokenEntry(props: EntryProps): VNode {
-    const requestToken = useApplicationView(props.requestToken)
-    return h(RequestResetTokenComponent, {
-        link: props.link,
-        requestToken,
-        state: useApplicationAction(requestToken),
-        validate: useApplicationAction(requestToken.validate),
-    })
-}
+export function RequestResetToken(viewProps: Props): VNode {
+    const props = {
+        link: viewProps.link,
+        requestToken: useApplicationView(viewProps.requestToken),
+    }
+    const state = useApplicationAction(props.requestToken)
+    const validateState = useApplicationAction(props.requestToken.validate)
 
-const title = "パスワードリセット"
-
-type Props = Readonly<{
-    link: SignLink
-    requestToken: RequestResetTokenAction
-    state: RequestResetTokenState
-    validate: ValidateBoardState
-}>
-export function RequestResetTokenComponent(props: Props): VNode {
-    return basedOn(props)
-
-    function basedOn({ state }: Props): VNode {
-        switch (state.type) {
-            case "initial":
-                return requestTokenForm({ state: "start" })
-
-            case "failed":
-                return requestTokenForm({
-                    state: "start",
-                    err: requestTokenError(state.err),
-                })
-
-            case "try":
-                return requestTokenForm({ state: "connecting" })
-
-            case "take-longtime":
-                return takeLongtimeMessage()
-
-            case "success":
-                return successMessage()
-        }
+    const content = {
+        title: "パスワードリセット",
     }
 
-    type FormState = "start" | "connecting"
+    switch (state.type) {
+        case "initial":
+        case "try":
+        case "failed":
+            return form(
+                loginBox(siteInfo, {
+                    ...content,
+                    body: [
+                        h(InputLoginId, {
+                            field: props.requestToken.loginId,
+                            help: [
+                                "このログインIDに設定された送信先にリセットトークンを送信します",
+                            ],
+                        }),
+                        buttons({
+                            left: state.type === "try" ? connectingButton() : sendButton(),
+                            right: clearButton(),
+                        }),
+                    ],
+                    footer: [
+                        footerLinks(),
+                        state.type === "failed" ? fieldError(requestTokenError(state.err)) : "",
+                    ],
+                }),
+            )
 
-    type FormContent = Readonly<{ state: FormState }> & Partial<{ err: readonly VNodeContent[] }>
-
-    function requestTokenForm(content: FormContent): VNode {
-        return form(
-            loginBox(siteInfo, {
-                title,
+        case "take-longtime":
+            return loginBox(siteInfo, {
+                ...content,
                 body: [
-                    h(InputLoginIdEntry, {
-                        field: props.requestToken.loginId,
-                        help: ["このログインIDに設定された送信先にリセットトークンを送信します"],
-                    }),
-                    buttons({ left: button(), right: clearButton() }),
+                    html`<p>${icon_spinner} トークンの送信に時間がかかっています</p>`,
+                    html`<p>
+                        30秒以上かかる場合は何かがおかしいので、
+                        <br />
+                        お手数ですが管理者に連絡お願いします
+                    </p>`,
                 ],
-                footer: [footerLinks(), error()],
-            }),
-        )
+                footer: footerLinks(),
+            })
 
-        function clearButton() {
-            const label = "入力内容をクリア"
-            switch (props.validate) {
-                case "initial":
-                    return button_disabled({ label })
+        case "success":
+            return loginBox(siteInfo, {
+                ...content,
+                body: [
+                    html`<p>トークンの送信が完了しました</p>`,
+                    html`<p>
+                        メールからパスワードのリセットができます<br />
+                        メールを確認してください
+                    </p>`,
+                ],
+                footer: footerLinks(),
+            })
+    }
 
-                case "invalid":
-                case "valid":
-                    return button_undo({ label, onClick })
-            }
+    function clearButton() {
+        const label = "入力内容をクリア"
+        switch (validateState) {
+            case "initial":
+                return button_disabled({ label })
 
-            function onClick(e: Event) {
-                e.preventDefault()
-                props.requestToken.clear()
-            }
+            case "invalid":
+            case "valid":
+                return button_undo({ label, onClick })
         }
 
-        function button() {
-            switch (content.state) {
-                case "start":
-                    return startSessionButton()
-
-                case "connecting":
-                    return connectingButton()
-            }
-
-            function startSessionButton() {
-                const label = "トークン送信"
-
-                switch (props.validate) {
-                    case "initial":
-                        return button_send({ state: "normal", label, onClick })
-
-                    case "valid":
-                        return button_send({ state: "confirm", label, onClick })
-
-                    case "invalid":
-                        return button_disabled({ label })
-                }
-
-                function onClick(e: Event) {
-                    e.preventDefault()
-                    props.requestToken.submit()
-                }
-            }
-            function connectingButton(): VNode {
-                return button_send({
-                    state: "connect",
-                    label: html`トークンを送信しています ${icon_spinner}`,
-                })
-            }
-        }
-
-        function error() {
-            if (content.err) {
-                return fieldError(content.err)
-            }
-            return ""
+        function onClick(e: Event) {
+            e.preventDefault()
+            props.requestToken.clear()
         }
     }
-    function takeLongtimeMessage() {
-        return loginBox(siteInfo, {
-            title,
-            body: [
-                html`<p>${icon_spinner} トークンの送信に時間がかかっています</p>`,
-                html`<p>
-                    30秒以上かかる場合は何かがおかしいので、
-                    <br />
-                    お手数ですが管理者に連絡お願いします
-                </p>`,
-            ],
-            footer: footerLinks(),
-        })
+
+    function sendButton() {
+        const label = "トークン送信"
+
+        switch (validateState) {
+            case "initial":
+                return button_send({ state: "normal", label, onClick })
+
+            case "valid":
+                return button_send({ state: "confirm", label, onClick })
+
+            case "invalid":
+                return button_disabled({ label })
+        }
+
+        function onClick(e: Event) {
+            e.preventDefault()
+            props.requestToken.submit()
+        }
     }
-    function successMessage() {
-        return loginBox(siteInfo, {
-            title,
-            body: [
-                html`<p>トークンの送信が完了しました</p>`,
-                html`<p>
-                    メールからパスワードのリセットができます<br />
-                    メールを確認してください
-                </p>`,
-            ],
-            footer: footerLinks(),
+    function connectingButton(): VNode {
+        return button_send({
+            state: "connect",
+            label: html`トークンを送信しています ${icon_spinner}`,
         })
     }
 

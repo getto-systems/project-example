@@ -11,13 +11,11 @@ import { siteInfo } from "../../x_content/site"
 import { iconHtml } from "../../core/x_preact/design/icon"
 import { icon_home } from "../../x_content/icon"
 
-const pageTitle = "Not Found" as const
-
 type Props = {
     // no props
 }
-export function NotFoundComponent(_props: Props): VNode {
-    useDocumentTitle(pageTitle)
+export function NotFound(_props: Props): VNode {
+    useDocumentTitle("Not Found")
 
     return loginBox(siteInfo, {
         title: "リンクが切れていました",

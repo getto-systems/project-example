@@ -20,46 +20,40 @@ import { useDocumentTitle } from "../../../../../core/x_preact/hooks"
 
 import { copyright, siteInfo } from "../../../../../x_content/site"
 
-import { ApplicationErrorComponent } from "../../../../../avail/x_preact/application_error"
-import { LoadSeasonEntry } from "../../../../../core/season/load/x_preact/load_season"
-import { LoadMenuEntry } from "../../../../../core/outline/load/x_preact/load_menu"
-import { LoadBreadcrumbListComponent } from "../../../../../core/outline/load/x_preact/load_breadcrumb_list"
-import { SearchAuthUserAccountEntry } from "../../../../../auth/user/account/search/x_preact/search"
-import { ListAuthUserAccountEntry } from "../../../../../auth/user/account/search/x_preact/list"
-import { DetailAuthUserAccountEntry } from "../../../../../auth/user/account/search/x_preact/detail"
-import { MainTitleWithSidebarEntry } from "../../../../../z_lib/ui/search/sidebar/x_preact/main_title"
+import { ApplicationError } from "../../../../../avail/x_preact/application_error"
+import { LoadSeason } from "../../../../../core/season/load/x_preact/load_season"
+import { LoadMenu } from "../../../../../core/outline/load/x_preact/load_menu"
+import { LoadBreadcrumbList } from "../../../../../core/outline/load/x_preact/load_breadcrumb_list"
+import { SearchAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/search"
+import { ListAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/list"
+import { DetailAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/detail"
+import { MainTitleWithSidebar } from "../../../../../z_lib/ui/search/sidebar/x_preact/main_title"
 
-import { sidebarExpand } from "../../../../../z_lib/ui/search/sidebar/x_preact/helper"
+import { isSidebarExpand } from "../../../../../z_lib/ui/search/sidebar/x_preact/helper"
 
 import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 import { ManageUserAccountPageResource } from "./resource"
 
-export function ManageUserAccountPageEntry(
-    view: ApplicationView<ManageUserAccountPageResource>,
-): VNode {
+export function ManageUserAccountPage(view: ApplicationView<ManageUserAccountPageResource>): VNode {
+    const pageTitle = "ユーザー"
+    const detailTitle = "ユーザー詳細"
+    const listTitle = "一覧"
+
+    useDocumentTitle(pageTitle)
     const resource = useApplicationView(view)
     const err = useNotifyUnexpectedError(resource)
 
+    const sidebarState = useApplicationAction(resource.sidebar)
+    const detailState = useApplicationAction(resource.search.detail)
+
     if (err) {
-        return h(ApplicationErrorComponent, { err: `${err}` })
+        return h(ApplicationError, { err: `${err}` })
     }
-    return h(ManageUserAccountPageComponent, resource)
-}
-
-const pageTitle = "ユーザー"
-const detailTitle = "ユーザー詳細"
-const listTitle = "一覧"
-
-export function ManageUserAccountPageComponent(props: ManageUserAccountPageResource): VNode {
-    useDocumentTitle(pageTitle)
-
-    const sidebarState = useApplicationAction(props.sidebar)
-    const detailState = useApplicationAction(props.search.detail)
 
     const common = {
         siteInfo,
-        header: [h(LoadSeasonEntry, props)],
-        menu: h(LoadMenuEntry, props),
+        header: [h(LoadSeason, resource)],
+        menu: h(LoadMenu, resource),
     }
 
     switch (detailState.type) {
@@ -67,11 +61,8 @@ export function ManageUserAccountPageComponent(props: ManageUserAccountPageResou
             return appLayout({
                 ...common,
                 main: appMain({
-                    header: mainHeader([
-                        mainTitle(pageTitle),
-                        h(LoadBreadcrumbListComponent, props),
-                    ]),
-                    body: mainBody(h(SearchAuthUserAccountEntry, props)),
+                    header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, resource)]),
+                    body: mainBody(h(SearchAuthUserAccount, resource)),
                     copyright,
                 }),
             })
@@ -83,15 +74,15 @@ export function ManageUserAccountPageComponent(props: ManageUserAccountPageResou
                 ...common,
                 main: appMain({
                     header: mainHeader([
-                        h(MainTitleWithSidebarEntry, {
-                            sidebar: props.sidebar,
+                        h(MainTitleWithSidebar, {
+                            sidebar: resource.sidebar,
                             title: detailTitle,
                         }),
-                        h(LoadBreadcrumbListComponent, props),
+                        h(LoadBreadcrumbList, resource),
                     ]),
                     body: mainBody(
-                        h(DetailAuthUserAccountEntry, {
-                            ...props,
+                        h(DetailAuthUserAccount, {
+                            ...resource,
                             user:
                                 detailState.type === "focus-failed"
                                     ? { found: false }
@@ -100,10 +91,12 @@ export function ManageUserAccountPageComponent(props: ManageUserAccountPageResou
                     ),
                     copyright,
                 }),
-                sidebar: sidebarExpand(sidebarState)
+                sidebar: isSidebarExpand(sidebarState)
                     ? appSidebar({
                           header: mainHeader([mainTitle(listTitle)]),
-                          body: sidebarBody(h(ListAuthUserAccountEntry, props), { id: "sidebar" }),
+                          body: sidebarBody(h(ListAuthUserAccount, resource), {
+                              id: "sidebar",
+                          }),
                           copyright,
                       })
                     : undefined,

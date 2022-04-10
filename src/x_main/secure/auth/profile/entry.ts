@@ -1,6 +1,6 @@
 import { h, render } from "preact"
 
-import { ProfilePageEntry } from "./page"
+import { ProfilePage } from "./page"
 
 import { newForegroundOutsideFeature } from "../../../../x_outside_feature/common"
 
@@ -13,7 +13,7 @@ import { ApplicationView } from "../../../../z_vendor/getto-application/action/a
 import { ProfilePageResource } from "./resource"
 import { initEditableBoardAction } from "../../../../z_vendor/getto-application/board/editable/action"
 
-render(h(ProfilePageEntry, props()), document.body)
+render(h(ProfilePage, props()), document.body)
 
 function props(): ApplicationView<ProfilePageResource> {
     return toProfileView({ resource: newResource() })

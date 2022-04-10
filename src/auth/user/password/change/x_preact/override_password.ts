@@ -15,7 +15,7 @@ import {
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { buttonLabel, icon_save, icon_spinner } from "../../../../../x_content/icon"
 
-import { InputPasswordEntry } from "../../input/x_preact/input"
+import { InputPassword } from "../../input/x_preact/input"
 import { SuccessButton } from "../../../../../core/x_preact/design/button"
 
 import { changePasswordError } from "./helper"
@@ -48,7 +48,7 @@ export function OverridePassword(props: Props): VNode {
         }
         return {
             body: [
-                h(InputPasswordEntry, {
+                h(InputPassword, {
                     field: props.override.newPassword,
                     title: "新しいパスワード",
                     help: ["管理者権限でパスワードを上書きします"],

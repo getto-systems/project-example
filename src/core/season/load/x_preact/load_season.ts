@@ -1,4 +1,4 @@
-import { h, VNode } from "preact"
+import { VNode } from "preact"
 import { html } from "htm/preact"
 
 import { useApplicationAction } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
@@ -9,31 +9,28 @@ import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 
 import { seasonLabel } from "../../kernel/helper"
 
-import { LoadSeasonAction, LoadSeasonState } from "../action"
+import { LoadSeasonAction } from "../action"
 
 import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 
-type EntryProps = Readonly<{
+type Props = Readonly<{
     season: LoadSeasonAction
 }>
-export function LoadSeasonEntry({ season }: EntryProps): VNode {
-    return h(LoadSeasonComponent, { season, state: useApplicationAction(season) })
-}
+export function LoadSeason(props: Props): VNode {
+    const state = useApplicationAction(props.season)
 
-type Props = EntryProps & Readonly<{ state: LoadSeasonState }>
-export function LoadSeasonComponent(props: Props): VNode {
     return info(body())
 
     function body(): VNodeContent {
-        switch (props.state.type) {
+        switch (state.type) {
             case "initial":
                 return EMPTY_CONTENT
 
             case "success":
-                return seasonLabel(props.state.season)
+                return seasonLabel(state.season)
 
             case "failed":
-                return errorContent(props.state.err)
+                return errorContent(state.err)
         }
     }
 }

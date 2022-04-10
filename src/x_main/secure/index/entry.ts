@@ -4,6 +4,6 @@ import { newForegroundOutsideFeature } from "../../../x_outside_feature/common"
 
 import { newDashboardView } from "../../../core/dashboard/init/resource"
 
-import { DashboardEntry } from "../../../core/dashboard/x_preact/dashboard"
+import { Dashboard } from "../../../core/dashboard/x_preact/dashboard"
 
-render(h(DashboardEntry, newDashboardView(newForegroundOutsideFeature())), document.body)
+render(h(Dashboard, newDashboardView(newForegroundOutsideFeature())), document.body)

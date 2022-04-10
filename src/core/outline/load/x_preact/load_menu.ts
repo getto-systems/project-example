@@ -1,4 +1,4 @@
-import { h, VNode } from "preact"
+import { VNode } from "preact"
 import { html } from "htm/preact"
 
 import { remoteCommonErrorReason } from "../../../../z_lib/ui/remote/x_error/reason"
@@ -16,49 +16,39 @@ import {
 import { badge_alert, notice_alert } from "../../../../z_vendor/getto-css/preact/design/highlight"
 
 import { poweredBy } from "../../../../x_content/site"
+import { iconHtml } from "../../../x_preact/design/icon"
 
-import { LoadMenuAction, LoadMenuState } from "../action"
+import { LoadMenuAction } from "../action"
 
 import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
 import { Menu, MenuCategoryNode, MenuItemNode } from "../data"
-import { iconHtml } from "../../../x_preact/design/icon"
 
 export const MENU_ID = "menu"
 
-type EntryProps = Readonly<{
+type Props = Readonly<{
     menu: LoadMenuAction
 }>
-export function LoadMenuEntry({ menu }: EntryProps): VNode {
-    return h(LoadMenuComponent, {
-        menu,
-        state: useApplicationAction(menu),
-    })
-}
+export function LoadMenu(props: Props): VNode {
+    const state = useApplicationAction(props.menu)
 
-type Props = EntryProps &
-    Readonly<{
-        state: LoadMenuState
-    }>
-
-export function LoadMenuComponent(props: Props): VNode {
-    switch (props.state.type) {
+    switch (state.type) {
         case "initial-menu":
             return menu([content([])])
 
         case "succeed-to-load":
         case "succeed-to-update":
         case "succeed-to-toggle":
-            return menu([content(props.state.menu)])
+            return menu([content(state.menu)])
 
         case "failed-to-update":
-            return menu([menuBox(error(props.state.err)), content(props.state.menu)])
+            return menu([menuBox(error(state.err)), content(state.menu)])
 
         case "required-to-login":
             return menu([menuBox(requiredToLogin())])
 
         case "repository-error":
-            return menu([menuBox(repositoryError(props.state.err))])
+            return menu([menuBox(repositoryError(state.err))])
     }
 
     function menu(content: readonly VNode[]) {

@@ -6,7 +6,7 @@ import { applicationPath } from "../helper"
 import { ConvertLocationResult } from "../../../../z_lib/ui/location/data"
 import { ApplicationTargetPath } from "../data"
 
-export function MoveToNextVersionEntry(view: ApplicationView<FindNextVersionAction>): void {
+export function MoveToNextVersion(view: ApplicationView<FindNextVersionAction>): void {
     // /${version}/index.html とかで実行する
     const findNext = view.resource
     try {

@@ -25,93 +25,79 @@ import { icon_spinner } from "../../../../../x_content/icon"
 import { appendScript } from "../../../../sign/x_preact/script"
 import { signNav } from "../../../../sign/nav/x_preact/nav"
 
-import { ApplicationErrorComponent } from "../../../../../avail/x_preact/application_error"
-import { InputLoginIdEntry } from "../../../login_id/input/x_preact/input"
-import { InputPasswordEntry } from "../../input/x_preact/input"
+import { ApplicationError } from "../../../../../avail/x_preact/application_error"
+import { InputLoginId } from "../../../login_id/input/x_preact/input"
+import { InputPassword } from "../../input/x_preact/input"
 
 import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
-import { AuthenticatePasswordAction, AuthenticatePasswordState } from "../action"
-import { ValidateBoardState } from "../../../../../z_vendor/getto-application/board/validate_board/action"
-
-import { AuthenticatePasswordError } from "../data"
+import { AuthenticatePasswordAction } from "../action"
 import { SignLink } from "../../../../sign/nav/action"
 
-type EntryProps = Readonly<{
-    link: SignLink
-    authenticate: ApplicationView<AuthenticatePasswordAction>
-}>
-export function AuthenticatePasswordEntry(props: EntryProps): VNode {
-    const authenticate = useApplicationView(props.authenticate)
-    return h(AuthenticatePasswordComponent, {
-        link: props.link,
-        authenticate,
-        state: useApplicationAction(authenticate),
-        validate: useApplicationAction(authenticate.validate),
-    })
-}
+import { AuthenticatePasswordError } from "../data"
 
 type Props = Readonly<{
     link: SignLink
-    authenticate: AuthenticatePasswordAction
-    state: AuthenticatePasswordState
-    validate: ValidateBoardState
+    authenticate: ApplicationView<AuthenticatePasswordAction>
 }>
-export function AuthenticatePasswordComponent(props: Props): VNode {
+export function AuthenticatePassword(viewProps: Props): VNode {
+    const props = {
+        link: viewProps.link,
+        authenticate: useApplicationView(viewProps.authenticate),
+    }
+    const state = useApplicationAction(props.authenticate)
+    const validateState = useApplicationAction(props.authenticate.validate)
+
     useLayoutEffect(() => {
         // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
-        switch (props.state.type) {
+        switch (state.type) {
             case "try-to-load":
-                if (!props.state.scriptPath.valid) {
+                if (!state.scriptPath.valid) {
                     props.authenticate.loadError({
                         type: "infra-error",
-                        err: `スクリプトのロードに失敗しました: ${props.state.type}`,
+                        err: `スクリプトのロードに失敗しました: ${state.type}`,
                     })
                     break
                 }
-                appendScript(props.state.scriptPath.value, (script) => {
+                appendScript(state.scriptPath.value, (script) => {
                     script.onerror = () => {
                         props.authenticate.loadError({
                             type: "infra-error",
-                            err: `スクリプトのロードに失敗しました: ${props.state.type}`,
+                            err: `スクリプトのロードに失敗しました: ${state.type}`,
                         })
                     }
                 })
                 break
         }
-    }, [props.authenticate, props.state])
+    }, [props.authenticate, state])
 
-    return basedOn(props)
+    switch (state.type) {
+        case "initial-login":
+            return authenticateForm({ state: validateState })
 
-    function basedOn({ state, validate }: Props): VNode {
-        switch (state.type) {
-            case "initial-login":
-                return authenticateForm({ state: validate })
+        case "failed-to-login":
+            return authenticateForm({ state: validateState, err: loginError(state.err) })
 
-            case "failed-to-login":
-                return authenticateForm({ state: validate, err: loginError(state.err) })
+        case "try-to-login":
+            return authenticateForm({ state: "connecting" })
 
-            case "try-to-login":
-                return authenticateForm({ state: "connecting" })
+        case "take-longtime-to-login":
+            return takeLongtimeMessage()
 
-            case "take-longtime-to-login":
-                return takeLongtimeMessage()
+        case "try-to-load":
+            // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
+            return EMPTY_CONTENT
 
-            case "try-to-load":
-                // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
-                return EMPTY_CONTENT
+        case "succeed-to-renew":
+        case "ticket-not-expired":
+        case "required-to-login":
+        case "failed-to-renew":
+            // これらはスクリプトがロードされた後に発行される
+            // したがって、un-mount されているのでここには来ない
+            return EMPTY_CONTENT
 
-            case "succeed-to-renew":
-            case "ticket-not-expired":
-            case "required-to-login":
-            case "failed-to-renew":
-                // これらはスクリプトがロードされた後に発行される
-                // したがって、un-mount されているのでここには来ない
-                return EMPTY_CONTENT
-
-            case "repository-error":
-            case "load-error":
-                return h(ApplicationErrorComponent, { err: state.err.err })
-        }
+        case "repository-error":
+        case "load-error":
+            return h(ApplicationError, { err: state.err.err })
     }
 
     type State = "initial" | "valid" | "invalid" | "connecting"
@@ -127,11 +113,11 @@ export function AuthenticatePasswordComponent(props: Props): VNode {
             loginBox(siteInfo, {
                 title: authenticateTitle(),
                 body: [
-                    h(InputLoginIdEntry, {
+                    h(InputLoginId, {
                         field: props.authenticate.loginId,
                         autocomplete: "username",
                     }),
-                    h(InputPasswordEntry, {
+                    h(InputPassword, {
                         field: props.authenticate.password,
                         autocomplete: "current-password",
                     }),

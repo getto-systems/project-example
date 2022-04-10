@@ -22,7 +22,7 @@ import { BreadcrumbList, BreadcrumbNode, MenuCategory, MenuItem } from "../data"
 type Props = Readonly<{
     breadcrumbList: LoadBreadcrumbListAction
 }>
-export function LoadBreadcrumbListComponent({ breadcrumbList }: Props): VNode {
+export function LoadBreadcrumbList({ breadcrumbList }: Props): VNode {
     return mainBreadcrumbList(toContent(breadcrumbList.load()))
 }
 

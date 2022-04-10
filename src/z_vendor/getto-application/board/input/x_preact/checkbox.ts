@@ -24,7 +24,7 @@ type Props = Readonly<{
     Partial<{
         block: boolean
     }>
-export function CheckboxBoardComponent(props: Props): VNode {
+export function CheckboxBoard(props: Props): VNode {
     const [current, store] = useCheckboxStore(props.input.connector)
 
     return html`${content()}`

@@ -10,31 +10,21 @@ import {
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
-import { InputBoardComponent } from "../../../../../z_vendor/getto-application/board/input/x_preact/input"
+import { InputBoard } from "../../../../../z_vendor/getto-application/board/input/x_preact/input"
 
-import { ValidateBoardFieldState } from "../../../../../z_vendor/getto-application/board/validate_field/action"
+import { InputPasswordAction } from "../action"
 
 import { ValidatePasswordError } from "../data"
-import { InputPasswordAction, ValidatePasswordState } from "../action"
 
-type EntryProps = Readonly<{ field: InputPasswordAction }> &
+type Props = Readonly<{ field: InputPasswordAction }> &
     Partial<{
         title: VNodeContent
         help: readonly VNodeContent[]
         autocomplete: string
     }>
-export function InputPasswordEntry(resource: EntryProps): VNode {
-    return h(InputPasswordComponent, {
-        ...resource,
-        state: useApplicationAction(resource.field.validate),
-    })
-}
+export function InputPassword(props: Props): VNode {
+    const state = useApplicationAction(props.field.validate)
 
-type Props = EntryProps &
-    Readonly<{
-        state: ValidatePasswordState
-    }>
-export function InputPasswordComponent(props: Props): VNode {
     return label_password_fill(content())
 
     function title() {
@@ -46,7 +36,7 @@ export function InputPasswordComponent(props: Props): VNode {
     function content() {
         const content = {
             title: title(),
-            body: h(InputBoardComponent, {
+            body: h(InputBoard, {
                 type: "password",
                 input: props.field.input,
                 autocomplete: props.autocomplete,
@@ -54,12 +44,12 @@ export function InputPasswordComponent(props: Props): VNode {
             help: [...help(), characterHelp()],
         }
 
-        if (props.state.valid) {
+        if (state.valid) {
             return field(content)
         } else {
             return field_error({
                 ...content,
-                notice: passwordValidationError(props.state),
+                notice: passwordValidationError(state.err),
             })
         }
     }
@@ -79,14 +69,8 @@ export function InputPasswordComponent(props: Props): VNode {
     }
 }
 
-function passwordValidationError(
-    result: ValidateBoardFieldState<ValidatePasswordError>,
-): readonly VNodeContent[] {
-    if (result.valid) {
-        return []
-    }
-
-    return result.err.map((err) => {
+function passwordValidationError(err: readonly ValidatePasswordError[]): readonly VNodeContent[] {
+    return err.map((err) => {
         switch (err.type) {
             case "empty":
                 return ["パスワードを入力してください"]

@@ -1,7 +1,7 @@
 import { h, render } from "preact"
 
-import { ApplicationErrorComponent } from "../../../../../avail/x_preact/application_error"
-import { ProfilePageEntry } from "../page"
+import { ApplicationError } from "../../../../../avail/x_preact/application_error"
+import { ProfilePage } from "../page"
 
 import { newWorkerForegroundOutsideFeature } from "../../../../../x_outside_feature/worker"
 
@@ -32,9 +32,9 @@ renderEntry()
 
 async function renderEntry() {
     try {
-        render(h(ProfilePageEntry, await props()), document.body)
+        render(h(ProfilePage, await props()), document.body)
     } catch (err) {
-        render(h(ApplicationErrorComponent, { err: `${err}` }), document.body)
+        render(h(ApplicationError, { err: `${err}` }), document.body)
     }
 }
 

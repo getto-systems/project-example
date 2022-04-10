@@ -24,16 +24,16 @@ export interface SignViewFactory {
 }
 
 export type SignActionState =
-    | Readonly<{ type: "initial-view" }>
+    | Readonly<{ type: "initial" }>
     | Readonly<{ type: "static-privacyPolicy" }>
-    | View<"check-authTicket", ApplicationView<CheckAuthTicketAction>>
+    | View<"authTicket-check", ApplicationView<CheckAuthTicketAction>>
     | View<"password-authenticate", ApplicationView<AuthenticatePasswordAction>>
     | View<"password-reset-requestToken", ApplicationView<RequestResetTokenAction>>
     | View<"password-reset", ApplicationView<ResetPasswordAction>>
 
 type View<T, V> = Readonly<{ type: T; view: V }>
 
-const initialState: SignActionState = { type: "initial-view" }
+const initialState: SignActionState = { type: "initial" }
 
 export type SignActionShell = Readonly<{
     detectViewType: SignViewTypeDetecter
@@ -68,7 +68,7 @@ class Action extends AbstractStatefulApplicationAction<SignActionState> implemen
                             return this.post(this.mapViewType(viewType))
                     }
                 }
-                return this.post({ type: "check-authTicket", view: view })
+                return this.post({ type: "authTicket-check", view })
             },
         })
         this.factory = factory

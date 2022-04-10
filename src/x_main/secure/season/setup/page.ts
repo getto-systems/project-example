@@ -15,39 +15,35 @@ import { useDocumentTitle } from "../../../../core/x_preact/hooks"
 
 import { copyright, siteInfo } from "../../../../x_content/site"
 
-import { ApplicationErrorComponent } from "../../../../avail/x_preact/application_error"
-import { LoadSeasonEntry } from "../../../../core/season/load/x_preact/load_season"
-import { LoadMenuEntry } from "../../../../core/outline/load/x_preact/load_menu"
-import { LoadBreadcrumbListComponent } from "../../../../core/outline/load/x_preact/load_breadcrumb_list"
-import { SetupSeasonEntry } from "../../../../core/season/setup/x_preact/setup"
+import { ApplicationError } from "../../../../avail/x_preact/application_error"
+import { LoadSeason } from "../../../../core/season/load/x_preact/load_season"
+import { LoadMenu } from "../../../../core/outline/load/x_preact/load_menu"
+import { LoadBreadcrumbList } from "../../../../core/outline/load/x_preact/load_breadcrumb_list"
+import { SetupSeason } from "../../../../core/season/setup/x_preact/setup"
 
 import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 import { SetupSeasonPageResource } from "./resource"
 import { container } from "../../../../z_vendor/getto-css/preact/design/box"
 
-const pageTitle = "シーズン設定" as const
+export function SetupSeasonPage(view: ApplicationView<SetupSeasonPageResource>): VNode {
+    const pageTitle = "シーズン設定" as const
 
-export function SetupSeasonPageEntry(view: ApplicationView<SetupSeasonPageResource>): VNode {
+    useDocumentTitle(pageTitle)
     const resource = useApplicationView(view)
     const err = useNotifyUnexpectedError(resource)
 
     if (err) {
-        return h(ApplicationErrorComponent, { err: `${err}` })
+        return h(ApplicationError, { err: `${err}` })
     }
-    return h(SetupSeasonPageComponent, resource)
-}
-
-export function SetupSeasonPageComponent(props: SetupSeasonPageResource): VNode {
-    useDocumentTitle(pageTitle)
 
     return appLayout({
         siteInfo,
-        header: [h(LoadSeasonEntry, props)],
+        header: [h(LoadSeason, resource)],
         main: appMain({
-            header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbListComponent, props)]),
-            body: mainBody(container([h(SetupSeasonEntry, props)])),
+            header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, resource)]),
+            body: mainBody(container([h(SetupSeason, resource)])),
             copyright,
         }),
-        menu: h(LoadMenuEntry, props),
+        menu: h(LoadMenu, resource),
     })
 }

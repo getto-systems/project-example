@@ -30,13 +30,13 @@ test("redirect password authenticate", async () => {
     await runner(async () => {
         const state = await action.ignitionState
         switch (state.type) {
-            case "check-authTicket":
+            case "authTicket-check":
                 await state.view.resource.ignitionState
         }
         return state
     }).then((stack) => {
         expect(stack.map((state) => state.type)).toEqual([
-            "check-authTicket",
+            "authTicket-check",
             "password-authenticate",
         ])
     })
@@ -50,13 +50,13 @@ test("static privacy policy", async () => {
     await runner(async () => {
         const state = await action.ignitionState
         switch (state.type) {
-            case "check-authTicket":
+            case "authTicket-check":
                 await state.view.resource.ignitionState
         }
         return state
     }).then((stack) => {
         expect(stack.map((state) => state.type)).toEqual([
-            "check-authTicket",
+            "authTicket-check",
             "static-privacyPolicy",
         ])
     })
@@ -70,13 +70,13 @@ test("password reset request token", async () => {
     await runner(async () => {
         const state = await action.ignitionState
         switch (state.type) {
-            case "check-authTicket":
+            case "authTicket-check":
                 await state.view.resource.ignitionState
         }
         return state
     }).then((stack) => {
         expect(stack.map((state) => state.type)).toEqual([
-            "check-authTicket",
+            "authTicket-check",
             "password-reset-requestToken",
         ])
     })

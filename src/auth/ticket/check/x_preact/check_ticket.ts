@@ -18,38 +18,31 @@ import { icon_spinner } from "../../../../x_content/icon"
 
 import { appendScript } from "../../../sign/x_preact/script"
 
-import { ApplicationErrorComponent } from "../../../../avail/x_preact/application_error"
+import { ApplicationError } from "../../../../avail/x_preact/application_error"
 
 import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
-import { CheckAuthTicketAction, CheckAuthTicketState } from "../action"
+import { CheckAuthTicketAction } from "../action"
 
 import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
 
-export function CheckAuthTicketEntry(view: ApplicationView<CheckAuthTicketAction>): VNode {
-    const check = useApplicationView(view)
-    return h(CheckAuthTicketComponent, {
-        check,
-        state: useApplicationAction(check),
-    })
-}
+export function CheckAuthTicket(view: ApplicationView<CheckAuthTicketAction>): VNode {
+    const props = {
+        check: useApplicationView(view),
+    }
+    const state = useApplicationAction(props.check)
 
-type Props = Readonly<{
-    check: CheckAuthTicketAction
-    state: CheckAuthTicketState
-}>
-export function CheckAuthTicketComponent(props: Props): VNode {
     useLayoutEffect(() => {
         // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
-        switch (props.state.type) {
+        switch (state.type) {
             case "try-to-instant-load":
-                if (!props.state.scriptPath.valid) {
+                if (!state.scriptPath.valid) {
                     props.check.loadError({
                         type: "infra-error",
-                        err: `スクリプトのロードに失敗しました: ${props.state.type}`,
+                        err: `スクリプトのロードに失敗しました: ${state.type}`,
                     })
                     break
                 }
-                appendScript(props.state.scriptPath.value, (script) => {
+                appendScript(state.scriptPath.value, (script) => {
                     script.onload = () => {
                         props.check.succeedToInstantLoad()
                     }
@@ -60,26 +53,26 @@ export function CheckAuthTicketComponent(props: Props): VNode {
                 break
 
             case "try-to-load":
-                if (!props.state.scriptPath.valid) {
+                if (!state.scriptPath.valid) {
                     props.check.loadError({
                         type: "infra-error",
-                        err: `スクリプトのロードに失敗しました: ${props.state.type}`,
+                        err: `スクリプトのロードに失敗しました: ${state.type}`,
                     })
                     break
                 }
-                appendScript(props.state.scriptPath.value, (script) => {
+                appendScript(state.scriptPath.value, (script) => {
                     script.onerror = () => {
                         props.check.loadError({
                             type: "infra-error",
-                            err: `スクリプトのロードに失敗しました: ${props.state.type}`,
+                            err: `スクリプトのロードに失敗しました: ${state.type}`,
                         })
                     }
                 })
                 break
         }
-    }, [props.check, props.state])
+    }, [props.check, state])
 
-    switch (props.state.type) {
+    switch (state.type) {
         case "initial-check":
         case "required-to-login":
             return EMPTY_CONTENT
@@ -104,11 +97,11 @@ export function CheckAuthTicketComponent(props: Props): VNode {
             return takeLongtimeMessage()
 
         case "failed-to-renew":
-            return errorMessage(props.state.err)
+            return errorMessage(state.err)
 
         case "repository-error":
         case "load-error":
-            return h(ApplicationErrorComponent, { err: props.state.err.err })
+            return h(ApplicationError, { err: state.err.err })
     }
 
     function takeLongtimeMessage() {

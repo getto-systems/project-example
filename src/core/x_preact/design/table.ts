@@ -63,6 +63,7 @@ export const TAKE_LONGTIME_TO_SEARCH_TABLE: VNode = container(
     }),
 )
 
+// TODO なんかどこかでまとめた気がする: static, connect とか
 export const SEARCH_BUTTON_STATIC: VNode = html`検索 ${iconHtml(icon_search)}`
 export const SEARCH_BUTTON_CONNECT: VNode = html`検索 ${iconHtml(icon_spinner)}`
 

@@ -12,7 +12,7 @@ type Props = Readonly<{
     Partial<{
         disabled: boolean
     }>
-export function SelectFileComponent({ file, disabled }: Props): VNode {
+export function SelectFile({ file, disabled }: Props): VNode {
     return html`<input
         ref=${useFileRef(file.connector)}
         type="file"

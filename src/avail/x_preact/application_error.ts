@@ -16,7 +16,7 @@ import { siteInfo } from "../../x_content/site"
 type Props = Readonly<{
     err: string
 }>
-export function ApplicationErrorComponent(props: Props): VNode {
+export function ApplicationError(props: Props): VNode {
     return loginBox(siteInfo, {
         title: html`システムエラーが発生しました`,
         body: [

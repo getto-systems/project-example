@@ -7,59 +7,54 @@ import {
     useApplicationView,
 } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { ApplicationErrorComponent } from "../../../../avail/x_preact/application_error"
-import { CheckAuthTicketEntry } from "../../../ticket/check/x_preact/check_ticket"
-import { AuthenticatePasswordEntry } from "../../../user/password/authenticate/x_preact/authenticate_password"
-import { RequestResetTokenEntry } from "../../../user/password/reset/request_token/x_preact/request_token"
-import { ResetPasswordEntry } from "../../../user/password/reset/reset/x_preact/reset_password"
-import { PrivacyPolicyComponent } from "./privacy_policy"
+import { ApplicationError } from "../../../../avail/x_preact/application_error"
+import { CheckAuthTicket } from "../../../ticket/check/x_preact/check_ticket"
+import { AuthenticatePassword } from "../../../user/password/authenticate/x_preact/authenticate_password"
+import { RequestResetToken } from "../../../user/password/reset/request_token/x_preact/request_token"
+import { ResetPassword } from "../../../user/password/reset/reset/x_preact/reset_password"
+import { PrivacyPolicy } from "./privacy_policy"
 
-import { SignAction, SignActionState } from "../action"
 import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
+import { SignAction } from "../action"
 import { SignLink } from "../../nav/action"
 
-type EntryProps = Readonly<{
+type Props = Readonly<{
     link: SignLink
     sign: ApplicationView<SignAction>
 }>
-export function SignEntry(props: EntryProps): VNode {
-    const sign = useApplicationView(props.sign)
-    const state = useApplicationAction(sign)
+export function Sign(viewProps: Props): VNode {
+    const props = {
+        link: viewProps.link,
+        sign: useApplicationView(viewProps.sign),
+    }
+    const state = useApplicationAction(props.sign)
     const [err] = useErrorBoundary((err) => {
         // 認証前なのでエラーはどうしようもない
         console.log(err)
     })
 
     if (err) {
-        return h(ApplicationErrorComponent, { err: `${err}` })
+        return h(ApplicationError, { err: `${err}` })
     }
-    return h(SignComponent, { link: props.link, sign, state })
-}
 
-type Props = Readonly<{
-    link: SignLink
-    sign: SignAction
-    state: SignActionState
-}>
-export function SignComponent({ link, state }: Props): VNode {
     switch (state.type) {
-        case "initial-view":
+        case "initial":
             return EMPTY_CONTENT
 
         case "static-privacyPolicy":
-            return h(PrivacyPolicyComponent, { link })
+            return h(PrivacyPolicy, { link: props.link })
 
-        case "check-authTicket":
-            return h(CheckAuthTicketEntry, state.view)
+        case "authTicket-check":
+            return h(CheckAuthTicket, state.view)
 
         case "password-authenticate":
-            return h(AuthenticatePasswordEntry, { link, authenticate: state.view })
+            return h(AuthenticatePassword, { link: props.link, authenticate: state.view })
 
         case "password-reset-requestToken":
-            return h(RequestResetTokenEntry, { link, requestToken: state.view })
+            return h(RequestResetToken, { link: props.link, requestToken: state.view })
 
         case "password-reset":
-            return h(ResetPasswordEntry, { link, reset: state.view })
+            return h(ResetPassword, { link: props.link, reset: state.view })
     }
 }
 

@@ -9,99 +9,62 @@ import {
 } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box_grow } from "../../../../../z_vendor/getto-css/preact/design/box"
 
-import { SearchLoginIdComponent } from "../../../login_id/input/x_preact/search"
+import { SearchLoginId } from "../../../login_id/input/x_preact/search"
 
-import { SearchAuthUserAccountAction, SearchAuthUserAccountState } from "../action"
-import { ObserveBoardState } from "../../../../../z_vendor/getto-application/board/observe_board/action"
+import { SearchAuthUserAccountAction } from "../action"
 import {
     SEARCH_BUTTON_CONNECT,
     SEARCH_BUTTON_STATIC,
 } from "../../../../../core/x_preact/design/table"
 
-type EntryProps = Readonly<{
+type Props = Readonly<{
     search: SearchAuthUserAccountAction
 }>
-export function SearchAuthUserAccountFormEntry({ search }: EntryProps): VNode {
-    return h(SearchAuthUserAccountFormComponent, {
-        search,
-        state: useApplicationAction(search),
-        observe: useApplicationAction(search.observe),
+export function SearchAuthUserAccountForm(props: Props): VNode {
+    const state = useApplicationAction(props.search)
+    const observeState = useApplicationAction(props.search.observe)
+
+    return box_grow({
+        body: [
+            h(SearchLoginId, { field: props.search.loginId }),
+            // TODO granted role (checkbox)
+        ],
+        footer: buttons({ left: searchButton(), right: clearButton() }),
+        form: true,
     })
-}
 
-type Props = EntryProps &
-    Readonly<{
-        state: SearchAuthUserAccountState
-        observe: ObserveBoardState
-    }>
-export function SearchAuthUserAccountFormComponent(props: Props): VNode {
-    return basedOn(props)
-
-    function basedOn({ state, observe }: Props): VNode {
-        if (observe.hasChanged) {
-            return searchForm({ type: "has-changed" })
+    function searchButton(): VNode {
+        if (observeState.hasChanged) {
+            return button_search({ state: "confirm", label: SEARCH_BUTTON_STATIC, onClick })
         }
 
         switch (state.type) {
             case "initial":
             case "success":
-                return searchForm({ type: "initial" })
+                return button_search({ state: "normal", label: SEARCH_BUTTON_STATIC, onClick })
 
             case "try":
             case "take-longtime":
-                return searchForm({ type: "connecting" })
+                return button_search({ state: "connect", label: SEARCH_BUTTON_CONNECT })
 
             case "failed":
-                return searchForm({ type: "failed" })
+                return button_search({ state: "confirm", label: SEARCH_BUTTON_STATIC, onClick })
+        }
+
+        function onClick(e: Event) {
+            e.preventDefault()
+            props.search.search()
         }
     }
 
-    type Content =
-        | Readonly<{ type: "has-changed" }>
-        | Readonly<{ type: "initial" }>
-        | Readonly<{ type: "connecting" }>
-        | Readonly<{ type: "failed" }>
+    function clearButton(): VNode {
+        const label = "検索項目をクリア"
 
-    function searchForm(content: Content): VNode {
-        return box_grow({
-            body: [
-                h(SearchLoginIdComponent, { field: props.search.loginId }),
-                // TODO granted role (checkbox)
-            ],
-            footer: buttons({ left: button(), right: clearButton() }),
-            form: true,
-        })
+        return button_undo({ label, onClick })
 
-        function clearButton(): VNode {
-            const label = "検索項目をクリア"
-
-            return button_undo({ label, onClick })
-
-            function onClick(e: Event) {
-                e.preventDefault()
-                props.search.clear()
-            }
-        }
-
-        function button(): VNode {
-            switch (content.type) {
-                case "has-changed":
-                    return button_search({ state: "confirm", label: SEARCH_BUTTON_STATIC, onClick })
-
-                case "initial":
-                    return button_search({ state: "normal", label: SEARCH_BUTTON_STATIC, onClick })
-
-                case "connecting":
-                    return button_search({ state: "connect", label: SEARCH_BUTTON_CONNECT })
-
-                case "failed":
-                    return button_search({ state: "confirm", label: SEARCH_BUTTON_STATIC, onClick })
-            }
-
-            function onClick(e: Event) {
-                e.preventDefault()
-                props.search.search()
-            }
+        function onClick(e: Event) {
+            e.preventDefault()
+            props.search.clear()
         }
     }
 }

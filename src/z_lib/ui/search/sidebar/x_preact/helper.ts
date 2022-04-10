@@ -1,6 +1,6 @@
 import { SearchSidebarState } from "../action"
 
-export function sidebarExpand(state: SearchSidebarState): boolean {
+export function isSidebarExpand(state: SearchSidebarState): boolean {
     switch (state.type) {
         case "repository-error":
             return true

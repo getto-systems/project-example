@@ -14,7 +14,7 @@ type Props = Readonly<{
     input: InputBoardAction
     options: readonly VNode[]
 }>
-export function SelectBoardComponent({ input, options }: Props): VNode {
+export function SelectBoard({ input, options }: Props): VNode {
     return html`<select ref=${useSelectRef(input.connector)} onInput=${onInput}>
         ${options}
     </select>`

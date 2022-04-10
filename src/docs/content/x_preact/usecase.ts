@@ -17,9 +17,9 @@ import { container } from "../../../z_vendor/getto-css/preact/design/box"
 import { copyright, siteInfo } from "../../../x_content/site"
 import { docsActionBox, docsDataBox, docsUsecaseBox } from "./helper"
 
-import { ApplicationErrorComponent } from "../../../avail/x_preact/application_error"
-import { LoadMenuEntry } from "../../../core/outline/load/x_preact/load_menu"
-import { LoadBreadcrumbListComponent } from "../../../core/outline/load/x_preact/load_breadcrumb_list"
+import { ApplicationError } from "../../../avail/x_preact/application_error"
+import { LoadMenu } from "../../../core/outline/load/x_preact/load_menu"
+import { LoadBreadcrumbList } from "../../../core/outline/load/x_preact/load_breadcrumb_list"
 
 import { DocsView, DocsResource } from "../resource"
 import { DocsData, DocsUsecase } from "../../../z_vendor/getto-application/docs/data"
@@ -33,7 +33,7 @@ export function DocsUsecaseEntry(props: EntryProps): VNode {
 
     const err = useNotifyUnexpectedError(resource)
     if (err) {
-        return h(ApplicationErrorComponent, { err: `${err}` })
+        return h(ApplicationError, { err: `${err}` })
     }
 
     return h(DocsUsecaseComponent, { ...resource, docs: props.docs })
@@ -47,11 +47,11 @@ export function DocsUsecaseComponent(resource: Props): VNode {
         siteInfo,
         header: [],
         main: appMain({
-            header: mainHeader([mainTitle(title()), h(LoadBreadcrumbListComponent, resource)]),
+            header: mainHeader([mainTitle(title()), h(LoadBreadcrumbList, resource)]),
             body: mainBody(content(resource.docs)),
             copyright,
         }),
-        menu: h(LoadMenuEntry, resource),
+        menu: h(LoadMenu, resource),
     })
 
     function title() {
