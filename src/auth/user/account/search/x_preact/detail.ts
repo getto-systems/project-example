@@ -21,7 +21,7 @@ import { ChangeResetTokenDestinationAction } from "../../../password/reset/token
 
 import { AuthUserAccount } from "../../kernel/data"
 
-type EntryProps = Readonly<{
+type Props = Readonly<{
     detail: DetailAuthUserAccountAction
     modify: Readonly<{
         editable: EditableBoardAction
@@ -41,8 +41,8 @@ type EntryProps = Readonly<{
     }>
     user: Readonly<{ found: false }> | Readonly<{ found: true; user: AuthUserAccount }>
 }>
-export function DetailAuthUserAccountEntry(props: EntryProps): VNode {
-    return html`${[container([h(CloseButtonComponent, props)]), content()]}`
+export function DetailAuthUserAccount(props: Props): VNode {
+    return html`${[container([h(CloseButton, props)]), content()]}`
 
     function content(): VNode {
         if (!props.user.found) {
@@ -80,8 +80,8 @@ export function DetailAuthUserAccountEntry(props: EntryProps): VNode {
     }
 }
 
-type CloseButtonProps = EntryProps
-function CloseButtonComponent(props: CloseButtonProps): VNode {
+type CloseButtonProps = Props
+function CloseButton(props: CloseButtonProps): VNode {
     return box_grow({ body: button_cancel({ label: BACK_TO_LIST_BUTTON, onClick }) })
 
     function onClick() {

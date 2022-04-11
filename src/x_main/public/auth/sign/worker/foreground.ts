@@ -1,7 +1,7 @@
 import { render, h } from "preact"
 
-import { SignEntry } from "../../../../../auth/sign/sign/x_preact/sign"
-import { ApplicationErrorComponent } from "../../../../../avail/x_preact/application_error"
+import { Sign } from "../../../../../auth/sign/sign/x_preact/sign"
+import { ApplicationError } from "../../../../../avail/x_preact/application_error"
 
 import { newSignViewWorkerForeground } from "../../../../../auth/sign/sign/init/worker/foreground"
 import { newWorkerForegroundOutsideFeature } from "../../../../../x_outside_feature/worker"
@@ -12,13 +12,13 @@ renderEntry()
 async function renderEntry() {
     try {
         render(
-            h(SignEntry, {
+            h(Sign, {
                 link: initSignLink(),
                 sign: newSignViewWorkerForeground(await newWorkerForegroundOutsideFeature()),
             }),
             document.body,
         )
     } catch (err) {
-        render(h(ApplicationErrorComponent, { err: `${err}` }), document.body)
+        render(h(ApplicationError, { err: `${err}` }), document.body)
     }
 }

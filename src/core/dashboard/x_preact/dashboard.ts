@@ -1,5 +1,9 @@
 import { h, VNode } from "preact"
 
+import { useApplicationView } from "../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useNotifyUnexpectedError } from "../../../avail/unexpected_error/notify/x_preact/hooks"
+import { useDocumentTitle } from "../../x_preact/hooks"
+
 import {
     appLayout,
     appMain,
@@ -7,55 +11,48 @@ import {
     mainHeader,
     mainTitle,
 } from "../../../z_vendor/getto-css/preact/layout/app"
-
-import { useApplicationView } from "../../../z_vendor/getto-application/action/x_preact/hooks"
-import { useNotifyUnexpectedError } from "../../../avail/unexpected_error/notify/x_preact/hooks"
-import { useDocumentTitle } from "../../x_preact/hooks"
+import { box_double, container } from "../../../z_vendor/getto-css/preact/design/box"
 
 import { copyright, siteInfo } from "../../../x_content/site"
 
-import { ApplicationErrorComponent } from "../../../avail/x_preact/application_error"
-import { LoadSeasonEntry } from "../../season/load/x_preact/load_season"
-import { LoadMenuEntry } from "../../outline/load/x_preact/load_menu"
-import { LoadBreadcrumbListComponent } from "../../outline/load/x_preact/load_breadcrumb_list"
-import { LoadSeasonFieldEntry } from "../../season/load/x_preact/load_season_field"
+import { ApplicationError } from "../../../avail/x_preact/application_error"
+import { LoadSeason } from "../../season/load/x_preact/load_season"
+import { LoadMenu } from "../../outline/load/x_preact/load_menu"
+import { LoadBreadcrumbList } from "../../outline/load/x_preact/load_breadcrumb_list"
+import { LoadSeasonField } from "../../season/load/x_preact/load_season_field"
 
-import { DashboardView, DashboardResource } from "../resource"
-import { box_double, container } from "../../../z_vendor/getto-css/preact/design/box"
+import { DashboardResource } from "../resource"
+import { ApplicationView } from "../../../z_vendor/getto-application/action/action"
 
-export function DashboardEntry(view: DashboardView): VNode {
+export function Dashboard(view: ApplicationView<DashboardResource>): VNode {
+    const pageTitle = "ホーム"
+
     const resource = useApplicationView(view)
+
+    useDocumentTitle(pageTitle)
 
     const err = useNotifyUnexpectedError(resource)
     if (err) {
-        return h(ApplicationErrorComponent, { err: `${err}` })
+        return h(ApplicationError, { err: `${err}` })
     }
-
-    return h(DashboardComponent, resource)
-}
-
-const pageTitle = "ホーム" as const
-
-export function DashboardComponent(resource: DashboardResource): VNode {
-    useDocumentTitle(pageTitle)
 
     return appLayout({
         siteInfo,
-        header: [h(LoadSeasonEntry, resource)],
+        header: [h(LoadSeason, resource)],
         main: appMain({
-            header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbListComponent, resource)]),
-            body: mainBody(h(ExampleComponent, resource)),
+            header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, resource)]),
+            body: mainBody(h(Example, resource)),
             copyright,
         }),
-        menu: h(LoadMenuEntry, resource),
+        menu: h(LoadMenu, resource),
     })
 }
 
-function ExampleComponent(resource: DashboardResource): VNode {
+function Example(resource: DashboardResource): VNode {
     return container([
         box_double({
             title: "GETTO Example",
-            body: h(LoadSeasonFieldEntry, resource),
+            body: h(LoadSeasonField, resource),
         }),
     ])
 }

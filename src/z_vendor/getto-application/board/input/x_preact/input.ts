@@ -29,7 +29,7 @@ type Props = Readonly<{
     Partial<{
         autocomplete: string
     }>
-export function InputBoardComponent({ type, input, autocomplete }: Props): VNode {
+export function InputBoard({ type, input, autocomplete }: Props): VNode {
     return html`<input
         ref=${useInputRef(input.connector)}
         type=${type}

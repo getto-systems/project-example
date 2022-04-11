@@ -12,9 +12,9 @@ import { label_gray } from "../../../../../../../z_vendor/getto-css/preact/desig
 
 import { VNodeContent } from "../../../../../../../z_lib/ui/x_preact/common"
 
-import { InputBoardComponent } from "../../../../../../../z_vendor/getto-application/board/input/x_preact/input"
+import { InputBoard } from "../../../../../../../z_vendor/getto-application/board/input/x_preact/input"
 import {
-    RadioBoardComponent,
+    RadioBoard,
     RadioBoardContent,
 } from "../../../../../../../z_vendor/getto-application/board/input/x_preact/radio"
 
@@ -64,7 +64,7 @@ export function ResetTokenDestinationField(props: Props): VNode {
         }
         return [
             label_text_fill(
-                h(RadioBoardComponent, {
+                h(RadioBoard, {
                     input: props.field.destinationType,
                     name: "destinationType",
                     options: [destinationRadio("email"), destinationRadio("none")],
@@ -79,7 +79,7 @@ export function ResetTokenDestinationField(props: Props): VNode {
                     return EMPTY_CONTENT
 
                 case "email":
-                    return h(InputBoardComponent, {
+                    return h(InputBoard, {
                         type: "email",
                         input: props.field.email,
                         autocomplete: props.autocomplete,

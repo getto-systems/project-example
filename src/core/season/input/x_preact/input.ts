@@ -5,7 +5,7 @@ import { field } from "../../../../z_vendor/getto-css/preact/design/form"
 
 import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 
-import { SelectBoardComponent } from "../../../../z_vendor/getto-application/board/input/x_preact/select"
+import { SelectBoard } from "../../../../z_vendor/getto-application/board/input/x_preact/select"
 
 import { seasonLabel } from "../../kernel/helper"
 import { seasonToBoardValue } from "../../kernel/convert"
@@ -19,10 +19,10 @@ type Props = Readonly<{
     title: VNodeContent
     seasons: readonly Season[]
 }>
-export function InputSeasonComponent(props: Props): VNode {
+export function InputSeason(props: Props): VNode {
     return field({
         title: props.title,
-        body: h(SelectBoardComponent, {
+        body: h(SelectBoard, {
             input: props.field.input,
             options: options(props.seasons),
         }),

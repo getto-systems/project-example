@@ -16,7 +16,7 @@ import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { buttonLabel, icon_save, icon_spinner } from "../../../../../x_content/icon"
 
 import { changeLoginIdError } from "./helper"
-import { InputLoginIdEntry } from "../../input/x_preact/input"
+import { InputLoginId } from "../../input/x_preact/input"
 import { SuccessButton } from "../../../../../core/x_preact/design/button"
 
 import { OverrideLoginIdAction } from "../action"
@@ -46,7 +46,7 @@ export function OverrideLoginId(props: Props): VNode {
         }
         return {
             body: [
-                h(InputLoginIdEntry, {
+                h(InputLoginId, {
                     field: props.override.newLoginId,
                     title: "新しいログインID",
                     help: ["管理者権限でログインIDを上書きします"],

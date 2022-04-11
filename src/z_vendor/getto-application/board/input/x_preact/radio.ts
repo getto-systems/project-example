@@ -27,7 +27,7 @@ type Props = Readonly<{
         autoFocus: boolean
         onKeyDown: { (e: KeyboardEvent): void }
     }>
-export function RadioBoardComponent(props: Props): VNode {
+export function RadioBoard(props: Props): VNode {
     const [current, store] = useRadioStore(props.input.connector)
 
     return html`${content()}`

@@ -14,7 +14,8 @@ import { SignLink } from "../../nav/action"
 type Props = Readonly<{
     link: SignLink
 }>
-export function PrivacyPolicyComponent(props: Props): VNode {
+export function PrivacyPolicy(props: Props): VNode {
+    // TODO プライバシーボリシーの内容は x_content の中に入れたい
     return loginBox(siteInfo, {
         title: "プライバシーポリシー",
         body: docs_dataHandling.action.map(docsActionField),

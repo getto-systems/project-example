@@ -1,6 +1,6 @@
 import { h, render } from "preact"
 
-import { LogoutPageEntry } from "./page"
+import { LogoutPage } from "./page"
 import { newLogoutPageView } from "./resource"
 
-render(h(LogoutPageEntry, newLogoutPageView()), document.body)
+render(h(LogoutPage, newLogoutPageView()), document.body)

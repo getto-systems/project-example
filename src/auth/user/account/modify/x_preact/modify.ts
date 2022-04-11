@@ -17,7 +17,7 @@ import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 import { iconHtml } from "../../../../../core/x_preact/design/icon"
 import { icon_save, icon_spinner } from "../../../../../x_content/icon"
 
-import { InputGrantedRolesEntry } from "../../input/x_preact/granted_roles"
+import { InputGrantedRoles } from "../../input/x_preact/granted_roles"
 
 import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
 
@@ -45,7 +45,7 @@ export function ModifyAuthUserAccount(props: Props): VNode {
         box({
             title: "基本情報",
             body: [
-                h(InputGrantedRolesEntry, {
+                h(InputGrantedRoles, {
                     user: props.user,
                     editable: props.editable,
                     field: props.modify.grantedRoles,

@@ -1,6 +1,6 @@
 import { h, render } from "preact"
 
-import { ManageUserAccountPageEntry } from "./page"
+import { ManageUserAccountPage } from "./page"
 
 import { newForegroundOutsideFeature } from "../../../../../x_outside_feature/common"
 import { newBaseResource } from "../../../../../core/base/init/resource"
@@ -16,7 +16,7 @@ import { newOverrideLoginIdAction } from "../../../../../auth/user/login_id/chan
 import { newModifyAuthUserAccountAction } from "../../../../../auth/user/account/modify/init/resource"
 import { newChangeResetTokenDestinationAction } from "../../../../../auth/user/password/reset/token_destination/change/init/resource"
 
-render(h(ManageUserAccountPageEntry, props()), document.body)
+render(h(ManageUserAccountPage, props()), document.body)
 
 function props(): ApplicationView<ManageUserAccountPageResource> {
     return toManageUserAccountView({ resource: newResource() })

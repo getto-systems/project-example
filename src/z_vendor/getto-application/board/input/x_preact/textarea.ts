@@ -12,7 +12,7 @@ import { emptyBoardValue } from "../../kernel/data"
 
 type Props = Readonly<{ input: InputBoardAction }> &
     Partial<Readonly<{ rows: number; cols: number; disabled: boolean }>>
-export function TextareaBoardComponent({ input, rows, cols, disabled }: Props): VNode {
+export function TextareaBoard({ input, rows, cols, disabled }: Props): VNode {
     return html`<textarea
         ref=${useInputRef(input.connector)}
         onInput=${onInput}

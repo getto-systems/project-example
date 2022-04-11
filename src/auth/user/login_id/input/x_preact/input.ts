@@ -10,38 +10,26 @@ import {
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
-import { InputBoardComponent } from "../../../../../z_vendor/getto-application/board/input/x_preact/input"
+import { InputBoard } from "../../../../../z_vendor/getto-application/board/input/x_preact/input"
 
-import { ValidateBoardFieldState } from "../../../../../z_vendor/getto-application/board/validate_field/action"
-import { InputLoginIdAction, ValidateLoginIdState } from "../action"
+import { InputLoginIdAction } from "../action"
 
 import { ValidateLoginIdError } from "../data"
 
-type EntryProps = Readonly<{ field: InputLoginIdAction }> &
+type Props = Readonly<{ field: InputLoginIdAction }> &
     Partial<{
         title: VNodeContent
         help: readonly VNodeContent[]
         autocomplete: string
     }>
-export function InputLoginIdEntry(resource: EntryProps): VNode {
-    return h(InputLoginIdComponent, {
-        ...resource,
-        state: useApplicationAction(resource.field.validate),
-    })
-}
-
-type Props = EntryProps &
-    Readonly<{
-        state: ValidateLoginIdState
-    }>
-
-export function InputLoginIdComponent(props: Props): VNode {
+export function InputLoginId(props: Props): VNode {
+    const validateState = useApplicationAction(props.field.validate)
     return label_text_fill(content())
 
     function content() {
         const content = {
             title: title(),
-            body: h(InputBoardComponent, {
+            body: h(InputBoard, {
                 type: "text",
                 input: props.field.input,
                 autocomplete: props.autocomplete,
@@ -49,10 +37,10 @@ export function InputLoginIdComponent(props: Props): VNode {
             help: help(),
         }
 
-        if (props.state.valid) {
+        if (validateState.valid) {
             return field(content)
         } else {
-            return field_error({ ...content, notice: loginIdValidationError(props.state) })
+            return field_error({ ...content, notice: loginIdValidationError(validateState.err) })
         }
     }
     function title(): VNodeContent {
@@ -69,14 +57,8 @@ export function InputLoginIdComponent(props: Props): VNode {
     }
 }
 
-function loginIdValidationError(
-    result: ValidateBoardFieldState<ValidateLoginIdError>,
-): readonly VNodeContent[] {
-    if (result.valid) {
-        return []
-    }
-
-    return result.err.map((err) => {
+function loginIdValidationError(err: readonly ValidateLoginIdError[]): readonly VNodeContent[] {
+    return err.map((err) => {
         switch (err.type) {
             case "empty":
                 return ["ログインIDを入力してください"]

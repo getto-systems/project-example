@@ -9,22 +9,19 @@ import { field } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { label_gray, label_info } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 
 import {
-    CheckboxBoardComponent,
+    CheckboxBoard,
     CheckboxBoardContent,
 } from "../../../../../z_vendor/getto-application/board/input/x_preact/checkbox"
 
 import { InputGrantedRolesAction } from "../action"
-import {
-    EditableBoardAction,
-    EditableBoardState,
-} from "../../../../../z_vendor/getto-application/board/editable/action"
+import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
 
 import { toBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/convert"
 
 import { GrantedAuthRole } from "../data"
 import { LoginId } from "../../../login_id/input/data"
 
-type EntryProps = Readonly<{
+type Props = Readonly<{
     user: Readonly<{ loginId: LoginId; grantedRoles: readonly GrantedAuthRole[] }>
     editable: EditableBoardAction
     field: InputGrantedRolesAction
@@ -34,46 +31,30 @@ type EntryProps = Readonly<{
         help: readonly VNodeContent[]
     }>
 
-export function InputGrantedRolesEntry(props: EntryProps): VNode {
-    return h(InputGrantedRolesComponent, {
-        ...props,
-        editableState: useApplicationAction(props.editable),
+export function InputGrantedRoles(props: Props): VNode {
+    const editableState = useApplicationAction(props.editable)
+
+    return field({
+        title: props.title || "権限",
+        help: props.help,
+        body: body(),
     })
-}
 
-type Props = EntryProps &
-    Readonly<{
-        editableState: EditableBoardState
-    }>
-
-export function InputGrantedRolesComponent(props: Props): VNode {
-    return content()
-
-    function content() {
-        const content = {
-            title: props.title || "権限",
-            help: props.help,
-            body: body(),
+    function body(): VNodeContent {
+        if (!editableState.isEditable) {
+            return h(GrantedRoleLabels, { ...props.user })
         }
+        return h(CheckboxBoard, {
+            input: props.field.grantedRoles,
+            options: [grantedRoleCheckbox("user")],
+        })
+    }
 
-        return field(content)
-
-        function body(): VNodeContent {
-            if (!props.editableState.isEditable) {
-                return h(GrantedRoleLabels, { ...props.user })
-            }
-            return h(CheckboxBoardComponent, {
-                input: props.field.grantedRoles,
-                options: [grantedRoleCheckbox("user")],
-            })
-        }
-
-        function grantedRoleCheckbox(grantedRole: GrantedAuthRole): CheckboxBoardContent {
-            return {
-                key: grantedRole,
-                value: toBoardValue(grantedRole),
-                label: grantedRoleLabel(grantedRole),
-            }
+    function grantedRoleCheckbox(grantedRole: GrantedAuthRole): CheckboxBoardContent {
+        return {
+            key: grantedRole,
+            value: toBoardValue(grantedRole),
+            label: grantedRoleLabel(grantedRole),
         }
     }
 }

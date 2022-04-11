@@ -1,4 +1,4 @@
-import { h, VNode } from "preact"
+import { VNode } from "preact"
 import { useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
 
@@ -12,80 +12,64 @@ import { button_send, field } from "../../../../z_vendor/getto-css/preact/design
 import { notice_alert } from "../../../../z_vendor/getto-css/preact/design/highlight"
 import { v_small } from "../../../../z_vendor/getto-css/preact/design/alignment"
 
-import { LogoutAction, LogoutState } from "../action"
+import { LogoutAction } from "../action"
 
 import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
 
-type Resource = Readonly<{
+type Props = Readonly<{
     logout: LogoutAction
 }>
-export function LogoutEntry(resource: Resource): VNode {
-    return h(LogoutComponent, <Props>{
-        ...resource,
-        state: useApplicationAction(resource.logout),
-    })
-}
+export function Logout(props: Props): VNode {
+    const state = useApplicationAction(props.logout)
 
-type Props = Resource & Readonly<{ state: LogoutState }>
-export function LogoutComponent(props: Props): VNode {
     useLayoutEffect(() => {
-        switch (props.state.type) {
+        switch (state.type) {
             case "success":
                 // credential が削除されているので、reload するとログイン画面になる
                 location.reload()
                 break
         }
-    }, [props.state])
+    }, [state])
 
-    return basedOn(props)
+    return box({
+        body: [
+            v_small(),
+            field({
+                title: "ログアウト",
+                body: logoutButton(),
+                help: ["作業完了後ログアウトしてください"],
+            }),
+            ...error(),
+        ],
+    })
 
-    function basedOn({ state }: Readonly<{ state: LogoutState }>): VNode {
-        switch (state.type) {
-            case "initial":
-            case "success":
-                return logoutBox({ type: "initial" })
+    function logoutButton() {
+        return button_send({ label: "ログアウト", state: "normal", onClick })
 
-            case "repository-error":
-                return logoutBox({ type: "error", err: repositoryError(state.err) })
-
-            case "failed":
-                return logoutBox({ type: "error", err: logoutError(state.err) })
+        function onClick() {
+            props.logout.submit()
         }
     }
 
-    type LogoutBoxContent =
-        | Readonly<{ type: "initial" }>
-        | Readonly<{ type: "error"; err: readonly string[] }>
-    function logoutBox(content: LogoutBoxContent): VNode {
-        return box({
-            body: [
-                v_small(),
-                field({
-                    title: "ログアウト",
-                    body: logoutButton(),
-                    help: ["作業完了後ログアウトしてください"],
-                }),
-                ...error(),
-            ],
-        })
+    function error(): readonly VNode[] {
+        switch (state.type) {
+            case "initial":
+            case "success":
+                return []
 
-        function logoutButton() {
-            return button_send({ label: "ログアウト", state: "normal", onClick })
+            case "repository-error":
+                return errorMessage(repositoryError(state.err))
 
-            function onClick() {
-                props.logout.submit()
-            }
+            case "failed":
+                return errorMessage(logoutError(state.err))
         }
 
-        function error(): readonly VNode[] {
-            if (content.type === "initial") {
-                return []
-            }
+        function errorMessage(err: readonly string[]): readonly VNode[] {
             return [
                 v_small(),
                 notice_alert("ログアウトの処理中にエラーが発生しました"),
-                ...content.err.map((message) => html`<p>${message}</p>`),
+                ...err.map((message) => html`<p>${message}</p>`),
             ]
         }
     }
