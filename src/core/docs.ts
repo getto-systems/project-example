@@ -1,30 +1,20 @@
-import { DocsAction, DocsDomain } from "../z_vendor/getto-application/docs/data"
+import { DocsDescription } from "../z_vendor/getto-application/docs/data"
 
-const docs_app: DocsAction = {
-    title: "業務アプリケーション",
-    action: [
+export const docs_example: DocsDescription = {
+    title: "業務アプリケーションのひな型",
+    descriptions: [
         {
-            type: "check",
-            check: [
+            title: "ひな形",
+            description: ["このコードをコピーして始める"],
+        },
+        {
+            title: "業務アプリケーション",
+            description: [
                 "業務の目標を達成する",
                 "業務で必要な時に使用できる",
                 "業務に合ったコストで運用できる",
                 "業務内容をプライベートに保つ",
             ],
-        },
-    ],
-    data: [],
-}
-
-export const docs_core: DocsDomain = {
-    path: "index",
-    title: "ドキュメント",
-    usecase: [
-        {
-            path: "app",
-            title: docs_app.title,
-            purpose: ["業務アプリケーションのひな型", "このコードをコピーして始める"],
-            action: [docs_app],
         },
     ],
 }

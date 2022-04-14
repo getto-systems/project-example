@@ -1,17 +1,17 @@
 import { render, h } from "preact"
 
 import { newForegroundOutsideFeature } from "../../../../x_outside_feature/common"
-
 import { newDocsView } from "../../../../docs/content/init/resource"
 
-import { DocsDomainDetailEntry } from "../../../../docs/content/x_preact/domain_detail"
+import { Docs } from "../../../../docs/x_preact/docs"
 
 import { docs_docs } from "../../../../docs/docs"
 
 render(
-    h(DocsDomainDetailEntry, {
+    h(Docs, {
         view: newDocsView(newForegroundOutsideFeature()),
-        docs: docs_docs,
+        title: "ドキュメント",
+        docs: [docs_docs],
     }),
     document.body,
 )

@@ -11,16 +11,6 @@
     { "name": "docs/privacy-policy" },
 
     { "name": "docs/auth" },
-    { "name": "docs/auth/index" },
-    { "name": "docs/auth/ticket/logout" },
-    { "name": "docs/auth/ticket/check" },
-    { "name": "docs/auth/password/authenticate" },
-    { "name": "docs/auth/password/reset" },
-    { "name": "docs/auth/password/change" },
-
-    { "name": "docs/auth/login-id/override" },
-    { "name": "docs/auth/password/override" },
-
     { "name": "docs/avail" },
     { "name": "docs/docs" }
 ]
