@@ -10,6 +10,7 @@
     { "name": "docs/index" },
     { "name": "docs/privacy-policy" },
 
+    { "name": "docs/auth" },
     { "name": "docs/auth/index" },
     { "name": "docs/auth/ticket/logout" },
     { "name": "docs/auth/ticket/check" },
