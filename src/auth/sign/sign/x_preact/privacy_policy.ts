@@ -1,13 +1,12 @@
 import { VNode } from "preact"
+import { html } from "htm/preact"
 
 import { loginBox } from "../../../../z_vendor/getto-css/preact/layout/login"
-import { buttons } from "../../../../z_vendor/getto-css/preact/design/form"
+import { buttons, field } from "../../../../z_vendor/getto-css/preact/design/form"
 
+import { content_privacyPolicy } from "../../../../x_content/privacy_policy"
 import { siteInfo } from "../../../../x_content/site"
 import { signNav } from "../../nav/x_preact/nav"
-import { docsActionField } from "../../../../docs/content/x_preact/helper"
-
-import { docs_dataHandling } from "../../../../docs/docs"
 
 import { SignLink } from "../../nav/action"
 
@@ -15,10 +14,16 @@ type Props = Readonly<{
     link: SignLink
 }>
 export function PrivacyPolicy(props: Props): VNode {
-    // TODO プライバシーボリシーの内容は x_content の中に入れたい
     return loginBox(siteInfo, {
         title: "プライバシーポリシー",
-        body: docs_dataHandling.action.map(docsActionField),
+        body: content_privacyPolicy.descriptions.map((description) =>
+            field({
+                title: description.title,
+                body: html`<ul>
+                    ${description.description.map((description) => html`<li>${description}</li>`)}
+                </ul>`,
+            }),
+        ),
         footer: buttons({ left: loginLink(), right: resetLink() }),
     })
 
