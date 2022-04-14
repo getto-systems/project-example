@@ -22,7 +22,7 @@ impl<'a> TableNonce<'a> {
     pub const fn new(feature: &'a AuthOutsideStore) -> Self {
         Self {
             client: &feature.dynamodb,
-            table_name: feature.login_id_table_name,
+            table_name: feature.nonce_table_name,
         }
     }
 
