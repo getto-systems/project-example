@@ -4,14 +4,15 @@ import { newForegroundOutsideFeature } from "../../../../x_outside_feature/commo
 
 import { newDocsView } from "../../../../docs/content/init/resource"
 
-import { DocsDomainDetailEntry } from "../../../../docs/content/x_preact/domain_detail"
+import { Docs } from "../../../../docs/x_preact/docs"
 
-import { docs_core } from "../../../../core/docs"
+import { docs_example } from "../../../../core/docs"
 
 render(
-    h(DocsDomainDetailEntry, {
+    h(Docs, {
         view: newDocsView(newForegroundOutsideFeature()),
-        docs: docs_core,
+        title: "Example",
+        docs: [docs_example],
     }),
     document.body,
 )

@@ -4,14 +4,17 @@ import { newForegroundOutsideFeature } from "../../../../x_outside_feature/commo
 
 import { newDocsView } from "../../../../docs/content/init/resource"
 
-import { DocsDomainDetailEntry } from "../../../../docs/content/x_preact/domain_detail"
+import { Docs } from "../../../../docs/x_preact/docs"
 
 import { docs_avail } from "../../../../avail/docs"
+import { docs_avail_unexpectedError } from "../../../../avail/unexpected_error/docs"
+import { docs_avail_version } from "../../../../avail/version/docs"
 
 render(
-    h(DocsDomainDetailEntry, {
+    h(Docs, {
         view: newDocsView(newForegroundOutsideFeature()),
-        docs: docs_avail,
+        title: "保守・運用",
+        docs: [docs_avail, docs_avail_version, docs_avail_unexpectedError],
     }),
     document.body,
 )
