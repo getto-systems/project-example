@@ -1,3 +1,4 @@
+// TODO kernel に移動
 export type LoginId = string & { LoginId: never }
 
 export type ValidateLoginIdError =

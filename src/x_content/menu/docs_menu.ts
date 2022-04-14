@@ -35,6 +35,7 @@ function devDocs(): readonly MenuTreeNode[] {
     return [
         category("開発用", allow, [
             docsMenuNode(docs_auth),
+            item("認証・認可", files, "docs/auth.html"),
             item(docs_avail.title, files, "docs/avail.html"),
             item(docs_docs.title, files, "docs/docs.html"),
             item("coverage api", files, "coverage/api/index.html"),
