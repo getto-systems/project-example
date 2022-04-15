@@ -6,7 +6,6 @@ use crate::{
 pub struct SearchAuthUserAccountFilter {
     offset: i32,
     sort: SearchSort<SearchAuthUserAccountSortKey>,
-    // TODO LoginId にするべき
     login_id: Option<String>,
 }
 

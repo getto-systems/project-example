@@ -1,15 +1,16 @@
 import { BoardValue } from "../../../../z_vendor/getto-application/board/kernel/data"
-import { BoardFieldValueConverter } from "../../../../z_vendor/getto-application/board/validate_field/infra"
 import { ConvertLocationResult } from "../../../../z_lib/ui/location/data"
 import { SignNav, signNavKey } from "../../../sign/nav/data"
 import { Password, ResetToken, ValidatePasswordError } from "./data"
+import { ConvertBoardFieldResult } from "../../../../z_vendor/getto-application/board/validate_field/data"
 
 // password には技術的な制限はないが、使用可能な最大文字数は定義しておく
 // api の設定と同期すること
 export const PASSWORD_MAX_LENGTH = 100
 
-type Converter = BoardFieldValueConverter<Password, BoardValue, ValidatePasswordError>
-export const passwordBoardConverter: Converter = (value) => {
+export function passwordBoardConverter(
+    value: BoardValue,
+): ConvertBoardFieldResult<Password, ValidatePasswordError> {
     if (value.length === 0) {
         return { valid: false, err: EMPTY }
     }
