@@ -23,7 +23,7 @@ import { changePasswordError } from "./helper"
 import { OverridePasswordAction } from "../action"
 import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
 
-import { LoginId } from "../../../login_id/input/data"
+import { LoginId } from "../../../login_id/kernel/data"
 
 type Props = Readonly<{
     user: Readonly<{ loginId: LoginId }>

@@ -17,7 +17,7 @@ import {
 } from "../infra"
 
 import { ResetTokenDestination } from "../../kernel/data"
-import { LoginId } from "../../../../../login_id/input/data"
+import { LoginId } from "../../../../../login_id/kernel/data"
 import { ChangeResetTokenDestinationRemoteError } from "../data"
 
 export function newModifyAuthUserAccountRemote(

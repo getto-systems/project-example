@@ -14,8 +14,8 @@ import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf
 import { ModifyAuthUserAccountRemoteResult, ModifyAuthUserAccountRemote } from "../infra"
 
 import { ModifyAuthUserAccountFields, ModifyAuthUserAccountRemoteError } from "../data"
-import { LoginId } from "../../../login_id/input/data"
-import { GrantedAuthRole } from "../../input/data"
+import { LoginId } from "../../../login_id/kernel/data"
+import { GrantedAuthRole } from "../../../kernel/data"
 
 export function newModifyAuthUserAccountRemote(
     feature: RemoteOutsideFeature,

@@ -15,7 +15,7 @@ import { isSameMultipleBoardValue } from "../../../../z_vendor/getto-application
 
 import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
-import { GrantedAuthRole } from "./data"
+import { GrantedAuthRole } from "../../kernel/data"
 
 export interface InputGrantedRolesAction extends ApplicationAction {
     readonly grantedRoles: MultipleInputBoardAction

@@ -25,8 +25,8 @@ import { EditableBoardAction } from "../../../../../z_vendor/getto-application/b
 import { ModifyAuthUserAccountAction } from "../action"
 
 import { ModifyAuthUserAccountError, ModifyAuthUserAccountFields } from "../data"
-import { LoginId } from "../../../login_id/input/data"
-import { GrantedAuthRole } from "../../input/data"
+import { LoginId } from "../../../login_id/kernel/data"
+import { GrantedAuthRole } from "../../../kernel/data"
 import { SuccessButton } from "../../../../../core/x_preact/design/button"
 
 type Props = Readonly<{

@@ -10,8 +10,8 @@ import { restoreLoginId } from "../../login_id/input/convert"
 import { ModifyAuthUserAccountRemote } from "./infra"
 import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
-import { LoginId } from "../../login_id/input/data"
-import { GrantedAuthRole } from "../input/data"
+import { LoginId } from "../../login_id/kernel/data"
+import { GrantedAuthRole } from "../../kernel/data"
 
 const VALID_INFO = {
     grantedRoles: ["user"],

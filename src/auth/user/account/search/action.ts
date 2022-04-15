@@ -39,7 +39,7 @@ import {
 } from "./data"
 import { AuthUserAccount } from "../kernel/data"
 import { SearchSortOrder } from "../../../../z_lib/ui/search/sort/data"
-import { LoginId } from "../../login_id/input/data"
+import { LoginId } from "../../login_id/kernel/data"
 import { ResetTokenDestination } from "../../password/reset/token_destination/kernel/data"
 
 export interface SearchAuthUserAccountAction extends ListAuthUserAccountAction {

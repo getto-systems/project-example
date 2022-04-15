@@ -18,8 +18,9 @@ import {
 import { BoardFieldChecker } from "../../../../z_vendor/getto-application/board/validate_field/infra"
 
 import { emptyBoardValue } from "../../../../z_vendor/getto-application/board/kernel/data"
-import { LoginId, ValidateLoginIdError } from "./data"
+import { ValidateLoginIdError } from "./data"
 import { SingleValueFilter } from "../../../../z_lib/ui/search/kernel/data"
+import { LoginId } from "../kernel/data"
 
 export interface InputLoginIdAction extends ApplicationAction {
     readonly input: InputBoardAction

@@ -26,7 +26,7 @@ import { DelayTime } from "../../../../../../z_lib/ui/config/infra"
 import { BoardConverter } from "../../../../../../z_vendor/getto-application/board/kernel/infra"
 
 import { ResetTokenDestination } from "../kernel/data"
-import { LoginId } from "../../../../login_id/input/data"
+import { LoginId } from "../../../../login_id/kernel/data"
 
 export interface ChangeResetTokenDestinationAction
     extends StatefulApplicationAction<ChangeResetTokenDestinationState> {

@@ -1,6 +1,6 @@
-import { LoginId } from "../../login_id/input/data"
+import { LoginId } from "../../login_id/kernel/data"
 import { ResetTokenDestination } from "../../password/reset/token_destination/kernel/data"
-import { GrantedAuthRole } from "../input/data"
+import { GrantedAuthRole } from "../../kernel/data"
 
 export type AuthUserAccount = Readonly<{
     loginId: LoginId

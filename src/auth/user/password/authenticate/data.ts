@@ -1,5 +1,5 @@
 import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
-import { LoginId } from "../../login_id/input/data"
+import { LoginId } from "../../login_id/kernel/data"
 import { Password } from "../input/data"
 
 export type AuthenticatePasswordFields = Readonly<{

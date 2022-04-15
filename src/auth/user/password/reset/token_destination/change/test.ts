@@ -10,7 +10,7 @@ import { restoreLoginId } from "../../../../login_id/input/convert"
 import { ChangeResetTokenDestinationRemote } from "./infra"
 import { BoardValueStore } from "../../../../../../z_vendor/getto-application/board/input/infra"
 
-import { LoginId } from "../../../../login_id/input/data"
+import { LoginId } from "../../../../login_id/kernel/data"
 import { ResetTokenDestination } from "../kernel/data"
 
 const VALID_INFO = {

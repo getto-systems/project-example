@@ -1,7 +1,7 @@
 import { RemoteResult } from "../../../../z_lib/ui/remote/infra"
 
-import { LoginId } from "../../login_id/input/data"
-import { GrantedAuthRole } from "../input/data"
+import { LoginId } from "../../login_id/kernel/data"
+import { GrantedAuthRole } from "../../kernel/data"
 import { ModifyAuthUserAccountRemoteError, ModifyAuthUserAccountFields } from "./data"
 
 export interface ModifyAuthUserAccountRemote {

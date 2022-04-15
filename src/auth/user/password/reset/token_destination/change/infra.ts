@@ -1,6 +1,6 @@
 import { RemoteResult } from "../../../../../../z_lib/ui/remote/infra"
 
-import { LoginId } from "../../../../login_id/input/data"
+import { LoginId } from "../../../../login_id/kernel/data"
 import { ResetTokenDestination } from "../kernel/data"
 import { ChangeResetTokenDestinationRemoteError } from "./data"
 

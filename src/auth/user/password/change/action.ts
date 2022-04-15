@@ -16,7 +16,7 @@ import { BoardConverter } from "../../../../z_vendor/getto-application/board/ker
 
 import { ChangePasswordError, ChangePasswordFields, OverridePasswordFields } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
-import { LoginId } from "../../login_id/input/data"
+import { LoginId } from "../../login_id/kernel/data"
 
 export interface ChangePasswordAction extends StatefulApplicationAction<ChangePasswordState> {
     readonly currentPassword: InputPasswordAction

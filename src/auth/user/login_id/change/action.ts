@@ -18,7 +18,7 @@ import { OverrideLoginIdRemote } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
 import { BoardConverter } from "../../../../z_vendor/getto-application/board/kernel/infra"
 
-import { LoginId } from "../input/data"
+import { LoginId } from "../kernel/data"
 
 export interface OverrideLoginIdAction extends StatefulApplicationAction<OverrideLoginIdState> {
     readonly newLoginId: InputLoginIdAction
