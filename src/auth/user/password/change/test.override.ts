@@ -11,7 +11,7 @@ import { restoreLoginId } from "../../login_id/input/convert"
 import { OverridePasswordRemote, ChangePasswordRemoteResult } from "./infra"
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
-import { LoginId } from "../../login_id/input/data"
+import { LoginId } from "../../login_id/kernel/data"
 
 const VALID_PASSWORD = { currentPassword: "current-password", newPassword: "new-password" } as const
 

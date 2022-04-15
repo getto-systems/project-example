@@ -1,4 +1,4 @@
-import { GrantedAuthRole } from "../../user/account/input/data"
+import { GrantedAuthRole } from "../../user/kernel/data"
 
 export type AuthTicket = Readonly<{
     authAt: Date

@@ -22,8 +22,8 @@ import {
     ObserveBoardAction,
 } from "../../../../z_vendor/getto-application/board/observe_board/action"
 import { BoardConverter } from "../../../../z_vendor/getto-application/board/kernel/infra"
-import { GrantedAuthRole } from "../input/data"
-import { LoginId } from "../../login_id/input/data"
+import { GrantedAuthRole } from "../../kernel/data"
+import { LoginId } from "../../login_id/kernel/data"
 
 export interface ModifyAuthUserAccountAction
     extends StatefulApplicationAction<ModifyAuthUserAccountState> {

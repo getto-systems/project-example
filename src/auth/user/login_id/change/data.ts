@@ -1,5 +1,5 @@
 import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
-import { LoginId } from "../input/data"
+import { LoginId } from "../kernel/data"
 
 export type OverrideLoginIdFields = Readonly<{
     newLoginId: LoginId

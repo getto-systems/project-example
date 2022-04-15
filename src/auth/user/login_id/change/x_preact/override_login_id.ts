@@ -22,7 +22,7 @@ import { SuccessButton } from "../../../../../core/x_preact/design/button"
 import { OverrideLoginIdAction } from "../action"
 import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
 
-import { LoginId } from "../../input/data"
+import { LoginId } from "../../kernel/data"
 
 type Props = Readonly<{
     user: Readonly<{ loginId: LoginId }>

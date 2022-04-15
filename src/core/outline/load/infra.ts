@@ -5,7 +5,7 @@ import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
 import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 import { MenuCategoryPath, MenuTargetPath } from "./data"
 import { Icon } from "../../../z_lib/ui/icon/data"
-import { GrantedAuthRole } from "../../../auth/user/account/input/data"
+import { GrantedAuthRole } from "../../../auth/user/kernel/data"
 
 export interface MenuTargetPathDetecter {
     (): ConvertLocationResult<MenuTargetPath>

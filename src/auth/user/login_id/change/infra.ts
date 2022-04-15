@@ -1,7 +1,7 @@
 import { RemoteResult } from "../../../../z_lib/ui/remote/infra"
 
 import { ChangeLoginIdRemoteError, OverrideLoginIdFields } from "./data"
-import { LoginId } from "../input/data"
+import { LoginId } from "../kernel/data"
 
 export interface OverrideLoginIdRemote {
     (

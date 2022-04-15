@@ -14,7 +14,7 @@ import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 import { ChangePasswordRemoteResult, OverridePasswordRemote } from "../infra"
 
 import { OverridePasswordFields } from "../data"
-import { LoginId } from "../../../login_id/input/data"
+import { LoginId } from "../../../login_id/kernel/data"
 
 export function newOverridePasswordRemote(feature: RemoteOutsideFeature): OverridePasswordRemote {
     return (user, fields) => fetchRemote(feature, user, fields)

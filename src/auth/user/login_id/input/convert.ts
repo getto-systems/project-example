@@ -1,6 +1,7 @@
 import { BoardValue } from "../../../../z_vendor/getto-application/board/kernel/data"
-import { LoginId, ValidateLoginIdError } from "./data"
+import { ValidateLoginIdError } from "./data"
 import { ConvertBoardFieldResult } from "../../../../z_vendor/getto-application/board/validate_field/data"
+import { LoginId } from "../kernel/data"
 
 // login id には技術的な制限はないが、使用可能な最大文字数は定義しておく
 // api の設定と同期させること

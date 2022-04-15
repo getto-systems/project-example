@@ -25,7 +25,7 @@ import { EditableBoardAction } from "../../../../../../../z_vendor/getto-applica
 import { ChangeResetTokenDestinationAction } from "../action"
 
 import { ChangeResetTokenDestinationError } from "../data"
-import { LoginId } from "../../../../../login_id/input/data"
+import { LoginId } from "../../../../../login_id/kernel/data"
 import { ResetTokenDestination } from "../../kernel/data"
 
 type Props = Readonly<{

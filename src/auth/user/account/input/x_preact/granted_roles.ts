@@ -18,8 +18,8 @@ import { EditableBoardAction } from "../../../../../z_vendor/getto-application/b
 
 import { toBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/convert"
 
-import { GrantedAuthRole } from "../data"
-import { LoginId } from "../../../login_id/input/data"
+import { GrantedAuthRole } from "../../../kernel/data"
+import { LoginId } from "../../../login_id/kernel/data"
 
 type Props = Readonly<{
     user: Readonly<{ loginId: LoginId; grantedRoles: readonly GrantedAuthRole[] }>
