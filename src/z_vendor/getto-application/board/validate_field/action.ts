@@ -1,6 +1,6 @@
 import { StatefulApplicationAction, AbstractStatefulApplicationAction } from "../../action/action"
 
-import { BoardFieldChecker, BoardFieldConverter } from "./infra"
+import { BoardFieldChecker } from "./infra"
 
 import { ConvertBoardFieldResult, ValidateBoardFieldResult } from "../validate_field/data"
 
@@ -12,7 +12,7 @@ export interface ValidateBoardFieldAction<E>
 export type ValidateBoardFieldState<E> = ValidateBoardFieldResult<E>
 
 export type ValidateBoardFieldInfra<T, E> = Readonly<{
-    converter: BoardFieldConverter<T, E>
+    converter: { (): ConvertBoardFieldResult<T, E> }
 }>
 
 export function initValidateBoardFieldAction<T, E>(

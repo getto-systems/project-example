@@ -1,14 +1,14 @@
-import { BoardFieldValueConverter } from "../../../../z_vendor/getto-application/board/validate_field/infra"
-
 import { BoardValue } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { LoginId, ValidateLoginIdError } from "./data"
+import { ConvertBoardFieldResult } from "../../../../z_vendor/getto-application/board/validate_field/data"
 
 // login id には技術的な制限はないが、使用可能な最大文字数は定義しておく
 // api の設定と同期させること
 export const LOGIN_ID_MAX_LENGTH = 100
 
-type Converter = BoardFieldValueConverter<LoginId, BoardValue, ValidateLoginIdError>
-export const loginIdBoardConverter: Converter = (value) => {
+export function loginIdBoardConverter(
+    value: BoardValue,
+): ConvertBoardFieldResult<LoginId, ValidateLoginIdError> {
     if (value.length === 0) {
         return { valid: false, err: EMPTY }
     }
