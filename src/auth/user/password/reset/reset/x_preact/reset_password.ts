@@ -9,14 +9,7 @@ import {
     useApplicationView,
 } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import {
-    buttons,
-    button_disabled,
-    button_send,
-    button_undo,
-    fieldError,
-    form,
-} from "../../../../../../z_vendor/getto-css/preact/design/form"
+import { buttons, fieldError, form } from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { loginBox } from "../../../../../../z_vendor/getto-css/preact/layout/login"
 
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
@@ -24,6 +17,7 @@ import { siteInfo } from "../../../../../../x_content/site"
 import { icon_spinner } from "../../../../../../x_content/icon"
 import { appendScript } from "../../../../../sign/x_preact/script"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
+import { iconHtml } from "../../../../../../core/x_preact/design/icon"
 
 import { ApplicationError } from "../../../../../../avail/x_preact/application_error"
 import { InputLoginId } from "../../../../login_id/input/x_preact/input"
@@ -34,6 +28,8 @@ import { ResetPasswordAction } from "../action"
 import { SignLink } from "../../../../../sign/nav/action"
 
 import { ResetPasswordError } from "../data"
+import { ClearChangesButton } from "../../../../../../core/x_preact/button/clear_changes_button"
+import { ChangeButton } from "../../../../../../core/x_preact/button/change_button"
 
 type Props = Readonly<{
     link: SignLink
@@ -79,38 +75,13 @@ export function ResetPassword(viewProps: Props): VNode {
         case "initial-reset":
         case "failed-to-reset":
         case "try-to-reset":
-            return form(
-                loginBox(siteInfo, {
-                    ...content,
-                    body: [
-                        h(InputLoginId, {
-                            field: props.reset.loginId,
-                            help: ["入力したログインIDをもう一度入力してください"],
-                            autocomplete: "username",
-                        }),
-                        h(InputPassword, {
-                            field: props.reset.password,
-                            help: ["新しいパスワードを入力してください"],
-                            autocomplete: "new-password",
-                        }),
-                        buttons({
-                            left:
-                                state.type === "try-to-reset" ? connectingButton() : resetButton(),
-                            right: clearButton(),
-                        }),
-                    ],
-                    footer: [
-                        footerLinks(),
-                        state.type === "failed-to-reset" ? fieldError(resetError(state.err)) : "",
-                    ],
-                }),
-            )
+            return resetForm(state)
 
         case "take-longtime-to-reset":
             return loginBox(siteInfo, {
                 ...content,
                 body: [
-                    html`<p>${icon_spinner} リセットに時間がかかっています</p>`,
+                    html`<p>${iconHtml(icon_spinner)} リセットに時間がかかっています</p>`,
                     html`<p>
                         30秒以上かかる場合は何かがおかしいので、
                         <br />
@@ -122,7 +93,7 @@ export function ResetPassword(viewProps: Props): VNode {
 
         case "try-to-load":
             // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
-            return EMPTY_CONTENT
+            return html``
 
         case "succeed-to-renew":
         case "ticket-not-expired":
@@ -130,54 +101,66 @@ export function ResetPassword(viewProps: Props): VNode {
         case "failed-to-renew":
             // これらはスクリプトがロードされた後に発行される
             // したがって、un-mount されているのでここには来ない
-            return EMPTY_CONTENT
+            return html``
 
         case "repository-error":
         case "load-error":
             return h(ApplicationError, { err: state.err.err })
     }
 
-    function clearButton() {
-        const label = "入力内容をクリア"
-        switch (validateState) {
-            case "initial":
-                return button_disabled({ label })
+    type ResetState =
+        | Readonly<{ type: "initial-reset" }>
+        | Readonly<{ type: "try-to-reset" }>
+        | Readonly<{ type: "failed-to-reset"; err: ResetPasswordError }>
+    function resetForm(state: ResetState): VNode {
+        return form(
+            loginBox(siteInfo, {
+                ...content,
+                body: [
+                    h(InputLoginId, {
+                        field: props.reset.loginId,
+                        help: ["入力したログインIDをもう一度入力してください"],
+                        autocomplete: "username",
+                    }),
+                    h(InputPassword, {
+                        field: props.reset.password,
+                        help: ["新しいパスワードを入力してください"],
+                        autocomplete: "new-password",
+                    }),
+                    buttons({
+                        left: resetButton(),
+                        right: clearButton(),
+                    }),
+                ],
+                footer: [
+                    footerLinks(),
+                    state.type === "failed-to-reset" ? fieldError(resetError(state.err)) : "",
+                ],
+            }),
+        )
 
-            case "invalid":
-            case "valid":
-                return button_undo({ label, onClick })
+        function resetButton() {
+            return h(ChangeButton, {
+                label: "パスワードリセット",
+                isConnecting: state.type === "try-to-reset",
+                validateState,
+                onClick,
+            })
+
+            function onClick(e: Event) {
+                e.preventDefault()
+                props.reset.submit()
+            }
         }
+    }
+
+    function clearButton() {
+        return h(ClearChangesButton, { validateState, onClick })
 
         function onClick(e: Event) {
             e.preventDefault()
             props.reset.clear()
         }
-    }
-
-    function resetButton() {
-        const label = "パスワードリセット"
-
-        switch (validateState) {
-            case "initial":
-                return button_send({ state: "normal", label, onClick })
-
-            case "valid":
-                return button_send({ state: "confirm", label, onClick })
-
-            case "invalid":
-                return button_disabled({ label })
-        }
-
-        function onClick(e: Event) {
-            e.preventDefault()
-            props.reset.submit()
-        }
-    }
-    function connectingButton(): VNode {
-        return button_send({
-            state: "connect",
-            label: html`パスワードをリセットしています ${icon_spinner}`,
-        })
     }
 
     function footerLinks() {
@@ -215,5 +198,3 @@ function resetError(err: ResetPasswordError): readonly VNodeContent[] {
             ])
     }
 }
-
-const EMPTY_CONTENT = html``

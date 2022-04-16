@@ -60,7 +60,7 @@ export function MainTitleWithSidebar(props: Props): VNode {
     function error(): VNode {
         switch (state.type) {
             case "success":
-                return EMPTY_CONTENT
+                return html``
 
             case "repository-error":
                 return notice_alert(
@@ -72,5 +72,3 @@ export function MainTitleWithSidebar(props: Props): VNode {
         }
     }
 }
-
-const EMPTY_CONTENT = html``

@@ -29,7 +29,7 @@ export function LoadSeasonField(props: Props): VNode {
     function body(): VNodeContent {
         switch (state.type) {
             case "initial":
-                return EMPTY_CONTENT
+                return html``
 
             case "success":
                 return seasonLabel(state.season)
@@ -50,5 +50,3 @@ function loadError(err: RepositoryError): VNodeContent {
         return [v_small(), html`<small><p>詳細: ${err.err}</p></small>`]
     }
 }
-
-const EMPTY_CONTENT = html``

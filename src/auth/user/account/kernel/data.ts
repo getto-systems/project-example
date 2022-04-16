@@ -1,9 +1,9 @@
 import { LoginId } from "../../login_id/kernel/data"
 import { ResetTokenDestination } from "../../password/reset/token_destination/kernel/data"
-import { GrantedAuthRole } from "../../kernel/data"
+import { AuthRole } from "../../kernel/data"
 
 export type AuthUserAccount = Readonly<{
     loginId: LoginId
-    grantedRoles: readonly GrantedAuthRole[]
+    grantedRoles: readonly AuthRole[]
     resetTokenDestination: ResetTokenDestination
 }>

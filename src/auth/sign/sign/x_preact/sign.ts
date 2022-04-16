@@ -39,7 +39,7 @@ export function Sign(viewProps: Props): VNode {
 
     switch (state.type) {
         case "initial":
-            return EMPTY_CONTENT
+            return html``
 
         case "static-privacyPolicy":
             return h(PrivacyPolicy, { link: props.link })
@@ -57,5 +57,3 @@ export function Sign(viewProps: Props): VNode {
             return h(ResetPassword, { link: props.link, reset: state.view })
     }
 }
-
-const EMPTY_CONTENT = html``

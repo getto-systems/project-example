@@ -5,15 +5,11 @@ import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { button_search, fieldError } from "../../../../../z_vendor/getto-css/preact/design/form"
-import {
-    pagerCount,
-    pagerParams,
-    PAGER_BUTTON_CONNECT,
-    PAGER_BUTTON_STATIC,
-} from "../../../../../core/x_preact/design/table"
+import { fieldError } from "../../../../../z_vendor/getto-css/preact/design/form"
+import { pagerCount, pagerParams } from "../../../../../core/x_preact/design/table"
 
 import { SearchOffset } from "../../../../../z_lib/ui/search/offset/x_preact/offset"
+import { LoadButton } from "../../../../../core/x_preact/button/load_button"
 
 import { ListAuthUserAccountAction } from "../action"
 
@@ -29,14 +25,14 @@ export function SearchAuthUserAccountPager(props: Props): VNode {
 
     switch (state.type) {
         case "initial":
-            return EMPTY_CONTENT
+            return html``
 
         case "try":
         case "take-longtime":
             if (state.previousResponse) {
                 return pagerForm({ page: state.previousResponse.page, isConnecting: true })
             } else {
-                return EMPTY_CONTENT
+                return html``
             }
 
         case "success":
@@ -57,11 +53,7 @@ export function SearchAuthUserAccountPager(props: Props): VNode {
         })
 
         function button(): VNode {
-            if (isConnecting) {
-                return button_search({ state: "connect", label: PAGER_BUTTON_CONNECT })
-            } else {
-                return button_search({ state: "normal", label: PAGER_BUTTON_STATIC, onClick })
-            }
+            return h(LoadButton, { isConnecting, onClick })
 
             function onClick(e: Event) {
                 e.preventDefault()
@@ -70,8 +62,6 @@ export function SearchAuthUserAccountPager(props: Props): VNode {
         }
     }
 }
-
-const EMPTY_CONTENT = html``
 
 function searchError(err: RemoteCommonError) {
     return remoteCommonErrorReason(err, (reason) => [

@@ -4,20 +4,17 @@ import { useEffect, useState } from "preact/hooks"
 
 import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
 
-import { button_send } from "../../../z_vendor/getto-css/preact/design/form"
+import { button_edit } from "../../../z_vendor/getto-css/preact/design/form"
 
 import { icon_ok } from "../../../x_content/icon"
-import { iconHtml } from "./icon"
+import { iconHtml } from "../design/icon"
 
-export function SuccessButton({
-    isSuccess,
-    label,
-    onClick,
-}: Readonly<{
+type Props = Readonly<{
     isSuccess: boolean
-    label: VNodeContent
+    label?: VNodeContent
     onClick: { (e: Event): void }
-}>): VNode {
+}>
+export function EditButton({ isSuccess, label, onClick }: Props): VNode {
     type SuccessButtonState = "success" | "normal"
 
     const [state, setState] = useState<SuccessButtonState>(isSuccess ? "success" : "normal")
@@ -30,15 +27,17 @@ export function SuccessButton({
         }
     }, [state])
 
+    const buttonLabel = label || "変更"
+
     switch (state) {
         case "success":
-            return button_send({
+            return button_edit({
                 state: "normal",
-                label: html`${label} ${iconHtml(icon_ok)}`,
+                label: html`${buttonLabel} ${iconHtml(icon_ok)}`,
                 onClick,
             })
 
         case "normal":
-            return button_send({ state: "normal", label, onClick })
+            return button_edit({ state: "normal", label: buttonLabel, onClick })
     }
 }

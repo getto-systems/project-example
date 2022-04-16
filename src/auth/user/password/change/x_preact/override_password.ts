@@ -4,19 +4,16 @@ import { html } from "htm/preact"
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import {
-    buttons,
-    button_disabled,
-    button_send,
-    button_undo,
-    fieldError,
-    form,
-} from "../../../../../z_vendor/getto-css/preact/design/form"
+import { buttons, fieldError, form } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
-import { buttonLabel, icon_save, icon_spinner } from "../../../../../x_content/icon"
+import { icon_spinner } from "../../../../../x_content/icon"
+import { iconHtml } from "../../../../../core/x_preact/design/icon"
 
 import { InputPassword } from "../../input/x_preact/input"
-import { SuccessButton } from "../../../../../core/x_preact/design/button"
+import { EditButton } from "../../../../../core/x_preact/button/edit_button"
+import { ClearChangesButton } from "../../../../../core/x_preact/button/clear_changes_button"
+import { CloseButton } from "../../../../../core/x_preact/button/close_button"
+import { ChangeButton } from "../../../../../core/x_preact/button/change_button"
 
 import { changePasswordError } from "./helper"
 
@@ -43,7 +40,7 @@ export function OverridePassword(props: Props): VNode {
     function content(): Content {
         if (!editableState.isEditable) {
             return {
-                body: openButton(),
+                body: editButton(),
             }
         }
         return {
@@ -68,12 +65,8 @@ export function OverridePassword(props: Props): VNode {
         }
     }
 
-    function openButton(): VNode {
-        return h(SuccessButton, {
-            label: LABEL_OVERRIDE.static,
-            onClick,
-            isSuccess: state.type === "success",
-        })
+    function editButton(): VNode {
+        return h(EditButton, { isSuccess: state.type === "success", onClick })
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -83,28 +76,11 @@ export function OverridePassword(props: Props): VNode {
     }
 
     function submitButton(): VNode {
-        switch (state.type) {
-            case "initial":
-            case "failed":
-            case "success":
-                switch (validateState) {
-                    case "initial":
-                    case "valid":
-                        return button_send({
-                            state: validateState === "initial" ? "normal" : "confirm",
-                            label: LABEL_OVERRIDE.normal,
-                            onClick,
-                        })
-
-                    case "invalid":
-                        return button_disabled({ label: LABEL_OVERRIDE.normal })
-                }
-                break
-
-            case "try":
-            case "take-longtime":
-                return button_send({ state: "connect", label: LABEL_OVERRIDE.connect })
-        }
+        return h(ChangeButton, {
+            isConnecting: state.type === "try" || state.type === "take-longtime",
+            validateState,
+            onClick,
+        })
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -118,24 +94,7 @@ export function OverridePassword(props: Props): VNode {
     }
 
     function clearButton(): VNode {
-        switch (state.type) {
-            case "initial":
-            case "failed":
-            case "success":
-                switch (validateState) {
-                    case "initial":
-                        return button_disabled({ label: LABEL_CLEAR })
-
-                    case "valid":
-                    case "invalid":
-                        return button_undo({ label: LABEL_CLEAR, onClick })
-                }
-                break
-
-            case "try":
-            case "take-longtime":
-                return EMPTY_CONTENT
-        }
+        return h(ClearChangesButton, { validateState, onClick })
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -143,7 +102,7 @@ export function OverridePassword(props: Props): VNode {
         }
     }
     function closeButton(): VNode {
-        return button_undo({ label: "閉じる", onClick })
+        return h(CloseButton, { onClick })
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -174,15 +133,10 @@ export function OverridePassword(props: Props): VNode {
             case "take-longtime":
                 return [
                     fieldError([
-                        html`${icon_spinner} パスワード変更中です`,
+                        html`${iconHtml(icon_spinner)} 変更に時間がかかっています`,
                         html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
                     ]),
                 ]
         }
     }
 }
-
-const LABEL_OVERRIDE = buttonLabel("変更", icon_save)
-const LABEL_CLEAR = "入力内容をクリア"
-
-const EMPTY_CONTENT = html``

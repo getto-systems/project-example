@@ -15,6 +15,7 @@ import { v_medium } from "../../../../z_vendor/getto-css/preact/design/alignment
 import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../x_content/site"
 import { icon_spinner } from "../../../../x_content/icon"
+import { iconHtml } from "../../../../core/x_preact/design/icon"
 
 import { appendScript } from "../../../sign/x_preact/script"
 
@@ -75,57 +76,50 @@ export function CheckAuthTicket(view: ApplicationView<CheckAuthTicketAction>): V
     switch (state.type) {
         case "initial-check":
         case "required-to-login":
-            return EMPTY_CONTENT
+            return html``
 
         case "try-to-instant-load":
         case "try-to-load":
             // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
-            return EMPTY_CONTENT
+            return html``
 
         case "succeed-to-start-continuous-renew":
         case "succeed-to-renew":
         case "ticket-not-expired":
             // これらはスクリプトがロードされた後に発行される
             // したがって、un-mount されているのでここには来ない
-            return EMPTY_CONTENT
+            return html``
 
         case "try-to-renew":
             // すぐに帰ってくることを想定
-            return EMPTY_CONTENT
+            return html``
 
         case "take-longtime-to-renew":
-            return takeLongtimeMessage()
+            return loginBox(siteInfo, {
+                title: "認証に時間がかかっています",
+                body: [
+                    html`<p>${iconHtml(icon_spinner)} 認証に時間がかかっています</p>`,
+                    html`<p>
+                        30秒以上かかる場合は何かがおかしいので、
+                        <br />
+                        お手数ですが管理者に連絡お願いします
+                    </p>`,
+                ],
+            })
 
         case "failed-to-renew":
-            return errorMessage(state.err)
+            return loginBox(siteInfo, {
+                title: "認証に失敗しました",
+                body: [
+                    ...renewError(state.err).map((message) => html`<p>${message}</p>`),
+                    v_medium(),
+                    html`<p>お手数ですが、上記メッセージを管理者にお伝えください</p>`,
+                ],
+            })
 
         case "repository-error":
         case "load-error":
             return h(ApplicationError, { err: state.err.err })
-    }
-
-    function takeLongtimeMessage() {
-        return loginBox(siteInfo, {
-            title: "認証に時間がかかっています",
-            body: [
-                html`<p>${icon_spinner} 認証処理中です</p>`,
-                html`<p>
-                    30秒以上かかる場合は何かがおかしいので、
-                    <br />
-                    お手数ですが管理者に連絡お願いします
-                </p>`,
-            ],
-        })
-    }
-    function errorMessage(err: RemoteCommonError): VNode {
-        return loginBox(siteInfo, {
-            title: "認証に失敗しました",
-            body: [
-                ...renewError(err).map((message) => html`<p>${message}</p>`),
-                v_medium(),
-                html`<p>お手数ですが、上記メッセージを管理者にお伝えください</p>`,
-            ],
-        })
     }
 }
 
@@ -135,5 +129,3 @@ function renewError(err: RemoteCommonError): readonly VNodeContent[] {
         ...reason.detail,
     ])
 }
-
-const EMPTY_CONTENT: VNode = html``

@@ -1,8 +1,8 @@
 import { allAuthRoles } from "../../../../x_content/role"
-import { GrantedAuthRole } from "../../kernel/data"
+import { AuthRole } from "../../kernel/data"
 
-export function toGrantedRoles(roles: readonly string[]): readonly GrantedAuthRole[] {
-    const converted: GrantedAuthRole[] = []
+export function toGrantedRoles(roles: readonly string[]): readonly AuthRole[] {
+    const converted: AuthRole[] = []
 
     allAuthRoles.forEach((role) => {
         if (roles.includes(role)) {

@@ -76,7 +76,7 @@ export function ResetTokenDestinationField(props: Props): VNode {
         function email(): VNode {
             switch (state.type) {
                 case "none":
-                    return EMPTY_CONTENT
+                    return html``
 
                 case "email":
                     return h(InputBoard, {
@@ -125,5 +125,3 @@ function validationError(
         }
     })
 }
-
-const EMPTY_CONTENT = html``

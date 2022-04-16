@@ -11,7 +11,7 @@ import { ModifyAuthUserAccountRemote } from "./infra"
 import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
 import { LoginId } from "../../login_id/kernel/data"
-import { GrantedAuthRole } from "../../kernel/data"
+import { AuthRole } from "../../kernel/data"
 
 const VALID_INFO = {
     grantedRoles: ["user"],
@@ -101,7 +101,7 @@ function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
     store: Readonly<{
         grantedRoles: MultipleBoardValueStore
     }>
-    user: Readonly<{ loginId: LoginId; grantedRoles: readonly GrantedAuthRole[] }>
+    user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>
 }> {
     const resource = {
         modify: initModifyAuthUserAccountAction({
