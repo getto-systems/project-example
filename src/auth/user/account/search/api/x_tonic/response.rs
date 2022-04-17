@@ -51,6 +51,7 @@ impl Into<SearchAuthUserAccountResponsePb> for AuthUserAccountSearch {
                 .map(|user| AuthUserAccountPb {
                     login_id: user.login_id.extract(),
                     granted_roles: user.granted_roles.extract().into_iter().collect(),
+                    reset_token_destination: Some(user.reset_token_destination.into()),
                 })
                 .collect(),
             ..Default::default()

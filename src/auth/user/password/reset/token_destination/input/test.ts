@@ -5,7 +5,7 @@ import { mockBoardValueStore } from "../../../../../../z_vendor/getto-applicatio
 
 import { initInputResetTokenDestinationAction } from "./action"
 
-import { restoreResetTokenDestination } from "./convert"
+import { restoreResetTokenDestination } from "../kernel/convert"
 
 import { ResetTokenDestination } from "../kernel/data"
 

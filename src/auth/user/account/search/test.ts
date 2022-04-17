@@ -10,7 +10,7 @@ import { initSearchAuthUserAccountAction, SearchAuthUserAccountAction } from "./
 
 import { readSearchAuthUserAccountSortKey } from "./convert"
 import { restoreLoginId } from "../../login_id/input/convert"
-import { restoreResetTokenDestination } from "../../password/reset/token_destination/input/convert"
+import { restoreResetTokenDestination } from "../../password/reset/token_destination/kernel/convert"
 
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 import { SearchAuthUserAccountRemote, SearchAuthUserAccountRemoteResult } from "./infra"
