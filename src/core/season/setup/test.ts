@@ -124,10 +124,8 @@ function initResource(seasonRepository: SeasonRepository): Readonly<{
     }
 
     const store = {
-        season: mockBoardValueStore(),
+        season: mockBoardValueStore(resource.setupSeason.season.input),
     }
-
-    resource.setupSeason.season.input.connector.connect(store.season)
 
     return {
         resource,

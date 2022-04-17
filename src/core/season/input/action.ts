@@ -7,11 +7,13 @@ import {
 
 import { seasonToBoardValue } from "../kernel/convert"
 
+import { BoardValueStore } from "../../../z_vendor/getto-application/board/input/infra"
+
 import { BoardValue } from "../../../z_vendor/getto-application/board/kernel/data"
 import { Season } from "../kernel/data"
 
 export interface InputSeasonAction extends ApplicationAction {
-    readonly input: InputBoardAction
+    readonly input: InputBoardAction<BoardValueStore>
 }
 
 export function initInputSeasonAction(): Readonly<{

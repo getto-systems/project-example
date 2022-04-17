@@ -6,11 +6,11 @@ import { readBoardValue } from "../../kernel/convert"
 
 import { InputBoardAction } from "../action"
 
-import { BoardValueStoreConnector } from "../../input/infra"
+import { BoardValueStore, BoardValueStoreConnector } from "../../input/infra"
 
 import { emptyBoardValue } from "../../kernel/data"
 
-type Props = Readonly<{ input: InputBoardAction }> &
+type Props = Readonly<{ input: InputBoardAction<BoardValueStore> }> &
     Partial<Readonly<{ rows: number; cols: number; disabled: boolean }>>
 export function TextareaBoard({ input, rows, cols, disabled }: Props): VNode {
     return html`<textarea
@@ -26,7 +26,7 @@ export function TextareaBoard({ input, rows, cols, disabled }: Props): VNode {
     }
 }
 
-function useInputRef(connector: BoardValueStoreConnector) {
+function useInputRef(connector: BoardValueStoreConnector<BoardValueStore>) {
     const REF = useRef<HTMLInputElement>()
 
     useLayoutEffect(() => {

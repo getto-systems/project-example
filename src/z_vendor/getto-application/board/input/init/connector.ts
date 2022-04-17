@@ -2,16 +2,14 @@ import {
     BoardValueStore,
     BoardValueStoreConnector,
     MultipleBoardValueStore,
-    MultipleBoardValueStoreConnector,
     FileStore,
-    FileStoreConnector,
     SelectFileResult,
 } from "../infra"
 
 import { BoardValue, emptyBoardValue } from "../../kernel/data"
 
 export function initBoardValueStoreConnector(): Readonly<{
-    connector: BoardValueStoreConnector
+    connector: BoardValueStoreConnector<BoardValueStore>
     store: BoardValueStore
 }> {
     const connector = new Connector()
@@ -25,7 +23,7 @@ type Connection = Readonly<{ connect: false }> | Readonly<{ connect: true; store
 
 const initialConnection: Connection = { connect: false }
 
-class Connector implements BoardValueStoreConnector, BoardValueStore {
+class Connector implements BoardValueStoreConnector<BoardValueStore>, BoardValueStore {
     conn = initialConnection
     store = emptyBoardValue
 
@@ -52,7 +50,7 @@ class Connector implements BoardValueStoreConnector, BoardValueStore {
 }
 
 export function initMultipleBoardValueStoreConnector(): Readonly<{
-    connector: MultipleBoardValueStoreConnector
+    connector: BoardValueStoreConnector<MultipleBoardValueStore>
     store: MultipleBoardValueStore
 }> {
     const connector = new MultipleConnector()
@@ -68,7 +66,9 @@ type MultipleConnection =
 
 const initialMultipleConnection: MultipleConnection = { connect: false }
 
-class MultipleConnector implements MultipleBoardValueStoreConnector, MultipleBoardValueStore {
+class MultipleConnector
+    implements BoardValueStoreConnector<MultipleBoardValueStore>, MultipleBoardValueStore
+{
     conn = initialMultipleConnection
     store: readonly BoardValue[] = []
 
@@ -95,7 +95,7 @@ class MultipleConnector implements MultipleBoardValueStoreConnector, MultipleBoa
 }
 
 export function initFileStoreConnector(): Readonly<{
-    connector: FileStoreConnector
+    connector: BoardValueStoreConnector<FileStore>
     store: FileStore
 }> {
     const connector = new FileConnector()
@@ -109,7 +109,7 @@ type FileConnection = Readonly<{ connect: false }> | Readonly<{ connect: true; s
 
 const initialFileConnection: FileConnection = { connect: false }
 
-class FileConnector implements FileStoreConnector, FileStore {
+class FileConnector implements BoardValueStoreConnector<FileStore>, FileStore {
     conn = initialFileConnection
 
     get(): SelectFileResult {

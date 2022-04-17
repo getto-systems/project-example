@@ -36,8 +36,7 @@ test("terminate", async () => {
 
 function standard() {
     const { input: action } = initSearchLoginIdAction({ search: false })
-    const store = mockBoardValueStore()
-    action.input.connector.connect(store)
+    const store = mockBoardValueStore(action.input)
 
     return { action, store }
 }

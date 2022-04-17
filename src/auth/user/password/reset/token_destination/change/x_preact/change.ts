@@ -5,19 +5,17 @@ import { useApplicationAction } from "../../../../../../../z_vendor/getto-applic
 
 import {
     buttons,
-    button_disabled,
-    button_send,
-    button_undo,
     fieldError,
     form,
 } from "../../../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../../../z_vendor/getto-css/preact/design/box"
 
 import { VNodeContent } from "../../../../../../../z_lib/ui/x_preact/common"
-import { buttonLabel, icon_save, icon_spinner } from "../../../../../../../x_content/icon"
+import { icon_spinner } from "../../../../../../../x_content/icon"
+import { iconHtml } from "../../../../../../../core/x_preact/design/icon"
 
 import { ResetTokenDestinationField } from "../../input/x_preact/destination"
-import { SuccessButton } from "../../../../../../../core/x_preact/design/button"
+import { EditButton } from "../../../../../../../core/x_preact/button/edit_button"
 
 import { remoteCommonErrorReason } from "../../../../../../../z_lib/ui/remote/x_error/reason"
 
@@ -27,6 +25,9 @@ import { ChangeResetTokenDestinationAction } from "../action"
 import { ChangeResetTokenDestinationError } from "../data"
 import { LoginId } from "../../../../../login_id/kernel/data"
 import { ResetTokenDestination } from "../../kernel/data"
+import { ResetButton } from "../../../../../../../core/x_preact/button/reset_button"
+import { ChangeButton } from "../../../../../../../core/x_preact/button/change_button"
+import { CloseButton } from "../../../../../../../core/x_preact/button/close_button"
 
 type Props = Readonly<{
     user: Readonly<{ loginId: LoginId; resetTokenDestination: ResetTokenDestination }>
@@ -50,16 +51,23 @@ export function ChangeResetTokenDestination(props: Props): VNode {
                     field: props.change.destination,
                 }),
             ],
-            footer: editableState.isEditable ? editButtons() : openButton(),
+            footer: editableState.isEditable
+                ? [
+                      buttons({
+                          left: submitButton(),
+                          right: resetButton(),
+                      }),
+                      ...message(),
+                      buttons({
+                          right: closeButton(),
+                      }),
+                  ]
+                : editButton(),
         }),
     )
 
-    function openButton(): VNode {
-        return h(SuccessButton, {
-            label: LABEL_CHANGE.static,
-            onClick,
-            isSuccess: state.type === "success",
-        })
+    function editButton(): VNode {
+        return h(EditButton, { isSuccess: state.type === "success", onClick })
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -68,102 +76,65 @@ export function ChangeResetTokenDestination(props: Props): VNode {
         }
     }
 
-    function editButtons(): VNodeContent {
-        return [
-            buttons({
-                left: submitButton(),
-                right: resetButton(),
-            }),
-            ...message(),
-            buttons({
-                right: closeButton(),
-            }),
-        ]
+    function submitButton(): VNode {
+        return h(ChangeButton, {
+            isConnecting: state.type === "try" || state.type === "take-longtime",
+            validateState,
+            observeState,
+            onClick,
+        })
 
-        function submitButton(): VNode {
-            switch (state.type) {
-                case "initial":
-                case "failed":
-                case "success":
-                    if (validateState === "invalid") {
-                        return button_disabled({ label: LABEL_CHANGE.normal })
-                    }
-                    return button_send({
-                        state: observeState.hasChanged ? "confirm" : "normal",
-                        label: LABEL_CHANGE.normal,
-                        onClick,
-                    })
-
-                case "try":
-                case "take-longtime":
-                    return button_send({ state: "connect", label: LABEL_CHANGE.connect })
-            }
-
-            function onClick(e: Event) {
-                e.preventDefault()
-                props.change.submit(props.user).then((state) => {
-                    if (state.type === "success") {
-                        props.editable.close()
-                        props.onSuccess(state.data)
-                    }
-                })
-            }
+        function onClick(e: Event) {
+            e.preventDefault()
+            props.change.submit(props.user).then((state) => {
+                if (state.type === "success") {
+                    props.editable.close()
+                    props.onSuccess(state.data)
+                }
+            })
         }
+    }
 
-        function resetButton(): VNode {
-            switch (state.type) {
-                case "initial":
-                case "success":
-                case "failed":
-                    if (observeState.hasChanged) {
-                        return button_undo({ label: LABEL_RESET, onClick })
-                    } else {
-                        return button_disabled({ label: LABEL_RESET })
-                    }
+    function resetButton(): VNode {
+        return h(ResetButton, { observeState, onClick })
 
-                case "try":
-                case "take-longtime":
-                    return EMPTY_CONTENT
-            }
-
-            function onClick(e: Event) {
-                e.preventDefault()
-                props.change.reset(props.user.resetTokenDestination)
-            }
+        function onClick(e: Event) {
+            e.preventDefault()
+            props.change.reset(props.user.resetTokenDestination)
         }
+    }
 
-        function closeButton(): VNode {
-            return button_undo({ label: "閉じる", onClick })
+    function closeButton(): VNode {
+        return h(CloseButton, { onClick })
 
-            function onClick(e: Event) {
-                e.preventDefault()
-                props.editable.close()
-            }
+        function onClick(e: Event) {
+            e.preventDefault()
+            props.editable.close()
         }
+    }
 
-        function message(): readonly VNode[] {
-            switch (state.type) {
-                case "initial":
-                case "success":
-                    if (validateState === "invalid") {
-                        return [fieldError(["正しく入力されていません"])]
-                    }
-                    return []
+    function message(): readonly VNode[] {
+        switch (state.type) {
+            case "initial":
+            case "success":
+                if (validateState === "invalid") {
+                    return [fieldError(["正しく入力されていません"])]
+                }
+                return []
 
-                case "try":
-                    return []
+            case "try":
+                return []
 
-                case "take-longtime":
-                    return [
-                        fieldError([
-                            html`${icon_spinner} 基本情報変更中です`,
-                            html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
-                        ]),
-                    ]
+            case "take-longtime":
+                return [
+                    fieldError([
+                        html`${iconHtml(icon_spinner)} 変更に時間がかかっています`,
+                        html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
+                    ]),
+                ]
 
-                case "failed":
-                    return [fieldError(modifyError(state.err))]
-            }
+            case "failed":
+                return [fieldError(modifyError(state.err))]
         }
     }
 }
@@ -189,8 +160,3 @@ function modifyError(err: ChangeResetTokenDestinationError): readonly VNodeConte
             ])
     }
 }
-
-const LABEL_CHANGE = buttonLabel("変更", icon_save)
-const LABEL_RESET = "変更前に戻す"
-
-const EMPTY_CONTENT = html``

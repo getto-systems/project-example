@@ -3,7 +3,7 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 import {
-    MultipleInputBoardAction,
+    InputBoardAction,
     initMultipleInputBoardAction,
 } from "../../../../z_vendor/getto-application/board/input/action"
 
@@ -17,7 +17,7 @@ import { SearchColumns } from "./data"
 import { RepositoryError } from "../../repository/data"
 
 export interface SearchColumnsAction extends StatefulApplicationAction<SearchColumnsState> {
-    readonly input: MultipleInputBoardAction
+    readonly input: InputBoardAction<MultipleBoardValueStore>
 
     set(columns: readonly string[]): Promise<SearchColumnsState>
 }
@@ -43,7 +43,7 @@ class Action
 {
     readonly initialState = initialState
 
-    readonly input: MultipleInputBoardAction
+    readonly input: InputBoardAction<MultipleBoardValueStore>
 
     infra: SearchColumnsInfra
     store: MultipleBoardValueStore

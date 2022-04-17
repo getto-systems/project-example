@@ -3,22 +3,19 @@ import { html } from "htm/preact"
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import {
-    buttons,
-    button_disabled,
-    button_send,
-    button_undo,
-    fieldError,
-    form,
-} from "../../../../../z_vendor/getto-css/preact/design/form"
+import { buttons, fieldError, form } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 
 import { iconHtml } from "../../../../../core/x_preact/design/icon"
-import { icon_save, icon_spinner } from "../../../../../x_content/icon"
+import { icon_spinner } from "../../../../../x_content/icon"
 
 import { changePasswordError } from "./helper"
 import { InputPassword } from "../../input/x_preact/input"
+import { ClearChangesButton } from "../../../../../core/x_preact/button/clear_changes_button"
+import { CloseButton } from "../../../../../core/x_preact/button/close_button"
+import { ChangeButton } from "../../../../../core/x_preact/button/change_button"
+import { EditButton } from "../../../../../core/x_preact/button/edit_button"
 
 import { ChangePasswordAction } from "../action"
 import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
@@ -31,6 +28,7 @@ export function ChangePassword(props: Props): VNode {
     const state = useApplicationAction(props.change)
     const editableState = useApplicationAction(props.editable)
     const validateState = useApplicationAction(props.change.validate)
+    const observeState = useApplicationAction(props.change.observe)
 
     const content = {
         title: "パスワード",
@@ -40,7 +38,7 @@ export function ChangePassword(props: Props): VNode {
         return form(
             box({
                 ...content,
-                body: openButton(),
+                body: editButton(),
                 footer:
                     state.type === "success"
                         ? notice_success(["パスワードを変更しました"])
@@ -79,8 +77,8 @@ export function ChangePassword(props: Props): VNode {
         }),
     )
 
-    function openButton(): VNode {
-        return button_send({ state: "normal", label: "変更", onClick })
+    function editButton(): VNode {
+        return h(EditButton, { isSuccess: state.type === "success", onClick })
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -90,26 +88,11 @@ export function ChangePassword(props: Props): VNode {
     }
 
     function submitButton(): VNode {
-        switch (state.type) {
-            case "initial":
-            case "success":
-            case "failed":
-                switch (validateState) {
-                    case "initial":
-                        return button_send({ state: "normal", label: LABEL_STATIC, onClick })
-
-                    case "valid":
-                        return button_send({ state: "confirm", label: LABEL_STATIC, onClick })
-
-                    case "invalid":
-                        return button_disabled({ label: LABEL_STATIC })
-                }
-                break
-
-            case "try":
-            case "take-longtime":
-                return button_send({ state: "connect", label: LABEL_CONNECT })
-        }
+        return h(ChangeButton, {
+            isConnecting: state.type === "try" || state.type === "take-longtime",
+            validateState,
+            onClick,
+        })
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -123,24 +106,7 @@ export function ChangePassword(props: Props): VNode {
     }
 
     function clearButton(): VNode {
-        switch (state.type) {
-            case "initial":
-            case "success":
-            case "failed":
-                switch (validateState) {
-                    case "initial":
-                        return button_disabled({ label: LABEL_CLEAR })
-
-                    case "invalid":
-                    case "valid":
-                        return button_undo({ label: LABEL_CLEAR, onClick })
-                }
-                break
-
-            case "try":
-            case "take-longtime":
-                return EMPTY_CONTENT
-        }
+        return h(ClearChangesButton, { observeState, onClick })
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -149,7 +115,7 @@ export function ChangePassword(props: Props): VNode {
     }
 
     function closeButton(): VNode {
-        return button_undo({ label: "閉じる", onClick })
+        return h(CloseButton, { onClick })
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -178,7 +144,7 @@ export function ChangePassword(props: Props): VNode {
             case "take-longtime":
                 return [
                     fieldError([
-                        html`${icon_spinner} パスワード変更中です`,
+                        html`${iconHtml(icon_spinner)} 変更に時間がかかっています`,
                         html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
                     ]),
                 ]
@@ -188,9 +154,3 @@ export function ChangePassword(props: Props): VNode {
         }
     }
 }
-
-const LABEL_STATIC = html`変更 ${iconHtml(icon_save)}`
-const LABEL_CONNECT = html`変更 ${iconHtml(icon_spinner)}`
-const LABEL_CLEAR = "入力内容をクリア"
-
-const EMPTY_CONTENT = html``

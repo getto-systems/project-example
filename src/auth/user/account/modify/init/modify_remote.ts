@@ -15,7 +15,7 @@ import { ModifyAuthUserAccountRemoteResult, ModifyAuthUserAccountRemote } from "
 
 import { ModifyAuthUserAccountFields, ModifyAuthUserAccountRemoteError } from "../data"
 import { LoginId } from "../../../login_id/kernel/data"
-import { GrantedAuthRole } from "../../../kernel/data"
+import { AuthRole } from "../../../kernel/data"
 
 export function newModifyAuthUserAccountRemote(
     feature: RemoteOutsideFeature,
@@ -25,7 +25,7 @@ export function newModifyAuthUserAccountRemote(
 
 async function fetchRemote(
     feature: RemoteOutsideFeature,
-    user: Readonly<{ loginId: LoginId; grantedRoles: readonly GrantedAuthRole[] }>,
+    user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>,
     fields: ModifyAuthUserAccountFields,
 ): Promise<ModifyAuthUserAccountRemoteResult> {
     const mock = true

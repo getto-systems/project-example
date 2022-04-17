@@ -11,7 +11,7 @@ import { ModifyAuthUserAccountRemote } from "./infra"
 import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
 import { LoginId } from "../../login_id/kernel/data"
-import { GrantedAuthRole } from "../../kernel/data"
+import { AuthRole } from "../../kernel/data"
 
 const VALID_INFO = {
     grantedRoles: ["user"],
@@ -24,8 +24,6 @@ test("submit valid info", async () => {
 
     await runner(async () => {
         store.grantedRoles.set(VALID_INFO.grantedRoles.map(markBoardValue))
-
-        resource.modify.grantedRoles.grantedRoles.publisher.post()
 
         return resource.modify.submit(user)
     }).then((stack) => {
@@ -44,8 +42,6 @@ test("submit valid login-id; take long time", async () => {
 
     await runner(() => {
         store.grantedRoles.set(VALID_INFO.grantedRoles.map(markBoardValue))
-
-        resource.modify.grantedRoles.grantedRoles.publisher.post()
 
         return resource.modify.submit(user)
     }).then((stack) => {
@@ -101,7 +97,7 @@ function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
     store: Readonly<{
         grantedRoles: MultipleBoardValueStore
     }>
-    user: Readonly<{ loginId: LoginId; grantedRoles: readonly GrantedAuthRole[] }>
+    user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>
 }> {
     const resource = {
         modify: initModifyAuthUserAccountAction({
@@ -115,10 +111,8 @@ function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
     }
 
     const store = {
-        grantedRoles: mockMultipleBoardValueStore(),
+        grantedRoles: mockMultipleBoardValueStore(resource.modify.grantedRoles.grantedRoles),
     }
-
-    resource.modify.grantedRoles.grantedRoles.connector.connect(store.grantedRoles)
 
     return {
         resource,

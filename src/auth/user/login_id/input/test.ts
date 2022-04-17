@@ -12,7 +12,6 @@ test("validate; valid input", async () => {
 
     await runner(async () => {
         store.set(markBoardValue("valid"))
-        action.input.publisher.post()
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: true }])
@@ -26,7 +25,6 @@ test("validate; invalid : empty", async () => {
 
     await runner(async () => {
         store.set(markBoardValue(""))
-        action.input.publisher.post()
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: false, err: [{ type: "empty" }] }])
@@ -40,7 +38,6 @@ test("validate; invalid : too-long", async () => {
 
     await runner(async () => {
         store.set(markBoardValue("a".repeat(100 + 1)))
-        action.input.publisher.post()
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: false, err: [{ type: "too-long", maxLength: 100 }] }])
@@ -54,7 +51,6 @@ test("validate; valid : just max-length", async () => {
 
     await runner(async () => {
         store.set(markBoardValue("a".repeat(100)))
-        action.input.publisher.post()
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: true }])
@@ -92,8 +88,7 @@ test("terminate", async () => {
 
 function standard() {
     const { input: action } = initInputLoginIdAction()
-    const store = mockBoardValueStore()
-    action.input.connector.connect(store)
+    const store = mockBoardValueStore(action.input)
 
     return { action, store }
 }

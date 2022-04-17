@@ -1,9 +1,10 @@
 import { setupActionTestRunner } from "../../action/test_helper"
 
-import { mockBoardValueStore } from "./test_helper"
 import { markBoardValue } from "../kernel/test_helper"
 
 import { initInputBoardAction } from "./action"
+import { BoardValueStore } from "./infra"
+import { BoardValue, emptyBoardValue } from "../kernel/data"
 
 test("get / set; store connected", async () => {
     const { source_store, input, store, subscriber } = standard()
@@ -68,5 +69,15 @@ test("terminate", async () => {
 })
 
 function standard() {
-    return { source_store: mockBoardValueStore(), ...initInputBoardAction() }
+    return { source_store: boardValueStore(), ...initInputBoardAction() }
+}
+
+function boardValueStore(): BoardValueStore {
+    let storedValue: BoardValue = emptyBoardValue
+    return {
+        get: () => storedValue,
+        set: (value) => {
+            storedValue = value
+        },
+    }
 }

@@ -1,7 +1,7 @@
 import { ApplicationAction } from "../../../../z_vendor/getto-application/action/action"
 import {
     initMultipleInputBoardAction,
-    MultipleInputBoardAction,
+    InputBoardAction,
 } from "../../../../z_vendor/getto-application/board/input/action"
 import {
     initObserveBoardFieldAction,
@@ -15,18 +15,18 @@ import { isSameMultipleBoardValue } from "../../../../z_vendor/getto-application
 
 import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
-import { GrantedAuthRole } from "../../kernel/data"
+import { AuthRole } from "../../kernel/data"
 
 export interface InputGrantedRolesAction extends ApplicationAction {
-    readonly grantedRoles: MultipleInputBoardAction
+    readonly grantedRoles: InputBoardAction<MultipleBoardValueStore>
     readonly observe: ObserveBoardFieldAction
 
-    reset(grantedRoles: readonly GrantedAuthRole[]): void
+    reset(grantedRoles: readonly AuthRole[]): void
 }
 
 export function initInputGrantedRolesAction(): Readonly<{
     input: InputGrantedRolesAction
-    convert: { (): readonly GrantedAuthRole[] }
+    convert: { (): readonly AuthRole[] }
 }> {
     const input = new GrantedRolesAction()
     return {
@@ -36,7 +36,7 @@ export function initInputGrantedRolesAction(): Readonly<{
 }
 
 class GrantedRolesAction implements InputGrantedRolesAction {
-    readonly grantedRoles: MultipleInputBoardAction
+    readonly grantedRoles: InputBoardAction<MultipleBoardValueStore>
     readonly observe: ObserveBoardFieldAction
 
     readonly store: Readonly<{
@@ -71,7 +71,7 @@ class GrantedRolesAction implements InputGrantedRolesAction {
         }
     }
 
-    reset(grantedRoles: readonly GrantedAuthRole[]): void {
+    reset(grantedRoles: readonly AuthRole[]): void {
         this.store.grantedRoles.set(grantedRoles.map(toBoardValue))
     }
 }

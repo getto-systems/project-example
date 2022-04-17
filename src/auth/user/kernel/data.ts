@@ -1,3 +1,3 @@
 import { allAuthRoles } from "../../../x_content/role"
 
-export type GrantedAuthRole = typeof allAuthRoles[number]
+export type AuthRole = typeof allAuthRoles[number]

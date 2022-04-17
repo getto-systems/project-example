@@ -11,6 +11,7 @@ import { loginBox } from "../../../../z_vendor/getto-css/preact/layout/login"
 import { siteInfo } from "../../../../x_content/site"
 import { icon_spinner } from "../../../../x_content/icon"
 import { applicationPath } from "../../find_next/helper"
+import { iconHtml } from "../../../../core/x_preact/design/icon"
 
 import { ApplicationError } from "../../../x_preact/application_error"
 
@@ -45,13 +46,15 @@ export function MoveToLatestVersion(view: ApplicationView<FindNextVersionAction>
 
     switch (state.type) {
         case "initial":
-            return EMPTY_CONTENT
+            return html``
 
         case "take-longtime":
             return loginBox(siteInfo, {
                 title: "アプリケーション読み込み中",
                 body: [
-                    html`<p>${icon_spinner} アプリケーションの読み込みに時間がかかっています</p>`,
+                    html`<p>
+                        ${iconHtml(icon_spinner)} アプリケーションの読み込みに時間がかかっています
+                    </p>`,
                     html`<p>
                         30秒以上かかるようであれば何かがおかしいので、<br />
                         お手数ですが、管理者にお伝えください
@@ -62,7 +65,7 @@ export function MoveToLatestVersion(view: ApplicationView<FindNextVersionAction>
 
         case "success":
             // location の変更は useLayoutEffect で行うので中身は空
-            return EMPTY_CONTENT
+            return html``
 
         case "failed":
             return h(ApplicationError, { err: errorMessage(state.err) })
@@ -78,5 +81,3 @@ function errorMessage(err: CheckDeployExistsError): string {
             return `ネットワークエラーが発生しました: ${err.err}`
     }
 }
-
-const EMPTY_CONTENT = html``

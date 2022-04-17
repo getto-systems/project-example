@@ -2,20 +2,14 @@ import { h, VNode } from "preact"
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import {
-    buttons,
-    button_search,
-    button_undo,
-} from "../../../../../z_vendor/getto-css/preact/design/form"
+import { buttons } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box_grow } from "../../../../../z_vendor/getto-css/preact/design/box"
 
 import { SearchLoginId } from "../../../login_id/input/x_preact/search"
+import { SearchButton } from "../../../../../core/x_preact/button/search_button"
+import { ClearSearchButton } from "../../../../../core/x_preact/button/clear_search_button"
 
 import { SearchAuthUserAccountAction } from "../action"
-import {
-    SEARCH_BUTTON_CONNECT,
-    SEARCH_BUTTON_STATIC,
-} from "../../../../../core/x_preact/design/table"
 
 type Props = Readonly<{
     search: SearchAuthUserAccountAction
@@ -34,22 +28,11 @@ export function SearchAuthUserAccountForm(props: Props): VNode {
     })
 
     function searchButton(): VNode {
-        if (observeState.hasChanged) {
-            return button_search({ state: "confirm", label: SEARCH_BUTTON_STATIC, onClick })
-        }
-
-        switch (state.type) {
-            case "initial":
-            case "success":
-                return button_search({ state: "normal", label: SEARCH_BUTTON_STATIC, onClick })
-
-            case "try":
-            case "take-longtime":
-                return button_search({ state: "connect", label: SEARCH_BUTTON_CONNECT })
-
-            case "failed":
-                return button_search({ state: "confirm", label: SEARCH_BUTTON_STATIC, onClick })
-        }
+        return h(SearchButton, {
+            isConnecting: state.type === "try" || state.type === "take-longtime",
+            observeState,
+            onClick,
+        })
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -58,9 +41,7 @@ export function SearchAuthUserAccountForm(props: Props): VNode {
     }
 
     function clearButton(): VNode {
-        const label = "検索項目をクリア"
-
-        return button_undo({ label, onClick })
+        return h(ClearSearchButton, { onClick })
 
         function onClick(e: Event) {
             e.preventDefault()

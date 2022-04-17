@@ -119,7 +119,7 @@ export function LoadMenu(props: Props): VNode {
 
 function badge(badgeCount: number) {
     if (badgeCount === 0) {
-        return EMPTY_CONTENT
+        return html``
     }
 
     return badge_alert(html`${badgeCount}`)
@@ -146,5 +146,3 @@ function errorDetail(err: string): readonly VNode[] {
     }
     return [html`<small><p>詳細: ${err}</p></small>`]
 }
-
-const EMPTY_CONTENT = html``

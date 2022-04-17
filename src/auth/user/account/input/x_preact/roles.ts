@@ -18,11 +18,12 @@ import { EditableBoardAction } from "../../../../../z_vendor/getto-application/b
 
 import { toBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/convert"
 
-import { GrantedAuthRole } from "../../../kernel/data"
+import { AuthRole } from "../../../kernel/data"
 import { LoginId } from "../../../login_id/kernel/data"
+import { authRoleLabel } from "../../../../../x_content/role"
 
 type Props = Readonly<{
-    user: Readonly<{ loginId: LoginId; grantedRoles: readonly GrantedAuthRole[] }>
+    user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>
     editable: EditableBoardAction
     field: InputGrantedRolesAction
 }> &
@@ -31,7 +32,7 @@ type Props = Readonly<{
         help: readonly VNodeContent[]
     }>
 
-export function InputGrantedRoles(props: Props): VNode {
+export function InputAuthRoles(props: Props): VNode {
     const editableState = useApplicationAction(props.editable)
 
     return field({
@@ -42,35 +43,28 @@ export function InputGrantedRoles(props: Props): VNode {
 
     function body(): VNodeContent {
         if (!editableState.isEditable) {
-            return h(GrantedRoleLabels, { ...props.user })
+            return h(AuthRoleLabels, { ...props.user })
         }
         return h(CheckboxBoard, {
             input: props.field.grantedRoles,
-            options: [grantedRoleCheckbox("user")],
+            options: [roleCheckbox("user")],
         })
     }
 
-    function grantedRoleCheckbox(grantedRole: GrantedAuthRole): CheckboxBoardContent {
+    function roleCheckbox(role: AuthRole): CheckboxBoardContent {
         return {
-            key: grantedRole,
-            value: toBoardValue(grantedRole),
-            label: grantedRoleLabel(grantedRole),
+            key: role,
+            value: toBoardValue(role),
+            label: authRoleLabel(role),
         }
     }
 }
 
-export function GrantedRoleLabels({
+export function AuthRoleLabels({
     grantedRoles,
-}: Readonly<{ grantedRoles: readonly GrantedAuthRole[] }>): VNode {
+}: Readonly<{ grantedRoles: readonly AuthRole[] }>): VNode {
     if (grantedRoles.length === 0) {
         return label_gray("権限なし")
     }
-    return html`${grantedRoles.map((grantedRole) => label_info(grantedRoleLabel(grantedRole)))}`
-}
-export function grantedRoleLabel(grantedRole: GrantedAuthRole): VNodeContent {
-    switch (grantedRole) {
-        case "user":
-            // TODO これはメニューと一緒にしたい
-            return "ユーザー管理"
-    }
+    return html`${grantedRoles.map((grantedRole) => label_info(authRoleLabel(grantedRole)))}`
 }

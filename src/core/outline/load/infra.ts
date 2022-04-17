@@ -5,7 +5,7 @@ import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
 import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 import { MenuCategoryPath, MenuTargetPath } from "./data"
 import { Icon } from "../../../z_lib/ui/icon/data"
-import { GrantedAuthRole } from "../../../auth/user/kernel/data"
+import { AuthRole } from "../../../auth/user/kernel/data"
 
 export interface MenuTargetPathDetecter {
     (): ConvertLocationResult<MenuTargetPath>
@@ -39,7 +39,7 @@ export type MenuPermission =
     | Readonly<{ type: "allow" }>
     | Readonly<{ type: "any"; permits: readonly MenuPermission[] }>
     | Readonly<{ type: "all"; permits: readonly MenuPermission[] }>
-    | Readonly<{ type: "role"; role: GrantedAuthRole }>
+    | Readonly<{ type: "role"; role: AuthRole }>
 
 export type MenuBadge = Map<string, number>
 export type MenuBadgeItem = Readonly<{ path: string; count: number }>

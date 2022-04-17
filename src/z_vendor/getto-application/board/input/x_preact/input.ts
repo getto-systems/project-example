@@ -6,7 +6,7 @@ import { readBoardValue } from "../../kernel/convert"
 
 import { InputBoardAction } from "../action"
 
-import { BoardValueStoreConnector } from "../infra"
+import { BoardValueStore, BoardValueStoreConnector } from "../infra"
 
 import { emptyBoardValue } from "../../kernel/data"
 
@@ -24,7 +24,7 @@ export type InputType = typeof inputTypes[number]
 
 type Props = Readonly<{
     type: InputType
-    input: InputBoardAction
+    input: InputBoardAction<BoardValueStore>
 }> &
     Partial<{
         autocomplete: string
@@ -42,7 +42,7 @@ export function InputBoard({ type, input, autocomplete }: Props): VNode {
     }
 }
 
-function useInputRef(connector: BoardValueStoreConnector) {
+function useInputRef(connector: BoardValueStoreConnector<BoardValueStore>) {
     const REF = useRef<HTMLInputElement>()
 
     useLayoutEffect(() => {

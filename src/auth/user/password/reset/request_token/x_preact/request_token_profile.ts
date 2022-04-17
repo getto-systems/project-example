@@ -5,21 +5,19 @@ import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
 import { useApplicationAction } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import {
-    buttons,
-    button_disabled,
-    button_send,
-    button_undo,
-    fieldError,
-    form,
-} from "../../../../../../z_vendor/getto-css/preact/design/form"
-import { icon_spinner } from "../../../../../../x_content/icon"
+import { buttons, fieldError, form } from "../../../../../../z_vendor/getto-css/preact/design/form"
+import { icon_change, icon_spinner } from "../../../../../../x_content/icon"
 import { box } from "../../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../../z_vendor/getto-css/preact/design/highlight"
+import { iconHtml } from "../../../../../../core/x_preact/design/icon"
 
 import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_error/reason"
 
 import { InputLoginId } from "../../../../login_id/input/x_preact/input"
+import { EditButton } from "../../../../../../core/x_preact/button/edit_button"
+import { SendButton } from "../../../../../../core/x_preact/button/send_button"
+import { ClearChangesButton } from "../../../../../../core/x_preact/button/clear_changes_button"
+import { CloseButton } from "../../../../../../core/x_preact/button/close_button"
 
 import { RequestResetTokenAction } from "../action"
 import { EditableBoardAction } from "../../../../../../z_vendor/getto-application/board/editable/action"
@@ -34,58 +32,54 @@ export function RequestResetTokenProfile(props: Props): VNode {
     const state = useApplicationAction(props.requestToken)
     const editableState = useApplicationAction(props.editable)
     const validateState = useApplicationAction(props.requestToken.validate)
-
-    const content = {
-        title: "パスワードリセット",
-    }
-
-    if (!editableState.isEditable) {
-        return form(
-            box({
-                ...content,
-                body: openButton(),
-                footer:
-                    state.type === "success"
-                        ? [
-                              notice_success([
-                                  html`パスワードリセットのための<br />
-                                      トークンをメールで送信しました`,
-                              ]),
-                              html`<p>
-                                  メールからパスワードリセットできます<br />
-                                  メールを確認してください
-                              </p>`,
-                          ]
-                        : undefined,
-            }),
-        )
-    }
+    const observeState = useApplicationAction(props.requestToken.observe)
 
     return form(
         box({
-            ...content,
-            body: [
-                h(InputLoginId, {
-                    field: props.requestToken.loginId,
-                    title: "ログインID",
-                    help: ["確認のため、ログインIDを入力します"],
-                }),
-            ],
-            footer: [
-                buttons({
-                    left: submitButton(),
-                    right: clearButton(),
-                }),
-                ...message(),
-                buttons({
-                    right: closeButton(),
-                }),
-            ],
+            title: "パスワードリセット",
+            ...(editableState.isEditable
+                ? {
+                      body: h(InputLoginId, {
+                          field: props.requestToken.loginId,
+                          title: "ログインID",
+                          help: ["確認のため、ログインIDを入力します"],
+                      }),
+                      footer: [
+                          buttons({
+                              left: submitButton(),
+                              right: clearButton(),
+                          }),
+                          ...message(),
+                          buttons({
+                              right: closeButton(),
+                          }),
+                      ],
+                  }
+                : {
+                      body: editButton(),
+                      footer:
+                          state.type === "success"
+                              ? [
+                                    notice_success([
+                                        html`パスワードリセットのための<br />
+                                            トークンをメールで送信しました`,
+                                    ]),
+                                    html`<p>
+                                        メールからパスワードリセットできます<br />
+                                        メールを確認してください
+                                    </p>`,
+                                ]
+                              : undefined,
+                  }),
         }),
     )
 
-    function openButton(): VNode {
-        return button_send({ state: "normal", label: "トークン送信", onClick })
+    function editButton(): VNode {
+        return h(EditButton, {
+            label: "トークン送信",
+            isSuccess: state.type === "success",
+            onClick,
+        })
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -95,31 +89,13 @@ export function RequestResetTokenProfile(props: Props): VNode {
     }
 
     function submitButton(): VNode {
-        const label = "トークン送信"
-
-        switch (state.type) {
-            case "initial":
-            case "success":
-            case "failed":
-                switch (validateState) {
-                    case "initial":
-                        return button_send({ state: "normal", label, onClick })
-
-                    case "valid":
-                        return button_send({ state: "confirm", label, onClick })
-
-                    case "invalid":
-                        return button_disabled({ label })
-                }
-                break
-
-            case "try":
-            case "take-longtime":
-                return button_send({
-                    state: "connect",
-                    label: html`リセットトークン送信中 ${icon_spinner}`,
-                })
-        }
+        return h(SendButton, {
+            label: "トークン送信",
+            icon: icon_change,
+            isConnecting: state.type === "try" || state.type === "take-longtime",
+            validateState,
+            onClick,
+        })
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -130,25 +106,7 @@ export function RequestResetTokenProfile(props: Props): VNode {
     }
 
     function clearButton(): VNode {
-        const label = "入力内容をクリア"
-        switch (state.type) {
-            case "initial":
-            case "success":
-            case "failed":
-                switch (validateState) {
-                    case "initial":
-                        return button_disabled({ label })
-
-                    case "invalid":
-                    case "valid":
-                        return button_undo({ label, onClick })
-                }
-                break
-
-            case "try":
-            case "take-longtime":
-                return EMPTY_CONTENT
-        }
+        return h(ClearChangesButton, { observeState, onClick })
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -156,7 +114,7 @@ export function RequestResetTokenProfile(props: Props): VNode {
         }
     }
     function closeButton(): VNode {
-        return button_undo({ label: "閉じる", onClick })
+        return h(CloseButton, { onClick })
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -185,7 +143,7 @@ export function RequestResetTokenProfile(props: Props): VNode {
             case "take-longtime":
                 return [
                     fieldError([
-                        html`${icon_spinner} リセットトークン送信中です`,
+                        html`${iconHtml(icon_spinner)} リセットトークン送信に時間がかかっています`,
                         html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
                     ]),
                 ]
@@ -211,5 +169,3 @@ function requestTokenError(err: RequestResetTokenError): readonly VNodeContent[]
             ])
     }
 }
-
-const EMPTY_CONTENT = html``

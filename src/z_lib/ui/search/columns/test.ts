@@ -20,9 +20,7 @@ test("select columns", async () => {
         await resource.field.ignitionState
         await resource.field.set(["column-initial"])
         store.columns.set([markBoardValue("column-a")])
-        resource.field.input.publisher.post()
         store.columns.set([markBoardValue("column-a"), markBoardValue("column-b")])
-        resource.field.input.publisher.post()
         return resource.field.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
@@ -71,10 +69,8 @@ function initResource(): Readonly<{
     }
 
     const store = {
-        columns: mockMultipleBoardValueStore(),
+        columns: mockMultipleBoardValueStore(resource.field.input),
     }
-
-    resource.field.input.connector.connect(store.columns)
 
     return { resource, store }
 }

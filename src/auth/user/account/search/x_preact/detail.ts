@@ -3,14 +3,12 @@ import { html } from "htm/preact"
 
 import { box_grow, container } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_gray } from "../../../../../z_vendor/getto-css/preact/design/highlight"
-import { button_cancel } from "../../../../../z_vendor/getto-css/preact/design/form"
-
-import { BACK_TO_LIST_BUTTON } from "../../../../../core/x_preact/design/table"
 
 import { ModifyAuthUserAccount } from "../../modify/x_preact/modify"
 import { OverrideLoginId } from "../../../login_id/change/x_preact/override_login_id"
 import { OverridePassword } from "../../../password/change/x_preact/override_password"
 import { ChangeResetTokenDestination } from "../../../password/reset/token_destination/change/x_preact/change"
+import { BackToListButton } from "../../../../../core/x_preact/button/back_to_list_button"
 
 import { DetailAuthUserAccountAction } from "../action"
 import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
@@ -42,7 +40,7 @@ type Props = Readonly<{
     user: Readonly<{ found: false }> | Readonly<{ found: true; user: AuthUserAccount }>
 }>
 export function DetailAuthUserAccount(props: Props): VNode {
-    return html`${[container([h(CloseButton, props)]), content()]}`
+    return html`${[container([box_grow({ body: backToListButton() })]), content()]}`
 
     function content(): VNode {
         if (!props.user.found) {
@@ -78,13 +76,12 @@ export function DetailAuthUserAccount(props: Props): VNode {
             h(OverridePassword, { ...props.overridePassword, user }),
         ])
     }
-}
 
-type CloseButtonProps = Props
-function CloseButton(props: CloseButtonProps): VNode {
-    return box_grow({ body: button_cancel({ label: BACK_TO_LIST_BUTTON, onClick }) })
+    function backToListButton(): VNode {
+        return h(BackToListButton, { onClick })
 
-    function onClick() {
-        props.detail.close()
+        function onClick() {
+            props.detail.close()
+        }
     }
 }

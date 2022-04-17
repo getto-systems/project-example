@@ -116,10 +116,8 @@ function initResource(overrideLoginIdRemote: OverrideLoginIdRemote): Readonly<{
     }
 
     const store = {
-        newLoginId: mockBoardValueStore(),
+        newLoginId: mockBoardValueStore(resource.override.newLoginId.input),
     }
-
-    resource.override.newLoginId.input.connector.connect(store.newLoginId)
 
     return {
         resource,

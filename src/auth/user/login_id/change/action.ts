@@ -10,6 +10,10 @@ import {
     ValidateBoardAction,
     initValidateBoardAction,
 } from "../../../../z_vendor/getto-application/board/validate_board/action"
+import {
+    initObserveBoardAction,
+    ObserveBoardAction,
+} from "../../../../z_vendor/getto-application/board/observe_board/action"
 
 import { ChangeLoginIdError, OverrideLoginIdFields } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
@@ -23,14 +27,13 @@ import { LoginId } from "../kernel/data"
 export interface OverrideLoginIdAction extends StatefulApplicationAction<OverrideLoginIdState> {
     readonly newLoginId: InputLoginIdAction
     readonly validate: ValidateBoardAction
+    readonly observe: ObserveBoardAction
 
     clear(): OverrideLoginIdState
     submit(user: Readonly<{ loginId: LoginId }>): Promise<OverrideLoginIdState>
 }
 
-export type OverrideLoginIdState =
-    | Readonly<{ type: "initial" }>
-    | OverrideLoginIdEvent
+export type OverrideLoginIdState = Readonly<{ type: "initial" }> | OverrideLoginIdEvent
 
 const initialOverrideState: OverrideLoginIdState = { type: "initial" }
 
@@ -61,6 +64,7 @@ class OverrideAction
 
     readonly newLoginId: InputLoginIdAction
     readonly validate: ValidateBoardAction
+    readonly observe: ObserveBoardAction
 
     material: OverrideLoginIdMaterial
     convert: BoardConverter<OverrideLoginIdFields>
@@ -70,6 +74,7 @@ class OverrideAction
             terminate: () => {
                 this.newLoginId.terminate()
                 this.validate.terminate()
+                this.observe.terminate()
             },
         })
         this.material = material
@@ -96,14 +101,19 @@ class OverrideAction
                 },
             },
         )
+        const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         this.newLoginId = newLoginId.input
         this.validate = validate
+        this.observe = observe
         this.convert = () => validateChecker.get()
 
         this.newLoginId.validate.subscriber.subscribe((result) =>
             validateChecker.update("newLoginId", result.valid),
         )
+        this.newLoginId.observe.subscriber.subscribe((result) => {
+            observeChecker.update("newLoginId", result.hasChanged)
+        })
     }
 
     clear(): OverrideLoginIdState {

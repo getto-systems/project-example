@@ -31,7 +31,7 @@ export function SetupSeason(props: Props): VNode {
     switch (loadState.type) {
         case "initial":
         case "failed":
-            return EMPTY_CONTENT
+            return html``
 
         case "success":
             switch (state.type) {
@@ -89,8 +89,6 @@ export function SetupSeason(props: Props): VNode {
         }
     }
 }
-
-const EMPTY_CONTENT = html``
 
 function repositoryError(err: RepositoryError): readonly string[] {
     return repositoryErrorReason(err, (reason) => [

@@ -12,7 +12,6 @@ test("observe; has changed", async () => {
 
     await runner(async () => {
         store.grantedRoles.set(["user"].map(markBoardValue))
-        action.grantedRoles.publisher.post()
         return action.observe.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ hasChanged: true }])
@@ -31,7 +30,6 @@ test("terminate", async () => {
 
     await runner(async () => {
         action.terminate()
-        action.grantedRoles.publisher.post()
         return action.observe.currentState()
     }).then((stack) => {
         // no input/validate event after terminate
@@ -42,9 +40,8 @@ test("terminate", async () => {
 function standard() {
     const { input: action } = initInputGrantedRolesAction()
     const store = {
-        grantedRoles: mockMultipleBoardValueStore(),
+        grantedRoles: mockMultipleBoardValueStore(action.grantedRoles),
     }
-    action.grantedRoles.connector.connect(store.grantedRoles)
 
     return { action, store }
 }

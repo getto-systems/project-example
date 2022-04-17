@@ -494,7 +494,7 @@ export function tableColumn(content: TableColumnContent): readonly VNode[] {
                     return column.content
 
                 case "empty":
-                    return EMPTY_CONTENT
+                    return html``
             }
         }
     }
@@ -735,7 +735,7 @@ function summaryContent(summary: TableDataSummary): VNodeContent {
     switch (summary.type) {
         case "empty":
         case "empty-expansion":
-            return EMPTY_CONTENT
+            return html``
 
         case "simple":
         case "expansion":
@@ -872,5 +872,3 @@ function borderWidthToClass(borderWidth: number): string {
     }
     return `_${borderWidth}`
 }
-
-const EMPTY_CONTENT = html``

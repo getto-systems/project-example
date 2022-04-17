@@ -2,12 +2,12 @@ import { VNode } from "preact"
 import { useLayoutEffect, useRef } from "preact/hooks"
 import { html } from "htm/preact"
 
-import { SelectFileAction } from "../action"
+import { InputBoardAction } from "../action"
 
-import { FileStoreConnector } from "../infra"
+import { BoardValueStoreConnector, FileStore } from "../infra"
 
 type Props = Readonly<{
-    file: SelectFileAction
+    file: InputBoardAction<FileStore>
 }> &
     Partial<{
         disabled: boolean
@@ -25,7 +25,7 @@ export function SelectFile({ file, disabled }: Props): VNode {
     }
 }
 
-function useFileRef(connector: FileStoreConnector) {
+function useFileRef(connector: BoardValueStoreConnector<FileStore>) {
     const REF = useRef<HTMLInputElement>()
 
     useLayoutEffect(() => {

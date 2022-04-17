@@ -11,8 +11,8 @@ import {
     thead,
 } from "../../../../../z_vendor/getto-css/preact/design/table"
 import {
-    EMPTY_TABLE,
-    TAKE_LONGTIME_TO_SEARCH_TABLE,
+    emptyTable,
+    takeLongtimeTable,
 } from "../../../../../core/x_preact/design/table"
 
 import { searchColumns } from "../../../../../z_lib/ui/search/columns/x_preact/helper"
@@ -30,16 +30,16 @@ export function SearchAuthUserAccountTable(props: Props): VNode {
     const columnsState = useApplicationAction(props.list.columns)
 
     if (state.type === "take-longtime") {
-        return TAKE_LONGTIME_TO_SEARCH_TABLE
+        return takeLongtimeTable()
     }
 
     const result = props.list.searchResponse(state)
     const columns = searchColumns(columnsState)
     if (!columns.found || !result.response) {
-        return EMPTY_CONTENT
+        return html``
     }
     if (result.response.page.all === 0) {
-        return EMPTY_TABLE
+        return emptyTable()
     }
 
     const params = { summary: {}, visibleKeys: columns.columns }
@@ -54,5 +54,3 @@ export function SearchAuthUserAccountTable(props: Props): VNode {
         ),
     ])
 }
-
-const EMPTY_CONTENT = html``

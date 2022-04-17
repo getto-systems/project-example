@@ -22,7 +22,7 @@ import {
     ObserveBoardAction,
 } from "../../../../z_vendor/getto-application/board/observe_board/action"
 import { BoardConverter } from "../../../../z_vendor/getto-application/board/kernel/infra"
-import { GrantedAuthRole } from "../../kernel/data"
+import { AuthRole } from "../../kernel/data"
 import { LoginId } from "../../login_id/kernel/data"
 
 export interface ModifyAuthUserAccountAction
@@ -31,9 +31,9 @@ export interface ModifyAuthUserAccountAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    reset(user: Readonly<{ grantedRoles: readonly GrantedAuthRole[] }>): ModifyAuthUserAccountState
+    reset(user: Readonly<{ grantedRoles: readonly AuthRole[] }>): ModifyAuthUserAccountState
     submit(
-        user: Readonly<{ loginId: LoginId; grantedRoles: readonly GrantedAuthRole[] }>,
+        user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>,
     ): Promise<ModifyAuthUserAccountState>
 }
 
@@ -114,14 +114,14 @@ class Action
         })
     }
 
-    reset(user: Readonly<{ grantedRoles: readonly GrantedAuthRole[] }>): ModifyAuthUserAccountState {
+    reset(user: Readonly<{ grantedRoles: readonly AuthRole[] }>): ModifyAuthUserAccountState {
         this.grantedRoles.reset(user.grantedRoles)
         this.validate.clear()
         this.observe.clear()
         return this.post(this.initialState)
     }
     async submit(
-        user: Readonly<{ loginId: LoginId; grantedRoles: readonly GrantedAuthRole[] }>,
+        user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>,
     ): Promise<ModifyAuthUserAccountState> {
         return modifyUser(this.material, user, this.convert(), this.post)
     }
@@ -135,7 +135,7 @@ type ModifyUserEvent =
 
 async function modifyUser<S>(
     { infra, config }: ModifyAuthUserAccountMaterial,
-    user: Readonly<{ loginId: LoginId; grantedRoles: readonly GrantedAuthRole[] }>,
+    user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>,
     fields: ConvertBoardResult<ModifyAuthUserAccountFields>,
     post: Post<ModifyUserEvent, S>,
 ): Promise<S> {
