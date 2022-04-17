@@ -45,10 +45,8 @@ function initResource(): Readonly<{
     }
 
     const store = {
-        offset: mockBoardValueStore(),
+        offset: mockBoardValueStore(resource.field.input),
     }
-
-    resource.field.input.connector.connect(store.offset)
 
     return { resource, store, get, reset }
 }

@@ -112,11 +112,8 @@ function initResource(overridePasswordRemote: OverridePasswordRemote): Readonly<
     }
 
     const store = {
-        currentPassword: mockBoardValueStore(),
-        newPassword: mockBoardValueStore(),
+        newPassword: mockBoardValueStore(resource.override.newPassword.input),
     }
-
-    resource.override.newPassword.input.connector.connect(store.newPassword)
 
     return {
         resource,

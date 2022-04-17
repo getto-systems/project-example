@@ -243,11 +243,9 @@ function initView(
     )
 
     const store = {
-        loginId: mockBoardValueStore(),
-        password: mockBoardValueStore(),
+        loginId: mockBoardValueStore(view.resource.loginId.input),
+        password: mockBoardValueStore(view.resource.password.input),
     }
-    view.resource.loginId.input.connector.connect(store.loginId)
-    view.resource.password.input.connector.connect(store.password)
 
     return { view, store }
 }

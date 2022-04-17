@@ -17,8 +17,6 @@ test("validate; valid input", async () => {
     await runner(async () => {
         store.destinationType.set(markBoardValue("email"))
         store.email.set(markBoardValue("user@example.com"))
-        action.destinationType.publisher.post()
-        action.email.publisher.post()
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: true }])
@@ -33,8 +31,6 @@ test("validate; invalid : empty", async () => {
     await runner(async () => {
         store.destinationType.set(markBoardValue("email"))
         store.email.set(markBoardValue(""))
-        action.destinationType.publisher.post()
-        action.email.publisher.post()
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: false, err: [{ type: "empty-email" }] }])
@@ -49,8 +45,6 @@ test("validate; invalid : invalid", async () => {
     await runner(async () => {
         store.destinationType.set(markBoardValue("email"))
         store.email.set(markBoardValue("invalid-email; not includes at-mark"))
-        action.destinationType.publisher.post()
-        action.email.publisher.post()
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: false, err: [{ type: "invalid-email" }] }])
@@ -65,8 +59,6 @@ test("validate; invalid : too-long", async () => {
     await runner(async () => {
         store.destinationType.set(markBoardValue("email"))
         store.email.set(markBoardValue("@".repeat(255 + 1)))
-        action.destinationType.publisher.post()
-        action.email.publisher.post()
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: false, err: [{ type: "too-long-email", maxLength: 255 }] }])
@@ -81,8 +73,6 @@ test("validate; valid : just max-length", async () => {
     await runner(async () => {
         store.destinationType.set(markBoardValue("email"))
         store.email.set(markBoardValue("@".repeat(255)))
-        action.destinationType.publisher.post()
-        action.email.publisher.post()
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: true }])
@@ -133,11 +123,9 @@ test("terminate", async () => {
 function standard() {
     const { input: action } = initInputResetTokenDestinationAction()
     const store = {
-        destinationType: mockBoardValueStore(),
-        email: mockBoardValueStore(),
+        destinationType: mockBoardValueStore(action.destinationType),
+        email: mockBoardValueStore(action.email),
     }
-    action.destinationType.connector.connect(store.destinationType)
-    action.email.connector.connect(store.email)
 
     return { action, store }
 }

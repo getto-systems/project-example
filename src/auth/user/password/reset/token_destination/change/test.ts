@@ -27,9 +27,6 @@ test("submit valid info", async () => {
         store.destinationType.set(markBoardValue(VALID_INFO.destinationType))
         store.email.set(markBoardValue(VALID_INFO.email))
 
-        resource.change.destination.destinationType.publisher.post()
-        resource.change.destination.email.publisher.post()
-
         return resource.change.submit(user)
     }).then((stack) => {
         expect(stack).toEqual([
@@ -49,9 +46,6 @@ test("submit valid login-id; take long time", async () => {
         store.destinationType.set(markBoardValue(VALID_INFO.destinationType))
         store.email.set(markBoardValue(VALID_INFO.email))
 
-        resource.change.destination.destinationType.publisher.post()
-        resource.change.destination.email.publisher.post()
-
         return resource.change.submit(user)
     }).then((stack) => {
         expect(stack).toEqual([
@@ -70,9 +64,6 @@ test("submit with invalid value; empty email", async () => {
     await runner(() => {
         store.destinationType.set(markBoardValue("email"))
         store.email.set(markBoardValue(""))
-
-        resource.change.destination.destinationType.publisher.post()
-        resource.change.destination.email.publisher.post()
 
         return resource.change.submit(user)
     }).then((stack) => {
@@ -142,12 +133,9 @@ function initResource(modifyUserRemote: ChangeResetTokenDestinationRemote): Read
     }
 
     const store = {
-        destinationType: mockBoardValueStore(),
-        email: mockBoardValueStore(),
+        destinationType: mockBoardValueStore(resource.change.destination.destinationType),
+        email: mockBoardValueStore(resource.change.destination.email),
     }
-
-    resource.change.destination.destinationType.connector.connect(store.destinationType)
-    resource.change.destination.email.connector.connect(store.email)
 
     return {
         resource,

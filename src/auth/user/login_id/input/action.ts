@@ -16,6 +16,7 @@ import {
 } from "../../../../z_vendor/getto-application/board/validate_field/action"
 
 import { BoardFieldChecker } from "../../../../z_vendor/getto-application/board/validate_field/infra"
+import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
 import { emptyBoardValue } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { ValidateLoginIdError } from "./data"
@@ -23,8 +24,9 @@ import { SingleValueFilter } from "../../../../z_lib/ui/search/kernel/data"
 import { LoginId } from "../kernel/data"
 
 export interface InputLoginIdAction extends ApplicationAction {
-    readonly input: InputBoardAction
+    readonly input: InputBoardAction<BoardValueStore>
     readonly validate: ValidateLoginIdAction
+    readonly observe: ObserveBoardFieldAction
     clear(): void
 }
 
@@ -41,12 +43,20 @@ export function initInputLoginIdAction(): Readonly<{
         converter: () => loginIdBoardConverter(store.get()),
     })
 
-    subscriber.subscribe(() => checker.check())
+    const observe = initObserveBoardFieldAction({
+        observer: initBoardFieldObserver({ current: () => store.get() }),
+    })
+
+    subscriber.subscribe(() => {
+        checker.check()
+        observe.check()
+    })
 
     return {
         input: {
             input,
             validate,
+            observe,
             clear: () => {
                 store.set(emptyBoardValue)
                 validate.clear()
@@ -61,7 +71,7 @@ export function initInputLoginIdAction(): Readonly<{
 }
 
 export interface SearchLoginIdAction extends ApplicationAction {
-    readonly input: InputBoardAction
+    readonly input: InputBoardAction<BoardValueStore>
     readonly observe: ObserveBoardFieldAction
     clear(): void
 }

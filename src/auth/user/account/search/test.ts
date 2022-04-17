@@ -40,7 +40,6 @@ test("search", async () => {
 
     await runner(async () => {
         store.loginId.set(markBoardValue("MY-LOGIN-ID"))
-        resource.search.loginId.input.publisher.post()
         return resource.search.search()
     }).then((stack) => {
         expect(stack).toEqual([
@@ -263,10 +262,8 @@ function initResource(
     }
 
     const store = {
-        loginId: mockBoardValueStore(),
+        loginId: mockBoardValueStore(resource.search.loginId.input),
     }
-
-    resource.search.loginId.input.connector.connect(store.loginId)
 
     return { resource, store }
 }

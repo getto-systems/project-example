@@ -31,6 +31,7 @@ export function OverridePassword(props: Props): VNode {
     const state = useApplicationAction(props.override)
     const editableState = useApplicationAction(props.editable)
     const validateState = useApplicationAction(props.override.validate)
+    const observeState = useApplicationAction(props.override.observe)
 
     return form(box({ title: "パスワード", ...content() }))
 
@@ -94,7 +95,7 @@ export function OverridePassword(props: Props): VNode {
     }
 
     function clearButton(): VNode {
-        return h(ClearChangesButton, { validateState, onClick })
+        return h(ClearChangesButton, { observeState, onClick })
 
         function onClick(e: Event) {
             e.preventDefault()

@@ -43,6 +43,7 @@ export function AuthenticatePassword(viewProps: Props): VNode {
     }
     const state = useApplicationAction(props.authenticate)
     const validateState = useApplicationAction(props.authenticate.validate)
+    const observeState = useApplicationAction(props.authenticate.observe)
 
     useLayoutEffect(() => {
         // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
@@ -149,7 +150,7 @@ export function AuthenticatePassword(viewProps: Props): VNode {
             }
         }
         function clearButton(): VNode {
-            return h(ClearChangesButton, { validateState, onClick })
+            return h(ClearChangesButton, { observeState, onClick })
 
             function onClick(e: Event) {
                 e.preventDefault()

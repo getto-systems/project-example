@@ -25,8 +25,6 @@ test("submit valid info", async () => {
     await runner(async () => {
         store.grantedRoles.set(VALID_INFO.grantedRoles.map(markBoardValue))
 
-        resource.modify.grantedRoles.grantedRoles.publisher.post()
-
         return resource.modify.submit(user)
     }).then((stack) => {
         expect(stack).toEqual([
@@ -44,8 +42,6 @@ test("submit valid login-id; take long time", async () => {
 
     await runner(() => {
         store.grantedRoles.set(VALID_INFO.grantedRoles.map(markBoardValue))
-
-        resource.modify.grantedRoles.grantedRoles.publisher.post()
 
         return resource.modify.submit(user)
     }).then((stack) => {
@@ -115,10 +111,8 @@ function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
     }
 
     const store = {
-        grantedRoles: mockMultipleBoardValueStore(),
+        grantedRoles: mockMultipleBoardValueStore(resource.modify.grantedRoles.grantedRoles),
     }
-
-    resource.modify.grantedRoles.grantedRoles.connector.connect(store.grantedRoles)
 
     return {
         resource,

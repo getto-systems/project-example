@@ -18,7 +18,7 @@ export type RadioBoardContent = Readonly<{
 }>
 
 type Props = Readonly<{
-    input: InputBoardAction
+    input: InputBoardAction<BoardValueStore>
     name: string
     options: readonly RadioBoardContent[]
 }> &
@@ -70,7 +70,7 @@ interface RadioStore {
     set(value: string): void
 }
 
-function useRadioStore(connector: BoardValueStoreConnector): [string, RadioStore] {
+function useRadioStore(connector: BoardValueStoreConnector<BoardValueStore>): [string, RadioStore] {
     const [current, setValue] = useState<BoardValue>(emptyBoardValue)
     const store = useMemo(() => new ValueStore(), [])
 

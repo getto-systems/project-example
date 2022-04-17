@@ -7,6 +7,7 @@ import { initInputPasswordAction } from "../input/action"
 import { initValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
 import { InputPasswordAction } from "../input/action"
 import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
+import { initObserveBoardAction, ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
 
 import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 
@@ -22,6 +23,7 @@ export interface ChangePasswordAction extends StatefulApplicationAction<ChangePa
     readonly currentPassword: InputPasswordAction
     readonly newPassword: InputPasswordAction
     readonly validate: ValidateBoardAction
+    readonly observe: ObserveBoardAction
 
     clear(): ChangePasswordState
     submit(): Promise<ChangePasswordState>
@@ -34,6 +36,7 @@ const initialState: ChangePasswordState = { type: "initial" }
 export interface OverridePasswordAction extends StatefulApplicationAction<OverridePasswordState> {
     readonly newPassword: InputPasswordAction
     readonly validate: ValidateBoardAction
+    readonly observe: ObserveBoardAction
 
     clear(): OverridePasswordState
     submit(user: Readonly<{ loginId: LoginId }>): Promise<OverridePasswordState>
@@ -69,6 +72,7 @@ class Action
     readonly currentPassword: InputPasswordAction
     readonly newPassword: InputPasswordAction
     readonly validate: ValidateBoardAction
+    readonly observe: ObserveBoardAction
 
     material: ChangePasswordMaterial
     convert: BoardConverter<ChangePasswordFields>
@@ -79,6 +83,7 @@ class Action
                 this.currentPassword.terminate()
                 this.newPassword.terminate()
                 this.validate.terminate()
+                this.observe.terminate()
             },
         })
         this.material = material
@@ -108,17 +113,25 @@ class Action
                 },
             },
         )
+        const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         this.currentPassword = currentPassword.input
         this.newPassword = newPassword.input
         this.validate = validate
+        this.observe = observe
         this.convert = () => validateChecker.get()
 
         this.currentPassword.validate.subscriber.subscribe((result) =>
             validateChecker.update("currentPassword", result.valid),
         )
+        this.currentPassword.observe.subscriber.subscribe((result) =>
+            observeChecker.update("currentPassword", result.hasChanged),
+        )
         this.newPassword.validate.subscriber.subscribe((result) =>
             validateChecker.update("newPassword", result.valid),
+        )
+        this.newPassword.observe.subscriber.subscribe((result) =>
+            observeChecker.update("newPassword", result.hasChanged),
         )
     }
 
@@ -192,6 +205,7 @@ class OverrideAction
 
     readonly newPassword: InputPasswordAction
     readonly validate: ValidateBoardAction
+    readonly observe: ObserveBoardAction
 
     material: OverridePasswordMaterial
     convert: BoardConverter<OverridePasswordFields>
@@ -201,6 +215,7 @@ class OverrideAction
             terminate: () => {
                 this.newPassword.terminate()
                 this.validate.terminate()
+                this.observe.terminate()
             },
         })
         this.material = material
@@ -227,13 +242,18 @@ class OverrideAction
                 },
             },
         )
+        const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         this.newPassword = newPassword.input
         this.validate = validate
+        this.observe = observe
         this.convert = () => validateChecker.get()
 
         this.newPassword.validate.subscriber.subscribe((result) =>
             validateChecker.update("newPassword", result.valid),
+        )
+        this.newPassword.observe.subscriber.subscribe((result) =>
+            observeChecker.update("newPassword", result.hasChanged),
         )
     }
 

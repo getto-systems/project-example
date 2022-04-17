@@ -5,9 +5,9 @@ import { html } from "htm/preact"
 import { VNodeContent, VNodeKey } from "../../../../getto-css/preact/common"
 import { checkbox, checkbox_block } from "../../../../getto-css/preact/design/form"
 
-import { MultipleInputBoardAction } from "../action"
+import { InputBoardAction } from "../action"
 
-import { MultipleBoardValueStoreConnector } from "../infra"
+import { BoardValueStoreConnector, MultipleBoardValueStore } from "../infra"
 
 import { BoardValue } from "../../kernel/data"
 
@@ -18,7 +18,7 @@ export type CheckboxBoardContent = Readonly<{
 }>
 
 type Props = Readonly<{
-    input: MultipleInputBoardAction
+    input: InputBoardAction<MultipleBoardValueStore>
     options: readonly CheckboxBoardContent[]
 }> &
     Partial<{
@@ -63,7 +63,7 @@ interface CheckboxStore {
 }
 
 function useCheckboxStore(
-    connector: MultipleBoardValueStoreConnector,
+    connector: BoardValueStoreConnector<MultipleBoardValueStore>,
 ): [ReadonlySet<BoardValue>, CheckboxStore] {
     const [current, setValue] = useState<ReadonlySet<BoardValue>>(new Set())
     const store = useMemo(() => new ValuesStore(), [])

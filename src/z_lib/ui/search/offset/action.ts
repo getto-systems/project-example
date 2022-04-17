@@ -4,13 +4,15 @@ import {
     initInputBoardAction,
 } from "../../../../z_vendor/getto-application/board/input/action"
 
+import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
+
 import {
     BoardValue,
     zeroBoardValue,
 } from "../../../../z_vendor/getto-application/board/kernel/data"
 
 export interface SearchOffsetAction extends ApplicationAction {
-    readonly input: InputBoardAction
+    readonly input: InputBoardAction<BoardValueStore>
 }
 
 export function initSearchOffsetAction(initial: BoardValue): Readonly<{

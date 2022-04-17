@@ -38,6 +38,7 @@ export function RequestResetToken(viewProps: Props): VNode {
     }
     const state = useApplicationAction(props.requestToken)
     const validateState = useApplicationAction(props.requestToken.validate)
+    const observeState = useApplicationAction(props.requestToken.observe)
 
     const content = {
         title: "パスワードリセット",
@@ -98,7 +99,7 @@ export function RequestResetToken(viewProps: Props): VNode {
     }
 
     function clearButton() {
-        return h(ClearChangesButton, { validateState, onClick })
+        return h(ClearChangesButton, { observeState, onClick })
 
         function onClick(e: Event) {
             e.preventDefault()

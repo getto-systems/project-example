@@ -1,6 +1,7 @@
 import { setupActionTestRunner } from "../../action/test_helper"
+import { BoardValueStore } from "../input/infra"
+import { BoardValue, emptyBoardValue } from "../kernel/data"
 
-import { mockBoardValueStore } from "../input/test_helper"
 import { markBoardValue } from "../kernel/test_helper"
 
 import { initObserveBoardFieldAction } from "./action"
@@ -86,7 +87,7 @@ test("check same value; zero length second argument", async () => {
 })
 
 function standard() {
-    const store = mockBoardValueStore()
+    const store = boardValueStore()
     const observer = initBoardFieldObserver({
         current: () => store.get(),
         isSame: (a, b) => a === b,
@@ -94,4 +95,14 @@ function standard() {
     const action = initObserveBoardFieldAction({ observer })
 
     return { action, observer, store }
+}
+
+function boardValueStore(): BoardValueStore {
+    let storedValue: BoardValue = emptyBoardValue
+    return {
+        get: () => storedValue,
+        set: (value) => {
+            storedValue = value
+        },
+    }
 }

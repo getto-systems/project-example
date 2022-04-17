@@ -1,6 +1,6 @@
 import { setupActionTestRunner } from "../../action/test_helper"
 
-import { mockFileStore } from "./test_helper"
+import { FileStore, SelectFileResult } from "./infra"
 
 import { initSelectFileAction } from "./action"
 
@@ -65,7 +65,14 @@ test("terminate", async () => {
 
 function standard() {
     return {
-        source_store: mockFileStore({ found: true, file: "file" as unknown as File }),
+        // テストでは File として扱わないので as File で無理やり File にしても大丈夫
+        source_store: fileStore({ found: true, file: "file" as unknown as File }),
         ...initSelectFileAction(),
+    }
+}
+
+function fileStore(result: SelectFileResult): FileStore {
+    return {
+        get: () => result,
     }
 }

@@ -3,13 +3,13 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../../../z_vendor/getto-application/action/action"
 
-import { initInputLoginIdAction } from "../../../login_id/input/action"
-import { initInputPasswordAction } from "../../input/action"
-import { initValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
-
-import { InputLoginIdAction } from "../../../login_id/input/action"
-import { InputPasswordAction } from "../../input/action"
-import { ValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
+import { InputLoginIdAction, initInputLoginIdAction } from "../../../login_id/input/action"
+import { InputPasswordAction, initInputPasswordAction } from "../../input/action"
+import {
+    ValidateBoardAction,
+    initValidateBoardAction,
+} from "../../../../../z_vendor/getto-application/board/validate_board/action"
+import { initObserveBoardAction, ObserveBoardAction } from "../../../../../z_vendor/getto-application/board/observe_board/action"
 
 import { delayedChecker } from "../../../../../z_lib/ui/timer/helper"
 
@@ -36,6 +36,7 @@ export interface ResetPasswordAction extends StatefulApplicationAction<ResetPass
     readonly loginId: InputLoginIdAction
     readonly password: InputPasswordAction
     readonly validate: ValidateBoardAction
+    readonly observe: ObserveBoardAction
 
     clear(): void
     submit(): Promise<ResetPasswordState>
@@ -86,6 +87,7 @@ class Action
     readonly loginId: InputLoginIdAction
     readonly password: InputPasswordAction
     readonly validate: ValidateBoardAction
+    readonly observe: ObserveBoardAction
 
     material: ResetPasswordMaterial
     convert: BoardConverter<ResetPasswordFields>
@@ -96,6 +98,7 @@ class Action
                 this.loginId.terminate()
                 this.password.terminate()
                 this.validate.terminate()
+                this.observe.terminate()
             },
         })
         this.material = material
@@ -124,17 +127,25 @@ class Action
                 },
             },
         )
+        const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         this.loginId = loginId.input
         this.password = password.input
         this.validate = validate
+        this.observe = observe
         this.convert = () => validateChecker.get()
 
         this.loginId.validate.subscriber.subscribe((result) =>
             validateChecker.update("loginId", result.valid),
         )
+        this.loginId.observe.subscriber.subscribe((result) =>
+            observeChecker.update("loginId", result.hasChanged),
+        )
         this.password.validate.subscriber.subscribe((result) =>
             validateChecker.update("password", result.valid),
+        )
+        this.password.observe.subscriber.subscribe((result) =>
+            observeChecker.update("password", result.hasChanged),
         )
     }
 

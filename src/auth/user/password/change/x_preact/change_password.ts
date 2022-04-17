@@ -28,6 +28,7 @@ export function ChangePassword(props: Props): VNode {
     const state = useApplicationAction(props.change)
     const editableState = useApplicationAction(props.editable)
     const validateState = useApplicationAction(props.change.validate)
+    const observeState = useApplicationAction(props.change.observe)
 
     const content = {
         title: "パスワード",
@@ -105,7 +106,7 @@ export function ChangePassword(props: Props): VNode {
     }
 
     function clearButton(): VNode {
-        return h(ClearChangesButton, { validateState, onClick })
+        return h(ClearChangesButton, { observeState, onClick })
 
         function onClick(e: Event) {
             e.preventDefault()

@@ -30,8 +30,7 @@ test("terminate", async () => {
 
 function standard() {
     const { input: action, get, set } = initInputSeasonAction()
-    const store = mockBoardValueStore()
-    action.input.connector.connect(store)
+    const store = mockBoardValueStore(action.input)
 
     return { action, store, get, set }
 }

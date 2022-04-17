@@ -29,8 +29,8 @@ import { ResetTokenDestination } from "../kernel/data"
 
 export interface InputResetTokenDestinationAction
     extends StatefulApplicationAction<InputResetTokenDestinationState> {
-    readonly destinationType: InputBoardAction
-    readonly email: InputBoardAction
+    readonly destinationType: InputBoardAction<BoardValueStore>
+    readonly email: InputBoardAction<BoardValueStore>
     readonly validate: ValidateResetTokenDestinationAction
     readonly observe: ObserveBoardFieldAction
 
@@ -63,8 +63,8 @@ class DestinationAction
 {
     initialState = initialState
 
-    readonly destinationType: InputBoardAction
-    readonly email: InputBoardAction
+    readonly destinationType: InputBoardAction<BoardValueStore>
+    readonly email: InputBoardAction<BoardValueStore>
     readonly validate: ValidateResetTokenDestinationAction
     readonly observe: ObserveBoardFieldAction
 

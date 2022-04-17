@@ -113,12 +113,9 @@ function initResource(changePasswordRemote: ChangePasswordRemote): Readonly<{
     }
 
     const store = {
-        currentPassword: mockBoardValueStore(),
-        newPassword: mockBoardValueStore(),
+        currentPassword: mockBoardValueStore(resource.change.currentPassword.input),
+        newPassword: mockBoardValueStore(resource.change.newPassword.input),
     }
-
-    resource.change.currentPassword.input.connector.connect(store.currentPassword)
-    resource.change.newPassword.input.connector.connect(store.newPassword)
 
     return { resource, store }
 }

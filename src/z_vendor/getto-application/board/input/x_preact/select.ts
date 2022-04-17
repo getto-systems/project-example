@@ -6,12 +6,12 @@ import { readBoardValue } from "../../kernel/convert"
 
 import { InputBoardAction } from "../action"
 
-import { BoardValueStoreConnector } from "../infra"
+import { BoardValueStore, BoardValueStoreConnector } from "../infra"
 
 import { BoardValue, emptyBoardValue } from "../../kernel/data"
 
 type Props = Readonly<{
-    input: InputBoardAction
+    input: InputBoardAction<BoardValueStore>
     options: readonly VNode[]
 }>
 export function SelectBoard({ input, options }: Props): VNode {
@@ -24,7 +24,7 @@ export function SelectBoard({ input, options }: Props): VNode {
     }
 }
 
-function useSelectRef(connector: BoardValueStoreConnector) {
+function useSelectRef(connector: BoardValueStoreConnector<BoardValueStore>) {
     const REF = useRef<HTMLSelectElement>()
     const temporaryStore = useRef<BoardValue>()
 

@@ -9,22 +9,20 @@ import {
     BoardValueStore,
     BoardValueStoreConnector,
     FileStore,
-    FileStoreConnector,
     InputBoardEventPublisher,
     InputBoardEventSubscriber,
     MultipleBoardValueStore,
-    MultipleBoardValueStoreConnector,
 } from "./infra"
 
-export interface InputBoardAction {
+export interface InputBoardAction<S> {
     // 例外的に infra をそのまま公開する
     // input を infra として使用するので、この要素は action よりも infra に近い
-    readonly connector: BoardValueStoreConnector
+    readonly connector: BoardValueStoreConnector<S>
     readonly publisher: InputBoardEventPublisher
 }
 
 export function initInputBoardAction(): Readonly<{
-    input: InputBoardAction
+    input: InputBoardAction<BoardValueStore>
     store: BoardValueStore
     subscriber: InputBoardEventSubscriber
 }> {
@@ -38,15 +36,8 @@ export function initInputBoardAction(): Readonly<{
     }
 }
 
-export interface MultipleInputBoardAction {
-    // 例外的に infra をそのまま公開する
-    // input を infra として使用するので、この要素は action よりも infra に近い
-    readonly connector: MultipleBoardValueStoreConnector
-    readonly publisher: InputBoardEventPublisher
-}
-
 export function initMultipleInputBoardAction(): Readonly<{
-    input: MultipleInputBoardAction
+    input: InputBoardAction<MultipleBoardValueStore>
     store: MultipleBoardValueStore
     subscriber: InputBoardEventSubscriber
 }> {
@@ -60,15 +51,8 @@ export function initMultipleInputBoardAction(): Readonly<{
     }
 }
 
-export interface SelectFileAction {
-    // 例外的に infra をそのまま公開する
-    // input を infra として使用するので、この要素は action よりも infra に近い
-    readonly connector: FileStoreConnector
-    readonly publisher: InputBoardEventPublisher
-}
-
 export function initSelectFileAction(): Readonly<{
-    input: SelectFileAction
+    input: InputBoardAction<FileStore>
     store: FileStore
     subscriber: InputBoardEventSubscriber
 }> {

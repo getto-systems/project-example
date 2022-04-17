@@ -4,11 +4,16 @@ import {
     StatefulApplicationAction,
     AbstractStatefulApplicationAction,
 } from "../../../../../z_vendor/getto-application/action/action"
-import { initInputLoginIdAction } from "../../../login_id/input/action"
-import { initValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
 
-import { InputLoginIdAction } from "../../../login_id/input/action"
-import { ValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
+import { InputLoginIdAction, initInputLoginIdAction } from "../../../login_id/input/action"
+import {
+    ValidateBoardAction,
+    initValidateBoardAction,
+} from "../../../../../z_vendor/getto-application/board/validate_board/action"
+import {
+    initObserveBoardAction,
+    ObserveBoardAction,
+} from "../../../../../z_vendor/getto-application/board/observe_board/action"
 
 import { RequestResetTokenRemote } from "./infra"
 import { DelayTime } from "../../../../../z_lib/ui/config/infra"
@@ -20,6 +25,7 @@ import { ConvertBoardResult } from "../../../../../z_vendor/getto-application/bo
 export interface RequestResetTokenAction extends StatefulApplicationAction<RequestResetTokenState> {
     readonly loginId: InputLoginIdAction
     readonly validate: ValidateBoardAction
+    readonly observe: ObserveBoardAction
 
     clear(): RequestResetTokenState
     submit(): Promise<RequestResetTokenState>
@@ -56,6 +62,7 @@ class Action
 
     readonly loginId: InputLoginIdAction
     readonly validate: ValidateBoardAction
+    readonly observe: ObserveBoardAction
 
     material: RequestResetTokenMaterial
     convert: BoardConverter<RequestResetTokenFields>
@@ -65,6 +72,7 @@ class Action
             terminate: () => {
                 this.loginId.terminate()
                 this.validate.terminate()
+                this.observe.terminate()
             },
         })
         this.material = material
@@ -90,13 +98,18 @@ class Action
                 },
             },
         )
+        const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         this.loginId = loginId.input
         this.validate = validate
+        this.observe = observe
         this.convert = () => validateChecker.get()
 
         this.loginId.validate.subscriber.subscribe((result) =>
             validateChecker.update("loginId", result.valid),
+        )
+        this.loginId.observe.subscriber.subscribe((result) =>
+            observeChecker.update("loginId", result.hasChanged),
         )
     }
 

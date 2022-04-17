@@ -109,9 +109,8 @@ function initView(requestTokenRemote: RequestResetTokenRemote): Readonly<{
     )
 
     const store = {
-        loginId: mockBoardValueStore(),
+        loginId: mockBoardValueStore(view.resource.loginId.input),
     }
-    view.resource.loginId.input.connector.connect(store.loginId)
 
     return { view, store }
 }
