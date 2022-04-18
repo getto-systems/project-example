@@ -49,7 +49,7 @@ use crate::{
     },
     z_lib::{
         repository::data::RepositoryError,
-        search::data::{SearchOffset, SearchPage, SearchSortOrder},
+        search::data::{detect_search_page, SearchOffsetDetecterExtract, SearchSortOrder},
     },
 };
 
@@ -446,11 +446,6 @@ fn search<'a>(
     let mut destinations: HashMap<LoginId, EntryLoginId> =
         repository.login_id.all().into_iter().collect();
 
-    let all: i32 = users
-        .len()
-        .try_into()
-        .map_err(|err| infra_error("convert users length error", err))?;
-
     match filter.sort().key() {
         SearchAuthUserAccountSortKey::LoginId => {
             users.sort_by_cached_key(|(_, user)| user.login_id.clone());
@@ -479,21 +474,26 @@ fn search<'a>(
         })
         .collect();
 
-    let limit = 1000;
-    let offset = SearchOffset { all, limit }.detect(filter.offset());
+    let detecter = SearchOffsetDetecterExtract {
+        all: users.len(),
+        limit: 1000,
+    };
+    let page = detect_search_page(
+        detecter
+            .try_into()
+            .map_err(|err| infra_error("convert offset error", err))?,
+        filter.offset(),
+    );
+
     let mut users = users.split_off(
-        offset
+        page.offset
             .try_into()
             .map_err(|err| infra_error("convert offset error", err))?,
     );
-    users.truncate(
-        limit
-            .try_into()
-            .map_err(|err| infra_error("convert limit error", err))?,
-    );
+    users.truncate(detecter.limit);
 
     Ok(AuthUserAccountSearch {
-        page: SearchPage { all, limit, offset },
+        page,
         sort: filter.into_sort(),
         users,
     })
