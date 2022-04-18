@@ -20,6 +20,7 @@ import { SearchAuthUserAccountRemote, SearchAuthUserAccountRemoteResult } from "
 
 import { defaultSearchAuthUserAccountSort, SearchAuthUserAccountFilter } from "../data"
 import { AuthUserAccount } from "../../kernel/data"
+import { restoreResetTokenDestination } from "../../../password/reset/token_destination/kernel/convert"
 
 export function newSearchAuthUserAccountRemote(
     feature: RemoteOutsideFeature,
@@ -96,8 +97,10 @@ async function fetchRemote(
                     (user): AuthUserAccount => ({
                         loginId: restoreLoginId(user.loginId || ""),
                         grantedRoles: toGrantedRoles(user.grantedRoles || []),
-                        // TODO destination を返してもらう
-                        resetTokenDestination: { type: "none" },
+                        resetTokenDestination: restoreResetTokenDestination({
+                            type: user.resetTokenDestination?.type || "",
+                            email: user.resetTokenDestination?.email || "",
+                        }),
                     }),
                 ),
             },

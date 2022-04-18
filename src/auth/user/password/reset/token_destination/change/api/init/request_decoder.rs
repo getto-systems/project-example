@@ -1,5 +1,6 @@
-use crate::auth::user::password::reset::token_destination::change::y_protobuf::service::{
-    ChangeResetTokenDestinationRequestPb, ResetTokenDestinationPb,
+use crate::auth::user::password::reset::token_destination::{
+    change::y_protobuf::service::ChangeResetTokenDestinationRequestPb,
+    kernel::y_protobuf::service::ResetTokenDestinationPb,
 };
 
 use crate::auth::user::password::reset::token_destination::change::infra::{

@@ -17,7 +17,7 @@ import {
 } from "../../../../../../z_vendor/getto-application/board/observe_field/action"
 
 import { initBoardFieldObserver } from "../../../../../../z_vendor/getto-application/board/observe_field/init/observer"
-import { resetTokenDestinationBoardConverter } from "./convert"
+import { resetTokenDestinationBoardConverter } from "../kernel/convert"
 import { toBoardValue } from "../../../../../../z_vendor/getto-application/board/kernel/convert"
 
 import { BoardFieldChecker } from "../../../../../../z_vendor/getto-application/board/validate_field/infra"

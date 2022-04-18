@@ -1,6 +1,6 @@
 import { BoardValue } from "../../../../../../z_vendor/getto-application/board/kernel/data"
-import { ResetTokenDestination, ResetTokenDestinationEmail } from "../kernel/data"
-import { ValidateResetTokenDestinationError } from "./data"
+import { ResetTokenDestination, ResetTokenDestinationEmail } from "./data"
+import { ValidateResetTokenDestinationError } from "../input/data"
 import { ConvertBoardFieldResult } from "../../../../../../z_vendor/getto-application/board/validate_field/data"
 
 // email には技術的な制限はないが、使用可能な最大文字数は定義しておく

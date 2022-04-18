@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package auth.user.password.reset.token_destination.kernel.service;
+
+message ResetTokenDestinationPb {
+    string type = 1;
+    string email = 2;
+}

@@ -2,13 +2,15 @@ syntax = "proto3";
 
 package auth.user.password.reset.token_destination.change.service;
 
+import "auth/user/password/reset/token_destination/kernel/x_protobuf/service.proto";
+
 service ChangeResetTokenDestinationPb {
     rpc ChangeDestination (ChangeResetTokenDestinationRequestPb) returns (ChangeResetTokenDestinationResponsePb);
 }
 message ChangeResetTokenDestinationRequestPb {
     string login_id = 1;
-    ResetTokenDestinationPb from = 2;
-    ResetTokenDestinationPb to = 3;
+    auth.user.password.reset.token_destination.kernel.service.ResetTokenDestinationPb from = 2;
+    auth.user.password.reset.token_destination.kernel.service.ResetTokenDestinationPb to = 3;
 }
 message ChangeResetTokenDestinationResponsePb {
     bool success = 1;
@@ -18,8 +20,4 @@ enum ChangeResetTokenDestinationErrorKindPb {
     CONFLICT = 0;
     NOT_FOUND = 1;
     INVALID = 2;
-}
-message ResetTokenDestinationPb {
-    string type = 1;
-    string email = 2;
 }
