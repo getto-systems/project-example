@@ -118,8 +118,12 @@ class Action
         this.validate.clear()
         return this.currentState()
     }
-    submit(): Promise<RequestResetTokenState> {
-        return requestResetToken(this.material, this.convert(), this.post)
+    async submit(): Promise<RequestResetTokenState> {
+        const fields = this.convert()
+        if (!fields.valid) {
+            return this.currentState()
+        }
+        return requestResetToken(this.material, fields.value, this.post)
     }
 }
 
@@ -131,20 +135,16 @@ type RequestResetTokenEvent =
 
 async function requestResetToken<S>(
     { infra, config }: RequestResetTokenMaterial,
-    fields: ConvertBoardResult<RequestResetTokenFields>,
+    fields: RequestResetTokenFields,
     post: Post<RequestResetTokenEvent, S>,
 ): Promise<S> {
-    if (!fields.valid) {
-        return post({ type: "failed", err: { type: "validation-error" } })
-    }
-
     post({ type: "try" })
 
     const { requestTokenRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(
-        requestTokenRemote(fields.value),
+        requestTokenRemote(fields),
         config.takeLongtimeThreshold,
         () => post({ type: "take-longtime" }),
     )

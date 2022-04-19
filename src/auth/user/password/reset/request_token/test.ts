@@ -48,7 +48,7 @@ test("submit without fields", async () => {
     const runner = setupActionTestRunner(action.subscriber)
 
     await runner(() => action.submit()).then((stack) => {
-        expect(stack).toEqual([{ type: "failed", err: { type: "validation-error" } }])
+        expect(stack).toEqual([])
     })
 })
 

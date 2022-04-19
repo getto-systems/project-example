@@ -48,6 +48,7 @@ export function OverrideLoginId(props: Props): VNode {
                               left: submitButton(),
                               right: clearButton(),
                           }),
+                          ...validationMessage(),
                           ...message(),
                           buttons({
                               right: closeButton(),
@@ -104,23 +105,20 @@ export function OverrideLoginId(props: Props): VNode {
         }
     }
 
+    function validationMessage(): readonly VNode[] {
+        switch (validateState) {
+            case "initial":
+            case "valid":
+                return []
+
+            case "invalid":
+                return [fieldError(["正しく入力されていません"])]
+        }
+    }
     function message(): readonly VNode[] {
         switch (state.type) {
             case "initial":
             case "success":
-                switch (validateState) {
-                    case "initial":
-                    case "valid":
-                        return []
-
-                    case "invalid":
-                        return [fieldError(["正しく入力されていません"])]
-                }
-                break
-
-            case "failed":
-                return [fieldError(changeLoginIdError(state.err))]
-
             case "try":
                 return []
 
@@ -131,6 +129,9 @@ export function OverrideLoginId(props: Props): VNode {
                         html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
                     ]),
                 ]
+
+            case "failed":
+                return [fieldError(changeLoginIdError(state.err))]
         }
     }
 }

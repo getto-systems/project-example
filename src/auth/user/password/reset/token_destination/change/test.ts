@@ -67,7 +67,7 @@ test("submit with invalid value; empty email", async () => {
 
         return resource.change.submit(user)
     }).then((stack) => {
-        expect(stack).toEqual([{ type: "failed", err: { type: "validation-error" } }])
+        expect(stack).toEqual([])
     })
 })
 

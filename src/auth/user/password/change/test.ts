@@ -48,7 +48,7 @@ test("submit without fields", async () => {
     const runner = setupActionTestRunner(resource.change.subscriber)
 
     await runner(() => resource.change.submit()).then((stack) => {
-        expect(stack).toEqual([{ type: "failed", err: { type: "validation-error" } }])
+        expect(stack).toEqual([])
     })
 })
 

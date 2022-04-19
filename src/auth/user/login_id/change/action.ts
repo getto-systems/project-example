@@ -122,7 +122,11 @@ class OverrideAction
         return this.post(this.initialState)
     }
     async submit(user: Readonly<{ loginId: LoginId }>): Promise<OverrideLoginIdState> {
-        return overrideLoginId(this.material, user, this.convert(), this.post)
+        const fields = this.convert()
+        if (!fields.valid) {
+            return this.currentState()
+        }
+        return overrideLoginId(this.material, user, fields.value, this.post)
     }
 }
 
@@ -135,20 +139,16 @@ type OverrideLoginIdEvent =
 async function overrideLoginId<S>(
     { infra, config }: OverrideLoginIdMaterial,
     user: Readonly<{ loginId: LoginId }>,
-    fields: ConvertBoardResult<OverrideLoginIdFields>,
+    fields: OverrideLoginIdFields,
     post: Post<OverrideLoginIdEvent, S>,
 ): Promise<S> {
-    if (!fields.valid) {
-        return post({ type: "failed", err: { type: "validation-error" } })
-    }
-
     post({ type: "try" })
 
     const { overrideLoginIdRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(
-        overrideLoginIdRemote(user, fields.value),
+        overrideLoginIdRemote(user, fields),
         config.takeLongtimeThreshold,
         () => post({ type: "take-longtime" }),
     )
@@ -156,7 +156,7 @@ async function overrideLoginId<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "success", loginId: fields.value.newLoginId })
+    return post({ type: "success", loginId: fields.newLoginId })
 }
 
 interface Post<E, S> {

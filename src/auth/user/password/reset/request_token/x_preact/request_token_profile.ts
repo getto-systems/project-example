@@ -5,7 +5,7 @@ import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
 import { useApplicationAction } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { buttons, fieldError, form } from "../../../../../../z_vendor/getto-css/preact/design/form"
+import { buttons, fieldError } from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { icon_change, icon_spinner } from "../../../../../../x_content/icon"
 import { box } from "../../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../../z_vendor/getto-css/preact/design/highlight"
@@ -34,45 +34,45 @@ export function RequestResetTokenProfile(props: Props): VNode {
     const validateState = useApplicationAction(props.requestToken.validate)
     const observeState = useApplicationAction(props.requestToken.observe)
 
-    return form(
-        box({
-            title: "パスワードリセット",
-            ...(editableState.isEditable
-                ? {
-                      body: h(InputLoginId, {
-                          field: props.requestToken.loginId,
-                          title: "ログインID",
-                          help: ["確認のため、ログインIDを入力します"],
-                      }),
-                      footer: [
-                          buttons({
-                              left: submitButton(),
-                              right: clearButton(),
-                          }),
-                          ...message(),
-                          buttons({
-                              right: closeButton(),
-                          }),
-                      ],
-                  }
-                : {
-                      body: editButton(),
-                      footer:
-                          state.type === "success"
-                              ? [
-                                    notice_success([
-                                        html`パスワードリセットのための<br />
-                                            トークンをメールで送信しました`,
-                                    ]),
-                                    html`<p>
-                                        メールからパスワードリセットできます<br />
-                                        メールを確認してください
-                                    </p>`,
-                                ]
-                              : undefined,
+    return box({
+        title: "パスワードリセット",
+        ...(editableState.isEditable
+            ? {
+                  form: true,
+                  body: h(InputLoginId, {
+                      field: props.requestToken.loginId,
+                      title: "ログインID",
+                      help: ["確認のため、ログインIDを入力します"],
                   }),
-        }),
-    )
+                  footer: [
+                      buttons({
+                          left: submitButton(),
+                          right: clearButton(),
+                      }),
+                      ...validationMessage(),
+                      ...message(),
+                      buttons({
+                          right: closeButton(),
+                      }),
+                  ],
+              }
+            : {
+                  body: editButton(),
+                  footer:
+                      state.type === "success"
+                          ? [
+                                notice_success([
+                                    html`パスワードリセットのための<br />
+                                        トークンをメールで送信しました`,
+                                ]),
+                                html`<p>
+                                    メールからパスワードリセットできます<br />
+                                    メールを確認してください
+                                </p>`,
+                            ]
+                          : undefined,
+              }),
+    })
 
     function editButton(): VNode {
         return h(EditButton, {
@@ -123,20 +123,20 @@ export function RequestResetTokenProfile(props: Props): VNode {
         }
     }
 
+    function validationMessage(): readonly VNode[] {
+        switch (validateState) {
+            case "initial":
+            case "valid":
+                return []
+
+            case "invalid":
+                return [fieldError(["正しく入力されていません"])]
+        }
+    }
     function message(): readonly VNode[] {
         switch (state.type) {
             case "initial":
             case "success":
-                switch (validateState) {
-                    case "initial":
-                    case "valid":
-                        return []
-
-                    case "invalid":
-                        return [fieldError(["正しく入力されていません"])]
-                }
-                break
-
             case "try":
                 return []
 
@@ -156,9 +156,6 @@ export function RequestResetTokenProfile(props: Props): VNode {
 
 function requestTokenError(err: RequestResetTokenError): readonly VNodeContent[] {
     switch (err.type) {
-        case "validation-error":
-            return ["正しく入力してください"]
-
         case "invalid-reset":
             return ["ログインIDが登録されていないか、トークンの送信先が登録されていません"]
 

@@ -5,7 +5,7 @@ export type OverrideLoginIdFields = Readonly<{
     newLoginId: LoginId
 }>
 
-export type ChangeLoginIdError = Readonly<{ type: "validation-error" }> | ChangeLoginIdRemoteError
+export type ChangeLoginIdError = ChangeLoginIdRemoteError
 
 export type ChangeLoginIdRemoteError =
     | RemoteCommonError

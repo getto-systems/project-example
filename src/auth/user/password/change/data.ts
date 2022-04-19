@@ -10,10 +10,6 @@ export type OverridePasswordFields = Readonly<{
     newPassword: Password
 }>
 
-export type ChangePasswordError =
-    | Readonly<{ type: "validation-error" }>
-    | ChangePasswordRemoteError
+export type ChangePasswordError = ChangePasswordRemoteError
 
-export type ChangePasswordRemoteError =
-    | RemoteCommonError
-    | Readonly<{ type: "invalid-password" }>
+export type ChangePasswordRemoteError = RemoteCommonError | Readonly<{ type: "invalid-password" }>

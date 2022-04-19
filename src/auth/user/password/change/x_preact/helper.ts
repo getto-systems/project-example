@@ -6,9 +6,6 @@ import { ChangePasswordError } from "../data"
 
 export function changePasswordError(err: ChangePasswordError): readonly VNodeContent[] {
     switch (err.type) {
-        case "validation-error":
-            return ["正しく入力してください"]
-
         case "invalid-password":
             return ["現在のパスワードが違います"]
 

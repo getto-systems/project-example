@@ -57,6 +57,7 @@ export function ChangeResetTokenDestination(props: Props): VNode {
                           left: submitButton(),
                           right: resetButton(),
                       }),
+                      ...validationMessage(),
                       ...message(),
                       buttons({
                           right: closeButton(),
@@ -113,37 +114,40 @@ export function ChangeResetTokenDestination(props: Props): VNode {
         }
     }
 
+    function validationMessage(): readonly VNode[] {
+        switch (validateState) {
+            case "initial":
+            case "valid":
+                return []
+
+            case "invalid":
+                return [fieldError(["正しく入力されていません"])]
+        }
+    }
     function message(): readonly VNode[] {
         switch (state.type) {
             case "initial":
             case "success":
-                if (validateState === "invalid") {
-                    return [fieldError(["正しく入力されていません"])]
-                }
-                return []
-
             case "try":
                 return []
 
             case "take-longtime":
                 return [
                     fieldError([
+                        // TODO このメッセージをまとめたい
                         html`${iconHtml(icon_spinner)} 変更に時間がかかっています`,
                         html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
                     ]),
                 ]
 
             case "failed":
-                return [fieldError(modifyError(state.err))]
+                return [fieldError(changeError(state.err))]
         }
     }
 }
 
-function modifyError(err: ChangeResetTokenDestinationError): readonly VNodeContent[] {
+function changeError(err: ChangeResetTokenDestinationError): readonly VNodeContent[] {
     switch (err.type) {
-        case "validation-error":
-            return ["正しく入力してください"]
-
         case "conflict":
             return ["他で変更がありました", "一旦リロードしてやり直してください"]
 

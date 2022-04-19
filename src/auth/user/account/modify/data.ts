@@ -5,9 +5,7 @@ export type ModifyAuthUserAccountFields = Readonly<{
     grantedRoles: readonly AuthRole[]
 }>
 
-export type ModifyAuthUserAccountError =
-    | Readonly<{ type: "validation-error" }>
-    | ModifyAuthUserAccountRemoteError
+export type ModifyAuthUserAccountError = ModifyAuthUserAccountRemoteError
 
 export type ModifyAuthUserAccountRemoteError =
     | RemoteCommonError

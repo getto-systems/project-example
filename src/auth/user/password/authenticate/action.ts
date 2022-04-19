@@ -160,7 +160,11 @@ class Action
         return this.initialState
     }
     async submit(): Promise<AuthenticatePasswordState> {
-        const result = await authenticate(this.material, this.convert(), this.post)
+        const fields = this.convert()
+        if (!fields.valid) {
+            return this.currentState()
+        }
+        const result = await authenticate(this.material, fields.value, this.post)
         if (!result.success) {
             return result.state
         }
@@ -206,23 +210,16 @@ type AuthenticateResult<S> =
 
 async function authenticate<S>(
     { infra, config }: AuthenticateMaterial,
-    fields: ConvertBoardResult<AuthenticatePasswordFields>,
+    fields: AuthenticatePasswordFields,
     post: Post<AuthenticateEvent, S>,
 ): Promise<AuthenticateResult<S>> {
-    if (!fields.valid) {
-        return {
-            success: false,
-            state: post({ type: "failed-to-login", err: { type: "validation-error" } }),
-        }
-    }
-
     post({ type: "try-to-login" })
 
     const { authenticateRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(
-        authenticateRemote(fields.value),
+        authenticateRemote(fields),
         config.takeLongtimeThreshold,
         () => post({ type: "take-longtime-to-login" }),
     )

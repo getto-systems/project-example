@@ -68,29 +68,12 @@ export function ResetPassword(viewProps: Props): VNode {
         }
     }, [props.reset, state])
 
-    const content = {
-        title: "パスワードリセット",
-    }
-
     switch (state.type) {
         case "initial-reset":
         case "failed-to-reset":
         case "try-to-reset":
-            return resetForm(state)
-
         case "take-longtime-to-reset":
-            return loginBox(siteInfo, {
-                ...content,
-                body: [
-                    html`<p>${iconHtml(icon_spinner)} リセットに時間がかかっています</p>`,
-                    html`<p>
-                        30秒以上かかる場合は何かがおかしいので、
-                        <br />
-                        お手数ですが管理者に連絡お願いします
-                    </p>`,
-                ],
-                footer: footerLinks(),
-            })
+            return resetForm(state)
 
         case "try-to-load":
             // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
@@ -112,11 +95,12 @@ export function ResetPassword(viewProps: Props): VNode {
     type ResetState =
         | Readonly<{ type: "initial-reset" }>
         | Readonly<{ type: "try-to-reset" }>
+        | Readonly<{ type: "take-longtime-to-reset" }>
         | Readonly<{ type: "failed-to-reset"; err: ResetPasswordError }>
     function resetForm(state: ResetState): VNode {
         return form(
             loginBox(siteInfo, {
-                ...content,
+                title: "パスワードリセット",
                 body: [
                     h(InputLoginId, {
                         field: props.reset.loginId,
@@ -133,10 +117,7 @@ export function ResetPassword(viewProps: Props): VNode {
                         right: clearButton(),
                     }),
                 ],
-                footer: [
-                    footerLinks(),
-                    state.type === "failed-to-reset" ? fieldError(resetError(state.err)) : "",
-                ],
+                footer: [footerLinks(), ...validationMessage(), ...message()],
             }),
         )
 
@@ -151,6 +132,35 @@ export function ResetPassword(viewProps: Props): VNode {
             function onClick(e: Event) {
                 e.preventDefault()
                 props.reset.submit()
+            }
+        }
+
+        function validationMessage(): readonly VNode[] {
+            switch (validateState) {
+                case "initial":
+                case "valid":
+                    return []
+
+                case "invalid":
+                    return [fieldError(["正しく入力されていません"])]
+            }
+        }
+        function message(): readonly VNode[] {
+            switch (state.type) {
+                case "initial-reset":
+                case "try-to-reset":
+                    return []
+
+                case "take-longtime-to-reset":
+                    return [
+                        fieldError([
+                            html`${iconHtml(icon_spinner)} パスワードリセットに時間がかかっています`,
+                            html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
+                        ]),
+                    ]
+
+                case "failed-to-reset":
+                    return [fieldError(resetError(state.err))]
             }
         }
     }
@@ -177,11 +187,8 @@ export function ResetPassword(viewProps: Props): VNode {
 
 function resetError(err: ResetPasswordError): readonly VNodeContent[] {
     switch (err.type) {
-        case "validation-error":
-            return ["正しく入力してください"]
-
         case "empty-reset-token":
-            return ["リセットトークンが見つかりませんでした"]
+            return ["リセットトークンが指定されていません"]
 
         case "invalid-reset":
             return ["ログインIDが最初に入力したものと違うか、有効期限が切れています"]

@@ -123,7 +123,11 @@ class Action
     async submit(
         user: Readonly<{ loginId: LoginId; resetTokenDestination: ResetTokenDestination }>,
     ): Promise<ChangeResetTokenDestinationState> {
-        return changeDestination(this.material, user, this.convert(), this.post)
+        const fields = this.convert()
+        if (!fields.valid) {
+            return this.currentState()
+        }
+        return changeDestination(this.material, user, fields.value, this.post)
     }
 }
 
@@ -136,20 +140,16 @@ type ChangeDestinationEvent =
 async function changeDestination<S>(
     { infra, config }: ChangeResetTokenDestinationMaterial,
     user: Readonly<{ loginId: LoginId; resetTokenDestination: ResetTokenDestination }>,
-    fields: ConvertBoardResult<ResetTokenDestination>,
+    fields: ResetTokenDestination,
     post: Post<ChangeDestinationEvent, S>,
 ): Promise<S> {
-    if (!fields.valid) {
-        return post({ type: "failed", err: { type: "validation-error" } })
-    }
-
     post({ type: "try" })
 
     const { changeDestinationRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(
-        changeDestinationRemote(user, fields.value),
+        changeDestinationRemote(user, fields),
         config.takeLongtimeThreshold,
         () => post({ type: "take-longtime" }),
     )
@@ -157,7 +157,7 @@ async function changeDestination<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "success", data: fields.value })
+    return post({ type: "success", data: fields })
 }
 
 interface Post<E, S> {

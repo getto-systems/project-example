@@ -10,7 +10,7 @@ import {
 } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { loginBox } from "../../../../../z_vendor/getto-css/preact/layout/login"
-import { buttons, fieldError, form } from "../../../../../z_vendor/getto-css/preact/design/form"
+import { buttons, fieldError } from "../../../../../z_vendor/getto-css/preact/design/form"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../../x_content/site"
@@ -68,29 +68,12 @@ export function AuthenticatePassword(viewProps: Props): VNode {
         }
     }, [props.authenticate, state])
 
-    const content = {
-        title: "ログイン",
-    }
-
     switch (state.type) {
         case "initial-login":
         case "failed-to-login":
         case "try-to-login":
-            return authenticateForm(state)
-
         case "take-longtime-to-login":
-            return loginBox(siteInfo, {
-                ...content,
-                body: [
-                    html`<p>${iconHtml(icon_spinner)} 認証に時間がかかっています</p>`,
-                    html`<p>
-                        30秒以上かかる場合は何かがおかしいので、
-                        <br />
-                        お手数ですが管理者に連絡お願いします
-                    </p>`,
-                ],
-                footer: footerLinks(),
-            })
+            return authenticateForm(state)
 
         case "try-to-load":
             // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
@@ -112,28 +95,28 @@ export function AuthenticatePassword(viewProps: Props): VNode {
     type AuthenticateState =
         | Readonly<{ type: "initial-login" }>
         | Readonly<{ type: "try-to-login" }>
+        | Readonly<{ type: "take-longtime-to-login" }>
         | Readonly<{ type: "failed-to-login"; err: AuthenticatePasswordError }>
     function authenticateForm(authenticateState: AuthenticateState): VNode {
-        return form(
-            loginBox(siteInfo, {
-                ...content,
-                body: [
-                    h(InputLoginId, {
-                        field: props.authenticate.loginId,
-                        autocomplete: "username",
-                    }),
-                    h(InputPassword, {
-                        field: props.authenticate.password,
-                        autocomplete: "current-password",
-                    }),
-                    buttons({
-                        left: authenticateButton(),
-                        right: clearButton(),
-                    }),
-                ],
-                footer: [footerLinks(), message()],
-            }),
-        )
+        return loginBox(siteInfo, {
+            form: true,
+            title: "ログイン",
+            body: [
+                h(InputLoginId, {
+                    field: props.authenticate.loginId,
+                    autocomplete: "username",
+                }),
+                h(InputPassword, {
+                    field: props.authenticate.password,
+                    autocomplete: "current-password",
+                }),
+                buttons({
+                    left: authenticateButton(),
+                    right: clearButton(),
+                }),
+            ],
+            footer: [footerLinks(), ...validationMessage(), ...message()],
+        })
 
         function authenticateButton(): VNode {
             return h(SendButton, {
@@ -158,24 +141,32 @@ export function AuthenticatePassword(viewProps: Props): VNode {
             }
         }
 
-        function message(): VNode {
+        function validationMessage(): VNode[] {
+            switch (validateState) {
+                case "initial":
+                case "valid":
+                    return []
+
+                case "invalid":
+                    return [fieldError(["正しく入力されていません"])]
+            }
+        }
+        function message(): VNode[] {
             switch (authenticateState.type) {
                 case "initial-login":
-                    switch (validateState) {
-                        case "initial":
-                        case "valid":
-                            return html``
-
-                        case "invalid":
-                            return fieldError(["正しく入力されていません"])
-                    }
-                    break
-
                 case "try-to-login":
-                    return html``
+                    return []
+
+                case "take-longtime-to-login":
+                    return [
+                        fieldError([
+                            html`${iconHtml(icon_spinner)} 認証に時間がかかっています`,
+                            html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
+                        ]),
+                    ]
 
                 case "failed-to-login":
-                    return fieldError(loginError(authenticateState.err))
+                    return [fieldError(loginError(authenticateState.err))]
             }
         }
     }
@@ -193,9 +184,6 @@ export function AuthenticatePassword(viewProps: Props): VNode {
 
 function loginError(err: AuthenticatePasswordError): readonly VNodeContent[] {
     switch (err.type) {
-        case "validation-error":
-            return ["正しく入力してください"]
-
         case "invalid-password":
             return ["ログインIDかパスワードが違います"]
 
