@@ -10,12 +10,16 @@ use crate::auth::user::password::reset::token_destination::change::infra::{
 };
 
 use crate::{
-    auth::user::password::reset::token_destination::change::data::ValidateChangeResetTokenDestinationFieldsError,
+    auth::{
+        data::RequireAuthRoles, ticket::kernel::data::ValidateAuthRolesError,
+        user::password::reset::token_destination::change::data::ValidateChangeResetTokenDestinationFieldsError,
+    },
     z_lib::repository::data::RepositoryError,
 };
 
 pub enum ChangeResetTokenDestinationState {
     Validate(ValidateAuthTokenEvent),
+    PermissionError(ValidateAuthRolesError),
     ChangeDestination(ChangeResetTokenDestinationEvent),
 }
 
@@ -23,6 +27,7 @@ impl std::fmt::Display for ChangeResetTokenDestinationState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Validate(event) => event.fmt(f),
+            Self::PermissionError(err) => err.fmt(f),
             Self::ChangeDestination(event) => event.fmt(f),
         }
     }
@@ -71,10 +76,14 @@ impl<R: ChangeResetTokenDestinationRequestDecoder, M: ChangeResetTokenDestinatio
 
         let fields = self.request_decoder.decode();
 
-        validate_auth_token(m.validate(), |event| {
+        let ticket = validate_auth_token(m.validate(), |event| {
             pubsub.post(ChangeResetTokenDestinationState::Validate(event))
         })
         .await?;
+
+        ticket
+            .check_enough_permission(RequireAuthRoles::user())
+            .map_err(|err| pubsub.post(ChangeResetTokenDestinationState::PermissionError(err)))?;
 
         change_destination(&m, fields, |event| {
             pubsub.post(ChangeResetTokenDestinationState::ChangeDestination(event))

@@ -159,6 +159,10 @@ impl RequireAuthRoles {
         });
         Self::HasAny(require_roles)
     }
+
+    pub fn user() -> Self {
+        Self::HasAny(vec![AuthRole::User].into_iter().collect())
+    }
 }
 
 impl std::fmt::Display for RequireAuthRoles {

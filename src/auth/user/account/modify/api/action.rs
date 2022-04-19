@@ -10,12 +10,16 @@ use crate::auth::user::account::modify::infra::{
 };
 
 use crate::{
-    auth::user::account::modify::data::ValidateModifyAuthUserAccountFieldsError,
+    auth::{
+        data::RequireAuthRoles, ticket::kernel::data::ValidateAuthRolesError,
+        user::account::modify::data::ValidateModifyAuthUserAccountFieldsError,
+    },
     z_lib::repository::data::RepositoryError,
 };
 
 pub enum ModifyAuthUserAccountState {
     Validate(ValidateAuthTokenEvent),
+    PermissionError(ValidateAuthRolesError),
     ModifyUser(ModifyAuthUserAccountEvent),
 }
 
@@ -23,6 +27,7 @@ impl std::fmt::Display for ModifyAuthUserAccountState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Validate(event) => event.fmt(f),
+            Self::PermissionError(event) => event.fmt(f),
             Self::ModifyUser(event) => event.fmt(f),
         }
     }
@@ -71,10 +76,14 @@ impl<R: ModifyAuthUserAccountRequestDecoder, M: ModifyAuthUserAccountMaterial>
 
         let fields = self.request_decoder.decode();
 
-        validate_auth_token(m.validate(), |event| {
+        let ticket = validate_auth_token(m.validate(), |event| {
             pubsub.post(ModifyAuthUserAccountState::Validate(event))
         })
         .await?;
+
+        ticket
+            .check_enough_permission(RequireAuthRoles::user())
+            .map_err(|err| pubsub.post(ModifyAuthUserAccountState::PermissionError(err)))?;
 
         modify_user(&m, fields, |event| {
             pubsub.post(ModifyAuthUserAccountState::ModifyUser(event))

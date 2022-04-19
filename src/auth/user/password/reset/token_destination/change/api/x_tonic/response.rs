@@ -12,6 +12,7 @@ impl ServiceResponder<ChangeResetTokenDestinationResponsePb> for ChangeResetToke
     fn respond_to(self) -> Result<Response<ChangeResetTokenDestinationResponsePb>, Status> {
         match self {
             Self::Validate(event) => event.respond_to(),
+            Self::PermissionError(err) => err.respond_to(),
             Self::ChangeDestination(event) => event.respond_to(),
         }
     }
