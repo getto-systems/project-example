@@ -1,26 +1,50 @@
-use std::convert::TryInto;
+use std::num::TryFromIntError;
 
-pub struct SearchOffset {
-    pub all: i32,
+pub struct SearchPage {
+    pub offset: i32,
     pub limit: i32,
+    pub all: i32,
 }
 
-impl SearchOffset {
-    pub fn detect(&self, offset: i32) -> i32 {
-        let offset = self.cast_offset(offset);
-        if offset >= self.all {
-            self.last_page()
-        } else {
-            self.offset_floor(offset)
-        }
+pub fn detect_search_page(detecter: SearchOffsetDetecter, offset: i32) -> SearchPage {
+    SearchPage {
+        offset: detecter.detect(offset),
+        limit: detecter.limit,
+        all: detecter.all,
     }
-    fn cast_offset(&self, offset: i32) -> i32 {
+}
+
+pub struct SearchOffsetDetecter {
+    all: i32,
+    limit: i32,
+}
+
+#[derive(Clone, Copy)]
+pub struct SearchOffsetDetecterExtract<T> {
+    pub all: T,
+    pub limit: T,
+}
+
+impl TryInto<SearchOffsetDetecter> for SearchOffsetDetecterExtract<usize> {
+    type Error = TryFromIntError;
+
+    fn try_into(self) -> Result<SearchOffsetDetecter, Self::Error> {
+        Ok(SearchOffsetDetecter {
+            all: self.all.try_into()?,
+            limit: self.limit.try_into()?,
+        })
+    }
+}
+
+impl SearchOffsetDetecter {
+    fn detect(&self, offset: i32) -> i32 {
         if offset < 0 {
-            0
-        } else {
-            // マイナスでなければエラーにはならない
-            offset.try_into().unwrap()
+            return 0;
         }
+        if offset >= self.all {
+            return self.last_page();
+        }
+        self.offset_floor(offset)
     }
     fn offset_floor(&self, offset: i32) -> i32 {
         offset - (offset % self.limit)
@@ -88,10 +112,4 @@ impl<K: From<String>> Into<SearchSort<K>> for SearchSortExtract {
             },
         }
     }
-}
-
-pub struct SearchPage {
-    pub offset: i32,
-    pub limit: i32,
-    pub all: i32,
 }
