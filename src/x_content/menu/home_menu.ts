@@ -4,7 +4,7 @@ import { icon_home } from "../icon"
 
 import { category, item } from "./common"
 
-import { MenuContent, MenuPermission } from "../../core/outline/load/infra"
+import { MenuContent } from "../../core/outline/load/infra"
 import { authRoleLabel } from "../role"
 
 export function homeMenuContent(): MenuContent {
@@ -17,7 +17,7 @@ export function homeMenuContent(): MenuContent {
                 item("ドキュメント", lnir(["files-alt"]), "docs/index.html"),
             ]),
             category("シーズン", allow, [item("設定", lnir(["cog"]), "season/setup.html")]),
-            category(authRoleLabel("user"), user, [
+            category(authRoleLabel(user.role), user, [
                 item("一覧", lnir(["friends"]), "auth/user/account.html"),
             ]),
             category("SYSTEM", allow, [
@@ -28,5 +28,5 @@ export function homeMenuContent(): MenuContent {
     }
 }
 
-const allow: MenuPermission = { type: "allow" }
-const user: MenuPermission = { type: "allow" } // TODO { type: "role", role: "manage_auth_user" } ロールの編集ができるようになったら制限する
+const allow = { type: "allow" } as const
+const user = { type: "role", role: "user" } as const

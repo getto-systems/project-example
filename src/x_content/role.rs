@@ -14,7 +14,6 @@ impl AuthRole {
 }
 
 pub const AUTH_ROLE_ALL: [AuthRole; 1] = [AuthRole::User];
-pub const AUTH_ROLE_USER: [AuthRole; 1] = [AuthRole::User];
 
 pub fn auth_role_set() -> HashSet<String> {
     let mut set = HashSet::new();

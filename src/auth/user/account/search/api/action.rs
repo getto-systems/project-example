@@ -12,9 +12,7 @@ use crate::{
     auth::{
         ticket::kernel::data::ValidateAuthRolesError,
         user::{
-            account::search::data::{
-                AuthUserAccountSearch, SearchAuthUserAccountFilterExtract,
-            },
+            account::search::data::{AuthUserAccountSearch, SearchAuthUserAccountFilterExtract},
             kernel::data::RequireAuthRoles,
         },
     },
@@ -83,7 +81,7 @@ impl<R: SearchAuthUserAccountRequestDecoder, M: SearchAuthUserAccountMaterial>
         .await?;
 
         ticket
-            .check_enough_permission(RequireAuthRoles::Nothing) // TODO RequireAuthRoles::manage_auth_user(),
+            .check_enough_permission(RequireAuthRoles::user())
             .map_err(|err| pubsub.post(SearchAuthUserAccountState::PermissionError(err)))?;
 
         search_user_account(&self.material, fields, |event| {

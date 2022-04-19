@@ -12,6 +12,7 @@ impl LogFilter for ModifyAuthUserAccountState {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::Validate(event) => event.log_level(),
+            Self::PermissionError(event) => event.log_level(),
             Self::ModifyUser(event) => event.log_level(),
         }
     }

@@ -12,6 +12,7 @@ impl ServiceResponder<ModifyAuthUserAccountResponsePb> for ModifyAuthUserAccount
     fn respond_to(self) -> Result<Response<ModifyAuthUserAccountResponsePb>, Status> {
         match self {
             Self::Validate(event) => event.respond_to(),
+            Self::PermissionError(err) => err.respond_to(),
             Self::ModifyUser(event) => event.respond_to(),
         }
     }
