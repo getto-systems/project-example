@@ -31,7 +31,7 @@ async function fetchRemote(
     user: Readonly<{ loginId: LoginId; resetTokenDestination: ResetTokenDestination }>,
     fields: ResetTokenDestination,
 ): Promise<ChangeResetTokenDestinationRemoteResult> {
-    const mock = true
+    const mock = false
     if (mock) {
         return { success: true, value: true }
     }

@@ -151,9 +151,12 @@ impl<'a> TableLoginId<'a> {
             .await
             .map_err(|err| infra_error("get reset token entry error", err))?;
 
-        Ok(response
-            .item
-            .and_then(|mut attrs| ColumnResetTokenDestinationEmail::remove_value(&mut attrs)))
+        Ok(response.item.and_then(|mut attrs| {
+            Some(
+                ColumnResetTokenDestinationEmail::remove_value(&mut attrs)
+                    .unwrap_or(ResetTokenDestination::None),
+            )
+        }))
     }
 
     pub async fn put_override_entry(
@@ -213,7 +216,7 @@ impl<'a> TableLoginId<'a> {
                 table_name: self.table_name.into(),
                 key: Self::key(login_id),
                 update_expression: Some(format!(
-                    "set {} = null",
+                    "remove {}",
                     ColumnResetTokenDestinationEmail::as_name()
                 )),
                 ..Default::default()

@@ -199,6 +199,19 @@ impl<'a> TableUser<'a> {
         user_id: AuthUserId,
         changes: ModifyAuthUserAccountChanges,
     ) -> Result<(), RepositoryError> {
+        let granted_roles = changes.granted_roles.extract();
+        if granted_roles.is_empty() {
+            self.remove_granted_roles(user_id).await
+        } else {
+            self.set_granted_roles(user_id, GrantedAuthRoles::restore(granted_roles))
+                .await
+        }
+    }
+    async fn set_granted_roles(
+        &self,
+        user_id: AuthUserId,
+        granted_roles: GrantedAuthRoles,
+    ) -> Result<(), RepositoryError> {
         let input = UpdateItemInput {
             table_name: self.table_name.into(),
             key: Self::key(user_id),
@@ -209,7 +222,7 @@ impl<'a> TableUser<'a> {
             expression_attribute_values: Some(
                 vec![(
                     ":granted_roles".to_owned(),
-                    ColumnGrantedAuthRoles::to_attr(changes.granted_roles),
+                    ColumnGrantedAuthRoles::to_attr(granted_roles),
                 )]
                 .into_iter()
                 .collect(),
@@ -220,7 +233,25 @@ impl<'a> TableUser<'a> {
         self.client
             .update_item(input)
             .await
-            .map_err(|err| infra_error("update user error", err))?;
+            .map_err(|err| infra_error("set granted roles error", err))?;
+
+        Ok(())
+    }
+    async fn remove_granted_roles(&self, user_id: AuthUserId) -> Result<(), RepositoryError> {
+        let input = UpdateItemInput {
+            table_name: self.table_name.into(),
+            key: Self::key(user_id),
+            update_expression: Some(format!(
+                "remove {}",
+                vec![ColumnGrantedAuthRoles::as_name()].join(",")
+            )),
+            ..Default::default()
+        };
+
+        self.client
+            .update_item(input)
+            .await
+            .map_err(|err| infra_error("remove granted roles error", err))?;
 
         Ok(())
     }
