@@ -54,10 +54,31 @@ async fn success_modify_user() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
         "modify auth user account success",
     ]);
     assert!(result.is_ok());
+}
+
+#[tokio::test]
+async fn permission_denied() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::new();
+    let material = TestStruct::not_permitted(&store);
+    let request_decoder = standard_request_decoder();
+
+    let mut action = ModifyAuthUserAccountAction::with_material(request_decoder, material);
+    action.subscribe(handler);
+
+    let result = action.ignite().await;
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "user permission denied; granted: [], require: any [user]",
+    ]);
+    assert!(!result.is_ok());
 }
 
 #[tokio::test]
@@ -75,7 +96,7 @@ async fn error_conflict_changes() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
         "modify auth user account error; changes conflicted",
     ]);
     assert!(!result.is_ok());
@@ -96,7 +117,7 @@ async fn error_not_found() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
         "modify auth user account error; not found",
     ]);
     assert!(!result.is_ok());
@@ -136,6 +157,12 @@ impl TestStore {
 
 impl<'a> TestStruct<'a> {
     fn standard(store: &'a TestStore) -> Self {
+        Self::new(store, standard_token_decoder())
+    }
+    fn not_permitted(store: &'a TestStore) -> Self {
+        Self::new(store, not_permitted_token_decoder())
+    }
+    fn new(store: &'a TestStore, token_decoder: StaticAuthTokenDecoder) -> Self {
         Self {
             validate: StaticValidateAuthTokenStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
@@ -145,7 +172,7 @@ impl<'a> TestStruct<'a> {
                     nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
                 },
                 token_metadata: standard_token_header(),
-                token_decoder: standard_token_decoder(),
+                token_decoder,
             },
             user_repository: standard_user_repository(&store.user),
         }
@@ -176,6 +203,13 @@ fn standard_token_decoder() -> StaticAuthTokenDecoder {
     StaticAuthTokenDecoder::Valid(AuthTicketExtract {
         ticket_id: TICKET_ID.into(),
         user_id: USER_ID.into(),
+        granted_roles: standard_granted_roles(),
+    })
+}
+fn not_permitted_token_decoder() -> StaticAuthTokenDecoder {
+    StaticAuthTokenDecoder::Valid(AuthTicketExtract {
+        ticket_id: TICKET_ID.into(),
+        user_id: USER_ID.into(),
         granted_roles: HashSet::new(),
     })
 }
@@ -192,7 +226,7 @@ fn standard_request_decoder() -> StaticModifyAuthUserAccountRequestDecoder {
     StaticModifyAuthUserAccountRequestDecoder::Valid(ModifyAuthUserAccountFields {
         login_id: LoginId::restore(LOGIN_ID.into()),
         from: ModifyAuthUserAccountChanges {
-            granted_roles: GrantedAuthRoles::restore(test_granted_roles()),
+            granted_roles: GrantedAuthRoles::restore(standard_granted_roles()),
         },
         to: ModifyAuthUserAccountChanges {
             granted_roles: GrantedAuthRoles::empty(),
@@ -225,35 +259,33 @@ fn not_found_request_decoder() -> StaticModifyAuthUserAccountRequestDecoder {
 fn standard_user_repository<'a>(store: &'a MemoryAuthUserStore) -> MemoryAuthUserRepository<'a> {
     MemoryAuthUserRepository::with_user_and_password(
         store,
-        test_user_login_id(),
-        test_user(),
-        test_user_password(),
-        vec![(test_registered_login_id(), test_registered_user_id())],
+        standard_login_id(),
+        standard_user(),
+        standard_password(),
+        vec![(registered_login_id(), registered_user_id())],
     )
 }
 
-fn test_user() -> AuthUser {
+fn standard_user() -> AuthUser {
     AuthUserExtract {
         user_id: USER_ID.into(),
-        granted_roles: test_granted_roles(),
+        granted_roles: standard_granted_roles(),
     }
     .restore()
 }
-fn test_granted_roles() -> HashSet<String> {
-    let mut granted_roles = HashSet::new();
-    granted_roles.insert("user".into());
-    granted_roles
+fn standard_granted_roles() -> HashSet<String> {
+    vec!["user".into()].into_iter().collect()
 }
-fn test_user_login_id() -> LoginId {
+fn standard_login_id() -> LoginId {
     LoginId::restore(LOGIN_ID.into())
 }
-fn test_user_password() -> HashedPassword {
+fn standard_password() -> HashedPassword {
     HashedPassword::restore(PASSWORD.into())
 }
 
-fn test_registered_user_id() -> AuthUserId {
+fn registered_user_id() -> AuthUserId {
     AuthUserId::restore(REGISTERED_USER_ID.into())
 }
-fn test_registered_login_id() -> LoginId {
+fn registered_login_id() -> LoginId {
     LoginId::restore(REGISTERED_LOGIN_ID.into())
 }

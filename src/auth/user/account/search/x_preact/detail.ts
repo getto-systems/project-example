@@ -40,41 +40,47 @@ type Props = Readonly<{
     user: Readonly<{ found: false }> | Readonly<{ found: true; user: AuthUserAccount }>
 }>
 export function DetailAuthUserAccount(props: Props): VNode {
-    return html`${[container([box_grow({ body: backToListButton() })]), content()]}`
+    return html`${[container([box_grow({ body: backToListButton() })]), ...content()]}`
 
-    function content(): VNode {
+    function content(): VNode[] {
         if (!props.user.found) {
-            return container([
-                box_grow({ body: notice_gray(["指定されたユーザーが見つかりませんでした"]) }),
-            ])
+            return [
+                container([
+                    box_grow({ body: notice_gray(["指定されたユーザーが見つかりませんでした"]) }),
+                ]),
+            ]
         }
 
         const user = props.user.user
 
-        return container([
-            h(ModifyAuthUserAccount, {
-                ...props.modify,
-                user,
-                onSuccess: (fields) => {
-                    props.detail.update({ ...user, ...fields })
-                },
-            }),
-            h(ChangeResetTokenDestination, {
-                ...props.changeResetTokenDestination,
-                user,
-                onSuccess: (resetTokenDestination) => {
-                    props.detail.update({ ...user, resetTokenDestination })
-                },
-            }),
-            h(OverrideLoginId, {
-                ...props.overrideLoginId,
-                user,
-                onSuccess: (loginId) => {
-                    props.detail.update({ ...user, loginId })
-                },
-            }),
-            h(OverridePassword, { ...props.overridePassword, user }),
-        ])
+        return [
+            container([
+                h(ModifyAuthUserAccount, {
+                    ...props.modify,
+                    user,
+                    onSuccess: (fields) => {
+                        props.detail.update({ ...user, ...fields })
+                    },
+                }),
+                h(ChangeResetTokenDestination, {
+                    ...props.changeResetTokenDestination,
+                    user,
+                    onSuccess: (resetTokenDestination) => {
+                        props.detail.update({ ...user, resetTokenDestination })
+                    },
+                }),
+            ]),
+            container([
+                h(OverrideLoginId, {
+                    ...props.overrideLoginId,
+                    user,
+                    onSuccess: (loginId) => {
+                        props.detail.update({ ...user, loginId })
+                    },
+                }),
+                h(OverridePassword, { ...props.overridePassword, user }),
+            ]),
+        ]
     }
 
     function backToListButton(): VNode {
