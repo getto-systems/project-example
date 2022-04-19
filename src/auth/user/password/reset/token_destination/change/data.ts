@@ -1,8 +1,6 @@
 import { RemoteCommonError } from "../../../../../../z_lib/ui/remote/data"
 
-export type ChangeResetTokenDestinationError =
-    | Readonly<{ type: "validation-error" }>
-    | ChangeResetTokenDestinationRemoteError
+export type ChangeResetTokenDestinationError = ChangeResetTokenDestinationRemoteError
 
 export type ChangeResetTokenDestinationRemoteError =
     | RemoteCommonError

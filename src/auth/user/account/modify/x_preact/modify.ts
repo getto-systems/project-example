@@ -53,6 +53,7 @@ export function ModifyAuthUserAccount(props: Props): VNode {
                           left: submitButton(),
                           right: resetButton(),
                       }),
+                      ...validationMessage(),
                       ...message(),
                       buttons({
                           right: closeButton(),
@@ -109,15 +110,20 @@ export function ModifyAuthUserAccount(props: Props): VNode {
         }
     }
 
+    function validationMessage(): readonly VNode[] {
+        switch (validateState) {
+            case "initial":
+            case "valid":
+                return []
+
+            case "invalid":
+                return [fieldError(["正しく入力されていません"])]
+        }
+    }
     function message(): readonly VNode[] {
         switch (state.type) {
             case "initial":
             case "success":
-                if (validateState === "invalid") {
-                    return [fieldError(["正しく入力されていません"])]
-                }
-                return []
-
             case "try":
                 return []
 
@@ -137,9 +143,6 @@ export function ModifyAuthUserAccount(props: Props): VNode {
 
 function modifyError(err: ModifyAuthUserAccountError): readonly VNodeContent[] {
     switch (err.type) {
-        case "validation-error":
-            return ["正しく入力してください"]
-
         case "conflict":
             return ["他で変更がありました", "一旦リロードしてやり直してください"]
 

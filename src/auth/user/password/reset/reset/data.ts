@@ -8,7 +8,6 @@ export type ResetPasswordFields = Readonly<{
 }>
 
 export type ResetPasswordError =
-    | Readonly<{ type: "validation-error" }>
     | Readonly<{ type: "empty-reset-token" }>
     | ResetPasswordRemoteError
 

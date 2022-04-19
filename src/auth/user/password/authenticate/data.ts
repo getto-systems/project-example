@@ -7,9 +7,7 @@ export type AuthenticatePasswordFields = Readonly<{
     password: Password
 }>
 
-export type AuthenticatePasswordError =
-    | Readonly<{ type: "validation-error" }>
-    | AuthenticatePasswordRemoteError
+export type AuthenticatePasswordError = AuthenticatePasswordRemoteError
 
 export type AuthenticatePasswordRemoteError =
     | RemoteCommonError

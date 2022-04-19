@@ -123,7 +123,11 @@ class Action
     async submit(
         user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>,
     ): Promise<ModifyAuthUserAccountState> {
-        return modifyUser(this.material, user, this.convert(), this.post)
+        const fields = this.convert()
+        if (!fields.valid) {
+            return this.currentState()
+        }
+        return modifyUser(this.material, user, fields.value, this.post)
     }
 }
 
@@ -136,20 +140,16 @@ type ModifyUserEvent =
 async function modifyUser<S>(
     { infra, config }: ModifyAuthUserAccountMaterial,
     user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>,
-    fields: ConvertBoardResult<ModifyAuthUserAccountFields>,
+    fields: ModifyAuthUserAccountFields,
     post: Post<ModifyUserEvent, S>,
 ): Promise<S> {
-    if (!fields.valid) {
-        return post({ type: "failed", err: { type: "validation-error" } })
-    }
-
     post({ type: "try" })
 
     const { modifyUserRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(
-        modifyUserRemote(user, fields.value),
+        modifyUserRemote(user, fields),
         config.takeLongtimeThreshold,
         () => post({ type: "take-longtime" }),
     )
@@ -157,7 +157,7 @@ async function modifyUser<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "success", data: fields.value })
+    return post({ type: "success", data: fields })
 }
 
 interface Post<E, S> {

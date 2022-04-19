@@ -7,7 +7,10 @@ import { initInputPasswordAction } from "../input/action"
 import { initValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
 import { InputPasswordAction } from "../input/action"
 import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
-import { initObserveBoardAction, ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
+import {
+    initObserveBoardAction,
+    ObserveBoardAction,
+} from "../../../../z_vendor/getto-application/board/observe_board/action"
 
 import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 
@@ -142,7 +145,11 @@ class Action
         return this.post(this.initialState)
     }
     async submit(): Promise<ChangePasswordState> {
-        return changePassword(this.material, this.convert(), this.post)
+        const fields = this.convert()
+        if (!fields.valid) {
+            return this.currentState()
+        }
+        return changePassword(this.material, fields.value, this.post)
     }
 }
 
@@ -154,20 +161,16 @@ type ChangePasswordEvent =
 
 async function changePassword<S>(
     { infra, config }: ChangePasswordMaterial,
-    fields: ConvertBoardResult<ChangePasswordFields>,
+    fields: ChangePasswordFields,
     post: Post<ChangePasswordEvent, S>,
 ): Promise<S> {
-    if (!fields.valid) {
-        return post({ type: "failed", err: { type: "validation-error" } })
-    }
-
     post({ type: "try" })
 
     const { changePasswordRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(
-        changePasswordRemote(fields.value),
+        changePasswordRemote(fields),
         config.takeLongtimeThreshold,
         () => post({ type: "take-longtime" }),
     )
@@ -263,7 +266,11 @@ class OverrideAction
         return this.post(this.initialState)
     }
     async submit(user: Readonly<{ loginId: LoginId }>): Promise<OverridePasswordState> {
-        return overridePassword(this.material, user, this.convert(), this.post)
+        const fields = this.convert()
+        if (!fields.valid) {
+            return this.currentState()
+        }
+        return overridePassword(this.material, user, fields.value, this.post)
     }
 }
 
@@ -276,20 +283,16 @@ type OverridePasswordEvent =
 async function overridePassword<S>(
     { infra, config }: OverridePasswordMaterial,
     user: Readonly<{ loginId: LoginId }>,
-    fields: ConvertBoardResult<OverridePasswordFields>,
+    fields: OverridePasswordFields,
     post: Post<OverridePasswordEvent, S>,
 ): Promise<S> {
-    if (!fields.valid) {
-        return post({ type: "failed", err: { type: "validation-error" } })
-    }
-
     post({ type: "try" })
 
     const { overridePasswordRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(
-        overridePasswordRemote(user, fields.value),
+        overridePasswordRemote(user, fields),
         config.takeLongtimeThreshold,
         () => post({ type: "take-longtime" }),
     )

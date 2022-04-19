@@ -9,7 +9,10 @@ import {
     ValidateBoardAction,
     initValidateBoardAction,
 } from "../../../../../z_vendor/getto-application/board/validate_board/action"
-import { initObserveBoardAction, ObserveBoardAction } from "../../../../../z_vendor/getto-application/board/observe_board/action"
+import {
+    initObserveBoardAction,
+    ObserveBoardAction,
+} from "../../../../../z_vendor/getto-application/board/observe_board/action"
 
 import { delayedChecker } from "../../../../../z_lib/ui/timer/helper"
 
@@ -155,7 +158,11 @@ class Action
         this.validate.clear()
     }
     async submit(): Promise<ResetPasswordState> {
-        const result = await reset(this.material, this.convert(), this.post)
+        const fields = this.convert()
+        if (!fields.valid) {
+            return this.currentState()
+        }
+        const result = await reset(this.material, fields.value, this.post)
         if (!result.success) {
             return result.state
         }
@@ -196,16 +203,9 @@ type ResetResult<S> =
 
 async function reset<S>(
     { infra, shell, config }: ResetPasswordMaterial,
-    fields: ConvertBoardResult<ResetPasswordFields>,
+    fields: ResetPasswordFields,
     post: Post<ResetEvent, S>,
 ): Promise<ResetResult<S>> {
-    if (!fields.valid) {
-        return {
-            success: false,
-            state: post({ type: "failed-to-reset", err: { type: "validation-error" } }),
-        }
-    }
-
     const resetToken = shell.detectResetToken()
     if (!resetToken.valid) {
         return {
@@ -220,7 +220,7 @@ async function reset<S>(
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(
-        resetRemote(resetToken.value, fields.value),
+        resetRemote(resetToken.value, fields),
         config.takeLongtimeThreshold,
         () => post({ type: "take-longtime-to-reset" }),
     )

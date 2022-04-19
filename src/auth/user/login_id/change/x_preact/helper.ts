@@ -6,9 +6,6 @@ import { ChangeLoginIdError } from "../data"
 
 export function changeLoginIdError(err: ChangeLoginIdError): readonly VNodeContent[] {
     switch (err.type) {
-        case "validation-error":
-            return ["正しく入力してください"]
-
         case "not-found":
             return ["ユーザーが見つかりませんでした", "一旦リロードしてやり直してください"]
 

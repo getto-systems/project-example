@@ -50,7 +50,7 @@ test("submit without fields", async () => {
     const runner = setupActionTestRunner(resource.override.subscriber)
 
     await runner(() => resource.override.submit(user)).then((stack) => {
-        expect(stack).toEqual([{ type: "failed", err: { type: "validation-error" } }])
+        expect(stack).toEqual([])
     })
 })
 

@@ -8,7 +8,7 @@ import {
     useApplicationView,
 } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { buttons, fieldError, form } from "../../../../../../z_vendor/getto-css/preact/design/form"
+import { buttons, fieldError } from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { loginBox } from "../../../../../../z_vendor/getto-css/preact/layout/login"
 
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
@@ -40,65 +40,36 @@ export function RequestResetToken(viewProps: Props): VNode {
     const validateState = useApplicationAction(props.requestToken.validate)
     const observeState = useApplicationAction(props.requestToken.observe)
 
-    const content = {
+    return loginBox(siteInfo, {
         title: "パスワードリセット",
-    }
+        ...(state.type === "success"
+            ? {
+                  body: [
+                      html`<p>トークンの送信が完了しました</p>`,
+                      html`<p>
+                          メールからパスワードのリセットができます<br />
+                          メールを確認してください
+                      </p>`,
+                  ],
+                  footer: footerLinks(),
+              }
+            : {
+                  form: true,
+                  body: [
+                      h(InputLoginId, {
+                          field: props.requestToken.loginId,
+                          help: ["このログインIDに設定された送信先にリセットトークンを送信します"],
+                      }),
+                      buttons({
+                          left: sendButton(),
+                          right: clearButton(),
+                      }),
+                  ],
+                  footer: [footerLinks(), ...validationMessage(), ...message()],
+              }),
+    })
 
-    switch (state.type) {
-        case "initial":
-        case "try":
-        case "failed":
-            return form(
-                loginBox(siteInfo, {
-                    ...content,
-                    body: [
-                        h(InputLoginId, {
-                            field: props.requestToken.loginId,
-                            help: [
-                                "このログインIDに設定された送信先にリセットトークンを送信します",
-                            ],
-                        }),
-                        buttons({
-                            left: sendButton(),
-                            right: clearButton(),
-                        }),
-                    ],
-                    footer: [
-                        footerLinks(),
-                        state.type === "failed" ? fieldError(requestTokenError(state.err)) : "",
-                    ],
-                }),
-            )
-
-        case "take-longtime":
-            return loginBox(siteInfo, {
-                ...content,
-                body: [
-                    html`<p>${iconHtml(icon_spinner)} トークンの送信に時間がかかっています</p>`,
-                    html`<p>
-                        30秒以上かかる場合は何かがおかしいので、
-                        <br />
-                        お手数ですが管理者に連絡お願いします
-                    </p>`,
-                ],
-                footer: footerLinks(),
-            })
-
-        case "success":
-            return loginBox(siteInfo, {
-                ...content,
-                body: [
-                    html`<p>トークンの送信が完了しました</p>`,
-                    html`<p>
-                        メールからパスワードのリセットができます<br />
-                        メールを確認してください
-                    </p>`,
-                ],
-                footer: footerLinks(),
-            })
-    }
-
-    function clearButton() {
+    function clearButton(): VNode {
         return h(ClearChangesButton, { observeState, onClick })
 
         function onClick(e: Event) {
@@ -107,7 +78,7 @@ export function RequestResetToken(viewProps: Props): VNode {
         }
     }
 
-    function sendButton() {
+    function sendButton(): VNode {
         return h(SendButton, {
             label: "トークン送信",
             icon: icon_change,
@@ -122,10 +93,40 @@ export function RequestResetToken(viewProps: Props): VNode {
         }
     }
 
-    function footerLinks() {
+    function validationMessage(): readonly VNode[] {
+        switch (validateState) {
+            case "initial":
+            case "valid":
+                return []
+
+            case "invalid":
+                return [fieldError(["正しく入力されていません"])]
+        }
+    }
+    function message(): readonly VNode[] {
+        switch (state.type) {
+            case "initial":
+            case "success":
+            case "try":
+                return []
+
+            case "take-longtime":
+                return [
+                    fieldError([
+                        html`${iconHtml(icon_spinner)} トークンの送信に時間がかかっています`,
+                        html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
+                    ]),
+                ]
+
+            case "failed":
+                return [fieldError(requestTokenError(state.err))]
+        }
+    }
+
+    function footerLinks(): VNode {
         return buttons({ left: privacyPolicyLink(), right: loginLink() })
     }
-    function privacyPolicyLink() {
+    function privacyPolicyLink(): VNode {
         return signNav(props.link.getNav_static_privacyPolicy())
     }
     function loginLink(): VNode {
@@ -135,9 +136,6 @@ export function RequestResetToken(viewProps: Props): VNode {
 
 function requestTokenError(err: RequestResetTokenError): readonly VNodeContent[] {
     switch (err.type) {
-        case "validation-error":
-            return ["正しく入力してください"]
-
         case "invalid-reset":
             return ["ログインIDが登録されていないか、トークンの送信先が登録されていません"]
 

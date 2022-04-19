@@ -69,6 +69,7 @@ export function ChangePassword(props: Props): VNode {
                     left: submitButton(),
                     right: clearButton(),
                 }),
+                ...validationMessage(),
                 ...message(),
                 buttons({
                     right: closeButton(),
@@ -124,20 +125,20 @@ export function ChangePassword(props: Props): VNode {
         }
     }
 
+    function validationMessage(): readonly VNode[] {
+        switch (validateState) {
+            case "initial":
+            case "valid":
+                return []
+
+            case "invalid":
+                return [fieldError(["正しく入力されていません"])]
+        }
+    }
     function message(): readonly VNode[] {
         switch (state.type) {
             case "initial":
             case "success":
-                switch (validateState) {
-                    case "initial":
-                    case "valid":
-                        return []
-
-                    case "invalid":
-                        return [fieldError(["正しく入力されていません"])]
-                }
-                break
-
             case "try":
                 return []
 
