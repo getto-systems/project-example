@@ -1,14 +1,15 @@
 import { h, VNode } from "preact"
-import { html } from "htm/preact"
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { buttons, fieldError, form } from "../../../../../z_vendor/getto-css/preact/design/form"
+import {
+    buttons,
+    fieldHelp_error,
+    form,
+} from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../z_vendor/getto-css/preact/design/highlight"
-
-import { iconHtml } from "../../../../../core/x_preact/design/icon"
-import { icon_spinner } from "../../../../../x_content/icon"
+import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
 
 import { changePasswordError } from "./helper"
 import { InputPassword } from "../../input/x_preact/input"
@@ -132,7 +133,7 @@ export function ChangePassword(props: Props): VNode {
                 return []
 
             case "invalid":
-                return [fieldError(["正しく入力されていません"])]
+                return [fieldHelp_error(["正しく入力されていません"])]
         }
     }
     function message(): readonly VNode[] {
@@ -143,15 +144,10 @@ export function ChangePassword(props: Props): VNode {
                 return []
 
             case "take-longtime":
-                return [
-                    fieldError([
-                        html`${iconHtml(icon_spinner)} 変更に時間がかかっています`,
-                        html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
-                    ]),
-                ]
+                return [takeLongtimeField("変更")]
 
             case "failed":
-                return [fieldError(changePasswordError(state.err))]
+                return [fieldHelp_error(changePasswordError(state.err))]
         }
     }
 }

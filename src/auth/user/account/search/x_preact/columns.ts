@@ -2,7 +2,7 @@ import { h, VNode } from "preact"
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { fieldError } from "../../../../../z_vendor/getto-css/preact/design/form"
+import { fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 
 import { SearchColumns } from "../../../../../z_lib/ui/search/columns/x_preact/columns"
 
@@ -29,7 +29,7 @@ export function SearchAuthUserAccountColumns(props: Props): VNode {
             })
 
         case "repository-error":
-            return fieldError(repositoryError(columnsState.err))
+            return fieldHelp_error(repositoryError(columnsState.err))
     }
 }
 function repositoryError(err: RepositoryError): readonly string[] {

@@ -1,19 +1,22 @@
 import { h, VNode } from "preact"
-import { html } from "htm/preact"
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { buttons, fieldError, form } from "../../../../../z_vendor/getto-css/preact/design/form"
+import {
+    buttons,
+    fieldHelp_error,
+    form,
+} from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
+import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
-import { icon_spinner } from "../../../../../x_content/icon"
-import { iconHtml } from "../../../../../core/x_preact/design/icon"
 
 import { InputAuthRoles } from "../../input/x_preact/roles"
 import { EditButton } from "../../../../../core/x_preact/button/edit_button"
 import { ResetButton } from "../../../../../core/x_preact/button/reset_button"
 import { CloseButton } from "../../../../../core/x_preact/button/close_button"
+import { ChangeButton } from "../../../../../core/x_preact/button/change_button"
 
 import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
 
@@ -23,7 +26,6 @@ import { ModifyAuthUserAccountAction } from "../action"
 import { ModifyAuthUserAccountError, ModifyAuthUserAccountFields } from "../data"
 import { LoginId } from "../../../login_id/kernel/data"
 import { AuthRole } from "../../../kernel/data"
-import { ChangeButton } from "../../../../../core/x_preact/button/change_button"
 
 type Props = Readonly<{
     user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>
@@ -117,7 +119,7 @@ export function ModifyAuthUserAccount(props: Props): VNode {
                 return []
 
             case "invalid":
-                return [fieldError(["正しく入力されていません"])]
+                return [fieldHelp_error(["正しく入力されていません"])]
         }
     }
     function message(): readonly VNode[] {
@@ -128,15 +130,10 @@ export function ModifyAuthUserAccount(props: Props): VNode {
                 return []
 
             case "take-longtime":
-                return [
-                    fieldError([
-                        html`${iconHtml(icon_spinner)} 変更に時間がかかっています`,
-                        html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
-                    ]),
-                ]
+                return [takeLongtimeField("変更")]
 
             case "failed":
-                return [fieldError(modifyError(state.err))]
+                return [fieldHelp_error(modifyError(state.err))]
         }
     }
 }

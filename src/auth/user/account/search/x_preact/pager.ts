@@ -5,7 +5,7 @@ import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { fieldError } from "../../../../../z_vendor/getto-css/preact/design/form"
+import { fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { pagerCount, pagerParams } from "../../../../../core/x_preact/design/table"
 
 import { SearchOffset } from "../../../../../z_lib/ui/search/offset/x_preact/offset"
@@ -39,7 +39,7 @@ export function SearchAuthUserAccountPager(props: Props): VNode {
             return pagerForm({ page: state.response.page, isConnecting: false })
 
         case "failed":
-            return fieldError(searchError(state.err))
+            return fieldHelp_error(searchError(state.err))
     }
 
     type Content = Readonly<{ page: SearchPageResponse; isConnecting: boolean }>

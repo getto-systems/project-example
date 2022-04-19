@@ -10,15 +10,14 @@ import {
 } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { loginBox } from "../../../../../z_vendor/getto-css/preact/layout/login"
-import { buttons, fieldError } from "../../../../../z_vendor/getto-css/preact/design/form"
+import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../../x_content/site"
 import { lnir } from "../../../../../z_lib/ui/icon/init/line_icon"
-import { icon_spinner } from "../../../../../x_content/icon"
 import { appendScript } from "../../../../sign/x_preact/script"
 import { signNav } from "../../../../sign/nav/x_preact/nav"
-import { iconHtml } from "../../../../../core/x_preact/design/icon"
+import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
 
 import { ApplicationError } from "../../../../../avail/x_preact/application_error"
 import { InputLoginId } from "../../../login_id/input/x_preact/input"
@@ -148,7 +147,7 @@ export function AuthenticatePassword(viewProps: Props): VNode {
                     return []
 
                 case "invalid":
-                    return [fieldError(["正しく入力されていません"])]
+                    return [fieldHelp_error(["正しく入力されていません"])]
             }
         }
         function message(): VNode[] {
@@ -158,15 +157,10 @@ export function AuthenticatePassword(viewProps: Props): VNode {
                     return []
 
                 case "take-longtime-to-login":
-                    return [
-                        fieldError([
-                            html`${iconHtml(icon_spinner)} 認証に時間がかかっています`,
-                            html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
-                        ]),
-                    ]
+                    return [takeLongtimeField("認証")]
 
                 case "failed-to-login":
-                    return [fieldError(loginError(authenticateState.err))]
+                    return [fieldHelp_error(loginError(authenticateState.err))]
             }
         }
     }

@@ -135,24 +135,47 @@ function fieldSectionContent(field: FieldSectionContent): VNode {
     }
 }
 
-export function fieldError(notice: readonly VNodeContent[]): VNode {
+type FieldHelpContent = Readonly<{
+    help?: readonly VNodeContent[]
+    notice?: readonly VNodeContent[]
+}>
+export function fieldHelp(content: FieldHelpContent): VNode {
+    if (helpLength() + noticeLength() === 0) {
+        return html``
+    }
+    return html`<aside class="field__help">${notice()}${help()}</aside>`
+
+    function helpLength(): number {
+        return content.help?.length || 0
+    }
+    function noticeLength(): number {
+        return content.notice?.length || 0
+    }
+
+    function notice(): VNode[] {
+        if (!content.notice) {
+            return []
+        }
+        return content.notice.map(toFieldNotice)
+    }
+    function help(): VNode[] {
+        if (!content.help) {
+            return []
+        }
+        return content.help.map(toFieldHelp)
+    }
+}
+export function fieldHelp_error(notice: readonly VNodeContent[]): VNode {
+    if (notice.length === 0) {
+        return html``
+    }
     return html`<aside class="field__help field_error">${notice.map(toFieldNotice)}</aside>`
 }
-export function fieldWarning(notice: VNodeContent[]): VNode {
-    return html`<aside class="field__help field_warning">${notice.map(toFieldNotice)}</aside>`
-}
-
-type FieldHelpContent = Readonly<{
-    help: readonly VNodeContent[]
-    notice: readonly VNodeContent[]
-}>
-function fieldHelp({ help, notice }: FieldHelpContent) {
-    if (help.length + notice.length == 0) {
-        return ""
+export function fieldHelp_warning(notice: readonly VNodeContent[]): VNode {
+    if (notice.length === 0) {
+        return html``
     }
-    return html`<aside class="field__help">
-        ${notice.map(toFieldNotice)}${help.map(toFieldHelp)}
-    </aside>`
+    return html`<aside class="field__help field_warning">${notice.map(toFieldNotice)}</aside>`
 }
 function toFieldNotice(message: VNodeContent) {
     return html`<p class="field__notice">${message}</p>`

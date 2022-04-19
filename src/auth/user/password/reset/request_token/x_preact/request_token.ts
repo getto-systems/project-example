@@ -8,14 +8,14 @@ import {
     useApplicationView,
 } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { buttons, fieldError } from "../../../../../../z_vendor/getto-css/preact/design/form"
+import { buttons, fieldHelp_error } from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { loginBox } from "../../../../../../z_vendor/getto-css/preact/layout/login"
 
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../../../x_content/site"
-import { icon_change, icon_spinner } from "../../../../../../x_content/icon"
+import { icon_change } from "../../../../../../x_content/icon"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
-import { iconHtml } from "../../../../../../core/x_preact/design/icon"
+import { takeLongtimeField } from "../../../../../../core/x_preact/design/form"
 
 import { InputLoginId } from "../../../../login_id/input/x_preact/input"
 import { ClearChangesButton } from "../../../../../../core/x_preact/button/clear_changes_button"
@@ -100,7 +100,7 @@ export function RequestResetToken(viewProps: Props): VNode {
                 return []
 
             case "invalid":
-                return [fieldError(["正しく入力されていません"])]
+                return [fieldHelp_error(["正しく入力されていません"])]
         }
     }
     function message(): readonly VNode[] {
@@ -111,15 +111,10 @@ export function RequestResetToken(viewProps: Props): VNode {
                 return []
 
             case "take-longtime":
-                return [
-                    fieldError([
-                        html`${iconHtml(icon_spinner)} トークンの送信に時間がかかっています`,
-                        html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
-                    ]),
-                ]
+                return [takeLongtimeField("トークンの送信")]
 
             case "failed":
-                return [fieldError(requestTokenError(state.err))]
+                return [fieldHelp_error(requestTokenError(state.err))]
         }
     }
 
