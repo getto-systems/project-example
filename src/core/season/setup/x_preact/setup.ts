@@ -73,7 +73,7 @@ export function SetupSeason(props: Props): VNode {
     }
 
     function setupButton(): VNode {
-        // select による選択なので validate はしないので、validateState は "initial" 固定
+        // select による選択なので validate しない; validateState は "initial" 固定
         return h(ChangeButton, { isConnecting: false, validateState: "initial", onClick })
 
         function onClick(e: Event) {
