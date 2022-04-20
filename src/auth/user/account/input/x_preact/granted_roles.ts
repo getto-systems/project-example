@@ -32,7 +32,7 @@ type Props = Readonly<{
         help: readonly VNodeContent[]
     }>
 
-export function InputAuthRoles(props: Props): VNode {
+export function InputGrantedRoles(props: Props): VNode {
     const editableState = useApplicationAction(props.editable)
 
     return field({

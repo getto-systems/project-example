@@ -26,6 +26,7 @@ impl SearchAuthUserAccountRequestDecoder for PbSearchAuthUserAccountRequestDecod
                 order: self.request.sort_order,
             },
             login_id: self.request.login_id.pop(),
+            granted_roles: self.request.granted_roles,
         }
     }
 }

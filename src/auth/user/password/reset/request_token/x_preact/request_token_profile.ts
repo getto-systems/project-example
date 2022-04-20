@@ -5,11 +5,11 @@ import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
 import { useApplicationAction } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { buttons, fieldError } from "../../../../../../z_vendor/getto-css/preact/design/form"
-import { icon_change, icon_spinner } from "../../../../../../x_content/icon"
+import { buttons, fieldHelp_error } from "../../../../../../z_vendor/getto-css/preact/design/form"
+import { icon_change } from "../../../../../../x_content/icon"
 import { box } from "../../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../../z_vendor/getto-css/preact/design/highlight"
-import { iconHtml } from "../../../../../../core/x_preact/design/icon"
+import { takeLongtimeField } from "../../../../../../core/x_preact/design/form"
 
 import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_error/reason"
 
@@ -130,7 +130,7 @@ export function RequestResetTokenProfile(props: Props): VNode {
                 return []
 
             case "invalid":
-                return [fieldError(["正しく入力されていません"])]
+                return [fieldHelp_error(["正しく入力されていません"])]
         }
     }
     function message(): readonly VNode[] {
@@ -141,15 +141,10 @@ export function RequestResetTokenProfile(props: Props): VNode {
                 return []
 
             case "take-longtime":
-                return [
-                    fieldError([
-                        html`${iconHtml(icon_spinner)} リセットトークン送信に時間がかかっています`,
-                        html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
-                    ]),
-                ]
+                return [takeLongtimeField("リセットトークン送信")]
 
             case "failed":
-                return [fieldError(requestTokenError(state.err))]
+                return [fieldHelp_error(requestTokenError(state.err))]
         }
     }
 }

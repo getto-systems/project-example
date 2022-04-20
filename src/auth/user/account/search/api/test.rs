@@ -154,6 +154,7 @@ fn standard_request_decoder() -> StaticSearchAuthUserAccountRequestDecoder {
             order: "normal".into(),
         },
         login_id: Some("login-id".into()),
+        granted_roles: vec!["user".into()],
     })
 }
 

@@ -12,6 +12,7 @@ message SearchAuthUserAccountRequestPb {
     string sort_key = 2;
     string sort_order = 3;
     repeated string login_id = 4;
+    repeated string granted_roles = 5;
 }
 message SearchAuthUserAccountResponsePb {
     int32 offset = 1;

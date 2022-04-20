@@ -18,7 +18,7 @@ import { tableClassName } from "../../../../../z_vendor/getto-table/preact/decor
 import { ListAuthUserAccountAction } from "../action"
 
 import { SearchAuthUserAccountSortKey } from "../data"
-import { AuthRoleLabels } from "../../input/x_preact/roles"
+import { AuthRoleLabels } from "../../input/x_preact/granted_roles"
 import { AuthUserAccount } from "../../kernel/data"
 
 export type SearchAuthUserAccountTableStructure = TableStructure<Summary, AuthUserAccount>

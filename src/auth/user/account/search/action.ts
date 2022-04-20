@@ -7,6 +7,7 @@ import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 import { nextSort } from "../../../../z_lib/ui/search/sort/helper"
 
 import { initSearchLoginIdAction, SearchLoginIdAction } from "../../login_id/input/action"
+import { initSearchGrantedRolesAction, SearchGrantedRolesAction } from "../input/action"
 import {
     initObserveBoardAction,
     ObserveBoardAction,
@@ -44,6 +45,7 @@ import { ResetTokenDestination } from "../../password/reset/token_destination/ke
 
 export interface SearchAuthUserAccountAction extends ListAuthUserAccountAction {
     readonly loginId: SearchLoginIdAction
+    readonly grantedRoles: SearchGrantedRolesAction
     readonly observe: ObserveBoardAction
 
     clear(): SearchAuthUserAccountState
@@ -122,6 +124,7 @@ class Action
     readonly detail: DetailAuthUserAccountAction
 
     readonly loginId: SearchLoginIdAction
+    readonly grantedRoles: SearchGrantedRolesAction
     readonly offset: SearchOffsetAction
     readonly columns: SearchColumnsAction
     readonly observe: ObserveBoardAction
@@ -141,6 +144,7 @@ class Action
             terminate: () => {
                 this.detail.terminate()
                 this.loginId.terminate()
+                this.grantedRoles.terminate()
                 this.offset.terminate()
                 this.columns.terminate()
                 this.observe.terminate()
@@ -149,9 +153,10 @@ class Action
 
         const initialFilter = material.shell.detectFilter()
 
-        const fields = ["loginId"] as const
+        const fields = ["login-id", "granted-roles"] as const
 
         const loginId = initSearchLoginIdAction(initialFilter.loginId)
+        const grantedRoles = initSearchGrantedRolesAction(initialFilter.grantedRoles)
         const offset = initSearchOffsetAction(initialFilter.offset)
         const columns = initSearchColumnsAction(material.infra)
         const { observe, observeChecker } = initObserveBoardAction({ fields })
@@ -160,6 +165,7 @@ class Action
             this.setFilter({
                 offset: offset.reset(),
                 loginId: loginId.pin(),
+                grantedRoles: grantedRoles.pin(),
             })
         this.setFilterOnLoad = () =>
             this.setFilter({
@@ -192,6 +198,7 @@ class Action
         })
 
         this.loginId = loginId.input
+        this.grantedRoles = grantedRoles.input
         this.offset = offset.input
         this.columns = columns
         this.observe = observe
@@ -199,7 +206,10 @@ class Action
         this.filter = initialFilter
 
         this.loginId.observe.subscriber.subscribe((result) =>
-            observeChecker.update("loginId", result.hasChanged),
+            observeChecker.update("login-id", result.hasChanged),
+        )
+        this.grantedRoles.observe.subscriber.subscribe((result) =>
+            observeChecker.update("granted-roles", result.hasChanged),
         )
     }
 

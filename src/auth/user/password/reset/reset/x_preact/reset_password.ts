@@ -9,27 +9,30 @@ import {
     useApplicationView,
 } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { buttons, fieldError, form } from "../../../../../../z_vendor/getto-css/preact/design/form"
+import {
+    buttons,
+    fieldHelp_error,
+    form,
+} from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { loginBox } from "../../../../../../z_vendor/getto-css/preact/layout/login"
 
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../../../x_content/site"
-import { icon_spinner } from "../../../../../../x_content/icon"
 import { appendScript } from "../../../../../sign/x_preact/script"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
-import { iconHtml } from "../../../../../../core/x_preact/design/icon"
+import { takeLongtimeField } from "../../../../../../core/x_preact/design/form"
 
 import { ApplicationError } from "../../../../../../avail/x_preact/application_error"
 import { InputLoginId } from "../../../../login_id/input/x_preact/input"
 import { InputPassword } from "../../../input/x_preact/input"
+import { ClearChangesButton } from "../../../../../../core/x_preact/button/clear_changes_button"
+import { ChangeButton } from "../../../../../../core/x_preact/button/change_button"
 
 import { ApplicationView } from "../../../../../../z_vendor/getto-application/action/action"
 import { ResetPasswordAction } from "../action"
 import { SignLink } from "../../../../../sign/nav/action"
 
 import { ResetPasswordError } from "../data"
-import { ClearChangesButton } from "../../../../../../core/x_preact/button/clear_changes_button"
-import { ChangeButton } from "../../../../../../core/x_preact/button/change_button"
 
 type Props = Readonly<{
     link: SignLink
@@ -142,7 +145,7 @@ export function ResetPassword(viewProps: Props): VNode {
                     return []
 
                 case "invalid":
-                    return [fieldError(["正しく入力されていません"])]
+                    return [fieldHelp_error(["正しく入力されていません"])]
             }
         }
         function message(): readonly VNode[] {
@@ -152,15 +155,10 @@ export function ResetPassword(viewProps: Props): VNode {
                     return []
 
                 case "take-longtime-to-reset":
-                    return [
-                        fieldError([
-                            html`${iconHtml(icon_spinner)} パスワードリセットに時間がかかっています`,
-                            html`30秒以上かかる場合は何かがおかしいので、お手数ですが管理者に連絡お願いします`,
-                        ]),
-                    ]
+                    return [takeLongtimeField("パスワードリセット")]
 
                 case "failed-to-reset":
-                    return [fieldError(resetError(state.err))]
+                    return [fieldHelp_error(resetError(state.err))]
             }
         }
     }

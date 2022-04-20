@@ -4,7 +4,7 @@ import { html } from "htm/preact"
 import { useApplicationAction } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { box } from "../../../../z_vendor/getto-css/preact/design/box"
-import { button_edit, field, fieldError } from "../../../../z_vendor/getto-css/preact/design/form"
+import { button_edit, field, fieldHelp_error } from "../../../../z_vendor/getto-css/preact/design/form"
 
 import { InputSeason } from "../../input/x_preact/input"
 
@@ -64,10 +64,10 @@ export function SetupSeason(props: Props): VNode {
                     })
 
                 case "invalid":
-                    return box({ body: fieldError(["シーズンの設定に失敗しました"]) })
+                    return box({ body: fieldHelp_error(["シーズンの設定に失敗しました"]) })
 
                 case "failed":
-                    return box({ body: fieldError(repositoryError(state.err)) })
+                    return box({ body: fieldHelp_error(repositoryError(state.err)) })
             }
     }
 

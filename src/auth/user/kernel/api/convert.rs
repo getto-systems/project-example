@@ -1,4 +1,4 @@
-use crate::x_content::role::auth_role_set;
+use crate::x_content::role::AuthRole;
 
 use crate::auth::user::kernel::data::{
     GrantedAuthRoles, GrantedAuthRolesExtract, ValidateGrantedAuthRolesError,
@@ -6,8 +6,7 @@ use crate::auth::user::kernel::data::{
 
 impl GrantedAuthRolesExtract for Vec<String> {
     fn validate(self) -> Result<GrantedAuthRoles, ValidateGrantedAuthRolesError> {
-        let all_roles = auth_role_set();
-        if self.iter().any(|role| !all_roles.contains(role)) {
+        if self.iter().any(|role| AuthRole::member(role).is_none()) {
             return Err(ValidateGrantedAuthRolesError::InvalidRole);
         }
         Ok(GrantedAuthRoles::restore(self.into_iter().collect()))

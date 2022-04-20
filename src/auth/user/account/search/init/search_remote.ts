@@ -62,6 +62,7 @@ async function fetchRemote(
                 if (filter.loginId.search) {
                     message.loginId = [filter.loginId.value]
                 }
+                message.grantedRoles = Array.from(filter.grantedRoles)
             },
         )
 
