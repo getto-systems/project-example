@@ -13,8 +13,6 @@ import { authRoleLabel } from "../../../../../x_content/role"
 
 import { SearchGrantedRolesAction } from "../action"
 
-import { toBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/convert"
-
 import { AuthRole } from "../../../kernel/data"
 
 type Props = Readonly<{
@@ -42,7 +40,7 @@ export function SearchGrantedRoles(props: Props): VNode {
     function roleCheckbox(role: AuthRole): CheckboxBoardContent {
         return {
             key: role,
-            value: toBoardValue(role),
+            value: role,
             label: authRoleLabel(role),
         }
     }

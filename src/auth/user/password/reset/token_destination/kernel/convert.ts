@@ -1,4 +1,3 @@
-import { BoardValue } from "../../../../../../z_vendor/getto-application/board/kernel/data"
 import { ResetTokenDestination, ResetTokenDestinationEmail } from "./data"
 import { ValidateResetTokenDestinationError } from "../input/data"
 import { ConvertBoardFieldResult } from "../../../../../../z_vendor/getto-application/board/validate_field/data"
@@ -8,7 +7,7 @@ import { ConvertBoardFieldResult } from "../../../../../../z_vendor/getto-applic
 export const EMAIL_MAX_LENGTH = 255
 
 export function resetTokenDestinationBoardConverter(
-    value: Readonly<{ type: BoardValue; email: BoardValue }>,
+    value: Readonly<{ type: string; email: string }>,
 ): ConvertBoardFieldResult<ResetTokenDestination, ValidateResetTokenDestinationError> {
     switch (value.type) {
         case "none":

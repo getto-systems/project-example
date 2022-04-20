@@ -6,19 +6,14 @@ import {
 
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
-import {
-    BoardValue,
-    zeroBoardValue,
-} from "../../../../z_vendor/getto-application/board/kernel/data"
-
 export interface SearchOffsetAction extends ApplicationAction {
     readonly input: InputBoardAction<BoardValueStore>
 }
 
-export function initSearchOffsetAction(initial: BoardValue): Readonly<{
+export function initSearchOffsetAction(initial: string): Readonly<{
     input: SearchOffsetAction
-    get: { (): BoardValue }
-    reset: { (): BoardValue }
+    get: { (): string }
+    reset: { (): string }
 }> {
     const { input, store, subscriber } = initInputBoardAction()
 
@@ -37,7 +32,7 @@ export function initSearchOffsetAction(initial: BoardValue): Readonly<{
             return storeValue()
         },
         reset: () => {
-            store.set(zeroBoardValue)
+            store.set("0")
             return storeValue()
         },
     }

@@ -1,7 +1,6 @@
 import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 
-import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 import { mockSearchAuthUserAccountShell } from "./init/mock"
 import { initMemoryDB } from "../../../../z_lib/ui/repository/init/memory"
@@ -39,7 +38,7 @@ test("search", async () => {
     await resource.search.ignitionState
 
     await runner(async () => {
-        store.loginId.set(markBoardValue("MY-LOGIN-ID"))
+        store.loginId.set("MY-LOGIN-ID")
         return resource.search.search()
     }).then((stack) => {
         expect(stack).toEqual([
@@ -87,7 +86,7 @@ test("sort", async () => {
 test("clear", () => {
     const { resource, store } = standard()
 
-    store.loginId.set(markBoardValue("MY-LOGIN-ID"))
+    store.loginId.set("MY-LOGIN-ID")
     resource.search.clear()
 
     expect(store.loginId.get()).toEqual("")

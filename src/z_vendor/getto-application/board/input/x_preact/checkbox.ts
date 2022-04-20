@@ -9,11 +9,9 @@ import { InputBoardAction } from "../action"
 
 import { BoardValueStoreConnector, MultipleBoardValueStore } from "../infra"
 
-import { BoardValue } from "../../kernel/data"
-
 export type CheckboxBoardContent = Readonly<{
     key: VNodeKey
-    value: BoardValue
+    value: string
     label: VNodeContent
 }>
 
@@ -64,8 +62,8 @@ interface CheckboxStore {
 
 function useCheckboxStore(
     connector: BoardValueStoreConnector<MultipleBoardValueStore>,
-): [ReadonlySet<BoardValue>, CheckboxStore] {
-    const [current, setValue] = useState<ReadonlySet<BoardValue>>(new Set())
+): [ReadonlySet<string>, CheckboxStore] {
+    const [current, setValue] = useState<ReadonlySet<string>>(new Set())
     const store = useMemo(() => new ValuesStore(), [])
 
     useLayoutEffect(() => {
@@ -78,20 +76,20 @@ function useCheckboxStore(
 }
 
 class ValuesStore implements CheckboxStore {
-    value: Set<BoardValue>
+    value: Set<string>
 
     constructor() {
         this.value = new Set()
     }
 
-    setValue: { (value: ReadonlySet<BoardValue>): void } = () => null
+    setValue: { (value: ReadonlySet<string>): void } = () => null
 
-    connect(setValue: { (value: ReadonlySet<BoardValue>): void }): void {
+    connect(setValue: { (value: ReadonlySet<string>): void }): void {
         setValue(this.value)
         this.setValue = setValue
     }
 
-    setChecked(value: BoardValue, isChecked: boolean): void {
+    setChecked(value: string, isChecked: boolean): void {
         if (isChecked) {
             this.value.add(value)
         } else {
@@ -100,10 +98,10 @@ class ValuesStore implements CheckboxStore {
         this.setValue(this.value)
     }
 
-    get(): readonly BoardValue[] {
+    get(): readonly string[] {
         return Array.from(this.value.values())
     }
-    set(value: readonly BoardValue[]): void {
+    set(value: readonly string[]): void {
         this.value = new Set(value)
         this.setValue(this.value)
     }

@@ -8,7 +8,7 @@ import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 import { SelectBoard } from "../../../../z_vendor/getto-application/board/input/x_preact/select"
 
 import { seasonLabel } from "../../kernel/helper"
-import { seasonToBoardValue } from "../../kernel/convert"
+import { seasonToString } from "../../kernel/convert"
 
 import { InputSeasonAction } from "../action"
 
@@ -33,7 +33,7 @@ export function InputSeason(props: Props): VNode {
             html`<option value="">今シーズン</option>`,
             ...seasons.map((season) => {
                 const label = `${seasonLabel(season)}`
-                return html`<option value="${seasonToBoardValue(season)}">${label}</option>`
+                return html`<option value="${seasonToString(season)}">${label}</option>`
             }),
         ]
     }

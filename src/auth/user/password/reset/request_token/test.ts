@@ -2,7 +2,6 @@ import { setupActionTestRunner } from "../../../../../z_vendor/getto-application
 import { toApplicationView } from "../../../../../z_vendor/getto-application/action/helper"
 import { ticker } from "../../../../../z_lib/ui/timer/helper"
 
-import { markBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/test_helper"
 
 import { RequestResetTokenRemote, RequestResetTokenRemoteResult } from "./infra"
@@ -19,7 +18,7 @@ test("submit valid login-id", async () => {
     const runner = setupActionTestRunner(action.subscriber)
 
     await runner(() => {
-        store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
+        store.loginId.set(VALID_LOGIN.loginId)
         return action.submit()
     }).then((stack) => {
         expect(stack).toEqual([{ type: "try" }, { type: "success" }])
@@ -34,7 +33,7 @@ test("submit valid login-id; with take longtime", async () => {
     const runner = setupActionTestRunner(action.subscriber)
 
     await runner(() => {
-        store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
+        store.loginId.set(VALID_LOGIN.loginId)
         return action.submit()
     }).then((stack) => {
         expect(stack).toEqual([{ type: "try" }, { type: "take-longtime" }, { type: "success" }])
@@ -56,7 +55,7 @@ test("clear", () => {
     const { view, store } = standard()
     const resource = view.resource
 
-    store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
+    store.loginId.set(VALID_LOGIN.loginId)
     resource.clear()
 
     expect(store.loginId.get()).toEqual("")

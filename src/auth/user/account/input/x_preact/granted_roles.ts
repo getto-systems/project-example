@@ -16,8 +16,6 @@ import {
 import { InputGrantedRolesAction } from "../action"
 import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
 
-import { toBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/convert"
-
 import { AuthRole } from "../../../kernel/data"
 import { LoginId } from "../../../login_id/kernel/data"
 import { authRoleLabel } from "../../../../../x_content/role"
@@ -54,7 +52,7 @@ export function InputGrantedRoles(props: Props): VNode {
     function roleCheckbox(role: AuthRole): CheckboxBoardContent {
         return {
             key: role,
-            value: toBoardValue(role),
+            value: role,
             label: authRoleLabel(role),
         }
     }

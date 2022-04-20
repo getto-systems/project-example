@@ -13,7 +13,6 @@ import { SeasonRepository } from "../kernel/infra"
 import { Clock } from "../../../z_lib/ui/clock/infra"
 import { ExpireTime } from "../../../z_lib/ui/config/infra"
 
-import { BoardValue } from "../../../z_vendor/getto-application/board/kernel/data"
 import { RepositoryError } from "../../../z_lib/ui/repository/data"
 
 export interface SetupSeasonAction extends StatefulApplicationAction<SetupSeasonState> {
@@ -62,7 +61,7 @@ class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
     material: SetupSeasonMaterial
     load: LoadAction
 
-    field: { (): BoardValue }
+    field: { (): string }
 
     constructor(material: SetupSeasonMaterial, load: LoadAction) {
         super()
@@ -103,7 +102,7 @@ type SetupSeasonEvent =
 
 async function setupSeason<S>(
     { infra, config }: SetupSeasonMaterial,
-    value: BoardValue,
+    value: string,
     post: Post<SetupSeasonEvent, S>,
 ): Promise<S> {
     const { clock, seasonRepository } = infra

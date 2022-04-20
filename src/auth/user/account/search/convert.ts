@@ -16,7 +16,6 @@ import { ReadSearchSortKeyResult } from "../../../../z_lib/ui/search/sort/data"
 import { DetectLoginIdResult } from "./infra"
 import { AuthUserAccount } from "../kernel/data"
 import { toGrantedRoles } from "../input/convert"
-import { toBoardValue } from "../../../../z_vendor/getto-application/board/kernel/convert"
 
 const SEARCH_LOGIN_ID = "search-login-id" as const
 const SEARCH_GRANTED_ROLES = "search-granted-roles" as const
@@ -62,11 +61,7 @@ export function updateSearchAuthUserAccountFilterQuery(
 ): URL {
     let url = new URL(currentURL.toString())
     url = updateSingleValueFilter(url, SEARCH_LOGIN_ID, fields.loginId)
-    url = updateMultipleValueFilter(
-        url,
-        SEARCH_GRANTED_ROLES,
-        fields.grantedRoles.map(toBoardValue),
-    )
+    url = updateMultipleValueFilter(url, SEARCH_GRANTED_ROLES, fields.grantedRoles)
     url = updateSearchOffset(url, fields.offset)
     url = updateSearchSort(url, fields.sort)
     return url

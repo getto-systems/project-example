@@ -2,10 +2,8 @@ import { InputBoardAction } from "./action"
 
 import { BoardValueStore, MultipleBoardValueStore, FileStore, SelectFileResult } from "./infra"
 
-import { BoardValue, emptyBoardValue } from "../kernel/data"
-
 export function mockBoardValueStore(input: InputBoardAction<BoardValueStore>): BoardValueStore {
-    let storedValue: BoardValue = emptyBoardValue
+    let storedValue = ""
     const store: BoardValueStore = {
         get: () => storedValue,
         set: (value) => {
@@ -27,7 +25,7 @@ export function mockBoardValueStore(input: InputBoardAction<BoardValueStore>): B
 export function mockMultipleBoardValueStore(
     input: InputBoardAction<MultipleBoardValueStore>,
 ): MultipleBoardValueStore {
-    let storedValue: readonly BoardValue[] = []
+    let storedValue: readonly string[] = []
     const store: MultipleBoardValueStore = {
         get: () => storedValue,
         set: (value) => {

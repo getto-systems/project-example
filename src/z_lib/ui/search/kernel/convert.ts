@@ -1,4 +1,3 @@
-import { toBoardValue } from "../../../../z_vendor/getto-application/board/kernel/convert"
 import { MultipleValueFilter, ReadSearchResult, SingleValueFilter } from "./data"
 
 export function readSearchParams(params: URLSearchParams, name: string): ReadSearchResult {
@@ -6,7 +5,7 @@ export function readSearchParams(params: URLSearchParams, name: string): ReadSea
     if (value === null) {
         return { found: false }
     }
-    return { found: true, value: toBoardValue(value) }
+    return { found: true, value }
 }
 
 export function readSingleValueFilter(params: URLSearchParams, name: string): SingleValueFilter {
@@ -14,13 +13,13 @@ export function readSingleValueFilter(params: URLSearchParams, name: string): Si
     if (value === null) {
         return { search: false }
     }
-    return { search: true, value: toBoardValue(value) }
+    return { search: true, value }
 }
 export function readMultipleValueFilter(
     params: URLSearchParams,
     name: string,
 ): MultipleValueFilter {
-    return params.getAll(name).map(toBoardValue)
+    return params.getAll(name)
 }
 
 export function updateSingleValueFilter(

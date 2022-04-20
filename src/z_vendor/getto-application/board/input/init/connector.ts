@@ -6,8 +6,6 @@ import {
     SelectFileResult,
 } from "../infra"
 
-import { BoardValue, emptyBoardValue } from "../../kernel/data"
-
 export function initBoardValueStoreConnector(): Readonly<{
     connector: BoardValueStoreConnector<BoardValueStore>
     store: BoardValueStore
@@ -25,15 +23,15 @@ const initialConnection: Connection = { connect: false }
 
 class Connector implements BoardValueStoreConnector<BoardValueStore>, BoardValueStore {
     conn = initialConnection
-    store = emptyBoardValue
+    store = ""
 
-    get(): BoardValue {
+    get(): string {
         if (this.conn.connect) {
             this.store = this.conn.store.get()
         }
         return this.store
     }
-    set(value: BoardValue): void {
+    set(value: string): void {
         if (this.conn.connect) {
             this.conn.store.set(value)
         }
@@ -70,15 +68,15 @@ class MultipleConnector
     implements BoardValueStoreConnector<MultipleBoardValueStore>, MultipleBoardValueStore
 {
     conn = initialMultipleConnection
-    store: readonly BoardValue[] = []
+    store: readonly string[] = []
 
-    get(): readonly BoardValue[] {
+    get(): readonly string[] {
         if (this.conn.connect) {
             this.store = this.conn.store.get()
         }
         return this.store
     }
-    set(value: readonly BoardValue[]): void {
+    set(value: readonly string[]): void {
         if (this.conn.connect) {
             this.conn.store.set(value)
         }

@@ -1,12 +1,10 @@
-import { BoardValue } from "../kernel/data"
-
 export interface BoardValueStore {
-    get(): BoardValue
-    set(value: BoardValue): void
+    get(): string
+    set(value: string): void
 }
 export interface MultipleBoardValueStore {
-    get(): readonly BoardValue[]
-    set(value: readonly BoardValue[]): void
+    get(): readonly string[]
+    set(value: readonly string[]): void
 }
 export interface FileStore {
     get(): SelectFileResult

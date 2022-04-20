@@ -1,4 +1,3 @@
-import { markBoardValue } from "../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockBoardValueStore } from "../../../z_vendor/getto-application/board/input/test_helper"
 
 import { initInputSeasonAction } from "./action"
@@ -8,7 +7,7 @@ import { Season } from "../kernel/data"
 test("get value", async () => {
     const { store, get } = standard()
 
-    store.set(markBoardValue("2021.summer"))
+    store.set("2021.summer")
     expect(get()).toEqual("2021.summer")
 })
 

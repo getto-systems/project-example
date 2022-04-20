@@ -1,6 +1,5 @@
 import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
-import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockMultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 
 import { ModifyAuthUserAccountAction, initModifyAuthUserAccountAction } from "./action"
@@ -23,7 +22,7 @@ test("submit valid info", async () => {
     const runner = setupActionTestRunner(resource.modify.subscriber)
 
     await runner(async () => {
-        store.grantedRoles.set(VALID_INFO.grantedRoles.map(markBoardValue))
+        store.grantedRoles.set(VALID_INFO.grantedRoles)
 
         return resource.modify.submit(user)
     }).then((stack) => {
@@ -41,7 +40,7 @@ test("submit valid login-id; take long time", async () => {
     const runner = setupActionTestRunner(resource.modify.subscriber)
 
     await runner(() => {
-        store.grantedRoles.set(VALID_INFO.grantedRoles.map(markBoardValue))
+        store.grantedRoles.set(VALID_INFO.grantedRoles)
 
         return resource.modify.submit(user)
     }).then((stack) => {
@@ -56,7 +55,7 @@ test("submit valid login-id; take long time", async () => {
 test("reset", () => {
     const { resource, store, user } = standard()
 
-    store.grantedRoles.set(VALID_INFO.grantedRoles.map(markBoardValue))
+    store.grantedRoles.set(VALID_INFO.grantedRoles)
 
     resource.modify.reset(user)
 
