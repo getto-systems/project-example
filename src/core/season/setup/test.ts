@@ -4,7 +4,6 @@ import { markSeason } from "../kernel/test_helper"
 
 import { mockClock, mockClockPubSub } from "../../../z_lib/ui/clock/mock"
 import { mockBoardValueStore } from "../../../z_vendor/getto-application/board/input/test_helper"
-import { markBoardValue } from "../../../z_vendor/getto-application/board/kernel/test_helper"
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 
 import { initSetupSeasonAction } from "./action"
@@ -14,7 +13,7 @@ import { SetupSeasonAction } from "./action"
 import { SeasonRepository } from "../kernel/infra"
 import { BoardValueStore } from "../../../z_vendor/getto-application/board/input/infra"
 
-import { seasonRepositoryConverter, seasonToBoardValue } from "../kernel/convert"
+import { seasonRepositoryConverter, seasonToString } from "../kernel/convert"
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"
 
 import { Season } from "../kernel/data"
@@ -25,7 +24,7 @@ test("setup season", async () => {
     const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
     await runner(() => {
-        store.season.set(markBoardValue("2021.summer"))
+        store.season.set("2021.summer")
         return resource.setupSeason.setup()
     }).then((stack) => {
         expect(stack).toEqual([{ type: "success" }])
@@ -48,7 +47,7 @@ test("setup season; invalid input", async () => {
     const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
     await runner(() => {
-        store.season.set(markBoardValue("invalid"))
+        store.season.set("invalid")
         return resource.setupSeason.setup()
     }).then((stack) => {
         expect(stack).toEqual([{ type: "invalid" }])
@@ -61,7 +60,7 @@ test("setup season; invalid year", async () => {
     const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
     await runner(() => {
-        store.season.set(markBoardValue("2020.summer"))
+        store.season.set("2020.summer")
         return resource.setupSeason.setup()
     }).then((stack) => {
         expect(stack).toEqual([{ type: "invalid" }])
@@ -74,7 +73,7 @@ test("setup season; invalid period", async () => {
     const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
     await runner(() => {
-        store.season.set(markBoardValue("2020.unknown"))
+        store.season.set("2020.unknown")
         return resource.setupSeason.setup()
     }).then((stack) => {
         expect(stack).toEqual([{ type: "invalid" }])
@@ -92,7 +91,7 @@ test("open", async () => {
 })
 
 test("convert season to board value", () => {
-    expect(seasonToBoardValue(markSeason({ year: 2021, period: "summer" }))).toEqual("2021.summer")
+    expect(seasonToString(markSeason({ year: 2021, period: "summer" }))).toEqual("2021.summer")
 })
 
 function standard() {

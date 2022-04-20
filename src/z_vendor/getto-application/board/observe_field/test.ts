@@ -1,12 +1,10 @@
 import { setupActionTestRunner } from "../../action/test_helper"
-import { BoardValueStore } from "../input/infra"
-import { BoardValue, emptyBoardValue } from "../kernel/data"
-
-import { markBoardValue } from "../kernel/test_helper"
 
 import { initObserveBoardFieldAction } from "./action"
 import { isSameMultipleBoardValue } from "./helper"
 import { initBoardFieldObserver } from "./init/observer"
+
+import { BoardValueStore } from "../input/infra"
 
 test("observe; no change", async () => {
     const { action, observer } = standard()
@@ -29,7 +27,7 @@ test("observe; has changed", async () => {
 
     await runner(async () => {
         observer.pin()
-        store.set(markBoardValue("changed"))
+        store.set("changed")
         action.check()
         return action.currentState()
     }).then((stack) => {
@@ -51,39 +49,35 @@ test("observe; initial", async () => {
 })
 
 test("check same value; all same value", async () => {
-    const a = ["a", "b", "c"].map(markBoardValue)
-    const b = ["a", "b", "c"].map(markBoardValue)
+    const a = ["a", "b", "c"]
+    const b = ["a", "b", "c"]
     expect(isSameMultipleBoardValue(a, b)).toBe(true)
 })
 
 test("check same value; some different value", async () => {
-    const a = ["a", "b", "c"].map(markBoardValue)
-    const b = ["a", "b", "x"].map(markBoardValue)
+    const a = ["a", "b", "c"]
+    const b = ["a", "b", "x"]
     expect(isSameMultipleBoardValue(a, b)).toBe(false)
 })
 
 test("check same value; different order", async () => {
-    const a = ["a", "b", "c"].map(markBoardValue)
-    const b = ["a", "c", "b"].map(markBoardValue)
+    const a = ["a", "b", "c"]
+    const b = ["a", "c", "b"]
     expect(isSameMultipleBoardValue(a, b)).toBe(false)
 })
 
 test("check same value; different length", async () => {
-    const a = ["a", "b", "c"].map(markBoardValue)
-    const b = ["a", "b"].map(markBoardValue)
+    const a = ["a", "b", "c"]
+    const b = ["a", "b"]
     expect(isSameMultipleBoardValue(a, b)).toBe(false)
 })
 
 test("check same value; zero length first argument", async () => {
-    const a = [].map(markBoardValue)
-    const b = ["a", "b"].map(markBoardValue)
-    expect(isSameMultipleBoardValue(a, b)).toBe(false)
+    expect(isSameMultipleBoardValue([], ["a", "b"])).toBe(false)
 })
 
 test("check same value; zero length second argument", async () => {
-    const a = ["a", "b"].map(markBoardValue)
-    const b = [].map(markBoardValue)
-    expect(isSameMultipleBoardValue(a, b)).toBe(false)
+    expect(isSameMultipleBoardValue(["a", "b"], [])).toBe(false)
 })
 
 function standard() {
@@ -98,7 +92,7 @@ function standard() {
 }
 
 function boardValueStore(): BoardValueStore {
-    let storedValue: BoardValue = emptyBoardValue
+    let storedValue = ""
     return {
         get: () => storedValue,
         set: (value) => {

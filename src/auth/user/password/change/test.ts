@@ -1,7 +1,6 @@
 import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 
-import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 
 import { ChangePasswordAction, initChangePasswordAction } from "./action"
@@ -17,8 +16,8 @@ test("submit valid current-password and new-password", async () => {
     const runner = setupActionTestRunner(resource.change.subscriber)
 
     await runner(async () => {
-        store.currentPassword.set(markBoardValue(VALID_PASSWORD.currentPassword))
-        store.newPassword.set(markBoardValue(VALID_PASSWORD.newPassword))
+        store.currentPassword.set(VALID_PASSWORD.currentPassword)
+        store.newPassword.set(VALID_PASSWORD.newPassword)
 
         return resource.change.submit()
     }).then((stack) => {
@@ -33,8 +32,8 @@ test("submit valid login-id and password; take long time", async () => {
     const runner = setupActionTestRunner(resource.change.subscriber)
 
     await runner(() => {
-        store.currentPassword.set(markBoardValue(VALID_PASSWORD.currentPassword))
-        store.newPassword.set(markBoardValue(VALID_PASSWORD.newPassword))
+        store.currentPassword.set(VALID_PASSWORD.currentPassword)
+        store.newPassword.set(VALID_PASSWORD.newPassword)
 
         return resource.change.submit()
     }).then((stack) => {
@@ -55,8 +54,8 @@ test("submit without fields", async () => {
 test("clear", () => {
     const { resource, store } = standard()
 
-    store.currentPassword.set(markBoardValue(VALID_PASSWORD.currentPassword))
-    store.newPassword.set(markBoardValue(VALID_PASSWORD.newPassword))
+    store.currentPassword.set(VALID_PASSWORD.currentPassword)
+    store.newPassword.set(VALID_PASSWORD.newPassword)
     resource.change.clear()
 
     expect(store.currentPassword.get()).toEqual("")

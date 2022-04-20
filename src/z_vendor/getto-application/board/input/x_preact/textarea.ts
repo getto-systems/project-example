@@ -8,8 +8,6 @@ import { InputBoardAction } from "../action"
 
 import { BoardValueStore, BoardValueStoreConnector } from "../../input/infra"
 
-import { emptyBoardValue } from "../../kernel/data"
-
 type Props = Readonly<{ input: InputBoardAction<BoardValueStore> }> &
     Partial<Readonly<{ rows: number; cols: number; disabled: boolean }>>
 export function TextareaBoard({ input, rows, cols, disabled }: Props): VNode {
@@ -33,7 +31,7 @@ function useInputRef(connector: BoardValueStoreConnector<BoardValueStore>) {
         connector.connect({
             get: () => {
                 if (!REF.current) {
-                    return emptyBoardValue
+                    return ""
                 }
                 return readBoardValue(REF.current)
             },

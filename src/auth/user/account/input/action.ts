@@ -10,7 +10,6 @@ import {
 
 import { initBoardFieldObserver } from "../../../../z_vendor/getto-application/board/observe_field/init/observer"
 import { toGrantedRoles } from "./convert"
-import { toBoardValue } from "../../../../z_vendor/getto-application/board/kernel/convert"
 import { isSameMultipleBoardValue } from "../../../../z_vendor/getto-application/board/observe_field/helper"
 
 import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
@@ -72,7 +71,7 @@ class InputAction implements InputGrantedRolesAction {
     }
 
     reset(grantedRoles: readonly AuthRole[]): void {
-        this.store.grantedRoles.set(grantedRoles.map(toBoardValue))
+        this.store.grantedRoles.set(grantedRoles)
     }
 }
 
@@ -88,7 +87,7 @@ export function initSearchGrantedRolesAction(initial: readonly AuthRole[]): Read
     pin: { (): readonly AuthRole[] }
 }> {
     const input = new SearchAction()
-    input.store.grantedRoles.set(initial.map(toBoardValue))
+    input.store.grantedRoles.set(initial)
     return {
         input,
         pin: () => {

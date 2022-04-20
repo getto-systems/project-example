@@ -1,10 +1,8 @@
 import { setupActionTestRunner } from "../../action/test_helper"
 
-import { markBoardValue } from "../kernel/test_helper"
-
 import { initInputBoardAction } from "./action"
+
 import { BoardValueStore } from "./infra"
-import { BoardValue, emptyBoardValue } from "../kernel/data"
 
 test("get / set; store connected", async () => {
     const { source_store, input, store, subscriber } = standard()
@@ -19,7 +17,7 @@ test("get / set; store connected", async () => {
     })
 
     await runner(async () => {
-        source_store.set(markBoardValue("value"))
+        source_store.set("value")
         input.publisher.post()
     }).then((stack) => {
         expect(stack).toEqual(["value"])
@@ -40,7 +38,7 @@ test("get / set; store not connected", async () => {
     })
 
     await runner(async () => {
-        source_store.set(markBoardValue("value"))
+        source_store.set("value")
         input.publisher.post()
     }).then((stack) => {
         expect(stack).toEqual([""])
@@ -61,7 +59,7 @@ test("terminate", async () => {
 
     await runner(async () => {
         subscriber.terminate()
-        source_store.set(markBoardValue("value"))
+        source_store.set("value")
         input.publisher.post()
     }).then((stack) => {
         expect(stack).toEqual([])
@@ -73,7 +71,7 @@ function standard() {
 }
 
 function boardValueStore(): BoardValueStore {
-    let storedValue: BoardValue = emptyBoardValue
+    let storedValue = ""
     return {
         get: () => storedValue,
         set: (value) => {

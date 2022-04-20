@@ -8,12 +8,11 @@ import { InputBoardAction } from "../action"
 
 import { BoardValueStore, BoardValueStoreConnector } from "../../input/infra"
 
-import { BoardValue, emptyBoardValue } from "../../kernel/data"
 import { radio, radio_block } from "../../../../getto-css/preact/design/form"
 
 export type RadioBoardContent = Readonly<{
     key: VNodeKey
-    value: BoardValue
+    value: string
     label: VNodeContent
 }>
 
@@ -71,7 +70,7 @@ interface RadioStore {
 }
 
 function useRadioStore(connector: BoardValueStoreConnector<BoardValueStore>): [string, RadioStore] {
-    const [current, setValue] = useState<BoardValue>(emptyBoardValue)
+    const [current, setValue] = useState("")
     const store = useMemo(() => new ValueStore(), [])
 
     useLayoutEffect(() => {
@@ -84,23 +83,23 @@ function useRadioStore(connector: BoardValueStoreConnector<BoardValueStore>): [s
 }
 
 class ValueStore implements RadioStore, BoardValueStore {
-    value: BoardValue
+    value: string
 
     constructor() {
-        this.value = emptyBoardValue
+        this.value = ""
     }
 
-    setValue: { (value: BoardValue): void } = () => null
+    setValue: { (value: string): void } = () => null
 
-    connect(setValue: { (value: BoardValue): void }): void {
+    connect(setValue: { (value: string): void }): void {
         setValue(this.get())
         this.setValue = setValue
     }
 
-    get(): BoardValue {
+    get(): string {
         return this.value
     }
-    set(value: BoardValue): void {
+    set(value: string): void {
         this.value = value
         this.setValue(this.value)
     }

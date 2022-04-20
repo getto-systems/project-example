@@ -18,7 +18,6 @@ import {
 import { BoardFieldChecker } from "../../../../z_vendor/getto-application/board/validate_field/infra"
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
-import { emptyBoardValue } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { ValidateLoginIdError } from "./data"
 import { SingleValueFilter } from "../../../../z_lib/ui/search/kernel/data"
 import { LoginId } from "../kernel/data"
@@ -58,7 +57,7 @@ export function initInputLoginIdAction(): Readonly<{
             validate,
             observe,
             clear: () => {
-                store.set(emptyBoardValue)
+                store.set("")
                 validate.clear()
             },
             terminate: () => {
@@ -104,7 +103,7 @@ export function initSearchLoginIdAction(initial: SingleValueFilter): Readonly<{
             input,
             observe,
             clear: () => {
-                store.set(emptyBoardValue)
+                store.set("")
                 observe.check()
             },
             terminate: () => {

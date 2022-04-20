@@ -1,18 +1,16 @@
-import { BoardValue } from "../../../../z_vendor/getto-application/board/kernel/data"
-
 export type SingleValueFilter =
     | Readonly<{ search: false }>
-    | Readonly<{ search: true; value: BoardValue }>
+    | Readonly<{ search: true; value: string }>
 
-export type MultipleValueFilter = readonly BoardValue[]
+export type MultipleValueFilter = readonly string[]
 
 export type ReadSearchResult =
     | Readonly<{ found: false }>
-    | Readonly<{ found: true; value: BoardValue }>
+    | Readonly<{ found: true; value: string }>
 
 export type SearchPageRequest = Readonly<{
-    offset: BoardValue
-    limit: BoardValue
+    offset: string
+    limit: string
 }>
 export type SearchPageResponse = Readonly<{
     offset: number

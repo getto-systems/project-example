@@ -18,12 +18,10 @@ import {
 
 import { initBoardFieldObserver } from "../../../../../../z_vendor/getto-application/board/observe_field/init/observer"
 import { resetTokenDestinationBoardConverter } from "../kernel/convert"
-import { toBoardValue } from "../../../../../../z_vendor/getto-application/board/kernel/convert"
 
 import { BoardFieldChecker } from "../../../../../../z_vendor/getto-application/board/validate_field/infra"
 import { BoardValueStore } from "../../../../../../z_vendor/getto-application/board/input/infra"
 
-import { emptyBoardValue } from "../../../../../../z_vendor/getto-application/board/kernel/data"
 import { ValidateResetTokenDestinationError } from "./data"
 import { ResetTokenDestination } from "../kernel/data"
 
@@ -148,15 +146,15 @@ class DestinationAction
 
     reset(destination: ResetTokenDestination): InputResetTokenDestinationState {
         const destinationType = destination.type
-        this.store.destinationType.set(toBoardValue(destinationType))
+        this.store.destinationType.set(destinationType)
         this.store.input.set(
             (() => {
                 switch (destinationType) {
                     case "none":
-                        return emptyBoardValue
+                        return ""
 
                     case "email":
-                        return toBoardValue(destination.email)
+                        return destination.email
                 }
             })(),
         )

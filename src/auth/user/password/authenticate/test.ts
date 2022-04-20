@@ -3,7 +3,6 @@ import { toApplicationView } from "../../../../z_vendor/getto-application/action
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_lib/ui/clock/mock"
-import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 import {
     mockGetScriptPathShell,
@@ -51,8 +50,8 @@ test("submit valid login-id and password", async () => {
     const runner = setupActionTestRunner(resource.subscriber)
 
     await runner(async () => {
-        store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
-        store.password.set(markBoardValue(VALID_LOGIN.password))
+        store.loginId.set(VALID_LOGIN.loginId)
+        store.password.set(VALID_LOGIN.password)
 
         return resource.submit()
     }).then((stack) => {
@@ -88,8 +87,8 @@ test("submit valid login-id and password; take long time", async () => {
     const runner = setupActionTestRunner(resource.subscriber)
 
     await runner(() => {
-        store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
-        store.password.set(markBoardValue(VALID_LOGIN.password))
+        store.loginId.set(VALID_LOGIN.loginId)
+        store.password.set(VALID_LOGIN.password)
 
         return resource.submit()
     }).then((stack) => {
@@ -125,8 +124,8 @@ test("clear", () => {
     const { view, store } = standard()
     const resource = view.resource
 
-    store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
-    store.password.set(markBoardValue(VALID_LOGIN.password))
+    store.loginId.set(VALID_LOGIN.loginId)
+    store.password.set(VALID_LOGIN.password)
     resource.clear()
 
     expect(store.loginId.get()).toEqual("")

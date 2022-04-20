@@ -1,7 +1,6 @@
 import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 
-import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 
 import { OverrideLoginIdAction, initOverrideLoginIdAction } from "./action"
@@ -21,7 +20,7 @@ test("submit valid new-login-id", async () => {
     const runner = setupActionTestRunner(resource.override.subscriber)
 
     await runner(async () => {
-        store.newLoginId.set(markBoardValue(VALID_LOGIN_ID.newLoginId))
+        store.newLoginId.set(VALID_LOGIN_ID.newLoginId)
 
         return resource.override.submit(user)
     }).then((stack) => {
@@ -36,7 +35,7 @@ test("submit valid login-id; take long time", async () => {
     const runner = setupActionTestRunner(resource.override.subscriber)
 
     await runner(() => {
-        store.newLoginId.set(markBoardValue(VALID_LOGIN_ID.newLoginId))
+        store.newLoginId.set(VALID_LOGIN_ID.newLoginId)
 
         return resource.override.submit(user)
     }).then((stack) => {
@@ -61,7 +60,7 @@ test("submit without fields", async () => {
 test("clear", () => {
     const { resource, store } = standard()
 
-    store.newLoginId.set(markBoardValue(VALID_LOGIN_ID.newLoginId))
+    store.newLoginId.set(VALID_LOGIN_ID.newLoginId)
     resource.override.clear()
 
     expect(store.newLoginId.get()).toEqual("")

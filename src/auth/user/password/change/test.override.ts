@@ -1,7 +1,6 @@
 import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 
-import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 
 import { OverridePasswordAction, initOverridePasswordAction } from "./action"
@@ -21,7 +20,7 @@ test("submit valid new-password", async () => {
     const runner = setupActionTestRunner(resource.override.subscriber)
 
     await runner(async () => {
-        store.newPassword.set(markBoardValue(VALID_PASSWORD.newPassword))
+        store.newPassword.set(VALID_PASSWORD.newPassword)
 
         return resource.override.submit(user)
     }).then((stack) => {
@@ -36,7 +35,7 @@ test("submit valid login-id and password; take long time", async () => {
     const runner = setupActionTestRunner(resource.override.subscriber)
 
     await runner(() => {
-        store.newPassword.set(markBoardValue(VALID_PASSWORD.newPassword))
+        store.newPassword.set(VALID_PASSWORD.newPassword)
 
         return resource.override.submit(user)
     }).then((stack) => {
@@ -57,7 +56,7 @@ test("submit without fields", async () => {
 test("clear", () => {
     const { resource, store } = standard()
 
-    store.newPassword.set(markBoardValue(VALID_PASSWORD.newPassword))
+    store.newPassword.set(VALID_PASSWORD.newPassword)
     resource.override.clear()
 
     expect(store.newPassword.get()).toEqual("")

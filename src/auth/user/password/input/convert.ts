@@ -1,4 +1,3 @@
-import { BoardValue } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { ConvertLocationResult } from "../../../../z_lib/ui/location/data"
 import { SignNav, signNavKey } from "../../../sign/nav/data"
 import { Password, ResetToken, ValidatePasswordError } from "./data"
@@ -9,7 +8,7 @@ import { ConvertBoardFieldResult } from "../../../../z_vendor/getto-application/
 export const PASSWORD_MAX_LENGTH = 100
 
 export function passwordBoardConverter(
-    value: BoardValue,
+    value: string,
 ): ConvertBoardFieldResult<Password, ValidatePasswordError> {
     if (value.length === 0) {
         return { valid: false, err: EMPTY }

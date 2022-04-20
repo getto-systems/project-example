@@ -8,8 +8,6 @@ import { InputBoardAction } from "../action"
 
 import { BoardValueStore, BoardValueStoreConnector } from "../infra"
 
-import { emptyBoardValue } from "../../kernel/data"
-
 export const inputTypes = [
     "text",
     "password",
@@ -49,7 +47,7 @@ function useInputRef(connector: BoardValueStoreConnector<BoardValueStore>) {
         connector.connect({
             get: () => {
                 if (!REF.current) {
-                    return emptyBoardValue
+                    return ""
                 }
                 return readBoardValue(REF.current)
             },

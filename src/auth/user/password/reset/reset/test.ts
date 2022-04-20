@@ -2,7 +2,6 @@ import { setupActionTestRunner } from "../../../../../z_vendor/getto-application
 import { ticker } from "../../../../../z_lib/ui/timer/helper"
 import { toApplicationView } from "../../../../../z_vendor/getto-application/action/helper"
 
-import { markBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/test_helper"
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../../z_lib/ui/clock/mock"
 import { mockSecureServerURL } from "../../../../sign/get_script_path/init/mock"
@@ -48,8 +47,8 @@ test("submit valid login-id and password", async () => {
     const runner = setupActionTestRunner(action.subscriber)
 
     await runner(() => {
-        store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
-        store.password.set(markBoardValue(VALID_LOGIN.password))
+        store.loginId.set(VALID_LOGIN.loginId)
+        store.password.set(VALID_LOGIN.password)
         return action.submit()
     }).then((stack) => {
         expect(stack).toEqual([
@@ -81,8 +80,8 @@ test("submit valid login-id and password; with take longtime", async () => {
     const runner = setupActionTestRunner(action.subscriber)
 
     await runner(() => {
-        store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
-        store.password.set(markBoardValue(VALID_LOGIN.password))
+        store.loginId.set(VALID_LOGIN.loginId)
+        store.password.set(VALID_LOGIN.password)
         return action.submit()
     }).then((stack) => {
         expect(stack).toEqual([
@@ -117,8 +116,8 @@ test("submit without resetToken", async () => {
     const runner = setupActionTestRunner(action.subscriber)
 
     await runner(() => {
-        store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
-        store.password.set(markBoardValue(VALID_LOGIN.password))
+        store.loginId.set(VALID_LOGIN.loginId)
+        store.password.set(VALID_LOGIN.password)
         return action.submit()
     }).then((stack) => {
         expect(stack).toEqual([{ type: "failed-to-reset", err: { type: "empty-reset-token" } }])
@@ -129,8 +128,8 @@ test("clear", () => {
     const { view, store } = standard()
     const resource = view.resource
 
-    store.loginId.set(markBoardValue(VALID_LOGIN.loginId))
-    store.password.set(markBoardValue(VALID_LOGIN.password))
+    store.loginId.set(VALID_LOGIN.loginId)
+    store.password.set(VALID_LOGIN.password)
     resource.clear()
 
     expect(store.loginId.get()).toEqual("")

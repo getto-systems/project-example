@@ -8,7 +8,6 @@ import {
 } from "../../../../z_vendor/getto-application/board/input/action"
 
 import { toSearchColumns } from "./convert"
-import { toBoardValue } from "../../../../z_vendor/getto-application/board/kernel/convert"
 
 import { SearchColumnsRepository } from "./infra"
 import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
@@ -68,7 +67,7 @@ class Action
     }
 
     async set(columns: readonly string[]): Promise<SearchColumnsState> {
-        this.store.set(columns.map(toBoardValue))
+        this.store.set(columns)
         return this.post({ type: "success", columns: toSearchColumns(columns) })
     }
 

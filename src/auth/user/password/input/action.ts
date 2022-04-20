@@ -20,10 +20,6 @@ import { BoardFieldChecker } from "../../../../z_vendor/getto-application/board/
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
 import { Password, PasswordCharacterState, ValidatePasswordError } from "./data"
-import {
-    BoardValue,
-    emptyBoardValue,
-} from "../../../../z_vendor/getto-application/board/kernel/data"
 
 export interface InputPasswordAction extends ApplicationAction {
     readonly input: InputBoardAction<BoardValueStore>
@@ -62,7 +58,7 @@ export function initInputPasswordAction(): Readonly<{
             validate,
             observe,
             clear: () => {
-                store.set(emptyBoardValue)
+                store.set("")
                 validate.clear()
             },
             checkCharacter: () => checkPasswordCharacter(store.get()),
@@ -75,7 +71,7 @@ export function initInputPasswordAction(): Readonly<{
     }
 }
 
-function checkPasswordCharacter(password: BoardValue): PasswordCharacterState {
+function checkPasswordCharacter(password: string): PasswordCharacterState {
     return {
         multiByte: new TextEncoder().encode(password).byteLength > password.length,
     }

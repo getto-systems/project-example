@@ -9,8 +9,6 @@ import {
     CheckboxBoardContent,
 } from "../../../../../z_vendor/getto-application/board/input/x_preact/checkbox"
 
-import { toBoardValue } from "../../../../../z_vendor/getto-application/board/kernel/convert"
-
 import { SearchColumnsAction } from "../action"
 
 export type SearchColumnContent = Readonly<{
@@ -48,7 +46,7 @@ export function SearchColumns(props: Props): VNode {
         function options(): readonly CheckboxBoardContent[] {
             return props.columns.map((column) => ({
                 key: column.key,
-                value: toBoardValue(`${column.key}`),
+                value: `${column.key}`,
                 label: column.content,
             }))
         }

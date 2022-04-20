@@ -1,6 +1,5 @@
 import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
 
-import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 
 import { initInputPasswordAction } from "./action"
@@ -11,7 +10,7 @@ test("validate; valid input", async () => {
     const runner = setupActionTestRunner(action.validate.subscriber)
 
     await runner(async () => {
-        store.set(markBoardValue("valid"))
+        store.set("valid")
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: true }])
@@ -24,7 +23,7 @@ test("validate; invalid : empty", async () => {
     const runner = setupActionTestRunner(action.validate.subscriber)
 
     await runner(async () => {
-        store.set(markBoardValue(""))
+        store.set("")
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: false, err: [{ type: "empty" }] }])
@@ -37,7 +36,7 @@ test("validate; invalid : too-long", async () => {
     const runner = setupActionTestRunner(action.validate.subscriber)
 
     await runner(async () => {
-        store.set(markBoardValue("a".repeat(100 + 1)))
+        store.set("a".repeat(100 + 1))
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: false, err: [{ type: "too-long", maxLength: 100 }] }])
@@ -50,7 +49,7 @@ test("validate; valid : just max-length", async () => {
     const runner = setupActionTestRunner(action.validate.subscriber)
 
     await runner(async () => {
-        store.set(markBoardValue("a".repeat(100)))
+        store.set("a".repeat(100))
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: true }])
@@ -63,7 +62,7 @@ test("validate; invalid : too-long : multi-byte", async () => {
     const runner = setupActionTestRunner(action.validate.subscriber)
 
     await runner(async () => {
-        store.set(markBoardValue("あ".repeat(100) + "a"))
+        store.set("あ".repeat(100) + "a")
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: false, err: [{ type: "too-long", maxLength: 100 }] }])
@@ -76,7 +75,7 @@ test("validate; valid : just max-length : multi-byte", async () => {
     const runner = setupActionTestRunner(action.validate.subscriber)
 
     await runner(async () => {
-        store.set(markBoardValue("あ".repeat(100)))
+        store.set("あ".repeat(100))
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: true }])
@@ -86,21 +85,21 @@ test("validate; valid : just max-length : multi-byte", async () => {
 test("password character state : single byte", () => {
     const { action, store } = standard()
 
-    store.set(markBoardValue("password"))
+    store.set("password")
     expect(action.checkCharacter()).toEqual({ multiByte: false })
 })
 
 test("password character state : multi byte", () => {
     const { action, store } = standard()
 
-    store.set(markBoardValue("パスワード"))
+    store.set("パスワード")
     expect(action.checkCharacter()).toEqual({ multiByte: true })
 })
 
 test("clear", () => {
     const { action, store } = standard()
 
-    store.set(markBoardValue("valid"))
+    store.set("valid")
     action.clear()
 
     expect(store.get()).toEqual("")

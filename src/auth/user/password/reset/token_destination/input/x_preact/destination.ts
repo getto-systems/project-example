@@ -21,8 +21,6 @@ import {
 import { InputResetTokenDestinationAction } from "../action"
 import { EditableBoardAction } from "../../../../../../../z_vendor/getto-application/board/editable/action"
 
-import { toBoardValue } from "../../../../../../../z_vendor/getto-application/board/kernel/convert"
-
 import { ValidateResetTokenDestinationError } from "../data"
 import { ResetTokenDestination } from "../../kernel/data"
 
@@ -91,7 +89,7 @@ export function ResetTokenDestinationField(props: Props): VNode {
         ): RadioBoardContent {
             return {
                 key: destinationType,
-                value: toBoardValue(destinationType),
+                value: destinationType,
                 label: (() => {
                     switch (destinationType) {
                         case "none":

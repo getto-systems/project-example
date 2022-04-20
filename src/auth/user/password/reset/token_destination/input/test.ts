@@ -1,6 +1,5 @@
 import { setupActionTestRunner } from "../../../../../../z_vendor/getto-application/action/test_helper"
 
-import { markBoardValue } from "../../../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockBoardValueStore } from "../../../../../../z_vendor/getto-application/board/input/test_helper"
 
 import { initInputResetTokenDestinationAction } from "./action"
@@ -15,8 +14,8 @@ test("validate; valid input", async () => {
     const runner = setupActionTestRunner(action.validate.subscriber)
 
     await runner(async () => {
-        store.destinationType.set(markBoardValue("email"))
-        store.email.set(markBoardValue("user@example.com"))
+        store.destinationType.set("email")
+        store.email.set("user@example.com")
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: true }])
@@ -29,8 +28,8 @@ test("validate; invalid : empty", async () => {
     const runner = setupActionTestRunner(action.validate.subscriber)
 
     await runner(async () => {
-        store.destinationType.set(markBoardValue("email"))
-        store.email.set(markBoardValue(""))
+        store.destinationType.set("email")
+        store.email.set("")
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: false, err: [{ type: "empty-email" }] }])
@@ -43,8 +42,8 @@ test("validate; invalid : invalid", async () => {
     const runner = setupActionTestRunner(action.validate.subscriber)
 
     await runner(async () => {
-        store.destinationType.set(markBoardValue("email"))
-        store.email.set(markBoardValue("invalid-email; not includes at-mark"))
+        store.destinationType.set("email")
+        store.email.set("invalid-email; not includes at-mark")
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: false, err: [{ type: "invalid-email" }] }])
@@ -57,8 +56,8 @@ test("validate; invalid : too-long", async () => {
     const runner = setupActionTestRunner(action.validate.subscriber)
 
     await runner(async () => {
-        store.destinationType.set(markBoardValue("email"))
-        store.email.set(markBoardValue("@".repeat(255 + 1)))
+        store.destinationType.set("email")
+        store.email.set("@".repeat(255 + 1))
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: false, err: [{ type: "too-long-email", maxLength: 255 }] }])
@@ -71,8 +70,8 @@ test("validate; valid : just max-length", async () => {
     const runner = setupActionTestRunner(action.validate.subscriber)
 
     await runner(async () => {
-        store.destinationType.set(markBoardValue("email"))
-        store.email.set(markBoardValue("@".repeat(255)))
+        store.destinationType.set("email")
+        store.email.set("@".repeat(255))
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ valid: true }])
@@ -83,7 +82,7 @@ test("reset; has email", () => {
     const { action, store } = standard()
     const destination = standard_destination()
 
-    store.email.set(markBoardValue("some-user@example.com"))
+    store.email.set("some-user@example.com")
     action.reset(destination)
 
     expect(store.destinationType.get()).toEqual("email")
@@ -93,7 +92,7 @@ test("reset; none", () => {
     const { action, store } = standard()
     const destination = no_destination()
 
-    store.email.set(markBoardValue("some-user@example.com"))
+    store.email.set("some-user@example.com")
     action.reset(destination)
 
     expect(store.destinationType.get()).toEqual("none")

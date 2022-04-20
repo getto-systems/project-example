@@ -1,6 +1,5 @@
 import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
 
-import { markBoardValue } from "../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockMultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 import { initMemoryDB } from "../../repository/init/memory"
 
@@ -19,8 +18,8 @@ test("select columns", async () => {
     await runner(async () => {
         await resource.field.ignitionState
         await resource.field.set(["column-initial"])
-        store.columns.set([markBoardValue("column-a")])
-        store.columns.set([markBoardValue("column-a"), markBoardValue("column-b")])
+        store.columns.set(["column-a"])
+        store.columns.set(["column-a", "column-b"])
         return resource.field.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
@@ -44,7 +43,7 @@ test("terminate", async () => {
 
     await runner(async () => {
         resource.field.terminate()
-        store.columns.set([markBoardValue("column-a")])
+        store.columns.set(["column-a"])
         return resource.field.currentState()
     }).then((stack) => {
         // no input/validate event after terminate

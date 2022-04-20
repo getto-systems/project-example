@@ -1,4 +1,3 @@
-import { BoardValue } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { ValidateLoginIdError } from "./data"
 import { ConvertBoardFieldResult } from "../../../../z_vendor/getto-application/board/validate_field/data"
 import { LoginId } from "../kernel/data"
@@ -8,7 +7,7 @@ import { LoginId } from "../kernel/data"
 export const LOGIN_ID_MAX_LENGTH = 100
 
 export function loginIdBoardConverter(
-    value: BoardValue,
+    value: string,
 ): ConvertBoardFieldResult<LoginId, ValidateLoginIdError> {
     if (value.length === 0) {
         return { valid: false, err: EMPTY }

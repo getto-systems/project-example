@@ -1,6 +1,5 @@
 import { setupActionTestRunner } from "../../../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../../../z_lib/ui/timer/helper"
-import { markBoardValue } from "../../../../../../z_vendor/getto-application/board/kernel/test_helper"
 import { mockBoardValueStore } from "../../../../../../z_vendor/getto-application/board/input/test_helper"
 
 import { ChangeResetTokenDestinationAction, initChangeResetTokenDestinationAction } from "./action"
@@ -24,8 +23,8 @@ test("submit valid info", async () => {
     const runner = setupActionTestRunner(resource.change.subscriber)
 
     await runner(async () => {
-        store.destinationType.set(markBoardValue(VALID_INFO.destinationType))
-        store.email.set(markBoardValue(VALID_INFO.email))
+        store.destinationType.set(VALID_INFO.destinationType)
+        store.email.set(VALID_INFO.email)
 
         return resource.change.submit(user)
     }).then((stack) => {
@@ -43,8 +42,8 @@ test("submit valid login-id; take long time", async () => {
     const runner = setupActionTestRunner(resource.change.subscriber)
 
     await runner(() => {
-        store.destinationType.set(markBoardValue(VALID_INFO.destinationType))
-        store.email.set(markBoardValue(VALID_INFO.email))
+        store.destinationType.set(VALID_INFO.destinationType)
+        store.email.set(VALID_INFO.email)
 
         return resource.change.submit(user)
     }).then((stack) => {
@@ -62,8 +61,8 @@ test("submit with invalid value; empty email", async () => {
     const runner = setupActionTestRunner(resource.change.subscriber)
 
     await runner(() => {
-        store.destinationType.set(markBoardValue("email"))
-        store.email.set(markBoardValue(""))
+        store.destinationType.set("email")
+        store.email.set("")
 
         return resource.change.submit(user)
     }).then((stack) => {
@@ -74,8 +73,8 @@ test("submit with invalid value; empty email", async () => {
 test("reset", () => {
     const { resource, store, user } = standard()
 
-    store.destinationType.set(markBoardValue(VALID_INFO.destinationType))
-    store.email.set(markBoardValue(VALID_INFO.email))
+    store.destinationType.set(VALID_INFO.destinationType)
+    store.email.set(VALID_INFO.email)
 
     resource.change.reset(user.resetTokenDestination)
 
