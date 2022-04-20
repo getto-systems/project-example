@@ -1,14 +1,8 @@
-import { defaultSeason } from "./default_season"
-
-import { Clock } from "../../../../z_lib/ui/clock/infra"
-
 import { Season, seasonPeriods } from "../data"
 import { beginningOfSystemSeason } from "../../../../x_content/season"
 
-// TODO mock できるようにしたい
-export function availableSeasons(clock: Clock): readonly Season[] {
+export function allSeasons(currentSeason: Season): readonly Season[] {
     const seasons: Season[] = Array.from(beginningOfSystemSeason)
-    const currentSeason = defaultSeason(clock)
 
     for (let year = seasons[0].year + 1; year <= currentSeason.year; year++) {
         if (year < currentSeason.year || currentSeason.period === "winter") {
@@ -20,6 +14,6 @@ export function availableSeasons(clock: Clock): readonly Season[] {
         }
     }
 
-    // 新しいやつが上に来るようにしたい
+    // 新しいやつが上に来るように reverse する
     return seasons.reverse()
 }

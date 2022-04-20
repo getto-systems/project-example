@@ -3,9 +3,6 @@ import {
     StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 
-import { availableSeasons } from "../kernel/init/available_seasons"
-import { defaultSeason } from "../kernel/init/default_season"
-
 import { SeasonRepository } from "../kernel/infra"
 import { Clock } from "../../../z_lib/ui/clock/infra"
 
@@ -17,7 +14,9 @@ export interface LoadSeasonAction extends StatefulApplicationAction<LoadSeasonSt
 }
 
 export type LoadSeasonMaterial = Readonly<{
-    season: SeasonRepository
+    defaultSeason: Season
+    availableSeasons: readonly Season[]
+    seasonRepository: SeasonRepository
     clock: Clock
 }>
 
@@ -58,26 +57,16 @@ async function loadSeason<S>(
     infra: LoadSeasonMaterial,
     post: Post<LoadSeasonEvent, S>,
 ): Promise<S> {
-    const { clock, season } = infra
+    const { clock, seasonRepository, defaultSeason, availableSeasons } = infra
 
-    const result = await season.get()
+    const result = await seasonRepository.get()
     if (!result.success) {
         return post({ type: "failed", err: result.err })
     }
     if (!result.found || result.value.expires < clock.now().getTime()) {
-        return post({
-            type: "success",
-            season: defaultSeason(clock),
-            default: true,
-            availableSeasons: availableSeasons(clock),
-        })
+        return post({ type: "success", season: defaultSeason, default: true, availableSeasons })
     }
-    return post({
-        type: "success",
-        season: result.value.season,
-        default: false,
-        availableSeasons: availableSeasons(clock),
-    })
+    return post({ type: "success", season: result.value.season, default: false, availableSeasons })
 }
 
 interface Post<E, S> {
