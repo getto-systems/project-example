@@ -1,3 +1,2 @@
-pub mod mail;
-pub mod metadata;
-pub mod role;
+mod api;
+pub use api::*;

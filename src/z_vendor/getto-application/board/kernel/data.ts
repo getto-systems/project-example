@@ -1,3 +1,4 @@
+// TODO 廃止したい
 export type BoardValue = string & { BoardValue: never }
 
 export const emptyBoardValue: BoardValue = "" as BoardValue
