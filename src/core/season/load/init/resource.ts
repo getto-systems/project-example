@@ -4,15 +4,20 @@ import { newSeasonRepository } from "../../kernel/init/season_repository"
 import { newClock } from "../../../../z_lib/ui/clock/init"
 
 import { LoadSeasonAction, initLoadSeasonAction } from "../action"
-import { availableSeasons } from "../../kernel/init/available_seasons"
+import { allSeasons } from "../../kernel/init/all_seasons"
+import { currentSeason } from "../../kernel/init/current_season"
 
 type OutsideFeature = RepositoryOutsideFeature
 export function newLoadSeasonResource(
     feature: OutsideFeature,
 ): Readonly<{ season: LoadSeasonAction }> {
+    const defaultSeason = currentSeason(newClock())
+    const availableSeasons = allSeasons(defaultSeason)
     return {
         season: initLoadSeasonAction({
-            season: newSeasonRepository(feature, availableSeasons(newClock())),
+            defaultSeason,
+            availableSeasons,
+            seasonRepository: newSeasonRepository(feature, availableSeasons),
             clock: newClock(),
         }),
     }

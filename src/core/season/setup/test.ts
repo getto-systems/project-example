@@ -108,6 +108,7 @@ function initResource(seasonRepository: SeasonRepository): Readonly<{
         setupSeason: initSetupSeasonAction(
             {
                 infra: {
+                    availableSeasons: standard_availableSeasons(),
                     seasonRepository,
                     clock,
                 },

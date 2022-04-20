@@ -1,5 +1,3 @@
-import { availableSeasons } from "../kernel/init/available_seasons"
-
 import {
     AbstractStatefulApplicationAction,
     StatefulApplicationAction,
@@ -14,6 +12,7 @@ import { Clock } from "../../../z_lib/ui/clock/infra"
 import { ExpireTime } from "../../../z_lib/ui/config/infra"
 
 import { RepositoryError } from "../../../z_lib/ui/repository/data"
+import { Season } from "../kernel/data"
 
 export interface SetupSeasonAction extends StatefulApplicationAction<SetupSeasonState> {
     readonly season: InputSeasonAction
@@ -27,6 +26,7 @@ export type SetupSeasonMaterial = Readonly<{
     config: SetupSeasonConfig
 }>
 export type SetupSeasonInfra = Readonly<{
+    availableSeasons: readonly Season[]
     seasonRepository: SeasonRepository
     clock: Clock
 }>
@@ -105,9 +105,9 @@ async function setupSeason<S>(
     value: string,
     post: Post<SetupSeasonEvent, S>,
 ): Promise<S> {
-    const { clock, seasonRepository } = infra
+    const { clock, seasonRepository, availableSeasons } = infra
 
-    const convertResult = seasonBoardConverter(availableSeasons(clock), value)
+    const convertResult = seasonBoardConverter(availableSeasons, value)
     if (!convertResult.valid) {
         return post({ type: "invalid" })
     }

@@ -1,7 +1,7 @@
 import { Clock } from "../../../../z_lib/ui/clock/infra"
 import { Season } from "../data"
 
-export function defaultSeason(clock: Clock): Season {
+export function currentSeason(clock: Clock): Season {
     const now = clock.now()
     const year = now.getFullYear()
     const month = now.getMonth()

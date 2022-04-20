@@ -15,6 +15,7 @@ import { seasonRepositoryConverter } from "../kernel/convert"
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"
 
 import { Season } from "../kernel/data"
+import { currentSeason } from "../kernel/init/current_season"
 
 test("load from repository", async () => {
     const { resource } = standard()
@@ -28,6 +29,7 @@ test("load from repository", async () => {
                 season: { year: 2022, period: "summer" },
                 default: false,
                 availableSeasons: [
+                    { year: 2022, period: "summer" },
                     { year: 2021, period: "winter" },
                     { year: 2021, period: "summer" },
                 ],
@@ -48,6 +50,7 @@ test("expired; use default", async () => {
                 season: { year: 2021, period: "summer" },
                 default: true,
                 availableSeasons: [
+                    { year: 2022, period: "summer" },
                     { year: 2021, period: "winter" },
                     { year: 2021, period: "summer" },
                 ],
@@ -68,6 +71,7 @@ test("not found; use default", async () => {
                 season: { year: 2021, period: "summer" },
                 default: true,
                 availableSeasons: [
+                    { year: 2022, period: "summer" },
                     { year: 2021, period: "winter" },
                     { year: 2021, period: "summer" },
                 ],
@@ -88,6 +92,7 @@ test("not found; use default; winter", async () => {
                 season: { year: 2021, period: "winter" },
                 default: true,
                 availableSeasons: [
+                    { year: 2022, period: "summer" },
                     { year: 2021, period: "winter" },
                     { year: 2021, period: "summer" },
                 ],
@@ -108,6 +113,7 @@ test("not found; use default; last winter", async () => {
                 season: { year: 2021, period: "winter" },
                 default: true,
                 availableSeasons: [
+                    { year: 2022, period: "summer" },
                     { year: 2021, period: "winter" },
                     { year: 2021, period: "summer" },
                 ],
@@ -149,11 +155,13 @@ function empty_last_winter() {
 
 function initResource(
     clock: Clock,
-    season: SeasonRepository,
+    seasonRepository: SeasonRepository,
 ): Readonly<{ season: LoadSeasonAction }> {
     return {
         season: initLoadSeasonAction({
-            season,
+            defaultSeason: currentSeason(clock),
+            availableSeasons: standard_availableSeasons(),
+            seasonRepository,
             clock,
         }),
     }
@@ -197,8 +205,8 @@ function empty_season(): SeasonRepository {
 
 function standard_availableSeasons(): readonly Season[] {
     return [
-        { year: 2021, period: "summer" } as Season,
-        { year: 2021, period: "winter" } as Season,
         { year: 2022, period: "summer" } as Season,
+        { year: 2021, period: "winter" } as Season,
+        { year: 2021, period: "summer" } as Season,
     ]
 }
