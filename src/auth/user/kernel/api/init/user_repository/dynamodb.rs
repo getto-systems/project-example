@@ -320,9 +320,8 @@ async fn search_user_account<'client>(
 
     let mut users: Vec<AuthUserAccount> = users
         .into_iter()
-        .filter(|(login_id, _)| match filter.login_id() {
-            None => true,
-            Some(filter_login_id) => login_id.as_str() == filter_login_id,
+        .filter(|(login_id, granted_roles)| {
+            filter.match_login_id(login_id) && filter.match_granted_roles(granted_roles)
         })
         .map(|(login_id, granted_roles)| {
             let destination = destinations.remove(&login_id);

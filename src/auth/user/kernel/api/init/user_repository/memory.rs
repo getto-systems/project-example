@@ -458,9 +458,8 @@ fn search<'a>(
 
     let mut users: Vec<AuthUserAccount> = users
         .into_iter()
-        .filter(|(_, user)| match filter.login_id() {
-            None => true,
-            Some(filter_login_id) => user.login_id.as_str() == filter_login_id,
+        .filter(|(_, user)| {
+            filter.match_login_id(&user.login_id) && filter.match_granted_roles(&user.granted_roles)
         })
         .map(|(_, user)| {
             let entry = destinations.remove(&user.login_id);

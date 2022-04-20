@@ -12,7 +12,7 @@ import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
-import { InputAuthRoles } from "../../input/x_preact/roles"
+import { InputGrantedRoles } from "../../input/x_preact/granted_roles"
 import { EditButton } from "../../../../../core/x_preact/button/edit_button"
 import { ResetButton } from "../../../../../core/x_preact/button/reset_button"
 import { CloseButton } from "../../../../../core/x_preact/button/close_button"
@@ -43,7 +43,7 @@ export function ModifyAuthUserAccount(props: Props): VNode {
         box({
             title: "基本情報",
             body: [
-                h(InputAuthRoles, {
+                h(InputGrantedRoles, {
                     user: props.user,
                     editable: props.editable,
                     field: props.modify.grantedRoles,

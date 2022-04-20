@@ -104,6 +104,9 @@ impl GrantedAuthRoles {
             .map(|role| role.as_str().to_owned())
             .collect()
     }
+    pub(in crate::auth) fn inner(&self) -> &HashSet<AuthRole> {
+        &self.0
+    }
 
     pub fn has_enough_permission(&self, require_roles: &RequireAuthRoles) -> bool {
         match require_roles {

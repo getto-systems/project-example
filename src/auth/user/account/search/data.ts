@@ -2,11 +2,13 @@ import { BoardValue } from "../../../../z_vendor/getto-application/board/kernel/
 import { SingleValueFilter, SearchPageResponse } from "../../../../z_lib/ui/search/kernel/data"
 import { SearchSort } from "../../../../z_lib/ui/search/sort/data"
 import { AuthUserAccount } from "../kernel/data"
+import { AuthRole } from "../../kernel/data"
 
 export type SearchAuthUserAccountFilter = Readonly<{
     offset: BoardValue
     sort: SearchAuthUserAccountSort
     loginId: SingleValueFilter
+    grantedRoles: readonly AuthRole[]
 }>
 
 export type SearchAuthUserAccountSort = SearchSort<"login-id">
