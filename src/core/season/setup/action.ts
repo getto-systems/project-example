@@ -17,7 +17,6 @@ import { Season } from "../kernel/data"
 export interface SetupSeasonAction extends StatefulApplicationAction<SetupSeasonState> {
     readonly season: InputSeasonAction
 
-    open(): Promise<SetupSeasonState>
     setup(): Promise<SetupSeasonState>
 }
 
@@ -34,10 +33,7 @@ export type SetupSeasonConfig = Readonly<{
     manualSetupSeasonExpire: ExpireTime
 }>
 
-export type SetupSeasonState =
-    | Readonly<{ type: "initial" }>
-    | Readonly<{ type: "edit-season" }> // TODO editable にする
-    | SetupSeasonEvent
+export type SetupSeasonState = Readonly<{ type: "initial" }> | SetupSeasonEvent
 
 const initialState: SetupSeasonState = { type: "initial" }
 
@@ -89,9 +85,6 @@ class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
             }
             return this.post(state)
         })
-    }
-    async open(): Promise<SetupSeasonState> {
-        return this.post({ type: "edit-season" })
     }
 }
 

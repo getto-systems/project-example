@@ -80,16 +80,6 @@ test("setup season; invalid period", async () => {
     })
 })
 
-test("open", async () => {
-    const { resource } = standard()
-
-    const runner = setupActionTestRunner(resource.setupSeason.subscriber)
-
-    await runner(() => resource.setupSeason.open()).then((stack) => {
-        expect(stack).toEqual([{ type: "edit-season" }])
-    })
-})
-
 test("convert season to board value", () => {
     expect(seasonToString(markSeason({ year: 2021, period: "summer" }))).toEqual("2021.summer")
 })
