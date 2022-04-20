@@ -10,17 +10,27 @@ import { initBaseView } from "../../../../core/base/init"
 
 import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 import { SetupSeasonPageResource } from "./resource"
+import { initEditableBoardAction } from "../../../../z_vendor/getto-application/board/editable/action"
 
 render(h(SetupSeasonPage, props()), document.body)
 
 function props(): ApplicationView<SetupSeasonPageResource> {
     const resource = newResource()
     return initBaseView(resource, () => {
-        resource.setupSeason.terminate()
+        resource.setup.season.terminate()
+        resource.setup.editable.terminate()
     })
 }
 function newResource(): SetupSeasonPageResource {
     const feature = newForegroundOutsideFeature()
     const baseResource = newBaseResource(feature)
-    return { ...baseResource, ...newSetupSeasonResource(feature, baseResource.season) }
+    const resource = newSetupSeasonResource(feature, baseResource.season)
+    return {
+        ...baseResource,
+        season: resource.season,
+        setup: {
+            season: resource.setupSeason,
+            editable: initEditableBoardAction(),
+        },
+    }
 }
