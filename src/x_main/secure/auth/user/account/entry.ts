@@ -28,8 +28,6 @@ function newResource() {
         ...newBaseResource(feature),
         sidebar: newSearchSidebarAction(feature, "auth.user.account"),
         search,
-        list: search,
-        detail: search.detail,
         modify: {
             editable: initEditableBoardAction(),
             modify: newModifyAuthUserAccountAction(feature),

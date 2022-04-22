@@ -7,28 +7,20 @@ import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 
 import { initInputGrantedRolesAction, InputGrantedRolesAction } from "../input/action"
 import {
-    ValidateBoardAction,
-    initValidateBoardAction,
-} from "../../../../z_vendor/getto-application/board/validate_board/action"
-
-import { ModifyAuthUserAccountError, ModifyAuthUserAccountFields } from "./data"
-import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
+    initObserveBoardAction,
+    ObserveBoardAction,
+} from "../../../../z_vendor/getto-application/board/observe_board/action"
 
 import { ModifyAuthUserAccountRemote } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
 
-import {
-    initObserveBoardAction,
-    ObserveBoardAction,
-} from "../../../../z_vendor/getto-application/board/observe_board/action"
-import { BoardConverter } from "../../../../z_vendor/getto-application/board/kernel/infra"
+import { ModifyAuthUserAccountError, ModifyAuthUserAccountFields } from "./data"
 import { AuthRole } from "../../kernel/data"
 import { LoginId } from "../../login_id/kernel/data"
 
 export interface ModifyAuthUserAccountAction
     extends StatefulApplicationAction<ModifyAuthUserAccountState> {
     readonly grantedRoles: InputGrantedRolesAction
-    readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
     reset(user: Readonly<{ grantedRoles: readonly AuthRole[] }>): ModifyAuthUserAccountState
@@ -67,17 +59,16 @@ class Action
     readonly initialState = initialState
 
     readonly grantedRoles: InputGrantedRolesAction
-    readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
     material: ModifyAuthUserAccountMaterial
-    convert: BoardConverter<ModifyAuthUserAccountFields>
+    convert: { (): ModifyAuthUserAccountFields }
 
     constructor(material: ModifyAuthUserAccountMaterial) {
         super({
             terminate: () => {
                 this.grantedRoles.terminate()
-                this.validate.terminate()
+                this.observe.terminate()
             },
         })
         this.material = material
@@ -85,29 +76,14 @@ class Action
         const fields = ["grantedRoles"] as const
 
         const grantedRoles = initInputGrantedRolesAction()
-        const { validate, validateChecker } = initValidateBoardAction(
-            { fields },
-            {
-                converter: (): ConvertBoardResult<ModifyAuthUserAccountFields> => {
-                    const result = {
-                        grantedRoles: grantedRoles.convert(),
-                    }
-                    return {
-                        valid: true,
-                        value: {
-                            grantedRoles: result.grantedRoles,
-                        },
-                    }
-                },
-            },
-        )
 
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         this.grantedRoles = grantedRoles.input
-        this.validate = validate
         this.observe = observe
-        this.convert = () => validateChecker.get()
+        this.convert = (): ModifyAuthUserAccountFields => ({
+            grantedRoles: grantedRoles.convert(),
+        })
 
         this.grantedRoles.observe.subscriber.subscribe((result) => {
             observeChecker.update("grantedRoles", result.hasChanged)
@@ -116,18 +92,13 @@ class Action
 
     reset(user: Readonly<{ grantedRoles: readonly AuthRole[] }>): ModifyAuthUserAccountState {
         this.grantedRoles.reset(user.grantedRoles)
-        this.validate.clear()
         this.observe.clear()
-        return this.post(this.initialState)
+        return this.currentState()
     }
     async submit(
         user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>,
     ): Promise<ModifyAuthUserAccountState> {
-        const fields = this.convert()
-        if (!fields.valid) {
-            return this.currentState()
-        }
-        return modifyUser(this.material, user, fields.value, this.post)
+        return modifyUser(this.material, user, this.convert(), this.post)
     }
 }
 

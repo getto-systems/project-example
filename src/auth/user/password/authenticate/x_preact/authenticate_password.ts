@@ -20,8 +20,8 @@ import { signNav } from "../../../../sign/nav/x_preact/nav"
 import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
 
 import { ApplicationError } from "../../../../../avail/x_preact/application_error"
-import { InputLoginId } from "../../../login_id/input/x_preact/input"
-import { InputPassword } from "../../input/x_preact/input"
+import { LoginIdField } from "../../../login_id/input/x_preact/input"
+import { PasswordField } from "../../input/x_preact/input"
 import { SendButton } from "../../../../../core/x_preact/button/send_button"
 import { ClearChangesButton } from "../../../../../core/x_preact/button/clear_changes_button"
 
@@ -101,11 +101,11 @@ export function AuthenticatePassword(viewProps: Props): VNode {
             form: true,
             title: "ログイン",
             body: [
-                h(InputLoginId, {
+                h(LoginIdField, {
                     field: props.authenticate.loginId,
                     autocomplete: "username",
                 }),
-                h(InputPassword, {
+                h(PasswordField, {
                     field: props.authenticate.password,
                     autocomplete: "current-password",
                 }),

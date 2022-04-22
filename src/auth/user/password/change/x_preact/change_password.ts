@@ -12,7 +12,7 @@ import { notice_success } from "../../../../../z_vendor/getto-css/preact/design/
 import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
 
 import { changePasswordError } from "./helper"
-import { InputPassword } from "../../input/x_preact/input"
+import { PasswordField } from "../../input/x_preact/input"
 import { ClearChangesButton } from "../../../../../core/x_preact/button/clear_changes_button"
 import { CloseButton } from "../../../../../core/x_preact/button/close_button"
 import { ChangeButton } from "../../../../../core/x_preact/button/change_button"
@@ -52,13 +52,13 @@ export function ChangePassword(props: Props): VNode {
         box({
             ...content,
             body: [
-                h(InputPassword, {
+                h(PasswordField, {
                     field: props.change.currentPassword,
                     title: "現在のパスワード",
                     help: ["変更前のパスワードを入力します"],
                     autocomplete: "current-password",
                 }),
-                h(InputPassword, {
+                h(PasswordField, {
                     field: props.change.newPassword,
                     title: "新しいパスワード",
                     help: ["今後はこのパスワードになります"],

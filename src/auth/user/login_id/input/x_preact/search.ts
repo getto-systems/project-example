@@ -10,7 +10,7 @@ import { SearchLoginIdAction } from "../action"
 
 type Props = Readonly<{ field: SearchLoginIdAction }> &
     Partial<{ title: VNodeContent; help: readonly VNodeContent[] }>
-export function SearchLoginId(props: Props): VNode {
+export function SearchLoginIdField(props: Props): VNode {
     return search({
         title: title(),
         body: h(InputBoard, { type: "text", input: props.field.input }),

@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package auth.user.account.register.service;
+
+import "auth/user/password/reset/token_destination/kernel/x_protobuf/service.proto";
+
+service RegisterAuthUserAccountPb {
+    rpc RegisterUser (RegisterAuthUserAccountRequestPb) returns (RegisterAuthUserAccountResponsePb);
+}
+message RegisterAuthUserAccountRequestPb {
+    string login_id = 1;
+    repeated string granted_roles = 2;
+    auth.user.password.reset.token_destination.kernel.service.ResetTokenDestinationPb resetTokenDestination = 3;
+}
+message RegisterAuthUserAccountResponsePb {
+    bool success = 1;
+    RegisterAuthUserAccountErrorKindPb err = 2;
+}
+enum RegisterAuthUserAccountErrorKindPb {
+    LOGIN_ID_ALREADY_REGISTERED = 0;
+    INVALID = 1;
+}

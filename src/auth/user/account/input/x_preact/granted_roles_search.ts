@@ -2,14 +2,14 @@ import { h, VNode } from "preact"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
-import { field } from "../../../../../z_vendor/getto-css/preact/design/form"
+import { search } from "../../../../../z_vendor/getto-css/preact/design/form"
 
 import {
     CheckboxBoard,
     CheckboxBoardContent,
 } from "../../../../../z_vendor/getto-application/board/input/x_preact/checkbox"
 
-import { authRoleLabel } from "../../../../../x_content/role"
+import { ALL_AUTH_ROLES, authRoleLabel } from "../../../../../x_content/role"
 
 import { SearchGrantedRolesAction } from "../action"
 
@@ -23,19 +23,15 @@ type Props = Readonly<{
         help: readonly VNodeContent[]
     }>
 
-export function SearchGrantedRoles(props: Props): VNode {
-    return field({
+export function SearchGrantedRolesField(props: Props): VNode {
+    return search({
         title: props.title || "権限",
         help: props.help,
-        body: body(),
-    })
-
-    function body(): VNodeContent {
-        return h(CheckboxBoard, {
+        body: h(CheckboxBoard, {
             input: props.field.grantedRoles,
-            options: [roleCheckbox("user")],
-        })
-    }
+            options: ALL_AUTH_ROLES.map(roleCheckbox),
+        }),
+    })
 
     function roleCheckbox(role: AuthRole): CheckboxBoardContent {
         return {
