@@ -4,13 +4,19 @@ use crate::auth::ticket::kernel::init::ticket_repository::memory::ticket::{
     EntryTicket, MapTicket, StoreTicket,
 };
 
-use crate::auth::ticket::{
-    encode::infra::EncodeAuthTicketRepository, issue::infra::IssueAuthTicketRepository,
-    logout::infra::LogoutAuthTicketRepository,
+use crate::auth::{
+    ticket::{
+        encode::infra::EncodeAuthTicketRepository, issue::infra::IssueAuthTicketRepository,
+        logout::infra::LogoutAuthTicketRepository,
+    },
+    user::account::unregister::infra::DiscardAuthTicketRepository,
 };
 
 use crate::{
-    auth::ticket::kernel::data::{AuthDateTime, AuthTicket, ExpansionLimitDateTime},
+    auth::{
+        ticket::kernel::data::{AuthDateTime, AuthTicket, ExpansionLimitDateTime},
+        user::kernel::data::AuthUserId,
+    },
     z_lib::repository::data::RepositoryError,
 };
 
@@ -84,5 +90,15 @@ impl<'a> EncodeAuthTicketRepository for MemoryAuthTicketRepository<'a> {
         ticket: &AuthTicket,
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError> {
         Ok(self.ticket.get_expansion_limit(ticket.as_ticket_id()))
+    }
+}
+
+#[async_trait::async_trait]
+impl<'a> DiscardAuthTicketRepository for MemoryAuthTicketRepository<'a> {
+    async fn discard_all(&self, user_id: &AuthUserId) -> Result<(), RepositoryError> {
+        for ticket_id in self.ticket.get_all_ticket_id(user_id) {
+            self.ticket.remove_ticket(&ticket_id)
+        }
+        Ok(())
     }
 }

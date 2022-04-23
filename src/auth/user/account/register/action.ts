@@ -160,6 +160,7 @@ class Action
         this.observe = observe
         this.convert = () => validateChecker.get()
 
+        // TODO [("login-id", this.loginId)] とかから設定したい
         this.loginId.validate.subscriber.subscribe((result) => {
             validateChecker.update("login-id", result.valid)
         })
@@ -175,6 +176,8 @@ class Action
         this.resetTokenDestination.observe.subscriber.subscribe((result) => {
             observeChecker.update("reset-token-destination", result.hasChanged)
         })
+
+        this.clear()
     }
 
     clear(): RegisterAuthUserAccountState {

@@ -5,7 +5,10 @@ use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
     ticket::{
-        kernel::init::clock::test::StaticChronoAuthClock,
+        kernel::init::{
+            clock::test::StaticChronoAuthClock,
+            ticket_repository::memory::{MemoryAuthTicketRepository, MemoryAuthTicketStore},
+        },
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
@@ -80,16 +83,22 @@ async fn permission_denied() {
 
 struct TestStruct<'a> {
     validate: StaticValidateAuthTokenStruct<'a>,
+    ticket_repository: MemoryAuthTicketRepository<'a>,
     user_repository: MemoryAuthUserRepository<'a>,
 }
 
 impl<'a> UnregisterAuthUserAccountMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
 
+    type TicketRepository = MemoryAuthTicketRepository<'a>;
     type UserRepository = MemoryAuthUserRepository<'a>;
 
     fn validate(&self) -> &Self::Validate {
         &self.validate
+    }
+
+    fn ticket_repository(&self) -> &Self::TicketRepository {
+        &self.ticket_repository
     }
     fn user_repository(&self) -> &Self::UserRepository {
         &self.user_repository
@@ -98,6 +107,7 @@ impl<'a> UnregisterAuthUserAccountMaterial for TestStruct<'a> {
 
 struct TestStore {
     nonce: MemoryAuthNonceStore,
+    ticket: MemoryAuthTicketStore,
     user: MemoryAuthUserStore,
 }
 
@@ -105,6 +115,7 @@ impl TestStore {
     fn new() -> Self {
         Self {
             nonce: MemoryAuthNonceStore::new(),
+            ticket: MemoryAuthTicketStore::new(),
             user: MemoryAuthUserStore::new(),
         }
     }
@@ -129,6 +140,7 @@ impl<'a> TestStruct<'a> {
                 token_metadata: standard_token_header(),
                 token_decoder,
             },
+            ticket_repository: MemoryAuthTicketRepository::new(&store.ticket),
             user_repository: standard_user_repository(&store.user),
         }
     }

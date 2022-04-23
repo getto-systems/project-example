@@ -3,12 +3,13 @@ use std::collections::HashMap;
 use chrono::{DateTime, NaiveDateTime, Utc};
 use rusoto_dynamodb::{
     AttributeValue, DeleteItemInput, DynamoDb, DynamoDbClient, GetItemInput, PutItemInput,
+    QueryInput,
 };
 
 use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
 use crate::z_lib::repository::{
-    dynamodb::helper::{string_value, timestamp_value, DynamoDbColumn},
+    dynamodb::helper::{string_value, timestamp_value, DynamoDbColumn, ScanKey},
     helper::infra_error,
 };
 
@@ -32,12 +33,10 @@ impl<'a> TableTicket<'a> {
         }
     }
 
-    fn key(ticket: AuthTicket) -> HashMap<String, AttributeValue> {
-        let (ticket_id, user) = ticket.extract();
-
+    fn key(ticket_id: AuthTicketId, user_id: AuthUserId) -> HashMap<String, AttributeValue> {
         vec![
             ColumnTicketId::to_attr_pair(ticket_id),
-            ColumnUserId::to_attr_pair(user.into_user_id()),
+            ColumnUserId::to_attr_pair(user_id),
         ]
         .into_iter()
         .collect()
@@ -47,9 +46,11 @@ impl<'a> TableTicket<'a> {
         &self,
         ticket: AuthTicket,
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError> {
+        let (ticket_id, user) = ticket.extract();
+
         let input = GetItemInput {
             table_name: self.table_name.into(),
-            key: Self::key(ticket),
+            key: Self::key(ticket_id, user.into_user_id()),
             projection_expression: Some(
                 vec![ColumnExpansionLimit::as_name()].into_iter().collect(),
             ),
@@ -101,10 +102,14 @@ impl<'a> TableTicket<'a> {
         Ok(())
     }
 
-    pub async fn delete_ticket(&self, ticket: AuthTicket) -> Result<(), RepositoryError> {
+    pub async fn delete_ticket(
+        &self,
+        ticket_id: AuthTicketId,
+        user_id: AuthUserId,
+    ) -> Result<(), RepositoryError> {
         let input = DeleteItemInput {
             table_name: self.table_name.into(),
-            key: Self::key(ticket),
+            key: Self::key(ticket_id, user_id),
             ..Default::default()
         };
 
@@ -114,6 +119,54 @@ impl<'a> TableTicket<'a> {
             .map_err(|err| infra_error("delete ticket error", err))?;
 
         Ok(())
+    }
+
+    pub async fn query_ticket_id(
+        &self,
+        user_id: AuthUserId,
+    ) -> Result<Vec<AuthTicketId>, RepositoryError> {
+        let mut acc = vec![];
+        let mut scan_key = ScanKey::FirstTime;
+        while scan_key.has_next() {
+            let (mut items, key) = self.query_ticket_id_part(user_id.clone(), scan_key).await?;
+            acc.append(&mut items);
+            scan_key = key;
+        }
+        Ok(acc)
+    }
+    async fn query_ticket_id_part(
+        &self,
+        user_id: AuthUserId,
+        scan_key: ScanKey,
+    ) -> Result<(Vec<AuthTicketId>, ScanKey), RepositoryError> {
+        let input = QueryInput {
+            table_name: self.table_name.into(),
+            key_condition_expression: Some(format!("{} = :user_id", ColumnUserId::as_name())),
+            expression_attribute_values: Some(
+                vec![(":user_id".to_owned(), ColumnUserId::to_attr(user_id))]
+                    .into_iter()
+                    .collect(),
+            ),
+            exclusive_start_key: scan_key.extract(),
+            projection_expression: Some(vec![ColumnTicketId::as_name()].join(",")),
+            ..Default::default()
+        };
+
+        let response = self
+            .client
+            .query(input)
+            .await
+            .map_err(|err| infra_error("scan user error", err))?;
+
+        let items = match response.items {
+            None => vec![],
+            Some(items) => items
+                .into_iter()
+                .filter_map(|mut attrs| ColumnTicketId::remove_value(&mut attrs))
+                .collect(),
+        };
+
+        Ok((items, ScanKey::next(response.last_evaluated_key)))
     }
 }
 

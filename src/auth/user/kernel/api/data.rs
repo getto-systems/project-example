@@ -23,6 +23,10 @@ impl AuthUser {
         self.granted_roles
     }
 
+    #[cfg(test)]
+    pub fn user_id(&self) -> &AuthUserId {
+        &self.user_id
+    }
     pub fn granted_roles(&self) -> &GrantedAuthRoles {
         &self.granted_roles
     }

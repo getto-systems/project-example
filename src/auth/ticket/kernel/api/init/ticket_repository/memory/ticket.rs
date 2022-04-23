@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::Mutex};
 
 use crate::auth::{
     ticket::kernel::data::{AuthDateTime, AuthTicket, AuthTicketId, ExpansionLimitDateTime},
-    user::kernel::data::AuthUser,
+    user::kernel::data::{AuthUser, AuthUserId},
 };
 
 pub struct MapTicket<'a> {
@@ -56,5 +56,19 @@ impl<'a> MapTicket<'a> {
     pub fn remove_ticket(&self, ticket_id: &AuthTicketId) {
         let mut store = self.store.lock().unwrap();
         store.remove(ticket_id);
+    }
+
+    pub fn get_all_ticket_id(&self, user_id: &AuthUserId) -> Vec<AuthTicketId> {
+        let store = self.store.lock().unwrap();
+        store
+            .iter()
+            .filter_map(|(ticket_id, entry)| {
+                if entry.user.user_id() == user_id {
+                    Some(ticket_id.clone())
+                } else {
+                    None
+                }
+            })
+            .collect()
     }
 }

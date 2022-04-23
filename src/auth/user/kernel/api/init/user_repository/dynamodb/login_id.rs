@@ -62,6 +62,12 @@ impl<'a> TableLoginId<'a> {
             .item
             .and_then(|mut attrs| ColumnUserId::remove_value(&mut attrs)))
     }
+    pub async fn check_login_id_registered(
+        &self,
+        login_id: LoginId,
+    ) -> Result<bool, RepositoryError> {
+        Ok(self.get_user_id(login_id).await?.is_some())
+    }
     pub async fn get_override_entry(
         &self,
         login_id: LoginId,

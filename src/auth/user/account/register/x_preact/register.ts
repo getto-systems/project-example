@@ -2,12 +2,8 @@ import { h, VNode } from "preact"
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import {
-    buttons,
-    fieldHelp_error,
-    form,
-} from "../../../../../z_vendor/getto-css/preact/design/form"
-import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
+import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
+import { box, container } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
@@ -32,8 +28,9 @@ export function RegisterAuthUserAccount(props: Props): VNode {
     const validateState = useApplicationAction(props.register.validate)
     const observeState = useApplicationAction(props.register.observe)
 
-    return form(
+    return container(
         box({
+            form: true,
             title: "新規ユーザー登録",
             body: [
                 h(LoginIdField, { field: props.register.loginId }),
