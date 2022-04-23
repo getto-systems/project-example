@@ -1,43 +1,30 @@
 use tonic::{Response, Status};
 
-use crate::auth::user::account::modify::y_protobuf::service::{
-    ModifyAuthUserAccountErrorKindPb, ModifyAuthUserAccountResponsePb,
-};
+use crate::auth::user::account::unregister::y_protobuf::service::UnregisterAuthUserAccountResponsePb;
 
 use crate::z_lib::response::tonic::ServiceResponder;
 
-use super::super::action::{ModifyAuthUserAccountEvent, ModifyAuthUserAccountState};
+use super::super::action::{UnregisterAuthUserAccountEvent, UnregisterAuthUserAccountState};
 
-impl ServiceResponder<ModifyAuthUserAccountResponsePb> for ModifyAuthUserAccountState {
-    fn respond_to(self) -> Result<Response<ModifyAuthUserAccountResponsePb>, Status> {
+impl ServiceResponder<UnregisterAuthUserAccountResponsePb> for UnregisterAuthUserAccountState {
+    fn respond_to(self) -> Result<Response<UnregisterAuthUserAccountResponsePb>, Status> {
         match self {
             Self::Validate(event) => event.respond_to(),
             Self::PermissionError(err) => err.respond_to(),
-            Self::ModifyUser(event) => event.respond_to(),
+            Self::UnregisterUser(event) => event.respond_to(),
         }
     }
 }
 
-impl ServiceResponder<ModifyAuthUserAccountResponsePb> for ModifyAuthUserAccountEvent {
-    fn respond_to(self) -> Result<Response<ModifyAuthUserAccountResponsePb>, Status> {
+impl ServiceResponder<UnregisterAuthUserAccountResponsePb> for UnregisterAuthUserAccountEvent {
+    fn respond_to(self) -> Result<Response<UnregisterAuthUserAccountResponsePb>, Status> {
         match self {
-            Self::Success => Ok(Response::new(ModifyAuthUserAccountResponsePb {
+            Self::Success => Ok(Response::new(UnregisterAuthUserAccountResponsePb {
                 success: true,
                 ..Default::default()
             })),
-            Self::NotFound => Ok(Response::new(ModifyAuthUserAccountResponsePb {
+            Self::Invalid(_) => Ok(Response::new(UnregisterAuthUserAccountResponsePb {
                 success: false,
-                err: ModifyAuthUserAccountErrorKindPb::NotFound as i32,
-                ..Default::default()
-            })),
-            Self::Conflict => Ok(Response::new(ModifyAuthUserAccountResponsePb {
-                success: false,
-                err: ModifyAuthUserAccountErrorKindPb::Conflict as i32,
-                ..Default::default()
-            })),
-            Self::Invalid(_) => Ok(Response::new(ModifyAuthUserAccountResponsePb {
-                success: false,
-                err: ModifyAuthUserAccountErrorKindPb::Invalid as i32,
                 ..Default::default()
             })),
             Self::RepositoryError(err) => err.respond_to(),

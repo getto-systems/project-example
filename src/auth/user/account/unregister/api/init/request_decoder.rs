@@ -1,69 +1,46 @@
-use crate::auth::user::account::modify::y_protobuf::service::{
-    ModifyAuthUserAccountChangesPb, ModifyAuthUserAccountRequestPb,
-};
+use crate::auth::user::account::unregister::y_protobuf::service::UnregisterAuthUserAccountRequestPb;
 
-use crate::auth::user::account::modify::infra::{
-    ModifyAuthUserAccountFields, ModifyAuthUserAccountRequestDecoder,
-};
+use crate::auth::user::account::unregister::infra::UnregisterAuthUserAccountRequestDecoder;
 
 use crate::auth::user::{
-    account::modify::data::{
-        ModifyAuthUserAccountChanges, ValidateModifyAuthUserAccountChangesError, ValidateModifyAuthUserAccountFieldsError,
-    },
-    kernel::data::GrantedAuthRoles,
+    account::unregister::data::ValidateUnregisterAuthUserAccountFieldsError,
     login_id::kernel::data::LoginId,
 };
 
-pub struct PbModifyAuthUserAccountRequestDecoder {
-    request: ModifyAuthUserAccountRequestPb,
+pub struct PbUnregisterAuthUserAccountRequestDecoder {
+    request: UnregisterAuthUserAccountRequestPb,
 }
 
-impl PbModifyAuthUserAccountRequestDecoder {
-    pub const fn new(request: ModifyAuthUserAccountRequestPb) -> Self {
+impl PbUnregisterAuthUserAccountRequestDecoder {
+    pub const fn new(request: UnregisterAuthUserAccountRequestPb) -> Self {
         Self { request }
     }
 }
 
-impl ModifyAuthUserAccountRequestDecoder for PbModifyAuthUserAccountRequestDecoder {
-    fn decode(self) -> Result<ModifyAuthUserAccountFields, ValidateModifyAuthUserAccountFieldsError> {
-        Ok(ModifyAuthUserAccountFields {
-            login_id: LoginId::validate(self.request.login_id)
-                .map_err(ValidateModifyAuthUserAccountFieldsError::InvalidLoginId)?,
-            from: validate_data(self.request.from)
-                .map_err(ValidateModifyAuthUserAccountFieldsError::InvalidFrom)?,
-            to: validate_data(self.request.to).map_err(ValidateModifyAuthUserAccountFieldsError::InvalidTo)?,
-        })
-    }
-}
-
-fn validate_data(
-    data: Option<ModifyAuthUserAccountChangesPb>,
-) -> Result<ModifyAuthUserAccountChanges, ValidateModifyAuthUserAccountChangesError> {
-    match data {
-        None => Err(ValidateModifyAuthUserAccountChangesError::NotFound),
-        Some(data) => Ok(ModifyAuthUserAccountChanges {
-            granted_roles: GrantedAuthRoles::validate(data.granted_roles)
-                .map_err(ValidateModifyAuthUserAccountChangesError::InvalidGrantedRoles)?,
-        }),
+impl UnregisterAuthUserAccountRequestDecoder for PbUnregisterAuthUserAccountRequestDecoder {
+    fn decode(self) -> Result<LoginId, ValidateUnregisterAuthUserAccountFieldsError> {
+        Ok(LoginId::validate(self.request.login_id)
+            .map_err(ValidateUnregisterAuthUserAccountFieldsError::InvalidLoginId)?)
     }
 }
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::user::account::modify::infra::{
-        ModifyAuthUserAccountFields, ModifyAuthUserAccountRequestDecoder,
+    use crate::auth::user::account::unregister::infra::UnregisterAuthUserAccountRequestDecoder;
+
+    use crate::auth::user::{
+        account::unregister::data::ValidateUnregisterAuthUserAccountFieldsError,
+        login_id::kernel::data::LoginId,
     };
 
-    use crate::auth::user::account::modify::data::ValidateModifyAuthUserAccountFieldsError;
-
-    pub enum StaticModifyAuthUserAccountRequestDecoder {
-        Valid(ModifyAuthUserAccountFields),
+    pub enum StaticUnregisterAuthUserAccountRequestDecoder {
+        Valid(LoginId),
     }
 
-    impl ModifyAuthUserAccountRequestDecoder for StaticModifyAuthUserAccountRequestDecoder {
-        fn decode(self) -> Result<ModifyAuthUserAccountFields, ValidateModifyAuthUserAccountFieldsError> {
+    impl UnregisterAuthUserAccountRequestDecoder for StaticUnregisterAuthUserAccountRequestDecoder {
+        fn decode(self) -> Result<LoginId, ValidateUnregisterAuthUserAccountFieldsError> {
             match self {
-                Self::Valid(fields) => Ok(fields),
+                Self::Valid(login_id) => Ok(login_id),
             }
         }
     }

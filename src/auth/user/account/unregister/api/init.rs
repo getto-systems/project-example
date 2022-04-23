@@ -2,33 +2,33 @@ pub mod request_decoder;
 
 use tonic::metadata::MetadataMap;
 
-use crate::auth::user::account::modify::y_protobuf::service::ModifyAuthUserAccountRequestPb;
+use crate::auth::user::account::unregister::y_protobuf::service::UnregisterAuthUserAccountRequestPb;
 
 use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::{
     ticket::validate::init::ApiValidateAuthTokenStruct,
     user::{
-        account::modify::init::request_decoder::PbModifyAuthUserAccountRequestDecoder,
+        account::unregister::init::request_decoder::PbUnregisterAuthUserAccountRequestDecoder,
         kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,
     },
 };
 
-use super::action::{ModifyAuthUserAccountAction, ModifyAuthUserAccountMaterial};
+use super::action::{UnregisterAuthUserAccountAction, UnregisterAuthUserAccountMaterial};
 
-pub struct ModifyAuthUserAccountFeature<'a> {
+pub struct UnregisterAuthUserAccountFeature<'a> {
     validate: ApiValidateAuthTokenStruct<'a>,
     user_repository: DynamoDbAuthUserRepository<'a>,
 }
 
-impl<'a> ModifyAuthUserAccountFeature<'a> {
+impl<'a> UnregisterAuthUserAccountFeature<'a> {
     pub fn action(
         feature: &'a AuthAppFeature,
         metadata: &'a MetadataMap,
-        request: ModifyAuthUserAccountRequestPb,
-    ) -> ModifyAuthUserAccountAction<PbModifyAuthUserAccountRequestDecoder, Self> {
-        ModifyAuthUserAccountAction::with_material(
-            PbModifyAuthUserAccountRequestDecoder::new(request),
+        request: UnregisterAuthUserAccountRequestPb,
+    ) -> UnregisterAuthUserAccountAction<PbUnregisterAuthUserAccountRequestDecoder, Self> {
+        UnregisterAuthUserAccountAction::with_material(
+            PbUnregisterAuthUserAccountRequestDecoder::new(request),
             Self {
                 validate: ApiValidateAuthTokenStruct::new(feature, metadata),
                 user_repository: DynamoDbAuthUserRepository::new(&feature.store),
@@ -37,7 +37,7 @@ impl<'a> ModifyAuthUserAccountFeature<'a> {
     }
 }
 
-impl<'a> ModifyAuthUserAccountMaterial for ModifyAuthUserAccountFeature<'a> {
+impl<'a> UnregisterAuthUserAccountMaterial for UnregisterAuthUserAccountFeature<'a> {
     type Validate = ApiValidateAuthTokenStruct<'a>;
 
     type UserRepository = DynamoDbAuthUserRepository<'a>;

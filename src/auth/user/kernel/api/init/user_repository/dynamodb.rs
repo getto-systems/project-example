@@ -4,7 +4,6 @@ mod user;
 
 use std::{collections::HashMap, convert::TryInto};
 
-use crate::auth::user::account::register::infra::RegisterAuthUserAccountFields;
 use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
 use crate::auth::user::kernel::init::user_repository::dynamodb::{
@@ -16,8 +15,9 @@ use crate::z_lib::repository::helper::infra_error;
 use crate::auth::user::{
     account::{
         modify::infra::ModifyAuthUserAccountRepository,
-        register::infra::RegisterAuthUserAccountRepository,
+        register::infra::{RegisterAuthUserAccountFields, RegisterAuthUserAccountRepository},
         search::infra::SearchAuthUserAccountRepository,
+        unregister::infra::UnregisterAuthUserAccountRepository,
     },
     login_id::change::infra::{OverrideLoginIdEntry, OverrideLoginIdRepository},
     password::{
@@ -216,6 +216,29 @@ impl<'client> ModifyAuthUserAccountRepository for DynamoDbAuthUserRepository<'cl
         changes: ModifyAuthUserAccountChanges,
     ) -> Result<(), RepositoryError> {
         self.user.update_user(user_id, changes).await
+    }
+}
+
+#[async_trait::async_trait]
+impl<'client> UnregisterAuthUserAccountRepository for DynamoDbAuthUserRepository<'client> {
+    async fn unregister_user(&self, login_id: &LoginId) -> Result<(), RepositoryError> {
+        if let Some(user_id) = self.login_id.get_user_id(login_id.clone()).await? {
+            let entry = self.user.get_entry(user_id.clone()).await?;
+            self.user.delete_entry(user_id.clone()).await?;
+
+            {
+                let result = self.login_id.delete_entry(login_id.clone()).await;
+                if result.is_err() {
+                    if let Some(entry) = entry {
+                        self.user.put_entry(user_id, entry).await?;
+                    }
+                }
+                result?;
+            }
+
+            // TODO ticket repository と統合してここで user_id に紐づく ticket を全て削除する
+        }
+        Ok(())
     }
 }
 

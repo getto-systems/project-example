@@ -1,42 +1,17 @@
 use crate::{
     auth::user::{
-        account::modify::data::{
-            ModifyAuthUserAccountChanges, ValidateModifyAuthUserAccountFieldsError,
-        },
-        kernel::data::AuthUserId,
+        account::unregister::data::ValidateUnregisterAuthUserAccountFieldsError,
         login_id::kernel::data::LoginId,
     },
     z_lib::repository::data::RepositoryError,
 };
 
 // TODO Extract で受け取って validate は action でやる、だったはず
-pub trait ModifyAuthUserAccountRequestDecoder {
-    fn decode(
-        self,
-    ) -> Result<ModifyAuthUserAccountFields, ValidateModifyAuthUserAccountFieldsError>;
-}
-
-pub struct ModifyAuthUserAccountFields {
-    pub login_id: LoginId,
-    pub from: ModifyAuthUserAccountChanges,
-    pub to: ModifyAuthUserAccountChanges,
+pub trait UnregisterAuthUserAccountRequestDecoder {
+    fn decode(self) -> Result<LoginId, ValidateUnregisterAuthUserAccountFieldsError>;
 }
 
 #[async_trait::async_trait]
-pub trait ModifyAuthUserAccountRepository {
-    async fn lookup_user_id(
-        &self,
-        login_id: &LoginId,
-    ) -> Result<Option<AuthUserId>, RepositoryError>;
-
-    async fn lookup_changes(
-        &self,
-        user_id: &AuthUserId,
-    ) -> Result<Option<ModifyAuthUserAccountChanges>, RepositoryError>;
-
-    async fn modify_user(
-        &self,
-        user_id: AuthUserId,
-        data: ModifyAuthUserAccountChanges,
-    ) -> Result<(), RepositoryError>;
+pub trait UnregisterAuthUserAccountRepository {
+    async fn unregister_user(&self, login_id: &LoginId) -> Result<(), RepositoryError>;
 }

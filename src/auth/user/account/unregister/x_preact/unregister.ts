@@ -116,9 +116,6 @@ export function UnregisterAuthUserAccount(props: Props): VNode {
 
 function modifyError(err: UnregisterAuthUserAccountError): readonly VNodeContent[] {
     switch (err.type) {
-        case "not-found":
-            return ["ユーザーが見つかりませんでした", "一旦リロードしてやり直してください"]
-
         case "invalid":
             return ["データが正しくありません", "一旦リロードしてやり直してください"]
 

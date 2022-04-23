@@ -10,9 +10,4 @@ message UnregisterAuthUserAccountRequestPb {
 }
 message UnregisterAuthUserAccountResponsePb {
     bool success = 1;
-    UnregisterAuthUserAccountErrorKindPb err = 2;
-}
-enum UnregisterAuthUserAccountErrorKindPb {
-    NOT_FOUND = 0;
-    INVALID = 1;
 }

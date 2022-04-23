@@ -15,39 +15,36 @@ use crate::auth::{
         },
     },
     user::{
-        account::modify::init::request_decoder::test::StaticModifyAuthUserAccountRequestDecoder,
+        account::unregister::init::request_decoder::test::StaticUnregisterAuthUserAccountRequestDecoder,
         kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
     },
 };
 
-use crate::auth::user::account::modify::action::{
-    ModifyAuthUserAccountAction, ModifyAuthUserAccountMaterial,
+use crate::auth::user::account::unregister::action::{
+    UnregisterAuthUserAccountAction, UnregisterAuthUserAccountMaterial,
 };
 
 use crate::auth::ticket::validate::method::AuthNonceConfig;
 
-use crate::auth::user::{
-    account::modify::infra::ModifyAuthUserAccountFields, password::kernel::infra::HashedPassword,
-};
+use crate::auth::user::password::kernel::infra::HashedPassword;
 
 use crate::auth::{
     ticket::kernel::data::{AuthTicketExtract, ExpireDuration},
     user::{
-        account::modify::data::ModifyAuthUserAccountChanges,
-        kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
+        kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
         login_id::kernel::data::LoginId,
     },
 };
 
 #[tokio::test]
-async fn success_modify_user() {
+async fn success_unregister_user() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::new();
     let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ModifyAuthUserAccountAction::with_material(request_decoder, material);
+    let mut action = UnregisterAuthUserAccountAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -55,7 +52,7 @@ async fn success_modify_user() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [user])",
-        "modify auth user account success",
+        "unregister auth user account success",
     ]);
     assert!(result.is_ok());
 }
@@ -68,7 +65,7 @@ async fn permission_denied() {
     let material = TestStruct::not_permitted(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = ModifyAuthUserAccountAction::with_material(request_decoder, material);
+    let mut action = UnregisterAuthUserAccountAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -81,54 +78,12 @@ async fn permission_denied() {
     assert!(result.is_err());
 }
 
-#[tokio::test]
-async fn error_conflict_changes() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::new();
-    let material = TestStruct::standard(&store);
-    let request_decoder = conflict_request_decoder();
-
-    let mut action = ModifyAuthUserAccountAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
-        "modify auth user account error; changes conflicted",
-    ]);
-    assert!(result.is_err());
-}
-
-#[tokio::test]
-async fn error_not_found() {
-    let (handler, assert_state) = ActionTestRunner::new();
-
-    let store = TestStore::new();
-    let material = TestStruct::standard(&store);
-    let request_decoder = not_found_request_decoder();
-
-    let mut action = ModifyAuthUserAccountAction::with_material(request_decoder, material);
-    action.subscribe(handler);
-
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
-        "modify auth user account error; not found",
-    ]);
-    assert!(result.is_err());
-}
-
 struct TestStruct<'a> {
     validate: StaticValidateAuthTokenStruct<'a>,
     user_repository: MemoryAuthUserRepository<'a>,
 }
 
-impl<'a> ModifyAuthUserAccountMaterial for TestStruct<'a> {
+impl<'a> UnregisterAuthUserAccountMaterial for TestStruct<'a> {
     type Validate = StaticValidateAuthTokenStruct<'a>;
 
     type UserRepository = MemoryAuthUserRepository<'a>;
@@ -222,38 +177,8 @@ const REGISTERED_USER_ID: &'static str = "registered-user-id";
 const REGISTERED_LOGIN_ID: &'static str = "registered-login-id";
 const PASSWORD: &'static str = "current-password";
 
-fn standard_request_decoder() -> StaticModifyAuthUserAccountRequestDecoder {
-    StaticModifyAuthUserAccountRequestDecoder::Valid(ModifyAuthUserAccountFields {
-        login_id: LoginId::restore(LOGIN_ID.into()),
-        from: ModifyAuthUserAccountChanges {
-            granted_roles: GrantedAuthRoles::restore(standard_granted_roles()),
-        },
-        to: ModifyAuthUserAccountChanges {
-            granted_roles: GrantedAuthRoles::empty(),
-        },
-    })
-}
-fn conflict_request_decoder() -> StaticModifyAuthUserAccountRequestDecoder {
-    StaticModifyAuthUserAccountRequestDecoder::Valid(ModifyAuthUserAccountFields {
-        login_id: LoginId::restore(LOGIN_ID.into()),
-        from: ModifyAuthUserAccountChanges {
-            granted_roles: GrantedAuthRoles::empty(),
-        },
-        to: ModifyAuthUserAccountChanges {
-            granted_roles: GrantedAuthRoles::empty(),
-        },
-    })
-}
-fn not_found_request_decoder() -> StaticModifyAuthUserAccountRequestDecoder {
-    StaticModifyAuthUserAccountRequestDecoder::Valid(ModifyAuthUserAccountFields {
-        login_id: LoginId::restore("unknown-user".into()),
-        from: ModifyAuthUserAccountChanges {
-            granted_roles: GrantedAuthRoles::empty(),
-        },
-        to: ModifyAuthUserAccountChanges {
-            granted_roles: GrantedAuthRoles::empty(),
-        },
-    })
+fn standard_request_decoder() -> StaticUnregisterAuthUserAccountRequestDecoder {
+    StaticUnregisterAuthUserAccountRequestDecoder::Valid(LoginId::restore(LOGIN_ID.into()))
 }
 
 fn standard_user_repository<'a>(store: &'a MemoryAuthUserStore) -> MemoryAuthUserRepository<'a> {

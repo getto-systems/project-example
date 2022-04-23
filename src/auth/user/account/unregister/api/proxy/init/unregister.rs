@@ -1,9 +1,9 @@
 use prost::Message;
 use tonic::Request;
 
-use crate::auth::user::account::modify::y_protobuf::service::{
-    modify_auth_user_account_pb_client::ModifyAuthUserAccountPbClient,
-    ModifyAuthUserAccountRequestPb,
+use crate::auth::user::account::unregister::y_protobuf::service::{
+    unregister_auth_user_account_pb_client::UnregisterAuthUserAccountPbClient,
+    UnregisterAuthUserAccountRequestPb,
 };
 
 use crate::auth::x_outside_feature::feature::AuthOutsideService;
@@ -27,14 +27,14 @@ use crate::{
     z_lib::message::data::MessageError,
 };
 
-pub struct ModifyUserProxyService<'a> {
+pub struct UnregisterUserProxyService<'a> {
     service_url: &'static str,
     request_id: &'a str,
     authorizer: GoogleServiceAuthorizer<'a>,
     body: String,
 }
 
-impl<'a> ModifyUserProxyService<'a> {
+impl<'a> UnregisterUserProxyService<'a> {
     pub fn new(service: &'a AuthOutsideService, request_id: &'a str, body: String) -> Self {
         Self {
             service_url: service.service_url,
@@ -46,7 +46,7 @@ impl<'a> ModifyUserProxyService<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthProxyService for ModifyUserProxyService<'a> {
+impl<'a> AuthProxyService for UnregisterUserProxyService<'a> {
     type Response = AuthProxyResponse;
 
     fn name(&self) -> &str {
@@ -58,10 +58,10 @@ impl<'a> AuthProxyService for ModifyUserProxyService<'a> {
 }
 
 async fn call<'a>(
-    service: ModifyUserProxyService<'a>,
+    service: UnregisterUserProxyService<'a>,
     metadata: AuthMetadataContent,
 ) -> Result<AuthProxyResponse, AuthProxyError> {
-    let mut client = ModifyAuthUserAccountPbClient::new(
+    let mut client = UnregisterAuthUserAccountPbClient::new(
         new_endpoint(service.service_url)
             .map_err(|err| infra_error("service endpoint error", err))?
             .connect()
@@ -81,7 +81,7 @@ async fn call<'a>(
     .map_err(|err| infra_error("metadata error", err))?;
 
     let response = client
-        .modify_user(request)
+        .unregister_user(request)
         .await
         .map_err(AuthProxyError::from)?
         .into_inner();
@@ -91,6 +91,6 @@ async fn call<'a>(
     ))
 }
 
-fn decode_request(body: String) -> Result<ModifyAuthUserAccountRequestPb, MessageError> {
-    ModifyAuthUserAccountRequestPb::decode(decode_base64(body)?).map_err(invalid_protobuf)
+fn decode_request(body: String) -> Result<UnregisterAuthUserAccountRequestPb, MessageError> {
+    UnregisterAuthUserAccountRequestPb::decode(decode_base64(body)?).map_err(invalid_protobuf)
 }

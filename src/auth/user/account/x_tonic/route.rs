@@ -2,11 +2,12 @@ use crate::auth::user::account::{
     modify::y_protobuf::service::modify_auth_user_account_pb_server::ModifyAuthUserAccountPbServer,
     register::y_protobuf::service::register_auth_user_account_pb_server::RegisterAuthUserAccountPbServer,
     search::y_protobuf::service::search_auth_user_account_pb_server::SearchAuthUserAccountPbServer,
+    unregister::y_protobuf::service::unregister_auth_user_account_pb_server::UnregisterAuthUserAccountPbServer,
 };
 
 use crate::auth::user::account::{
     modify::x_tonic::route::ServiceModifyUser, register::x_tonic::route::ServiceRegisterUser,
-    search::x_tonic::route::ServiceSearch,
+    search::x_tonic::route::ServiceSearch, unregister::x_tonic::route::ServiceUnregisterUser,
 };
 
 pub struct AccountServer;
@@ -20,5 +21,8 @@ impl AccountServer {
     }
     pub fn register_user(&self) -> RegisterAuthUserAccountPbServer<ServiceRegisterUser> {
         RegisterAuthUserAccountPbServer::new(ServiceRegisterUser)
+    }
+    pub fn unregister_user(&self) -> UnregisterAuthUserAccountPbServer<ServiceUnregisterUser> {
+        UnregisterAuthUserAccountPbServer::new(ServiceUnregisterUser)
     }
 }

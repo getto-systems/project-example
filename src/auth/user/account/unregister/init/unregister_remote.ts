@@ -13,7 +13,6 @@ import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf
 
 import { UnregisterAuthUserAccountRemoteResult, UnregisterAuthUserAccountRemote } from "../infra"
 
-import { UnregisterAuthUserAccountRemoteError } from "../data"
 import { LoginId } from "../../../login_id/kernel/data"
 
 export function newUnregisterAuthUserAccountRemote(
@@ -26,8 +25,7 @@ async function fetchRemote(
     feature: RemoteOutsideFeature,
     user: Readonly<{ loginId: LoginId }>,
 ): Promise<UnregisterAuthUserAccountRemoteResult> {
-    // TODO つなぐ
-    const mock = true
+    const mock = false
     if (mock) {
         return { success: true, value: true }
     }
@@ -58,22 +56,10 @@ async function fetchRemote(
             await response.text(),
         )
         if (!message.success) {
-            return { success: false, err: errorResponse(message.err) }
+            return { success: false, err: { type: "invalid" } }
         }
         return { success: true, value: true }
     } catch (err) {
         return remoteInfraError(err)
-    }
-}
-
-function errorResponse(
-    err: pb.auth.user.account.unregister.service.UnregisterAuthUserAccountErrorKindPb,
-): UnregisterAuthUserAccountRemoteError {
-    switch (err) {
-        case pb.auth.user.account.unregister.service.UnregisterAuthUserAccountErrorKindPb.NOT_FOUND:
-            return { type: "not-found" }
-
-        case pb.auth.user.account.unregister.service.UnregisterAuthUserAccountErrorKindPb.INVALID:
-            return { type: "invalid" }
     }
 }

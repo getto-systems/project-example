@@ -2,7 +2,4 @@ import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
 
 export type UnregisterAuthUserAccountError = UnregisterAuthUserAccountRemoteError
 
-export type UnregisterAuthUserAccountRemoteError =
-    | RemoteCommonError
-    | Readonly<{ type: "not-found" }>
-    | Readonly<{ type: "invalid" }>
+export type UnregisterAuthUserAccountRemoteError = RemoteCommonError | Readonly<{ type: "invalid" }>
