@@ -20,9 +20,12 @@ export function FocusedRegisteredAuthUserAccount(props: Props): VNode {
         container([box_grow({ body: backToRegisterButton() })]),
         h(DetailAuthUserAccount, {
             ...props,
-            onSuccess: (loginId, user) => {
+            onModify: (loginId, user) => {
                 props.focused.update(loginId, user)
             },
+            onUnregister: (loginId) => {
+                props.focused.remove(loginId)
+            }
         }),
     ]}`
 

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package auth.user.account.unregister.service;
+
+service UnregisterAuthUserAccountPb {
+    rpc UnregisterUser (UnregisterAuthUserAccountRequestPb) returns (UnregisterAuthUserAccountResponsePb);
+}
+message UnregisterAuthUserAccountRequestPb {
+    string login_id = 1;
+}
+message UnregisterAuthUserAccountResponsePb {
+    bool success = 1;
+    UnregisterAuthUserAccountErrorKindPb err = 2;
+}
+enum UnregisterAuthUserAccountErrorKindPb {
+    NOT_FOUND = 0;
+    INVALID = 1;
+}

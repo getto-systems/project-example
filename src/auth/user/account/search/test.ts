@@ -190,6 +190,20 @@ test("update user", async () => {
     })
 })
 
+test("remove user", async () => {
+    const { resource } = focused()
+
+    const runner = setupActionTestRunner(resource.search.focused.subscriber)
+
+    await resource.search.ignitionState
+
+    await runner(async () => {
+        return resource.search.focused.remove(restoreLoginId("user-1"))
+    }).then((stack) => {
+        expect(stack).toEqual([{ type: "initial" }])
+    })
+})
+
 test("terminate", async () => {
     const { resource } = standard()
 

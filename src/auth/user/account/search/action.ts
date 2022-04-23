@@ -70,6 +70,7 @@ export interface FocusedAuthUserAccountAction
     extends StatefulApplicationAction<FocusedAuthUserAccountState> {
     focus(user: AuthUserAccount): FocusedAuthUserAccountState
     update(loginId: LoginId, user: AuthUserAccount): FocusedAuthUserAccountState
+    remove(loginId: LoginId): FocusedAuthUserAccountState
     close(): FocusedAuthUserAccountState
 
     isFocused(user: AuthUserAccount): boolean
@@ -192,7 +193,12 @@ class Action
                     }
                     return { found: true, user }
                 },
-                updateUser: (loginId, user) => this.update(loginId, user),
+                updateUser: (loginId, user) => {
+                    this.update(loginId, user)
+                },
+                removeUser: (loginId) => {
+                    this.remove(loginId)
+                },
             },
             shell: material.shell,
         })
@@ -281,6 +287,34 @@ class Action
                 return this.post({ ...state, response: this.response })
         }
     }
+    remove(loginId: LoginId): SearchAuthUserAccountState {
+        if (!this.response) {
+            return this.currentState()
+        }
+
+        this.response = {
+            ...this.response,
+            page: {
+                ...this.response.page,
+                all: this.response.page.all - 1,
+            },
+            users: this.response.users.filter((row) => row.loginId !== loginId),
+        }
+
+        const state = this.currentState()
+        switch (state.type) {
+            case "initial":
+                return state
+
+            case "try":
+            case "take-longtime":
+            case "failed":
+                return this.post({ ...state, previousResponse: this.response })
+
+            case "success":
+                return this.post({ ...state, response: this.response })
+        }
+    }
 
     searchResponse(state: SearchAuthUserAccountState): Readonly<{
         response?:
@@ -353,6 +387,7 @@ type FocusedMaterial = Readonly<{
 interface FocusedInfra {
     detectUser(loginId: string): Promise<DetectUserResult>
     updateUser(loginId: LoginId, user: AuthUserAccount): void
+    removeUser(loginId: LoginId): void
 }
 type DetectUserResult =
     | Readonly<{ found: false }>
@@ -396,6 +431,10 @@ class FocusedAction
         this.material.infra.updateUser(loginId, user)
         this.material.shell.updateFocus.focus(user)
         return this.post({ type: "focus-on", user })
+    }
+    remove(loginId: LoginId): FocusedAuthUserAccountState {
+        this.material.infra.removeUser(loginId)
+        return this.close()
     }
     close(): FocusedAuthUserAccountState {
         this.material.shell.updateFocus.clear()

@@ -169,6 +169,25 @@ test("update user", async () => {
     })
 })
 
+test("remove user", async () => {
+    const { resource, store } = standard()
+
+    const runner = setupActionTestRunner(resource.register.list.focused.subscriber)
+
+    store.loginId.set(VALID_INFO.loginId)
+    store.grantedRoles.set(VALID_INFO.grantedRoles)
+    store.resetTokenDestinationType.set("email")
+    store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
+
+    await resource.register.submit()
+
+    await runner(async () => {
+        return resource.register.list.focused.remove(restoreLoginId("login-id"))
+    }).then((stack) => {
+        expect(stack).toEqual([{ type: "initial" }])
+    })
+})
+
 test("terminate", async () => {
     const { resource } = standard()
 
