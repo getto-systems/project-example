@@ -85,7 +85,7 @@ async fn error_allow_for_user_role_but_not_granted() {
         "validate success; ticket: ticket-id / user: no-role-user-id (granted: [])",
         "user permission denied; granted: [], require: any [user]",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -105,7 +105,7 @@ async fn error_token_expired() {
         "validate nonce success",
         "validate error; token expired",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -124,7 +124,7 @@ async fn error_conflict_nonce() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce error; conflict",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 struct TestStruct;

@@ -80,7 +80,7 @@ async fn error_empty_login_id() {
         "validate nonce success",
         "request reset token error; invalid; login-id: empty login id",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -100,7 +100,7 @@ async fn error_too_long_login_id() {
         "validate nonce success",
         "request reset token error; invalid; login-id: too long login id",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -120,7 +120,7 @@ async fn just_max_length_login_id() {
         "validate nonce success",
         "request reset token error; not found",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -140,7 +140,7 @@ async fn error_destination_not_stored() {
         "validate nonce success",
         "request reset token error; not found",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 struct TestStruct<'a> {

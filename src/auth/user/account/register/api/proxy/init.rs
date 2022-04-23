@@ -1,4 +1,4 @@
-mod modify;
+mod register;
 
 use actix_web::HttpRequest;
 
@@ -6,17 +6,17 @@ use crate::auth::x_outside_feature::feature::AuthProxyOutsideFeature;
 
 use crate::auth::{
     ticket::validate::init::ValidateApiMetadataStruct,
-    user::account::modify::proxy::init::modify::ModifyUserProxyService,
+    user::account::register::proxy::init::register::ModifyUserProxyService,
 };
 
 use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
 
-pub struct ModifyAuthUserAccountProxyStruct<'a> {
+pub struct RegisterAuthUserAccountProxyStruct<'a> {
     validate: ValidateApiMetadataStruct<'a>,
     proxy_service: ModifyUserProxyService<'a>,
 }
 
-impl<'a> ModifyAuthUserAccountProxyStruct<'a> {
+impl<'a> RegisterAuthUserAccountProxyStruct<'a> {
     pub fn action(
         feature: &'a AuthProxyOutsideFeature,
         request_id: &'a str,
@@ -31,7 +31,7 @@ impl<'a> ModifyAuthUserAccountProxyStruct<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthProxyMaterial for ModifyAuthUserAccountProxyStruct<'a> {
+impl<'a> AuthProxyMaterial for RegisterAuthUserAccountProxyStruct<'a> {
     type Validate = ValidateApiMetadataStruct<'a>;
     type ProxyService = ModifyUserProxyService<'a>;
 

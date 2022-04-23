@@ -76,7 +76,7 @@ async fn permission_denied() {
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "user permission denied; granted: [], require: any [user]",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -97,7 +97,7 @@ async fn error_conflict_changes() {
         "validate success; ticket: ticket-id / user: user-id (granted: [user])",
         "change reset token destination error; changes conflicted",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -118,7 +118,7 @@ async fn error_not_found() {
         "validate success; ticket: ticket-id / user: user-id (granted: [user])",
         "change reset token destination error; not found",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 struct TestStruct<'a> {

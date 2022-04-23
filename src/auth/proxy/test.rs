@@ -43,7 +43,7 @@ async fn expired_token() {
 
     let result = action.ignite().await;
     assert_state(vec!["validate metadata error; token expired"]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 struct TestStruct {

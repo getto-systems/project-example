@@ -1,14 +1,14 @@
 use prost::Message;
 use tonic::Request;
 
-use crate::auth::user::account::modify::y_protobuf::service::{
-    modify_auth_user_account_pb_client::ModifyAuthUserAccountPbClient,
-    ModifyAuthUserAccountRequestPb,
+use crate::auth::user::account::register::y_protobuf::service::{
+    register_auth_user_account_pb_client::RegisterAuthUserAccountPbClient,
+    RegisterAuthUserAccountRequestPb,
 };
 
 use crate::auth::x_outside_feature::feature::AuthOutsideService;
 
-use crate::auth::user::account::modify::x_tonic::route::ServiceModifyUser;
+use crate::auth::user::account::register::x_tonic::route::ServiceRegisterUser;
 
 use crate::z_lib::service::init::authorizer::GoogleServiceAuthorizer;
 
@@ -50,7 +50,7 @@ impl<'a> AuthProxyService for ModifyUserProxyService<'a> {
     type Response = AuthProxyResponse;
 
     fn name(&self) -> &str {
-        ServiceModifyUser::name()
+        ServiceRegisterUser::name()
     }
     async fn call(self, metadata: AuthMetadataContent) -> Result<Self::Response, AuthProxyError> {
         call(self, metadata).await
@@ -61,7 +61,7 @@ async fn call<'a>(
     service: ModifyUserProxyService<'a>,
     metadata: AuthMetadataContent,
 ) -> Result<AuthProxyResponse, AuthProxyError> {
-    let mut client = ModifyAuthUserAccountPbClient::new(
+    let mut client = RegisterAuthUserAccountPbClient::new(
         new_endpoint(service.service_url)
             .map_err(|err| infra_error("service endpoint error", err))?
             .connect()
@@ -81,7 +81,7 @@ async fn call<'a>(
     .map_err(|err| infra_error("metadata error", err))?;
 
     let response = client
-        .modify_user(request)
+        .register_user(request)
         .await
         .map_err(AuthProxyError::from)?
         .into_inner();
@@ -91,6 +91,6 @@ async fn call<'a>(
     ))
 }
 
-fn decode_request(body: String) -> Result<ModifyAuthUserAccountRequestPb, MessageError> {
-    ModifyAuthUserAccountRequestPb::decode(decode_base64(body)?).map_err(invalid_protobuf)
+fn decode_request(body: String) -> Result<RegisterAuthUserAccountRequestPb, MessageError> {
+    RegisterAuthUserAccountRequestPb::decode(decode_base64(body)?).map_err(invalid_protobuf)
 }

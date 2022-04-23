@@ -27,6 +27,7 @@ import { BoardConverter } from "../../../../z_vendor/getto-application/board/ker
 import { RegisterAuthUserAccountError } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { AuthUserAccount } from "../kernel/data"
+import { LoginId } from "../../login_id/kernel/data"
 
 export interface RegisterAuthUserAccountAction
     extends StatefulApplicationAction<RegisterAuthUserAccountState> {
@@ -48,7 +49,7 @@ export interface ListRegisteredAuthUserAccountAction
 export interface FocusedRegisteredAuthUserAccountAction
     extends StatefulApplicationAction<FocusedRegisteredAuthUserAccountState> {
     focus(user: AuthUserAccount): FocusedRegisteredAuthUserAccountState
-    update(user: AuthUserAccount): FocusedRegisteredAuthUserAccountState
+    update(loginId: LoginId, user: AuthUserAccount): FocusedRegisteredAuthUserAccountState
     close(): FocusedRegisteredAuthUserAccountState
 
     isFocused(user: AuthUserAccount): boolean
@@ -246,8 +247,8 @@ class ListAction
         })
 
         this.focused = new FocusedAction({
-            updateUser: (user) => {
-                this.update(user)
+            updateUser: (loginId, user) => {
+                this.update(loginId, user)
             },
         })
     }
@@ -258,9 +259,9 @@ class ListAction
         return this.post({ type: "registered", users: this.list })
     }
 
-    update(user: AuthUserAccount): ListRegisteredAuthUserAccountState {
+    update(loginId: LoginId, user: AuthUserAccount): ListRegisteredAuthUserAccountState {
         this.list = this.list.map((row) => {
-            if (row.loginId !== user.loginId) {
+            if (row.loginId !== loginId) {
                 return row
             }
             return user
@@ -270,7 +271,7 @@ class ListAction
 }
 
 type FocusedMaterial = Readonly<{
-    updateUser(user: AuthUserAccount): void
+    updateUser(loginId: LoginId, user: AuthUserAccount): void
 }>
 
 class FocusedAction
@@ -289,8 +290,8 @@ class FocusedAction
     focus(user: AuthUserAccount): FocusedRegisteredAuthUserAccountState {
         return this.post({ type: "focus-on", user })
     }
-    update(user: AuthUserAccount): FocusedRegisteredAuthUserAccountState {
-        this.material.updateUser(user)
+    update(loginId: LoginId, user: AuthUserAccount): FocusedRegisteredAuthUserAccountState {
+        this.material.updateUser(loginId, user)
         return this.post({ type: "focus-on", user })
     }
     close(): FocusedRegisteredAuthUserAccountState {

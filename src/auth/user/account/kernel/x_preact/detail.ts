@@ -15,6 +15,7 @@ import { ModifyAuthUserAccountAction } from "../../modify/action"
 import { ChangeResetTokenDestinationAction } from "../../../password/reset/token_destination/change/action"
 
 import { AuthUserAccount } from "../../kernel/data"
+import { LoginId } from "../../../login_id/kernel/data"
 
 export type DetailAuthUserAccountActions = Readonly<{
     modify: Readonly<{
@@ -37,7 +38,7 @@ export type DetailAuthUserAccountActions = Readonly<{
 type Props = DetailAuthUserAccountActions &
     Readonly<{
         user: AuthUserAccount
-        onSuccess: { (user: AuthUserAccount): void }
+        onSuccess: { (loginId: LoginId, user: AuthUserAccount): void }
     }>
 export function DetailAuthUserAccount(props: Props): VNode {
     const user = props.user
@@ -48,14 +49,14 @@ export function DetailAuthUserAccount(props: Props): VNode {
                 ...props.modify,
                 user,
                 onSuccess: (fields) => {
-                    props.onSuccess({ ...user, ...fields })
+                    props.onSuccess(user.loginId, { ...user, ...fields })
                 },
             }),
             h(ChangeResetTokenDestination, {
                 ...props.changeResetTokenDestination,
                 user,
                 onSuccess: (resetTokenDestination) => {
-                    props.onSuccess({ ...user, resetTokenDestination })
+                    props.onSuccess(user.loginId, { ...user, resetTokenDestination })
                 },
             }),
         ]),
@@ -64,7 +65,7 @@ export function DetailAuthUserAccount(props: Props): VNode {
                 ...props.overrideLoginId,
                 user,
                 onSuccess: (loginId) => {
-                    props.onSuccess({ ...user, loginId })
+                    props.onSuccess(user.loginId, { ...user, loginId })
                 },
             }),
             h(OverridePassword, { ...props.overridePassword, user }),

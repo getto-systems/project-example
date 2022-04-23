@@ -98,7 +98,7 @@ async fn error_match_failed_login_id() {
         "validate nonce success",
         "reset password error; login id not matched",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -118,7 +118,7 @@ async fn error_empty_login_id() {
         "validate nonce success",
         "reset password error; invalid; login-id: empty login id",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -138,7 +138,7 @@ async fn error_too_long_login_id() {
         "validate nonce success",
         "reset password error; invalid; login-id: too long login id",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -158,7 +158,7 @@ async fn just_max_length_login_id() {
         "validate nonce success",
         "reset password error; login id not matched",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -178,7 +178,7 @@ async fn error_empty_password() {
         "validate nonce success",
         "reset password error; invalid; new-password: empty password",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -198,7 +198,7 @@ async fn error_too_long_password() {
         "validate nonce success",
         "reset password error; invalid; new-password: too long password",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -243,7 +243,7 @@ async fn error_empty_reset_token() {
         "validate nonce success",
         "reset password error; invalid; reset-token: empty reset token",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -263,7 +263,7 @@ async fn error_reset_token_expired_at_decode() {
         "validate nonce success",
         "reset password error; reset token expired",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -283,7 +283,7 @@ async fn error_reset_token_expired_in_store() {
         "validate nonce success",
         "reset password error; reset token expired",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -303,7 +303,7 @@ async fn error_reset_token_discarded() {
         "validate nonce success",
         "reset password error; already reset",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -323,7 +323,7 @@ async fn error_reset_token_not_stored() {
         "validate nonce success",
         "reset password error; not found",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 struct TestStruct<'a> {

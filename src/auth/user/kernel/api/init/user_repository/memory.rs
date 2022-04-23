@@ -4,10 +4,13 @@ mod user;
 
 use std::collections::HashMap;
 
-use crate::auth::user::kernel::init::user_repository::memory::{
-    login_id::{EntryLoginId, MapLoginId, StoreLoginId},
-    reset_token::{EntryResetToken, MapResetToken, StoreResetToken},
-    user::{EntryUser, MapUser, StoreUser},
+use crate::auth::user::{
+    account::register::infra::RegisterAuthUserAccountFields,
+    kernel::init::user_repository::memory::{
+        login_id::{EntryLoginId, MapLoginId, StoreLoginId},
+        reset_token::{EntryResetToken, MapResetToken, StoreResetToken},
+        user::{EntryUser, MapUser, StoreUser},
+    },
 };
 
 use crate::z_lib::repository::helper::infra_error;
@@ -15,6 +18,7 @@ use crate::z_lib::repository::helper::infra_error;
 use crate::auth::user::{
     account::{
         modify::infra::ModifyAuthUserAccountRepository,
+        register::infra::RegisterAuthUserAccountRepository,
         search::infra::SearchAuthUserAccountRepository,
     },
     login_id::change::infra::{OverrideLoginIdEntry, OverrideLoginIdRepository},
@@ -307,6 +311,37 @@ impl<'a> OverridePasswordRepository for MemoryAuthUserRepository<'a> {
         new_password: HashedPassword,
     ) -> Result<(), RepositoryError> {
         Ok(self.user.update_password(user_id, new_password))
+    }
+}
+
+#[async_trait::async_trait]
+impl<'a> RegisterAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
+    async fn check_login_id_registered(&self, login_id: &LoginId) -> Result<bool, RepositoryError> {
+        Ok(self.login_id.get_user_id(login_id).is_some())
+    }
+
+    async fn register_user(
+        &self,
+        user_id: AuthUserId,
+        fields: RegisterAuthUserAccountFields,
+    ) -> Result<(), RepositoryError> {
+        self.user.insert_entry(
+            user_id.clone(),
+            EntryUser {
+                login_id: fields.login_id.clone(),
+                granted_roles: Some(fields.granted_roles),
+                password: None,
+            },
+        );
+        self.login_id.insert_entry(
+            fields.login_id,
+            EntryLoginId {
+                user_id,
+                reset_token_destination: Some(fields.reset_token_destination),
+            },
+        );
+
+        Ok(())
     }
 }
 

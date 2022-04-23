@@ -72,7 +72,7 @@ async fn error_token_expired() {
         "validate nonce success",
         "validate error; token expired",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -113,7 +113,7 @@ async fn error_no_ticket() {
         "validate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
         "encode error; ticket data not found",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 struct TestStruct<'a> {

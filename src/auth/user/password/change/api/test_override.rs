@@ -80,7 +80,7 @@ async fn error_empty_password() {
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "override password error; invalid; new-password: empty password",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -101,7 +101,7 @@ async fn error_too_long_password() {
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "override password error; invalid; new-password: too long password",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]

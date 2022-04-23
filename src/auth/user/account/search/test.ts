@@ -184,7 +184,7 @@ test("update user", async () => {
     }
 
     await runner(async () => {
-        return resource.search.focused.update(user)
+        return resource.search.focused.update(user.loginId, user)
     }).then((stack) => {
         expect(stack).toEqual([{ type: "focus-on", user }])
     })

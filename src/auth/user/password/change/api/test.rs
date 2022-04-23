@@ -81,7 +81,7 @@ async fn error_empty_current_password() {
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; invalid; current: empty password",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -102,7 +102,7 @@ async fn error_too_long_current_password() {
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; invalid; current: too long password",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -123,7 +123,7 @@ async fn just_max_length_current_password() {
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; password not matched",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -144,7 +144,7 @@ async fn error_empty_new_password() {
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; invalid; new: empty password",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -165,7 +165,7 @@ async fn error_too_long_new_password() {
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; invalid; new: too long password",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -207,7 +207,7 @@ async fn error_failed_to_match_password() {
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; password not matched",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -228,7 +228,7 @@ async fn error_password_not_stored() {
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; not found",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 struct TestStruct<'a> {

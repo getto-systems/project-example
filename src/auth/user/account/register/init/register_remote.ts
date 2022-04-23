@@ -26,8 +26,7 @@ async function fetchRemote(
     feature: RemoteOutsideFeature,
     fields: AuthUserAccount,
 ): Promise<RegisterAuthUserAccountRemoteResult> {
-    // TODO つなぐ
-    const mock = true
+    const mock = false
     if (mock) {
         return { success: true, value: true }
     }

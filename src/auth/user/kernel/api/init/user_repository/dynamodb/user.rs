@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
 use rusoto_dynamodb::{
-    AttributeValue, DynamoDb, DynamoDbClient, GetItemInput, ScanInput, UpdateItemInput,
+    AttributeValue, DeleteItemInput, DynamoDb, DynamoDbClient, GetItemInput, PutItemInput,
+    ScanInput, UpdateItemInput,
 };
 
 use crate::auth::x_outside_feature::feature::AuthOutsideStore;
@@ -140,6 +141,52 @@ impl<'a> TableUser<'a> {
             }))
     }
 
+    pub async fn put_new_entry(
+        &self,
+        user_id: AuthUserId,
+        login_id: LoginId,
+        granted_roles: GrantedAuthRoles,
+    ) -> Result<(), RepositoryError> {
+        let mut item = vec![
+            ColumnUserId::to_attr_pair(user_id),
+            ColumnLoginId::to_attr_pair(login_id),
+        ];
+        if !granted_roles.inner().is_empty() {
+            item.push(ColumnGrantedAuthRoles::to_attr_pair(granted_roles))
+        }
+
+        let input = PutItemInput {
+            table_name: self.table_name.into(),
+            item: item.into_iter().collect(),
+            condition_expression: Some(format!(
+                "attribute_not_exists({})",
+                ColumnUserId::as_name()
+            )),
+            ..Default::default()
+        };
+
+        self.client
+            .put_item(input)
+            .await
+            .map_err(|err| infra_error("put new user error", err))?;
+
+        Ok(())
+    }
+    pub async fn delete_entry(&self, user_id: AuthUserId) -> Result<(), RepositoryError> {
+        let input = DeleteItemInput {
+            table_name: self.table_name.into(),
+            key: Self::key(user_id),
+            ..Default::default()
+        };
+
+        self.client
+            .delete_item(input)
+            .await
+            .map_err(|err| infra_error("delete login id error", err))?;
+
+        Ok(())
+    }
+
     pub async fn update_password(
         &self,
         user_id: AuthUserId,
@@ -199,12 +246,10 @@ impl<'a> TableUser<'a> {
         user_id: AuthUserId,
         changes: ModifyAuthUserAccountChanges,
     ) -> Result<(), RepositoryError> {
-        let granted_roles = changes.granted_roles.extract();
-        if granted_roles.is_empty() {
+        if changes.granted_roles.inner().is_empty() {
             self.remove_granted_roles(user_id).await
         } else {
-            self.set_granted_roles(user_id, GrantedAuthRoles::restore(granted_roles))
-                .await
+            self.set_granted_roles(user_id, changes.granted_roles).await
         }
     }
     async fn set_granted_roles(

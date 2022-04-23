@@ -69,7 +69,7 @@ export interface ListAuthUserAccountAction
 export interface FocusedAuthUserAccountAction
     extends StatefulApplicationAction<FocusedAuthUserAccountState> {
     focus(user: AuthUserAccount): FocusedAuthUserAccountState
-    update(user: AuthUserAccount): FocusedAuthUserAccountState
+    update(loginId: LoginId, user: AuthUserAccount): FocusedAuthUserAccountState
     close(): FocusedAuthUserAccountState
 
     isFocused(user: AuthUserAccount): boolean
@@ -192,7 +192,7 @@ class Action
                     }
                     return { found: true, user }
                 },
-                updateUser: (user) => this.update(user),
+                updateUser: (loginId, user) => this.update(loginId, user),
             },
             shell: material.shell,
         })
@@ -252,7 +252,7 @@ class Action
         return state
     }
 
-    update(user: AuthUserAccount): SearchAuthUserAccountState {
+    update(loginId: LoginId, user: AuthUserAccount): SearchAuthUserAccountState {
         if (!this.response) {
             return this.currentState()
         }
@@ -260,7 +260,7 @@ class Action
         this.response = {
             ...this.response,
             users: this.response.users.map((row) => {
-                if (row.loginId !== user.loginId) {
+                if (row.loginId !== loginId) {
                     return row
                 }
                 return user
@@ -352,7 +352,7 @@ type FocusedMaterial = Readonly<{
 
 interface FocusedInfra {
     detectUser(loginId: string): Promise<DetectUserResult>
-    updateUser(user: AuthUserAccount): void
+    updateUser(loginId: LoginId, user: AuthUserAccount): void
 }
 type DetectUserResult =
     | Readonly<{ found: false }>
@@ -392,8 +392,9 @@ class FocusedAction
         this.material.shell.updateFocus.focus(user)
         return this.post({ type: "focus-on", user })
     }
-    update(user: AuthUserAccount): FocusedAuthUserAccountState {
-        this.material.infra.updateUser(user)
+    update(loginId: LoginId, user: AuthUserAccount): FocusedAuthUserAccountState {
+        this.material.infra.updateUser(loginId, user)
+        this.material.shell.updateFocus.focus(user)
         return this.post({ type: "focus-on", user })
     }
     close(): FocusedAuthUserAccountState {

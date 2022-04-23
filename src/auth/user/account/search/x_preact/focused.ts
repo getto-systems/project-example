@@ -29,8 +29,8 @@ export function FocusedAuthUserAccount(props: Props): VNode {
         return h(DetailAuthUserAccount, {
             ...props,
             user: props.user.user,
-            onSuccess: (user) => {
-                props.focused.update(user)
+            onSuccess: (loginId, user) => {
+                props.focused.update(loginId, user)
             },
         })
     }
