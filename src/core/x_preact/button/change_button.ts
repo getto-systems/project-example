@@ -15,7 +15,7 @@ type Props = Readonly<{
     icon?: Icon
     isConnecting: boolean
     validateState: ValidateBoardState
-    observeState?: ObserveBoardState
+    observeState?: ObserveBoardState // TODO 必須にしたい
     onClick: { (e: Event): void }
 }>
 export function ChangeButton(props: Props): VNode {

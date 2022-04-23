@@ -4,6 +4,7 @@ mod user;
 
 use std::{collections::HashMap, convert::TryInto};
 
+use crate::auth::user::account::register::infra::RegisterAuthUserAccountFields;
 use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
 use crate::auth::user::kernel::init::user_repository::dynamodb::{
@@ -15,6 +16,7 @@ use crate::z_lib::repository::helper::infra_error;
 use crate::auth::user::{
     account::{
         modify::infra::ModifyAuthUserAccountRepository,
+        register::infra::RegisterAuthUserAccountRepository,
         search::infra::SearchAuthUserAccountRepository,
     },
     login_id::change::infra::{OverrideLoginIdEntry, OverrideLoginIdRepository},
@@ -150,6 +152,45 @@ impl<'client> OverridePasswordRepository for DynamoDbAuthUserRepository<'client>
         new_password: HashedPassword,
     ) -> Result<(), RepositoryError> {
         self.user.update_password(user_id, new_password).await
+    }
+}
+
+#[async_trait::async_trait]
+impl<'client> RegisterAuthUserAccountRepository for DynamoDbAuthUserRepository<'client> {
+    async fn check_login_id_registered(&self, login_id: &LoginId) -> Result<bool, RepositoryError> {
+        Ok(self.login_id.get_user_id(login_id.clone()).await?.is_some())
+    }
+
+    async fn register_user(
+        &self,
+        user_id: AuthUserId,
+        fields: RegisterAuthUserAccountFields,
+    ) -> Result<(), RepositoryError> {
+        self.user
+            .put_new_entry(
+                user_id.clone(),
+                fields.login_id.clone(),
+                fields.granted_roles,
+            )
+            .await?;
+
+        {
+            // login-id が衝突した場合に rollback する
+            let result = self
+                .login_id
+                .put_new_entry(
+                    fields.login_id,
+                    user_id.clone(),
+                    fields.reset_token_destination,
+                )
+                .await;
+            if result.is_err() {
+                self.user.delete_entry(user_id.clone()).await?;
+            }
+            result?;
+        }
+
+        Ok(())
     }
 }
 

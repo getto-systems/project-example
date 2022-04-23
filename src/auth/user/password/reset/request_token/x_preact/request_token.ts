@@ -17,7 +17,7 @@ import { icon_change } from "../../../../../../x_content/icon"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
 import { takeLongtimeField } from "../../../../../../core/x_preact/design/form"
 
-import { InputLoginId } from "../../../../login_id/input/x_preact/input"
+import { LoginIdField } from "../../../../login_id/input/x_preact/input"
 import { ClearChangesButton } from "../../../../../../core/x_preact/button/clear_changes_button"
 import { SendButton } from "../../../../../../core/x_preact/button/send_button"
 
@@ -56,7 +56,7 @@ export function RequestResetToken(viewProps: Props): VNode {
             : {
                   form: true,
                   body: [
-                      h(InputLoginId, {
+                      h(LoginIdField, {
                           field: props.requestToken.loginId,
                           help: ["このログインIDに設定された送信先にリセットトークンを送信します"],
                       }),

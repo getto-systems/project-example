@@ -11,7 +11,7 @@ import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
 
 import { changeLoginIdError } from "./helper"
-import { InputLoginId } from "../../input/x_preact/input"
+import { LoginIdField } from "../../input/x_preact/input"
 import { EditButton } from "../../../../../core/x_preact/button/edit_button"
 import { ClearChangesButton } from "../../../../../core/x_preact/button/clear_changes_button"
 import { ChangeButton } from "../../../../../core/x_preact/button/change_button"
@@ -39,7 +39,7 @@ export function OverrideLoginId(props: Props): VNode {
             title: "ログインID",
             ...(editableState.isEditable
                 ? {
-                      body: h(InputLoginId, {
+                      body: h(LoginIdField, {
                           field: props.override.newLoginId,
                           title: "新しいログインID",
                           help: ["管理者権限でログインIDを上書きします"],

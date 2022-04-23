@@ -68,7 +68,6 @@ test("terminate", async () => {
     const runner = setupActionTestRunner({
         subscribe: (handler) => {
             resource.modify.subscriber.subscribe(handler)
-            resource.modify.validate.subscriber.subscribe(handler)
         },
         unsubscribe: () => null,
     })

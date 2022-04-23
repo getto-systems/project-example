@@ -9,8 +9,10 @@ import { linky } from "../../../../../z_vendor/getto-css/preact/design/highlight
 
 import { focusClass, listEditLabel, SORT_SIGN } from "../../../../../core/x_preact/design/table"
 
-import { TableStructure } from "../../../../../z_vendor/getto-table/preact/core"
+import { AuthRoleLabels } from "../../input/x_preact/granted_roles"
+import { ResetTokenDestinationLabel } from "../../../password/reset/token_destination/input/x_preact/destination"
 
+import { TableStructure } from "../../../../../z_vendor/getto-table/preact/core"
 import { tableStructure } from "../../../../../z_vendor/getto-table/preact/cell/structure"
 import { tableCell } from "../../../../../z_vendor/getto-table/preact/cell/simple"
 import { tableClassName } from "../../../../../z_vendor/getto-table/preact/decorator"
@@ -18,7 +20,6 @@ import { tableClassName } from "../../../../../z_vendor/getto-table/preact/decor
 import { ListAuthUserAccountAction } from "../action"
 
 import { SearchAuthUserAccountSortKey } from "../data"
-import { AuthRoleLabels } from "../../input/x_preact/granted_roles"
 import { AuthUserAccount } from "../../kernel/data"
 
 export type SearchAuthUserAccountTableStructure = TableStructure<Summary, AuthUserAccount>
@@ -47,6 +48,7 @@ function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStruc
 
         // TODO builder にしたいかな
         tableCell("login-id", (key) => ({
+            // TODO このラベルをどこかに統一したいが...
             label: "ログインID",
             header: sort(key),
             column: loginId,
@@ -58,6 +60,12 @@ function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStruc
             label: "権限",
             header: linky,
             column: grantedRoles,
+        })).border(["left"]),
+
+        tableCell("reset-token-destination", (_key) => ({
+            label: "パスワードリセット用Eメール",
+            header: linky,
+            column: resetTokenDestination,
         })).border(["left"]),
     ])
         .decorateRow(tableClassName(["row_hover"]))
@@ -87,9 +95,12 @@ function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStruc
     function grantedRoles(row: AuthUserAccount): VNodeContent {
         return h(AuthRoleLabels, row)
     }
+    function resetTokenDestination(row: AuthUserAccount): VNodeContent {
+        return h(ResetTokenDestinationLabel, row)
+    }
 
     function editLink(row: AuthUserAccount): VNodeContent {
-        const isFocused = list.detail.isFocused(row)
+        const isFocused = list.focused.isFocused(row)
         return html`<a
             href="#"
             id="${isFocused ? "focused" : undefined}"
@@ -101,7 +112,7 @@ function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStruc
 
         function onClick(e: Event) {
             e.preventDefault()
-            list.detail.focus(row)
+            list.focused.focus(row)
         }
     }
 }

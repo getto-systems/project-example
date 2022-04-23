@@ -44,9 +44,11 @@ export function ChangeResetTokenDestination(props: Props): VNode {
             title: "パスワードリセット",
             body: [
                 h(ResetTokenDestinationField, {
-                    user: props.user,
-                    editable: props.editable,
                     field: props.change.destination,
+                    edit: {
+                        data: props.user,
+                        editable: props.editable,
+                    },
                 }),
             ],
             footer: editableState.isEditable

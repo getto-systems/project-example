@@ -16,25 +16,29 @@ import { InputLoginIdAction } from "../action"
 
 import { ValidateLoginIdError } from "../data"
 
-type Props = Readonly<{ field: InputLoginIdAction }> &
+type Props = Readonly<{
+    field: InputLoginIdAction
+}> &
     Partial<{
         title: VNodeContent
         help: readonly VNodeContent[]
         autocomplete: string
     }>
-export function InputLoginId(props: Props): VNode {
+export function LoginIdField(props: Props): VNode {
     const validateState = useApplicationAction(props.field.validate)
+
+    // TODO 整理したい
     return label_text_fill(content())
 
     function content() {
         const content = {
-            title: title(),
+            title: props.title || "ログインID",
             body: h(InputBoard, {
                 type: "text",
                 input: props.field.input,
                 autocomplete: props.autocomplete,
             }),
-            help: help(),
+            help: props.help,
         }
 
         if (validateState.valid) {
@@ -42,18 +46,6 @@ export function InputLoginId(props: Props): VNode {
         } else {
             return field_error({ ...content, notice: loginIdValidationError(validateState.err) })
         }
-    }
-    function title(): VNodeContent {
-        if (props.title) {
-            return props.title
-        }
-        return "ログインID"
-    }
-    function help(): readonly VNodeContent[] {
-        if (props.help) {
-            return props.help
-        }
-        return []
     }
 }
 

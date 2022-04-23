@@ -92,7 +92,7 @@ async fn error_empty_login_id() {
         "validate nonce success",
         "authenticate password error; invalid; login-id: empty login id",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -112,7 +112,7 @@ async fn error_too_long_login_id() {
         "validate nonce success",
         "authenticate password error; invalid; login-id: too long login id",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -132,7 +132,7 @@ async fn just_max_length_login_id() {
         "validate nonce success",
         "authenticate password error; not found",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -152,7 +152,7 @@ async fn error_empty_password() {
         "validate nonce success",
         "authenticate password error; invalid; password: empty password",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -172,7 +172,7 @@ async fn error_too_long_password() {
         "validate nonce success",
         "authenticate password error; invalid; password: too long password",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -192,7 +192,7 @@ async fn just_max_length_password() {
         "validate nonce success",
         "authenticate password error; password not matched",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -212,7 +212,7 @@ async fn error_failed_to_match_password() {
         "validate nonce success",
         "authenticate password error; password not matched",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -232,7 +232,7 @@ async fn error_no_user() {
         "validate nonce success",
         "authenticate password error; not found",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 struct TestStruct<'a> {

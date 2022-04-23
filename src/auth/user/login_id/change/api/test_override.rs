@@ -75,7 +75,7 @@ async fn error_empty_login_id() {
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "override login-id error; invalid; new: empty login id",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -96,7 +96,7 @@ async fn error_too_long_login_id() {
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "override login-id error; invalid; new: too long login id",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
@@ -138,7 +138,7 @@ async fn error_login_id_already_registered() {
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
         "override login-id error; new login id is already registered",
     ]);
-    assert!(!result.is_ok());
+    assert!(result.is_err());
 }
 
 struct TestStruct<'a> {

@@ -12,6 +12,7 @@ import { notice_gray } from "../../../z_vendor/getto-css/preact/design/highlight
 
 import { SearchPageResponse } from "../../../z_lib/ui/search/kernel/data"
 
+// TODO VNode を返す形になっているので、別な形に変更したい
 export const SORT_SIGN: SortSign = {
     normal: iconHtml(lnir(["angle-double-down"])),
     reverse: iconHtml(lnir(["angle-double-up"])),
@@ -41,6 +42,12 @@ export function listEditLabel(isFocused: boolean): VNode {
 
 export function emptyTable(): VNode {
     return container(box_grow({ body: notice_gray("指定された条件で 1件も見つかりませんでした") }))
+}
+
+export function emptyRegisteredTable(label?: VNodeContent): VNode {
+    return container(
+        box_grow({ body: notice_gray(html`${label || "登録"}するとここに表示されます`) }),
+    )
 }
 
 export function takeLongtimeTable(): VNode {

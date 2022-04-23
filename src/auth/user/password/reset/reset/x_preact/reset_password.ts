@@ -23,8 +23,8 @@ import { signNav } from "../../../../../sign/nav/x_preact/nav"
 import { takeLongtimeField } from "../../../../../../core/x_preact/design/form"
 
 import { ApplicationError } from "../../../../../../avail/x_preact/application_error"
-import { InputLoginId } from "../../../../login_id/input/x_preact/input"
-import { InputPassword } from "../../../input/x_preact/input"
+import { LoginIdField } from "../../../../login_id/input/x_preact/input"
+import { PasswordField } from "../../../input/x_preact/input"
 import { ClearChangesButton } from "../../../../../../core/x_preact/button/clear_changes_button"
 import { ChangeButton } from "../../../../../../core/x_preact/button/change_button"
 
@@ -105,12 +105,12 @@ export function ResetPassword(viewProps: Props): VNode {
             loginBox(siteInfo, {
                 title: "パスワードリセット",
                 body: [
-                    h(InputLoginId, {
+                    h(LoginIdField, {
                         field: props.reset.loginId,
                         help: ["入力したログインIDをもう一度入力してください"],
                         autocomplete: "username",
                     }),
-                    h(InputPassword, {
+                    h(PasswordField, {
                         field: props.reset.password,
                         help: ["新しいパスワードを入力してください"],
                         autocomplete: "new-password",

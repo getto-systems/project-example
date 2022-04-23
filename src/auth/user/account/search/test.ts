@@ -95,7 +95,7 @@ test("clear", () => {
 test("focus / close", async () => {
     const { resource } = standard()
 
-    const runner = setupActionTestRunner(resource.search.detail.subscriber)
+    const runner = setupActionTestRunner(resource.search.focused.subscriber)
 
     await resource.search.ignitionState
 
@@ -111,15 +111,15 @@ test("focus / close", async () => {
             resetTokenDestination: { type: "none" },
         }
 
-        resource.search.detail.focus(user)
-        expect(resource.search.detail.isFocused(user)).toBe(true)
-        expect(resource.search.detail.isFocused(another)).toBe(false)
+        resource.search.focused.focus(user)
+        expect(resource.search.focused.isFocused(user)).toBe(true)
+        expect(resource.search.focused.isFocused(another)).toBe(false)
 
-        resource.search.detail.close()
-        expect(resource.search.detail.isFocused(user)).toBe(false)
-        expect(resource.search.detail.isFocused(another)).toBe(false)
+        resource.search.focused.close()
+        expect(resource.search.focused.isFocused(user)).toBe(false)
+        expect(resource.search.focused.isFocused(another)).toBe(false)
 
-        return resource.search.detail.currentState()
+        return resource.search.focused.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             {
@@ -138,10 +138,10 @@ test("focus / close", async () => {
 test("detect user", async () => {
     const { resource } = focused()
 
-    const runner = setupActionTestRunner(resource.search.detail.subscriber)
+    const runner = setupActionTestRunner(resource.search.focused.subscriber)
 
     await runner(async () => {
-        return resource.search.detail.ignitionState
+        return resource.search.focused.ignitionState
     }).then((stack) => {
         expect(stack).toEqual([
             {
@@ -158,10 +158,10 @@ test("detect user", async () => {
 test("detect user; failed", async () => {
     const { resource } = focusFailed()
 
-    const runner = setupActionTestRunner(resource.search.detail.subscriber)
+    const runner = setupActionTestRunner(resource.search.focused.subscriber)
 
     await runner(async () => {
-        return resource.search.detail.ignitionState
+        return resource.search.focused.ignitionState
     }).then((stack) => {
         expect(stack).toEqual([{ type: "focus-failed" }])
     })
@@ -170,7 +170,7 @@ test("detect user; failed", async () => {
 test("update user", async () => {
     const { resource } = focused()
 
-    const runner = setupActionTestRunner(resource.search.detail.subscriber)
+    const runner = setupActionTestRunner(resource.search.focused.subscriber)
 
     await resource.search.ignitionState
 
@@ -184,7 +184,7 @@ test("update user", async () => {
     }
 
     await runner(async () => {
-        return resource.search.detail.update(user)
+        return resource.search.focused.update(user.loginId, user)
     }).then((stack) => {
         expect(stack).toEqual([{ type: "focus-on", user }])
     })

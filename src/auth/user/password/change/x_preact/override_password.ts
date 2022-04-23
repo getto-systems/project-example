@@ -11,7 +11,7 @@ import {
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
 
-import { InputPassword } from "../../input/x_preact/input"
+import { PasswordField } from "../../input/x_preact/input"
 import { EditButton } from "../../../../../core/x_preact/button/edit_button"
 import { ClearChangesButton } from "../../../../../core/x_preact/button/clear_changes_button"
 import { CloseButton } from "../../../../../core/x_preact/button/close_button"
@@ -48,7 +48,7 @@ export function OverridePassword(props: Props): VNode {
         }
         return {
             body: [
-                h(InputPassword, {
+                h(PasswordField, {
                     field: props.override.newPassword,
                     title: "新しいパスワード",
                     help: ["管理者権限でパスワードを上書きします"],

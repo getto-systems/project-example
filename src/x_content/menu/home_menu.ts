@@ -19,6 +19,7 @@ export function homeMenuContent(): MenuContent {
             category("シーズン", allow, [item("設定", lnir(["cog"]), "season/setup.html")]),
             category(authRoleLabel(user.role), user, [
                 item("一覧", lnir(["friends"]), "auth/user/account.html"),
+                item("登録", lnir(["add-user"]), "auth/user/register.html"),
             ]),
             category("SYSTEM", allow, [
                 item("プロフィール", lnir(["user"]), "auth/profile.html"),

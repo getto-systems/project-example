@@ -22,9 +22,10 @@ type Props = Readonly<{ field: InputPasswordAction }> &
         help: readonly VNodeContent[]
         autocomplete: string
     }>
-export function InputPassword(props: Props): VNode {
+export function PasswordField(props: Props): VNode {
     const state = useApplicationAction(props.field.validate)
 
+    // TODO 整理したい
     return label_password_fill(content())
 
     function title() {

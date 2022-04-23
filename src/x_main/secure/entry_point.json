@@ -4,6 +4,7 @@
     { "name": "auth/ticket/logout" },
     { "name": "auth/profile", "worker": true },
     { "name": "auth/user/account" },
+    { "name": "auth/user/register" },
 
     { "name": "season/setup" },
 

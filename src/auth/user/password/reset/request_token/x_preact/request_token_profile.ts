@@ -13,7 +13,7 @@ import { takeLongtimeField } from "../../../../../../core/x_preact/design/form"
 
 import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_error/reason"
 
-import { InputLoginId } from "../../../../login_id/input/x_preact/input"
+import { LoginIdField } from "../../../../login_id/input/x_preact/input"
 import { EditButton } from "../../../../../../core/x_preact/button/edit_button"
 import { SendButton } from "../../../../../../core/x_preact/button/send_button"
 import { ClearChangesButton } from "../../../../../../core/x_preact/button/clear_changes_button"
@@ -39,7 +39,7 @@ export function RequestResetTokenProfile(props: Props): VNode {
         ...(editableState.isEditable
             ? {
                   form: true,
-                  body: h(InputLoginId, {
+                  body: h(LoginIdField, {
                       field: props.requestToken.loginId,
                       title: "ログインID",
                       help: ["確認のため、ログインIDを入力します"],

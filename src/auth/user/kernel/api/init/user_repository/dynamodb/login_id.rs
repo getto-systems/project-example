@@ -18,7 +18,7 @@ use crate::{
     auth::user::{
         kernel::data::AuthUserId,
         login_id::kernel::data::LoginId,
-        password::reset::kernel::data::{ResetTokenDestination, ResetTokenDestinationExtract},
+        password::reset::kernel::data::{ResetTokenDestination, ResetTokenDestinationEmail},
     },
     z_lib::repository::data::RepositoryError,
 };
@@ -90,10 +90,11 @@ impl<'a> TableLoginId<'a> {
                 ColumnUserId::remove_value(&mut attrs),
                 ColumnResetTokenDestinationEmail::remove_value(&mut attrs),
             ) {
-                (Some(user_id), reset_token_destination) => Some(OverrideLoginIdEntry {
+                (Some(user_id), reset_token_destination_email) => Some(OverrideLoginIdEntry {
                     login_id,
                     user_id,
-                    reset_token_destination,
+                    reset_token_destination: reset_token_destination_email
+                        .map(ResetTokenDestination::Email),
                 }),
                 _ => None,
             }
@@ -127,7 +128,7 @@ impl<'a> TableLoginId<'a> {
                 ColumnUserId::remove_value(&mut attrs),
                 ColumnResetTokenDestinationEmail::remove_value(&mut attrs),
             ) {
-                (Some(user_id), email) => Some((user_id, email)),
+                (Some(user_id), email) => Some((user_id, email.map(ResetTokenDestination::Email))),
                 _ => None,
             }
         }))
@@ -151,12 +152,43 @@ impl<'a> TableLoginId<'a> {
             .await
             .map_err(|err| infra_error("get reset token entry error", err))?;
 
-        Ok(response.item.and_then(|mut attrs| {
-            Some(
-                ColumnResetTokenDestinationEmail::remove_value(&mut attrs)
-                    .unwrap_or(ResetTokenDestination::None),
-            )
+        Ok(response.item.map(|mut attrs| {
+            ColumnResetTokenDestinationEmail::remove_value(&mut attrs)
+                .map(ResetTokenDestination::Email)
+                .unwrap_or(ResetTokenDestination::None)
         }))
+    }
+
+    pub async fn put_new_entry(
+        &self,
+        login_id: LoginId,
+        user_id: AuthUserId,
+        reset_token_destination: ResetTokenDestination,
+    ) -> Result<(), RepositoryError> {
+        let mut item = vec![
+            ColumnLoginId::to_attr_pair(login_id),
+            ColumnUserId::to_attr_pair(user_id),
+        ];
+        if let ResetTokenDestination::Email(email) = reset_token_destination {
+            item.push(ColumnResetTokenDestinationEmail::to_attr_pair(email))
+        }
+
+        let input = PutItemInput {
+            table_name: self.table_name.into(),
+            item: item.into_iter().collect(),
+            condition_expression: Some(format!(
+                "attribute_not_exists({})",
+                ColumnLoginId::as_name()
+            )),
+            ..Default::default()
+        };
+
+        self.client
+            .put_item(input)
+            .await
+            .map_err(|err| infra_error("put new login-id error", err))?;
+
+        Ok(())
     }
 
     pub async fn put_override_entry(
@@ -168,10 +200,8 @@ impl<'a> TableLoginId<'a> {
             ColumnLoginId::to_attr_pair(login_id),
             ColumnUserId::to_attr_pair(user.user_id),
         ];
-        if let Some(reset_token_destination) = user.reset_token_destination {
-            item.push(ColumnResetTokenDestinationEmail::to_attr_pair(
-                reset_token_destination,
-            ))
+        if let Some(ResetTokenDestination::Email(email)) = user.reset_token_destination {
+            item.push(ColumnResetTokenDestinationEmail::to_attr_pair(email))
         }
 
         let input = PutItemInput {
@@ -221,7 +251,7 @@ impl<'a> TableLoginId<'a> {
                 )),
                 ..Default::default()
             },
-            ResetTokenDestination::Email(_) => UpdateItemInput {
+            ResetTokenDestination::Email(email) => UpdateItemInput {
                 table_name: self.table_name.into(),
                 key: Self::key(login_id),
                 update_expression: Some(format!(
@@ -231,7 +261,7 @@ impl<'a> TableLoginId<'a> {
                 expression_attribute_values: Some(
                     vec![(
                         ":email".to_owned(),
-                        ColumnResetTokenDestinationEmail::to_attr(new_destination),
+                        ColumnResetTokenDestinationEmail::to_attr(email),
                     )]
                     .into_iter()
                     .collect(),
@@ -292,7 +322,9 @@ impl<'a> TableLoginId<'a> {
                         ColumnLoginId::remove_value(&mut attrs),
                         ColumnResetTokenDestinationEmail::remove_value(&mut attrs),
                     ) {
-                        (Some(login_id), granted_roles) => Some((login_id, granted_roles)),
+                        (Some(login_id), email) => {
+                            Some((login_id, email.map(ResetTokenDestination::Email)))
+                        }
                         _ => None,
                     }
                 })
@@ -335,19 +367,15 @@ impl DynamoDbColumn for ColumnUserId {
 
 struct ColumnResetTokenDestinationEmail;
 impl DynamoDbColumn for ColumnResetTokenDestinationEmail {
-    type Value = ResetTokenDestination;
+    type Value = ResetTokenDestinationEmail;
 
     fn as_name() -> &'static str {
         "reset_token_destination_email"
     }
     fn to_attr(value: Self::Value) -> AttributeValue {
-        match value {
-            Self::Value::None => AttributeValue::default(),
-            Self::Value::Email(email) => string_value(email.extract()),
-        }
+        string_value(value.extract())
     }
     fn to_value(attr: AttributeValue) -> Option<Self::Value> {
-        attr.s
-            .map(|value| Self::Value::restore(ResetTokenDestinationExtract::Email(value)))
+        attr.s.map(|value| Self::Value::restore(value))
     }
 }

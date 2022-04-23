@@ -2,6 +2,7 @@ import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
 import { useApplicationAction } from "../../../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useEditableState } from "../../../../../../../z_vendor/getto-application/board/editable/x_preact/hooks"
 
 import {
     field,
@@ -25,18 +26,20 @@ import { ValidateResetTokenDestinationError } from "../data"
 import { ResetTokenDestination } from "../../kernel/data"
 
 type Props = Readonly<{
-    user: Readonly<{ resetTokenDestination: ResetTokenDestination }>
-    editable: EditableBoardAction
     field: InputResetTokenDestinationAction
 }> &
     Partial<{
         title: VNodeContent
         help: readonly VNodeContent[]
         autocomplete: string
+        edit: Readonly<{
+            data: Readonly<{ resetTokenDestination: ResetTokenDestination }>
+            editable: EditableBoardAction
+        }>
     }>
 export function ResetTokenDestinationField(props: Props): VNode {
     const state = useApplicationAction(props.field)
-    const editableState = useApplicationAction(props.editable)
+    const editableState = useEditableState(props.edit)
     const validateState = useApplicationAction(props.field.validate)
 
     const content = {
@@ -52,13 +55,7 @@ export function ResetTokenDestinationField(props: Props): VNode {
 
     function body(): VNodeContent {
         if (!editableState.isEditable) {
-            switch (props.user.resetTokenDestination.type) {
-                case "none":
-                    return label_gray("無効")
-
-                case "email":
-                    return props.user.resetTokenDestination.email
-            }
+            return h(ResetTokenDestinationLabel, editableState.data)
         }
         return [
             label_text_fill(
@@ -101,6 +98,18 @@ export function ResetTokenDestinationField(props: Props): VNode {
                 })(),
             }
         }
+    }
+}
+
+export function ResetTokenDestinationLabel({
+    resetTokenDestination,
+}: Readonly<{ resetTokenDestination: ResetTokenDestination }>): VNode {
+    switch (resetTokenDestination.type) {
+        case "none":
+            return label_gray("無効")
+
+        case "email":
+            return html`${resetTokenDestination.email}`
     }
 }
 

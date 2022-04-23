@@ -53,7 +53,7 @@ export interface SearchAuthUserAccountAction extends ListAuthUserAccountAction {
 }
 export interface ListAuthUserAccountAction
     extends StatefulApplicationAction<SearchAuthUserAccountState> {
-    readonly detail: DetailAuthUserAccountAction
+    readonly focused: FocusedAuthUserAccountAction
     readonly offset: SearchOffsetAction
     readonly columns: SearchColumnsAction
 
@@ -66,11 +66,11 @@ export interface ListAuthUserAccountAction
         state: SearchAuthUserAccountState,
     ): Readonly<{ response?: SearchAuthUserAccountRemoteResponse }>
 }
-export interface DetailAuthUserAccountAction
-    extends StatefulApplicationAction<DetailAuthUserAccountState> {
-    focus(user: AuthUserAccount): DetailAuthUserAccountState
-    update(user: AuthUserAccount): DetailAuthUserAccountState
-    close(): DetailAuthUserAccountState
+export interface FocusedAuthUserAccountAction
+    extends StatefulApplicationAction<FocusedAuthUserAccountState> {
+    focus(user: AuthUserAccount): FocusedAuthUserAccountState
+    update(loginId: LoginId, user: AuthUserAccount): FocusedAuthUserAccountState
+    close(): FocusedAuthUserAccountState
 
     isFocused(user: AuthUserAccount): boolean
 }
@@ -79,13 +79,13 @@ export type SearchAuthUserAccountState = Readonly<{ type: "initial" }> | SearchA
 
 const initialSearchState: SearchAuthUserAccountState = { type: "initial" }
 
-export type DetailAuthUserAccountState =
+export type FocusedAuthUserAccountState =
     | Readonly<{ type: "initial" }>
     | Readonly<{ type: "focus-failed" }>
     | Readonly<{ type: "focus-detected"; user: AuthUserAccount }>
     | Readonly<{ type: "focus-on"; user: AuthUserAccount }>
 
-const initialDetailState: DetailAuthUserAccountState = { type: "initial" }
+const initialFocusedState: FocusedAuthUserAccountState = { type: "initial" }
 
 export type SearchAuthUserAccountMaterial = Readonly<{
     infra: SearchAuthUserAccountInfra
@@ -121,7 +121,7 @@ class Action
 {
     readonly initialState = initialSearchState
 
-    readonly detail: DetailAuthUserAccountAction
+    readonly focused: FocusedAuthUserAccountAction
 
     readonly loginId: SearchLoginIdAction
     readonly grantedRoles: SearchGrantedRolesAction
@@ -142,7 +142,7 @@ class Action
         super({
             ignite: async () => this.load(),
             terminate: () => {
-                this.detail.terminate()
+                this.focused.terminate()
                 this.loginId.terminate()
                 this.grantedRoles.terminate()
                 this.offset.terminate()
@@ -179,7 +179,7 @@ class Action
 
         this.material = material
 
-        this.detail = new DetailAction({
+        this.focused = new FocusedAction({
             infra: {
                 detectUser: async (loginId): Promise<DetectUserResult> => {
                     const result = this.searchResponse(await this.ignitionState)
@@ -192,7 +192,7 @@ class Action
                     }
                     return { found: true, user }
                 },
-                updateUser: (user) => this.update(user),
+                updateUser: (loginId, user) => this.update(loginId, user),
             },
             shell: material.shell,
         })
@@ -252,7 +252,7 @@ class Action
         return state
     }
 
-    update(user: AuthUserAccount): SearchAuthUserAccountState {
+    update(loginId: LoginId, user: AuthUserAccount): SearchAuthUserAccountState {
         if (!this.response) {
             return this.currentState()
         }
@@ -260,7 +260,7 @@ class Action
         this.response = {
             ...this.response,
             users: this.response.users.map((row) => {
-                if (row.loginId !== user.loginId) {
+                if (row.loginId !== loginId) {
                     return row
                 }
                 return user
@@ -345,33 +345,33 @@ async function search<S>(
     return post({ type: "success", response: response.value })
 }
 
-type DetailMaterial = Readonly<{
-    infra: DetailInfra
-    shell: DetailShell
+type FocusedMaterial = Readonly<{
+    infra: FocusedInfra
+    shell: FocusedShell
 }>
 
-interface DetailInfra {
+interface FocusedInfra {
     detectUser(loginId: string): Promise<DetectUserResult>
-    updateUser(user: AuthUserAccount): void
+    updateUser(loginId: LoginId, user: AuthUserAccount): void
 }
 type DetectUserResult =
     | Readonly<{ found: false }>
     | Readonly<{ found: true; user: AuthUserAccount }>
 
-type DetailShell = Readonly<{
+type FocusedShell = Readonly<{
     detectFocus: FocusAuthUserAccountDetecter
     updateFocus: UpdateFocusAuthUserAccountQuery
 }>
 
-class DetailAction
-    extends AbstractStatefulApplicationAction<DetailAuthUserAccountState>
-    implements DetailAuthUserAccountAction
+class FocusedAction
+    extends AbstractStatefulApplicationAction<FocusedAuthUserAccountState>
+    implements FocusedAuthUserAccountAction
 {
-    readonly initialState = initialDetailState
+    readonly initialState = initialFocusedState
 
-    material: DetailMaterial
+    material: FocusedMaterial
 
-    constructor(material: DetailMaterial) {
+    constructor(material: FocusedMaterial) {
         super({
             ignite: async () => {
                 const focus = this.material.shell.detectFocus()
@@ -388,15 +388,16 @@ class DetailAction
         this.material = material
     }
 
-    focus(user: AuthUserAccount): DetailAuthUserAccountState {
+    focus(user: AuthUserAccount): FocusedAuthUserAccountState {
         this.material.shell.updateFocus.focus(user)
         return this.post({ type: "focus-on", user })
     }
-    update(user: AuthUserAccount): DetailAuthUserAccountState {
-        this.material.infra.updateUser(user)
+    update(loginId: LoginId, user: AuthUserAccount): FocusedAuthUserAccountState {
+        this.material.infra.updateUser(loginId, user)
+        this.material.shell.updateFocus.focus(user)
         return this.post({ type: "focus-on", user })
     }
-    close(): DetailAuthUserAccountState {
+    close(): FocusedAuthUserAccountState {
         this.material.shell.updateFocus.clear()
         return this.post({ type: "initial" })
     }

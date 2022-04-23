@@ -12,7 +12,8 @@ import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
-import { InputGrantedRoles } from "../../input/x_preact/granted_roles"
+import { StaticLoginIdField } from "../../../login_id/input/x_preact/static"
+import { GrantedRolesField } from "../../input/x_preact/granted_roles"
 import { EditButton } from "../../../../../core/x_preact/button/edit_button"
 import { ResetButton } from "../../../../../core/x_preact/button/reset_button"
 import { CloseButton } from "../../../../../core/x_preact/button/close_button"
@@ -36,16 +37,18 @@ type Props = Readonly<{
 export function ModifyAuthUserAccount(props: Props): VNode {
     const state = useApplicationAction(props.modify)
     const editableState = useApplicationAction(props.editable)
-    const validateState = useApplicationAction(props.modify.validate)
     const observeState = useApplicationAction(props.modify.observe)
 
     return form(
         box({
             title: "基本情報",
             body: [
-                h(InputGrantedRoles, {
-                    user: props.user,
-                    editable: props.editable,
+                h(StaticLoginIdField, { user: props.user }),
+                h(GrantedRolesField, {
+                    edit: {
+                        data: props.user,
+                        editable: props.editable,
+                    },
                     field: props.modify.grantedRoles,
                 }),
             ],
@@ -55,7 +58,6 @@ export function ModifyAuthUserAccount(props: Props): VNode {
                           left: submitButton(),
                           right: resetButton(),
                       }),
-                      ...validationMessage(),
                       ...message(),
                       buttons({
                           right: closeButton(),
@@ -78,7 +80,8 @@ export function ModifyAuthUserAccount(props: Props): VNode {
     function submitButton(): VNode {
         return h(ChangeButton, {
             isConnecting: state.type === "try" || state.type === "take-longtime",
-            validateState,
+            // granted roles は validate しないので "initial" 固定
+            validateState: "initial",
             observeState,
             onClick,
         })
@@ -112,16 +115,6 @@ export function ModifyAuthUserAccount(props: Props): VNode {
         }
     }
 
-    function validationMessage(): readonly VNode[] {
-        switch (validateState) {
-            case "initial":
-            case "valid":
-                return []
-
-            case "invalid":
-                return [fieldHelp_error(["正しく入力されていません"])]
-        }
-    }
     function message(): readonly VNode[] {
         switch (state.type) {
             case "initial":
