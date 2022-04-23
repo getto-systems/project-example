@@ -50,6 +50,7 @@ export interface FocusedRegisteredAuthUserAccountAction
     extends StatefulApplicationAction<FocusedRegisteredAuthUserAccountState> {
     focus(user: AuthUserAccount): FocusedRegisteredAuthUserAccountState
     update(loginId: LoginId, user: AuthUserAccount): FocusedRegisteredAuthUserAccountState
+    remove(loginId: LoginId): FocusedRegisteredAuthUserAccountState
     close(): FocusedRegisteredAuthUserAccountState
 
     isFocused(user: AuthUserAccount): boolean
@@ -250,6 +251,9 @@ class ListAction
             updateUser: (loginId, user) => {
                 this.update(loginId, user)
             },
+            removeUser: (loginId) => {
+                this.remove(loginId)
+            },
         })
     }
 
@@ -268,10 +272,15 @@ class ListAction
         })
         return this.post({ type: "registered", users: this.list })
     }
+    remove(loginId: LoginId): ListRegisteredAuthUserAccountState {
+        this.list = this.list.filter((row) => row.loginId !== loginId)
+        return this.post({ type: "registered", users: this.list })
+    }
 }
 
 type FocusedMaterial = Readonly<{
     updateUser(loginId: LoginId, user: AuthUserAccount): void
+    removeUser(loginId: LoginId): void
 }>
 
 class FocusedAction
@@ -293,6 +302,10 @@ class FocusedAction
     update(loginId: LoginId, user: AuthUserAccount): FocusedRegisteredAuthUserAccountState {
         this.material.updateUser(loginId, user)
         return this.post({ type: "focus-on", user })
+    }
+    remove(loginId: LoginId): FocusedRegisteredAuthUserAccountState {
+        this.material.removeUser(loginId)
+        return this.close()
     }
     close(): FocusedRegisteredAuthUserAccountState {
         return this.post({ type: "initial" })

@@ -29,8 +29,11 @@ export function FocusedAuthUserAccount(props: Props): VNode {
         return h(DetailAuthUserAccount, {
             ...props,
             user: props.user.user,
-            onSuccess: (loginId, user) => {
+            onModify: (loginId, user) => {
                 props.focused.update(loginId, user)
+            },
+            onUnregister: (loginId) => {
+                props.focused.remove(loginId)
             },
         })
     }

@@ -41,6 +41,7 @@ async fn main() {
         .add_service(server.auth.user.account.search())
         .add_service(server.auth.user.account.modify_user())
         .add_service(server.auth.user.account.register_user())
+        .add_service(server.auth.user.account.unregister_user())
         .serve(
             format!("0.0.0.0:{}", &ENV.port)
                 .parse()

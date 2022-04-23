@@ -27,14 +27,14 @@ use crate::{
     z_lib::message::data::MessageError,
 };
 
-pub struct ModifyUserProxyService<'a> {
+pub struct RegisterUserProxyService<'a> {
     service_url: &'static str,
     request_id: &'a str,
     authorizer: GoogleServiceAuthorizer<'a>,
     body: String,
 }
 
-impl<'a> ModifyUserProxyService<'a> {
+impl<'a> RegisterUserProxyService<'a> {
     pub fn new(service: &'a AuthOutsideService, request_id: &'a str, body: String) -> Self {
         Self {
             service_url: service.service_url,
@@ -46,7 +46,7 @@ impl<'a> ModifyUserProxyService<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthProxyService for ModifyUserProxyService<'a> {
+impl<'a> AuthProxyService for RegisterUserProxyService<'a> {
     type Response = AuthProxyResponse;
 
     fn name(&self) -> &str {
@@ -58,7 +58,7 @@ impl<'a> AuthProxyService for ModifyUserProxyService<'a> {
 }
 
 async fn call<'a>(
-    service: ModifyUserProxyService<'a>,
+    service: RegisterUserProxyService<'a>,
     metadata: AuthMetadataContent,
 ) -> Result<AuthProxyResponse, AuthProxyError> {
     let mut client = RegisterAuthUserAccountPbClient::new(

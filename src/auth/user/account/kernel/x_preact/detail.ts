@@ -7,12 +7,14 @@ import { ModifyAuthUserAccount } from "../../modify/x_preact/modify"
 import { OverrideLoginId } from "../../../login_id/change/x_preact/override_login_id"
 import { OverridePassword } from "../../../password/change/x_preact/override_password"
 import { ChangeResetTokenDestination } from "../../../password/reset/token_destination/change/x_preact/change"
+import { UnregisterAuthUserAccount } from "../../unregister/x_preact/unregister"
 
 import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
 import { OverrideLoginIdAction } from "../../../login_id/change/action"
 import { OverridePasswordAction } from "../../../password/change/action"
 import { ModifyAuthUserAccountAction } from "../../modify/action"
 import { ChangeResetTokenDestinationAction } from "../../../password/reset/token_destination/change/action"
+import { UnregisterAuthUserAccountAction } from "../../unregister/action"
 
 import { AuthUserAccount } from "../../kernel/data"
 import { LoginId } from "../../../login_id/kernel/data"
@@ -34,11 +36,16 @@ export type DetailAuthUserAccountActions = Readonly<{
         editable: EditableBoardAction
         override: OverridePasswordAction
     }>
+    unregister: Readonly<{
+        editable: EditableBoardAction
+        unregister: UnregisterAuthUserAccountAction
+    }>
 }>
 type Props = DetailAuthUserAccountActions &
     Readonly<{
         user: AuthUserAccount
-        onSuccess: { (loginId: LoginId, user: AuthUserAccount): void }
+        onModify: { (loginId: LoginId, user: AuthUserAccount): void }
+        onUnregister: { (loginId: LoginId): void }
     }>
 export function DetailAuthUserAccount(props: Props): VNode {
     const user = props.user
@@ -49,14 +56,14 @@ export function DetailAuthUserAccount(props: Props): VNode {
                 ...props.modify,
                 user,
                 onSuccess: (fields) => {
-                    props.onSuccess(user.loginId, { ...user, ...fields })
+                    props.onModify(user.loginId, { ...user, ...fields })
                 },
             }),
             h(ChangeResetTokenDestination, {
                 ...props.changeResetTokenDestination,
                 user,
                 onSuccess: (resetTokenDestination) => {
-                    props.onSuccess(user.loginId, { ...user, resetTokenDestination })
+                    props.onModify(user.loginId, { ...user, resetTokenDestination })
                 },
             }),
         ]),
@@ -65,10 +72,19 @@ export function DetailAuthUserAccount(props: Props): VNode {
                 ...props.overrideLoginId,
                 user,
                 onSuccess: (loginId) => {
-                    props.onSuccess(user.loginId, { ...user, loginId })
+                    props.onModify(user.loginId, { ...user, loginId })
                 },
             }),
             h(OverridePassword, { ...props.overridePassword, user }),
+        ]),
+        container([
+            h(UnregisterAuthUserAccount, {
+                ...props.unregister,
+                user,
+                onSuccess: (loginId) => {
+                    props.onUnregister(loginId)
+                },
+            }),
         ]),
     ]}`
 }

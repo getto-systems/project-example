@@ -64,6 +64,11 @@ impl<'a> MapUser<'a> {
         let mut store = self.store.lock().unwrap();
         store.insert(user_id, entry);
     }
+    pub fn remove_entry(&self, user_id: &AuthUserId) {
+        let mut store = self.store.lock().unwrap();
+        store.remove(user_id);
+    }
+
     pub fn update_login_id(&self, user_id: AuthUserId, login_id: LoginId) {
         let mut store = self.store.lock().unwrap();
         if let Some(entry) = store.remove(&user_id) {

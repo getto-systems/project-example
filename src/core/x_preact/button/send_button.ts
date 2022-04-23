@@ -30,21 +30,21 @@ export function SendButton({
     onClick,
 }: Props): VNode {
     if (isConnecting) {
-        return button_send({ state: "connect", label: iconLabel(icon_spinner) })
+        return button_send({ state: "connect", label: buttonLabel(icon_spinner) })
     }
 
     switch (validateState) {
         case "initial":
-            return button_send({ state: buttonState("normal"), label: iconLabel(icon), onClick })
+            return button_send({ state: buttonState("normal"), label: buttonLabel(icon), onClick })
 
         case "valid":
-            return button_send({ state: buttonState("confirm"), label: iconLabel(icon), onClick })
+            return button_send({ state: buttonState("confirm"), label: buttonLabel(icon), onClick })
 
         case "invalid":
-            return button_disabled({ label: iconLabel(icon) })
+            return button_disabled({ label: buttonLabel(icon) })
     }
 
-    function iconLabel(icon: Icon): VNode {
+    function buttonLabel(icon: Icon): VNode {
         return html`${label} ${iconHtml(icon)}`
     }
     function buttonState(defaultState: "normal" | "confirm"): "normal" | "confirm" {

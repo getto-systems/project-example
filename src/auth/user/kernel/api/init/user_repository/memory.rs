@@ -5,7 +5,10 @@ mod user;
 use std::collections::HashMap;
 
 use crate::auth::user::{
-    account::register::infra::RegisterAuthUserAccountFields,
+    account::{
+        register::infra::RegisterAuthUserAccountFields,
+        unregister::infra::UnregisterAuthUserAccountRepository,
+    },
     kernel::init::user_repository::memory::{
         login_id::{EntryLoginId, MapLoginId, StoreLoginId},
         reset_token::{EntryResetToken, MapResetToken, StoreResetToken},
@@ -341,6 +344,19 @@ impl<'a> RegisterAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
             },
         );
 
+        Ok(())
+    }
+}
+
+#[async_trait::async_trait]
+impl<'a> UnregisterAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
+    async fn unregister_user(&self, login_id: &LoginId) -> Result<(), RepositoryError> {
+        if let Some(user_id) = self.login_id.get_user_id(login_id) {
+            self.user.remove_entry(&user_id);
+            self.login_id.remove_entry(login_id);
+
+            // TODO ticket repository と統合してここで user_id に紐づく ticket を全て削除する
+        }
         Ok(())
     }
 }

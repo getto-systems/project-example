@@ -48,7 +48,7 @@ impl<'a> TableUser<'a> {
         let input = GetItemInput {
             table_name: self.table_name.into(),
             key: Self::key(user_id),
-            projection_expression: Some(vec![ColumnGrantedAuthRoles::as_name()].join(",")),
+            projection_expression: Some(vec![ColumnGrantedRoles::as_name()].join(",")),
             ..Default::default()
         };
 
@@ -60,7 +60,7 @@ impl<'a> TableUser<'a> {
 
         Ok(response
             .item
-            .map(move |mut attrs| ColumnGrantedAuthRoles::remove_value(&mut attrs)))
+            .map(move |mut attrs| ColumnGrantedRoles::remove_value(&mut attrs)))
     }
     pub async fn get_password_and_granted_roles(
         &self,
@@ -70,11 +70,7 @@ impl<'a> TableUser<'a> {
             table_name: self.table_name.into(),
             key: Self::key(user_id),
             projection_expression: Some(
-                vec![
-                    ColumnHashedPassword::as_name(),
-                    ColumnGrantedAuthRoles::as_name(),
-                ]
-                .join(","),
+                vec![ColumnPassword::as_name(), ColumnGrantedRoles::as_name()].join(","),
             ),
             ..Default::default()
         };
@@ -87,8 +83,8 @@ impl<'a> TableUser<'a> {
 
         Ok(response.item.and_then(move |mut attrs| {
             match (
-                ColumnHashedPassword::remove_value(&mut attrs),
-                ColumnGrantedAuthRoles::remove_value(&mut attrs),
+                ColumnPassword::remove_value(&mut attrs),
+                ColumnGrantedRoles::remove_value(&mut attrs),
             ) {
                 (Some(hashed_password), granted_roles) => Some((hashed_password, granted_roles)),
                 _ => None,
@@ -102,7 +98,7 @@ impl<'a> TableUser<'a> {
         let input = GetItemInput {
             table_name: self.table_name.into(),
             key: Self::key(user_id),
-            projection_expression: Some(vec![ColumnHashedPassword::as_name()].join(",")),
+            projection_expression: Some(vec![ColumnPassword::as_name()].join(",")),
             ..Default::default()
         };
 
@@ -114,7 +110,7 @@ impl<'a> TableUser<'a> {
 
         Ok(response
             .item
-            .and_then(move |mut attrs| ColumnHashedPassword::remove_value(&mut attrs)))
+            .and_then(move |mut attrs| ColumnPassword::remove_value(&mut attrs)))
     }
     pub async fn get_modify_changes(
         &self,
@@ -123,7 +119,7 @@ impl<'a> TableUser<'a> {
         let input = GetItemInput {
             table_name: self.table_name.into(),
             key: Self::key(user_id),
-            projection_expression: Some(vec![ColumnGrantedAuthRoles::as_name()].join(",")),
+            projection_expression: Some(vec![ColumnGrantedRoles::as_name()].join(",")),
             ..Default::default()
         };
 
@@ -136,9 +132,48 @@ impl<'a> TableUser<'a> {
         Ok(response
             .item
             .map(move |mut attrs| ModifyAuthUserAccountChanges {
-                granted_roles: ColumnGrantedAuthRoles::remove_value(&mut attrs)
+                granted_roles: ColumnGrantedRoles::remove_value(&mut attrs)
                     .unwrap_or(GrantedAuthRoles::empty()),
             }))
+    }
+    pub async fn get_entry(
+        &self,
+        user_id: AuthUserId,
+    ) -> Result<Option<EntryUser>, RepositoryError> {
+        let input = GetItemInput {
+            table_name: self.table_name.into(),
+            key: Self::key(user_id),
+            projection_expression: Some(
+                vec![
+                    ColumnLoginId::as_name(),
+                    ColumnGrantedRoles::as_name(),
+                    ColumnPassword::as_name(),
+                ]
+                .join(","),
+            ),
+            ..Default::default()
+        };
+
+        let response = self
+            .client
+            .get_item(input)
+            .await
+            .map_err(|err| infra_error("get granted roles error", err))?;
+
+        Ok(response.item.and_then(move |mut attrs| {
+            match (
+                ColumnLoginId::remove_value(&mut attrs),
+                ColumnGrantedRoles::remove_value(&mut attrs),
+                ColumnPassword::remove_value(&mut attrs),
+            ) {
+                (Some(login_id), granted_roles, hashed_password) => Some(EntryUser {
+                    login_id,
+                    granted_roles,
+                    hashed_password,
+                }),
+                _ => None,
+            }
+        }))
     }
 
     pub async fn put_new_entry(
@@ -152,7 +187,7 @@ impl<'a> TableUser<'a> {
             ColumnLoginId::to_attr_pair(login_id),
         ];
         if !granted_roles.inner().is_empty() {
-            item.push(ColumnGrantedAuthRoles::to_attr_pair(granted_roles))
+            item.push(ColumnGrantedRoles::to_attr_pair(granted_roles))
         }
 
         let input = PutItemInput {
@@ -172,6 +207,42 @@ impl<'a> TableUser<'a> {
 
         Ok(())
     }
+    pub async fn put_entry(
+        &self,
+        user_id: AuthUserId,
+        entry: EntryUser,
+    ) -> Result<(), RepositoryError> {
+        let mut item = vec![
+            ColumnUserId::to_attr_pair(user_id),
+            ColumnLoginId::to_attr_pair(entry.login_id),
+        ];
+        if let Some(granted_roles) = entry.granted_roles {
+            if !granted_roles.inner().is_empty() {
+                item.push(ColumnGrantedRoles::to_attr_pair(granted_roles))
+            }
+        }
+        if let Some(hashed_password) = entry.hashed_password {
+            item.push(ColumnPassword::to_attr_pair(hashed_password))
+        }
+
+        let input = PutItemInput {
+            table_name: self.table_name.into(),
+            item: item.into_iter().collect(),
+            condition_expression: Some(format!(
+                "attribute_not_exists({})",
+                ColumnUserId::as_name()
+            )),
+            ..Default::default()
+        };
+
+        self.client
+            .put_item(input)
+            .await
+            .map_err(|err| infra_error("put new user error", err))?;
+
+        Ok(())
+    }
+
     pub async fn delete_entry(&self, user_id: AuthUserId) -> Result<(), RepositoryError> {
         let input = DeleteItemInput {
             table_name: self.table_name.into(),
@@ -195,17 +266,11 @@ impl<'a> TableUser<'a> {
         let input = UpdateItemInput {
             table_name: self.table_name.into(),
             key: Self::key(user_id),
-            update_expression: Some(format!(
-                "set {} = :password",
-                ColumnHashedPassword::as_name()
-            )),
+            update_expression: Some(format!("set {} = :password", ColumnPassword::as_name())),
             expression_attribute_values: Some(
-                vec![(
-                    ":password".to_owned(),
-                    ColumnHashedPassword::to_attr(password),
-                )]
-                .into_iter()
-                .collect(),
+                vec![(":password".to_owned(), ColumnPassword::to_attr(password))]
+                    .into_iter()
+                    .collect(),
             ),
             ..Default::default()
         };
@@ -262,12 +327,12 @@ impl<'a> TableUser<'a> {
             key: Self::key(user_id),
             update_expression: Some(format!(
                 "set {} = :granted_roles",
-                ColumnGrantedAuthRoles::as_name()
+                ColumnGrantedRoles::as_name()
             )),
             expression_attribute_values: Some(
                 vec![(
                     ":granted_roles".to_owned(),
-                    ColumnGrantedAuthRoles::to_attr(granted_roles),
+                    ColumnGrantedRoles::to_attr(granted_roles),
                 )]
                 .into_iter()
                 .collect(),
@@ -288,7 +353,7 @@ impl<'a> TableUser<'a> {
             key: Self::key(user_id),
             update_expression: Some(format!(
                 "remove {}",
-                vec![ColumnGrantedAuthRoles::as_name()].join(",")
+                vec![ColumnGrantedRoles::as_name()].join(",")
             )),
             ..Default::default()
         };
@@ -321,7 +386,7 @@ impl<'a> TableUser<'a> {
             table_name: self.table_name.into(),
             exclusive_start_key: scan_key.extract(),
             projection_expression: Some(
-                vec![ColumnLoginId::as_name(), ColumnGrantedAuthRoles::as_name()].join(","),
+                vec![ColumnLoginId::as_name(), ColumnGrantedRoles::as_name()].join(","),
             ),
             ..Default::default()
         };
@@ -339,7 +404,7 @@ impl<'a> TableUser<'a> {
                 .filter_map(|mut attrs| {
                     match (
                         ColumnLoginId::remove_value(&mut attrs),
-                        ColumnGrantedAuthRoles::remove_value(&mut attrs),
+                        ColumnGrantedRoles::remove_value(&mut attrs),
                     ) {
                         (Some(login_id), granted_roles) => Some((login_id, granted_roles)),
                         _ => None,
@@ -350,6 +415,12 @@ impl<'a> TableUser<'a> {
 
         Ok((items, ScanKey::next(response.last_evaluated_key)))
     }
+}
+
+pub struct EntryUser {
+    pub login_id: LoginId,
+    pub granted_roles: Option<GrantedAuthRoles>,
+    pub hashed_password: Option<HashedPassword>,
 }
 
 struct ColumnUserId;
@@ -382,8 +453,8 @@ impl DynamoDbColumn for ColumnLoginId {
     }
 }
 
-struct ColumnGrantedAuthRoles;
-impl DynamoDbColumn for ColumnGrantedAuthRoles {
+struct ColumnGrantedRoles;
+impl DynamoDbColumn for ColumnGrantedRoles {
     type Value = GrantedAuthRoles;
 
     fn as_name() -> &'static str {
@@ -398,8 +469,8 @@ impl DynamoDbColumn for ColumnGrantedAuthRoles {
     }
 }
 
-struct ColumnHashedPassword;
-impl DynamoDbColumn for ColumnHashedPassword {
+struct ColumnPassword;
+impl DynamoDbColumn for ColumnPassword {
     type Value = HashedPassword;
 
     fn as_name() -> &'static str {

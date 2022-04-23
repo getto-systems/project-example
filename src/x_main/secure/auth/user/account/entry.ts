@@ -15,6 +15,7 @@ import { newSearchSidebarAction } from "../../../../../z_lib/ui/search/sidebar/i
 import { newOverrideLoginIdAction } from "../../../../../auth/user/login_id/change/init/resource"
 import { newModifyAuthUserAccountAction } from "../../../../../auth/user/account/modify/init/resource"
 import { newChangeResetTokenDestinationAction } from "../../../../../auth/user/password/reset/token_destination/change/init/resource"
+import { newUnregisterAuthUserAccountAction } from "../../../../../auth/user/account/unregister/init/resource"
 
 render(h(ManageUserAccountPage, props()), document.body)
 
@@ -43,6 +44,10 @@ function newResource() {
         overridePassword: {
             editable: initEditableBoardAction(),
             override: newOverridePasswordAction(feature),
+        },
+        unregister: {
+            editable: initEditableBoardAction(),
+            unregister: newUnregisterAuthUserAccountAction(feature),
         },
     }
 }
