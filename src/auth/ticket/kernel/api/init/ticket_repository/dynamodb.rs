@@ -4,13 +4,19 @@ use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
 use crate::auth::ticket::kernel::init::ticket_repository::dynamodb::ticket::TableTicket;
 
-use crate::auth::ticket::{
-    encode::infra::EncodeAuthTicketRepository, issue::infra::IssueAuthTicketRepository,
-    logout::infra::LogoutAuthTicketRepository,
+use crate::auth::{
+    ticket::{
+        encode::infra::EncodeAuthTicketRepository, issue::infra::IssueAuthTicketRepository,
+        logout::infra::LogoutAuthTicketRepository,
+    },
+    user::account::unregister::infra::DiscardAuthTicketRepository,
 };
 
 use crate::{
-    auth::ticket::kernel::data::{AuthDateTime, AuthTicket, ExpansionLimitDateTime},
+    auth::{
+        ticket::kernel::data::{AuthDateTime, AuthTicket, ExpansionLimitDateTime},
+        user::kernel::data::AuthUserId,
+    },
     z_lib::repository::data::RepositoryError,
 };
 
@@ -43,7 +49,10 @@ impl<'a> IssueAuthTicketRepository for DynamoDbAuthTicketRepository<'a> {
 #[async_trait::async_trait]
 impl<'a> LogoutAuthTicketRepository for DynamoDbAuthTicketRepository<'a> {
     async fn discard(&self, ticket: &AuthTicket) -> Result<(), RepositoryError> {
-        self.ticket.delete_ticket(ticket.clone()).await
+        let (ticket_id, user) = ticket.clone().extract();
+        self.ticket
+            .delete_ticket(ticket_id, user.into_user_id())
+            .await
     }
 }
 
@@ -54,5 +63,15 @@ impl<'a> EncodeAuthTicketRepository for DynamoDbAuthTicketRepository<'a> {
         ticket: &AuthTicket,
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError> {
         self.ticket.get_expansion_limit(ticket.clone()).await
+    }
+}
+
+#[async_trait::async_trait]
+impl<'a> DiscardAuthTicketRepository for DynamoDbAuthTicketRepository<'a> {
+    async fn discard_all(&self, user_id: &AuthUserId) -> Result<(), RepositoryError> {
+        for ticket_id in self.ticket.query_ticket_id(user_id.clone()).await? {
+            self.ticket.delete_ticket(ticket_id.clone(), user_id.clone()).await?
+        }
+        Ok(())
     }
 }

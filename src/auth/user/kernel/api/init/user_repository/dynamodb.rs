@@ -72,7 +72,7 @@ impl<'a> DynamoDbAuthUserRepository<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'client> AuthenticatePasswordRepository for DynamoDbAuthUserRepository<'client> {
+impl<'a> AuthenticatePasswordRepository for DynamoDbAuthUserRepository<'a> {
     async fn lookup_user_id(
         &self,
         login_id: &LoginId,
@@ -91,7 +91,7 @@ impl<'client> AuthenticatePasswordRepository for DynamoDbAuthUserRepository<'cli
 }
 
 #[async_trait::async_trait]
-impl<'client> OverrideLoginIdRepository for DynamoDbAuthUserRepository<'client> {
+impl<'a> OverrideLoginIdRepository for DynamoDbAuthUserRepository<'a> {
     async fn lookup_user(
         &self,
         login_id: &LoginId,
@@ -100,7 +100,9 @@ impl<'client> OverrideLoginIdRepository for DynamoDbAuthUserRepository<'client> 
     }
 
     async fn check_login_id_registered(&self, login_id: &LoginId) -> Result<bool, RepositoryError> {
-        Ok(self.login_id.get_user_id(login_id.clone()).await?.is_some())
+        self.login_id
+            .check_login_id_registered(login_id.clone())
+            .await
     }
 
     async fn override_login_id(
@@ -120,7 +122,7 @@ impl<'client> OverrideLoginIdRepository for DynamoDbAuthUserRepository<'client> 
 }
 
 #[async_trait::async_trait]
-impl<'client> ChangePasswordRepository for DynamoDbAuthUserRepository<'client> {
+impl<'a> ChangePasswordRepository for DynamoDbAuthUserRepository<'a> {
     async fn lookup_password(
         &self,
         user_id: &AuthUserId,
@@ -138,7 +140,7 @@ impl<'client> ChangePasswordRepository for DynamoDbAuthUserRepository<'client> {
 }
 
 #[async_trait::async_trait]
-impl<'client> OverridePasswordRepository for DynamoDbAuthUserRepository<'client> {
+impl<'a> OverridePasswordRepository for DynamoDbAuthUserRepository<'a> {
     async fn lookup_user_id(
         &self,
         login_id: &LoginId,
@@ -156,9 +158,11 @@ impl<'client> OverridePasswordRepository for DynamoDbAuthUserRepository<'client>
 }
 
 #[async_trait::async_trait]
-impl<'client> RegisterAuthUserAccountRepository for DynamoDbAuthUserRepository<'client> {
+impl<'a> RegisterAuthUserAccountRepository for DynamoDbAuthUserRepository<'a> {
     async fn check_login_id_registered(&self, login_id: &LoginId) -> Result<bool, RepositoryError> {
-        Ok(self.login_id.get_user_id(login_id.clone()).await?.is_some())
+        self.login_id
+            .check_login_id_registered(login_id.clone())
+            .await
     }
 
     async fn register_user(
@@ -195,7 +199,7 @@ impl<'client> RegisterAuthUserAccountRepository for DynamoDbAuthUserRepository<'
 }
 
 #[async_trait::async_trait]
-impl<'client> ModifyAuthUserAccountRepository for DynamoDbAuthUserRepository<'client> {
+impl<'a> ModifyAuthUserAccountRepository for DynamoDbAuthUserRepository<'a> {
     async fn lookup_user_id(
         &self,
         login_id: &LoginId,
@@ -220,30 +224,37 @@ impl<'client> ModifyAuthUserAccountRepository for DynamoDbAuthUserRepository<'cl
 }
 
 #[async_trait::async_trait]
-impl<'client> UnregisterAuthUserAccountRepository for DynamoDbAuthUserRepository<'client> {
-    async fn unregister_user(&self, login_id: &LoginId) -> Result<(), RepositoryError> {
-        if let Some(user_id) = self.login_id.get_user_id(login_id.clone()).await? {
-            let entry = self.user.get_entry(user_id.clone()).await?;
-            self.user.delete_entry(user_id.clone()).await?;
+impl<'a> UnregisterAuthUserAccountRepository for DynamoDbAuthUserRepository<'a> {
+    async fn lookup_user_id(
+        &self,
+        login_id: &LoginId,
+    ) -> Result<Option<AuthUserId>, RepositoryError> {
+        self.login_id.get_user_id(login_id.clone()).await
+    }
 
-            {
-                let result = self.login_id.delete_entry(login_id.clone()).await;
-                if result.is_err() {
-                    if let Some(entry) = entry {
-                        self.user.put_entry(user_id, entry).await?;
-                    }
+    async fn unregister_user(
+        &self,
+        user_id: &AuthUserId,
+        login_id: &LoginId,
+    ) -> Result<(), RepositoryError> {
+        let entry = self.user.get_entry(user_id.clone()).await?;
+        self.user.delete_entry(user_id.clone()).await?;
+
+        {
+            let result = self.login_id.delete_entry(login_id.clone()).await;
+            if result.is_err() {
+                if let Some(entry) = entry {
+                    self.user.put_entry(user_id.clone(), entry).await?;
                 }
-                result?;
             }
-
-            // TODO ticket repository と統合してここで user_id に紐づく ticket を全て削除する
+            result?;
         }
         Ok(())
     }
 }
 
 #[async_trait::async_trait]
-impl<'client> ChangeResetTokenDestinationRepository for DynamoDbAuthUserRepository<'client> {
+impl<'a> ChangeResetTokenDestinationRepository for DynamoDbAuthUserRepository<'a> {
     async fn lookup_destination(
         &self,
         login_id: &LoginId,
@@ -265,7 +276,7 @@ impl<'client> ChangeResetTokenDestinationRepository for DynamoDbAuthUserReposito
 }
 
 #[async_trait::async_trait]
-impl<'client> RegisterResetTokenRepository for DynamoDbAuthUserRepository<'client> {
+impl<'a> RegisterResetTokenRepository for DynamoDbAuthUserRepository<'a> {
     async fn lookup_user(
         &self,
         login_id: &LoginId,
@@ -296,7 +307,7 @@ impl<'client> RegisterResetTokenRepository for DynamoDbAuthUserRepository<'clien
 }
 
 #[async_trait::async_trait]
-impl<'client> ResetPasswordRepository for DynamoDbAuthUserRepository<'client> {
+impl<'a> ResetPasswordRepository for DynamoDbAuthUserRepository<'a> {
     async fn lookup_reset_token_entry(
         &self,
         reset_token: &ResetToken,
@@ -326,8 +337,8 @@ impl<'client> ResetPasswordRepository for DynamoDbAuthUserRepository<'client> {
         reset_password(self, user_id, reset_token, new_password, reset_at).await
     }
 }
-async fn reset_password<'client>(
-    repository: &DynamoDbAuthUserRepository<'client>,
+async fn reset_password<'a>(
+    repository: &DynamoDbAuthUserRepository<'a>,
     user_id: AuthUserId,
     reset_token: ResetToken,
     new_password: HashedPassword,
@@ -347,7 +358,7 @@ async fn reset_password<'client>(
 }
 
 #[async_trait::async_trait]
-impl<'client> SearchAuthUserAccountRepository for DynamoDbAuthUserRepository<'client> {
+impl<'a> SearchAuthUserAccountRepository for DynamoDbAuthUserRepository<'a> {
     async fn search(
         &self,
         filter: SearchAuthUserAccountFilter,
@@ -355,8 +366,8 @@ impl<'client> SearchAuthUserAccountRepository for DynamoDbAuthUserRepository<'cl
         search_user_account(&self, filter).await
     }
 }
-async fn search_user_account<'client>(
-    repository: &DynamoDbAuthUserRepository<'client>,
+async fn search_user_account<'a>(
+    repository: &DynamoDbAuthUserRepository<'a>,
     filter: SearchAuthUserAccountFilter,
 ) -> Result<AuthUserAccountSearch, RepositoryError> {
     // 業務用アプリケーションなので、ユーザー数は 100を超えない

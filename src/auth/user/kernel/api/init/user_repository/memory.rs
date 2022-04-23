@@ -350,13 +350,20 @@ impl<'a> RegisterAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
 
 #[async_trait::async_trait]
 impl<'a> UnregisterAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
-    async fn unregister_user(&self, login_id: &LoginId) -> Result<(), RepositoryError> {
-        if let Some(user_id) = self.login_id.get_user_id(login_id) {
-            self.user.remove_entry(&user_id);
-            self.login_id.remove_entry(login_id);
+    async fn lookup_user_id(
+        &self,
+        login_id: &LoginId,
+    ) -> Result<Option<AuthUserId>, RepositoryError> {
+        Ok(self.login_id.get_user_id(login_id))
+    }
 
-            // TODO ticket repository と統合してここで user_id に紐づく ticket を全て削除する
-        }
+    async fn unregister_user(
+        &self,
+        user_id: &AuthUserId,
+        login_id: &LoginId,
+    ) -> Result<(), RepositoryError> {
+        self.user.remove_entry(user_id);
+        self.login_id.remove_entry(login_id);
         Ok(())
     }
 }

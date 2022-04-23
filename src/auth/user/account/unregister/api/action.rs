@@ -5,7 +5,8 @@ use crate::auth::ticket::validate::method::{
 };
 
 use crate::auth::user::account::unregister::infra::{
-    UnregisterAuthUserAccountRepository, UnregisterAuthUserAccountRequestDecoder,
+    DiscardAuthTicketRepository, UnregisterAuthUserAccountRepository,
+    UnregisterAuthUserAccountRequestDecoder,
 };
 
 use crate::{
@@ -39,10 +40,12 @@ impl std::fmt::Display for UnregisterAuthUserAccountState {
 pub trait UnregisterAuthUserAccountMaterial {
     type Validate: ValidateAuthTokenInfra;
 
+    type TicketRepository: DiscardAuthTicketRepository;
     type UserRepository: UnregisterAuthUserAccountRepository;
 
     fn validate(&self) -> &Self::Validate;
 
+    fn ticket_repository(&self) -> &Self::TicketRepository;
     fn user_repository(&self) -> &Self::UserRepository;
 }
 
@@ -125,12 +128,24 @@ async fn unregister_user<S>(
 ) -> MethodResult<S> {
     let login_id = fields.map_err(|err| post(UnregisterAuthUserAccountEvent::Invalid(err)))?;
 
+    let ticket_repository = infra.ticket_repository();
     let user_repository = infra.user_repository();
 
-    user_repository
-        .unregister_user(&login_id)
+    if let Some(user_id) = user_repository
+        .lookup_user_id(&login_id)
         .await
-        .map_err(|err| post(UnregisterAuthUserAccountEvent::RepositoryError(err)))?;
+        .map_err(|err| post(UnregisterAuthUserAccountEvent::RepositoryError(err)))?
+    {
+        user_repository
+            .unregister_user(&user_id, &login_id)
+            .await
+            .map_err(|err| post(UnregisterAuthUserAccountEvent::RepositoryError(err)))?;
+
+        ticket_repository
+            .discard_all(&user_id)
+            .await
+            .map_err(|err| post(UnregisterAuthUserAccountEvent::RepositoryError(err)))?;
+    }
 
     Ok(post(UnregisterAuthUserAccountEvent::Success))
 }
