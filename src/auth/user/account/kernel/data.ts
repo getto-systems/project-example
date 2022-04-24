@@ -6,4 +6,7 @@ export type AuthUserAccount = Readonly<{
     loginId: LoginId
     grantedRoles: readonly AuthRole[]
     resetTokenDestination: ResetTokenDestination
+    memo: AuthUserMemo
 }>
+
+export type AuthUserMemo = string & { AuthUserMemo: never }

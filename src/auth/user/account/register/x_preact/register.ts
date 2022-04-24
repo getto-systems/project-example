@@ -9,7 +9,8 @@ import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
 import { LoginIdField } from "../../../login_id/input/x_preact/input"
-import { GrantedRolesField } from "../../input/x_preact/granted_roles"
+import { AuthUserMemoField } from "../../input/memo/x_preact/input"
+import { GrantedRolesField } from "../../input/granted_roles/x_preact/input"
 import { ResetTokenDestinationField } from "../../../password/reset/token_destination/input/x_preact/destination"
 import { ClearChangesButton } from "../../../../../core/x_preact/button/clear_changes_button"
 import { RegisterButton } from "../../../../../core/x_preact/button/register_button"
@@ -34,6 +35,7 @@ export function RegisterAuthUserAccount(props: Props): VNode {
             title: "新規ユーザー登録",
             body: [
                 h(LoginIdField, { field: props.register.loginId }),
+                h(AuthUserMemoField, { field: props.register.memo }),
                 h(GrantedRolesField, { field: props.register.grantedRoles }),
                 h(ResetTokenDestinationField, { field: props.register.resetTokenDestination }),
             ],

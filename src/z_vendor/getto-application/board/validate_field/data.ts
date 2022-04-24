@@ -1,3 +1,4 @@
+// TODO kernel/data の ConvertBoardResult と名前が紛らわしいのでなんとかしたい
 export type ConvertBoardFieldResult<T, E> =
     | Readonly<{ valid: true; value: T }>
     | Readonly<{ valid: false; err: readonly E[] }>

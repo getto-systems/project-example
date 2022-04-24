@@ -10,6 +10,7 @@ import { initSearchAuthUserAccountAction, SearchAuthUserAccountAction } from "./
 import { readSearchAuthUserAccountSortKey } from "./convert"
 import { restoreLoginId } from "../../login_id/input/convert"
 import { restoreResetTokenDestination } from "../../password/reset/token_destination/kernel/convert"
+import { restoreAuthUserMemo } from "../input/memo/convert"
 
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 import { SearchAuthUserAccountRemote, SearchAuthUserAccountRemoteResult } from "./infra"
@@ -104,11 +105,13 @@ test("focus / close", async () => {
             loginId: restoreLoginId("user-1"),
             grantedRoles: [],
             resetTokenDestination: { type: "none" },
+            memo: restoreAuthUserMemo("memo"),
         }
         const another: AuthUserAccount = {
             loginId: restoreLoginId("user-another"),
             grantedRoles: [],
             resetTokenDestination: { type: "none" },
+            memo: restoreAuthUserMemo("memo"),
         }
 
         resource.search.focused.focus(user)
@@ -181,6 +184,7 @@ test("update user", async () => {
             type: "email",
             email: "user@example.com",
         }),
+        memo: restoreAuthUserMemo("memo"),
     }
 
     await runner(async () => {
@@ -312,11 +316,13 @@ const standard_response: SearchAuthUserAccountRemoteResponse = {
             loginId: restoreLoginId("user-1"),
             grantedRoles: [],
             resetTokenDestination: { type: "none" },
+            memo: restoreAuthUserMemo("memo"),
         },
         {
             loginId: restoreLoginId("user-2"),
             grantedRoles: [],
             resetTokenDestination: { type: "none" },
+            memo: restoreAuthUserMemo("memo"),
         },
     ],
 }

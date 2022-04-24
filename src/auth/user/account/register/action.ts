@@ -5,7 +5,10 @@ import {
 
 import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 
-import { initInputGrantedRolesAction, InputGrantedRolesAction } from "../input/action"
+import {
+    initInputGrantedAuthRolesAction,
+    InputGrantedAuthRolesAction,
+} from "../input/granted_roles/action"
 import {
     ValidateBoardAction,
     initValidateBoardAction,
@@ -19,6 +22,7 @@ import {
     initInputResetTokenDestinationAction,
     InputResetTokenDestinationAction,
 } from "../../password/reset/token_destination/input/action"
+import { initInputAuthUserMemoAction, InputAuthUserMemoAction } from "../input/memo/action"
 
 import { RegisterAuthUserAccountRemote } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
@@ -34,8 +38,9 @@ export interface RegisterAuthUserAccountAction
     readonly list: ListRegisteredAuthUserAccountAction
 
     readonly loginId: InputLoginIdAction
-    readonly grantedRoles: InputGrantedRolesAction
+    readonly grantedRoles: InputGrantedAuthRolesAction
     readonly resetTokenDestination: InputResetTokenDestinationAction
+    readonly memo: InputAuthUserMemoAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -100,8 +105,9 @@ class Action
     readonly list: ListAction
 
     readonly loginId: InputLoginIdAction
-    readonly grantedRoles: InputGrantedRolesAction
+    readonly grantedRoles: InputGrantedAuthRolesAction
     readonly resetTokenDestination: InputResetTokenDestinationAction
+    readonly memo: InputAuthUserMemoAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -115,17 +121,19 @@ class Action
                 this.loginId.terminate()
                 this.grantedRoles.terminate()
                 this.resetTokenDestination.terminate()
+                this.memo.terminate()
                 this.validate.terminate()
                 this.observe.terminate()
             },
         })
         this.material = material
 
-        const fields = ["login-id", "granted-roles", "reset-token-destination"] as const
+        const fields = ["login-id", "granted-roles", "reset-token-destination", "memo"] as const
 
         const loginId = initInputLoginIdAction()
-        const grantedRoles = initInputGrantedRolesAction()
+        const grantedRoles = initInputGrantedAuthRolesAction()
         const resetTokenDestination = initInputResetTokenDestinationAction()
+        const memo = initInputAuthUserMemoAction()
         const { validate, validateChecker } = initValidateBoardAction(
             { fields },
             {
@@ -134,8 +142,13 @@ class Action
                         loginId: loginId.checker.check(),
                         grantedRoles: grantedRoles.convert(),
                         resetTokenDestination: resetTokenDestination.checker.check(),
+                        memo: memo.convert(),
                     }
-                    if (!result.loginId.valid || !result.resetTokenDestination.valid) {
+                    if (
+                        !result.loginId.valid ||
+                        !result.resetTokenDestination.valid ||
+                        !result.memo.valid
+                    ) {
                         return { valid: false }
                     }
                     return {
@@ -144,6 +157,7 @@ class Action
                             loginId: result.loginId.value,
                             grantedRoles: result.grantedRoles,
                             resetTokenDestination: result.resetTokenDestination.value,
+                            memo: result.memo.value,
                         },
                     }
                 },
@@ -156,6 +170,7 @@ class Action
         this.loginId = loginId.input
         this.grantedRoles = grantedRoles.input
         this.resetTokenDestination = resetTokenDestination.input
+        this.memo = memo.input
         this.validate = validate
         this.observe = observe
         this.convert = () => validateChecker.get()
@@ -175,6 +190,12 @@ class Action
         })
         this.resetTokenDestination.observe.subscriber.subscribe((result) => {
             observeChecker.update("reset-token-destination", result.hasChanged)
+        })
+        this.memo.validate.subscriber.subscribe((result) => {
+            validateChecker.update("memo", result.valid)
+        })
+        this.memo.observe.subscriber.subscribe((result) => {
+            observeChecker.update("memo", result.hasChanged)
         })
 
         this.clear()

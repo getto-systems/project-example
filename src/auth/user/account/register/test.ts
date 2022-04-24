@@ -7,14 +7,17 @@ import {
 
 import { RegisterAuthUserAccountAction, initRegisterAuthUserAccountAction } from "./action"
 
+import { restoreLoginId } from "../../login_id/input/convert"
+import { restoreResetTokenDestination } from "../../password/reset/token_destination/kernel/convert"
+import { restoreAuthUserMemo } from "../input/memo/convert"
+
 import { RegisterAuthUserAccountRemote } from "./infra"
 import {
     BoardValueStore,
     MultipleBoardValueStore,
 } from "../../../../z_vendor/getto-application/board/input/infra"
+
 import { AuthUserAccount } from "../kernel/data"
-import { restoreLoginId } from "../../login_id/input/convert"
-import { restoreResetTokenDestination } from "../../password/reset/token_destination/kernel/convert"
 
 const VALID_INFO = {
     loginId: "login-id",
@@ -113,11 +116,13 @@ test("focus / close", async () => {
                 type: "email",
                 email: "user@example.com",
             }),
+            memo: restoreAuthUserMemo("memo"),
         }
         const another: AuthUserAccount = {
             loginId: restoreLoginId("user-another"),
             grantedRoles: [],
             resetTokenDestination: { type: "none" },
+            memo: restoreAuthUserMemo("memo"),
         }
 
         resource.register.list.focused.focus(user)
@@ -160,6 +165,7 @@ test("update user", async () => {
         loginId: restoreLoginId("login-id"),
         grantedRoles: [],
         resetTokenDestination: { type: "none" },
+        memo: restoreAuthUserMemo("memo"),
     }
 
     await runner(async () => {

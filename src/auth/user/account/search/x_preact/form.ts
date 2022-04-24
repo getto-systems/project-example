@@ -10,7 +10,7 @@ import { SearchButton } from "../../../../../core/x_preact/button/search_button"
 import { ClearSearchButton } from "../../../../../core/x_preact/button/clear_search_button"
 
 import { SearchAuthUserAccountAction } from "../action"
-import { SearchGrantedRolesField } from "../../input/x_preact/granted_roles_search"
+import { SearchGrantedRolesField } from "../../input/granted_roles/x_preact/search"
 
 type Props = Readonly<{
     search: SearchAuthUserAccountAction

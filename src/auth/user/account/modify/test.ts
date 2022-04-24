@@ -5,12 +5,13 @@ import { mockMultipleBoardValueStore } from "../../../../z_vendor/getto-applicat
 import { ModifyAuthUserAccountAction, initModifyAuthUserAccountAction } from "./action"
 
 import { restoreLoginId } from "../../login_id/input/convert"
+import { restoreAuthUserMemo } from "../input/memo/convert"
 
 import { ModifyAuthUserAccountRemote } from "./infra"
 import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
 import { LoginId } from "../../login_id/kernel/data"
-import { AuthRole } from "../../kernel/data"
+import { ModifyAuthUserAccountFields } from "./data"
 
 const VALID_INFO = {
     grantedRoles: ["user"],
@@ -95,7 +96,7 @@ function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
     store: Readonly<{
         grantedRoles: MultipleBoardValueStore
     }>
-    user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>
+    user: Readonly<{ loginId: LoginId }> & ModifyAuthUserAccountFields
 }> {
     const resource = {
         modify: initModifyAuthUserAccountAction({
@@ -118,6 +119,7 @@ function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
         user: {
             loginId: restoreLoginId("user-id"),
             grantedRoles: [],
+            memo: restoreAuthUserMemo("memo"),
         },
     }
 }

@@ -1,26 +1,26 @@
 import { html } from "htm/preact"
 import { h, VNode } from "preact"
 
-import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
-import { useEditableState } from "../../../../../z_vendor/getto-application/board/editable/x_preact/hooks"
+import { useEditableState } from "../../../../../../z_vendor/getto-application/board/editable/x_preact/hooks"
 
-import { field } from "../../../../../z_vendor/getto-css/preact/design/form"
-import { label_gray, label_info } from "../../../../../z_vendor/getto-css/preact/design/highlight"
+import { field } from "../../../../../../z_vendor/getto-css/preact/design/form"
+import { label_gray, label_info } from "../../../../../../z_vendor/getto-css/preact/design/highlight"
 
 import {
     CheckboxBoard,
     CheckboxBoardContent,
-} from "../../../../../z_vendor/getto-application/board/input/x_preact/checkbox"
+} from "../../../../../../z_vendor/getto-application/board/input/x_preact/checkbox"
 
-import { ALL_AUTH_ROLES, authRoleLabel } from "../../../../../x_content/role"
+import { ALL_AUTH_ROLES, authRoleLabel } from "../../../../../../x_content/role"
 
-import { InputGrantedRolesAction } from "../action"
-import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
+import { InputGrantedAuthRolesAction } from "../action"
+import { EditableBoardAction } from "../../../../../../z_vendor/getto-application/board/editable/action"
 
-import { AuthRole } from "../../../kernel/data"
+import { AuthRole } from "../../../../kernel/data"
 
-type Props = Readonly<{ field: InputGrantedRolesAction }> &
+type Props = Readonly<{ field: InputGrantedAuthRolesAction }> &
     Partial<{
         title: VNodeContent
         help: readonly VNodeContent[]

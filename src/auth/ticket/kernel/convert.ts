@@ -1,4 +1,4 @@
-import { toGrantedRoles } from "../../user/account/input/convert"
+import { toGrantedRoles } from "../../user/account/input/granted_roles/convert"
 
 import { RepositoryConverter } from "../../../z_lib/ui/repository/infra"
 import { AuthTicketRepositoryValue } from "./infra"

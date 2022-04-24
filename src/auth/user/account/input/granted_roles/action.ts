@@ -1,30 +1,30 @@
-import { ApplicationAction } from "../../../../z_vendor/getto-application/action/action"
+import { ApplicationAction } from "../../../../../z_vendor/getto-application/action/action"
 import {
     initMultipleInputBoardAction,
     InputBoardAction,
-} from "../../../../z_vendor/getto-application/board/input/action"
+} from "../../../../../z_vendor/getto-application/board/input/action"
 import {
     initObserveBoardFieldAction,
     ObserveBoardFieldAction,
-} from "../../../../z_vendor/getto-application/board/observe_field/action"
+} from "../../../../../z_vendor/getto-application/board/observe_field/action"
 
-import { initBoardFieldObserver } from "../../../../z_vendor/getto-application/board/observe_field/init/observer"
+import { initBoardFieldObserver } from "../../../../../z_vendor/getto-application/board/observe_field/init/observer"
 import { toGrantedRoles } from "./convert"
-import { isSameMultipleBoardValue } from "../../../../z_vendor/getto-application/board/observe_field/helper"
+import { isSameMultipleBoardValue } from "../../../../../z_vendor/getto-application/board/observe_field/helper"
 
-import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
+import { MultipleBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/infra"
 
-import { AuthRole } from "../../kernel/data"
+import { AuthRole } from "../../../kernel/data"
 
-export interface InputGrantedRolesAction extends ApplicationAction {
+export interface InputGrantedAuthRolesAction extends ApplicationAction {
     readonly grantedRoles: InputBoardAction<MultipleBoardValueStore>
     readonly observe: ObserveBoardFieldAction
 
     reset(grantedRoles: readonly AuthRole[]): void
 }
 
-export function initInputGrantedRolesAction(): Readonly<{
-    input: InputGrantedRolesAction
+export function initInputGrantedAuthRolesAction(): Readonly<{
+    input: InputGrantedAuthRolesAction
     convert: { (): readonly AuthRole[] }
 }> {
     const input = new InputAction()
@@ -34,7 +34,7 @@ export function initInputGrantedRolesAction(): Readonly<{
     }
 }
 
-class InputAction implements InputGrantedRolesAction {
+class InputAction implements InputGrantedAuthRolesAction {
     readonly grantedRoles: InputBoardAction<MultipleBoardValueStore>
     readonly observe: ObserveBoardFieldAction
 

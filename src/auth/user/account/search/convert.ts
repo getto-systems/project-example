@@ -15,7 +15,7 @@ import {
 import { ReadSearchSortKeyResult } from "../../../../z_lib/ui/search/sort/data"
 import { DetectLoginIdResult } from "./infra"
 import { AuthUserAccount } from "../kernel/data"
-import { toGrantedRoles } from "../input/convert"
+import { toGrantedRoles } from "../input/granted_roles/convert"
 
 const SEARCH_LOGIN_ID = "search-login-id" as const
 const SEARCH_GRANTED_ROLES = "search-granted-roles" as const

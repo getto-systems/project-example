@@ -1,5 +1,6 @@
-import { ALL_AUTH_ROLES } from "../../../../x_content/role"
-import { AuthRole } from "../../kernel/data"
+import { ALL_AUTH_ROLES } from "../../../../../x_content/role"
+
+import { AuthRole } from "../../../kernel/data"
 
 export function toGrantedRoles(roles: readonly string[]): readonly AuthRole[] {
     const converted: AuthRole[] = []
