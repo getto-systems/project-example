@@ -5,7 +5,12 @@ export const docs_auth_user_account: DocsDescription = {
     descriptions: [
         {
             title: "登録",
-            description: ["ログインID、権限、パスワード、リセットトークン送信先を指定して登録する"],
+            description: [
+                "下記項目を指定して登録する",
+                "・ログインID",
+                "・権限",
+                "・リセットトークン送信先",
+            ],
         },
         {
             title: "権限",
@@ -17,7 +22,11 @@ export const docs_auth_user_account: DocsDescription = {
         },
         {
             title: "削除",
-            description: ["ユーザーを削除する", "削除されたユーザーはその後許可証検証が通らない"],
+            description: [
+                "ユーザーを削除する",
+                "削除されたユーザーはその後許可証検証が通らない",
+                "削除された時点でそのユーザーはログアウトされる",
+            ],
         },
     ],
 }
