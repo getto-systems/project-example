@@ -131,6 +131,7 @@ test("focus / close", async () => {
                     loginId: "user-1",
                     grantedRoles: [],
                     resetTokenDestination: { type: "none" },
+                    memo: "memo",
                 },
             },
             { type: "initial" },
@@ -153,6 +154,7 @@ test("detect user", async () => {
                     loginId: "user-1",
                     grantedRoles: [],
                     resetTokenDestination: { type: "none" },
+                    memo: "memo",
                 },
             },
         ])

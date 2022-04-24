@@ -39,7 +39,7 @@ test("terminate", async () => {
 function standard() {
     const { input: action } = initInputGrantedAuthRolesAction()
     const store = {
-        grantedRoles: mockMultipleBoardValueStore(action.grantedRoles),
+        grantedRoles: mockMultipleBoardValueStore(action.input),
     }
 
     return { action, store }

@@ -44,7 +44,7 @@ export function GrantedRolesField(props: Props): VNode {
             return h(AuthRoleLabels, { ...editableState.data })
         }
         return h(CheckboxBoard, {
-            input: props.field.grantedRoles,
+            input: props.field.input,
             options: ALL_AUTH_ROLES.map(roleCheckbox),
         })
     }

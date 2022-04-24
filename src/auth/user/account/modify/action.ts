@@ -94,7 +94,7 @@ class Action
         const memo = initInputAuthUserMemoAction()
         const grantedRoles = initInputGrantedAuthRolesAction()
 
-        this.convert = (): ConvertBoardResult<ModifyAuthUserAccountFields> => {
+        const convert = (): ConvertBoardResult<ModifyAuthUserAccountFields> => {
             const result = {
                 grantedRoles: grantedRoles.convert(),
                 memo: memo.convert(),
@@ -114,7 +114,8 @@ class Action
         const { validate, validateChecker } = initValidateBoardAction(
             { fields },
             {
-                converter: () => this.convert(),
+                // TODO converter => convert がいいかな
+                converter: convert,
             },
         )
         const { observe, observeChecker } = initObserveBoardAction({ fields })
@@ -123,6 +124,7 @@ class Action
         this.grantedRoles = grantedRoles.input
         this.validate = validate
         this.observe = observe
+        this.convert = convert
 
         this.memo.validate.subscriber.subscribe((result) => {
             validateChecker.update("memo", result.valid)
@@ -135,7 +137,8 @@ class Action
         })
     }
 
-    reset(user: Readonly<{ grantedRoles: readonly AuthRole[] }>): ModifyAuthUserAccountState {
+    reset(user: ModifyAuthUserAccountFields): ModifyAuthUserAccountState {
+        this.memo.reset(user.memo)
         this.grantedRoles.reset(user.grantedRoles)
         this.observe.clear()
         return this.currentState()

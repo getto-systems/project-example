@@ -32,6 +32,7 @@ import { RegisterAuthUserAccountError } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { AuthUserAccount } from "../kernel/data"
 import { LoginId } from "../../login_id/kernel/data"
+import { restoreAuthUserMemo } from "../input/memo/convert"
 
 export interface RegisterAuthUserAccountAction
     extends StatefulApplicationAction<RegisterAuthUserAccountState> {
@@ -205,6 +206,7 @@ class Action
         this.loginId.clear()
         this.grantedRoles.reset([])
         this.resetTokenDestination.reset({ type: "none" })
+        this.memo.reset(restoreAuthUserMemo(""))
         this.validate.clear()
         this.observe.clear()
         return this.currentState()

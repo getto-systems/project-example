@@ -28,7 +28,7 @@ test("validate; invalid : too-long", async () => {
         store.memo.set("a".repeat(255 + 1))
         return action.validate.currentState()
     }).then((stack) => {
-        expect(stack).toEqual([{ valid: false, err: [{ type: "too-long", maxLength: 100 }] }])
+        expect(stack).toEqual([{ valid: false, err: [{ type: "too-long", maxLength: 255 }] }])
     })
 })
 

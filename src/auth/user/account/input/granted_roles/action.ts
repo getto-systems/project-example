@@ -17,7 +17,7 @@ import { MultipleBoardValueStore } from "../../../../../z_vendor/getto-applicati
 import { AuthRole } from "../../../kernel/data"
 
 export interface InputGrantedAuthRolesAction extends ApplicationAction {
-    readonly grantedRoles: InputBoardAction<MultipleBoardValueStore>
+    readonly input: InputBoardAction<MultipleBoardValueStore>
     readonly observe: ObserveBoardFieldAction
 
     reset(grantedRoles: readonly AuthRole[]): void
@@ -35,7 +35,7 @@ export function initInputGrantedAuthRolesAction(): Readonly<{
 }
 
 class InputAction implements InputGrantedAuthRolesAction {
-    readonly grantedRoles: InputBoardAction<MultipleBoardValueStore>
+    readonly input: InputBoardAction<MultipleBoardValueStore>
     readonly observe: ObserveBoardFieldAction
 
     readonly store: Readonly<{
@@ -53,7 +53,7 @@ class InputAction implements InputGrantedAuthRolesAction {
             }),
         })
 
-        this.grantedRoles = grantedRoles.input
+        this.input = grantedRoles.input
         this.observe = observe
 
         this.store = {
