@@ -5,8 +5,11 @@ import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
 import { useEditableState } from "../../../../../../z_vendor/getto-application/board/editable/x_preact/hooks"
 
-import { field } from "../../../../../../z_vendor/getto-css/preact/design/form"
-import { label_gray, label_info } from "../../../../../../z_vendor/getto-css/preact/design/highlight"
+import { inputField, label } from "../../../../../../z_vendor/getto-css/preact/design/form"
+import {
+    label_gray,
+    label_info,
+} from "../../../../../../z_vendor/getto-css/preact/design/highlight"
 
 import {
     CheckboxBoard,
@@ -33,21 +36,18 @@ type Props = Readonly<{ field: InputGrantedAuthRolesAction }> &
 export function GrantedRolesField(props: Props): VNode {
     const editableState = useEditableState(props.edit)
 
-    return field({
+    return inputField({
         title: props.title || "権限",
         help: props.help,
-        body: body(),
+        label,
+        state: { type: "normal" },
+        body: editableState.isEditable
+            ? h(CheckboxBoard, {
+                  input: props.field.input,
+                  options: ALL_AUTH_ROLES.map(roleCheckbox),
+              })
+            : h(AuthRoleLabels, { ...editableState.data }),
     })
-
-    function body(): VNodeContent {
-        if (!editableState.isEditable) {
-            return h(AuthRoleLabels, { ...editableState.data })
-        }
-        return h(CheckboxBoard, {
-            input: props.field.input,
-            options: ALL_AUTH_ROLES.map(roleCheckbox),
-        })
-    }
 
     function roleCheckbox(role: AuthRole): CheckboxBoardContent {
         return {

@@ -3,8 +3,7 @@ import { h, VNode } from "preact"
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
-    field,
-    field_error,
+    inputField,
     label_password_fill,
 } from "../../../../../z_vendor/getto-css/preact/design/form"
 
@@ -12,9 +11,9 @@ import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
 import { InputBoard } from "../../../../../z_vendor/getto-application/board/input/x_preact/input"
 
-import { InputPasswordAction } from "../action"
+import { textValidationError } from "../../../../../z_lib/ui/validate/x_plain/error"
 
-import { ValidatePasswordError } from "../data"
+import { InputPasswordAction } from "../action"
 
 type Props = Readonly<{ field: InputPasswordAction }> &
     Partial<{
@@ -23,43 +22,21 @@ type Props = Readonly<{ field: InputPasswordAction }> &
         autocomplete: string
     }>
 export function PasswordField(props: Props): VNode {
-    const state = useApplicationAction(props.field.validate)
+    const validateState = useApplicationAction(props.field.validate)
 
-    // TODO 整理したい
-    return label_password_fill(content())
-
-    function title() {
-        if (props.title) {
-            return props.title
-        }
-        return "パスワード"
-    }
-    function content() {
-        const content = {
-            title: title(),
-            body: h(InputBoard, {
-                type: "password",
-                input: props.field.input,
-                autocomplete: props.autocomplete,
-            }),
-            help: [...help(), characterHelp()],
-        }
-
-        if (state.valid) {
-            return field(content)
-        } else {
-            return field_error({
-                ...content,
-                notice: passwordValidationError(state.err),
-            })
-        }
-    }
-    function help(): readonly VNodeContent[] {
-        if (props.help) {
-            return props.help
-        }
-        return []
-    }
+    return inputField({
+        title: props.title || "パスワード",
+        help: [...(props.help || []), characterHelp()],
+        label: label_password_fill,
+        state: validateState.valid
+            ? { type: "normal" }
+            : { type: "error", notice: textValidationError(validateState.err) },
+        body: h(InputBoard, {
+            type: "password",
+            input: props.field.input,
+            autocomplete: props.autocomplete,
+        }),
+    })
 
     function characterHelp(): string {
         if (props.field.checkCharacter().multiByte) {
@@ -68,16 +45,4 @@ export function PasswordField(props: Props): VNode {
             return ""
         }
     }
-}
-
-function passwordValidationError(err: readonly ValidatePasswordError[]): readonly VNodeContent[] {
-    return err.map((err) => {
-        switch (err.type) {
-            case "empty":
-                return ["パスワードを入力してください"]
-
-            case "too-long":
-                return [`パスワードが長すぎます(${err.maxLength}文字以内)`]
-        }
-    })
 }

@@ -5,8 +5,7 @@ import { useApplicationAction } from "../../../../../../../z_vendor/getto-applic
 import { useEditableState } from "../../../../../../../z_vendor/getto-application/board/editable/x_preact/hooks"
 
 import {
-    field,
-    field_error,
+    inputField,
     label_text_fill,
 } from "../../../../../../../z_vendor/getto-css/preact/design/form"
 import { label_gray } from "../../../../../../../z_vendor/getto-css/preact/design/highlight"
@@ -24,6 +23,7 @@ import { EditableBoardAction } from "../../../../../../../z_vendor/getto-applica
 
 import { ValidateResetTokenDestinationError } from "../data"
 import { ResetTokenDestination } from "../../kernel/data"
+import { textValidationError } from "../../../../../../../z_lib/ui/validate/x_plain/error"
 
 type Props = Readonly<{
     field: InputResetTokenDestinationAction
@@ -42,61 +42,51 @@ export function ResetTokenDestinationField(props: Props): VNode {
     const editableState = useEditableState(props.edit)
     const validateState = useApplicationAction(props.field.validate)
 
-    const content = {
+    return inputField({
         title: props.title || "パスワードリセット用Eメール",
         help: props.help,
-        body: body(),
-    }
+        label: label_text_fill,
+        state: validateState.valid
+            ? { type: "normal" }
+            : { type: "error", notice: validationError(validateState.err) },
+        body: editableState.isEditable
+            ? [
+                  h(RadioBoard, {
+                      input: props.field.destinationType,
+                      name: "destinationType",
+                      options: [destinationRadio("email"), destinationRadio("none")],
+                  }),
+                  email(),
+              ]
+            : h(ResetTokenDestinationLabel, editableState.data),
+    })
 
-    if (editableState.isEditable && !validateState.valid) {
-        return field_error({ ...content, notice: validationError(validateState.err) })
-    }
-    return field(content)
+    function email(): VNode {
+        switch (state.type) {
+            case "none":
+                return html``
 
-    function body(): VNodeContent {
-        if (!editableState.isEditable) {
-            return h(ResetTokenDestinationLabel, editableState.data)
+            case "email":
+                return h(InputBoard, {
+                    type: "email",
+                    input: props.field.email,
+                    autocomplete: props.autocomplete,
+                })
         }
-        return [
-            label_text_fill(
-                h(RadioBoard, {
-                    input: props.field.destinationType,
-                    name: "destinationType",
-                    options: [destinationRadio("email"), destinationRadio("none")],
-                }),
-            ),
-            email(),
-        ]
+    }
+    function destinationRadio(destinationType: ResetTokenDestination["type"]): RadioBoardContent {
+        return {
+            key: destinationType,
+            value: destinationType,
+            label: (() => {
+                switch (destinationType) {
+                    case "none":
+                        return "無効"
 
-        function email(): VNode {
-            switch (state.type) {
-                case "none":
-                    return html``
-
-                case "email":
-                    return h(InputBoard, {
-                        type: "email",
-                        input: props.field.email,
-                        autocomplete: props.autocomplete,
-                    })
-            }
-        }
-        function destinationRadio(
-            destinationType: ResetTokenDestination["type"],
-        ): RadioBoardContent {
-            return {
-                key: destinationType,
-                value: destinationType,
-                label: (() => {
-                    switch (destinationType) {
-                        case "none":
-                            return "無効"
-
-                        case "email":
-                            return "有効"
-                    }
-                })(),
-            }
+                    case "email":
+                        return "有効"
+                }
+            })(),
         }
     }
 }
@@ -113,22 +103,17 @@ export function ResetTokenDestinationLabel({
     }
 }
 
-function validationError(
-    err: readonly ValidateResetTokenDestinationError[],
-): readonly VNodeContent[] {
-    return err.map((err) => {
-        switch (err.type) {
-            case "invalid-type":
-                return ["有効/無効を選択してください"]
+function validationError(err: ValidateResetTokenDestinationError): readonly VNodeContent[] {
+    switch (err.type) {
+        case "type":
+            return err.err.map((err) => {
+                switch (err.type) {
+                    case "invalid-type":
+                        return "有効/無効を選択してください"
+                }
+            })
 
-            case "empty-email":
-                return ["メールアドレスを入力してください"]
-
-            case "invalid-email":
-                return ["正しいメールアドレスを入力してください"]
-
-            case "too-long-email":
-                return [`メールアドレスが長すぎます(${err.maxLength}文字以内)`]
-        }
-    })
+        case "email":
+            return textValidationError(err.err)
+    }
 }

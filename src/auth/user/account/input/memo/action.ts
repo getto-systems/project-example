@@ -7,7 +7,6 @@ import {
     initObserveBoardFieldAction,
     ObserveBoardFieldAction,
 } from "../../../../../z_vendor/getto-application/board/observe_field/action"
-import { ValidateLoginIdAction } from "../../../login_id/input/action"
 
 import { initBoardFieldObserver } from "../../../../../z_vendor/getto-application/board/observe_field/init/observer"
 
@@ -16,13 +15,16 @@ import { authUserMemoBoardConverter } from "./convert"
 import { BoardValueStore } from "../../../../../z_vendor/getto-application/board/input/infra"
 
 import { AuthUserMemo } from "../../kernel/data"
-import { ValidateAuthUserMemoError } from "./data"
-import { ConvertBoardFieldResult } from "../../../../../z_vendor/getto-application/board/validate_field/data"
-import { initValidateBoardFieldAction } from "../../../../../z_vendor/getto-application/board/validate_field/action"
+import {
+    initValidateBoardFieldAction,
+    ValidateBoardFieldAction,
+} from "../../../../../z_vendor/getto-application/board/validate_field/action"
+import { ConvertAuthUserMemoResult } from "./data"
+import { ValidateTextError } from "../../../../../z_lib/ui/validate/data"
 
 export interface InputAuthUserMemoAction extends ApplicationAction {
     readonly input: InputBoardAction<BoardValueStore>
-    readonly validate: ValidateLoginIdAction
+    readonly validate: ValidateBoardFieldAction<readonly ValidateTextError[]>
     readonly observe: ObserveBoardFieldAction
 
     reset(memo: AuthUserMemo): void
@@ -30,61 +32,42 @@ export interface InputAuthUserMemoAction extends ApplicationAction {
 
 export function initInputAuthUserMemoAction(): Readonly<{
     input: InputAuthUserMemoAction
-    convert: { (): ConvertBoardFieldResult<AuthUserMemo, ValidateAuthUserMemoError> }
+    convert: { (): ConvertAuthUserMemoResult }
 }> {
-    const input = new InputAction()
+    const memo = initInputBoardAction()
+
+    const convert = () => authUserMemoBoardConverter(memo.store.get())
+
+    const { validate, checker } = initValidateBoardFieldAction({
+        converter: convert,
+    })
+    const observe = initObserveBoardFieldAction({
+        observer: initBoardFieldObserver({
+            current: () => memo.store.get(),
+        }),
+    })
+
+    memo.subscriber.subscribe(() => {
+        checker.check()
+        observe.check()
+    })
+
     return {
-        input,
-        convert: () => input.convert(),
-    }
-}
+        input: {
+            terminate: () => {
+                memo.subscriber.terminate()
+                validate.terminate()
+                observe.terminate()
+            },
 
-class InputAction implements InputAuthUserMemoAction {
-    readonly input: InputBoardAction<BoardValueStore>
-    readonly validate: ValidateLoginIdAction
-    readonly observe: ObserveBoardFieldAction
+            input: memo.input,
+            validate,
+            observe,
 
-    readonly store: Readonly<{
-        memo: BoardValueStore
-    }>
-
-    terminate: { (): void }
-
-    constructor() {
-        const memo = initInputBoardAction()
-        const { validate, checker } = initValidateBoardFieldAction({
-            converter: () => this.convert(),
-        })
-        const observe = initObserveBoardFieldAction({
-            observer: initBoardFieldObserver({
-                current: () => memo.store.get(),
-            }),
-        })
-
-        this.input = memo.input
-        this.validate = validate
-        this.observe = observe
-
-        this.store = {
-            memo: memo.store,
-        }
-
-        memo.subscriber.subscribe(() => {
-            checker.check()
-            observe.check()
-        })
-
-        this.terminate = () => {
-            memo.subscriber.terminate()
-            observe.terminate()
-        }
-    }
-
-    convert(): ConvertBoardFieldResult<AuthUserMemo, ValidateAuthUserMemoError> {
-        return authUserMemoBoardConverter(this.store.memo.get())
-    }
-
-    reset(memo: AuthUserMemo): void {
-        this.store.memo.set(memo)
+            reset: (value: AuthUserMemo) => {
+                memo.store.set(value)
+            },
+        },
+        convert,
     }
 }

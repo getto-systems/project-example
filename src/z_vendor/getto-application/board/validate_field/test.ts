@@ -38,7 +38,7 @@ test("validate; invalid input; clear", async () => {
     })
 })
 
-function standard(result: ConvertBoardFieldResult<FieldValue, ValidateError>) {
+function standard(result: ConvertBoardFieldResult<FieldValue, readonly ValidateError[]>) {
     const { validate: action, checker } = initValidateBoardFieldAction({
         converter: () => result,
     })

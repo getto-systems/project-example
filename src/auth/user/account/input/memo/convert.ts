@@ -1,23 +1,17 @@
+import { converter } from "../../../../../z_lib/ui/validate/helper"
+import { check_text_tooLong } from "../../../../../z_lib/ui/validate/text"
+
 import { AuthUserMemo } from "../../kernel/data"
-import { ValidateAuthUserMemoError } from "./data"
-import { ConvertBoardFieldResult } from "../../../../../z_vendor/getto-application/board/validate_field/data"
+import { ConvertAuthUserMemoResult } from "./data"
 
-// memo には技術的な制限はないが、使用可能な最大文字数は定義しておく
-// api の設定と同期させること
-export const MEMO_MAX_LENGTH = 255
-
-export function authUserMemoBoardConverter(
-    value: string,
-): ConvertBoardFieldResult<AuthUserMemo, ValidateAuthUserMemoError> {
-    if (value.length > MEMO_MAX_LENGTH) {
-        return { valid: false, err: TOO_LONG }
-    }
-    return { valid: true, value: value as string as AuthUserMemo }
-}
-
-const TOO_LONG: readonly ValidateAuthUserMemoError[] = [
-    { type: "too-long", maxLength: MEMO_MAX_LENGTH },
-]
+export const authUserMemoBoardConverter: { (value: string): ConvertAuthUserMemoResult } = converter(
+    restoreAuthUserMemo,
+    [
+        // memo には意味的な制限はないが、使用可能な最大文字数は定義しておく
+        // api の設定と同期させること
+        check_text_tooLong(255),
+    ],
+)
 
 export function restoreAuthUserMemo(memo: string): AuthUserMemo {
     return memo as AuthUserMemo

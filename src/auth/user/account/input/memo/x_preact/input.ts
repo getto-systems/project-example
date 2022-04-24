@@ -2,11 +2,17 @@ import { h, VNode } from "preact"
 
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
+import { useApplicationAction } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 import { useEditableState } from "../../../../../../z_vendor/getto-application/board/editable/x_preact/hooks"
 
-import { field, label_text_fill } from "../../../../../../z_vendor/getto-css/preact/design/form"
+import {
+    inputField,
+    label_text_fill,
+} from "../../../../../../z_vendor/getto-css/preact/design/form"
 
 import { InputBoard } from "../../../../../../z_vendor/getto-application/board/input/x_preact/input"
+
+import { textValidationError } from "../../../../../../z_lib/ui/validate/x_plain/error"
 
 import { InputAuthUserMemoAction } from "../action"
 import { EditableBoardAction } from "../../../../../../z_vendor/getto-application/board/editable/action"
@@ -24,23 +30,18 @@ type Props = Readonly<{ field: InputAuthUserMemoAction }> &
     }>
 
 export function AuthUserMemoField(props: Props): VNode {
+    const validateState = useApplicationAction(props.field.validate)
     const editableState = useEditableState(props.edit)
 
-    return label_text_fill(
-        field({
-            title: props.title || "備考",
-            help: props.help,
-            body: body(),
-        }),
-    )
-
-    function body(): VNodeContent {
-        if (!editableState.isEditable) {
-            return editableState.data.memo
-        }
-        return h(InputBoard, {
-            type: "text",
-            input: props.field.input,
-        })
-    }
+    return inputField({
+        title: props.title || "備考",
+        help: props.help,
+        label: label_text_fill,
+        state: validateState.valid
+            ? { type: "normal" }
+            : { type: "error", notice: textValidationError(validateState.err) },
+        body: editableState.isEditable
+            ? h(InputBoard, { type: "text", input: props.field.input })
+            : editableState.data.memo,
+    })
 }

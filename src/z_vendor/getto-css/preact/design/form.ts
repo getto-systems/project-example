@@ -12,14 +12,20 @@ type FieldContent =
     | Readonly<{ type: SearchFieldType; content: NormalFieldContent }>
     | Readonly<{ type: NoticeFieldType; content: NoticeFieldContent }>
 
-export type NormalFieldContent = NormalFieldContent_base &
-    Partial<{ help: readonly VNodeContent[] }>
-export type NoticeFieldContent = NormalFieldContent & Readonly<{ notice: readonly VNodeContent[] }>
-
-type NormalFieldContent_base = Readonly<{
+export type NormalFieldContent = Readonly<{
     title: VNodeContent
     body: VNodeContent
+    help?: readonly VNodeContent[]
 }>
+export type NoticeFieldContent = NormalFieldContent & Readonly<{ notice: readonly VNodeContent[] }>
+
+export type InputFieldContent = NormalFieldContent &
+    Readonly<{
+        state:
+            | Readonly<{ type: "normal" }>
+            | Readonly<{ type: "error"; notice: readonly VNodeContent[] }>
+        label: { (content: VNode): VNode }
+    }>
 
 type FieldType = NormalFieldType | SearchFieldType | NoticeFieldType
 type NormalFieldType = "normal"
@@ -38,6 +44,16 @@ function mapFieldType(fieldType: FieldType): string {
 
         default:
             return `field_${fieldType}`
+    }
+}
+
+export function inputField(content: InputFieldContent): VNode {
+    switch (content.state.type) {
+        case "normal":
+            return content.label(field(content))
+
+        case "error":
+            return content.label(field_error({ ...content, notice: content.state.notice }))
     }
 }
 
@@ -365,6 +381,10 @@ function mapInputStyle(style: InputStyle): string {
         default:
             return `input_${style}`
     }
+}
+
+export function label(content: VNodeContent): VNode {
+    return html`<label>${content}</label>`
 }
 
 export function label_number_small(content: VNodeContent): VNode {
