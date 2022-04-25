@@ -1,28 +1,20 @@
 import { ConvertLocationResult } from "../../../../z_lib/ui/location/data"
 import { SignNav, signNavKey } from "../../../sign/nav/data"
-import { Password, ResetToken, ValidatePasswordError } from "./data"
-import { ConvertBoardFieldResult } from "../../../../z_vendor/getto-application/board/validate_field/data"
+import { ConvertPasswordResult, Password, ResetToken } from "./data"
+import { converter } from "../../../../z_lib/ui/validate/helper"
+import { check_text_empty, check_text_tooLong } from "../../../../z_lib/ui/validate/text"
 
-// password には技術的な制限はないが、使用可能な最大文字数は定義しておく
-// api の設定と同期すること
 export const PASSWORD_MAX_LENGTH = 100
 
-export function passwordBoardConverter(
-    value: string,
-): ConvertBoardFieldResult<Password, ValidatePasswordError> {
-    if (value.length === 0) {
-        return { valid: false, err: EMPTY }
-    }
-    if (value.length > PASSWORD_MAX_LENGTH) {
-        return { valid: false, err: TOO_LONG }
-    }
-    return { valid: true, value: markPassword(value) }
-}
-
-const EMPTY: readonly ValidatePasswordError[] = [{ type: "empty" }]
-const TOO_LONG: readonly ValidatePasswordError[] = [
-    { type: "too-long", maxLength: PASSWORD_MAX_LENGTH },
-]
+export const passwordBoardConverter: { (value: string): ConvertPasswordResult } = converter(
+    markPassword,
+    [
+        check_text_empty,
+        // password には意味的な制限はないが、使用可能な最大文字数は定義しておく
+        // api の設定と同期すること
+        check_text_tooLong(100),
+    ],
+)
 
 function markPassword(password: string): Password {
     return password as Password

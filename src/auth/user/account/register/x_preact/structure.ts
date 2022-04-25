@@ -8,7 +8,7 @@ import { linky } from "../../../../../z_vendor/getto-css/preact/design/highlight
 
 import { focusClass, listEditLabel } from "../../../../../core/x_preact/design/table"
 
-import { AuthRoleLabels } from "../../input/x_preact/granted_roles"
+import { AuthRoleLabels } from "../../input/granted_roles/x_preact/input"
 import { ResetTokenDestinationLabel } from "../../../password/reset/token_destination/input/x_preact/destination"
 
 import { TableStructure } from "../../../../../z_vendor/getto-table/preact/core"

@@ -146,7 +146,7 @@ async fn authenticate_password<S>(
     fields: AuthenticatePasswordFieldsExtract,
     post: impl Fn(AuthenticatePasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
-    let fields = AuthenticatePasswordFields::validate(fields)
+    let fields = AuthenticatePasswordFields::convert(fields)
         .map_err(|err| post(AuthenticatePasswordEvent::Invalid(err)))?;
 
     let password_repository = infra.password_repository();

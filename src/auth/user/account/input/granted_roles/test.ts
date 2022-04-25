@@ -1,8 +1,8 @@
-import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
+import { setupActionTestRunner } from "../../../../../z_vendor/getto-application/action/test_helper"
 
-import { mockMultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
+import { mockMultipleBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/test_helper"
 
-import { initInputGrantedRolesAction } from "./action"
+import { initInputGrantedAuthRolesAction } from "./action"
 
 test("observe; has changed", async () => {
     const { action, store } = standard()
@@ -37,9 +37,9 @@ test("terminate", async () => {
 })
 
 function standard() {
-    const { input: action } = initInputGrantedRolesAction()
+    const { input: action } = initInputGrantedAuthRolesAction()
     const store = {
-        grantedRoles: mockMultipleBoardValueStore(action.grantedRoles),
+        grantedRoles: mockMultipleBoardValueStore(action.input),
     }
 
     return { action, store }

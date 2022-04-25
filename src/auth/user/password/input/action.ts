@@ -7,7 +7,6 @@ import {
 import {
     initValidateBoardFieldAction,
     ValidateBoardFieldAction,
-    ValidateBoardFieldState,
 } from "../../../../z_vendor/getto-application/board/validate_field/action"
 import { ApplicationAction } from "../../../../z_vendor/getto-application/action/action"
 import {
@@ -19,23 +18,21 @@ import { initBoardFieldObserver } from "../../../../z_vendor/getto-application/b
 import { BoardFieldChecker } from "../../../../z_vendor/getto-application/board/validate_field/infra"
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
-import { Password, PasswordCharacterState, ValidatePasswordError } from "./data"
+import { Password, PasswordCharacterState } from "./data"
+import { ValidateTextError } from "../../../../z_lib/ui/validate/data"
 
 export interface InputPasswordAction extends ApplicationAction {
     readonly input: InputBoardAction<BoardValueStore>
-    readonly validate: ValidatePasswordAction
+    readonly validate: ValidateBoardFieldAction<readonly ValidateTextError[]>
     readonly observe: ObserveBoardFieldAction
 
     clear(): void
     checkCharacter(): PasswordCharacterState
 }
 
-export type ValidatePasswordAction = ValidateBoardFieldAction<ValidatePasswordError>
-export type ValidatePasswordState = ValidateBoardFieldState<ValidatePasswordError>
-
 export function initInputPasswordAction(): Readonly<{
     input: InputPasswordAction
-    checker: BoardFieldChecker<Password, ValidatePasswordError>
+    checker: BoardFieldChecker<Password, readonly ValidateTextError[]>
 }> {
     const { input, store, subscriber } = initInputBoardAction()
 

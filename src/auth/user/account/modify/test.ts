@@ -1,18 +1,20 @@
 import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
-import { mockMultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
+import { mockBoardValueStore, mockMultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 
 import { ModifyAuthUserAccountAction, initModifyAuthUserAccountAction } from "./action"
 
 import { restoreLoginId } from "../../login_id/input/convert"
+import { restoreAuthUserMemo } from "../input/memo/convert"
 
 import { ModifyAuthUserAccountRemote } from "./infra"
-import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
+import { BoardValueStore, MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
 import { LoginId } from "../../login_id/kernel/data"
-import { AuthRole } from "../../kernel/data"
+import { ModifyAuthUserAccountFields } from "./data"
 
 const VALID_INFO = {
+    memo: "memo",
     grantedRoles: ["user"],
 } as const
 
@@ -22,13 +24,14 @@ test("submit valid info", async () => {
     const runner = setupActionTestRunner(resource.modify.subscriber)
 
     await runner(async () => {
+        store.memo.set(VALID_INFO.memo)
         store.grantedRoles.set(VALID_INFO.grantedRoles)
 
         return resource.modify.submit(user)
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try" },
-            { type: "success", data: { grantedRoles: ["user"] } },
+            { type: "success", data: { grantedRoles: ["user"], memo: "memo" } },
         ])
     })
 })
@@ -40,6 +43,7 @@ test("submit valid login-id; take long time", async () => {
     const runner = setupActionTestRunner(resource.modify.subscriber)
 
     await runner(() => {
+        store.memo.set(VALID_INFO.memo)
         store.grantedRoles.set(VALID_INFO.grantedRoles)
 
         return resource.modify.submit(user)
@@ -47,7 +51,7 @@ test("submit valid login-id; take long time", async () => {
         expect(stack).toEqual([
             { type: "try" },
             { type: "take-longtime" },
-            { type: "success", data: { grantedRoles: ["user"] } },
+            { type: "success", data: { grantedRoles: ["user"], memo: "memo" } },
         ])
     })
 })
@@ -55,10 +59,12 @@ test("submit valid login-id; take long time", async () => {
 test("reset", () => {
     const { resource, store, user } = standard()
 
+    store.memo.set(VALID_INFO.memo)
     store.grantedRoles.set(VALID_INFO.grantedRoles)
 
     resource.modify.reset(user)
 
+    expect(store.memo.get()).toEqual("initial-memo")
     expect(store.grantedRoles.get()).toEqual([])
 })
 
@@ -93,9 +99,10 @@ function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
         modify: ModifyAuthUserAccountAction
     }>
     store: Readonly<{
+        memo: BoardValueStore
         grantedRoles: MultipleBoardValueStore
     }>
-    user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>
+    user: Readonly<{ loginId: LoginId }> & ModifyAuthUserAccountFields
 }> {
     const resource = {
         modify: initModifyAuthUserAccountAction({
@@ -109,7 +116,8 @@ function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
     }
 
     const store = {
-        grantedRoles: mockMultipleBoardValueStore(resource.modify.grantedRoles.grantedRoles),
+        memo: mockBoardValueStore(resource.modify.memo.input),
+        grantedRoles: mockMultipleBoardValueStore(resource.modify.grantedRoles.input),
     }
 
     return {
@@ -118,6 +126,7 @@ function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
         user: {
             loginId: restoreLoginId("user-id"),
             grantedRoles: [],
+            memo: restoreAuthUserMemo("initial-memo"),
         },
     }
 }

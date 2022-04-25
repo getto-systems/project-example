@@ -269,6 +269,7 @@ impl ExpansionLimitDuration {
     }
 }
 
+// TODO 多分 AuthorizeError とか CheckPermissionError とか
 pub enum ValidateAuthRolesError {
     PermissionDenied(GrantedAuthRoles, RequireAuthRoles),
 }

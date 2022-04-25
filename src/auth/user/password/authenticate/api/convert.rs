@@ -10,13 +10,13 @@ use crate::auth::user::{
 };
 
 impl AuthenticatePasswordFields {
-    pub fn validate(
+    pub fn convert(
         fields: AuthenticatePasswordFieldsExtract,
     ) -> Result<Self, ValidateAuthenticatePasswordFieldsError> {
         Ok(Self {
-            login_id: LoginId::validate(fields.login_id)
+            login_id: LoginId::convert(fields.login_id)
                 .map_err(ValidateAuthenticatePasswordFieldsError::InvalidLoginId)?,
-            password: PlainPassword::validate(fields.password)
+            password: PlainPassword::convert(fields.password)
                 .map_err(ValidateAuthenticatePasswordFieldsError::InvalidPassword)?,
         })
     }

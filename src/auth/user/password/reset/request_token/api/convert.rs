@@ -8,11 +8,11 @@ use crate::auth::user::{
 };
 
 impl RequestResetTokenFields {
-    pub fn validate(
+    pub fn convert(
         fields: RequestResetTokenFieldsExtract,
     ) -> Result<Self, ValidateRequestResetTokenFieldsError> {
         Ok(Self {
-            login_id: LoginId::validate(fields.login_id)
+            login_id: LoginId::convert(fields.login_id)
                 .map_err(ValidateRequestResetTokenFieldsError::InvalidLoginId)?,
         })
     }

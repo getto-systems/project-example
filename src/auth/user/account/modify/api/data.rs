@@ -1,16 +1,17 @@
 use crate::auth::user::{
     kernel::data::{GrantedAuthRoles, ValidateGrantedAuthRolesError},
-    login_id::kernel::data::ValidateLoginIdError,
+    login_id::kernel::data::ValidateLoginIdError, account::kernel::data::{AuthUserAttributes, ValidateAuthUserAttributesError},
 };
 
 #[derive(PartialEq, Eq)]
 pub struct ModifyAuthUserAccountChanges {
     pub granted_roles: GrantedAuthRoles,
+    pub attrs: AuthUserAttributes,
 }
 
 impl std::fmt::Display for ModifyAuthUserAccountChanges {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "changes: {}", self.granted_roles)
+        write!(f, "changes: {} / {}", self.granted_roles, self.attrs)
     }
 }
 
@@ -23,6 +24,7 @@ pub enum ValidateModifyAuthUserAccountFieldsError {
 pub enum ValidateModifyAuthUserAccountChangesError {
     NotFound,
     InvalidGrantedRoles(ValidateGrantedAuthRolesError),
+    InvalidAttrs(ValidateAuthUserAttributesError),
 }
 
 impl std::fmt::Display for ValidateModifyAuthUserAccountFieldsError {
@@ -40,6 +42,7 @@ impl std::fmt::Display for ValidateModifyAuthUserAccountChangesError {
         match self {
             Self::NotFound => write!(f, "data not found"),
             Self::InvalidGrantedRoles(err) => err.fmt(f),
+            Self::InvalidAttrs(err) => err.fmt(f),
         }
     }
 }

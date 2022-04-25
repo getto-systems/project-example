@@ -5,11 +5,19 @@ import {
 
 import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 
-import { initInputGrantedRolesAction, InputGrantedRolesAction } from "../input/action"
+import {
+    initInputGrantedAuthRolesAction,
+    InputGrantedAuthRolesAction,
+} from "../input/granted_roles/action"
+import { initInputAuthUserMemoAction, InputAuthUserMemoAction } from "../input/memo/action"
 import {
     initObserveBoardAction,
     ObserveBoardAction,
 } from "../../../../z_vendor/getto-application/board/observe_board/action"
+import {
+    initValidateBoardAction,
+    ValidateBoardAction,
+} from "../../../../z_vendor/getto-application/board/validate_board/action"
 
 import { ModifyAuthUserAccountRemote } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
@@ -17,15 +25,18 @@ import { DelayTime } from "../../../../z_lib/ui/config/infra"
 import { ModifyAuthUserAccountError, ModifyAuthUserAccountFields } from "./data"
 import { AuthRole } from "../../kernel/data"
 import { LoginId } from "../../login_id/kernel/data"
+import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 
 export interface ModifyAuthUserAccountAction
     extends StatefulApplicationAction<ModifyAuthUserAccountState> {
-    readonly grantedRoles: InputGrantedRolesAction
+    readonly memo: InputAuthUserMemoAction
+    readonly grantedRoles: InputGrantedAuthRolesAction
+    readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
     reset(user: Readonly<{ grantedRoles: readonly AuthRole[] }>): ModifyAuthUserAccountState
     submit(
-        user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>,
+        user: Readonly<{ loginId: LoginId }> & ModifyAuthUserAccountFields,
     ): Promise<ModifyAuthUserAccountState>
 }
 
@@ -58,11 +69,16 @@ class Action
 {
     readonly initialState = initialState
 
-    readonly grantedRoles: InputGrantedRolesAction
+    readonly memo: InputAuthUserMemoAction
+    readonly grantedRoles: InputGrantedAuthRolesAction
+    readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
     material: ModifyAuthUserAccountMaterial
-    convert: { (): ModifyAuthUserAccountFields }
+
+    readonly convert: {
+        (): ConvertBoardResult<ModifyAuthUserAccountFields>
+    }
 
     constructor(material: ModifyAuthUserAccountMaterial) {
         super({
@@ -73,32 +89,68 @@ class Action
         })
         this.material = material
 
-        const fields = ["grantedRoles"] as const
+        const fields = ["memo", "grantedRoles"] as const
 
-        const grantedRoles = initInputGrantedRolesAction()
+        const memo = initInputAuthUserMemoAction()
+        const grantedRoles = initInputGrantedAuthRolesAction()
 
+        const convert = (): ConvertBoardResult<ModifyAuthUserAccountFields> => {
+            const result = {
+                grantedRoles: grantedRoles.convert(),
+                memo: memo.convert(),
+            }
+            if (!result.memo.valid) {
+                return { valid: false }
+            }
+            return {
+                valid: true,
+                value: {
+                    grantedRoles: result.grantedRoles,
+                    memo: result.memo.value,
+                },
+            }
+        }
+
+        const { validate, validateChecker } = initValidateBoardAction(
+            { fields },
+            {
+                // TODO converter => convert がいいかな
+                converter: convert,
+            },
+        )
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
+        this.memo = memo.input
         this.grantedRoles = grantedRoles.input
+        this.validate = validate
         this.observe = observe
-        this.convert = (): ModifyAuthUserAccountFields => ({
-            grantedRoles: grantedRoles.convert(),
-        })
+        this.convert = convert
 
+        this.memo.validate.subscriber.subscribe((result) => {
+            validateChecker.update("memo", result.valid)
+        })
+        this.memo.observe.subscriber.subscribe((result) => {
+            observeChecker.update("memo", result.hasChanged)
+        })
         this.grantedRoles.observe.subscriber.subscribe((result) => {
             observeChecker.update("grantedRoles", result.hasChanged)
         })
     }
 
-    reset(user: Readonly<{ grantedRoles: readonly AuthRole[] }>): ModifyAuthUserAccountState {
+    reset(user: ModifyAuthUserAccountFields): ModifyAuthUserAccountState {
+        this.memo.reset(user.memo)
         this.grantedRoles.reset(user.grantedRoles)
         this.observe.clear()
         return this.currentState()
     }
     async submit(
-        user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>,
+        user: Readonly<{ loginId: LoginId }> & ModifyAuthUserAccountFields,
     ): Promise<ModifyAuthUserAccountState> {
-        return modifyUser(this.material, user, this.convert(), this.post)
+        const fields = this.convert()
+        if (!fields.valid) {
+            return this.currentState()
+        }
+        return modifyUser(this.material, user, fields.value, this.post)
     }
 }
 
@@ -110,7 +162,7 @@ type ModifyUserEvent =
 
 async function modifyUser<S>(
     { infra, config }: ModifyAuthUserAccountMaterial,
-    user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>,
+    user: Readonly<{ loginId: LoginId }> & ModifyAuthUserAccountFields,
     fields: ModifyAuthUserAccountFields,
     post: Post<ModifyUserEvent, S>,
 ): Promise<S> {

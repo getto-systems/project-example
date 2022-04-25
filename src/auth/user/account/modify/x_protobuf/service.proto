@@ -21,4 +21,5 @@ enum ModifyAuthUserAccountErrorKindPb {
 }
 message ModifyAuthUserAccountChangesPb {
     repeated string granted_roles = 1;
+    string memo = 2;
 }

@@ -1,9 +1,11 @@
+use crate::z_lib::validate::data::ValidateTextError;
+
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct LoginId(String);
 
 impl LoginId {
-    pub fn validate(login_id: impl LoginIdExtract) -> Result<Self, ValidateLoginIdError> {
-        Ok(Self(login_id.validate()?))
+    pub fn convert(login_id: impl LoginIdExtract) -> Result<Self, ValidateLoginIdError> {
+        Ok(Self(login_id.convert()?))
     }
 
     pub(in crate::auth) const fn restore(login_id: String) -> Self {
@@ -14,8 +16,8 @@ impl LoginId {
         self.0
     }
 
-    pub fn as_str(&self) -> &str {
-        self.0.as_str()
+    pub fn inner(&self) -> &String {
+        &self.0
     }
 }
 
@@ -26,19 +28,17 @@ impl std::fmt::Display for LoginId {
 }
 
 pub trait LoginIdExtract {
-    fn validate(self) -> Result<String, ValidateLoginIdError>;
+    fn convert(self) -> Result<String, ValidateLoginIdError>;
 }
 
 pub enum ValidateLoginIdError {
-    Empty,
-    TooLong,
+    Text(ValidateTextError),
 }
 
 impl std::fmt::Display for ValidateLoginIdError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::Empty => write!(f, "empty login id"),
-            Self::TooLong => write!(f, "too long login id"),
+            Self::Text(err) => err.fmt(f),
         }
     }
 }

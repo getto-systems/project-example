@@ -1,3 +1,4 @@
+use crate::auth::user::account::kernel::data::{AuthUserAttributes, AuthUserAttributesExtract};
 use crate::auth::user::account::register::y_protobuf::service::RegisterAuthUserAccountRequestPb;
 
 use crate::auth::user::account::register::infra::{
@@ -27,11 +28,11 @@ impl RegisterAuthUserAccountRequestDecoder for PbRegisterAuthUserAccountRequestD
         self,
     ) -> Result<RegisterAuthUserAccountFields, ValidateRegisterAuthUserAccountFieldsError> {
         Ok(RegisterAuthUserAccountFields {
-            login_id: LoginId::validate(self.request.login_id)
+            login_id: LoginId::convert(self.request.login_id)
                 .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidLoginId)?,
-            granted_roles: GrantedAuthRoles::validate(self.request.granted_roles)
+            granted_roles: GrantedAuthRoles::convert(self.request.granted_roles)
                 .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidGrantedRoles)?,
-            reset_token_destination: ResetTokenDestination::validate(
+            reset_token_destination: ResetTokenDestination::convert(
                 self.request
                     .reset_token_destination
                     .and_then(|destination| match destination.r#type.as_str() {
@@ -41,6 +42,9 @@ impl RegisterAuthUserAccountRequestDecoder for PbRegisterAuthUserAccountRequestD
                     .unwrap_or(ResetTokenDestinationExtract::None),
             )
             .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidResetTokenDestination)?,
+            attrs: AuthUserAttributes::convert(AuthUserAttributesExtract {
+                memo: self.request.memo,
+            }).map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidAttrs)?,
         })
     }
 }

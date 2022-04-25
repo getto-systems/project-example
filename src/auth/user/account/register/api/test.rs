@@ -38,6 +38,7 @@ use crate::auth::user::{
 use crate::auth::{
     ticket::kernel::data::{AuthTicketExtract, ExpireDuration},
     user::{
+        account::kernel::data::{AuthUserAttributes, AuthUserAttributesExtract},
         kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
         login_id::kernel::data::LoginId,
     },
@@ -236,6 +237,7 @@ fn standard_request_decoder() -> StaticRegisterAuthUserAccountRequestDecoder {
         reset_token_destination: ResetTokenDestination::restore(
             ResetTokenDestinationExtract::Email("user@example.com".into()),
         ),
+        attrs: AuthUserAttributes::restore(AuthUserAttributesExtract { memo: "".into() }),
     })
 }
 

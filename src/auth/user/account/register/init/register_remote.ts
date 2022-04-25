@@ -46,6 +46,7 @@ async function fetchRemote(
                     message.loginId = fields.loginId
                     message.grantedRoles = Array.from(fields.grantedRoles)
                     message.resetTokenDestination = fields.resetTokenDestination
+                    message.memo = fields.memo
                 },
             ),
         })

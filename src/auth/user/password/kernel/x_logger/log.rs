@@ -13,8 +13,7 @@ impl LogFilter for PasswordHashError {
 impl LogFilter for ValidatePasswordError {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Empty => LogLevel::Error,
-            Self::TooLong => LogLevel::Error,
+            Self::Text(err) => err.log_level(),
         }
     }
 }

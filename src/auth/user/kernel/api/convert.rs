@@ -5,7 +5,7 @@ use crate::auth::user::kernel::data::{
 };
 
 impl GrantedAuthRolesExtract for Vec<String> {
-    fn validate(self) -> Result<GrantedAuthRoles, ValidateGrantedAuthRolesError> {
+    fn convert(self) -> Result<GrantedAuthRoles, ValidateGrantedAuthRolesError> {
         if self.iter().any(|role| AuthRole::member(role).is_none()) {
             return Err(ValidateGrantedAuthRolesError::InvalidRole);
         }

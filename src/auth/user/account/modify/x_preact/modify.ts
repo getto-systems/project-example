@@ -13,7 +13,8 @@ import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
 import { StaticLoginIdField } from "../../../login_id/input/x_preact/static"
-import { GrantedRolesField } from "../../input/x_preact/granted_roles"
+import { AuthUserMemoField } from "../../input/memo/x_preact/input"
+import { GrantedRolesField } from "../../input/granted_roles/x_preact/input"
 import { EditButton } from "../../../../../core/x_preact/button/edit_button"
 import { ResetButton } from "../../../../../core/x_preact/button/reset_button"
 import { CloseButton } from "../../../../../core/x_preact/button/close_button"
@@ -27,9 +28,10 @@ import { ModifyAuthUserAccountAction } from "../action"
 import { ModifyAuthUserAccountError, ModifyAuthUserAccountFields } from "../data"
 import { LoginId } from "../../../login_id/kernel/data"
 import { AuthRole } from "../../../kernel/data"
+import { AuthUserMemo } from "../../kernel/data"
 
 type Props = Readonly<{
-    user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>
+    user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[]; memo: AuthUserMemo }>
     editable: EditableBoardAction
     modify: ModifyAuthUserAccountAction
     onSuccess: { (fields: ModifyAuthUserAccountFields): void }
@@ -37,6 +39,7 @@ type Props = Readonly<{
 export function ModifyAuthUserAccount(props: Props): VNode {
     const state = useApplicationAction(props.modify)
     const editableState = useApplicationAction(props.editable)
+    const validateState = useApplicationAction(props.modify.validate)
     const observeState = useApplicationAction(props.modify.observe)
 
     return form(
@@ -44,6 +47,13 @@ export function ModifyAuthUserAccount(props: Props): VNode {
             title: "基本情報",
             body: [
                 h(StaticLoginIdField, { user: props.user }),
+                h(AuthUserMemoField, {
+                    edit: {
+                        data: props.user,
+                        editable: props.editable,
+                    },
+                    field: props.modify.memo,
+                }),
                 h(GrantedRolesField, {
                     edit: {
                         data: props.user,
@@ -58,6 +68,7 @@ export function ModifyAuthUserAccount(props: Props): VNode {
                           left: submitButton(),
                           right: resetButton(),
                       }),
+                      ...validationMessage(),
                       ...message(),
                       buttons({
                           right: closeButton(),
@@ -115,6 +126,16 @@ export function ModifyAuthUserAccount(props: Props): VNode {
         }
     }
 
+    function validationMessage(): readonly VNode[] {
+        switch (validateState) {
+            case "initial":
+            case "valid":
+                return []
+
+            case "invalid":
+                return [fieldHelp_error(["正しく入力されていません"])]
+        }
+    }
     function message(): readonly VNode[] {
         switch (state.type) {
             case "initial":

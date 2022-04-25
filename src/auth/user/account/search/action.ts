@@ -7,7 +7,7 @@ import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 import { nextSort } from "../../../../z_lib/ui/search/sort/helper"
 
 import { initSearchLoginIdAction, SearchLoginIdAction } from "../../login_id/input/action"
-import { initSearchGrantedRolesAction, SearchGrantedRolesAction } from "../input/action"
+import { initSearchGrantedRolesAction, SearchGrantedRolesAction } from "../input/granted_roles/action"
 import {
     initObserveBoardAction,
     ObserveBoardAction,
@@ -38,10 +38,9 @@ import {
     SearchAuthUserAccountSort,
     SearchAuthUserAccountSortKey,
 } from "./data"
-import { AuthUserAccount } from "../kernel/data"
 import { SearchSortOrder } from "../../../../z_lib/ui/search/sort/data"
+import { AuthUserAccount } from "../kernel/data"
 import { LoginId } from "../../login_id/kernel/data"
-import { ResetTokenDestination } from "../../password/reset/token_destination/kernel/data"
 
 export interface SearchAuthUserAccountAction extends ListAuthUserAccountAction {
     readonly loginId: SearchLoginIdAction
@@ -321,11 +320,7 @@ class Action
             | Readonly<{
                   page: Readonly<{ offset: number; limit: number; all: number }>
                   sort: Readonly<{ key: "login-id"; order: SearchSortOrder }>
-                  users: readonly Readonly<{
-                      loginId: LoginId
-                      grantedRoles: readonly "user"[]
-                      resetTokenDestination: ResetTokenDestination
-                  }>[]
+                  users: readonly AuthUserAccount[]
               }>
             | undefined
     }> {

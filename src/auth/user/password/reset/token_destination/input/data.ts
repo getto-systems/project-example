@@ -1,5 +1,7 @@
+import { ValidateTextError } from "../../../../../../z_lib/ui/validate/data"
+
 export type ValidateResetTokenDestinationError =
-    | Readonly<{ type: "invalid-type" }>
-    | Readonly<{ type: "empty-email" }>
-    | Readonly<{ type: "invalid-email" }>
-    | Readonly<{ type: "too-long-email"; maxLength: number }>
+    | Readonly<{ type: "type"; err: readonly ValidateResetTokenDestinationTypeError[] }>
+    | Readonly<{ type: "email"; err: readonly ValidateTextError[] }>
+
+export type ValidateResetTokenDestinationTypeError = Readonly<{ type: "invalid-type" }>

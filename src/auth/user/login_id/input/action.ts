@@ -12,29 +12,25 @@ import { ObserveBoardFieldAction } from "../../../../z_vendor/getto-application/
 import {
     initValidateBoardFieldAction,
     ValidateBoardFieldAction,
-    ValidateBoardFieldState,
 } from "../../../../z_vendor/getto-application/board/validate_field/action"
 
 import { BoardFieldChecker } from "../../../../z_vendor/getto-application/board/validate_field/infra"
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
-import { ValidateLoginIdError } from "./data"
 import { SingleValueFilter } from "../../../../z_lib/ui/search/kernel/data"
 import { LoginId } from "../kernel/data"
+import { ValidateTextError } from "../../../../z_lib/ui/validate/data"
 
 export interface InputLoginIdAction extends ApplicationAction {
     readonly input: InputBoardAction<BoardValueStore>
-    readonly validate: ValidateLoginIdAction
+    readonly validate: ValidateBoardFieldAction<readonly ValidateTextError[]>
     readonly observe: ObserveBoardFieldAction
     clear(): void
 }
 
-export type ValidateLoginIdAction = ValidateBoardFieldAction<ValidateLoginIdError>
-export type ValidateLoginIdState = ValidateBoardFieldState<ValidateLoginIdError>
-
 export function initInputLoginIdAction(): Readonly<{
     input: InputLoginIdAction
-    checker: BoardFieldChecker<LoginId, ValidateLoginIdError>
+    checker: BoardFieldChecker<LoginId, readonly ValidateTextError[]>
 }> {
     const { input, store, subscriber } = initInputBoardAction()
 

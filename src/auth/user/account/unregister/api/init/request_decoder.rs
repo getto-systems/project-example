@@ -19,7 +19,7 @@ impl PbUnregisterAuthUserAccountRequestDecoder {
 
 impl UnregisterAuthUserAccountRequestDecoder for PbUnregisterAuthUserAccountRequestDecoder {
     fn decode(self) -> Result<LoginId, ValidateUnregisterAuthUserAccountFieldsError> {
-        Ok(LoginId::validate(self.request.login_id)
+        Ok(LoginId::convert(self.request.login_id)
             .map_err(ValidateUnregisterAuthUserAccountFieldsError::InvalidLoginId)?)
     }
 }

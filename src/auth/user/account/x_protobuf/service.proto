@@ -8,4 +8,5 @@ message AuthUserAccountPb {
     string login_id = 1;
     repeated string granted_roles = 2;
     auth.user.password.reset.token_destination.kernel.service.ResetTokenDestinationPb reset_token_destination = 3;
+    string memo = 4;
 }

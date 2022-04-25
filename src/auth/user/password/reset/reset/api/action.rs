@@ -160,7 +160,7 @@ async fn reset_password<S>(
     fields: ResetPasswordFieldsExtract,
     post: impl Fn(ResetPasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
-    let fields = ResetPasswordFields::validate(fields)
+    let fields = ResetPasswordFields::convert(fields)
         .map_err(|err| post(ResetPasswordEvent::Invalid(err)))?;
 
     let token_decoder = infra.token_decoder();

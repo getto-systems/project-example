@@ -13,8 +13,9 @@ import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 
 import { readSearchAuthUserAccountSortKey } from "../convert"
 import { parseSearchSort } from "../../../../../z_lib/ui/search/sort/convert"
-import { toGrantedRoles } from "../../input/convert"
+import { toGrantedRoles } from "../../input/granted_roles/convert"
 import { restoreLoginId } from "../../../login_id/input/convert"
+import { restoreAuthUserMemo } from "../../input/memo/convert"
 
 import { SearchAuthUserAccountRemote, SearchAuthUserAccountRemoteResult } from "../infra"
 
@@ -41,6 +42,7 @@ async function fetchRemote(
                     loginId: restoreLoginId(`user-${i}`),
                     grantedRoles: [],
                     resetTokenDestination: { type: "none" },
+                    memo: restoreAuthUserMemo(`no. ${i}`),
                 })
             }
             return {
@@ -102,6 +104,7 @@ async function fetchRemote(
                             type: user.resetTokenDestination?.type || "",
                             email: user.resetTokenDestination?.email || "",
                         }),
+                        memo: restoreAuthUserMemo(user.memo || ""),
                     }),
                 ),
             },

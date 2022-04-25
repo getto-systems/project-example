@@ -15,7 +15,10 @@ use crate::auth::{
         },
     },
     user::{
-        account::modify::init::request_decoder::test::StaticModifyAuthUserAccountRequestDecoder,
+        account::{
+            kernel::data::{AuthUserAttributes, AuthUserAttributesExtract},
+            modify::init::request_decoder::test::StaticModifyAuthUserAccountRequestDecoder,
+        },
         kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
     },
 };
@@ -227,9 +230,13 @@ fn standard_request_decoder() -> StaticModifyAuthUserAccountRequestDecoder {
         login_id: LoginId::restore(LOGIN_ID.into()),
         from: ModifyAuthUserAccountChanges {
             granted_roles: GrantedAuthRoles::restore(standard_granted_roles()),
+            attrs: AuthUserAttributes::restore(AuthUserAttributesExtract::default()),
         },
         to: ModifyAuthUserAccountChanges {
             granted_roles: GrantedAuthRoles::empty(),
+            attrs: AuthUserAttributes::restore(AuthUserAttributesExtract {
+                memo: "memo".into(),
+            }),
         },
     })
 }
@@ -238,9 +245,15 @@ fn conflict_request_decoder() -> StaticModifyAuthUserAccountRequestDecoder {
         login_id: LoginId::restore(LOGIN_ID.into()),
         from: ModifyAuthUserAccountChanges {
             granted_roles: GrantedAuthRoles::empty(),
+            attrs: AuthUserAttributes::restore(AuthUserAttributesExtract {
+                memo: "memo".into(),
+            }),
         },
         to: ModifyAuthUserAccountChanges {
             granted_roles: GrantedAuthRoles::empty(),
+            attrs: AuthUserAttributes::restore(AuthUserAttributesExtract {
+                memo: "memo".into(),
+            }),
         },
     })
 }
@@ -249,9 +262,11 @@ fn not_found_request_decoder() -> StaticModifyAuthUserAccountRequestDecoder {
         login_id: LoginId::restore("unknown-user".into()),
         from: ModifyAuthUserAccountChanges {
             granted_roles: GrantedAuthRoles::empty(),
+            attrs: AuthUserAttributes::restore(AuthUserAttributesExtract::default()),
         },
         to: ModifyAuthUserAccountChanges {
             granted_roles: GrantedAuthRoles::empty(),
+            attrs: AuthUserAttributes::restore(AuthUserAttributesExtract::default()),
         },
     })
 }

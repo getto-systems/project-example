@@ -4,16 +4,10 @@ mod user;
 
 use std::collections::HashMap;
 
-use crate::auth::user::{
-    account::{
-        register::infra::RegisterAuthUserAccountFields,
-        unregister::infra::UnregisterAuthUserAccountRepository,
-    },
-    kernel::init::user_repository::memory::{
-        login_id::{EntryLoginId, MapLoginId, StoreLoginId},
-        reset_token::{EntryResetToken, MapResetToken, StoreResetToken},
-        user::{EntryUser, MapUser, StoreUser},
-    },
+use crate::auth::user::kernel::init::user_repository::memory::{
+    login_id::{EntryLoginId, MapLoginId, StoreLoginId},
+    reset_token::{EntryResetToken, MapResetToken, StoreResetToken},
+    user::{EntryUser, MapUser, StoreUser},
 };
 
 use crate::z_lib::repository::helper::infra_error;
@@ -21,8 +15,9 @@ use crate::z_lib::repository::helper::infra_error;
 use crate::auth::user::{
     account::{
         modify::infra::ModifyAuthUserAccountRepository,
-        register::infra::RegisterAuthUserAccountRepository,
+        register::infra::{RegisterAuthUserAccountFields, RegisterAuthUserAccountRepository},
         search::infra::SearchAuthUserAccountRepository,
+        unregister::infra::UnregisterAuthUserAccountRepository,
     },
     login_id::change::infra::{OverrideLoginIdEntry, OverrideLoginIdRepository},
     password::{
@@ -42,7 +37,7 @@ use crate::{
         ticket::kernel::data::{AuthDateTime, ExpireDateTime},
         user::{
             account::{
-                kernel::data::AuthUserAccount,
+                kernel::data::{AuthUserAccount, AuthUserAttributes},
                 modify::data::ModifyAuthUserAccountChanges,
                 search::data::{
                     AuthUserAccountSearch, SearchAuthUserAccountFilter,
@@ -126,6 +121,7 @@ impl<'a> MemoryAuthUserRepository<'a> {
                 login_id,
                 granted_roles: Some(granted_roles),
                 password: Some(password),
+                attrs: AuthUserAttributes::restore(Default::default()),
             },
         );
 
@@ -156,6 +152,7 @@ impl<'a> MemoryAuthUserRepository<'a> {
                 login_id,
                 granted_roles: None,
                 password: None,
+                attrs: AuthUserAttributes::restore(Default::default()),
             },
         );
 
@@ -190,6 +187,7 @@ impl<'a> MemoryAuthUserRepository<'a> {
                 login_id: login_id.clone(),
                 granted_roles: Some(granted_roles),
                 password: None,
+                attrs: AuthUserAttributes::restore(Default::default()),
             },
         );
         repository.reset_token.insert_entry(
@@ -221,6 +219,7 @@ impl<'a> MemoryAuthUserRepository<'a> {
                 login_id,
                 granted_roles: None,
                 password: None,
+                attrs: AuthUserAttributes::restore(Default::default()),
             },
         );
     }
@@ -334,6 +333,7 @@ impl<'a> RegisterAuthUserAccountRepository for MemoryAuthUserRepository<'a> {
                 login_id: fields.login_id.clone(),
                 granted_roles: Some(fields.granted_roles),
                 password: None,
+                attrs: fields.attrs,
             },
         );
         self.login_id.insert_entry(
@@ -527,6 +527,7 @@ fn search<'a>(
                 reset_token_destination: entry
                     .and_then(|entry| entry.reset_token_destination)
                     .unwrap_or(ResetTokenDestination::None),
+                attrs: user.attrs,
             }
         })
         .collect();

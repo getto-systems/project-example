@@ -32,7 +32,7 @@ test("validate; invalid : empty", async () => {
         store.email.set("")
         return action.validate.currentState()
     }).then((stack) => {
-        expect(stack).toEqual([{ valid: false, err: [{ type: "empty-email" }] }])
+        expect(stack).toEqual([{ valid: false, err: { type: "email", err: [{ type: "empty" }] } }])
     })
 })
 
@@ -46,7 +46,9 @@ test("validate; invalid : invalid", async () => {
         store.email.set("invalid-email; not includes at-mark")
         return action.validate.currentState()
     }).then((stack) => {
-        expect(stack).toEqual([{ valid: false, err: [{ type: "invalid-email" }] }])
+        expect(stack).toEqual([
+            { valid: false, err: { type: "email", err: [{ type: "invalid-email" }] } },
+        ])
     })
 })
 
@@ -60,7 +62,9 @@ test("validate; invalid : too-long", async () => {
         store.email.set("@".repeat(255 + 1))
         return action.validate.currentState()
     }).then((stack) => {
-        expect(stack).toEqual([{ valid: false, err: [{ type: "too-long-email", maxLength: 255 }] }])
+        expect(stack).toEqual([
+            { valid: false, err: { type: "email", err: [{ type: "too-long", maxLength: 255 }] } },
+        ])
     })
 })
 

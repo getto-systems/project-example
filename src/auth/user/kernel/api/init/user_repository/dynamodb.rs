@@ -175,6 +175,7 @@ impl<'a> RegisterAuthUserAccountRepository for DynamoDbAuthUserRepository<'a> {
                 user_id.clone(),
                 fields.login_id.clone(),
                 fields.granted_roles,
+                fields.attrs,
             )
             .await?;
 
@@ -385,7 +386,7 @@ async fn search_user_account<'a>(
 
     match filter.sort().key() {
         SearchAuthUserAccountSortKey::LoginId => {
-            users.sort_by_cached_key(|(login_id, _)| login_id.clone());
+            users.sort_by_cached_key(|(login_id, _, _)| login_id.clone());
             match filter.sort().order() {
                 SearchSortOrder::Normal => (),
                 SearchSortOrder::Reverse => users.reverse(),
@@ -395,15 +396,16 @@ async fn search_user_account<'a>(
 
     let mut users: Vec<AuthUserAccount> = users
         .into_iter()
-        .filter(|(login_id, granted_roles)| {
+        .filter(|(login_id, granted_roles, _)| {
             filter.match_login_id(login_id) && filter.match_granted_roles(granted_roles)
         })
-        .map(|(login_id, granted_roles)| {
+        .map(|(login_id, granted_roles, attrs)| {
             let destination = destinations.remove(&login_id);
             AuthUserAccount {
                 login_id,
                 granted_roles: granted_roles.unwrap_or(GrantedAuthRoles::empty()),
                 reset_token_destination: destination.unwrap_or(ResetTokenDestination::None),
+                attrs,
             }
         })
         .collect();

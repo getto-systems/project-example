@@ -135,7 +135,7 @@ async fn request_reset_token<S>(
     fields: RequestResetTokenFieldsExtract,
     post: impl Fn(RequestResetTokenEvent) -> S,
 ) -> MethodResult<S> {
-    let fields = RequestResetTokenFields::validate(fields)
+    let fields = RequestResetTokenFields::convert(fields)
         .map_err(|err| post(RequestResetTokenEvent::Invalid(err)))?;
 
     let reset_token_repository = infra.reset_token_repository();

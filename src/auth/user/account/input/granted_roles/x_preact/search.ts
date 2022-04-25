@@ -1,19 +1,19 @@
 import { h, VNode } from "preact"
 
-import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
-import { search } from "../../../../../z_vendor/getto-css/preact/design/form"
+import { search } from "../../../../../../z_vendor/getto-css/preact/design/form"
 
 import {
     CheckboxBoard,
     CheckboxBoardContent,
-} from "../../../../../z_vendor/getto-application/board/input/x_preact/checkbox"
+} from "../../../../../../z_vendor/getto-application/board/input/x_preact/checkbox"
 
-import { ALL_AUTH_ROLES, authRoleLabel } from "../../../../../x_content/role"
+import { ALL_AUTH_ROLES, authRoleLabel } from "../../../../../../x_content/role"
 
 import { SearchGrantedRolesAction } from "../action"
 
-import { AuthRole } from "../../../kernel/data"
+import { AuthRole } from "../../../../kernel/data"
 
 type Props = Readonly<{
     field: SearchGrantedRolesAction

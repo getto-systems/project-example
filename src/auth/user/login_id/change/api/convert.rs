@@ -7,13 +7,13 @@ use crate::auth::user::login_id::{
 };
 
 impl OverrideLoginIdFields {
-    pub fn validate(
+    pub fn convert(
         fields: OverrideLoginIdFieldsExtract,
     ) -> Result<OverrideLoginIdFields, ValidateOverrideLoginIdFieldsError> {
         Ok(Self {
-            login_id: LoginId::validate(fields.login_id)
+            login_id: LoginId::convert(fields.login_id)
                 .map_err(ValidateOverrideLoginIdFieldsError::InvalidCurrentLoginId)?,
-            new_login_id: LoginId::validate(fields.new_login_id)
+            new_login_id: LoginId::convert(fields.new_login_id)
                 .map_err(ValidateOverrideLoginIdFieldsError::InvalidNewLoginId)?,
         })
     }

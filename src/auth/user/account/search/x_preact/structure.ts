@@ -9,7 +9,7 @@ import { linky } from "../../../../../z_vendor/getto-css/preact/design/highlight
 
 import { focusClass, listEditLabel, SORT_SIGN } from "../../../../../core/x_preact/design/table"
 
-import { AuthRoleLabels } from "../../input/x_preact/granted_roles"
+import { AuthRoleLabels } from "../../input/granted_roles/x_preact/input"
 import { ResetTokenDestinationLabel } from "../../../password/reset/token_destination/input/x_preact/destination"
 
 import { TableStructure } from "../../../../../z_vendor/getto-table/preact/core"
@@ -56,6 +56,12 @@ function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStruc
             .alwaysVisible()
             .border(["leftDouble"]),
 
+        tableCell("memo", (_key) => ({
+            label: "備考",
+            header: linky,
+            column: memo,
+        })).border(["left"]),
+
         tableCell("granted-roles", (_key) => ({
             label: "権限",
             header: linky,
@@ -91,6 +97,9 @@ function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStruc
 
     function loginId(row: AuthUserAccount): VNodeContent {
         return row.loginId
+    }
+    function memo(row: AuthUserAccount): VNodeContent {
+        return row.memo
     }
     function grantedRoles(row: AuthUserAccount): VNodeContent {
         return h(AuthRoleLabels, row)

@@ -11,15 +11,15 @@ use crate::auth::user::{
 };
 
 impl ResetPasswordFields {
-    pub fn validate(
+    pub fn convert(
         fields: ResetPasswordFieldsExtract,
     ) -> Result<Self, ValidateResetPasswordFieldsError> {
         Ok(Self {
-            reset_token: ResetTokenEncoded::validate(fields.reset_token)
+            reset_token: ResetTokenEncoded::convert(fields.reset_token)
                 .map_err(ValidateResetPasswordFieldsError::InvalidResetToken)?,
-            login_id: LoginId::validate(fields.login_id)
+            login_id: LoginId::convert(fields.login_id)
                 .map_err(ValidateResetPasswordFieldsError::InvalidLoginId)?,
-            new_password: PlainPassword::validate(fields.new_password)
+            new_password: PlainPassword::convert(fields.new_password)
                 .map_err(ValidateResetPasswordFieldsError::InvalidNewPassword)?,
         })
     }

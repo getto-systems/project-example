@@ -7,19 +7,23 @@ import {
 
 import { RegisterAuthUserAccountAction, initRegisterAuthUserAccountAction } from "./action"
 
+import { restoreLoginId } from "../../login_id/input/convert"
+import { restoreResetTokenDestination } from "../../password/reset/token_destination/kernel/convert"
+import { restoreAuthUserMemo } from "../input/memo/convert"
+
 import { RegisterAuthUserAccountRemote } from "./infra"
 import {
     BoardValueStore,
     MultipleBoardValueStore,
 } from "../../../../z_vendor/getto-application/board/input/infra"
+
 import { AuthUserAccount } from "../kernel/data"
-import { restoreLoginId } from "../../login_id/input/convert"
-import { restoreResetTokenDestination } from "../../password/reset/token_destination/kernel/convert"
 
 const VALID_INFO = {
     loginId: "login-id",
     grantedRoles: ["user"],
     resetTokenDestinationEmail: "user@example.com",
+    memo: "memo",
 } as const
 
 test("submit valid info", async () => {
@@ -43,6 +47,7 @@ test("submit valid info", async () => {
                     loginId: "login-id",
                     grantedRoles: ["user"],
                     resetTokenDestination: { type: "email", email: "user@example.com" },
+                    memo: "",
                 },
             },
         ])
@@ -60,6 +65,7 @@ test("submit valid login-id; take long time", async () => {
         store.grantedRoles.set(VALID_INFO.grantedRoles)
         store.resetTokenDestinationType.set("email")
         store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
+        store.memo.set(VALID_INFO.memo)
 
         return resource.register.submit()
     }).then((stack) => {
@@ -72,6 +78,7 @@ test("submit valid login-id; take long time", async () => {
                     loginId: "login-id",
                     grantedRoles: ["user"],
                     resetTokenDestination: { type: "email", email: "user@example.com" },
+                    memo: "memo",
                 },
             },
         ])
@@ -85,6 +92,7 @@ test("clear", () => {
     store.grantedRoles.set(VALID_INFO.grantedRoles)
     store.resetTokenDestinationType.set("email")
     store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
+    store.memo.set(VALID_INFO.memo)
 
     resource.register.clear()
 
@@ -92,6 +100,7 @@ test("clear", () => {
     expect(store.grantedRoles.get()).toEqual([])
     expect(store.resetTokenDestinationType.get()).toEqual("none")
     expect(store.resetTokenDestinationEmail.get()).toEqual("")
+    expect(store.memo.get()).toEqual("")
 })
 
 test("focus / close", async () => {
@@ -113,11 +122,13 @@ test("focus / close", async () => {
                 type: "email",
                 email: "user@example.com",
             }),
+            memo: restoreAuthUserMemo("memo"),
         }
         const another: AuthUserAccount = {
             loginId: restoreLoginId("user-another"),
             grantedRoles: [],
             resetTokenDestination: { type: "none" },
+            memo: restoreAuthUserMemo("memo"),
         }
 
         resource.register.list.focused.focus(user)
@@ -137,6 +148,7 @@ test("focus / close", async () => {
                     loginId: "login-id",
                     grantedRoles: [],
                     resetTokenDestination: { type: "email", email: "user@example.com" },
+                    memo: "memo",
                 },
             },
             { type: "initial" },
@@ -160,6 +172,7 @@ test("update user", async () => {
         loginId: restoreLoginId("login-id"),
         grantedRoles: [],
         resetTokenDestination: { type: "none" },
+        memo: restoreAuthUserMemo("memo"),
     }
 
     await runner(async () => {
@@ -178,6 +191,7 @@ test("remove user", async () => {
     store.grantedRoles.set(VALID_INFO.grantedRoles)
     store.resetTokenDestinationType.set("email")
     store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
+    store.memo.set(VALID_INFO.memo)
 
     await resource.register.submit()
 
@@ -224,6 +238,7 @@ function initResource(registerUserRemote: RegisterAuthUserAccountRemote): Readon
         grantedRoles: MultipleBoardValueStore
         resetTokenDestinationType: BoardValueStore
         resetTokenDestinationEmail: BoardValueStore
+        memo: BoardValueStore
     }>
 }> {
     const resource = {
@@ -239,13 +254,14 @@ function initResource(registerUserRemote: RegisterAuthUserAccountRemote): Readon
 
     const store = {
         loginId: mockBoardValueStore(resource.register.loginId.input),
-        grantedRoles: mockMultipleBoardValueStore(resource.register.grantedRoles.grantedRoles),
+        grantedRoles: mockMultipleBoardValueStore(resource.register.grantedRoles.input),
         resetTokenDestinationType: mockBoardValueStore(
             resource.register.resetTokenDestination.destinationType,
         ),
         resetTokenDestinationEmail: mockBoardValueStore(
             resource.register.resetTokenDestination.email,
         ),
+        memo: mockBoardValueStore(resource.register.memo.input),
     }
 
     return {
