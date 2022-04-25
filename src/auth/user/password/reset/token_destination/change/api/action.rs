@@ -5,8 +5,8 @@ use crate::auth::ticket::validate::method::{
 };
 
 use crate::auth::user::password::reset::token_destination::change::infra::{
-    ChangeResetTokenDestinationFields, ChangeResetTokenDestinationRepository,
-    ChangeResetTokenDestinationRequestDecoder,
+    ChangeResetTokenDestinationFields, ChangeResetTokenDestinationFieldsExtract,
+    ChangeResetTokenDestinationRepository, ChangeResetTokenDestinationRequestDecoder,
 };
 
 use crate::{
@@ -110,7 +110,7 @@ mod change_reset_token_destination_event {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
                 Self::Success => write!(f, "{}", SUCCESS),
-                Self::Invalid(err) => err.fmt(f),
+                Self::Invalid(err) => write!(f, "{}; invalid; {}", ERROR, err),
                 Self::NotFound => write!(f, "{}; not found", ERROR),
                 Self::Conflict => write!(f, "{}; changes conflicted", ERROR),
                 Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
@@ -121,13 +121,11 @@ mod change_reset_token_destination_event {
 
 async fn change_destination<S>(
     infra: &impl ChangeResetTokenDestinationMaterial,
-    fields: Result<
-        ChangeResetTokenDestinationFields,
-        ValidateChangeResetTokenDestinationFieldsError,
-    >,
+    fields: ChangeResetTokenDestinationFieldsExtract,
     post: impl Fn(ChangeResetTokenDestinationEvent) -> S,
 ) -> MethodResult<S> {
-    let fields = fields.map_err(|err| post(ChangeResetTokenDestinationEvent::Invalid(err)))?;
+    let fields = ChangeResetTokenDestinationFields::convert(fields)
+        .map_err(|err| post(ChangeResetTokenDestinationEvent::Invalid(err)))?;
 
     let destination_repository = infra.destination_repository();
 

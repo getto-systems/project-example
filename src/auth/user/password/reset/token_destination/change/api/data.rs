@@ -18,8 +18,8 @@ impl std::fmt::Display for ValidateChangeResetTokenDestinationFieldsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::InvalidLoginId(err) => err.fmt(f),
-            Self::InvalidFrom(err) => write!(f, "invalid from: {}", err),
-            Self::InvalidTo(err) => write!(f, "invalid to: {}", err),
+            Self::InvalidFrom(err) => write!(f, "from: {}", err),
+            Self::InvalidTo(err) => write!(f, "to: {}", err),
         }
     }
 }

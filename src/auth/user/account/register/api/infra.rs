@@ -1,21 +1,18 @@
 use crate::{
     auth::user::{
         account::{
-            kernel::data::AuthUserAttributes,
+            kernel::data::{AuthUserAttributes, AuthUserAttributesExtract},
             register::data::ValidateRegisterAuthUserAccountFieldsError,
         },
         kernel::data::{AuthUserId, GrantedAuthRoles},
         login_id::kernel::data::LoginId,
-        password::reset::kernel::data::ResetTokenDestination,
+        password::reset::kernel::data::{ResetTokenDestination, ResetTokenDestinationExtract},
     },
     z_lib::repository::data::RepositoryError,
 };
 
-// TODO Extract で受け取って validate は action でやる、だったはず
 pub trait RegisterAuthUserAccountRequestDecoder {
-    fn decode(
-        self,
-    ) -> Result<RegisterAuthUserAccountFields, ValidateRegisterAuthUserAccountFieldsError>;
+    fn decode(self) -> RegisterAuthUserAccountFieldsExtract;
 }
 
 pub struct RegisterAuthUserAccountFields {
@@ -23,6 +20,32 @@ pub struct RegisterAuthUserAccountFields {
     pub granted_roles: GrantedAuthRoles,
     pub reset_token_destination: ResetTokenDestination,
     pub attrs: AuthUserAttributes,
+}
+
+pub struct RegisterAuthUserAccountFieldsExtract {
+    pub login_id: String,
+    pub granted_roles: Vec<String>,
+    pub reset_token_destination: ResetTokenDestinationExtract,
+    pub attrs: AuthUserAttributesExtract,
+}
+
+impl RegisterAuthUserAccountFields {
+    pub fn convert(
+        fields: RegisterAuthUserAccountFieldsExtract,
+    ) -> Result<Self, ValidateRegisterAuthUserAccountFieldsError> {
+        Ok(Self {
+            login_id: LoginId::convert(fields.login_id)
+                .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidLoginId)?,
+            granted_roles: GrantedAuthRoles::convert(fields.granted_roles)
+                .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidGrantedRoles)?,
+            reset_token_destination: ResetTokenDestination::convert(fields.reset_token_destination)
+                .map_err(
+                    ValidateRegisterAuthUserAccountFieldsError::InvalidResetTokenDestination,
+                )?,
+            attrs: AuthUserAttributes::convert(fields.attrs)
+                .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidAttrs)?,
+        })
+    }
 }
 
 pub trait AuthUserIdGenerator {

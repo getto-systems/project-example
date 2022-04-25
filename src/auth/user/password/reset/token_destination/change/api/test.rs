@@ -26,7 +26,7 @@ use crate::auth::user::password::reset::token_destination::change::action::{
 
 use crate::auth::ticket::validate::method::AuthNonceConfig;
 
-use crate::auth::user::password::reset::token_destination::change::infra::ChangeResetTokenDestinationFields;
+use crate::auth::user::password::reset::token_destination::change::infra::ChangeResetTokenDestinationFieldsExtract;
 
 use crate::auth::{
     ticket::kernel::data::{AuthTicketExtract, ExpireDuration},
@@ -117,6 +117,27 @@ async fn error_not_found() {
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [user])",
         "change reset token destination error; not found",
+    ]);
+    assert!(result.is_err());
+}
+
+#[tokio::test]
+async fn error_invalid_email() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
+    let request_decoder = invalid_email_request_decoder();
+
+    let mut action = ChangeResetTokenDestinationAction::with_material(request_decoder, material);
+    action.subscribe(handler);
+
+    let result = action.ignite().await;
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "change reset token destination error; invalid; to: invalid email",
     ]);
     assert!(result.is_err());
 }
@@ -218,33 +239,48 @@ const USER_ID: &'static str = "user-id";
 const LOGIN_ID: &'static str = "login-id";
 
 fn standard_request_decoder() -> StaticChangeResetTokenDestinationRequestDecoder {
-    StaticChangeResetTokenDestinationRequestDecoder::Valid(ChangeResetTokenDestinationFields {
-        login_id: LoginId::restore(LOGIN_ID.into()),
-        from: ResetTokenDestination::None,
-        to: ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(
-            "user@example.com".into(),
-        )),
-    })
+    StaticChangeResetTokenDestinationRequestDecoder::Valid(
+        ChangeResetTokenDestinationFieldsExtract {
+            login_id: LOGIN_ID.into(),
+            from: Some(ResetTokenDestinationExtract::None),
+            to: Some(ResetTokenDestinationExtract::Email(
+                "user@example.com".into(),
+            )),
+        },
+    )
 }
 fn conflict_request_decoder() -> StaticChangeResetTokenDestinationRequestDecoder {
-    StaticChangeResetTokenDestinationRequestDecoder::Valid(ChangeResetTokenDestinationFields {
-        login_id: LoginId::restore(LOGIN_ID.into()),
-        from: ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(
-            "user@example.com".into(),
-        )),
-        to: ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(
-            "user@example.com".into(),
-        )),
-    })
+    StaticChangeResetTokenDestinationRequestDecoder::Valid(
+        ChangeResetTokenDestinationFieldsExtract {
+            login_id: LOGIN_ID.into(),
+            from: Some(ResetTokenDestinationExtract::Email(
+                "user@example.com".into(),
+            )),
+            to: Some(ResetTokenDestinationExtract::Email(
+                "user@example.com".into(),
+            )),
+        },
+    )
 }
 fn not_found_request_decoder() -> StaticChangeResetTokenDestinationRequestDecoder {
-    StaticChangeResetTokenDestinationRequestDecoder::Valid(ChangeResetTokenDestinationFields {
-        login_id: LoginId::restore("unknown-user".into()),
-        from: ResetTokenDestination::None,
-        to: ResetTokenDestination::restore(ResetTokenDestinationExtract::Email(
-            "user@example.com".into(),
-        )),
-    })
+    StaticChangeResetTokenDestinationRequestDecoder::Valid(
+        ChangeResetTokenDestinationFieldsExtract {
+            login_id: "unknown-user".into(),
+            from: Some(ResetTokenDestinationExtract::None),
+            to: Some(ResetTokenDestinationExtract::Email(
+                "user@example.com".into(),
+            )),
+        },
+    )
+}
+fn invalid_email_request_decoder() -> StaticChangeResetTokenDestinationRequestDecoder {
+    StaticChangeResetTokenDestinationRequestDecoder::Valid(
+        ChangeResetTokenDestinationFieldsExtract {
+            login_id: LOGIN_ID.into(),
+            from: Some(ResetTokenDestinationExtract::None),
+            to: Some(ResetTokenDestinationExtract::Email("invalid-email".into())),
+        },
+    )
 }
 
 fn standard_destination_repository<'a>(

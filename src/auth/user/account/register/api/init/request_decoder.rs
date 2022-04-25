@@ -1,16 +1,12 @@
-use crate::auth::user::account::kernel::data::{AuthUserAttributes, AuthUserAttributesExtract};
 use crate::auth::user::account::register::y_protobuf::service::RegisterAuthUserAccountRequestPb;
 
 use crate::auth::user::account::register::infra::{
-    RegisterAuthUserAccountFields, RegisterAuthUserAccountRequestDecoder,
+    RegisterAuthUserAccountFieldsExtract, RegisterAuthUserAccountRequestDecoder,
 };
 
-use crate::auth::user::password::reset::kernel::data::{
-    ResetTokenDestination, ResetTokenDestinationExtract,
-};
 use crate::auth::user::{
-    account::register::data::ValidateRegisterAuthUserAccountFieldsError,
-    kernel::data::GrantedAuthRoles, login_id::kernel::data::LoginId,
+    account::kernel::data::AuthUserAttributesExtract,
+    password::reset::kernel::data::ResetTokenDestinationExtract,
 };
 
 pub struct PbRegisterAuthUserAccountRequestDecoder {
@@ -24,50 +20,39 @@ impl PbRegisterAuthUserAccountRequestDecoder {
 }
 
 impl RegisterAuthUserAccountRequestDecoder for PbRegisterAuthUserAccountRequestDecoder {
-    fn decode(
-        self,
-    ) -> Result<RegisterAuthUserAccountFields, ValidateRegisterAuthUserAccountFieldsError> {
-        Ok(RegisterAuthUserAccountFields {
-            login_id: LoginId::convert(self.request.login_id)
-                .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidLoginId)?,
-            granted_roles: GrantedAuthRoles::convert(self.request.granted_roles)
-                .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidGrantedRoles)?,
-            reset_token_destination: ResetTokenDestination::convert(
-                self.request
-                    .reset_token_destination
-                    .and_then(|destination| match destination.r#type.as_str() {
-                        "email" => Some(ResetTokenDestinationExtract::Email(destination.email)),
-                        _ => None,
-                    })
-                    .unwrap_or(ResetTokenDestinationExtract::None),
-            )
-            .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidResetTokenDestination)?,
-            attrs: AuthUserAttributes::convert(AuthUserAttributesExtract {
+    fn decode(self) -> RegisterAuthUserAccountFieldsExtract {
+        RegisterAuthUserAccountFieldsExtract {
+            login_id: self.request.login_id,
+            granted_roles: self.request.granted_roles,
+            reset_token_destination: self
+                .request
+                .reset_token_destination
+                .and_then(|destination| match destination.r#type.as_str() {
+                    "email" => Some(ResetTokenDestinationExtract::Email(destination.email)),
+                    _ => None,
+                })
+                .unwrap_or(ResetTokenDestinationExtract::None),
+            attrs: AuthUserAttributesExtract {
                 memo: self.request.memo,
-            }).map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidAttrs)?,
-        })
+            },
+        }
     }
 }
 
 #[cfg(test)]
 pub mod test {
     use crate::auth::user::account::register::infra::{
-        RegisterAuthUserAccountFields, RegisterAuthUserAccountRequestDecoder,
+        RegisterAuthUserAccountFieldsExtract, RegisterAuthUserAccountRequestDecoder,
     };
 
-    use crate::auth::user::account::register::data::ValidateRegisterAuthUserAccountFieldsError;
-
     pub enum StaticRegisterAuthUserAccountRequestDecoder {
-        Valid(RegisterAuthUserAccountFields),
+        Valid(RegisterAuthUserAccountFieldsExtract),
     }
 
     impl RegisterAuthUserAccountRequestDecoder for StaticRegisterAuthUserAccountRequestDecoder {
-        fn decode(
-            self,
-        ) -> Result<RegisterAuthUserAccountFields, ValidateRegisterAuthUserAccountFieldsError>
-        {
+        fn decode(self) -> RegisterAuthUserAccountFieldsExtract {
             match self {
-                Self::Valid(fields) => Ok(fields),
+                Self::Valid(fields) => fields,
             }
         }
     }
