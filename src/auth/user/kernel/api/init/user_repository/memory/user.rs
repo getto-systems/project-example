@@ -1,7 +1,7 @@
 use std::{collections::HashMap, sync::Mutex};
 
 use crate::auth::user::{
-    account::modify::data::ModifyAuthUserAccountChanges,
+    account::{kernel::data::AuthUserAttributes, modify::data::ModifyAuthUserAccountChanges},
     kernel::data::{AuthUserId, GrantedAuthRoles},
     login_id::kernel::data::LoginId,
     password::kernel::infra::HashedPassword,
@@ -17,6 +17,7 @@ pub struct EntryUser {
     pub login_id: LoginId,
     pub granted_roles: Option<GrantedAuthRoles>,
     pub password: Option<HashedPassword>,
+    pub attrs: AuthUserAttributes,
 }
 
 impl<'a> MapUser<'a> {
@@ -56,6 +57,7 @@ impl<'a> MapUser<'a> {
                     .granted_roles
                     .clone()
                     .unwrap_or(GrantedAuthRoles::empty()),
+                attrs: entry.attrs.clone(),
             })
     }
 
@@ -94,6 +96,7 @@ impl<'a> MapUser<'a> {
                 user_id,
                 EntryUser {
                     granted_roles: Some(changes.granted_roles),
+                    attrs: changes.attrs,
                     ..entry
                 },
             );

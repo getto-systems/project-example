@@ -1,6 +1,9 @@
-use crate::z_lib::validate::{text::{check_text_empty, check_text_too_long}, data::ValidateTextError};
+use crate::z_lib::validate::text::{check_text_empty, check_text_too_long};
 
-use super::data::{LoginIdExtract, ValidateLoginIdError};
+use crate::{
+    auth::user::login_id::kernel::data::{LoginIdExtract, ValidateLoginIdError},
+    z_lib::validate::data::ValidateTextError,
+};
 
 impl LoginIdExtract for String {
     fn convert(self) -> Result<String, ValidateLoginIdError> {
@@ -11,8 +14,6 @@ impl LoginIdExtract for String {
 
 fn validate_login_id(value: &str) -> Result<(), ValidateTextError> {
     check_text_empty(value)?;
-    // login id には意味的な制限はないが、使用可能な最大文字数は定義しておく
-    // ui の設定と同期させること
-    check_text_too_long(value, 100)?;
+    check_text_too_long(value, 100)?; // ui の設定と同期させること
     Ok(())
 }

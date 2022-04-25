@@ -14,8 +14,6 @@ impl PlainPasswordExtract for String {
 
 fn validate_password(value: &str) -> Result<(), ValidateTextError> {
     check_text_empty(value)?;
-    // password には技術的な制限はないが、使用可能な最大文字数は定義しておく
-    // ui の設定と同期させること
-    check_text_too_long(value, 100)?;
+    check_text_too_long(value, 100)?; // ui の設定と同期させること
     Ok(())
 }

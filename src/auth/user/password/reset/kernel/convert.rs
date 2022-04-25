@@ -31,9 +31,7 @@ impl ResetTokenDestinationEmailExtract for String {
 
 fn validate_reset_token_destination_email(value: &str) -> Result<(), ValidateTextError> {
     check_text_empty(value)?;
-    // email には意味的な制限はないが、使用可能な最大文字数は定義しておく
-    // ui の設定と同期させること
-    check_text_too_long(value, 255)?;
+    check_text_too_long(value, 255)?; // ui の設定と同期させること
     check_text_invalid_email(value)?;
     Ok(())
 }

@@ -1,6 +1,9 @@
 use crate::{
     auth::user::{
-        account::register::data::ValidateRegisterAuthUserAccountFieldsError,
+        account::{
+            kernel::data::AuthUserAttributes,
+            register::data::ValidateRegisterAuthUserAccountFieldsError,
+        },
         kernel::data::{AuthUserId, GrantedAuthRoles},
         login_id::kernel::data::LoginId,
         password::reset::kernel::data::ResetTokenDestination,
@@ -19,6 +22,7 @@ pub struct RegisterAuthUserAccountFields {
     pub login_id: LoginId,
     pub granted_roles: GrantedAuthRoles,
     pub reset_token_destination: ResetTokenDestination,
+    pub attrs: AuthUserAttributes,
 }
 
 pub trait AuthUserIdGenerator {

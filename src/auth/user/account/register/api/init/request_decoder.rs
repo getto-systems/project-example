@@ -1,3 +1,4 @@
+use crate::auth::user::account::kernel::data::{AuthUserAttributes, AuthUserAttributesExtract};
 use crate::auth::user::account::register::y_protobuf::service::RegisterAuthUserAccountRequestPb;
 
 use crate::auth::user::account::register::infra::{
@@ -41,6 +42,9 @@ impl RegisterAuthUserAccountRequestDecoder for PbRegisterAuthUserAccountRequestD
                     .unwrap_or(ResetTokenDestinationExtract::None),
             )
             .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidResetTokenDestination)?,
+            attrs: AuthUserAttributes::convert(AuthUserAttributesExtract {
+                memo: self.request.memo,
+            }).map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidAttrs)?,
         })
     }
 }

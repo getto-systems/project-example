@@ -1,3 +1,4 @@
+use crate::auth::user::account::kernel::data::{AuthUserAttributes, AuthUserAttributesExtract};
 use crate::auth::user::account::modify::y_protobuf::service::{
     ModifyAuthUserAccountChangesPb, ModifyAuthUserAccountRequestPb,
 };
@@ -8,7 +9,8 @@ use crate::auth::user::account::modify::infra::{
 
 use crate::auth::user::{
     account::modify::data::{
-        ModifyAuthUserAccountChanges, ValidateModifyAuthUserAccountChangesError, ValidateModifyAuthUserAccountFieldsError,
+        ModifyAuthUserAccountChanges, ValidateModifyAuthUserAccountChangesError,
+        ValidateModifyAuthUserAccountFieldsError,
     },
     kernel::data::GrantedAuthRoles,
     login_id::kernel::data::LoginId,
@@ -25,13 +27,16 @@ impl PbModifyAuthUserAccountRequestDecoder {
 }
 
 impl ModifyAuthUserAccountRequestDecoder for PbModifyAuthUserAccountRequestDecoder {
-    fn decode(self) -> Result<ModifyAuthUserAccountFields, ValidateModifyAuthUserAccountFieldsError> {
+    fn decode(
+        self,
+    ) -> Result<ModifyAuthUserAccountFields, ValidateModifyAuthUserAccountFieldsError> {
         Ok(ModifyAuthUserAccountFields {
             login_id: LoginId::convert(self.request.login_id)
                 .map_err(ValidateModifyAuthUserAccountFieldsError::InvalidLoginId)?,
             from: validate_data(self.request.from)
                 .map_err(ValidateModifyAuthUserAccountFieldsError::InvalidFrom)?,
-            to: validate_data(self.request.to).map_err(ValidateModifyAuthUserAccountFieldsError::InvalidTo)?,
+            to: validate_data(self.request.to)
+                .map_err(ValidateModifyAuthUserAccountFieldsError::InvalidTo)?,
         })
     }
 }
@@ -44,6 +49,8 @@ fn validate_data(
         Some(data) => Ok(ModifyAuthUserAccountChanges {
             granted_roles: GrantedAuthRoles::convert(data.granted_roles)
                 .map_err(ValidateModifyAuthUserAccountChangesError::InvalidGrantedRoles)?,
+            attrs: AuthUserAttributes::convert(AuthUserAttributesExtract { memo: data.memo })
+                .map_err(ValidateModifyAuthUserAccountChangesError::InvalidAttrs)?,
         }),
     }
 }
@@ -61,7 +68,9 @@ pub mod test {
     }
 
     impl ModifyAuthUserAccountRequestDecoder for StaticModifyAuthUserAccountRequestDecoder {
-        fn decode(self) -> Result<ModifyAuthUserAccountFields, ValidateModifyAuthUserAccountFieldsError> {
+        fn decode(
+            self,
+        ) -> Result<ModifyAuthUserAccountFields, ValidateModifyAuthUserAccountFieldsError> {
             match self {
                 Self::Valid(fields) => Ok(fields),
             }

@@ -104,8 +104,7 @@ async function fetchRemote(
                             type: user.resetTokenDestination?.type || "",
                             email: user.resetTokenDestination?.email || "",
                         }),
-                        // TODO memo を受け取る
-                        memo: restoreAuthUserMemo(""),
+                        memo: restoreAuthUserMemo(user.memo || ""),
                     }),
                 ),
             },

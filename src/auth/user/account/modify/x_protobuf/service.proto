@@ -20,6 +20,6 @@ enum ModifyAuthUserAccountErrorKindPb {
     INVALID = 2;
 }
 message ModifyAuthUserAccountChangesPb {
-    string memo = 1;
-    repeated string granted_roles = 2;
+    repeated string granted_roles = 1;
+    string memo = 2;
 }
