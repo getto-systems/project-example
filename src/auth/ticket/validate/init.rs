@@ -29,26 +29,22 @@ use crate::auth::ticket::{
     },
 };
 
-use crate::auth::ticket::validate::action::AuthorizeAction;
+use crate::auth::ticket::validate::action::AuthenticateApiAction;
 
 use crate::auth::ticket::validate::method::{
     AuthNonceConfig, AuthenticateInfra, AuthorizeInfra, ValidateAuthMetadataInfra,
     ValidateAuthNonceInfra,
 };
 
-pub struct AuthorizeStruct;
-
-impl AuthorizeStruct {
-    pub fn action<'a>(
-        feature: &'a AuthAppFeature,
-        metadata: &'a MetadataMap,
-        request: AuthorizeRequestPb,
-    ) -> AuthorizeAction<PbAuthorizeRequestDecoder, AuthenticateApiStruct<'a>> {
-        AuthorizeAction::with_material(
-            PbAuthorizeRequestDecoder::new(request),
-            AuthenticateApiStruct::new(feature, metadata),
-        )
-    }
+pub fn authenticate_api_action<'a>(
+    feature: &'a AuthAppFeature,
+    metadata: &'a MetadataMap,
+    request: AuthorizeRequestPb,
+) -> AuthenticateApiAction<PbAuthorizeRequestDecoder, AuthenticateApiStruct<'a>> {
+    AuthenticateApiAction::with_material(
+        PbAuthorizeRequestDecoder::new(request),
+        AuthenticateApiStruct::new(feature, metadata),
+    )
 }
 
 pub struct AuthenticateTicketStruct<'a> {
@@ -115,13 +111,13 @@ impl<'a> AuthenticateInfra for AuthenticateApiStruct<'a> {
     }
 }
 
-pub struct CheckPermissionStruct<'a> {
+pub struct AuthorizeStruct<'a> {
     auth_metadata: TonicAuthMetadata<'a>,
     token_decoder: NoopTokenDecoder,
     validate_service: TonicValidateService<'a>,
 }
 
-impl<'a> CheckPermissionStruct<'a> {
+impl<'a> AuthorizeStruct<'a> {
     pub fn new(
         service: &'a AuthOutsideService,
         request_id: &'a str,
@@ -135,7 +131,7 @@ impl<'a> CheckPermissionStruct<'a> {
     }
 }
 
-impl<'a> AuthorizeInfra for CheckPermissionStruct<'a> {
+impl<'a> AuthorizeInfra for AuthorizeStruct<'a> {
     type AuthMetadata = TonicAuthMetadata<'a>;
     type TokenDecoder = NoopTokenDecoder;
     type ValidateService = TonicValidateService<'a>;
@@ -311,13 +307,13 @@ pub mod test {
         }
     }
 
-    pub struct StaticCheckPermissionStruct {
+    pub struct StaticAuthorizeStruct {
         pub auth_metadata: StaticAuthMetadata,
         pub token_decoder: StaticAuthTokenDecoder,
         pub validate_service: StaticValidateService,
     }
 
-    impl AuthorizeInfra for StaticCheckPermissionStruct {
+    impl AuthorizeInfra for StaticAuthorizeStruct {
         type AuthMetadata = StaticAuthMetadata;
         type TokenDecoder = StaticAuthTokenDecoder;
         type ValidateService = StaticValidateService;

@@ -8,7 +8,7 @@ use crate::auth::user::account::search::infra::{
 
 use crate::{
     auth::{
-        ticket::kernel::data::ValidateAuthRolesError,
+        ticket::kernel::data::PermissionError,
         user::{
             account::search::data::{AuthUserAccountSearch, SearchAuthUserAccountFilterExtract},
             kernel::data::RequireAuthRoles,
@@ -19,7 +19,7 @@ use crate::{
 
 pub enum SearchAuthUserAccountState {
     Authenticate(AuthenticateEvent),
-    PermissionError(ValidateAuthRolesError),
+    PermissionError(PermissionError),
     Search(SearchAuthUserAccountEvent),
 }
 

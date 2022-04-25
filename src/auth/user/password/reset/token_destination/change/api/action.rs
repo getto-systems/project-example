@@ -11,7 +11,7 @@ use crate::auth::user::password::reset::token_destination::change::infra::{
 
 use crate::{
     auth::{
-        data::RequireAuthRoles, ticket::kernel::data::ValidateAuthRolesError,
+        data::RequireAuthRoles, ticket::kernel::data::PermissionError,
         user::password::reset::token_destination::change::data::ValidateChangeResetTokenDestinationFieldsError,
     },
     z_lib::repository::data::RepositoryError,
@@ -19,7 +19,7 @@ use crate::{
 
 pub enum ChangeResetTokenDestinationState {
     Authenticate(AuthenticateEvent),
-    PermissionError(ValidateAuthRolesError),
+    PermissionError(PermissionError),
     ChangeDestination(ChangeResetTokenDestinationEvent),
 }
 

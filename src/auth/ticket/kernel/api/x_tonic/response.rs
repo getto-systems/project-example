@@ -10,7 +10,7 @@ use crate::auth::ticket::y_protobuf::service::{
 
 use crate::auth::ticket::kernel::data::{
     AuthTokenExtract, CloudfrontTokenKind, DecodeAuthTokenError, EncodedAuthTokens,
-    ValidateAuthRolesError,
+    PermissionError,
 };
 
 impl Into<EncodedAuthTokensPb> for EncodedAuthTokens {
@@ -111,7 +111,7 @@ impl<T> ServiceResponder<T> for DecodeAuthTokenError {
     }
 }
 
-impl<T> ServiceResponder<T> for ValidateAuthRolesError {
+impl<T> ServiceResponder<T> for PermissionError {
     fn respond_to(self) -> Result<Response<T>, Status> {
         match self {
             Self::PermissionDenied(_, _) => Err(Status::permission_denied(format!("{}", self))),

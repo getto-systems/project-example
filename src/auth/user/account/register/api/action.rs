@@ -11,7 +11,7 @@ use crate::auth::user::account::register::infra::{
 
 use crate::{
     auth::{
-        data::RequireAuthRoles, ticket::kernel::data::ValidateAuthRolesError,
+        data::RequireAuthRoles, ticket::kernel::data::PermissionError,
         user::account::register::data::ValidateRegisterAuthUserAccountFieldsError,
     },
     z_lib::repository::data::RepositoryError,
@@ -19,7 +19,7 @@ use crate::{
 
 pub enum RegisterAuthUserAccountState {
     Authenticate(AuthenticateEvent),
-    PermissionError(ValidateAuthRolesError),
+    PermissionError(PermissionError),
     RegisterUser(RegisterAuthUserAccountEvent),
 }
 

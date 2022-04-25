@@ -23,10 +23,10 @@ impl std::fmt::Display for LogoutState {
 }
 
 pub trait LogoutMaterial {
-    type AuthenticateInfra: AuthenticateInfra;
+    type Authenticate: AuthenticateInfra;
     type TicketRepository: LogoutAuthTicketRepository;
 
-    fn authenticate(&self) -> &Self::AuthenticateInfra;
+    fn authenticate(&self) -> &Self::Authenticate;
     fn ticket_repository(&self) -> &Self::TicketRepository;
 }
 

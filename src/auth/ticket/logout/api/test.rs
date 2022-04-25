@@ -75,10 +75,10 @@ struct TestStruct<'a> {
 }
 
 impl<'a> LogoutMaterial for TestStruct<'a> {
-    type AuthenticateInfra = StaticAuthenticateStruct<'a>;
+    type Authenticate = StaticAuthenticateStruct<'a>;
     type TicketRepository = MemoryAuthTicketRepository<'a>;
 
-    fn authenticate(&self) -> &Self::AuthenticateInfra {
+    fn authenticate(&self) -> &Self::Authenticate {
         &self.validate
     }
     fn ticket_repository(&self) -> &Self::TicketRepository {

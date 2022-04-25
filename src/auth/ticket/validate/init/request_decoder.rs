@@ -1,6 +1,6 @@
 use crate::auth::ticket::validate::y_protobuf::service::AuthorizeRequestPb;
 
-use crate::auth::ticket::validate::infra::AuthorizeRequestDecoder;
+use crate::auth::ticket::validate::infra::AuthenticateApiRequestDecoder;
 
 use crate::auth::user::kernel::data::RequireAuthRoles;
 
@@ -14,7 +14,7 @@ impl PbAuthorizeRequestDecoder {
     }
 }
 
-impl AuthorizeRequestDecoder for PbAuthorizeRequestDecoder {
+impl AuthenticateApiRequestDecoder for PbAuthorizeRequestDecoder {
     fn decode(self) -> RequireAuthRoles {
         if self.request.allow_any_role {
             RequireAuthRoles::Nothing
@@ -33,7 +33,7 @@ impl AuthorizeRequestDecoder for PbAuthorizeRequestDecoder {
 #[cfg(test)]
 pub mod test {
     use crate::auth::{
-        ticket::validate::infra::AuthorizeRequestDecoder,
+        ticket::validate::infra::AuthenticateApiRequestDecoder,
         user::kernel::data::RequireAuthRoles,
     };
 
@@ -41,7 +41,7 @@ pub mod test {
         pub require_roles: RequireAuthRoles,
     }
 
-    impl AuthorizeRequestDecoder for StaticValidateApiTokenRequestDecoder {
+    impl AuthenticateApiRequestDecoder for StaticValidateApiTokenRequestDecoder {
         fn decode(self) -> RequireAuthRoles {
             self.require_roles
         }

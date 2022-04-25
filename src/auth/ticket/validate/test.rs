@@ -18,7 +18,7 @@ use crate::auth::ticket::{
 
 use crate::auth::ticket::validate::method::AuthNonceConfig;
 
-use super::action::AuthorizeAction;
+use super::action::AuthenticateApiAction;
 
 use crate::auth::{
     ticket::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
@@ -33,7 +33,7 @@ async fn success_allow_for_any_role() {
     let material = TestStruct::standard(&store);
     let request_decoder = allow_any_role_request_decoder();
 
-    let mut action = AuthorizeAction::with_material(request_decoder, material);
+    let mut action = AuthenticateApiAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -54,7 +54,7 @@ async fn success_allow_for_user_role() {
     let material = TestStruct::standard(&store);
     let request_decoder = allow_user_role_request_decoder();
 
-    let mut action = AuthorizeAction::with_material(request_decoder, material);
+    let mut action = AuthenticateApiAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -75,7 +75,7 @@ async fn error_allow_for_user_role_but_not_granted() {
     let material = TestStruct::no_granted_roles(&store);
     let request_decoder = allow_user_role_request_decoder();
 
-    let mut action = AuthorizeAction::with_material(request_decoder, material);
+    let mut action = AuthenticateApiAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -96,7 +96,7 @@ async fn error_token_expired() {
     let material = TestStruct::token_expired(&store);
     let request_decoder = allow_user_role_request_decoder();
 
-    let mut action = AuthorizeAction::with_material(request_decoder, material);
+    let mut action = AuthenticateApiAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -116,7 +116,7 @@ async fn error_conflict_nonce() {
     let material = TestStruct::conflict_nonce(&store);
     let request_decoder = allow_user_role_request_decoder();
 
-    let mut action = AuthorizeAction::with_material(request_decoder, material);
+    let mut action = AuthenticateApiAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;

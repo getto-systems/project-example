@@ -13,7 +13,7 @@ use crate::x_outside_feature::auth::{
 
 use crate::x_content::metadata::metadata_request_id;
 
-use crate::auth::ticket::validate::init::AuthorizeStruct;
+use crate::auth::ticket::validate::init::authenticate_api_action;
 
 use crate::z_lib::{logger::infra::Logger, response::tonic::ServiceResponder};
 
@@ -33,7 +33,7 @@ impl AuthorizePb for ServiceAuthorize {
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger("auth.ticket.authorize", request_id.into());
-        let mut action = AuthorizeStruct::action(&feature, &metadata, request);
+        let mut action = authenticate_api_action(&feature, &metadata, request);
         action.subscribe(move |state| logger.log(state));
 
         flatten(action.ignite().await).respond_to()

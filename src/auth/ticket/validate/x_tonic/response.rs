@@ -4,13 +4,13 @@ use crate::auth::ticket::validate::y_protobuf::service::AuthorizeResponsePb;
 
 use crate::z_lib::response::tonic::ServiceResponder;
 
-use crate::auth::ticket::validate::action::AuthorizeState;
+use crate::auth::ticket::validate::action::AuthenticateApiState;
 
 use crate::auth::ticket::validate::method::{
     AuthorizeEvent, ValidateAuthNonceEvent, AuthenticateEvent,
 };
 
-impl ServiceResponder<AuthorizeResponsePb> for AuthorizeState {
+impl ServiceResponder<AuthorizeResponsePb> for AuthenticateApiState {
     fn respond_to(self) -> Result<Response<AuthorizeResponsePb>, Status> {
         match self {
             Self::Authenticate(event) => event.respond_to(),

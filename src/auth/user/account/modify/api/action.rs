@@ -11,7 +11,7 @@ use crate::auth::user::account::modify::infra::{
 
 use crate::{
     auth::{
-        data::RequireAuthRoles, ticket::kernel::data::ValidateAuthRolesError,
+        data::RequireAuthRoles, ticket::kernel::data::PermissionError,
         user::account::modify::data::ValidateModifyAuthUserAccountFieldsError,
     },
     z_lib::repository::data::RepositoryError,
@@ -19,7 +19,7 @@ use crate::{
 
 pub enum ModifyAuthUserAccountState {
     Authenticate(AuthenticateEvent),
-    PermissionError(ValidateAuthRolesError),
+    PermissionError(PermissionError),
     ModifyUser(ModifyAuthUserAccountEvent),
 }
 

@@ -11,7 +11,7 @@ impl LogMessage for LoadOutlineMenuBadgeState {
 impl LogFilter for LoadOutlineMenuBadgeState {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::CheckPermission(event) => event.log_level(),
+            Self::Authorize(event) => event.log_level(),
             Self::LoadMenuBadge(event) => event.log_level(),
         }
     }

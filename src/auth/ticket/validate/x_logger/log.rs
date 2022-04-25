@@ -1,4 +1,4 @@
-use crate::auth::ticket::validate::action::AuthorizeState;
+use crate::auth::ticket::validate::action::AuthenticateApiState;
 
 use crate::auth::ticket::validate::method::{
     AuthorizeEvent, ValidateAuthMetadataEvent, ValidateAuthNonceEvent, AuthenticateEvent,
@@ -6,13 +6,13 @@ use crate::auth::ticket::validate::method::{
 
 use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
 
-impl LogMessage for AuthorizeState {
+impl LogMessage for AuthenticateApiState {
     fn log_message(&self) -> String {
         format!("{}", self)
     }
 }
 
-impl LogFilter for AuthorizeState {
+impl LogFilter for AuthenticateApiState {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::Authenticate(event) => event.log_level(),

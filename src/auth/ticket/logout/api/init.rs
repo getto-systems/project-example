@@ -25,10 +25,10 @@ impl<'a> LogoutStruct<'a> {
 
 #[async_trait::async_trait]
 impl<'a> LogoutMaterial for LogoutStruct<'a> {
-    type AuthenticateInfra = AuthenticateTicketStruct<'a>;
+    type Authenticate = AuthenticateTicketStruct<'a>;
     type TicketRepository = DynamoDbAuthTicketRepository<'a>;
 
-    fn authenticate(&self) -> &Self::AuthenticateInfra {
+    fn authenticate(&self) -> &Self::Authenticate {
         &self.validate
     }
     fn ticket_repository(&self) -> &Self::TicketRepository {

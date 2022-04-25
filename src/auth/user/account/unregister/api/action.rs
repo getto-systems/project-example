@@ -10,7 +10,7 @@ use crate::auth::user::account::unregister::infra::{
 
 use crate::{
     auth::{
-        data::RequireAuthRoles, ticket::kernel::data::ValidateAuthRolesError,
+        data::RequireAuthRoles, ticket::kernel::data::PermissionError,
         user::account::unregister::data::ValidateUnregisterAuthUserAccountFieldsError,
     },
     z_lib::repository::data::RepositoryError,
@@ -18,7 +18,7 @@ use crate::{
 
 pub enum UnregisterAuthUserAccountState {
     Authenticate(AuthenticateEvent),
-    PermissionError(ValidateAuthRolesError),
+    PermissionError(PermissionError),
     UnregisterUser(UnregisterAuthUserAccountEvent),
 }
 

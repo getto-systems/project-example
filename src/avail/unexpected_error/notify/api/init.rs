@@ -7,14 +7,14 @@ use crate::avail::unexpected_error::notify::y_protobuf::service::NotifyRequestPb
 use crate::x_outside_feature::core::feature::CoreAppFeature;
 
 use crate::{
-    auth::init::CheckPermissionStruct,
+    auth::init::AuthorizeStruct,
     avail::unexpected_error::notify::init::request_decoder::PbNotifyUnexpectedErrorRequestDecoder,
 };
 
 use super::action::{NotifyUnexpectedErrorAction, NotifyUnexpectedErrorMaterial};
 
 pub struct NotifyUnexpectedErrorFeature<'a> {
-    check_permission: CheckPermissionStruct<'a>,
+    authorize: AuthorizeStruct<'a>,
 }
 
 impl<'a> NotifyUnexpectedErrorFeature<'a> {
@@ -27,7 +27,7 @@ impl<'a> NotifyUnexpectedErrorFeature<'a> {
         NotifyUnexpectedErrorAction::with_material(
             PbNotifyUnexpectedErrorRequestDecoder::new(request),
             Self {
-                check_permission: CheckPermissionStruct::new(
+                authorize: AuthorizeStruct::new(
                     &feature.auth.service,
                     request_id,
                     metadata,
@@ -39,9 +39,9 @@ impl<'a> NotifyUnexpectedErrorFeature<'a> {
 
 #[async_trait::async_trait]
 impl<'a> NotifyUnexpectedErrorMaterial for NotifyUnexpectedErrorFeature<'a> {
-    type CheckPermission = CheckPermissionStruct<'a>;
+    type Authorize = AuthorizeStruct<'a>;
 
-    fn check_permission(&self) -> &Self::CheckPermission {
-        &self.check_permission
+    fn authorize(&self) -> &Self::Authorize {
+        &self.authorize
     }
 }
