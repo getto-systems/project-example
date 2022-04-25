@@ -4,19 +4,10 @@ use crate::auth::user::password::reset::token_destination::{
 };
 
 use crate::auth::user::password::reset::token_destination::change::infra::{
-    ChangeResetTokenDestinationFields, ChangeResetTokenDestinationRequestDecoder,
+    ChangeResetTokenDestinationFieldsExtract, ChangeResetTokenDestinationRequestDecoder,
 };
 
-use crate::auth::user::{
-    login_id::kernel::data::LoginId,
-    password::reset::{
-        kernel::data::{ResetTokenDestination, ResetTokenDestinationExtract},
-        token_destination::change::data::{
-            ValidateChangeResetTokenDestinationChangesError,
-            ValidateChangeResetTokenDestinationFieldsError,
-        },
-    },
-};
+use crate::auth::user::password::reset::kernel::data::ResetTokenDestinationExtract;
 
 pub struct PbChangeResetTokenDestinationRequestDecoder {
     request: ChangeResetTokenDestinationRequestPb,
@@ -29,55 +20,36 @@ impl PbChangeResetTokenDestinationRequestDecoder {
 }
 
 impl ChangeResetTokenDestinationRequestDecoder for PbChangeResetTokenDestinationRequestDecoder {
-    fn decode(
-        self,
-    ) -> Result<ChangeResetTokenDestinationFields, ValidateChangeResetTokenDestinationFieldsError>
-    {
-        Ok(ChangeResetTokenDestinationFields {
-            login_id: LoginId::convert(self.request.login_id)
-                .map_err(ValidateChangeResetTokenDestinationFieldsError::InvalidLoginId)?,
-            from: validate_data(self.request.from)
-                .map_err(ValidateChangeResetTokenDestinationFieldsError::InvalidFrom)?,
-            to: validate_data(self.request.to)
-                .map_err(ValidateChangeResetTokenDestinationFieldsError::InvalidTo)?,
-        })
+    fn decode(self) -> ChangeResetTokenDestinationFieldsExtract {
+        ChangeResetTokenDestinationFieldsExtract {
+            login_id: self.request.login_id,
+            from: self.request.from.map(decode_destination),
+            to: self.request.to.map(decode_destination),
+        }
     }
 }
 
-fn validate_data(
-    data: Option<ResetTokenDestinationPb>,
-) -> Result<ResetTokenDestination, ValidateChangeResetTokenDestinationChangesError> {
-    match data {
-        None => Err(ValidateChangeResetTokenDestinationChangesError::NotFound),
-        Some(destination) => ResetTokenDestination::convert({
-            if destination.r#type == "email" {
-                ResetTokenDestinationExtract::Email(destination.email)
-            } else {
-                ResetTokenDestinationExtract::None
-            }
-        })
-        .map_err(ValidateChangeResetTokenDestinationChangesError::InvalidResetTokenDestination),
+fn decode_destination(request: ResetTokenDestinationPb) -> ResetTokenDestinationExtract {
+    match request.r#type.as_str() {
+        "email" => ResetTokenDestinationExtract::Email(request.email),
+        _ => ResetTokenDestinationExtract::None,
     }
 }
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::user::password::reset::token_destination::change::{
-        data::ValidateChangeResetTokenDestinationFieldsError,
-        infra::{ChangeResetTokenDestinationFields, ChangeResetTokenDestinationRequestDecoder},
+    use crate::auth::user::password::reset::token_destination::change::infra::{
+        ChangeResetTokenDestinationFieldsExtract, ChangeResetTokenDestinationRequestDecoder,
     };
 
     pub enum StaticChangeResetTokenDestinationRequestDecoder {
-        Valid(ChangeResetTokenDestinationFields),
+        Valid(ChangeResetTokenDestinationFieldsExtract),
     }
 
     impl ChangeResetTokenDestinationRequestDecoder for StaticChangeResetTokenDestinationRequestDecoder {
-        fn decode(
-            self,
-        ) -> Result<ChangeResetTokenDestinationFields, ValidateChangeResetTokenDestinationFieldsError>
-        {
+        fn decode(self) -> ChangeResetTokenDestinationFieldsExtract {
             match self {
-                Self::Valid(fields) => Ok(fields),
+                Self::Valid(fields) => fields,
             }
         }
     }

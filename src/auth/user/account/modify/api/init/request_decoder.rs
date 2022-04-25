@@ -23,13 +23,13 @@ impl ModifyAuthUserAccountRequestDecoder for PbModifyAuthUserAccountRequestDecod
     fn decode(self) -> ModifyAuthUserAccountFieldsExtract {
         ModifyAuthUserAccountFieldsExtract {
             login_id: self.request.login_id,
-            from: self.request.from.map(changes),
-            to: self.request.to.map(changes),
+            from: self.request.from.map(decode_changes),
+            to: self.request.to.map(decode_changes),
         }
     }
 }
 
-fn changes(data: ModifyAuthUserAccountChangesPb) -> ModifyAuthUserAccountChangesExtract {
+fn decode_changes(data: ModifyAuthUserAccountChangesPb) -> ModifyAuthUserAccountChangesExtract {
     ModifyAuthUserAccountChangesExtract {
         granted_roles: data.granted_roles,
         attrs: AuthUserAttributesExtract { memo: data.memo },
