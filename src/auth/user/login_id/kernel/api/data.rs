@@ -38,7 +38,7 @@ pub enum ValidateLoginIdError {
 impl std::fmt::Display for ValidateLoginIdError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::Text(err) => write!(f, "invalid login id; {}", err),
+            Self::Text(err) => err.fmt(f),
         }
     }
 }
