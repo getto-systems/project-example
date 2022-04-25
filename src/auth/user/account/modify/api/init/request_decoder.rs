@@ -42,7 +42,7 @@ fn validate_data(
     match data {
         None => Err(ValidateModifyAuthUserAccountChangesError::NotFound),
         Some(data) => Ok(ModifyAuthUserAccountChanges {
-            granted_roles: GrantedAuthRoles::validate(data.granted_roles)
+            granted_roles: GrantedAuthRoles::convert(data.granted_roles)
                 .map_err(ValidateModifyAuthUserAccountChangesError::InvalidGrantedRoles)?,
         }),
     }

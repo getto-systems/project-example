@@ -1,3 +1,5 @@
+use crate::z_lib::validate::data::ValidateTextError;
+
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct ResetToken(String);
 
@@ -14,8 +16,8 @@ impl ResetToken {
 pub struct ResetTokenEncoded(String);
 
 impl ResetTokenEncoded {
-    pub fn validate(token: impl ResetTokenEncodedExtract) -> Result<Self, ValidateResetTokenError> {
-        Ok(Self(token.validate()?))
+    pub fn convert(token: impl ResetTokenEncodedExtract) -> Result<Self, ValidateResetTokenError> {
+        Ok(Self(token.convert()?))
     }
 
     pub const fn new(token: String) -> Self {
@@ -28,7 +30,7 @@ impl ResetTokenEncoded {
 }
 
 pub trait ResetTokenEncodedExtract {
-    fn validate(self) -> Result<String, ValidateResetTokenError>;
+    fn convert(self) -> Result<String, ValidateResetTokenError>;
 }
 
 #[derive(Clone, PartialEq, Eq)]
@@ -38,13 +40,13 @@ pub enum ResetTokenDestination {
 }
 
 impl ResetTokenDestination {
-    pub fn validate(
+    pub fn convert(
         destination: ResetTokenDestinationExtract,
     ) -> Result<ResetTokenDestination, ValidateResetTokenDestinationError> {
         match destination {
             ResetTokenDestinationExtract::None => Ok(ResetTokenDestination::None),
             ResetTokenDestinationExtract::Email(email) => {
-                match ResetTokenDestinationEmail::validate(email) {
+                match ResetTokenDestinationEmail::convert(email) {
                     Ok(email) => Ok(ResetTokenDestination::Email(email)),
                     Err(err) => Err(ValidateResetTokenDestinationError::Email(err)),
                 }
@@ -84,10 +86,10 @@ impl std::fmt::Display for ResetTokenDestination {
 pub struct ResetTokenDestinationEmail(String);
 
 impl ResetTokenDestinationEmail {
-    pub fn validate(
+    pub fn convert(
         email: impl ResetTokenDestinationEmailExtract,
     ) -> Result<Self, ValidateResetTokenDestinationEmailError> {
-        Ok(Self(email.validate()?))
+        Ok(Self(email.convert()?))
     }
 
     pub(in crate::auth) const fn restore(email: String) -> Self {
@@ -106,7 +108,7 @@ impl std::fmt::Display for ResetTokenDestinationEmail {
 }
 
 pub trait ResetTokenDestinationEmailExtract {
-    fn validate(self) -> Result<String, ValidateResetTokenDestinationEmailError>;
+    fn convert(self) -> Result<String, ValidateResetTokenDestinationEmailError>;
 }
 
 pub enum ValidateResetTokenDestinationError {
@@ -122,17 +124,13 @@ impl std::fmt::Display for ValidateResetTokenDestinationError {
 }
 
 pub enum ValidateResetTokenDestinationEmailError {
-    Invalid,
-    Empty,
-    TooLong,
+    Text(ValidateTextError),
 }
 
 impl std::fmt::Display for ValidateResetTokenDestinationEmailError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::Invalid => write!(f, "invalid email"),
-            Self::Empty => write!(f, "empty email"),
-            Self::TooLong => write!(f, "too long email"),
+            Self::Text(err) => err.fmt(f),
         }
     }
 }
@@ -143,6 +141,7 @@ pub enum ResetTokenDestinationExtract {
     Email(String),
 }
 
+// TODO ValidateTextError を使う
 pub enum ValidateResetTokenError {
     Empty,
 }

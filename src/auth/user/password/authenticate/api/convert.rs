@@ -10,7 +10,7 @@ use crate::auth::user::{
 };
 
 impl AuthenticatePasswordFields {
-    pub fn validate(
+    pub fn convert(
         fields: AuthenticatePasswordFieldsExtract,
     ) -> Result<Self, ValidateAuthenticatePasswordFieldsError> {
         Ok(Self {

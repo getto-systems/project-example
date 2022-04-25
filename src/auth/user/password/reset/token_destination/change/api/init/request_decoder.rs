@@ -49,7 +49,7 @@ fn validate_data(
 ) -> Result<ResetTokenDestination, ValidateChangeResetTokenDestinationChangesError> {
     match data {
         None => Err(ValidateChangeResetTokenDestinationChangesError::NotFound),
-        Some(destination) => ResetTokenDestination::validate({
+        Some(destination) => ResetTokenDestination::convert({
             if destination.r#type == "email" {
                 ResetTokenDestinationExtract::Email(destination.email)
             } else {

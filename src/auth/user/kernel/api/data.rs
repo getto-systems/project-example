@@ -86,10 +86,10 @@ impl GrantedAuthRoles {
         Self(HashSet::new())
     }
 
-    pub fn validate(
+    pub fn convert(
         roles: impl GrantedAuthRolesExtract,
     ) -> Result<Self, ValidateGrantedAuthRolesError> {
-        roles.validate()
+        roles.convert()
     }
 
     pub(in crate::auth) fn restore(roles: HashSet<String>) -> Self {
@@ -135,7 +135,7 @@ impl std::fmt::Display for GrantedAuthRoles {
 }
 
 pub trait GrantedAuthRolesExtract {
-    fn validate(self) -> Result<GrantedAuthRoles, ValidateGrantedAuthRolesError>;
+    fn convert(self) -> Result<GrantedAuthRoles, ValidateGrantedAuthRolesError>;
 }
 
 pub enum ValidateGrantedAuthRolesError {

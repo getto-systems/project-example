@@ -7,7 +7,7 @@ use crate::auth::user::login_id::{
 };
 
 impl OverrideLoginIdFields {
-    pub fn validate(
+    pub fn convert(
         fields: OverrideLoginIdFieldsExtract,
     ) -> Result<OverrideLoginIdFields, ValidateOverrideLoginIdFieldsError> {
         Ok(Self {

@@ -12,7 +12,7 @@ use crate::auth::user::{
 };
 
 impl ChangePasswordFields {
-    pub fn validate(
+    pub fn convert(
         fields: ChangePasswordFieldsExtract,
     ) -> Result<Self, ValidateChangePasswordFieldsError> {
         Ok(Self {
@@ -25,7 +25,7 @@ impl ChangePasswordFields {
 }
 
 impl OverridePasswordFields {
-    pub fn validate(
+    pub fn convert(
         fields: OverridePasswordFieldsExtract,
     ) -> Result<Self, ValidateOverridePasswordFieldsError> {
         Ok(Self {

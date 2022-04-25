@@ -29,9 +29,9 @@ impl RegisterAuthUserAccountRequestDecoder for PbRegisterAuthUserAccountRequestD
         Ok(RegisterAuthUserAccountFields {
             login_id: LoginId::convert(self.request.login_id)
                 .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidLoginId)?,
-            granted_roles: GrantedAuthRoles::validate(self.request.granted_roles)
+            granted_roles: GrantedAuthRoles::convert(self.request.granted_roles)
                 .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidGrantedRoles)?,
-            reset_token_destination: ResetTokenDestination::validate(
+            reset_token_destination: ResetTokenDestination::convert(
                 self.request
                     .reset_token_destination
                     .and_then(|destination| match destination.r#type.as_str() {

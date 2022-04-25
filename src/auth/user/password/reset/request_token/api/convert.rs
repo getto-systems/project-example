@@ -8,7 +8,7 @@ use crate::auth::user::{
 };
 
 impl RequestResetTokenFields {
-    pub fn validate(
+    pub fn convert(
         fields: RequestResetTokenFieldsExtract,
     ) -> Result<Self, ValidateRequestResetTokenFieldsError> {
         Ok(Self {

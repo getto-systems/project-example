@@ -109,7 +109,7 @@ async fn override_login_id<S>(
     fields: OverrideLoginIdFieldsExtract,
     post: impl Fn(OverrideLoginIdEvent) -> S,
 ) -> MethodResult<S> {
-    let fields = OverrideLoginIdFields::validate(fields)
+    let fields = OverrideLoginIdFields::convert(fields)
         .map_err(|err| post(OverrideLoginIdEvent::Invalid(err)))?;
 
     let login_id_repository = infra.login_id_repository();

@@ -130,7 +130,7 @@ async fn change_password<S>(
     fields: ChangePasswordFieldsExtract,
     post: impl Fn(ChangePasswordEvent) -> S,
 ) -> MethodResult<S> {
-    let fields = ChangePasswordFields::validate(fields)
+    let fields = ChangePasswordFields::convert(fields)
         .map_err(|err| post(ChangePasswordEvent::Invalid(err)))?;
 
     let password_repository = infra.password_repository();
@@ -261,7 +261,7 @@ async fn override_password<S>(
     fields: OverridePasswordFieldsExtract,
     post: impl Fn(OverridePasswordEvent) -> S,
 ) -> MethodResult<S> {
-    let fields = OverridePasswordFields::validate(fields)
+    let fields = OverridePasswordFields::convert(fields)
         .map_err(|err| post(OverridePasswordEvent::Invalid(err)))?;
 
     let password_repository = infra.password_repository();
