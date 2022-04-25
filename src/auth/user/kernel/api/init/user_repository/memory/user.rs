@@ -1,7 +1,9 @@
 use std::{collections::HashMap, sync::Mutex};
 
+use crate::auth::user::account::modify::infra::ModifyAuthUserAccountChanges;
+
 use crate::auth::user::{
-    account::{kernel::data::AuthUserAttributes, modify::data::ModifyAuthUserAccountChanges},
+    account::kernel::data::AuthUserAttributes,
     kernel::data::{AuthUserId, GrantedAuthRoles},
     login_id::kernel::data::LoginId,
     password::kernel::infra::HashedPassword,

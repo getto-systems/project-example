@@ -5,7 +5,6 @@ use rusoto_dynamodb::{
     ScanInput, UpdateItemInput,
 };
 
-use crate::auth::user::account::kernel::data::{AuthUserAttributes, AuthUserAttributesExtract};
 use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
 use crate::z_lib::repository::{
@@ -13,11 +12,13 @@ use crate::z_lib::repository::{
     helper::infra_error,
 };
 
-use crate::auth::user::password::kernel::infra::HashedPassword;
+use crate::auth::user::{
+    account::modify::infra::ModifyAuthUserAccountChanges, password::kernel::infra::HashedPassword,
+};
 
 use crate::{
     auth::user::{
-        account::modify::data::ModifyAuthUserAccountChanges,
+        account::kernel::data::{AuthUserAttributes, AuthUserAttributesExtract},
         kernel::data::{AuthUserId, GrantedAuthRoles},
         login_id::kernel::data::LoginId,
     },

@@ -15,9 +15,9 @@ use crate::auth::{
         },
     },
     user::{
-        account::{
-            kernel::data::{AuthUserAttributes, AuthUserAttributesExtract},
-            modify::init::request_decoder::test::StaticModifyAuthUserAccountRequestDecoder,
+        account::modify::{
+            infra::{ModifyAuthUserAccountChangesExtract, ModifyAuthUserAccountFieldsExtract},
+            init::request_decoder::test::StaticModifyAuthUserAccountRequestDecoder,
         },
         kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
     },
@@ -29,15 +29,13 @@ use crate::auth::user::account::modify::action::{
 
 use crate::auth::ticket::validate::method::AuthNonceConfig;
 
-use crate::auth::user::{
-    account::modify::infra::ModifyAuthUserAccountFields, password::kernel::infra::HashedPassword,
-};
+use crate::auth::user::password::kernel::infra::HashedPassword;
 
 use crate::auth::{
     ticket::kernel::data::{AuthTicketExtract, ExpireDuration},
     user::{
-        account::modify::data::ModifyAuthUserAccountChanges,
-        kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
+        account::kernel::data::AuthUserAttributesExtract,
+        kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
         login_id::kernel::data::LoginId,
     },
 };
@@ -126,6 +124,48 @@ async fn error_not_found() {
     assert!(result.is_err());
 }
 
+#[tokio::test]
+async fn error_invalid_granted_roles() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
+    let request_decoder = invalid_granted_roles_request_decoder();
+
+    let mut action = ModifyAuthUserAccountAction::with_material(request_decoder, material);
+    action.subscribe(handler);
+
+    let result = action.ignite().await;
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "modify auth user account error; invalid to; invalid role",
+    ]);
+    assert!(result.is_err());
+}
+
+#[tokio::test]
+async fn error_invalid_memo() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
+    let request_decoder = invalid_memo_request_decoder();
+
+    let mut action = ModifyAuthUserAccountAction::with_material(request_decoder, material);
+    action.subscribe(handler);
+
+    let result = action.ignite().await;
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "modify auth user account error; invalid to; memo: too long",
+    ]);
+    assert!(result.is_err());
+}
+
 struct TestStruct<'a> {
     validate: StaticValidateAuthTokenStruct<'a>,
     user_repository: MemoryAuthUserRepository<'a>,
@@ -206,7 +246,7 @@ fn standard_token_decoder() -> StaticAuthTokenDecoder {
     StaticAuthTokenDecoder::Valid(AuthTicketExtract {
         ticket_id: TICKET_ID.into(),
         user_id: USER_ID.into(),
-        granted_roles: standard_granted_roles(),
+        granted_roles: standard_granted_roles().into_iter().collect(),
     })
 }
 fn not_permitted_token_decoder() -> StaticAuthTokenDecoder {
@@ -226,48 +266,78 @@ const REGISTERED_LOGIN_ID: &'static str = "registered-login-id";
 const PASSWORD: &'static str = "current-password";
 
 fn standard_request_decoder() -> StaticModifyAuthUserAccountRequestDecoder {
-    StaticModifyAuthUserAccountRequestDecoder::Valid(ModifyAuthUserAccountFields {
-        login_id: LoginId::restore(LOGIN_ID.into()),
-        from: ModifyAuthUserAccountChanges {
-            granted_roles: GrantedAuthRoles::restore(standard_granted_roles()),
-            attrs: AuthUserAttributes::restore(AuthUserAttributesExtract::default()),
-        },
-        to: ModifyAuthUserAccountChanges {
-            granted_roles: GrantedAuthRoles::empty(),
-            attrs: AuthUserAttributes::restore(AuthUserAttributesExtract {
+    StaticModifyAuthUserAccountRequestDecoder::Valid(ModifyAuthUserAccountFieldsExtract {
+        login_id: LOGIN_ID.into(),
+        from: Some(ModifyAuthUserAccountChangesExtract {
+            granted_roles: standard_granted_roles(),
+            attrs: AuthUserAttributesExtract::default(),
+        }),
+        to: Some(ModifyAuthUserAccountChangesExtract {
+            granted_roles: vec![],
+            attrs: AuthUserAttributesExtract {
                 memo: "memo".into(),
-            }),
-        },
+            },
+        }),
     })
 }
 fn conflict_request_decoder() -> StaticModifyAuthUserAccountRequestDecoder {
-    StaticModifyAuthUserAccountRequestDecoder::Valid(ModifyAuthUserAccountFields {
-        login_id: LoginId::restore(LOGIN_ID.into()),
-        from: ModifyAuthUserAccountChanges {
-            granted_roles: GrantedAuthRoles::empty(),
-            attrs: AuthUserAttributes::restore(AuthUserAttributesExtract {
+    StaticModifyAuthUserAccountRequestDecoder::Valid(ModifyAuthUserAccountFieldsExtract {
+        login_id: LOGIN_ID.into(),
+        from: Some(ModifyAuthUserAccountChangesExtract {
+            granted_roles: vec![],
+            attrs: AuthUserAttributesExtract {
                 memo: "memo".into(),
-            }),
-        },
-        to: ModifyAuthUserAccountChanges {
-            granted_roles: GrantedAuthRoles::empty(),
-            attrs: AuthUserAttributes::restore(AuthUserAttributesExtract {
+            },
+        }),
+        to: Some(ModifyAuthUserAccountChangesExtract {
+            granted_roles: vec![],
+            attrs: AuthUserAttributesExtract {
                 memo: "memo".into(),
-            }),
-        },
+            },
+        }),
     })
 }
 fn not_found_request_decoder() -> StaticModifyAuthUserAccountRequestDecoder {
-    StaticModifyAuthUserAccountRequestDecoder::Valid(ModifyAuthUserAccountFields {
-        login_id: LoginId::restore("unknown-user".into()),
-        from: ModifyAuthUserAccountChanges {
-            granted_roles: GrantedAuthRoles::empty(),
-            attrs: AuthUserAttributes::restore(AuthUserAttributesExtract::default()),
-        },
-        to: ModifyAuthUserAccountChanges {
-            granted_roles: GrantedAuthRoles::empty(),
-            attrs: AuthUserAttributes::restore(AuthUserAttributesExtract::default()),
-        },
+    StaticModifyAuthUserAccountRequestDecoder::Valid(ModifyAuthUserAccountFieldsExtract {
+        login_id: "unknown-user".into(),
+        from: Some(ModifyAuthUserAccountChangesExtract {
+            granted_roles: vec![],
+            attrs: AuthUserAttributesExtract::default(),
+        }),
+        to: Some(ModifyAuthUserAccountChangesExtract {
+            granted_roles: vec![],
+            attrs: AuthUserAttributesExtract::default(),
+        }),
+    })
+}
+fn invalid_granted_roles_request_decoder() -> StaticModifyAuthUserAccountRequestDecoder {
+    StaticModifyAuthUserAccountRequestDecoder::Valid(ModifyAuthUserAccountFieldsExtract {
+        login_id: LOGIN_ID.into(),
+        from: Some(ModifyAuthUserAccountChangesExtract {
+            granted_roles: standard_granted_roles(),
+            attrs: AuthUserAttributesExtract::default(),
+        }),
+        to: Some(ModifyAuthUserAccountChangesExtract {
+            granted_roles: vec!["invalid-role".into()],
+            attrs: AuthUserAttributesExtract {
+                memo: "memo".into(),
+            },
+        }),
+    })
+}
+fn invalid_memo_request_decoder() -> StaticModifyAuthUserAccountRequestDecoder {
+    StaticModifyAuthUserAccountRequestDecoder::Valid(ModifyAuthUserAccountFieldsExtract {
+        login_id: LOGIN_ID.into(),
+        from: Some(ModifyAuthUserAccountChangesExtract {
+            granted_roles: standard_granted_roles(),
+            attrs: AuthUserAttributesExtract::default(),
+        }),
+        to: Some(ModifyAuthUserAccountChangesExtract {
+            granted_roles: vec![],
+            attrs: AuthUserAttributesExtract {
+                memo: "a".repeat(255 + 1),
+            },
+        }),
     })
 }
 
@@ -284,12 +354,12 @@ fn standard_user_repository<'a>(store: &'a MemoryAuthUserStore) -> MemoryAuthUse
 fn standard_user() -> AuthUser {
     AuthUserExtract {
         user_id: USER_ID.into(),
-        granted_roles: standard_granted_roles(),
+        granted_roles: standard_granted_roles().into_iter().collect(),
     }
     .restore()
 }
-fn standard_granted_roles() -> HashSet<String> {
-    vec!["user".into()].into_iter().collect()
+fn standard_granted_roles() -> Vec<String> {
+    vec!["user".into()]
 }
 fn standard_login_id() -> LoginId {
     LoginId::restore(LOGIN_ID.into())

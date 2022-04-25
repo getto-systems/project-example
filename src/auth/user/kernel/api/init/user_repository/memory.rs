@@ -14,7 +14,7 @@ use crate::z_lib::repository::helper::infra_error;
 
 use crate::auth::user::{
     account::{
-        modify::infra::ModifyAuthUserAccountRepository,
+        modify::infra::{ModifyAuthUserAccountChanges, ModifyAuthUserAccountRepository},
         register::infra::{RegisterAuthUserAccountFields, RegisterAuthUserAccountRepository},
         search::infra::SearchAuthUserAccountRepository,
         unregister::infra::UnregisterAuthUserAccountRepository,
@@ -38,7 +38,6 @@ use crate::{
         user::{
             account::{
                 kernel::data::{AuthUserAccount, AuthUserAttributes},
-                modify::data::ModifyAuthUserAccountChanges,
                 search::data::{
                     AuthUserAccountSearch, SearchAuthUserAccountFilter,
                     SearchAuthUserAccountSortKey,
