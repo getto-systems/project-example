@@ -27,7 +27,7 @@ impl PbModifyAuthUserAccountRequestDecoder {
 impl ModifyAuthUserAccountRequestDecoder for PbModifyAuthUserAccountRequestDecoder {
     fn decode(self) -> Result<ModifyAuthUserAccountFields, ValidateModifyAuthUserAccountFieldsError> {
         Ok(ModifyAuthUserAccountFields {
-            login_id: LoginId::validate(self.request.login_id)
+            login_id: LoginId::convert(self.request.login_id)
                 .map_err(ValidateModifyAuthUserAccountFieldsError::InvalidLoginId)?,
             from: validate_data(self.request.from)
                 .map_err(ValidateModifyAuthUserAccountFieldsError::InvalidFrom)?,

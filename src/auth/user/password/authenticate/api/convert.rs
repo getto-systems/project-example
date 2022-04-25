@@ -14,7 +14,7 @@ impl AuthenticatePasswordFields {
         fields: AuthenticatePasswordFieldsExtract,
     ) -> Result<Self, ValidateAuthenticatePasswordFieldsError> {
         Ok(Self {
-            login_id: LoginId::validate(fields.login_id)
+            login_id: LoginId::convert(fields.login_id)
                 .map_err(ValidateAuthenticatePasswordFieldsError::InvalidLoginId)?,
             password: PlainPassword::validate(fields.password)
                 .map_err(ValidateAuthenticatePasswordFieldsError::InvalidPassword)?,

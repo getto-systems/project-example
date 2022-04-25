@@ -34,7 +34,7 @@ impl ChangeResetTokenDestinationRequestDecoder for PbChangeResetTokenDestination
     ) -> Result<ChangeResetTokenDestinationFields, ValidateChangeResetTokenDestinationFieldsError>
     {
         Ok(ChangeResetTokenDestinationFields {
-            login_id: LoginId::validate(self.request.login_id)
+            login_id: LoginId::convert(self.request.login_id)
                 .map_err(ValidateChangeResetTokenDestinationFieldsError::InvalidLoginId)?,
             from: validate_data(self.request.from)
                 .map_err(ValidateChangeResetTokenDestinationFieldsError::InvalidFrom)?,

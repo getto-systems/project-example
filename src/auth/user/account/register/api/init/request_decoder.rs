@@ -27,7 +27,7 @@ impl RegisterAuthUserAccountRequestDecoder for PbRegisterAuthUserAccountRequestD
         self,
     ) -> Result<RegisterAuthUserAccountFields, ValidateRegisterAuthUserAccountFieldsError> {
         Ok(RegisterAuthUserAccountFields {
-            login_id: LoginId::validate(self.request.login_id)
+            login_id: LoginId::convert(self.request.login_id)
                 .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidLoginId)?,
             granted_roles: GrantedAuthRoles::validate(self.request.granted_roles)
                 .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidGrantedRoles)?,

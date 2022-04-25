@@ -17,7 +17,7 @@ impl ResetPasswordFields {
         Ok(Self {
             reset_token: ResetTokenEncoded::validate(fields.reset_token)
                 .map_err(ValidateResetPasswordFieldsError::InvalidResetToken)?,
-            login_id: LoginId::validate(fields.login_id)
+            login_id: LoginId::convert(fields.login_id)
                 .map_err(ValidateResetPasswordFieldsError::InvalidLoginId)?,
             new_password: PlainPassword::validate(fields.new_password)
                 .map_err(ValidateResetPasswordFieldsError::InvalidNewPassword)?,

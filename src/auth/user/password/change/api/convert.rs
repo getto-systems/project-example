@@ -29,7 +29,7 @@ impl OverridePasswordFields {
         fields: OverridePasswordFieldsExtract,
     ) -> Result<Self, ValidateOverridePasswordFieldsError> {
         Ok(Self {
-            login_id: LoginId::validate(fields.login_id)
+            login_id: LoginId::convert(fields.login_id)
                 .map_err(ValidateOverridePasswordFieldsError::InvalidLoginId)?,
             new_password: PlainPassword::validate(fields.new_password)
                 .map_err(ValidateOverridePasswordFieldsError::InvalidNewPassword)?,

@@ -49,7 +49,7 @@ impl SearchAuthUserAccountFilter {
     pub fn match_login_id(&self, login_id: &LoginId) -> bool {
         match self.login_id {
             None => true,
-            Some(ref filter_login_id) => login_id.as_str() == filter_login_id,
+            Some(ref filter_login_id) => login_id.inner() == filter_login_id,
         }
     }
     pub fn match_granted_roles(&self, granted_roles: &Option<GrantedAuthRoles>) -> bool {

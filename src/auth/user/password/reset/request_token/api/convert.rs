@@ -12,7 +12,7 @@ impl RequestResetTokenFields {
         fields: RequestResetTokenFieldsExtract,
     ) -> Result<Self, ValidateRequestResetTokenFieldsError> {
         Ok(Self {
-            login_id: LoginId::validate(fields.login_id)
+            login_id: LoginId::convert(fields.login_id)
                 .map_err(ValidateRequestResetTokenFieldsError::InvalidLoginId)?,
         })
     }
