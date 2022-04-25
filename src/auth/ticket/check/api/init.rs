@@ -3,13 +3,13 @@ use tonic::metadata::MetadataMap;
 use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::ticket::{
-    encode::init::EncodeAuthTicketStruct, validate::init::TicketValidateAuthTokenStruct,
+    encode::init::EncodeAuthTicketStruct, validate::init::AuthenticateTicketStruct,
 };
 
 use super::action::{CheckAuthTicketAction, CheckAuthTicketMaterial};
 
 pub struct CheckAuthTicketStruct<'a> {
-    validate: TicketValidateAuthTokenStruct<'a>,
+    validate: AuthenticateTicketStruct<'a>,
     encode: EncodeAuthTicketStruct<'a>,
 }
 
@@ -19,17 +19,17 @@ impl<'a> CheckAuthTicketStruct<'a> {
         metadata: &'a MetadataMap,
     ) -> CheckAuthTicketAction<Self> {
         CheckAuthTicketAction::with_material(Self {
-            validate: TicketValidateAuthTokenStruct::new(feature, metadata),
+            validate: AuthenticateTicketStruct::new(feature, metadata),
             encode: EncodeAuthTicketStruct::new(feature),
         })
     }
 }
 
 impl<'a> CheckAuthTicketMaterial for CheckAuthTicketStruct<'a> {
-    type Validate = TicketValidateAuthTokenStruct<'a>;
+    type Authenticate = AuthenticateTicketStruct<'a>;
     type Encode = EncodeAuthTicketStruct<'a>;
 
-    fn validate(&self) -> &Self::Validate {
+    fn authenticate(&self) -> &Self::Authenticate {
         &self.validate
     }
     fn encode(&self) -> &Self::Encode {

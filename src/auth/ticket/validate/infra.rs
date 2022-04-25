@@ -33,7 +33,7 @@ pub trait AuthTokenDecoder {
     fn decode(&self, token: &AuthToken) -> Result<AuthTicketExtract, DecodeAuthTokenError>;
 }
 
-pub trait ValidateApiTokenRequestDecoder {
+pub trait AuthorizeRequestDecoder {
     fn decode(self) -> RequireAuthRoles;
 }
 

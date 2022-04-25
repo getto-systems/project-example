@@ -9,11 +9,10 @@ pub mod validate_service;
 use actix_web::HttpRequest;
 use tonic::metadata::MetadataMap;
 
-use crate::auth::ticket::validate::y_protobuf::service::ValidateApiTokenRequestPb;
+use crate::auth::ticket::validate::y_protobuf::service::AuthorizeRequestPb;
 
-use crate::auth::x_outside_feature::feature::AuthOutsideService;
 use crate::{
-    auth::x_outside_feature::feature::AuthOutsideDecodingKey,
+    auth::x_outside_feature::feature::{AuthOutsideDecodingKey, AuthOutsideService},
     x_outside_feature::auth::feature::AuthAppFeature,
 };
 
@@ -23,43 +22,42 @@ use crate::auth::ticket::{
         auth_metadata::{ApiAuthMetadata, NoAuthMetadata, TicketAuthMetadata, TonicAuthMetadata},
         nonce_metadata::TonicAuthNonceMetadata,
         nonce_repository::dynamodb::DynamoDbAuthNonceRepository,
-        request_decoder::PbValidateApiTokenRequestDecoder,
+        request_decoder::PbAuthorizeRequestDecoder,
         token_decoder::{JwtApiTokenDecoder, JwtTicketTokenDecoder, NoopTokenDecoder},
         token_metadata::TonicAuthTokenMetadata,
         validate_service::TonicValidateService,
     },
 };
 
-use crate::auth::ticket::validate::action::ValidateApiTokenAction;
+use crate::auth::ticket::validate::action::AuthorizeAction;
 
 use crate::auth::ticket::validate::method::{
-    AuthNonceConfig, CheckPermissionInfra, ValidateAuthMetadataInfra, ValidateAuthNonceInfra,
-    ValidateAuthTokenInfra,
+    AuthNonceConfig, AuthenticateInfra, AuthorizeInfra, ValidateAuthMetadataInfra,
+    ValidateAuthNonceInfra,
 };
 
-pub struct ValidateApiTokenStruct;
+pub struct AuthorizeStruct;
 
-impl ValidateApiTokenStruct {
+impl AuthorizeStruct {
     pub fn action<'a>(
         feature: &'a AuthAppFeature,
         metadata: &'a MetadataMap,
-        request: ValidateApiTokenRequestPb,
-    ) -> ValidateApiTokenAction<PbValidateApiTokenRequestDecoder, ApiValidateAuthTokenStruct<'a>>
-    {
-        ValidateApiTokenAction::with_material(
-            PbValidateApiTokenRequestDecoder::new(request),
-            ApiValidateAuthTokenStruct::new(feature, metadata),
+        request: AuthorizeRequestPb,
+    ) -> AuthorizeAction<PbAuthorizeRequestDecoder, AuthenticateApiStruct<'a>> {
+        AuthorizeAction::with_material(
+            PbAuthorizeRequestDecoder::new(request),
+            AuthenticateApiStruct::new(feature, metadata),
         )
     }
 }
 
-pub struct TicketValidateAuthTokenStruct<'a> {
+pub struct AuthenticateTicketStruct<'a> {
     validate_nonce: ValidateAuthNonceStruct<'a>,
     token_metadata: TonicAuthTokenMetadata<'a>,
     token_decoder: JwtTicketTokenDecoder<'a>,
 }
 
-impl<'a> TicketValidateAuthTokenStruct<'a> {
+impl<'a> AuthenticateTicketStruct<'a> {
     pub fn new(feature: &'a AuthAppFeature, metadata: &'a MetadataMap) -> Self {
         Self {
             validate_nonce: ValidateAuthNonceStruct::new(feature, metadata),
@@ -69,7 +67,7 @@ impl<'a> TicketValidateAuthTokenStruct<'a> {
     }
 }
 
-impl<'a> ValidateAuthTokenInfra for TicketValidateAuthTokenStruct<'a> {
+impl<'a> AuthenticateInfra for AuthenticateTicketStruct<'a> {
     type ValidateNonce = ValidateAuthNonceStruct<'a>;
     type TokenMetadata = TonicAuthTokenMetadata<'a>;
     type TokenDecoder = JwtTicketTokenDecoder<'a>;
@@ -85,13 +83,13 @@ impl<'a> ValidateAuthTokenInfra for TicketValidateAuthTokenStruct<'a> {
     }
 }
 
-pub struct ApiValidateAuthTokenStruct<'a> {
+pub struct AuthenticateApiStruct<'a> {
     validate_nonce: ValidateAuthNonceStruct<'a>,
     token_metadata: TonicAuthTokenMetadata<'a>,
     token_decoder: JwtApiTokenDecoder<'a>,
 }
 
-impl<'a> ApiValidateAuthTokenStruct<'a> {
+impl<'a> AuthenticateApiStruct<'a> {
     pub fn new(feature: &'a AuthAppFeature, metadata: &'a MetadataMap) -> Self {
         Self {
             validate_nonce: ValidateAuthNonceStruct::new(feature, metadata),
@@ -101,7 +99,7 @@ impl<'a> ApiValidateAuthTokenStruct<'a> {
     }
 }
 
-impl<'a> ValidateAuthTokenInfra for ApiValidateAuthTokenStruct<'a> {
+impl<'a> AuthenticateInfra for AuthenticateApiStruct<'a> {
     type ValidateNonce = ValidateAuthNonceStruct<'a>;
     type TokenMetadata = TonicAuthTokenMetadata<'a>;
     type TokenDecoder = JwtApiTokenDecoder<'a>;
@@ -137,7 +135,7 @@ impl<'a> CheckPermissionStruct<'a> {
     }
 }
 
-impl<'a> CheckPermissionInfra for CheckPermissionStruct<'a> {
+impl<'a> AuthorizeInfra for CheckPermissionStruct<'a> {
     type AuthMetadata = TonicAuthMetadata<'a>;
     type TokenDecoder = NoopTokenDecoder;
     type ValidateService = TonicValidateService<'a>;
@@ -287,17 +285,17 @@ pub mod test {
     };
 
     use crate::auth::ticket::validate::method::{
-        AuthNonceConfig, CheckPermissionInfra, ValidateAuthMetadataInfra, ValidateAuthNonceInfra,
-        ValidateAuthTokenInfra,
+        AuthNonceConfig, AuthenticateInfra, AuthorizeInfra, ValidateAuthMetadataInfra,
+        ValidateAuthNonceInfra,
     };
 
-    pub struct StaticValidateAuthTokenStruct<'a> {
+    pub struct StaticAuthenticateStruct<'a> {
         pub validate_nonce: StaticValidateAuthNonceStruct<'a>,
         pub token_metadata: StaticAuthTokenMetadata,
         pub token_decoder: StaticAuthTokenDecoder,
     }
 
-    impl<'a> ValidateAuthTokenInfra for StaticValidateAuthTokenStruct<'a> {
+    impl<'a> AuthenticateInfra for StaticAuthenticateStruct<'a> {
         type ValidateNonce = StaticValidateAuthNonceStruct<'a>;
         type TokenMetadata = StaticAuthTokenMetadata;
         type TokenDecoder = StaticAuthTokenDecoder;
@@ -319,7 +317,7 @@ pub mod test {
         pub validate_service: StaticValidateService,
     }
 
-    impl CheckPermissionInfra for StaticCheckPermissionStruct {
+    impl AuthorizeInfra for StaticCheckPermissionStruct {
         type AuthMetadata = StaticAuthMetadata;
         type TokenDecoder = StaticAuthTokenDecoder;
         type ValidateService = StaticValidateService;

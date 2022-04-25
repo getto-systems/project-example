@@ -15,7 +15,7 @@ use crate::auth::ticket::{
     validate::init::{
         nonce_metadata::test::StaticAuthNonceMetadata,
         nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
-        test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
+        test::{StaticValidateAuthNonceStruct, StaticAuthenticateStruct},
         token_decoder::test::StaticAuthTokenDecoder,
         token_metadata::test::StaticAuthTokenMetadata,
     },
@@ -43,7 +43,7 @@ async fn success_logout() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "logout success",
     ]);
     assert!(result.is_ok());
@@ -63,22 +63,22 @@ async fn error_no_ticket() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "logout success",
     ]);
     assert!(result.is_ok());
 }
 
 struct TestStruct<'a> {
-    validate: StaticValidateAuthTokenStruct<'a>,
+    validate: StaticAuthenticateStruct<'a>,
     ticket_repository: MemoryAuthTicketRepository<'a>,
 }
 
 impl<'a> LogoutMaterial for TestStruct<'a> {
-    type ValidateInfra = StaticValidateAuthTokenStruct<'a>;
+    type AuthenticateInfra = StaticAuthenticateStruct<'a>;
     type TicketRepository = MemoryAuthTicketRepository<'a>;
 
-    fn validate(&self) -> &Self::ValidateInfra {
+    fn authenticate(&self) -> &Self::AuthenticateInfra {
         &self.validate
     }
     fn ticket_repository(&self) -> &Self::TicketRepository {
@@ -109,7 +109,7 @@ impl<'a> TestStruct<'a> {
     }
     fn new(store: &'a TestStore, ticket_repository: MemoryAuthTicketRepository<'a>) -> Self {
         Self {
-            validate: StaticValidateAuthTokenStruct {
+            validate: StaticAuthenticateStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),

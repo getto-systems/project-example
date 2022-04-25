@@ -28,7 +28,7 @@ async fn success_notify() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["validate api token success", "UNEXPECTED-ERROR"]);
+    assert_state(vec!["authorize success", "UNEXPECTED-ERROR"]);
     assert!(result.is_ok());
 }
 

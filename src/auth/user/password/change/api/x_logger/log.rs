@@ -17,7 +17,7 @@ impl LogMessage for ChangePasswordState {
 impl LogFilter for ChangePasswordState {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Validate(event) => event.log_level(),
+            Self::Authenticate(event) => event.log_level(),
             Self::Change(event) => event.log_level(),
         }
     }
@@ -54,7 +54,7 @@ impl LogMessage for OverridePasswordState {
 impl LogFilter for OverridePasswordState {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Validate(event) => event.log_level(),
+            Self::Authenticate(event) => event.log_level(),
             Self::Override(event) => event.log_level(),
         }
     }

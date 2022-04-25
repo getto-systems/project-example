@@ -3,14 +3,15 @@ use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 use crate::{
     auth::{
         data::RequireAuthRoles,
-        method::{check_permission, CheckPermissionEvent, CheckPermissionInfra},
+        method::{authorize, AuthorizeEvent, AuthorizeInfra},
     },
     core::outline::load::{data::OutlineMenuBadge, infra::OutlineMenuBadgeRepository},
     z_lib::repository::data::RepositoryError,
 };
 
 pub enum LoadOutlineMenuBadgeState {
-    CheckPermission(CheckPermissionEvent),
+    // TODO Authorize(AuthorizeEvent)
+    CheckPermission(AuthorizeEvent),
     LoadMenuBadge(LoadOutlineMenuBadgeEvent),
 }
 
@@ -24,7 +25,7 @@ impl std::fmt::Display for LoadOutlineMenuBadgeState {
 }
 
 pub trait LoadOutlineMenuBadgeMaterial {
-    type CheckPermission: CheckPermissionInfra;
+    type CheckPermission: AuthorizeInfra;
     type MenuBadgeRepository: OutlineMenuBadgeRepository;
 
     fn check_permission(&self) -> &Self::CheckPermission;
@@ -55,7 +56,7 @@ impl<M: LoadOutlineMenuBadgeMaterial> LoadOutlineMenuBadgeAction<M> {
         let pubsub = self.pubsub;
         let m = self.material;
 
-        check_permission(m.check_permission(), RequireAuthRoles::Nothing, |event| {
+        authorize(m.check_permission(), RequireAuthRoles::Nothing, |event| {
             pubsub.post(LoadOutlineMenuBadgeState::CheckPermission(event))
         })
         .await?;

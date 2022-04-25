@@ -9,7 +9,7 @@ use crate::auth::{
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
-            test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
+            test::{StaticValidateAuthNonceStruct, StaticAuthenticateStruct},
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
         },
@@ -57,7 +57,7 @@ async fn success_change() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password success",
     ]);
     assert!(result.is_ok());
@@ -78,7 +78,7 @@ async fn error_empty_current_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; invalid; current: empty",
     ]);
     assert!(result.is_err());
@@ -99,7 +99,7 @@ async fn error_too_long_current_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; invalid; current: too long",
     ]);
     assert!(result.is_err());
@@ -120,7 +120,7 @@ async fn just_max_length_current_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; password not matched",
     ]);
     assert!(result.is_err());
@@ -141,7 +141,7 @@ async fn error_empty_new_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; invalid; new: empty",
     ]);
     assert!(result.is_err());
@@ -162,7 +162,7 @@ async fn error_too_long_new_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; invalid; new: too long",
     ]);
     assert!(result.is_err());
@@ -183,7 +183,7 @@ async fn just_max_length_new_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password success",
     ]);
     assert!(result.is_ok());
@@ -204,7 +204,7 @@ async fn error_failed_to_match_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; password not matched",
     ]);
     assert!(result.is_err());
@@ -225,25 +225,25 @@ async fn error_password_not_stored() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "change password error; not found",
     ]);
     assert!(result.is_err());
 }
 
 struct TestStruct<'a> {
-    validate: StaticValidateAuthTokenStruct<'a>,
+    validate: StaticAuthenticateStruct<'a>,
     password_repository: MemoryAuthUserRepository<'a>,
 }
 
 impl<'a> ChangePasswordMaterial for TestStruct<'a> {
-    type Validate = StaticValidateAuthTokenStruct<'a>;
+    type Authenticate = StaticAuthenticateStruct<'a>;
 
     type PasswordRepository = MemoryAuthUserRepository<'a>;
     type PasswordMatcher = PlainPasswordMatcher;
     type PasswordHasher = PlainPasswordHasher;
 
-    fn validate(&self) -> &Self::Validate {
+    fn authenticate(&self) -> &Self::Authenticate {
         &self.validate
     }
     fn password_repository(&self) -> &Self::PasswordRepository {
@@ -278,7 +278,7 @@ impl<'a> TestStruct<'a> {
 
     fn new(store: &'a TestStore, password_repository: MemoryAuthUserRepository<'a>) -> Self {
         Self {
-            validate: StaticValidateAuthTokenStruct {
+            validate: StaticAuthenticateStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),

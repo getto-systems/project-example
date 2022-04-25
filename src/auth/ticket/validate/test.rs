@@ -10,7 +10,7 @@ use crate::auth::ticket::{
         nonce_metadata::test::StaticAuthNonceMetadata,
         nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
         request_decoder::test::StaticValidateApiTokenRequestDecoder,
-        test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
+        test::{StaticValidateAuthNonceStruct, StaticAuthenticateStruct},
         token_decoder::test::StaticAuthTokenDecoder,
         token_metadata::test::StaticAuthTokenMetadata,
     },
@@ -18,7 +18,7 @@ use crate::auth::ticket::{
 
 use crate::auth::ticket::validate::method::AuthNonceConfig;
 
-use super::action::ValidateApiTokenAction;
+use super::action::AuthorizeAction;
 
 use crate::auth::{
     ticket::kernel::data::{AuthDateTime, AuthTicketExtract, ExpireDuration},
@@ -33,15 +33,15 @@ async fn success_allow_for_any_role() {
     let material = TestStruct::standard(&store);
     let request_decoder = allow_any_role_request_decoder();
 
-    let mut action = ValidateApiTokenAction::with_material(request_decoder, material);
+    let mut action = AuthorizeAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
-        "validate api token success; user: user-role-user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
+        "authorize success; user: user-role-user-id (granted: [user])",
     ]);
     assert!(result.is_ok());
 }
@@ -54,15 +54,15 @@ async fn success_allow_for_user_role() {
     let material = TestStruct::standard(&store);
     let request_decoder = allow_user_role_request_decoder();
 
-    let mut action = ValidateApiTokenAction::with_material(request_decoder, material);
+    let mut action = AuthorizeAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
-        "validate api token success; user: user-role-user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
+        "authorize success; user: user-role-user-id (granted: [user])",
     ]);
     assert!(result.is_ok());
 }
@@ -75,14 +75,14 @@ async fn error_allow_for_user_role_but_not_granted() {
     let material = TestStruct::no_granted_roles(&store);
     let request_decoder = allow_user_role_request_decoder();
 
-    let mut action = ValidateApiTokenAction::with_material(request_decoder, material);
+    let mut action = AuthorizeAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: no-role-user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: no-role-user-id (granted: [])",
         "user permission denied; granted: [], require: any [user]",
     ]);
     assert!(result.is_err());
@@ -96,14 +96,14 @@ async fn error_token_expired() {
     let material = TestStruct::token_expired(&store);
     let request_decoder = allow_user_role_request_decoder();
 
-    let mut action = ValidateApiTokenAction::with_material(request_decoder, material);
+    let mut action = AuthorizeAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate error; token expired",
+        "authenticate error; token expired",
     ]);
     assert!(result.is_err());
 }
@@ -116,7 +116,7 @@ async fn error_conflict_nonce() {
     let material = TestStruct::conflict_nonce(&store);
     let request_decoder = allow_user_role_request_decoder();
 
-    let mut action = ValidateApiTokenAction::with_material(request_decoder, material);
+    let mut action = AuthorizeAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -142,25 +142,25 @@ impl TestStore {
 }
 
 impl TestStruct {
-    fn standard<'a>(store: &'a TestStore) -> StaticValidateAuthTokenStruct<'a> {
+    fn standard<'a>(store: &'a TestStore) -> StaticAuthenticateStruct<'a> {
         Self::with_token_validator(
             standard_nonce_repository(&store.nonce),
             standard_token_decoder(),
         )
     }
-    fn conflict_nonce<'a>(store: &'a TestStore) -> StaticValidateAuthTokenStruct<'a> {
+    fn conflict_nonce<'a>(store: &'a TestStore) -> StaticAuthenticateStruct<'a> {
         Self::with_token_validator(
             conflict_nonce_repository(&store.nonce),
             standard_token_decoder(),
         )
     }
-    fn no_granted_roles<'a>(store: &'a TestStore) -> StaticValidateAuthTokenStruct<'a> {
+    fn no_granted_roles<'a>(store: &'a TestStore) -> StaticAuthenticateStruct<'a> {
         Self::with_token_validator(
             standard_nonce_repository(&store.nonce),
             no_granted_roles_token_decoder(),
         )
     }
-    fn token_expired<'a>(store: &'a TestStore) -> StaticValidateAuthTokenStruct<'a> {
+    fn token_expired<'a>(store: &'a TestStore) -> StaticAuthenticateStruct<'a> {
         Self::with_token_validator(
             standard_nonce_repository(&store.nonce),
             expired_token_decoder(),
@@ -170,8 +170,8 @@ impl TestStruct {
     fn with_token_validator(
         nonce_repository: MemoryAuthNonceRepository,
         token_decoder: StaticAuthTokenDecoder,
-    ) -> StaticValidateAuthTokenStruct {
-        StaticValidateAuthTokenStruct {
+    ) -> StaticAuthenticateStruct {
+        StaticAuthenticateStruct {
             validate_nonce: StaticValidateAuthNonceStruct {
                 config: standard_nonce_config(),
                 clock: standard_clock(),

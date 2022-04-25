@@ -11,7 +11,7 @@ impl LogMessage for RegisterAuthUserAccountState {
 impl LogFilter for RegisterAuthUserAccountState {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Validate(event) => event.log_level(),
+            Self::Authenticate(event) => event.log_level(),
             Self::PermissionError(event) => event.log_level(),
             Self::RegisterUser(event) => event.log_level(),
         }

@@ -3,8 +3,7 @@ use tonic::{Request, Response, Status};
 use getto_application::helper::flatten;
 
 use crate::auth::ticket::validate::y_protobuf::service::{
-    validate_api_token_pb_server::ValidateApiTokenPb, ValidateApiTokenRequestPb,
-    ValidateApiTokenResponsePb,
+    authorize_pb_server::AuthorizePb, AuthorizeRequestPb, AuthorizeResponsePb,
 };
 
 use crate::x_outside_feature::auth::{
@@ -14,18 +13,18 @@ use crate::x_outside_feature::auth::{
 
 use crate::x_content::metadata::metadata_request_id;
 
-use crate::auth::ticket::validate::init::ValidateApiTokenStruct;
+use crate::auth::ticket::validate::init::AuthorizeStruct;
 
 use crate::z_lib::{logger::infra::Logger, response::tonic::ServiceResponder};
 
-pub struct ServiceValidate;
+pub struct ServiceAuthorize;
 
 #[async_trait::async_trait]
-impl ValidateApiTokenPb for ServiceValidate {
-    async fn validate(
+impl AuthorizePb for ServiceAuthorize {
+    async fn authorize(
         &self,
-        request: Request<ValidateApiTokenRequestPb>,
-    ) -> Result<Response<ValidateApiTokenResponsePb>, Status> {
+        request: Request<AuthorizeRequestPb>,
+    ) -> Result<Response<AuthorizeResponsePb>, Status> {
         let TonicRequest {
             feature,
             metadata,
@@ -33,8 +32,8 @@ impl ValidateApiTokenPb for ServiceValidate {
         } = extract_request(request);
         let request_id = metadata_request_id(&metadata);
 
-        let logger = app_logger("auth.ticket.validate", request_id.into());
-        let mut action = ValidateApiTokenStruct::action(&feature, &metadata, request);
+        let logger = app_logger("auth.ticket.authorize", request_id.into());
+        let mut action = AuthorizeStruct::action(&feature, &metadata, request);
         action.subscribe(move |state| logger.log(state));
 
         flatten(action.ignite().await).respond_to()

@@ -5,19 +5,11 @@ use tonic::{Response, Status};
 use crate::z_lib::response::tonic::ServiceResponder;
 
 use crate::auth::{
-    ticket::validate::y_protobuf::service::{
-        ValidateApiTokenRequestPb, ValidateApiTokenResponsePb,
-    },
+    ticket::validate::y_protobuf::service::{AuthorizeRequestPb, AuthorizeResponsePb},
     user::y_protobuf::service::GrantedAuthRolesPb,
 };
 
 use crate::auth::user::kernel::data::{AuthUser, GrantedAuthRoles, RequireAuthRoles};
-
-impl ServiceResponder<ValidateApiTokenResponsePb> for AuthUser {
-    fn respond_to(self) -> Result<Response<ValidateApiTokenResponsePb>, Status> {
-        Ok(Response::new(ValidateApiTokenResponsePb {}))
-    }
-}
 
 impl Into<GrantedAuthRolesPb> for GrantedAuthRoles {
     fn into(self) -> GrantedAuthRolesPb {
@@ -33,14 +25,20 @@ impl Into<GrantedAuthRoles> for GrantedAuthRolesPb {
     }
 }
 
-impl Into<ValidateApiTokenRequestPb> for RequireAuthRoles {
-    fn into(self) -> ValidateApiTokenRequestPb {
+impl ServiceResponder<AuthorizeResponsePb> for AuthUser {
+    fn respond_to(self) -> Result<Response<AuthorizeResponsePb>, Status> {
+        Ok(Response::new(AuthorizeResponsePb {}))
+    }
+}
+
+impl Into<AuthorizeRequestPb> for RequireAuthRoles {
+    fn into(self) -> AuthorizeRequestPb {
         match self {
-            Self::Nothing => ValidateApiTokenRequestPb {
+            Self::Nothing => AuthorizeRequestPb {
                 allow_any_role: true,
                 ..Default::default()
             },
-            Self::HasAny(require_roles) => ValidateApiTokenRequestPb {
+            Self::HasAny(require_roles) => AuthorizeRequestPb {
                 allow_any_role: false,
                 require_roles: Vec::from_iter(
                     require_roles

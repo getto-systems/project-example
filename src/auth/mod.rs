@@ -30,7 +30,7 @@ pub mod init {
 }
 pub mod method {
     pub use crate::auth::ticket::validate::method::{
-        check_permission, validate_auth_metadata, CheckPermissionEvent, CheckPermissionInfra,
+        authorize, validate_auth_metadata, AuthorizeEvent, AuthorizeInfra,
         ValidateAuthMetadataEvent, ValidateAuthMetadataInfra,
     };
 }

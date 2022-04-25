@@ -2,7 +2,7 @@ use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::{
     data::RequireAuthRoles,
-    method::{check_permission, CheckPermissionEvent, CheckPermissionInfra},
+    method::{authorize, AuthorizeEvent, AuthorizeInfra},
 };
 
 use crate::avail::unexpected_error::notify::infra::{
@@ -10,7 +10,8 @@ use crate::avail::unexpected_error::notify::infra::{
 };
 
 pub enum NotifyUnexpectedErrorState {
-    CheckPermission(CheckPermissionEvent),
+    // TODO Authorize(AuthorizeEvent)
+    CheckPermission(AuthorizeEvent),
     Notify(NotifyUnexpectedErrorEvent),
 }
 
@@ -24,7 +25,7 @@ impl std::fmt::Display for NotifyUnexpectedErrorState {
 }
 
 pub trait NotifyUnexpectedErrorMaterial {
-    type CheckPermission: CheckPermissionInfra;
+    type CheckPermission: AuthorizeInfra;
 
     fn check_permission(&self) -> &Self::CheckPermission;
 }
@@ -62,7 +63,7 @@ impl<R: NotifyUnexpectedErrorRequestDecoder, M: NotifyUnexpectedErrorMaterial>
 
         let fields = self.request_decoder.decode();
 
-        check_permission(m.check_permission(), RequireAuthRoles::Nothing, |event| {
+        authorize(m.check_permission(), RequireAuthRoles::Nothing, |event| {
             pubsub.post(NotifyUnexpectedErrorState::CheckPermission(event))
         })
         .await?;

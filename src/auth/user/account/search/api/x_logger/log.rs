@@ -13,7 +13,7 @@ impl LogMessage for SearchAuthUserAccountState {
 impl LogFilter for SearchAuthUserAccountState {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Validate(event) => event.log_level(),
+            Self::Authenticate(event) => event.log_level(),
             Self::PermissionError(err) => err.log_level(),
             Self::Search(event) => event.log_level(),
         }

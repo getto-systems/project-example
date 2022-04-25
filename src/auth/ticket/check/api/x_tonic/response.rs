@@ -16,7 +16,7 @@ use crate::auth::ticket::encode::data::AuthTicketEncoded;
 impl ServiceResponder<CheckAuthTicketResponsePb> for CheckAuthTicketState {
     fn respond_to(self) -> Result<Response<CheckAuthTicketResponsePb>, Status> {
         match self {
-            Self::Validate(event) => event.respond_to(),
+            Self::Authenticate(event) => event.respond_to(),
             Self::Encode(event) => event.respond_to(),
         }
     }

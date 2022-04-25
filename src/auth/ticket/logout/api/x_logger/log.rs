@@ -13,7 +13,7 @@ impl LogMessage for LogoutState {
 impl LogFilter for LogoutState {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Validate(event) => event.log_level(),
+            Self::Authenticate(event) => event.log_level(),
             Self::Logout(event) => event.log_level(),
         }
     }

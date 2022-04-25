@@ -11,7 +11,7 @@ impl LogMessage for UnregisterAuthUserAccountState {
 impl LogFilter for UnregisterAuthUserAccountState {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Validate(event) => event.log_level(),
+            Self::Authenticate(event) => event.log_level(),
             Self::PermissionError(event) => event.log_level(),
             Self::UnregisterUser(event) => event.log_level(),
         }

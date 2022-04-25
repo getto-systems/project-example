@@ -1,7 +1,7 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::ticket::validate::method::{
-    validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
+    authenticate, AuthenticateEvent, AuthenticateInfra,
 };
 
 use crate::auth::user::password::{
@@ -27,27 +27,27 @@ use crate::{
 };
 
 pub enum ChangePasswordState {
-    Validate(ValidateAuthTokenEvent),
+    Authenticate(AuthenticateEvent),
     Change(ChangePasswordEvent),
 }
 
 impl std::fmt::Display for ChangePasswordState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Validate(event) => event.fmt(f),
+            Self::Authenticate(event) => event.fmt(f),
             Self::Change(event) => event.fmt(f),
         }
     }
 }
 
 pub trait ChangePasswordMaterial {
-    type Validate: ValidateAuthTokenInfra;
+    type Authenticate: AuthenticateInfra;
 
     type PasswordRepository: ChangePasswordRepository;
     type PasswordMatcher: AuthUserPasswordMatcher;
     type PasswordHasher: AuthUserPasswordHasher;
 
-    fn validate(&self) -> &Self::Validate;
+    fn authenticate(&self) -> &Self::Authenticate;
 
     fn password_repository(&self) -> &Self::PasswordRepository;
     fn password_matcher(&self, plain_password: PlainPassword) -> Self::PasswordMatcher {
@@ -83,8 +83,8 @@ impl<R: ChangePasswordRequestDecoder, M: ChangePasswordMaterial> ChangePasswordA
 
         let fields = self.request_decoder.decode();
 
-        let ticket = validate_auth_token(m.validate(), |event| {
-            pubsub.post(ChangePasswordState::Validate(event))
+        let ticket = authenticate(m.authenticate(), |event| {
+            pubsub.post(ChangePasswordState::Authenticate(event))
         })
         .await?;
 
@@ -165,26 +165,26 @@ async fn change_password<S>(
 }
 
 pub enum OverridePasswordState {
-    Validate(ValidateAuthTokenEvent),
+    Authenticate(AuthenticateEvent),
     Override(OverridePasswordEvent),
 }
 
 impl std::fmt::Display for OverridePasswordState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Validate(event) => event.fmt(f),
+            Self::Authenticate(event) => event.fmt(f),
             Self::Override(event) => event.fmt(f),
         }
     }
 }
 
 pub trait OverridePasswordMaterial {
-    type Validate: ValidateAuthTokenInfra;
+    type Authenticate: AuthenticateInfra;
 
     type PasswordRepository: OverridePasswordRepository;
     type PasswordHasher: AuthUserPasswordHasher;
 
-    fn validate(&self) -> &Self::Validate;
+    fn authenticate(&self) -> &Self::Authenticate;
 
     fn password_repository(&self) -> &Self::PasswordRepository;
     fn password_hasher(&self, plain_password: PlainPassword) -> Self::PasswordHasher {
@@ -217,8 +217,8 @@ impl<R: OverridePasswordRequestDecoder, M: OverridePasswordMaterial> OverridePas
 
         let fields = self.request_decoder.decode();
 
-        validate_auth_token(m.validate(), |event| {
-            pubsub.post(OverridePasswordState::Validate(event))
+        authenticate(m.authenticate(), |event| {
+            pubsub.post(OverridePasswordState::Authenticate(event))
         })
         .await?;
 

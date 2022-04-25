@@ -9,7 +9,7 @@ use crate::auth::{
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
-            test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
+            test::{StaticValidateAuthNonceStruct, StaticAuthenticateStruct},
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
         },
@@ -51,7 +51,7 @@ async fn success_override() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "override login-id success",
     ]);
     assert!(result.is_ok());
@@ -72,7 +72,7 @@ async fn error_empty_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "override login-id error; invalid; new: empty",
     ]);
     assert!(result.is_err());
@@ -93,7 +93,7 @@ async fn error_too_long_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "override login-id error; invalid; new: too long",
     ]);
     assert!(result.is_err());
@@ -114,7 +114,7 @@ async fn just_max_length_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "override login-id success",
     ]);
     assert!(result.is_ok());
@@ -135,23 +135,23 @@ async fn error_login_id_already_registered() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "override login-id error; new login id is already registered",
     ]);
     assert!(result.is_err());
 }
 
 struct TestStruct<'a> {
-    validate: StaticValidateAuthTokenStruct<'a>,
+    validate: StaticAuthenticateStruct<'a>,
     login_id_repository: MemoryAuthUserRepository<'a>,
 }
 
 impl<'a> OverrideLoginIdMaterial for TestStruct<'a> {
-    type Validate = StaticValidateAuthTokenStruct<'a>;
+    type Authenticate = StaticAuthenticateStruct<'a>;
 
     type LoginIdRepository = MemoryAuthUserRepository<'a>;
 
-    fn validate(&self) -> &Self::Validate {
+    fn authenticate(&self) -> &Self::Authenticate {
         &self.validate
     }
     fn login_id_repository(&self) -> &Self::LoginIdRepository {
@@ -176,7 +176,7 @@ impl TestStore {
 impl<'a> TestStruct<'a> {
     fn standard(store: &'a TestStore) -> Self {
         Self {
-            validate: StaticValidateAuthTokenStruct {
+            validate: StaticAuthenticateStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),

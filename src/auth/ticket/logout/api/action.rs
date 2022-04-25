@@ -1,7 +1,7 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::ticket::validate::method::{
-    validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
+    authenticate, AuthenticateEvent, AuthenticateInfra,
 };
 
 use crate::auth::ticket::logout::infra::LogoutAuthTicketRepository;
@@ -9,24 +9,24 @@ use crate::auth::ticket::logout::infra::LogoutAuthTicketRepository;
 use crate::{auth::ticket::kernel::data::AuthTicket, z_lib::repository::data::RepositoryError};
 
 pub enum LogoutState {
-    Validate(ValidateAuthTokenEvent),
+    Authenticate(AuthenticateEvent),
     Logout(LogoutEvent),
 }
 
 impl std::fmt::Display for LogoutState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Validate(event) => event.fmt(f),
+            Self::Authenticate(event) => event.fmt(f),
             Self::Logout(event) => event.fmt(f),
         }
     }
 }
 
 pub trait LogoutMaterial {
-    type ValidateInfra: ValidateAuthTokenInfra;
+    type AuthenticateInfra: AuthenticateInfra;
     type TicketRepository: LogoutAuthTicketRepository;
 
-    fn validate(&self) -> &Self::ValidateInfra;
+    fn authenticate(&self) -> &Self::AuthenticateInfra;
     fn ticket_repository(&self) -> &Self::TicketRepository;
 }
 
@@ -51,8 +51,8 @@ impl<M: LogoutMaterial> LogoutAction<M> {
         let pubsub = self.pubsub;
         let m = self.material;
 
-        let ticket = validate_auth_token(m.validate(), |event| {
-            pubsub.post(LogoutState::Validate(event))
+        let ticket = authenticate(m.authenticate(), |event| {
+            pubsub.post(LogoutState::Authenticate(event))
         })
         .await?;
 

@@ -1,8 +1,6 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::ticket::validate::method::{
-    validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
-};
+use crate::auth::ticket::validate::method::{authenticate, AuthenticateEvent, AuthenticateInfra};
 
 use crate::auth::user::account::unregister::infra::{
     DiscardAuthTicketRepository, UnregisterAuthUserAccountFields,
@@ -19,7 +17,7 @@ use crate::{
 };
 
 pub enum UnregisterAuthUserAccountState {
-    Validate(ValidateAuthTokenEvent),
+    Authenticate(AuthenticateEvent),
     PermissionError(ValidateAuthRolesError),
     UnregisterUser(UnregisterAuthUserAccountEvent),
 }
@@ -27,7 +25,7 @@ pub enum UnregisterAuthUserAccountState {
 impl std::fmt::Display for UnregisterAuthUserAccountState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Validate(event) => event.fmt(f),
+            Self::Authenticate(event) => event.fmt(f),
             Self::PermissionError(event) => event.fmt(f),
             Self::UnregisterUser(event) => event.fmt(f),
         }
@@ -35,12 +33,12 @@ impl std::fmt::Display for UnregisterAuthUserAccountState {
 }
 
 pub trait UnregisterAuthUserAccountMaterial {
-    type Validate: ValidateAuthTokenInfra;
+    type Authenticate: AuthenticateInfra;
 
     type TicketRepository: DiscardAuthTicketRepository;
     type UserRepository: UnregisterAuthUserAccountRepository;
 
-    fn validate(&self) -> &Self::Validate;
+    fn authenticate(&self) -> &Self::Authenticate;
 
     fn ticket_repository(&self) -> &Self::TicketRepository;
     fn user_repository(&self) -> &Self::UserRepository;
@@ -79,8 +77,8 @@ impl<R: UnregisterAuthUserAccountRequestDecoder, M: UnregisterAuthUserAccountMat
 
         let fields = self.request_decoder.decode();
 
-        let ticket = validate_auth_token(m.validate(), |event| {
-            pubsub.post(UnregisterAuthUserAccountState::Validate(event))
+        let ticket = authenticate(m.authenticate(), |event| {
+            pubsub.post(UnregisterAuthUserAccountState::Authenticate(event))
         })
         .await?;
 

@@ -9,7 +9,7 @@ use crate::auth::{
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
-            test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
+            test::{StaticValidateAuthNonceStruct, StaticAuthenticateStruct},
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
         },
@@ -56,7 +56,7 @@ async fn success_override() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "override password success",
     ]);
     assert!(result.is_ok());
@@ -77,7 +77,7 @@ async fn error_empty_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "override password error; invalid; new-password: empty",
     ]);
     assert!(result.is_err());
@@ -98,7 +98,7 @@ async fn error_too_long_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "override password error; invalid; new-password: too long",
     ]);
     assert!(result.is_err());
@@ -119,24 +119,24 @@ async fn just_max_length_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "override password success",
     ]);
     assert!(result.is_ok());
 }
 
 struct TestStruct<'a> {
-    validate: StaticValidateAuthTokenStruct<'a>,
+    validate: StaticAuthenticateStruct<'a>,
     password_repository: MemoryAuthUserRepository<'a>,
 }
 
 impl<'a> OverridePasswordMaterial for TestStruct<'a> {
-    type Validate = StaticValidateAuthTokenStruct<'a>;
+    type Authenticate = StaticAuthenticateStruct<'a>;
 
     type PasswordRepository = MemoryAuthUserRepository<'a>;
     type PasswordHasher = PlainPasswordHasher;
 
-    fn validate(&self) -> &Self::Validate {
+    fn authenticate(&self) -> &Self::Authenticate {
         &self.validate
     }
     fn password_repository(&self) -> &Self::PasswordRepository {
@@ -161,7 +161,7 @@ impl TestStore {
 impl<'a> TestStruct<'a> {
     fn standard(store: &'a TestStore) -> Self {
         Self {
-            validate: StaticValidateAuthTokenStruct {
+            validate: StaticAuthenticateStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),

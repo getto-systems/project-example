@@ -23,7 +23,7 @@ async fn success_load_menu_badge() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["validate api token success", "load menu badge success"]);
+    assert_state(vec!["authorize success", "load menu badge success"]);
     assert!(result.is_ok());
 }
 

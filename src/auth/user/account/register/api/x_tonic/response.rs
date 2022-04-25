@@ -11,7 +11,7 @@ use super::super::action::{RegisterAuthUserAccountEvent, RegisterAuthUserAccount
 impl ServiceResponder<RegisterAuthUserAccountResponsePb> for RegisterAuthUserAccountState {
     fn respond_to(self) -> Result<Response<RegisterAuthUserAccountResponsePb>, Status> {
         match self {
-            Self::Validate(event) => event.respond_to(),
+            Self::Authenticate(event) => event.respond_to(),
             Self::PermissionError(err) => err.respond_to(),
             Self::RegisterUser(event) => event.respond_to(),
         }

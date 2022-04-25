@@ -1,7 +1,7 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::ticket::validate::method::{
-    validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
+    authenticate, AuthenticateEvent, AuthenticateInfra,
 };
 
 use crate::auth::user::account::modify::infra::{
@@ -18,7 +18,7 @@ use crate::{
 };
 
 pub enum ModifyAuthUserAccountState {
-    Validate(ValidateAuthTokenEvent),
+    Authenticate(AuthenticateEvent),
     PermissionError(ValidateAuthRolesError),
     ModifyUser(ModifyAuthUserAccountEvent),
 }
@@ -26,7 +26,7 @@ pub enum ModifyAuthUserAccountState {
 impl std::fmt::Display for ModifyAuthUserAccountState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Validate(event) => event.fmt(f),
+            Self::Authenticate(event) => event.fmt(f),
             Self::PermissionError(event) => event.fmt(f),
             Self::ModifyUser(event) => event.fmt(f),
         }
@@ -34,11 +34,11 @@ impl std::fmt::Display for ModifyAuthUserAccountState {
 }
 
 pub trait ModifyAuthUserAccountMaterial {
-    type Validate: ValidateAuthTokenInfra;
+    type Authenticate: AuthenticateInfra;
 
     type UserRepository: ModifyAuthUserAccountRepository;
 
-    fn validate(&self) -> &Self::Validate;
+    fn authenticate(&self) -> &Self::Authenticate;
 
     fn user_repository(&self) -> &Self::UserRepository;
 }
@@ -76,8 +76,8 @@ impl<R: ModifyAuthUserAccountRequestDecoder, M: ModifyAuthUserAccountMaterial>
 
         let fields = self.request_decoder.decode();
 
-        let ticket = validate_auth_token(m.validate(), |event| {
-            pubsub.post(ModifyAuthUserAccountState::Validate(event))
+        let ticket = authenticate(m.authenticate(), |event| {
+            pubsub.post(ModifyAuthUserAccountState::Authenticate(event))
         })
         .await?;
 

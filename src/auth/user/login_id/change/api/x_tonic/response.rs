@@ -10,7 +10,7 @@ use super::super::action::{OverrideLoginIdEvent, OverrideLoginIdState};
 impl ServiceResponder<OverrideLoginIdResponsePb> for OverrideLoginIdState {
     fn respond_to(self) -> Result<Response<OverrideLoginIdResponsePb>, Status> {
         match self {
-            Self::Validate(event) => event.respond_to(),
+            Self::Authenticate(event) => event.respond_to(),
             Self::Override(event) => event.respond_to(),
         }
     }
