@@ -241,7 +241,7 @@ async fn error_empty_reset_token() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid; reset-token: empty reset token",
+        "reset password error; invalid; reset-token: empty",
     ]);
     assert!(result.is_err());
 }

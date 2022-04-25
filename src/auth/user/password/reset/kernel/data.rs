@@ -141,15 +141,14 @@ pub enum ResetTokenDestinationExtract {
     Email(String),
 }
 
-// TODO ValidateTextError を使う
 pub enum ValidateResetTokenError {
-    Empty,
+    Text(ValidateTextError),
 }
 
 impl std::fmt::Display for ValidateResetTokenError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::Empty => write!(f, "empty reset token"),
+            Self::Text(err) => err.fmt(f),
         }
     }
 }

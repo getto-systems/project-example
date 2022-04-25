@@ -73,7 +73,7 @@ impl LogFilter for DecodeResetTokenError {
 impl LogFilter for ValidateResetTokenError {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Empty => LogLevel::Error,
+            Self::Text(err) => err.log_level(),
         }
     }
 }

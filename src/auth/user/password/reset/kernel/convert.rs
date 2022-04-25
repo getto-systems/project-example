@@ -11,11 +11,14 @@ use crate::{
 
 impl ResetTokenEncodedExtract for String {
     fn convert(self) -> Result<String, ValidateResetTokenError> {
-        match self.chars().count() {
-            n if n == 0 => Err(ValidateResetTokenError::Empty),
-            _ => Ok(self),
-        }
+        validate_reset_token_encoded(&self).map_err(ValidateResetTokenError::Text)?;
+        Ok(self)
     }
+}
+
+fn validate_reset_token_encoded(value: &str) -> Result<(), ValidateTextError> {
+    check_text_empty(value)?;
+    Ok(())
 }
 
 impl ResetTokenDestinationEmailExtract for String {
