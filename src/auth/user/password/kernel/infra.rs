@@ -20,24 +20,19 @@ impl HashedPassword {
 pub struct PlainPassword(String);
 
 impl PlainPassword {
-    pub fn validate(
+    pub fn convert(
         password: impl PlainPasswordExtract,
     ) -> Result<PlainPassword, ValidatePasswordError> {
-        Ok(Self(password.validate()?))
+        Ok(Self(password.convert()?))
     }
 
-    pub fn as_bytes(&self) -> &[u8] {
-        self.0.as_bytes()
-    }
-
-    #[cfg(test)]
     pub fn extract(self) -> String {
         self.0
     }
 }
 
 pub trait PlainPasswordExtract {
-    fn validate(self) -> Result<String, ValidatePasswordError>;
+    fn convert(self) -> Result<String, ValidatePasswordError>;
 }
 
 pub trait AuthUserPasswordMatcher: Send {

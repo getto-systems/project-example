@@ -16,7 +16,7 @@ impl AuthenticatePasswordFields {
         Ok(Self {
             login_id: LoginId::convert(fields.login_id)
                 .map_err(ValidateAuthenticatePasswordFieldsError::InvalidLoginId)?,
-            password: PlainPassword::validate(fields.password)
+            password: PlainPassword::convert(fields.password)
                 .map_err(ValidateAuthenticatePasswordFieldsError::InvalidPassword)?,
         })
     }

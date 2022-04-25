@@ -1,17 +1,21 @@
+use crate::z_lib::validate::data::ValidateTextError;
+use crate::z_lib::validate::text::{check_text_empty, check_text_too_long};
+
 use super::infra::PlainPasswordExtract;
 
 use super::data::ValidatePasswordError;
 
-// password には技術的な制限はないが、使用可能な最大文字数は定義しておく
-// ui の設定と同期させること
-const PASSWORD_MAX_LENGTH: usize = 100;
-
 impl PlainPasswordExtract for String {
-    fn validate(self) -> Result<String, ValidatePasswordError> {
-        match self.chars().count() {
-            n if n == 0 => Err(ValidatePasswordError::Empty),
-            n if n > PASSWORD_MAX_LENGTH => Err(ValidatePasswordError::TooLong),
-            _ => Ok(self),
-        }
+    fn convert(self) -> Result<String, ValidatePasswordError> {
+        validate_password(&self).map_err(ValidatePasswordError::Text)?;
+        Ok(self)
     }
+}
+
+fn validate_password(value: &str) -> Result<(), ValidateTextError> {
+    check_text_empty(value)?;
+    // password には技術的な制限はないが、使用可能な最大文字数は定義しておく
+    // ui の設定と同期させること
+    check_text_too_long(value, 100)?;
+    Ok(())
 }

@@ -176,7 +176,7 @@ async fn error_empty_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid; new-password: empty password",
+        "reset password error; invalid; new-password: empty",
     ]);
     assert!(result.is_err());
 }
@@ -196,7 +196,7 @@ async fn error_too_long_password() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "reset password error; invalid; new-password: too long password",
+        "reset password error; invalid; new-password: too long",
     ]);
     assert!(result.is_err());
 }

@@ -14,6 +14,5 @@ fn validate_login_id(value: &str) -> Result<(), ValidateTextError> {
     // login id には意味的な制限はないが、使用可能な最大文字数は定義しておく
     // ui の設定と同期させること
     check_text_too_long(value, 100)?;
-
     Ok(())
 }

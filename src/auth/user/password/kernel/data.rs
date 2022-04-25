@@ -1,13 +1,13 @@
+use crate::z_lib::validate::data::ValidateTextError;
+
 pub enum ValidatePasswordError {
-    Empty,
-    TooLong,
+    Text(ValidateTextError),
 }
 
 impl std::fmt::Display for ValidatePasswordError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::Empty => write!(f, "empty password"),
-            Self::TooLong => write!(f, "too long password"),
+            Self::Text(err) => err.fmt(f),
         }
     }
 }

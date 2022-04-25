@@ -16,9 +16,9 @@ impl ChangePasswordFields {
         fields: ChangePasswordFieldsExtract,
     ) -> Result<Self, ValidateChangePasswordFieldsError> {
         Ok(Self {
-            current_password: PlainPassword::validate(fields.current_password)
+            current_password: PlainPassword::convert(fields.current_password)
                 .map_err(ValidateChangePasswordFieldsError::InvalidCurrentPassword)?,
-            new_password: PlainPassword::validate(fields.new_password)
+            new_password: PlainPassword::convert(fields.new_password)
                 .map_err(ValidateChangePasswordFieldsError::InvalidNewPassword)?,
         })
     }
@@ -31,7 +31,7 @@ impl OverridePasswordFields {
         Ok(Self {
             login_id: LoginId::convert(fields.login_id)
                 .map_err(ValidateOverridePasswordFieldsError::InvalidLoginId)?,
-            new_password: PlainPassword::validate(fields.new_password)
+            new_password: PlainPassword::convert(fields.new_password)
                 .map_err(ValidateOverridePasswordFieldsError::InvalidNewPassword)?,
         })
     }

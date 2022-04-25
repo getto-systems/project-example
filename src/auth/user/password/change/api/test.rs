@@ -79,7 +79,7 @@ async fn error_empty_current_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password error; invalid; current: empty password",
+        "change password error; invalid; current: empty",
     ]);
     assert!(result.is_err());
 }
@@ -100,7 +100,7 @@ async fn error_too_long_current_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password error; invalid; current: too long password",
+        "change password error; invalid; current: too long",
     ]);
     assert!(result.is_err());
 }
@@ -142,7 +142,7 @@ async fn error_empty_new_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password error; invalid; new: empty password",
+        "change password error; invalid; new: empty",
     ]);
     assert!(result.is_err());
 }
@@ -163,7 +163,7 @@ async fn error_too_long_new_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [])",
-        "change password error; invalid; new: too long password",
+        "change password error; invalid; new: too long",
     ]);
     assert!(result.is_err());
 }

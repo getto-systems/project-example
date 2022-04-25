@@ -19,7 +19,7 @@ impl ResetPasswordFields {
                 .map_err(ValidateResetPasswordFieldsError::InvalidResetToken)?,
             login_id: LoginId::convert(fields.login_id)
                 .map_err(ValidateResetPasswordFieldsError::InvalidLoginId)?,
-            new_password: PlainPassword::validate(fields.new_password)
+            new_password: PlainPassword::convert(fields.new_password)
                 .map_err(ValidateResetPasswordFieldsError::InvalidNewPassword)?,
         })
     }
