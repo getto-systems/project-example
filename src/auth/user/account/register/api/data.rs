@@ -14,10 +14,12 @@ pub enum ValidateRegisterAuthUserAccountFieldsError {
 impl std::fmt::Display for ValidateRegisterAuthUserAccountFieldsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::InvalidLoginId(err) => err.fmt(f),
-            Self::InvalidGrantedRoles(err) => err.fmt(f),
-            Self::InvalidResetTokenDestination(err) => err.fmt(f),
-            Self::InvalidAttrs(err) => err.fmt(f),
+            Self::InvalidLoginId(err) => write!(f, "login-id: {}", err),
+            Self::InvalidGrantedRoles(err) => write!(f, "granted-roles: {}", err),
+            Self::InvalidResetTokenDestination(err) => {
+                write!(f, "reset-token destination: {}", err)
+            }
+            Self::InvalidAttrs(err) => write!(f, "attrs: {}", err),
         }
     }
 }

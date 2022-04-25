@@ -20,7 +20,6 @@ use crate::auth::{
             user_id_generator::test::StaticAuthUserIdGenerator,
         },
         kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
-        password::reset::kernel::data::{ResetTokenDestination, ResetTokenDestinationExtract},
     },
 };
 
@@ -31,16 +30,17 @@ use crate::auth::user::account::register::action::{
 use crate::auth::ticket::validate::method::AuthNonceConfig;
 
 use crate::auth::user::{
-    account::register::infra::RegisterAuthUserAccountFields,
+    account::register::infra::RegisterAuthUserAccountFieldsExtract,
     password::kernel::infra::HashedPassword,
 };
 
 use crate::auth::{
     ticket::kernel::data::{AuthTicketExtract, ExpireDuration},
     user::{
-        account::kernel::data::{AuthUserAttributes, AuthUserAttributesExtract},
-        kernel::data::{AuthUser, AuthUserExtract, AuthUserId, GrantedAuthRoles},
+        account::kernel::data::AuthUserAttributesExtract,
+        kernel::data::{AuthUser, AuthUserExtract, AuthUserId},
         login_id::kernel::data::LoginId,
+        password::reset::kernel::data::ResetTokenDestinationExtract,
     },
 };
 
@@ -87,6 +87,27 @@ async fn permission_denied() {
 }
 
 #[tokio::test]
+async fn error_invalid_login_id() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
+    let request_decoder = invalid_login_id_request_decoder();
+
+    let mut action = RegisterAuthUserAccountAction::with_material(request_decoder, material);
+    action.subscribe(handler);
+
+    let result = action.ignite().await;
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "register auth user account error; invalid; login-id: empty",
+    ]);
+    assert!(result.is_err());
+}
+
+#[tokio::test]
 async fn error_login_id_already_registered() {
     let (handler, assert_state) = ActionTestRunner::new();
 
@@ -103,6 +124,69 @@ async fn error_login_id_already_registered() {
         "validate nonce success",
         "validate success; ticket: ticket-id / user: user-id (granted: [user])",
         "register auth user account error; login-id already registered",
+    ]);
+    assert!(result.is_err());
+}
+
+#[tokio::test]
+async fn error_invalid_granted_roles() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
+    let request_decoder = invalid_granted_roles_request_decoder();
+
+    let mut action = RegisterAuthUserAccountAction::with_material(request_decoder, material);
+    action.subscribe(handler);
+
+    let result = action.ignite().await;
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "register auth user account error; invalid; granted-roles: invalid role",
+    ]);
+    assert!(result.is_err());
+}
+
+#[tokio::test]
+async fn error_invalid_reset_token_destination_email() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
+    let request_decoder = invalid_reset_token_destination_email_request_decoder();
+
+    let mut action = RegisterAuthUserAccountAction::with_material(request_decoder, material);
+    action.subscribe(handler);
+
+    let result = action.ignite().await;
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "register auth user account error; invalid; reset-token destination: invalid email",
+    ]);
+    assert!(result.is_err());
+}
+
+#[tokio::test]
+async fn error_invalid_memo() {
+    let (handler, assert_state) = ActionTestRunner::new();
+
+    let store = TestStore::new();
+    let material = TestStruct::standard(&store);
+    let request_decoder = invalid_memo_request_decoder();
+
+    let mut action = RegisterAuthUserAccountAction::with_material(request_decoder, material);
+    action.subscribe(handler);
+
+    let result = action.ignite().await;
+    assert_state(vec![
+        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
+        "validate nonce success",
+        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "register auth user account error; invalid; attrs: memo: too long",
     ]);
     assert!(result.is_err());
 }
@@ -213,7 +297,7 @@ fn standard_token_decoder() -> StaticAuthTokenDecoder {
     StaticAuthTokenDecoder::Valid(AuthTicketExtract {
         ticket_id: TICKET_ID.into(),
         user_id: USER_ID.into(),
-        granted_roles: standard_granted_roles(),
+        granted_roles: standard_granted_roles().into_iter().collect(),
     })
 }
 fn not_permitted_token_decoder() -> StaticAuthTokenDecoder {
@@ -231,13 +315,46 @@ const LOGIN_ID: &'static str = "login-id";
 const PASSWORD: &'static str = "current-password";
 
 fn standard_request_decoder() -> StaticRegisterAuthUserAccountRequestDecoder {
-    StaticRegisterAuthUserAccountRequestDecoder::Valid(RegisterAuthUserAccountFields {
-        login_id: LoginId::restore(LOGIN_ID.into()),
-        granted_roles: GrantedAuthRoles::restore(standard_granted_roles()),
-        reset_token_destination: ResetTokenDestination::restore(
-            ResetTokenDestinationExtract::Email("user@example.com".into()),
-        ),
-        attrs: AuthUserAttributes::restore(AuthUserAttributesExtract { memo: "".into() }),
+    StaticRegisterAuthUserAccountRequestDecoder::Valid(RegisterAuthUserAccountFieldsExtract {
+        login_id: LOGIN_ID.into(),
+        granted_roles: standard_granted_roles(),
+        reset_token_destination: ResetTokenDestinationExtract::Email("user@example.com".into()),
+        attrs: AuthUserAttributesExtract { memo: "".into() },
+    })
+}
+fn invalid_login_id_request_decoder() -> StaticRegisterAuthUserAccountRequestDecoder {
+    StaticRegisterAuthUserAccountRequestDecoder::Valid(RegisterAuthUserAccountFieldsExtract {
+        login_id: "".into(),
+        granted_roles: standard_granted_roles(),
+        reset_token_destination: ResetTokenDestinationExtract::Email("user@example.com".into()),
+        attrs: AuthUserAttributesExtract { memo: "".into() },
+    })
+}
+fn invalid_granted_roles_request_decoder() -> StaticRegisterAuthUserAccountRequestDecoder {
+    StaticRegisterAuthUserAccountRequestDecoder::Valid(RegisterAuthUserAccountFieldsExtract {
+        login_id: LOGIN_ID.into(),
+        granted_roles: vec!["unknown-role".into()],
+        reset_token_destination: ResetTokenDestinationExtract::Email("user@example.com".into()),
+        attrs: AuthUserAttributesExtract { memo: "".into() },
+    })
+}
+fn invalid_reset_token_destination_email_request_decoder(
+) -> StaticRegisterAuthUserAccountRequestDecoder {
+    StaticRegisterAuthUserAccountRequestDecoder::Valid(RegisterAuthUserAccountFieldsExtract {
+        login_id: LOGIN_ID.into(),
+        granted_roles: standard_granted_roles(),
+        reset_token_destination: ResetTokenDestinationExtract::Email("invalid-email".into()),
+        attrs: AuthUserAttributesExtract { memo: "".into() },
+    })
+}
+fn invalid_memo_request_decoder() -> StaticRegisterAuthUserAccountRequestDecoder {
+    StaticRegisterAuthUserAccountRequestDecoder::Valid(RegisterAuthUserAccountFieldsExtract {
+        login_id: LOGIN_ID.into(),
+        granted_roles: standard_granted_roles(),
+        reset_token_destination: ResetTokenDestinationExtract::Email("user@example.com".into()),
+        attrs: AuthUserAttributesExtract {
+            memo: "a".repeat(255 + 1),
+        },
     })
 }
 
@@ -257,15 +374,15 @@ fn registered_user_repository<'a>(store: &'a MemoryAuthUserStore) -> MemoryAuthU
 fn standard_user() -> AuthUser {
     AuthUserExtract {
         user_id: USER_ID.into(),
-        granted_roles: standard_granted_roles(),
+        granted_roles: standard_granted_roles().into_iter().collect(),
     }
     .restore()
 }
 fn standard_user_id() -> AuthUserId {
     AuthUserId::restore(USER_ID.into())
 }
-fn standard_granted_roles() -> HashSet<String> {
-    vec!["user".into()].into_iter().collect()
+fn standard_granted_roles() -> Vec<String> {
+    vec!["user".into()]
 }
 fn standard_login_id() -> LoginId {
     LoginId::restore(LOGIN_ID.into())

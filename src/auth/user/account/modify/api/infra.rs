@@ -12,7 +12,6 @@ use crate::{
     z_lib::repository::data::RepositoryError,
 };
 
-// TODO Extract で受け取って validate は action でやる、だったはず
 pub trait ModifyAuthUserAccountRequestDecoder {
     fn decode(self) -> ModifyAuthUserAccountFieldsExtract;
 }

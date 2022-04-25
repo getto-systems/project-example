@@ -5,8 +5,8 @@ use crate::auth::ticket::validate::method::{
 };
 
 use crate::auth::user::account::register::infra::{
-    AuthUserIdGenerator, RegisterAuthUserAccountFields, RegisterAuthUserAccountRepository,
-    RegisterAuthUserAccountRequestDecoder,
+    AuthUserIdGenerator, RegisterAuthUserAccountFields, RegisterAuthUserAccountFieldsExtract,
+    RegisterAuthUserAccountRepository, RegisterAuthUserAccountRequestDecoder,
 };
 
 use crate::{
@@ -112,7 +112,7 @@ mod register_auth_user_account_event {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
                 Self::Success => write!(f, "{}", SUCCESS),
-                Self::Invalid(err) => err.fmt(f),
+                Self::Invalid(err) => write!(f, "{}; invalid; {}", ERROR, err),
                 Self::LoginIdAlreadyRegistered => {
                     write!(f, "{}; login-id already registered", ERROR)
                 }
@@ -124,10 +124,11 @@ mod register_auth_user_account_event {
 
 async fn register_user<S>(
     infra: &impl RegisterAuthUserAccountMaterial,
-    fields: Result<RegisterAuthUserAccountFields, ValidateRegisterAuthUserAccountFieldsError>,
+    fields: RegisterAuthUserAccountFieldsExtract,
     post: impl Fn(RegisterAuthUserAccountEvent) -> S,
 ) -> MethodResult<S> {
-    let fields = fields.map_err(|err| post(RegisterAuthUserAccountEvent::Invalid(err)))?;
+    let fields = RegisterAuthUserAccountFields::convert(fields)
+        .map_err(|err| post(RegisterAuthUserAccountEvent::Invalid(err)))?;
 
     let user_id_generator = infra.user_id_generator();
     let user_repository = infra.user_repository();
