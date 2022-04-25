@@ -5,18 +5,15 @@ use crate::auth::ticket::validate::method::{
 };
 
 use crate::auth::user::account::unregister::infra::{
-    DiscardAuthTicketRepository, UnregisterAuthUserAccountRepository,
+    DiscardAuthTicketRepository, UnregisterAuthUserAccountFields,
+    UnregisterAuthUserAccountFieldsExtract, UnregisterAuthUserAccountRepository,
     UnregisterAuthUserAccountRequestDecoder,
 };
 
 use crate::{
     auth::{
-        data::RequireAuthRoles,
-        ticket::kernel::data::ValidateAuthRolesError,
-        user::{
-            account::unregister::data::ValidateUnregisterAuthUserAccountFieldsError,
-            login_id::kernel::data::LoginId,
-        },
+        data::RequireAuthRoles, ticket::kernel::data::ValidateAuthRolesError,
+        user::account::unregister::data::ValidateUnregisterAuthUserAccountFieldsError,
     },
     z_lib::repository::data::RepositoryError,
 };
@@ -114,7 +111,7 @@ mod unregister_auth_user_account_event {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
                 Self::Success => write!(f, "{}", SUCCESS),
-                Self::Invalid(err) => err.fmt(f),
+                Self::Invalid(err) => write!(f, "{}; invalid; {}", ERROR, err),
                 Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
             }
         }
@@ -123,21 +120,22 @@ mod unregister_auth_user_account_event {
 
 async fn unregister_user<S>(
     infra: &impl UnregisterAuthUserAccountMaterial,
-    fields: Result<LoginId, ValidateUnregisterAuthUserAccountFieldsError>,
+    fields: UnregisterAuthUserAccountFieldsExtract,
     post: impl Fn(UnregisterAuthUserAccountEvent) -> S,
 ) -> MethodResult<S> {
-    let login_id = fields.map_err(|err| post(UnregisterAuthUserAccountEvent::Invalid(err)))?;
+    let fields = UnregisterAuthUserAccountFields::convert(fields)
+        .map_err(|err| post(UnregisterAuthUserAccountEvent::Invalid(err)))?;
 
     let ticket_repository = infra.ticket_repository();
     let user_repository = infra.user_repository();
 
     if let Some(user_id) = user_repository
-        .lookup_user_id(&login_id)
+        .lookup_user_id(&fields.login_id)
         .await
         .map_err(|err| post(UnregisterAuthUserAccountEvent::RepositoryError(err)))?
     {
         user_repository
-            .unregister_user(&user_id, &login_id)
+            .unregister_user(&user_id, &fields.login_id)
             .await
             .map_err(|err| post(UnregisterAuthUserAccountEvent::RepositoryError(err)))?;
 

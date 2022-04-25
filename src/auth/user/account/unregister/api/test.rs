@@ -29,7 +29,10 @@ use crate::auth::user::account::unregister::action::{
 
 use crate::auth::ticket::validate::method::AuthNonceConfig;
 
-use crate::auth::user::password::kernel::infra::HashedPassword;
+use crate::auth::user::{
+    account::unregister::infra::UnregisterAuthUserAccountFieldsExtract,
+    password::kernel::infra::HashedPassword,
+};
 
 use crate::auth::{
     ticket::kernel::data::{AuthTicketExtract, ExpireDuration},
@@ -190,7 +193,9 @@ const REGISTERED_LOGIN_ID: &'static str = "registered-login-id";
 const PASSWORD: &'static str = "current-password";
 
 fn standard_request_decoder() -> StaticUnregisterAuthUserAccountRequestDecoder {
-    StaticUnregisterAuthUserAccountRequestDecoder::Valid(LoginId::restore(LOGIN_ID.into()))
+    StaticUnregisterAuthUserAccountRequestDecoder::Valid(UnregisterAuthUserAccountFieldsExtract {
+        login_id: LOGIN_ID.into(),
+    })
 }
 
 fn standard_user_repository<'a>(store: &'a MemoryAuthUserStore) -> MemoryAuthUserRepository<'a> {

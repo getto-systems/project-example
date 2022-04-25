@@ -6,9 +6,27 @@ use crate::{
     z_lib::repository::data::RepositoryError,
 };
 
-// TODO Extract で受け取って validate は action でやる、だったはず
 pub trait UnregisterAuthUserAccountRequestDecoder {
-    fn decode(self) -> Result<LoginId, ValidateUnregisterAuthUserAccountFieldsError>;
+    fn decode(self) -> UnregisterAuthUserAccountFieldsExtract;
+}
+
+pub struct UnregisterAuthUserAccountFields {
+    pub login_id: LoginId,
+}
+
+pub struct UnregisterAuthUserAccountFieldsExtract {
+    pub login_id: String,
+}
+
+impl UnregisterAuthUserAccountFields {
+    pub fn convert(
+        fields: UnregisterAuthUserAccountFieldsExtract,
+    ) -> Result<Self, ValidateUnregisterAuthUserAccountFieldsError> {
+        Ok(Self {
+            login_id: LoginId::convert(fields.login_id)
+                .map_err(ValidateUnregisterAuthUserAccountFieldsError::InvalidLoginId)?,
+        })
+    }
 }
 
 #[async_trait::async_trait]
