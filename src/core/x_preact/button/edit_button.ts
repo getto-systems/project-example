@@ -1,7 +1,7 @@
 import { html } from "htm/preact"
 import { VNode } from "preact"
 
-import { VNodeContent } from "../x_preact/common"
+import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
 
 import { useSuccessState } from "./hooks"
 

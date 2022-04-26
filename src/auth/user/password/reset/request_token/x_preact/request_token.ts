@@ -1,6 +1,8 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
+import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
+
 import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_error/reason"
 
 import {
@@ -11,15 +13,14 @@ import {
 import { buttons, fieldHelp_error } from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { loginBox } from "../../../../../../z_vendor/getto-css/preact/layout/login"
 
-import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../../../x_content/site"
 import { icon_change } from "../../../../../../x_content/icon"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
 import { takeLongtimeField } from "../../../../../../core/x_preact/design/form"
 
 import { LoginIdField } from "../../../../login_id/input/x_preact/input"
-import { ClearChangesButton } from "../../../../../../z_lib/ui/button/clear_changes_button"
-import { SendButton } from "../../../../../../z_lib/ui/button/send_button"
+import { ClearChangesButton } from "../../../../../../core/x_preact/button/clear_changes_button"
+import { SendButton } from "../../../../../../core/x_preact/button/send_button"
 
 import { ApplicationView } from "../../../../../../z_vendor/getto-application/action/action"
 import { RequestResetTokenAction } from "../action"

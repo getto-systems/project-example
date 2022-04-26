@@ -12,9 +12,9 @@ import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
-import { DeleteConfirmButton } from "../../../../../z_lib/ui/button/delete_confirm_button"
-import { DeleteButton } from "../../../../../z_lib/ui/button/delete_button"
-import { CloseButton } from "../../../../../z_lib/ui/button/close_button"
+import { DeleteConfirmButton } from "../../../../../core/x_preact/button/delete_confirm_button"
+import { DeleteButton } from "../../../../../core/x_preact/button/delete_button"
+import { CloseButton } from "../../../../../core/x_preact/button/close_button"
 
 import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
 

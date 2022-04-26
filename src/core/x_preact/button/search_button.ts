@@ -1,7 +1,7 @@
 import { html } from "htm/preact"
 import { VNode } from "preact"
 
-import { VNodeContent } from "../x_preact/common"
+import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
 
 import { button_search } from "../../../z_vendor/getto-css/preact/design/form"
 
@@ -10,7 +10,7 @@ import { iconHtml } from "../../../core/x_preact/design/icon"
 
 import { ObserveBoardState } from "../../../z_vendor/getto-application/board/observe_board/action"
 
-import { Icon } from "../icon/data"
+import { Icon } from "../../../z_lib/ui/icon/data"
 
 type Props = Readonly<{
     label?: VNodeContent
