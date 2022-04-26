@@ -5,7 +5,7 @@ import { box_grow, container } from "../../../../../z_vendor/getto-css/preact/de
 import { notice_gray } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 
 import { DetailAuthUserAccount, DetailAuthUserAccountActions } from "../../kernel/x_preact/detail"
-import { BackToListButton } from "../../../../../core/x_preact/button/back_to_list_button"
+import { BackToListButton } from "../../../../../z_lib/ui/button/back_to_list_button"
 
 import { FocusedAuthUserAccountAction } from "../action"
 

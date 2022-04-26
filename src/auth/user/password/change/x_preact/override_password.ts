@@ -7,10 +7,10 @@ import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
 
 import { PasswordField } from "../../input/x_preact/input"
-import { EditButton } from "../../../../../core/x_preact/button/edit_button"
-import { ClearChangesButton } from "../../../../../core/x_preact/button/clear_changes_button"
-import { CloseButton } from "../../../../../core/x_preact/button/close_button"
-import { ChangeButton } from "../../../../../core/x_preact/button/change_button"
+import { EditButton } from "../../../../../z_lib/ui/button/edit_button"
+import { ClearChangesButton } from "../../../../../z_lib/ui/button/clear_changes_button"
+import { CloseButton } from "../../../../../z_lib/ui/button/close_button"
+import { ChangeButton } from "../../../../../z_lib/ui/button/change_button"
 
 import { changePasswordError } from "./helper"
 

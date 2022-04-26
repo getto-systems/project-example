@@ -1,14 +1,14 @@
 import { html } from "htm/preact"
 import { VNode } from "preact"
 
-import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../x_preact/common"
 
 import { useSuccessState } from "./hooks"
 
 import { button_edit } from "../../../z_vendor/getto-css/preact/design/form"
 
 import { icon_edit, icon_ok } from "../../../x_content/icon"
-import { iconHtml } from "../design/icon"
+import { iconHtml } from "../../../core/x_preact/design/icon"
 
 type Props = Readonly<{
     isSuccess: boolean

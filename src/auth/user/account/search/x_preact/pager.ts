@@ -9,7 +9,7 @@ import { fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design
 import { pagerCount, pagerParams } from "../../../../../core/x_preact/design/table"
 
 import { SearchOffset } from "../../../../../z_lib/ui/search/offset/x_preact/offset"
-import { LoadButton } from "../../../../../core/x_preact/button/load_button"
+import { LoadButton } from "../../../../../z_lib/ui/button/load_button"
 
 import { ListAuthUserAccountAction } from "../action"
 

@@ -1,6 +1,6 @@
 import { VNode } from "preact"
 
-import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../x_preact/common"
 
 import { button_cancel } from "../../../z_vendor/getto-css/preact/design/form"
 

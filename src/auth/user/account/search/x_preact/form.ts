@@ -6,8 +6,8 @@ import { buttons } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box_grow, container } from "../../../../../z_vendor/getto-css/preact/design/box"
 
 import { SearchLoginIdField } from "../../../login_id/input/x_preact/search"
-import { SearchButton } from "../../../../../core/x_preact/button/search_button"
-import { ClearSearchButton } from "../../../../../core/x_preact/button/clear_search_button"
+import { SearchButton } from "../../../../../z_lib/ui/button/search_button"
+import { ClearSearchButton } from "../../../../../z_lib/ui/button/clear_search_button"
 
 import { SearchAuthUserAccountAction } from "../action"
 import { SearchGrantedRolesField } from "../../input/granted_roles/x_preact/search"

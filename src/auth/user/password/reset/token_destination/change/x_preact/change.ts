@@ -12,7 +12,7 @@ import { box } from "../../../../../../../z_vendor/getto-css/preact/design/box"
 import { VNodeContent } from "../../../../../../../z_lib/ui/x_preact/common"
 
 import { ResetTokenDestinationField } from "../../input/x_preact/destination"
-import { EditButton } from "../../../../../../../core/x_preact/button/edit_button"
+import { EditButton } from "../../../../../../../z_lib/ui/button/edit_button"
 
 import { remoteCommonErrorReason } from "../../../../../../../z_lib/ui/remote/x_error/reason"
 
@@ -22,9 +22,9 @@ import { ChangeResetTokenDestinationAction } from "../action"
 import { ChangeResetTokenDestinationError } from "../data"
 import { LoginId } from "../../../../../login_id/kernel/data"
 import { ResetTokenDestination } from "../../kernel/data"
-import { ResetButton } from "../../../../../../../core/x_preact/button/reset_button"
-import { ChangeButton } from "../../../../../../../core/x_preact/button/change_button"
-import { CloseButton } from "../../../../../../../core/x_preact/button/close_button"
+import { ResetButton } from "../../../../../../../z_lib/ui/button/reset_button"
+import { ChangeButton } from "../../../../../../../z_lib/ui/button/change_button"
+import { CloseButton } from "../../../../../../../z_lib/ui/button/close_button"
 import { takeLongtimeField } from "../../../../../../../core/x_preact/design/form"
 
 type Props = Readonly<{
