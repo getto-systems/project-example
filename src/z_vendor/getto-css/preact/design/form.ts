@@ -18,14 +18,8 @@ export type NormalFieldContent = Readonly<{
     help?: readonly VNodeContent[]
 }>
 export type NoticeFieldContent = NormalFieldContent & Readonly<{ notice: readonly VNodeContent[] }>
-
-export type InputFieldContent = NormalFieldContent &
-    Readonly<{
-        state:
-            | Readonly<{ type: "normal" }>
-            | Readonly<{ type: "error"; notice: readonly VNodeContent[] }>
-        label: { (content: VNode): VNode }
-    }>
+export type SearchFieldContent = NormalFieldContent &
+    Readonly<{ label: { (content: VNode): VNode } }>
 
 type FieldType = NormalFieldType | SearchFieldType | NoticeFieldType
 type NormalFieldType = "normal"
@@ -47,6 +41,14 @@ function mapFieldType(fieldType: FieldType): string {
     }
 }
 
+export type InputFieldContent = NormalFieldContent &
+    Readonly<{
+        state:
+            | Readonly<{ type: "normal" }>
+            | Readonly<{ type: "error"; notice: readonly VNodeContent[] }>
+        label: { (content: VNode): VNode }
+    }>
+
 export function inputField(content: InputFieldContent): VNode {
     switch (content.state.type) {
         case "normal":
@@ -66,11 +68,11 @@ export function field_error(content: NoticeFieldContent): VNode {
 export function field_warning(content: NoticeFieldContent): VNode {
     return fieldContent({ type: "warning", content })
 }
-export function search(content: NormalFieldContent): VNode {
-    return fieldContent({ type: "search", content })
+export function search(content: SearchFieldContent): VNode {
+    return content.label(fieldContent({ type: "search", content }))
 }
-export function search_double(content: NormalFieldContent): VNode {
-    return fieldContent({ type: "search_double", content })
+export function search_double(content: SearchFieldContent): VNode {
+    return content.label(fieldContent({ type: "search_double", content }))
 }
 
 function fieldContent(field: FieldContent): VNode {

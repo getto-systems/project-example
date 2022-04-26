@@ -2,7 +2,7 @@ import { h, VNode } from "preact"
 
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
-import { search } from "../../../../../../z_vendor/getto-css/preact/design/form"
+import { label, search } from "../../../../../../z_vendor/getto-css/preact/design/form"
 
 import {
     CheckboxBoard,
@@ -26,6 +26,7 @@ type Props = Readonly<{
 
 export function SearchGrantedRolesField(props: Props): VNode {
     return search({
+        label,
         title: props.title || AUTH_USER_ACCOUNT["granted-roles"],
         help: props.help,
         body: h(CheckboxBoard, {
