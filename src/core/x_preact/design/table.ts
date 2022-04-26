@@ -2,20 +2,26 @@ import { VNode } from "preact"
 import { html } from "htm/preact"
 
 import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
-import { PagerOptionsContent, SortSign } from "../../../z_vendor/getto-css/preact/design/table"
+import {
+    PagerOptionsContent,
+    SortSignContent,
+} from "../../../z_vendor/getto-css/preact/design/table"
 
 import { iconHtml } from "./icon"
-import { icon_edit, icon_edit_focused } from "../../../x_content/icon"
-import { lnir } from "../../../z_lib/ui/icon/init/line_icon"
+import {
+    icon_edit,
+    icon_edit_focused,
+    icon_sort_normal,
+    icon_sort_reverse,
+} from "../../../x_content/icon"
 import { box_grow, container } from "../../../z_vendor/getto-css/preact/design/box"
 import { notice_gray } from "../../../z_vendor/getto-css/preact/design/highlight"
 
 import { SearchPageResponse } from "../../../z_lib/ui/search/kernel/data"
 
-// TODO VNode を返す形になっているので、別な形に変更したい
-export const SORT_SIGN: SortSign = {
-    normal: iconHtml(lnir(["angle-double-down"])),
-    reverse: iconHtml(lnir(["angle-double-up"])),
+export const SORT_SIGN: SortSignContent = {
+    normal: () => iconHtml(icon_sort_normal),
+    reverse: () => iconHtml(icon_sort_reverse),
 }
 
 export function pagerCount(all: number): VNodeContent {

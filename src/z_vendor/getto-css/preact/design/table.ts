@@ -33,15 +33,19 @@ export type SortQuery = Readonly<{
 }>
 export type SortOrder = "normal" | "reverse"
 
-export type SortSign = Readonly<{
-    normal: VNodeContent
-    reverse: VNodeContent
+export type SortSignContent = Readonly<{
+    normal: { (): VNodeContent }
+    reverse: { (): VNodeContent }
 }>
-export function sortSign(sign: SortSign, currentSort: SortQuery, key: SortKey): VNodeContent {
+export function sortSign(
+    sign: SortSignContent,
+    currentSort: SortQuery,
+    key: SortKey,
+): VNodeContent {
     if (currentSort.key !== key) {
         return ""
     }
-    return sign[currentSort.order]
+    return sign[currentSort.order]()
 }
 
 export interface SortLink {
@@ -52,7 +56,7 @@ export type Sort = Readonly<{
     key: SortKey
     order: SortOrder
     href: { (query: SortQuery): SortHref }
-    sign: SortSign
+    sign: SortSignContent
 }>
 export type SortKey = VNodeKey
 export type SortHref = string
