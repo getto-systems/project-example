@@ -22,6 +22,7 @@ import { InputGrantedAuthRolesAction } from "../action"
 import { EditableBoardAction } from "../../../../../../z_vendor/getto-application/board/editable/action"
 
 import { AuthRole } from "../../../../kernel/data"
+import { AUTH_USER_ACCOUNT } from "../../../kernel/data"
 
 type Props = Readonly<{ field: InputGrantedAuthRolesAction }> &
     Partial<{
@@ -37,7 +38,7 @@ export function GrantedRolesField(props: Props): VNode {
     const editableState = useEditableState(props.edit)
 
     return inputField({
-        title: props.title || "権限",
+        title: props.title || AUTH_USER_ACCOUNT["granted-roles"],
         help: props.help,
         label,
         state: { type: "normal" },
