@@ -129,6 +129,7 @@ export function ResetPassword(viewProps: Props): VNode {
                 label: "パスワードリセット",
                 isConnecting: state.type === "try-to-reset",
                 validateState,
+                observeState,
                 onClick,
             })
 

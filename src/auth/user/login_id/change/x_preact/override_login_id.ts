@@ -70,6 +70,7 @@ export function OverrideLoginId(props: Props): VNode {
         return h(ChangeButton, {
             isConnecting: state.type === "try" || state.type === "take-longtime",
             validateState,
+            observeState,
             onClick,
         })
 

@@ -34,20 +34,20 @@ export function initInputAuthUserMemoAction(): Readonly<{
     input: InputAuthUserMemoAction
     convert: { (): ConvertAuthUserMemoResult }
 }> {
-    const memo = initInputBoardAction()
+    const { input, store, subscriber } = initInputBoardAction()
 
-    const convert = () => authUserMemoBoardConverter(memo.store.get())
+    const convert = () => authUserMemoBoardConverter(store.get())
 
     const { validate, checker } = initValidateBoardFieldAction({
         converter: convert,
     })
     const observe = initObserveBoardFieldAction({
         observer: initBoardFieldObserver({
-            current: () => memo.store.get(),
+            current: () => store.get(),
         }),
     })
 
-    memo.subscriber.subscribe(() => {
+    subscriber.subscribe(() => {
         checker.check()
         observe.check()
     })
@@ -55,17 +55,17 @@ export function initInputAuthUserMemoAction(): Readonly<{
     return {
         input: {
             terminate: () => {
-                memo.subscriber.terminate()
+                subscriber.terminate()
                 validate.terminate()
                 observe.terminate()
             },
 
-            input: memo.input,
+            input,
             validate,
             observe,
 
             reset: (value: AuthUserMemo) => {
-                memo.store.set(value)
+                store.set(value)
             },
         },
         convert,

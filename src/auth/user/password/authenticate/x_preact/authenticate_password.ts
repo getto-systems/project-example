@@ -124,6 +124,7 @@ export function AuthenticatePassword(viewProps: Props): VNode {
                 icon: lnir(["enter"]),
                 isConnecting: authenticateState.type === "try-to-login",
                 validateState,
+                observeState,
                 onClick,
             })
 
