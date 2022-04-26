@@ -93,6 +93,7 @@ export function RequestResetTokenProfile(props: Props): VNode {
             icon: icon_change,
             isConnecting: state.type === "try" || state.type === "take-longtime",
             validateState,
+            observeState,
             onClick,
         })
 

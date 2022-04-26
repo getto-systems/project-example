@@ -2,6 +2,8 @@ import { h, VNode } from "preact"
 import { useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
 
+import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
+
 import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
 
 import {
@@ -12,7 +14,6 @@ import {
 import { loginBox } from "../../../../../z_vendor/getto-css/preact/layout/login"
 import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 
-import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../../x_content/site"
 import { lnir } from "../../../../../z_lib/ui/icon/init/line_icon"
 import { appendScript } from "../../../../sign/x_preact/script"
@@ -123,6 +124,7 @@ export function AuthenticatePassword(viewProps: Props): VNode {
                 icon: lnir(["enter"]),
                 isConnecting: authenticateState.type === "try-to-login",
                 validateState,
+                observeState,
                 onClick,
             })
 

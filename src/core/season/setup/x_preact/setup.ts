@@ -28,6 +28,7 @@ type Props = Readonly<{
 }>
 export function SetupSeason(props: Props): VNode {
     const state = useApplicationAction(props.setup.season)
+    const observeState = useApplicationAction(props.setup.season.observe)
     const editableState = useApplicationAction(props.setup.editable)
     const loadState = useApplicationAction(props.season)
 
@@ -74,7 +75,12 @@ export function SetupSeason(props: Props): VNode {
 
     function setupButton(): VNode {
         // select による選択なので validate しない; validateState は "initial" 固定
-        return h(ChangeButton, { isConnecting: false, validateState: "initial", onClick })
+        return h(ChangeButton, {
+            isConnecting: false,
+            validateState: "initial",
+            observeState,
+            onClick,
+        })
 
         function onClick(e: Event) {
             e.preventDefault()

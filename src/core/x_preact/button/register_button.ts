@@ -3,6 +3,8 @@ import { VNode } from "preact"
 
 import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
 
+import { useSuccessState } from "./hooks"
+
 import { button_disabled, button_send } from "../../../z_vendor/getto-css/preact/design/form"
 
 import { icon_add, icon_ok, icon_spinner } from "../../../x_content/icon"
@@ -12,7 +14,6 @@ import { ValidateBoardState } from "../../../z_vendor/getto-application/board/va
 import { ObserveBoardState } from "../../../z_vendor/getto-application/board/observe_board/action"
 
 import { Icon } from "../../../z_lib/ui/icon/data"
-import { useSuccessState } from "./hooks"
 
 type Props = Readonly<{
     label?: VNodeContent

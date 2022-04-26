@@ -4,6 +4,10 @@ import {
 } from "../../../z_vendor/getto-application/action/action"
 import { initInputSeasonAction, InputSeasonAction } from "../input/action"
 import { LoadSeasonState } from "../load/action"
+import {
+    initObserveBoardAction,
+    ObserveBoardAction,
+} from "../../../z_vendor/getto-application/board/observe_board/action"
 
 import { seasonBoardConverter } from "../kernel/convert"
 
@@ -16,6 +20,7 @@ import { Season } from "../kernel/data"
 
 export interface SetupSeasonAction extends StatefulApplicationAction<SetupSeasonState> {
     readonly season: InputSeasonAction
+    readonly observe: ObserveBoardAction
 
     setup(): Promise<SetupSeasonState>
 }
@@ -53,6 +58,7 @@ class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
     readonly initialState = initialState
 
     readonly season: InputSeasonAction
+    readonly observe: ObserveBoardAction
 
     material: SetupSeasonMaterial
     load: LoadAction
@@ -62,7 +68,11 @@ class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
     constructor(material: SetupSeasonMaterial, load: LoadAction) {
         super()
 
+        const fields = ["season"] as const
+
         const season = initInputSeasonAction()
+
+        const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         load.ignitionState.then((state) => {
             switch (state.type) {
@@ -72,10 +82,15 @@ class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
         })
 
         this.season = season.input
+        this.observe = observe
 
         this.material = material
         this.load = load
         this.field = () => season.get()
+
+        this.season.observe.subscriber.subscribe((result) => {
+            observeChecker.update("season", result.hasChanged)
+        })
     }
 
     setup(): Promise<SetupSeasonState> {

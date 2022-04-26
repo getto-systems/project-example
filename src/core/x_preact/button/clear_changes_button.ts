@@ -1,6 +1,7 @@
 import { VNode } from "preact"
 
 import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
+
 import { ObserveBoardState } from "../../../z_vendor/getto-application/board/observe_board/action"
 
 import { button_disabled, button_undo } from "../../../z_vendor/getto-css/preact/design/form"
