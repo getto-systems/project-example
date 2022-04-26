@@ -17,7 +17,7 @@ import { textValidationError } from "../../../../../../z_lib/ui/validate/x_plain
 import { InputAuthUserMemoAction } from "../action"
 import { EditableBoardAction } from "../../../../../../z_vendor/getto-application/board/editable/action"
 
-import { AuthUserMemo } from "../../../kernel/data"
+import { AuthUserMemo, AUTH_USER_ACCOUNT } from "../../../kernel/data"
 
 type Props = Readonly<{ field: InputAuthUserMemoAction }> &
     Partial<{
@@ -34,7 +34,7 @@ export function AuthUserMemoField(props: Props): VNode {
     const editableState = useEditableState(props.edit)
 
     return inputField({
-        title: props.title || "備考",
+        title: props.title || AUTH_USER_ACCOUNT["memo"],
         help: props.help,
         label: label_text_fill,
         state: validateState.valid

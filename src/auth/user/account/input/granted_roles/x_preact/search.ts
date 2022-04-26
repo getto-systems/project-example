@@ -14,6 +14,7 @@ import { ALL_AUTH_ROLES, authRoleLabel } from "../../../../../../x_content/role"
 import { SearchGrantedRolesAction } from "../action"
 
 import { AuthRole } from "../../../../kernel/data"
+import { AUTH_USER_ACCOUNT } from "../../../kernel/data"
 
 type Props = Readonly<{
     field: SearchGrantedRolesAction
@@ -25,7 +26,7 @@ type Props = Readonly<{
 
 export function SearchGrantedRolesField(props: Props): VNode {
     return search({
-        title: props.title || "権限",
+        title: props.title || AUTH_USER_ACCOUNT["granted-roles"],
         help: props.help,
         body: h(CheckboxBoard, {
             input: props.field.grantedRoles,

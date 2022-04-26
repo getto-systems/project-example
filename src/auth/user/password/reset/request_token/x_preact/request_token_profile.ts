@@ -41,7 +41,6 @@ export function RequestResetTokenProfile(props: Props): VNode {
                   form: true,
                   body: h(LoginIdField, {
                       field: props.requestToken.loginId,
-                      title: "ログインID",
                       help: ["確認のため、ログインIDを入力します"],
                   }),
                   footer: [

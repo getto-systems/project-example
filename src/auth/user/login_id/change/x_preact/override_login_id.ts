@@ -2,11 +2,7 @@ import { h, VNode } from "preact"
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import {
-    buttons,
-    fieldHelp_error,
-    form,
-} from "../../../../../z_vendor/getto-css/preact/design/form"
+import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
 
@@ -34,32 +30,31 @@ export function OverrideLoginId(props: Props): VNode {
     const validateState = useApplicationAction(props.override.validate)
     const observeState = useApplicationAction(props.override.observe)
 
-    return form(
-        box({
-            title: "ログインID",
-            ...(editableState.isEditable
-                ? {
-                      body: h(LoginIdField, {
-                          field: props.override.newLoginId,
-                          title: "新しいログインID",
-                          help: ["管理者権限でログインIDを上書きします"],
-                          autocomplete: "username",
+    return box({
+        form: true,
+        title: "ログインID変更",
+        ...(editableState.isEditable
+            ? {
+                  body: h(LoginIdField, {
+                      field: props.override.newLoginId,
+                      title: "新しいログインID",
+                      help: ["管理者権限でログインIDを上書きします"],
+                      autocomplete: "username",
+                  }),
+                  footer: [
+                      buttons({
+                          left: submitButton(),
+                          right: clearButton(),
                       }),
-                      footer: [
-                          buttons({
-                              left: submitButton(),
-                              right: clearButton(),
-                          }),
-                          ...validationMessage(),
-                          ...message(),
-                          buttons({
-                              right: closeButton(),
-                          }),
-                      ],
-                  }
-                : { body: editButton() }),
-        }),
-    )
+                      ...validationMessage(),
+                      ...message(),
+                      buttons({
+                          right: closeButton(),
+                      }),
+                  ],
+              }
+            : { body: editButton() }),
+    })
 
     function editButton(): VNode {
         return h(EditButton, { isSuccess: state.type === "success", onClick })

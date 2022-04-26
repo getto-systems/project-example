@@ -2,13 +2,8 @@ import { h, VNode } from "preact"
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import {
-    buttons,
-    fieldHelp_error,
-    form,
-} from "../../../../../z_vendor/getto-css/preact/design/form"
+import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
-import { notice_success } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
 
 import { changePasswordError } from "./helper"
@@ -31,53 +26,41 @@ export function ChangePassword(props: Props): VNode {
     const validateState = useApplicationAction(props.change.validate)
     const observeState = useApplicationAction(props.change.observe)
 
-    const content = {
-        title: "パスワード",
-    }
-
-    if (!editableState.isEditable) {
-        return form(
-            box({
-                ...content,
-                body: editButton(),
-                footer:
-                    state.type === "success"
-                        ? notice_success(["パスワードを変更しました"])
-                        : undefined,
-            }),
-        )
-    }
-
-    return form(
-        box({
-            ...content,
-            body: [
-                h(PasswordField, {
-                    field: props.change.currentPassword,
-                    title: "現在のパスワード",
-                    help: ["変更前のパスワードを入力します"],
-                    autocomplete: "current-password",
-                }),
-                h(PasswordField, {
-                    field: props.change.newPassword,
-                    title: "新しいパスワード",
-                    help: ["今後はこのパスワードになります"],
-                    autocomplete: "new-password",
-                }),
-            ],
-            footer: [
-                buttons({
-                    left: submitButton(),
-                    right: clearButton(),
-                }),
-                ...validationMessage(),
-                ...message(),
-                buttons({
-                    right: closeButton(),
-                }),
-            ],
-        }),
-    )
+    return box({
+        form: true,
+        title: "パスワード変更",
+        ...(editableState.isEditable
+            ? {
+                  body: [
+                      h(PasswordField, {
+                          field: props.change.currentPassword,
+                          title: "現在のパスワード",
+                          help: ["変更前のパスワードを入力します"],
+                          autocomplete: "current-password",
+                      }),
+                      h(PasswordField, {
+                          field: props.change.newPassword,
+                          title: "新しいパスワード",
+                          help: ["今後はこのパスワードになります"],
+                          autocomplete: "new-password",
+                      }),
+                  ],
+                  footer: [
+                      buttons({
+                          left: submitButton(),
+                          right: clearButton(),
+                      }),
+                      ...validationMessage(),
+                      ...message(),
+                      buttons({
+                          right: closeButton(),
+                      }),
+                  ],
+              }
+            : {
+                  body: editButton(),
+              }),
+    })
 
     function editButton(): VNode {
         return h(EditButton, { isSuccess: state.type === "success", onClick })
@@ -126,6 +109,7 @@ export function ChangePassword(props: Props): VNode {
         }
     }
 
+    // TODO 共通化できると思う
     function validationMessage(): readonly VNode[] {
         switch (validateState) {
             case "initial":

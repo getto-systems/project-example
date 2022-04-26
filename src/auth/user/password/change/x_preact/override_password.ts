@@ -1,13 +1,8 @@
 import { h, VNode } from "preact"
 
-import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import {
-    buttons,
-    fieldHelp_error,
-    form,
-} from "../../../../../z_vendor/getto-css/preact/design/form"
+import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
 
@@ -35,39 +30,35 @@ export function OverridePassword(props: Props): VNode {
     const validateState = useApplicationAction(props.override.validate)
     const observeState = useApplicationAction(props.override.observe)
 
-    return form(box({ title: "パスワード", ...content() }))
-
-    type Content =
-        | Readonly<{ body: VNodeContent }>
-        | Readonly<{ body: VNodeContent; footer: VNodeContent }>
-    function content(): Content {
-        if (!editableState.isEditable) {
-            return {
-                body: editButton(),
-            }
-        }
-        return {
-            body: [
-                h(PasswordField, {
-                    field: props.override.newPassword,
-                    title: "新しいパスワード",
-                    help: ["管理者権限でパスワードを上書きします"],
-                    autocomplete: "new-password",
-                }),
-            ],
-            footer: [
-                buttons({
-                    left: submitButton(),
-                    right: clearButton(),
-                }),
-                ...validationMessage(),
-                ...message(),
-                buttons({
-                    right: closeButton(),
-                }),
-            ],
-        }
-    }
+    return box({
+        form: true,
+        title: "パスワード",
+        ...(editableState.isEditable
+            ? {
+                  body: [
+                      h(PasswordField, {
+                          field: props.override.newPassword,
+                          title: "新しいパスワード",
+                          help: ["管理者権限でパスワードを上書きします"],
+                          autocomplete: "new-password",
+                      }),
+                  ],
+                  footer: [
+                      buttons({
+                          left: submitButton(),
+                          right: clearButton(),
+                      }),
+                      ...validationMessage(),
+                      ...message(),
+                      buttons({
+                          right: closeButton(),
+                      }),
+                  ],
+              }
+            : {
+                  body: editButton(),
+              }),
+    })
 
     function editButton(): VNode {
         return h(EditButton, { isSuccess: state.type === "success", onClick })
