@@ -1,20 +1,20 @@
-use crate::auth::ticket::validate::y_protobuf::service::ValidateApiTokenRequestPb;
+use crate::auth::ticket::validate::y_protobuf::service::AuthorizeRequestPb;
 
-use crate::auth::ticket::validate::infra::ValidateApiTokenRequestDecoder;
+use crate::auth::ticket::validate::infra::AuthenticateApiRequestDecoder;
 
 use crate::auth::user::kernel::data::RequireAuthRoles;
 
-pub struct PbValidateApiTokenRequestDecoder {
-    request: ValidateApiTokenRequestPb,
+pub struct PbAuthorizeRequestDecoder {
+    request: AuthorizeRequestPb,
 }
 
-impl PbValidateApiTokenRequestDecoder {
-    pub const fn new(request: ValidateApiTokenRequestPb) -> Self {
+impl PbAuthorizeRequestDecoder {
+    pub const fn new(request: AuthorizeRequestPb) -> Self {
         Self { request }
     }
 }
 
-impl ValidateApiTokenRequestDecoder for PbValidateApiTokenRequestDecoder {
+impl AuthenticateApiRequestDecoder for PbAuthorizeRequestDecoder {
     fn decode(self) -> RequireAuthRoles {
         if self.request.allow_any_role {
             RequireAuthRoles::Nothing
@@ -33,7 +33,7 @@ impl ValidateApiTokenRequestDecoder for PbValidateApiTokenRequestDecoder {
 #[cfg(test)]
 pub mod test {
     use crate::auth::{
-        ticket::validate::infra::ValidateApiTokenRequestDecoder,
+        ticket::validate::infra::AuthenticateApiRequestDecoder,
         user::kernel::data::RequireAuthRoles,
     };
 
@@ -41,7 +41,7 @@ pub mod test {
         pub require_roles: RequireAuthRoles,
     }
 
-    impl ValidateApiTokenRequestDecoder for StaticValidateApiTokenRequestDecoder {
+    impl AuthenticateApiRequestDecoder for StaticValidateApiTokenRequestDecoder {
         fn decode(self) -> RequireAuthRoles {
             self.require_roles
         }

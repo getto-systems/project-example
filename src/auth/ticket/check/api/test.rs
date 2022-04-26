@@ -19,7 +19,7 @@ use crate::auth::ticket::{
     validate::init::{
         nonce_metadata::test::StaticAuthNonceMetadata,
         nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
-        test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
+        test::{StaticValidateAuthNonceStruct, StaticAuthenticateStruct},
         token_decoder::test::StaticAuthTokenDecoder,
         token_metadata::test::StaticAuthTokenMetadata,
     },
@@ -49,7 +49,7 @@ async fn success() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
     ]);
@@ -70,7 +70,7 @@ async fn error_token_expired() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate error; token expired",
+        "authenticate error; token expired",
     ]);
     assert!(result.is_err());
 }
@@ -89,7 +89,7 @@ async fn success_limited_ticket() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
         "token expires calculated; ticket: 2021-01-01 11:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
     ]);
@@ -110,22 +110,22 @@ async fn error_no_ticket() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
         "encode error; ticket data not found",
     ]);
     assert!(result.is_err());
 }
 
 struct TestStruct<'a> {
-    validate: StaticValidateAuthTokenStruct<'a>,
+    validate: StaticAuthenticateStruct<'a>,
     encode: StaticEncodeAuthTicketStruct<'a>,
 }
 
 impl<'a> CheckAuthTicketMaterial for TestStruct<'a> {
-    type Validate = StaticValidateAuthTokenStruct<'a>;
+    type Authenticate = StaticAuthenticateStruct<'a>;
     type Encode = StaticEncodeAuthTicketStruct<'a>;
 
-    fn validate(&self) -> &Self::Validate {
+    fn authenticate(&self) -> &Self::Authenticate {
         &self.validate
     }
     fn encode(&self) -> &Self::Encode {
@@ -183,7 +183,7 @@ impl<'a> TestStruct<'a> {
         token_validator: StaticAuthTokenDecoder,
     ) -> Self {
         Self {
-            validate: StaticValidateAuthTokenStruct {
+            validate: StaticAuthenticateStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),

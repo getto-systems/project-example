@@ -2,7 +2,7 @@ use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::{
     data::RequireAuthRoles,
-    method::{check_permission, CheckPermissionEvent, CheckPermissionInfra},
+    method::{authorize, AuthorizeEvent, AuthorizeInfra},
 };
 
 use crate::avail::unexpected_error::notify::infra::{
@@ -10,23 +10,23 @@ use crate::avail::unexpected_error::notify::infra::{
 };
 
 pub enum NotifyUnexpectedErrorState {
-    CheckPermission(CheckPermissionEvent),
+    Authorize(AuthorizeEvent),
     Notify(NotifyUnexpectedErrorEvent),
 }
 
 impl std::fmt::Display for NotifyUnexpectedErrorState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::CheckPermission(event) => event.fmt(f),
+            Self::Authorize(event) => event.fmt(f),
             Self::Notify(event) => event.fmt(f),
         }
     }
 }
 
 pub trait NotifyUnexpectedErrorMaterial {
-    type CheckPermission: CheckPermissionInfra;
+    type Authorize: AuthorizeInfra;
 
-    fn check_permission(&self) -> &Self::CheckPermission;
+    fn authorize(&self) -> &Self::Authorize;
 }
 
 pub struct NotifyUnexpectedErrorAction<
@@ -62,8 +62,8 @@ impl<R: NotifyUnexpectedErrorRequestDecoder, M: NotifyUnexpectedErrorMaterial>
 
         let fields = self.request_decoder.decode();
 
-        check_permission(m.check_permission(), RequireAuthRoles::Nothing, |event| {
-            pubsub.post(NotifyUnexpectedErrorState::CheckPermission(event))
+        authorize(m.authorize(), RequireAuthRoles::Nothing, |event| {
+            pubsub.post(NotifyUnexpectedErrorState::Authorize(event))
         })
         .await?;
 

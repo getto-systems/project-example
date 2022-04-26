@@ -1,8 +1,6 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::ticket::validate::method::{
-    validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
-};
+use crate::auth::ticket::validate::method::{authenticate, AuthenticateEvent, AuthenticateInfra};
 
 use crate::auth::user::account::search::infra::{
     SearchAuthUserAccountRepository, SearchAuthUserAccountRequestDecoder,
@@ -10,7 +8,7 @@ use crate::auth::user::account::search::infra::{
 
 use crate::{
     auth::{
-        ticket::kernel::data::ValidateAuthRolesError,
+        ticket::kernel::data::PermissionError,
         user::{
             account::search::data::{AuthUserAccountSearch, SearchAuthUserAccountFilterExtract},
             kernel::data::RequireAuthRoles,
@@ -20,15 +18,15 @@ use crate::{
 };
 
 pub enum SearchAuthUserAccountState {
-    Validate(ValidateAuthTokenEvent),
-    PermissionError(ValidateAuthRolesError),
+    Authenticate(AuthenticateEvent),
+    PermissionError(PermissionError),
     Search(SearchAuthUserAccountEvent),
 }
 
 impl std::fmt::Display for SearchAuthUserAccountState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Validate(event) => event.fmt(f),
+            Self::Authenticate(event) => event.fmt(f),
             Self::PermissionError(err) => err.fmt(f),
             Self::Search(event) => event.fmt(f),
         }
@@ -36,10 +34,10 @@ impl std::fmt::Display for SearchAuthUserAccountState {
 }
 
 pub trait SearchAuthUserAccountMaterial {
-    type Validate: ValidateAuthTokenInfra;
+    type Authenticate: AuthenticateInfra;
     type SearchRepository: SearchAuthUserAccountRepository;
 
-    fn validate(&self) -> &Self::Validate;
+    fn authenticate(&self) -> &Self::Authenticate;
     fn search_repository(&self) -> &Self::SearchRepository;
 }
 
@@ -75,8 +73,8 @@ impl<R: SearchAuthUserAccountRequestDecoder, M: SearchAuthUserAccountMaterial>
 
         let fields = self.request_decoder.decode();
 
-        let ticket = validate_auth_token(self.material.validate(), |event| {
-            pubsub.post(SearchAuthUserAccountState::Validate(event))
+        let ticket = authenticate(self.material.authenticate(), |event| {
+            pubsub.post(SearchAuthUserAccountState::Authenticate(event))
         })
         .await?;
 

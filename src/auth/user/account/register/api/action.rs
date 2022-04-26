@@ -1,7 +1,7 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::ticket::validate::method::{
-    validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
+    authenticate, AuthenticateEvent, AuthenticateInfra,
 };
 
 use crate::auth::user::account::register::infra::{
@@ -11,23 +11,22 @@ use crate::auth::user::account::register::infra::{
 
 use crate::{
     auth::{
-        data::RequireAuthRoles, ticket::kernel::data::ValidateAuthRolesError,
+        data::RequireAuthRoles, ticket::kernel::data::PermissionError,
         user::account::register::data::ValidateRegisterAuthUserAccountFieldsError,
     },
     z_lib::repository::data::RepositoryError,
 };
 
 pub enum RegisterAuthUserAccountState {
-    // TODO Authenticate(ValidateAuthTokenEvent) にしたい
-    Validate(ValidateAuthTokenEvent),
-    PermissionError(ValidateAuthRolesError),
+    Authenticate(AuthenticateEvent),
+    PermissionError(PermissionError),
     RegisterUser(RegisterAuthUserAccountEvent),
 }
 
 impl std::fmt::Display for RegisterAuthUserAccountState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Validate(event) => event.fmt(f),
+            Self::Authenticate(event) => event.fmt(f),
             Self::PermissionError(event) => event.fmt(f),
             Self::RegisterUser(event) => event.fmt(f),
         }
@@ -35,12 +34,12 @@ impl std::fmt::Display for RegisterAuthUserAccountState {
 }
 
 pub trait RegisterAuthUserAccountMaterial {
-    type Validate: ValidateAuthTokenInfra;
+    type Authenticate: AuthenticateInfra;
 
     type UserIdGenerator: AuthUserIdGenerator;
     type UserRepository: RegisterAuthUserAccountRepository;
 
-    fn validate(&self) -> &Self::Validate;
+    fn authenticate(&self) -> &Self::Authenticate;
 
     fn user_id_generator(&self) -> &Self::UserIdGenerator;
     fn user_repository(&self) -> &Self::UserRepository;
@@ -79,8 +78,8 @@ impl<R: RegisterAuthUserAccountRequestDecoder, M: RegisterAuthUserAccountMateria
 
         let fields = self.request_decoder.decode();
 
-        let ticket = validate_auth_token(m.validate(), |event| {
-            pubsub.post(RegisterAuthUserAccountState::Validate(event))
+        let ticket = authenticate(m.authenticate(), |event| {
+            pubsub.post(RegisterAuthUserAccountState::Authenticate(event))
         })
         .await?;
 

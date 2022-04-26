@@ -4,7 +4,7 @@ use getto_application_test::ActionTestRunner;
 
 use crate::{
     auth::init::test::{
-        StaticAuthMetadata, StaticAuthTokenDecoder, StaticCheckPermissionStruct,
+        StaticAuthMetadata, StaticAuthTokenDecoder, StaticAuthorizeStruct,
         StaticValidateService,
     },
     avail::unexpected_error::notify::init::request_decoder::test::StaticNotifyUnexpectedErrorRequestDecoder,
@@ -28,18 +28,18 @@ async fn success_notify() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["validate api token success", "UNEXPECTED-ERROR"]);
+    assert_state(vec!["authorize success", "UNEXPECTED-ERROR"]);
     assert!(result.is_ok());
 }
 
 struct TestStruct {
-    validate: StaticCheckPermissionStruct,
+    validate: StaticAuthorizeStruct,
 }
 
 impl NotifyUnexpectedErrorMaterial for TestStruct {
-    type CheckPermission = StaticCheckPermissionStruct;
+    type Authorize = StaticAuthorizeStruct;
 
-    fn check_permission(&self) -> &Self::CheckPermission {
+    fn authorize(&self) -> &Self::Authorize {
         &self.validate
     }
 }
@@ -55,7 +55,7 @@ impl TestStore {
 impl TestStruct {
     fn standard(_store: &TestStore) -> Self {
         Self {
-            validate: StaticCheckPermissionStruct {
+            validate: StaticAuthorizeStruct {
                 auth_metadata: StaticAuthMetadata {
                     nonce: "NONCE".into(),
                     token: "TOKEN".into(),

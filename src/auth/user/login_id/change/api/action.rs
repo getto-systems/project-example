@@ -1,7 +1,7 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::ticket::validate::method::{
-    validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
+    authenticate, AuthenticateEvent, AuthenticateInfra,
 };
 
 use crate::auth::user::login_id::change::infra::{
@@ -15,25 +15,25 @@ use crate::{
 };
 
 pub enum OverrideLoginIdState {
-    Validate(ValidateAuthTokenEvent),
+    Authenticate(AuthenticateEvent),
     Override(OverrideLoginIdEvent),
 }
 
 impl std::fmt::Display for OverrideLoginIdState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Validate(event) => event.fmt(f),
+            Self::Authenticate(event) => event.fmt(f),
             Self::Override(event) => event.fmt(f),
         }
     }
 }
 
 pub trait OverrideLoginIdMaterial {
-    type Validate: ValidateAuthTokenInfra;
+    type Authenticate: AuthenticateInfra;
 
     type LoginIdRepository: OverrideLoginIdRepository;
 
-    fn validate(&self) -> &Self::Validate;
+    fn authenticate(&self) -> &Self::Authenticate;
 
     fn login_id_repository(&self) -> &Self::LoginIdRepository;
 }
@@ -63,8 +63,8 @@ impl<R: OverrideLoginIdRequestDecoder, M: OverrideLoginIdMaterial> OverrideLogin
 
         let fields = self.request_decoder.decode();
 
-        validate_auth_token(m.validate(), |event| {
-            pubsub.post(OverrideLoginIdState::Validate(event))
+        authenticate(m.authenticate(), |event| {
+            pubsub.post(OverrideLoginIdState::Authenticate(event))
         })
         .await?;
 

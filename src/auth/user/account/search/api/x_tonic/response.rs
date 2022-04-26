@@ -14,7 +14,7 @@ use crate::auth::user::account::search::data::AuthUserAccountSearch;
 impl ServiceResponder<SearchAuthUserAccountResponsePb> for SearchAuthUserAccountState {
     fn respond_to(self) -> Result<Response<SearchAuthUserAccountResponsePb>, Status> {
         match self {
-            Self::Validate(event) => event.respond_to(),
+            Self::Authenticate(event) => event.respond_to(),
             Self::PermissionError(err) => err.respond_to(),
             Self::Search(event) => event.respond_to(),
         }

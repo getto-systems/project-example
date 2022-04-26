@@ -9,7 +9,7 @@ use super::super::action::{LogoutEvent, LogoutState};
 impl ServiceResponder<LogoutResponsePb> for LogoutState {
     fn respond_to(self) -> Result<Response<LogoutResponsePb>, Status> {
         match self {
-            Self::Validate(event) => event.respond_to(),
+            Self::Authenticate(event) => event.respond_to(),
             Self::Logout(event) => event.respond_to(),
         }
     }

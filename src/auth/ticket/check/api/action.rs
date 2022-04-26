@@ -2,28 +2,28 @@ use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::ticket::{
     encode::method::{encode_auth_ticket, EncodeAuthTicketEvent, EncodeAuthTicketInfra},
-    validate::method::{validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra},
+    validate::method::{authenticate, AuthenticateEvent, AuthenticateInfra},
 };
 
 pub enum CheckAuthTicketState {
-    Validate(ValidateAuthTokenEvent),
+    Authenticate(AuthenticateEvent),
     Encode(EncodeAuthTicketEvent),
 }
 
 impl std::fmt::Display for CheckAuthTicketState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Validate(event) => write!(f, "{}", event),
+            Self::Authenticate(event) => write!(f, "{}", event),
             Self::Encode(event) => write!(f, "{}", event),
         }
     }
 }
 
 pub trait CheckAuthTicketMaterial {
-    type Validate: ValidateAuthTokenInfra;
+    type Authenticate: AuthenticateInfra;
     type Encode: EncodeAuthTicketInfra;
 
-    fn validate(&self) -> &Self::Validate;
+    fn authenticate(&self) -> &Self::Authenticate;
     fn encode(&self) -> &Self::Encode;
 }
 
@@ -48,8 +48,8 @@ impl<M: CheckAuthTicketMaterial> CheckAuthTicketAction<M> {
         let pubsub = self.pubsub;
         let m = self.material;
 
-        let ticket = validate_auth_token(m.validate(), |event| {
-            pubsub.post(CheckAuthTicketState::Validate(event))
+        let ticket = authenticate(m.authenticate(), |event| {
+            pubsub.post(CheckAuthTicketState::Authenticate(event))
         })
         .await?;
 

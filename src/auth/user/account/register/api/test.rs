@@ -9,7 +9,7 @@ use crate::auth::{
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
-            test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
+            test::{StaticValidateAuthNonceStruct, StaticAuthenticateStruct},
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
         },
@@ -59,7 +59,7 @@ async fn success_register_user() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
         "register auth user account success",
     ]);
     assert!(result.is_ok());
@@ -80,7 +80,7 @@ async fn permission_denied() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "user permission denied; granted: [], require: any [user]",
     ]);
     assert!(result.is_err());
@@ -101,7 +101,7 @@ async fn error_invalid_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
         "register auth user account error; invalid; login-id: empty",
     ]);
     assert!(result.is_err());
@@ -122,7 +122,7 @@ async fn error_login_id_already_registered() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
         "register auth user account error; login-id already registered",
     ]);
     assert!(result.is_err());
@@ -143,7 +143,7 @@ async fn error_invalid_granted_roles() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
         "register auth user account error; invalid; granted-roles: invalid role",
     ]);
     assert!(result.is_err());
@@ -164,7 +164,7 @@ async fn error_invalid_reset_token_destination_email() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
         "register auth user account error; invalid; reset-token destination: invalid email",
     ]);
     assert!(result.is_err());
@@ -185,25 +185,25 @@ async fn error_invalid_memo() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
         "register auth user account error; invalid; attrs: memo: too long",
     ]);
     assert!(result.is_err());
 }
 
 struct TestStruct<'a> {
-    validate: StaticValidateAuthTokenStruct<'a>,
+    validate: StaticAuthenticateStruct<'a>,
     user_id_generator: StaticAuthUserIdGenerator,
     user_repository: MemoryAuthUserRepository<'a>,
 }
 
 impl<'a> RegisterAuthUserAccountMaterial for TestStruct<'a> {
-    type Validate = StaticValidateAuthTokenStruct<'a>;
+    type Authenticate = StaticAuthenticateStruct<'a>;
 
     type UserIdGenerator = StaticAuthUserIdGenerator;
     type UserRepository = MemoryAuthUserRepository<'a>;
 
-    fn validate(&self) -> &Self::Validate {
+    fn authenticate(&self) -> &Self::Authenticate {
         &self.validate
     }
 
@@ -257,7 +257,7 @@ impl<'a> TestStruct<'a> {
         user_repository: MemoryAuthUserRepository<'a>,
     ) -> Self {
         Self {
-            validate: StaticValidateAuthTokenStruct {
+            validate: StaticAuthenticateStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),

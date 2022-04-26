@@ -22,7 +22,7 @@ async fn main() {
         }))
         .add_service(server.auth.ticket.logout())
         .add_service(server.auth.ticket.check())
-        .add_service(server.auth.ticket.validate())
+        .add_service(server.auth.ticket.authorize())
         .add_service(server.auth.user.login_id.override_login_id())
         .add_service(server.auth.user.password.authenticate())
         .add_service(server.auth.user.password.change_password())

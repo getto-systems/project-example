@@ -1,28 +1,28 @@
-use crate::auth::ticket::validate::action::ValidateApiTokenState;
+use crate::auth::ticket::validate::action::AuthenticateApiState;
 
 use crate::auth::ticket::validate::method::{
-    CheckPermissionEvent, ValidateAuthMetadataEvent, ValidateAuthNonceEvent, ValidateAuthTokenEvent,
+    AuthorizeEvent, ValidateAuthMetadataEvent, ValidateAuthNonceEvent, AuthenticateEvent,
 };
 
 use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
 
-impl LogMessage for ValidateApiTokenState {
+impl LogMessage for AuthenticateApiState {
     fn log_message(&self) -> String {
         format!("{}", self)
     }
 }
 
-impl LogFilter for ValidateApiTokenState {
+impl LogFilter for AuthenticateApiState {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Validate(event) => event.log_level(),
+            Self::Authenticate(event) => event.log_level(),
             Self::PermissionError(err) => err.log_level(),
             Self::Success(_) => LogLevel::Info,
         }
     }
 }
 
-impl LogFilter for ValidateAuthTokenEvent {
+impl LogFilter for AuthenticateEvent {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::ValidateNonce(event) => event.log_level(),
@@ -34,7 +34,7 @@ impl LogFilter for ValidateAuthTokenEvent {
     }
 }
 
-impl LogFilter for CheckPermissionEvent {
+impl LogFilter for AuthorizeEvent {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::Success => LogLevel::Info,

@@ -15,7 +15,7 @@ impl LogMessage for ChangeResetTokenDestinationState {
 impl LogFilter for ChangeResetTokenDestinationState {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Validate(event) => event.log_level(),
+            Self::Authenticate(event) => event.log_level(),
             Self::PermissionError(err) => err.log_level(),
             Self::ChangeDestination(event) => event.log_level(),
         }

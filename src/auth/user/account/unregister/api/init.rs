@@ -8,7 +8,7 @@ use crate::auth::user::account::unregister::y_protobuf::service::UnregisterAuthU
 use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::{
-    ticket::validate::init::ApiValidateAuthTokenStruct,
+    ticket::validate::init::AuthenticateApiStruct,
     user::{
         account::unregister::init::request_decoder::PbUnregisterAuthUserAccountRequestDecoder,
         kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,
@@ -18,7 +18,7 @@ use crate::auth::{
 use super::action::{UnregisterAuthUserAccountAction, UnregisterAuthUserAccountMaterial};
 
 pub struct UnregisterAuthUserAccountFeature<'a> {
-    validate: ApiValidateAuthTokenStruct<'a>,
+    validate: AuthenticateApiStruct<'a>,
     ticket_repository: DynamoDbAuthTicketRepository<'a>,
     user_repository: DynamoDbAuthUserRepository<'a>,
 }
@@ -32,7 +32,7 @@ impl<'a> UnregisterAuthUserAccountFeature<'a> {
         UnregisterAuthUserAccountAction::with_material(
             PbUnregisterAuthUserAccountRequestDecoder::new(request),
             Self {
-                validate: ApiValidateAuthTokenStruct::new(feature, metadata),
+                validate: AuthenticateApiStruct::new(feature, metadata),
                 ticket_repository: DynamoDbAuthTicketRepository::new(&feature.store),
                 user_repository: DynamoDbAuthUserRepository::new(&feature.store),
             },
@@ -41,12 +41,12 @@ impl<'a> UnregisterAuthUserAccountFeature<'a> {
 }
 
 impl<'a> UnregisterAuthUserAccountMaterial for UnregisterAuthUserAccountFeature<'a> {
-    type Validate = ApiValidateAuthTokenStruct<'a>;
+    type Authenticate = AuthenticateApiStruct<'a>;
 
     type TicketRepository = DynamoDbAuthTicketRepository<'a>;
     type UserRepository = DynamoDbAuthUserRepository<'a>;
 
-    fn validate(&self) -> &Self::Validate {
+    fn authenticate(&self) -> &Self::Authenticate {
         &self.validate
     }
 

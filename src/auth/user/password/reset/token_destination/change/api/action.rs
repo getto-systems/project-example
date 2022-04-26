@@ -1,7 +1,7 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::ticket::validate::method::{
-    validate_auth_token, ValidateAuthTokenEvent, ValidateAuthTokenInfra,
+    authenticate, AuthenticateEvent, AuthenticateInfra,
 };
 
 use crate::auth::user::password::reset::token_destination::change::infra::{
@@ -11,22 +11,22 @@ use crate::auth::user::password::reset::token_destination::change::infra::{
 
 use crate::{
     auth::{
-        data::RequireAuthRoles, ticket::kernel::data::ValidateAuthRolesError,
+        data::RequireAuthRoles, ticket::kernel::data::PermissionError,
         user::password::reset::token_destination::change::data::ValidateChangeResetTokenDestinationFieldsError,
     },
     z_lib::repository::data::RepositoryError,
 };
 
 pub enum ChangeResetTokenDestinationState {
-    Validate(ValidateAuthTokenEvent),
-    PermissionError(ValidateAuthRolesError),
+    Authenticate(AuthenticateEvent),
+    PermissionError(PermissionError),
     ChangeDestination(ChangeResetTokenDestinationEvent),
 }
 
 impl std::fmt::Display for ChangeResetTokenDestinationState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Validate(event) => event.fmt(f),
+            Self::Authenticate(event) => event.fmt(f),
             Self::PermissionError(err) => err.fmt(f),
             Self::ChangeDestination(event) => event.fmt(f),
         }
@@ -34,11 +34,11 @@ impl std::fmt::Display for ChangeResetTokenDestinationState {
 }
 
 pub trait ChangeResetTokenDestinationMaterial {
-    type Validate: ValidateAuthTokenInfra;
+    type Authenticate: AuthenticateInfra;
 
     type DestinationRepository: ChangeResetTokenDestinationRepository;
 
-    fn validate(&self) -> &Self::Validate;
+    fn authenticate(&self) -> &Self::Authenticate;
 
     fn destination_repository(&self) -> &Self::DestinationRepository;
 }
@@ -76,8 +76,8 @@ impl<R: ChangeResetTokenDestinationRequestDecoder, M: ChangeResetTokenDestinatio
 
         let fields = self.request_decoder.decode();
 
-        let ticket = validate_auth_token(m.validate(), |event| {
-            pubsub.post(ChangeResetTokenDestinationState::Validate(event))
+        let ticket = authenticate(m.authenticate(), |event| {
+            pubsub.post(ChangeResetTokenDestinationState::Authenticate(event))
         })
         .await?;
 

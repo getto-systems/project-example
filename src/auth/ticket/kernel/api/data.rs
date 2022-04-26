@@ -134,7 +134,7 @@ impl AuthTicket {
     pub fn check_enough_permission(
         self,
         require_roles: RequireAuthRoles,
-    ) -> Result<Self, ValidateAuthRolesError> {
+    ) -> Result<Self, PermissionError> {
         if self
             .user
             .granted_roles()
@@ -142,7 +142,7 @@ impl AuthTicket {
         {
             Ok(self)
         } else {
-            Err(ValidateAuthRolesError::PermissionDenied(
+            Err(PermissionError::PermissionDenied(
                 self.user.into_granted_roles(),
                 require_roles,
             ))
@@ -269,12 +269,11 @@ impl ExpansionLimitDuration {
     }
 }
 
-// TODO 多分 AuthorizeError とか CheckPermissionError とか
-pub enum ValidateAuthRolesError {
+pub enum PermissionError {
     PermissionDenied(GrantedAuthRoles, RequireAuthRoles),
 }
 
-impl std::fmt::Display for ValidateAuthRolesError {
+impl std::fmt::Display for PermissionError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::PermissionDenied(granted_roles, require_roles) => {

@@ -15,7 +15,7 @@ use crate::auth::user::password::change::data::ValidateChangePasswordFieldsError
 impl ServiceResponder<ChangePasswordResponsePb> for ChangePasswordState {
     fn respond_to(self) -> Result<Response<ChangePasswordResponsePb>, Status> {
         match self {
-            Self::Validate(event) => event.respond_to(),
+            Self::Authenticate(event) => event.respond_to(),
             Self::Change(event) => event.respond_to(),
         }
     }
@@ -45,7 +45,7 @@ impl ServiceResponder<ChangePasswordResponsePb> for ValidateChangePasswordFields
 impl ServiceResponder<OverridePasswordResponsePb> for OverridePasswordState {
     fn respond_to(self) -> Result<Response<OverridePasswordResponsePb>, Status> {
         match self {
-            Self::Validate(event) => event.respond_to(),
+            Self::Authenticate(event) => event.respond_to(),
             Self::Override(event) => event.respond_to(),
         }
     }

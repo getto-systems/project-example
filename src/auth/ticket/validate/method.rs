@@ -20,7 +20,7 @@ use crate::{
     },
 };
 
-pub enum ValidateAuthTokenEvent {
+pub enum AuthenticateEvent {
     ValidateNonce(ValidateAuthNonceEvent),
     Success(AuthTicket),
     TokenNotSent,
@@ -28,13 +28,13 @@ pub enum ValidateAuthTokenEvent {
     DecodeError(DecodeAuthTokenError),
 }
 
-mod validate_auth_token_event {
-    use super::ValidateAuthTokenEvent;
+mod authenticate_event {
+    use super::AuthenticateEvent;
 
-    const SUCCESS: &'static str = "validate success";
-    const ERROR: &'static str = "validate error";
+    const SUCCESS: &'static str = "authenticate success";
+    const ERROR: &'static str = "authenticate error";
 
-    impl std::fmt::Display for ValidateAuthTokenEvent {
+    impl std::fmt::Display for AuthenticateEvent {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
                 Self::ValidateNonce(event) => event.fmt(f),
@@ -47,7 +47,7 @@ mod validate_auth_token_event {
     }
 }
 
-pub trait ValidateAuthTokenInfra {
+pub trait AuthenticateInfra {
     type ValidateNonce: ValidateAuthNonceInfra;
     type TokenMetadata: AuthTokenMetadata;
     type TokenDecoder: AuthTokenDecoder;
@@ -57,53 +57,53 @@ pub trait ValidateAuthTokenInfra {
     fn token_decoder(&self) -> &Self::TokenDecoder;
 }
 
-pub async fn validate_auth_token<S>(
-    infra: &impl ValidateAuthTokenInfra,
-    post: impl Fn(ValidateAuthTokenEvent) -> S,
+pub async fn authenticate<S>(
+    infra: &impl AuthenticateInfra,
+    post: impl Fn(AuthenticateEvent) -> S,
 ) -> Result<AuthTicket, S> {
     validate_auth_nonce(infra.validate_nonce(), |event| {
-        post(ValidateAuthTokenEvent::ValidateNonce(event))
+        post(AuthenticateEvent::ValidateNonce(event))
     })
     .await?;
 
     let ticket = decode_ticket(infra).map_err(|event| post(event))?;
 
     // 呼び出し側を簡単にするため、例外的に State ではなく AuthTicket を返す
-    post(ValidateAuthTokenEvent::Success(ticket.clone()));
+    post(AuthenticateEvent::Success(ticket.clone()));
     Ok(ticket)
 }
 
 fn decode_ticket(
-    infra: &impl ValidateAuthTokenInfra,
-) -> Result<AuthTicket, ValidateAuthTokenEvent> {
+    infra: &impl AuthenticateInfra,
+) -> Result<AuthTicket, AuthenticateEvent> {
     let token_metadata = infra.token_metadata();
     let token_decoder = infra.token_decoder();
 
     let token = token_metadata
         .token()
-        .map_err(ValidateAuthTokenEvent::MetadataError)?
-        .ok_or(ValidateAuthTokenEvent::TokenNotSent)?;
+        .map_err(AuthenticateEvent::MetadataError)?
+        .ok_or(AuthenticateEvent::TokenNotSent)?;
 
     token_decoder
         .decode(&token)
         .map(|ticket| AuthTicket::restore(ticket))
-        .map_err(ValidateAuthTokenEvent::DecodeError)
+        .map_err(AuthenticateEvent::DecodeError)
 }
 
-pub enum CheckPermissionEvent {
+pub enum AuthorizeEvent {
     Success,
     ServiceError(AuthProxyError),
     MetadataError(MetadataError),
     DecodeError(DecodeAuthTokenError),
 }
 
-mod check_permission_event {
-    use super::CheckPermissionEvent;
+mod authorize_event {
+    use super::AuthorizeEvent;
 
-    const SUCCESS: &'static str = "validate api token success";
-    const ERROR: &'static str = "validate api token error";
+    const SUCCESS: &'static str = "authorize success";
+    const ERROR: &'static str = "authorize error";
 
-    impl std::fmt::Display for CheckPermissionEvent {
+    impl std::fmt::Display for AuthorizeEvent {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
                 Self::Success => write!(f, "{}", SUCCESS),
@@ -115,7 +115,7 @@ mod check_permission_event {
     }
 }
 
-pub trait CheckPermissionInfra {
+pub trait AuthorizeInfra {
     type AuthMetadata: AuthMetadata;
     type TokenDecoder: AuthTokenDecoder;
     type ValidateService: ValidateService;
@@ -125,10 +125,10 @@ pub trait CheckPermissionInfra {
     fn validate_service(&self) -> &Self::ValidateService;
 }
 
-pub async fn check_permission<S>(
-    infra: &impl CheckPermissionInfra,
+pub async fn authorize<S>(
+    infra: &impl AuthorizeInfra,
     require_roles: RequireAuthRoles,
-    post: impl Fn(CheckPermissionEvent) -> S,
+    post: impl Fn(AuthorizeEvent) -> S,
 ) -> MethodResult<S> {
     let auth_metadata = infra.auth_metadata();
     let token_decoder = infra.token_decoder();
@@ -136,20 +136,20 @@ pub async fn check_permission<S>(
 
     let metadata = auth_metadata
         .metadata()
-        .map_err(|err| post(CheckPermissionEvent::MetadataError(err)))?;
+        .map_err(|err| post(AuthorizeEvent::MetadataError(err)))?;
 
     if let Some(ref token) = metadata.token {
         token_decoder
             .decode(token)
-            .map_err(|err| post(CheckPermissionEvent::DecodeError(err)))?;
+            .map_err(|err| post(AuthorizeEvent::DecodeError(err)))?;
     }
 
     validate_service
         .validate(metadata, require_roles)
         .await
-        .map_err(|err| post(CheckPermissionEvent::ServiceError(err)))?;
+        .map_err(|err| post(AuthorizeEvent::ServiceError(err)))?;
 
-    Ok(post(CheckPermissionEvent::Success))
+    Ok(post(AuthorizeEvent::Success))
 }
 
 pub enum ValidateAuthMetadataEvent {

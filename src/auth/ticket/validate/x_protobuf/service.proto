@@ -2,11 +2,11 @@ syntax = "proto3";
 
 package auth.ticket.validate.service;
 
-service ValidateApiTokenPb {
-    rpc Validate (ValidateApiTokenRequestPb) returns (ValidateApiTokenResponsePb);
+service AuthorizePb {
+    rpc Authorize (AuthorizeRequestPb) returns (AuthorizeResponsePb);
 }
-message ValidateApiTokenRequestPb {
+message AuthorizeRequestPb {
     bool allow_any_role = 1;
     repeated string require_roles = 2;
 }
-message ValidateApiTokenResponsePb {}
+message AuthorizeResponsePb {}

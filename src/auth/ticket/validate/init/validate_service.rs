@@ -1,7 +1,7 @@
 use tonic::Request;
 
 use crate::auth::ticket::validate::y_protobuf::service::{
-    validate_api_token_pb_client::ValidateApiTokenPbClient, ValidateApiTokenRequestPb,
+    authorize_pb_client::AuthorizePbClient, AuthorizeRequestPb,
 };
 
 use crate::auth::x_outside_feature::feature::AuthOutsideService;
@@ -49,7 +49,7 @@ async fn validate<'a>(
     metadata: AuthMetadataContent,
     require_roles: RequireAuthRoles,
 ) -> Result<(), AuthProxyError> {
-    let mut client = ValidateApiTokenPbClient::new(
+    let mut client = AuthorizePbClient::new(
         new_endpoint(service.service_url)
             .map_err(|err| infra_error("service endpoint error", err))?
             .connect()
@@ -57,7 +57,7 @@ async fn validate<'a>(
             .map_err(|err| infra_error("connect error", err))?,
     );
 
-    let request: ValidateApiTokenRequestPb = require_roles.into();
+    let request: AuthorizeRequestPb = require_roles.into();
     let mut request = Request::new(request);
     set_metadata(
         &mut request,
@@ -69,7 +69,7 @@ async fn validate<'a>(
     .map_err(|err| infra_error("metadata error", err))?;
 
     client
-        .validate(request)
+        .authorize(request)
         .await
         .map_err(AuthProxyError::from)?;
 

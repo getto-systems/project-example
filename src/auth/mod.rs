@@ -16,13 +16,13 @@ pub mod infra {
 }
 pub mod init {
     pub use crate::auth::ticket::validate::init::{
-        CheckPermissionStruct, ValidateApiMetadataStruct,
+        AuthorizeStruct, ValidateApiMetadataStruct,
     };
 
     #[cfg(test)]
     pub mod test {
         pub use crate::auth::ticket::validate::init::{
-            auth_metadata::test::StaticAuthMetadata, test::StaticCheckPermissionStruct,
+            auth_metadata::test::StaticAuthMetadata, test::StaticAuthorizeStruct,
             token_decoder::test::StaticAuthTokenDecoder,
             validate_service::test::StaticValidateService,
         };
@@ -30,7 +30,7 @@ pub mod init {
 }
 pub mod method {
     pub use crate::auth::ticket::validate::method::{
-        check_permission, validate_auth_metadata, CheckPermissionEvent, CheckPermissionInfra,
+        authorize, validate_auth_metadata, AuthorizeEvent, AuthorizeInfra,
         ValidateAuthMetadataEvent, ValidateAuthMetadataInfra,
     };
 }

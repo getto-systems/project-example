@@ -1,6 +1,6 @@
 use crate::z_lib::logger::infra::{LogFilter, LogLevel};
 
-use crate::auth::ticket::kernel::data::{DecodeAuthTokenError, ValidateAuthRolesError};
+use crate::auth::ticket::kernel::data::{DecodeAuthTokenError, PermissionError};
 
 impl LogFilter for DecodeAuthTokenError {
     fn log_level(&self) -> LogLevel {
@@ -11,7 +11,7 @@ impl LogFilter for DecodeAuthTokenError {
     }
 }
 
-impl LogFilter for ValidateAuthRolesError {
+impl LogFilter for PermissionError {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::PermissionDenied(_, _) => LogLevel::Audit,

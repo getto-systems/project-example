@@ -9,7 +9,7 @@ use crate::auth::{
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
-            test::{StaticValidateAuthNonceStruct, StaticValidateAuthTokenStruct},
+            test::{StaticValidateAuthNonceStruct, StaticAuthenticateStruct},
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
         },
@@ -55,7 +55,7 @@ async fn success_modify_user() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
         "modify auth user account success",
     ]);
     assert!(result.is_ok());
@@ -76,7 +76,7 @@ async fn permission_denied() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
         "user permission denied; granted: [], require: any [user]",
     ]);
     assert!(result.is_err());
@@ -97,7 +97,7 @@ async fn error_conflict_changes() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
         "modify auth user account error; changes conflicted",
     ]);
     assert!(result.is_err());
@@ -118,7 +118,7 @@ async fn error_not_found() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
         "modify auth user account error; not found",
     ]);
     assert!(result.is_err());
@@ -139,7 +139,7 @@ async fn error_invalid_granted_roles() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
         "modify auth user account error; invalid to; invalid role",
     ]);
     assert!(result.is_err());
@@ -160,23 +160,23 @@ async fn error_invalid_memo() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "validate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
         "modify auth user account error; invalid to; memo: too long",
     ]);
     assert!(result.is_err());
 }
 
 struct TestStruct<'a> {
-    validate: StaticValidateAuthTokenStruct<'a>,
+    validate: StaticAuthenticateStruct<'a>,
     user_repository: MemoryAuthUserRepository<'a>,
 }
 
 impl<'a> ModifyAuthUserAccountMaterial for TestStruct<'a> {
-    type Validate = StaticValidateAuthTokenStruct<'a>;
+    type Authenticate = StaticAuthenticateStruct<'a>;
 
     type UserRepository = MemoryAuthUserRepository<'a>;
 
-    fn validate(&self) -> &Self::Validate {
+    fn authenticate(&self) -> &Self::Authenticate {
         &self.validate
     }
     fn user_repository(&self) -> &Self::UserRepository {
@@ -207,7 +207,7 @@ impl<'a> TestStruct<'a> {
     }
     fn new(store: &'a TestStore, token_decoder: StaticAuthTokenDecoder) -> Self {
         Self {
-            validate: StaticValidateAuthTokenStruct {
+            validate: StaticAuthenticateStruct {
                 validate_nonce: StaticValidateAuthNonceStruct {
                     config: standard_nonce_config(),
                     clock: standard_clock(),

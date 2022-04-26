@@ -11,7 +11,7 @@ impl LogMessage for OverrideLoginIdState {
 impl LogFilter for OverrideLoginIdState {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Validate(event) => event.log_level(),
+            Self::Authenticate(event) => event.log_level(),
             Self::Override(event) => event.log_level(),
         }
     }
