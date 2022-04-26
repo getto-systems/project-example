@@ -6,7 +6,7 @@ import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
 import { button_disabled, button_send } from "../../../z_vendor/getto-css/preact/design/form"
 
 import { icon_spinner } from "../../../x_content/icon"
-import { iconHtml } from "../../../core/x_preact/design/icon"
+import { iconHtml } from "../design/icon"
 
 import { ValidateBoardState } from "../../../z_vendor/getto-application/board/validate_board/action"
 import { ObserveBoardState } from "../../../z_vendor/getto-application/board/observe_board/action"
