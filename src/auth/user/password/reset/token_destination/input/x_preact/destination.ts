@@ -24,6 +24,7 @@ import { EditableBoardAction } from "../../../../../../../z_vendor/getto-applica
 import { ValidateResetTokenDestinationError } from "../data"
 import { ResetTokenDestination } from "../../kernel/data"
 import { textValidationError } from "../../../../../../../z_lib/ui/validate/x_plain/error"
+import { AUTH_USER_ACCOUNT } from "../../../../../account/kernel/data"
 
 type Props = Readonly<{
     field: InputResetTokenDestinationAction
@@ -43,7 +44,7 @@ export function ResetTokenDestinationField(props: Props): VNode {
     const validateState = useApplicationAction(props.field.validate)
 
     return inputField({
-        title: props.title || "パスワードリセット用Eメール",
+        title: props.title || AUTH_USER_ACCOUNT["reset-token-destination"],
         help: props.help,
         label: label_text_fill,
         state: validateState.valid

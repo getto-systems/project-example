@@ -11,6 +11,7 @@ import { InputBoard } from "../../../../../z_vendor/getto-application/board/inpu
 import { textValidationError } from "../../../../../z_lib/ui/validate/x_plain/error"
 
 import { InputLoginIdAction } from "../action"
+import { AUTH_USER_ACCOUNT } from "../../../account/kernel/data"
 
 type Props = Readonly<{
     field: InputLoginIdAction
@@ -24,7 +25,7 @@ export function LoginIdField(props: Props): VNode {
     const validateState = useApplicationAction(props.field.validate)
 
     return inputField({
-        title: props.title || "ログインID",
+        title: props.title || AUTH_USER_ACCOUNT["login-id"],
         help: props.help,
         label: label_text_fill,
         state: validateState.valid

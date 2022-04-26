@@ -18,7 +18,7 @@ import { tableClassName } from "../../../../../z_vendor/getto-table/preact/decor
 
 import { ListRegisteredAuthUserAccountAction } from "../action"
 
-import { AuthUserAccount } from "../../kernel/data"
+import { AuthUserAccount, AUTH_USER_ACCOUNT } from "../../kernel/data"
 
 export type ListRegisteredAuthUserAccountTableStructure = TableStructure<Summary, AuthUserAccount>
 
@@ -42,23 +42,22 @@ function build(
             column: editLink,
         })).alwaysVisible(),
 
-        // TODO builder にしたいかな
-        tableCell("login-id", (_key) => ({
-            label: "ログインID",
+        tableCell("login-id", (key) => ({
+            label: AUTH_USER_ACCOUNT[key],
             header: linky,
             column: loginId,
         }))
             .alwaysVisible()
             .border(["leftDouble"]),
 
-        tableCell("granted-roles", (_key) => ({
-            label: "権限",
+        tableCell("granted-roles", (key) => ({
+            label: AUTH_USER_ACCOUNT[key],
             header: linky,
             column: grantedRoles,
         })).border(["left"]),
 
-        tableCell("reset-token-destination", (_key) => ({
-            label: "パスワードリセット用Eメール",
+        tableCell("reset-token-destination", (key) => ({
+            label: AUTH_USER_ACCOUNT[key],
             header: linky,
             column: resetTokenDestination,
         })).border(["left"]),

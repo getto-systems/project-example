@@ -10,3 +10,11 @@ export type AuthUserAccount = Readonly<{
 }>
 
 export type AuthUserMemo = string & { AuthUserMemo: never }
+
+export const AUTH_USER_ACCOUNT = {
+    "login-id": "ログインID",
+    password: "パスワード",
+    memo: "備考",
+    "granted-roles": "権限",
+    "reset-token-destination": "パスワードリセット用Eメール",
+} as const

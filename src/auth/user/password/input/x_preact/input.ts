@@ -14,6 +14,7 @@ import { InputBoard } from "../../../../../z_vendor/getto-application/board/inpu
 import { textValidationError } from "../../../../../z_lib/ui/validate/x_plain/error"
 
 import { InputPasswordAction } from "../action"
+import { AUTH_USER_ACCOUNT } from "../../../account/kernel/data"
 
 type Props = Readonly<{ field: InputPasswordAction }> &
     Partial<{
@@ -25,7 +26,7 @@ export function PasswordField(props: Props): VNode {
     const validateState = useApplicationAction(props.field.validate)
 
     return inputField({
-        title: props.title || "パスワード",
+        title: props.title || AUTH_USER_ACCOUNT["password"],
         help: [...(props.help || []), characterHelp()],
         label: label_password_fill,
         state: validateState.valid

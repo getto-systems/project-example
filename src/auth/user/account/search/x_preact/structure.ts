@@ -20,7 +20,7 @@ import { tableClassName } from "../../../../../z_vendor/getto-table/preact/decor
 import { ListAuthUserAccountAction } from "../action"
 
 import { SearchAuthUserAccountSortKey } from "../data"
-import { AuthUserAccount } from "../../kernel/data"
+import { AuthUserAccount, AUTH_USER_ACCOUNT } from "../../kernel/data"
 
 export type SearchAuthUserAccountTableStructure = TableStructure<Summary, AuthUserAccount>
 
@@ -46,30 +46,28 @@ function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStruc
             column: editLink,
         })).alwaysVisible(),
 
-        // TODO builder にしたいかな
         tableCell("login-id", (key) => ({
-            // TODO このラベルをどこかに統一したいが...
-            label: "ログインID",
+            label: AUTH_USER_ACCOUNT[key],
             header: sort(key),
             column: loginId,
         }))
             .alwaysVisible()
             .border(["leftDouble"]),
 
-        tableCell("memo", (_key) => ({
-            label: "備考",
+        tableCell("memo", (key) => ({
+            label: AUTH_USER_ACCOUNT[key],
             header: linky,
             column: memo,
         })).border(["left"]),
 
-        tableCell("granted-roles", (_key) => ({
-            label: "権限",
+        tableCell("granted-roles", (key) => ({
+            label: AUTH_USER_ACCOUNT[key],
             header: linky,
             column: grantedRoles,
         })).border(["left"]),
 
-        tableCell("reset-token-destination", (_key) => ({
-            label: "パスワードリセット用Eメール",
+        tableCell("reset-token-destination", (key) => ({
+            label: AUTH_USER_ACCOUNT[key],
             header: linky,
             column: resetTokenDestination,
         })).border(["left"]),
