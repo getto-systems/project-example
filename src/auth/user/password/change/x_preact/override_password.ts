@@ -32,7 +32,7 @@ export function OverridePassword(props: Props): VNode {
 
     return box({
         form: true,
-        title: "パスワード",
+        title: "パスワード変更",
         ...(editableState.isEditable
             ? {
                   body: [
