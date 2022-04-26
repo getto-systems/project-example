@@ -72,7 +72,6 @@ export function AuthenticatePassword(viewProps: Props): VNode {
         case "initial-login":
         case "failed-to-login":
         case "try-to-login":
-        case "take-longtime-to-login":
             return authenticateForm(state)
 
         case "try-to-load":
@@ -94,10 +93,9 @@ export function AuthenticatePassword(viewProps: Props): VNode {
 
     type AuthenticateState =
         | Readonly<{ type: "initial-login" }>
-        | Readonly<{ type: "try-to-login" }>
-        | Readonly<{ type: "take-longtime-to-login" }>
+        | Readonly<{ type: "try-to-login"; hasTakenLongtime: boolean }>
         | Readonly<{ type: "failed-to-login"; err: AuthenticatePasswordError }>
-    function authenticateForm(authenticateState: AuthenticateState): VNode {
+    function authenticateForm(state: AuthenticateState): VNode {
         return loginBox(siteInfo, {
             form: true,
             title: "ログイン",
@@ -122,7 +120,7 @@ export function AuthenticatePassword(viewProps: Props): VNode {
             return h(SendButton, {
                 label: "ログイン",
                 icon: lnir(["enter"]),
-                isConnecting: authenticateState.type === "try-to-login",
+                isConnecting: state.type === "try-to-login",
                 validateState,
                 observeState,
                 onClick,
@@ -153,16 +151,18 @@ export function AuthenticatePassword(viewProps: Props): VNode {
             }
         }
         function message(): VNode[] {
-            switch (authenticateState.type) {
+            switch (state.type) {
                 case "initial-login":
-                case "try-to-login":
                     return []
 
-                case "take-longtime-to-login":
-                    return [takeLongtimeField("認証")]
+                case "try-to-login":
+                    if (state.hasTakenLongtime) {
+                        return [takeLongtimeField("認証")]
+                    }
+                    return []
 
                 case "failed-to-login":
-                    return [fieldHelp_error(loginError(authenticateState.err))]
+                    return [fieldHelp_error(loginError(state.err))]
             }
         }
     }

@@ -25,7 +25,7 @@ test("initial load", async () => {
 
     await runner(async () => resource.search.ignitionState).then((stack) => {
         expect(stack).toEqual([
-            { type: "try", previousResponse: undefined },
+            { type: "try", hasTakenLongtime: false, previousResponse: undefined },
             { type: "success", response: standard_response },
         ])
     })
@@ -43,7 +43,7 @@ test("search", async () => {
         return resource.search.search()
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "try", previousResponse: standard_response },
+            { type: "try", hasTakenLongtime: false, previousResponse: standard_response },
             { type: "success", response: standard_response },
         ])
     })
@@ -60,8 +60,8 @@ test("search; take longtime", async () => {
         return resource.search.search()
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "try", previousResponse: standard_response },
-            { type: "take-longtime", previousResponse: standard_response },
+            { type: "try", hasTakenLongtime: false, previousResponse: standard_response },
+            { type: "try", hasTakenLongtime: true, previousResponse: standard_response },
             { type: "success", response: standard_response },
         ])
     })
@@ -78,7 +78,7 @@ test("sort", async () => {
         return resource.search.sort("login-id")
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "try", previousResponse: standard_response },
+            { type: "try", hasTakenLongtime: false, previousResponse: standard_response },
             { type: "success", response: standard_response },
         ])
     })

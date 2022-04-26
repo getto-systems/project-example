@@ -74,7 +74,7 @@ export function UnregisterAuthUserAccount(props: Props): VNode {
 
     function submitButton(): VNode {
         return h(DeleteButton, {
-            isConnecting: state.type === "try" || state.type === "take-longtime",
+            isConnecting: state.type === "try",
             onClick,
         })
 
@@ -102,11 +102,13 @@ export function UnregisterAuthUserAccount(props: Props): VNode {
         switch (state.type) {
             case "initial":
             case "success":
-            case "try":
                 return []
 
-            case "take-longtime":
-                return [takeLongtimeField("変更")]
+            case "try":
+                if (state.hasTakenLongtime) {
+                    return [takeLongtimeField("変更")]
+                }
+                return []
 
             case "failed":
                 return [fieldHelp_error(modifyError(state.err))]

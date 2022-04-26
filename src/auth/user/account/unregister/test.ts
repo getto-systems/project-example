@@ -17,7 +17,7 @@ test("submit", async () => {
     await runner(async () => {
         return resource.unregister.submit(user)
     }).then((stack) => {
-        expect(stack).toEqual([{ type: "try" }, { type: "success" }])
+        expect(stack).toEqual([{ type: "try", hasTakenLongtime: false }, { type: "success" }])
     })
 })
 
@@ -30,7 +30,11 @@ test("submit; take long time", async () => {
     await runner(() => {
         return resource.unregister.submit(user)
     }).then((stack) => {
-        expect(stack).toEqual([{ type: "try" }, { type: "take-longtime" }, { type: "success" }])
+        expect(stack).toEqual([
+            { type: "try", hasTakenLongtime: false },
+            { type: "try", hasTakenLongtime: true },
+            { type: "success" },
+        ])
     })
 })
 

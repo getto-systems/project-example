@@ -56,7 +56,7 @@ test("submit valid login-id and password", async () => {
         return resource.submit()
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "try-to-login" },
+            { type: "try-to-login", hasTakenLongtime: false },
             {
                 type: "try-to-load",
                 scriptPath: {
@@ -93,8 +93,8 @@ test("submit valid login-id and password; take long time", async () => {
         return resource.submit()
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "try-to-login" },
-            { type: "take-longtime-to-login" },
+            { type: "try-to-login", hasTakenLongtime: false },
+            { type: "try-to-login", hasTakenLongtime: true },
             {
                 type: "try-to-load",
                 scriptPath: {

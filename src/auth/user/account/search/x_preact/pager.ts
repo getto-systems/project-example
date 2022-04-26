@@ -28,7 +28,6 @@ export function SearchAuthUserAccountPager(props: Props): VNode {
             return html``
 
         case "try":
-        case "take-longtime":
             if (state.previousResponse) {
                 return pagerForm({ page: state.previousResponse.page, isConnecting: true })
             } else {

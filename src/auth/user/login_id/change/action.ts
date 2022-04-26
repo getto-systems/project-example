@@ -131,8 +131,7 @@ class OverrideAction
 }
 
 type OverrideLoginIdEvent =
-    | Readonly<{ type: "try" }>
-    | Readonly<{ type: "take-longtime" }>
+    | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ChangeLoginIdError }>
     | Readonly<{ type: "success"; loginId: LoginId }>
 
@@ -142,7 +141,7 @@ async function overrideLoginId<S>(
     fields: OverrideLoginIdFields,
     post: Post<OverrideLoginIdEvent, S>,
 ): Promise<S> {
-    post({ type: "try" })
+    post({ type: "try", hasTakenLongtime: false })
 
     const { overrideLoginIdRemote } = infra
 
@@ -150,7 +149,7 @@ async function overrideLoginId<S>(
     const response = await delayedChecker(
         overrideLoginIdRemote(user, fields),
         config.takeLongtimeThreshold,
-        () => post({ type: "take-longtime" }),
+        () => post({ type: "try", hasTakenLongtime: true }),
     )
     if (!response.success) {
         return post({ type: "failed", err: response.err })

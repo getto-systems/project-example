@@ -137,8 +137,7 @@ type CheckMaterial = Readonly<{
 
 type RenewEvent =
     | Readonly<{ type: "required-to-login" }>
-    | Readonly<{ type: "try-to-renew" }>
-    | Readonly<{ type: "take-longtime-to-renew" }>
+    | Readonly<{ type: "try-to-renew"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed-to-renew"; err: RemoteCommonError }>
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
@@ -192,11 +191,11 @@ async function renew<S>(
 ): Promise<RenewResult<S>> {
     const { ticketRepository, renewRemote } = infra
 
-    post({ type: "try-to-renew" })
+    post({ type: "try-to-renew", hasTakenLongtime: false })
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(renewRemote(), config.takeLongtimeThreshold, () =>
-        post({ type: "take-longtime-to-renew" }),
+        post({ type: "try-to-renew", hasTakenLongtime: true }),
     )
     if (!response.success) {
         if (response.err.type === "unauthorized") {

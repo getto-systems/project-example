@@ -10,10 +10,7 @@ import {
     tbody,
     thead,
 } from "../../../../../z_vendor/getto-css/preact/design/table"
-import {
-    emptyTable,
-    takeLongtimeTable,
-} from "../../../../../core/x_preact/design/table"
+import { emptyTable, takeLongtimeTable } from "../../../../../core/x_preact/design/table"
 
 import { searchColumns } from "../../../../../z_lib/ui/search/columns/x_preact/helper"
 
@@ -29,7 +26,7 @@ export function SearchAuthUserAccountTable(props: Props): VNode {
     const state = useApplicationAction(props.list)
     const columnsState = useApplicationAction(props.list.columns)
 
-    if (state.type === "take-longtime") {
+    if (state.type === "try" && state.hasTakenLongtime) {
         return takeLongtimeTable()
     }
 

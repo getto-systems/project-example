@@ -192,8 +192,7 @@ class Action
 }
 
 type ResetEvent =
-    | Readonly<{ type: "try-to-reset" }>
-    | Readonly<{ type: "take-longtime-to-reset" }>
+    | Readonly<{ type: "try-to-reset"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed-to-reset"; err: ResetPasswordError }>
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
@@ -214,7 +213,7 @@ async function reset<S>(
         }
     }
 
-    post({ type: "try-to-reset" })
+    post({ type: "try-to-reset", hasTakenLongtime: false })
 
     const { resetRemote } = infra
 
@@ -222,7 +221,7 @@ async function reset<S>(
     const response = await delayedChecker(
         resetRemote(resetToken.value, fields),
         config.takeLongtimeThreshold,
-        () => post({ type: "take-longtime-to-reset" }),
+        () => post({ type: "try-to-reset", hasTakenLongtime: true }),
     )
     if (!response.success) {
         return { success: false, state: post({ type: "failed-to-reset", err: response.err }) }
