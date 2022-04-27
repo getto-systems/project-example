@@ -17,4 +17,7 @@ class Stack implements ValidateBoardStack {
     set(name: string, valid: boolean): void {
         this.stack.set(name, valid)
     }
+    delete(name: string): void {
+        this.stack.delete(name)
+    }
 }

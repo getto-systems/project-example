@@ -2,7 +2,12 @@ import { StatefulApplicationAction, AbstractStatefulApplicationAction } from "..
 
 import { initValidateBoardStack } from "./init/stack"
 
-import { ValidateBoardChecker, ValidateBoardStack, ValidateBoardStateFound } from "./infra"
+import {
+    ValidateBoardChecker,
+    ValidateBoardCheckState,
+    ValidateBoardStack,
+    ValidateBoardStateFound,
+} from "./infra"
 
 import { ConvertBoardResult } from "../kernel/data"
 
@@ -65,8 +70,8 @@ class Action<N extends string, T>
         this.shell = shell
     }
 
-    update(name: N, result: boolean): ValidateBoardState {
-        return this.post(update(this.config, this.infra, name, result))
+    update(name: N, state: ValidateBoardCheckState): ValidateBoardState {
+        return this.post(update(this.config, this.infra, name, state))
     }
     get(): ConvertBoardResult<T> {
         return this.shell.convert()
@@ -81,11 +86,19 @@ function update<N extends string>(
     config: ValidateBoardConfig<N>,
     infra: ValidateBoardInfra,
     name: N,
-    valid: boolean,
+    state: ValidateBoardCheckState,
 ): ValidateBoardState {
     const { stack } = infra
 
-    stack.set(name, valid)
+    switch (state.type) {
+        case "initial":
+            stack.delete(name)
+            break
+
+        case "validated":
+            stack.set(name, state.result.valid)
+            break
+    }
     return compose(config.fields.map((field) => stack.get(field)))
 }
 

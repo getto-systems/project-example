@@ -119,30 +119,14 @@ class Action
         this.observe = observe
         this.convert = convert
 
-        this.memo.validate.subscriber.subscribe((state): true => {
-            switch (state.type) {
-                case "initial":
-                    validateChecker.update("memo", true)
-                    return true
-
-                case "validated":
-                    validateChecker.update("memo", state.result.valid)
-                    return true
-            }
+        this.memo.validate.subscriber.subscribe((state) => {
+            validateChecker.update("memo", state)
         })
         this.memo.observe.subscriber.subscribe((result) => {
             observeChecker.update("memo", result.hasChanged)
         })
-        this.grantedRoles.validate.subscriber.subscribe((state): true => {
-            switch (state.type) {
-                case "initial":
-                    validateChecker.update("granted-roles", true)
-                    return true
-
-                case "validated":
-                    validateChecker.update("granted-roles", state.result.valid)
-                    return true
-            }
+        this.grantedRoles.validate.subscriber.subscribe((state) => {
+            validateChecker.update("granted-roles", state)
         })
         this.grantedRoles.observe.subscriber.subscribe((result) => {
             observeChecker.update("granted-roles", result.hasChanged)

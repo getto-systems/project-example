@@ -108,16 +108,8 @@ class Action
         this.observe = observe
         this.convert = convert
 
-        this.destination.validate.subscriber.subscribe((state): true => {
-            switch (state.type) {
-                case "initial":
-                    validateChecker.update("destination", true)
-                    return true
-
-                case "validated":
-                    validateChecker.update("destination", state.result.valid)
-                    return true
-            }
+        this.destination.validate.subscriber.subscribe((state) => {
+            validateChecker.update("destination", state)
         })
         this.destination.observe.subscriber.subscribe((result) => {
             observeChecker.update("destination", result.hasChanged)
