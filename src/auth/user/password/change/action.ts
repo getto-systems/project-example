@@ -93,11 +93,11 @@ class Action
         const currentPassword = initInputPasswordAction()
         const newPassword = initInputPasswordAction()
 
-        const fields = ["currentPassword", "newPassword"] as const
+        const fields = ["current-password", "new-password"] as const
         const convert = (): ConvertBoardResult<ChangePasswordFields> => {
             const result = {
-                currentPassword: currentPassword.checker.check(),
-                newPassword: newPassword.checker.check(),
+                currentPassword: currentPassword.validate.check(),
+                newPassword: newPassword.validate.check(),
             }
             if (!result.currentPassword.valid || !result.newPassword.valid) {
                 return { valid: false }
@@ -114,23 +114,39 @@ class Action
         const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
-        this.currentPassword = currentPassword.input
-        this.newPassword = newPassword.input
+        this.currentPassword = currentPassword
+        this.newPassword = newPassword
         this.validate = validate
         this.observe = observe
         this.convert = convert
 
-        this.currentPassword.validate.subscriber.subscribe((result) =>
-            validateChecker.update("currentPassword", result.valid),
-        )
+        this.currentPassword.validate.subscriber.subscribe((state): true => {
+            switch (state.type) {
+                case "initial":
+                    validateChecker.update("current-password", true)
+                    return true
+
+                case "validated":
+                    validateChecker.update("current-password", state.result.valid)
+                    return true
+            }
+        })
         this.currentPassword.observe.subscriber.subscribe((result) =>
-            observeChecker.update("currentPassword", result.hasChanged),
+            observeChecker.update("current-password", result.hasChanged),
         )
-        this.newPassword.validate.subscriber.subscribe((result) =>
-            validateChecker.update("newPassword", result.valid),
-        )
+        this.newPassword.validate.subscriber.subscribe((state): true => {
+            switch (state.type) {
+                case "initial":
+                    validateChecker.update("new-password", true)
+                    return true
+
+                case "validated":
+                    validateChecker.update("new-password", state.result.valid)
+                    return true
+            }
+        })
         this.newPassword.observe.subscriber.subscribe((result) =>
-            observeChecker.update("newPassword", result.hasChanged),
+            observeChecker.update("new-password", result.hasChanged),
         )
     }
 
@@ -218,7 +234,7 @@ class OverrideAction
         })
         this.material = material
 
-        const fields = ["newPassword"] as const
+        const fields = ["new-password"] as const
 
         const newPassword = initInputPasswordAction()
         const { validate, validateChecker } = initValidateBoardAction(
@@ -226,7 +242,7 @@ class OverrideAction
             {
                 convert: (): ConvertBoardResult<OverridePasswordFields> => {
                     const result = {
-                        newPassword: newPassword.checker.check(),
+                        newPassword: newPassword.validate.check(),
                     }
                     if (!result.newPassword.valid) {
                         return { valid: false }
@@ -242,16 +258,24 @@ class OverrideAction
         )
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
-        this.newPassword = newPassword.input
+        this.newPassword = newPassword
         this.validate = validate
         this.observe = observe
         this.convert = () => validateChecker.get()
 
-        this.newPassword.validate.subscriber.subscribe((result) =>
-            validateChecker.update("newPassword", result.valid),
-        )
+        this.newPassword.validate.subscriber.subscribe((state): true => {
+            switch (state.type) {
+                case "initial":
+                    validateChecker.update("new-password", true)
+                    return true
+
+                case "validated":
+                    validateChecker.update("new-password", state.result.valid)
+                    return true
+            }
+        })
         this.newPassword.observe.subscriber.subscribe((result) =>
-            observeChecker.update("newPassword", result.hasChanged),
+            observeChecker.update("new-password", result.hasChanged),
         )
     }
 

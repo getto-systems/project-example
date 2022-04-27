@@ -1,5 +1,5 @@
 import { ValidateTextError } from "../../../../../../z_lib/ui/validate/data"
-import { ConvertBoardFieldResult } from "../../../../../../z_vendor/getto-application/board/validate_field/data"
+import { ValidateBoardFieldResult } from "../../../../../../z_vendor/getto-application/board/validate_field/data"
 
 export type ResetTokenDestination =
     | Readonly<{ type: "none" }>
@@ -12,7 +12,7 @@ export type ValidateResetTokenDestinationError =
 
 export type ValidateResetTokenDestinationTypeError = Readonly<{ type: "invalid-type" }>
 
-export type ConvertResetTokenDestinationResult = ConvertBoardFieldResult<
+export type ConvertResetTokenDestinationResult = ValidateBoardFieldResult<
     ResetTokenDestination,
     ValidateResetTokenDestinationError
 >

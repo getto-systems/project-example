@@ -19,27 +19,21 @@ import {
     initValidateBoardFieldAction,
     ValidateBoardFieldAction,
 } from "../../../../../z_vendor/getto-application/board/validate_field/action"
-import { ConvertAuthUserMemoResult } from "./data"
 import { ValidateTextError } from "../../../../../z_lib/ui/validate/data"
 
 export interface InputAuthUserMemoAction extends ApplicationAction {
     readonly input: InputBoardAction<BoardValueStore>
-    readonly validate: ValidateBoardFieldAction<readonly ValidateTextError[]>
+    readonly validate: ValidateBoardFieldAction<AuthUserMemo, readonly ValidateTextError[]>
     readonly observe: ObserveBoardFieldAction
 
     reset(memo: AuthUserMemo): void
 }
 
-export function initInputAuthUserMemoAction(): Readonly<{
-    input: InputAuthUserMemoAction
-    convert: { (): ConvertAuthUserMemoResult }
-}> {
+export function initInputAuthUserMemoAction(): InputAuthUserMemoAction {
     const { input, store, subscriber } = initInputBoardAction()
 
-    const convert = () => authUserMemoBoardConverter(store.get())
-
-    const { validate, checker } = initValidateBoardFieldAction({
-        converter: convert,
+    const validate = initValidateBoardFieldAction({
+        convert: () => authUserMemoBoardConverter(store.get()),
     })
     const observe = initObserveBoardFieldAction({
         observer: initBoardFieldObserver({
@@ -48,26 +42,23 @@ export function initInputAuthUserMemoAction(): Readonly<{
     })
 
     subscriber.subscribe(() => {
-        checker.check()
+        validate.check()
         observe.check()
     })
 
     return {
-        input: {
-            terminate: () => {
-                subscriber.terminate()
-                validate.terminate()
-                observe.terminate()
-            },
-
-            input,
-            validate,
-            observe,
-
-            reset: (value: AuthUserMemo) => {
-                store.set(value)
-            },
+        terminate: () => {
+            subscriber.terminate()
+            validate.terminate()
+            observe.terminate()
         },
-        convert,
+
+        input,
+        validate,
+        observe,
+
+        reset: (value: AuthUserMemo) => {
+            store.set(value)
+        },
     }
 }

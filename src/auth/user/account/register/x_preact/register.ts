@@ -11,7 +11,7 @@ import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 import { LoginIdField } from "../../../login_id/input/x_preact/input"
 import { AuthUserMemoField } from "../../input/memo/x_preact/input"
 import { GrantedRolesField } from "../../input/granted_roles/x_preact/input"
-import { ResetTokenDestinationField } from "../../../password/reset/token_destination/input/x_preact/destination"
+import { ResetTokenDestinationField } from "../../../password/reset/token_destination/input/x_preact/input"
 import { ClearChangesButton } from "../../../../../core/x_preact/button/clear_changes_button"
 import { RegisterButton } from "../../../../../core/x_preact/button/register_button"
 

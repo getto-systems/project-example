@@ -15,7 +15,6 @@ import {
 } from "../../../../z_vendor/getto-application/board/observe_field/action"
 import { initBoardFieldObserver } from "../../../../z_vendor/getto-application/board/observe_field/init/observer"
 
-import { BoardFieldChecker } from "../../../../z_vendor/getto-application/board/validate_field/infra"
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
 import { Password, PasswordCharacterState } from "./data"
@@ -23,48 +22,41 @@ import { ValidateTextError } from "../../../../z_lib/ui/validate/data"
 
 export interface InputPasswordAction extends ApplicationAction {
     readonly input: InputBoardAction<BoardValueStore>
-    readonly validate: ValidateBoardFieldAction<readonly ValidateTextError[]>
+    readonly validate: ValidateBoardFieldAction<Password, readonly ValidateTextError[]>
     readonly observe: ObserveBoardFieldAction
 
     clear(): void
     checkCharacter(): PasswordCharacterState
 }
 
-export function initInputPasswordAction(): Readonly<{
-    input: InputPasswordAction
-    checker: BoardFieldChecker<Password, readonly ValidateTextError[]>
-}> {
+export function initInputPasswordAction(): InputPasswordAction {
     const { input, store, subscriber } = initInputBoardAction()
 
-    const { validate, checker } = initValidateBoardFieldAction({
-        converter: () => passwordBoardConverter(store.get()),
+    const validate = initValidateBoardFieldAction({
+        convert: () => passwordBoardConverter(store.get()),
     })
-
     const observe = initObserveBoardFieldAction({
         observer: initBoardFieldObserver({ current: () => store.get() }),
     })
 
     subscriber.subscribe(() => {
-        checker.check()
+        validate.check()
         observe.check()
     })
 
     return {
-        input: {
-            input,
-            validate,
-            observe,
-            clear: () => {
-                store.set("")
-                validate.clear()
-            },
-            checkCharacter: () => checkPasswordCharacter(store.get()),
-            terminate: () => {
-                subscriber.terminate()
-                validate.terminate()
-            },
+        input,
+        validate,
+        observe,
+        clear: () => {
+            store.set("")
+            validate.clear()
         },
-        checker,
+        checkCharacter: () => checkPasswordCharacter(store.get()),
+        terminate: () => {
+            subscriber.terminate()
+            validate.terminate()
+        },
     }
 }
 

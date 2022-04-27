@@ -18,7 +18,12 @@ test("validate; valid input", async () => {
         store.email.set("user@example.com")
         return action.validate.currentState()
     }).then((stack) => {
-        expect(stack).toEqual([{ valid: true }])
+        expect(stack).toEqual([
+            {
+                type: "validated",
+                result: { valid: true, value: { type: "email", email: "user@example.com" } },
+            },
+        ])
     })
 })
 
@@ -32,7 +37,12 @@ test("validate; invalid : empty", async () => {
         store.email.set("")
         return action.validate.currentState()
     }).then((stack) => {
-        expect(stack).toEqual([{ valid: false, err: { type: "email", err: [{ type: "empty" }] } }])
+        expect(stack).toEqual([
+            {
+                type: "validated",
+                result: { valid: false, err: { type: "email", err: [{ type: "empty" }] } },
+            },
+        ])
     })
 })
 
@@ -47,7 +57,10 @@ test("validate; invalid : invalid", async () => {
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
-            { valid: false, err: { type: "email", err: [{ type: "invalid-email" }] } },
+            {
+                type: "validated",
+                result: { valid: false, err: { type: "email", err: [{ type: "invalid-email" }] } },
+            },
         ])
     })
 })
@@ -63,7 +76,13 @@ test("validate; invalid : too-long", async () => {
         return action.validate.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
-            { valid: false, err: { type: "email", err: [{ type: "too-long", maxLength: 255 }] } },
+            {
+                type: "validated",
+                result: {
+                    valid: false,
+                    err: { type: "email", err: [{ type: "too-long", maxLength: 255 }] },
+                },
+            },
         ])
     })
 })
@@ -78,7 +97,15 @@ test("validate; valid : just max-length", async () => {
         store.email.set("@".repeat(255))
         return action.validate.currentState()
     }).then((stack) => {
-        expect(stack).toEqual([{ valid: true }])
+        expect(stack).toEqual([
+            {
+                type: "validated",
+                result: {
+                    valid: true,
+                    value: { type: "email", email: "@".repeat(255) },
+                },
+            },
+        ])
     })
 })
 
@@ -124,7 +151,7 @@ test("terminate", async () => {
 })
 
 function standard() {
-    const { input: action } = initInputResetTokenDestinationAction()
+    const action = initInputResetTokenDestinationAction()
     const store = {
         destinationType: mockBoardValueStore(action.destinationType),
         email: mockBoardValueStore(action.email),

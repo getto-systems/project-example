@@ -136,13 +136,14 @@ class Action
         const fields = ["login-id", "granted-roles", "reset-token-destination", "memo"] as const
         const convert = (): ConvertBoardResult<AuthUserAccount> => {
             const result = {
-                loginId: loginId.checker.check(),
-                grantedRoles: grantedRoles.convert(),
-                resetTokenDestination: resetTokenDestination.checker.check(),
-                memo: memo.convert(),
+                loginId: loginId.validate.check(),
+                grantedRoles: grantedRoles.validate.check(),
+                resetTokenDestination: resetTokenDestination.validate.check(),
+                memo: memo.validate.check(),
             }
             if (
                 !result.loginId.valid ||
+                !result.grantedRoles.valid ||
                 !result.resetTokenDestination.valid ||
                 !result.memo.valid
             ) {
@@ -152,7 +153,7 @@ class Action
                 valid: true,
                 value: {
                     loginId: result.loginId.value,
-                    grantedRoles: result.grantedRoles,
+                    grantedRoles: result.grantedRoles.value,
                     resetTokenDestination: result.resetTokenDestination.value,
                     memo: result.memo.value,
                 },
@@ -164,32 +165,67 @@ class Action
 
         this.list = new ListAction()
 
-        this.loginId = loginId.input
-        this.grantedRoles = grantedRoles.input
-        this.resetTokenDestination = resetTokenDestination.input
-        this.memo = memo.input
+        this.loginId = loginId
+        this.grantedRoles = grantedRoles
+        this.resetTokenDestination = resetTokenDestination
+        this.memo = memo
         this.validate = validate
         this.observe = observe
         this.convert = convert
 
         // TODO [("login-id", this.loginId)] とかから設定したい
-        this.loginId.validate.subscriber.subscribe((result) => {
-            validateChecker.update("login-id", result.valid)
+        this.loginId.validate.subscriber.subscribe((state): true => {
+            switch (state.type) {
+                case "initial":
+                    validateChecker.update("login-id", true)
+                    return true
+
+                case "validated":
+                    validateChecker.update("login-id", state.result.valid)
+                    return true
+            }
         })
         this.loginId.observe.subscriber.subscribe((result) => {
             observeChecker.update("login-id", result.hasChanged)
         })
+        this.grantedRoles.validate.subscriber.subscribe((state): true => {
+            switch (state.type) {
+                case "initial":
+                    validateChecker.update("granted-roles", true)
+                    return true
+
+                case "validated":
+                    validateChecker.update("granted-roles", state.result.valid)
+                    return true
+            }
+        })
         this.grantedRoles.observe.subscriber.subscribe((result) => {
             observeChecker.update("granted-roles", result.hasChanged)
         })
-        this.resetTokenDestination.validate.subscriber.subscribe((result) => {
-            validateChecker.update("reset-token-destination", result.valid)
+        this.resetTokenDestination.validate.subscriber.subscribe((state): true => {
+            switch (state.type) {
+                case "initial":
+                    validateChecker.update("reset-token-destination", true)
+                    return true
+
+                case "validated":
+                    validateChecker.update("reset-token-destination", state.result.valid)
+                    return true
+            }
         })
         this.resetTokenDestination.observe.subscriber.subscribe((result) => {
             observeChecker.update("reset-token-destination", result.hasChanged)
         })
-        this.memo.validate.subscriber.subscribe((result) => {
-            validateChecker.update("memo", result.valid)
+        this.memo.validate.subscriber.subscribe((state): true => {
+            switch (state.type) {
+                case "initial":
+                    validateChecker.update("memo", true)
+                    return true
+
+                case "validated":
+                    validateChecker.update("memo", state.result.valid)
+                    return true
+            }
         })
         this.memo.observe.subscriber.subscribe((result) => {
             observeChecker.update("memo", result.hasChanged)

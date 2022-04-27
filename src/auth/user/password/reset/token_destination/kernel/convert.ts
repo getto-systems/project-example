@@ -3,7 +3,7 @@ import {
     ResetTokenDestination,
     ResetTokenDestinationEmail,
 } from "./data"
-import { ConvertBoardFieldResult } from "../../../../../../z_vendor/getto-application/board/validate_field/data"
+import { ValidateBoardFieldResult } from "../../../../../../z_vendor/getto-application/board/validate_field/data"
 import { converter } from "../../../../../../z_lib/ui/validate/helper"
 import {
     check_text_empty,
@@ -40,7 +40,7 @@ function validateEmail(value: string): ConvertResetTokenDestinationResult {
 }
 
 const emailConverter: {
-    (value: string): ConvertBoardFieldResult<
+    (value: string): ValidateBoardFieldResult<
         ResetTokenDestinationEmail,
         readonly ValidateTextError[]
     >

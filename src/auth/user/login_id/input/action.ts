@@ -14,7 +14,6 @@ import {
     ValidateBoardFieldAction,
 } from "../../../../z_vendor/getto-application/board/validate_field/action"
 
-import { BoardFieldChecker } from "../../../../z_vendor/getto-application/board/validate_field/infra"
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
 import { SingleValueFilter } from "../../../../z_lib/ui/search/kernel/data"
@@ -23,45 +22,38 @@ import { ValidateTextError } from "../../../../z_lib/ui/validate/data"
 
 export interface InputLoginIdAction extends ApplicationAction {
     readonly input: InputBoardAction<BoardValueStore>
-    readonly validate: ValidateBoardFieldAction<readonly ValidateTextError[]>
+    readonly validate: ValidateBoardFieldAction<LoginId, readonly ValidateTextError[]>
     readonly observe: ObserveBoardFieldAction
     clear(): void
 }
 
-export function initInputLoginIdAction(): Readonly<{
-    input: InputLoginIdAction
-    checker: BoardFieldChecker<LoginId, readonly ValidateTextError[]>
-}> {
+export function initInputLoginIdAction(): InputLoginIdAction {
     const { input, store, subscriber } = initInputBoardAction()
 
-    const { validate, checker } = initValidateBoardFieldAction({
-        converter: () => loginIdBoardConverter(store.get()),
+    const validate = initValidateBoardFieldAction({
+        convert: () => loginIdBoardConverter(store.get()),
     })
-
     const observe = initObserveBoardFieldAction({
         observer: initBoardFieldObserver({ current: () => store.get() }),
     })
 
     subscriber.subscribe(() => {
-        checker.check()
+        validate.check()
         observe.check()
     })
 
     return {
-        input: {
-            input,
-            validate,
-            observe,
-            clear: () => {
-                store.set("")
-                validate.clear()
-            },
-            terminate: () => {
-                subscriber.terminate()
-                validate.terminate()
-            },
+        input,
+        validate,
+        observe,
+        clear: () => {
+            store.set("")
+            validate.clear()
         },
-        checker,
+        terminate: () => {
+            subscriber.terminate()
+            validate.terminate()
+        },
     }
 }
 

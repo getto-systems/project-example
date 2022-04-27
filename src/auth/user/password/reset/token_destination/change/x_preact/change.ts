@@ -11,7 +11,7 @@ import { box } from "../../../../../../../z_vendor/getto-css/preact/design/box"
 
 import { VNodeContent } from "../../../../../../../z_lib/ui/x_preact/common"
 
-import { ResetTokenDestinationField } from "../../input/x_preact/destination"
+import { ResetTokenDestinationField } from "../../input/x_preact/input"
 import { EditButton } from "../../../../../../../core/x_preact/button/edit_button"
 
 import { remoteCommonErrorReason } from "../../../../../../../z_lib/ui/remote/x_error/reason"

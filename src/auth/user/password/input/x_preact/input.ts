@@ -29,9 +29,10 @@ export function PasswordField(props: Props): VNode {
         title: props.title || AUTH_USER_ACCOUNT["password"],
         help: [...(props.help || []), characterHelp()],
         label: label_password_fill,
-        state: validateState.valid
-            ? { type: "normal" }
-            : { type: "error", notice: textValidationError(validateState.err) },
+        state:
+            validateState.type === "initial" || validateState.result.valid
+                ? { type: "normal" }
+                : { type: "error", notice: textValidationError(validateState.result.err) },
         body: h(InputBoard, {
             type: "password",
             input: props.field.input,
