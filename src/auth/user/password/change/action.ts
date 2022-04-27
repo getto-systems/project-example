@@ -16,7 +16,6 @@ import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 
 import { ChangePasswordRemote, OverridePasswordRemote } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
-import { BoardConverter } from "../../../../z_vendor/getto-application/board/kernel/infra"
 
 import { ChangePasswordError, ChangePasswordFields, OverridePasswordFields } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
@@ -78,7 +77,7 @@ class Action
     readonly observe: ObserveBoardAction
 
     material: ChangePasswordMaterial
-    convert: BoardConverter<ChangePasswordFields>
+    convert: { (): ConvertBoardResult<ChangePasswordFields> }
 
     constructor(material: ChangePasswordMaterial) {
         super({
@@ -207,7 +206,7 @@ class OverrideAction
     readonly observe: ObserveBoardAction
 
     material: OverridePasswordMaterial
-    convert: BoardConverter<OverridePasswordFields>
+    convert: { (): ConvertBoardResult<OverridePasswordFields> }
 
     constructor(material: OverridePasswordMaterial) {
         super({

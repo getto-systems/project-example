@@ -27,7 +27,6 @@ import {
 import { GetScriptPathConfig, GetScriptPathShell } from "../../../../sign/get_script_path/infra"
 import { DelayTime } from "../../../../../z_lib/ui/config/infra"
 import { ResetPasswordRemote, ResetTokenDetecter } from "./infra"
-import { BoardConverter } from "../../../../../z_vendor/getto-application/board/kernel/infra"
 
 import { LoadScriptError, ConvertScriptPathResult } from "../../../../sign/get_script_path/data"
 import { ResetPasswordError, ResetPasswordFields } from "./data"
@@ -93,7 +92,7 @@ class Action
     readonly observe: ObserveBoardAction
 
     material: ResetPasswordMaterial
-    convert: BoardConverter<ResetPasswordFields>
+    convert: { (): ConvertBoardResult<ResetPasswordFields> }
 
     constructor(material: ResetPasswordMaterial) {
         super({
