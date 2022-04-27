@@ -30,7 +30,7 @@ export function SearchGrantedRolesField(props: Props): VNode {
         title: props.title || AUTH_USER_ACCOUNT["granted-roles"],
         help: props.help,
         body: h(CheckboxBoard, {
-            input: props.field.grantedRoles,
+            input: props.field.input,
             options: ALL_AUTH_ROLES.map(roleCheckbox),
         }),
     })

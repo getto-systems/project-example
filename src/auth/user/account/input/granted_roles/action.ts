@@ -9,74 +9,62 @@ import {
 } from "../../../../../z_vendor/getto-application/board/observe_field/action"
 
 import { initBoardFieldObserver } from "../../../../../z_vendor/getto-application/board/observe_field/init/observer"
-import { toGrantedRoles } from "./convert"
 import { isSameMultipleBoardValue } from "../../../../../z_vendor/getto-application/board/observe_field/helper"
+import { toGrantedRoles } from "./convert"
 
 import { MultipleBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/infra"
 
 import { AuthRole } from "../../../kernel/data"
+import {
+    initValidateBoardFieldAction,
+    ValidateBoardFieldAction,
+} from "../../../../../z_vendor/getto-application/board/validate_field/action"
+import { ValidateBoardFieldResult } from "../../../../../z_vendor/getto-application/board/validate_field/data"
 
 export interface InputGrantedAuthRolesAction extends ApplicationAction {
     readonly input: InputBoardAction<MultipleBoardValueStore>
+    readonly validate: ValidateBoardFieldAction<readonly AuthRole[], false>
     readonly observe: ObserveBoardFieldAction
 
     reset(grantedRoles: readonly AuthRole[]): void
 }
 
-export function initInputGrantedAuthRolesAction(): Readonly<{
-    input: InputGrantedAuthRolesAction
-    convert: { (): readonly AuthRole[] }
-}> {
-    const input = new InputAction()
+export function initInputGrantedAuthRolesAction(): InputGrantedAuthRolesAction {
+    const { input, store, subscriber } = initMultipleInputBoardAction()
+    const validate = initValidateBoardFieldAction({
+        convert: (): ValidateBoardFieldResult<readonly AuthRole[], false> => ({
+            valid: true,
+            value: toGrantedRoles(store.get()),
+        }),
+    })
+    const observe = initObserveBoardFieldAction({
+        observer: initBoardFieldObserver({
+            current: () => store.get(),
+            isSame: isSameMultipleBoardValue,
+        }),
+    })
+
+    subscriber.subscribe(() => {
+        observe.check()
+    })
+
     return {
         input,
-        convert: () => toGrantedRoles(input.store.grantedRoles.get()),
-    }
-}
+        validate,
+        observe,
 
-class InputAction implements InputGrantedAuthRolesAction {
-    readonly input: InputBoardAction<MultipleBoardValueStore>
-    readonly observe: ObserveBoardFieldAction
-
-    readonly store: Readonly<{
-        grantedRoles: MultipleBoardValueStore
-    }>
-
-    terminate: { (): void }
-
-    constructor() {
-        const grantedRoles = initMultipleInputBoardAction()
-        const observe = initObserveBoardFieldAction({
-            observer: initBoardFieldObserver({
-                current: () => grantedRoles.store.get(),
-                isSame: isSameMultipleBoardValue,
-            }),
-        })
-
-        this.input = grantedRoles.input
-        this.observe = observe
-
-        this.store = {
-            grantedRoles: grantedRoles.store,
-        }
-
-        grantedRoles.subscriber.subscribe(() => {
-            observe.check()
-        })
-
-        this.terminate = () => {
-            grantedRoles.subscriber.terminate()
+        reset: (grantedRoles) => {
+            store.set(grantedRoles)
+        },
+        terminate: () => {
+            subscriber.terminate()
             observe.terminate()
-        }
-    }
-
-    reset(grantedRoles: readonly AuthRole[]): void {
-        this.store.grantedRoles.set(grantedRoles)
+        },
     }
 }
 
 export interface SearchGrantedRolesAction extends ApplicationAction {
-    readonly grantedRoles: InputBoardAction<MultipleBoardValueStore>
+    readonly input: InputBoardAction<MultipleBoardValueStore>
     readonly observe: ObserveBoardFieldAction
 
     clear(): void
@@ -86,55 +74,38 @@ export function initSearchGrantedRolesAction(initial: readonly AuthRole[]): Read
     input: SearchGrantedRolesAction
     pin: { (): readonly AuthRole[] }
 }> {
-    const input = new SearchAction()
-    input.store.grantedRoles.set(initial)
+    const { input, store, subscriber } = initMultipleInputBoardAction()
+    const observe = initObserveBoardFieldAction({
+        observer: initBoardFieldObserver({
+            current: () => store.get(),
+            isSame: isSameMultipleBoardValue,
+        }),
+    })
+
+    store.set(initial)
+
+    subscriber.subscribe(() => {
+        observe.check()
+    })
+
     return {
-        input,
-        pin: () => {
-            input.observe.pin()
-            return toGrantedRoles(input.store.grantedRoles.get())
+        input: {
+            input,
+            observe,
+
+            clear: () => {
+                store.set([])
+                observe.check()
+            },
+
+            terminate: () => {
+                subscriber.terminate()
+                observe.terminate()
+            },
         },
-    }
-}
-
-class SearchAction implements SearchGrantedRolesAction {
-    readonly grantedRoles: InputBoardAction<MultipleBoardValueStore>
-    readonly observe: ObserveBoardFieldAction
-
-    readonly store: Readonly<{
-        grantedRoles: MultipleBoardValueStore
-    }>
-
-    terminate: { (): void }
-
-    constructor() {
-        const grantedRoles = initMultipleInputBoardAction()
-        const observe = initObserveBoardFieldAction({
-            observer: initBoardFieldObserver({
-                current: () => grantedRoles.store.get(),
-                isSame: isSameMultipleBoardValue,
-            }),
-        })
-
-        this.grantedRoles = grantedRoles.input
-        this.observe = observe
-
-        this.store = {
-            grantedRoles: grantedRoles.store,
-        }
-
-        grantedRoles.subscriber.subscribe(() => {
-            observe.check()
-        })
-
-        this.terminate = () => {
-            grantedRoles.subscriber.terminate()
-            observe.terminate()
-        }
-    }
-
-    clear(): void {
-        this.store.grantedRoles.set([])
-        this.observe.check()
+        pin: () => {
+            observe.pin()
+            return toGrantedRoles(store.get())
+        },
     }
 }

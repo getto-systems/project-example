@@ -90,7 +90,7 @@ class Action
 
         const fields = ["destination"] as const
         const convert = (): ConvertBoardResult<ResetTokenDestination> => {
-            const result = destination.checker.check()
+            const result = destination.validate.check()
             if (!result.valid) {
                 return { valid: false }
             }
@@ -103,15 +103,22 @@ class Action
         const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
-        this.destination = destination.input
+        this.destination = destination
         this.validate = validate
         this.observe = observe
         this.convert = convert
 
-        this.destination.validate.subscriber.subscribe((result) =>
-            validateChecker.update("destination", result.valid),
-        )
+        this.destination.validate.subscriber.subscribe((state): true => {
+            switch (state.type) {
+                case "initial":
+                    validateChecker.update("destination", true)
+                    return true
 
+                case "validated":
+                    validateChecker.update("destination", state.result.valid)
+                    return true
+            }
+        })
         this.destination.observe.subscriber.subscribe((result) => {
             observeChecker.update("destination", result.hasChanged)
         })

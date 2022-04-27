@@ -89,23 +89,22 @@ class Action
         })
         this.material = material
 
-
         const memo = initInputAuthUserMemoAction()
         const grantedRoles = initInputGrantedAuthRolesAction()
 
-        const fields = ["memo", "grantedRoles"] as const
+        const fields = ["memo", "granted-roles"] as const
         const convert = (): ConvertBoardResult<ModifyAuthUserAccountFields> => {
             const result = {
-                grantedRoles: grantedRoles.convert(),
-                memo: memo.convert(),
+                grantedRoles: grantedRoles.validate.check(),
+                memo: memo.validate.check(),
             }
-            if (!result.memo.valid) {
+            if (!result.grantedRoles.valid || !result.memo.valid) {
                 return { valid: false }
             }
             return {
                 valid: true,
                 value: {
-                    grantedRoles: result.grantedRoles,
+                    grantedRoles: result.grantedRoles.value,
                     memo: result.memo.value,
                 },
             }
@@ -114,20 +113,39 @@ class Action
         const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
-        this.memo = memo.input
-        this.grantedRoles = grantedRoles.input
+        this.memo = memo
+        this.grantedRoles = grantedRoles
         this.validate = validate
         this.observe = observe
         this.convert = convert
 
-        this.memo.validate.subscriber.subscribe((result) => {
-            validateChecker.update("memo", result.valid)
+        this.memo.validate.subscriber.subscribe((state): true => {
+            switch (state.type) {
+                case "initial":
+                    validateChecker.update("memo", true)
+                    return true
+
+                case "validated":
+                    validateChecker.update("memo", state.result.valid)
+                    return true
+            }
         })
         this.memo.observe.subscriber.subscribe((result) => {
             observeChecker.update("memo", result.hasChanged)
         })
+        this.grantedRoles.validate.subscriber.subscribe((state): true => {
+            switch (state.type) {
+                case "initial":
+                    validateChecker.update("granted-roles", true)
+                    return true
+
+                case "validated":
+                    validateChecker.update("granted-roles", state.result.valid)
+                    return true
+            }
+        })
         this.grantedRoles.observe.subscriber.subscribe((result) => {
-            observeChecker.update("grantedRoles", result.hasChanged)
+            observeChecker.update("granted-roles", result.hasChanged)
         })
     }
 

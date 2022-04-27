@@ -18,7 +18,6 @@ import {
 import { initBoardFieldObserver } from "../../../../../../z_vendor/getto-application/board/observe_field/init/observer"
 import { resetTokenDestinationBoardConverter } from "../kernel/convert"
 
-import { BoardFieldChecker } from "../../../../../../z_vendor/getto-application/board/validate_field/infra"
 import { BoardValueStore } from "../../../../../../z_vendor/getto-application/board/input/infra"
 
 import { ValidateResetTokenDestinationError } from "./data"
@@ -28,7 +27,10 @@ export interface InputResetTokenDestinationAction
     extends StatefulApplicationAction<InputResetTokenDestinationState> {
     readonly destinationType: InputBoardAction<BoardValueStore>
     readonly email: InputBoardAction<BoardValueStore>
-    readonly validate: ValidateBoardFieldAction<ValidateResetTokenDestinationError>
+    readonly validate: ValidateBoardFieldAction<
+        ResetTokenDestination,
+        ValidateResetTokenDestinationError
+    >
     readonly observe: ObserveBoardFieldAction
 
     reset(destination: ResetTokenDestination): InputResetTokenDestinationState
@@ -38,15 +40,8 @@ export type InputResetTokenDestinationState = Readonly<{ type: ResetTokenDestina
 
 const initialState: InputResetTokenDestinationState = { type: "none" }
 
-export function initInputResetTokenDestinationAction(): Readonly<{
-    input: InputResetTokenDestinationAction
-    checker: BoardFieldChecker<ResetTokenDestination, ValidateResetTokenDestinationError>
-}> {
-    const input = new DestinationAction()
-    return {
-        input,
-        checker: input.checker,
-    }
+export function initInputResetTokenDestinationAction(): InputResetTokenDestinationAction {
+    return new DestinationAction()
 }
 
 class DestinationAction
@@ -57,10 +52,11 @@ class DestinationAction
 
     readonly destinationType: InputBoardAction<BoardValueStore>
     readonly email: InputBoardAction<BoardValueStore>
-    readonly validate: ValidateBoardFieldAction<ValidateResetTokenDestinationError>
+    readonly validate: ValidateBoardFieldAction<
+        ResetTokenDestination,
+        ValidateResetTokenDestinationError
+    >
     readonly observe: ObserveBoardFieldAction
-
-    readonly checker: BoardFieldChecker<ResetTokenDestination, ValidateResetTokenDestinationError>
 
     readonly store: Readonly<{
         destinationType: BoardValueStore
@@ -100,8 +96,8 @@ class DestinationAction
             }),
         })
 
-        const { validate, checker } = initValidateBoardFieldAction({
-            converter: () =>
+        const validate = initValidateBoardFieldAction({
+            convert: () =>
                 resetTokenDestinationBoardConverter({
                     type: destinationType.store.get(),
                     email: email.store.get(),
@@ -116,13 +112,13 @@ class DestinationAction
                     return
 
                 default:
-                    checker.check()
+                    validate.check()
                     this.post({ type: "none" })
                     return
             }
         })
         email.subscriber.subscribe(() => {
-            checker.check()
+            validate.check()
             observe.check()
         })
 
@@ -131,7 +127,6 @@ class DestinationAction
         this.validate = validate
         this.observe = observe
 
-        this.checker = checker
         this.store = {
             destinationType: destinationType.store,
             input: email.store,

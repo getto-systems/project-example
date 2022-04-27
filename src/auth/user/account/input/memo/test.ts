@@ -15,7 +15,7 @@ test("validate; valid input", async () => {
         store.memo.set("valid")
         return action.validate.currentState()
     }).then((stack) => {
-        expect(stack).toEqual([{ valid: true }])
+        expect(stack).toEqual([{ type: "validated", result: { valid: true, value: "valid" } }])
     })
 })
 
@@ -28,7 +28,12 @@ test("validate; invalid : too-long", async () => {
         store.memo.set("a".repeat(255 + 1))
         return action.validate.currentState()
     }).then((stack) => {
-        expect(stack).toEqual([{ valid: false, err: [{ type: "too-long", maxLength: 255 }] }])
+        expect(stack).toEqual([
+            {
+                type: "validated",
+                result: { valid: false, err: [{ type: "too-long", maxLength: 255 }] },
+            },
+        ])
     })
 })
 
@@ -41,7 +46,9 @@ test("validate; valid : just max-length", async () => {
         store.memo.set("a".repeat(255))
         return action.validate.currentState()
     }).then((stack) => {
-        expect(stack).toEqual([{ valid: true }])
+        expect(stack).toEqual([
+            { type: "validated", result: { valid: true, value: "a".repeat(255) } },
+        ])
     })
 })
 
@@ -87,7 +94,7 @@ test("terminate", async () => {
 })
 
 function standard() {
-    const { input: action } = initInputAuthUserMemoAction()
+    const action = initInputAuthUserMemoAction()
     const store = {
         memo: mockBoardValueStore(action.input),
     }

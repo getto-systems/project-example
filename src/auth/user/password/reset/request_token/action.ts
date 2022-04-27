@@ -78,9 +78,9 @@ class Action
 
         const loginId = initInputLoginIdAction()
 
-        const fields = ["loginId"] as const
+        const fields = ["login-id"] as const
         const convert = (): ConvertBoardResult<RequestResetTokenFields> => {
-            const loginIdResult = loginId.checker.check()
+            const loginIdResult = loginId.validate.check()
             if (!loginIdResult.valid) {
                 return { valid: false }
             }
@@ -95,16 +95,24 @@ class Action
         const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
-        this.loginId = loginId.input
+        this.loginId = loginId
         this.validate = validate
         this.observe = observe
         this.convert = convert
 
-        this.loginId.validate.subscriber.subscribe((result) =>
-            validateChecker.update("loginId", result.valid),
-        )
+        this.loginId.validate.subscriber.subscribe((state): true => {
+            switch (state.type) {
+                case "initial":
+                    validateChecker.update("login-id", true)
+                    return true
+
+                case "validated":
+                    validateChecker.update("login-id", state.result.valid)
+                    return true
+            }
+        })
         this.loginId.observe.subscriber.subscribe((result) =>
-            observeChecker.update("loginId", result.hasChanged),
+            observeChecker.update("login-id", result.hasChanged),
         )
     }
 
