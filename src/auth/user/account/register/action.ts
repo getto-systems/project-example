@@ -129,41 +129,38 @@ class Action
         })
         this.material = material
 
-        const fields = ["login-id", "granted-roles", "reset-token-destination", "memo"] as const
-
         const loginId = initInputLoginIdAction()
         const grantedRoles = initInputGrantedAuthRolesAction()
         const resetTokenDestination = initInputResetTokenDestinationAction()
         const memo = initInputAuthUserMemoAction()
-        const { validate, validateChecker } = initValidateBoardAction(
-            { fields },
-            {
-                converter: (): ConvertBoardResult<AuthUserAccount> => {
-                    const result = {
-                        loginId: loginId.checker.check(),
-                        grantedRoles: grantedRoles.convert(),
-                        resetTokenDestination: resetTokenDestination.checker.check(),
-                        memo: memo.convert(),
-                    }
-                    if (
-                        !result.loginId.valid ||
-                        !result.resetTokenDestination.valid ||
-                        !result.memo.valid
-                    ) {
-                        return { valid: false }
-                    }
-                    return {
-                        valid: true,
-                        value: {
-                            loginId: result.loginId.value,
-                            grantedRoles: result.grantedRoles,
-                            resetTokenDestination: result.resetTokenDestination.value,
-                            memo: result.memo.value,
-                        },
-                    }
+
+        const fields = ["login-id", "granted-roles", "reset-token-destination", "memo"] as const
+        const convert = (): ConvertBoardResult<AuthUserAccount> => {
+            const result = {
+                loginId: loginId.checker.check(),
+                grantedRoles: grantedRoles.convert(),
+                resetTokenDestination: resetTokenDestination.checker.check(),
+                memo: memo.convert(),
+            }
+            if (
+                !result.loginId.valid ||
+                !result.resetTokenDestination.valid ||
+                !result.memo.valid
+            ) {
+                return { valid: false }
+            }
+            return {
+                valid: true,
+                value: {
+                    loginId: result.loginId.value,
+                    grantedRoles: result.grantedRoles,
+                    resetTokenDestination: result.resetTokenDestination.value,
+                    memo: result.memo.value,
                 },
-            },
-        )
+            }
+        }
+
+        const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         this.list = new ListAction()
@@ -174,7 +171,7 @@ class Action
         this.memo = memo.input
         this.validate = validate
         this.observe = observe
-        this.convert = () => validateChecker.get()
+        this.convert = convert
 
         // TODO [("login-id", this.loginId)] とかから設定したい
         this.loginId.validate.subscriber.subscribe((result) => {

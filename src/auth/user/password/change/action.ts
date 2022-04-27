@@ -91,38 +91,35 @@ class Action
         })
         this.material = material
 
-        const fields = ["currentPassword", "newPassword"] as const
-
         const currentPassword = initInputPasswordAction()
         const newPassword = initInputPasswordAction()
-        const { validate, validateChecker } = initValidateBoardAction(
-            { fields },
-            {
-                converter: (): ConvertBoardResult<ChangePasswordFields> => {
-                    const result = {
-                        currentPassword: currentPassword.checker.check(),
-                        newPassword: newPassword.checker.check(),
-                    }
-                    if (!result.currentPassword.valid || !result.newPassword.valid) {
-                        return { valid: false }
-                    }
-                    return {
-                        valid: true,
-                        value: {
-                            currentPassword: result.currentPassword.value,
-                            newPassword: result.newPassword.value,
-                        },
-                    }
+
+        const fields = ["currentPassword", "newPassword"] as const
+        const convert = (): ConvertBoardResult<ChangePasswordFields> => {
+            const result = {
+                currentPassword: currentPassword.checker.check(),
+                newPassword: newPassword.checker.check(),
+            }
+            if (!result.currentPassword.valid || !result.newPassword.valid) {
+                return { valid: false }
+            }
+            return {
+                valid: true,
+                value: {
+                    currentPassword: result.currentPassword.value,
+                    newPassword: result.newPassword.value,
                 },
-            },
-        )
+            }
+        }
+
+        const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         this.currentPassword = currentPassword.input
         this.newPassword = newPassword.input
         this.validate = validate
         this.observe = observe
-        this.convert = () => validateChecker.get()
+        this.convert = convert
 
         this.currentPassword.validate.subscriber.subscribe((result) =>
             validateChecker.update("currentPassword", result.valid),
@@ -228,7 +225,7 @@ class OverrideAction
         const { validate, validateChecker } = initValidateBoardAction(
             { fields },
             {
-                converter: (): ConvertBoardResult<OverridePasswordFields> => {
+                convert: (): ConvertBoardResult<OverridePasswordFields> => {
                     const result = {
                         newPassword: newPassword.checker.check(),
                     }

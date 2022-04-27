@@ -89,11 +89,11 @@ class Action
         })
         this.material = material
 
-        const fields = ["memo", "grantedRoles"] as const
 
         const memo = initInputAuthUserMemoAction()
         const grantedRoles = initInputGrantedAuthRolesAction()
 
+        const fields = ["memo", "grantedRoles"] as const
         const convert = (): ConvertBoardResult<ModifyAuthUserAccountFields> => {
             const result = {
                 grantedRoles: grantedRoles.convert(),
@@ -111,13 +111,7 @@ class Action
             }
         }
 
-        const { validate, validateChecker } = initValidateBoardAction(
-            { fields },
-            {
-                // TODO converter => convert がいいかな
-                converter: convert,
-            },
-        )
+        const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         this.memo = memo.input

@@ -56,7 +56,7 @@ function standard() {
             fields: ["name", "description"],
         },
         {
-            converter: () => ({ valid: true, value: { name: "valid-name", value: "valid-value" } }),
+            convert: () => ({ valid: true, value: { name: "valid-name", value: "valid-value" } }),
         },
     )
 
