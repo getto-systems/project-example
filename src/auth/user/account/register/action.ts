@@ -174,58 +174,26 @@ class Action
         this.convert = convert
 
         // TODO [("login-id", this.loginId)] とかから設定したい
-        this.loginId.validate.subscriber.subscribe((state): true => {
-            switch (state.type) {
-                case "initial":
-                    validateChecker.update("login-id", true)
-                    return true
-
-                case "validated":
-                    validateChecker.update("login-id", state.result.valid)
-                    return true
-            }
+        this.loginId.validate.subscriber.subscribe((state) => {
+            validateChecker.update("login-id", state)
         })
         this.loginId.observe.subscriber.subscribe((result) => {
             observeChecker.update("login-id", result.hasChanged)
         })
-        this.grantedRoles.validate.subscriber.subscribe((state): true => {
-            switch (state.type) {
-                case "initial":
-                    validateChecker.update("granted-roles", true)
-                    return true
-
-                case "validated":
-                    validateChecker.update("granted-roles", state.result.valid)
-                    return true
-            }
+        this.grantedRoles.validate.subscriber.subscribe((state) => {
+            validateChecker.update("granted-roles", state)
         })
         this.grantedRoles.observe.subscriber.subscribe((result) => {
             observeChecker.update("granted-roles", result.hasChanged)
         })
-        this.resetTokenDestination.validate.subscriber.subscribe((state): true => {
-            switch (state.type) {
-                case "initial":
-                    validateChecker.update("reset-token-destination", true)
-                    return true
-
-                case "validated":
-                    validateChecker.update("reset-token-destination", state.result.valid)
-                    return true
-            }
+        this.resetTokenDestination.validate.subscriber.subscribe((state) => {
+            validateChecker.update("reset-token-destination", state)
         })
         this.resetTokenDestination.observe.subscriber.subscribe((result) => {
             observeChecker.update("reset-token-destination", result.hasChanged)
         })
-        this.memo.validate.subscriber.subscribe((state): true => {
-            switch (state.type) {
-                case "initial":
-                    validateChecker.update("memo", true)
-                    return true
-
-                case "validated":
-                    validateChecker.update("memo", state.result.valid)
-                    return true
-            }
+        this.memo.validate.subscriber.subscribe((state) => {
+            validateChecker.update("memo", state)
         })
         this.memo.observe.subscriber.subscribe((result) => {
             observeChecker.update("memo", result.hasChanged)

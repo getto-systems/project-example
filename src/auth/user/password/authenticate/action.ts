@@ -135,30 +135,14 @@ class Action
         this.observe = observe
         this.convert = convert
 
-        this.loginId.validate.subscriber.subscribe((state): true => {
-            switch (state.type) {
-                case "initial":
-                    validateChecker.update("login-id", true)
-                    return true
-
-                case "validated":
-                    validateChecker.update("login-id", state.result.valid)
-                    return true
-            }
+        this.loginId.validate.subscriber.subscribe((state) => {
+            validateChecker.update("login-id", state)
         })
         this.loginId.observe.subscriber.subscribe((result) =>
             observeChecker.update("login-id", result.hasChanged),
         )
-        this.password.validate.subscriber.subscribe((state): true => {
-            switch (state.type) {
-                case "initial":
-                    validateChecker.update("password", true)
-                    return true
-
-                case "validated":
-                    validateChecker.update("password", state.result.valid)
-                    return true
-            }
+        this.password.validate.subscriber.subscribe((state) => {
+            validateChecker.update("password", state)
         })
         this.password.observe.subscriber.subscribe((result) =>
             observeChecker.update("password", result.hasChanged),

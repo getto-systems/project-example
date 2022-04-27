@@ -104,16 +104,8 @@ class OverrideAction
         this.observe = observe
         this.convert = convert
 
-        this.newLoginId.validate.subscriber.subscribe((state): true => {
-            switch (state.type) {
-                case "initial":
-                    validateChecker.update("new-login-id", true)
-                    return true
-
-                case "validated":
-                    validateChecker.update("new-login-id", state.result.valid)
-                    return true
-            }
+        this.newLoginId.validate.subscriber.subscribe((state) => {
+            validateChecker.update("new-login-id", state)
         })
         this.newLoginId.observe.subscriber.subscribe((result) => {
             observeChecker.update("new-login-id", result.hasChanged)
