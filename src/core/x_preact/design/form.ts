@@ -3,7 +3,9 @@ import { VNode } from "preact"
 
 import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
 
-import { fieldHelp } from "../../../z_vendor/getto-css/preact/design/form"
+import { fieldHelp, fieldHelp_error } from "../../../z_vendor/getto-css/preact/design/form"
+
+import { ValidateBoardState } from "../../../z_vendor/getto-application/board/validate_board/action"
 
 export function takeLongtimeField(label: VNodeContent): VNode {
     return fieldHelp({
@@ -13,4 +15,15 @@ export function takeLongtimeField(label: VNodeContent): VNode {
                 お手数ですが管理者に連絡お願いします`,
         ],
     })
+}
+
+export function validationMessage(validateState: ValidateBoardState): readonly VNode[] {
+    switch (validateState) {
+        case "initial":
+        case "valid":
+            return []
+
+        case "invalid":
+            return [fieldHelp_error(["正しく入力されていません"])]
+    }
 }

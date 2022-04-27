@@ -20,7 +20,7 @@ import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../../../x_content/site"
 import { appendScript } from "../../../../../sign/x_preact/script"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
-import { takeLongtimeField } from "../../../../../../core/x_preact/design/form"
+import { takeLongtimeField, validationMessage } from "../../../../../../core/x_preact/design/form"
 
 import { ApplicationError } from "../../../../../../avail/x_preact/application_error"
 import { LoginIdField } from "../../../../login_id/input/x_preact/input"
@@ -118,7 +118,7 @@ export function ResetPassword(viewProps: Props): VNode {
                         right: clearButton(),
                     }),
                 ],
-                footer: [footerLinks(), ...validationMessage(), ...message()],
+                footer: [footerLinks(), ...validationMessage(validateState), ...message()],
             }),
         )
 
@@ -137,16 +137,6 @@ export function ResetPassword(viewProps: Props): VNode {
             }
         }
 
-        function validationMessage(): readonly VNode[] {
-            switch (validateState) {
-                case "initial":
-                case "valid":
-                    return []
-
-                case "invalid":
-                    return [fieldHelp_error(["正しく入力されていません"])]
-            }
-        }
         function message(): readonly VNode[] {
             switch (state.type) {
                 case "initial-reset":

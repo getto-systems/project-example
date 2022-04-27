@@ -4,7 +4,7 @@ import { useApplicationAction } from "../../../../../z_vendor/getto-application/
 
 import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box, container } from "../../../../../z_vendor/getto-css/preact/design/box"
-import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
+import { takeLongtimeField, validationMessage } from "../../../../../core/x_preact/design/form"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
@@ -44,7 +44,7 @@ export function RegisterAuthUserAccount(props: Props): VNode {
                     left: submitButton(),
                     right: clearButton(),
                 }),
-                ...validationMessage(),
+                ...validationMessage(validateState),
                 ...message(),
             ],
         }),
@@ -74,16 +74,6 @@ export function RegisterAuthUserAccount(props: Props): VNode {
         }
     }
 
-    function validationMessage(): readonly VNode[] {
-        switch (validateState) {
-            case "initial":
-            case "valid":
-                return []
-
-            case "invalid":
-                return [fieldHelp_error(["正しく入力されていません"])]
-        }
-    }
     function message(): readonly VNode[] {
         switch (state.type) {
             case "initial":
