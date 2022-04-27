@@ -80,7 +80,7 @@ class OverrideAction
 
         const newLoginId = initInputLoginIdAction()
 
-        const fields = ["new-login-id"] as const
+        const fields = ["newLoginId"] as const
         const convert = (): ConvertBoardResult<OverrideLoginIdFields> => {
             const result = {
                 newLoginId: newLoginId.validate.check(),
@@ -104,11 +104,13 @@ class OverrideAction
         this.observe = observe
         this.convert = convert
 
-        this.newLoginId.validate.subscriber.subscribe((state) => {
-            validateChecker.update("new-login-id", state)
-        })
-        this.newLoginId.observe.subscriber.subscribe((result) => {
-            observeChecker.update("new-login-id", result.hasChanged)
+        fields.forEach((field) => {
+            this[field].validate.subscriber.subscribe((state) => {
+                validateChecker.update(field, state)
+            })
+            this[field].observe.subscriber.subscribe((result) => {
+                observeChecker.update(field, result.hasChanged)
+            })
         })
     }
 

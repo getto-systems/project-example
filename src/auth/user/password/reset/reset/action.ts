@@ -108,7 +108,7 @@ class Action
         const loginId = initInputLoginIdAction()
         const password = initInputPasswordAction()
 
-        const fields = ["login-id", "password"] as const
+        const fields = ["loginId", "password"] as const
         const convert = (): ConvertBoardResult<ResetPasswordFields> => {
             const result = {
                 loginId: loginId.validate.check(),
@@ -135,18 +135,14 @@ class Action
         this.observe = observe
         this.convert = convert
 
-        this.loginId.validate.subscriber.subscribe((state) => {
-            validateChecker.update("login-id", state)
+        fields.forEach((field) => {
+            this[field].validate.subscriber.subscribe((state) => {
+                validateChecker.update(field, state)
+            })
+            this[field].observe.subscriber.subscribe((result) => {
+                observeChecker.update(field, result.hasChanged)
+            })
         })
-        this.loginId.observe.subscriber.subscribe((result) =>
-            observeChecker.update("login-id", result.hasChanged),
-        )
-        this.password.validate.subscriber.subscribe((state) => {
-            validateChecker.update("password", state)
-        })
-        this.password.observe.subscriber.subscribe((result) =>
-            observeChecker.update("password", result.hasChanged),
-        )
     }
 
     clear(): void {

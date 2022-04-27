@@ -156,7 +156,7 @@ class Action
 
         const initialFilter = material.shell.detectFilter()
 
-        const fields = ["login-id", "granted-roles"] as const
+        const fields = ["loginId", "grantedRoles"] as const
 
         const loginId = initSearchLoginIdAction(initialFilter.loginId)
         const grantedRoles = initSearchGrantedRolesAction(initialFilter.grantedRoles)
@@ -213,12 +213,11 @@ class Action
 
         this.filter = initialFilter
 
-        this.loginId.observe.subscriber.subscribe((result) =>
-            observeChecker.update("login-id", result.hasChanged),
-        )
-        this.grantedRoles.observe.subscriber.subscribe((result) =>
-            observeChecker.update("granted-roles", result.hasChanged),
-        )
+        fields.forEach((field) => {
+            this[field].observe.subscriber.subscribe((result) => {
+                observeChecker.update(field, result.hasChanged)
+            })
+        })
     }
 
     setFilter(filter: Partial<SearchAuthUserAccountFilter>): SearchAuthUserAccountFilter {

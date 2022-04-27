@@ -51,6 +51,7 @@ export function initInputPasswordAction(): InputPasswordAction {
         clear: () => {
             store.set("")
             validate.clear()
+            observe.check()
         },
         checkCharacter: () => checkPasswordCharacter(store.get()),
         terminate: () => {

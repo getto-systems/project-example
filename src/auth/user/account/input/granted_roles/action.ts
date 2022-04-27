@@ -55,9 +55,11 @@ export function initInputGrantedAuthRolesAction(): InputGrantedAuthRolesAction {
 
         reset: (grantedRoles) => {
             store.set(grantedRoles)
+            observe.pin()
         },
         terminate: () => {
             subscriber.terminate()
+            validate.terminate()
             observe.terminate()
         },
     }

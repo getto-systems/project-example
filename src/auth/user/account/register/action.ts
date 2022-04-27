@@ -133,7 +133,7 @@ class Action
         const resetTokenDestination = initInputResetTokenDestinationAction()
         const memo = initInputAuthUserMemoAction()
 
-        const fields = ["login-id", "granted-roles", "reset-token-destination", "memo"] as const
+        const fields = ["loginId", "grantedRoles", "resetTokenDestination", "memo"] as const
         const convert = (): ConvertBoardResult<AuthUserAccount> => {
             const result = {
                 loginId: loginId.validate.check(),
@@ -173,30 +173,13 @@ class Action
         this.observe = observe
         this.convert = convert
 
-        // TODO [("login-id", this.loginId)] とかから設定したい
-        this.loginId.validate.subscriber.subscribe((state) => {
-            validateChecker.update("login-id", state)
-        })
-        this.loginId.observe.subscriber.subscribe((result) => {
-            observeChecker.update("login-id", result.hasChanged)
-        })
-        this.grantedRoles.validate.subscriber.subscribe((state) => {
-            validateChecker.update("granted-roles", state)
-        })
-        this.grantedRoles.observe.subscriber.subscribe((result) => {
-            observeChecker.update("granted-roles", result.hasChanged)
-        })
-        this.resetTokenDestination.validate.subscriber.subscribe((state) => {
-            validateChecker.update("reset-token-destination", state)
-        })
-        this.resetTokenDestination.observe.subscriber.subscribe((result) => {
-            observeChecker.update("reset-token-destination", result.hasChanged)
-        })
-        this.memo.validate.subscriber.subscribe((state) => {
-            validateChecker.update("memo", state)
-        })
-        this.memo.observe.subscriber.subscribe((result) => {
-            observeChecker.update("memo", result.hasChanged)
+        fields.forEach((field) => {
+            this[field].validate.subscriber.subscribe((state) => {
+                validateChecker.update(field, state)
+            })
+            this[field].observe.subscriber.subscribe((result) => {
+                observeChecker.update(field, result.hasChanged)
+            })
         })
 
         this.clear()

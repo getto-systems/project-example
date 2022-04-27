@@ -92,7 +92,7 @@ class Action
         const memo = initInputAuthUserMemoAction()
         const grantedRoles = initInputGrantedAuthRolesAction()
 
-        const fields = ["memo", "granted-roles"] as const
+        const fields = ["memo", "grantedRoles"] as const
         const convert = (): ConvertBoardResult<ModifyAuthUserAccountFields> => {
             const result = {
                 grantedRoles: grantedRoles.validate.check(),
@@ -119,17 +119,13 @@ class Action
         this.observe = observe
         this.convert = convert
 
-        this.memo.validate.subscriber.subscribe((state) => {
-            validateChecker.update("memo", state)
-        })
-        this.memo.observe.subscriber.subscribe((result) => {
-            observeChecker.update("memo", result.hasChanged)
-        })
-        this.grantedRoles.validate.subscriber.subscribe((state) => {
-            validateChecker.update("granted-roles", state)
-        })
-        this.grantedRoles.observe.subscriber.subscribe((result) => {
-            observeChecker.update("granted-roles", result.hasChanged)
+        fields.forEach((field) => {
+            this[field].validate.subscriber.subscribe((state) => {
+                validateChecker.update(field, state)
+            })
+            this[field].observe.subscriber.subscribe((result) => {
+                observeChecker.update(field, result.hasChanged)
+            })
         })
     }
 
