@@ -58,8 +58,7 @@ class Action
 }
 
 type UnregisterUserEvent =
-    | Readonly<{ type: "try" }>
-    | Readonly<{ type: "take-longtime" }>
+    | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: UnregisterAuthUserAccountError }>
     | Readonly<{ type: "success" }>
 
@@ -68,7 +67,7 @@ async function unregisterUser<S>(
     user: Readonly<{ loginId: LoginId }>,
     post: Post<UnregisterUserEvent, S>,
 ): Promise<S> {
-    post({ type: "try" })
+    post({ type: "try", hasTakenLongtime: false })
 
     const { unregisterUserRemote } = infra
 
@@ -76,7 +75,7 @@ async function unregisterUser<S>(
     const response = await delayedChecker(
         unregisterUserRemote(user),
         config.takeLongtimeThreshold,
-        () => post({ type: "take-longtime" }),
+        () => post({ type: "try", hasTakenLongtime: true }),
     )
     if (!response.success) {
         return post({ type: "failed", err: response.err })

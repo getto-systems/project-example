@@ -154,8 +154,7 @@ class Action
 }
 
 type ChangePasswordEvent =
-    | Readonly<{ type: "try" }>
-    | Readonly<{ type: "take-longtime" }>
+    | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ChangePasswordError }>
     | Readonly<{ type: "success" }>
 
@@ -164,7 +163,7 @@ async function changePassword<S>(
     fields: ChangePasswordFields,
     post: Post<ChangePasswordEvent, S>,
 ): Promise<S> {
-    post({ type: "try" })
+    post({ type: "try", hasTakenLongtime: false })
 
     const { changePasswordRemote } = infra
 
@@ -172,7 +171,7 @@ async function changePassword<S>(
     const response = await delayedChecker(
         changePasswordRemote(fields),
         config.takeLongtimeThreshold,
-        () => post({ type: "take-longtime" }),
+        () => post({ type: "try", hasTakenLongtime: true }),
     )
     if (!response.success) {
         return post({ type: "failed", err: response.err })
@@ -275,8 +274,7 @@ class OverrideAction
 }
 
 type OverridePasswordEvent =
-    | Readonly<{ type: "try" }>
-    | Readonly<{ type: "take-longtime" }>
+    | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ChangePasswordError }>
     | Readonly<{ type: "success" }>
 
@@ -286,7 +284,7 @@ async function overridePassword<S>(
     fields: OverridePasswordFields,
     post: Post<OverridePasswordEvent, S>,
 ): Promise<S> {
-    post({ type: "try" })
+    post({ type: "try", hasTakenLongtime: false })
 
     const { overridePasswordRemote } = infra
 
@@ -294,7 +292,7 @@ async function overridePassword<S>(
     const response = await delayedChecker(
         overridePasswordRemote(user, fields),
         config.takeLongtimeThreshold,
-        () => post({ type: "take-longtime" }),
+        () => post({ type: "try", hasTakenLongtime: true }),
     )
     if (!response.success) {
         return post({ type: "failed", err: response.err })

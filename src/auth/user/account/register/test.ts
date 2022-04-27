@@ -40,7 +40,7 @@ test("submit valid info", async () => {
         return resource.register.submit()
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "try" },
+            { type: "try", hasTakenLongtime: false },
             {
                 type: "success",
                 data: {
@@ -70,8 +70,8 @@ test("submit valid login-id; take long time", async () => {
         return resource.register.submit()
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "try" },
-            { type: "take-longtime" },
+            { type: "try", hasTakenLongtime: false },
+            { type: "try", hasTakenLongtime: true },
             {
                 type: "success",
                 data: {

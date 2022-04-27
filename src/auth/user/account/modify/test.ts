@@ -30,7 +30,7 @@ test("submit valid info", async () => {
         return resource.modify.submit(user)
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "try" },
+            { type: "try", hasTakenLongtime: false },
             { type: "success", data: { grantedRoles: ["user"], memo: "memo" } },
         ])
     })
@@ -49,8 +49,8 @@ test("submit valid login-id; take long time", async () => {
         return resource.modify.submit(user)
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "try" },
-            { type: "take-longtime" },
+            { type: "try", hasTakenLongtime: false },
+            { type: "try", hasTakenLongtime: true },
             { type: "success", data: { grantedRoles: ["user"], memo: "memo" } },
         ])
     })

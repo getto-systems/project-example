@@ -30,7 +30,7 @@ export function SearchAuthUserAccountForm(props: Props): VNode {
 
     function searchButton(): VNode {
         return h(SearchButton, {
-            isConnecting: state.type === "try" || state.type === "take-longtime",
+            isConnecting: state.type === "try",
             observeState,
             onClick,
         })

@@ -74,7 +74,7 @@ export function ChangePassword(props: Props): VNode {
 
     function submitButton(): VNode {
         return h(ChangeButton, {
-            isConnecting: state.type === "try" || state.type === "take-longtime",
+            isConnecting: state.type === "try",
             validateState,
             observeState,
             onClick,
@@ -125,11 +125,13 @@ export function ChangePassword(props: Props): VNode {
         switch (state.type) {
             case "initial":
             case "success":
-            case "try":
                 return []
 
-            case "take-longtime":
-                return [takeLongtimeField("変更")]
+            case "try":
+                if (state.hasTakenLongtime) {
+                    return [takeLongtimeField("変更")]
+                }
+                return []
 
             case "failed":
                 return [fieldHelp_error(changePasswordError(state.err))]

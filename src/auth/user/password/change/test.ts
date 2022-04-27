@@ -21,7 +21,7 @@ test("submit valid current-password and new-password", async () => {
 
         return resource.change.submit()
     }).then((stack) => {
-        expect(stack).toEqual([{ type: "try" }, { type: "success" }])
+        expect(stack).toEqual([{ type: "try", hasTakenLongtime: false }, { type: "success" }])
     })
 })
 
@@ -37,7 +37,11 @@ test("submit valid login-id and password; take long time", async () => {
 
         return resource.change.submit()
     }).then((stack) => {
-        expect(stack).toEqual([{ type: "try" }, { type: "take-longtime" }, { type: "success" }])
+        expect(stack).toEqual([
+            { type: "try", hasTakenLongtime: false },
+            { type: "try", hasTakenLongtime: true },
+            { type: "success" },
+        ])
     })
 })
 

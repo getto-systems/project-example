@@ -83,7 +83,7 @@ export function RequestResetToken(viewProps: Props): VNode {
         return h(SendButton, {
             label: "トークン送信",
             icon: icon_change,
-            isConnecting: state.type === "try" || state.type === "take-longtime",
+            isConnecting: state.type === "try",
             validateState,
             observeState,
             onClick,
@@ -109,11 +109,13 @@ export function RequestResetToken(viewProps: Props): VNode {
         switch (state.type) {
             case "initial":
             case "success":
-            case "try":
                 return []
 
-            case "take-longtime":
-                return [takeLongtimeField("トークンの送信")]
+            case "try":
+                if (state.hasTakenLongtime) {
+                    return [takeLongtimeField("トークンの送信")]
+                }
+                return []
 
             case "failed":
                 return [fieldHelp_error(requestTokenError(state.err))]

@@ -128,8 +128,7 @@ class Action
 }
 
 type RequestResetTokenEvent =
-    | Readonly<{ type: "try" }>
-    | Readonly<{ type: "take-longtime" }>
+    | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: RequestResetTokenError }>
     | Readonly<{ type: "success" }>
 
@@ -138,7 +137,7 @@ async function requestResetToken<S>(
     fields: RequestResetTokenFields,
     post: Post<RequestResetTokenEvent, S>,
 ): Promise<S> {
-    post({ type: "try" })
+    post({ type: "try", hasTakenLongtime: false })
 
     const { requestTokenRemote } = infra
 
@@ -146,7 +145,7 @@ async function requestResetToken<S>(
     const response = await delayedChecker(
         requestTokenRemote(fields),
         config.takeLongtimeThreshold,
-        () => post({ type: "take-longtime" }),
+        () => post({ type: "try", hasTakenLongtime: true }),
     )
     if (!response.success) {
         return post({ type: "failed", err: response.err })

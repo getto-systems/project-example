@@ -52,7 +52,7 @@ test("submit valid login-id and password", async () => {
         return action.submit()
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "try-to-reset" },
+            { type: "try-to-reset", hasTakenLongtime: false },
             {
                 type: "try-to-load",
                 scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
@@ -85,8 +85,8 @@ test("submit valid login-id and password; with take longtime", async () => {
         return action.submit()
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "try-to-reset" },
-            { type: "take-longtime-to-reset" },
+            { type: "try-to-reset", hasTakenLongtime: false },
+            { type: "try-to-reset", hasTakenLongtime: true },
             {
                 type: "try-to-load",
                 scriptPath: { valid: true, value: "https://secure.example.com/index.js" },

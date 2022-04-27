@@ -75,7 +75,6 @@ export function ResetPassword(viewProps: Props): VNode {
         case "initial-reset":
         case "failed-to-reset":
         case "try-to-reset":
-        case "take-longtime-to-reset":
             return resetForm(state)
 
         case "try-to-load":
@@ -97,8 +96,7 @@ export function ResetPassword(viewProps: Props): VNode {
 
     type ResetState =
         | Readonly<{ type: "initial-reset" }>
-        | Readonly<{ type: "try-to-reset" }>
-        | Readonly<{ type: "take-longtime-to-reset" }>
+        | Readonly<{ type: "try-to-reset"; hasTakenLongtime: boolean }>
         | Readonly<{ type: "failed-to-reset"; err: ResetPasswordError }>
     function resetForm(state: ResetState): VNode {
         return form(
@@ -152,11 +150,13 @@ export function ResetPassword(viewProps: Props): VNode {
         function message(): readonly VNode[] {
             switch (state.type) {
                 case "initial-reset":
-                case "try-to-reset":
                     return []
 
-                case "take-longtime-to-reset":
-                    return [takeLongtimeField("パスワードリセット")]
+                case "try-to-reset":
+                    if (state.hasTakenLongtime) {
+                        return [takeLongtimeField("パスワードリセット")]
+                    }
+                    return []
 
                 case "failed-to-reset":
                     return [fieldHelp_error(resetError(state.err))]

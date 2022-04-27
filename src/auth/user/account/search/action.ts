@@ -7,7 +7,10 @@ import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 import { nextSort } from "../../../../z_lib/ui/search/sort/helper"
 
 import { initSearchLoginIdAction, SearchLoginIdAction } from "../../login_id/input/action"
-import { initSearchGrantedRolesAction, SearchGrantedRolesAction } from "../input/granted_roles/action"
+import {
+    initSearchGrantedRolesAction,
+    SearchGrantedRolesAction,
+} from "../input/granted_roles/action"
 import {
     initObserveBoardAction,
     ObserveBoardAction,
@@ -278,7 +281,6 @@ class Action
                 return state
 
             case "try":
-            case "take-longtime":
             case "failed":
                 return this.post({ ...state, previousResponse: this.response })
 
@@ -306,7 +308,6 @@ class Action
                 return state
 
             case "try":
-            case "take-longtime":
             case "failed":
                 return this.post({ ...state, previousResponse: this.response })
 
@@ -329,7 +330,6 @@ class Action
                 return { response: undefined }
 
             case "try":
-            case "take-longtime":
             case "failed":
                 return { response: state.previousResponse }
 
@@ -340,9 +340,9 @@ class Action
 }
 
 type SearchAuthUserAccountEvent =
-    | Readonly<{ type: "try"; previousResponse?: SearchAuthUserAccountRemoteResponse }>
     | Readonly<{
-          type: "take-longtime"
+          type: "try"
+          hasTakenLongtime: boolean
           previousResponse?: SearchAuthUserAccountRemoteResponse
       }>
     | Readonly<{
@@ -359,13 +359,13 @@ async function search<S>(
     post: Post<SearchAuthUserAccountEvent, S>,
 ): Promise<S> {
     shell.updateQuery(fields)
-    post({ type: "try", previousResponse })
+    post({ type: "try", hasTakenLongtime: false, previousResponse })
 
     const { searchRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(searchRemote(fields), config.takeLongtimeThreshold, () =>
-        post({ type: "take-longtime", previousResponse }),
+        post({ type: "try", hasTakenLongtime: true, previousResponse }),
     )
     if (!response.success) {
         return post({ type: "failed", err: response.err, previousResponse })

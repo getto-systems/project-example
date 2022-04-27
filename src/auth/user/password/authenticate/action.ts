@@ -199,8 +199,7 @@ type AuthenticateMaterial = Readonly<{
 }>
 
 type AuthenticateEvent =
-    | Readonly<{ type: "try-to-login" }>
-    | Readonly<{ type: "take-longtime-to-login" }>
+    | Readonly<{ type: "try-to-login"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed-to-login"; err: AuthenticatePasswordError }>
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
@@ -213,7 +212,7 @@ async function authenticate<S>(
     fields: AuthenticatePasswordFields,
     post: Post<AuthenticateEvent, S>,
 ): Promise<AuthenticateResult<S>> {
-    post({ type: "try-to-login" })
+    post({ type: "try-to-login", hasTakenLongtime: false })
 
     const { authenticateRemote } = infra
 
@@ -221,7 +220,7 @@ async function authenticate<S>(
     const response = await delayedChecker(
         authenticateRemote(fields),
         config.takeLongtimeThreshold,
-        () => post({ type: "take-longtime-to-login" }),
+        () => post({ type: "try-to-login", hasTakenLongtime: true }),
     )
     if (!response.success) {
         return { success: false, state: post({ type: "failed-to-login", err: response.err }) }

@@ -91,21 +91,21 @@ export function CheckAuthTicket(view: ApplicationView<CheckAuthTicketAction>): V
             return html``
 
         case "try-to-renew":
+            if (state.hasTakenLongtime) {
+                return loginBox(siteInfo, {
+                    title: "認証に時間がかかっています",
+                    body: [
+                        html`<p>${iconHtml(icon_spinner)} 認証に時間がかかっています</p>`,
+                        html`<p>
+                            30秒以上かかる場合は何かがおかしいので、
+                            <br />
+                            お手数ですが管理者に連絡お願いします
+                        </p>`,
+                    ],
+                })
+            }
             // すぐに帰ってくることを想定
             return html``
-
-        case "take-longtime-to-renew":
-            return loginBox(siteInfo, {
-                title: "認証に時間がかかっています",
-                body: [
-                    html`<p>${iconHtml(icon_spinner)} 認証に時間がかかっています</p>`,
-                    html`<p>
-                        30秒以上かかる場合は何かがおかしいので、
-                        <br />
-                        お手数ですが管理者に連絡お願いします
-                    </p>`,
-                ],
-            })
 
         case "failed-to-renew":
             return loginBox(siteInfo, {

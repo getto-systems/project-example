@@ -91,7 +91,7 @@ export function RequestResetTokenProfile(props: Props): VNode {
         return h(SendButton, {
             label: "トークン送信",
             icon: icon_change,
-            isConnecting: state.type === "try" || state.type === "take-longtime",
+            isConnecting: state.type === "try",
             validateState,
             observeState,
             onClick,
@@ -137,11 +137,13 @@ export function RequestResetTokenProfile(props: Props): VNode {
         switch (state.type) {
             case "initial":
             case "success":
-            case "try":
                 return []
 
-            case "take-longtime":
-                return [takeLongtimeField("リセットトークン送信")]
+            case "try":
+                if (state.hasTakenLongtime) {
+                    return [takeLongtimeField("リセットトークン送信")]
+                }
+                return []
 
             case "failed":
                 return [fieldHelp_error(requestTokenError(state.err))]

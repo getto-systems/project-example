@@ -85,7 +85,7 @@ test("instant load failed", async () => {
 
     await runner(() => resource.failedToInstantLoad()).then((stack) => {
         expect(stack).toEqual([
-            { type: "try-to-renew" },
+            { type: "try-to-renew", hasTakenLongtime: false },
             {
                 type: "try-to-load",
                 scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
@@ -113,7 +113,7 @@ test("renew stored credential", async () => {
 
     await runner(() => resource.ignitionState).then((stack) => {
         expect(stack).toEqual([
-            { type: "try-to-renew" },
+            { type: "try-to-renew", hasTakenLongtime: false },
             {
                 type: "try-to-load",
                 scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
@@ -142,8 +142,8 @@ test("renew stored credential; take long time", async () => {
 
     await runner(() => resource.ignitionState).then((stack) => {
         expect(stack).toEqual([
-            { type: "try-to-renew" },
-            { type: "take-longtime-to-renew" },
+            { type: "try-to-renew", hasTakenLongtime: false },
+            { type: "try-to-renew", hasTakenLongtime: true },
             {
                 type: "try-to-load",
                 scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
