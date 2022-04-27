@@ -26,7 +26,6 @@ import { initInputAuthUserMemoAction, InputAuthUserMemoAction } from "../input/m
 
 import { RegisterAuthUserAccountRemote } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
-import { BoardConverter } from "../../../../z_vendor/getto-application/board/kernel/infra"
 
 import { RegisterAuthUserAccountError } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
@@ -113,7 +112,7 @@ class Action
     readonly observe: ObserveBoardAction
 
     material: RegisterAuthUserAccountMaterial
-    convert: BoardConverter<AuthUserAccount>
+    convert: { (): ConvertBoardResult<AuthUserAccount> }
 
     constructor(material: RegisterAuthUserAccountMaterial) {
         super({

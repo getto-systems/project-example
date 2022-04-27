@@ -27,7 +27,6 @@ import {
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
 import { GetScriptPathConfig, GetScriptPathShell } from "../../../sign/get_script_path/infra"
 import { AuthenticatePasswordRemote } from "./infra"
-import { BoardConverter } from "../../../../z_vendor/getto-application/board/kernel/infra"
 
 import { LoadScriptError, ConvertScriptPathResult } from "../../../sign/get_script_path/data"
 import { AuthenticatePasswordError, AuthenticatePasswordFields } from "./data"
@@ -93,7 +92,7 @@ class Action
     readonly observe: ObserveBoardAction
 
     material: AuthenticatePasswordMaterial
-    convert: BoardConverter<AuthenticatePasswordFields>
+    convert: { (): ConvertBoardResult<AuthenticatePasswordFields> }
 
     constructor(material: AuthenticatePasswordMaterial) {
         super({

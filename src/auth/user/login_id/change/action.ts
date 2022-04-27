@@ -20,7 +20,6 @@ import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board
 
 import { OverrideLoginIdRemote } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
-import { BoardConverter } from "../../../../z_vendor/getto-application/board/kernel/infra"
 
 import { LoginId } from "../kernel/data"
 
@@ -67,7 +66,7 @@ class OverrideAction
     readonly observe: ObserveBoardAction
 
     material: OverrideLoginIdMaterial
-    convert: BoardConverter<OverrideLoginIdFields>
+    convert: { (): ConvertBoardResult<OverrideLoginIdFields> }
 
     constructor(material: OverrideLoginIdMaterial) {
         super({

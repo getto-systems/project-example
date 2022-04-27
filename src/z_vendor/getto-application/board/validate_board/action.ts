@@ -2,7 +2,6 @@ import { StatefulApplicationAction, AbstractStatefulApplicationAction } from "..
 
 import { initValidateBoardStack } from "./init/stack"
 
-import { BoardConverter } from "../kernel/infra"
 import { ValidateBoardChecker, ValidateBoardStack, ValidateBoardStateFound } from "./infra"
 
 import { ConvertBoardResult } from "../kernel/data"
@@ -22,7 +21,7 @@ export type ValidateBoardInfra = Readonly<{
     stack: ValidateBoardStack
 }>
 export type ValidateBoardShell<T> = Readonly<{
-    convert: BoardConverter<T>
+    convert: { (): ConvertBoardResult<T> }
 }>
 
 export function initValidateBoardAction<N extends string, T>(

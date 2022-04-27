@@ -23,7 +23,6 @@ import { ConvertBoardResult } from "../../../../../../z_vendor/getto-application
 
 import { ChangeResetTokenDestinationRemote } from "./infra"
 import { DelayTime } from "../../../../../../z_lib/ui/config/infra"
-import { BoardConverter } from "../../../../../../z_vendor/getto-application/board/kernel/infra"
 
 import { ResetTokenDestination } from "../kernel/data"
 import { LoginId } from "../../../../login_id/kernel/data"
@@ -76,7 +75,7 @@ class Action
     readonly observe: ObserveBoardAction
 
     material: ChangeResetTokenDestinationMaterial
-    convert: BoardConverter<ResetTokenDestination>
+    convert: { (): ConvertBoardResult<ResetTokenDestination> }
 
     constructor(material: ChangeResetTokenDestinationMaterial) {
         super({

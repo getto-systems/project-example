@@ -17,7 +17,6 @@ import {
 
 import { RequestResetTokenRemote } from "./infra"
 import { DelayTime } from "../../../../../z_lib/ui/config/infra"
-import { BoardConverter } from "../../../../../z_vendor/getto-application/board/kernel/infra"
 
 import { RequestResetTokenError, RequestResetTokenFields } from "./data"
 import { ConvertBoardResult } from "../../../../../z_vendor/getto-application/board/kernel/data"
@@ -65,7 +64,7 @@ class Action
     readonly observe: ObserveBoardAction
 
     material: RequestResetTokenMaterial
-    convert: BoardConverter<RequestResetTokenFields>
+    convert: { (): ConvertBoardResult<RequestResetTokenFields> }
 
     constructor(material: RequestResetTokenMaterial) {
         super({
