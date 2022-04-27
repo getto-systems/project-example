@@ -106,38 +106,35 @@ class Action
         })
         this.material = material
 
-        const fields = ["loginId", "password"] as const
-
         const loginId = initInputLoginIdAction()
         const password = initInputPasswordAction()
-        const { validate, validateChecker } = initValidateBoardAction(
-            { fields },
-            {
-                converter: (): ConvertBoardResult<AuthenticatePasswordFields> => {
-                    const result = {
-                        loginId: loginId.checker.check(),
-                        password: password.checker.check(),
-                    }
-                    if (!result.loginId.valid || !result.password.valid) {
-                        return { valid: false }
-                    }
-                    return {
-                        valid: true,
-                        value: {
-                            loginId: result.loginId.value,
-                            password: result.password.value,
-                        },
-                    }
+
+        const fields = ["loginId", "password"] as const
+        const convert = (): ConvertBoardResult<AuthenticatePasswordFields> => {
+            const result = {
+                loginId: loginId.checker.check(),
+                password: password.checker.check(),
+            }
+            if (!result.loginId.valid || !result.password.valid) {
+                return { valid: false }
+            }
+            return {
+                valid: true,
+                value: {
+                    loginId: result.loginId.value,
+                    password: result.password.value,
                 },
-            },
-        )
+            }
+        }
+
+        const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         this.loginId = loginId.input
         this.password = password.input
         this.validate = validate
         this.observe = observe
-        this.convert = () => validateChecker.get()
+        this.convert = convert
 
         this.loginId.validate.subscriber.subscribe((result) =>
             validateChecker.update("loginId", result.valid),

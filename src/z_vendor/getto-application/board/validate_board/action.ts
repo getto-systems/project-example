@@ -22,7 +22,7 @@ export type ValidateBoardInfra = Readonly<{
     stack: ValidateBoardStack
 }>
 export type ValidateBoardShell<T> = Readonly<{
-    converter: BoardConverter<T>
+    convert: BoardConverter<T>
 }>
 
 export function initValidateBoardAction<N extends string, T>(
@@ -70,7 +70,7 @@ class Action<N extends string, T>
         return this.post(update(this.config, this.infra, name, result))
     }
     get(): ConvertBoardResult<T> {
-        return this.shell.converter()
+        return this.shell.convert()
     }
 
     clear(): ValidateBoardState {

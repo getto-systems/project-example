@@ -87,23 +87,27 @@ class Action
         })
         this.material = material
 
-        const fields = ["destination"] as const
-
         const destination = initInputResetTokenDestinationAction()
-        const { validate, validateChecker } = initValidateBoardAction(
-            { fields },
-            {
-                converter: (): ConvertBoardResult<ResetTokenDestination> =>
-                    destination.checker.check(),
-            },
-        )
 
+        const fields = ["destination"] as const
+        const convert = (): ConvertBoardResult<ResetTokenDestination> => {
+            const result = destination.checker.check()
+            if (!result.valid) {
+                return { valid: false }
+            }
+            return {
+                valid: true,
+                value: result.value,
+            }
+        }
+
+        const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         this.destination = destination.input
         this.validate = validate
         this.observe = observe
-        this.convert = () => validateChecker.get()
+        this.convert = convert
 
         this.destination.validate.subscriber.subscribe((result) =>
             validateChecker.update("destination", result.valid),

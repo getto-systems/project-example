@@ -77,33 +77,29 @@ class Action
         })
         this.material = material
 
-        const fields = ["loginId"] as const
-
         const loginId = initInputLoginIdAction()
 
-        const { validate, validateChecker } = initValidateBoardAction(
-            { fields },
-            {
-                converter: (): ConvertBoardResult<RequestResetTokenFields> => {
-                    const loginIdResult = loginId.checker.check()
-                    if (!loginIdResult.valid) {
-                        return { valid: false }
-                    }
-                    return {
-                        valid: true,
-                        value: {
-                            loginId: loginIdResult.value,
-                        },
-                    }
+        const fields = ["loginId"] as const
+        const convert = (): ConvertBoardResult<RequestResetTokenFields> => {
+            const loginIdResult = loginId.checker.check()
+            if (!loginIdResult.valid) {
+                return { valid: false }
+            }
+            return {
+                valid: true,
+                value: {
+                    loginId: loginIdResult.value,
                 },
-            },
-        )
+            }
+        }
+
+        const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         this.loginId = loginId.input
         this.validate = validate
         this.observe = observe
-        this.convert = () => validateChecker.get()
+        this.convert = convert
 
         this.loginId.validate.subscriber.subscribe((result) =>
             validateChecker.update("loginId", result.valid),
