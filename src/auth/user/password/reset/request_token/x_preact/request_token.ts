@@ -16,7 +16,7 @@ import { loginBox } from "../../../../../../z_vendor/getto-css/preact/layout/log
 import { siteInfo } from "../../../../../../x_content/site"
 import { icon_change } from "../../../../../../x_content/icon"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
-import { takeLongtimeField } from "../../../../../../core/x_preact/design/form"
+import { takeLongtimeField, validationMessage } from "../../../../../../core/x_preact/design/form"
 
 import { LoginIdField } from "../../../../login_id/input/x_preact/input"
 import { ClearChangesButton } from "../../../../../../core/x_preact/button/clear_changes_button"
@@ -66,7 +66,7 @@ export function RequestResetToken(viewProps: Props): VNode {
                           right: clearButton(),
                       }),
                   ],
-                  footer: [footerLinks(), ...validationMessage(), ...message()],
+                  footer: [footerLinks(), ...validationMessage(validateState), ...message()],
               }),
     })
 
@@ -95,16 +95,6 @@ export function RequestResetToken(viewProps: Props): VNode {
         }
     }
 
-    function validationMessage(): readonly VNode[] {
-        switch (validateState) {
-            case "initial":
-            case "valid":
-                return []
-
-            case "invalid":
-                return [fieldHelp_error(["正しく入力されていません"])]
-        }
-    }
     function message(): readonly VNode[] {
         switch (state.type) {
             case "initial":

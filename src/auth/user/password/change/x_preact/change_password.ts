@@ -4,7 +4,7 @@ import { useApplicationAction } from "../../../../../z_vendor/getto-application/
 
 import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
-import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
+import { takeLongtimeField, validationMessage } from "../../../../../core/x_preact/design/form"
 
 import { changePasswordError } from "./helper"
 import { PasswordField } from "../../input/x_preact/input"
@@ -50,7 +50,7 @@ export function ChangePassword(props: Props): VNode {
                           left: submitButton(),
                           right: clearButton(),
                       }),
-                      ...validationMessage(),
+                      ...validationMessage(validateState),
                       ...message(),
                       buttons({
                           right: closeButton(),
@@ -110,17 +110,6 @@ export function ChangePassword(props: Props): VNode {
         }
     }
 
-    // TODO 共通化できると思う
-    function validationMessage(): readonly VNode[] {
-        switch (validateState) {
-            case "initial":
-            case "valid":
-                return []
-
-            case "invalid":
-                return [fieldHelp_error(["正しく入力されていません"])]
-        }
-    }
     function message(): readonly VNode[] {
         switch (state.type) {
             case "initial":

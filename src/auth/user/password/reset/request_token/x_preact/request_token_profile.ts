@@ -9,7 +9,7 @@ import { buttons, fieldHelp_error } from "../../../../../../z_vendor/getto-css/p
 import { icon_change } from "../../../../../../x_content/icon"
 import { box } from "../../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../../z_vendor/getto-css/preact/design/highlight"
-import { takeLongtimeField } from "../../../../../../core/x_preact/design/form"
+import { takeLongtimeField, validationMessage } from "../../../../../../core/x_preact/design/form"
 
 import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_error/reason"
 
@@ -48,7 +48,7 @@ export function RequestResetTokenProfile(props: Props): VNode {
                           left: submitButton(),
                           right: clearButton(),
                       }),
-                      ...validationMessage(),
+                      ...validationMessage(validateState),
                       ...message(),
                       buttons({
                           right: closeButton(),
@@ -123,16 +123,6 @@ export function RequestResetTokenProfile(props: Props): VNode {
         }
     }
 
-    function validationMessage(): readonly VNode[] {
-        switch (validateState) {
-            case "initial":
-            case "valid":
-                return []
-
-            case "invalid":
-                return [fieldHelp_error(["正しく入力されていません"])]
-        }
-    }
     function message(): readonly VNode[] {
         switch (state.type) {
             case "initial":

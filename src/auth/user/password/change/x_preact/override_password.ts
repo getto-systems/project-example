@@ -4,7 +4,7 @@ import { useApplicationAction } from "../../../../../z_vendor/getto-application/
 
 import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
-import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
+import { takeLongtimeField, validationMessage } from "../../../../../core/x_preact/design/form"
 
 import { PasswordField } from "../../input/x_preact/input"
 import { EditButton } from "../../../../../core/x_preact/button/edit_button"
@@ -48,7 +48,7 @@ export function OverridePassword(props: Props): VNode {
                           left: submitButton(),
                           right: clearButton(),
                       }),
-                      ...validationMessage(),
+                      ...validationMessage(validateState),
                       ...message(),
                       buttons({
                           right: closeButton(),
@@ -106,16 +106,6 @@ export function OverridePassword(props: Props): VNode {
         }
     }
 
-    function validationMessage(): readonly VNode[] {
-        switch (validateState) {
-            case "initial":
-            case "valid":
-                return []
-
-            case "invalid":
-                return [fieldHelp_error(["正しく入力されていません"])]
-        }
-    }
     function message(): readonly VNode[] {
         switch (state.type) {
             case "initial":
