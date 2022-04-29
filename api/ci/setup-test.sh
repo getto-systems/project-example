@@ -3,7 +3,7 @@
 setup_main() {
   local target
   target=$1
-  if [ -z "$target" ]: then
+  if [ -z "$target" ]; then
     echo "usage: setup-test.sh <install-dir>"
     exit 1
   fi
