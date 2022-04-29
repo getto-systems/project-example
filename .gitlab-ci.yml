@@ -86,7 +86,7 @@ test-api:
   before_script:
     - rustup component add rustfmt
   script:
-    - cargo test
+    - ./api/ci/test.sh
 
 bump_version-ui:
   stage: bump_version

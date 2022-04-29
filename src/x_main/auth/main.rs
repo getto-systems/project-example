@@ -11,6 +11,7 @@ lazy_static! {
 
 #[tokio::main]
 async fn main() {
+    // main
     let feature: Arc<AuthAppFeature> = Arc::new(AuthAppFeature::new(&ENV));
 
     let server = route::Server::new();
