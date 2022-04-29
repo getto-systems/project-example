@@ -88,7 +88,8 @@ test-api:
     - rustup component add llvm-tools-preview
     - cargo install cargo-llvm-cov
   script:
-    - cargo llvm-cov --ignore-filename-regex '(\.cargo|rustc|^api/|/[xy]_|/init/|/(main|test|init|data|infra|helper)\.rs)'
+    - cargo llvm-cov --ignore-filename-regex '(\.cargo|rustc|^api/|/[xy]_|/init/|/(main|test|init|data|infra|helper)\.rs)' | tee output.txt
+    - ./api/ci/check-coverage.sh output.txt
 
 bump_version-ui:
   stage: bump_version
