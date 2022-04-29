@@ -85,8 +85,10 @@ test-api:
 
   before_script:
     - rustup component add rustfmt
+    - rustup component add llvm-tools-preview
+    - cargo install cargo-llvm-cov
   script:
-    - ./api/ci/test.sh
+    - cargo llvm-cov --ignore-filename-regex '(\.cargo|rustc|^api/|/[xy]_|/init/|/(main|test|init|data|infra|helper)\.rs)'
 
 bump_version-ui:
   stage: bump_version
