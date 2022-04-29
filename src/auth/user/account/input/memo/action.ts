@@ -59,6 +59,7 @@ export function initInputAuthUserMemoAction(): InputAuthUserMemoAction {
 
         reset: (value: AuthUserMemo) => {
             store.set(value)
+            observe.pin()
         },
     }
 }

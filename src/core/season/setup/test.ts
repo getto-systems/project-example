@@ -1,10 +1,9 @@
 import { setupActionTestRunner } from "../../../z_vendor/getto-application/action/test_helper"
 
-import { markSeason } from "../kernel/test_helper"
-
 import { mockClock, mockClockPubSub } from "../../../z_lib/ui/clock/mock"
 import { mockBoardValueStore } from "../../../z_vendor/getto-application/board/input/test_helper"
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
+import { markSeason } from "../kernel/test_helper"
 
 import { initSetupSeasonAction } from "./action"
 
@@ -13,7 +12,7 @@ import { SetupSeasonAction } from "./action"
 import { SeasonRepository } from "../kernel/infra"
 import { BoardValueStore } from "../../../z_vendor/getto-application/board/input/infra"
 
-import { seasonRepositoryConverter, seasonToString } from "../kernel/convert"
+import { seasonRepositoryConverter } from "../kernel/convert"
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"
 
 import { Season } from "../kernel/data"
@@ -39,49 +38,6 @@ test("setup season; default", async () => {
     await runner(() => resource.setupSeason.setup()).then((stack) => {
         expect(stack).toEqual([{ type: "success" }])
     })
-})
-
-test("setup season; invalid input", async () => {
-    const { resource, store } = standard()
-
-    const runner = setupActionTestRunner(resource.setupSeason.subscriber)
-
-    await runner(() => {
-        store.season.set("invalid")
-        return resource.setupSeason.setup()
-    }).then((stack) => {
-        expect(stack).toEqual([{ type: "invalid" }])
-    })
-})
-
-test("setup season; invalid year", async () => {
-    const { resource, store } = standard()
-
-    const runner = setupActionTestRunner(resource.setupSeason.subscriber)
-
-    await runner(() => {
-        store.season.set("2020.summer")
-        return resource.setupSeason.setup()
-    }).then((stack) => {
-        expect(stack).toEqual([{ type: "invalid" }])
-    })
-})
-
-test("setup season; invalid period", async () => {
-    const { resource, store } = standard()
-
-    const runner = setupActionTestRunner(resource.setupSeason.subscriber)
-
-    await runner(() => {
-        store.season.set("2020.unknown")
-        return resource.setupSeason.setup()
-    }).then((stack) => {
-        expect(stack).toEqual([{ type: "invalid" }])
-    })
-})
-
-test("convert season to board value", () => {
-    expect(seasonToString(markSeason({ year: 2021, period: "summer" }))).toEqual("2021.summer")
 })
 
 function standard() {
@@ -128,5 +84,5 @@ function standard_season(): SeasonRepository {
 }
 
 function standard_availableSeasons(): readonly Season[] {
-    return [{ year: 2021, period: "summer" } as Season]
+    return [markSeason({ year: 2021, period: "summer" })]
 }

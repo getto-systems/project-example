@@ -108,11 +108,13 @@ class Action
         this.observe = observe
         this.convert = convert
 
-        this.destination.validate.subscriber.subscribe((state) => {
-            validateChecker.update("destination", state)
-        })
-        this.destination.observe.subscriber.subscribe((result) => {
-            observeChecker.update("destination", result.hasChanged)
+        fields.forEach((field) => {
+            this[field].validate.subscriber.subscribe((state) => {
+                validateChecker.update(field, state)
+            })
+            this[field].observe.subscriber.subscribe((result) => {
+                observeChecker.update(field, result.hasChanged)
+            })
         })
     }
 

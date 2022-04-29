@@ -11,19 +11,19 @@ export function seasonToString(
 ): string {
     return `${season.year}.${season.period}`
 }
-export function seasonBoardConverter(
+export function seasonConverter(
     availableSeasons: readonly Season[],
     value: string,
 ): ConvertSeasonResult {
     if (value === "") {
-        return { valid: true, default: true }
+        return { valid: true, value: { default: true } }
     }
 
     const result = findSeason(availableSeasons, value)
     if (!result.found) {
-        return { valid: false }
+        return { valid: false, err: { type: "invalid-season" } }
     }
-    return { valid: true, default: false, season: result.season }
+    return { valid: true, value: { default: false, season: result.season } }
 }
 
 export function seasonRepositoryConverter(

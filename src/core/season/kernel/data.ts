@@ -1,3 +1,5 @@
+import { ValidateBoardFieldResult } from "../../../z_vendor/getto-application/board/validate_field/data"
+
 export type Season = Season_data & { Season: never }
 type Season_data = Readonly<{
     year: number
@@ -7,7 +9,10 @@ type Season_data = Readonly<{
 export const seasonPeriods = ["summer", "winter"] as const
 export type SeasonPeriod = typeof seasonPeriods[number]
 
-export type ConvertSeasonResult =
-    | Readonly<{ valid: false }>
-    | Readonly<{ valid: true; default: true }>
-    | Readonly<{ valid: true; default: false; season: Season }>
+export type ConvertSeasonResult = ValidateBoardFieldResult<DetectedSeason, ValidateSeasonError>
+
+export type DetectedSeason =
+    | Readonly<{ default: true }>
+    | Readonly<{ default: false; season: Season }>
+
+export type ValidateSeasonError = Readonly<{ type: "invalid-season" }>

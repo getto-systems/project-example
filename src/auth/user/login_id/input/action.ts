@@ -49,6 +49,7 @@ export function initInputLoginIdAction(): InputLoginIdAction {
         clear: () => {
             store.set("")
             validate.clear()
+            observe.pin()
         },
         terminate: () => {
             subscriber.terminate()

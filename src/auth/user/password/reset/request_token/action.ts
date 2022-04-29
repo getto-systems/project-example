@@ -78,7 +78,7 @@ class Action
 
         const loginId = initInputLoginIdAction()
 
-        const fields = ["login-id"] as const
+        const fields = ["loginId"] as const
         const convert = (): ConvertBoardResult<RequestResetTokenFields> => {
             const loginIdResult = loginId.validate.check()
             if (!loginIdResult.valid) {
@@ -100,12 +100,14 @@ class Action
         this.observe = observe
         this.convert = convert
 
-        this.loginId.validate.subscriber.subscribe((state) => {
-            validateChecker.update("login-id", state)
+        fields.forEach((field) => {
+            this[field].validate.subscriber.subscribe((state) => {
+                validateChecker.update(field, state)
+            })
+            this[field].observe.subscriber.subscribe((result) => {
+                observeChecker.update(field, result.hasChanged)
+            })
         })
-        this.loginId.observe.subscriber.subscribe((result) =>
-            observeChecker.update("login-id", result.hasChanged),
-        )
     }
 
     clear(): RequestResetTokenState {
