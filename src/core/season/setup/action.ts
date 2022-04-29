@@ -8,18 +8,22 @@ import {
     initObserveBoardAction,
     ObserveBoardAction,
 } from "../../../z_vendor/getto-application/board/observe_board/action"
-
-import { seasonBoardConverter } from "../kernel/convert"
+import {
+    initValidateBoardAction,
+    ValidateBoardAction,
+} from "../../../z_vendor/getto-application/board/validate_board/action"
 
 import { SeasonRepository } from "../kernel/infra"
 import { Clock } from "../../../z_lib/ui/clock/infra"
 import { ExpireTime } from "../../../z_lib/ui/config/infra"
 
 import { RepositoryError } from "../../../z_lib/ui/repository/data"
-import { Season } from "../kernel/data"
+import { DetectedSeason, Season } from "../kernel/data"
+import { ConvertBoardResult } from "../../../z_vendor/getto-application/board/kernel/data"
 
 export interface SetupSeasonAction extends StatefulApplicationAction<SetupSeasonState> {
     readonly season: InputSeasonAction
+    readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
     setup(): Promise<SetupSeasonState>
@@ -58,43 +62,67 @@ class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
     readonly initialState = initialState
 
     readonly season: InputSeasonAction
+    readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
     material: SetupSeasonMaterial
     load: LoadAction
 
-    field: { (): string }
+    convert: { (): ConvertBoardResult<DetectedSeason> }
 
     constructor(material: SetupSeasonMaterial, load: LoadAction) {
         super()
 
+        const season = initInputSeasonAction(material.infra.availableSeasons)
+
         const fields = ["season"] as const
+        const convert = (): ConvertBoardResult<DetectedSeason> => {
+            const result = {
+                season: season.validate.check(),
+            }
+            if (!result.season.valid) {
+                return { valid: false }
+            }
+            return {
+                valid: true,
+                value: result.season.value,
+            }
+        }
 
-        const season = initInputSeasonAction()
-
+        const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         load.ignitionState.then((state) => {
             switch (state.type) {
                 case "success":
-                    season.set(state.season)
+                    season.reset(state.season)
             }
         })
 
-        this.season = season.input
+        this.season = season
+        this.validate = validate
         this.observe = observe
 
         this.material = material
         this.load = load
-        this.field = () => season.get()
+        this.convert = convert
 
-        this.season.observe.subscriber.subscribe((result) => {
-            observeChecker.update("season", result.hasChanged)
+        fields.forEach((field) => {
+            this[field].validate.subscriber.subscribe((state) => {
+                validateChecker.update(field, state)
+            })
+            this[field].observe.subscriber.subscribe((result) => {
+                observeChecker.update(field, result.hasChanged)
+            })
         })
     }
 
-    setup(): Promise<SetupSeasonState> {
-        return setupSeason(this.material, this.field(), (state) => {
+    async setup(): Promise<SetupSeasonState> {
+        const fields = this.convert()
+        if (!fields.valid) {
+            return this.currentState()
+        }
+        return setupSeason(this.material, fields.value, (state) => {
             if (state.type === "success") {
                 this.load.load()
             }
@@ -104,23 +132,17 @@ class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
 }
 
 type SetupSeasonEvent =
-    | Readonly<{ type: "invalid" }>
     | Readonly<{ type: "failed"; err: RepositoryError }>
     | Readonly<{ type: "success" }>
 
 async function setupSeason<S>(
     { infra, config }: SetupSeasonMaterial,
-    value: string,
+    season: DetectedSeason,
     post: Post<SetupSeasonEvent, S>,
 ): Promise<S> {
-    const { clock, seasonRepository, availableSeasons } = infra
+    const { clock, seasonRepository } = infra
 
-    const convertResult = seasonBoardConverter(availableSeasons, value)
-    if (!convertResult.valid) {
-        return post({ type: "invalid" })
-    }
-
-    if (convertResult.default) {
+    if (season.default) {
         const result = await seasonRepository.remove()
         if (!result.success) {
             return post({ type: "failed", err: result.err })
@@ -129,7 +151,7 @@ async function setupSeason<S>(
     }
 
     const result = await seasonRepository.set({
-        season: convertResult.season,
+        season: season.season,
         expires: clock.now().getTime() + config.manualSetupSeasonExpire.expire_millisecond,
     })
     if (!result.success) {

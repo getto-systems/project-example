@@ -93,7 +93,7 @@ class Action
         const currentPassword = initInputPasswordAction()
         const newPassword = initInputPasswordAction()
 
-        const fields = ["current-password", "new-password"] as const
+        const fields = ["currentPassword", "newPassword"] as const
         const convert = (): ConvertBoardResult<ChangePasswordFields> => {
             const result = {
                 currentPassword: currentPassword.validate.check(),
@@ -120,18 +120,14 @@ class Action
         this.observe = observe
         this.convert = convert
 
-        this.currentPassword.validate.subscriber.subscribe((state) => {
-            validateChecker.update("current-password", state)
+        fields.forEach((field) => {
+            this[field].validate.subscriber.subscribe((state) => {
+                validateChecker.update(field, state)
+            })
+            this[field].observe.subscriber.subscribe((result) => {
+                observeChecker.update(field, result.hasChanged)
+            })
         })
-        this.currentPassword.observe.subscriber.subscribe((result) =>
-            observeChecker.update("current-password", result.hasChanged),
-        )
-        this.newPassword.validate.subscriber.subscribe((state) => {
-            validateChecker.update("new-password", state)
-        })
-        this.newPassword.observe.subscriber.subscribe((result) =>
-            observeChecker.update("new-password", result.hasChanged),
-        )
     }
 
     clear(): ChangePasswordState {
@@ -218,7 +214,7 @@ class OverrideAction
         })
         this.material = material
 
-        const fields = ["new-password"] as const
+        const fields = ["newPassword"] as const
 
         const newPassword = initInputPasswordAction()
         const { validate, validateChecker } = initValidateBoardAction(
@@ -247,12 +243,14 @@ class OverrideAction
         this.observe = observe
         this.convert = () => validateChecker.get()
 
-        this.newPassword.validate.subscriber.subscribe((state) => {
-            validateChecker.update("new-password", state)
+        fields.forEach((field) => {
+            this[field].validate.subscriber.subscribe((state) => {
+                validateChecker.update(field, state)
+            })
+            this[field].observe.subscriber.subscribe((result) => {
+                observeChecker.update(field, result.hasChanged)
+            })
         })
-        this.newPassword.observe.subscriber.subscribe((result) =>
-            observeChecker.update("new-password", result.hasChanged),
-        )
     }
 
     clear(): OverridePasswordState {

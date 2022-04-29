@@ -205,8 +205,8 @@ function empty_season(): SeasonRepository {
 
 function standard_availableSeasons(): readonly Season[] {
     return [
-        { year: 2022, period: "summer" } as Season,
-        { year: 2021, period: "winter" } as Season,
-        { year: 2021, period: "summer" } as Season,
+        markSeason({ year: 2022, period: "summer" }),
+        markSeason({ year: 2021, period: "winter" }),
+        markSeason({ year: 2021, period: "summer" }),
     ]
 }

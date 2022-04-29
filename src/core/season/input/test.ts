@@ -3,18 +3,32 @@ import { mockBoardValueStore } from "../../../z_vendor/getto-application/board/i
 import { initInputSeasonAction } from "./action"
 
 import { Season } from "../kernel/data"
+import { markSeason } from "../kernel/test_helper"
 
 test("get value", async () => {
-    const { store, get } = standard()
+    const { action, store } = standard()
 
     store.set("2021.summer")
-    expect(get()).toEqual("2021.summer")
+    expect(action.validate.check()).toEqual({
+        valid: true,
+        value: { default: false, season: { year: 2021, period: "summer" } },
+    })
+})
+
+test("get default", async () => {
+    const { action, store } = standard()
+
+    store.set("")
+    expect(action.validate.check()).toEqual({
+        valid: true,
+        value: { default: true },
+    })
 })
 
 test("set value", async () => {
-    const { store, set } = standard()
+    const { action, store } = standard()
 
-    set({ year: 2021, period: "summer" } as Season)
+    action.reset(markSeason({ year: 2021, period: "summer" }))
     expect(store.get()).toEqual("2021.summer")
 })
 
@@ -28,8 +42,12 @@ test("terminate", async () => {
 })
 
 function standard() {
-    const { input: action, get, set } = initInputSeasonAction()
+    const action = initInputSeasonAction(standard_availableSeasons())
     const store = mockBoardValueStore(action.input)
 
-    return { action, store, get, set }
+    return { action, store }
+}
+
+function standard_availableSeasons(): readonly Season[] {
+    return [markSeason({ year: 2021, period: "summer" })]
 }
