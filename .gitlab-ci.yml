@@ -81,7 +81,6 @@ test-api:
   image: asia-docker.pkg.dev/getto-systems/example/test:latest
 
   variables:
-    DOCKER_AUTH_CONFIG: $TEST_DOCKER_CONFIG
     RUN_CODE_BUILDER: "TRUE"
 
   before_script:
