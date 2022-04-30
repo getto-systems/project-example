@@ -58,7 +58,7 @@ async fn success_modify_user() {
         "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
         "modify auth user account success",
     ]);
-    assert!(result.is_err());
+    assert!(result.is_ok());
 }
 
 #[tokio::test]
