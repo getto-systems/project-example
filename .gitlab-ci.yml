@@ -265,7 +265,7 @@ release_build-test:
     - docker:dind
 
   script:
-    - api/ci/build.sh test
+    - api/ci/build-test.sh
 
 release_build-proxy:
   stage: release_build
