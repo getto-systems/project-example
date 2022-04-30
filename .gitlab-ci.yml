@@ -78,7 +78,7 @@ test-api:
       - "src/**/*.rs"
       - "api/vendor/**/*.rs"
 
-  image: asia-docker.pkg.dev/getto-systems/example/test:latest
+  image: asia-docker.pkg.dev/getto-projects/example/test:latest
 
   variables:
     RUN_CODE_BUILDER: "TRUE"
