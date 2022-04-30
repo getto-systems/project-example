@@ -78,16 +78,13 @@ test-api:
       - "src/**/*.rs"
       - "api/vendor/**/*.rs"
 
-  image: rust:1-bullseye
+  image: asia-docker.pkg.dev/getto-systems/example/test:latest
 
   variables:
     RUN_CODE_BUILDER: "TRUE"
 
   before_script:
-    - apt-get update && apt-get install -y cmake
-    - rustup component add rustfmt
-    - rustup component add llvm-tools-preview
-    - ./api/ci/setup-test.sh /usr/local/bin
+    - ln -s /apps/target
   script:
     - cargo llvm-cov --ignore-filename-regex '(\.cargo|rustc|^api/|/[xy]_|/init/|/(main|test|init|data|infra|helper)\.rs)' | tee output.txt
     - ./api/ci/check-coverage.sh output.txt
@@ -249,6 +246,26 @@ release-proxy:
 
   script:
     - curl $TRELLIS_CI_BUMP_VERSION/push_tags.sh | sh
+
+release_build-test:
+  stage: release_build
+  only:
+    refs:
+      - schedules
+    variables:
+      - $RELEASE_TEST
+
+  image: docker:stable
+
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+
+  services:
+    - docker:dind
+
+  script:
+    - api/ci/build.sh test
 
 release_build-proxy:
   stage: release_build
