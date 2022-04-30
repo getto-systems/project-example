@@ -3,6 +3,7 @@
 body {
   font-family: 'BIZ UDPGothic', sans-serif;
 }
+/* TODO たぶん .number みたいな td のみに適用したほうがいい(アルファベットがほそい) */
 table {
   font-family: 'BIZ UDGothic', sans-serif;
 }
