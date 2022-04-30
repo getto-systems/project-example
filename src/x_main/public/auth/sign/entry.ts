@@ -6,6 +6,7 @@ import { newSignView } from "../../../../auth/sign/sign/init/resource"
 import { Sign } from "../../../../auth/sign/sign/x_preact/sign"
 import { newForegroundOutsideFeature } from "../../../../x_outside_feature/common"
 
+// entry
 render(
     h(Sign, {
         link: initSignLink(),

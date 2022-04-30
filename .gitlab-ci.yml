@@ -84,6 +84,7 @@ test-api:
     RUN_CODE_BUILDER: "TRUE"
 
   before_script:
+    - apt-get update && apt-get install -y cmake
     - rustup component add rustfmt
     - rustup component add llvm-tools-preview
     - ./api/ci/setup-test.sh /usr/local/bin
