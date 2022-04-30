@@ -85,8 +85,11 @@ test-api:
 
   before_script:
     - rustup component add rustfmt
+    - rustup component add llvm-tools-preview
+    - ./api/ci/setup-test.sh /usr/local/bin
   script:
-    - cargo test
+    - cargo llvm-cov --ignore-filename-regex '(\.cargo|rustc|^api/|/[xy]_|/init/|/(main|test|init|data|infra|helper)\.rs)' | tee output.txt
+    - ./api/ci/check-coverage.sh output.txt
 
 bump_version-ui:
   stage: bump_version
