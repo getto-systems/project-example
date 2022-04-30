@@ -1,11 +1,8 @@
-@font-face {
-  font-family: minmoji;
-  src: url('../fonts/minmoji/minmoji.eot');
-  src: local('minmoji'),
-    url('../fonts/minmoji/minmoji.woff') format('woff'),
-    url('../fonts/minmoji/minmoji.ttf') format('opentype');
-}
+@import url('https://fonts.googleapis.com/css2?family=BIZ+UDGothic&family=BIZ+UDPGothic&display=swap');
 
 body {
-  font-family: minmoji, sans-serif !important;
+  font-family: 'BIZ UDPGothic', sans-serif;
+}
+table {
+  font-family: 'BIZ UDGothic', sans-serif;
 }

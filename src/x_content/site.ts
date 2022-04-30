@@ -11,4 +11,4 @@ export const siteInfo: SiteInfo = {
 }
 
 export const copyright = "GETTO.systems" as const
-export const poweredBy = ["LineIcons", "みんなの文字"] as const
+export const poweredBy = ["LineIcons", "BIZ UDPGothic"] as const
