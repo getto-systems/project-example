@@ -9,7 +9,7 @@ use crate::auth::{
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
-            test::{StaticValidateAuthNonceStruct, StaticAuthenticateStruct},
+            test::{StaticAuthenticateStruct, StaticValidateAuthNonceStruct},
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
         },
@@ -58,7 +58,7 @@ async fn success_modify_user() {
         "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
         "modify auth user account success",
     ]);
-    assert!(result.is_ok());
+    assert!(result.is_err());
 }
 
 #[tokio::test]
