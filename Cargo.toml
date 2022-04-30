@@ -26,27 +26,27 @@ getto-application = { path = "api/vendor/getto-application" }
 aws-cloudfront-cookie = { path = "api/vendor/aws-cloudfront-cookie" }
 
 tokio = "1"
-actix-web = "4.0.0-rc"
-actix-cors = "0.6.0-beta"
-rusoto_core = { version = "0.47", default_features = false, features = ["rustls"] }
-rusoto_ses = { version = "0.47", default_features = false, features = ["rustls"] }
-rusoto_dynamodb = { version = "0.47", default_features = false, features = ["rustls"] }
+actix-web = "4"
+actix-cors = "0.6"
+rusoto_core = { version = "0.48", default_features = false, features = ["rustls"] }
+rusoto_ses = { version = "0.48", default_features = false, features = ["rustls"] }
+rusoto_dynamodb = { version = "0.48", default_features = false, features = ["rustls"] }
 sqlx = { version = "0.5", default_features = false, features = ["macros", "offline", "runtime-tokio-rustls", "mysql", "chrono"] }
-sea-query = { version = "0.21", default_features = false, features = ["derive", "backend-mysql", "sqlx-mysql"] }
+sea-query = { version = "0.24", default_features = false, features = ["derive", "backend-mysql", "sqlx-mysql"] }
 
 jsonwebtoken = "8"
-argon2 = "0.3"
+argon2 = "0.4"
 
-tonic = { version = "0.6", features = ["transport", "tls", "tls-roots"] }
+tonic = { version = "0.7", features = ["transport", "tls", "tls-roots"] }
 tower = "0.4"
 reqwest = { version = "0.11", default_features = false, features = ["rustls"] }
-prost = "0.9"
+prost = "0.10"
 bytes = "1"
 base64 = "0.13"
 
 chrono = "0.4"
 time = "0.3"
-uuid = { version = "0.8", features = ["v4"] }
+uuid = { version = "1", features = ["v4"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 url = "2"
@@ -56,7 +56,7 @@ rand_core = { version = "0.6", features = ["std"] }
 getto-application-test = { path = "api/vendor/getto-application-test" }
 
 [build-dependencies]
-tonic-build = "0.6"
-prost-build = "0.9"
+tonic-build = "0.7"
+prost-build = "0.10"
 
 regex = "1"
