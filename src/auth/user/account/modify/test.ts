@@ -1,3 +1,4 @@
+import { test, expect } from "vitest"
 import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 import { mockBoardValueStore, mockMultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"

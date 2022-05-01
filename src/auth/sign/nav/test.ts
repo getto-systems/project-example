@@ -1,3 +1,4 @@
+import { test, expect } from "vitest"
 import { initSignLink } from "./action"
 
 test("link", () => {

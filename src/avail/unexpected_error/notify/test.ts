@@ -1,3 +1,4 @@
+import { test, expect } from "vitest"
 import { initNotifyUnexpectedErrorAction } from "./action"
 
 import { NotifyUnexpectedErrorRemote } from "./infra"

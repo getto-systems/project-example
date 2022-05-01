@@ -1,3 +1,4 @@
+import { test, expect } from "vitest"
 import { setupActionTestRunner } from "../../../z_vendor/getto-application/action/test_helper"
 
 import { mockClock, mockClockPubSub } from "../../../z_lib/ui/clock/mock"
