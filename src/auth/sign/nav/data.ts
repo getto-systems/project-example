@@ -36,7 +36,7 @@ export enum StaticSignViewVariant {
 }
 export type StaticSignViewVariantKey = keyof typeof StaticSignViewVariant
 
-export type AuthenticatePasswordVariantKey = ["authenticate"]
+export type AuthenticatePasswordVariantKey = "authenticate"
 
 export enum ResetPasswordVariant {
     "request-token",
