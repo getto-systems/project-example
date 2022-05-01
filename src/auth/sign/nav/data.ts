@@ -11,7 +11,6 @@ export enum SignNav {
     "static",
     "passwordAuthenticate",
     "passwordReset",
-    "passwordResetSessionID",
     "passwordResetToken",
 }
 
@@ -27,9 +26,6 @@ export function signNavKey(nav: SignNav): string {
         case SignNav.passwordReset:
             return "-password-reset"
 
-        case SignNav.passwordResetSessionID:
-            return "-password-reset-session-id"
-
         case SignNav.passwordResetToken:
             return "-password-reset-token"
     }
@@ -40,10 +36,7 @@ export enum StaticSignViewVariant {
 }
 export type StaticSignViewVariantKey = keyof typeof StaticSignViewVariant
 
-export enum AuthenticatePasswordVariant {
-    "authenticate",
-}
-export type AuthenticatePasswordVariantKey = keyof typeof AuthenticatePasswordVariant
+export type AuthenticatePasswordVariantKey = ["authenticate"]
 
 export enum ResetPasswordVariant {
     "request-token",

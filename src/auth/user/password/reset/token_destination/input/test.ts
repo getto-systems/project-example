@@ -164,5 +164,5 @@ function standard_destination(): ResetTokenDestination {
     return restoreResetTokenDestination({ type: "email", email: "user@example.com" })
 }
 function no_destination(): ResetTokenDestination {
-    return { type: "none" }
+    return restoreResetTokenDestination({ type: "none", email: "" })
 }

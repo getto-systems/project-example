@@ -27,7 +27,7 @@ function secureHtmlFiles() {
 function linkableHtmlFiles() {
     return [
         "coverage/api/index.html",
-        "coverage/ui/lcov-report/index.html",
+        "coverage/ui/index.html",
         ...secureHtmlFiles(),
     ]
 }

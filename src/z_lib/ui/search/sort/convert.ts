@@ -40,6 +40,7 @@ export function parseSearchSort<K>(
         default:
             return { key: key.key, order: "normal" }
     }
+    /* c8 ignore next */
 }
 
 export function updateSearchSort<K extends string>(currentURL: URL, sort: SearchSort<K>): URL {

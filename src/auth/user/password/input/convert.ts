@@ -4,8 +4,6 @@ import { ConvertPasswordResult, Password, ResetToken } from "./data"
 import { converter } from "../../../../z_lib/ui/validate/helper"
 import { check_text_empty, check_text_tooLong } from "../../../../z_lib/ui/validate/text"
 
-export const PASSWORD_MAX_LENGTH = 100
-
 export const passwordBoardConverter: { (value: string): ConvertPasswordResult } = converter(
     markPassword,
     [
@@ -20,6 +18,7 @@ function markPassword(password: string): Password {
     return password as Password
 }
 
+// TODO ここじゃない気がする
 export function detectResetToken(currentURL: URL): ConvertLocationResult<ResetToken> {
     const resetToken = currentURL.searchParams.get(signNavKey(SignNav.passwordResetToken))
     if (resetToken === null) {
