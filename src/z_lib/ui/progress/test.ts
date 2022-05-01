@@ -1,3 +1,4 @@
+import { test, expect } from "vitest"
 import { ProgressInfo } from "./data"
 import { initProgressCounter } from "./helper"
 

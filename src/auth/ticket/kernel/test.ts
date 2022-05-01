@@ -1,3 +1,4 @@
+import { test, expect } from "vitest"
 import { authTicketRepositoryConverter } from "./convert"
 
 test("authTicketRepositoryConverter", () => {

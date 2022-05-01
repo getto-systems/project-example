@@ -1,3 +1,4 @@
+import { test, expect } from "vitest"
 import { setupActionTestRunner } from "../../action/test_helper"
 
 import { initValidateBoardFieldAction } from "./action"

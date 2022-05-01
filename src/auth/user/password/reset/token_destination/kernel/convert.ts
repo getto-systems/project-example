@@ -12,10 +12,6 @@ import {
 } from "../../../../../../z_lib/ui/validate/text"
 import { ValidateTextError } from "../../../../../../z_lib/ui/validate/data"
 
-// email には技術的な制限はないが、使用可能な最大文字数は定義しておく
-// api の設定と同期させること
-export const EMAIL_MAX_LENGTH = 255
-
 export function resetTokenDestinationBoardConverter(
     value: Readonly<{ type: string; email: string }>,
 ): ConvertResetTokenDestinationResult {

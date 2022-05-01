@@ -1,3 +1,4 @@
+import { test, expect } from "vitest"
 import { setupActionTestRunner } from "../../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../../z_lib/ui/timer/helper"
 import { toApplicationView } from "../../../../../z_vendor/getto-application/action/helper"
@@ -110,6 +111,20 @@ test("submit without fields", async () => {
 })
 
 test("submit without resetToken", async () => {
+    const { view, store } = noResetToken()
+    const action = view.resource
+
+    const runner = setupActionTestRunner(action.subscriber)
+
+    await runner(() => {
+        store.loginId.set(VALID_LOGIN.loginId)
+        store.password.set(VALID_LOGIN.password)
+        return action.submit()
+    }).then((stack) => {
+        expect(stack).toEqual([{ type: "failed-to-reset", err: { type: "empty-reset-token" } }])
+    })
+})
+test("submit with empty resetToken", async () => {
     const { view, store } = emptyResetToken()
     const action = view.resource
 
@@ -198,6 +213,16 @@ function takeLongtime() {
 
     return { clock: clockPubSub, ...view }
 }
+function noResetToken() {
+    const clockPubSub = mockClockPubSub()
+    const clock = mockClock(START_AT, clockPubSub)
+    return initView(
+        noResetToken_URL(),
+        standard_resetRemote(clock),
+        standard_renewRemote(clock, clockPubSub),
+        clock,
+    )
+}
 function emptyResetToken() {
     const clockPubSub = mockClockPubSub()
     const clock = mockClock(START_AT, clockPubSub)
@@ -252,8 +277,11 @@ function initView(
 function standard_URL(): URL {
     return new URL("https://example.com/index.html?-password-reset-token=reset-token")
 }
-function emptyResetToken_URL(): URL {
+function noResetToken_URL(): URL {
     return new URL("https://example.com/index.html")
+}
+function emptyResetToken_URL(): URL {
+    return new URL("https://example.com/index.html?-password-reset-token=")
 }
 
 function standard_ticketRepository(): AuthTicketRepository {

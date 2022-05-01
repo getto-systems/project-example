@@ -1,3 +1,4 @@
+import { test, expect } from "vitest"
 import { setupActionTestRunner } from "../../../../../../z_vendor/getto-application/action/test_helper"
 
 import { mockBoardValueStore } from "../../../../../../z_vendor/getto-application/board/input/test_helper"
@@ -164,5 +165,5 @@ function standard_destination(): ResetTokenDestination {
     return restoreResetTokenDestination({ type: "email", email: "user@example.com" })
 }
 function no_destination(): ResetTokenDestination {
-    return { type: "none" }
+    return restoreResetTokenDestination({ type: "none", email: "" })
 }

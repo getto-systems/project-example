@@ -35,7 +35,7 @@ function devDocs(): readonly MenuTreeNode[] {
             item(docs_avail.title, files, "docs/avail.html"),
             item("ドキュメント", files, "docs/docs.html"),
             item("coverage api", files, "coverage/api/index.html"),
-            item("coverage ui", files, "coverage/ui/lcov-report/index.html"),
+            item("coverage ui", files, "coverage/ui/index.html"),
         ]),
     ]
 }

@@ -1,3 +1,4 @@
+import { test, expect } from "vitest"
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
