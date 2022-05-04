@@ -9,7 +9,7 @@ import { newAuthTicketRepository } from "../../../../../ticket/kernel/init/ticke
 import { newCheckAuthTicketRemote } from "../../../../../ticket/check/init/check_remote"
 import { newResetPasswordRemote } from "./reset_remote"
 
-import { detectResetToken } from "../../../input/convert"
+import { detectResetToken } from "../convert"
 
 import { RemoteOutsideFeature } from "../../../../../../z_lib/ui/remote/feature"
 import { RepositoryOutsideFeature } from "../../../../../../z_lib/ui/repository/feature"

@@ -1,6 +1,6 @@
 import { mockGetScriptPathShell } from "../../../../../sign/get_script_path/init/mock"
 
-import { detectResetToken } from "../../../input/convert"
+import { detectResetToken } from "../convert"
 
 import { ResetPasswordShell } from "../action"
 
