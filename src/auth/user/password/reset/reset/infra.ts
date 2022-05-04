@@ -1,8 +1,7 @@
 import { RemoteResult } from "../../../../../z_lib/ui/remote/infra"
 
 import { AuthTicket } from "../../../../ticket/kernel/data"
-import { ResetPasswordFields, ResetPasswordRemoteError } from "./data"
-import { ResetToken } from "../../input/data"
+import { ResetToken, ResetPasswordFields, ResetPasswordRemoteError } from "./data"
 import { ConvertLocationResult } from "../../../../../z_lib/ui/location/data"
 
 export interface ResetTokenDetecter {

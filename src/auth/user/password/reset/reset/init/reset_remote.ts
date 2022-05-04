@@ -16,8 +16,7 @@ import { convertCheckRemote } from "../../../../../ticket/check/convert"
 import { Clock } from "../../../../../../z_lib/ui/clock/infra"
 import { ResetPasswordRemote, ResetPasswordRemoteResult } from "../infra"
 
-import { ResetToken } from "../../../input/data"
-import { ResetPasswordFields } from "../data"
+import { ResetToken, ResetPasswordFields } from "../data"
 
 export function newResetPasswordRemote(
     feature: RemoteOutsideFeature,
