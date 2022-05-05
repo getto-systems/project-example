@@ -9,6 +9,8 @@ lazy_static! {
     static ref ENV: AuthEnv = AuthEnv::new();
 }
 
+// main
+
 #[tokio::main]
 async fn main() {
     let feature: Arc<AuthAppFeature> = Arc::new(AuthAppFeature::new(&ENV));
