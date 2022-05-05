@@ -8,4 +8,4 @@ run apt-get update && apt-get install -y cmake && \
     rustup component add llvm-tools-preview && \
     ./api/ci/setup-test.sh /usr/local/bin
 
-run cargo llvm-cov
+run RUN_CODE_BUILDER=TRUE cargo llvm-cov
