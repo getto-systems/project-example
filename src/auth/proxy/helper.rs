@@ -1,7 +1,4 @@
-use tonic::{
-    metadata::{errors::InvalidMetadataValue, MetadataValue},
-    Request,
-};
+use tonic::{metadata::errors::InvalidMetadataValue, Request};
 
 use crate::x_content::metadata::{METADATA_NONCE, METADATA_REQUEST_ID, METADATA_TOKEN};
 
@@ -39,13 +36,17 @@ pub async fn set_metadata<T>(
 ) -> Result<(), AuthMetadataError> {
     request.metadata_mut().insert(
         METADATA_REQUEST_ID,
-        MetadataValue::from_str(request_id).map_err(AuthMetadataError::InvalidMetadataValue)?,
+        request_id
+            .try_into()
+            .map_err(AuthMetadataError::InvalidMetadataValue)?,
     );
 
     let nonce = metadata.nonce.ok_or(AuthMetadataError::NonceNotFound)?;
     request.metadata_mut().insert(
         METADATA_NONCE,
-        MetadataValue::from_str(&nonce.extract())
+        nonce
+            .extract()
+            .try_into()
             .map_err(AuthMetadataError::InvalidMetadataValue)?,
     );
 
@@ -53,7 +54,9 @@ pub async fn set_metadata<T>(
     if let Some(token) = metadata.token {
         request.metadata_mut().insert(
             METADATA_TOKEN,
-            MetadataValue::from_str(&token.extract())
+            token
+                .extract()
+                .try_into()
                 .map_err(AuthMetadataError::InvalidMetadataValue)?,
         );
     }
@@ -65,7 +68,8 @@ pub async fn set_metadata<T>(
     {
         request.metadata_mut().insert(
             "authorization",
-            MetadataValue::from_str(&format!("Bearer {}", authorize_token.extract()))
+            format!("Bearer {}", authorize_token.extract())
+                .try_into()
                 .map_err(AuthMetadataError::InvalidMetadataValue)?,
         );
     }
