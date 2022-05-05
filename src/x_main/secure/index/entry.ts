@@ -1,9 +1,20 @@
 import { render, h } from "preact"
 
 import { newForegroundOutsideFeature } from "../../../x_outside_feature/common"
+import { newBaseResource } from "../../../core/base/init/resource"
+import { initBaseView } from "../../../core/base/init"
 
-import { newDashboardView } from "../../../core/dashboard/init/resource"
+import { DashboardPage } from "./page"
 
-import { Dashboard } from "../../../core/dashboard/x_preact/dashboard"
+import { ApplicationView } from "../../../z_vendor/getto-application/action/action"
+import { BaseResource } from "../../../core/base/resource"
 
-render(h(Dashboard, newDashboardView(newForegroundOutsideFeature())), document.body)
+render(h(DashboardPage, props()), document.body)
+
+function props(): ApplicationView<BaseResource> {
+    return initBaseView(newResource(), () => null)
+}
+function newResource() {
+    const feature = newForegroundOutsideFeature()
+    return newBaseResource(feature)
+}
