@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::Mutex};
 
 use crate::auth::user::{
     kernel::data::AuthUserId,
-    login_id::{change::infra::OverrideLoginIdEntry, kernel::data::LoginId},
+    login_id::{change::infra::OverwriteLoginIdEntry, kernel::data::LoginId},
     password::reset::kernel::data::ResetTokenDestination,
 };
 
@@ -29,9 +29,9 @@ impl<'a> MapLoginId<'a> {
         let store = self.store.lock().unwrap();
         store.get(login_id).map(|entry| entry.user_id.clone())
     }
-    pub fn get_override_entry(&self, login_id: &LoginId) -> Option<OverrideLoginIdEntry> {
+    pub fn get_overwrite_entry(&self, login_id: &LoginId) -> Option<OverwriteLoginIdEntry> {
         let store = self.store.lock().unwrap();
-        store.get(login_id).map(|entry| OverrideLoginIdEntry {
+        store.get(login_id).map(|entry| OverwriteLoginIdEntry {
             user_id: entry.user_id.clone(),
             login_id: login_id.clone(),
             reset_token_destination: entry.reset_token_destination.clone(),
@@ -58,7 +58,7 @@ impl<'a> MapLoginId<'a> {
         let mut store = self.store.lock().unwrap();
         store.insert(login_id, entry);
     }
-    pub fn insert_override_entry(&self, login_id: LoginId, user: OverrideLoginIdEntry) {
+    pub fn insert_overwrite_entry(&self, login_id: LoginId, user: OverwriteLoginIdEntry) {
         let mut store = self.store.lock().unwrap();
         store.insert(
             login_id,

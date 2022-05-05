@@ -19,10 +19,10 @@ use crate::auth::user::{
         search::infra::SearchAuthUserAccountRepository,
         unregister::infra::UnregisterAuthUserAccountRepository,
     },
-    login_id::change::infra::{OverrideLoginIdEntry, OverrideLoginIdRepository},
+    login_id::change::infra::{OverwriteLoginIdEntry, OverwriteLoginIdRepository},
     password::{
         authenticate::infra::AuthenticatePasswordRepository,
-        change::infra::{ChangePasswordRepository, OverridePasswordRepository},
+        change::infra::{ChangePasswordRepository, OverwritePasswordRepository},
         kernel::infra::HashedPassword,
         reset::{
             request_token::infra::RegisterResetTokenRepository,
@@ -242,30 +242,30 @@ impl<'a> AuthenticatePasswordRepository for MemoryAuthUserRepository<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> OverrideLoginIdRepository for MemoryAuthUserRepository<'a> {
+impl<'a> OverwriteLoginIdRepository for MemoryAuthUserRepository<'a> {
     async fn lookup_user(
         &self,
         login_id: &LoginId,
-    ) -> Result<Option<OverrideLoginIdEntry>, RepositoryError> {
-        Ok(self.login_id.get_override_entry(login_id))
+    ) -> Result<Option<OverwriteLoginIdEntry>, RepositoryError> {
+        Ok(self.login_id.get_overwrite_entry(login_id))
     }
 
     async fn check_login_id_registered(&self, login_id: &LoginId) -> Result<bool, RepositoryError> {
         Ok(self.login_id.get_user_id(login_id).is_some())
     }
 
-    async fn override_login_id(
+    async fn overwrite_login_id(
         &self,
         new_login_id: LoginId,
-        user: OverrideLoginIdEntry,
+        user: OverwriteLoginIdEntry,
     ) -> Result<(), RepositoryError> {
-        override_login_id(self, new_login_id, user)
+        overwrite_login_id(self, new_login_id, user)
     }
 }
-fn override_login_id<'a>(
+fn overwrite_login_id<'a>(
     repository: &MemoryAuthUserRepository<'a>,
     new_login_id: LoginId,
-    user: OverrideLoginIdEntry,
+    user: OverwriteLoginIdEntry,
 ) -> Result<(), RepositoryError> {
     repository
         .user
@@ -274,7 +274,7 @@ fn override_login_id<'a>(
     repository.login_id.remove_entry(&user.login_id);
     repository
         .login_id
-        .insert_override_entry(new_login_id, user);
+        .insert_overwrite_entry(new_login_id, user);
 
     Ok(())
 }
@@ -298,7 +298,7 @@ impl<'a> ChangePasswordRepository for MemoryAuthUserRepository<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> OverridePasswordRepository for MemoryAuthUserRepository<'a> {
+impl<'a> OverwritePasswordRepository for MemoryAuthUserRepository<'a> {
     async fn lookup_user_id(
         &self,
         login_id: &LoginId,
@@ -306,7 +306,7 @@ impl<'a> OverridePasswordRepository for MemoryAuthUserRepository<'a> {
         Ok(self.login_id.get_user_id(login_id))
     }
 
-    async fn override_password(
+    async fn overwrite_password(
         &self,
         user_id: AuthUserId,
         new_password: HashedPassword,

@@ -53,7 +53,7 @@ test("update multiple value", () => {
         "https://example.com/?key=search-1&key=search-2",
     )
 })
-test("update multiple value; override", () => {
+test("update multiple value; overwrite", () => {
     const url = new URL("https://example.com/?key=original-1&key=original-2")
     expect(updateMultipleValueFilter(url, "key", ["search-1", "search-2"]).toString()).toEqual(
         "https://example.com/?key=search-1&key=search-2",

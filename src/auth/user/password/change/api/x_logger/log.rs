@@ -1,11 +1,11 @@
 use super::super::action::{
-    ChangePasswordEvent, ChangePasswordState, OverridePasswordEvent, OverridePasswordState,
+    ChangePasswordEvent, ChangePasswordState, OverwritePasswordEvent, OverwritePasswordState,
 };
 
 use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
 
 use crate::auth::user::password::change::data::{
-    ValidateChangePasswordFieldsError, ValidateOverridePasswordFieldsError,
+    ValidateChangePasswordFieldsError, ValidateOverwritePasswordFieldsError,
 };
 
 impl LogMessage for ChangePasswordState {
@@ -45,22 +45,22 @@ impl LogFilter for ValidateChangePasswordFieldsError {
     }
 }
 
-impl LogMessage for OverridePasswordState {
+impl LogMessage for OverwritePasswordState {
     fn log_message(&self) -> String {
         format!("{}", self)
     }
 }
 
-impl LogFilter for OverridePasswordState {
+impl LogFilter for OverwritePasswordState {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::Authenticate(event) => event.log_level(),
-            Self::Override(event) => event.log_level(),
+            Self::Overwrite(event) => event.log_level(),
         }
     }
 }
 
-impl LogFilter for OverridePasswordEvent {
+impl LogFilter for OverwritePasswordEvent {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::Success => LogLevel::Audit,
@@ -72,7 +72,7 @@ impl LogFilter for OverridePasswordEvent {
     }
 }
 
-impl LogFilter for ValidateOverridePasswordFieldsError {
+impl LogFilter for ValidateOverwritePasswordFieldsError {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::InvalidLoginId(_) => LogLevel::Error,

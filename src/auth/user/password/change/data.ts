@@ -6,7 +6,7 @@ export type ChangePasswordFields = Readonly<{
     newPassword: Password
 }>
 
-export type OverridePasswordFields = Readonly<{
+export type OverwritePasswordFields = Readonly<{
     newPassword: Password
 }>
 

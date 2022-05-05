@@ -6,9 +6,9 @@ import { newForegroundOutsideFeature } from "../../../../../x_outside_feature/co
 import { newBaseResource } from "../../../../../core/base/init/resource"
 import { newRegisterAuthUserAccountAction } from "../../../../../auth/user/account/register/init/resource"
 import { initEditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
-import { newOverridePasswordAction } from "../../../../../auth/user/password/change/init/resource"
+import { newOverwritePasswordAction } from "../../../../../auth/user/password/change/init/resource"
 import { newSearchSidebarAction } from "../../../../../z_lib/ui/search/sidebar/init/resource"
-import { newOverrideLoginIdAction } from "../../../../../auth/user/login_id/change/init/resource"
+import { newOverwriteLoginIdAction } from "../../../../../auth/user/login_id/change/init/resource"
 import { newModifyAuthUserAccountAction } from "../../../../../auth/user/account/modify/init/resource"
 import { newChangeResetTokenDestinationAction } from "../../../../../auth/user/password/reset/token_destination/change/init/resource"
 import { newUnregisterAuthUserAccountAction } from "../../../../../auth/user/account/unregister/init/resource"
@@ -37,13 +37,13 @@ function newResource() {
             editable: initEditableBoardAction(),
             change: newChangeResetTokenDestinationAction(feature),
         },
-        overrideLoginId: {
+        overwriteLoginId: {
             editable: initEditableBoardAction(),
-            override: newOverrideLoginIdAction(feature),
+            overwrite: newOverwriteLoginIdAction(feature),
         },
-        overridePassword: {
+        overwritePassword: {
             editable: initEditableBoardAction(),
-            override: newOverridePasswordAction(feature),
+            overwrite: newOverwritePasswordAction(feature),
         },
         unregister: {
             editable: initEditableBoardAction(),

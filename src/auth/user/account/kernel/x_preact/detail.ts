@@ -4,14 +4,14 @@ import { html } from "htm/preact"
 import { container } from "../../../../../z_vendor/getto-css/preact/design/box"
 
 import { ModifyAuthUserAccount } from "../../modify/x_preact/modify"
-import { OverrideLoginId } from "../../../login_id/change/x_preact/override_login_id"
-import { OverridePassword } from "../../../password/change/x_preact/override_password"
+import { OverwriteLoginId } from "../../../login_id/change/x_preact/overwrite_login_id"
+import { OverwritePassword } from "../../../password/change/x_preact/overwrite_password"
 import { ChangeResetTokenDestination } from "../../../password/reset/token_destination/change/x_preact/change"
 import { UnregisterAuthUserAccount } from "../../unregister/x_preact/unregister"
 
 import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
-import { OverrideLoginIdAction } from "../../../login_id/change/action"
-import { OverridePasswordAction } from "../../../password/change/action"
+import { OverwriteLoginIdAction } from "../../../login_id/change/action"
+import { OverwritePasswordAction } from "../../../password/change/action"
 import { ModifyAuthUserAccountAction } from "../../modify/action"
 import { ChangeResetTokenDestinationAction } from "../../../password/reset/token_destination/change/action"
 import { UnregisterAuthUserAccountAction } from "../../unregister/action"
@@ -28,13 +28,13 @@ export type DetailAuthUserAccountActions = Readonly<{
         editable: EditableBoardAction
         change: ChangeResetTokenDestinationAction
     }>
-    overrideLoginId: Readonly<{
+    overwriteLoginId: Readonly<{
         editable: EditableBoardAction
-        override: OverrideLoginIdAction
+        overwrite: OverwriteLoginIdAction
     }>
-    overridePassword: Readonly<{
+    overwritePassword: Readonly<{
         editable: EditableBoardAction
-        override: OverridePasswordAction
+        overwrite: OverwritePasswordAction
     }>
     unregister: Readonly<{
         editable: EditableBoardAction
@@ -68,14 +68,14 @@ export function DetailAuthUserAccount(props: Props): VNode {
             }),
         ]),
         container([
-            h(OverrideLoginId, {
-                ...props.overrideLoginId,
+            h(OverwriteLoginId, {
+                ...props.overwriteLoginId,
                 user,
                 onSuccess: (loginId) => {
                     props.onModify(user.loginId, { ...user, loginId })
                 },
             }),
-            h(OverridePassword, { ...props.overridePassword, user }),
+            h(OverwritePassword, { ...props.overwritePassword, user }),
         ]),
         container([
             h(UnregisterAuthUserAccount, {

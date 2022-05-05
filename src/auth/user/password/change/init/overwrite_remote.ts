@@ -11,19 +11,19 @@ import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf
 
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 
-import { ChangePasswordRemoteResult, OverridePasswordRemote } from "../infra"
+import { ChangePasswordRemoteResult, OverwritePasswordRemote } from "../infra"
 
-import { OverridePasswordFields } from "../data"
+import { OverwritePasswordFields } from "../data"
 import { LoginId } from "../../../login_id/kernel/data"
 
-export function newOverridePasswordRemote(feature: RemoteOutsideFeature): OverridePasswordRemote {
+export function newOverwritePasswordRemote(feature: RemoteOutsideFeature): OverwritePasswordRemote {
     return (user, fields) => fetchRemote(feature, user, fields)
 }
 
 async function fetchRemote(
     feature: RemoteOutsideFeature,
     user: Readonly<{ loginId: LoginId }>,
-    fields: OverridePasswordFields,
+    fields: OverwritePasswordFields,
 ): Promise<ChangePasswordRemoteResult> {
     try {
         const mock = false
@@ -36,14 +36,14 @@ async function fetchRemote(
 
         const opts = fetchOptions({
             serverURL: env.apiServerURL,
-            path: "/auth/user/password/override",
+            path: "/auth/user/password/overwrite",
             method: "PATCH",
             headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
         })
         const response = await fetch(opts.url, {
             ...opts.options,
             body: encodeProtobuf(
-                pb.auth.user.password.change.service.OverridePasswordRequestPb,
+                pb.auth.user.password.change.service.OverwritePasswordRequestPb,
                 (message) => {
                     message.loginId = user.loginId
                     message.newPassword = fields.newPassword

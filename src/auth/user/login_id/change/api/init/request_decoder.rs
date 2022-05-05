@@ -1,22 +1,22 @@
-use crate::auth::user::login_id::change::y_protobuf::service::OverrideLoginIdRequestPb;
+use crate::auth::user::login_id::change::y_protobuf::service::OverwriteLoginIdRequestPb;
 
 use crate::auth::user::login_id::change::infra::{
-    OverrideLoginIdFieldsExtract, OverrideLoginIdRequestDecoder,
+    OverwriteLoginIdFieldsExtract, OverwriteLoginIdRequestDecoder,
 };
 
-pub struct PbOverrideLoginIdRequestDecoder {
-    request: OverrideLoginIdRequestPb,
+pub struct PbOverwriteLoginIdRequestDecoder {
+    request: OverwriteLoginIdRequestPb,
 }
 
-impl PbOverrideLoginIdRequestDecoder {
-    pub const fn new(request: OverrideLoginIdRequestPb) -> Self {
+impl PbOverwriteLoginIdRequestDecoder {
+    pub const fn new(request: OverwriteLoginIdRequestPb) -> Self {
         Self { request }
     }
 }
 
-impl OverrideLoginIdRequestDecoder for PbOverrideLoginIdRequestDecoder {
-    fn decode(self) -> OverrideLoginIdFieldsExtract {
-        OverrideLoginIdFieldsExtract {
+impl OverwriteLoginIdRequestDecoder for PbOverwriteLoginIdRequestDecoder {
+    fn decode(self) -> OverwriteLoginIdFieldsExtract {
+        OverwriteLoginIdFieldsExtract {
             login_id: self.request.login_id,
             new_login_id: self.request.new_login_id,
         }
@@ -26,15 +26,15 @@ impl OverrideLoginIdRequestDecoder for PbOverrideLoginIdRequestDecoder {
 #[cfg(test)]
 pub mod test {
     use crate::auth::user::login_id::change::infra::{
-        OverrideLoginIdFieldsExtract, OverrideLoginIdRequestDecoder,
+        OverwriteLoginIdFieldsExtract, OverwriteLoginIdRequestDecoder,
     };
 
-    pub enum StaticOverrideLoginIdRequestDecoder {
-        Valid(OverrideLoginIdFieldsExtract),
+    pub enum StaticOverwriteLoginIdRequestDecoder {
+        Valid(OverwriteLoginIdFieldsExtract),
     }
 
-    impl OverrideLoginIdRequestDecoder for StaticOverrideLoginIdRequestDecoder {
-        fn decode(self) -> OverrideLoginIdFieldsExtract {
+    impl OverwriteLoginIdRequestDecoder for StaticOverwriteLoginIdRequestDecoder {
+        fn decode(self) -> OverwriteLoginIdFieldsExtract {
             match self {
                 Self::Valid(fields) => fields,
             }

@@ -19,16 +19,16 @@ pub struct ChangePasswordFieldsExtract {
     pub new_password: String,
 }
 
-pub trait OverridePasswordRequestDecoder {
-    fn decode(self) -> OverridePasswordFieldsExtract;
+pub trait OverwritePasswordRequestDecoder {
+    fn decode(self) -> OverwritePasswordFieldsExtract;
 }
 
-pub struct OverridePasswordFields {
+pub struct OverwritePasswordFields {
     pub login_id: LoginId,
     pub new_password: PlainPassword,
 }
 
-pub struct OverridePasswordFieldsExtract {
+pub struct OverwritePasswordFieldsExtract {
     pub login_id: String,
     pub new_password: String,
 }
@@ -48,13 +48,13 @@ pub trait ChangePasswordRepository {
 }
 
 #[async_trait::async_trait]
-pub trait OverridePasswordRepository {
+pub trait OverwritePasswordRepository {
     async fn lookup_user_id(
         &self,
         login_id: &LoginId,
     ) -> Result<Option<AuthUserId>, RepositoryError>;
 
-    async fn override_password(
+    async fn overwrite_password(
         &self,
         user_id: AuthUserId,
         new_password: HashedPassword,

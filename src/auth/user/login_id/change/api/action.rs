@@ -1,50 +1,48 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::ticket::validate::method::{
-    authenticate, AuthenticateEvent, AuthenticateInfra,
-};
+use crate::auth::ticket::validate::method::{authenticate, AuthenticateEvent, AuthenticateInfra};
 
 use crate::auth::user::login_id::change::infra::{
-    OverrideLoginIdFields, OverrideLoginIdFieldsExtract, OverrideLoginIdRepository,
-    OverrideLoginIdRequestDecoder,
+    OverwriteLoginIdFields, OverwriteLoginIdFieldsExtract, OverwriteLoginIdRepository,
+    OverwriteLoginIdRequestDecoder,
 };
 
 use crate::{
-    auth::user::login_id::change::data::ValidateOverrideLoginIdFieldsError,
+    auth::user::login_id::change::data::ValidateOverwriteLoginIdFieldsError,
     z_lib::repository::data::RepositoryError,
 };
 
-pub enum OverrideLoginIdState {
+pub enum OverwriteLoginIdState {
     Authenticate(AuthenticateEvent),
-    Override(OverrideLoginIdEvent),
+    Overwrite(OverwriteLoginIdEvent),
 }
 
-impl std::fmt::Display for OverrideLoginIdState {
+impl std::fmt::Display for OverwriteLoginIdState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Authenticate(event) => event.fmt(f),
-            Self::Override(event) => event.fmt(f),
+            Self::Overwrite(event) => event.fmt(f),
         }
     }
 }
 
-pub trait OverrideLoginIdMaterial {
+pub trait OverwriteLoginIdMaterial {
     type Authenticate: AuthenticateInfra;
 
-    type LoginIdRepository: OverrideLoginIdRepository;
+    type LoginIdRepository: OverwriteLoginIdRepository;
 
     fn authenticate(&self) -> &Self::Authenticate;
 
     fn login_id_repository(&self) -> &Self::LoginIdRepository;
 }
 
-pub struct OverrideLoginIdAction<R: OverrideLoginIdRequestDecoder, M: OverrideLoginIdMaterial> {
-    pubsub: ActionStatePubSub<OverrideLoginIdState>,
+pub struct OverwriteLoginIdAction<R: OverwriteLoginIdRequestDecoder, M: OverwriteLoginIdMaterial> {
+    pubsub: ActionStatePubSub<OverwriteLoginIdState>,
     request_decoder: R,
     material: M,
 }
 
-impl<R: OverrideLoginIdRequestDecoder, M: OverrideLoginIdMaterial> OverrideLoginIdAction<R, M> {
+impl<R: OverwriteLoginIdRequestDecoder, M: OverwriteLoginIdMaterial> OverwriteLoginIdAction<R, M> {
     pub fn with_material(request_decoder: R, material: M) -> Self {
         Self {
             pubsub: ActionStatePubSub::new(),
@@ -53,43 +51,43 @@ impl<R: OverrideLoginIdRequestDecoder, M: OverrideLoginIdMaterial> OverrideLogin
         }
     }
 
-    pub fn subscribe(&mut self, handler: impl 'static + Fn(&OverrideLoginIdState) + Send + Sync) {
+    pub fn subscribe(&mut self, handler: impl 'static + Fn(&OverwriteLoginIdState) + Send + Sync) {
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<OverrideLoginIdState> {
+    pub async fn ignite(self) -> MethodResult<OverwriteLoginIdState> {
         let pubsub = self.pubsub;
         let m = self.material;
 
         let fields = self.request_decoder.decode();
 
         authenticate(m.authenticate(), |event| {
-            pubsub.post(OverrideLoginIdState::Authenticate(event))
+            pubsub.post(OverwriteLoginIdState::Authenticate(event))
         })
         .await?;
 
-        override_login_id(&m, fields, |event| {
-            pubsub.post(OverrideLoginIdState::Override(event))
+        overwrite_login_id(&m, fields, |event| {
+            pubsub.post(OverwriteLoginIdState::Overwrite(event))
         })
         .await
     }
 }
 
-pub enum OverrideLoginIdEvent {
+pub enum OverwriteLoginIdEvent {
     Success,
-    Invalid(ValidateOverrideLoginIdFieldsError),
+    Invalid(ValidateOverwriteLoginIdFieldsError),
     NotFound,
     AlreadyRegistered,
     RepositoryError(RepositoryError),
 }
 
-mod override_login_id_event {
-    use super::OverrideLoginIdEvent;
+mod overwrite_login_id_event {
+    use super::OverwriteLoginIdEvent;
 
-    const SUCCESS: &'static str = "override login-id success";
-    const ERROR: &'static str = "override login-id error";
+    const SUCCESS: &'static str = "overwrite login-id success";
+    const ERROR: &'static str = "overwrite login-id error";
 
-    impl std::fmt::Display for OverrideLoginIdEvent {
+    impl std::fmt::Display for OverwriteLoginIdEvent {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
                 Self::Success => write!(f, "{}", SUCCESS),
@@ -104,34 +102,34 @@ mod override_login_id_event {
     }
 }
 
-async fn override_login_id<S>(
-    infra: &impl OverrideLoginIdMaterial,
-    fields: OverrideLoginIdFieldsExtract,
-    post: impl Fn(OverrideLoginIdEvent) -> S,
+async fn overwrite_login_id<S>(
+    infra: &impl OverwriteLoginIdMaterial,
+    fields: OverwriteLoginIdFieldsExtract,
+    post: impl Fn(OverwriteLoginIdEvent) -> S,
 ) -> MethodResult<S> {
-    let fields = OverrideLoginIdFields::convert(fields)
-        .map_err(|err| post(OverrideLoginIdEvent::Invalid(err)))?;
+    let fields = OverwriteLoginIdFields::convert(fields)
+        .map_err(|err| post(OverwriteLoginIdEvent::Invalid(err)))?;
 
     let login_id_repository = infra.login_id_repository();
 
     if login_id_repository
         .check_login_id_registered(&fields.new_login_id)
         .await
-        .map_err(|err| post(OverrideLoginIdEvent::RepositoryError(err)))?
+        .map_err(|err| post(OverwriteLoginIdEvent::RepositoryError(err)))?
     {
-        return Err(post(OverrideLoginIdEvent::AlreadyRegistered));
+        return Err(post(OverwriteLoginIdEvent::AlreadyRegistered));
     }
 
     let user = login_id_repository
         .lookup_user(&fields.login_id)
         .await
-        .map_err(|err| post(OverrideLoginIdEvent::RepositoryError(err)))?
-        .ok_or_else(|| post(OverrideLoginIdEvent::NotFound))?;
+        .map_err(|err| post(OverwriteLoginIdEvent::RepositoryError(err)))?
+        .ok_or_else(|| post(OverwriteLoginIdEvent::NotFound))?;
 
     login_id_repository
-        .override_login_id(fields.new_login_id, user)
+        .overwrite_login_id(fields.new_login_id, user)
         .await
-        .map_err(|err| post(OverrideLoginIdEvent::RepositoryError(err)))?;
+        .map_err(|err| post(OverwriteLoginIdEvent::RepositoryError(err)))?;
 
-    Ok(post(OverrideLoginIdEvent::Success))
+    Ok(post(OverwriteLoginIdEvent::Success))
 }

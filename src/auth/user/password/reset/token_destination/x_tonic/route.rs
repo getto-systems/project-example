@@ -5,9 +5,7 @@ use crate::auth::user::password::reset::token_destination::change::x_tonic::rout
 pub struct TokenDestinationServer;
 
 impl TokenDestinationServer {
-    pub fn change_destination(
-        &self,
-    ) -> ChangeResetTokenDestinationPbServer<ServiceChangeDestination> {
+    pub fn change(&self) -> ChangeResetTokenDestinationPbServer<ServiceChangeDestination> {
         ChangeResetTokenDestinationPbServer::new(ServiceChangeDestination)
     }
 }

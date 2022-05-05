@@ -17,20 +17,20 @@ use crate::auth::{
     user::{
         kernel::init::user_repository::memory::{MemoryAuthUserRepository, MemoryAuthUserStore},
         password::{
-            change::init::request_decoder::test::StaticOverridePasswordRequestDecoder,
+            change::init::request_decoder::test::StaticOverwritePasswordRequestDecoder,
             kernel::init::password_hasher::test::PlainPasswordHasher,
         },
     },
 };
 
 use crate::auth::user::password::change::action::{
-    OverridePasswordAction, OverridePasswordMaterial,
+    OverwritePasswordAction, OverwritePasswordMaterial,
 };
 
 use crate::auth::ticket::validate::method::AuthNonceConfig;
 
 use crate::auth::user::password::{
-    change::infra::OverridePasswordFieldsExtract, kernel::infra::HashedPassword,
+    change::infra::OverwritePasswordFieldsExtract, kernel::infra::HashedPassword,
 };
 
 use crate::auth::{
@@ -42,14 +42,14 @@ use crate::auth::{
 };
 
 #[tokio::test]
-async fn success_override() {
+async fn success_overwrite() {
     let (handler, assert_state) = ActionTestRunner::new();
 
     let store = TestStore::new();
     let material = TestStruct::standard(&store);
     let request_decoder = standard_request_decoder();
 
-    let mut action = OverridePasswordAction::with_material(request_decoder, material);
+    let mut action = OverwritePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -57,7 +57,7 @@ async fn success_override() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override password success",
+        "overwrite password success",
     ]);
     assert!(result.is_ok());
 }
@@ -70,7 +70,7 @@ async fn error_empty_password() {
     let material = TestStruct::standard(&store);
     let request_decoder = empty_password_request_decoder();
 
-    let mut action = OverridePasswordAction::with_material(request_decoder, material);
+    let mut action = OverwritePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -78,7 +78,7 @@ async fn error_empty_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override password error; invalid; new-password: empty",
+        "overwrite password error; invalid; new-password: empty",
     ]);
     assert!(result.is_err());
 }
@@ -91,7 +91,7 @@ async fn error_too_long_password() {
     let material = TestStruct::standard(&store);
     let request_decoder = too_long_password_request_decoder();
 
-    let mut action = OverridePasswordAction::with_material(request_decoder, material);
+    let mut action = OverwritePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -99,7 +99,7 @@ async fn error_too_long_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override password error; invalid; new-password: too long",
+        "overwrite password error; invalid; new-password: too long",
     ]);
     assert!(result.is_err());
 }
@@ -112,7 +112,7 @@ async fn just_max_length_password() {
     let material = TestStruct::standard(&store);
     let request_decoder = just_max_length_password_request_decoder();
 
-    let mut action = OverridePasswordAction::with_material(request_decoder, material);
+    let mut action = OverwritePasswordAction::with_material(request_decoder, material);
     action.subscribe(handler);
 
     let result = action.ignite().await;
@@ -120,7 +120,7 @@ async fn just_max_length_password() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
-        "override password success",
+        "overwrite password success",
     ]);
     assert!(result.is_ok());
 }
@@ -130,7 +130,7 @@ struct TestStruct<'a> {
     password_repository: MemoryAuthUserRepository<'a>,
 }
 
-impl<'a> OverridePasswordMaterial for TestStruct<'a> {
+impl<'a> OverwritePasswordMaterial for TestStruct<'a> {
     type Authenticate = StaticAuthenticateStruct<'a>;
 
     type PasswordRepository = MemoryAuthUserRepository<'a>;
@@ -210,26 +210,26 @@ const USER_ID: &'static str = "user-id";
 const LOGIN_ID: &'static str = "login-id";
 const PASSWORD: &'static str = "current-password";
 
-fn standard_request_decoder() -> StaticOverridePasswordRequestDecoder {
-    StaticOverridePasswordRequestDecoder::Valid(OverridePasswordFieldsExtract {
+fn standard_request_decoder() -> StaticOverwritePasswordRequestDecoder {
+    StaticOverwritePasswordRequestDecoder::Valid(OverwritePasswordFieldsExtract {
         login_id: LOGIN_ID.into(),
         new_password: "new-password".into(),
     })
 }
-fn empty_password_request_decoder() -> StaticOverridePasswordRequestDecoder {
-    StaticOverridePasswordRequestDecoder::Valid(OverridePasswordFieldsExtract {
+fn empty_password_request_decoder() -> StaticOverwritePasswordRequestDecoder {
+    StaticOverwritePasswordRequestDecoder::Valid(OverwritePasswordFieldsExtract {
         login_id: LOGIN_ID.into(),
         new_password: "".into(),
     })
 }
-fn too_long_password_request_decoder() -> StaticOverridePasswordRequestDecoder {
-    StaticOverridePasswordRequestDecoder::Valid(OverridePasswordFieldsExtract {
+fn too_long_password_request_decoder() -> StaticOverwritePasswordRequestDecoder {
+    StaticOverwritePasswordRequestDecoder::Valid(OverwritePasswordFieldsExtract {
         login_id: LOGIN_ID.into(),
         new_password: vec!["a"; 100 + 1].join(""),
     })
 }
-fn just_max_length_password_request_decoder() -> StaticOverridePasswordRequestDecoder {
-    StaticOverridePasswordRequestDecoder::Valid(OverridePasswordFieldsExtract {
+fn just_max_length_password_request_decoder() -> StaticOverwritePasswordRequestDecoder {
+    StaticOverwritePasswordRequestDecoder::Valid(OverwritePasswordFieldsExtract {
         login_id: LOGIN_ID.into(),
         new_password: vec!["a"; 100].join(""),
     })

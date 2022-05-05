@@ -1,4 +1,4 @@
-mod override_login_id;
+mod overwrite_login_id;
 
 use actix_web::HttpRequest;
 
@@ -6,17 +6,17 @@ use crate::auth::x_outside_feature::feature::AuthProxyOutsideFeature;
 
 use crate::auth::{
     ticket::validate::init::ValidateApiMetadataStruct,
-    user::login_id::change::proxy::init::override_login_id::OverrideLoginIdProxyService,
+    user::login_id::change::proxy::init::overwrite_login_id::OverwriteLoginIdProxyService,
 };
 
 use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
 
-pub struct OverrideLoginIdProxyStruct<'a> {
+pub struct OverwriteLoginIdProxyStruct<'a> {
     validate: ValidateApiMetadataStruct<'a>,
-    proxy_service: OverrideLoginIdProxyService<'a>,
+    proxy_service: OverwriteLoginIdProxyService<'a>,
 }
 
-impl<'a> OverrideLoginIdProxyStruct<'a> {
+impl<'a> OverwriteLoginIdProxyStruct<'a> {
     pub fn action(
         feature: &'a AuthProxyOutsideFeature,
         request_id: &'a str,
@@ -25,15 +25,15 @@ impl<'a> OverrideLoginIdProxyStruct<'a> {
     ) -> AuthProxyAction<Self> {
         AuthProxyAction::with_material(Self {
             validate: ValidateApiMetadataStruct::new(&feature.decoding_key, request),
-            proxy_service: OverrideLoginIdProxyService::new(&feature.service, request_id, body),
+            proxy_service: OverwriteLoginIdProxyService::new(&feature.service, request_id, body),
         })
     }
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthProxyMaterial for OverrideLoginIdProxyStruct<'a> {
+impl<'a> AuthProxyMaterial for OverwriteLoginIdProxyStruct<'a> {
     type Validate = ValidateApiMetadataStruct<'a>;
-    type ProxyService = OverrideLoginIdProxyService<'a>;
+    type ProxyService = OverwriteLoginIdProxyService<'a>;
 
     fn extract(self) -> (Self::Validate, Self::ProxyService) {
         (self.validate, self.proxy_service)

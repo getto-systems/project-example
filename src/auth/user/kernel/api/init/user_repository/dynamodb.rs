@@ -19,10 +19,10 @@ use crate::auth::user::{
         search::infra::SearchAuthUserAccountRepository,
         unregister::infra::UnregisterAuthUserAccountRepository,
     },
-    login_id::change::infra::{OverrideLoginIdEntry, OverrideLoginIdRepository},
+    login_id::change::infra::{OverwriteLoginIdEntry, OverwriteLoginIdRepository},
     password::{
         authenticate::infra::AuthenticatePasswordRepository,
-        change::infra::{ChangePasswordRepository, OverridePasswordRepository},
+        change::infra::{ChangePasswordRepository, OverwritePasswordRepository},
         kernel::infra::HashedPassword,
         reset::{
             request_token::infra::RegisterResetTokenRepository,
@@ -90,12 +90,12 @@ impl<'a> AuthenticatePasswordRepository for DynamoDbAuthUserRepository<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> OverrideLoginIdRepository for DynamoDbAuthUserRepository<'a> {
+impl<'a> OverwriteLoginIdRepository for DynamoDbAuthUserRepository<'a> {
     async fn lookup_user(
         &self,
         login_id: &LoginId,
-    ) -> Result<Option<OverrideLoginIdEntry>, RepositoryError> {
-        self.login_id.get_override_entry(login_id.clone()).await
+    ) -> Result<Option<OverwriteLoginIdEntry>, RepositoryError> {
+        self.login_id.get_overwrite_entry(login_id.clone()).await
     }
 
     async fn check_login_id_registered(&self, login_id: &LoginId) -> Result<bool, RepositoryError> {
@@ -104,17 +104,17 @@ impl<'a> OverrideLoginIdRepository for DynamoDbAuthUserRepository<'a> {
             .await
     }
 
-    async fn override_login_id(
+    async fn overwrite_login_id(
         &self,
         new_login_id: LoginId,
-        user: OverrideLoginIdEntry,
+        user: OverwriteLoginIdEntry,
     ) -> Result<(), RepositoryError> {
         self.user
             .update_login_id(user.user_id.clone(), new_login_id.clone())
             .await?;
 
         self.login_id.delete_entry(user.login_id.clone()).await?;
-        self.login_id.put_override_entry(new_login_id, user).await?;
+        self.login_id.put_overwrite_entry(new_login_id, user).await?;
 
         Ok(())
     }
@@ -139,7 +139,7 @@ impl<'a> ChangePasswordRepository for DynamoDbAuthUserRepository<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> OverridePasswordRepository for DynamoDbAuthUserRepository<'a> {
+impl<'a> OverwritePasswordRepository for DynamoDbAuthUserRepository<'a> {
     async fn lookup_user_id(
         &self,
         login_id: &LoginId,
@@ -147,7 +147,7 @@ impl<'a> OverridePasswordRepository for DynamoDbAuthUserRepository<'a> {
         self.login_id.get_user_id(login_id.clone()).await
     }
 
-    async fn override_password(
+    async fn overwrite_password(
         &self,
         user_id: AuthUserId,
         new_password: HashedPassword,

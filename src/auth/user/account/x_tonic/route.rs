@@ -16,13 +16,13 @@ impl AccountServer {
     pub fn search(&self) -> SearchAuthUserAccountPbServer<ServiceSearch> {
         SearchAuthUserAccountPbServer::new(ServiceSearch)
     }
-    pub fn modify_user(&self) -> ModifyAuthUserAccountPbServer<ServiceModifyUser> {
+    pub fn modify(&self) -> ModifyAuthUserAccountPbServer<ServiceModifyUser> {
         ModifyAuthUserAccountPbServer::new(ServiceModifyUser)
     }
-    pub fn register_user(&self) -> RegisterAuthUserAccountPbServer<ServiceRegisterUser> {
+    pub fn register(&self) -> RegisterAuthUserAccountPbServer<ServiceRegisterUser> {
         RegisterAuthUserAccountPbServer::new(ServiceRegisterUser)
     }
-    pub fn unregister_user(&self) -> UnregisterAuthUserAccountPbServer<ServiceUnregisterUser> {
+    pub fn unregister(&self) -> UnregisterAuthUserAccountPbServer<ServiceUnregisterUser> {
         UnregisterAuthUserAccountPbServer::new(ServiceUnregisterUser)
     }
 }

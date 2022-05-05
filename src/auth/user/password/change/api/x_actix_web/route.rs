@@ -3,7 +3,7 @@ use actix_web::{patch, web::Data, HttpRequest, Responder};
 use getto_application::helper::flatten;
 
 use crate::{
-    auth::user::password::change::proxy::init::OverridePasswordProxyStruct,
+    auth::user::password::change::proxy::init::OverwritePasswordProxyStruct,
     x_outside_feature::proxy::{
         feature::ProxyAppFeature,
         logger::{app_logger, generate_request_id},
@@ -29,8 +29,8 @@ pub async fn service_change_password(
     flatten(action.ignite().await).respond_to()
 }
 
-#[patch("/override")]
-pub async fn service_override_password(
+#[patch("/overwrite")]
+pub async fn service_overwrite_password(
     feature: Data<ProxyAppFeature>,
     request: HttpRequest,
     body: String,
@@ -39,7 +39,7 @@ pub async fn service_override_password(
     let logger = app_logger(request_id.clone(), &request);
 
     let mut action =
-        OverridePasswordProxyStruct::action(&feature.auth, &request_id, &request, body);
+        OverwritePasswordProxyStruct::action(&feature.auth, &request_id, &request, body);
     action.subscribe(move |state| logger.log(state));
 
     flatten(action.ignite().await).respond_to()

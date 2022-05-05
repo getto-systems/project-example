@@ -14,10 +14,10 @@ import {
 
 import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
 
-import { ChangePasswordRemote, OverridePasswordRemote } from "./infra"
+import { ChangePasswordRemote, OverwritePasswordRemote } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
 
-import { ChangePasswordError, ChangePasswordFields, OverridePasswordFields } from "./data"
+import { ChangePasswordError, ChangePasswordFields, OverwritePasswordFields } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { LoginId } from "../../login_id/kernel/data"
 
@@ -35,18 +35,18 @@ export type ChangePasswordState = Readonly<{ type: "initial" }> | ChangePassword
 
 const initialState: ChangePasswordState = { type: "initial" }
 
-export interface OverridePasswordAction extends StatefulApplicationAction<OverridePasswordState> {
+export interface OverwritePasswordAction extends StatefulApplicationAction<OverwritePasswordState> {
     readonly newPassword: InputPasswordAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    clear(): OverridePasswordState
-    submit(user: Readonly<{ loginId: LoginId }>): Promise<OverridePasswordState>
+    clear(): OverwritePasswordState
+    submit(user: Readonly<{ loginId: LoginId }>): Promise<OverwritePasswordState>
 }
 
-export type OverridePasswordState = Readonly<{ type: "initial" }> | OverridePasswordEvent
+export type OverwritePasswordState = Readonly<{ type: "initial" }> | OverwritePasswordEvent
 
-const initialOverrideState: OverridePasswordState = { type: "initial" }
+const initialOverwriteState: OverwritePasswordState = { type: "initial" }
 
 export type ChangePasswordMaterial = Readonly<{
     infra: ChangePasswordInfra
@@ -172,39 +172,39 @@ async function changePassword<S>(
     return post({ type: "success" })
 }
 
-export type OverridePasswordMaterial = Readonly<{
-    infra: OverridePasswordInfra
-    config: OverridePasswordConfig
+export type OverwritePasswordMaterial = Readonly<{
+    infra: OverwritePasswordInfra
+    config: OverwritePasswordConfig
 }>
 
-export type OverridePasswordInfra = Readonly<{
-    overridePasswordRemote: OverridePasswordRemote
+export type OverwritePasswordInfra = Readonly<{
+    overwritePasswordRemote: OverwritePasswordRemote
 }>
 
-export type OverridePasswordConfig = Readonly<{
+export type OverwritePasswordConfig = Readonly<{
     takeLongtimeThreshold: DelayTime
 }>
 
-export function initOverridePasswordAction(
-    material: OverridePasswordMaterial,
-): OverridePasswordAction {
-    return new OverrideAction(material)
+export function initOverwritePasswordAction(
+    material: OverwritePasswordMaterial,
+): OverwritePasswordAction {
+    return new OverwriteAction(material)
 }
 
-class OverrideAction
-    extends AbstractStatefulApplicationAction<OverridePasswordState>
-    implements OverridePasswordAction
+class OverwriteAction
+    extends AbstractStatefulApplicationAction<OverwritePasswordState>
+    implements OverwritePasswordAction
 {
-    readonly initialState = initialOverrideState
+    readonly initialState = initialOverwriteState
 
     readonly newPassword: InputPasswordAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    material: OverridePasswordMaterial
-    convert: { (): ConvertBoardResult<OverridePasswordFields> }
+    material: OverwritePasswordMaterial
+    convert: { (): ConvertBoardResult<OverwritePasswordFields> }
 
-    constructor(material: OverridePasswordMaterial) {
+    constructor(material: OverwritePasswordMaterial) {
         super({
             terminate: () => {
                 this.newPassword.terminate()
@@ -220,7 +220,7 @@ class OverrideAction
         const { validate, validateChecker } = initValidateBoardAction(
             { fields },
             {
-                convert: (): ConvertBoardResult<OverridePasswordFields> => {
+                convert: (): ConvertBoardResult<OverwritePasswordFields> => {
                     const result = {
                         newPassword: newPassword.validate.check(),
                     }
@@ -253,38 +253,38 @@ class OverrideAction
         })
     }
 
-    clear(): OverridePasswordState {
+    clear(): OverwritePasswordState {
         this.newPassword.clear()
         this.validate.clear()
         return this.post(this.initialState)
     }
-    async submit(user: Readonly<{ loginId: LoginId }>): Promise<OverridePasswordState> {
+    async submit(user: Readonly<{ loginId: LoginId }>): Promise<OverwritePasswordState> {
         const fields = this.convert()
         if (!fields.valid) {
             return this.currentState()
         }
-        return overridePassword(this.material, user, fields.value, this.post)
+        return overwritePassword(this.material, user, fields.value, this.post)
     }
 }
 
-type OverridePasswordEvent =
+type OverwritePasswordEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ChangePasswordError }>
     | Readonly<{ type: "success" }>
 
-async function overridePassword<S>(
-    { infra, config }: OverridePasswordMaterial,
+async function overwritePassword<S>(
+    { infra, config }: OverwritePasswordMaterial,
     user: Readonly<{ loginId: LoginId }>,
-    fields: OverridePasswordFields,
-    post: Post<OverridePasswordEvent, S>,
+    fields: OverwritePasswordFields,
+    post: Post<OverwritePasswordEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
 
-    const { overridePasswordRemote } = infra
+    const { overwritePasswordRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(
-        overridePasswordRemote(user, fields),
+        overwritePasswordRemote(user, fields),
         config.takeLongtimeThreshold,
         () => post({ type: "try", hasTakenLongtime: true }),
     )

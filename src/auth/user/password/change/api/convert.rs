@@ -1,12 +1,12 @@
 use crate::auth::user::password::change::infra::{
-    ChangePasswordFields, ChangePasswordFieldsExtract, OverridePasswordFields,
-    OverridePasswordFieldsExtract,
+    ChangePasswordFields, ChangePasswordFieldsExtract, OverwritePasswordFields,
+    OverwritePasswordFieldsExtract,
 };
 
 use crate::auth::user::{
     login_id::kernel::data::LoginId,
     password::{
-        change::data::{ValidateChangePasswordFieldsError, ValidateOverridePasswordFieldsError},
+        change::data::{ValidateChangePasswordFieldsError, ValidateOverwritePasswordFieldsError},
         kernel::infra::PlainPassword,
     },
 };
@@ -24,15 +24,15 @@ impl ChangePasswordFields {
     }
 }
 
-impl OverridePasswordFields {
+impl OverwritePasswordFields {
     pub fn convert(
-        fields: OverridePasswordFieldsExtract,
-    ) -> Result<Self, ValidateOverridePasswordFieldsError> {
+        fields: OverwritePasswordFieldsExtract,
+    ) -> Result<Self, ValidateOverwritePasswordFieldsError> {
         Ok(Self {
             login_id: LoginId::convert(fields.login_id)
-                .map_err(ValidateOverridePasswordFieldsError::InvalidLoginId)?,
+                .map_err(ValidateOverwritePasswordFieldsError::InvalidLoginId)?,
             new_password: PlainPassword::convert(fields.new_password)
-                .map_err(ValidateOverridePasswordFieldsError::InvalidNewPassword)?,
+                .map_err(ValidateOverwritePasswordFieldsError::InvalidNewPassword)?,
         })
     }
 }

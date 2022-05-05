@@ -1,8 +1,8 @@
 import { AUTH_CONFIG } from "../../../../x_outside_feature/config"
 
-import {  OverrideLoginIdConfig } from "../action"
+import {  OverwriteLoginIdConfig } from "../action"
 
-export function newOverridePasswordConfig(): OverrideLoginIdConfig {
+export function newOverwritePasswordConfig(): OverwriteLoginIdConfig {
     return {
         takeLongtimeThreshold: AUTH_CONFIG.takeLongtimeThreshold,
     }

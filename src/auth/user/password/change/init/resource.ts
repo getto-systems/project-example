@@ -1,15 +1,15 @@
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 
-import { newChangePasswordConfig, newOverridePasswordConfig } from "./config"
+import { newChangePasswordConfig, newOverwritePasswordConfig } from "./config"
 
 import {
     ChangePasswordAction,
     initChangePasswordAction,
-    initOverridePasswordAction,
-    OverridePasswordAction,
+    initOverwritePasswordAction,
+    OverwritePasswordAction,
 } from "../action"
 
-import { newChangePasswordInfra, newOverridePasswordInfra } from "./infra"
+import { newChangePasswordInfra, newOverwritePasswordInfra } from "./infra"
 
 type OutsideFeature = RemoteOutsideFeature
 export function newChangePasswordAction(feature: OutsideFeature): ChangePasswordAction {
@@ -19,9 +19,9 @@ export function newChangePasswordAction(feature: OutsideFeature): ChangePassword
     })
 }
 
-export function newOverridePasswordAction(feature: OutsideFeature): OverridePasswordAction {
-    return initOverridePasswordAction({
-        infra: newOverridePasswordInfra(feature),
-        config: newOverridePasswordConfig(),
+export function newOverwritePasswordAction(feature: OutsideFeature): OverwritePasswordAction {
+    return initOverwritePasswordAction({
+        infra: newOverwritePasswordInfra(feature),
+        config: newOverwritePasswordConfig(),
     })
 }

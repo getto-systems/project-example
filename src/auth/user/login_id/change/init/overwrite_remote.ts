@@ -11,19 +11,19 @@ import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf
 
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 
-import { ChangePasswordRemoteResult, OverrideLoginIdRemote } from "../infra"
+import { ChangePasswordRemoteResult, OverwriteLoginIdRemote } from "../infra"
 
-import { OverrideLoginIdFields } from "../data"
+import { OverwriteLoginIdFields } from "../data"
 import { LoginId } from "../../kernel/data"
 
-export function newOverrideLoginIdRemote(feature: RemoteOutsideFeature): OverrideLoginIdRemote {
+export function newOverwriteLoginIdRemote(feature: RemoteOutsideFeature): OverwriteLoginIdRemote {
     return (user, fields) => fetchRemote(feature, user, fields)
 }
 
 async function fetchRemote(
     feature: RemoteOutsideFeature,
     user: Readonly<{ loginId: LoginId }>,
-    fields: OverrideLoginIdFields,
+    fields: OverwriteLoginIdFields,
 ): Promise<ChangePasswordRemoteResult> {
     try {
         const mock = false
@@ -36,14 +36,14 @@ async function fetchRemote(
 
         const opts = fetchOptions({
             serverURL: env.apiServerURL,
-            path: "/auth/user/login-id/override",
+            path: "/auth/user/login-id/overwrite",
             method: "PATCH",
             headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
         })
         const response = await fetch(opts.url, {
             ...opts.options,
             body: encodeProtobuf(
-                pb.auth.user.loginId.change.service.OverrideLoginIdRequestPb,
+                pb.auth.user.loginId.change.service.OverwriteLoginIdRequestPb,
                 (message) => {
                     message.loginId = user.loginId
                     message.newLoginId = fields.newLoginId
@@ -56,7 +56,7 @@ async function fetchRemote(
         }
 
         const message = decodeProtobuf(
-            pb.auth.user.loginId.change.service.OverrideLoginIdResponsePb,
+            pb.auth.user.loginId.change.service.OverwriteLoginIdResponsePb,
             await response.text(),
         )
         if (!message.success) {
@@ -72,16 +72,16 @@ async function fetchRemote(
 }
 
 function errorResponse(
-    err: pb.auth.user.loginId.change.service.OverrideLoginIdErrorKindPb,
+    err: pb.auth.user.loginId.change.service.OverwriteLoginIdErrorKindPb,
 ): ChangePasswordRemoteResult {
     switch (err) {
-        case pb.auth.user.loginId.change.service.OverrideLoginIdErrorKindPb.NOT_FOUND:
+        case pb.auth.user.loginId.change.service.OverwriteLoginIdErrorKindPb.NOT_FOUND:
             return { success: false, err: { type: "not-found" } }
 
-        case pb.auth.user.loginId.change.service.OverrideLoginIdErrorKindPb.INVALID:
+        case pb.auth.user.loginId.change.service.OverwriteLoginIdErrorKindPb.INVALID:
             return { success: false, err: { type: "invalid" } }
 
-        case pb.auth.user.loginId.change.service.OverrideLoginIdErrorKindPb.ALREADY_REGISTERED:
+        case pb.auth.user.loginId.change.service.OverwriteLoginIdErrorKindPb.ALREADY_REGISTERED:
             return { success: false, err: { type: "already-registered" } }
     }
 }
