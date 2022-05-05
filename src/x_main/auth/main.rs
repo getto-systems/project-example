@@ -23,25 +23,17 @@ async fn main() {
         .add_service(server.auth.ticket.logout())
         .add_service(server.auth.ticket.check())
         .add_service(server.auth.ticket.authorize())
-        .add_service(server.auth.user.login_id.override_login_id())
+        .add_service(server.auth.user.login_id.overwrite())
         .add_service(server.auth.user.password.authenticate())
-        .add_service(server.auth.user.password.change_password())
-        .add_service(server.auth.user.password.override_password())
+        .add_service(server.auth.user.password.change())
+        .add_service(server.auth.user.password.overwrite())
         .add_service(server.auth.user.password.reset.request_token())
         .add_service(server.auth.user.password.reset.reset())
-        .add_service(
-            server
-                .auth
-                .user
-                .password
-                .reset
-                .token_destination
-                .change_destination(),
-        )
+        .add_service(server.auth.user.password.reset.token_destination.change())
         .add_service(server.auth.user.account.search())
-        .add_service(server.auth.user.account.modify_user())
-        .add_service(server.auth.user.account.register_user())
-        .add_service(server.auth.user.account.unregister_user())
+        .add_service(server.auth.user.account.modify())
+        .add_service(server.auth.user.account.register())
+        .add_service(server.auth.user.account.unregister())
         .serve(
             format!("0.0.0.0:{}", &ENV.port)
                 .parse()

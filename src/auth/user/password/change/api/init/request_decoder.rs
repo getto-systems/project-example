@@ -1,10 +1,10 @@
 use crate::auth::user::password::change::y_protobuf::service::{
-    ChangePasswordRequestPb, OverridePasswordRequestPb,
+    ChangePasswordRequestPb, OverwritePasswordRequestPb,
 };
 
 use crate::auth::user::password::change::infra::{
-    ChangePasswordFieldsExtract, ChangePasswordRequestDecoder, OverridePasswordFieldsExtract,
-    OverridePasswordRequestDecoder,
+    ChangePasswordFieldsExtract, ChangePasswordRequestDecoder, OverwritePasswordFieldsExtract,
+    OverwritePasswordRequestDecoder,
 };
 
 pub struct PbChangePasswordRequestDecoder {
@@ -26,19 +26,19 @@ impl ChangePasswordRequestDecoder for PbChangePasswordRequestDecoder {
     }
 }
 
-pub struct PbOverridePasswordRequestDecoder {
-    request: OverridePasswordRequestPb,
+pub struct PbOverwritePasswordRequestDecoder {
+    request: OverwritePasswordRequestPb,
 }
 
-impl PbOverridePasswordRequestDecoder {
-    pub const fn new(request: OverridePasswordRequestPb) -> Self {
+impl PbOverwritePasswordRequestDecoder {
+    pub const fn new(request: OverwritePasswordRequestPb) -> Self {
         Self { request }
     }
 }
 
-impl OverridePasswordRequestDecoder for PbOverridePasswordRequestDecoder {
-    fn decode(self) -> OverridePasswordFieldsExtract {
-        OverridePasswordFieldsExtract {
+impl OverwritePasswordRequestDecoder for PbOverwritePasswordRequestDecoder {
+    fn decode(self) -> OverwritePasswordFieldsExtract {
+        OverwritePasswordFieldsExtract {
             login_id: self.request.login_id,
             new_password: self.request.new_password,
         }
@@ -48,8 +48,8 @@ impl OverridePasswordRequestDecoder for PbOverridePasswordRequestDecoder {
 #[cfg(test)]
 pub mod test {
     use crate::auth::user::password::change::infra::{
-        ChangePasswordFieldsExtract, ChangePasswordRequestDecoder, OverridePasswordFieldsExtract,
-        OverridePasswordRequestDecoder,
+        ChangePasswordFieldsExtract, ChangePasswordRequestDecoder, OverwritePasswordFieldsExtract,
+        OverwritePasswordRequestDecoder,
     };
 
     pub enum StaticChangePasswordRequestDecoder {
@@ -64,12 +64,12 @@ pub mod test {
         }
     }
 
-    pub enum StaticOverridePasswordRequestDecoder {
-        Valid(OverridePasswordFieldsExtract),
+    pub enum StaticOverwritePasswordRequestDecoder {
+        Valid(OverwritePasswordFieldsExtract),
     }
 
-    impl OverridePasswordRequestDecoder for StaticOverridePasswordRequestDecoder {
-        fn decode(self) -> OverridePasswordFieldsExtract {
+    impl OverwritePasswordRequestDecoder for StaticOverwritePasswordRequestDecoder {
+        fn decode(self) -> OverwritePasswordFieldsExtract {
             match self {
                 Self::Valid(fields) => fields,
             }

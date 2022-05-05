@@ -3,9 +3,9 @@ use tonic::{Request, Response, Status};
 use getto_application::helper::flatten;
 
 use crate::auth::user::password::change::y_protobuf::service::{
-    change_password_pb_server::ChangePasswordPb, override_password_pb_server::OverridePasswordPb,
-    ChangePasswordRequestPb, ChangePasswordResponsePb, OverridePasswordRequestPb,
-    OverridePasswordResponsePb,
+    change_password_pb_server::ChangePasswordPb, overwrite_password_pb_server::OverwritePasswordPb,
+    ChangePasswordRequestPb, ChangePasswordResponsePb, OverwritePasswordRequestPb,
+    OverwritePasswordResponsePb,
 };
 
 use crate::x_outside_feature::auth::{
@@ -15,7 +15,7 @@ use crate::x_outside_feature::auth::{
 
 use crate::x_content::metadata::metadata_request_id;
 
-use crate::auth::user::password::change::init::{ChangePasswordFeature, OverridePasswordFeature};
+use crate::auth::user::password::change::init::{ChangePasswordFeature, OverwritePasswordFeature};
 
 use crate::z_lib::{logger::infra::Logger, response::tonic::ServiceResponder};
 
@@ -48,20 +48,20 @@ impl ChangePasswordPb for ServiceChangePassword {
     }
 }
 
-pub struct ServiceOverridePassword;
+pub struct ServiceOverwritePassword;
 
-impl ServiceOverridePassword {
+impl ServiceOverwritePassword {
     pub const fn name() -> &'static str {
-        "auth.user.password.override"
+        "auth.user.password.overwrite"
     }
 }
 
 #[async_trait::async_trait]
-impl OverridePasswordPb for ServiceOverridePassword {
-    async fn override_password(
+impl OverwritePasswordPb for ServiceOverwritePassword {
+    async fn overwrite_password(
         &self,
-        request: Request<OverridePasswordRequestPb>,
-    ) -> Result<Response<OverridePasswordResponsePb>, Status> {
+        request: Request<OverwritePasswordRequestPb>,
+    ) -> Result<Response<OverwritePasswordResponsePb>, Status> {
         let TonicRequest {
             feature,
             metadata,
@@ -70,7 +70,7 @@ impl OverridePasswordPb for ServiceOverridePassword {
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger(Self::name(), request_id.into());
-        let mut action = OverridePasswordFeature::action(&feature, &metadata, request);
+        let mut action = OverwritePasswordFeature::action(&feature, &metadata, request);
         action.subscribe(move |state| logger.log(state));
 
         flatten(action.ignite().await).respond_to()

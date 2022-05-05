@@ -1,23 +1,23 @@
-use super::super::action::{OverrideLoginIdEvent, OverrideLoginIdState};
+use super::super::action::{OverwriteLoginIdEvent, OverwriteLoginIdState};
 
 use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
 
-impl LogMessage for OverrideLoginIdState {
+impl LogMessage for OverwriteLoginIdState {
     fn log_message(&self) -> String {
         format!("{}", self)
     }
 }
 
-impl LogFilter for OverrideLoginIdState {
+impl LogFilter for OverwriteLoginIdState {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::Authenticate(event) => event.log_level(),
-            Self::Override(event) => event.log_level(),
+            Self::Overwrite(event) => event.log_level(),
         }
     }
 }
 
-impl LogFilter for OverrideLoginIdEvent {
+impl LogFilter for OverwriteLoginIdEvent {
     fn log_level(&self) -> LogLevel {
         match self {
             Self::Success => LogLevel::Audit,

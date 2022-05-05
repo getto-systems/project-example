@@ -14,7 +14,7 @@ import { ChangeButton } from "../../../../../core/x_preact/button/change_button"
 
 import { changePasswordError } from "./helper"
 
-import { OverridePasswordAction } from "../action"
+import { OverwritePasswordAction } from "../action"
 import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
 
 import { LoginId } from "../../../login_id/kernel/data"
@@ -22,13 +22,13 @@ import { LoginId } from "../../../login_id/kernel/data"
 type Props = Readonly<{
     user: Readonly<{ loginId: LoginId }>
     editable: EditableBoardAction
-    override: OverridePasswordAction
+    overwrite: OverwritePasswordAction
 }>
-export function OverridePassword(props: Props): VNode {
-    const state = useApplicationAction(props.override)
+export function OverwritePassword(props: Props): VNode {
+    const state = useApplicationAction(props.overwrite)
     const editableState = useApplicationAction(props.editable)
-    const validateState = useApplicationAction(props.override.validate)
-    const observeState = useApplicationAction(props.override.observe)
+    const validateState = useApplicationAction(props.overwrite.validate)
+    const observeState = useApplicationAction(props.overwrite.observe)
 
     return box({
         form: true,
@@ -37,7 +37,7 @@ export function OverridePassword(props: Props): VNode {
             ? {
                   body: [
                       h(PasswordField, {
-                          field: props.override.newPassword,
+                          field: props.overwrite.newPassword,
                           title: "新しいパスワード",
                           help: ["管理者権限でパスワードを上書きします"],
                           autocomplete: "new-password",
@@ -65,7 +65,7 @@ export function OverridePassword(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.override.clear()
+            props.overwrite.clear()
             props.editable.open()
         }
     }
@@ -80,7 +80,7 @@ export function OverridePassword(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.override.submit(props.user).then((state) => {
+            props.overwrite.submit(props.user).then((state) => {
                 switch (state.type) {
                     case "success":
                         props.editable.close()
@@ -94,7 +94,7 @@ export function OverridePassword(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.override.clear()
+            props.overwrite.clear()
         }
     }
     function closeButton(): VNode {

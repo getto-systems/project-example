@@ -1,15 +1,15 @@
 import { RemoteResult } from "../../../../z_lib/ui/remote/infra"
 
 import { LoginId } from "../../login_id/kernel/data"
-import { ChangePasswordFields, ChangePasswordRemoteError, OverridePasswordFields } from "./data"
+import { ChangePasswordFields, ChangePasswordRemoteError, OverwritePasswordFields } from "./data"
 
 export interface ChangePasswordRemote {
     (fields: ChangePasswordFields): Promise<ChangePasswordRemoteResult>
 }
-export interface OverridePasswordRemote {
+export interface OverwritePasswordRemote {
     (
         user: Readonly<{ loginId: LoginId }>,
-        fields: OverridePasswordFields,
+        fields: OverwritePasswordFields,
     ): Promise<ChangePasswordRemoteResult>
 }
 

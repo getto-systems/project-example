@@ -13,7 +13,7 @@ import { ClearChangesButton } from "../../../../../core/x_preact/button/clear_ch
 import { ChangeButton } from "../../../../../core/x_preact/button/change_button"
 import { CloseButton } from "../../../../../core/x_preact/button/close_button"
 
-import { OverrideLoginIdAction } from "../action"
+import { OverwriteLoginIdAction } from "../action"
 import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
 
 import { LoginId } from "../../kernel/data"
@@ -21,14 +21,14 @@ import { LoginId } from "../../kernel/data"
 type Props = Readonly<{
     user: Readonly<{ loginId: LoginId }>
     editable: EditableBoardAction
-    override: OverrideLoginIdAction
+    overwrite: OverwriteLoginIdAction
     onSuccess: { (loginId: LoginId): void }
 }>
-export function OverrideLoginId(props: Props): VNode {
-    const state = useApplicationAction(props.override)
+export function OverwriteLoginId(props: Props): VNode {
+    const state = useApplicationAction(props.overwrite)
     const editableState = useApplicationAction(props.editable)
-    const validateState = useApplicationAction(props.override.validate)
-    const observeState = useApplicationAction(props.override.observe)
+    const validateState = useApplicationAction(props.overwrite.validate)
+    const observeState = useApplicationAction(props.overwrite.observe)
 
     return box({
         form: true,
@@ -36,7 +36,7 @@ export function OverrideLoginId(props: Props): VNode {
         ...(editableState.isEditable
             ? {
                   body: h(LoginIdField, {
-                      field: props.override.newLoginId,
+                      field: props.overwrite.newLoginId,
                       title: "新しいログインID",
                       help: ["管理者権限でログインIDを上書きします"],
                       autocomplete: "username",
@@ -61,7 +61,7 @@ export function OverrideLoginId(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.override.clear()
+            props.overwrite.clear()
             props.editable.open()
         }
     }
@@ -76,7 +76,7 @@ export function OverrideLoginId(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.override.submit(props.user).then((state) => {
+            props.overwrite.submit(props.user).then((state) => {
                 switch (state.type) {
                     case "success":
                         props.editable.close()
@@ -91,7 +91,7 @@ export function OverrideLoginId(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.override.clear()
+            props.overwrite.clear()
         }
     }
     function closeButton(): VNode {

@@ -15,60 +15,60 @@ import {
     ObserveBoardAction,
 } from "../../../../z_vendor/getto-application/board/observe_board/action"
 
-import { ChangeLoginIdError, OverrideLoginIdFields } from "./data"
+import { ChangeLoginIdError, OverwriteLoginIdFields } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 
-import { OverrideLoginIdRemote } from "./infra"
+import { OverwriteLoginIdRemote } from "./infra"
 import { DelayTime } from "../../../../z_lib/ui/config/infra"
 
 import { LoginId } from "../kernel/data"
 
-export interface OverrideLoginIdAction extends StatefulApplicationAction<OverrideLoginIdState> {
+export interface OverwriteLoginIdAction extends StatefulApplicationAction<OverwriteLoginIdState> {
     readonly newLoginId: InputLoginIdAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    clear(): OverrideLoginIdState
-    submit(user: Readonly<{ loginId: LoginId }>): Promise<OverrideLoginIdState>
+    clear(): OverwriteLoginIdState
+    submit(user: Readonly<{ loginId: LoginId }>): Promise<OverwriteLoginIdState>
 }
 
-export type OverrideLoginIdState = Readonly<{ type: "initial" }> | OverrideLoginIdEvent
+export type OverwriteLoginIdState = Readonly<{ type: "initial" }> | OverwriteLoginIdEvent
 
-const initialOverrideState: OverrideLoginIdState = { type: "initial" }
+const initialState: OverwriteLoginIdState = { type: "initial" }
 
-export type OverrideLoginIdMaterial = Readonly<{
-    infra: OverrideLoginIdInfra
-    config: OverrideLoginIdConfig
+export type OverwriteLoginIdMaterial = Readonly<{
+    infra: OverwriteLoginIdInfra
+    config: OverwriteLoginIdConfig
 }>
 
-export type OverrideLoginIdInfra = Readonly<{
-    overrideLoginIdRemote: OverrideLoginIdRemote
+export type OverwriteLoginIdInfra = Readonly<{
+    overwriteLoginIdRemote: OverwriteLoginIdRemote
 }>
 
-export type OverrideLoginIdConfig = Readonly<{
+export type OverwriteLoginIdConfig = Readonly<{
     takeLongtimeThreshold: DelayTime
 }>
 
-export function initOverrideLoginIdAction(
-    material: OverrideLoginIdMaterial,
-): OverrideLoginIdAction {
-    return new OverrideAction(material)
+export function initOverwriteLoginIdAction(
+    material: OverwriteLoginIdMaterial,
+): OverwriteLoginIdAction {
+    return new OverwriteAction(material)
 }
 
-class OverrideAction
-    extends AbstractStatefulApplicationAction<OverrideLoginIdState>
-    implements OverrideLoginIdAction
+class OverwriteAction
+    extends AbstractStatefulApplicationAction<OverwriteLoginIdState>
+    implements OverwriteLoginIdAction
 {
-    readonly initialState = initialOverrideState
+    readonly initialState = initialState
 
     readonly newLoginId: InputLoginIdAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    material: OverrideLoginIdMaterial
-    convert: { (): ConvertBoardResult<OverrideLoginIdFields> }
+    material: OverwriteLoginIdMaterial
+    convert: { (): ConvertBoardResult<OverwriteLoginIdFields> }
 
-    constructor(material: OverrideLoginIdMaterial) {
+    constructor(material: OverwriteLoginIdMaterial) {
         super({
             terminate: () => {
                 this.newLoginId.terminate()
@@ -81,7 +81,7 @@ class OverrideAction
         const newLoginId = initInputLoginIdAction()
 
         const fields = ["newLoginId"] as const
-        const convert = (): ConvertBoardResult<OverrideLoginIdFields> => {
+        const convert = (): ConvertBoardResult<OverwriteLoginIdFields> => {
             const result = {
                 newLoginId: newLoginId.validate.check(),
             }
@@ -114,38 +114,38 @@ class OverrideAction
         })
     }
 
-    clear(): OverrideLoginIdState {
+    clear(): OverwriteLoginIdState {
         this.newLoginId.clear()
         this.validate.clear()
         return this.post(this.initialState)
     }
-    async submit(user: Readonly<{ loginId: LoginId }>): Promise<OverrideLoginIdState> {
+    async submit(user: Readonly<{ loginId: LoginId }>): Promise<OverwriteLoginIdState> {
         const fields = this.convert()
         if (!fields.valid) {
             return this.currentState()
         }
-        return overrideLoginId(this.material, user, fields.value, this.post)
+        return overwriteLoginId(this.material, user, fields.value, this.post)
     }
 }
 
-type OverrideLoginIdEvent =
+type OverwriteLoginIdEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ChangeLoginIdError }>
     | Readonly<{ type: "success"; loginId: LoginId }>
 
-async function overrideLoginId<S>(
-    { infra, config }: OverrideLoginIdMaterial,
+async function overwriteLoginId<S>(
+    { infra, config }: OverwriteLoginIdMaterial,
     user: Readonly<{ loginId: LoginId }>,
-    fields: OverrideLoginIdFields,
-    post: Post<OverrideLoginIdEvent, S>,
+    fields: OverwriteLoginIdFields,
+    post: Post<OverwriteLoginIdEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
 
-    const { overrideLoginIdRemote } = infra
+    const { overwriteLoginIdRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
     const response = await delayedChecker(
-        overrideLoginIdRemote(user, fields),
+        overwriteLoginIdRemote(user, fields),
         config.takeLongtimeThreshold,
         () => post({ type: "try", hasTakenLongtime: true }),
     )

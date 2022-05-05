@@ -1,39 +1,39 @@
 use tonic::{Response, Status};
 
 use crate::auth::user::login_id::change::y_protobuf::service::{
-    OverrideLoginIdErrorKindPb, OverrideLoginIdResponsePb,
+    OverwriteLoginIdErrorKindPb, OverwriteLoginIdResponsePb,
 };
 use crate::z_lib::response::tonic::ServiceResponder;
 
-use super::super::action::{OverrideLoginIdEvent, OverrideLoginIdState};
+use super::super::action::{OverwriteLoginIdEvent, OverwriteLoginIdState};
 
-impl ServiceResponder<OverrideLoginIdResponsePb> for OverrideLoginIdState {
-    fn respond_to(self) -> Result<Response<OverrideLoginIdResponsePb>, Status> {
+impl ServiceResponder<OverwriteLoginIdResponsePb> for OverwriteLoginIdState {
+    fn respond_to(self) -> Result<Response<OverwriteLoginIdResponsePb>, Status> {
         match self {
             Self::Authenticate(event) => event.respond_to(),
-            Self::Override(event) => event.respond_to(),
+            Self::Overwrite(event) => event.respond_to(),
         }
     }
 }
 
-impl ServiceResponder<OverrideLoginIdResponsePb> for OverrideLoginIdEvent {
-    fn respond_to(self) -> Result<Response<OverrideLoginIdResponsePb>, Status> {
+impl ServiceResponder<OverwriteLoginIdResponsePb> for OverwriteLoginIdEvent {
+    fn respond_to(self) -> Result<Response<OverwriteLoginIdResponsePb>, Status> {
         match self {
-            Self::Success => Ok(Response::new(OverrideLoginIdResponsePb {
+            Self::Success => Ok(Response::new(OverwriteLoginIdResponsePb {
                 success: true,
                 ..Default::default()
             })),
-            Self::Invalid(_) => Ok(Response::new(OverrideLoginIdResponsePb {
+            Self::Invalid(_) => Ok(Response::new(OverwriteLoginIdResponsePb {
                 success: false,
-                err: OverrideLoginIdErrorKindPb::Invalid as i32,
+                err: OverwriteLoginIdErrorKindPb::Invalid as i32,
             })),
-            Self::NotFound => Ok(Response::new(OverrideLoginIdResponsePb {
+            Self::NotFound => Ok(Response::new(OverwriteLoginIdResponsePb {
                 success: false,
-                err: OverrideLoginIdErrorKindPb::NotFound as i32,
+                err: OverwriteLoginIdErrorKindPb::NotFound as i32,
             })),
-            Self::AlreadyRegistered => Ok(Response::new(OverrideLoginIdResponsePb {
+            Self::AlreadyRegistered => Ok(Response::new(OverwriteLoginIdResponsePb {
                 success: false,
-                err: OverrideLoginIdErrorKindPb::AlreadyRegistered as i32,
+                err: OverwriteLoginIdErrorKindPb::AlreadyRegistered as i32,
             })),
             Self::RepositoryError(err) => err.respond_to(),
         }

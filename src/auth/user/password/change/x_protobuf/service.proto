@@ -13,13 +13,13 @@ message ChangePasswordResponsePb {
     bool success = 1;
 }
 
-service OverridePasswordPb {
-    rpc OverridePassword (OverridePasswordRequestPb) returns (OverridePasswordResponsePb);
+service OverwritePasswordPb {
+    rpc OverwritePassword (OverwritePasswordRequestPb) returns (OverwritePasswordResponsePb);
 }
-message OverridePasswordRequestPb {
+message OverwritePasswordRequestPb {
     string login_id = 1;
     string new_password = 2;
 }
-message OverridePasswordResponsePb {
+message OverwritePasswordResponsePb {
     bool success = 1;
 }

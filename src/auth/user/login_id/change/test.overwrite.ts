@@ -4,11 +4,11 @@ import { ticker } from "../../../../z_lib/ui/timer/helper"
 
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 
-import { OverrideLoginIdAction, initOverrideLoginIdAction } from "./action"
+import { OverwriteLoginIdAction, initOverwriteLoginIdAction } from "./action"
 
 import { restoreLoginId } from "../input/convert"
 
-import { OverrideLoginIdRemote, ChangePasswordRemoteResult } from "./infra"
+import { OverwriteLoginIdRemote, ChangePasswordRemoteResult } from "./infra"
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
 import { LoginId } from "../kernel/data"
@@ -18,12 +18,12 @@ const VALID_LOGIN_ID = { newLoginId: "new-login-id" } as const
 test("submit valid new-login-id", async () => {
     const { resource, store, user } = standard()
 
-    const runner = setupActionTestRunner(resource.override.subscriber)
+    const runner = setupActionTestRunner(resource.overwrite.subscriber)
 
     await runner(async () => {
         store.newLoginId.set(VALID_LOGIN_ID.newLoginId)
 
-        return resource.override.submit(user)
+        return resource.overwrite.submit(user)
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
@@ -36,12 +36,12 @@ test("submit valid login-id; take long time", async () => {
     // wait for take longtime timeout
     const { resource, store, user } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(resource.override.subscriber)
+    const runner = setupActionTestRunner(resource.overwrite.subscriber)
 
     await runner(() => {
         store.newLoginId.set(VALID_LOGIN_ID.newLoginId)
 
-        return resource.override.submit(user)
+        return resource.overwrite.submit(user)
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
@@ -54,9 +54,9 @@ test("submit valid login-id; take long time", async () => {
 test("submit without fields", async () => {
     const { resource, user } = standard()
 
-    const runner = setupActionTestRunner(resource.override.subscriber)
+    const runner = setupActionTestRunner(resource.overwrite.subscriber)
 
-    await runner(() => resource.override.submit(user)).then((stack) => {
+    await runner(() => resource.overwrite.submit(user)).then((stack) => {
         expect(stack).toEqual([])
     })
 })
@@ -65,7 +65,7 @@ test("clear", () => {
     const { resource, store } = standard()
 
     store.newLoginId.set(VALID_LOGIN_ID.newLoginId)
-    resource.override.clear()
+    resource.overwrite.clear()
 
     expect(store.newLoginId.get()).toEqual("")
 })
@@ -75,16 +75,16 @@ test("terminate", async () => {
 
     const runner = setupActionTestRunner({
         subscribe: (handler) => {
-            resource.override.subscriber.subscribe(handler)
-            resource.override.validate.subscriber.subscribe(handler)
-            resource.override.newLoginId.validate.subscriber.subscribe(handler)
+            resource.overwrite.subscriber.subscribe(handler)
+            resource.overwrite.validate.subscriber.subscribe(handler)
+            resource.overwrite.newLoginId.validate.subscriber.subscribe(handler)
         },
         unsubscribe: () => null,
     })
 
     await runner(async () => {
-        resource.override.terminate()
-        return resource.override.submit(user)
+        resource.overwrite.terminate()
+        return resource.overwrite.submit(user)
     }).then((stack) => {
         // no input/validate event after terminate
         expect(stack).toEqual([])
@@ -92,15 +92,15 @@ test("terminate", async () => {
 })
 
 function standard() {
-    return initResource(standard_overrideRemote())
+    return initResource(standard_overwriteRemote())
 }
 function takeLongtime_elements() {
-    return initResource(takeLongtime_overrideRemote())
+    return initResource(takeLongtime_overwriteRemote())
 }
 
-function initResource(overrideLoginIdRemote: OverrideLoginIdRemote): Readonly<{
+function initResource(overwriteLoginIdRemote: OverwriteLoginIdRemote): Readonly<{
     resource: Readonly<{
-        override: OverrideLoginIdAction
+        overwrite: OverwriteLoginIdAction
     }>
     store: Readonly<{
         newLoginId: BoardValueStore
@@ -108,9 +108,9 @@ function initResource(overrideLoginIdRemote: OverrideLoginIdRemote): Readonly<{
     user: Readonly<{ loginId: LoginId }>
 }> {
     const resource = {
-        override: initOverrideLoginIdAction({
+        overwrite: initOverwriteLoginIdAction({
             infra: {
-                overrideLoginIdRemote,
+                overwriteLoginIdRemote,
             },
             config: {
                 takeLongtimeThreshold: { delay_millisecond: 32 },
@@ -119,7 +119,7 @@ function initResource(overrideLoginIdRemote: OverrideLoginIdRemote): Readonly<{
     }
 
     const store = {
-        newLoginId: mockBoardValueStore(resource.override.newLoginId.input),
+        newLoginId: mockBoardValueStore(resource.overwrite.newLoginId.input),
     }
 
     return {
@@ -131,10 +131,10 @@ function initResource(overrideLoginIdRemote: OverrideLoginIdRemote): Readonly<{
     }
 }
 
-function standard_overrideRemote(): OverrideLoginIdRemote {
+function standard_overwriteRemote(): OverwriteLoginIdRemote {
     return async () => standard_changeRemoteResult()
 }
-function takeLongtime_overrideRemote(): OverrideLoginIdRemote {
+function takeLongtime_overwriteRemote(): OverwriteLoginIdRemote {
     return async () => ticker({ wait_millisecond: 64 }, () => standard_changeRemoteResult())
 }
 function standard_changeRemoteResult(): ChangePasswordRemoteResult {

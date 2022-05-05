@@ -3,7 +3,7 @@ pub mod request_decoder;
 use tonic::metadata::MetadataMap;
 
 use crate::auth::user::password::change::y_protobuf::service::{
-    ChangePasswordRequestPb, OverridePasswordRequestPb,
+    ChangePasswordRequestPb, OverwritePasswordRequestPb,
 };
 
 use crate::x_outside_feature::auth::feature::AuthAppFeature;
@@ -14,7 +14,7 @@ use crate::auth::{
         kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,
         password::{
             change::init::request_decoder::{
-                PbChangePasswordRequestDecoder, PbOverridePasswordRequestDecoder,
+                PbChangePasswordRequestDecoder, PbOverwritePasswordRequestDecoder,
             },
             kernel::init::{
                 password_hasher::Argon2PasswordHasher, password_matcher::Argon2PasswordMatcher,
@@ -24,7 +24,7 @@ use crate::auth::{
 };
 
 use super::action::{
-    ChangePasswordAction, ChangePasswordMaterial, OverridePasswordAction, OverridePasswordMaterial,
+    ChangePasswordAction, ChangePasswordMaterial, OverwritePasswordAction, OverwritePasswordMaterial,
 };
 
 pub struct ChangePasswordFeature<'a> {
@@ -63,19 +63,19 @@ impl<'a> ChangePasswordMaterial for ChangePasswordFeature<'a> {
     }
 }
 
-pub struct OverridePasswordFeature<'a> {
+pub struct OverwritePasswordFeature<'a> {
     validate: AuthenticateApiStruct<'a>,
     user_repository: DynamoDbAuthUserRepository<'a>,
 }
 
-impl<'a> OverridePasswordFeature<'a> {
+impl<'a> OverwritePasswordFeature<'a> {
     pub fn action(
         feature: &'a AuthAppFeature,
         metadata: &'a MetadataMap,
-        request: OverridePasswordRequestPb,
-    ) -> OverridePasswordAction<PbOverridePasswordRequestDecoder, Self> {
-        OverridePasswordAction::with_material(
-            PbOverridePasswordRequestDecoder::new(request),
+        request: OverwritePasswordRequestPb,
+    ) -> OverwritePasswordAction<PbOverwritePasswordRequestDecoder, Self> {
+        OverwritePasswordAction::with_material(
+            PbOverwritePasswordRequestDecoder::new(request),
             Self {
                 validate: AuthenticateApiStruct::new(feature, metadata),
                 user_repository: DynamoDbAuthUserRepository::new(&feature.store),
@@ -84,7 +84,7 @@ impl<'a> OverridePasswordFeature<'a> {
     }
 }
 
-impl<'a> OverridePasswordMaterial for OverridePasswordFeature<'a> {
+impl<'a> OverwritePasswordMaterial for OverwritePasswordFeature<'a> {
     type Authenticate = AuthenticateApiStruct<'a>;
 
     type PasswordRepository = DynamoDbAuthUserRepository<'a>;

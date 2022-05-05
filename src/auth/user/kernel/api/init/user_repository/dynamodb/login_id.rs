@@ -12,7 +12,7 @@ use crate::z_lib::repository::{
     helper::infra_error,
 };
 
-use crate::auth::user::login_id::change::infra::OverrideLoginIdEntry;
+use crate::auth::user::login_id::change::infra::OverwriteLoginIdEntry;
 
 use crate::{
     auth::user::{
@@ -68,10 +68,10 @@ impl<'a> TableLoginId<'a> {
     ) -> Result<bool, RepositoryError> {
         Ok(self.get_user_id(login_id).await?.is_some())
     }
-    pub async fn get_override_entry(
+    pub async fn get_overwrite_entry(
         &self,
         login_id: LoginId,
-    ) -> Result<Option<OverrideLoginIdEntry>, RepositoryError> {
+    ) -> Result<Option<OverwriteLoginIdEntry>, RepositoryError> {
         let input = GetItemInput {
             table_name: self.table_name.into(),
             key: TableLoginId::key(login_id.clone()),
@@ -89,14 +89,14 @@ impl<'a> TableLoginId<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("get override entry error", err))?;
+            .map_err(|err| infra_error("get overwrite entry error", err))?;
 
         Ok(response.item.and_then(move |mut attrs| {
             match (
                 ColumnUserId::remove_value(&mut attrs),
                 ColumnResetTokenDestinationEmail::remove_value(&mut attrs),
             ) {
-                (Some(user_id), reset_token_destination_email) => Some(OverrideLoginIdEntry {
+                (Some(user_id), reset_token_destination_email) => Some(OverwriteLoginIdEntry {
                     login_id,
                     user_id,
                     reset_token_destination: reset_token_destination_email
@@ -197,10 +197,10 @@ impl<'a> TableLoginId<'a> {
         Ok(())
     }
 
-    pub async fn put_override_entry(
+    pub async fn put_overwrite_entry(
         &self,
         login_id: LoginId,
-        user: OverrideLoginIdEntry,
+        user: OverwriteLoginIdEntry,
     ) -> Result<(), RepositoryError> {
         let mut item = vec![
             ColumnLoginId::to_attr_pair(login_id),
