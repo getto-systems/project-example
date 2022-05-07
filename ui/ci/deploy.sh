@@ -47,6 +47,14 @@ deploy_cp_public() {
       --metadata "$metadata" \
       $file "s3://$AWS_S3_PUBLIC_BUCKET/$(basename $file)"
   done
+
+  for file in $public/well-known/*; do
+    aws s3 cp \
+      --acl private \
+      --cache-control "public, max-age=86400" \
+      --metadata "$metadata" \
+      $file "s3://$AWS_S3_PUBLIC_BUCKET/.well-known/$(basename $file)"
+  done
 }
 deploy_cp_secure() {
   local metadata

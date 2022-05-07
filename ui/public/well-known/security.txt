@@ -1,0 +1,3 @@
+Contact: mailto:shun@getto.systems
+Expires: 2023-08-10T00:00:00.000Z
+Preferred-Languages: en, ja
