@@ -4,6 +4,7 @@ WORKDIR /build
 RUN : && \
   apt-get update && \
   apt-get install -y \
+    cmake \
     musl-tools \
   && \
   :
