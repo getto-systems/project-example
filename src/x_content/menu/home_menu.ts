@@ -17,7 +17,7 @@ export function homeMenuContent(): MenuContent {
                 item("ドキュメント", lnir(["files-alt"]), "docs/index.html"),
             ]),
             category("シーズン", allow, [item("設定", lnir(["cog"]), "season/setup.html")]),
-            category(authRoleLabel(user.role), user, [
+            category(authRoleLabel(authUser.role), authUser, [
                 item("一覧", lnir(["friends"]), "auth/user/account.html"),
                 item("登録", lnir(["add-user"]), "auth/user/register.html"),
             ]),
@@ -30,4 +30,4 @@ export function homeMenuContent(): MenuContent {
 }
 
 const allow = { type: "allow" } as const
-const user = { type: "role", role: "user" } as const
+const authUser = { type: "role", role: "auth-user" } as const

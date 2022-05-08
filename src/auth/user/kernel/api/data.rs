@@ -168,7 +168,7 @@ impl RequireAuthRoles {
     }
 
     pub fn user() -> Self {
-        Self::HasAny(vec![AuthRole::User].into_iter().collect())
+        Self::HasAny(vec![AuthRole::AuthUser].into_iter().collect())
     }
 }
 
