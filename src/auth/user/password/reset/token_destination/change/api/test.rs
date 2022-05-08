@@ -9,7 +9,7 @@ use crate::auth::{
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
-            test::{StaticValidateAuthNonceStruct, StaticAuthenticateStruct},
+            test::{StaticAuthenticateStruct, StaticValidateAuthNonceStruct},
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
         },
@@ -52,7 +52,7 @@ async fn success_change_destination() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [auth-user])",
         "change reset token destination success",
     ]);
     assert!(result.is_ok());
@@ -74,7 +74,7 @@ async fn permission_denied() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
-        "user permission denied; granted: [], require: any [user]",
+        "user permission denied; granted: [], require: any [auth-user]",
     ]);
     assert!(result.is_err());
 }
@@ -94,7 +94,7 @@ async fn error_conflict_changes() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [auth-user])",
         "change reset token destination error; changes conflicted",
     ]);
     assert!(result.is_err());
@@ -115,7 +115,7 @@ async fn error_not_found() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [auth-user])",
         "change reset token destination error; not found",
     ]);
     assert!(result.is_err());
@@ -136,7 +136,7 @@ async fn error_invalid_email() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [auth-user])",
         "change reset token destination error; invalid; to: invalid email",
     ]);
     assert!(result.is_err());
@@ -304,5 +304,5 @@ fn standard_destination() -> ResetTokenDestination {
     ResetTokenDestination::None
 }
 fn standard_granted_roles() -> HashSet<String> {
-    vec!["user".to_owned()].into_iter().collect()
+    vec!["auth-user".to_owned()].into_iter().collect()
 }

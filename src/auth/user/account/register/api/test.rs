@@ -9,7 +9,7 @@ use crate::auth::{
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
-            test::{StaticValidateAuthNonceStruct, StaticAuthenticateStruct},
+            test::{StaticAuthenticateStruct, StaticValidateAuthNonceStruct},
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
         },
@@ -59,7 +59,7 @@ async fn success_register_user() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [auth-user])",
         "register auth user account success",
     ]);
     assert!(result.is_ok());
@@ -81,7 +81,7 @@ async fn permission_denied() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
-        "user permission denied; granted: [], require: any [user]",
+        "user permission denied; granted: [], require: any [auth-user]",
     ]);
     assert!(result.is_err());
 }
@@ -101,7 +101,7 @@ async fn error_invalid_login_id() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [auth-user])",
         "register auth user account error; invalid; login-id: empty",
     ]);
     assert!(result.is_err());
@@ -122,7 +122,7 @@ async fn error_login_id_already_registered() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [auth-user])",
         "register auth user account error; login-id already registered",
     ]);
     assert!(result.is_err());
@@ -143,7 +143,7 @@ async fn error_invalid_granted_roles() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [auth-user])",
         "register auth user account error; invalid; granted-roles: invalid role",
     ]);
     assert!(result.is_err());
@@ -164,7 +164,7 @@ async fn error_invalid_reset_token_destination_email() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [auth-user])",
         "register auth user account error; invalid; reset-token destination: invalid email",
     ]);
     assert!(result.is_err());
@@ -185,7 +185,7 @@ async fn error_invalid_memo() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [auth-user])",
         "register auth user account error; invalid; attrs: memo: too long",
     ]);
     assert!(result.is_err());
@@ -382,7 +382,7 @@ fn standard_user_id() -> AuthUserId {
     AuthUserId::restore(USER_ID.into())
 }
 fn standard_granted_roles() -> Vec<String> {
-    vec!["user".into()]
+    vec!["auth-user".into()]
 }
 fn standard_login_id() -> LoginId {
     LoginId::restore(LOGIN_ID.into())

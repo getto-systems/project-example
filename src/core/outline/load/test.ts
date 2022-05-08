@@ -337,7 +337,7 @@ function empty() {
     return { resource }
 }
 function user() {
-    const [resource] = initResource(user_authz(), empty_menuExpandRepository())
+    const [resource] = initResource(user_ticketRepository(), empty_menuExpandRepository())
 
     return { resource }
 }
@@ -397,11 +397,11 @@ function standard_ticketRepository(): AuthTicketRepository {
 function empty_ticketRepository(): AuthTicketRepository {
     return initMemoryDB<AuthTicket>()
 }
-function user_authz(): AuthTicketRepository {
+function user_ticketRepository(): AuthTicketRepository {
     const db = initMemoryDB<AuthTicketRepositoryValue>()
     db.set({
         authAt: "2020-01-01 00:00:00",
-        grantedRoles: ["user"],
+        grantedRoles: ["auth-user"],
     })
     return convertDB(db, authTicketRepositoryConverter)
 }

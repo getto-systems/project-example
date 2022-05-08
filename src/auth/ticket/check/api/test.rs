@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use getto_application_test::ActionTestRunner;
 
 use chrono::{DateTime, Duration, TimeZone, Utc};
@@ -19,7 +17,7 @@ use crate::auth::ticket::{
     validate::init::{
         nonce_metadata::test::StaticAuthNonceMetadata,
         nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
-        test::{StaticValidateAuthNonceStruct, StaticAuthenticateStruct},
+        test::{StaticAuthenticateStruct, StaticValidateAuthNonceStruct},
         token_decoder::test::StaticAuthTokenDecoder,
         token_metadata::test::StaticAuthTokenMetadata,
     },
@@ -49,7 +47,7 @@ async fn success() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-role-user-id (granted: [auth-user])",
         "token expires calculated; ticket: 2021-01-02 10:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
     ]);
@@ -89,7 +87,7 @@ async fn success_limited_ticket() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-role-user-id (granted: [auth-user])",
         "token expires calculated; ticket: 2021-01-01 11:00:00 UTC / api: 2021-01-01 10:01:00 UTC / cloudfront: 2021-01-01 10:01:00 UTC",
         "encode success",
     ]);
@@ -110,7 +108,7 @@ async fn error_no_ticket() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-role-user-id (granted: [auth-user])",
         "encode error; ticket data not found",
     ]);
     assert!(result.is_err());
@@ -237,13 +235,10 @@ fn standard_token_header() -> StaticAuthTokenMetadata {
 }
 
 fn standard_token_decoder() -> StaticAuthTokenDecoder {
-    let mut granted_roles = HashSet::new();
-    granted_roles.insert("user".into());
-
     StaticAuthTokenDecoder::Valid(AuthTicketExtract {
         ticket_id: TICKET_ID.into(),
         user_id: "user-role-user-id".into(),
-        granted_roles,
+        granted_roles: vec!["auth-user".to_owned()].into_iter().collect(),
     })
 }
 fn expired_token_decoder() -> StaticAuthTokenDecoder {
@@ -274,6 +269,6 @@ fn test_ticket() -> AuthTicket {
     AuthTicket::restore(AuthTicketExtract {
         ticket_id: TICKET_ID.into(),
         user_id: USER_ID.into(),
-        granted_roles: HashSet::new(),
+        granted_roles: vec![].into_iter().collect(),
     })
 }

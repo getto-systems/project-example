@@ -55,7 +55,7 @@ async fn success_modify_user() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [auth-user])",
         "modify auth user account success",
     ]);
     assert!(result.is_ok());
@@ -77,7 +77,7 @@ async fn permission_denied() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
-        "user permission denied; granted: [], require: any [user]",
+        "user permission denied; granted: [], require: any [auth-user]",
     ]);
     assert!(result.is_err());
 }
@@ -97,7 +97,7 @@ async fn error_conflict_changes() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [auth-user])",
         "modify auth user account error; changes conflicted",
     ]);
     assert!(result.is_err());
@@ -118,7 +118,7 @@ async fn error_not_found() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [auth-user])",
         "modify auth user account error; not found",
     ]);
     assert!(result.is_err());
@@ -139,7 +139,7 @@ async fn error_invalid_granted_roles() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [auth-user])",
         "modify auth user account error; invalid to; invalid role",
     ]);
     assert!(result.is_err());
@@ -160,7 +160,7 @@ async fn error_invalid_memo() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [auth-user])",
         "modify auth user account error; invalid to; memo: too long",
     ]);
     assert!(result.is_err());
@@ -359,7 +359,7 @@ fn standard_user() -> AuthUser {
     .restore()
 }
 fn standard_granted_roles() -> Vec<String> {
-    vec!["user".into()]
+    vec!["auth-user".into()]
 }
 fn standard_login_id() -> LoginId {
     LoginId::restore(LOGIN_ID.into())

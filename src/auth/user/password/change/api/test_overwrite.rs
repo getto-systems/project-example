@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use chrono::{DateTime, Duration, TimeZone, Utc};
 use getto_application_test::ActionTestRunner;
 
@@ -9,7 +7,7 @@ use crate::auth::{
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
-            test::{StaticValidateAuthNonceStruct, StaticAuthenticateStruct},
+            test::{StaticAuthenticateStruct, StaticValidateAuthNonceStruct},
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
         },
@@ -200,7 +198,7 @@ fn standard_token_decoder() -> StaticAuthTokenDecoder {
     StaticAuthTokenDecoder::Valid(AuthTicketExtract {
         ticket_id: TICKET_ID.into(),
         user_id: USER_ID.into(),
-        granted_roles: HashSet::new(),
+        granted_roles: vec![].into_iter().collect(),
     })
 }
 
@@ -248,12 +246,9 @@ fn standard_password_repository<'a>(
 }
 
 fn test_user() -> AuthUser {
-    let mut granted_roles = HashSet::new();
-    granted_roles.insert("something".into());
-
     AuthUserExtract {
         user_id: USER_ID.into(),
-        granted_roles,
+        granted_roles: vec!["something".to_owned()].into_iter().collect(),
     }
     .restore()
 }

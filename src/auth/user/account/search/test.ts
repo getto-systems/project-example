@@ -182,7 +182,7 @@ test("update user", async () => {
 
     const user: AuthUserAccount = {
         loginId: restoreLoginId("user-1"),
-        grantedRoles: ["user"],
+        grantedRoles: ["auth-user"],
         resetTokenDestination: restoreResetTokenDestination({
             type: "email",
             email: "user@example.com",

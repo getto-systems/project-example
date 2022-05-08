@@ -12,7 +12,7 @@ use crate::auth::{
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
-            test::{StaticValidateAuthNonceStruct, StaticAuthenticateStruct},
+            test::{StaticAuthenticateStruct, StaticValidateAuthNonceStruct},
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
         },
@@ -57,7 +57,7 @@ async fn success_unregister_user() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [auth-user])",
         "unregister auth user account success",
     ]);
     assert!(result.is_ok());
@@ -79,7 +79,7 @@ async fn permission_denied() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
-        "user permission denied; granted: [], require: any [user]",
+        "user permission denied; granted: [], require: any [auth-user]",
     ]);
     assert!(result.is_err());
 }
@@ -216,7 +216,7 @@ fn standard_user() -> AuthUser {
     .restore()
 }
 fn standard_granted_roles() -> HashSet<String> {
-    vec!["user".into()].into_iter().collect()
+    vec!["auth-user".into()].into_iter().collect()
 }
 fn standard_login_id() -> LoginId {
     LoginId::restore(LOGIN_ID.into())
