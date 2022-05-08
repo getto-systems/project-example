@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use getto_application_test::ActionTestRunner;
 
 use crate::auth::{
@@ -89,13 +87,10 @@ const TOKEN: &'static str = "token";
 const TICKET_ID: &'static str = "ticket-id";
 
 fn standard_token_decoder() -> StaticAuthTokenDecoder {
-    let mut granted_roles = HashSet::new();
-    granted_roles.insert("something".into());
-
     StaticAuthTokenDecoder::Valid(AuthTicketExtract {
         ticket_id: TICKET_ID.into(),
         user_id: "something-role-user-id".into(),
-        granted_roles,
+        granted_roles: vec!["something".to_owned()].into_iter().collect(),
     })
 }
 fn expired_token_decoder() -> StaticAuthTokenDecoder {

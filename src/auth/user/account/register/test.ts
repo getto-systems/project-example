@@ -22,7 +22,7 @@ import { AuthUserAccount } from "../kernel/data"
 
 const VALID_INFO = {
     loginId: "login-id",
-    grantedRoles: ["user"],
+    grantedRoles: ["auth-user"],
     resetTokenDestinationEmail: "user@example.com",
     memo: "memo",
 } as const
@@ -46,7 +46,7 @@ test("submit valid info", async () => {
                 type: "success",
                 data: {
                     loginId: "login-id",
-                    grantedRoles: ["user"],
+                    grantedRoles: ["auth-user"],
                     resetTokenDestination: { type: "email", email: "user@example.com" },
                     memo: "",
                 },
@@ -77,7 +77,7 @@ test("submit valid login-id; take long time", async () => {
                 type: "success",
                 data: {
                     loginId: "login-id",
-                    grantedRoles: ["user"],
+                    grantedRoles: ["auth-user"],
                     resetTokenDestination: { type: "email", email: "user@example.com" },
                     memo: "memo",
                 },

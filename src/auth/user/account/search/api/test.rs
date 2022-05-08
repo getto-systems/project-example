@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use getto_application_test::ActionTestRunner;
@@ -10,7 +8,7 @@ use crate::auth::{
         validate::init::{
             nonce_metadata::test::StaticAuthNonceMetadata,
             nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
-            test::{StaticValidateAuthNonceStruct, StaticAuthenticateStruct},
+            test::{StaticAuthenticateStruct, StaticValidateAuthNonceStruct},
             token_decoder::test::StaticAuthTokenDecoder,
             token_metadata::test::StaticAuthTokenMetadata,
         },
@@ -54,7 +52,7 @@ async fn success_search() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-id (granted: [auth-user])",
         "search user account success",
     ]);
     assert!(result.is_ok());
@@ -136,13 +134,10 @@ fn standard_token_header() -> StaticAuthTokenMetadata {
 }
 
 fn standard_token_decoder() -> StaticAuthTokenDecoder {
-    let mut granted_roles = HashSet::new();
-    granted_roles.insert("user".into());
-
     StaticAuthTokenDecoder::Valid(AuthTicketExtract {
         ticket_id: TICKET_ID.into(),
         user_id: USER_ID.into(),
-        granted_roles,
+        granted_roles: vec!["auth-user".to_owned()].into_iter().collect(),
     })
 }
 
@@ -154,7 +149,7 @@ fn standard_request_decoder() -> StaticSearchAuthUserAccountRequestDecoder {
             order: "normal".into(),
         },
         login_id: Some("login-id".into()),
-        granted_roles: vec!["user".into()],
+        granted_roles: vec!["auth-user".into()],
     })
 }
 
@@ -169,12 +164,9 @@ fn standard_search_repository<'a>(store: &'a MemoryAuthUserStore) -> MemoryAuthU
 }
 
 fn test_user() -> AuthUser {
-    let mut granted_roles = HashSet::new();
-    granted_roles.insert("user".into());
-
     AuthUserExtract {
         user_id: "test-user-id".into(),
-        granted_roles,
+        granted_roles: vec!["auth-user".to_owned()].into_iter().collect(),
     }
     .restore()
 }

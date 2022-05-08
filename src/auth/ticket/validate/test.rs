@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use getto_application_test::ActionTestRunner;
 
 use chrono::{DateTime, Duration, TimeZone, Utc};
@@ -10,7 +8,7 @@ use crate::auth::ticket::{
         nonce_metadata::test::StaticAuthNonceMetadata,
         nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
         request_decoder::test::StaticValidateApiTokenRequestDecoder,
-        test::{StaticValidateAuthNonceStruct, StaticAuthenticateStruct},
+        test::{StaticAuthenticateStruct, StaticValidateAuthNonceStruct},
         token_decoder::test::StaticAuthTokenDecoder,
         token_metadata::test::StaticAuthTokenMetadata,
     },
@@ -40,8 +38,8 @@ async fn success_allow_for_any_role() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
-        "authorize success; user: user-role-user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-role-user-id (granted: [auth-user])",
+        "authorize success; user: user-role-user-id (granted: [auth-user])",
     ]);
     assert!(result.is_ok());
 }
@@ -61,8 +59,8 @@ async fn success_allow_for_user_role() {
     assert_state(vec![
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-role-user-id (granted: [user])",
-        "authorize success; user: user-role-user-id (granted: [user])",
+        "authenticate success; ticket: ticket-id / user: user-role-user-id (granted: [auth-user])",
+        "authorize success; user: user-role-user-id (granted: [auth-user])",
     ]);
     assert!(result.is_ok());
 }
@@ -83,7 +81,7 @@ async fn error_allow_for_user_role_but_not_granted() {
         "nonce expires calculated; 2021-01-02 10:00:00 UTC",
         "validate nonce success",
         "authenticate success; ticket: ticket-id / user: no-role-user-id (granted: [])",
-        "user permission denied; granted: [], require: any [user]",
+        "user permission denied; granted: [], require: any [auth-user]",
     ]);
     assert!(result.is_err());
 }
@@ -194,7 +192,7 @@ fn allow_any_role_request_decoder() -> StaticValidateApiTokenRequestDecoder {
 }
 fn allow_user_role_request_decoder() -> StaticValidateApiTokenRequestDecoder {
     StaticValidateApiTokenRequestDecoder {
-        require_roles: RequireAuthRoles::restore_has_any(vec!["user"]),
+        require_roles: RequireAuthRoles::restore_has_any(vec!["auth-user"]),
     }
 }
 
@@ -219,20 +217,17 @@ fn standard_token_header() -> StaticAuthTokenMetadata {
 }
 
 fn standard_token_decoder() -> StaticAuthTokenDecoder {
-    let mut granted_roles = HashSet::new();
-    granted_roles.insert("user".into());
-
     StaticAuthTokenDecoder::Valid(AuthTicketExtract {
         ticket_id: TICKET_ID.into(),
         user_id: "user-role-user-id".into(),
-        granted_roles,
+        granted_roles: vec!["auth-user".to_owned()].into_iter().collect(),
     })
 }
 fn no_granted_roles_token_decoder() -> StaticAuthTokenDecoder {
     StaticAuthTokenDecoder::Valid(AuthTicketExtract {
         ticket_id: TICKET_ID.into(),
         user_id: "no-role-user-id".into(),
-        granted_roles: HashSet::new(),
+        granted_roles: vec![].into_iter().collect(),
     })
 }
 fn expired_token_decoder() -> StaticAuthTokenDecoder {

@@ -1,7 +1,10 @@
 import { test, expect } from "vitest"
 import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
-import { mockBoardValueStore, mockMultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
+import {
+    mockBoardValueStore,
+    mockMultipleBoardValueStore,
+} from "../../../../z_vendor/getto-application/board/input/test_helper"
 
 import { ModifyAuthUserAccountAction, initModifyAuthUserAccountAction } from "./action"
 
@@ -9,14 +12,17 @@ import { restoreLoginId } from "../../login_id/input/convert"
 import { restoreAuthUserMemo } from "../input/memo/convert"
 
 import { ModifyAuthUserAccountRemote } from "./infra"
-import { BoardValueStore, MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
+import {
+    BoardValueStore,
+    MultipleBoardValueStore,
+} from "../../../../z_vendor/getto-application/board/input/infra"
 
 import { LoginId } from "../../login_id/kernel/data"
 import { ModifyAuthUserAccountFields } from "./data"
 
 const VALID_INFO = {
     memo: "memo",
-    grantedRoles: ["user"],
+    grantedRoles: ["auth-user"],
 } as const
 
 test("submit valid info", async () => {
@@ -32,7 +38,7 @@ test("submit valid info", async () => {
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
-            { type: "success", data: { grantedRoles: ["user"], memo: "memo" } },
+            { type: "success", data: { grantedRoles: ["auth-user"], memo: "memo" } },
         ])
     })
 })
@@ -52,7 +58,7 @@ test("submit valid login-id; take long time", async () => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
             { type: "try", hasTakenLongtime: true },
-            { type: "success", data: { grantedRoles: ["user"], memo: "memo" } },
+            { type: "success", data: { grantedRoles: ["auth-user"], memo: "memo" } },
         ])
     })
 })

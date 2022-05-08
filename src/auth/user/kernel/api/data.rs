@@ -93,13 +93,18 @@ impl GrantedAuthRoles {
     }
 
     pub(in crate::auth) fn restore(roles: HashSet<String>) -> Self {
-        let mut granted_roles: HashSet<AuthRole> = HashSet::new();
-        for ref role in AUTH_ROLE_ALL {
-            if roles.contains(&role.as_str().to_owned()) {
-                granted_roles.insert(role.clone());
-            }
-        }
-        Self(granted_roles)
+        Self(
+            AUTH_ROLE_ALL
+                .iter()
+                .filter_map(|role| {
+                    if roles.contains(&role.as_str().to_owned()) {
+                        Some(role.clone())
+                    } else {
+                        None
+                    }
+                })
+                .collect(),
+        )
     }
 
     pub(in crate::auth) fn extract(self) -> HashSet<String> {
@@ -158,13 +163,18 @@ pub enum RequireAuthRoles {
 
 impl RequireAuthRoles {
     pub(in crate::auth) fn restore_has_any(roles: Vec<&str>) -> Self {
-        let mut require_roles = HashSet::new();
-        for ref role in AUTH_ROLE_ALL {
-            if roles.contains(&role.as_str()) {
-                require_roles.insert(role.clone());
-            }
-        }
-        Self::HasAny(require_roles)
+        Self::HasAny(
+            AUTH_ROLE_ALL
+                .iter()
+                .filter_map(|role| {
+                    if roles.contains(&role.as_str()) {
+                        Some(role.clone())
+                    } else {
+                        None
+                    }
+                })
+                .collect(),
+        )
     }
 
     pub fn user() -> Self {

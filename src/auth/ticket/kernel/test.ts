@@ -3,7 +3,7 @@ import { authTicketRepositoryConverter } from "./convert"
 
 test("authTicketRepositoryConverter", () => {
     const authAt = new Date("2020-01-01 10:00:00").toISOString()
-    const grantedRoles = ["user"]
+    const grantedRoles = ["auth-user"]
 
     const result = authTicketRepositoryConverter.fromRepository({ authAt, grantedRoles })
     if (!result.valid) {
