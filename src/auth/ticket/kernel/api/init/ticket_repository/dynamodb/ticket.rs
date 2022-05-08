@@ -51,9 +51,7 @@ impl<'a> TableTicket<'a> {
         let input = GetItemInput {
             table_name: self.table_name.into(),
             key: Self::key(ticket_id, user.into_user_id()),
-            projection_expression: Some(
-                vec![ColumnExpansionLimit::as_name()].into_iter().collect(),
-            ),
+            projection_expression: Some(vec![ColumnExpansionLimit::as_name()].join(",")),
             ..Default::default()
         };
 

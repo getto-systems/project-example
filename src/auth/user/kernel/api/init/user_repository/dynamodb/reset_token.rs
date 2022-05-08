@@ -64,8 +64,7 @@ impl<'a> TableResetToken<'a> {
                     ColumnExpires::as_name(),
                     ColumnResetAt::as_name(),
                 ]
-                .into_iter()
-                .collect(),
+                .join(","),
             ),
             ..Default::default()
         };
