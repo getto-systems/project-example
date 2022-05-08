@@ -38,7 +38,14 @@ deploy_cp_public() {
     --cache-control "public, max-age=31536000" \
     --metadata "$metadata" \
     --recursive \
-    $public/dist s3://$AWS_S3_PUBLIC_BUCKET/$version
+    $public/dist "s3://$AWS_S3_PUBLIC_BUCKET/$version"
+
+  aws s3 cp \
+    --acl private \
+    --cache-control "public, max-age=86400" \
+    --metadata "$metadata" \
+    --recursive \
+    $public/well-known "s3://$AWS_S3_PUBLIC_BUCKET/.well-known"
 
   for file in $public/root/*; do
     aws s3 cp \
@@ -46,14 +53,6 @@ deploy_cp_public() {
       --cache-control "public, max-age=86400" \
       --metadata "$metadata" \
       $file "s3://$AWS_S3_PUBLIC_BUCKET/$(basename $file)"
-  done
-
-  for file in $public/well-known/*; do
-    aws s3 cp \
-      --acl private \
-      --cache-control "public, max-age=86400" \
-      --metadata "$metadata" \
-      $file "s3://$AWS_S3_PUBLIC_BUCKET/.well-known/$(basename $file)"
   done
 }
 deploy_cp_secure() {
