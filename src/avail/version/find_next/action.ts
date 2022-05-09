@@ -136,15 +136,25 @@ async function findNext(
     return result
 
     async function checkNext(current: Version, suffix: string): Promise<FindNextResult> {
-        // 自動で major バージョンアップをするとまずいので minor バージョンのチェックから行う
-        const response = await checkVersion(nextMinorVersion(current, suffix))
-        if (!response.success) {
-            return response
+        // まず次の major バージョンがあるか確認
+        const majorResponse = await checkVersion(nextMajorVersion(current, suffix))
+        if (!majorResponse.success) {
+            return majorResponse
         }
-        if (response.found) {
-            return response
+        if (majorResponse.found) {
+            return majorResponse
         }
-        // minor バージョンが見つからなかったら patch バージョンのチェックを行う
+
+        // 次に minor バージョン
+        const minorResponse = await checkVersion(nextMinorVersion(current, suffix))
+        if (!minorResponse.success) {
+            return minorResponse
+        }
+        if (minorResponse.found) {
+            return minorResponse
+        }
+
+        // 最後に patch バージョン
         return await checkVersion(nextPatchVersion(current, suffix))
     }
     async function checkVersion(version: Version): Promise<FindNextResult> {
@@ -159,6 +169,15 @@ async function findNext(
     }
 }
 
+function nextMajorVersion(version: Version, suffix: string): Version {
+    return {
+        ...version,
+        major: version.major + 1,
+        minor: 0,
+        patch: 0,
+        suffix,
+    }
+}
 function nextMinorVersion(version: Version, suffix: string): Version {
     return {
         ...version,

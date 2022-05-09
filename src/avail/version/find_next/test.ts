@@ -59,6 +59,27 @@ test("up to date; take longtime", async () => {
     })
 })
 
+test("found next major version", async () => {
+    const { view } = found(["/2.0.0-ui/index.html"])
+    const resource = view.resource
+
+    const runner = setupActionTestRunner(resource.subscriber)
+
+    await runner(() => resource.ignitionState).then((stack) => {
+        expect(stack).toEqual([
+            {
+                type: "success",
+                upToDate: false,
+                version: "2.0.0-ui",
+                target: {
+                    valid: true,
+                    value: { specified: false, path: "/index.html?search=parameter#hash" },
+                },
+            },
+        ])
+    })
+})
+
 test("found next minor version", async () => {
     const { view } = found(["/1.1.0-ui/index.html"])
     const resource = view.resource

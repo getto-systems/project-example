@@ -24,6 +24,7 @@ const headers = {
     "style-src " + [
       "'self'",
       "https://trellis.getto.systems/css/",
+      "https://fonts.googleapis.com/",
     ].join(" "),
   ].join(";"),
   "x-content-type-options": "nosniff",
