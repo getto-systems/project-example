@@ -10,7 +10,7 @@ const headers = {
     "img-src 'self'",
     "font-src " + [
       "'self'",
-      "https://fonts.googleapis.com/",
+      "https://fonts.gstatic.com/",
     ].join(" "),
     "manifest-src 'self'",
     "connect-src " + [
