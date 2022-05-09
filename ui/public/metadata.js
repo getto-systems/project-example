@@ -8,7 +8,10 @@ const headers = {
     "frame-src 'none'",
     "frame-ancestors 'none'",
     "img-src 'self'",
-    "font-src 'self'",
+    "font-src " + [
+      "'self'",
+      "https://fonts.googleapis.com/",
+    ].join(" "),
     "manifest-src 'self'",
     "connect-src " + [
       "'self'",
