@@ -1,16 +1,7 @@
-FROM rust:1-bullseye as builder
+FROM asia-docker.pkg.dev/getto-projects/example/base:latest as builder
 COPY . /build
 WORKDIR /build
 RUN : && \
-  apt-get update && \
-  apt-get install -y \
-    cmake \
-    musl-tools \
-  && \
-  :
-RUN : && \
-  rustup component add rustfmt && \
-  rustup target add x86_64-unknown-linux-musl && \
   RUN_CODE_BUILDER=TRUE cargo build --bin proxy --release --target x86_64-unknown-linux-musl && \
   :
 
