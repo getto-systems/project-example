@@ -89,6 +89,46 @@ test-api:
     - cargo llvm-cov --ignore-filename-regex '(\.cargo|rustc|^api/|/[xy]_|/init/|/(main|test|init|data|infra|helper)\.rs)' | tee output.txt
     - ./api/ci/check-coverage.sh output.txt
 
+release_build-test:
+  stage: release_build
+  only:
+    refs:
+      - schedules
+    variables:
+      - $RELEASE_TEST
+
+  image: docker:stable
+
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+
+  services:
+    - docker:dind
+
+  script:
+    - api/ci/build.sh test
+
+release_build-base:
+  stage: release_build
+  only:
+    refs:
+      - schedules
+    variables:
+      - $RELEASE_BASE
+
+  image: docker:stable
+
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+
+  services:
+    - docker:dind
+
+  script:
+    - api/ci/build.sh base
+
 bump_version-ui:
   stage: bump_version
   only:
@@ -246,26 +286,6 @@ release-proxy:
 
   script:
     - curl $TRELLIS_CI_BUMP_VERSION/push_tags.sh | sh
-
-release_build-test:
-  stage: release_build
-  only:
-    refs:
-      - schedules
-    variables:
-      - $RELEASE_TEST
-
-  image: docker:stable
-
-  variables:
-    DOCKER_HOST: tcp://docker:2375/
-    DOCKER_DRIVER: overlay2
-
-  services:
-    - docker:dind
-
-  script:
-    - api/ci/build.sh test
 
 release_build-proxy:
   stage: release_build
