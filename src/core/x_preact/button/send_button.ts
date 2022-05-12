@@ -35,10 +35,8 @@ export function SendButton({
 
     switch (validateState) {
         case "initial":
-            return button_send({ state: buttonState("normal"), label: buttonLabel(icon), onClick })
-
         case "valid":
-            return button_send({ state: buttonState("confirm"), label: buttonLabel(icon), onClick })
+            return button_send({ state: buttonState(), label: buttonLabel(icon), onClick })
 
         case "invalid":
             return button_disabled({ label: buttonLabel(icon) })
@@ -47,10 +45,7 @@ export function SendButton({
     function buttonLabel(icon: Icon): VNode {
         return html`${label} ${iconHtml(icon)}`
     }
-    function buttonState(defaultState: "normal" | "confirm"): "normal" | "confirm" {
-        if (observeState === undefined) {
-            return defaultState
-        }
+    function buttonState(): "normal" | "confirm" {
         return observeState.hasChanged ? "confirm" : "normal"
     }
 }
