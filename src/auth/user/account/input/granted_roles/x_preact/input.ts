@@ -65,5 +65,7 @@ export function AuthRoleLabels({
     if (grantedRoles.length === 0) {
         return label_gray("権限なし")
     }
-    return html`${grantedRoles.map((grantedRole) => label_info(authRoleLabel(grantedRole)))}`
+    return html`${grantedRoles.map((grantedRole) => {
+        return html` ${label_info(authRoleLabel(grantedRole))} `
+    })}`
 }
