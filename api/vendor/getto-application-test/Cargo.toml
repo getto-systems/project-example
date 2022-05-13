@@ -1,6 +1,6 @@
 [package]
 name = "getto-application-test"
-version = "0.28.0-api"
+version = "0.28.0-proxy"
 authors = ["shun <shun.fix9@gmail.com>"]
 edition = "2018"
 
