@@ -23,9 +23,13 @@ test("submit valid new-password", async () => {
     await runner(async () => {
         store.newPassword.set(VALID_PASSWORD.newPassword)
 
-        return resource.overwrite.submit(user)
+        return resource.overwrite.submit(user, () => null)
     }).then((stack) => {
-        expect(stack).toEqual([{ type: "try", hasTakenLongtime: false }, { type: "success" }])
+        expect(stack).toEqual([
+            { type: "try", hasTakenLongtime: false },
+            { type: "success" },
+            { type: "initial" },
+        ])
     })
 })
 
@@ -38,12 +42,13 @@ test("submit valid login-id and password; take long time", async () => {
     await runner(() => {
         store.newPassword.set(VALID_PASSWORD.newPassword)
 
-        return resource.overwrite.submit(user)
+        return resource.overwrite.submit(user, () => null)
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
             { type: "try", hasTakenLongtime: true },
             { type: "success" },
+            { type: "initial" },
         ])
     })
 })
@@ -53,7 +58,7 @@ test("submit without fields", async () => {
 
     const runner = setupActionTestRunner(resource.overwrite.subscriber)
 
-    await runner(() => resource.overwrite.submit(user)).then((stack) => {
+    await runner(() => resource.overwrite.submit(user, () => null)).then((stack) => {
         expect(stack).toEqual([])
     })
 })
@@ -81,7 +86,7 @@ test("terminate", async () => {
 
     await runner(async () => {
         resource.overwrite.terminate()
-        return resource.overwrite.submit(user)
+        return resource.overwrite.submit(user, () => null)
     }).then((stack) => {
         // no input/validate event after terminate
         expect(stack).toEqual([])
@@ -110,7 +115,8 @@ function initResource(overwritePasswordRemote: OverwritePasswordRemote): Readonl
                 overwritePasswordRemote,
             },
             config: {
-                takeLongtimeThreshold: { delay_millisecond: 32 },
+                takeLongtimeThreshold: { wait_millisecond: 32 },
+                resetToInitialTimeout: { wait_millisecond: 32 },
             },
         }),
     }

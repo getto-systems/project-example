@@ -5,5 +5,6 @@ import {  OverwriteLoginIdConfig } from "../action"
 export function newOverwritePasswordConfig(): OverwriteLoginIdConfig {
     return {
         takeLongtimeThreshold: AUTH_CONFIG.takeLongtimeThreshold,
+        resetToInitialTimeout: AUTH_CONFIG.resetToInitialTimeout,
     }
 }

@@ -15,7 +15,7 @@ import {
     ObserveBoardAction,
 } from "../../../../z_vendor/getto-application/board/observe_board/action"
 
-import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime } from "../../../../z_lib/ui/timer/helper"
 import { getScriptPath } from "../../../sign/get_script_path/method"
 import {
     startContinuousRenew,
@@ -24,7 +24,7 @@ import {
     StartContinuousRenewEvent,
 } from "../../../ticket/check/method"
 
-import { DelayTime } from "../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../z_lib/ui/config/infra"
 import { GetScriptPathConfig, GetScriptPathShell } from "../../../sign/get_script_path/infra"
 import { AuthenticatePasswordRemote } from "./infra"
 
@@ -69,7 +69,7 @@ export type AuthenticatePasswordInfra = Readonly<{
 export type AuthenticatePasswordShell = GetScriptPathShell
 
 export type AuthenticatePasswordConfig = Readonly<{
-    takeLongtimeThreshold: DelayTime
+    takeLongtimeThreshold: WaitTime
 }> &
     StartContinuousRenewConfig &
     GetScriptPathConfig
@@ -209,7 +209,7 @@ async function authenticate<S>(
     const { authenticateRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
-    const response = await delayedChecker(
+    const response = await checkTakeLongtime(
         authenticateRemote(fields),
         config.takeLongtimeThreshold,
         () => post({ type: "try-to-login", hasTakenLongtime: true }),

@@ -3,7 +3,7 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
-import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
 
 import { InputLoginIdAction, initInputLoginIdAction } from "../input/action"
 import {
@@ -19,7 +19,7 @@ import { ChangeLoginIdError, OverwriteLoginIdFields } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 
 import { OverwriteLoginIdRemote } from "./infra"
-import { DelayTime } from "../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../z_lib/ui/config/infra"
 
 import { LoginId } from "../kernel/data"
 
@@ -29,10 +29,13 @@ export interface OverwriteLoginIdAction extends StatefulApplicationAction<Overwr
     readonly observe: ObserveBoardAction
 
     clear(): OverwriteLoginIdState
-    submit(user: Readonly<{ loginId: LoginId }>): Promise<OverwriteLoginIdState>
+    submit(
+        user: Readonly<{ loginId: LoginId }>,
+        onSuccess: { (loginId: LoginId): void },
+    ): Promise<OverwriteLoginIdState>
 }
 
-export type OverwriteLoginIdState = Readonly<{ type: "initial" }> | OverwriteLoginIdEvent
+export type OverwriteLoginIdState = OverwriteLoginIdEvent
 
 const initialState: OverwriteLoginIdState = { type: "initial" }
 
@@ -46,7 +49,8 @@ export type OverwriteLoginIdInfra = Readonly<{
 }>
 
 export type OverwriteLoginIdConfig = Readonly<{
-    takeLongtimeThreshold: DelayTime
+    takeLongtimeThreshold: WaitTime
+    resetToInitialTimeout: WaitTime
 }>
 
 export function initOverwriteLoginIdAction(
@@ -119,24 +123,29 @@ class OverwriteAction
         this.validate.clear()
         return this.post(this.initialState)
     }
-    async submit(user: Readonly<{ loginId: LoginId }>): Promise<OverwriteLoginIdState> {
+    async submit(
+        user: Readonly<{ loginId: LoginId }>,
+        onSuccess: { (loginId: LoginId): void },
+    ): Promise<OverwriteLoginIdState> {
         const fields = this.convert()
         if (!fields.valid) {
             return this.currentState()
         }
-        return overwriteLoginId(this.material, user, fields.value, this.post)
+        return overwriteLoginId(this.material, user, fields.value, onSuccess, this.post)
     }
 }
 
 type OverwriteLoginIdEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ChangeLoginIdError }>
-    | Readonly<{ type: "success"; loginId: LoginId }>
+    | Readonly<{ type: "success" }>
+    | Readonly<{ type: "initial" }>
 
 async function overwriteLoginId<S>(
     { infra, config }: OverwriteLoginIdMaterial,
     user: Readonly<{ loginId: LoginId }>,
     fields: OverwriteLoginIdFields,
+    onSuccess: { (loginId: LoginId): void },
     post: Post<OverwriteLoginIdEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
@@ -144,7 +153,7 @@ async function overwriteLoginId<S>(
     const { overwriteLoginIdRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
-    const response = await delayedChecker(
+    const response = await checkTakeLongtime(
         overwriteLoginIdRemote(user, fields),
         config.takeLongtimeThreshold,
         () => post({ type: "try", hasTakenLongtime: true }),
@@ -153,7 +162,9 @@ async function overwriteLoginId<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "success", loginId: fields.newLoginId })
+    onSuccess(fields.newLoginId)
+    post({ type: "success" })
+    return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 
 interface Post<E, S> {

@@ -3,11 +3,9 @@ import { VNode } from "preact"
 
 import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
 
-import { useSuccessState } from "./hooks"
-
 import { button_disabled, button_send } from "../../../z_vendor/getto-css/preact/design/form"
 
-import { icon_add, icon_ok, icon_spinner } from "../../../x_content/icon"
+import { icon_add, icon_spinner } from "../../../x_content/icon"
 import { iconHtml } from "../design/icon"
 
 import { ValidateBoardState } from "../../../z_vendor/getto-application/board/validate_board/action"
@@ -18,14 +16,12 @@ import { Icon } from "../../../z_lib/ui/icon/data"
 type Props = Readonly<{
     label?: VNodeContent
     icon?: Icon
-    isSuccess: boolean
     isConnecting: boolean
     validateState: ValidateBoardState
     observeState: ObserveBoardState
     onClick: { (e: Event): void }
 }>
 export function RegisterButton({
-    isSuccess,
     isConnecting,
     validateState,
     observeState,
@@ -33,13 +29,7 @@ export function RegisterButton({
     icon,
     onClick,
 }: Props): VNode {
-    const state = useSuccessState(isSuccess)
-
     const buttonIcon = icon || icon_add
-
-    if (state === "success-confirming") {
-        return button_send({ state: buttonState(), label: buttonLabel(icon_ok), onClick })
-    }
 
     if (isConnecting) {
         return button_send({ state: "connect", label: buttonLabel(icon_spinner) })

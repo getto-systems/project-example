@@ -3,17 +3,20 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
-import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime } from "../../../../z_lib/ui/timer/helper"
 
 import { UnregisterAuthUserAccountRemote } from "./infra"
-import { DelayTime } from "../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../z_lib/ui/config/infra"
 
 import { UnregisterAuthUserAccountError } from "./data"
 import { LoginId } from "../../login_id/kernel/data"
 
 export interface UnregisterAuthUserAccountAction
     extends StatefulApplicationAction<UnregisterAuthUserAccountState> {
-    submit(user: Readonly<{ loginId: LoginId }>): Promise<UnregisterAuthUserAccountState>
+    submit(
+        user: Readonly<{ loginId: LoginId }>,
+        onSuccess: { (): void },
+    ): Promise<UnregisterAuthUserAccountState>
 }
 
 export type UnregisterAuthUserAccountState = Readonly<{ type: "initial" }> | UnregisterUserEvent
@@ -30,7 +33,7 @@ export type UnregisterAuthUserAccountInfra = Readonly<{
 }>
 
 export type UnregisterAuthUserAccountConfig = Readonly<{
-    takeLongtimeThreshold: DelayTime
+    takeLongtimeThreshold: WaitTime
 }>
 
 export function initUnregisterAuthUserAccountAction(
@@ -52,8 +55,11 @@ class Action
         this.material = material
     }
 
-    async submit(user: Readonly<{ loginId: LoginId }>): Promise<UnregisterAuthUserAccountState> {
-        return unregisterUser(this.material, user, this.post)
+    async submit(
+        user: Readonly<{ loginId: LoginId }>,
+        onSuccess: { (): void },
+    ): Promise<UnregisterAuthUserAccountState> {
+        return unregisterUser(this.material, user, onSuccess, this.post)
     }
 }
 
@@ -65,6 +71,7 @@ type UnregisterUserEvent =
 async function unregisterUser<S>(
     { infra, config }: UnregisterAuthUserAccountMaterial,
     user: Readonly<{ loginId: LoginId }>,
+    onSuccess: { (): void },
     post: Post<UnregisterUserEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
@@ -72,7 +79,7 @@ async function unregisterUser<S>(
     const { unregisterUserRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
-    const response = await delayedChecker(
+    const response = await checkTakeLongtime(
         unregisterUserRemote(user),
         config.takeLongtimeThreshold,
         () => post({ type: "try", hasTakenLongtime: true }),
@@ -81,6 +88,7 @@ async function unregisterUser<S>(
         return post({ type: "failed", err: response.err })
     }
 
+    onSuccess()
     return post({ type: "success" })
 }
 

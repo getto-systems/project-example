@@ -5,5 +5,6 @@ import { ChangeResetTokenDestinationConfig } from "../action"
 export function newChangeResetTokenDestinationConfig(): ChangeResetTokenDestinationConfig {
     return {
         takeLongtimeThreshold: AUTH_CONFIG.takeLongtimeThreshold,
+        resetToInitialTimeout: AUTH_CONFIG.resetToInitialTimeout,
     }
 }

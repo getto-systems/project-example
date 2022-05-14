@@ -12,10 +12,10 @@ import {
     ObserveBoardAction,
 } from "../../../../z_vendor/getto-application/board/observe_board/action"
 
-import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
 
 import { ChangePasswordRemote, OverwritePasswordRemote } from "./infra"
-import { DelayTime } from "../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../z_lib/ui/config/infra"
 
 import { ChangePasswordError, ChangePasswordFields, OverwritePasswordFields } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
@@ -28,10 +28,10 @@ export interface ChangePasswordAction extends StatefulApplicationAction<ChangePa
     readonly observe: ObserveBoardAction
 
     clear(): ChangePasswordState
-    submit(): Promise<ChangePasswordState>
+    submit(onSuccess: { (): void }): Promise<ChangePasswordState>
 }
 
-export type ChangePasswordState = Readonly<{ type: "initial" }> | ChangePasswordEvent
+export type ChangePasswordState = ChangePasswordEvent
 
 const initialState: ChangePasswordState = { type: "initial" }
 
@@ -41,10 +41,13 @@ export interface OverwritePasswordAction extends StatefulApplicationAction<Overw
     readonly observe: ObserveBoardAction
 
     clear(): OverwritePasswordState
-    submit(user: Readonly<{ loginId: LoginId }>): Promise<OverwritePasswordState>
+    submit(
+        user: Readonly<{ loginId: LoginId }>,
+        onSuccess: { (): void },
+    ): Promise<OverwritePasswordState>
 }
 
-export type OverwritePasswordState = Readonly<{ type: "initial" }> | OverwritePasswordEvent
+export type OverwritePasswordState = OverwritePasswordEvent
 
 const initialOverwriteState: OverwritePasswordState = { type: "initial" }
 
@@ -58,7 +61,8 @@ export type ChangePasswordInfra = Readonly<{
 }>
 
 export type ChangePasswordConfig = Readonly<{
-    takeLongtimeThreshold: DelayTime
+    takeLongtimeThreshold: WaitTime
+    resetToInitialTimeout: WaitTime
 }>
 
 export function initChangePasswordAction(material: ChangePasswordMaterial): ChangePasswordAction {
@@ -136,12 +140,12 @@ class Action
         this.validate.clear()
         return this.post(this.initialState)
     }
-    async submit(): Promise<ChangePasswordState> {
+    async submit(onSuccess: { (): void }): Promise<ChangePasswordState> {
         const fields = this.convert()
         if (!fields.valid) {
             return this.currentState()
         }
-        return changePassword(this.material, fields.value, this.post)
+        return changePassword(this.material, fields.value, onSuccess, this.post)
     }
 }
 
@@ -149,10 +153,12 @@ type ChangePasswordEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ChangePasswordError }>
     | Readonly<{ type: "success" }>
+    | Readonly<{ type: "initial" }>
 
 async function changePassword<S>(
     { infra, config }: ChangePasswordMaterial,
     fields: ChangePasswordFields,
+    onSuccess: { (): void },
     post: Post<ChangePasswordEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
@@ -160,7 +166,7 @@ async function changePassword<S>(
     const { changePasswordRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
-    const response = await delayedChecker(
+    const response = await checkTakeLongtime(
         changePasswordRemote(fields),
         config.takeLongtimeThreshold,
         () => post({ type: "try", hasTakenLongtime: true }),
@@ -169,7 +175,9 @@ async function changePassword<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "success" })
+    onSuccess()
+    post({ type: "success" })
+    return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 
 export type OverwritePasswordMaterial = Readonly<{
@@ -182,7 +190,8 @@ export type OverwritePasswordInfra = Readonly<{
 }>
 
 export type OverwritePasswordConfig = Readonly<{
-    takeLongtimeThreshold: DelayTime
+    takeLongtimeThreshold: WaitTime
+    resetToInitialTimeout: WaitTime
 }>
 
 export function initOverwritePasswordAction(
@@ -258,12 +267,15 @@ class OverwriteAction
         this.validate.clear()
         return this.post(this.initialState)
     }
-    async submit(user: Readonly<{ loginId: LoginId }>): Promise<OverwritePasswordState> {
+    async submit(
+        user: Readonly<{ loginId: LoginId }>,
+        onSuccess: { (): void },
+    ): Promise<OverwritePasswordState> {
         const fields = this.convert()
         if (!fields.valid) {
             return this.currentState()
         }
-        return overwritePassword(this.material, user, fields.value, this.post)
+        return overwritePassword(this.material, user, fields.value, onSuccess, this.post)
     }
 }
 
@@ -271,11 +283,13 @@ type OverwritePasswordEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ChangePasswordError }>
     | Readonly<{ type: "success" }>
+    | Readonly<{ type: "initial" }>
 
 async function overwritePassword<S>(
     { infra, config }: OverwritePasswordMaterial,
     user: Readonly<{ loginId: LoginId }>,
     fields: OverwritePasswordFields,
+    onSuccess: { (): void },
     post: Post<OverwritePasswordEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
@@ -283,7 +297,7 @@ async function overwritePassword<S>(
     const { overwritePasswordRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
-    const response = await delayedChecker(
+    const response = await checkTakeLongtime(
         overwritePasswordRemote(user, fields),
         config.takeLongtimeThreshold,
         () => post({ type: "try", hasTakenLongtime: true }),
@@ -292,7 +306,9 @@ async function overwritePassword<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "success" })
+    onSuccess()
+    post({ type: "success" })
+    return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 
 interface Post<E, S> {

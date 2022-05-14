@@ -276,7 +276,7 @@ function initResource(
                 urlStore.current = url
             }),
             config: {
-                takeLongtimeThreshold: { delay_millisecond: 32 },
+                takeLongtimeThreshold: { wait_millisecond: 32 },
             },
         }),
     }

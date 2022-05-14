@@ -14,6 +14,7 @@ import { GrantedRolesField } from "../../input/granted_roles/x_preact/input"
 import { ResetTokenDestinationField } from "../../../password/reset/token_destination/input/x_preact/input"
 import { ClearChangesButton } from "../../../../../core/x_preact/button/clear_changes_button"
 import { RegisterButton } from "../../../../../core/x_preact/button/register_button"
+import { RegisterSuccessButton } from "../../../../../core/x_preact/button/register_success_button"
 
 import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
 
@@ -51,17 +52,24 @@ export function RegisterAuthUserAccount(props: Props): VNode {
     )
 
     function submitButton(): VNode {
-        return h(RegisterButton, {
-            isSuccess: state.type === "success",
-            isConnecting: state.type === "try",
-            validateState,
-            observeState,
-            onClick,
-        })
+        if (state.type === "success") {
+            return h(RegisterSuccessButton, { onClick })
+        } else {
+            return h(RegisterButton, {
+                isConnecting: state.type === "try",
+                validateState,
+                observeState,
+                onClick,
+            })
+        }
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.register.submit()
+            props.register.submit(onSuccess)
+
+            function onSuccess() {
+                // noop
+            }
         }
     }
 

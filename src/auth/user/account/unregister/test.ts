@@ -16,7 +16,7 @@ test("submit", async () => {
     const runner = setupActionTestRunner(resource.unregister.subscriber)
 
     await runner(async () => {
-        return resource.unregister.submit(user)
+        return resource.unregister.submit(user, () => null)
     }).then((stack) => {
         expect(stack).toEqual([{ type: "try", hasTakenLongtime: false }, { type: "success" }])
     })
@@ -29,7 +29,7 @@ test("submit; take long time", async () => {
     const runner = setupActionTestRunner(resource.unregister.subscriber)
 
     await runner(() => {
-        return resource.unregister.submit(user)
+        return resource.unregister.submit(user, () => null)
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
@@ -51,7 +51,7 @@ test("terminate", async () => {
 
     await runner(async () => {
         resource.unregister.terminate()
-        return resource.unregister.submit(user)
+        return resource.unregister.submit(user, () => null)
     }).then((stack) => {
         // no input/validate event after terminate
         expect(stack).toEqual([])
@@ -77,7 +77,7 @@ function initResource(modifyUserRemote: UnregisterAuthUserAccountRemote): Readon
                 unregisterUserRemote: modifyUserRemote,
             },
             config: {
-                takeLongtimeThreshold: { delay_millisecond: 32 },
+                takeLongtimeThreshold: { wait_millisecond: 32 },
             },
         }),
     }

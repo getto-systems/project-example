@@ -16,6 +16,7 @@ import { StaticLoginIdField } from "../../../login_id/input/x_preact/static"
 import { AuthUserMemoField } from "../../input/memo/x_preact/input"
 import { GrantedRolesField } from "../../input/granted_roles/x_preact/input"
 import { EditButton } from "../../../../../core/x_preact/button/edit_button"
+import { EditSuccessButton } from "../../../../../core/x_preact/button/edit_success_button"
 import { ResetButton } from "../../../../../core/x_preact/button/reset_button"
 import { CloseButton } from "../../../../../core/x_preact/button/close_button"
 import { ChangeButton } from "../../../../../core/x_preact/button/change_button"
@@ -79,7 +80,11 @@ export function ModifyAuthUserAccount(props: Props): VNode {
     )
 
     function editButton(): VNode {
-        return h(EditButton, { onClick, isSuccess: state.type === "success" })
+        if (state.type === "success") {
+            return h(EditSuccessButton, { onClick })
+        } else {
+            return h(EditButton, { onClick })
+        }
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -98,12 +103,12 @@ export function ModifyAuthUserAccount(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.modify.submit(props.user).then((state) => {
-                if (state.type === "success") {
-                    props.editable.close()
-                    props.onSuccess(state.data)
-                }
-            })
+            props.modify.submit(props.user, onSuccess)
+
+            function onSuccess(data: ModifyAuthUserAccountFields) {
+                props.editable.close()
+                props.onSuccess(data)
+            }
         }
     }
 

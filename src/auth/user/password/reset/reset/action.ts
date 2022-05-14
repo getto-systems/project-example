@@ -14,7 +14,7 @@ import {
     ObserveBoardAction,
 } from "../../../../../z_vendor/getto-application/board/observe_board/action"
 
-import { delayedChecker } from "../../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime } from "../../../../../z_lib/ui/timer/helper"
 
 import { getScriptPath } from "../../../../sign/get_script_path/method"
 import {
@@ -25,7 +25,7 @@ import {
 } from "../../../../ticket/check/method"
 
 import { GetScriptPathConfig, GetScriptPathShell } from "../../../../sign/get_script_path/infra"
-import { DelayTime } from "../../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../../z_lib/ui/config/infra"
 import { ResetPasswordRemote, ResetTokenDetecter } from "./infra"
 
 import { LoadScriptError, ConvertScriptPathResult } from "../../../../sign/get_script_path/data"
@@ -71,7 +71,7 @@ export type ResetPasswordShell = Readonly<{
     GetScriptPathShell
 
 export type ResetPasswordConfig = Readonly<{
-    takeLongtimeThreshold: DelayTime
+    takeLongtimeThreshold: WaitTime
 }> &
     StartContinuousRenewConfig &
     GetScriptPathConfig
@@ -211,7 +211,7 @@ async function reset<S>(
     const { resetRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
-    const response = await delayedChecker(
+    const response = await checkTakeLongtime(
         resetRemote(resetToken.value, fields),
         config.takeLongtimeThreshold,
         () => post({ type: "try-to-reset", hasTakenLongtime: true }),

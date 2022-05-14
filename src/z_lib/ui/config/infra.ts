@@ -1,4 +1,3 @@
-export type DelayTime = Readonly<{ delay_millisecond: number }>
 export type ExpireTime = Readonly<{ expire_millisecond: number }>
 export type IntervalTime = Readonly<{ interval_millisecond: number }>
 export type WaitTime = Readonly<{ wait_millisecond: number }>
@@ -17,13 +16,6 @@ export function expireDay(day: number): ExpireTime {
     return expireHour(day * 24)
 }
 
-export function delaySecond(second: number): DelayTime {
-    return { delay_millisecond: second * 1000 }
-}
-export function delayMinute(minute: number): DelayTime {
-    return delaySecond(minute * 60)
-}
-
 export function intervalSecond(second: number): IntervalTime {
     return { interval_millisecond: second * 1000 }
 }
@@ -33,6 +25,9 @@ export function intervalMinute(minute: number): IntervalTime {
 
 export function waitSecond(second: number): WaitTime {
     return { wait_millisecond: second * 1000 }
+}
+export function waitMinute(minute: number): WaitTime {
+    return waitSecond(minute * 60)
 }
 
 export function limit(count: number): Limit {

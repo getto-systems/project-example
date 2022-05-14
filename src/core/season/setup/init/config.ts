@@ -5,5 +5,6 @@ import { SetupSeasonConfig } from "../action"
 export function newSetupSeasonConfig(): SetupSeasonConfig {
     return {
         manualSetupSeasonExpire: CORE_CONFIG.manualSetupSeasonExpire,
+        resetToInitialTimeout: CORE_CONFIG.resetToInitialTimeout,
     }
 }

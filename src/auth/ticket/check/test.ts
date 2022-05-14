@@ -253,7 +253,7 @@ function initView(
                 continuousRenewInterval: { interval_millisecond: 128 },
                 ticketExpire: { expire_millisecond: 1 * 1000 },
                 instantLoadExpire: { expire_millisecond: 20 * 1000 },
-                takeLongtimeThreshold: { delay_millisecond: 32 },
+                takeLongtimeThreshold: { wait_millisecond: 32 },
                 secureServerURL: mockSecureServerURL("https://secure.example.com"),
             },
         }),

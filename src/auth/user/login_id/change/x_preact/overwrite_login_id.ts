@@ -9,6 +9,7 @@ import { takeLongtimeField, validationMessage } from "../../../../../core/x_prea
 import { changeLoginIdError } from "./helper"
 import { LoginIdField } from "../../input/x_preact/input"
 import { EditButton } from "../../../../../core/x_preact/button/edit_button"
+import { EditSuccessButton } from "../../../../../core/x_preact/button/edit_success_button"
 import { ClearChangesButton } from "../../../../../core/x_preact/button/clear_changes_button"
 import { ChangeButton } from "../../../../../core/x_preact/button/change_button"
 import { CloseButton } from "../../../../../core/x_preact/button/close_button"
@@ -57,7 +58,11 @@ export function OverwriteLoginId(props: Props): VNode {
     })
 
     function editButton(): VNode {
-        return h(EditButton, { isSuccess: state.type === "success", onClick })
+        if (state.type === "success") {
+            return h(EditSuccessButton, { onClick })
+        } else {
+            return h(EditButton, { onClick })
+        }
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -76,13 +81,12 @@ export function OverwriteLoginId(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.overwrite.submit(props.user).then((state) => {
-                switch (state.type) {
-                    case "success":
-                        props.editable.close()
-                        props.onSuccess(state.loginId)
-                }
-            })
+            props.overwrite.submit(props.user, onSuccess)
+
+            function onSuccess(loginId: LoginId) {
+                props.editable.close()
+                props.onSuccess(loginId)
+            }
         }
     }
 

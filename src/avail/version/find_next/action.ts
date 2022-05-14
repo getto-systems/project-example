@@ -2,20 +2,23 @@ import {
     StatefulApplicationAction,
     AbstractStatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
-import { DelayTime } from "../../../z_lib/ui/config/infra"
-import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
-import { delayedChecker } from "../../../z_lib/ui/timer/helper"
+
 import { versionStringConverter } from "../kernel/convert"
-import { VersionString } from "../kernel/data"
 import { versionConfigConverter } from "./convert"
+import { versionToString } from "./helper"
+import { checkTakeLongtime } from "../../../z_lib/ui/timer/helper"
+
+import { WaitTime } from "../../../z_lib/ui/config/infra"
+import { ApplicationTargetPathDetecter, CheckDeployExistsRemote } from "./infra"
+
+import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
+import { VersionString } from "../kernel/data"
 import {
     ApplicationTargetPath,
     CheckDeployExistsError,
     CheckDeployExistsRemoteError,
     Version,
 } from "./data"
-import { versionToString } from "./helper"
-import { ApplicationTargetPathDetecter, CheckDeployExistsRemote } from "./infra"
 
 export type FindNextVersionAction = StatefulApplicationAction<FindNextVersionState>
 
@@ -37,7 +40,7 @@ export type FindNextVersionShell = Readonly<{
 export type FindNextVersionConfig = Readonly<{
     version: string
     versionSuffix: string
-    takeLongtimeThreshold: DelayTime
+    takeLongtimeThreshold: WaitTime
 }>
 
 export function initFindNextVersionAction(
@@ -87,7 +90,7 @@ async function findNextVersion<S>(
     }
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
-    const next = await delayedChecker(
+    const next = await checkTakeLongtime(
         findNext(check, currentVersion.value, config.versionSuffix),
         config.takeLongtimeThreshold,
         () => post({ type: "take-longtime" }),

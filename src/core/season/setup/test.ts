@@ -25,9 +25,9 @@ test("setup season", async () => {
 
     await runner(() => {
         store.season.set("2021.summer")
-        return resource.setupSeason.setup()
+        return resource.setupSeason.setup(() => null)
     }).then((stack) => {
-        expect(stack).toEqual([{ type: "success" }])
+        expect(stack).toEqual([{ type: "success" }, { type: "initial" }])
     })
 })
 
@@ -36,8 +36,8 @@ test("setup season; default", async () => {
 
     const runner = setupActionTestRunner(resource.setupSeason.subscriber)
 
-    await runner(() => resource.setupSeason.setup()).then((stack) => {
-        expect(stack).toEqual([{ type: "success" }])
+    await runner(() => resource.setupSeason.setup(() => null)).then((stack) => {
+        expect(stack).toEqual([{ type: "success" }, { type: "initial" }])
     })
 })
 
@@ -61,6 +61,7 @@ function initResource(seasonRepository: SeasonRepository): Readonly<{
                 },
                 config: {
                     manualSetupSeasonExpire: { expire_millisecond: 1000 },
+                    resetToInitialTimeout: { wait_millisecond: 32 },
                 },
             },
             {

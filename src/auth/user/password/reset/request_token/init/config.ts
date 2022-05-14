@@ -5,5 +5,6 @@ import { RequestResetTokenConfig } from "../action"
 export function newRequestResetTokenConfig(): RequestResetTokenConfig {
     return {
         takeLongtimeThreshold: AUTH_CONFIG.takeLongtimeThreshold,
+        resetToInitialTimeout: AUTH_CONFIG.resetToInitialTimeout,
     }
 }

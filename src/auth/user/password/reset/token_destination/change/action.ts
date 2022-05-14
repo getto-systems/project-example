@@ -3,7 +3,7 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../../../../z_vendor/getto-application/action/action"
 
-import { delayedChecker } from "../../../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime, ticker } from "../../../../../../z_lib/ui/timer/helper"
 
 import {
     initInputResetTokenDestinationAction,
@@ -22,7 +22,7 @@ import { ChangeResetTokenDestinationError } from "./data"
 import { ConvertBoardResult } from "../../../../../../z_vendor/getto-application/board/kernel/data"
 
 import { ChangeResetTokenDestinationRemote } from "./infra"
-import { DelayTime } from "../../../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../../../z_lib/ui/config/infra"
 
 import { ResetTokenDestination } from "../kernel/data"
 import { LoginId } from "../../../../login_id/kernel/data"
@@ -36,12 +36,11 @@ export interface ChangeResetTokenDestinationAction
     reset(destination: ResetTokenDestination): ChangeResetTokenDestinationState
     submit(
         user: Readonly<{ loginId: LoginId; resetTokenDestination: ResetTokenDestination }>,
+        onSuccess: { (data: ResetTokenDestination): void },
     ): Promise<ChangeResetTokenDestinationState>
 }
 
-export type ChangeResetTokenDestinationState =
-    | Readonly<{ type: "initial" }>
-    | ChangeDestinationEvent
+export type ChangeResetTokenDestinationState = ChangeDestinationEvent
 
 const initialState: ChangeResetTokenDestinationState = { type: "initial" }
 
@@ -55,7 +54,8 @@ export type ChangeResetTokenDestinationInfra = Readonly<{
 }>
 
 export type ChangeResetTokenDestinationConfig = Readonly<{
-    takeLongtimeThreshold: DelayTime
+    takeLongtimeThreshold: WaitTime
+    resetToInitialTimeout: WaitTime
 }>
 
 export function initChangeResetTokenDestinationAction(
@@ -126,24 +126,27 @@ class Action
     }
     async submit(
         user: Readonly<{ loginId: LoginId; resetTokenDestination: ResetTokenDestination }>,
+        onSuccess: { (data: ResetTokenDestination): void },
     ): Promise<ChangeResetTokenDestinationState> {
         const fields = this.convert()
         if (!fields.valid) {
             return this.currentState()
         }
-        return changeDestination(this.material, user, fields.value, this.post)
+        return changeDestination(this.material, user, fields.value, onSuccess, this.post)
     }
 }
 
 type ChangeDestinationEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ChangeResetTokenDestinationError }>
-    | Readonly<{ type: "success"; data: ResetTokenDestination }>
+    | Readonly<{ type: "success" }>
+    | Readonly<{ type: "initial" }>
 
 async function changeDestination<S>(
     { infra, config }: ChangeResetTokenDestinationMaterial,
     user: Readonly<{ loginId: LoginId; resetTokenDestination: ResetTokenDestination }>,
     fields: ResetTokenDestination,
+    onSuccess: { (data: ResetTokenDestination): void },
     post: Post<ChangeDestinationEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
@@ -151,7 +154,7 @@ async function changeDestination<S>(
     const { changeDestinationRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
-    const response = await delayedChecker(
+    const response = await checkTakeLongtime(
         changeDestinationRemote(user, fields),
         config.takeLongtimeThreshold,
         () => post({ type: "try", hasTakenLongtime: true }),
@@ -160,7 +163,9 @@ async function changeDestination<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "success", data: fields })
+    onSuccess(fields)
+    post({ type: "success" })
+    return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 
 interface Post<E, S> {

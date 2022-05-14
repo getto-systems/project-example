@@ -12,6 +12,7 @@ import { ClearChangesButton } from "../../../../../core/x_preact/button/clear_ch
 import { CloseButton } from "../../../../../core/x_preact/button/close_button"
 import { ChangeButton } from "../../../../../core/x_preact/button/change_button"
 import { EditButton } from "../../../../../core/x_preact/button/edit_button"
+import { EditSuccessButton } from "../../../../../core/x_preact/button/edit_success_button"
 
 import { ChangePasswordAction } from "../action"
 import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
@@ -63,7 +64,11 @@ export function ChangePassword(props: Props): VNode {
     })
 
     function editButton(): VNode {
-        return h(EditButton, { isSuccess: state.type === "success", onClick })
+        if (state.type === "success") {
+            return h(EditSuccessButton, { onClick })
+        } else {
+            return h(EditButton, { onClick })
+        }
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -82,12 +87,11 @@ export function ChangePassword(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.change.submit().then((state) => {
-                switch (state.type) {
-                    case "success":
-                        props.editable.close()
-                }
-            })
+            props.change.submit(onSuccess)
+
+            function onSuccess() {
+                props.editable.close()
+            }
         }
     }
 

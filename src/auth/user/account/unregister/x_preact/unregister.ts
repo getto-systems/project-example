@@ -80,12 +80,12 @@ export function UnregisterAuthUserAccount(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.unregister.submit(props.user).then((state) => {
-                if (state.type === "success") {
-                    props.editable.close()
-                    props.onSuccess(props.user.loginId)
-                }
-            })
+            props.unregister.submit(props.user, onSuccess)
+
+            function onSuccess() {
+                props.editable.close()
+                props.onSuccess(props.user.loginId)
+            }
         }
     }
 
