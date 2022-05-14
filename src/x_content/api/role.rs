@@ -1,3 +1,5 @@
+use crate::auth::data::RequireAuthRoles;
+
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AuthRole {
     AuthUser,
@@ -20,5 +22,11 @@ impl AuthRole {
         match self {
             Self::AuthUser => "auth-user",
         }
+    }
+}
+
+impl RequireAuthRoles {
+    pub fn user() -> Self {
+        Self::HasAny(vec![AuthRole::AuthUser].into_iter().collect())
     }
 }
