@@ -155,6 +155,7 @@ async function setupSeason<S>(
             return post({ type: "failed", err: result.err })
         }
 
+        onSuccess()
         post({ type: "success" })
         return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
     }
