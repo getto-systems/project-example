@@ -20,9 +20,13 @@ test("submit valid current-password and new-password", async () => {
         store.currentPassword.set(VALID_PASSWORD.currentPassword)
         store.newPassword.set(VALID_PASSWORD.newPassword)
 
-        return resource.change.submit()
+        return resource.change.submit(() => null)
     }).then((stack) => {
-        expect(stack).toEqual([{ type: "try", hasTakenLongtime: false }, { type: "success" }])
+        expect(stack).toEqual([
+            { type: "try", hasTakenLongtime: false },
+            { type: "success" },
+            { type: "initial" },
+        ])
     })
 })
 
@@ -36,12 +40,13 @@ test("submit valid login-id and password; take long time", async () => {
         store.currentPassword.set(VALID_PASSWORD.currentPassword)
         store.newPassword.set(VALID_PASSWORD.newPassword)
 
-        return resource.change.submit()
+        return resource.change.submit(() => null)
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
             { type: "try", hasTakenLongtime: true },
             { type: "success" },
+            { type: "initial" },
         ])
     })
 })
@@ -51,7 +56,7 @@ test("submit without fields", async () => {
 
     const runner = setupActionTestRunner(resource.change.subscriber)
 
-    await runner(() => resource.change.submit()).then((stack) => {
+    await runner(() => resource.change.submit(() => null)).then((stack) => {
         expect(stack).toEqual([])
     })
 })
@@ -82,7 +87,7 @@ test("terminate", async () => {
 
     await runner(async () => {
         resource.change.terminate()
-        return resource.change.submit()
+        return resource.change.submit(() => null)
     }).then((stack) => {
         // no input/validate event after terminate
         expect(stack).toEqual([])
@@ -111,7 +116,8 @@ function initResource(changePasswordRemote: ChangePasswordRemote): Readonly<{
                 changePasswordRemote,
             },
             config: {
-                takeLongtimeThreshold: { delay_millisecond: 32 },
+                takeLongtimeThreshold: { wait_millisecond: 32 },
+                resetToInitialTimeout: { wait_millisecond: 32 },
             },
         }),
     }

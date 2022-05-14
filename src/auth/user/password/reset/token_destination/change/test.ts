@@ -27,11 +27,14 @@ test("submit valid info", async () => {
         store.destinationType.set(VALID_INFO.destinationType)
         store.email.set(VALID_INFO.email)
 
-        return resource.change.submit(user)
+        return resource.change.submit(user, (data) => {
+            expect(data).toEqual({ type: "email", email: "user@example.com" })
+        })
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
-            { type: "success", data: { type: "email", email: "user@example.com" } },
+            { type: "success" },
+            { type: "initial" },
         ])
     })
 })
@@ -46,12 +49,15 @@ test("submit valid login-id; take long time", async () => {
         store.destinationType.set(VALID_INFO.destinationType)
         store.email.set(VALID_INFO.email)
 
-        return resource.change.submit(user)
+        return resource.change.submit(user, (data) => {
+            expect(data).toEqual({ type: "email", email: "user@example.com" })
+        })
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
             { type: "try", hasTakenLongtime: true },
-            { type: "success", data: { type: "email", email: "user@example.com" } },
+            { type: "success" },
+            { type: "initial" },
         ])
     })
 })
@@ -65,7 +71,7 @@ test("submit with invalid value; empty email", async () => {
         store.destinationType.set("email")
         store.email.set("")
 
-        return resource.change.submit(user)
+        return resource.change.submit(user, () => null)
     }).then((stack) => {
         expect(stack).toEqual([])
     })
@@ -97,7 +103,7 @@ test("terminate", async () => {
 
     await runner(async () => {
         resource.change.terminate()
-        return resource.change.submit(user)
+        return resource.change.submit(user, () => null)
     }).then((stack) => {
         // no input/validate event after terminate
         expect(stack).toEqual([])
@@ -127,7 +133,8 @@ function initResource(modifyUserRemote: ChangeResetTokenDestinationRemote): Read
                 changeDestinationRemote: modifyUserRemote,
             },
             config: {
-                takeLongtimeThreshold: { delay_millisecond: 32 },
+                takeLongtimeThreshold: { wait_millisecond: 32 },
+                resetToInitialTimeout: { wait_millisecond: 32 },
             },
         }),
     }

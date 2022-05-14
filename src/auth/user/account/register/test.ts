@@ -38,19 +38,19 @@ test("submit valid info", async () => {
         store.resetTokenDestinationType.set("email")
         store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
 
-        return resource.register.submit()
+        return resource.register.submit((data) => {
+            expect(data).toEqual({
+                loginId: "login-id",
+                grantedRoles: ["auth-user"],
+                resetTokenDestination: { type: "email", email: "user@example.com" },
+                memo: "",
+            })
+        })
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
-            {
-                type: "success",
-                data: {
-                    loginId: "login-id",
-                    grantedRoles: ["auth-user"],
-                    resetTokenDestination: { type: "email", email: "user@example.com" },
-                    memo: "",
-                },
-            },
+            { type: "success" },
+            { type: "initial" },
         ])
     })
 })
@@ -68,20 +68,20 @@ test("submit valid login-id; take long time", async () => {
         store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
         store.memo.set(VALID_INFO.memo)
 
-        return resource.register.submit()
+        return resource.register.submit((data) => {
+            expect(data).toEqual({
+                loginId: "login-id",
+                grantedRoles: ["auth-user"],
+                resetTokenDestination: { type: "email", email: "user@example.com" },
+                memo: "memo",
+            })
+        })
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
             { type: "try", hasTakenLongtime: true },
-            {
-                type: "success",
-                data: {
-                    loginId: "login-id",
-                    grantedRoles: ["auth-user"],
-                    resetTokenDestination: { type: "email", email: "user@example.com" },
-                    memo: "memo",
-                },
-            },
+            { type: "success" },
+            { type: "initial" },
         ])
     })
 })
@@ -113,7 +113,7 @@ test("focus / close", async () => {
     store.grantedRoles.set(VALID_INFO.grantedRoles)
     store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
 
-    await resource.register.submit()
+    await resource.register.submit(() => null)
 
     await runner(async () => {
         const user: AuthUserAccount = {
@@ -167,7 +167,7 @@ test("update user", async () => {
     store.resetTokenDestinationType.set("email")
     store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
 
-    await resource.register.submit()
+    await resource.register.submit(() => null)
 
     const user: AuthUserAccount = {
         loginId: restoreLoginId("login-id"),
@@ -194,7 +194,7 @@ test("remove user", async () => {
     store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
     store.memo.set(VALID_INFO.memo)
 
-    await resource.register.submit()
+    await resource.register.submit(() => null)
 
     await runner(async () => {
         return resource.register.list.focused.remove(restoreLoginId("login-id"))
@@ -216,7 +216,7 @@ test("terminate", async () => {
 
     await runner(async () => {
         resource.register.terminate()
-        return resource.register.submit()
+        return resource.register.submit(() => null)
     }).then((stack) => {
         // no input/validate event after terminate
         expect(stack).toEqual([])
@@ -248,7 +248,8 @@ function initResource(registerUserRemote: RegisterAuthUserAccountRemote): Readon
                 registerUserRemote,
             },
             config: {
-                takeLongtimeThreshold: { delay_millisecond: 32 },
+                takeLongtimeThreshold: { wait_millisecond: 32 },
+                resetToInitialTimeout: { wait_millisecond: 32 },
             },
         }),
     }

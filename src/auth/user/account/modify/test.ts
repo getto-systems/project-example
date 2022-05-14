@@ -34,11 +34,14 @@ test("submit valid info", async () => {
         store.memo.set(VALID_INFO.memo)
         store.grantedRoles.set(VALID_INFO.grantedRoles)
 
-        return resource.modify.submit(user)
+        return resource.modify.submit(user, (data) => {
+            expect(data).toEqual({ grantedRoles: ["auth-user"], memo: "memo" })
+        })
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
-            { type: "success", data: { grantedRoles: ["auth-user"], memo: "memo" } },
+            { type: "success" },
+            { type: "initial" },
         ])
     })
 })
@@ -53,12 +56,15 @@ test("submit valid login-id; take long time", async () => {
         store.memo.set(VALID_INFO.memo)
         store.grantedRoles.set(VALID_INFO.grantedRoles)
 
-        return resource.modify.submit(user)
+        return resource.modify.submit(user, (data) => {
+            expect(data).toEqual({ grantedRoles: ["auth-user"], memo: "memo" })
+        })
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
             { type: "try", hasTakenLongtime: true },
-            { type: "success", data: { grantedRoles: ["auth-user"], memo: "memo" } },
+            { type: "success" },
+            { type: "initial" },
         ])
     })
 })
@@ -87,7 +93,7 @@ test("terminate", async () => {
 
     await runner(async () => {
         resource.modify.terminate()
-        return resource.modify.submit(user)
+        return resource.modify.submit(user, () => null)
     }).then((stack) => {
         // no input/validate event after terminate
         expect(stack).toEqual([])
@@ -117,7 +123,8 @@ function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
                 modifyUserRemote,
             },
             config: {
-                takeLongtimeThreshold: { delay_millisecond: 32 },
+                takeLongtimeThreshold: { wait_millisecond: 32 },
+                resetToInitialTimeout: { wait_millisecond: 32 },
             },
         }),
     }

@@ -5,5 +5,6 @@ import { ModifyAuthUserAccountConfig } from "../action"
 export function newModifyAuthUserAccountConfig(): ModifyAuthUserAccountConfig {
     return {
         takeLongtimeThreshold: AUTH_CONFIG.takeLongtimeThreshold,
+        resetToInitialTimeout: AUTH_CONFIG.resetToInitialTimeout,
     }
 }

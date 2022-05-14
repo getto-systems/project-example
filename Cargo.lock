@@ -930,7 +930,7 @@ version = "0.47.0-proxy"
 
 [[package]]
 name = "getto-application-test"
-version = "0.28.0-api"
+version = "0.28.0-proxy"
 dependencies = [
  "pretty_assertions",
 ]

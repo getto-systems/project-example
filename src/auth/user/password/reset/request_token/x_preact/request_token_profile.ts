@@ -15,6 +15,7 @@ import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_err
 
 import { LoginIdField } from "../../../../login_id/input/x_preact/input"
 import { EditButton } from "../../../../../../core/x_preact/button/edit_button"
+import { EditSuccessButton } from "../../../../../../core/x_preact/button/edit_success_button"
 import { SendButton } from "../../../../../../core/x_preact/button/send_button"
 import { ClearChangesButton } from "../../../../../../core/x_preact/button/clear_changes_button"
 import { CloseButton } from "../../../../../../core/x_preact/button/close_button"
@@ -74,11 +75,12 @@ export function RequestResetTokenProfile(props: Props): VNode {
     })
 
     function editButton(): VNode {
-        return h(EditButton, {
-            label: "トークン送信",
-            isSuccess: state.type === "success",
-            onClick,
-        })
+        const label = "トークン送信"
+        if (state.type === "success") {
+            return h(EditSuccessButton, { label, onClick })
+        } else {
+            return h(EditButton, { label, onClick })
+        }
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -99,9 +101,11 @@ export function RequestResetTokenProfile(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.requestToken.submit().then(() => {
+            props.requestToken.submit(onSuccess)
+
+            function onSuccess() {
                 props.editable.close()
-            })
+            }
         }
     }
 

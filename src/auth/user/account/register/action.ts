@@ -3,7 +3,7 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
-import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
 
 import {
     initInputGrantedAuthRolesAction,
@@ -25,7 +25,7 @@ import {
 import { initInputAuthUserMemoAction, InputAuthUserMemoAction } from "../input/memo/action"
 
 import { RegisterAuthUserAccountRemote } from "./infra"
-import { DelayTime } from "../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../z_lib/ui/config/infra"
 
 import { RegisterAuthUserAccountError } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
@@ -45,7 +45,7 @@ export interface RegisterAuthUserAccountAction
     readonly observe: ObserveBoardAction
 
     clear(): RegisterAuthUserAccountState
-    submit(): Promise<RegisterAuthUserAccountState>
+    submit(onSuccess: { (data: AuthUserAccount): void }): Promise<RegisterAuthUserAccountState>
 }
 export interface ListRegisteredAuthUserAccountAction
     extends StatefulApplicationAction<ListRegisteredAuthUserAccountState> {
@@ -61,7 +61,7 @@ export interface FocusedRegisteredAuthUserAccountAction
     isFocused(user: AuthUserAccount): boolean
 }
 
-export type RegisterAuthUserAccountState = Readonly<{ type: "initial" }> | RegisterUserEvent
+export type RegisterAuthUserAccountState = RegisterUserEvent
 
 const initialState: RegisterAuthUserAccountState = { type: "initial" }
 
@@ -87,7 +87,8 @@ export type RegisterAuthUserAccountInfra = Readonly<{
 }>
 
 export type RegisterAuthUserAccountConfig = Readonly<{
-    takeLongtimeThreshold: DelayTime
+    takeLongtimeThreshold: WaitTime
+    resetToInitialTimeout: WaitTime
 }>
 
 export function initRegisterAuthUserAccountAction(
@@ -194,31 +195,36 @@ class Action
         this.observe.clear()
         return this.currentState()
     }
-    async submit(): Promise<RegisterAuthUserAccountState> {
+    async submit(onSuccess: {
+        (data: AuthUserAccount): void
+    }): Promise<RegisterAuthUserAccountState> {
         const fields = this.convert()
         if (!fields.valid) {
             return this.currentState()
         }
-        return registerUser(this.material, fields.value, this.post).then((state) => {
-            switch (state.type) {
-                case "success":
-                    this.clear()
-                    this.list.push(state.data)
-                    break
-            }
-            return state
-        })
+        return registerUser(
+            this.material,
+            fields.value,
+            (data) => {
+                onSuccess(data)
+                this.clear()
+                this.list.push(data)
+            },
+            this.post,
+        )
     }
 }
 
 type RegisterUserEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: RegisterAuthUserAccountError }>
-    | Readonly<{ type: "success"; data: AuthUserAccount }>
+    | Readonly<{ type: "success" }>
+    | Readonly<{ type: "initial" }>
 
 async function registerUser<S>(
     { infra, config }: RegisterAuthUserAccountMaterial,
     fields: AuthUserAccount,
+    onSuccess: { (data: AuthUserAccount): void },
     post: Post<RegisterUserEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
@@ -226,7 +232,7 @@ async function registerUser<S>(
     const { registerUserRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
-    const response = await delayedChecker(
+    const response = await checkTakeLongtime(
         registerUserRemote(fields),
         config.takeLongtimeThreshold,
         () => post({ type: "try", hasTakenLongtime: true }),
@@ -235,7 +241,9 @@ async function registerUser<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "success", data: fields })
+    onSuccess(fields)
+    post({ type: "success" })
+    return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 
 class ListAction

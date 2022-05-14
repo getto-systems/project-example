@@ -15,18 +15,19 @@ import {
 
 import { SeasonRepository } from "../kernel/infra"
 import { Clock } from "../../../z_lib/ui/clock/infra"
-import { ExpireTime } from "../../../z_lib/ui/config/infra"
+import { ExpireTime, WaitTime } from "../../../z_lib/ui/config/infra"
 
 import { RepositoryError } from "../../../z_lib/ui/repository/data"
 import { DetectedSeason, Season } from "../kernel/data"
 import { ConvertBoardResult } from "../../../z_vendor/getto-application/board/kernel/data"
+import { ticker } from "../../../z_lib/ui/timer/helper"
 
 export interface SetupSeasonAction extends StatefulApplicationAction<SetupSeasonState> {
     readonly season: InputSeasonAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    setup(): Promise<SetupSeasonState>
+    setup(onSuccess: { (): void }): Promise<SetupSeasonState>
 }
 
 export type SetupSeasonMaterial = Readonly<{
@@ -40,9 +41,10 @@ export type SetupSeasonInfra = Readonly<{
 }>
 export type SetupSeasonConfig = Readonly<{
     manualSetupSeasonExpire: ExpireTime
+    resetToInitialTimeout: WaitTime
 }>
 
-export type SetupSeasonState = Readonly<{ type: "initial" }> | SetupSeasonEvent
+export type SetupSeasonState = SetupSeasonEvent
 
 const initialState: SetupSeasonState = { type: "initial" }
 
@@ -117,27 +119,32 @@ class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
         })
     }
 
-    async setup(): Promise<SetupSeasonState> {
+    async setup(onSuccess: { (): void }): Promise<SetupSeasonState> {
         const fields = this.convert()
         if (!fields.valid) {
             return this.currentState()
         }
-        return setupSeason(this.material, fields.value, (state) => {
-            if (state.type === "success") {
+        return setupSeason(
+            this.material,
+            fields.value,
+            () => {
+                onSuccess()
                 this.load.load()
-            }
-            return this.post(state)
-        })
+            },
+            this.post,
+        )
     }
 }
 
 type SetupSeasonEvent =
     | Readonly<{ type: "failed"; err: RepositoryError }>
     | Readonly<{ type: "success" }>
+    | Readonly<{ type: "initial" }>
 
 async function setupSeason<S>(
     { infra, config }: SetupSeasonMaterial,
     season: DetectedSeason,
+    onSuccess: { (): void },
     post: Post<SetupSeasonEvent, S>,
 ): Promise<S> {
     const { clock, seasonRepository } = infra
@@ -147,7 +154,9 @@ async function setupSeason<S>(
         if (!result.success) {
             return post({ type: "failed", err: result.err })
         }
-        return post({ type: "success" })
+
+        post({ type: "success" })
+        return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
     }
 
     const result = await seasonRepository.set({
@@ -158,7 +167,9 @@ async function setupSeason<S>(
         return post({ type: "failed", err: result.err })
     }
 
-    return post({ type: "success" })
+    onSuccess()
+    post({ type: "success" })
+    return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 
 interface Post<E, S> {

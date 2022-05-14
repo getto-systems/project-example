@@ -1,4 +1,4 @@
-import { delayedChecker } from "../../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime, ticker } from "../../../../../z_lib/ui/timer/helper"
 
 import {
     StatefulApplicationAction,
@@ -16,7 +16,7 @@ import {
 } from "../../../../../z_vendor/getto-application/board/observe_board/action"
 
 import { RequestResetTokenRemote } from "./infra"
-import { DelayTime } from "../../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../../z_lib/ui/config/infra"
 
 import { RequestResetTokenError, RequestResetTokenFields } from "./data"
 import { ConvertBoardResult } from "../../../../../z_vendor/getto-application/board/kernel/data"
@@ -27,10 +27,10 @@ export interface RequestResetTokenAction extends StatefulApplicationAction<Reque
     readonly observe: ObserveBoardAction
 
     clear(): RequestResetTokenState
-    submit(): Promise<RequestResetTokenState>
+    submit(onSuccess: { (): void }): Promise<RequestResetTokenState>
 }
 
-export type RequestResetTokenState = Readonly<{ type: "initial" }> | RequestResetTokenEvent
+export type RequestResetTokenState = RequestResetTokenEvent
 
 export type RequestResetTokenMaterial = Readonly<{
     infra: RequestResetTokenInfra
@@ -42,7 +42,8 @@ export type RequestResetTokenInfra = Readonly<{
 }>
 
 export type RequestResetTokenConfig = Readonly<{
-    takeLongtimeThreshold: DelayTime
+    takeLongtimeThreshold: WaitTime
+    resetToInitialTimeout: WaitTime
 }>
 
 const initialState: RequestResetTokenState = { type: "initial" }
@@ -115,12 +116,12 @@ class Action
         this.validate.clear()
         return this.currentState()
     }
-    async submit(): Promise<RequestResetTokenState> {
+    async submit(onSuccess: { (): void }): Promise<RequestResetTokenState> {
         const fields = this.convert()
         if (!fields.valid) {
             return this.currentState()
         }
-        return requestResetToken(this.material, fields.value, this.post)
+        return requestResetToken(this.material, fields.value, onSuccess, this.post)
     }
 }
 
@@ -128,10 +129,12 @@ type RequestResetTokenEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: RequestResetTokenError }>
     | Readonly<{ type: "success" }>
+    | Readonly<{ type: "initial" }>
 
 async function requestResetToken<S>(
     { infra, config }: RequestResetTokenMaterial,
     fields: RequestResetTokenFields,
+    onSuccess: { (): void },
     post: Post<RequestResetTokenEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
@@ -139,7 +142,7 @@ async function requestResetToken<S>(
     const { requestTokenRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
-    const response = await delayedChecker(
+    const response = await checkTakeLongtime(
         requestTokenRemote(fields),
         config.takeLongtimeThreshold,
         () => post({ type: "try", hasTakenLongtime: true }),
@@ -148,7 +151,9 @@ async function requestResetToken<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "success" })
+    onSuccess()
+    post({ type: "success" })
+    return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 
 interface Post<E, S> {

@@ -20,9 +20,13 @@ test("submit valid login-id", async () => {
 
     await runner(() => {
         store.loginId.set(VALID_LOGIN.loginId)
-        return action.submit()
+        return action.submit(() => null)
     }).then((stack) => {
-        expect(stack).toEqual([{ type: "try", hasTakenLongtime: false }, { type: "success" }])
+        expect(stack).toEqual([
+            { type: "try", hasTakenLongtime: false },
+            { type: "success" },
+            { type: "initial" },
+        ])
     })
 })
 
@@ -35,12 +39,13 @@ test("submit valid login-id; with take longtime", async () => {
 
     await runner(() => {
         store.loginId.set(VALID_LOGIN.loginId)
-        return action.submit()
+        return action.submit(() => null)
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
             { type: "try", hasTakenLongtime: true },
             { type: "success" },
+            { type: "initial" },
         ])
     })
 })
@@ -51,7 +56,7 @@ test("submit without fields", async () => {
 
     const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => action.submit()).then((stack) => {
+    await runner(() => action.submit(() => null)).then((stack) => {
         expect(stack).toEqual([])
     })
 })
@@ -81,7 +86,7 @@ test("terminate", async () => {
 
     await runner(async () => {
         view.terminate()
-        action.submit()
+        action.submit(() => null)
     }).then((stack) => {
         // no input/validate event after terminate
         expect(stack).toEqual([])
@@ -107,7 +112,8 @@ function initView(requestTokenRemote: RequestResetTokenRemote): Readonly<{
                 requestTokenRemote,
             },
             config: {
-                takeLongtimeThreshold: { delay_millisecond: 32 },
+                takeLongtimeThreshold: { wait_millisecond: 32 },
+                resetToInitialTimeout: { wait_millisecond: 32 },
             },
         }),
     )

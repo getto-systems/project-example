@@ -23,11 +23,14 @@ test("submit valid new-login-id", async () => {
     await runner(async () => {
         store.newLoginId.set(VALID_LOGIN_ID.newLoginId)
 
-        return resource.overwrite.submit(user)
+        return resource.overwrite.submit(user, (loginId) => {
+            expect(loginId).toEqual("new-login-id")
+        })
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
-            { type: "success", loginId: "new-login-id" },
+            { type: "success" },
+            { type: "initial" },
         ])
     })
 })
@@ -41,12 +44,15 @@ test("submit valid login-id; take long time", async () => {
     await runner(() => {
         store.newLoginId.set(VALID_LOGIN_ID.newLoginId)
 
-        return resource.overwrite.submit(user)
+        return resource.overwrite.submit(user, (loginId) => {
+            expect(loginId).toEqual("new-login-id")
+        })
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
             { type: "try", hasTakenLongtime: true },
-            { type: "success", loginId: "new-login-id" },
+            { type: "success" },
+            { type: "initial" },
         ])
     })
 })
@@ -56,7 +62,7 @@ test("submit without fields", async () => {
 
     const runner = setupActionTestRunner(resource.overwrite.subscriber)
 
-    await runner(() => resource.overwrite.submit(user)).then((stack) => {
+    await runner(() => resource.overwrite.submit(user, () => null)).then((stack) => {
         expect(stack).toEqual([])
     })
 })
@@ -84,7 +90,7 @@ test("terminate", async () => {
 
     await runner(async () => {
         resource.overwrite.terminate()
-        return resource.overwrite.submit(user)
+        return resource.overwrite.submit(user, () => null)
     }).then((stack) => {
         // no input/validate event after terminate
         expect(stack).toEqual([])
@@ -113,7 +119,8 @@ function initResource(overwriteLoginIdRemote: OverwriteLoginIdRemote): Readonly<
                 overwriteLoginIdRemote,
             },
             config: {
-                takeLongtimeThreshold: { delay_millisecond: 32 },
+                takeLongtimeThreshold: { wait_millisecond: 32 },
+                resetToInitialTimeout: { wait_millisecond: 32 },
             },
         }),
     }

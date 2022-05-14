@@ -3,7 +3,7 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
-import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime } from "../../../../z_lib/ui/timer/helper"
 import { nextSort } from "../../../../z_lib/ui/search/sort/helper"
 
 import { initSearchLoginIdAction, SearchLoginIdAction } from "../../login_id/input/action"
@@ -32,7 +32,7 @@ import {
     UpdateFocusAuthUserAccountQuery,
     UpdateSearchAuthUserAccountFieldsQuery,
 } from "./infra"
-import { DelayTime } from "../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../z_lib/ui/config/infra"
 
 import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
 import {
@@ -109,7 +109,7 @@ export type SearchAuthUserAccountShell = Readonly<{
 }>
 
 export type SearchAuthUserAccountConfig = Readonly<{
-    takeLongtimeThreshold: DelayTime
+    takeLongtimeThreshold: WaitTime
 }>
 
 export function initSearchAuthUserAccountAction(
@@ -363,8 +363,10 @@ async function search<S>(
     const { searchRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
-    const response = await delayedChecker(searchRemote(fields), config.takeLongtimeThreshold, () =>
-        post({ type: "try", hasTakenLongtime: true, previousResponse }),
+    const response = await checkTakeLongtime(
+        searchRemote(fields),
+        config.takeLongtimeThreshold,
+        () => post({ type: "try", hasTakenLongtime: true, previousResponse }),
     )
     if (!response.success) {
         return post({ type: "failed", err: response.err, previousResponse })

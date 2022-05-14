@@ -3,7 +3,7 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
-import { delayedChecker } from "../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
 
 import {
     initInputGrantedAuthRolesAction,
@@ -20,7 +20,7 @@ import {
 } from "../../../../z_vendor/getto-application/board/validate_board/action"
 
 import { ModifyAuthUserAccountRemote } from "./infra"
-import { DelayTime } from "../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../z_lib/ui/config/infra"
 
 import { ModifyAuthUserAccountError, ModifyAuthUserAccountFields } from "./data"
 import { AuthRole } from "../../kernel/data"
@@ -37,10 +37,11 @@ export interface ModifyAuthUserAccountAction
     reset(user: Readonly<{ grantedRoles: readonly AuthRole[] }>): ModifyAuthUserAccountState
     submit(
         user: Readonly<{ loginId: LoginId }> & ModifyAuthUserAccountFields,
+        onSuccess: { (data: ModifyAuthUserAccountFields): void },
     ): Promise<ModifyAuthUserAccountState>
 }
 
-export type ModifyAuthUserAccountState = Readonly<{ type: "initial" }> | ModifyUserEvent
+export type ModifyAuthUserAccountState = ModifyUserEvent
 
 const initialState: ModifyAuthUserAccountState = { type: "initial" }
 
@@ -54,7 +55,8 @@ export type ModifyAuthUserAccountInfra = Readonly<{
 }>
 
 export type ModifyAuthUserAccountConfig = Readonly<{
-    takeLongtimeThreshold: DelayTime
+    takeLongtimeThreshold: WaitTime
+    resetToInitialTimeout: WaitTime
 }>
 
 export function initModifyAuthUserAccountAction(
@@ -137,24 +139,27 @@ class Action
     }
     async submit(
         user: Readonly<{ loginId: LoginId }> & ModifyAuthUserAccountFields,
+        onSuccess: { (data: ModifyAuthUserAccountFields): void },
     ): Promise<ModifyAuthUserAccountState> {
         const fields = this.convert()
         if (!fields.valid) {
             return this.currentState()
         }
-        return modifyUser(this.material, user, fields.value, this.post)
+        return modifyUser(this.material, user, fields.value, onSuccess, this.post)
     }
 }
 
 type ModifyUserEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ModifyAuthUserAccountError }>
-    | Readonly<{ type: "success"; data: ModifyAuthUserAccountFields }>
+    | Readonly<{ type: "success" }>
+    | Readonly<{ type: "initial" }>
 
 async function modifyUser<S>(
     { infra, config }: ModifyAuthUserAccountMaterial,
     user: Readonly<{ loginId: LoginId }> & ModifyAuthUserAccountFields,
     fields: ModifyAuthUserAccountFields,
+    onSuccess: { (data: ModifyAuthUserAccountFields): void },
     post: Post<ModifyUserEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
@@ -162,7 +167,7 @@ async function modifyUser<S>(
     const { modifyUserRemote } = infra
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
-    const response = await delayedChecker(
+    const response = await checkTakeLongtime(
         modifyUserRemote(user, fields),
         config.takeLongtimeThreshold,
         () => post({ type: "try", hasTakenLongtime: true }),
@@ -171,7 +176,9 @@ async function modifyUser<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "success", data: fields })
+    onSuccess(fields)
+    post({ type: "success" })
+    return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 
 interface Post<E, S> {

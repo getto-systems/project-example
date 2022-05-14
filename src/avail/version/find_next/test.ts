@@ -335,7 +335,7 @@ function initView(
             config: {
                 version,
                 versionSuffix: "-ui",
-                takeLongtimeThreshold: { delay_millisecond: 1 },
+                takeLongtimeThreshold: { wait_millisecond: 1 },
             },
         }),
     )

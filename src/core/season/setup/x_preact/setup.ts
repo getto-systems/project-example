@@ -8,6 +8,7 @@ import { field, fieldHelp_error } from "../../../../z_vendor/getto-css/preact/de
 
 import { InputSeason } from "../../input/x_preact/input"
 import { EditButton } from "../../../x_preact/button/edit_button"
+import { EditSuccessButton } from "../../../x_preact/button/edit_success_button"
 import { ChangeButton } from "../../../x_preact/button/change_button"
 
 import { repositoryErrorReason } from "../../../../z_lib/ui/repository/x_error/reason"
@@ -66,7 +67,11 @@ export function SetupSeason(props: Props): VNode {
     }
 
     function editButton(): VNode {
-        return h(EditButton, { isSuccess: state.type === "success", onClick })
+        if (state.type === "success") {
+            return h(EditSuccessButton, { onClick })
+        } else {
+            return h(EditButton, { onClick })
+        }
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -84,11 +89,11 @@ export function SetupSeason(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.setup.season.setup().then((state) => {
-                if (state.type === "success") {
-                    props.setup.editable.close()
-                }
-            })
+            props.setup.season.setup(onSuccess)
+
+            function onSuccess() {
+                props.setup.editable.close()
+            }
         }
     }
 

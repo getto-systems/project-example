@@ -11,8 +11,17 @@ import { box } from "../../../../../../../z_vendor/getto-css/preact/design/box"
 
 import { VNodeContent } from "../../../../../../../z_lib/ui/x_preact/common"
 
+import {
+    takeLongtimeField,
+    validationMessage,
+} from "../../../../../../../core/x_preact/design/form"
+
 import { ResetTokenDestinationField } from "../../input/x_preact/input"
 import { EditButton } from "../../../../../../../core/x_preact/button/edit_button"
+import { EditSuccessButton } from "../../../../../../../core/x_preact/button/edit_success_button"
+import { ResetButton } from "../../../../../../../core/x_preact/button/reset_button"
+import { ChangeButton } from "../../../../../../../core/x_preact/button/change_button"
+import { CloseButton } from "../../../../../../../core/x_preact/button/close_button"
 
 import { remoteCommonErrorReason } from "../../../../../../../z_lib/ui/remote/x_error/reason"
 
@@ -22,13 +31,6 @@ import { ChangeResetTokenDestinationAction } from "../action"
 import { ChangeResetTokenDestinationError } from "../data"
 import { LoginId } from "../../../../../login_id/kernel/data"
 import { ResetTokenDestination } from "../../kernel/data"
-import { ResetButton } from "../../../../../../../core/x_preact/button/reset_button"
-import { ChangeButton } from "../../../../../../../core/x_preact/button/change_button"
-import { CloseButton } from "../../../../../../../core/x_preact/button/close_button"
-import {
-    takeLongtimeField,
-    validationMessage,
-} from "../../../../../../../core/x_preact/design/form"
 
 type Props = Readonly<{
     user: Readonly<{ loginId: LoginId; resetTokenDestination: ResetTokenDestination }>
@@ -71,7 +73,11 @@ export function ChangeResetTokenDestination(props: Props): VNode {
     )
 
     function editButton(): VNode {
-        return h(EditButton, { isSuccess: state.type === "success", onClick })
+        if (state.type === "success") {
+            return h(EditSuccessButton, { onClick })
+        } else {
+            return h(EditButton, { onClick })
+        }
 
         function onClick(e: Event) {
             e.preventDefault()
@@ -90,12 +96,12 @@ export function ChangeResetTokenDestination(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.change.submit(props.user).then((state) => {
-                if (state.type === "success") {
-                    props.editable.close()
-                    props.onSuccess(state.data)
-                }
-            })
+            props.change.submit(props.user, onSuccess)
+
+            function onSuccess(data: ResetTokenDestination) {
+                props.editable.close()
+                props.onSuccess(data)
+            }
         }
     }
 

@@ -1,4 +1,4 @@
-import { delayedChecker } from "../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime } from "../../../z_lib/ui/timer/helper"
 
 import {
     StatefulApplicationAction,
@@ -19,7 +19,7 @@ import { GetScriptPathConfig, GetScriptPathShell } from "../../sign/get_script_p
 import { AuthTicketRepository } from "../kernel/infra"
 import { CheckAuthTicketRemote } from "./infra"
 import { Clock } from "../../../z_lib/ui/clock/infra"
-import { DelayTime, ExpireTime } from "../../../z_lib/ui/config/infra"
+import { WaitTime, ExpireTime } from "../../../z_lib/ui/config/infra"
 
 import { AuthTicket } from "../kernel/data"
 import { ConvertScriptPathResult, LoadScriptError } from "../../sign/get_script_path/data"
@@ -49,7 +49,7 @@ export type CheckAuthTicketShell = GetScriptPathShell
 
 export type CheckAuthTicketConfig = Readonly<{
     instantLoadExpire: ExpireTime
-    takeLongtimeThreshold: DelayTime
+    takeLongtimeThreshold: WaitTime
 }> &
     StartContinuousRenewConfig &
     GetScriptPathConfig
@@ -194,7 +194,7 @@ async function renew<S>(
     post({ type: "try-to-renew", hasTakenLongtime: false })
 
     // ネットワークの状態が悪い可能性があるので、一定時間後に take longtime イベントを発行
-    const response = await delayedChecker(renewRemote(), config.takeLongtimeThreshold, () =>
+    const response = await checkTakeLongtime(renewRemote(), config.takeLongtimeThreshold, () =>
         post({ type: "try-to-renew", hasTakenLongtime: true }),
     )
     if (!response.success) {
