@@ -1,4 +1,4 @@
-import { checkTakeLongtime, ticker } from "../../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime } from "../../../../../z_lib/ui/timer/helper"
 
 import {
     StatefulApplicationAction,
@@ -30,7 +30,7 @@ export interface RequestResetTokenAction extends StatefulApplicationAction<Reque
     submit(onSuccess: { (): void }): Promise<RequestResetTokenState>
 }
 
-export type RequestResetTokenState = RequestResetTokenEvent
+export type RequestResetTokenState = Readonly<{ type: "initial" }> | RequestResetTokenEvent
 
 export type RequestResetTokenMaterial = Readonly<{
     infra: RequestResetTokenInfra
@@ -43,7 +43,6 @@ export type RequestResetTokenInfra = Readonly<{
 
 export type RequestResetTokenConfig = Readonly<{
     takeLongtimeThreshold: WaitTime
-    resetToInitialTimeout: WaitTime
 }>
 
 const initialState: RequestResetTokenState = { type: "initial" }
@@ -129,7 +128,6 @@ type RequestResetTokenEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: RequestResetTokenError }>
     | Readonly<{ type: "success" }>
-    | Readonly<{ type: "initial" }>
 
 async function requestResetToken<S>(
     { infra, config }: RequestResetTokenMaterial,
@@ -152,8 +150,7 @@ async function requestResetToken<S>(
     }
 
     onSuccess()
-    post({ type: "success" })
-    return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
+    return post({ type: "success" })
 }
 
 interface Post<E, S> {
