@@ -22,11 +22,7 @@ test("submit valid login-id", async () => {
         store.loginId.set(VALID_LOGIN.loginId)
         return action.submit(() => null)
     }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            { type: "success" },
-            { type: "initial" },
-        ])
+        expect(stack).toEqual([{ type: "try", hasTakenLongtime: false }, { type: "success" }])
     })
 })
 
@@ -45,7 +41,6 @@ test("submit valid login-id; with take longtime", async () => {
             { type: "try", hasTakenLongtime: false },
             { type: "try", hasTakenLongtime: true },
             { type: "success" },
-            { type: "initial" },
         ])
     })
 })
@@ -113,7 +108,6 @@ function initView(requestTokenRemote: RequestResetTokenRemote): Readonly<{
             },
             config: {
                 takeLongtimeThreshold: { wait_millisecond: 32 },
-                resetToInitialTimeout: { wait_millisecond: 32 },
             },
         }),
     )
