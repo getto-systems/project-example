@@ -4,7 +4,7 @@ import { ProfilePage } from "./page"
 
 import { newForegroundOutsideFeature } from "../../../../x_outside_feature/common"
 
-import { newBaseResource } from "../../../../core/base/init/resource"
+import { newBaseResource } from "../../../../common/base/init/resource"
 import { newChangePasswordAction } from "../../../../auth/user/password/change/init/resource"
 import { newRequestResetTokenAction } from "../../../../auth/user/password/reset/request_token/init/resource"
 import { toProfileView } from "./common"

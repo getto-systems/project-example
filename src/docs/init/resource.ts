@@ -4,7 +4,7 @@ import { newNotifyUnexpectedErrorResource } from "../../avail/unexpected_error/n
 import {
     newLoadBreadcrumbListResource,
     newLoadMenuResource,
-} from "../../core/outline/load/init/resource"
+} from "../../common/outline/load/init/resource"
 
 import { initDocsView } from "../init"
 

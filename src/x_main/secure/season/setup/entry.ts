@@ -4,9 +4,9 @@ import { SetupSeasonPage } from "./page"
 
 import { newForegroundOutsideFeature } from "../../../../x_outside_feature/common"
 
-import { newBaseResource } from "../../../../core/base/init/resource"
+import { newBaseResource } from "../../../../common/base/init/resource"
 import { newSetupSeasonResource } from "../../../../core/season/setup/init/resource"
-import { initBaseView } from "../../../../core/base/init"
+import { initBaseView } from "../../../../common/base/init"
 
 import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 import { SetupSeasonPageResource } from "./resource"

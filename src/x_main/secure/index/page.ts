@@ -2,7 +2,7 @@ import { h, VNode } from "preact"
 
 import { useApplicationView } from "../../../z_vendor/getto-application/action/x_preact/hooks"
 import { useNotifyUnexpectedError } from "../../../avail/unexpected_error/notify/x_preact/hooks"
-import { useDocumentTitle } from "../../../core/x_preact/hooks"
+import { useDocumentTitle } from "../../../common/x_preact/hooks"
 
 import {
     appLayout,
@@ -16,12 +16,12 @@ import { copyright, siteInfo } from "../../../x_content/site"
 
 import { ApplicationError } from "../../../avail/x_preact/application_error"
 import { LoadSeason } from "../../../core/season/load/x_preact/load_season"
-import { LoadBreadcrumbList } from "../../../core/outline/load/x_preact/load_breadcrumb_list"
-import { LoadMenu } from "../../../core/outline/load/x_preact/load_menu"
-import { Dashboard } from "../../../core/dashboard/x_preact/dashboard"
+import { LoadBreadcrumbList } from "../../../common/outline/load/x_preact/load_breadcrumb_list"
+import { LoadMenu } from "../../../common/outline/load/x_preact/load_menu"
+import { Dashboard } from "../../../x_content/x_preact/dashboard"
 
 import { ApplicationView } from "../../../z_vendor/getto-application/action/action"
-import { BaseResource } from "../../../core/base/resource"
+import { BaseResource } from "../../../common/base/resource"
 
 export function DashboardPage(view: ApplicationView<BaseResource>): VNode {
     const pageTitle = "ホーム"

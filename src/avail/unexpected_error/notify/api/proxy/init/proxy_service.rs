@@ -5,7 +5,7 @@ use crate::avail::unexpected_error::notify::y_protobuf::service::{
     notify_pb_client::NotifyPbClient, NotifyRequestPb,
 };
 
-use crate::core::x_outside_feature::feature::CoreOutsideService;
+use crate::common::x_outside_feature::feature::CommonOutsideService;
 
 use crate::avail::unexpected_error::notify::x_tonic::route::ServiceNotify;
 
@@ -34,7 +34,7 @@ pub struct ProxyService<'a> {
 }
 
 impl<'a> ProxyService<'a> {
-    pub fn new(service: &'a CoreOutsideService, request_id: &'a str, body: String) -> Self {
+    pub fn new(service: &'a CommonOutsideService, request_id: &'a str, body: String) -> Self {
         Self {
             service_url: service.service_url,
             request_id,

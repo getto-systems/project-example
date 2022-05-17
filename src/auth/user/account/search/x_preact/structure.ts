@@ -7,7 +7,7 @@ import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 import { sortSign } from "../../../../../z_vendor/getto-css/preact/design/table"
 import { linky } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 
-import { focusClass, listEditLabel, SORT_SIGN } from "../../../../../core/x_preact/design/table"
+import { focusClass, listEditLabel, SORT_SIGN } from "../../../../../common/x_preact/design/table"
 
 import { AuthRoleLabels } from "../../input/granted_roles/x_preact/input"
 import { ResetTokenDestinationLabel } from "../../../password/reset/token_destination/input/x_preact/input"

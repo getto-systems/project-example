@@ -1,6 +1,6 @@
 import { staticMenuPath, StaticMenuPath } from "../../y_environment/ui/path"
 
-import { MenuPermission, MenuTree, MenuTreeNode } from "../../core/outline/load/infra"
+import { MenuPermission, MenuTree, MenuTreeNode } from "../../common/outline/load/infra"
 
 import { Icon } from "../../z_lib/ui/icon/data"
 

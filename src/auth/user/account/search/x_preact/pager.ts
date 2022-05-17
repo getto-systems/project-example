@@ -6,10 +6,10 @@ import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
-import { pagerCount, pagerParams } from "../../../../../core/x_preact/design/table"
+import { pagerCount, pagerParams } from "../../../../../common/x_preact/design/table"
 
 import { SearchOffset } from "../../../../../z_lib/ui/search/offset/x_preact/offset"
-import { LoadButton } from "../../../../../core/x_preact/button/load_button"
+import { LoadButton } from "../../../../../common/x_preact/button/load_button"
 
 import { ListAuthUserAccountAction } from "../action"
 

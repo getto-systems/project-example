@@ -7,7 +7,7 @@ import { category, item } from "./common"
 
 import { docs_avail } from "../../avail/docs"
 
-import { MenuContent, MenuPermission, MenuTreeNode } from "../../core/outline/load/infra"
+import { MenuContent, MenuPermission, MenuTreeNode } from "../../common/outline/load/infra"
 
 import { Icon } from "../../z_lib/ui/icon/data"
 

@@ -9,7 +9,7 @@ import {
     tbody,
     thead,
 } from "../../../../../z_vendor/getto-css/preact/design/table"
-import { emptyRegisteredTable } from "../../../../../core/x_preact/design/table"
+import { emptyRegisteredTable } from "../../../../../common/x_preact/design/table"
 
 import { ListRegisteredAuthUserAccountAction } from "../action"
 

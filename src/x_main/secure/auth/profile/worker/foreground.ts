@@ -8,7 +8,7 @@ import { newWorkerForegroundOutsideFeature } from "../../../../../x_outside_feat
 import { newRequestResetTokenConfig } from "../../../../../auth/user/password/reset/request_token/init/config"
 import { newChangePasswordConfig } from "../../../../../auth/user/password/change/init/config"
 
-import { newBaseResource } from "../../../../../core/base/init/resource"
+import { newBaseResource } from "../../../../../common/base/init/resource"
 import {
     newRequestResetTokenProxy,
     RequestResetTokenProxy,

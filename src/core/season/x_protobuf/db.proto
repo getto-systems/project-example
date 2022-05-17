@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package core.season.db;
+package common.season.db;
 
 message SeasonPb {
     int32 year = 1;

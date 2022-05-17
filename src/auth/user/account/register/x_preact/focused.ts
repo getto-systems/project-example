@@ -4,7 +4,7 @@ import { html } from "htm/preact"
 import { box_grow, container } from "../../../../../z_vendor/getto-css/preact/design/box"
 
 import { DetailAuthUserAccount, DetailAuthUserAccountActions } from "../../kernel/x_preact/detail"
-import { BackToRegisterButton } from "../../../../../core/x_preact/button/back_to_register_button"
+import { BackToRegisterButton } from "../../../../../common/x_preact/button/back_to_register_button"
 
 import { FocusedRegisteredAuthUserAccountAction } from "../action"
 

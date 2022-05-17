@@ -14,14 +14,14 @@ import { VNodeContent } from "../../../../../../../z_lib/ui/x_preact/common"
 import {
     takeLongtimeField,
     validationMessage,
-} from "../../../../../../../core/x_preact/design/form"
+} from "../../../../../../../common/x_preact/design/form"
 
 import { ResetTokenDestinationField } from "../../input/x_preact/input"
-import { EditButton } from "../../../../../../../core/x_preact/button/edit_button"
-import { EditSuccessButton } from "../../../../../../../core/x_preact/button/edit_success_button"
-import { ResetButton } from "../../../../../../../core/x_preact/button/reset_button"
-import { ChangeButton } from "../../../../../../../core/x_preact/button/change_button"
-import { CloseButton } from "../../../../../../../core/x_preact/button/close_button"
+import { EditButton } from "../../../../../../../common/x_preact/button/edit_button"
+import { EditSuccessButton } from "../../../../../../../common/x_preact/button/edit_success_button"
+import { ResetButton } from "../../../../../../../common/x_preact/button/reset_button"
+import { ChangeButton } from "../../../../../../../common/x_preact/button/change_button"
+import { CloseButton } from "../../../../../../../common/x_preact/button/close_button"
 
 import { remoteCommonErrorReason } from "../../../../../../../z_lib/ui/remote/x_error/reason"
 

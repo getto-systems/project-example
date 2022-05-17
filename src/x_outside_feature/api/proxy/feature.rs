@@ -2,7 +2,7 @@ use crate::{
     auth::x_outside_feature::feature::{
         AuthOutsideCookie, AuthOutsideDecodingKey, AuthOutsideService, AuthProxyOutsideFeature,
     },
-    core::x_outside_feature::feature::CoreOutsideService,
+    common::x_outside_feature::feature::CommonOutsideService,
     x_outside_feature::proxy::env::ProxyEnv,
     z_lib::service::x_outside_feature::feature::GoogleServiceAuthorizerOutsideFeature,
 };
@@ -11,11 +11,11 @@ use crate::z_lib::jwt::helper::decoding_key_from_ec_pem;
 
 pub struct ProxyAppFeature {
     pub auth: AuthProxyOutsideFeature,
-    pub core: CoreOutsideFeature,
+    pub common: CommonOutsideFeature,
 }
 
-pub struct CoreOutsideFeature {
-    pub service: CoreOutsideService,
+pub struct CommonOutsideFeature {
+    pub service: CommonOutsideService,
 }
 
 impl ProxyAppFeature {
@@ -37,8 +37,8 @@ impl ProxyAppFeature {
                     cloudfront_key_pair_id: &env.cloudfront_key_pair_id,
                 },
             },
-            core: CoreOutsideFeature {
-                service: CoreOutsideService {
+            common: CommonOutsideFeature {
+                service: CommonOutsideService {
                     service_url: &env.core_service_url,
                     google_authorizer: GoogleServiceAuthorizerOutsideFeature::new(
                         &env.core_service_url,

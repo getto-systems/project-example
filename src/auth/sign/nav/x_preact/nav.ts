@@ -1,6 +1,6 @@
 import { html } from "htm/preact"
 import { VNode } from "preact"
-import { iconHtml } from "../../../../core/x_preact/design/icon"
+import { iconHtml } from "../../../../common/x_preact/design/icon"
 
 import { SignNavItem } from "../data"
 
