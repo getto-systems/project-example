@@ -16,10 +16,10 @@ import { useDocumentTitle } from "../../../../common/x_preact/hooks"
 import { copyright, siteInfo } from "../../../../x_content/site"
 
 import { ApplicationError } from "../../../../avail/x_preact/application_error"
-import { LoadSeason } from "../../../../common/season/load/x_preact/load_season"
+import { LoadSeason } from "../../../../core/season/load/x_preact/load_season"
 import { LoadMenu } from "../../../../common/outline/load/x_preact/load_menu"
 import { LoadBreadcrumbList } from "../../../../common/outline/load/x_preact/load_breadcrumb_list"
-import { SetupSeason } from "../../../../common/season/setup/x_preact/setup"
+import { SetupSeason } from "../../../../core/season/setup/x_preact/setup"
 
 import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 import { SetupSeasonPageResource } from "./resource"

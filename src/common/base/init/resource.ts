@@ -5,7 +5,7 @@ import {
     newLoadBreadcrumbListResource,
     newLoadMenuResource,
 } from "../../outline/load/init/resource"
-import { newLoadSeasonResource } from "../../season/load/init/resource"
+import { newLoadSeasonResource } from "../../../core/season/load/init/resource"
 
 import { RepositoryOutsideFeature } from "../../../z_lib/ui/repository/feature"
 import { RemoteOutsideFeature } from "../../../z_lib/ui/remote/feature"

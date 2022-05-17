@@ -7,9 +7,9 @@ import { box } from "../../../../z_vendor/getto-css/preact/design/box"
 import { field, fieldHelp_error } from "../../../../z_vendor/getto-css/preact/design/form"
 
 import { InputSeason } from "../../input/x_preact/input"
-import { EditButton } from "../../../x_preact/button/edit_button"
-import { EditSuccessButton } from "../../../x_preact/button/edit_success_button"
-import { ChangeButton } from "../../../x_preact/button/change_button"
+import { EditButton } from "../../../../common/x_preact/button/edit_button"
+import { EditSuccessButton } from "../../../../common/x_preact/button/edit_success_button"
+import { ChangeButton } from "../../../../common/x_preact/button/change_button"
 
 import { repositoryErrorReason } from "../../../../z_lib/ui/repository/x_error/reason"
 import { seasonLabel } from "../../kernel/helper"

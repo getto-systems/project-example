@@ -24,7 +24,7 @@ impl<'a> GetOutlineMenuBadgeProxyStruct<'a> {
     ) -> AuthProxyAction<Self> {
         AuthProxyAction::with_material(Self {
             validate: ValidateApiMetadataStruct::new(&feature.auth.decoding_key, request),
-            proxy_service: ProxyService::new(&feature.core.service, request_id),
+            proxy_service: ProxyService::new(&feature.common.service, request_id),
         })
     }
 }

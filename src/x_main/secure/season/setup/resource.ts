@@ -1,6 +1,6 @@
 import { BaseResource } from "../../../../common/base/resource"
-import { SetupSeasonAction } from "../../../../common/season/setup/action"
-import { LoadSeasonAction } from "../../../../common/season/load/action"
+import { SetupSeasonAction } from "../../../../core/season/setup/action"
+import { LoadSeasonAction } from "../../../../core/season/load/action"
 import { EditableBoardAction } from "../../../../z_vendor/getto-application/board/editable/action"
 
 export type SetupSeasonPageResource = BaseResource &
