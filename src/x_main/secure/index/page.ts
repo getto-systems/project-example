@@ -18,7 +18,7 @@ import { ApplicationError } from "../../../avail/x_preact/application_error"
 import { LoadSeason } from "../../../core/season/load/x_preact/load_season"
 import { LoadBreadcrumbList } from "../../../core/outline/load/x_preact/load_breadcrumb_list"
 import { LoadMenu } from "../../../core/outline/load/x_preact/load_menu"
-import { Dashboard } from "../../../core/dashboard/x_preact/dashboard"
+import { Dashboard } from "../../../x_content/x_preact/dashboard"
 
 import { ApplicationView } from "../../../z_vendor/getto-application/action/action"
 import { BaseResource } from "../../../core/base/resource"

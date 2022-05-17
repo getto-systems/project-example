@@ -1,10 +1,10 @@
 import { h, VNode } from "preact"
 
-import { box_double, container } from "../../../z_vendor/getto-css/preact/design/box"
+import { box_double, container } from "../../z_vendor/getto-css/preact/design/box"
 
-import { LoadSeasonField } from "../../season/load/x_preact/load_season_field"
+import { LoadSeasonField } from "../../core/season/load/x_preact/load_season_field"
 
-import { LoadSeasonAction } from "../../season/load/action"
+import { LoadSeasonAction } from "../../core/season/load/action"
 
 type Props = Readonly<{
     season: LoadSeasonAction
