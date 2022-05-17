@@ -16,14 +16,14 @@ import {
 } from "../../../../../z_vendor/getto-css/preact/layout/app"
 
 import { useNotifyUnexpectedError } from "../../../../../avail/unexpected_error/notify/x_preact/hooks"
-import { useDocumentTitle } from "../../../../../core/x_preact/hooks"
+import { useDocumentTitle } from "../../../../../common/x_preact/hooks"
 
 import { copyright, siteInfo } from "../../../../../x_content/site"
 
 import { ApplicationError } from "../../../../../avail/x_preact/application_error"
-import { LoadSeason } from "../../../../../core/season/load/x_preact/load_season"
-import { LoadMenu } from "../../../../../core/outline/load/x_preact/load_menu"
-import { LoadBreadcrumbList } from "../../../../../core/outline/load/x_preact/load_breadcrumb_list"
+import { LoadSeason } from "../../../../../common/season/load/x_preact/load_season"
+import { LoadMenu } from "../../../../../common/outline/load/x_preact/load_menu"
+import { LoadBreadcrumbList } from "../../../../../common/outline/load/x_preact/load_breadcrumb_list"
 import { SearchAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/search"
 import { ListAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/list"
 import { FocusedAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/focused"

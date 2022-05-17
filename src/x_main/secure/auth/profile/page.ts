@@ -12,14 +12,14 @@ import {
 import { container } from "../../../../z_vendor/getto-css/preact/design/box"
 
 import { useNotifyUnexpectedError } from "../../../../avail/unexpected_error/notify/x_preact/hooks"
-import { useDocumentTitle } from "../../../../core/x_preact/hooks"
+import { useDocumentTitle } from "../../../../common/x_preact/hooks"
 
 import { copyright, siteInfo } from "../../../../x_content/site"
 
 import { ApplicationError } from "../../../../avail/x_preact/application_error"
-import { LoadSeason } from "../../../../core/season/load/x_preact/load_season"
-import { LoadMenu } from "../../../../core/outline/load/x_preact/load_menu"
-import { LoadBreadcrumbList } from "../../../../core/outline/load/x_preact/load_breadcrumb_list"
+import { LoadSeason } from "../../../../common/season/load/x_preact/load_season"
+import { LoadMenu } from "../../../../common/outline/load/x_preact/load_menu"
+import { LoadBreadcrumbList } from "../../../../common/outline/load/x_preact/load_breadcrumb_list"
 import { ChangePassword } from "../../../../auth/user/password/change/x_preact/change_password"
 import { RequestResetTokenProfile } from "../../../../auth/user/password/reset/request_token/x_preact/request_token_profile"
 

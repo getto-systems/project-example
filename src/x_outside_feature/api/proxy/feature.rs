@@ -2,7 +2,7 @@ use crate::{
     auth::x_outside_feature::feature::{
         AuthOutsideCookie, AuthOutsideDecodingKey, AuthOutsideService, AuthProxyOutsideFeature,
     },
-    core::x_outside_feature::feature::CoreOutsideService,
+    common::x_outside_feature::feature::CoreOutsideService,
     x_outside_feature::proxy::env::ProxyEnv,
     z_lib::service::x_outside_feature::feature::GoogleServiceAuthorizerOutsideFeature,
 };

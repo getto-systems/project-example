@@ -1,4 +1,4 @@
-import { initBaseView } from "../../../../../core/base/init"
+import { initBaseView } from "../../../../../common/base/init"
 
 import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 import { RegisterUserAccountPageResource } from "./resource"

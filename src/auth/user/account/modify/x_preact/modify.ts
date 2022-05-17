@@ -8,18 +8,18 @@ import {
     form,
 } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
-import { takeLongtimeField, validationMessage } from "../../../../../core/x_preact/design/form"
+import { takeLongtimeField, validationMessage } from "../../../../../common/x_preact/design/form"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
 import { StaticLoginIdField } from "../../../login_id/input/x_preact/static"
 import { AuthUserMemoField } from "../../input/memo/x_preact/input"
 import { GrantedRolesField } from "../../input/granted_roles/x_preact/input"
-import { EditButton } from "../../../../../core/x_preact/button/edit_button"
-import { EditSuccessButton } from "../../../../../core/x_preact/button/edit_success_button"
-import { ResetButton } from "../../../../../core/x_preact/button/reset_button"
-import { CloseButton } from "../../../../../core/x_preact/button/close_button"
-import { ChangeButton } from "../../../../../core/x_preact/button/change_button"
+import { EditButton } from "../../../../../common/x_preact/button/edit_button"
+import { EditSuccessButton } from "../../../../../common/x_preact/button/edit_success_button"
+import { ResetButton } from "../../../../../common/x_preact/button/reset_button"
+import { CloseButton } from "../../../../../common/x_preact/button/close_button"
+import { ChangeButton } from "../../../../../common/x_preact/button/change_button"
 
 import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
 

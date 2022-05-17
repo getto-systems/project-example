@@ -5,7 +5,7 @@ use crate::avail::unexpected_error::notify::y_protobuf::service::{
     notify_pb_client::NotifyPbClient, NotifyRequestPb,
 };
 
-use crate::core::x_outside_feature::feature::CoreOutsideService;
+use crate::common::x_outside_feature::feature::CoreOutsideService;
 
 use crate::avail::unexpected_error::notify::x_tonic::route::ServiceNotify;
 

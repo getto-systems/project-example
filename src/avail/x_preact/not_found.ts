@@ -6,9 +6,9 @@ import { env } from "../../y_environment/ui/env"
 import { loginBox } from "../../z_vendor/getto-css/preact/layout/login"
 import { buttons } from "../../z_vendor/getto-css/preact/design/form"
 
-import { useDocumentTitle } from "../../core/x_preact/hooks"
+import { useDocumentTitle } from "../../common/x_preact/hooks"
 import { siteInfo } from "../../x_content/site"
-import { iconHtml } from "../../core/x_preact/design/icon"
+import { iconHtml } from "../../common/x_preact/design/icon"
 import { icon_home } from "../../x_content/icon"
 
 type Props = {

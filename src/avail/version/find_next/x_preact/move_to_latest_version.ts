@@ -11,7 +11,7 @@ import { loginBox } from "../../../../z_vendor/getto-css/preact/layout/login"
 import { siteInfo } from "../../../../x_content/site"
 import { icon_spinner } from "../../../../x_content/icon"
 import { applicationPath } from "../../find_next/helper"
-import { iconHtml } from "../../../../core/x_preact/design/icon"
+import { iconHtml } from "../../../../common/x_preact/design/icon"
 
 import { ApplicationError } from "../../../x_preact/application_error"
 

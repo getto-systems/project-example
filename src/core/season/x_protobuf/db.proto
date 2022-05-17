@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-package core.season.db;
-
-message SeasonPb {
-    int32 year = 1;
-    string period = 2;
-    int64 expires = 3;
-}

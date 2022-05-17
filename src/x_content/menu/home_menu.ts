@@ -4,7 +4,7 @@ import { icon_home } from "../icon"
 
 import { category, item } from "./common"
 
-import { MenuContent } from "../../core/outline/load/infra"
+import { MenuContent } from "../../common/outline/load/infra"
 import { authRoleLabel } from "../role"
 
 export function homeMenuContent(): MenuContent {

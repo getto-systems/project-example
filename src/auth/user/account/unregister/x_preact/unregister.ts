@@ -8,13 +8,13 @@ import {
     form,
 } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
-import { takeLongtimeField } from "../../../../../core/x_preact/design/form"
+import { takeLongtimeField } from "../../../../../common/x_preact/design/form"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
-import { DeleteConfirmButton } from "../../../../../core/x_preact/button/delete_confirm_button"
-import { DeleteButton } from "../../../../../core/x_preact/button/delete_button"
-import { CloseButton } from "../../../../../core/x_preact/button/close_button"
+import { DeleteConfirmButton } from "../../../../../common/x_preact/button/delete_confirm_button"
+import { DeleteButton } from "../../../../../common/x_preact/button/delete_button"
+import { CloseButton } from "../../../../../common/x_preact/button/close_button"
 
 import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
 

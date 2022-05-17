@@ -8,7 +8,7 @@ use example_api::x_outside_feature::proxy::{env::ProxyEnv, feature::ProxyAppFeat
 
 use example_api::{
     auth::x_actix_web::route::scope_auth, avail::x_actix_web::route::scope_avail,
-    core::x_actix_web::route::scope_core,
+    common::x_actix_web::route::scope_common,
 };
 
 lazy_static! {
@@ -33,7 +33,7 @@ async fn main() -> io::Result<()> {
             .service(root::index)
             .service(scope_auth())
             .service(scope_avail())
-            .service(scope_core())
+            .service(scope_common())
     })
     .bind(format!("0.0.0.0:{}", &ENV.port))?
     .run()

@@ -4,14 +4,14 @@ import { useApplicationAction } from "../../../../../z_vendor/getto-application/
 
 import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
-import { takeLongtimeField, validationMessage } from "../../../../../core/x_preact/design/form"
+import { takeLongtimeField, validationMessage } from "../../../../../common/x_preact/design/form"
 
 import { PasswordField } from "../../input/x_preact/input"
-import { EditButton } from "../../../../../core/x_preact/button/edit_button"
-import { EditSuccessButton } from "../../../../../core/x_preact/button/edit_success_button"
-import { ClearChangesButton } from "../../../../../core/x_preact/button/clear_changes_button"
-import { CloseButton } from "../../../../../core/x_preact/button/close_button"
-import { ChangeButton } from "../../../../../core/x_preact/button/change_button"
+import { EditButton } from "../../../../../common/x_preact/button/edit_button"
+import { EditSuccessButton } from "../../../../../common/x_preact/button/edit_success_button"
+import { ClearChangesButton } from "../../../../../common/x_preact/button/clear_changes_button"
+import { CloseButton } from "../../../../../common/x_preact/button/close_button"
+import { ChangeButton } from "../../../../../common/x_preact/button/change_button"
 
 import { changePasswordError } from "./helper"
 

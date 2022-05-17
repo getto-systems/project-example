@@ -5,7 +5,7 @@ import { newDocsView } from "../../../../docs/init/resource"
 
 import { Docs } from "../../../../docs/x_preact/docs"
 
-import { docs_example } from "../../../../core/docs"
+import { docs_example } from "../../../../common/docs"
 
 render(
     h(Docs, {

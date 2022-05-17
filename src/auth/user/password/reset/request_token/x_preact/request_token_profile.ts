@@ -9,16 +9,16 @@ import { buttons, fieldHelp_error } from "../../../../../../z_vendor/getto-css/p
 import { icon_change } from "../../../../../../x_content/icon"
 import { box } from "../../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../../z_vendor/getto-css/preact/design/highlight"
-import { takeLongtimeField, validationMessage } from "../../../../../../core/x_preact/design/form"
+import { takeLongtimeField, validationMessage } from "../../../../../../common/x_preact/design/form"
 
 import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_error/reason"
 
 import { LoginIdField } from "../../../../login_id/input/x_preact/input"
-import { EditButton } from "../../../../../../core/x_preact/button/edit_button"
-import { EditSuccessButton } from "../../../../../../core/x_preact/button/edit_success_button"
-import { SendButton } from "../../../../../../core/x_preact/button/send_button"
-import { ClearChangesButton } from "../../../../../../core/x_preact/button/clear_changes_button"
-import { CloseButton } from "../../../../../../core/x_preact/button/close_button"
+import { EditButton } from "../../../../../../common/x_preact/button/edit_button"
+import { EditSuccessButton } from "../../../../../../common/x_preact/button/edit_success_button"
+import { SendButton } from "../../../../../../common/x_preact/button/send_button"
+import { ClearChangesButton } from "../../../../../../common/x_preact/button/clear_changes_button"
+import { CloseButton } from "../../../../../../common/x_preact/button/close_button"
 
 import { RequestResetTokenAction } from "../action"
 import { EditableBoardAction } from "../../../../../../z_vendor/getto-application/board/editable/action"

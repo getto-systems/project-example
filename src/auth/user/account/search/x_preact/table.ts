@@ -10,7 +10,7 @@ import {
     tbody,
     thead,
 } from "../../../../../z_vendor/getto-css/preact/design/table"
-import { emptyTable, takeLongtimeTable } from "../../../../../core/x_preact/design/table"
+import { emptyTable, takeLongtimeTable } from "../../../../../common/x_preact/design/table"
 
 import { searchColumns } from "../../../../../z_lib/ui/search/columns/x_preact/helper"
 
