@@ -3,7 +3,8 @@ use std::sync::Arc;
 use tonic::{metadata::MetadataMap, Request};
 
 use crate::{
-    auth::x_outside_feature::feature::AuthOutsideService, x_outside_feature::core::env::CoreEnv, z_lib::service::x_outside_feature::feature::GoogleServiceAuthorizerOutsideFeature,
+    auth::x_outside_feature::feature::AuthOutsideService, x_outside_feature::core::env::CoreEnv,
+    z_lib::service::x_outside_feature::feature::GoogleServiceAuthorizerOutsideFeature,
 };
 
 pub struct CoreAppFeature {

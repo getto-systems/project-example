@@ -2,7 +2,7 @@ use crate::{
     auth::x_outside_feature::feature::{
         AuthOutsideCookie, AuthOutsideDecodingKey, AuthOutsideService, AuthProxyOutsideFeature,
     },
-    common::x_outside_feature::feature::CoreOutsideService,
+    common::x_outside_feature::feature::CommonOutsideService,
     x_outside_feature::proxy::env::ProxyEnv,
     z_lib::service::x_outside_feature::feature::GoogleServiceAuthorizerOutsideFeature,
 };
@@ -15,7 +15,7 @@ pub struct ProxyAppFeature {
 }
 
 pub struct CoreOutsideFeature {
-    pub service: CoreOutsideService,
+    pub service: CommonOutsideService,
 }
 
 impl ProxyAppFeature {
@@ -38,7 +38,7 @@ impl ProxyAppFeature {
                 },
             },
             core: CoreOutsideFeature {
-                service: CoreOutsideService {
+                service: CommonOutsideService {
                     service_url: &env.core_service_url,
                     google_authorizer: GoogleServiceAuthorizerOutsideFeature::new(
                         &env.core_service_url,
