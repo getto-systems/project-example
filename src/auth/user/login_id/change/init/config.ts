@@ -1,10 +1,10 @@
-import { AUTH_CONFIG } from "../../../../x_outside_feature/config"
+import { COMMON_CONFIG } from "../../../../../common/x_outside_feature/config"
 
-import {  OverwriteLoginIdConfig } from "../action"
+import { OverwriteLoginIdConfig } from "../action"
 
 export function newOverwritePasswordConfig(): OverwriteLoginIdConfig {
     return {
-        takeLongtimeThreshold: AUTH_CONFIG.takeLongtimeThreshold,
-        resetToInitialTimeout: AUTH_CONFIG.resetToInitialTimeout,
+        takeLongtimeThreshold: COMMON_CONFIG.takeLongtimeThreshold,
+        resetToInitialTimeout: COMMON_CONFIG.resetToInitialTimeout,
     }
 }

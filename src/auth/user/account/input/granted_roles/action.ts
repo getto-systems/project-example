@@ -45,6 +45,7 @@ export function initInputGrantedAuthRolesAction(): InputGrantedAuthRolesAction {
     })
 
     subscriber.subscribe(() => {
+        validate.check()
         observe.check()
     })
 

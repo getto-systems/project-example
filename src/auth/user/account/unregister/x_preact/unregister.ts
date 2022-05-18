@@ -1,4 +1,5 @@
 import { h, VNode } from "preact"
+import { html } from "htm/preact"
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
@@ -23,11 +24,9 @@ import { UnregisterAuthUserAccountAction } from "../action"
 
 import { UnregisterAuthUserAccountError } from "../data"
 import { LoginId } from "../../../login_id/kernel/data"
-import { AuthRole } from "../../../kernel/data"
-import { html } from "htm/preact"
 
 type Props = Readonly<{
-    user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[] }>
+    user: Readonly<{ loginId: LoginId }>
     editable: EditableBoardAction
     unregister: UnregisterAuthUserAccountAction
     onSuccess: { (loginID: LoginId): void }

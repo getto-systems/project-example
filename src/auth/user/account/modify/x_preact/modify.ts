@@ -154,7 +154,7 @@ function modifyError(err: ModifyAuthUserAccountError): readonly VNodeContent[] {
             return ["他で変更がありました", "一旦リロードしてやり直してください"]
 
         case "not-found":
-            return ["ユーザーが見つかりませんでした", "一旦リロードしてやり直してください"]
+            return ["データが見つかりませんでした", "一旦リロードしてやり直してください"]
 
         case "invalid":
             return ["データが正しくありません", "一旦リロードしてやり直してください"]
