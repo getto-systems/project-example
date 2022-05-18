@@ -86,6 +86,7 @@ class Action
         super({
             terminate: () => {
                 this.grantedRoles.terminate()
+                this.validate.terminate()
                 this.observe.terminate()
             },
         })

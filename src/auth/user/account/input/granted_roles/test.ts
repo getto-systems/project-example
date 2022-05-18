@@ -5,13 +5,26 @@ import { mockMultipleBoardValueStore } from "../../../../../z_vendor/getto-appli
 
 import { initInputGrantedAuthRolesAction } from "./action"
 
+test("validate; valid input", async () => {
+    const { action, store } = standard()
+
+    const runner = setupActionTestRunner(action.validate.subscriber)
+
+    await runner(async () => {
+        store.grantedRoles.set(["auth-user"])
+        return action.validate.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual([{ type: "validated", result: { valid: true, value: ["auth-user"] } }])
+    })
+})
+
 test("observe; has changed", async () => {
     const { action, store } = standard()
 
     const runner = setupActionTestRunner(action.observe.subscriber)
 
     await runner(async () => {
-        store.grantedRoles.set(["user"])
+        store.grantedRoles.set(["auth-user"])
         return action.observe.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ hasChanged: true }])

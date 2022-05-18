@@ -1,9 +1,9 @@
-import { AUTH_CONFIG } from "../../../../../x_outside_feature/config"
+import { COMMON_CONFIG } from "../../../../../../common/x_outside_feature/config"
 
 import { RequestResetTokenConfig } from "../action"
 
 export function newRequestResetTokenConfig(): RequestResetTokenConfig {
     return {
-        takeLongtimeThreshold: AUTH_CONFIG.takeLongtimeThreshold,
+        takeLongtimeThreshold: COMMON_CONFIG.takeLongtimeThreshold,
     }
 }

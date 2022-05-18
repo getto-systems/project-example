@@ -1,4 +1,5 @@
 import { AUTH_CONFIG } from "../../../x_outside_feature/config"
+import { COMMON_CONFIG } from "../../../../common/x_outside_feature/config"
 
 import { newGetScriptPathConfig } from "../../../sign/get_script_path/init/config"
 import { StartContinuousRenewConfig } from "../../check/method"
@@ -10,7 +11,7 @@ export function newCheckAuthTicketConfig(): CheckAuthTicketConfig {
         ...newStartContinuousRenewConfig(),
         ...newGetScriptPathConfig(),
         instantLoadExpire: AUTH_CONFIG.instantLoadExpire,
-        takeLongtimeThreshold: AUTH_CONFIG.takeLongtimeThreshold,
+        takeLongtimeThreshold: COMMON_CONFIG.takeLongtimeThreshold,
     }
 }
 
