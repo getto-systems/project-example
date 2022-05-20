@@ -35,7 +35,7 @@ impl<T> ServiceResponder<T> for AuthenticateEvent {
 impl<T> ServiceResponder<T> for AuthorizeEvent {
     fn respond_to(self) -> Result<Response<T>, Status> {
         match self {
-            Self::Success => Err(Status::cancelled("cancelled at authorize succeeded")),
+            Self::Success(_) => Err(Status::cancelled("cancelled at authorize succeeded")),
             Self::ServiceError(err) => err.respond_to(),
             Self::MetadataError(err) => err.respond_to(),
             Self::DecodeError(err) => err.respond_to(),

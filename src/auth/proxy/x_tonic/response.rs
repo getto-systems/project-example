@@ -11,7 +11,7 @@ impl From<Status> for AuthProxyError {
             Code::Unauthenticated => Self::Unauthenticated(status.message().into()),
             Code::PermissionDenied => Self::PermissionDenied(status.message().into()),
             Code::Cancelled => Self::Cancelled(status.message().into()),
-            _ => Self::InfraError(status.message().into()),
+            _ => Self::InfraError(format!("status: {}({})", status.code(), status.message())),
         }
     }
 }

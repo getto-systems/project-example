@@ -11,35 +11,29 @@ use crate::auth::ticket::{
 
 use crate::auth::ticket::kernel::data::{AuthTicketExtract, AuthToken, DecodeAuthTokenError};
 
-pub struct JwtTicketTokenDecoder<'a> {
+pub struct JwtAuthTokenDecoder<'a> {
     key: &'a DecodingKey,
+    audience: [&'static str; 1],
 }
 
-impl<'a> JwtTicketTokenDecoder<'a> {
-    pub const fn new(key: &'a AuthOutsideDecodingKey) -> Self {
-        Self { key: &key.ticket }
+impl<'a> JwtAuthTokenDecoder<'a> {
+    pub const fn ticket(decoding_key: &'a AuthOutsideDecodingKey) -> Self {
+        Self {
+            key: &decoding_key.ticket,
+            audience: [AUTH_JWT_AUDIENCE_TICKET],
+        }
+    }
+    pub const fn api(decoding_key: &'a AuthOutsideDecodingKey) -> Self {
+        Self {
+            key: &decoding_key.api,
+            audience: [AUTH_JWT_AUDIENCE_API],
+        }
     }
 }
 
-impl<'a> AuthTokenDecoder for JwtTicketTokenDecoder<'a> {
+impl<'a> AuthTokenDecoder for JwtAuthTokenDecoder<'a> {
     fn decode(&self, token: &AuthToken) -> Result<AuthTicketExtract, DecodeAuthTokenError> {
-        validate_jwt(token, &[AUTH_JWT_AUDIENCE_TICKET], &self.key)
-    }
-}
-
-pub struct JwtApiTokenDecoder<'a> {
-    key: &'a DecodingKey,
-}
-
-impl<'a> JwtApiTokenDecoder<'a> {
-    pub const fn new(key: &'a AuthOutsideDecodingKey) -> Self {
-        Self { key: &key.api }
-    }
-}
-
-impl<'a> AuthTokenDecoder for JwtApiTokenDecoder<'a> {
-    fn decode(&self, token: &AuthToken) -> Result<AuthTicketExtract, DecodeAuthTokenError> {
-        validate_jwt(token, &[AUTH_JWT_AUDIENCE_API], &self.key)
+        validate_jwt(token, &self.audience, &self.key)
     }
 }
 

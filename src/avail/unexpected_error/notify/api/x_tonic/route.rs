@@ -7,7 +7,7 @@ use crate::avail::unexpected_error::notify::y_protobuf::service::{
 };
 
 use crate::x_outside_feature::core::{
-    feature::{extract_request, TonicRequest},
+    feature::{extract_core_request, CoreTonicRequest},
     logger::app_logger,
 };
 
@@ -31,11 +31,11 @@ impl NotifyPb for ServiceNotify {
         &self,
         request: Request<NotifyRequestPb>,
     ) -> Result<Response<NotifyResponsePb>, Status> {
-        let TonicRequest {
+        let CoreTonicRequest {
             metadata,
             feature,
             request,
-        } = extract_request(request);
+        } = extract_core_request(request);
         let request_id = metadata_request_id(&metadata);
         let logger = app_logger(Self::name(), request_id.into());
 

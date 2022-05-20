@@ -2,13 +2,15 @@ pub mod request_decoder;
 
 use tonic::metadata::MetadataMap;
 
-use crate::auth::ticket::kernel::init::ticket_repository::dynamodb::DynamoDbAuthTicketRepository;
 use crate::auth::user::account::unregister::y_protobuf::service::UnregisterAuthUserAccountRequestPb;
 
 use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::{
-    ticket::validate::init::AuthenticateApiStruct,
+    ticket::{
+        kernel::init::ticket_repository::dynamodb::DynamoDbAuthTicketRepository,
+        validate::init::AuthenticateApiStruct,
+    },
     user::{
         account::unregister::init::request_decoder::PbUnregisterAuthUserAccountRequestDecoder,
         kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,

@@ -8,8 +8,8 @@ use crate::{
 
 use crate::{auth::proxy::data::AuthProxyError, z_lib::service::data::ServiceAuthorizeError};
 
-pub fn infra_error(label: &'static str, err: impl std::fmt::Display) -> AuthProxyError {
-    AuthProxyError::InfraError(format!("proxy infra error; {}; {}", label, err))
+pub fn proxy_infra_error(label: &'static str, err: impl std::fmt::Display) -> AuthProxyError {
+    AuthProxyError::InfraError(format!("{}; {}", label, err))
 }
 
 pub enum AuthMetadataError {

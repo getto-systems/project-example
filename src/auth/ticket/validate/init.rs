@@ -23,7 +23,7 @@ use crate::auth::ticket::{
         nonce_metadata::TonicAuthNonceMetadata,
         nonce_repository::dynamodb::DynamoDbAuthNonceRepository,
         request_decoder::PbAuthorizeRequestDecoder,
-        token_decoder::{JwtApiTokenDecoder, JwtTicketTokenDecoder, NoopTokenDecoder},
+        token_decoder::{JwtAuthTokenDecoder, NoopTokenDecoder},
         token_metadata::TonicAuthTokenMetadata,
         validate_service::TonicValidateService,
     },
@@ -50,7 +50,7 @@ pub fn authenticate_api_action<'a>(
 pub struct AuthenticateTicketStruct<'a> {
     validate_nonce: ValidateAuthNonceStruct<'a>,
     token_metadata: TonicAuthTokenMetadata<'a>,
-    token_decoder: JwtTicketTokenDecoder<'a>,
+    token_decoder: JwtAuthTokenDecoder<'a>,
 }
 
 impl<'a> AuthenticateTicketStruct<'a> {
@@ -58,7 +58,7 @@ impl<'a> AuthenticateTicketStruct<'a> {
         Self {
             validate_nonce: ValidateAuthNonceStruct::new(feature, metadata),
             token_metadata: TonicAuthTokenMetadata::new(metadata),
-            token_decoder: JwtTicketTokenDecoder::new(&feature.decoding_key),
+            token_decoder: JwtAuthTokenDecoder::ticket(&feature.decoding_key),
         }
     }
 }
@@ -66,7 +66,7 @@ impl<'a> AuthenticateTicketStruct<'a> {
 impl<'a> AuthenticateInfra for AuthenticateTicketStruct<'a> {
     type ValidateNonce = ValidateAuthNonceStruct<'a>;
     type TokenMetadata = TonicAuthTokenMetadata<'a>;
-    type TokenDecoder = JwtTicketTokenDecoder<'a>;
+    type TokenDecoder = JwtAuthTokenDecoder<'a>;
 
     fn validate_nonce(&self) -> &Self::ValidateNonce {
         &self.validate_nonce
@@ -82,7 +82,7 @@ impl<'a> AuthenticateInfra for AuthenticateTicketStruct<'a> {
 pub struct AuthenticateApiStruct<'a> {
     validate_nonce: ValidateAuthNonceStruct<'a>,
     token_metadata: TonicAuthTokenMetadata<'a>,
-    token_decoder: JwtApiTokenDecoder<'a>,
+    token_decoder: JwtAuthTokenDecoder<'a>,
 }
 
 impl<'a> AuthenticateApiStruct<'a> {
@@ -90,7 +90,7 @@ impl<'a> AuthenticateApiStruct<'a> {
         Self {
             validate_nonce: ValidateAuthNonceStruct::new(feature, metadata),
             token_metadata: TonicAuthTokenMetadata::new(metadata),
-            token_decoder: JwtApiTokenDecoder::new(&feature.decoding_key),
+            token_decoder: JwtAuthTokenDecoder::api(&feature.decoding_key),
         }
     }
 }
@@ -98,7 +98,7 @@ impl<'a> AuthenticateApiStruct<'a> {
 impl<'a> AuthenticateInfra for AuthenticateApiStruct<'a> {
     type ValidateNonce = ValidateAuthNonceStruct<'a>;
     type TokenMetadata = TonicAuthTokenMetadata<'a>;
-    type TokenDecoder = JwtApiTokenDecoder<'a>;
+    type TokenDecoder = JwtAuthTokenDecoder<'a>;
 
     fn validate_nonce(&self) -> &Self::ValidateNonce {
         &self.validate_nonce
@@ -149,14 +149,14 @@ impl<'a> AuthorizeInfra for AuthorizeStruct<'a> {
 
 pub struct ValidateTicketMetadataStruct<'a> {
     auth_metadata: TicketAuthMetadata<'a>,
-    token_decoder: JwtTicketTokenDecoder<'a>,
+    token_decoder: JwtAuthTokenDecoder<'a>,
 }
 
 impl<'a> ValidateTicketMetadataStruct<'a> {
     pub fn new(decoding_key: &'a AuthOutsideDecodingKey, request: &'a HttpRequest) -> Self {
         Self {
             auth_metadata: TicketAuthMetadata::new(request),
-            token_decoder: JwtTicketTokenDecoder::new(&decoding_key),
+            token_decoder: JwtAuthTokenDecoder::ticket(&decoding_key),
         }
     }
 }
@@ -164,7 +164,7 @@ impl<'a> ValidateTicketMetadataStruct<'a> {
 #[async_trait::async_trait]
 impl<'a> ValidateAuthMetadataInfra for ValidateTicketMetadataStruct<'a> {
     type AuthMetadata = TicketAuthMetadata<'a>;
-    type TokenDecoder = JwtTicketTokenDecoder<'a>;
+    type TokenDecoder = JwtAuthTokenDecoder<'a>;
 
     fn auth_metadata(&self) -> &Self::AuthMetadata {
         &self.auth_metadata
@@ -176,14 +176,14 @@ impl<'a> ValidateAuthMetadataInfra for ValidateTicketMetadataStruct<'a> {
 
 pub struct ValidateApiMetadataStruct<'a> {
     auth_metadata: ApiAuthMetadata<'a>,
-    token_decoder: JwtApiTokenDecoder<'a>,
+    token_decoder: JwtAuthTokenDecoder<'a>,
 }
 
 impl<'a> ValidateApiMetadataStruct<'a> {
     pub fn new(decoding_key: &'a AuthOutsideDecodingKey, request: &'a HttpRequest) -> Self {
         Self {
             auth_metadata: ApiAuthMetadata::new(request),
-            token_decoder: JwtApiTokenDecoder::new(&decoding_key),
+            token_decoder: JwtAuthTokenDecoder::api(&decoding_key),
         }
     }
 }
@@ -191,7 +191,7 @@ impl<'a> ValidateApiMetadataStruct<'a> {
 #[async_trait::async_trait]
 impl<'a> ValidateAuthMetadataInfra for ValidateApiMetadataStruct<'a> {
     type AuthMetadata = ApiAuthMetadata<'a>;
-    type TokenDecoder = JwtApiTokenDecoder<'a>;
+    type TokenDecoder = JwtAuthTokenDecoder<'a>;
 
     fn auth_metadata(&self) -> &Self::AuthMetadata {
         &self.auth_metadata

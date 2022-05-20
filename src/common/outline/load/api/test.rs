@@ -4,8 +4,7 @@ use getto_application_test::ActionTestRunner;
 
 use crate::{
     auth::init::test::{
-        StaticAuthMetadata, StaticAuthTokenDecoder, StaticAuthorizeStruct,
-        StaticValidateService,
+        StaticAuthMetadata, StaticAuthTokenDecoder, StaticAuthorizeStruct, StaticValidateService,
     },
     common::outline::load::init::menu_badge_repository::test::StaticOutlineMenuBadgeRepository,
 };
@@ -23,25 +22,25 @@ async fn success_load_menu_badge() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authorize success", "load menu badge success"]);
+    assert_state(vec![
+        "authorize success; require: nothing",
+        "load menu badge success",
+    ]);
     assert!(result.is_ok());
 }
 
 struct TestStruct {
-    validate: StaticAuthorizeStruct,
-
+    authorize: StaticAuthorizeStruct,
     menu_badge_repository: StaticOutlineMenuBadgeRepository,
 }
 
 impl LoadOutlineMenuBadgeMaterial for TestStruct {
     type Authorize = StaticAuthorizeStruct;
-
     type MenuBadgeRepository = StaticOutlineMenuBadgeRepository;
 
     fn authorize(&self) -> &Self::Authorize {
-        &self.validate
+        &self.authorize
     }
-
     fn menu_badge_repository(&self) -> &Self::MenuBadgeRepository {
         &self.menu_badge_repository
     }
@@ -58,7 +57,7 @@ impl TestStore {
 impl TestStruct {
     fn standard(_store: &TestStore) -> Self {
         Self {
-            validate: StaticAuthorizeStruct {
+            authorize: StaticAuthorizeStruct {
                 auth_metadata: StaticAuthMetadata {
                     nonce: "NONCE".into(),
                     token: "TOKEN".into(),

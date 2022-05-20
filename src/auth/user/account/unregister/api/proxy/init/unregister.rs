@@ -8,12 +8,12 @@ use crate::auth::user::account::unregister::y_protobuf::service::{
 
 use crate::auth::x_outside_feature::feature::AuthOutsideService;
 
-use crate::auth::user::account::modify::x_tonic::route::ServiceModifyUser;
+use crate::auth::user::account::unregister::x_tonic::route::ServiceUnregisterUser;
 
 use crate::z_lib::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::{
-    auth::proxy::helper::{infra_error, set_metadata},
+    auth::proxy::helper::{proxy_infra_error, set_metadata},
     z_lib::{
         message::helper::{decode_base64, encode_protobuf_base64, invalid_protobuf},
         service::helper::new_endpoint,
@@ -50,7 +50,7 @@ impl<'a> AuthProxyService for UnregisterUserProxyService<'a> {
     type Response = AuthProxyResponse;
 
     fn name(&self) -> &str {
-        ServiceModifyUser::name()
+        ServiceUnregisterUser::name()
     }
     async fn call(self, metadata: AuthMetadataContent) -> Result<Self::Response, AuthProxyError> {
         call(self, metadata).await
@@ -63,10 +63,10 @@ async fn call<'a>(
 ) -> Result<AuthProxyResponse, AuthProxyError> {
     let mut client = UnregisterAuthUserAccountPbClient::new(
         new_endpoint(service.service_url)
-            .map_err(|err| infra_error("service endpoint error", err))?
+            .map_err(|err| proxy_infra_error("service endpoint error", err))?
             .connect()
             .await
-            .map_err(|err| infra_error("connect error", err))?,
+            .map_err(|err| proxy_infra_error("connect error", err))?,
     );
 
     let mut request =
@@ -78,7 +78,7 @@ async fn call<'a>(
         metadata,
     )
     .await
-    .map_err(|err| infra_error("metadata error", err))?;
+    .map_err(|err| proxy_infra_error("metadata error", err))?;
 
     let response = client
         .unregister_user(request)

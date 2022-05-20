@@ -11,7 +11,7 @@ use crate::auth::ticket::logout::x_tonic::route::ServiceLogout;
 use crate::z_lib::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::{
-    auth::proxy::helper::{infra_error, set_metadata},
+    auth::proxy::helper::{proxy_infra_error, set_metadata},
     z_lib::{message::helper::encode_protobuf_base64, service::helper::new_endpoint},
 };
 
@@ -53,10 +53,10 @@ async fn call<'a>(
 ) -> Result<AuthProxyResponse, AuthProxyError> {
     let mut client = LogoutPbClient::new(
         new_endpoint(service.service_url)
-            .map_err(|err| infra_error("service endpoint error", err))?
+            .map_err(|err| proxy_infra_error("service endpoint error", err))?
             .connect()
             .await
-            .map_err(|err| infra_error("connect error", err))?,
+            .map_err(|err| proxy_infra_error("connect error", err))?,
     );
 
     let mut request = Request::new(LogoutRequestPb {});
@@ -67,7 +67,7 @@ async fn call<'a>(
         metadata,
     )
     .await
-    .map_err(|err| infra_error("metadata error", err))?;
+    .map_err(|err| proxy_infra_error("metadata error", err))?;
 
     let response = client
         .logout(request)

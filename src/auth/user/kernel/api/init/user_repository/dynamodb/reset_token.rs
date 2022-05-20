@@ -9,7 +9,7 @@ use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
 use crate::z_lib::repository::{
     dynamodb::helper::{string_value, timestamp_value, DynamoDbColumn},
-    helper::infra_error,
+    helper::repository_infra_error,
 };
 
 use crate::auth::user::password::reset::reset::infra::ResetTokenMoment;
@@ -73,7 +73,7 @@ impl<'a> TableResetToken<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("get reset token error", err))?;
+            .map_err(|err| repository_infra_error("get reset token error", err))?;
 
         Ok(response.item.and_then(|mut attrs| {
             match (
@@ -127,7 +127,7 @@ impl<'a> TableResetToken<'a> {
         self.client
             .put_item(input)
             .await
-            .map_err(|err| infra_error("put reset token error", err))?;
+            .map_err(|err| repository_infra_error("put reset token error", err))?;
         Ok(())
     }
     pub async fn update_reset_at(
@@ -150,7 +150,7 @@ impl<'a> TableResetToken<'a> {
         self.client
             .update_item(input)
             .await
-            .map_err(|err| infra_error("update reset at error", err))?;
+            .map_err(|err| repository_infra_error("update reset at error", err))?;
         Ok(())
     }
 }

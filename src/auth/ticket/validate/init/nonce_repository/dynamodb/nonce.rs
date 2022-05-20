@@ -6,7 +6,7 @@ use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
 use crate::z_lib::repository::{
     dynamodb::helper::{string_value, timestamp_value, DynamoDbColumn},
-    helper::infra_error,
+    helper::repository_infra_error,
 };
 
 use crate::{
@@ -52,7 +52,7 @@ impl<'a> TableNonce<'a> {
                 RusotoError::Service(PutItemError::ConditionalCheckFailed(_)) => {
                     Ok(RegisterResult::Conflict)
                 }
-                _ => Err(infra_error("put nonce error", err)),
+                _ => Err(repository_infra_error("put nonce error", err)),
             },
         }
     }

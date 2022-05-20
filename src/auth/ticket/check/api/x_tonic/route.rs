@@ -8,7 +8,7 @@ use crate::auth::ticket::check::y_protobuf::service::{
 };
 
 use crate::x_outside_feature::auth::{
-    feature::{extract_request, TonicRequest},
+    feature::{extract_auth_request, AuthTonicRequest},
     logger::app_logger,
 };
 
@@ -32,9 +32,9 @@ impl CheckAuthTicketPb for ServiceCheck {
         &self,
         request: Request<CheckAuthTicketRequestPb>,
     ) -> Result<Response<CheckAuthTicketResponsePb>, Status> {
-        let TonicRequest {
+        let AuthTonicRequest {
             feature, metadata, ..
-        } = extract_request(request);
+        } = extract_auth_request(request);
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger(Self::name(), request_id.into());

@@ -9,7 +9,7 @@ use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
 use crate::z_lib::repository::{
     dynamodb::helper::{string_value, DynamoDbColumn, ScanKey},
-    helper::infra_error,
+    helper::repository_infra_error,
 };
 
 use crate::auth::user::login_id::change::infra::OverwriteLoginIdEntry;
@@ -56,7 +56,7 @@ impl<'a> TableLoginId<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("get user id error", err))?;
+            .map_err(|err| repository_infra_error("get user id error", err))?;
 
         Ok(response
             .item
@@ -89,7 +89,7 @@ impl<'a> TableLoginId<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("get overwrite entry error", err))?;
+            .map_err(|err| repository_infra_error("get overwrite entry error", err))?;
 
         Ok(response.item.and_then(move |mut attrs| {
             match (
@@ -127,7 +127,7 @@ impl<'a> TableLoginId<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("get reset token entry error", err))?;
+            .map_err(|err| repository_infra_error("get reset token entry error", err))?;
 
         Ok(response.item.and_then(|mut attrs| {
             match (
@@ -156,7 +156,7 @@ impl<'a> TableLoginId<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("get reset token entry error", err))?;
+            .map_err(|err| repository_infra_error("get reset token entry error", err))?;
 
         Ok(response.item.map(|mut attrs| {
             ColumnResetTokenDestinationEmail::remove_value(&mut attrs)
@@ -192,7 +192,7 @@ impl<'a> TableLoginId<'a> {
         self.client
             .put_item(input)
             .await
-            .map_err(|err| infra_error("put new login-id error", err))?;
+            .map_err(|err| repository_infra_error("put new login-id error", err))?;
 
         Ok(())
     }
@@ -223,7 +223,7 @@ impl<'a> TableLoginId<'a> {
         self.client
             .put_item(input)
             .await
-            .map_err(|err| infra_error("put login id error", err))?;
+            .map_err(|err| repository_infra_error("put login id error", err))?;
 
         Ok(())
     }
@@ -237,7 +237,7 @@ impl<'a> TableLoginId<'a> {
         self.client
             .delete_item(input)
             .await
-            .map_err(|err| infra_error("delete login id error", err))?;
+            .map_err(|err| repository_infra_error("delete login id error", err))?;
 
         Ok(())
     }
@@ -276,10 +276,9 @@ impl<'a> TableLoginId<'a> {
             },
         };
 
-        self.client
-            .update_item(input)
-            .await
-            .map_err(|err| infra_error("update reset token destination email error", err))?;
+        self.client.update_item(input).await.map_err(|err| {
+            repository_infra_error("update reset token destination email error", err)
+        })?;
 
         Ok(())
     }
@@ -317,7 +316,7 @@ impl<'a> TableLoginId<'a> {
             .client
             .scan(input)
             .await
-            .map_err(|err| infra_error("scan user error", err))?;
+            .map_err(|err| repository_infra_error("scan user error", err))?;
 
         let items = match response.items {
             None => vec![],

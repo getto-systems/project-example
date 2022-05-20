@@ -2,7 +2,7 @@ mod login_id;
 mod reset_token;
 mod user;
 
-use std::{collections::HashMap, convert::TryInto};
+use std::collections::HashMap;
 
 use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
@@ -10,7 +10,7 @@ use crate::auth::user::kernel::init::user_repository::dynamodb::{
     login_id::TableLoginId, reset_token::TableResetToken, user::TableUser,
 };
 
-use crate::z_lib::repository::helper::infra_error;
+use crate::z_lib::search::helper::{clip_search, sort_normal, sort_search, SearchClip};
 
 use crate::auth::user::{
     account::{
@@ -48,10 +48,7 @@ use crate::{
             password::reset::kernel::data::{ResetToken, ResetTokenDestination},
         },
     },
-    z_lib::{
-        repository::data::RepositoryError,
-        search::data::{detect_search_page, SearchOffsetDetecterExtract, SearchSortOrder},
-    },
+    z_lib::repository::data::RepositoryError,
 };
 
 pub struct DynamoDbAuthUserRepository<'a> {
@@ -114,7 +111,9 @@ impl<'a> OverwriteLoginIdRepository for DynamoDbAuthUserRepository<'a> {
             .await?;
 
         self.login_id.delete_entry(user.login_id.clone()).await?;
-        self.login_id.put_overwrite_entry(new_login_id, user).await?;
+        self.login_id
+            .put_overwrite_entry(new_login_id, user)
+            .await?;
 
         Ok(())
     }
@@ -372,7 +371,6 @@ async fn search_user_account<'a>(
 ) -> Result<AuthUserAccountSearch, RepositoryError> {
     // 業務用アプリケーションなので、ユーザー数は 100を超えない
     // dynamodb から全てのデータを取得してフィルタ、ソートする
-    let mut users = repository.user.scan_user().await?;
     let mut destinations: HashMap<LoginId, ResetTokenDestination> = repository
         .login_id
         .scan_reset_token_destination()
@@ -383,17 +381,10 @@ async fn search_user_account<'a>(
         })
         .collect();
 
-    match filter.sort().key() {
-        SearchAuthUserAccountSortKey::LoginId => {
-            users.sort_by_cached_key(|(login_id, _, _)| login_id.clone());
-            match filter.sort().order() {
-                SearchSortOrder::Normal => (),
-                SearchSortOrder::Reverse => users.reverse(),
-            }
-        }
-    };
-
-    let mut users: Vec<AuthUserAccount> = users
+    let users = repository
+        .user
+        .scan_user()
+        .await?
         .into_iter()
         .filter(|(login_id, granted_roles, _)| {
             filter.match_login_id(login_id) && filter.match_granted_roles(granted_roles)
@@ -409,23 +400,21 @@ async fn search_user_account<'a>(
         })
         .collect();
 
-    let detecter = SearchOffsetDetecterExtract {
-        all: users.len(),
-        limit: 1000,
-    };
-    let page = detect_search_page(
-        detecter
-            .try_into()
-            .map_err(|err| infra_error("convert offset error", err))?,
-        filter.offset(),
-    );
-
-    let mut users = users.split_off(
-        page.offset
-            .try_into()
-            .map_err(|err| infra_error("convert offset error", err))?,
-    );
-    users.truncate(detecter.limit);
+    let (users, page) = clip_search(
+        sort_search(
+            users,
+            |user| match filter.sort().key() {
+                SearchAuthUserAccountSortKey::LoginId => user.login_id.clone(),
+            },
+            match filter.sort().key() {
+                SearchAuthUserAccountSortKey::LoginId => sort_normal,
+            }(filter.sort().order()),
+        ),
+        SearchClip {
+            limit: 1000,
+            offset: filter.offset(),
+        },
+    )?;
 
     Ok(AuthUserAccountSearch {
         page,

@@ -9,7 +9,7 @@ use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
 use crate::z_lib::repository::{
     dynamodb::helper::{string_set_value, string_value, DynamoDbColumn, ScanKey},
-    helper::infra_error,
+    helper::repository_infra_error,
 };
 
 use crate::auth::user::{
@@ -58,7 +58,7 @@ impl<'a> TableUser<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("get user and granted roles error", err))?;
+            .map_err(|err| repository_infra_error("get user and granted roles error", err))?;
 
         Ok(response
             .item
@@ -77,11 +77,10 @@ impl<'a> TableUser<'a> {
             ..Default::default()
         };
 
-        let response = self
-            .client
-            .get_item(input)
-            .await
-            .map_err(|err| infra_error("get password and granted roles error", err))?;
+        let response =
+            self.client.get_item(input).await.map_err(|err| {
+                repository_infra_error("get password and granted roles error", err)
+            })?;
 
         Ok(response.item.and_then(move |mut attrs| {
             if let Some(hashed_password) = ColumnPassword::remove_value(&mut attrs) {
@@ -109,7 +108,7 @@ impl<'a> TableUser<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("get password error", err))?;
+            .map_err(|err| repository_infra_error("get password error", err))?;
 
         Ok(response
             .item
@@ -132,7 +131,7 @@ impl<'a> TableUser<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("get granted roles error", err))?;
+            .map_err(|err| repository_infra_error("get granted roles error", err))?;
 
         Ok(response.item.map(move |mut attrs| {
             let default_attrs = AuthUserAttributesExtract::default();
@@ -168,7 +167,7 @@ impl<'a> TableUser<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("get granted roles error", err))?;
+            .map_err(|err| repository_infra_error("get granted roles error", err))?;
 
         Ok(response.item.and_then(move |mut attrs| {
             if let Some(login_id) = ColumnLoginId::remove_value(&mut attrs) {
@@ -239,7 +238,7 @@ impl<'a> TableUser<'a> {
         self.client
             .put_item(input)
             .await
-            .map_err(|err| infra_error("put user error", err))?;
+            .map_err(|err| repository_infra_error("put user error", err))?;
 
         Ok(())
     }
@@ -254,7 +253,7 @@ impl<'a> TableUser<'a> {
         self.client
             .delete_item(input)
             .await
-            .map_err(|err| infra_error("delete login id error", err))?;
+            .map_err(|err| repository_infra_error("delete login id error", err))?;
 
         Ok(())
     }
@@ -279,7 +278,7 @@ impl<'a> TableUser<'a> {
         self.client
             .update_item(input)
             .await
-            .map_err(|err| infra_error("update password error", err))?;
+            .map_err(|err| repository_infra_error("update password error", err))?;
 
         Ok(())
     }
@@ -303,7 +302,7 @@ impl<'a> TableUser<'a> {
         self.client
             .update_item(input)
             .await
-            .map_err(|err| infra_error("update login id error", err))?;
+            .map_err(|err| repository_infra_error("update login id error", err))?;
 
         Ok(())
     }
@@ -349,7 +348,7 @@ impl<'a> TableUser<'a> {
         self.client
             .update_item(input)
             .await
-            .map_err(|err| infra_error("set granted roles error", err))?;
+            .map_err(|err| repository_infra_error("set granted roles error", err))?;
 
         Ok(())
     }
@@ -367,7 +366,7 @@ impl<'a> TableUser<'a> {
         self.client
             .update_item(input)
             .await
-            .map_err(|err| infra_error("remove granted roles error", err))?;
+            .map_err(|err| repository_infra_error("remove granted roles error", err))?;
 
         Ok(())
     }
@@ -393,7 +392,7 @@ impl<'a> TableUser<'a> {
         self.client
             .update_item(input)
             .await
-            .map_err(|err| infra_error("set granted roles error", err))?;
+            .map_err(|err| repository_infra_error("set granted roles error", err))?;
 
         Ok(())
     }
@@ -438,7 +437,7 @@ impl<'a> TableUser<'a> {
             .client
             .scan(input)
             .await
-            .map_err(|err| infra_error("scan user error", err))?;
+            .map_err(|err| repository_infra_error("scan user error", err))?;
 
         let items = match response.items {
             None => vec![],
