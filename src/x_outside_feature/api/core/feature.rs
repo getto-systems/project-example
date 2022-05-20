@@ -30,20 +30,20 @@ impl CoreAppFeature {
     }
 }
 
-pub struct TonicRequest<T> {
+pub struct CoreTonicRequest<T> {
     pub feature: Arc<CoreAppFeature>,
     pub metadata: MetadataMap,
     pub request: T,
 }
 
-pub fn extract_request<T>(request: Request<T>) -> TonicRequest<T> {
+pub fn extract_core_request<T>(request: Request<T>) -> CoreTonicRequest<T> {
     let feature = request
         .extensions()
         .get::<Arc<CoreAppFeature>>()
         .expect("failed to get AppFeature")
         .clone();
 
-    TonicRequest {
+    CoreTonicRequest {
         feature,
         // metadata と inner の両方を into してくれるやつが無いため、to_owned する
         metadata: request.metadata().to_owned(),

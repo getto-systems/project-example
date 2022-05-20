@@ -18,6 +18,10 @@ path = "src/x_main/auth/main.rs"
 name = "core"
 path = "src/x_main/core/main.rs"
 
+[features]
+default = ["sea_query"]
+sea_query = []
+
 [dependencies]
 async-trait = "0.1"
 lazy_static = "1"

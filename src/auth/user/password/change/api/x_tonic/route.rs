@@ -9,7 +9,7 @@ use crate::auth::user::password::change::y_protobuf::service::{
 };
 
 use crate::x_outside_feature::auth::{
-    feature::{extract_request, TonicRequest},
+    feature::{extract_auth_request, AuthTonicRequest},
     logger::app_logger,
 };
 
@@ -33,11 +33,11 @@ impl ChangePasswordPb for ServiceChangePassword {
         &self,
         request: Request<ChangePasswordRequestPb>,
     ) -> Result<Response<ChangePasswordResponsePb>, Status> {
-        let TonicRequest {
+        let AuthTonicRequest {
             feature,
             metadata,
             request,
-        } = extract_request(request);
+        } = extract_auth_request(request);
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger(Self::name(), request_id.into());
@@ -62,11 +62,11 @@ impl OverwritePasswordPb for ServiceOverwritePassword {
         &self,
         request: Request<OverwritePasswordRequestPb>,
     ) -> Result<Response<OverwritePasswordResponsePb>, Status> {
-        let TonicRequest {
+        let AuthTonicRequest {
             feature,
             metadata,
             request,
-        } = extract_request(request);
+        } = extract_auth_request(request);
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger(Self::name(), request_id.into());

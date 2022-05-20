@@ -12,7 +12,7 @@ use crate::auth::user::login_id::change::x_tonic::route::ServiceOverwriteLoginId
 use crate::z_lib::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::{
-    auth::proxy::helper::{infra_error, set_metadata},
+    auth::proxy::helper::{proxy_infra_error, set_metadata},
     z_lib::{
         message::helper::{decode_base64, encode_protobuf_base64, invalid_protobuf},
         service::helper::new_endpoint,
@@ -62,10 +62,10 @@ async fn call<'a>(
 ) -> Result<AuthProxyResponse, AuthProxyError> {
     let mut client = OverwriteLoginIdPbClient::new(
         new_endpoint(service.service_url)
-            .map_err(|err| infra_error("service endpoint error", err))?
+            .map_err(|err| proxy_infra_error("service endpoint error", err))?
             .connect()
             .await
-            .map_err(|err| infra_error("connect error", err))?,
+            .map_err(|err| proxy_infra_error("connect error", err))?,
     );
 
     let mut request =
@@ -77,7 +77,7 @@ async fn call<'a>(
         metadata,
     )
     .await
-    .map_err(|err| infra_error("metadata error", err))?;
+    .map_err(|err| proxy_infra_error("metadata error", err))?;
 
     let response = client
         .overwrite_login_id(request)

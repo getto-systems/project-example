@@ -7,7 +7,7 @@ use crate::common::outline::load::y_protobuf::service::{
 };
 
 use crate::x_outside_feature::core::{
-    feature::{extract_request, TonicRequest},
+    feature::{extract_core_request, CoreTonicRequest},
     logger::app_logger,
 };
 
@@ -31,9 +31,9 @@ impl LoadMenuBadgePb for ServiceLoadMenuBadge {
         &self,
         request: Request<LoadMenuBadgeRequestPb>,
     ) -> Result<Response<LoadMenuBadgeResponsePb>, Status> {
-        let TonicRequest {
+        let CoreTonicRequest {
             metadata, feature, ..
-        } = extract_request(request);
+        } = extract_core_request(request);
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger(Self::name(), request_id.into());

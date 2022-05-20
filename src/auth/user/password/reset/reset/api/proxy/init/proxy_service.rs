@@ -16,7 +16,7 @@ use crate::{
 
 use crate::{
     auth::{
-        proxy::helper::{infra_error, set_metadata},
+        proxy::helper::{proxy_infra_error, set_metadata},
         ticket::kernel::infra::AuthTokenResponseBuilder,
     },
     z_lib::{
@@ -73,10 +73,10 @@ async fn call<'a>(
 ) -> Result<AuthResponse, AuthProxyError> {
     let mut client = ResetPasswordPbClient::new(
         new_endpoint(service.service_url)
-            .map_err(|err| infra_error("service endpoint error", err))?
+            .map_err(|err| proxy_infra_error("service endpoint error", err))?
             .connect()
             .await
-            .map_err(|err| infra_error("connect error", err))?,
+            .map_err(|err| proxy_infra_error("connect error", err))?,
     );
 
     let mut request =
@@ -88,7 +88,7 @@ async fn call<'a>(
         metadata,
     )
     .await
-    .map_err(|err| infra_error("metadata error", err))?;
+    .map_err(|err| proxy_infra_error("metadata error", err))?;
 
     let response = client
         .reset(request)

@@ -4,8 +4,7 @@ use getto_application_test::ActionTestRunner;
 
 use crate::{
     auth::init::test::{
-        StaticAuthMetadata, StaticAuthTokenDecoder, StaticAuthorizeStruct,
-        StaticValidateService,
+        StaticAuthMetadata, StaticAuthTokenDecoder, StaticAuthorizeStruct, StaticValidateService,
     },
     avail::unexpected_error::notify::init::request_decoder::test::StaticNotifyUnexpectedErrorRequestDecoder,
 };
@@ -28,7 +27,10 @@ async fn success_notify() {
     action.subscribe(handler);
 
     let result = action.ignite().await;
-    assert_state(vec!["authorize success", "UNEXPECTED-ERROR"]);
+    assert_state(vec![
+        "authorize success; require: nothing",
+        "UNEXPECTED-ERROR",
+    ]);
     assert!(result.is_ok());
 }
 

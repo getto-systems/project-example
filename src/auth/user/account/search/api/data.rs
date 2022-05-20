@@ -1,9 +1,10 @@
-use crate::auth::user::kernel::data::GrantedAuthRoles;
-use crate::auth::user::login_id::kernel::data::LoginId;
 use crate::x_content::role::AuthRole;
 
 use crate::{
-    auth::user::account::kernel::data::AuthUserAccount,
+    auth::user::{
+        account::kernel::data::AuthUserAccount, kernel::data::GrantedAuthRoles,
+        login_id::kernel::data::LoginId,
+    },
     z_lib::search::data::{SearchPage, SearchSort, SearchSortExtract},
 };
 
@@ -54,13 +55,15 @@ impl SearchAuthUserAccountFilter {
     }
     pub fn match_granted_roles(&self, granted_roles: &Option<GrantedAuthRoles>) -> bool {
         if self.granted_roles.is_empty() {
-            return true
+            return true;
         }
         match granted_roles {
             None => false,
             Some(granted_roles) => {
                 let granted_roles = granted_roles.inner();
-                self.granted_roles.iter().any(|role| granted_roles.contains(role))
+                self.granted_roles
+                    .iter()
+                    .any(|role| granted_roles.contains(role))
             }
         }
     }

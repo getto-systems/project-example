@@ -17,7 +17,7 @@ use crate::auth::{
 use super::action::{ModifyAuthUserAccountAction, ModifyAuthUserAccountMaterial};
 
 pub struct ModifyAuthUserAccountFeature<'a> {
-    validate: AuthenticateApiStruct<'a>,
+    authenticate: AuthenticateApiStruct<'a>,
     user_repository: DynamoDbAuthUserRepository<'a>,
 }
 
@@ -30,7 +30,7 @@ impl<'a> ModifyAuthUserAccountFeature<'a> {
         ModifyAuthUserAccountAction::with_material(
             PbModifyAuthUserAccountRequestDecoder::new(request),
             Self {
-                validate: AuthenticateApiStruct::new(feature, metadata),
+                authenticate: AuthenticateApiStruct::new(feature, metadata),
                 user_repository: DynamoDbAuthUserRepository::new(&feature.store),
             },
         )
@@ -43,7 +43,7 @@ impl<'a> ModifyAuthUserAccountMaterial for ModifyAuthUserAccountFeature<'a> {
     type UserRepository = DynamoDbAuthUserRepository<'a>;
 
     fn authenticate(&self) -> &Self::Authenticate {
-        &self.validate
+        &self.authenticate
     }
     fn user_repository(&self) -> &Self::UserRepository {
         &self.user_repository

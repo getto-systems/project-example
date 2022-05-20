@@ -10,7 +10,7 @@ use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
 use crate::z_lib::repository::{
     dynamodb::helper::{string_value, timestamp_value, DynamoDbColumn, ScanKey},
-    helper::infra_error,
+    helper::repository_infra_error,
 };
 
 use crate::{
@@ -59,7 +59,7 @@ impl<'a> TableTicket<'a> {
             .client
             .get_item(input)
             .await
-            .map_err(|err| infra_error("get expansion limit error", err))?;
+            .map_err(|err| repository_infra_error("get expansion limit error", err))?;
 
         Ok(response
             .item
@@ -95,7 +95,7 @@ impl<'a> TableTicket<'a> {
         self.client
             .put_item(input)
             .await
-            .map_err(|err| infra_error("put ticket error", err))?;
+            .map_err(|err| repository_infra_error("put ticket error", err))?;
 
         Ok(())
     }
@@ -114,7 +114,7 @@ impl<'a> TableTicket<'a> {
         self.client
             .delete_item(input)
             .await
-            .map_err(|err| infra_error("delete ticket error", err))?;
+            .map_err(|err| repository_infra_error("delete ticket error", err))?;
 
         Ok(())
     }
@@ -154,7 +154,7 @@ impl<'a> TableTicket<'a> {
             .client
             .query(input)
             .await
-            .map_err(|err| infra_error("scan user error", err))?;
+            .map_err(|err| repository_infra_error("scan user error", err))?;
 
         let items = match response.items {
             None => vec![],

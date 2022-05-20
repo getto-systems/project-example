@@ -37,7 +37,7 @@ impl LogFilter for AuthenticateEvent {
 impl LogFilter for AuthorizeEvent {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Success => LogLevel::Info,
+            Self::Success(_) => LogLevel::Info,
             Self::MetadataError(err) => err.log_level(),
             Self::DecodeError(err) => err.log_level(),
             Self::ServiceError(err) => err.log_level(),

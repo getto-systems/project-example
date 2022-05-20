@@ -91,7 +91,7 @@ fn decode_ticket(
 }
 
 pub enum AuthorizeEvent {
-    Success,
+    Success(RequireAuthRoles),
     ServiceError(AuthProxyError),
     MetadataError(MetadataError),
     DecodeError(DecodeAuthTokenError),
@@ -106,7 +106,7 @@ mod authorize_event {
     impl std::fmt::Display for AuthorizeEvent {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             match self {
-                Self::Success => write!(f, "{}", SUCCESS),
+                Self::Success(roles) => write!(f, "{}; {}", SUCCESS, roles),
                 Self::ServiceError(err) => write!(f, "{}; {}", ERROR, err),
                 Self::MetadataError(err) => write!(f, "{}; {}", ERROR, err),
                 Self::DecodeError(err) => write!(f, "{}; {}", ERROR, err),
@@ -145,11 +145,11 @@ pub async fn authorize<S>(
     }
 
     validate_service
-        .validate(metadata, require_roles)
+        .validate(metadata, require_roles.clone())
         .await
         .map_err(|err| post(AuthorizeEvent::ServiceError(err)))?;
 
-    Ok(post(AuthorizeEvent::Success))
+    Ok(post(AuthorizeEvent::Success(require_roles)))
 }
 
 pub enum ValidateAuthMetadataEvent {

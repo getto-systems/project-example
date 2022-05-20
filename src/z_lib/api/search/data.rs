@@ -6,17 +6,23 @@ pub struct SearchPage {
     pub all: i32,
 }
 
-pub fn detect_search_page(detecter: SearchOffsetDetecter, offset: i32) -> SearchPage {
-    SearchPage {
-        offset: detecter.detect(offset),
-        limit: detecter.limit,
-        all: detecter.all,
-    }
-}
-
 pub struct SearchOffsetDetecter {
     all: i32,
     limit: i32,
+}
+
+impl SearchOffsetDetecter {
+    pub fn convert<E>(detecter: impl TryInto<Self, Error = E>) -> Result<Self, E> {
+        detecter.try_into()
+    }
+
+    pub fn detect_page(self, offset: i32) -> SearchPage {
+        SearchPage {
+            offset: self.detect(offset),
+            limit: self.limit,
+            all: self.all,
+        }
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -26,6 +32,16 @@ pub struct SearchOffsetDetecterExtract<T> {
 }
 
 impl TryInto<SearchOffsetDetecter> for SearchOffsetDetecterExtract<usize> {
+    type Error = TryFromIntError;
+
+    fn try_into(self) -> Result<SearchOffsetDetecter, Self::Error> {
+        Ok(SearchOffsetDetecter {
+            all: self.all.try_into()?,
+            limit: self.limit.try_into()?,
+        })
+    }
+}
+impl TryInto<SearchOffsetDetecter> for SearchOffsetDetecterExtract<u64> {
     type Error = TryFromIntError;
 
     fn try_into(self) -> Result<SearchOffsetDetecter, Self::Error> {
@@ -69,8 +85,8 @@ impl<K> SearchSort<K> {
     pub fn key(&self) -> &K {
         &self.key
     }
-    pub fn order(&self) -> &SearchSortOrder {
-        &self.order
+    pub fn order(&self) -> SearchSortOrder {
+        self.order
     }
 }
 
@@ -83,9 +99,15 @@ impl<K: Into<String>> SearchSort<K> {
     }
 }
 
+#[derive(Clone, Copy)]
 pub enum SearchSortOrder {
     Normal,
     Reverse,
+}
+
+pub enum SearchSortOrderExtract {
+    Asc,
+    Desc,
 }
 
 impl Into<String> for SearchSortOrder {

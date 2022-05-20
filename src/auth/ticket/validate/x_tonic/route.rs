@@ -7,7 +7,7 @@ use crate::auth::ticket::validate::y_protobuf::service::{
 };
 
 use crate::x_outside_feature::auth::{
-    feature::{extract_request, TonicRequest},
+    feature::{extract_auth_request, AuthTonicRequest},
     logger::app_logger,
 };
 
@@ -25,11 +25,11 @@ impl AuthorizePb for ServiceAuthorize {
         &self,
         request: Request<AuthorizeRequestPb>,
     ) -> Result<Response<AuthorizeResponsePb>, Status> {
-        let TonicRequest {
+        let AuthTonicRequest {
             feature,
             metadata,
             request,
-        } = extract_request(request);
+        } = extract_auth_request(request);
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger("auth.ticket.authorize", request_id.into());

@@ -9,7 +9,7 @@ use crate::auth::x_outside_feature::feature::AuthOutsideService;
 use crate::z_lib::service::init::authorizer::GoogleServiceAuthorizer;
 
 use crate::{
-    auth::proxy::helper::{infra_error, set_metadata},
+    auth::proxy::helper::{proxy_infra_error, set_metadata},
     z_lib::service::helper::new_endpoint,
 };
 
@@ -51,10 +51,10 @@ async fn validate<'a>(
 ) -> Result<(), AuthProxyError> {
     let mut client = AuthorizePbClient::new(
         new_endpoint(service.service_url)
-            .map_err(|err| infra_error("service endpoint error", err))?
+            .map_err(|err| proxy_infra_error("service endpoint error", err))?
             .connect()
             .await
-            .map_err(|err| infra_error("connect error", err))?,
+            .map_err(|err| proxy_infra_error("connect error", err))?,
     );
 
     let request: AuthorizeRequestPb = require_roles.into();
@@ -66,7 +66,7 @@ async fn validate<'a>(
         metadata,
     )
     .await
-    .map_err(|err| infra_error("metadata error", err))?;
+    .map_err(|err| proxy_infra_error("metadata error", err))?;
 
     client
         .authorize(request)

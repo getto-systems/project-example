@@ -8,7 +8,7 @@ use crate::auth::user::password::reset::token_destination::change::y_protobuf::s
 };
 
 use crate::x_outside_feature::auth::{
-    feature::{extract_request, TonicRequest},
+    feature::{extract_auth_request, AuthTonicRequest},
     logger::app_logger,
 };
 
@@ -32,11 +32,11 @@ impl ChangeResetTokenDestinationPb for ServiceChangeDestination {
         &self,
         request: Request<ChangeResetTokenDestinationRequestPb>,
     ) -> Result<Response<ChangeResetTokenDestinationResponsePb>, Status> {
-        let TonicRequest {
+        let AuthTonicRequest {
             feature,
             metadata,
             request,
-        } = extract_request(request);
+        } = extract_auth_request(request);
         let request_id = metadata_request_id(&metadata);
 
         let logger = app_logger(Self::name(), request_id.into());

@@ -4,13 +4,16 @@ mod user;
 
 use std::collections::HashMap;
 
-use crate::auth::user::kernel::init::user_repository::memory::{
-    login_id::{EntryLoginId, MapLoginId, StoreLoginId},
-    reset_token::{EntryResetToken, MapResetToken, StoreResetToken},
-    user::{EntryUser, MapUser, StoreUser},
+use crate::{
+    auth::user::kernel::init::user_repository::memory::{
+        login_id::{EntryLoginId, MapLoginId, StoreLoginId},
+        reset_token::{EntryResetToken, MapResetToken, StoreResetToken},
+        user::{EntryUser, MapUser, StoreUser},
+    },
+    z_lib::search::helper::sort_normal,
 };
 
-use crate::z_lib::repository::helper::infra_error;
+use crate::z_lib::search::helper::{clip_search, sort_search, SearchClip};
 
 use crate::auth::user::{
     account::{
@@ -48,10 +51,7 @@ use crate::{
             password::reset::kernel::data::{ResetToken, ResetTokenDestination},
         },
     },
-    z_lib::{
-        repository::data::RepositoryError,
-        search::data::{detect_search_page, SearchOffsetDetecterExtract, SearchSortOrder},
-    },
+    z_lib::repository::data::RepositoryError,
 };
 
 pub struct MemoryAuthUserRepository<'a> {
@@ -499,21 +499,12 @@ fn search<'a>(
     repository: &MemoryAuthUserRepository<'a>,
     filter: SearchAuthUserAccountFilter,
 ) -> Result<AuthUserAccountSearch, RepositoryError> {
-    let mut users = repository.user.all();
     let mut destinations: HashMap<LoginId, EntryLoginId> =
         repository.login_id.all().into_iter().collect();
 
-    match filter.sort().key() {
-        SearchAuthUserAccountSortKey::LoginId => {
-            users.sort_by_cached_key(|(_, user)| user.login_id.clone());
-            match filter.sort().order() {
-                SearchSortOrder::Normal => (),
-                SearchSortOrder::Reverse => users.reverse(),
-            }
-        }
-    };
-
-    let mut users: Vec<AuthUserAccount> = users
+    let users = repository
+        .user
+        .all()
         .into_iter()
         .filter(|(_, user)| {
             filter.match_login_id(&user.login_id) && filter.match_granted_roles(&user.granted_roles)
@@ -531,23 +522,21 @@ fn search<'a>(
         })
         .collect();
 
-    let detecter = SearchOffsetDetecterExtract {
-        all: users.len(),
-        limit: 1000,
-    };
-    let page = detect_search_page(
-        detecter
-            .try_into()
-            .map_err(|err| infra_error("convert offset error", err))?,
-        filter.offset(),
-    );
-
-    let mut users = users.split_off(
-        page.offset
-            .try_into()
-            .map_err(|err| infra_error("convert offset error", err))?,
-    );
-    users.truncate(detecter.limit);
+    let (users, page) = clip_search(
+        sort_search(
+            users,
+            |user| match filter.sort().key() {
+                SearchAuthUserAccountSortKey::LoginId => user.login_id.clone(),
+            },
+            match filter.sort().key() {
+                SearchAuthUserAccountSortKey::LoginId => sort_normal,
+            }(filter.sort().order()),
+        ),
+        SearchClip {
+            limit: 1000,
+            offset: filter.offset(),
+        },
+    )?;
 
     Ok(AuthUserAccountSearch {
         page,
