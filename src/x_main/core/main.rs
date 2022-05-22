@@ -17,7 +17,7 @@ async fn main() {
 
     Server::builder()
         .layer(interceptor(move |mut request: Request<()>| {
-            request.extensions_mut().insert(feature.clone());
+            request.extensions_mut().insert(Arc::clone(&feature));
             Ok(request)
         }))
         .add_service(server.avail.unexpected_error.notify())

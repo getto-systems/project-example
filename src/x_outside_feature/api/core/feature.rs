@@ -37,11 +37,12 @@ pub struct CoreTonicRequest<T> {
 }
 
 pub fn extract_core_request<T>(request: Request<T>) -> CoreTonicRequest<T> {
-    let feature = request
-        .extensions()
-        .get::<Arc<CoreAppFeature>>()
-        .expect("failed to get AppFeature")
-        .clone();
+    let feature = Arc::clone(
+        request
+            .extensions()
+            .get::<Arc<CoreAppFeature>>()
+            .expect("failed to get AppFeature"),
+    );
 
     CoreTonicRequest {
         feature,
