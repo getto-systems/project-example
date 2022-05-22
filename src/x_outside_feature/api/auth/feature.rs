@@ -86,11 +86,12 @@ pub struct AuthTonicRequest<T> {
 }
 
 pub fn extract_auth_request<T>(request: Request<T>) -> AuthTonicRequest<T> {
-    let feature = request
-        .extensions()
-        .get::<Arc<AuthAppFeature>>()
-        .expect("failed to get AppFeature")
-        .clone();
+    let feature = Arc::clone(
+        request
+            .extensions()
+            .get::<Arc<AuthAppFeature>>()
+            .expect("failed to get AppFeature"),
+    );
 
     AuthTonicRequest {
         feature,
