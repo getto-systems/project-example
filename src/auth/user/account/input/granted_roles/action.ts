@@ -66,15 +66,15 @@ export function initInputGrantedAuthRolesAction(): InputGrantedAuthRolesAction {
     }
 }
 
-export interface SearchGrantedRolesAction extends ApplicationAction {
+export interface FilterGrantedRolesAction extends ApplicationAction {
     readonly input: InputBoardAction<MultipleBoardValueStore>
     readonly observe: ObserveBoardFieldAction
 
     clear(): void
 }
 
-export function initSearchGrantedRolesAction(initial: readonly AuthRole[]): Readonly<{
-    input: SearchGrantedRolesAction
+export function initFilterGrantedRolesAction(initial: readonly AuthRole[]): Readonly<{
+    input: FilterGrantedRolesAction
     pin: { (): readonly AuthRole[] }
 }> {
     const { input, store, subscriber } = initMultipleInputBoardAction()

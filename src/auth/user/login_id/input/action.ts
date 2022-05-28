@@ -58,28 +58,28 @@ export function initInputLoginIdAction(): InputLoginIdAction {
     }
 }
 
-export interface SearchLoginIdAction extends ApplicationAction {
+export interface FilterLoginIdAction extends ApplicationAction {
     readonly input: InputBoardAction<BoardValueStore>
     readonly observe: ObserveBoardFieldAction
     clear(): void
 }
 
-export function initSearchLoginIdAction(initial: SingleValueFilter): Readonly<{
-    input: SearchLoginIdAction
+export function initFilterLoginIdAction(initial: SingleValueFilter): Readonly<{
+    input: FilterLoginIdAction
     pin: { (): SingleValueFilter }
 }> {
     const { input, store, subscriber } = initInputBoardAction()
 
-    if (initial.search) {
+    if (initial.filter) {
         store.set(initial.value)
     }
 
     const value = (): SingleValueFilter => {
         const value = store.get()
         if (value === "") {
-            return { search: false }
+            return { filter: false }
         }
-        return { search: true, value }
+        return { filter: true, value }
     }
     const observe = initObserveBoardFieldAction({
         observer: initBoardFieldObserver({ current: value }),

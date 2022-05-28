@@ -82,6 +82,7 @@ test("sort", async () => {
             { type: "try", hasTakenLongtime: false, previousResponse: standard_response },
             { type: "success", response: standard_response },
         ])
+        expect(resource.search.currentSort()).toEqual({ key: "login-id", order: "normal" })
     })
 })
 

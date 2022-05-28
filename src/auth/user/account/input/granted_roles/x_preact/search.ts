@@ -11,13 +11,13 @@ import {
 
 import { ALL_AUTH_ROLES, authRoleLabel } from "../../../../../../x_content/role"
 
-import { SearchGrantedRolesAction } from "../action"
+import { FilterGrantedRolesAction } from "../action"
 
 import { AuthRole } from "../../../../kernel/data"
 import { AUTH_USER_ACCOUNT } from "../../../kernel/data"
 
 type Props = Readonly<{
-    field: SearchGrantedRolesAction
+    field: FilterGrantedRolesAction
 }> &
     Partial<{
         title: VNodeContent

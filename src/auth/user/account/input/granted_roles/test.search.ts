@@ -3,7 +3,7 @@ import { setupActionTestRunner } from "../../../../../z_vendor/getto-application
 
 import { mockMultipleBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/test_helper"
 
-import { initSearchGrantedRolesAction } from "./action"
+import { initFilterGrantedRolesAction } from "./action"
 
 test("observe; has changed", async () => {
     const { action, store } = standard()
@@ -53,7 +53,7 @@ test("terminate", async () => {
 })
 
 function standard() {
-    const { input: action } = initSearchGrantedRolesAction([])
+    const { input: action } = initFilterGrantedRolesAction([])
     const store = {
         grantedRoles: mockMultipleBoardValueStore(action.input),
     }

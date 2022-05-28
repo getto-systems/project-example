@@ -4,26 +4,16 @@ import {
 } from "../../../../z_vendor/getto-application/action/action"
 
 import { checkTakeLongtime } from "../../../../z_lib/ui/timer/helper"
-import { nextSort } from "../../../../z_lib/ui/search/sort/helper"
 
-import { initSearchLoginIdAction, SearchLoginIdAction } from "../../login_id/input/action"
+import { initFilterLoginIdAction, FilterLoginIdAction } from "../../login_id/input/action"
 import {
-    initSearchGrantedRolesAction,
-    SearchGrantedRolesAction,
+    initFilterGrantedRolesAction,
+    FilterGrantedRolesAction,
 } from "../input/granted_roles/action"
-import {
-    initObserveBoardAction,
-    ObserveBoardAction,
-} from "../../../../z_vendor/getto-application/board/observe_board/action"
-import {
-    initSearchOffsetAction,
-    SearchOffsetAction,
-} from "../../../../z_lib/ui/search/offset/action"
-import {
-    initSearchColumnsAction,
-    SearchColumnsAction,
-    SearchColumnsInfra,
-} from "../../../../z_lib/ui/search/columns/action"
+import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
+import { SearchOffsetAction } from "../../../../z_lib/ui/search/offset/action"
+import { SearchColumnsAction, SearchColumnsInfra } from "../../../../z_lib/ui/search/columns/action"
+import { initSearchFilter, SearchFilterAction } from "../../../../z_lib/ui/search/filter/action"
 
 import {
     FocusAuthUserAccountDetecter,
@@ -37,6 +27,7 @@ import { WaitTime } from "../../../../z_lib/ui/config/infra"
 import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
 import {
     SearchAuthUserAccountFilter,
+    SearchAuthUserAccountFilterProps,
     SearchAuthUserAccountRemoteResponse,
     SearchAuthUserAccountSort,
     SearchAuthUserAccountSortKey,
@@ -46,11 +37,11 @@ import { AuthUserAccount } from "../kernel/data"
 import { LoginId } from "../../login_id/kernel/data"
 
 export interface SearchAuthUserAccountAction extends ListAuthUserAccountAction {
-    readonly loginId: SearchLoginIdAction
-    readonly grantedRoles: SearchGrantedRolesAction
+    readonly loginId: FilterLoginIdAction
+    readonly grantedRoles: FilterGrantedRolesAction
     readonly observe: ObserveBoardAction
 
-    clear(): SearchAuthUserAccountState
+    clear(): void
     search(): Promise<SearchAuthUserAccountState>
 }
 export interface ListAuthUserAccountAction
@@ -126,18 +117,16 @@ class Action
 
     readonly focused: FocusedAuthUserAccountAction
 
-    readonly loginId: SearchLoginIdAction
-    readonly grantedRoles: SearchGrantedRolesAction
+    readonly loginId: FilterLoginIdAction
+    readonly grantedRoles: FilterGrantedRolesAction
     readonly offset: SearchOffsetAction
     readonly columns: SearchColumnsAction
     readonly observe: ObserveBoardAction
 
     material: SearchAuthUserAccountMaterial
 
-    filter: SearchAuthUserAccountFilter
-    setFilterOnSearch: { (): SearchAuthUserAccountFilter }
-    setFilterOnLoad: { (): SearchAuthUserAccountFilter }
-    setFilterOnSort: { (key: SearchAuthUserAccountSortKey): SearchAuthUserAccountFilter }
+    filter: SearchFilterAction<SearchAuthUserAccountSortKey, SearchAuthUserAccountFilterProps>
+    clear: () => void
 
     response?: SearchAuthUserAccountRemoteResponse
 
@@ -146,41 +135,37 @@ class Action
             ignite: async () => this.load(),
             terminate: () => {
                 this.focused.terminate()
-                this.loginId.terminate()
-                this.grantedRoles.terminate()
-                this.offset.terminate()
-                this.columns.terminate()
-                this.observe.terminate()
+                terminate()
             },
         })
 
         const initialFilter = material.shell.detectFilter()
 
-        const fields = ["loginId", "grantedRoles"] as const
+        const loginId = initFilterLoginIdAction(initialFilter.loginId)
+        const grantedRoles = initFilterGrantedRolesAction(initialFilter.grantedRoles)
 
-        const loginId = initSearchLoginIdAction(initialFilter.loginId)
-        const grantedRoles = initSearchGrantedRolesAction(initialFilter.grantedRoles)
-        const offset = initSearchOffsetAction(initialFilter.offset)
-        const columns = initSearchColumnsAction(material.infra)
-        const { observe, observeChecker } = initObserveBoardAction({ fields })
-
-        this.setFilterOnSearch = () =>
-            this.setFilter({
-                offset: offset.reset(),
+        const { observe, offset, columns, filter, clear, terminate } = initSearchFilter(
+            material.infra,
+            initialFilter,
+            [
+                ["loginId", loginId.input],
+                ["grantedRoles", grantedRoles.input],
+            ],
+            () => ({
                 loginId: loginId.pin(),
                 grantedRoles: grantedRoles.pin(),
-            })
-        this.setFilterOnLoad = () =>
-            this.setFilter({
-                offset: offset.get(),
-            })
-        this.setFilterOnSort = (key: SearchAuthUserAccountSortKey) =>
-            this.setFilter({
-                offset: offset.reset(),
-                sort: nextSort(this.currentSort(), key),
-            })
+            }),
+        )
 
         this.material = material
+        this.filter = filter
+        this.clear = clear
+
+        this.loginId = loginId.input
+        this.grantedRoles = grantedRoles.input
+        this.offset = offset
+        this.columns = columns
+        this.observe = observe
 
         this.focused = new FocusedAction({
             infra: {
@@ -204,55 +189,31 @@ class Action
             },
             shell: material.shell,
         })
-
-        this.loginId = loginId.input
-        this.grantedRoles = grantedRoles.input
-        this.offset = offset.input
-        this.columns = columns
-        this.observe = observe
-
-        this.filter = initialFilter
-
-        fields.forEach((field) => {
-            this[field].observe.subscriber.subscribe((result) => {
-                observeChecker.update(field, result.hasChanged)
-            })
-        })
-    }
-
-    setFilter(filter: Partial<SearchAuthUserAccountFilter>): SearchAuthUserAccountFilter {
-        this.filter = { ...this.filter, ...filter }
-        return this.filter
     }
 
     currentSort(): SearchAuthUserAccountSort {
-        return this.filter.sort
-    }
-
-    clear(): SearchAuthUserAccountState {
-        this.loginId.clear()
-        return this.currentState()
+        return this.filter.get().sort
     }
 
     async search(): Promise<SearchAuthUserAccountState> {
         return this.updateResponse(
-            await search(this.material, this.setFilterOnSearch(), this.response, this.post),
+            await search(this.material, this.filter.search(), this.response, this.post),
         )
     }
     async load(): Promise<SearchAuthUserAccountState> {
         return this.updateResponse(
-            await search(this.material, this.setFilterOnLoad(), this.response, this.post),
+            await search(this.material, this.filter.load(), this.response, this.post),
         )
     }
     async sort(key: SearchAuthUserAccountSortKey): Promise<SearchAuthUserAccountState> {
         return this.updateResponse(
-            await search(this.material, this.setFilterOnSort(key), this.response, this.post),
+            await search(this.material, this.filter.sort(key), this.response, this.post),
         )
     }
     updateResponse(state: SearchAuthUserAccountState): SearchAuthUserAccountState {
         switch (state.type) {
             case "success":
-                this.setFilter({ sort: state.response.sort })
+                this.filter.setSort(state.response.sort)
                 this.response = state.response
                 break
         }

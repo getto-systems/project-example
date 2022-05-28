@@ -9,14 +9,14 @@ import {
 test("read single value filter", () => {
     const url = new URL("https://example.com/?key=search")
     expect(readSingleValueFilter(url.searchParams, "key")).toEqual({
-        search: true,
+        filter: true,
         value: "search",
     })
 })
 test("read single value filter; not found", () => {
     const url = new URL("https://example.com/")
     expect(readSingleValueFilter(url.searchParams, "key")).toEqual({
-        search: false,
+        filter: false,
     })
 })
 
@@ -33,7 +33,7 @@ test("update single value filter", () => {
     const url = new URL("https://example.com/")
     expect(
         updateSingleValueFilter(url, "key", {
-            search: true,
+            filter: true,
             value: "search",
         }).toString(),
     ).toEqual("https://example.com/?key=search")
@@ -42,7 +42,7 @@ test("update single value filter; no value", () => {
     const url = new URL("https://example.com?key=search")
     expect(
         updateSingleValueFilter(url, "key", {
-            search: false,
+            filter: false,
         }).toString(),
     ).toEqual("https://example.com/")
 })

@@ -3,9 +3,12 @@ import { SearchSort } from "../../../../z_lib/ui/search/sort/data"
 import { AuthUserAccount } from "../kernel/data"
 import { AuthRole } from "../../kernel/data"
 
-export type SearchAuthUserAccountFilter = Readonly<{
-    offset: string
-    sort: SearchAuthUserAccountSort
+export type SearchAuthUserAccountFilter = SearchAuthUserAccountFilterProps &
+    Readonly<{
+        offset: string
+        sort: SearchAuthUserAccountSort
+    }>
+export type SearchAuthUserAccountFilterProps = Readonly<{
     loginId: SingleValueFilter
     grantedRoles: readonly AuthRole[]
 }>

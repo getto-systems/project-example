@@ -61,7 +61,7 @@ async function fetchRemote(
                 message.offset = parseInt(filter.offset)
                 message.sortKey = filter.sort.key
                 message.sortOrder = filter.sort.order
-                if (filter.loginId.search) {
+                if (filter.loginId.filter) {
                     message.loginId = [filter.loginId.value]
                 }
                 message.grantedRoles = Array.from(filter.grantedRoles)
