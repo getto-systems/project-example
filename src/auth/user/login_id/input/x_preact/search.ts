@@ -6,10 +6,10 @@ import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
 import { InputBoard } from "../../../../../z_vendor/getto-application/board/input/x_preact/input"
 
-import { SearchLoginIdAction } from "../action"
+import { FilterLoginIdAction } from "../action"
 import { AUTH_USER_ACCOUNT } from "../../../account/kernel/data"
 
-type Props = Readonly<{ field: SearchLoginIdAction }> &
+type Props = Readonly<{ field: FilterLoginIdAction }> &
     Partial<{ title: VNodeContent; help: readonly VNodeContent[] }>
 export function SearchLoginIdField(props: Props): VNode {
     return search({

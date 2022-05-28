@@ -3,7 +3,7 @@ import { setupActionTestRunner } from "../../../../z_vendor/getto-application/ac
 
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 
-import { initSearchLoginIdAction } from "./action"
+import { initFilterLoginIdAction } from "./action"
 
 test("clear", () => {
     const { action, store } = standard()
@@ -35,7 +35,7 @@ test("terminate", async () => {
 })
 
 function standard() {
-    const { input: action } = initSearchLoginIdAction({ search: false })
+    const { input: action } = initFilterLoginIdAction({ filter: false })
     const store = mockBoardValueStore(action.input)
 
     return { action, store }

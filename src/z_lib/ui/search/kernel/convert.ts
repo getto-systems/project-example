@@ -11,9 +11,9 @@ export function readSearchParams(params: URLSearchParams, name: string): ReadSea
 export function readSingleValueFilter(params: URLSearchParams, name: string): SingleValueFilter {
     const value = params.get(name)
     if (value === null) {
-        return { search: false }
+        return { filter: false }
     }
-    return { search: true, value }
+    return { filter: true, value }
 }
 export function readMultipleValueFilter(
     params: URLSearchParams,
@@ -29,7 +29,7 @@ export function updateSingleValueFilter(
 ): URL {
     const url = new URL(currentURL.toString())
     const params = url.searchParams
-    if (!filter.search) {
+    if (!filter.filter) {
         params.delete(key)
     } else {
         params.set(key, filter.value)
