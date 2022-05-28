@@ -21,20 +21,6 @@ test("logout", async () => {
     })
 })
 
-test("terminate", async () => {
-    const { resource } = standard()
-
-    const runner = setupActionTestRunner(resource.logout.subscriber)
-
-    await runner(() => {
-        resource.logout.terminate()
-        return resource.logout.submit()
-    }).then((stack) => {
-        // no input/validate event after terminate
-        expect(stack).toEqual([])
-    })
-})
-
 function standard() {
     const resource = initResource()
 

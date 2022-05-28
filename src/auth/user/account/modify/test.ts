@@ -81,25 +81,6 @@ test("reset", () => {
     expect(store.grantedRoles.get()).toEqual([])
 })
 
-test("terminate", async () => {
-    const { resource, user } = standard()
-
-    const runner = setupActionTestRunner({
-        subscribe: (handler) => {
-            resource.modify.subscriber.subscribe(handler)
-        },
-        unsubscribe: () => null,
-    })
-
-    await runner(async () => {
-        resource.modify.terminate()
-        return resource.modify.submit(user, () => null)
-    }).then((stack) => {
-        // no input/validate event after terminate
-        expect(stack).toEqual([])
-    })
-})
-
 function standard() {
     return initResource(standard_modifyUserRemote())
 }

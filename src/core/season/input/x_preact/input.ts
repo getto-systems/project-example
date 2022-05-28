@@ -1,11 +1,13 @@
 import { h, VNode } from "preact"
-import { html } from "htm/preact"
 
 import { field } from "../../../../z_vendor/getto-css/preact/design/form"
 
 import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 
-import { SelectBoard } from "../../../../z_vendor/getto-application/board/input/x_preact/select"
+import {
+    SelectBoard,
+    SelectBoardContent,
+} from "../../../../z_vendor/getto-application/board/input/x_preact/select"
 
 import { seasonLabel } from "../../kernel/helper"
 import { seasonToString } from "../../kernel/convert"
@@ -28,13 +30,14 @@ export function InputSeason(props: Props): VNode {
         }),
     })
 
-    function options(seasons: readonly Season[]): VNode[] {
+    function options(seasons: readonly Season[]): readonly SelectBoardContent[] {
         return [
-            html`<option value="">今シーズン</option>`,
-            ...seasons.map((season) => {
-                const label = `${seasonLabel(season)}`
-                return html`<option value="${seasonToString(season)}">${label}</option>`
-            }),
+            { key: "", value: "", label: "今シーズン" },
+            ...seasons.map((season) => ({
+                key: seasonToString(season),
+                value: seasonToString(season),
+                label: seasonLabel(season),
+            })),
         ]
     }
 }

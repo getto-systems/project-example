@@ -1,6 +1,5 @@
 import { h, VNode } from "preact"
 
-import { useApplicationView } from "../../../z_vendor/getto-application/action/x_preact/hooks"
 import { useNotifyUnexpectedError } from "../../../avail/unexpected_error/notify/x_preact/hooks"
 import { useDocumentTitle } from "../../../common/x_preact/hooks"
 
@@ -20,29 +19,26 @@ import { LoadBreadcrumbList } from "../../../common/outline/load/x_preact/load_b
 import { LoadMenu } from "../../../common/outline/load/x_preact/load_menu"
 import { Dashboard } from "../../../x_content/x_preact/dashboard"
 
-import { ApplicationView } from "../../../z_vendor/getto-application/action/action"
 import { BaseResource } from "../../../common/base/resource"
 
-export function DashboardPage(view: ApplicationView<BaseResource>): VNode {
+export function DashboardPage(props: BaseResource): VNode {
     const pageTitle = "ホーム"
-
-    const resource = useApplicationView(view)
 
     useDocumentTitle(pageTitle)
 
-    const err = useNotifyUnexpectedError(resource)
+    const err = useNotifyUnexpectedError(props)
     if (err) {
         return h(ApplicationError, { err: `${err}` })
     }
 
     return appLayout({
         siteInfo,
-        header: [h(LoadSeason, resource)],
+        header: [h(LoadSeason, props)],
         main: appMain({
-            header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, resource)]),
-            body: mainBody(h(Dashboard, resource)),
+            header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, props)]),
+            body: mainBody(h(Dashboard, props)),
             copyright,
         }),
-        menu: h(LoadMenu, resource),
+        menu: h(LoadMenu, props),
     })
 }

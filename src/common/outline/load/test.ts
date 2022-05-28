@@ -249,20 +249,6 @@ test("load menu; dev docs", async () => {
     })
 })
 
-test("terminate", async () => {
-    const { resource } = standard()
-
-    const runner = setupActionTestRunner(resource.menu.subscriber)
-
-    await runner(() => {
-        resource.menu.terminate()
-        return resource.menu.ignitionState
-    }).then((stack) => {
-        // no input/validate event after terminate
-        expect(stack).toEqual([])
-    })
-})
-
 type MenuNode =
     | Readonly<{
           type: "category"

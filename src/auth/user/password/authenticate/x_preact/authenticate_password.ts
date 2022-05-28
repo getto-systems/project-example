@@ -6,10 +6,7 @@ import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
 import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
 
-import {
-    useApplicationAction,
-    useApplicationView,
-} from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { loginBox } from "../../../../../z_vendor/getto-css/preact/layout/login"
 import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
@@ -26,7 +23,6 @@ import { PasswordField } from "../../input/x_preact/input"
 import { SendButton } from "../../../../../common/x_preact/button/send_button"
 import { ClearChangesButton } from "../../../../../common/x_preact/button/clear_changes_button"
 
-import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 import { AuthenticatePasswordAction } from "../action"
 import { SignLink } from "../../../../sign/nav/action"
 
@@ -34,13 +30,9 @@ import { AuthenticatePasswordError } from "../data"
 
 type Props = Readonly<{
     link: SignLink
-    authenticate: ApplicationView<AuthenticatePasswordAction>
+    authenticate: AuthenticatePasswordAction
 }>
-export function AuthenticatePassword(viewProps: Props): VNode {
-    const props = {
-        link: viewProps.link,
-        authenticate: useApplicationView(viewProps.authenticate),
-    }
+export function AuthenticatePassword(props: Props): VNode {
     const state = useApplicationAction(props.authenticate)
     const validateState = useApplicationAction(props.authenticate.validate)
     const observeState = useApplicationAction(props.authenticate.observe)

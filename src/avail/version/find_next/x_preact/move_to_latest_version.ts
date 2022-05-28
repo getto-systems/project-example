@@ -2,10 +2,7 @@ import { h, VNode } from "preact"
 import { useErrorBoundary, useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
 
-import {
-    useApplicationAction,
-    useApplicationView,
-} from "../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { loginBox } from "../../../../z_vendor/getto-css/preact/layout/login"
 import { siteInfo } from "../../../../x_content/site"
@@ -15,15 +12,14 @@ import { iconHtml } from "../../../../common/x_preact/design/icon"
 
 import { ApplicationError } from "../../../x_preact/application_error"
 
-import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 import { FindNextVersionAction } from "../action"
 
 import { CheckDeployExistsError } from "../../find_next/data"
 
-export function MoveToLatestVersion(view: ApplicationView<FindNextVersionAction>): VNode {
-    const props = {
-        findNext: useApplicationView(view),
-    }
+type Props = Readonly<{
+    findNext: FindNextVersionAction
+}>
+export function MoveToLatestVersion(props: Props): VNode {
     const state = useApplicationAction(props.findNext)
     const [err] = useErrorBoundary((err) => {
         // 認証前なのでエラーはどうしようもない

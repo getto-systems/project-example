@@ -1,5 +1,3 @@
-import { toApplicationView } from "../../../../../../z_vendor/getto-application/action/helper"
-
 import { newResetPasswordConfig } from "./config"
 
 import { newGetScriptPathShell } from "../../../../../sign/get_script_path/init/infra"
@@ -16,24 +14,20 @@ import { RepositoryOutsideFeature } from "../../../../../../z_lib/ui/repository/
 import { LocationOutsideFeature } from "../../../../../../z_lib/ui/location/feature"
 
 import { initResetPasswordAction, ResetPasswordAction } from "../action"
-import { ApplicationView } from "../../../../../../z_vendor/getto-application/action/action"
 
-export function newResetPasswordView(
-    feature: RemoteOutsideFeature & RepositoryOutsideFeature & LocationOutsideFeature,
-): ApplicationView<ResetPasswordAction> {
-    return toApplicationView(
-        initResetPasswordAction({
-            infra: {
-                ticketRepository: newAuthTicketRepository(feature),
-                renewRemote: newCheckAuthTicketRemote(feature, newClock()),
-                resetRemote: newResetPasswordRemote(feature, newClock()),
-                clock: newClock(),
-            },
-            shell: {
-                ...newGetScriptPathShell(feature),
-                detectResetToken: () => detectResetToken(toURL(feature)),
-            },
-            config: newResetPasswordConfig(),
-        }),
-    )
+type OutsideFeature = RemoteOutsideFeature & RepositoryOutsideFeature & LocationOutsideFeature
+export function newResetPasswordAction(feature: OutsideFeature): ResetPasswordAction {
+    return initResetPasswordAction({
+        infra: {
+            ticketRepository: newAuthTicketRepository(feature),
+            renewRemote: newCheckAuthTicketRemote(feature, newClock()),
+            resetRemote: newResetPasswordRemote(feature, newClock()),
+            clock: newClock(),
+        },
+        shell: {
+            ...newGetScriptPathShell(feature),
+            detectResetToken: () => detectResetToken(toURL(feature)),
+        },
+        config: newResetPasswordConfig(),
+    })
 }

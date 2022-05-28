@@ -11,10 +11,10 @@ use crate::z_lib::jwt::helper::decoding_key_from_ec_pem;
 
 pub struct ProxyAppFeature {
     pub auth: AuthProxyOutsideFeature,
-    pub common: CommonOutsideFeature,
+    pub core: CoreProxyOutsideFeature,
 }
 
-pub struct CommonOutsideFeature {
+pub struct CoreProxyOutsideFeature {
     pub service: CommonOutsideService,
 }
 
@@ -37,7 +37,7 @@ impl ProxyAppFeature {
                     cloudfront_key_pair_id: &env.cloudfront_key_pair_id,
                 },
             },
-            common: CommonOutsideFeature {
+            core: CoreProxyOutsideFeature {
                 service: CommonOutsideService {
                     service_url: &env.core_service_url,
                     google_authorizer: GoogleServiceAuthorizerOutsideFeature::new(

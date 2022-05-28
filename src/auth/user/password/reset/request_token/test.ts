@@ -1,20 +1,17 @@
 import { test, expect } from "vitest"
 import { setupActionTestRunner } from "../../../../../z_vendor/getto-application/action/test_helper"
-import { toApplicationView } from "../../../../../z_vendor/getto-application/action/helper"
 import { ticker } from "../../../../../z_lib/ui/timer/helper"
 
 import { mockBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/test_helper"
 
 import { RequestResetTokenRemote, RequestResetTokenRemoteResult } from "./infra"
 import { BoardValueStore } from "../../../../../z_vendor/getto-application/board/input/infra"
-import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 import { initRequestResetTokenAction, RequestResetTokenAction } from "./action"
 
 const VALID_LOGIN = { loginId: "login-id" } as const
 
 test("submit valid login-id", async () => {
-    const { view, store } = standard()
-    const action = view.resource
+    const { action, store } = standard()
 
     const runner = setupActionTestRunner(action.subscriber)
 
@@ -28,8 +25,7 @@ test("submit valid login-id", async () => {
 
 test("submit valid login-id; with take longtime", async () => {
     // wait for take longtime timeout
-    const { view, store } = takeLongtime()
-    const action = view.resource
+    const { action, store } = takeLongtime()
 
     const runner = setupActionTestRunner(action.subscriber)
 
@@ -46,8 +42,7 @@ test("submit valid login-id; with take longtime", async () => {
 })
 
 test("submit without fields", async () => {
-    const { view } = standard()
-    const action = view.resource
+    const { action } = standard()
 
     const runner = setupActionTestRunner(action.subscriber)
 
@@ -57,66 +52,41 @@ test("submit without fields", async () => {
 })
 
 test("clear", () => {
-    const { view, store } = standard()
-    const resource = view.resource
+    const { action, store } = standard()
 
     store.loginId.set(VALID_LOGIN.loginId)
-    resource.clear()
+    action.clear()
 
     expect(store.loginId.get()).toEqual("")
 })
 
-test("terminate", async () => {
-    const { view } = standard()
-    const action = view.resource
-
-    const runner = setupActionTestRunner({
-        subscribe: (handler) => {
-            action.subscriber.subscribe(handler)
-            action.validate.subscriber.subscribe(handler)
-            action.loginId.validate.subscriber.subscribe(handler)
-        },
-        unsubscribe: () => null,
-    })
-
-    await runner(async () => {
-        view.terminate()
-        action.submit(() => null)
-    }).then((stack) => {
-        // no input/validate event after terminate
-        expect(stack).toEqual([])
-    })
-})
-
 function standard() {
-    return initView(standard_requestToken())
+    return initResource(standard_requestToken())
 }
 function takeLongtime() {
-    return initView(takeLongtime_requestToken())
+    return initResource(takeLongtime_requestToken())
 }
 
-function initView(requestTokenRemote: RequestResetTokenRemote): Readonly<{
-    view: ApplicationView<RequestResetTokenAction>
+function initResource(requestTokenRemote: RequestResetTokenRemote): Readonly<{
+    action: RequestResetTokenAction
     store: Readonly<{
         loginId: BoardValueStore
     }>
 }> {
-    const view = toApplicationView(
-        initRequestResetTokenAction({
-            infra: {
-                requestTokenRemote,
-            },
-            config: {
-                takeLongtimeThreshold: { wait_millisecond: 32 },
-            },
-        }),
-    )
+    const action = initRequestResetTokenAction({
+        infra: {
+            requestTokenRemote,
+        },
+        config: {
+            takeLongtimeThreshold: { wait_millisecond: 32 },
+        },
+    })
 
     const store = {
-        loginId: mockBoardValueStore(view.resource.loginId.input),
+        loginId: mockBoardValueStore(action.loginId.input),
     }
 
-    return { view, store }
+    return { action, store }
 }
 
 function standard_requestToken(): RequestResetTokenRemote {

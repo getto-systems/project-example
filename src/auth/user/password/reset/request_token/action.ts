@@ -67,13 +67,7 @@ class Action
     convert: { (): ConvertBoardResult<RequestResetTokenFields> }
 
     constructor(material: RequestResetTokenMaterial) {
-        super({
-            terminate: () => {
-                this.loginId.terminate()
-                this.validate.terminate()
-                this.observe.terminate()
-            },
-        })
+        super()
         this.material = material
 
         const loginId = initInputLoginIdAction()

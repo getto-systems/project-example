@@ -1,55 +1,64 @@
 import { VNode } from "preact"
-import { useEffect, useLayoutEffect, useRef } from "preact/hooks"
+import { useLayoutEffect, useMemo, useState } from "preact/hooks"
 import { html } from "htm/preact"
 
-import { readBoardValue } from "../../kernel/convert"
+import { VNodeContent, VNodeKey } from "../../../../../z_lib/ui/x_preact/common"
 
 import { InputBoardAction } from "../action"
 
+import { readBoardValue } from "../../kernel/convert"
+
 import { BoardValueStore, BoardValueStoreConnector } from "../infra"
+import { initBoardValueStore } from "../init/store"
+
+export type SelectBoardContent = Readonly<{
+    key: VNodeKey
+    value: string
+    label: VNodeContent
+}>
 
 type Props = Readonly<{
     input: InputBoardAction<BoardValueStore>
-    options: readonly VNode[]
+    options: readonly SelectBoardContent[]
 }>
 export function SelectBoard({ input, options }: Props): VNode {
-    return html`<select ref=${useSelectRef(input.connector)} onInput=${onInput}>
-        ${options}
+    const [current, store] = useSelectStore(input.connector)
+
+    return html`<select onInput=${onInput}>
+        ${content()}
     </select>`
 
-    function onInput() {
-        input.publisher.post()
+    function content(): VNode[] {
+        return options.map(({ key, value, label }) => {
+            return html`<option key=${key} value=${value} selected=${value === current}>
+                ${label}
+            </option>`
+        })
+    }
+
+    function onInput(e: Event) {
+        const target = e.target
+        if (target instanceof HTMLSelectElement) {
+            store.set(readBoardValue(target))
+        }
     }
 }
 
-function useSelectRef(connector: BoardValueStoreConnector<BoardValueStore>) {
-    const REF = useRef<HTMLSelectElement>()
-    const temporaryStore = useRef<string>()
+interface SelectStore {
+    set(value: string): void
+}
+
+function useSelectStore(
+    connector: BoardValueStoreConnector<BoardValueStore>,
+): [string, SelectStore] {
+    const [current, setValue] = useState("")
+    const { store, connect } = useMemo(() => initBoardValueStore(), [])
 
     useLayoutEffect(() => {
-        connector.connect({
-            get: () => {
-                if (REF.current) {
-                    return readBoardValue(REF.current)
-                }
-                return ""
-            },
-            set: (value) => {
-                if (REF.current) {
-                    REF.current.value = value
-                } else {
-                    temporaryStore.current = value
-                }
-            },
-        })
+        connect(setValue)
+        connector.connect(store)
         return () => connector.terminate()
-    }, [connector])
+    }, [connector, store, connect])
 
-    useEffect(() => {
-        if (REF.current && temporaryStore.current !== undefined) {
-            REF.current.value = temporaryStore.current
-        }
-    }, [])
-
-    return REF
+    return [current, store]
 }

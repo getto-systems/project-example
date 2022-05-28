@@ -131,26 +131,6 @@ test("reset; none", () => {
     expect(store.email.get()).toEqual("")
 })
 
-test("terminate", async () => {
-    const { action } = standard()
-
-    const runner = setupActionTestRunner({
-        subscribe: (handler) => {
-            action.validate.subscriber.subscribe(handler)
-        },
-        unsubscribe: () => null,
-    })
-
-    await runner(async () => {
-        action.terminate()
-        action.email.publisher.post()
-        return action.validate.currentState()
-    }).then((stack) => {
-        // no input/validate event after terminate
-        expect(stack).toEqual([])
-    })
-})
-
 function standard() {
     const action = initInputResetTokenDestinationAction()
     const store = {

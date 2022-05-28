@@ -13,7 +13,6 @@ import { SearchSort } from "../sort/data"
 export interface SearchFilterField {
     readonly observe: ObserveBoardFieldAction
     clear(): void
-    terminate(): void
 }
 
 export type SearchFilterFields<K extends string> = readonly [K, SearchFilterField][]
@@ -24,7 +23,6 @@ export type SearchFilterProps<S, F> = Readonly<{
     columns: SearchColumnsAction
     filter: SearchFilterAction<S, F>
     clear: { (): void }
-    terminate: { (): void }
 }>
 
 export interface SearchFilterAction<S, F> {
@@ -58,16 +56,6 @@ export function initSearchFilter<K extends string, S, F>(
             observeChecker.update(key, result.hasChanged)
         })
     })
-
-    const terminate = () => {
-        fields.forEach(([_, field]) => {
-            field.terminate()
-        })
-
-        observe.terminate()
-        offset.input.terminate()
-        columns.terminate()
-    }
 
     const clear = () => {
         fields.forEach(([_, field]) => {
@@ -109,6 +97,5 @@ export function initSearchFilter<K extends string, S, F>(
         columns,
         filter,
         clear,
-        terminate,
     }
 }

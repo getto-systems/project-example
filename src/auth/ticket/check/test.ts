@@ -1,6 +1,5 @@
 import { test, expect } from "vitest"
 import { setupActionTestRunner } from "../../../z_vendor/getto-application/action/test_helper"
-import { toApplicationView } from "../../../z_vendor/getto-application/action/helper"
 import { ticker } from "../../../z_lib/ui/timer/helper"
 
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../z_lib/ui/clock/mock"
@@ -16,7 +15,6 @@ import { WaitTime } from "../../../z_lib/ui/config/infra"
 import { AuthTicketRepository, AuthTicketRepositoryValue } from "../kernel/infra"
 import { CheckAuthTicketRemote } from "./infra"
 
-import { ApplicationView } from "../../../z_vendor/getto-application/action/action"
 import { CheckAuthTicketAction, initCheckAuthTicketAction } from "./action"
 
 import { LoadScriptError } from "../../sign/get_script_path/data"
@@ -40,12 +38,11 @@ const CONTINUOUS_RENEW_AT = [
 ]
 
 test("instant load", async () => {
-    const { clock, view } = instantLoadable()
-    const resource = view.resource
+    const { clock, action } = instantLoadable()
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => resource.ignitionState).then((stack) => {
+    await runner(() => action.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "try-to-instant-load",
@@ -56,7 +53,7 @@ test("instant load", async () => {
 
     clock.update(CONTINUOUS_RENEW_START_AT)
 
-    await runner(() => resource.succeedToInstantLoad()).then((stack) => {
+    await runner(() => action.succeedToInstantLoad()).then((stack) => {
         expect(stack).toEqual([
             { type: "succeed-to-start-continuous-renew", continue: true },
             { type: "succeed-to-renew", continue: true },
@@ -68,12 +65,11 @@ test("instant load", async () => {
 })
 
 test("instant load failed", async () => {
-    const { clock, view } = instantLoadable()
-    const resource = view.resource
+    const { clock, action } = instantLoadable()
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => resource.ignitionState).then((stack) => {
+    await runner(() => action.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "try-to-instant-load",
@@ -84,7 +80,7 @@ test("instant load failed", async () => {
 
     clock.update(CONTINUOUS_RENEW_START_AT)
 
-    await runner(() => resource.failedToInstantLoad()).then((stack) => {
+    await runner(() => action.failedToInstantLoad()).then((stack) => {
         expect(stack).toEqual([
             { type: "try-to-renew", hasTakenLongtime: false },
             {
@@ -99,10 +95,9 @@ test("instant load failed", async () => {
 })
 
 test("renew stored credential", async () => {
-    const { clock, view } = standard()
-    const resource = view.resource
+    const { clock, action } = standard()
 
-    resource.subscriber.subscribe((state) => {
+    action.subscriber.subscribe((state) => {
         switch (state.type) {
             case "try-to-load":
                 clock.update(CONTINUOUS_RENEW_START_AT)
@@ -110,9 +105,9 @@ test("renew stored credential", async () => {
         }
     })
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => resource.ignitionState).then((stack) => {
+    await runner(() => action.ignitionState).then((stack) => {
         expect(stack).toEqual([
             { type: "try-to-renew", hasTakenLongtime: false },
             {
@@ -128,10 +123,9 @@ test("renew stored credential", async () => {
 
 test("renew stored credential; take long time", async () => {
     // wait for take longtime timeout
-    const { clock, view } = takeLongtime()
-    const resource = view.resource
+    const { clock, action } = takeLongtime()
 
-    resource.subscriber.subscribe((state) => {
+    action.subscriber.subscribe((state) => {
         switch (state.type) {
             case "try-to-load":
                 clock.update(CONTINUOUS_RENEW_START_AT)
@@ -139,9 +133,9 @@ test("renew stored credential; take long time", async () => {
         }
     })
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => resource.ignitionState).then((stack) => {
+    await runner(() => action.ignitionState).then((stack) => {
         expect(stack).toEqual([
             { type: "try-to-renew", hasTakenLongtime: false },
             { type: "try-to-renew", hasTakenLongtime: true },
@@ -158,106 +152,92 @@ test("renew stored credential; take long time", async () => {
 
 test("renew without stored credential", async () => {
     // empty credential
-    const { view } = noStored()
-    const resource = view.resource
+    const { action } = noStored()
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => resource.ignitionState).then((stack) => {
+    await runner(() => action.ignitionState).then((stack) => {
         expect(stack).toEqual([{ type: "required-to-login" }])
     })
 })
 
 test("load error", async () => {
-    const { view } = standard()
-    const resource = view.resource
+    const { action } = standard()
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
     const err: LoadScriptError = { type: "infra-error", err: "load error" }
 
-    await runner(() => resource.loadError(err)).then((stack) => {
+    await runner(() => action.loadError(err)).then((stack) => {
         expect(stack).toEqual([{ type: "load-error", err }])
-    })
-})
-
-test("terminate", async () => {
-    const { view } = standard()
-
-    const runner = setupActionTestRunner(view.resource.subscriber)
-
-    await runner(() => {
-        view.terminate()
-        return view.resource.ignitionState
-    }).then((stack) => {
-        // no input/validate event after terminate
-        expect(stack).toEqual([])
     })
 })
 
 function standard() {
     const clockPubSub = mockClockPubSub()
     const clock = mockClock(START_AT, clockPubSub)
-    const view = initView(
+    const action = initAction(
         standard_ticketRepository(),
         standard_renewRemote(clock, clockPubSub),
         clock,
     )
 
-    return { clock: clockPubSub, view }
+    return { clock: clockPubSub, action }
 }
 function instantLoadable() {
     const clockPubSub = mockClockPubSub()
     const clock = mockClock(START_AT_INSTANT_LOAD_AVAILABLE, clockPubSub)
-    const view = initView(
+    const action = initAction(
         standard_ticketRepository(),
         standard_renewRemote(clock, clockPubSub),
         clock,
     )
 
-    return { clock: clockPubSub, view }
+    return { clock: clockPubSub, action }
 }
 function takeLongtime() {
     const clockPubSub = mockClockPubSub()
     const clock = mockClock(START_AT, clockPubSub)
-    const view = initView(standard_ticketRepository(), wait_renewRemote(clock, clockPubSub), clock)
-    return { clock: clockPubSub, view }
+    const action = initAction(
+        standard_ticketRepository(),
+        wait_renewRemote(clock, clockPubSub),
+        clock,
+    )
+    return { clock: clockPubSub, action }
 }
 function noStored() {
     const clockPubSub = mockClockPubSub()
     const clock = mockClock(START_AT, clockPubSub)
-    const view = initView(
+    const action = initAction(
         noStored_ticketRepository(),
         standard_renewRemote(clock, clockPubSub),
         clock,
     )
-    return { view }
+    return { action }
 }
 
-function initView(
+function initAction(
     ticketRepository: AuthTicketRepository,
     renewRemote: CheckAuthTicketRemote,
     clock: Clock,
-): ApplicationView<CheckAuthTicketAction> {
-    return toApplicationView(
-        initCheckAuthTicketAction({
-            infra: {
-                ticketRepository,
-                renewRemote,
-                clock,
-            },
-            shell: {
-                ...mockGetScriptPathShell(new URL("https://example.com/index.html")),
-            },
-            config: {
-                continuousRenewInterval: { interval_millisecond: 128 },
-                ticketExpire: { expire_millisecond: 1 * 1000 },
-                instantLoadExpire: { expire_millisecond: 20 * 1000 },
-                takeLongtimeThreshold: { wait_millisecond: 32 },
-                secureServerURL: mockSecureServerURL("https://secure.example.com"),
-            },
-        }),
-    )
+): CheckAuthTicketAction {
+    return initCheckAuthTicketAction({
+        infra: {
+            ticketRepository,
+            renewRemote,
+            clock,
+        },
+        shell: {
+            ...mockGetScriptPathShell(new URL("https://example.com/index.html")),
+        },
+        config: {
+            continuousRenewInterval: { interval_millisecond: 128 },
+            ticketExpire: { expire_millisecond: 1 * 1000 },
+            instantLoadExpire: { expire_millisecond: 20 * 1000 },
+            takeLongtimeThreshold: { wait_millisecond: 32 },
+            secureServerURL: mockSecureServerURL("https://secure.example.com"),
+        },
+    })
 }
 
 function standard_ticketRepository(): AuthTicketRepository {

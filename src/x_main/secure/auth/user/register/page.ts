@@ -1,9 +1,6 @@
 import { h, VNode } from "preact"
 
-import {
-    useApplicationAction,
-    useApplicationView,
-} from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     appLayout,
@@ -31,22 +28,18 @@ import { FocusedRegisteredAuthUserAccount } from "../../../../../auth/user/accou
 
 import { isSidebarExpand } from "../../../../../z_lib/ui/search/sidebar/x_preact/helper"
 
-import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 import { RegisterUserAccountPageResource } from "./resource"
 
-export function ManageUserAccountPage(
-    view: ApplicationView<RegisterUserAccountPageResource>,
-): VNode {
+export function ManageUserAccountPage(props: RegisterUserAccountPageResource): VNode {
     const pageTitle = "ユーザー登録"
     const focusedTitle = "ユーザー詳細"
     const sidebarTitle = "登録済み一覧"
 
     useDocumentTitle(pageTitle)
-    const resource = useApplicationView(view)
-    const err = useNotifyUnexpectedError(resource)
+    const err = useNotifyUnexpectedError(props)
 
-    const sidebarState = useApplicationAction(resource.sidebar)
-    const focusedState = useApplicationAction(resource.register.list.focused)
+    const sidebarState = useApplicationAction(props.sidebar)
+    const focusedState = useApplicationAction(props.register.list.focused)
 
     if (err) {
         return h(ApplicationError, { err: `${err}` })
@@ -54,33 +47,33 @@ export function ManageUserAccountPage(
 
     return appLayout({
         siteInfo,
-        header: [h(LoadSeason, resource)],
-        menu: h(LoadMenu, resource),
+        header: [h(LoadSeason, props)],
+        menu: h(LoadMenu, props),
         main:
             focusedState.type === "initial"
                 ? appMain({
                       header: mainHeader([
                           h(MainTitleWithSidebar, {
-                              sidebar: resource.sidebar,
+                              sidebar: props.sidebar,
                               title: pageTitle,
                           }),
-                          h(LoadBreadcrumbList, resource),
+                          h(LoadBreadcrumbList, props),
                       ]),
-                      body: mainBody(h(RegisterAuthUserAccount, resource)),
+                      body: mainBody(h(RegisterAuthUserAccount, props)),
                       copyright,
                   })
                 : appMain({
                       header: mainHeader([
                           h(MainTitleWithSidebar, {
-                              sidebar: resource.sidebar,
+                              sidebar: props.sidebar,
                               title: focusedTitle,
                           }),
-                          h(LoadBreadcrumbList, resource),
+                          h(LoadBreadcrumbList, props),
                       ]),
                       body: mainBody(
                           h(FocusedRegisteredAuthUserAccount, {
-                              ...resource,
-                              focused: resource.register.list.focused,
+                              ...props,
+                              focused: props.register.list.focused,
                               user: focusedState.user,
                           }),
                       ),
@@ -91,8 +84,8 @@ export function ManageUserAccountPage(
                   header: mainHeader([mainTitle(sidebarTitle)]),
                   body: sidebarBody(
                       h(ListRegisteredAuthUserAccount, {
-                          ...resource,
-                          list: resource.register.list,
+                          ...props,
+                          list: props.register.list,
                       }),
                       { id: "sidebar" },
                   ),

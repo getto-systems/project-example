@@ -4,14 +4,17 @@ import { field, pager } from "../../../../../z_vendor/getto-css/preact/design/fo
 
 import { VNodeContent } from "../../../x_preact/common"
 
-import { SelectBoard } from "../../../../../z_vendor/getto-application/board/input/x_preact/select"
+import {
+    SelectBoard,
+    SelectBoardContent,
+} from "../../../../../z_vendor/getto-application/board/input/x_preact/select"
 
 import { SearchOffsetAction } from "../action"
 
 type Props = Readonly<{
     field: SearchOffsetAction
     count: VNodeContent
-    options: readonly VNode[]
+    options: readonly SelectBoardContent[]
     button: VNode
 }>
 export function SearchOffset(props: Props): VNode {

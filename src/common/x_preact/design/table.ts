@@ -2,10 +2,7 @@ import { VNode } from "preact"
 import { html } from "htm/preact"
 
 import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
-import {
-    PagerOptionsContent,
-    SortSignContent,
-} from "../../../z_vendor/getto-css/preact/design/table"
+import { PagerOptionsProps, SortSignContent } from "../../../z_vendor/getto-css/preact/design/table"
 
 import { iconHtml } from "./icon"
 import {
@@ -27,7 +24,7 @@ export const SORT_SIGN: SortSignContent = {
 export function pagerCount(all: number): VNodeContent {
     return `全 ${pageCountFormat(all)} 件中`
 }
-export function pagerParams(page: SearchPageResponse): PagerOptionsContent {
+export function pagerParams(page: SearchPageResponse): PagerOptionsProps {
     return {
         all: page.all,
         step: page.limit,

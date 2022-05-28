@@ -7,18 +7,13 @@ import { newForegroundOutsideFeature } from "../../../../x_outside_feature/commo
 import { newBaseResource } from "../../../../common/base/init/resource"
 import { newChangePasswordAction } from "../../../../auth/user/password/change/init/resource"
 import { newRequestResetTokenAction } from "../../../../auth/user/password/reset/request_token/init/resource"
-import { toProfileView } from "./common"
 
-import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 import { ProfilePageResource } from "./resource"
 import { initEditableBoardAction } from "../../../../z_vendor/getto-application/board/editable/action"
 
 render(h(ProfilePage, props()), document.body)
 
-function props(): ApplicationView<ProfilePageResource> {
-    return toProfileView({ resource: newResource() })
-}
-function newResource() {
+function props(): ProfilePageResource {
     const feature = newForegroundOutsideFeature()
     return {
         ...newBaseResource(feature),

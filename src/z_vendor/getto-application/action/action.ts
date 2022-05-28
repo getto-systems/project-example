@@ -1,12 +1,4 @@
-export type ApplicationView<R> = Readonly<{
-    resource: R
-    terminate: { (): void }
-}>
-
-export interface ApplicationAction {
-    terminate(): void
-}
-export interface StatefulApplicationAction<S> extends ApplicationAction {
+export interface StatefulApplicationAction<S> {
     readonly subscriber: ApplicationStateSubscriber<S>
     readonly ignitionState: Promise<S>
     currentState(): S
@@ -18,27 +10,21 @@ export interface ApplicationStateSubscriber<S> {
 }
 export interface ApplicationStatePublisher<S> {
     post(state: S): S
-    terminate(): void
 }
 export interface ApplicationStateHandler<S> {
     (state: S): void
 }
 export type ApplicationActionHook<S> = Partial<{
     ignite: ApplicationActionIgniteHook<S>
-    terminate: ApplicationActionTerminateHook
 }>
 
 export interface ApplicationActionIgniteHook<S> {
     (): Promise<S>
 }
-export interface ApplicationActionTerminateHook {
-    (): void
-}
 
 export abstract class AbstractStatefulApplicationAction<S> implements StatefulApplicationAction<S> {
     abstract readonly initialState: S
 
-    readonly terminateHooks: ApplicationActionTerminateHook[] = []
     readonly subscriber: ApplicationStateSubscriber<S>
 
     readonly ignitionState: Promise<S>
@@ -60,13 +46,6 @@ export abstract class AbstractStatefulApplicationAction<S> implements StatefulAp
             }, 0)
         })
 
-        this.terminateHooks.push(() => {
-            pub.terminate()
-        })
-        if (hook.terminate) {
-            this.terminateHooks.push(hook.terminate)
-        }
-
         // sub class から currentState に手出しできないようにコンストラクタの中で構築する
         let currentState: S | null = null
         sub.subscribe((state) => {
@@ -80,10 +59,6 @@ export abstract class AbstractStatefulApplicationAction<S> implements StatefulAp
             }
         }
     }
-
-    terminate(): void {
-        this.terminateHooks.forEach((terminate) => terminate())
-    }
 }
 
 class PubSub<S> {
@@ -93,9 +68,6 @@ class PubSub<S> {
         post: (state) => {
             this.handlers.forEach((post) => post(state))
             return state
-        },
-        terminate: () => {
-            this.handlers = []
         },
     }
     sub: ApplicationStateSubscriber<S> = {

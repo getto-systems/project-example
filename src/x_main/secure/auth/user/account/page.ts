@@ -1,9 +1,6 @@
 import { h, VNode } from "preact"
 
-import {
-    useApplicationAction,
-    useApplicationView,
-} from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     appLayout,
@@ -31,20 +28,18 @@ import { MainTitleWithSidebar } from "../../../../../z_lib/ui/search/sidebar/x_p
 
 import { isSidebarExpand } from "../../../../../z_lib/ui/search/sidebar/x_preact/helper"
 
-import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 import { ManageUserAccountPageResource } from "./resource"
 
-export function ManageUserAccountPage(view: ApplicationView<ManageUserAccountPageResource>): VNode {
+export function ManageUserAccountPage(props: ManageUserAccountPageResource): VNode {
     const pageTitle = "ユーザー"
     const focusedTitle = "ユーザー詳細"
     const sidebarTitle = "一覧"
 
     useDocumentTitle(pageTitle)
-    const resource = useApplicationView(view)
-    const err = useNotifyUnexpectedError(resource)
+    const err = useNotifyUnexpectedError(props)
 
-    const sidebarState = useApplicationAction(resource.sidebar)
-    const focusedState = useApplicationAction(resource.search.focused)
+    const sidebarState = useApplicationAction(props.sidebar)
+    const focusedState = useApplicationAction(props.search.focused)
 
     if (err) {
         return h(ApplicationError, { err: `${err}` })
@@ -52,8 +47,8 @@ export function ManageUserAccountPage(view: ApplicationView<ManageUserAccountPag
 
     return appLayout({
         siteInfo,
-        header: [h(LoadSeason, resource)],
-        menu: h(LoadMenu, resource),
+        header: [h(LoadSeason, props)],
+        menu: h(LoadMenu, props),
         ...content(),
     })
 
@@ -62,8 +57,8 @@ export function ManageUserAccountPage(view: ApplicationView<ManageUserAccountPag
             case "initial":
                 return {
                     main: appMain({
-                        header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, resource)]),
-                        body: mainBody(h(SearchAuthUserAccount, resource)),
+                        header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, props)]),
+                        body: mainBody(h(SearchAuthUserAccount, props)),
                         copyright,
                     }),
                 }
@@ -75,15 +70,15 @@ export function ManageUserAccountPage(view: ApplicationView<ManageUserAccountPag
                     main: appMain({
                         header: mainHeader([
                             h(MainTitleWithSidebar, {
-                                sidebar: resource.sidebar,
+                                sidebar: props.sidebar,
                                 title: focusedTitle,
                             }),
-                            h(LoadBreadcrumbList, resource),
+                            h(LoadBreadcrumbList, props),
                         ]),
                         body: mainBody(
                             h(FocusedAuthUserAccount, {
-                                ...resource,
-                                focused: resource.search.focused,
+                                ...props,
+                                focused: props.search.focused,
                                 user:
                                     focusedState.type === "focus-failed"
                                         ? { found: false }
@@ -96,7 +91,7 @@ export function ManageUserAccountPage(view: ApplicationView<ManageUserAccountPag
                         ? appSidebar({
                               header: mainHeader([mainTitle(sidebarTitle)]),
                               body: sidebarBody(
-                                  h(ListAuthUserAccount, { ...resource, list: resource.search }),
+                                  h(ListAuthUserAccount, { ...props, list: props.search }),
                                   { id: "sidebar" },
                               ),
                               copyright,

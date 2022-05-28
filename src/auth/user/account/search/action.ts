@@ -133,10 +133,6 @@ class Action
     constructor(material: SearchAuthUserAccountMaterial) {
         super({
             ignite: async () => this.load(),
-            terminate: () => {
-                this.focused.terminate()
-                terminate()
-            },
         })
 
         const initialFilter = material.shell.detectFilter()
@@ -144,7 +140,7 @@ class Action
         const loginId = initFilterLoginIdAction(initialFilter.loginId)
         const grantedRoles = initFilterGrantedRolesAction(initialFilter.grantedRoles)
 
-        const { observe, offset, columns, filter, clear, terminate } = initSearchFilter(
+        const { observe, offset, columns, filter, clear } = initSearchFilter(
             material.infra,
             initialFilter,
             [

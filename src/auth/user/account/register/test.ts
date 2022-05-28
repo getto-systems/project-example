@@ -203,26 +203,6 @@ test("remove user", async () => {
     })
 })
 
-test("terminate", async () => {
-    const { resource } = standard()
-
-    const runner = setupActionTestRunner({
-        subscribe: (handler) => {
-            resource.register.subscriber.subscribe(handler)
-            resource.register.validate.subscriber.subscribe(handler)
-        },
-        unsubscribe: () => null,
-    })
-
-    await runner(async () => {
-        resource.register.terminate()
-        return resource.register.submit(() => null)
-    }).then((stack) => {
-        // no input/validate event after terminate
-        expect(stack).toEqual([])
-    })
-})
-
 function standard() {
     return initResource(standard_registerUserRemote())
 }

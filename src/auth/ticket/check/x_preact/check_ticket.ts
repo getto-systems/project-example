@@ -4,10 +4,7 @@ import { html } from "htm/preact"
 
 import { remoteCommonErrorReason } from "../../../../z_lib/ui/remote/x_error/reason"
 
-import {
-    useApplicationAction,
-    useApplicationView,
-} from "../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { loginBox } from "../../../../z_vendor/getto-css/preact/layout/login"
 import { v_medium } from "../../../../z_vendor/getto-css/preact/design/alignment"
@@ -21,15 +18,14 @@ import { appendScript } from "../../../sign/x_preact/script"
 
 import { ApplicationError } from "../../../../avail/x_preact/application_error"
 
-import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 import { CheckAuthTicketAction } from "../action"
 
 import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
 
-export function CheckAuthTicket(view: ApplicationView<CheckAuthTicketAction>): VNode {
-    const props = {
-        check: useApplicationView(view),
-    }
+type Props = Readonly<{
+    check: CheckAuthTicketAction
+}>
+export function CheckAuthTicket(props: Props): VNode {
     const state = useApplicationAction(props.check)
 
     useLayoutEffect(() => {

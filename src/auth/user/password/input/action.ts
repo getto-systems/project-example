@@ -8,7 +8,6 @@ import {
     initValidateBoardFieldAction,
     ValidateBoardFieldAction,
 } from "../../../../z_vendor/getto-application/board/validate_field/action"
-import { ApplicationAction } from "../../../../z_vendor/getto-application/action/action"
 import {
     initObserveBoardFieldAction,
     ObserveBoardFieldAction,
@@ -20,7 +19,7 @@ import { BoardValueStore } from "../../../../z_vendor/getto-application/board/in
 import { Password, PasswordCharacterState } from "./data"
 import { ValidateTextError } from "../../../../z_lib/ui/validate/data"
 
-export interface InputPasswordAction extends ApplicationAction {
+export interface InputPasswordAction {
     readonly input: InputBoardAction<BoardValueStore>
     readonly validate: ValidateBoardFieldAction<Password, readonly ValidateTextError[]>
     readonly observe: ObserveBoardFieldAction
@@ -54,10 +53,6 @@ export function initInputPasswordAction(): InputPasswordAction {
             observe.check()
         },
         checkCharacter: () => checkPasswordCharacter(store.get()),
-        terminate: () => {
-            subscriber.terminate()
-            validate.terminate()
-        },
     }
 }
 

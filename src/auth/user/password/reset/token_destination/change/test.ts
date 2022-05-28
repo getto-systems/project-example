@@ -89,27 +89,6 @@ test("reset", () => {
     expect(store.email.get()).toEqual("")
 })
 
-test("terminate", async () => {
-    const { resource, user } = standard()
-
-    const runner = setupActionTestRunner({
-        subscribe: (handler) => {
-            resource.change.subscriber.subscribe(handler)
-            resource.change.validate.subscriber.subscribe(handler)
-            resource.change.destination.validate.subscriber.subscribe(handler)
-        },
-        unsubscribe: () => null,
-    })
-
-    await runner(async () => {
-        resource.change.terminate()
-        return resource.change.submit(user, () => null)
-    }).then((stack) => {
-        // no input/validate event after terminate
-        expect(stack).toEqual([])
-    })
-})
-
 function standard() {
     return initResource(standard_changeDestinationRemote())
 }

@@ -1,7 +1,5 @@
 import { h, VNode } from "preact"
 
-import { useApplicationView } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
-
 import {
     appLayout,
     appMain,
@@ -23,15 +21,13 @@ import { LoadBreadcrumbList } from "../../../../common/outline/load/x_preact/loa
 import { ChangePassword } from "../../../../auth/user/password/change/x_preact/change_password"
 import { RequestResetTokenProfile } from "../../../../auth/user/password/reset/request_token/x_preact/request_token_profile"
 
-import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 import { ProfilePageResource } from "./resource"
 
-export function ProfilePage(view: ApplicationView<ProfilePageResource>): VNode {
+export function ProfilePage(props: ProfilePageResource): VNode {
     const pageTitle = "プロフィール" as const
 
     useDocumentTitle(pageTitle)
-    const resource = useApplicationView(view)
-    const err = useNotifyUnexpectedError(resource)
+    const err = useNotifyUnexpectedError(props)
 
     if (err) {
         return h(ApplicationError, { err: `${err}` })
@@ -39,17 +35,17 @@ export function ProfilePage(view: ApplicationView<ProfilePageResource>): VNode {
 
     return appLayout({
         siteInfo,
-        header: [h(LoadSeason, resource)],
+        header: [h(LoadSeason, props)],
         main: appMain({
-            header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, resource)]),
+            header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, props)]),
             body: mainBody(
                 container([
-                    h(ChangePassword, resource.change),
-                    h(RequestResetTokenProfile, resource.requestToken),
+                    h(ChangePassword, props.change),
+                    h(RequestResetTokenProfile, props.requestToken),
                 ]),
             ),
             copyright,
         }),
-        menu: h(LoadMenu, resource),
+        menu: h(LoadMenu, props),
     })
 }

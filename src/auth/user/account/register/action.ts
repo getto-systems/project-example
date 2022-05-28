@@ -116,17 +116,7 @@ class Action
     convert: { (): ConvertBoardResult<AuthUserAccount> }
 
     constructor(material: RegisterAuthUserAccountMaterial) {
-        super({
-            terminate: () => {
-                this.list.terminate()
-                this.loginId.terminate()
-                this.grantedRoles.terminate()
-                this.resetTokenDestination.terminate()
-                this.memo.terminate()
-                this.validate.terminate()
-                this.observe.terminate()
-            },
-        })
+        super()
         this.material = material
 
         const loginId = initInputLoginIdAction()
@@ -257,11 +247,7 @@ class ListAction
     list: AuthUserAccount[] = []
 
     constructor() {
-        super({
-            terminate: () => {
-                this.focused.terminate()
-            },
-        })
+        super()
 
         this.focused = new FocusedAction({
             updateUser: (loginId, user) => {

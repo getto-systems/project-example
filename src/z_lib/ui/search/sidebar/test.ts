@@ -27,21 +27,6 @@ test("select columns", async () => {
     })
 })
 
-test("terminate", async () => {
-    const { sidebar } = standard()
-
-    const runner = setupActionTestRunner(sidebar.subscriber)
-
-    await runner(async () => {
-        sidebar.terminate()
-        sidebar.fold()
-        return sidebar.currentState()
-    }).then((stack) => {
-        // no input/validate event after terminate
-        expect(stack).toEqual([])
-    })
-})
-
 function standard() {
     return initResource()
 }

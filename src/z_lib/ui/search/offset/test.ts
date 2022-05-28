@@ -14,15 +14,6 @@ test("get; reset", async () => {
     expect(get()).toEqual("0")
 })
 
-test("terminate", async () => {
-    const { resource } = standard()
-
-    resource.field.terminate()
-
-    // offset action では subscribe していないのでテストする内容がない
-    expect(true).toBe(true)
-})
-
 function standard() {
     return initResource()
 }
