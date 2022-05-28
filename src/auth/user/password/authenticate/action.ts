@@ -95,14 +95,7 @@ class Action
     convert: { (): ConvertBoardResult<AuthenticatePasswordFields> }
 
     constructor(material: AuthenticatePasswordMaterial) {
-        super({
-            terminate: () => {
-                this.loginId.terminate()
-                this.password.terminate()
-                this.validate.terminate()
-                this.observe.terminate()
-            },
-        })
+        super()
         this.material = material
 
         const loginId = initInputLoginIdAction()

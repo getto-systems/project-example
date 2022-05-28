@@ -1,6 +1,8 @@
-import { newFindNextVersionView } from "../../../../../avail/version/find_next/init/resource"
+import { newFindNextVersionAction } from "../../../../../avail/version/find_next/init/resource"
 
 import { MoveToNextVersion } from "../../../../../avail/version/find_next/x_plain/move_to_next_version"
 import { newForegroundOutsideFeature } from "../../../../../x_outside_feature/common"
 
-MoveToNextVersion(newFindNextVersionView(newForegroundOutsideFeature()))
+MoveToNextVersion({
+    findNext: newFindNextVersionAction(newForegroundOutsideFeature()),
+})

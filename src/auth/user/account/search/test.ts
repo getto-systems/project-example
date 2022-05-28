@@ -212,27 +212,6 @@ test("remove user", async () => {
     })
 })
 
-test("terminate", async () => {
-    const { resource } = standard()
-
-    const runner = setupActionTestRunner({
-        subscribe: (handler) => {
-            resource.search.subscriber.subscribe(handler)
-            resource.search.observe.subscriber.subscribe(handler)
-            resource.search.loginId.observe.subscriber.subscribe(handler)
-        },
-        unsubscribe: () => null,
-    })
-
-    await runner(async () => {
-        resource.search.terminate()
-        return resource.search.search()
-    }).then((stack) => {
-        // no input/validate event after terminate
-        expect(stack).toEqual([])
-    })
-})
-
 test("read sort key", () => {
     expect(readSearchAuthUserAccountSortKey("login-id")).toEqual({
         found: true,

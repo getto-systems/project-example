@@ -1,40 +1,37 @@
-import { toApplicationView } from "../../../../../z_vendor/getto-application/action/helper"
-
 import { RepositoryOutsideFeature } from "../../../../../z_lib/ui/repository/feature"
 import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 import { WorkerOutsideFeature } from "../../../../../z_vendor/getto-application/action/worker/feature"
 import { LocationOutsideFeature } from "../../../../../z_lib/ui/location/feature"
 
 import { newSignActionShell } from "../shell"
-import { newCheckAuthTicketView } from "../../../../ticket/check/init/view"
-import { newAuthenticatePasswordView } from "../../../../user/password/authenticate/init/view"
-import { newResetPasswordView } from "../../../../user/password/reset/reset/init/view"
+import { newCheckAuthTicketAction } from "../../../../ticket/check/init/view"
+import { newAuthenticatePasswordAction } from "../../../../user/password/authenticate/init/view"
+import { newResetPasswordAction } from "../../../../user/password/reset/reset/init/view"
 import {
     newRequestResetTokenProxy,
     RequestResetTokenProxy,
 } from "../../../../user/password/reset/request_token/init/worker/foreground"
-import { initRequestResetTokenView } from "../../../../user/password/reset/request_token/init/worker/foreground"
+import { newRequestResetTokenAction } from "../../../../user/password/reset/request_token/init/worker/foreground"
 
 import { initSignAction, SignAction } from "../../action"
 
 import { SignForegroundMessage, SignBackgroundMessage } from "./message"
-import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 
 type OutsideFeature = RemoteOutsideFeature &
     RepositoryOutsideFeature &
     WorkerOutsideFeature &
     LocationOutsideFeature
-export function newSignViewWorkerForeground(feature: OutsideFeature): ApplicationView<SignAction> {
+export function newSignViewWorkerForeground(feature: OutsideFeature): SignAction {
     const { worker } = feature
     const proxy = initProxy(postForegroundMessage)
 
     const sign = initSignAction(newSignActionShell(feature), {
-        check: () => newCheckAuthTicketView(feature),
+        check: () => newCheckAuthTicketAction(feature),
 
-        password_authenticate: () => newAuthenticatePasswordView(feature),
+        password_authenticate: () => newAuthenticatePasswordAction(feature),
         password_reset_requestToken: () =>
-            initRequestResetTokenView(proxy.password.reset.requestToken.infra),
-        password_reset: () => newResetPasswordView(feature),
+            newRequestResetTokenAction(proxy.password.reset.requestToken.infra),
+        password_reset: () => newResetPasswordAction(feature),
     })
 
     const messageHandler = initBackgroundMessageHandler(proxy, (err: string) => {
@@ -45,14 +42,7 @@ export function newSignViewWorkerForeground(feature: OutsideFeature): Applicatio
         messageHandler(event.data)
     })
 
-    const view = toApplicationView(sign)
-    return {
-        resource: view.resource,
-        terminate: () => {
-            worker.terminate()
-            view.terminate()
-        },
-    }
+    return sign
 
     function postForegroundMessage(message: SignForegroundMessage) {
         worker.postMessage(message)

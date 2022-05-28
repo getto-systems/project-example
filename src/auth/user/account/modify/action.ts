@@ -83,13 +83,7 @@ class Action
     }
 
     constructor(material: ModifyAuthUserAccountMaterial) {
-        super({
-            terminate: () => {
-                this.grantedRoles.terminate()
-                this.validate.terminate()
-                this.observe.terminate()
-            },
-        })
+        super()
         this.material = material
 
         const memo = initInputAuthUserMemoAction()

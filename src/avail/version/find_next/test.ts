@@ -2,7 +2,6 @@ import { test, expect } from "vitest"
 import { setupActionTestRunner } from "../../../z_vendor/getto-application/action/test_helper"
 import { standardApplicationTargetPath } from "./test_helper"
 
-import { toApplicationView } from "../../../z_vendor/getto-application/action/helper"
 import { ticker } from "../../../z_lib/ui/timer/helper"
 import { mockFindNextVersionShell } from "./init/mock"
 
@@ -11,15 +10,13 @@ import { applicationPath } from "./helper"
 import { CheckDeployExistsRemote } from "./infra"
 
 import { FindNextVersionAction, initFindNextVersionAction } from "../find_next/action"
-import { ApplicationView } from "../../../z_vendor/getto-application/action/action"
 
 test("up to date", async () => {
-    const { view } = standard()
-    const resource = view.resource
+    const { action } = standard()
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => resource.ignitionState).then((stack) => {
+    await runner(() => action.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -38,12 +35,11 @@ test("up to date", async () => {
 })
 
 test("up to date; take longtime", async () => {
-    const { view } = takeLongtime()
-    const resource = view.resource
+    const { action } = takeLongtime()
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => resource.ignitionState).then((stack) => {
+    await runner(() => action.ignitionState).then((stack) => {
         expect(stack).toEqual([
             { type: "take-longtime" },
             {
@@ -60,12 +56,11 @@ test("up to date; take longtime", async () => {
 })
 
 test("found next major version", async () => {
-    const { view } = found(["/2.0.0-ui/index.html"])
-    const resource = view.resource
+    const { action } = found(["/2.0.0-ui/index.html"])
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => resource.ignitionState).then((stack) => {
+    await runner(() => action.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -81,12 +76,11 @@ test("found next major version", async () => {
 })
 
 test("found next minor version", async () => {
-    const { view } = found(["/1.1.0-ui/index.html"])
-    const resource = view.resource
+    const { action } = found(["/1.1.0-ui/index.html"])
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => resource.ignitionState).then((stack) => {
+    await runner(() => action.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -102,12 +96,11 @@ test("found next minor version", async () => {
 })
 
 test("found next patch version", async () => {
-    const { view } = found(["/1.0.1-ui/index.html"])
-    const resource = view.resource
+    const { action } = found(["/1.0.1-ui/index.html"])
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => resource.ignitionState).then((stack) => {
+    await runner(() => action.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -123,12 +116,11 @@ test("found next patch version", async () => {
 })
 
 test("found next minor version; recursive", async () => {
-    const { view } = found(["/1.1.0-ui/index.html", "/1.2.0-ui/index.html"])
-    const resource = view.resource
+    const { action } = found(["/1.1.0-ui/index.html", "/1.2.0-ui/index.html"])
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => resource.ignitionState).then((stack) => {
+    await runner(() => action.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -144,12 +136,11 @@ test("found next minor version; recursive", async () => {
 })
 
 test("found next patch version; recursive", async () => {
-    const { view } = found(["/1.0.1-ui/index.html", "/1.0.2-ui/index.html"])
-    const resource = view.resource
+    const { action } = found(["/1.0.1-ui/index.html", "/1.0.2-ui/index.html"])
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => resource.ignitionState).then((stack) => {
+    await runner(() => action.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -165,12 +156,11 @@ test("found next patch version; recursive", async () => {
 })
 
 test("found next patch version; complex", async () => {
-    const { view } = found(["/1.1.0-ui/index.html", "/1.1.1-ui/index.html"])
-    const resource = view.resource
+    const { action } = found(["/1.1.0-ui/index.html", "/1.1.1-ui/index.html"])
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => resource.ignitionState).then((stack) => {
+    await runner(() => action.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -186,12 +176,15 @@ test("found next patch version; complex", async () => {
 })
 
 test("found next patch version; complex skipped", async () => {
-    const { view } = found(["/1.1.0-ui/index.html", "/1.1.1-ui/index.html", "/1.1.3-ui/index.html"])
-    const resource = view.resource
+    const { action } = found([
+        "/1.1.0-ui/index.html",
+        "/1.1.1-ui/index.html",
+        "/1.1.3-ui/index.html",
+    ])
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => resource.ignitionState).then((stack) => {
+    await runner(() => action.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -207,12 +200,11 @@ test("found next patch version; complex skipped", async () => {
 })
 
 test("found next minor version; complex current version", async () => {
-    const { view } = foundComplex(["/1.1.0-ui/index.html"])
-    const resource = view.resource
+    const { action } = foundComplex(["/1.1.0-ui/index.html"])
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => resource.ignitionState).then((stack) => {
+    await runner(() => action.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -228,12 +220,11 @@ test("found next minor version; complex current version", async () => {
 })
 
 test("invalid version url", async () => {
-    const { view } = invalidVersion()
-    const resource = view.resource
+    const { action } = invalidVersion()
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => resource.ignitionState).then((stack) => {
+    await runner(() => action.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -259,12 +250,11 @@ test("invalid ApplicationTargetPath", () => {
 })
 
 test("specify target", async () => {
-    const { view } = specifyTarget()
-    const resource = view.resource
+    const { action } = specifyTarget()
 
-    const runner = setupActionTestRunner(resource.subscriber)
+    const runner = setupActionTestRunner(action.subscriber)
 
-    await runner(() => resource.ignitionState).then((stack) => {
+    await runner(() => action.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -282,52 +272,32 @@ test("specify target", async () => {
     })
 })
 
-test("terminate", async () => {
-    const { view } = standard()
-
-    const runner = setupActionTestRunner(view.resource.subscriber)
-
-    await runner(() => {
-        view.terminate()
-        return view.resource.ignitionState
-    }).then((stack) => {
-        // no input/validate event after terminate
-        expect(stack).toEqual([])
-    })
-})
-
 function standard() {
-    const view = initView(standard_URL(), standard_version(), standard_check())
-    return { view }
+    return initResource(standard_URL(), standard_version(), standard_check())
 }
 function found(versions: string[]) {
-    const view = initView(standard_URL(), standard_version(), found_check(versions))
-    return { view }
+    return initResource(standard_URL(), standard_version(), found_check(versions))
 }
 function foundComplex(versions: string[]) {
-    const view = initView(complex_URL(), complex_Version(), found_check(versions))
-    return { view }
+    return initResource(complex_URL(), complex_Version(), found_check(versions))
 }
 function invalidVersion() {
-    const view = initView(invalidVersion_URL(), standard_version(), standard_check())
-    return { view }
+    return initResource(invalidVersion_URL(), standard_version(), standard_check())
 }
 function takeLongtime() {
-    const view = initView(standard_URL(), standard_version(), takeLongtime_check())
-    return { view }
+    return initResource(standard_URL(), standard_version(), takeLongtime_check())
 }
 function specifyTarget() {
-    const view = initView(specifyTarget_URL(), standard_version(), standard_check())
-    return { view }
+    return initResource(specifyTarget_URL(), standard_version(), standard_check())
 }
 
-function initView(
+function initResource(
     currentURL: URL,
     version: string,
     check: CheckDeployExistsRemote,
-): ApplicationView<FindNextVersionAction> {
-    return toApplicationView(
-        initFindNextVersionAction({
+): Readonly<{ action: FindNextVersionAction }> {
+    return {
+        action: initFindNextVersionAction({
             infra: {
                 check,
             },
@@ -338,7 +308,7 @@ function initView(
                 takeLongtimeThreshold: { wait_millisecond: 1 },
             },
         }),
-    )
+    }
 }
 
 function standard_version(): string {

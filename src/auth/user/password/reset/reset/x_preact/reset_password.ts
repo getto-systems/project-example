@@ -4,10 +4,7 @@ import { html } from "htm/preact"
 
 import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_error/reason"
 
-import {
-    useApplicationAction,
-    useApplicationView,
-} from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     buttons,
@@ -28,7 +25,6 @@ import { PasswordField } from "../../../input/x_preact/input"
 import { ClearChangesButton } from "../../../../../../common/x_preact/button/clear_changes_button"
 import { ChangeButton } from "../../../../../../common/x_preact/button/change_button"
 
-import { ApplicationView } from "../../../../../../z_vendor/getto-application/action/action"
 import { ResetPasswordAction } from "../action"
 import { SignLink } from "../../../../../sign/nav/action"
 
@@ -36,14 +32,9 @@ import { ResetPasswordError } from "../data"
 
 type Props = Readonly<{
     link: SignLink
-    reset: ApplicationView<ResetPasswordAction>
+    reset: ResetPasswordAction
 }>
-export function ResetPassword(viewProps: Props): VNode {
-    const props = {
-        link: viewProps.link,
-        reset: useApplicationView(viewProps.reset),
-    }
-
+export function ResetPassword(props: Props): VNode {
     const state = useApplicationAction(props.reset)
     const validateState = useApplicationAction(props.reset.validate)
     const observeState = useApplicationAction(props.reset.observe)

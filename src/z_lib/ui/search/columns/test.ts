@@ -32,26 +32,6 @@ test("select columns", async () => {
     })
 })
 
-test("terminate", async () => {
-    const { resource, store } = standard()
-
-    const runner = setupActionTestRunner({
-        subscribe: (handler) => {
-            resource.field.subscriber.subscribe(handler)
-        },
-        unsubscribe: () => null,
-    })
-
-    await runner(async () => {
-        resource.field.terminate()
-        store.columns.set(["column-a"])
-        return resource.field.currentState()
-    }).then((stack) => {
-        // no input/validate event after terminate
-        expect(stack).toEqual([])
-    })
-})
-
 function standard() {
     return initResource()
 }

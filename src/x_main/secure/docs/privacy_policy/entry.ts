@@ -1,7 +1,7 @@
 import { render, h } from "preact"
 
 import { newForegroundOutsideFeature } from "../../../../x_outside_feature/common"
-import { newDocsView } from "../../../../docs/init/resource"
+import { newDocsResource } from "../../../../docs/init/resource"
 
 import { Docs } from "../../../../docs/x_preact/docs"
 
@@ -9,7 +9,7 @@ import { content_privacyPolicy } from "../../../../x_content/privacy_policy"
 
 render(
     h(Docs, {
-        view: newDocsView(newForegroundOutsideFeature()),
+        ...newDocsResource(newForegroundOutsideFeature()),
         title: "プライバシーポリシー",
         docs: [content_privacyPolicy],
     }),

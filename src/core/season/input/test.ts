@@ -33,15 +33,6 @@ test("set value", async () => {
     expect(store.get()).toEqual("2021.summer")
 })
 
-test("terminate", async () => {
-    const { action } = standard()
-
-    action.terminate()
-
-    // input action では特に subscribe しないので確認することがない
-    expect(true).toBe(true)
-})
-
 function standard() {
     const action = initInputSeasonAction(standard_availableSeasons())
     const store = mockBoardValueStore(action.input)

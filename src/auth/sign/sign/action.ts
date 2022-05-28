@@ -1,7 +1,6 @@
 import {
     StatefulApplicationAction,
     AbstractStatefulApplicationAction,
-    ApplicationView,
 } from "../../../z_vendor/getto-application/action/action"
 import { CheckAuthTicketAction } from "../../ticket/check/action"
 import { AuthenticatePasswordAction } from "../../user/password/authenticate/action"
@@ -15,23 +14,23 @@ import { SignViewTypeDetecter } from "../router/infra"
 export type SignAction = StatefulApplicationAction<SignActionState>
 
 export interface SignViewFactory {
-    check(): ApplicationView<CheckAuthTicketAction>
+    check(): CheckAuthTicketAction
 
-    password_authenticate(): ApplicationView<AuthenticatePasswordAction>
+    password_authenticate(): AuthenticatePasswordAction
 
-    password_reset_requestToken(): ApplicationView<RequestResetTokenAction>
-    password_reset(): ApplicationView<ResetPasswordAction>
+    password_reset_requestToken(): RequestResetTokenAction
+    password_reset(): ResetPasswordAction
 }
 
 export type SignActionState =
     | Readonly<{ type: "initial" }>
     | Readonly<{ type: "static-privacyPolicy" }>
-    | View<"authTicket-check", ApplicationView<CheckAuthTicketAction>>
-    | View<"password-authenticate", ApplicationView<AuthenticatePasswordAction>>
-    | View<"password-reset-requestToken", ApplicationView<RequestResetTokenAction>>
-    | View<"password-reset", ApplicationView<ResetPasswordAction>>
+    | View<"authTicket-check", CheckAuthTicketAction>
+    | View<"password-authenticate", AuthenticatePasswordAction>
+    | View<"password-reset-requestToken", RequestResetTokenAction>
+    | View<"password-reset", ResetPasswordAction>
 
-type View<T, V> = Readonly<{ type: T; view: V }>
+type View<T, A> = Readonly<{ type: T; action: A }>
 
 const initialState: SignActionState = { type: "initial" }
 
@@ -51,10 +50,10 @@ class Action extends AbstractStatefulApplicationAction<SignActionState> implemen
     constructor(shell: SignActionShell, factory: SignViewFactory) {
         super({
             ignite: async () => {
-                const view = this.factory.check()
+                const checkAction = this.factory.check()
                 const viewType = shell.detectViewType()
 
-                view.resource.subscriber.subscribe((state) => {
+                checkAction.subscriber.subscribe((state) => {
                     switch (state.type) {
                         case "required-to-login":
                             this.post(this.mapViewType(viewType))
@@ -68,7 +67,7 @@ class Action extends AbstractStatefulApplicationAction<SignActionState> implemen
                             return this.post(this.mapViewType(viewType))
                     }
                 }
-                return this.post({ type: "authTicket-check", view })
+                return this.post({ type: "authTicket-check", action: checkAction })
             },
         })
         this.factory = factory
@@ -79,7 +78,7 @@ class Action extends AbstractStatefulApplicationAction<SignActionState> implemen
             // 特に指定が無ければパスワードログイン
             return {
                 type: "password-authenticate",
-                view: this.factory.password_authenticate(),
+                action: this.factory.password_authenticate(),
             }
         }
 
@@ -89,9 +88,9 @@ class Action extends AbstractStatefulApplicationAction<SignActionState> implemen
                 return { type }
 
             case "password-reset-requestToken":
-                return { type, view: this.factory.password_reset_requestToken() }
+                return { type, action: this.factory.password_reset_requestToken() }
             case "password-reset":
-                return { type, view: this.factory.password_reset() }
+                return { type, action: this.factory.password_reset() }
         }
     }
 }

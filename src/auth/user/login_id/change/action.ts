@@ -73,13 +73,7 @@ class OverwriteAction
     convert: { (): ConvertBoardResult<OverwriteLoginIdFields> }
 
     constructor(material: OverwriteLoginIdMaterial) {
-        super({
-            terminate: () => {
-                this.newLoginId.terminate()
-                this.validate.terminate()
-                this.observe.terminate()
-            },
-        })
+        super()
         this.material = material
 
         const newLoginId = initInputLoginIdAction()

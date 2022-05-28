@@ -31,25 +31,6 @@ test("observe; has changed", async () => {
     })
 })
 
-test("terminate", async () => {
-    const { action } = standard()
-
-    const runner = setupActionTestRunner({
-        subscribe: (handler) => {
-            action.observe.subscriber.subscribe(handler)
-        },
-        unsubscribe: () => null,
-    })
-
-    await runner(async () => {
-        action.terminate()
-        return action.observe.currentState()
-    }).then((stack) => {
-        // no input/validate event after terminate
-        expect(stack).toEqual([])
-    })
-})
-
 function standard() {
     const action = initInputGrantedAuthRolesAction()
     const store = {

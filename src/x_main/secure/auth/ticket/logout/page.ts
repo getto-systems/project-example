@@ -1,6 +1,5 @@
 import { h, VNode } from "preact"
 
-import { useApplicationView } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 import { useNotifyUnexpectedError } from "../../../../../avail/unexpected_error/notify/x_preact/hooks"
 import { useDocumentTitle } from "../../../../../common/x_preact/hooks"
 
@@ -21,15 +20,13 @@ import { LoadMenu } from "../../../../../common/outline/load/x_preact/load_menu"
 import { LoadBreadcrumbList } from "../../../../../common/outline/load/x_preact/load_breadcrumb_list"
 import { Logout } from "../../../../../auth/ticket/logout/x_preact/logout"
 
-import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 import { LogoutPageResource } from "./resource"
 
-export function LogoutPage(view: ApplicationView<LogoutPageResource>): VNode {
+export function LogoutPage(props: LogoutPageResource): VNode {
     const pageTitle = "ログアウト" as const
 
     useDocumentTitle(pageTitle)
-    const resource = useApplicationView(view)
-    const err = useNotifyUnexpectedError(resource)
+    const err = useNotifyUnexpectedError(props)
 
     if (err) {
         return h(ApplicationError, { err: `${err}` })
@@ -37,12 +34,12 @@ export function LogoutPage(view: ApplicationView<LogoutPageResource>): VNode {
 
     return appLayout({
         siteInfo,
-        header: [h(LoadSeason, resource)],
+        header: [h(LoadSeason, props)],
         main: appMain({
-            header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, resource)]),
-            body: mainBody(container(h(Logout, resource))),
+            header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, props)]),
+            body: mainBody(container(h(Logout, props))),
             copyright,
         }),
-        menu: h(LoadMenu, resource),
+        menu: h(LoadMenu, props),
     })
 }

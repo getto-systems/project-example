@@ -93,22 +93,31 @@ export function tableViewColumns(content: VNodeContent): VNode {
     return html`<section class="table__viewColumns">${content}</section>`
 }
 
-export type PagerOptionsContent = Readonly<{
+export type PagerOptionContent = Readonly<{
+    key: VNodeKey
+    value: string
+    label: VNodeContent
+}>
+export type PagerOptionsProps = Readonly<{
     all: number
     step: number
     content: { (params: PagerOptionsContentParams): VNodeContent }
 }>
 export type PagerOptionsContentParams = Readonly<{ start: number; end: number }>
-export function pagerOptions({ all, step, content }: PagerOptionsContent): readonly VNode[] {
+export function pagerOptions({
+    all,
+    step,
+    content,
+}: PagerOptionsProps): readonly PagerOptionContent[] {
     if (all === 0) {
-        return [html`<option value="0">${content({ start: 0, end: 0 })}</option>`]
+        return [{ key: 0, value: "0", label: content({ start: 0, end: 0 }) }]
     }
 
-    const options: VNode[] = []
+    const options: PagerOptionContent[] = []
     for (let i = 0; i < Math.ceil(all / step); i++) {
         const offset = i * step
         const params = { start: offset + 1, end: end(offset) }
-        options.push(html`<option value=${offset}>${content(params)}</option>`)
+        options.push({ key: offset, value: `${offset}`, label: content(params) })
     }
     return options
 

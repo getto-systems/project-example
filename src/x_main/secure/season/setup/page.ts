@@ -1,7 +1,5 @@
 import { h, VNode } from "preact"
 
-import { useApplicationView } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
-
 import {
     appLayout,
     appMain,
@@ -21,16 +19,14 @@ import { LoadMenu } from "../../../../common/outline/load/x_preact/load_menu"
 import { LoadBreadcrumbList } from "../../../../common/outline/load/x_preact/load_breadcrumb_list"
 import { SetupSeason } from "../../../../core/season/setup/x_preact/setup"
 
-import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 import { SetupSeasonPageResource } from "./resource"
 import { container } from "../../../../z_vendor/getto-css/preact/design/box"
 
-export function SetupSeasonPage(view: ApplicationView<SetupSeasonPageResource>): VNode {
+export function SetupSeasonPage(props: SetupSeasonPageResource): VNode {
     const pageTitle = "シーズン設定" as const
 
     useDocumentTitle(pageTitle)
-    const resource = useApplicationView(view)
-    const err = useNotifyUnexpectedError(resource)
+    const err = useNotifyUnexpectedError(props)
 
     if (err) {
         return h(ApplicationError, { err: `${err}` })
@@ -38,12 +34,12 @@ export function SetupSeasonPage(view: ApplicationView<SetupSeasonPageResource>):
 
     return appLayout({
         siteInfo,
-        header: [h(LoadSeason, resource)],
+        header: [h(LoadSeason, props)],
         main: appMain({
-            header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, resource)]),
-            body: mainBody(container([h(SetupSeason, resource)])),
+            header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, props)]),
+            body: mainBody(container([h(SetupSeason, props)])),
             copyright,
         }),
-        menu: h(LoadMenu, resource),
+        menu: h(LoadMenu, props),
     })
 }

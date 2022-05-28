@@ -12,7 +12,7 @@ use crate::{
 use super::action::{LoadOutlineMenuBadgeAction, LoadOutlineMenuBadgeMaterial};
 
 pub struct LoadOutlineMenuBadgeStruct<'a> {
-    check_permission: AuthorizeStruct<'a>,
+    authorize: AuthorizeStruct<'a>,
 
     menu_badge_repository: UnitedOutlineMenuBadgeRepository,
 }
@@ -24,11 +24,7 @@ impl<'a> LoadOutlineMenuBadgeStruct<'a> {
         metadata: &'a MetadataMap,
     ) -> LoadOutlineMenuBadgeAction<Self> {
         LoadOutlineMenuBadgeAction::with_material(Self {
-            check_permission: AuthorizeStruct::new(
-                &feature.auth.service,
-                request_id,
-                metadata,
-            ),
+            authorize: AuthorizeStruct::new(&feature.auth.service, request_id, metadata),
 
             menu_badge_repository: UnitedOutlineMenuBadgeRepository,
         })
@@ -42,7 +38,7 @@ impl<'a> LoadOutlineMenuBadgeMaterial for LoadOutlineMenuBadgeStruct<'a> {
     type MenuBadgeRepository = UnitedOutlineMenuBadgeRepository;
 
     fn authorize(&self) -> &Self::Authorize {
-        &self.check_permission
+        &self.authorize
     }
 
     fn menu_badge_repository(&self) -> &Self::MenuBadgeRepository {

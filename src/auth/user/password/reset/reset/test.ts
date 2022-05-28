@@ -1,7 +1,6 @@
 import { test, expect } from "vitest"
 import { setupActionTestRunner } from "../../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../../z_lib/ui/timer/helper"
-import { toApplicationView } from "../../../../../z_vendor/getto-application/action/helper"
 
 import { mockBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/test_helper"
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../../z_lib/ui/clock/mock"
@@ -20,7 +19,6 @@ import { CheckAuthTicketRemote } from "../../../../ticket/check/infra"
 import { BoardValueStore } from "../../../../../z_vendor/getto-application/board/input/infra"
 
 import { initResetPasswordAction, ResetPasswordAction } from "./action"
-import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")
@@ -34,8 +32,7 @@ const CONTINUOUS_RENEW_AT = [new Date("2020-01-01 10:01:00"), new Date("2020-01-
 const VALID_LOGIN = { loginId: "login-id", password: "password" } as const
 
 test("submit valid login-id and password", async () => {
-    const { clock, view, store } = standard()
-    const action = view.resource
+    const { clock, action, store } = standard()
 
     action.subscriber.subscribe((state) => {
         switch (state.type) {
@@ -67,8 +64,7 @@ test("submit valid login-id and password", async () => {
 
 test("submit valid login-id and password; with take longtime", async () => {
     // wait for take longtime timeout
-    const { clock, view, store } = takeLongtime()
-    const action = view.resource
+    const { clock, action, store } = takeLongtime()
 
     action.subscriber.subscribe((state) => {
         switch (state.type) {
@@ -100,8 +96,7 @@ test("submit valid login-id and password; with take longtime", async () => {
 })
 
 test("submit without fields", async () => {
-    const { view } = standard()
-    const action = view.resource
+    const { action } = standard()
 
     const runner = setupActionTestRunner(action.subscriber)
 
@@ -111,8 +106,7 @@ test("submit without fields", async () => {
 })
 
 test("submit without resetToken", async () => {
-    const { view, store } = noResetToken()
-    const action = view.resource
+    const { action, store } = noResetToken()
 
     const runner = setupActionTestRunner(action.subscriber)
 
@@ -125,8 +119,7 @@ test("submit without resetToken", async () => {
     })
 })
 test("submit with empty resetToken", async () => {
-    const { view, store } = emptyResetToken()
-    const action = view.resource
+    const { action, store } = emptyResetToken()
 
     const runner = setupActionTestRunner(action.subscriber)
 
@@ -140,20 +133,18 @@ test("submit with empty resetToken", async () => {
 })
 
 test("clear", () => {
-    const { view, store } = standard()
-    const resource = view.resource
+    const { action, store } = standard()
 
     store.loginId.set(VALID_LOGIN.loginId)
     store.password.set(VALID_LOGIN.password)
-    resource.clear()
+    action.clear()
 
     expect(store.loginId.get()).toEqual("")
     expect(store.password.get()).toEqual("")
 })
 
 test("load error", async () => {
-    const { view } = standard()
-    const action = view.resource
+    const { action } = standard()
 
     const runner = setupActionTestRunner(action.subscriber)
 
@@ -166,57 +157,34 @@ test("load error", async () => {
     )
 })
 
-test("terminate", async () => {
-    const { view } = standard()
-    const action = view.resource
-
-    const runner = setupActionTestRunner({
-        subscribe: (handler) => {
-            action.subscriber.subscribe(handler)
-            action.validate.subscriber.subscribe(handler)
-            action.loginId.validate.subscriber.subscribe(handler)
-            action.password.validate.subscriber.subscribe(handler)
-        },
-        unsubscribe: () => null,
-    })
-
-    await runner(async () => {
-        view.terminate()
-        action.submit()
-    }).then((stack) => {
-        // no input/validate event after terminate
-        expect(stack).toEqual([])
-    })
-})
-
 function standard() {
     const clockPubSub = mockClockPubSub()
     const clock = mockClock(START_AT, clockPubSub)
-    const view = initView(
+    const resource = initResource(
         standard_URL(),
         standard_resetRemote(clock),
         standard_renewRemote(clock, clockPubSub),
         clock,
     )
 
-    return { clock: clockPubSub, ...view }
+    return { clock: clockPubSub, ...resource }
 }
 function takeLongtime() {
     const clockPubSub = mockClockPubSub()
     const clock = mockClock(START_AT, clockPubSub)
-    const view = initView(
+    const resource = initResource(
         standard_URL(),
         takeLongtime_resetRemote(clock),
         standard_renewRemote(clock, clockPubSub),
         clock,
     )
 
-    return { clock: clockPubSub, ...view }
+    return { clock: clockPubSub, ...resource }
 }
 function noResetToken() {
     const clockPubSub = mockClockPubSub()
     const clock = mockClock(START_AT, clockPubSub)
-    return initView(
+    return initResource(
         noResetToken_URL(),
         standard_resetRemote(clock),
         standard_renewRemote(clock, clockPubSub),
@@ -226,7 +194,7 @@ function noResetToken() {
 function emptyResetToken() {
     const clockPubSub = mockClockPubSub()
     const clock = mockClock(START_AT, clockPubSub)
-    return initView(
+    return initResource(
         emptyResetToken_URL(),
         standard_resetRemote(clock),
         standard_renewRemote(clock, clockPubSub),
@@ -234,13 +202,13 @@ function emptyResetToken() {
     )
 }
 
-function initView(
+function initResource(
     currentURL: URL,
     resetRemote: ResetPasswordRemote,
     renewRemote: CheckAuthTicketRemote,
     clock: Clock,
 ): Readonly<{
-    view: ApplicationView<ResetPasswordAction>
+    action: ResetPasswordAction
     store: Readonly<{
         loginId: BoardValueStore
         password: BoardValueStore
@@ -248,30 +216,28 @@ function initView(
 }> {
     const ticketRepository = standard_ticketRepository()
 
-    const view = toApplicationView(
-        initResetPasswordAction({
-            infra: {
-                ticketRepository,
-                renewRemote,
-                resetRemote,
-                clock,
-            },
-            shell: mockResetPasswordShell(currentURL),
-            config: {
-                continuousRenewInterval: { interval_millisecond: 64 },
-                ticketExpire: { expire_millisecond: 500 },
-                takeLongtimeThreshold: { wait_millisecond: 32 },
-                secureServerURL: mockSecureServerURL("https://secure.example.com"),
-            },
-        }),
-    )
+    const action = initResetPasswordAction({
+        infra: {
+            ticketRepository,
+            renewRemote,
+            resetRemote,
+            clock,
+        },
+        shell: mockResetPasswordShell(currentURL),
+        config: {
+            continuousRenewInterval: { interval_millisecond: 64 },
+            ticketExpire: { expire_millisecond: 500 },
+            takeLongtimeThreshold: { wait_millisecond: 32 },
+            secureServerURL: mockSecureServerURL("https://secure.example.com"),
+        },
+    })
 
     const store = {
-        loginId: mockBoardValueStore(view.resource.loginId.input),
-        password: mockBoardValueStore(view.resource.password.input),
+        loginId: mockBoardValueStore(action.loginId.input),
+        password: mockBoardValueStore(action.password.input),
     }
 
-    return { view, store }
+    return { action, store }
 }
 
 function standard_URL(): URL {

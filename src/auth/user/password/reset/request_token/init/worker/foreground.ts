@@ -1,5 +1,3 @@
-import { ApplicationView } from "../../../../../../../z_vendor/getto-application/action/action"
-import { toApplicationView } from "../../../../../../../z_vendor/getto-application/action/helper"
 import { newWorkerProxyMap } from "../../../../../../../z_vendor/getto-application/action/worker/foreground"
 
 import {
@@ -13,15 +11,11 @@ import { newRequestResetTokenConfig } from "../config"
 
 import { RequestResetTokenProxyMessage, RequestResetTokenProxyResponse } from "./message"
 
-export function initRequestResetTokenView(
-    infra: RequestResetTokenInfra,
-): ApplicationView<RequestResetTokenAction> {
-    return toApplicationView(
-        initRequestResetTokenAction({
-            infra,
-            config: newRequestResetTokenConfig(),
-        }),
-    )
+export function newRequestResetTokenAction(infra: RequestResetTokenInfra): RequestResetTokenAction {
+    return initRequestResetTokenAction({
+        infra,
+        config: newRequestResetTokenConfig(),
+    })
 }
 
 export type RequestResetTokenProxy = Readonly<{

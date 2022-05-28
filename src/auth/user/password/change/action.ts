@@ -84,14 +84,7 @@ class Action
     convert: { (): ConvertBoardResult<ChangePasswordFields> }
 
     constructor(material: ChangePasswordMaterial) {
-        super({
-            terminate: () => {
-                this.currentPassword.terminate()
-                this.newPassword.terminate()
-                this.validate.terminate()
-                this.observe.terminate()
-            },
-        })
+        super()
         this.material = material
 
         const currentPassword = initInputPasswordAction()
@@ -214,13 +207,7 @@ class OverwriteAction
     convert: { (): ConvertBoardResult<OverwritePasswordFields> }
 
     constructor(material: OverwritePasswordMaterial) {
-        super({
-            terminate: () => {
-                this.newPassword.terminate()
-                this.validate.terminate()
-                this.observe.terminate()
-            },
-        })
+        super()
         this.material = material
 
         const fields = ["newPassword"] as const

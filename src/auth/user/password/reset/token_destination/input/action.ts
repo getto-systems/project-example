@@ -64,13 +64,7 @@ class DestinationAction
     }>
 
     constructor() {
-        super({
-            terminate: () => {
-                destinationType.subscriber.terminate()
-                email.subscriber.terminate()
-                validate.terminate()
-            },
-        })
+        super()
 
         const destinationType = initInputBoardAction()
         const email = initInputBoardAction()

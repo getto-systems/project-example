@@ -1,5 +1,3 @@
-import { ApplicationView } from "../../../../../../z_vendor/getto-application/action/action"
-import { toApplicationView } from "../../../../../../z_vendor/getto-application/action/helper"
 import { newWorkerProxyMap } from "../../../../../../z_vendor/getto-application/action/worker/foreground"
 
 import { newChangePasswordConfig } from "../config"
@@ -10,15 +8,11 @@ import { ChangePasswordRemoteResult } from "../../infra"
 
 import { ChangePasswordProxyMessage, ChangePasswordProxyResponse } from "./message"
 
-export function initChangePasswordView(
-    infra: ChangePasswordInfra,
-): ApplicationView<ChangePasswordAction> {
-    return toApplicationView(
-        initChangePasswordAction({
-            infra,
-            config: newChangePasswordConfig(),
-        }),
-    )
+export function newChangePasswordAction(infra: ChangePasswordInfra): ChangePasswordAction {
+    return initChangePasswordAction({
+        infra,
+        config: newChangePasswordConfig(),
+    })
 }
 
 export type ChangePasswordProxy = Readonly<{

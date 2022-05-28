@@ -1,4 +1,3 @@
-import { ApplicationAction } from "../../../../../z_vendor/getto-application/action/action"
 import {
     initInputBoardAction,
     InputBoardAction,
@@ -21,7 +20,7 @@ import {
 } from "../../../../../z_vendor/getto-application/board/validate_field/action"
 import { ValidateTextError } from "../../../../../z_lib/ui/validate/data"
 
-export interface InputAuthUserMemoAction extends ApplicationAction {
+export interface InputAuthUserMemoAction {
     readonly input: InputBoardAction<BoardValueStore>
     readonly validate: ValidateBoardFieldAction<AuthUserMemo, readonly ValidateTextError[]>
     readonly observe: ObserveBoardFieldAction
@@ -47,12 +46,6 @@ export function initInputAuthUserMemoAction(): InputAuthUserMemoAction {
     })
 
     return {
-        terminate: () => {
-            subscriber.terminate()
-            validate.terminate()
-            observe.terminate()
-        },
-
         input,
         validate,
         observe,

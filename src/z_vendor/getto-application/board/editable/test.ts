@@ -16,19 +16,6 @@ test("open / close", async () => {
     })
 })
 
-test("terminate", async () => {
-    const { action } = standard()
-
-    const runner = setupActionTestRunner(action.subscriber)
-
-    await runner(async () => {
-        action.terminate()
-        return action.open()
-    }).then((stack) => {
-        expect(stack).toEqual([])
-    })
-})
-
 function standard() {
     return { action: initEditableBoardAction() }
 }

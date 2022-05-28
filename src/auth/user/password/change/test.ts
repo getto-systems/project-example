@@ -72,28 +72,6 @@ test("clear", () => {
     expect(store.newPassword.get()).toEqual("")
 })
 
-test("terminate", async () => {
-    const { resource } = standard()
-
-    const runner = setupActionTestRunner({
-        subscribe: (handler) => {
-            resource.change.subscriber.subscribe(handler)
-            resource.change.validate.subscriber.subscribe(handler)
-            resource.change.currentPassword.validate.subscriber.subscribe(handler)
-            resource.change.newPassword.validate.subscriber.subscribe(handler)
-        },
-        unsubscribe: () => null,
-    })
-
-    await runner(async () => {
-        resource.change.terminate()
-        return resource.change.submit(() => null)
-    }).then((stack) => {
-        // no input/validate event after terminate
-        expect(stack).toEqual([])
-    })
-})
-
 function standard() {
     return initResource(standard_changeRemote())
 }

@@ -78,12 +78,7 @@ class Action
     convert: { (): ConvertBoardResult<ResetTokenDestination> }
 
     constructor(material: ChangeResetTokenDestinationMaterial) {
-        super({
-            terminate: () => {
-                this.destination.terminate()
-                this.validate.terminate()
-            },
-        })
+        super()
         this.material = material
 
         const destination = initInputResetTokenDestinationAction()

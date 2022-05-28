@@ -12,17 +12,12 @@ import { newOverwriteLoginIdAction } from "../../../../../auth/user/login_id/cha
 import { newModifyAuthUserAccountAction } from "../../../../../auth/user/account/modify/init/resource"
 import { newChangeResetTokenDestinationAction } from "../../../../../auth/user/password/reset/token_destination/change/init/resource"
 import { newUnregisterAuthUserAccountAction } from "../../../../../auth/user/account/unregister/init/resource"
-import { toRegisterUserAccountView } from "./common"
 
-import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 import { RegisterUserAccountPageResource } from "./resource"
 
 render(h(ManageUserAccountPage, props()), document.body)
 
-function props(): ApplicationView<RegisterUserAccountPageResource> {
-    return toRegisterUserAccountView({ resource: newResource() })
-}
-function newResource() {
+function props(): RegisterUserAccountPageResource {
     const feature = newForegroundOutsideFeature()
     const register = newRegisterAuthUserAccountAction(feature)
     return {

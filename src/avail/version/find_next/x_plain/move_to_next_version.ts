@@ -1,4 +1,3 @@
-import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 import { FindNextVersionAction, FindNextVersionState } from "../action"
 
 import { applicationPath } from "../helper"
@@ -6,11 +5,13 @@ import { applicationPath } from "../helper"
 import { ConvertLocationResult } from "../../../../z_lib/ui/location/data"
 import { ApplicationTargetPath } from "../data"
 
-export function MoveToNextVersion(view: ApplicationView<FindNextVersionAction>): void {
+type Props = Readonly<{
+    findNext: FindNextVersionAction
+}>
+export function MoveToNextVersion(props: Props): void {
     // /${version}/index.html とかで実行する
-    const findNext = view.resource
     try {
-        findNext.subscriber.subscribe(handleState)
+        props.findNext.subscriber.subscribe(handleState)
     } catch (err) {
         handleError(err)
     }
@@ -41,7 +42,7 @@ export function MoveToNextVersion(view: ApplicationView<FindNextVersionAction>):
             location.href = path.path
         }
 
-        view.terminate()
+        props.findNext.subscriber.unsubscribe(handleState)
     }
     function redirectPath(
         upToDate: boolean,
@@ -67,7 +68,7 @@ export function MoveToNextVersion(view: ApplicationView<FindNextVersionAction>):
     function handleError(err: unknown) {
         // エラーはどうしようもないので console.log でお茶を濁す
         console.log(err)
-        view.terminate()
+        props.findNext.subscriber.unsubscribe(handleState)
     }
 }
 

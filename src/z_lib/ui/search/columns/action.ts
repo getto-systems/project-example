@@ -50,9 +50,6 @@ class Action
     constructor(infra: SearchColumnsInfra) {
         super({
             ignite: () => this.load(),
-            terminate: () => {
-                subscriber.terminate()
-            },
         })
 
         const { input, store, subscriber } = initMultipleInputBoardAction()

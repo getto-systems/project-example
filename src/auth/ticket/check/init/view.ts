@@ -1,5 +1,3 @@
-import { toApplicationView } from "../../../../z_vendor/getto-application/action/helper"
-
 import { newCheckAuthTicketConfig } from "./config"
 
 import { newGetScriptPathShell } from "../../../sign/get_script_path/init/infra"
@@ -12,23 +10,18 @@ import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/featur
 import { LocationOutsideFeature } from "../../../../z_lib/ui/location/feature"
 
 import { CheckAuthTicketAction, initCheckAuthTicketAction } from "../action"
-import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 
 type OutsideFeature = RemoteOutsideFeature & RepositoryOutsideFeature & LocationOutsideFeature
-export function newCheckAuthTicketView(
-    feature: OutsideFeature,
-): ApplicationView<CheckAuthTicketAction> {
-    return toApplicationView(
-        initCheckAuthTicketAction({
-            infra: {
-                ticketRepository: newAuthTicketRepository(feature),
-                renewRemote: newCheckAuthTicketRemote(feature, newClock()),
-                clock: newClock(),
-            },
-            shell: {
-                ...newGetScriptPathShell(feature),
-            },
-            config: newCheckAuthTicketConfig(),
-        }),
-    )
+export function newCheckAuthTicketAction(feature: OutsideFeature): CheckAuthTicketAction {
+    return initCheckAuthTicketAction({
+        infra: {
+            ticketRepository: newAuthTicketRepository(feature),
+            renewRemote: newCheckAuthTicketRemote(feature, newClock()),
+            clock: newClock(),
+        },
+        shell: {
+            ...newGetScriptPathShell(feature),
+        },
+        config: newCheckAuthTicketConfig(),
+    })
 }

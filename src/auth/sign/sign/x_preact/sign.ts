@@ -2,10 +2,7 @@ import { h, VNode } from "preact"
 import { useErrorBoundary } from "preact/hooks"
 import { html } from "htm/preact"
 
-import {
-    useApplicationAction,
-    useApplicationView,
-} from "../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { ApplicationError } from "../../../../avail/x_preact/application_error"
 import { CheckAuthTicket } from "../../../ticket/check/x_preact/check_ticket"
@@ -14,19 +11,14 @@ import { RequestResetToken } from "../../../user/password/reset/request_token/x_
 import { ResetPassword } from "../../../user/password/reset/reset/x_preact/reset_password"
 import { PrivacyPolicy } from "./privacy_policy"
 
-import { ApplicationView } from "../../../../z_vendor/getto-application/action/action"
 import { SignAction } from "../action"
 import { SignLink } from "../../nav/action"
 
 type Props = Readonly<{
     link: SignLink
-    sign: ApplicationView<SignAction>
+    sign: SignAction
 }>
-export function Sign(viewProps: Props): VNode {
-    const props = {
-        link: viewProps.link,
-        sign: useApplicationView(viewProps.sign),
-    }
+export function Sign(props: Props): VNode {
     const state = useApplicationAction(props.sign)
     const [err] = useErrorBoundary((err) => {
         // 認証前なのでエラーはどうしようもない
@@ -45,15 +37,15 @@ export function Sign(viewProps: Props): VNode {
             return h(PrivacyPolicy, { link: props.link })
 
         case "authTicket-check":
-            return h(CheckAuthTicket, state.view)
+            return h(CheckAuthTicket, { check: state.action })
 
         case "password-authenticate":
-            return h(AuthenticatePassword, { link: props.link, authenticate: state.view })
+            return h(AuthenticatePassword, { link: props.link, authenticate: state.action })
 
         case "password-reset-requestToken":
-            return h(RequestResetToken, { link: props.link, requestToken: state.view })
+            return h(RequestResetToken, { link: props.link, requestToken: state.action })
 
         case "password-reset":
-            return h(ResetPassword, { link: props.link, reset: state.view })
+            return h(ResetPassword, { link: props.link, reset: state.action })
     }
 }

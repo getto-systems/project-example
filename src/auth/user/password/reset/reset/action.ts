@@ -95,14 +95,7 @@ class Action
     convert: { (): ConvertBoardResult<ResetPasswordFields> }
 
     constructor(material: ResetPasswordMaterial) {
-        super({
-            terminate: () => {
-                this.loginId.terminate()
-                this.password.terminate()
-                this.validate.terminate()
-                this.observe.terminate()
-            },
-        })
+        super()
         this.material = material
 
         const loginId = initInputLoginIdAction()

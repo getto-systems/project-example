@@ -17,9 +17,7 @@ import {
     ChangePasswordProxy,
     newChangePasswordProxy,
 } from "../../../../../auth/user/password/change/init/worker/foreground"
-import { toProfileView } from "../common"
 
-import { ApplicationView } from "../../../../../z_vendor/getto-application/action/action"
 import { initRequestResetTokenAction } from "../../../../../auth/user/password/reset/request_token/action"
 import { initChangePasswordAction } from "../../../../../auth/user/password/change/action"
 
@@ -38,10 +36,7 @@ async function renderEntry() {
     }
 }
 
-async function props(): Promise<ApplicationView<ProfilePageResource>> {
-    return toProfileView(await newResource())
-}
-async function newResource() {
+async function props(): Promise<ProfilePageResource> {
     const feature = await newWorkerForegroundOutsideFeature()
     const { worker } = feature
     const proxy = initProxy(postForegroundMessage)
@@ -53,14 +48,9 @@ async function newResource() {
     })
 
     return {
-        resource: {
-            ...newBaseResource(feature),
-            ...newChangePasswordResource(proxy),
-            ...newRequestResetTokenResource(proxy),
-        },
-        terminate: () => {
-            worker.terminate()
-        },
+        ...newBaseResource(feature),
+        ...newChangePasswordResource(proxy),
+        ...newRequestResetTokenResource(proxy),
     }
 
     function postForegroundMessage(message: ProfileForegroundMessage) {

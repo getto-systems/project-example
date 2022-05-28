@@ -39,25 +39,6 @@ test("submit; take long time", async () => {
     })
 })
 
-test("terminate", async () => {
-    const { resource, user } = standard()
-
-    const runner = setupActionTestRunner({
-        subscribe: (handler) => {
-            resource.unregister.subscriber.subscribe(handler)
-        },
-        unsubscribe: () => null,
-    })
-
-    await runner(async () => {
-        resource.unregister.terminate()
-        return resource.unregister.submit(user, () => null)
-    }).then((stack) => {
-        // no input/validate event after terminate
-        expect(stack).toEqual([])
-    })
-})
-
 function standard() {
     return initResource(standard_unregisterUserRemote())
 }

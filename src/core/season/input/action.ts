@@ -1,5 +1,3 @@
-import { ApplicationAction } from "../../../z_vendor/getto-application/action/action"
-
 import {
     InputBoardAction,
     initInputBoardAction,
@@ -20,7 +18,7 @@ import {
     ValidateBoardFieldAction,
 } from "../../../z_vendor/getto-application/board/validate_field/action"
 
-export interface InputSeasonAction extends ApplicationAction {
+export interface InputSeasonAction {
     readonly input: InputBoardAction<BoardValueStore>
     readonly validate: ValidateBoardFieldAction<DetectedSeason, ValidateSeasonError>
     readonly observe: ObserveBoardFieldAction
@@ -52,10 +50,6 @@ export function initInputSeasonAction(availableSeasons: readonly Season[]): Inpu
         reset: (season) => {
             store.set(seasonToString(season))
             observe.pin()
-        },
-        terminate: () => {
-            observe.terminate()
-            subscriber.terminate()
         },
     }
 }

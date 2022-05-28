@@ -5,10 +5,7 @@ import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
 import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_error/reason"
 
-import {
-    useApplicationAction,
-    useApplicationView,
-} from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationAction } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { buttons, fieldHelp_error } from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { loginBox } from "../../../../../../z_vendor/getto-css/preact/layout/login"
@@ -22,7 +19,6 @@ import { LoginIdField } from "../../../../login_id/input/x_preact/input"
 import { ClearChangesButton } from "../../../../../../common/x_preact/button/clear_changes_button"
 import { SendButton } from "../../../../../../common/x_preact/button/send_button"
 
-import { ApplicationView } from "../../../../../../z_vendor/getto-application/action/action"
 import { RequestResetTokenAction } from "../action"
 import { SignLink } from "../../../../../sign/nav/action"
 
@@ -30,13 +26,9 @@ import { RequestResetTokenError } from "../data"
 
 type Props = Readonly<{
     link: SignLink
-    requestToken: ApplicationView<RequestResetTokenAction>
+    requestToken: RequestResetTokenAction
 }>
-export function RequestResetToken(viewProps: Props): VNode {
-    const props = {
-        link: viewProps.link,
-        requestToken: useApplicationView(viewProps.requestToken),
-    }
+export function RequestResetToken(props: Props): VNode {
     const state = useApplicationAction(props.requestToken)
     const validateState = useApplicationAction(props.requestToken.validate)
     const observeState = useApplicationAction(props.requestToken.observe)

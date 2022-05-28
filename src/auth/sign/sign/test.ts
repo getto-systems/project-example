@@ -1,6 +1,5 @@
 import { test, expect } from "vitest"
 import { setupActionTestRunner } from "../../../z_vendor/getto-application/action/test_helper"
-import { toApplicationView } from "../../../z_vendor/getto-application/action/helper"
 
 import { newResetPasswordConfig } from "../../user/password/reset/reset/init/config"
 import { newAuthenticatePasswordConfig } from "../../user/password/authenticate/init/config"
@@ -32,7 +31,7 @@ test("redirect password authenticate", async () => {
         const state = await action.ignitionState
         switch (state.type) {
             case "authTicket-check":
-                await state.view.resource.ignitionState
+                await state.action.ignitionState
         }
         return state
     }).then((stack) => {
@@ -52,7 +51,7 @@ test("static privacy policy", async () => {
         const state = await action.ignitionState
         switch (state.type) {
             case "authTicket-check":
-                await state.view.resource.ignitionState
+                await state.action.ignitionState
         }
         return state
     }).then((stack) => {
@@ -72,7 +71,7 @@ test("password reset request token", async () => {
         const state = await action.ignitionState
         switch (state.type) {
             case "authTicket-check":
-                await state.view.resource.ignitionState
+                await state.action.ignitionState
         }
         return state
     }).then((stack) => {
@@ -130,57 +129,49 @@ function initAction(currentURL: URL): SignAction {
 
     return initSignAction(mockSignActionShell(currentURL), {
         check: () =>
-            toApplicationView(
-                initCheckAuthTicketAction({
-                    infra: {
-                        ticketRepository,
-                        renewRemote,
-                        clock,
-                    },
-                    shell: {
-                        ...mockGetScriptPathShell(currentURL),
-                    },
-                    config: newCheckAuthTicketConfig(),
-                }),
-            ),
+            initCheckAuthTicketAction({
+                infra: {
+                    ticketRepository,
+                    renewRemote,
+                    clock,
+                },
+                shell: {
+                    ...mockGetScriptPathShell(currentURL),
+                },
+                config: newCheckAuthTicketConfig(),
+            }),
 
         password_authenticate: () =>
-            toApplicationView(
-                initAuthenticatePasswordAction({
-                    infra: {
-                        ticketRepository,
-                        renewRemote,
-                        authenticateRemote,
-                        clock,
-                    },
-                    shell: {
-                        ...mockGetScriptPathShell(currentURL),
-                    },
-                    config: newAuthenticatePasswordConfig(),
-                }),
-            ),
+            initAuthenticatePasswordAction({
+                infra: {
+                    ticketRepository,
+                    renewRemote,
+                    authenticateRemote,
+                    clock,
+                },
+                shell: {
+                    ...mockGetScriptPathShell(currentURL),
+                },
+                config: newAuthenticatePasswordConfig(),
+            }),
         password_reset: () =>
-            toApplicationView(
-                initResetPasswordAction({
-                    infra: {
-                        ticketRepository,
-                        renewRemote,
-                        resetRemote,
-                        clock,
-                    },
-                    shell: mockResetPasswordShell(currentURL),
-                    config: newResetPasswordConfig(),
-                }),
-            ),
+            initResetPasswordAction({
+                infra: {
+                    ticketRepository,
+                    renewRemote,
+                    resetRemote,
+                    clock,
+                },
+                shell: mockResetPasswordShell(currentURL),
+                config: newResetPasswordConfig(),
+            }),
         password_reset_requestToken: () =>
-            toApplicationView(
-                initRequestResetTokenAction({
-                    infra: {
-                        requestTokenRemote,
-                    },
-                    config: newRequestResetTokenConfig(),
-                }),
-            ),
+            initRequestResetTokenAction({
+                infra: {
+                    requestTokenRemote,
+                },
+                config: newRequestResetTokenConfig(),
+            }),
     })
 }
 

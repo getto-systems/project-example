@@ -1,4 +1,3 @@
-import { ApplicationAction } from "../../../../../z_vendor/getto-application/action/action"
 import {
     initMultipleInputBoardAction,
     InputBoardAction,
@@ -21,7 +20,7 @@ import {
 } from "../../../../../z_vendor/getto-application/board/validate_field/action"
 import { ValidateBoardFieldResult } from "../../../../../z_vendor/getto-application/board/validate_field/data"
 
-export interface InputGrantedAuthRolesAction extends ApplicationAction {
+export interface InputGrantedAuthRolesAction {
     readonly input: InputBoardAction<MultipleBoardValueStore>
     readonly validate: ValidateBoardFieldAction<readonly AuthRole[], false>
     readonly observe: ObserveBoardFieldAction
@@ -58,15 +57,10 @@ export function initInputGrantedAuthRolesAction(): InputGrantedAuthRolesAction {
             store.set(grantedRoles)
             observe.pin()
         },
-        terminate: () => {
-            subscriber.terminate()
-            validate.terminate()
-            observe.terminate()
-        },
     }
 }
 
-export interface FilterGrantedRolesAction extends ApplicationAction {
+export interface FilterGrantedRolesAction {
     readonly input: InputBoardAction<MultipleBoardValueStore>
     readonly observe: ObserveBoardFieldAction
 
@@ -99,11 +93,6 @@ export function initFilterGrantedRolesAction(initial: readonly AuthRole[]): Read
             clear: () => {
                 store.set([])
                 observe.check()
-            },
-
-            terminate: () => {
-                subscriber.terminate()
-                observe.terminate()
             },
         },
         pin: () => {
