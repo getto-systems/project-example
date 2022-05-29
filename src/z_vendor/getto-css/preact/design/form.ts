@@ -51,7 +51,7 @@ export type InputFieldContent = NormalFieldContent &
     }>
 
 export function inputField(content: InputFieldContent): VNode {
-    const isEditable = content.editableState === undefined ? true : content.editableState
+    const isEditable = content.editableState === undefined ? true : content.editableState.isEditable
 
     if (!isEditable || content.validateState === undefined) {
         return content.label(field(content))
