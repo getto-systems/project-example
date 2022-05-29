@@ -37,7 +37,8 @@ export function AuthUserMemoField(props: Props): VNode {
         title: props.title || AUTH_USER_ACCOUNT["memo"],
         help: props.help,
         label: label_text_fill,
-        state:
+        editableState,
+        validateState:
             validateState.type === "initial" || validateState.result.valid
                 ? { type: "normal" }
                 : { type: "error", notice: textValidationError(validateState.result.err) },
