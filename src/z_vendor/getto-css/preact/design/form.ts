@@ -43,19 +43,26 @@ function mapFieldType(fieldType: FieldType): string {
 
 export type InputFieldContent = NormalFieldContent &
     Readonly<{
-        state:
+        editableState?: Readonly<{ isEditable: boolean }>
+        validateState?:
             | Readonly<{ type: "normal" }>
             | Readonly<{ type: "error"; notice: readonly VNodeContent[] }>
         label: { (content: VNode): VNode }
     }>
 
 export function inputField(content: InputFieldContent): VNode {
-    switch (content.state.type) {
+    const isEditable = content.editableState === undefined ? true : content.editableState
+
+    if (!isEditable || content.validateState === undefined) {
+        return content.label(field(content))
+    }
+
+    switch (content.validateState.type) {
         case "normal":
             return content.label(field(content))
 
         case "error":
-            return content.label(field_error({ ...content, notice: content.state.notice }))
+            return content.label(field_error({ ...content, notice: content.validateState.notice }))
     }
 }
 

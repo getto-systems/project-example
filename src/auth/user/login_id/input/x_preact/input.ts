@@ -28,7 +28,7 @@ export function LoginIdField(props: Props): VNode {
         title: props.title || AUTH_USER_ACCOUNT["login-id"],
         help: props.help,
         label: label_text_fill,
-        state:
+        validateState:
             validateState.type === "initial" || validateState.result.valid
                 ? { type: "normal" }
                 : { type: "error", notice: textValidationError(validateState.result.err) },

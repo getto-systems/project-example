@@ -41,7 +41,7 @@ export function GrantedRolesField(props: Props): VNode {
         title: props.title || AUTH_USER_ACCOUNT["granted-roles"],
         help: props.help,
         label,
-        state: { type: "normal" },
+        editableState,
         body: editableState.isEditable
             ? h(CheckboxBoard, {
                   input: props.field.input,
