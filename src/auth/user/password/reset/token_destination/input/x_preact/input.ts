@@ -1,5 +1,6 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
+import { VNodeContent } from "../../../../../../../z_lib/ui/x_preact/common"
 
 import { useApplicationAction } from "../../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 import { useEditableState } from "../../../../../../../z_vendor/getto-application/board/editable/x_preact/hooks"
@@ -9,8 +10,7 @@ import {
     label_text_fill,
 } from "../../../../../../../z_vendor/getto-css/preact/design/form"
 import { label_gray } from "../../../../../../../z_vendor/getto-css/preact/design/highlight"
-
-import { VNodeContent } from "../../../../../../../z_lib/ui/x_preact/common"
+import { mapValidateState } from "../../../../../../../z_lib/ui/input/x_preact/helper"
 
 import { InputBoard } from "../../../../../../../z_vendor/getto-application/board/input/x_preact/input"
 import {
@@ -21,9 +21,10 @@ import {
 import { InputResetTokenDestinationAction } from "../action"
 import { EditableBoardAction } from "../../../../../../../z_vendor/getto-application/board/editable/action"
 
+import { textValidationError } from "../../../../../../../z_lib/ui/validate/x_plain/error"
+
 import { ValidateResetTokenDestinationError } from "../data"
 import { ResetTokenDestination } from "../../kernel/data"
-import { textValidationError } from "../../../../../../../z_lib/ui/validate/x_plain/error"
 import { AUTH_USER_ACCOUNT } from "../../../../../account/kernel/data"
 
 type Props = Readonly<{
@@ -48,10 +49,7 @@ export function ResetTokenDestinationField(props: Props): VNode {
         help: props.help,
         label: label_text_fill,
         editableState,
-        validateState:
-            validateState.type === "initial" || validateState.result.valid
-                ? { type: "normal" }
-                : { type: "error", notice: validationError(validateState.result.err) },
+        validateState: mapValidateState(validateState, validationError),
         body: editableState.isEditable
             ? [
                   h(RadioBoard, {

@@ -9,6 +9,7 @@ import {
     inputField,
     label_text_fill,
 } from "../../../../../../z_vendor/getto-css/preact/design/form"
+import { mapValidateState } from "../../../../../../z_lib/ui/input/x_preact/helper"
 
 import { InputBoard } from "../../../../../../z_vendor/getto-application/board/input/x_preact/input"
 
@@ -38,10 +39,7 @@ export function AuthUserMemoField(props: Props): VNode {
         help: props.help,
         label: label_text_fill,
         editableState,
-        validateState:
-            validateState.type === "initial" || validateState.result.valid
-                ? { type: "normal" }
-                : { type: "error", notice: textValidationError(validateState.result.err) },
+        validateState: mapValidateState(validateState, textValidationError),
         body: editableState.isEditable
             ? h(InputBoard, { type: "text", input: props.field.input })
             : editableState.data.memo,
