@@ -1,10 +1,10 @@
 import { h, VNode } from "preact"
+import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { inputField, label_text_fill } from "../../../../../z_vendor/getto-css/preact/design/form"
-
-import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
+import { mapValidateState } from "../../../../../z_lib/ui/input/x_preact/helper"
 
 import { InputBoard } from "../../../../../z_vendor/getto-application/board/input/x_preact/input"
 
@@ -28,10 +28,7 @@ export function LoginIdField(props: Props): VNode {
         title: props.title || AUTH_USER_ACCOUNT["login-id"],
         help: props.help,
         label: label_text_fill,
-        validateState:
-            validateState.type === "initial" || validateState.result.valid
-                ? { type: "normal" }
-                : { type: "error", notice: textValidationError(validateState.result.err) },
+        validateState: mapValidateState(validateState, textValidationError),
         body: h(InputBoard, {
             type: "text",
             input: props.field.input,
