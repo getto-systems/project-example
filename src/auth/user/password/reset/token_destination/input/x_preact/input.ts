@@ -21,10 +21,9 @@ import {
 import { InputResetTokenDestinationAction } from "../action"
 import { EditableBoardAction } from "../../../../../../../z_vendor/getto-application/board/editable/action"
 
-import { textValidationError } from "../../../../../../../z_lib/ui/validate/x_plain/error"
-
 import { ValidateResetTokenDestinationError } from "../data"
 import { ResetTokenDestination } from "../../kernel/data"
+import { textValidationError } from "../../../../../../../z_lib/ui/validate/x_plain/error"
 import { AUTH_USER_ACCOUNT } from "../../../../../account/kernel/data"
 
 type Props = Readonly<{

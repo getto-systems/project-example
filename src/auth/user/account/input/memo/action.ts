@@ -6,6 +6,10 @@ import {
     initObserveBoardFieldAction,
     ObserveBoardFieldAction,
 } from "../../../../../z_vendor/getto-application/board/observe_field/action"
+import {
+    initValidateBoardFieldAction,
+    ValidateBoardFieldAction,
+} from "../../../../../z_vendor/getto-application/board/validate_field/action"
 
 import { initBoardFieldObserver } from "../../../../../z_vendor/getto-application/board/observe_field/init/observer"
 
@@ -14,10 +18,6 @@ import { authUserMemoBoardConverter } from "./convert"
 import { BoardValueStore } from "../../../../../z_vendor/getto-application/board/input/infra"
 
 import { AuthUserMemo } from "../../kernel/data"
-import {
-    initValidateBoardFieldAction,
-    ValidateBoardFieldAction,
-} from "../../../../../z_vendor/getto-application/board/validate_field/action"
 import { ValidateTextError } from "../../../../../z_lib/ui/validate/data"
 
 export interface InputAuthUserMemoAction {

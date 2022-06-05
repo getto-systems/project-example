@@ -82,6 +82,10 @@ pub struct SearchSort<K> {
 }
 
 impl<K> SearchSort<K> {
+    pub fn restore(key: K, order: SearchSortOrder) -> Self {
+        Self { key, order }
+    }
+
     pub fn key(&self) -> &K {
         &self.key
     }
