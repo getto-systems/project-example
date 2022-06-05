@@ -31,11 +31,7 @@ type Summary = {
 export function useAuthUserAccountTableStructure(
     list: ListAuthUserAccountAction,
 ): SearchAuthUserAccountTableStructure {
-    return useMemo(() => {
-        const structure = build(list)
-        list.columns.set(structure.initialVisibleCells())
-        return structure
-    }, [list])
+    return useMemo(() => build(list), [list])
 }
 
 function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStructure {
