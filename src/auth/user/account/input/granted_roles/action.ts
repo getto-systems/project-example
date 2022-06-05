@@ -6,6 +6,10 @@ import {
     initObserveBoardFieldAction,
     ObserveBoardFieldAction,
 } from "../../../../../z_vendor/getto-application/board/observe_field/action"
+import {
+    initValidateBoardFieldAction,
+    ValidateBoardFieldAction,
+} from "../../../../../z_vendor/getto-application/board/validate_field/action"
 
 import { initBoardFieldObserver } from "../../../../../z_vendor/getto-application/board/observe_field/init/observer"
 import { isSameMultipleBoardValue } from "../../../../../z_vendor/getto-application/board/observe_field/helper"
@@ -14,10 +18,6 @@ import { toGrantedRoles } from "./convert"
 import { MultipleBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/infra"
 
 import { AuthRole } from "../../../kernel/data"
-import {
-    initValidateBoardFieldAction,
-    ValidateBoardFieldAction,
-} from "../../../../../z_vendor/getto-application/board/validate_field/action"
 import { ValidateBoardFieldResult } from "../../../../../z_vendor/getto-application/board/validate_field/data"
 
 export interface InputGrantedAuthRolesAction {

@@ -41,6 +41,7 @@ export function SelectBoard({ input, options }: Props): VNode {
         if (target instanceof HTMLSelectElement) {
             store.set(readBoardValue(target))
         }
+        input.publisher.post()
     }
 }
 

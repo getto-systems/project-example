@@ -24,11 +24,12 @@ test("select columns", async () => {
         return resource.field.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "success", columns: [] },
-            { type: "success", columns: ["column-initial"] },
-            { type: "success", columns: ["column-a"] },
-            { type: "success", columns: ["column-a", "column-b"] },
+            { type: "success" },
+            { type: "success" },
+            { type: "success" },
+            { type: "success" },
         ])
+        expect(resource.field.get()).toEqual(["column-a", "column-b"])
     })
 })
 

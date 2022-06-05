@@ -7,18 +7,16 @@ import {
     initMultipleInputBoardAction,
 } from "../../../../z_vendor/getto-application/board/input/action"
 
-import { toSearchColumns } from "./convert"
-
 import { SearchColumnsRepository } from "./infra"
 import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
-import { SearchColumns } from "./data"
 import { RepositoryError } from "../../repository/data"
 
 export interface SearchColumnsAction extends StatefulApplicationAction<SearchColumnsState> {
     readonly input: InputBoardAction<MultipleBoardValueStore>
 
     set(columns: readonly string[]): Promise<SearchColumnsState>
+    get(): readonly string[]
 }
 
 export type SearchColumnsInfra = Readonly<{
@@ -27,7 +25,7 @@ export type SearchColumnsInfra = Readonly<{
 
 export type SearchColumnsState =
     | Readonly<{ type: "initial" }>
-    | Readonly<{ type: "success"; columns: SearchColumns }>
+    | Readonly<{ type: "success" }>
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
 const initialState: SearchColumnsState = { type: "initial" }
@@ -59,22 +57,25 @@ class Action
         this.infra = infra
 
         subscriber.subscribe(() => {
-            this.save(toSearchColumns(store.get()))
+            this.save(store.get())
         })
     }
 
     async set(columns: readonly string[]): Promise<SearchColumnsState> {
         this.store.set(columns)
-        return this.post({ type: "success", columns: toSearchColumns(columns) })
+        return this.post({ type: "success" })
+    }
+    get(): readonly string[] {
+        return this.store.get()
     }
 
-    async save(columns: SearchColumns): Promise<SearchColumnsState> {
+    async save(columns: readonly string[]): Promise<SearchColumnsState> {
         const { columnsRepository } = this.infra
         const result = await columnsRepository.set(columns)
         if (!result.success) {
             return this.post({ type: "repository-error", err: result.err })
         }
-        return this.post({ type: "success", columns })
+        return this.post({ type: "success" })
     }
 
     async load(): Promise<SearchColumnsState> {
@@ -88,6 +89,6 @@ class Action
             return this.post(this.currentState())
         }
 
-        return this.post({ type: "success", columns: columnsResult.value })
+        return this.set(columnsResult.value)
     }
 }
