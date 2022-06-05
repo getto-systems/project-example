@@ -18,17 +18,11 @@ test("select columns", async () => {
 
     await runner(async () => {
         await resource.field.ignitionState
-        await resource.field.set(["column-initial"])
         store.columns.set(["column-a"])
         store.columns.set(["column-a", "column-b"])
         return resource.field.currentState()
     }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "success" },
-            { type: "success" },
-            { type: "success" },
-            { type: "success" },
-        ])
+        expect(stack).toEqual([{ type: "success" }, { type: "success" }, { type: "success" }])
         expect(resource.field.get()).toEqual(["column-a", "column-b"])
     })
 })

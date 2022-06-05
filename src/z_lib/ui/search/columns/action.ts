@@ -15,7 +15,6 @@ import { RepositoryError } from "../../repository/data"
 export interface SearchColumnsAction extends StatefulApplicationAction<SearchColumnsState> {
     readonly input: InputBoardAction<MultipleBoardValueStore>
 
-    set(columns: readonly string[]): Promise<SearchColumnsState>
     get(): readonly string[]
 }
 
@@ -61,10 +60,6 @@ class Action
         })
     }
 
-    async set(columns: readonly string[]): Promise<SearchColumnsState> {
-        this.store.set(columns)
-        return this.post({ type: "success" })
-    }
     get(): readonly string[] {
         return this.store.get()
     }
@@ -89,6 +84,7 @@ class Action
             return this.post(this.currentState())
         }
 
-        return this.set(columnsResult.value)
+        this.store.set(columnsResult.value)
+        return this.post({ type: "success" })
     }
 }
