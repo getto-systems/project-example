@@ -99,18 +99,30 @@ test("validate; valid : just max-length : multi-byte", async () => {
     })
 })
 
-test("password character state : single byte", () => {
+test("password character state : single byte", async () => {
     const { action, store } = standard()
 
-    store.set("password")
-    expect(action.checkCharacter()).toEqual({ multiByte: false })
+    const runner = setupActionTestRunner(action.character.subscriber)
+
+    await runner(async () => {
+        store.set("password")
+        return action.character.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual([{ multiByte: false }])
+    })
 })
 
-test("password character state : multi byte", () => {
+test("password character state : multi byte", async () => {
     const { action, store } = standard()
 
-    store.set("パスワード")
-    expect(action.checkCharacter()).toEqual({ multiByte: true })
+    const runner = setupActionTestRunner(action.character.subscriber)
+
+    await runner(async () => {
+        store.set("パスワード")
+        return action.character.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual([{ multiByte: true }])
+    })
 })
 
 test("clear", () => {
