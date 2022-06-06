@@ -38,7 +38,7 @@ export function GrantedRolesField(props: Props): VNode {
     const editableState = useEditableState(props.edit)
 
     return inputField({
-        title: props.title || AUTH_USER_ACCOUNT["granted-roles"],
+        title: props.title || AUTH_USER_ACCOUNT["grantedRoles"],
         help: props.help,
         label,
         editableState,

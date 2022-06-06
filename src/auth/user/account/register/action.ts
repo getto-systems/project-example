@@ -22,7 +22,7 @@ import {
     initInputResetTokenDestinationAction,
     InputResetTokenDestinationAction,
 } from "../../password/reset/token_destination/input/action"
-import { initInputAuthUserMemoAction, InputAuthUserMemoAction } from "../input/memo/action"
+import { AuthUserTextFieldAction, initAuthUserTextFieldAction } from "../input/field/action"
 
 import { RegisterAuthUserAccountRemote } from "./infra"
 import { WaitTime } from "../../../../z_lib/ui/config/infra"
@@ -31,7 +31,6 @@ import { RegisterAuthUserAccountError } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { AuthUserAccount } from "../kernel/data"
 import { LoginId } from "../../login_id/kernel/data"
-import { restoreAuthUserMemo } from "../input/memo/convert"
 
 export interface RegisterAuthUserAccountAction
     extends StatefulApplicationAction<RegisterAuthUserAccountState> {
@@ -40,7 +39,7 @@ export interface RegisterAuthUserAccountAction
     readonly loginId: InputLoginIdAction
     readonly grantedRoles: InputGrantedAuthRolesAction
     readonly resetTokenDestination: InputResetTokenDestinationAction
-    readonly memo: InputAuthUserMemoAction
+    readonly memo: AuthUserTextFieldAction<"memo">
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -108,7 +107,7 @@ class Action
     readonly loginId: InputLoginIdAction
     readonly grantedRoles: InputGrantedAuthRolesAction
     readonly resetTokenDestination: InputResetTokenDestinationAction
-    readonly memo: InputAuthUserMemoAction
+    readonly memo: AuthUserTextFieldAction<"memo">
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -122,7 +121,7 @@ class Action
         const loginId = initInputLoginIdAction()
         const grantedRoles = initInputGrantedAuthRolesAction()
         const resetTokenDestination = initInputResetTokenDestinationAction()
-        const memo = initInputAuthUserMemoAction()
+        const memo = initAuthUserTextFieldAction("memo")
 
         const fields = ["loginId", "grantedRoles", "resetTokenDestination", "memo"] as const
         const convert = (): ConvertBoardResult<AuthUserAccount> => {
@@ -180,7 +179,7 @@ class Action
         this.loginId.clear()
         this.grantedRoles.reset([])
         this.resetTokenDestination.reset({ type: "none" })
-        this.memo.reset(restoreAuthUserMemo(""))
+        this.memo.clear()
         this.validate.clear()
         this.observe.clear()
         return this.currentState()

@@ -10,7 +10,7 @@ import {
     label_text_fill,
 } from "../../../../../../../z_vendor/getto-css/preact/design/form"
 import { label_gray } from "../../../../../../../z_vendor/getto-css/preact/design/highlight"
-import { mapValidateState } from "../../../../../../../z_lib/ui/field/x_preact/helper"
+import { mapValidateState } from "../../../../../../../z_lib/ui/input/field/x_preact/helper"
 
 import { InputBoard } from "../../../../../../../z_vendor/getto-application/board/input/x_preact/input"
 import {
@@ -44,7 +44,7 @@ export function ResetTokenDestinationField(props: Props): VNode {
     const validateState = useApplicationAction(props.field.validate)
 
     return inputField({
-        title: props.title || AUTH_USER_ACCOUNT["reset-token-destination"],
+        title: props.title || AUTH_USER_ACCOUNT["resetTokenDestination"],
         help: props.help,
         label: label_text_fill,
         editableState,

@@ -39,7 +39,7 @@ export function readSearchAuthUserAccountSortKey(
     key: string,
 ): ReadSearchSortKeyResult<SearchAuthUserAccountSortKey> {
     switch (key) {
-        case "login-id":
+        case "loginId":
             return { found: true, key }
 
         default:

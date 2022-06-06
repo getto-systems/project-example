@@ -13,7 +13,7 @@ import { takeLongtimeField, validationMessage } from "../../../../../common/x_pr
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
 import { StaticLoginIdField } from "../../../login_id/input/x_preact/static"
-import { AuthUserMemoField } from "../../input/memo/x_preact/input"
+import { AuthUserMemoField } from "../../input/field/x_preact/input"
 import { GrantedRolesField } from "../../input/granted_roles/x_preact/input"
 import { EditButton } from "../../../../../common/x_preact/button/edit_button"
 import { EditSuccessButton } from "../../../../../common/x_preact/button/edit_success_button"
@@ -29,10 +29,14 @@ import { ModifyAuthUserAccountAction } from "../action"
 import { ModifyAuthUserAccountError, ModifyAuthUserAccountFields } from "../data"
 import { LoginId } from "../../../login_id/kernel/data"
 import { AuthRole } from "../../../kernel/data"
-import { AuthUserMemo } from "../../kernel/data"
+import { TypeAuthUser } from "../../kernel/data"
 
 type Props = Readonly<{
-    user: Readonly<{ loginId: LoginId; grantedRoles: readonly AuthRole[]; memo: AuthUserMemo }>
+    user: Readonly<{
+        loginId: LoginId
+        grantedRoles: readonly AuthRole[]
+        memo: TypeAuthUser<"memo">
+    }>
     editable: EditableBoardAction
     modify: ModifyAuthUserAccountAction
     onSuccess: { (fields: ModifyAuthUserAccountFields): void }

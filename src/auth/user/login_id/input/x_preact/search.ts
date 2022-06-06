@@ -14,7 +14,7 @@ type Props = Readonly<{ field: FilterLoginIdAction }> &
 export function SearchLoginIdField(props: Props): VNode {
     return search({
         label,
-        title: props.title || AUTH_USER_ACCOUNT["login-id"],
+        title: props.title || AUTH_USER_ACCOUNT["loginId"],
         body: h(InputBoard, { type: "text", input: props.field.input }),
         help: props.help,
     })

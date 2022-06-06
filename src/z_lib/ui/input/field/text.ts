@@ -1,24 +1,24 @@
 import {
     initInputBoardAction,
     InputBoardAction,
-} from "../../../z_vendor/getto-application/board/input/action"
+} from "../../../../z_vendor/getto-application/board/input/action"
 import {
     initObserveBoardFieldAction,
     ObserveBoardFieldAction,
-} from "../../../z_vendor/getto-application/board/observe_field/action"
+} from "../../../../z_vendor/getto-application/board/observe_field/action"
 import {
     initValidateBoardFieldAction,
     ValidateBoardFieldAction,
-} from "../../../z_vendor/getto-application/board/validate_field/action"
+} from "../../../../z_vendor/getto-application/board/validate_field/action"
 
-import { initBoardFieldObserver } from "../../../z_vendor/getto-application/board/observe_field/init/observer"
+import { initBoardFieldObserver } from "../../../../z_vendor/getto-application/board/observe_field/init/observer"
 
-import { BoardValueStore } from "../../../z_vendor/getto-application/board/input/infra"
+import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
-import { ValidateBoardFieldResult } from "../../../z_vendor/getto-application/board/validate_field/data"
-import { ValidateTextError } from "../validate/data"
+import { ValidateBoardFieldResult } from "../../../../z_vendor/getto-application/board/validate_field/data"
+import { ValidateTextError } from "../../validate/data"
 
-export interface InputTextFieldAction<T> {
+export interface TextFieldAction<T> {
     readonly input: InputBoardAction<BoardValueStore>
     readonly validate: ValidateBoardFieldAction<T, readonly ValidateTextError[]>
     readonly observe: ObserveBoardFieldAction
@@ -27,12 +27,12 @@ export interface InputTextFieldAction<T> {
     reset(value: T): void
 }
 
-export type InputTextFieldProps<T> = Readonly<{
+export type TextFieldProps<T> = Readonly<{
     convert: (value: string) => ValidateBoardFieldResult<T, readonly ValidateTextError[]>
 }>
-export function initInputTextFieldAction<T extends string>(
-    props: InputTextFieldProps<T>,
-): InputTextFieldAction<T> {
+export function initTextFieldAction<T extends string>(
+    props: TextFieldProps<T>,
+): TextFieldAction<T> {
     const { input, store, subscriber } = initInputBoardAction()
 
     const validate = initValidateBoardFieldAction({

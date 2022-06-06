@@ -27,7 +27,7 @@ type Props = Readonly<{
 export function SearchGrantedRolesField(props: Props): VNode {
     return search_double({
         label,
-        title: props.title || AUTH_USER_ACCOUNT["granted-roles"],
+        title: props.title || AUTH_USER_ACCOUNT["grantedRoles"],
         help: props.help,
         body: h(CheckboxBoard, {
             input: props.field.input,

@@ -1,6 +1,6 @@
-import { VNodeContent } from "../../x_preact/common"
+import { VNodeContent } from "../../../x_preact/common"
 
-import { ValidateBoardFieldState } from "../../../../z_vendor/getto-application/board/validate_field/action"
+import { ValidateBoardFieldState } from "../../../../../z_vendor/getto-application/board/validate_field/action"
 
 type ValidateState =
     | Readonly<{ type: "normal" }>

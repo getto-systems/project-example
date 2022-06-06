@@ -9,28 +9,32 @@ import {
     inputField,
     label_text_fill,
 } from "../../../../../../z_vendor/getto-css/preact/design/form"
-import { mapValidateState } from "../../../../../../z_lib/ui/field/x_preact/helper"
+import { mapValidateState } from "../../../../../../z_lib/ui/input/field/x_preact/helper"
 
 import { InputBoard } from "../../../../../../z_vendor/getto-application/board/input/x_preact/input"
 
+import { authUserMemo } from "../../../kernel/x_preact/field"
+
 import { textValidationError } from "../../../../../../z_lib/ui/validate/x_plain/error"
 
-import { InputAuthUserMemoAction } from "../action"
+import { AuthUserTextFieldAction } from "../action"
 import { EditableBoardAction } from "../../../../../../z_vendor/getto-application/board/editable/action"
 
-import { AuthUserMemo, AUTH_USER_ACCOUNT } from "../../../kernel/data"
+import { AuthUserTextField } from "../convert"
 
-type Props = Readonly<{ field: InputAuthUserMemoAction }> &
+import { TypeAuthUser, AUTH_USER_ACCOUNT } from "../../../kernel/data"
+
+type TextProps<K extends AuthUserTextField> = Readonly<{ field: AuthUserTextFieldAction<K> }> &
     Partial<{
         title: VNodeContent
         help: readonly VNodeContent[]
         edit: Readonly<{
-            data: Readonly<{ memo: AuthUserMemo }>
+            data: Readonly<{ [key in K]: TypeAuthUser<K> }>
             editable: EditableBoardAction
         }>
     }>
 
-export function AuthUserMemoField(props: Props): VNode {
+export function AuthUserMemoField(props: TextProps<"memo">): VNode {
     const validateState = useApplicationAction(props.field.validate)
     const editableState = useEditableState(props.edit)
 
@@ -42,6 +46,6 @@ export function AuthUserMemoField(props: Props): VNode {
         validateState: mapValidateState(validateState, textValidationError),
         body: editableState.isEditable
             ? h(InputBoard, { type: "text", input: props.field.input })
-            : editableState.data.memo,
+            : authUserMemo(editableState.data),
     })
 }

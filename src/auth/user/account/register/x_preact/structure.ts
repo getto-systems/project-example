@@ -42,7 +42,7 @@ function build(
             column: editLink,
         })).alwaysVisible(),
 
-        tableCell("login-id", (key) => ({
+        tableCell("loginId", (key) => ({
             label: AUTH_USER_ACCOUNT[key],
             header: linky,
             column: loginId,
@@ -50,13 +50,13 @@ function build(
             .alwaysVisible()
             .border(["leftDouble"]),
 
-        tableCell("granted-roles", (key) => ({
+        tableCell("grantedRoles", (key) => ({
             label: AUTH_USER_ACCOUNT[key],
             header: linky,
             column: grantedRoles,
         })).border(["left"]),
 
-        tableCell("reset-token-destination", (key) => ({
+        tableCell("resetTokenDestination", (key) => ({
             label: AUTH_USER_ACCOUNT[key],
             header: linky,
             column: resetTokenDestination,

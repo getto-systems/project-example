@@ -16,7 +16,7 @@ type Props = Readonly<{
     }>
 export function StaticLoginIdField(props: Props): VNode {
     return field({
-        title: props.title || AUTH_USER_ACCOUNT["login-id"],
+        title: props.title || AUTH_USER_ACCOUNT["loginId"],
         body: props.user.loginId,
         help: props.help,
     })

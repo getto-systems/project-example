@@ -9,7 +9,7 @@ import {
 import { ModifyAuthUserAccountAction, initModifyAuthUserAccountAction } from "./action"
 
 import { restoreLoginId } from "../../login_id/input/convert"
-import { restoreAuthUserMemo } from "../input/memo/convert"
+import { restoreAuthUserField } from "../kernel/convert"
 
 import { ModifyAuthUserAccountRemote } from "./infra"
 import {
@@ -121,7 +121,7 @@ function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
         user: {
             loginId: restoreLoginId("user-id"),
             grantedRoles: [],
-            memo: restoreAuthUserMemo("initial-memo"),
+            memo: restoreAuthUserField("initial-memo"),
         },
     }
 }

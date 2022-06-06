@@ -9,7 +9,6 @@ import {
     initInputGrantedAuthRolesAction,
     InputGrantedAuthRolesAction,
 } from "../input/granted_roles/action"
-import { initInputAuthUserMemoAction, InputAuthUserMemoAction } from "../input/memo/action"
 import {
     initObserveBoardAction,
     ObserveBoardAction,
@@ -18,6 +17,7 @@ import {
     initValidateBoardAction,
     ValidateBoardAction,
 } from "../../../../z_vendor/getto-application/board/validate_board/action"
+import { AuthUserTextFieldAction, initAuthUserTextFieldAction } from "../input/field/action"
 
 import { ModifyAuthUserAccountRemote } from "./infra"
 import { WaitTime } from "../../../../z_lib/ui/config/infra"
@@ -29,7 +29,7 @@ import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board
 
 export interface ModifyAuthUserAccountAction
     extends StatefulApplicationAction<ModifyAuthUserAccountState> {
-    readonly memo: InputAuthUserMemoAction
+    readonly memo: AuthUserTextFieldAction<"memo">
     readonly grantedRoles: InputGrantedAuthRolesAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
@@ -71,7 +71,7 @@ class Action
 {
     readonly initialState = initialState
 
-    readonly memo: InputAuthUserMemoAction
+    readonly memo: AuthUserTextFieldAction<"memo">
     readonly grantedRoles: InputGrantedAuthRolesAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
@@ -86,7 +86,7 @@ class Action
         super()
         this.material = material
 
-        const memo = initInputAuthUserMemoAction()
+        const memo = initAuthUserTextFieldAction("memo")
         const grantedRoles = initInputGrantedAuthRolesAction()
 
         const fields = ["memo", "grantedRoles"] as const

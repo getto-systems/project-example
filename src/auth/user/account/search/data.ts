@@ -13,10 +13,10 @@ export type SearchAuthUserAccountFilterProps = Readonly<{
     grantedRoles: readonly AuthRole[]
 }>
 
-export type SearchAuthUserAccountSort = SearchSort<"login-id">
+export type SearchAuthUserAccountSort = SearchSort<"loginId">
 export type SearchAuthUserAccountSortKey = SearchAuthUserAccountSort["key"]
 
-export const defaultSearchAuthUserAccountSort: SearchAuthUserAccountSortKey = "login-id"
+export const defaultSearchAuthUserAccountSort: SearchAuthUserAccountSortKey = "loginId"
 
 export type SearchAuthUserAccountRemoteResponse = Readonly<{
     page: SearchPageResponse

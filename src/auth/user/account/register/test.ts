@@ -10,7 +10,7 @@ import { RegisterAuthUserAccountAction, initRegisterAuthUserAccountAction } from
 
 import { restoreLoginId } from "../../login_id/input/convert"
 import { restoreResetTokenDestination } from "../../password/reset/token_destination/kernel/convert"
-import { restoreAuthUserMemo } from "../input/memo/convert"
+import { restoreAuthUserField } from "../kernel/convert"
 
 import { RegisterAuthUserAccountRemote } from "./infra"
 import {
@@ -123,13 +123,13 @@ test("focus / close", async () => {
                 type: "email",
                 email: "user@example.com",
             }),
-            memo: restoreAuthUserMemo("memo"),
+            memo: restoreAuthUserField("memo"),
         }
         const another: AuthUserAccount = {
             loginId: restoreLoginId("user-another"),
             grantedRoles: [],
             resetTokenDestination: { type: "none" },
-            memo: restoreAuthUserMemo("memo"),
+            memo: restoreAuthUserField("memo"),
         }
 
         resource.register.list.focused.focus(user)
@@ -173,7 +173,7 @@ test("update user", async () => {
         loginId: restoreLoginId("login-id"),
         grantedRoles: [],
         resetTokenDestination: { type: "none" },
-        memo: restoreAuthUserMemo("memo"),
+        memo: restoreAuthUserField("memo"),
     }
 
     await runner(async () => {

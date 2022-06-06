@@ -1,23 +1,23 @@
 import {
     initInputBoardAction,
     InputBoardAction,
-} from "../../../z_vendor/getto-application/board/input/action"
+} from "../../../../z_vendor/getto-application/board/input/action"
 import {
     initObserveBoardFieldAction,
     ObserveBoardFieldAction,
-} from "../../../z_vendor/getto-application/board/observe_field/action"
+} from "../../../../z_vendor/getto-application/board/observe_field/action"
 import {
     initValidateBoardFieldAction,
     ValidateBoardFieldAction,
-} from "../../../z_vendor/getto-application/board/validate_field/action"
+} from "../../../../z_vendor/getto-application/board/validate_field/action"
 
-import { initBoardFieldObserver } from "../../../z_vendor/getto-application/board/observe_field/init/observer"
+import { initBoardFieldObserver } from "../../../../z_vendor/getto-application/board/observe_field/init/observer"
 
-import { BoardValueStore } from "../../../z_vendor/getto-application/board/input/infra"
+import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
-import { PrepareElementState } from "../prepare/data"
-import { ValidateSelectError } from "../validate/data"
-import { ValidateBoardFieldResult } from "../../../z_vendor/getto-application/board/validate_field/data"
+import { PrepareElementState } from "../../prepare/data"
+import { ValidateSelectError } from "../../validate/data"
+import { ValidateBoardFieldResult } from "../../../../z_vendor/getto-application/board/validate_field/data"
 
 export interface SelectFieldAction<T> {
     readonly input: InputBoardAction<BoardValueStore>

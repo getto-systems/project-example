@@ -276,7 +276,7 @@ class Action
         response?:
             | Readonly<{
                   page: Readonly<{ offset: number; limit: number; all: number }>
-                  sort: Readonly<{ key: "login-id"; order: SearchSortOrder }>
+                  sort: Readonly<{ key: "loginId"; order: SearchSortOrder }>
                   users: readonly AuthUserAccount[]
               }>
             | undefined
