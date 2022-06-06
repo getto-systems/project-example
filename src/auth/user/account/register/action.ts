@@ -13,7 +13,6 @@ import {
     initObserveBoardAction,
     ObserveBoardAction,
 } from "../../../../z_vendor/getto-application/board/observe_board/action"
-import { initInputLoginIdAction, InputLoginIdAction } from "../../login_id/input/action"
 import {
     initInputResetTokenDestinationAction,
     InputResetTokenDestinationAction,
@@ -24,6 +23,7 @@ import {
     initAuthUserGrantedRolesFieldAction,
     initAuthUserTextFieldAction,
 } from "../input/field/action"
+import { initLoginIdFieldAction, LoginIdFieldAction } from "../../login_id/input/action"
 
 import { ALL_AUTH_ROLES } from "../../../../x_content/role"
 
@@ -39,7 +39,7 @@ export interface RegisterAuthUserAccountAction
     extends StatefulApplicationAction<RegisterAuthUserAccountState> {
     readonly list: ListRegisteredAuthUserAccountAction
 
-    readonly loginId: InputLoginIdAction
+    readonly loginId: LoginIdFieldAction
     readonly grantedRoles: AuthUserGrantedRolesFieldAction
     readonly resetTokenDestination: InputResetTokenDestinationAction
     readonly memo: AuthUserTextFieldAction<"memo">
@@ -107,7 +107,7 @@ class Action
 
     readonly list: ListAction
 
-    readonly loginId: InputLoginIdAction
+    readonly loginId: LoginIdFieldAction
     readonly grantedRoles: AuthUserGrantedRolesFieldAction
     readonly resetTokenDestination: InputResetTokenDestinationAction
     readonly memo: AuthUserTextFieldAction<"memo">
@@ -121,7 +121,7 @@ class Action
         super()
         this.material = material
 
-        const loginId = initInputLoginIdAction()
+        const loginId = initLoginIdFieldAction()
         const grantedRoles = initAuthUserGrantedRolesFieldAction()
         const resetTokenDestination = initInputResetTokenDestinationAction()
         const memo = initAuthUserTextFieldAction("memo")

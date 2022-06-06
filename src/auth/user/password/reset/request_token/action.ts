@@ -5,7 +5,7 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../../../z_vendor/getto-application/action/action"
 
-import { InputLoginIdAction, initInputLoginIdAction } from "../../../login_id/input/action"
+import { LoginIdFieldAction, initLoginIdFieldAction } from "../../../login_id/input/action"
 import {
     ValidateBoardAction,
     initValidateBoardAction,
@@ -22,7 +22,7 @@ import { RequestResetTokenError, RequestResetTokenFields } from "./data"
 import { ConvertBoardResult } from "../../../../../z_vendor/getto-application/board/kernel/data"
 
 export interface RequestResetTokenAction extends StatefulApplicationAction<RequestResetTokenState> {
-    readonly loginId: InputLoginIdAction
+    readonly loginId: LoginIdFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -59,7 +59,7 @@ class Action
 {
     readonly initialState = initialState
 
-    readonly loginId: InputLoginIdAction
+    readonly loginId: LoginIdFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -70,7 +70,7 @@ class Action
         super()
         this.material = material
 
-        const loginId = initInputLoginIdAction()
+        const loginId = initLoginIdFieldAction()
 
         const fields = ["loginId"] as const
         const convert = (): ConvertBoardResult<RequestResetTokenFields> => {

@@ -3,7 +3,7 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../../../z_vendor/getto-application/action/action"
 
-import { InputLoginIdAction, initInputLoginIdAction } from "../../../login_id/input/action"
+import { LoginIdFieldAction, initLoginIdFieldAction } from "../../../login_id/input/action"
 import { InputPasswordAction, initInputPasswordAction } from "../../input/action"
 import {
     ValidateBoardAction,
@@ -35,7 +35,7 @@ import { ConvertBoardResult } from "../../../../../z_vendor/getto-application/bo
 import { RepositoryError } from "../../../../../z_lib/ui/repository/data"
 
 export interface ResetPasswordAction extends StatefulApplicationAction<ResetPasswordState> {
-    readonly loginId: InputLoginIdAction
+    readonly loginId: LoginIdFieldAction
     readonly password: InputPasswordAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
@@ -86,7 +86,7 @@ class Action
 {
     readonly initialState = initialState
 
-    readonly loginId: InputLoginIdAction
+    readonly loginId: LoginIdFieldAction
     readonly password: InputPasswordAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
@@ -98,7 +98,7 @@ class Action
         super()
         this.material = material
 
-        const loginId = initInputLoginIdAction()
+        const loginId = initLoginIdFieldAction()
         const password = initInputPasswordAction()
 
         const fields = ["loginId", "password"] as const

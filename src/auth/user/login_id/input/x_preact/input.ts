@@ -10,11 +10,11 @@ import { InputBoard } from "../../../../../z_vendor/getto-application/board/inpu
 
 import { textValidationError } from "../../../../../z_lib/ui/validate/x_plain/error"
 
-import { InputLoginIdAction } from "../action"
+import { LoginIdFieldAction } from "../action"
 import { AUTH_USER_ACCOUNT } from "../../../account/kernel/data"
 
 type Props = Readonly<{
-    field: InputLoginIdAction
+    field: LoginIdFieldAction
 }> &
     Partial<{
         title: VNodeContent

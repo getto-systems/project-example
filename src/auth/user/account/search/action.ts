@@ -5,7 +5,7 @@ import {
 
 import { checkTakeLongtime } from "../../../../z_lib/ui/timer/helper"
 
-import { initFilterLoginIdAction, FilterLoginIdAction } from "../../login_id/input/action"
+import { initTextFilterAction, TextFilterAction } from "../../../../z_lib/ui/input/filter/text"
 import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
 import { SearchOffsetAction } from "../../../../z_lib/ui/search/offset/action"
 import { SearchColumnsAction, SearchColumnsInfra } from "../../../../z_lib/ui/search/columns/action"
@@ -39,7 +39,7 @@ import { AuthUserAccount } from "../kernel/data"
 import { LoginId } from "../../login_id/kernel/data"
 
 export interface SearchAuthUserAccountAction extends ListAuthUserAccountAction {
-    readonly loginId: FilterLoginIdAction
+    readonly loginId: TextFilterAction
     readonly grantedRoles: AuthUserGrantedRolesFilterAction
     readonly observe: ObserveBoardAction
 
@@ -119,7 +119,7 @@ class Action
 
     readonly focused: FocusedAuthUserAccountAction
 
-    readonly loginId: FilterLoginIdAction
+    readonly loginId: TextFilterAction
     readonly grantedRoles: AuthUserGrantedRolesFilterAction
     readonly offset: SearchOffsetAction
     readonly columns: SearchColumnsAction
@@ -139,7 +139,7 @@ class Action
 
         const initialFilter = material.shell.detectFilter()
 
-        const loginId = initFilterLoginIdAction(initialFilter.loginId)
+        const loginId = initTextFilterAction(initialFilter.loginId)
         const grantedRoles = initAuthUserGrantedRolesFilterAction(initialFilter.grantedRoles)
 
         const { observe, offset, columns, filter, clear } = initSearchFilter(

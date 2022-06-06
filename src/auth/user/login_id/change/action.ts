@@ -5,7 +5,7 @@ import {
 
 import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
 
-import { InputLoginIdAction, initInputLoginIdAction } from "../input/action"
+import { initLoginIdFieldAction, LoginIdFieldAction } from "../input/action"
 import {
     ValidateBoardAction,
     initValidateBoardAction,
@@ -24,7 +24,7 @@ import { WaitTime } from "../../../../z_lib/ui/config/infra"
 import { LoginId } from "../kernel/data"
 
 export interface OverwriteLoginIdAction extends StatefulApplicationAction<OverwriteLoginIdState> {
-    readonly newLoginId: InputLoginIdAction
+    readonly newLoginId: LoginIdFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -65,7 +65,7 @@ class OverwriteAction
 {
     readonly initialState = initialState
 
-    readonly newLoginId: InputLoginIdAction
+    readonly newLoginId: LoginIdFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -76,7 +76,7 @@ class OverwriteAction
         super()
         this.material = material
 
-        const newLoginId = initInputLoginIdAction()
+        const newLoginId = initLoginIdFieldAction()
 
         const fields = ["newLoginId"] as const
         const convert = (): ConvertBoardResult<OverwriteLoginIdFields> => {

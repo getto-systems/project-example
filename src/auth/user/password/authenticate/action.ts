@@ -3,13 +3,13 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
-import { initInputLoginIdAction } from "../../login_id/input/action"
-import { initInputPasswordAction } from "../input/action"
-import { initValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
+import { LoginIdFieldAction, initLoginIdFieldAction } from "../../login_id/input/action"
+import { InputPasswordAction, initInputPasswordAction } from "../input/action"
+import {
+    ValidateBoardAction,
+    initValidateBoardAction,
+} from "../../../../z_vendor/getto-application/board/validate_board/action"
 
-import { InputLoginIdAction } from "../../login_id/input/action"
-import { InputPasswordAction } from "../input/action"
-import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
 import {
     initObserveBoardAction,
     ObserveBoardAction,
@@ -36,7 +36,7 @@ import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 
 export interface AuthenticatePasswordAction
     extends StatefulApplicationAction<AuthenticatePasswordState> {
-    readonly loginId: InputLoginIdAction
+    readonly loginId: LoginIdFieldAction
     readonly password: InputPasswordAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
@@ -86,7 +86,7 @@ class Action
 {
     readonly initialState = initialState
 
-    readonly loginId: InputLoginIdAction
+    readonly loginId: LoginIdFieldAction
     readonly password: InputPasswordAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
@@ -98,7 +98,7 @@ class Action
         super()
         this.material = material
 
-        const loginId = initInputLoginIdAction()
+        const loginId = initLoginIdFieldAction()
         const password = initInputPasswordAction()
 
         const fields = ["loginId", "password"] as const
