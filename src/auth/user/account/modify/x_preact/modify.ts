@@ -13,8 +13,7 @@ import { takeLongtimeField, validationMessage } from "../../../../../common/x_pr
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
 import { StaticLoginIdField } from "../../../login_id/input/x_preact/static"
-import { AuthUserMemoField } from "../../input/field/x_preact/input"
-import { GrantedRolesField } from "../../input/granted_roles/x_preact/input"
+import { AuthUserMemoField, AuthUserGrantedRolesField } from "../../input/field/x_preact/input"
 import { EditButton } from "../../../../../common/x_preact/button/edit_button"
 import { EditSuccessButton } from "../../../../../common/x_preact/button/edit_success_button"
 import { ResetButton } from "../../../../../common/x_preact/button/reset_button"
@@ -59,7 +58,7 @@ export function ModifyAuthUserAccount(props: Props): VNode {
                     },
                     field: props.modify.memo,
                 }),
-                h(GrantedRolesField, {
+                h(AuthUserGrantedRolesField, {
                     edit: {
                         data: props.user,
                         editable: props.editable,

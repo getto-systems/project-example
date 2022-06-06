@@ -5,6 +5,7 @@ import { restoreAuthUserField } from "../../kernel/convert"
 import { ValidateAuthUserTextResult } from "./data"
 
 export type AuthUserTextField = keyof typeof textValidators
+export type AuthUserMultipleField = "grantedRole"
 
 const textValidators = {
     memo: [check_text_tooLong(255)],

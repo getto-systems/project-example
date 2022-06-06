@@ -6,10 +6,6 @@ import {
 import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
 
 import {
-    initInputGrantedAuthRolesAction,
-    InputGrantedAuthRolesAction,
-} from "../input/granted_roles/action"
-import {
     ValidateBoardAction,
     initValidateBoardAction,
 } from "../../../../z_vendor/getto-application/board/validate_board/action"
@@ -22,7 +18,14 @@ import {
     initInputResetTokenDestinationAction,
     InputResetTokenDestinationAction,
 } from "../../password/reset/token_destination/input/action"
-import { AuthUserTextFieldAction, initAuthUserTextFieldAction } from "../input/field/action"
+import {
+    AuthUserGrantedRolesFieldAction,
+    AuthUserTextFieldAction,
+    initAuthUserGrantedRolesFieldAction,
+    initAuthUserTextFieldAction,
+} from "../input/field/action"
+
+import { ALL_AUTH_ROLES } from "../../../../x_content/role"
 
 import { RegisterAuthUserAccountRemote } from "./infra"
 import { WaitTime } from "../../../../z_lib/ui/config/infra"
@@ -37,7 +40,7 @@ export interface RegisterAuthUserAccountAction
     readonly list: ListRegisteredAuthUserAccountAction
 
     readonly loginId: InputLoginIdAction
-    readonly grantedRoles: InputGrantedAuthRolesAction
+    readonly grantedRoles: AuthUserGrantedRolesFieldAction
     readonly resetTokenDestination: InputResetTokenDestinationAction
     readonly memo: AuthUserTextFieldAction<"memo">
     readonly validate: ValidateBoardAction
@@ -105,7 +108,7 @@ class Action
     readonly list: ListAction
 
     readonly loginId: InputLoginIdAction
-    readonly grantedRoles: InputGrantedAuthRolesAction
+    readonly grantedRoles: AuthUserGrantedRolesFieldAction
     readonly resetTokenDestination: InputResetTokenDestinationAction
     readonly memo: AuthUserTextFieldAction<"memo">
     readonly validate: ValidateBoardAction
@@ -119,7 +122,7 @@ class Action
         this.material = material
 
         const loginId = initInputLoginIdAction()
-        const grantedRoles = initInputGrantedAuthRolesAction()
+        const grantedRoles = initAuthUserGrantedRolesFieldAction()
         const resetTokenDestination = initInputResetTokenDestinationAction()
         const memo = initAuthUserTextFieldAction("memo")
 
@@ -127,7 +130,7 @@ class Action
         const convert = (): ConvertBoardResult<AuthUserAccount> => {
             const result = {
                 loginId: loginId.validate.check(),
-                grantedRoles: grantedRoles.validate.check(),
+                grantedRoles: grantedRoles.input.validate.check(),
                 resetTokenDestination: resetTokenDestination.validate.check(),
                 memo: memo.validate.check(),
             }
@@ -153,10 +156,12 @@ class Action
         const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
+        grantedRoles.setOptions(ALL_AUTH_ROLES)
+
         this.list = new ListAction()
 
         this.loginId = loginId
-        this.grantedRoles = grantedRoles
+        this.grantedRoles = grantedRoles.input
         this.resetTokenDestination = resetTokenDestination
         this.memo = memo
         this.validate = validate

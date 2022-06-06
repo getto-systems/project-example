@@ -7,32 +7,43 @@ import { useEditableState } from "../../../../../../z_vendor/getto-application/b
 
 import {
     inputField,
+    label,
     label_text_fill,
 } from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { mapValidateState } from "../../../../../../z_lib/ui/input/field/x_preact/helper"
+import { checkboxOptions } from "../../../../../../common/x_preact/design/checkbox"
 
 import { InputBoard } from "../../../../../../z_vendor/getto-application/board/input/x_preact/input"
+import { CheckboxBoard } from "../../../../../../z_vendor/getto-application/board/input/x_preact/checkbox"
+import { AuthRoleLabels } from "../../granted_roles/x_preact/input"
 
 import { authUserMemo } from "../../../kernel/x_preact/field"
+import { authRoleLabel } from "../../../../../../x_content/role"
 
 import { textValidationError } from "../../../../../../z_lib/ui/validate/x_plain/error"
 
-import { AuthUserTextFieldAction } from "../action"
+import { AuthUserTextFieldAction, AuthUserGrantedRolesFieldAction } from "../action"
 import { EditableBoardAction } from "../../../../../../z_vendor/getto-application/board/editable/action"
 
 import { AuthUserTextField } from "../convert"
 
 import { TypeAuthUser, AUTH_USER_ACCOUNT } from "../../../kernel/data"
+import { AuthRole } from "../../../../kernel/data"
 
-type TextProps<K extends AuthUserTextField> = Readonly<{ field: AuthUserTextFieldAction<K> }> &
+type FieldProps<A, T> = Readonly<{ field: A }> &
     Partial<{
         title: VNodeContent
         help: readonly VNodeContent[]
         edit: Readonly<{
-            data: Readonly<{ [key in K]: TypeAuthUser<K> }>
+            data: T
             editable: EditableBoardAction
         }>
     }>
+
+type TextProps<K extends AuthUserTextField> = FieldProps<
+    AuthUserTextFieldAction<K>,
+    Readonly<{ [key in K]: TypeAuthUser<K> }>
+>
 
 export function AuthUserMemoField(props: TextProps<"memo">): VNode {
     const validateState = useApplicationAction(props.field.validate)
@@ -47,5 +58,31 @@ export function AuthUserMemoField(props: TextProps<"memo">): VNode {
         body: editableState.isEditable
             ? h(InputBoard, { type: "text", input: props.field.input })
             : authUserMemo(editableState.data),
+    })
+}
+
+export function AuthUserGrantedRolesField(
+    props: FieldProps<
+        AuthUserGrantedRolesFieldAction,
+        Readonly<{ grantedRoles: readonly AuthRole[] }>
+    >,
+): VNode {
+    const editableState = useEditableState(props.edit)
+
+    return inputField({
+        title: props.title || AUTH_USER_ACCOUNT["grantedRoles"],
+        help: props.help,
+        label: label,
+        editableState,
+        body: editableState.isEditable
+            ? h(CheckboxBoard, {
+                  input: props.field.input,
+                  options: checkboxOptions(props.field.options(), (data) => ({
+                      key: data,
+                      value: data,
+                      label: authRoleLabel(data),
+                  })),
+              })
+            : h(AuthRoleLabels, { ...editableState.data }),
     })
 }

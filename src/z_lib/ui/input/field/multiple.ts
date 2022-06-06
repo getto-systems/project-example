@@ -1,5 +1,5 @@
 import {
-    initInputBoardAction,
+    initMultipleInputBoardAction,
     InputBoardAction,
 } from "../../../../z_vendor/getto-application/board/input/action"
 import {
@@ -13,33 +13,35 @@ import {
 
 import { initBoardFieldObserver } from "../../../../z_vendor/getto-application/board/observe_field/init/observer"
 
-import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
+import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
 import { PrepareElementState } from "../../prepare/data"
-import { ValidateSelectError } from "../../validate/data"
 import { ValidateBoardFieldResult } from "../../../../z_vendor/getto-application/board/validate_field/data"
 
-export interface SelectFieldAction<T> {
-    readonly input: InputBoardAction<BoardValueStore>
-    readonly validate: ValidateBoardFieldAction<T, ValidateSelectError>
+export interface MultipleFieldAction<T> {
+    readonly input: InputBoardAction<MultipleBoardValueStore>
+    readonly validate: ValidateBoardFieldAction<readonly T[], never>
     readonly observe: ObserveBoardFieldAction
 
     options(): PrepareElementState<readonly T[]>
     clear(): void
-    reset(data: T): void
+    reset(data: readonly T[]): void
 }
 
-export type SelectFieldProps<T> = Readonly<{
+export type MultipleFieldProps<T> = Readonly<{
     convert: (data: T) => string
 }>
-export function initSelectFieldAction<T>(props: SelectFieldProps<T>): Readonly<{
-    input: SelectFieldAction<T>
+export function initMultipleFieldAction<T>(props: MultipleFieldProps<T>): Readonly<{
+    input: MultipleFieldAction<T>
     setOptions: { (state: readonly T[]): void }
 }> {
-    const { input, store, subscriber } = initInputBoardAction()
+    const { input, store, subscriber } = initMultipleInputBoardAction()
     let options: PrepareElementState<readonly T[]> = { type: "initial" }
     const validate = initValidateBoardFieldAction({
-        convert: () => convert(store.get(), options, props.convert),
+        convert: (): ValidateBoardFieldResult<readonly T[], never> => ({
+            valid: true,
+            value: convert(store.get(), options, props.convert),
+        }),
     })
     const observe = initObserveBoardFieldAction({
         observer: initBoardFieldObserver({
@@ -60,10 +62,10 @@ export function initSelectFieldAction<T>(props: SelectFieldProps<T>): Readonly<{
 
             options: () => options,
             clear: () => {
-                store.set("")
+                store.set([])
             },
             reset: (data) => {
-                store.set(props.convert(data))
+                store.set(data.map((value) => props.convert(value)))
             },
         },
         setOptions: (newOptions) => {
@@ -73,18 +75,13 @@ export function initSelectFieldAction<T>(props: SelectFieldProps<T>): Readonly<{
 }
 
 function convert<T>(
-    selected: string,
+    selected: readonly string[],
     options: PrepareElementState<readonly T[]>,
     convert: (data: T) => string,
-): ValidateBoardFieldResult<T, ValidateSelectError> {
+): readonly T[] {
     if (options.type === "initial") {
-        return { valid: false, err: { type: "not-selected" } }
+        return []
     }
 
-    const value = options.data.find((data) => selected === convert(data))
-    if (value === undefined) {
-        return { valid: false, err: { type: "not-selected" } }
-    }
-
-    return { valid: true, value }
+    return options.data.filter((data) => selected.some((value) => value === convert(data)))
 }

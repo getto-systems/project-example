@@ -6,10 +6,6 @@ import {
 import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
 
 import {
-    initInputGrantedAuthRolesAction,
-    InputGrantedAuthRolesAction,
-} from "../input/granted_roles/action"
-import {
     initObserveBoardAction,
     ObserveBoardAction,
 } from "../../../../z_vendor/getto-application/board/observe_board/action"
@@ -17,7 +13,14 @@ import {
     initValidateBoardAction,
     ValidateBoardAction,
 } from "../../../../z_vendor/getto-application/board/validate_board/action"
-import { AuthUserTextFieldAction, initAuthUserTextFieldAction } from "../input/field/action"
+import {
+    AuthUserTextFieldAction,
+    AuthUserGrantedRolesFieldAction,
+    initAuthUserTextFieldAction,
+    initAuthUserGrantedRolesFieldAction,
+} from "../input/field/action"
+
+import { ALL_AUTH_ROLES } from "../../../../x_content/role"
 
 import { ModifyAuthUserAccountRemote } from "./infra"
 import { WaitTime } from "../../../../z_lib/ui/config/infra"
@@ -30,7 +33,7 @@ import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board
 export interface ModifyAuthUserAccountAction
     extends StatefulApplicationAction<ModifyAuthUserAccountState> {
     readonly memo: AuthUserTextFieldAction<"memo">
-    readonly grantedRoles: InputGrantedAuthRolesAction
+    readonly grantedRoles: AuthUserGrantedRolesFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -72,7 +75,7 @@ class Action
     readonly initialState = initialState
 
     readonly memo: AuthUserTextFieldAction<"memo">
-    readonly grantedRoles: InputGrantedAuthRolesAction
+    readonly grantedRoles: AuthUserGrantedRolesFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -87,12 +90,12 @@ class Action
         this.material = material
 
         const memo = initAuthUserTextFieldAction("memo")
-        const grantedRoles = initInputGrantedAuthRolesAction()
+        const grantedRoles = initAuthUserGrantedRolesFieldAction()
 
         const fields = ["memo", "grantedRoles"] as const
         const convert = (): ConvertBoardResult<ModifyAuthUserAccountFields> => {
             const result = {
-                grantedRoles: grantedRoles.validate.check(),
+                grantedRoles: grantedRoles.input.validate.check(),
                 memo: memo.validate.check(),
             }
             if (!result.grantedRoles.valid || !result.memo.valid) {
@@ -110,8 +113,10 @@ class Action
         const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
+        grantedRoles.setOptions(ALL_AUTH_ROLES)
+
         this.memo = memo
-        this.grantedRoles = grantedRoles
+        this.grantedRoles = grantedRoles.input
         this.validate = validate
         this.observe = observe
         this.convert = convert
