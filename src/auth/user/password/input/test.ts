@@ -4,6 +4,7 @@ import { setupActionTestRunner } from "../../../../z_vendor/getto-application/ac
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 
 import { initPasswordFieldAction } from "./action"
+import { Password } from "./data"
 
 test("validate; valid input", async () => {
     const { action, store } = standard()
@@ -123,6 +124,15 @@ test("password character state : multi byte", async () => {
     }).then((stack) => {
         expect(stack).toEqual([{ multiByte: true }])
     })
+})
+
+test("reset", () => {
+    const { action, store } = standard()
+
+    store.set("valid")
+    action.reset("password" as Password)
+
+    expect(store.get()).toEqual("password")
 })
 
 test("clear", () => {

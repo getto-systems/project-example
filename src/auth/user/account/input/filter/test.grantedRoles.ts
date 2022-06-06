@@ -19,6 +19,14 @@ test("observe; has changed", async () => {
     })
 })
 
+test("pin", async () => {
+    const { store, pin } = standard()
+
+    store.set(["auth-user"])
+
+    expect(pin()).toEqual(["auth-user"])
+})
+
 test("options", async () => {
     const { action } = standard()
 
@@ -35,10 +43,10 @@ test("clear", async () => {
 })
 
 function standard() {
-    const { input: action, setOptions } = initAuthUserGrantedRolesFilterAction([])
+    const { input: action, setOptions, pin } = initAuthUserGrantedRolesFilterAction([])
     const store = mockMultipleBoardValueStore(action.input)
 
     setOptions(ALL_AUTH_ROLES)
 
-    return { action, store }
+    return { action, store, pin }
 }
