@@ -3,7 +3,7 @@ import { setupActionTestRunner } from "../../../../z_vendor/getto-application/ac
 
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 
-import { initInputPasswordAction } from "./action"
+import { initPasswordFieldAction } from "./action"
 
 test("validate; valid input", async () => {
     const { action, store } = standard()
@@ -123,7 +123,7 @@ test("clear", () => {
 })
 
 function standard() {
-    const action = initInputPasswordAction()
+    const action = initPasswordFieldAction()
     const store = mockBoardValueStore(action.input)
 
     return { action, store }

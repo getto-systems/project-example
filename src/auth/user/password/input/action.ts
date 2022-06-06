@@ -19,7 +19,7 @@ import { BoardValueStore } from "../../../../z_vendor/getto-application/board/in
 import { Password, PasswordCharacterState } from "./data"
 import { ValidateTextError } from "../../../../z_lib/ui/validate/data"
 
-export interface InputPasswordAction {
+export interface PasswordFieldAction {
     readonly input: InputBoardAction<BoardValueStore>
     readonly validate: ValidateBoardFieldAction<Password, readonly ValidateTextError[]>
     readonly observe: ObserveBoardFieldAction
@@ -28,7 +28,7 @@ export interface InputPasswordAction {
     checkCharacter(): PasswordCharacterState
 }
 
-export function initInputPasswordAction(): InputPasswordAction {
+export function initPasswordFieldAction(): PasswordFieldAction {
     const { input, store, subscriber } = initInputBoardAction()
 
     const validate = initValidateBoardFieldAction({

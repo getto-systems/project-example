@@ -5,4 +5,7 @@ export type Password = string & { Password: never }
 
 export type PasswordCharacterState = Readonly<{ multiByte: boolean }>
 
-export type ConvertPasswordResult = ValidateBoardFieldResult<Password, readonly ValidateTextError[]>
+export type ValidatePasswordResult = ValidateBoardFieldResult<
+    Password,
+    readonly ValidateTextError[]
+>

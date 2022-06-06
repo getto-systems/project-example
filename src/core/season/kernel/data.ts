@@ -9,7 +9,7 @@ type Season_data = Readonly<{
 export const seasonPeriods = ["summer", "winter"] as const
 export type SeasonPeriod = typeof seasonPeriods[number]
 
-export type ConvertSeasonResult = ValidateBoardFieldResult<DetectedSeason, ValidateSeasonError>
+export type ValidateSeasonResult = ValidateBoardFieldResult<DetectedSeason, ValidateSeasonError>
 
 export type DetectedSeason =
     | Readonly<{ default: true }>

@@ -1,8 +1,8 @@
-import { ConvertPasswordResult, Password } from "./data"
+import { ValidatePasswordResult, Password } from "./data"
 import { converter } from "../../../../z_lib/ui/validate/helper"
 import { check_text_empty, check_text_tooLong } from "../../../../z_lib/ui/validate/text"
 
-export const passwordBoardConverter: { (value: string): ConvertPasswordResult } = converter(
+export const passwordBoardConverter: { (value: string): ValidatePasswordResult } = converter(
     markPassword,
     [
         check_text_empty,

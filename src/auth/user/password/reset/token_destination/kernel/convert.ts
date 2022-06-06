@@ -1,5 +1,5 @@
 import {
-    ConvertResetTokenDestinationResult,
+    ValidateResetTokenDestinationResult,
     ResetTokenDestination,
     ResetTokenDestinationEmail,
 } from "./data"
@@ -14,7 +14,7 @@ import { ValidateTextError } from "../../../../../../z_lib/ui/validate/data"
 
 export function resetTokenDestinationBoardConverter(
     value: Readonly<{ type: string; email: string }>,
-): ConvertResetTokenDestinationResult {
+): ValidateResetTokenDestinationResult {
     switch (value.type) {
         case "none":
             return { valid: true, value: { type: "none" } }
@@ -27,7 +27,7 @@ export function resetTokenDestinationBoardConverter(
     }
 }
 
-function validateEmail(value: string): ConvertResetTokenDestinationResult {
+function validateEmail(value: string): ValidateResetTokenDestinationResult {
     const result = emailConverter(value)
     if (!result.valid) {
         return { valid: false, err: { type: "email", err: result.err } }
