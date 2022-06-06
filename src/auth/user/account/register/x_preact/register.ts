@@ -8,7 +8,7 @@ import { takeLongtimeField, validationMessage } from "../../../../../common/x_pr
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
-import { LoginIdField } from "../../../login_id/input/x_preact/input"
+import { LoginIdField } from "../../../login_id/input/x_preact/field"
 import { AuthUserMemoField, AuthUserGrantedRolesField } from "../../input/field/x_preact/input"
 import { ResetTokenDestinationField } from "../../../password/reset/token_destination/input/x_preact/input"
 import { ClearChangesButton } from "../../../../../common/x_preact/button/clear_changes_button"

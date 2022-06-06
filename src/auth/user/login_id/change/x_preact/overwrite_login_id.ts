@@ -7,7 +7,7 @@ import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { takeLongtimeField, validationMessage } from "../../../../../common/x_preact/design/form"
 
 import { changeLoginIdError } from "./helper"
-import { LoginIdField } from "../../input/x_preact/input"
+import { LoginIdField } from "../../input/x_preact/field"
 import { EditButton } from "../../../../../common/x_preact/button/edit_button"
 import { EditSuccessButton } from "../../../../../common/x_preact/button/edit_success_button"
 import { ClearChangesButton } from "../../../../../common/x_preact/button/clear_changes_button"
