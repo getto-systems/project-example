@@ -1,3 +1,5 @@
+import { env } from "../../../../y_environment/ui/env"
+
 import { VNode } from "preact"
 import { useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
@@ -26,8 +28,7 @@ export function Logout(props: Props): VNode {
     useLayoutEffect(() => {
         switch (state.type) {
             case "success":
-                // credential が削除されているので、reload するとログイン画面になる
-                location.reload()
+                location.href = `/${env.version}/index.html`
                 break
         }
     }, [state])
