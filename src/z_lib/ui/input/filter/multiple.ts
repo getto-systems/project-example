@@ -6,10 +6,6 @@ import {
     initObserveBoardFieldAction,
     ObserveBoardFieldAction,
 } from "../../../../z_vendor/getto-application/board/observe_field/action"
-import {
-    initValidateBoardFieldAction,
-    ValidateBoardFieldAction,
-} from "../../../../z_vendor/getto-application/board/validate_field/action"
 
 import { initBoardFieldObserver } from "../../../../z_vendor/getto-application/board/observe_field/init/observer"
 import { isSameMultipleBoardValue } from "../../../../z_vendor/getto-application/board/observe_field/helper"
@@ -17,33 +13,26 @@ import { isSameMultipleBoardValue } from "../../../../z_vendor/getto-application
 import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
 import { PrepareElementState } from "../../prepare/data"
-import { ValidateBoardFieldResult } from "../../../../z_vendor/getto-application/board/validate_field/data"
 
-export interface MultipleFieldAction<T> {
+export interface MultipleFilterAction<T> {
     readonly input: InputBoardAction<MultipleBoardValueStore>
-    readonly validate: ValidateBoardFieldAction<readonly T[], never>
     readonly observe: ObserveBoardFieldAction
 
     options(): PrepareElementState<readonly T[]>
     clear(): void
-    reset(data: readonly T[]): void
 }
 
-export type MultipleFieldProps<T> = Readonly<{
+export type MultipleFilterProps<T> = Readonly<{
+    initial: readonly T[]
     convert: (data: T) => string
 }>
-export function initMultipleFieldAction<T>(props: MultipleFieldProps<T>): Readonly<{
-    input: MultipleFieldAction<T>
+export function initMultipleFilterAction<T>(props: MultipleFilterProps<T>): Readonly<{
+    input: MultipleFilterAction<T>
     setOptions: { (state: readonly T[]): void }
+    pin: () => readonly T[]
 }> {
     const { input, store, subscriber } = initMultipleInputBoardAction()
     let options: PrepareElementState<readonly T[]> = { type: "initial" }
-    const validate = initValidateBoardFieldAction({
-        convert: (): ValidateBoardFieldResult<readonly T[], never> => ({
-            valid: true,
-            value: convert(store.get(), options, props.convert),
-        }),
-    })
     const observe = initObserveBoardFieldAction({
         observer: initBoardFieldObserver({
             current: () => store.get(),
@@ -51,32 +40,33 @@ export function initMultipleFieldAction<T>(props: MultipleFieldProps<T>): Readon
         }),
     })
 
+    store.set(props.initial.map((value) => props.convert(value)))
+
     subscriber.subscribe(() => {
-        validate.check()
         observe.check()
     })
 
     return {
         input: {
             input,
-            validate,
             observe,
 
             options: () => options,
             clear: () => {
                 store.set([])
             },
-            reset: (data) => {
-                store.set(data.map((value) => props.convert(value)))
-            },
         },
         setOptions: (newOptions) => {
             options = { type: "loaded", data: newOptions }
         },
+        pin: () => {
+            observe.pin()
+            return filter(store.get(), options, props.convert)
+        },
     }
 }
 
-function convert<T>(
+function filter<T>(
     selected: readonly string[],
     options: PrepareElementState<readonly T[]>,
     convert: (data: T) => string,
@@ -85,5 +75,5 @@ function convert<T>(
         return []
     }
 
-    return options.data.filter((data) => selected.some((value) => value === convert(data)))
+    return options.data.filter((option) => selected.some((value) => value === convert(option)))
 }

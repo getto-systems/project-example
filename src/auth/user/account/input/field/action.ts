@@ -20,7 +20,7 @@ export function initAuthUserTextFieldAction<K extends AuthUserTextField>(
 export type AuthUserGrantedRolesFieldAction = MultipleFieldAction<AuthRole>
 
 export function initAuthUserGrantedRolesFieldAction(): Readonly<{
-    input: MultipleFieldAction<AuthRole>
+    input: AuthUserGrantedRolesFieldAction
     setOptions: { (state: readonly AuthRole[]): void }
 }> {
     return initMultipleFieldAction({

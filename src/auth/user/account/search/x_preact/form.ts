@@ -6,11 +6,11 @@ import { buttons } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box_grow, container } from "../../../../../z_vendor/getto-css/preact/design/box"
 
 import { SearchLoginIdField } from "../../../login_id/input/x_preact/search"
+import { AuthUserGrantedRolesFilter } from "../../input/filter/x_preact/input"
 import { SearchButton } from "../../../../../common/x_preact/button/search_button"
 import { ClearSearchButton } from "../../../../../common/x_preact/button/clear_search_button"
 
 import { SearchAuthUserAccountAction } from "../action"
-import { SearchGrantedRolesField } from "../../input/granted_roles/x_preact/search"
 
 type Props = Readonly<{
     search: SearchAuthUserAccountAction
@@ -23,7 +23,7 @@ export function SearchAuthUserAccountForm(props: Props): VNode {
         form: true,
         body: container([
             h(SearchLoginIdField, { field: props.search.loginId }),
-            h(SearchGrantedRolesField, { field: props.search.grantedRoles }),
+            h(AuthUserGrantedRolesFilter, { field: props.search.grantedRoles }),
         ]),
         footer: buttons({ left: searchButton(), right: clearButton() }),
     })

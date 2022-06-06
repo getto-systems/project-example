@@ -15,10 +15,12 @@ import { checkboxOptions } from "../../../../../../common/x_preact/design/checkb
 
 import { InputBoard } from "../../../../../../z_vendor/getto-application/board/input/x_preact/input"
 import { CheckboxBoard } from "../../../../../../z_vendor/getto-application/board/input/x_preact/checkbox"
-import { AuthRoleLabels } from "../../granted_roles/x_preact/input"
 
-import { authUserMemo } from "../../../kernel/x_preact/field"
-import { authRoleLabel } from "../../../../../../x_content/role"
+import {
+    authRoleCheckboxContent,
+    authUserGrantedRoles,
+    authUserMemo,
+} from "../../../kernel/x_preact/field"
 
 import { textValidationError } from "../../../../../../z_lib/ui/validate/x_plain/error"
 
@@ -77,12 +79,8 @@ export function AuthUserGrantedRolesField(
         body: editableState.isEditable
             ? h(CheckboxBoard, {
                   input: props.field.input,
-                  options: checkboxOptions(props.field.options(), (data) => ({
-                      key: data,
-                      value: data,
-                      label: authRoleLabel(data),
-                  })),
+                  options: checkboxOptions(props.field.options(), authRoleCheckboxContent),
               })
-            : h(AuthRoleLabels, { ...editableState.data }),
+            : authUserGrantedRoles(editableState.data),
     })
 }

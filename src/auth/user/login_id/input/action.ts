@@ -69,15 +69,8 @@ export function initFilterLoginIdAction(initial: SingleValueFilter): Readonly<{
         store.set(initial.value)
     }
 
-    const value = (): SingleValueFilter => {
-        const value = store.get()
-        if (value === "") {
-            return { filter: false }
-        }
-        return { filter: true, value }
-    }
     const observe = initObserveBoardFieldAction({
-        observer: initBoardFieldObserver({ current: value }),
+        observer: initBoardFieldObserver({ current: () => store.get() }),
     })
 
     subscriber.subscribe(() => observe.check())
@@ -93,7 +86,11 @@ export function initFilterLoginIdAction(initial: SingleValueFilter): Readonly<{
         },
         pin: () => {
             observe.pin()
-            return value()
+            const value = store.get()
+            if (value === "") {
+                return { filter: false }
+            }
+            return { filter: true, value }
         },
     }
 }

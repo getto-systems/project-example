@@ -10,6 +10,7 @@ import {
 import { initBoardFieldObserver } from "../../../../z_vendor/getto-application/board/observe_field/init/observer"
 
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
+import { SingleValueFilter } from "../../search/kernel/data"
 
 export interface TextFilterAction {
     readonly input: InputBoardAction<BoardValueStore>
@@ -18,14 +19,9 @@ export interface TextFilterAction {
     clear(): void
 }
 
-export type TextFilterProps<T> = Readonly<{
-    restore: (value: string) => T
-}>
-export function initTextFilterAction<T extends string>(
-    props: TextFilterProps<T>,
-): Readonly<{
+export function initTextFilterAction(initial: SingleValueFilter): Readonly<{
     input: TextFilterAction
-    pin: () => T
+    pin: () => SingleValueFilter
 }> {
     const { input, store, subscriber } = initInputBoardAction()
 
@@ -34,6 +30,10 @@ export function initTextFilterAction<T extends string>(
             current: () => store.get(),
         }),
     })
+
+    if (initial.filter) {
+        store.set(initial.value)
+    }
 
     subscriber.subscribe(() => {
         observe.check()
@@ -50,7 +50,12 @@ export function initTextFilterAction<T extends string>(
         },
         pin: () => {
             observe.pin()
-            return props.restore(store.get())
+
+            const value = store.get()
+            if (value === "") {
+                return { filter: false }
+            }
+            return { filter: true, value }
         },
     }
 }
