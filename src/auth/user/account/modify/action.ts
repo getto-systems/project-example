@@ -5,20 +5,15 @@ import {
 
 import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
 
-import {
-    initObserveBoardAction,
-    ObserveBoardAction,
-} from "../../../../z_vendor/getto-application/board/observe_board/action"
-import {
-    initValidateBoardAction,
-    ValidateBoardAction,
-} from "../../../../z_vendor/getto-application/board/validate_board/action"
+import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
+import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
 import {
     AuthUserTextFieldAction,
     AuthUserGrantedRolesFieldAction,
     initAuthUserTextFieldAction,
     initAuthUserGrantedRolesFieldAction,
 } from "../input/field/action"
+import { initModifyField, modifyField } from "../../../../z_lib/ui/modify/action"
 
 import { ALL_AUTH_ROLES } from "../../../../x_content/role"
 
@@ -37,7 +32,7 @@ export interface ModifyAuthUserAccountAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    reset(user: Readonly<{ grantedRoles: readonly AuthRole[] }>): ModifyAuthUserAccountState
+    reset(user: Readonly<{ grantedRoles: readonly AuthRole[] }>): void
     submit(
         user: Readonly<{ loginId: LoginId }> & ModifyAuthUserAccountFields,
         onSuccess: { (data: ModifyAuthUserAccountFields): void },
@@ -81,9 +76,8 @@ class Action
 
     material: ModifyAuthUserAccountMaterial
 
-    readonly convert: {
-        (): ConvertBoardResult<ModifyAuthUserAccountFields>
-    }
+    convert: () => ConvertBoardResult<ModifyAuthUserAccountFields>
+    reset: (user: ModifyAuthUserAccountFields) => void
 
     constructor(material: ModifyAuthUserAccountMaterial) {
         super()
@@ -92,7 +86,6 @@ class Action
         const memo = initAuthUserTextFieldAction("memo")
         const grantedRoles = initAuthUserGrantedRolesFieldAction()
 
-        const fields = ["memo", "grantedRoles"] as const
         const convert = (): ConvertBoardResult<ModifyAuthUserAccountFields> => {
             const result = {
                 grantedRoles: grantedRoles.input.validate.check(),
@@ -110,8 +103,17 @@ class Action
             }
         }
 
-        const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
-        const { observe, observeChecker } = initObserveBoardAction({ fields })
+        const { validate, observe, reset } = initModifyField(
+            [
+                modifyField("memo", memo, (data: ModifyAuthUserAccountFields) => data.memo),
+                modifyField(
+                    "grantedRoles",
+                    grantedRoles.input,
+                    (data: ModifyAuthUserAccountFields) => data.grantedRoles,
+                ),
+            ],
+            convert,
+        )
 
         grantedRoles.setOptions(ALL_AUTH_ROLES)
 
@@ -120,23 +122,9 @@ class Action
         this.validate = validate
         this.observe = observe
         this.convert = convert
-
-        fields.forEach((field) => {
-            this[field].validate.subscriber.subscribe((state) => {
-                validateChecker.update(field, state)
-            })
-            this[field].observe.subscriber.subscribe((result) => {
-                observeChecker.update(field, result.hasChanged)
-            })
-        })
+        this.reset = reset
     }
 
-    reset(user: ModifyAuthUserAccountFields): ModifyAuthUserAccountState {
-        this.memo.reset(user.memo)
-        this.grantedRoles.reset(user.grantedRoles)
-        this.observe.clear()
-        return this.currentState()
-    }
     async submit(
         user: Readonly<{ loginId: LoginId }> & ModifyAuthUserAccountFields,
         onSuccess: { (data: ModifyAuthUserAccountFields): void },

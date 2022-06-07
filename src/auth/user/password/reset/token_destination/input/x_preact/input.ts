@@ -18,7 +18,7 @@ import {
     RadioBoardContent,
 } from "../../../../../../../z_vendor/getto-application/board/input/x_preact/radio"
 
-import { InputResetTokenDestinationAction } from "../action"
+import { ResetTokenDestinationFieldAction } from "../action"
 import { EditableBoardAction } from "../../../../../../../z_vendor/getto-application/board/editable/action"
 
 import { ValidateResetTokenDestinationError } from "../data"
@@ -27,7 +27,7 @@ import { textValidationError } from "../../../../../../../z_lib/ui/validate/x_pl
 import { AUTH_USER_ACCOUNT } from "../../../../../account/kernel/data"
 
 type Props = Readonly<{
-    field: InputResetTokenDestinationAction
+    field: ResetTokenDestinationFieldAction
 }> &
     Partial<{
         title: VNodeContent

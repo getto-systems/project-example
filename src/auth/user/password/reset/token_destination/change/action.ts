@@ -6,8 +6,8 @@ import {
 import { checkTakeLongtime, ticker } from "../../../../../../z_lib/ui/timer/helper"
 
 import {
-    initInputResetTokenDestinationAction,
-    InputResetTokenDestinationAction,
+    initResetTokenDestinationFieldAction,
+    ResetTokenDestinationFieldAction,
 } from "../input/action"
 import {
     ValidateBoardAction,
@@ -29,7 +29,7 @@ import { LoginId } from "../../../../login_id/kernel/data"
 
 export interface ChangeResetTokenDestinationAction
     extends StatefulApplicationAction<ChangeResetTokenDestinationState> {
-    readonly destination: InputResetTokenDestinationAction
+    readonly destination: ResetTokenDestinationFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -70,7 +70,7 @@ class Action
 {
     readonly initialState = initialState
 
-    readonly destination: InputResetTokenDestinationAction
+    readonly destination: ResetTokenDestinationFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -81,7 +81,7 @@ class Action
         super()
         this.material = material
 
-        const destination = initInputResetTokenDestinationAction()
+        const destination = initResetTokenDestinationFieldAction()
 
         const fields = ["destination"] as const
         const convert = (): ConvertBoardResult<ResetTokenDestination> => {

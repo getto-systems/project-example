@@ -9,7 +9,7 @@ import { initTextFilterAction, TextFilterAction } from "../../../../z_lib/ui/inp
 import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
 import { SearchOffsetAction } from "../../../../z_lib/ui/search/offset/action"
 import { SearchColumnsAction, SearchColumnsInfra } from "../../../../z_lib/ui/search/columns/action"
-import { initSearchFilter, SearchFilterAction } from "../../../../z_lib/ui/search/filter/action"
+import { initSearchFilter, SearchFilter } from "../../../../z_lib/ui/search/filter/action"
 import {
     AuthUserGrantedRolesFilterAction,
     initAuthUserGrantedRolesFilterAction,
@@ -127,7 +127,7 @@ class Action
 
     material: SearchAuthUserAccountMaterial
 
-    filter: SearchFilterAction<SearchAuthUserAccountSortKey, SearchAuthUserAccountFilterProps>
+    filter: SearchFilter<SearchAuthUserAccountSortKey, SearchAuthUserAccountFilterProps>
     clear: () => void
 
     response?: SearchAuthUserAccountRemoteResponse
