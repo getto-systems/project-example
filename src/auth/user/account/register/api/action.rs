@@ -1,8 +1,6 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::ticket::validate::method::{
-    authenticate, AuthenticateEvent, AuthenticateInfra,
-};
+use crate::auth::ticket::validate::method::{authenticate, AuthenticateEvent, AuthenticateInfra};
 
 use crate::auth::user::account::register::infra::{
     AuthUserIdGenerator, RegisterAuthUserAccountFields, RegisterAuthUserAccountFieldsExtract,
@@ -101,29 +99,25 @@ pub enum RegisterAuthUserAccountEvent {
     RepositoryError(RepositoryError),
 }
 
-mod register_auth_user_account_event {
-    use super::RegisterAuthUserAccountEvent;
+const SUCCESS: &'static str = "register auth user account success";
+const ERROR: &'static str = "register auth user account error";
 
-    const SUCCESS: &'static str = "register auth user account success";
-    const ERROR: &'static str = "register auth user account error";
-
-    impl std::fmt::Display for RegisterAuthUserAccountEvent {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            match self {
-                Self::Success => write!(f, "{}", SUCCESS),
-                Self::Invalid(err) => write!(f, "{}; invalid; {}", ERROR, err),
-                Self::LoginIdAlreadyRegistered => {
-                    write!(f, "{}; login-id already registered", ERROR)
-                }
-                Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
+impl std::fmt::Display for RegisterAuthUserAccountEvent {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Success => write!(f, "{}", SUCCESS),
+            Self::Invalid(err) => write!(f, "{}; invalid; {}", ERROR, err),
+            Self::LoginIdAlreadyRegistered => {
+                write!(f, "{}; login-id already registered", ERROR)
             }
+            Self::RepositoryError(err) => write!(f, "{}; {}", ERROR, err),
         }
     }
 }
 
 async fn register_user<S>(
     infra: &impl RegisterAuthUserAccountMaterial,
-    fields: RegisterAuthUserAccountFieldsExtract,
+    fields: Option<RegisterAuthUserAccountFieldsExtract>,
     post: impl Fn(RegisterAuthUserAccountEvent) -> S,
 ) -> MethodResult<S> {
     let fields = RegisterAuthUserAccountFields::convert(fields)

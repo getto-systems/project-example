@@ -5,6 +5,7 @@ use crate::auth::user::{
 };
 
 pub enum ValidateRegisterAuthUserAccountFieldsError {
+    NotFound,
     InvalidLoginId(ValidateLoginIdError),
     InvalidGrantedRoles(ValidateGrantedAuthRolesError),
     InvalidResetTokenDestination(ValidateResetTokenDestinationError),
@@ -14,6 +15,7 @@ pub enum ValidateRegisterAuthUserAccountFieldsError {
 impl std::fmt::Display for ValidateRegisterAuthUserAccountFieldsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
+            Self::NotFound => write!(f, "not found"),
             Self::InvalidLoginId(err) => write!(f, "login-id: {}", err),
             Self::InvalidGrantedRoles(err) => write!(f, "granted-roles: {}", err),
             Self::InvalidResetTokenDestination(err) => {

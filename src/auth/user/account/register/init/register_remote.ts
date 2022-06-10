@@ -43,10 +43,10 @@ async function fetchRemote(
             body: encodeProtobuf(
                 pb.auth.user.account.register.service.RegisterAuthUserAccountRequestPb,
                 (message) => {
-                    message.loginId = fields.loginId
-                    message.grantedRoles = Array.from(fields.grantedRoles)
-                    message.resetTokenDestination = fields.resetTokenDestination
-                    message.memo = fields.memo
+                    message.data = {
+                        ...fields,
+                        grantedRoles: Array.from(fields.grantedRoles),
+                    }
                 },
             ),
         })

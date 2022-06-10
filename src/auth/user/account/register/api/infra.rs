@@ -12,7 +12,7 @@ use crate::{
 };
 
 pub trait RegisterAuthUserAccountRequestDecoder {
-    fn decode(self) -> RegisterAuthUserAccountFieldsExtract;
+    fn decode(self) -> Option<RegisterAuthUserAccountFieldsExtract>;
 }
 
 pub struct RegisterAuthUserAccountFields {
@@ -31,8 +31,9 @@ pub struct RegisterAuthUserAccountFieldsExtract {
 
 impl RegisterAuthUserAccountFields {
     pub fn convert(
-        fields: RegisterAuthUserAccountFieldsExtract,
+        fields: Option<RegisterAuthUserAccountFieldsExtract>,
     ) -> Result<Self, ValidateRegisterAuthUserAccountFieldsError> {
+        let fields = fields.ok_or(ValidateRegisterAuthUserAccountFieldsError::NotFound)?;
         Ok(Self {
             login_id: LoginId::convert(fields.login_id)
                 .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidLoginId)?,

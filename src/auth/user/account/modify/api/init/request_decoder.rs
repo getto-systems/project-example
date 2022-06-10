@@ -1,5 +1,6 @@
-use crate::auth::user::account::modify::y_protobuf::service::{
-    ModifyAuthUserAccountChangesPb, ModifyAuthUserAccountRequestPb,
+use crate::auth::user::account::{
+    modify::y_protobuf::service::ModifyAuthUserAccountRequestPb,
+    y_protobuf::service::AuthUserAccountPb,
 };
 
 use crate::auth::user::account::modify::infra::{
@@ -29,7 +30,7 @@ impl ModifyAuthUserAccountRequestDecoder for PbModifyAuthUserAccountRequestDecod
     }
 }
 
-fn decode_changes(data: ModifyAuthUserAccountChangesPb) -> ModifyAuthUserAccountChangesExtract {
+fn decode_changes(data: AuthUserAccountPb) -> ModifyAuthUserAccountChangesExtract {
     ModifyAuthUserAccountChangesExtract {
         granted_roles: data.granted_roles,
         attrs: AuthUserAttributesExtract { memo: data.memo },

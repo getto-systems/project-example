@@ -2,13 +2,15 @@ syntax = "proto3";
 
 package auth.user.account.modify.service;
 
+import "auth/user/account/x_protobuf/service.proto";
+
 service ModifyAuthUserAccountPb {
     rpc ModifyUser (ModifyAuthUserAccountRequestPb) returns (ModifyAuthUserAccountResponsePb);
 }
 message ModifyAuthUserAccountRequestPb {
     string login_id = 1;
-    ModifyAuthUserAccountChangesPb from = 2;
-    ModifyAuthUserAccountChangesPb to = 3;
+    auth.user.account.service.AuthUserAccountPb from = 2;
+    auth.user.account.service.AuthUserAccountPb to = 3;
 }
 message ModifyAuthUserAccountResponsePb {
     bool success = 1;
@@ -18,8 +20,4 @@ enum ModifyAuthUserAccountErrorKindPb {
     CONFLICT = 0;
     NOT_FOUND = 1;
     INVALID = 2;
-}
-message ModifyAuthUserAccountChangesPb {
-    repeated string granted_roles = 1;
-    string memo = 2;
 }
