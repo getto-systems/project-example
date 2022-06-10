@@ -2,7 +2,7 @@ import { test, expect } from "vitest"
 
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 
-import { initFilterLoginIdAction } from "./action"
+import { initTextFilterAction } from "../../../../z_lib/ui/input/filter/text"
 
 test("clear", () => {
     const { action, store } = standard()
@@ -14,7 +14,7 @@ test("clear", () => {
 })
 
 function standard() {
-    const { input: action } = initFilterLoginIdAction({ filter: false })
+    const { input: action } = initTextFilterAction({ filter: false })
     const store = mockBoardValueStore(action.input)
 
     return { action, store }

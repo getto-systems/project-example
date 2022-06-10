@@ -23,8 +23,8 @@ import { BoardValueStore } from "../../../../../../z_vendor/getto-application/bo
 import { ValidateResetTokenDestinationError } from "./data"
 import { ResetTokenDestination } from "../kernel/data"
 
-export interface InputResetTokenDestinationAction
-    extends StatefulApplicationAction<InputResetTokenDestinationState> {
+export interface ResetTokenDestinationFieldAction
+    extends StatefulApplicationAction<ResetTokenDestinationFieldState> {
     readonly destinationType: InputBoardAction<BoardValueStore>
     readonly email: InputBoardAction<BoardValueStore>
     readonly validate: ValidateBoardFieldAction<
@@ -33,20 +33,21 @@ export interface InputResetTokenDestinationAction
     >
     readonly observe: ObserveBoardFieldAction
 
-    reset(destination: ResetTokenDestination): InputResetTokenDestinationState
+    reset(destination: ResetTokenDestination): ResetTokenDestinationFieldState
+    clear(): ResetTokenDestinationFieldState
 }
 
-export type InputResetTokenDestinationState = Readonly<{ type: ResetTokenDestination["type"] }>
+export type ResetTokenDestinationFieldState = Readonly<{ type: ResetTokenDestination["type"] }>
 
-const initialState: InputResetTokenDestinationState = { type: "none" }
+const initialState: ResetTokenDestinationFieldState = { type: "none" }
 
-export function initInputResetTokenDestinationAction(): InputResetTokenDestinationAction {
+export function initResetTokenDestinationFieldAction(): ResetTokenDestinationFieldAction {
     return new DestinationAction()
 }
 
 class DestinationAction
-    extends AbstractStatefulApplicationAction<InputResetTokenDestinationState>
-    implements InputResetTokenDestinationAction
+    extends AbstractStatefulApplicationAction<ResetTokenDestinationFieldState>
+    implements ResetTokenDestinationFieldAction
 {
     initialState = initialState
 
@@ -127,7 +128,7 @@ class DestinationAction
         }
     }
 
-    reset(destination: ResetTokenDestination): InputResetTokenDestinationState {
+    reset(destination: ResetTokenDestination): ResetTokenDestinationFieldState {
         const destinationType = destination.type
         this.store.destinationType.set(destinationType)
         this.store.input.set(
@@ -144,5 +145,8 @@ class DestinationAction
         this.validate.clear()
         this.observe.pin()
         return this.post({ type: destinationType })
+    }
+    clear(): ResetTokenDestinationFieldState {
+        return this.reset({ type: "none" })
     }
 }

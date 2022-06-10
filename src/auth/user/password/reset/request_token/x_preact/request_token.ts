@@ -15,7 +15,7 @@ import { icon_change } from "../../../../../../x_content/icon"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
 import { takeLongtimeField, validationMessage } from "../../../../../../common/x_preact/design/form"
 
-import { LoginIdField } from "../../../../login_id/input/x_preact/input"
+import { LoginIdField } from "../../../../login_id/input/x_preact/field"
 import { ClearChangesButton } from "../../../../../../common/x_preact/button/clear_changes_button"
 import { SendButton } from "../../../../../../common/x_preact/button/send_button"
 

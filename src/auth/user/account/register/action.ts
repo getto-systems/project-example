@@ -5,24 +5,22 @@ import {
 
 import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
 
+import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
+import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
 import {
-    initInputGrantedAuthRolesAction,
-    InputGrantedAuthRolesAction,
-} from "../input/granted_roles/action"
-import {
-    ValidateBoardAction,
-    initValidateBoardAction,
-} from "../../../../z_vendor/getto-application/board/validate_board/action"
-import {
-    initObserveBoardAction,
-    ObserveBoardAction,
-} from "../../../../z_vendor/getto-application/board/observe_board/action"
-import { initInputLoginIdAction, InputLoginIdAction } from "../../login_id/input/action"
-import {
-    initInputResetTokenDestinationAction,
-    InputResetTokenDestinationAction,
+    initResetTokenDestinationFieldAction,
+    ResetTokenDestinationFieldAction,
 } from "../../password/reset/token_destination/input/action"
-import { initInputAuthUserMemoAction, InputAuthUserMemoAction } from "../input/memo/action"
+import {
+    AuthUserGrantedRolesFieldAction,
+    AuthUserTextFieldAction,
+    initAuthUserGrantedRolesFieldAction,
+    initAuthUserTextFieldAction,
+} from "../input/field/action"
+import { initLoginIdFieldAction, LoginIdFieldAction } from "../../login_id/input/action"
+import { initRegisterField } from "../../../../z_lib/ui/register/action"
+
+import { ALL_AUTH_ROLES } from "../../../../x_content/role"
 
 import { RegisterAuthUserAccountRemote } from "./infra"
 import { WaitTime } from "../../../../z_lib/ui/config/infra"
@@ -31,20 +29,19 @@ import { RegisterAuthUserAccountError } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { AuthUserAccount } from "../kernel/data"
 import { LoginId } from "../../login_id/kernel/data"
-import { restoreAuthUserMemo } from "../input/memo/convert"
 
 export interface RegisterAuthUserAccountAction
     extends StatefulApplicationAction<RegisterAuthUserAccountState> {
     readonly list: ListRegisteredAuthUserAccountAction
 
-    readonly loginId: InputLoginIdAction
-    readonly grantedRoles: InputGrantedAuthRolesAction
-    readonly resetTokenDestination: InputResetTokenDestinationAction
-    readonly memo: InputAuthUserMemoAction
+    readonly loginId: LoginIdFieldAction
+    readonly grantedRoles: AuthUserGrantedRolesFieldAction
+    readonly resetTokenDestination: ResetTokenDestinationFieldAction
+    readonly memo: AuthUserTextFieldAction<"memo">
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    clear(): RegisterAuthUserAccountState
+    clear(): void
     submit(onSuccess: { (data: AuthUserAccount): void }): Promise<RegisterAuthUserAccountState>
 }
 export interface ListRegisteredAuthUserAccountAction
@@ -105,30 +102,30 @@ class Action
 
     readonly list: ListAction
 
-    readonly loginId: InputLoginIdAction
-    readonly grantedRoles: InputGrantedAuthRolesAction
-    readonly resetTokenDestination: InputResetTokenDestinationAction
-    readonly memo: InputAuthUserMemoAction
+    readonly loginId: LoginIdFieldAction
+    readonly grantedRoles: AuthUserGrantedRolesFieldAction
+    readonly resetTokenDestination: ResetTokenDestinationFieldAction
+    readonly memo: AuthUserTextFieldAction<"memo">
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
     material: RegisterAuthUserAccountMaterial
-    convert: { (): ConvertBoardResult<AuthUserAccount> }
+    convert: () => ConvertBoardResult<AuthUserAccount>
+    clear: () => void
 
     constructor(material: RegisterAuthUserAccountMaterial) {
         super()
         this.material = material
 
-        const loginId = initInputLoginIdAction()
-        const grantedRoles = initInputGrantedAuthRolesAction()
-        const resetTokenDestination = initInputResetTokenDestinationAction()
-        const memo = initInputAuthUserMemoAction()
+        const loginId = initLoginIdFieldAction()
+        const grantedRoles = initAuthUserGrantedRolesFieldAction()
+        const resetTokenDestination = initResetTokenDestinationFieldAction()
+        const memo = initAuthUserTextFieldAction("memo")
 
-        const fields = ["loginId", "grantedRoles", "resetTokenDestination", "memo"] as const
         const convert = (): ConvertBoardResult<AuthUserAccount> => {
             const result = {
                 loginId: loginId.validate.check(),
-                grantedRoles: grantedRoles.validate.check(),
+                grantedRoles: grantedRoles.input.validate.check(),
                 resetTokenDestination: resetTokenDestination.validate.check(),
                 memo: memo.validate.check(),
             }
@@ -151,40 +148,32 @@ class Action
             }
         }
 
-        const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
-        const { observe, observeChecker } = initObserveBoardAction({ fields })
+        const { validate, observe, clear } = initRegisterField(
+            [
+                ["loginId", loginId],
+                ["grantedRoles", grantedRoles.input],
+                ["resetTokenDestination", resetTokenDestination],
+                ["memo", memo],
+            ],
+            convert,
+        )
+
+        grantedRoles.setOptions(ALL_AUTH_ROLES)
 
         this.list = new ListAction()
 
         this.loginId = loginId
-        this.grantedRoles = grantedRoles
+        this.grantedRoles = grantedRoles.input
         this.resetTokenDestination = resetTokenDestination
         this.memo = memo
         this.validate = validate
         this.observe = observe
         this.convert = convert
-
-        fields.forEach((field) => {
-            this[field].validate.subscriber.subscribe((state) => {
-                validateChecker.update(field, state)
-            })
-            this[field].observe.subscriber.subscribe((result) => {
-                observeChecker.update(field, result.hasChanged)
-            })
-        })
+        this.clear = clear
 
         this.clear()
     }
 
-    clear(): RegisterAuthUserAccountState {
-        this.loginId.clear()
-        this.grantedRoles.reset([])
-        this.resetTokenDestination.reset({ type: "none" })
-        this.memo.reset(restoreAuthUserMemo(""))
-        this.validate.clear()
-        this.observe.clear()
-        return this.currentState()
-    }
     async submit(onSuccess: {
         (data: AuthUserAccount): void
     }): Promise<RegisterAuthUserAccountState> {

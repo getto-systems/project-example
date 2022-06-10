@@ -1,63 +1,68 @@
-import { passwordBoardConverter } from "./convert"
+import {
+    AbstractStatefulApplicationAction,
+    StatefulApplicationAction,
+} from "../../../../z_vendor/getto-application/action/action"
+import {
+    initTextFieldActionWithResource,
+    TextFieldAction,
+    TextFieldActionSubscriber,
+} from "../../../../z_lib/ui/input/field/text"
 
-import {
-    initInputBoardAction,
-    InputBoardAction,
-} from "../../../../z_vendor/getto-application/board/input/action"
-import {
-    initValidateBoardFieldAction,
-    ValidateBoardFieldAction,
-} from "../../../../z_vendor/getto-application/board/validate_field/action"
-import {
-    initObserveBoardFieldAction,
-    ObserveBoardFieldAction,
-} from "../../../../z_vendor/getto-application/board/observe_field/action"
-import { initBoardFieldObserver } from "../../../../z_vendor/getto-application/board/observe_field/init/observer"
+import { passwordBoardConverter } from "./convert"
 
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
-import { Password, PasswordCharacterState } from "./data"
-import { ValidateTextError } from "../../../../z_lib/ui/validate/data"
+import { Password } from "./data"
 
-export interface InputPasswordAction {
-    readonly input: InputBoardAction<BoardValueStore>
-    readonly validate: ValidateBoardFieldAction<Password, readonly ValidateTextError[]>
-    readonly observe: ObserveBoardFieldAction
-
-    clear(): void
-    checkCharacter(): PasswordCharacterState
+export interface PasswordFieldAction extends TextFieldAction<Password> {
+    readonly character: PasswordCharacterAction
 }
 
-export function initInputPasswordAction(): InputPasswordAction {
-    const { input, store, subscriber } = initInputBoardAction()
+export type PasswordCharacterAction = StatefulApplicationAction<PasswordCharacterState>
+export type PasswordCharacterState = Readonly<{ multiByte: boolean }>
 
-    const validate = initValidateBoardFieldAction({
-        convert: () => passwordBoardConverter(store.get()),
+export function initPasswordFieldAction(): PasswordFieldAction {
+    return initTextFieldActionWithResource({
+        convert: passwordBoardConverter,
+        resource: (infra) => ({
+            character: initPasswordCharacterAction(infra),
+        }),
     })
-    const observe = initObserveBoardFieldAction({
-        observer: initBoardFieldObserver({ current: () => store.get() }),
-    })
+}
 
-    subscriber.subscribe(() => {
-        validate.check()
-        observe.check()
-    })
+type PasswordCharacterInfra = Readonly<{
+    store: BoardValueStore
+    subscriber: TextFieldActionSubscriber
+}>
 
-    return {
-        input,
-        validate,
-        observe,
-        clear: () => {
-            store.set("")
-            validate.clear()
-            observe.check()
-        },
-        checkCharacter: () => checkPasswordCharacter(store.get()),
+function initPasswordCharacterAction(infra: PasswordCharacterInfra): PasswordCharacterAction {
+    return new CharacterAction(infra)
+}
+
+class CharacterAction
+    extends AbstractStatefulApplicationAction<PasswordCharacterState>
+    implements PasswordCharacterAction
+{
+    readonly initialState: PasswordCharacterState = { multiByte: false }
+
+    infra: PasswordCharacterInfra
+
+    constructor(infra: PasswordCharacterInfra) {
+        super()
+
+        this.infra = infra
+
+        infra.subscriber.subscribe({
+            onInput: () => this.check(),
+            onClear: () => this.check(),
+            onReset: () => this.check(),
+        })
     }
-}
 
-function checkPasswordCharacter(password: string): PasswordCharacterState {
-    return {
-        multiByte: new TextEncoder().encode(password).byteLength > password.length,
+    check(): PasswordCharacterState {
+        const value = this.infra.store.get()
+        return this.post({
+            multiByte: new TextEncoder().encode(value).byteLength > value.length,
+        })
     }
 }

@@ -8,7 +8,6 @@ import { linky } from "../../../../../z_vendor/getto-css/preact/design/highlight
 
 import { focusClass, listEditLabel } from "../../../../../common/x_preact/design/table"
 
-import { AuthRoleLabels } from "../../input/granted_roles/x_preact/input"
 import { ResetTokenDestinationLabel } from "../../../password/reset/token_destination/input/x_preact/input"
 
 import { TableStructure } from "../../../../../z_vendor/getto-table/preact/core"
@@ -19,6 +18,7 @@ import { tableClassName } from "../../../../../z_vendor/getto-table/preact/decor
 import { ListRegisteredAuthUserAccountAction } from "../action"
 
 import { AuthUserAccount, AUTH_USER_ACCOUNT } from "../../kernel/data"
+import { authUserGrantedRoles } from "../../kernel/x_preact/field"
 
 export type ListRegisteredAuthUserAccountTableStructure = TableStructure<Summary, AuthUserAccount>
 
@@ -42,7 +42,7 @@ function build(
             column: editLink,
         })).alwaysVisible(),
 
-        tableCell("login-id", (key) => ({
+        tableCell("loginId", (key) => ({
             label: AUTH_USER_ACCOUNT[key],
             header: linky,
             column: loginId,
@@ -50,13 +50,13 @@ function build(
             .alwaysVisible()
             .border(["leftDouble"]),
 
-        tableCell("granted-roles", (key) => ({
+        tableCell("grantedRoles", (key) => ({
             label: AUTH_USER_ACCOUNT[key],
             header: linky,
-            column: grantedRoles,
+            column: (row: AuthUserAccount) => authUserGrantedRoles(row),
         })).border(["left"]),
 
-        tableCell("reset-token-destination", (key) => ({
+        tableCell("resetTokenDestination", (key) => ({
             label: AUTH_USER_ACCOUNT[key],
             header: linky,
             column: resetTokenDestination,
@@ -72,9 +72,6 @@ function build(
 
     function loginId(row: AuthUserAccount): VNodeContent {
         return row.loginId
-    }
-    function grantedRoles(row: AuthUserAccount): VNodeContent {
-        return h(AuthRoleLabels, row)
     }
     function resetTokenDestination(row: AuthUserAccount): VNodeContent {
         return h(ResetTokenDestinationLabel, row)

@@ -20,22 +20,21 @@ impl PbRegisterAuthUserAccountRequestDecoder {
 }
 
 impl RegisterAuthUserAccountRequestDecoder for PbRegisterAuthUserAccountRequestDecoder {
-    fn decode(self) -> RegisterAuthUserAccountFieldsExtract {
-        RegisterAuthUserAccountFieldsExtract {
-            login_id: self.request.login_id,
-            granted_roles: self.request.granted_roles,
-            reset_token_destination: self
-                .request
-                .reset_token_destination
-                .and_then(|destination| match destination.r#type.as_str() {
-                    "email" => Some(ResetTokenDestinationExtract::Email(destination.email)),
-                    _ => None,
-                })
-                .unwrap_or(ResetTokenDestinationExtract::None),
-            attrs: AuthUserAttributesExtract {
-                memo: self.request.memo,
-            },
-        }
+    fn decode(self) -> Option<RegisterAuthUserAccountFieldsExtract> {
+        self.request
+            .data
+            .map(|data| RegisterAuthUserAccountFieldsExtract {
+                login_id: data.login_id,
+                granted_roles: data.granted_roles,
+                reset_token_destination: data
+                    .reset_token_destination
+                    .and_then(|destination| match destination.r#type.as_str() {
+                        "email" => Some(ResetTokenDestinationExtract::Email(destination.email)),
+                        _ => None,
+                    })
+                    .unwrap_or(ResetTokenDestinationExtract::None),
+                attrs: AuthUserAttributesExtract { memo: data.memo },
+            })
     }
 }
 
@@ -50,9 +49,9 @@ pub mod test {
     }
 
     impl RegisterAuthUserAccountRequestDecoder for StaticRegisterAuthUserAccountRequestDecoder {
-        fn decode(self) -> RegisterAuthUserAccountFieldsExtract {
+        fn decode(self) -> Option<RegisterAuthUserAccountFieldsExtract> {
             match self {
-                Self::Valid(fields) => fields,
+                Self::Valid(fields) => Some(fields),
             }
         }
     }

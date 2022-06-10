@@ -12,7 +12,7 @@ export type ValidateResetTokenDestinationError =
 
 export type ValidateResetTokenDestinationTypeError = Readonly<{ type: "invalid-type" }>
 
-export type ConvertResetTokenDestinationResult = ValidateBoardFieldResult<
+export type ValidateResetTokenDestinationResult = ValidateBoardFieldResult<
     ResetTokenDestination,
     ValidateResetTokenDestinationError
 >

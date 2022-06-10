@@ -3,7 +3,8 @@ import { setupActionTestRunner } from "../../../../z_vendor/getto-application/ac
 
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 
-import { initInputPasswordAction } from "./action"
+import { initPasswordFieldAction } from "./action"
+import { Password } from "./data"
 
 test("validate; valid input", async () => {
     const { action, store } = standard()
@@ -99,18 +100,39 @@ test("validate; valid : just max-length : multi-byte", async () => {
     })
 })
 
-test("password character state : single byte", () => {
+test("password character state : single byte", async () => {
     const { action, store } = standard()
 
-    store.set("password")
-    expect(action.checkCharacter()).toEqual({ multiByte: false })
+    const runner = setupActionTestRunner(action.character.subscriber)
+
+    await runner(async () => {
+        store.set("password")
+        return action.character.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual([{ multiByte: false }])
+    })
 })
 
-test("password character state : multi byte", () => {
+test("password character state : multi byte", async () => {
     const { action, store } = standard()
 
-    store.set("パスワード")
-    expect(action.checkCharacter()).toEqual({ multiByte: true })
+    const runner = setupActionTestRunner(action.character.subscriber)
+
+    await runner(async () => {
+        store.set("パスワード")
+        return action.character.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual([{ multiByte: true }])
+    })
+})
+
+test("reset", () => {
+    const { action, store } = standard()
+
+    store.set("valid")
+    action.reset("password" as Password)
+
+    expect(store.get()).toEqual("password")
 })
 
 test("clear", () => {
@@ -123,7 +145,7 @@ test("clear", () => {
 })
 
 function standard() {
-    const action = initInputPasswordAction()
+    const action = initPasswordFieldAction()
     const store = mockBoardValueStore(action.input)
 
     return { action, store }

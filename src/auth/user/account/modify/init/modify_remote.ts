@@ -46,11 +46,11 @@ async function fetchRemote(
                 (message) => {
                     message.loginId = user.loginId
                     message.from = {
-                        memo: user.memo,
+                        ...user,
                         grantedRoles: Array.from(user.grantedRoles),
                     }
                     message.to = {
-                        memo: fields.memo,
+                        ...fields,
                         grantedRoles: Array.from(fields.grantedRoles),
                     }
                 },

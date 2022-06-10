@@ -10,30 +10,30 @@ import { nextSort } from "../sort/helper"
 
 import { SearchSort } from "../sort/data"
 
-export interface SearchFilterField {
+export interface SearchFilterAction {
     readonly observe: ObserveBoardFieldAction
     clear(): void
 }
 
-export type SearchFilterFields<K extends string> = readonly [K, SearchFilterField][]
+export type SearchFilterEntry<K extends string> = [K, SearchFilterAction]
 
 export type SearchFilterProps<S, F> = Readonly<{
     observe: ObserveBoardAction
     offset: SearchOffsetAction
     columns: SearchColumnsAction
-    filter: SearchFilterAction<S, F>
+    filter: SearchFilter<S, F>
     clear: { (): void }
 }>
 
-export interface SearchFilterAction<S, F> {
-    get: { (): SearchFilter<S, F> }
+export interface SearchFilter<S, F> {
+    get: { (): SearchFilterValue<S, F> }
     setSort: { (sort: SearchSort<S>): void }
-    search: { (): SearchFilter<S, F> }
-    load: { (): SearchFilter<S, F> }
-    sort: { (key: S): SearchFilter<S, F> }
+    search: { (): SearchFilterValue<S, F> }
+    load: { (): SearchFilterValue<S, F> }
+    sort: { (key: S): SearchFilterValue<S, F> }
 }
 
-export type SearchFilter<S, F> = F &
+export type SearchFilterValue<S, F> = F &
     Readonly<{
         offset: string
         sort: SearchSort<S>
@@ -41,8 +41,8 @@ export type SearchFilter<S, F> = F &
 
 export function initSearchFilter<K extends string, S, F>(
     infra: SearchColumnsInfra,
-    initialFilter: SearchFilter<S, F>,
-    fields: SearchFilterFields<K>,
+    initialFilter: SearchFilterValue<S, F>,
+    fields: readonly SearchFilterEntry<K>[],
     pin: () => F,
 ): SearchFilterProps<S, F> {
     const offset = initSearchOffsetAction(initialFilter.offset)
@@ -65,25 +65,26 @@ export function initSearchFilter<K extends string, S, F>(
 
     const filter = {
         value: initialFilter,
-        get: (): SearchFilter<S, F> => filter.value,
-        set: (newFilter: SearchFilter<S, F>): SearchFilter<S, F> => (filter.value = newFilter),
+        get: (): SearchFilterValue<S, F> => filter.value,
+        set: (newFilter: SearchFilterValue<S, F>): SearchFilterValue<S, F> =>
+            (filter.value = newFilter),
         setSort: (sort: SearchSort<S>) =>
             filter.set({
                 ...filter.value,
                 sort,
             }),
-        search: (): SearchFilter<S, F> =>
+        search: (): SearchFilterValue<S, F> =>
             filter.set({
                 ...filter.value,
                 offset: offset.reset(),
                 ...pin(),
             }),
-        load: (): SearchFilter<S, F> =>
+        load: (): SearchFilterValue<S, F> =>
             filter.set({
                 ...filter.value,
                 offset: offset.get(),
             }),
-        sort: (key: S): SearchFilter<S, F> =>
+        sort: (key: S): SearchFilterValue<S, F> =>
             filter.set({
                 ...filter.value,
                 offset: offset.reset(),

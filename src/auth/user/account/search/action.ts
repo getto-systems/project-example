@@ -5,15 +5,17 @@ import {
 
 import { checkTakeLongtime } from "../../../../z_lib/ui/timer/helper"
 
-import { initFilterLoginIdAction, FilterLoginIdAction } from "../../login_id/input/action"
-import {
-    initFilterGrantedRolesAction,
-    FilterGrantedRolesAction,
-} from "../input/granted_roles/action"
+import { initTextFilterAction, TextFilterAction } from "../../../../z_lib/ui/input/filter/text"
 import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
 import { SearchOffsetAction } from "../../../../z_lib/ui/search/offset/action"
 import { SearchColumnsAction, SearchColumnsInfra } from "../../../../z_lib/ui/search/columns/action"
-import { initSearchFilter, SearchFilterAction } from "../../../../z_lib/ui/search/filter/action"
+import { initSearchFilter, SearchFilter } from "../../../../z_lib/ui/search/filter/action"
+import {
+    AuthUserGrantedRolesFilterAction,
+    initAuthUserGrantedRolesFilterAction,
+} from "../input/filter/action"
+
+import { ALL_AUTH_ROLES } from "../../../../x_content/role"
 
 import {
     FocusAuthUserAccountDetecter,
@@ -37,8 +39,8 @@ import { AuthUserAccount } from "../kernel/data"
 import { LoginId } from "../../login_id/kernel/data"
 
 export interface SearchAuthUserAccountAction extends ListAuthUserAccountAction {
-    readonly loginId: FilterLoginIdAction
-    readonly grantedRoles: FilterGrantedRolesAction
+    readonly loginId: TextFilterAction
+    readonly grantedRoles: AuthUserGrantedRolesFilterAction
     readonly observe: ObserveBoardAction
 
     clear(): void
@@ -117,15 +119,15 @@ class Action
 
     readonly focused: FocusedAuthUserAccountAction
 
-    readonly loginId: FilterLoginIdAction
-    readonly grantedRoles: FilterGrantedRolesAction
+    readonly loginId: TextFilterAction
+    readonly grantedRoles: AuthUserGrantedRolesFilterAction
     readonly offset: SearchOffsetAction
     readonly columns: SearchColumnsAction
     readonly observe: ObserveBoardAction
 
     material: SearchAuthUserAccountMaterial
 
-    filter: SearchFilterAction<SearchAuthUserAccountSortKey, SearchAuthUserAccountFilterProps>
+    filter: SearchFilter<SearchAuthUserAccountSortKey, SearchAuthUserAccountFilterProps>
     clear: () => void
 
     response?: SearchAuthUserAccountRemoteResponse
@@ -137,8 +139,8 @@ class Action
 
         const initialFilter = material.shell.detectFilter()
 
-        const loginId = initFilterLoginIdAction(initialFilter.loginId)
-        const grantedRoles = initFilterGrantedRolesAction(initialFilter.grantedRoles)
+        const loginId = initTextFilterAction(initialFilter.loginId)
+        const grantedRoles = initAuthUserGrantedRolesFilterAction(initialFilter.grantedRoles)
 
         const { observe, offset, columns, filter, clear } = initSearchFilter(
             material.infra,
@@ -152,6 +154,8 @@ class Action
                 grantedRoles: grantedRoles.pin(),
             }),
         )
+
+        grantedRoles.setOptions(ALL_AUTH_ROLES)
 
         this.material = material
         this.filter = filter
@@ -276,7 +280,7 @@ class Action
         response?:
             | Readonly<{
                   page: Readonly<{ offset: number; limit: number; all: number }>
-                  sort: Readonly<{ key: "login-id"; order: SearchSortOrder }>
+                  sort: Readonly<{ key: "loginId"; order: SearchSortOrder }>
                   users: readonly AuthUserAccount[]
               }>
             | undefined

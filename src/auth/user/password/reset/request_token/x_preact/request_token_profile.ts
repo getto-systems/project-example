@@ -13,7 +13,7 @@ import { takeLongtimeField, validationMessage } from "../../../../../../common/x
 
 import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_error/reason"
 
-import { LoginIdField } from "../../../../login_id/input/x_preact/input"
+import { LoginIdField } from "../../../../login_id/input/x_preact/field"
 import { EditButton } from "../../../../../../common/x_preact/button/edit_button"
 import { EditSuccessButton } from "../../../../../../common/x_preact/button/edit_success_button"
 import { SendButton } from "../../../../../../common/x_preact/button/send_button"

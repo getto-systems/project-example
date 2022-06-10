@@ -11,7 +11,7 @@ import { initSearchAuthUserAccountAction, SearchAuthUserAccountAction } from "./
 import { readSearchAuthUserAccountSortKey } from "./convert"
 import { restoreLoginId } from "../../login_id/input/convert"
 import { restoreResetTokenDestination } from "../../password/reset/token_destination/kernel/convert"
-import { restoreAuthUserMemo } from "../input/memo/convert"
+import { restoreAuthUserField } from "../kernel/convert"
 
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 import { SearchAuthUserAccountRemote, SearchAuthUserAccountRemoteResult } from "./infra"
@@ -76,13 +76,13 @@ test("sort", async () => {
     await resource.search.ignitionState
 
     await runner(async () => {
-        return resource.search.sort("login-id")
+        return resource.search.sort("loginId")
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false, previousResponse: standard_response },
             { type: "success", response: standard_response },
         ])
-        expect(resource.search.currentSort()).toEqual({ key: "login-id", order: "normal" })
+        expect(resource.search.currentSort()).toEqual({ key: "loginId", order: "normal" })
     })
 })
 
@@ -107,13 +107,13 @@ test("focus / close", async () => {
             loginId: restoreLoginId("user-1"),
             grantedRoles: [],
             resetTokenDestination: { type: "none" },
-            memo: restoreAuthUserMemo("memo"),
+            memo: restoreAuthUserField("memo"),
         }
         const another: AuthUserAccount = {
             loginId: restoreLoginId("user-another"),
             grantedRoles: [],
             resetTokenDestination: { type: "none" },
-            memo: restoreAuthUserMemo("memo"),
+            memo: restoreAuthUserField("memo"),
         }
 
         resource.search.focused.focus(user)
@@ -188,7 +188,7 @@ test("update user", async () => {
             type: "email",
             email: "user@example.com",
         }),
-        memo: restoreAuthUserMemo("memo"),
+        memo: restoreAuthUserField("memo"),
     }
 
     await runner(async () => {
@@ -213,9 +213,9 @@ test("remove user", async () => {
 })
 
 test("read sort key", () => {
-    expect(readSearchAuthUserAccountSortKey("login-id")).toEqual({
+    expect(readSearchAuthUserAccountSortKey("loginId")).toEqual({
         found: true,
-        key: "login-id",
+        key: "loginId",
     })
     expect(readSearchAuthUserAccountSortKey("unknown")).toEqual({
         found: false,
@@ -299,13 +299,13 @@ const standard_response: SearchAuthUserAccountRemoteResponse = {
             loginId: restoreLoginId("user-1"),
             grantedRoles: [],
             resetTokenDestination: { type: "none" },
-            memo: restoreAuthUserMemo("memo"),
+            memo: restoreAuthUserField("memo"),
         },
         {
             loginId: restoreLoginId("user-2"),
             grantedRoles: [],
             resetTokenDestination: { type: "none" },
-            memo: restoreAuthUserMemo("memo"),
+            memo: restoreAuthUserField("memo"),
         },
     ],
 }

@@ -3,7 +3,7 @@ import { setupActionTestRunner } from "../../../../../../z_vendor/getto-applicat
 
 import { mockBoardValueStore } from "../../../../../../z_vendor/getto-application/board/input/test_helper"
 
-import { initInputResetTokenDestinationAction } from "./action"
+import { initResetTokenDestinationFieldAction } from "./action"
 
 import { restoreResetTokenDestination } from "../kernel/convert"
 
@@ -132,7 +132,7 @@ test("reset; none", () => {
 })
 
 function standard() {
-    const action = initInputResetTokenDestinationAction()
+    const action = initResetTokenDestinationFieldAction()
     const store = {
         destinationType: mockBoardValueStore(action.destinationType),
         email: mockBoardValueStore(action.email),

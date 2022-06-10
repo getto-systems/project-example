@@ -1,7 +1,7 @@
 import { RepositoryConverter } from "../../../z_lib/ui/repository/infra"
 import { SeasonExpires, SeasonRepositoryValue } from "./infra"
 
-import { ConvertSeasonResult, Season } from "./data"
+import { ValidateSeasonResult, Season } from "./data"
 
 export function seasonToString(
     season: Readonly<{
@@ -14,7 +14,7 @@ export function seasonToString(
 export function seasonConverter(
     availableSeasons: readonly Season[],
     value: string,
-): ConvertSeasonResult {
+): ValidateSeasonResult {
     if (value === "") {
         return { valid: true, value: { default: true } }
     }

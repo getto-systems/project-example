@@ -3,9 +3,9 @@ import {
     AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
-import { initInputPasswordAction } from "../input/action"
+import { initPasswordFieldAction } from "../input/action"
 import { initValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
-import { InputPasswordAction } from "../input/action"
+import { PasswordFieldAction } from "../input/action"
 import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
 import {
     initObserveBoardAction,
@@ -22,8 +22,8 @@ import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board
 import { LoginId } from "../../login_id/kernel/data"
 
 export interface ChangePasswordAction extends StatefulApplicationAction<ChangePasswordState> {
-    readonly currentPassword: InputPasswordAction
-    readonly newPassword: InputPasswordAction
+    readonly currentPassword: PasswordFieldAction
+    readonly newPassword: PasswordFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -36,7 +36,7 @@ export type ChangePasswordState = ChangePasswordEvent
 const initialState: ChangePasswordState = { type: "initial" }
 
 export interface OverwritePasswordAction extends StatefulApplicationAction<OverwritePasswordState> {
-    readonly newPassword: InputPasswordAction
+    readonly newPassword: PasswordFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -75,8 +75,8 @@ class Action
 {
     readonly initialState = initialState
 
-    readonly currentPassword: InputPasswordAction
-    readonly newPassword: InputPasswordAction
+    readonly currentPassword: PasswordFieldAction
+    readonly newPassword: PasswordFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -87,8 +87,8 @@ class Action
         super()
         this.material = material
 
-        const currentPassword = initInputPasswordAction()
-        const newPassword = initInputPasswordAction()
+        const currentPassword = initPasswordFieldAction()
+        const newPassword = initPasswordFieldAction()
 
         const fields = ["currentPassword", "newPassword"] as const
         const convert = (): ConvertBoardResult<ChangePasswordFields> => {
@@ -199,7 +199,7 @@ class OverwriteAction
 {
     readonly initialState = initialOverwriteState
 
-    readonly newPassword: InputPasswordAction
+    readonly newPassword: PasswordFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -212,7 +212,7 @@ class OverwriteAction
 
         const fields = ["newPassword"] as const
 
-        const newPassword = initInputPasswordAction()
+        const newPassword = initPasswordFieldAction()
         const { validate, validateChecker } = initValidateBoardAction(
             { fields },
             {

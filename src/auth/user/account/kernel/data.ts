@@ -6,15 +6,21 @@ export type AuthUserAccount = Readonly<{
     loginId: LoginId
     grantedRoles: readonly AuthRole[]
     resetTokenDestination: ResetTokenDestination
-    memo: AuthUserMemo
+    memo: TypeAuthUser<"memo">
 }>
 
-export type AuthUserMemo = string & { AuthUserMemo: never }
+type TypeDef<K extends string, T> = T & { [key in K]: never }
+export type TypeAuthUser<K extends AuthUserField> = TypeDef<`authUser-${K}`, AuthUserExtract[K]>
+export type AuthUserField = keyof AuthUserExtract
+export type AuthUserExtract = {
+    grantedRole: AuthRole
+    memo: string
+}
 
 export const AUTH_USER_ACCOUNT = {
-    "login-id": "ログインID",
+    loginId: "ログインID",
     password: "パスワード",
     memo: "備考",
-    "granted-roles": "権限",
-    "reset-token-destination": "パスワードリセット用Eメール",
+    grantedRoles: "権限",
+    resetTokenDestination: "パスワードリセット用Eメール",
 } as const

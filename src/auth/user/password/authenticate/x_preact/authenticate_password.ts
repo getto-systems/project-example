@@ -18,7 +18,7 @@ import { signNav } from "../../../../sign/nav/x_preact/nav"
 import { takeLongtimeField, validationMessage } from "../../../../../common/x_preact/design/form"
 
 import { ApplicationError } from "../../../../../avail/x_preact/application_error"
-import { LoginIdField } from "../../../login_id/input/x_preact/input"
+import { LoginIdField } from "../../../login_id/input/x_preact/field"
 import { PasswordField } from "../../input/x_preact/input"
 import { SendButton } from "../../../../../common/x_preact/button/send_button"
 import { ClearChangesButton } from "../../../../../common/x_preact/button/clear_changes_button"
