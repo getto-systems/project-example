@@ -227,6 +227,10 @@ class Cell<M, R> implements TableCellExpansion<M, R> {
         this.mutable.leaf.alwaysVisible()
         return this
     }
+    initiallyHidden(): TableCellExpansion<M, R> {
+        this.mutable.leaf.initiallyHidden()
+        return this
+    }
     border(borders: readonly TableDataVerticalBorder[]): TableCellExpansion<M, R> {
         this.mutable.leaf.border(borders)
         return this

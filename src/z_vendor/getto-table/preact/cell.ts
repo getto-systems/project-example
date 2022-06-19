@@ -163,6 +163,7 @@ interface TableCell_base<T, R> {
 }
 interface TableCell_leaf<T> {
     alwaysVisible(): T
+    initiallyHidden(): T
     border(borders: readonly TableDataVerticalBorder[]): T
 
     decorateView(decorator: TableDataViewDecorator): T
