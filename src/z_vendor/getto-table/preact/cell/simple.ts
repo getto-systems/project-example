@@ -208,6 +208,10 @@ class Cell<M, R> implements TableCellSimple<M, R> {
         this.mutable.leaf.alwaysVisible()
         return this
     }
+    initiallyHidden(): TableCellSimple<M, R> {
+        this.mutable.leaf.initiallyHidden()
+        return this
+    }
     border(borders: readonly TableDataVerticalBorder[]): TableCellSimple<M, R> {
         this.mutable.leaf.border(borders)
         return this
