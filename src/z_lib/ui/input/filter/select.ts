@@ -22,14 +22,17 @@ export interface SelectFilterAction<T> {
     clear(): void
 }
 
-export type SelectFilterProps<T> = Readonly<{
-    initial: SelectResult<T>
-    convert: (data: T) => string
+export type SelectFilterProps<T, V> = Readonly<{
+    initial: SelectResult<V>
+    map: (data: T) => V
+    convert: (data: V) => string
 }>
-export function initSelectFilterAction<T>(props: SelectFilterProps<T>): Readonly<{
+export function initSelectFilterAction<T, V>(
+    props: SelectFilterProps<T, V>,
+): Readonly<{
     input: SelectFilterAction<T>
     setOptions: { (state: readonly T[]): void }
-    pin: () => SelectResult<T>
+    pin: () => SelectResult<V>
 }> {
     const { input, store, subscriber } = initInputBoardAction()
     let options: PrepareElementState<readonly T[]> = { type: "initial" }
@@ -55,6 +58,7 @@ export function initSelectFilterAction<T>(props: SelectFilterProps<T>): Readonly
             options: () => options,
             clear: () => {
                 store.set("")
+                observe.check()
             },
         },
         setOptions: (newOptions) => {
@@ -62,24 +66,25 @@ export function initSelectFilterAction<T>(props: SelectFilterProps<T>): Readonly
         },
         pin: () => {
             observe.pin()
-            return find(store.get(), options, props.convert)
+            return find(store.get(), options, props.convert, props.map)
         },
     }
 }
 
-function find<T>(
+function find<T, V>(
     selected: string,
     options: PrepareElementState<readonly T[]>,
-    convert: (data: T) => string,
-): SelectResult<T> {
+    convert: (data: V) => string,
+    map: (data: T) => V,
+): SelectResult<V> {
     if (options.type === "initial") {
         return { isSelected: false }
     }
 
-    const value = options.data.find((data) => selected === convert(data))
+    const value = options.data.find((data) => selected === convert(map(data)))
     if (value === undefined) {
         return { isSelected: false }
     }
 
-    return { isSelected: true, value }
+    return { isSelected: true, value: map(value) }
 }
