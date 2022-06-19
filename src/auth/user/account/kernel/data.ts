@@ -13,7 +13,6 @@ type TypeDef<K extends string, T> = T & { [key in K]: never }
 export type TypeAuthUser<K extends AuthUserField> = TypeDef<`authUser-${K}`, AuthUserExtract[K]>
 export type AuthUserField = keyof AuthUserExtract
 export type AuthUserExtract = {
-    grantedRole: AuthRole
     memo: string
 }
 
