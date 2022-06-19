@@ -31,7 +31,7 @@ export function initSelectFilterAction<T, V>(
     props: SelectFilterProps<T, V>,
 ): Readonly<{
     input: SelectFilterAction<T>
-    setOptions: { (state: readonly T[]): void }
+    setOptions: (state: readonly T[]) => void
     pin: () => SelectResult<V>
 }> {
     const { input, store, subscriber } = initInputBoardAction()
