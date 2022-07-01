@@ -1,6 +1,7 @@
 import {
+    ApplicationStateAction,
+    initApplicationStateAction,
     StatefulApplicationAction,
-    AbstractStatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 
 import { AuthTicketRepository } from "../kernel/infra"
@@ -30,14 +31,16 @@ export type LogoutInfra = Readonly<{
     logoutRemote: LogoutRemote
 }>
 
-class Action extends AbstractStatefulApplicationAction<LogoutState> implements LogoutAction {
-    readonly initialState = initialState
-
-    infra: LogoutInfra
+class Action implements LogoutAction {
+    readonly infra: LogoutInfra
+    readonly state: ApplicationStateAction<LogoutState>
+    readonly post: (state: LogoutState) => LogoutState
 
     constructor(infra: LogoutInfra) {
-        super()
+        const { state, post } = initApplicationStateAction({ initialState })
         this.infra = infra
+        this.state = state
+        this.post = post
     }
 
     async submit(): Promise<LogoutState> {

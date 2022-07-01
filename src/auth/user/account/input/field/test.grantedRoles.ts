@@ -10,11 +10,11 @@ import { ALL_AUTH_ROLES } from "../../../../../x_content/role"
 test("validate; valid input", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate.subscriber)
+    const runner = setupActionTestRunner(action.validate)
 
     await runner(async () => {
         store.set(["auth-user"])
-        return action.validate.currentState()
+        return action.validate.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "validated", result: { valid: true, value: ["auth-user"] } },
@@ -25,11 +25,11 @@ test("validate; valid input", async () => {
 test("observe; has changed", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.observe.subscriber)
+    const runner = setupActionTestRunner(action.observe)
 
     await runner(async () => {
         store.set(["auth-user"])
-        return action.observe.currentState()
+        return action.observe.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ hasChanged: true }])
     })

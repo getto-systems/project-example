@@ -11,7 +11,7 @@ type Props = Readonly<{
 export function MoveToNextVersion(props: Props): void {
     // /${version}/index.html とかで実行する
     try {
-        props.findNext.subscriber.subscribe(handleState)
+        props.findNext.state.subscribe(handleState)
     } catch (err) {
         handleError(err)
     }
@@ -42,7 +42,7 @@ export function MoveToNextVersion(props: Props): void {
             location.href = path.path
         }
 
-        props.findNext.subscriber.unsubscribe(handleState)
+        props.findNext.state.unsubscribe(handleState)
     }
     function redirectPath(
         upToDate: boolean,
@@ -68,7 +68,7 @@ export function MoveToNextVersion(props: Props): void {
     function handleError(err: unknown) {
         // エラーはどうしようもないので console.log でお茶を濁す
         console.log(err)
-        props.findNext.subscriber.unsubscribe(handleState)
+        props.findNext.state.unsubscribe(handleState)
     }
 }
 

@@ -11,13 +11,13 @@ import { initSearchSidebarAction, SearchSidebarAction } from "./action"
 test("select columns", async () => {
     const { sidebar } = standard()
 
-    const runner = setupActionTestRunner(sidebar.subscriber)
+    const runner = setupActionTestRunner(sidebar)
 
     await runner(async () => {
-        await sidebar.ignitionState
+        await sidebar.state.ignitionState
         await sidebar.fold()
         await sidebar.expand()
-        return sidebar.currentState()
+        return sidebar.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "success", state: { isExpand: true } },

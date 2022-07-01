@@ -1,6 +1,7 @@
 import {
+    ApplicationStateAction,
+    initApplicationStateAction,
     StatefulApplicationAction,
-    AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
 import { checkTakeLongtime } from "../../../../z_lib/ui/timer/helper"
@@ -111,11 +112,10 @@ export function initSearchAuthUserAccountAction(
     return new Action(material)
 }
 
-class Action
-    extends AbstractStatefulApplicationAction<SearchAuthUserAccountState>
-    implements SearchAuthUserAccountAction
-{
-    readonly initialState = initialSearchState
+class Action implements SearchAuthUserAccountAction {
+    readonly material: SearchAuthUserAccountMaterial
+    readonly state: ApplicationStateAction<SearchAuthUserAccountState>
+    readonly post: (state: SearchAuthUserAccountState) => SearchAuthUserAccountState
 
     readonly focused: FocusedAuthUserAccountAction
 
@@ -125,17 +125,18 @@ class Action
     readonly columns: SearchColumnsAction
     readonly observe: ObserveBoardAction
 
-    material: SearchAuthUserAccountMaterial
-
     filter: SearchFilter<SearchAuthUserAccountSortKey, SearchAuthUserAccountFilterProps>
     clear: () => void
 
     response?: SearchAuthUserAccountRemoteResponse
 
     constructor(material: SearchAuthUserAccountMaterial) {
-        super({
-            ignite: async () => this.load(),
+        const { state, post } = initApplicationStateAction({
+            initialState: initialSearchState,
+            ignite: () => this.load(),
         })
+        this.state = state
+        this.post = post
 
         const initialFilter = material.shell.detectFilter()
 
@@ -170,7 +171,7 @@ class Action
         this.focused = new FocusedAction({
             infra: {
                 detectUser: async (loginId): Promise<DetectUserResult> => {
-                    const result = this.searchResponse(await this.ignitionState)
+                    const result = this.searchResponse(await this.state.ignitionState)
                     if (!result.response) {
                         return { found: false }
                     }
@@ -222,7 +223,7 @@ class Action
 
     update(loginId: LoginId, user: AuthUserAccount): SearchAuthUserAccountState {
         if (!this.response) {
-            return this.currentState()
+            return this.state.currentState()
         }
 
         this.response = {
@@ -235,7 +236,7 @@ class Action
             }),
         }
 
-        const state = this.currentState()
+        const state = this.state.currentState()
         switch (state.type) {
             case "initial":
                 return state
@@ -250,7 +251,7 @@ class Action
     }
     remove(loginId: LoginId): SearchAuthUserAccountState {
         if (!this.response) {
-            return this.currentState()
+            return this.state.currentState()
         }
 
         this.response = {
@@ -262,7 +263,7 @@ class Action
             users: this.response.users.filter((row) => row.loginId !== loginId),
         }
 
-        const state = this.currentState()
+        const state = this.state.currentState()
         switch (state.type) {
             case "initial":
                 return state
@@ -355,29 +356,30 @@ type FocusedShell = Readonly<{
     updateFocus: UpdateFocusAuthUserAccountQuery
 }>
 
-class FocusedAction
-    extends AbstractStatefulApplicationAction<FocusedAuthUserAccountState>
-    implements FocusedAuthUserAccountAction
-{
-    readonly initialState = initialFocusedState
-
-    material: FocusedMaterial
+class FocusedAction implements FocusedAuthUserAccountAction {
+    readonly material: FocusedMaterial
+    readonly state: ApplicationStateAction<FocusedAuthUserAccountState>
+    readonly post: (state: FocusedAuthUserAccountState) => FocusedAuthUserAccountState
 
     constructor(material: FocusedMaterial) {
-        super({
-            ignite: async () => {
-                const focus = this.material.shell.detectFocus()
-                if (!focus.found) {
-                    return this.currentState()
-                }
-                const user = await this.material.infra.detectUser(focus.loginId)
-                if (!user.found) {
-                    return this.post({ type: "focus-failed" })
-                }
-                return this.post({ type: "focus-detected", user: user.user })
-            },
+        const { state, post } = initApplicationStateAction({
+            initialState: initialFocusedState,
+            ignite: () => this.load(),
         })
         this.material = material
+        this.state = state
+        this.post = post
+    }
+    async load(): Promise<FocusedAuthUserAccountState> {
+        const focus = this.material.shell.detectFocus()
+        if (!focus.found) {
+            return this.state.currentState()
+        }
+        const user = await this.material.infra.detectUser(focus.loginId)
+        if (!user.found) {
+            return this.post({ type: "focus-failed" })
+        }
+        return this.post({ type: "focus-detected", user: user.user })
     }
 
     focus(user: AuthUserAccount): FocusedAuthUserAccountState {
@@ -399,7 +401,7 @@ class FocusedAction
     }
 
     isFocused(user: AuthUserAccount): boolean {
-        const state = this.currentState()
+        const state = this.state.currentState()
         switch (state.type) {
             case "initial":
             case "focus-failed":

@@ -1,70 +1,51 @@
 import { test, expect } from "vitest"
-import { setupActionTestRunner } from "../../action/test_helper"
 
 import { initInputBoardAction } from "./action"
 
 import { BoardValueStore } from "./infra"
 
-test("get / set; store connected", async () => {
+test("get / set; store connected", () => {
     const { source_store, input, store, subscriber } = standard()
 
     input.connector.connect(source_store)
 
-    const runner = setupActionTestRunner({
-        subscribe: (handler) => {
-            subscriber.subscribe(() => handler(store.get()))
-        },
-        unsubscribe: () => null,
-    })
+    const stack: string[] = []
+    subscriber.subscribe(() => stack.push(store.get()))
 
-    await runner(async () => {
-        source_store.set("value")
-        input.publisher.post()
-    }).then((stack) => {
-        expect(stack).toEqual(["value"])
-    })
+    source_store.set("value")
+    input.publisher.post()
+
+    expect(stack).toEqual(["value"])
 })
 
-test("get / set; store not connected", async () => {
+test("get / set; store not connected", () => {
     const { source_store, input, store, subscriber } = standard()
 
     // store not connected
     //input.connector.connect(source_store)
 
-    const runner = setupActionTestRunner({
-        subscribe: (handler) => {
-            subscriber.subscribe(() => handler(store.get()))
-        },
-        unsubscribe: () => null,
-    })
+    const stack: string[] = []
+    subscriber.subscribe(() => stack.push(store.get()))
 
-    await runner(async () => {
-        source_store.set("value")
-        input.publisher.post()
-    }).then((stack) => {
-        expect(stack).toEqual([""])
-    })
+    source_store.set("value")
+    input.publisher.post()
+
+    expect(stack).toEqual([""])
 })
 
-test("terminate", async () => {
+test("terminate", () => {
     const { source_store, input, store, subscriber } = standard()
 
     input.connector.connect(source_store)
 
-    const runner = setupActionTestRunner({
-        subscribe: (handler) => {
-            subscriber.subscribe(() => handler(store.get()))
-        },
-        unsubscribe: () => null,
-    })
+    const stack: string[] = []
+    subscriber.subscribe(() => stack.push(store.get()))
 
-    await runner(async () => {
-        subscriber.terminate()
-        source_store.set("value")
-        input.publisher.post()
-    }).then((stack) => {
-        expect(stack).toEqual([])
-    })
+    subscriber.terminate()
+    source_store.set("value")
+    input.publisher.post()
+
+    expect(stack).toEqual([])
 })
 
 function standard() {

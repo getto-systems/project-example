@@ -1,6 +1,6 @@
 import {
+    initApplicationStateAction,
     StatefulApplicationAction,
-    AbstractStatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 import { CheckAuthTicketAction } from "../../ticket/check/action"
 import { AuthenticatePasswordAction } from "../../user/password/authenticate/action"
@@ -39,46 +39,35 @@ export type SignActionShell = Readonly<{
 }>
 
 export function initSignAction(shell: SignActionShell, factory: SignViewFactory): SignAction {
-    return new Action(shell, factory)
-}
+    const { state, post } = initApplicationStateAction({ initialState, ignite })
+    return { state }
 
-class Action extends AbstractStatefulApplicationAction<SignActionState> implements SignAction {
-    readonly initialState = initialState
+    async function ignite(): Promise<SignActionState> {
+        const checkAction = factory.check()
+        const viewType = shell.detectViewType()
 
-    factory: SignViewFactory
-
-    constructor(shell: SignActionShell, factory: SignViewFactory) {
-        super({
-            ignite: async () => {
-                const checkAction = this.factory.check()
-                const viewType = shell.detectViewType()
-
-                checkAction.subscriber.subscribe((state) => {
-                    switch (state.type) {
-                        case "required-to-login":
-                            this.post(this.mapViewType(viewType))
-                            return
-                    }
-                })
-
-                if (viewType.valid) {
-                    switch (viewType.value) {
-                        case "password-reset":
-                            return this.post(this.mapViewType(viewType))
-                    }
-                }
-                return this.post({ type: "authTicket-check", action: checkAction })
-            },
+        checkAction.state.subscribe((state) => {
+            switch (state.type) {
+                case "required-to-login":
+                    post(mapViewType(viewType))
+                    return
+            }
         })
-        this.factory = factory
-    }
 
-    mapViewType(result: ConvertLocationResult<SignViewType>): SignActionState {
+        if (viewType.valid) {
+            switch (viewType.value) {
+                case "password-reset":
+                    return post(mapViewType(viewType))
+            }
+        }
+        return post({ type: "authTicket-check", action: checkAction })
+    }
+    function mapViewType(result: ConvertLocationResult<SignViewType>): SignActionState {
         if (!result.valid) {
             // 特に指定が無ければパスワードログイン
             return {
                 type: "password-authenticate",
-                action: this.factory.password_authenticate(),
+                action: factory.password_authenticate(),
             }
         }
 
@@ -88,9 +77,9 @@ class Action extends AbstractStatefulApplicationAction<SignActionState> implemen
                 return { type }
 
             case "password-reset-requestToken":
-                return { type, action: this.factory.password_reset_requestToken() }
+                return { type, action: factory.password_reset_requestToken() }
             case "password-reset":
-                return { type, action: this.factory.password_reset() }
+                return { type, action: factory.password_reset() }
         }
     }
 }

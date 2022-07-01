@@ -1,5 +1,6 @@
 import {
-    AbstractStatefulApplicationAction,
+    ApplicationStateAction,
+    initApplicationStateAction,
     StatefulApplicationAction,
 } from "../../../../../../z_vendor/getto-application/action/action"
 import {
@@ -45,11 +46,9 @@ export function initResetTokenDestinationFieldAction(): ResetTokenDestinationFie
     return new DestinationAction()
 }
 
-class DestinationAction
-    extends AbstractStatefulApplicationAction<ResetTokenDestinationFieldState>
-    implements ResetTokenDestinationFieldAction
-{
-    initialState = initialState
+class DestinationAction implements ResetTokenDestinationFieldAction {
+    readonly state: ApplicationStateAction<ResetTokenDestinationFieldState>
+    readonly post: (state: ResetTokenDestinationFieldState) => ResetTokenDestinationFieldState
 
     readonly destinationType: InputBoardAction<BoardValueStore>
     readonly email: InputBoardAction<BoardValueStore>
@@ -65,7 +64,9 @@ class DestinationAction
     }>
 
     constructor() {
-        super()
+        const { state, post } = initApplicationStateAction({ initialState })
+        this.state = state
+        this.post = post
 
         const destinationType = initInputBoardAction()
         const email = initInputBoardAction()

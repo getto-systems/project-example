@@ -13,7 +13,7 @@ import { LoginId } from "../../login_id/kernel/data"
 test("submit", async () => {
     const { resource, user } = standard()
 
-    const runner = setupActionTestRunner(resource.unregister.subscriber)
+    const runner = setupActionTestRunner(resource.unregister)
 
     await runner(async () => {
         return resource.unregister.submit(user, () => null)
@@ -26,7 +26,7 @@ test("submit; take long time", async () => {
     // wait for take longtime timeout
     const { resource, user } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(resource.unregister.subscriber)
+    const runner = setupActionTestRunner(resource.unregister)
 
     await runner(() => {
         return resource.unregister.submit(user, () => null)

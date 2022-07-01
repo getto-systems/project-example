@@ -9,11 +9,11 @@ import { Password } from "./data"
 test("validate; valid input", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate.subscriber)
+    const runner = setupActionTestRunner(action.validate)
 
     await runner(async () => {
         store.set("valid")
-        return action.validate.currentState()
+        return action.validate.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ type: "validated", result: { valid: true, value: "valid" } }])
     })
@@ -22,11 +22,11 @@ test("validate; valid input", async () => {
 test("validate; invalid : empty", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate.subscriber)
+    const runner = setupActionTestRunner(action.validate)
 
     await runner(async () => {
         store.set("")
-        return action.validate.currentState()
+        return action.validate.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "validated", result: { valid: false, err: [{ type: "empty" }] } },
@@ -37,11 +37,11 @@ test("validate; invalid : empty", async () => {
 test("validate; invalid : too-long", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate.subscriber)
+    const runner = setupActionTestRunner(action.validate)
 
     await runner(async () => {
         store.set("a".repeat(100 + 1))
-        return action.validate.currentState()
+        return action.validate.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             {
@@ -55,11 +55,11 @@ test("validate; invalid : too-long", async () => {
 test("validate; valid : just max-length", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate.subscriber)
+    const runner = setupActionTestRunner(action.validate)
 
     await runner(async () => {
         store.set("a".repeat(100))
-        return action.validate.currentState()
+        return action.validate.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "validated", result: { valid: true, value: "a".repeat(100) } },
@@ -70,11 +70,11 @@ test("validate; valid : just max-length", async () => {
 test("validate; invalid : too-long : multi-byte", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate.subscriber)
+    const runner = setupActionTestRunner(action.validate)
 
     await runner(async () => {
         store.set("あ".repeat(100) + "a")
-        return action.validate.currentState()
+        return action.validate.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             {
@@ -88,11 +88,11 @@ test("validate; invalid : too-long : multi-byte", async () => {
 test("validate; valid : just max-length : multi-byte", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate.subscriber)
+    const runner = setupActionTestRunner(action.validate)
 
     await runner(async () => {
         store.set("あ".repeat(100))
-        return action.validate.currentState()
+        return action.validate.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "validated", result: { valid: true, value: "あ".repeat(100) } },
@@ -103,11 +103,11 @@ test("validate; valid : just max-length : multi-byte", async () => {
 test("password character state : single byte", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.character.subscriber)
+    const runner = setupActionTestRunner(action.character)
 
     await runner(async () => {
         store.set("password")
-        return action.character.currentState()
+        return action.character.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ multiByte: false }])
     })
@@ -116,11 +116,11 @@ test("password character state : single byte", async () => {
 test("password character state : multi byte", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.character.subscriber)
+    const runner = setupActionTestRunner(action.character)
 
     await runner(async () => {
         store.set("パスワード")
-        return action.character.currentState()
+        return action.character.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ multiByte: true }])
     })

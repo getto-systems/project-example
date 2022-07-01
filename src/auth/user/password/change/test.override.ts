@@ -18,7 +18,7 @@ const VALID_PASSWORD = { currentPassword: "current-password", newPassword: "new-
 test("submit valid new-password", async () => {
     const { resource, store, user } = standard()
 
-    const runner = setupActionTestRunner(resource.overwrite.subscriber)
+    const runner = setupActionTestRunner(resource.overwrite)
 
     await runner(async () => {
         store.newPassword.set(VALID_PASSWORD.newPassword)
@@ -37,7 +37,7 @@ test("submit valid login-id and password; take long time", async () => {
     // wait for take longtime timeout
     const { resource, store, user } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(resource.overwrite.subscriber)
+    const runner = setupActionTestRunner(resource.overwrite)
 
     await runner(() => {
         store.newPassword.set(VALID_PASSWORD.newPassword)
@@ -56,7 +56,7 @@ test("submit valid login-id and password; take long time", async () => {
 test("submit without fields", async () => {
     const { resource, user } = standard()
 
-    const runner = setupActionTestRunner(resource.overwrite.subscriber)
+    const runner = setupActionTestRunner(resource.overwrite)
 
     await runner(() => resource.overwrite.submit(user, () => null)).then((stack) => {
         expect(stack).toEqual([])

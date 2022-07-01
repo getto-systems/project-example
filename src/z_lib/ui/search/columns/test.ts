@@ -14,13 +14,13 @@ import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/
 test("select columns", async () => {
     const { resource, store } = standard()
 
-    const runner = setupActionTestRunner(resource.field.subscriber)
+    const runner = setupActionTestRunner(resource.field)
 
     await runner(async () => {
-        await resource.field.ignitionState
+        await resource.field.state.ignitionState
         store.columns.set(["column-a"])
         store.columns.set(["column-a", "column-b"])
-        return resource.field.currentState()
+        return resource.field.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ type: "success" }, { type: "success" }, { type: "success" }])
         expect(resource.field.get()).toEqual(["column-a", "column-b"])

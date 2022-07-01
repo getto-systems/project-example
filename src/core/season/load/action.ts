@@ -1,5 +1,5 @@
 import {
-    AbstractStatefulApplicationAction,
+    initApplicationStateAction,
     StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 
@@ -25,22 +25,14 @@ export type LoadSeasonState = Readonly<{ type: "initial" }> | LoadSeasonEvent
 const initialState: LoadSeasonState = { type: "initial" }
 
 export function initLoadSeasonAction(material: LoadSeasonMaterial): LoadSeasonAction {
-    return new Action(material)
-}
+    const { state, post } = initApplicationStateAction({
+        initialState,
+        ignite: () => load(),
+    })
+    return { state, load }
 
-class Action extends AbstractStatefulApplicationAction<LoadSeasonState> {
-    readonly initialState = initialState
-
-    material: LoadSeasonMaterial
-
-    constructor(material: LoadSeasonMaterial) {
-        super({ ignite: () => this.load() })
-
-        this.material = material
-    }
-
-    load(): Promise<LoadSeasonState> {
-        return loadSeason(this.material, this.post)
+    function load(): Promise<LoadSeasonState> {
+        return loadSeason(material, post)
     }
 }
 

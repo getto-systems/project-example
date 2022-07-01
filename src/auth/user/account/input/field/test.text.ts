@@ -13,11 +13,11 @@ fields.forEach(([name, maxLength]) => {
         test("validate; valid input", async () => {
             const { action, store } = standard()
 
-            const runner = setupActionTestRunner(action.validate.subscriber)
+            const runner = setupActionTestRunner(action.validate)
 
             await runner(async () => {
                 store.set("valid")
-                return action.validate.currentState()
+                return action.validate.state.currentState()
             }).then((stack) => {
                 expect(stack).toEqual([
                     { type: "validated", result: { valid: true, value: "valid" } },
@@ -28,11 +28,11 @@ fields.forEach(([name, maxLength]) => {
         test("validate; invalid : too-long", async () => {
             const { action, store } = standard()
 
-            const runner = setupActionTestRunner(action.validate.subscriber)
+            const runner = setupActionTestRunner(action.validate)
 
             await runner(async () => {
                 store.set("a".repeat(maxLength + 1))
-                return action.validate.currentState()
+                return action.validate.state.currentState()
             }).then((stack) => {
                 expect(stack).toEqual([
                     {
@@ -46,11 +46,11 @@ fields.forEach(([name, maxLength]) => {
         test("validate; valid : just max-length", async () => {
             const { action, store } = standard()
 
-            const runner = setupActionTestRunner(action.validate.subscriber)
+            const runner = setupActionTestRunner(action.validate)
 
             await runner(async () => {
                 store.set("a".repeat(maxLength))
-                return action.validate.currentState()
+                return action.validate.state.currentState()
             }).then((stack) => {
                 expect(stack).toEqual([
                     { type: "validated", result: { valid: true, value: "a".repeat(maxLength) } },
@@ -61,11 +61,11 @@ fields.forEach(([name, maxLength]) => {
         test("observe; has changed", async () => {
             const { action, store } = standard()
 
-            const runner = setupActionTestRunner(action.observe.subscriber)
+            const runner = setupActionTestRunner(action.observe)
 
             await runner(async () => {
                 store.set("changed")
-                return action.observe.currentState()
+                return action.observe.state.currentState()
             }).then((stack) => {
                 expect(stack).toEqual([{ hasChanged: true }])
             })

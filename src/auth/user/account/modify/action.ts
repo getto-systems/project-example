@@ -1,6 +1,7 @@
 import {
+    ApplicationStateAction,
+    initApplicationStateAction,
     StatefulApplicationAction,
-    AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
 import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
@@ -63,25 +64,24 @@ export function initModifyAuthUserAccountAction(
     return new Action(material)
 }
 
-class Action
-    extends AbstractStatefulApplicationAction<ModifyAuthUserAccountState>
-    implements ModifyAuthUserAccountAction
-{
-    readonly initialState = initialState
+class Action implements ModifyAuthUserAccountAction {
+    readonly material: ModifyAuthUserAccountMaterial
+    readonly state: ApplicationStateAction<ModifyAuthUserAccountState>
+    readonly post: (state: ModifyAuthUserAccountState) => ModifyAuthUserAccountState
 
     readonly memo: AuthUserTextFieldAction<"memo">
     readonly grantedRoles: AuthUserGrantedRolesFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    material: ModifyAuthUserAccountMaterial
-
     convert: () => ConvertBoardResult<ModifyAuthUserAccountFields>
     reset: (user: ModifyAuthUserAccountFields) => void
 
     constructor(material: ModifyAuthUserAccountMaterial) {
-        super()
+        const { state, post } = initApplicationStateAction({ initialState })
         this.material = material
+        this.state = state
+        this.post = post
 
         const memo = initAuthUserTextFieldAction("memo")
         const grantedRoles = initAuthUserGrantedRolesFieldAction()
@@ -131,7 +131,7 @@ class Action
     ): Promise<ModifyAuthUserAccountState> {
         const fields = this.convert()
         if (!fields.valid) {
-            return this.currentState()
+            return this.state.currentState()
         }
         return modifyUser(this.material, user, fields.value, onSuccess, this.post)
     }

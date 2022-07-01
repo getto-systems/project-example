@@ -9,11 +9,11 @@ import { initAuthUserGrantedRolesFilterAction } from "./action"
 test("observe; has changed", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.observe.subscriber)
+    const runner = setupActionTestRunner(action.observe)
 
     await runner(async () => {
         store.set(["auth-user"])
-        return action.observe.currentState()
+        return action.observe.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ hasChanged: true }])
     })

@@ -6,18 +6,18 @@ import { initValidateBoardAction } from "./action"
 test("validate; all valid state; clear", async () => {
     const { action, checker } = standard()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(async () => {
         checker.update("name", { type: "validated", result: { valid: true } })
         checker.update("description", { type: "validated", result: { valid: true } })
-        return action.currentState()
+        return action.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual(["initial", "valid"])
     })
     await runner(async () => {
         action.clear()
-        return action.currentState()
+        return action.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual(["initial"])
     })
@@ -26,12 +26,12 @@ test("validate; all valid state; clear", async () => {
 test("validate; invalid exists", async () => {
     const { action, checker } = standard()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(async () => {
         checker.update("name", { type: "validated", result: { valid: false } }) // invalid
         checker.update("description", { type: "validated", result: { valid: true } })
-        return action.currentState()
+        return action.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual(["invalid", "invalid"])
     })
@@ -40,12 +40,12 @@ test("validate; invalid exists", async () => {
 test("validate; initial exists", async () => {
     const { action, checker } = standard()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(async () => {
         checker.update("name", { type: "validated", result: { valid: true } })
         checker.update("description", { type: "initial" })
-        return action.currentState()
+        return action.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual(["initial", "initial"])
     })

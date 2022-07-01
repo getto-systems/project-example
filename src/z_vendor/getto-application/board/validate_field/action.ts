@@ -1,4 +1,4 @@
-import { StatefulApplicationAction, AbstractStatefulApplicationAction } from "../../action/action"
+import { initApplicationStateAction, StatefulApplicationAction } from "../../action/action"
 
 import { ValidateBoardFieldResult } from "../validate_field/data"
 
@@ -19,29 +19,18 @@ export type ValidateBoardFieldInfra<T, E> = Readonly<{
 export function initValidateBoardFieldAction<T, E>(
     infra: ValidateBoardFieldInfra<T, E>,
 ): ValidateBoardFieldAction<T, E> {
-    return new Action(infra)
-}
+    const { state, post } = initApplicationStateAction<ValidateBoardFieldState<T, E>>({
+        initialState: { type: "initial" },
+    })
+    return { state, check, clear }
 
-class Action<T, E>
-    extends AbstractStatefulApplicationAction<ValidateBoardFieldState<T, E>>
-    implements ValidateBoardFieldAction<T, E>
-{
-    readonly initialState: ValidateBoardFieldState<T, E> = { type: "initial" }
-
-    infra: ValidateBoardFieldInfra<T, E>
-
-    constructor(infra: ValidateBoardFieldInfra<T, E>) {
-        super()
-        this.infra = infra
-    }
-
-    check(): ValidateBoardFieldResult<T, E> {
-        const { convert } = this.infra
+    function check(): ValidateBoardFieldResult<T, E> {
+        const { convert } = infra
         const result = convert()
-        this.post({ type: "validated", result })
+        post({ type: "validated", result })
         return result
     }
-    clear(): ValidateBoardFieldState<T, E> {
-        return this.post({ type: "initial" })
+    function clear(): ValidateBoardFieldState<T, E> {
+        return post({ type: "initial" })
     }
 }

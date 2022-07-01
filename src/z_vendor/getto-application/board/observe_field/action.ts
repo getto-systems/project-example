@@ -1,4 +1,4 @@
-import { StatefulApplicationAction, AbstractStatefulApplicationAction } from "../../action/action"
+import { initApplicationStateAction, StatefulApplicationAction } from "../../action/action"
 
 import { ObserveBoardFieldResult } from "../observe_field/data"
 import { BoardFieldObserver } from "./infra"
@@ -18,29 +18,16 @@ export type ObserveBoardFieldInfra = Readonly<{
 export function initObserveBoardFieldAction(
     infra: ObserveBoardFieldInfra,
 ): ObserveBoardFieldAction {
-    return new Action(infra)
-}
+    const { state, post } = initApplicationStateAction({ initialState })
+    return { state, pin, check }
 
-class Action
-    extends AbstractStatefulApplicationAction<ObserveBoardFieldState>
-    implements ObserveBoardFieldAction
-{
-    readonly initialState = initialState
-
-    infra: ObserveBoardFieldInfra
-
-    constructor(infra: ObserveBoardFieldInfra) {
-        super()
-        this.infra = infra
-    }
-
-    pin(): ObserveBoardFieldState {
-        const { observer } = this.infra
+    function pin(): ObserveBoardFieldState {
+        const { observer } = infra
         observer.pin()
-        return this.check()
+        return check()
     }
-    check(): ObserveBoardFieldState {
-        const { observer } = this.infra
-        return this.post({ hasChanged: observer.hasChanged() })
+    function check(): ObserveBoardFieldState {
+        const { observer } = infra
+        return post({ hasChanged: observer.hasChanged() })
     }
 }

@@ -1,82 +1,67 @@
-export interface StatefulApplicationAction<S> {
-    readonly subscriber: ApplicationStateSubscriber<S>
-    readonly ignitionState: Promise<S>
-    currentState(): S
-}
+export type StatefulApplicationAction<S> = Readonly<{
+    state: ApplicationStateAction<S>
+}>
 
-export interface ApplicationStateSubscriber<S> {
+export interface ApplicationStateAction<S> {
+    readonly ignitionState: Promise<S>
     subscribe(handler: ApplicationStateHandler<S>): void
     unsubscribe(target: ApplicationStateHandler<S>): void
-}
-export interface ApplicationStatePublisher<S> {
-    post(state: S): S
+    currentState(): S
 }
 export interface ApplicationStateHandler<S> {
     (state: S): void
 }
-export type ApplicationActionHook<S> = Partial<{
-    ignite: ApplicationActionIgniteHook<S>
+
+export type ApplicationStateActionProps<S> = Readonly<{
+    initialState: S
+    ignite?: () => Promise<S>
 }>
-
-export interface ApplicationActionIgniteHook<S> {
-    (): Promise<S>
-}
-
-export abstract class AbstractStatefulApplicationAction<S> implements StatefulApplicationAction<S> {
-    abstract readonly initialState: S
-
-    readonly subscriber: ApplicationStateSubscriber<S>
-
-    readonly ignitionState: Promise<S>
-    readonly currentState: { (): S }
-
-    // this.material.doSomething(this.post) できるようにプロパティとして提供
-    readonly post: Post<S>
-
-    constructor(hook: ApplicationActionHook<S> = {}) {
-        const { pub, sub } = new PubSub<S>()
-        this.subscriber = sub
-        this.post = (state: S) => pub.post(state)
-
-        this.ignitionState = new Promise((resolve) => {
-            // コンストラクタが重くならないように初期 action は setTimeout で呼び出す
-            // 状態は currentState() で最新のものを参照するので subscribe を待つ必要はない
-            setTimeout(async () => {
-                resolve(hook.ignite ? await hook.ignite() : this.initialState)
-            }, 0)
-        })
-
-        // sub class から currentState に手出しできないようにコンストラクタの中で構築する
-        let currentState: S | null = null
-        sub.subscribe((state) => {
-            currentState = state
-        })
-        this.currentState = () => {
-            if (currentState === null) {
-                return this.initialState
-            } else {
-                return currentState
-            }
-        }
+export function initApplicationStateAction<S>(props: ApplicationStateActionProps<S>): Readonly<{
+    state: ApplicationStateAction<S>
+    post: Post<S>
+}> {
+    const action = new StateAction(props)
+    return {
+        state: action,
+        post: (state) => action.post(state),
     }
 }
 
-class PubSub<S> {
+class StateAction<S> implements ApplicationStateAction<S> {
     handlers: ApplicationStateHandler<S>[] = []
 
-    pub: ApplicationStatePublisher<S> = {
-        post: (state) => {
-            this.handlers.forEach((post) => post(state))
-            return state
-        },
+    readonly ignitionState: Promise<S>
+    state: S
+
+    constructor(props: ApplicationStateActionProps<S>) {
+        this.ignitionState = ignite()
+        this.state = props.initialState
+
+        function ignite(): Promise<S> {
+            return new Promise((resolve) => {
+                // コンストラクタが重くならないように初期 action は setTimeout で呼び出す
+                // 状態は currentState() で最新のものを参照するので subscribe を待つ必要はない
+                setTimeout(async () => {
+                    resolve(props.ignite ? await props.ignite() : props.initialState)
+                }, 0)
+            })
+        }
     }
-    sub: ApplicationStateSubscriber<S> = {
-        subscribe: (handler) => {
-            this.handlers = [...this.handlers, handler]
-        },
-        unsubscribe: (target) => {
-            this.handlers = this.handlers.filter((handler) => handler !== target)
-        },
+
+    subscribe(handler: ApplicationStateHandler<S>): void {
+        this.handlers = [...this.handlers, handler]
+    }
+    unsubscribe(target: ApplicationStateHandler<S>): void {
+        this.handlers = this.handlers.filter((handler) => handler !== target)
+    }
+    post(state: S): S {
+        this.state = state
+        this.handlers.forEach((post) => post(state))
+        return state
+    }
+
+    currentState(): S {
+        return this.state
     }
 }
 

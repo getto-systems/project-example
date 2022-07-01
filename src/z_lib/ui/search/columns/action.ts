@@ -1,6 +1,7 @@
 import {
+    ApplicationStateAction,
+    initApplicationStateAction,
     StatefulApplicationAction,
-    AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 import {
     InputBoardAction,
@@ -33,21 +34,22 @@ export function initSearchColumnsAction(infra: SearchColumnsInfra): SearchColumn
     return new Action(infra)
 }
 
-class Action
-    extends AbstractStatefulApplicationAction<SearchColumnsState>
-    implements SearchColumnsAction
-{
-    readonly initialState = initialState
+class Action implements SearchColumnsAction {
+    readonly infra: SearchColumnsInfra
+    readonly state: ApplicationStateAction<SearchColumnsState>
+    readonly post: (state: SearchColumnsState) => SearchColumnsState
 
     readonly input: InputBoardAction<MultipleBoardValueStore>
 
-    infra: SearchColumnsInfra
     store: MultipleBoardValueStore
 
     constructor(infra: SearchColumnsInfra) {
-        super({
+        const { state, post } = initApplicationStateAction({
+            initialState,
             ignite: () => this.load(),
         })
+        this.state = state
+        this.post = post
 
         const { input, store, subscriber } = initMultipleInputBoardAction()
 
@@ -81,7 +83,7 @@ class Action
             return this.post({ type: "repository-error", err: columnsResult.err })
         }
         if (!columnsResult.found) {
-            return this.post(this.currentState())
+            return this.post(this.state.currentState())
         }
 
         this.store.set(columnsResult.value)

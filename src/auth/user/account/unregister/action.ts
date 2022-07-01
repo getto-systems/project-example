@@ -1,6 +1,7 @@
 import {
+    ApplicationStateAction,
+    initApplicationStateAction,
     StatefulApplicationAction,
-    AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
 import { checkTakeLongtime } from "../../../../z_lib/ui/timer/helper"
@@ -42,17 +43,16 @@ export function initUnregisterAuthUserAccountAction(
     return new Action(material)
 }
 
-class Action
-    extends AbstractStatefulApplicationAction<UnregisterAuthUserAccountState>
-    implements UnregisterAuthUserAccountAction
-{
-    readonly initialState = initialState
-
-    material: UnregisterAuthUserAccountMaterial
+class Action implements UnregisterAuthUserAccountAction {
+    readonly material: UnregisterAuthUserAccountMaterial
+    readonly state: ApplicationStateAction<UnregisterAuthUserAccountState>
+    readonly post: (state: UnregisterAuthUserAccountState) => UnregisterAuthUserAccountState
 
     constructor(material: UnregisterAuthUserAccountMaterial) {
-        super()
+        const { state, post } = initApplicationStateAction({ initialState })
         this.material = material
+        this.state = state
+        this.post = post
     }
 
     async submit(

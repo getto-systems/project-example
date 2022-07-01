@@ -38,7 +38,7 @@ const VALID_LOGIN = { loginId: "login-id", password: "password" } as const
 test("submit valid login-id and password", async () => {
     const { clock, action, store } = standard()
 
-    action.subscriber.subscribe((state) => {
+    action.state.subscribe((state) => {
         switch (state.type) {
             case "try-to-load":
                 clock.update(CONTINUOUS_RENEW_START_AT)
@@ -46,7 +46,7 @@ test("submit valid login-id and password", async () => {
         }
     })
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(async () => {
         store.loginId.set(VALID_LOGIN.loginId)
@@ -74,7 +74,7 @@ test("submit valid login-id and password; take long time", async () => {
     // wait for take longtime timeout
     const { clock, action, store } = takeLongtime_elements()
 
-    action.subscriber.subscribe((state) => {
+    action.state.subscribe((state) => {
         switch (state.type) {
             case "try-to-load":
                 clock.update(CONTINUOUS_RENEW_START_AT)
@@ -82,7 +82,7 @@ test("submit valid login-id and password; take long time", async () => {
         }
     })
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(() => {
         store.loginId.set(VALID_LOGIN.loginId)
@@ -110,7 +110,7 @@ test("submit valid login-id and password; take long time", async () => {
 test("submit without fields", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(() => action.submit()).then((stack) => {
         expect(stack).toEqual([])
@@ -131,7 +131,7 @@ test("clear", () => {
 test("load error", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     const err: LoadScriptError = { type: "infra-error", err: "load error" }
 

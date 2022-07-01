@@ -1,5 +1,6 @@
 import {
-    AbstractStatefulApplicationAction,
+    ApplicationStateAction,
+    initApplicationStateAction,
     StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 import { initInputSeasonAction, InputSeasonAction } from "../input/action"
@@ -56,27 +57,31 @@ export function initSetupSeasonAction(
 }
 
 interface LoadAction {
-    ignitionState: Promise<LoadSeasonState>
+    readonly state: { ignitionState: Promise<LoadSeasonState> }
     load(): Promise<LoadSeasonState>
 }
 
-class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
-    readonly initialState = initialState
+class Action implements SetupSeasonAction {
+    readonly material: SetupSeasonMaterial
+    readonly state: ApplicationStateAction<SetupSeasonState>
+    readonly post: (state: SetupSeasonState) => SetupSeasonState
 
     readonly season: InputSeasonAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    material: SetupSeasonMaterial
     load: LoadAction
 
     convert: { (): ConvertBoardResult<DetectedSeason> }
 
     constructor(material: SetupSeasonMaterial, load: LoadAction) {
-        super()
+        const { state, post } = initApplicationStateAction({ initialState })
+        this.state = state
+        this.post = post
 
         const season = initInputSeasonAction(material.infra.availableSeasons)
 
+        // TODO register field を使う
         const fields = ["season"] as const
         const convert = (): ConvertBoardResult<DetectedSeason> => {
             const result = {
@@ -94,7 +99,7 @@ class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
         const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
         const { observe, observeChecker } = initObserveBoardAction({ fields })
 
-        load.ignitionState.then((state) => {
+        load.state.ignitionState.then((state) => {
             switch (state.type) {
                 case "success":
                     season.reset(state.season)
@@ -110,10 +115,10 @@ class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
         this.convert = convert
 
         fields.forEach((field) => {
-            this[field].validate.subscriber.subscribe((state) => {
+            this[field].validate.state.subscribe((state) => {
                 validateChecker.update(field, state)
             })
-            this[field].observe.subscriber.subscribe((result) => {
+            this[field].observe.state.subscribe((result) => {
                 observeChecker.update(field, result.hasChanged)
             })
         })
@@ -122,7 +127,7 @@ class Action extends AbstractStatefulApplicationAction<SetupSeasonState> {
     async setup(onSuccess: { (): void }): Promise<SetupSeasonState> {
         const fields = this.convert()
         if (!fields.valid) {
-            return this.currentState()
+            return this.state.currentState()
         }
         return setupSeason(
             this.material,

@@ -1,4 +1,4 @@
-import { StatefulApplicationAction, AbstractStatefulApplicationAction } from "../../action/action"
+import { initApplicationStateAction, StatefulApplicationAction } from "../../action/action"
 
 import { ObserveBoardFieldResult } from "../observe_field/data"
 import { ObserveBoardChecker, ObserveBoardStack, ObserveBoardStateFound } from "./infra"
@@ -24,39 +24,24 @@ export function initObserveBoardAction<N extends string>(
     observe: ObserveBoardAction
     observeChecker: ObserveBoardChecker<N>
 }> {
-    const action = new Action(config, {
+    const infra = {
         stack: initObserveBoardStack(),
-    })
+    }
+    const { state, post } = initApplicationStateAction({ initialState })
     return {
-        observe: action,
-        observeChecker: action,
+        observe: { state, clear },
+        observeChecker: { update },
+    }
+
+    function clear(): ObserveBoardState {
+        return post(clearState(config, infra))
+    }
+    function update(name: N, hasChanged: boolean): ObserveBoardState {
+        return post(updateState(config, infra, name, hasChanged))
     }
 }
 
-class Action<N extends string>
-    extends AbstractStatefulApplicationAction<ObserveBoardState>
-    implements ObserveBoardAction, ObserveBoardChecker<N>
-{
-    readonly initialState = initialState
-
-    config: ObserveBoardConfig<N>
-    infra: ObserveBoardInfra
-
-    constructor(config: ObserveBoardConfig<N>, infra: ObserveBoardInfra) {
-        super()
-        this.config = config
-        this.infra = infra
-    }
-
-    clear(): ObserveBoardState {
-        return this.post(clear(this.config, this.infra))
-    }
-    update(name: N, hasChanged: boolean): ObserveBoardState {
-        return this.post(update(this.config, this.infra, name, hasChanged))
-    }
-}
-
-function clear<N extends string>(
+function clearState<N extends string>(
     config: ObserveBoardConfig<N>,
     infra: ObserveBoardInfra,
 ): ObserveBoardFieldResult {
@@ -65,7 +50,7 @@ function clear<N extends string>(
     stack.clear()
     return compose(config.fields.map((field) => stack.get(field)))
 }
-function update<N extends string>(
+function updateState<N extends string>(
     config: ObserveBoardConfig<N>,
     infra: ObserveBoardInfra,
     name: N,

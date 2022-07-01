@@ -1,6 +1,7 @@
 import {
+    ApplicationStateAction,
+    initApplicationStateAction,
     StatefulApplicationAction,
-    AbstractStatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 
 import { buildMenu, BuildMenuParams } from "./helper"
@@ -134,28 +135,33 @@ export function initLoadMenuAction(material: LoadMenuMaterial): LoadMenuAction {
     return new Action(material)
 }
 
-class Action extends AbstractStatefulApplicationAction<LoadMenuState> implements LoadMenuAction {
-    readonly initialState = initialState
-
-    material: LoadMenuMaterial
+class Action implements LoadMenuAction {
+    readonly material: LoadMenuMaterial
+    readonly state: ApplicationStateAction<LoadMenuState>
+    readonly post: (state: LoadMenuState) => LoadMenuState
 
     constructor(material: LoadMenuMaterial) {
-        super({
-            ignite: async () =>
-                loadMenu(this.material, (event) => {
-                    const state = this.post(event)
-
-                    switch (event.type) {
-                        case "succeed-to-load":
-                            // 初期ロード完了で最初の badge 更新を行う
-                            return this.updateBadge()
-
-                        default:
-                            return state
-                    }
-                }),
+        const { state, post } = initApplicationStateAction({
+            initialState,
+            ignite: () => this.load(),
         })
         this.material = material
+        this.state = state
+        this.post = post
+    }
+    async load(): Promise<LoadMenuState> {
+        return loadMenu(this.material, (event) => {
+            const state = this.post(event)
+
+            switch (event.type) {
+                case "succeed-to-load":
+                    // 初期ロード完了で最初の badge 更新を行う
+                    return this.updateBadge()
+
+                default:
+                    return state
+            }
+        })
     }
 
     updateBadge(): Promise<LoadMenuState> {

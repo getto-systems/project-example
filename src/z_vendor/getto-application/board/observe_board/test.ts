@@ -6,7 +6,7 @@ import { initObserveBoardAction } from "./action"
 test("observe", async () => {
     const { action, checker } = standard()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(async () => {
         checker.update("name", false)
@@ -15,7 +15,7 @@ test("observe", async () => {
         checker.update("description", true)
         checker.update("name", false)
         checker.update("description", false)
-        return action.currentState()
+        return action.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             { hasChanged: false },

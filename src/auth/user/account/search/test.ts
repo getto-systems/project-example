@@ -22,9 +22,9 @@ import { AuthUserAccount } from "../kernel/data"
 test("initial load", async () => {
     const { resource } = standard()
 
-    const runner = setupActionTestRunner(resource.search.subscriber)
+    const runner = setupActionTestRunner(resource.search)
 
-    await runner(async () => resource.search.ignitionState).then((stack) => {
+    await runner(async () => resource.search.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false, previousResponse: undefined },
             { type: "success", response: standard_response },
@@ -35,9 +35,9 @@ test("initial load", async () => {
 test("search", async () => {
     const { resource, store } = standard()
 
-    const runner = setupActionTestRunner(resource.search.subscriber)
+    const runner = setupActionTestRunner(resource.search)
 
-    await resource.search.ignitionState
+    await resource.search.state.ignitionState
 
     await runner(async () => {
         store.loginId.set("MY-LOGIN-ID")
@@ -53,9 +53,9 @@ test("search", async () => {
 test("search; take longtime", async () => {
     const { resource } = takeLongtime()
 
-    const runner = setupActionTestRunner(resource.search.subscriber)
+    const runner = setupActionTestRunner(resource.search)
 
-    await resource.search.ignitionState
+    await resource.search.state.ignitionState
 
     await runner(async () => {
         return resource.search.search()
@@ -71,9 +71,9 @@ test("search; take longtime", async () => {
 test("sort", async () => {
     const { resource } = standard()
 
-    const runner = setupActionTestRunner(resource.search.subscriber)
+    const runner = setupActionTestRunner(resource.search)
 
-    await resource.search.ignitionState
+    await resource.search.state.ignitionState
 
     await runner(async () => {
         return resource.search.sort("loginId")
@@ -98,9 +98,9 @@ test("clear", () => {
 test("focus / close", async () => {
     const { resource } = standard()
 
-    const runner = setupActionTestRunner(resource.search.focused.subscriber)
+    const runner = setupActionTestRunner(resource.search.focused)
 
-    await resource.search.ignitionState
+    await resource.search.state.ignitionState
 
     await runner(async () => {
         const user: AuthUserAccount = {
@@ -124,7 +124,7 @@ test("focus / close", async () => {
         expect(resource.search.focused.isFocused(user)).toBe(false)
         expect(resource.search.focused.isFocused(another)).toBe(false)
 
-        return resource.search.focused.currentState()
+        return resource.search.focused.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             {
@@ -144,10 +144,10 @@ test("focus / close", async () => {
 test("detect user", async () => {
     const { resource } = focused()
 
-    const runner = setupActionTestRunner(resource.search.focused.subscriber)
+    const runner = setupActionTestRunner(resource.search.focused)
 
     await runner(async () => {
-        return resource.search.focused.ignitionState
+        return resource.search.focused.state.ignitionState
     }).then((stack) => {
         expect(stack).toEqual([
             {
@@ -165,10 +165,10 @@ test("detect user", async () => {
 test("detect user; failed", async () => {
     const { resource } = focusFailed()
 
-    const runner = setupActionTestRunner(resource.search.focused.subscriber)
+    const runner = setupActionTestRunner(resource.search.focused)
 
     await runner(async () => {
-        return resource.search.focused.ignitionState
+        return resource.search.focused.state.ignitionState
     }).then((stack) => {
         expect(stack).toEqual([{ type: "focus-failed" }])
     })
@@ -177,9 +177,9 @@ test("detect user; failed", async () => {
 test("update user", async () => {
     const { resource } = focused()
 
-    const runner = setupActionTestRunner(resource.search.focused.subscriber)
+    const runner = setupActionTestRunner(resource.search.focused)
 
-    await resource.search.ignitionState
+    await resource.search.state.ignitionState
 
     const user: AuthUserAccount = {
         loginId: restoreLoginId("user-1"),
@@ -201,9 +201,9 @@ test("update user", async () => {
 test("remove user", async () => {
     const { resource } = focused()
 
-    const runner = setupActionTestRunner(resource.search.focused.subscriber)
+    const runner = setupActionTestRunner(resource.search.focused)
 
-    await resource.search.ignitionState
+    await resource.search.state.ignitionState
 
     await runner(async () => {
         return resource.search.focused.remove(restoreLoginId("user-1"))
