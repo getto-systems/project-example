@@ -1,8 +1,9 @@
 import { checkTakeLongtime } from "../../../z_lib/ui/timer/helper"
 
 import {
+    ApplicationStateAction,
+    initApplicationStateAction,
     StatefulApplicationAction,
-    AbstractStatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 
 import { startContinuousRenew } from "./method"
@@ -70,31 +71,32 @@ export function initCheckAuthTicketAction(
     return new Action(material)
 }
 
-class Action
-    extends AbstractStatefulApplicationAction<CheckAuthTicketState>
-    implements CheckAuthTicketAction
-{
-    readonly initialState = initialState
-
-    material: CheckAuthTicketMaterial
+class Action implements CheckAuthTicketAction {
+    readonly material: CheckAuthTicketMaterial
+    readonly state: ApplicationStateAction<CheckAuthTicketState>
+    readonly post: (state: CheckAuthTicketState) => CheckAuthTicketState
 
     constructor(material: CheckAuthTicketMaterial) {
-        super({
-            ignite: async () => {
-                const checkResult = await check(this.material, this.post)
-                if (!checkResult.success) {
-                    return checkResult.state
-                }
-                if (!checkResult.expired) {
-                    return this.post({
-                        type: "try-to-instant-load",
-                        scriptPath: this.secureScriptPath(),
-                    })
-                }
-                return this.startContinuousRenew(checkResult.ticket)
-            },
+        const { state, post } = initApplicationStateAction({
+            initialState,
+            ignite: () => this.ignite(),
         })
         this.material = material
+        this.state = state
+        this.post = post
+    }
+    async ignite(): Promise<CheckAuthTicketState> {
+        const checkResult = await check(this.material, this.post)
+        if (!checkResult.success) {
+            return checkResult.state
+        }
+        if (!checkResult.expired) {
+            return this.post({
+                type: "try-to-instant-load",
+                scriptPath: this.secureScriptPath(),
+            })
+        }
+        return this.startContinuousRenew(checkResult.ticket)
     }
 
     succeedToInstantLoad(): Promise<CheckAuthTicketState> {

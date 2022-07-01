@@ -1,8 +1,9 @@
 import { checkTakeLongtime } from "../../../../../z_lib/ui/timer/helper"
 
 import {
+    ApplicationStateAction,
+    initApplicationStateAction,
     StatefulApplicationAction,
-    AbstractStatefulApplicationAction,
 } from "../../../../../z_vendor/getto-application/action/action"
 
 import { LoginIdFieldAction, initLoginIdFieldAction } from "../../../login_id/input/action"
@@ -53,25 +54,26 @@ export function initRequestResetTokenAction(
     return new Action(material)
 }
 
-class Action
-    extends AbstractStatefulApplicationAction<RequestResetTokenState>
-    implements RequestResetTokenAction
-{
-    readonly initialState = initialState
+class Action implements RequestResetTokenAction {
+    readonly material: RequestResetTokenMaterial
+    readonly state: ApplicationStateAction<RequestResetTokenState>
+    readonly post: (state: RequestResetTokenState) => RequestResetTokenState
 
     readonly loginId: LoginIdFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    material: RequestResetTokenMaterial
     convert: { (): ConvertBoardResult<RequestResetTokenFields> }
 
     constructor(material: RequestResetTokenMaterial) {
-        super()
+        const { state, post } = initApplicationStateAction({ initialState })
         this.material = material
+        this.state = state
+        this.post = post
 
         const loginId = initLoginIdFieldAction()
 
+        // TODO register field を使う
         const fields = ["loginId"] as const
         const convert = (): ConvertBoardResult<RequestResetTokenFields> => {
             const loginIdResult = loginId.validate.check()
@@ -95,10 +97,10 @@ class Action
         this.convert = convert
 
         fields.forEach((field) => {
-            this[field].validate.subscriber.subscribe((state) => {
+            this[field].validate.state.subscribe((state) => {
                 validateChecker.update(field, state)
             })
-            this[field].observe.subscriber.subscribe((result) => {
+            this[field].observe.state.subscribe((result) => {
                 observeChecker.update(field, result.hasChanged)
             })
         })
@@ -107,12 +109,12 @@ class Action
     clear(): RequestResetTokenState {
         this.loginId.clear()
         this.validate.clear()
-        return this.currentState()
+        return this.state.currentState()
     }
     async submit(onSuccess: { (): void }): Promise<RequestResetTokenState> {
         const fields = this.convert()
         if (!fields.valid) {
-            return this.currentState()
+            return this.state.currentState()
         }
         return requestResetToken(this.material, fields.value, onSuccess, this.post)
     }

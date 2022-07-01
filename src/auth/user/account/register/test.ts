@@ -30,7 +30,7 @@ const VALID_INFO = {
 test("submit valid info", async () => {
     const { resource, store } = standard()
 
-    const runner = setupActionTestRunner(resource.register.subscriber)
+    const runner = setupActionTestRunner(resource.register)
 
     await runner(async () => {
         store.loginId.set(VALID_INFO.loginId)
@@ -59,7 +59,7 @@ test("submit valid login-id; take long time", async () => {
     // wait for take longtime timeout
     const { resource, store } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(resource.register.subscriber)
+    const runner = setupActionTestRunner(resource.register)
 
     await runner(() => {
         store.loginId.set(VALID_INFO.loginId)
@@ -107,7 +107,7 @@ test("clear", () => {
 test("focus / close", async () => {
     const { resource, store } = standard()
 
-    const runner = setupActionTestRunner(resource.register.list.focused.subscriber)
+    const runner = setupActionTestRunner(resource.register.list.focused)
 
     store.loginId.set(VALID_INFO.loginId)
     store.grantedRoles.set(VALID_INFO.grantedRoles)
@@ -140,7 +140,7 @@ test("focus / close", async () => {
         expect(resource.register.list.focused.isFocused(user)).toBe(false)
         expect(resource.register.list.focused.isFocused(another)).toBe(false)
 
-        return resource.register.list.focused.currentState()
+        return resource.register.list.focused.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             {
@@ -160,7 +160,7 @@ test("focus / close", async () => {
 test("update user", async () => {
     const { resource, store } = standard()
 
-    const runner = setupActionTestRunner(resource.register.list.focused.subscriber)
+    const runner = setupActionTestRunner(resource.register.list.focused)
 
     store.loginId.set(VALID_INFO.loginId)
     store.grantedRoles.set(VALID_INFO.grantedRoles)
@@ -186,7 +186,7 @@ test("update user", async () => {
 test("remove user", async () => {
     const { resource, store } = standard()
 
-    const runner = setupActionTestRunner(resource.register.list.focused.subscriber)
+    const runner = setupActionTestRunner(resource.register.list.focused)
 
     store.loginId.set(VALID_INFO.loginId)
     store.grantedRoles.set(VALID_INFO.grantedRoles)

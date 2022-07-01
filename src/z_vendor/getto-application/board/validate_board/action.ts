@@ -1,4 +1,4 @@
-import { StatefulApplicationAction, AbstractStatefulApplicationAction } from "../../action/action"
+import { initApplicationStateAction, StatefulApplicationAction } from "../../action/action"
 
 import { initValidateBoardStack } from "./init/stack"
 
@@ -36,53 +36,27 @@ export function initValidateBoardAction<N extends string, T>(
     validate: ValidateBoardAction
     validateChecker: ValidateBoardChecker<N, T>
 }> {
-    const action = new Action(
-        config,
-        {
-            stack: initValidateBoardStack(),
-        },
-        shell,
-    )
+    const infra = {
+        stack: initValidateBoardStack(),
+    }
+    const { state, post } = initApplicationStateAction({ initialState })
     return {
-        validate: action,
-        validateChecker: action,
+        validate: { state, clear },
+        validateChecker: { update, get },
+    }
+
+    function update(name: N, state: ValidateBoardCheckState): ValidateBoardState {
+        return post(updateState(config, infra, name, state))
+    }
+    function get(): ConvertBoardResult<T> {
+        return shell.convert()
+    }
+    function clear(): ValidateBoardState {
+        return post(initialState)
     }
 }
 
-class Action<N extends string, T>
-    extends AbstractStatefulApplicationAction<ValidateBoardState>
-    implements ValidateBoardAction, ValidateBoardChecker<N, T>
-{
-    readonly initialState: ValidateBoardState = initialState
-
-    config: ValidateBoardConfig<N>
-    infra: ValidateBoardInfra
-    shell: ValidateBoardShell<T>
-
-    constructor(
-        config: ValidateBoardConfig<N>,
-        infra: ValidateBoardInfra,
-        shell: ValidateBoardShell<T>,
-    ) {
-        super()
-        this.config = config
-        this.infra = infra
-        this.shell = shell
-    }
-
-    update(name: N, state: ValidateBoardCheckState): ValidateBoardState {
-        return this.post(update(this.config, this.infra, name, state))
-    }
-    get(): ConvertBoardResult<T> {
-        return this.shell.convert()
-    }
-
-    clear(): ValidateBoardState {
-        return this.post(initialState)
-    }
-}
-
-function update<N extends string>(
+function updateState<N extends string>(
     config: ValidateBoardConfig<N>,
     infra: ValidateBoardInfra,
     name: N,

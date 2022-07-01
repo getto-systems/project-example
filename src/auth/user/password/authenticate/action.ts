@@ -1,6 +1,7 @@
 import {
+    ApplicationStateAction,
+    initApplicationStateAction,
     StatefulApplicationAction,
-    AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
 import { LoginIdFieldAction, initLoginIdFieldAction } from "../../login_id/input/action"
@@ -80,27 +81,28 @@ export function initAuthenticatePasswordAction(
     return new Action(material)
 }
 
-class Action
-    extends AbstractStatefulApplicationAction<AuthenticatePasswordState>
-    implements AuthenticatePasswordAction
-{
-    readonly initialState = initialState
+class Action implements AuthenticatePasswordAction {
+    readonly material: AuthenticatePasswordMaterial
+    readonly state: ApplicationStateAction<AuthenticatePasswordState>
+    readonly post: (state: AuthenticatePasswordState) => AuthenticatePasswordState
 
     readonly loginId: LoginIdFieldAction
     readonly password: PasswordFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    material: AuthenticatePasswordMaterial
     convert: { (): ConvertBoardResult<AuthenticatePasswordFields> }
 
     constructor(material: AuthenticatePasswordMaterial) {
-        super()
+        const { state, post } = initApplicationStateAction({ initialState })
         this.material = material
+        this.state = state
+        this.post = post
 
         const loginId = initLoginIdFieldAction()
         const password = initPasswordFieldAction()
 
+        // TODO register field を使う
         const fields = ["loginId", "password"] as const
         const convert = (): ConvertBoardResult<AuthenticatePasswordFields> => {
             const result = {
@@ -129,10 +131,10 @@ class Action
         this.convert = convert
 
         fields.forEach((field) => {
-            this[field].validate.subscriber.subscribe((state) => {
+            this[field].validate.state.subscribe((state) => {
                 validateChecker.update(field, state)
             })
-            this[field].observe.subscriber.subscribe((result) => {
+            this[field].observe.state.subscribe((result) => {
                 observeChecker.update(field, result.hasChanged)
             })
         })
@@ -142,12 +144,12 @@ class Action
         this.loginId.clear()
         this.password.clear()
         this.validate.clear()
-        return this.initialState
+        return initialState
     }
     async submit(): Promise<AuthenticatePasswordState> {
         const fields = this.convert()
         if (!fields.valid) {
-            return this.currentState()
+            return this.state.currentState()
         }
         const result = await authenticate(this.material, fields.value, this.post)
         if (!result.success) {

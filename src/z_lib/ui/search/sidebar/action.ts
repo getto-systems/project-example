@@ -1,6 +1,7 @@
 import {
+    ApplicationStateAction,
+    initApplicationStateAction,
     StatefulApplicationAction,
-    AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
 import { SearchSidebarRepository } from "./infra"
@@ -28,22 +29,19 @@ export function initSearchSidebarAction(
     return new Action(infra, state)
 }
 
-class Action
-    extends AbstractStatefulApplicationAction<SearchSidebarState>
-    implements SearchSidebarAction
-{
-    initialState: SearchSidebarState
+class Action implements SearchSidebarAction {
+    readonly infra: SearchSidebarInfra
+    readonly state: ApplicationStateAction<SearchSidebarState>
+    readonly post: (state: SearchSidebarState) => SearchSidebarState
 
-    infra: SearchSidebarInfra
-
-    constructor(infra: SearchSidebarInfra, state: SearchSidebarExpand) {
-        super({
+    constructor(infra: SearchSidebarInfra, initialExpand: SearchSidebarExpand) {
+        const { state, post } = initApplicationStateAction({
+            initialState: { type: "success", state: initialExpand },
             ignite: () => this.load(),
         })
-
-        this.initialState = { type: "success", state }
-
         this.infra = infra
+        this.state = state
+        this.post = post
     }
 
     async fold(): Promise<SearchSidebarState> {
@@ -69,7 +67,7 @@ class Action
             return this.post({ type: "repository-error", err: sidebarResult.err })
         }
         if (!sidebarResult.found) {
-            return this.post(this.currentState())
+            return this.post(this.state.currentState())
         }
 
         return this.post({ type: "success", state: sidebarResult.value })

@@ -40,9 +40,9 @@ const CONTINUOUS_RENEW_AT = [
 test("instant load", async () => {
     const { clock, action } = instantLoadable()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
-    await runner(() => action.ignitionState).then((stack) => {
+    await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "try-to-instant-load",
@@ -67,9 +67,9 @@ test("instant load", async () => {
 test("instant load failed", async () => {
     const { clock, action } = instantLoadable()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
-    await runner(() => action.ignitionState).then((stack) => {
+    await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "try-to-instant-load",
@@ -97,7 +97,7 @@ test("instant load failed", async () => {
 test("renew stored credential", async () => {
     const { clock, action } = standard()
 
-    action.subscriber.subscribe((state) => {
+    action.state.subscribe((state) => {
         switch (state.type) {
             case "try-to-load":
                 clock.update(CONTINUOUS_RENEW_START_AT)
@@ -105,9 +105,9 @@ test("renew stored credential", async () => {
         }
     })
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
-    await runner(() => action.ignitionState).then((stack) => {
+    await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             { type: "try-to-renew", hasTakenLongtime: false },
             {
@@ -125,7 +125,7 @@ test("renew stored credential; take long time", async () => {
     // wait for take longtime timeout
     const { clock, action } = takeLongtime()
 
-    action.subscriber.subscribe((state) => {
+    action.state.subscribe((state) => {
         switch (state.type) {
             case "try-to-load":
                 clock.update(CONTINUOUS_RENEW_START_AT)
@@ -133,9 +133,9 @@ test("renew stored credential; take long time", async () => {
         }
     })
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
-    await runner(() => action.ignitionState).then((stack) => {
+    await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             { type: "try-to-renew", hasTakenLongtime: false },
             { type: "try-to-renew", hasTakenLongtime: true },
@@ -154,9 +154,9 @@ test("renew without stored credential", async () => {
     // empty credential
     const { action } = noStored()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
-    await runner(() => action.ignitionState).then((stack) => {
+    await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([{ type: "required-to-login" }])
     })
 })
@@ -164,7 +164,7 @@ test("renew without stored credential", async () => {
 test("load error", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     const err: LoadScriptError = { type: "infra-error", err: "load error" }
 

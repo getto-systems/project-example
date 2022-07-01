@@ -10,12 +10,12 @@ import { BoardValueStore } from "../input/infra"
 test("observe; no change", async () => {
     const { action, observer } = standard()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(async () => {
         observer.pin()
         action.check()
-        return action.currentState()
+        return action.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ hasChanged: false }])
     })
@@ -24,13 +24,13 @@ test("observe; no change", async () => {
 test("observe; has changed", async () => {
     const { action, observer, store } = standard()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(async () => {
         observer.pin()
         store.set("changed")
         action.check()
-        return action.currentState()
+        return action.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ hasChanged: true }])
     })
@@ -39,11 +39,11 @@ test("observe; has changed", async () => {
 test("observe; initial", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(async () => {
         action.check()
-        return action.currentState()
+        return action.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ hasChanged: false }])
     })

@@ -52,7 +52,7 @@ export function initSearchFilter<K extends string, S, F>(
     })
 
     fields.forEach(([key, field]) => {
-        field.observe.subscriber.subscribe((result) => {
+        field.observe.state.subscribe((result) => {
             observeChecker.update(key, result.hasChanged)
         })
     })

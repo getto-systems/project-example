@@ -9,11 +9,11 @@ test("validate; valid input", async () => {
     // valid input
     const { action } = standard({ valid: true, value: "valid" })
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(async () => {
         action.check()
-        return action.currentState()
+        return action.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ type: "validated", result: { valid: true, value: "valid" } }])
     })
@@ -23,17 +23,17 @@ test("validate; invalid input; clear", async () => {
     // invalid input
     const { action } = standard({ valid: false, err: ["empty"] })
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(async () => {
         action.check()
-        return action.currentState()
+        return action.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ type: "validated", result: { valid: false, err: ["empty"] } }])
     })
     await runner(async () => {
         action.clear()
-        return action.currentState()
+        return action.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ type: "initial" }])
     })

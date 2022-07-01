@@ -34,10 +34,10 @@ export function initRegisterField<K extends string>(
     const { observe, observeChecker } = initObserveBoardAction({ fields })
 
     entries.forEach(([field, input]) => {
-        input.validate.subscriber.subscribe((state) => {
+        input.validate.state.subscribe((state) => {
             validateChecker.update(field, state)
         })
-        input.observe.subscriber.subscribe((result) => {
+        input.observe.state.subscribe((result) => {
             observeChecker.update(field, result.hasChanged)
         })
     })

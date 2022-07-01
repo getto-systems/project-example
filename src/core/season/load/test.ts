@@ -21,9 +21,9 @@ import { currentSeason } from "../kernel/init/current_season"
 test("load from repository", async () => {
     const { resource } = standard()
 
-    const runner = setupActionTestRunner(resource.season.subscriber)
+    const runner = setupActionTestRunner(resource.season)
 
-    await runner(() => resource.season.ignitionState).then((stack) => {
+    await runner(() => resource.season.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -42,9 +42,9 @@ test("load from repository", async () => {
 test("expired; use default", async () => {
     const { resource } = expired()
 
-    const runner = setupActionTestRunner(resource.season.subscriber)
+    const runner = setupActionTestRunner(resource.season)
 
-    await runner(() => resource.season.ignitionState).then((stack) => {
+    await runner(() => resource.season.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -63,9 +63,9 @@ test("expired; use default", async () => {
 test("not found; use default", async () => {
     const { resource } = empty_summer()
 
-    const runner = setupActionTestRunner(resource.season.subscriber)
+    const runner = setupActionTestRunner(resource.season)
 
-    await runner(() => resource.season.ignitionState).then((stack) => {
+    await runner(() => resource.season.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -84,9 +84,9 @@ test("not found; use default", async () => {
 test("not found; use default; winter", async () => {
     const { resource } = empty_winter()
 
-    const runner = setupActionTestRunner(resource.season.subscriber)
+    const runner = setupActionTestRunner(resource.season)
 
-    await runner(() => resource.season.ignitionState).then((stack) => {
+    await runner(() => resource.season.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -105,9 +105,9 @@ test("not found; use default; winter", async () => {
 test("not found; use default; last winter", async () => {
     const { resource } = empty_last_winter()
 
-    const runner = setupActionTestRunner(resource.season.subscriber)
+    const runner = setupActionTestRunner(resource.season)
 
-    await runner(() => resource.season.ignitionState).then((stack) => {
+    await runner(() => resource.season.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",

@@ -8,11 +8,11 @@ import { initLoginIdFieldAction } from "./action"
 test("validate; valid input", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate.subscriber)
+    const runner = setupActionTestRunner(action.validate)
 
     await runner(async () => {
         store.set("valid")
-        return action.validate.currentState()
+        return action.validate.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ type: "validated", result: { valid: true, value: "valid" } }])
     })
@@ -21,11 +21,11 @@ test("validate; valid input", async () => {
 test("validate; invalid : empty", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate.subscriber)
+    const runner = setupActionTestRunner(action.validate)
 
     await runner(async () => {
         store.set("")
-        return action.validate.currentState()
+        return action.validate.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "validated", result: { valid: false, err: [{ type: "empty" }] } },
@@ -36,11 +36,11 @@ test("validate; invalid : empty", async () => {
 test("validate; invalid : too-long", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate.subscriber)
+    const runner = setupActionTestRunner(action.validate)
 
     await runner(async () => {
         store.set("a".repeat(100 + 1))
-        return action.validate.currentState()
+        return action.validate.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             {
@@ -54,11 +54,11 @@ test("validate; invalid : too-long", async () => {
 test("validate; valid : just max-length", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate.subscriber)
+    const runner = setupActionTestRunner(action.validate)
 
     await runner(async () => {
         store.set("a".repeat(100))
-        return action.validate.currentState()
+        return action.validate.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "validated", result: { valid: true, value: "a".repeat(100) } },

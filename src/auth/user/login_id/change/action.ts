@@ -1,6 +1,7 @@
 import {
+    ApplicationStateAction,
+    initApplicationStateAction,
     StatefulApplicationAction,
-    AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
 import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
@@ -59,25 +60,26 @@ export function initOverwriteLoginIdAction(
     return new OverwriteAction(material)
 }
 
-class OverwriteAction
-    extends AbstractStatefulApplicationAction<OverwriteLoginIdState>
-    implements OverwriteLoginIdAction
-{
-    readonly initialState = initialState
+class OverwriteAction implements OverwriteLoginIdAction {
+    readonly material: OverwriteLoginIdMaterial
+    readonly state: ApplicationStateAction<OverwriteLoginIdState>
+    readonly post: (state: OverwriteLoginIdState) => OverwriteLoginIdState
 
     readonly newLoginId: LoginIdFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    material: OverwriteLoginIdMaterial
     convert: { (): ConvertBoardResult<OverwriteLoginIdFields> }
 
     constructor(material: OverwriteLoginIdMaterial) {
-        super()
+        const { state, post } = initApplicationStateAction({ initialState })
         this.material = material
+        this.state = state
+        this.post = post
 
         const newLoginId = initLoginIdFieldAction()
 
+        // TODO modify field を使う
         const fields = ["newLoginId"] as const
         const convert = (): ConvertBoardResult<OverwriteLoginIdFields> => {
             const result = {
@@ -103,10 +105,10 @@ class OverwriteAction
         this.convert = convert
 
         fields.forEach((field) => {
-            this[field].validate.subscriber.subscribe((state) => {
+            this[field].validate.state.subscribe((state) => {
                 validateChecker.update(field, state)
             })
-            this[field].observe.subscriber.subscribe((result) => {
+            this[field].observe.state.subscribe((result) => {
                 observeChecker.update(field, result.hasChanged)
             })
         })
@@ -115,7 +117,7 @@ class OverwriteAction
     clear(): OverwriteLoginIdState {
         this.newLoginId.clear()
         this.validate.clear()
-        return this.post(this.initialState)
+        return this.post(initialState)
     }
     async submit(
         user: Readonly<{ loginId: LoginId }>,
@@ -123,7 +125,7 @@ class OverwriteAction
     ): Promise<OverwriteLoginIdState> {
         const fields = this.convert()
         if (!fields.valid) {
-            return this.currentState()
+            return this.state.currentState()
         }
         return overwriteLoginId(this.material, user, fields.value, onSuccess, this.post)
     }

@@ -5,12 +5,12 @@ import { initEditableBoardAction } from "./action"
 test("open / close", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(async () => {
         action.open()
         action.close()
-        return action.currentState()
+        return action.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([{ isEditable: true }, { isEditable: false }])
     })

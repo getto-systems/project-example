@@ -12,12 +12,12 @@ import { ResetTokenDestination } from "../kernel/data"
 test("validate; valid input", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate.subscriber)
+    const runner = setupActionTestRunner(action.validate)
 
     await runner(async () => {
         store.destinationType.set("email")
         store.email.set("user@example.com")
-        return action.validate.currentState()
+        return action.validate.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             {
@@ -31,12 +31,12 @@ test("validate; valid input", async () => {
 test("validate; invalid : empty", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate.subscriber)
+    const runner = setupActionTestRunner(action.validate)
 
     await runner(async () => {
         store.destinationType.set("email")
         store.email.set("")
-        return action.validate.currentState()
+        return action.validate.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             {
@@ -50,12 +50,12 @@ test("validate; invalid : empty", async () => {
 test("validate; invalid : invalid", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate.subscriber)
+    const runner = setupActionTestRunner(action.validate)
 
     await runner(async () => {
         store.destinationType.set("email")
         store.email.set("invalid-email; not includes at-mark")
-        return action.validate.currentState()
+        return action.validate.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             {
@@ -69,12 +69,12 @@ test("validate; invalid : invalid", async () => {
 test("validate; invalid : too-long", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate.subscriber)
+    const runner = setupActionTestRunner(action.validate)
 
     await runner(async () => {
         store.destinationType.set("email")
         store.email.set("@".repeat(255 + 1))
-        return action.validate.currentState()
+        return action.validate.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             {
@@ -91,12 +91,12 @@ test("validate; invalid : too-long", async () => {
 test("validate; valid : just max-length", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate.subscriber)
+    const runner = setupActionTestRunner(action.validate)
 
     await runner(async () => {
         store.destinationType.set("email")
         store.email.set("@".repeat(255))
-        return action.validate.currentState()
+        return action.validate.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual([
             {

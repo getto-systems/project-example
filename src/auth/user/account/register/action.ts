@@ -1,6 +1,7 @@
 import {
+    ApplicationStateAction,
+    initApplicationStateAction,
     StatefulApplicationAction,
-    AbstractStatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
 import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
@@ -94,11 +95,10 @@ export function initRegisterAuthUserAccountAction(
     return new Action(material)
 }
 
-class Action
-    extends AbstractStatefulApplicationAction<RegisterAuthUserAccountState>
-    implements RegisterAuthUserAccountAction
-{
-    readonly initialState = initialState
+class Action implements RegisterAuthUserAccountAction {
+    readonly material: RegisterAuthUserAccountMaterial
+    readonly state: ApplicationStateAction<RegisterAuthUserAccountState>
+    readonly post: (state: RegisterAuthUserAccountState) => RegisterAuthUserAccountState
 
     readonly list: ListAction
 
@@ -109,13 +109,14 @@ class Action
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    material: RegisterAuthUserAccountMaterial
     convert: () => ConvertBoardResult<AuthUserAccount>
     clear: () => void
 
     constructor(material: RegisterAuthUserAccountMaterial) {
-        super()
+        const { state, post } = initApplicationStateAction({ initialState })
         this.material = material
+        this.state = state
+        this.post = post
 
         const loginId = initLoginIdFieldAction()
         const grantedRoles = initAuthUserGrantedRolesFieldAction()
@@ -179,7 +180,7 @@ class Action
     }): Promise<RegisterAuthUserAccountState> {
         const fields = this.convert()
         if (!fields.valid) {
-            return this.currentState()
+            return this.state.currentState()
         }
         return registerUser(
             this.material,
@@ -225,18 +226,18 @@ async function registerUser<S>(
     return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 
-class ListAction
-    extends AbstractStatefulApplicationAction<ListRegisteredAuthUserAccountState>
-    implements ListRegisteredAuthUserAccountAction
-{
-    readonly initialState = initialListState
+class ListAction implements ListRegisteredAuthUserAccountAction {
+    readonly state: ApplicationStateAction<ListRegisteredAuthUserAccountState>
+    readonly post: (state: ListRegisteredAuthUserAccountState) => ListRegisteredAuthUserAccountState
 
     readonly focused: FocusedRegisteredAuthUserAccountAction
 
     list: AuthUserAccount[] = []
 
     constructor() {
-        super()
+        const { state, post } = initApplicationStateAction({ initialState: initialListState })
+        this.state = state
+        this.post = post
 
         this.focused = new FocusedAction({
             updateUser: (loginId, user) => {
@@ -274,17 +275,18 @@ type FocusedMaterial = Readonly<{
     removeUser(loginId: LoginId): void
 }>
 
-class FocusedAction
-    extends AbstractStatefulApplicationAction<FocusedRegisteredAuthUserAccountState>
-    implements FocusedRegisteredAuthUserAccountAction
-{
-    readonly initialState = initialFocusedState
-
+class FocusedAction implements FocusedRegisteredAuthUserAccountAction {
     readonly material: FocusedMaterial
+    readonly state: ApplicationStateAction<FocusedRegisteredAuthUserAccountState>
+    readonly post: (
+        state: FocusedRegisteredAuthUserAccountState,
+    ) => FocusedRegisteredAuthUserAccountState
 
     constructor(material: FocusedMaterial) {
-        super()
+        const { state, post } = initApplicationStateAction({ initialState: initialFocusedState })
         this.material = material
+        this.state = state
+        this.post = post
     }
 
     focus(user: AuthUserAccount): FocusedRegisteredAuthUserAccountState {
@@ -303,7 +305,7 @@ class FocusedAction
     }
 
     isFocused(user: AuthUserAccount): boolean {
-        const state = this.currentState()
+        const state = this.state.currentState()
         switch (state.type) {
             case "initial":
                 return false

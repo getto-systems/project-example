@@ -1,47 +1,30 @@
 import { test, expect } from "vitest"
-import { setupActionTestRunner } from "../../action/test_helper"
 
 import { FileStore, SelectFileResult } from "./infra"
 
 import { initSelectFileAction } from "./action"
 
-test("get; store connected", async () => {
+test("get; store connected", () => {
     const { source_store, input, store, subscriber } = standard()
 
     input.connector.connect(source_store)
 
-    const runner = setupActionTestRunner({
-        subscribe: (handler) => {
-            subscriber.subscribe(() => handler(store.get()))
-        },
-        unsubscribe: () => null,
-    })
-
-    await runner(async () => {
-        input.publisher.post()
-    }).then((stack) => {
-        expect(stack).toEqual([{ found: true, file: "file" }])
-    })
+    const stack: SelectFileResult[] = []
+    subscriber.subscribe(() => stack.push(store.get()))
+    input.publisher.post()
+    expect(stack).toEqual([{ found: true, file: "file" }])
 })
 
-test("get; store not connected", async () => {
+test("get; store not connected", () => {
     const { input, store, subscriber } = standard()
 
     // store not connected
     //input.connector.connect(source_store)
 
-    const runner = setupActionTestRunner({
-        subscribe: (handler) => {
-            subscriber.subscribe(() => handler(store.get()))
-        },
-        unsubscribe: () => null,
-    })
-
-    await runner(async () => {
-        input.publisher.post()
-    }).then((stack) => {
-        expect(stack).toEqual([{ found: false }])
-    })
+    const stack: SelectFileResult[] = []
+    subscriber.subscribe(() => stack.push(store.get()))
+    input.publisher.post()
+    expect(stack).toEqual([{ found: false }])
 })
 
 test("terminate", async () => {
@@ -49,19 +32,13 @@ test("terminate", async () => {
 
     input.connector.connect(source_store)
 
-    const runner = setupActionTestRunner({
-        subscribe: (handler) => {
-            subscriber.subscribe(() => handler(store.get()))
-        },
-        unsubscribe: () => null,
-    })
+    const stack: SelectFileResult[] = []
+    subscriber.subscribe(() => stack.push(store.get()))
 
-    await runner(async () => {
-        subscriber.terminate()
-        input.publisher.post()
-    }).then((stack) => {
-        expect(stack).toEqual([])
-    })
+    subscriber.terminate()
+    input.publisher.post()
+
+    expect(stack).toEqual([])
 })
 
 function standard() {

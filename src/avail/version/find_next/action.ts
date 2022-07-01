@@ -1,6 +1,6 @@
 import {
+    initApplicationStateAction,
     StatefulApplicationAction,
-    AbstractStatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 
 import { versionStringConverter } from "../kernel/convert"
@@ -46,20 +46,11 @@ export type FindNextVersionConfig = Readonly<{
 export function initFindNextVersionAction(
     material: FindNextVersionMaterial,
 ): FindNextVersionAction {
-    return new Action(material)
-}
-
-class Action
-    extends AbstractStatefulApplicationAction<FindNextVersionState>
-    implements FindNextVersionAction
-{
-    readonly initialState = initialState
-
-    constructor(material: FindNextVersionMaterial) {
-        super({
-            ignite: () => findNextVersion(material, this.post),
-        })
-    }
+    const { state, post } = initApplicationStateAction({
+        initialState,
+        ignite: (): Promise<FindNextVersionState> => findNextVersion(material, post),
+    })
+    return { state }
 }
 
 export type FindNextVersionEvent =

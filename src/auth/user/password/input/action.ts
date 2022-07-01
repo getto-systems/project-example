@@ -1,5 +1,6 @@
 import {
-    AbstractStatefulApplicationAction,
+    ApplicationStateAction,
+    initApplicationStateAction,
     StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 import {
@@ -21,6 +22,8 @@ export interface PasswordFieldAction extends TextFieldAction<Password> {
 export type PasswordCharacterAction = StatefulApplicationAction<PasswordCharacterState>
 export type PasswordCharacterState = Readonly<{ multiByte: boolean }>
 
+const initialState: PasswordCharacterState = { multiByte: false }
+
 export function initPasswordFieldAction(): PasswordFieldAction {
     return initTextFieldActionWithResource({
         convert: passwordBoardConverter,
@@ -39,18 +42,16 @@ function initPasswordCharacterAction(infra: PasswordCharacterInfra): PasswordCha
     return new CharacterAction(infra)
 }
 
-class CharacterAction
-    extends AbstractStatefulApplicationAction<PasswordCharacterState>
-    implements PasswordCharacterAction
-{
-    readonly initialState: PasswordCharacterState = { multiByte: false }
-
-    infra: PasswordCharacterInfra
+class CharacterAction implements PasswordCharacterAction {
+    readonly infra: PasswordCharacterInfra
+    readonly state: ApplicationStateAction<PasswordCharacterState>
+    readonly post: (state: PasswordCharacterState) => PasswordCharacterState
 
     constructor(infra: PasswordCharacterInfra) {
-        super()
-
+        const { state, post } = initApplicationStateAction({ initialState })
         this.infra = infra
+        this.state = state
+        this.post = post
 
         infra.subscriber.subscribe({
             onInput: () => this.check(),

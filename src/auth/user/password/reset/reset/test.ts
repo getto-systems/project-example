@@ -34,7 +34,7 @@ const VALID_LOGIN = { loginId: "login-id", password: "password" } as const
 test("submit valid login-id and password", async () => {
     const { clock, action, store } = standard()
 
-    action.subscriber.subscribe((state) => {
+    action.state.subscribe((state) => {
         switch (state.type) {
             case "try-to-load":
                 clock.update(CONTINUOUS_RENEW_START_AT)
@@ -42,7 +42,7 @@ test("submit valid login-id and password", async () => {
         }
     })
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(() => {
         store.loginId.set(VALID_LOGIN.loginId)
@@ -66,7 +66,7 @@ test("submit valid login-id and password; with take longtime", async () => {
     // wait for take longtime timeout
     const { clock, action, store } = takeLongtime()
 
-    action.subscriber.subscribe((state) => {
+    action.state.subscribe((state) => {
         switch (state.type) {
             case "try-to-load":
                 clock.update(CONTINUOUS_RENEW_START_AT)
@@ -74,7 +74,7 @@ test("submit valid login-id and password; with take longtime", async () => {
         }
     })
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(() => {
         store.loginId.set(VALID_LOGIN.loginId)
@@ -98,7 +98,7 @@ test("submit valid login-id and password; with take longtime", async () => {
 test("submit without fields", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(() => action.submit()).then((stack) => {
         expect(stack).toEqual([])
@@ -108,7 +108,7 @@ test("submit without fields", async () => {
 test("submit without resetToken", async () => {
     const { action, store } = noResetToken()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(() => {
         store.loginId.set(VALID_LOGIN.loginId)
@@ -121,7 +121,7 @@ test("submit without resetToken", async () => {
 test("submit with empty resetToken", async () => {
     const { action, store } = emptyResetToken()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(() => {
         store.loginId.set(VALID_LOGIN.loginId)
@@ -146,7 +146,7 @@ test("clear", () => {
 test("load error", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
     await runner(() => action.loadError({ type: "infra-error", err: "load error" })).then(
         (stack) => {

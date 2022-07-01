@@ -14,9 +14,9 @@ import { FindNextVersionAction, initFindNextVersionAction } from "../find_next/a
 test("up to date", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
-    await runner(() => action.ignitionState).then((stack) => {
+    await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -37,9 +37,9 @@ test("up to date", async () => {
 test("up to date; take longtime", async () => {
     const { action } = takeLongtime()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
-    await runner(() => action.ignitionState).then((stack) => {
+    await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             { type: "take-longtime" },
             {
@@ -58,9 +58,9 @@ test("up to date; take longtime", async () => {
 test("found next major version", async () => {
     const { action } = found(["/2.0.0-ui/index.html"])
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
-    await runner(() => action.ignitionState).then((stack) => {
+    await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -78,9 +78,9 @@ test("found next major version", async () => {
 test("found next minor version", async () => {
     const { action } = found(["/1.1.0-ui/index.html"])
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
-    await runner(() => action.ignitionState).then((stack) => {
+    await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -98,9 +98,9 @@ test("found next minor version", async () => {
 test("found next patch version", async () => {
     const { action } = found(["/1.0.1-ui/index.html"])
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
-    await runner(() => action.ignitionState).then((stack) => {
+    await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -118,9 +118,9 @@ test("found next patch version", async () => {
 test("found next minor version; recursive", async () => {
     const { action } = found(["/1.1.0-ui/index.html", "/1.2.0-ui/index.html"])
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
-    await runner(() => action.ignitionState).then((stack) => {
+    await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -138,9 +138,9 @@ test("found next minor version; recursive", async () => {
 test("found next patch version; recursive", async () => {
     const { action } = found(["/1.0.1-ui/index.html", "/1.0.2-ui/index.html"])
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
-    await runner(() => action.ignitionState).then((stack) => {
+    await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -158,9 +158,9 @@ test("found next patch version; recursive", async () => {
 test("found next patch version; complex", async () => {
     const { action } = found(["/1.1.0-ui/index.html", "/1.1.1-ui/index.html"])
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
-    await runner(() => action.ignitionState).then((stack) => {
+    await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -182,9 +182,9 @@ test("found next patch version; complex skipped", async () => {
         "/1.1.3-ui/index.html",
     ])
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
-    await runner(() => action.ignitionState).then((stack) => {
+    await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -202,9 +202,9 @@ test("found next patch version; complex skipped", async () => {
 test("found next minor version; complex current version", async () => {
     const { action } = foundComplex(["/1.1.0-ui/index.html"])
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
-    await runner(() => action.ignitionState).then((stack) => {
+    await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -222,9 +222,9 @@ test("found next minor version; complex current version", async () => {
 test("invalid version url", async () => {
     const { action } = invalidVersion()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
-    await runner(() => action.ignitionState).then((stack) => {
+    await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",
@@ -252,9 +252,9 @@ test("invalid ApplicationTargetPath", () => {
 test("specify target", async () => {
     const { action } = specifyTarget()
 
-    const runner = setupActionTestRunner(action.subscriber)
+    const runner = setupActionTestRunner(action)
 
-    await runner(() => action.ignitionState).then((stack) => {
+    await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
             {
                 type: "success",

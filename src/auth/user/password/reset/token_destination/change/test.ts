@@ -21,7 +21,7 @@ const VALID_INFO = {
 test("submit valid info", async () => {
     const { resource, store, user } = standard()
 
-    const runner = setupActionTestRunner(resource.change.subscriber)
+    const runner = setupActionTestRunner(resource.change)
 
     await runner(async () => {
         store.destinationType.set(VALID_INFO.destinationType)
@@ -43,7 +43,7 @@ test("submit valid login-id; take long time", async () => {
     // wait for take longtime timeout
     const { resource, store, user } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(resource.change.subscriber)
+    const runner = setupActionTestRunner(resource.change)
 
     await runner(() => {
         store.destinationType.set(VALID_INFO.destinationType)
@@ -65,7 +65,7 @@ test("submit valid login-id; take long time", async () => {
 test("submit with invalid value; empty email", async () => {
     const { resource, store, user } = standard()
 
-    const runner = setupActionTestRunner(resource.change.subscriber)
+    const runner = setupActionTestRunner(resource.change)
 
     await runner(() => {
         store.destinationType.set("email")
