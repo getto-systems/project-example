@@ -12,16 +12,15 @@ import {
 } from "../input/action"
 import { ValidateBoardAction } from "../../../../../../z_vendor/getto-application/board/validate_board/action"
 import { ObserveBoardAction } from "../../../../../../z_vendor/getto-application/board/observe_board/action"
-
-import { ChangeResetTokenDestinationError } from "./data"
-import { ConvertBoardResult } from "../../../../../../z_vendor/getto-application/board/kernel/data"
+import { initModifyField, modifyField } from "../../../../../../z_lib/ui/modify/action"
 
 import { ChangeResetTokenDestinationRemote } from "./infra"
 import { WaitTime } from "../../../../../../z_lib/ui/config/infra"
 
 import { ResetTokenDestination } from "../kernel/data"
 import { LoginId } from "../../../../login_id/kernel/data"
-import { initModifyField, modifyField } from "../../../../../../z_lib/ui/modify/action"
+import { ChangeResetTokenDestinationError } from "./data"
+import { ConvertBoardResult } from "../../../../../../z_vendor/getto-application/board/kernel/data"
 
 export interface ChangeResetTokenDestinationAction
     extends StatefulApplicationAction<ChangeResetTokenDestinationState> {
