@@ -52,6 +52,7 @@ export function initBoardValueFieldAction<T, E>(
 ): BoardValueFieldAction<T, E> {
     const { input } = initAction(props)
     return input
+    /* c8 ignore next */
 }
 
 export type BoardValueFieldResourceProps<R> = Readonly<{
