@@ -7,14 +7,9 @@ import {
 } from "../../../../../z_vendor/getto-application/action/action"
 
 import { LoginIdFieldAction, initLoginIdFieldAction } from "../../../login_id/input/action"
-import {
-    ValidateBoardAction,
-    initValidateBoardAction,
-} from "../../../../../z_vendor/getto-application/board/validate_board/action"
-import {
-    initObserveBoardAction,
-    ObserveBoardAction,
-} from "../../../../../z_vendor/getto-application/board/observe_board/action"
+import { ValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
+import { ObserveBoardAction } from "../../../../../z_vendor/getto-application/board/observe_board/action"
+import { initRegisterField } from "../../../../../z_lib/ui/register/action"
 
 import { RequestResetTokenRemote } from "./infra"
 import { WaitTime } from "../../../../../z_lib/ui/config/infra"
@@ -27,7 +22,7 @@ export interface RequestResetTokenAction extends StatefulApplicationAction<Reque
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    clear(): RequestResetTokenState
+    clear(): void
     submit(onSuccess: { (): void }): Promise<RequestResetTokenState>
 }
 
@@ -63,7 +58,8 @@ class Action implements RequestResetTokenAction {
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    convert: { (): ConvertBoardResult<RequestResetTokenFields> }
+    convert: () => ConvertBoardResult<RequestResetTokenFields>
+    clear: () => void
 
     constructor(material: RequestResetTokenMaterial) {
         const { state, post } = initApplicationStateAction({ initialState })
@@ -73,8 +69,6 @@ class Action implements RequestResetTokenAction {
 
         const loginId = initLoginIdFieldAction()
 
-        // TODO register field を使う
-        const fields = ["loginId"] as const
         const convert = (): ConvertBoardResult<RequestResetTokenFields> => {
             const loginIdResult = loginId.validate.check()
             if (!loginIdResult.valid) {
@@ -88,29 +82,15 @@ class Action implements RequestResetTokenAction {
             }
         }
 
-        const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
-        const { observe, observeChecker } = initObserveBoardAction({ fields })
+        const { validate, observe, clear } = initRegisterField([["loginId", loginId]], convert)
 
         this.loginId = loginId
         this.validate = validate
         this.observe = observe
         this.convert = convert
-
-        fields.forEach((field) => {
-            this[field].validate.state.subscribe((state) => {
-                validateChecker.update(field, state)
-            })
-            this[field].observe.state.subscribe((result) => {
-                observeChecker.update(field, result.hasChanged)
-            })
-        })
+        this.clear = clear
     }
 
-    clear(): RequestResetTokenState {
-        this.loginId.clear()
-        this.validate.clear()
-        return this.state.currentState()
-    }
     async submit(onSuccess: { (): void }): Promise<RequestResetTokenState> {
         const fields = this.convert()
         if (!fields.valid) {

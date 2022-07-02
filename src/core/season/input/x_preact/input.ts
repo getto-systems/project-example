@@ -12,12 +12,12 @@ import {
 import { seasonLabel } from "../../kernel/helper"
 import { seasonToString } from "../../kernel/convert"
 
-import { InputSeasonAction } from "../action"
+import { SeasonFieldAction } from "../action"
 
 import { Season } from "../../kernel/data"
 
 type Props = Readonly<{
-    field: InputSeasonAction
+    field: SeasonFieldAction
     title: VNodeContent
     seasons: readonly Season[]
 }>

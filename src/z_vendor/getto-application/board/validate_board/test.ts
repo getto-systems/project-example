@@ -11,6 +11,10 @@ test("validate; all valid state; clear", async () => {
     await runner(async () => {
         checker.update("name", { type: "validated", result: { valid: true } })
         checker.update("description", { type: "validated", result: { valid: true } })
+        expect(checker.get()).toEqual({
+            valid: true,
+            value: { name: "valid-name", value: "valid-value" },
+        })
         return action.state.currentState()
     }).then((stack) => {
         expect(stack).toEqual(["initial", "valid"])

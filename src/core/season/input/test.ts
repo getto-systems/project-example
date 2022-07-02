@@ -1,7 +1,7 @@
 import { test, expect } from "vitest"
 import { mockBoardValueStore } from "../../../z_vendor/getto-application/board/input/test_helper"
 
-import { initInputSeasonAction } from "./action"
+import { initSeasonFieldAction } from "./action"
 
 import { Season } from "../kernel/data"
 import { markSeason } from "../kernel/test_helper"
@@ -29,12 +29,12 @@ test("get default", async () => {
 test("set value", async () => {
     const { action, store } = standard()
 
-    action.reset(markSeason({ year: 2021, period: "summer" }))
+    action.reset({ default: false, season: markSeason({ year: 2021, period: "summer" }) })
     expect(store.get()).toEqual("2021.summer")
 })
 
 function standard() {
-    const action = initInputSeasonAction(standard_availableSeasons())
+    const action = initSeasonFieldAction(standard_availableSeasons())
     const store = mockBoardValueStore(action.input)
 
     return { action, store }

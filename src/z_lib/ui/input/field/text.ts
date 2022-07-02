@@ -10,7 +10,6 @@ import {
     initValidateBoardFieldAction,
     ValidateBoardFieldAction,
 } from "../../../../z_vendor/getto-application/board/validate_field/action"
-
 import { initBoardFieldObserver } from "../../../../z_vendor/getto-application/board/observe_field/init/observer"
 
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
@@ -18,14 +17,7 @@ import { BoardValueStore } from "../../../../z_vendor/getto-application/board/in
 import { ValidateBoardFieldResult } from "../../../../z_vendor/getto-application/board/validate_field/data"
 import { ValidateTextError } from "../../validate/data"
 
-export interface TextFieldAction<T> {
-    readonly input: InputBoardAction<BoardValueStore>
-    readonly validate: ValidateBoardFieldAction<T, readonly ValidateTextError[]>
-    readonly observe: ObserveBoardFieldAction
-
-    clear(): void
-    reset(value: T): void
-}
+export type TextFieldAction<T> = BoardValueFieldAction<T, readonly ValidateTextError[]>
 
 export type TextFieldProps<T> = Readonly<{
     convert: (value: string) => ValidateBoardFieldResult<T, readonly ValidateTextError[]>
@@ -33,33 +25,58 @@ export type TextFieldProps<T> = Readonly<{
 export function initTextFieldAction<T extends string>(
     props: TextFieldProps<T>,
 ): TextFieldAction<T> {
+    return initBoardValueFieldAction({ map: (value) => value, ...props })
+}
+
+export function initTextFieldActionWithResource<T extends string, R>(
+    props: TextFieldProps<T> & BoardValueFieldResourceProps<R>,
+): TextFieldAction<T> & R {
+    return initBoardValueFieldActionWithResource({ map: (value) => value, ...props })
+}
+
+export interface BoardValueFieldAction<T, E> {
+    readonly input: InputBoardAction<BoardValueStore>
+    readonly validate: ValidateBoardFieldAction<T, E>
+    readonly observe: ObserveBoardFieldAction
+
+    clear(): void
+    reset(value: T): void
+}
+
+export type BoardValueFieldProps<T, E> = Readonly<{
+    map: (value: T) => string
+    convert: (value: string) => ValidateBoardFieldResult<T, E>
+}>
+export function initBoardValueFieldAction<T, E>(
+    props: BoardValueFieldProps<T, E>,
+): BoardValueFieldAction<T, E> {
     const { input } = initAction(props)
     return input
 }
 
-export type TextFieldPropsWithResource<T, R> = TextFieldProps<T> &
-    Readonly<{
-        resource: (
-            props: Readonly<{
-                store: BoardValueStore
-                subscriber: TextFieldActionSubscriber
-            }>,
-        ) => R
-    }>
-export function initTextFieldActionWithResource<T extends string, R>(
-    props: TextFieldPropsWithResource<T, R>,
-): TextFieldAction<T> & R {
+export type BoardValueFieldResourceProps<R> = Readonly<{
+    resource: (
+        props: Readonly<{
+            store: BoardValueStore
+            subscriber: TextFieldActionSubscriber
+        }>,
+    ) => R
+}>
+export function initBoardValueFieldActionWithResource<T, E, R>(
+    props: BoardValueFieldProps<T, E> & BoardValueFieldResourceProps<R>,
+): BoardValueFieldAction<T, E> & R {
     const { input, store, subscriber } = initAction(props)
     return {
         ...input,
         ...props.resource({ store, subscriber }),
     }
+    /* c8 ignore next */
 }
 
-function initAction<T extends string>(
-    props: TextFieldProps<T>,
+function initAction<T, E>(
+    props: BoardValueFieldProps<T, E>,
 ): Readonly<{
-    input: TextFieldAction<T>
+    input: BoardValueFieldAction<T, E>
     store: BoardValueStore
     subscriber: TextFieldActionSubscriber
 }> {
@@ -93,7 +110,7 @@ function initAction<T extends string>(
                 post.onClear()
             },
             reset: (value) => {
-                store.set(value)
+                store.set(props.map(value))
                 post.onReset()
             },
         },

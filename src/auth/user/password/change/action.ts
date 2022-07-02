@@ -5,13 +5,10 @@ import {
 } from "../../../../z_vendor/getto-application/action/action"
 
 import { initPasswordFieldAction } from "../input/action"
-import { initValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
 import { PasswordFieldAction } from "../input/action"
 import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
-import {
-    initObserveBoardAction,
-    ObserveBoardAction,
-} from "../../../../z_vendor/getto-application/board/observe_board/action"
+import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
+import { initRegisterField } from "../../../../z_lib/ui/register/action"
 
 import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
 
@@ -28,7 +25,7 @@ export interface ChangePasswordAction extends StatefulApplicationAction<ChangePa
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    clear(): ChangePasswordState
+    clear(): void
     submit(onSuccess: { (): void }): Promise<ChangePasswordState>
 }
 
@@ -41,7 +38,7 @@ export interface OverwritePasswordAction extends StatefulApplicationAction<Overw
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    clear(): OverwritePasswordState
+    clear(): void
     submit(
         user: Readonly<{ loginId: LoginId }>,
         onSuccess: { (): void },
@@ -80,7 +77,8 @@ class Action implements ChangePasswordAction {
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    convert: { (): ConvertBoardResult<ChangePasswordFields> }
+    convert: () => ConvertBoardResult<ChangePasswordFields>
+    clear: () => void
 
     constructor(material: ChangePasswordMaterial) {
         const { state, post } = initApplicationStateAction({ initialState })
@@ -91,8 +89,6 @@ class Action implements ChangePasswordAction {
         const currentPassword = initPasswordFieldAction()
         const newPassword = initPasswordFieldAction()
 
-        // TODO register field を使う
-        const fields = ["currentPassword", "newPassword"] as const
         const convert = (): ConvertBoardResult<ChangePasswordFields> => {
             const result = {
                 currentPassword: currentPassword.validate.check(),
@@ -110,31 +106,22 @@ class Action implements ChangePasswordAction {
             }
         }
 
-        const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
-        const { observe, observeChecker } = initObserveBoardAction({ fields })
+        const { validate, observe, clear } = initRegisterField(
+            [
+                ["newPassword", newPassword],
+                ["currentPassword", currentPassword],
+            ],
+            convert,
+        )
 
         this.currentPassword = currentPassword
         this.newPassword = newPassword
         this.validate = validate
         this.observe = observe
         this.convert = convert
-
-        fields.forEach((field) => {
-            this[field].validate.state.subscribe((state) => {
-                validateChecker.update(field, state)
-            })
-            this[field].observe.state.subscribe((result) => {
-                observeChecker.update(field, result.hasChanged)
-            })
-        })
+        this.clear = clear
     }
 
-    clear(): ChangePasswordState {
-        this.currentPassword.clear()
-        this.newPassword.clear()
-        this.validate.clear()
-        return this.post(initialState)
-    }
     async submit(onSuccess: { (): void }): Promise<ChangePasswordState> {
         const fields = this.convert()
         if (!fields.valid) {
@@ -204,7 +191,8 @@ class OverwriteAction implements OverwritePasswordAction {
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    convert: { (): ConvertBoardResult<OverwritePasswordFields> }
+    convert: () => ConvertBoardResult<OverwritePasswordFields>
+    clear: () => void
 
     constructor(material: OverwritePasswordMaterial) {
         const { state, post } = initApplicationStateAction({ initialState: initialOverwriteState })
@@ -212,50 +200,35 @@ class OverwriteAction implements OverwritePasswordAction {
         this.state = state
         this.post = post
 
-        const fields = ["newPassword"] as const
-
         const newPassword = initPasswordFieldAction()
-        const { validate, validateChecker } = initValidateBoardAction(
-            { fields },
-            {
-                convert: (): ConvertBoardResult<OverwritePasswordFields> => {
-                    const result = {
-                        newPassword: newPassword.validate.check(),
-                    }
-                    if (!result.newPassword.valid) {
-                        return { valid: false }
-                    }
-                    return {
-                        valid: true,
-                        value: {
-                            newPassword: result.newPassword.value,
-                        },
-                    }
+
+        const convert = (): ConvertBoardResult<OverwritePasswordFields> => {
+            const result = {
+                newPassword: newPassword.validate.check(),
+            }
+            if (!result.newPassword.valid) {
+                return { valid: false }
+            }
+            return {
+                valid: true,
+                value: {
+                    newPassword: result.newPassword.value,
                 },
-            },
+            }
+        }
+
+        const { validate, observe, clear } = initRegisterField(
+            [["newPassword", newPassword]],
+            convert,
         )
-        const { observe, observeChecker } = initObserveBoardAction({ fields })
 
         this.newPassword = newPassword
         this.validate = validate
         this.observe = observe
-        this.convert = () => validateChecker.get()
-
-        fields.forEach((field) => {
-            this[field].validate.state.subscribe((state) => {
-                validateChecker.update(field, state)
-            })
-            this[field].observe.state.subscribe((result) => {
-                observeChecker.update(field, result.hasChanged)
-            })
-        })
+        this.convert = convert
+        this.clear = clear
     }
 
-    clear(): OverwritePasswordState {
-        this.newPassword.clear()
-        this.validate.clear()
-        return this.post(initialState)
-    }
     async submit(
         user: Readonly<{ loginId: LoginId }>,
         onSuccess: { (): void },
