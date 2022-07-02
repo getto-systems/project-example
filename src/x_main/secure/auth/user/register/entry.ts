@@ -3,7 +3,7 @@ import { h, render } from "preact"
 import { ManageUserAccountPage } from "./page"
 
 import { newForegroundOutsideFeature } from "../../../../../x_outside_feature/common"
-import { newBaseResource } from "../../../../../common/base/init/resource"
+import { newBaseResource } from "../../../base/init/resource"
 import { newRegisterAuthUserAccountAction } from "../../../../../auth/user/account/register/init/resource"
 import { initEditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
 import { newOverwritePasswordAction } from "../../../../../auth/user/password/change/init/resource"

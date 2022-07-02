@@ -19,7 +19,7 @@ import { LoadBreadcrumbList } from "../../../common/outline/load/x_preact/load_b
 import { LoadMenu } from "../../../common/outline/load/x_preact/load_menu"
 import { Dashboard } from "../../../x_content/x_preact/dashboard"
 
-import { BaseResource } from "../../../common/base/resource"
+import { BaseResource } from "../base/resource"
 
 export function DashboardPage(props: BaseResource): VNode {
     const pageTitle = "ホーム"

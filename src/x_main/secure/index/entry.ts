@@ -1,11 +1,11 @@
 import { render, h } from "preact"
 
 import { newForegroundOutsideFeature } from "../../../x_outside_feature/common"
-import { newBaseResource } from "../../../common/base/init/resource"
+import { newBaseResource } from "../base/init/resource"
 
 import { DashboardPage } from "./page"
 
-import { BaseResource } from "../../../common/base/resource"
+import { BaseResource } from "../base/resource"
 
 render(h(DashboardPage, props()), document.body)
 
