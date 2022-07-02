@@ -7,14 +7,9 @@ import {
 import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
 
 import { initLoginIdFieldAction, LoginIdFieldAction } from "../input/action"
-import {
-    ValidateBoardAction,
-    initValidateBoardAction,
-} from "../../../../z_vendor/getto-application/board/validate_board/action"
-import {
-    initObserveBoardAction,
-    ObserveBoardAction,
-} from "../../../../z_vendor/getto-application/board/observe_board/action"
+import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
+import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
+import { initRegisterField } from "../../../../z_lib/ui/register/action"
 
 import { ChangeLoginIdError, OverwriteLoginIdFields } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
@@ -29,7 +24,7 @@ export interface OverwriteLoginIdAction extends StatefulApplicationAction<Overwr
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    clear(): OverwriteLoginIdState
+    clear(): void
     submit(
         user: Readonly<{ loginId: LoginId }>,
         onSuccess: { (loginId: LoginId): void },
@@ -69,7 +64,8 @@ class OverwriteAction implements OverwriteLoginIdAction {
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    convert: { (): ConvertBoardResult<OverwriteLoginIdFields> }
+    convert: () => ConvertBoardResult<OverwriteLoginIdFields>
+    clear: () => void
 
     constructor(material: OverwriteLoginIdMaterial) {
         const { state, post } = initApplicationStateAction({ initialState })
@@ -79,8 +75,6 @@ class OverwriteAction implements OverwriteLoginIdAction {
 
         const newLoginId = initLoginIdFieldAction()
 
-        // TODO modify field を使う
-        const fields = ["newLoginId"] as const
         const convert = (): ConvertBoardResult<OverwriteLoginIdFields> => {
             const result = {
                 newLoginId: newLoginId.validate.check(),
@@ -96,29 +90,18 @@ class OverwriteAction implements OverwriteLoginIdAction {
             }
         }
 
-        const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
-        const { observe, observeChecker } = initObserveBoardAction({ fields })
+        const { validate, observe, clear } = initRegisterField(
+            [["newLoginId", newLoginId]],
+            convert,
+        )
 
         this.newLoginId = newLoginId
         this.validate = validate
         this.observe = observe
         this.convert = convert
-
-        fields.forEach((field) => {
-            this[field].validate.state.subscribe((state) => {
-                validateChecker.update(field, state)
-            })
-            this[field].observe.state.subscribe((result) => {
-                observeChecker.update(field, result.hasChanged)
-            })
-        })
+        this.clear = clear
     }
 
-    clear(): OverwriteLoginIdState {
-        this.newLoginId.clear()
-        this.validate.clear()
-        return this.post(initialState)
-    }
     async submit(
         user: Readonly<{ loginId: LoginId }>,
         onSuccess: { (loginId: LoginId): void },

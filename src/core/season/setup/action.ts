@@ -3,16 +3,11 @@ import {
     initApplicationStateAction,
     StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
-import { initInputSeasonAction, InputSeasonAction } from "../input/action"
+import { initSeasonFieldAction, SeasonFieldAction } from "../input/action"
 import { LoadSeasonState } from "../load/action"
-import {
-    initObserveBoardAction,
-    ObserveBoardAction,
-} from "../../../z_vendor/getto-application/board/observe_board/action"
-import {
-    initValidateBoardAction,
-    ValidateBoardAction,
-} from "../../../z_vendor/getto-application/board/validate_board/action"
+import { ObserveBoardAction } from "../../../z_vendor/getto-application/board/observe_board/action"
+import { ValidateBoardAction } from "../../../z_vendor/getto-application/board/validate_board/action"
+import { initRegisterField } from "../../../z_lib/ui/register/action"
 
 import { SeasonRepository } from "../kernel/infra"
 import { Clock } from "../../../z_lib/ui/clock/infra"
@@ -24,7 +19,7 @@ import { ConvertBoardResult } from "../../../z_vendor/getto-application/board/ke
 import { ticker } from "../../../z_lib/ui/timer/helper"
 
 export interface SetupSeasonAction extends StatefulApplicationAction<SetupSeasonState> {
-    readonly season: InputSeasonAction
+    readonly season: SeasonFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -66,7 +61,7 @@ class Action implements SetupSeasonAction {
     readonly state: ApplicationStateAction<SetupSeasonState>
     readonly post: (state: SetupSeasonState) => SetupSeasonState
 
-    readonly season: InputSeasonAction
+    readonly season: SeasonFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
@@ -79,10 +74,8 @@ class Action implements SetupSeasonAction {
         this.state = state
         this.post = post
 
-        const season = initInputSeasonAction(material.infra.availableSeasons)
+        const season = initSeasonFieldAction(material.infra.availableSeasons)
 
-        // TODO register field を使う
-        const fields = ["season"] as const
         const convert = (): ConvertBoardResult<DetectedSeason> => {
             const result = {
                 season: season.validate.check(),
@@ -96,13 +89,16 @@ class Action implements SetupSeasonAction {
             }
         }
 
-        const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
-        const { observe, observeChecker } = initObserveBoardAction({ fields })
+        const { validate, observe } = initRegisterField([["season", season]], convert)
 
         load.state.ignitionState.then((state) => {
             switch (state.type) {
                 case "success":
-                    season.reset(state.season)
+                    if (state.default) {
+                        season.reset({ default: true })
+                    } else {
+                        season.reset({ default: false, season: state.season })
+                    }
             }
         })
 
@@ -113,15 +109,6 @@ class Action implements SetupSeasonAction {
         this.material = material
         this.load = load
         this.convert = convert
-
-        fields.forEach((field) => {
-            this[field].validate.state.subscribe((state) => {
-                validateChecker.update(field, state)
-            })
-            this[field].observe.state.subscribe((result) => {
-                observeChecker.update(field, result.hasChanged)
-            })
-        })
     }
 
     async setup(onSuccess: { (): void }): Promise<SetupSeasonState> {

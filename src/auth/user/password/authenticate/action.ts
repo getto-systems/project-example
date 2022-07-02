@@ -6,15 +6,9 @@ import {
 
 import { LoginIdFieldAction, initLoginIdFieldAction } from "../../login_id/input/action"
 import { PasswordFieldAction, initPasswordFieldAction } from "../input/action"
-import {
-    ValidateBoardAction,
-    initValidateBoardAction,
-} from "../../../../z_vendor/getto-application/board/validate_board/action"
-
-import {
-    initObserveBoardAction,
-    ObserveBoardAction,
-} from "../../../../z_vendor/getto-application/board/observe_board/action"
+import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
+import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
+import { initRegisterField } from "../../../../z_lib/ui/register/action"
 
 import { checkTakeLongtime } from "../../../../z_lib/ui/timer/helper"
 import { getScriptPath } from "../../../sign/get_script_path/method"
@@ -42,7 +36,7 @@ export interface AuthenticatePasswordAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    clear(): AuthenticatePasswordState
+    clear(): void
     submit(): Promise<AuthenticatePasswordState>
     loadError(err: LoadScriptError): Promise<AuthenticatePasswordState>
 }
@@ -91,7 +85,8 @@ class Action implements AuthenticatePasswordAction {
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    convert: { (): ConvertBoardResult<AuthenticatePasswordFields> }
+    convert: () => ConvertBoardResult<AuthenticatePasswordFields>
+    clear: () => void
 
     constructor(material: AuthenticatePasswordMaterial) {
         const { state, post } = initApplicationStateAction({ initialState })
@@ -102,8 +97,6 @@ class Action implements AuthenticatePasswordAction {
         const loginId = initLoginIdFieldAction()
         const password = initPasswordFieldAction()
 
-        // TODO register field を使う
-        const fields = ["loginId", "password"] as const
         const convert = (): ConvertBoardResult<AuthenticatePasswordFields> => {
             const result = {
                 loginId: loginId.validate.check(),
@@ -121,31 +114,22 @@ class Action implements AuthenticatePasswordAction {
             }
         }
 
-        const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
-        const { observe, observeChecker } = initObserveBoardAction({ fields })
+        const { validate, observe, clear } = initRegisterField(
+            [
+                ["loginId", loginId],
+                ["password", password],
+            ],
+            convert,
+        )
 
         this.loginId = loginId
         this.password = password
         this.validate = validate
         this.observe = observe
         this.convert = convert
-
-        fields.forEach((field) => {
-            this[field].validate.state.subscribe((state) => {
-                validateChecker.update(field, state)
-            })
-            this[field].observe.state.subscribe((result) => {
-                observeChecker.update(field, result.hasChanged)
-            })
-        })
+        this.clear = clear
     }
 
-    clear(): AuthenticatePasswordState {
-        this.loginId.clear()
-        this.password.clear()
-        this.validate.clear()
-        return initialState
-    }
     async submit(): Promise<AuthenticatePasswordState> {
         const fields = this.convert()
         if (!fields.valid) {

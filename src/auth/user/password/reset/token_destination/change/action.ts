@@ -10,23 +10,17 @@ import {
     initResetTokenDestinationFieldAction,
     ResetTokenDestinationFieldAction,
 } from "../input/action"
-import {
-    ValidateBoardAction,
-    initValidateBoardAction,
-} from "../../../../../../z_vendor/getto-application/board/validate_board/action"
-import {
-    initObserveBoardAction,
-    ObserveBoardAction,
-} from "../../../../../../z_vendor/getto-application/board/observe_board/action"
-
-import { ChangeResetTokenDestinationError } from "./data"
-import { ConvertBoardResult } from "../../../../../../z_vendor/getto-application/board/kernel/data"
+import { ValidateBoardAction } from "../../../../../../z_vendor/getto-application/board/validate_board/action"
+import { ObserveBoardAction } from "../../../../../../z_vendor/getto-application/board/observe_board/action"
+import { initModifyField, modifyField } from "../../../../../../z_lib/ui/modify/action"
 
 import { ChangeResetTokenDestinationRemote } from "./infra"
 import { WaitTime } from "../../../../../../z_lib/ui/config/infra"
 
 import { ResetTokenDestination } from "../kernel/data"
 import { LoginId } from "../../../../login_id/kernel/data"
+import { ChangeResetTokenDestinationError } from "./data"
+import { ConvertBoardResult } from "../../../../../../z_vendor/getto-application/board/kernel/data"
 
 export interface ChangeResetTokenDestinationAction
     extends StatefulApplicationAction<ChangeResetTokenDestinationState> {
@@ -34,7 +28,7 @@ export interface ChangeResetTokenDestinationAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    reset(destination: ResetTokenDestination): ChangeResetTokenDestinationState
+    reset(destination: ResetTokenDestination): void
     submit(
         user: Readonly<{ loginId: LoginId; resetTokenDestination: ResetTokenDestination }>,
         onSuccess: { (data: ResetTokenDestination): void },
@@ -74,7 +68,8 @@ class Action implements ChangeResetTokenDestinationAction {
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
 
-    convert: { (): ConvertBoardResult<ResetTokenDestination> }
+    convert: () => ConvertBoardResult<ResetTokenDestination>
+    reset: (destination: ResetTokenDestination) => void
 
     constructor(material: ChangeResetTokenDestinationMaterial) {
         const { state, post } = initApplicationStateAction({ initialState })
@@ -84,8 +79,6 @@ class Action implements ChangeResetTokenDestinationAction {
 
         const destination = initResetTokenDestinationFieldAction()
 
-        // TODO modify field を使う
-        const fields = ["destination"] as const
         const convert = (): ConvertBoardResult<ResetTokenDestination> => {
             const result = destination.validate.check()
             if (!result.valid) {
@@ -97,30 +90,18 @@ class Action implements ChangeResetTokenDestinationAction {
             }
         }
 
-        const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
-        const { observe, observeChecker } = initObserveBoardAction({ fields })
+        const { validate, observe, reset } = initModifyField(
+            [modifyField("destination", destination, (data: ResetTokenDestination) => data)],
+            convert,
+        )
 
         this.destination = destination
         this.validate = validate
         this.observe = observe
         this.convert = convert
-
-        fields.forEach((field) => {
-            this[field].validate.state.subscribe((state) => {
-                validateChecker.update(field, state)
-            })
-            this[field].observe.state.subscribe((result) => {
-                observeChecker.update(field, result.hasChanged)
-            })
-        })
+        this.reset = reset
     }
 
-    reset(destination: ResetTokenDestination): ChangeResetTokenDestinationState {
-        this.destination.reset(destination)
-        this.validate.clear()
-        this.observe.clear()
-        return this.post(initialState)
-    }
     async submit(
         user: Readonly<{ loginId: LoginId; resetTokenDestination: ResetTokenDestination }>,
         onSuccess: { (data: ResetTokenDestination): void },
