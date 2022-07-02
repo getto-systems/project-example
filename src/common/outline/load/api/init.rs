@@ -26,7 +26,7 @@ impl<'a> LoadOutlineMenuBadgeStruct<'a> {
         LoadOutlineMenuBadgeAction::with_material(Self {
             authorize: AuthorizeStruct::new(&feature.auth.service, request_id, metadata),
 
-            menu_badge_repository: UnitedOutlineMenuBadgeRepository,
+            menu_badge_repository: UnitedOutlineMenuBadgeRepository::new().build(),
         })
     }
 }

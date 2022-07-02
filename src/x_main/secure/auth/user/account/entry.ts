@@ -3,7 +3,7 @@ import { h, render } from "preact"
 import { ManageUserAccountPage } from "./page"
 
 import { newForegroundOutsideFeature } from "../../../../../x_outside_feature/common"
-import { newBaseResource } from "../../../../../common/base/init/resource"
+import { newBaseResource } from "../../../base/init/resource"
 import { newSearchAuthUserAccountAction } from "../../../../../auth/user/account/search/init/resource"
 
 import { ManageUserAccountPageResource } from "./resource"

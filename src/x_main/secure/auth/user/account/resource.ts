@@ -1,4 +1,4 @@
-import { BaseResource } from "../../../../../common/base/resource"
+import { BaseResource } from "../../../base/resource"
 import { SearchAuthUserAccountAction } from "../../../../../auth/user/account/search/action"
 import { SearchSidebarAction } from "../../../../../z_lib/ui/search/sidebar/action"
 import { DetailAuthUserAccountActions } from "../../../../../auth/user/account/kernel/x_preact/detail"

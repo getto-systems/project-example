@@ -2,7 +2,9 @@ use tonic::{Response, Status};
 
 use crate::z_lib::response::tonic::ServiceResponder;
 
-use crate::common::outline::load::y_protobuf::service::LoadMenuBadgeResponsePb;
+use crate::common::outline::load::y_protobuf::service::{
+    LoadMenuBadgeEntryPb, LoadMenuBadgeResponsePb,
+};
 
 use super::super::action::{LoadOutlineMenuBadgeEvent, LoadOutlineMenuBadgeState};
 
@@ -31,8 +33,17 @@ impl ServiceResponder<LoadMenuBadgeResponsePb> for LoadOutlineMenuBadgeEvent {
 
 impl Into<LoadMenuBadgeResponsePb> for OutlineMenuBadge {
     fn into(self) -> LoadMenuBadgeResponsePb {
-        LoadMenuBadgeResponsePb {
-            index: self.index.extract(),
-        }
+        let response = LoadMenuBadgeResponsePb {
+            items: self
+                .extract()
+                .into_iter()
+                .map(|(path, count)| LoadMenuBadgeEntryPb {
+                    path: path.to_string(),
+                    count: count.extract(),
+                })
+                .collect(),
+        };
+
+        response
     }
 }
