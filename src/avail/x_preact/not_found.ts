@@ -8,7 +8,7 @@ import { buttons } from "../../z_vendor/getto-css/preact/design/form"
 
 import { useDocumentTitle } from "../../common/x_preact/hooks"
 import { siteInfo } from "../../x_content/site"
-import { iconHtml } from "../../common/x_preact/design/icon"
+import { iconHtml } from "../../z_lib/ui/icon/x_preact/icon"
 import { icon_home } from "../../x_content/icon"
 
 type Props = {

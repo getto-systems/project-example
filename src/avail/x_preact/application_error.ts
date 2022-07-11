@@ -9,7 +9,7 @@ import { lnir } from "../../z_lib/ui/icon/init/line_icon"
 
 import { env } from "../../y_environment/ui/env"
 
-import { iconHtml } from "../../common/x_preact/design/icon"
+import { iconHtml } from "../../z_lib/ui/icon/x_preact/icon"
 import { icon_home } from "../../x_content/icon"
 import { siteInfo } from "../../x_content/site"
 

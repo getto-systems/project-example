@@ -4,7 +4,7 @@ import { html } from "htm/preact"
 import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
 import { PagerOptionsProps, SortSignContent } from "../../../z_vendor/getto-css/preact/design/table"
 
-import { iconHtml } from "./icon"
+import { iconHtml } from "../../../z_lib/ui/icon/x_preact/icon"
 import {
     icon_edit,
     icon_edit_focused,

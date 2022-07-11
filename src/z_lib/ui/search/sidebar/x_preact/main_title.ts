@@ -11,7 +11,7 @@ import { notice_alert } from "../../../../../z_vendor/getto-css/preact/design/hi
 import { repositoryErrorReason } from "../../../repository/x_error/reason"
 import { isSidebarExpand } from "./helper"
 
-import { iconHtml } from "../../../../../common/x_preact/design/icon"
+import { iconHtml } from "../../../icon/x_preact/icon"
 import { icon_sidebar_expand, icon_sidebar_fold } from "../../../../../x_content/icon"
 
 import { SearchSidebarAction } from "../action"

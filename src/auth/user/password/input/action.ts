@@ -6,8 +6,8 @@ import {
 import {
     initTextFieldActionWithResource,
     TextFieldAction,
-    TextFieldActionSubscriber,
 } from "../../../../z_lib/ui/input/field/text"
+import { TextFieldActionSubscriber } from "../../../../z_lib/ui/input/field/init/pubsub"
 
 import { passwordBoardConverter } from "./convert"
 

@@ -6,7 +6,7 @@ import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
 import { button_search } from "../../../z_vendor/getto-css/preact/design/form"
 
 import { icon_search, icon_spinner } from "../../../x_content/icon"
-import { iconHtml } from "../design/icon"
+import { iconHtml } from "../../../z_lib/ui/icon/x_preact/icon"
 
 import { ObserveBoardState } from "../../../z_vendor/getto-application/board/observe_board/action"
 
@@ -20,20 +20,17 @@ type Props = Readonly<{
     onClick: { (e: Event): void }
 }>
 export function SearchButton({ isConnecting, observeState, label, icon, onClick }: Props): VNode {
-    const buttonLabel = label || "検索"
-    const buttonIcon = icon || icon_search
-
     if (isConnecting) {
         return button_search({ state: "connect", label: iconLabel(icon_spinner) })
     }
 
     return button_search({
         state: observeState.hasChanged ? "confirm" : "normal",
-        label: iconLabel(buttonIcon),
+        label: iconLabel(icon || icon_search),
         onClick,
     })
 
     function iconLabel(icon: Icon): VNode {
-        return html`${buttonLabel} ${iconHtml(icon)}`
+        return html`${label || "検索"} ${iconHtml(icon)}`
     }
 }

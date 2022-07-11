@@ -11,6 +11,7 @@ import {
     ValidateBoardFieldAction,
 } from "../../../../z_vendor/getto-application/board/validate_field/action"
 import { initBoardFieldObserver } from "../../../../z_vendor/getto-application/board/observe_field/init/observer"
+import { initTextFieldActionSubscriber, TextFieldActionSubscriber } from "./init/pubsub"
 
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
@@ -92,7 +93,7 @@ function initAction<T, E>(
         }),
     })
 
-    const [actionSubscriber, post] = initActionSubscriber()
+    const [actionSubscriber, post] = initTextFieldActionSubscriber()
 
     subscriber.subscribe(() => {
         validate.check()
@@ -118,43 +119,4 @@ function initAction<T, E>(
         store,
         subscriber: actionSubscriber,
     }
-}
-
-export interface TextFieldActionSubscriber {
-    subscribe(handler: TextFieldActionHandler): void
-}
-export type TextFieldActionHandler = Readonly<{
-    onInput?: () => void
-    onClear?: () => void
-    onReset?: () => void
-}>
-
-function initActionSubscriber(): [
-    TextFieldActionSubscriber,
-    {
-        onInput(): void
-        onClear(): void
-        onReset(): void
-    },
-] {
-    let handlers: TextFieldActionHandler[] = []
-
-    return [
-        {
-            subscribe: (handler) => {
-                handlers = [handler, ...handlers]
-            },
-        },
-        {
-            onInput: () => {
-                handlers.forEach((handler) => handler.onInput?.())
-            },
-            onClear: () => {
-                handlers.forEach((handler) => handler.onClear?.())
-            },
-            onReset: () => {
-                handlers.forEach((handler) => handler.onReset?.())
-            },
-        },
-    ]
 }

@@ -4,6 +4,11 @@ import { VNode } from "preact"
 import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
 
 import { fieldHelp, fieldHelp_error } from "../../../z_vendor/getto-css/preact/design/form"
+import { VectorButton } from "../../../z_vendor/getto-application/board/input/x_preact/vector"
+
+import { VectorAddButton } from "../button/vector_add_button"
+import { VectorRemoveButton } from "../button/vector_remove_button"
+import { VectorUndoRemoveButton } from "../button/vector_undo_remove_button"
 
 import { ValidateBoardState } from "../../../z_vendor/getto-application/board/validate_board/action"
 
@@ -25,5 +30,13 @@ export function validationMessage(validateState: ValidateBoardState): readonly V
 
         case "invalid":
             return [fieldHelp_error(["正しく入力されていません"])]
+    }
+}
+
+export function vectorButton(): VectorButton {
+    return {
+        add: ({ onClick }) => VectorAddButton({ onClick }),
+        remove: ({ onClick }) => VectorRemoveButton({ onClick }),
+        undoRemove: ({ onClick }) => VectorUndoRemoveButton({ onClick }),
     }
 }

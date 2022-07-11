@@ -16,7 +16,7 @@ import {
 import { badge_alert, notice_alert } from "../../../../z_vendor/getto-css/preact/design/highlight"
 
 import { poweredBy } from "../../../../x_content/site"
-import { iconHtml } from "../../../x_preact/design/icon"
+import { iconHtml } from "../../../../z_lib/ui/icon/x_preact/icon"
 
 import { LoadMenuAction } from "../action"
 

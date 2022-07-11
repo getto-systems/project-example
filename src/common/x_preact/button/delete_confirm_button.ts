@@ -6,7 +6,7 @@ import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
 import { button_delete } from "../../../z_vendor/getto-css/preact/design/form"
 
 import { icon_delete } from "../../../x_content/icon"
-import { iconHtml } from "../design/icon"
+import { iconHtml } from "../../../z_lib/ui/icon/x_preact/icon"
 
 import { Icon } from "../../../z_lib/ui/icon/data"
 
