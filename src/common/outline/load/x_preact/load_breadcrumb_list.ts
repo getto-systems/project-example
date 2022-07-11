@@ -10,7 +10,7 @@ import { linky } from "../../../../z_vendor/getto-css/preact/design/highlight"
 import { lnir } from "../../../../z_lib/ui/icon/init/line_icon"
 
 import { siteInfo } from "../../../../x_content/site"
-import { iconHtml } from "../../../x_preact/design/icon"
+import { iconHtml } from "../../../../z_lib/ui/icon/x_preact/icon"
 import { icon_home } from "../../../../x_content/icon"
 
 import { MENU_ID } from "./load_menu"

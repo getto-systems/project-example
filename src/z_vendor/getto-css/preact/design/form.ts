@@ -231,7 +231,10 @@ export function buttons(content: ButtonsContent): VNode {
 }
 
 type ButtonContent =
-    | Readonly<{ type: StatefulButtonType; content: StatefulButtonContent }>
+    | Readonly<{
+          type: StatefulButtonType
+          content: StatefulButtonContent
+      }>
     | Readonly<{
           type: StatelessButtonType
           content: StatelessButtonContent & NormalStateButtonContent
@@ -246,10 +249,12 @@ type ClickableButtonContent = Readonly<{
     state: ClickableButtonState
     onClick: Handler<Event>
     label: VNodeContent
+    submit?: boolean
 }>
 type ConnectButtonContent = Readonly<{
     state: ConnectButtonState
     label: VNodeContent
+    submit?: boolean
 }>
 
 export type StatelessButtonContent = Readonly<{
@@ -259,7 +264,10 @@ export type StatelessButtonContent = Readonly<{
 export type DisabledButtonContent = Readonly<{
     label: VNodeContent
 }>
-type NormalStateButtonContent = Readonly<{ state: NormalButtonState }>
+type NormalStateButtonContent = Readonly<{
+    state: NormalButtonState
+    submit?: boolean
+}>
 
 type ButtonType = StatefulButtonType | StatelessButtonType | DisabledButtonType
 type StatefulButtonType = "edit" | "search" | "send" | "delete" | "complete" | "warning" | "pending"
@@ -356,6 +364,10 @@ function buttonContent(button: ButtonContent): VNode {
         }
 
         function submitType(): SubmitType {
+            if (button.content.submit !== undefined) {
+                return button.content.submit ? "submit" : "button"
+            }
+
             switch (button.type) {
                 // 正常実行系は submit
                 case "edit":

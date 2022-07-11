@@ -23,6 +23,6 @@ export function ChangeButton(props: Props): VNode {
     return h(SendButton, {
         ...props,
         label: props.label || "変更",
-        icon: icon_change,
+        icon: props.icon || icon_change,
     })
 }

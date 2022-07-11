@@ -12,7 +12,7 @@ import { v_medium } from "../../../../z_vendor/getto-css/preact/design/alignment
 import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../x_content/site"
 import { icon_spinner } from "../../../../x_content/icon"
-import { iconHtml } from "../../../../common/x_preact/design/icon"
+import { iconHtml } from "../../../../z_lib/ui/icon/x_preact/icon"
 
 import { appendScript } from "../../../sign/x_preact/script"
 
