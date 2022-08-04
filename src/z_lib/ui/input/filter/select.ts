@@ -35,7 +35,7 @@ export function initSelectFilterAction<T, V>(
     pin: () => SelectResult<V>
 }> {
     const { input, store, subscriber } = initInputBoardAction()
-    let options: PrepareElementState<readonly T[]> = { type: "initial" }
+    let options: PrepareElementState<readonly T[]> = { isLoad: false }
     const observe = initObserveBoardFieldAction({
         observer: initBoardFieldObserver({
             current: () => store.get(),
@@ -62,7 +62,7 @@ export function initSelectFilterAction<T, V>(
             },
         },
         setOptions: (newOptions) => {
-            options = { type: "loaded", data: newOptions }
+            options = { isLoad: true, data: newOptions }
         },
         pin: () => {
             observe.pin()
@@ -77,7 +77,7 @@ function find<T, V>(
     convert: (data: V) => string,
     map: (data: T) => V,
 ): SelectResult<V> {
-    if (options.type === "initial") {
+    if (!options.isLoad) {
         return { isSelected: false }
     }
 

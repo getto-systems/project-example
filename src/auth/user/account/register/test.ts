@@ -8,17 +8,11 @@ import {
 
 import { RegisterAuthUserAccountAction, initRegisterAuthUserAccountAction } from "./action"
 
-import { restoreLoginId } from "../../login_id/input/convert"
-import { restoreResetTokenDestination } from "../../password/reset/token_destination/kernel/convert"
-import { restoreAuthUserField } from "../kernel/convert"
-
 import { RegisterAuthUserAccountRemote } from "./infra"
 import {
     BoardValueStore,
     MultipleBoardValueStore,
 } from "../../../../z_vendor/getto-application/board/input/infra"
-
-import { AuthUserAccount } from "../kernel/data"
 
 const VALID_INFO = {
     loginId: "login-id",
@@ -38,18 +32,19 @@ test("submit valid info", async () => {
         store.resetTokenDestinationType.set("email")
         store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
 
-        return resource.register.submit((data) => {
-            expect(data).toEqual({
-                loginId: "login-id",
-                grantedRoles: ["auth-user"],
-                resetTokenDestination: { type: "email", email: "user@example.com" },
-                memo: "",
-            })
-        })
+        return resource.register.submit()
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
-            { type: "success" },
+            {
+                type: "success",
+                entry: {
+                    loginId: "login-id",
+                    grantedRoles: ["auth-user"],
+                    resetTokenDestination: { type: "email", email: "user@example.com" },
+                    memo: "",
+                },
+            },
             { type: "initial" },
         ])
     })
@@ -68,19 +63,20 @@ test("submit valid login-id; take long time", async () => {
         store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
         store.memo.set(VALID_INFO.memo)
 
-        return resource.register.submit((data) => {
-            expect(data).toEqual({
-                loginId: "login-id",
-                grantedRoles: ["auth-user"],
-                resetTokenDestination: { type: "email", email: "user@example.com" },
-                memo: "memo",
-            })
-        })
+        return resource.register.submit()
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
             { type: "try", hasTakenLongtime: true },
-            { type: "success" },
+            {
+                type: "success",
+                entry: {
+                    loginId: "login-id",
+                    grantedRoles: ["auth-user"],
+                    resetTokenDestination: { type: "email", email: "user@example.com" },
+                    memo: "memo",
+                },
+            },
             { type: "initial" },
         ])
     })
@@ -102,105 +98,6 @@ test("clear", () => {
     expect(store.resetTokenDestinationType.get()).toEqual("none")
     expect(store.resetTokenDestinationEmail.get()).toEqual("")
     expect(store.memo.get()).toEqual("")
-})
-
-test("focus / close", async () => {
-    const { resource, store } = standard()
-
-    const runner = setupActionTestRunner(resource.register.list.focused)
-
-    store.loginId.set(VALID_INFO.loginId)
-    store.grantedRoles.set(VALID_INFO.grantedRoles)
-    store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
-
-    await resource.register.submit(() => null)
-
-    await runner(async () => {
-        const user: AuthUserAccount = {
-            loginId: restoreLoginId("login-id"),
-            grantedRoles: [],
-            resetTokenDestination: restoreResetTokenDestination({
-                type: "email",
-                email: "user@example.com",
-            }),
-            memo: restoreAuthUserField("memo"),
-        }
-        const another: AuthUserAccount = {
-            loginId: restoreLoginId("user-another"),
-            grantedRoles: [],
-            resetTokenDestination: { type: "none" },
-            memo: restoreAuthUserField("memo"),
-        }
-
-        resource.register.list.focused.focus(user)
-        expect(resource.register.list.focused.isFocused(user)).toBe(true)
-        expect(resource.register.list.focused.isFocused(another)).toBe(false)
-
-        resource.register.list.focused.close()
-        expect(resource.register.list.focused.isFocused(user)).toBe(false)
-        expect(resource.register.list.focused.isFocused(another)).toBe(false)
-
-        return resource.register.list.focused.state.currentState()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            {
-                type: "focus-on",
-                user: {
-                    loginId: "login-id",
-                    grantedRoles: [],
-                    resetTokenDestination: { type: "email", email: "user@example.com" },
-                    memo: "memo",
-                },
-            },
-            { type: "initial" },
-        ])
-    })
-})
-
-test("update user", async () => {
-    const { resource, store } = standard()
-
-    const runner = setupActionTestRunner(resource.register.list.focused)
-
-    store.loginId.set(VALID_INFO.loginId)
-    store.grantedRoles.set(VALID_INFO.grantedRoles)
-    store.resetTokenDestinationType.set("email")
-    store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
-
-    await resource.register.submit(() => null)
-
-    const user: AuthUserAccount = {
-        loginId: restoreLoginId("login-id"),
-        grantedRoles: [],
-        resetTokenDestination: { type: "none" },
-        memo: restoreAuthUserField("memo"),
-    }
-
-    await runner(async () => {
-        return resource.register.list.focused.update(user.loginId, user)
-    }).then((stack) => {
-        expect(stack).toEqual([{ type: "focus-on", user }])
-    })
-})
-
-test("remove user", async () => {
-    const { resource, store } = standard()
-
-    const runner = setupActionTestRunner(resource.register.list.focused)
-
-    store.loginId.set(VALID_INFO.loginId)
-    store.grantedRoles.set(VALID_INFO.grantedRoles)
-    store.resetTokenDestinationType.set("email")
-    store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
-    store.memo.set(VALID_INFO.memo)
-
-    await resource.register.submit(() => null)
-
-    await runner(async () => {
-        return resource.register.list.focused.remove(restoreLoginId("login-id"))
-    }).then((stack) => {
-        expect(stack).toEqual([{ type: "initial" }])
-    })
 })
 
 function standard() {

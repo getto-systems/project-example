@@ -7,42 +7,34 @@ import { notice_gray } from "../../../../../z_vendor/getto-css/preact/design/hig
 import { DetailAuthUserAccount, DetailAuthUserAccountActions } from "../../kernel/x_preact/detail"
 import { BackToListButton } from "../../../../../common/x_preact/button/back_to_list_button"
 
-import { FocusedAuthUserAccountAction } from "../action"
+import { SearchAuthUserAccountAction } from "../action"
 
-import { AuthUserAccount } from "../../kernel/data"
+import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 type Props = DetailAuthUserAccountActions &
     Readonly<{
-        focused: FocusedAuthUserAccountAction
-        user: Readonly<{ found: false }> | Readonly<{ found: true; user: AuthUserAccount }>
+        search: SearchAuthUserAccountAction
     }>
-export function FocusedAuthUserAccount(props: Props): VNode {
+export function FocusAuthUserAccount(props: Props): VNode {
+    const focusState = useApplicationAction(props.search.list.focus)
+
     return html`${[container([box_grow({ body: backToListButton() })]), content()]}`
 
     function content(): VNode {
-        if (!props.user.found) {
+        if (focusState.type === "detect-failed") {
             return container([
                 box_grow({ body: notice_gray(["指定されたユーザーが見つかりませんでした"]) }),
             ])
         }
 
-        return h(DetailAuthUserAccount, {
-            ...props,
-            user: props.user.user,
-            onModify: (loginId, user) => {
-                props.focused.update(loginId, user)
-            },
-            onUnregister: (loginId) => {
-                props.focused.remove(loginId)
-            },
-        })
+        return h(DetailAuthUserAccount, props)
     }
 
     function backToListButton(): VNode {
         return h(BackToListButton, { onClick })
 
         function onClick() {
-            props.focused.close()
+            props.search.list.focus.close()
         }
     }
 }

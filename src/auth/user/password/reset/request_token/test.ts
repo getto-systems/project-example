@@ -51,11 +51,12 @@ test("submit without fields", async () => {
     })
 })
 
-test("clear", () => {
+test("edit", () => {
     const { action, store } = standard()
 
     store.loginId.set(VALID_LOGIN.loginId)
-    action.clear()
+
+    action.edit()
 
     expect(store.loginId.get()).toEqual("")
 })

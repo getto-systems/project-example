@@ -30,7 +30,7 @@ test("pin", async () => {
 test("options", async () => {
     const { action } = standard()
 
-    expect(action.options()).toEqual({ type: "loaded", data: ALL_AUTH_ROLES })
+    expect(action.options()).toEqual({ isLoad: true, data: ALL_AUTH_ROLES })
 })
 
 test("clear", async () => {

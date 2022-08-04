@@ -9,82 +9,29 @@ import { OverwritePassword } from "../../../password/change/x_preact/overwrite_p
 import { ChangeResetTokenDestination } from "../../../password/reset/token_destination/change/x_preact/change"
 import { UnregisterAuthUserAccount } from "../../unregister/x_preact/unregister"
 
-import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
 import { OverwriteLoginIdAction } from "../../../login_id/change/action"
 import { OverwritePasswordAction } from "../../../password/change/action"
 import { ModifyAuthUserAccountAction } from "../../modify/action"
 import { ChangeResetTokenDestinationAction } from "../../../password/reset/token_destination/change/action"
 import { UnregisterAuthUserAccountAction } from "../../unregister/action"
 
-import { AuthUserAccount } from "../../kernel/data"
-import { LoginId } from "../../../login_id/kernel/data"
-
 export type DetailAuthUserAccountActions = Readonly<{
-    modify: Readonly<{
-        editable: EditableBoardAction
-        modify: ModifyAuthUserAccountAction
-    }>
-    changeResetTokenDestination: Readonly<{
-        editable: EditableBoardAction
-        change: ChangeResetTokenDestinationAction
-    }>
-    overwriteLoginId: Readonly<{
-        editable: EditableBoardAction
-        overwrite: OverwriteLoginIdAction
-    }>
-    overwritePassword: Readonly<{
-        editable: EditableBoardAction
-        overwrite: OverwritePasswordAction
-    }>
-    unregister: Readonly<{
-        editable: EditableBoardAction
-        unregister: UnregisterAuthUserAccountAction
-    }>
+    modify: ModifyAuthUserAccountAction
+    changeResetTokenDestination: ChangeResetTokenDestinationAction
+    overwriteLoginId: OverwriteLoginIdAction
+    overwritePassword: OverwritePasswordAction
+    unregister: UnregisterAuthUserAccountAction
 }>
-type Props = DetailAuthUserAccountActions &
-    Readonly<{
-        user: AuthUserAccount
-        onModify: { (loginId: LoginId, user: AuthUserAccount): void }
-        onUnregister: { (loginId: LoginId): void }
-    }>
-export function DetailAuthUserAccount(props: Props): VNode {
-    const user = props.user
-
+export function DetailAuthUserAccount(props: DetailAuthUserAccountActions): VNode {
     return html`${[
         container([
-            h(ModifyAuthUserAccount, {
-                ...props.modify,
-                user,
-                onSuccess: (fields) => {
-                    props.onModify(user.loginId, { ...user, ...fields })
-                },
-            }),
-            h(ChangeResetTokenDestination, {
-                ...props.changeResetTokenDestination,
-                user,
-                onSuccess: (resetTokenDestination) => {
-                    props.onModify(user.loginId, { ...user, resetTokenDestination })
-                },
-            }),
+            h(ModifyAuthUserAccount, { modify: props.modify }),
+            h(ChangeResetTokenDestination, { change: props.changeResetTokenDestination }),
         ]),
         container([
-            h(OverwriteLoginId, {
-                ...props.overwriteLoginId,
-                user,
-                onSuccess: (loginId) => {
-                    props.onModify(user.loginId, { ...user, loginId })
-                },
-            }),
-            h(OverwritePassword, { ...props.overwritePassword, user }),
+            h(OverwriteLoginId, { overwrite: props.overwriteLoginId }),
+            h(OverwritePassword, { overwrite: props.overwritePassword }),
         ]),
-        container([
-            h(UnregisterAuthUserAccount, {
-                ...props.unregister,
-                user,
-                onSuccess: (loginId) => {
-                    props.onUnregister(loginId)
-                },
-            }),
-        ]),
+        container([h(UnregisterAuthUserAccount, { unregister: props.unregister })]),
     ]}`
 }

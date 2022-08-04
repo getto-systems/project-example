@@ -61,12 +61,13 @@ test("submit without fields", async () => {
     })
 })
 
-test("clear", () => {
+test("edit", () => {
     const { resource, store } = standard()
 
     store.currentPassword.set(VALID_PASSWORD.currentPassword)
     store.newPassword.set(VALID_PASSWORD.newPassword)
-    resource.change.clear()
+
+    resource.change.edit()
 
     expect(store.currentPassword.get()).toEqual("")
     expect(store.newPassword.get()).toEqual("")

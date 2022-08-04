@@ -21,17 +21,15 @@ import { ClearChangesButton } from "../../../../../../common/x_preact/button/cle
 import { CloseButton } from "../../../../../../common/x_preact/button/close_button"
 
 import { RequestResetTokenAction } from "../action"
-import { EditableBoardAction } from "../../../../../../z_vendor/getto-application/board/editable/action"
 
 import { RequestResetTokenError } from "../data"
 
 type Props = Readonly<{
-    editable: EditableBoardAction
     requestToken: RequestResetTokenAction
 }>
 export function RequestResetTokenProfile(props: Props): VNode {
     const state = useApplicationAction(props.requestToken)
-    const editableState = useApplicationAction(props.editable)
+    const editableState = useApplicationAction(props.requestToken.editable)
     const validateState = useApplicationAction(props.requestToken.validate)
     const observeState = useApplicationAction(props.requestToken.observe)
 
@@ -84,8 +82,7 @@ export function RequestResetTokenProfile(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.requestToken.clear()
-            props.editable.open()
+            props.requestToken.edit()
         }
     }
 
@@ -104,7 +101,7 @@ export function RequestResetTokenProfile(props: Props): VNode {
             props.requestToken.submit(onSuccess)
 
             function onSuccess() {
-                props.editable.close()
+                // noop
             }
         }
     }
@@ -122,8 +119,7 @@ export function RequestResetTokenProfile(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.requestToken.clear()
-            props.editable.close()
+            props.requestToken.editable.close()
         }
     }
 

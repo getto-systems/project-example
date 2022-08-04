@@ -9,6 +9,10 @@ import { PasswordFieldAction } from "../input/action"
 import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
 import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
 import { initRegisterField } from "../../../../z_lib/ui/register/action"
+import {
+    EditableBoardAction,
+    initEditableBoardAction,
+} from "../../../../z_vendor/getto-application/board/editable/action"
 
 import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
 
@@ -18,13 +22,17 @@ import { WaitTime } from "../../../../z_lib/ui/config/infra"
 import { ChangePasswordError, ChangePasswordFields, OverwritePasswordFields } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { LoginId } from "../../login_id/kernel/data"
+import { PrepareElementState } from "../../../../z_lib/ui/prepare/data"
+import { initModifyField, modifyField, ModifyFieldHandler } from "../../../../z_lib/ui/modify/action"
 
 export interface ChangePasswordAction extends StatefulApplicationAction<ChangePasswordState> {
     readonly currentPassword: PasswordFieldAction
     readonly newPassword: PasswordFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
+    readonly editable: EditableBoardAction
 
+    edit(): void
     clear(): void
     submit(onSuccess: { (): void }): Promise<ChangePasswordState>
 }
@@ -37,13 +45,17 @@ export interface OverwritePasswordAction extends StatefulApplicationAction<Overw
     readonly newPassword: PasswordFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
+    readonly editable: EditableBoardAction
 
-    clear(): void
-    submit(
-        user: Readonly<{ loginId: LoginId }>,
-        onSuccess: { (): void },
-    ): Promise<OverwritePasswordState>
+    onSuccess(handler: (data: OverwritePasswordEntry) => void): void
+
+    data(): PrepareElementState<OverwritePasswordEntry>
+
+    reset(): void
+    submit(): Promise<OverwritePasswordState>
 }
+
+export type OverwritePasswordEntry = Readonly<{ loginId: LoginId }>
 
 export type OverwritePasswordState = OverwritePasswordEvent
 
@@ -76,6 +88,7 @@ class Action implements ChangePasswordAction {
     readonly newPassword: PasswordFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
+    readonly editable: EditableBoardAction
 
     convert: () => ConvertBoardResult<ChangePasswordFields>
     clear: () => void
@@ -85,6 +98,7 @@ class Action implements ChangePasswordAction {
         this.material = material
         this.state = state
         this.post = post
+        this.editable = initEditableBoardAction()
 
         const currentPassword = initPasswordFieldAction()
         const newPassword = initPasswordFieldAction()
@@ -122,12 +136,24 @@ class Action implements ChangePasswordAction {
         this.clear = clear
     }
 
+    edit(): void {
+        this.editable.open()
+        this.clear()
+    }
     async submit(onSuccess: { (): void }): Promise<ChangePasswordState> {
         const fields = this.convert()
         if (!fields.valid) {
             return this.state.currentState()
         }
-        return changePassword(this.material, fields.value, onSuccess, this.post)
+        return changePassword(
+            this.material,
+            fields.value,
+            () => {
+                this.editable.close()
+                onSuccess()
+            },
+            this.post,
+        )
     }
 }
 
@@ -176,10 +202,12 @@ export type OverwritePasswordConfig = Readonly<{
     resetToInitialTimeout: WaitTime
 }>
 
-export function initOverwritePasswordAction(
-    material: OverwritePasswordMaterial,
-): OverwritePasswordAction {
-    return new OverwriteAction(material)
+export function initOverwritePasswordAction(material: OverwritePasswordMaterial): Readonly<{
+    action: OverwritePasswordAction
+    handler: ModifyFieldHandler<OverwritePasswordEntry>
+}> {
+    const action = new OverwriteAction(material)
+    return { action, handler: action.handler }
 }
 
 class OverwriteAction implements OverwritePasswordAction {
@@ -190,9 +218,12 @@ class OverwriteAction implements OverwritePasswordAction {
     readonly newPassword: PasswordFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
+    readonly editable: EditableBoardAction
 
-    convert: () => ConvertBoardResult<OverwritePasswordFields>
-    clear: () => void
+    readonly convert: () => ConvertBoardResult<OverwritePasswordFields>
+    readonly data: () => PrepareElementState<OverwritePasswordEntry>
+    readonly handler: ModifyFieldHandler<OverwritePasswordEntry>
+    readonly reset: () => void
 
     constructor(material: OverwritePasswordMaterial) {
         const { state, post } = initApplicationStateAction({ initialState: initialOverwriteState })
@@ -217,41 +248,58 @@ class OverwriteAction implements OverwritePasswordAction {
             }
         }
 
-        const { validate, observe, clear } = initRegisterField(
-            [["newPassword", newPassword]],
+        const { validate, observe, editable, data, handler, reset } = initModifyField(
+            [modifyField("newPassword", newPassword, (_data: OverwritePasswordEntry) => "")],
             convert,
         )
 
         this.newPassword = newPassword
         this.validate = validate
         this.observe = observe
+        this.editable = editable
         this.convert = convert
-        this.clear = clear
+        this.data = data
+        this.handler = handler
+        this.reset = reset
+
+        this.onSuccess(() => {
+            this.editable.close()
+        })
     }
 
-    async submit(
-        user: Readonly<{ loginId: LoginId }>,
-        onSuccess: { (): void },
-    ): Promise<OverwritePasswordState> {
+    onSuccess(handler: (data: Readonly<{ loginId: LoginId }>) => void): void {
+        this.state.subscribe((state) => {
+            if (state.type === "success") {
+                handler(state.entry)
+            }
+        })
+    }
+
+    async submit(): Promise<OverwritePasswordState> {
+        const element = this.data()
+        if (!element.isLoad) {
+            return this.state.currentState()
+        }
+
         const fields = this.convert()
         if (!fields.valid) {
             return this.state.currentState()
         }
-        return overwritePassword(this.material, user, fields.value, onSuccess, this.post)
+
+        return overwritePassword(this.material, element.data, fields.value, this.post)
     }
 }
 
 type OverwritePasswordEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ChangePasswordError }>
-    | Readonly<{ type: "success" }>
+    | Readonly<{ type: "success"; entry: OverwritePasswordEntry }>
     | Readonly<{ type: "initial" }>
 
 async function overwritePassword<S>(
     { infra, config }: OverwritePasswordMaterial,
-    user: Readonly<{ loginId: LoginId }>,
+    user: OverwritePasswordEntry,
     fields: OverwritePasswordFields,
-    onSuccess: { (): void },
     post: Post<OverwritePasswordEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
@@ -268,8 +316,7 @@ async function overwritePassword<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    onSuccess()
-    post({ type: "success" })
+    post({ type: "success", entry: user })
     return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 

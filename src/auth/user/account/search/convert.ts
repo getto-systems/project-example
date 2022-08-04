@@ -13,9 +13,9 @@ import {
     SearchAuthUserAccountSortKey,
 } from "./data"
 import { ReadSearchSortKeyResult } from "../../../../z_lib/ui/search/sort/data"
-import { DetectLoginIdResult } from "./infra"
 import { AuthUserAccount } from "../kernel/data"
 import { toGrantedRoles } from "../input/granted_roles/convert"
+import { DetectFocusListKeyResult } from "../../../../z_lib/ui/list/data"
 
 const SEARCH_LOGIN_ID = "search-login-id" as const
 const SEARCH_GRANTED_ROLES = "search-granted-roles" as const
@@ -47,12 +47,12 @@ export function readSearchAuthUserAccountSortKey(
     }
 }
 
-export function detectFocusAuthUserAccount(currentURL: URL): DetectLoginIdResult {
+export function detectFocusAuthUserAccount(currentURL: URL): DetectFocusListKeyResult {
     const loginId = currentURL.searchParams.get(FOCUS_ID)
     if (loginId === null) {
         return { found: false }
     }
-    return { found: true, loginId }
+    return { found: true, key: loginId }
 }
 
 export function updateSearchAuthUserAccountFilterQuery(

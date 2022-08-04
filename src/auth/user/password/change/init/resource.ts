@@ -7,7 +7,9 @@ import {
     initChangePasswordAction,
     initOverwritePasswordAction,
     OverwritePasswordAction,
+    OverwritePasswordEntry,
 } from "../action"
+import { ModifyFieldHandler } from "../../../../../z_lib/ui/modify/action"
 
 import { newChangePasswordInfra, newOverwritePasswordInfra } from "./infra"
 
@@ -19,7 +21,10 @@ export function newChangePasswordAction(feature: OutsideFeature): ChangePassword
     })
 }
 
-export function newOverwritePasswordAction(feature: OutsideFeature): OverwritePasswordAction {
+export function newOverwritePasswordAction(feature: OutsideFeature): Readonly<{
+    action: OverwritePasswordAction
+    handler: ModifyFieldHandler<OverwritePasswordEntry>
+}> {
     return initOverwritePasswordAction({
         infra: newOverwritePasswordInfra(feature),
         config: newOverwritePasswordConfig(),

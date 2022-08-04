@@ -8,7 +8,7 @@ import { LoginId } from "../../kernel/data"
 import { AUTH_USER_ACCOUNT } from "../../../account/kernel/data"
 
 type Props = Readonly<{
-    user: Readonly<{ loginId: LoginId }>
+    data: Readonly<{ loginId: LoginId }>
 }> &
     Partial<{
         title: VNodeContent
@@ -17,7 +17,7 @@ type Props = Readonly<{
 export function StaticLoginIdField(props: Props): VNode {
     return field({
         title: props.title || AUTH_USER_ACCOUNT["loginId"],
-        body: props.user.loginId,
+        body: props.data.loginId,
         help: props.help,
     })
 }

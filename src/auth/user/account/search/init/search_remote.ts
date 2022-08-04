@@ -36,9 +36,9 @@ async function fetchRemote(
         const mock = false
         if (mock) {
             //await ticker({ wait_millisecond: 3000 }, () => null)
-            const users: AuthUserAccount[] = []
+            const list: AuthUserAccount[] = []
             for (let i = 0; i < 50; i++) {
-                users.push({
+                list.push({
                     loginId: restoreLoginId(`user-${i}`),
                     grantedRoles: [],
                     resetTokenDestination: { type: "none" },
@@ -48,9 +48,9 @@ async function fetchRemote(
             return {
                 success: true,
                 value: {
-                    page: { offset: 0, limit: 1000, all: users.length },
+                    page: { offset: 0, limit: 1000, all: list.length },
                     sort: { key: defaultSearchAuthUserAccountSort, order: "normal" },
-                    users,
+                    list,
                 },
             }
         }
@@ -96,7 +96,7 @@ async function fetchRemote(
                     defaultSearchAuthUserAccountSort,
                     readSearchAuthUserAccountSortKey,
                 ),
-                users: message.users.map(
+                list: message.users.map(
                     (user): AuthUserAccount => ({
                         loginId: restoreLoginId(user.loginId || ""),
                         grantedRoles: toGrantedRoles(user.grantedRoles || []),

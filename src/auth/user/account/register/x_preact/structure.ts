@@ -15,7 +15,7 @@ import { tableStructure } from "../../../../../z_vendor/getto-table/preact/cell/
 import { tableCell } from "../../../../../z_vendor/getto-table/preact/cell/simple"
 import { tableClassName } from "../../../../../z_vendor/getto-table/preact/decorator"
 
-import { ListRegisteredAuthUserAccountAction } from "../action"
+import { ListRegisteredAction } from "../../../../../z_lib/ui/list/action"
 
 import { AuthUserAccount, AUTH_USER_ACCOUNT } from "../../kernel/data"
 import { authUserGrantedRoles } from "../../kernel/x_preact/field"
@@ -27,13 +27,13 @@ type Summary = {
 }
 
 export function useRegisteredAuthUserAccountTableStructure(
-    list: ListRegisteredAuthUserAccountAction,
+    list: ListRegisteredAction<AuthUserAccount>,
 ): ListRegisteredAuthUserAccountTableStructure {
     return useMemo(() => build(list), [list])
 }
 
 function build(
-    list: ListRegisteredAuthUserAccountAction,
+    list: ListRegisteredAction<AuthUserAccount>,
 ): ListRegisteredAuthUserAccountTableStructure {
     return tableStructure(rowKey, [
         tableCell("edit", (_key) => ({
@@ -78,7 +78,7 @@ function build(
     }
 
     function editLink(row: AuthUserAccount): VNodeContent {
-        const isFocused = list.focused.isFocused(row)
+        const isFocused = list.focus.isFocused(row)
         return html`<a
             href="#"
             id="${isFocused ? "focused" : undefined}"
@@ -90,7 +90,7 @@ function build(
 
         function onClick(e: Event) {
             e.preventDefault()
-            list.focused.focus(row)
+            list.focus.change(row)
         }
     }
 }

@@ -11,28 +11,28 @@ import { box_grow, container } from "../../../../../z_vendor/getto-css/preact/de
 import { SearchAuthUserAccountPager } from "./pager"
 import { SearchAuthUserAccountTable } from "./table"
 
-import { FocusedAuthUserAccountAction, ListAuthUserAccountAction } from "../action"
+import { SearchAuthUserAccountAction } from "../action"
 
 type Props = Readonly<{
-    list: ListAuthUserAccountAction
+    search: SearchAuthUserAccountAction
 }>
-export function ListAuthUserAccount(resource: Props): VNode {
-    const structure = useAuthUserAccountTableStructure(resource.list)
-    useScrollToFocused(resource.list.focused)
+export function ListAuthUserAccount(props: Props): VNode {
+    const structure = useAuthUserAccountTableStructure(props.search)
+    useScrollToFocused(props.search)
 
     return html`
-        ${container([box_grow({ body: h(SearchAuthUserAccountPager, resource) })])}
-        ${h(SearchAuthUserAccountTable, { structure, ...resource })}
+        ${container([box_grow({ body: h(SearchAuthUserAccountPager, props) })])}
+        ${h(SearchAuthUserAccountTable, { structure, ...props })}
     `
 }
 
-function useScrollToFocused(detail: FocusedAuthUserAccountAction): void {
-    const state = useApplicationAction(detail)
+function useScrollToFocused(search: SearchAuthUserAccountAction): void {
+    const state = useApplicationAction(search.list.focus)
     useEffect(() => {
         scrollToFocused({
             sidebarId: "sidebar",
             focusedId: "focused",
-            isFirstTime: state.type === "focus-detected",
+            isFirstTime: state.type === "detect",
         })
     }, [state])
 }

@@ -11,23 +11,21 @@ import { restoreLoginId } from "../../login_id/input/convert"
 import { OverwritePasswordRemote, ChangePasswordRemoteResult } from "./infra"
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
-import { LoginId } from "../../login_id/kernel/data"
-
 const VALID_PASSWORD = { currentPassword: "current-password", newPassword: "new-password" } as const
 
 test("submit valid new-password", async () => {
-    const { resource, store, user } = standard()
+    const { overwrite, store } = standard()
 
-    const runner = setupActionTestRunner(resource.overwrite)
+    const runner = setupActionTestRunner(overwrite)
 
     await runner(async () => {
         store.newPassword.set(VALID_PASSWORD.newPassword)
 
-        return resource.overwrite.submit(user, () => null)
+        return overwrite.submit()
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
-            { type: "success" },
+            { type: "success", entry: { loginId: "user-id" } },
             { type: "initial" },
         ])
     })
@@ -35,39 +33,40 @@ test("submit valid new-password", async () => {
 
 test("submit valid login-id and password; take long time", async () => {
     // wait for take longtime timeout
-    const { resource, store, user } = takeLongtime_elements()
+    const { overwrite, store } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(resource.overwrite)
+    const runner = setupActionTestRunner(overwrite)
 
     await runner(() => {
         store.newPassword.set(VALID_PASSWORD.newPassword)
 
-        return resource.overwrite.submit(user, () => null)
+        return overwrite.submit()
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
             { type: "try", hasTakenLongtime: true },
-            { type: "success" },
+            { type: "success", entry: { loginId: "user-id" } },
             { type: "initial" },
         ])
     })
 })
 
 test("submit without fields", async () => {
-    const { resource, user } = standard()
+    const { overwrite } = standard()
 
-    const runner = setupActionTestRunner(resource.overwrite)
+    const runner = setupActionTestRunner(overwrite)
 
-    await runner(() => resource.overwrite.submit(user, () => null)).then((stack) => {
+    await runner(() => overwrite.submit()).then((stack) => {
         expect(stack).toEqual([])
     })
 })
 
-test("clear", () => {
-    const { resource, store } = standard()
+test("reset", () => {
+    const { overwrite, store } = standard()
 
     store.newPassword.set(VALID_PASSWORD.newPassword)
-    resource.overwrite.clear()
+
+    overwrite.reset()
 
     expect(store.newPassword.get()).toEqual("")
 })
@@ -80,35 +79,29 @@ function takeLongtime_elements() {
 }
 
 function initResource(overwritePasswordRemote: OverwritePasswordRemote): Readonly<{
-    resource: Readonly<{
-        overwrite: OverwritePasswordAction
-    }>
+    overwrite: OverwritePasswordAction
     store: Readonly<{
         newPassword: BoardValueStore
     }>
-    user: Readonly<{ loginId: LoginId }>
 }> {
-    const resource = {
-        overwrite: initOverwritePasswordAction({
-            infra: {
-                overwritePasswordRemote,
-            },
-            config: {
-                takeLongtimeThreshold: { wait_millisecond: 32 },
-                resetToInitialTimeout: { wait_millisecond: 32 },
-            },
-        }),
-    }
+    const overwrite = initOverwritePasswordAction({
+        infra: {
+            overwritePasswordRemote,
+        },
+        config: {
+            takeLongtimeThreshold: { wait_millisecond: 32 },
+            resetToInitialTimeout: { wait_millisecond: 32 },
+        },
+    })
 
-    const store = {
-        newPassword: mockBoardValueStore(resource.overwrite.newPassword.input),
-    }
+    overwrite.handler.focus({
+        loginId: restoreLoginId("user-id"),
+    })
 
     return {
-        resource,
-        store,
-        user: {
-            loginId: restoreLoginId("user-id"),
+        overwrite: overwrite.action,
+        store: {
+            newPassword: mockBoardValueStore(overwrite.action.newPassword.input),
         },
     }
 }

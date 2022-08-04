@@ -17,30 +17,28 @@ import {
     MultipleBoardValueStore,
 } from "../../../../z_vendor/getto-application/board/input/infra"
 
-import { LoginId } from "../../login_id/kernel/data"
-import { ModifyAuthUserAccountFields } from "./data"
-
 const VALID_INFO = {
     memo: "memo",
     grantedRoles: ["auth-user"],
 } as const
 
 test("submit valid info", async () => {
-    const { resource, store, user } = standard()
+    const { modify, store } = standard()
 
-    const runner = setupActionTestRunner(resource.modify)
+    const runner = setupActionTestRunner(modify)
 
     await runner(async () => {
         store.memo.set(VALID_INFO.memo)
         store.grantedRoles.set(VALID_INFO.grantedRoles)
 
-        return resource.modify.submit(user, (data) => {
-            expect(data).toEqual({ grantedRoles: ["auth-user"], memo: "memo" })
-        })
+        return modify.submit()
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
-            { type: "success" },
+            {
+                type: "success",
+                entry: { loginId: "user-id", grantedRoles: ["auth-user"], memo: "memo" },
+            },
             { type: "initial" },
         ])
     })
@@ -48,34 +46,35 @@ test("submit valid info", async () => {
 
 test("submit valid login-id; take long time", async () => {
     // wait for take longtime timeout
-    const { resource, store, user } = takeLongtime_elements()
+    const { modify, store } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(resource.modify)
+    const runner = setupActionTestRunner(modify)
 
     await runner(() => {
         store.memo.set(VALID_INFO.memo)
         store.grantedRoles.set(VALID_INFO.grantedRoles)
 
-        return resource.modify.submit(user, (data) => {
-            expect(data).toEqual({ grantedRoles: ["auth-user"], memo: "memo" })
-        })
+        return modify.submit()
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
             { type: "try", hasTakenLongtime: true },
-            { type: "success" },
+            {
+                type: "success",
+                entry: { loginId: "user-id", grantedRoles: ["auth-user"], memo: "memo" },
+            },
             { type: "initial" },
         ])
     })
 })
 
 test("reset", () => {
-    const { resource, store, user } = standard()
+    const { modify, store } = standard()
 
     store.memo.set(VALID_INFO.memo)
     store.grantedRoles.set(VALID_INFO.grantedRoles)
 
-    resource.modify.reset(user)
+    modify.reset()
 
     expect(store.memo.get()).toEqual("initial-memo")
     expect(store.grantedRoles.get()).toEqual([])
@@ -89,39 +88,33 @@ function takeLongtime_elements() {
 }
 
 function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
-    resource: Readonly<{
-        modify: ModifyAuthUserAccountAction
-    }>
+    modify: ModifyAuthUserAccountAction
     store: Readonly<{
         memo: BoardValueStore
         grantedRoles: MultipleBoardValueStore
     }>
-    user: Readonly<{ loginId: LoginId }> & ModifyAuthUserAccountFields
 }> {
-    const resource = {
-        modify: initModifyAuthUserAccountAction({
-            infra: {
-                modifyUserRemote,
-            },
-            config: {
-                takeLongtimeThreshold: { wait_millisecond: 32 },
-                resetToInitialTimeout: { wait_millisecond: 32 },
-            },
-        }),
-    }
+    const modify = initModifyAuthUserAccountAction({
+        infra: {
+            modifyUserRemote,
+        },
+        config: {
+            takeLongtimeThreshold: { wait_millisecond: 32 },
+            resetToInitialTimeout: { wait_millisecond: 32 },
+        },
+    })
 
-    const store = {
-        memo: mockBoardValueStore(resource.modify.memo.input),
-        grantedRoles: mockMultipleBoardValueStore(resource.modify.grantedRoles.input),
-    }
+    modify.handler.focus({
+        loginId: restoreLoginId("user-id"),
+        grantedRoles: [],
+        memo: restoreAuthUserField("initial-memo"),
+    })
 
     return {
-        resource,
-        store,
-        user: {
-            loginId: restoreLoginId("user-id"),
-            grantedRoles: [],
-            memo: restoreAuthUserField("initial-memo"),
+        modify: modify.action,
+        store: {
+            memo: mockBoardValueStore(modify.action.memo.input),
+            grantedRoles: mockMultipleBoardValueStore(modify.action.grantedRoles.input),
         },
     }
 }

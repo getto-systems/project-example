@@ -15,6 +15,7 @@ import {
     AuthUserGrantedRolesFilterAction,
     initAuthUserGrantedRolesFilterAction,
 } from "../input/filter/action"
+import { initListSearchedAction, ListSearchedAction } from "../../../../z_lib/ui/list/action"
 
 import { ALL_AUTH_ROLES } from "../../../../x_content/role"
 
@@ -34,55 +35,38 @@ import {
     SearchAuthUserAccountRemoteResponse,
     SearchAuthUserAccountSort,
     SearchAuthUserAccountSortKey,
+    SearchAuthUserAccountSummary,
 } from "./data"
-import { SearchSortOrder } from "../../../../z_lib/ui/search/sort/data"
 import { AuthUserAccount } from "../kernel/data"
-import { LoginId } from "../../login_id/kernel/data"
+import { prepared, preparing } from "../../../../z_lib/ui/prepare/data"
 
-export interface SearchAuthUserAccountAction extends ListAuthUserAccountAction {
+export interface SearchAuthUserAccountAction
+    extends StatefulApplicationAction<SearchAuthUserAccountState> {
+    readonly list: ListSearchedAuthUserAccountAction
+
     readonly loginId: TextFilterAction
     readonly grantedRoles: AuthUserGrantedRolesFilterAction
     readonly observe: ObserveBoardAction
-
-    clear(): void
-    search(): Promise<SearchAuthUserAccountState>
-}
-export interface ListAuthUserAccountAction
-    extends StatefulApplicationAction<SearchAuthUserAccountState> {
-    readonly focused: FocusedAuthUserAccountAction
     readonly offset: SearchOffsetAction
     readonly columns: SearchColumnsAction
 
     currentSort(): SearchAuthUserAccountSort
 
+    clear(): void
+    search(): Promise<SearchAuthUserAccountState>
     load(): Promise<SearchAuthUserAccountState>
     sort(key: SearchAuthUserAccountSortKey): Promise<SearchAuthUserAccountState>
-
-    searchResponse(
-        state: SearchAuthUserAccountState,
-    ): Readonly<{ response?: SearchAuthUserAccountRemoteResponse }>
 }
-export interface FocusedAuthUserAccountAction
-    extends StatefulApplicationAction<FocusedAuthUserAccountState> {
-    focus(user: AuthUserAccount): FocusedAuthUserAccountState
-    update(loginId: LoginId, user: AuthUserAccount): FocusedAuthUserAccountState
-    remove(loginId: LoginId): FocusedAuthUserAccountState
-    close(): FocusedAuthUserAccountState
 
-    isFocused(user: AuthUserAccount): boolean
-}
+type ListSearchedAuthUserAccountAction = ListSearchedAction<
+    AuthUserAccount,
+    SearchAuthUserAccountSummary,
+    RemoteCommonError
+>
 
 export type SearchAuthUserAccountState = Readonly<{ type: "initial" }> | SearchAuthUserAccountEvent
 
-const initialSearchState: SearchAuthUserAccountState = { type: "initial" }
-
-export type FocusedAuthUserAccountState =
-    | Readonly<{ type: "initial" }>
-    | Readonly<{ type: "focus-failed" }>
-    | Readonly<{ type: "focus-detected"; user: AuthUserAccount }>
-    | Readonly<{ type: "focus-on"; user: AuthUserAccount }>
-
-const initialFocusedState: FocusedAuthUserAccountState = { type: "initial" }
+const initialState: SearchAuthUserAccountState = { type: "initial" }
 
 export type SearchAuthUserAccountMaterial = Readonly<{
     infra: SearchAuthUserAccountInfra
@@ -117,7 +101,7 @@ class Action implements SearchAuthUserAccountAction {
     readonly state: ApplicationStateAction<SearchAuthUserAccountState>
     readonly post: (state: SearchAuthUserAccountState) => SearchAuthUserAccountState
 
-    readonly focused: FocusedAuthUserAccountAction
+    readonly list: ListSearchedAuthUserAccountAction
 
     readonly loginId: TextFilterAction
     readonly grantedRoles: AuthUserGrantedRolesFilterAction
@@ -128,11 +112,9 @@ class Action implements SearchAuthUserAccountAction {
     filter: SearchFilter<SearchAuthUserAccountSortKey, SearchAuthUserAccountFilterProps>
     clear: () => void
 
-    response?: SearchAuthUserAccountRemoteResponse
-
     constructor(material: SearchAuthUserAccountMaterial) {
         const { state, post } = initApplicationStateAction({
-            initialState: initialSearchState,
+            initialState,
             ignite: () => this.load(),
         })
         this.state = state
@@ -158,6 +140,38 @@ class Action implements SearchAuthUserAccountAction {
 
         grantedRoles.setOptions(ALL_AUTH_ROLES)
 
+        const list = initListSearchedAction({
+            initialSearch: this.state.ignitionState.then((state) => {
+                switch (state.type) {
+                    case "initial":
+                    case "try":
+                        return preparing()
+
+                    case "success":
+                    case "failed":
+                        return prepared(state)
+                }
+            }),
+            detect: {
+                get: () => this.material.shell.detectFocus(),
+                key: (data: AuthUserAccount) => data.loginId,
+            },
+        })
+
+        list.action.focus.state.subscribe((state) => {
+            switch (state.type) {
+                case "change":
+                    material.shell.updateFocus.focus(state.data)
+                    break
+
+                case "close":
+                    material.shell.updateFocus.clear()
+                    break
+            }
+        })
+
+        this.list = list.action
+
         this.material = material
         this.filter = filter
         this.clear = clear
@@ -168,27 +182,31 @@ class Action implements SearchAuthUserAccountAction {
         this.columns = columns
         this.observe = observe
 
-        this.focused = new FocusedAction({
-            infra: {
-                detectUser: async (loginId): Promise<DetectUserResult> => {
-                    const result = this.searchResponse(await this.state.ignitionState)
-                    if (!result.response) {
-                        return { found: false }
-                    }
-                    const user = result.response.users.find((user) => user.loginId === loginId)
-                    if (user === undefined) {
-                        return { found: false }
-                    }
-                    return { found: true, user }
-                },
-                updateUser: (loginId, user) => {
-                    this.update(loginId, user)
-                },
-                removeUser: (loginId) => {
-                    this.remove(loginId)
-                },
-            },
-            shell: material.shell,
+        this.onSuccess((data) => {
+            this.filter.setSort(data.sort)
+        })
+        this.onSearched((state) => {
+            list.handler.load({ isLoad: true, data: state })
+        })
+    }
+
+    onSuccess(handler: (response: SearchAuthUserAccountRemoteResponse) => void): void {
+        this.state.subscribe((state) => {
+            if (state.type === "success") {
+                handler(state.response)
+            }
+        })
+    }
+    onSearched(
+        handler: (state: Exclude<SearchAuthUserAccountEvent, { type: "try" }>) => void,
+    ): void {
+        this.state.subscribe((state) => {
+            switch (state.type) {
+                case "success":
+                case "failed":
+                    handler(state)
+                    break
+            }
         })
     }
 
@@ -197,130 +215,28 @@ class Action implements SearchAuthUserAccountAction {
     }
 
     async search(): Promise<SearchAuthUserAccountState> {
-        return this.updateResponse(
-            await search(this.material, this.filter.search(), this.response, this.post),
-        )
+        return search(this.material, this.filter.search(), this.post)
     }
     async load(): Promise<SearchAuthUserAccountState> {
-        return this.updateResponse(
-            await search(this.material, this.filter.load(), this.response, this.post),
-        )
+        return search(this.material, this.filter.load(), this.post)
     }
     async sort(key: SearchAuthUserAccountSortKey): Promise<SearchAuthUserAccountState> {
-        return this.updateResponse(
-            await search(this.material, this.filter.sort(key), this.response, this.post),
-        )
-    }
-    updateResponse(state: SearchAuthUserAccountState): SearchAuthUserAccountState {
-        switch (state.type) {
-            case "success":
-                this.filter.setSort(state.response.sort)
-                this.response = state.response
-                break
-        }
-        return state
-    }
-
-    update(loginId: LoginId, user: AuthUserAccount): SearchAuthUserAccountState {
-        if (!this.response) {
-            return this.state.currentState()
-        }
-
-        this.response = {
-            ...this.response,
-            users: this.response.users.map((row) => {
-                if (row.loginId !== loginId) {
-                    return row
-                }
-                return user
-            }),
-        }
-
-        const state = this.state.currentState()
-        switch (state.type) {
-            case "initial":
-                return state
-
-            case "try":
-            case "failed":
-                return this.post({ ...state, previousResponse: this.response })
-
-            case "success":
-                return this.post({ ...state, response: this.response })
-        }
-    }
-    remove(loginId: LoginId): SearchAuthUserAccountState {
-        if (!this.response) {
-            return this.state.currentState()
-        }
-
-        this.response = {
-            ...this.response,
-            page: {
-                ...this.response.page,
-                all: this.response.page.all - 1,
-            },
-            users: this.response.users.filter((row) => row.loginId !== loginId),
-        }
-
-        const state = this.state.currentState()
-        switch (state.type) {
-            case "initial":
-                return state
-
-            case "try":
-            case "failed":
-                return this.post({ ...state, previousResponse: this.response })
-
-            case "success":
-                return this.post({ ...state, response: this.response })
-        }
-    }
-
-    searchResponse(state: SearchAuthUserAccountState): Readonly<{
-        response?:
-            | Readonly<{
-                  page: Readonly<{ offset: number; limit: number; all: number }>
-                  sort: Readonly<{ key: "loginId"; order: SearchSortOrder }>
-                  users: readonly AuthUserAccount[]
-              }>
-            | undefined
-    }> {
-        switch (state.type) {
-            case "initial":
-                return { response: undefined }
-
-            case "try":
-            case "failed":
-                return { response: state.previousResponse }
-
-            case "success":
-                return { response: state.response }
-        }
+        return search(this.material, this.filter.sort(key), this.post)
     }
 }
 
 type SearchAuthUserAccountEvent =
-    | Readonly<{
-          type: "try"
-          hasTakenLongtime: boolean
-          previousResponse?: SearchAuthUserAccountRemoteResponse
-      }>
-    | Readonly<{
-          type: "failed"
-          err: RemoteCommonError
-          previousResponse?: SearchAuthUserAccountRemoteResponse
-      }>
+    | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
+    | Readonly<{ type: "failed"; err: RemoteCommonError }>
     | Readonly<{ type: "success"; response: SearchAuthUserAccountRemoteResponse }>
 
 async function search<S>(
     { infra, shell, config }: SearchAuthUserAccountMaterial,
     fields: SearchAuthUserAccountFilter,
-    previousResponse: SearchAuthUserAccountRemoteResponse | undefined,
     post: Post<SearchAuthUserAccountEvent, S>,
 ): Promise<S> {
     shell.updateQuery(fields)
-    post({ type: "try", hasTakenLongtime: false, previousResponse })
+    post({ type: "try", hasTakenLongtime: false })
 
     const { searchRemote } = infra
 
@@ -328,90 +244,13 @@ async function search<S>(
     const response = await checkTakeLongtime(
         searchRemote(fields),
         config.takeLongtimeThreshold,
-        () => post({ type: "try", hasTakenLongtime: true, previousResponse }),
+        () => post({ type: "try", hasTakenLongtime: true }),
     )
     if (!response.success) {
-        return post({ type: "failed", err: response.err, previousResponse })
+        return post({ type: "failed", err: response.err })
     }
 
     return post({ type: "success", response: response.value })
-}
-
-type FocusedMaterial = Readonly<{
-    infra: FocusedInfra
-    shell: FocusedShell
-}>
-
-interface FocusedInfra {
-    detectUser(loginId: string): Promise<DetectUserResult>
-    updateUser(loginId: LoginId, user: AuthUserAccount): void
-    removeUser(loginId: LoginId): void
-}
-type DetectUserResult =
-    | Readonly<{ found: false }>
-    | Readonly<{ found: true; user: AuthUserAccount }>
-
-type FocusedShell = Readonly<{
-    detectFocus: FocusAuthUserAccountDetecter
-    updateFocus: UpdateFocusAuthUserAccountQuery
-}>
-
-class FocusedAction implements FocusedAuthUserAccountAction {
-    readonly material: FocusedMaterial
-    readonly state: ApplicationStateAction<FocusedAuthUserAccountState>
-    readonly post: (state: FocusedAuthUserAccountState) => FocusedAuthUserAccountState
-
-    constructor(material: FocusedMaterial) {
-        const { state, post } = initApplicationStateAction({
-            initialState: initialFocusedState,
-            ignite: () => this.load(),
-        })
-        this.material = material
-        this.state = state
-        this.post = post
-    }
-    async load(): Promise<FocusedAuthUserAccountState> {
-        const focus = this.material.shell.detectFocus()
-        if (!focus.found) {
-            return this.state.currentState()
-        }
-        const user = await this.material.infra.detectUser(focus.loginId)
-        if (!user.found) {
-            return this.post({ type: "focus-failed" })
-        }
-        return this.post({ type: "focus-detected", user: user.user })
-    }
-
-    focus(user: AuthUserAccount): FocusedAuthUserAccountState {
-        this.material.shell.updateFocus.focus(user)
-        return this.post({ type: "focus-on", user })
-    }
-    update(loginId: LoginId, user: AuthUserAccount): FocusedAuthUserAccountState {
-        this.material.infra.updateUser(loginId, user)
-        this.material.shell.updateFocus.focus(user)
-        return this.post({ type: "focus-on", user })
-    }
-    remove(loginId: LoginId): FocusedAuthUserAccountState {
-        this.material.infra.removeUser(loginId)
-        return this.close()
-    }
-    close(): FocusedAuthUserAccountState {
-        this.material.shell.updateFocus.clear()
-        return this.post({ type: "initial" })
-    }
-
-    isFocused(user: AuthUserAccount): boolean {
-        const state = this.state.currentState()
-        switch (state.type) {
-            case "initial":
-            case "focus-failed":
-                return false
-
-            case "focus-detected":
-            case "focus-on":
-                return user.loginId === state.user.loginId
-        }
-    }
 }
 
 interface Post<E, S> {

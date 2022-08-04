@@ -16,7 +16,7 @@ import { tableStructure } from "../../../../../z_vendor/getto-table/preact/cell/
 import { tableCell } from "../../../../../z_vendor/getto-table/preact/cell/simple"
 import { tableClassName } from "../../../../../z_vendor/getto-table/preact/decorator"
 
-import { ListAuthUserAccountAction } from "../action"
+import { SearchAuthUserAccountAction } from "../action"
 
 import { SearchAuthUserAccountSortKey } from "../data"
 import { AuthUserAccount, AUTH_USER_ACCOUNT } from "../../kernel/data"
@@ -29,12 +29,12 @@ type Summary = {
 }
 
 export function useAuthUserAccountTableStructure(
-    list: ListAuthUserAccountAction,
+    search: SearchAuthUserAccountAction,
 ): SearchAuthUserAccountTableStructure {
-    return useMemo(() => build(list), [list])
+    return useMemo(() => build(search), [search])
 }
 
-function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStructure {
+function build(search: SearchAuthUserAccountAction): SearchAuthUserAccountTableStructure {
     return tableStructure(rowKey, [
         tableCell("edit", (_key) => ({
             label: "",
@@ -76,12 +76,12 @@ function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStruc
         return (content) => html`<a href="#" onClick=${onClick}>${content} ${sign()}</a>`
 
         function sign() {
-            const currentSort = list.currentSort()
+            const currentSort = search.currentSort()
             return sortSign(SORT_SIGN, currentSort, key)
         }
         function onClick(e: Event) {
             e.preventDefault()
-            list.sort(key)
+            search.sort(key)
         }
     }
 
@@ -100,7 +100,7 @@ function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStruc
     }
 
     function editLink(row: AuthUserAccount): VNodeContent {
-        const isFocused = list.focused.isFocused(row)
+        const isFocused = search.list.focus.isFocused(row)
         return html`<a
             href="#"
             id="${isFocused ? "focused" : undefined}"
@@ -112,7 +112,7 @@ function build(list: ListAuthUserAccountAction): SearchAuthUserAccountTableStruc
 
         function onClick(e: Event) {
             e.preventDefault()
-            list.focused.focus(row)
+            search.list.focus.change(row)
         }
     }
 }

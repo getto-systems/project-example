@@ -37,7 +37,7 @@ export function initSelectFieldAction<T>(props: SelectFieldProps<T>): Readonly<{
     setOptions: { (state: readonly T[]): void }
 }> {
     const { input, store, subscriber } = initInputBoardAction()
-    let options: PrepareElementState<readonly T[]> = { type: "initial" }
+    let options: PrepareElementState<readonly T[]> = { isLoad: false }
     const validate = initValidateBoardFieldAction({
         convert: () => convert(store.get(), options, props.convert),
     })
@@ -67,7 +67,7 @@ export function initSelectFieldAction<T>(props: SelectFieldProps<T>): Readonly<{
             },
         },
         setOptions: (newOptions) => {
-            options = { type: "loaded", data: newOptions }
+            options = { isLoad: true, data: newOptions }
         },
     }
 }
@@ -77,7 +77,7 @@ function convert<T>(
     options: PrepareElementState<readonly T[]>,
     convert: (data: T) => string,
 ): ValidateBoardFieldResult<T, ValidateSelectError> {
-    if (options.type === "initial") {
+    if (!options.isLoad) {
         return { valid: false, err: { type: "not-selected" } }
     }
 

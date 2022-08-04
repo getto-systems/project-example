@@ -19,21 +19,16 @@ import { CloseButton } from "../../../../../common/x_preact/button/close_button"
 
 import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
 
-import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
 import { UnregisterAuthUserAccountAction } from "../action"
 
 import { UnregisterAuthUserAccountError } from "../data"
-import { LoginId } from "../../../login_id/kernel/data"
 
 type Props = Readonly<{
-    user: Readonly<{ loginId: LoginId }>
-    editable: EditableBoardAction
     unregister: UnregisterAuthUserAccountAction
-    onSuccess: { (loginID: LoginId): void }
 }>
 export function UnregisterAuthUserAccount(props: Props): VNode {
     const state = useApplicationAction(props.unregister)
-    const editableState = useApplicationAction(props.editable)
+    const editableState = useApplicationAction(props.unregister.editable)
 
     return form(
         box({
@@ -67,7 +62,7 @@ export function UnregisterAuthUserAccount(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.editable.open()
+            props.unregister.editable.open()
         }
     }
 
@@ -79,12 +74,7 @@ export function UnregisterAuthUserAccount(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.unregister.submit(props.user, onSuccess)
-
-            function onSuccess() {
-                props.editable.close()
-                props.onSuccess(props.user.loginId)
-            }
+            props.unregister.submit()
         }
     }
 
@@ -93,7 +83,7 @@ export function UnregisterAuthUserAccount(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.editable.close()
+            props.unregister.editable.close()
         }
     }
 

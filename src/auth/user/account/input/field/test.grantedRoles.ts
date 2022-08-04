@@ -38,7 +38,7 @@ test("observe; has changed", async () => {
 test("options", () => {
     const { action } = standard()
 
-    expect(action.options()).toEqual({ type: "loaded", data: ALL_AUTH_ROLES })
+    expect(action.options()).toEqual({ isLoad: true, data: ALL_AUTH_ROLES })
 })
 
 test("reset", () => {

@@ -6,34 +6,23 @@ import { box_grow, container } from "../../../../../z_vendor/getto-css/preact/de
 import { DetailAuthUserAccount, DetailAuthUserAccountActions } from "../../kernel/x_preact/detail"
 import { BackToRegisterButton } from "../../../../../common/x_preact/button/back_to_register_button"
 
-import { FocusedRegisteredAuthUserAccountAction } from "../action"
-
-import { AuthUserAccount } from "../../kernel/data"
+import { RegisterAuthUserAccountAction } from "../action"
 
 type Props = DetailAuthUserAccountActions &
     Readonly<{
-        focused: FocusedRegisteredAuthUserAccountAction
-        user: AuthUserAccount
+        register: RegisterAuthUserAccountAction
     }>
-export function FocusedRegisteredAuthUserAccount(props: Props): VNode {
+export function FocusRegisteredAuthUserAccount(props: Props): VNode {
     return html`${[
         container([box_grow({ body: backToRegisterButton() })]),
-        h(DetailAuthUserAccount, {
-            ...props,
-            onModify: (loginId, user) => {
-                props.focused.update(loginId, user)
-            },
-            onUnregister: (loginId) => {
-                props.focused.remove(loginId)
-            }
-        }),
+        h(DetailAuthUserAccount, props),
     ]}`
 
     function backToRegisterButton(): VNode {
         return h(BackToRegisterButton, { onClick })
 
         function onClick() {
-            props.focused.close()
+            props.register.list.focus.close()
         }
     }
 }
