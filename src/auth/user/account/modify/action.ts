@@ -14,7 +14,12 @@ import {
     initAuthUserTextFieldAction,
     initAuthUserGrantedRolesFieldAction,
 } from "../input/field/action"
-import { initModifyField, modifyField } from "../../../../z_lib/ui/modify/action"
+import {
+    initModifyField,
+    modifyField,
+    ModifyFieldHandler,
+} from "../../../../z_lib/ui/modify/action"
+import { EditableBoardAction } from "../../../../z_vendor/getto-application/board/editable/action"
 
 import { ALL_AUTH_ROLES } from "../../../../x_content/role"
 
@@ -22,9 +27,9 @@ import { ModifyAuthUserAccountRemote } from "./infra"
 import { WaitTime } from "../../../../z_lib/ui/config/infra"
 
 import { ModifyAuthUserAccountError, ModifyAuthUserAccountFields } from "./data"
-import { AuthRole } from "../../kernel/data"
 import { LoginId } from "../../login_id/kernel/data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
+import { PrepareElementState } from "../../../../z_lib/ui/prepare/data"
 
 export interface ModifyAuthUserAccountAction
     extends StatefulApplicationAction<ModifyAuthUserAccountState> {
@@ -32,13 +37,17 @@ export interface ModifyAuthUserAccountAction
     readonly grantedRoles: AuthUserGrantedRolesFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
+    readonly editable: EditableBoardAction
 
-    reset(user: Readonly<{ grantedRoles: readonly AuthRole[] }>): void
-    submit(
-        user: Readonly<{ loginId: LoginId }> & ModifyAuthUserAccountFields,
-        onSuccess: { (data: ModifyAuthUserAccountFields): void },
-    ): Promise<ModifyAuthUserAccountState>
+    onSuccess(handler: (data: ModifyAuthUserAccountEntry) => void): void
+
+    data(): PrepareElementState<ModifyAuthUserAccountEntry>
+    reset(): void
+    submit(): Promise<ModifyAuthUserAccountState>
 }
+
+export type ModifyAuthUserAccountEntry = Readonly<{ loginId: LoginId }> &
+    ModifyAuthUserAccountFields
 
 export type ModifyAuthUserAccountState = ModifyUserEvent
 
@@ -58,10 +67,15 @@ export type ModifyAuthUserAccountConfig = Readonly<{
     resetToInitialTimeout: WaitTime
 }>
 
-export function initModifyAuthUserAccountAction(
-    material: ModifyAuthUserAccountMaterial,
-): ModifyAuthUserAccountAction {
-    return new Action(material)
+export function initModifyAuthUserAccountAction(material: ModifyAuthUserAccountMaterial): Readonly<{
+    action: ModifyAuthUserAccountAction
+    handler: ModifyFieldHandler<ModifyAuthUserAccountEntry>
+}> {
+    const action = new Action(material)
+    return {
+        action,
+        handler: action.handler,
+    }
 }
 
 class Action implements ModifyAuthUserAccountAction {
@@ -73,9 +87,12 @@ class Action implements ModifyAuthUserAccountAction {
     readonly grantedRoles: AuthUserGrantedRolesFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
+    readonly editable: EditableBoardAction
 
-    convert: () => ConvertBoardResult<ModifyAuthUserAccountFields>
-    reset: (user: ModifyAuthUserAccountFields) => void
+    readonly convert: () => ConvertBoardResult<ModifyAuthUserAccountFields>
+    readonly data: () => PrepareElementState<ModifyAuthUserAccountEntry>
+    readonly handler: ModifyFieldHandler<ModifyAuthUserAccountEntry>
+    readonly reset: () => void
 
     constructor(material: ModifyAuthUserAccountMaterial) {
         const { state, post } = initApplicationStateAction({ initialState })
@@ -103,13 +120,13 @@ class Action implements ModifyAuthUserAccountAction {
             }
         }
 
-        const { validate, observe, reset } = initModifyField(
+        const { validate, observe, editable, data, handler, reset } = initModifyField(
             [
-                modifyField("memo", memo, (data: ModifyAuthUserAccountFields) => data.memo),
+                modifyField("memo", memo, (data: ModifyAuthUserAccountEntry) => data.memo),
                 modifyField(
                     "grantedRoles",
                     grantedRoles.input,
-                    (data: ModifyAuthUserAccountFields) => data.grantedRoles,
+                    (data: ModifyAuthUserAccountEntry) => data.grantedRoles,
                 ),
             ],
             convert,
@@ -121,33 +138,50 @@ class Action implements ModifyAuthUserAccountAction {
         this.grantedRoles = grantedRoles.input
         this.validate = validate
         this.observe = observe
+        this.editable = editable
         this.convert = convert
+        this.data = data
+        this.handler = handler
         this.reset = reset
+
+        this.onSuccess(() => {
+            this.editable.close()
+        })
     }
 
-    async submit(
-        user: Readonly<{ loginId: LoginId }> & ModifyAuthUserAccountFields,
-        onSuccess: { (data: ModifyAuthUserAccountFields): void },
-    ): Promise<ModifyAuthUserAccountState> {
+    onSuccess(handler: (data: ModifyAuthUserAccountEntry) => void): void {
+        this.state.subscribe((state) => {
+            if (state.type === "success") {
+                handler(state.entry)
+            }
+        })
+    }
+
+    async submit(): Promise<ModifyAuthUserAccountState> {
+        const element = this.data()
+        if (!element.isLoad) {
+            return this.state.currentState()
+        }
+
         const fields = this.convert()
         if (!fields.valid) {
             return this.state.currentState()
         }
-        return modifyUser(this.material, user, fields.value, onSuccess, this.post)
+
+        return modifyUser(this.material, element.data, fields.value, this.post)
     }
 }
 
 type ModifyUserEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ModifyAuthUserAccountError }>
-    | Readonly<{ type: "success" }>
+    | Readonly<{ type: "success"; entry: ModifyAuthUserAccountEntry }>
     | Readonly<{ type: "initial" }>
 
 async function modifyUser<S>(
     { infra, config }: ModifyAuthUserAccountMaterial,
-    user: Readonly<{ loginId: LoginId }> & ModifyAuthUserAccountFields,
+    user: ModifyAuthUserAccountEntry,
     fields: ModifyAuthUserAccountFields,
-    onSuccess: { (data: ModifyAuthUserAccountFields): void },
     post: Post<ModifyUserEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
@@ -164,8 +198,7 @@ async function modifyUser<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    onSuccess(fields)
-    post({ type: "success" })
+    post({ type: "success", entry: { ...user, ...fields } })
     return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 

@@ -32,7 +32,7 @@ export function initMultipleFilterAction<T>(props: MultipleFilterProps<T>): Read
     pin: () => readonly T[]
 }> {
     const { input, store, subscriber } = initMultipleInputBoardAction()
-    let options: PrepareElementState<readonly T[]> = { type: "initial" }
+    let options: PrepareElementState<readonly T[]> = { isLoad: false }
     const observe = initObserveBoardFieldAction({
         observer: initBoardFieldObserver({
             current: () => store.get(),
@@ -57,7 +57,7 @@ export function initMultipleFilterAction<T>(props: MultipleFilterProps<T>): Read
             },
         },
         setOptions: (newOptions) => {
-            options = { type: "loaded", data: newOptions }
+            options = { isLoad: true, data: newOptions }
         },
         pin: () => {
             observe.pin()
@@ -71,7 +71,7 @@ function filter<T>(
     options: PrepareElementState<readonly T[]>,
     convert: (data: T) => string,
 ): readonly T[] {
-    if (options.type === "initial") {
+    if (!options.isLoad) {
         return []
     }
 

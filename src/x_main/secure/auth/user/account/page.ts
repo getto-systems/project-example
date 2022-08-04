@@ -18,12 +18,11 @@ import { useDocumentTitle } from "../../../../../common/x_preact/hooks"
 import { copyright, siteInfo } from "../../../../../x_content/site"
 
 import { ApplicationError } from "../../../../../avail/x_preact/application_error"
-import { LoadSeason } from "../../../../../core/season/load/x_preact/load_season"
 import { LoadMenu } from "../../../../../common/outline/load/x_preact/load_menu"
 import { LoadBreadcrumbList } from "../../../../../common/outline/load/x_preact/load_breadcrumb_list"
 import { SearchAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/search"
 import { ListAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/list"
-import { FocusedAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/focused"
+import { FocusAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/focus"
 import { MainTitleWithSidebar } from "../../../../../z_lib/ui/search/sidebar/x_preact/main_title"
 
 import { isSidebarExpand } from "../../../../../z_lib/ui/search/sidebar/x_preact/helper"
@@ -39,7 +38,7 @@ export function ManageUserAccountPage(props: ManageUserAccountPageResource): VNo
     const err = useNotifyUnexpectedError(props)
 
     const sidebarState = useApplicationAction(props.sidebar)
-    const focusedState = useApplicationAction(props.search.focused)
+    const focusState = useApplicationAction(props.search.list.focus)
 
     if (err) {
         return h(ApplicationError, { err: `${err}` })
@@ -47,57 +46,35 @@ export function ManageUserAccountPage(props: ManageUserAccountPageResource): VNo
 
     return appLayout({
         siteInfo,
-        header: [h(LoadSeason, props)],
+        header: [],
         menu: h(LoadMenu, props),
-        ...content(),
+        ...(focusState.type === "close"
+            ? {
+                  main: appMain({
+                      header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, props)]),
+                      body: mainBody(h(SearchAuthUserAccount, props)),
+                      copyright,
+                  }),
+              }
+            : {
+                  main: appMain({
+                      header: mainHeader([
+                          h(MainTitleWithSidebar, {
+                              sidebar: props.sidebar,
+                              title: focusedTitle,
+                          }),
+                          h(LoadBreadcrumbList, props),
+                      ]),
+                      body: mainBody(h(FocusAuthUserAccount, props)),
+                      copyright,
+                  }),
+                  sidebar: isSidebarExpand(sidebarState)
+                      ? appSidebar({
+                            header: mainHeader([mainTitle(sidebarTitle)]),
+                            body: sidebarBody(h(ListAuthUserAccount, props), { id: "sidebar" }),
+                            copyright,
+                        })
+                      : undefined,
+              }),
     })
-
-    function content() {
-        switch (focusedState.type) {
-            case "initial":
-                return {
-                    main: appMain({
-                        header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, props)]),
-                        body: mainBody(h(SearchAuthUserAccount, props)),
-                        copyright,
-                    }),
-                }
-
-            case "focus-failed":
-            case "focus-detected":
-            case "focus-on":
-                return {
-                    main: appMain({
-                        header: mainHeader([
-                            h(MainTitleWithSidebar, {
-                                sidebar: props.sidebar,
-                                title: focusedTitle,
-                            }),
-                            h(LoadBreadcrumbList, props),
-                        ]),
-                        body: mainBody(
-                            h(FocusedAuthUserAccount, {
-                                ...props,
-                                focused: props.search.focused,
-                                user:
-                                    focusedState.type === "focus-failed"
-                                        ? { found: false }
-                                        : { found: true, user: focusedState.user },
-                            }),
-                        ),
-                        copyright,
-                    }),
-                    sidebar: isSidebarExpand(sidebarState)
-                        ? appSidebar({
-                              header: mainHeader([mainTitle(sidebarTitle)]),
-                              body: sidebarBody(
-                                  h(ListAuthUserAccount, { ...props, list: props.search }),
-                                  { id: "sidebar" },
-                              ),
-                              copyright,
-                          })
-                        : undefined,
-                }
-        }
-    }
 }

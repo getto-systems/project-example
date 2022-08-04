@@ -15,15 +15,13 @@ import { EditButton } from "../../../../../common/x_preact/button/edit_button"
 import { EditSuccessButton } from "../../../../../common/x_preact/button/edit_success_button"
 
 import { ChangePasswordAction } from "../action"
-import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
 
 type Props = Readonly<{
-    editable: EditableBoardAction
     change: ChangePasswordAction
 }>
 export function ChangePassword(props: Props): VNode {
     const state = useApplicationAction(props.change)
-    const editableState = useApplicationAction(props.editable)
+    const editableState = useApplicationAction(props.change.editable)
     const validateState = useApplicationAction(props.change.validate)
     const observeState = useApplicationAction(props.change.observe)
 
@@ -72,8 +70,7 @@ export function ChangePassword(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.change.clear()
-            props.editable.open()
+            props.change.edit()
         }
     }
 
@@ -90,7 +87,7 @@ export function ChangePassword(props: Props): VNode {
             props.change.submit(onSuccess)
 
             function onSuccess() {
-                props.editable.close()
+                // noop
             }
         }
     }
@@ -109,8 +106,7 @@ export function ChangePassword(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.change.clear()
-            props.editable.close()
+            props.change.editable.close()
         }
     }
 

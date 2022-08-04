@@ -20,6 +20,7 @@ import {
 } from "../input/field/action"
 import { initLoginIdFieldAction, LoginIdFieldAction } from "../../login_id/input/action"
 import { initRegisterField } from "../../../../z_lib/ui/register/action"
+import { initListRegisteredAction, ListRegisteredAction } from "../../../../z_lib/ui/list/action"
 
 import { ALL_AUTH_ROLES } from "../../../../x_content/role"
 
@@ -29,11 +30,10 @@ import { WaitTime } from "../../../../z_lib/ui/config/infra"
 import { RegisterAuthUserAccountError } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { AuthUserAccount } from "../kernel/data"
-import { LoginId } from "../../login_id/kernel/data"
 
 export interface RegisterAuthUserAccountAction
     extends StatefulApplicationAction<RegisterAuthUserAccountState> {
-    readonly list: ListRegisteredAuthUserAccountAction
+    readonly list: ListRegisteredAction<AuthUserAccount>
 
     readonly loginId: LoginIdFieldAction
     readonly grantedRoles: AuthUserGrantedRolesFieldAction
@@ -43,37 +43,12 @@ export interface RegisterAuthUserAccountAction
     readonly observe: ObserveBoardAction
 
     clear(): void
-    submit(onSuccess: { (data: AuthUserAccount): void }): Promise<RegisterAuthUserAccountState>
-}
-export interface ListRegisteredAuthUserAccountAction
-    extends StatefulApplicationAction<ListRegisteredAuthUserAccountState> {
-    readonly focused: FocusedRegisteredAuthUserAccountAction
-}
-export interface FocusedRegisteredAuthUserAccountAction
-    extends StatefulApplicationAction<FocusedRegisteredAuthUserAccountState> {
-    focus(user: AuthUserAccount): FocusedRegisteredAuthUserAccountState
-    update(loginId: LoginId, user: AuthUserAccount): FocusedRegisteredAuthUserAccountState
-    remove(loginId: LoginId): FocusedRegisteredAuthUserAccountState
-    close(): FocusedRegisteredAuthUserAccountState
-
-    isFocused(user: AuthUserAccount): boolean
+    submit(): Promise<RegisterAuthUserAccountState>
 }
 
 export type RegisterAuthUserAccountState = RegisterUserEvent
 
 const initialState: RegisterAuthUserAccountState = { type: "initial" }
-
-export type ListRegisteredAuthUserAccountState =
-    | Readonly<{ type: "initial" }>
-    | Readonly<{ type: "registered"; users: readonly AuthUserAccount[] }>
-
-const initialListState: ListRegisteredAuthUserAccountState = { type: "initial" }
-
-export type FocusedRegisteredAuthUserAccountState =
-    | Readonly<{ type: "initial" }>
-    | Readonly<{ type: "focus-on"; user: AuthUserAccount }>
-
-const initialFocusedState: FocusedRegisteredAuthUserAccountState = { type: "initial" }
 
 export type RegisterAuthUserAccountMaterial = Readonly<{
     infra: RegisterAuthUserAccountInfra
@@ -100,7 +75,7 @@ class Action implements RegisterAuthUserAccountAction {
     readonly state: ApplicationStateAction<RegisterAuthUserAccountState>
     readonly post: (state: RegisterAuthUserAccountState) => RegisterAuthUserAccountState
 
-    readonly list: ListAction
+    readonly list: ListRegisteredAction<AuthUserAccount>
 
     readonly loginId: LoginIdFieldAction
     readonly grantedRoles: AuthUserGrantedRolesFieldAction
@@ -161,7 +136,9 @@ class Action implements RegisterAuthUserAccountAction {
 
         grantedRoles.setOptions(ALL_AUTH_ROLES)
 
-        this.list = new ListAction()
+        const list = initListRegisteredAction<AuthUserAccount>()
+
+        this.list = list.action
 
         this.loginId = loginId
         this.grantedRoles = grantedRoles.input
@@ -173,38 +150,41 @@ class Action implements RegisterAuthUserAccountAction {
         this.clear = clear
 
         this.clear()
+
+        this.onSuccess((data) => {
+            this.clear()
+            list.handler.register(data)
+        })
     }
 
-    async submit(onSuccess: {
-        (data: AuthUserAccount): void
-    }): Promise<RegisterAuthUserAccountState> {
+    onSuccess(handler: (data: AuthUserAccount) => void): void {
+        this.state.subscribe((state) => {
+            switch (state.type) {
+                case "success":
+                    handler(state.entry)
+                    break
+            }
+        })
+    }
+
+    async submit(): Promise<RegisterAuthUserAccountState> {
         const fields = this.convert()
         if (!fields.valid) {
             return this.state.currentState()
         }
-        return registerUser(
-            this.material,
-            fields.value,
-            (data) => {
-                onSuccess(data)
-                this.clear()
-                this.list.push(data)
-            },
-            this.post,
-        )
+        return registerUser(this.material, fields.value, this.post)
     }
 }
 
 type RegisterUserEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: RegisterAuthUserAccountError }>
-    | Readonly<{ type: "success" }>
+    | Readonly<{ type: "success"; entry: AuthUserAccount }>
     | Readonly<{ type: "initial" }>
 
 async function registerUser<S>(
     { infra, config }: RegisterAuthUserAccountMaterial,
     fields: AuthUserAccount,
-    onSuccess: { (data: AuthUserAccount): void },
     post: Post<RegisterUserEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
@@ -221,99 +201,8 @@ async function registerUser<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    onSuccess(fields)
-    post({ type: "success" })
+    post({ type: "success", entry: fields })
     return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
-}
-
-class ListAction implements ListRegisteredAuthUserAccountAction {
-    readonly state: ApplicationStateAction<ListRegisteredAuthUserAccountState>
-    readonly post: (state: ListRegisteredAuthUserAccountState) => ListRegisteredAuthUserAccountState
-
-    readonly focused: FocusedRegisteredAuthUserAccountAction
-
-    list: AuthUserAccount[] = []
-
-    constructor() {
-        const { state, post } = initApplicationStateAction({ initialState: initialListState })
-        this.state = state
-        this.post = post
-
-        this.focused = new FocusedAction({
-            updateUser: (loginId, user) => {
-                this.update(loginId, user)
-            },
-            removeUser: (loginId) => {
-                this.remove(loginId)
-            },
-        })
-    }
-
-    push(user: AuthUserAccount): ListRegisteredAuthUserAccountState {
-        // 最新のものが上に表示されるように上から追加する
-        this.list.unshift(user)
-        return this.post({ type: "registered", users: this.list })
-    }
-
-    update(loginId: LoginId, user: AuthUserAccount): ListRegisteredAuthUserAccountState {
-        this.list = this.list.map((row) => {
-            if (row.loginId !== loginId) {
-                return row
-            }
-            return user
-        })
-        return this.post({ type: "registered", users: this.list })
-    }
-    remove(loginId: LoginId): ListRegisteredAuthUserAccountState {
-        this.list = this.list.filter((row) => row.loginId !== loginId)
-        return this.post({ type: "registered", users: this.list })
-    }
-}
-
-type FocusedMaterial = Readonly<{
-    updateUser(loginId: LoginId, user: AuthUserAccount): void
-    removeUser(loginId: LoginId): void
-}>
-
-class FocusedAction implements FocusedRegisteredAuthUserAccountAction {
-    readonly material: FocusedMaterial
-    readonly state: ApplicationStateAction<FocusedRegisteredAuthUserAccountState>
-    readonly post: (
-        state: FocusedRegisteredAuthUserAccountState,
-    ) => FocusedRegisteredAuthUserAccountState
-
-    constructor(material: FocusedMaterial) {
-        const { state, post } = initApplicationStateAction({ initialState: initialFocusedState })
-        this.material = material
-        this.state = state
-        this.post = post
-    }
-
-    focus(user: AuthUserAccount): FocusedRegisteredAuthUserAccountState {
-        return this.post({ type: "focus-on", user })
-    }
-    update(loginId: LoginId, user: AuthUserAccount): FocusedRegisteredAuthUserAccountState {
-        this.material.updateUser(loginId, user)
-        return this.post({ type: "focus-on", user })
-    }
-    remove(loginId: LoginId): FocusedRegisteredAuthUserAccountState {
-        this.material.removeUser(loginId)
-        return this.close()
-    }
-    close(): FocusedRegisteredAuthUserAccountState {
-        return this.post({ type: "initial" })
-    }
-
-    isFocused(user: AuthUserAccount): boolean {
-        const state = this.state.currentState()
-        switch (state.type) {
-            case "initial":
-                return false
-
-            case "focus-on":
-                return user.loginId === state.user.loginId
-        }
-    }
 }
 
 interface Post<E, S> {

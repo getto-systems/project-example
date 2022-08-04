@@ -18,13 +18,12 @@ import { useDocumentTitle } from "../../../../../common/x_preact/hooks"
 import { copyright, siteInfo } from "../../../../../x_content/site"
 
 import { ApplicationError } from "../../../../../avail/x_preact/application_error"
-import { LoadSeason } from "../../../../../core/season/load/x_preact/load_season"
 import { LoadMenu } from "../../../../../common/outline/load/x_preact/load_menu"
 import { LoadBreadcrumbList } from "../../../../../common/outline/load/x_preact/load_breadcrumb_list"
 import { MainTitleWithSidebar } from "../../../../../z_lib/ui/search/sidebar/x_preact/main_title"
 import { RegisterAuthUserAccount } from "../../../../../auth/user/account/register/x_preact/register"
 import { ListRegisteredAuthUserAccount } from "../../../../../auth/user/account/register/x_preact/list"
-import { FocusedRegisteredAuthUserAccount } from "../../../../../auth/user/account/register/x_preact/focused"
+import { FocusRegisteredAuthUserAccount } from "../../../../../auth/user/account/register/x_preact/focus"
 
 import { isSidebarExpand } from "../../../../../z_lib/ui/search/sidebar/x_preact/helper"
 
@@ -39,7 +38,7 @@ export function ManageUserAccountPage(props: RegisterUserAccountPageResource): V
     const err = useNotifyUnexpectedError(props)
 
     const sidebarState = useApplicationAction(props.sidebar)
-    const focusedState = useApplicationAction(props.register.list.focused)
+    const focusState = useApplicationAction(props.register.list.focus)
 
     if (err) {
         return h(ApplicationError, { err: `${err}` })
@@ -47,10 +46,10 @@ export function ManageUserAccountPage(props: RegisterUserAccountPageResource): V
 
     return appLayout({
         siteInfo,
-        header: [h(LoadSeason, props)],
+        header: [],
         menu: h(LoadMenu, props),
         main:
-            focusedState.type === "initial"
+            focusState.type === "close"
                 ? appMain({
                       header: mainHeader([
                           h(MainTitleWithSidebar, {
@@ -70,25 +69,13 @@ export function ManageUserAccountPage(props: RegisterUserAccountPageResource): V
                           }),
                           h(LoadBreadcrumbList, props),
                       ]),
-                      body: mainBody(
-                          h(FocusedRegisteredAuthUserAccount, {
-                              ...props,
-                              focused: props.register.list.focused,
-                              user: focusedState.user,
-                          }),
-                      ),
+                      body: mainBody(h(FocusRegisteredAuthUserAccount, props)),
                       copyright,
                   }),
         sidebar: isSidebarExpand(sidebarState)
             ? appSidebar({
                   header: mainHeader([mainTitle(sidebarTitle)]),
-                  body: sidebarBody(
-                      h(ListRegisteredAuthUserAccount, {
-                          ...props,
-                          list: props.register.list,
-                      }),
-                      { id: "sidebar" },
-                  ),
+                  body: sidebarBody(h(ListRegisteredAuthUserAccount, props), { id: "sidebar" }),
                   copyright,
               })
             : undefined,

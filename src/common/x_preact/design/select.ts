@@ -5,12 +5,10 @@ export function selectOptions<T>(
     state: PrepareElementState<readonly T[]>,
     option: { (value: T): SelectBoardContent },
 ): readonly SelectBoardContent[] {
-    switch (state.type) {
-        case "initial":
-            return [loading()]
-
-        case "loaded":
-            return state.data.map(option)
+    if (state.isLoad) {
+        return state.data.map(option)
+    } else {
+        return [loading()]
     }
 }
 
@@ -18,12 +16,10 @@ export function selectOptionsWithAll<T>(
     state: PrepareElementState<readonly T[]>,
     option: { (value: T): SelectBoardContent },
 ): readonly SelectBoardContent[] {
-    switch (state.type) {
-        case "initial":
-            return [loading()]
-
-        case "loaded":
-            return [all(), ...state.data.map(option)]
+    if (state.isLoad) {
+        return [all(), ...state.data.map(option)]
+    } else {
+        return [loading()]
     }
 }
 
@@ -31,12 +27,10 @@ export function selectOptionsWithPrompt<T>(
     state: PrepareElementState<readonly T[]>,
     option: { (value: T): SelectBoardContent },
 ): readonly SelectBoardContent[] {
-    switch (state.type) {
-        case "initial":
-            return [loading()]
-
-        case "loaded":
-            return [prompt(), ...state.data.map(option)]
+    if (state.isLoad) {
+        return [prompt(), ...state.data.map(option)]
+    } else {
+        return [loading()]
     }
 }
 

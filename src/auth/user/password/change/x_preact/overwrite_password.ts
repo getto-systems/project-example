@@ -16,18 +16,13 @@ import { ChangeButton } from "../../../../../common/x_preact/button/change_butto
 import { changePasswordError } from "./helper"
 
 import { OverwritePasswordAction } from "../action"
-import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
-
-import { LoginId } from "../../../login_id/kernel/data"
 
 type Props = Readonly<{
-    user: Readonly<{ loginId: LoginId }>
-    editable: EditableBoardAction
     overwrite: OverwritePasswordAction
 }>
 export function OverwritePassword(props: Props): VNode {
     const state = useApplicationAction(props.overwrite)
-    const editableState = useApplicationAction(props.editable)
+    const editableState = useApplicationAction(props.overwrite.editable)
     const validateState = useApplicationAction(props.overwrite.validate)
     const observeState = useApplicationAction(props.overwrite.observe)
 
@@ -70,8 +65,7 @@ export function OverwritePassword(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.overwrite.clear()
-            props.editable.open()
+            props.overwrite.editable.open()
         }
     }
 
@@ -85,11 +79,7 @@ export function OverwritePassword(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.overwrite.submit(props.user, onSuccess)
-
-            function onSuccess() {
-                props.editable.close()
-            }
+            props.overwrite.submit()
         }
     }
 
@@ -98,7 +88,7 @@ export function OverwritePassword(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.overwrite.clear()
+            props.overwrite.reset()
         }
     }
     function closeButton(): VNode {
@@ -106,7 +96,7 @@ export function OverwritePassword(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.editable.close()
+            props.overwrite.editable.close()
         }
     }
 

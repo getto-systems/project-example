@@ -10,7 +10,6 @@ import { initSearchAuthUserAccountAction, SearchAuthUserAccountAction } from "./
 
 import { readSearchAuthUserAccountSortKey } from "./convert"
 import { restoreLoginId } from "../../login_id/input/convert"
-import { restoreResetTokenDestination } from "../../password/reset/token_destination/kernel/convert"
 import { restoreAuthUserField } from "../kernel/convert"
 
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
@@ -20,196 +19,79 @@ import { defaultSearchAuthUserAccountSort, SearchAuthUserAccountRemoteResponse }
 import { AuthUserAccount } from "../kernel/data"
 
 test("initial load", async () => {
-    const { resource } = standard()
+    const { search } = standard()
 
-    const runner = setupActionTestRunner(resource.search)
+    const runner = setupActionTestRunner(search)
 
-    await runner(async () => resource.search.state.ignitionState).then((stack) => {
+    await runner(async () => search.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false, previousResponse: undefined },
+            { type: "try", hasTakenLongtime: false },
             { type: "success", response: standard_response },
         ])
     })
 })
 
 test("search", async () => {
-    const { resource, store } = standard()
+    const { search, store } = standard()
 
-    const runner = setupActionTestRunner(resource.search)
+    const runner = setupActionTestRunner(search)
 
-    await resource.search.state.ignitionState
+    await search.state.ignitionState
 
     await runner(async () => {
         store.loginId.set("MY-LOGIN-ID")
-        return resource.search.search()
+        return search.search()
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false, previousResponse: standard_response },
+            { type: "try", hasTakenLongtime: false },
             { type: "success", response: standard_response },
         ])
     })
 })
 
 test("search; take longtime", async () => {
-    const { resource } = takeLongtime()
+    const { search } = takeLongtime()
 
-    const runner = setupActionTestRunner(resource.search)
+    const runner = setupActionTestRunner(search)
 
-    await resource.search.state.ignitionState
+    await search.state.ignitionState
 
     await runner(async () => {
-        return resource.search.search()
+        return search.search()
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false, previousResponse: standard_response },
-            { type: "try", hasTakenLongtime: true, previousResponse: standard_response },
+            { type: "try", hasTakenLongtime: false },
+            { type: "try", hasTakenLongtime: true },
             { type: "success", response: standard_response },
         ])
     })
 })
 
 test("sort", async () => {
-    const { resource } = standard()
+    const { search } = standard()
 
-    const runner = setupActionTestRunner(resource.search)
+    const runner = setupActionTestRunner(search)
 
-    await resource.search.state.ignitionState
+    await search.state.ignitionState
 
     await runner(async () => {
-        return resource.search.sort("loginId")
+        return search.sort("loginId")
     }).then((stack) => {
         expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false, previousResponse: standard_response },
+            { type: "try", hasTakenLongtime: false },
             { type: "success", response: standard_response },
         ])
-        expect(resource.search.currentSort()).toEqual({ key: "loginId", order: "normal" })
+        expect(search.currentSort()).toEqual({ key: "loginId", order: "normal" })
     })
 })
 
 test("clear", () => {
-    const { resource, store } = standard()
+    const { search, store } = standard()
 
     store.loginId.set("MY-LOGIN-ID")
-    resource.search.clear()
+    search.clear()
 
     expect(store.loginId.get()).toEqual("")
-})
-
-test("focus / close", async () => {
-    const { resource } = standard()
-
-    const runner = setupActionTestRunner(resource.search.focused)
-
-    await resource.search.state.ignitionState
-
-    await runner(async () => {
-        const user: AuthUserAccount = {
-            loginId: restoreLoginId("user-1"),
-            grantedRoles: [],
-            resetTokenDestination: { type: "none" },
-            memo: restoreAuthUserField("memo"),
-        }
-        const another: AuthUserAccount = {
-            loginId: restoreLoginId("user-another"),
-            grantedRoles: [],
-            resetTokenDestination: { type: "none" },
-            memo: restoreAuthUserField("memo"),
-        }
-
-        resource.search.focused.focus(user)
-        expect(resource.search.focused.isFocused(user)).toBe(true)
-        expect(resource.search.focused.isFocused(another)).toBe(false)
-
-        resource.search.focused.close()
-        expect(resource.search.focused.isFocused(user)).toBe(false)
-        expect(resource.search.focused.isFocused(another)).toBe(false)
-
-        return resource.search.focused.state.currentState()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            {
-                type: "focus-on",
-                user: {
-                    loginId: "user-1",
-                    grantedRoles: [],
-                    resetTokenDestination: { type: "none" },
-                    memo: "memo",
-                },
-            },
-            { type: "initial" },
-        ])
-    })
-})
-
-test("detect user", async () => {
-    const { resource } = focused()
-
-    const runner = setupActionTestRunner(resource.search.focused)
-
-    await runner(async () => {
-        return resource.search.focused.state.ignitionState
-    }).then((stack) => {
-        expect(stack).toEqual([
-            {
-                type: "focus-detected",
-                user: {
-                    loginId: "user-1",
-                    grantedRoles: [],
-                    resetTokenDestination: { type: "none" },
-                    memo: "memo",
-                },
-            },
-        ])
-    })
-})
-test("detect user; failed", async () => {
-    const { resource } = focusFailed()
-
-    const runner = setupActionTestRunner(resource.search.focused)
-
-    await runner(async () => {
-        return resource.search.focused.state.ignitionState
-    }).then((stack) => {
-        expect(stack).toEqual([{ type: "focus-failed" }])
-    })
-})
-
-test("update user", async () => {
-    const { resource } = focused()
-
-    const runner = setupActionTestRunner(resource.search.focused)
-
-    await resource.search.state.ignitionState
-
-    const user: AuthUserAccount = {
-        loginId: restoreLoginId("user-1"),
-        grantedRoles: ["auth-user"],
-        resetTokenDestination: restoreResetTokenDestination({
-            type: "email",
-            email: "user@example.com",
-        }),
-        memo: restoreAuthUserField("memo"),
-    }
-
-    await runner(async () => {
-        return resource.search.focused.update(user.loginId, user)
-    }).then((stack) => {
-        expect(stack).toEqual([{ type: "focus-on", user }])
-    })
-})
-
-test("remove user", async () => {
-    const { resource } = focused()
-
-    const runner = setupActionTestRunner(resource.search.focused)
-
-    await resource.search.state.ignitionState
-
-    await runner(async () => {
-        return resource.search.focused.remove(restoreLoginId("user-1"))
-    }).then((stack) => {
-        expect(stack).toEqual([{ type: "initial" }])
-    })
 })
 
 test("read sort key", () => {
@@ -222,60 +104,99 @@ test("read sort key", () => {
     })
 })
 
+test("detected", async () => {
+    const { search } = detected()
+
+    const focusRunner = setupActionTestRunner(search.list.focus)
+
+    await focusRunner(async () => {
+        await search.list.state.ignitionState
+        return search.list.focus.state.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual([{ type: "detect", data: standard_response.list[0] }])
+    })
+})
+
+test("focus / close", async () => {
+    const { search } = standard()
+
+    const runner = setupActionTestRunner(search.list.focus)
+
+    await runner(async () => {
+        await search.list.state.ignitionState
+        const another: AuthUserAccount = {
+            loginId: restoreLoginId("another-1"),
+            grantedRoles: [],
+            resetTokenDestination: { type: "none" },
+            memo: restoreAuthUserField("memo"),
+        }
+
+        search.list.focus.change(standard_response.list[0])
+        expect(search.list.focus.isFocused(standard_response.list[0])).toBe(true)
+        expect(search.list.focus.isFocused(another)).toBe(false)
+
+        search.list.focus.close()
+        expect(search.list.focus.isFocused(standard_response.list[0])).toBe(false)
+        expect(search.list.focus.isFocused(another)).toBe(false)
+
+        search.list.focus.change(another)
+
+        return search.list.focus.state.currentState()
+    }).then((stack) => {
+        expect(stack).toEqual([
+            { type: "change", data: standard_response.list[0] },
+            { type: "close" },
+            { type: "close" },
+        ])
+    })
+})
+
 function standard() {
     return initResource(standard_url(), standard_search())
 }
 function takeLongtime() {
     return initResource(standard_url(), takeLongtime_search())
 }
-function focused() {
-    return initResource(focused_url(), standard_search())
-}
-function focusFailed() {
-    return initResource(focusFailed_url(), standard_search())
+function detected() {
+    return initResource(detected_url(), standard_search())
 }
 
 function initResource(
     currentURL: URL,
     searchRemote: SearchAuthUserAccountRemote,
 ): Readonly<{
-    resource: Readonly<{ search: SearchAuthUserAccountAction }>
+    search: SearchAuthUserAccountAction
     store: Readonly<{
         loginId: BoardValueStore
     }>
 }> {
     const urlStore = { current: currentURL }
 
-    const resource = {
-        search: initSearchAuthUserAccountAction({
-            infra: {
-                searchRemote,
-                columnsRepository: initMemoryDB(),
-            },
-            shell: mockSearchAuthUserAccountShell(currentURL, (url) => {
-                urlStore.current = url
-            }),
-            config: {
-                takeLongtimeThreshold: { wait_millisecond: 32 },
-            },
+    const search = initSearchAuthUserAccountAction({
+        infra: {
+            searchRemote,
+            columnsRepository: initMemoryDB(),
+        },
+        shell: mockSearchAuthUserAccountShell(currentURL, (url) => {
+            urlStore.current = url
         }),
-    }
+        config: {
+            takeLongtimeThreshold: { wait_millisecond: 32 },
+        },
+    })
 
     const store = {
-        loginId: mockBoardValueStore(resource.search.loginId.input),
+        loginId: mockBoardValueStore(search.loginId.input),
     }
 
-    return { resource, store }
+    return { search, store }
 }
 
 function standard_url(): URL {
     return new URL("https://example.com/index.html")
 }
-function focused_url(): URL {
+function detected_url(): URL {
     return new URL("https://example.com/index.html?id=user-1")
-}
-function focusFailed_url(): URL {
-    return new URL("https://example.com/index.html?id=user-unknown")
 }
 
 function standard_search(): SearchAuthUserAccountRemote {
@@ -294,7 +215,7 @@ function standard_searchRemoteResult(): SearchAuthUserAccountRemoteResult {
 const standard_response: SearchAuthUserAccountRemoteResponse = {
     page: { offset: 0, limit: 1000, all: 245 },
     sort: { key: defaultSearchAuthUserAccountSort, order: "normal" },
-    users: [
+    list: [
         {
             loginId: restoreLoginId("user-1"),
             grantedRoles: [],

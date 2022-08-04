@@ -5,11 +5,9 @@ export function checkboxOptions<T>(
     state: PrepareElementState<readonly T[]>,
     option: { (value: T): CheckboxBoardContent },
 ): readonly CheckboxBoardContent[] {
-    switch (state.type) {
-        case "initial":
-            return []
-
-        case "loaded":
-            return state.data.map(option)
+    if (state.isLoad) {
+        return state.data.map(option)
+    } else {
+        return []
     }
 }

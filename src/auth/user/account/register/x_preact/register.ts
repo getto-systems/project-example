@@ -64,11 +64,7 @@ export function RegisterAuthUserAccount(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.register.submit(onSuccess)
-
-            function onSuccess() {
-                // noop
-            }
+            props.register.submit()
         }
     }
 

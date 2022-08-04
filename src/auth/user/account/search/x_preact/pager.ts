@@ -11,52 +11,47 @@ import { pagerCount, pagerParams } from "../../../../../common/x_preact/design/t
 import { SearchOffset } from "../../../../../z_lib/ui/search/offset/x_preact/offset"
 import { LoadButton } from "../../../../../common/x_preact/button/load_button"
 
-import { ListAuthUserAccountAction } from "../action"
+import { SearchAuthUserAccountAction } from "../action"
 
 import { pagerOptions } from "../../../../../z_vendor/getto-css/preact/design/table"
 import { SearchPageResponse } from "../../../../../z_lib/ui/search/kernel/data"
 import { RemoteCommonError } from "../../../../../z_lib/ui/remote/data"
 
 type Props = Readonly<{
-    list: ListAuthUserAccountAction
+    search: SearchAuthUserAccountAction
 }>
 export function SearchAuthUserAccountPager(props: Props): VNode {
-    const state = useApplicationAction(props.list)
+    const state = useApplicationAction(props.search.list)
 
-    switch (state.type) {
-        case "initial":
-            return html``
-
-        case "try":
-            if (state.previousResponse) {
-                return pagerForm({ page: state.previousResponse.page, isConnecting: true })
-            } else {
-                return html``
-            }
-
-        case "success":
-            return pagerForm({ page: state.response.page, isConnecting: false })
-
-        case "failed":
-            return fieldHelp_error(searchError(state.err))
+    if (!state.isLoad) {
+        return html``
     }
 
-    type Content = Readonly<{ page: SearchPageResponse; isConnecting: boolean }>
+    switch (state.data.type) {
+        case "success":
+            return pagerForm({ page: state.data.response.page })
 
-    function pagerForm({ page, isConnecting }: Content): VNode {
+        case "failed":
+            return fieldHelp_error(searchError(state.data.err))
+    }
+
+    type Content = Readonly<{
+        page: SearchPageResponse
+    }>
+    function pagerForm({ page }: Content): VNode {
         return h(SearchOffset, {
-            field: props.list.offset,
+            field: props.search.offset,
             count: pagerCount(page.all),
             options: pagerOptions(pagerParams(page)),
             button: button(),
         })
 
         function button(): VNode {
-            return h(LoadButton, { isConnecting, onClick })
+            return h(LoadButton, { onClick })
 
             function onClick(e: Event) {
                 e.preventDefault()
-                props.list.load()
+                props.search.load()
             }
         }
     }

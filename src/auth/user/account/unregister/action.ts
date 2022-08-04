@@ -3,6 +3,8 @@ import {
     initApplicationStateAction,
     StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
+import { EditableBoardAction } from "../../../../z_vendor/getto-application/board/editable/action"
+import { initEditableDataHandler, ModifyFieldHandler } from "../../../../z_lib/ui/modify/action"
 
 import { checkTakeLongtime } from "../../../../z_lib/ui/timer/helper"
 
@@ -11,14 +13,20 @@ import { WaitTime } from "../../../../z_lib/ui/config/infra"
 
 import { UnregisterAuthUserAccountError } from "./data"
 import { LoginId } from "../../login_id/kernel/data"
+import { PrepareElementState } from "../../../../z_lib/ui/prepare/data"
 
 export interface UnregisterAuthUserAccountAction
     extends StatefulApplicationAction<UnregisterAuthUserAccountState> {
-    submit(
-        user: Readonly<{ loginId: LoginId }>,
-        onSuccess: { (): void },
-    ): Promise<UnregisterAuthUserAccountState>
+    readonly editable: EditableBoardAction
+
+    onSuccess(handler: (data: UnregisterAuthUserAccountEntry) => void): void
+
+    data(): PrepareElementState<UnregisterAuthUserAccountEntry>
+
+    submit(): Promise<UnregisterAuthUserAccountState>
 }
+
+export type UnregisterAuthUserAccountEntry = Readonly<{ loginId: LoginId }>
 
 export type UnregisterAuthUserAccountState = Readonly<{ type: "initial" }> | UnregisterUserEvent
 
@@ -39,8 +47,12 @@ export type UnregisterAuthUserAccountConfig = Readonly<{
 
 export function initUnregisterAuthUserAccountAction(
     material: UnregisterAuthUserAccountMaterial,
-): UnregisterAuthUserAccountAction {
-    return new Action(material)
+): Readonly<{
+    action: UnregisterAuthUserAccountAction
+    handler: ModifyFieldHandler<UnregisterAuthUserAccountEntry>
+}> {
+    const action = new Action(material)
+    return { action, handler: action.handler }
 }
 
 class Action implements UnregisterAuthUserAccountAction {
@@ -48,30 +60,55 @@ class Action implements UnregisterAuthUserAccountAction {
     readonly state: ApplicationStateAction<UnregisterAuthUserAccountState>
     readonly post: (state: UnregisterAuthUserAccountState) => UnregisterAuthUserAccountState
 
+    readonly editable: EditableBoardAction
+
+    readonly data: () => PrepareElementState<UnregisterAuthUserAccountEntry>
+    readonly handler: ModifyFieldHandler<UnregisterAuthUserAccountEntry>
+
     constructor(material: UnregisterAuthUserAccountMaterial) {
         const { state, post } = initApplicationStateAction({ initialState })
         this.material = material
         this.state = state
         this.post = post
+
+        const { editable, data, handler } =
+            initEditableDataHandler<UnregisterAuthUserAccountEntry>()
+
+        this.editable = editable
+        this.data = data
+        this.handler = handler
+
+        this.onSuccess(() => {
+            this.editable.close()
+        })
     }
 
-    async submit(
-        user: Readonly<{ loginId: LoginId }>,
-        onSuccess: { (): void },
-    ): Promise<UnregisterAuthUserAccountState> {
-        return unregisterUser(this.material, user, onSuccess, this.post)
+    onSuccess(handler: (data: Readonly<{ loginId: LoginId }>) => void): void {
+        this.state.subscribe((state) => {
+            if (state.type === "success") {
+                handler(state.entry)
+            }
+        })
+    }
+
+    async submit(): Promise<UnregisterAuthUserAccountState> {
+        const element = this.data()
+        if (!element.isLoad) {
+            return this.state.currentState()
+        }
+
+        return unregisterUser(this.material, element.data, this.post)
     }
 }
 
 type UnregisterUserEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: UnregisterAuthUserAccountError }>
-    | Readonly<{ type: "success" }>
+    | Readonly<{ type: "success"; entry: UnregisterAuthUserAccountEntry }>
 
 async function unregisterUser<S>(
     { infra, config }: UnregisterAuthUserAccountMaterial,
     user: Readonly<{ loginId: LoginId }>,
-    onSuccess: { (): void },
     post: Post<UnregisterUserEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
@@ -88,8 +125,7 @@ async function unregisterUser<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    onSuccess()
-    return post({ type: "success" })
+    return post({ type: "success", entry: user })
 }
 
 interface Post<E, S> {

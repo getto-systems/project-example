@@ -24,7 +24,6 @@ import { initChangePasswordAction } from "../../../../../auth/user/password/chan
 import { ProfilePageResource } from "../resource"
 
 import { ProfileBackgroundMessage, ProfileForegroundMessage } from "./message"
-import { initEditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
 
 renderEntry()
 
@@ -60,24 +59,18 @@ async function props(): Promise<ProfilePageResource> {
 
 function newChangePasswordResource(proxy: Proxy) {
     return {
-        change: {
-            editable: initEditableBoardAction(),
-            change: initChangePasswordAction({
-                infra: proxy.password.change.infra,
-                config: newChangePasswordConfig(),
-            }),
-        },
+        change: initChangePasswordAction({
+            infra: proxy.password.change.infra,
+            config: newChangePasswordConfig(),
+        }),
     }
 }
 function newRequestResetTokenResource(proxy: Proxy) {
     return {
-        requestToken: {
-            editable: initEditableBoardAction(),
-            requestToken: initRequestResetTokenAction({
-                infra: proxy.password.reset.requestToken.infra,
-                config: newRequestResetTokenConfig(),
-            }),
-        },
+        requestToken: initRequestResetTokenAction({
+            infra: proxy.password.reset.requestToken.infra,
+            config: newRequestResetTokenConfig(),
+        }),
     }
 }
 

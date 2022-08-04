@@ -8,23 +8,23 @@ import { SearchColumns } from "../../../../../z_lib/ui/search/columns/x_preact/c
 
 import { repositoryErrorReason } from "../../../../../z_lib/ui/repository/x_error/reason"
 
-import { ListAuthUserAccountAction } from "../action"
+import { SearchAuthUserAccountAction } from "../action"
 
 import { SearchAuthUserAccountTableStructure } from "./structure"
 
 import { RepositoryError } from "../../../../../z_lib/ui/repository/data"
 
 type Props = Readonly<{
-    list: ListAuthUserAccountAction
+    search: SearchAuthUserAccountAction
     structure: SearchAuthUserAccountTableStructure
 }>
 export function SearchAuthUserAccountColumns(props: Props): VNode {
-    const columnsState = useApplicationAction(props.list.columns)
+    const columnsState = useApplicationAction(props.search.columns)
     switch (columnsState.type) {
         case "initial":
         case "success":
             return h(SearchColumns, {
-                field: props.list.columns,
+                field: props.search.columns,
                 columns: props.structure.view(),
             })
 

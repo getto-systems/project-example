@@ -10,6 +10,10 @@ import { LoginIdFieldAction, initLoginIdFieldAction } from "../../../login_id/in
 import { ValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
 import { ObserveBoardAction } from "../../../../../z_vendor/getto-application/board/observe_board/action"
 import { initRegisterField } from "../../../../../z_lib/ui/register/action"
+import {
+    EditableBoardAction,
+    initEditableBoardAction,
+} from "../../../../../z_vendor/getto-application/board/editable/action"
 
 import { RequestResetTokenRemote } from "./infra"
 import { WaitTime } from "../../../../../z_lib/ui/config/infra"
@@ -21,7 +25,9 @@ export interface RequestResetTokenAction extends StatefulApplicationAction<Reque
     readonly loginId: LoginIdFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
+    readonly editable: EditableBoardAction
 
+    edit(): void
     clear(): void
     submit(onSuccess: { (): void }): Promise<RequestResetTokenState>
 }
@@ -57,6 +63,7 @@ class Action implements RequestResetTokenAction {
     readonly loginId: LoginIdFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
+    readonly editable: EditableBoardAction
 
     convert: () => ConvertBoardResult<RequestResetTokenFields>
     clear: () => void
@@ -66,6 +73,7 @@ class Action implements RequestResetTokenAction {
         this.material = material
         this.state = state
         this.post = post
+        this.editable = initEditableBoardAction()
 
         const loginId = initLoginIdFieldAction()
 
@@ -91,12 +99,24 @@ class Action implements RequestResetTokenAction {
         this.clear = clear
     }
 
+    edit(): void {
+        this.editable.open()
+        this.clear()
+    }
     async submit(onSuccess: { (): void }): Promise<RequestResetTokenState> {
         const fields = this.convert()
         if (!fields.valid) {
             return this.state.currentState()
         }
-        return requestResetToken(this.material, fields.value, onSuccess, this.post)
+        return requestResetToken(
+            this.material,
+            fields.value,
+            () => {
+                this.editable.close()
+                onSuccess()
+            },
+            this.post,
+        )
     }
 }
 

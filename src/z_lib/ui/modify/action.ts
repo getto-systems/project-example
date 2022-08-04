@@ -1,3 +1,7 @@
+import {
+    EditableBoardAction,
+    initEditableBoardAction,
+} from "../../../z_vendor/getto-application/board/editable/action"
 import { ConvertBoardResult } from "../../../z_vendor/getto-application/board/kernel/data"
 import {
     initObserveBoardAction,
@@ -9,20 +13,34 @@ import {
     ValidateBoardAction,
 } from "../../../z_vendor/getto-application/board/validate_board/action"
 import { ValidateBoardFieldAction } from "../../../z_vendor/getto-application/board/validate_field/action"
+import { PrepareElementState } from "../prepare/data"
 
 export interface ModifyFieldAction<T> {
     readonly observe: ObserveBoardFieldAction
     readonly validate: ValidateBoardFieldAction<T, unknown>
     reset(value: T): void
+    clear(): void
 }
 
 export type ModifyFieldEntry<K extends string, T, R> = [K, ModifyFieldAction<T>, (data: R) => void]
 
-export type ModifyFieldProps<R> = Readonly<{
-    validate: ValidateBoardAction
-    observe: ObserveBoardAction
-    reset: (data: R) => void
+export type ModifyFieldProps<T> = EditableDataProps<T> &
+    Readonly<{
+        validate: ValidateBoardAction
+        observe: ObserveBoardAction
+        reset: () => void
+    }>
+export type EditableDataProps<T> = Readonly<{
+    editable: EditableBoardAction
+    data: () => PrepareElementState<T>
+    handler: ModifyFieldHandler<T>
 }>
+
+export interface ModifyFieldHandler<T> {
+    focus(data: T): void
+    update(data: T): void
+    close(): void
+}
 
 export function modifyField<K extends string, T, R>(
     key: K,
@@ -32,14 +50,15 @@ export function modifyField<K extends string, T, R>(
     return [key, input, (data: R) => input.reset(map(data))]
 }
 
-export function initModifyField<K extends string, R>(
-    entries: readonly ModifyFieldEntry<K, unknown, R>[],
-    convert: () => ConvertBoardResult<R>,
-): ModifyFieldProps<R> {
+export function initModifyField<K extends string, T, M>(
+    entries: readonly ModifyFieldEntry<K, unknown, T>[],
+    convert: () => ConvertBoardResult<M>,
+): ModifyFieldProps<T> {
     const fields = entries.map(([field]) => field)
 
     const { validate, validateChecker } = initValidateBoardAction({ fields }, { convert })
     const { observe, observeChecker } = initObserveBoardAction({ fields })
+    const { editable, data, handler } = initEditableDataHandler<T>()
 
     entries.forEach(([field, input]) => {
         input.validate.state.subscribe((state) => {
@@ -50,17 +69,74 @@ export function initModifyField<K extends string, R>(
         })
     })
 
-    const reset = (data: R) => {
-        entries.forEach(([_field, _input, reset]) => {
-            reset(data)
+    const clear = () => {
+        entries.forEach(([_field, input, _set]) => {
+            input.clear()
         })
         validate.clear()
         observe.clear()
     }
+    const resetTo = (data: T) => {
+        entries.forEach(([_field, _input, set]) => {
+            set(data)
+        })
+        validate.clear()
+        observe.clear()
+    }
+    const reset = () => {
+        const element = data()
+        if (element.isLoad) {
+            resetTo(element.data)
+        } else {
+            clear()
+        }
+    }
+
+    editable.state.subscribe((state) => {
+        if (state.isEditable) {
+            reset()
+        } else {
+            clear()
+        }
+    })
 
     return {
         observe,
         validate,
+        editable,
+        data,
+        handler,
         reset,
+    }
+}
+
+export function initEditableDataHandler<T>(): EditableDataProps<T> {
+    const editable = initEditableBoardAction()
+
+    let element: PrepareElementState<T> = { isLoad: false }
+
+    const initData = () => {
+        element = { isLoad: false }
+    }
+    const setData = (data: T) => {
+        element = { isLoad: true, data }
+    }
+
+    return {
+        editable,
+        data: () => element,
+        handler: {
+            focus: (data: T) => {
+                setData(data)
+                editable.close()
+            },
+            update: (data: T) => {
+                setData(data)
+            },
+            close: () => {
+                initData()
+                editable.close()
+            },
+        },
     }
 }

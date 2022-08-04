@@ -1,4 +1,5 @@
 import { h, VNode } from "preact"
+import { html } from "htm/preact"
 
 import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
@@ -22,49 +23,33 @@ import { ChangeButton } from "../../../../../common/x_preact/button/change_butto
 
 import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
 
-import { EditableBoardAction } from "../../../../../z_vendor/getto-application/board/editable/action"
 import { ModifyAuthUserAccountAction } from "../action"
 
-import { ModifyAuthUserAccountError, ModifyAuthUserAccountFields } from "../data"
-import { LoginId } from "../../../login_id/kernel/data"
-import { AuthRole } from "../../../kernel/data"
-import { TypeAuthUser } from "../../kernel/data"
+import { ModifyAuthUserAccountError } from "../data"
 
 type Props = Readonly<{
-    user: Readonly<{
-        loginId: LoginId
-        grantedRoles: readonly AuthRole[]
-        memo: TypeAuthUser<"memo">
-    }>
-    editable: EditableBoardAction
     modify: ModifyAuthUserAccountAction
-    onSuccess: { (fields: ModifyAuthUserAccountFields): void }
 }>
 export function ModifyAuthUserAccount(props: Props): VNode {
-    const state = useApplicationAction(props.modify)
-    const editableState = useApplicationAction(props.editable)
+    const modifyState = useApplicationAction(props.modify)
+    const editableState = useApplicationAction(props.modify.editable)
     const validateState = useApplicationAction(props.modify.validate)
     const observeState = useApplicationAction(props.modify.observe)
+
+    const element = props.modify.data()
+    if (!element.isLoad) {
+        return html``
+    }
+
+    const edit = { data: element.data, editable: props.modify.editable }
 
     return form(
         box({
             title: "基本情報",
             body: [
-                h(StaticLoginIdField, { user: props.user }),
-                h(AuthUserMemoField, {
-                    edit: {
-                        data: props.user,
-                        editable: props.editable,
-                    },
-                    field: props.modify.memo,
-                }),
-                h(AuthUserGrantedRolesField, {
-                    edit: {
-                        data: props.user,
-                        editable: props.editable,
-                    },
-                    field: props.modify.grantedRoles,
-                }),
+                h(StaticLoginIdField, { data: edit.data }),
+                h(AuthUserMemoField, { edit, field: props.modify.memo }),
+                h(AuthUserGrantedRolesField, { edit, field: props.modify.grantedRoles }),
             ],
             footer: editableState.isEditable
                 ? [
@@ -83,7 +68,7 @@ export function ModifyAuthUserAccount(props: Props): VNode {
     )
 
     function editButton(): VNode {
-        if (state.type === "success") {
+        if (modifyState.type === "success") {
             return h(EditSuccessButton, { onClick })
         } else {
             return h(EditButton, { onClick })
@@ -91,14 +76,13 @@ export function ModifyAuthUserAccount(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.modify.reset(props.user)
-            props.editable.open()
+            props.modify.editable.open()
         }
     }
 
     function submitButton(): VNode {
         return h(ChangeButton, {
-            isConnecting: state.type === "try",
+            isConnecting: modifyState.type === "try",
             validateState,
             observeState,
             onClick,
@@ -106,12 +90,7 @@ export function ModifyAuthUserAccount(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.modify.submit(props.user, onSuccess)
-
-            function onSuccess(data: ModifyAuthUserAccountFields) {
-                props.editable.close()
-                props.onSuccess(data)
-            }
+            props.modify.submit()
         }
     }
 
@@ -120,7 +99,7 @@ export function ModifyAuthUserAccount(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.modify.reset(props.user)
+            props.modify.reset()
         }
     }
 
@@ -129,24 +108,24 @@ export function ModifyAuthUserAccount(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.editable.close()
+            props.modify.editable.close()
         }
     }
 
     function message(): readonly VNode[] {
-        switch (state.type) {
+        switch (modifyState.type) {
             case "initial":
             case "success":
                 return []
 
             case "try":
-                if (state.hasTakenLongtime) {
+                if (modifyState.hasTakenLongtime) {
                     return [takeLongtimeField("変更")]
                 }
                 return []
 
             case "failed":
-                return [fieldHelp_error(modifyError(state.err))]
+                return [fieldHelp_error(modifyError(modifyState.err))]
         }
     }
 }

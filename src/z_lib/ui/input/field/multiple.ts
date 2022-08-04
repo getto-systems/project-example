@@ -37,7 +37,7 @@ export function initMultipleFieldAction<T>(props: MultipleFieldProps<T>): Readon
     setOptions: { (state: readonly T[]): void }
 }> {
     const { input, store, subscriber } = initMultipleInputBoardAction()
-    let options: PrepareElementState<readonly T[]> = { type: "initial" }
+    let options: PrepareElementState<readonly T[]> = { isLoad: false }
     const validate = initValidateBoardFieldAction({
         convert: (): ValidateBoardFieldResult<readonly T[], never> => ({
             valid: true,
@@ -71,7 +71,7 @@ export function initMultipleFieldAction<T>(props: MultipleFieldProps<T>): Readon
             },
         },
         setOptions: (newOptions) => {
-            options = { type: "loaded", data: newOptions }
+            options = { isLoad: true, data: newOptions }
         },
     }
 }
@@ -81,7 +81,7 @@ function convert<T>(
     options: PrepareElementState<readonly T[]>,
     convert: (data: T) => string,
 ): readonly T[] {
-    if (options.type === "initial") {
+    if (!options.isLoad) {
         return []
     }
 

@@ -9,7 +9,12 @@ import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
 import { initLoginIdFieldAction, LoginIdFieldAction } from "../input/action"
 import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
 import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
-import { initRegisterField } from "../../../../z_lib/ui/register/action"
+import { EditableBoardAction } from "../../../../z_vendor/getto-application/board/editable/action"
+import {
+    initModifyField,
+    modifyField,
+    ModifyFieldHandler,
+} from "../../../../z_lib/ui/modify/action"
 
 import { ChangeLoginIdError, OverwriteLoginIdFields } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
@@ -18,18 +23,23 @@ import { OverwriteLoginIdRemote } from "./infra"
 import { WaitTime } from "../../../../z_lib/ui/config/infra"
 
 import { LoginId } from "../kernel/data"
+import { PrepareElementState } from "../../../../z_lib/ui/prepare/data"
 
 export interface OverwriteLoginIdAction extends StatefulApplicationAction<OverwriteLoginIdState> {
     readonly newLoginId: LoginIdFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
+    readonly editable: EditableBoardAction
 
-    clear(): void
-    submit(
-        user: Readonly<{ loginId: LoginId }>,
-        onSuccess: { (loginId: LoginId): void },
-    ): Promise<OverwriteLoginIdState>
+    onSuccess(handler: (data: OverwriteLoginIdEntry) => void): void
+
+    data(): PrepareElementState<OverwriteLoginIdEntry>
+
+    reset(): void
+    submit(): Promise<OverwriteLoginIdState>
 }
+
+export type OverwriteLoginIdEntry = Readonly<{ loginId: LoginId }>
 
 export type OverwriteLoginIdState = OverwriteLoginIdEvent
 
@@ -49,10 +59,12 @@ export type OverwriteLoginIdConfig = Readonly<{
     resetToInitialTimeout: WaitTime
 }>
 
-export function initOverwriteLoginIdAction(
-    material: OverwriteLoginIdMaterial,
-): OverwriteLoginIdAction {
-    return new OverwriteAction(material)
+export function initOverwriteLoginIdAction(material: OverwriteLoginIdMaterial): Readonly<{
+    action: OverwriteLoginIdAction
+    handler: ModifyFieldHandler<OverwriteLoginIdEntry>
+}> {
+    const action = new OverwriteAction(material)
+    return { action, handler: action.handler }
 }
 
 class OverwriteAction implements OverwriteLoginIdAction {
@@ -63,9 +75,12 @@ class OverwriteAction implements OverwriteLoginIdAction {
     readonly newLoginId: LoginIdFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
+    readonly editable: EditableBoardAction
 
-    convert: () => ConvertBoardResult<OverwriteLoginIdFields>
-    clear: () => void
+    readonly convert: () => ConvertBoardResult<OverwriteLoginIdFields>
+    readonly data: () => PrepareElementState<OverwriteLoginIdEntry>
+    readonly handler: ModifyFieldHandler<OverwriteLoginIdEntry>
+    readonly reset: () => void
 
     constructor(material: OverwriteLoginIdMaterial) {
         const { state, post } = initApplicationStateAction({ initialState })
@@ -90,41 +105,58 @@ class OverwriteAction implements OverwriteLoginIdAction {
             }
         }
 
-        const { validate, observe, clear } = initRegisterField(
-            [["newLoginId", newLoginId]],
+        const { validate, observe, editable, data, handler, reset } = initModifyField(
+            [modifyField("newLoginId", newLoginId, (_data: OverwriteLoginIdEntry) => "")],
             convert,
         )
 
         this.newLoginId = newLoginId
         this.validate = validate
         this.observe = observe
+        this.editable = editable
         this.convert = convert
-        this.clear = clear
+        this.data = data
+        this.handler = handler
+        this.reset = reset
+
+        this.onSuccess(() => {
+            this.editable.close()
+        })
     }
 
-    async submit(
-        user: Readonly<{ loginId: LoginId }>,
-        onSuccess: { (loginId: LoginId): void },
-    ): Promise<OverwriteLoginIdState> {
+    onSuccess(handler: (data: OverwriteLoginIdEntry) => void): void {
+        this.state.subscribe((state) => {
+            if (state.type === "success") {
+                handler(state.entry)
+            }
+        })
+    }
+
+    async submit(): Promise<OverwriteLoginIdState> {
+        const element = this.data()
+        if (!element.isLoad) {
+            return this.state.currentState()
+        }
+
         const fields = this.convert()
         if (!fields.valid) {
             return this.state.currentState()
         }
-        return overwriteLoginId(this.material, user, fields.value, onSuccess, this.post)
+
+        return overwriteLoginId(this.material, element.data, fields.value, this.post)
     }
 }
 
 type OverwriteLoginIdEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ChangeLoginIdError }>
-    | Readonly<{ type: "success" }>
+    | Readonly<{ type: "success"; entry: OverwriteLoginIdEntry }>
     | Readonly<{ type: "initial" }>
 
 async function overwriteLoginId<S>(
     { infra, config }: OverwriteLoginIdMaterial,
     user: Readonly<{ loginId: LoginId }>,
     fields: OverwriteLoginIdFields,
-    onSuccess: { (loginId: LoginId): void },
     post: Post<OverwriteLoginIdEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
@@ -141,8 +173,7 @@ async function overwriteLoginId<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    onSuccess(fields.newLoginId)
-    post({ type: "success" })
+    post({ type: "success", entry: { loginId: fields.newLoginId } })
     return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 

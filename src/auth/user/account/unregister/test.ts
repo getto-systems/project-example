@@ -8,33 +8,34 @@ import { restoreLoginId } from "../../login_id/input/convert"
 
 import { UnregisterAuthUserAccountRemote } from "./infra"
 
-import { LoginId } from "../../login_id/kernel/data"
-
 test("submit", async () => {
-    const { resource, user } = standard()
+    const { unregister } = standard()
 
-    const runner = setupActionTestRunner(resource.unregister)
+    const runner = setupActionTestRunner(unregister)
 
     await runner(async () => {
-        return resource.unregister.submit(user, () => null)
+        return unregister.submit()
     }).then((stack) => {
-        expect(stack).toEqual([{ type: "try", hasTakenLongtime: false }, { type: "success" }])
+        expect(stack).toEqual([
+            { type: "try", hasTakenLongtime: false },
+            { type: "success", entry: { loginId: "user-id" } },
+        ])
     })
 })
 
 test("submit; take long time", async () => {
     // wait for take longtime timeout
-    const { resource, user } = takeLongtime_elements()
+    const { unregister } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(resource.unregister)
+    const runner = setupActionTestRunner(unregister)
 
     await runner(() => {
-        return resource.unregister.submit(user, () => null)
+        return unregister.submit()
     }).then((stack) => {
         expect(stack).toEqual([
             { type: "try", hasTakenLongtime: false },
             { type: "try", hasTakenLongtime: true },
-            { type: "success" },
+            { type: "success", entry: { loginId: "user-id" } },
         ])
     })
 })
@@ -47,27 +48,23 @@ function takeLongtime_elements() {
 }
 
 function initResource(modifyUserRemote: UnregisterAuthUserAccountRemote): Readonly<{
-    resource: Readonly<{
-        unregister: UnregisterAuthUserAccountAction
-    }>
-    user: Readonly<{ loginId: LoginId }>
+    unregister: UnregisterAuthUserAccountAction
 }> {
-    const resource = {
-        unregister: initUnregisterAuthUserAccountAction({
-            infra: {
-                unregisterUserRemote: modifyUserRemote,
-            },
-            config: {
-                takeLongtimeThreshold: { wait_millisecond: 32 },
-            },
-        }),
-    }
+    const unregister = initUnregisterAuthUserAccountAction({
+        infra: {
+            unregisterUserRemote: modifyUserRemote,
+        },
+        config: {
+            takeLongtimeThreshold: { wait_millisecond: 32 },
+        },
+    })
+
+    unregister.handler.focus({
+        loginId: restoreLoginId("user-id"),
+    })
 
     return {
-        resource,
-        user: {
-            loginId: restoreLoginId("user-id"),
-        },
+        unregister: unregister.action,
     }
 }
 

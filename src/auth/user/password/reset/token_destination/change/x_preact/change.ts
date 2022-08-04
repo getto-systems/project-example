@@ -1,4 +1,5 @@
 import { h, VNode } from "preact"
+import { html } from "htm/preact"
 
 import { useApplicationAction } from "../../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
@@ -25,37 +26,30 @@ import { CloseButton } from "../../../../../../../common/x_preact/button/close_b
 
 import { remoteCommonErrorReason } from "../../../../../../../z_lib/ui/remote/x_error/reason"
 
-import { EditableBoardAction } from "../../../../../../../z_vendor/getto-application/board/editable/action"
 import { ChangeResetTokenDestinationAction } from "../action"
 
 import { ChangeResetTokenDestinationError } from "../data"
-import { LoginId } from "../../../../../login_id/kernel/data"
-import { ResetTokenDestination } from "../../kernel/data"
 
 type Props = Readonly<{
-    user: Readonly<{ loginId: LoginId; resetTokenDestination: ResetTokenDestination }>
-    editable: EditableBoardAction
     change: ChangeResetTokenDestinationAction
-    onSuccess: { (destination: ResetTokenDestination): void }
 }>
 export function ChangeResetTokenDestination(props: Props): VNode {
     const state = useApplicationAction(props.change)
-    const editableState = useApplicationAction(props.editable)
+    const editableState = useApplicationAction(props.change.editable)
     const validateState = useApplicationAction(props.change.validate)
     const observeState = useApplicationAction(props.change.observe)
+
+    const element = props.change.data()
+    if (!element.isLoad) {
+        return html``
+    }
+
+    const edit = { data: element.data, editable: props.change.editable }
 
     return form(
         box({
             title: "パスワードリセット",
-            body: [
-                h(ResetTokenDestinationField, {
-                    field: props.change.destination,
-                    edit: {
-                        data: props.user,
-                        editable: props.editable,
-                    },
-                }),
-            ],
+            body: [h(ResetTokenDestinationField, { edit, field: props.change.destination })],
             footer: editableState.isEditable
                 ? [
                       buttons({
@@ -81,8 +75,7 @@ export function ChangeResetTokenDestination(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.change.reset(props.user.resetTokenDestination)
-            props.editable.open()
+            props.change.editable.open()
         }
     }
 
@@ -96,12 +89,7 @@ export function ChangeResetTokenDestination(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.change.submit(props.user, onSuccess)
-
-            function onSuccess(data: ResetTokenDestination) {
-                props.editable.close()
-                props.onSuccess(data)
-            }
+            props.change.submit()
         }
     }
 
@@ -110,7 +98,7 @@ export function ChangeResetTokenDestination(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.change.reset(props.user.resetTokenDestination)
+            props.change.reset()
         }
     }
 
@@ -119,7 +107,7 @@ export function ChangeResetTokenDestination(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.editable.close()
+            props.change.editable.close()
         }
     }
 

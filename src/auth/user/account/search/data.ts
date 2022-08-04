@@ -2,6 +2,7 @@ import { SingleValueFilter, SearchPageResponse } from "../../../../z_lib/ui/sear
 import { SearchSort } from "../../../../z_lib/ui/search/sort/data"
 import { AuthUserAccount } from "../kernel/data"
 import { AuthRole } from "../../kernel/data"
+import { ListSearchedData } from "../../../../z_lib/ui/list/data"
 
 export type SearchAuthUserAccountFilter = SearchAuthUserAccountFilterProps &
     Readonly<{
@@ -18,8 +19,11 @@ export type SearchAuthUserAccountSortKey = SearchAuthUserAccountSort["key"]
 
 export const defaultSearchAuthUserAccountSort: SearchAuthUserAccountSortKey = "loginId"
 
-export type SearchAuthUserAccountRemoteResponse = Readonly<{
+export type SearchAuthUserAccountRemoteResponse = ListSearchedData<
+    AuthUserAccount,
+    SearchAuthUserAccountSummary
+>
+export type SearchAuthUserAccountSummary = Readonly<{
     page: SearchPageResponse
     sort: SearchAuthUserAccountSort
-    users: readonly AuthUserAccount[]
 }>

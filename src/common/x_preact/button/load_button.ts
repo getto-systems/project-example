@@ -5,7 +5,7 @@ import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
 
 import { button_search } from "../../../z_vendor/getto-css/preact/design/form"
 
-import { icon_search, icon_spinner } from "../../../x_content/icon"
+import { icon_search } from "../../../x_content/icon"
 import { iconHtml } from "../../../z_lib/ui/icon/x_preact/icon"
 
 import { Icon } from "../../../z_lib/ui/icon/data"
@@ -13,14 +13,9 @@ import { Icon } from "../../../z_lib/ui/icon/data"
 type Props = Readonly<{
     label?: VNodeContent
     icon?: Icon
-    isConnecting: boolean
     onClick: { (e: Event): void }
 }>
-export function LoadButton({ isConnecting, label, icon, onClick }: Props): VNode {
-    if (isConnecting) {
-        return button_search({ state: "connect", label: iconLabel(icon_spinner) })
-    }
-
+export function LoadButton({ label, icon, onClick }: Props): VNode {
     return button_search({ state: "normal", label: iconLabel(icon || icon_search), onClick })
 
     function iconLabel(icon: Icon): VNode {

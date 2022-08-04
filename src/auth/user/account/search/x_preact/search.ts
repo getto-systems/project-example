@@ -15,17 +15,17 @@ import { useAuthUserAccountTableStructure } from "./structure"
 type Props = Readonly<{
     search: SearchAuthUserAccountAction
 }>
-export function SearchAuthUserAccount(resource: Props): VNode {
-    const structure = useAuthUserAccountTableStructure(resource.search)
+export function SearchAuthUserAccount(props: Props): VNode {
+    const structure = useAuthUserAccountTableStructure(props.search)
 
     return html`
-        ${container([h(SearchAuthUserAccountForm, resource)])}
+        ${container([h(SearchAuthUserAccountForm, props)])}
         ${container([
-            box({ body: h(SearchAuthUserAccountPager, { list: resource.search }) }),
+            box({ body: h(SearchAuthUserAccountPager, props) }),
             box_grow({
-                body: h(SearchAuthUserAccountColumns, { structure, list: resource.search }),
+                body: h(SearchAuthUserAccountColumns, { structure, search: props.search }),
             }),
         ])}
-        ${h(SearchAuthUserAccountTable, { structure, list: resource.search })}
+        ${h(SearchAuthUserAccountTable, { structure, search: props.search })}
     `
 }

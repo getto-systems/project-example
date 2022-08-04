@@ -137,6 +137,7 @@ class VectorStore implements Vector {
                     this.store[index].store.set(value)
                     this.store[index] = { ...this.store[index], isDeleting: false }
                 })
+                this.postCurrent()
             },
         })
     }
