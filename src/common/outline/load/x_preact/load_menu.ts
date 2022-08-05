@@ -3,7 +3,7 @@ import { html } from "htm/preact"
 
 import { remoteCommonErrorReason } from "../../../../z_lib/ui/remote/x_error/reason"
 
-import { useApplicationAction } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     appMenu,
@@ -30,7 +30,7 @@ type Props = Readonly<{
     menu: LoadMenuAction
 }>
 export function LoadMenu(props: Props): VNode {
-    const state = useApplicationAction(props.menu)
+    const state = useApplicationState(props.menu.state)
 
     switch (state.type) {
         case "initial-menu":

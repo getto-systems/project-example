@@ -16,7 +16,7 @@ const VALID_LOGIN_ID = { newLoginId: "new-login-id" } as const
 test("submit valid new-login-id", async () => {
     const { overwrite, store } = standard()
 
-    const runner = setupActionTestRunner(overwrite)
+    const runner = setupActionTestRunner(overwrite.state)
 
     await runner(async () => {
         store.newLoginId.set(VALID_LOGIN_ID.newLoginId)
@@ -35,7 +35,7 @@ test("submit valid login-id; take long time", async () => {
     // wait for take longtime timeout
     const { overwrite, store } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(overwrite)
+    const runner = setupActionTestRunner(overwrite.state)
 
     await runner(() => {
         store.newLoginId.set(VALID_LOGIN_ID.newLoginId)
@@ -54,7 +54,7 @@ test("submit valid login-id; take long time", async () => {
 test("submit without fields", async () => {
     const { overwrite } = standard()
 
-    const runner = setupActionTestRunner(overwrite)
+    const runner = setupActionTestRunner(overwrite.state)
 
     await runner(() => overwrite.submit()).then((stack) => {
         expect(stack).toEqual([])

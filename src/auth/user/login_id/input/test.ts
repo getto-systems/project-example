@@ -8,7 +8,7 @@ import { initLoginIdFieldAction } from "./action"
 test("validate; valid input", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate)
+    const runner = setupActionTestRunner(action.validate.state)
 
     await runner(async () => {
         store.set("valid")
@@ -21,7 +21,7 @@ test("validate; valid input", async () => {
 test("validate; invalid : empty", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate)
+    const runner = setupActionTestRunner(action.validate.state)
 
     await runner(async () => {
         store.set("")
@@ -36,7 +36,7 @@ test("validate; invalid : empty", async () => {
 test("validate; invalid : too-long", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate)
+    const runner = setupActionTestRunner(action.validate.state)
 
     await runner(async () => {
         store.set("a".repeat(100 + 1))
@@ -54,7 +54,7 @@ test("validate; invalid : too-long", async () => {
 test("validate; valid : just max-length", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate)
+    const runner = setupActionTestRunner(action.validate.state)
 
     await runner(async () => {
         store.set("a".repeat(100))

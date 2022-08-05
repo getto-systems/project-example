@@ -1,6 +1,6 @@
 import { VNode } from "preact"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     table,
@@ -22,7 +22,7 @@ type Props = Readonly<{
     structure: ListRegisteredAuthUserAccountTableStructure
 }>
 export function ListRegisteredAuthUserAccountTable(props: Props): VNode {
-    const state = useApplicationAction(props.list)
+    const state = useApplicationState(props.list.state)
 
     if (!state.isLoad) {
         return emptyRegisteredTable()

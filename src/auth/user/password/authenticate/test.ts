@@ -46,7 +46,7 @@ test("submit valid login-id and password", async () => {
         }
     })
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(async () => {
         store.loginId.set(VALID_LOGIN.loginId)
@@ -82,7 +82,7 @@ test("submit valid login-id and password; take long time", async () => {
         }
     })
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(() => {
         store.loginId.set(VALID_LOGIN.loginId)
@@ -110,7 +110,7 @@ test("submit valid login-id and password; take long time", async () => {
 test("submit without fields", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(() => action.submit()).then((stack) => {
         expect(stack).toEqual([])
@@ -131,7 +131,7 @@ test("clear", () => {
 test("load error", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     const err: LoadScriptError = { type: "infra-error", err: "load error" }
 

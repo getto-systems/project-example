@@ -25,7 +25,7 @@ const VALID_INFO = {
 test("submit valid info", async () => {
     const { modify, store } = standard()
 
-    const runner = setupActionTestRunner(modify)
+    const runner = setupActionTestRunner(modify.state)
 
     await runner(async () => {
         store.memo.set(VALID_INFO.memo)
@@ -48,7 +48,7 @@ test("submit valid login-id; take long time", async () => {
     // wait for take longtime timeout
     const { modify, store } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(modify)
+    const runner = setupActionTestRunner(modify.state)
 
     await runner(() => {
         store.memo.set(VALID_INFO.memo)

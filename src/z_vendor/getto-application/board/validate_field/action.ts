@@ -1,9 +1,9 @@
-import { initApplicationState, StatefulApplicationAction } from "../../action/action"
+import { ApplicationState, initApplicationState } from "../../action/action"
 
 import { ValidateBoardFieldResult } from "../validate_field/data"
 
-export interface ValidateBoardFieldAction<T, E>
-    extends StatefulApplicationAction<ValidateBoardFieldState<T, E>> {
+export interface ValidateBoardFieldAction<T, E> {
+    readonly state: ApplicationState<ValidateBoardFieldState<T, E>>
     check(): ValidateBoardFieldResult<T, E>
     clear(): ValidateBoardFieldState<T, E>
 }

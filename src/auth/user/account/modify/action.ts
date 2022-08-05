@@ -1,7 +1,6 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
 import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
@@ -31,8 +30,8 @@ import { LoginId } from "../../login_id/kernel/data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { PrepareElementState } from "../../../../z_lib/ui/prepare/data"
 
-export interface ModifyAuthUserAccountAction
-    extends StatefulApplicationAction<ModifyAuthUserAccountState> {
+export interface ModifyAuthUserAccountAction {
+    readonly state: ApplicationState<ModifyAuthUserAccountState>
     readonly memo: AuthUserTextFieldAction<"memo">
     readonly grantedRoles: AuthUserGrantedRolesFieldAction
     readonly validate: ValidateBoardAction

@@ -22,7 +22,7 @@ test("error", async () => {
 test("detected", async () => {
     const { list, item, stack } = detected()
 
-    const focusRunner = setupActionTestRunner(list.focus)
+    const focusRunner = setupActionTestRunner(list.focus.state)
 
     await focusRunner(async () => {
         await list.state.ignitionState
@@ -41,7 +41,7 @@ test("detected", async () => {
 test("detect failed", async () => {
     const { list, stack } = detectFailed()
 
-    const focusRunner = setupActionTestRunner(list.focus)
+    const focusRunner = setupActionTestRunner(list.focus.state)
 
     await focusRunner(async () => {
         await list.state.ignitionState
@@ -60,7 +60,7 @@ test("detect failed", async () => {
 test("focus / close", async () => {
     const { list, item, stack } = standard()
 
-    const runner = setupActionTestRunner(list.focus)
+    const runner = setupActionTestRunner(list.focus.state)
 
     await runner(async () => {
         await list.state.ignitionState
@@ -97,8 +97,8 @@ test("update", async () => {
 
     const updatedData: Data = { id: 1, name: "updated-name" }
 
-    const listRunner = setupActionTestRunner(list)
-    const focusRunner = setupActionTestRunner(list.focus)
+    const listRunner = setupActionTestRunner(list.state)
+    const focusRunner = setupActionTestRunner(list.focus.state)
 
     await listRunner(async () => {
         await focusRunner(async () => {
@@ -131,8 +131,8 @@ test("update", async () => {
 test("remove", async () => {
     const { list, item, stack } = standard()
 
-    const listRunner = setupActionTestRunner(list)
-    const focusRunner = setupActionTestRunner(list.focus)
+    const listRunner = setupActionTestRunner(list.state)
+    const focusRunner = setupActionTestRunner(list.focus.state)
 
     await listRunner(async () => {
         await focusRunner(async () => {

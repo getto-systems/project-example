@@ -5,7 +5,7 @@ import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
 import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_error/reason"
 
-import { useApplicationAction } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { buttons, fieldHelp_error } from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { loginBox } from "../../../../../../z_vendor/getto-css/preact/layout/login"
@@ -29,9 +29,9 @@ type Props = Readonly<{
     requestToken: RequestResetTokenAction
 }>
 export function RequestResetToken(props: Props): VNode {
-    const state = useApplicationAction(props.requestToken)
-    const validateState = useApplicationAction(props.requestToken.validate)
-    const observeState = useApplicationAction(props.requestToken.observe)
+    const state = useApplicationState(props.requestToken.state)
+    const validateState = useApplicationState(props.requestToken.validate.state)
+    const observeState = useApplicationState(props.requestToken.observe.state)
 
     return loginBox(siteInfo, {
         title: "パスワードリセット",

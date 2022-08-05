@@ -1,7 +1,6 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
 import { LoginIdFieldAction, initLoginIdFieldAction } from "../../login_id/input/action"
@@ -29,8 +28,8 @@ import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board
 import { AuthTicket } from "../../../ticket/kernel/data"
 import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 
-export interface AuthenticatePasswordAction
-    extends StatefulApplicationAction<AuthenticatePasswordState> {
+export interface AuthenticatePasswordAction {
+    readonly state: ApplicationState<AuthenticatePasswordState>
     readonly loginId: LoginIdFieldAction
     readonly password: PasswordFieldAction
     readonly validate: ValidateBoardAction

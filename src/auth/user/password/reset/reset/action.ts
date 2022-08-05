@@ -1,7 +1,6 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../../../z_vendor/getto-application/action/action"
 
 import { LoginIdFieldAction, initLoginIdFieldAction } from "../../../login_id/input/action"
@@ -30,7 +29,8 @@ import { AuthTicket } from "../../../../ticket/kernel/data"
 import { ConvertBoardResult } from "../../../../../z_vendor/getto-application/board/kernel/data"
 import { RepositoryError } from "../../../../../z_lib/ui/repository/data"
 
-export interface ResetPasswordAction extends StatefulApplicationAction<ResetPasswordState> {
+export interface ResetPasswordAction {
+    readonly state: ApplicationState<ResetPasswordState>
     readonly loginId: LoginIdFieldAction
     readonly password: PasswordFieldAction
     readonly validate: ValidateBoardAction

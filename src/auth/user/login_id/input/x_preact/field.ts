@@ -1,7 +1,7 @@
 import { h, VNode } from "preact"
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { inputField, label_text_fill } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { mapValidateState } from "../../../../../z_lib/ui/input/field/x_preact/helper"
@@ -22,7 +22,7 @@ type Props = Readonly<{
         autocomplete: string
     }>
 export function LoginIdField(props: Props): VNode {
-    const validateState = useApplicationAction(props.field.validate)
+    const validateState = useApplicationState(props.field.validate.state)
 
     return inputField({
         title: props.title || AUTH_USER_ACCOUNT["loginId"],

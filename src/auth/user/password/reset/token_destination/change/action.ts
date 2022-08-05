@@ -1,7 +1,6 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../../../../z_vendor/getto-application/action/action"
 
 import { checkTakeLongtime, ticker } from "../../../../../../z_lib/ui/timer/helper"
@@ -28,8 +27,8 @@ import { ChangeResetTokenDestinationError } from "./data"
 import { ConvertBoardResult } from "../../../../../../z_vendor/getto-application/board/kernel/data"
 import { PrepareElementState } from "../../../../../../z_lib/ui/prepare/data"
 
-export interface ChangeResetTokenDestinationAction
-    extends StatefulApplicationAction<ChangeResetTokenDestinationState> {
+export interface ChangeResetTokenDestinationAction {
+    readonly state: ApplicationState<ChangeResetTokenDestinationState>
     readonly destination: ResetTokenDestinationFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction

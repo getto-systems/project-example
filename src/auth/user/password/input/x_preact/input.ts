@@ -1,7 +1,7 @@
 import { h, VNode } from "preact"
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     inputField,
@@ -24,8 +24,8 @@ type Props = Readonly<{ field: PasswordFieldAction }> &
         autocomplete: string
     }>
 export function PasswordField(props: Props): VNode {
-    const validateState = useApplicationAction(props.field.validate)
-    const characterState = useApplicationAction(props.field.character)
+    const validateState = useApplicationState(props.field.validate.state)
+    const characterState = useApplicationState(props.field.character.state)
 
     return inputField({
         title: props.title || AUTH_USER_ACCOUNT["password"],

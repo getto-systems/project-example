@@ -11,7 +11,7 @@ import { UnregisterAuthUserAccountRemote } from "./infra"
 test("submit", async () => {
     const { unregister } = standard()
 
-    const runner = setupActionTestRunner(unregister)
+    const runner = setupActionTestRunner(unregister.state)
 
     await runner(async () => {
         return unregister.submit()
@@ -27,7 +27,7 @@ test("submit; take long time", async () => {
     // wait for take longtime timeout
     const { unregister } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(unregister)
+    const runner = setupActionTestRunner(unregister.state)
 
     await runner(() => {
         return unregister.submit()

@@ -14,7 +14,7 @@ import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/
 test("select columns", async () => {
     const { resource, store } = standard()
 
-    const runner = setupActionTestRunner(resource.field)
+    const runner = setupActionTestRunner(resource.field.state)
 
     await runner(async () => {
         await resource.field.state.ignitionState

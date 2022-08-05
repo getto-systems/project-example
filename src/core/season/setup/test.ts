@@ -21,7 +21,7 @@ import { Season } from "../kernel/data"
 test("setup season", async () => {
     const { resource, store } = standard()
 
-    const runner = setupActionTestRunner(resource.setupSeason)
+    const runner = setupActionTestRunner(resource.setupSeason.state)
 
     await runner(() => {
         store.season.set("2021.summer")
@@ -34,7 +34,7 @@ test("setup season", async () => {
 test("setup season; default", async () => {
     const { resource } = standard()
 
-    const runner = setupActionTestRunner(resource.setupSeason)
+    const runner = setupActionTestRunner(resource.setupSeason.state)
 
     await runner(() => resource.setupSeason.setup(() => null)).then((stack) => {
         expect(stack).toEqual([{ type: "success" }, { type: "initial" }])

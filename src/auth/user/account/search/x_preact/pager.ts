@@ -3,7 +3,7 @@ import { html } from "htm/preact"
 
 import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { pagerCount, pagerParams } from "../../../../../common/x_preact/design/table"
@@ -21,7 +21,7 @@ type Props = Readonly<{
     search: SearchAuthUserAccountAction
 }>
 export function SearchAuthUserAccountPager(props: Props): VNode {
-    const state = useApplicationAction(props.search.list)
+    const state = useApplicationState(props.search.list.state)
 
     if (!state.isLoad) {
         return html``

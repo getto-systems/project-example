@@ -13,7 +13,7 @@ const VALID_LOGIN = { loginId: "login-id" } as const
 test("submit valid login-id", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(() => {
         store.loginId.set(VALID_LOGIN.loginId)
@@ -27,7 +27,7 @@ test("submit valid login-id; with take longtime", async () => {
     // wait for take longtime timeout
     const { action, store } = takeLongtime()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(() => {
         store.loginId.set(VALID_LOGIN.loginId)
@@ -44,7 +44,7 @@ test("submit valid login-id; with take longtime", async () => {
 test("submit without fields", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(() => action.submit(() => null)).then((stack) => {
         expect(stack).toEqual([])

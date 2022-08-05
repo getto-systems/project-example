@@ -1,7 +1,6 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
 import { checkTakeLongtime } from "../../../../z_lib/ui/timer/helper"
@@ -40,8 +39,8 @@ import {
 import { AuthUserAccount } from "../kernel/data"
 import { prepared, preparing } from "../../../../z_lib/ui/prepare/data"
 
-export interface SearchAuthUserAccountAction
-    extends StatefulApplicationAction<SearchAuthUserAccountState> {
+export interface SearchAuthUserAccountAction {
+    readonly state: ApplicationState<SearchAuthUserAccountState>
     readonly list: ListSearchedAuthUserAccountAction
 
     readonly loginId: TextFilterAction

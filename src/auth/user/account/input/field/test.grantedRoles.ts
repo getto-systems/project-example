@@ -10,7 +10,7 @@ import { ALL_AUTH_ROLES } from "../../../../../x_content/role"
 test("validate; valid input", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.validate)
+    const runner = setupActionTestRunner(action.validate.state)
 
     await runner(async () => {
         store.set(["auth-user"])
@@ -25,7 +25,7 @@ test("validate; valid input", async () => {
 test("observe; has changed", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.observe)
+    const runner = setupActionTestRunner(action.observe.state)
 
     await runner(async () => {
         store.set(["auth-user"])

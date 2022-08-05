@@ -7,7 +7,7 @@ import { html } from "htm/preact"
 import { remoteCommonErrorReason } from "../../../../z_lib/ui/remote/x_error/reason"
 import { repositoryErrorReason } from "../../../../z_lib/ui/repository/x_error/reason"
 
-import { useApplicationAction } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { box } from "../../../../z_vendor/getto-css/preact/design/box"
 import { button_send, field } from "../../../../z_vendor/getto-css/preact/design/form"
@@ -23,7 +23,7 @@ type Props = Readonly<{
     logout: LogoutAction
 }>
 export function Logout(props: Props): VNode {
-    const state = useApplicationAction(props.logout)
+    const state = useApplicationState(props.logout.state)
 
     useLayoutEffect(() => {
         switch (state.type) {

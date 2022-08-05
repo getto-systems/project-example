@@ -1,7 +1,6 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
 import { initPasswordFieldAction } from "../input/action"
@@ -29,7 +28,8 @@ import {
     ModifyFieldHandler,
 } from "../../../../z_lib/ui/modify/action"
 
-export interface ChangePasswordAction extends StatefulApplicationAction<ChangePasswordState> {
+export interface ChangePasswordAction {
+    readonly state: ApplicationState<ChangePasswordState>
     readonly currentPassword: PasswordFieldAction
     readonly newPassword: PasswordFieldAction
     readonly validate: ValidateBoardAction
@@ -45,7 +45,8 @@ export type ChangePasswordState = ChangePasswordEvent
 
 const initialState: ChangePasswordState = { type: "initial" }
 
-export interface OverwritePasswordAction extends StatefulApplicationAction<OverwritePasswordState> {
+export interface OverwritePasswordAction {
+    readonly state: ApplicationState<OverwritePasswordState>
     readonly newPassword: PasswordFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction

@@ -1,7 +1,7 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     buttons,
@@ -31,10 +31,10 @@ type Props = Readonly<{
     modify: ModifyAuthUserAccountAction
 }>
 export function ModifyAuthUserAccount(props: Props): VNode {
-    const modifyState = useApplicationAction(props.modify)
-    const editableState = useApplicationAction(props.modify.editable)
-    const validateState = useApplicationAction(props.modify.validate)
-    const observeState = useApplicationAction(props.modify.observe)
+    const modifyState = useApplicationState(props.modify.state)
+    const editableState = useApplicationState(props.modify.editable.state)
+    const validateState = useApplicationState(props.modify.validate.state)
+    const observeState = useApplicationState(props.modify.observe.state)
 
     const element = props.modify.data()
     if (!element.isLoad) {

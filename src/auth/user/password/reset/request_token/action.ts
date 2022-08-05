@@ -3,7 +3,6 @@ import { checkTakeLongtime } from "../../../../../z_lib/ui/timer/helper"
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../../../z_vendor/getto-application/action/action"
 
 import { LoginIdFieldAction, initLoginIdFieldAction } from "../../../login_id/input/action"
@@ -21,7 +20,8 @@ import { WaitTime } from "../../../../../z_lib/ui/config/infra"
 import { RequestResetTokenError, RequestResetTokenFields } from "./data"
 import { ConvertBoardResult } from "../../../../../z_vendor/getto-application/board/kernel/data"
 
-export interface RequestResetTokenAction extends StatefulApplicationAction<RequestResetTokenState> {
+export interface RequestResetTokenAction {
+    readonly state: ApplicationState<RequestResetTokenState>
     readonly loginId: LoginIdFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction

@@ -1,6 +1,6 @@
 import { h, VNode } from "preact"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
@@ -20,10 +20,10 @@ type Props = Readonly<{
     change: ChangePasswordAction
 }>
 export function ChangePassword(props: Props): VNode {
-    const state = useApplicationAction(props.change)
-    const editableState = useApplicationAction(props.change.editable)
-    const validateState = useApplicationAction(props.change.validate)
-    const observeState = useApplicationAction(props.change.observe)
+    const state = useApplicationState(props.change.state)
+    const editableState = useApplicationState(props.change.editable.state)
+    const validateState = useApplicationState(props.change.validate.state)
+    const observeState = useApplicationState(props.change.observe.state)
 
     return box({
         form: true,

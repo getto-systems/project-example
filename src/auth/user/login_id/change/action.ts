@@ -1,7 +1,6 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
 import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
@@ -25,7 +24,8 @@ import { WaitTime } from "../../../../z_lib/ui/config/infra"
 import { LoginId } from "../kernel/data"
 import { PrepareElementState } from "../../../../z_lib/ui/prepare/data"
 
-export interface OverwriteLoginIdAction extends StatefulApplicationAction<OverwriteLoginIdState> {
+export interface OverwriteLoginIdAction {
+    readonly state: ApplicationState<OverwriteLoginIdState>
     readonly newLoginId: LoginIdFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction

@@ -9,14 +9,14 @@ import { BackToListButton } from "../../../../../common/x_preact/button/back_to_
 
 import { SearchAuthUserAccountAction } from "../action"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 type Props = DetailAuthUserAccountActions &
     Readonly<{
         search: SearchAuthUserAccountAction
     }>
 export function FocusAuthUserAccount(props: Props): VNode {
-    const focusState = useApplicationAction(props.search.list.focus)
+    const focusState = useApplicationState(props.search.list.focus.state)
 
     return html`${[container([box_grow({ body: backToListButton() })]), content()]}`
 

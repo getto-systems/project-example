@@ -1,7 +1,7 @@
 import { VNode } from "preact"
 import { html } from "htm/preact"
 
-import { useApplicationAction } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { label_alert } from "../../../../z_vendor/getto-css/preact/design/highlight"
 
@@ -17,7 +17,7 @@ type Props = Readonly<{
     season: LoadSeasonAction
 }>
 export function LoadSeason(props: Props): VNode {
-    const state = useApplicationAction(props.season)
+    const state = useApplicationState(props.season.state)
 
     return info(body())
 

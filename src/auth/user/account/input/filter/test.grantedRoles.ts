@@ -9,7 +9,7 @@ import { initAuthUserGrantedRolesFilterAction } from "./action"
 test("observe; has changed", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.observe)
+    const runner = setupActionTestRunner(action.observe.state)
 
     await runner(async () => {
         store.set(["auth-user"])

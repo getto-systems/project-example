@@ -6,7 +6,7 @@ import { initObserveBoardAction } from "./action"
 test("observe", async () => {
     const { action, checker } = standard()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(async () => {
         checker.update("name", false)

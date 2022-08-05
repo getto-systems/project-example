@@ -1,7 +1,7 @@
 import { VNode } from "preact"
 import { html } from "htm/preact"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { VNodeContent } from "../../../x_preact/common"
 
@@ -21,7 +21,7 @@ type Props = Readonly<{
     title: VNodeContent
 }>
 export function MainTitleWithSidebar(props: Props): VNode {
-    const state = useApplicationAction(props.sidebar)
+    const state = useApplicationState(props.sidebar.state)
 
     return html`${[content(), error()]}`
 

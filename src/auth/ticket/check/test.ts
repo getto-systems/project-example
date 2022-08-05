@@ -40,7 +40,7 @@ const CONTINUOUS_RENEW_AT = [
 test("instant load", async () => {
     const { clock, action } = instantLoadable()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
@@ -67,7 +67,7 @@ test("instant load", async () => {
 test("instant load failed", async () => {
     const { clock, action } = instantLoadable()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
@@ -105,7 +105,7 @@ test("renew stored credential", async () => {
         }
     })
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
@@ -133,7 +133,7 @@ test("renew stored credential; take long time", async () => {
         }
     })
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
@@ -154,7 +154,7 @@ test("renew without stored credential", async () => {
     // empty credential
     const { action } = noStored()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(() => action.state.ignitionState).then((stack) => {
         expect(stack).toEqual([{ type: "required-to-login" }])
@@ -164,7 +164,7 @@ test("renew without stored credential", async () => {
 test("load error", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     const err: LoadScriptError = { type: "infra-error", err: "load error" }
 

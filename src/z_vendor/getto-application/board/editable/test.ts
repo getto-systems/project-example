@@ -5,7 +5,7 @@ import { initEditableBoardAction } from "./action"
 test("open / close", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(async () => {
         action.open()

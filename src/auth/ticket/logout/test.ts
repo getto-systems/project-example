@@ -14,7 +14,7 @@ import { initLogoutAction, LogoutAction } from "./action"
 test("logout", async () => {
     const { resource } = standard()
 
-    const runner = setupActionTestRunner(resource.logout)
+    const runner = setupActionTestRunner(resource.logout.state)
 
     await runner(() => resource.logout.submit()).then((stack) => {
         expect(stack).toEqual([{ type: "success" }])

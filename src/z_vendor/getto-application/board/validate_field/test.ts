@@ -9,7 +9,7 @@ test("validate; valid input", async () => {
     // valid input
     const { action } = standard({ valid: true, value: "valid" })
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(async () => {
         action.check()
@@ -23,7 +23,7 @@ test("validate; invalid input; clear", async () => {
     // invalid input
     const { action } = standard({ valid: false, err: ["empty"] })
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(async () => {
         action.check()

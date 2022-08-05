@@ -8,7 +8,7 @@ import { initListRegisteredAction, ListRegisteredAction, ListRegisteredHandler }
 test("register", async () => {
     const { list, handler, stack } = standard()
 
-    const runner = setupActionTestRunner(list)
+    const runner = setupActionTestRunner(list.state)
 
     const data: Data = { id: 1, name: "name" }
 
@@ -31,7 +31,7 @@ test("focus / close", async () => {
     const data: Data = { id: 1, name: "name" }
     handler.register(data)
 
-    const runner = setupActionTestRunner(list.focus)
+    const runner = setupActionTestRunner(list.focus.state)
 
     await runner(async () => {
         const another: Data = { id: 2, name: "another" }
@@ -64,8 +64,8 @@ test("update", async () => {
     const data: Data = { id: 1, name: "name" }
     const updatedData: Data = { id: 1, name: "updated-name" }
 
-    const listRunner = setupActionTestRunner(list)
-    const focusRunner = setupActionTestRunner(list.focus)
+    const listRunner = setupActionTestRunner(list.state)
+    const focusRunner = setupActionTestRunner(list.focus.state)
 
     await listRunner(async () => {
         handler.register(data)
@@ -99,8 +99,8 @@ test("remove", async () => {
 
     const data: Data = { id: 1, name: "name" }
 
-    const listRunner = setupActionTestRunner(list)
-    const focusRunner = setupActionTestRunner(list.focus)
+    const listRunner = setupActionTestRunner(list.state)
+    const focusRunner = setupActionTestRunner(list.focus.state)
 
     await listRunner(async () => {
         handler.register(data)

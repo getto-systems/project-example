@@ -14,7 +14,7 @@ const VALID_PASSWORD = { currentPassword: "current-password", newPassword: "new-
 test("submit valid current-password and new-password", async () => {
     const { resource, store } = standard()
 
-    const runner = setupActionTestRunner(resource.change)
+    const runner = setupActionTestRunner(resource.change.state)
 
     await runner(async () => {
         store.currentPassword.set(VALID_PASSWORD.currentPassword)
@@ -34,7 +34,7 @@ test("submit valid login-id and password; take long time", async () => {
     // wait for take longtime timeout
     const { resource, store } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(resource.change)
+    const runner = setupActionTestRunner(resource.change.state)
 
     await runner(() => {
         store.currentPassword.set(VALID_PASSWORD.currentPassword)
@@ -54,7 +54,7 @@ test("submit valid login-id and password; take long time", async () => {
 test("submit without fields", async () => {
     const { resource } = standard()
 
-    const runner = setupActionTestRunner(resource.change)
+    const runner = setupActionTestRunner(resource.change.state)
 
     await runner(() => resource.change.submit(() => null)).then((stack) => {
         expect(stack).toEqual([])

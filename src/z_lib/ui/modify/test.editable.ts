@@ -7,7 +7,7 @@ import { EditableDataProps, initEditableDataHandler } from "./action"
 test("focus / update / close", async () => {
     const { editable, data, handler } = standard()
 
-    const runner = setupActionTestRunner(editable)
+    const runner = setupActionTestRunner(editable.state)
 
     await runner(async () => {
         const item: Data = { id: 1, name: "name" }

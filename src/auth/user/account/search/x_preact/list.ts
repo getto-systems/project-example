@@ -3,7 +3,7 @@ import { useEffect } from "preact/hooks"
 import { html } from "htm/preact"
 
 import { useAuthUserAccountTableStructure } from "./structure"
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 import { scrollToFocused } from "../../../../../z_lib/ui/search/sidebar/x_preact/helper"
 
 import { box_grow, container } from "../../../../../z_vendor/getto-css/preact/design/box"
@@ -27,7 +27,7 @@ export function ListAuthUserAccount(props: Props): VNode {
 }
 
 function useScrollToFocused(search: SearchAuthUserAccountAction): void {
-    const state = useApplicationAction(search.list.focus)
+    const state = useApplicationState(search.list.focus.state)
     useEffect(() => {
         scrollToFocused({
             sidebarId: "sidebar",

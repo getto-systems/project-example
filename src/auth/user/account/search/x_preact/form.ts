@@ -1,6 +1,6 @@
 import { h, VNode } from "preact"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { buttons } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box_grow, container } from "../../../../../z_vendor/getto-css/preact/design/box"
@@ -16,8 +16,8 @@ type Props = Readonly<{
     search: SearchAuthUserAccountAction
 }>
 export function SearchAuthUserAccountForm(props: Props): VNode {
-    const state = useApplicationAction(props.search)
-    const observeState = useApplicationAction(props.search.observe)
+    const state = useApplicationState(props.search.state)
+    const observeState = useApplicationState(props.search.observe.state)
 
     return box_grow({
         form: true,

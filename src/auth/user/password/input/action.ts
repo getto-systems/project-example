@@ -1,7 +1,6 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 import {
     initTextFieldActionWithResource,
@@ -19,7 +18,9 @@ export interface PasswordFieldAction extends TextFieldAction<Password> {
     readonly character: PasswordCharacterAction
 }
 
-export type PasswordCharacterAction = StatefulApplicationAction<PasswordCharacterState>
+export interface PasswordCharacterAction {
+    readonly state: ApplicationState<PasswordCharacterState>
+}
 export type PasswordCharacterState = Readonly<{ multiByte: boolean }>
 
 const initialState: PasswordCharacterState = { multiByte: false }

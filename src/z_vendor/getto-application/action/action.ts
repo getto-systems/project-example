@@ -1,7 +1,3 @@
-export type StatefulApplicationAction<S> = Readonly<{
-    state: ApplicationState<S>
-}>
-
 export interface ApplicationState<S> {
     readonly ignitionState: Promise<S>
     subscribe(handler: ApplicationStateHandler<S>): void

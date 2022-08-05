@@ -21,7 +21,7 @@ import { currentSeason } from "../kernel/init/current_season"
 test("load from repository", async () => {
     const { resource } = standard()
 
-    const runner = setupActionTestRunner(resource.season)
+    const runner = setupActionTestRunner(resource.season.state)
 
     await runner(() => resource.season.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
@@ -42,7 +42,7 @@ test("load from repository", async () => {
 test("expired; use default", async () => {
     const { resource } = expired()
 
-    const runner = setupActionTestRunner(resource.season)
+    const runner = setupActionTestRunner(resource.season.state)
 
     await runner(() => resource.season.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
@@ -63,7 +63,7 @@ test("expired; use default", async () => {
 test("not found; use default", async () => {
     const { resource } = empty_summer()
 
-    const runner = setupActionTestRunner(resource.season)
+    const runner = setupActionTestRunner(resource.season.state)
 
     await runner(() => resource.season.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
@@ -84,7 +84,7 @@ test("not found; use default", async () => {
 test("not found; use default; winter", async () => {
     const { resource } = empty_winter()
 
-    const runner = setupActionTestRunner(resource.season)
+    const runner = setupActionTestRunner(resource.season.state)
 
     await runner(() => resource.season.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
@@ -105,7 +105,7 @@ test("not found; use default; winter", async () => {
 test("not found; use default; last winter", async () => {
     const { resource } = empty_last_winter()
 
-    const runner = setupActionTestRunner(resource.season)
+    const runner = setupActionTestRunner(resource.season.state)
 
     await runner(() => resource.season.state.ignitionState).then((stack) => {
         expect(stack).toEqual([

@@ -1,7 +1,7 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { useApplicationAction } from "../../../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     buttons,
@@ -34,10 +34,10 @@ type Props = Readonly<{
     change: ChangeResetTokenDestinationAction
 }>
 export function ChangeResetTokenDestination(props: Props): VNode {
-    const state = useApplicationAction(props.change)
-    const editableState = useApplicationAction(props.change.editable)
-    const validateState = useApplicationAction(props.change.validate)
-    const observeState = useApplicationAction(props.change.observe)
+    const state = useApplicationState(props.change.state)
+    const editableState = useApplicationState(props.change.editable.state)
+    const validateState = useApplicationState(props.change.validate.state)
+    const observeState = useApplicationState(props.change.observe.state)
 
     const element = props.change.data()
     if (!element.isLoad) {

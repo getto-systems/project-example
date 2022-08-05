@@ -6,7 +6,7 @@ import { initValidateBoardAction } from "./action"
 test("validate; all valid state; clear", async () => {
     const { action, checker } = standard()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(async () => {
         checker.update("name", { type: "validated", result: { valid: true } })
@@ -30,7 +30,7 @@ test("validate; all valid state; clear", async () => {
 test("validate; invalid exists", async () => {
     const { action, checker } = standard()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(async () => {
         checker.update("name", { type: "validated", result: { valid: false } }) // invalid
@@ -44,7 +44,7 @@ test("validate; invalid exists", async () => {
 test("validate; initial exists", async () => {
     const { action, checker } = standard()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(async () => {
         checker.update("name", { type: "validated", result: { valid: true } })

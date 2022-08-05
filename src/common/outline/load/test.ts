@@ -26,7 +26,7 @@ import { AuthTicket } from "../../../auth/ticket/kernel/data"
 test("load menu", async () => {
     const { resource } = standard()
 
-    const runner = setupActionTestRunner(resource.menu)
+    const runner = setupActionTestRunner(resource.menu.state)
 
     await runner(() => resource.menu.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
@@ -67,7 +67,7 @@ test("load menu", async () => {
 test("load menu; empty roles", async () => {
     const { resource } = empty()
 
-    const runner = setupActionTestRunner(resource.menu)
+    const runner = setupActionTestRunner(resource.menu.state)
 
     await runner(() => resource.menu.state.ignitionState).then((stack) => {
         expect(stack).toEqual([{ type: "required-to-login" }])
@@ -77,7 +77,7 @@ test("load menu; empty roles", async () => {
 test("load menu; saved expands", async () => {
     const { resource } = expand()
 
-    const runner = setupActionTestRunner(resource.menu)
+    const runner = setupActionTestRunner(resource.menu.state)
 
     await runner(() => resource.menu.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
@@ -118,7 +118,7 @@ test("load menu; saved expands", async () => {
 test("load menu; toggle expands", async () => {
     const { resource, menuExpand } = standard()
 
-    const runner = setupActionTestRunner(resource.menu)
+    const runner = setupActionTestRunner(resource.menu.state)
 
     await runner(() => resource.menu.state.ignitionState)
     await runner(() => resource.menu.show([markMenuCategoryLabel("DOCUMENT")])).then((stack) => {
@@ -205,7 +205,7 @@ test("load menu; toggle expands", async () => {
 test("load menu; dev docs", async () => {
     const { resource } = user()
 
-    const runner = setupActionTestRunner(resource.menu)
+    const runner = setupActionTestRunner(resource.menu.state)
 
     await runner(() => resource.menu.state.ignitionState).then((stack) => {
         expect(stack).toEqual([

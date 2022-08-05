@@ -1,6 +1,6 @@
 import {
+    ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 import { ModifyFieldHandler } from "../modify/action"
 
@@ -11,19 +11,23 @@ export interface ListRegisteredAction<T> extends ListAction<readonly T[]> {
     readonly focus: FocusRegisteredAction<T>
 }
 
-export type FocusRegisteredAction<T> = StatefulApplicationAction<FocusState<T>> &
-    FocusAction<T, FocusState<T>>
+export interface FocusRegisteredAction<T> extends FocusAction<T, FocusState<T>> {
+    readonly state: ApplicationState<FocusState<T>>
+}
 
 export interface ListSearchedAction<T, M, E> extends ListAction<ListSearchedResult<T, M, E>> {
     readonly focus: FocusSearchedAction<T>
 }
 
-export type FocusSearchedAction<T> = StatefulApplicationAction<FocusSearchedState<T>> &
-    FocusAction<T, FocusSearchedState<T>>
+export interface FocusSearchedAction<T> extends FocusAction<T, FocusSearchedState<T>> {
+    readonly state: ApplicationState<FocusSearchedState<T>>
+}
 
 export type FocusSearchedState<T> = FocusState<T> | FocusDetectState<T>
 
-type ListAction<S> = StatefulApplicationAction<ListState<S>>
+interface ListAction<S> {
+    readonly state: ApplicationState<ListState<S>>
+}
 type ListState<S> = PrepareElementState<S>
 
 export interface FocusAction<T, S> {
@@ -273,7 +277,7 @@ interface FocusHandler<T, S> {
 function initFocus<T, S>(
     props: FocusProps<T, S>,
 ): Readonly<{
-    action: FocusAction<T, S> & StatefulApplicationAction<FocusState<T> | S>
+    action: FocusAction<T, S> & { readonly state: ApplicationState<FocusState<T> | S> }
     handler: FocusHandler<T, S>
 }> {
     const { state, post } = initApplicationState<FocusState<T> | S>({

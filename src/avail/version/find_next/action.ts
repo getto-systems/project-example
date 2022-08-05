@@ -1,6 +1,6 @@
 import {
+    ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 
 import { versionStringConverter } from "../kernel/convert"
@@ -20,7 +20,9 @@ import {
     Version,
 } from "./data"
 
-export type FindNextVersionAction = StatefulApplicationAction<FindNextVersionState>
+export interface FindNextVersionAction {
+    readonly state: ApplicationState<FindNextVersionState>
+}
 
 export type FindNextVersionState = Readonly<{ type: "initial" }> | FindNextVersionEvent
 

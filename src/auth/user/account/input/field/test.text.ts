@@ -13,7 +13,7 @@ fields.forEach(([name, maxLength]) => {
         test("validate; valid input", async () => {
             const { action, store } = standard()
 
-            const runner = setupActionTestRunner(action.validate)
+            const runner = setupActionTestRunner(action.validate.state)
 
             await runner(async () => {
                 store.set("valid")
@@ -28,7 +28,7 @@ fields.forEach(([name, maxLength]) => {
         test("validate; invalid : too-long", async () => {
             const { action, store } = standard()
 
-            const runner = setupActionTestRunner(action.validate)
+            const runner = setupActionTestRunner(action.validate.state)
 
             await runner(async () => {
                 store.set("a".repeat(maxLength + 1))
@@ -46,7 +46,7 @@ fields.forEach(([name, maxLength]) => {
         test("validate; valid : just max-length", async () => {
             const { action, store } = standard()
 
-            const runner = setupActionTestRunner(action.validate)
+            const runner = setupActionTestRunner(action.validate.state)
 
             await runner(async () => {
                 store.set("a".repeat(maxLength))
@@ -61,7 +61,7 @@ fields.forEach(([name, maxLength]) => {
         test("observe; has changed", async () => {
             const { action, store } = standard()
 
-            const runner = setupActionTestRunner(action.observe)
+            const runner = setupActionTestRunner(action.observe.state)
 
             await runner(async () => {
                 store.set("changed")

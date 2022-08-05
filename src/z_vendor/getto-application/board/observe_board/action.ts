@@ -1,10 +1,11 @@
-import { initApplicationState, StatefulApplicationAction } from "../../action/action"
+import { ApplicationState, initApplicationState } from "../../action/action"
 
 import { ObserveBoardFieldResult } from "../observe_field/data"
 import { ObserveBoardChecker, ObserveBoardStack, ObserveBoardStateFound } from "./infra"
 import { initObserveBoardStack } from "./init/stack"
 
-export interface ObserveBoardAction extends StatefulApplicationAction<ObserveBoardState> {
+export interface ObserveBoardAction {
+    readonly state: ApplicationState<ObserveBoardState>
     clear(): ObserveBoardState
 }
 

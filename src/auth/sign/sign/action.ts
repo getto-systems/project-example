@@ -1,6 +1,6 @@
 import {
+    ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 import { CheckAuthTicketAction } from "../../ticket/check/action"
 import { AuthenticatePasswordAction } from "../../user/password/authenticate/action"
@@ -11,7 +11,9 @@ import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
 import { SignViewType } from "../router/data"
 import { SignViewTypeDetecter } from "../router/infra"
 
-export type SignAction = StatefulApplicationAction<SignActionState>
+export interface SignAction {
+    readonly state: ApplicationState<SignActionState>
+}
 
 export interface SignViewFactory {
     check(): CheckAuthTicketAction

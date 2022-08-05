@@ -1,7 +1,6 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../../../../z_vendor/getto-application/action/action"
 import {
     initInputBoardAction,
@@ -24,8 +23,8 @@ import { BoardValueStore } from "../../../../../../z_vendor/getto-application/bo
 import { ValidateResetTokenDestinationError } from "./data"
 import { ResetTokenDestination } from "../kernel/data"
 
-export interface ResetTokenDestinationFieldAction
-    extends StatefulApplicationAction<ResetTokenDestinationFieldState> {
+export interface ResetTokenDestinationFieldAction {
+    readonly state: ApplicationState<ResetTokenDestinationFieldState>
     readonly destinationType: InputBoardAction<BoardValueStore>
     readonly email: InputBoardAction<BoardValueStore>
     readonly validate: ValidateBoardFieldAction<

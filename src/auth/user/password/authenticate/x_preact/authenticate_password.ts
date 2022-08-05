@@ -6,7 +6,7 @@ import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
 import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { loginBox } from "../../../../../z_vendor/getto-css/preact/layout/login"
 import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
@@ -33,9 +33,9 @@ type Props = Readonly<{
     authenticate: AuthenticatePasswordAction
 }>
 export function AuthenticatePassword(props: Props): VNode {
-    const state = useApplicationAction(props.authenticate)
-    const validateState = useApplicationAction(props.authenticate.validate)
-    const observeState = useApplicationAction(props.authenticate.observe)
+    const state = useApplicationState(props.authenticate.state)
+    const validateState = useApplicationState(props.authenticate.validate.state)
+    const observeState = useApplicationState(props.authenticate.observe.state)
 
     useLayoutEffect(() => {
         // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う

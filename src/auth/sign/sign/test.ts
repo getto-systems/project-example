@@ -25,7 +25,7 @@ import { AuthTicket } from "../../ticket/kernel/data"
 test("redirect password authenticate", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(async () => {
         const state = await action.state.ignitionState
@@ -45,7 +45,7 @@ test("redirect password authenticate", async () => {
 test("static privacy policy", async () => {
     const { action } = static_privacyPolicy()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(async () => {
         const state = await action.state.ignitionState
@@ -65,7 +65,7 @@ test("static privacy policy", async () => {
 test("password reset request token", async () => {
     const { action } = passwordReset_requestToken()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(async () => {
         const state = await action.state.ignitionState
@@ -85,7 +85,7 @@ test("password reset request token", async () => {
 test("password reset", async () => {
     const { action } = passwordReset_reset()
 
-    const runner = setupActionTestRunner(action)
+    const runner = setupActionTestRunner(action.state)
 
     await runner(async () => {
         return await action.state.ignitionState

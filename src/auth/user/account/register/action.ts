@@ -1,7 +1,6 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
 import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
@@ -31,8 +30,8 @@ import { RegisterAuthUserAccountError } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { AuthUserAccount } from "../kernel/data"
 
-export interface RegisterAuthUserAccountAction
-    extends StatefulApplicationAction<RegisterAuthUserAccountState> {
+export interface RegisterAuthUserAccountAction {
+    readonly state: ApplicationState<RegisterAuthUserAccountState>
     readonly list: ListRegisteredAction<AuthUserAccount>
 
     readonly loginId: LoginIdFieldAction

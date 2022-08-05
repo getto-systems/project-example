@@ -11,7 +11,7 @@ import { initSearchSidebarAction, SearchSidebarAction } from "./action"
 test("select columns", async () => {
     const { sidebar } = standard()
 
-    const runner = setupActionTestRunner(sidebar)
+    const runner = setupActionTestRunner(sidebar.state)
 
     await runner(async () => {
         await sidebar.state.ignitionState

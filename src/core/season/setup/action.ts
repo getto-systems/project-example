@@ -1,7 +1,6 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 import { initSeasonFieldAction, SeasonFieldAction } from "../input/action"
 import { LoadSeasonState } from "../load/action"
@@ -18,7 +17,8 @@ import { DetectedSeason, Season } from "../kernel/data"
 import { ConvertBoardResult } from "../../../z_vendor/getto-application/board/kernel/data"
 import { ticker } from "../../../z_lib/ui/timer/helper"
 
-export interface SetupSeasonAction extends StatefulApplicationAction<SetupSeasonState> {
+export interface SetupSeasonAction {
+    readonly state: ApplicationState<SetupSeasonState>
     readonly season: SeasonFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction

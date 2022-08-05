@@ -1,7 +1,7 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { useApplicationAction } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { box } from "../../../../z_vendor/getto-css/preact/design/box"
 import { field, fieldHelp_error } from "../../../../z_vendor/getto-css/preact/design/form"
@@ -28,11 +28,11 @@ type Props = Readonly<{
     }>
 }>
 export function SetupSeason(props: Props): VNode {
-    const state = useApplicationAction(props.setup.season)
-    const validateState = useApplicationAction(props.setup.season.validate)
-    const observeState = useApplicationAction(props.setup.season.observe)
-    const editableState = useApplicationAction(props.setup.editable)
-    const loadState = useApplicationAction(props.season)
+    const state = useApplicationState(props.setup.season.state)
+    const validateState = useApplicationState(props.setup.season.validate.state)
+    const observeState = useApplicationState(props.setup.season.observe.state)
+    const editableState = useApplicationState(props.setup.editable.state)
+    const loadState = useApplicationState(props.season.state)
 
     switch (loadState.type) {
         case "initial":

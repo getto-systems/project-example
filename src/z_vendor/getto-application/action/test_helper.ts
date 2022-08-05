@@ -1,11 +1,11 @@
-import { StatefulApplicationAction } from "./action"
+import { ApplicationState } from "./action"
 
 export interface ApplicationActionTestRunner<S> {
     (statement: { (): Promise<S> }): Promise<S[]>
 }
 
 export function setupActionTestRunner<S>(
-    action: StatefulApplicationAction<S>,
+    state: ApplicationState<S>,
 ): ApplicationActionTestRunner<S> {
     return async (statement) => {
         const stack: S[] = []
@@ -13,10 +13,10 @@ export function setupActionTestRunner<S>(
             stack.push(state)
         }
 
-        action.state.subscribe(handler)
+        state.subscribe(handler)
         await statement()
 
-        action.state.unsubscribe(handler)
+        state.unsubscribe(handler)
         return stack
     }
 }

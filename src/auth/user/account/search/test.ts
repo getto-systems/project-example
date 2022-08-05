@@ -21,7 +21,7 @@ import { AuthUserAccount } from "../kernel/data"
 test("initial load", async () => {
     const { search } = standard()
 
-    const runner = setupActionTestRunner(search)
+    const runner = setupActionTestRunner(search.state)
 
     await runner(async () => search.state.ignitionState).then((stack) => {
         expect(stack).toEqual([
@@ -34,7 +34,7 @@ test("initial load", async () => {
 test("search", async () => {
     const { search, store } = standard()
 
-    const runner = setupActionTestRunner(search)
+    const runner = setupActionTestRunner(search.state)
 
     await search.state.ignitionState
 
@@ -52,7 +52,7 @@ test("search", async () => {
 test("search; take longtime", async () => {
     const { search } = takeLongtime()
 
-    const runner = setupActionTestRunner(search)
+    const runner = setupActionTestRunner(search.state)
 
     await search.state.ignitionState
 
@@ -70,7 +70,7 @@ test("search; take longtime", async () => {
 test("sort", async () => {
     const { search } = standard()
 
-    const runner = setupActionTestRunner(search)
+    const runner = setupActionTestRunner(search.state)
 
     await search.state.ignitionState
 
@@ -107,7 +107,7 @@ test("read sort key", () => {
 test("detected", async () => {
     const { search } = detected()
 
-    const focusRunner = setupActionTestRunner(search.list.focus)
+    const focusRunner = setupActionTestRunner(search.list.focus.state)
 
     await focusRunner(async () => {
         await search.list.state.ignitionState
@@ -120,7 +120,7 @@ test("detected", async () => {
 test("focus / close", async () => {
     const { search } = standard()
 
-    const runner = setupActionTestRunner(search.list.focus)
+    const runner = setupActionTestRunner(search.list.focus.state)
 
     await runner(async () => {
         await search.list.state.ignitionState
