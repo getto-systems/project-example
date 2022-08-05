@@ -20,14 +20,14 @@ export function initApplicationState<S>(props: ApplicationStateActionProps<S>): 
     state: ApplicationState<S>
     post: Post<S>
 }> {
-    const action = new StateAction(props)
+    const action = new State(props)
     return {
         state: action,
         post: (state) => action.post(state),
     }
 }
 
-class StateAction<S> implements ApplicationState<S> {
+class State<S> implements ApplicationState<S> {
     handlers: ApplicationStateHandler<S>[] = []
 
     readonly ignitionState: Promise<S>
