@@ -1,6 +1,6 @@
 import {
     ApplicationState,
-    initApplicationStateAction,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 import {
@@ -44,7 +44,7 @@ class Action implements SearchColumnsAction {
     store: MultipleBoardValueStore
 
     constructor(infra: SearchColumnsInfra) {
-        const { state, post } = initApplicationStateAction({
+        const { state, post } = initApplicationState({
             initialState,
             ignite: () => this.load(),
         })

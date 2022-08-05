@@ -1,4 +1,4 @@
-import { initApplicationStateAction, StatefulApplicationAction } from "../../action/action"
+import { initApplicationState, StatefulApplicationAction } from "../../action/action"
 
 import { ObserveBoardFieldResult } from "../observe_field/data"
 import { ObserveBoardChecker, ObserveBoardStack, ObserveBoardStateFound } from "./infra"
@@ -27,7 +27,7 @@ export function initObserveBoardAction<N extends string>(
     const infra = {
         stack: initObserveBoardStack(),
     }
-    const { state, post } = initApplicationStateAction({ initialState })
+    const { state, post } = initApplicationState({ initialState })
     return {
         observe: { state, clear },
         observeChecker: { update },

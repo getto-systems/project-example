@@ -1,6 +1,6 @@
 import {
     ApplicationState,
-    initApplicationStateAction,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 
@@ -37,7 +37,7 @@ class Action implements LogoutAction {
     readonly post: (state: LogoutState) => LogoutState
 
     constructor(infra: LogoutInfra) {
-        const { state, post } = initApplicationStateAction({ initialState })
+        const { state, post } = initApplicationState({ initialState })
         this.infra = infra
         this.state = state
         this.post = post

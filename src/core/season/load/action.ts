@@ -1,5 +1,5 @@
 import {
-    initApplicationStateAction,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 
@@ -25,7 +25,7 @@ export type LoadSeasonState = Readonly<{ type: "initial" }> | LoadSeasonEvent
 const initialState: LoadSeasonState = { type: "initial" }
 
 export function initLoadSeasonAction(material: LoadSeasonMaterial): LoadSeasonAction {
-    const { state, post } = initApplicationStateAction({
+    const { state, post } = initApplicationState({
         initialState,
         ignite: () => load(),
     })

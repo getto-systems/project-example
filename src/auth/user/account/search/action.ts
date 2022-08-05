@@ -1,6 +1,6 @@
 import {
     ApplicationState,
-    initApplicationStateAction,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
@@ -113,7 +113,7 @@ class Action implements SearchAuthUserAccountAction {
     clear: () => void
 
     constructor(material: SearchAuthUserAccountMaterial) {
-        const { state, post } = initApplicationStateAction({
+        const { state, post } = initApplicationState({
             initialState,
             ignite: () => this.load(),
         })

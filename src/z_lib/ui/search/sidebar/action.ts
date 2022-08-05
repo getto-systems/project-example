@@ -1,6 +1,6 @@
 import {
     ApplicationState,
-    initApplicationStateAction,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
@@ -35,7 +35,7 @@ class Action implements SearchSidebarAction {
     readonly post: (state: SearchSidebarState) => SearchSidebarState
 
     constructor(infra: SearchSidebarInfra, initialExpand: SearchSidebarExpand) {
-        const { state, post } = initApplicationStateAction({
+        const { state, post } = initApplicationState({
             initialState: { type: "success", state: initialExpand },
             ignite: () => this.load(),
         })

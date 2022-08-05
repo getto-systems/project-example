@@ -16,7 +16,7 @@ export type ApplicationStateActionProps<S> = Readonly<{
     initialState: S
     ignite?: () => Promise<S>
 }>
-export function initApplicationStateAction<S>(props: ApplicationStateActionProps<S>): Readonly<{
+export function initApplicationState<S>(props: ApplicationStateActionProps<S>): Readonly<{
     state: ApplicationState<S>
     post: Post<S>
 }> {

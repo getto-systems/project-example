@@ -1,4 +1,4 @@
-import { initApplicationStateAction, StatefulApplicationAction } from "../../action/action"
+import { initApplicationState, StatefulApplicationAction } from "../../action/action"
 
 import { ObserveBoardFieldResult } from "../observe_field/data"
 import { BoardFieldObserver } from "./infra"
@@ -18,7 +18,7 @@ export type ObserveBoardFieldInfra = Readonly<{
 export function initObserveBoardFieldAction(
     infra: ObserveBoardFieldInfra,
 ): ObserveBoardFieldAction {
-    const { state, post } = initApplicationStateAction({ initialState })
+    const { state, post } = initApplicationState({ initialState })
     return { state, pin, check }
 
     function pin(): ObserveBoardFieldState {

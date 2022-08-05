@@ -1,6 +1,6 @@
 import {
     ApplicationState,
-    initApplicationStateAction,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 import { initSeasonFieldAction, SeasonFieldAction } from "../input/action"
@@ -70,7 +70,7 @@ class Action implements SetupSeasonAction {
     convert: { (): ConvertBoardResult<DetectedSeason> }
 
     constructor(material: SetupSeasonMaterial, load: LoadAction) {
-        const { state, post } = initApplicationStateAction({ initialState })
+        const { state, post } = initApplicationState({ initialState })
         this.state = state
         this.post = post
 

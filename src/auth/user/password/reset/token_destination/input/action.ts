@@ -1,6 +1,6 @@
 import {
     ApplicationState,
-    initApplicationStateAction,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../../../../z_vendor/getto-application/action/action"
 import {
@@ -64,7 +64,7 @@ class DestinationAction implements ResetTokenDestinationFieldAction {
     }>
 
     constructor() {
-        const { state, post } = initApplicationStateAction({ initialState })
+        const { state, post } = initApplicationState({ initialState })
         this.state = state
         this.post = post
 
