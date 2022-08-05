@@ -1,7 +1,7 @@
 import { checkTakeLongtime } from "../../../z_lib/ui/timer/helper"
 
 import {
-    ApplicationStateAction,
+    ApplicationState,
     initApplicationStateAction,
     StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
@@ -73,7 +73,7 @@ export function initCheckAuthTicketAction(
 
 class Action implements CheckAuthTicketAction {
     readonly material: CheckAuthTicketMaterial
-    readonly state: ApplicationStateAction<CheckAuthTicketState>
+    readonly state: ApplicationState<CheckAuthTicketState>
     readonly post: (state: CheckAuthTicketState) => CheckAuthTicketState
 
     constructor(material: CheckAuthTicketMaterial) {

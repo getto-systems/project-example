@@ -1,5 +1,5 @@
 import {
-    ApplicationStateAction,
+    ApplicationState,
     initApplicationStateAction,
     StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
@@ -57,7 +57,7 @@ export function initUnregisterAuthUserAccountAction(
 
 class Action implements UnregisterAuthUserAccountAction {
     readonly material: UnregisterAuthUserAccountMaterial
-    readonly state: ApplicationStateAction<UnregisterAuthUserAccountState>
+    readonly state: ApplicationState<UnregisterAuthUserAccountState>
     readonly post: (state: UnregisterAuthUserAccountState) => UnregisterAuthUserAccountState
 
     readonly editable: EditableBoardAction

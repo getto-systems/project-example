@@ -1,5 +1,5 @@
 import {
-    ApplicationStateAction,
+    ApplicationState,
     initApplicationStateAction,
     StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
@@ -44,7 +44,7 @@ function initPasswordCharacterAction(infra: PasswordCharacterInfra): PasswordCha
 
 class CharacterAction implements PasswordCharacterAction {
     readonly infra: PasswordCharacterInfra
-    readonly state: ApplicationStateAction<PasswordCharacterState>
+    readonly state: ApplicationState<PasswordCharacterState>
     readonly post: (state: PasswordCharacterState) => PasswordCharacterState
 
     constructor(infra: PasswordCharacterInfra) {

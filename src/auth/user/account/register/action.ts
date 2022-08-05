@@ -1,5 +1,5 @@
 import {
-    ApplicationStateAction,
+    ApplicationState,
     initApplicationStateAction,
     StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
@@ -72,7 +72,7 @@ export function initRegisterAuthUserAccountAction(
 
 class Action implements RegisterAuthUserAccountAction {
     readonly material: RegisterAuthUserAccountMaterial
-    readonly state: ApplicationStateAction<RegisterAuthUserAccountState>
+    readonly state: ApplicationState<RegisterAuthUserAccountState>
     readonly post: (state: RegisterAuthUserAccountState) => RegisterAuthUserAccountState
 
     readonly list: ListRegisteredAction<AuthUserAccount>

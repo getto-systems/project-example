@@ -1,5 +1,5 @@
 import {
-    ApplicationStateAction,
+    ApplicationState,
     initApplicationStateAction,
     StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
@@ -33,7 +33,7 @@ export type LogoutInfra = Readonly<{
 
 class Action implements LogoutAction {
     readonly infra: LogoutInfra
-    readonly state: ApplicationStateAction<LogoutState>
+    readonly state: ApplicationState<LogoutState>
     readonly post: (state: LogoutState) => LogoutState
 
     constructor(infra: LogoutInfra) {

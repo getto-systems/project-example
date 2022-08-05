@@ -1,5 +1,5 @@
 import {
-    ApplicationStateAction,
+    ApplicationState,
     initApplicationStateAction,
     StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
@@ -23,7 +23,11 @@ import { ChangePasswordError, ChangePasswordFields, OverwritePasswordFields } fr
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { LoginId } from "../../login_id/kernel/data"
 import { PrepareElementState } from "../../../../z_lib/ui/prepare/data"
-import { initModifyField, modifyField, ModifyFieldHandler } from "../../../../z_lib/ui/modify/action"
+import {
+    initModifyField,
+    modifyField,
+    ModifyFieldHandler,
+} from "../../../../z_lib/ui/modify/action"
 
 export interface ChangePasswordAction extends StatefulApplicationAction<ChangePasswordState> {
     readonly currentPassword: PasswordFieldAction
@@ -81,7 +85,7 @@ export function initChangePasswordAction(material: ChangePasswordMaterial): Chan
 
 class Action implements ChangePasswordAction {
     readonly material: ChangePasswordMaterial
-    readonly state: ApplicationStateAction<ChangePasswordState>
+    readonly state: ApplicationState<ChangePasswordState>
     readonly post: (state: ChangePasswordState) => ChangePasswordState
 
     readonly currentPassword: PasswordFieldAction
@@ -212,7 +216,7 @@ export function initOverwritePasswordAction(material: OverwritePasswordMaterial)
 
 class OverwriteAction implements OverwritePasswordAction {
     readonly material: OverwritePasswordMaterial
-    readonly state: ApplicationStateAction<OverwritePasswordState>
+    readonly state: ApplicationState<OverwritePasswordState>
     readonly post: (state: OverwritePasswordState) => OverwritePasswordState
 
     readonly newPassword: PasswordFieldAction

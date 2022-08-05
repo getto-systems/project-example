@@ -1,5 +1,5 @@
 import {
-    ApplicationStateAction,
+    ApplicationState,
     initApplicationStateAction,
     StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
@@ -58,7 +58,7 @@ interface LoadAction {
 
 class Action implements SetupSeasonAction {
     readonly material: SetupSeasonMaterial
-    readonly state: ApplicationStateAction<SetupSeasonState>
+    readonly state: ApplicationState<SetupSeasonState>
     readonly post: (state: SetupSeasonState) => SetupSeasonState
 
     readonly season: SeasonFieldAction

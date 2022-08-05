@@ -1,5 +1,5 @@
 import {
-    ApplicationStateAction,
+    ApplicationState,
     initApplicationStateAction,
     StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
@@ -31,7 +31,7 @@ export function initSearchSidebarAction(
 
 class Action implements SearchSidebarAction {
     readonly infra: SearchSidebarInfra
-    readonly state: ApplicationStateAction<SearchSidebarState>
+    readonly state: ApplicationState<SearchSidebarState>
     readonly post: (state: SearchSidebarState) => SearchSidebarState
 
     constructor(infra: SearchSidebarInfra, initialExpand: SearchSidebarExpand) {

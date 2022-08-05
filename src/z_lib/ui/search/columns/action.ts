@@ -1,5 +1,5 @@
 import {
-    ApplicationStateAction,
+    ApplicationState,
     initApplicationStateAction,
     StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
@@ -36,7 +36,7 @@ export function initSearchColumnsAction(infra: SearchColumnsInfra): SearchColumn
 
 class Action implements SearchColumnsAction {
     readonly infra: SearchColumnsInfra
-    readonly state: ApplicationStateAction<SearchColumnsState>
+    readonly state: ApplicationState<SearchColumnsState>
     readonly post: (state: SearchColumnsState) => SearchColumnsState
 
     readonly input: InputBoardAction<MultipleBoardValueStore>

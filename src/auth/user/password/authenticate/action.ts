@@ -1,5 +1,5 @@
 import {
-    ApplicationStateAction,
+    ApplicationState,
     initApplicationStateAction,
     StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
@@ -77,7 +77,7 @@ export function initAuthenticatePasswordAction(
 
 class Action implements AuthenticatePasswordAction {
     readonly material: AuthenticatePasswordMaterial
-    readonly state: ApplicationStateAction<AuthenticatePasswordState>
+    readonly state: ApplicationState<AuthenticatePasswordState>
     readonly post: (state: AuthenticatePasswordState) => AuthenticatePasswordState
 
     readonly loginId: LoginIdFieldAction

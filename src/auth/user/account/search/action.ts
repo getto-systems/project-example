@@ -1,5 +1,5 @@
 import {
-    ApplicationStateAction,
+    ApplicationState,
     initApplicationStateAction,
     StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
@@ -98,7 +98,7 @@ export function initSearchAuthUserAccountAction(
 
 class Action implements SearchAuthUserAccountAction {
     readonly material: SearchAuthUserAccountMaterial
-    readonly state: ApplicationStateAction<SearchAuthUserAccountState>
+    readonly state: ApplicationState<SearchAuthUserAccountState>
     readonly post: (state: SearchAuthUserAccountState) => SearchAuthUserAccountState
 
     readonly list: ListSearchedAuthUserAccountAction
