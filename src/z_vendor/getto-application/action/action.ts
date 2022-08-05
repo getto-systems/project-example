@@ -12,11 +12,11 @@ export interface ApplicationStateHandler<S> {
     (state: S): void
 }
 
-export type ApplicationStateActionProps<S> = Readonly<{
+export type ApplicationStateProps<S> = Readonly<{
     initialState: S
     ignite?: () => Promise<S>
 }>
-export function initApplicationState<S>(props: ApplicationStateActionProps<S>): Readonly<{
+export function initApplicationState<S>(props: ApplicationStateProps<S>): Readonly<{
     state: ApplicationState<S>
     post: Post<S>
 }> {
@@ -33,7 +33,7 @@ class State<S> implements ApplicationState<S> {
     readonly ignitionState: Promise<S>
     state: S
 
-    constructor(props: ApplicationStateActionProps<S>) {
+    constructor(props: ApplicationStateProps<S>) {
         this.ignitionState = ignite()
         this.state = props.initialState
 
