@@ -1,4 +1,4 @@
-import { initApplicationStateAction, StatefulApplicationAction } from "../../action/action"
+import { initApplicationState, StatefulApplicationAction } from "../../action/action"
 
 import { ValidateBoardFieldResult } from "../validate_field/data"
 
@@ -19,7 +19,7 @@ export type ValidateBoardFieldInfra<T, E> = Readonly<{
 export function initValidateBoardFieldAction<T, E>(
     infra: ValidateBoardFieldInfra<T, E>,
 ): ValidateBoardFieldAction<T, E> {
-    const { state, post } = initApplicationStateAction<ValidateBoardFieldState<T, E>>({
+    const { state, post } = initApplicationState<ValidateBoardFieldState<T, E>>({
         initialState: { type: "initial" },
     })
     return { state, check, clear }

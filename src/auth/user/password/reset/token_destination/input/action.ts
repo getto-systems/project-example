@@ -1,6 +1,6 @@
 import {
-    ApplicationStateAction,
-    initApplicationStateAction,
+    ApplicationState,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../../../../z_vendor/getto-application/action/action"
 import {
@@ -47,7 +47,7 @@ export function initResetTokenDestinationFieldAction(): ResetTokenDestinationFie
 }
 
 class DestinationAction implements ResetTokenDestinationFieldAction {
-    readonly state: ApplicationStateAction<ResetTokenDestinationFieldState>
+    readonly state: ApplicationState<ResetTokenDestinationFieldState>
     readonly post: (state: ResetTokenDestinationFieldState) => ResetTokenDestinationFieldState
 
     readonly destinationType: InputBoardAction<BoardValueStore>
@@ -64,7 +64,7 @@ class DestinationAction implements ResetTokenDestinationFieldAction {
     }>
 
     constructor() {
-        const { state, post } = initApplicationStateAction({ initialState })
+        const { state, post } = initApplicationState({ initialState })
         this.state = state
         this.post = post
 

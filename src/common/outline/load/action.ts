@@ -1,6 +1,6 @@
 import {
-    ApplicationStateAction,
-    initApplicationStateAction,
+    ApplicationState,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 
@@ -137,11 +137,11 @@ export function initLoadMenuAction(material: LoadMenuMaterial): LoadMenuAction {
 
 class Action implements LoadMenuAction {
     readonly material: LoadMenuMaterial
-    readonly state: ApplicationStateAction<LoadMenuState>
+    readonly state: ApplicationState<LoadMenuState>
     readonly post: (state: LoadMenuState) => LoadMenuState
 
     constructor(material: LoadMenuMaterial) {
-        const { state, post } = initApplicationStateAction({
+        const { state, post } = initApplicationState({
             initialState,
             ignite: () => this.load(),
         })

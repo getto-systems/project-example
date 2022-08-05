@@ -1,6 +1,6 @@
 import {
-    ApplicationStateAction,
-    initApplicationStateAction,
+    ApplicationState,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../../../../z_vendor/getto-application/action/action"
 
@@ -77,7 +77,7 @@ export function initChangeResetTokenDestinationAction(
 
 class Action implements ChangeResetTokenDestinationAction {
     readonly material: ChangeResetTokenDestinationMaterial
-    readonly state: ApplicationStateAction<ChangeResetTokenDestinationState>
+    readonly state: ApplicationState<ChangeResetTokenDestinationState>
     readonly post: (state: ChangeResetTokenDestinationState) => ChangeResetTokenDestinationState
 
     readonly destination: ResetTokenDestinationFieldAction
@@ -91,7 +91,7 @@ class Action implements ChangeResetTokenDestinationAction {
     readonly reset: () => void
 
     constructor(material: ChangeResetTokenDestinationMaterial) {
-        const { state, post } = initApplicationStateAction({ initialState })
+        const { state, post } = initApplicationState({ initialState })
         this.material = material
         this.state = state
         this.post = post

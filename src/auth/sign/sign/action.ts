@@ -1,5 +1,5 @@
 import {
-    initApplicationStateAction,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 import { CheckAuthTicketAction } from "../../ticket/check/action"
@@ -39,7 +39,7 @@ export type SignActionShell = Readonly<{
 }>
 
 export function initSignAction(shell: SignActionShell, factory: SignViewFactory): SignAction {
-    const { state, post } = initApplicationStateAction({ initialState, ignite })
+    const { state, post } = initApplicationState({ initialState, ignite })
     return { state }
 
     async function ignite(): Promise<SignActionState> {

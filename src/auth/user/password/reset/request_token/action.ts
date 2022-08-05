@@ -1,8 +1,8 @@
 import { checkTakeLongtime } from "../../../../../z_lib/ui/timer/helper"
 
 import {
-    ApplicationStateAction,
-    initApplicationStateAction,
+    ApplicationState,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../../../z_vendor/getto-application/action/action"
 
@@ -57,7 +57,7 @@ export function initRequestResetTokenAction(
 
 class Action implements RequestResetTokenAction {
     readonly material: RequestResetTokenMaterial
-    readonly state: ApplicationStateAction<RequestResetTokenState>
+    readonly state: ApplicationState<RequestResetTokenState>
     readonly post: (state: RequestResetTokenState) => RequestResetTokenState
 
     readonly loginId: LoginIdFieldAction
@@ -69,7 +69,7 @@ class Action implements RequestResetTokenAction {
     clear: () => void
 
     constructor(material: RequestResetTokenMaterial) {
-        const { state, post } = initApplicationStateAction({ initialState })
+        const { state, post } = initApplicationState({ initialState })
         this.material = material
         this.state = state
         this.post = post

@@ -1,4 +1,4 @@
-import { initApplicationStateAction, StatefulApplicationAction } from "../../action/action"
+import { initApplicationState, StatefulApplicationAction } from "../../action/action"
 
 import { initValidateBoardStack } from "./init/stack"
 
@@ -39,7 +39,7 @@ export function initValidateBoardAction<N extends string, T>(
     const infra = {
         stack: initValidateBoardStack(),
     }
-    const { state, post } = initApplicationStateAction({ initialState })
+    const { state, post } = initApplicationState({ initialState })
     return {
         validate: { state, clear },
         validateChecker: { update, get },

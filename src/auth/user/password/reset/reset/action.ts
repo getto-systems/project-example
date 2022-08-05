@@ -1,6 +1,6 @@
 import {
-    ApplicationStateAction,
-    initApplicationStateAction,
+    ApplicationState,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../../../z_vendor/getto-application/action/action"
 
@@ -78,7 +78,7 @@ export function initResetPasswordAction(material: ResetPasswordMaterial): ResetP
 
 class Action implements ResetPasswordAction {
     readonly material: ResetPasswordMaterial
-    readonly state: ApplicationStateAction<ResetPasswordState>
+    readonly state: ApplicationState<ResetPasswordState>
     readonly post: (state: ResetPasswordState) => ResetPasswordState
 
     readonly loginId: LoginIdFieldAction
@@ -90,7 +90,7 @@ class Action implements ResetPasswordAction {
     clear: () => void
 
     constructor(material: ResetPasswordMaterial) {
-        const { state, post } = initApplicationStateAction({ initialState })
+        const { state, post } = initApplicationState({ initialState })
         this.material = material
         this.state = state
         this.post = post

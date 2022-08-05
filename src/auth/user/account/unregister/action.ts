@@ -1,6 +1,6 @@
 import {
-    ApplicationStateAction,
-    initApplicationStateAction,
+    ApplicationState,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 import { EditableBoardAction } from "../../../../z_vendor/getto-application/board/editable/action"
@@ -57,7 +57,7 @@ export function initUnregisterAuthUserAccountAction(
 
 class Action implements UnregisterAuthUserAccountAction {
     readonly material: UnregisterAuthUserAccountMaterial
-    readonly state: ApplicationStateAction<UnregisterAuthUserAccountState>
+    readonly state: ApplicationState<UnregisterAuthUserAccountState>
     readonly post: (state: UnregisterAuthUserAccountState) => UnregisterAuthUserAccountState
 
     readonly editable: EditableBoardAction
@@ -66,7 +66,7 @@ class Action implements UnregisterAuthUserAccountAction {
     readonly handler: ModifyFieldHandler<UnregisterAuthUserAccountEntry>
 
     constructor(material: UnregisterAuthUserAccountMaterial) {
-        const { state, post } = initApplicationStateAction({ initialState })
+        const { state, post } = initApplicationState({ initialState })
         this.material = material
         this.state = state
         this.post = post

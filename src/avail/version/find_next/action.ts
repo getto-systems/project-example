@@ -1,5 +1,5 @@
 import {
-    initApplicationStateAction,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 
@@ -46,7 +46,7 @@ export type FindNextVersionConfig = Readonly<{
 export function initFindNextVersionAction(
     material: FindNextVersionMaterial,
 ): FindNextVersionAction {
-    const { state, post } = initApplicationStateAction({
+    const { state, post } = initApplicationState({
         initialState,
         ignite: (): Promise<FindNextVersionState> => findNextVersion(material, post),
     })

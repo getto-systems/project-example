@@ -1,6 +1,6 @@
 import {
-    ApplicationStateAction,
-    initApplicationStateAction,
+    ApplicationState,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
@@ -69,7 +69,7 @@ export function initOverwriteLoginIdAction(material: OverwriteLoginIdMaterial): 
 
 class OverwriteAction implements OverwriteLoginIdAction {
     readonly material: OverwriteLoginIdMaterial
-    readonly state: ApplicationStateAction<OverwriteLoginIdState>
+    readonly state: ApplicationState<OverwriteLoginIdState>
     readonly post: (state: OverwriteLoginIdState) => OverwriteLoginIdState
 
     readonly newLoginId: LoginIdFieldAction
@@ -83,7 +83,7 @@ class OverwriteAction implements OverwriteLoginIdAction {
     readonly reset: () => void
 
     constructor(material: OverwriteLoginIdMaterial) {
-        const { state, post } = initApplicationStateAction({ initialState })
+        const { state, post } = initApplicationState({ initialState })
         this.material = material
         this.state = state
         this.post = post

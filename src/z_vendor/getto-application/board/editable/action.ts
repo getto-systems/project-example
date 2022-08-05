@@ -1,4 +1,4 @@
-import { initApplicationStateAction, StatefulApplicationAction } from "../../action/action"
+import { initApplicationState, StatefulApplicationAction } from "../../action/action"
 
 export interface EditableBoardAction extends StatefulApplicationAction<EditableBoardState> {
     open(): EditableBoardState
@@ -12,7 +12,7 @@ const initialState: EditableBoardState = { isEditable: false }
 export function initEditableBoardAction(
     defaultState: EditableBoardState = initialState,
 ): EditableBoardAction {
-    const { state, post } = initApplicationStateAction({ initialState: defaultState })
+    const { state, post } = initApplicationState({ initialState: defaultState })
     return {
         state,
         open(): EditableBoardState {

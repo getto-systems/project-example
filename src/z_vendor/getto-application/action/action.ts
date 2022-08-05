@@ -1,8 +1,8 @@
 export type StatefulApplicationAction<S> = Readonly<{
-    state: ApplicationStateAction<S>
+    state: ApplicationState<S>
 }>
 
-export interface ApplicationStateAction<S> {
+export interface ApplicationState<S> {
     readonly ignitionState: Promise<S>
     subscribe(handler: ApplicationStateHandler<S>): void
     unsubscribe(target: ApplicationStateHandler<S>): void
@@ -12,28 +12,28 @@ export interface ApplicationStateHandler<S> {
     (state: S): void
 }
 
-export type ApplicationStateActionProps<S> = Readonly<{
+export type ApplicationStateProps<S> = Readonly<{
     initialState: S
     ignite?: () => Promise<S>
 }>
-export function initApplicationStateAction<S>(props: ApplicationStateActionProps<S>): Readonly<{
-    state: ApplicationStateAction<S>
+export function initApplicationState<S>(props: ApplicationStateProps<S>): Readonly<{
+    state: ApplicationState<S>
     post: Post<S>
 }> {
-    const action = new StateAction(props)
+    const action = new State(props)
     return {
         state: action,
         post: (state) => action.post(state),
     }
 }
 
-class StateAction<S> implements ApplicationStateAction<S> {
+class State<S> implements ApplicationState<S> {
     handlers: ApplicationStateHandler<S>[] = []
 
     readonly ignitionState: Promise<S>
     state: S
 
-    constructor(props: ApplicationStateActionProps<S>) {
+    constructor(props: ApplicationStateProps<S>) {
         this.ignitionState = ignite()
         this.state = props.initialState
 

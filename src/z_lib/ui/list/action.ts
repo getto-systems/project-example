@@ -1,5 +1,5 @@
 import {
-    initApplicationStateAction,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 import { ModifyFieldHandler } from "../modify/action"
@@ -190,7 +190,7 @@ function initListAction<T, S>(
 }> {
     let element: ListState<S> = { isLoad: false }
 
-    const { state, post } = initApplicationStateAction<ListState<S>>({
+    const { state, post } = initApplicationState<ListState<S>>({
         initialState: element,
         ignite: props.ignite,
     })
@@ -276,7 +276,7 @@ function initFocus<T, S>(
     action: FocusAction<T, S> & StatefulApplicationAction<FocusState<T> | S>
     handler: FocusHandler<T, S>
 }> {
-    const { state, post } = initApplicationStateAction<FocusState<T> | S>({
+    const { state, post } = initApplicationState<FocusState<T> | S>({
         initialState: { type: "close" },
     })
 

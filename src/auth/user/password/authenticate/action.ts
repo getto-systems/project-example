@@ -1,6 +1,6 @@
 import {
-    ApplicationStateAction,
-    initApplicationStateAction,
+    ApplicationState,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
@@ -77,7 +77,7 @@ export function initAuthenticatePasswordAction(
 
 class Action implements AuthenticatePasswordAction {
     readonly material: AuthenticatePasswordMaterial
-    readonly state: ApplicationStateAction<AuthenticatePasswordState>
+    readonly state: ApplicationState<AuthenticatePasswordState>
     readonly post: (state: AuthenticatePasswordState) => AuthenticatePasswordState
 
     readonly loginId: LoginIdFieldAction
@@ -89,7 +89,7 @@ class Action implements AuthenticatePasswordAction {
     clear: () => void
 
     constructor(material: AuthenticatePasswordMaterial) {
-        const { state, post } = initApplicationStateAction({ initialState })
+        const { state, post } = initApplicationState({ initialState })
         this.material = material
         this.state = state
         this.post = post

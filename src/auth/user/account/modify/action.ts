@@ -1,6 +1,6 @@
 import {
-    ApplicationStateAction,
-    initApplicationStateAction,
+    ApplicationState,
+    initApplicationState,
     StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
@@ -80,7 +80,7 @@ export function initModifyAuthUserAccountAction(material: ModifyAuthUserAccountM
 
 class Action implements ModifyAuthUserAccountAction {
     readonly material: ModifyAuthUserAccountMaterial
-    readonly state: ApplicationStateAction<ModifyAuthUserAccountState>
+    readonly state: ApplicationState<ModifyAuthUserAccountState>
     readonly post: (state: ModifyAuthUserAccountState) => ModifyAuthUserAccountState
 
     readonly memo: AuthUserTextFieldAction<"memo">
@@ -95,7 +95,7 @@ class Action implements ModifyAuthUserAccountAction {
     readonly reset: () => void
 
     constructor(material: ModifyAuthUserAccountMaterial) {
-        const { state, post } = initApplicationStateAction({ initialState })
+        const { state, post } = initApplicationState({ initialState })
         this.material = material
         this.state = state
         this.post = post
