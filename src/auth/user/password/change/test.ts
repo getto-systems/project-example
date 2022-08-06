@@ -19,8 +19,7 @@ test("submit valid current-password and new-password", async () => {
             store.currentPassword.set(VALID_PASSWORD.currentPassword)
             store.newPassword.set(VALID_PASSWORD.newPassword)
 
-            // TODO submit(onSuccess <= これいらない)
-            return change.submit(() => null)
+            return change.submit()
         }),
     ).toEqual([{ type: "try", hasTakenLongtime: false }, { type: "success" }, { type: "initial" }])
 })
@@ -34,8 +33,7 @@ test("submit valid login-id and password; take long time", async () => {
             store.currentPassword.set(VALID_PASSWORD.currentPassword)
             store.newPassword.set(VALID_PASSWORD.newPassword)
 
-            // TODO submit(onSuccess <= これいらない)
-            return change.submit(() => null)
+            return change.submit()
         }),
     ).toEqual([
         { type: "try", hasTakenLongtime: false },
@@ -50,8 +48,7 @@ test("submit without fields", async () => {
 
     expect(
         await observeApplicationState(change.state, async () => {
-            // TODO submit(onSuccess <= これいらない)
-            return change.submit(() => null)
+            return change.submit()
         }),
     ).toEqual([])
 })

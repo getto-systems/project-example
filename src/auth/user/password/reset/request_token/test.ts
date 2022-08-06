@@ -17,8 +17,7 @@ test("submit valid login-id", async () => {
         await observeApplicationState(action.state, async () => {
             store.loginId.set(VALID_LOGIN.loginId)
 
-            // TODO submit(onSuccess <= これいらない)
-            return action.submit(() => null)
+            return action.submit()
         }),
     ).toEqual([{ type: "try", hasTakenLongtime: false }, { type: "success" }])
 })
@@ -31,8 +30,7 @@ test("submit valid login-id; with take longtime", async () => {
         await observeApplicationState(action.state, async () => {
             store.loginId.set(VALID_LOGIN.loginId)
 
-            // TODO submit(onSuccess <= これいらない)
-            return action.submit(() => null)
+            return action.submit()
         }),
     ).toEqual([
         { type: "try", hasTakenLongtime: false },
@@ -46,8 +44,7 @@ test("submit without fields", async () => {
 
     expect(
         await observeApplicationState(action.state, async () => {
-            // TODO submit(onSuccess <= これいらない)
-            return action.submit(() => null)
+            return action.submit()
         }),
     ).toEqual([])
 })

@@ -38,7 +38,7 @@ export interface ChangePasswordAction {
 
     edit(): void
     clear(): void
-    submit(onSuccess: { (): void }): Promise<ChangePasswordState>
+    submit(): Promise<ChangePasswordState>
 }
 
 export type ChangePasswordState = ChangePasswordEvent
@@ -139,26 +139,32 @@ class Action implements ChangePasswordAction {
         this.observe = observe
         this.convert = convert
         this.clear = clear
+
+        this.onSuccess(() => {
+            this.editable.close()
+        })
+    }
+
+    onSuccess(handler: () => void): void {
+        this.state.subscribe((state) => {
+            switch (state.type) {
+                case "success":
+                    handler()
+                    break
+            }
+        })
     }
 
     edit(): void {
         this.editable.open()
         this.clear()
     }
-    async submit(onSuccess: { (): void }): Promise<ChangePasswordState> {
+    async submit(): Promise<ChangePasswordState> {
         const fields = this.convert()
         if (!fields.valid) {
             return this.state.currentState()
         }
-        return changePassword(
-            this.material,
-            fields.value,
-            () => {
-                this.editable.close()
-                onSuccess()
-            },
-            this.post,
-        )
+        return changePassword(this.material, fields.value, this.post)
     }
 }
 
@@ -171,7 +177,6 @@ type ChangePasswordEvent =
 async function changePassword<S>(
     { infra, config }: ChangePasswordMaterial,
     fields: ChangePasswordFields,
-    onSuccess: { (): void },
     post: Post<ChangePasswordEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
@@ -188,7 +193,6 @@ async function changePassword<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    onSuccess()
     post({ type: "success" })
     return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }

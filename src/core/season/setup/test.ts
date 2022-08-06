@@ -25,8 +25,7 @@ test("setup season", async () => {
         await observeApplicationState(setupSeason.state, async () => {
             store.season.set("2021.summer")
 
-            // TODO setup(onSuccess <= これいらない)
-            return setupSeason.setup(() => null)
+            return setupSeason.setup()
         }),
     ).toEqual([{ type: "success" }, { type: "initial" }])
 })
@@ -36,8 +35,7 @@ test("setup season; default", async () => {
 
     expect(
         await observeApplicationState(setupSeason.state, async () => {
-            // TODO setup(onSuccess <= これいらない)
-            return setupSeason.setup(() => null)
+            return setupSeason.setup()
         }),
     ).toEqual([{ type: "success" }, { type: "initial" }])
 })

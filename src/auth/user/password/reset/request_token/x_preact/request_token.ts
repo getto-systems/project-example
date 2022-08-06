@@ -83,11 +83,7 @@ export function RequestResetToken(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.requestToken.submit(onSuccess)
-
-            function onSuccess() {
-                // noop
-            }
+            props.requestToken.submit()
         }
     }
 

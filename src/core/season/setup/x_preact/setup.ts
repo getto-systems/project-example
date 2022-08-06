@@ -16,21 +16,17 @@ import { seasonLabel } from "../../kernel/helper"
 
 import { LoadSeasonAction } from "../../load/action"
 import { SetupSeasonAction } from "../action"
-import { EditableBoardAction } from "../../../../z_vendor/getto-application/board/editable/action"
 
 import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 
 type Props = Readonly<{
     season: LoadSeasonAction
-    setup: Readonly<{
-        season: SetupSeasonAction
-        editable: EditableBoardAction
-    }>
+    setup: SetupSeasonAction
 }>
 export function SetupSeason(props: Props): VNode {
-    const state = useApplicationState(props.setup.season.state)
-    const validateState = useApplicationState(props.setup.season.validate.state)
-    const observeState = useApplicationState(props.setup.season.observe.state)
+    const state = useApplicationState(props.setup.state)
+    const validateState = useApplicationState(props.setup.validate.state)
+    const observeState = useApplicationState(props.setup.observe.state)
     const editableState = useApplicationState(props.setup.editable.state)
     const loadState = useApplicationState(props.season.state)
 
@@ -47,7 +43,7 @@ export function SetupSeason(props: Props): VNode {
                           body: [
                               h(InputSeason, {
                                   title: "シーズン",
-                                  field: props.setup.season.season,
+                                  field: props.setup.season,
                                   seasons: loadState.availableSeasons,
                               }),
                           ],
@@ -89,11 +85,7 @@ export function SetupSeason(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.setup.season.setup(onSuccess)
-
-            function onSuccess() {
-                props.setup.editable.close()
-            }
+            props.setup.setup()
         }
     }
 
