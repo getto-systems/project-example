@@ -1,5 +1,5 @@
 import { test, expect } from "vitest"
-import { setupActionTestRunner } from "../../../z_vendor/getto-application/action/test_helper"
+import { observeApplicationState } from "../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../z_lib/ui/timer/helper"
 
 import { ClockPubSub, mockClock, mockClockPubSub } from "../../../z_lib/ui/clock/mock"
@@ -40,58 +40,48 @@ const CONTINUOUS_RENEW_AT = [
 test("instant load", async () => {
     const { clock, action } = instantLoadable()
 
-    const runner = setupActionTestRunner(action.state)
-
-    await runner(() => action.state.ignitionState).then((stack) => {
-        expect(stack).toEqual([
-            {
-                type: "try-to-instant-load",
-                scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
-            },
-        ])
-    })
-
-    clock.update(CONTINUOUS_RENEW_START_AT)
-
-    await runner(() => action.succeedToInstantLoad()).then((stack) => {
-        expect(stack).toEqual([
-            { type: "succeed-to-start-continuous-renew", continue: true },
-            { type: "succeed-to-renew", continue: true },
-            { type: "succeed-to-renew", continue: true },
-            { type: "succeed-to-renew", continue: true },
-            { type: "required-to-login", continue: false },
-        ])
-    })
+    expect(
+        await observeApplicationState(action.state, async () => {
+            await action.state.ignitionState
+            clock.update(CONTINUOUS_RENEW_START_AT)
+            return action.succeedToInstantLoad()
+        }),
+    ).toEqual([
+        {
+            type: "try-to-instant-load",
+            scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
+        },
+        { type: "succeed-to-start-continuous-renew", continue: true },
+        { type: "succeed-to-renew", continue: true },
+        { type: "succeed-to-renew", continue: true },
+        { type: "succeed-to-renew", continue: true },
+        { type: "required-to-login", continue: false },
+    ])
 })
 
 test("instant load failed", async () => {
     const { clock, action } = instantLoadable()
 
-    const runner = setupActionTestRunner(action.state)
-
-    await runner(() => action.state.ignitionState).then((stack) => {
-        expect(stack).toEqual([
-            {
-                type: "try-to-instant-load",
-                scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
-            },
-        ])
-    })
-
-    clock.update(CONTINUOUS_RENEW_START_AT)
-
-    await runner(() => action.failedToInstantLoad()).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try-to-renew", hasTakenLongtime: false },
-            {
-                type: "try-to-load",
-                scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
-            },
-            { type: "succeed-to-renew", continue: true },
-            { type: "succeed-to-renew", continue: true },
-            { type: "required-to-login", continue: false },
-        ])
-    })
+    expect(
+        await observeApplicationState(action.state, async () => {
+            await action.state.ignitionState
+            clock.update(CONTINUOUS_RENEW_START_AT)
+            return action.failedToInstantLoad()
+        }),
+    ).toEqual([
+        {
+            type: "try-to-instant-load",
+            scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
+        },
+        { type: "try-to-renew", hasTakenLongtime: false },
+        {
+            type: "try-to-load",
+            scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
+        },
+        { type: "succeed-to-renew", continue: true },
+        { type: "succeed-to-renew", continue: true },
+        { type: "required-to-login", continue: false },
+    ])
 })
 
 test("renew stored credential", async () => {
@@ -105,20 +95,20 @@ test("renew stored credential", async () => {
         }
     })
 
-    const runner = setupActionTestRunner(action.state)
-
-    await runner(() => action.state.ignitionState).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try-to-renew", hasTakenLongtime: false },
-            {
-                type: "try-to-load",
-                scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
-            },
-            { type: "succeed-to-renew", continue: true },
-            { type: "succeed-to-renew", continue: true },
-            { type: "required-to-login", continue: false },
-        ])
-    })
+    expect(
+        await observeApplicationState(action.state, async () => {
+            return action.state.ignitionState
+        }),
+    ).toEqual([
+        { type: "try-to-renew", hasTakenLongtime: false },
+        {
+            type: "try-to-load",
+            scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
+        },
+        { type: "succeed-to-renew", continue: true },
+        { type: "succeed-to-renew", continue: true },
+        { type: "required-to-login", continue: false },
+    ])
 })
 
 test("renew stored credential; take long time", async () => {
@@ -133,44 +123,44 @@ test("renew stored credential; take long time", async () => {
         }
     })
 
-    const runner = setupActionTestRunner(action.state)
-
-    await runner(() => action.state.ignitionState).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try-to-renew", hasTakenLongtime: false },
-            { type: "try-to-renew", hasTakenLongtime: true },
-            {
-                type: "try-to-load",
-                scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
-            },
-            { type: "succeed-to-renew", continue: true },
-            { type: "succeed-to-renew", continue: true },
-            { type: "required-to-login", continue: false },
-        ])
-    })
+    expect(
+        await observeApplicationState(action.state, async () => {
+            return action.state.ignitionState
+        }),
+    ).toEqual([
+        { type: "try-to-renew", hasTakenLongtime: false },
+        { type: "try-to-renew", hasTakenLongtime: true },
+        {
+            type: "try-to-load",
+            scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
+        },
+        { type: "succeed-to-renew", continue: true },
+        { type: "succeed-to-renew", continue: true },
+        { type: "required-to-login", continue: false },
+    ])
 })
 
 test("renew without stored credential", async () => {
     // empty credential
     const { action } = noStored()
 
-    const runner = setupActionTestRunner(action.state)
-
-    await runner(() => action.state.ignitionState).then((stack) => {
-        expect(stack).toEqual([{ type: "required-to-login" }])
-    })
+    expect(
+        await observeApplicationState(action.state, async () => {
+            return action.state.ignitionState
+        }),
+    ).toEqual([{ type: "required-to-login" }])
 })
 
 test("load error", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action.state)
-
     const err: LoadScriptError = { type: "infra-error", err: "load error" }
 
-    await runner(() => action.loadError(err)).then((stack) => {
-        expect(stack).toEqual([{ type: "load-error", err }])
-    })
+    expect(
+        await observeApplicationState(action.state, async () => {
+            return action.loadError(err)
+        }),
+    ).toEqual([{ type: "load-error", err }])
 })
 
 function standard() {

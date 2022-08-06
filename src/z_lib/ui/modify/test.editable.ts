@@ -1,34 +1,34 @@
 import { test, expect } from "vitest"
 
-import { setupActionTestRunner } from "../../../z_vendor/getto-application/action/test_helper"
+import { observeApplicationState } from "../../../z_vendor/getto-application/action/test_helper"
 
 import { EditableDataProps, initEditableDataHandler } from "./action"
 
 test("focus / update / close", async () => {
     const { editable, data, handler } = standard()
 
-    const runner = setupActionTestRunner(editable.state)
+    const item: Data = { id: 1, name: "name" }
+    const updatedItem: Data = { id: 1, name: "updated-name" }
 
-    await runner(async () => {
-        const item: Data = { id: 1, name: "name" }
-        const updatedItem: Data = { id: 1, name: "updated-name" }
+    expect(
+        await observeApplicationState(editable.state, async () => {
+            await editable.state.ignitionState
 
-        expect(data()).toEqual({ isLoad: false })
+            expect(data()).toEqual({ isLoad: false })
 
-        handler.focus(item)
-        expect(data()).toEqual({ isLoad: true, data: item })
+            handler.focus(item)
+            expect(data()).toEqual({ isLoad: true, data: item })
 
-        editable.open()
-        handler.update(updatedItem)
-        expect(data()).toEqual({ isLoad: true, data: updatedItem })
+            editable.open()
+            handler.update(updatedItem)
+            expect(data()).toEqual({ isLoad: true, data: updatedItem })
 
-        handler.close()
-        expect(data()).toEqual({ isLoad: false })
+            handler.close()
+            expect(data()).toEqual({ isLoad: false })
 
-        return editable.state.ignitionState
-    }).then((stack) => {
-        expect(stack).toEqual([{ isEditable: false }, { isEditable: true }, { isEditable: false }])
-    })
+            return editable.state.currentState()
+        }),
+    ).toEqual([{ isEditable: false }, { isEditable: true }, { isEditable: false }])
 })
 
 function standard(): EditableDataProps<Data> {

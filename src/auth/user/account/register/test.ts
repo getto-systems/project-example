@@ -1,5 +1,5 @@
 import { test, expect } from "vitest"
-import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
+import { observeApplicationState } from "../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 import {
     mockBoardValueStore,
@@ -22,68 +22,65 @@ const VALID_INFO = {
 } as const
 
 test("submit valid info", async () => {
-    const { resource, store } = standard()
+    const { register, store } = standard()
 
-    const runner = setupActionTestRunner(resource.register.state)
+    expect(
+        await observeApplicationState(register.state, async () => {
+            store.loginId.set(VALID_INFO.loginId)
+            store.grantedRoles.set(VALID_INFO.grantedRoles)
+            store.resetTokenDestinationType.set("email")
+            store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
+            store.memo.set(VALID_INFO.memo)
 
-    await runner(async () => {
-        store.loginId.set(VALID_INFO.loginId)
-        store.grantedRoles.set(VALID_INFO.grantedRoles)
-        store.resetTokenDestinationType.set("email")
-        store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
-
-        return resource.register.submit()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            {
-                type: "success",
-                entry: {
-                    loginId: "login-id",
-                    grantedRoles: ["auth-user"],
-                    resetTokenDestination: { type: "email", email: "user@example.com" },
-                    memo: "",
-                },
+            return register.submit()
+        }),
+    ).toEqual([
+        { type: "try", hasTakenLongtime: false },
+        {
+            type: "success",
+            entry: {
+                loginId: "login-id",
+                grantedRoles: ["auth-user"],
+                resetTokenDestination: { type: "email", email: "user@example.com" },
+                memo: "memo",
             },
-            { type: "initial" },
-        ])
-    })
+        },
+        { type: "initial" },
+    ])
 })
 
 test("submit valid login-id; take long time", async () => {
     // wait for take longtime timeout
-    const { resource, store } = takeLongtime_elements()
+    const { register, store } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(resource.register.state)
+    expect(
+        await observeApplicationState(register.state, async () => {
+            store.loginId.set(VALID_INFO.loginId)
+            store.grantedRoles.set(VALID_INFO.grantedRoles)
+            store.resetTokenDestinationType.set("email")
+            store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
+            store.memo.set(VALID_INFO.memo)
 
-    await runner(() => {
-        store.loginId.set(VALID_INFO.loginId)
-        store.grantedRoles.set(VALID_INFO.grantedRoles)
-        store.resetTokenDestinationType.set("email")
-        store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
-        store.memo.set(VALID_INFO.memo)
-
-        return resource.register.submit()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            { type: "try", hasTakenLongtime: true },
-            {
-                type: "success",
-                entry: {
-                    loginId: "login-id",
-                    grantedRoles: ["auth-user"],
-                    resetTokenDestination: { type: "email", email: "user@example.com" },
-                    memo: "memo",
-                },
+            return register.submit()
+        }),
+    ).toEqual([
+        { type: "try", hasTakenLongtime: false },
+        { type: "try", hasTakenLongtime: true },
+        {
+            type: "success",
+            entry: {
+                loginId: "login-id",
+                grantedRoles: ["auth-user"],
+                resetTokenDestination: { type: "email", email: "user@example.com" },
+                memo: "memo",
             },
-            { type: "initial" },
-        ])
-    })
+        },
+        { type: "initial" },
+    ])
 })
 
 test("clear", () => {
-    const { resource, store } = standard()
+    const { register, store } = standard()
 
     store.loginId.set(VALID_INFO.loginId)
     store.grantedRoles.set(VALID_INFO.grantedRoles)
@@ -91,7 +88,7 @@ test("clear", () => {
     store.resetTokenDestinationEmail.set(VALID_INFO.resetTokenDestinationEmail)
     store.memo.set(VALID_INFO.memo)
 
-    resource.register.clear()
+    register.clear()
 
     expect(store.loginId.get()).toEqual("")
     expect(store.grantedRoles.get()).toEqual([])
@@ -108,9 +105,7 @@ function takeLongtime_elements() {
 }
 
 function initResource(registerUserRemote: RegisterAuthUserAccountRemote): Readonly<{
-    resource: Readonly<{
-        register: RegisterAuthUserAccountAction
-    }>
+    register: RegisterAuthUserAccountAction
     store: Readonly<{
         loginId: BoardValueStore
         grantedRoles: MultipleBoardValueStore
@@ -119,32 +114,28 @@ function initResource(registerUserRemote: RegisterAuthUserAccountRemote): Readon
         memo: BoardValueStore
     }>
 }> {
-    const resource = {
-        register: initRegisterAuthUserAccountAction({
-            infra: {
-                registerUserRemote,
-            },
-            config: {
-                takeLongtimeThreshold: { wait_millisecond: 32 },
-                resetToInitialTimeout: { wait_millisecond: 32 },
-            },
-        }),
-    }
+    const register = initRegisterAuthUserAccountAction({
+        infra: {
+            registerUserRemote,
+        },
+        config: {
+            takeLongtimeThreshold: { wait_millisecond: 32 },
+            resetToInitialTimeout: { wait_millisecond: 32 },
+        },
+    })
 
     const store = {
-        loginId: mockBoardValueStore(resource.register.loginId.input),
-        grantedRoles: mockMultipleBoardValueStore(resource.register.grantedRoles.input),
+        loginId: mockBoardValueStore(register.loginId.input),
+        grantedRoles: mockMultipleBoardValueStore(register.grantedRoles.input),
         resetTokenDestinationType: mockBoardValueStore(
-            resource.register.resetTokenDestination.destinationType,
+            register.resetTokenDestination.destinationType,
         ),
-        resetTokenDestinationEmail: mockBoardValueStore(
-            resource.register.resetTokenDestination.email,
-        ),
-        memo: mockBoardValueStore(resource.register.memo.input),
+        resetTokenDestinationEmail: mockBoardValueStore(register.resetTokenDestination.email),
+        memo: mockBoardValueStore(register.memo.input),
     }
 
     return {
-        resource,
+        register,
         store,
     }
 }

@@ -1,5 +1,5 @@
 import { test, expect } from "vitest"
-import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
+import { observeApplicationState } from "../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
@@ -21,68 +21,62 @@ import { AuthUserAccount } from "../kernel/data"
 test("initial load", async () => {
     const { search } = standard()
 
-    const runner = setupActionTestRunner(search.state)
-
-    await runner(async () => search.state.ignitionState).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            { type: "success", response: standard_response },
-        ])
-    })
+    expect(
+        await observeApplicationState(search.state, async () => {
+            return search.state.ignitionState
+        }),
+    ).toEqual([
+        { type: "try", hasTakenLongtime: false },
+        { type: "success", response: standard_response },
+    ])
 })
 
 test("search", async () => {
     const { search, store } = standard()
 
-    const runner = setupActionTestRunner(search.state)
-
     await search.state.ignitionState
 
-    await runner(async () => {
-        store.loginId.set("MY-LOGIN-ID")
-        return search.search()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            { type: "success", response: standard_response },
-        ])
-    })
+    expect(
+        await observeApplicationState(search.state, async () => {
+            store.loginId.set("MY-LOGIN-ID")
+            return search.search()
+        }),
+    ).toEqual([
+        { type: "try", hasTakenLongtime: false },
+        { type: "success", response: standard_response },
+    ])
 })
 
 test("search; take longtime", async () => {
     const { search } = takeLongtime()
 
-    const runner = setupActionTestRunner(search.state)
-
     await search.state.ignitionState
 
-    await runner(async () => {
-        return search.search()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            { type: "try", hasTakenLongtime: true },
-            { type: "success", response: standard_response },
-        ])
-    })
+    expect(
+        await observeApplicationState(search.state, async () => {
+            return search.search()
+        }),
+    ).toEqual([
+        { type: "try", hasTakenLongtime: false },
+        { type: "try", hasTakenLongtime: true },
+        { type: "success", response: standard_response },
+    ])
 })
 
 test("sort", async () => {
     const { search } = standard()
 
-    const runner = setupActionTestRunner(search.state)
-
     await search.state.ignitionState
 
-    await runner(async () => {
-        return search.sort("loginId")
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            { type: "success", response: standard_response },
-        ])
-        expect(search.currentSort()).toEqual({ key: "loginId", order: "normal" })
-    })
+    expect(
+        await observeApplicationState(search.state, async () => {
+            return search.sort("loginId")
+        }),
+    ).toEqual([
+        { type: "try", hasTakenLongtime: false },
+        { type: "success", response: standard_response },
+    ])
+    expect(search.currentSort()).toEqual({ key: "loginId", order: "normal" })
 })
 
 test("clear", () => {
@@ -107,48 +101,44 @@ test("read sort key", () => {
 test("detected", async () => {
     const { search } = detected()
 
-    const focusRunner = setupActionTestRunner(search.list.focus.state)
-
-    await focusRunner(async () => {
-        await search.list.state.ignitionState
-        return search.list.focus.state.currentState()
-    }).then((stack) => {
-        expect(stack).toEqual([{ type: "detect", data: standard_response.list[0] }])
-    })
+    expect(
+        await observeApplicationState(search.list.focus.state, async () => {
+            await search.list.state.ignitionState
+            return search.list.focus.state.currentState()
+        }),
+    ).toEqual([{ type: "detect", data: standard_response.list[0] }])
 })
 
 test("focus / close", async () => {
     const { search } = standard()
 
-    const runner = setupActionTestRunner(search.list.focus.state)
+    expect(
+        await observeApplicationState(search.list.focus.state, async () => {
+            await search.list.state.ignitionState
+            const another: AuthUserAccount = {
+                loginId: restoreLoginId("another-1"),
+                grantedRoles: [],
+                resetTokenDestination: { type: "none" },
+                memo: restoreAuthUserField("memo"),
+            }
 
-    await runner(async () => {
-        await search.list.state.ignitionState
-        const another: AuthUserAccount = {
-            loginId: restoreLoginId("another-1"),
-            grantedRoles: [],
-            resetTokenDestination: { type: "none" },
-            memo: restoreAuthUserField("memo"),
-        }
+            search.list.focus.change(standard_response.list[0])
+            expect(search.list.focus.isFocused(standard_response.list[0])).toBe(true)
+            expect(search.list.focus.isFocused(another)).toBe(false)
 
-        search.list.focus.change(standard_response.list[0])
-        expect(search.list.focus.isFocused(standard_response.list[0])).toBe(true)
-        expect(search.list.focus.isFocused(another)).toBe(false)
+            search.list.focus.close()
+            expect(search.list.focus.isFocused(standard_response.list[0])).toBe(false)
+            expect(search.list.focus.isFocused(another)).toBe(false)
 
-        search.list.focus.close()
-        expect(search.list.focus.isFocused(standard_response.list[0])).toBe(false)
-        expect(search.list.focus.isFocused(another)).toBe(false)
+            search.list.focus.change(another)
 
-        search.list.focus.change(another)
-
-        return search.list.focus.state.currentState()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "change", data: standard_response.list[0] },
-            { type: "close" },
-            { type: "close" },
-        ])
-    })
+            return search.list.focus.state.currentState()
+        }),
+    ).toEqual([
+        { type: "change", data: standard_response.list[0] },
+        { type: "close" },
+        { type: "close" },
+    ])
 })
 
 function standard() {

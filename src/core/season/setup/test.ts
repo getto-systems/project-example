@@ -1,5 +1,5 @@
 import { test, expect } from "vitest"
-import { setupActionTestRunner } from "../../../z_vendor/getto-application/action/test_helper"
+import { observeApplicationState } from "../../../z_vendor/getto-application/action/test_helper"
 
 import { mockClock, mockClockPubSub } from "../../../z_lib/ui/clock/mock"
 import { mockBoardValueStore } from "../../../z_vendor/getto-application/board/input/test_helper"
@@ -19,26 +19,27 @@ import { convertDB } from "../../../z_lib/ui/repository/init/convert"
 import { Season } from "../kernel/data"
 
 test("setup season", async () => {
-    const { resource, store } = standard()
+    const { setupSeason, store } = standard()
 
-    const runner = setupActionTestRunner(resource.setupSeason.state)
+    expect(
+        await observeApplicationState(setupSeason.state, async () => {
+            store.season.set("2021.summer")
 
-    await runner(() => {
-        store.season.set("2021.summer")
-        return resource.setupSeason.setup(() => null)
-    }).then((stack) => {
-        expect(stack).toEqual([{ type: "success" }, { type: "initial" }])
-    })
+            // TODO setup(onSuccess <= これいらない)
+            return setupSeason.setup(() => null)
+        }),
+    ).toEqual([{ type: "success" }, { type: "initial" }])
 })
 
 test("setup season; default", async () => {
-    const { resource } = standard()
+    const { setupSeason } = standard()
 
-    const runner = setupActionTestRunner(resource.setupSeason.state)
-
-    await runner(() => resource.setupSeason.setup(() => null)).then((stack) => {
-        expect(stack).toEqual([{ type: "success" }, { type: "initial" }])
-    })
+    expect(
+        await observeApplicationState(setupSeason.state, async () => {
+            // TODO setup(onSuccess <= これいらない)
+            return setupSeason.setup(() => null)
+        }),
+    ).toEqual([{ type: "success" }, { type: "initial" }])
 })
 
 function standard() {
@@ -46,38 +47,34 @@ function standard() {
 }
 
 function initResource(seasonRepository: SeasonRepository): Readonly<{
-    resource: Readonly<{ setupSeason: SetupSeasonAction }>
+    setupSeason: SetupSeasonAction
     store: Readonly<{ season: BoardValueStore }>
 }> {
     const clock = mockClock(new Date("2021-01-01 10:00:00"), mockClockPubSub())
 
-    const resource = {
-        setupSeason: initSetupSeasonAction(
-            {
-                infra: {
-                    availableSeasons: standard_availableSeasons(),
-                    seasonRepository,
-                    clock,
-                },
-                config: {
-                    manualSetupSeasonExpire: { expire_millisecond: 1000 },
-                    resetToInitialTimeout: { wait_millisecond: 32 },
-                },
+    const setupSeason = initSetupSeasonAction(
+        {
+            infra: {
+                availableSeasons: standard_availableSeasons(),
+                seasonRepository,
+                clock,
             },
-            {
-                state: { ignitionState: Promise.resolve({ type: "initial" }) },
-                load: async () => ({ type: "initial" }),
+            config: {
+                manualSetupSeasonExpire: { expire_millisecond: 1000 },
+                resetToInitialTimeout: { wait_millisecond: 32 },
             },
-        ),
-    }
-
-    const store = {
-        season: mockBoardValueStore(resource.setupSeason.season.input),
-    }
+        },
+        {
+            state: { ignitionState: Promise.resolve({ type: "initial" }) },
+            load: async () => ({ type: "initial" }),
+        },
+    )
 
     return {
-        resource,
-        store,
+        setupSeason,
+        store: {
+            season: mockBoardValueStore(setupSeason.season.input),
+        },
     }
 }
 

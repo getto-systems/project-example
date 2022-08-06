@@ -1,5 +1,5 @@
 import { test, expect } from "vitest"
-import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
+import { observeApplicationState } from "../../../../z_vendor/getto-application/action/test_helper"
 
 import { initMemoryDB } from "../../repository/init/memory"
 
@@ -11,27 +11,21 @@ import { initSearchSidebarAction, SearchSidebarAction } from "./action"
 test("select columns", async () => {
     const { sidebar } = standard()
 
-    const runner = setupActionTestRunner(sidebar.state)
-
-    await runner(async () => {
-        await sidebar.state.ignitionState
-        await sidebar.fold()
-        await sidebar.expand()
-        return sidebar.state.currentState()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "success", state: { isExpand: true } },
-            { type: "success", state: { isExpand: false } },
-            { type: "success", state: { isExpand: true } },
-        ])
-    })
+    expect(
+        await observeApplicationState(sidebar.state, async () => {
+            await sidebar.state.ignitionState
+            await sidebar.fold()
+            await sidebar.expand()
+            return sidebar.state.currentState()
+        }),
+    ).toEqual([
+        { type: "success", state: { isExpand: true } },
+        { type: "success", state: { isExpand: false } },
+        { type: "success", state: { isExpand: true } },
+    ])
 })
 
-function standard() {
-    return initResource()
-}
-
-function initResource(): Readonly<{
+function standard(): Readonly<{
     sidebar: SearchSidebarAction
 }> {
     return {

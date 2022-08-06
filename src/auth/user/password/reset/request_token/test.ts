@@ -1,5 +1,5 @@
 import { test, expect } from "vitest"
-import { setupActionTestRunner } from "../../../../../z_vendor/getto-application/action/test_helper"
+import { observeApplicationState } from "../../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../../z_lib/ui/timer/helper"
 
 import { mockBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/test_helper"
@@ -13,42 +13,43 @@ const VALID_LOGIN = { loginId: "login-id" } as const
 test("submit valid login-id", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.state)
+    expect(
+        await observeApplicationState(action.state, async () => {
+            store.loginId.set(VALID_LOGIN.loginId)
 
-    await runner(() => {
-        store.loginId.set(VALID_LOGIN.loginId)
-        return action.submit(() => null)
-    }).then((stack) => {
-        expect(stack).toEqual([{ type: "try", hasTakenLongtime: false }, { type: "success" }])
-    })
+            // TODO submit(onSuccess <= これいらない)
+            return action.submit(() => null)
+        }),
+    ).toEqual([{ type: "try", hasTakenLongtime: false }, { type: "success" }])
 })
 
 test("submit valid login-id; with take longtime", async () => {
     // wait for take longtime timeout
     const { action, store } = takeLongtime()
 
-    const runner = setupActionTestRunner(action.state)
+    expect(
+        await observeApplicationState(action.state, async () => {
+            store.loginId.set(VALID_LOGIN.loginId)
 
-    await runner(() => {
-        store.loginId.set(VALID_LOGIN.loginId)
-        return action.submit(() => null)
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            { type: "try", hasTakenLongtime: true },
-            { type: "success" },
-        ])
-    })
+            // TODO submit(onSuccess <= これいらない)
+            return action.submit(() => null)
+        }),
+    ).toEqual([
+        { type: "try", hasTakenLongtime: false },
+        { type: "try", hasTakenLongtime: true },
+        { type: "success" },
+    ])
 })
 
 test("submit without fields", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action.state)
-
-    await runner(() => action.submit(() => null)).then((stack) => {
-        expect(stack).toEqual([])
-    })
+    expect(
+        await observeApplicationState(action.state, async () => {
+            // TODO submit(onSuccess <= これいらない)
+            return action.submit(() => null)
+        }),
+    ).toEqual([])
 })
 
 test("edit", () => {

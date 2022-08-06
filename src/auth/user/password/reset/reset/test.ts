@@ -1,5 +1,5 @@
 import { test, expect } from "vitest"
-import { setupActionTestRunner } from "../../../../../z_vendor/getto-application/action/test_helper"
+import { observeApplicationState } from "../../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../../z_lib/ui/timer/helper"
 
 import { mockBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/test_helper"
@@ -19,6 +19,7 @@ import { CheckAuthTicketRemote } from "../../../../ticket/check/infra"
 import { BoardValueStore } from "../../../../../z_vendor/getto-application/board/input/infra"
 
 import { initResetPasswordAction, ResetPasswordAction } from "./action"
+import { LoadScriptError } from "../../../../sign/get_script_path/data"
 
 // テスト開始時刻
 const START_AT = new Date("2020-01-01 10:00:00")
@@ -42,24 +43,22 @@ test("submit valid login-id and password", async () => {
         }
     })
 
-    const runner = setupActionTestRunner(action.state)
-
-    await runner(() => {
-        store.loginId.set(VALID_LOGIN.loginId)
-        store.password.set(VALID_LOGIN.password)
-        return action.submit()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try-to-reset", hasTakenLongtime: false },
-            {
-                type: "try-to-load",
-                scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
-            },
-            { type: "succeed-to-renew", continue: true },
-            { type: "succeed-to-renew", continue: true },
-            { type: "required-to-login", continue: false },
-        ])
-    })
+    expect(
+        await observeApplicationState(action.state, async () => {
+            store.loginId.set(VALID_LOGIN.loginId)
+            store.password.set(VALID_LOGIN.password)
+            return action.submit()
+        }),
+    ).toEqual([
+        { type: "try-to-reset", hasTakenLongtime: false },
+        {
+            type: "try-to-load",
+            scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
+        },
+        { type: "succeed-to-renew", continue: true },
+        { type: "succeed-to-renew", continue: true },
+        { type: "required-to-login", continue: false },
+    ])
 })
 
 test("submit valid login-id and password; with take longtime", async () => {
@@ -74,62 +73,56 @@ test("submit valid login-id and password; with take longtime", async () => {
         }
     })
 
-    const runner = setupActionTestRunner(action.state)
-
-    await runner(() => {
-        store.loginId.set(VALID_LOGIN.loginId)
-        store.password.set(VALID_LOGIN.password)
-        return action.submit()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try-to-reset", hasTakenLongtime: false },
-            { type: "try-to-reset", hasTakenLongtime: true },
-            {
-                type: "try-to-load",
-                scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
-            },
-            { type: "succeed-to-renew", continue: true },
-            { type: "succeed-to-renew", continue: true },
-            { type: "required-to-login", continue: false },
-        ])
-    })
+    expect(
+        await observeApplicationState(action.state, async () => {
+            store.loginId.set(VALID_LOGIN.loginId)
+            store.password.set(VALID_LOGIN.password)
+            return action.submit()
+        }),
+    ).toEqual([
+        { type: "try-to-reset", hasTakenLongtime: false },
+        { type: "try-to-reset", hasTakenLongtime: true },
+        {
+            type: "try-to-load",
+            scriptPath: { valid: true, value: "https://secure.example.com/index.js" },
+        },
+        { type: "succeed-to-renew", continue: true },
+        { type: "succeed-to-renew", continue: true },
+        { type: "required-to-login", continue: false },
+    ])
 })
 
 test("submit without fields", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action.state)
-
-    await runner(() => action.submit()).then((stack) => {
-        expect(stack).toEqual([])
-    })
+    expect(
+        await observeApplicationState(action.state, async () => {
+            return action.submit()
+        }),
+    ).toEqual([])
 })
 
 test("submit without resetToken", async () => {
     const { action, store } = noResetToken()
 
-    const runner = setupActionTestRunner(action.state)
-
-    await runner(() => {
-        store.loginId.set(VALID_LOGIN.loginId)
-        store.password.set(VALID_LOGIN.password)
-        return action.submit()
-    }).then((stack) => {
-        expect(stack).toEqual([{ type: "failed-to-reset", err: { type: "empty-reset-token" } }])
-    })
+    expect(
+        await observeApplicationState(action.state, async () => {
+            store.loginId.set(VALID_LOGIN.loginId)
+            store.password.set(VALID_LOGIN.password)
+            return action.submit()
+        }),
+    ).toEqual([{ type: "failed-to-reset", err: { type: "empty-reset-token" } }])
 })
 test("submit with empty resetToken", async () => {
     const { action, store } = emptyResetToken()
 
-    const runner = setupActionTestRunner(action.state)
-
-    await runner(() => {
-        store.loginId.set(VALID_LOGIN.loginId)
-        store.password.set(VALID_LOGIN.password)
-        return action.submit()
-    }).then((stack) => {
-        expect(stack).toEqual([{ type: "failed-to-reset", err: { type: "empty-reset-token" } }])
-    })
+    expect(
+        await observeApplicationState(action.state, async () => {
+            store.loginId.set(VALID_LOGIN.loginId)
+            store.password.set(VALID_LOGIN.password)
+            return action.submit()
+        }),
+    ).toEqual([{ type: "failed-to-reset", err: { type: "empty-reset-token" } }])
 })
 
 test("clear", () => {
@@ -146,15 +139,13 @@ test("clear", () => {
 test("load error", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action.state)
+    const err: LoadScriptError = { type: "infra-error", err: "load error" }
 
-    await runner(() => action.loadError({ type: "infra-error", err: "load error" })).then(
-        (stack) => {
-            expect(stack).toEqual([
-                { type: "load-error", err: { type: "infra-error", err: "load error" } },
-            ])
-        },
-    )
+    expect(
+        await observeApplicationState(action.state, async () => {
+            return action.loadError(err)
+        }),
+    ).toEqual([{ type: "load-error", err }])
 })
 
 function standard() {

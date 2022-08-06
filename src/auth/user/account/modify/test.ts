@@ -1,5 +1,5 @@
 import { test, expect } from "vitest"
-import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
+import { observeApplicationState } from "../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 import {
     mockBoardValueStore,
@@ -25,47 +25,43 @@ const VALID_INFO = {
 test("submit valid info", async () => {
     const { modify, store } = standard()
 
-    const runner = setupActionTestRunner(modify.state)
+    expect(
+        await observeApplicationState(modify.state, async () => {
+            store.memo.set(VALID_INFO.memo)
+            store.grantedRoles.set(VALID_INFO.grantedRoles)
 
-    await runner(async () => {
-        store.memo.set(VALID_INFO.memo)
-        store.grantedRoles.set(VALID_INFO.grantedRoles)
-
-        return modify.submit()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            {
-                type: "success",
-                entry: { loginId: "user-id", grantedRoles: ["auth-user"], memo: "memo" },
-            },
-            { type: "initial" },
-        ])
-    })
+            return modify.submit()
+        }),
+    ).toEqual([
+        { type: "try", hasTakenLongtime: false },
+        {
+            type: "success",
+            entry: { loginId: "user-id", grantedRoles: ["auth-user"], memo: "memo" },
+        },
+        { type: "initial" },
+    ])
 })
 
 test("submit valid login-id; take long time", async () => {
     // wait for take longtime timeout
     const { modify, store } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(modify.state)
+    expect(
+        await observeApplicationState(modify.state, async () => {
+            store.memo.set(VALID_INFO.memo)
+            store.grantedRoles.set(VALID_INFO.grantedRoles)
 
-    await runner(() => {
-        store.memo.set(VALID_INFO.memo)
-        store.grantedRoles.set(VALID_INFO.grantedRoles)
-
-        return modify.submit()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            { type: "try", hasTakenLongtime: true },
-            {
-                type: "success",
-                entry: { loginId: "user-id", grantedRoles: ["auth-user"], memo: "memo" },
-            },
-            { type: "initial" },
-        ])
-    })
+            return modify.submit()
+        }),
+    ).toEqual([
+        { type: "try", hasTakenLongtime: false },
+        { type: "try", hasTakenLongtime: true },
+        {
+            type: "success",
+            entry: { loginId: "user-id", grantedRoles: ["auth-user"], memo: "memo" },
+        },
+        { type: "initial" },
+    ])
 })
 
 test("reset", () => {

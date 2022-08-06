@@ -1,5 +1,5 @@
 import { test, expect } from "vitest"
-import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
+import { observeApplicationState } from "../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
@@ -12,62 +12,57 @@ import { BoardValueStore } from "../../../../z_vendor/getto-application/board/in
 const VALID_PASSWORD = { currentPassword: "current-password", newPassword: "new-password" } as const
 
 test("submit valid current-password and new-password", async () => {
-    const { resource, store } = standard()
+    const { change, store } = standard()
 
-    const runner = setupActionTestRunner(resource.change.state)
+    expect(
+        await observeApplicationState(change.state, async () => {
+            store.currentPassword.set(VALID_PASSWORD.currentPassword)
+            store.newPassword.set(VALID_PASSWORD.newPassword)
 
-    await runner(async () => {
-        store.currentPassword.set(VALID_PASSWORD.currentPassword)
-        store.newPassword.set(VALID_PASSWORD.newPassword)
-
-        return resource.change.submit(() => null)
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            { type: "success" },
-            { type: "initial" },
-        ])
-    })
+            // TODO submit(onSuccess <= これいらない)
+            return change.submit(() => null)
+        }),
+    ).toEqual([{ type: "try", hasTakenLongtime: false }, { type: "success" }, { type: "initial" }])
 })
 
 test("submit valid login-id and password; take long time", async () => {
     // wait for take longtime timeout
-    const { resource, store } = takeLongtime_elements()
+    const { change, store } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(resource.change.state)
+    expect(
+        await observeApplicationState(change.state, async () => {
+            store.currentPassword.set(VALID_PASSWORD.currentPassword)
+            store.newPassword.set(VALID_PASSWORD.newPassword)
 
-    await runner(() => {
-        store.currentPassword.set(VALID_PASSWORD.currentPassword)
-        store.newPassword.set(VALID_PASSWORD.newPassword)
-
-        return resource.change.submit(() => null)
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            { type: "try", hasTakenLongtime: true },
-            { type: "success" },
-            { type: "initial" },
-        ])
-    })
+            // TODO submit(onSuccess <= これいらない)
+            return change.submit(() => null)
+        }),
+    ).toEqual([
+        { type: "try", hasTakenLongtime: false },
+        { type: "try", hasTakenLongtime: true },
+        { type: "success" },
+        { type: "initial" },
+    ])
 })
 
 test("submit without fields", async () => {
-    const { resource } = standard()
+    const { change } = standard()
 
-    const runner = setupActionTestRunner(resource.change.state)
-
-    await runner(() => resource.change.submit(() => null)).then((stack) => {
-        expect(stack).toEqual([])
-    })
+    expect(
+        await observeApplicationState(change.state, async () => {
+            // TODO submit(onSuccess <= これいらない)
+            return change.submit(() => null)
+        }),
+    ).toEqual([])
 })
 
 test("edit", () => {
-    const { resource, store } = standard()
+    const { change, store } = standard()
 
     store.currentPassword.set(VALID_PASSWORD.currentPassword)
     store.newPassword.set(VALID_PASSWORD.newPassword)
 
-    resource.change.edit()
+    change.edit()
 
     expect(store.currentPassword.get()).toEqual("")
     expect(store.newPassword.get()).toEqual("")
@@ -81,32 +76,29 @@ function takeLongtime_elements() {
 }
 
 function initResource(changePasswordRemote: ChangePasswordRemote): Readonly<{
-    resource: Readonly<{
-        change: ChangePasswordAction
-    }>
+    change: ChangePasswordAction
     store: Readonly<{
         currentPassword: BoardValueStore
         newPassword: BoardValueStore
     }>
 }> {
-    const resource = {
-        change: initChangePasswordAction({
-            infra: {
-                changePasswordRemote,
-            },
-            config: {
-                takeLongtimeThreshold: { wait_millisecond: 32 },
-                resetToInitialTimeout: { wait_millisecond: 32 },
-            },
-        }),
-    }
+    const change = initChangePasswordAction({
+        infra: {
+            changePasswordRemote,
+        },
+        config: {
+            takeLongtimeThreshold: { wait_millisecond: 32 },
+            resetToInitialTimeout: { wait_millisecond: 32 },
+        },
+    })
 
-    const store = {
-        currentPassword: mockBoardValueStore(resource.change.currentPassword.input),
-        newPassword: mockBoardValueStore(resource.change.newPassword.input),
+    return {
+        change,
+        store: {
+            currentPassword: mockBoardValueStore(change.currentPassword.input),
+            newPassword: mockBoardValueStore(change.newPassword.input),
+        },
     }
-
-    return { resource, store }
 }
 
 function standard_changeRemote(): ChangePasswordRemote {

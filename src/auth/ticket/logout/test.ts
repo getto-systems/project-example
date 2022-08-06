@@ -1,5 +1,5 @@
 import { test, expect } from "vitest"
-import { setupActionTestRunner } from "../../../z_vendor/getto-application/action/test_helper"
+import { observeApplicationState } from "../../../z_vendor/getto-application/action/test_helper"
 
 import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
 
@@ -12,22 +12,16 @@ import { LogoutRemote } from "./infra"
 import { initLogoutAction, LogoutAction } from "./action"
 
 test("logout", async () => {
-    const { resource } = standard()
+    const { logout } = standard()
 
-    const runner = setupActionTestRunner(resource.logout.state)
-
-    await runner(() => resource.logout.submit()).then((stack) => {
-        expect(stack).toEqual([{ type: "success" }])
-    })
+    expect(
+        await observeApplicationState(logout.state, () => {
+            return logout.submit()
+        }),
+    ).toEqual([{ type: "success" }])
 })
 
-function standard() {
-    const resource = initResource()
-
-    return { resource }
-}
-
-function initResource(): Readonly<{ logout: LogoutAction }> {
+function standard(): Readonly<{ logout: LogoutAction }> {
     return {
         logout: initLogoutAction({
             ticketRepository: standard_ticketRepository(),

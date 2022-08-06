@@ -1,5 +1,5 @@
 import { test, expect } from "vitest"
-import { setupActionTestRunner } from "../../../../../../z_vendor/getto-application/action/test_helper"
+import { observeApplicationState } from "../../../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../../../z_lib/ui/timer/helper"
 import { mockBoardValueStore } from "../../../../../../z_vendor/getto-application/board/input/test_helper"
 
@@ -18,68 +18,62 @@ const VALID_INFO = {
 test("submit valid info", async () => {
     const { change, store } = standard()
 
-    const runner = setupActionTestRunner(change.state)
+    expect(
+        await observeApplicationState(change.state, async () => {
+            store.destinationType.set(VALID_INFO.destinationType)
+            store.email.set(VALID_INFO.email)
 
-    await runner(async () => {
-        store.destinationType.set(VALID_INFO.destinationType)
-        store.email.set(VALID_INFO.email)
-
-        return change.submit()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            {
-                type: "success",
-                entry: {
-                    loginId: "user-id",
-                    resetTokenDestination: { type: "email", email: "user@example.com" },
-                },
+            return change.submit()
+        }),
+    ).toEqual([
+        { type: "try", hasTakenLongtime: false },
+        {
+            type: "success",
+            entry: {
+                loginId: "user-id",
+                resetTokenDestination: { type: "email", email: "user@example.com" },
             },
-            { type: "initial" },
-        ])
-    })
+        },
+        { type: "initial" },
+    ])
 })
 
 test("submit valid login-id; take long time", async () => {
     // wait for take longtime timeout
     const { change, store } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(change.state)
+    expect(
+        await observeApplicationState(change.state, async () => {
+            store.destinationType.set(VALID_INFO.destinationType)
+            store.email.set(VALID_INFO.email)
 
-    await runner(() => {
-        store.destinationType.set(VALID_INFO.destinationType)
-        store.email.set(VALID_INFO.email)
-
-        return change.submit()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            { type: "try", hasTakenLongtime: true },
-            {
-                type: "success",
-                entry: {
-                    loginId: "user-id",
-                    resetTokenDestination: { type: "email", email: "user@example.com" },
-                },
+            return change.submit()
+        }),
+    ).toEqual([
+        { type: "try", hasTakenLongtime: false },
+        { type: "try", hasTakenLongtime: true },
+        {
+            type: "success",
+            entry: {
+                loginId: "user-id",
+                resetTokenDestination: { type: "email", email: "user@example.com" },
             },
-            { type: "initial" },
-        ])
-    })
+        },
+        { type: "initial" },
+    ])
 })
 
 test("submit with invalid value; empty email", async () => {
     const { change, store } = standard()
 
-    const runner = setupActionTestRunner(change.state)
+    expect(
+        await observeApplicationState(change.state, async () => {
+            store.destinationType.set("email")
+            store.email.set("")
 
-    await runner(() => {
-        store.destinationType.set("email")
-        store.email.set("")
-
-        return change.submit()
-    }).then((stack) => {
-        expect(stack).toEqual([])
-    })
+            return change.submit()
+        }),
+    ).toEqual([])
 })
 
 test("reset", () => {

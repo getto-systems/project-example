@@ -1,5 +1,5 @@
 import { test, expect } from "vitest"
-import { setupActionTestRunner } from "../../action/test_helper"
+import { observeApplicationState } from "../../action/test_helper"
 
 import { initObserveBoardFieldAction } from "./action"
 import { isSameMultipleBoardValue } from "./helper"
@@ -10,43 +10,37 @@ import { BoardValueStore } from "../input/infra"
 test("observe; no change", async () => {
     const { action, observer } = standard()
 
-    const runner = setupActionTestRunner(action.state)
-
-    await runner(async () => {
-        observer.pin()
-        action.check()
-        return action.state.currentState()
-    }).then((stack) => {
-        expect(stack).toEqual([{ hasChanged: false }])
-    })
+    expect(
+        await observeApplicationState(action.state, async () => {
+            observer.pin()
+            action.check()
+            return action.state.currentState()
+        }),
+    ).toEqual([{ hasChanged: false }])
 })
 
 test("observe; has changed", async () => {
     const { action, observer, store } = standard()
 
-    const runner = setupActionTestRunner(action.state)
-
-    await runner(async () => {
-        observer.pin()
-        store.set("changed")
-        action.check()
-        return action.state.currentState()
-    }).then((stack) => {
-        expect(stack).toEqual([{ hasChanged: true }])
-    })
+    expect(
+        await observeApplicationState(action.state, async () => {
+            observer.pin()
+            store.set("changed")
+            action.check()
+            return action.state.currentState()
+        }),
+    ).toEqual([{ hasChanged: true }])
 })
 
 test("observe; initial", async () => {
     const { action } = standard()
 
-    const runner = setupActionTestRunner(action.state)
-
-    await runner(async () => {
-        action.check()
-        return action.state.currentState()
-    }).then((stack) => {
-        expect(stack).toEqual([{ hasChanged: false }])
-    })
+    expect(
+        await observeApplicationState(action.state, async () => {
+            action.check()
+            return action.state.currentState()
+        }),
+    ).toEqual([{ hasChanged: false }])
 })
 
 test("check same value; all same value", async () => {

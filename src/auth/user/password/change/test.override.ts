@@ -1,5 +1,5 @@
 import { test, expect } from "vitest"
-import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
+import { observeApplicationState } from "../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
@@ -16,49 +16,45 @@ const VALID_PASSWORD = { currentPassword: "current-password", newPassword: "new-
 test("submit valid new-password", async () => {
     const { overwrite, store } = standard()
 
-    const runner = setupActionTestRunner(overwrite.state)
+    expect(
+        await observeApplicationState(overwrite.state, async () => {
+            store.newPassword.set(VALID_PASSWORD.newPassword)
 
-    await runner(async () => {
-        store.newPassword.set(VALID_PASSWORD.newPassword)
-
-        return overwrite.submit()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            { type: "success", entry: { loginId: "user-id" } },
-            { type: "initial" },
-        ])
-    })
+            return overwrite.submit()
+        }),
+    ).toEqual([
+        { type: "try", hasTakenLongtime: false },
+        { type: "success", entry: { loginId: "user-id" } },
+        { type: "initial" },
+    ])
 })
 
 test("submit valid login-id and password; take long time", async () => {
     // wait for take longtime timeout
     const { overwrite, store } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(overwrite.state)
+    expect(
+        await observeApplicationState(overwrite.state, async () => {
+            store.newPassword.set(VALID_PASSWORD.newPassword)
 
-    await runner(() => {
-        store.newPassword.set(VALID_PASSWORD.newPassword)
-
-        return overwrite.submit()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            { type: "try", hasTakenLongtime: true },
-            { type: "success", entry: { loginId: "user-id" } },
-            { type: "initial" },
-        ])
-    })
+            return overwrite.submit()
+        }),
+    ).toEqual([
+        { type: "try", hasTakenLongtime: false },
+        { type: "try", hasTakenLongtime: true },
+        { type: "success", entry: { loginId: "user-id" } },
+        { type: "initial" },
+    ])
 })
 
 test("submit without fields", async () => {
     const { overwrite } = standard()
 
-    const runner = setupActionTestRunner(overwrite.state)
-
-    await runner(() => overwrite.submit()).then((stack) => {
-        expect(stack).toEqual([])
-    })
+    expect(
+        await observeApplicationState(overwrite.state, async () => {
+            return overwrite.submit()
+        }),
+    ).toEqual([])
 })
 
 test("reset", () => {
