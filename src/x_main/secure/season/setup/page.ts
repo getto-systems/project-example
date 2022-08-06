@@ -12,6 +12,7 @@ import { useNotifyUnexpectedError } from "../../../../avail/unexpected_error/not
 import { useDocumentTitle } from "../../../../common/x_preact/hooks"
 
 import { copyright, siteInfo } from "../../../../x_content/site"
+import { container } from "../../../../z_vendor/getto-css/preact/design/box"
 
 import { ApplicationError } from "../../../../avail/x_preact/application_error"
 import { LoadSeason } from "../../../../core/season/load/x_preact/load_season"
@@ -20,7 +21,6 @@ import { LoadBreadcrumbList } from "../../../../common/outline/load/x_preact/loa
 import { SetupSeason } from "../../../../core/season/setup/x_preact/setup"
 
 import { SetupSeasonPageResource } from "./resource"
-import { container } from "../../../../z_vendor/getto-css/preact/design/box"
 
 export function SetupSeasonPage(props: SetupSeasonPageResource): VNode {
     const pageTitle = "シーズン設定" as const
