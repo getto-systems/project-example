@@ -160,7 +160,7 @@ class Action implements RegisterAuthUserAccountAction {
         this.state.subscribe((state) => {
             switch (state.type) {
                 case "success":
-                    handler(state.entry)
+                    handler(state.data)
                     break
             }
         })
@@ -178,7 +178,7 @@ class Action implements RegisterAuthUserAccountAction {
 type RegisterUserEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: RegisterAuthUserAccountError }>
-    | Readonly<{ type: "success"; entry: AuthUserAccount }>
+    | Readonly<{ type: "success"; data: AuthUserAccount }>
     | Readonly<{ type: "initial" }>
 
 async function registerUser<S>(
@@ -200,7 +200,7 @@ async function registerUser<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    post({ type: "success", entry: fields })
+    post({ type: "success", data: fields })
     return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 

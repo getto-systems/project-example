@@ -38,7 +38,7 @@ test("submit valid info", async () => {
         { type: "try", hasTakenLongtime: false },
         {
             type: "success",
-            entry: {
+            data: {
                 loginId: "login-id",
                 grantedRoles: ["auth-user"],
                 resetTokenDestination: { type: "email", email: "user@example.com" },
@@ -68,7 +68,7 @@ test("submit valid login-id; take long time", async () => {
         { type: "try", hasTakenLongtime: true },
         {
             type: "success",
-            entry: {
+            data: {
                 loginId: "login-id",
                 grantedRoles: ["auth-user"],
                 resetTokenDestination: { type: "email", email: "user@example.com" },

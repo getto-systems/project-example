@@ -279,7 +279,7 @@ class OverwriteAction implements OverwritePasswordAction {
     onSuccess(handler: (data: Readonly<{ loginId: LoginId }>) => void): void {
         this.state.subscribe((state) => {
             if (state.type === "success") {
-                handler(state.entry)
+                handler(state.data)
             }
         })
     }
@@ -302,7 +302,7 @@ class OverwriteAction implements OverwritePasswordAction {
 type OverwritePasswordEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ChangePasswordError }>
-    | Readonly<{ type: "success"; entry: OverwritePasswordEntry }>
+    | Readonly<{ type: "success"; data: OverwritePasswordEntry }>
     | Readonly<{ type: "initial" }>
 
 async function overwritePassword<S>(
@@ -325,7 +325,7 @@ async function overwritePassword<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    post({ type: "success", entry: user })
+    post({ type: "success", data: user })
     return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 

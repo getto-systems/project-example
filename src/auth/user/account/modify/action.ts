@@ -151,7 +151,7 @@ class Action implements ModifyAuthUserAccountAction {
     onSuccess(handler: (data: ModifyAuthUserAccountEntry) => void): void {
         this.state.subscribe((state) => {
             if (state.type === "success") {
-                handler(state.entry)
+                handler(state.data)
             }
         })
     }
@@ -174,7 +174,7 @@ class Action implements ModifyAuthUserAccountAction {
 type ModifyUserEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ModifyAuthUserAccountError }>
-    | Readonly<{ type: "success"; entry: ModifyAuthUserAccountEntry }>
+    | Readonly<{ type: "success"; data: ModifyAuthUserAccountEntry }>
     | Readonly<{ type: "initial" }>
 
 async function modifyUser<S>(
@@ -197,7 +197,7 @@ async function modifyUser<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    post({ type: "success", entry: { ...user, ...fields } })
+    post({ type: "success", data: { ...user, ...fields } })
     return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 

@@ -24,7 +24,7 @@ test("submit valid new-password", async () => {
         }),
     ).toEqual([
         { type: "try", hasTakenLongtime: false },
-        { type: "success", entry: { loginId: "user-id" } },
+        { type: "success", data: { loginId: "user-id" } },
         { type: "initial" },
     ])
 })
@@ -42,7 +42,7 @@ test("submit valid login-id and password; take long time", async () => {
     ).toEqual([
         { type: "try", hasTakenLongtime: false },
         { type: "try", hasTakenLongtime: true },
-        { type: "success", entry: { loginId: "user-id" } },
+        { type: "success", data: { loginId: "user-id" } },
         { type: "initial" },
     ])
 })
