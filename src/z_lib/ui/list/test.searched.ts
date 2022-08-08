@@ -94,8 +94,7 @@ test("update", async () => {
         await observeApplicationStateTuple2([list.state, list.focus.state], async () => {
             await list.state.ignitionState
             list.focus.change(item[0])
-            list.focus.update(updatedData)
-            return [list.state.currentState(), list.focus.state.currentState()]
+            return list.focus.update(updatedData)
         }),
     ).toEqual([
         [
@@ -124,8 +123,7 @@ test("remove", async () => {
         await observeApplicationStateTuple2([list.state, list.focus.state], async () => {
             await list.state.ignitionState
             list.focus.change(item[0])
-            list.focus.remove()
-            return [list.state.currentState(), list.focus.state.currentState()]
+            return list.focus.remove()
         }),
     ).toEqual([
         [
