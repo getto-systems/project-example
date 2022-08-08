@@ -85,7 +85,7 @@ class Action implements UnregisterAuthUserAccountAction {
     onSuccess(handler: (data: Readonly<{ loginId: LoginId }>) => void): void {
         this.state.subscribe((state) => {
             if (state.type === "success") {
-                handler(state.entry)
+                handler(state.data)
             }
         })
     }
@@ -103,7 +103,7 @@ class Action implements UnregisterAuthUserAccountAction {
 type UnregisterUserEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: UnregisterAuthUserAccountError }>
-    | Readonly<{ type: "success"; entry: UnregisterAuthUserAccountEntry }>
+    | Readonly<{ type: "success"; data: UnregisterAuthUserAccountEntry }>
 
 async function unregisterUser<S>(
     { infra, config }: UnregisterAuthUserAccountMaterial,
@@ -124,7 +124,7 @@ async function unregisterUser<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    return post({ type: "success", entry: user })
+    return post({ type: "success", data: user })
 }
 
 interface Post<E, S> {

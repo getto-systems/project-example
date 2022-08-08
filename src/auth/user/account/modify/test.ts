@@ -36,7 +36,7 @@ test("submit valid info", async () => {
         { type: "try", hasTakenLongtime: false },
         {
             type: "success",
-            entry: { loginId: "user-id", grantedRoles: ["auth-user"], memo: "memo" },
+            data: { loginId: "user-id", grantedRoles: ["auth-user"], memo: "memo" },
         },
         { type: "initial" },
     ])
@@ -58,7 +58,7 @@ test("submit valid login-id; take long time", async () => {
         { type: "try", hasTakenLongtime: true },
         {
             type: "success",
-            entry: { loginId: "user-id", grantedRoles: ["auth-user"], memo: "memo" },
+            data: { loginId: "user-id", grantedRoles: ["auth-user"], memo: "memo" },
         },
         { type: "initial" },
     ])

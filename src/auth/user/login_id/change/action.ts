@@ -127,7 +127,7 @@ class OverwriteAction implements OverwriteLoginIdAction {
     onSuccess(handler: (data: OverwriteLoginIdEntry) => void): void {
         this.state.subscribe((state) => {
             if (state.type === "success") {
-                handler(state.entry)
+                handler(state.data)
             }
         })
     }
@@ -150,7 +150,7 @@ class OverwriteAction implements OverwriteLoginIdAction {
 type OverwriteLoginIdEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ChangeLoginIdError }>
-    | Readonly<{ type: "success"; entry: OverwriteLoginIdEntry }>
+    | Readonly<{ type: "success"; data: OverwriteLoginIdEntry }>
     | Readonly<{ type: "initial" }>
 
 async function overwriteLoginId<S>(
@@ -173,7 +173,7 @@ async function overwriteLoginId<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    post({ type: "success", entry: { loginId: fields.newLoginId } })
+    post({ type: "success", data: { loginId: fields.newLoginId } })
     return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 

@@ -136,7 +136,7 @@ class Action implements ChangeResetTokenDestinationAction {
     onSuccess(handler: (data: ChangeResetTokenDestinationEntry) => void): void {
         this.state.subscribe((state) => {
             if (state.type === "success") {
-                handler(state.entry)
+                handler(state.data)
             }
         })
     }
@@ -158,7 +158,7 @@ class Action implements ChangeResetTokenDestinationAction {
 type ChangeDestinationEvent =
     | Readonly<{ type: "try"; hasTakenLongtime: boolean }>
     | Readonly<{ type: "failed"; err: ChangeResetTokenDestinationError }>
-    | Readonly<{ type: "success"; entry: ChangeResetTokenDestinationEntry }>
+    | Readonly<{ type: "success"; data: ChangeResetTokenDestinationEntry }>
     | Readonly<{ type: "initial" }>
 
 async function changeDestination<S>(
@@ -181,7 +181,7 @@ async function changeDestination<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    post({ type: "success", entry: { loginId: user.loginId, resetTokenDestination: fields } })
+    post({ type: "success", data: { loginId: user.loginId, resetTokenDestination: fields } })
     return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }
 

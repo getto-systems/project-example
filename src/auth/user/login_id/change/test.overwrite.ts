@@ -22,7 +22,7 @@ test("submit valid new-login-id", async () => {
         }),
     ).toEqual([
         { type: "try", hasTakenLongtime: false },
-        { type: "success", entry: { loginId: "new-login-id" } },
+        { type: "success", data: { loginId: "new-login-id" } },
         { type: "initial" },
     ])
 })
@@ -39,7 +39,7 @@ test("submit valid login-id; take long time", async () => {
     ).toEqual([
         { type: "try", hasTakenLongtime: false },
         { type: "try", hasTakenLongtime: true },
-        { type: "success", entry: { loginId: "new-login-id" } },
+        { type: "success", data: { loginId: "new-login-id" } },
         { type: "initial" },
     ])
 })
