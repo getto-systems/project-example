@@ -1,5 +1,5 @@
 import { test, expect } from "vitest"
-import { setupActionTestRunner } from "../../../../z_vendor/getto-application/action/test_helper"
+import { observeApplicationState } from "../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 
 import { UnregisterAuthUserAccountAction, initUnregisterAuthUserAccountAction } from "./action"
@@ -11,33 +11,29 @@ import { UnregisterAuthUserAccountRemote } from "./infra"
 test("submit", async () => {
     const { unregister } = standard()
 
-    const runner = setupActionTestRunner(unregister)
-
-    await runner(async () => {
-        return unregister.submit()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            { type: "success", entry: { loginId: "user-id" } },
-        ])
-    })
+    expect(
+        await observeApplicationState(unregister.state, async () => {
+            return unregister.submit()
+        }),
+    ).toEqual([
+        { type: "try", hasTakenLongtime: false },
+        { type: "success", entry: { loginId: "user-id" } },
+    ])
 })
 
 test("submit; take long time", async () => {
     // wait for take longtime timeout
     const { unregister } = takeLongtime_elements()
 
-    const runner = setupActionTestRunner(unregister)
-
-    await runner(() => {
-        return unregister.submit()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "try", hasTakenLongtime: false },
-            { type: "try", hasTakenLongtime: true },
-            { type: "success", entry: { loginId: "user-id" } },
-        ])
-    })
+    expect(
+        await observeApplicationState(unregister.state, async () => {
+            return unregister.submit()
+        }),
+    ).toEqual([
+        { type: "try", hasTakenLongtime: false },
+        { type: "try", hasTakenLongtime: true },
+        { type: "success", entry: { loginId: "user-id" } },
+    ])
 })
 
 function standard() {

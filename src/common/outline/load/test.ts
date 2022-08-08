@@ -1,5 +1,5 @@
 import { test, expect } from "vitest"
-import { setupActionTestRunner } from "../../../z_vendor/getto-application/action/test_helper"
+import { observeApplicationState } from "../../../z_vendor/getto-application/action/test_helper"
 
 import { markMenuCategoryLabel, standard_MenuTree } from "./test_helper"
 
@@ -24,229 +24,232 @@ import {
 import { AuthTicket } from "../../../auth/ticket/kernel/data"
 
 test("load menu", async () => {
-    const { resource } = standard()
+    const { menu } = standard()
 
-    const runner = setupActionTestRunner(resource.menu)
-
-    await runner(() => resource.menu.state.ignitionState).then((stack) => {
-        expect(stack).toEqual([
-            {
-                type: "succeed-to-load",
-                menu: [
-                    $category("MAIN", ["MAIN"], 0, [
-                        $item("ホーム", "home", "/1.0.0/index.html", 0),
-                        item("ドキュメント", "docs", "/1.0.0/docs/index.html", 0),
+    expect(
+        await observeApplicationState(menu.state, async () => {
+            return menu.state.ignitionState
+        }),
+    ).toEqual([
+        {
+            type: "succeed-to-load",
+            menu: [
+                $category("MAIN", ["MAIN"], 0, [
+                    $item("ホーム", "home", "/1.0.0/index.html", 0),
+                    item("ドキュメント", "docs", "/1.0.0/docs/index.html", 0),
+                ]),
+                category("DOCUMENT", ["DOCUMENT"], 0, [
+                    item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
+                    category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
+                        item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
                     ]),
-                    category("DOCUMENT", ["DOCUMENT"], 0, [
-                        item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
-                        category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
-                            item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
-                        ]),
+                ]),
+            ],
+        },
+        {
+            type: "succeed-to-update",
+            menu: [
+                $category("MAIN", ["MAIN"], 30, [
+                    $item("ホーム", "home", "/1.0.0/index.html", 10),
+                    item("ドキュメント", "docs", "/1.0.0/docs/index.html", 20),
+                ]),
+                category("DOCUMENT", ["DOCUMENT"], 0, [
+                    item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
+                    category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
+                        item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
                     ]),
-                ],
-            },
-            {
-                type: "succeed-to-update",
-                menu: [
-                    $category("MAIN", ["MAIN"], 30, [
-                        $item("ホーム", "home", "/1.0.0/index.html", 10),
-                        item("ドキュメント", "docs", "/1.0.0/docs/index.html", 20),
-                    ]),
-                    category("DOCUMENT", ["DOCUMENT"], 0, [
-                        item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
-                        category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
-                            item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
-                        ]),
-                    ]),
-                ],
-            },
-        ])
-    })
+                ]),
+            ],
+        },
+    ])
 })
 
 test("load menu; empty roles", async () => {
-    const { resource } = empty()
+    const { menu } = empty()
 
-    const runner = setupActionTestRunner(resource.menu)
-
-    await runner(() => resource.menu.state.ignitionState).then((stack) => {
-        expect(stack).toEqual([{ type: "required-to-login" }])
-    })
+    expect(
+        await observeApplicationState(menu.state, async () => {
+            return menu.state.ignitionState
+        }),
+    ).toEqual([{ type: "required-to-login" }])
 })
 
 test("load menu; saved expands", async () => {
-    const { resource } = expand()
+    const { menu } = expand()
 
-    const runner = setupActionTestRunner(resource.menu)
-
-    await runner(() => resource.menu.state.ignitionState).then((stack) => {
-        expect(stack).toEqual([
-            {
-                type: "succeed-to-load",
-                menu: [
-                    $category("MAIN", ["MAIN"], 0, [
-                        $item("ホーム", "home", "/1.0.0/index.html", 0),
-                        item("ドキュメント", "docs", "/1.0.0/docs/index.html", 0),
+    expect(
+        await observeApplicationState(menu.state, async () => {
+            return menu.state.ignitionState
+        }),
+    ).toEqual([
+        {
+            type: "succeed-to-load",
+            menu: [
+                $category("MAIN", ["MAIN"], 0, [
+                    $item("ホーム", "home", "/1.0.0/index.html", 0),
+                    item("ドキュメント", "docs", "/1.0.0/docs/index.html", 0),
+                ]),
+                $category("DOCUMENT", ["DOCUMENT"], 0, [
+                    item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
+                    category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
+                        item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
                     ]),
-                    $category("DOCUMENT", ["DOCUMENT"], 0, [
-                        item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
-                        category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
-                            item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
-                        ]),
+                ]),
+            ],
+        },
+        {
+            type: "succeed-to-update",
+            menu: [
+                $category("MAIN", ["MAIN"], 30, [
+                    $item("ホーム", "home", "/1.0.0/index.html", 10),
+                    item("ドキュメント", "docs", "/1.0.0/docs/index.html", 20),
+                ]),
+                $category("DOCUMENT", ["DOCUMENT"], 0, [
+                    item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
+                    category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
+                        item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
                     ]),
-                ],
-            },
-            {
-                type: "succeed-to-update",
-                menu: [
-                    $category("MAIN", ["MAIN"], 30, [
-                        $item("ホーム", "home", "/1.0.0/index.html", 10),
-                        item("ドキュメント", "docs", "/1.0.0/docs/index.html", 20),
-                    ]),
-                    $category("DOCUMENT", ["DOCUMENT"], 0, [
-                        item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
-                        category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
-                            item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
-                        ]),
-                    ]),
-                ],
-            },
-        ])
-    })
+                ]),
+            ],
+        },
+    ])
 })
 
 test("load menu; toggle expands", async () => {
-    const { resource, menuExpand } = standard()
+    const { menu, repository } = standard()
 
-    const runner = setupActionTestRunner(resource.menu)
+    await menu.state.ignitionState
 
-    await runner(() => resource.menu.state.ignitionState)
-    await runner(() => resource.menu.show([markMenuCategoryLabel("DOCUMENT")])).then((stack) => {
-        expect(stack).toEqual([
-            {
-                type: "succeed-to-toggle",
-                menu: [
-                    $category("MAIN", ["MAIN"], 30, [
-                        $item("ホーム", "home", "/1.0.0/index.html", 10),
-                        item("ドキュメント", "docs", "/1.0.0/docs/index.html", 20),
+    expect(
+        await observeApplicationState(menu.state, async () => {
+            return menu.show([markMenuCategoryLabel("DOCUMENT")])
+        }),
+    ).toEqual([
+        {
+            type: "succeed-to-toggle",
+            menu: [
+                $category("MAIN", ["MAIN"], 30, [
+                    $item("ホーム", "home", "/1.0.0/index.html", 10),
+                    item("ドキュメント", "docs", "/1.0.0/docs/index.html", 20),
+                ]),
+                $category("DOCUMENT", ["DOCUMENT"], 0, [
+                    item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
+                    category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
+                        item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
                     ]),
-                    $category("DOCUMENT", ["DOCUMENT"], 0, [
-                        item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
-                        category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
-                            item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
-                        ]),
-                    ]),
-                ],
-            },
-        ])
+                ]),
+            ],
+        },
+    ])
+
+    expect(await repository.get()).toMatchObject({
+        success: true,
+        found: true,
+        value: { values: [["DOCUMENT"]] },
     })
-    await runner(() =>
-        resource.menu.show([markMenuCategoryLabel("DOCUMENT"), markMenuCategoryLabel("DETAIL")]),
-    ).then(async (stack) => {
-        expect(stack).toEqual([
-            {
-                type: "succeed-to-toggle",
-                menu: [
-                    $category("MAIN", ["MAIN"], 30, [
-                        $item("ホーム", "home", "/1.0.0/index.html", 10),
-                        item("ドキュメント", "docs", "/1.0.0/docs/index.html", 20),
-                    ]),
-                    $category("DOCUMENT", ["DOCUMENT"], 0, [
-                        item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
-                        $category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
-                            item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
-                        ]),
-                    ]),
-                ],
-            },
-        ])
 
-        const result = await menuExpand.get()
-        if (!result.success) {
-            throw new Error("menu expand get failed")
-        }
-        if (!result.found) {
-            throw new Error("menu expand not found")
-        }
-        expect(result.value.values).toEqual([["DOCUMENT"], ["DOCUMENT", "DETAIL"]])
+    expect(
+        await observeApplicationState(menu.state, async () => {
+            return menu.show([markMenuCategoryLabel("DOCUMENT"), markMenuCategoryLabel("DETAIL")])
+        }),
+    ).toEqual([
+        {
+            type: "succeed-to-toggle",
+            menu: [
+                $category("MAIN", ["MAIN"], 30, [
+                    $item("ホーム", "home", "/1.0.0/index.html", 10),
+                    item("ドキュメント", "docs", "/1.0.0/docs/index.html", 20),
+                ]),
+                $category("DOCUMENT", ["DOCUMENT"], 0, [
+                    item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
+                    $category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
+                        item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
+                    ]),
+                ]),
+            ],
+        },
+    ])
+
+    expect(await repository.get()).toMatchObject({
+        success: true,
+        found: true,
+        value: { values: [["DOCUMENT"], ["DOCUMENT", "DETAIL"]] },
     })
-    await runner(() =>
-        resource.menu.hide([markMenuCategoryLabel("DOCUMENT"), markMenuCategoryLabel("DETAIL")]),
-    ).then(async (stack) => {
-        expect(stack).toEqual([
-            {
-                type: "succeed-to-toggle",
-                menu: [
-                    $category("MAIN", ["MAIN"], 30, [
-                        $item("ホーム", "home", "/1.0.0/index.html", 10),
-                        item("ドキュメント", "docs", "/1.0.0/docs/index.html", 20),
-                    ]),
-                    $category("DOCUMENT", ["DOCUMENT"], 0, [
-                        item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
-                        category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
-                            item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
-                        ]),
-                    ]),
-                ],
-            },
-        ])
 
-        const result = await menuExpand.get()
-        if (!result.success) {
-            throw new Error("menu expand get failed")
-        }
-        if (!result.found) {
-            throw new Error("menu expand not found")
-        }
-        expect(result.value.values).toEqual([["DOCUMENT"]])
+    expect(
+        await observeApplicationState(menu.state, async () => {
+            return menu.hide([markMenuCategoryLabel("DOCUMENT"), markMenuCategoryLabel("DETAIL")])
+        }),
+    ).toEqual([
+        {
+            type: "succeed-to-toggle",
+            menu: [
+                $category("MAIN", ["MAIN"], 30, [
+                    $item("ホーム", "home", "/1.0.0/index.html", 10),
+                    item("ドキュメント", "docs", "/1.0.0/docs/index.html", 20),
+                ]),
+                $category("DOCUMENT", ["DOCUMENT"], 0, [
+                    item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
+                    category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
+                        item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
+                    ]),
+                ]),
+            ],
+        },
+    ])
+
+    expect(await repository.get()).toMatchObject({
+        success: true,
+        found: true,
+        value: { values: [["DOCUMENT"]] },
     })
 })
 
 test("load menu; dev docs", async () => {
-    const { resource } = user()
+    const { menu } = user()
 
-    const runner = setupActionTestRunner(resource.menu)
-
-    await runner(() => resource.menu.state.ignitionState).then((stack) => {
-        expect(stack).toEqual([
-            {
-                type: "succeed-to-load",
-                menu: [
-                    $category("MAIN", ["MAIN"], 0, [
-                        $item("ホーム", "home", "/1.0.0/index.html", 0),
-                        item("ドキュメント", "docs", "/1.0.0/docs/index.html", 0),
+    expect(
+        await observeApplicationState(menu.state, async () => {
+            return menu.state.ignitionState
+        }),
+    ).toEqual([
+        {
+            type: "succeed-to-load",
+            menu: [
+                $category("MAIN", ["MAIN"], 0, [
+                    $item("ホーム", "home", "/1.0.0/index.html", 0),
+                    item("ドキュメント", "docs", "/1.0.0/docs/index.html", 0),
+                ]),
+                category("DOCUMENT", ["DOCUMENT"], 0, [
+                    item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
+                    category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
+                        item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
                     ]),
-                    category("DOCUMENT", ["DOCUMENT"], 0, [
-                        item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
-                        category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
-                            item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
-                        ]),
+                ]),
+                category("ACCOUNT", ["ACCOUNT"], 0, [
+                    item("ユーザー", "friends", "/1.0.0/user/account.html", 0),
+                ]),
+            ],
+        },
+        {
+            type: "succeed-to-update",
+            menu: [
+                $category("MAIN", ["MAIN"], 30, [
+                    $item("ホーム", "home", "/1.0.0/index.html", 10),
+                    item("ドキュメント", "docs", "/1.0.0/docs/index.html", 20),
+                ]),
+                category("DOCUMENT", ["DOCUMENT"], 0, [
+                    item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
+                    category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
+                        item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
                     ]),
-                    category("ACCOUNT", ["ACCOUNT"], 0, [
-                        item("ユーザー", "friends", "/1.0.0/user/account.html", 0),
-                    ]),
-                ],
-            },
-            {
-                type: "succeed-to-update",
-                menu: [
-                    $category("MAIN", ["MAIN"], 30, [
-                        $item("ホーム", "home", "/1.0.0/index.html", 10),
-                        item("ドキュメント", "docs", "/1.0.0/docs/index.html", 20),
-                    ]),
-                    category("DOCUMENT", ["DOCUMENT"], 0, [
-                        item("認証・認可", "auth", "/1.0.0/docs/auth.html", 0),
-                        category("DETAIL", ["DOCUMENT", "DETAIL"], 0, [
-                            item("詳細", "detail", "/1.0.0/docs/auth.html", 0),
-                        ]),
-                    ]),
-                    category("ACCOUNT", ["ACCOUNT"], 0, [
-                        item("ユーザー", "friends", "/1.0.0/user/account.html", 0),
-                    ]),
-                ],
-            },
-        ])
-    })
+                ]),
+                category("ACCOUNT", ["ACCOUNT"], 0, [
+                    item("ユーザー", "friends", "/1.0.0/user/account.html", 0),
+                ]),
+            ],
+        },
+    ])
 })
 
 type MenuNode =
@@ -310,58 +313,45 @@ function itemNode(
 }
 
 function standard() {
-    const [resource, menuExpand] = initResource(
-        standard_ticketRepository(),
-        empty_menuExpandRepository(),
-    )
-
-    return { resource, menuExpand }
+    return initResource(standard_ticketRepository(), empty_menuExpandRepository())
 }
 function empty() {
-    const [resource] = initResource(empty_ticketRepository(), empty_menuExpandRepository())
-
-    return { resource }
+    return initResource(empty_ticketRepository(), empty_menuExpandRepository())
 }
 function user() {
-    const [resource] = initResource(user_ticketRepository(), empty_menuExpandRepository())
-
-    return { resource }
+    return initResource(user_ticketRepository(), empty_menuExpandRepository())
 }
 function expand() {
-    const [resource] = initResource(standard_ticketRepository(), expand_menuExpandRepository())
-
-    return { resource }
+    return initResource(standard_ticketRepository(), expand_menuExpandRepository())
 }
 
 function initResource(
     ticketRepository: AuthTicketRepository,
     menuExpandRepository: MenuExpandRepository,
-): [Readonly<{ menu: LoadMenuAction }>, MenuExpandRepository] {
+): Readonly<{ menu: LoadMenuAction; repository: MenuExpandRepository }> {
     const version = standard_version()
     const detectTargetPath = standard_detecter()
     const loadMenuBadgeRemote = standard_loadMenuBadgeRemote()
 
-    return [
-        {
-            menu: initLoadMenuAction({
-                infra: {
-                    loadMenuBadgeRemote,
-                    ticketRepository,
-                    menuExpandRepository,
-                    menuExpandStore: initMenuExpandStore(),
-                    menuBadgeStore: initMenuBadgeStore(),
-                },
-                shell: {
-                    detectTargetPath,
-                },
-                config: {
-                    version,
-                    menuTree: standard_MenuTree(),
-                },
-            }),
-        },
-        menuExpandRepository,
-    ]
+    return {
+        menu: initLoadMenuAction({
+            infra: {
+                loadMenuBadgeRemote,
+                ticketRepository,
+                menuExpandRepository,
+                menuExpandStore: initMenuExpandStore(),
+                menuBadgeStore: initMenuBadgeStore(),
+            },
+            shell: {
+                detectTargetPath,
+            },
+            config: {
+                version,
+                menuTree: standard_MenuTree(),
+            },
+        }),
+        repository: menuExpandRepository,
+    }
 }
 
 function standard_detecter(): MenuTargetPathDetecter {

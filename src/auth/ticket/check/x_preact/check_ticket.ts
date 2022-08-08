@@ -4,7 +4,7 @@ import { html } from "htm/preact"
 
 import { remoteCommonErrorReason } from "../../../../z_lib/ui/remote/x_error/reason"
 
-import { useApplicationAction } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { loginBox } from "../../../../z_vendor/getto-css/preact/layout/login"
 import { v_medium } from "../../../../z_vendor/getto-css/preact/design/alignment"
@@ -26,7 +26,7 @@ type Props = Readonly<{
     check: CheckAuthTicketAction
 }>
 export function CheckAuthTicket(props: Props): VNode {
-    const state = useApplicationAction(props.check)
+    const state = useApplicationState(props.check.state)
 
     useLayoutEffect(() => {
         // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う

@@ -1,7 +1,6 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 import {
     InputBoardAction,
@@ -13,7 +12,8 @@ import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/
 
 import { RepositoryError } from "../../repository/data"
 
-export interface SearchColumnsAction extends StatefulApplicationAction<SearchColumnsState> {
+export interface SearchColumnsAction {
+    readonly state: ApplicationState<SearchColumnsState>
     readonly input: InputBoardAction<MultipleBoardValueStore>
 
     get(): readonly string[]

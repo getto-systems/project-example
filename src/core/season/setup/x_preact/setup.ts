@@ -1,7 +1,7 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { useApplicationAction } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { box } from "../../../../z_vendor/getto-css/preact/design/box"
 import { field, fieldHelp_error } from "../../../../z_vendor/getto-css/preact/design/form"
@@ -16,23 +16,19 @@ import { seasonLabel } from "../../kernel/helper"
 
 import { LoadSeasonAction } from "../../load/action"
 import { SetupSeasonAction } from "../action"
-import { EditableBoardAction } from "../../../../z_vendor/getto-application/board/editable/action"
 
 import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 
 type Props = Readonly<{
     season: LoadSeasonAction
-    setup: Readonly<{
-        season: SetupSeasonAction
-        editable: EditableBoardAction
-    }>
+    setup: SetupSeasonAction
 }>
 export function SetupSeason(props: Props): VNode {
-    const state = useApplicationAction(props.setup.season)
-    const validateState = useApplicationAction(props.setup.season.validate)
-    const observeState = useApplicationAction(props.setup.season.observe)
-    const editableState = useApplicationAction(props.setup.editable)
-    const loadState = useApplicationAction(props.season)
+    const state = useApplicationState(props.setup.state)
+    const validateState = useApplicationState(props.setup.validate.state)
+    const observeState = useApplicationState(props.setup.observe.state)
+    const editableState = useApplicationState(props.setup.editable.state)
+    const loadState = useApplicationState(props.season.state)
 
     switch (loadState.type) {
         case "initial":
@@ -47,7 +43,7 @@ export function SetupSeason(props: Props): VNode {
                           body: [
                               h(InputSeason, {
                                   title: "シーズン",
-                                  field: props.setup.season.season,
+                                  field: props.setup.season,
                                   seasons: loadState.availableSeasons,
                               }),
                           ],
@@ -89,11 +85,7 @@ export function SetupSeason(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.setup.season.setup(onSuccess)
-
-            function onSuccess() {
-                props.setup.editable.close()
-            }
+            props.setup.setup()
         }
     }
 

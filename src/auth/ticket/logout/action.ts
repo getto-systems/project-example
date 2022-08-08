@@ -1,7 +1,6 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 
 import { AuthTicketRepository } from "../kernel/infra"
@@ -10,7 +9,8 @@ import { LogoutRemote } from "./infra"
 import { RepositoryError } from "../../../z_lib/ui/repository/data"
 import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
 
-export interface LogoutAction extends StatefulApplicationAction<LogoutState> {
+export interface LogoutAction {
+    readonly state: ApplicationState<LogoutState>
     submit(): Promise<LogoutState>
 }
 

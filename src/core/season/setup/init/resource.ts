@@ -10,10 +10,10 @@ type OutsideFeature = RepositoryOutsideFeature
 export function newSetupSeasonResource(
     feature: OutsideFeature,
     season: LoadSeasonAction,
-): Readonly<{ season: LoadSeasonAction; setupSeason: SetupSeasonAction }> {
+): Readonly<{ season: LoadSeasonAction; setup: SetupSeasonAction }> {
     return {
         season,
-        setupSeason: initSetupSeasonAction(
+        setup: initSetupSeasonAction(
             {
                 infra: newSetupSeasonInfra(feature),
                 config: newSetupSeasonConfig(),

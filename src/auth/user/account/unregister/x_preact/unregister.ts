@@ -1,7 +1,7 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     buttons,
@@ -27,8 +27,8 @@ type Props = Readonly<{
     unregister: UnregisterAuthUserAccountAction
 }>
 export function UnregisterAuthUserAccount(props: Props): VNode {
-    const state = useApplicationAction(props.unregister)
-    const editableState = useApplicationAction(props.unregister.editable)
+    const state = useApplicationState(props.unregister.state)
+    const editableState = useApplicationState(props.unregister.editable.state)
 
     return form(
         box({

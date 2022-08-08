@@ -2,7 +2,7 @@ import { h, VNode } from "preact"
 import { useErrorBoundary, useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
 
-import { useApplicationAction } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { loginBox } from "../../../../z_vendor/getto-css/preact/layout/login"
 import { siteInfo } from "../../../../x_content/site"
@@ -20,7 +20,7 @@ type Props = Readonly<{
     findNext: FindNextVersionAction
 }>
 export function MoveToLatestVersion(props: Props): VNode {
-    const state = useApplicationAction(props.findNext)
+    const state = useApplicationState(props.findNext.state)
     const [err] = useErrorBoundary((err) => {
         // 認証前なのでエラーはどうしようもない
         console.log(err)

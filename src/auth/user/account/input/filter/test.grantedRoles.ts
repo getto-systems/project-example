@@ -1,7 +1,6 @@
 import { test, expect } from "vitest"
 import { ALL_AUTH_ROLES } from "../../../../../x_content/role"
-import { setupActionTestRunner } from "../../../../../z_vendor/getto-application/action/test_helper"
-
+import { observeApplicationState } from "../../../../../z_vendor/getto-application/action/test_helper"
 import { mockMultipleBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/test_helper"
 
 import { initAuthUserGrantedRolesFilterAction } from "./action"
@@ -9,14 +8,12 @@ import { initAuthUserGrantedRolesFilterAction } from "./action"
 test("observe; has changed", async () => {
     const { action, store } = standard()
 
-    const runner = setupActionTestRunner(action.observe)
-
-    await runner(async () => {
-        store.set(["auth-user"])
-        return action.observe.state.currentState()
-    }).then((stack) => {
-        expect(stack).toEqual([{ hasChanged: true }])
-    })
+    expect(
+        await observeApplicationState(action.observe.state, async () => {
+            store.set(["auth-user"])
+            return action.observe.state.currentState()
+        }),
+    ).toEqual([{ hasChanged: true }])
 })
 
 test("pin", async () => {

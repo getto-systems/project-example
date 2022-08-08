@@ -4,7 +4,7 @@ import { html } from "htm/preact"
 
 import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_error/reason"
 
-import { useApplicationAction } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     buttons,
@@ -35,9 +35,9 @@ type Props = Readonly<{
     reset: ResetPasswordAction
 }>
 export function ResetPassword(props: Props): VNode {
-    const state = useApplicationAction(props.reset)
-    const validateState = useApplicationAction(props.reset.validate)
-    const observeState = useApplicationAction(props.reset.observe)
+    const state = useApplicationState(props.reset.state)
+    const validateState = useApplicationState(props.reset.validate.state)
+    const observeState = useApplicationState(props.reset.observe.state)
 
     useLayoutEffect(() => {
         // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う

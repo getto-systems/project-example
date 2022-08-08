@@ -1,6 +1,6 @@
 import { h, VNode } from "preact"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box, container } from "../../../../../z_vendor/getto-css/preact/design/box"
@@ -25,9 +25,9 @@ type Props = Readonly<{
     register: RegisterAuthUserAccountAction
 }>
 export function RegisterAuthUserAccount(props: Props): VNode {
-    const state = useApplicationAction(props.register)
-    const validateState = useApplicationAction(props.register.validate)
-    const observeState = useApplicationAction(props.register.observe)
+    const state = useApplicationState(props.register.state)
+    const validateState = useApplicationState(props.register.validate.state)
+    const observeState = useApplicationState(props.register.observe.state)
 
     return container(
         box({

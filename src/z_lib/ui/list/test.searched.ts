@@ -1,6 +1,9 @@
 import { test, expect } from "vitest"
 
-import { setupActionTestRunner } from "../../../z_vendor/getto-application/action/test_helper"
+import {
+    observeApplicationState,
+    observeApplicationStateTuple2,
+} from "../../../z_vendor/getto-application/action/test_helper"
 
 import { ModifyFieldHandler } from "../modify/action"
 import { initListSearchedAction, ListSearchedAction } from "./action"
@@ -22,14 +25,12 @@ test("error", async () => {
 test("detected", async () => {
     const { list, item, stack } = detected()
 
-    const focusRunner = setupActionTestRunner(list.focus)
-
-    await focusRunner(async () => {
-        await list.state.ignitionState
-        return list.focus.state.currentState()
-    }).then((stack) => {
-        expect(stack).toEqual([{ type: "detect", data: item[0] }])
-    })
+    expect(
+        await observeApplicationState(list.focus.state, async () => {
+            await list.state.ignitionState
+            return list.focus.state.currentState()
+        }),
+    ).toEqual([{ type: "detect", data: item[0] }])
 
     expect(stack).toEqual({
         focus: [item[0]],
@@ -41,14 +42,12 @@ test("detected", async () => {
 test("detect failed", async () => {
     const { list, stack } = detectFailed()
 
-    const focusRunner = setupActionTestRunner(list.focus)
-
-    await focusRunner(async () => {
-        await list.state.ignitionState
-        return list.focus.state.currentState()
-    }).then((stack) => {
-        expect(stack).toEqual([{ type: "detect-failed" }])
-    })
+    expect(
+        await observeApplicationState(list.focus.state, async () => {
+            await list.state.ignitionState
+            return list.focus.state.currentState()
+        }),
+    ).toEqual([{ type: "detect-failed" }])
 
     expect(stack).toEqual({
         focus: [],
@@ -60,30 +59,24 @@ test("detect failed", async () => {
 test("focus / close", async () => {
     const { list, item, stack } = standard()
 
-    const runner = setupActionTestRunner(list.focus)
+    expect(
+        await observeApplicationState(list.focus.state, async () => {
+            await list.state.ignitionState
+            const another: Data = { id: 2, name: "another" }
 
-    await runner(async () => {
-        await list.state.ignitionState
-        const another: Data = { id: 2, name: "another" }
+            list.focus.change(item[0])
+            expect(list.focus.isFocused(item[0])).toBe(true)
+            expect(list.focus.isFocused(another)).toBe(false)
 
-        list.focus.change(item[0])
-        expect(list.focus.isFocused(item[0])).toBe(true)
-        expect(list.focus.isFocused(another)).toBe(false)
+            list.focus.close()
+            expect(list.focus.isFocused(item[0])).toBe(false)
+            expect(list.focus.isFocused(another)).toBe(false)
 
-        list.focus.close()
-        expect(list.focus.isFocused(item[0])).toBe(false)
-        expect(list.focus.isFocused(another)).toBe(false)
+            list.focus.change(another)
 
-        list.focus.change(another)
-
-        return list.focus.state.currentState()
-    }).then((stack) => {
-        expect(stack).toEqual([
-            { type: "change", data: item[0] },
-            { type: "close" },
-            { type: "close" },
-        ])
-    })
+            return list.focus.state.currentState()
+        }),
+    ).toEqual([{ type: "change", data: item[0] }, { type: "close" }, { type: "close" }])
 
     expect(stack).toEqual({
         focus: [item[0]],
@@ -97,29 +90,24 @@ test("update", async () => {
 
     const updatedData: Data = { id: 1, name: "updated-name" }
 
-    const listRunner = setupActionTestRunner(list)
-    const focusRunner = setupActionTestRunner(list.focus)
-
-    await listRunner(async () => {
-        await focusRunner(async () => {
+    expect(
+        await observeApplicationStateTuple2([list.state, list.focus.state], async () => {
             await list.state.ignitionState
             list.focus.change(item[0])
             return list.focus.update(updatedData)
-        }).then((stack) => {
-            expect(stack).toEqual([
-                { type: "change", data: item[0] },
-                { type: "update", data: updatedData },
-            ])
-        })
-        return list.state.currentState()
-    }).then((stack) => {
-        expect(stack).toEqual([
+        }),
+    ).toEqual([
+        [
             {
                 isLoad: true,
                 data: { type: "success", response: { list: [updatedData, item[1]], sort: "id" } },
             },
-        ])
-    })
+        ],
+        [
+            { type: "change", data: item[0] },
+            { type: "update", data: updatedData },
+        ],
+    ])
 
     expect(stack).toEqual({
         focus: [item[0]],
@@ -131,26 +119,21 @@ test("update", async () => {
 test("remove", async () => {
     const { list, item, stack } = standard()
 
-    const listRunner = setupActionTestRunner(list)
-    const focusRunner = setupActionTestRunner(list.focus)
-
-    await listRunner(async () => {
-        await focusRunner(async () => {
+    expect(
+        await observeApplicationStateTuple2([list.state, list.focus.state], async () => {
             await list.state.ignitionState
             list.focus.change(item[0])
             return list.focus.remove()
-        }).then((stack) => {
-            expect(stack).toEqual([{ type: "change", data: item[0] }, { type: "close" }])
-        })
-        return list.state.currentState()
-    }).then((stack) => {
-        expect(stack).toEqual([
+        }),
+    ).toEqual([
+        [
             {
                 isLoad: true,
                 data: { type: "success", response: { list: [item[1]], sort: "id" } },
             },
-        ])
-    })
+        ],
+        [{ type: "change", data: item[0] }, { type: "close" }],
+    ])
 
     expect(stack).toEqual({
         focus: [item[0]],

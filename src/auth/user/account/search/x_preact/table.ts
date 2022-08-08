@@ -1,7 +1,7 @@
 import { VNode } from "preact"
 import { html } from "htm/preact"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     table,
@@ -21,9 +21,9 @@ type Props = Readonly<{
     structure: SearchAuthUserAccountTableStructure
 }>
 export function SearchAuthUserAccountTable(props: Props): VNode {
-    const state = useApplicationAction(props.search)
-    const listState = useApplicationAction(props.search.list)
-    const _columnsState = useApplicationAction(props.search.columns)
+    const state = useApplicationState(props.search.state)
+    const listState = useApplicationState(props.search.list.state)
+    const _columnsState = useApplicationState(props.search.columns.state)
 
     if (state.type === "try" && state.hasTakenLongtime) {
         return takeLongtimeTable()

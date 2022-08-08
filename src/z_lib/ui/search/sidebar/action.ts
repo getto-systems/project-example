@@ -1,7 +1,6 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
 import { SearchSidebarRepository } from "./infra"
@@ -9,7 +8,8 @@ import { SearchSidebarRepository } from "./infra"
 import { SearchSidebarExpand } from "./data"
 import { RepositoryError } from "../../repository/data"
 
-export interface SearchSidebarAction extends StatefulApplicationAction<SearchSidebarState> {
+export interface SearchSidebarAction {
+    readonly state: ApplicationState<SearchSidebarState>
     fold(): Promise<SearchSidebarState>
     expand(): Promise<SearchSidebarState>
 }

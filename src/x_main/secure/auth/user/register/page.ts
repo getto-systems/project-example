@@ -1,6 +1,6 @@
 import { h, VNode } from "preact"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import {
     appLayout,
@@ -37,8 +37,8 @@ export function ManageUserAccountPage(props: RegisterUserAccountPageResource): V
     useDocumentTitle(pageTitle)
     const err = useNotifyUnexpectedError(props)
 
-    const sidebarState = useApplicationAction(props.sidebar)
-    const focusState = useApplicationAction(props.register.list.focus)
+    const sidebarState = useApplicationState(props.sidebar.state)
+    const focusState = useApplicationState(props.register.list.focus.state)
 
     if (err) {
         return h(ApplicationError, { err: `${err}` })

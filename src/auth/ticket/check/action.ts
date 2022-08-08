@@ -3,7 +3,6 @@ import { checkTakeLongtime } from "../../../z_lib/ui/timer/helper"
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 
 import { startContinuousRenew } from "./method"
@@ -27,7 +26,8 @@ import { ConvertScriptPathResult, LoadScriptError } from "../../sign/get_script_
 import { RepositoryError } from "../../../z_lib/ui/repository/data"
 import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
 
-export interface CheckAuthTicketAction extends StatefulApplicationAction<CheckAuthTicketState> {
+export interface CheckAuthTicketAction {
+    readonly state: ApplicationState<CheckAuthTicketState>
     succeedToInstantLoad(): Promise<CheckAuthTicketState>
     failedToInstantLoad(): Promise<CheckAuthTicketState>
     loadError(err: LoadScriptError): Promise<CheckAuthTicketState>

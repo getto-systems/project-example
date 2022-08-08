@@ -2,7 +2,7 @@ import { h, VNode } from "preact"
 
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
-import { useApplicationAction } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 import { useEditableState } from "../../../../../../z_vendor/getto-application/board/editable/x_preact/hooks"
 
 import {
@@ -48,7 +48,7 @@ type TextProps<K extends AuthUserTextField> = FieldProps<
 >
 
 export function AuthUserMemoField(props: TextProps<"memo">): VNode {
-    const validateState = useApplicationAction(props.field.validate)
+    const validateState = useApplicationState(props.field.validate.state)
     const editableState = useEditableState(props.edit)
 
     return inputField({

@@ -1,6 +1,6 @@
 import { h, VNode } from "preact"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 
@@ -19,7 +19,7 @@ type Props = Readonly<{
     structure: SearchAuthUserAccountTableStructure
 }>
 export function SearchAuthUserAccountColumns(props: Props): VNode {
-    const columnsState = useApplicationAction(props.search.columns)
+    const columnsState = useApplicationState(props.search.columns.state)
     switch (columnsState.type) {
         case "initial":
         case "success":

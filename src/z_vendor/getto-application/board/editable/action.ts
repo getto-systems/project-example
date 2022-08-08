@@ -1,6 +1,7 @@
-import { initApplicationState, StatefulApplicationAction } from "../../action/action"
+import { ApplicationState, initApplicationState } from "../../action/action"
 
-export interface EditableBoardAction extends StatefulApplicationAction<EditableBoardState> {
+export interface EditableBoardAction {
+    readonly state: ApplicationState<EditableBoardState>
     open(): EditableBoardState
     close(): EditableBoardState
 }

@@ -1,7 +1,6 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 import { EditableBoardAction } from "../../../../z_vendor/getto-application/board/editable/action"
 import { initEditableDataHandler, ModifyFieldHandler } from "../../../../z_lib/ui/modify/action"
@@ -15,8 +14,8 @@ import { UnregisterAuthUserAccountError } from "./data"
 import { LoginId } from "../../login_id/kernel/data"
 import { PrepareElementState } from "../../../../z_lib/ui/prepare/data"
 
-export interface UnregisterAuthUserAccountAction
-    extends StatefulApplicationAction<UnregisterAuthUserAccountState> {
+export interface UnregisterAuthUserAccountAction {
+    readonly state: ApplicationState<UnregisterAuthUserAccountState>
     readonly editable: EditableBoardAction
 
     onSuccess(handler: (data: UnregisterAuthUserAccountEntry) => void): void

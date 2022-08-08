@@ -1,7 +1,6 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../../z_vendor/getto-application/action/action"
 
 import { initPasswordFieldAction } from "../input/action"
@@ -29,7 +28,8 @@ import {
     ModifyFieldHandler,
 } from "../../../../z_lib/ui/modify/action"
 
-export interface ChangePasswordAction extends StatefulApplicationAction<ChangePasswordState> {
+export interface ChangePasswordAction {
+    readonly state: ApplicationState<ChangePasswordState>
     readonly currentPassword: PasswordFieldAction
     readonly newPassword: PasswordFieldAction
     readonly validate: ValidateBoardAction
@@ -38,14 +38,15 @@ export interface ChangePasswordAction extends StatefulApplicationAction<ChangePa
 
     edit(): void
     clear(): void
-    submit(onSuccess: { (): void }): Promise<ChangePasswordState>
+    submit(): Promise<ChangePasswordState>
 }
 
 export type ChangePasswordState = ChangePasswordEvent
 
 const initialState: ChangePasswordState = { type: "initial" }
 
-export interface OverwritePasswordAction extends StatefulApplicationAction<OverwritePasswordState> {
+export interface OverwritePasswordAction {
+    readonly state: ApplicationState<OverwritePasswordState>
     readonly newPassword: PasswordFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
@@ -138,26 +139,32 @@ class Action implements ChangePasswordAction {
         this.observe = observe
         this.convert = convert
         this.clear = clear
+
+        this.onSuccess(() => {
+            this.editable.close()
+        })
+    }
+
+    onSuccess(handler: () => void): void {
+        this.state.subscribe((state) => {
+            switch (state.type) {
+                case "success":
+                    handler()
+                    break
+            }
+        })
     }
 
     edit(): void {
         this.editable.open()
         this.clear()
     }
-    async submit(onSuccess: { (): void }): Promise<ChangePasswordState> {
+    async submit(): Promise<ChangePasswordState> {
         const fields = this.convert()
         if (!fields.valid) {
             return this.state.currentState()
         }
-        return changePassword(
-            this.material,
-            fields.value,
-            () => {
-                this.editable.close()
-                onSuccess()
-            },
-            this.post,
-        )
+        return changePassword(this.material, fields.value, this.post)
     }
 }
 
@@ -170,7 +177,6 @@ type ChangePasswordEvent =
 async function changePassword<S>(
     { infra, config }: ChangePasswordMaterial,
     fields: ChangePasswordFields,
-    onSuccess: { (): void },
     post: Post<ChangePasswordEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
@@ -187,7 +193,6 @@ async function changePassword<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    onSuccess()
     post({ type: "success" })
     return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }

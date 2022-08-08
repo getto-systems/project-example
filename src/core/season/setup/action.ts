@@ -1,12 +1,15 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 import { initSeasonFieldAction, SeasonFieldAction } from "../input/action"
 import { LoadSeasonState } from "../load/action"
 import { ObserveBoardAction } from "../../../z_vendor/getto-application/board/observe_board/action"
 import { ValidateBoardAction } from "../../../z_vendor/getto-application/board/validate_board/action"
+import {
+    EditableBoardAction,
+    initEditableBoardAction,
+} from "../../../z_vendor/getto-application/board/editable/action"
 import { initRegisterField } from "../../../z_lib/ui/register/action"
 
 import { SeasonRepository } from "../kernel/infra"
@@ -18,12 +21,14 @@ import { DetectedSeason, Season } from "../kernel/data"
 import { ConvertBoardResult } from "../../../z_vendor/getto-application/board/kernel/data"
 import { ticker } from "../../../z_lib/ui/timer/helper"
 
-export interface SetupSeasonAction extends StatefulApplicationAction<SetupSeasonState> {
+export interface SetupSeasonAction {
+    readonly state: ApplicationState<SetupSeasonState>
     readonly season: SeasonFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
+    readonly editable: EditableBoardAction
 
-    setup(onSuccess: { (): void }): Promise<SetupSeasonState>
+    setup(): Promise<SetupSeasonState>
 }
 
 export type SetupSeasonMaterial = Readonly<{
@@ -64,6 +69,7 @@ class Action implements SetupSeasonAction {
     readonly season: SeasonFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
+    readonly editable: EditableBoardAction
 
     load: LoadAction
 
@@ -73,6 +79,7 @@ class Action implements SetupSeasonAction {
         const { state, post } = initApplicationState({ initialState })
         this.state = state
         this.post = post
+        this.editable = initEditableBoardAction()
 
         const season = initSeasonFieldAction(material.infra.availableSeasons)
 
@@ -109,22 +116,29 @@ class Action implements SetupSeasonAction {
         this.material = material
         this.load = load
         this.convert = convert
+
+        this.onSuccess(() => {
+            this.editable.close()
+            this.load.load()
+        })
     }
 
-    async setup(onSuccess: { (): void }): Promise<SetupSeasonState> {
+    onSuccess(handler: () => void): void {
+        this.state.subscribe((state) => {
+            switch (state.type) {
+                case "success":
+                    handler()
+                    break
+            }
+        })
+    }
+
+    async setup(): Promise<SetupSeasonState> {
         const fields = this.convert()
         if (!fields.valid) {
             return this.state.currentState()
         }
-        return setupSeason(
-            this.material,
-            fields.value,
-            () => {
-                onSuccess()
-                this.load.load()
-            },
-            this.post,
-        )
+        return setupSeason(this.material, fields.value, this.post)
     }
 }
 
@@ -136,7 +150,6 @@ type SetupSeasonEvent =
 async function setupSeason<S>(
     { infra, config }: SetupSeasonMaterial,
     season: DetectedSeason,
-    onSuccess: { (): void },
     post: Post<SetupSeasonEvent, S>,
 ): Promise<S> {
     const { clock, seasonRepository } = infra
@@ -146,21 +159,16 @@ async function setupSeason<S>(
         if (!result.success) {
             return post({ type: "failed", err: result.err })
         }
-
-        onSuccess()
-        post({ type: "success" })
-        return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
+    } else {
+        const result = await seasonRepository.set({
+            season: season.season,
+            expires: clock.now().getTime() + config.manualSetupSeasonExpire.expire_millisecond,
+        })
+        if (!result.success) {
+            return post({ type: "failed", err: result.err })
+        }
     }
 
-    const result = await seasonRepository.set({
-        season: season.season,
-        expires: clock.now().getTime() + config.manualSetupSeasonExpire.expire_millisecond,
-    })
-    if (!result.success) {
-        return post({ type: "failed", err: result.err })
-    }
-
-    onSuccess()
     post({ type: "success" })
     return ticker(config.resetToInitialTimeout, () => post({ type: "initial" }))
 }

@@ -3,7 +3,7 @@ import { html } from "htm/preact"
 
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 
-import { useApplicationAction } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { buttons, fieldHelp_error } from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { icon_change } from "../../../../../../x_content/icon"
@@ -28,10 +28,10 @@ type Props = Readonly<{
     requestToken: RequestResetTokenAction
 }>
 export function RequestResetTokenProfile(props: Props): VNode {
-    const state = useApplicationAction(props.requestToken)
-    const editableState = useApplicationAction(props.requestToken.editable)
-    const validateState = useApplicationAction(props.requestToken.validate)
-    const observeState = useApplicationAction(props.requestToken.observe)
+    const state = useApplicationState(props.requestToken.state)
+    const editableState = useApplicationState(props.requestToken.editable.state)
+    const validateState = useApplicationState(props.requestToken.validate.state)
+    const observeState = useApplicationState(props.requestToken.observe.state)
 
     return box({
         title: "パスワードリセット",
@@ -98,11 +98,7 @@ export function RequestResetTokenProfile(props: Props): VNode {
 
         function onClick(e: Event) {
             e.preventDefault()
-            props.requestToken.submit(onSuccess)
-
-            function onSuccess() {
-                // noop
-            }
+            props.requestToken.submit()
         }
     }
 

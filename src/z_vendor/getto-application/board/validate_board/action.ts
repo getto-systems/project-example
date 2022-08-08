@@ -1,4 +1,4 @@
-import { initApplicationState, StatefulApplicationAction } from "../../action/action"
+import { ApplicationState, initApplicationState } from "../../action/action"
 
 import { initValidateBoardStack } from "./init/stack"
 
@@ -11,7 +11,8 @@ import {
 
 import { ConvertBoardResult } from "../kernel/data"
 
-export interface ValidateBoardAction extends StatefulApplicationAction<ValidateBoardState> {
+export interface ValidateBoardAction {
+    readonly state: ApplicationState<ValidateBoardState>
     clear(): ValidateBoardState
 }
 

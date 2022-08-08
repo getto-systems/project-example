@@ -1,7 +1,7 @@
 import { h, VNode } from "preact"
 import { useEffect } from "preact/hooks"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 import { useRegisteredAuthUserAccountTableStructure } from "./structure"
 import { scrollToFocused } from "../../../../../z_lib/ui/search/sidebar/x_preact/helper"
 
@@ -20,7 +20,7 @@ export function ListRegisteredAuthUserAccount(props: Props): VNode {
 }
 
 function useScrollToFocused(register: RegisterAuthUserAccountAction): void {
-    const state = useApplicationAction(register.list.focus)
+    const state = useApplicationState(register.list.focus.state)
     useEffect(() => {
         scrollToFocused({
             sidebarId: "sidebar",

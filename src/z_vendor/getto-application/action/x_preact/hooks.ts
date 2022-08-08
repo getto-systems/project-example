@@ -1,31 +1,31 @@
 import { useLayoutEffect, useState } from "preact/hooks"
 
-import { StatefulApplicationAction } from "../action"
+import { ApplicationState } from "../action"
 
-export function useApplicationAction<S>(action: StatefulApplicationAction<S>): S {
-    const [state, setState] = useState(action.state.currentState())
+export function useApplicationState<S>(state: ApplicationState<S>): S {
+    const [currentState, setState] = useState(state.currentState())
     useLayoutEffect(() => {
-        action.state.subscribe(setState)
+        state.subscribe(setState)
         return () => {
-            action.state.unsubscribe(setState)
+            state.unsubscribe(setState)
         }
-    }, [action])
-    return state
+    }, [state])
+    return currentState
 }
-export function useApplicationActionWithFallback<S>(
-    action: StatefulApplicationAction<S> | undefined,
+export function useApplicationStateWithFallback<S>(
+    state: ApplicationState<S> | undefined,
     fallbackState: S,
 ): S {
-    const [state, setState] = useState(
-        action === undefined ? fallbackState : action.state.currentState(),
+    const [currentState, setState] = useState(
+        state === undefined ? fallbackState : state.currentState(),
     )
     useLayoutEffect(() => {
-        if (action) {
-            action.state.subscribe(setState)
+        if (state) {
+            state.subscribe(setState)
             return () => {
-                action.state.unsubscribe(setState)
+                state.unsubscribe(setState)
             }
         }
-    }, [action])
-    return state
+    }, [state])
+    return currentState
 }

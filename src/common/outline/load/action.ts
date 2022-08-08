@@ -1,7 +1,6 @@
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../z_vendor/getto-application/action/action"
 
 import { buildMenu, BuildMenuParams } from "./helper"
@@ -97,7 +96,8 @@ function load({ shell, config }: LoadBreadcrumbListMaterial): BreadcrumbList {
 
 const EMPTY: BreadcrumbList = []
 
-export interface LoadMenuAction extends StatefulApplicationAction<LoadMenuState> {
+export interface LoadMenuAction {
+    readonly state: ApplicationState<LoadMenuState>
     updateBadge(): Promise<LoadMenuState>
     show(path: MenuCategoryPath): Promise<LoadMenuState>
     hide(path: MenuCategoryPath): Promise<LoadMenuState>

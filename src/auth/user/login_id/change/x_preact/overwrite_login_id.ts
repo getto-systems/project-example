@@ -1,6 +1,6 @@
 import { h, VNode } from "preact"
 
-import { useApplicationAction } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
@@ -20,10 +20,10 @@ type Props = Readonly<{
     overwrite: OverwriteLoginIdAction
 }>
 export function OverwriteLoginId(props: Props): VNode {
-    const state = useApplicationAction(props.overwrite)
-    const editableState = useApplicationAction(props.overwrite.editable)
-    const validateState = useApplicationAction(props.overwrite.validate)
-    const observeState = useApplicationAction(props.overwrite.observe)
+    const state = useApplicationState(props.overwrite.state)
+    const editableState = useApplicationState(props.overwrite.editable.state)
+    const validateState = useApplicationState(props.overwrite.validate.state)
+    const observeState = useApplicationState(props.overwrite.observe.state)
 
     return box({
         form: true,

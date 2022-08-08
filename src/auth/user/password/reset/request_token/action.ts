@@ -3,7 +3,6 @@ import { checkTakeLongtime } from "../../../../../z_lib/ui/timer/helper"
 import {
     ApplicationState,
     initApplicationState,
-    StatefulApplicationAction,
 } from "../../../../../z_vendor/getto-application/action/action"
 
 import { LoginIdFieldAction, initLoginIdFieldAction } from "../../../login_id/input/action"
@@ -21,7 +20,8 @@ import { WaitTime } from "../../../../../z_lib/ui/config/infra"
 import { RequestResetTokenError, RequestResetTokenFields } from "./data"
 import { ConvertBoardResult } from "../../../../../z_vendor/getto-application/board/kernel/data"
 
-export interface RequestResetTokenAction extends StatefulApplicationAction<RequestResetTokenState> {
+export interface RequestResetTokenAction {
+    readonly state: ApplicationState<RequestResetTokenState>
     readonly loginId: LoginIdFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
@@ -29,7 +29,7 @@ export interface RequestResetTokenAction extends StatefulApplicationAction<Reque
 
     edit(): void
     clear(): void
-    submit(onSuccess: { (): void }): Promise<RequestResetTokenState>
+    submit(): Promise<RequestResetTokenState>
 }
 
 export type RequestResetTokenState = Readonly<{ type: "initial" }> | RequestResetTokenEvent
@@ -97,26 +97,32 @@ class Action implements RequestResetTokenAction {
         this.observe = observe
         this.convert = convert
         this.clear = clear
+
+        this.onSuccess(() => {
+            this.editable.close()
+        })
+    }
+
+    onSuccess(handler: () => void): void {
+        this.state.subscribe((state) => {
+            switch (state.type) {
+                case "success":
+                    handler()
+                    break
+            }
+        })
     }
 
     edit(): void {
         this.editable.open()
         this.clear()
     }
-    async submit(onSuccess: { (): void }): Promise<RequestResetTokenState> {
+    async submit(): Promise<RequestResetTokenState> {
         const fields = this.convert()
         if (!fields.valid) {
             return this.state.currentState()
         }
-        return requestResetToken(
-            this.material,
-            fields.value,
-            () => {
-                this.editable.close()
-                onSuccess()
-            },
-            this.post,
-        )
+        return requestResetToken(this.material, fields.value, this.post)
     }
 }
 
@@ -128,7 +134,6 @@ type RequestResetTokenEvent =
 async function requestResetToken<S>(
     { infra, config }: RequestResetTokenMaterial,
     fields: RequestResetTokenFields,
-    onSuccess: { (): void },
     post: Post<RequestResetTokenEvent, S>,
 ): Promise<S> {
     post({ type: "try", hasTakenLongtime: false })
@@ -145,7 +150,6 @@ async function requestResetToken<S>(
         return post({ type: "failed", err: response.err })
     }
 
-    onSuccess()
     return post({ type: "success" })
 }
 

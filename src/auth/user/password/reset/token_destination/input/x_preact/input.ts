@@ -2,7 +2,7 @@ import { h, VNode } from "preact"
 import { html } from "htm/preact"
 import { VNodeContent } from "../../../../../../../z_lib/ui/x_preact/common"
 
-import { useApplicationAction } from "../../../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 import { useEditableState } from "../../../../../../../z_vendor/getto-application/board/editable/x_preact/hooks"
 
 import {
@@ -39,9 +39,9 @@ type Props = Readonly<{
         }>
     }>
 export function ResetTokenDestinationField(props: Props): VNode {
-    const state = useApplicationAction(props.field)
+    const state = useApplicationState(props.field.state)
     const editableState = useEditableState(props.edit)
-    const validateState = useApplicationAction(props.field.validate)
+    const validateState = useApplicationState(props.field.validate.state)
 
     return inputField({
         title: props.title || AUTH_USER_ACCOUNT["resetTokenDestination"],
