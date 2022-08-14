@@ -42,98 +42,77 @@ export type ResetTokenDestinationFieldState = Readonly<{ type: ResetTokenDestina
 const initialState: ResetTokenDestinationFieldState = { type: "none" }
 
 export function initResetTokenDestinationFieldAction(): ResetTokenDestinationFieldAction {
-    return new DestinationAction()
-}
+    const { state, post } = initApplicationState({ initialState })
 
-class DestinationAction implements ResetTokenDestinationFieldAction {
-    readonly state: ApplicationState<ResetTokenDestinationFieldState>
-    readonly post: (state: ResetTokenDestinationFieldState) => ResetTokenDestinationFieldState
+    const destinationType = initInputBoardAction()
+    const email = initInputBoardAction()
 
-    readonly destinationType: InputBoardAction<BoardValueStore>
-    readonly email: InputBoardAction<BoardValueStore>
-    readonly validate: ValidateBoardFieldAction<
-        ResetTokenDestination,
-        ValidateResetTokenDestinationError
-    >
-    readonly observe: ObserveBoardFieldAction
-
-    readonly store: Readonly<{
-        destinationType: BoardValueStore
-        input: BoardValueStore
-    }>
-
-    constructor() {
-        const { state, post } = initApplicationState({ initialState })
-        this.state = state
-        this.post = post
-
-        const destinationType = initInputBoardAction()
-        const email = initInputBoardAction()
-
-        const observe = initObserveBoardFieldAction({
-            observer: initBoardFieldObserver({
-                current: () => ({
-                    destinationType: destinationType.store.get(),
-                    email: email.store.get(),
-                }),
-                isSame: (a, b) => {
-                    if (a.destinationType !== b.destinationType) {
-                        return false
-                    }
-                    switch (a.destinationType) {
-                        case "email":
-                            return a.email === b.email
-
-                        default:
-                            return true
-                    }
-                },
+    const observe = initObserveBoardFieldAction({
+        observer: initBoardFieldObserver({
+            current: () => ({
+                destinationType: destinationType.store.get(),
+                email: email.store.get(),
             }),
-        })
+            isSame: (a, b) => {
+                if (a.destinationType !== b.destinationType) {
+                    return false
+                }
+                switch (a.destinationType) {
+                    case "email":
+                        return a.email === b.email
 
-        const validate = initValidateBoardFieldAction({
-            convert: () =>
-                resetTokenDestinationBoardConverter({
-                    type: destinationType.store.get(),
-                    email: email.store.get(),
-                }),
-        })
+                    default:
+                        return true
+                }
+            },
+        }),
+    })
 
-        destinationType.subscriber.subscribe(() => {
-            observe.check()
-            switch (destinationType.store.get()) {
-                case "email":
-                    this.post({ type: "email" })
-                    return
+    const validate = initValidateBoardFieldAction({
+        convert: () =>
+            resetTokenDestinationBoardConverter({
+                type: destinationType.store.get(),
+                email: email.store.get(),
+            }),
+    })
 
-                default:
-                    validate.check()
-                    this.post({ type: "none" })
-                    return
-            }
-        })
-        email.subscriber.subscribe(() => {
-            validate.check()
-            observe.check()
-        })
+    destinationType.subscriber.subscribe(() => {
+        observe.check()
+        switch (destinationType.store.get()) {
+            case "email":
+                post({ type: "email" })
+                return
 
-        this.destinationType = destinationType.input
-        this.email = email.input
-        this.validate = validate
-        this.observe = observe
-
-        this.store = {
-            destinationType: destinationType.store,
-            input: email.store,
+            default:
+                validate.check()
+                post({ type: "none" })
+                return
         }
+    })
+    email.subscriber.subscribe(() => {
+        validate.check()
+        observe.check()
+    })
+
+    return {
+        state,
+
+        destinationType: destinationType.input,
+        email: email.input,
+
+        validate,
+        observe,
+
+        reset,
+        clear,
     }
 
-    reset(destination: ResetTokenDestination): ResetTokenDestinationFieldState {
-        const destinationType = destination.type
-        this.store.destinationType.set(destinationType)
-        this.store.input.set(
+    function reset(destination: ResetTokenDestination): ResetTokenDestinationFieldState {
+        const type = destination.type
+        destinationType.store.set(type)
+        email.store.set(
             (() => {
-                switch (destinationType) {
+                switch (type) {
                     case "none":
                         return ""
 
@@ -142,11 +121,11 @@ class DestinationAction implements ResetTokenDestinationFieldAction {
                 }
             })(),
         )
-        this.validate.clear()
-        this.observe.pin()
-        return this.post({ type: destinationType })
+        validate.clear()
+        observe.pin()
+        return post({ type })
     }
-    clear(): ResetTokenDestinationFieldState {
-        return this.reset({ type: "none" })
+    function clear(): ResetTokenDestinationFieldState {
+        return reset({ type: "none" })
     }
 }
