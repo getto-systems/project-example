@@ -1,23 +1,21 @@
 import { ValidateBoardStack, ValidateBoardStateFound } from "../infra"
 
 export function initValidateBoardStack(): ValidateBoardStack {
-    return new Stack()
-}
+    const stack: Map<string, boolean> = new Map()
 
-class Stack implements ValidateBoardStack {
-    stack: Map<string, boolean> = new Map()
-
-    get(name: string): ValidateBoardStateFound {
-        const state = this.stack.get(name)
-        if (state === undefined) {
-            return { found: false }
-        }
-        return { found: true, state }
-    }
-    set(name: string, valid: boolean): void {
-        this.stack.set(name, valid)
-    }
-    delete(name: string): void {
-        this.stack.delete(name)
+    return {
+        get(name: string): ValidateBoardStateFound {
+            const state = stack.get(name)
+            if (state === undefined) {
+                return { found: false }
+            }
+            return { found: true, state }
+        },
+        set(name: string, valid: boolean): void {
+            stack.set(name, valid)
+        },
+        delete(name: string): void {
+            stack.delete(name)
+        },
     }
 }

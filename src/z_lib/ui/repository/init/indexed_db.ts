@@ -2,10 +2,6 @@ import { repositoryError } from "./helper"
 
 import { FetchRepositoryResult, RepositoryErrorResult, StoreRepositoryResult } from "../infra"
 
-export function initIndexedDB(webDB: IDBFactory, config: IndexedDBConfig): IndexedDB {
-    return new DB(webDB, config)
-}
-
 // objectStore(`name`, { keyPath: "key" }) に { key: string, value: string } という値を保存する
 export interface IndexedDB {
     get<T>(store: IndexedDBTarget, converter: FromDB<T>): Promise<FetchRepositoryResult<T>>
@@ -31,6 +27,10 @@ export type IndexedDBTarget = Readonly<{
     key: string
 }>
 
+interface Migration {
+    (db: IDBDatabase, stores: readonly string[]): void
+}
+
 // 構造を変えるときは migration を追加することで対応
 const MIGRATIONS: readonly Migration[] = [
     (db, stores) => {
@@ -40,106 +40,100 @@ const MIGRATIONS: readonly Migration[] = [
     },
 ]
 
-interface Migration {
-    (db: IDBDatabase, stores: readonly string[]): void
-}
+export function initIndexedDB(webDB: IDBFactory, config: IndexedDBConfig): IndexedDB {
+    return {
+        get<T>(target: IndexedDBTarget, converter: FromDB<T>): Promise<FetchRepositoryResult<T>> {
+            return new Promise((resolve) => {
+                open(resolve, (db) => {
+                    try {
+                        const tx = db.transaction(target.store)
+                        tx.oncomplete = () => db.close()
 
-class DB implements IndexedDB {
-    webDB: IDBFactory
-    config: IndexedDBConfig
+                        const request = tx.objectStore(target.store).get(target.key)
+                        request.onsuccess = (e: Event) => {
+                            if (!e.target || !(e.target instanceof IDBRequest)) {
+                                resolve(repositoryError("invalid get result"))
+                                return
+                            }
+                            if (!e.target.result) {
+                                resolve({ success: true, found: false })
+                                return
+                            }
 
-    constructor(webDB: IDBFactory, config: IndexedDBConfig) {
-        this.webDB = webDB
-        this.config = config
-    }
-
-    get<T>(target: IndexedDBTarget, converter: FromDB<T>): Promise<FetchRepositoryResult<T>> {
-        return new Promise((resolve) => {
-            this.open(resolve, (db) => {
-                try {
-                    const tx = db.transaction(target.store)
-                    tx.oncomplete = () => db.close()
-
-                    const request = tx.objectStore(target.store).get(target.key)
-                    request.onsuccess = (e: Event) => {
-                        if (!e.target || !(e.target instanceof IDBRequest)) {
-                            resolve(repositoryError("invalid get result"))
-                            return
+                            try {
+                                // e.target.result は any のため、実行時エラーを覚悟する
+                                // ブラウザのオブジェクトストレージの内容が any なのは本質的で避けられない
+                                resolve({
+                                    success: true,
+                                    found: true,
+                                    value: converter(e.target.result.value),
+                                })
+                            } catch (err) {
+                                resolve(repositoryError(`${err}`))
+                            }
                         }
-                        if (!e.target.result) {
-                            resolve({ success: true, found: false })
-                            return
+                        request.onerror = () => {
+                            resolve(repositoryError("failed to get"))
                         }
+                    } catch (err) {
+                        resolve(repositoryError(`${err}`))
+                    }
+                })
+            })
+        },
 
-                        try {
-                            // e.target.result は any のため、実行時エラーを覚悟する
-                            // ブラウザのオブジェクトストレージの内容が any なのは本質的で避けられない
-                            resolve({
-                                success: true,
-                                found: true,
-                                value: converter(e.target.result.value),
-                            })
-                        } catch (err) {
-                            resolve(repositoryError(`${err}`))
+        set<T>(
+            target: IndexedDBTarget,
+            converter: ToDB<T>,
+            value: T,
+        ): Promise<StoreRepositoryResult> {
+            return new Promise((resolve) => {
+                open(resolve, (db) => {
+                    try {
+                        const tx = db.transaction(target.store, "readwrite")
+                        tx.oncomplete = () => db.close()
+
+                        const request = tx
+                            .objectStore(target.store)
+                            .put({ key: target.key, value: converter(value) })
+                        request.onsuccess = () => {
+                            resolve({ success: true })
                         }
+                        request.onerror = () => {
+                            resolve(repositoryError("failed to put"))
+                        }
+                    } catch (err) {
+                        resolve(repositoryError(`${err}`))
                     }
-                    request.onerror = () => {
-                        resolve(repositoryError("failed to get"))
-                    }
-                } catch (err) {
-                    resolve(repositoryError(`${err}`))
-                }
+                })
             })
-        })
+        },
+
+        remove(target: IndexedDBTarget): Promise<StoreRepositoryResult> {
+            return new Promise((resolve) => {
+                open(resolve, (db) => {
+                    try {
+                        const tx = db.transaction(target.store, "readwrite")
+                        tx.oncomplete = () => db.close()
+
+                        const request = tx.objectStore(target.store).delete(target.key)
+                        request.onsuccess = () => {
+                            resolve({ success: true })
+                        }
+                        request.onerror = () => {
+                            resolve(repositoryError("failed to remove"))
+                        }
+                    } catch (err) {
+                        resolve(repositoryError(`${err}`))
+                    }
+                })
+            })
+        },
     }
 
-    set<T>(target: IndexedDBTarget, converter: ToDB<T>, value: T): Promise<StoreRepositoryResult> {
-        return new Promise((resolve) => {
-            this.open(resolve, (db) => {
-                try {
-                    const tx = db.transaction(target.store, "readwrite")
-                    tx.oncomplete = () => db.close()
-
-                    const request = tx
-                        .objectStore(target.store)
-                        .put({ key: target.key, value: converter(value) })
-                    request.onsuccess = () => {
-                        resolve({ success: true })
-                    }
-                    request.onerror = () => {
-                        resolve(repositoryError("failed to put"))
-                    }
-                } catch (err) {
-                    resolve(repositoryError(`${err}`))
-                }
-            })
-        })
-    }
-
-    remove(target: IndexedDBTarget): Promise<StoreRepositoryResult> {
-        return new Promise((resolve) => {
-            this.open(resolve, (db) => {
-                try {
-                    const tx = db.transaction(target.store, "readwrite")
-                    tx.oncomplete = () => db.close()
-
-                    const request = tx.objectStore(target.store).delete(target.key)
-                    request.onsuccess = () => {
-                        resolve({ success: true })
-                    }
-                    request.onerror = () => {
-                        resolve(repositoryError("failed to remove"))
-                    }
-                } catch (err) {
-                    resolve(repositoryError(`${err}`))
-                }
-            })
-        })
-    }
-
-    open(error: Post<RepositoryErrorResult>, success: Post<IDBDatabase>): void {
-        const request = this.webDB.open(this.config.database, MIGRATIONS.length)
-        request.onupgradeneeded = upgrade(this.config.stores, MIGRATIONS)
+    function open(error: Post<RepositoryErrorResult>, success: Post<IDBDatabase>): void {
+        const request = webDB.open(config.database, MIGRATIONS.length)
+        request.onupgradeneeded = upgrade(config.stores, MIGRATIONS)
         request.onerror = () => {
             error(repositoryError("failed to open db"))
         }
