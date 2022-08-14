@@ -137,7 +137,7 @@ export function initRegisterAuthUserAccountAction(
         async submit(): Promise<RegisterAuthUserAccountState> {
             const fields = convert()
             if (!fields.valid) {
-                return this.state.currentState()
+                return state.currentState()
             }
             return registerUser(material, fields.value, post)
         },

@@ -133,7 +133,7 @@ export function initModifyAuthUserAccountAction(material: ModifyAuthUserAccountM
 
                 const fields = convert()
                 if (!fields.valid) {
-                    return this.state.currentState()
+                    return state.currentState()
                 }
 
                 return modifyUser(material, element.data, fields.value, post)

@@ -123,7 +123,7 @@ export function initChangeResetTokenDestinationAction(
 
                 const fields = convert()
                 if (!fields.valid) {
-                    return this.state.currentState()
+                    return state.currentState()
                 }
                 return changeDestination(material, element.data, fields.value, post)
             },
