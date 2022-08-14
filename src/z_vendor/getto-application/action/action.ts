@@ -45,7 +45,7 @@ export function initApplicationState<S>(props: ApplicationStateProps<S>): Readon
 
     function post(newState: S): S {
         state = newState
-        handlers.forEach((post) => post(newState))
+        handlers.forEach((handler) => handler(newState))
         return newState
     }
 }
