@@ -1,23 +1,21 @@
 import { ObserveBoardStack, ObserveBoardStateFound } from "../infra"
 
 export function initObserveBoardStack(): ObserveBoardStack {
-    return new Stack()
-}
+    const stack: Map<string, boolean> = new Map()
 
-class Stack implements ObserveBoardStack {
-    stack: Map<string, boolean> = new Map()
-
-    get(name: string): ObserveBoardStateFound {
-        const hasChanged = this.stack.get(name)
-        if (hasChanged === undefined) {
-            return { found: false }
-        }
-        return { found: true, hasChanged }
-    }
-    set(name: string, hasChanged: boolean): void {
-        this.stack.set(name, hasChanged)
-    }
-    clear(): void {
-        this.stack.clear()
+    return {
+        get(name: string): ObserveBoardStateFound {
+            const hasChanged = stack.get(name)
+            if (hasChanged === undefined) {
+                return { found: false }
+            }
+            return { found: true, hasChanged }
+        },
+        set(name: string, hasChanged: boolean): void {
+            stack.set(name, hasChanged)
+        },
+        clear(): void {
+            stack.clear()
+        },
     }
 }
