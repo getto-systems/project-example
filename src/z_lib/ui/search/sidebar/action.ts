@@ -24,52 +24,42 @@ export type SearchSidebarInfra = Readonly<{
 
 export function initSearchSidebarAction(
     infra: SearchSidebarInfra,
-    state: SearchSidebarExpand,
+    initialExpand: SearchSidebarExpand,
 ): SearchSidebarAction {
-    return new Action(infra, state)
-}
+    const { state, post } = initApplicationState({
+        initialState: { type: "success", state: initialExpand },
+        ignite: async (): Promise<SearchSidebarState> => {
+            const { sidebarRepository } = infra
 
-class Action implements SearchSidebarAction {
-    readonly infra: SearchSidebarInfra
-    readonly state: ApplicationState<SearchSidebarState>
-    readonly post: (state: SearchSidebarState) => SearchSidebarState
+            const sidebarResult = await sidebarRepository.get()
+            if (!sidebarResult.success) {
+                return post({ type: "repository-error", err: sidebarResult.err })
+            }
+            if (!sidebarResult.found) {
+                return post(state.currentState())
+            }
 
-    constructor(infra: SearchSidebarInfra, initialExpand: SearchSidebarExpand) {
-        const { state, post } = initApplicationState({
-            initialState: { type: "success", state: initialExpand },
-            ignite: () => this.load(),
-        })
-        this.infra = infra
-        this.state = state
-        this.post = post
+            return post({ type: "success", state: sidebarResult.value })
+        },
+    })
+
+    return {
+        state,
+
+        async fold(): Promise<SearchSidebarState> {
+            return set({ isExpand: false })
+        },
+        async expand(): Promise<SearchSidebarState> {
+            return set({ isExpand: true })
+        },
     }
 
-    async fold(): Promise<SearchSidebarState> {
-        return this.set({ isExpand: false })
-    }
-    async expand(): Promise<SearchSidebarState> {
-        return this.set({ isExpand: true })
-    }
-    async set(state: SearchSidebarExpand): Promise<SearchSidebarState> {
-        const { sidebarRepository } = this.infra
+    async function set(state: SearchSidebarExpand): Promise<SearchSidebarState> {
+        const { sidebarRepository } = infra
         const result = await sidebarRepository.set(state)
         if (!result.success) {
-            return this.post({ type: "repository-error", err: result.err })
+            return post({ type: "repository-error", err: result.err })
         }
-        return this.post({ type: "success", state })
-    }
-
-    async load(): Promise<SearchSidebarState> {
-        const { sidebarRepository } = this.infra
-
-        const sidebarResult = await sidebarRepository.get()
-        if (!sidebarResult.success) {
-            return this.post({ type: "repository-error", err: sidebarResult.err })
-        }
-        if (!sidebarResult.found) {
-            return this.post(this.state.currentState())
-        }
-
-        return this.post({ type: "success", state: sidebarResult.value })
+        return post({ type: "success", state })
     }
 }
