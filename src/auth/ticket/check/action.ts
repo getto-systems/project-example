@@ -68,65 +68,48 @@ const initialState: CheckAuthTicketState = { type: "initial-check" }
 export function initCheckAuthTicketAction(
     material: CheckAuthTicketMaterial,
 ): CheckAuthTicketAction {
-    return new Action(material)
-}
+    const { state, post } = initApplicationState({
+        initialState,
+        ignite: async (): Promise<CheckAuthTicketState> => {
+            const result = await check(material, post)
+            if (!result.success) {
+                return result.state
+            }
+            if (!result.expired) {
+                return post({ type: "try-to-instant-load", scriptPath: scriptPath() })
+            }
+            return start(result.ticket)
+        },
+    })
 
-class Action implements CheckAuthTicketAction {
-    readonly material: CheckAuthTicketMaterial
-    readonly state: ApplicationState<CheckAuthTicketState>
-    readonly post: (state: CheckAuthTicketState) => CheckAuthTicketState
-
-    constructor(material: CheckAuthTicketMaterial) {
-        const { state, post } = initApplicationState({
-            initialState,
-            ignite: () => this.ignite(),
-        })
-        this.material = material
-        this.state = state
-        this.post = post
-    }
-    async ignite(): Promise<CheckAuthTicketState> {
-        const checkResult = await check(this.material, this.post)
-        if (!checkResult.success) {
-            return checkResult.state
-        }
-        if (!checkResult.expired) {
-            return this.post({
-                type: "try-to-instant-load",
-                scriptPath: this.secureScriptPath(),
-            })
-        }
-        return this.startContinuousRenew(checkResult.ticket)
-    }
-
-    succeedToInstantLoad(): Promise<CheckAuthTicketState> {
-        return startContinuousRenew(this.material, { hasTicket: false }, this.post)
-    }
-    async failedToInstantLoad(): Promise<CheckAuthTicketState> {
-        const result = await renew(this.material, this.post)
-        if (!result.success) {
-            return result.state
-        }
-        return this.startContinuousRenew(result.ticket)
-    }
-    async loadError(err: LoadScriptError): Promise<CheckAuthTicketState> {
-        return this.post({ type: "load-error", err })
+    return {
+        state,
+        succeedToInstantLoad(): Promise<CheckAuthTicketState> {
+            return startContinuousRenew(material, { hasTicket: false }, post)
+        },
+        async failedToInstantLoad(): Promise<CheckAuthTicketState> {
+            const result = await renew(material, post)
+            if (!result.success) {
+                return result.state
+            }
+            return start(result.ticket)
+        },
+        async loadError(err: LoadScriptError): Promise<CheckAuthTicketState> {
+            return post({ type: "load-error", err })
+        },
     }
 
-    secureScriptPath() {
-        return getScriptPath(this.material)
+    function scriptPath() {
+        return getScriptPath(material)
     }
 
-    async startContinuousRenew(ticket: AuthTicket): Promise<CheckAuthTicketState> {
-        return await startContinuousRenew(this.material, { hasTicket: true, ticket }, (event) => {
+    async function start(ticket: AuthTicket): Promise<CheckAuthTicketState> {
+        return await startContinuousRenew(material, { hasTicket: true, ticket }, (event) => {
             switch (event.type) {
                 case "succeed-to-start-continuous-renew":
-                    return this.post({
-                        type: "try-to-load",
-                        scriptPath: this.secureScriptPath(),
-                    })
+                    return post({ type: "try-to-load", scriptPath: scriptPath() })
                 default:
-                    return this.post(event)
+                    return post(event)
             }
         })
     }
