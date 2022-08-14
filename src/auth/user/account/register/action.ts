@@ -66,112 +66,91 @@ export type RegisterAuthUserAccountConfig = Readonly<{
 export function initRegisterAuthUserAccountAction(
     material: RegisterAuthUserAccountMaterial,
 ): RegisterAuthUserAccountAction {
-    return new Action(material)
-}
+    const { state, post } = initApplicationState({ initialState })
 
-class Action implements RegisterAuthUserAccountAction {
-    readonly material: RegisterAuthUserAccountMaterial
-    readonly state: ApplicationState<RegisterAuthUserAccountState>
-    readonly post: (state: RegisterAuthUserAccountState) => RegisterAuthUserAccountState
+    const loginId = initLoginIdFieldAction()
+    const grantedRoles = initAuthUserGrantedRolesFieldAction()
+    const resetTokenDestination = initResetTokenDestinationFieldAction()
+    const memo = initAuthUserTextFieldAction("memo")
 
-    readonly list: ListRegisteredAction<AuthUserAccount>
-
-    readonly loginId: LoginIdFieldAction
-    readonly grantedRoles: AuthUserGrantedRolesFieldAction
-    readonly resetTokenDestination: ResetTokenDestinationFieldAction
-    readonly memo: AuthUserTextFieldAction<"memo">
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
-
-    convert: () => ConvertBoardResult<AuthUserAccount>
-    clear: () => void
-
-    constructor(material: RegisterAuthUserAccountMaterial) {
-        const { state, post } = initApplicationState({ initialState })
-        this.material = material
-        this.state = state
-        this.post = post
-
-        const loginId = initLoginIdFieldAction()
-        const grantedRoles = initAuthUserGrantedRolesFieldAction()
-        const resetTokenDestination = initResetTokenDestinationFieldAction()
-        const memo = initAuthUserTextFieldAction("memo")
-
-        const convert = (): ConvertBoardResult<AuthUserAccount> => {
-            const result = {
-                loginId: loginId.validate.check(),
-                grantedRoles: grantedRoles.input.validate.check(),
-                resetTokenDestination: resetTokenDestination.validate.check(),
-                memo: memo.validate.check(),
-            }
-            if (
-                !result.loginId.valid ||
-                !result.grantedRoles.valid ||
-                !result.resetTokenDestination.valid ||
-                !result.memo.valid
-            ) {
-                return { valid: false }
-            }
-            return {
-                valid: true,
-                value: {
-                    loginId: result.loginId.value,
-                    grantedRoles: result.grantedRoles.value,
-                    resetTokenDestination: result.resetTokenDestination.value,
-                    memo: result.memo.value,
-                },
-            }
+    const convert = (): ConvertBoardResult<AuthUserAccount> => {
+        const result = {
+            loginId: loginId.validate.check(),
+            grantedRoles: grantedRoles.input.validate.check(),
+            resetTokenDestination: resetTokenDestination.validate.check(),
+            memo: memo.validate.check(),
         }
-
-        const { validate, observe, clear } = initRegisterField(
-            [
-                ["loginId", loginId],
-                ["grantedRoles", grantedRoles.input],
-                ["resetTokenDestination", resetTokenDestination],
-                ["memo", memo],
-            ],
-            convert,
-        )
-
-        grantedRoles.setOptions(ALL_AUTH_ROLES)
-
-        const list = initListRegisteredAction<AuthUserAccount>()
-
-        this.list = list.action
-
-        this.loginId = loginId
-        this.grantedRoles = grantedRoles.input
-        this.resetTokenDestination = resetTokenDestination
-        this.memo = memo
-        this.validate = validate
-        this.observe = observe
-        this.convert = convert
-        this.clear = clear
-
-        this.clear()
-
-        this.onSuccess((data) => {
-            this.clear()
-            list.handler.register(data)
-        })
+        if (
+            !result.loginId.valid ||
+            !result.grantedRoles.valid ||
+            !result.resetTokenDestination.valid ||
+            !result.memo.valid
+        ) {
+            return { valid: false }
+        }
+        return {
+            valid: true,
+            value: {
+                loginId: result.loginId.value,
+                grantedRoles: result.grantedRoles.value,
+                resetTokenDestination: result.resetTokenDestination.value,
+                memo: result.memo.value,
+            },
+        }
     }
 
-    onSuccess(handler: (data: AuthUserAccount) => void): void {
-        this.state.subscribe((state) => {
+    const { validate, observe, clear } = initRegisterField(
+        [
+            ["loginId", loginId],
+            ["grantedRoles", grantedRoles.input],
+            ["resetTokenDestination", resetTokenDestination],
+            ["memo", memo],
+        ],
+        convert,
+    )
+
+    grantedRoles.setOptions(ALL_AUTH_ROLES)
+
+    const list = initListRegisteredAction<AuthUserAccount>()
+
+    clear()
+
+    onSuccess((data) => {
+        clear()
+        list.handler.register(data)
+    })
+
+    return {
+        state,
+
+        list: list.action,
+
+        loginId,
+        grantedRoles: grantedRoles.input,
+        resetTokenDestination,
+        memo,
+
+        validate,
+        observe,
+        clear,
+
+        async submit(): Promise<RegisterAuthUserAccountState> {
+            const fields = convert()
+            if (!fields.valid) {
+                return this.state.currentState()
+            }
+            return registerUser(material, fields.value, post)
+        },
+    }
+
+    function onSuccess(handler: (data: AuthUserAccount) => void): void {
+        state.subscribe((state) => {
             switch (state.type) {
                 case "success":
                     handler(state.data)
                     break
             }
         })
-    }
-
-    async submit(): Promise<RegisterAuthUserAccountState> {
-        const fields = this.convert()
-        if (!fields.valid) {
-            return this.state.currentState()
-        }
-        return registerUser(this.material, fields.value, this.post)
     }
 }
 
