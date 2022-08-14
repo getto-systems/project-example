@@ -81,90 +81,74 @@ export type ChangePasswordConfig = Readonly<{
 }>
 
 export function initChangePasswordAction(material: ChangePasswordMaterial): ChangePasswordAction {
-    return new Action(material)
-}
+    const { state, post } = initApplicationState({ initialState })
+    const editable = initEditableBoardAction()
 
-class Action implements ChangePasswordAction {
-    readonly material: ChangePasswordMaterial
-    readonly state: ApplicationState<ChangePasswordState>
-    readonly post: (state: ChangePasswordState) => ChangePasswordState
+    const currentPassword = initPasswordFieldAction()
+    const newPassword = initPasswordFieldAction()
 
-    readonly currentPassword: PasswordFieldAction
-    readonly newPassword: PasswordFieldAction
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
-    readonly editable: EditableBoardAction
-
-    convert: () => ConvertBoardResult<ChangePasswordFields>
-    clear: () => void
-
-    constructor(material: ChangePasswordMaterial) {
-        const { state, post } = initApplicationState({ initialState })
-        this.material = material
-        this.state = state
-        this.post = post
-        this.editable = initEditableBoardAction()
-
-        const currentPassword = initPasswordFieldAction()
-        const newPassword = initPasswordFieldAction()
-
-        const convert = (): ConvertBoardResult<ChangePasswordFields> => {
-            const result = {
-                currentPassword: currentPassword.validate.check(),
-                newPassword: newPassword.validate.check(),
-            }
-            if (!result.currentPassword.valid || !result.newPassword.valid) {
-                return { valid: false }
-            }
-            return {
-                valid: true,
-                value: {
-                    currentPassword: result.currentPassword.value,
-                    newPassword: result.newPassword.value,
-                },
-            }
+    const convert = (): ConvertBoardResult<ChangePasswordFields> => {
+        const result = {
+            currentPassword: currentPassword.validate.check(),
+            newPassword: newPassword.validate.check(),
         }
-
-        const { validate, observe, clear } = initRegisterField(
-            [
-                ["newPassword", newPassword],
-                ["currentPassword", currentPassword],
-            ],
-            convert,
-        )
-
-        this.currentPassword = currentPassword
-        this.newPassword = newPassword
-        this.validate = validate
-        this.observe = observe
-        this.convert = convert
-        this.clear = clear
-
-        this.onSuccess(() => {
-            this.editable.close()
-        })
+        if (!result.currentPassword.valid || !result.newPassword.valid) {
+            return { valid: false }
+        }
+        return {
+            valid: true,
+            value: {
+                currentPassword: result.currentPassword.value,
+                newPassword: result.newPassword.value,
+            },
+        }
     }
 
-    onSuccess(handler: () => void): void {
-        this.state.subscribe((state) => {
+    const { validate, observe, clear } = initRegisterField(
+        [
+            ["newPassword", newPassword],
+            ["currentPassword", currentPassword],
+        ],
+        convert,
+    )
+
+    onSuccess(() => {
+        editable.close()
+    })
+
+    return {
+        state,
+
+        currentPassword,
+        newPassword,
+
+        validate,
+        observe,
+        editable,
+
+        clear,
+
+        edit(): void {
+            editable.open()
+            clear()
+        },
+        async submit(): Promise<ChangePasswordState> {
+            const fields = convert()
+            if (!fields.valid) {
+                return state.currentState()
+            }
+            return changePassword(material, fields.value, post)
+        },
+    }
+
+    function onSuccess(handler: () => void): void {
+        state.subscribe((state) => {
             switch (state.type) {
                 case "success":
                     handler()
                     break
             }
         })
-    }
-
-    edit(): void {
-        this.editable.open()
-        this.clear()
-    }
-    async submit(): Promise<ChangePasswordState> {
-        const fields = this.convert()
-        if (!fields.valid) {
-            return this.state.currentState()
-        }
-        return changePassword(this.material, fields.value, this.post)
     }
 }
 
