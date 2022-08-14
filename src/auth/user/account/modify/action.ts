@@ -70,104 +70,84 @@ export function initModifyAuthUserAccountAction(material: ModifyAuthUserAccountM
     action: ModifyAuthUserAccountAction
     handler: ModifyFieldHandler<ModifyAuthUserAccountEntry>
 }> {
-    const action = new Action(material)
-    return {
-        action,
-        handler: action.handler,
-    }
-}
+    const { state, post } = initApplicationState({ initialState })
 
-class Action implements ModifyAuthUserAccountAction {
-    readonly material: ModifyAuthUserAccountMaterial
-    readonly state: ApplicationState<ModifyAuthUserAccountState>
-    readonly post: (state: ModifyAuthUserAccountState) => ModifyAuthUserAccountState
+    const memo = initAuthUserTextFieldAction("memo")
+    const grantedRoles = initAuthUserGrantedRolesFieldAction()
 
-    readonly memo: AuthUserTextFieldAction<"memo">
-    readonly grantedRoles: AuthUserGrantedRolesFieldAction
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
-    readonly editable: EditableBoardAction
-
-    readonly convert: () => ConvertBoardResult<ModifyAuthUserAccountFields>
-    readonly data: () => PrepareElementState<ModifyAuthUserAccountEntry>
-    readonly handler: ModifyFieldHandler<ModifyAuthUserAccountEntry>
-    readonly reset: () => void
-
-    constructor(material: ModifyAuthUserAccountMaterial) {
-        const { state, post } = initApplicationState({ initialState })
-        this.material = material
-        this.state = state
-        this.post = post
-
-        const memo = initAuthUserTextFieldAction("memo")
-        const grantedRoles = initAuthUserGrantedRolesFieldAction()
-
-        const convert = (): ConvertBoardResult<ModifyAuthUserAccountFields> => {
-            const result = {
-                grantedRoles: grantedRoles.input.validate.check(),
-                memo: memo.validate.check(),
-            }
-            if (!result.grantedRoles.valid || !result.memo.valid) {
-                return { valid: false }
-            }
-            return {
-                valid: true,
-                value: {
-                    grantedRoles: result.grantedRoles.value,
-                    memo: result.memo.value,
-                },
-            }
+    const convert = (): ConvertBoardResult<ModifyAuthUserAccountFields> => {
+        const result = {
+            grantedRoles: grantedRoles.input.validate.check(),
+            memo: memo.validate.check(),
         }
-
-        const { validate, observe, editable, data, handler, reset } = initModifyField(
-            [
-                modifyField("memo", memo, (data: ModifyAuthUserAccountEntry) => data.memo),
-                modifyField(
-                    "grantedRoles",
-                    grantedRoles.input,
-                    (data: ModifyAuthUserAccountEntry) => data.grantedRoles,
-                ),
-            ],
-            convert,
-        )
-
-        grantedRoles.setOptions(ALL_AUTH_ROLES)
-
-        this.memo = memo
-        this.grantedRoles = grantedRoles.input
-        this.validate = validate
-        this.observe = observe
-        this.editable = editable
-        this.convert = convert
-        this.data = data
-        this.handler = handler
-        this.reset = reset
-
-        this.onSuccess(() => {
-            this.editable.close()
-        })
+        if (!result.grantedRoles.valid || !result.memo.valid) {
+            return { valid: false }
+        }
+        return {
+            valid: true,
+            value: {
+                grantedRoles: result.grantedRoles.value,
+                memo: result.memo.value,
+            },
+        }
     }
 
-    onSuccess(handler: (data: ModifyAuthUserAccountEntry) => void): void {
-        this.state.subscribe((state) => {
+    const { validate, observe, editable, data, handler, reset } = initModifyField(
+        [
+            modifyField("memo", memo, (data: ModifyAuthUserAccountEntry) => data.memo),
+            modifyField(
+                "grantedRoles",
+                grantedRoles.input,
+                (data: ModifyAuthUserAccountEntry) => data.grantedRoles,
+            ),
+        ],
+        convert,
+    )
+
+    grantedRoles.setOptions(ALL_AUTH_ROLES)
+
+    onSuccess(() => {
+        editable.close()
+    })
+
+    return {
+        action: {
+            state,
+
+            memo,
+            grantedRoles: grantedRoles.input,
+
+            validate,
+            observe,
+            editable,
+
+            onSuccess,
+            data,
+            reset,
+
+            async submit(): Promise<ModifyAuthUserAccountState> {
+                const element = data()
+                if (!element.isLoad) {
+                    return state.currentState()
+                }
+
+                const fields = convert()
+                if (!fields.valid) {
+                    return this.state.currentState()
+                }
+
+                return modifyUser(material, element.data, fields.value, post)
+            },
+        },
+        handler,
+    }
+
+    function onSuccess(handler: (data: ModifyAuthUserAccountEntry) => void): void {
+        state.subscribe((state) => {
             if (state.type === "success") {
                 handler(state.data)
             }
         })
-    }
-
-    async submit(): Promise<ModifyAuthUserAccountState> {
-        const element = this.data()
-        if (!element.isLoad) {
-            return this.state.currentState()
-        }
-
-        const fields = this.convert()
-        if (!fields.valid) {
-            return this.state.currentState()
-        }
-
-        return modifyUser(this.material, element.data, fields.value, this.post)
     }
 }
 
