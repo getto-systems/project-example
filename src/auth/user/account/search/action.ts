@@ -9,7 +9,7 @@ import { initTextFilterAction, TextFilterAction } from "../../../../z_lib/ui/inp
 import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
 import { SearchOffsetAction } from "../../../../z_lib/ui/search/offset/action"
 import { SearchColumnsAction, SearchColumnsInfra } from "../../../../z_lib/ui/search/columns/action"
-import { initSearchFilter, SearchFilter } from "../../../../z_lib/ui/search/filter/action"
+import { initSearchFilter } from "../../../../z_lib/ui/search/filter/action"
 import {
     AuthUserGrantedRolesFilterAction,
     initAuthUserGrantedRolesFilterAction,
@@ -30,7 +30,6 @@ import { WaitTime } from "../../../../z_lib/ui/config/infra"
 import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
 import {
     SearchAuthUserAccountFilter,
-    SearchAuthUserAccountFilterProps,
     SearchAuthUserAccountRemoteResponse,
     SearchAuthUserAccountSort,
     SearchAuthUserAccountSortKey,
@@ -92,114 +91,106 @@ export type SearchAuthUserAccountConfig = Readonly<{
 export function initSearchAuthUserAccountAction(
     material: SearchAuthUserAccountMaterial,
 ): SearchAuthUserAccountAction {
-    return new Action(material)
-}
+    const { state, post } = initApplicationState({ initialState, ignite: load })
 
-class Action implements SearchAuthUserAccountAction {
-    readonly material: SearchAuthUserAccountMaterial
-    readonly state: ApplicationState<SearchAuthUserAccountState>
-    readonly post: (state: SearchAuthUserAccountState) => SearchAuthUserAccountState
+    const initialFilter = material.shell.detectFilter()
 
-    readonly list: ListSearchedAuthUserAccountAction
+    const loginId = initTextFilterAction(initialFilter.loginId)
+    const grantedRoles = initAuthUserGrantedRolesFilterAction(initialFilter.grantedRoles)
 
-    readonly loginId: TextFilterAction
-    readonly grantedRoles: AuthUserGrantedRolesFilterAction
-    readonly offset: SearchOffsetAction
-    readonly columns: SearchColumnsAction
-    readonly observe: ObserveBoardAction
+    const { observe, offset, columns, filter, clear } = initSearchFilter(
+        material.infra,
+        initialFilter,
+        [
+            ["loginId", loginId.input],
+            ["grantedRoles", grantedRoles.input],
+        ],
+        () => ({
+            loginId: loginId.pin(),
+            grantedRoles: grantedRoles.pin(),
+        }),
+    )
 
-    filter: SearchFilter<SearchAuthUserAccountSortKey, SearchAuthUserAccountFilterProps>
-    clear: () => void
+    grantedRoles.setOptions(ALL_AUTH_ROLES)
 
-    constructor(material: SearchAuthUserAccountMaterial) {
-        const { state, post } = initApplicationState({
-            initialState,
-            ignite: () => this.load(),
-        })
-        this.state = state
-        this.post = post
-
-        const initialFilter = material.shell.detectFilter()
-
-        const loginId = initTextFilterAction(initialFilter.loginId)
-        const grantedRoles = initAuthUserGrantedRolesFilterAction(initialFilter.grantedRoles)
-
-        const { observe, offset, columns, filter, clear } = initSearchFilter(
-            material.infra,
-            initialFilter,
-            [
-                ["loginId", loginId.input],
-                ["grantedRoles", grantedRoles.input],
-            ],
-            () => ({
-                loginId: loginId.pin(),
-                grantedRoles: grantedRoles.pin(),
-            }),
-        )
-
-        grantedRoles.setOptions(ALL_AUTH_ROLES)
-
-        const list = initListSearchedAction({
-            initialSearch: this.state.ignitionState.then((state) => {
-                switch (state.type) {
-                    case "initial":
-                    case "try":
-                        return preparing()
-
-                    case "success":
-                    case "failed":
-                        return prepared(state)
-                }
-            }),
-            detect: {
-                get: () => this.material.shell.detectFocus(),
-                key: (data: AuthUserAccount) => data.loginId,
-            },
-        })
-
-        list.action.focus.state.subscribe((state) => {
+    const list = initListSearchedAction({
+        initialSearch: state.ignitionState.then((state) => {
             switch (state.type) {
-                case "change":
-                    material.shell.updateFocus.focus(state.data)
-                    break
+                case "initial":
+                case "try":
+                    return preparing()
 
-                case "close":
-                    material.shell.updateFocus.clear()
-                    break
+                case "success":
+                case "failed":
+                    return prepared(state)
             }
-        })
+        }),
+        detect: {
+            get: () => material.shell.detectFocus(),
+            key: (data: AuthUserAccount) => data.loginId,
+        },
+    })
 
-        this.list = list.action
+    list.action.focus.state.subscribe((state) => {
+        switch (state.type) {
+            case "change":
+                material.shell.updateFocus.focus(state.data)
+                break
 
-        this.material = material
-        this.filter = filter
-        this.clear = clear
+            case "close":
+                material.shell.updateFocus.clear()
+                break
+        }
+    })
 
-        this.loginId = loginId.input
-        this.grantedRoles = grantedRoles.input
-        this.offset = offset
-        this.columns = columns
-        this.observe = observe
+    onSuccess((data) => {
+        filter.setSort(data.sort)
+    })
+    onSearched((state) => {
+        list.handler.load({ isLoad: true, data: state })
+    })
 
-        this.onSuccess((data) => {
-            this.filter.setSort(data.sort)
-        })
-        this.onSearched((state) => {
-            list.handler.load({ isLoad: true, data: state })
-        })
+    return {
+        state,
+        list: list.action,
+
+        loginId: loginId.input,
+        grantedRoles: grantedRoles.input,
+        offset,
+        columns,
+
+        observe,
+
+        clear,
+
+        currentSort(): SearchAuthUserAccountSort {
+            return filter.get().sort
+        },
+
+        load,
+        search(): Promise<SearchAuthUserAccountState> {
+            return search(material, filter.search(), post)
+        },
+        sort(key: SearchAuthUserAccountSortKey): Promise<SearchAuthUserAccountState> {
+            return search(material, filter.sort(key), post)
+        },
     }
 
-    onSuccess(handler: (response: SearchAuthUserAccountRemoteResponse) => void): void {
-        this.state.subscribe((state) => {
+    function load(): Promise<SearchAuthUserAccountState> {
+        return search(material, filter.load(), post)
+    }
+
+    function onSuccess(handler: (response: SearchAuthUserAccountRemoteResponse) => void): void {
+        state.subscribe((state) => {
             if (state.type === "success") {
                 handler(state.response)
             }
         })
     }
-    onSearched(
+    function onSearched(
         handler: (state: Exclude<SearchAuthUserAccountEvent, { type: "try" }>) => void,
     ): void {
-        this.state.subscribe((state) => {
+        state.subscribe((state) => {
             switch (state.type) {
                 case "success":
                 case "failed":
@@ -207,20 +198,6 @@ class Action implements SearchAuthUserAccountAction {
                     break
             }
         })
-    }
-
-    currentSort(): SearchAuthUserAccountSort {
-        return this.filter.get().sort
-    }
-
-    async search(): Promise<SearchAuthUserAccountState> {
-        return search(this.material, this.filter.search(), this.post)
-    }
-    async load(): Promise<SearchAuthUserAccountState> {
-        return search(this.material, this.filter.load(), this.post)
-    }
-    async sort(key: SearchAuthUserAccountSortKey): Promise<SearchAuthUserAccountState> {
-        return search(this.material, this.filter.sort(key), this.post)
     }
 }
 
