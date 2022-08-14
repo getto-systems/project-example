@@ -70,88 +70,73 @@ export function initChangeResetTokenDestinationAction(
     action: ChangeResetTokenDestinationAction
     handler: ModifyFieldHandler<ChangeResetTokenDestinationEntry>
 }> {
-    const action = new Action(material)
-    return { action, handler: action.handler }
-}
+    const { state, post } = initApplicationState({ initialState })
 
-class Action implements ChangeResetTokenDestinationAction {
-    readonly material: ChangeResetTokenDestinationMaterial
-    readonly state: ApplicationState<ChangeResetTokenDestinationState>
-    readonly post: (state: ChangeResetTokenDestinationState) => ChangeResetTokenDestinationState
+    const destination = initResetTokenDestinationFieldAction()
 
-    readonly destination: ResetTokenDestinationFieldAction
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
-    readonly editable: EditableBoardAction
-
-    readonly convert: () => ConvertBoardResult<ResetTokenDestination>
-    readonly data: () => PrepareElementState<ChangeResetTokenDestinationEntry>
-    readonly handler: ModifyFieldHandler<ChangeResetTokenDestinationEntry>
-    readonly reset: () => void
-
-    constructor(material: ChangeResetTokenDestinationMaterial) {
-        const { state, post } = initApplicationState({ initialState })
-        this.material = material
-        this.state = state
-        this.post = post
-
-        const destination = initResetTokenDestinationFieldAction()
-
-        const convert = (): ConvertBoardResult<ResetTokenDestination> => {
-            const result = destination.validate.check()
-            if (!result.valid) {
-                return { valid: false }
-            }
-            return {
-                valid: true,
-                value: result.value,
-            }
+    const convert = (): ConvertBoardResult<ResetTokenDestination> => {
+        const result = destination.validate.check()
+        if (!result.valid) {
+            return { valid: false }
         }
-
-        const { validate, observe, editable, data, handler, reset } = initModifyField(
-            [
-                modifyField(
-                    "destination",
-                    destination,
-                    (data: ChangeResetTokenDestinationEntry) => data.resetTokenDestination,
-                ),
-            ],
-            convert,
-        )
-
-        this.destination = destination
-        this.validate = validate
-        this.observe = observe
-        this.editable = editable
-        this.convert = convert
-        this.data = data
-        this.handler = handler
-        this.reset = reset
-
-        this.onSuccess(() => {
-            this.editable.close()
-        })
+        return {
+            valid: true,
+            value: result.value,
+        }
     }
 
-    onSuccess(handler: (data: ChangeResetTokenDestinationEntry) => void): void {
-        this.state.subscribe((state) => {
+    const { validate, observe, editable, data, handler, reset } = initModifyField(
+        [
+            modifyField(
+                "destination",
+                destination,
+                (data: ChangeResetTokenDestinationEntry) => data.resetTokenDestination,
+            ),
+        ],
+        convert,
+    )
+
+    onSuccess(() => {
+        editable.close()
+    })
+
+    return {
+        action: {
+            state,
+
+            destination,
+
+            validate,
+            observe,
+            editable,
+
+            data,
+            reset,
+
+            onSuccess,
+
+            async submit(): Promise<ChangeResetTokenDestinationState> {
+                const element = data()
+                if (!element.isLoad) {
+                    return state.currentState()
+                }
+
+                const fields = convert()
+                if (!fields.valid) {
+                    return this.state.currentState()
+                }
+                return changeDestination(material, element.data, fields.value, post)
+            },
+        },
+        handler,
+    }
+
+    function onSuccess(handler: (data: ChangeResetTokenDestinationEntry) => void): void {
+        state.subscribe((state) => {
             if (state.type === "success") {
                 handler(state.data)
             }
         })
-    }
-
-    async submit(): Promise<ChangeResetTokenDestinationState> {
-        const element = this.data()
-        if (!element.isLoad) {
-            return this.state.currentState()
-        }
-
-        const fields = this.convert()
-        if (!fields.valid) {
-            return this.state.currentState()
-        }
-        return changeDestination(this.material, element.data, fields.value, this.post)
     }
 }
 
