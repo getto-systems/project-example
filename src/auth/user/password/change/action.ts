@@ -199,87 +199,72 @@ export function initOverwritePasswordAction(material: OverwritePasswordMaterial)
     action: OverwritePasswordAction
     handler: ModifyFieldHandler<OverwritePasswordEntry>
 }> {
-    const action = new OverwriteAction(material)
-    return { action, handler: action.handler }
-}
+    const { state, post } = initApplicationState({ initialState: initialOverwriteState })
 
-class OverwriteAction implements OverwritePasswordAction {
-    readonly material: OverwritePasswordMaterial
-    readonly state: ApplicationState<OverwritePasswordState>
-    readonly post: (state: OverwritePasswordState) => OverwritePasswordState
+    const newPassword = initPasswordFieldAction()
 
-    readonly newPassword: PasswordFieldAction
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
-    readonly editable: EditableBoardAction
-
-    readonly convert: () => ConvertBoardResult<OverwritePasswordFields>
-    readonly data: () => PrepareElementState<OverwritePasswordEntry>
-    readonly handler: ModifyFieldHandler<OverwritePasswordEntry>
-    readonly reset: () => void
-
-    constructor(material: OverwritePasswordMaterial) {
-        const { state, post } = initApplicationState({ initialState: initialOverwriteState })
-        this.material = material
-        this.state = state
-        this.post = post
-
-        const newPassword = initPasswordFieldAction()
-
-        const convert = (): ConvertBoardResult<OverwritePasswordFields> => {
-            const result = {
-                newPassword: newPassword.validate.check(),
-            }
-            if (!result.newPassword.valid) {
-                return { valid: false }
-            }
-            return {
-                valid: true,
-                value: {
-                    newPassword: result.newPassword.value,
-                },
-            }
+    const convert = (): ConvertBoardResult<OverwritePasswordFields> => {
+        const result = {
+            newPassword: newPassword.validate.check(),
         }
-
-        const { validate, observe, editable, data, handler, reset } = initModifyField(
-            [modifyField("newPassword", newPassword, (_data: OverwritePasswordEntry) => "")],
-            convert,
-        )
-
-        this.newPassword = newPassword
-        this.validate = validate
-        this.observe = observe
-        this.editable = editable
-        this.convert = convert
-        this.data = data
-        this.handler = handler
-        this.reset = reset
-
-        this.onSuccess(() => {
-            this.editable.close()
-        })
+        if (!result.newPassword.valid) {
+            return { valid: false }
+        }
+        return {
+            valid: true,
+            value: {
+                newPassword: result.newPassword.value,
+            },
+        }
     }
 
-    onSuccess(handler: (data: Readonly<{ loginId: LoginId }>) => void): void {
-        this.state.subscribe((state) => {
+    const { validate, observe, editable, data, handler, reset } = initModifyField(
+        [modifyField("newPassword", newPassword, (_data: OverwritePasswordEntry) => "")],
+        convert,
+    )
+
+    onSuccess(() => {
+        editable.close()
+    })
+
+    return {
+        action: {
+            state,
+
+            newPassword,
+
+            validate,
+            observe,
+            editable,
+
+            data,
+            reset,
+
+            onSuccess,
+
+            async submit(): Promise<OverwritePasswordState> {
+                const element = data()
+                if (!element.isLoad) {
+                    return state.currentState()
+                }
+
+                const fields = convert()
+                if (!fields.valid) {
+                    return state.currentState()
+                }
+
+                return overwritePassword(material, element.data, fields.value, post)
+            },
+        },
+        handler,
+    }
+
+    function onSuccess(handler: (data: Readonly<{ loginId: LoginId }>) => void): void {
+        state.subscribe((state) => {
             if (state.type === "success") {
                 handler(state.data)
             }
         })
-    }
-
-    async submit(): Promise<OverwritePasswordState> {
-        const element = this.data()
-        if (!element.isLoad) {
-            return this.state.currentState()
-        }
-
-        const fields = this.convert()
-        if (!fields.valid) {
-            return this.state.currentState()
-        }
-
-        return overwritePassword(this.material, element.data, fields.value, this.post)
     }
 }
 
