@@ -99,83 +99,80 @@ interface Vector {
     undoRemove(index: number): void
 }
 
-function useVectorConnector(
-    connector: BoardValueStoreConnector<MultipleBoardValueStore>,
-): [readonly VectorItem[], Vector] {
-    const [connectors, setConnectors] = useState<readonly VectorItem[]>([])
-    const store = useMemo(() => new VectorStore(connector, setConnectors), [connector])
-    return [connectors, store]
-}
-
 type VectorItem = Readonly<{
     connector: BoardValueStoreConnector<BoardValueStore>
     store: BoardValueStore
     isDeleting: boolean
 }>
 
-class VectorStore implements Vector {
-    store: VectorItem[] = []
-    length = 0
+function useVectorConnector(
+    connector: BoardValueStoreConnector<MultipleBoardValueStore>,
+): [readonly VectorItem[], Vector] {
+    const [connectors, setConnectors] = useState<readonly VectorItem[]>([])
+    const store = useMemo(() => initVector(connector, setConnectors), [connector])
+    return [connectors, store]
+}
 
-    readonly setConnectors: (connectors: readonly VectorItem[]) => void
+function initVector(
+    connector: BoardValueStoreConnector<MultipleBoardValueStore>,
+    setConnectors: (connectors: readonly VectorItem[]) => void,
+): Vector {
+    const store: VectorItem[] = []
+    let length = 0
 
-    constructor(
-        connector: BoardValueStoreConnector<MultipleBoardValueStore>,
-        setConnectors: (connectors: readonly VectorItem[]) => void,
-    ) {
-        this.setConnectors = setConnectors
+    connector.connect({
+        get: () => {
+            return current()
+                .filter((item) => !item.isDeleting)
+                .map((item) => item.store.get())
+        },
+        set: (value) => {
+            extend(value.length)
+            value.forEach((value, index) => {
+                store[index].store.set(value)
+                store[index] = { ...store[index], isDeleting: false }
+            })
+            postCurrent()
+        },
+    })
 
-        connector.connect({
-            get: () => {
-                return this.current()
-                    .filter((item) => !item.isDeleting)
-                    .map((item) => item.store.get())
-            },
-            set: (value) => {
-                this.extend(value.length)
-                value.forEach((value, index) => {
-                    this.store[index].store.set(value)
-                    this.store[index] = { ...this.store[index], isDeleting: false }
-                })
-                this.postCurrent()
-            },
-        })
+    return {
+        push(): void {
+            extend(length + 1)
+            postCurrent()
+        },
+        remove(index: number): void {
+            setDeleting(index, true)
+        },
+        undoRemove(index: number): void {
+            setDeleting(index, false)
+        },
     }
 
-    current(): readonly VectorItem[] {
-        return this.store.slice(0, this.length)
+    function current(): readonly VectorItem[] {
+        return store.slice(0, length)
     }
-    postCurrent(): void {
-        this.setConnectors(this.current())
+    function postCurrent(): void {
+        setConnectors(current())
     }
 
-    extend(length: number): void {
-        while (this.store.length < length) {
+    function extend(newLength: number): void {
+        while (store.length < newLength) {
             // infra の実装扱いなので、例外的に init を使用していい
-            this.store.push({
+            store.push({
                 ...initBoardValueStoreConnector(),
                 isDeleting: false,
             })
         }
 
-        this.length = length
+        length = newLength
     }
 
-    push(): void {
-        this.extend(this.length + 1)
-        this.postCurrent()
-    }
-    remove(index: number): void {
-        this.setDeleting(index, true)
-    }
-    undoRemove(index: number): void {
-        this.setDeleting(index, false)
-    }
-    setDeleting(index: number, isDeleting: boolean): void {
-        if (index < 0 || index >= this.store.length) {
+    function setDeleting(index: number, isDeleting: boolean): void {
+        if (index < 0 || index >= store.length) {
             return
         }
-        this.store[index] = { ...this.store[index], isDeleting }
-        this.postCurrent()
+        store[index] = { ...store[index], isDeleting }
+        postCurrent()
     }
 }
