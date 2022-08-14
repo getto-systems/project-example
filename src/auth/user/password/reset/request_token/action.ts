@@ -52,77 +52,61 @@ const initialState: RequestResetTokenState = { type: "initial" }
 export function initRequestResetTokenAction(
     material: RequestResetTokenMaterial,
 ): RequestResetTokenAction {
-    return new Action(material)
-}
+    const { state, post } = initApplicationState({ initialState })
+    const editable = initEditableBoardAction()
 
-class Action implements RequestResetTokenAction {
-    readonly material: RequestResetTokenMaterial
-    readonly state: ApplicationState<RequestResetTokenState>
-    readonly post: (state: RequestResetTokenState) => RequestResetTokenState
+    const loginId = initLoginIdFieldAction()
 
-    readonly loginId: LoginIdFieldAction
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
-    readonly editable: EditableBoardAction
-
-    convert: () => ConvertBoardResult<RequestResetTokenFields>
-    clear: () => void
-
-    constructor(material: RequestResetTokenMaterial) {
-        const { state, post } = initApplicationState({ initialState })
-        this.material = material
-        this.state = state
-        this.post = post
-        this.editable = initEditableBoardAction()
-
-        const loginId = initLoginIdFieldAction()
-
-        const convert = (): ConvertBoardResult<RequestResetTokenFields> => {
-            const loginIdResult = loginId.validate.check()
-            if (!loginIdResult.valid) {
-                return { valid: false }
-            }
-            return {
-                valid: true,
-                value: {
-                    loginId: loginIdResult.value,
-                },
-            }
+    const convert = (): ConvertBoardResult<RequestResetTokenFields> => {
+        const loginIdResult = loginId.validate.check()
+        if (!loginIdResult.valid) {
+            return { valid: false }
         }
-
-        const { validate, observe, clear } = initRegisterField([["loginId", loginId]], convert)
-
-        this.loginId = loginId
-        this.validate = validate
-        this.observe = observe
-        this.convert = convert
-        this.clear = clear
-
-        this.onSuccess(() => {
-            this.editable.close()
-        })
+        return {
+            valid: true,
+            value: {
+                loginId: loginIdResult.value,
+            },
+        }
     }
 
-    onSuccess(handler: () => void): void {
-        this.state.subscribe((state) => {
+    const { validate, observe, clear } = initRegisterField([["loginId", loginId]], convert)
+
+    onSuccess(() => {
+        editable.close()
+    })
+
+    return {
+        state,
+
+        loginId,
+
+        validate,
+        observe,
+        editable,
+
+        clear,
+        edit(): void {
+            editable.open()
+            clear()
+        },
+        async submit(): Promise<RequestResetTokenState> {
+            const fields = convert()
+            if (!fields.valid) {
+                return state.currentState()
+            }
+            return requestResetToken(material, fields.value, post)
+        },
+    }
+
+    function onSuccess(handler: () => void): void {
+        state.subscribe((state) => {
             switch (state.type) {
                 case "success":
                     handler()
                     break
             }
         })
-    }
-
-    edit(): void {
-        this.editable.open()
-        this.clear()
-    }
-    async submit(): Promise<RequestResetTokenState> {
-        const fields = this.convert()
-        if (!fields.valid) {
-            return this.state.currentState()
-        }
-        return requestResetToken(this.material, fields.value, this.post)
     }
 }
 
