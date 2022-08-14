@@ -14,57 +14,55 @@ export interface LogoutAction {
     submit(): Promise<LogoutState>
 }
 
-export type LogoutState =
-    | Readonly<{ type: "initial" }>
-    | Readonly<{ type: "repository-error"; err: RepositoryError }>
-    | Readonly<{ type: "failed"; err: RemoteCommonError }>
-    | Readonly<{ type: "success" }>
+export type LogoutState = Readonly<{ type: "initial" }> | LogoutEvent
 
 const initialState: LogoutState = { type: "initial" }
-
-export function initLogoutAction(infra: LogoutInfra): LogoutAction {
-    return new Action(infra)
-}
 
 export type LogoutInfra = Readonly<{
     ticketRepository: AuthTicketRepository
     logoutRemote: LogoutRemote
 }>
 
-class Action implements LogoutAction {
-    readonly infra: LogoutInfra
-    readonly state: ApplicationState<LogoutState>
-    readonly post: (state: LogoutState) => LogoutState
+export function initLogoutAction(infra: LogoutInfra): LogoutAction {
+    const { state, post } = initApplicationState({ initialState })
+    return {
+        state,
+        submit(): Promise<LogoutState> {
+            return logout(infra, post)
+        },
+    }
+}
 
-    constructor(infra: LogoutInfra) {
-        const { state, post } = initApplicationState({ initialState })
-        this.infra = infra
-        this.state = state
-        this.post = post
+type LogoutEvent =
+    | Readonly<{ type: "repository-error"; err: RepositoryError }>
+    | Readonly<{ type: "failed"; err: RemoteCommonError }>
+    | Readonly<{ type: "success" }>
+
+async function logout<S>(infra: LogoutInfra, post: Post<LogoutEvent, S>): Promise<S> {
+    const { ticketRepository, logoutRemote } = infra
+
+    const findResult = await ticketRepository.get()
+    if (!findResult.success) {
+        return post({ type: "repository-error", err: findResult.err })
+    }
+    if (!findResult.found) {
+        // 認証情報のクリアをするのが目的なので、ticket が設定されていなければ success とする
+        return post({ type: "success" })
     }
 
-    async submit(): Promise<LogoutState> {
-        const { ticketRepository, logoutRemote } = this.infra
-
-        const findProfileResult = await ticketRepository.get()
-        if (!findProfileResult.success) {
-            return this.post({ type: "repository-error", err: findProfileResult.err })
-        }
-        if (!findProfileResult.found) {
-            // 認証情報のクリアをするのが目的なので、profile が設定されていなければ success とする
-            return this.post({ type: "success" })
-        }
-
-        const response = await logoutRemote()
-        if (!response.success) {
-            return this.post({ type: "failed", err: response.err })
-        }
-
-        const removeProfileResult = await ticketRepository.remove()
-        if (!removeProfileResult.success) {
-            return this.post({ type: "repository-error", err: removeProfileResult.err })
-        }
-
-        return this.post({ type: "success" })
+    const response = await logoutRemote()
+    if (!response.success) {
+        return post({ type: "failed", err: response.err })
     }
+
+    const removeResult = await ticketRepository.remove()
+    if (!removeResult.success) {
+        return post({ type: "repository-error", err: removeResult.err })
+    }
+
+    return post({ type: "success" })
+}
+
+interface Post<E, S> {
+    (event: E): S
 }
