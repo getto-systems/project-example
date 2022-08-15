@@ -43,7 +43,7 @@ export async function observeApplicationStateTuple2<S1, S2>(
 
 export async function observeApplicationStateTuple3<S1, S2, S3>(
     state: [ApplicationState<S1>, ApplicationState<S2>, ApplicationState<S3>],
-    statement: () => Promise<[S1, S2, S3]>,
+    statement: () => Promise<S1 | S2 | S3>,
 ): Promise<[readonly S1[], readonly S2[], readonly S3[]]> {
     const stack: [S1[], S2[], S3[]] = [[], [], []]
     const handlers: [(state: S1) => void, (state: S2) => void, (state: S3) => void] = [
