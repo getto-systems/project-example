@@ -64,45 +64,48 @@ function useCheckboxStore(
     connector: BoardValueStoreConnector<MultipleBoardValueStore>,
 ): [ReadonlySet<string>, CheckboxStore] {
     const [current, setValue] = useState<ReadonlySet<string>>(new Set())
-    const store = useMemo(() => new ValuesStore(), [])
+    const { check, store, connect } = useMemo(() => initCheckboxStore(), [])
 
     useLayoutEffect(() => {
-        store.connect(setValue)
+        connect(setValue)
         connector.connect(store)
         return () => connector.terminate()
-    }, [connector, store])
+    }, [connector, store, connect])
 
-    return [current, store]
+    return [current, check]
 }
 
-class ValuesStore implements CheckboxStore {
-    value: Set<string>
+function initCheckboxStore(): Readonly<{
+    check: CheckboxStore
+    store: MultipleBoardValueStore
+    connect: (setValue: (value: ReadonlySet<string>) => void) => void
+}> {
+    let value: Set<string> = new Set()
+    let setValue: { (value: ReadonlySet<string>): void } = () => null
 
-    constructor() {
-        this.value = new Set()
-    }
-
-    setValue: { (value: ReadonlySet<string>): void } = () => null
-
-    connect(setValue: { (value: ReadonlySet<string>): void }): void {
-        setValue(this.value)
-        this.setValue = setValue
-    }
-
-    setChecked(value: string, isChecked: boolean): void {
-        if (isChecked) {
-            this.value.add(value)
-        } else {
-            this.value.delete(value)
-        }
-        this.setValue(this.value)
-    }
-
-    get(): readonly string[] {
-        return Array.from(this.value.values())
-    }
-    set(value: readonly string[]): void {
-        this.value = new Set(value)
-        this.setValue(this.value)
+    return {
+        check: {
+            setChecked(item: string, isChecked: boolean): void {
+                if (isChecked) {
+                    value.add(item)
+                } else {
+                    value.delete(item)
+                }
+                setValue(value)
+            },
+        },
+        store: {
+            get(): readonly string[] {
+                return Array.from(value.values())
+            },
+            set(newValue: readonly string[]): void {
+                value = new Set(newValue)
+                setValue(value)
+            },
+        },
+        connect(newSetValue: { (value: ReadonlySet<string>): void }): void {
+            newSetValue(value)
+            setValue = newSetValue
+        },
     }
 }

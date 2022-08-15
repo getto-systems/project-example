@@ -31,62 +31,48 @@ export type SearchColumnsState =
 const initialState: SearchColumnsState = { type: "initial" }
 
 export function initSearchColumnsAction(infra: SearchColumnsInfra): SearchColumnsAction {
-    return new Action(infra)
-}
+    const { state, post } = initApplicationState({
+        initialState,
+        ignite: load,
+    })
 
-class Action implements SearchColumnsAction {
-    readonly infra: SearchColumnsInfra
-    readonly state: ApplicationState<SearchColumnsState>
-    readonly post: (state: SearchColumnsState) => SearchColumnsState
+    const { input, store, subscriber } = initMultipleInputBoardAction()
 
-    readonly input: InputBoardAction<MultipleBoardValueStore>
+    subscriber.subscribe(() => {
+        save(store.get())
+    })
 
-    store: MultipleBoardValueStore
+    return {
+        state,
 
-    constructor(infra: SearchColumnsInfra) {
-        const { state, post } = initApplicationState({
-            initialState,
-            ignite: () => this.load(),
-        })
-        this.state = state
-        this.post = post
+        input,
 
-        const { input, store, subscriber } = initMultipleInputBoardAction()
-
-        this.input = input
-        this.store = store
-        this.infra = infra
-
-        subscriber.subscribe(() => {
-            this.save(store.get())
-        })
+        get(): readonly string[] {
+            return store.get()
+        },
     }
 
-    get(): readonly string[] {
-        return this.store.get()
-    }
-
-    async save(columns: readonly string[]): Promise<SearchColumnsState> {
-        const { columnsRepository } = this.infra
+    async function save(columns: readonly string[]): Promise<SearchColumnsState> {
+        const { columnsRepository } = infra
         const result = await columnsRepository.set(columns)
         if (!result.success) {
-            return this.post({ type: "repository-error", err: result.err })
+            return post({ type: "repository-error", err: result.err })
         }
-        return this.post({ type: "success" })
+        return post({ type: "success" })
     }
 
-    async load(): Promise<SearchColumnsState> {
-        const { columnsRepository } = this.infra
+    async function load(): Promise<SearchColumnsState> {
+        const { columnsRepository } = infra
 
         const columnsResult = await columnsRepository.get()
         if (!columnsResult.success) {
-            return this.post({ type: "repository-error", err: columnsResult.err })
+            return post({ type: "repository-error", err: columnsResult.err })
         }
         if (!columnsResult.found) {
-            return this.post(this.state.currentState())
+            return post(state.currentState())
         }
 
-        this.store.set(columnsResult.value)
-        return this.post({ type: "success" })
+        store.set(columnsResult.value)
+        return post({ type: "success" })
     }
 }

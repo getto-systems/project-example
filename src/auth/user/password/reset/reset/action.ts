@@ -73,95 +73,79 @@ export type ResetPasswordConfig = Readonly<{
     GetScriptPathConfig
 
 export function initResetPasswordAction(material: ResetPasswordMaterial): ResetPasswordAction {
-    return new Action(material)
-}
+    const { state, post } = initApplicationState({ initialState })
 
-class Action implements ResetPasswordAction {
-    readonly material: ResetPasswordMaterial
-    readonly state: ApplicationState<ResetPasswordState>
-    readonly post: (state: ResetPasswordState) => ResetPasswordState
+    const loginId = initLoginIdFieldAction()
+    const password = initPasswordFieldAction()
 
-    readonly loginId: LoginIdFieldAction
-    readonly password: PasswordFieldAction
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
-
-    convert: () => ConvertBoardResult<ResetPasswordFields>
-    clear: () => void
-
-    constructor(material: ResetPasswordMaterial) {
-        const { state, post } = initApplicationState({ initialState })
-        this.material = material
-        this.state = state
-        this.post = post
-
-        const loginId = initLoginIdFieldAction()
-        const password = initPasswordFieldAction()
-
-        const convert = (): ConvertBoardResult<ResetPasswordFields> => {
-            const result = {
-                loginId: loginId.validate.check(),
-                password: password.validate.check(),
-            }
-            if (!result.loginId.valid || !result.password.valid) {
-                return { valid: false }
-            }
-            return {
-                valid: true,
-                value: {
-                    loginId: result.loginId.value,
-                    newPassword: result.password.value,
-                },
-            }
+    const convert = (): ConvertBoardResult<ResetPasswordFields> => {
+        const result = {
+            loginId: loginId.validate.check(),
+            password: password.validate.check(),
         }
-
-        const { validate, observe, clear } = initRegisterField(
-            [
-                ["loginId", loginId],
-                ["password", password],
-            ],
-            convert,
-        )
-
-        this.loginId = loginId
-        this.password = password
-        this.validate = validate
-        this.observe = observe
-        this.convert = convert
-        this.clear = clear
+        if (!result.loginId.valid || !result.password.valid) {
+            return { valid: false }
+        }
+        return {
+            valid: true,
+            value: {
+                loginId: result.loginId.value,
+                newPassword: result.password.value,
+            },
+        }
     }
 
-    async submit(): Promise<ResetPasswordState> {
-        const fields = this.convert()
-        if (!fields.valid) {
-            return this.state.currentState()
-        }
-        const result = await reset(this.material, fields.value, this.post)
-        if (!result.success) {
-            return result.state
-        }
-        return this.startContinuousRenew(result.ticket)
+    const { validate, observe, clear } = initRegisterField(
+        [
+            ["loginId", loginId],
+            ["password", password],
+        ],
+        convert,
+    )
+
+    return {
+        state,
+
+        loginId,
+        password,
+
+        validate,
+        observe,
+
+        clear,
+
+        async submit(): Promise<ResetPasswordState> {
+            const fields = convert()
+            if (!fields.valid) {
+                return state.currentState()
+            }
+            const result = await reset(material, fields.value, post)
+            if (!result.success) {
+                return result.state
+            }
+            return start(result.ticket)
+        },
+        async loadError(err: LoadScriptError): Promise<ResetPasswordState> {
+            return post({ type: "load-error", err })
+        },
     }
-    async startContinuousRenew(ticket: AuthTicket): Promise<ResetPasswordState> {
-        return await startContinuousRenew(this.material, { hasTicket: true, ticket }, (event) => {
+
+    async function start(ticket: AuthTicket): Promise<ResetPasswordState> {
+        return await startContinuousRenew(material, { hasTicket: true, ticket }, (event) => {
             switch (event.type) {
                 case "succeed-to-start-continuous-renew":
-                    return this.post({
+                    return post({
                         type: "try-to-load",
-                        scriptPath: this.secureScriptPath(),
+                        scriptPath: scriptPath(),
                     })
                 default:
-                    return this.post(event)
+                    return post(event)
             }
         })
     }
 
-    async loadError(err: LoadScriptError): Promise<ResetPasswordState> {
-        return this.post({ type: "load-error", err })
-    }
-
-    secureScriptPath() {
-        return getScriptPath(this.material)
+    function scriptPath() {
+        return getScriptPath(material)
     }
 }
 

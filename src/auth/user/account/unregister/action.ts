@@ -50,53 +50,41 @@ export function initUnregisterAuthUserAccountAction(
     action: UnregisterAuthUserAccountAction
     handler: ModifyFieldHandler<UnregisterAuthUserAccountEntry>
 }> {
-    const action = new Action(material)
-    return { action, handler: action.handler }
-}
+    const { state, post } = initApplicationState({ initialState })
 
-class Action implements UnregisterAuthUserAccountAction {
-    readonly material: UnregisterAuthUserAccountMaterial
-    readonly state: ApplicationState<UnregisterAuthUserAccountState>
-    readonly post: (state: UnregisterAuthUserAccountState) => UnregisterAuthUserAccountState
+    const { editable, data, handler } = initEditableDataHandler<UnregisterAuthUserAccountEntry>()
 
-    readonly editable: EditableBoardAction
+    onSuccess(() => {
+        editable.close()
+    })
 
-    readonly data: () => PrepareElementState<UnregisterAuthUserAccountEntry>
-    readonly handler: ModifyFieldHandler<UnregisterAuthUserAccountEntry>
+    return {
+        action: {
+            state,
+            editable,
 
-    constructor(material: UnregisterAuthUserAccountMaterial) {
-        const { state, post } = initApplicationState({ initialState })
-        this.material = material
-        this.state = state
-        this.post = post
+            data,
 
-        const { editable, data, handler } =
-            initEditableDataHandler<UnregisterAuthUserAccountEntry>()
+            onSuccess,
 
-        this.editable = editable
-        this.data = data
-        this.handler = handler
+            async submit(): Promise<UnregisterAuthUserAccountState> {
+                const element = data()
+                if (!element.isLoad) {
+                    return state.currentState()
+                }
 
-        this.onSuccess(() => {
-            this.editable.close()
-        })
+                return unregisterUser(material, element.data, post)
+            },
+        },
+        handler,
     }
 
-    onSuccess(handler: (data: Readonly<{ loginId: LoginId }>) => void): void {
-        this.state.subscribe((state) => {
+    function onSuccess(handler: (data: Readonly<{ loginId: LoginId }>) => void): void {
+        state.subscribe((state) => {
             if (state.type === "success") {
                 handler(state.data)
             }
         })
-    }
-
-    async submit(): Promise<UnregisterAuthUserAccountState> {
-        const element = this.data()
-        if (!element.isLoad) {
-            return this.state.currentState()
-        }
-
-        return unregisterUser(this.material, element.data, this.post)
     }
 }
 

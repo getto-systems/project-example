@@ -132,47 +132,38 @@ export type LoadMenuConfig = Readonly<{
 }>
 
 export function initLoadMenuAction(material: LoadMenuMaterial): LoadMenuAction {
-    return new Action(material)
-}
+    const { state, post } = initApplicationState({
+        initialState,
+        ignite: async (): Promise<LoadMenuState> => {
+            return loadMenu(material, (event) => {
+                const state = post(event)
 
-class Action implements LoadMenuAction {
-    readonly material: LoadMenuMaterial
-    readonly state: ApplicationState<LoadMenuState>
-    readonly post: (state: LoadMenuState) => LoadMenuState
+                switch (event.type) {
+                    case "succeed-to-load":
+                        // 初期ロード完了で最初の badge 更新を行う
+                        return updateBadge()
 
-    constructor(material: LoadMenuMaterial) {
-        const { state, post } = initApplicationState({
-            initialState,
-            ignite: () => this.load(),
-        })
-        this.material = material
-        this.state = state
-        this.post = post
-    }
-    async load(): Promise<LoadMenuState> {
-        return loadMenu(this.material, (event) => {
-            const state = this.post(event)
+                    default:
+                        return state
+                }
+            })
+        },
+    })
 
-            switch (event.type) {
-                case "succeed-to-load":
-                    // 初期ロード完了で最初の badge 更新を行う
-                    return this.updateBadge()
+    return {
+        state,
 
-                default:
-                    return state
-            }
-        })
+        updateBadge,
+        show(path: MenuCategoryPath): Promise<LoadMenuState> {
+            return toggleMenuExpand(material, path, true, post)
+        },
+        hide(path: MenuCategoryPath): Promise<LoadMenuState> {
+            return toggleMenuExpand(material, path, false, post)
+        },
     }
 
-    updateBadge(): Promise<LoadMenuState> {
-        return updateMenuBadge(this.material, this.post)
-    }
-
-    show(path: MenuCategoryPath): Promise<LoadMenuState> {
-        return toggleMenuExpand(this.material, path, true, this.post)
-    }
-    hide(path: MenuCategoryPath): Promise<LoadMenuState> {
-        return toggleMenuExpand(this.material, path, false, this.post)
+    function updateBadge(): Promise<LoadMenuState> {
+        return updateMenuBadge(material, post)
     }
 }
 

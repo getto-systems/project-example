@@ -49,96 +49,77 @@ export type SetupSeasonState = SetupSeasonEvent
 
 const initialState: SetupSeasonState = { type: "initial" }
 
-export function initSetupSeasonAction(
-    material: SetupSeasonMaterial,
-    load: LoadAction,
-): SetupSeasonAction {
-    return new Action(material, load)
-}
-
 interface LoadAction {
     readonly state: { ignitionState: Promise<LoadSeasonState> }
     load(): Promise<LoadSeasonState>
 }
 
-class Action implements SetupSeasonAction {
-    readonly material: SetupSeasonMaterial
-    readonly state: ApplicationState<SetupSeasonState>
-    readonly post: (state: SetupSeasonState) => SetupSeasonState
+export function initSetupSeasonAction(
+    material: SetupSeasonMaterial,
+    load: LoadAction,
+): SetupSeasonAction {
+    const { state, post } = initApplicationState({ initialState })
+    const editable = initEditableBoardAction()
 
-    readonly season: SeasonFieldAction
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
-    readonly editable: EditableBoardAction
+    const season = initSeasonFieldAction(material.infra.availableSeasons)
 
-    load: LoadAction
-
-    convert: { (): ConvertBoardResult<DetectedSeason> }
-
-    constructor(material: SetupSeasonMaterial, load: LoadAction) {
-        const { state, post } = initApplicationState({ initialState })
-        this.state = state
-        this.post = post
-        this.editable = initEditableBoardAction()
-
-        const season = initSeasonFieldAction(material.infra.availableSeasons)
-
-        const convert = (): ConvertBoardResult<DetectedSeason> => {
-            const result = {
-                season: season.validate.check(),
-            }
-            if (!result.season.valid) {
-                return { valid: false }
-            }
-            return {
-                valid: true,
-                value: result.season.value,
-            }
+    const convert = (): ConvertBoardResult<DetectedSeason> => {
+        const result = {
+            season: season.validate.check(),
         }
-
-        const { validate, observe } = initRegisterField([["season", season]], convert)
-
-        load.state.ignitionState.then((state) => {
-            switch (state.type) {
-                case "success":
-                    if (state.default) {
-                        season.reset({ default: true })
-                    } else {
-                        season.reset({ default: false, season: state.season })
-                    }
-            }
-        })
-
-        this.season = season
-        this.validate = validate
-        this.observe = observe
-
-        this.material = material
-        this.load = load
-        this.convert = convert
-
-        this.onSuccess(() => {
-            this.editable.close()
-            this.load.load()
-        })
+        if (!result.season.valid) {
+            return { valid: false }
+        }
+        return {
+            valid: true,
+            value: result.season.value,
+        }
     }
 
-    onSuccess(handler: () => void): void {
-        this.state.subscribe((state) => {
+    const { validate, observe } = initRegisterField([["season", season]], convert)
+
+    load.state.ignitionState.then((state) => {
+        switch (state.type) {
+            case "success":
+                if (state.default) {
+                    season.reset({ default: true })
+                } else {
+                    season.reset({ default: false, season: state.season })
+                }
+        }
+    })
+
+    onSuccess(() => {
+        editable.close()
+        load.load()
+    })
+
+    return {
+        state,
+
+        season,
+
+        validate,
+        observe,
+        editable,
+
+        async setup(): Promise<SetupSeasonState> {
+            const fields = convert()
+            if (!fields.valid) {
+                return state.currentState()
+            }
+            return setupSeason(material, fields.value, post)
+        },
+    }
+
+    function onSuccess(handler: () => void): void {
+        state.subscribe((state) => {
             switch (state.type) {
                 case "success":
                     handler()
                     break
             }
         })
-    }
-
-    async setup(): Promise<SetupSeasonState> {
-        const fields = this.convert()
-        if (!fields.valid) {
-            return this.state.currentState()
-        }
-        return setupSeason(this.material, fields.value, this.post)
     }
 }
 

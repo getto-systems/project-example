@@ -40,30 +40,21 @@ type PasswordCharacterInfra = Readonly<{
 }>
 
 function initPasswordCharacterAction(infra: PasswordCharacterInfra): PasswordCharacterAction {
-    return new CharacterAction(infra)
-}
+    const { state, post } = initApplicationState({ initialState })
 
-class CharacterAction implements PasswordCharacterAction {
-    readonly infra: PasswordCharacterInfra
-    readonly state: ApplicationState<PasswordCharacterState>
-    readonly post: (state: PasswordCharacterState) => PasswordCharacterState
+    infra.subscriber.subscribe({
+        onInput: check,
+        onClear: check,
+        onReset: check,
+    })
 
-    constructor(infra: PasswordCharacterInfra) {
-        const { state, post } = initApplicationState({ initialState })
-        this.infra = infra
-        this.state = state
-        this.post = post
-
-        infra.subscriber.subscribe({
-            onInput: () => this.check(),
-            onClear: () => this.check(),
-            onReset: () => this.check(),
-        })
+    return {
+        state,
     }
 
-    check(): PasswordCharacterState {
-        const value = this.infra.store.get()
-        return this.post({
+    function check(): PasswordCharacterState {
+        const value = infra.store.get()
+        return post({
             multiByte: new TextEncoder().encode(value).byteLength > value.length,
         })
     }

@@ -7,43 +7,37 @@ export interface WorkerProxyMap<P> {
 }
 
 export function newWorkerProxyMap<P>(label: string): WorkerProxyMap<P> {
-    return new ProxyMap(label)
-}
+    const map: Map<WorkerProxyCallID, P> = new Map()
+    const idFactory = newIdFactory()
 
-class ProxyMap<P> implements WorkerProxyMap<P> {
-    label: string
-
-    map: Map<WorkerProxyCallID, P> = new Map()
-    idGenerator = idGenerator()
-
-    constructor(label: string) {
-        this.label = label
+    return {
+        register(proxy: P): WorkerProxyCallID {
+            const id = idFactory()
+            map.set(id, proxy)
+            return id
+        },
+        find,
+        drop(id: WorkerProxyCallID): P {
+            const proxy = find(id)
+            map.delete(id)
+            return proxy
+        },
     }
 
-    register(proxy: P): WorkerProxyCallID {
-        const id = this.idGenerator()
-        this.map.set(id, proxy)
-        return id
-    }
-    find(id: WorkerProxyCallID): P {
-        const proxy = this.map.get(id)
+    function find(id: WorkerProxyCallID): P {
+        const proxy = map.get(id)
         if (proxy === undefined) {
-            throw new Error(`handler not registered: ${this.label}`)
+            throw new Error(`handler not registered: ${label}`)
         }
         return proxy
     }
-    drop(id: WorkerProxyCallID): P {
-        const proxy = this.find(id)
-        this.map.delete(id)
-        return proxy
-    }
 }
 
-function idGenerator(): IDGenerator {
+function newIdFactory(): IdFactory {
     let id = 0
     return () => id++
 }
 
-interface IDGenerator {
+interface IdFactory {
     (): WorkerProxyCallID
 }

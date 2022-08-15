@@ -63,87 +63,72 @@ export function initOverwriteLoginIdAction(material: OverwriteLoginIdMaterial): 
     action: OverwriteLoginIdAction
     handler: ModifyFieldHandler<OverwriteLoginIdEntry>
 }> {
-    const action = new OverwriteAction(material)
-    return { action, handler: action.handler }
-}
+    const { state, post } = initApplicationState({ initialState })
 
-class OverwriteAction implements OverwriteLoginIdAction {
-    readonly material: OverwriteLoginIdMaterial
-    readonly state: ApplicationState<OverwriteLoginIdState>
-    readonly post: (state: OverwriteLoginIdState) => OverwriteLoginIdState
+    const newLoginId = initLoginIdFieldAction()
 
-    readonly newLoginId: LoginIdFieldAction
-    readonly validate: ValidateBoardAction
-    readonly observe: ObserveBoardAction
-    readonly editable: EditableBoardAction
-
-    readonly convert: () => ConvertBoardResult<OverwriteLoginIdFields>
-    readonly data: () => PrepareElementState<OverwriteLoginIdEntry>
-    readonly handler: ModifyFieldHandler<OverwriteLoginIdEntry>
-    readonly reset: () => void
-
-    constructor(material: OverwriteLoginIdMaterial) {
-        const { state, post } = initApplicationState({ initialState })
-        this.material = material
-        this.state = state
-        this.post = post
-
-        const newLoginId = initLoginIdFieldAction()
-
-        const convert = (): ConvertBoardResult<OverwriteLoginIdFields> => {
-            const result = {
-                newLoginId: newLoginId.validate.check(),
-            }
-            if (!result.newLoginId.valid) {
-                return { valid: false }
-            }
-            return {
-                valid: true,
-                value: {
-                    newLoginId: result.newLoginId.value,
-                },
-            }
+    const convert = (): ConvertBoardResult<OverwriteLoginIdFields> => {
+        const result = {
+            newLoginId: newLoginId.validate.check(),
         }
-
-        const { validate, observe, editable, data, handler, reset } = initModifyField(
-            [modifyField("newLoginId", newLoginId, (_data: OverwriteLoginIdEntry) => "")],
-            convert,
-        )
-
-        this.newLoginId = newLoginId
-        this.validate = validate
-        this.observe = observe
-        this.editable = editable
-        this.convert = convert
-        this.data = data
-        this.handler = handler
-        this.reset = reset
-
-        this.onSuccess(() => {
-            this.editable.close()
-        })
+        if (!result.newLoginId.valid) {
+            return { valid: false }
+        }
+        return {
+            valid: true,
+            value: {
+                newLoginId: result.newLoginId.value,
+            },
+        }
     }
 
-    onSuccess(handler: (data: OverwriteLoginIdEntry) => void): void {
-        this.state.subscribe((state) => {
+    const { validate, observe, editable, data, handler, reset } = initModifyField(
+        [modifyField("newLoginId", newLoginId, (_data: OverwriteLoginIdEntry) => "")],
+        convert,
+    )
+
+    onSuccess(() => {
+        editable.close()
+    })
+
+    return {
+        action: {
+            state,
+
+            newLoginId,
+
+            validate,
+            observe,
+            editable,
+
+            data,
+            reset,
+
+            onSuccess,
+
+            async submit(): Promise<OverwriteLoginIdState> {
+                const element = data()
+                if (!element.isLoad) {
+                    return state.currentState()
+                }
+
+                const fields = convert()
+                if (!fields.valid) {
+                    return state.currentState()
+                }
+
+                return overwriteLoginId(material, element.data, fields.value, post)
+            },
+        },
+        handler,
+    }
+
+    function onSuccess(handler: (data: OverwriteLoginIdEntry) => void): void {
+        state.subscribe((state) => {
             if (state.type === "success") {
                 handler(state.data)
             }
         })
-    }
-
-    async submit(): Promise<OverwriteLoginIdState> {
-        const element = this.data()
-        if (!element.isLoad) {
-            return this.state.currentState()
-        }
-
-        const fields = this.convert()
-        if (!fields.valid) {
-            return this.state.currentState()
-        }
-
-        return overwriteLoginId(this.material, element.data, fields.value, this.post)
     }
 }
 

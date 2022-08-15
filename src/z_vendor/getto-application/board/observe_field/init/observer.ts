@@ -1,44 +1,22 @@
 import { BoardFieldObserver } from "../infra"
 
 export function initBoardFieldObserver<V>(
-    value: Readonly<{
+    props: Readonly<{
         current: { (): V }
         isSame?: { (a: V, b: V): boolean }
     }>,
 ): BoardFieldObserver {
-    return new Observer(value)
-}
+    const current = props.current
+    const isSame = props.isSame ? props.isSame : (a: V, b: V) => a === b
 
-interface ObserveValueGetter<V> {
-    (): V
-}
-interface ObserveValueCompare<V> {
-    (a: V, b: V): boolean
-}
+    let value = props.current()
 
-class Observer<V> implements BoardFieldObserver {
-    current: ObserveValueGetter<V>
-    isSame: ObserveValueCompare<V> = (a, b) => a === b
-    store: V
-
-    constructor({
-        current,
-        isSame,
-    }: Readonly<{
-        current: { (): V }
-        isSame?: { (a: V, b: V): boolean }
-    }>) {
-        this.current = current
-        if (isSame) {
-            this.isSame = isSame
-        }
-        this.store = current()
-    }
-
-    pin(): void {
-        this.store = this.current()
-    }
-    hasChanged(): boolean {
-        return !this.isSame(this.store, this.current())
+    return {
+        pin(): void {
+            value = current()
+        },
+        hasChanged(): boolean {
+            return !isSame(value, current())
+        },
     }
 }
