@@ -10,7 +10,6 @@ import {
     mainHeader,
     mainTitle,
 } from "../../../../../z_vendor/getto-css/preact/layout/app"
-import { container } from "../../../../../z_vendor/getto-css/preact/design/box"
 
 import { copyright, siteInfo } from "../../../../../x_content/site"
 
@@ -36,7 +35,7 @@ export function LogoutPage(props: LogoutPageResource): VNode {
         header: [],
         main: appMain({
             header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, props)]),
-            body: mainBody(container(h(Logout, props))),
+            body: mainBody(h(Logout, props)),
             copyright,
         }),
         menu: h(LoadMenu, props),
