@@ -28,17 +28,14 @@ export function ValidationMessage(
     props: Readonly<{ state: ApplicationState<ValidateBoardState> }>,
 ): VNode {
     const validateState = useApplicationState(props.state)
-    return html`${validationMessage(validateState)}`
-}
 
-export function validationMessage(validateState: ValidateBoardState): readonly VNode[] {
     switch (validateState) {
         case "initial":
         case "valid":
-            return []
+            return html``
 
         case "invalid":
-            return [fieldHelp_error(["正しく入力されていません"])]
+            return fieldHelp_error(["正しく入力されていません"])
     }
 }
 

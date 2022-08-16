@@ -6,18 +6,14 @@ import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_err
 
 import { useApplicationState } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import {
-    buttons,
-    fieldHelp_error,
-    form,
-} from "../../../../../../z_vendor/getto-css/preact/design/form"
+import { buttons, fieldHelp_error } from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { loginBox } from "../../../../../../z_vendor/getto-css/preact/layout/login"
 
 import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
 import { siteInfo } from "../../../../../../x_content/site"
 import { appendScript } from "../../../../../sign/x_preact/script"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
-import { takeLongtimeField, validationMessage } from "../../../../../../common/x_preact/design/form"
+import { takeLongtimeField, ValidationMessage } from "../../../../../../common/x_preact/design/form"
 
 import { ApplicationError } from "../../../../../../avail/x_preact/application_error"
 import { LoginIdField } from "../../../../login_id/input/x_preact/field"
@@ -35,39 +31,13 @@ type Props = Readonly<{
     reset: ResetPasswordAction
 }>
 export function ResetPassword(props: Props): VNode {
-    const state = useApplicationState(props.reset.state)
+    useLoadScript(props.reset)
+
+    const resetState = useApplicationState(props.reset.state)
     const validateState = useApplicationState(props.reset.validate.state)
     const observeState = useApplicationState(props.reset.observe.state)
 
-    useLayoutEffect(() => {
-        // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
-        switch (state.type) {
-            case "try-to-load":
-                if (!state.scriptPath.valid) {
-                    props.reset.loadError({
-                        type: "infra-error",
-                        err: `スクリプトのロードに失敗しました: ${state.type}`,
-                    })
-                    break
-                }
-                appendScript(state.scriptPath.value, (script) => {
-                    script.onerror = () => {
-                        props.reset.loadError({
-                            type: "infra-error",
-                            err: `スクリプトのロードに失敗しました: ${state.type}`,
-                        })
-                    }
-                })
-                break
-        }
-    }, [props.reset, state])
-
-    switch (state.type) {
-        case "initial-reset":
-        case "failed-to-reset":
-        case "try-to-reset":
-            return resetForm(state)
-
+    switch (resetState.type) {
         case "try-to-load":
             // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
             return html``
@@ -82,75 +52,74 @@ export function ResetPassword(props: Props): VNode {
 
         case "repository-error":
         case "load-error":
-            return h(ApplicationError, { err: state.err.err })
+            return h(ApplicationError, { err: resetState.err.err })
     }
 
-    type ResetState =
-        | Readonly<{ type: "initial-reset" }>
-        | Readonly<{ type: "try-to-reset"; hasTakenLongtime: boolean }>
-        | Readonly<{ type: "failed-to-reset"; err: ResetPasswordError }>
-    function resetForm(state: ResetState): VNode {
-        return form(
-            loginBox(siteInfo, {
-                title: "パスワードリセット",
-                body: [
-                    h(LoginIdField, {
-                        field: props.reset.loginId,
-                        help: ["入力したログインIDをもう一度入力してください"],
-                        autocomplete: "username",
-                    }),
-                    h(PasswordField, {
-                        field: props.reset.password,
-                        help: ["新しいパスワードを入力してください"],
-                        autocomplete: "new-password",
-                    }),
-                    buttons({
-                        left: resetButton(),
-                        right: clearButton(),
-                    }),
-                ],
-                footer: [footerLinks(), ...validationMessage(validateState), ...message()],
+    return loginBox(siteInfo, {
+        form: true,
+        title: "パスワードリセット",
+        body: [
+            h(LoginIdField, {
+                field: props.reset.loginId,
+                help: ["入力したログインIDをもう一度入力してください"],
+                autocomplete: "username",
             }),
-        )
+            h(PasswordField, {
+                field: props.reset.password,
+                help: ["新しいパスワードを入力してください"],
+                autocomplete: "new-password",
+            }),
+            buttons({ left: h(Submit, {}), right: h(Clear, {}) }),
+            h(ValidationMessage, props.reset.validate),
+            h(Message, {}),
+        ],
+        footer: footerLinks(),
+    })
 
-        function resetButton() {
-            return h(ChangeButton, {
-                label: "パスワードリセット",
-                isConnecting: state.type === "try-to-reset",
-                validateState,
-                observeState,
-                onClick,
-            })
+    function Submit(_props: unknown): VNode {
+        return h(ChangeButton, {
+            label: "パスワードリセット",
+            isConnecting: resetState.type === "try-to-reset",
+            validateState,
+            observeState,
+            onClick,
+        })
 
-            function onClick(e: Event) {
-                e.preventDefault()
-                props.reset.submit()
-            }
-        }
-
-        function message(): readonly VNode[] {
-            switch (state.type) {
-                case "initial-reset":
-                    return []
-
-                case "try-to-reset":
-                    if (state.hasTakenLongtime) {
-                        return [takeLongtimeField("パスワードリセット")]
-                    }
-                    return []
-
-                case "failed-to-reset":
-                    return [fieldHelp_error(resetError(state.err))]
-            }
+        function onClick(e: Event) {
+            e.preventDefault()
+            props.reset.submit()
         }
     }
 
-    function clearButton() {
+    function Clear(_props: unknown): VNode {
         return h(ClearChangesButton, { observeState, onClick })
 
         function onClick(e: Event) {
             e.preventDefault()
             props.reset.clear()
+        }
+    }
+
+    function Message(_props: unknown): VNode {
+        switch (resetState.type) {
+            case "initial-reset":
+            case "try-to-load":
+            case "succeed-to-renew":
+            case "ticket-not-expired":
+            case "required-to-login":
+            case "failed-to-renew":
+            case "repository-error":
+            case "load-error":
+                return html``
+
+            case "try-to-reset":
+                if (resetState.hasTakenLongtime) {
+                    return takeLongtimeField("パスワードリセット")
+                }
+                return html``
+
+            case "failed-to-reset":
+                return fieldHelp_error(resetError(resetState.err))
         }
     }
 
@@ -185,4 +154,31 @@ function resetError(err: ResetPasswordError): readonly VNodeContent[] {
                 ...reason.detail,
             ])
     }
+}
+
+function useLoadScript(reset: ResetPasswordAction): void {
+    const resetState = useApplicationState(reset.state)
+
+    useLayoutEffect(() => {
+        // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
+        switch (resetState.type) {
+            case "try-to-load":
+                if (!resetState.scriptPath.valid) {
+                    reset.loadError({
+                        type: "infra-error",
+                        err: `スクリプトのロードに失敗しました: ${resetState.type}`,
+                    })
+                    break
+                }
+                appendScript(resetState.scriptPath.value, (script) => {
+                    script.onerror = () => {
+                        reset.loadError({
+                            type: "infra-error",
+                            err: `スクリプトのロードに失敗しました: ${resetState.type}`,
+                        })
+                    }
+                })
+                break
+        }
+    }, [reset, resetState])
 }

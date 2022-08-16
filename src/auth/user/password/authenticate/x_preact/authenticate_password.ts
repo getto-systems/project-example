@@ -15,7 +15,7 @@ import { siteInfo } from "../../../../../x_content/site"
 import { lnir } from "../../../../../z_lib/ui/icon/init/line_icon"
 import { appendScript } from "../../../../sign/x_preact/script"
 import { signNav } from "../../../../sign/nav/x_preact/nav"
-import { takeLongtimeField, validationMessage } from "../../../../../common/x_preact/design/form"
+import { takeLongtimeField, ValidationMessage } from "../../../../../common/x_preact/design/form"
 
 import { ApplicationError } from "../../../../../avail/x_preact/application_error"
 import { LoginIdField } from "../../../login_id/input/x_preact/field"
@@ -33,39 +33,10 @@ type Props = Readonly<{
     authenticate: AuthenticatePasswordAction
 }>
 export function AuthenticatePassword(props: Props): VNode {
-    const state = useApplicationState(props.authenticate.state)
-    const validateState = useApplicationState(props.authenticate.validate.state)
-    const observeState = useApplicationState(props.authenticate.observe.state)
+    useLoadScript(props.authenticate)
 
-    useLayoutEffect(() => {
-        // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
-        switch (state.type) {
-            case "try-to-load":
-                if (!state.scriptPath.valid) {
-                    props.authenticate.loadError({
-                        type: "infra-error",
-                        err: `スクリプトのロードに失敗しました: ${state.type}`,
-                    })
-                    break
-                }
-                appendScript(state.scriptPath.value, (script) => {
-                    script.onerror = () => {
-                        props.authenticate.loadError({
-                            type: "infra-error",
-                            err: `スクリプトのロードに失敗しました: ${state.type}`,
-                        })
-                    }
-                })
-                break
-        }
-    }, [props.authenticate, state])
-
-    switch (state.type) {
-        case "initial-login":
-        case "failed-to-login":
-        case "try-to-login":
-            return authenticateForm(state)
-
+    const authenticateState = useApplicationState(props.authenticate.state)
+    switch (authenticateState.type) {
         case "try-to-load":
             // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
             return html``
@@ -80,72 +51,77 @@ export function AuthenticatePassword(props: Props): VNode {
 
         case "repository-error":
         case "load-error":
-            return h(ApplicationError, { err: state.err.err })
+            return h(ApplicationError, { err: authenticateState.err.err })
     }
 
-    type AuthenticateState =
-        | Readonly<{ type: "initial-login" }>
-        | Readonly<{ type: "try-to-login"; hasTakenLongtime: boolean }>
-        | Readonly<{ type: "failed-to-login"; err: AuthenticatePasswordError }>
-    function authenticateForm(state: AuthenticateState): VNode {
-        return loginBox(siteInfo, {
-            form: true,
-            title: "ログイン",
-            body: [
-                h(LoginIdField, {
-                    field: props.authenticate.loginId,
-                    autocomplete: "username",
-                }),
-                h(PasswordField, {
-                    field: props.authenticate.password,
-                    autocomplete: "current-password",
-                }),
-                buttons({
-                    left: authenticateButton(),
-                    right: clearButton(),
-                }),
-            ],
-            footer: [footerLinks(), ...validationMessage(validateState), ...message()],
+    return loginBox(siteInfo, {
+        form: true,
+        title: "ログイン",
+        body: [
+            h(LoginIdField, {
+                field: props.authenticate.loginId,
+                autocomplete: "username",
+            }),
+            h(PasswordField, {
+                field: props.authenticate.password,
+                autocomplete: "current-password",
+            }),
+            buttons({ left: h(Submit, {}), right: h(Clear, {}) }),
+            h(ValidationMessage, props.authenticate.validate),
+            h(Message, {}),
+        ],
+        footer: footerLinks(),
+    })
+
+    function Submit(_props: unknown): VNode {
+        const validateState = useApplicationState(props.authenticate.validate.state)
+        const observeState = useApplicationState(props.authenticate.observe.state)
+
+        return h(SendButton, {
+            label: "ログイン",
+            icon: lnir(["enter"]),
+            isConnecting: authenticateState.type === "try-to-login",
+            validateState,
+            observeState,
+            onClick,
         })
 
-        function authenticateButton(): VNode {
-            return h(SendButton, {
-                label: "ログイン",
-                icon: lnir(["enter"]),
-                isConnecting: state.type === "try-to-login",
-                validateState,
-                observeState,
-                onClick,
-            })
-
-            function onClick(e: Event) {
-                e.preventDefault()
-                props.authenticate.submit()
-            }
+        function onClick(e: Event) {
+            e.preventDefault()
+            props.authenticate.submit()
         }
-        function clearButton(): VNode {
-            return h(ClearChangesButton, { observeState, onClick })
+    }
+    function Clear(_props: unknown): VNode {
+        const observeState = useApplicationState(props.authenticate.observe.state)
 
-            function onClick(e: Event) {
-                e.preventDefault()
-                props.authenticate.clear()
-            }
+        return h(ClearChangesButton, { observeState, onClick })
+
+        function onClick(e: Event) {
+            e.preventDefault()
+            props.authenticate.clear()
         }
+    }
 
-        function message(): VNode[] {
-            switch (state.type) {
-                case "initial-login":
-                    return []
+    function Message(_props: unknown): VNode {
+        switch (authenticateState.type) {
+            case "initial-login":
+            case "try-to-load":
+            case "succeed-to-renew":
+            case "ticket-not-expired":
+            case "required-to-login":
+            case "failed-to-renew":
+            case "repository-error":
+            case "load-error":
+                return html``
 
-                case "try-to-login":
-                    if (state.hasTakenLongtime) {
-                        return [takeLongtimeField("認証")]
-                    }
-                    return []
+            case "try-to-login":
+                if (authenticateState.hasTakenLongtime) {
+                    return takeLongtimeField("認証")
+                }
+                return html``
 
-                case "failed-to-login":
-                    return [fieldHelp_error(loginError(state.err))]
-            }
+            case "failed-to-login":
+                return fieldHelp_error(loginError(authenticateState.err))
         }
     }
 
@@ -171,4 +147,30 @@ function loginError(err: AuthenticatePasswordError): readonly VNodeContent[] {
                 ...reason.detail,
             ])
     }
+}
+
+function useLoadScript(authenticate: AuthenticatePasswordAction): void {
+    const authenticateState = useApplicationState(authenticate.state)
+    useLayoutEffect(() => {
+        // スクリプトのロードは appendChild する必要があるため useLayoutEffect で行う
+        switch (authenticateState.type) {
+            case "try-to-load":
+                if (!authenticateState.scriptPath.valid) {
+                    authenticate.loadError({
+                        type: "infra-error",
+                        err: `スクリプトのロードに失敗しました: ${authenticateState.type}`,
+                    })
+                    break
+                }
+                appendScript(authenticateState.scriptPath.value, (script) => {
+                    script.onerror = () => {
+                        authenticate.loadError({
+                            type: "infra-error",
+                            err: `スクリプトのロードに失敗しました: ${authenticateState.type}`,
+                        })
+                    }
+                })
+                break
+        }
+    }, [authenticate, authenticateState])
 }
