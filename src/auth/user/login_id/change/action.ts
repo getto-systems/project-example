@@ -22,7 +22,6 @@ import { OverwriteLoginIdRemote } from "./infra"
 import { WaitTime } from "../../../../z_lib/ui/config/infra"
 
 import { LoginId } from "../kernel/data"
-import { PrepareElementState } from "../../../../z_lib/ui/prepare/data"
 
 export interface OverwriteLoginIdAction {
     readonly state: ApplicationState<OverwriteLoginIdState>
@@ -32,8 +31,6 @@ export interface OverwriteLoginIdAction {
     readonly editable: EditableBoardAction
 
     onSuccess(handler: (data: OverwriteLoginIdEntry) => void): void
-
-    data(): PrepareElementState<OverwriteLoginIdEntry>
 
     reset(): void
     submit(): Promise<OverwriteLoginIdState>
@@ -101,7 +98,6 @@ export function initOverwriteLoginIdAction(material: OverwriteLoginIdMaterial): 
             observe,
             editable,
 
-            data,
             reset,
 
             onSuccess,
