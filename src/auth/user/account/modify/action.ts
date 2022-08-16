@@ -28,7 +28,6 @@ import { WaitTime } from "../../../../z_lib/ui/config/infra"
 import { ModifyAuthUserAccountError, ModifyAuthUserAccountFields } from "./data"
 import { LoginId } from "../../login_id/kernel/data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
-import { PrepareElementState } from "../../../../z_lib/ui/prepare/data"
 
 export interface ModifyAuthUserAccountAction {
     readonly state: ApplicationState<ModifyAuthUserAccountState>
@@ -40,7 +39,6 @@ export interface ModifyAuthUserAccountAction {
 
     onSuccess(handler: (data: ModifyAuthUserAccountEntry) => void): void
 
-    data(): PrepareElementState<ModifyAuthUserAccountEntry>
     reset(): void
     submit(): Promise<ModifyAuthUserAccountState>
 }
@@ -122,7 +120,6 @@ export function initModifyAuthUserAccountAction(material: ModifyAuthUserAccountM
             editable,
 
             onSuccess,
-            data,
             reset,
 
             async submit(): Promise<ModifyAuthUserAccountState> {

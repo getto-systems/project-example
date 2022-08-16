@@ -3,11 +3,7 @@ import { html } from "htm/preact"
 
 import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import {
-    buttons,
-    fieldHelp_error,
-    form,
-} from "../../../../../z_vendor/getto-css/preact/design/form"
+import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { takeLongtimeField } from "../../../../../common/x_preact/design/form"
 
@@ -27,37 +23,35 @@ type Props = Readonly<{
     unregister: UnregisterAuthUserAccountAction
 }>
 export function UnregisterAuthUserAccount(props: Props): VNode {
-    const state = useApplicationState(props.unregister.state)
     const editableState = useApplicationState(props.unregister.editable.state)
 
-    return form(
-        box({
-            title: "ユーザー削除",
-            ...(editableState.isEditable
-                ? {
-                      body: [
-                          html`<p>このユーザーを削除します</p>`,
-                          html`<p>
-                              削除後は、すぐに利用できなくなります<br />
-                              現在ログインしている場合、ログアウトされます
-                          </p>`,
-                          html`<p>削除した後に元に戻すことはできません</p>`,
-                      ],
-                      footer: [
-                          buttons({
-                              left: submitButton(),
-                              right: closeButton(),
-                          }),
-                          ...message(),
-                      ],
-                  }
-                : {
-                      body: deleteConfirmButton(),
-                  }),
-        }),
-    )
+    return box({
+        form: true,
+        title: "ユーザー削除",
+        ...(editableState.isEditable
+            ? {
+                  body: [
+                      html`<p>このユーザーを削除します</p>`,
+                      html`<p>
+                          削除後は、すぐに利用できなくなります<br />
+                          現在ログインしている場合、ログアウトされます
+                      </p>`,
+                      html`<p>削除した後に元に戻すことはできません</p>`,
+                  ],
+                  footer: [
+                      buttons({
+                          left: h(Submit, {}),
+                          right: h(Close, {}),
+                      }),
+                      h(Message, {}),
+                  ],
+              }
+            : {
+                  body: h(DeleteConfirm, {}),
+              }),
+    })
 
-    function deleteConfirmButton(): VNode {
+    function DeleteConfirm(_props: unknown): VNode {
         return h(DeleteConfirmButton, { onClick })
 
         function onClick(e: Event) {
@@ -66,9 +60,11 @@ export function UnregisterAuthUserAccount(props: Props): VNode {
         }
     }
 
-    function submitButton(): VNode {
+    function Submit(_props: unknown): VNode {
+        const unregisterState = useApplicationState(props.unregister.state)
+
         return h(DeleteButton, {
-            isConnecting: state.type === "try",
+            isConnecting: unregisterState.type === "try",
             onClick,
         })
 
@@ -78,7 +74,7 @@ export function UnregisterAuthUserAccount(props: Props): VNode {
         }
     }
 
-    function closeButton(): VNode {
+    function Close(_props: unknown): VNode {
         return h(CloseButton, { onClick })
 
         function onClick(e: Event) {
@@ -87,20 +83,22 @@ export function UnregisterAuthUserAccount(props: Props): VNode {
         }
     }
 
-    function message(): readonly VNode[] {
-        switch (state.type) {
+    function Message(_props: unknown): VNode {
+        const unregisterState = useApplicationState(props.unregister.state)
+
+        switch (unregisterState.type) {
             case "initial":
             case "success":
-                return []
+                return html``
 
             case "try":
-                if (state.hasTakenLongtime) {
-                    return [takeLongtimeField("変更")]
+                if (unregisterState.hasTakenLongtime) {
+                    return takeLongtimeField("変更")
                 }
-                return []
+                return html``
 
             case "failed":
-                return [fieldHelp_error(modifyError(state.err))]
+                return fieldHelp_error(modifyError(unregisterState.err))
         }
     }
 }

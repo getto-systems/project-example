@@ -6,7 +6,6 @@ import { useApplicationState } from "../../../../../../../z_vendor/getto-applica
 import {
     buttons,
     fieldHelp_error,
-    form,
 } from "../../../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../../../z_vendor/getto-css/preact/design/box"
 
@@ -14,7 +13,7 @@ import { VNodeContent } from "../../../../../../../z_lib/ui/x_preact/common"
 
 import {
     takeLongtimeField,
-    validationMessage,
+    ValidationMessage,
 } from "../../../../../../../common/x_preact/design/form"
 
 import { ResetTokenDestinationField } from "../../input/x_preact/input"
@@ -27,104 +26,116 @@ import { CloseButton } from "../../../../../../../common/x_preact/button/close_b
 import { remoteCommonErrorReason } from "../../../../../../../z_lib/ui/remote/x_error/reason"
 
 import { ChangeResetTokenDestinationAction } from "../action"
+import { ApplicationState } from "../../../../../../../z_vendor/getto-application/action/action"
+import { FocusSearchedState } from "../../../../../../../z_lib/ui/list/action"
 
 import { ChangeResetTokenDestinationError } from "../data"
+import { AuthUserAccount } from "../../../../../account/kernel/data"
 
 type Props = Readonly<{
+    focus: ApplicationState<FocusSearchedState<AuthUserAccount>>
     change: ChangeResetTokenDestinationAction
 }>
 export function ChangeResetTokenDestination(props: Props): VNode {
-    const state = useApplicationState(props.change.state)
-    const editableState = useApplicationState(props.change.editable.state)
-    const validateState = useApplicationState(props.change.validate.state)
-    const observeState = useApplicationState(props.change.observe.state)
-
-    const element = props.change.data()
-    if (!element.isLoad) {
-        return html``
+    const focusState = useApplicationState(props.focus)
+    switch (focusState.type) {
+        case "close":
+        case "detect-failed":
+            return html``
     }
 
-    const edit = { data: element.data, editable: props.change.editable }
+    const edit = { data: focusState.data, editable: props.change.editable }
 
-    return form(
-        box({
-            title: "パスワードリセット",
-            body: [h(ResetTokenDestinationField, { edit, field: props.change.destination })],
-            footer: editableState.isEditable
-                ? [
-                      buttons({
-                          left: submitButton(),
-                          right: resetButton(),
-                      }),
-                      ...validationMessage(validateState),
-                      ...message(),
-                      buttons({
-                          right: closeButton(),
-                      }),
-                  ]
-                : editButton(),
-        }),
-    )
+    return box({
+        form: true,
+        title: "パスワードリセット",
+        body: [h(ResetTokenDestinationField, { edit, field: props.change.destination })],
+        footer: h(Footer, {}),
+    })
 
-    function editButton(): VNode {
-        if (state.type === "success") {
-            return h(EditSuccessButton, { onClick })
-        } else {
-            return h(EditButton, { onClick })
+    function Footer(_props: unknown): VNode {
+        const editableState = useApplicationState(props.change.editable.state)
+
+        if (!editableState.isEditable) {
+            return h(Edit, {})
+        }
+        return html`${[
+            buttons({ left: h(Submit, {}), right: h(Reset, {}) }),
+            h(ValidationMessage, props.change.validate),
+            h(Message, {}),
+            buttons({ right: h(Close, {}) }),
+        ]}`
+
+        function Edit(_props: unknown): VNode {
+            const changeState = useApplicationState(props.change.state)
+
+            if (changeState.type === "success") {
+                return h(EditSuccessButton, { onClick })
+            } else {
+                return h(EditButton, { onClick })
+            }
+
+            function onClick(e: Event) {
+                e.preventDefault()
+                props.change.editable.open()
+            }
         }
 
-        function onClick(e: Event) {
-            e.preventDefault()
-            props.change.editable.open()
+        function Submit(_props: unknown): VNode {
+            const changeState = useApplicationState(props.change.state)
+            const validateState = useApplicationState(props.change.validate.state)
+            const observeState = useApplicationState(props.change.observe.state)
+
+            return h(ChangeButton, {
+                isConnecting: changeState.type === "try",
+                validateState,
+                observeState,
+                onClick,
+            })
+
+            function onClick(e: Event) {
+                e.preventDefault()
+                props.change.submit()
+            }
         }
-    }
 
-    function submitButton(): VNode {
-        return h(ChangeButton, {
-            isConnecting: state.type === "try",
-            validateState,
-            observeState,
-            onClick,
-        })
+        function Reset(_props: unknown): VNode {
+            const observeState = useApplicationState(props.change.observe.state)
 
-        function onClick(e: Event) {
-            e.preventDefault()
-            props.change.submit()
+            return h(ResetButton, { observeState, onClick })
+
+            function onClick(e: Event) {
+                e.preventDefault()
+                props.change.reset()
+            }
         }
-    }
 
-    function resetButton(): VNode {
-        return h(ResetButton, { observeState, onClick })
+        function Close(_props: unknown): VNode {
+            return h(CloseButton, { onClick })
 
-        function onClick(e: Event) {
-            e.preventDefault()
-            props.change.reset()
+            function onClick(e: Event) {
+                e.preventDefault()
+                props.change.editable.close()
+            }
         }
-    }
 
-    function closeButton(): VNode {
-        return h(CloseButton, { onClick })
+        function Message(_props: unknown): VNode {
+            const changeState = useApplicationState(props.change.state)
 
-        function onClick(e: Event) {
-            e.preventDefault()
-            props.change.editable.close()
-        }
-    }
+            switch (changeState.type) {
+                case "initial":
+                case "success":
+                    return html``
 
-    function message(): readonly VNode[] {
-        switch (state.type) {
-            case "initial":
-            case "success":
-                return []
+                case "try":
+                    if (changeState.hasTakenLongtime) {
+                        return takeLongtimeField("変更")
+                    }
+                    return html``
 
-            case "try":
-                if (state.hasTakenLongtime) {
-                    return [takeLongtimeField("変更")]
-                }
-                return []
-
-            case "failed":
-                return [fieldHelp_error(changeError(state.err))]
+                case "failed":
+                    return fieldHelp_error(changeError(changeState.err))
+            }
         }
     }
 }

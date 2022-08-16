@@ -4,15 +4,14 @@ import { html } from "htm/preact"
 import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { box } from "../../../../z_vendor/getto-css/preact/design/box"
-import { field, fieldHelp_error } from "../../../../z_vendor/getto-css/preact/design/form"
+import { fieldHelp_error } from "../../../../z_vendor/getto-css/preact/design/form"
 
-import { InputSeason } from "../../input/x_preact/input"
+import { SeasonField } from "../../input/x_preact/input"
 import { EditButton } from "../../../../common/x_preact/button/edit_button"
 import { EditSuccessButton } from "../../../../common/x_preact/button/edit_success_button"
 import { ChangeButton } from "../../../../common/x_preact/button/change_button"
 
 import { repositoryErrorReason } from "../../../../z_lib/ui/repository/x_error/reason"
-import { seasonLabel } from "../../kernel/helper"
 
 import { LoadSeasonAction } from "../../load/action"
 import { SetupSeasonAction } from "../action"
@@ -24,79 +23,80 @@ type Props = Readonly<{
     setup: SetupSeasonAction
 }>
 export function SetupSeason(props: Props): VNode {
-    const state = useApplicationState(props.setup.state)
-    const validateState = useApplicationState(props.setup.validate.state)
-    const observeState = useApplicationState(props.setup.observe.state)
-    const editableState = useApplicationState(props.setup.editable.state)
-    const loadState = useApplicationState(props.season.state)
-
-    switch (loadState.type) {
+    const loadSeasonState = useApplicationState(props.season.state)
+    switch (loadSeasonState.type) {
         case "initial":
         case "failed":
             return html``
+    }
 
-        case "success":
-            return box({
-                title: "シーズン設定",
-                ...(editableState.isEditable
-                    ? {
-                          body: [
-                              h(InputSeason, {
-                                  title: "シーズン",
-                                  field: props.setup.season,
-                                  seasons: loadState.availableSeasons,
-                              }),
-                          ],
-                          footer: [setupButton(), ...message()],
-                          form: true,
-                      }
-                    : {
-                          body: [
-                              field({
-                                  title: "シーズン",
-                                  body: seasonLabel(loadState.season),
-                              }),
-                          ],
-                          footer: editButton(),
-                      }),
+    const edit = { data: loadSeasonState, editable: props.setup.editable }
+
+    return box({
+        form: true,
+        title: "シーズン設定",
+        body: [
+            h(SeasonField, {
+                title: "シーズン",
+                field: props.setup.season,
+                availableSeasons: loadSeasonState.availableSeasons,
+                edit,
+            }),
+        ],
+        footer: h(Footer, {}),
+    })
+
+    function Footer(_props: unknown): VNode {
+        const editableState = useApplicationState(props.setup.editable.state)
+
+        if (!editableState.isEditable) {
+            return h(Edit, {})
+        }
+        return html`${[h(Submit, {}), h(Message, {})]}`
+
+        function Edit(_props: unknown): VNode {
+            const setupSeasonState = useApplicationState(props.setup.state)
+
+            if (setupSeasonState.type === "success") {
+                return h(EditSuccessButton, { onClick })
+            } else {
+                return h(EditButton, { onClick })
+            }
+
+            function onClick(e: Event) {
+                e.preventDefault()
+                props.setup.editable.open()
+            }
+        }
+
+        function Submit(_props: unknown): VNode {
+            const validateState = useApplicationState(props.setup.validate.state)
+            const observeState = useApplicationState(props.setup.observe.state)
+
+            return h(ChangeButton, {
+                isConnecting: false,
+                validateState,
+                observeState,
+                onClick,
             })
-    }
 
-    function editButton(): VNode {
-        if (state.type === "success") {
-            return h(EditSuccessButton, { onClick })
-        } else {
-            return h(EditButton, { onClick })
+            function onClick(e: Event) {
+                e.preventDefault()
+                props.setup.setup()
+            }
         }
 
-        function onClick(e: Event) {
-            e.preventDefault()
-            props.setup.editable.open()
-        }
-    }
+        function Message(_props: unknown): VNode {
+            const setupSeasonState = useApplicationState(props.setup.state)
 
-    function setupButton(): VNode {
-        return h(ChangeButton, {
-            isConnecting: false,
-            validateState,
-            observeState,
-            onClick,
-        })
+            switch (setupSeasonState.type) {
+                case "initial":
+                case "success":
+                    return html``
 
-        function onClick(e: Event) {
-            e.preventDefault()
-            props.setup.setup()
-        }
-    }
-
-    function message(): VNode[] {
-        switch (state.type) {
-            case "initial":
-            case "success":
-                return []
-
-            case "failed":
-                return [fieldHelp_error(repositoryError(state.err))]
+                case "failed":
+                    return fieldHelp_error(repositoryError(setupSeasonState.err))
+            }
         }
     }
 }

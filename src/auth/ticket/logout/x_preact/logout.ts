@@ -10,7 +10,7 @@ import { repositoryErrorReason } from "../../../../z_lib/ui/repository/x_error/r
 import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { box, container } from "../../../../z_vendor/getto-css/preact/design/box"
-import { button_send, field, form } from "../../../../z_vendor/getto-css/preact/design/form"
+import { button_send, field } from "../../../../z_vendor/getto-css/preact/design/form"
 import { notice_alert } from "../../../../z_vendor/getto-css/preact/design/highlight"
 import { v_small } from "../../../../z_vendor/getto-css/preact/design/alignment"
 
@@ -25,10 +25,11 @@ type Props = Readonly<{
 export function Logout(props: Props): VNode {
     useRedirectOnSuccess(props.logout)
 
-    return form(container([logoutBox()]))
+    return container([logoutBox()])
 
     function logoutBox(): VNode {
         return box({
+            form: true,
             body: [
                 v_small(),
                 field({
