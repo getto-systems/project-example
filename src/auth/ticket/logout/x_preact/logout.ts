@@ -37,7 +37,7 @@ export function Logout(props: Props): VNode {
                     body: logoutButton(),
                     help: ["作業完了後ログアウトしてください"],
                 }),
-                h(Error, props),
+                h(Error, {}),
             ],
         })
 
@@ -48,6 +48,30 @@ export function Logout(props: Props): VNode {
                 e.preventDefault()
                 props.logout.submit()
             }
+        }
+    }
+
+    function Error(_props: unknown): VNode {
+        const state = useApplicationState(props.logout.state)
+
+        switch (state.type) {
+            case "initial":
+            case "success":
+                return html``
+
+            case "repository-error":
+                return html`${errorMessage(repositoryError(state.err))}`
+
+            case "failed":
+                return html`${errorMessage(logoutError(state.err))}`
+        }
+
+        function errorMessage(err: readonly string[]): readonly VNode[] {
+            return [
+                v_small(),
+                notice_alert("ログアウトの処理中にエラーが発生しました"),
+                ...err.map((message) => html`<p>${message}</p>`),
+            ]
         }
     }
 }
@@ -61,30 +85,6 @@ function useRedirectOnSuccess(logout: LogoutAction): void {
                 break
         }
     }, [state])
-}
-
-function Error(props: Props): VNode {
-    const state = useApplicationState(props.logout.state)
-
-    switch (state.type) {
-        case "initial":
-        case "success":
-            return html``
-
-        case "repository-error":
-            return html`${errorMessage(repositoryError(state.err))}`
-
-        case "failed":
-            return html`${errorMessage(logoutError(state.err))}`
-    }
-
-    function errorMessage(err: readonly string[]): readonly VNode[] {
-        return [
-            v_small(),
-            notice_alert("ログアウトの処理中にエラーが発生しました"),
-            ...err.map((message) => html`<p>${message}</p>`),
-        ]
-    }
 }
 
 function repositoryError(err: RepositoryError): readonly string[] {
