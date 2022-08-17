@@ -24,7 +24,6 @@ export interface SelectFieldAction<T> {
     readonly validate: ValidateBoardFieldAction<T, ValidateSelectError>
     readonly observe: ObserveBoardFieldAction
 
-    options(): PrepareElementState<readonly T[]>
     clear(): void
     reset(data: T): void
 }
@@ -58,7 +57,6 @@ export function initSelectFieldAction<T>(props: SelectFieldProps<T>): Readonly<{
             validate,
             observe,
 
-            options: () => options,
             clear: () => {
                 store.set("")
             },

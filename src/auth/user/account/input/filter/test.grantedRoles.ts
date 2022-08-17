@@ -24,12 +24,6 @@ test("pin", async () => {
     expect(pin()).toEqual(["auth-user"])
 })
 
-test("options", async () => {
-    const { action } = standard()
-
-    expect(action.options()).toEqual({ isLoad: true, data: ALL_AUTH_ROLES })
-})
-
 test("clear", async () => {
     const { action, store } = standard()
 

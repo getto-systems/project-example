@@ -14,11 +14,10 @@ import { BoardValueStore } from "../../../../z_vendor/getto-application/board/in
 import { PrepareElementState } from "../../prepare/data"
 import { SelectResult } from "../../validate/data"
 
-export interface SelectFilterAction<T> {
+export interface SelectFilterAction {
     readonly input: InputBoardAction<BoardValueStore>
     readonly observe: ObserveBoardFieldAction
 
-    options(): PrepareElementState<readonly T[]>
     clear(): void
 }
 
@@ -30,7 +29,7 @@ export type SelectFilterProps<T, V> = Readonly<{
 export function initSelectFilterAction<T, V>(
     props: SelectFilterProps<T, V>,
 ): Readonly<{
-    input: SelectFilterAction<T>
+    input: SelectFilterAction
     setOptions: (state: readonly T[]) => void
     pin: () => SelectResult<V>
 }> {
@@ -55,7 +54,6 @@ export function initSelectFilterAction<T, V>(
             input,
             observe,
 
-            options: () => options,
             clear: () => {
                 store.set("")
                 observe.check()

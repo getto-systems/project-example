@@ -27,10 +27,12 @@ import { textValidationError } from "../../../../../../z_lib/ui/validate/x_plain
 import { AuthUserTextFieldAction, AuthUserGrantedRolesFieldAction } from "../action"
 import { EditableBoardAction } from "../../../../../../z_vendor/getto-application/board/editable/action"
 
+import { ALL_AUTH_ROLES } from "../../../../../../x_content/role"
 import { AuthUserTextField } from "../convert"
 
 import { TypeAuthUser, AUTH_USER_ACCOUNT } from "../../../kernel/data"
 import { AuthRole } from "../../../../kernel/data"
+import { prepared } from "../../../../../../z_lib/ui/prepare/data"
 
 type FieldProps<A, T> = Readonly<{ field: A }> &
     Partial<{
@@ -79,7 +81,7 @@ export function AuthUserGrantedRolesField(
         body: editableState.isEditable
             ? h(CheckboxBoard, {
                   input: props.field.input,
-                  options: checkboxOptions(props.field.options(), authRoleCheckboxContent),
+                  options: checkboxOptions(prepared(ALL_AUTH_ROLES), authRoleCheckboxContent),
               })
             : authUserGrantedRoles(editableState.data),
     })

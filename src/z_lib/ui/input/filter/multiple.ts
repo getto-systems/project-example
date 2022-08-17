@@ -14,11 +14,10 @@ import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/
 
 import { PrepareElementState } from "../../prepare/data"
 
-export interface MultipleFilterAction<T> {
+export interface MultipleFilterAction {
     readonly input: InputBoardAction<MultipleBoardValueStore>
     readonly observe: ObserveBoardFieldAction
 
-    options(): PrepareElementState<readonly T[]>
     clear(): void
 }
 
@@ -27,7 +26,7 @@ export type MultipleFilterProps<T> = Readonly<{
     convert: (data: T) => string
 }>
 export function initMultipleFilterAction<T>(props: MultipleFilterProps<T>): Readonly<{
-    input: MultipleFilterAction<T>
+    input: MultipleFilterAction
     setOptions: { (state: readonly T[]): void }
     pin: () => readonly T[]
 }> {
@@ -51,7 +50,6 @@ export function initMultipleFilterAction<T>(props: MultipleFilterProps<T>): Read
             input,
             observe,
 
-            options: () => options,
             clear: () => {
                 store.set([])
             },

@@ -9,7 +9,10 @@ import { authRoleCheckboxContent } from "../../../kernel/x_preact/field"
 
 import { AuthUserGrantedRolesFilterAction } from "../action"
 
+import { ALL_AUTH_ROLES } from "../../../../../../x_content/role"
+
 import { AUTH_USER_ACCOUNT } from "../../../kernel/data"
+import { prepared } from "../../../../../../z_lib/ui/prepare/data"
 
 type Props = Readonly<{
     field: AuthUserGrantedRolesFilterAction
@@ -26,7 +29,7 @@ export function AuthUserGrantedRolesFilter(props: Props): VNode {
         help: props.help,
         body: h(CheckboxBoard, {
             input: props.field.input,
-            options: checkboxOptions(props.field.options(), authRoleCheckboxContent),
+            options: checkboxOptions(prepared(ALL_AUTH_ROLES), authRoleCheckboxContent),
         }),
     })
 }

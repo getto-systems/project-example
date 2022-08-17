@@ -24,7 +24,6 @@ export interface MultipleFieldAction<T> {
     readonly validate: ValidateBoardFieldAction<readonly T[], never>
     readonly observe: ObserveBoardFieldAction
 
-    options(): PrepareElementState<readonly T[]>
     clear(): void
     reset(data: readonly T[]): void
 }
@@ -62,7 +61,6 @@ export function initMultipleFieldAction<T>(props: MultipleFieldProps<T>): Readon
             validate,
             observe,
 
-            options: () => options,
             clear: () => {
                 store.set([])
             },
