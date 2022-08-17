@@ -16,21 +16,21 @@ type Props = Readonly<{
     search: SearchAuthUserAccountAction
 }>
 export function SearchAuthUserAccountForm(props: Props): VNode {
-    const state = useApplicationState(props.search.state)
-    const observeState = useApplicationState(props.search.observe.state)
-
     return box_grow({
         form: true,
         body: container([
             h(LoginIdFilter, { field: props.search.loginId }),
             h(AuthUserGrantedRolesFilter, { field: props.search.grantedRoles }),
         ]),
-        footer: buttons({ left: searchButton(), right: clearButton() }),
+        footer: buttons({ left: h(Search, {}), right: h(Clear, {}) }),
     })
 
-    function searchButton(): VNode {
+    function Search(_props: unknown): VNode {
+        const searchState = useApplicationState(props.search.state)
+        const observeState = useApplicationState(props.search.observe.state)
+
         return h(SearchButton, {
-            isConnecting: state.type === "try",
+            isConnecting: searchState.type === "try",
             observeState,
             onClick,
         })
@@ -41,7 +41,7 @@ export function SearchAuthUserAccountForm(props: Props): VNode {
         }
     }
 
-    function clearButton(): VNode {
+    function Clear(_props: unknown): VNode {
         return h(ClearSearchButton, { onClick })
 
         function onClick(e: Event) {
