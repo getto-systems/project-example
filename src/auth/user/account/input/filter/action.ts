@@ -5,7 +5,7 @@ import {
 
 import { AuthRole } from "../../../kernel/data"
 
-export type AuthUserGrantedRolesFilterAction = MultipleFilterAction<AuthRole>
+export type AuthUserGrantedRolesFilterAction = MultipleFilterAction
 
 export function initAuthUserGrantedRolesFilterAction(initial: readonly AuthRole[]): Readonly<{
     input: AuthUserGrantedRolesFilterAction
