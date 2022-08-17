@@ -12,6 +12,11 @@ import {
     EditableBoardAction,
     initEditableBoardAction,
 } from "../../../../z_vendor/getto-application/board/editable/action"
+import {
+    initModifyField,
+    modifyField,
+    ModifyFieldHandler,
+} from "../../../../z_lib/ui/modify/action"
 
 import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
 
@@ -21,12 +26,6 @@ import { WaitTime } from "../../../../z_lib/ui/config/infra"
 import { ChangePasswordError, ChangePasswordFields, OverwritePasswordFields } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { LoginId } from "../../login_id/kernel/data"
-import { PrepareElementState } from "../../../../z_lib/ui/prepare/data"
-import {
-    initModifyField,
-    modifyField,
-    ModifyFieldHandler,
-} from "../../../../z_lib/ui/modify/action"
 
 export interface ChangePasswordAction {
     readonly state: ApplicationState<ChangePasswordState>
@@ -53,8 +52,6 @@ export interface OverwritePasswordAction {
     readonly editable: EditableBoardAction
 
     onSuccess(handler: (data: OverwritePasswordEntry) => void): void
-
-    data(): PrepareElementState<OverwritePasswordEntry>
 
     reset(): void
     submit(): Promise<OverwritePasswordState>
@@ -237,7 +234,6 @@ export function initOverwritePasswordAction(material: OverwritePasswordMaterial)
             observe,
             editable,
 
-            data,
             reset,
 
             onSuccess,

@@ -8,13 +8,13 @@ import { newUnregisterAuthUserAccountAction } from "../../../../auth/user/accoun
 
 import { DetailAuthUserAccountActions } from "../../../../auth/user/account/kernel/x_preact/detail"
 import { ModifyFieldHandler } from "../../../../z_lib/ui/modify/action"
-import { FocusAction } from "../../../../z_lib/ui/list/action"
+import { FocusAction, FocusSearchedState } from "../../../../z_lib/ui/list/action"
 
 import { AuthUserAccount } from "../../../../auth/user/account/kernel/data"
 
 export function newDetailAuthUserAccountActions(
     feature: ForegroundOutsideFeature,
-    focused: FocusAction<AuthUserAccount, unknown>,
+    focus: FocusAction<AuthUserAccount, FocusSearchedState<AuthUserAccount>>,
 ): DetailAuthUserAccountActions {
     const modify = newModifyAuthUserAccountAction(feature)
     const changeResetTokenDestination = newChangeResetTokenDestinationAction(feature)
@@ -22,7 +22,7 @@ export function newDetailAuthUserAccountActions(
     const overwritePassword = newOverwritePasswordAction(feature)
     const unregister = newUnregisterAuthUserAccountAction(feature)
 
-    focused.onModify(
+    focus.onModify(
         buildHandler({
             modify: [modify, changeResetTokenDestination, overwriteLoginId, overwritePassword],
             unregister: [unregister],
@@ -30,6 +30,7 @@ export function newDetailAuthUserAccountActions(
     )
 
     return {
+        focus: focus.state,
         modify: modify.action,
         changeResetTokenDestination: changeResetTokenDestination.action,
         overwriteLoginId: overwriteLoginId.action,
@@ -50,10 +51,10 @@ export function newDetailAuthUserAccountActions(
         }>,
     ): ModifyFieldHandler<T> {
         actions.modify.forEach(({ action }) => {
-            action.onSuccess((data) => focused.update(data))
+            action.onSuccess((data) => focus.update(data))
         })
         actions.unregister.forEach(({ action }) => {
-            action.onSuccess(() => focused.remove())
+            action.onSuccess(() => focus.remove())
         })
 
         return {

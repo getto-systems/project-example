@@ -12,15 +12,12 @@ import { WaitTime } from "../../../../z_lib/ui/config/infra"
 
 import { UnregisterAuthUserAccountError } from "./data"
 import { LoginId } from "../../login_id/kernel/data"
-import { PrepareElementState } from "../../../../z_lib/ui/prepare/data"
 
 export interface UnregisterAuthUserAccountAction {
     readonly state: ApplicationState<UnregisterAuthUserAccountState>
     readonly editable: EditableBoardAction
 
     onSuccess(handler: (data: UnregisterAuthUserAccountEntry) => void): void
-
-    data(): PrepareElementState<UnregisterAuthUserAccountEntry>
 
     submit(): Promise<UnregisterAuthUserAccountState>
 }
@@ -62,8 +59,6 @@ export function initUnregisterAuthUserAccountAction(
         action: {
             state,
             editable,
-
-            data,
 
             onSuccess,
 

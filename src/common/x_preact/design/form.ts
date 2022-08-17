@@ -11,6 +11,8 @@ import { VectorRemoveButton } from "../button/vector_remove_button"
 import { VectorUndoRemoveButton } from "../button/vector_undo_remove_button"
 
 import { ValidateBoardState } from "../../../z_vendor/getto-application/board/validate_board/action"
+import { ApplicationState } from "../../../z_vendor/getto-application/action/action"
+import { useApplicationState } from "../../../z_vendor/getto-application/action/x_preact/hooks"
 
 export function takeLongtimeField(label: VNodeContent): VNode {
     return fieldHelp({
@@ -22,14 +24,18 @@ export function takeLongtimeField(label: VNodeContent): VNode {
     })
 }
 
-export function validationMessage(validateState: ValidateBoardState): readonly VNode[] {
+export function ValidationMessage(
+    props: Readonly<{ state: ApplicationState<ValidateBoardState> }>,
+): VNode {
+    const validateState = useApplicationState(props.state)
+
     switch (validateState) {
         case "initial":
         case "valid":
-            return []
+            return html``
 
         case "invalid":
-            return [fieldHelp_error(["正しく入力されていません"])]
+            return fieldHelp_error(["正しく入力されていません"])
     }
 }
 

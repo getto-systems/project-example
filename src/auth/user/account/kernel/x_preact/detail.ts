@@ -14,8 +14,13 @@ import { OverwritePasswordAction } from "../../../password/change/action"
 import { ModifyAuthUserAccountAction } from "../../modify/action"
 import { ChangeResetTokenDestinationAction } from "../../../password/reset/token_destination/change/action"
 import { UnregisterAuthUserAccountAction } from "../../unregister/action"
+import { ApplicationState } from "../../../../../z_vendor/getto-application/action/action"
+import { FocusSearchedState } from "../../../../../z_lib/ui/list/action"
+
+import { AuthUserAccount } from "../data"
 
 export type DetailAuthUserAccountActions = Readonly<{
+    focus: ApplicationState<FocusSearchedState<AuthUserAccount>>
     modify: ModifyAuthUserAccountAction
     changeResetTokenDestination: ChangeResetTokenDestinationAction
     overwriteLoginId: OverwriteLoginIdAction
@@ -25,8 +30,11 @@ export type DetailAuthUserAccountActions = Readonly<{
 export function DetailAuthUserAccount(props: DetailAuthUserAccountActions): VNode {
     return html`${[
         container([
-            h(ModifyAuthUserAccount, { modify: props.modify }),
-            h(ChangeResetTokenDestination, { change: props.changeResetTokenDestination }),
+            h(ModifyAuthUserAccount, props),
+            h(ChangeResetTokenDestination, {
+                focus: props.focus,
+                change: props.changeResetTokenDestination,
+            }),
         ]),
         container([
             h(OverwriteLoginId, { overwrite: props.overwriteLoginId }),

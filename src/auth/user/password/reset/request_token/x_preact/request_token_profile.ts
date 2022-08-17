@@ -9,7 +9,7 @@ import { buttons, fieldHelp_error } from "../../../../../../z_vendor/getto-css/p
 import { icon_change } from "../../../../../../x_content/icon"
 import { box } from "../../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../../z_vendor/getto-css/preact/design/highlight"
-import { takeLongtimeField, validationMessage } from "../../../../../../common/x_preact/design/form"
+import { takeLongtimeField, ValidationMessage } from "../../../../../../common/x_preact/design/form"
 
 import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_error/reason"
 
@@ -28,53 +28,40 @@ type Props = Readonly<{
     requestToken: RequestResetTokenAction
 }>
 export function RequestResetTokenProfile(props: Props): VNode {
-    const state = useApplicationState(props.requestToken.state)
     const editableState = useApplicationState(props.requestToken.editable.state)
-    const validateState = useApplicationState(props.requestToken.validate.state)
-    const observeState = useApplicationState(props.requestToken.observe.state)
 
     return box({
+        form: true,
         title: "パスワードリセット",
         ...(editableState.isEditable
             ? {
-                  form: true,
                   body: h(LoginIdField, {
                       field: props.requestToken.loginId,
                       help: ["確認のため、ログインIDを入力します"],
                   }),
                   footer: [
                       buttons({
-                          left: submitButton(),
-                          right: clearButton(),
+                          left: h(Submit, {}),
+                          right: h(Clear, {}),
                       }),
-                      ...validationMessage(validateState),
-                      ...message(),
+                      h(ValidationMessage, props.requestToken.validate),
+                      h(Message, {}),
                       buttons({
-                          right: closeButton(),
+                          right: h(Close, {}),
                       }),
                   ],
               }
             : {
-                  body: editButton(),
-                  footer:
-                      state.type === "success"
-                          ? [
-                                notice_success([
-                                    html`パスワードリセットのための<br />
-                                        トークンをメールで送信しました`,
-                                ]),
-                                html`<p>
-                                    メールからパスワードリセットできます<br />
-                                    メールを確認してください
-                                </p>`,
-                            ]
-                          : undefined,
+                  body: h(Edit, {}),
+                  footer: h(SuccessMessage, {}),
               }),
     })
 
-    function editButton(): VNode {
+    function Edit(_props: unknown): VNode {
+        const requestTokenState = useApplicationState(props.requestToken.state)
+
         const label = "トークン送信"
-        if (state.type === "success") {
+        if (requestTokenState.type === "success") {
             return h(EditSuccessButton, { label, onClick })
         } else {
             return h(EditButton, { label, onClick })
@@ -86,11 +73,15 @@ export function RequestResetTokenProfile(props: Props): VNode {
         }
     }
 
-    function submitButton(): VNode {
+    function Submit(_props: unknown): VNode {
+        const requestTokenState = useApplicationState(props.requestToken.state)
+        const validateState = useApplicationState(props.requestToken.validate.state)
+        const observeState = useApplicationState(props.requestToken.observe.state)
+
         return h(SendButton, {
             label: "トークン送信",
             icon: icon_change,
-            isConnecting: state.type === "try",
+            isConnecting: requestTokenState.type === "try",
             validateState,
             observeState,
             onClick,
@@ -102,7 +93,9 @@ export function RequestResetTokenProfile(props: Props): VNode {
         }
     }
 
-    function clearButton(): VNode {
+    function Clear(_props: unknown): VNode {
+        const observeState = useApplicationState(props.requestToken.observe.state)
+
         return h(ClearChangesButton, { observeState, onClick })
 
         function onClick(e: Event) {
@@ -110,7 +103,7 @@ export function RequestResetTokenProfile(props: Props): VNode {
             props.requestToken.clear()
         }
     }
-    function closeButton(): VNode {
+    function Close(_props: unknown): VNode {
         return h(CloseButton, { onClick })
 
         function onClick(e: Event) {
@@ -119,20 +112,43 @@ export function RequestResetTokenProfile(props: Props): VNode {
         }
     }
 
-    function message(): readonly VNode[] {
-        switch (state.type) {
+    function Message(_props: unknown): VNode {
+        const requestTokenState = useApplicationState(props.requestToken.state)
+
+        switch (requestTokenState.type) {
             case "initial":
             case "success":
-                return []
+                return html``
 
             case "try":
-                if (state.hasTakenLongtime) {
-                    return [takeLongtimeField("リセットトークン送信")]
+                if (requestTokenState.hasTakenLongtime) {
+                    return takeLongtimeField("リセットトークン送信")
                 }
-                return []
+                return html``
 
             case "failed":
-                return [fieldHelp_error(requestTokenError(state.err))]
+                return fieldHelp_error(requestTokenError(requestTokenState.err))
+        }
+    }
+    function SuccessMessage(_props: unknown): VNode {
+        const requestTokenState = useApplicationState(props.requestToken.state)
+
+        switch (requestTokenState.type) {
+            case "success":
+                return html`${notice_success([
+                        html`パスワードリセットのための<br />
+                            トークンをメールで送信しました`,
+                    ])}
+                    <p>
+                        メールからパスワードリセットできます<br />
+                        メールを確認してください
+                    </p>`
+
+            default:
+                return html`<p>
+                    パスワードリセットのためのトークンを<br />
+                    登録されたメールアドレスに送信します
+                </p>`
         }
     }
 }

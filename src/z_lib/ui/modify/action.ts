@@ -77,8 +77,9 @@ export function initModifyField<K extends string, T, M>(
         observe.clear()
     }
     const resetTo = (data: T) => {
-        entries.forEach(([_field, _input, set]) => {
+        entries.forEach(([_field, input, set]) => {
             set(data)
+            input.validate.clear()
         })
         validate.clear()
         observe.clear()

@@ -25,7 +25,6 @@ import { ResetTokenDestination } from "../kernel/data"
 import { LoginId } from "../../../../login_id/kernel/data"
 import { ChangeResetTokenDestinationError } from "./data"
 import { ConvertBoardResult } from "../../../../../../z_vendor/getto-application/board/kernel/data"
-import { PrepareElementState } from "../../../../../../z_lib/ui/prepare/data"
 
 export interface ChangeResetTokenDestinationAction {
     readonly state: ApplicationState<ChangeResetTokenDestinationState>
@@ -36,7 +35,6 @@ export interface ChangeResetTokenDestinationAction {
 
     onSuccess(handler: (data: ChangeResetTokenDestinationEntry) => void): void
 
-    data(): PrepareElementState<ChangeResetTokenDestinationEntry>
     reset(): void
     submit(): Promise<ChangeResetTokenDestinationState>
 }
@@ -110,7 +108,6 @@ export function initChangeResetTokenDestinationAction(
             observe,
             editable,
 
-            data,
             reset,
 
             onSuccess,

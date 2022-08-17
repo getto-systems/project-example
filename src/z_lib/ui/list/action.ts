@@ -11,19 +11,24 @@ export interface ListRegisteredAction<T> extends ListAction<readonly T[]> {
     readonly focus: FocusRegisteredAction<T>
 }
 
-export interface FocusRegisteredAction<T> extends FocusAction<T, FocusState<T>> {
-    readonly state: ApplicationState<FocusState<T>>
-}
+export type FocusRegisteredAction<T> = FocusAction<T, FocusState<T>>
+
+export type FocusState<T> =
+    | Readonly<{ type: "close" }>
+    | Readonly<{ type: "change"; data: T }>
+    | Readonly<{ type: "update"; data: T }>
 
 export interface ListSearchedAction<T, M, E> extends ListAction<ListSearchedResult<T, M, E>> {
     readonly focus: FocusSearchedAction<T>
 }
 
-export interface FocusSearchedAction<T> extends FocusAction<T, FocusSearchedState<T>> {
-    readonly state: ApplicationState<FocusSearchedState<T>>
-}
+export type FocusSearchedAction<T> = FocusAction<T, FocusSearchedState<T>>
 
 export type FocusSearchedState<T> = FocusState<T> | FocusDetectState<T>
+
+type FocusDetectState<T> =
+    | Readonly<{ type: "detect"; data: T }>
+    | Readonly<{ type: "detect-failed" }>
 
 interface ListAction<S> {
     readonly state: ApplicationState<ListState<S>>
@@ -31,6 +36,8 @@ interface ListAction<S> {
 type ListState<S> = PrepareElementState<S>
 
 export interface FocusAction<T, S> {
+    readonly state: ApplicationState<FocusState<T> | S>
+
     onModify(handler: ModifyFieldHandler<T>): void
 
     change(data: T): FocusState<T> | S
@@ -40,15 +47,6 @@ export interface FocusAction<T, S> {
 
     isFocused(data: T): boolean
 }
-
-export type FocusState<T> =
-    | Readonly<{ type: "close" }>
-    | Readonly<{ type: "change"; data: T }>
-    | Readonly<{ type: "update"; data: T }>
-
-type FocusDetectState<T> =
-    | Readonly<{ type: "detect"; data: T }>
-    | Readonly<{ type: "detect-failed" }>
 
 export interface ListRegisteredHandler<T> {
     register(data: T): ListState<readonly T[]>

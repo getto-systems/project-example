@@ -1,10 +1,11 @@
 import { h, VNode } from "preact"
+import { html } from "htm/preact"
 
 import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 import { box, container } from "../../../../../z_vendor/getto-css/preact/design/box"
-import { takeLongtimeField, validationMessage } from "../../../../../common/x_preact/design/form"
+import { takeLongtimeField, ValidationMessage } from "../../../../../common/x_preact/design/form"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
 
@@ -25,10 +26,6 @@ type Props = Readonly<{
     register: RegisterAuthUserAccountAction
 }>
 export function RegisterAuthUserAccount(props: Props): VNode {
-    const state = useApplicationState(props.register.state)
-    const validateState = useApplicationState(props.register.validate.state)
-    const observeState = useApplicationState(props.register.observe.state)
-
     return container(
         box({
             form: true,
@@ -39,23 +36,28 @@ export function RegisterAuthUserAccount(props: Props): VNode {
                 h(AuthUserGrantedRolesField, { field: props.register.grantedRoles }),
                 h(ResetTokenDestinationField, { field: props.register.resetTokenDestination }),
             ],
-            footer: [
-                buttons({
-                    left: submitButton(),
-                    right: clearButton(),
-                }),
-                ...validationMessage(validateState),
-                ...message(),
-            ],
+            footer: h(Footer, {}),
         }),
     )
 
-    function submitButton(): VNode {
-        if (state.type === "success") {
+    function Footer(_props: unknown): VNode {
+        return html`${[
+            buttons({ left: h(Submit, {}), right: h(Clear, {}) }),
+            h(ValidationMessage, props.register.validate),
+            h(Message, {}),
+        ]}`
+    }
+
+    function Submit(_props: unknown): VNode {
+        const registerState = useApplicationState(props.register.state)
+        const validateState = useApplicationState(props.register.validate.state)
+        const observeState = useApplicationState(props.register.observe.state)
+
+        if (registerState.type === "success") {
             return h(RegisterSuccessButton, { onClick })
         } else {
             return h(RegisterButton, {
-                isConnecting: state.type === "try",
+                isConnecting: registerState.type === "try",
                 validateState,
                 observeState,
                 onClick,
@@ -68,7 +70,9 @@ export function RegisterAuthUserAccount(props: Props): VNode {
         }
     }
 
-    function clearButton(): VNode {
+    function Clear(_props: unknown): VNode {
+        const observeState = useApplicationState(props.register.observe.state)
+
         return h(ClearChangesButton, { observeState, onClick })
 
         function onClick(e: Event) {
@@ -77,20 +81,22 @@ export function RegisterAuthUserAccount(props: Props): VNode {
         }
     }
 
-    function message(): readonly VNode[] {
-        switch (state.type) {
+    function Message(_props: unknown): VNode {
+        const registerState = useApplicationState(props.register.state)
+
+        switch (registerState.type) {
             case "initial":
             case "success":
-                return []
+                return html``
 
             case "try":
-                if (state.hasTakenLongtime) {
-                    return [takeLongtimeField("変更")]
+                if (registerState.hasTakenLongtime) {
+                    return takeLongtimeField("変更")
                 }
-                return []
+                return html``
 
             case "failed":
-                return [fieldHelp_error(modifyError(state.err))]
+                return fieldHelp_error(modifyError(registerState.err))
         }
     }
 }

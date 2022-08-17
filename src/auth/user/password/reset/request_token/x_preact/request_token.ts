@@ -13,7 +13,7 @@ import { loginBox } from "../../../../../../z_vendor/getto-css/preact/layout/log
 import { siteInfo } from "../../../../../../x_content/site"
 import { icon_change } from "../../../../../../x_content/icon"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"
-import { takeLongtimeField, validationMessage } from "../../../../../../common/x_preact/design/form"
+import { takeLongtimeField, ValidationMessage } from "../../../../../../common/x_preact/design/form"
 
 import { LoginIdField } from "../../../../login_id/input/x_preact/field"
 import { ClearChangesButton } from "../../../../../../common/x_preact/button/clear_changes_button"
@@ -29,13 +29,12 @@ type Props = Readonly<{
     requestToken: RequestResetTokenAction
 }>
 export function RequestResetToken(props: Props): VNode {
-    const state = useApplicationState(props.requestToken.state)
-    const validateState = useApplicationState(props.requestToken.validate.state)
-    const observeState = useApplicationState(props.requestToken.observe.state)
+    const requestTokenState = useApplicationState(props.requestToken.state)
 
     return loginBox(siteInfo, {
         title: "パスワードリセット",
-        ...(state.type === "success"
+        footer: footerLinks(),
+        ...(requestTokenState.type === "success"
             ? {
                   body: [
                       html`<p>トークンの送信が完了しました</p>`,
@@ -44,38 +43,29 @@ export function RequestResetToken(props: Props): VNode {
                           メールを確認してください
                       </p>`,
                   ],
-                  footer: footerLinks(),
               }
             : {
                   form: true,
                   body: [
                       h(LoginIdField, {
                           field: props.requestToken.loginId,
-                          help: ["このログインIDに設定された送信先にリセットトークンを送信します"],
+                          help: ["登録されたメールアドレスにリセットトークンを送信します"],
                       }),
-                      buttons({
-                          left: sendButton(),
-                          right: clearButton(),
-                      }),
+                      buttons({ left: h(Submit, {}), right: h(Clear, {}) }),
+                      h(ValidationMessage, props.requestToken.validate),
+                      h(Message, {}),
                   ],
-                  footer: [footerLinks(), ...validationMessage(validateState), ...message()],
               }),
     })
 
-    function clearButton(): VNode {
-        return h(ClearChangesButton, { observeState, onClick })
+    function Submit(_props: unknown): VNode {
+        const validateState = useApplicationState(props.requestToken.validate.state)
+        const observeState = useApplicationState(props.requestToken.observe.state)
 
-        function onClick(e: Event) {
-            e.preventDefault()
-            props.requestToken.clear()
-        }
-    }
-
-    function sendButton(): VNode {
         return h(SendButton, {
             label: "トークン送信",
             icon: icon_change,
-            isConnecting: state.type === "try",
+            isConnecting: requestTokenState.type === "try",
             validateState,
             observeState,
             onClick,
@@ -87,20 +77,31 @@ export function RequestResetToken(props: Props): VNode {
         }
     }
 
-    function message(): readonly VNode[] {
-        switch (state.type) {
+    function Clear(_props: unknown): VNode {
+        const observeState = useApplicationState(props.requestToken.observe.state)
+
+        return h(ClearChangesButton, { observeState, onClick })
+
+        function onClick(e: Event) {
+            e.preventDefault()
+            props.requestToken.clear()
+        }
+    }
+
+    function Message(_props: unknown): VNode {
+        switch (requestTokenState.type) {
             case "initial":
             case "success":
-                return []
+                return html``
 
             case "try":
-                if (state.hasTakenLongtime) {
-                    return [takeLongtimeField("トークンの送信")]
+                if (requestTokenState.hasTakenLongtime) {
+                    return takeLongtimeField("トークンの送信")
                 }
-                return []
+                return html``
 
             case "failed":
-                return [fieldHelp_error(requestTokenError(state.err))]
+                return fieldHelp_error(requestTokenError(requestTokenState.err))
         }
     }
 
