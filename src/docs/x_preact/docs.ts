@@ -17,7 +17,7 @@ import { field } from "../../z_vendor/getto-css/preact/design/form"
 import { copyright, siteInfo } from "../../x_content/site"
 
 import { ApplicationError } from "../../avail/x_preact/application_error"
-import { OutlineMenu } from "../../common/outline/load/x_preact/load_menu"
+import { OutlineMenu } from "../../common/outline/load/x_preact/outline_menu"
 import { LoadBreadcrumbList } from "../../common/outline/load/x_preact/load_breadcrumb_list"
 
 import { DocsResource } from "../resource"

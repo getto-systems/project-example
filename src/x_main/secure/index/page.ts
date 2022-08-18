@@ -16,7 +16,7 @@ import { copyright, siteInfo } from "../../../x_content/site"
 import { ApplicationError } from "../../../avail/x_preact/application_error"
 import { LoadSeason } from "../../../core/season/load/x_preact/load_season"
 import { LoadBreadcrumbList } from "../../../common/outline/load/x_preact/load_breadcrumb_list"
-import { OutlineMenu } from "../../../common/outline/load/x_preact/load_menu"
+import { OutlineMenu } from "../../../common/outline/load/x_preact/outline_menu"
 import { Dashboard } from "../../../x_content/x_preact/dashboard"
 
 import { BaseResource } from "../base/resource"

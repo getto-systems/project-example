@@ -18,7 +18,7 @@ import { useDocumentTitle } from "../../../../../common/x_preact/hooks"
 import { copyright, siteInfo } from "../../../../../x_content/site"
 
 import { ApplicationError } from "../../../../../avail/x_preact/application_error"
-import { OutlineMenu } from "../../../../../common/outline/load/x_preact/load_menu"
+import { OutlineMenu } from "../../../../../common/outline/load/x_preact/outline_menu"
 import { LoadBreadcrumbList } from "../../../../../common/outline/load/x_preact/load_breadcrumb_list"
 import { MainTitleWithSidebar } from "../../../../../z_lib/ui/search/sidebar/x_preact/main_title"
 import { RegisterAuthUserAccount } from "../../../../../auth/user/account/register/x_preact/register"
