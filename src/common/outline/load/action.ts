@@ -22,31 +22,31 @@ import { RepositoryError } from "../../../z_lib/ui/repository/data"
 import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
 import { BreadcrumbList, BreadcrumbNode, Menu, MenuCategoryPath, MenuTargetPath } from "./data"
 
-export interface LoadBreadcrumbListAction {
+export interface OutlineBreadcrumbListAction {
     load(): BreadcrumbList
 }
 
-export type LoadBreadcrumbListMaterial = Readonly<{
-    shell: LoadBreadcrumbListShell
-    config: LoadBreadcrumbListConfig
+export type OutlineBreadcrumbListMaterial = Readonly<{
+    shell: OutlineBreadcrumbListShell
+    config: OutlineBreadcrumbListConfig
 }>
-export type LoadBreadcrumbListShell = Readonly<{
+export type OutlineBreadcrumbListShell = Readonly<{
     detectTargetPath: MenuTargetPathDetecter
 }>
-export type LoadBreadcrumbListConfig = Readonly<{
+export type OutlineBreadcrumbListConfig = Readonly<{
     version: string
     menuTree: MenuTree
 }>
 
-export function initLoadBreadcrumbListAction(
-    material: LoadBreadcrumbListMaterial,
-): LoadBreadcrumbListAction {
+export function initOutlineBreadcrumbListAction(
+    material: OutlineBreadcrumbListMaterial,
+): OutlineBreadcrumbListAction {
     return {
         load: () => load(material),
     }
 }
 
-function load({ shell, config }: LoadBreadcrumbListMaterial): BreadcrumbList {
+function load({ shell, config }: OutlineBreadcrumbListMaterial): BreadcrumbList {
     const { detectTargetPath } = shell
 
     const menuTargetPath = detectTargetPath()

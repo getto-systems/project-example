@@ -18,7 +18,7 @@ import { ApplicationError } from "../../../../avail/x_preact/application_error"
 // TODO DisplaySeason, OutlineMenu, BreadcrumbList
 import { LoadSeason } from "../../../../core/season/load/x_preact/load_season"
 import { DisplayOutlineMenu } from "../../../../common/outline/load/x_preact/display_menu"
-import { LoadBreadcrumbList } from "../../../../common/outline/load/x_preact/load_breadcrumb_list"
+import { DisplayOutlineBreadcrumbList } from "../../../../common/outline/load/x_preact/display_breadcrumb_list"
 import { SetupSeason } from "../../../../core/season/setup/x_preact/setup"
 
 import { SetupSeasonPageResource } from "./resource"
@@ -37,7 +37,7 @@ export function SetupSeasonPage(props: SetupSeasonPageResource): VNode {
         siteInfo,
         header: [h(LoadSeason, props)],
         main: appMain({
-            header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, props)]),
+            header: mainHeader([mainTitle(pageTitle), h(DisplayOutlineBreadcrumbList, props)]),
             body: mainBody(container([h(SetupSeason, props)])),
             copyright,
         }),

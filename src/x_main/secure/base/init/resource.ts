@@ -2,7 +2,7 @@ import { homeMenuContent } from "../../../../x_content/menu/home_menu"
 
 import { newNotifyUnexpectedErrorResource } from "../../../../avail/unexpected_error/notify/init/resource"
 import {
-    newLoadBreadcrumbListResource,
+    newOutlineBreadcrumbListResource,
     newOutlineMenuResource,
 } from "../../../../common/outline/load/init/resource"
 import { newLoadSeasonResource } from "../../../../core/season/load/init/resource"
@@ -19,7 +19,7 @@ export type BaseOutsideFeature = RemoteOutsideFeature &
 export function newBaseResource(feature: BaseOutsideFeature): BaseResource {
     const menu = homeMenuContent()
     return {
-        ...newLoadBreadcrumbListResource(feature, menu),
+        ...newOutlineBreadcrumbListResource(feature, menu),
         ...newOutlineMenuResource(feature, menu),
         ...newNotifyUnexpectedErrorResource(feature),
         ...newLoadSeasonResource(feature),

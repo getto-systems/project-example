@@ -2,7 +2,7 @@ import { docsMenuContent } from "../../x_content/menu/docs_menu"
 
 import { newNotifyUnexpectedErrorResource } from "../../avail/unexpected_error/notify/init/resource"
 import {
-    newLoadBreadcrumbListResource,
+    newOutlineBreadcrumbListResource,
     newOutlineMenuResource,
 } from "../../common/outline/load/init/resource"
 
@@ -16,7 +16,7 @@ type OutsideFeature = RemoteOutsideFeature & RepositoryOutsideFeature & Location
 export function newDocsResource(feature: OutsideFeature): DocsResource {
     const menu = docsMenuContent()
     return {
-        ...newLoadBreadcrumbListResource(feature, menu),
+        ...newOutlineBreadcrumbListResource(feature, menu),
         ...newOutlineMenuResource(feature, menu),
         ...newNotifyUnexpectedErrorResource(feature),
     }
