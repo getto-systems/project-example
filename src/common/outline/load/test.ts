@@ -11,7 +11,7 @@ import { convertMenuBadgeRemote, menuExpandRepositoryConverter } from "./convert
 import { authTicketRepositoryConverter } from "../../../auth/ticket/kernel/convert"
 import { convertDB } from "../../../z_lib/ui/repository/init/convert"
 
-import { initLoadMenuAction, LoadMenuAction } from "./action"
+import { initOutlineMenuAction, OutlineMenuAction } from "./action"
 
 import { AuthTicketRepository, AuthTicketRepositoryValue } from "../../../auth/ticket/kernel/infra"
 import {
@@ -328,15 +328,15 @@ function expand() {
 function initResource(
     ticketRepository: AuthTicketRepository,
     menuExpandRepository: MenuExpandRepository,
-): Readonly<{ menu: LoadMenuAction; repository: MenuExpandRepository }> {
+): Readonly<{ menu: OutlineMenuAction; repository: MenuExpandRepository }> {
     const version = standard_version()
     const detectTargetPath = standard_detecter()
     const loadMenuBadgeRemote = standard_loadMenuBadgeRemote()
 
     return {
-        menu: initLoadMenuAction({
+        menu: initOutlineMenuAction({
             infra: {
-                loadMenuBadgeRemote,
+                loadMenuBadgeRemote: loadMenuBadgeRemote,
                 ticketRepository,
                 menuExpandRepository,
                 menuExpandStore: initMenuExpandStore(),

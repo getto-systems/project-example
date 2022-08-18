@@ -96,46 +96,46 @@ function load({ shell, config }: LoadBreadcrumbListMaterial): BreadcrumbList {
 
 const EMPTY: BreadcrumbList = []
 
-export interface LoadMenuAction {
-    readonly state: ApplicationState<LoadMenuState>
-    updateBadge(): Promise<LoadMenuState>
-    show(path: MenuCategoryPath): Promise<LoadMenuState>
-    hide(path: MenuCategoryPath): Promise<LoadMenuState>
+export interface OutlineMenuAction {
+    readonly state: ApplicationState<OutlineMenuState>
+    updateBadge(): Promise<OutlineMenuState>
+    show(path: MenuCategoryPath): Promise<OutlineMenuState>
+    hide(path: MenuCategoryPath): Promise<OutlineMenuState>
 }
 
-export type LoadMenuState =
+export type OutlineMenuState =
     | Readonly<{ type: "initial-menu" }>
-    | LoadMenuEvent
+    | OutlineMenuEvent
     | UpdateMenuBadgeEvent
     | ToggleMenuExpandEvent
 
-const initialState: LoadMenuState = { type: "initial-menu" }
+const initialState: OutlineMenuState = { type: "initial-menu" }
 
-export type LoadMenuMaterial = Readonly<{
-    infra: LoadMenuInfra
-    shell: LoadMenuShell
-    config: LoadMenuConfig
+export type OutlineMenuMaterial = Readonly<{
+    infra: OutlineMenuInfra
+    shell: OutlineMenuShell
+    config: OutlineMenuConfig
 }>
-export type LoadMenuInfra = Readonly<{
+export type OutlineMenuInfra = Readonly<{
     loadMenuBadgeRemote: LoadMenuBadgeRemote
     ticketRepository: AuthTicketRepository
     menuExpandRepository: MenuExpandRepository
     menuExpandStore: MenuExpandStore
     menuBadgeStore: MenuBadgeStore
 }>
-export type LoadMenuShell = Readonly<{
+export type OutlineMenuShell = Readonly<{
     detectTargetPath: MenuTargetPathDetecter
 }>
-export type LoadMenuConfig = Readonly<{
+export type OutlineMenuConfig = Readonly<{
     version: string
     menuTree: MenuTree
 }>
 
-export function initLoadMenuAction(material: LoadMenuMaterial): LoadMenuAction {
+export function initOutlineMenuAction(material: OutlineMenuMaterial): OutlineMenuAction {
     const { state, post } = initApplicationState({
         initialState,
-        ignite: async (): Promise<LoadMenuState> => {
-            return loadMenu(material, (event) => {
+        ignite: async (): Promise<OutlineMenuState> => {
+            return outlineMenu(material, (event) => {
                 const state = post(event)
 
                 switch (event.type) {
@@ -154,27 +154,27 @@ export function initLoadMenuAction(material: LoadMenuMaterial): LoadMenuAction {
         state,
 
         updateBadge,
-        show(path: MenuCategoryPath): Promise<LoadMenuState> {
+        show(path: MenuCategoryPath): Promise<OutlineMenuState> {
             return toggleMenuExpand(material, path, true, post)
         },
-        hide(path: MenuCategoryPath): Promise<LoadMenuState> {
+        hide(path: MenuCategoryPath): Promise<OutlineMenuState> {
             return toggleMenuExpand(material, path, false, post)
         },
     }
 
-    function updateBadge(): Promise<LoadMenuState> {
+    function updateBadge(): Promise<OutlineMenuState> {
         return updateMenuBadge(material, post)
     }
 }
 
-type LoadMenuEvent =
+type OutlineMenuEvent =
     | Readonly<{ type: "required-to-login" }>
     | Readonly<{ type: "succeed-to-load"; menu: Menu }>
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
-async function loadMenu<S>(
-    { infra, shell, config }: LoadMenuMaterial,
-    post: Post<LoadMenuEvent, S>,
+async function outlineMenu<S>(
+    { infra, shell, config }: OutlineMenuMaterial,
+    post: Post<OutlineMenuEvent, S>,
 ): Promise<S> {
     const { ticketRepository, menuExpandRepository, menuExpandStore } = infra
 
@@ -215,7 +215,7 @@ type ToggleMenuExpandEvent =
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
 async function toggleMenuExpand<S>(
-    { infra, shell, config }: LoadMenuMaterial,
+    { infra, shell, config }: OutlineMenuMaterial,
     path: MenuCategoryPath,
     isShow: boolean,
     post: Post<ToggleMenuExpandEvent, S>,
@@ -271,7 +271,7 @@ type UpdateMenuBadgeEvent =
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
 async function updateMenuBadge<S>(
-    { infra, shell, config }: LoadMenuMaterial,
+    { infra, shell, config }: OutlineMenuMaterial,
     post: Post<UpdateMenuBadgeEvent, S>,
 ): Promise<S> {
     const { ticketRepository, loadMenuBadgeRemote, menuExpandStore, menuBadgeStore } = infra

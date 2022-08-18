@@ -3,7 +3,7 @@ import { docsMenuContent } from "../../x_content/menu/docs_menu"
 import { newNotifyUnexpectedErrorResource } from "../../avail/unexpected_error/notify/init/resource"
 import {
     newLoadBreadcrumbListResource,
-    newLoadMenuResource,
+    newOutlineMenuResource,
 } from "../../common/outline/load/init/resource"
 
 import { RepositoryOutsideFeature } from "../../z_lib/ui/repository/feature"
@@ -17,7 +17,7 @@ export function newDocsResource(feature: OutsideFeature): DocsResource {
     const menu = docsMenuContent()
     return {
         ...newLoadBreadcrumbListResource(feature, menu),
-        ...newLoadMenuResource(feature, menu),
+        ...newOutlineMenuResource(feature, menu),
         ...newNotifyUnexpectedErrorResource(feature),
     }
 }

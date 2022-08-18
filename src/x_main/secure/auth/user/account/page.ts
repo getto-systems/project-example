@@ -18,7 +18,7 @@ import { useDocumentTitle } from "../../../../../common/x_preact/hooks"
 import { copyright, siteInfo } from "../../../../../x_content/site"
 
 import { ApplicationError } from "../../../../../avail/x_preact/application_error"
-import { LoadMenu } from "../../../../../common/outline/load/x_preact/load_menu"
+import { DisplayOutlineMenu } from "../../../../../common/outline/load/x_preact/display_menu"
 import { LoadBreadcrumbList } from "../../../../../common/outline/load/x_preact/load_breadcrumb_list"
 import { SearchAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/search"
 import { ListAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/list"
@@ -47,7 +47,7 @@ export function ManageUserAccountPage(props: ManageUserAccountPageResource): VNo
     return appLayout({
         siteInfo,
         header: [],
-        menu: h(LoadMenu, props),
+        menu: h(DisplayOutlineMenu, props),
         ...(focusState.type === "close"
             ? {
                   main: appMain({

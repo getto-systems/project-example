@@ -17,7 +17,7 @@ import { field } from "../../z_vendor/getto-css/preact/design/form"
 import { copyright, siteInfo } from "../../x_content/site"
 
 import { ApplicationError } from "../../avail/x_preact/application_error"
-import { LoadMenu } from "../../common/outline/load/x_preact/load_menu"
+import { DisplayOutlineMenu } from "../../common/outline/load/x_preact/display_menu"
 import { LoadBreadcrumbList } from "../../common/outline/load/x_preact/load_breadcrumb_list"
 
 import { DocsResource } from "../resource"
@@ -44,7 +44,7 @@ export function Docs(props: Props): VNode {
             body: mainBody(content(props.docs)),
             copyright,
         }),
-        menu: h(LoadMenu, props),
+        menu: h(DisplayOutlineMenu, props),
     })
 }
 

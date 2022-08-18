@@ -1,6 +1,6 @@
 import { env } from "../../../../y_environment/ui/env"
 
-import { LoadBreadcrumbListConfig, LoadMenuConfig } from "../action"
+import { LoadBreadcrumbListConfig, OutlineMenuConfig } from "../action"
 
 import { MenuContent } from "../infra"
 
@@ -11,7 +11,7 @@ export function newLoadBreadcrumbListConfig(menuContent: MenuContent): LoadBread
     }
 }
 
-export function newLoadMenuConfig(menuContent: MenuContent): LoadMenuConfig {
+export function newOutlineMenuConfig(menuContent: MenuContent): OutlineMenuConfig {
     return {
         version: env.version,
         menuTree: menuContent.menuTree,

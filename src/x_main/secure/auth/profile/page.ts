@@ -15,7 +15,7 @@ import { useDocumentTitle } from "../../../../common/x_preact/hooks"
 import { copyright, siteInfo } from "../../../../x_content/site"
 
 import { ApplicationError } from "../../../../avail/x_preact/application_error"
-import { LoadMenu } from "../../../../common/outline/load/x_preact/load_menu"
+import { DisplayOutlineMenu } from "../../../../common/outline/load/x_preact/display_menu"
 import { LoadBreadcrumbList } from "../../../../common/outline/load/x_preact/load_breadcrumb_list"
 import { ChangePassword } from "../../../../auth/user/password/change/x_preact/change_password"
 import { RequestResetTokenProfile } from "../../../../auth/user/password/reset/request_token/x_preact/request_token_profile"
@@ -38,13 +38,10 @@ export function ProfilePage(props: ProfilePageResource): VNode {
         main: appMain({
             header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, props)]),
             body: mainBody(
-                container([
-                    h(ChangePassword, props),
-                    h(RequestResetTokenProfile, props),
-                ]),
+                container([h(ChangePassword, props), h(RequestResetTokenProfile, props)]),
             ),
             copyright,
         }),
-        menu: h(LoadMenu, props),
+        menu: h(DisplayOutlineMenu, props),
     })
 }
