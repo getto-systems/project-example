@@ -23,8 +23,10 @@ import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
 import { BreadcrumbList, BreadcrumbNode, Menu, MenuCategoryPath, MenuTargetPath } from "./data"
 
 export interface OutlineBreadcrumbListAction {
-    load(): BreadcrumbList
+    readonly state: ApplicationState<OutlineBreadcrumbListState>
 }
+
+export type OutlineBreadcrumbListState = Readonly<{ list: BreadcrumbList }>
 
 export type OutlineBreadcrumbListMaterial = Readonly<{
     shell: OutlineBreadcrumbListShell
@@ -41,8 +43,9 @@ export type OutlineBreadcrumbListConfig = Readonly<{
 export function initOutlineBreadcrumbListAction(
     material: OutlineBreadcrumbListMaterial,
 ): OutlineBreadcrumbListAction {
+    const { state } = initApplicationState({ initialState: { list: load(material) } })
     return {
-        load: () => load(material),
+        state,
     }
 }
 

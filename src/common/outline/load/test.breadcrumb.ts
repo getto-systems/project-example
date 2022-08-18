@@ -6,18 +6,17 @@ import { mockOutlineBreadcrumbListShell } from "./init/mock"
 import { initOutlineBreadcrumbListAction, OutlineBreadcrumbListAction } from "./action"
 
 test("load breadcrumb", () => {
-    const { resource } = standard()
+    const { breadcrumbList } = standard()
 
-    expect(resource.breadcrumbList.load()).toEqual([
-        category("MAIN"),
-        item("ホーム", "home", "/1.0.0/index.html"),
-    ])
+    expect(breadcrumbList.state.currentState()).toEqual({
+        list: [category("MAIN"), item("ホーム", "home", "/1.0.0/index.html")],
+    })
 })
 
 test("load empty breadcrumb; unknown menu target", () => {
-    const { resource } = unknownTarget()
+    const { breadcrumbList } = unknownTarget()
 
-    expect(resource.breadcrumbList.load()).toEqual([])
+    expect(breadcrumbList.state.currentState()).toEqual({ list: [] })
 })
 
 function category(label: string) {
@@ -28,14 +27,10 @@ function item(label: string, icon: string, href: string) {
 }
 
 function standard() {
-    const resource = newResource(standard_URL())
-
-    return { resource }
+    return newResource(standard_URL())
 }
 function unknownTarget() {
-    const resource = newResource(unknownTarget_URL())
-
-    return { resource }
+    return newResource(unknownTarget_URL())
 }
 
 function newResource(currentURL: URL): Readonly<{ breadcrumbList: OutlineBreadcrumbListAction }> {
