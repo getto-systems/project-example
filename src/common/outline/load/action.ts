@@ -15,12 +15,7 @@ import {
     MenuTreeItem,
     MenuTreeNode,
 } from "./infra"
-import {
-    OutlineMenuBadgeRemote,
-    MenuBadgeStore,
-    MenuExpandStore,
-    MenuExpandRepository,
-} from "./infra"
+import { LoadMenuBadgeRemote, MenuBadgeStore, MenuExpandStore, MenuExpandRepository } from "./infra"
 import { AuthTicketRepository } from "../../../auth/ticket/kernel/infra"
 
 import { RepositoryError } from "../../../z_lib/ui/repository/data"
@@ -122,7 +117,7 @@ export type OutlineMenuMaterial = Readonly<{
     config: OutlineMenuConfig
 }>
 export type OutlineMenuInfra = Readonly<{
-    menuBadgeRemote: OutlineMenuBadgeRemote
+    loadMenuBadgeRemote: LoadMenuBadgeRemote
     ticketRepository: AuthTicketRepository
     menuExpandRepository: MenuExpandRepository
     menuExpandStore: MenuExpandStore
@@ -279,7 +274,7 @@ async function updateMenuBadge<S>(
     { infra, shell, config }: OutlineMenuMaterial,
     post: Post<UpdateMenuBadgeEvent, S>,
 ): Promise<S> {
-    const { ticketRepository, menuBadgeRemote, menuExpandStore, menuBadgeStore } = infra
+    const { ticketRepository, loadMenuBadgeRemote, menuExpandStore, menuBadgeStore } = infra
 
     const ticketResult = await ticketRepository.get()
     if (!ticketResult.success) {
@@ -301,7 +296,7 @@ async function updateMenuBadge<S>(
         menuBadge: EMPTY_BADGE,
     }
 
-    const response = await menuBadgeRemote()
+    const response = await loadMenuBadgeRemote()
     if (!response.success) {
         return post({ type: "failed-to-update", menu: buildMenu(buildParams), err: response.err })
     }
