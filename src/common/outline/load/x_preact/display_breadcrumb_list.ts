@@ -18,13 +18,14 @@ import { MENU_ID } from "./display_menu"
 import { OutlineBreadcrumbListAction } from "../action"
 
 import { BreadcrumbList, BreadcrumbNode, MenuCategory, MenuItem } from "../data"
+import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 type Props = Readonly<{
     breadcrumbList: OutlineBreadcrumbListAction
 }>
-export function DisplayOutlineBreadcrumbList({ breadcrumbList }: Props): VNode {
-    // TODO state にするべき
-    return mainBreadcrumbList(toContent(breadcrumbList.load()))
+export function DisplayOutlineBreadcrumbList(props: Props): VNode {
+    const breadcrumbListState = useApplicationState(props.breadcrumbList.state)
+    return mainBreadcrumbList(toContent(breadcrumbListState.list))
 }
 
 function toContent(breadcrumbList: BreadcrumbList): readonly VNode[] {
