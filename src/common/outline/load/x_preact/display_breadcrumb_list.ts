@@ -23,6 +23,7 @@ type Props = Readonly<{
     breadcrumbList: OutlineBreadcrumbListAction
 }>
 export function DisplayOutlineBreadcrumbList({ breadcrumbList }: Props): VNode {
+    // TODO state にするべき
     return mainBreadcrumbList(toContent(breadcrumbList.load()))
 }
 

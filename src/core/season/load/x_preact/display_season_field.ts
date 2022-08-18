@@ -3,7 +3,9 @@ import { html } from "htm/preact"
 
 import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { label_alert } from "../../../../z_vendor/getto-css/preact/design/highlight"
+import { field } from "../../../../z_vendor/getto-css/preact/design/form"
+import { notice_alert } from "../../../../z_vendor/getto-css/preact/design/highlight"
+import { v_small } from "../../../../z_vendor/getto-css/preact/design/alignment"
 
 import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
 
@@ -16,10 +18,13 @@ import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 type Props = Readonly<{
     season: LoadSeasonAction
 }>
-export function LoadSeason(props: Props): VNode {
+export function DisplaySeasonField(props: Props): VNode {
     const state = useApplicationState(props.season.state)
 
-    return info(body())
+    return field({
+        title: "シーズン",
+        body: body(),
+    })
 
     function body(): VNodeContent {
         switch (state.type) {
@@ -30,22 +35,18 @@ export function LoadSeason(props: Props): VNode {
                 return seasonLabel(state.season)
 
             case "failed":
-                return errorContent(state.err)
+                return loadError(state.err)
         }
     }
 }
 
-function info(body: VNodeContent) {
-    return html`<small>シーズン:</small> ${body}`
-}
-
-function errorContent(err: RepositoryError) {
-    return [label_alert("ロードエラー"), ...detail()]
+function loadError(err: RepositoryError): VNodeContent {
+    return [notice_alert("ロードエラー"), ...detail()]
 
     function detail(): VNode[] {
         if (err.err.length === 0) {
             return []
         }
-        return [html` <small>詳細: ${err.err}</small>`]
+        return [v_small(), html`<small><p>詳細: ${err.err}</p></small>`]
     }
 }
