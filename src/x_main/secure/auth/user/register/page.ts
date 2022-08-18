@@ -19,7 +19,7 @@ import { copyright, siteInfo } from "../../../../../x_content/site"
 
 import { ApplicationError } from "../../../../../avail/x_preact/application_error"
 import { DisplayOutlineMenu } from "../../../../../common/outline/load/x_preact/display_menu"
-import { LoadBreadcrumbList } from "../../../../../common/outline/load/x_preact/load_breadcrumb_list"
+import { DisplayOutlineBreadcrumbList } from "../../../../../common/outline/load/x_preact/display_breadcrumb_list"
 import { MainTitleWithSidebar } from "../../../../../z_lib/ui/search/sidebar/x_preact/main_title"
 import { RegisterAuthUserAccount } from "../../../../../auth/user/account/register/x_preact/register"
 import { ListRegisteredAuthUserAccount } from "../../../../../auth/user/account/register/x_preact/list"
@@ -56,7 +56,7 @@ export function ManageUserAccountPage(props: RegisterUserAccountPageResource): V
                               sidebar: props.sidebar,
                               title: pageTitle,
                           }),
-                          h(LoadBreadcrumbList, props),
+                          h(DisplayOutlineBreadcrumbList, props),
                       ]),
                       body: mainBody(h(RegisterAuthUserAccount, props)),
                       copyright,
@@ -67,7 +67,7 @@ export function ManageUserAccountPage(props: RegisterUserAccountPageResource): V
                               sidebar: props.sidebar,
                               title: focusedTitle,
                           }),
-                          h(LoadBreadcrumbList, props),
+                          h(DisplayOutlineBreadcrumbList, props),
                       ]),
                       body: mainBody(h(FocusRegisteredAuthUserAccount, props)),
                       copyright,

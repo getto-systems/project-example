@@ -1,11 +1,11 @@
 import { detectMenuTargetPath } from "../convert"
 
-import { LoadBreadcrumbListShell, OutlineMenuShell } from "../action"
+import { OutlineBreadcrumbListShell, OutlineMenuShell } from "../action"
 
-export function mockLoadBreadcrumbListShell(
+export function mockOutlineBreadcrumbListShell(
     currentURL: URL,
     version: string,
-): LoadBreadcrumbListShell {
+): OutlineBreadcrumbListShell {
     return {
         detectTargetPath: () => detectMenuTargetPath(currentURL, version),
     }

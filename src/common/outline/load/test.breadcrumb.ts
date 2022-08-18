@@ -1,9 +1,9 @@
 import { test, expect } from "vitest"
 import { standard_MenuTree } from "./test_helper"
 
-import { mockLoadBreadcrumbListShell } from "./init/mock"
+import { mockOutlineBreadcrumbListShell } from "./init/mock"
 
-import { initLoadBreadcrumbListAction, LoadBreadcrumbListAction } from "./action"
+import { initOutlineBreadcrumbListAction, OutlineBreadcrumbListAction } from "./action"
 
 test("load breadcrumb", () => {
     const { resource } = standard()
@@ -38,11 +38,11 @@ function unknownTarget() {
     return { resource }
 }
 
-function newResource(currentURL: URL): Readonly<{ breadcrumbList: LoadBreadcrumbListAction }> {
+function newResource(currentURL: URL): Readonly<{ breadcrumbList: OutlineBreadcrumbListAction }> {
     const version = standard_version()
     return {
-        breadcrumbList: initLoadBreadcrumbListAction({
-            shell: mockLoadBreadcrumbListShell(currentURL, version),
+        breadcrumbList: initOutlineBreadcrumbListAction({
+            shell: mockOutlineBreadcrumbListShell(currentURL, version),
             config: {
                 version,
                 menuTree: standard_MenuTree(),

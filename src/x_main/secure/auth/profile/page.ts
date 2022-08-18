@@ -16,7 +16,7 @@ import { copyright, siteInfo } from "../../../../x_content/site"
 
 import { ApplicationError } from "../../../../avail/x_preact/application_error"
 import { DisplayOutlineMenu } from "../../../../common/outline/load/x_preact/display_menu"
-import { LoadBreadcrumbList } from "../../../../common/outline/load/x_preact/load_breadcrumb_list"
+import { DisplayOutlineBreadcrumbList } from "../../../../common/outline/load/x_preact/display_breadcrumb_list"
 import { ChangePassword } from "../../../../auth/user/password/change/x_preact/change_password"
 import { RequestResetTokenProfile } from "../../../../auth/user/password/reset/request_token/x_preact/request_token_profile"
 
@@ -36,7 +36,7 @@ export function ProfilePage(props: ProfilePageResource): VNode {
         siteInfo,
         header: [],
         main: appMain({
-            header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, props)]),
+            header: mainHeader([mainTitle(pageTitle), h(DisplayOutlineBreadcrumbList, props)]),
             body: mainBody(
                 container([h(ChangePassword, props), h(RequestResetTokenProfile, props)]),
             ),

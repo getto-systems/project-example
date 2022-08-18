@@ -19,7 +19,7 @@ import { copyright, siteInfo } from "../../../../../x_content/site"
 
 import { ApplicationError } from "../../../../../avail/x_preact/application_error"
 import { DisplayOutlineMenu } from "../../../../../common/outline/load/x_preact/display_menu"
-import { LoadBreadcrumbList } from "../../../../../common/outline/load/x_preact/load_breadcrumb_list"
+import { DisplayOutlineBreadcrumbList } from "../../../../../common/outline/load/x_preact/display_breadcrumb_list"
 import { SearchAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/search"
 import { ListAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/list"
 import { FocusAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/focus"
@@ -51,7 +51,10 @@ export function ManageUserAccountPage(props: ManageUserAccountPageResource): VNo
         ...(focusState.type === "close"
             ? {
                   main: appMain({
-                      header: mainHeader([mainTitle(pageTitle), h(LoadBreadcrumbList, props)]),
+                      header: mainHeader([
+                          mainTitle(pageTitle),
+                          h(DisplayOutlineBreadcrumbList, props),
+                      ]),
                       body: mainBody(h(SearchAuthUserAccount, props)),
                       copyright,
                   }),
@@ -63,7 +66,7 @@ export function ManageUserAccountPage(props: ManageUserAccountPageResource): VNo
                               sidebar: props.sidebar,
                               title: focusedTitle,
                           }),
-                          h(LoadBreadcrumbList, props),
+                          h(DisplayOutlineBreadcrumbList, props),
                       ]),
                       body: mainBody(h(FocusAuthUserAccount, props)),
                       copyright,

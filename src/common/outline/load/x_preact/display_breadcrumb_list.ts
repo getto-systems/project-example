@@ -15,14 +15,14 @@ import { icon_home } from "../../../../x_content/icon"
 
 import { MENU_ID } from "./display_menu"
 
-import { LoadBreadcrumbListAction } from "../action"
+import { OutlineBreadcrumbListAction } from "../action"
 
 import { BreadcrumbList, BreadcrumbNode, MenuCategory, MenuItem } from "../data"
 
 type Props = Readonly<{
-    breadcrumbList: LoadBreadcrumbListAction
+    breadcrumbList: OutlineBreadcrumbListAction
 }>
-export function LoadBreadcrumbList({ breadcrumbList }: Props): VNode {
+export function DisplayOutlineBreadcrumbList({ breadcrumbList }: Props): VNode {
     return mainBreadcrumbList(toContent(breadcrumbList.load()))
 }
 

@@ -18,7 +18,7 @@ import { copyright, siteInfo } from "../../x_content/site"
 
 import { ApplicationError } from "../../avail/x_preact/application_error"
 import { DisplayOutlineMenu } from "../../common/outline/load/x_preact/display_menu"
-import { LoadBreadcrumbList } from "../../common/outline/load/x_preact/load_breadcrumb_list"
+import { DisplayOutlineBreadcrumbList } from "../../common/outline/load/x_preact/display_breadcrumb_list"
 
 import { DocsResource } from "../resource"
 
@@ -40,7 +40,7 @@ export function Docs(props: Props): VNode {
         siteInfo,
         header: [],
         main: appMain({
-            header: mainHeader([mainTitle(props.title), h(LoadBreadcrumbList, props)]),
+            header: mainHeader([mainTitle(props.title), h(DisplayOutlineBreadcrumbList, props)]),
             body: mainBody(content(props.docs)),
             copyright,
         }),
