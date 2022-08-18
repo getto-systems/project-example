@@ -29,7 +29,7 @@ export const MENU_ID = "menu"
 type Props = Readonly<{
     menu: OutlineMenuAction
 }>
-export function OutlineMenu(props: Props): VNode {
+export function DisplayOutlineMenu(props: Props): VNode {
     const state = useApplicationState(props.menu.state)
 
     switch (state.type) {

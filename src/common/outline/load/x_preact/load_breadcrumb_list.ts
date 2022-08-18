@@ -13,7 +13,7 @@ import { siteInfo } from "../../../../x_content/site"
 import { iconHtml } from "../../../../z_lib/ui/icon/x_preact/icon"
 import { icon_home } from "../../../../x_content/icon"
 
-import { MENU_ID } from "./outline_menu"
+import { MENU_ID } from "./display_menu"
 
 import { LoadBreadcrumbListAction } from "../action"
 

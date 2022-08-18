@@ -14,7 +14,7 @@ import {
 import { copyright, siteInfo } from "../../../../../x_content/site"
 
 import { ApplicationError } from "../../../../../avail/x_preact/application_error"
-import { OutlineMenu } from "../../../../../common/outline/load/x_preact/outline_menu"
+import { DisplayOutlineMenu } from "../../../../../common/outline/load/x_preact/display_menu"
 import { LoadBreadcrumbList } from "../../../../../common/outline/load/x_preact/load_breadcrumb_list"
 import { Logout } from "../../../../../auth/ticket/logout/x_preact/logout"
 
@@ -38,6 +38,6 @@ export function LogoutPage(props: LogoutPageResource): VNode {
             body: mainBody(h(Logout, props)),
             copyright,
         }),
-        menu: h(OutlineMenu, props),
+        menu: h(DisplayOutlineMenu, props),
     })
 }
