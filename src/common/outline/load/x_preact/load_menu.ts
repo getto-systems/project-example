@@ -18,7 +18,7 @@ import { badge_alert, notice_alert } from "../../../../z_vendor/getto-css/preact
 import { poweredBy } from "../../../../x_content/site"
 import { iconHtml } from "../../../../z_lib/ui/icon/x_preact/icon"
 
-import { LoadMenuAction } from "../action"
+import { OutlineMenuAction } from "../action"
 
 import { RepositoryError } from "../../../../z_lib/ui/repository/data"
 import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
@@ -27,9 +27,9 @@ import { Menu, MenuCategoryNode, MenuItemNode } from "../data"
 export const MENU_ID = "menu"
 
 type Props = Readonly<{
-    menu: LoadMenuAction
+    menu: OutlineMenuAction
 }>
-export function LoadMenu(props: Props): VNode {
+export function OutlineMenu(props: Props): VNode {
     const state = useApplicationState(props.menu.state)
 
     switch (state.type) {

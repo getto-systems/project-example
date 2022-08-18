@@ -17,7 +17,7 @@ import { container } from "../../../../z_vendor/getto-css/preact/design/box"
 import { ApplicationError } from "../../../../avail/x_preact/application_error"
 // TODO DisplaySeason, OutlineMenu, BreadcrumbList
 import { LoadSeason } from "../../../../core/season/load/x_preact/load_season"
-import { LoadMenu } from "../../../../common/outline/load/x_preact/load_menu"
+import { OutlineMenu } from "../../../../common/outline/load/x_preact/load_menu"
 import { LoadBreadcrumbList } from "../../../../common/outline/load/x_preact/load_breadcrumb_list"
 import { SetupSeason } from "../../../../core/season/setup/x_preact/setup"
 
@@ -41,6 +41,6 @@ export function SetupSeasonPage(props: SetupSeasonPageResource): VNode {
             body: mainBody(container([h(SetupSeason, props)])),
             copyright,
         }),
-        menu: h(LoadMenu, props),
+        menu: h(OutlineMenu, props),
     })
 }

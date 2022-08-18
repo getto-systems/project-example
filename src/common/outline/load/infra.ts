@@ -90,10 +90,10 @@ export function initMenuExpand(): MenuExpand {
     })
 }
 
-export interface LoadMenuBadgeRemote {
-    (): Promise<LoadMenuBadgeRemoteResult>
+export interface OutlineMenuBadgeRemote {
+    (): Promise<OutlineMenuBadgeRemoteResult>
 }
-export type LoadMenuBadgeRemoteResult = RemoteResult<MenuBadge, RemoteCommonError>
+export type OutlineMenuBadgeRemoteResult = RemoteResult<MenuBadge, RemoteCommonError>
 
 export type MenuBadgeStore = MenuStore<MenuBadge>
 export type MenuExpandStore = MenuStore<MenuExpand>

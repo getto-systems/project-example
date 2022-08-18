@@ -6,7 +6,7 @@ import { toURL } from "../../../../z_lib/ui/location/init"
 
 import { detectMenuTargetPath } from "../convert"
 
-import { LoadBreadcrumbListShell, LoadMenuShell } from "../action"
+import { LoadBreadcrumbListShell, OutlineMenuShell } from "../action"
 
 type OutsideFeature = LocationOutsideFeature
 
@@ -16,7 +16,7 @@ export function newLoadBreadcrumbListShell(feature: OutsideFeature): LoadBreadcr
     }
 }
 
-export function newLoadMenuShell(feature: OutsideFeature): LoadMenuShell {
+export function newOutlineMenuShell(feature: OutsideFeature): OutlineMenuShell {
     return {
         detectTargetPath: () => detectMenuTargetPath(toURL(feature), env.version),
     }

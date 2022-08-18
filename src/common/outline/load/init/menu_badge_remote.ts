@@ -11,15 +11,15 @@ import { decodeProtobuf } from "../../../../z_vendor/protobuf/helper"
 
 import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
 
-import { LoadMenuBadgeRemote, LoadMenuBadgeRemoteResult, MenuBadgeItem } from "../infra"
+import { OutlineMenuBadgeRemote, OutlineMenuBadgeRemoteResult, MenuBadgeItem } from "../infra"
 
 import { convertMenuBadgeRemote } from "../convert"
 import { decodeOutlineMenuBadgePath } from "../../../../x_content/menu/badge"
 
-export function newLoadMenuBadgeRemote(feature: RemoteOutsideFeature): LoadMenuBadgeRemote {
+export function newOutlineMenuBadgeRemote(feature: RemoteOutsideFeature): OutlineMenuBadgeRemote {
     return () => fetchRemote(feature)
 }
-async function fetchRemote(feature: RemoteOutsideFeature): Promise<LoadMenuBadgeRemoteResult> {
+async function fetchRemote(feature: RemoteOutsideFeature): Promise<OutlineMenuBadgeRemoteResult> {
     try {
         const mock = false
         if (mock) {

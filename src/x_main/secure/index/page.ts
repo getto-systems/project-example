@@ -16,7 +16,7 @@ import { copyright, siteInfo } from "../../../x_content/site"
 import { ApplicationError } from "../../../avail/x_preact/application_error"
 import { LoadSeason } from "../../../core/season/load/x_preact/load_season"
 import { LoadBreadcrumbList } from "../../../common/outline/load/x_preact/load_breadcrumb_list"
-import { LoadMenu } from "../../../common/outline/load/x_preact/load_menu"
+import { OutlineMenu } from "../../../common/outline/load/x_preact/load_menu"
 import { Dashboard } from "../../../x_content/x_preact/dashboard"
 
 import { BaseResource } from "../base/resource"
@@ -39,6 +39,6 @@ export function DashboardPage(props: BaseResource): VNode {
             body: mainBody(h(Dashboard, props)),
             copyright,
         }),
-        menu: h(LoadMenu, props),
+        menu: h(OutlineMenu, props),
     })
 }
