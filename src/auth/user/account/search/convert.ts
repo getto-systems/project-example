@@ -17,8 +17,8 @@ import { AuthUserAccount } from "../kernel/data"
 import { toGrantedRoles } from "../input/granted_roles/convert"
 import { DetectFocusListKeyResult } from "../../../../z_lib/ui/list/data"
 
-const SEARCH_LOGIN_ID = "search-login-id" as const
-const SEARCH_GRANTED_ROLES = "search-granted-roles" as const
+const FILTER_LOGIN_ID = "filter-login-id" as const
+const FILTER_GRANTED_ROLES = "filter-granted-roles" as const
 
 const FOCUS_ID = "id" as const
 
@@ -31,8 +31,8 @@ export function detectSearchAuthUserAccountFilter(currentURL: URL): SearchAuthUs
             defaultSearchAuthUserAccountSort,
             readSearchAuthUserAccountSortKey,
         ),
-        loginId: readSingleValueFilter(params, SEARCH_LOGIN_ID),
-        grantedRoles: toGrantedRoles(readMultipleValueFilter(params, SEARCH_GRANTED_ROLES)),
+        loginId: readSingleValueFilter(params, FILTER_LOGIN_ID),
+        grantedRoles: toGrantedRoles(readMultipleValueFilter(params, FILTER_GRANTED_ROLES)),
     }
 }
 export function readSearchAuthUserAccountSortKey(
@@ -57,13 +57,13 @@ export function detectFocusAuthUserAccount(currentURL: URL): DetectFocusListKeyR
 
 export function updateSearchAuthUserAccountFilterQuery(
     currentURL: URL,
-    fields: SearchAuthUserAccountFilter,
+    filter: SearchAuthUserAccountFilter,
 ): URL {
     let url = new URL(currentURL.toString())
-    url = updateSingleValueFilter(url, SEARCH_LOGIN_ID, fields.loginId)
-    url = updateMultipleValueFilter(url, SEARCH_GRANTED_ROLES, fields.grantedRoles)
-    url = updateSearchOffset(url, fields.offset)
-    url = updateSearchSort(url, fields.sort)
+    url = updateSingleValueFilter(url, FILTER_LOGIN_ID, filter.loginId)
+    url = updateMultipleValueFilter(url, FILTER_GRANTED_ROLES, filter.grantedRoles)
+    url = updateSearchOffset(url, filter.offset)
+    url = updateSearchSort(url, filter.sort)
     return url
 }
 export function updateFocusAuthUserAccountQuery(currentURL: URL, user: AuthUserAccount): URL {

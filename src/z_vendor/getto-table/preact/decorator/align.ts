@@ -4,32 +4,28 @@ export const decorateAlign =
     (aligns: readonly TableDataAlign[]): Decorator<TableDataAlignStyle> =>
     (style) => {
         const update = { ...style }
-        aligns.forEach((align) => {
+        aligns.forEach((align): true => {
             switch (align) {
                 case "inherit":
-                    break
+                    return true
+
                 case "top":
                 case "middle":
                 case "baseline":
                 case "bottom":
                     update.vertical = align
-                    break
+                    return true
+
                 case "left":
                 case "center":
                 case "right":
                 case "numeric":
                     update.horizontal = align
-                    break
-                default:
-                    assertNever(align)
+                    return true
             }
         })
         return update
     }
-
-function assertNever(_: never): never {
-    throw new Error("NEVER")
-}
 
 interface Decorator<T> {
     (base: T): T
