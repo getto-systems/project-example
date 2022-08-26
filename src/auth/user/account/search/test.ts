@@ -1,10 +1,12 @@
 import { test, expect } from "vitest"
-import { observeApplicationState } from "../../../../z_vendor/getto-application/action/test_helper"
+import {
+    observeApplicationState,
+    observeApplicationStateTuple2,
+} from "../../../../z_vendor/getto-application/action/test_helper"
 import { ticker } from "../../../../z_lib/ui/timer/helper"
 
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 import { mockSearchAuthUserAccountShell } from "./init/mock"
-import { initMemoryDB } from "../../../../z_lib/ui/repository/init/memory"
 
 import { initSearchAuthUserAccountAction, SearchAuthUserAccountAction } from "./action"
 
@@ -102,11 +104,14 @@ test("detected", async () => {
     const { search } = detected()
 
     expect(
-        await observeApplicationState(search.list.focus.state, async () => {
-            await search.list.state.ignitionState
-            return search.list.focus.state.currentState()
-        }),
-    ).toEqual([{ type: "detect", data: standard_response.list[0] }])
+        await observeApplicationStateTuple2(
+            [search.list.focus.state, search.list.scroll.state],
+            async () => {
+                await search.list.state.ignitionState
+                return search.list.focus.state.currentState()
+            },
+        ),
+    ).toEqual([[{ type: "focus-change", data: standard_response.list[0] }], [{ type: "detect" }]])
 })
 
 test("focus / close", async () => {
@@ -122,22 +127,22 @@ test("focus / close", async () => {
                 memo: restoreAuthUserField("memo"),
             }
 
-            search.list.focus.change(standard_response.list[0])
+            search.list.focus.change(standard_response.list[0], { y: 0 })
             expect(search.list.focus.isFocused(standard_response.list[0])).toBe(true)
             expect(search.list.focus.isFocused(another)).toBe(false)
 
-            search.list.focus.close()
+            search.list.focus.close({ y: 0 })
             expect(search.list.focus.isFocused(standard_response.list[0])).toBe(false)
             expect(search.list.focus.isFocused(another)).toBe(false)
 
-            search.list.focus.change(another)
+            search.list.focus.change(another, { y: 0 })
 
             return search.list.focus.state.currentState()
         }),
     ).toEqual([
-        { type: "change", data: standard_response.list[0] },
+        { type: "focus-change", data: standard_response.list[0] },
         { type: "close" },
-        { type: "close" },
+        { type: "not-found" },
     ])
 })
 
@@ -165,7 +170,6 @@ function initResource(
     const search = initSearchAuthUserAccountAction({
         infra: {
             searchRemote,
-            columnsRepository: initMemoryDB(),
         },
         shell: mockSearchAuthUserAccountShell(currentURL, (url) => {
             urlStore.current = url

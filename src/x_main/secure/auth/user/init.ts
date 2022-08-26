@@ -8,13 +8,13 @@ import { newUnregisterAuthUserAccountAction } from "../../../../auth/user/accoun
 
 import { DetailAuthUserAccountActions } from "../../../../auth/user/account/kernel/x_preact/detail"
 import { ModifyFieldHandler } from "../../../../z_lib/ui/modify/action"
-import { FocusAction, FocusSearchedState } from "../../../../z_lib/ui/list/action"
+import { FocusSearchedAction } from "../../../../z_lib/ui/list/action"
 
 import { AuthUserAccount } from "../../../../auth/user/account/kernel/data"
 
 export function newDetailAuthUserAccountActions(
     feature: ForegroundOutsideFeature,
-    focus: FocusAction<AuthUserAccount, FocusSearchedState<AuthUserAccount>>,
+    focus: FocusSearchedAction<AuthUserAccount>,
 ): DetailAuthUserAccountActions {
     const modify = newModifyAuthUserAccountAction(feature)
     const changeResetTokenDestination = newChangeResetTokenDestinationAction(feature)

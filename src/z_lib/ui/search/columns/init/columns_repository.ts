@@ -21,15 +21,18 @@ export function newSearchColumnsRepository(
 ): SearchColumnsRepository {
     const db = initDB()
     return {
-        get: () =>
-            mapFetchRepositoryResult(db.get(), async (value) => {
+        get: async () => {
+            return mapFetchRepositoryResult(db.get(), async (value) => {
                 const result = searchColumnsRepositoryConverter.fromRepository(value)
                 if (!result.valid) {
                     return fetchRepositoryRemovedResult(await db.remove())
                 }
                 return { success: true, found: true, value: result.value }
-            }),
-        set: (value) => db.set(searchColumnsRepositoryConverter.toRepository(value)),
+            })
+        },
+        set: (value) => {
+            return db.set(searchColumnsRepositoryConverter.toRepository(value))
+        },
     }
 
     function initDB() {

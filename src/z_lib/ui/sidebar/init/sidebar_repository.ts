@@ -1,26 +1,26 @@
-import { env } from "../../../../../y_environment/ui/env"
-import pb from "../../../../../y_protobuf/proto.js"
+import { env } from "../../../../y_environment/ui/env"
+import pb from "../../../../y_protobuf/proto.js"
 
-import { IndexedDBTarget, initIndexedDB } from "../../../repository/init/indexed_db"
+import { IndexedDBTarget, initIndexedDB } from "../../repository/init/indexed_db"
 
-import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf/helper"
+import { decodeProtobuf, encodeProtobuf } from "../../../../z_vendor/protobuf/helper"
 import {
     fetchRepositoryRemovedResult,
     mapFetchRepositoryResult,
-} from "../../../repository/init/helper"
+} from "../../repository/init/helper"
 
-import { RepositoryOutsideFeature } from "../../../repository/feature"
+import { RepositoryOutsideFeature } from "../../repository/feature"
 
 import { searchSidebarRepositoryConverter } from "../convert"
 
-import { SearchSidebarRepository } from "../infra"
+import { ToggleSidebarRepository } from "../infra"
 
-import { SearchSidebarExpand } from "../data"
+import { SidebarExpand } from "../data"
 
 export function newSearchSidebarRepository(
     { webDB }: RepositoryOutsideFeature,
     key: string,
-): SearchSidebarRepository {
+): ToggleSidebarRepository {
     const db = initDB()
     return {
         get: () =>
@@ -46,17 +46,17 @@ export function newSearchSidebarRepository(
 
         return {
             get: () => db.get(target, fromDB),
-            set: (value: SearchSidebarExpand) => db.set(target, toDB, value),
+            set: (value: SidebarExpand) => db.set(target, toDB, value),
             remove: () => db.remove(target),
         }
 
-        function toDB(value: SearchSidebarExpand): string {
+        function toDB(value: SidebarExpand): string {
             return encodeProtobuf(pb.lib.search.sidebar.db.SidebarPb, (message) => {
                 // value に readonly がついているため、新しく生成する
                 message.isExpand = value.isExpand
             })
         }
-        function fromDB(raw: string): SearchSidebarExpand {
+        function fromDB(raw: string): SidebarExpand {
             const message = decodeProtobuf(pb.lib.search.sidebar.db.SidebarPb, raw)
             return { isExpand: message.isExpand }
         }

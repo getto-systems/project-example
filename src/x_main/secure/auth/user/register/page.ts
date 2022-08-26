@@ -20,16 +20,16 @@ import { copyright, siteInfo } from "../../../../../x_content/site"
 import { ApplicationError } from "../../../../../avail/x_preact/application_error"
 import { DisplayOutlineMenu } from "../../../../../common/outline/load/x_preact/display_menu"
 import { DisplayOutlineBreadcrumbList } from "../../../../../common/outline/load/x_preact/display_breadcrumb_list"
-import { MainTitleWithSidebar } from "../../../../../z_lib/ui/search/sidebar/x_preact/main_title"
+import { MainTitleWithSidebar } from "../../../../../z_lib/ui/sidebar/x_preact/main_title"
 import { RegisterAuthUserAccount } from "../../../../../auth/user/account/register/x_preact/register"
 import { ListRegisteredAuthUserAccount } from "../../../../../auth/user/account/register/x_preact/list"
 import { FocusRegisteredAuthUserAccount } from "../../../../../auth/user/account/register/x_preact/focus"
 
-import { isSidebarExpand } from "../../../../../z_lib/ui/search/sidebar/x_preact/helper"
+import { isSidebarExpand } from "../../../../../z_lib/ui/sidebar/x_preact/helper"
 
 import { RegisterUserAccountPageResource } from "./resource"
 
-export function ManageUserAccountPage(props: RegisterUserAccountPageResource): VNode {
+export function RegisterUserAccountPage(props: RegisterUserAccountPageResource): VNode {
     const pageTitle = "ユーザー登録"
     const focusedTitle = "ユーザー詳細"
     const sidebarTitle = "登録済み一覧"

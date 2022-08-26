@@ -1,5 +1,4 @@
 import { h } from "preact"
-import { useMemo } from "preact/hooks"
 import { html } from "htm/preact"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
@@ -28,13 +27,9 @@ type Summary = {
     // no props
 }
 
-export function useAuthUserAccountTableStructure(
+export function initSearchAuthUserAccountTableStructure(
     search: SearchAuthUserAccountAction,
 ): SearchAuthUserAccountTableStructure {
-    return useMemo(() => build(search), [search])
-}
-
-function build(search: SearchAuthUserAccountAction): SearchAuthUserAccountTableStructure {
     return tableStructure(rowKey, [
         tableCell("edit", (_key) => ({
             label: "",
@@ -112,7 +107,7 @@ function build(search: SearchAuthUserAccountAction): SearchAuthUserAccountTableS
 
         function onClick(e: Event) {
             e.preventDefault()
-            search.list.focus.change(row)
+            search.list.focus.change(row, { y: document.documentElement.scrollTop })
         }
     }
 }

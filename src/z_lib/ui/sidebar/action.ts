@@ -1,34 +1,34 @@
 import {
     ApplicationState,
     initApplicationState,
-} from "../../../../z_vendor/getto-application/action/action"
+} from "../../../z_vendor/getto-application/action/action"
 
-import { SearchSidebarRepository } from "./infra"
+import { ToggleSidebarRepository } from "./infra"
 
-import { SearchSidebarExpand } from "./data"
-import { RepositoryError } from "../../repository/data"
+import { SidebarExpand } from "./data"
+import { RepositoryError } from "../repository/data"
 
-export interface SearchSidebarAction {
-    readonly state: ApplicationState<SearchSidebarState>
-    fold(): Promise<SearchSidebarState>
-    expand(): Promise<SearchSidebarState>
+export interface ToggleSidebarAction {
+    readonly state: ApplicationState<ToggleSidebarState>
+    fold(): Promise<ToggleSidebarState>
+    expand(): Promise<ToggleSidebarState>
 }
 
-export type SearchSidebarState =
-    | Readonly<{ type: "success"; state: SearchSidebarExpand }>
+export type ToggleSidebarState =
+    | Readonly<{ type: "success"; state: SidebarExpand }>
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
-export type SearchSidebarInfra = Readonly<{
-    sidebarRepository: SearchSidebarRepository
+export type ToggleSidebarInfra = Readonly<{
+    sidebarRepository: ToggleSidebarRepository
 }>
 
-export function initSearchSidebarAction(
-    infra: SearchSidebarInfra,
-    initialExpand: SearchSidebarExpand,
-): SearchSidebarAction {
+export function initToggleSidebarAction(
+    infra: ToggleSidebarInfra,
+    initialExpand: SidebarExpand,
+): ToggleSidebarAction {
     const { state, post } = initApplicationState({
         initialState: { type: "success", state: initialExpand },
-        ignite: async (): Promise<SearchSidebarState> => {
+        ignite: async (): Promise<ToggleSidebarState> => {
             const { sidebarRepository } = infra
 
             const sidebarResult = await sidebarRepository.get()
@@ -46,15 +46,15 @@ export function initSearchSidebarAction(
     return {
         state,
 
-        async fold(): Promise<SearchSidebarState> {
+        async fold(): Promise<ToggleSidebarState> {
             return set({ isExpand: false })
         },
-        async expand(): Promise<SearchSidebarState> {
+        async expand(): Promise<ToggleSidebarState> {
             return set({ isExpand: true })
         },
     }
 
-    async function set(state: SearchSidebarExpand): Promise<SearchSidebarState> {
+    async function set(state: SidebarExpand): Promise<ToggleSidebarState> {
         const { sidebarRepository } = infra
         const result = await sidebarRepository.set(state)
         if (!result.success) {

@@ -48,12 +48,12 @@ test("focus / close", async () => {
 
             return list.focus.state.currentState()
         }),
-    ).toEqual([{ type: "change", data }, { type: "close" }, { type: "close" }])
+    ).toEqual([{ type: "focus-change", data }, { type: "close" }, { type: "not-found" }])
 
     expect(stack).toEqual({
         focus: [data],
         update: [],
-        close: [true, true],
+        close: [true],
     })
 })
 
@@ -75,8 +75,8 @@ test("update", async () => {
             { isLoad: true, data: [updatedData] },
         ],
         [
-            { type: "change", data },
-            { type: "update", data: updatedData },
+            { type: "focus-change", data },
+            { type: "data-update", data: updatedData },
         ],
     ])
 
@@ -103,13 +103,13 @@ test("remove", async () => {
             { isLoad: true, data: [data] },
             { isLoad: true, data: [] },
         ],
-        [{ type: "change", data }, { type: "close" }],
+        [{ type: "focus-change", data }, { type: "data-remove" }],
     ])
 
     expect(stack).toEqual({
         focus: [data],
         update: [],
-        close: [true],
+        close: [],
     })
 })
 

@@ -15,12 +15,12 @@ import { ModifyAuthUserAccountAction } from "../../modify/action"
 import { ChangeResetTokenDestinationAction } from "../../../password/reset/token_destination/change/action"
 import { UnregisterAuthUserAccountAction } from "../../unregister/action"
 import { ApplicationState } from "../../../../../z_vendor/getto-application/action/action"
-import { FocusSearchedState } from "../../../../../z_lib/ui/list/action"
+import { FocusState } from "../../../../../z_lib/ui/list/action"
 
 import { AuthUserAccount } from "../data"
 
 export type DetailAuthUserAccountActions = Readonly<{
-    focus: ApplicationState<FocusSearchedState<AuthUserAccount>>
+    focus: ApplicationState<FocusState<AuthUserAccount>>
     modify: ModifyAuthUserAccountAction
     changeResetTokenDestination: ChangeResetTokenDestinationAction
     overwriteLoginId: OverwriteLoginIdAction

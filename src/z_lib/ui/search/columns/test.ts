@@ -7,9 +7,10 @@ import { initMemoryDB } from "../../repository/init/memory"
 import { searchColumnsRepositoryConverter } from "./convert"
 import { convertDB } from "../../repository/init/convert"
 
-import { initSearchColumnsAction, SearchColumnsAction } from "./action"
+import { initSearchColumnsAction, SearchColumnsAction, visibleKeys } from "./action"
 
 import { MultipleBoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
+import { ticker } from "../../timer/helper"
 
 test("select columns", async () => {
     const { field, store } = standard()
@@ -17,13 +18,22 @@ test("select columns", async () => {
     expect(
         await observeApplicationState(field.state, async () => {
             await field.state.ignitionState
+
             store.columns.set(["column-a"])
+            await ticker({ wait_millisecond: 0 }, () => null)
+
             store.columns.set(["column-a", "column-b"])
             return field.state.currentState()
         }),
-    ).toEqual([{ type: "success" }, { type: "success" }, { type: "success" }])
+    ).toEqual([
+        { type: "columns", visibleKeys: ["stored"] },
+        { type: "columns", visibleKeys: ["column-a"] },
+        { type: "columns", visibleKeys: ["column-a", "column-b"] },
+    ])
+})
 
-    expect(field.get()).toEqual(["column-a", "column-b"])
+test("visibleKeys", async () => {
+    expect(visibleKeys({ type: "columns", visibleKeys: ["key"] })).toEqual(["key"])
 })
 
 function standard(): Readonly<{
@@ -32,9 +42,12 @@ function standard(): Readonly<{
         columns: MultipleBoardValueStore
     }>
 }> {
-    const field = initSearchColumnsAction({
-        columnsRepository: standard_columnRepository(),
-    })
+    const field = initSearchColumnsAction(
+        {
+            columnsRepository: standard_columnRepository(),
+        },
+        ["initial"],
+    )
 
     return {
         field,
@@ -46,6 +59,6 @@ function standard(): Readonly<{
 
 function standard_columnRepository() {
     const db = initMemoryDB()
-    db.set([])
+    db.set(["stored"])
     return convertDB(db, searchColumnsRepositoryConverter)
 }

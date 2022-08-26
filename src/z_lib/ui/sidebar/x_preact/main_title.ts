@@ -1,23 +1,23 @@
 import { VNode } from "preact"
 import { html } from "htm/preact"
 
-import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
+import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { VNodeContent } from "../../../x_preact/common"
+import { VNodeContent } from "../../x_preact/common"
 
-import { mainTitleWithSidebarButton } from "../../../../../z_vendor/getto-css/preact/layout/app"
-import { notice_alert } from "../../../../../z_vendor/getto-css/preact/design/highlight"
+import { mainTitleWithSidebarButton } from "../../../../z_vendor/getto-css/preact/layout/app"
+import { notice_alert } from "../../../../z_vendor/getto-css/preact/design/highlight"
 
-import { repositoryErrorReason } from "../../../repository/x_error/reason"
+import { repositoryErrorReason } from "../../repository/x_error/reason"
 import { isSidebarExpand } from "./helper"
 
-import { iconHtml } from "../../../icon/x_preact/icon"
-import { icon_sidebar_expand, icon_sidebar_fold } from "../../../../../x_content/icon"
+import { iconHtml } from "../../icon/x_preact/icon"
+import { icon_sidebar_expand, icon_sidebar_fold } from "../../../../x_content/icon"
 
-import { SearchSidebarAction } from "../action"
+import { ToggleSidebarAction } from "../action"
 
 type Props = Readonly<{
-    sidebar: SearchSidebarAction
+    sidebar: ToggleSidebarAction
     title: VNodeContent
 }>
 export function MainTitleWithSidebar(props: Props): VNode {
