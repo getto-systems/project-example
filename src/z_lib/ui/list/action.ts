@@ -32,8 +32,6 @@ export interface FocusRegisteredAction<T> {
     update(data: Partial<T>): FocusState<T>
     remove(): FocusState<T>
     close(): FocusState<T>
-
-    isFocused(data: T): boolean
 }
 
 export interface FocusSearchedAction<T> {
@@ -45,16 +43,32 @@ export interface FocusSearchedAction<T> {
     update(data: Partial<T>): FocusState<T>
     remove(): FocusState<T>
     close(position: ScrollPosition): FocusState<T>
-
-    isFocused(data: T): boolean
 }
 
 export type FocusState<T> =
-    | Readonly<{ type: "close" }>
+    | Readonly<{ type: "close"; isFocused: false }>
+    | Readonly<{ type: "close"; isFocused: true; data: T }>
     | Readonly<{ type: "not-found" }>
     | Readonly<{ type: "focus-change"; data: T }>
     | Readonly<{ type: "data-update"; data: T }>
     | Readonly<{ type: "data-remove" }>
+
+export type FocusedData<T> = Readonly<{ isFocused: false }> | Readonly<{ isFocused: true; data: T }>
+
+export function focusedData<T>(state: FocusState<T>): FocusedData<T> {
+    switch (state.type) {
+        case "close":
+            return state.isFocused ? { isFocused: true, data: state.data } : { isFocused: false }
+
+        case "not-found":
+        case "data-remove":
+            return { isFocused: false }
+
+        case "focus-change":
+        case "data-update":
+            return { isFocused: true, data: state.data }
+    }
+}
 
 export interface ScrollAction {
     readonly state: ApplicationState<ScrollState>
@@ -325,13 +339,13 @@ type FocusProps<T> = Readonly<{
 
 function initFocus<T>(props: FocusProps<T>) {
     const { state, post } = initApplicationState<FocusState<T>>({
-        initialState: { type: "close" },
+        initialState: { type: "close", isFocused: false },
     })
 
     let element: PrepareElementState<T> = { isLoad: false }
 
     return {
-        action: { state, onModify, change, update, remove, close, isFocused },
+        action: { state, onModify, change, update, remove, close },
         detect,
     }
 
@@ -398,18 +412,18 @@ function initFocus<T>(props: FocusProps<T>) {
         return post({ type: "data-remove" })
     }
     function close(position?: ScrollPosition): FocusState<T> {
+        const focused: { isFocused: false } | { isFocused: true; data: T } = element.isLoad
+            ? { isFocused: true, data: element.data }
+            : { isFocused: false }
+
         element = { isLoad: false }
         if (position !== undefined) {
             props.scroll?.close(position)
         }
-        return post({ type: "close" })
+        return post({ type: "close", ...focused })
     }
     function not_found(): FocusState<T> {
         element = { isLoad: false }
         return post({ type: "not-found" })
-    }
-
-    function isFocused(data: T): boolean {
-        return element.isLoad && element.data === data
     }
 }

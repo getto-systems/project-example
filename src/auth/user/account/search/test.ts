@@ -128,20 +128,14 @@ test("focus / close", async () => {
             }
 
             search.list.focus.change(standard_response.list[0], { y: 0 })
-            expect(search.list.focus.isFocused(standard_response.list[0])).toBe(true)
-            expect(search.list.focus.isFocused(another)).toBe(false)
-
             search.list.focus.close({ y: 0 })
-            expect(search.list.focus.isFocused(standard_response.list[0])).toBe(false)
-            expect(search.list.focus.isFocused(another)).toBe(false)
-
             search.list.focus.change(another, { y: 0 })
 
             return search.list.focus.state.currentState()
         }),
     ).toEqual([
         { type: "focus-change", data: standard_response.list[0] },
-        { type: "close" },
+        { type: "close", isFocused: true, data: standard_response.list[0] },
         { type: "not-found" },
     ])
 })

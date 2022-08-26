@@ -66,19 +66,17 @@ test("focus / close", async () => {
             const another: Data = { id: 2, name: "another" }
 
             list.focus.change(item[0], { y: 0 })
-            expect(list.focus.isFocused(item[0])).toBe(true)
-            expect(list.focus.isFocused(another)).toBe(false)
-
             list.focus.close({ y: 1 })
-            expect(list.focus.isFocused(item[0])).toBe(false)
-            expect(list.focus.isFocused(another)).toBe(false)
-
             list.focus.change(another, { y: 2 })
 
             return list.focus.state.currentState()
         }),
     ).toEqual([
-        [{ type: "focus-change", data: item[0] }, { type: "close" }, { type: "not-found" }],
+        [
+            { type: "focus-change", data: item[0] },
+            { type: "close", isFocused: true, data: item[0] },
+            { type: "not-found" },
+        ],
         [
             { type: "focus-change", position: { y: 0 } },
             { type: "close", position: { y: 1 } },

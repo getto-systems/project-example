@@ -1,7 +1,9 @@
-import { h } from "preact"
+import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
+
+import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { sortSign } from "../../../../../z_vendor/getto-css/preact/design/table"
 import { linky } from "../../../../../z_vendor/getto-css/preact/design/highlight"
@@ -16,10 +18,12 @@ import { tableCell } from "../../../../../z_vendor/getto-table/preact/cell/simpl
 import { tableClassName } from "../../../../../z_vendor/getto-table/preact/decorator"
 
 import { SearchAuthUserAccountAction } from "../action"
+import { focusedData } from "../../../../../z_lib/ui/list/action"
 
 import { SearchAuthUserAccountSortKey } from "../data"
 import { AuthUserAccount, AUTH_USER_ACCOUNT } from "../../kernel/data"
 import { authUserGrantedRoles } from "../../kernel/x_preact/field"
+import { ScrollPosition } from "../../../../../z_lib/ui/scroll/data"
 
 export type SearchAuthUserAccountTableStructure = TableStructure<Summary, AuthUserAccount>
 
@@ -34,7 +38,7 @@ export function initSearchAuthUserAccountTableStructure(
         tableCell("edit", (_key) => ({
             label: "",
             header: linky,
-            column: editLink,
+            column: (data: AuthUserAccount) => h(EditLink, { data }),
         })).alwaysVisible(),
 
         tableCell("loginId", (key) => ({
@@ -94,20 +98,37 @@ export function initSearchAuthUserAccountTableStructure(
         return h(ResetTokenDestinationLabel, row)
     }
 
-    function editLink(row: AuthUserAccount): VNodeContent {
-        const isFocused = search.list.focus.isFocused(row)
+    function EditLink(props: Readonly<{ data: AuthUserAccount }>): VNode {
+        const focusState = useApplicationState(search.list.focus.state)
+
+        const data = focusedData(focusState)
+        const isFocused = data.isFocused && data.data === props.data
+
         return html`<a
             href="#"
             id="${isFocused ? "focused" : undefined}"
             class="${focusClass(isFocused)}"
             onClick=${onClick}
         >
-            ${listEditLabel(isFocused)}
+            ${listEditLabel()}
         </a>`
 
         function onClick(e: Event) {
             e.preventDefault()
-            search.list.focus.change(row, { y: document.documentElement.scrollTop })
+            if (e.target instanceof HTMLElement) {
+                e.target.blur()
+            }
+
+            search.list.focus.change(props.data, currentScrollPosition())
+
+            function currentScrollPosition(): ScrollPosition {
+                return {
+                    y:
+                        focusState.type === "close"
+                            ? document.documentElement.scrollTop
+                            : document.getElementById("sidebar")?.scrollTop || 0,
+                }
+            }
         }
     }
 }

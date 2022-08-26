@@ -5,12 +5,7 @@ import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
 import { PagerOptionsProps, SortSignContent } from "../../../z_vendor/getto-css/preact/design/table"
 
 import { iconHtml } from "../../../z_lib/ui/icon/x_preact/icon"
-import {
-    icon_edit,
-    icon_edit_focused,
-    icon_sort_normal,
-    icon_sort_reverse,
-} from "../../../x_content/icon"
+import { icon_edit, icon_sort_normal, icon_sort_reverse } from "../../../x_content/icon"
 import { box_grow, container } from "../../../z_vendor/getto-css/preact/design/box"
 import { notice_gray } from "../../../z_vendor/getto-css/preact/design/highlight"
 
@@ -39,8 +34,8 @@ export function focusClass(isFocused: boolean): string {
         return ""
     }
 }
-export function listEditLabel(isFocused: boolean): VNode {
-    return html`編集 ${iconHtml(isFocused ? icon_edit_focused : icon_edit)}`
+export function listEditLabel(): VNode {
+    return html`編集 ${iconHtml(icon_edit)}`
 }
 
 export function emptyTable(): VNode {
