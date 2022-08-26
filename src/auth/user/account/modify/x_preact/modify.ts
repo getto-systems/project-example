@@ -21,20 +21,21 @@ import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/
 
 import { ModifyAuthUserAccountAction } from "../action"
 import { ApplicationState } from "../../../../../z_vendor/getto-application/action/action"
-import { FocusSearchedState } from "../../../../../z_lib/ui/list/action"
+import { FocusState } from "../../../../../z_lib/ui/list/action"
 
 import { ModifyAuthUserAccountError } from "../data"
 import { AuthUserAccount } from "../../kernel/data"
 
 type Props = Readonly<{
-    focus: ApplicationState<FocusSearchedState<AuthUserAccount>>
+    focus: ApplicationState<FocusState<AuthUserAccount>>
     modify: ModifyAuthUserAccountAction
 }>
 export function ModifyAuthUserAccount(props: Props): VNode {
     const focusState = useApplicationState(props.focus)
     switch (focusState.type) {
         case "close":
-        case "detect-failed":
+        case "not-found":
+        case "data-remove":
             return html``
     }
 

@@ -15,8 +15,6 @@ import { RepositoryError } from "../../repository/data"
 export interface SearchColumnsAction {
     readonly state: ApplicationState<SearchColumnsState>
     readonly input: InputBoardAction<MultipleBoardValueStore>
-
-    get(): readonly string[]
 }
 
 export type SearchColumnsInfra = Readonly<{
@@ -24,15 +22,15 @@ export type SearchColumnsInfra = Readonly<{
 }>
 
 export type SearchColumnsState =
-    | Readonly<{ type: "initial" }>
-    | Readonly<{ type: "success" }>
+    | Readonly<{ type: "columns"; visibleKeys: readonly string[] }>
     | Readonly<{ type: "repository-error"; err: RepositoryError }>
 
-const initialState: SearchColumnsState = { type: "initial" }
-
-export function initSearchColumnsAction(infra: SearchColumnsInfra): SearchColumnsAction {
+export function initSearchColumnsAction(
+    infra: SearchColumnsInfra,
+    initial: readonly string[],
+): SearchColumnsAction {
     const { state, post } = initApplicationState({
-        initialState,
+        initialState: { type: "columns", visibleKeys: initial },
         ignite: load,
     })
 
@@ -42,14 +40,11 @@ export function initSearchColumnsAction(infra: SearchColumnsInfra): SearchColumn
         save(store.get())
     })
 
+    store.set(initial)
+
     return {
         state,
-
         input,
-
-        get(): readonly string[] {
-            return store.get()
-        },
     }
 
     async function save(columns: readonly string[]): Promise<SearchColumnsState> {
@@ -58,7 +53,7 @@ export function initSearchColumnsAction(infra: SearchColumnsInfra): SearchColumn
         if (!result.success) {
             return post({ type: "repository-error", err: result.err })
         }
-        return post({ type: "success" })
+        return post({ type: "columns", visibleKeys: store.get() })
     }
 
     async function load(): Promise<SearchColumnsState> {
@@ -68,11 +63,19 @@ export function initSearchColumnsAction(infra: SearchColumnsInfra): SearchColumn
         if (!columnsResult.success) {
             return post({ type: "repository-error", err: columnsResult.err })
         }
-        if (!columnsResult.found) {
-            return post(state.currentState())
+        if (columnsResult.found) {
+            store.set(columnsResult.value)
         }
+        return post({ type: "columns", visibleKeys: store.get() })
+    }
+}
 
-        store.set(columnsResult.value)
-        return post({ type: "success" })
+export function visibleKeys(state: SearchColumnsState): readonly string[] {
+    switch (state.type) {
+        case "repository-error":
+            return []
+
+        case "columns":
+            return state.visibleKeys
     }
 }

@@ -1,5 +1,4 @@
 import { h } from "preact"
-import { useMemo } from "preact/hooks"
 import { html } from "htm/preact"
 
 import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
@@ -15,26 +14,20 @@ import { tableStructure } from "../../../../../z_vendor/getto-table/preact/cell/
 import { tableCell } from "../../../../../z_vendor/getto-table/preact/cell/simple"
 import { tableClassName } from "../../../../../z_vendor/getto-table/preact/decorator"
 
-import { ListRegisteredAction } from "../../../../../z_lib/ui/list/action"
+import { RegisterAuthUserAccountAction } from "../action"
 
 import { AuthUserAccount, AUTH_USER_ACCOUNT } from "../../kernel/data"
 import { authUserGrantedRoles } from "../../kernel/x_preact/field"
 
-export type ListRegisteredAuthUserAccountTableStructure = TableStructure<Summary, AuthUserAccount>
+export type RegisteredAuthUserAccountTableStructure = TableStructure<Summary, AuthUserAccount>
 
 type Summary = {
     // no props
 }
 
-export function useRegisteredAuthUserAccountTableStructure(
-    list: ListRegisteredAction<AuthUserAccount>,
-): ListRegisteredAuthUserAccountTableStructure {
-    return useMemo(() => build(list), [list])
-}
-
-function build(
-    list: ListRegisteredAction<AuthUserAccount>,
-): ListRegisteredAuthUserAccountTableStructure {
+export function initRegisteredAuthUserAccountTableStructure(
+    register: RegisterAuthUserAccountAction,
+): RegisteredAuthUserAccountTableStructure {
     return tableStructure(rowKey, [
         tableCell("edit", (_key) => ({
             label: "",
@@ -78,7 +71,7 @@ function build(
     }
 
     function editLink(row: AuthUserAccount): VNodeContent {
-        const isFocused = list.focus.isFocused(row)
+        const isFocused = register.list.focus.isFocused(row)
         return html`<a
             href="#"
             id="${isFocused ? "focused" : undefined}"
@@ -90,7 +83,7 @@ function build(
 
         function onClick(e: Event) {
             e.preventDefault()
-            list.focus.change(row)
+            register.list.focus.change(row)
         }
     }
 }

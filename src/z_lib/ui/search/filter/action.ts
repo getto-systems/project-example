@@ -3,7 +3,6 @@ import {
     ObserveBoardAction,
 } from "../../../../z_vendor/getto-application/board/observe_board/action"
 import { ObserveBoardFieldAction } from "../../../../z_vendor/getto-application/board/observe_field/action"
-import { initSearchColumnsAction, SearchColumnsAction, SearchColumnsInfra } from "../columns/action"
 import { initSearchOffsetAction, SearchOffsetAction } from "../offset/action"
 
 import { nextSort } from "../sort/helper"
@@ -20,7 +19,6 @@ export type SearchFilterEntry<K extends string> = [K, SearchFilterAction]
 export type SearchFilterProps<S, F> = Readonly<{
     observe: ObserveBoardAction
     offset: SearchOffsetAction
-    columns: SearchColumnsAction
     filter: SearchFilter<S, F>
     clear: { (): void }
 }>
@@ -40,13 +38,11 @@ export type SearchFilterValue<S, F> = F &
     }>
 
 export function initSearchFilter<K extends string, S, F>(
-    infra: SearchColumnsInfra,
     initialFilter: SearchFilterValue<S, F>,
     fields: readonly SearchFilterEntry<K>[],
     pin: () => F,
 ): SearchFilterProps<S, F> {
     const offset = initSearchOffsetAction(initialFilter.offset)
-    const columns = initSearchColumnsAction(infra)
     const { observe, observeChecker } = initObserveBoardAction({
         fields: fields.map(([key, _]) => key),
     })
@@ -95,7 +91,6 @@ export function initSearchFilter<K extends string, S, F>(
     return {
         observe,
         offset: offset.input,
-        columns,
         filter,
         clear,
     }

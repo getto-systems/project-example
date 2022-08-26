@@ -3,6 +3,7 @@ import { test, expect } from "vitest"
 import {
     observeApplicationState,
     observeApplicationStateTuple2,
+    observeApplicationStateTuple3,
 } from "../../../z_vendor/getto-application/action/test_helper"
 
 import { ModifyFieldHandler } from "../modify/action"
@@ -26,11 +27,11 @@ test("detected", async () => {
     const { list, item, stack } = detected()
 
     expect(
-        await observeApplicationState(list.focus.state, async () => {
+        await observeApplicationState(list.scroll.state, async () => {
             await list.state.ignitionState
-            return list.focus.state.currentState()
+            return list.scroll.state.currentState()
         }),
-    ).toEqual([{ type: "detect", data: item[0] }])
+    ).toEqual([{ type: "detect" }])
 
     expect(stack).toEqual({
         focus: [item[0]],
@@ -47,7 +48,7 @@ test("detect failed", async () => {
             await list.state.ignitionState
             return list.focus.state.currentState()
         }),
-    ).toEqual([{ type: "detect-failed" }])
+    ).toEqual([{ type: "not-found" }])
 
     expect(stack).toEqual({
         focus: [],
@@ -60,28 +61,34 @@ test("focus / close", async () => {
     const { list, item, stack } = standard()
 
     expect(
-        await observeApplicationState(list.focus.state, async () => {
+        await observeApplicationStateTuple2([list.focus.state, list.scroll.state], async () => {
             await list.state.ignitionState
             const another: Data = { id: 2, name: "another" }
 
-            list.focus.change(item[0])
+            list.focus.change(item[0], { y: 0 })
             expect(list.focus.isFocused(item[0])).toBe(true)
             expect(list.focus.isFocused(another)).toBe(false)
 
-            list.focus.close()
+            list.focus.close({ y: 1 })
             expect(list.focus.isFocused(item[0])).toBe(false)
             expect(list.focus.isFocused(another)).toBe(false)
 
-            list.focus.change(another)
+            list.focus.change(another, { y: 2 })
 
             return list.focus.state.currentState()
         }),
-    ).toEqual([{ type: "change", data: item[0] }, { type: "close" }, { type: "close" }])
+    ).toEqual([
+        [{ type: "focus-change", data: item[0] }, { type: "close" }, { type: "not-found" }],
+        [
+            { type: "focus-change", position: { y: 0 } },
+            { type: "close", position: { y: 1 } },
+        ],
+    ])
 
     expect(stack).toEqual({
         focus: [item[0]],
         update: [],
-        close: [true, true],
+        close: [true],
     })
 })
 
@@ -93,7 +100,7 @@ test("update", async () => {
     expect(
         await observeApplicationStateTuple2([list.state, list.focus.state], async () => {
             await list.state.ignitionState
-            list.focus.change(item[0])
+            list.focus.change(item[0], { y: 0 })
             return list.focus.update(updatedData)
         }),
     ).toEqual([
@@ -104,8 +111,8 @@ test("update", async () => {
             },
         ],
         [
-            { type: "change", data: item[0] },
-            { type: "update", data: updatedData },
+            { type: "focus-change", data: item[0] },
+            { type: "data-update", data: updatedData },
         ],
     ])
 
@@ -120,11 +127,14 @@ test("remove", async () => {
     const { list, item, stack } = standard()
 
     expect(
-        await observeApplicationStateTuple2([list.state, list.focus.state], async () => {
-            await list.state.ignitionState
-            list.focus.change(item[0])
-            return list.focus.remove()
-        }),
+        await observeApplicationStateTuple3(
+            [list.state, list.focus.state, list.scroll.state],
+            async () => {
+                await list.state.ignitionState
+                list.focus.change(item[0], { y: 0 })
+                return list.focus.remove()
+            },
+        ),
     ).toEqual([
         [
             {
@@ -132,13 +142,14 @@ test("remove", async () => {
                 data: { type: "success", response: { list: [item[1]], sort: "id" } },
             },
         ],
-        [{ type: "change", data: item[0] }, { type: "close" }],
+        [{ type: "focus-change", data: item[0] }, { type: "data-remove" }],
+        [{ type: "focus-change", position: { y: 0 } }],
     ])
 
     expect(stack).toEqual({
         focus: [item[0]],
         update: [],
-        close: [true],
+        close: [],
     })
 })
 

@@ -8,7 +8,6 @@ import { checkTakeLongtime } from "../../../../z_lib/ui/timer/helper"
 import { initTextFilterAction, TextFilterAction } from "../../../../z_lib/ui/input/filter/text"
 import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
 import { SearchOffsetAction } from "../../../../z_lib/ui/search/offset/action"
-import { SearchColumnsAction, SearchColumnsInfra } from "../../../../z_lib/ui/search/columns/action"
 import { initSearchFilter } from "../../../../z_lib/ui/search/filter/action"
 import {
     AuthUserGrantedRolesFilterAction,
@@ -41,12 +40,11 @@ import { prepared, preparing } from "../../../../z_lib/ui/prepare/data"
 export interface SearchAuthUserAccountAction {
     readonly state: ApplicationState<SearchAuthUserAccountState>
     readonly list: ListSearchedAuthUserAccountAction
+    readonly offset: SearchOffsetAction
 
     readonly loginId: TextFilterAction
     readonly grantedRoles: AuthUserGrantedRolesFilterAction
     readonly observe: ObserveBoardAction
-    readonly offset: SearchOffsetAction
-    readonly columns: SearchColumnsAction
 
     currentSort(): SearchAuthUserAccountSort
 
@@ -74,8 +72,7 @@ export type SearchAuthUserAccountMaterial = Readonly<{
 
 export type SearchAuthUserAccountInfra = Readonly<{
     searchRemote: SearchAuthUserAccountRemote
-}> &
-    SearchColumnsInfra
+}>
 
 export type SearchAuthUserAccountShell = Readonly<{
     detectFilter: SearchAuthUserAccountFilterDetecter
@@ -98,8 +95,7 @@ export function initSearchAuthUserAccountAction(
     const loginId = initTextFilterAction(initialFilter.loginId)
     const grantedRoles = initAuthUserGrantedRolesFilterAction(initialFilter.grantedRoles)
 
-    const { observe, offset, columns, filter, clear } = initSearchFilter(
-        material.infra,
+    const { observe, offset, filter, clear } = initSearchFilter(
         initialFilter,
         [
             ["loginId", loginId.input],
@@ -133,7 +129,7 @@ export function initSearchAuthUserAccountAction(
 
     list.action.focus.state.subscribe((state) => {
         switch (state.type) {
-            case "change":
+            case "focus-change":
                 material.shell.updateFocus.focus(state.data)
                 break
 
@@ -153,11 +149,10 @@ export function initSearchAuthUserAccountAction(
     return {
         state,
         list: list.action,
+        offset,
 
         loginId: loginId.input,
         grantedRoles: grantedRoles.input,
-        offset,
-        columns,
 
         observe,
 

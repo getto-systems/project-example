@@ -16,25 +16,29 @@ type Props = DetailAuthUserAccountActions &
         search: SearchAuthUserAccountAction
     }>
 export function FocusAuthUserAccount(props: Props): VNode {
-    const focusState = useApplicationState(props.search.list.focus.state)
+    return html`${[container([box_grow({ body: backToListButton() })]), h(Content, {})]}`
 
-    return html`${[container([box_grow({ body: backToListButton() })]), content()]}`
+    function Content(_props: unknown): VNode {
+        const focusState = useApplicationState(props.search.list.focus.state)
+        switch (focusState.type) {
+            case "not-found":
+                return container([
+                    box_grow({ body: notice_gray(["指定されたユーザーが見つかりませんでした"]) }),
+                ])
 
-    function content(): VNode {
-        if (focusState.type === "detect-failed") {
-            return container([
-                box_grow({ body: notice_gray(["指定されたユーザーが見つかりませんでした"]) }),
-            ])
+            case "data-remove":
+                return container([box_grow({ body: notice_gray(["このデータは削除されました"]) })])
+
+            default:
+                return h(DetailAuthUserAccount, props)
         }
-
-        return h(DetailAuthUserAccount, props)
     }
 
     function backToListButton(): VNode {
         return h(BackToListButton, { onClick })
 
         function onClick() {
-            props.search.list.focus.close()
+            props.search.list.focus.close({ y: document.getElementById("sidebar")?.scrollTop || 0 })
         }
     }
 }

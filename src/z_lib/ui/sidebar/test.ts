@@ -1,14 +1,14 @@
 import { test, expect } from "vitest"
-import { observeApplicationState } from "../../../../z_vendor/getto-application/action/test_helper"
+import { observeApplicationState } from "../../../z_vendor/getto-application/action/test_helper"
 
-import { initMemoryDB } from "../../repository/init/memory"
+import { initMemoryDB } from "../repository/init/memory"
 
 import { searchSidebarRepositoryConverter } from "./convert"
-import { convertDB } from "../../repository/init/convert"
+import { convertDB } from "../repository/init/convert"
 
-import { initSearchSidebarAction, SearchSidebarAction } from "./action"
+import { initToggleSidebarAction, ToggleSidebarAction } from "./action"
 
-test("select columns", async () => {
+test("toggle sidebar", async () => {
     const { sidebar } = standard()
 
     expect(
@@ -26,10 +26,10 @@ test("select columns", async () => {
 })
 
 function standard(): Readonly<{
-    sidebar: SearchSidebarAction
+    sidebar: ToggleSidebarAction
 }> {
     return {
-        sidebar: initSearchSidebarAction(
+        sidebar: initToggleSidebarAction(
             {
                 sidebarRepository: standard_sidebarRepository(),
             },

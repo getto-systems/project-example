@@ -13,17 +13,19 @@ import {
 import { emptyTable, takeLongtimeTable } from "../../../../../common/x_preact/design/table"
 
 import { SearchAuthUserAccountAction } from "../action"
+import { SearchColumnsAction, visibleKeys } from "../../../../../z_lib/ui/search/columns/action"
 
 import { SearchAuthUserAccountTableStructure } from "./structure"
 
 type Props = Readonly<{
     search: SearchAuthUserAccountAction
+    columns: SearchColumnsAction
     structure: SearchAuthUserAccountTableStructure
 }>
 export function SearchAuthUserAccountTable(props: Props): VNode {
     const state = useApplicationState(props.search.state)
     const listState = useApplicationState(props.search.list.state)
-    const _columnsState = useApplicationState(props.search.columns.state)
+    const columnsState = useApplicationState(props.columns.state)
 
     if (state.type === "try" && state.hasTakenLongtime) {
         return takeLongtimeTable()
@@ -36,7 +38,10 @@ export function SearchAuthUserAccountTable(props: Props): VNode {
         return emptyTable()
     }
 
-    const params = { summary: {}, visibleKeys: props.search.columns.get() }
+    const params = {
+        summary: {},
+        visibleKeys: visibleKeys(columnsState),
+    }
 
     const sticky = props.structure.sticky()
     return table(sticky, [
