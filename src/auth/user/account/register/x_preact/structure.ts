@@ -77,7 +77,7 @@ export function initRegisteredAuthUserAccountTableStructure(
         const focusState = useApplicationState(register.list.focus.state)
 
         const data = focusedData(focusState)
-        const isFocused = data.isFocused && data.data === props.data
+        const isFocused = focusState.type !== "close" && data.isFocused && data.data === props.data
 
         return html`<a
             href="#"
