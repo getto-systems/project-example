@@ -8,6 +8,7 @@ RUN : && \
   apt-get install -y \
     cmake \
     musl-tools \
+    protobuf-compiler \
   && \
   rustup component add rustfmt && \
   rustup target add x86_64-unknown-linux-musl && \

@@ -3,7 +3,7 @@ from rust:1-bullseye
 copy . /apps
 workdir /apps
 
-run apt-get update && apt-get install -y cmake && \
+run apt-get update && apt-get install -y cmake protobuf-compiler && \
     rustup component add rustfmt && \
     rustup component add llvm-tools-preview && \
     ./api/ci/setup-test.sh /usr/local/bin
