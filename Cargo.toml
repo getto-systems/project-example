@@ -1,6 +1,6 @@
 [package]
 name = "example-api"
-version = "0.47.0-proxy"
+version = "1.2.0-proxy"
 authors = ["shun <shun.fix9@gmail.com>"]
 edition = "2021"
 build = "api/setup/build.rs"
