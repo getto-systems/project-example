@@ -312,7 +312,7 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 
 [[package]]
 name = "aws-cloudfront-cookie"
-version = "0.1.0-proxy"
+version = "1.2.0-proxy"
 dependencies = [
  "base64 0.20.0",
  "digest 0.10.6",
@@ -777,7 +777,7 @@ checksum = "0206175f82b8d6bf6652ff7d71a1e27fd2e4efde587fd368662814d6ec1d9ce0"
 
 [[package]]
 name = "example-api"
-version = "0.47.0-proxy"
+version = "1.2.0-proxy"
 dependencies = [
  "actix-cors",
  "actix-web",
@@ -977,11 +977,11 @@ dependencies = [
 
 [[package]]
 name = "getto-application"
-version = "0.1.0-proxy"
+version = "1.2.0-proxy"
 
 [[package]]
 name = "getto-application-test"
-version = "0.1.0-proxy"
+version = "1.2.0-proxy"
 
 [[package]]
 name = "h2"
