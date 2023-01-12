@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package auth.user.service;
-
-message GrantedAuthRolesPb {
-    repeated string granted_roles = 2;
-}

@@ -1,6 +1,6 @@
-import { toGrantedRoles } from "../../user/account/input/granted_roles/convert"
+import { toGranted } from "../../user/account/input/granted/convert"
 
-import { RepositoryConverter } from "../../../z_lib/ui/repository/infra"
+import { RepositoryConverter } from "../../../common/util/repository/infra"
 import { AuthTicketRepositoryValue } from "./infra"
 
 import { AuthTicket } from "./data"
@@ -11,7 +11,7 @@ export const authTicketRepositoryConverter: RepositoryConverter<
 > = {
     toRepository: (value) => ({
         authAt: value.authAt.toISOString(),
-        grantedRoles: value.grantedRoles,
+        granted: value.granted,
     }),
     fromRepository: (value) => {
         const authAt = new Date(value.authAt)
@@ -22,11 +22,11 @@ export const authTicketRepositoryConverter: RepositoryConverter<
 
         return {
             valid: true,
-            value: markAuthTicket(authAt, value.grantedRoles),
+            value: markAuthTicket(authAt, value.granted),
         }
     },
 }
 
-function markAuthTicket(authAt: Date, roles: readonly string[]): AuthTicket {
-    return { authAt, grantedRoles: toGrantedRoles(roles) } as AuthTicket
+function markAuthTicket(authAt: Date, permissions: readonly string[]): AuthTicket {
+    return { authAt, granted: toGranted(permissions) } as AuthTicket
 }

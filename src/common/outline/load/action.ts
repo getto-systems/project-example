@@ -18,8 +18,8 @@ import {
 import { LoadMenuBadgeRemote, MenuBadgeStore, MenuExpandStore, MenuExpandRepository } from "./infra"
 import { AuthTicketRepository } from "../../../auth/ticket/kernel/infra"
 
-import { RepositoryError } from "../../../z_lib/ui/repository/data"
-import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
+import { RepositoryError } from "../../util/repository/data"
+import { RemoteCommonError } from "../../util/remote/data"
 import { BreadcrumbList, BreadcrumbNode, Menu, MenuCategoryPath, MenuTargetPath } from "./data"
 
 export interface OutlineBreadcrumbListAction {

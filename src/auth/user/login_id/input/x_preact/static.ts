@@ -2,7 +2,7 @@ import { VNode } from "preact"
 
 import { field } from "../../../../../z_vendor/getto-css/preact/design/form"
 
-import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../common/x_preact/vnode"
 
 import { LoginId } from "../../kernel/data"
 import { AUTH_USER_ACCOUNT } from "../../../account/kernel/data"

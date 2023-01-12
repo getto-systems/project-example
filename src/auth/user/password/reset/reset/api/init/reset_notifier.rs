@@ -10,7 +10,7 @@ use crate::x_content::mail::{
 use crate::auth::user::password::reset::reset::infra::ResetPasswordNotifier;
 
 use crate::auth::user::password::reset::{
-    kernel::data::ResetTokenDestination,
+    kernel::data::ResetPasswordTokenDestination,
     reset::data::{NotifyResetPasswordError, NotifyResetPasswordResponse},
 };
 
@@ -28,7 +28,7 @@ impl<'a> EmailResetPasswordNotifier<'a> {
 impl<'a> ResetPasswordNotifier for EmailResetPasswordNotifier<'a> {
     async fn notify(
         &self,
-        destination: ResetTokenDestination,
+        destination: ResetPasswordTokenDestination,
     ) -> Result<NotifyResetPasswordResponse, NotifyResetPasswordError> {
         match destination.into() {
             None => Ok(NotifyResetPasswordResponse::NoDestination),
@@ -79,7 +79,7 @@ pub mod test {
     use crate::auth::user::password::reset::reset::infra::ResetPasswordNotifier;
 
     use crate::auth::user::password::reset::{
-        kernel::data::ResetTokenDestination,
+        kernel::data::ResetPasswordTokenDestination,
         reset::data::{NotifyResetPasswordError, NotifyResetPasswordResponse},
     };
 
@@ -89,7 +89,7 @@ pub mod test {
     impl ResetPasswordNotifier for StaticResetPasswordNotifier {
         async fn notify(
             &self,
-            _destination: ResetTokenDestination,
+            _destination: ResetPasswordTokenDestination,
         ) -> Result<NotifyResetPasswordResponse, NotifyResetPasswordError> {
             Ok(NotifyResetPasswordResponse::Send("message-id".into()))
         }

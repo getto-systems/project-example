@@ -1,50 +1,53 @@
-pub mod token_encoder;
-
 use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
-use crate::auth::ticket::{
-    encode::init::token_encoder::{
-        ApiJwtAuthTokenEncoder, CookieCloudfrontTokenEncoder, TicketJwtAuthTokenEncoder,
-    },
-    kernel::init::{
-        clock::ChronoAuthClock, ticket_repository::dynamodb::DynamoDbAuthTicketRepository,
+use crate::auth::{
+    kernel::init::clock::ChronoAuthClock,
+    ticket::kernel::init::{
+        ticket_repository::dynamodb::DynamoDbAuthTicketRepository,
+        token::{
+            authenticate::encoder::JwtAuthenticateTokenEncoder,
+            authorize::encoder::JwtAuthorizeTokenEncoder,
+            cdn::encoder::AWSCloudfrontCdnTokenEncoder,
+        },
     },
 };
 
-use super::method::{EncodeAuthTicketConfig, EncodeAuthTicketInfra};
+use crate::auth::ticket::encode::method::EncodeAuthTokenInfra;
 
-pub struct EncodeAuthTicketStruct<'a> {
+use crate::auth::ticket::encode::infra::EncodeAuthTokenConfig;
+
+pub struct ActiveEncodeAuthTokenInfra<'a> {
     clock: ChronoAuthClock,
     ticket_repository: DynamoDbAuthTicketRepository<'a>,
-    ticket_encoder: TicketJwtAuthTokenEncoder<'a>,
-    api_encoder: ApiJwtAuthTokenEncoder<'a>,
-    cloudfront_encoder: CookieCloudfrontTokenEncoder<'a>,
-    config: EncodeAuthTicketConfig,
+    authenticate_encoder: JwtAuthenticateTokenEncoder<'a>,
+    authorize_encoder: JwtAuthorizeTokenEncoder<'a>,
+    cdn_encoder: AWSCloudfrontCdnTokenEncoder<'a>,
+    config: EncodeAuthTokenConfig,
 }
 
-impl<'a> EncodeAuthTicketStruct<'a> {
+impl<'a> ActiveEncodeAuthTokenInfra<'a> {
     pub fn new(feature: &'a AuthAppFeature) -> Self {
         Self {
             clock: ChronoAuthClock::new(),
             ticket_repository: DynamoDbAuthTicketRepository::new(&feature.store),
-            ticket_encoder: TicketJwtAuthTokenEncoder::new(&feature.encoding_key.ticket),
-            api_encoder: ApiJwtAuthTokenEncoder::new(&feature.encoding_key.api),
-            cloudfront_encoder: CookieCloudfrontTokenEncoder::new(&feature.cloudfront_key),
-            config: EncodeAuthTicketConfig {
-                ticket_expires: feature.config.ticket_expires,
-                api_expires: feature.config.api_expires,
-                cloudfront_expires: feature.config.cloudfront_expires,
+            authenticate_encoder: JwtAuthenticateTokenEncoder::new(&feature.encoding_key),
+            authorize_encoder: JwtAuthorizeTokenEncoder::new(&feature.encoding_key),
+            cdn_encoder: AWSCloudfrontCdnTokenEncoder::new(&feature.cloudfront_key),
+            config: EncodeAuthTokenConfig {
+                authenticate_expires: feature.config.authenticate_expires,
+                authorize_expires: feature.config.authorize_expires,
+                cdn_expires: feature.config.cdn_expires,
             },
         }
     }
 }
 
-impl<'a> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a> {
+impl<'a> EncodeAuthTokenInfra for ActiveEncodeAuthTokenInfra<'a> {
     type Clock = ChronoAuthClock;
     type TicketRepository = DynamoDbAuthTicketRepository<'a>;
-    type TicketEncoder = TicketJwtAuthTokenEncoder<'a>;
-    type ApiEncoder = ApiJwtAuthTokenEncoder<'a>;
-    type CloudfrontEncoder = CookieCloudfrontTokenEncoder<'a>;
+    type AuthenticateEncoder = JwtAuthenticateTokenEncoder<'a>;
+    type AuthorizeEncoder = JwtAuthorizeTokenEncoder<'a>;
+    type CdnEncoder = AWSCloudfrontCdnTokenEncoder<'a>;
 
     fn clock(&self) -> &Self::Clock {
         &self.clock
@@ -52,47 +55,70 @@ impl<'a> EncodeAuthTicketInfra for EncodeAuthTicketStruct<'a> {
     fn ticket_repository(&self) -> &Self::TicketRepository {
         &self.ticket_repository
     }
-    fn ticket_encoder(&self) -> &Self::TicketEncoder {
-        &self.ticket_encoder
+    fn authenticate_encoder(&self) -> &Self::AuthenticateEncoder {
+        &self.authenticate_encoder
     }
-    fn api_encoder(&self) -> &Self::ApiEncoder {
-        &self.api_encoder
+    fn authorize_encoder(&self) -> &Self::AuthorizeEncoder {
+        &self.authorize_encoder
     }
-    fn cloudfront_encoder(&self) -> &Self::CloudfrontEncoder {
-        &self.cloudfront_encoder
+    fn cdn_encoder(&self) -> &Self::CdnEncoder {
+        &self.cdn_encoder
     }
-    fn config(&self) -> &EncodeAuthTicketConfig {
+    fn config(&self) -> &EncodeAuthTokenConfig {
         &self.config
     }
 }
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::ticket::{
-        encode::init::token_encoder::test::{StaticAuthTokenEncoder, StaticCloudfrontTokenEncoder},
-        kernel::init::{
-            clock::test::StaticChronoAuthClock,
+    use crate::auth::{
+        kernel::init::clock::test::StaticChronoAuthClock,
+        ticket::kernel::init::{
             ticket_repository::memory::MemoryAuthTicketRepository,
+            token::{
+                authenticate::encoder::test::StaticAuthenticateTokenEncoder,
+                authorize::encoder::test::StaticAuthorizeTokenEncoder,
+                cdn::encoder::test::StaticCdnTokenEncoder,
+            },
         },
     };
 
-    use super::super::method::{EncodeAuthTicketConfig, EncodeAuthTicketInfra};
+    use crate::auth::ticket::encode::method::EncodeAuthTokenInfra;
 
-    pub struct StaticEncodeAuthTicketStruct<'a> {
-        pub clock: StaticChronoAuthClock,
-        pub ticket_repository: MemoryAuthTicketRepository<'a>,
-        pub ticket_encoder: StaticAuthTokenEncoder,
-        pub api_encoder: StaticAuthTokenEncoder,
-        pub cloudfront_encoder: StaticCloudfrontTokenEncoder,
-        pub config: EncodeAuthTicketConfig,
+    use crate::auth::ticket::encode::infra::EncodeAuthTokenConfig;
+
+    pub struct StaticEncodeAuthTokenInfra<'a> {
+        clock: StaticChronoAuthClock,
+        ticket_repository: MemoryAuthTicketRepository<'a>,
+        authenticate_encoder: StaticAuthenticateTokenEncoder,
+        authorize_encoder: StaticAuthorizeTokenEncoder,
+        cdn_encoder: StaticCdnTokenEncoder,
+        config: EncodeAuthTokenConfig,
     }
 
-    impl<'a> EncodeAuthTicketInfra for StaticEncodeAuthTicketStruct<'a> {
+    impl<'a> StaticEncodeAuthTokenInfra<'a> {
+        pub fn standard(
+            clock: StaticChronoAuthClock,
+            ticket_repository: MemoryAuthTicketRepository<'a>,
+            config: EncodeAuthTokenConfig,
+        ) -> Self {
+            Self {
+                clock,
+                ticket_repository,
+                authenticate_encoder: StaticAuthenticateTokenEncoder,
+                authorize_encoder: StaticAuthorizeTokenEncoder,
+                cdn_encoder: StaticCdnTokenEncoder,
+                config,
+            }
+        }
+    }
+
+    impl<'a> EncodeAuthTokenInfra for StaticEncodeAuthTokenInfra<'a> {
         type Clock = StaticChronoAuthClock;
         type TicketRepository = MemoryAuthTicketRepository<'a>;
-        type TicketEncoder = StaticAuthTokenEncoder;
-        type ApiEncoder = StaticAuthTokenEncoder;
-        type CloudfrontEncoder = StaticCloudfrontTokenEncoder;
+        type AuthenticateEncoder = StaticAuthenticateTokenEncoder;
+        type AuthorizeEncoder = StaticAuthorizeTokenEncoder;
+        type CdnEncoder = StaticCdnTokenEncoder;
 
         fn clock(&self) -> &Self::Clock {
             &self.clock
@@ -100,16 +126,16 @@ pub mod test {
         fn ticket_repository(&self) -> &Self::TicketRepository {
             &self.ticket_repository
         }
-        fn ticket_encoder(&self) -> &Self::TicketEncoder {
-            &self.ticket_encoder
+        fn authenticate_encoder(&self) -> &Self::AuthenticateEncoder {
+            &self.authenticate_encoder
         }
-        fn api_encoder(&self) -> &Self::ApiEncoder {
-            &self.api_encoder
+        fn authorize_encoder(&self) -> &Self::AuthorizeEncoder {
+            &self.authorize_encoder
         }
-        fn cloudfront_encoder(&self) -> &Self::CloudfrontEncoder {
-            &self.cloudfront_encoder
+        fn cdn_encoder(&self) -> &Self::CdnEncoder {
+            &self.cdn_encoder
         }
-        fn config(&self) -> &EncodeAuthTicketConfig {
+        fn config(&self) -> &EncodeAuthTokenConfig {
             &self.config
         }
     }

@@ -1,4 +1,4 @@
-import { RemoteResult } from "../../../../z_lib/ui/remote/infra"
+import { RemoteResult } from "../../../../common/util/remote/infra"
 
 import { LoginId } from "../../login_id/kernel/data"
 import { ChangePasswordFields, ChangePasswordRemoteError, OverwritePasswordFields } from "./data"

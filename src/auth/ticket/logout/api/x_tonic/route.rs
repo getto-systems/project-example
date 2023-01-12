@@ -6,24 +6,13 @@ use crate::auth::ticket::logout::y_protobuf::service::{
     logout_pb_server::LogoutPb, LogoutRequestPb, LogoutResponsePb,
 };
 
-use crate::x_outside_feature::auth::{
-    feature::{extract_auth_request, AuthTonicRequest},
-    logger::app_logger,
-};
+use crate::x_outside_feature::auth::{feature::AuthTonicRequest, logger::AuthLogger};
 
-use crate::x_content::metadata::metadata_request_id;
+use crate::auth::ticket::logout::init::ActiveLogoutMaterial;
 
-use crate::auth::ticket::logout::init::LogoutStruct;
-
-use crate::z_lib::{logger::infra::Logger, response::tonic::ServiceResponder};
+use crate::common::api::{logger::infra::Logger, response::tonic::ServiceResponder};
 
 pub struct ServiceLogout;
-
-impl ServiceLogout {
-    pub const fn name() -> &'static str {
-        "auth.ticket.logout"
-    }
-}
 
 #[async_trait::async_trait]
 impl LogoutPb for ServiceLogout {
@@ -32,14 +21,16 @@ impl LogoutPb for ServiceLogout {
         request: Request<LogoutRequestPb>,
     ) -> Result<Response<LogoutResponsePb>, Status> {
         let AuthTonicRequest {
-            feature, metadata, ..
-        } = extract_auth_request(request);
-        let request_id = metadata_request_id(&metadata);
+            feature,
+            metadata,
+            request_id,
+            ..
+        } = AuthTonicRequest::from_request(request);
 
-        let logger = app_logger(Self::name(), request_id.into());
-        let mut action = LogoutStruct::action(&feature, &metadata);
+        let mut action = ActiveLogoutMaterial::action(&feature);
+        let logger = AuthLogger::default(&feature, action.info.name(), request_id);
         action.subscribe(move |state| logger.log(state));
 
-        flatten(action.ignite().await).respond_to()
+        flatten(action.ignite(&metadata).await).respond_to()
     }
 }

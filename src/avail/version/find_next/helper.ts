@@ -1,6 +1,6 @@
 import { VersionString } from "../kernel/data"
 import { ApplicationTargetPath, Version } from "./data"
-import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
+import { ConvertLocationResult } from "../../../common/util/location/data"
 
 export function applicationPath(
     version: string,

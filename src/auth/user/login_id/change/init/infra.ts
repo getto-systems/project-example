@@ -1,12 +1,9 @@
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
-
 import { newOverwriteLoginIdRemote } from "./overwrite_remote"
 
-import {  OverwriteLoginIdInfra } from "../action"
+import { OverwriteLoginIdInfra } from "../action"
 
-type OutsideFeature = RemoteOutsideFeature
-export function newOverwritePasswordInfra(feature: OutsideFeature): OverwriteLoginIdInfra {
+export function newOverwritePasswordInfra(): OverwriteLoginIdInfra {
     return {
-        overwriteLoginIdRemote: newOverwriteLoginIdRemote(feature),
+        overwriteLoginIdRemote: newOverwriteLoginIdRemote(),
     }
 }

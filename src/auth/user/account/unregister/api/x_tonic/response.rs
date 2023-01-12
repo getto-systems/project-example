@@ -2,15 +2,14 @@ use tonic::{Response, Status};
 
 use crate::auth::user::account::unregister::y_protobuf::service::UnregisterAuthUserAccountResponsePb;
 
-use crate::z_lib::response::tonic::ServiceResponder;
+use crate::common::api::response::tonic::ServiceResponder;
 
 use super::super::action::{UnregisterAuthUserAccountEvent, UnregisterAuthUserAccountState};
 
 impl ServiceResponder<UnregisterAuthUserAccountResponsePb> for UnregisterAuthUserAccountState {
     fn respond_to(self) -> Result<Response<UnregisterAuthUserAccountResponsePb>, Status> {
         match self {
-            Self::Authenticate(event) => event.respond_to(),
-            Self::PermissionError(err) => err.respond_to(),
+            Self::Authorize(event) => event.respond_to(),
             Self::UnregisterUser(event) => event.respond_to(),
         }
     }

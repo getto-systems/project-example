@@ -1,15 +1,15 @@
-use crate::auth::user::password::reset::token_destination::kernel::y_protobuf::service::ResetTokenDestinationPb;
+use crate::auth::user::password::reset::kernel::y_protobuf::service::ResetTokenDestinationPb;
 
-use crate::auth::user::password::reset::kernel::data::ResetTokenDestination;
+use crate::auth::user::password::reset::kernel::data::ResetPasswordTokenDestination;
 
-impl Into<ResetTokenDestinationPb> for ResetTokenDestination {
+impl Into<ResetTokenDestinationPb> for ResetPasswordTokenDestination {
     fn into(self) -> ResetTokenDestinationPb {
         match self {
-            ResetTokenDestination::None => ResetTokenDestinationPb {
+            ResetPasswordTokenDestination::None => ResetTokenDestinationPb {
                 r#type: "none".into(),
                 ..Default::default()
             },
-            ResetTokenDestination::Email(email) => ResetTokenDestinationPb {
+            ResetPasswordTokenDestination::Email(email) => ResetTokenDestinationPb {
                 r#type: "email".into(),
                 email: email.extract(),
             },

@@ -1,4 +1,4 @@
-import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
+import { RemoteCommonError } from "../../../../common/util/remote/data"
 import { LoginId } from "../../login_id/kernel/data"
 import { Password } from "../input/data"
 

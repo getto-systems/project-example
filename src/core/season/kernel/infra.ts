@@ -1,4 +1,4 @@
-import { FetchRepositoryResult, StoreRepositoryResult } from "../../../z_lib/ui/repository/infra"
+import { FetchRepositoryResult, StoreRepositoryResult } from "../../../common/util/repository/infra"
 import { Season } from "./data"
 
 export interface SeasonRepository {
@@ -15,5 +15,5 @@ export type SeasonRepositoryValue = Readonly<{
         year: number
         period: string
     }>
-    expires: number | Long.Long
+    expires: number
 }>

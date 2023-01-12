@@ -7,16 +7,16 @@ import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/prea
 import { box, container } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { takeLongtimeField, ValidationMessage } from "../../../../../common/x_preact/design/form"
 
-import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../common/x_preact/vnode"
 
 import { LoginIdField } from "../../../login_id/input/x_preact/field"
-import { AuthUserMemoField, AuthUserGrantedRolesField } from "../../input/field/x_preact/input"
+import { AuthUserMemoField, AuthPermissionGrantedField } from "../../input/field/x_preact/input"
 import { ResetTokenDestinationField } from "../../../password/reset/token_destination/input/x_preact/input"
 import { ClearChangesButton } from "../../../../../common/x_preact/button/clear_changes_button"
 import { RegisterButton } from "../../../../../common/x_preact/button/register_button"
 import { RegisterSuccessButton } from "../../../../../common/x_preact/button/register_success_button"
 
-import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
+import { remoteCommonErrorReason } from "../../../../../common/util/remote/x_error/reason"
 
 import { RegisterAuthUserAccountAction } from "../action"
 
@@ -33,7 +33,7 @@ export function RegisterAuthUserAccount(props: Props): VNode {
             body: [
                 h(LoginIdField, { field: props.register.loginId }),
                 h(AuthUserMemoField, { field: props.register.memo }),
-                h(AuthUserGrantedRolesField, { field: props.register.grantedRoles }),
+                h(AuthPermissionGrantedField, { field: props.register.granted }),
                 h(ResetTokenDestinationField, { field: props.register.resetTokenDestination }),
             ],
             footer: h(Footer, {}),

@@ -1,6 +1,6 @@
 use tonic::{Response, Status};
 
-use crate::z_lib::response::tonic::ServiceResponder;
+use crate::common::api::response::tonic::ServiceResponder;
 
 use crate::common::outline::load::y_protobuf::service::{
     LoadMenuBadgeEntryPb, LoadMenuBadgeResponsePb,
@@ -38,7 +38,7 @@ impl Into<LoadMenuBadgeResponsePb> for OutlineMenuBadge {
                 .extract()
                 .into_iter()
                 .map(|(path, count)| LoadMenuBadgeEntryPb {
-                    path: path.to_string(),
+                    path: path.extract(),
                     count: count.extract(),
                 })
                 .collect(),

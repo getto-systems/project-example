@@ -1,32 +1,17 @@
 use crate::{
     auth::user::{
-        account::unregister::data::ValidateUnregisterAuthUserAccountFieldsError,
-        kernel::data::AuthUserId, login_id::kernel::data::LoginId,
+        kernel::data::AuthUserId,
+        login_id::kernel::data::{LoginId, ValidateLoginIdError},
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
-
-pub trait UnregisterAuthUserAccountRequestDecoder {
-    fn decode(self) -> UnregisterAuthUserAccountFieldsExtract;
-}
 
 pub struct UnregisterAuthUserAccountFields {
     pub login_id: LoginId,
 }
 
-pub struct UnregisterAuthUserAccountFieldsExtract {
-    pub login_id: String,
-}
-
-impl UnregisterAuthUserAccountFields {
-    pub fn convert(
-        fields: UnregisterAuthUserAccountFieldsExtract,
-    ) -> Result<Self, ValidateUnregisterAuthUserAccountFieldsError> {
-        Ok(Self {
-            login_id: LoginId::convert(fields.login_id)
-                .map_err(ValidateUnregisterAuthUserAccountFieldsError::InvalidLoginId)?,
-        })
-    }
+pub trait UnregisterAuthUserAccountFieldsExtract {
+    fn convert(self) -> Result<UnregisterAuthUserAccountFields, ValidateLoginIdError>;
 }
 
 #[async_trait::async_trait]

@@ -1,52 +1,14 @@
 use crate::{
     auth::user::{
-        account::{
-            kernel::data::{AuthUserAttributes, AuthUserAttributesExtract},
-            register::data::ValidateRegisterAuthUserAccountFieldsError,
-        },
-        kernel::data::{AuthUserId, GrantedAuthRoles},
+        account::kernel::data::{AuthUserAccount, ValidateAuthUserAccountError},
+        kernel::data::AuthUserId,
         login_id::kernel::data::LoginId,
-        password::reset::kernel::data::{ResetTokenDestination, ResetTokenDestinationExtract},
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
-pub trait RegisterAuthUserAccountRequestDecoder {
-    fn decode(self) -> Option<RegisterAuthUserAccountFieldsExtract>;
-}
-
-pub struct RegisterAuthUserAccountFields {
-    pub login_id: LoginId,
-    pub granted_roles: GrantedAuthRoles,
-    pub reset_token_destination: ResetTokenDestination,
-    pub attrs: AuthUserAttributes,
-}
-
-pub struct RegisterAuthUserAccountFieldsExtract {
-    pub login_id: String,
-    pub granted_roles: Vec<String>,
-    pub reset_token_destination: ResetTokenDestinationExtract,
-    pub attrs: AuthUserAttributesExtract,
-}
-
-impl RegisterAuthUserAccountFields {
-    pub fn convert(
-        fields: Option<RegisterAuthUserAccountFieldsExtract>,
-    ) -> Result<Self, ValidateRegisterAuthUserAccountFieldsError> {
-        let fields = fields.ok_or(ValidateRegisterAuthUserAccountFieldsError::NotFound)?;
-        Ok(Self {
-            login_id: LoginId::convert(fields.login_id)
-                .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidLoginId)?,
-            granted_roles: GrantedAuthRoles::convert(fields.granted_roles)
-                .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidGrantedRoles)?,
-            reset_token_destination: ResetTokenDestination::convert(fields.reset_token_destination)
-                .map_err(
-                    ValidateRegisterAuthUserAccountFieldsError::InvalidResetTokenDestination,
-                )?,
-            attrs: AuthUserAttributes::convert(fields.attrs)
-                .map_err(ValidateRegisterAuthUserAccountFieldsError::InvalidAttrs)?,
-        })
-    }
+pub trait RegisterAuthUserAccountFieldsExtract {
+    fn convert(self) -> Result<AuthUserAccount, ValidateAuthUserAccountError>;
 }
 
 pub trait AuthUserIdGenerator {
@@ -60,6 +22,6 @@ pub trait RegisterAuthUserAccountRepository {
     async fn register_user(
         &self,
         user_id: AuthUserId,
-        data: RegisterAuthUserAccountFields,
+        data: AuthUserAccount,
     ) -> Result<(), RepositoryError>;
 }

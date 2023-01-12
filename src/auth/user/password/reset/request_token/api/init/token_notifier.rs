@@ -1,7 +1,6 @@
 use rusoto_ses::{Body, Content, Destination, Message, SendEmailRequest, Ses, SesClient};
 use url::{ParseError, Url};
 
-use crate::auth::user::password::reset::kernel::data::ResetTokenDestinationExtract;
 use crate::auth::x_outside_feature::feature::AuthOutsideEmail;
 
 use crate::x_content::mail::{
@@ -9,10 +8,10 @@ use crate::x_content::mail::{
     SENDER_ADDRESS,
 };
 
-use crate::auth::user::password::reset::request_token::infra::ResetTokenNotifier;
+use crate::auth::user::password::reset::request_token::infra::ResetPasswordTokenNotifier;
 
 use crate::auth::user::password::reset::{
-    kernel::data::{ResetTokenDestination, ResetTokenEncoded},
+    kernel::data::{ResetPasswordToken, ResetPasswordTokenDestination},
     request_token::data::{NotifyResetTokenError, NotifyResetTokenResponse},
 };
 
@@ -31,11 +30,11 @@ impl<'a> EmailResetTokenNotifier<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> ResetTokenNotifier for EmailResetTokenNotifier<'a> {
+impl<'a> ResetPasswordTokenNotifier for EmailResetTokenNotifier<'a> {
     async fn notify(
         &self,
-        destination: ResetTokenDestination,
-        token: ResetTokenEncoded,
+        destination: ResetPasswordTokenDestination,
+        token: ResetPasswordToken,
     ) -> Result<NotifyResetTokenResponse, NotifyResetTokenError> {
         match destination.into() {
             None => Err(NotifyResetTokenError::NoDestination),
@@ -63,14 +62,14 @@ impl<'a> ResetTokenNotifier for EmailResetTokenNotifier<'a> {
     }
 }
 
-impl Into<Option<Destination>> for ResetTokenDestination {
+impl Into<Option<Destination>> for ResetPasswordTokenDestination {
     fn into(self) -> Option<Destination> {
-        match self.extract() {
-            ResetTokenDestinationExtract::None => None,
-            ResetTokenDestinationExtract::Email(email) => Some(Destination {
+        match self {
+            Self::None => None,
+            Self::Email(email) => Some(Destination {
                 bcc_addresses: None,
                 cc_addresses: None,
-                to_addresses: Some(vec![email]),
+                to_addresses: Some(vec![email.extract()]),
             }),
         }
     }
@@ -78,7 +77,7 @@ impl Into<Option<Destination>> for ResetTokenDestination {
 
 fn build_message(
     reset_password_url: &str,
-    token: ResetTokenEncoded,
+    token: ResetPasswordToken,
 ) -> Result<Message, ParseError> {
     let url = build_url(reset_password_url, token)?;
 
@@ -93,13 +92,13 @@ fn build_message(
         },
     })
 }
-fn build_url(reset_password_url: &str, token: ResetTokenEncoded) -> Result<Url, ParseError> {
+fn build_url(reset_password_url: &str, token: ResetPasswordToken) -> Result<Url, ParseError> {
     // path と query を組み立てる; ホスト名は使用されない
     let mut target = Url::parse("http://localhost/index.html")?;
     target
         .query_pairs_mut()
         .append_pair("-password-reset", "reset")
-        .append_pair("-password-reset-token", token.as_str());
+        .append_pair("-password-reset-token", token.extract().as_str());
     let target = format!("{}?{}", target.path(), target.query().unwrap_or(""));
 
     let mut url = Url::parse(reset_password_url)?;
@@ -116,21 +115,21 @@ fn utf8_content(data: String) -> Content {
 
 #[cfg(test)]
 pub mod test {
-    use crate::auth::user::password::reset::request_token::infra::ResetTokenNotifier;
+    use crate::auth::user::password::reset::request_token::infra::ResetPasswordTokenNotifier;
 
     use crate::auth::user::password::reset::{
-        kernel::data::{ResetTokenDestination, ResetTokenEncoded},
+        kernel::data::{ResetPasswordToken, ResetPasswordTokenDestination},
         request_token::data::{NotifyResetTokenError, NotifyResetTokenResponse},
     };
 
     pub struct StaticResetTokenNotifier;
 
     #[async_trait::async_trait]
-    impl ResetTokenNotifier for StaticResetTokenNotifier {
+    impl ResetPasswordTokenNotifier for StaticResetTokenNotifier {
         async fn notify(
             &self,
-            _destination: ResetTokenDestination,
-            _token: ResetTokenEncoded,
+            _destination: ResetPasswordTokenDestination,
+            _token: ResetPasswordToken,
         ) -> Result<NotifyResetTokenResponse, NotifyResetTokenError> {
             Ok(NotifyResetTokenResponse::new("message-id".into()))
         }

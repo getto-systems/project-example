@@ -1,9 +1,9 @@
-import { RemoteResult } from "../../../../z_lib/ui/remote/infra"
+import { RemoteResult } from "../../../../common/util/remote/infra"
 
-import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
+import { RemoteCommonError } from "../../../../common/util/remote/data"
 import { SearchAuthUserAccountFilter, SearchAuthUserAccountRemoteResponse } from "./data"
 import { AuthUserAccount } from "../kernel/data"
-import { DetectFocusListKeyResult } from "../../../../z_lib/ui/list/data"
+import { DetectFocusListKeyResult } from "../../../../common/util/list/data"
 
 export interface SearchAuthUserAccountFilterDetecter {
     (): SearchAuthUserAccountFilter

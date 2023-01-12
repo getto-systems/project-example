@@ -4,18 +4,19 @@ mod user;
 
 use std::collections::HashMap;
 
+use crate::auth::ticket::authorize::infra::ClarifyAuthorizeTokenAuthUserRepository;
 use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
 use crate::auth::user::kernel::init::user_repository::dynamodb::{
     login_id::TableLoginId, reset_token::TableResetToken, user::TableUser,
 };
 
-use crate::z_lib::search::helper::{clip_search, sort_normal, sort_search, SearchClip};
+use crate::common::api::search::helper::{clip_search, sort_normal, sort_search};
 
 use crate::auth::user::{
     account::{
-        modify::infra::{ModifyAuthUserAccountChanges, ModifyAuthUserAccountRepository},
-        register::infra::{RegisterAuthUserAccountFields, RegisterAuthUserAccountRepository},
+        modify::infra::ModifyAuthUserAccountRepository,
+        register::infra::RegisterAuthUserAccountRepository,
         search::infra::SearchAuthUserAccountRepository,
         unregister::infra::UnregisterAuthUserAccountRepository,
     },
@@ -25,8 +26,8 @@ use crate::auth::user::{
         change::infra::{ChangePasswordRepository, OverwritePasswordRepository},
         kernel::infra::HashedPassword,
         reset::{
-            request_token::infra::RegisterResetTokenRepository,
-            reset::infra::{ResetPasswordRepository, ResetTokenMoment},
+            request_token::infra::RegisterResetPasswordTokenRepository,
+            reset::infra::{ResetPasswordRepository, ResetPasswordTokenMoment},
             token_destination::change::infra::ChangeResetTokenDestinationRepository,
         },
     },
@@ -34,21 +35,22 @@ use crate::auth::user::{
 
 use crate::{
     auth::{
-        ticket::kernel::data::{AuthDateTime, ExpireDateTime},
+        kernel::data::{AuthDateTime, ExpireDateTime},
+        ticket::kernel::data::AuthPermissionGranted,
         user::{
             account::{
-                kernel::data::AuthUserAccount,
+                kernel::data::{AuthUserAccount, AuthUserAccountAttrs, AuthUserMemo},
                 search::data::{
                     AuthUserAccountSearch, SearchAuthUserAccountFilter,
                     SearchAuthUserAccountSortKey,
                 },
             },
-            kernel::data::{AuthUserId, GrantedAuthRoles},
+            kernel::data::AuthUserId,
             login_id::kernel::data::LoginId,
-            password::reset::kernel::data::{ResetToken, ResetTokenDestination},
+            password::reset::kernel::data::{ResetPasswordId, ResetPasswordTokenDestination},
         },
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::{repository::data::RepositoryError, search::data::SearchLimit},
 };
 
 pub struct DynamoDbAuthUserRepository<'a> {
@@ -68,21 +70,29 @@ impl<'a> DynamoDbAuthUserRepository<'a> {
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthenticatePasswordRepository for DynamoDbAuthUserRepository<'a> {
-    async fn lookup_user_id(
-        &self,
-        login_id: &LoginId,
-    ) -> Result<Option<AuthUserId>, RepositoryError> {
-        self.login_id.get_user_id(login_id.clone()).await
-    }
-
-    async fn lookup_user(
+impl<'a> ClarifyAuthorizeTokenAuthUserRepository for DynamoDbAuthUserRepository<'a> {
+    async fn lookup_permission_granted(
         &self,
         user_id: &AuthUserId,
-    ) -> Result<Option<(HashedPassword, Option<GrantedAuthRoles>)>, RepositoryError> {
-        self.user
-            .get_password_and_granted_roles(user_id.clone())
-            .await
+    ) -> Result<Option<AuthPermissionGranted>, RepositoryError> {
+        self.user.get_granted(user_id.clone()).await
+    }
+}
+
+#[async_trait::async_trait]
+impl<'a> AuthenticatePasswordRepository for DynamoDbAuthUserRepository<'a> {
+    async fn lookup_user(
+        &self,
+        login_id: &LoginId,
+    ) -> Result<Option<(AuthUserId, HashedPassword, Option<AuthPermissionGranted>)>, RepositoryError>
+    {
+        match self.login_id.get_user_id(login_id.clone()).await? {
+            None => Ok(None),
+            Some(user_id) => match self.user.get_password_and_granted(user_id.clone()).await? {
+                None => Ok(None),
+                Some((password, granted)) => Ok(Some((user_id, password, granted))),
+            },
+        }
     }
 }
 
@@ -166,14 +176,14 @@ impl<'a> RegisterAuthUserAccountRepository for DynamoDbAuthUserRepository<'a> {
     async fn register_user(
         &self,
         user_id: AuthUserId,
-        fields: RegisterAuthUserAccountFields,
+        fields: AuthUserAccount,
     ) -> Result<(), RepositoryError> {
         self.user
             .put_new_entry(
                 user_id.clone(),
                 fields.login_id.clone(),
-                fields.granted_roles,
-                fields.attrs,
+                fields.attrs.granted,
+                fields.attrs.memo,
             )
             .await?;
 
@@ -206,19 +216,19 @@ impl<'a> ModifyAuthUserAccountRepository for DynamoDbAuthUserRepository<'a> {
         self.login_id.get_user_id(login_id.clone()).await
     }
 
-    async fn lookup_changes(
+    async fn lookup_attrs(
         &self,
         user_id: &AuthUserId,
-    ) -> Result<Option<ModifyAuthUserAccountChanges>, RepositoryError> {
-        self.user.get_modify_changes(user_id.clone()).await
+    ) -> Result<Option<AuthUserAccountAttrs>, RepositoryError> {
+        self.user.get_attrs(user_id.clone()).await
     }
 
     async fn modify_user(
         &self,
         user_id: AuthUserId,
-        changes: ModifyAuthUserAccountChanges,
+        attrs: AuthUserAccountAttrs,
     ) -> Result<(), RepositoryError> {
-        self.user.update_user(user_id, changes).await
+        self.user.update_user(user_id, attrs).await
     }
 }
 
@@ -257,7 +267,7 @@ impl<'a> ChangeResetTokenDestinationRepository for DynamoDbAuthUserRepository<'a
     async fn lookup_destination(
         &self,
         login_id: &LoginId,
-    ) -> Result<Option<ResetTokenDestination>, RepositoryError> {
+    ) -> Result<Option<ResetPasswordTokenDestination>, RepositoryError> {
         self.login_id
             .get_reset_token_destination(login_id.clone())
             .await
@@ -266,7 +276,7 @@ impl<'a> ChangeResetTokenDestinationRepository for DynamoDbAuthUserRepository<'a
     async fn change_destination(
         &self,
         login_id: LoginId,
-        new_destination: ResetTokenDestination,
+        new_destination: ResetPasswordTokenDestination,
     ) -> Result<(), RepositoryError> {
         self.login_id
             .update_reset_token_destination(login_id, new_destination)
@@ -275,20 +285,20 @@ impl<'a> ChangeResetTokenDestinationRepository for DynamoDbAuthUserRepository<'a
 }
 
 #[async_trait::async_trait]
-impl<'a> RegisterResetTokenRepository for DynamoDbAuthUserRepository<'a> {
+impl<'a> RegisterResetPasswordTokenRepository for DynamoDbAuthUserRepository<'a> {
     async fn lookup_user(
         &self,
         login_id: &LoginId,
-    ) -> Result<Option<(AuthUserId, Option<ResetTokenDestination>)>, RepositoryError> {
+    ) -> Result<Option<(AuthUserId, Option<ResetPasswordTokenDestination>)>, RepositoryError> {
         self.login_id.get_reset_token_entry(login_id.clone()).await
     }
 
     async fn register_reset_token(
         &self,
-        reset_token: ResetToken,
+        reset_token: ResetPasswordId,
         user_id: AuthUserId,
         login_id: LoginId,
-        destination: ResetTokenDestination,
+        destination: ResetPasswordTokenDestination,
         expires: ExpireDateTime,
         requested_at: AuthDateTime,
     ) -> Result<(), RepositoryError> {
@@ -309,9 +319,14 @@ impl<'a> RegisterResetTokenRepository for DynamoDbAuthUserRepository<'a> {
 impl<'a> ResetPasswordRepository for DynamoDbAuthUserRepository<'a> {
     async fn lookup_reset_token_entry(
         &self,
-        reset_token: &ResetToken,
+        reset_token: &ResetPasswordId,
     ) -> Result<
-        Option<(AuthUserId, LoginId, ResetTokenDestination, ResetTokenMoment)>,
+        Option<(
+            AuthUserId,
+            LoginId,
+            ResetPasswordTokenDestination,
+            ResetPasswordTokenMoment,
+        )>,
         RepositoryError,
     > {
         self.reset_token
@@ -319,17 +334,17 @@ impl<'a> ResetPasswordRepository for DynamoDbAuthUserRepository<'a> {
             .await
     }
 
-    async fn lookup_granted_roles(
+    async fn lookup_permission_granted(
         &self,
         user_id: &AuthUserId,
-    ) -> Result<Option<Option<GrantedAuthRoles>>, RepositoryError> {
-        self.user.get_granted_roles(user_id.clone()).await
+    ) -> Result<Option<AuthPermissionGranted>, RepositoryError> {
+        self.user.get_granted(user_id.clone()).await
     }
 
     async fn reset_password(
         &self,
         user_id: AuthUserId,
-        reset_token: ResetToken,
+        reset_token: ResetPasswordId,
         new_password: HashedPassword,
         reset_at: AuthDateTime,
     ) -> Result<(), RepositoryError> {
@@ -339,7 +354,7 @@ impl<'a> ResetPasswordRepository for DynamoDbAuthUserRepository<'a> {
 async fn reset_password<'a>(
     repository: &DynamoDbAuthUserRepository<'a>,
     user_id: AuthUserId,
-    reset_token: ResetToken,
+    reset_token: ResetPasswordId,
     new_password: HashedPassword,
     reset_at: AuthDateTime,
 ) -> Result<(), RepositoryError> {
@@ -371,7 +386,7 @@ async fn search_user_account<'a>(
 ) -> Result<AuthUserAccountSearch, RepositoryError> {
     // 業務用アプリケーションなので、ユーザー数は 100を超えない
     // dynamodb から全てのデータを取得してフィルタ、ソートする
-    let mut destinations: HashMap<LoginId, ResetTokenDestination> = repository
+    let mut destinations: HashMap<LoginId, ResetPasswordTokenDestination> = repository
         .login_id
         .scan_reset_token_destination()
         .await?
@@ -386,16 +401,18 @@ async fn search_user_account<'a>(
         .scan_user()
         .await?
         .into_iter()
-        .filter(|(login_id, granted_roles, _)| {
-            filter.match_login_id(login_id) && filter.match_granted_roles(granted_roles)
+        .filter(|(login_id, granted, _)| {
+            filter.props.match_login_id(login_id) && filter.props.match_granted(granted)
         })
-        .map(|(login_id, granted_roles, attrs)| {
+        .map(|(login_id, granted, memo)| {
             let destination = destinations.remove(&login_id);
             AuthUserAccount {
                 login_id,
-                granted_roles: granted_roles.unwrap_or(GrantedAuthRoles::empty()),
-                reset_token_destination: destination.unwrap_or(ResetTokenDestination::None),
-                attrs,
+                attrs: AuthUserAccountAttrs {
+                    granted: granted.unwrap_or_default(),
+                    memo: memo.unwrap_or(AuthUserMemo::empty()),
+                },
+                reset_token_destination: destination.unwrap_or(ResetPasswordTokenDestination::None),
             }
         })
         .collect();
@@ -403,22 +420,20 @@ async fn search_user_account<'a>(
     let (users, page) = clip_search(
         sort_search(
             users,
-            |user| match filter.sort().key() {
+            |user| match filter.sort.key {
                 SearchAuthUserAccountSortKey::LoginId => user.login_id.clone(),
             },
-            match filter.sort().key() {
+            match filter.sort.key {
                 SearchAuthUserAccountSortKey::LoginId => sort_normal,
-            }(filter.sort().order()),
+            }(filter.sort.order),
         ),
-        SearchClip {
-            limit: 1000,
-            offset: filter.offset(),
-        },
+        filter.offset,
+        SearchLimit::default(),
     )?;
 
     Ok(AuthUserAccountSearch {
         page,
-        sort: filter.into_sort(),
+        sort: filter.sort,
         users,
     })
 }

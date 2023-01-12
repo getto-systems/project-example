@@ -7,21 +7,21 @@ import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/prea
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { takeLongtimeField, ValidationMessage } from "../../../../../common/x_preact/design/form"
 
-import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../common/x_preact/vnode"
 
 import { StaticLoginIdField } from "../../../login_id/input/x_preact/static"
-import { AuthUserMemoField, AuthUserGrantedRolesField } from "../../input/field/x_preact/input"
+import { AuthUserMemoField, AuthPermissionGrantedField } from "../../input/field/x_preact/input"
 import { EditButton } from "../../../../../common/x_preact/button/edit_button"
 import { EditSuccessButton } from "../../../../../common/x_preact/button/edit_success_button"
 import { ResetButton } from "../../../../../common/x_preact/button/reset_button"
 import { CloseButton } from "../../../../../common/x_preact/button/close_button"
 import { ChangeButton } from "../../../../../common/x_preact/button/change_button"
 
-import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
+import { remoteCommonErrorReason } from "../../../../../common/util/remote/x_error/reason"
 
 import { ModifyAuthUserAccountAction } from "../action"
 import { ApplicationState } from "../../../../../z_vendor/getto-application/action/action"
-import { FocusState } from "../../../../../z_lib/ui/list/action"
+import { FocusState } from "../../../../../common/util/list/action"
 
 import { ModifyAuthUserAccountError } from "../data"
 import { AuthUserAccount } from "../../kernel/data"
@@ -47,7 +47,7 @@ export function ModifyAuthUserAccount(props: Props): VNode {
         body: [
             h(StaticLoginIdField, { data: edit.data }),
             h(AuthUserMemoField, { edit, field: props.modify.memo }),
-            h(AuthUserGrantedRolesField, { edit, field: props.modify.grantedRoles }),
+            h(AuthPermissionGrantedField, { edit, field: props.modify.granted }),
         ],
         footer: h(Footer, {}),
     })

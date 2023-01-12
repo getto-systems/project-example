@@ -2,22 +2,18 @@ use actix_web::{delete, web::Data, HttpRequest, Responder};
 
 use getto_application::helper::flatten;
 
-use crate::x_outside_feature::proxy::{
-    feature::ProxyAppFeature,
-    logger::{app_logger, generate_request_id},
-};
+use crate::x_outside_feature::proxy::{feature::ProxyAppFeature, logger::ProxyLogger};
 
-use crate::auth::ticket::logout::proxy::init::LogoutProxyStruct;
+use crate::auth::ticket::logout::proxy::init::ActiveLogoutProxyMaterial;
 
-use crate::z_lib::{logger::infra::Logger, response::actix_web::ProxyResponder};
+use crate::common::api::{logger::infra::Logger, response::actix_web::ProxyResponder};
 
 #[delete("")]
 async fn service_logout(feature: Data<ProxyAppFeature>, request: HttpRequest) -> impl Responder {
-    let request_id = generate_request_id();
-    let logger = app_logger(request_id.clone(), &request);
+    let (request_id, logger) = ProxyLogger::default(&feature, &request);
 
-    let mut action = LogoutProxyStruct::action(&feature.auth, &request_id, &request);
+    let mut action = ActiveLogoutProxyMaterial::action(&feature, request_id);
     action.subscribe(move |state| logger.log(state));
 
-    flatten(action.ignite().await).respond_to()
+    flatten(action.ignite(&request).await).respond_to()
 }

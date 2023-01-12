@@ -6,8 +6,8 @@ import {
 import { AuthTicketRepository } from "../kernel/infra"
 import { LogoutRemote } from "./infra"
 
-import { RepositoryError } from "../../../z_lib/ui/repository/data"
-import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
+import { RepositoryError } from "../../../common/util/repository/data"
+import { RemoteCommonError } from "../../../common/util/remote/data"
 
 export interface LogoutAction {
     readonly state: ApplicationState<LogoutState>

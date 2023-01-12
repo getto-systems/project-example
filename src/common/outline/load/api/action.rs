@@ -1,12 +1,14 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
+use crate::auth::method::proxy::{authorize, AuthorizeEvent, AuthorizeInfra};
+
+use crate::common::outline::load::infra::OutlineMenuBadgeRepository;
+
+use crate::common::proxy::action::CoreProxyParams;
 use crate::{
-    auth::{
-        data::RequireAuthRoles,
-        method::{authorize, AuthorizeEvent, AuthorizeInfra},
-    },
-    common::outline::load::{data::OutlineMenuBadge, infra::OutlineMenuBadgeRepository},
-    z_lib::repository::data::RepositoryError,
+    auth::data::{AuthPermissionRequired, AuthorizeTokenExtract},
+    common::api::repository::data::RepositoryError,
+    common::outline::load::data::OutlineMenuBadge,
 };
 
 pub enum LoadOutlineMenuBadgeState {
@@ -32,13 +34,31 @@ pub trait LoadOutlineMenuBadgeMaterial {
 }
 
 pub struct LoadOutlineMenuBadgeAction<M: LoadOutlineMenuBadgeMaterial> {
+    pub info: LoadOutlineMenuBadgeActionInfo,
     pubsub: ActionStatePubSub<LoadOutlineMenuBadgeState>,
     material: M,
+}
+
+pub struct LoadOutlineMenuBadgeActionInfo;
+
+impl LoadOutlineMenuBadgeActionInfo {
+    pub const fn name(&self) -> &'static str {
+        "common.outline.load"
+    }
+
+    pub fn required(&self) -> AuthPermissionRequired {
+        AuthPermissionRequired::Nothing
+    }
+
+    pub fn params(&self) -> CoreProxyParams {
+        (self.name(), self.required())
+    }
 }
 
 impl<M: LoadOutlineMenuBadgeMaterial> LoadOutlineMenuBadgeAction<M> {
     pub fn with_material(material: M) -> Self {
         Self {
+            info: LoadOutlineMenuBadgeActionInfo,
             pubsub: ActionStatePubSub::new(),
             material,
         }
@@ -51,17 +71,23 @@ impl<M: LoadOutlineMenuBadgeMaterial> LoadOutlineMenuBadgeAction<M> {
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<LoadOutlineMenuBadgeState> {
-        let pubsub = self.pubsub;
-        let m = self.material;
-
-        authorize(m.authorize(), RequireAuthRoles::Nothing, |event| {
-            pubsub.post(LoadOutlineMenuBadgeState::Authorize(event))
-        })
+    pub async fn ignite(
+        self,
+        token: impl AuthorizeTokenExtract,
+    ) -> MethodResult<LoadOutlineMenuBadgeState> {
+        authorize(
+            self.material.authorize(),
+            (token, self.info.required()),
+            |event| {
+                self.pubsub
+                    .post(LoadOutlineMenuBadgeState::Authorize(event))
+            },
+        )
         .await?;
 
-        load_menu_badge(&m, |event| {
-            pubsub.post(LoadOutlineMenuBadgeState::LoadMenuBadge(event))
+        load_menu_badge(&self.material, |event| {
+            self.pubsub
+                .post(LoadOutlineMenuBadgeState::LoadMenuBadge(event))
         })
         .await
     }
@@ -88,9 +114,8 @@ async fn load_menu_badge<S>(
     infra: &impl LoadOutlineMenuBadgeMaterial,
     post: impl Fn(LoadOutlineMenuBadgeEvent) -> S,
 ) -> MethodResult<S> {
-    let menu_badge_repository = infra.menu_badge_repository();
-
-    let menu_badge = menu_badge_repository
+    let menu_badge = infra
+        .menu_badge_repository()
         .load_menu_badge()
         .await
         .map_err(|err| post(LoadOutlineMenuBadgeEvent::RepositoryError(err)))?;

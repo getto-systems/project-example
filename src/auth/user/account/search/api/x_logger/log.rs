@@ -2,7 +2,7 @@ use crate::auth::user::account::search::action::{
     SearchAuthUserAccountEvent, SearchAuthUserAccountState,
 };
 
-use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
+use crate::common::api::logger::infra::{LogFilter, LogLevel, LogMessage};
 
 impl LogMessage for SearchAuthUserAccountState {
     fn log_message(&self) -> String {
@@ -13,8 +13,7 @@ impl LogMessage for SearchAuthUserAccountState {
 impl LogFilter for SearchAuthUserAccountState {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Authenticate(event) => event.log_level(),
-            Self::PermissionError(err) => err.log_level(),
+            Self::Authorize(event) => event.log_level(),
             Self::Search(event) => event.log_level(),
         }
     }

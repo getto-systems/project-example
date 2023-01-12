@@ -1,5 +1,4 @@
-import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/feature"
-import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
+import { RepositoryOutsideFeature } from "../../../util/repository/feature"
 
 import { newAuthTicketRepository } from "../../../../auth/ticket/kernel/init/ticket_repository"
 import { newMenuExpandRepository } from "./menu_expand_repository"
@@ -10,14 +9,14 @@ import { OutlineMenuInfra } from "../action"
 
 import { MenuContent } from "../infra"
 
-type OutsideFeature = RepositoryOutsideFeature & RemoteOutsideFeature
+type OutsideFeature = RepositoryOutsideFeature
 export function newOutlineMenuInfra(
     feature: OutsideFeature,
     menuContent: MenuContent,
 ): OutlineMenuInfra {
     return {
         loadMenuBadgeRemote: menuContent.loadMenuBadge
-            ? newLoadMenuBadgeRemote(feature)
+            ? newLoadMenuBadgeRemote()
             : async () => ({ success: true, value: new Map() }),
         ticketRepository: newAuthTicketRepository(feature),
         menuExpandRepository: newMenuExpandRepository(feature, menuContent),

@@ -1,76 +1,73 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::ticket::validate::method::{
-    validate_auth_nonce, ValidateAuthNonceEvent, ValidateAuthNonceInfra,
-};
-
 use crate::auth::{
-    ticket::kernel::infra::AuthClock,
+    kernel::infra::AuthClock,
     user::password::reset::request_token::infra::{
-        RegisterResetTokenRepository, RequestResetTokenConfig, RequestResetTokenFields,
-        RequestResetTokenFieldsExtract, RequestResetTokenRequestDecoder, ResetTokenEncoder,
-        ResetTokenGenerator, ResetTokenNotifier,
+        RegisterResetPasswordTokenRepository, RequestResetPasswordTokenConfig,
+        RequestResetPasswordTokenFieldsExtract, ResetPasswordIdGenerator,
+        ResetPasswordTokenEncoder, ResetPasswordTokenNotifier,
     },
 };
 
 use crate::{
     auth::{
-        ticket::kernel::data::ExpireDateTime,
-        user::password::reset::request_token::data::{
-            EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
-            ValidateRequestResetTokenFieldsError,
+        kernel::data::ExpireDateTime,
+        user::{
+            login_id::kernel::data::ValidateLoginIdError,
+            password::reset::request_token::data::{
+                EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
+            },
         },
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
 pub enum RequestResetTokenState {
-    ValidateNonce(ValidateAuthNonceEvent),
     RequestToken(RequestResetTokenEvent),
 }
 
 impl std::fmt::Display for RequestResetTokenState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::ValidateNonce(event) => event.fmt(f),
             Self::RequestToken(event) => event.fmt(f),
         }
     }
 }
 
 pub trait RequestResetTokenMaterial {
-    type ValidateNonce: ValidateAuthNonceInfra;
-
     type Clock: AuthClock;
-    type ResetTokenRepository: RegisterResetTokenRepository;
-    type TokenGenerator: ResetTokenGenerator;
-    type TokenEncoder: ResetTokenEncoder;
-    type TokenNotifier: ResetTokenNotifier;
-
-    fn validate_nonce(&self) -> &Self::ValidateNonce;
+    type ResetTokenRepository: RegisterResetPasswordTokenRepository;
+    type IdGenerator: ResetPasswordIdGenerator;
+    type TokenEncoder: ResetPasswordTokenEncoder;
+    type TokenNotifier: ResetPasswordTokenNotifier;
 
     fn clock(&self) -> &Self::Clock;
     fn reset_token_repository(&self) -> &Self::ResetTokenRepository;
-    fn token_generator(&self) -> &Self::TokenGenerator;
+    fn id_generator(&self) -> &Self::IdGenerator;
     fn token_encoder(&self) -> &Self::TokenEncoder;
     fn token_notifier(&self) -> &Self::TokenNotifier;
-    fn config(&self) -> &RequestResetTokenConfig;
+    fn config(&self) -> &RequestResetPasswordTokenConfig;
 }
 
-pub struct RequestResetTokenAction<R: RequestResetTokenRequestDecoder, M: RequestResetTokenMaterial>
-{
+pub struct RequestResetTokenAction<M: RequestResetTokenMaterial> {
+    pub info: RequestResetTokenActionInfo,
     pubsub: ActionStatePubSub<RequestResetTokenState>,
-    request_decoder: R,
     material: M,
 }
 
-impl<R: RequestResetTokenRequestDecoder, M: RequestResetTokenMaterial>
-    RequestResetTokenAction<R, M>
-{
-    pub fn with_material(request_decoder: R, material: M) -> Self {
+pub struct RequestResetTokenActionInfo;
+
+impl RequestResetTokenActionInfo {
+    pub const fn name(&self) -> &'static str {
+        "auth.user.password.reset.request-token"
+    }
+}
+
+impl<M: RequestResetTokenMaterial> RequestResetTokenAction<M> {
+    pub fn with_material(material: M) -> Self {
         Self {
+            info: RequestResetTokenActionInfo,
             pubsub: ActionStatePubSub::new(),
-            request_decoder,
             material,
         }
     }
@@ -79,19 +76,13 @@ impl<R: RequestResetTokenRequestDecoder, M: RequestResetTokenMaterial>
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<RequestResetTokenState> {
-        let pubsub = self.pubsub;
-        let m = self.material;
-
-        let fields = self.request_decoder.decode();
-
-        validate_auth_nonce(m.validate_nonce(), |event| {
-            pubsub.post(RequestResetTokenState::ValidateNonce(event))
-        })
-        .await?;
-
-        request_reset_token(&m, fields, |event| {
-            pubsub.post(RequestResetTokenState::RequestToken(event))
+    pub async fn ignite(
+        self,
+        fields: impl RequestResetPasswordTokenFieldsExtract,
+    ) -> MethodResult<RequestResetTokenState> {
+        request_reset_token(&self.material, fields, |event| {
+            self.pubsub
+                .post(RequestResetTokenState::RequestToken(event))
         })
         .await
     }
@@ -101,15 +92,15 @@ pub enum RequestResetTokenEvent {
     TokenExpiresCalculated(ExpireDateTime),
     TokenNotified(NotifyResetTokenResponse),
     Success,
-    Invalid(ValidateRequestResetTokenFieldsError),
+    Invalid(ValidateLoginIdError),
     NotFound,
     RepositoryError(RepositoryError),
     EncodeError(EncodeResetTokenError),
     NotifyError(NotifyResetTokenError),
 }
 
-const SUCCESS: &'static str = "request reset token success";
-const ERROR: &'static str = "request reset token error";
+const SUCCESS: &'static str = "request reset-token success";
+const ERROR: &'static str = "request reset-token error";
 
 impl std::fmt::Display for RequestResetTokenEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -132,19 +123,15 @@ impl std::fmt::Display for RequestResetTokenEvent {
 
 async fn request_reset_token<S>(
     infra: &impl RequestResetTokenMaterial,
-    fields: RequestResetTokenFieldsExtract,
+    fields: impl RequestResetPasswordTokenFieldsExtract,
     post: impl Fn(RequestResetTokenEvent) -> S,
 ) -> MethodResult<S> {
-    let fields = RequestResetTokenFields::convert(fields)
+    let fields = fields
+        .convert()
         .map_err(|err| post(RequestResetTokenEvent::Invalid(err)))?;
 
-    let reset_token_repository = infra.reset_token_repository();
-    let token_generator = infra.token_generator();
-    let token_encoder = infra.token_encoder();
-    let token_notifier = infra.token_notifier();
-    let config = infra.config();
-
-    let (user_id, destination) = reset_token_repository
+    let (user_id, destination) = infra
+        .reset_token_repository()
         .lookup_user(&fields.login_id)
         .await
         .map_err(|err| post(RequestResetTokenEvent::RepositoryError(err)))?
@@ -152,19 +139,18 @@ async fn request_reset_token<S>(
 
     let destination = destination.ok_or_else(|| post(RequestResetTokenEvent::NotFound))?;
 
-    let clock = infra.clock();
-
-    let reset_token = token_generator.generate();
-    let requested_at = clock.now();
-    let expires = requested_at.expires(&config.token_expires);
+    let reset_password_id = infra.id_generator().generate();
+    let requested_at = infra.clock().now();
+    let expires = requested_at.expires(&infra.config().token_expires);
 
     post(RequestResetTokenEvent::TokenExpiresCalculated(
         expires.clone(),
     ));
 
-    reset_token_repository
+    infra
+        .reset_token_repository()
         .register_reset_token(
-            reset_token.clone(),
+            reset_password_id.clone(),
             user_id,
             fields.login_id,
             destination.clone(),
@@ -174,11 +160,13 @@ async fn request_reset_token<S>(
         .await
         .map_err(|err| post(RequestResetTokenEvent::RepositoryError(err)))?;
 
-    let token_encoded = token_encoder
-        .encode(reset_token, expires)
+    let token_encoded = infra
+        .token_encoder()
+        .encode(reset_password_id, expires)
         .map_err(|err| post(RequestResetTokenEvent::EncodeError(err)))?;
 
-    let notify_response = token_notifier
+    let notify_response = infra
+        .token_notifier()
         .notify(destination, token_encoded)
         .await
         .map_err(|err| post(RequestResetTokenEvent::NotifyError(err)))?;

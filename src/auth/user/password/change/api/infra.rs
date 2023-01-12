@@ -1,26 +1,23 @@
 use crate::auth::user::password::kernel::infra::{HashedPassword, PlainPassword};
 
 use crate::{
-    auth::user::{kernel::data::AuthUserId, login_id::kernel::data::LoginId},
-    z_lib::repository::data::RepositoryError,
+    auth::user::{
+        kernel::data::AuthUserId,
+        login_id::kernel::data::LoginId,
+        password::change::data::{
+            ValidateChangePasswordFieldsError, ValidateOverwritePasswordFieldsError,
+        },
+    },
+    common::api::repository::data::RepositoryError,
 };
-
-pub trait ChangePasswordRequestDecoder {
-    fn decode(self) -> ChangePasswordFieldsExtract;
-}
 
 pub struct ChangePasswordFields {
     pub current_password: PlainPassword,
     pub new_password: PlainPassword,
 }
 
-pub struct ChangePasswordFieldsExtract {
-    pub current_password: String,
-    pub new_password: String,
-}
-
-pub trait OverwritePasswordRequestDecoder {
-    fn decode(self) -> OverwritePasswordFieldsExtract;
+pub trait ChangePasswordFieldsExtract {
+    fn convert(self) -> Result<ChangePasswordFields, ValidateChangePasswordFieldsError>;
 }
 
 pub struct OverwritePasswordFields {
@@ -28,9 +25,8 @@ pub struct OverwritePasswordFields {
     pub new_password: PlainPassword,
 }
 
-pub struct OverwritePasswordFieldsExtract {
-    pub login_id: String,
-    pub new_password: String,
+pub trait OverwritePasswordFieldsExtract {
+    fn convert(self) -> Result<OverwritePasswordFields, ValidateOverwritePasswordFieldsError>;
 }
 
 #[async_trait::async_trait]

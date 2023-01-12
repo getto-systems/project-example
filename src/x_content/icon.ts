@@ -1,6 +1,6 @@
-import { lnir } from "../z_lib/ui/icon/init/line_icon"
+import { lnir } from "../common/util/icon/init/line_icon"
 
-import { Icon } from "../z_lib/ui/icon/data"
+import { Icon } from "../common/util/icon/data"
 
 export const icon_home: Icon = lnir(["flags"])
 export const icon_spinner: Icon = lnir(["spinner", "is-spinning"])

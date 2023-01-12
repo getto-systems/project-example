@@ -24,7 +24,7 @@ pub enum ValidateOverwritePasswordFieldsError {
 impl std::fmt::Display for ValidateOverwritePasswordFieldsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::InvalidLoginId(err) => write!(f, "login-id: {}", err),
+            Self::InvalidLoginId(err) => err.fmt(f),
             Self::InvalidNewPassword(err) => write!(f, "new-password: {}", err),
         }
     }

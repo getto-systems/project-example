@@ -2,7 +2,7 @@ import { VNode } from "preact"
 import { useLayoutEffect, useMemo, useState } from "preact/hooks"
 import { html } from "htm/preact"
 
-import { VNodeContent, VNodeKey } from "../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent, VNodeKey } from "../../../../../common/x_preact/vnode"
 
 import { InputBoardAction } from "../action"
 

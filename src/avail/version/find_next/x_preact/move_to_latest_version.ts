@@ -8,7 +8,7 @@ import { loginBox } from "../../../../z_vendor/getto-css/preact/layout/login"
 import { siteInfo } from "../../../../x_content/site"
 import { icon_spinner } from "../../../../x_content/icon"
 import { applicationPath } from "../../find_next/helper"
-import { iconHtml } from "../../../../z_lib/ui/icon/x_preact/icon"
+import { iconHtml } from "../../../../common/util/icon/x_preact/icon"
 
 import { ApplicationError } from "../../../x_preact/application_error"
 

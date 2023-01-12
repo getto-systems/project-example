@@ -1,4 +1,4 @@
-import { ConvertLocationResult } from "../../../../../z_lib/ui/location/data"
+import { ConvertLocationResult } from "../../../../../common/util/location/data"
 import { SignNav, signNavKey } from "../../../../sign/nav/data"
 import { ResetToken } from "./data"
 

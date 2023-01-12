@@ -1,24 +1,24 @@
 import { html } from "htm/preact"
-import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../common/x_preact/vnode"
 
-import { authRoleLabel } from "../../../../../x_content/role"
+import { authPermissionLabel } from "../../../../../x_content/permission"
 
 import { CheckboxBoardContent } from "../../../../../z_vendor/getto-application/board/input/x_preact/checkbox"
 import { label_gray, label_info } from "../../../../../z_vendor/getto-css/preact/design/highlight"
 
-import { AuthRole } from "../../../kernel/data"
+import { AuthPermission } from "../../../kernel/data"
 import { AuthUserField, TypeAuthUser } from "../data"
 
 type Props<K extends AuthUserField> = Readonly<{ [key in K]: TypeAuthUser<K> }>
 
-export function authUserGrantedRoles({
-    grantedRoles,
-}: Readonly<{ grantedRoles: readonly AuthRole[] }>): VNodeContent {
-    if (grantedRoles.length === 0) {
+export function authPermissionGranted({
+    granted,
+}: Readonly<{ granted: readonly AuthPermission[] }>): VNodeContent {
+    if (granted.length === 0) {
         return label_gray("権限なし")
     }
-    return html`${grantedRoles.map((grantedRole) => {
-        return html` ${label_info(authRoleLabel(grantedRole))} `
+    return html`${granted.map((permission) => {
+        return html` ${label_info(authPermissionLabel(permission))} `
     })}`
 }
 
@@ -26,10 +26,10 @@ export function authUserMemo(data: Props<"memo">): VNodeContent {
     return data.memo
 }
 
-export function authRoleCheckboxContent(value: AuthRole): CheckboxBoardContent {
+export function authPermissionCheckboxContent(value: AuthPermission): CheckboxBoardContent {
     return {
         key: value,
         value: value,
-        label: authRoleLabel(value),
+        label: authPermissionLabel(value),
     }
 }

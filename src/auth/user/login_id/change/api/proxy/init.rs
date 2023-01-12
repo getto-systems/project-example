@@ -1,41 +1,28 @@
-mod overwrite_login_id;
+mod proxy_call;
 
-use actix_web::HttpRequest;
+use crate::x_outside_feature::{data::RequestId, proxy::feature::ProxyAppFeature};
 
-use crate::auth::x_outside_feature::feature::AuthProxyOutsideFeature;
-
-use crate::auth::{
-    ticket::validate::init::ValidateApiMetadataStruct,
-    user::login_id::change::proxy::init::overwrite_login_id::OverwriteLoginIdProxyService,
+use crate::{
+    auth::user::login_id::change::proxy::init::proxy_call::TonicOverwriteLoginIdProxyCall,
+    common::proxy::init::ActiveCoreProxyMaterial,
 };
 
-use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
+use crate::{
+    auth::user::login_id::change::action::OverwriteLoginIdActionInfo,
+    common::proxy::action::CoreProxyAction,
+};
 
-pub struct OverwriteLoginIdProxyStruct<'a> {
-    validate: ValidateApiMetadataStruct<'a>,
-    proxy_service: OverwriteLoginIdProxyService<'a>,
-}
+pub type ActiveOverwriteLoginIdProxyMaterial<'a> =
+    ActiveCoreProxyMaterial<'a, TonicOverwriteLoginIdProxyCall<'a>>;
 
-impl<'a> OverwriteLoginIdProxyStruct<'a> {
-    pub fn action(
-        feature: &'a AuthProxyOutsideFeature,
-        request_id: &'a str,
-        request: &'a HttpRequest,
-        body: String,
-    ) -> AuthProxyAction<Self> {
-        AuthProxyAction::with_material(Self {
-            validate: ValidateApiMetadataStruct::new(&feature.decoding_key, request),
-            proxy_service: OverwriteLoginIdProxyService::new(&feature.service, request_id, body),
-        })
-    }
-}
-
-#[async_trait::async_trait]
-impl<'a> AuthProxyMaterial for OverwriteLoginIdProxyStruct<'a> {
-    type Validate = ValidateApiMetadataStruct<'a>;
-    type ProxyService = OverwriteLoginIdProxyService<'a>;
-
-    fn extract(self) -> (Self::Validate, Self::ProxyService) {
-        (self.validate, self.proxy_service)
+impl<'a> ActiveOverwriteLoginIdProxyMaterial<'a> {
+    pub fn action(feature: &'a ProxyAppFeature, request_id: RequestId) -> CoreProxyAction<Self> {
+        CoreProxyAction::with_material(
+            OverwriteLoginIdActionInfo.params(),
+            ActiveCoreProxyMaterial::new(
+                &feature.auth.decoding_key,
+                TonicOverwriteLoginIdProxyCall::new(&feature.core, request_id),
+            ),
+        )
     }
 }

@@ -1,4 +1,4 @@
-use base64::{encode_config, STANDARD};
+use base64::encode;
 use digest::{Digest, Update};
 use rsa::{errors::Error as RsaError, Hash, PaddingScheme, RsaPrivateKey};
 use serde_json::{to_string, Error as SerdeJsonError};
@@ -40,7 +40,7 @@ fn hash_sha1(message: &[u8]) -> (PaddingScheme, impl AsRef<[u8]>) {
 
 fn cloudfront_base64(source: impl AsRef<[u8]>) -> String {
     // cloudfront flavored base64; see: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-setting-signed-cookie-custom-policy.html#private-content-custom-policy-signature-cookies
-    encode_config(source, STANDARD)
+    encode(source)
         .replace("+", "-")
         .replace("=", "_")
         .replace("/", "~")

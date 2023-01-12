@@ -2,22 +2,21 @@ syntax = "proto3";
 
 package auth.user.password.authenticate.service;
 
-import "auth/user/x_protobuf/service.proto";
 import "auth/ticket/x_protobuf/service.proto";
 
-service AuthenticatePasswordPb {
-    rpc Authenticate (AuthenticatePasswordRequestPb) returns (AuthenticatePasswordResponsePb);
+service AuthenticateWithPasswordPb {
+    rpc Authenticate (AuthenticateWithPasswordRequestPb) returns (AuthenticateWithPasswordResponsePb);
 }
-message AuthenticatePasswordRequestPb {
+message AuthenticateWithPasswordRequestPb {
     string login_id = 1;
     string password = 2;
 }
-message AuthenticatePasswordResponsePb {
+message AuthenticateWithPasswordResponsePb {
     bool success = 1;
-    auth.user.service.GrantedAuthRolesPb roles = 2;
-    auth.ticket.service.EncodedAuthTokensPb token = 3;
+    auth.ticket.service.AuthPermissionGrantedPb granted = 2;
+    auth.ticket.service.AuthTokenPb token = 3;
 }
-message AuthenticatePasswordMaskedResponsePb {
+message AuthenticateWithPasswordMaskedResponsePb {
     bool success = 1;
-    auth.user.service.GrantedAuthRolesPb roles = 2;
+    auth.ticket.service.AuthPermissionGrantedPb granted = 2;
 }

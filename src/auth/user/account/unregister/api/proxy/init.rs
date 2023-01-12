@@ -1,41 +1,28 @@
-mod unregister;
+mod proxy_call;
 
-use actix_web::HttpRequest;
+use crate::x_outside_feature::{data::RequestId, proxy::feature::ProxyAppFeature};
 
-use crate::auth::x_outside_feature::feature::AuthProxyOutsideFeature;
-
-use crate::auth::{
-    ticket::validate::init::ValidateApiMetadataStruct,
-    user::account::unregister::proxy::init::unregister::UnregisterUserProxyService,
+use crate::{
+    auth::user::account::unregister::proxy::init::proxy_call::TonicUnregisterAuthUserAccountProxyCall,
+    common::proxy::init::ActiveCoreProxyMaterial,
 };
 
-use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
+use crate::{
+    auth::user::account::unregister::action::UnregisterAuthUserAccountActionInfo,
+    common::proxy::action::CoreProxyAction,
+};
 
-pub struct UnregisterAuthUserAccountProxyStruct<'a> {
-    validate: ValidateApiMetadataStruct<'a>,
-    proxy_service: UnregisterUserProxyService<'a>,
-}
+pub type ActiveUnregisterAuthUserAccountProxyMaterial<'a> =
+    ActiveCoreProxyMaterial<'a, TonicUnregisterAuthUserAccountProxyCall<'a>>;
 
-impl<'a> UnregisterAuthUserAccountProxyStruct<'a> {
-    pub fn action(
-        feature: &'a AuthProxyOutsideFeature,
-        request_id: &'a str,
-        request: &'a HttpRequest,
-        body: String,
-    ) -> AuthProxyAction<Self> {
-        AuthProxyAction::with_material(Self {
-            validate: ValidateApiMetadataStruct::new(&feature.decoding_key, request),
-            proxy_service: UnregisterUserProxyService::new(&feature.service, request_id, body),
-        })
-    }
-}
-
-#[async_trait::async_trait]
-impl<'a> AuthProxyMaterial for UnregisterAuthUserAccountProxyStruct<'a> {
-    type Validate = ValidateApiMetadataStruct<'a>;
-    type ProxyService = UnregisterUserProxyService<'a>;
-
-    fn extract(self) -> (Self::Validate, Self::ProxyService) {
-        (self.validate, self.proxy_service)
+impl<'a> ActiveUnregisterAuthUserAccountProxyMaterial<'a> {
+    pub fn action(feature: &'a ProxyAppFeature, request_id: RequestId) -> CoreProxyAction<Self> {
+        CoreProxyAction::with_material(
+            UnregisterAuthUserAccountActionInfo.params(),
+            ActiveCoreProxyMaterial::new(
+                &feature.auth.decoding_key,
+                TonicUnregisterAuthUserAccountProxyCall::new(&feature.core, request_id),
+            ),
+        )
     }
 }

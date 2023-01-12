@@ -1,6 +1,6 @@
 use super::super::action::{UnregisterAuthUserAccountEvent, UnregisterAuthUserAccountState};
 
-use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
+use crate::common::api::logger::infra::{LogFilter, LogLevel, LogMessage};
 
 impl LogMessage for UnregisterAuthUserAccountState {
     fn log_message(&self) -> String {
@@ -11,8 +11,7 @@ impl LogMessage for UnregisterAuthUserAccountState {
 impl LogFilter for UnregisterAuthUserAccountState {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Authenticate(event) => event.log_level(),
-            Self::PermissionError(event) => event.log_level(),
+            Self::Authorize(event) => event.log_level(),
             Self::UnregisterUser(event) => event.log_level(),
         }
     }
@@ -21,7 +20,7 @@ impl LogFilter for UnregisterAuthUserAccountState {
 impl LogFilter for UnregisterAuthUserAccountEvent {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Success => LogLevel::Audit,
+            Self::Success => LogLevel::Important,
             Self::Invalid(_) => LogLevel::Error,
             Self::RepositoryError(err) => err.log_level(),
         }

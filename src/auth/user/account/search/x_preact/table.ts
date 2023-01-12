@@ -13,7 +13,7 @@ import {
 import { emptyTable, takeLongtimeTable } from "../../../../../common/x_preact/design/table"
 
 import { SearchAuthUserAccountAction } from "../action"
-import { SearchColumnsAction, visibleKeys } from "../../../../../z_lib/ui/search/columns/action"
+import { SearchColumnsAction, visibleKeys } from "../../../../../common/util/search/columns/action"
 
 import { SearchAuthUserAccountTableStructure } from "./structure"
 
@@ -34,7 +34,7 @@ export function SearchAuthUserAccountTable(props: Props): VNode {
     if (!listState.isLoad || listState.data.type === "failed") {
         return html``
     }
-    if (listState.data.response.page.all === 0) {
+    if (listState.data.response.page.count === 0) {
         return emptyTable()
     }
 

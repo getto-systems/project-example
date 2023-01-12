@@ -1,5 +1,3 @@
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
-
 import { newModifyAuthUserAccountConfig } from "./config"
 
 import {
@@ -7,17 +5,16 @@ import {
     ModifyAuthUserAccountAction,
     ModifyAuthUserAccountEntry,
 } from "../action"
-import { ModifyFieldHandler } from "../../../../../z_lib/ui/modify/action"
+import { ModifyFieldHandler } from "../../../../../common/util/modify/action"
 
 import { newModifyAuthUserAccountInfra } from "./infra"
 
-type OutsideFeature = RemoteOutsideFeature
-export function newModifyAuthUserAccountAction(feature: OutsideFeature): Readonly<{
+export function newModifyAuthUserAccountAction(): Readonly<{
     action: ModifyAuthUserAccountAction
     handler: ModifyFieldHandler<ModifyAuthUserAccountEntry>
 }> {
     return initModifyAuthUserAccountAction({
-        infra: newModifyAuthUserAccountInfra(feature),
+        infra: newModifyAuthUserAccountInfra(),
         config: newModifyAuthUserAccountConfig(),
     })
 }

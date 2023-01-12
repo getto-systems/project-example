@@ -1,10 +1,9 @@
-import { RepositoryOutsideFeature } from "../../../../../z_lib/ui/repository/feature"
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
+import { RepositoryOutsideFeature } from "../../../../../common/util/repository/feature"
 import { WorkerOutsideFeature } from "../../../../../z_vendor/getto-application/action/worker/feature"
-import { LocationOutsideFeature } from "../../../../../z_lib/ui/location/feature"
+import { LocationOutsideFeature } from "../../../../../common/util/location/feature"
 
 import { newSignActionShell } from "../shell"
-import { newCheckAuthTicketAction } from "../../../../ticket/check/init/view"
+import { newCheckAuthTicketAction } from "../../../../ticket/authenticate/init/view"
 import { newAuthenticatePasswordAction } from "../../../../user/password/authenticate/init/view"
 import { newResetPasswordAction } from "../../../../user/password/reset/reset/init/view"
 import {
@@ -17,10 +16,7 @@ import { initSignAction, SignAction } from "../../action"
 
 import { SignForegroundMessage, SignBackgroundMessage } from "./message"
 
-type OutsideFeature = RemoteOutsideFeature &
-    RepositoryOutsideFeature &
-    WorkerOutsideFeature &
-    LocationOutsideFeature
+type OutsideFeature = RepositoryOutsideFeature & WorkerOutsideFeature & LocationOutsideFeature
 export function newSignViewWorkerForeground(feature: OutsideFeature): SignAction {
     const { worker } = feature
     const proxy = initProxy(postForegroundMessage)

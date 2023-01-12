@@ -5,32 +5,34 @@ use rusoto_ses::SesClient;
 use aws_cloudfront_cookie::CloudfrontKey;
 
 use crate::{
-    auth::ticket::kernel::data::{ExpansionLimitDuration, ExpireDuration},
-    z_lib::service::x_outside_feature::feature::GoogleServiceAuthorizerOutsideFeature,
+    auth::kernel::data::{ExpansionLimitDuration, ExpireDuration},
+    common::x_outside_feature::feature::CommonOutsideService,
 };
 
 pub struct AuthOutsideConfig {
-    pub ticket_expires: ExpireDuration,
-    pub ticket_expansion_limit: ExpansionLimitDuration,
-    pub api_expires: ExpireDuration,
-    pub cloudfront_expires: ExpireDuration,
+    pub authenticate_expires: ExpireDuration,
+    pub authenticate_expansion_limit: ExpansionLimitDuration,
+    pub authorize_expires: ExpireDuration,
+    pub cdn_expires: ExpireDuration,
     pub reset_token_expires: ExpireDuration,
 }
 pub struct AuthOutsideStore {
     pub dynamodb: DynamoDbClient,
-    pub nonce_table_name: &'static str,
     pub ticket_table_name: &'static str,
     pub user_table_name: &'static str,
     pub login_id_table_name: &'static str,
     pub reset_token_table_name: &'static str,
 }
 pub struct AuthOutsideEncodingKey {
-    pub ticket: EncodingKey,
-    pub api: EncodingKey,
+    pub authenticate: EncodingKey,
+    pub authorize: EncodingKey,
 }
 pub struct AuthOutsideDecodingKey {
-    pub ticket: DecodingKey,
-    pub api: DecodingKey,
+    pub authenticate: DecodingKey,
+    pub authorize: DecodingKey,
+}
+pub struct AuthOutsideAuthorizeKey {
+    pub key: DecodingKey,
 }
 pub struct AuthOutsideResetTokenKey {
     pub decoding_key: DecodingKey,
@@ -46,14 +48,14 @@ pub struct AuthOutsideEmail {
     pub reset_password_url: &'static str,
 }
 
-pub struct AuthProxyOutsideFeature {
-    pub service: AuthOutsideService,
-    pub decoding_key: AuthOutsideDecodingKey,
-    pub cookie: AuthOutsideCookie,
+pub struct AuthServiceOutsideFeature {
+    pub service: CommonOutsideService,
+    pub decoding_key: AuthOutsideAuthorizeKey,
 }
-pub struct AuthOutsideService {
-    pub service_url: &'static str,
-    pub google_authorizer: GoogleServiceAuthorizerOutsideFeature,
+pub struct AuthProxyOutsideFeature {
+    pub service: CommonOutsideService,
+    pub cookie: AuthOutsideCookie,
+    pub decoding_key: AuthOutsideDecodingKey,
 }
 pub struct AuthOutsideCookie {
     pub domain: &'static str,

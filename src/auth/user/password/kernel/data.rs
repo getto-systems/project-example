@@ -1,13 +1,14 @@
-use crate::z_lib::validate::data::ValidateTextError;
+use crate::common::api::validate::data::ValidateTextError;
 
+#[derive(Debug)]
 pub enum ValidatePasswordError {
-    Text(ValidateTextError),
+    Password(ValidateTextError),
 }
 
 impl std::fmt::Display for ValidatePasswordError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::Text(err) => err.fmt(f),
+            Self::Password(err) => write!(f, "password: {}", err),
         }
     }
 }

@@ -1,25 +1,24 @@
 import { newAuthenticatePasswordConfig } from "./config"
 
 import { newGetScriptPathShell } from "../../../../sign/get_script_path/init/infra"
-import { newClock } from "../../../../../z_lib/ui/clock/init"
+import { newClock } from "../../../../../common/util/clock/init"
 import { newAuthenticatePasswordRemote } from "./authenticate_remote"
 import { newAuthTicketRepository } from "../../../../ticket/kernel/init/ticket_repository"
-import { newCheckAuthTicketRemote } from "../../../../ticket/check/init/check_remote"
+import { newCheckAuthTicketRemote } from "../../../../ticket/authenticate/init/check_remote"
 
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
-import { RepositoryOutsideFeature } from "../../../../../z_lib/ui/repository/feature"
-import { LocationOutsideFeature } from "../../../../../z_lib/ui/location/feature"
+import { RepositoryOutsideFeature } from "../../../../../common/util/repository/feature"
+import { LocationOutsideFeature } from "../../../../../common/util/location/feature"
 
 import { AuthenticatePasswordAction, initAuthenticatePasswordAction } from "../action"
 
 export function newAuthenticatePasswordAction(
-    feature: RemoteOutsideFeature & RepositoryOutsideFeature & LocationOutsideFeature,
+    feature: RepositoryOutsideFeature & LocationOutsideFeature,
 ): AuthenticatePasswordAction {
     return initAuthenticatePasswordAction({
         infra: {
             ticketRepository: newAuthTicketRepository(feature),
-            renewRemote: newCheckAuthTicketRemote(feature, newClock()),
-            authenticateRemote: newAuthenticatePasswordRemote(feature, newClock()),
+            renewRemote: newCheckAuthTicketRemote(newClock()),
+            authenticateRemote: newAuthenticatePasswordRemote(newClock()),
             clock: newClock(),
         },
         shell: {

@@ -2,16 +2,12 @@ import { WorkerBackgroundHandler } from "../../../../../../../z_vendor/getto-app
 
 import { newRequestResetTokenInfra } from "../infra"
 
-import { RemoteOutsideFeature } from "../../../../../../../z_lib/ui/remote/feature"
-
 import { RequestResetTokenProxyMessage, RequestResetTokenProxyResponse } from "./message"
 
-type OutsideFeature = RemoteOutsideFeature
 export function newRequestResetTokenWorkerHandler(
-    feature: OutsideFeature,
     postMessage: Post<RequestResetTokenProxyResponse>,
 ): WorkerBackgroundHandler<RequestResetTokenProxyMessage, RequestResetTokenProxyResponse> {
-    const infra = newRequestResetTokenInfra(feature)
+    const infra = newRequestResetTokenInfra()
 
     return async (message) => {
         switch (message.name) {

@@ -2,7 +2,7 @@ import { test, expect } from "vitest"
 import { observeApplicationState } from "../../../z_vendor/getto-application/action/test_helper"
 import { standardApplicationTargetPath } from "./test_helper"
 
-import { ticker } from "../../../z_lib/ui/timer/helper"
+import { ticker } from "../../../common/util/timer/helper"
 import { mockFindNextVersionShell } from "./init/mock"
 
 import { applicationPath } from "./helper"

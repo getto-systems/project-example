@@ -2,24 +2,18 @@ import { env } from "../../../../../y_environment/ui/env"
 import pb from "../../../../../y_protobuf/proto.js"
 
 import {
-    generateNonce,
     fetchOptions,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../z_lib/ui/remote/init/helper"
+} from "../../../../../common/util/remote/init/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf/helper"
 
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
-
-import { Clock } from "../../../../../z_lib/ui/clock/infra"
+import { Clock } from "../../../../../common/util/clock/infra"
 import { AuthenticatePasswordRemote } from "../infra"
 
-import { convertCheckRemote } from "../../../../ticket/check/convert"
+import { convertCheckRemote } from "../../../../ticket/authenticate/convert"
 
-export function newAuthenticatePasswordRemote(
-    feature: RemoteOutsideFeature,
-    clock: Clock,
-): AuthenticatePasswordRemote {
+export function newAuthenticatePasswordRemote(clock: Clock): AuthenticatePasswordRemote {
     return async (fields) => {
         try {
             const mock = false
@@ -34,12 +28,11 @@ export function newAuthenticatePasswordRemote(
                 serverURL: env.apiServerURL,
                 path: "/auth/user/password/authenticate",
                 method: "POST",
-                headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
             })
             const response = await fetch(opts.url, {
                 ...opts.options,
                 body: encodeProtobuf(
-                    pb.auth.user.password.authenticate.service.AuthenticatePasswordRequestPb,
+                    pb.auth.user.password.authenticate.service.AuthenticateWithPasswordRequestPb,
                     (message) => {
                         message.loginId = fields.loginId
                         message.password = fields.password
@@ -52,7 +45,7 @@ export function newAuthenticatePasswordRemote(
             }
 
             const message = decodeProtobuf(
-                pb.auth.user.password.authenticate.service.AuthenticatePasswordMaskedResponsePb,
+                pb.auth.user.password.authenticate.service.AuthenticateWithPasswordMaskedResponsePb,
                 await response.text(),
             )
             if (!message.success) {
@@ -60,7 +53,7 @@ export function newAuthenticatePasswordRemote(
             }
             return {
                 success: true,
-                value: convertCheckRemote(clock, message.roles?.grantedRoles || []),
+                value: convertCheckRemote(clock, message.granted?.permissions || []),
             }
         } catch (err) {
             return remoteInfraError(err)

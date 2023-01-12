@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-package lib.search.sidebar.db;
-
-message SidebarPb {
-  bool is_expand = 1;
-}

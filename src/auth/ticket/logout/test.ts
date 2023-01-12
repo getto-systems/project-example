@@ -1,9 +1,9 @@
 import { test, expect } from "vitest"
 import { observeApplicationState } from "../../../z_vendor/getto-application/action/test_helper"
 
-import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
+import { initMemoryDB } from "../../../common/util/repository/init/memory"
 
-import { convertDB } from "../../../z_lib/ui/repository/init/convert"
+import { convertDB } from "../../../common/util/repository/init/convert"
 import { authTicketRepositoryConverter } from "../kernel/convert"
 
 import { AuthTicketRepository, AuthTicketRepositoryValue } from "../kernel/infra"
@@ -34,7 +34,7 @@ function standard_ticketRepository(): AuthTicketRepository {
     const db = initMemoryDB<AuthTicketRepositoryValue>()
     db.set({
         authAt: "2020-01-01 09:00:00",
-        grantedRoles: ["role"],
+        granted: ["permission"],
     })
     return convertDB(db, authTicketRepositoryConverter)
 }

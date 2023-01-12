@@ -1,4 +1,4 @@
-use crate::z_lib::logger::infra::{LogFilter, LogLevel};
+use crate::common::api::logger::infra::{LogFilter, LogLevel};
 
 use crate::auth::user::password::kernel::data::{PasswordHashError, ValidatePasswordError};
 
@@ -13,7 +13,7 @@ impl LogFilter for PasswordHashError {
 impl LogFilter for ValidatePasswordError {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Text(err) => err.log_level(),
+            Self::Password(err) => err.log_level(),
         }
     }
 }

@@ -1,15 +1,15 @@
 import { VNode } from "preact"
 import { html } from "htm/preact"
 
-import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../vnode"
 import { PagerOptionsProps, SortSignContent } from "../../../z_vendor/getto-css/preact/design/table"
 
-import { iconHtml } from "../../../z_lib/ui/icon/x_preact/icon"
+import { iconHtml } from "../../util/icon/x_preact/icon"
 import { icon_edit, icon_sort_normal, icon_sort_reverse } from "../../../x_content/icon"
 import { box_grow, container } from "../../../z_vendor/getto-css/preact/design/box"
 import { notice_gray } from "../../../z_vendor/getto-css/preact/design/highlight"
 
-import { SearchPageResponse } from "../../../z_lib/ui/search/kernel/data"
+import { SearchPageResponse } from "../../util/search/kernel/data"
 
 export const SORT_SIGN: SortSignContent = {
     normal: () => iconHtml(icon_sort_normal),
@@ -21,7 +21,7 @@ export function pagerCount(all: number): VNodeContent {
 }
 export function pagerParams(page: SearchPageResponse): PagerOptionsProps {
     return {
-        all: page.all,
+        all: page.count,
         step: page.limit,
         content: ({ start, end }) => `${pageCountFormat(start)} ～ ${pageCountFormat(end)} 件`,
     }

@@ -1,7 +1,7 @@
 import {
     BoardValueFieldAction,
     initBoardValueFieldAction,
-} from "../../../z_lib/ui/input/field/text"
+} from "../../../common/util/input/field/text"
 
 import { seasonConverter, seasonToString } from "../kernel/convert"
 

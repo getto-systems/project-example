@@ -1,28 +1,22 @@
 import { env } from "../../../../../y_environment/ui/env"
 import pb from "../../../../../y_protobuf/proto.js"
 
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
-
 import {
-    generateNonce,
     fetchOptions,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../z_lib/ui/remote/init/helper"
+} from "../../../../../common/util/remote/init/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf/helper"
 
 import { UnregisterAuthUserAccountRemoteResult, UnregisterAuthUserAccountRemote } from "../infra"
 
 import { LoginId } from "../../../login_id/kernel/data"
 
-export function newUnregisterAuthUserAccountRemote(
-    feature: RemoteOutsideFeature,
-): UnregisterAuthUserAccountRemote {
-    return (user) => fetchRemote(feature, user)
+export function newUnregisterAuthUserAccountRemote(): UnregisterAuthUserAccountRemote {
+    return (user) => fetchRemote(user)
 }
 
 async function fetchRemote(
-    feature: RemoteOutsideFeature,
     user: Readonly<{ loginId: LoginId }>,
 ): Promise<UnregisterAuthUserAccountRemoteResult> {
     const mock = false
@@ -35,7 +29,6 @@ async function fetchRemote(
             serverURL: env.apiServerURL,
             path: "/auth/user/account",
             method: "DELETE",
-            headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
         })
         const response = await fetch(opts.url, {
             ...opts.options,

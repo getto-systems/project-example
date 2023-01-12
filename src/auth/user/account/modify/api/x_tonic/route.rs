@@ -7,24 +7,13 @@ use crate::auth::user::account::modify::y_protobuf::service::{
     ModifyAuthUserAccountResponsePb,
 };
 
-use crate::x_outside_feature::auth::{
-    feature::{extract_auth_request, AuthTonicRequest},
-    logger::app_logger,
-};
+use crate::x_outside_feature::auth::{feature::AuthTonicRequest, logger::AuthLogger};
 
-use crate::x_content::metadata::metadata_request_id;
+use crate::auth::user::account::modify::init::ActiveModifyAuthUserAccountMaterial;
 
-use crate::auth::user::account::modify::init::ModifyAuthUserAccountFeature;
-
-use crate::z_lib::{logger::infra::Logger, response::tonic::ServiceResponder};
+use crate::common::api::{logger::infra::Logger, response::tonic::ServiceResponder};
 
 pub struct ServiceModifyUser;
-
-impl ServiceModifyUser {
-    pub const fn name() -> &'static str {
-        "auth.user.account.modify"
-    }
-}
 
 #[async_trait::async_trait]
 impl ModifyAuthUserAccountPb for ServiceModifyUser {
@@ -36,13 +25,13 @@ impl ModifyAuthUserAccountPb for ServiceModifyUser {
             feature,
             metadata,
             request,
-        } = extract_auth_request(request);
-        let request_id = metadata_request_id(&metadata);
+            request_id,
+        } = AuthTonicRequest::from_request(request);
 
-        let logger = app_logger(Self::name(), request_id.into());
-        let mut action = ModifyAuthUserAccountFeature::action(&feature, &metadata, request);
+        let mut action = ActiveModifyAuthUserAccountMaterial::action(&feature, request_id.clone());
+        let logger = AuthLogger::default(&feature, action.info.name(), request_id);
         action.subscribe(move |state| logger.log(state));
 
-        flatten(action.ignite().await).respond_to()
+        flatten(action.ignite(&metadata, request).await).respond_to()
     }
 }

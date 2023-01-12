@@ -3,9 +3,9 @@ import { test, expect } from "vitest"
 import { observeApplicationState } from "../../../../../z_vendor/getto-application/action/test_helper"
 import { mockMultipleBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/test_helper"
 
-import { initAuthUserGrantedRolesFieldAction } from "./action"
+import { initAuthPermissionGrantedFieldAction } from "./action"
 
-import { ALL_AUTH_ROLES } from "../../../../../x_content/role"
+import { ALL_AUTH_PERMISSIONS } from "../../../../../x_content/permission"
 
 test("validate; valid input", async () => {
     const { action, store } = standard()
@@ -48,10 +48,10 @@ test("clear", () => {
 })
 
 function standard() {
-    const { input, setOptions } = initAuthUserGrantedRolesFieldAction()
+    const { input, setOptions } = initAuthPermissionGrantedFieldAction()
     const store = mockMultipleBoardValueStore(input.input)
 
-    setOptions(ALL_AUTH_ROLES)
+    setOptions(ALL_AUTH_PERMISSIONS)
 
     return { action: input, store }
 }

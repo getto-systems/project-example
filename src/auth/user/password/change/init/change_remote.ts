@@ -2,27 +2,21 @@ import { env } from "../../../../../y_environment/ui/env"
 import pb from "../../../../../y_protobuf/proto.js"
 
 import {
-    generateNonce,
     fetchOptions,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../z_lib/ui/remote/init/helper"
+} from "../../../../../common/util/remote/init/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf/helper"
-
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 
 import { ChangePasswordRemote, ChangePasswordRemoteResult } from "../infra"
 
 import { ChangePasswordFields } from "../data"
 
-export function newChangePasswordRemote(feature: RemoteOutsideFeature): ChangePasswordRemote {
-    return (fields) => fetchRemote(feature, fields)
+export function newChangePasswordRemote(): ChangePasswordRemote {
+    return (fields) => fetchRemote(fields)
 }
 
-async function fetchRemote(
-    feature: RemoteOutsideFeature,
-    fields: ChangePasswordFields,
-): Promise<ChangePasswordRemoteResult> {
+async function fetchRemote(fields: ChangePasswordFields): Promise<ChangePasswordRemoteResult> {
     try {
         const mock = false
         if (mock) {
@@ -36,7 +30,6 @@ async function fetchRemote(
             serverURL: env.apiServerURL,
             path: "/auth/user/password",
             method: "PATCH",
-            headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
         })
         const response = await fetch(opts.url, {
             ...opts.options,

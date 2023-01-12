@@ -1,5 +1,5 @@
 use crate::auth::user::password::{
-    authenticate::y_protobuf::service::authenticate_password_pb_server::AuthenticatePasswordPbServer,
+    authenticate::y_protobuf::service::authenticate_with_password_pb_server::AuthenticateWithPasswordPbServer,
     change::y_protobuf::service::{
         change_password_pb_server::ChangePasswordPbServer,
         overwrite_password_pb_server::OverwritePasswordPbServer,
@@ -7,23 +7,25 @@ use crate::auth::user::password::{
 };
 
 use crate::auth::user::password::{
-    authenticate::x_tonic::route::ServiceAuthenticate,
+    authenticate::x_tonic::route::ServiceAuthenticateWithPassword,
     change::x_tonic::route::{ServiceChangePassword, ServiceOverwritePassword},
-    reset::x_tonic::route::ResetServer,
+    reset::x_tonic::route::AuthPasswordResetServer,
 };
 
-pub struct PasswordServer {
-    pub reset: ResetServer,
+pub struct AuthPasswordServer {
+    pub reset: AuthPasswordResetServer,
 }
 
-impl PasswordServer {
+impl AuthPasswordServer {
     pub const fn new() -> Self {
         Self {
-            reset: ResetServer::new(),
+            reset: AuthPasswordResetServer::new(),
         }
     }
-    pub fn authenticate(&self) -> AuthenticatePasswordPbServer<ServiceAuthenticate> {
-        AuthenticatePasswordPbServer::new(ServiceAuthenticate)
+    pub fn authenticate(
+        &self,
+    ) -> AuthenticateWithPasswordPbServer<ServiceAuthenticateWithPassword> {
+        AuthenticateWithPasswordPbServer::new(ServiceAuthenticateWithPassword)
     }
     pub fn change(&self) -> ChangePasswordPbServer<ServiceChangePassword> {
         ChangePasswordPbServer::new(ServiceChangePassword)

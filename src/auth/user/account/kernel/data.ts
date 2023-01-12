@@ -1,10 +1,10 @@
 import { LoginId } from "../../login_id/kernel/data"
 import { ResetTokenDestination } from "../../password/reset/token_destination/kernel/data"
-import { AuthRole } from "../../kernel/data"
+import { AuthPermission } from "../../kernel/data"
 
 export type AuthUserAccount = Readonly<{
     loginId: LoginId
-    grantedRoles: readonly AuthRole[]
+    granted: readonly AuthPermission[]
     resetTokenDestination: ResetTokenDestination
     memo: TypeAuthUser<"memo">
 }>
@@ -20,6 +20,6 @@ export const AUTH_USER_ACCOUNT = {
     loginId: "ログインID",
     password: "パスワード",
     memo: "備考",
-    grantedRoles: "権限",
+    granted: "権限",
     resetTokenDestination: "パスワードリセット用Eメール",
 } as const

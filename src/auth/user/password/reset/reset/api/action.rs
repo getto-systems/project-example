@@ -1,18 +1,17 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::ticket::{
-    encode::method::{encode_auth_ticket, EncodeAuthTicketEvent, EncodeAuthTicketInfra},
+    encode::method::{encode_auth_token, EncodeAuthTokenEvent, EncodeAuthTokenInfra},
     issue::method::{issue_auth_ticket, IssueAuthTicketEvent, IssueAuthTicketInfra},
-    validate::method::{validate_auth_nonce, ValidateAuthNonceEvent, ValidateAuthNonceInfra},
 };
 
 use crate::auth::{
-    ticket::kernel::infra::AuthClock,
+    kernel::infra::AuthClock,
     user::password::{
         kernel::infra::{AuthUserPasswordHasher, PlainPassword},
         reset::reset::infra::{
-            ResetPasswordFields, ResetPasswordFieldsExtract, ResetPasswordNotifier,
-            ResetPasswordRepository, ResetPasswordRequestDecoder, ResetTokenDecoder,
+            ResetPasswordFieldsExtract, ResetPasswordNotifier, ResetPasswordRepository,
+            ResetPasswordTokenDecoder,
         },
     },
 };
@@ -28,20 +27,18 @@ use crate::{
             },
         },
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
 pub enum ResetPasswordState {
-    ValidateNonce(ValidateAuthNonceEvent),
     Reset(ResetPasswordEvent),
     Issue(IssueAuthTicketEvent),
-    Encode(EncodeAuthTicketEvent),
+    Encode(EncodeAuthTokenEvent),
 }
 
 impl std::fmt::Display for ResetPasswordState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::ValidateNonce(event) => event.fmt(f),
             Self::Reset(event) => event.fmt(f),
             Self::Issue(event) => event.fmt(f),
             Self::Encode(event) => event.fmt(f),
@@ -50,17 +47,15 @@ impl std::fmt::Display for ResetPasswordState {
 }
 
 pub trait ResetPasswordMaterial {
-    type ValidateNonce: ValidateAuthNonceInfra;
     type Issue: IssueAuthTicketInfra;
-    type Encode: EncodeAuthTicketInfra;
+    type Encode: EncodeAuthTokenInfra;
 
     type Clock: AuthClock;
     type ResetPasswordRepository: ResetPasswordRepository;
     type PasswordHasher: AuthUserPasswordHasher;
-    type TokenDecoder: ResetTokenDecoder;
+    type TokenDecoder: ResetPasswordTokenDecoder;
     type ResetNotifier: ResetPasswordNotifier;
 
-    fn validate_nonce(&self) -> &Self::ValidateNonce;
     fn issue(&self) -> &Self::Issue;
     fn encode(&self) -> &Self::Encode;
 
@@ -73,17 +68,25 @@ pub trait ResetPasswordMaterial {
     fn reset_notifier(&self) -> &Self::ResetNotifier;
 }
 
-pub struct ResetPasswordAction<R: ResetPasswordRequestDecoder, M: ResetPasswordMaterial> {
+pub struct ResetPasswordAction<M: ResetPasswordMaterial> {
+    pub info: ResetPasswordActionInfo,
     pubsub: ActionStatePubSub<ResetPasswordState>,
-    request_decoder: R,
     material: M,
 }
 
-impl<R: ResetPasswordRequestDecoder, M: ResetPasswordMaterial> ResetPasswordAction<R, M> {
-    pub fn with_material(request_decoder: R, material: M) -> Self {
+pub struct ResetPasswordActionInfo;
+
+impl ResetPasswordActionInfo {
+    pub const fn name(&self) -> &'static str {
+        "auth.user.password.reset"
+    }
+}
+
+impl<M: ResetPasswordMaterial> ResetPasswordAction<M> {
+    pub fn with_material(material: M) -> Self {
         Self {
+            info: ResetPasswordActionInfo,
             pubsub: ActionStatePubSub::new(),
-            request_decoder,
             material,
         }
     }
@@ -92,29 +95,22 @@ impl<R: ResetPasswordRequestDecoder, M: ResetPasswordMaterial> ResetPasswordActi
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<ResetPasswordState> {
-        let pubsub = self.pubsub;
-        let m = self.material;
-
-        let fields = self.request_decoder.decode();
-
-        validate_auth_nonce(m.validate_nonce(), |event| {
-            pubsub.post(ResetPasswordState::ValidateNonce(event))
+    pub async fn ignite(
+        self,
+        fields: impl ResetPasswordFieldsExtract,
+    ) -> MethodResult<ResetPasswordState> {
+        let user = reset_password(&self.material, fields, |event| {
+            self.pubsub.post(ResetPasswordState::Reset(event))
         })
         .await?;
 
-        let user = reset_password(&m, fields, |event| {
-            pubsub.post(ResetPasswordState::Reset(event))
+        let ticket = issue_auth_ticket(self.material.issue(), user.into(), |event| {
+            self.pubsub.post(ResetPasswordState::Issue(event))
         })
         .await?;
 
-        let ticket = issue_auth_ticket(m.issue(), user, |event| {
-            pubsub.post(ResetPasswordState::Issue(event))
-        })
-        .await?;
-
-        encode_auth_ticket(m.encode(), ticket, |event| {
-            pubsub.post(ResetPasswordState::Encode(event))
+        encode_auth_token(self.material.encode(), ticket, |event| {
+            self.pubsub.post(ResetPasswordState::Encode(event))
         })
         .await
     }
@@ -157,33 +153,30 @@ impl std::fmt::Display for ResetPasswordEvent {
 
 async fn reset_password<S>(
     infra: &impl ResetPasswordMaterial,
-    fields: ResetPasswordFieldsExtract,
+    fields: impl ResetPasswordFieldsExtract,
     post: impl Fn(ResetPasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
-    let fields = ResetPasswordFields::convert(fields)
+    let fields = fields
+        .convert()
         .map_err(|err| post(ResetPasswordEvent::Invalid(err)))?;
 
-    let token_decoder = infra.token_decoder();
-    let reset_notifier = infra.reset_notifier();
-
-    let reset_token = token_decoder
+    let reset_id = infra
+        .token_decoder()
         .decode(fields.reset_token)
         .map_err(|err| post(ResetPasswordEvent::DecodeError(err)))?;
 
-    let reset_password_repository = infra.reset_password_repository();
-    let password_hasher = infra.password_hasher(fields.new_password);
-    let clock = infra.clock();
+    let reset_at = infra.clock().now();
 
-    let reset_at = clock.now();
-
-    let (user_id, stored_login_id, destination, moment) = reset_password_repository
-        .lookup_reset_token_entry(&reset_token)
+    let (user_id, stored_login_id, destination, moment) = infra
+        .reset_password_repository()
+        .lookup_reset_token_entry(&reset_id)
         .await
         .map_err(|err| post(ResetPasswordEvent::RepositoryError(err)))?
         .ok_or_else(|| post(ResetPasswordEvent::NotFound))?;
 
-    let granted_roles = reset_password_repository
-        .lookup_granted_roles(&user_id)
+    let granted = infra
+        .reset_password_repository()
+        .lookup_permission_granted(&user_id)
         .await
         .map_err(|err| post(ResetPasswordEvent::RepositoryError(err)))?
         .ok_or_else(|| post(ResetPasswordEvent::NotFound))?;
@@ -200,23 +193,27 @@ async fn reset_password<S>(
         return Err(post(ResetPasswordEvent::ResetTokenExpired));
     }
 
-    let hashed_password = password_hasher
+    let hashed_password = infra
+        .password_hasher(fields.new_password)
         .hash_password()
         .map_err(|err| post(ResetPasswordEvent::PasswordHashError(err)))?;
 
-    reset_password_repository
-        .reset_password(user_id.clone(), reset_token, hashed_password, reset_at)
+    infra
+        .reset_password_repository()
+        .reset_password(user_id.clone(), reset_id, hashed_password, reset_at)
         .await
         .map_err(|err| post(ResetPasswordEvent::RepositoryError(err)))?;
 
-    let notify_response = reset_notifier
+    let notify_response = infra
+        .reset_notifier()
         .notify(destination)
         .await
         .map_err(|err| post(ResetPasswordEvent::NotifyError(err)))?;
 
     post(ResetPasswordEvent::ResetNotified(notify_response));
 
-    let user = AuthUser::restore(user_id, granted_roles);
+    let user = AuthUser { user_id, granted };
+
     post(ResetPasswordEvent::Success(user.clone()));
     Ok(user)
 }

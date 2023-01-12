@@ -1,7 +1,7 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../../common/x_preact/vnode"
 
 import { useApplicationState } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
@@ -11,7 +11,7 @@ import { box } from "../../../../../../z_vendor/getto-css/preact/design/box"
 import { notice_success } from "../../../../../../z_vendor/getto-css/preact/design/highlight"
 import { takeLongtimeField, ValidationMessage } from "../../../../../../common/x_preact/design/form"
 
-import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_error/reason"
+import { remoteCommonErrorReason } from "../../../../../../common/util/remote/x_error/reason"
 
 import { LoginIdField } from "../../../../login_id/input/x_preact/field"
 import { EditButton } from "../../../../../../common/x_preact/button/edit_button"

@@ -1,4 +1,4 @@
-import { RepositoryConverter } from "../../../z_lib/ui/repository/infra"
+import { RepositoryConverter } from "../../../common/util/repository/infra"
 import { SeasonExpires, SeasonRepositoryValue } from "./infra"
 
 import { ValidateSeasonResult, Season } from "./data"

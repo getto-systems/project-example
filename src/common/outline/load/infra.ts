@@ -1,11 +1,11 @@
-import { RemoteResult } from "../../../z_lib/ui/remote/infra"
-import { FetchRepositoryResult, StoreRepositoryResult } from "../../../z_lib/ui/repository/infra"
+import { RemoteResult } from "../../util/remote/infra"
+import { FetchRepositoryResult, StoreRepositoryResult } from "../../util/repository/infra"
 
-import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
-import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
+import { RemoteCommonError } from "../../util/remote/data"
+import { ConvertLocationResult } from "../../util/location/data"
 import { MenuCategoryPath, MenuTargetPath } from "./data"
-import { Icon } from "../../../z_lib/ui/icon/data"
-import { AuthRole } from "../../../auth/user/kernel/data"
+import { Icon } from "../../util/icon/data"
+import { AuthPermission } from "../../../auth/user/kernel/data"
 
 export interface MenuTargetPathDetecter {
     (): ConvertLocationResult<MenuTargetPath>
@@ -24,7 +24,7 @@ export type MenuTreeNode =
 
 export type MenuTreeCategory = Readonly<{
     label: MenuTreeLabel
-    permission: MenuPermission
+    required: MenuPermissionRequired
 }>
 export type MenuTreeItem = Readonly<{
     path: MenuPath
@@ -35,11 +35,9 @@ export type MenuTreeItem = Readonly<{
 export type MenuTreeLabel = string
 export type MenuPath = string
 
-export type MenuPermission =
-    | Readonly<{ type: "allow" }>
-    | Readonly<{ type: "any"; permits: readonly MenuPermission[] }>
-    | Readonly<{ type: "all"; permits: readonly MenuPermission[] }>
-    | Readonly<{ type: "role"; role: AuthRole }>
+export type MenuPermissionRequired =
+    | Readonly<{ type: "nothing" }>
+    | Readonly<{ type: "has-some"; permissions: readonly AuthPermission[] }>
 
 export type MenuBadge = Map<string, number>
 export type MenuBadgeItem = Readonly<{ path: string; count: number }>

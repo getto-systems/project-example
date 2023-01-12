@@ -2,18 +2,16 @@ import { env } from "../../../../../y_environment/ui/env"
 import pb from "../../../../../y_protobuf/proto.js"
 
 import {
-    generateNonce,
     fetchOptions,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../z_lib/ui/remote/init/helper"
+} from "../../../../../common/util/remote/init/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf/helper"
 
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
-
 import { readSearchAuthUserAccountSortKey } from "../convert"
-import { parseSearchSort } from "../../../../../z_lib/ui/search/sort/convert"
-import { toGrantedRoles } from "../../input/granted_roles/convert"
+import { parseSearchSort } from "../../../../../common/util/search/sort/convert"
+import { parseSearchPage } from "../../../../../common/util/search/kernel/convert"
+import { toGranted } from "../../input/granted/convert"
 import { restoreLoginId } from "../../../login_id/input/convert"
 import { restoreAuthUserField } from "../../kernel/convert"
 
@@ -23,13 +21,10 @@ import { defaultSearchAuthUserAccountSort, SearchAuthUserAccountFilter } from ".
 import { AuthUserAccount } from "../../kernel/data"
 import { restoreResetTokenDestination } from "../../../password/reset/token_destination/kernel/convert"
 
-export function newSearchAuthUserAccountRemote(
-    feature: RemoteOutsideFeature,
-): SearchAuthUserAccountRemote {
-    return (filter) => fetchRemote(feature, filter)
+export function newSearchAuthUserAccountRemote(): SearchAuthUserAccountRemote {
+    return (filter) => fetchRemote(filter)
 }
 async function fetchRemote(
-    feature: RemoteOutsideFeature,
     filter: SearchAuthUserAccountFilter,
 ): Promise<SearchAuthUserAccountRemoteResult> {
     try {
@@ -40,7 +35,7 @@ async function fetchRemote(
             for (let i = 0; i < 50; i++) {
                 list.push({
                     loginId: restoreLoginId(`user-${i}`),
-                    grantedRoles: [],
+                    granted: [],
                     resetTokenDestination: { type: "none" },
                     memo: restoreAuthUserField(`no. ${i}`),
                 })
@@ -48,7 +43,7 @@ async function fetchRemote(
             return {
                 success: true,
                 value: {
-                    page: { offset: 0, limit: 1000, all: list.length },
+                    page: { offset: 0, limit: 1000, count: list.length },
                     sort: { key: defaultSearchAuthUserAccountSort, order: "normal" },
                     list,
                 },
@@ -59,12 +54,11 @@ async function fetchRemote(
             pb.auth.user.account.search.service.SearchAuthUserAccountRequestPb,
             (message) => {
                 message.offset = parseInt(filter.offset)
-                message.sortKey = filter.sort.key
-                message.sortOrder = filter.sort.order
+                message.sort = filter.sort
                 if (filter.loginId.filter) {
                     message.loginId = [filter.loginId.value]
                 }
-                message.grantedRoles = Array.from(filter.grantedRoles)
+                message.granted = Array.from(filter.granted)
             },
         )
 
@@ -72,7 +66,6 @@ async function fetchRemote(
             serverURL: env.apiServerURL,
             path: `/auth/user/account/search/${body}`,
             method: "GET",
-            headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
         })
         const response = await fetch(opts.url, opts.options)
 
@@ -87,19 +80,16 @@ async function fetchRemote(
         return {
             success: true,
             value: {
-                page: { offset: message.offset, limit: message.limit, all: message.all },
+                page: parseSearchPage(message.page),
                 sort: parseSearchSort(
-                    {
-                        key: message.sortKey,
-                        order: message.sortOrder,
-                    },
+                    message.sort,
                     defaultSearchAuthUserAccountSort,
                     readSearchAuthUserAccountSortKey,
                 ),
                 list: message.users.map(
                     (user): AuthUserAccount => ({
                         loginId: restoreLoginId(user.loginId || ""),
-                        grantedRoles: toGrantedRoles(user.grantedRoles || []),
+                        granted: toGranted(user.granted || []),
                         resetTokenDestination: restoreResetTokenDestination({
                             type: user.resetTokenDestination?.type || "",
                             email: user.resetTokenDestination?.email || "",

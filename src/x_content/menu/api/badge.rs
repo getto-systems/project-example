@@ -1,9 +1,8 @@
-use crate::common::outline::load::init::menu_badge_repository::{
-    OutlineMenuBadgeCountProvider, UnitedOutlineMenuBadgeRepository,
-};
+use crate::common::outline::load::infra::OutlineMenuBadgeRepository;
 
 use crate::{
-    common::outline::load::data::OutlineMenuBadgeCount, z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
+    common::outline::load::data::{OutlineMenuBadge, OutlineMenuBadgeCount},
 };
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
@@ -11,32 +10,51 @@ pub enum OutlineMenuBadgePath {
     Index,
 }
 
-impl ToString for OutlineMenuBadgePath {
-    fn to_string(&self) -> String {
+impl OutlineMenuBadgePath {
+    pub const fn as_str(&self) -> &'static str {
         match self {
-            Self::Index => "index".to_owned(),
+            Self::Index => "index",
         }
     }
-}
 
-impl UnitedOutlineMenuBadgeRepository {
-    pub fn build(mut self) -> Self {
-        self.register(OutlineMenuBadgePath::Index, ExampleProvider::boxed());
-        self
-    }
-}
-
-struct ExampleProvider;
-
-impl ExampleProvider {
-    fn boxed() -> Box<dyn OutlineMenuBadgeCountProvider + Sync + Send> {
-        Box::new(Self)
+    pub fn extract(self) -> String {
+        self.as_str().to_owned()
     }
 }
 
 #[async_trait::async_trait]
-impl OutlineMenuBadgeCountProvider for ExampleProvider {
-    async fn count(&self) -> Result<OutlineMenuBadgeCount, RepositoryError> {
-        Ok(OutlineMenuBadgeCount::restore(4649))
+pub trait OutlineMenuExampleBadgeRepository {
+    async fn index(&self) -> Result<OutlineMenuBadgeCount, RepositoryError>;
+}
+
+pub struct ActiveOutlineMenuBadgeRepository {
+    example: ActiveOutlineMenuExampleBadgeRepository,
+}
+
+impl ActiveOutlineMenuBadgeRepository {
+    pub const fn new() -> Self {
+        Self {
+            example: ActiveOutlineMenuExampleBadgeRepository,
+        }
+    }
+}
+
+#[async_trait::async_trait]
+impl OutlineMenuBadgeRepository for ActiveOutlineMenuBadgeRepository {
+    async fn load_menu_badge(&self) -> Result<OutlineMenuBadge, RepositoryError> {
+        let mut badge = OutlineMenuBadge::new();
+
+        badge.set(OutlineMenuBadgePath::Index, self.example.index().await?);
+
+        Ok(badge)
+    }
+}
+
+struct ActiveOutlineMenuExampleBadgeRepository;
+
+#[async_trait::async_trait]
+impl OutlineMenuExampleBadgeRepository for ActiveOutlineMenuExampleBadgeRepository {
+    async fn index(&self) -> Result<OutlineMenuBadgeCount, RepositoryError> {
+        Ok(OutlineMenuBadgeCount::restore(0))
     }
 }

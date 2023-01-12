@@ -1,65 +1,44 @@
-pub mod request_decoder;
-
-use tonic::metadata::MetadataMap;
-
-use crate::auth::user::password::authenticate::y_protobuf::service::AuthenticatePasswordRequestPb;
+mod request;
 
 use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::{
-    ticket::{
-        encode::init::EncodeAuthTicketStruct, issue::init::IssueAuthTicketStruct,
-        validate::init::ValidateAuthNonceStruct,
-    },
+    ticket::{encode::init::ActiveEncodeAuthTokenInfra, issue::init::ActiveIssueAuthTicketInfra},
     user::{
         kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,
-        password::{
-            authenticate::init::request_decoder::PbAuthenticatePasswordRequestDecoder,
-            kernel::init::password_matcher::Argon2PasswordMatcher,
-        },
+        password::kernel::init::password_matcher::Argon2PasswordMatcher,
     },
 };
 
-use super::action::{AuthenticatePasswordAction, AuthenticatePasswordMaterial};
+use crate::auth::user::password::authenticate::action::{
+    AuthenticateWithPasswordAction, AuthenticateWithPasswordMaterial,
+};
 
-pub struct AuthenticatePasswordStruct<'a> {
-    validate_nonce: ValidateAuthNonceStruct<'a>,
-    issue: IssueAuthTicketStruct<'a>,
-    encode: EncodeAuthTicketStruct<'a>,
+pub struct ActiveAuthenticateWithPasswordMaterial<'a> {
+    issue: ActiveIssueAuthTicketInfra<'a>,
+    encode: ActiveEncodeAuthTokenInfra<'a>,
 
-    user_repository: DynamoDbAuthUserRepository<'a>,
+    password_repository: DynamoDbAuthUserRepository<'a>,
 }
 
-impl<'a> AuthenticatePasswordStruct<'a> {
-    pub fn action(
-        feature: &'a AuthAppFeature,
-        metadata: &'a MetadataMap,
-        request: AuthenticatePasswordRequestPb,
-    ) -> AuthenticatePasswordAction<PbAuthenticatePasswordRequestDecoder, Self> {
-        AuthenticatePasswordAction::with_material(
-            PbAuthenticatePasswordRequestDecoder::new(request),
-            Self {
-                validate_nonce: ValidateAuthNonceStruct::new(feature, metadata),
-                issue: IssueAuthTicketStruct::new(feature),
-                encode: EncodeAuthTicketStruct::new(feature),
+impl<'a> ActiveAuthenticateWithPasswordMaterial<'a> {
+    pub fn action(feature: &'a AuthAppFeature) -> AuthenticateWithPasswordAction<Self> {
+        AuthenticateWithPasswordAction::with_material(Self {
+            issue: ActiveIssueAuthTicketInfra::new(feature),
+            encode: ActiveEncodeAuthTokenInfra::new(feature),
 
-                user_repository: DynamoDbAuthUserRepository::new(&feature.store),
-            },
-        )
+            password_repository: DynamoDbAuthUserRepository::new(&feature.store),
+        })
     }
 }
 
-impl<'a> AuthenticatePasswordMaterial for AuthenticatePasswordStruct<'a> {
-    type ValidateNonce = ValidateAuthNonceStruct<'a>;
-    type Issue = IssueAuthTicketStruct<'a>;
-    type Encode = EncodeAuthTicketStruct<'a>;
+impl<'a> AuthenticateWithPasswordMaterial for ActiveAuthenticateWithPasswordMaterial<'a> {
+    type Issue = ActiveIssueAuthTicketInfra<'a>;
+    type Encode = ActiveEncodeAuthTokenInfra<'a>;
 
     type PasswordRepository = DynamoDbAuthUserRepository<'a>;
     type PasswordMatcher = Argon2PasswordMatcher;
 
-    fn validate_nonce(&self) -> &Self::ValidateNonce {
-        &self.validate_nonce
-    }
     fn issue(&self) -> &Self::Issue {
         &self.issue
     }
@@ -68,6 +47,50 @@ impl<'a> AuthenticatePasswordMaterial for AuthenticatePasswordStruct<'a> {
     }
 
     fn password_repository(&self) -> &Self::PasswordRepository {
-        &self.user_repository
+        &self.password_repository
+    }
+}
+
+#[cfg(test)]
+pub mod test {
+    pub use super::request::test::*;
+
+    use crate::auth::{
+        ticket::{
+            encode::init::test::StaticEncodeAuthTokenInfra,
+            issue::init::test::StaticIssueAuthTicketInfra,
+        },
+        user::{
+            kernel::init::user_repository::memory::MemoryAuthUserRepository,
+            password::kernel::init::password_matcher::test::PlainPasswordMatcher,
+        },
+    };
+
+    use crate::auth::user::password::authenticate::action::AuthenticateWithPasswordMaterial;
+
+    pub struct StaticAuthenticateWithPasswordMaterial<'a> {
+        pub issue: StaticIssueAuthTicketInfra<'a>,
+        pub encode: StaticEncodeAuthTokenInfra<'a>,
+
+        pub password_repository: MemoryAuthUserRepository<'a>,
+    }
+
+    impl<'a> AuthenticateWithPasswordMaterial for StaticAuthenticateWithPasswordMaterial<'a> {
+        type Issue = StaticIssueAuthTicketInfra<'a>;
+        type Encode = StaticEncodeAuthTokenInfra<'a>;
+
+        type PasswordRepository = MemoryAuthUserRepository<'a>;
+        type PasswordMatcher = PlainPasswordMatcher;
+
+        fn issue(&self) -> &Self::Issue {
+            &self.issue
+        }
+        fn encode(&self) -> &Self::Encode {
+            &self.encode
+        }
+
+        fn password_repository(&self) -> &Self::PasswordRepository {
+            &self.password_repository
+        }
     }
 }

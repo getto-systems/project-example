@@ -1,64 +1,72 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::ticket::validate::method::{
-    authenticate, AuthenticateEvent, AuthenticateInfra,
-};
+use crate::common::proxy::action::CoreProxyParams;
+
+use crate::auth::ticket::authorize::proxy::{authorize, AuthorizeEvent, AuthorizeInfra};
 
 use crate::auth::user::account::modify::infra::{
-    ModifyAuthUserAccountFields, ModifyAuthUserAccountFieldsExtract,
-    ModifyAuthUserAccountRepository, ModifyAuthUserAccountRequestDecoder,
+    ModifyAuthUserAccountFieldsExtract, ModifyAuthUserAccountRepository,
 };
 
 use crate::{
     auth::{
-        data::RequireAuthRoles, ticket::kernel::data::PermissionError,
+        ticket::kernel::data::{AuthPermissionRequired, AuthorizeTokenExtract},
         user::account::modify::data::ValidateModifyAuthUserAccountFieldsError,
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
 pub enum ModifyAuthUserAccountState {
-    Authenticate(AuthenticateEvent),
-    PermissionError(PermissionError),
+    Authorize(AuthorizeEvent),
     ModifyUser(ModifyAuthUserAccountEvent),
 }
 
 impl std::fmt::Display for ModifyAuthUserAccountState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Authenticate(event) => event.fmt(f),
-            Self::PermissionError(event) => event.fmt(f),
+            Self::Authorize(event) => event.fmt(f),
             Self::ModifyUser(event) => event.fmt(f),
         }
     }
 }
 
 pub trait ModifyAuthUserAccountMaterial {
-    type Authenticate: AuthenticateInfra;
+    type Authorize: AuthorizeInfra;
 
     type UserRepository: ModifyAuthUserAccountRepository;
 
-    fn authenticate(&self) -> &Self::Authenticate;
+    fn authorize(&self) -> &Self::Authorize;
 
     fn user_repository(&self) -> &Self::UserRepository;
 }
 
-pub struct ModifyAuthUserAccountAction<
-    R: ModifyAuthUserAccountRequestDecoder,
-    M: ModifyAuthUserAccountMaterial,
-> {
+pub struct ModifyAuthUserAccountAction<M: ModifyAuthUserAccountMaterial> {
+    pub info: ModifyAuthUserAccountActionInfo,
     pubsub: ActionStatePubSub<ModifyAuthUserAccountState>,
-    request_decoder: R,
     material: M,
 }
 
-impl<R: ModifyAuthUserAccountRequestDecoder, M: ModifyAuthUserAccountMaterial>
-    ModifyAuthUserAccountAction<R, M>
-{
-    pub fn with_material(request_decoder: R, material: M) -> Self {
+pub struct ModifyAuthUserAccountActionInfo;
+
+impl ModifyAuthUserAccountActionInfo {
+    pub const fn name(&self) -> &'static str {
+        "auth.user.account.modify"
+    }
+
+    pub fn required(&self) -> AuthPermissionRequired {
+        AuthPermissionRequired::user()
+    }
+
+    pub fn params(&self) -> CoreProxyParams {
+        (self.name(), self.required())
+    }
+}
+
+impl<M: ModifyAuthUserAccountMaterial> ModifyAuthUserAccountAction<M> {
+    pub fn with_material(material: M) -> Self {
         Self {
+            info: ModifyAuthUserAccountActionInfo,
             pubsub: ActionStatePubSub::new(),
-            request_decoder,
             material,
         }
     }
@@ -70,23 +78,24 @@ impl<R: ModifyAuthUserAccountRequestDecoder, M: ModifyAuthUserAccountMaterial>
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<ModifyAuthUserAccountState> {
-        let pubsub = self.pubsub;
-        let m = self.material;
-
-        let fields = self.request_decoder.decode();
-
-        let ticket = authenticate(m.authenticate(), |event| {
-            pubsub.post(ModifyAuthUserAccountState::Authenticate(event))
-        })
+    pub async fn ignite(
+        self,
+        token: impl AuthorizeTokenExtract,
+        fields: impl ModifyAuthUserAccountFieldsExtract,
+    ) -> MethodResult<ModifyAuthUserAccountState> {
+        authorize(
+            self.material.authorize(),
+            (token, self.info.required()),
+            |event| {
+                self.pubsub
+                    .post(ModifyAuthUserAccountState::Authorize(event))
+            },
+        )
         .await?;
 
-        ticket
-            .check_enough_permission(RequireAuthRoles::user())
-            .map_err(|err| pubsub.post(ModifyAuthUserAccountState::PermissionError(err)))?;
-
-        modify_user(&m, fields, |event| {
-            pubsub.post(ModifyAuthUserAccountState::ModifyUser(event))
+        modify_user(&self.material, fields, |event| {
+            self.pubsub
+                .post(ModifyAuthUserAccountState::ModifyUser(event))
         })
         .await
     }
@@ -121,22 +130,23 @@ mod modify_auth_user_account_event {
 
 async fn modify_user<S>(
     infra: &impl ModifyAuthUserAccountMaterial,
-    fields: ModifyAuthUserAccountFieldsExtract,
+    fields: impl ModifyAuthUserAccountFieldsExtract,
     post: impl Fn(ModifyAuthUserAccountEvent) -> S,
 ) -> MethodResult<S> {
-    let fields = ModifyAuthUserAccountFields::convert(fields)
+    let fields = fields
+        .convert()
         .map_err(|err| post(ModifyAuthUserAccountEvent::Invalid(err)))?;
 
-    let user_repository = infra.user_repository();
-
-    let user_id = user_repository
+    let user_id = infra
+        .user_repository()
         .lookup_user_id(&fields.login_id)
         .await
         .map_err(|err| post(ModifyAuthUserAccountEvent::RepositoryError(err)))?
         .ok_or_else(|| post(ModifyAuthUserAccountEvent::NotFound))?;
 
-    let stored_user = user_repository
-        .lookup_changes(&user_id)
+    let stored_user = infra
+        .user_repository()
+        .lookup_attrs(&user_id)
         .await
         .map_err(|err| post(ModifyAuthUserAccountEvent::RepositoryError(err)))?
         .ok_or_else(|| post(ModifyAuthUserAccountEvent::NotFound))?;
@@ -145,7 +155,8 @@ async fn modify_user<S>(
         return Err(post(ModifyAuthUserAccountEvent::Conflict));
     }
 
-    user_repository
+    infra
+        .user_repository()
         .modify_user(user_id, fields.to)
         .await
         .map_err(|err| post(ModifyAuthUserAccountEvent::RepositoryError(err)))?;

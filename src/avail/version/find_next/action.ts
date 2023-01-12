@@ -6,12 +6,12 @@ import {
 import { versionStringConverter } from "../kernel/convert"
 import { versionConfigConverter } from "./convert"
 import { versionToString } from "./helper"
-import { checkTakeLongtime } from "../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime } from "../../../common/util/timer/helper"
 
-import { WaitTime } from "../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../common/util/config/infra"
 import { ApplicationTargetPathDetecter, CheckDeployExistsRemote } from "./infra"
 
-import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
+import { ConvertLocationResult } from "../../../common/util/location/data"
 import { VersionString } from "../kernel/data"
 import {
     ApplicationTargetPath,

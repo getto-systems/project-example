@@ -1,13 +1,10 @@
 use crate::{
-    auth::user::account::search::data::{
-        AuthUserAccountSearch, SearchAuthUserAccountFilter,
-        SearchAuthUserAccountFilterExtract,
-    },
-    z_lib::repository::data::RepositoryError,
+    auth::user::account::search::data::{AuthUserAccountSearch, SearchAuthUserAccountFilter},
+    common::api::repository::data::RepositoryError,
 };
 
-pub trait SearchAuthUserAccountRequestDecoder {
-    fn decode(self) -> SearchAuthUserAccountFilterExtract;
+pub trait SearchAuthUserAccountFilterExtract {
+    fn convert(self) -> SearchAuthUserAccountFilter;
 }
 
 #[async_trait::async_trait]

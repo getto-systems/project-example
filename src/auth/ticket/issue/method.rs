@@ -1,14 +1,16 @@
-use crate::auth::ticket::{
-    issue::infra::{AuthTicketIdGenerator, IssueAuthTicketRepository},
+use crate::auth::{
     kernel::infra::AuthClock,
+    ticket::issue::infra::{
+        AuthTicketIdGenerator, IssueAuthTicketConfig, IssueAuthTicketRepository,
+    },
 };
 
 use crate::{
     auth::{
-        ticket::kernel::data::{AuthTicket, ExpansionLimitDateTime, ExpansionLimitDuration},
-        user::kernel::data::AuthUser,
+        kernel::data::ExpansionLimitDateTime,
+        ticket::kernel::data::{AuthTicket, AuthTicketAttrs},
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
 pub enum IssueAuthTicketEvent {
@@ -17,8 +19,8 @@ pub enum IssueAuthTicketEvent {
     RepositoryError(RepositoryError),
 }
 
-const SUCCESS: &'static str = "issue success";
-const ERROR: &'static str = "issue error";
+const SUCCESS: &'static str = "issue auth-ticket success";
+const ERROR: &'static str = "issue auth-ticket error";
 
 impl std::fmt::Display for IssueAuthTicketEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -43,30 +45,26 @@ pub trait IssueAuthTicketInfra {
     fn config(&self) -> &IssueAuthTicketConfig;
 }
 
-pub struct IssueAuthTicketConfig {
-    pub ticket_expansion_limit: ExpansionLimitDuration,
-}
-
 pub async fn issue_auth_ticket<S>(
     infra: &impl IssueAuthTicketInfra,
-    user: AuthUser,
+    attrs: AuthTicketAttrs,
     post: impl Fn(IssueAuthTicketEvent) -> S,
 ) -> Result<AuthTicket, S> {
-    let ticket_id_generator = infra.ticket_id_generator();
-    let config = infra.config();
-    let clock = infra.clock();
-    let ticket_repository = infra.ticket_repository();
+    let ticket = AuthTicket {
+        ticket_id: infra.ticket_id_generator().generate(),
+        attrs,
+    };
 
-    let ticket = AuthTicket::new(ticket_id_generator.generate(), user);
+    let issued_at = infra.clock().now();
+    let limit = issued_at.expansion_limit(&infra.config().authenticate_expansion_limit);
 
-    let issued_at = clock.now();
-    let limit = issued_at.expansion_limit(&config.ticket_expansion_limit);
     post(IssueAuthTicketEvent::ExpansionLimitCalculated(
         limit.clone(),
     ));
 
-    ticket_repository
-        .issue(ticket.clone(), limit, issued_at)
+    infra
+        .ticket_repository()
+        .register(ticket.clone(), limit, issued_at)
         .await
         .map_err(|err| post(IssueAuthTicketEvent::RepositoryError(err)))?;
 

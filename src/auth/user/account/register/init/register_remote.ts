@@ -1,14 +1,11 @@
 import { env } from "../../../../../y_environment/ui/env"
 import pb from "../../../../../y_protobuf/proto.js"
 
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
-
 import {
-    generateNonce,
     fetchOptions,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../z_lib/ui/remote/init/helper"
+} from "../../../../../common/util/remote/init/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf/helper"
 
 import { RegisterAuthUserAccountRemoteResult, RegisterAuthUserAccountRemote } from "../infra"
@@ -16,16 +13,11 @@ import { RegisterAuthUserAccountRemoteResult, RegisterAuthUserAccountRemote } fr
 import { RegisterAuthUserAccountRemoteError } from "../data"
 import { AuthUserAccount } from "../../kernel/data"
 
-export function newRegisterAuthUserAccountRemote(
-    feature: RemoteOutsideFeature,
-): RegisterAuthUserAccountRemote {
-    return (fields) => fetchRemote(feature, fields)
+export function newRegisterAuthUserAccountRemote(): RegisterAuthUserAccountRemote {
+    return (fields) => fetchRemote(fields)
 }
 
-async function fetchRemote(
-    feature: RemoteOutsideFeature,
-    fields: AuthUserAccount,
-): Promise<RegisterAuthUserAccountRemoteResult> {
+async function fetchRemote(fields: AuthUserAccount): Promise<RegisterAuthUserAccountRemoteResult> {
     const mock = false
     if (mock) {
         return { success: true, value: true }
@@ -36,7 +28,6 @@ async function fetchRemote(
             serverURL: env.apiServerURL,
             path: "/auth/user/account",
             method: "POST",
-            headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
         })
         const response = await fetch(opts.url, {
             ...opts.options,
@@ -45,7 +36,7 @@ async function fetchRemote(
                 (message) => {
                     message.data = {
                         ...fields,
-                        grantedRoles: Array.from(fields.grantedRoles),
+                        granted: Array.from(fields.granted),
                     }
                 },
             ),

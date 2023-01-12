@@ -1,13 +1,13 @@
 use std::{collections::HashMap, sync::Mutex};
 
 use crate::auth::{
-    ticket::kernel::data::{AuthDateTime, ExpireDateTime},
+    kernel::data::{AuthDateTime, ExpireDateTime},
     user::{
         kernel::data::AuthUserId,
         login_id::kernel::data::LoginId,
         password::reset::{
-            kernel::data::{ResetToken, ResetTokenDestination},
-            reset::infra::ResetTokenMoment,
+            kernel::data::{ResetPasswordId, ResetPasswordTokenDestination},
+            reset::infra::ResetPasswordTokenMoment,
         },
     },
 };
@@ -15,12 +15,12 @@ use crate::auth::{
 pub struct MapResetToken<'a> {
     store: &'a StoreResetToken,
 }
-pub type StoreResetToken = Mutex<HashMap<ResetToken, EntryResetToken>>;
+pub type StoreResetToken = Mutex<HashMap<ResetPasswordId, EntryResetToken>>;
 
 pub struct EntryResetToken {
     pub user_id: AuthUserId,
     pub login_id: LoginId,
-    pub destination: ResetTokenDestination,
+    pub destination: ResetPasswordTokenDestination,
     pub expires: ExpireDateTime,
     pub requested_at: AuthDateTime,
     pub reset_at: Option<AuthDateTime>,
@@ -36,29 +36,34 @@ impl<'a> MapResetToken<'a> {
 
     pub fn get_reset_token_entry(
         &self,
-        reset_token: &ResetToken,
-    ) -> Option<(AuthUserId, LoginId, ResetTokenDestination, ResetTokenMoment)> {
+        reset_token: &ResetPasswordId,
+    ) -> Option<(
+        AuthUserId,
+        LoginId,
+        ResetPasswordTokenDestination,
+        ResetPasswordTokenMoment,
+    )> {
         let store = self.store.lock().unwrap();
         store.get(reset_token).map(|entry| {
             (
                 entry.user_id.clone(),
                 entry.login_id.clone(),
                 entry.destination.clone(),
-                ResetTokenMoment::restore(entry.expires.clone(), entry.reset_at.clone()),
+                ResetPasswordTokenMoment::restore(entry.expires.clone(), entry.reset_at.clone()),
             )
         })
     }
 
-    pub fn insert_entry(&self, reset_token: ResetToken, entry: EntryResetToken) {
+    pub fn insert_entry(&self, reset_token: ResetPasswordId, entry: EntryResetToken) {
         let mut store = self.store.lock().unwrap();
         store.insert(reset_token, entry);
     }
     pub fn insert_reset_token(
         &self,
-        reset_token: ResetToken,
+        reset_token: ResetPasswordId,
         user_id: AuthUserId,
         login_id: LoginId,
-        destination: ResetTokenDestination,
+        destination: ResetPasswordTokenDestination,
         expires: ExpireDateTime,
         requested_at: AuthDateTime,
     ) {
@@ -76,7 +81,7 @@ impl<'a> MapResetToken<'a> {
             },
         );
     }
-    pub fn update_reset_at(&self, reset_token: ResetToken, reset_at: AuthDateTime) {
+    pub fn update_reset_at(&self, reset_token: ResetPasswordId, reset_at: AuthDateTime) {
         let mut store = self.store.lock().unwrap();
         if let Some(entry) = store.remove(&reset_token) {
             store.insert(

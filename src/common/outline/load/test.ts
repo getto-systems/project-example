@@ -3,13 +3,13 @@ import { observeApplicationState } from "../../../z_vendor/getto-application/act
 
 import { markMenuCategoryLabel, standard_MenuTree } from "./test_helper"
 
-import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
+import { initMemoryDB } from "../../util/repository/init/memory"
 import { initMenuBadgeStore, initMenuExpandStore } from "./init/store"
 
 import { detectMenuTargetPath } from "./convert"
 import { convertMenuBadgeRemote, menuExpandRepositoryConverter } from "./convert"
 import { authTicketRepositoryConverter } from "../../../auth/ticket/kernel/convert"
-import { convertDB } from "../../../z_lib/ui/repository/init/convert"
+import { convertDB } from "../../util/repository/init/convert"
 
 import { initOutlineMenuAction, OutlineMenuAction } from "./action"
 
@@ -64,7 +64,7 @@ test("load menu", async () => {
     ])
 })
 
-test("load menu; empty roles", async () => {
+test("load menu; empty permissions", async () => {
     const { menu } = empty()
 
     expect(
@@ -366,7 +366,7 @@ function standard_ticketRepository(): AuthTicketRepository {
     const db = initMemoryDB<AuthTicketRepositoryValue>()
     db.set({
         authAt: "2020-01-01 00:00:00",
-        grantedRoles: ["admin"],
+        granted: ["admin"],
     })
     return convertDB(db, authTicketRepositoryConverter)
 }
@@ -377,7 +377,7 @@ function user_ticketRepository(): AuthTicketRepository {
     const db = initMemoryDB<AuthTicketRepositoryValue>()
     db.set({
         authAt: "2020-01-01 00:00:00",
-        grantedRoles: ["auth-user"],
+        granted: ["auth-user"],
     })
     return convertDB(db, authTicketRepositoryConverter)
 }

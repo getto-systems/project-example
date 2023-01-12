@@ -1,16 +1,12 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
 use crate::auth::ticket::{
-    encode::method::{encode_auth_ticket, EncodeAuthTicketEvent, EncodeAuthTicketInfra},
+    encode::method::{encode_auth_token, EncodeAuthTokenEvent, EncodeAuthTokenInfra},
     issue::method::{issue_auth_ticket, IssueAuthTicketEvent, IssueAuthTicketInfra},
-    validate::method::{validate_auth_nonce, ValidateAuthNonceEvent, ValidateAuthNonceInfra},
 };
 
 use crate::auth::user::password::{
-    authenticate::infra::{
-        AuthenticatePasswordFields, AuthenticatePasswordFieldsExtract,
-        AuthenticatePasswordRepository, AuthenticatePasswordRequestDecoder,
-    },
+    authenticate::infra::{AuthenticatePasswordRepository, AuthenticateWithPasswordFieldsExtract},
     kernel::infra::{AuthUserPasswordMatcher, PlainPassword},
 };
 
@@ -18,40 +14,36 @@ use crate::{
     auth::user::{
         kernel::data::AuthUser,
         password::{
-            authenticate::data::ValidateAuthenticatePasswordFieldsError,
+            authenticate::data::ValidateAuthenticateWithPasswordFieldsError,
             kernel::data::PasswordHashError,
         },
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
-pub enum AuthenticatePasswordState {
-    Authenticate(AuthenticatePasswordEvent),
-    ValidateNonce(ValidateAuthNonceEvent),
+pub enum AuthenticateWithPasswordState {
+    AuthenticateWithPassword(AuthenticateWithPasswordEvent),
     Issue(IssueAuthTicketEvent),
-    Encode(EncodeAuthTicketEvent),
+    Encode(EncodeAuthTokenEvent),
 }
 
-impl std::fmt::Display for AuthenticatePasswordState {
+impl std::fmt::Display for AuthenticateWithPasswordState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Authenticate(event) => event.fmt(f),
-            Self::ValidateNonce(event) => event.fmt(f),
+            Self::AuthenticateWithPassword(event) => event.fmt(f),
             Self::Issue(event) => event.fmt(f),
             Self::Encode(event) => event.fmt(f),
         }
     }
 }
 
-pub trait AuthenticatePasswordMaterial {
-    type ValidateNonce: ValidateAuthNonceInfra;
+pub trait AuthenticateWithPasswordMaterial {
     type Issue: IssueAuthTicketInfra;
-    type Encode: EncodeAuthTicketInfra;
+    type Encode: EncodeAuthTokenInfra;
 
     type PasswordRepository: AuthenticatePasswordRepository;
     type PasswordMatcher: AuthUserPasswordMatcher;
 
-    fn validate_nonce(&self) -> &Self::ValidateNonce;
     fn issue(&self) -> &Self::Issue;
     fn encode(&self) -> &Self::Encode;
 
@@ -61,74 +53,75 @@ pub trait AuthenticatePasswordMaterial {
     }
 }
 
-pub struct AuthenticatePasswordAction<
-    R: AuthenticatePasswordRequestDecoder,
-    M: AuthenticatePasswordMaterial,
-> {
-    pubsub: ActionStatePubSub<AuthenticatePasswordState>,
-    request_decoder: R,
+pub struct AuthenticateWithPasswordAction<M: AuthenticateWithPasswordMaterial> {
+    pub info: AuthenticateWithPasswordActionInfo,
+    pubsub: ActionStatePubSub<AuthenticateWithPasswordState>,
     material: M,
 }
 
-impl<R: AuthenticatePasswordRequestDecoder, M: AuthenticatePasswordMaterial>
-    AuthenticatePasswordAction<R, M>
-{
-    pub fn with_material(request_decoder: R, material: M) -> Self {
+pub struct AuthenticateWithPasswordActionInfo;
+
+impl AuthenticateWithPasswordActionInfo {
+    pub const fn name(&self) -> &'static str {
+        "auth.user.password.authenticate"
+    }
+}
+
+impl<M: AuthenticateWithPasswordMaterial> AuthenticateWithPasswordAction<M> {
+    pub fn with_material(material: M) -> Self {
         Self {
+            info: AuthenticateWithPasswordActionInfo,
             pubsub: ActionStatePubSub::new(),
-            request_decoder,
             material,
         }
     }
 
     pub fn subscribe(
         &mut self,
-        handler: impl 'static + Fn(&AuthenticatePasswordState) + Send + Sync,
+        handler: impl 'static + Fn(&AuthenticateWithPasswordState) + Send + Sync,
     ) {
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<AuthenticatePasswordState> {
-        let pubsub = self.pubsub;
-        let m = self.material;
-
-        let fields = self.request_decoder.decode();
-
-        validate_auth_nonce(m.validate_nonce(), |event| {
-            pubsub.post(AuthenticatePasswordState::ValidateNonce(event))
+    pub async fn ignite(
+        self,
+        fields: impl AuthenticateWithPasswordFieldsExtract,
+    ) -> MethodResult<AuthenticateWithPasswordState> {
+        let user = authenticate_with_password(&self.material, fields, |event| {
+            self.pubsub
+                .post(AuthenticateWithPasswordState::AuthenticateWithPassword(
+                    event,
+                ))
         })
         .await?;
 
-        let user = authenticate_password(&m, fields, |event| {
-            pubsub.post(AuthenticatePasswordState::Authenticate(event))
+        let ticket = issue_auth_ticket(self.material.issue(), user.into(), |event| {
+            self.pubsub
+                .post(AuthenticateWithPasswordState::Issue(event))
         })
         .await?;
 
-        let ticket = issue_auth_ticket(m.issue(), user, |event| {
-            pubsub.post(AuthenticatePasswordState::Issue(event))
-        })
-        .await?;
-
-        encode_auth_ticket(m.encode(), ticket, |event| {
-            pubsub.post(AuthenticatePasswordState::Encode(event))
+        encode_auth_token(self.material.encode(), ticket, |event| {
+            self.pubsub
+                .post(AuthenticateWithPasswordState::Encode(event))
         })
         .await
     }
 }
 
-pub enum AuthenticatePasswordEvent {
+pub enum AuthenticateWithPasswordEvent {
     Success(AuthUser),
-    Invalid(ValidateAuthenticatePasswordFieldsError),
+    Invalid(ValidateAuthenticateWithPasswordFieldsError),
     NotFound,
     PasswordNotMatched,
     PasswordHashError(PasswordHashError),
     RepositoryError(RepositoryError),
 }
 
-const SUCCESS: &'static str = "authenticate password success";
-const ERROR: &'static str = "authenticate password error";
+const SUCCESS: &'static str = "authenticate with password success";
+const ERROR: &'static str = "authenticate with password error";
 
-impl std::fmt::Display for AuthenticatePasswordEvent {
+impl std::fmt::Display for AuthenticateWithPasswordEvent {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Success(user) => write!(f, "{}; {}", SUCCESS, user),
@@ -141,38 +134,35 @@ impl std::fmt::Display for AuthenticatePasswordEvent {
     }
 }
 
-async fn authenticate_password<S>(
-    infra: &impl AuthenticatePasswordMaterial,
-    fields: AuthenticatePasswordFieldsExtract,
-    post: impl Fn(AuthenticatePasswordEvent) -> S,
+async fn authenticate_with_password<S>(
+    infra: &impl AuthenticateWithPasswordMaterial,
+    fields: impl AuthenticateWithPasswordFieldsExtract,
+    post: impl Fn(AuthenticateWithPasswordEvent) -> S,
 ) -> Result<AuthUser, S> {
-    let fields = AuthenticatePasswordFields::convert(fields)
-        .map_err(|err| post(AuthenticatePasswordEvent::Invalid(err)))?;
+    let fields = fields
+        .convert()
+        .map_err(|err| post(AuthenticateWithPasswordEvent::Invalid(err)))?;
 
-    let password_repository = infra.password_repository();
-    let password_matcher = infra.password_matcher(fields.password);
-
-    let user_id = password_repository
-        .lookup_user_id(&fields.login_id)
+    let (user_id, stored_password, granted) = infra
+        .password_repository()
+        .lookup_user(&fields.login_id)
         .await
-        .map_err(|err| post(AuthenticatePasswordEvent::RepositoryError(err)))?
-        .ok_or_else(|| post(AuthenticatePasswordEvent::NotFound))?;
+        .map_err(|err| post(AuthenticateWithPasswordEvent::RepositoryError(err)))?
+        .ok_or_else(|| post(AuthenticateWithPasswordEvent::NotFound))?;
 
-    let (hashed_password, granted_roles) = password_repository
-        .lookup_user(&user_id)
-        .await
-        .map_err(|err| post(AuthenticatePasswordEvent::RepositoryError(err)))?
-        .ok_or_else(|| post(AuthenticatePasswordEvent::NotFound))?;
-
-    if !password_matcher
-        .match_password(&hashed_password)
-        .map_err(|err| post(AuthenticatePasswordEvent::PasswordHashError(err)))?
+    if !infra
+        .password_matcher(fields.plain_password)
+        .match_password(stored_password)
+        .map_err(|err| post(AuthenticateWithPasswordEvent::PasswordHashError(err)))?
     {
-        return Err(post(AuthenticatePasswordEvent::PasswordNotMatched));
+        return Err(post(AuthenticateWithPasswordEvent::PasswordNotMatched));
     }
 
-    let user = AuthUser::restore(user_id, granted_roles);
+    let user = AuthUser {
+        user_id,
+        granted: granted.unwrap_or_default(),
+    };
 
-    post(AuthenticatePasswordEvent::Success(user.clone()));
+    post(AuthenticateWithPasswordEvent::Success(user.clone()));
     Ok(user)
 }

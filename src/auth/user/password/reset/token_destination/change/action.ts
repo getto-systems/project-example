@@ -3,7 +3,7 @@ import {
     initApplicationState,
 } from "../../../../../../z_vendor/getto-application/action/action"
 
-import { checkTakeLongtime, ticker } from "../../../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime, ticker } from "../../../../../../common/util/timer/helper"
 
 import {
     initResetTokenDestinationFieldAction,
@@ -15,11 +15,11 @@ import {
     initModifyField,
     modifyField,
     ModifyFieldHandler,
-} from "../../../../../../z_lib/ui/modify/action"
+} from "../../../../../../common/util/modify/action"
 import { EditableBoardAction } from "../../../../../../z_vendor/getto-application/board/editable/action"
 
 import { ChangeResetTokenDestinationRemote } from "./infra"
-import { WaitTime } from "../../../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../../../common/util/config/infra"
 
 import { ResetTokenDestination } from "../kernel/data"
 import { LoginId } from "../../../../login_id/kernel/data"

@@ -1,43 +1,56 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::ticket::validate::method::{
-    authenticate, AuthenticateEvent, AuthenticateInfra,
+use crate::auth::ticket::authenticate::method::{
+    authenticate_with_token, AuthenticateWithTokenEvent, AuthenticateWithTokenInfra,
 };
 
 use crate::auth::ticket::logout::infra::LogoutAuthTicketRepository;
 
-use crate::{auth::ticket::kernel::data::AuthTicket, z_lib::repository::data::RepositoryError};
+use crate::{
+    auth::ticket::kernel::data::{AuthTicket, AuthenticateTokenExtract},
+    common::api::repository::data::RepositoryError,
+};
 
 pub enum LogoutState {
-    Authenticate(AuthenticateEvent),
+    AuthenticateWithToken(AuthenticateWithTokenEvent),
     Logout(LogoutEvent),
 }
 
 impl std::fmt::Display for LogoutState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Authenticate(event) => event.fmt(f),
+            Self::AuthenticateWithToken(event) => event.fmt(f),
             Self::Logout(event) => event.fmt(f),
         }
     }
 }
 
 pub trait LogoutMaterial {
-    type Authenticate: AuthenticateInfra;
+    type AuthenticateWithToken: AuthenticateWithTokenInfra;
     type TicketRepository: LogoutAuthTicketRepository;
 
-    fn authenticate(&self) -> &Self::Authenticate;
+    fn authenticate_with_token(&self) -> &Self::AuthenticateWithToken;
     fn ticket_repository(&self) -> &Self::TicketRepository;
 }
 
 pub struct LogoutAction<M: LogoutMaterial> {
+    pub info: LogoutActionInfo,
     pubsub: ActionStatePubSub<LogoutState>,
     material: M,
+}
+
+pub struct LogoutActionInfo;
+
+impl LogoutActionInfo {
+    pub const fn name(&self) -> &'static str {
+        "auth.ticket.logout"
+    }
 }
 
 impl<M: LogoutMaterial> LogoutAction<M> {
     pub fn with_material(material: M) -> Self {
         Self {
+            info: LogoutActionInfo,
             pubsub: ActionStatePubSub::new(),
             material,
         }
@@ -47,16 +60,17 @@ impl<M: LogoutMaterial> LogoutAction<M> {
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<LogoutState> {
-        let pubsub = self.pubsub;
-        let m = self.material;
+    pub async fn ignite(self, token: impl AuthenticateTokenExtract) -> MethodResult<LogoutState> {
+        let (ticket, _token) =
+            authenticate_with_token(self.material.authenticate_with_token(), token, |event| {
+                self.pubsub.post(LogoutState::AuthenticateWithToken(event))
+            })
+            .await?;
 
-        let ticket = authenticate(m.authenticate(), |event| {
-            pubsub.post(LogoutState::Authenticate(event))
+        logout(&self.material, ticket, |event| {
+            self.pubsub.post(LogoutState::Logout(event))
         })
-        .await?;
-
-        logout(&m, ticket, |event| pubsub.post(LogoutState::Logout(event))).await
+        .await
     }
 }
 
@@ -82,9 +96,8 @@ async fn logout<S>(
     ticket: AuthTicket,
     post: impl Fn(LogoutEvent) -> S,
 ) -> MethodResult<S> {
-    let ticket_repository = infra.ticket_repository();
-
-    ticket_repository
+    infra
+        .ticket_repository()
         .discard(&ticket)
         .await
         .map_err(|err| post(LogoutEvent::RepositoryError(err)))?;

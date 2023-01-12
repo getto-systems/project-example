@@ -1,8 +1,9 @@
 use std::{collections::HashMap, sync::Mutex};
 
 use crate::auth::{
-    ticket::kernel::data::{AuthDateTime, AuthTicket, AuthTicketId, ExpansionLimitDateTime},
-    user::kernel::data::{AuthUser, AuthUserId},
+    kernel::data::{AuthDateTime, ExpansionLimitDateTime},
+    ticket::kernel::data::{AuthTicket, AuthTicketId},
+    user::kernel::data::AuthUserId,
 };
 
 pub struct MapTicket<'a> {
@@ -11,7 +12,7 @@ pub struct MapTicket<'a> {
 pub type StoreTicket = Mutex<HashMap<AuthTicketId, EntryTicket>>;
 
 pub struct EntryTicket {
-    pub user: AuthUser,
+    pub user_id: AuthUserId,
     pub limit: ExpansionLimitDateTime,
     pub issued_at: AuthDateTime,
 }
@@ -39,14 +40,12 @@ impl<'a> MapTicket<'a> {
         limit: ExpansionLimitDateTime,
         issued_at: AuthDateTime,
     ) {
-        let (ticket_id, user) = ticket.extract();
-
         // 本当のデータベースでは ticket_id がすでに存在したらエラーにする
         let mut store = self.store.lock().unwrap();
         store.insert(
-            ticket_id,
+            ticket.ticket_id,
             EntryTicket {
-                user,
+                user_id: ticket.attrs.user_id,
                 limit,
                 issued_at,
             },
@@ -59,11 +58,12 @@ impl<'a> MapTicket<'a> {
     }
 
     pub fn get_all_ticket_id(&self, user_id: &AuthUserId) -> Vec<AuthTicketId> {
+        let user_id = user_id.clone();
         let store = self.store.lock().unwrap();
         store
             .iter()
             .filter_map(|(ticket_id, entry)| {
-                if entry.user.user_id() == user_id {
+                if entry.user_id == user_id {
                     Some(ticket_id.clone())
                 } else {
                     None

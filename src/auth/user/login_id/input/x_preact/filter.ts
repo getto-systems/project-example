@@ -1,11 +1,11 @@
 import { h, VNode } from "preact"
-import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../common/x_preact/vnode"
 
 import { label, search } from "../../../../../z_vendor/getto-css/preact/design/form"
 
 import { InputBoard } from "../../../../../z_vendor/getto-application/board/input/x_preact/input"
 
-import { TextFilterAction } from "../../../../../z_lib/ui/input/filter/text"
+import { TextFilterAction } from "../../../../../common/util/input/filter/text"
 
 import { AUTH_USER_ACCOUNT } from "../../../account/kernel/data"
 

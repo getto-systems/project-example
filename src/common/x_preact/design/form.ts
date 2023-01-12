@@ -1,7 +1,7 @@
 import { html } from "htm/preact"
 import { VNode } from "preact"
 
-import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../vnode"
 
 import { fieldHelp, fieldHelp_error } from "../../../z_vendor/getto-css/preact/design/form"
 import { VectorButton } from "../../../z_vendor/getto-application/board/input/x_preact/vector"

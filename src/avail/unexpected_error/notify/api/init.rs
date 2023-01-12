@@ -1,47 +1,65 @@
-pub mod request_decoder;
+use crate::x_outside_feature::{core::feature::CoreAppFeature, data::RequestId};
 
-use tonic::metadata::MetadataMap;
+use crate::auth::init::ActiveAuthorizeInfra;
 
-use crate::avail::unexpected_error::notify::y_protobuf::service::NotifyRequestPb;
-
-use crate::x_outside_feature::core::feature::CoreAppFeature;
-
-use crate::{
-    auth::init::AuthorizeStruct,
-    avail::unexpected_error::notify::init::request_decoder::PbNotifyUnexpectedErrorRequestDecoder,
+use crate::avail::unexpected_error::notify::action::{
+    NotifyUnexpectedErrorAction, NotifyUnexpectedErrorMaterial,
 };
 
-use super::action::{NotifyUnexpectedErrorAction, NotifyUnexpectedErrorMaterial};
-
-pub struct NotifyUnexpectedErrorFeature<'a> {
-    authorize: AuthorizeStruct<'a>,
+pub struct ActiveNotifyUnexpectedErrorMaterial<'a> {
+    authorize: ActiveAuthorizeInfra<'a>,
 }
 
-impl<'a> NotifyUnexpectedErrorFeature<'a> {
+impl<'a> ActiveNotifyUnexpectedErrorMaterial<'a> {
     pub fn action(
         feature: &'a CoreAppFeature,
-        request_id: &'a str,
-        metadata: &'a MetadataMap,
-        request: NotifyRequestPb,
-    ) -> NotifyUnexpectedErrorAction<PbNotifyUnexpectedErrorRequestDecoder, Self> {
-        NotifyUnexpectedErrorAction::with_material(
-            PbNotifyUnexpectedErrorRequestDecoder::new(request),
-            Self {
-                authorize: AuthorizeStruct::new(
-                    &feature.auth.service,
-                    request_id,
-                    metadata,
-                ),
-            },
-        )
+        request_id: RequestId,
+    ) -> NotifyUnexpectedErrorAction<Self> {
+        NotifyUnexpectedErrorAction::with_material(Self {
+            authorize: ActiveAuthorizeInfra::from_service(&feature.auth, request_id),
+        })
     }
 }
 
 #[async_trait::async_trait]
-impl<'a> NotifyUnexpectedErrorMaterial for NotifyUnexpectedErrorFeature<'a> {
-    type Authorize = AuthorizeStruct<'a>;
+impl<'a> NotifyUnexpectedErrorMaterial for ActiveNotifyUnexpectedErrorMaterial<'a> {
+    type Authorize = ActiveAuthorizeInfra<'a>;
 
     fn authorize(&self) -> &Self::Authorize {
         &self.authorize
+    }
+}
+
+#[cfg(test)]
+pub mod test {
+    use crate::auth::init::test::StaticAuthorizeInfra;
+
+    use crate::avail::unexpected_error::notify::action::NotifyUnexpectedErrorMaterial;
+
+    use crate::avail::unexpected_error::notify::infra::{
+        NotifyUnexpectedErrorFields, NotifyUnexpectedErrorFieldsExtract,
+    };
+
+    pub struct StaticNotifyUnexpectedErrorFields {
+        pub fields: NotifyUnexpectedErrorFields,
+    }
+
+    impl NotifyUnexpectedErrorFieldsExtract for StaticNotifyUnexpectedErrorFields {
+        fn convert(self) -> NotifyUnexpectedErrorFields {
+            self.fields
+        }
+    }
+
+    pub struct StaticNotifyUnexpectedErrorMaterial {
+        pub authorize: StaticAuthorizeInfra,
+    }
+
+    #[async_trait::async_trait]
+    impl NotifyUnexpectedErrorMaterial for StaticNotifyUnexpectedErrorMaterial {
+        type Authorize = StaticAuthorizeInfra;
+
+        fn authorize(&self) -> &Self::Authorize {
+            &self.authorize
+        }
     }
 }

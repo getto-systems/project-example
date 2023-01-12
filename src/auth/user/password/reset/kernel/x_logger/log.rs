@@ -1,21 +1,12 @@
-use crate::z_lib::logger::infra::{LogFilter, LogLevel};
+use crate::common::api::logger::infra::{LogFilter, LogLevel};
 
-use crate::auth::user::password::reset::kernel::data::{
-    ValidateResetTokenDestinationEmailError, ValidateResetTokenDestinationError,
-};
+use crate::auth::user::password::reset::kernel::data::ValidateResetPasswordTokenDestinationError;
 
-impl LogFilter for ValidateResetTokenDestinationError {
+impl LogFilter for ValidateResetPasswordTokenDestinationError {
     fn log_level(&self) -> LogLevel {
         match self {
+            Self::NotFound => LogLevel::Error,
             Self::Email(err) => err.log_level(),
-        }
-    }
-}
-
-impl LogFilter for ValidateResetTokenDestinationEmailError {
-    fn log_level(&self) -> LogLevel {
-        match self {
-            Self::Text(err) => err.log_level(),
         }
     }
 }

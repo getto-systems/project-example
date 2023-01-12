@@ -3,14 +3,14 @@ import { appendMenuCategoryPath, toMenuCategory, toMenuItem } from "./convert"
 import {
     MenuBadge,
     MenuExpand,
-    MenuPermission,
+    MenuPermissionRequired,
     MenuTree,
     MenuTreeCategory,
     MenuTreeItem,
     MenuTreeNode,
 } from "./infra"
 
-import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
+import { ConvertLocationResult } from "../../util/location/data"
 import { AuthTicket } from "../../../auth/ticket/kernel/data"
 import { Menu, MenuCategoryPath, MenuNode, MenuTargetPath } from "./data"
 
@@ -58,7 +58,7 @@ export function buildMenu(params: BuildMenuParams): Menu {
         menuTree: MenuTree,
         path: MenuCategoryPath,
     ): readonly MenuNode[] {
-        if (!isAllow(category.permission)) {
+        if (!isAllow(category.required)) {
             return EMPTY
         }
 
@@ -78,19 +78,18 @@ export function buildMenu(params: BuildMenuParams): Menu {
             },
         ]
 
-        function isAllow(permission: MenuPermission): boolean {
-            switch (permission.type) {
-                case "allow":
+        function isAllow(required: MenuPermissionRequired): boolean {
+            switch (required.type) {
+                case "nothing":
                     return true
 
-                case "any":
-                    return permission.permits.some(isAllow)
-
-                case "all":
-                    return permission.permits.every(isAllow)
-
-                case "role":
-                    return ticket.grantedRoles.includes(permission.role)
+                case "has-some":
+                    for (const permission of required.permissions) {
+                        if (ticket.granted.includes(permission)) {
+                            return true
+                        }
+                    }
+                    return false
             }
         }
         function hasActive(node: MenuNode): boolean {

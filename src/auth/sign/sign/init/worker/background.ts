@@ -8,17 +8,16 @@ import {
     RequestResetTokenProxyResponse,
 } from "../../../../user/password/reset/request_token/init/worker/message"
 
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 import { WorkerOutsideFeature } from "../../../../../z_vendor/getto-application/action/worker/feature"
 
-type OutsideFeature = RemoteOutsideFeature & WorkerOutsideFeature
+type OutsideFeature = WorkerOutsideFeature
 export function newSignViewWorkerBackground(feature: OutsideFeature): void {
     const { worker } = feature
 
     const handler: Handler = {
         password: {
             reset: {
-                requestToken: newRequestResetTokenWorkerHandler(feature, (response) =>
+                requestToken: newRequestResetTokenWorkerHandler((response) =>
                     postBackgroundMessage({ type: "password-reset-requestToken", response }),
                 ),
             },

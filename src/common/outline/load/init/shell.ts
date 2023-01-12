@@ -1,8 +1,8 @@
 import { env } from "../../../../y_environment/ui/env"
 
-import { LocationOutsideFeature } from "../../../../z_lib/ui/location/feature"
+import { LocationOutsideFeature } from "../../../util/location/feature"
 
-import { toURL } from "../../../../z_lib/ui/location/init"
+import { toURL } from "../../../util/location/init"
 
 import { detectMenuTargetPath } from "../convert"
 

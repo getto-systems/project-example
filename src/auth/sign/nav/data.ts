@@ -1,4 +1,4 @@
-import { Icon } from "../../../z_lib/ui/icon/data"
+import { Icon } from "../../../common/util/icon/data"
 
 export type SignNavHref = string & { SignNavHref: never }
 export type SignNavItem = { SignNavItem: never } & Readonly<{

@@ -1,6 +1,6 @@
 [package]
 name = "getto-application"
-version = "0.47.0-proxy"
+version = "0.1.0-proxy"
 authors = ["shun <shun.fix9@gmail.com>"]
 edition = "2018"
 

@@ -1,38 +1,54 @@
 use tonic::{Response, Status};
 
-use crate::auth::{
-    ticket::y_protobuf::service::EncodedAuthTokensPb,
-    user::password::authenticate::y_protobuf::service::{
-        AuthenticatePasswordMaskedResponsePb, AuthenticatePasswordResponsePb,
-    },
+use crate::auth::user::password::authenticate::y_protobuf::service::AuthenticateWithPasswordResponsePb;
+
+use crate::common::api::response::tonic::ServiceResponder;
+
+use crate::auth::user::password::authenticate::action::{
+    AuthenticateWithPasswordEvent, AuthenticateWithPasswordState,
 };
 
-use crate::z_lib::response::tonic::ServiceResponder;
+use crate::auth::ticket::encode::method::EncodeAuthTokenEvent;
 
-use super::super::action::{AuthenticatePasswordEvent, AuthenticatePasswordState};
+use crate::auth::ticket::kernel::data::{AuthPermissionGranted, AuthToken};
 
-use crate::auth::ticket::encode::method::EncodeAuthTicketEvent;
-
-use crate::auth::ticket::encode::data::AuthTicketEncoded;
-
-impl ServiceResponder<AuthenticatePasswordResponsePb> for AuthenticatePasswordState {
-    fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
+impl ServiceResponder<AuthenticateWithPasswordResponsePb> for AuthenticateWithPasswordState {
+    fn respond_to(self) -> Result<Response<AuthenticateWithPasswordResponsePb>, Status> {
         match self {
-            Self::Authenticate(event) => event.respond_to(),
-            Self::ValidateNonce(event) => event.respond_to(),
+            Self::AuthenticateWithPassword(event) => event.respond_to(),
             Self::Issue(event) => event.respond_to(),
             Self::Encode(event) => event.respond_to(),
         }
     }
 }
 
-impl ServiceResponder<AuthenticatePasswordResponsePb> for EncodeAuthTicketEvent {
-    fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
+impl ServiceResponder<AuthenticateWithPasswordResponsePb> for AuthenticateWithPasswordEvent {
+    fn respond_to(self) -> Result<Response<AuthenticateWithPasswordResponsePb>, Status> {
+        match self {
+            Self::Success(_) => Err(Status::cancelled("cancelled at authenticate password")),
+            Self::Invalid(_) => Ok(Response::new(failed())),
+            Self::NotFound => Ok(Response::new(failed())),
+            Self::PasswordNotMatched => Ok(Response::new(failed())),
+            Self::PasswordHashError(err) => err.respond_to(),
+            Self::RepositoryError(err) => err.respond_to(),
+        }
+    }
+}
+
+fn failed() -> AuthenticateWithPasswordResponsePb {
+    AuthenticateWithPasswordResponsePb {
+        success: false,
+        ..Default::default()
+    }
+}
+
+impl ServiceResponder<AuthenticateWithPasswordResponsePb> for EncodeAuthTokenEvent {
+    fn respond_to(self) -> Result<Response<AuthenticateWithPasswordResponsePb>, Status> {
         match self {
             Self::TokenExpiresCalculated(_) => {
                 Err(Status::cancelled("cancelled at token expires calculated"))
             }
-            Self::Success(response) => response.respond_to(),
+            Self::Success(token, granted) => (token, granted).respond_to(),
             Self::TicketNotFound => Err(Status::unauthenticated("ticket not found")),
             Self::RepositoryError(err) => err.respond_to(),
             Self::EncodeError(err) => err.respond_to(),
@@ -40,51 +56,12 @@ impl ServiceResponder<AuthenticatePasswordResponsePb> for EncodeAuthTicketEvent 
     }
 }
 
-impl AuthenticatePasswordResponsePb {
-    pub fn extract(
-        self,
-    ) -> (
-        Option<EncodedAuthTokensPb>,
-        AuthenticatePasswordMaskedResponsePb,
-    ) {
-        (
-            self.token,
-            AuthenticatePasswordMaskedResponsePb {
-                success: self.success,
-                roles: self.roles,
-            },
-        )
-    }
-}
-
-impl ServiceResponder<AuthenticatePasswordResponsePb> for AuthTicketEncoded {
-    fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
-        Ok(Response::new(AuthenticatePasswordResponsePb {
+impl ServiceResponder<AuthenticateWithPasswordResponsePb> for (AuthToken, AuthPermissionGranted) {
+    fn respond_to(self) -> Result<Response<AuthenticateWithPasswordResponsePb>, Status> {
+        Ok(Response::new(AuthenticateWithPasswordResponsePb {
             success: true,
-            roles: Some(self.roles.into()),
-            token: Some(self.token.into()),
+            token: Some(self.0.into()),
+            granted: Some(self.1.into()),
         }))
-    }
-}
-
-impl ServiceResponder<AuthenticatePasswordResponsePb> for AuthenticatePasswordEvent {
-    fn respond_to(self) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
-        match self {
-            Self::Success(_) => Err(Status::cancelled("cancelled at authenticate password")),
-            Self::Invalid(_) => Ok(Response::new(AuthenticatePasswordResponsePb {
-                success: false,
-                ..Default::default()
-            })),
-            Self::NotFound => Ok(Response::new(AuthenticatePasswordResponsePb {
-                success: false,
-                ..Default::default()
-            })),
-            Self::PasswordNotMatched => Ok(Response::new(AuthenticatePasswordResponsePb {
-                success: false,
-                ..Default::default()
-            })),
-            Self::PasswordHashError(err) => err.respond_to(),
-            Self::RepositoryError(err) => err.respond_to(),
-        }
     }
 }

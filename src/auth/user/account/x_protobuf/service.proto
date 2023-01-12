@@ -2,11 +2,11 @@ syntax = "proto3";
 
 package auth.user.account.service;
 
-import "auth/user/password/reset/token_destination/kernel/x_protobuf/service.proto";
+import "auth/user/password/reset/kernel/x_protobuf/service.proto";
 
 message AuthUserAccountPb {
     string login_id = 1;
-    repeated string granted_roles = 2;
-    auth.user.password.reset.token_destination.kernel.service.ResetTokenDestinationPb reset_token_destination = 3;
+    repeated string granted = 2;
+    auth.user.password.reset.kernel.service.ResetTokenDestinationPb reset_token_destination = 3;
     string memo = 4;
 }

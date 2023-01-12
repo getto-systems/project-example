@@ -1,62 +1,70 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::ticket::validate::method::{authenticate, AuthenticateEvent, AuthenticateInfra};
+use crate::common::proxy::action::CoreProxyParams;
+
+use crate::auth::ticket::authorize::proxy::{authorize, AuthorizeEvent, AuthorizeInfra};
 
 use crate::auth::user::account::search::infra::{
-    SearchAuthUserAccountRepository, SearchAuthUserAccountRequestDecoder,
+    SearchAuthUserAccountFilterExtract, SearchAuthUserAccountRepository,
 };
 
 use crate::{
     auth::{
-        ticket::kernel::data::PermissionError,
-        user::{
-            account::search::data::{AuthUserAccountSearch, SearchAuthUserAccountFilterExtract},
-            kernel::data::RequireAuthRoles,
-        },
+        ticket::kernel::data::{AuthPermissionRequired, AuthorizeTokenExtract},
+        user::account::search::data::AuthUserAccountSearch,
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
 pub enum SearchAuthUserAccountState {
-    Authenticate(AuthenticateEvent),
-    PermissionError(PermissionError),
+    Authorize(AuthorizeEvent),
     Search(SearchAuthUserAccountEvent),
 }
 
 impl std::fmt::Display for SearchAuthUserAccountState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Authenticate(event) => event.fmt(f),
-            Self::PermissionError(err) => err.fmt(f),
+            Self::Authorize(event) => event.fmt(f),
             Self::Search(event) => event.fmt(f),
         }
     }
 }
 
 pub trait SearchAuthUserAccountMaterial {
-    type Authenticate: AuthenticateInfra;
-    type SearchRepository: SearchAuthUserAccountRepository;
+    type Authorize: AuthorizeInfra;
+    type UserRepository: SearchAuthUserAccountRepository;
 
-    fn authenticate(&self) -> &Self::Authenticate;
-    fn search_repository(&self) -> &Self::SearchRepository;
+    fn authorize(&self) -> &Self::Authorize;
+    fn user_repository(&self) -> &Self::UserRepository;
 }
 
-pub struct SearchAuthUserAccountAction<
-    R: SearchAuthUserAccountRequestDecoder,
-    M: SearchAuthUserAccountMaterial,
-> {
+pub struct SearchAuthUserAccountAction<M: SearchAuthUserAccountMaterial> {
+    pub info: SearchAuthUserAccountActionInfo,
     pubsub: ActionStatePubSub<SearchAuthUserAccountState>,
-    request_decoder: R,
     material: M,
 }
 
-impl<R: SearchAuthUserAccountRequestDecoder, M: SearchAuthUserAccountMaterial>
-    SearchAuthUserAccountAction<R, M>
-{
-    pub fn with_material(request_decoder: R, material: M) -> Self {
+pub struct SearchAuthUserAccountActionInfo;
+
+impl SearchAuthUserAccountActionInfo {
+    pub const fn name(&self) -> &'static str {
+        "auth.user.account.search"
+    }
+
+    pub fn required(&self) -> AuthPermissionRequired {
+        AuthPermissionRequired::user()
+    }
+
+    pub fn params(&self) -> CoreProxyParams {
+        (self.name(), self.required())
+    }
+}
+
+impl<M: SearchAuthUserAccountMaterial> SearchAuthUserAccountAction<M> {
+    pub fn with_material(material: M) -> Self {
         Self {
+            info: SearchAuthUserAccountActionInfo,
             pubsub: ActionStatePubSub::new(),
-            request_decoder,
             material,
         }
     }
@@ -68,22 +76,23 @@ impl<R: SearchAuthUserAccountRequestDecoder, M: SearchAuthUserAccountMaterial>
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<SearchAuthUserAccountState> {
-        let pubsub = self.pubsub;
-
-        let fields = self.request_decoder.decode();
-
-        let ticket = authenticate(self.material.authenticate(), |event| {
-            pubsub.post(SearchAuthUserAccountState::Authenticate(event))
-        })
+    pub async fn ignite(
+        self,
+        token: impl AuthorizeTokenExtract,
+        filter: impl SearchAuthUserAccountFilterExtract,
+    ) -> MethodResult<SearchAuthUserAccountState> {
+        authorize(
+            self.material.authorize(),
+            (token, self.info.required()),
+            |event| {
+                self.pubsub
+                    .post(SearchAuthUserAccountState::Authorize(event))
+            },
+        )
         .await?;
 
-        ticket
-            .check_enough_permission(RequireAuthRoles::user())
-            .map_err(|err| pubsub.post(SearchAuthUserAccountState::PermissionError(err)))?;
-
-        search_user_account(&self.material, fields, |event| {
-            pubsub.post(SearchAuthUserAccountState::Search(event))
+        search_user_account(&self.material, filter, |event| {
+            self.pubsub.post(SearchAuthUserAccountState::Search(event))
         })
         .await
     }
@@ -108,14 +117,12 @@ impl std::fmt::Display for SearchAuthUserAccountEvent {
 
 async fn search_user_account<S>(
     infra: &impl SearchAuthUserAccountMaterial,
-    filter: SearchAuthUserAccountFilterExtract,
+    filter: impl SearchAuthUserAccountFilterExtract,
     post: impl Fn(SearchAuthUserAccountEvent) -> S,
 ) -> MethodResult<S> {
-    let filter = filter.into();
-
-    let search_repository = infra.search_repository();
-    let response = search_repository
-        .search(filter)
+    let response = infra
+        .user_repository()
+        .search(filter.convert())
         .await
         .map_err(|err| post(SearchAuthUserAccountEvent::RepositoryError(err)))?;
 

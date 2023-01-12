@@ -1,4 +1,4 @@
-import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
+import { ConvertLocationResult } from "../../../common/util/location/data"
 
 import { LocationPathname, ScriptPath } from "./data"
 import { SecureServerURL } from "./infra"

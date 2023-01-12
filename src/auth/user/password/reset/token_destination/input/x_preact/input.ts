@@ -1,6 +1,6 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
-import { VNodeContent } from "../../../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../../../common/x_preact/vnode"
 
 import { useApplicationState } from "../../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 import { useEditableState } from "../../../../../../../z_vendor/getto-application/board/editable/x_preact/hooks"
@@ -10,7 +10,7 @@ import {
     label_text_fill,
 } from "../../../../../../../z_vendor/getto-css/preact/design/form"
 import { label_gray } from "../../../../../../../z_vendor/getto-css/preact/design/highlight"
-import { mapValidateState } from "../../../../../../../z_lib/ui/input/field/x_preact/helper"
+import { mapValidateState } from "../../../../../../../common/util/input/field/x_preact/helper"
 
 import { InputBoard } from "../../../../../../../z_vendor/getto-application/board/input/x_preact/input"
 import {
@@ -23,7 +23,7 @@ import { EditableBoardAction } from "../../../../../../../z_vendor/getto-applica
 
 import { ValidateResetTokenDestinationError } from "../data"
 import { ResetTokenDestination } from "../../kernel/data"
-import { textValidationError } from "../../../../../../../z_lib/ui/validate/x_plain/error"
+import { textValidationError } from "../../../../../../../common/util/validate/x_plain/error"
 import { AUTH_USER_ACCOUNT } from "../../../../../account/kernel/data"
 
 type Props = Readonly<{

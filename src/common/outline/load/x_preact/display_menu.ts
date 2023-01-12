@@ -1,7 +1,7 @@
 import { VNode } from "preact"
 import { html } from "htm/preact"
 
-import { remoteCommonErrorReason } from "../../../../z_lib/ui/remote/x_error/reason"
+import { remoteCommonErrorReason } from "../../../util/remote/x_error/reason"
 
 import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
@@ -16,12 +16,12 @@ import {
 import { badge_alert, notice_alert } from "../../../../z_vendor/getto-css/preact/design/highlight"
 
 import { poweredBy } from "../../../../x_content/site"
-import { iconHtml } from "../../../../z_lib/ui/icon/x_preact/icon"
+import { iconHtml } from "../../../util/icon/x_preact/icon"
 
 import { OutlineMenuAction } from "../action"
 
-import { RepositoryError } from "../../../../z_lib/ui/repository/data"
-import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
+import { RepositoryError } from "../../../util/repository/data"
+import { RemoteCommonError } from "../../../util/remote/data"
 import { Menu, MenuCategoryNode, MenuItemNode } from "../data"
 
 export const MENU_ID = "menu"

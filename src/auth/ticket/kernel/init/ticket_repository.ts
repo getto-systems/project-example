@@ -2,13 +2,13 @@ import { env } from "../../../../y_environment/ui/env"
 import pb from "../../../../y_protobuf/proto.js"
 
 import { decodeProtobuf, encodeProtobuf } from "../../../../z_vendor/protobuf/helper"
-import { IndexedDBTarget, initIndexedDB } from "../../../../z_lib/ui/repository/init/indexed_db"
+import { IndexedDBTarget, initIndexedDB } from "../../../../common/util/repository/init/indexed_db"
 
-import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/feature"
+import { RepositoryOutsideFeature } from "../../../../common/util/repository/feature"
 
 import { AuthTicketRepository, AuthTicketRepositoryValue } from "../infra"
 import { authTicketRepositoryConverter } from "../convert"
-import { convertDB } from "../../../../z_lib/ui/repository/init/convert"
+import { convertDB } from "../../../../common/util/repository/init/convert"
 
 export function newAuthTicketRepository({ webDB }: RepositoryOutsideFeature): AuthTicketRepository {
     return convertDB(initDB(), authTicketRepositoryConverter)
@@ -32,7 +32,7 @@ export function newAuthTicketRepository({ webDB }: RepositoryOutsideFeature): Au
         function toDB(value: AuthTicketRepositoryValue): string {
             return encodeProtobuf(pb.auth.ticket.db.AuthTicketPb, (message) => {
                 message.authAt = value.authAt
-                message.grantedRoles = Array.from(value.grantedRoles)
+                message.granted = Array.from(value.granted)
             })
         }
         function fromDB(raw: string): AuthTicketRepositoryValue {

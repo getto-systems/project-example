@@ -1,7 +1,10 @@
-import { lnir } from "../../../z_lib/ui/icon/init/line_icon"
-import { encodeLocationSearchQuery, LocationSearchParam } from "../../../z_lib/ui/location/helper"
+import { lnir } from "../../../common/util/icon/init/line_icon"
+import {
+    encodeLocationSearchQuery,
+    LocationSearchParam,
+} from "../../../common/util/location/helper"
 
-import { Icon } from "../../../z_lib/ui/icon/data"
+import { Icon } from "../../../common/util/icon/data"
 import {
     AuthenticatePasswordVariantKey,
     ResetPasswordVariantKey,

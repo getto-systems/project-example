@@ -2,71 +2,74 @@ use crate::auth::user::password::kernel::infra::{HashedPassword, PlainPassword};
 
 use crate::{
     auth::{
-        ticket::kernel::data::{AuthDateTime, ExpireDateTime},
+        kernel::data::{AuthDateTime, ExpireDateTime},
+        ticket::kernel::data::AuthPermissionGranted,
         user::{
-            kernel::data::{AuthUserId, GrantedAuthRoles},
+            kernel::data::AuthUserId,
             login_id::kernel::data::LoginId,
             password::reset::{
-                kernel::data::{ResetToken, ResetTokenDestination, ResetTokenEncoded},
+                kernel::data::{
+                    ResetPasswordId, ResetPasswordToken, ResetPasswordTokenDestination,
+                },
                 reset::data::{
                     DecodeResetTokenError, NotifyResetPasswordError, NotifyResetPasswordResponse,
+                    ValidateResetPasswordFieldsError,
                 },
             },
         },
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
 pub struct ResetPasswordFields {
-    pub reset_token: ResetTokenEncoded,
+    pub reset_token: ResetPasswordToken,
     pub login_id: LoginId,
     pub new_password: PlainPassword,
 }
 
-pub struct ResetPasswordFieldsExtract {
-    pub reset_token: String,
-    pub login_id: String,
-    pub new_password: String,
+pub trait ResetPasswordFieldsExtract {
+    fn convert(self) -> Result<ResetPasswordFields, ValidateResetPasswordFieldsError>;
 }
 
-pub trait ResetTokenDecoder {
-    fn decode(&self, token: ResetTokenEncoded) -> Result<ResetToken, DecodeResetTokenError>;
-}
-
-pub trait ResetPasswordRequestDecoder {
-    fn decode(self) -> ResetPasswordFieldsExtract;
+pub trait ResetPasswordTokenDecoder {
+    fn decode(&self, token: ResetPasswordToken) -> Result<ResetPasswordId, DecodeResetTokenError>;
 }
 
 #[async_trait::async_trait]
 pub trait ResetPasswordRepository {
     async fn lookup_reset_token_entry(
         &self,
-        reset_token: &ResetToken,
+        reset_id: &ResetPasswordId,
     ) -> Result<
-        Option<(AuthUserId, LoginId, ResetTokenDestination, ResetTokenMoment)>,
+        Option<(
+            AuthUserId,
+            LoginId,
+            ResetPasswordTokenDestination,
+            ResetPasswordTokenMoment,
+        )>,
         RepositoryError,
     >;
 
-    async fn lookup_granted_roles(
+    async fn lookup_permission_granted(
         &self,
         user_id: &AuthUserId,
-    ) -> Result<Option<Option<GrantedAuthRoles>>, RepositoryError>;
+    ) -> Result<Option<AuthPermissionGranted>, RepositoryError>;
 
     async fn reset_password(
         &self,
         user_id: AuthUserId,
-        reset_token: ResetToken,
+        reset_id: ResetPasswordId,
         new_password: HashedPassword,
         reset_at: AuthDateTime,
     ) -> Result<(), RepositoryError>;
 }
 
-pub struct ResetTokenMoment {
+pub struct ResetPasswordTokenMoment {
     expires: ExpireDateTime,
     reset_at: Option<AuthDateTime>,
 }
 
-impl ResetTokenMoment {
+impl ResetPasswordTokenMoment {
     pub(in crate::auth) const fn restore(
         expires: ExpireDateTime,
         reset_at: Option<AuthDateTime>,
@@ -87,6 +90,6 @@ impl ResetTokenMoment {
 pub trait ResetPasswordNotifier {
     async fn notify(
         &self,
-        destination: ResetTokenDestination,
+        destination: ResetPasswordTokenDestination,
     ) -> Result<NotifyResetPasswordResponse, NotifyResetPasswordError>;
 }

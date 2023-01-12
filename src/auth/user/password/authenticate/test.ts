@@ -1,26 +1,26 @@
 import { test, expect } from "vitest"
 import { observeApplicationState } from "../../../../z_vendor/getto-application/action/test_helper"
-import { ticker } from "../../../../z_lib/ui/timer/helper"
+import { ticker } from "../../../../common/util/timer/helper"
 
 import { AuthenticatePasswordAction, initAuthenticatePasswordAction } from "./action"
 
-import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../z_lib/ui/clock/mock"
+import { ClockPubSub, mockClock, mockClockPubSub } from "../../../../common/util/clock/mock"
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 import {
     mockGetScriptPathShell,
     mockSecureServerURL,
 } from "../../../sign/get_script_path/init/mock"
-import { initMemoryDB } from "../../../../z_lib/ui/repository/init/memory"
-import { convertDB } from "../../../../z_lib/ui/repository/init/convert"
+import { initMemoryDB } from "../../../../common/util/repository/init/memory"
+import { convertDB } from "../../../../common/util/repository/init/convert"
 
-import { Clock } from "../../../../z_lib/ui/clock/infra"
+import { Clock } from "../../../../common/util/clock/infra"
 import { AuthenticatePasswordRemote, AuthenticatePasswordRemoteResult } from "./infra"
 import { AuthTicketRepository, AuthTicketRepositoryValue } from "../../../ticket/kernel/infra"
-import { CheckAuthTicketRemote } from "../../../ticket/check/infra"
+import { CheckAuthTicketRemote } from "../../../ticket/authenticate/infra"
 import { BoardValueStore } from "../../../../z_vendor/getto-application/board/input/infra"
 
 import { authTicketRepositoryConverter } from "../../../ticket/kernel/convert"
-import { convertCheckRemote } from "../../../ticket/check/convert"
+import { convertCheckRemote } from "../../../ticket/authenticate/convert"
 
 import { LoadScriptError } from "../../../sign/get_script_path/data"
 
@@ -204,7 +204,7 @@ function standard_ticketRepository(): AuthTicketRepository {
     const db = initMemoryDB<AuthTicketRepositoryValue>()
     db.set({
         authAt: "2020-01-01 00:00:00",
-        grantedRoles: ["role"],
+        granted: ["permission"],
     })
     return convertDB(db, authTicketRepositoryConverter)
 }
@@ -219,7 +219,7 @@ function takeLongtime_authenticate(clock: Clock): AuthenticatePasswordRemote {
 function standard_authenticateRemoteResult(clock: Clock): AuthenticatePasswordRemoteResult {
     return {
         success: true,
-        value: convertCheckRemote(clock, ["role"]),
+        value: convertCheckRemote(clock, ["permission"]),
     }
 }
 
@@ -238,7 +238,7 @@ function standard_renew(clock: Clock, clockPubSub: ClockPubSub): CheckAuthTicket
         count++
         return {
             success: true,
-            value: convertCheckRemote(clock, ["role"]),
+            value: convertCheckRemote(clock, ["permission"]),
         }
     }
 }

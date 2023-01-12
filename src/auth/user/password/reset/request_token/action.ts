@@ -1,4 +1,4 @@
-import { checkTakeLongtime } from "../../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime } from "../../../../../common/util/timer/helper"
 
 import {
     ApplicationState,
@@ -8,14 +8,14 @@ import {
 import { LoginIdFieldAction, initLoginIdFieldAction } from "../../../login_id/input/action"
 import { ValidateBoardAction } from "../../../../../z_vendor/getto-application/board/validate_board/action"
 import { ObserveBoardAction } from "../../../../../z_vendor/getto-application/board/observe_board/action"
-import { initRegisterField } from "../../../../../z_lib/ui/register/action"
+import { initRegisterField } from "../../../../../common/util/register/action"
 import {
     EditableBoardAction,
     initEditableBoardAction,
 } from "../../../../../z_vendor/getto-application/board/editable/action"
 
 import { RequestResetTokenRemote } from "./infra"
-import { WaitTime } from "../../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../../common/util/config/infra"
 
 import { RequestResetTokenError, RequestResetTokenFields } from "./data"
 import { ConvertBoardResult } from "../../../../../z_vendor/getto-application/board/kernel/data"

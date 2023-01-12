@@ -1,4 +1,5 @@
-pub mod proxy;
+mod kernel;
+mod proxy;
 mod ticket;
 mod user;
 pub mod x_actix_web;
@@ -7,30 +8,31 @@ pub mod x_tonic;
 
 pub mod data {
     pub use crate::auth::{
-        ticket::kernel::data::{ExpansionLimitDuration, ExpireDuration},
-        user::kernel::data::RequireAuthRoles,
+        kernel::data::{ExpansionLimitDuration, ExpireDuration},
+        ticket::kernel::data::{AuthPermissionRequired, AuthorizeTokenExtract},
     };
 }
-pub mod infra {
-    pub use crate::auth::ticket::validate::infra::AuthMetadataContent;
+pub mod method {
+    pub use crate::auth::ticket::authorize::method::{
+        authorize_with_token, AuthorizeWithTokenEvent, AuthorizeWithTokenInfra,
+    };
+
+    pub mod proxy {
+        pub use crate::auth::ticket::authorize::proxy::{
+            authorize, AuthorizeEvent, AuthorizeInfra,
+        };
+    }
 }
 pub mod init {
-    pub use crate::auth::ticket::validate::init::{
-        AuthorizeStruct, ValidateApiMetadataStruct,
+    pub use crate::auth::ticket::authorize::init::{
+        ActiveAuthorizeInfra, ActiveAuthorizeWithTokenInfra,
     };
 
     #[cfg(test)]
     pub mod test {
-        pub use crate::auth::ticket::validate::init::{
-            auth_metadata::test::StaticAuthMetadata, test::StaticAuthorizeStruct,
-            token_decoder::test::StaticAuthTokenDecoder,
-            validate_service::test::StaticValidateService,
+        pub use crate::auth::ticket::{
+            authorize::init::test::{StaticAuthorizeInfra, StaticAuthorizeWithTokenInfra},
+            kernel::init::request::test::StaticAuthorizeToken,
         };
     }
-}
-pub mod method {
-    pub use crate::auth::ticket::validate::method::{
-        authorize, validate_auth_metadata, AuthorizeEvent, AuthorizeInfra,
-        ValidateAuthMetadataEvent, ValidateAuthMetadataInfra,
-    };
 }

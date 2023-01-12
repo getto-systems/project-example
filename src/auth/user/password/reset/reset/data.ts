@@ -1,4 +1,4 @@
-import { RemoteCommonError } from "../../../../../z_lib/ui/remote/data"
+import { RemoteCommonError } from "../../../../../common/util/remote/data"
 import { LoginId } from "../../../login_id/kernel/data"
 import { Password } from "../../input/data"
 
@@ -9,9 +9,7 @@ export type ResetPasswordFields = Readonly<{
     newPassword: Password
 }>
 
-export type ResetPasswordError =
-    | Readonly<{ type: "empty-reset-token" }>
-    | ResetPasswordRemoteError
+export type ResetPasswordError = Readonly<{ type: "empty-reset-token" }> | ResetPasswordRemoteError
 
 export type ResetPasswordRemoteError =
     | RemoteCommonError

@@ -23,9 +23,9 @@ import { DisplayOutlineBreadcrumbList } from "../../../../../common/outline/load
 import { SearchAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/search"
 import { ListAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/list"
 import { FocusAuthUserAccount } from "../../../../../auth/user/account/search/x_preact/focus"
-import { MainTitleWithSidebar } from "../../../../../z_lib/ui/sidebar/x_preact/main_title"
+import { MainTitleWithSidebar } from "../../../../../common/util/sidebar/x_preact/main_title"
 
-import { isSidebarExpand } from "../../../../../z_lib/ui/sidebar/x_preact/helper"
+import { isSidebarExpand } from "../../../../../common/util/sidebar/x_preact/helper"
 
 import { ManageUserAccountPageResource } from "./resource"
 

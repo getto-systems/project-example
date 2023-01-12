@@ -8,17 +8,18 @@ use rusoto_dynamodb::{
 
 use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
-use crate::z_lib::repository::{
+use crate::common::api::repository::{
     dynamodb::helper::{string_value, timestamp_value, DynamoDbColumn, ScanKey},
     helper::repository_infra_error,
 };
 
 use crate::{
     auth::{
-        ticket::kernel::data::{AuthDateTime, AuthTicket, AuthTicketId, ExpansionLimitDateTime},
+        kernel::data::{AuthDateTime, ExpansionLimitDateTime},
+        ticket::kernel::data::{AuthTicket, AuthTicketId},
         user::kernel::data::AuthUserId,
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
 pub struct TableTicket<'a> {
@@ -46,11 +47,9 @@ impl<'a> TableTicket<'a> {
         &self,
         ticket: AuthTicket,
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError> {
-        let (ticket_id, user) = ticket.extract();
-
         let input = GetItemInput {
             table_name: self.table_name.into(),
-            key: Self::key(ticket_id, user.into_user_id()),
+            key: Self::key(ticket.ticket_id, ticket.attrs.user_id),
             projection_expression: Some(vec![ColumnExpansionLimit::as_name()].join(",")),
             ..Default::default()
         };
@@ -72,8 +71,6 @@ impl<'a> TableTicket<'a> {
         expansion_limit: ExpansionLimitDateTime,
         issued_at: AuthDateTime,
     ) -> Result<(), RepositoryError> {
-        let (ticket_id, user) = ticket.extract();
-
         // 有効期限が切れた項目は dynamodb の TTL の設定によって削除される
         let input = PutItemInput {
             table_name: self.table_name.into(),
@@ -82,8 +79,8 @@ impl<'a> TableTicket<'a> {
                 ColumnTicketId::as_name()
             )),
             item: vec![
-                ColumnTicketId::to_attr_pair(ticket_id),
-                ColumnUserId::to_attr_pair(user.into_user_id()),
+                ColumnTicketId::to_attr_pair(ticket.ticket_id),
+                ColumnUserId::to_attr_pair(ticket.attrs.user_id),
                 ColumnExpansionLimit::to_attr_pair(expansion_limit),
                 ColumnIssuedAt::to_attr_pair(issued_at),
             ]
@@ -213,7 +210,7 @@ impl DynamoDbColumn for ColumnExpansionLimit {
             .and_then(|value| value.parse::<i64>().ok())
             .map(|value| {
                 Self::Value::restore(DateTime::<Utc>::from_utc(
-                    NaiveDateTime::from_timestamp(value, 0),
+                    NaiveDateTime::from_timestamp_opt(value, 0).unwrap_or_default(),
                     Utc,
                 ))
             })
@@ -235,7 +232,7 @@ impl DynamoDbColumn for ColumnIssuedAt {
             .and_then(|value| value.parse::<i64>().ok())
             .map(|value| {
                 Self::Value::restore(DateTime::<Utc>::from_utc(
-                    NaiveDateTime::from_timestamp(value, 0),
+                    NaiveDateTime::from_timestamp_opt(value, 0).unwrap_or_default(),
                     Utc,
                 ))
             })

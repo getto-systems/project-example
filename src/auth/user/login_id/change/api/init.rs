@@ -1,51 +1,72 @@
-pub mod request_decoder;
+mod request;
 
-use tonic::metadata::MetadataMap;
-
-use crate::auth::user::login_id::change::y_protobuf::service::OverwriteLoginIdRequestPb;
-
-use crate::x_outside_feature::auth::feature::AuthAppFeature;
+use crate::x_outside_feature::{auth::feature::AuthAppFeature, data::RequestId};
 
 use crate::auth::{
-    ticket::validate::init::AuthenticateApiStruct,
-    user::{
-        kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,
-        login_id::change::init::request_decoder::PbOverwriteLoginIdRequestDecoder,
-    },
+    ticket::authorize::init::ActiveAuthorizeInfra,
+    user::kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,
 };
 
-use super::action::{OverwriteLoginIdAction, OverwriteLoginIdMaterial};
+use crate::auth::user::login_id::change::action::{
+    OverwriteLoginIdAction, OverwriteLoginIdMaterial,
+};
 
-pub struct OverwriteLoginIdFeature<'a> {
-    validate: AuthenticateApiStruct<'a>,
+pub struct ActiveOverwriteLoginIdMaterial<'a> {
+    authorize: ActiveAuthorizeInfra<'a>,
     user_repository: DynamoDbAuthUserRepository<'a>,
 }
 
-impl<'a> OverwriteLoginIdFeature<'a> {
+impl<'a> ActiveOverwriteLoginIdMaterial<'a> {
     pub fn action(
         feature: &'a AuthAppFeature,
-        metadata: &'a MetadataMap,
-        request: OverwriteLoginIdRequestPb,
-    ) -> OverwriteLoginIdAction<PbOverwriteLoginIdRequestDecoder, Self> {
-        OverwriteLoginIdAction::with_material(
-            PbOverwriteLoginIdRequestDecoder::new(request),
-            Self {
-                validate: AuthenticateApiStruct::new(feature, metadata),
-                user_repository: DynamoDbAuthUserRepository::new(&feature.store),
-            },
-        )
+        request_id: RequestId,
+    ) -> OverwriteLoginIdAction<Self> {
+        OverwriteLoginIdAction::with_material(Self {
+            authorize: ActiveAuthorizeInfra::from_auth(feature, request_id),
+            user_repository: DynamoDbAuthUserRepository::new(&feature.store),
+        })
     }
 }
 
-impl<'a> OverwriteLoginIdMaterial for OverwriteLoginIdFeature<'a> {
-    type Authenticate = AuthenticateApiStruct<'a>;
+impl<'a> OverwriteLoginIdMaterial for ActiveOverwriteLoginIdMaterial<'a> {
+    type Authorize = ActiveAuthorizeInfra<'a>;
 
     type LoginIdRepository = DynamoDbAuthUserRepository<'a>;
 
-    fn authenticate(&self) -> &Self::Authenticate {
-        &self.validate
+    fn authorize(&self) -> &Self::Authorize {
+        &self.authorize
     }
     fn login_id_repository(&self) -> &Self::LoginIdRepository {
         &self.user_repository
+    }
+}
+
+#[cfg(test)]
+pub mod test {
+    pub use super::request::test::*;
+
+    use crate::auth::{
+        ticket::authorize::init::test::StaticAuthorizeInfra,
+        user::kernel::init::user_repository::memory::MemoryAuthUserRepository,
+    };
+
+    use crate::auth::user::login_id::change::action::OverwriteLoginIdMaterial;
+
+    pub struct StaticOverwriteLoginIdMaterial<'a> {
+        pub authorize: StaticAuthorizeInfra,
+        pub login_id_repository: MemoryAuthUserRepository<'a>,
+    }
+
+    impl<'a> OverwriteLoginIdMaterial for StaticOverwriteLoginIdMaterial<'a> {
+        type Authorize = StaticAuthorizeInfra;
+
+        type LoginIdRepository = MemoryAuthUserRepository<'a>;
+
+        fn authorize(&self) -> &Self::Authorize {
+            &self.authorize
+        }
+        fn login_id_repository(&self) -> &Self::LoginIdRepository {
+            &self.login_id_repository
+        }
     }
 }

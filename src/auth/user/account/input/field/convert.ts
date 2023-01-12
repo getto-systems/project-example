@@ -1,11 +1,11 @@
-import { converter } from "../../../../../z_lib/ui/validate/helper"
-import { check_text_tooLong } from "../../../../../z_lib/ui/validate/text"
+import { converter } from "../../../../../common/util/validate/helper"
+import { check_text_tooLong } from "../../../../../common/util/validate/text"
 import { restoreAuthUserField } from "../../kernel/convert"
 
 import { ValidateAuthUserTextResult } from "./data"
 
 export type AuthUserTextField = keyof typeof textValidators
-export type AuthUserMultipleField = "grantedRole"
+export type AuthUserMultipleField = "granted"
 
 const textValidators = {
     memo: [check_text_tooLong(255)],

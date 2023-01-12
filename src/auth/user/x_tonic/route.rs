@@ -1,12 +1,12 @@
 use crate::auth::user::{
     account::x_tonic::route::AccountServer, login_id::x_tonic::route::LoginIdServer,
-    password::x_tonic::route::PasswordServer,
+    password::x_tonic::route::AuthPasswordServer,
 };
 
 pub struct AuthUserServer {
     pub account: AccountServer,
     pub login_id: LoginIdServer,
-    pub password: PasswordServer,
+    pub password: AuthPasswordServer,
 }
 
 impl AuthUserServer {
@@ -14,7 +14,7 @@ impl AuthUserServer {
         Self {
             account: AccountServer,
             login_id: LoginIdServer,
-            password: PasswordServer::new(),
+            password: AuthPasswordServer::new(),
         }
     }
 }

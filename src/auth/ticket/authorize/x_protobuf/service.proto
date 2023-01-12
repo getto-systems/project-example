@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package auth.ticket.authorize.service;
+
+service ClarifyAuthorizeTokenPb {
+    rpc Clarify (ClarifyAuthorizeTokenRequestPb) returns (ClarifyAuthorizeTokenResponsePb);
+}
+message ClarifyAuthorizeTokenRequestPb {
+    bool require_nothing = 1;
+    repeated string require_permissions = 2;
+}
+message ClarifyAuthorizeTokenResponsePb {
+    string user_id = 1;
+}

@@ -1,55 +1,44 @@
-pub mod request_decoder;
-
-use tonic::metadata::MetadataMap;
-
-use crate::auth::user::account::unregister::y_protobuf::service::UnregisterAuthUserAccountRequestPb;
-
-use crate::x_outside_feature::auth::feature::AuthAppFeature;
+use crate::x_outside_feature::{auth::feature::AuthAppFeature, data::RequestId};
 
 use crate::auth::{
     ticket::{
+        authorize::init::ActiveAuthorizeInfra,
         kernel::init::ticket_repository::dynamodb::DynamoDbAuthTicketRepository,
-        validate::init::AuthenticateApiStruct,
     },
-    user::{
-        account::unregister::init::request_decoder::PbUnregisterAuthUserAccountRequestDecoder,
-        kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,
-    },
+    user::kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,
 };
 
-use super::action::{UnregisterAuthUserAccountAction, UnregisterAuthUserAccountMaterial};
+use crate::auth::user::account::unregister::action::{
+    UnregisterAuthUserAccountAction, UnregisterAuthUserAccountMaterial,
+};
 
-pub struct UnregisterAuthUserAccountFeature<'a> {
-    validate: AuthenticateApiStruct<'a>,
+pub struct ActiveUnregisterAuthUserAccountMaterial<'a> {
+    authorize: ActiveAuthorizeInfra<'a>,
     ticket_repository: DynamoDbAuthTicketRepository<'a>,
     user_repository: DynamoDbAuthUserRepository<'a>,
 }
 
-impl<'a> UnregisterAuthUserAccountFeature<'a> {
+impl<'a> ActiveUnregisterAuthUserAccountMaterial<'a> {
     pub fn action(
         feature: &'a AuthAppFeature,
-        metadata: &'a MetadataMap,
-        request: UnregisterAuthUserAccountRequestPb,
-    ) -> UnregisterAuthUserAccountAction<PbUnregisterAuthUserAccountRequestDecoder, Self> {
-        UnregisterAuthUserAccountAction::with_material(
-            PbUnregisterAuthUserAccountRequestDecoder::new(request),
-            Self {
-                validate: AuthenticateApiStruct::new(feature, metadata),
-                ticket_repository: DynamoDbAuthTicketRepository::new(&feature.store),
-                user_repository: DynamoDbAuthUserRepository::new(&feature.store),
-            },
-        )
+        request_id: RequestId,
+    ) -> UnregisterAuthUserAccountAction<Self> {
+        UnregisterAuthUserAccountAction::with_material(Self {
+            authorize: ActiveAuthorizeInfra::from_auth(feature, request_id),
+            ticket_repository: DynamoDbAuthTicketRepository::new(&feature.store),
+            user_repository: DynamoDbAuthUserRepository::new(&feature.store),
+        })
     }
 }
 
-impl<'a> UnregisterAuthUserAccountMaterial for UnregisterAuthUserAccountFeature<'a> {
-    type Authenticate = AuthenticateApiStruct<'a>;
+impl<'a> UnregisterAuthUserAccountMaterial for ActiveUnregisterAuthUserAccountMaterial<'a> {
+    type Authorize = ActiveAuthorizeInfra<'a>;
 
     type TicketRepository = DynamoDbAuthTicketRepository<'a>;
     type UserRepository = DynamoDbAuthUserRepository<'a>;
 
-    fn authenticate(&self) -> &Self::Authenticate {
-        &self.validate
+    fn authorize(&self) -> &Self::Authorize {
+        &self.authorize
     }
 
     fn ticket_repository(&self) -> &Self::TicketRepository {
@@ -57,5 +46,60 @@ impl<'a> UnregisterAuthUserAccountMaterial for UnregisterAuthUserAccountFeature<
     }
     fn user_repository(&self) -> &Self::UserRepository {
         &self.user_repository
+    }
+}
+
+#[cfg(test)]
+pub mod test {
+    use crate::auth::{
+        ticket::{
+            authorize::init::test::StaticAuthorizeInfra,
+            kernel::init::ticket_repository::memory::MemoryAuthTicketRepository,
+        },
+        user::kernel::init::user_repository::memory::MemoryAuthUserRepository,
+    };
+
+    use crate::auth::user::account::unregister::action::UnregisterAuthUserAccountMaterial;
+
+    use crate::auth::user::account::unregister::infra::{
+        UnregisterAuthUserAccountFields, UnregisterAuthUserAccountFieldsExtract,
+    };
+
+    use crate::auth::user::login_id::kernel::data::ValidateLoginIdError;
+
+    pub enum StaticUnregisterAuthUserAccountFields {
+        Valid(UnregisterAuthUserAccountFields),
+    }
+
+    impl UnregisterAuthUserAccountFieldsExtract for StaticUnregisterAuthUserAccountFields {
+        fn convert(self) -> Result<UnregisterAuthUserAccountFields, ValidateLoginIdError> {
+            match self {
+                Self::Valid(fields) => Ok(fields),
+            }
+        }
+    }
+
+    pub struct StaticUnregisterAuthUserAccountMaterial<'a> {
+        pub authorize: StaticAuthorizeInfra,
+        pub ticket_repository: MemoryAuthTicketRepository<'a>,
+        pub user_repository: MemoryAuthUserRepository<'a>,
+    }
+
+    impl<'a> UnregisterAuthUserAccountMaterial for StaticUnregisterAuthUserAccountMaterial<'a> {
+        type Authorize = StaticAuthorizeInfra;
+
+        type TicketRepository = MemoryAuthTicketRepository<'a>;
+        type UserRepository = MemoryAuthUserRepository<'a>;
+
+        fn authorize(&self) -> &Self::Authorize {
+            &self.authorize
+        }
+
+        fn ticket_repository(&self) -> &Self::TicketRepository {
+            &self.ticket_repository
+        }
+        fn user_repository(&self) -> &Self::UserRepository {
+            &self.user_repository
+        }
     }
 }

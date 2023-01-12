@@ -1,10 +1,10 @@
-import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
-import { AuthRole } from "../../kernel/data"
+import { RemoteCommonError } from "../../../../common/util/remote/data"
+import { AuthPermission } from "../../kernel/data"
 import { TypeAuthUser } from "../kernel/data"
 
 export type ModifyAuthUserAccountFields = Readonly<{
     memo: TypeAuthUser<"memo">
-    grantedRoles: readonly AuthRole[]
+    granted: readonly AuthPermission[]
 }>
 
 export type ModifyAuthUserAccountError = ModifyAuthUserAccountRemoteError

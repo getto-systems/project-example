@@ -1,4 +1,4 @@
-import { LocationOutsideFeature } from "../../../../z_lib/ui/location/feature"
+import { LocationOutsideFeature } from "../../../../common/util/location/feature"
 
 import { newFindNextVersionConfig } from "./config"
 import { newFindNextVersionShell } from "./shell"

@@ -6,6 +6,7 @@ use crate::auth::ticket::kernel::init::ticket_repository::dynamodb::ticket::Tabl
 
 use crate::auth::{
     ticket::{
+        authorize::infra::ClarifyAuthorizeTokenAuthTicketRepository,
         encode::infra::EncodeAuthTicketRepository, issue::infra::IssueAuthTicketRepository,
         logout::infra::LogoutAuthTicketRepository,
     },
@@ -14,10 +15,11 @@ use crate::auth::{
 
 use crate::{
     auth::{
-        ticket::kernel::data::{AuthDateTime, AuthTicket, ExpansionLimitDateTime},
+        kernel::data::{AuthDateTime, ExpansionLimitDateTime},
+        ticket::kernel::data::AuthTicket,
         user::kernel::data::AuthUserId,
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
 pub struct DynamoDbAuthTicketRepository<'a> {
@@ -33,8 +35,18 @@ impl<'a> DynamoDbAuthTicketRepository<'a> {
 }
 
 #[async_trait::async_trait]
+impl<'a> ClarifyAuthorizeTokenAuthTicketRepository for DynamoDbAuthTicketRepository<'a> {
+    async fn lookup_expansion_limit(
+        &self,
+        ticket: &AuthTicket,
+    ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError> {
+        self.ticket.get_expansion_limit(ticket.clone()).await
+    }
+}
+
+#[async_trait::async_trait]
 impl<'a> IssueAuthTicketRepository for DynamoDbAuthTicketRepository<'a> {
-    async fn issue(
+    async fn register(
         &self,
         ticket: AuthTicket,
         expansion_limit: ExpansionLimitDateTime,
@@ -49,9 +61,9 @@ impl<'a> IssueAuthTicketRepository for DynamoDbAuthTicketRepository<'a> {
 #[async_trait::async_trait]
 impl<'a> LogoutAuthTicketRepository for DynamoDbAuthTicketRepository<'a> {
     async fn discard(&self, ticket: &AuthTicket) -> Result<(), RepositoryError> {
-        let (ticket_id, user) = ticket.clone().extract();
+        let ticket = ticket.clone();
         self.ticket
-            .delete_ticket(ticket_id, user.into_user_id())
+            .delete_ticket(ticket.ticket_id, ticket.attrs.user_id)
             .await
     }
 }
@@ -70,7 +82,9 @@ impl<'a> EncodeAuthTicketRepository for DynamoDbAuthTicketRepository<'a> {
 impl<'a> DiscardAuthTicketRepository for DynamoDbAuthTicketRepository<'a> {
     async fn discard_all(&self, user_id: &AuthUserId) -> Result<(), RepositoryError> {
         for ticket_id in self.ticket.query_ticket_id(user_id.clone()).await? {
-            self.ticket.delete_ticket(ticket_id.clone(), user_id.clone()).await?
+            self.ticket
+                .delete_ticket(ticket_id.clone(), user_id.clone())
+                .await?
         }
         Ok(())
     }

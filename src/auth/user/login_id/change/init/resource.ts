@@ -1,5 +1,3 @@
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
-
 import { newOverwritePasswordConfig } from "./config"
 
 import {
@@ -7,17 +5,16 @@ import {
     OverwriteLoginIdAction,
     OverwriteLoginIdEntry,
 } from "../action"
-import { ModifyFieldHandler } from "../../../../../z_lib/ui/modify/action"
+import { ModifyFieldHandler } from "../../../../../common/util/modify/action"
 
 import { newOverwritePasswordInfra } from "./infra"
 
-type OutsideFeature = RemoteOutsideFeature
-export function newOverwriteLoginIdAction(feature: OutsideFeature): Readonly<{
+export function newOverwriteLoginIdAction(): Readonly<{
     action: OverwriteLoginIdAction
     handler: ModifyFieldHandler<OverwriteLoginIdEntry>
 }> {
     return initOverwriteLoginIdAction({
-        infra: newOverwritePasswordInfra(feature),
+        infra: newOverwritePasswordInfra(),
         config: newOverwritePasswordConfig(),
     })
 }

@@ -1,6 +1,6 @@
 import { test, expect } from "vitest"
 import { observeApplicationState } from "../../../../z_vendor/getto-application/action/test_helper"
-import { ticker } from "../../../../z_lib/ui/timer/helper"
+import { ticker } from "../../../../common/util/timer/helper"
 import {
     mockBoardValueStore,
     mockMultipleBoardValueStore,
@@ -19,7 +19,7 @@ import {
 
 const VALID_INFO = {
     memo: "memo",
-    grantedRoles: ["auth-user"],
+    granted: ["auth-user"],
 } as const
 
 test("submit valid info", async () => {
@@ -28,7 +28,7 @@ test("submit valid info", async () => {
     expect(
         await observeApplicationState(modify.state, async () => {
             store.memo.set(VALID_INFO.memo)
-            store.grantedRoles.set(VALID_INFO.grantedRoles)
+            store.granted.set(VALID_INFO.granted)
 
             return modify.submit()
         }),
@@ -36,7 +36,7 @@ test("submit valid info", async () => {
         { type: "try", hasTakenLongtime: false },
         {
             type: "success",
-            data: { loginId: "user-id", grantedRoles: ["auth-user"], memo: "memo" },
+            data: { loginId: "user-id", granted: ["auth-user"], memo: "memo" },
         },
         { type: "initial" },
     ])
@@ -49,7 +49,7 @@ test("submit valid login-id; take long time", async () => {
     expect(
         await observeApplicationState(modify.state, async () => {
             store.memo.set(VALID_INFO.memo)
-            store.grantedRoles.set(VALID_INFO.grantedRoles)
+            store.granted.set(VALID_INFO.granted)
 
             return modify.submit()
         }),
@@ -58,7 +58,7 @@ test("submit valid login-id; take long time", async () => {
         { type: "try", hasTakenLongtime: true },
         {
             type: "success",
-            data: { loginId: "user-id", grantedRoles: ["auth-user"], memo: "memo" },
+            data: { loginId: "user-id", granted: ["auth-user"], memo: "memo" },
         },
         { type: "initial" },
     ])
@@ -68,12 +68,12 @@ test("reset", () => {
     const { modify, store } = standard()
 
     store.memo.set(VALID_INFO.memo)
-    store.grantedRoles.set(VALID_INFO.grantedRoles)
+    store.granted.set(VALID_INFO.granted)
 
     modify.reset()
 
     expect(store.memo.get()).toEqual("initial-memo")
-    expect(store.grantedRoles.get()).toEqual([])
+    expect(store.granted.get()).toEqual([])
 })
 
 function standard() {
@@ -87,7 +87,7 @@ function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
     modify: ModifyAuthUserAccountAction
     store: Readonly<{
         memo: BoardValueStore
-        grantedRoles: MultipleBoardValueStore
+        granted: MultipleBoardValueStore
     }>
 }> {
     const modify = initModifyAuthUserAccountAction({
@@ -102,7 +102,7 @@ function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
 
     modify.handler.focus({
         loginId: restoreLoginId("user-id"),
-        grantedRoles: [],
+        granted: [],
         memo: restoreAuthUserField("initial-memo"),
     })
 
@@ -110,7 +110,7 @@ function initResource(modifyUserRemote: ModifyAuthUserAccountRemote): Readonly<{
         modify: modify.action,
         store: {
             memo: mockBoardValueStore(modify.action.memo.input),
-            grantedRoles: mockMultipleBoardValueStore(modify.action.grantedRoles.input),
+            granted: mockMultipleBoardValueStore(modify.action.granted.input),
         },
     }
 }
