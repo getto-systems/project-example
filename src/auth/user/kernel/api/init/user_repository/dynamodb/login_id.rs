@@ -7,7 +7,7 @@ use rusoto_dynamodb::{
 
 use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
-use crate::z_lib::repository::{
+use crate::common::api::repository::{
     dynamodb::helper::{string_value, DynamoDbColumn, ScanKey},
     helper::repository_infra_error,
 };
@@ -18,9 +18,11 @@ use crate::{
     auth::user::{
         kernel::data::AuthUserId,
         login_id::kernel::data::LoginId,
-        password::reset::kernel::data::{ResetTokenDestination, ResetTokenDestinationEmail},
+        password::reset::kernel::data::{
+            ResetPasswordTokenDestination, ResetPasswordTokenDestinationEmail,
+        },
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
 pub struct TableLoginId<'a> {
@@ -100,7 +102,7 @@ impl<'a> TableLoginId<'a> {
                     login_id,
                     user_id,
                     reset_token_destination: reset_token_destination_email
-                        .map(ResetTokenDestination::Email),
+                        .map(ResetPasswordTokenDestination::Email),
                 }),
                 _ => None,
             }
@@ -109,7 +111,7 @@ impl<'a> TableLoginId<'a> {
     pub async fn get_reset_token_entry(
         &self,
         login_id: LoginId,
-    ) -> Result<Option<(AuthUserId, Option<ResetTokenDestination>)>, RepositoryError> {
+    ) -> Result<Option<(AuthUserId, Option<ResetPasswordTokenDestination>)>, RepositoryError> {
         let input = GetItemInput {
             table_name: self.table_name.into(),
             key: TableLoginId::key(login_id),
@@ -134,7 +136,9 @@ impl<'a> TableLoginId<'a> {
                 ColumnUserId::remove_value(&mut attrs),
                 ColumnResetTokenDestinationEmail::remove_value(&mut attrs),
             ) {
-                (Some(user_id), email) => Some((user_id, email.map(ResetTokenDestination::Email))),
+                (Some(user_id), email) => {
+                    Some((user_id, email.map(ResetPasswordTokenDestination::Email)))
+                }
                 _ => None,
             }
         }))
@@ -142,7 +146,7 @@ impl<'a> TableLoginId<'a> {
     pub async fn get_reset_token_destination(
         &self,
         login_id: LoginId,
-    ) -> Result<Option<ResetTokenDestination>, RepositoryError> {
+    ) -> Result<Option<ResetPasswordTokenDestination>, RepositoryError> {
         let input = GetItemInput {
             table_name: self.table_name.into(),
             key: TableLoginId::key(login_id),
@@ -160,8 +164,8 @@ impl<'a> TableLoginId<'a> {
 
         Ok(response.item.map(|mut attrs| {
             ColumnResetTokenDestinationEmail::remove_value(&mut attrs)
-                .map(ResetTokenDestination::Email)
-                .unwrap_or(ResetTokenDestination::None)
+                .map(ResetPasswordTokenDestination::Email)
+                .unwrap_or(ResetPasswordTokenDestination::None)
         }))
     }
 
@@ -169,13 +173,13 @@ impl<'a> TableLoginId<'a> {
         &self,
         login_id: LoginId,
         user_id: AuthUserId,
-        reset_token_destination: ResetTokenDestination,
+        reset_token_destination: ResetPasswordTokenDestination,
     ) -> Result<(), RepositoryError> {
         let mut item = vec![
             ColumnLoginId::to_attr_pair(login_id),
             ColumnUserId::to_attr_pair(user_id),
         ];
-        if let ResetTokenDestination::Email(email) = reset_token_destination {
+        if let ResetPasswordTokenDestination::Email(email) = reset_token_destination {
             item.push(ColumnResetTokenDestinationEmail::to_attr_pair(email))
         }
 
@@ -206,7 +210,7 @@ impl<'a> TableLoginId<'a> {
             ColumnLoginId::to_attr_pair(login_id),
             ColumnUserId::to_attr_pair(user.user_id),
         ];
-        if let Some(ResetTokenDestination::Email(email)) = user.reset_token_destination {
+        if let Some(ResetPasswordTokenDestination::Email(email)) = user.reset_token_destination {
             item.push(ColumnResetTokenDestinationEmail::to_attr_pair(email))
         }
 
@@ -245,10 +249,10 @@ impl<'a> TableLoginId<'a> {
     pub async fn update_reset_token_destination(
         &self,
         login_id: LoginId,
-        new_destination: ResetTokenDestination,
+        new_destination: ResetPasswordTokenDestination,
     ) -> Result<(), RepositoryError> {
         let input = match new_destination {
-            ResetTokenDestination::None => UpdateItemInput {
+            ResetPasswordTokenDestination::None => UpdateItemInput {
                 table_name: self.table_name.into(),
                 key: Self::key(login_id),
                 update_expression: Some(format!(
@@ -257,7 +261,7 @@ impl<'a> TableLoginId<'a> {
                 )),
                 ..Default::default()
             },
-            ResetTokenDestination::Email(email) => UpdateItemInput {
+            ResetPasswordTokenDestination::Email(email) => UpdateItemInput {
                 table_name: self.table_name.into(),
                 key: Self::key(login_id),
                 update_expression: Some(format!(
@@ -285,7 +289,7 @@ impl<'a> TableLoginId<'a> {
 
     pub async fn scan_reset_token_destination(
         &self,
-    ) -> Result<Vec<(LoginId, Option<ResetTokenDestination>)>, RepositoryError> {
+    ) -> Result<Vec<(LoginId, Option<ResetPasswordTokenDestination>)>, RepositoryError> {
         let mut acc = vec![];
         let mut scan_key = ScanKey::FirstTime;
         while scan_key.has_next() {
@@ -298,7 +302,13 @@ impl<'a> TableLoginId<'a> {
     async fn scan_reset_token_destination_part(
         &self,
         scan_key: ScanKey,
-    ) -> Result<(Vec<(LoginId, Option<ResetTokenDestination>)>, ScanKey), RepositoryError> {
+    ) -> Result<
+        (
+            Vec<(LoginId, Option<ResetPasswordTokenDestination>)>,
+            ScanKey,
+        ),
+        RepositoryError,
+    > {
         let input = ScanInput {
             table_name: self.table_name.into(),
             exclusive_start_key: scan_key.extract(),
@@ -328,7 +338,7 @@ impl<'a> TableLoginId<'a> {
                         ColumnResetTokenDestinationEmail::remove_value(&mut attrs),
                     ) {
                         (Some(login_id), email) => {
-                            Some((login_id, email.map(ResetTokenDestination::Email)))
+                            Some((login_id, email.map(ResetPasswordTokenDestination::Email)))
                         }
                         _ => None,
                     }
@@ -372,7 +382,7 @@ impl DynamoDbColumn for ColumnUserId {
 
 struct ColumnResetTokenDestinationEmail;
 impl DynamoDbColumn for ColumnResetTokenDestinationEmail {
-    type Value = ResetTokenDestinationEmail;
+    type Value = ResetPasswordTokenDestinationEmail;
 
     fn as_name() -> &'static str {
         "reset_token_destination_email"

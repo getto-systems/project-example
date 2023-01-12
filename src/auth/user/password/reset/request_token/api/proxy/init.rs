@@ -1,41 +1,51 @@
-mod proxy_service;
+mod proxy_call;
 
-use actix_web::HttpRequest;
+use proxy_call::TonicRequestResetTokenProxyCall;
 
-use crate::auth::x_outside_feature::feature::AuthProxyOutsideFeature;
+use crate::x_outside_feature::{data::RequestId, proxy::feature::ProxyAppFeature};
 
-use crate::auth::{
-    ticket::validate::init::NoValidateMetadataStruct,
-    user::password::reset::request_token::proxy::init::proxy_service::ProxyService,
+use crate::auth::user::password::reset::request_token::proxy::action::{
+    RequestResetTokenProxyAction, RequestResetTokenProxyMaterial,
 };
 
-use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
-
-pub struct RequestResetTokenProxyStruct<'a> {
-    validate: NoValidateMetadataStruct<'a>,
-    proxy_service: ProxyService<'a>,
+pub struct ActiveRequestResetTokenProxyMaterial<'a> {
+    proxy_call: TonicRequestResetTokenProxyCall<'a>,
 }
 
-impl<'a> RequestResetTokenProxyStruct<'a> {
+impl<'a> ActiveRequestResetTokenProxyMaterial<'a> {
     pub fn action(
-        feature: &'a AuthProxyOutsideFeature,
-        request_id: &'a str,
-        request: &'a HttpRequest,
-        body: String,
-    ) -> AuthProxyAction<Self> {
-        AuthProxyAction::with_material(Self {
-            validate: NoValidateMetadataStruct::new(request),
-            proxy_service: ProxyService::new(&feature.service, request_id, body),
+        feature: &'a ProxyAppFeature,
+        request_id: RequestId,
+    ) -> RequestResetTokenProxyAction<Self> {
+        RequestResetTokenProxyAction::with_material(Self {
+            proxy_call: TonicRequestResetTokenProxyCall::new(&feature.auth, request_id),
         })
     }
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthProxyMaterial for RequestResetTokenProxyStruct<'a> {
-    type Validate = NoValidateMetadataStruct<'a>;
-    type ProxyService = ProxyService<'a>;
+impl<'a> RequestResetTokenProxyMaterial for ActiveRequestResetTokenProxyMaterial<'a> {
+    type ProxyCall = TonicRequestResetTokenProxyCall<'a>;
 
-    fn extract(self) -> (Self::Validate, Self::ProxyService) {
-        (self.validate, self.proxy_service)
+    fn proxy_call(&self) -> &Self::ProxyCall {
+        &self.proxy_call
+    }
+}
+
+#[cfg(test)]
+pub mod test {
+    pub use super::proxy_call::test::*;
+
+    use crate::auth::user::password::reset::request_token::proxy::action::RequestResetTokenProxyMaterial;
+
+    pub struct StaticRequestResetTokenProxyMaterial;
+
+    #[async_trait::async_trait]
+    impl RequestResetTokenProxyMaterial for StaticRequestResetTokenProxyMaterial {
+        type ProxyCall = StaticRequestResetTokenProxyCall;
+
+        fn proxy_call(&self) -> &Self::ProxyCall {
+            &StaticRequestResetTokenProxyCall
+        }
     }
 }

@@ -1,6 +1,5 @@
 use crate::{
-    common::outline::load::data::OutlineMenuBadge,
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError, common::outline::load::data::OutlineMenuBadge,
 };
 
 #[async_trait::async_trait]

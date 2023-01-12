@@ -1,13 +1,12 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::{
-    data::RequireAuthRoles,
-    method::{authorize, AuthorizeEvent, AuthorizeInfra},
-};
+use crate::common::proxy::action::CoreProxyParams;
 
-use crate::avail::unexpected_error::notify::infra::{
-    NotifyUnexpectedErrorFieldsExtract, NotifyUnexpectedErrorRequestDecoder,
-};
+use crate::auth::method::proxy::{authorize, AuthorizeEvent, AuthorizeInfra};
+
+use crate::avail::unexpected_error::notify::infra::NotifyUnexpectedErrorFieldsExtract;
+
+use crate::auth::data::{AuthPermissionRequired, AuthorizeTokenExtract};
 
 pub enum NotifyUnexpectedErrorState {
     Authorize(AuthorizeEvent),
@@ -29,22 +28,33 @@ pub trait NotifyUnexpectedErrorMaterial {
     fn authorize(&self) -> &Self::Authorize;
 }
 
-pub struct NotifyUnexpectedErrorAction<
-    R: NotifyUnexpectedErrorRequestDecoder,
-    M: NotifyUnexpectedErrorMaterial,
-> {
+pub struct NotifyUnexpectedErrorAction<M: NotifyUnexpectedErrorMaterial> {
+    pub info: NotifyUnexpectedErrorActionInfo,
     pubsub: ActionStatePubSub<NotifyUnexpectedErrorState>,
-    request_decoder: R,
     material: M,
 }
 
-impl<R: NotifyUnexpectedErrorRequestDecoder, M: NotifyUnexpectedErrorMaterial>
-    NotifyUnexpectedErrorAction<R, M>
-{
-    pub fn with_material(request_decoder: R, material: M) -> Self {
+pub struct NotifyUnexpectedErrorActionInfo;
+
+impl NotifyUnexpectedErrorActionInfo {
+    pub const fn name(&self) -> &'static str {
+        "avail.unexpected-error.notify"
+    }
+
+    pub fn required(&self) -> AuthPermissionRequired {
+        AuthPermissionRequired::Nothing
+    }
+
+    pub fn params(&self) -> CoreProxyParams {
+        (self.name(), self.required())
+    }
+}
+
+impl<M: NotifyUnexpectedErrorMaterial> NotifyUnexpectedErrorAction<M> {
+    pub fn with_material(material: M) -> Self {
         Self {
+            info: NotifyUnexpectedErrorActionInfo,
             pubsub: ActionStatePubSub::new(),
-            request_decoder,
             material,
         }
     }
@@ -56,19 +66,23 @@ impl<R: NotifyUnexpectedErrorRequestDecoder, M: NotifyUnexpectedErrorMaterial>
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<NotifyUnexpectedErrorState> {
-        let pubsub = self.pubsub;
-        let m = self.material;
-
-        let fields = self.request_decoder.decode();
-
-        authorize(m.authorize(), RequireAuthRoles::Nothing, |event| {
-            pubsub.post(NotifyUnexpectedErrorState::Authorize(event))
-        })
+    pub async fn ignite(
+        self,
+        token: impl AuthorizeTokenExtract,
+        fields: impl NotifyUnexpectedErrorFieldsExtract,
+    ) -> MethodResult<NotifyUnexpectedErrorState> {
+        authorize(
+            self.material.authorize(),
+            (token, self.info.required()),
+            |event| {
+                self.pubsub
+                    .post(NotifyUnexpectedErrorState::Authorize(event))
+            },
+        )
         .await?;
 
-        notify_unexpected_error(&m, fields, |event| {
-            pubsub.post(NotifyUnexpectedErrorState::Notify(event))
+        notify_unexpected_error(fields, |event| {
+            self.pubsub.post(NotifyUnexpectedErrorState::Notify(event))
         })
         .await
     }
@@ -87,10 +101,11 @@ impl std::fmt::Display for NotifyUnexpectedErrorEvent {
 }
 
 async fn notify_unexpected_error<S>(
-    _: &impl NotifyUnexpectedErrorMaterial,
-    fields: NotifyUnexpectedErrorFieldsExtract,
+    fields: impl NotifyUnexpectedErrorFieldsExtract,
     post: impl Fn(NotifyUnexpectedErrorEvent) -> S,
 ) -> MethodResult<S> {
     // TODO おそらくここで slack に通知とかする
-    Ok(post(NotifyUnexpectedErrorEvent::Error(fields.err)))
+    Ok(post(NotifyUnexpectedErrorEvent::Error(
+        fields.convert().err,
+    )))
 }

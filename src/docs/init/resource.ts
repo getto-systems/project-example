@@ -6,18 +6,17 @@ import {
     newOutlineMenuResource,
 } from "../../common/outline/load/init/resource"
 
-import { RepositoryOutsideFeature } from "../../z_lib/ui/repository/feature"
-import { RemoteOutsideFeature } from "../../z_lib/ui/remote/feature"
-import { LocationOutsideFeature } from "../../z_lib/ui/location/feature"
+import { RepositoryOutsideFeature } from "../../common/util/repository/feature"
+import { LocationOutsideFeature } from "../../common/util/location/feature"
 
 import { DocsResource } from "../resource"
 
-type OutsideFeature = RemoteOutsideFeature & RepositoryOutsideFeature & LocationOutsideFeature
+type OutsideFeature = RepositoryOutsideFeature & LocationOutsideFeature
 export function newDocsResource(feature: OutsideFeature): DocsResource {
     const menu = docsMenuContent()
     return {
         ...newOutlineBreadcrumbListResource(feature, menu),
         ...newOutlineMenuResource(feature, menu),
-        ...newNotifyUnexpectedErrorResource(feature),
+        ...newNotifyUnexpectedErrorResource(),
     }
 }

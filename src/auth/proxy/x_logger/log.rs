@@ -1,34 +1,14 @@
-use crate::auth::proxy::action::AuthProxyState;
-
-use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
+use crate::common::api::logger::infra::{LogFilter, LogLevel};
 
 use crate::auth::proxy::data::AuthProxyError;
-
-impl<R> LogMessage for AuthProxyState<R> {
-    fn log_message(&self) -> String {
-        format!("{}", self)
-    }
-}
-
-impl<R> LogFilter for AuthProxyState<R> {
-    fn log_level(&self) -> LogLevel {
-        match self {
-            Self::Metadata(event) => event.log_level(),
-            Self::TryToCall(_) => LogLevel::Info,
-            Self::Response(_) => LogLevel::Debug,
-            Self::ServiceError(err) => err.log_level(),
-        }
-    }
-}
 
 impl LogFilter for AuthProxyError {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::AlreadyExists(_) => LogLevel::Audit,
-            Self::Unauthenticated(_) => LogLevel::Audit,
-            Self::PermissionDenied(_) => LogLevel::Audit,
-            Self::Cancelled(_) => LogLevel::Error,
+            Self::Unauthenticated(_) => LogLevel::Important,
             Self::InfraError(_) => LogLevel::Error,
+            Self::ServiceConnectError(err) => err.log_level(),
+            Self::ServiceMetadataError(err) => err.log_level(),
             Self::MessageError(err) => err.log_level(),
         }
     }

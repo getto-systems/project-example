@@ -1,4 +1,4 @@
-import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
+import { ConvertLocationResult } from "../../../common/util/location/data"
 
 import {
     ResetPasswordVariant,
@@ -39,9 +39,7 @@ function detectStaticSignViewVariant(
     return { valid: false }
 }
 
-function detectResetPasswordVariant(
-    currentURL: URL,
-): ConvertLocationResult<ResetPasswordVariant> {
+function detectResetPasswordVariant(currentURL: URL): ConvertLocationResult<ResetPasswordVariant> {
     const search = currentURL.searchParams.get(signNavKey(SignNav.passwordReset))
     if (!search) {
         return { valid: false }

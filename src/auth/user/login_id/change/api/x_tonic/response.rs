@@ -3,14 +3,14 @@ use tonic::{Response, Status};
 use crate::auth::user::login_id::change::y_protobuf::service::{
     OverwriteLoginIdErrorKindPb, OverwriteLoginIdResponsePb,
 };
-use crate::z_lib::response::tonic::ServiceResponder;
+use crate::common::api::response::tonic::ServiceResponder;
 
 use super::super::action::{OverwriteLoginIdEvent, OverwriteLoginIdState};
 
 impl ServiceResponder<OverwriteLoginIdResponsePb> for OverwriteLoginIdState {
     fn respond_to(self) -> Result<Response<OverwriteLoginIdResponsePb>, Status> {
         match self {
-            Self::Authenticate(event) => event.respond_to(),
+            Self::Authorize(event) => event.respond_to(),
             Self::Overwrite(event) => event.respond_to(),
         }
     }

@@ -1,5 +1,6 @@
 mod ticket;
 
+use crate::auth::ticket::authorize::infra::ClarifyAuthorizeTokenAuthTicketRepository;
 use crate::auth::ticket::kernel::init::ticket_repository::memory::ticket::{
     EntryTicket, MapTicket, StoreTicket,
 };
@@ -14,10 +15,11 @@ use crate::auth::{
 
 use crate::{
     auth::{
-        ticket::kernel::data::{AuthDateTime, AuthTicket, ExpansionLimitDateTime},
+        kernel::data::{AuthDateTime, ExpansionLimitDateTime},
+        ticket::kernel::data::AuthTicket,
         user::kernel::data::AuthUserId,
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
 pub struct MemoryAuthTicketRepository<'a> {
@@ -49,13 +51,11 @@ impl<'a> MemoryAuthTicketRepository<'a> {
         limit: ExpansionLimitDateTime,
         issued_at: AuthDateTime,
     ) -> Self {
-        let (ticket_id, user) = ticket.extract();
-
         let repository = Self::new(store);
         repository.ticket.insert_entry(
-            ticket_id,
+            ticket.ticket_id,
             EntryTicket {
-                user,
+                user_id: ticket.attrs.user_id,
                 limit,
                 issued_at,
             },
@@ -65,8 +65,18 @@ impl<'a> MemoryAuthTicketRepository<'a> {
 }
 
 #[async_trait::async_trait]
+impl<'a> ClarifyAuthorizeTokenAuthTicketRepository for MemoryAuthTicketRepository<'a> {
+    async fn lookup_expansion_limit(
+        &self,
+        ticket: &AuthTicket,
+    ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError> {
+        Ok(self.ticket.get_expansion_limit(&ticket.ticket_id))
+    }
+}
+
+#[async_trait::async_trait]
 impl<'a> IssueAuthTicketRepository for MemoryAuthTicketRepository<'a> {
-    async fn issue(
+    async fn register(
         &self,
         ticket: AuthTicket,
         limit: ExpansionLimitDateTime,
@@ -79,7 +89,7 @@ impl<'a> IssueAuthTicketRepository for MemoryAuthTicketRepository<'a> {
 #[async_trait::async_trait]
 impl<'a> LogoutAuthTicketRepository for MemoryAuthTicketRepository<'a> {
     async fn discard(&self, ticket: &AuthTicket) -> Result<(), RepositoryError> {
-        Ok(self.ticket.remove_ticket(ticket.as_ticket_id()))
+        Ok(self.ticket.remove_ticket(&ticket.ticket_id))
     }
 }
 
@@ -89,7 +99,7 @@ impl<'a> EncodeAuthTicketRepository for MemoryAuthTicketRepository<'a> {
         &self,
         ticket: &AuthTicket,
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError> {
-        Ok(self.ticket.get_expansion_limit(ticket.as_ticket_id()))
+        Ok(self.ticket.get_expansion_limit(&ticket.ticket_id))
     }
 }
 

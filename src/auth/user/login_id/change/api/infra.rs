@@ -1,9 +1,10 @@
 use crate::{
     auth::user::{
-        kernel::data::AuthUserId, login_id::kernel::data::LoginId,
-        password::reset::kernel::data::ResetTokenDestination,
+        kernel::data::AuthUserId,
+        login_id::{change::data::ValidateOverwriteLoginIdFieldsError, kernel::data::LoginId},
+        password::reset::kernel::data::ResetPasswordTokenDestination,
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
 pub struct OverwriteLoginIdFields {
@@ -11,13 +12,8 @@ pub struct OverwriteLoginIdFields {
     pub new_login_id: LoginId,
 }
 
-pub struct OverwriteLoginIdFieldsExtract {
-    pub login_id: String,
-    pub new_login_id: String,
-}
-
-pub trait OverwriteLoginIdRequestDecoder {
-    fn decode(self) -> OverwriteLoginIdFieldsExtract;
+pub trait OverwriteLoginIdFieldsExtract {
+    fn convert(self) -> Result<OverwriteLoginIdFields, ValidateOverwriteLoginIdFieldsError>;
 }
 
 #[async_trait::async_trait]
@@ -31,6 +27,7 @@ pub trait OverwriteLoginIdRepository {
 
     async fn overwrite_login_id(
         &self,
+        // TODO この引数なんかおかしい
         new_login_id: LoginId,
         user: OverwriteLoginIdEntry,
     ) -> Result<(), RepositoryError>;
@@ -39,5 +36,5 @@ pub trait OverwriteLoginIdRepository {
 pub struct OverwriteLoginIdEntry {
     pub user_id: AuthUserId,
     pub login_id: LoginId,
-    pub reset_token_destination: Option<ResetTokenDestination>,
+    pub reset_token_destination: Option<ResetPasswordTokenDestination>,
 }

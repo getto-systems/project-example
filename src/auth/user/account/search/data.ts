@@ -1,8 +1,8 @@
-import { SingleValueFilter, SearchPageResponse } from "../../../../z_lib/ui/search/kernel/data"
-import { SearchSort } from "../../../../z_lib/ui/search/sort/data"
+import { TextFilter, SearchPageResponse } from "../../../../common/util/search/kernel/data"
+import { SearchSort } from "../../../../common/util/search/sort/data"
 import { AuthUserAccount } from "../kernel/data"
-import { AuthRole } from "../../kernel/data"
-import { ListSearchedData } from "../../../../z_lib/ui/list/data"
+import { AuthPermission } from "../../kernel/data"
+import { ListSearchedData } from "../../../../common/util/list/data"
 
 export type SearchAuthUserAccountFilter = SearchAuthUserAccountFilterProps &
     Readonly<{
@@ -10,14 +10,15 @@ export type SearchAuthUserAccountFilter = SearchAuthUserAccountFilterProps &
         sort: SearchAuthUserAccountSort
     }>
 export type SearchAuthUserAccountFilterProps = Readonly<{
-    loginId: SingleValueFilter
-    grantedRoles: readonly AuthRole[]
+    loginId: TextFilter
+    granted: readonly AuthPermission[]
 }>
 
-export type SearchAuthUserAccountSort = SearchSort<"loginId">
+export const searchAuthUserAccountSortKeys = ["loginId"] as const
+export type SearchAuthUserAccountSort = SearchSort<typeof searchAuthUserAccountSortKeys[number]>
 export type SearchAuthUserAccountSortKey = SearchAuthUserAccountSort["key"]
 
-export const defaultSearchAuthUserAccountSort: SearchAuthUserAccountSortKey = "loginId"
+export const defaultSearchAuthUserAccountSort = searchAuthUserAccountSortKeys[0]
 
 export type SearchAuthUserAccountRemoteResponse = ListSearchedData<
     AuthUserAccount,

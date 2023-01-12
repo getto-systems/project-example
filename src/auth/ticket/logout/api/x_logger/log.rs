@@ -1,4 +1,4 @@
-use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
+use crate::common::api::logger::infra::{LogFilter, LogLevel, LogMessage};
 
 use crate::auth::ticket::logout::action::LogoutEvent;
 
@@ -13,7 +13,7 @@ impl LogMessage for LogoutState {
 impl LogFilter for LogoutState {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Authenticate(event) => event.log_level(),
+            Self::AuthenticateWithToken(event) => event.log_level(),
             Self::Logout(event) => event.log_level(),
         }
     }
@@ -22,7 +22,7 @@ impl LogFilter for LogoutState {
 impl LogFilter for LogoutEvent {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Success => LogLevel::Audit,
+            Self::Success => LogLevel::Important,
             Self::RepositoryError(err) => err.log_level(),
         }
     }

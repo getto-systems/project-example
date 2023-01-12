@@ -7,10 +7,10 @@ import {
     mainBreadcrumbSeparator,
 } from "../../../../z_vendor/getto-css/preact/layout/app"
 import { linky } from "../../../../z_vendor/getto-css/preact/design/highlight"
-import { lnir } from "../../../../z_lib/ui/icon/init/line_icon"
+import { lnir } from "../../../util/icon/init/line_icon"
 
 import { siteInfo } from "../../../../x_content/site"
-import { iconHtml } from "../../../../z_lib/ui/icon/x_preact/icon"
+import { iconHtml } from "../../../util/icon/x_preact/icon"
 import { icon_home } from "../../../../x_content/icon"
 
 import { MENU_ID } from "./display_menu"

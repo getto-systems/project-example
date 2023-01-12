@@ -3,7 +3,7 @@ import {
     observeApplicationState,
     observeApplicationStateTuple2,
 } from "../../../../z_vendor/getto-application/action/test_helper"
-import { ticker } from "../../../../z_lib/ui/timer/helper"
+import { ticker } from "../../../../common/util/timer/helper"
 
 import { mockBoardValueStore } from "../../../../z_vendor/getto-application/board/input/test_helper"
 import { mockSearchAuthUserAccountShell } from "./init/mock"
@@ -122,7 +122,7 @@ test("focus / close", async () => {
             await search.list.state.ignitionState
             const another: AuthUserAccount = {
                 loginId: restoreLoginId("another-1"),
-                grantedRoles: [],
+                granted: [],
                 resetTokenDestination: { type: "none" },
                 memo: restoreAuthUserField("memo"),
             }
@@ -201,18 +201,18 @@ function standard_searchRemoteResult(): SearchAuthUserAccountRemoteResult {
 }
 
 const standard_response: SearchAuthUserAccountRemoteResponse = {
-    page: { offset: 0, limit: 1000, all: 245 },
+    page: { offset: 0, limit: 1000, count: 245 },
     sort: { key: defaultSearchAuthUserAccountSort, order: "normal" },
     list: [
         {
             loginId: restoreLoginId("user-1"),
-            grantedRoles: [],
+            granted: [],
             resetTokenDestination: { type: "none" },
             memo: restoreAuthUserField("memo"),
         },
         {
             loginId: restoreLoginId("user-2"),
-            grantedRoles: [],
+            granted: [],
             resetTokenDestination: { type: "none" },
             memo: restoreAuthUserField("memo"),
         },

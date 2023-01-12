@@ -1,6 +1,5 @@
-import { LocationOutsideFeature } from "../../../../z_lib/ui/location/feature"
-import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
-import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/feature"
+import { LocationOutsideFeature } from "../../../util/location/feature"
+import { RepositoryOutsideFeature } from "../../../util/repository/feature"
 
 import { newOutlineMenuInfra } from "./infra"
 import { newOutlineMenuShell, newOutlineBreadcrumbListShell } from "./shell"
@@ -28,7 +27,7 @@ export function newOutlineBreadcrumbListResource(
     }
 }
 
-type MenuOutsideFeature = RepositoryOutsideFeature & RemoteOutsideFeature & LocationOutsideFeature
+type MenuOutsideFeature = RepositoryOutsideFeature & LocationOutsideFeature
 export function newOutlineMenuResource(
     feature: MenuOutsideFeature,
     menuContent: MenuContent,

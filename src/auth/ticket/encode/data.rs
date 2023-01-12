@@ -1,26 +1,18 @@
-use crate::auth::{
-    ticket::kernel::data::{EncodedAuthTokens, ExpireDateTime},
-    user::kernel::data::GrantedAuthRoles,
-};
-
-pub struct AuthTicketEncoded {
-    pub roles: GrantedAuthRoles,
-    pub token: EncodedAuthTokens,
-}
+use crate::auth::kernel::data::ExpireDateTime;
 
 #[derive(Clone)]
 pub struct AuthTokenExpires {
-    pub ticket: ExpireDateTime,
-    pub api: ExpireDateTime,
-    pub cloudfront: ExpireDateTime,
+    pub authenticate: ExpireDateTime,
+    pub authorize: ExpireDateTime,
+    pub cdn: ExpireDateTime,
 }
 
 impl std::fmt::Display for AuthTokenExpires {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(
             f,
-            "ticket: {} / api: {} / cloudfront: {}",
-            self.ticket, self.api, self.cloudfront
+            "authenticate: {} / authorize: {} / cdn: {}",
+            self.authenticate, self.authorize, self.cdn
         )
     }
 }
@@ -32,7 +24,7 @@ pub enum EncodeAuthTokenError {
 impl std::fmt::Display for EncodeAuthTokenError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::InfraError(err) => write!(f, "encode error: {}", err),
+            Self::InfraError(err) => write!(f, "encode auth-token error: {}", err),
         }
     }
 }

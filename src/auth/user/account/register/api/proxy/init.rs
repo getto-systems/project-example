@@ -1,41 +1,27 @@
-mod register;
+mod proxy_call;
 
-use actix_web::HttpRequest;
+use crate::x_outside_feature::{data::RequestId, proxy::feature::ProxyAppFeature};
 
-use crate::auth::x_outside_feature::feature::AuthProxyOutsideFeature;
+use crate::auth::user::account::register::proxy::init::proxy_call::TonicRegisterAuthUserAccountProxyCall;
 
-use crate::auth::{
-    ticket::validate::init::ValidateApiMetadataStruct,
-    user::account::register::proxy::init::register::RegisterUserProxyService,
+use crate::{
+    auth::user::account::register::action::RegisterAuthUserAccountActionInfo,
+    common::proxy::action::CoreProxyAction,
 };
 
-use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
+use crate::common::proxy::init::ActiveCoreProxyMaterial;
 
-pub struct RegisterAuthUserAccountProxyStruct<'a> {
-    validate: ValidateApiMetadataStruct<'a>,
-    proxy_service: RegisterUserProxyService<'a>,
-}
+pub type ActiveRegisterAuthUserAccountProxyMaterial<'a> =
+    ActiveCoreProxyMaterial<'a, TonicRegisterAuthUserAccountProxyCall<'a>>;
 
-impl<'a> RegisterAuthUserAccountProxyStruct<'a> {
-    pub fn action(
-        feature: &'a AuthProxyOutsideFeature,
-        request_id: &'a str,
-        request: &'a HttpRequest,
-        body: String,
-    ) -> AuthProxyAction<Self> {
-        AuthProxyAction::with_material(Self {
-            validate: ValidateApiMetadataStruct::new(&feature.decoding_key, request),
-            proxy_service: RegisterUserProxyService::new(&feature.service, request_id, body),
-        })
-    }
-}
-
-#[async_trait::async_trait]
-impl<'a> AuthProxyMaterial for RegisterAuthUserAccountProxyStruct<'a> {
-    type Validate = ValidateApiMetadataStruct<'a>;
-    type ProxyService = RegisterUserProxyService<'a>;
-
-    fn extract(self) -> (Self::Validate, Self::ProxyService) {
-        (self.validate, self.proxy_service)
+impl<'a> ActiveRegisterAuthUserAccountProxyMaterial<'a> {
+    pub fn action(feature: &'a ProxyAppFeature, request_id: RequestId) -> CoreProxyAction<Self> {
+        CoreProxyAction::with_material(
+            RegisterAuthUserAccountActionInfo.params(),
+            ActiveCoreProxyMaterial::new(
+                &feature.auth.decoding_key,
+                TonicRegisterAuthUserAccountProxyCall::new(&feature.core, request_id),
+            ),
+        )
     }
 }

@@ -1,10 +1,12 @@
 use crate::auth::user::{
     login_id::kernel::data::ValidateLoginIdError,
-    password::{kernel::data::ValidatePasswordError, reset::kernel::data::ValidateResetTokenError},
+    password::{
+        kernel::data::ValidatePasswordError, reset::kernel::data::ValidateResetPasswordTokenError,
+    },
 };
 
 pub enum ValidateResetPasswordFieldsError {
-    InvalidResetToken(ValidateResetTokenError),
+    InvalidResetToken(ValidateResetPasswordTokenError),
     InvalidLoginId(ValidateLoginIdError),
     InvalidNewPassword(ValidatePasswordError),
 }
@@ -13,7 +15,7 @@ impl std::fmt::Display for ValidateResetPasswordFieldsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
             Self::InvalidResetToken(err) => write!(f, "reset-token: {}", err),
-            Self::InvalidLoginId(err) => write!(f, "login-id: {}", err),
+            Self::InvalidLoginId(err) => err.fmt(f),
             Self::InvalidNewPassword(err) => write!(f, "new-password: {}", err),
         }
     }

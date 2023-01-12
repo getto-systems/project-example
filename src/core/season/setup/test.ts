@@ -1,9 +1,9 @@
 import { test, expect } from "vitest"
 import { observeApplicationState } from "../../../z_vendor/getto-application/action/test_helper"
 
-import { mockClock, mockClockPubSub } from "../../../z_lib/ui/clock/mock"
+import { mockClock, mockClockPubSub } from "../../../common/util/clock/mock"
 import { mockBoardValueStore } from "../../../z_vendor/getto-application/board/input/test_helper"
-import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
+import { initMemoryDB } from "../../../common/util/repository/init/memory"
 import { markSeason } from "../kernel/test_helper"
 
 import { initSetupSeasonAction } from "./action"
@@ -14,7 +14,7 @@ import { SeasonRepository } from "../kernel/infra"
 import { BoardValueStore } from "../../../z_vendor/getto-application/board/input/infra"
 
 import { seasonRepositoryConverter } from "../kernel/convert"
-import { convertDB } from "../../../z_lib/ui/repository/init/convert"
+import { convertDB } from "../../../common/util/repository/init/convert"
 
 import { Season } from "../kernel/data"
 

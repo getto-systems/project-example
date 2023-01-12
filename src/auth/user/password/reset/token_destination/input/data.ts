@@ -1,4 +1,4 @@
-import { ValidateTextError } from "../../../../../../z_lib/ui/validate/data"
+import { ValidateTextError } from "../../../../../../common/util/validate/data"
 
 export type ValidateResetTokenDestinationError =
     | Readonly<{ type: "type"; err: readonly ValidateResetTokenDestinationTypeError[] }>

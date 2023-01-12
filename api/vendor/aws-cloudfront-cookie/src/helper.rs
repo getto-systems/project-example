@@ -1,5 +1,5 @@
 use rsa::{
-    pkcs1::{Error as Pkcs1Error, FromRsaPrivateKey},
+    pkcs1::{DecodeRsaPrivateKey, Error as Pkcs1Error},
     RsaPrivateKey,
 };
 

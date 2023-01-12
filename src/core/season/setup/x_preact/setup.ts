@@ -11,12 +11,12 @@ import { EditButton } from "../../../../common/x_preact/button/edit_button"
 import { EditSuccessButton } from "../../../../common/x_preact/button/edit_success_button"
 import { ChangeButton } from "../../../../common/x_preact/button/change_button"
 
-import { repositoryErrorReason } from "../../../../z_lib/ui/repository/x_error/reason"
+import { repositoryErrorReason } from "../../../../common/util/repository/x_error/reason"
 
 import { LoadSeasonAction } from "../../load/action"
 import { SetupSeasonAction } from "../action"
 
-import { RepositoryError } from "../../../../z_lib/ui/repository/data"
+import { RepositoryError } from "../../../../common/util/repository/data"
 
 type Props = Readonly<{
     season: LoadSeasonAction

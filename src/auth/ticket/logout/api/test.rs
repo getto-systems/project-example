@@ -1,177 +1,118 @@
-use std::collections::HashSet;
-
-use getto_application_test::ActionTestRunner;
+use getto_application_test::ApplicationActionStateHolder;
+use pretty_assertions::assert_eq;
 
 use chrono::{DateTime, Duration, TimeZone, Utc};
 
 use crate::auth::ticket::{
-    kernel::{
-        data::AuthTicket,
-        init::{
-            clock::test::StaticChronoAuthClock,
-            ticket_repository::memory::{MemoryAuthTicketRepository, MemoryAuthTicketStore},
-        },
+    authenticate::init::test::StaticAuthenticateWithTokenInfra,
+    kernel::init::{
+        request::test::StaticAuthenticateToken,
+        ticket_repository::memory::{MemoryAuthTicketRepository, MemoryAuthTicketStore},
+        token::authenticate::decoder::test::StaticAuthenticateTokenDecoder,
     },
-    validate::init::{
-        nonce_metadata::test::StaticAuthNonceMetadata,
-        nonce_repository::memory::{MemoryAuthNonceRepository, MemoryAuthNonceStore},
-        test::{StaticValidateAuthNonceStruct, StaticAuthenticateStruct},
-        token_decoder::test::StaticAuthTokenDecoder,
-        token_metadata::test::StaticAuthTokenMetadata,
-    },
+    logout::init::test::StaticLogoutMaterial,
 };
 
-use crate::auth::ticket::validate::method::AuthNonceConfig;
+use crate::auth::ticket::logout::action::LogoutAction;
 
-use super::action::{LogoutAction, LogoutMaterial};
-
-use crate::auth::ticket::kernel::data::{
-    AuthDateTime, AuthTicketExtract, ExpansionLimitDuration, ExpireDuration,
+use crate::auth::{
+    kernel::data::{AuthDateTime, ExpansionLimitDuration},
+    ticket::kernel::data::AuthTicket,
 };
 
 #[tokio::test]
+async fn info() {
+    let store = TestStore::new();
+    let material = StaticLogoutMaterial {
+        authenticate_with_token: standard_authenticate_with_token_infra(),
+        ticket_repository: standard_ticket_repository(&store),
+    };
+
+    let action = LogoutAction::with_material(material);
+
+    assert_eq!(action.info.name(), "auth.ticket.logout");
+}
+
+#[tokio::test]
 async fn success_logout() {
-    let (handler, assert_state) = ActionTestRunner::new();
+    let holder = ApplicationActionStateHolder::new();
 
     let store = TestStore::new();
-    let material = TestStruct::standard(&store);
+    let material = StaticLogoutMaterial {
+        authenticate_with_token: standard_authenticate_with_token_infra(),
+        ticket_repository: standard_ticket_repository(&store),
+    };
 
     let mut action = LogoutAction::with_material(material);
-    action.subscribe(handler);
+    action.subscribe(holder.handler());
 
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
-        "logout success",
-    ]);
+    let result = action.ignite(StaticAuthenticateToken).await;
+    assert_eq!(
+        holder.extract(),
+        vec![
+            "authenticate with token success; ticket: ticket-id / user-id: user-id (granted: [])",
+            "logout success",
+        ],
+    );
     assert!(result.is_ok());
 }
 
 #[tokio::test]
 async fn error_no_ticket() {
-    let (handler, assert_state) = ActionTestRunner::new();
+    let holder = ApplicationActionStateHolder::new();
 
     let store = TestStore::new();
-    let material = TestStruct::no_ticket(&store);
+    let material = StaticLogoutMaterial {
+        authenticate_with_token: standard_authenticate_with_token_infra(),
+        ticket_repository: no_ticket_repository(&store),
+    };
 
     let mut action = LogoutAction::with_material(material);
-    action.subscribe(handler);
+    action.subscribe(holder.handler());
 
-    let result = action.ignite().await;
-    assert_state(vec![
-        "nonce expires calculated; 2021-01-02 10:00:00 UTC",
-        "validate nonce success",
-        "authenticate success; ticket: ticket-id / user: user-id (granted: [])",
-        "logout success",
-    ]);
+    let result = action.ignite(StaticAuthenticateToken).await;
+    assert_eq!(
+        holder.extract(),
+        vec![
+            "authenticate with token success; ticket: ticket-id / user-id: user-id (granted: [])",
+            "logout success",
+        ],
+    );
     assert!(result.is_ok());
 }
 
-struct TestStruct<'a> {
-    validate: StaticAuthenticateStruct<'a>,
-    ticket_repository: MemoryAuthTicketRepository<'a>,
-}
-
-impl<'a> LogoutMaterial for TestStruct<'a> {
-    type Authenticate = StaticAuthenticateStruct<'a>;
-    type TicketRepository = MemoryAuthTicketRepository<'a>;
-
-    fn authenticate(&self) -> &Self::Authenticate {
-        &self.validate
-    }
-    fn ticket_repository(&self) -> &Self::TicketRepository {
-        &self.ticket_repository
-    }
-}
-
 struct TestStore {
-    nonce: MemoryAuthNonceStore,
     ticket: MemoryAuthTicketStore,
 }
 
 impl TestStore {
     fn new() -> Self {
         Self {
-            nonce: MemoryAuthNonceStore::new(),
             ticket: MemoryAuthTicketStore::new(),
         }
     }
 }
 
-impl<'a> TestStruct<'a> {
-    fn standard(store: &'a TestStore) -> Self {
-        Self::new(store, standard_ticket_repository(&store.ticket))
-    }
-    fn no_ticket(store: &'a TestStore) -> Self {
-        Self::new(store, no_ticket_repository(&store.ticket))
-    }
-    fn new(store: &'a TestStore, ticket_repository: MemoryAuthTicketRepository<'a>) -> Self {
-        Self {
-            validate: StaticAuthenticateStruct {
-                validate_nonce: StaticValidateAuthNonceStruct {
-                    config: standard_nonce_config(),
-                    clock: standard_clock(),
-                    nonce_metadata: standard_nonce_metadata(),
-                    nonce_repository: MemoryAuthNonceRepository::new(&store.nonce),
-                },
-                token_metadata: standard_token_metadata(),
-                token_decoder: standard_token_validator(),
-            },
-            ticket_repository,
-        }
-    }
-}
-
-const NONCE: &'static str = "nonce";
-const TICKET_ID: &'static str = "ticket-id";
-const USER_ID: &'static str = "user-id";
-
-fn standard_nonce_config() -> AuthNonceConfig {
-    AuthNonceConfig {
-        nonce_expires: ExpireDuration::with_duration(Duration::days(1)),
-    }
-}
-
 fn standard_now() -> DateTime<Utc> {
-    Utc.ymd(2021, 1, 1).and_hms(10, 0, 0)
-}
-fn standard_clock() -> StaticChronoAuthClock {
-    StaticChronoAuthClock::new(standard_now())
+    Utc.with_ymd_and_hms(2021, 1, 1, 10, 0, 0).latest().unwrap()
 }
 
-fn standard_nonce_metadata() -> StaticAuthNonceMetadata {
-    StaticAuthNonceMetadata::new(NONCE.into())
-}
-fn standard_token_metadata() -> StaticAuthTokenMetadata {
-    StaticAuthTokenMetadata::new("TOKEN".into())
-}
-
-fn standard_token_validator() -> StaticAuthTokenDecoder {
-    StaticAuthTokenDecoder::Valid(AuthTicketExtract {
-        ticket_id: TICKET_ID.into(),
-        user_id: "user-id".into(),
-        granted_roles: HashSet::new(),
-    })
+fn standard_authenticate_with_token_infra() -> StaticAuthenticateWithTokenInfra {
+    StaticAuthenticateWithTokenInfra {
+        token_decoder: StaticAuthenticateTokenDecoder::Valid(stored_ticket()),
+    }
 }
 
-fn standard_ticket_repository<'a>(
-    store: &'a MemoryAuthTicketStore,
-) -> MemoryAuthTicketRepository<'a> {
+fn standard_ticket_repository<'a>(store: &'a TestStore) -> MemoryAuthTicketRepository<'a> {
     let issued_at = AuthDateTime::restore(standard_now());
     let limit =
         issued_at.expansion_limit(&ExpansionLimitDuration::with_duration(Duration::days(10)));
-    MemoryAuthTicketRepository::with_ticket(store, test_ticket(), limit, issued_at)
+    MemoryAuthTicketRepository::with_ticket(&store.ticket, stored_ticket(), limit, issued_at)
 }
-fn no_ticket_repository<'a>(store: &'a MemoryAuthTicketStore) -> MemoryAuthTicketRepository<'a> {
-    MemoryAuthTicketRepository::new(store)
+fn no_ticket_repository<'a>(store: &'a TestStore) -> MemoryAuthTicketRepository<'a> {
+    MemoryAuthTicketRepository::new(&store.ticket)
 }
 
-fn test_ticket() -> AuthTicket {
-    AuthTicket::restore(AuthTicketExtract {
-        ticket_id: TICKET_ID.into(),
-        user_id: USER_ID.into(),
-        granted_roles: HashSet::new(),
-    })
+fn stored_ticket() -> AuthTicket {
+    AuthTicket::standard()
 }

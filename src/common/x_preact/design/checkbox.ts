@@ -1,4 +1,4 @@
-import { PrepareElementState } from "../../../z_lib/ui/prepare/data"
+import { PrepareElementState } from "../../util/prepare/data"
 import { CheckboxBoardContent } from "../../../z_vendor/getto-application/board/input/x_preact/checkbox"
 
 export function checkboxOptions<T>(

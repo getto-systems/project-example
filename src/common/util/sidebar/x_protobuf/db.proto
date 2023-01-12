@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package z_lib.sidebar.db;
+
+message SidebarPb {
+  bool is_expand = 1;
+}

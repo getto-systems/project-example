@@ -23,11 +23,11 @@ function newBackground(): void {
 
     const handler: Handler = {
         password: {
-            change: newChangePasswordWorkerHandler(feature, (response) =>
+            change: newChangePasswordWorkerHandler((response) =>
                 postBackgroundMessage({ type: "password-change", response }),
             ),
             reset: {
-                requestToken: newRequestResetTokenWorkerHandler(feature, (response) =>
+                requestToken: newRequestResetTokenWorkerHandler((response) =>
                     postBackgroundMessage({ type: "password-reset-requestToken", response }),
                 ),
             },

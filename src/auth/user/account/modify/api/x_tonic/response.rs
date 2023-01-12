@@ -4,15 +4,14 @@ use crate::auth::user::account::modify::y_protobuf::service::{
     ModifyAuthUserAccountErrorKindPb, ModifyAuthUserAccountResponsePb,
 };
 
-use crate::z_lib::response::tonic::ServiceResponder;
+use crate::common::api::response::tonic::ServiceResponder;
 
 use super::super::action::{ModifyAuthUserAccountEvent, ModifyAuthUserAccountState};
 
 impl ServiceResponder<ModifyAuthUserAccountResponsePb> for ModifyAuthUserAccountState {
     fn respond_to(self) -> Result<Response<ModifyAuthUserAccountResponsePb>, Status> {
         match self {
-            Self::Authenticate(event) => event.respond_to(),
-            Self::PermissionError(err) => err.respond_to(),
+            Self::Authorize(event) => event.respond_to(),
             Self::ModifyUser(event) => event.respond_to(),
         }
     }

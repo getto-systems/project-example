@@ -4,10 +4,10 @@ import {
 } from "../../../z_vendor/getto-application/action/action"
 
 import { SeasonRepository } from "../kernel/infra"
-import { Clock } from "../../../z_lib/ui/clock/infra"
+import { Clock } from "../../../common/util/clock/infra"
 
 import { Season } from "../kernel/data"
-import { RepositoryError } from "../../../z_lib/ui/repository/data"
+import { RepositoryError } from "../../../common/util/repository/data"
 
 export interface LoadSeasonAction {
     readonly state: ApplicationState<LoadSeasonState>

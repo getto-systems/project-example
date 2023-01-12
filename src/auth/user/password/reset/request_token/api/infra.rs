@@ -1,71 +1,69 @@
 use crate::{
     auth::{
-        ticket::kernel::data::{AuthDateTime, ExpireDateTime, ExpireDuration},
+        kernel::data::{AuthDateTime, ExpireDateTime, ExpireDuration},
         user::{
             kernel::data::AuthUserId,
-            login_id::kernel::data::LoginId,
+            login_id::kernel::data::{LoginId, ValidateLoginIdError},
             password::reset::{
-                kernel::data::{ResetToken, ResetTokenDestination, ResetTokenEncoded},
+                kernel::data::{
+                    ResetPasswordId, ResetPasswordToken, ResetPasswordTokenDestination,
+                },
                 request_token::data::{
                     EncodeResetTokenError, NotifyResetTokenError, NotifyResetTokenResponse,
                 },
             },
         },
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
-pub trait RequestResetTokenRequestDecoder {
-    fn decode(self) -> RequestResetTokenFieldsExtract;
-}
-
-pub struct RequestResetTokenFields {
+pub struct RequestResetPasswordTokenFields {
     pub login_id: LoginId,
 }
 
-pub struct RequestResetTokenFieldsExtract {
-    pub login_id: String,
+pub trait RequestResetPasswordTokenFieldsExtract {
+    fn convert(self) -> Result<RequestResetPasswordTokenFields, ValidateLoginIdError>;
 }
 
 #[async_trait::async_trait]
-pub trait RegisterResetTokenRepository {
+pub trait RegisterResetPasswordTokenRepository {
     async fn lookup_user(
         &self,
         login_id: &LoginId,
-    ) -> Result<Option<(AuthUserId, Option<ResetTokenDestination>)>, RepositoryError>;
+    ) -> Result<Option<(AuthUserId, Option<ResetPasswordTokenDestination>)>, RepositoryError>;
 
     async fn register_reset_token(
         &self,
-        reset_token: ResetToken,
+        reset_token: ResetPasswordId,
         user_id: AuthUserId,
         login_id: LoginId,
-        destination: ResetTokenDestination,
+        destination: ResetPasswordTokenDestination,
         expires: ExpireDateTime,
         requested_at: AuthDateTime,
     ) -> Result<(), RepositoryError>;
 }
 
-pub trait ResetTokenGenerator {
-    fn generate(&self) -> ResetToken;
+pub trait ResetPasswordIdGenerator {
+    fn generate(&self) -> ResetPasswordId;
 }
 
-pub trait ResetTokenEncoder {
+pub trait ResetPasswordTokenEncoder {
     fn encode(
         &self,
-        token: ResetToken,
+        token: ResetPasswordId,
         expires: ExpireDateTime,
-    ) -> Result<ResetTokenEncoded, EncodeResetTokenError>;
+    ) -> Result<ResetPasswordToken, EncodeResetTokenError>;
 }
 
 #[async_trait::async_trait]
-pub trait ResetTokenNotifier {
+pub trait ResetPasswordTokenNotifier {
     async fn notify(
         &self,
-        destination: ResetTokenDestination,
-        token: ResetTokenEncoded,
+        destination: ResetPasswordTokenDestination,
+        token: ResetPasswordToken,
     ) -> Result<NotifyResetTokenResponse, NotifyResetTokenError>;
 }
 
-pub struct RequestResetTokenConfig {
+pub struct RequestResetPasswordTokenConfig {
     pub token_expires: ExpireDuration,
 }

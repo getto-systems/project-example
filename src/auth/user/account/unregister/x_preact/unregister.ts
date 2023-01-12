@@ -7,13 +7,13 @@ import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/prea
 import { box } from "../../../../../z_vendor/getto-css/preact/design/box"
 import { takeLongtimeField } from "../../../../../common/x_preact/design/form"
 
-import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../common/x_preact/vnode"
 
 import { DeleteConfirmButton } from "../../../../../common/x_preact/button/delete_confirm_button"
 import { DeleteButton } from "../../../../../common/x_preact/button/delete_button"
 import { CloseButton } from "../../../../../common/x_preact/button/close_button"
 
-import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
+import { remoteCommonErrorReason } from "../../../../../common/util/remote/x_error/reason"
 
 import { UnregisterAuthUserAccountAction } from "../action"
 

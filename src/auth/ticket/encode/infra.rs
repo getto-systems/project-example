@@ -1,14 +1,12 @@
-use std::collections::HashMap;
-
 use crate::{
-    auth::ticket::{
-        encode::data::EncodeAuthTokenError,
-        kernel::data::{
-            AuthTicket, AuthTokenExtract, CloudfrontTokenKind, ExpansionLimitDateTime,
-            ExpireDateTime,
+    auth::{
+        kernel::data::{ExpansionLimitDateTime, ExpireDateTime, ExpireDuration},
+        ticket::{
+            encode::data::EncodeAuthTokenError,
+            kernel::data::{AuthTicket, AuthenticateToken, AuthorizeToken, CdnToken},
         },
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
 #[async_trait::async_trait]
@@ -19,17 +17,31 @@ pub trait EncodeAuthTicketRepository {
     ) -> Result<Option<ExpansionLimitDateTime>, RepositoryError>;
 }
 
-pub trait AuthTokenEncoder {
+pub trait AuthenticateTokenEncoder {
     fn encode(
         &self,
         ticket: AuthTicket,
         expires: ExpireDateTime,
-    ) -> Result<AuthTokenExtract, EncodeAuthTokenError>;
+    ) -> Result<(AuthenticateToken, ExpireDateTime), EncodeAuthTokenError>;
 }
 
-pub trait CloudfrontTokenEncoder {
+pub trait AuthorizeTokenEncoder {
+    fn encode(
+        &self,
+        ticket: AuthTicket,
+        expires: ExpireDateTime,
+    ) -> Result<(AuthorizeToken, ExpireDateTime), EncodeAuthTokenError>;
+}
+
+pub trait CdnTokenEncoder {
     fn encode(
         &self,
         expires: ExpireDateTime,
-    ) -> Result<HashMap<CloudfrontTokenKind, AuthTokenExtract>, EncodeAuthTokenError>;
+    ) -> Result<(CdnToken, ExpireDateTime), EncodeAuthTokenError>;
+}
+
+pub struct EncodeAuthTokenConfig {
+    pub authenticate_expires: ExpireDuration,
+    pub authorize_expires: ExpireDuration,
+    pub cdn_expires: ExpireDuration,
 }

@@ -1,4 +1,4 @@
-import { PrepareElementState } from "../../../z_lib/ui/prepare/data"
+import { PrepareElementState } from "../../util/prepare/data"
 import { SelectBoardContent } from "../../../z_vendor/getto-application/board/input/x_preact/select"
 
 export function selectOptions<T>(

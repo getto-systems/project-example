@@ -1,7 +1,7 @@
 import { loginIdBoardConverter } from "./convert"
 
 import { LoginId } from "../kernel/data"
-import { initTextFieldAction, TextFieldAction } from "../../../../z_lib/ui/input/field/text"
+import { initTextFieldAction, TextFieldAction } from "../../../../common/util/input/field/text"
 
 export type LoginIdFieldAction = TextFieldAction<LoginId>
 

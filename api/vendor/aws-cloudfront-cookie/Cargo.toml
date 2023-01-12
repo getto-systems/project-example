@@ -1,12 +1,12 @@
 [package]
 name = "aws-cloudfront-cookie"
-version = "0.47.0-proxy"
+version = "0.1.0-proxy"
 authors = ["shun <shun.fix9@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-base64 = "0.13"
-rsa = "0.5"
+base64 = "0.20"
+rsa = "0.6"
 sha-1 = "0.10"
 digest = "0.10"
 serde = { version = "1", features = ["derive"] }

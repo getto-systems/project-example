@@ -3,7 +3,7 @@ use std::{collections::HashMap, sync::Mutex};
 use crate::auth::user::{
     kernel::data::AuthUserId,
     login_id::{change::infra::OverwriteLoginIdEntry, kernel::data::LoginId},
-    password::reset::kernel::data::ResetTokenDestination,
+    password::reset::kernel::data::ResetPasswordTokenDestination,
 };
 
 pub struct MapLoginId<'a> {
@@ -14,7 +14,7 @@ pub type StoreLoginId = Mutex<HashMap<LoginId, EntryLoginId>>;
 #[derive(Clone)]
 pub struct EntryLoginId {
     pub user_id: AuthUserId,
-    pub reset_token_destination: Option<ResetTokenDestination>,
+    pub reset_token_destination: Option<ResetPasswordTokenDestination>,
 }
 
 impl<'a> MapLoginId<'a> {
@@ -40,13 +40,16 @@ impl<'a> MapLoginId<'a> {
     pub fn get_reset_token_entry(
         &self,
         login_id: &LoginId,
-    ) -> Option<(AuthUserId, Option<ResetTokenDestination>)> {
+    ) -> Option<(AuthUserId, Option<ResetPasswordTokenDestination>)> {
         let store = self.store.lock().unwrap();
         store
             .get(login_id)
             .map(|entry| (entry.user_id.clone(), entry.reset_token_destination.clone()))
     }
-    pub fn get_reset_token_destination(&self, login_id: &LoginId) -> Option<ResetTokenDestination> {
+    pub fn get_reset_token_destination(
+        &self,
+        login_id: &LoginId,
+    ) -> Option<ResetPasswordTokenDestination> {
         let store = self.store.lock().unwrap();
         store
             .get(login_id)
@@ -76,7 +79,7 @@ impl<'a> MapLoginId<'a> {
     pub fn update_reset_token_destination(
         &self,
         login_id: LoginId,
-        new_destination: ResetTokenDestination,
+        new_destination: ResetPasswordTokenDestination,
     ) {
         let mut store = self.store.lock().unwrap();
         if let Some(entry) = store.remove(&login_id) {

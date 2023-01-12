@@ -1,10 +1,8 @@
 use super::super::action::{ChangeResetTokenDestinationEvent, ChangeResetTokenDestinationState};
 
-use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
+use crate::common::api::logger::infra::{LogFilter, LogLevel, LogMessage};
 
-use crate::auth::user::password::reset::token_destination::change::data::{
-    ValidateChangeResetTokenDestinationChangesError, ValidateChangeResetTokenDestinationFieldsError,
-};
+use crate::auth::user::password::reset::token_destination::change::data::ValidateChangeResetTokenDestinationFieldsError;
 
 impl LogMessage for ChangeResetTokenDestinationState {
     fn log_message(&self) -> String {
@@ -15,8 +13,7 @@ impl LogMessage for ChangeResetTokenDestinationState {
 impl LogFilter for ChangeResetTokenDestinationState {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Authenticate(event) => event.log_level(),
-            Self::PermissionError(err) => err.log_level(),
+            Self::Authorize(event) => event.log_level(),
             Self::ChangeDestination(event) => event.log_level(),
         }
     }
@@ -25,7 +22,7 @@ impl LogFilter for ChangeResetTokenDestinationState {
 impl LogFilter for ChangeResetTokenDestinationEvent {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Success => LogLevel::Audit,
+            Self::Success => LogLevel::Important,
             Self::Invalid(err) => err.log_level(),
             Self::NotFound => LogLevel::Error,
             Self::Conflict => LogLevel::Error,
@@ -40,15 +37,6 @@ impl LogFilter for ValidateChangeResetTokenDestinationFieldsError {
             Self::InvalidLoginId(err) => err.log_level(),
             Self::InvalidFrom(err) => err.log_level(),
             Self::InvalidTo(err) => err.log_level(),
-        }
-    }
-}
-
-impl LogFilter for ValidateChangeResetTokenDestinationChangesError {
-    fn log_level(&self) -> LogLevel {
-        match self {
-            Self::NotFound => LogLevel::Error,
-            Self::InvalidResetTokenDestination(err) => err.log_level(),
         }
     }
 }

@@ -16,7 +16,7 @@ function props(): ProfilePageResource {
     const feature = newForegroundOutsideFeature()
     return {
         ...newBaseResource(feature),
-        change: newChangePasswordAction(feature),
-        requestToken: newRequestResetTokenAction(feature),
+        change: newChangePasswordAction(),
+        requestToken: newRequestResetTokenAction(),
     }
 }

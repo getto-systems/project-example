@@ -1,4 +1,4 @@
-import { RemoteResult } from "../../../../z_lib/ui/remote/infra"
+import { RemoteResult } from "../../../../common/util/remote/infra"
 
 import { AuthUserAccount } from "../kernel/data"
 import { RegisterAuthUserAccountRemoteError } from "./data"

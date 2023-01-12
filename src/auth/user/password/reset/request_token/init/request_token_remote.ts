@@ -3,17 +3,14 @@ import pb from "../../../../../../y_protobuf/proto.js"
 
 import {
     fetchOptions,
-    generateNonce,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../../z_lib/ui/remote/init/helper"
+} from "../../../../../../common/util/remote/init/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../../z_vendor/protobuf/helper"
-
-import { RemoteOutsideFeature } from "../../../../../../z_lib/ui/remote/feature"
 
 import { RequestResetTokenRemote } from "../infra"
 
-export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): RequestResetTokenRemote {
+export function newRequestResetTokenRemote(): RequestResetTokenRemote {
     return async (fields) => {
         try {
             const mock = false
@@ -25,7 +22,6 @@ export function newRequestResetTokenRemote(feature: RemoteOutsideFeature): Reque
                 serverURL: env.apiServerURL,
                 path: "/auth/user/password/reset/token",
                 method: "POST",
-                headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
             })
             const response = await fetch(opts.url, {
                 ...opts.options,

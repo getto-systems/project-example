@@ -2,14 +2,14 @@ import { h, VNode } from "preact"
 import { useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
 
-import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_error/reason"
+import { remoteCommonErrorReason } from "../../../../../../common/util/remote/x_error/reason"
 
 import { useApplicationState } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { buttons, fieldHelp_error } from "../../../../../../z_vendor/getto-css/preact/design/form"
 import { loginBox } from "../../../../../../z_vendor/getto-css/preact/layout/login"
 
-import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../../common/x_preact/vnode"
 import { siteInfo } from "../../../../../../x_content/site"
 import { appendScript } from "../../../../../sign/x_preact/script"
 import { signNav } from "../../../../../sign/nav/x_preact/nav"

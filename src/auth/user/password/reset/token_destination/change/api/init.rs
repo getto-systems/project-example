@@ -1,51 +1,91 @@
-pub mod request_decoder;
-
-use tonic::metadata::MetadataMap;
-
-use crate::auth::user::password::reset::token_destination::change::y_protobuf::service::ChangeResetTokenDestinationRequestPb;
-
-use crate::x_outside_feature::auth::feature::AuthAppFeature;
+use crate::x_outside_feature::{auth::feature::AuthAppFeature, data::RequestId};
 
 use crate::auth::{
-    ticket::validate::init::AuthenticateApiStruct,
-    user::{
-        kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,
-        password::reset::token_destination::change::init::request_decoder::PbChangeResetTokenDestinationRequestDecoder,
-    },
+    ticket::authorize::init::ActiveAuthorizeInfra,
+    user::kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,
 };
 
-use super::action::{ChangeResetTokenDestinationAction, ChangeResetTokenDestinationMaterial};
+use crate::auth::user::password::reset::token_destination::change::action::{
+    ChangeResetTokenDestinationAction, ChangeResetTokenDestinationMaterial,
+};
 
-pub struct ChangeResetTokenDestinationFeature<'a> {
-    validate: AuthenticateApiStruct<'a>,
-    user_repository: DynamoDbAuthUserRepository<'a>,
+pub struct ActiveChangeResetTokenDestinationMaterial<'a> {
+    authorize: ActiveAuthorizeInfra<'a>,
+    destination_repository: DynamoDbAuthUserRepository<'a>,
 }
 
-impl<'a> ChangeResetTokenDestinationFeature<'a> {
+impl<'a> ActiveChangeResetTokenDestinationMaterial<'a> {
     pub fn action(
         feature: &'a AuthAppFeature,
-        metadata: &'a MetadataMap,
-        request: ChangeResetTokenDestinationRequestPb,
-    ) -> ChangeResetTokenDestinationAction<PbChangeResetTokenDestinationRequestDecoder, Self> {
-        ChangeResetTokenDestinationAction::with_material(
-            PbChangeResetTokenDestinationRequestDecoder::new(request),
-            Self {
-                validate: AuthenticateApiStruct::new(feature, metadata),
-                user_repository: DynamoDbAuthUserRepository::new(&feature.store),
-            },
-        )
+        request_id: RequestId,
+    ) -> ChangeResetTokenDestinationAction<Self> {
+        ChangeResetTokenDestinationAction::with_material(Self {
+            authorize: ActiveAuthorizeInfra::from_auth(feature, request_id),
+            destination_repository: DynamoDbAuthUserRepository::new(&feature.store),
+        })
     }
 }
 
-impl<'a> ChangeResetTokenDestinationMaterial for ChangeResetTokenDestinationFeature<'a> {
-    type Authenticate = AuthenticateApiStruct<'a>;
+impl<'a> ChangeResetTokenDestinationMaterial for ActiveChangeResetTokenDestinationMaterial<'a> {
+    type Authorize = ActiveAuthorizeInfra<'a>;
 
     type DestinationRepository = DynamoDbAuthUserRepository<'a>;
 
-    fn authenticate(&self) -> &Self::Authenticate {
-        &self.validate
+    fn authorize(&self) -> &Self::Authorize {
+        &self.authorize
     }
     fn destination_repository(&self) -> &Self::DestinationRepository {
-        &self.user_repository
+        &self.destination_repository
+    }
+}
+
+#[cfg(test)]
+pub mod test {
+    use crate::auth::{
+        ticket::authorize::init::test::StaticAuthorizeInfra,
+        user::kernel::init::user_repository::memory::MemoryAuthUserRepository,
+    };
+
+    use crate::auth::user::password::reset::token_destination::change::action::ChangeResetTokenDestinationMaterial;
+
+    use crate::auth::user::password::reset::token_destination::change::infra::{
+        ChangeResetTokenDestinationFields, ChangeResetTokenDestinationFieldsExtract,
+    };
+
+    use crate::auth::user::password::reset::token_destination::change::data::ValidateChangeResetTokenDestinationFieldsError;
+
+    pub enum StaticChangeResetTokenDestinationFields {
+        Valid(ChangeResetTokenDestinationFields),
+        Invalid(ValidateChangeResetTokenDestinationFieldsError),
+    }
+
+    impl ChangeResetTokenDestinationFieldsExtract for StaticChangeResetTokenDestinationFields {
+        fn convert(
+            self,
+        ) -> Result<ChangeResetTokenDestinationFields, ValidateChangeResetTokenDestinationFieldsError>
+        {
+            match self {
+                Self::Valid(fields) => Ok(fields),
+                Self::Invalid(err) => Err(err),
+            }
+        }
+    }
+
+    pub struct StaticChangeResetTokenDestinationMaterial<'a> {
+        pub authorize: StaticAuthorizeInfra,
+        pub destination_repository: MemoryAuthUserRepository<'a>,
+    }
+
+    impl<'a> ChangeResetTokenDestinationMaterial for StaticChangeResetTokenDestinationMaterial<'a> {
+        type Authorize = StaticAuthorizeInfra;
+
+        type DestinationRepository = MemoryAuthUserRepository<'a>;
+
+        fn authorize(&self) -> &Self::Authorize {
+            &self.authorize
+        }
+        fn destination_repository(&self) -> &Self::DestinationRepository {
+            &self.destination_repository
+        }
     }
 }

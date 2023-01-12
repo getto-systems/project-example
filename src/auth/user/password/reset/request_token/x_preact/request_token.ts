@@ -1,9 +1,9 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { VNodeContent } from "../../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../../common/x_preact/vnode"
 
-import { remoteCommonErrorReason } from "../../../../../../z_lib/ui/remote/x_error/reason"
+import { remoteCommonErrorReason } from "../../../../../../common/util/remote/x_error/reason"
 
 import { useApplicationState } from "../../../../../../z_vendor/getto-application/action/x_preact/hooks"
 

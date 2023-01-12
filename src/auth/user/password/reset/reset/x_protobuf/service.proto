@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package auth.user.password.reset.reset.service;
 
-import "auth/user/x_protobuf/service.proto";
 import "auth/ticket/x_protobuf/service.proto";
 
 service ResetPasswordPb {
@@ -15,13 +14,13 @@ message ResetPasswordRequestPb {
 }
 message ResetPasswordResponsePb {
     bool success = 1;
-    auth.user.service.GrantedAuthRolesPb roles = 2;
-    auth.ticket.service.EncodedAuthTokensPb token = 3;
+    auth.ticket.service.AuthPermissionGrantedPb granted = 2;
+    auth.ticket.service.AuthTokenPb token = 3;
     ResetPasswordErrorKindPb err = 4;
 }
 message ResetPasswordMaskedResponsePb {
     bool success = 1;
-    auth.user.service.GrantedAuthRolesPb roles = 2;
+    auth.ticket.service.AuthPermissionGrantedPb granted = 2;
     ResetPasswordErrorKindPb err = 3;
 }
 enum ResetPasswordErrorKindPb {

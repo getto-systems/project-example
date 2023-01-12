@@ -1,6 +1,6 @@
-import { RemoteResult } from "../../../z_lib/ui/remote/infra"
+import { RemoteResult } from "../../../common/util/remote/infra"
 
-import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
+import { ConvertLocationResult } from "../../../common/util/location/data"
 import { ApplicationTargetPath, CheckDeployExistsRemoteError } from "./data"
 
 export interface ApplicationTargetPathDetecter {

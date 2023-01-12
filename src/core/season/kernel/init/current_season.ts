@@ -1,4 +1,4 @@
-import { Clock } from "../../../../z_lib/ui/clock/infra"
+import { Clock } from "../../../../common/util/clock/infra"
 import { Season } from "../data"
 
 export function currentSeason(clock: Clock): Season {

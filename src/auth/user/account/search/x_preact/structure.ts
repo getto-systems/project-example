@@ -1,7 +1,7 @@
 import { h, VNode } from "preact"
 import { html } from "htm/preact"
 
-import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../common/x_preact/vnode"
 
 import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
@@ -18,12 +18,12 @@ import { tableCell } from "../../../../../z_vendor/getto-table/preact/cell/simpl
 import { tableClassName } from "../../../../../z_vendor/getto-table/preact/decorator"
 
 import { SearchAuthUserAccountAction } from "../action"
-import { focusedData } from "../../../../../z_lib/ui/list/action"
+import { focusedData } from "../../../../../common/util/list/action"
 
 import { SearchAuthUserAccountSortKey } from "../data"
 import { AuthUserAccount, AUTH_USER_ACCOUNT } from "../../kernel/data"
-import { authUserGrantedRoles } from "../../kernel/x_preact/field"
-import { ScrollPosition } from "../../../../../z_lib/ui/scroll/data"
+import { authPermissionGranted } from "../../kernel/x_preact/field"
+import { ScrollPosition } from "../../../../../common/util/scroll/data"
 
 export type SearchAuthUserAccountTableStructure = TableStructure<Summary, AuthUserAccount>
 
@@ -55,10 +55,10 @@ export function initSearchAuthUserAccountTableStructure(
             column: memo,
         })).border(["left"]),
 
-        tableCell("grantedRoles", (key) => ({
+        tableCell("granted", (key) => ({
             label: AUTH_USER_ACCOUNT[key],
             header: linky,
-            column: (row: AuthUserAccount) => authUserGrantedRoles(row),
+            column: (row: AuthUserAccount) => authPermissionGranted(row),
         })).border(["left"]),
 
         tableCell("resetTokenDestination", (key) => ({

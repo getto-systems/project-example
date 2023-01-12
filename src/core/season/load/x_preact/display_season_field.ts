@@ -7,13 +7,13 @@ import { field } from "../../../../z_vendor/getto-css/preact/design/form"
 import { notice_alert } from "../../../../z_vendor/getto-css/preact/design/highlight"
 import { v_small } from "../../../../z_vendor/getto-css/preact/design/alignment"
 
-import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../common/x_preact/vnode"
 
 import { seasonLabel } from "../../kernel/helper"
 
 import { LoadSeasonAction } from "../action"
 
-import { RepositoryError } from "../../../../z_lib/ui/repository/data"
+import { RepositoryError } from "../../../../common/util/repository/data"
 
 type Props = Readonly<{
     season: LoadSeasonAction

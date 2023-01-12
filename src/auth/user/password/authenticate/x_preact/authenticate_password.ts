@@ -2,9 +2,9 @@ import { h, VNode } from "preact"
 import { useLayoutEffect } from "preact/hooks"
 import { html } from "htm/preact"
 
-import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../common/x_preact/vnode"
 
-import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
+import { remoteCommonErrorReason } from "../../../../../common/util/remote/x_error/reason"
 
 import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
@@ -12,7 +12,7 @@ import { loginBox } from "../../../../../z_vendor/getto-css/preact/layout/login"
 import { buttons, fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 
 import { siteInfo } from "../../../../../x_content/site"
-import { lnir } from "../../../../../z_lib/ui/icon/init/line_icon"
+import { lnir } from "../../../../../common/util/icon/init/line_icon"
 import { appendScript } from "../../../../sign/x_preact/script"
 import { signNav } from "../../../../sign/nav/x_preact/nav"
 import { takeLongtimeField, ValidationMessage } from "../../../../../common/x_preact/design/form"

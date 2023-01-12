@@ -1,75 +1,51 @@
-use std::collections::HashSet;
-
-use getto_application_test::ActionTestRunner;
+use getto_application_test::ApplicationActionStateHolder;
+use pretty_assertions::assert_eq;
 
 use crate::{
-    auth::init::test::{
-        StaticAuthMetadata, StaticAuthTokenDecoder, StaticAuthorizeStruct, StaticValidateService,
+    auth::init::test::{StaticAuthorizeInfra, StaticAuthorizeToken},
+    common::outline::load::init::test::{
+        StaticLoadOutlineMenuBadgeMaterial, StaticOutlineMenuBadgeRepository,
     },
-    common::outline::load::init::menu_badge_repository::test::StaticOutlineMenuBadgeRepository,
 };
 
-use super::action::{LoadOutlineMenuBadgeAction, LoadOutlineMenuBadgeMaterial};
+use crate::common::outline::load::action::LoadOutlineMenuBadgeAction;
+
+#[tokio::test]
+async fn info() {
+    let material = StaticLoadOutlineMenuBadgeMaterial {
+        authorize: StaticAuthorizeInfra::standard(),
+        menu_badge_repository: StaticOutlineMenuBadgeRepository,
+    };
+
+    let action = LoadOutlineMenuBadgeAction::with_material(material);
+
+    let (name, required) = action.info.params();
+    assert_eq!(
+        format!("{}; {}", name, required),
+        "common.outline.load; require: nothing",
+    );
+}
 
 #[tokio::test]
 async fn success_load_menu_badge() {
-    let (handler, assert_state) = ActionTestRunner::new();
+    let holder = ApplicationActionStateHolder::new();
 
-    let store = TestStore::standard();
-    let material = TestStruct::standard(&store);
+    let material = StaticLoadOutlineMenuBadgeMaterial {
+        authorize: StaticAuthorizeInfra::standard(),
+        menu_badge_repository: StaticOutlineMenuBadgeRepository,
+    };
 
     let mut action = LoadOutlineMenuBadgeAction::with_material(material);
-    action.subscribe(handler);
+    action.subscribe(holder.handler());
 
-    let result = action.ignite().await;
-    assert_state(vec![
-        "authorize success; require: nothing",
-        "load menu badge success",
-    ]);
+    let result = action.ignite(StaticAuthorizeToken).await;
+    assert_eq!(
+        holder.extract(),
+        vec![
+            "try to proxy call: auth.ticket.authorize.clarify(require: nothing)",
+            "proxy call success",
+            "load menu badge success",
+        ],
+    );
     assert!(result.is_ok());
-}
-
-struct TestStruct {
-    authorize: StaticAuthorizeStruct,
-    menu_badge_repository: StaticOutlineMenuBadgeRepository,
-}
-
-impl LoadOutlineMenuBadgeMaterial for TestStruct {
-    type Authorize = StaticAuthorizeStruct;
-    type MenuBadgeRepository = StaticOutlineMenuBadgeRepository;
-
-    fn authorize(&self) -> &Self::Authorize {
-        &self.authorize
-    }
-    fn menu_badge_repository(&self) -> &Self::MenuBadgeRepository {
-        &self.menu_badge_repository
-    }
-}
-
-struct TestStore {}
-
-impl TestStore {
-    fn standard() -> Self {
-        Self {}
-    }
-}
-
-impl TestStruct {
-    fn standard(_store: &TestStore) -> Self {
-        Self {
-            authorize: StaticAuthorizeStruct {
-                auth_metadata: StaticAuthMetadata {
-                    nonce: "NONCE".into(),
-                    token: "TOKEN".into(),
-                },
-                token_decoder: StaticAuthTokenDecoder::valid(
-                    "TICKET-ID".into(),
-                    "USER-ID".into(),
-                    HashSet::new(),
-                ),
-                validate_service: StaticValidateService,
-            },
-            menu_badge_repository: StaticOutlineMenuBadgeRepository,
-        }
-    }
 }

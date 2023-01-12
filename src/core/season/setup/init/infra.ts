@@ -1,6 +1,6 @@
-import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/feature"
+import { RepositoryOutsideFeature } from "../../../../common/util/repository/feature"
 
-import { newClock } from "../../../../z_lib/ui/clock/init"
+import { newClock } from "../../../../common/util/clock/init"
 import { allSeasons } from "../../kernel/init/all_seasons"
 import { newSeasonRepository } from "../../kernel/init/season_repository"
 

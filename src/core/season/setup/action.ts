@@ -10,16 +10,16 @@ import {
     EditableBoardAction,
     initEditableBoardAction,
 } from "../../../z_vendor/getto-application/board/editable/action"
-import { initRegisterField } from "../../../z_lib/ui/register/action"
+import { initRegisterField } from "../../../common/util/register/action"
 
 import { SeasonRepository } from "../kernel/infra"
-import { Clock } from "../../../z_lib/ui/clock/infra"
-import { ExpireTime, WaitTime } from "../../../z_lib/ui/config/infra"
+import { Clock } from "../../../common/util/clock/infra"
+import { ExpireTime, WaitTime } from "../../../common/util/config/infra"
 
-import { RepositoryError } from "../../../z_lib/ui/repository/data"
+import { RepositoryError } from "../../../common/util/repository/data"
 import { DetectedSeason, Season } from "../kernel/data"
 import { ConvertBoardResult } from "../../../z_vendor/getto-application/board/kernel/data"
-import { ticker } from "../../../z_lib/ui/timer/helper"
+import { ticker } from "../../../common/util/timer/helper"
 
 export interface SetupSeasonAction {
     readonly state: ApplicationState<SetupSeasonState>

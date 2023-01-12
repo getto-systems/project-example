@@ -1,9 +1,9 @@
 import { test, expect } from "vitest"
-import { ALL_AUTH_ROLES } from "../../../../../x_content/role"
+import { ALL_AUTH_PERMISSIONS } from "../../../../../x_content/permission"
 import { observeApplicationState } from "../../../../../z_vendor/getto-application/action/test_helper"
 import { mockMultipleBoardValueStore } from "../../../../../z_vendor/getto-application/board/input/test_helper"
 
-import { initAuthUserGrantedRolesFilterAction } from "./action"
+import { initAuthPermissionGrantedFilterAction } from "./action"
 
 test("observe; has changed", async () => {
     const { action, store } = standard()
@@ -34,10 +34,10 @@ test("clear", async () => {
 })
 
 function standard() {
-    const { input: action, setOptions, pin } = initAuthUserGrantedRolesFilterAction([])
+    const { input: action, setOptions, pin } = initAuthPermissionGrantedFilterAction([])
     const store = mockMultipleBoardValueStore(action.input)
 
-    setOptions(ALL_AUTH_ROLES)
+    setOptions(ALL_AUTH_PERMISSIONS)
 
     return { action, store, pin }
 }

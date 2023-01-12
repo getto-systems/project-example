@@ -4,7 +4,7 @@ import { useEditableState } from "../../../../z_vendor/getto-application/board/e
 
 import { inputField, label } from "../../../../z_vendor/getto-css/preact/design/form"
 
-import { VNodeContent } from "../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../common/x_preact/vnode"
 
 import {
     SelectBoard,

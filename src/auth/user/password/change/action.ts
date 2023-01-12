@@ -7,7 +7,7 @@ import { initPasswordFieldAction } from "../input/action"
 import { PasswordFieldAction } from "../input/action"
 import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
 import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
-import { initRegisterField } from "../../../../z_lib/ui/register/action"
+import { initRegisterField } from "../../../../common/util/register/action"
 import {
     EditableBoardAction,
     initEditableBoardAction,
@@ -16,12 +16,12 @@ import {
     initModifyField,
     modifyField,
     ModifyFieldHandler,
-} from "../../../../z_lib/ui/modify/action"
+} from "../../../../common/util/modify/action"
 
-import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime, ticker } from "../../../../common/util/timer/helper"
 
 import { ChangePasswordRemote, OverwritePasswordRemote } from "./infra"
-import { WaitTime } from "../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../common/util/config/infra"
 
 import { ChangePasswordError, ChangePasswordFields, OverwritePasswordFields } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"

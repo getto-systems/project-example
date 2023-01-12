@@ -1,5 +1,5 @@
 import { h, VNode } from "preact"
-import { VNodeContent } from "../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../common/x_preact/vnode"
 
 import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
@@ -7,11 +7,11 @@ import {
     inputField,
     label_password_fill,
 } from "../../../../../z_vendor/getto-css/preact/design/form"
-import { mapValidateState } from "../../../../../z_lib/ui/input/field/x_preact/helper"
+import { mapValidateState } from "../../../../../common/util/input/field/x_preact/helper"
 
 import { InputBoard } from "../../../../../z_vendor/getto-application/board/input/x_preact/input"
 
-import { textValidationError } from "../../../../../z_lib/ui/validate/x_plain/error"
+import { textValidationError } from "../../../../../common/util/validate/x_plain/error"
 
 import { PasswordFieldAction } from "../action"
 

@@ -1,17 +1,13 @@
 import { WorkerBackgroundHandler } from "../../../../../../z_vendor/getto-application/action/worker/background"
 
-import { RemoteOutsideFeature } from "../../../../../../z_lib/ui/remote/feature"
-
 import { newChangePasswordInfra } from "../infra"
 
 import { ChangePasswordProxyMessage, ChangePasswordProxyResponse } from "./message"
 
-type OutsideFeature = RemoteOutsideFeature
 export function newChangePasswordWorkerHandler(
-    feature: OutsideFeature,
     postMessage: Post<ChangePasswordProxyResponse>,
 ): WorkerBackgroundHandler<ChangePasswordProxyMessage, ChangePasswordProxyResponse> {
-    const infra = newChangePasswordInfra(feature)
+    const infra = newChangePasswordInfra()
 
     return async (message) => {
         switch (message.name) {

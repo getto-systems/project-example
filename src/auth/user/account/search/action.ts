@@ -3,19 +3,19 @@ import {
     initApplicationState,
 } from "../../../../z_vendor/getto-application/action/action"
 
-import { checkTakeLongtime } from "../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime } from "../../../../common/util/timer/helper"
 
-import { initTextFilterAction, TextFilterAction } from "../../../../z_lib/ui/input/filter/text"
+import { initTextFilterAction, TextFilterAction } from "../../../../common/util/input/filter/text"
 import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
-import { SearchOffsetAction } from "../../../../z_lib/ui/search/offset/action"
-import { initSearchFilter } from "../../../../z_lib/ui/search/filter/action"
+import { SearchOffsetAction } from "../../../../common/util/search/offset/action"
+import { initSearchFilter } from "../../../../common/util/search/filter/action"
 import {
-    AuthUserGrantedRolesFilterAction,
-    initAuthUserGrantedRolesFilterAction,
+    AuthPermissionGrantedFilterAction,
+    initAuthPermissionGrantedFilterAction,
 } from "../input/filter/action"
-import { initListSearchedAction, ListSearchedAction } from "../../../../z_lib/ui/list/action"
+import { initListSearchedAction, ListSearchedAction } from "../../../../common/util/list/action"
 
-import { ALL_AUTH_ROLES } from "../../../../x_content/role"
+import { ALL_AUTH_PERMISSIONS } from "../../../../x_content/permission"
 
 import {
     FocusAuthUserAccountDetecter,
@@ -24,9 +24,9 @@ import {
     UpdateFocusAuthUserAccountQuery,
     UpdateSearchAuthUserAccountFieldsQuery,
 } from "./infra"
-import { WaitTime } from "../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../common/util/config/infra"
 
-import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
+import { RemoteCommonError } from "../../../../common/util/remote/data"
 import {
     SearchAuthUserAccountFilter,
     SearchAuthUserAccountRemoteResponse,
@@ -35,7 +35,7 @@ import {
     SearchAuthUserAccountSummary,
 } from "./data"
 import { AuthUserAccount } from "../kernel/data"
-import { prepared, preparing } from "../../../../z_lib/ui/prepare/data"
+import { prepared, preparing } from "../../../../common/util/prepare/data"
 
 export interface SearchAuthUserAccountAction {
     readonly state: ApplicationState<SearchAuthUserAccountState>
@@ -43,7 +43,7 @@ export interface SearchAuthUserAccountAction {
     readonly offset: SearchOffsetAction
 
     readonly loginId: TextFilterAction
-    readonly grantedRoles: AuthUserGrantedRolesFilterAction
+    readonly granted: AuthPermissionGrantedFilterAction
     readonly observe: ObserveBoardAction
 
     currentSort(): SearchAuthUserAccountSort
@@ -93,21 +93,21 @@ export function initSearchAuthUserAccountAction(
     const initialFilter = material.shell.detectFilter()
 
     const loginId = initTextFilterAction(initialFilter.loginId)
-    const grantedRoles = initAuthUserGrantedRolesFilterAction(initialFilter.grantedRoles)
+    const granted = initAuthPermissionGrantedFilterAction(initialFilter.granted)
 
     const { observe, offset, filter, clear } = initSearchFilter(
         initialFilter,
         [
             ["loginId", loginId.input],
-            ["grantedRoles", grantedRoles.input],
+            ["granted", granted.input],
         ],
         () => ({
             loginId: loginId.pin(),
-            grantedRoles: grantedRoles.pin(),
+            granted: granted.pin(),
         }),
     )
 
-    grantedRoles.setOptions(ALL_AUTH_ROLES)
+    granted.setOptions(ALL_AUTH_PERMISSIONS)
 
     const list = initListSearchedAction({
         initialSearch: state.ignitionState.then((state) => {
@@ -152,7 +152,7 @@ export function initSearchAuthUserAccountAction(
         offset,
 
         loginId: loginId.input,
-        grantedRoles: grantedRoles.input,
+        granted: granted.input,
 
         observe,
 

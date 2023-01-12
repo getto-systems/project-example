@@ -4,14 +4,17 @@ import { html } from "htm/preact"
 
 import { useApplicationState } from "../../../../../z_vendor/getto-application/action/x_preact/hooks"
 
-import { scrollToPosition, scrollToFocused } from "../../../../../z_lib/ui/scroll/x_preact/helper"
+import {
+    scrollToPosition,
+    scrollToFocused,
+} from "../../../../../common/util/scroll/x_preact/helper"
 import { box_grow, container } from "../../../../../z_vendor/getto-css/preact/design/box"
 
 import { SearchAuthUserAccountPager } from "./pager"
 import { SearchAuthUserAccountTable } from "./table"
 
 import { SearchAuthUserAccountAction } from "../action"
-import { SearchColumnsAction } from "../../../../../z_lib/ui/search/columns/action"
+import { SearchColumnsAction } from "../../../../../common/util/search/columns/action"
 
 import { SearchAuthUserAccountTableStructure } from "./structure"
 

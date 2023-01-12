@@ -1,158 +1,47 @@
 use std::collections::{HashMap, HashSet};
 
-use chrono::{DateTime, Duration, Utc};
+use crate::x_content::{metadata::METADATA_AUTHORIZE_TOKEN, permission::AuthPermission};
 
-use crate::auth::user::kernel::data::{
-    AuthUser, AuthUserExtract, GrantedAuthRoles, RequireAuthRoles,
+use crate::{
+    auth::{kernel::data::ExpireDateTime, user::kernel::data::AuthUserId},
+    common::api::request::data::MetadataError,
+    common::proxy::data::ProxyMetadataExtract,
 };
-
-#[derive(Clone, PartialEq, Eq, Hash)]
-pub struct AuthNonce(String);
-
-impl AuthNonce {
-    pub const fn restore(nonce: String) -> Self {
-        Self(nonce)
-    }
-
-    pub fn extract(self) -> String {
-        self.0
-    }
-
-    #[cfg(test)]
-    pub fn as_str(&self) -> &str {
-        self.0.as_str()
-    }
-}
-
-#[derive(Clone)]
-pub struct AuthToken(String);
-
-impl AuthToken {
-    pub const fn restore(token: String) -> Self {
-        Self(token)
-    }
-
-    pub fn extract(self) -> String {
-        self.0
-    }
-
-    pub fn as_str(&self) -> &str {
-        self.0.as_str()
-    }
-}
-
-#[derive(Clone)]
-pub struct AuthTokenExtract {
-    pub token: String,
-    pub expires: i64,
-}
-
-pub struct EncodedAuthTokens {
-    pub ticket_token: AuthTokenExtract,
-    pub api_token: AuthTokenExtract,
-    pub cloudfront_tokens: HashMap<CloudfrontTokenKind, AuthTokenExtract>,
-}
-
-#[derive(Eq, PartialEq, Hash)]
-pub enum CloudfrontTokenKind {
-    KeyPairId,
-    Policy,
-    Signature,
-}
-
-pub enum AuthResponse {
-    Succeeded(AuthTokenResponse),
-    Failed(String),
-}
-
-pub struct AuthTokenResponse {
-    pub domain: String,
-    pub message: AuthTokenMessage,
-}
-
-pub struct AuthTokenMessage {
-    pub body: String,
-    pub token: EncodedAuthTokens,
-}
-
-#[derive(Clone)]
-pub struct AuthTicketExtract {
-    pub ticket_id: String,
-    pub user_id: String,
-    pub granted_roles: HashSet<String>,
-}
-
-pub enum DecodeAuthTokenError {
-    Expired,
-    Invalid(String),
-}
-
-impl std::fmt::Display for DecodeAuthTokenError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        match self {
-            Self::Expired => write!(f, "token expired"),
-            Self::Invalid(err) => write!(f, "invalid token: {}", err),
-        }
-    }
-}
 
 #[derive(Clone)]
 pub struct AuthTicket {
-    ticket_id: AuthTicketId,
-    user: AuthUser,
+    pub ticket_id: AuthTicketId,
+    pub attrs: AuthTicketAttrs,
+}
+
+#[derive(Clone)]
+pub struct AuthTicketAttrs {
+    pub user_id: AuthUserId,
+    pub granted: AuthPermissionGranted,
 }
 
 impl AuthTicket {
-    pub const fn new(ticket_id: AuthTicketId, user: AuthUser) -> Self {
-        Self { ticket_id, user }
-    }
-
-    pub fn restore(ticket: AuthTicketExtract) -> Self {
-        Self {
-            ticket_id: AuthTicketId::restore(ticket.ticket_id),
-            user: AuthUserExtract {
-                user_id: ticket.user_id,
-                granted_roles: ticket.granted_roles,
-            }
-            .restore(),
-        }
-    }
-
     #[cfg(test)]
-    pub fn as_ticket_id(&self) -> &AuthTicketId {
-        &self.ticket_id
-    }
-
-    pub fn into_user(self) -> AuthUser {
-        self.user
-    }
-
-    pub fn extract(self) -> (AuthTicketId, AuthUser) {
-        (self.ticket_id, self.user)
-    }
-
-    pub fn check_enough_permission(
-        self,
-        require_roles: RequireAuthRoles,
-    ) -> Result<Self, PermissionError> {
-        if self
-            .user
-            .granted_roles()
-            .has_enough_permission(&require_roles)
-        {
-            Ok(self)
-        } else {
-            Err(PermissionError::PermissionDenied(
-                self.user.into_granted_roles(),
-                require_roles,
-            ))
+    pub fn standard() -> Self {
+        Self {
+            ticket_id: AuthTicketId::restore("ticket-id".to_owned()),
+            attrs: AuthTicketAttrs {
+                user_id: AuthUserId::restore("user-id".to_owned()),
+                granted: AuthPermissionGranted::default(),
+            },
         }
     }
 }
 
 impl std::fmt::Display for AuthTicket {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "{} / {}", self.ticket_id, self.user)
+        write!(f, "{} / {}", self.ticket_id, self.attrs)
+    }
+}
+
+impl std::fmt::Display for AuthTicketAttrs {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{} ({})", self.user_id, self.granted)
     }
 }
 
@@ -175,114 +64,263 @@ impl std::fmt::Display for AuthTicketId {
     }
 }
 
-#[derive(Clone)]
-pub struct AuthDateTime(DateTime<Utc>);
+#[derive(Clone, PartialEq, Eq)]
+pub struct AuthPermissionGranted(HashSet<AuthPermission>);
 
-impl AuthDateTime {
-    pub(in crate::auth) const fn restore(now: DateTime<Utc>) -> Self {
-        Self(now)
+impl AuthPermissionGranted {
+    pub fn convert(
+        value: impl AuthPermissionGrantedExtract,
+    ) -> Result<Self, ValidateAuthPermissionGrantedError> {
+        value.convert()
     }
 
-    pub fn extract(self) -> DateTime<Utc> {
+    pub(in crate::auth) fn restore(value: HashSet<AuthPermission>) -> Self {
+        Self(value)
+    }
+
+    pub(in crate::auth) fn extract(self) -> HashSet<String> {
         self.0
+            .into_iter()
+            .map(|permission| permission.extract())
+            .collect()
     }
 
-    pub fn expires(&self, duration: &ExpireDuration) -> ExpireDateTime {
-        ExpireDateTime(self.0 + duration.0)
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
     }
 
-    pub fn expansion_limit(&self, duration: &ExpansionLimitDuration) -> ExpansionLimitDateTime {
-        ExpansionLimitDateTime(self.0 + duration.0)
+    pub fn all_contains(&self, permissions: &Vec<AuthPermission>) -> bool {
+        permissions
+            .iter()
+            .all(|permission| self.0.contains(permission))
     }
 
-    pub fn expires_with_limit(
-        self,
-        duration: &ExpireDuration,
-        limit: ExpansionLimitDateTime,
-    ) -> ExpireDateTime {
-        let expires = self.0 + duration.0;
-        if expires > limit.0 {
-            ExpireDateTime(limit.0)
+    pub fn has_enough_permission(
+        &self,
+        required: &AuthPermissionRequired,
+    ) -> Result<(), AuthPermissionError> {
+        if match required {
+            AuthPermissionRequired::Nothing => true,
+            AuthPermissionRequired::HasSome(permissions) => permissions
+                .iter()
+                .any(|permission| self.0.contains(permission)),
+        } {
+            Ok(())
         } else {
-            ExpireDateTime(expires)
+            Err(AuthPermissionError::PermissionDenied(
+                self.clone(),
+                required.clone(),
+            ))
+        }
+    }
+}
+
+impl Default for AuthPermissionGranted {
+    fn default() -> Self {
+        Self(Default::default())
+    }
+}
+
+impl std::fmt::Display for AuthPermissionGranted {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "granted: [{}]",
+            self.0
+                .iter()
+                .map(|permission| permission.extract())
+                .collect::<Vec<String>>()
+                .join(",")
+        )
+    }
+}
+
+pub trait AuthPermissionGrantedExtract {
+    fn convert(self) -> Result<AuthPermissionGranted, ValidateAuthPermissionGrantedError>;
+}
+
+#[derive(Debug)]
+pub enum ValidateAuthPermissionGrantedError {
+    InvalidPermission,
+}
+
+impl std::fmt::Display for ValidateAuthPermissionGrantedError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::InvalidPermission => write!(f, "auth-permission-granted: invalid"),
         }
     }
 }
 
 #[derive(Clone)]
-pub struct ExpireDateTime(DateTime<Utc>);
-
-impl ExpireDateTime {
-    pub(in crate::auth) const fn restore(time: DateTime<Utc>) -> Self {
-        Self(time)
-    }
-
-    pub fn has_elapsed(&self, now: &AuthDateTime) -> bool {
-        self.0 < now.0
-    }
-
-    pub fn extract(self) -> DateTime<Utc> {
-        self.0
-    }
+pub enum AuthPermissionRequired {
+    Nothing,
+    HasSome(HashSet<AuthPermission>),
 }
 
-impl std::fmt::Display for ExpireDateTime {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        self.0.fmt(f)
-    }
-}
-
-#[derive(Clone, Copy)]
-pub struct ExpireDuration(Duration);
-
-impl ExpireDuration {
-    pub fn with_duration(duration: Duration) -> Self {
-        Self(duration)
-    }
-}
-
-#[derive(Clone)]
-pub struct ExpansionLimitDateTime(DateTime<Utc>);
-
-impl ExpansionLimitDateTime {
-    pub(in crate::auth) const fn restore(time: DateTime<Utc>) -> Self {
-        Self(time)
-    }
-
-    pub fn extract(self) -> DateTime<Utc> {
-        self.0
-    }
-}
-
-impl std::fmt::Display for ExpansionLimitDateTime {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        self.0.fmt(f)
-    }
-}
-
-#[derive(Clone, Copy)]
-pub struct ExpansionLimitDuration(Duration);
-
-impl ExpansionLimitDuration {
-    pub fn with_duration(duration: Duration) -> Self {
-        Self(duration)
-    }
-}
-
-pub enum PermissionError {
-    PermissionDenied(GrantedAuthRoles, RequireAuthRoles),
-}
-
-impl std::fmt::Display for PermissionError {
+impl std::fmt::Display for AuthPermissionRequired {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::PermissionDenied(granted_roles, require_roles) => {
-                write!(
-                    f,
-                    "user permission denied; {}, {}",
-                    granted_roles, require_roles
-                )
+            Self::Nothing => write!(f, "require: nothing"),
+            Self::HasSome(permissions) => write!(
+                f,
+                "require: some [{}]",
+                permissions
+                    .iter()
+                    .map(|permission| permission.extract())
+                    .collect::<Vec<String>>()
+                    .join(",")
+            ),
+        }
+    }
+}
+
+pub trait AuthPermissionRequiredExtract {
+    fn convert(self) -> Result<AuthPermissionRequired, ValidateAuthPermissionError>;
+}
+
+pub enum AuthPermissionError {
+    PermissionDenied(AuthPermissionGranted, AuthPermissionRequired),
+}
+
+impl std::fmt::Display for AuthPermissionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::PermissionDenied(granted, required) => {
+                write!(f, "permission denied; {}, {}", granted, required)
             }
         }
     }
+}
+
+pub enum ValidateAuthPermissionError {
+    Invalid,
+}
+
+impl std::fmt::Display for ValidateAuthPermissionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::Invalid => write!(f, "invalid permission"),
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct AuthenticateToken(String);
+
+impl AuthenticateToken {
+    pub const fn restore(token: String) -> Self {
+        Self(token)
+    }
+
+    pub fn extract(self) -> String {
+        self.0
+    }
+}
+
+pub trait AuthenticateTokenExtract {
+    fn convert(self) -> Result<AuthenticateToken, ValidateAuthenticateTokenError>;
+}
+
+pub enum ValidateAuthenticateTokenError {
+    NotFound,
+    MetadataError(MetadataError),
+}
+
+impl std::fmt::Display for ValidateAuthenticateTokenError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::NotFound => write!(f, "data not found"),
+            Self::MetadataError(err) => err.fmt(f),
+        }
+    }
+}
+
+pub enum DecodeAuthenticateTokenError {
+    Expired,
+    Invalid(String),
+}
+
+impl std::fmt::Display for DecodeAuthenticateTokenError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::Expired => write!(f, "token expired"),
+            Self::Invalid(err) => write!(f, "invalid token: {}", err),
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct AuthorizeToken(String);
+
+impl AuthorizeToken {
+    pub const fn restore(token: String) -> Self {
+        Self(token)
+    }
+
+    pub fn extract(self) -> String {
+        self.0
+    }
+}
+
+pub trait AuthorizeTokenExtract {
+    fn convert(self) -> Result<AuthorizeToken, ValidateAuthorizeTokenError>;
+}
+
+impl<T: AuthorizeTokenExtract + Send> ProxyMetadataExtract for T {
+    fn convert(self) -> Result<HashMap<&'static str, String>, MetadataError> {
+        match self.convert() {
+            Ok(token) => Ok(vec![(METADATA_AUTHORIZE_TOKEN, token.extract())]
+                .into_iter()
+                .collect()),
+            Err(err) => match err {
+                ValidateAuthorizeTokenError::NotFound => Ok(Default::default()),
+                ValidateAuthorizeTokenError::MetadataError(err) => Err(err),
+            },
+        }
+    }
+}
+
+pub enum ValidateAuthorizeTokenError {
+    NotFound,
+    MetadataError(MetadataError),
+}
+
+impl std::fmt::Display for ValidateAuthorizeTokenError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::NotFound => write!(f, "data not found"),
+            Self::MetadataError(err) => err.fmt(f),
+        }
+    }
+}
+
+pub enum DecodeAuthorizeTokenError {
+    Expired,
+    Invalid(String),
+}
+
+impl std::fmt::Display for DecodeAuthorizeTokenError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::Expired => write!(f, "token expired"),
+            Self::Invalid(err) => write!(f, "invalid token: {}", err),
+        }
+    }
+}
+
+pub struct AuthToken {
+    pub authenticate_token: (AuthenticateToken, ExpireDateTime),
+    pub authorize_token: (AuthorizeToken, ExpireDateTime),
+    pub cdn_token: (CdnToken, ExpireDateTime),
+}
+
+pub enum CdnToken {
+    AWSCloudfront(AWSCloudfrontToken),
+}
+
+pub struct AWSCloudfrontToken {
+    pub key_pair_id: String,
+    pub policy: String,
+    pub signature: String,
 }

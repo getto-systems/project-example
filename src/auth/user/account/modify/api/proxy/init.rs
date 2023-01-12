@@ -1,41 +1,28 @@
-mod modify;
+mod proxy_call;
 
-use actix_web::HttpRequest;
+use crate::x_outside_feature::{data::RequestId, proxy::feature::ProxyAppFeature};
 
-use crate::auth::x_outside_feature::feature::AuthProxyOutsideFeature;
-
-use crate::auth::{
-    ticket::validate::init::ValidateApiMetadataStruct,
-    user::account::modify::proxy::init::modify::ModifyUserProxyService,
+use crate::{
+    auth::user::account::modify::proxy::init::proxy_call::TonicModifyAuthUserAccountProxyCall,
+    common::proxy::init::ActiveCoreProxyMaterial,
 };
 
-use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
+use crate::{
+    auth::user::account::modify::action::ModifyAuthUserAccountActionInfo,
+    common::proxy::action::CoreProxyAction,
+};
 
-pub struct ModifyAuthUserAccountProxyStruct<'a> {
-    validate: ValidateApiMetadataStruct<'a>,
-    proxy_service: ModifyUserProxyService<'a>,
-}
+pub type ActiveModifyAuthUserAccountProxyMaterial<'a> =
+    ActiveCoreProxyMaterial<'a, TonicModifyAuthUserAccountProxyCall<'a>>;
 
-impl<'a> ModifyAuthUserAccountProxyStruct<'a> {
-    pub fn action(
-        feature: &'a AuthProxyOutsideFeature,
-        request_id: &'a str,
-        request: &'a HttpRequest,
-        body: String,
-    ) -> AuthProxyAction<Self> {
-        AuthProxyAction::with_material(Self {
-            validate: ValidateApiMetadataStruct::new(&feature.decoding_key, request),
-            proxy_service: ModifyUserProxyService::new(&feature.service, request_id, body),
-        })
-    }
-}
-
-#[async_trait::async_trait]
-impl<'a> AuthProxyMaterial for ModifyAuthUserAccountProxyStruct<'a> {
-    type Validate = ValidateApiMetadataStruct<'a>;
-    type ProxyService = ModifyUserProxyService<'a>;
-
-    fn extract(self) -> (Self::Validate, Self::ProxyService) {
-        (self.validate, self.proxy_service)
+impl<'a> ActiveModifyAuthUserAccountProxyMaterial<'a> {
+    pub fn action(feature: &'a ProxyAppFeature, request_id: RequestId) -> CoreProxyAction<Self> {
+        CoreProxyAction::with_material(
+            ModifyAuthUserAccountActionInfo.params(),
+            ActiveCoreProxyMaterial::new(
+                &feature.auth.decoding_key,
+                TonicModifyAuthUserAccountProxyCall::new(&feature.core, request_id),
+            ),
+        )
     }
 }

@@ -1,3 +1,3 @@
-import { ALL_AUTH_ROLES } from "../../../x_content/role"
+import { ALL_AUTH_PERMISSIONS } from "../../../x_content/permission"
 
-export type AuthRole = typeof ALL_AUTH_ROLES[number]
+export type AuthPermission = typeof ALL_AUTH_PERMISSIONS[number]

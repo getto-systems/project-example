@@ -4,7 +4,7 @@ use crate::auth::user::password::change::y_protobuf::service::{
     ChangePasswordResponsePb, OverwritePasswordResponsePb,
 };
 
-use crate::z_lib::response::tonic::ServiceResponder;
+use crate::common::api::response::tonic::ServiceResponder;
 
 use crate::auth::user::password::change::action::{
     ChangePasswordEvent, ChangePasswordState, OverwritePasswordEvent, OverwritePasswordState,
@@ -15,7 +15,7 @@ use crate::auth::user::password::change::data::ValidateChangePasswordFieldsError
 impl ServiceResponder<ChangePasswordResponsePb> for ChangePasswordState {
     fn respond_to(self) -> Result<Response<ChangePasswordResponsePb>, Status> {
         match self {
-            Self::Authenticate(event) => event.respond_to(),
+            Self::Authorize(event) => event.respond_to(),
             Self::Change(event) => event.respond_to(),
         }
     }
@@ -45,7 +45,7 @@ impl ServiceResponder<ChangePasswordResponsePb> for ValidateChangePasswordFields
 impl ServiceResponder<OverwritePasswordResponsePb> for OverwritePasswordState {
     fn respond_to(self) -> Result<Response<OverwritePasswordResponsePb>, Status> {
         match self {
-            Self::Authenticate(event) => event.respond_to(),
+            Self::Authorize(event) => event.respond_to(),
             Self::Overwrite(event) => event.respond_to(),
         }
     }
@@ -55,8 +55,12 @@ impl ServiceResponder<OverwritePasswordResponsePb> for OverwritePasswordEvent {
     fn respond_to(self) -> Result<Response<OverwritePasswordResponsePb>, Status> {
         match self {
             Self::Success => Ok(Response::new(OverwritePasswordResponsePb { success: true })),
-            Self::Invalid(_) => Ok(Response::new(OverwritePasswordResponsePb { success: false })),
-            Self::NotFound => Ok(Response::new(OverwritePasswordResponsePb { success: false })),
+            Self::Invalid(_) => Ok(Response::new(OverwritePasswordResponsePb {
+                success: false,
+            })),
+            Self::NotFound => Ok(Response::new(OverwritePasswordResponsePb {
+                success: false,
+            })),
             Self::PasswordHashError(err) => err.respond_to(),
             Self::RepositoryError(err) => err.respond_to(),
         }

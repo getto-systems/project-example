@@ -3,46 +3,35 @@ use tonic::{Request, Response, Status};
 use getto_application::helper::flatten;
 
 use crate::auth::user::password::authenticate::y_protobuf::service::{
-    authenticate_password_pb_server::AuthenticatePasswordPb, AuthenticatePasswordRequestPb,
-    AuthenticatePasswordResponsePb,
+    authenticate_with_password_pb_server::AuthenticateWithPasswordPb,
+    AuthenticateWithPasswordRequestPb, AuthenticateWithPasswordResponsePb,
 };
 
-use crate::x_outside_feature::auth::{
-    feature::{extract_auth_request, AuthTonicRequest},
-    logger::app_logger,
-};
+use crate::x_outside_feature::auth::{feature::AuthTonicRequest, logger::AuthLogger};
 
-use crate::x_content::metadata::metadata_request_id;
+use crate::auth::user::password::authenticate::init::ActiveAuthenticateWithPasswordMaterial;
 
-use crate::auth::user::password::authenticate::init::AuthenticatePasswordStruct;
+use crate::common::api::{logger::infra::Logger, response::tonic::ServiceResponder};
 
-use crate::z_lib::{logger::infra::Logger, response::tonic::ServiceResponder};
-
-pub struct ServiceAuthenticate;
-
-impl ServiceAuthenticate {
-    pub const fn name() -> &'static str {
-        "auth.user.password.authenticate"
-    }
-}
+pub struct ServiceAuthenticateWithPassword;
 
 #[async_trait::async_trait]
-impl AuthenticatePasswordPb for ServiceAuthenticate {
+impl AuthenticateWithPasswordPb for ServiceAuthenticateWithPassword {
     async fn authenticate(
         &self,
-        request: Request<AuthenticatePasswordRequestPb>,
-    ) -> Result<Response<AuthenticatePasswordResponsePb>, Status> {
+        request: Request<AuthenticateWithPasswordRequestPb>,
+    ) -> Result<Response<AuthenticateWithPasswordResponsePb>, Status> {
         let AuthTonicRequest {
             feature,
-            metadata,
             request,
-        } = extract_auth_request(request);
-        let request_id = metadata_request_id(&metadata);
+            request_id,
+            ..
+        } = AuthTonicRequest::from_request(request);
 
-        let logger = app_logger(Self::name(), request_id.into());
-        let mut action = AuthenticatePasswordStruct::action(&feature, &metadata, request);
+        let mut action = ActiveAuthenticateWithPasswordMaterial::action(&feature);
+        let logger = AuthLogger::default(&feature, action.info.name(), request_id);
         action.subscribe(move |state| logger.log(state));
 
-        flatten(action.ignite().await).respond_to()
+        flatten(action.ignite(request).await).respond_to()
     }
 }

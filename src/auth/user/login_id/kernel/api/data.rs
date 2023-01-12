@@ -1,44 +1,67 @@
-use crate::z_lib::validate::data::ValidateTextError;
+use crate::common::api::validate::data::ValidateTextError;
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct LoginId(String);
 
 impl LoginId {
-    pub fn convert(login_id: impl LoginIdExtract) -> Result<Self, ValidateLoginIdError> {
-        Ok(Self(login_id.convert()?))
+    pub fn convert(value: impl LoginIdExtract) -> Result<Self, ValidateLoginIdError> {
+        Ok(Self(
+            value.convert().map_err(ValidateLoginIdError::LoginId)?,
+        ))
     }
 
-    pub(in crate::auth) const fn restore(login_id: String) -> Self {
-        Self(login_id)
+    pub(in crate::auth) const fn restore(value: String) -> Self {
+        Self(value)
     }
 
     pub fn extract(self) -> String {
         self.0
     }
-
-    pub fn inner(&self) -> &String {
-        &self.0
-    }
 }
 
 impl std::fmt::Display for LoginId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "login id: {}", self.0)
+        write!(f, "login-id: {}", self.0)
     }
 }
 
 pub trait LoginIdExtract {
-    fn convert(self) -> Result<String, ValidateLoginIdError>;
+    fn convert(self) -> Result<String, ValidateTextError>;
 }
 
+#[derive(Debug)]
 pub enum ValidateLoginIdError {
-    Text(ValidateTextError),
+    LoginId(ValidateTextError),
 }
 
 impl std::fmt::Display for ValidateLoginIdError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::Text(err) => err.fmt(f),
+            Self::LoginId(err) => write!(f, "login-id: {}", err),
+        }
+    }
+}
+
+pub struct SearchLoginId(Option<String>);
+
+impl SearchLoginId {
+    pub(in crate::auth) const fn restore(value: Option<String>) -> Self {
+        Self(value)
+    }
+}
+
+impl PartialEq<SearchLoginId> for LoginId {
+    fn eq(&self, other: &SearchLoginId) -> bool {
+        match other.0 {
+            None => true,
+            Some(ref value) => &self.0 == value,
+        }
+    }
+
+    fn ne(&self, other: &SearchLoginId) -> bool {
+        match other.0 {
+            None => false,
+            Some(ref value) => &self.0 != value,
         }
     }
 }

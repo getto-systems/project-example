@@ -6,24 +6,13 @@ use crate::common::outline::load::y_protobuf::service::{
     load_menu_badge_pb_server::LoadMenuBadgePb, LoadMenuBadgeRequestPb, LoadMenuBadgeResponsePb,
 };
 
-use crate::x_outside_feature::core::{
-    feature::{extract_core_request, CoreTonicRequest},
-    logger::app_logger,
-};
+use crate::x_outside_feature::core::{feature::CoreTonicRequest, logger::CoreLogger};
 
-use crate::x_content::metadata::metadata_request_id;
+use crate::common::outline::load::init::ActiveLoadOutlineMenuBadgeMaterial;
 
-use crate::common::outline::load::init::LoadOutlineMenuBadgeStruct;
-
-use crate::z_lib::{logger::infra::Logger, response::tonic::ServiceResponder};
+use crate::common::api::{logger::infra::Logger, response::tonic::ServiceResponder};
 
 pub struct ServiceLoadMenuBadge;
-
-impl ServiceLoadMenuBadge {
-    pub const fn name() -> &'static str {
-        "common.outline.load_menu_badge"
-    }
-}
 
 #[async_trait::async_trait]
 impl LoadMenuBadgePb for ServiceLoadMenuBadge {
@@ -32,14 +21,16 @@ impl LoadMenuBadgePb for ServiceLoadMenuBadge {
         request: Request<LoadMenuBadgeRequestPb>,
     ) -> Result<Response<LoadMenuBadgeResponsePb>, Status> {
         let CoreTonicRequest {
-            metadata, feature, ..
-        } = extract_core_request(request);
-        let request_id = metadata_request_id(&metadata);
+            feature,
+            metadata,
+            request_id,
+            ..
+        } = CoreTonicRequest::from_request(request);
 
-        let logger = app_logger(Self::name(), request_id.into());
-        let mut action = LoadOutlineMenuBadgeStruct::action(&feature, &request_id, &metadata);
+        let mut action = ActiveLoadOutlineMenuBadgeMaterial::action(&feature, request_id.clone());
+        let logger = CoreLogger::default(&feature, action.info.name(), request_id);
         action.subscribe(move |state| logger.log(state));
 
-        flatten(action.ignite().await).respond_to()
+        flatten(action.ignite(&metadata).await).respond_to()
     }
 }

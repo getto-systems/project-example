@@ -7,25 +7,25 @@ use rusoto_dynamodb::{
 
 use crate::auth::x_outside_feature::feature::AuthOutsideStore;
 
-use crate::z_lib::repository::{
+use crate::common::api::repository::{
     dynamodb::helper::{string_value, timestamp_value, DynamoDbColumn},
     helper::repository_infra_error,
 };
 
-use crate::auth::user::password::reset::reset::infra::ResetTokenMoment;
+use crate::auth::user::password::reset::reset::infra::ResetPasswordTokenMoment;
 
 use crate::{
     auth::{
-        ticket::kernel::data::{AuthDateTime, ExpireDateTime},
+        kernel::data::{AuthDateTime, ExpireDateTime},
         user::{
             kernel::data::AuthUserId,
             login_id::kernel::data::LoginId,
             password::reset::kernel::data::{
-                ResetToken, ResetTokenDestination, ResetTokenDestinationExtract,
+                ResetPasswordId, ResetPasswordTokenDestination, ResetPasswordTokenDestinationEmail,
             },
         },
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
 pub struct TableResetToken<'a> {
@@ -40,7 +40,7 @@ impl<'a> TableResetToken<'a> {
         }
     }
 
-    fn key(reset_token: ResetToken) -> HashMap<String, AttributeValue> {
+    fn key(reset_token: ResetPasswordId) -> HashMap<String, AttributeValue> {
         vec![ColumnResetToken::to_attr_pair(reset_token)]
             .into_iter()
             .collect()
@@ -48,9 +48,14 @@ impl<'a> TableResetToken<'a> {
 
     pub async fn get_reset_token_entry(
         &self,
-        reset_token: ResetToken,
+        reset_token: ResetPasswordId,
     ) -> Result<
-        Option<(AuthUserId, LoginId, ResetTokenDestination, ResetTokenMoment)>,
+        Option<(
+            AuthUserId,
+            LoginId,
+            ResetPasswordTokenDestination,
+            ResetPasswordTokenMoment,
+        )>,
         RepositoryError,
     > {
         let input = GetItemInput {
@@ -87,7 +92,7 @@ impl<'a> TableResetToken<'a> {
                     user_id,
                     login_id,
                     email,
-                    ResetTokenMoment::restore(expires, reset_at),
+                    ResetPasswordTokenMoment::restore(expires, reset_at),
                 )),
                 _ => None,
             }
@@ -96,10 +101,10 @@ impl<'a> TableResetToken<'a> {
 
     pub async fn put_reset_token(
         &self,
-        reset_token: ResetToken,
+        reset_token: ResetPasswordId,
         user_id: AuthUserId,
         login_id: LoginId,
-        destination: ResetTokenDestination,
+        destination: ResetPasswordTokenDestination,
         expires: ExpireDateTime,
         requested_at: AuthDateTime,
     ) -> Result<(), RepositoryError> {
@@ -132,7 +137,7 @@ impl<'a> TableResetToken<'a> {
     }
     pub async fn update_reset_at(
         &self,
-        reset_token: ResetToken,
+        reset_token: ResetPasswordId,
         reset_at: AuthDateTime,
     ) -> Result<(), RepositoryError> {
         let input = UpdateItemInput {
@@ -157,7 +162,7 @@ impl<'a> TableResetToken<'a> {
 
 struct ColumnResetToken;
 impl DynamoDbColumn for ColumnResetToken {
-    type Value = ResetToken;
+    type Value = ResetPasswordId;
 
     fn as_name() -> &'static str {
         "reset_token"
@@ -202,7 +207,7 @@ impl DynamoDbColumn for ColumnUserId {
 
 struct ColumnEmail;
 impl DynamoDbColumn for ColumnEmail {
-    type Value = ResetTokenDestination;
+    type Value = ResetPasswordTokenDestination;
 
     fn as_name() -> &'static str {
         "email"
@@ -214,8 +219,9 @@ impl DynamoDbColumn for ColumnEmail {
         }
     }
     fn to_value(attr: AttributeValue) -> Option<Self::Value> {
-        attr.s
-            .map(|value| Self::Value::restore(ResetTokenDestinationExtract::Email(value)))
+        attr.s.map(|value| {
+            ResetPasswordTokenDestination::Email(ResetPasswordTokenDestinationEmail::restore(value))
+        })
     }
 }
 
@@ -234,7 +240,7 @@ impl DynamoDbColumn for ColumnExpires {
             .and_then(|value| value.parse::<i64>().ok())
             .map(|value| {
                 Self::Value::restore(DateTime::<Utc>::from_utc(
-                    NaiveDateTime::from_timestamp(value, 0),
+                    NaiveDateTime::from_timestamp_opt(value, 0).unwrap_or_default(),
                     Utc,
                 ))
             })
@@ -256,7 +262,7 @@ impl DynamoDbColumn for ColumnRequestedAt {
             .and_then(|value| value.parse::<i64>().ok())
             .map(|value| {
                 Self::Value::restore(DateTime::<Utc>::from_utc(
-                    NaiveDateTime::from_timestamp(value, 0),
+                    NaiveDateTime::from_timestamp_opt(value, 0).unwrap_or_default(),
                     Utc,
                 ))
             })
@@ -278,7 +284,7 @@ impl DynamoDbColumn for ColumnResetAt {
             .and_then(|value| value.parse::<i64>().ok())
             .map(|value| {
                 Self::Value::restore(DateTime::<Utc>::from_utc(
-                    NaiveDateTime::from_timestamp(value, 0),
+                    NaiveDateTime::from_timestamp_opt(value, 0).unwrap_or_default(),
                     Utc,
                 ))
             })

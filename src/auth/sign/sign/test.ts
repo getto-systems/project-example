@@ -3,19 +3,19 @@ import { observeApplicationState } from "../../../z_vendor/getto-application/act
 
 import { newResetPasswordConfig } from "../../user/password/reset/reset/init/config"
 import { newAuthenticatePasswordConfig } from "../../user/password/authenticate/init/config"
-import { newCheckAuthTicketConfig } from "../../ticket/check/init/config"
+import { newCheckAuthTicketConfig } from "../../ticket/authenticate/init/config"
 import { newRequestResetTokenConfig } from "../../user/password/reset/request_token/init/config"
 
 import { mockResetPasswordShell } from "../../user/password/reset/reset/init/mock"
 import { mockGetScriptPathShell } from "../get_script_path/init/mock"
-import { mockRemoteInfraError } from "../../../z_lib/ui/remote/mock"
+import { mockRemoteInfraError } from "../../../common/util/remote/mock"
 import { mockSignActionShell } from "./init/mock"
 
-import { initMemoryDB } from "../../../z_lib/ui/repository/init/memory"
-import { newClock } from "../../../z_lib/ui/clock/init"
+import { initMemoryDB } from "../../../common/util/repository/init/memory"
+import { newClock } from "../../../common/util/clock/init"
 
 import { initSignAction, SignAction } from "./action"
-import { initCheckAuthTicketAction } from "../../ticket/check/action"
+import { initAuthenticateWithTokenAction } from "../../ticket/authenticate/action"
 import { initAuthenticatePasswordAction } from "../../user/password/authenticate/action"
 import { initResetPasswordAction } from "../../user/password/reset/reset/action"
 import { initRequestResetTokenAction } from "../../user/password/reset/request_token/action"
@@ -92,7 +92,7 @@ function initAction(currentURL: URL): SignAction {
 
     return initSignAction(mockSignActionShell(currentURL), {
         check: () =>
-            initCheckAuthTicketAction({
+            initAuthenticateWithTokenAction({
                 infra: {
                     ticketRepository,
                     renewRemote,

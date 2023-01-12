@@ -1,7 +1,7 @@
 import { ConvertLoginIdResult } from "./data"
 import { LoginId } from "../kernel/data"
-import { converter } from "../../../../z_lib/ui/validate/helper"
-import { check_text_empty, check_text_tooLong } from "../../../../z_lib/ui/validate/text"
+import { converter } from "../../../../common/util/validate/helper"
+import { check_text_empty, check_text_tooLong } from "../../../../common/util/validate/text"
 
 export const loginIdBoardConverter: { (value: string): ConvertLoginIdResult } = converter(
     restoreLoginId,

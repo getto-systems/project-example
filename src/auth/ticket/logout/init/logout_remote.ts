@@ -2,29 +2,23 @@ import { env } from "../../../../y_environment/ui/env"
 
 import {
     fetchOptions,
-    generateNonce,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../z_lib/ui/remote/init/helper"
-
-import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
+} from "../../../../common/util/remote/init/helper"
 
 import { LogoutRemote } from "../infra"
-import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
-import { RemoteResult } from "../../../../z_lib/ui/remote/infra"
+import { RemoteCommonError } from "../../../../common/util/remote/data"
+import { RemoteResult } from "../../../../common/util/remote/infra"
 
-export function newLogoutRemote(feature: RemoteOutsideFeature): LogoutRemote {
-    return async () => fetchRemote(feature)
+export function newLogoutRemote(): LogoutRemote {
+    return async () => fetchRemote()
 }
-async function fetchRemote(
-    feature: RemoteOutsideFeature,
-): Promise<RemoteResult<true, RemoteCommonError>> {
+async function fetchRemote(): Promise<RemoteResult<true, RemoteCommonError>> {
     try {
         const opts = fetchOptions({
             serverURL: env.apiServerURL,
             path: "/auth/ticket",
             method: "DELETE",
-            headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
         })
         const response = await fetch(opts.url, opts.options)
 

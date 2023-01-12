@@ -1,6 +1,6 @@
-import { RemoteResult } from "../../../z_lib/ui/remote/infra"
+import { RemoteResult } from "../../../common/util/remote/infra"
 
-import { RemoteCommonError } from "../../../z_lib/ui/remote/data"
+import { RemoteCommonError } from "../../../common/util/remote/data"
 
 export interface LogoutRemote {
     (): Promise<RemoteResult<true, RemoteCommonError>>

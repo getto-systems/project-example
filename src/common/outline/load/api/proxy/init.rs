@@ -1,40 +1,27 @@
-mod proxy_service;
+mod proxy_call;
 
-use actix_web::HttpRequest;
+use crate::x_outside_feature::{data::RequestId, proxy::feature::ProxyAppFeature};
 
-use crate::x_outside_feature::proxy::feature::ProxyAppFeature;
-
-use crate::{
-    auth::init::ValidateApiMetadataStruct,
-    common::outline::load::proxy::init::proxy_service::ProxyService,
+use crate::common::{
+    outline::load::proxy::init::proxy_call::TonicGetOutlineMenuBadgeProxyCall,
+    proxy::init::ActiveCoreProxyMaterial,
 };
 
-use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
+use crate::common::{
+    outline::load::action::LoadOutlineMenuBadgeActionInfo, proxy::action::CoreProxyAction,
+};
 
-pub struct GetOutlineMenuBadgeProxyStruct<'a> {
-    validate: ValidateApiMetadataStruct<'a>,
-    proxy_service: ProxyService<'a>,
-}
+pub type ActiveGetOutlineMenuBadgeProxyMaterial<'a> =
+    ActiveCoreProxyMaterial<'a, TonicGetOutlineMenuBadgeProxyCall<'a>>;
 
-impl<'a> GetOutlineMenuBadgeProxyStruct<'a> {
-    pub fn action(
-        feature: &'a ProxyAppFeature,
-        request_id: &'a str,
-        request: &'a HttpRequest,
-    ) -> AuthProxyAction<Self> {
-        AuthProxyAction::with_material(Self {
-            validate: ValidateApiMetadataStruct::new(&feature.auth.decoding_key, request),
-            proxy_service: ProxyService::new(&feature.core.service, request_id),
-        })
-    }
-}
-
-#[async_trait::async_trait]
-impl<'a> AuthProxyMaterial for GetOutlineMenuBadgeProxyStruct<'a> {
-    type Validate = ValidateApiMetadataStruct<'a>;
-    type ProxyService = ProxyService<'a>;
-
-    fn extract(self) -> (Self::Validate, Self::ProxyService) {
-        (self.validate, self.proxy_service)
+impl<'a> ActiveGetOutlineMenuBadgeProxyMaterial<'a> {
+    pub fn action(feature: &'a ProxyAppFeature, request_id: RequestId) -> CoreProxyAction<Self> {
+        CoreProxyAction::with_material(
+            LoadOutlineMenuBadgeActionInfo.params(),
+            ActiveCoreProxyMaterial::new(
+                &feature.auth.decoding_key,
+                TonicGetOutlineMenuBadgeProxyCall::new(&feature.core, request_id),
+            ),
+        )
     }
 }

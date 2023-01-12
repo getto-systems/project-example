@@ -2,26 +2,22 @@ import { env } from "../../../../../y_environment/ui/env"
 import pb from "../../../../../y_protobuf/proto.js"
 
 import {
-    generateNonce,
     fetchOptions,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../z_lib/ui/remote/init/helper"
+} from "../../../../../common/util/remote/init/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../z_vendor/protobuf/helper"
-
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
 
 import { ChangePasswordRemoteResult, OverwritePasswordRemote } from "../infra"
 
 import { OverwritePasswordFields } from "../data"
 import { LoginId } from "../../../login_id/kernel/data"
 
-export function newOverwritePasswordRemote(feature: RemoteOutsideFeature): OverwritePasswordRemote {
-    return (user, fields) => fetchRemote(feature, user, fields)
+export function newOverwritePasswordRemote(): OverwritePasswordRemote {
+    return (user, fields) => fetchRemote(user, fields)
 }
 
 async function fetchRemote(
-    feature: RemoteOutsideFeature,
     user: Readonly<{ loginId: LoginId }>,
     fields: OverwritePasswordFields,
 ): Promise<ChangePasswordRemoteResult> {
@@ -38,7 +34,6 @@ async function fetchRemote(
             serverURL: env.apiServerURL,
             path: "/auth/user/password/overwrite",
             method: "PATCH",
-            headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
         })
         const response = await fetch(opts.url, {
             ...opts.options,

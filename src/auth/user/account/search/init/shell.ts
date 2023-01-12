@@ -1,7 +1,7 @@
 import {
     HistoryOutsideFeature,
     LocationOutsideFeature,
-} from "../../../../../z_lib/ui/location/feature"
+} from "../../../../../common/util/location/feature"
 
 import {
     clearFocusAuthUserAccountQuery,

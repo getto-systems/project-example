@@ -2,15 +2,15 @@ syntax = "proto3";
 
 package auth.user.password.reset.token_destination.change.service;
 
-import "auth/user/password/reset/token_destination/kernel/x_protobuf/service.proto";
+import "auth/user/password/reset/kernel/x_protobuf/service.proto";
 
 service ChangeResetTokenDestinationPb {
     rpc ChangeDestination (ChangeResetTokenDestinationRequestPb) returns (ChangeResetTokenDestinationResponsePb);
 }
 message ChangeResetTokenDestinationRequestPb {
     string login_id = 1;
-    auth.user.password.reset.token_destination.kernel.service.ResetTokenDestinationPb from = 2;
-    auth.user.password.reset.token_destination.kernel.service.ResetTokenDestinationPb to = 3;
+    auth.user.password.reset.kernel.service.ResetTokenDestinationPb from = 2;
+    auth.user.password.reset.kernel.service.ResetTokenDestinationPb to = 3;
 }
 message ChangeResetTokenDestinationResponsePb {
     bool success = 1;

@@ -3,19 +3,14 @@ import pb from "../../../../y_protobuf/proto.js"
 
 import {
     fetchOptions,
-    generateNonce,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../z_lib/ui/remote/init/helper"
+} from "../../../../common/util/remote/init/helper"
 import { encodeProtobuf } from "../../../../z_vendor/protobuf/helper"
-
-import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
 
 import { NotifyUnexpectedErrorRemote } from "../infra"
 
-export function newNotifyUnexpectedErrorRemote(
-    feature: RemoteOutsideFeature,
-): NotifyUnexpectedErrorRemote {
+export function newNotifyUnexpectedErrorRemote(): NotifyUnexpectedErrorRemote {
     return async (err) => {
         try {
             const mock = false
@@ -27,7 +22,6 @@ export function newNotifyUnexpectedErrorRemote(
                 serverURL: env.apiServerURL,
                 path: "/avail/unexpected-error",
                 method: "POST",
-                headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
             })
             const response = await fetch(opts.url, {
                 ...opts.options,

@@ -1,72 +1,47 @@
 mod change_password;
 mod overwrite_password;
 
-use actix_web::HttpRequest;
+use crate::x_outside_feature::{data::RequestId, proxy::feature::ProxyAppFeature};
 
-use crate::auth::user::password::change::proxy::init::overwrite_password::OverwritePasswordProxyService;
-use crate::auth::x_outside_feature::feature::AuthProxyOutsideFeature;
-
-use crate::auth::{
-    ticket::validate::init::ValidateApiMetadataStruct,
-    user::password::change::proxy::init::change_password::ChangePasswordProxyService,
+use crate::{
+    auth::user::password::change::proxy::init::{
+        change_password::TonicChangePasswordProxyCall,
+        overwrite_password::TonicOverwritePasswordProxyCall,
+    },
+    common::proxy::init::ActiveCoreProxyMaterial,
 };
 
-use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
+use crate::{
+    auth::user::password::change::action::{ChangePasswordActionInfo, OverwritePasswordActionInfo},
+    common::proxy::action::CoreProxyAction,
+};
 
-pub struct ChangePasswordProxyStruct<'a> {
-    validate: ValidateApiMetadataStruct<'a>,
-    proxy_service: ChangePasswordProxyService<'a>,
-}
+pub type ActiveChangePasswordProxyMaterial<'a> =
+    ActiveCoreProxyMaterial<'a, TonicChangePasswordProxyCall<'a>>;
 
-impl<'a> ChangePasswordProxyStruct<'a> {
-    pub fn action(
-        feature: &'a AuthProxyOutsideFeature,
-        request_id: &'a str,
-        request: &'a HttpRequest,
-        body: String,
-    ) -> AuthProxyAction<Self> {
-        AuthProxyAction::with_material(Self {
-            validate: ValidateApiMetadataStruct::new(&feature.decoding_key, request),
-            proxy_service: ChangePasswordProxyService::new(&feature.service, request_id, body),
-        })
+impl<'a> ActiveChangePasswordProxyMaterial<'a> {
+    pub fn action(feature: &'a ProxyAppFeature, request_id: RequestId) -> CoreProxyAction<Self> {
+        CoreProxyAction::with_material(
+            ChangePasswordActionInfo.params(),
+            ActiveCoreProxyMaterial::new(
+                &feature.auth.decoding_key,
+                TonicChangePasswordProxyCall::new(&feature.core, request_id),
+            ),
+        )
     }
 }
 
-#[async_trait::async_trait]
-impl<'a> AuthProxyMaterial for ChangePasswordProxyStruct<'a> {
-    type Validate = ValidateApiMetadataStruct<'a>;
-    type ProxyService = ChangePasswordProxyService<'a>;
+pub type ActiveOverwritePasswordProxyMaterial<'a> =
+    ActiveCoreProxyMaterial<'a, TonicOverwritePasswordProxyCall<'a>>;
 
-    fn extract(self) -> (Self::Validate, Self::ProxyService) {
-        (self.validate, self.proxy_service)
-    }
-}
-
-pub struct OverwritePasswordProxyStruct<'a> {
-    validate: ValidateApiMetadataStruct<'a>,
-    proxy_service: OverwritePasswordProxyService<'a>,
-}
-
-impl<'a> OverwritePasswordProxyStruct<'a> {
-    pub fn action(
-        feature: &'a AuthProxyOutsideFeature,
-        request_id: &'a str,
-        request: &'a HttpRequest,
-        body: String,
-    ) -> AuthProxyAction<Self> {
-        AuthProxyAction::with_material(Self {
-            validate: ValidateApiMetadataStruct::new(&feature.decoding_key, request),
-            proxy_service: OverwritePasswordProxyService::new(&feature.service, request_id, body),
-        })
-    }
-}
-
-#[async_trait::async_trait]
-impl<'a> AuthProxyMaterial for OverwritePasswordProxyStruct<'a> {
-    type Validate = ValidateApiMetadataStruct<'a>;
-    type ProxyService = OverwritePasswordProxyService<'a>;
-
-    fn extract(self) -> (Self::Validate, Self::ProxyService) {
-        (self.validate, self.proxy_service)
+impl<'a> ActiveOverwritePasswordProxyMaterial<'a> {
+    pub fn action(feature: &'a ProxyAppFeature, request_id: RequestId) -> CoreProxyAction<Self> {
+        CoreProxyAction::with_material(
+            OverwritePasswordActionInfo.params(),
+            ActiveCoreProxyMaterial::new(
+                &feature.auth.decoding_key,
+                TonicOverwritePasswordProxyCall::new(&feature.core, request_id),
+            ),
+        )
     }
 }

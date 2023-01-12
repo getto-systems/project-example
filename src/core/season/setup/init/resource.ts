@@ -1,4 +1,4 @@
-import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/feature"
+import { RepositoryOutsideFeature } from "../../../../common/util/repository/feature"
 
 import { newSetupSeasonInfra } from "./infra"
 import { newSetupSeasonConfig } from "./config"

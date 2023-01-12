@@ -1,12 +1,9 @@
-import { RemoteOutsideFeature } from "../../../../../z_lib/ui/remote/feature"
-
 import { newRegisterAuthUserAccountRemote } from "./register_remote"
 
-import {  RegisterAuthUserAccountInfra } from "../action"
+import { RegisterAuthUserAccountInfra } from "../action"
 
-type OutsideFeature = RemoteOutsideFeature
-export function newRegisterAuthUserAccountInfra(feature: OutsideFeature): RegisterAuthUserAccountInfra {
+export function newRegisterAuthUserAccountInfra(): RegisterAuthUserAccountInfra {
     return {
-        registerUserRemote: newRegisterAuthUserAccountRemote(feature),
+        registerUserRemote: newRegisterAuthUserAccountRemote(),
     }
 }

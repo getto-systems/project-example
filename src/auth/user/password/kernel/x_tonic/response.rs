@@ -1,6 +1,6 @@
 use tonic::{Response, Status};
 
-use crate::z_lib::response::tonic::ServiceResponder;
+use crate::common::api::response::tonic::ServiceResponder;
 
 use crate::auth::user::password::kernel::data::PasswordHashError;
 

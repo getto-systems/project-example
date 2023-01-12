@@ -3,7 +3,7 @@ import {
     initApplicationState,
 } from "../../../../z_vendor/getto-application/action/action"
 
-import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime, ticker } from "../../../../common/util/timer/helper"
 
 import { initLoginIdFieldAction, LoginIdFieldAction } from "../input/action"
 import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
@@ -13,13 +13,13 @@ import {
     initModifyField,
     modifyField,
     ModifyFieldHandler,
-} from "../../../../z_lib/ui/modify/action"
+} from "../../../../common/util/modify/action"
 
 import { ChangeLoginIdError, OverwriteLoginIdFields } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 
 import { OverwriteLoginIdRemote } from "./infra"
-import { WaitTime } from "../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../common/util/config/infra"
 
 import { LoginId } from "../kernel/data"
 

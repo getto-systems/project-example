@@ -1,6 +1,6 @@
-import { LocationOutsideFeature } from "../../../../z_lib/ui/location/feature"
+import { LocationOutsideFeature } from "../../../../common/util/location/feature"
 
-import { toURL } from "../../../../z_lib/ui/location/init"
+import { toURL } from "../../../../common/util/location/init"
 
 import { detectSignViewType } from "../../router/convert"
 

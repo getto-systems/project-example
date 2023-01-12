@@ -1,6 +1,6 @@
-import { AuthRole } from "../../user/kernel/data"
+import { AuthPermission } from "../../user/kernel/data"
 
 export type AuthTicket = Readonly<{
     authAt: Date
-    grantedRoles: readonly AuthRole[]
+    granted: readonly AuthPermission[]
 }> & { AuthTicket: never }

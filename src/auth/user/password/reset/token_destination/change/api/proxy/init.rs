@@ -1,41 +1,28 @@
-mod change;
+mod proxy_call;
 
-use actix_web::HttpRequest;
+use crate::x_outside_feature::{data::RequestId, proxy::feature::ProxyAppFeature};
 
-use crate::auth::x_outside_feature::feature::AuthProxyOutsideFeature;
-
-use crate::auth::{
-    ticket::validate::init::ValidateApiMetadataStruct,
-    user::password::reset::token_destination::change::proxy::init::change::ChangeDestinationProxyService,
+use crate::{
+    auth::user::password::reset::token_destination::change::proxy::init::proxy_call::TonicChangeResetTokenDestinationProxyCall,
+    common::proxy::init::ActiveCoreProxyMaterial,
 };
 
-use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
+use crate::{
+    auth::user::password::reset::token_destination::change::action::ChangeResetTokenDestinationActionInfo,
+    common::proxy::action::CoreProxyAction,
+};
 
-pub struct ChangeResetTokenDestinationProxyStruct<'a> {
-    validate: ValidateApiMetadataStruct<'a>,
-    proxy_service: ChangeDestinationProxyService<'a>,
-}
+pub type ActiveChangeResetTokenDestinationProxyMaterial<'a> =
+    ActiveCoreProxyMaterial<'a, TonicChangeResetTokenDestinationProxyCall<'a>>;
 
-impl<'a> ChangeResetTokenDestinationProxyStruct<'a> {
-    pub fn action(
-        feature: &'a AuthProxyOutsideFeature,
-        request_id: &'a str,
-        request: &'a HttpRequest,
-        body: String,
-    ) -> AuthProxyAction<Self> {
-        AuthProxyAction::with_material(Self {
-            validate: ValidateApiMetadataStruct::new(&feature.decoding_key, request),
-            proxy_service: ChangeDestinationProxyService::new(&feature.service, request_id, body),
-        })
-    }
-}
-
-#[async_trait::async_trait]
-impl<'a> AuthProxyMaterial for ChangeResetTokenDestinationProxyStruct<'a> {
-    type Validate = ValidateApiMetadataStruct<'a>;
-    type ProxyService = ChangeDestinationProxyService<'a>;
-
-    fn extract(self) -> (Self::Validate, Self::ProxyService) {
-        (self.validate, self.proxy_service)
+impl<'a> ActiveChangeResetTokenDestinationProxyMaterial<'a> {
+    pub fn action(feature: &'a ProxyAppFeature, request_id: RequestId) -> CoreProxyAction<Self> {
+        CoreProxyAction::with_material(
+            ChangeResetTokenDestinationActionInfo.params(),
+            ActiveCoreProxyMaterial::new(
+                &feature.auth.decoding_key,
+                TonicChangeResetTokenDestinationProxyCall::new(&feature.core, request_id),
+            ),
+        )
     }
 }

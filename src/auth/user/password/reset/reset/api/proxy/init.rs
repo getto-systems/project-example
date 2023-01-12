@@ -1,41 +1,51 @@
-mod proxy_service;
+mod proxy_call;
 
-use actix_web::HttpRequest;
+use proxy_call::TonicResetPasswordProxyCall;
 
-use crate::auth::x_outside_feature::feature::AuthProxyOutsideFeature;
+use crate::x_outside_feature::{data::RequestId, proxy::feature::ProxyAppFeature};
 
-use crate::auth::{
-    ticket::validate::init::NoValidateMetadataStruct,
-    user::password::reset::reset::proxy::init::proxy_service::ProxyService,
+use crate::auth::user::password::reset::reset::proxy::action::{
+    ResetPasswordProxyAction, ResetPasswordProxyMaterial,
 };
 
-use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
-
-pub struct ResetPasswordProxyStruct<'a> {
-    validate: NoValidateMetadataStruct<'a>,
-    proxy_service: ProxyService<'a>,
+pub struct ActiveResetPasswordProxyMaterial<'a> {
+    proxy_call: TonicResetPasswordProxyCall<'a>,
 }
 
-impl<'a> ResetPasswordProxyStruct<'a> {
+impl<'a> ActiveResetPasswordProxyMaterial<'a> {
     pub fn action(
-        feature: &'a AuthProxyOutsideFeature,
-        request_id: &'a str,
-        request: &'a HttpRequest,
-        body: String,
-    ) -> AuthProxyAction<Self> {
-        AuthProxyAction::with_material(Self {
-            validate: NoValidateMetadataStruct::new(request),
-            proxy_service: ProxyService::new(feature, request_id, body),
+        feature: &'a ProxyAppFeature,
+        request_id: RequestId,
+    ) -> ResetPasswordProxyAction<Self> {
+        ResetPasswordProxyAction::with_material(Self {
+            proxy_call: TonicResetPasswordProxyCall::new(&feature.auth, request_id),
         })
     }
 }
 
 #[async_trait::async_trait]
-impl<'a> AuthProxyMaterial for ResetPasswordProxyStruct<'a> {
-    type Validate = NoValidateMetadataStruct<'a>;
-    type ProxyService = ProxyService<'a>;
+impl<'a> ResetPasswordProxyMaterial for ActiveResetPasswordProxyMaterial<'a> {
+    type ProxyCall = TonicResetPasswordProxyCall<'a>;
 
-    fn extract(self) -> (Self::Validate, Self::ProxyService) {
-        (self.validate, self.proxy_service)
+    fn proxy_call(&self) -> &Self::ProxyCall {
+        &self.proxy_call
+    }
+}
+
+#[cfg(test)]
+pub mod test {
+    pub use super::proxy_call::test::*;
+
+    use crate::auth::user::password::reset::reset::proxy::action::ResetPasswordProxyMaterial;
+
+    pub struct StaticResetPasswordProxyMaterial;
+
+    #[async_trait::async_trait]
+    impl ResetPasswordProxyMaterial for StaticResetPasswordProxyMaterial {
+        type ProxyCall = StaticResetPasswordProxyCall;
+
+        fn proxy_call(&self) -> &Self::ProxyCall {
+            &StaticResetPasswordProxyCall
+        }
     }
 }

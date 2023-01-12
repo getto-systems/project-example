@@ -1,4 +1,4 @@
-import { Icon } from "../../../z_lib/ui/icon/data"
+import { Icon } from "../../util/icon/data"
 
 export type BreadcrumbList = readonly BreadcrumbNode[]
 

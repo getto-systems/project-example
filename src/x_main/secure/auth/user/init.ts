@@ -7,8 +7,8 @@ import { newOverwritePasswordAction } from "../../../../auth/user/password/chang
 import { newUnregisterAuthUserAccountAction } from "../../../../auth/user/account/unregister/init/resource"
 
 import { DetailAuthUserAccountActions } from "../../../../auth/user/account/kernel/x_preact/detail"
-import { ModifyFieldHandler } from "../../../../z_lib/ui/modify/action"
-import { FocusSearchedAction } from "../../../../z_lib/ui/list/action"
+import { ModifyFieldHandler } from "../../../../common/util/modify/action"
+import { FocusSearchedAction } from "../../../../common/util/list/action"
 
 import { AuthUserAccount } from "../../../../auth/user/account/kernel/data"
 
@@ -16,11 +16,11 @@ export function newDetailAuthUserAccountActions(
     feature: ForegroundOutsideFeature,
     focus: FocusSearchedAction<AuthUserAccount>,
 ): DetailAuthUserAccountActions {
-    const modify = newModifyAuthUserAccountAction(feature)
-    const changeResetTokenDestination = newChangeResetTokenDestinationAction(feature)
-    const overwriteLoginId = newOverwriteLoginIdAction(feature)
-    const overwritePassword = newOverwritePasswordAction(feature)
-    const unregister = newUnregisterAuthUserAccountAction(feature)
+    const modify = newModifyAuthUserAccountAction()
+    const changeResetTokenDestination = newChangeResetTokenDestinationAction()
+    const overwriteLoginId = newOverwriteLoginIdAction()
+    const overwritePassword = newOverwritePasswordAction()
+    const unregister = newUnregisterAuthUserAccountAction()
 
     focus.onModify(
         buildHandler({

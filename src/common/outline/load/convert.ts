@@ -1,4 +1,4 @@
-import { RepositoryConverter } from "../../../z_lib/ui/repository/infra"
+import { RepositoryConverter } from "../../util/repository/infra"
 import {
     initMenuExpand,
     MenuBadge,
@@ -10,7 +10,7 @@ import {
 } from "./infra"
 
 import { MenuCategoryLabel, MenuCategory, MenuCategoryPath, MenuItem, MenuTargetPath } from "./data"
-import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
+import { ConvertLocationResult } from "../../util/location/data"
 
 export function detectMenuTargetPath(
     currentURL: URL,

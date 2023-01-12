@@ -1,64 +1,72 @@
 use getto_application::{data::MethodResult, infra::ActionStatePubSub};
 
-use crate::auth::ticket::validate::method::{
-    authenticate, AuthenticateEvent, AuthenticateInfra,
-};
+use crate::common::proxy::action::CoreProxyParams;
+
+use crate::auth::ticket::authorize::proxy::{authorize, AuthorizeEvent, AuthorizeInfra};
 
 use crate::auth::user::password::reset::token_destination::change::infra::{
-    ChangeResetTokenDestinationFields, ChangeResetTokenDestinationFieldsExtract,
-    ChangeResetTokenDestinationRepository, ChangeResetTokenDestinationRequestDecoder,
+    ChangeResetTokenDestinationFieldsExtract, ChangeResetTokenDestinationRepository,
 };
 
 use crate::{
     auth::{
-        data::RequireAuthRoles, ticket::kernel::data::PermissionError,
+        ticket::kernel::data::{AuthPermissionRequired, AuthorizeTokenExtract},
         user::password::reset::token_destination::change::data::ValidateChangeResetTokenDestinationFieldsError,
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
 pub enum ChangeResetTokenDestinationState {
-    Authenticate(AuthenticateEvent),
-    PermissionError(PermissionError),
+    Authorize(AuthorizeEvent),
     ChangeDestination(ChangeResetTokenDestinationEvent),
 }
 
 impl std::fmt::Display for ChangeResetTokenDestinationState {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Authenticate(event) => event.fmt(f),
-            Self::PermissionError(err) => err.fmt(f),
+            Self::Authorize(event) => event.fmt(f),
             Self::ChangeDestination(event) => event.fmt(f),
         }
     }
 }
 
 pub trait ChangeResetTokenDestinationMaterial {
-    type Authenticate: AuthenticateInfra;
+    type Authorize: AuthorizeInfra;
 
     type DestinationRepository: ChangeResetTokenDestinationRepository;
 
-    fn authenticate(&self) -> &Self::Authenticate;
+    fn authorize(&self) -> &Self::Authorize;
 
     fn destination_repository(&self) -> &Self::DestinationRepository;
 }
 
-pub struct ChangeResetTokenDestinationAction<
-    R: ChangeResetTokenDestinationRequestDecoder,
-    M: ChangeResetTokenDestinationMaterial,
-> {
+pub struct ChangeResetTokenDestinationAction<M: ChangeResetTokenDestinationMaterial> {
+    pub info: ChangeResetTokenDestinationActionInfo,
     pubsub: ActionStatePubSub<ChangeResetTokenDestinationState>,
-    request_decoder: R,
     material: M,
 }
 
-impl<R: ChangeResetTokenDestinationRequestDecoder, M: ChangeResetTokenDestinationMaterial>
-    ChangeResetTokenDestinationAction<R, M>
-{
-    pub fn with_material(request_decoder: R, material: M) -> Self {
+pub struct ChangeResetTokenDestinationActionInfo;
+
+impl ChangeResetTokenDestinationActionInfo {
+    pub const fn name(&self) -> &'static str {
+        "auth.user.password.reset.token-destination.change"
+    }
+
+    pub fn required(&self) -> AuthPermissionRequired {
+        AuthPermissionRequired::user()
+    }
+
+    pub fn params(&self) -> CoreProxyParams {
+        (self.name(), self.required())
+    }
+}
+
+impl<M: ChangeResetTokenDestinationMaterial> ChangeResetTokenDestinationAction<M> {
+    pub fn with_material(material: M) -> Self {
         Self {
+            info: ChangeResetTokenDestinationActionInfo,
             pubsub: ActionStatePubSub::new(),
-            request_decoder,
             material,
         }
     }
@@ -70,23 +78,24 @@ impl<R: ChangeResetTokenDestinationRequestDecoder, M: ChangeResetTokenDestinatio
         self.pubsub.subscribe(handler);
     }
 
-    pub async fn ignite(self) -> MethodResult<ChangeResetTokenDestinationState> {
-        let pubsub = self.pubsub;
-        let m = self.material;
-
-        let fields = self.request_decoder.decode();
-
-        let ticket = authenticate(m.authenticate(), |event| {
-            pubsub.post(ChangeResetTokenDestinationState::Authenticate(event))
-        })
+    pub async fn ignite(
+        self,
+        token: impl AuthorizeTokenExtract,
+        fields: impl ChangeResetTokenDestinationFieldsExtract,
+    ) -> MethodResult<ChangeResetTokenDestinationState> {
+        authorize(
+            self.material.authorize(),
+            (token, self.info.required()),
+            |event| {
+                self.pubsub
+                    .post(ChangeResetTokenDestinationState::Authorize(event))
+            },
+        )
         .await?;
 
-        ticket
-            .check_enough_permission(RequireAuthRoles::user())
-            .map_err(|err| pubsub.post(ChangeResetTokenDestinationState::PermissionError(err)))?;
-
-        change_destination(&m, fields, |event| {
-            pubsub.post(ChangeResetTokenDestinationState::ChangeDestination(event))
+        change_destination(&self.material, fields, |event| {
+            self.pubsub
+                .post(ChangeResetTokenDestinationState::ChangeDestination(event))
         })
         .await
     }
@@ -121,15 +130,15 @@ mod change_reset_token_destination_event {
 
 async fn change_destination<S>(
     infra: &impl ChangeResetTokenDestinationMaterial,
-    fields: ChangeResetTokenDestinationFieldsExtract,
+    fields: impl ChangeResetTokenDestinationFieldsExtract,
     post: impl Fn(ChangeResetTokenDestinationEvent) -> S,
 ) -> MethodResult<S> {
-    let fields = ChangeResetTokenDestinationFields::convert(fields)
+    let fields = fields
+        .convert()
         .map_err(|err| post(ChangeResetTokenDestinationEvent::Invalid(err)))?;
 
-    let destination_repository = infra.destination_repository();
-
-    let stored_destination = destination_repository
+    let stored_destination = infra
+        .destination_repository()
         .lookup_destination(&fields.login_id)
         .await
         .map_err(|err| post(ChangeResetTokenDestinationEvent::RepositoryError(err)))?
@@ -139,7 +148,8 @@ async fn change_destination<S>(
         return Err(post(ChangeResetTokenDestinationEvent::Conflict));
     }
 
-    destination_repository
+    infra
+        .destination_repository()
         .change_destination(fields.login_id, fields.to)
         .await
         .map_err(|err| post(ChangeResetTokenDestinationEvent::RepositoryError(err)))?;

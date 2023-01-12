@@ -1,37 +1,61 @@
-use crate::{
-    auth::user::password::reset::kernel::data::{
-        ResetTokenDestinationEmailExtract, ResetTokenEncodedExtract,
-        ValidateResetTokenDestinationEmailError, ValidateResetTokenError,
-    },
-    z_lib::validate::{
-        data::ValidateTextError,
-        text::{check_text_empty, check_text_invalid_email, check_text_too_long},
-    },
+use crate::common::api::validate::text::{
+    check_text_empty, check_text_invalid_email, check_text_too_long,
 };
 
-impl ResetTokenEncodedExtract for String {
-    fn convert(self) -> Result<String, ValidateResetTokenError> {
-        validate_reset_token_encoded(&self).map_err(ValidateResetTokenError::Text)?;
+use crate::{
+    auth::user::password::reset::kernel::data::{
+        ResetPasswordTokenDestinationEmailExtract, ResetPasswordTokenExtract,
+    },
+    common::api::validate::data::ValidateTextError,
+};
+
+impl ResetPasswordTokenExtract for String {
+    fn convert(self) -> Result<String, ValidateTextError> {
+        check_text_empty(&self)?;
         Ok(self)
     }
 }
 
-fn validate_reset_token_encoded(value: &str) -> Result<(), ValidateTextError> {
-    check_text_empty(value)?;
-    Ok(())
-}
-
-impl ResetTokenDestinationEmailExtract for String {
-    fn convert(self) -> Result<String, ValidateResetTokenDestinationEmailError> {
-        validate_reset_token_destination_email(&self)
-            .map_err(ValidateResetTokenDestinationEmailError::Text)?;
+impl ResetPasswordTokenDestinationEmailExtract for String {
+    fn convert(self) -> Result<String, ValidateTextError> {
+        check_text_empty(&self)?;
+        check_text_too_long(&self, 255)?; // ui の設定と同期させること
+        check_text_invalid_email(&self)?;
         Ok(self)
     }
 }
 
-fn validate_reset_token_destination_email(value: &str) -> Result<(), ValidateTextError> {
-    check_text_empty(value)?;
-    check_text_too_long(value, 255)?; // ui の設定と同期させること
-    check_text_invalid_email(value)?;
-    Ok(())
+#[cfg(test)]
+mod test {
+    use pretty_assertions::assert_eq;
+
+    use crate::auth::user::password::reset::kernel::data::{
+        ResetPasswordToken, ResetPasswordTokenDestinationEmail,
+        ValidateResetPasswordTokenDestinationError, ValidateResetPasswordTokenError,
+    };
+
+    #[test]
+    fn success_convert_reset_password_token() -> Result<(), ValidateResetPasswordTokenError> {
+        assert_eq!(
+            format!(
+                "{}",
+                ResetPasswordToken::convert("reset-password-token".to_owned())?.extract()
+            ),
+            "reset-password-token",
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn success_convert_reset_password_token_destination_email(
+    ) -> Result<(), ValidateResetPasswordTokenDestinationError> {
+        assert_eq!(
+            format!(
+                "{}",
+                ResetPasswordTokenDestinationEmail::convert("user@example.com".to_owned())?
+            ),
+            "email: user@example.com",
+        );
+        Ok(())
+    }
 }

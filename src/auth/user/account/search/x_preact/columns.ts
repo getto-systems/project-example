@@ -4,15 +4,15 @@ import { useApplicationState } from "../../../../../z_vendor/getto-application/a
 
 import { fieldHelp_error } from "../../../../../z_vendor/getto-css/preact/design/form"
 
-import { SearchColumns } from "../../../../../z_lib/ui/search/columns/x_preact/columns"
+import { SearchColumns } from "../../../../../common/util/search/columns/x_preact/columns"
 
-import { repositoryErrorReason } from "../../../../../z_lib/ui/repository/x_error/reason"
+import { repositoryErrorReason } from "../../../../../common/util/repository/x_error/reason"
 
-import { SearchColumnsAction } from "../../../../../z_lib/ui/search/columns/action"
+import { SearchColumnsAction } from "../../../../../common/util/search/columns/action"
 
 import { SearchAuthUserAccountTableStructure } from "./structure"
 
-import { RepositoryError } from "../../../../../z_lib/ui/repository/data"
+import { RepositoryError } from "../../../../../common/util/repository/data"
 
 type Props = Readonly<{
     columns: SearchColumnsAction

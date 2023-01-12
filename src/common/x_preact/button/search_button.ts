@@ -1,16 +1,16 @@
 import { html } from "htm/preact"
 import { VNode } from "preact"
 
-import { VNodeContent } from "../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../vnode"
 
 import { button_search } from "../../../z_vendor/getto-css/preact/design/form"
 
 import { icon_search, icon_spinner } from "../../../x_content/icon"
-import { iconHtml } from "../../../z_lib/ui/icon/x_preact/icon"
+import { iconHtml } from "../../util/icon/x_preact/icon"
 
 import { ObserveBoardState } from "../../../z_vendor/getto-application/board/observe_board/action"
 
-import { Icon } from "../../../z_lib/ui/icon/data"
+import { Icon } from "../../util/icon/data"
 
 type Props = Readonly<{
     label?: VNodeContent

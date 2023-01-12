@@ -1,35 +1,31 @@
+use crate::auth::user::password::kernel::infra::{HashedPassword, PlainPassword};
+
 use crate::{
-    auth::user::{
-        kernel::data::{AuthUserId, GrantedAuthRoles},
-        login_id::kernel::data::LoginId,
-        password::kernel::infra::{HashedPassword, PlainPassword},
+    auth::{
+        ticket::kernel::data::AuthPermissionGranted,
+        user::{
+            kernel::data::AuthUserId, login_id::kernel::data::LoginId,
+            password::authenticate::data::ValidateAuthenticateWithPasswordFieldsError,
+        },
     },
-    z_lib::repository::data::RepositoryError,
+    common::api::repository::data::RepositoryError,
 };
 
-pub trait AuthenticatePasswordRequestDecoder {
-    fn decode(self) -> AuthenticatePasswordFieldsExtract;
-}
-
-pub struct AuthenticatePasswordFields {
+pub struct AuthenticateWithPasswordFields {
     pub login_id: LoginId,
-    pub password: PlainPassword,
+    pub plain_password: PlainPassword,
 }
 
-pub struct AuthenticatePasswordFieldsExtract {
-    pub login_id: String,
-    pub password: String,
+pub trait AuthenticateWithPasswordFieldsExtract {
+    fn convert(
+        self,
+    ) -> Result<AuthenticateWithPasswordFields, ValidateAuthenticateWithPasswordFieldsError>;
 }
 
 #[async_trait::async_trait]
 pub trait AuthenticatePasswordRepository {
-    async fn lookup_user_id(
-        &self,
-        login_id: &LoginId,
-    ) -> Result<Option<AuthUserId>, RepositoryError>;
-
     async fn lookup_user(
         &self,
-        user_id: &AuthUserId,
-    ) -> Result<Option<(HashedPassword, Option<GrantedAuthRoles>)>, RepositoryError>;
+        login_id: &LoginId,
+    ) -> Result<Option<(AuthUserId, HashedPassword, Option<AuthPermissionGranted>)>, RepositoryError>;
 }

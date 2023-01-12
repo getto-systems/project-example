@@ -2,7 +2,7 @@ use tonic::{Response, Status};
 
 use crate::auth::user::password::reset::request_token::y_protobuf::service::RequestResetTokenResponsePb;
 
-use crate::z_lib::response::tonic::ServiceResponder;
+use crate::common::api::response::tonic::ServiceResponder;
 
 use super::super::action::{RequestResetTokenEvent, RequestResetTokenState};
 
@@ -13,7 +13,6 @@ use crate::auth::user::password::reset::request_token::data::{
 impl ServiceResponder<RequestResetTokenResponsePb> for RequestResetTokenState {
     fn respond_to(self) -> Result<Response<RequestResetTokenResponsePb>, Status> {
         match self {
-            Self::ValidateNonce(event) => event.respond_to(),
             Self::RequestToken(event) => event.respond_to(),
         }
     }

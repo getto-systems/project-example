@@ -1,6 +1,6 @@
 import { VNodeContent } from "../../../../../z_vendor/getto-css/preact/common"
 
-import { remoteCommonErrorReason } from "../../../../../z_lib/ui/remote/x_error/reason"
+import { remoteCommonErrorReason } from "../../../../../common/util/remote/x_error/reason"
 
 import { ChangePasswordError } from "../data"
 

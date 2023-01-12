@@ -1,6 +1,6 @@
 import { test, expect } from "vitest"
 import { observeApplicationState } from "../../../../../../z_vendor/getto-application/action/test_helper"
-import { ticker } from "../../../../../../z_lib/ui/timer/helper"
+import { ticker } from "../../../../../../common/util/timer/helper"
 import { mockBoardValueStore } from "../../../../../../z_vendor/getto-application/board/input/test_helper"
 
 import { ChangeResetTokenDestinationAction, initChangeResetTokenDestinationAction } from "./action"

@@ -4,15 +4,14 @@ use crate::auth::user::account::register::y_protobuf::service::{
     RegisterAuthUserAccountErrorKindPb, RegisterAuthUserAccountResponsePb,
 };
 
-use crate::z_lib::response::tonic::ServiceResponder;
+use crate::common::api::response::tonic::ServiceResponder;
 
 use super::super::action::{RegisterAuthUserAccountEvent, RegisterAuthUserAccountState};
 
 impl ServiceResponder<RegisterAuthUserAccountResponsePb> for RegisterAuthUserAccountState {
     fn respond_to(self) -> Result<Response<RegisterAuthUserAccountResponsePb>, Status> {
         match self {
-            Self::Authenticate(event) => event.respond_to(),
-            Self::PermissionError(err) => err.respond_to(),
+            Self::Authorize(event) => event.respond_to(),
             Self::RegisterUser(event) => event.respond_to(),
         }
     }

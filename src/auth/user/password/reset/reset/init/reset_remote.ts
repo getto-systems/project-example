@@ -3,30 +3,23 @@ import pb from "../../../../../../y_protobuf/proto.js"
 
 import {
     fetchOptions,
-    generateNonce,
     remoteCommonError,
     remoteInfraError,
-} from "../../../../../../z_lib/ui/remote/init/helper"
+} from "../../../../../../common/util/remote/init/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../../../z_vendor/protobuf/helper"
 
-import { RemoteOutsideFeature } from "../../../../../../z_lib/ui/remote/feature"
+import { convertCheckRemote } from "../../../../../ticket/authenticate/convert"
 
-import { convertCheckRemote } from "../../../../../ticket/check/convert"
-
-import { Clock } from "../../../../../../z_lib/ui/clock/infra"
+import { Clock } from "../../../../../../common/util/clock/infra"
 import { ResetPasswordRemote, ResetPasswordRemoteResult } from "../infra"
 
 import { ResetToken, ResetPasswordFields } from "../data"
 
-export function newResetPasswordRemote(
-    feature: RemoteOutsideFeature,
-    clock: Clock,
-): ResetPasswordRemote {
-    return (resetToken, fields) => fetchRemote(feature, clock, resetToken, fields)
+export function newResetPasswordRemote(clock: Clock): ResetPasswordRemote {
+    return (resetToken, fields) => fetchRemote(clock, resetToken, fields)
 }
 
 async function fetchRemote(
-    feature: RemoteOutsideFeature,
     clock: Clock,
     resetToken: ResetToken,
     fields: ResetPasswordFields,
@@ -44,7 +37,6 @@ async function fetchRemote(
             serverURL: env.apiServerURL,
             path: "/auth/user/password/reset",
             method: "POST",
-            headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
         })
         const response = await fetch(opts.url, {
             ...opts.options,
@@ -71,7 +63,7 @@ async function fetchRemote(
         }
         return {
             success: true,
-            value: convertCheckRemote(clock, message.roles?.grantedRoles || []),
+            value: convertCheckRemote(clock, message.granted?.permissions || []),
         }
     } catch (err) {
         return remoteInfraError(err)

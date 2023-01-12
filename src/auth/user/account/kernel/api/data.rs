@@ -1,76 +1,88 @@
 use crate::{
-    auth::user::{
-        kernel::data::GrantedAuthRoles, login_id::kernel::data::LoginId,
-        password::reset::kernel::data::ResetTokenDestination,
+    auth::{
+        ticket::kernel::data::{AuthPermissionGranted, ValidateAuthPermissionGrantedError},
+        user::{
+            login_id::kernel::data::{LoginId, ValidateLoginIdError},
+            password::reset::kernel::data::{
+                ResetPasswordTokenDestination, ValidateResetPasswordTokenDestinationError,
+            },
+        },
     },
-    z_lib::validate::data::ValidateTextError,
+    common::api::validate::data::ValidateTextError,
 };
 
 pub struct AuthUserAccount {
     pub login_id: LoginId,
-    pub granted_roles: GrantedAuthRoles,
-    pub reset_token_destination: ResetTokenDestination,
-    pub attrs: AuthUserAttributes,
+    pub attrs: AuthUserAccountAttrs,
+    pub reset_token_destination: ResetPasswordTokenDestination,
+}
+
+#[derive(Clone, PartialEq, Eq)]
+pub struct AuthUserAccountAttrs {
+    pub granted: AuthPermissionGranted,
+    pub memo: AuthUserMemo,
 }
 
 impl std::fmt::Display for AuthUserAccount {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{}; [{}]; {}; {}",
-            self.login_id, self.granted_roles, self.reset_token_destination, self.attrs,
+            "{}([{}]/{})",
+            self.login_id, self.attrs.granted, self.reset_token_destination,
         )
     }
 }
-#[derive(Clone, PartialEq, Eq)]
-pub struct AuthUserAttributes(AuthUserAttributesExtract);
 
-impl AuthUserAttributes {
-    pub fn convert(
-        attrs: AuthUserAttributesExtract,
-    ) -> Result<Self, ValidateAuthUserAttributesError> {
-        Ok(Self(attrs.convert()?))
+#[derive(Clone, Eq, PartialEq)]
+pub struct AuthUserMemo(String);
+
+impl AuthUserMemo {
+    pub fn convert(value: impl AuthUserMemoExtract) -> Result<Self, ValidateAuthUserAccountError> {
+        Ok(Self(
+            value
+                .convert()
+                .map_err(ValidateAuthUserAccountError::Memo)?,
+        ))
     }
 
-    pub(in crate::auth) const fn restore(attrs: AuthUserAttributesExtract) -> Self {
-        Self(attrs)
+    pub(in crate::auth) const fn restore(value: String) -> Self {
+        Self(value)
+    }
+    pub(in crate::auth) fn empty() -> Self {
+        Self("".to_owned())
     }
 
-    pub fn extract(self) -> AuthUserAttributesExtract {
+    pub fn extract(self) -> String {
         self.0
     }
 }
 
-impl std::fmt::Display for AuthUserAttributes {
+impl std::fmt::Display for AuthUserMemo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.0.fmt(f)
+        write!(f, "memo: {}", self.0)
     }
 }
 
-#[derive(Clone, PartialEq, Eq)]
-pub struct AuthUserAttributesExtract {
-    pub memo: String,
+pub trait AuthUserMemoExtract {
+    fn convert(self) -> Result<String, ValidateTextError>;
 }
 
-impl Default for AuthUserAttributesExtract {
-    fn default() -> Self {
-        Self { memo: "".into() }
-    }
-}
-
-impl std::fmt::Display for AuthUserAttributesExtract {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "memo: {}", self.memo)
-    }
-}
-
-pub enum ValidateAuthUserAttributesError {
+#[derive(Debug)]
+pub enum ValidateAuthUserAccountError {
+    NotFound,
+    LoginId(ValidateLoginIdError),
+    ResetTokenDestination(ValidateResetPasswordTokenDestinationError),
+    Granted(ValidateAuthPermissionGrantedError),
     Memo(ValidateTextError),
 }
 
-impl std::fmt::Display for ValidateAuthUserAttributesError {
+impl std::fmt::Display for ValidateAuthUserAccountError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
+            Self::NotFound => write!(f, "data not found"),
+            Self::LoginId(err) => err.fmt(f),
+            Self::ResetTokenDestination(err) => err.fmt(f),
+            Self::Granted(err) => err.fmt(f),
             Self::Memo(err) => write!(f, "memo: {}", err),
         }
     }

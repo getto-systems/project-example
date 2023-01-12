@@ -2,21 +2,26 @@ syntax = "proto3";
 
 package auth.ticket.service;
 
-message EncodedAuthTokensPb {
-    AuthTokenPb ticket_token = 1;
-    AuthTokenPb api_token = 2;
-    repeated CloudfrontTokenPb cloudfront_tokens = 3;
+message AuthPermissionGrantedPb {
+    repeated string permissions = 1;
 }
+
 message AuthTokenPb {
-    string token = 1;
-    int64 expires = 2;
+    AuthenticateTokenPb authenticate_token = 1;
+    AuthorizeTokenPb authorize_token = 2;
+    CdnTokenPb cdn_token = 3;
 }
-message CloudfrontTokenPb {
-    CloudfrontTokenKindPb kind = 1;
-    AuthTokenPb token = 2;
+message AuthenticateTokenPb {
+    int64 expires = 1;
+    string token = 2;
 }
-enum CloudfrontTokenKindPb {
-    KeyPairId = 0;
-    Policy = 1;
-    Signature = 2;
+message AuthorizeTokenPb {
+    int64 expires = 1;
+    string token = 2;
+}
+message CdnTokenPb {
+    int64 expires = 1;
+    string aws_cloudfront_key_pair_id = 2;
+    string aws_cloudfront_policy = 3;
+    string aws_cloudfront_signature = 4;
 }

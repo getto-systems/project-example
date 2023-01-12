@@ -4,13 +4,13 @@ import {
     ResetTokenDestinationEmail,
 } from "./data"
 import { ValidateBoardFieldResult } from "../../../../../../z_vendor/getto-application/board/validate_field/data"
-import { converter } from "../../../../../../z_lib/ui/validate/helper"
+import { converter } from "../../../../../../common/util/validate/helper"
 import {
     check_text_empty,
     check_text_invalidEmail,
     check_text_tooLong,
-} from "../../../../../../z_lib/ui/validate/text"
-import { ValidateTextError } from "../../../../../../z_lib/ui/validate/data"
+} from "../../../../../../common/util/validate/text"
+import { ValidateTextError } from "../../../../../../common/util/validate/data"
 
 export function resetTokenDestinationBoardConverter(
     value: Readonly<{ type: string; email: string }>,

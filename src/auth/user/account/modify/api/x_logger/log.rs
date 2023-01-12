@@ -1,6 +1,6 @@
 use super::super::action::{ModifyAuthUserAccountEvent, ModifyAuthUserAccountState};
 
-use crate::z_lib::logger::infra::{LogFilter, LogLevel, LogMessage};
+use crate::common::api::logger::infra::{LogFilter, LogLevel, LogMessage};
 
 impl LogMessage for ModifyAuthUserAccountState {
     fn log_message(&self) -> String {
@@ -11,8 +11,7 @@ impl LogMessage for ModifyAuthUserAccountState {
 impl LogFilter for ModifyAuthUserAccountState {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Authenticate(event) => event.log_level(),
-            Self::PermissionError(event) => event.log_level(),
+            Self::Authorize(event) => event.log_level(),
             Self::ModifyUser(event) => event.log_level(),
         }
     }
@@ -21,7 +20,7 @@ impl LogFilter for ModifyAuthUserAccountState {
 impl LogFilter for ModifyAuthUserAccountEvent {
     fn log_level(&self) -> LogLevel {
         match self {
-            Self::Success => LogLevel::Audit,
+            Self::Success => LogLevel::Important,
             Self::Invalid(_) => LogLevel::Error,
             Self::NotFound => LogLevel::Error,
             Self::Conflict => LogLevel::Error,

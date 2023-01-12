@@ -1,77 +1,56 @@
-pub mod request_decoder;
-pub mod token_encoder;
-pub mod token_generator;
-pub mod token_notifier;
-
-use tonic::metadata::MetadataMap;
-
-use crate::auth::user::password::reset::request_token::y_protobuf::service::RequestResetTokenRequestPb;
+mod request;
+mod token_generator;
+mod token_notifier;
 
 use crate::x_outside_feature::auth::feature::AuthAppFeature;
 
 use crate::auth::{
-    ticket::{kernel::init::clock::ChronoAuthClock, validate::init::ValidateAuthNonceStruct},
+    kernel::init::clock::ChronoAuthClock,
     user::{
         kernel::init::user_repository::dynamodb::DynamoDbAuthUserRepository,
-        password::reset::request_token::init::{
-            request_decoder::PbRequestResetTokenRequestDecoder,
-            token_encoder::JwtResetTokenEncoder, token_generator::UuidResetTokenGenerator,
-            token_notifier::EmailResetTokenNotifier,
+        password::reset::{
+            kernel::init::token::encoder::JwtResetPasswordTokenEncoder,
+            request_token::init::{
+                token_generator::UuidResetTokenGenerator, token_notifier::EmailResetTokenNotifier,
+            },
         },
     },
 };
 
 use super::action::{RequestResetTokenAction, RequestResetTokenMaterial};
 
-use crate::auth::user::password::reset::request_token::infra::RequestResetTokenConfig;
+use crate::auth::user::password::reset::request_token::infra::RequestResetPasswordTokenConfig;
 
-pub struct RequestResetTokenStruct<'a> {
-    validate_nonce: ValidateAuthNonceStruct<'a>,
-
+pub struct ActiveRequestResetTokenMaterial<'a> {
     clock: ChronoAuthClock,
     reset_token_repository: DynamoDbAuthUserRepository<'a>,
     token_generator: UuidResetTokenGenerator,
-    token_encoder: JwtResetTokenEncoder<'a>,
+    token_encoder: JwtResetPasswordTokenEncoder<'a>,
     token_notifier: EmailResetTokenNotifier<'a>,
-    config: RequestResetTokenConfig,
+    config: RequestResetPasswordTokenConfig,
 }
 
-impl<'a> RequestResetTokenStruct<'a> {
-    pub fn action(
-        feature: &'a AuthAppFeature,
-        metadata: &'a MetadataMap,
-        request: RequestResetTokenRequestPb,
-    ) -> RequestResetTokenAction<PbRequestResetTokenRequestDecoder, Self> {
-        RequestResetTokenAction::with_material(
-            PbRequestResetTokenRequestDecoder::new(request),
-            Self {
-                validate_nonce: ValidateAuthNonceStruct::new(feature, metadata),
-
-                clock: ChronoAuthClock::new(),
-                reset_token_repository: DynamoDbAuthUserRepository::new(&feature.store),
-                token_generator: UuidResetTokenGenerator,
-                token_encoder: JwtResetTokenEncoder::new(&feature.reset_token_key),
-                token_notifier: EmailResetTokenNotifier::new(&feature.email),
-                config: RequestResetTokenConfig {
-                    token_expires: feature.config.reset_token_expires,
-                },
+impl<'a> ActiveRequestResetTokenMaterial<'a> {
+    pub fn action(feature: &'a AuthAppFeature) -> RequestResetTokenAction<Self> {
+        RequestResetTokenAction::with_material(Self {
+            clock: ChronoAuthClock::new(),
+            reset_token_repository: DynamoDbAuthUserRepository::new(&feature.store),
+            token_generator: UuidResetTokenGenerator,
+            token_encoder: JwtResetPasswordTokenEncoder::new(&feature.reset_token_key),
+            token_notifier: EmailResetTokenNotifier::new(&feature.email),
+            config: RequestResetPasswordTokenConfig {
+                token_expires: feature.config.reset_token_expires,
             },
-        )
+        })
     }
 }
 
-impl<'a> RequestResetTokenMaterial for RequestResetTokenStruct<'a> {
-    type ValidateNonce = ValidateAuthNonceStruct<'a>;
-
+impl<'a> RequestResetTokenMaterial for ActiveRequestResetTokenMaterial<'a> {
     type Clock = ChronoAuthClock;
     type ResetTokenRepository = DynamoDbAuthUserRepository<'a>;
-    type TokenGenerator = UuidResetTokenGenerator;
-    type TokenEncoder = JwtResetTokenEncoder<'a>;
+    type IdGenerator = UuidResetTokenGenerator;
+    type TokenEncoder = JwtResetPasswordTokenEncoder<'a>;
     type TokenNotifier = EmailResetTokenNotifier<'a>;
-
-    fn validate_nonce(&self) -> &Self::ValidateNonce {
-        &self.validate_nonce
-    }
 
     fn clock(&self) -> &Self::Clock {
         &self.clock
@@ -79,7 +58,7 @@ impl<'a> RequestResetTokenMaterial for RequestResetTokenStruct<'a> {
     fn reset_token_repository(&self) -> &Self::ResetTokenRepository {
         &self.reset_token_repository
     }
-    fn token_generator(&self) -> &Self::TokenGenerator {
+    fn id_generator(&self) -> &Self::IdGenerator {
         &self.token_generator
     }
     fn token_encoder(&self) -> &Self::TokenEncoder {
@@ -88,7 +67,80 @@ impl<'a> RequestResetTokenMaterial for RequestResetTokenStruct<'a> {
     fn token_notifier(&self) -> &Self::TokenNotifier {
         &self.token_notifier
     }
-    fn config(&self) -> &RequestResetTokenConfig {
+    fn config(&self) -> &RequestResetPasswordTokenConfig {
         &self.config
+    }
+}
+
+#[cfg(test)]
+pub mod test {
+    pub use super::request::test::*;
+    pub use super::token_generator::test::*;
+    pub use super::token_notifier::test::*;
+
+    use crate::auth::{
+        kernel::init::clock::test::StaticChronoAuthClock,
+        user::{
+            kernel::init::user_repository::memory::MemoryAuthUserRepository,
+            password::reset::kernel::init::token::encoder::test::StaticResetTokenEncoder,
+        },
+    };
+
+    use crate::auth::user::password::reset::request_token::action::RequestResetTokenMaterial;
+
+    use crate::auth::user::password::reset::request_token::infra::RequestResetPasswordTokenConfig;
+
+    pub struct StaticRequestResetTokenMaterial<'a> {
+        clock: StaticChronoAuthClock,
+        reset_token_repository: MemoryAuthUserRepository<'a>,
+        token_generator: StaticResetTokenGenerator,
+        token_encoder: StaticResetTokenEncoder,
+        token_notifier: StaticResetTokenNotifier,
+        config: RequestResetPasswordTokenConfig,
+    }
+
+    impl<'a> StaticRequestResetTokenMaterial<'a> {
+        pub fn new(
+            clock: StaticChronoAuthClock,
+            reset_token_repository: MemoryAuthUserRepository<'a>,
+            token_generator: StaticResetTokenGenerator,
+            config: RequestResetPasswordTokenConfig,
+        ) -> Self {
+            Self {
+                clock,
+                reset_token_repository,
+                token_generator,
+                token_encoder: StaticResetTokenEncoder,
+                token_notifier: StaticResetTokenNotifier,
+                config,
+            }
+        }
+    }
+
+    impl<'a> RequestResetTokenMaterial for StaticRequestResetTokenMaterial<'a> {
+        type Clock = StaticChronoAuthClock;
+        type ResetTokenRepository = MemoryAuthUserRepository<'a>;
+        type IdGenerator = StaticResetTokenGenerator;
+        type TokenEncoder = StaticResetTokenEncoder;
+        type TokenNotifier = StaticResetTokenNotifier;
+
+        fn clock(&self) -> &Self::Clock {
+            &self.clock
+        }
+        fn reset_token_repository(&self) -> &Self::ResetTokenRepository {
+            &self.reset_token_repository
+        }
+        fn id_generator(&self) -> &Self::IdGenerator {
+            &self.token_generator
+        }
+        fn token_encoder(&self) -> &Self::TokenEncoder {
+            &self.token_encoder
+        }
+        fn token_notifier(&self) -> &Self::TokenNotifier {
+            &self.token_notifier
+        }
+        fn config(&self) -> &RequestResetPasswordTokenConfig {
+            &self.config
+        }
     }
 }

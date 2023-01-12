@@ -1,24 +1,23 @@
-import { readSearchOffset, updateSearchOffset } from "../../../../z_lib/ui/search/offset/convert"
-import { readSearchSort, updateSearchSort } from "../../../../z_lib/ui/search/sort/convert"
+import { readSearchOffset, updateSearchOffset } from "../../../../common/util/search/offset/convert"
+import { readSearchSort, updateSearchSort } from "../../../../common/util/search/sort/convert"
 import {
-    readMultipleValueFilter,
-    readSingleValueFilter,
-    updateMultipleValueFilter,
-    updateSingleValueFilter,
-} from "../../../../z_lib/ui/search/kernel/convert"
+    readSearchMultipleValueFilter,
+    readSearchTextFilter,
+    updateSearchMultipleValueFilter,
+    updateSearchTextFilter,
+} from "../../../../common/util/search/kernel/convert"
 
 import {
     defaultSearchAuthUserAccountSort,
     SearchAuthUserAccountFilter,
+    SearchAuthUserAccountFilterProps,
     SearchAuthUserAccountSortKey,
+    searchAuthUserAccountSortKeys,
 } from "./data"
-import { ReadSearchSortKeyResult } from "../../../../z_lib/ui/search/sort/data"
+import { ReadSearchSortKeyResult } from "../../../../common/util/search/sort/data"
 import { AuthUserAccount } from "../kernel/data"
-import { toGrantedRoles } from "../input/granted_roles/convert"
-import { DetectFocusListKeyResult } from "../../../../z_lib/ui/list/data"
-
-const FILTER_LOGIN_ID = "filter-login-id" as const
-const FILTER_GRANTED_ROLES = "filter-granted-roles" as const
+import { toGranted } from "../input/granted/convert"
+import { DetectFocusListKeyResult } from "../../../../common/util/list/data"
 
 const FOCUS_ID = "id" as const
 
@@ -31,20 +30,19 @@ export function detectSearchAuthUserAccountFilter(currentURL: URL): SearchAuthUs
             defaultSearchAuthUserAccountSort,
             readSearchAuthUserAccountSortKey,
         ),
-        loginId: readSingleValueFilter(params, FILTER_LOGIN_ID),
-        grantedRoles: toGrantedRoles(readMultipleValueFilter(params, FILTER_GRANTED_ROLES)),
+        loginId: readSearchTextFilter(params, filterName("loginId")),
+        granted: toGranted(readSearchMultipleValueFilter(params, filterName("granted"))),
     }
 }
 export function readSearchAuthUserAccountSortKey(
     key: string,
 ): ReadSearchSortKeyResult<SearchAuthUserAccountSortKey> {
-    switch (key) {
-        case "loginId":
+    for (const sortKey of searchAuthUserAccountSortKeys) {
+        if (key === sortKey) {
             return { found: true, key }
-
-        default:
-            return { found: false }
+        }
     }
+    return { found: false }
 }
 
 export function detectFocusAuthUserAccount(currentURL: URL): DetectFocusListKeyResult {
@@ -60,11 +58,26 @@ export function updateSearchAuthUserAccountFilterQuery(
     filter: SearchAuthUserAccountFilter,
 ): URL {
     let url = new URL(currentURL.toString())
-    url = updateSingleValueFilter(url, FILTER_LOGIN_ID, filter.loginId)
-    url = updateMultipleValueFilter(url, FILTER_GRANTED_ROLES, filter.grantedRoles)
-    url = updateSearchOffset(url, filter.offset)
-    url = updateSearchSort(url, filter.sort)
+    for (const key of Object.keys(filter)) {
+        url = updateQuery(url, key as keyof SearchAuthUserAccountFilter)
+    }
     return url
+
+    function updateQuery(url: URL, key: keyof SearchAuthUserAccountFilter): URL {
+        switch (key) {
+            case "offset":
+                return updateSearchOffset(url, filter.offset)
+
+            case "sort":
+                return updateSearchSort(url, filter.sort)
+
+            case "loginId":
+                return updateSearchTextFilter(url, filterName(key), filter[key])
+
+            case "granted":
+                return updateSearchMultipleValueFilter(url, filterName(key), filter[key])
+        }
+    }
 }
 export function updateFocusAuthUserAccountQuery(currentURL: URL, user: AuthUserAccount): URL {
     const url = new URL(currentURL.toString())
@@ -75,4 +88,8 @@ export function clearFocusAuthUserAccountQuery(currentURL: URL): URL {
     const url = new URL(currentURL.toString())
     url.searchParams.delete(FOCUS_ID)
     return url
+}
+
+function filterName(key: keyof SearchAuthUserAccountFilterProps): string {
+    return `filter-${key}`
 }

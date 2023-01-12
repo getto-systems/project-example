@@ -1,15 +1,15 @@
 import { staticMenuPath, StaticMenuPath } from "../../y_environment/ui/path"
 
-import { MenuPermission, MenuTree, MenuTreeNode } from "../../common/outline/load/infra"
+import { MenuPermissionRequired, MenuTree, MenuTreeNode } from "../../common/outline/load/infra"
 
-import { Icon } from "../../z_lib/ui/icon/data"
+import { Icon } from "../../common/util/icon/data"
 
 export function category(
     label: string,
-    permission: MenuPermission,
+    permission: MenuPermissionRequired,
     children: MenuTree,
 ): MenuTreeNode {
-    return { type: "category", category: { label, permission }, children }
+    return { type: "category", category: { label, required: permission }, children }
 }
 
 export function item(label: string, icon: Icon, path: StaticMenuPath): MenuTreeNode {

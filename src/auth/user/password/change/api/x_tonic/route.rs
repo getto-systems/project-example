@@ -8,24 +8,15 @@ use crate::auth::user::password::change::y_protobuf::service::{
     OverwritePasswordResponsePb,
 };
 
-use crate::x_outside_feature::auth::{
-    feature::{extract_auth_request, AuthTonicRequest},
-    logger::app_logger,
+use crate::x_outside_feature::auth::{feature::AuthTonicRequest, logger::AuthLogger};
+
+use crate::auth::user::password::change::init::{
+    ActiveChangePasswordMaterial, ActiveOverwritePasswordMaterial,
 };
 
-use crate::x_content::metadata::metadata_request_id;
-
-use crate::auth::user::password::change::init::{ChangePasswordFeature, OverwritePasswordFeature};
-
-use crate::z_lib::{logger::infra::Logger, response::tonic::ServiceResponder};
+use crate::common::api::{logger::infra::Logger, response::tonic::ServiceResponder};
 
 pub struct ServiceChangePassword;
-
-impl ServiceChangePassword {
-    pub const fn name() -> &'static str {
-        "auth.user.password.change"
-    }
-}
 
 #[async_trait::async_trait]
 impl ChangePasswordPb for ServiceChangePassword {
@@ -37,24 +28,18 @@ impl ChangePasswordPb for ServiceChangePassword {
             feature,
             metadata,
             request,
-        } = extract_auth_request(request);
-        let request_id = metadata_request_id(&metadata);
+            request_id,
+        } = AuthTonicRequest::from_request(request);
 
-        let logger = app_logger(Self::name(), request_id.into());
-        let mut action = ChangePasswordFeature::action(&feature, &metadata, request);
+        let mut action = ActiveChangePasswordMaterial::action(&feature, request_id.clone());
+        let logger = AuthLogger::default(&feature, action.info.name(), request_id);
         action.subscribe(move |state| logger.log(state));
 
-        flatten(action.ignite().await).respond_to()
+        flatten(action.ignite(&metadata, request).await).respond_to()
     }
 }
 
 pub struct ServiceOverwritePassword;
-
-impl ServiceOverwritePassword {
-    pub const fn name() -> &'static str {
-        "auth.user.password.overwrite"
-    }
-}
 
 #[async_trait::async_trait]
 impl OverwritePasswordPb for ServiceOverwritePassword {
@@ -66,13 +51,13 @@ impl OverwritePasswordPb for ServiceOverwritePassword {
             feature,
             metadata,
             request,
-        } = extract_auth_request(request);
-        let request_id = metadata_request_id(&metadata);
+            request_id,
+        } = AuthTonicRequest::from_request(request);
 
-        let logger = app_logger(Self::name(), request_id.into());
-        let mut action = OverwritePasswordFeature::action(&feature, &metadata, request);
+        let mut action = ActiveOverwritePasswordMaterial::action(&feature, request_id.clone());
+        let logger = AuthLogger::default(&feature, action.info.name(), request_id);
         action.subscribe(move |state| logger.log(state));
 
-        flatten(action.ignite().await).respond_to()
+        flatten(action.ignite(&metadata, request).await).respond_to()
     }
 }

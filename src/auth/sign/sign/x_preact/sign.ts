@@ -5,7 +5,7 @@ import { html } from "htm/preact"
 import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
 import { ApplicationError } from "../../../../avail/x_preact/application_error"
-import { CheckAuthTicket } from "../../../ticket/check/x_preact/check_ticket"
+import { CheckAuthTicket } from "../../../ticket/authenticate/x_preact/check_ticket"
 import { AuthenticatePassword } from "../../../user/password/authenticate/x_preact/authenticate_password"
 import { RequestResetToken } from "../../../user/password/reset/request_token/x_preact/request_token"
 import { ResetPassword } from "../../../user/password/reset/reset/x_preact/reset_password"

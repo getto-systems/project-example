@@ -1,32 +1,29 @@
 use serde::Serialize;
 
-use crate::z_lib::logger::init::{InfoLogger, QuietLogger, VerboseLogger};
+use crate::x_outside_feature::{core::feature::CoreAppFeature, data::RequestId};
 
-use crate::z_lib::logger::infra::Logger;
+use crate::common::api::logger::init::JsonLogger;
 
-pub fn app_logger(target: &'static str, id: String) -> impl Logger {
-    // アプリケーション全体で使用するデフォルトの logger を返す
-    // 個別のアクションでレベルを指定したい時はそれぞれ個別のやつを呼び出す
-    verbose_logger(target, id)
-}
-pub fn quiet_logger(target: &'static str, id: String) -> impl Logger {
-    QuietLogger::with_request(RequestEntry::new(target, id))
-}
-pub fn info_logger(target: &'static str, id: String) -> impl Logger {
-    InfoLogger::with_request(RequestEntry::new(target, id))
-}
-pub fn verbose_logger(target: &'static str, id: String) -> impl Logger {
-    VerboseLogger::with_request(RequestEntry::new(target, id))
+pub struct CoreLogger;
+
+impl CoreLogger {
+    pub fn default(
+        feature: &CoreAppFeature,
+        target: &'static str,
+        request_id: RequestId,
+    ) -> JsonLogger<RequestEntry> {
+        JsonLogger::new(feature.log_level, RequestEntry::new(target, request_id))
+    }
 }
 
 #[derive(Debug, Clone, Serialize)]
-struct RequestEntry {
-    id: String,
+pub struct RequestEntry {
+    id: RequestId,
     target: &'static str,
 }
 
 impl RequestEntry {
-    fn new(target: &'static str, id: String) -> Self {
+    fn new(target: &'static str, id: RequestId) -> Self {
         Self { id, target }
     }
 }

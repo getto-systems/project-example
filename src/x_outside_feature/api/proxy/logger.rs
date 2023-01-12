@@ -1,39 +1,34 @@
 use actix_web::HttpRequest;
 use serde::Serialize;
-use uuid::Uuid;
 
-use crate::z_lib::logger::init::{InfoLogger, QuietLogger, VerboseLogger};
+use crate::x_outside_feature::{data::RequestId, proxy::feature::ProxyAppFeature};
 
-use crate::z_lib::logger::infra::Logger;
+use crate::common::api::logger::init::JsonLogger;
 
-pub fn generate_request_id() -> String {
-    Uuid::new_v4().to_string()
-}
+pub struct ProxyLogger;
 
-pub fn app_logger(id: String, request: &HttpRequest) -> impl Logger {
-    // アプリケーション全体で使用するデフォルトの logger を返す
-    // 個別のアクションでレベルを指定したい時はそれぞれ個別のやつを呼び出す
-    verbose_logger(id, request)
-}
-pub fn quiet_logger(id: String, request: &HttpRequest) -> impl Logger {
-    QuietLogger::with_request(RequestEntry::new(id, request))
-}
-pub fn info_logger(id: String, request: &HttpRequest) -> impl Logger {
-    InfoLogger::with_request(RequestEntry::new(id, request))
-}
-pub fn verbose_logger(id: String, request: &HttpRequest) -> impl Logger {
-    VerboseLogger::with_request(RequestEntry::new(id, request))
+impl ProxyLogger {
+    pub fn default(
+        feature: &ProxyAppFeature,
+        request: &HttpRequest,
+    ) -> (RequestId, JsonLogger<RequestEntry>) {
+        let id = RequestId::generate();
+        (
+            id.clone(),
+            JsonLogger::new(feature.log_level, RequestEntry::new(id, request)),
+        )
+    }
 }
 
 #[derive(Debug, Clone, Serialize)]
-struct RequestEntry {
-    id: String,
+pub struct RequestEntry {
+    id: RequestId,
     path: String,
     method: String,
 }
 
 impl RequestEntry {
-    fn new(id: String, request: &HttpRequest) -> Self {
+    fn new(id: RequestId, request: &HttpRequest) -> Self {
         Self {
             id,
             path: request.path().to_string(),

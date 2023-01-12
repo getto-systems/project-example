@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package common.api.search.service;
+
+message SearchSortPb {
+    string key = 1;
+    string order = 2;
+}
+
+message SearchPagePb {
+    int32 offset = 1;
+    int32 limit = 2;
+    int32 count = 3;
+}

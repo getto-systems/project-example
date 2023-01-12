@@ -4,11 +4,11 @@ import pb from "../../../../y_protobuf/proto.js"
 import {
     fetchRepositoryRemovedResult,
     mapFetchRepositoryResult,
-} from "../../../../z_lib/ui/repository/init/helper"
+} from "../../../util/repository/init/helper"
 import { decodeProtobuf, encodeProtobuf } from "../../../../z_vendor/protobuf/helper"
-import { IndexedDBTarget, initIndexedDB } from "../../../../z_lib/ui/repository/init/indexed_db"
+import { IndexedDBTarget, initIndexedDB } from "../../../util/repository/init/indexed_db"
 
-import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/feature"
+import { RepositoryOutsideFeature } from "../../../util/repository/feature"
 
 import { MenuExpandRepository, MenuExpandRepositoryValue } from "../infra"
 

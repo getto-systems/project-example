@@ -1,16 +1,18 @@
 import {
     initMultipleFilterAction,
     MultipleFilterAction,
-} from "../../../../../z_lib/ui/input/filter/multiple"
+} from "../../../../../common/util/input/filter/multiple"
 
-import { AuthRole } from "../../../kernel/data"
+import { AuthPermission } from "../../../kernel/data"
 
-export type AuthUserGrantedRolesFilterAction = MultipleFilterAction
+export type AuthPermissionGrantedFilterAction = MultipleFilterAction
 
-export function initAuthUserGrantedRolesFilterAction(initial: readonly AuthRole[]): Readonly<{
-    input: AuthUserGrantedRolesFilterAction
-    setOptions: { (state: readonly AuthRole[]): void }
-    pin: () => readonly AuthRole[]
+export function initAuthPermissionGrantedFilterAction(
+    initial: readonly AuthPermission[],
+): Readonly<{
+    input: AuthPermissionGrantedFilterAction
+    setOptions: { (state: readonly AuthPermission[]): void }
+    pin: () => readonly AuthPermission[]
 }> {
     return initMultipleFilterAction({
         initial,

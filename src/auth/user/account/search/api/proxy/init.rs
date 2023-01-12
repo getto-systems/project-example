@@ -1,41 +1,28 @@
-mod proxy_service;
+mod proxy_call;
 
-use actix_web::HttpRequest;
+use crate::x_outside_feature::{data::RequestId, proxy::feature::ProxyAppFeature};
 
-use crate::auth::x_outside_feature::feature::AuthProxyOutsideFeature;
-
-use crate::auth::{
-    ticket::validate::init::ValidateApiMetadataStruct,
-    user::account::search::proxy::init::proxy_service::ProxyService,
+use crate::{
+    auth::user::account::search::proxy::init::proxy_call::TonicSearchAuthUserAccountProxyCall,
+    common::proxy::init::ActiveCoreProxyMaterial,
 };
 
-use crate::auth::proxy::action::{AuthProxyAction, AuthProxyMaterial};
+use crate::{
+    auth::user::account::search::action::SearchAuthUserAccountActionInfo,
+    common::proxy::action::CoreProxyAction,
+};
 
-pub struct SearchAuthUserAccountProxyStruct<'a> {
-    validate: ValidateApiMetadataStruct<'a>,
-    proxy_service: ProxyService<'a>,
-}
+pub type ActiveSearchAuthUserAccountProxyMaterial<'a> =
+    ActiveCoreProxyMaterial<'a, TonicSearchAuthUserAccountProxyCall<'a>>;
 
-impl<'a> SearchAuthUserAccountProxyStruct<'a> {
-    pub fn action(
-        feature: &'a AuthProxyOutsideFeature,
-        request_id: &'a str,
-        request: &'a HttpRequest,
-        body: String,
-    ) -> AuthProxyAction<Self> {
-        AuthProxyAction::with_material(Self {
-            validate: ValidateApiMetadataStruct::new(&feature.decoding_key, request),
-            proxy_service: ProxyService::new(&feature.service, request_id, body),
-        })
-    }
-}
-
-#[async_trait::async_trait]
-impl<'a> AuthProxyMaterial for SearchAuthUserAccountProxyStruct<'a> {
-    type Validate = ValidateApiMetadataStruct<'a>;
-    type ProxyService = ProxyService<'a>;
-
-    fn extract(self) -> (Self::Validate, Self::ProxyService) {
-        (self.validate, self.proxy_service)
+impl<'a> ActiveSearchAuthUserAccountProxyMaterial<'a> {
+    pub fn action(feature: &'a ProxyAppFeature, request_id: RequestId) -> CoreProxyAction<Self> {
+        CoreProxyAction::with_material(
+            SearchAuthUserAccountActionInfo.params(),
+            ActiveCoreProxyMaterial::new(
+                &feature.auth.decoding_key,
+                TonicSearchAuthUserAccountProxyCall::new(&feature.core, request_id),
+            ),
+        )
     }
 }

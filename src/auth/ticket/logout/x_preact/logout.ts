@@ -4,8 +4,8 @@ import { html } from "htm/preact"
 
 import { env } from "../../../../y_environment/ui/env"
 
-import { remoteCommonErrorReason } from "../../../../z_lib/ui/remote/x_error/reason"
-import { repositoryErrorReason } from "../../../../z_lib/ui/repository/x_error/reason"
+import { remoteCommonErrorReason } from "../../../../common/util/remote/x_error/reason"
+import { repositoryErrorReason } from "../../../../common/util/repository/x_error/reason"
 
 import { useApplicationState } from "../../../../z_vendor/getto-application/action/x_preact/hooks"
 
@@ -16,8 +16,8 @@ import { v_small } from "../../../../z_vendor/getto-css/preact/design/alignment"
 
 import { LogoutAction } from "../action"
 
-import { RepositoryError } from "../../../../z_lib/ui/repository/data"
-import { RemoteCommonError } from "../../../../z_lib/ui/remote/data"
+import { RepositoryError } from "../../../../common/util/repository/data"
+import { RemoteCommonError } from "../../../../common/util/remote/data"
 
 type Props = Readonly<{
     logout: LogoutAction

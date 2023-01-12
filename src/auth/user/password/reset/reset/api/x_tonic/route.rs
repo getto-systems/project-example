@@ -6,24 +6,13 @@ use crate::auth::user::password::reset::reset::y_protobuf::service::{
     reset_password_pb_server::ResetPasswordPb, ResetPasswordRequestPb, ResetPasswordResponsePb,
 };
 
-use crate::x_outside_feature::auth::{
-    feature::{extract_auth_request, AuthTonicRequest},
-    logger::app_logger,
-};
+use crate::x_outside_feature::auth::{feature::AuthTonicRequest, logger::AuthLogger};
 
-use crate::x_content::metadata::metadata_request_id;
+use crate::auth::user::password::reset::reset::init::ActiveResetPasswordMaterial;
 
-use crate::auth::user::password::reset::reset::init::ResetPasswordFeature;
-
-use crate::z_lib::{logger::infra::Logger, response::tonic::ServiceResponder};
+use crate::common::api::{logger::infra::Logger, response::tonic::ServiceResponder};
 
 pub struct ServiceReset;
-
-impl ServiceReset {
-    pub const fn name() -> &'static str {
-        "auth.user.password.reset"
-    }
-}
 
 #[async_trait::async_trait]
 impl ResetPasswordPb for ServiceReset {
@@ -33,15 +22,15 @@ impl ResetPasswordPb for ServiceReset {
     ) -> Result<Response<ResetPasswordResponsePb>, Status> {
         let AuthTonicRequest {
             feature,
-            metadata,
             request,
-        } = extract_auth_request(request);
-        let request_id = metadata_request_id(&metadata);
+            request_id,
+            ..
+        } = AuthTonicRequest::from_request(request);
 
-        let logger = app_logger(Self::name(), request_id.into());
-        let mut action = ResetPasswordFeature::action(&feature, &metadata, request);
+        let mut action = ActiveResetPasswordMaterial::action(&feature);
+        let logger = AuthLogger::default(&feature, action.info.name(), request_id);
         action.subscribe(move |state| logger.log(state));
 
-        flatten(action.ignite().await).respond_to()
+        flatten(action.ignite(request).await).respond_to()
     }
 }

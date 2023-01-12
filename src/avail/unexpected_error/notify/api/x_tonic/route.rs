@@ -6,24 +6,13 @@ use crate::avail::unexpected_error::notify::y_protobuf::service::{
     notify_pb_server::NotifyPb, NotifyRequestPb, NotifyResponsePb,
 };
 
-use crate::x_outside_feature::core::{
-    feature::{extract_core_request, CoreTonicRequest},
-    logger::app_logger,
-};
+use crate::x_outside_feature::core::{feature::CoreTonicRequest, logger::CoreLogger};
 
-use crate::x_content::metadata::metadata_request_id;
+use crate::avail::unexpected_error::notify::init::ActiveNotifyUnexpectedErrorMaterial;
 
-use crate::avail::unexpected_error::notify::init::NotifyUnexpectedErrorFeature;
-
-use crate::z_lib::{logger::infra::Logger, response::tonic::ServiceResponder};
+use crate::common::api::{logger::infra::Logger, response::tonic::ServiceResponder};
 
 pub struct ServiceNotify;
-
-impl ServiceNotify {
-    pub const fn name() -> &'static str {
-        "avail.unexpected_error.notify"
-    }
-}
 
 #[async_trait::async_trait]
 impl NotifyPb for ServiceNotify {
@@ -35,14 +24,13 @@ impl NotifyPb for ServiceNotify {
             metadata,
             feature,
             request,
-        } = extract_core_request(request);
-        let request_id = metadata_request_id(&metadata);
-        let logger = app_logger(Self::name(), request_id.into());
+            request_id,
+        } = CoreTonicRequest::from_request(request);
 
-        let mut action =
-            NotifyUnexpectedErrorFeature::action(&feature, &request_id, &metadata, request);
+        let mut action = ActiveNotifyUnexpectedErrorMaterial::action(&feature, request_id.clone());
+        let logger = CoreLogger::default(&feature, action.info.name(), request_id);
         action.subscribe(move |state| logger.log(state));
 
-        flatten(action.ignite().await).respond_to()
+        flatten(action.ignite(&metadata, request).await).respond_to()
     }
 }

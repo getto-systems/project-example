@@ -2,12 +2,12 @@ import {
     ApplicationState,
     initApplicationState,
 } from "../../../z_vendor/getto-application/action/action"
-import { CheckAuthTicketAction } from "../../ticket/check/action"
+import { AuthenticateWithTokenAction } from "../../ticket/authenticate/action"
 import { AuthenticatePasswordAction } from "../../user/password/authenticate/action"
 import { RequestResetTokenAction } from "../../user/password/reset/request_token/action"
 import { ResetPasswordAction } from "../../user/password/reset/reset/action"
 
-import { ConvertLocationResult } from "../../../z_lib/ui/location/data"
+import { ConvertLocationResult } from "../../../common/util/location/data"
 import { SignViewType } from "../router/data"
 import { SignViewTypeDetecter } from "../router/infra"
 
@@ -16,7 +16,7 @@ export interface SignAction {
 }
 
 export interface SignViewFactory {
-    check(): CheckAuthTicketAction
+    check(): AuthenticateWithTokenAction
 
     password_authenticate(): AuthenticatePasswordAction
 
@@ -27,7 +27,7 @@ export interface SignViewFactory {
 export type SignActionState =
     | Readonly<{ type: "initial" }>
     | Readonly<{ type: "static-privacyPolicy" }>
-    | View<"authTicket-check", CheckAuthTicketAction>
+    | View<"authTicket-check", AuthenticateWithTokenAction>
     | View<"password-authenticate", AuthenticatePasswordAction>
     | View<"password-reset-requestToken", RequestResetTokenAction>
     | View<"password-reset", ResetPasswordAction>

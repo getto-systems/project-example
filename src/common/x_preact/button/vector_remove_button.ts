@@ -6,9 +6,9 @@ import { VNodeContent } from "../../../z_vendor/getto-css/preact/common"
 import { button_delete } from "../../../z_vendor/getto-css/preact/design/form"
 
 import { icon_remove } from "../../../x_content/icon"
-import { iconHtml } from "../../../z_lib/ui/icon/x_preact/icon"
+import { iconHtml } from "../../util/icon/x_preact/icon"
 
-import { Icon } from "../../../z_lib/ui/icon/data"
+import { Icon } from "../../util/icon/data"
 
 type Props = Readonly<{
     label?: VNodeContent

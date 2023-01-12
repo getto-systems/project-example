@@ -3,27 +3,27 @@ import {
     initApplicationState,
 } from "../../../../z_vendor/getto-application/action/action"
 
-import { checkTakeLongtime, ticker } from "../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime, ticker } from "../../../../common/util/timer/helper"
 
 import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
 import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
 import {
     AuthUserTextFieldAction,
-    AuthUserGrantedRolesFieldAction,
+    AuthPermissionGrantedFieldAction,
     initAuthUserTextFieldAction,
-    initAuthUserGrantedRolesFieldAction,
+    initAuthPermissionGrantedFieldAction,
 } from "../input/field/action"
 import {
     initModifyField,
     modifyField,
     ModifyFieldHandler,
-} from "../../../../z_lib/ui/modify/action"
+} from "../../../../common/util/modify/action"
 import { EditableBoardAction } from "../../../../z_vendor/getto-application/board/editable/action"
 
-import { ALL_AUTH_ROLES } from "../../../../x_content/role"
+import { ALL_AUTH_PERMISSIONS } from "../../../../x_content/permission"
 
 import { ModifyAuthUserAccountRemote } from "./infra"
-import { WaitTime } from "../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../common/util/config/infra"
 
 import { ModifyAuthUserAccountError, ModifyAuthUserAccountFields } from "./data"
 import { LoginId } from "../../login_id/kernel/data"
@@ -32,7 +32,7 @@ import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board
 export interface ModifyAuthUserAccountAction {
     readonly state: ApplicationState<ModifyAuthUserAccountState>
     readonly memo: AuthUserTextFieldAction<"memo">
-    readonly grantedRoles: AuthUserGrantedRolesFieldAction
+    readonly granted: AuthPermissionGrantedFieldAction
     readonly validate: ValidateBoardAction
     readonly observe: ObserveBoardAction
     readonly editable: EditableBoardAction
@@ -71,20 +71,20 @@ export function initModifyAuthUserAccountAction(material: ModifyAuthUserAccountM
     const { state, post } = initApplicationState({ initialState })
 
     const memo = initAuthUserTextFieldAction("memo")
-    const grantedRoles = initAuthUserGrantedRolesFieldAction()
+    const granted = initAuthPermissionGrantedFieldAction()
 
     const convert = (): ConvertBoardResult<ModifyAuthUserAccountFields> => {
         const result = {
-            grantedRoles: grantedRoles.input.validate.check(),
+            granted: granted.input.validate.check(),
             memo: memo.validate.check(),
         }
-        if (!result.grantedRoles.valid || !result.memo.valid) {
+        if (!result.granted.valid || !result.memo.valid) {
             return { valid: false }
         }
         return {
             valid: true,
             value: {
-                grantedRoles: result.grantedRoles.value,
+                granted: result.granted.value,
                 memo: result.memo.value,
             },
         }
@@ -94,15 +94,15 @@ export function initModifyAuthUserAccountAction(material: ModifyAuthUserAccountM
         [
             modifyField("memo", memo, (data: ModifyAuthUserAccountEntry) => data.memo),
             modifyField(
-                "grantedRoles",
-                grantedRoles.input,
-                (data: ModifyAuthUserAccountEntry) => data.grantedRoles,
+                "granted",
+                granted.input,
+                (data: ModifyAuthUserAccountEntry) => data.granted,
             ),
         ],
         convert,
     )
 
-    grantedRoles.setOptions(ALL_AUTH_ROLES)
+    granted.setOptions(ALL_AUTH_PERMISSIONS)
 
     onSuccess(() => {
         editable.close()
@@ -113,7 +113,7 @@ export function initModifyAuthUserAccountAction(material: ModifyAuthUserAccountM
             state,
 
             memo,
-            grantedRoles: grantedRoles.input,
+            granted: granted.input,
 
             validate,
             observe,

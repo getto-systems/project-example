@@ -1,25 +1,18 @@
 import { env } from "../../../../y_environment/ui/env"
 import pb from "../../../../y_protobuf/proto.js"
 
-import {
-    fetchOptions,
-    generateNonce,
-    remoteCommonError,
-    remoteInfraError,
-} from "../../../../z_lib/ui/remote/init/helper"
+import { fetchOptions, remoteCommonError, remoteInfraError } from "../../../util/remote/init/helper"
 import { decodeProtobuf } from "../../../../z_vendor/protobuf/helper"
-
-import { RemoteOutsideFeature } from "../../../../z_lib/ui/remote/feature"
 
 import { LoadMenuBadgeRemote, LoadMenuBadgeRemoteResult, MenuBadgeItem } from "../infra"
 
 import { convertMenuBadgeRemote } from "../convert"
 import { decodeOutlineMenuBadgePath } from "../../../../x_content/menu/badge"
 
-export function newLoadMenuBadgeRemote(feature: RemoteOutsideFeature): LoadMenuBadgeRemote {
-    return () => fetchRemote(feature)
+export function newLoadMenuBadgeRemote(): LoadMenuBadgeRemote {
+    return () => fetchRemote()
 }
-async function fetchRemote(feature: RemoteOutsideFeature): Promise<LoadMenuBadgeRemoteResult> {
+async function fetchRemote(): Promise<LoadMenuBadgeRemoteResult> {
     try {
         const mock = false
         if (mock) {
@@ -30,7 +23,6 @@ async function fetchRemote(feature: RemoteOutsideFeature): Promise<LoadMenuBadge
             serverURL: env.apiServerURL,
             path: "/common/outline/menu-badge",
             method: "GET",
-            headers: [[env.apiServerNonceHeader, generateNonce(feature)]],
         })
         const response = await fetch(opts.url, opts.options)
 

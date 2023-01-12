@@ -1,6 +1,7 @@
 use std::env::var;
 
 pub struct ProxyEnv {
+    pub log_level: String,
     pub port: String,
 
     pub domain: String,
@@ -11,13 +12,14 @@ pub struct ProxyEnv {
     pub auth_service_url: String,
     pub core_service_url: String,
 
-    pub ticket_public_key: String,
-    pub api_public_key: String,
+    pub authenticate_public_key: String,
+    pub authorize_public_key: String,
 }
 
 impl ProxyEnv {
     pub fn new() -> Self {
         Self {
+            log_level: load("PROXY_LOG_LEVEL"),
             port: load("PORT"),
 
             domain: load("DOMAIN"),
@@ -28,8 +30,8 @@ impl ProxyEnv {
             auth_service_url: load("AUTH_SERVICE_URL"),
             core_service_url: load("CORE_SERVICE_URL"),
 
-            ticket_public_key: load("SECRET_TICKET_PUBLIC_KEY"),
-            api_public_key: load("SECRET_API_PUBLIC_KEY"),
+            authenticate_public_key: load("SECRET_AUTHENTICATE_PUBLIC_KEY"),
+            authorize_public_key: load("SECRET_AUTHORIZE_PUBLIC_KEY"),
         }
     }
 }

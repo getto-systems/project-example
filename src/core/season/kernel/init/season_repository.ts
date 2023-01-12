@@ -2,14 +2,14 @@ import { env } from "../../../../y_environment/ui/env"
 import pb from "../../../../y_protobuf/proto.js"
 
 import { decodeProtobuf, encodeProtobuf } from "../../../../z_vendor/protobuf/helper"
-import { IndexedDBTarget, initIndexedDB } from "../../../../z_lib/ui/repository/init/indexed_db"
+import { IndexedDBTarget, initIndexedDB } from "../../../../common/util/repository/init/indexed_db"
 
-import { RepositoryOutsideFeature } from "../../../../z_lib/ui/repository/feature"
+import { RepositoryOutsideFeature } from "../../../../common/util/repository/feature"
 
 import { SeasonRepository, SeasonRepositoryValue } from "../infra"
 
 import { seasonRepositoryConverter } from "../convert"
-import { convertDB } from "../../../../z_lib/ui/repository/init/convert"
+import { convertDB } from "../../../../common/util/repository/init/convert"
 
 import { Season } from "../data"
 

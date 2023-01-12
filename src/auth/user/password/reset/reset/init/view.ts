@@ -1,27 +1,26 @@
 import { newResetPasswordConfig } from "./config"
 
 import { newGetScriptPathShell } from "../../../../../sign/get_script_path/init/infra"
-import { toURL } from "../../../../../../z_lib/ui/location/init"
-import { newClock } from "../../../../../../z_lib/ui/clock/init"
+import { toURL } from "../../../../../../common/util/location/init"
+import { newClock } from "../../../../../../common/util/clock/init"
 import { newAuthTicketRepository } from "../../../../../ticket/kernel/init/ticket_repository"
-import { newCheckAuthTicketRemote } from "../../../../../ticket/check/init/check_remote"
+import { newCheckAuthTicketRemote } from "../../../../../ticket/authenticate/init/check_remote"
 import { newResetPasswordRemote } from "./reset_remote"
 
 import { detectResetToken } from "../convert"
 
-import { RemoteOutsideFeature } from "../../../../../../z_lib/ui/remote/feature"
-import { RepositoryOutsideFeature } from "../../../../../../z_lib/ui/repository/feature"
-import { LocationOutsideFeature } from "../../../../../../z_lib/ui/location/feature"
+import { RepositoryOutsideFeature } from "../../../../../../common/util/repository/feature"
+import { LocationOutsideFeature } from "../../../../../../common/util/location/feature"
 
 import { initResetPasswordAction, ResetPasswordAction } from "../action"
 
-type OutsideFeature = RemoteOutsideFeature & RepositoryOutsideFeature & LocationOutsideFeature
+type OutsideFeature = RepositoryOutsideFeature & LocationOutsideFeature
 export function newResetPasswordAction(feature: OutsideFeature): ResetPasswordAction {
     return initResetPasswordAction({
         infra: {
             ticketRepository: newAuthTicketRepository(feature),
-            renewRemote: newCheckAuthTicketRemote(feature, newClock()),
-            resetRemote: newResetPasswordRemote(feature, newClock()),
+            renewRemote: newCheckAuthTicketRemote(newClock()),
+            resetRemote: newResetPasswordRemote(newClock()),
             clock: newClock(),
         },
         shell: {

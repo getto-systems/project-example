@@ -3,12 +3,12 @@ import {
     initApplicationState,
 } from "../../../../z_vendor/getto-application/action/action"
 import { EditableBoardAction } from "../../../../z_vendor/getto-application/board/editable/action"
-import { initEditableDataHandler, ModifyFieldHandler } from "../../../../z_lib/ui/modify/action"
+import { initEditableDataHandler, ModifyFieldHandler } from "../../../../common/util/modify/action"
 
-import { checkTakeLongtime } from "../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime } from "../../../../common/util/timer/helper"
 
 import { UnregisterAuthUserAccountRemote } from "./infra"
-import { WaitTime } from "../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../common/util/config/infra"
 
 import { UnregisterAuthUserAccountError } from "./data"
 import { LoginId } from "../../login_id/kernel/data"

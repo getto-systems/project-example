@@ -7,18 +7,18 @@ import { LoginIdFieldAction, initLoginIdFieldAction } from "../../login_id/input
 import { PasswordFieldAction, initPasswordFieldAction } from "../input/action"
 import { ValidateBoardAction } from "../../../../z_vendor/getto-application/board/validate_board/action"
 import { ObserveBoardAction } from "../../../../z_vendor/getto-application/board/observe_board/action"
-import { initRegisterField } from "../../../../z_lib/ui/register/action"
+import { initRegisterField } from "../../../../common/util/register/action"
 
-import { checkTakeLongtime } from "../../../../z_lib/ui/timer/helper"
+import { checkTakeLongtime } from "../../../../common/util/timer/helper"
 import { getScriptPath } from "../../../sign/get_script_path/method"
 import {
     startContinuousRenew,
     StartContinuousRenewConfig,
     StartContinuousRenewInfra,
     StartContinuousRenewEvent,
-} from "../../../ticket/check/method"
+} from "../../../ticket/authenticate/method"
 
-import { WaitTime } from "../../../../z_lib/ui/config/infra"
+import { WaitTime } from "../../../../common/util/config/infra"
 import { GetScriptPathConfig, GetScriptPathShell } from "../../../sign/get_script_path/infra"
 import { AuthenticatePasswordRemote } from "./infra"
 
@@ -26,7 +26,7 @@ import { LoadScriptError, ConvertScriptPathResult } from "../../../sign/get_scri
 import { AuthenticatePasswordError, AuthenticatePasswordFields } from "./data"
 import { ConvertBoardResult } from "../../../../z_vendor/getto-application/board/kernel/data"
 import { AuthTicket } from "../../../ticket/kernel/data"
-import { RepositoryError } from "../../../../z_lib/ui/repository/data"
+import { RepositoryError } from "../../../../common/util/repository/data"
 
 export interface AuthenticatePasswordAction {
     readonly state: ApplicationState<AuthenticatePasswordState>

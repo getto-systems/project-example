@@ -1,11 +1,11 @@
-use crate::z_lib::validate::data::ValidateTextError;
+use crate::common::api::validate::data::ValidateTextError;
 
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub struct ResetToken(String);
+pub struct ResetPasswordId(String);
 
-impl ResetToken {
-    pub const fn restore(token: String) -> Self {
-        Self(token)
+impl ResetPasswordId {
+    pub const fn restore(value: String) -> Self {
+        Self(value)
     }
 
     pub fn extract(self) -> String {
@@ -13,67 +13,51 @@ impl ResetToken {
     }
 }
 
-pub struct ResetTokenEncoded(String);
+pub struct ResetPasswordToken(String);
 
-impl ResetTokenEncoded {
-    pub fn convert(token: impl ResetTokenEncodedExtract) -> Result<Self, ValidateResetTokenError> {
-        Ok(Self(token.convert()?))
+impl ResetPasswordToken {
+    // TODO convert ではなく、AuthenticateToken と同じように扱いたい
+    pub fn convert(
+        value: impl ResetPasswordTokenExtract,
+    ) -> Result<Self, ValidateResetPasswordTokenError> {
+        Ok(Self(value.convert().map_err(
+            ValidateResetPasswordTokenError::ResetPasswordToken,
+        )?))
     }
 
-    pub const fn new(token: String) -> Self {
-        Self(token)
+    pub const fn restore(value: String) -> Self {
+        Self(value)
     }
 
-    pub fn as_str(&self) -> &str {
-        self.0.as_str()
+    pub fn extract(self) -> String {
+        self.0
     }
 }
 
-pub trait ResetTokenEncodedExtract {
-    fn convert(self) -> Result<String, ValidateResetTokenError>;
+pub trait ResetPasswordTokenExtract {
+    fn convert(self) -> Result<String, ValidateTextError>;
+}
+
+#[derive(Debug)]
+pub enum ValidateResetPasswordTokenError {
+    ResetPasswordToken(ValidateTextError),
+}
+
+impl std::fmt::Display for ValidateResetPasswordTokenError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::ResetPasswordToken(err) => err.fmt(f),
+        }
+    }
 }
 
 #[derive(Clone, PartialEq, Eq)]
-pub enum ResetTokenDestination {
+pub enum ResetPasswordTokenDestination {
     None,
-    Email(ResetTokenDestinationEmail),
+    Email(ResetPasswordTokenDestinationEmail),
 }
 
-impl ResetTokenDestination {
-    pub fn convert(
-        destination: ResetTokenDestinationExtract,
-    ) -> Result<ResetTokenDestination, ValidateResetTokenDestinationError> {
-        match destination {
-            ResetTokenDestinationExtract::None => Ok(ResetTokenDestination::None),
-            ResetTokenDestinationExtract::Email(email) => {
-                match ResetTokenDestinationEmail::convert(email) {
-                    Ok(email) => Ok(ResetTokenDestination::Email(email)),
-                    Err(err) => Err(ValidateResetTokenDestinationError::Email(err)),
-                }
-            }
-        }
-    }
-
-    pub(in crate::auth) fn restore(
-        destination: ResetTokenDestinationExtract,
-    ) -> ResetTokenDestination {
-        match destination {
-            ResetTokenDestinationExtract::None => ResetTokenDestination::None,
-            ResetTokenDestinationExtract::Email(email) => {
-                ResetTokenDestination::Email(ResetTokenDestinationEmail::restore(email))
-            }
-        }
-    }
-
-    pub fn extract(self) -> ResetTokenDestinationExtract {
-        match self {
-            Self::None => ResetTokenDestinationExtract::None,
-            Self::Email(email) => ResetTokenDestinationExtract::Email(email.extract()),
-        }
-    }
-}
-
-impl std::fmt::Display for ResetTokenDestination {
+impl std::fmt::Display for ResetPasswordTokenDestination {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::None => write!(f, "reset token destination: none"),
@@ -83,13 +67,15 @@ impl std::fmt::Display for ResetTokenDestination {
 }
 
 #[derive(Clone, PartialEq, Eq)]
-pub struct ResetTokenDestinationEmail(String);
+pub struct ResetPasswordTokenDestinationEmail(String);
 
-impl ResetTokenDestinationEmail {
+impl ResetPasswordTokenDestinationEmail {
     pub fn convert(
-        email: impl ResetTokenDestinationEmailExtract,
-    ) -> Result<Self, ValidateResetTokenDestinationEmailError> {
-        Ok(Self(email.convert()?))
+        email: impl ResetPasswordTokenDestinationEmailExtract,
+    ) -> Result<Self, ValidateResetPasswordTokenDestinationError> {
+        Ok(Self(email.convert().map_err(
+            ValidateResetPasswordTokenDestinationError::Email,
+        )?))
     }
 
     pub(in crate::auth) const fn restore(email: String) -> Self {
@@ -101,54 +87,27 @@ impl ResetTokenDestinationEmail {
     }
 }
 
-impl std::fmt::Display for ResetTokenDestinationEmail {
+impl std::fmt::Display for ResetPasswordTokenDestinationEmail {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "email({})", self.0)
+        write!(f, "email: {}", self.0)
     }
 }
 
-pub trait ResetTokenDestinationEmailExtract {
-    fn convert(self) -> Result<String, ValidateResetTokenDestinationEmailError>;
+pub trait ResetPasswordTokenDestinationEmailExtract {
+    fn convert(self) -> Result<String, ValidateTextError>;
 }
 
-pub enum ValidateResetTokenDestinationError {
-    Email(ValidateResetTokenDestinationEmailError),
+#[derive(Debug)]
+pub enum ValidateResetPasswordTokenDestinationError {
+    NotFound,
+    Email(ValidateTextError),
 }
 
-impl std::fmt::Display for ValidateResetTokenDestinationError {
+impl std::fmt::Display for ValidateResetPasswordTokenDestinationError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Self::Email(err) => err.fmt(f),
-        }
-    }
-}
-
-pub enum ValidateResetTokenDestinationEmailError {
-    Text(ValidateTextError),
-}
-
-impl std::fmt::Display for ValidateResetTokenDestinationEmailError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        match self {
-            Self::Text(err) => err.fmt(f),
-        }
-    }
-}
-
-#[derive(Clone)]
-pub enum ResetTokenDestinationExtract {
-    None,
-    Email(String),
-}
-
-pub enum ValidateResetTokenError {
-    Text(ValidateTextError),
-}
-
-impl std::fmt::Display for ValidateResetTokenError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        match self {
-            Self::Text(err) => err.fmt(f),
+            Self::NotFound => write!(f, "data not found"),
+            Self::Email(err) => write!(f, "reset-token-destination: email: {}", err),
         }
     }
 }

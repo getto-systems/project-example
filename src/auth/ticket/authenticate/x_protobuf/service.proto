@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package auth.ticket.authenticate.service;
+
+import "auth/ticket/x_protobuf/service.proto";
+
+service AuthenticateWithTokenPb {
+    rpc Call (AuthenticateWithTokenRequestPb) returns (AuthenticateWithTokenResponsePb);
+}
+message AuthenticateWithTokenRequestPb {}
+message AuthenticateWithTokenResponsePb {
+    auth.ticket.service.AuthPermissionGrantedPb granted = 1;
+    auth.ticket.service.AuthTokenPb token = 2;
+}
+message AuthenticateWithTokenMaskedResponsePb {
+    auth.ticket.service.AuthPermissionGrantedPb granted = 1;
+}

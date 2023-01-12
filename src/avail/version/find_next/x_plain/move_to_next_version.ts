@@ -2,7 +2,7 @@ import { FindNextVersionAction, FindNextVersionState } from "../action"
 
 import { applicationPath } from "../helper"
 
-import { ConvertLocationResult } from "../../../../z_lib/ui/location/data"
+import { ConvertLocationResult } from "../../../../common/util/location/data"
 import { ApplicationTargetPath } from "../data"
 
 type Props = Readonly<{

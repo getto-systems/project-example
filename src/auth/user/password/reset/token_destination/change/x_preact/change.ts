@@ -9,7 +9,7 @@ import {
 } from "../../../../../../../z_vendor/getto-css/preact/design/form"
 import { box } from "../../../../../../../z_vendor/getto-css/preact/design/box"
 
-import { VNodeContent } from "../../../../../../../z_lib/ui/x_preact/common"
+import { VNodeContent } from "../../../../../../../common/x_preact/vnode"
 
 import {
     takeLongtimeField,
@@ -23,11 +23,11 @@ import { ResetButton } from "../../../../../../../common/x_preact/button/reset_b
 import { ChangeButton } from "../../../../../../../common/x_preact/button/change_button"
 import { CloseButton } from "../../../../../../../common/x_preact/button/close_button"
 
-import { remoteCommonErrorReason } from "../../../../../../../z_lib/ui/remote/x_error/reason"
+import { remoteCommonErrorReason } from "../../../../../../../common/util/remote/x_error/reason"
 
 import { ChangeResetTokenDestinationAction } from "../action"
 import { ApplicationState } from "../../../../../../../z_vendor/getto-application/action/action"
-import { FocusState } from "../../../../../../../z_lib/ui/list/action"
+import { FocusState } from "../../../../../../../common/util/list/action"
 
 import { ChangeResetTokenDestinationError } from "../data"
 import { AuthUserAccount } from "../../../../../account/kernel/data"
