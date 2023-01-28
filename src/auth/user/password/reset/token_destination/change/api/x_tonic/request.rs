@@ -14,11 +14,17 @@ impl ChangeResetTokenDestinationFieldsExtract for ChangeResetTokenDestinationReq
         self,
     ) -> Result<ChangeResetTokenDestinationFields, ValidateChangeResetTokenDestinationFieldsError>
     {
-        type Error = ValidateChangeResetTokenDestinationFieldsError;
         Ok(ChangeResetTokenDestinationFields {
-            login_id: LoginId::convert(self.login_id).map_err(Error::InvalidLoginId)?,
-            from: self.from.try_into().map_err(Error::InvalidFrom)?,
-            to: self.to.try_into().map_err(Error::InvalidTo)?,
+            login_id: LoginId::convert(self.login_id)
+                .map_err(ValidateChangeResetTokenDestinationFieldsError::InvalidLoginId)?,
+            from: self
+                .from
+                .try_into()
+                .map_err(ValidateChangeResetTokenDestinationFieldsError::InvalidFrom)?,
+            to: self
+                .to
+                .try_into()
+                .map_err(ValidateChangeResetTokenDestinationFieldsError::InvalidTo)?,
         })
     }
 }

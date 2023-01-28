@@ -10,11 +10,10 @@ use crate::auth::ticket::kernel::data::{
 
 impl AuthenticateTokenExtract for &MetadataMap {
     fn convert(self) -> Result<AuthenticateToken, ValidateAuthenticateTokenError> {
-        type Error = ValidateAuthenticateTokenError;
         Ok(AuthenticateToken::restore(
             metadata(self, METADATA_AUTHENTICATE_TOKEN)
-                .map_err(Error::MetadataError)?
-                .ok_or(Error::NotFound)?
+                .map_err(ValidateAuthenticateTokenError::MetadataError)?
+                .ok_or(ValidateAuthenticateTokenError::NotFound)?
                 .to_owned(),
         ))
     }

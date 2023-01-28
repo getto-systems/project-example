@@ -9,8 +9,7 @@ impl TryFrom<Option<ResetTokenDestinationPb>> for ResetPasswordTokenDestination 
     type Error = ValidateResetPasswordTokenDestinationError;
 
     fn try_from(data: Option<ResetTokenDestinationPb>) -> Result<Self, Self::Error> {
-        type Error = ValidateResetPasswordTokenDestinationError;
-        let data = data.ok_or(Error::NotFound)?;
+        let data = data.ok_or(ValidateResetPasswordTokenDestinationError::NotFound)?;
         Ok(match data.r#type.as_str() {
             "email" => ResetPasswordTokenDestination::Email(
                 ResetPasswordTokenDestinationEmail::convert(data.email)?,
