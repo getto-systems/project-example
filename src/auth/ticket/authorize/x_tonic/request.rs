@@ -18,21 +18,19 @@ use crate::auth::ticket::{
 
 impl AuthorizeFieldsExtract for (&MetadataMap, ClarifyAuthorizeTokenRequestPb) {
     fn convert(self) -> Result<AuthorizeFields, ValidateAuthorizeFieldsError> {
-        type Error = ValidateAuthorizeFieldsError;
-
         Ok(AuthorizeFields {
-            token: decode_token(self.0).map_err(Error::Token)?,
-            required: decode_permission_required(self.1).map_err(Error::Required)?,
+            token: decode_token(self.0).map_err(ValidateAuthorizeFieldsError::Token)?,
+            required: decode_permission_required(self.1)
+                .map_err(ValidateAuthorizeFieldsError::Required)?,
         })
     }
 }
 
 fn decode_token(map: &MetadataMap) -> Result<AuthorizeToken, ValidateAuthorizeTokenError> {
-    type Error = ValidateAuthorizeTokenError;
     Ok(AuthorizeToken::restore(
         metadata(map, METADATA_AUTHORIZE_TOKEN)
-            .map_err(Error::MetadataError)?
-            .ok_or(Error::NotFound)?
+            .map_err(ValidateAuthorizeTokenError::MetadataError)?
+            .ok_or(ValidateAuthorizeTokenError::NotFound)?
             .to_owned(),
     ))
 }

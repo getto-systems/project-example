@@ -27,18 +27,19 @@ impl TryFrom<Option<AuthUserAccountPb>> for AuthUserAccount {
     type Error = ValidateAuthUserAccountError;
 
     fn try_from(data: Option<AuthUserAccountPb>) -> Result<Self, Self::Error> {
-        type Error = ValidateAuthUserAccountError;
-        let data = data.ok_or(Error::NotFound)?;
+        let data = data.ok_or(ValidateAuthUserAccountError::NotFound)?;
         Ok(Self {
-            login_id: LoginId::convert(data.login_id).map_err(Error::LoginId)?,
+            login_id: LoginId::convert(data.login_id)
+                .map_err(ValidateAuthUserAccountError::LoginId)?,
             attrs: AuthUserAccountAttrs {
-                granted: AuthPermissionGranted::convert(data.granted).map_err(Error::Granted)?,
+                granted: AuthPermissionGranted::convert(data.granted)
+                    .map_err(ValidateAuthUserAccountError::Granted)?,
                 memo: AuthUserMemo::convert(data.memo)?,
             },
             reset_token_destination: data
                 .reset_token_destination
                 .try_into()
-                .map_err(Error::ResetTokenDestination)?,
+                .map_err(ValidateAuthUserAccountError::ResetTokenDestination)?,
         })
     }
 }
