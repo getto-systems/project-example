@@ -86,7 +86,7 @@ test-api:
   before_script:
     - ln -s /apps/target
   script:
-    - cargo llvm-cov --ignore-filename-regex '(\.cargo|rustc|^api/|/[xy]_|/init/|/(main|test|init|data|infra|helper)\.rs)' | tee output.txt
+    - cargo llvm-cov --ignore-filename-regex '(\.cargo|rustc|/[xy]_|(/detail/|/test/)|/(main|feature|test|detail|data|infra|helper|proxy/action)\.rs)' | tee output.txt
     - ./api/ci/check-coverage.sh output.txt
 
 release_build-test:
