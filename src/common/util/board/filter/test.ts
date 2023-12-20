@@ -11,8 +11,17 @@ import {
     initOffsetFilterBoard,
     initSelectFilterBoard,
     initTextFilterBoard,
+    mapSelectFilterBoardFilter,
 } from "./action"
-import { SingleFilterBoardValue } from "./data"
+import { SelectFilterBoardFilter, SingleFilterBoardValue } from "./data"
+import {
+    readMultipleFilterBoardFilter,
+    readSelectFilterBoardFilter,
+    readSingleFilterBoardValue,
+    updateMultipleFilterBoardFilter,
+    updateSelectFilterBoardFilter,
+    updateSingleFilterBoardValue,
+} from "./convert"
 
 test("offset", async () => {
     const [offset, offsetInitializer] = initOffsetFilterBoard("0")
@@ -244,4 +253,50 @@ test("compose", async () => {
     pin()
 
     expect(observe.currentState()).toEqual({ hasChanged: false })
+})
+
+test("map select filter", async () => {
+    const filter: SelectFilterBoardFilter<string> = ["filter"]
+
+    expect(mapSelectFilterBoardFilter(filter, (value) => [value])).toEqual([["filter"]])
+})
+
+test("read single filter board value", async () => {
+    const url = new URL("http://localhost/index.html?filter=value")
+    expect(readSingleFilterBoardValue(url.searchParams, "filter")).toEqual(["value"])
+})
+
+test("read select filter board value", async () => {
+    const url = new URL("http://localhost/index.html?filter=value")
+    expect(readSelectFilterBoardFilter(url.searchParams, "filter", (value) => [value])).toEqual([
+        ["value"],
+    ])
+})
+
+test("read multiple filter board value", async () => {
+    const url = new URL("http://localhost/index.html?filter=value")
+    expect(readMultipleFilterBoardFilter(url.searchParams, "filter", (value) => [value])).toEqual([
+        ["value"],
+    ])
+})
+
+test("update single filter board value", async () => {
+    const url = new URL("http://localhost/index.html?filter=old")
+    expect(updateSingleFilterBoardValue(url, "filter", ["value"])).toEqual(
+        new URL("http://localhost/index.html?filter=value"),
+    )
+})
+
+test("update select filter board value", async () => {
+    const url = new URL("http://localhost/index.html?filter=old")
+    expect(updateSelectFilterBoardFilter(url, "filter", ["value"], (value) => `${value}`)).toEqual(
+        new URL("http://localhost/index.html?filter=value"),
+    )
+})
+
+test("update multiple filter board value", async () => {
+    const url = new URL("http://localhost/index.html?filter=old")
+    expect(
+        updateMultipleFilterBoardFilter(url, "filter", ["value"], (value) => `${value}`),
+    ).toEqual(new URL("http://localhost/index.html?filter=value"))
 })

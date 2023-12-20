@@ -1,7 +1,7 @@
 import { RepositoryConverter } from "../../../common/util/repository/infra"
 import { SeasonExpires, SeasonRepositoryValue } from "./infra"
 
-import { ValidateSeasonResult, Season, DetectedSeason } from "./data"
+import { Season, DetectedSeason } from "./data"
 
 export function seasonToString(data: DetectedSeason): string {
     if (data.default) {
@@ -17,21 +17,6 @@ function seasonString(
     }>,
 ): string {
     return `${season.year}.${season.period}`
-}
-
-export function seasonConverter(
-    availableSeasons: readonly Season[],
-    value: string,
-): ValidateSeasonResult {
-    if (value === "") {
-        return { valid: true, value: { default: true } }
-    }
-
-    const result = findSeason(availableSeasons, value)
-    if (!result.found) {
-        return { valid: false, err: { type: "invalid-season" } }
-    }
-    return { valid: true, value: { default: false, season: result.season } }
 }
 
 export function seasonRepositoryConverter(
